@@ -392,9 +392,9 @@ public class LexerATNSimulator extends ATNSimulator {
 				System.out.format("testing %s at %s\n", getTokenName(t), c.toString(recog, true));
 			}
 
-			int n = c.getState().getNumberOfTransitions();
-			for (int ti=0; ti<n; ti++) {               // for each transition
-				Transition trans = c.getState().transition(ti);
+			int n = c.getState().getNumberOfOptimizedTransitions();
+			for (int ti=0; ti<n; ti++) {               // for each optimized transition
+				Transition trans = c.getState().getOptimizedTransition(ti);
 				ATNState target = getReachableTarget(trans, t);
 				if ( target!=null ) {
 					closure(c.transform(target), reach);
@@ -604,8 +604,8 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		ATNState p = config.getState();
-		for (int i=0; i<p.getNumberOfTransitions(); i++) {
-			Transition t = p.transition(i);
+		for (int i=0; i<p.getNumberOfOptimizedTransitions(); i++) {
+			Transition t = p.getOptimizedTransition(i);
 			ATNConfig c = getEpsilonTarget(config, t, configs);
 			if ( c!=null ) closure(c, configs);
 		}

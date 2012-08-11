@@ -821,9 +821,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			for (int ci=0; ci<ncl; ci++) { // TODO: foreach
 				ATNConfig c = closureConfigs.get(ci);
 				if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString());
-				int n = c.getState().getNumberOfTransitions();
-				for (int ti=0; ti<n; ti++) {               // for each transition
-					Transition trans = c.getState().transition(ti);
+				int n = c.getState().getNumberOfOptimizedTransitions();
+				for (int ti=0; ti<n; ti++) {               // for each optimized transition
+					Transition trans = c.getState().getOptimizedTransition(ti);
 					ATNState target = getReachableTarget(c, trans, t);
 					if ( target!=null ) {
 						reachIntermediate.add(c.transform(target));
@@ -1291,8 +1291,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
             if ( debug ) System.out.println("added config "+configs);
         }
 
-        for (int i=0; i<p.getNumberOfTransitions(); i++) {
-            Transition t = p.transition(i);
+        for (int i=0; i<p.getNumberOfOptimizedTransitions(); i++) {
+            Transition t = p.getOptimizedTransition(i);
             boolean continueCollecting =
 				!(t instanceof ActionTransition) && collectPredicates;
             ATNConfig c = getEpsilonTarget(config, t, continueCollecting, depth == 0, contextCache);
@@ -1667,8 +1667,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		System.err.println("dead end configs: ");
 		for (ATNConfig c : nvae.deadEndConfigs) {
 			String trans = "no edges";
-			if ( c.getState().getNumberOfTransitions()>0 ) {
-				Transition t = c.getState().transition(0);
+			if ( c.getState().getNumberOfOptimizedTransitions()>0 ) {
+				Transition t = c.getState().getOptimizedTransition(0);
 				if ( t instanceof AtomTransition) {
 					AtomTransition at = (AtomTransition)t;
 					trans = "Atom "+getTokenName(at.label);
