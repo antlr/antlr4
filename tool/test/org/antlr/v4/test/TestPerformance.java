@@ -140,6 +140,7 @@ public class TestPerformance extends BaseTest {
 
     private static final boolean SHOW_CONFIG_STATS = false;
 
+	private static final boolean REPORT_SYNTAX_ERRORS = true;
 	private static final boolean REPORT_AMBIGUITIES = false;
 	private static final boolean REPORT_FULL_CONTEXT = false;
 	private static final boolean REPORT_CONTEXT_SENSITIVITY = REPORT_FULL_CONTEXT;
@@ -634,6 +635,12 @@ public class TestPerformance extends BaseTest {
                             ParseTreeWalker.DEFAULT.walk(sharedListener, (ParserRuleContext<?>)parseResult);
                         }
                     } catch (Exception e) {
+						if (BAIL_ON_ERROR && !REPORT_SYNTAX_ERRORS) {
+							if ((e.getCause() instanceof RuntimeException) && (e.getCause().getCause() instanceof RecognitionException)) {
+								return;
+							}
+						}
+
                         e.printStackTrace(System.out);
                         throw new IllegalStateException(e);
                     }
@@ -656,6 +663,10 @@ public class TestPerformance extends BaseTest {
 
 		@Override
 		public <T extends Token> void syntaxError(Recognizer<T, ?> recognizer, T offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+			if (!REPORT_SYNTAX_ERRORS) {
+				return;
+			}
+
 			String sourceName = recognizer.getInputStream().getSourceName();
 			sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName+": " : "";
 			System.err.println(sourceName+"line "+line+":"+charPositionInLine+" "+msg);
