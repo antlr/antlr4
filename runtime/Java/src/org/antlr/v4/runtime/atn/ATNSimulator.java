@@ -208,21 +208,22 @@ public abstract class ATNSimulator {
 		return atn;
 	}
 
-	private static void optimizeSets(ATN atn) {
+	private static int optimizeSets(ATN atn) {
+		int removedPaths = 0;
 		List<DecisionState> decisions = atn.decisionToState;
 		for (DecisionState decision : decisions) {
 			IntervalSet setTransitions = new IntervalSet();
-			for (int i = 0; i < decision.getNumberOfTransitions(); i++) {
-				Transition epsTransition = decision.transition(i);
+			for (int i = 0; i < decision.getNumberOfOptimizedTransitions(); i++) {
+				Transition epsTransition = decision.getOptimizedTransition(i);
 				if (!(epsTransition instanceof EpsilonTransition)) {
 					continue;
 				}
 
-				if (epsTransition.target.getNumberOfTransitions() != 1) {
+				if (epsTransition.target.getNumberOfOptimizedTransitions() != 1) {
 					continue;
 				}
 
-				Transition transition = epsTransition.target.transition(0);
+				Transition transition = epsTransition.target.getOptimizedTransition(0);
 				if (!(transition.target instanceof BlockEndState)) {
 					continue;
 				}
@@ -244,18 +245,19 @@ public abstract class ATNSimulator {
 				continue;
 			}
 
-			for (int i = 0; i < decision.getNumberOfTransitions(); i++) {
+			List<Transition> optimizedTransitions = new ArrayList<Transition>();
+			for (int i = 0; i < decision.getNumberOfOptimizedTransitions(); i++) {
 				if (!setTransitions.contains(i)) {
-					decision.addOptimizedTransition(decision.transition(i));
+					optimizedTransitions.add(decision.getOptimizedTransition(i));
 				}
 			}
 
-			ATNState blockEndState = decision.transition(setTransitions.getMinElement()).target.transition(0).target;
+			ATNState blockEndState = decision.getOptimizedTransition(setTransitions.getMinElement()).target.getOptimizedTransition(0).target;
 			IntervalSet matchSet = new IntervalSet();
 			for (int i = 0; i < setTransitions.getIntervals().size(); i++) {
 				Interval interval = setTransitions.getIntervals().get(i);
 				for (int j = interval.a; j <= interval.b; j++) {
-					Transition matchTransition = decision.transition(j).target.transition(0);
+					Transition matchTransition = decision.getOptimizedTransition(j).target.getOptimizedTransition(0);
 					if (matchTransition instanceof NotSetTransition) {
 						throw new UnsupportedOperationException("Not yet implemented.");
 					} else {
@@ -281,8 +283,26 @@ public abstract class ATNSimulator {
 			atn.addState(setOptimizedState);
 
 			setOptimizedState.addTransition(newTransition);
-			decision.addOptimizedTransition(new EpsilonTransition(setOptimizedState));
+			optimizedTransitions.add(new EpsilonTransition(setOptimizedState));
+
+			removedPaths += decision.getNumberOfOptimizedTransitions() - optimizedTransitions.size();
+
+			if (decision.isOptimized()) {
+				while (decision.getNumberOfOptimizedTransitions() > 0) {
+					decision.removeOptimizedTransition(decision.getNumberOfOptimizedTransitions() - 1);
+				}
+			}
+
+			for (Transition transition : optimizedTransitions) {
+				decision.addOptimizedTransition(transition);
+			}
 		}
+
+		if (ParserATNSimulator.debug) {
+			System.out.println("ATN runtime optimizer removed " + removedPaths + " paths by collapsing sets.");
+		}
+
+		return removedPaths;
 	}
 
 	public static int toInt(char c) {
