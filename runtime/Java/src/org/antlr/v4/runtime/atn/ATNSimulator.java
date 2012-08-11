@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Tuple;
@@ -203,7 +204,85 @@ public abstract class ATNSimulator {
 			decState.isGreedy = isGreedy==1;
 		}
 
+		optimizeSets(atn);
 		return atn;
+	}
+
+	private static void optimizeSets(ATN atn) {
+		List<DecisionState> decisions = atn.decisionToState;
+		for (DecisionState decision : decisions) {
+			IntervalSet setTransitions = new IntervalSet();
+			for (int i = 0; i < decision.getNumberOfTransitions(); i++) {
+				Transition epsTransition = decision.transition(i);
+				if (!(epsTransition instanceof EpsilonTransition)) {
+					continue;
+				}
+
+				if (epsTransition.target.getNumberOfTransitions() != 1) {
+					continue;
+				}
+
+				Transition transition = epsTransition.target.transition(0);
+				if (!(transition.target instanceof BlockEndState)) {
+					continue;
+				}
+
+				if (transition instanceof NotSetTransition) {
+					// TODO: not yet implemented
+					continue;
+				}
+
+				if (transition instanceof AtomTransition
+					|| transition instanceof RangeTransition
+					|| transition instanceof SetTransition)
+				{
+					setTransitions.add(i);
+				}
+			}
+
+			if (setTransitions.size() <= 1) {
+				continue;
+			}
+
+			for (int i = 0; i < decision.getNumberOfTransitions(); i++) {
+				if (!setTransitions.contains(i)) {
+					decision.addOptimizedTransition(decision.transition(i));
+				}
+			}
+
+			ATNState blockEndState = decision.transition(setTransitions.getMinElement()).target.transition(0).target;
+			IntervalSet matchSet = new IntervalSet();
+			for (int i = 0; i < setTransitions.getIntervals().size(); i++) {
+				Interval interval = setTransitions.getIntervals().get(i);
+				for (int j = interval.a; j <= interval.b; j++) {
+					Transition matchTransition = decision.transition(j).target.transition(0);
+					if (matchTransition instanceof NotSetTransition) {
+						throw new UnsupportedOperationException("Not yet implemented.");
+					} else {
+						matchSet.addAll(matchTransition.label());
+					}
+				}
+			}
+
+			Transition newTransition;
+			if (matchSet.getIntervals().size() == 1) {
+				if (matchSet.size() == 1) {
+					newTransition = new AtomTransition(blockEndState, matchSet.getMinElement());
+				} else {
+					Interval matchInterval = matchSet.getIntervals().get(0);
+					newTransition = new RangeTransition(blockEndState, matchInterval.a, matchInterval.b);
+				}
+			} else {
+				newTransition = new SetTransition(blockEndState, matchSet);
+			}
+
+			ATNState setOptimizedState = new ATNState();
+			setOptimizedState.setRuleIndex(decision.ruleIndex);
+			atn.addState(setOptimizedState);
+
+			setOptimizedState.addTransition(newTransition);
+			decision.addOptimizedTransition(new EpsilonTransition(setOptimizedState));
+		}
 	}
 
 	public static int toInt(char c) {
