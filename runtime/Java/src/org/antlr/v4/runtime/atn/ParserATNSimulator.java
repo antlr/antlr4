@@ -252,6 +252,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	public boolean optimize_unique_closure = true;
 	public boolean optimize_ll1 = true;
+	public boolean optimize_implicit_contexts = true;
+	private final BitSet implicit_context_rules;
 
 	public static boolean optimize_closure_busy = true;
 
@@ -301,6 +303,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		//		DOTGenerator dot = new DOTGenerator(null);
 		//		System.out.println(dot.getDOT(atn.rules.get(0), parser.getRuleNames()));
 		//		System.out.println(dot.getDOT(atn.rules.get(1), parser.getRuleNames()));
+
+		implicit_context_rules = new BitSet(atn.ruleToStopState.length);
+		for (int i = 0; i < atn.ruleToStartState.length; i++) {
+			if (atn.ruleToStopState[i].getNumberOfTransitions() == 1) {
+				implicit_context_rules.set(i);
+			}
+		}
 	}
 
 	@Override
@@ -385,7 +394,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			return new SimulatorState<Symbol>(outerContext, dfa.s0, false, outerContext);
 		}
 
-		RuleContext<Symbol> remainingContext = outerContext;
+		RuleContext<Symbol> remainingContext = getInitialContext(outerContext);
 		assert outerContext != null;
 		DFAState s0 = dfa.s0full;
 		while (remainingContext != null && s0 != null && s0.isCtxSensitive) {
@@ -394,7 +403,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				assert s0 == null || !s0.isCtxSensitive;
 			}
 			else {
-				remainingContext = remainingContext.parent;
+				remainingContext = getParent(remainingContext);
 			}
 		}
 
@@ -463,7 +472,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						return execATN(dfa, input, startIndex, initialState);
 					}
 
-					remainingOuterContext = (ParserRuleContext<Symbol>)remainingOuterContext.parent;
+					remainingOuterContext = (ParserRuleContext<Symbol>)getParent(remainingOuterContext);
 					s = next;
 				}
 			}
@@ -844,7 +853,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if (remainingGlobalContext.isEmpty()) {
 					remainingGlobalContext = null;
 				} else {
-					remainingGlobalContext = remainingGlobalContext.parent;
+					remainingGlobalContext = getParent(remainingGlobalContext);
 				}
 
 				contextElements.add(nextContextElement);
@@ -888,7 +897,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		final ATNState p = dfa.atnStartState;
 
 		int previousContext = 0;
-		RuleContext<Symbol> remainingGlobalContext = globalContext;
+		RuleContext<Symbol> remainingGlobalContext = getInitialContext(globalContext);
 		PredictionContext initialContext = useContext ? PredictionContext.EMPTY_FULL : PredictionContext.EMPTY_LOCAL; // always at least the implicit call to start rule
 		PredictionContextCache contextCache = new PredictionContextCache();
 		if (useContext) {
@@ -900,10 +909,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					remainingGlobalContext = null;
 				}
 				else {
-					next = s0.getContextTarget(getInvokingState(remainingGlobalContext));
 					previousContext = getInvokingState(remainingGlobalContext);
-					initialContext = initialContext.appendContext(getInvokingState(remainingGlobalContext), contextCache);
-					remainingGlobalContext = remainingGlobalContext.parent;
+					next = s0.getContextTarget(previousContext);
+					initialContext = initialContext.appendContext(previousContext, contextCache);
+					remainingGlobalContext = getParent(remainingGlobalContext);
 				}
 
 				if (next == null) {
@@ -971,7 +980,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if (remainingGlobalContext.isEmpty()) {
 				remainingGlobalContext = null;
 			} else {
-				remainingGlobalContext = remainingGlobalContext.parent;
+				remainingGlobalContext = getParent(remainingGlobalContext);
 			}
 
 			if (nextContextElement != PredictionContext.EMPTY_FULL_STATE_KEY) {
@@ -1228,6 +1237,15 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				configs.add(config, contextCache);
 				return;
 			}
+
+			boolean keepContext = keepContext(config.getState());
+			if (keepContext) {
+				// the step out operates as a continuation of the current rule, but at a different depth
+				ATNConfig c = config.transform(config.getState().transition(0).target);
+				closure(c, configs, intermediate, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContexts, contextCache, depth - 1);
+				return;
+			}
+
 			// We hit rule end. If we have context info, use it
 			if ( config.getContext()!=null && !config.getContext().isEmpty() ) {
 				int nonEmptySize = config.getContext().size() - (hasEmpty ? 1 : 0);
@@ -1318,12 +1336,15 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 				int newDepth = depth;
 				if ( config.getState() instanceof RuleStopState ) {
-					// target fell off end of rule; mark resulting c as having dipped into outer context
-					// We can't get here if incoming config was rule stop and we had context
-					// track how far we dip into outer context.  Might
-					// come in handy and we avoid evaluating context dependent
-					// preds if this is > 0.
-					c.setOuterContextDepth(c.getOuterContextDepth() + 1);
+					if (!keepContext(config.getState())) {
+						// target fell off end of rule; mark resulting c as having dipped into outer context
+						// We can't get here if incoming config was rule stop and we had context
+						// track how far we dip into outer context.  Might
+						// come in handy and we avoid evaluating context dependent
+						// preds if this is > 0.
+						c.setOuterContextDepth(c.getOuterContextDepth() + 1);
+					}
+
 					assert newDepth > Integer.MIN_VALUE;
 					newDepth--;
 					if ( debug ) System.out.println("dips into outer ctx: "+c);
@@ -1409,9 +1430,14 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			System.out.println("CALL rule "+getRuleName(t.target.ruleIndex)+
 							   ", ctx="+config.getContext());
 		}
+
 		ATNState p = config.getState();
 		PredictionContext newContext;
-		if (contextCache != null) {
+
+		if (keepContext(t.target)) {
+			newContext = config.getContext();
+		}
+		else if (contextCache != null) {
 			newContext = contextCache.getChild(config.getContext(), p.stateNumber);
 		}
 		else {
@@ -1419,6 +1445,14 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 
 		return config.transform(t.target, newContext);
+	}
+
+	private boolean keepContext(int ruleIndex) {
+		return optimize_implicit_contexts && implicit_context_rules.get(ruleIndex);
+	}
+
+	private boolean keepContext(ATNState state) {
+		return keepContext(state.ruleIndex);
 	}
 
 	/**
@@ -1834,11 +1868,35 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
                                                                      ambigAlts, configs);
     }
 
-	protected int getInvokingState(RuleContext<?> context) {
+	protected final int getInvokingState(RuleContext<?> context) {
 		if (context.isEmpty()) {
 			return PredictionContext.EMPTY_FULL_STATE_KEY;
 		}
-		
+
 		return context.invokingState;
 	}
+
+	protected final RuleContext<Symbol> getInitialContext(RuleContext<Symbol> context) {
+		if (!optimize_implicit_contexts) {
+			return context;
+		}
+
+		while (true) {
+			if (context == null || context.isEmpty()) {
+				return context;
+			}
+
+			if (keepContext(context.getRuleIndex())) {
+				context = context.getParent();
+				continue;
+			}
+
+			return context;
+		}
+	}
+
+	protected final RuleContext<Symbol> getParent(RuleContext<Symbol> context) {
+		return getInitialContext(context.getParent());
+	}
+
 }
