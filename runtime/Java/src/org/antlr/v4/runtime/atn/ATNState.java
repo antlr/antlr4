@@ -100,6 +100,8 @@ public class ATNState {
 	protected final List<Transition> transitions =
 		new ArrayList<Transition>(INITIAL_NUM_TRANSITIONS);
 
+	protected List<Transition> optimizedTransitions = transitions;
+
 	/** Used to cache lookahead during parsing, not used during construction */
     public IntervalSet nextTokenWithinRule;
 
@@ -118,7 +120,9 @@ public class ATNState {
 		return String.valueOf(stateNumber);
 	}
 
-	public int getNumberOfTransitions() { return transitions.size(); }
+	public int getNumberOfTransitions() {
+		return transitions.size();
+	}
 
 	public void addTransition(Transition e) {
 		if (transitions.isEmpty()) {
@@ -132,7 +136,9 @@ public class ATNState {
 		transitions.add(e);
 	}
 
-	public Transition transition(int i) { return transitions.get(i); }
+	public Transition transition(int i) {
+		return transitions.get(i);
+	}
 
 	public void setTransition(int i, Transition e) {
 		transitions.set(i, e);
@@ -151,4 +157,41 @@ public class ATNState {
 	}
 
 	public void setRuleIndex(int ruleIndex) { this.ruleIndex = ruleIndex; }
+
+	public boolean isOptimized() {
+		return optimizedTransitions != transitions;
+	}
+
+	public int getNumberOfOptimizedTransitions() {
+		return optimizedTransitions.size();
+	}
+
+	public Transition getOptimizedTransition(int i) {
+		return optimizedTransitions.get(i);
+	}
+
+	public void addOptimizedTransition(Transition e) {
+		if (!isOptimized()) {
+			optimizedTransitions = new ArrayList<Transition>();
+		}
+
+		optimizedTransitions.add(e);
+	}
+
+	public void setOptimizedTransition(int i, Transition e) {
+		if (!isOptimized()) {
+			throw new IllegalStateException();
+		}
+
+		optimizedTransitions.set(i, e);
+	}
+
+	public void removeOptimizedTransition(int i) {
+		if (!isOptimized()) {
+			throw new IllegalStateException();
+		}
+
+		optimizedTransitions.remove(i);
+	}
+
 }
