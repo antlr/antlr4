@@ -615,7 +615,7 @@ public class TestPerformance extends BaseTest {
 								sharedParser.setInterpreter(new NonCachingParserATNSimulator<Token>(sharedParser, sharedParser.getATN()));
 							}
 							sharedParser.getInterpreter().disable_global_context = false;
-							sharedParser.getInterpreter().force_global_context = false;
+							sharedParser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT;
 							sharedParser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
 							sharedParser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
 							sharedParser.getInterpreter().optimize_implicit_contexts = OPTIMIZE_IMPLICIT_CONTEXTS;
