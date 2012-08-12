@@ -78,6 +78,7 @@ public abstract class ATNSimulator {
 		// STATES
 		//
 		List<Tuple2<LoopEndState, Integer>> loopBackStateNumbers = new ArrayList<Tuple2<LoopEndState, Integer>>();
+		List<Tuple2<BlockStartState, Integer>> endStateNumbers = new ArrayList<Tuple2<BlockStartState, Integer>>();
 		int nstates = toInt(data[p++]);
 		for (int i=1; i<=nstates; i++) {
 			int stype = toInt(data[p++]);
@@ -92,12 +93,20 @@ public abstract class ATNSimulator {
 				int loopBackStateNumber = toInt(data[p++]);
 				loopBackStateNumbers.add(Tuple.create((LoopEndState)s, loopBackStateNumber));
 			}
+			else if (s instanceof BlockStartState) {
+				int endStateNumber = toInt(data[p++]);
+				endStateNumbers.add(Tuple.create((BlockStartState)s, endStateNumber));
+			}
 			atn.addState(s);
 		}
 
-		// delay the assignment of loop back states until we know all the state instances have been initialized
+		// delay the assignment of loop back and end states until we know all the state instances have been initialized
 		for (Tuple2<LoopEndState, Integer> pair : loopBackStateNumbers) {
 			pair.getItem1().loopBackState = atn.states.get(pair.getItem2());
+		}
+
+		for (Tuple2<BlockStartState, Integer> pair : endStateNumbers) {
+			pair.getItem1().endState = (BlockEndState)atn.states.get(pair.getItem2());
 		}
 
 		//
@@ -191,6 +200,27 @@ public abstract class ATNSimulator {
 			}
 		}
 
+		for (ATNState state : atn.states) {
+			if (state instanceof PlusLoopbackState) {
+				PlusLoopbackState loopbackState = (PlusLoopbackState)state;
+				for (int i = 0; i < loopbackState.getNumberOfTransitions(); i++) {
+					ATNState target = loopbackState.transition(i).target;
+					if (target instanceof PlusBlockStartState) {
+						((PlusBlockStartState)target).loopBackState = loopbackState;
+					}
+				}
+			}
+			else if (state instanceof StarLoopbackState) {
+				StarLoopbackState loopbackState = (StarLoopbackState)state;
+				for (int i = 0; i < loopbackState.getNumberOfTransitions(); i++) {
+					ATNState target = loopbackState.transition(i).target;
+					if (target instanceof StarLoopEntryState) {
+						((StarLoopEntryState)target).loopBackState = loopbackState;
+					}
+				}
+			}
+		}
+
 		//
 		// DECISIONS
 		//
@@ -214,7 +244,54 @@ public abstract class ATNSimulator {
 			}
 		}
 
+		verifyATN(atn);
 		return atn;
+	}
+
+	private static void verifyATN(ATN atn) {
+		// verify assumptions
+		for (ATNState state : atn.states) {
+			if (state == null) {
+				continue;
+			}
+
+			if (state instanceof PlusBlockStartState) {
+				if (((PlusBlockStartState)state).loopBackState == null) {
+					throw new IllegalStateException();
+				}
+			}
+
+			if (state instanceof StarLoopEntryState) {
+				if (((StarLoopEntryState)state).loopBackState == null) {
+					throw new IllegalStateException();
+				}
+			}
+
+			if (state instanceof LoopEndState) {
+				if (((LoopEndState)state).loopBackState == null) {
+					throw new IllegalStateException();
+				}
+			}
+
+			if (state instanceof RuleStartState) {
+				if (((RuleStartState)state).stopState == null) {
+					throw new IllegalStateException();
+				}
+			}
+
+			if (state instanceof BlockStartState) {
+				if (((BlockStartState)state).endState == null) {
+					throw new IllegalStateException();
+				}
+			}
+
+			if (state instanceof DecisionState) {
+				DecisionState decisionState = (DecisionState)state;
+				if (decisionState.getNumberOfTransitions() > 1 && decisionState.decision < 0) {
+					throw new IllegalStateException();
+				}
+			}
+		}
 	}
 
 	private static int inlineSetRules(ATN atn) {

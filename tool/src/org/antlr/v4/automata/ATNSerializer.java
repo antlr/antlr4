@@ -89,7 +89,12 @@ public class ATNSerializer {
 			}
 			data.add(s.getStateType());
 			data.add(s.ruleIndex);
-			if ( s.getStateType() == ATNState.LOOP_END ) data.add(((LoopEndState)s).loopBackState.stateNumber);
+			if ( s.getStateType() == ATNState.LOOP_END ) {
+				data.add(((LoopEndState)s).loopBackState.stateNumber);
+			}
+			else if ( s instanceof BlockStartState ) {
+				data.add(((BlockStartState)s).endState.stateNumber);
+			}
 			nedges += s.getNumberOfTransitions();
 			for (int i=0; i<s.getNumberOfTransitions(); i++) {
 				Transition t = s.transition(i);
@@ -212,6 +217,10 @@ public class ATNSerializer {
 			if ( stype == ATNState.LOOP_END ) {
 				int loopBackStateNumber = ATNSimulator.toInt(data[p++]);
 				arg = " "+loopBackStateNumber;
+			}
+			else if ( stype == ATNState.PLUS_BLOCK_START || stype == ATNState.STAR_BLOCK_START ) {
+				int endStateNumber = ATNSimulator.toInt(data[p++]);
+				arg = " "+endStateNumber;
 			}
 			buf.append(i - 1).append(":")
 				.append(ATNState.serializationNames.get(stype)).append(" ")
