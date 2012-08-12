@@ -120,6 +120,17 @@ public abstract class ATNSimulator {
 			}
 		}
 
+		atn.ruleToStopState = new RuleStopState[nrules];
+		for (ATNState state : atn.states) {
+			if (!(state instanceof RuleStopState)) {
+				continue;
+			}
+
+			RuleStopState stopState = (RuleStopState)state;
+			atn.ruleToStopState[state.ruleIndex] = stopState;
+			atn.ruleToStartState[state.ruleIndex].stopState = stopState;
+		}
+
 		//
 		// MODES
 		//
@@ -163,6 +174,20 @@ public abstract class ATNSimulator {
 			ATNState srcState = atn.states.get(src);
 			srcState.addTransition(trans);
 			p += 6;
+		}
+
+		if (atn.grammarType == ATN.LEXER) {
+			for (ATNState state : atn.states) {
+				for (int i = 0; i < state.getNumberOfTransitions(); i++) {
+					Transition t = state.transition(i);
+					if (!(t instanceof RuleTransition)) {
+						continue;
+					}
+
+					RuleTransition ruleTransition = (RuleTransition)t;
+					atn.ruleToStopState[ruleTransition.target.ruleIndex].addTransition(new EpsilonTransition(ruleTransition.followState));
+				}
+			}
 		}
 
 		//
