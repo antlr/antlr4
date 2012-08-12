@@ -222,7 +222,54 @@ public abstract class ATNSimulator {
 			decState.isGreedy = isGreedy==1;
 		}
 
+		verifyATN(atn);
 		return atn;
+	}
+
+	private static void verifyATN(ATN atn) {
+		// verify assumptions
+		for (ATNState state : atn.states) {
+			if (state == null) {
+				continue;
+			}
+
+			if (state instanceof PlusBlockStartState) {
+				if (((PlusBlockStartState)state).loopBackState == null) {
+					throw new IllegalStateException();
+				}
+			}
+
+			if (state instanceof StarLoopEntryState) {
+				if (((StarLoopEntryState)state).loopBackState == null) {
+					throw new IllegalStateException();
+				}
+			}
+
+			if (state instanceof LoopEndState) {
+				if (((LoopEndState)state).loopBackState == null) {
+					throw new IllegalStateException();
+				}
+			}
+
+			if (state instanceof RuleStartState) {
+				if (((RuleStartState)state).stopState == null) {
+					throw new IllegalStateException();
+				}
+			}
+
+			if (state instanceof BlockStartState) {
+				if (((BlockStartState)state).endState == null) {
+					throw new IllegalStateException();
+				}
+			}
+
+			if (state instanceof DecisionState) {
+				DecisionState decisionState = (DecisionState)state;
+				if (decisionState.getNumberOfTransitions() > 1 && decisionState.decision < 0) {
+					throw new IllegalStateException();
+				}
+			}
+		}
 	}
 
 	public static int toInt(char c) {
