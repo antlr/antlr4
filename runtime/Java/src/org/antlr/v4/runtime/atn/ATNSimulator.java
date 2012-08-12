@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Tuple;
@@ -203,7 +204,307 @@ public abstract class ATNSimulator {
 			decState.isGreedy = isGreedy==1;
 		}
 
+		while (true) {
+			int optimizationCount = 0;
+			optimizationCount += inlineSetRules(atn);
+			optimizationCount += combineChainedEpsilons(atn);
+			optimizationCount += optimizeSets(atn);
+			if (optimizationCount == 0) {
+				break;
+			}
+		}
+
 		return atn;
+	}
+
+	private static int inlineSetRules(ATN atn) {
+		int inlinedCalls = 0;
+
+		Transition[] ruleToInlineTransition = new Transition[atn.ruleToStartState.length];
+		for (int i = 0; i < atn.ruleToStartState.length; i++) {
+			RuleStartState startState = atn.ruleToStartState[i];
+			ATNState middleState = startState;
+			while (middleState.onlyHasEpsilonTransitions()
+				&& middleState.getNumberOfOptimizedTransitions() == 1
+				&& middleState.getOptimizedTransition(0).getSerializationType() == Transition.EPSILON)
+			{
+				middleState = middleState.getOptimizedTransition(0).target;
+			}
+
+			if (middleState.getNumberOfOptimizedTransitions() != 1) {
+				continue;
+			}
+
+			Transition matchTransition = middleState.getOptimizedTransition(0);
+			ATNState matchTarget = matchTransition.target;
+			if (matchTransition.isEpsilon()
+				|| !matchTarget.onlyHasEpsilonTransitions()
+				|| matchTarget.getNumberOfOptimizedTransitions() != 1
+				|| !(matchTarget.getOptimizedTransition(0).target instanceof RuleStopState))
+			{
+				continue;
+			}
+
+			switch (matchTransition.getSerializationType()) {
+			case Transition.ATOM:
+			case Transition.RANGE:
+			case Transition.SET:
+				ruleToInlineTransition[i] = matchTransition;
+				break;
+
+			case Transition.NOT_SET:
+			case Transition.WILDCARD:
+				// not implemented yet
+				continue;
+
+			default:
+				continue;
+			}
+		}
+
+		for (int stateNumber = 0; stateNumber < atn.states.size(); stateNumber++) {
+			ATNState state = atn.states.get(stateNumber);
+			if (state.ruleIndex < 0) {
+				continue;
+			}
+
+			List<Transition> optimizedTransitions = null;
+			for (int i = 0; i < state.getNumberOfOptimizedTransitions(); i++) {
+				Transition transition = state.getOptimizedTransition(i);
+				if (!(transition instanceof RuleTransition)) {
+					if (optimizedTransitions != null) {
+						optimizedTransitions.add(transition);
+					}
+
+					continue;
+				}
+
+				RuleTransition ruleTransition = (RuleTransition)transition;
+				Transition effective = ruleToInlineTransition[ruleTransition.target.ruleIndex];
+				if (effective == null) {
+					if (optimizedTransitions != null) {
+						optimizedTransitions.add(transition);
+					}
+
+					continue;
+				}
+
+				if (optimizedTransitions == null) {
+					optimizedTransitions = new ArrayList<Transition>();
+					for (int j = 0; j < i; j++) {
+						optimizedTransitions.add(state.getOptimizedTransition(i));
+					}
+				}
+
+				inlinedCalls++;
+				ATNState target = ruleTransition.followState;
+				ATNState intermediateState = new ATNState();
+				intermediateState.setRuleIndex(target.ruleIndex);
+				atn.addState(intermediateState);
+				optimizedTransitions.add(new EpsilonTransition(intermediateState));
+
+				switch (effective.getSerializationType()) {
+				case Transition.ATOM:
+					intermediateState.addTransition(new AtomTransition(target, ((AtomTransition)effective).label));
+					break;
+
+				case Transition.RANGE:
+					intermediateState.addTransition(new RangeTransition(target, ((RangeTransition)effective).from, ((RangeTransition)effective).to));
+					break;
+
+				case Transition.SET:
+					intermediateState.addTransition(new SetTransition(target, effective.label()));
+					break;
+
+				default:
+					throw new UnsupportedOperationException();
+				}
+			}
+
+			if (optimizedTransitions != null) {
+				if (state.isOptimized()) {
+					while (state.getNumberOfOptimizedTransitions() > 0) {
+						state.removeOptimizedTransition(state.getNumberOfOptimizedTransitions() - 1);
+					}
+				}
+
+				for (Transition transition : optimizedTransitions) {
+					state.addOptimizedTransition(transition);
+				}
+			}
+		}
+
+		if (ParserATNSimulator.debug) {
+			System.out.println("ATN runtime optimizer removed " + inlinedCalls + " rule invocations by inlining sets.");
+		}
+
+		return inlinedCalls;
+	}
+
+	private static int combineChainedEpsilons(ATN atn) {
+		int removedEdges = 0;
+
+		nextState:
+		for (ATNState state : atn.states) {
+			if (!state.onlyHasEpsilonTransitions() || state instanceof RuleStopState) {
+				continue;
+			}
+
+			List<Transition> optimizedTransitions = null;
+			nextTransition:
+			for (int i = 0; i < state.getNumberOfOptimizedTransitions(); i++) {
+				Transition transition = state.getOptimizedTransition(i);
+				ATNState intermediate = transition.target;
+				if (transition.getSerializationType() != Transition.EPSILON
+					|| intermediate.getStateType() != ATNState.BASIC
+					|| !intermediate.onlyHasEpsilonTransitions())
+				{
+					if (optimizedTransitions != null) {
+						optimizedTransitions.add(transition);
+					}
+
+					continue nextTransition;
+				}
+
+				for (int j = 0; j < intermediate.getNumberOfOptimizedTransitions(); j++) {
+					if (intermediate.getOptimizedTransition(j).getSerializationType() != Transition.EPSILON) {
+						if (optimizedTransitions != null) {
+							optimizedTransitions.add(transition);
+						}
+
+						continue nextTransition;
+					}
+				}
+
+				removedEdges++;
+				if (optimizedTransitions == null) {
+					optimizedTransitions = new ArrayList<Transition>();
+					for (int j = 0; j < i; j++) {
+						optimizedTransitions.add(state.getOptimizedTransition(j));
+					}
+				}
+
+				for (int j = 0; j < intermediate.getNumberOfOptimizedTransitions(); j++) {
+					ATNState target = intermediate.getOptimizedTransition(j).target;
+					optimizedTransitions.add(new EpsilonTransition(target));
+				}
+			}
+
+			if (optimizedTransitions != null) {
+				if (state.isOptimized()) {
+					while (state.getNumberOfOptimizedTransitions() > 0) {
+						state.removeOptimizedTransition(state.getNumberOfOptimizedTransitions() - 1);
+					}
+				}
+
+				for (Transition transition : optimizedTransitions) {
+					state.addOptimizedTransition(transition);
+				}
+			}
+		}
+
+		if (ParserATNSimulator.debug) {
+			System.out.println("ATN runtime optimizer removed " + removedEdges + " transitions by combining chained epsilon transitions.");
+		}
+
+		return removedEdges;
+	}
+
+	private static int optimizeSets(ATN atn) {
+		int removedPaths = 0;
+		List<DecisionState> decisions = atn.decisionToState;
+		for (DecisionState decision : decisions) {
+			IntervalSet setTransitions = new IntervalSet();
+			for (int i = 0; i < decision.getNumberOfOptimizedTransitions(); i++) {
+				Transition epsTransition = decision.getOptimizedTransition(i);
+				if (!(epsTransition instanceof EpsilonTransition)) {
+					continue;
+				}
+
+				if (epsTransition.target.getNumberOfOptimizedTransitions() != 1) {
+					continue;
+				}
+
+				Transition transition = epsTransition.target.getOptimizedTransition(0);
+				if (!(transition.target instanceof BlockEndState)) {
+					continue;
+				}
+
+				if (transition instanceof NotSetTransition) {
+					// TODO: not yet implemented
+					continue;
+				}
+
+				if (transition instanceof AtomTransition
+					|| transition instanceof RangeTransition
+					|| transition instanceof SetTransition)
+				{
+					setTransitions.add(i);
+				}
+			}
+
+			if (setTransitions.size() <= 1) {
+				continue;
+			}
+
+			List<Transition> optimizedTransitions = new ArrayList<Transition>();
+			for (int i = 0; i < decision.getNumberOfOptimizedTransitions(); i++) {
+				if (!setTransitions.contains(i)) {
+					optimizedTransitions.add(decision.getOptimizedTransition(i));
+				}
+			}
+
+			ATNState blockEndState = decision.getOptimizedTransition(setTransitions.getMinElement()).target.getOptimizedTransition(0).target;
+			IntervalSet matchSet = new IntervalSet();
+			for (int i = 0; i < setTransitions.getIntervals().size(); i++) {
+				Interval interval = setTransitions.getIntervals().get(i);
+				for (int j = interval.a; j <= interval.b; j++) {
+					Transition matchTransition = decision.getOptimizedTransition(j).target.getOptimizedTransition(0);
+					if (matchTransition instanceof NotSetTransition) {
+						throw new UnsupportedOperationException("Not yet implemented.");
+					} else {
+						matchSet.addAll(matchTransition.label());
+					}
+				}
+			}
+
+			Transition newTransition;
+			if (matchSet.getIntervals().size() == 1) {
+				if (matchSet.size() == 1) {
+					newTransition = new AtomTransition(blockEndState, matchSet.getMinElement());
+				} else {
+					Interval matchInterval = matchSet.getIntervals().get(0);
+					newTransition = new RangeTransition(blockEndState, matchInterval.a, matchInterval.b);
+				}
+			} else {
+				newTransition = new SetTransition(blockEndState, matchSet);
+			}
+
+			ATNState setOptimizedState = new ATNState();
+			setOptimizedState.setRuleIndex(decision.ruleIndex);
+			atn.addState(setOptimizedState);
+
+			setOptimizedState.addTransition(newTransition);
+			optimizedTransitions.add(new EpsilonTransition(setOptimizedState));
+
+			removedPaths += decision.getNumberOfOptimizedTransitions() - optimizedTransitions.size();
+
+			if (decision.isOptimized()) {
+				while (decision.getNumberOfOptimizedTransitions() > 0) {
+					decision.removeOptimizedTransition(decision.getNumberOfOptimizedTransitions() - 1);
+				}
+			}
+
+			for (Transition transition : optimizedTransitions) {
+				decision.addOptimizedTransition(transition);
+			}
+		}
+
+		if (ParserATNSimulator.debug) {
+			System.out.println("ATN runtime optimizer removed " + removedPaths + " paths by collapsing sets.");
+		}
+
+		return removedPaths;
 	}
 
 	public static int toInt(char c) {
