@@ -42,6 +42,7 @@ import org.antlr.v4.runtime.misc.Nullable;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.BitSet;
 
 /** "dup" of ParserInterpreter */
 public class LexerATNSimulator extends ATNSimulator {
@@ -49,6 +50,9 @@ public class LexerATNSimulator extends ATNSimulator {
 	public static boolean debug = false;
 	public static boolean dfa_debug = false;
 	public static final int MAX_DFA_EDGE = 127; // forces unicode to stay in ATN
+
+	public boolean optimize_implicit_contexts = true;
+	private final BitSet implicit_context_rules = new BitSet();
 
 	private boolean trace = false;
 	private OutputStream traceStream = null;
@@ -123,6 +127,15 @@ public class LexerATNSimulator extends ATNSimulator {
 			dfa[i] = new DFA(atn.modeToStartState.get(i));
 		}
 		this.recog = recog;
+
+		for (int i = 0; i < atn.ruleToStartState.length; i++) {
+			if (atn.ruleToStopState[i].getNumberOfTransitions() == 1
+				&& atn.ruleToActionIndex[i] == -1
+				&& atn.ruleToTokenType[i] == Token.INVALID_TYPE) {
+
+				implicit_context_rules.set(i);
+			}
+		}
 	}
 
 	public void copyState(@NotNull LexerATNSimulator simulator) {
@@ -559,18 +572,27 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 			}
 
-			if ( config.getContext() == null || config.getContext().isEmpty() ) {
+			// keepContext only for fragment rule referenced from only one location
+			boolean keepContext = keepContext((RuleStopState)config.getState());
+			PredictionContext context = config.getContext();
+			if ( context.isEmpty() && !keepContext ) {
 				configs.add(config);
 				return;
 			}
 
-			for (int i = 0; i < config.getContext().size(); i++) {
-				PredictionContext newContext = config.getContext().getParent(i); // "pop" invoking state
-				ATNState invokingState = atn.states.get(config.getContext().getInvokingState(i));
-				RuleTransition rt = (RuleTransition)invokingState.transition(0);
-				ATNState retState = rt.followState;
-				ATNConfig c = ATNConfig.create(retState, config.getAlt(), newContext);
+			if (keepContext) {
+				ATNConfig c = config.transform(config.getState().transition(0).target);
 				closure(c, configs);
+			}
+			else {
+				for (int i = 0; i < context.size(); i++) {
+					PredictionContext newContext = context.getParent(i); // "pop" invoking state
+					ATNState invokingState = atn.states.get(context.getInvokingState(i));
+					RuleTransition rt = (RuleTransition)invokingState.transition(0);
+					ATNState retState = rt.followState;
+					ATNConfig c = ATNConfig.create(retState, config.getAlt(), newContext);
+					closure(c, configs);
+				}
 			}
 
 			return;
@@ -600,11 +622,16 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		switch (t.getSerializationType()) {
 		case Transition.RULE:
-			PredictionContext newContext =
-				config.getContext().getChild(p.stateNumber);
-			c = config.transform(t.target, newContext);
+			if (keepContext(t.target.ruleIndex)) {
+				c = config.transform(t.target);
+			}
+			else {
+				PredictionContext newContext = config.getContext().getChild(p.stateNumber);
+				c = config.transform(t.target, newContext);
+			}
+
 			break;
-			
+
 		case Transition.PREDICATE:
 			if (recog == null) {
 				System.out.format("Predicates cannot be evaluated without a recognizer; assuming true.\n");
@@ -657,6 +684,14 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		return c;
+	}
+
+	private boolean keepContext(int ruleIndex) {
+		return optimize_implicit_contexts && implicit_context_rules.get(ruleIndex);
+	}
+
+	private boolean keepContext(RuleStopState state) {
+		return keepContext(state.ruleIndex);
 	}
 
 	protected int failOverToATN(@NotNull CharStream input, @NotNull DFAState s) {

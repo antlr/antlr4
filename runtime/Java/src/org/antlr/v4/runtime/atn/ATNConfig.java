@@ -57,12 +57,12 @@ public class ATNConfig {
 	 *  with this config.  We track only those contexts pushed during
 	 *  execution of the ATN simulator.
 	 */
-	@Nullable
+	@NotNull
 	private PredictionContext context;
 
 	protected ATNConfig(@NotNull ATNState state,
 						int alt,
-						@Nullable PredictionContext context)
+						@NotNull PredictionContext context)
 	{
 		assert (alt & 0xFFFFFF) == alt;
 		this.state = state;
@@ -70,7 +70,7 @@ public class ATNConfig {
 		this.context = context;
 	}
 
-	protected ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context)
+	protected ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @NotNull PredictionContext context)
     {
 		this.state = state;
 		this.altAndOuterContextDepth = c.altAndOuterContextDepth;
@@ -113,7 +113,7 @@ public class ATNConfig {
 		return altAndOuterContextDepth & 0x00FFFFFF;
 	}
 
-	@Nullable
+	@NotNull
 	public final PredictionContext getContext() {
 		return context;
 	}

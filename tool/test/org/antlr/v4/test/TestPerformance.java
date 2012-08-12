@@ -134,6 +134,7 @@ public class TestPerformance extends BaseTest {
     private static final boolean FORCE_GLOBAL_CONTEXT = false;
     private static final boolean TRY_LOCAL_CONTEXT_FIRST = true;
 	private static final boolean OPTIMIZE_UNIQUE_CLOSURE = true;
+	private static final boolean OPTIMIZE_IMPLICIT_CONTEXTS = true;
 
 	private static final boolean TWO_STAGE_PARSING = true;
 
@@ -569,6 +570,7 @@ public class TestPerformance extends BaseTest {
                             sharedParser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT;
                             sharedParser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
 							sharedParser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
+							sharedParser.getInterpreter().optimize_implicit_contexts = OPTIMIZE_IMPLICIT_CONTEXTS;
                             sharedParser.setBuildParseTree(BUILD_PARSE_TREES);
                             if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
                                 sharedParser.addParseListener(sharedListener);
@@ -613,6 +615,7 @@ public class TestPerformance extends BaseTest {
 								sharedFullContextParser.getInterpreter().force_global_context = false;
 								sharedFullContextParser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
 								sharedFullContextParser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
+								sharedFullContextParser.getInterpreter().optimize_implicit_contexts = OPTIMIZE_IMPLICIT_CONTEXTS;
 								sharedFullContextParser.setBuildParseTree(BUILD_PARSE_TREES);
 								if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
 									sharedFullContextParser.addParseListener(sharedListener);
