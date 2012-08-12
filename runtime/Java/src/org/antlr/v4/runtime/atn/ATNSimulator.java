@@ -179,6 +179,27 @@ public abstract class ATNSimulator {
 			}
 		}
 
+		for (ATNState state : atn.states) {
+			if (state instanceof PlusLoopbackState) {
+				PlusLoopbackState loopbackState = (PlusLoopbackState)state;
+				for (int i = 0; i < loopbackState.getNumberOfTransitions(); i++) {
+					ATNState target = loopbackState.transition(i).target;
+					if (target instanceof PlusBlockStartState) {
+						((PlusBlockStartState)target).loopBackState = loopbackState;
+					}
+				}
+			}
+			else if (state instanceof StarLoopbackState) {
+				StarLoopbackState loopbackState = (StarLoopbackState)state;
+				for (int i = 0; i < loopbackState.getNumberOfTransitions(); i++) {
+					ATNState target = loopbackState.transition(i).target;
+					if (target instanceof StarLoopEntryState) {
+						((StarLoopEntryState)target).loopBackState = loopbackState;
+					}
+				}
+			}
+		}
+
 		//
 		// DECISIONS
 		//
