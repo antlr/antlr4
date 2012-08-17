@@ -49,6 +49,7 @@ import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.atn.SimulatorState;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
@@ -753,7 +754,7 @@ public class TestPerformance extends BaseTest {
 
 		@NotNull
 		@Override
-		protected DFAState addDFAState(@NotNull DFA dfa, @NotNull ATNConfigSet configs) {
+		protected DFAState addDFAState(@NotNull DFA dfa, @NotNull ATNConfigSet configs, PredictionContextCache contextCache) {
 			DFAState proposed = new DFAState(configs, -1, -1);
 			DFAState existing = dfa.states.get(proposed);
 			if ( existing!=null ) return existing;

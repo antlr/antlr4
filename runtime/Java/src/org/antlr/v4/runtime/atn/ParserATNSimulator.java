@@ -954,7 +954,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			closure(reachIntermediate, configs, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContext, contextCache);
 			boolean stepIntoGlobal = configs.getDipsIntoOuterContext();
 
-			DFAState next = addDFAState(dfa, configs);
+			DFAState next = addDFAState(dfa, configs, contextCache);
 			if (s0 == null) {
 				if (useContext) {
 					dfa.s0full = next;
@@ -1475,7 +1475,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		};
 
-	private BitSet isConflicted(@NotNull ATNConfigSet configset) {
+	private BitSet isConflicted(@NotNull ATNConfigSet configset, PredictionContextCache contextCache) {
 		if (configset.getUniqueAlt() != ATN.INVALID_ALT_NUMBER || configset.size() <= 1) {
 			return null;
 		}
@@ -1532,7 +1532,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			for (int j = firstIndexCurrentState; j <= lastIndexCurrentStateMinAlt; j++) {
-				if (!configs.get(j).getContext().equals(config.getContext())) {
+				ATNConfig checkConfig = configs.get(j);
+				PredictionContext check = config.getContext();
+				check = contextCache.join(checkConfig.getContext(), check);
+				if (!checkConfig.getContext().equals(check)) {
 					return null;
 				}
 			}
@@ -1648,7 +1651,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		assert dfa.isContextSensitive() || contextTransitions == null || contextTransitions.isEmpty();
 
 		DFAState from = fromState;
-		DFAState to = addDFAState(dfa, toConfigs);
+		DFAState to = addDFAState(dfa, toConfigs, contextCache);
 
 		if (contextTransitions != null) {
 			for (int context : contextTransitions.toArray()) {
@@ -1697,26 +1700,26 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				contextConfigs.add(config.appendContext(invokingContext, contextCache));
 			}
 
-			return addDFAState(dfa, contextConfigs);
+			return addDFAState(dfa, contextConfigs, contextCache);
 		}
 		else {
 			assert !configs.isOutermostConfigSet() : "Shouldn't be adding a duplicate edge.";
 			configs = configs.clone(true);
 			configs.setOutermostConfigSet(true);
-			return addDFAState(dfa, configs);
+			return addDFAState(dfa, configs, contextCache);
 		}
 	}
 
 	/** See comment on LexerInterpreter.addDFAState. */
 	@NotNull
-	protected DFAState addDFAState(@NotNull DFA dfa, @NotNull ATNConfigSet configs) {
+	protected DFAState addDFAState(@NotNull DFA dfa, @NotNull ATNConfigSet configs, PredictionContextCache contextCache) {
 		DFAState proposed = new DFAState(configs, -1, atn.maxTokenType);
 		DFAState existing = dfa.states.get(proposed);
 		if ( existing!=null ) return existing;
 
 		if (!configs.isReadOnly()) {
 			configs.optimizeConfigs(this);
-			configs.setConflictingAlts(isConflicted(configs));
+			configs.setConflictingAlts(isConflicted(configs, contextCache));
 		}
 
 		DFAState newState = new DFAState(configs.clone(true), -1, atn.maxTokenType);
