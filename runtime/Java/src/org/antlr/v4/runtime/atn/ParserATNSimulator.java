@@ -40,15 +40,15 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.MultiMap;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1455,172 +1455,90 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		return keepContext(state.ruleIndex);
 	}
 
-	/**
-	 * From grammar:
+	private static final Comparator<ATNConfig> STATE_ALT_SORT_COMPARATOR =
+		new Comparator<ATNConfig>() {
 
-	 s' : s s ;
-	 s : x? | x ;
-	 x : 'a' ;
+			@Override
+			public int compare(ATNConfig o1, ATNConfig o2) {
+				int diff = o1.getState().stateNumber - o2.getState().stateNumber;
+				if (diff != 0) {
+					return diff;
+				}
 
-	 config list: (4,1), (11,1,4), (7,1), (3,1,1), (4,1,1), (8,1,1), (7,1,1),
-	 (8,2), (11,2,8), (11,1,[8 1])
+				diff = o1.getAlt() - o2.getAlt();
+				if (diff != 0) {
+					return diff;
+				}
 
-	 state to config list:
+				return 0;
+			}
 
-	 3  -> (3,1,1)
-	 4  -> (4,1), (4,1,1)
-	 7  -> (7,1), (7,1,1)
-	 8  -> (8,1,1), (8,2)
-	 11 -> (11,1,4), (11,2,8), (11,1,8 1)
+		};
 
-	 Walk and find state config lists with > 1 alt. If none, no conflict. return null. Here, states 11
-	 and 8 have lists with both alts 1 and 2. Must check these config lists for conflicting configs.
-
-	 Sam pointed out a problem with the previous definition, v3, of
-	 ambiguous states. If we have another state associated with conflicting
-	 alternatives, we should keep going. For example, the following grammar
-
-	 s : (ID | ID ID?) ';' ;
-
-	 When the ATN simulation reaches the state before ';', it has a DFA
-	 state that looks like: [12|1|[], 6|2|[], 12|2|[]]. Naturally
-	 12|1|[] and 12|2|[] conflict, but we cannot stop processing this node
-	 because alternative to has another way to continue, via [6|2|[]].
-	 The key is that we have a single state that has config's only associated
-	 with a single alternative, 2, and crucially the state transitions
-	 among the configurations are all non-epsilon transitions. That means
-	 we don't consider any conflicts that include alternative 2. So, we
-	 ignore the conflict between alts 1 and 2. We ignore a set of
-	 conflicting alts when there is an intersection with an alternative
-	 associated with a single alt state in the state->config-list map.
-
-	 It's also the case that we might have two conflicting configurations but
-	 also a 3rd nonconflicting configuration for a different alternative:
-	 [1|1|[], 1|2|[], 8|3|[]]. This can come about from grammar:
-
-	 a : A | A | A B ;
-
-	 After matching input A, we reach the stop state for rule A, state 1.
-	 State 8 is the state right before B. Clearly alternatives 1 and 2
-	 conflict and no amount of further lookahead will separate the two.
-	 However, alternative 3 will be able to continue and so we do not
-	 stop working on this state. In the previous example, we're concerned
-	 with states associated with the conflicting alternatives. Here alt
-	 3 is not associated with the conflicting configs, but since we can continue
-	 looking for input reasonably, I don't declare the state done. We
-	 ignore a set of conflicting alts when we have an alternative
-	 that we still need to pursue.
-
-	 So, in summary, as long as there is a single configuration that is
-	 not conflicting with any other configuration for that state, then
-	 there is more input we can use to keep going. E.g.,
-	 s->[(s,1,[x]), (s,2,[x]), (s,2,[y])]
-	 s->[(s,1,_)]
-	 s->[(s,1,[y]), (s,2,[x])]
-	 Regardless of what goes on for the other states, this is
-	 sufficient to force us to add this new state to the ATN-to-DFA work list.
-
-	 TODO: split into "has nonconflict config--add to work list" and getambigalts
-	 functions
-	 */
-	@Nullable
-	public BitSet getConflictingAlts(@NotNull ATNConfigSet configs) {
-		if ( debug ) System.out.println("### check ambiguous  "+configs);
-
-		if (configs.size() <= 1) {
+	private BitSet isConflicted(@NotNull ATNConfigSet configset) {
+		if (configset.getUniqueAlt() != ATN.INVALID_ALT_NUMBER || configset.size() <= 1) {
 			return null;
 		}
 
-		// First get a list of configurations for each state.
-		// Most of the time, each state will have one associated configuration.
-		MultiMap<Integer, ATNConfig> stateToConfigListMap = new MultiMap<Integer, ATNConfig>();
-		Map<Integer, BitSet> stateToAltListMap = new HashMap<Integer, BitSet>();
+		List<ATNConfig> configs = new ArrayList<ATNConfig>(configset);
+		Collections.sort(configs, STATE_ALT_SORT_COMPARATOR);
 
-		for (ATNConfig c : configs) {
-			stateToConfigListMap.map(c.getState().stateNumber, c);
-			BitSet alts = stateToAltListMap.get(c.getState().stateNumber);
-			if ( alts==null ) {
-				alts = new BitSet();
-				stateToAltListMap.put(c.getState().stateNumber, alts);
+		BitSet alts = new BitSet();
+		int minAlt = configs.get(0).getAlt();
+		alts.set(minAlt);
+		int currentState = configs.get(0).getState().stateNumber;
+		int firstIndexCurrentState = 0;
+		int lastIndexCurrentStateMinAlt = 0;
+		for (int i = 0; i < configs.size(); i++) {
+			ATNConfig config = configs.get(i);
+			if (config.getAlt() != minAlt) {
+				break;
 			}
-			alts.set(c.getAlt());
+
+			if (config.getState().stateNumber != currentState) {
+				break;
+			}
+
+			lastIndexCurrentStateMinAlt = i;
 		}
-		// potential conflicts are states, s, with > 1 configurations and diff alts
-		// find all alts with potential conflicts
-		int numPotentialConflicts = 0;
-		BitSet altsToIgnore = new BitSet();
-		for (int state : stateToConfigListMap.keySet()) { // for each state
-			BitSet alts = stateToAltListMap.get(state);
-			if ( alts.cardinality()==1 ) {
-				if ( !atn.states.get(state).onlyHasEpsilonTransitions() ) {
-					List<ATNConfig> configsPerState = stateToConfigListMap.get(state);
-					ATNConfig anyConfig = configsPerState.get(0);
-					altsToIgnore.set(anyConfig.getAlt());
-					if ( debug ) System.out.println("### one alt and all non-ep: "+configsPerState);
+
+		for (int i = lastIndexCurrentStateMinAlt + 1; i < configs.size(); i++) {
+			ATNConfig config = configs.get(i);
+			ATNState state = config.getState();
+			alts.set(config.getAlt());
+			if (state.stateNumber != currentState) {
+				if (config.getAlt() != minAlt) {
+					return null;
 				}
-				// remove state's configurations from further checking; no issues with them.
-				// (can't remove as it's concurrent modification; set to null)
-//				return null;
-				stateToConfigListMap.put(state, null);
-			}
-			else {
-				numPotentialConflicts++;
-			}
-		}
 
-		if ( debug ) System.out.println("### altsToIgnore: "+altsToIgnore);
-		if ( debug ) System.out.println("### stateToConfigListMap="+stateToConfigListMap);
-
-		if ( numPotentialConflicts==0 ) {
-			return null;
-		}
-
-		// compare each pair of configs in sets for states with > 1 alt in config list, looking for
-		// (s, i, ctx) and (s, j, ctx') where ctx==ctx' or one is suffix of the other.
-		BitSet ambigAlts = new BitSet();
-		for (int state : stateToConfigListMap.keySet()) {
-			List<ATNConfig> configsPerState = stateToConfigListMap.get(state);
-			if (configsPerState == null) continue;
-			BitSet alts = stateToAltListMap.get(state);
-// Sam's correction to ambig def is here:
-			if ( !altsToIgnore.isEmpty() ) {
-				BitSet combined = (BitSet)alts.clone();
-				combined.and(altsToIgnore);
-				if (combined.cardinality() <= 1) {
-//					System.err.println("ignoring alt since "+alts+"&"+altsToIgnore+
-//									   ".size is "+alts.and(altsToIgnore).size());
-					continue;
-				}
-			}
-			int size = configsPerState.size();
-			for (int i = 0; i < size; i++) {
-				ATNConfig c = configsPerState.get(i);
-				for (int j = i+1; j < size; j++) {
-					ATNConfig d = configsPerState.get(j);
-					if ( c.getAlt() != d.getAlt() ) {
-						boolean conflicting =
-							c.getContext().equals(d.getContext());
-						if ( conflicting ) {
-							if ( debug ) {
-								System.out.println("we reach state "+c.getState().stateNumber+
-												   " in rule "+
-												   (parser !=null ? getRuleName(c.getState().ruleIndex) :"n/a")+
-												   " alts "+c.getAlt()+","+d.getAlt()+" from ctx "+Utils.join(c.getContext().toStrings(parser, c.getState().stateNumber), "")
-												   +" and "+ Utils.join(d.getContext().toStrings(parser, d.getState().stateNumber), ""));
-							}
-							ambigAlts.set(c.getAlt());
-							ambigAlts.set(d.getAlt());
-						}
+				currentState = state.stateNumber;
+				firstIndexCurrentState = i;
+				lastIndexCurrentStateMinAlt = i;
+				for (int j = firstIndexCurrentState + 1; j < configs.size(); j++) {
+					ATNConfig config2 = configs.get(j);
+					if (config2.getAlt() != minAlt) {
+						break;
 					}
+
+					if (config2.getState().stateNumber != currentState) {
+						break;
+					}
+
+					lastIndexCurrentStateMinAlt = i;
+				}
+
+				i = lastIndexCurrentStateMinAlt;
+				continue;
+			}
+
+			for (int j = firstIndexCurrentState; j <= lastIndexCurrentStateMinAlt; j++) {
+				if (!configs.get(j).getContext().equals(config.getContext())) {
+					return null;
 				}
 			}
 		}
 
-		if ( debug ) System.out.println("### ambigAlts="+ambigAlts);
-
-		if ( ambigAlts.isEmpty() ) return null;
-
-		return ambigAlts;
+		return alts;
 	}
 
 	protected BitSet getConflictingAltsFromConfigSet(ATNConfigSet configs) {
@@ -1798,7 +1716,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		if (!configs.isReadOnly()) {
 			configs.optimizeConfigs(this);
-			configs.setConflictingAlts(getConflictingAlts(configs));
+			configs.setConflictingAlts(isConflicted(configs));
 		}
 
 		DFAState newState = new DFAState(configs.clone(true), -1, atn.maxTokenType);
