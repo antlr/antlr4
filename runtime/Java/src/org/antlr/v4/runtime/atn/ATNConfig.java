@@ -66,14 +66,14 @@ public class ATNConfig {
 	{
 		assert (alt & 0xFFFFFF) == alt;
 		this.state = state;
-		this.altAndOuterContextDepth = alt;
+		this.altAndOuterContextDepth = alt & 0x7FFFFFFF;
 		this.context = context;
 	}
 
 	protected ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @NotNull PredictionContext context)
     {
 		this.state = state;
-		this.altAndOuterContextDepth = c.altAndOuterContextDepth;
+		this.altAndOuterContextDepth = c.altAndOuterContextDepth & 0x7FFFFFFF;
 		this.context = context;
 	}
 
@@ -113,6 +113,17 @@ public class ATNConfig {
 		return altAndOuterContextDepth & 0x00FFFFFF;
 	}
 
+	public final boolean isHidden() {
+		return altAndOuterContextDepth < 0;
+	}
+
+	public final void setHidden(boolean value) {
+		if (value) {
+			altAndOuterContextDepth |= 0x80000000;
+		} else {
+			altAndOuterContextDepth &= ~0x80000000;
+		}
+	}
 	@NotNull
 	public final PredictionContext getContext() {
 		return context;
@@ -138,12 +149,12 @@ public class ATNConfig {
 	 * accurate depth since I don't ever decrement. TODO: make it a boolean then
 	 */
 	public final int getOuterContextDepth() {
-		return altAndOuterContextDepth >>> 24;
+		return (altAndOuterContextDepth >>> 24) & 0x7F;
 	}
 
 	public final void setOuterContextDepth(int outerContextDepth) {
-		assert outerContextDepth >= 0 && outerContextDepth <= 0xFF;
-		this.altAndOuterContextDepth = (outerContextDepth << 24) | getAlt();
+		assert outerContextDepth >= 0 && outerContextDepth <= 0x7F;
+		this.altAndOuterContextDepth = (outerContextDepth << 24) | (altAndOuterContextDepth & ~0x7F000000);
 	}
 
 	public int getActionIndex() {

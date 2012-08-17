@@ -136,6 +136,7 @@ public class TestPerformance extends BaseTest {
     private static final boolean TRY_LOCAL_CONTEXT_FIRST = true;
 	private static final boolean OPTIMIZE_UNIQUE_CLOSURE = true;
 	private static final boolean OPTIMIZE_IMPLICIT_CONTEXTS = true;
+	private static final boolean OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS = true;
 
 	private static final boolean TWO_STAGE_PARSING = true;
 
@@ -574,6 +575,7 @@ public class TestPerformance extends BaseTest {
 						sharedParser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST || TWO_STAGE_PARSING;
 						sharedParser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
 						sharedParser.getInterpreter().optimize_implicit_contexts = OPTIMIZE_IMPLICIT_CONTEXTS;
+						sharedParser.getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
 						sharedParser.setBuildParseTree(BUILD_PARSE_TREES);
 						if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
 							sharedParser.addParseListener(sharedListener);
@@ -620,6 +622,7 @@ public class TestPerformance extends BaseTest {
 							sharedParser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
 							sharedParser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
 							sharedParser.getInterpreter().optimize_implicit_contexts = OPTIMIZE_IMPLICIT_CONTEXTS;
+							sharedParser.getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
 							sharedParser.setBuildParseTree(BUILD_PARSE_TREES);
 							if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
 								sharedParser.addParseListener(sharedListener);

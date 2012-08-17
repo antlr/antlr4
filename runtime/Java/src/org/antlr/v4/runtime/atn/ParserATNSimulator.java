@@ -252,6 +252,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	public boolean optimize_unique_closure = true;
 	public boolean optimize_ll1 = true;
+	public boolean optimize_hidden_conflicted_configs = true;
 	public boolean optimize_implicit_contexts = true;
 	private final BitSet implicit_context_rules;
 
@@ -1538,6 +1539,14 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if (!checkConfig.getContext().equals(check)) {
 					return null;
 				}
+
+				if (optimize_hidden_conflicted_configs) {
+					if (checkConfig.getSemanticContext() == SemanticContext.NONE
+						|| checkConfig.getSemanticContext().equals(config.getSemanticContext()))
+					{
+						config.setHidden(true);
+					}
+				}
 			}
 		}
 
@@ -1719,7 +1728,18 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		if (!configs.isReadOnly()) {
 			configs.optimizeConfigs(this);
-			configs.setConflictingAlts(isConflicted(configs, contextCache));
+			if (configs.getConflictingAlts() == null) {
+				configs.setConflictingAlts(isConflicted(configs, contextCache));
+				if (optimize_hidden_conflicted_configs && configs.getConflictingAlts() != null) {
+					int size = configs.size();
+					configs.stripHiddenConfigs();
+					if (configs.size() < size) {
+						proposed = new DFAState(configs, -1, atn.maxTokenType);
+						existing = dfa.states.get(proposed);
+						if ( existing!=null ) return existing;
+					}
+				}
+			}
 		}
 
 		DFAState newState = new DFAState(configs.clone(true), -1, atn.maxTokenType);

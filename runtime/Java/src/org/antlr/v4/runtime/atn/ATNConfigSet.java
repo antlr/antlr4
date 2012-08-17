@@ -39,6 +39,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -128,6 +130,31 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	public boolean isReadOnly() {
 		return mergedConfigs == null;
+	}
+
+	public final void stripHiddenConfigs() {
+		ensureWritable();
+
+		Iterator<Map.Entry<Long, ATNConfig>> iterator = mergedConfigs.entrySet().iterator();
+		while (iterator.hasNext()) {
+			if (iterator.next().getValue().isHidden()) {
+				iterator.remove();
+			}
+		}
+
+		ListIterator<ATNConfig> iterator2 = unmerged.listIterator();
+		while (iterator2.hasNext()) {
+			if (iterator2.next().isHidden()) {
+				iterator2.remove();
+			}
+		}
+
+		iterator2 = configs.listIterator();
+		while (iterator2.hasNext()) {
+			if (iterator2.next().isHidden()) {
+				iterator2.remove();
+			}
+		}
 	}
 
 	public boolean isOutermostConfigSet() {
@@ -226,6 +253,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	public boolean add(ATNConfig e, @Nullable PredictionContextCache contextCache) {
 		ensureWritable();
 		assert !outermostConfigSet || !e.getReachesIntoOuterContext();
+		assert !e.isHidden();
 
 		if (contextCache == null) {
 			contextCache = PredictionContextCache.UNCACHED;
