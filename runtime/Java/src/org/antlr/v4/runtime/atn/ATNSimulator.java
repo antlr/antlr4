@@ -186,17 +186,16 @@ public abstract class ATNSimulator {
 			p += 6;
 		}
 
-		if (atn.grammarType == ATN.LEXER) {
-			for (ATNState state : atn.states) {
-				for (int i = 0; i < state.getNumberOfTransitions(); i++) {
-					Transition t = state.transition(i);
-					if (!(t instanceof RuleTransition)) {
-						continue;
-					}
-
-					RuleTransition ruleTransition = (RuleTransition)t;
-					atn.ruleToStopState[ruleTransition.target.ruleIndex].addTransition(new EpsilonTransition(ruleTransition.followState));
+		// edges for rule stop states can be derived, so they aren't serialized
+		for (ATNState state : atn.states) {
+			for (int i = 0; i < state.getNumberOfTransitions(); i++) {
+				Transition t = state.transition(i);
+				if (!(t instanceof RuleTransition)) {
+					continue;
 				}
+
+				RuleTransition ruleTransition = (RuleTransition)t;
+				atn.ruleToStopState[ruleTransition.target.ruleIndex].addTransition(new EpsilonTransition(ruleTransition.followState));
 			}
 		}
 
