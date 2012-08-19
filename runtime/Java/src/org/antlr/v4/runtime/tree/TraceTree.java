@@ -99,6 +99,6 @@ public class TraceTree implements Tree {
 
 	@Override
 	public String toStringTree() {
-		return Trees.toStringTree(this, null);
+		return Trees.toStringTree(this);
 	}
 }

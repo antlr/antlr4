@@ -32,6 +32,7 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.gui.TreePostScriptGenerator;
 
@@ -39,6 +40,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -75,31 +77,55 @@ public class Trees {
 		writePS(t, recog, fileName, "Helvetica", 11);
 	}
 
-	/** Print out a whole tree in LISP form. getNodeText is used on the
+	/** Print out a whole tree in LISP form. {@link #getNodeText} is used on the
 	 *  node payloads to get the text for the nodes.  Detect
 	 *  parse trees and extract data appropriately.
 	 */
-	public static String toStringTree(Tree t, Parser<?> recog) {
-		String s = Utils.escapeWhitespace(getNodeText(t, recog), false);
+	public static String toStringTree(@NotNull Tree t) {
+		return toStringTree(t, (List<String>)null);
+	}
+
+	/** Print out a whole tree in LISP form. {@link #getNodeText} is used on the
+	 *  node payloads to get the text for the nodes.  Detect
+	 *  parse trees and extract data appropriately.
+	 */
+	public static String toStringTree(@NotNull Tree t, @Nullable Parser<?> recog) {
+		String[] ruleNames = recog != null ? recog.getRuleNames() : null;
+		List<String> ruleNamesList = ruleNames != null ? Arrays.asList(ruleNames) : null;
+		return toStringTree(t, ruleNamesList);
+	}
+
+	/** Print out a whole tree in LISP form. {@link #getNodeText} is used on the
+	 *  node payloads to get the text for the nodes.  Detect
+	 *  parse trees and extract data appropriately.
+	 */
+	public static String toStringTree(@NotNull Tree t, @Nullable List<String> ruleNames) {
+		String s = Utils.escapeWhitespace(getNodeText(t, ruleNames), false);
 		if ( t.getChildCount()==0 ) return s;
 		StringBuilder buf = new StringBuilder();
 		buf.append("(");
-		s = Utils.escapeWhitespace(getNodeText(t, recog), false);
+		s = Utils.escapeWhitespace(getNodeText(t, ruleNames), false);
 		buf.append(s);
 		buf.append(' ');
 		for (int i = 0; i<t.getChildCount(); i++) {
 			if ( i>0 ) buf.append(' ');
-			buf.append(toStringTree(t.getChild(i), recog));
+			buf.append(toStringTree(t.getChild(i), ruleNames));
 		}
 		buf.append(")");
 		return buf.toString();
 	}
 
-	public static String getNodeText(Tree t, Parser<?> recog) {
-		if ( recog!=null ) {
+	public static String getNodeText(@NotNull Tree t, @Nullable Parser<?> recog) {
+		String[] ruleNames = recog != null ? recog.getRuleNames() : null;
+		List<String> ruleNamesList = ruleNames != null ? Arrays.asList(ruleNames) : null;
+		return getNodeText(t, ruleNamesList);
+	}
+
+	public static String getNodeText(@NotNull Tree t, @Nullable List<String> ruleNames) {
+		if ( ruleNames!=null ) {
 			if ( t instanceof RuleNode ) {
 				int ruleIndex = ((RuleNode<?>)t).getRuleContext().getRuleIndex();
-				String ruleName = recog.getRuleNames()[ruleIndex];
+				String ruleName = ruleNames.get(ruleIndex);
 				return ruleName;
 			}
 			else if ( t instanceof ErrorNode ) {

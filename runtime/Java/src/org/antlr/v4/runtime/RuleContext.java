@@ -38,6 +38,8 @@ import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
 import javax.print.PrintException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /** A rule context is a record of a single rule invocation. It knows
  *  which context invoked it, if any. If there is no parent context, then
@@ -177,32 +179,65 @@ public class RuleContext<Symbol> implements RuleNode<Symbol> {
 	 *  We have to know the recognizer so we can get rule names.
 	 */
 	@Override
-	public String toStringTree(Parser<?> recog) {
+	public String toStringTree(@Nullable Parser<?> recog) {
 		return Trees.toStringTree(this, recog);
 	}
 
+	/** Print out a whole tree, not just a node, in LISP format
+	 *  (root child1 .. childN). Print just a node if this is a leaf.
+	 */
+	public String toStringTree(@Nullable List<String> ruleNames) {
+		return Trees.toStringTree(this, ruleNames);
+	}
+
 	@Override
-	public String toStringTree() { return toStringTree(null); }
+	public String toStringTree() {
+		return toStringTree((List<String>)null);
+	}
 
 	@Override
 	public String toString() {
-		return toString(null);
+		return toString((List<String>)null, (RuleContext<?>)null);
 	}
 
-	public String toString(@Nullable Recognizer<?, ?> recog) {
+	public final String toString(@Nullable Recognizer<?, ?> recog) {
 		return toString(recog, ParserRuleContext.emptyContext());
 	}
 
+	public final String toString(@Nullable List<String> ruleNames) {
+		return toString(ruleNames, null);
+	}
+
 	// recog null unless ParserRuleContext, in which case we use subclass toString(...)
-	public String toString(@Nullable Recognizer<?,?> recog, RuleContext<?> stop) {
+	public String toString(@Nullable Recognizer<?,?> recog, @Nullable RuleContext<?> stop) {
+		String[] ruleNames = recog != null ? recog.getRuleNames() : null;
+		List<String> ruleNamesList = ruleNames != null ? Arrays.asList(ruleNames) : null;
+		return toString(ruleNamesList, stop);
+	}
+
+	public String toString(@Nullable List<String> ruleNames, @Nullable RuleContext<?> stop) {
 		StringBuilder buf = new StringBuilder();
 		RuleContext<?> p = this;
 		buf.append("[");
-		while ( p != null && p != stop ) {
-			if ( !p.isEmpty() ) buf.append(p.invokingState);
-			if ( p.parent != null && !p.parent.isEmpty() ) buf.append(" ");
+		while (p != null && p != stop) {
+			if (ruleNames == null) {
+				if (!p.isEmpty()) {
+					buf.append(p.invokingState);
+				}
+			}
+			else {
+				int ruleIndex = p.getRuleIndex();
+				String ruleName = ruleIndex >= 0 && ruleIndex < ruleNames.size() ? ruleNames.get(ruleIndex) : Integer.toString(ruleIndex);
+				buf.append(ruleName);
+			}
+
+			if (p.parent != null && (ruleNames != null || !p.parent.isEmpty())) {
+				buf.append(" ");
+			}
+
 			p = p.parent;
 		}
+
 		buf.append("]");
 		return buf.toString();
 	}
