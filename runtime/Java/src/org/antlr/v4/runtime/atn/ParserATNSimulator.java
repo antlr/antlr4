@@ -1490,7 +1490,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		int currentState = configs.get(0).getState().stateNumber;
 		int firstIndexCurrentState = 0;
 		int lastIndexCurrentStateMinAlt = 0;
-		for (int i = 0; i < configs.size(); i++) {
+		PredictionContext joinedCheckContext = configs.get(0).getContext();
+		for (int i = 1; i < configs.size(); i++) {
 			ATNConfig config = configs.get(i);
 			if (config.getAlt() != minAlt) {
 				break;
@@ -1501,6 +1502,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			lastIndexCurrentStateMinAlt = i;
+			joinedCheckContext = contextCache.join(joinedCheckContext, configs.get(i).getContext());
 		}
 
 		for (int i = lastIndexCurrentStateMinAlt + 1; i < configs.size(); i++) {
@@ -1515,6 +1517,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				currentState = state.stateNumber;
 				firstIndexCurrentState = i;
 				lastIndexCurrentStateMinAlt = i;
+				joinedCheckContext = config.getContext();
 				for (int j = firstIndexCurrentState + 1; j < configs.size(); j++) {
 					ATNConfig config2 = configs.get(j);
 					if (config2.getAlt() != minAlt) {
@@ -1526,21 +1529,21 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					}
 
 					lastIndexCurrentStateMinAlt = i;
+					joinedCheckContext = contextCache.join(joinedCheckContext, config2.getContext());
 				}
 
 				i = lastIndexCurrentStateMinAlt;
 				continue;
 			}
 
-			for (int j = firstIndexCurrentState; j <= lastIndexCurrentStateMinAlt; j++) {
-				ATNConfig checkConfig = configs.get(j);
-				PredictionContext check = config.getContext();
-				check = contextCache.join(checkConfig.getContext(), check);
-				if (!checkConfig.getContext().equals(check)) {
-					return null;
-				}
+			PredictionContext check = contextCache.join(joinedCheckContext, config.getContext());
+			if (!joinedCheckContext.equals(check)) {
+				return null;
+			}
 
-				if (optimize_hidden_conflicted_configs) {
+			if (optimize_hidden_conflicted_configs) {
+				for (int j = firstIndexCurrentState; j <= lastIndexCurrentStateMinAlt; j++) {
+					ATNConfig checkConfig = configs.get(j);
 					if (checkConfig.getSemanticContext() == SemanticContext.NONE
 						|| checkConfig.getSemanticContext().equals(config.getSemanticContext()))
 					{
