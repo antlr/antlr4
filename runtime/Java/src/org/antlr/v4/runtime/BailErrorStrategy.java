@@ -40,6 +40,10 @@ public class BailErrorStrategy extends DefaultErrorStrategy {
      */
     @Override
     public void recover(Parser recognizer, RecognitionException e) {
+		for (ParserRuleContext<?> context = recognizer.getContext(); context != null; context = context.getParent()) {
+			context.exception = e;
+		}
+
         throw new RuntimeException(e);
     }
 
@@ -50,7 +54,12 @@ public class BailErrorStrategy extends DefaultErrorStrategy {
     public Token recoverInline(Parser recognizer)
         throws RecognitionException
     {
-        throw new RuntimeException(new InputMismatchException(recognizer));
+		InputMismatchException e = new InputMismatchException(recognizer);
+		for (ParserRuleContext<?> context = recognizer.getContext(); context != null; context = context.getParent()) {
+			context.exception = e;
+		}
+
+        throw new RuntimeException(e);
     }
 
     /** Make sure we don't attempt to recover from problems in subrules. */
