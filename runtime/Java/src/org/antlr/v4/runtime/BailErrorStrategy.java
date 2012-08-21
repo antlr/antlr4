@@ -30,13 +30,14 @@
 package org.antlr.v4.runtime;
 
 /** Bail out of parser at first syntax error. Do this to use it:
- *      myparser.setErrorHandler(new BailErrorStrategy<Token>());
+ *  <p/>
+ *  {@code myparser.setErrorHandler(new BailErrorStrategy());}
  */
 public class BailErrorStrategy extends DefaultErrorStrategy {
-    /** Instead of recovering from exception e, Re-throw wrote it wrapped
-     *  in a generic RuntimeException so it is not caught by the
-     *  rule function catches.  Exception e is the "cause" of the
-     *  RuntimeException.
+    /** Instead of recovering from exception {@code e}, re-throw it wrapped
+     *  in a generic {@link RuntimeException} so it is not caught by the
+     *  rule function catches.  Use {@link RuntimeException#getCause()} to get the
+	 *  original {@link RecognitionException}.
      */
     @Override
     public void recover(Parser recognizer, RecognitionException e) {
