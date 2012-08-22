@@ -678,9 +678,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 			int predictedAlt = getUniqueAlt(reach);
 			if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
-				D.isAcceptState = true;
-				D.prediction = predictedAlt;
-
 				if (optimize_ll1
 					&& input.index() == startIndex
 					&& nextState.outerContext == nextState.remainingOuterContext
@@ -701,11 +698,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 			else {
 				if ( D.configset.getConflictingAlts()!=null ) {
+					predictedAlt = D.prediction;
 					if ( greedy ) {
-						D.isAcceptState = true;
-						D.prediction = predictedAlt = resolveToMinAlt(D, D.configset.getConflictingAlts());
-
-						int k = input.index() - startIndex + 1; // how much input we used
+//						int k = input.index() - startIndex + 1; // how much input we used
 //						System.out.println("used k="+k);
 						if ( !userWantsCtxSensitive ||
 							 !D.configset.getDipsIntoOuterContext() )
@@ -721,8 +716,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 							if ( D.isAcceptState && D.configset.hasSemanticContext() ) {
 								int nalts = decState.getNumberOfTransitions();
-								DFAState.PredPrediction[] predPredictions =
-									predicateDFAState(D, D.configset, outerContext, nalts);
+								DFAState.PredPrediction[] predPredictions = D.predicates;
 								if (predPredictions != null) {
 									input.seek(startIndex);
 									// always use complete evaluation here since we'll want to retry with full context if still ambiguous
@@ -740,59 +734,33 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							return execATN(dfa, input, startIndex, fullContextState);
 						}
 					}
-					else {
-						// upon ambiguity for nongreedy, default to exit branch to avoid inf loop
-						// this handles case where we find ambiguity that stops DFA construction
-						// before a config hits rule stop state. Was leaving prediction blank.
-						final int exitAlt = 2;
-						D.isAcceptState = true; // when ambig or ctx sens or nongreedy or .* loop hitting rule stop
-						D.prediction = predictedAlt = exitAlt;
-					}
 				}
 			}
 
-			if ( !greedy ) {
-				final int exitAlt = 2;
-				if ( predictedAlt != ATN.INVALID_ALT_NUMBER && configWithAltAtStopState(reach, 1) ) {
-					if ( debug ) System.out.println("nongreedy loop but unique alt "+D.configset.getUniqueAlt()+" at "+reach);
-					// reaches end via .* means nothing after.
-					D.isAcceptState = true;
-					D.prediction = predictedAlt = exitAlt;
-				}
-				else {// if we reached end of rule via exit branch and decision nongreedy, we matched
-					if ( configWithAltAtStopState(reach, exitAlt) ) {
-						if ( debug ) System.out.println("nongreedy at stop state for exit branch");
-						D.isAcceptState = true;
-						D.prediction = predictedAlt = exitAlt;
-					}
-				}
+			if ( !greedy && D.isAcceptState ) {
+				predictedAlt = D.prediction;
 			}
 
-			if ( D.isAcceptState && D.configset.hasSemanticContext() ) {
-				int nalts = decState.getNumberOfTransitions();
-				DFAState.PredPrediction[] predPredictions =
-					predicateDFAState(D, D.configset, outerContext, nalts);
-				if ( predPredictions!=null ) {
-					int stopIndex = input.index();
-					input.seek(startIndex);
-					BitSet alts = evalSemanticContext(predPredictions, outerContext, reportAmbiguities);
-					D.prediction = ATN.INVALID_ALT_NUMBER;
-					switch (alts.cardinality()) {
-					case 0:
-						throw noViableAlt(input, outerContext, D.configset, startIndex);
+			if ( D.isAcceptState && D.predicates != null ) {
+				int stopIndex = input.index();
+				input.seek(startIndex);
+				BitSet alts = evalSemanticContext(D.predicates, outerContext, reportAmbiguities);
+				D.prediction = ATN.INVALID_ALT_NUMBER;
+				switch (alts.cardinality()) {
+				case 0:
+					throw noViableAlt(input, outerContext, D.configset, startIndex);
 
-					case 1:
-						return alts.nextSetBit(0);
+				case 1:
+					return alts.nextSetBit(0);
 
-					default:
-						// report ambiguity after predicate evaluation to make sure the correct
-						// set of ambig alts is reported.
-						if (reportAmbiguities) {
-							reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configset);
-						}
-
-						return alts.nextSetBit(0);
+				default:
+					// report ambiguity after predicate evaluation to make sure the correct
+					// set of ambig alts is reported.
+					if (reportAmbiguities) {
+						reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configset);
 					}
+
+					return alts.nextSetBit(0);
 				}
 			}
 
@@ -1044,7 +1012,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	/** collect and set D's semantic context */
 	public DFAState.PredPrediction[] predicateDFAState(DFAState D,
 													   ATNConfigSet configs,
-													   RuleContext<Symbol> outerContext,
 													   int nalts)
 	{
 		BitSet conflictingAlts = getConflictingAltsFromConfigSet(configs);
@@ -1725,7 +1692,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	/** See comment on LexerInterpreter.addDFAState. */
 	@NotNull
 	protected DFAState addDFAState(@NotNull DFA dfa, @NotNull ATNConfigSet configs, PredictionContextCache contextCache) {
-		DFAState proposed = new DFAState(configs, -1, atn.maxTokenType);
+		DFAState proposed = createDFAState(configs);
 		DFAState existing = dfa.states.get(proposed);
 		if ( existing!=null ) return existing;
 
@@ -1737,7 +1704,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					int size = configs.size();
 					configs.stripHiddenConfigs();
 					if (configs.size() < size) {
-						proposed = new DFAState(configs, -1, atn.maxTokenType);
+						proposed = createDFAState(configs);
 						existing = dfa.states.get(proposed);
 						if ( existing!=null ) return existing;
 					}
@@ -1745,11 +1712,56 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 		}
 
-		DFAState newState = new DFAState(configs.clone(true), -1, atn.maxTokenType);
-		newState.stateNumber = dfa.states.size();
-		dfa.states.put(newState, newState);
+		DFAState newState = createDFAState(configs.clone(true));
+		DecisionState decisionState = atn.getDecisionState(dfa.decision);
+		boolean greedy = decisionState.isGreedy;
+		int predictedAlt = getUniqueAlt(configs);
+		if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
+			newState.isAcceptState = true;
+			newState.prediction = predictedAlt;
+		} else if (configs.getConflictingAlts() != null) {
+			if (greedy) {
+				newState.isAcceptState = true;
+				newState.prediction = resolveToMinAlt(newState, newState.configset.getConflictingAlts());
+			} else {
+				// upon ambiguity for nongreedy, default to exit branch to avoid inf loop
+				// this handles case where we find ambiguity that stops DFA construction
+				// before a config hits rule stop state. Was leaving prediction blank.
+				final int exitAlt = 2;
+				newState.isAcceptState = true; // when ambig or ctx sens or nongreedy or .* loop hitting rule stop
+				newState.prediction = exitAlt;
+			}
+		}
+
+		if ( !greedy ) {
+			final int exitAlt = 2;
+			if ( predictedAlt != ATN.INVALID_ALT_NUMBER && configWithAltAtStopState(configs, 1) ) {
+				if ( debug ) System.out.println("nongreedy loop but unique alt "+newState.configset.getUniqueAlt()+" at "+configs);
+				// reaches end via .* means nothing after.
+				newState.isAcceptState = true;
+				newState.prediction = exitAlt;
+			}
+			else {// if we reached end of rule via exit branch and decision nongreedy, we matched
+				if ( configWithAltAtStopState(configs, exitAlt) ) {
+					if ( debug ) System.out.println("nongreedy at stop state for exit branch");
+					newState.isAcceptState = true;
+					newState.prediction = exitAlt;
+				}
+			}
+		}
+
+		if (newState.isAcceptState && configs.hasSemanticContext()) {
+			predicateDFAState(newState, configs, decisionState.getNumberOfTransitions());
+		}
+
+		dfa.addState(newState);
         if ( debug ) System.out.println("adding new DFA state: "+newState);
 		return newState;
+	}
+
+	@NotNull
+	protected DFAState createDFAState(@NotNull ATNConfigSet configs) {
+		return new DFAState(configs, -1, atn.maxTokenType);
 	}
 
 //	public void reportConflict(int startIndex, int stopIndex,

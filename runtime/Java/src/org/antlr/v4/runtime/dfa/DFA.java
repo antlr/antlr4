@@ -28,13 +28,12 @@
  */
 package org.antlr.v4.runtime.dfa;
 
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class DFA {
 	/** A set of all DFA states. Use Map so we can get old state back
@@ -55,6 +54,8 @@ public class DFA {
 	@NotNull
 	public final ATNState atnStartState;
 
+	private int nextStateNumber;
+
 	/** Set of configs for a DFA state with at least one conflict? Mainly used as "return value"
 	 *  from predictATN() for retry.
 	 */
@@ -73,53 +74,9 @@ public class DFA {
 		return s0full != null;
 	}
 
-	/** Find the path in DFA from s0 to s, returning list of states encountered (inclusively) */
-//	public List<DFAState> getPathToState(DFAState finalState, TokenStream input, int start, int stop) {
-//		if ( s0==null ) return null;
-//		List<DFAState> states = new ArrayList<DFAState>();
-//		states.add(s0);
-//		DFAState p = s0;
-//		int i = start;
-//		Token t = input.get(i);
-//		while ( p != finalState && i<stop ) {
-//			int la = t.getType();
-//			if ( p.edges == null || la >= p.edges.length || la < -1 || p.edges[la+1] == null ) {
-//				return states;
-//			}
-//			DFAState target = p.edges[la+1];
-//			if ( target == ATNSimulator.ERROR ) {
-//				return states;
-//			}
-//			states.add(target);
-//			p = target;
-//			i++;
-//			t = input.get(i);
-//		}
-//		return states;
-//	}
-
-	public List<Set<ATNState>> getATNStatesAlongPath(ParserATNSimulator<?> atn,
-													 List<DFAState> dfaStates,
-													 TokenStream<? extends Token> input, int start, int stop)
-	{
-		List<Set<ATNState>> atnStates = new ArrayList<Set<ATNState>>();
-		int i = start;
-		for (DFAState D : dfaStates) {
-			Set<ATNState> statesInvolved = new HashSet<ATNState>();
-			for (ATNConfig c : D.configset) {
-				Transition t = c.getState().transition(0);
-				ATNState target = atn.getReachableTarget(c, t, input.get(i).getType());
-				if (target != null) {
-					statesInvolved.add(c.getState());
-				}
-			}
-
-			System.out.println("statesInvolved upon "+input.get(i).getText()+"="+statesInvolved);
-			i++;
-			atnStates.add(statesInvolved);
-		}
-
-		return atnStates;
+	public void addState(DFAState state) {
+		state.stateNumber = nextStateNumber++;
+		states.put(state, state);
 	}
 
 	@Override

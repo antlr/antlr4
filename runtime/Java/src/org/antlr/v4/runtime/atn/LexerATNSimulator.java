@@ -165,11 +165,12 @@ public class LexerATNSimulator extends ATNSimulator {
 		int mark = input.mark();
 		traceBeginMatch(input, mode);
 		try {
-			if ( dfa[mode].s0==null ) {
+			DFAState s0 = dfa[mode].s0;
+			if ( s0==null ) {
 				return matchATN(input);
 			}
 			else {
-				return execDFA(input, dfa[mode].s0);
+				return execDFA(input, s0);
 			}
 		}
         finally {
@@ -200,8 +201,9 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		ATNConfigSet s0_closure = computeStartState(input, startState);
 		int old_mode = mode;
-		dfa[mode].s0 = addDFAState(s0_closure);
-		int predict = execATN(input, s0_closure, dfa[mode].s0);
+		DFAState next = addDFAState(s0_closure);
+		dfa[mode].s0 = next;
+		int predict = execATN(input, s0_closure, next);
 
 		if ( debug ) {
 			System.out.format("DFA after matchATN: %s\n", dfa[old_mode].toLexerString());
@@ -798,8 +800,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			newState.prediction = atn.ruleToTokenType[newState.lexerRuleIndex];
 		}
 
-		newState.stateNumber = dfa[mode].states.size();
-		dfa[mode].states.put(newState, newState);
+		dfa[mode].addState(newState);
 		return newState;
 	}
 
