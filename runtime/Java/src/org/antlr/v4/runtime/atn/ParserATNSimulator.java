@@ -705,7 +705,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						D.isAcceptState = true;
 						D.prediction = predictedAlt = resolveToMinAlt(D, D.configset.getConflictingAlts());
 
-						int k = input.index() - startIndex + 1; // how much input we used
+//						int k = input.index() - startIndex + 1; // how much input we used
 //						System.out.println("used k="+k);
 						if ( !userWantsCtxSensitive ||
 							 !D.configset.getDipsIntoOuterContext() )
