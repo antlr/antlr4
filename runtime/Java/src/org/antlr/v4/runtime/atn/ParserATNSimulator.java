@@ -49,11 +49,10 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  The embodiment of the adaptive LL(*) parsing strategy.
@@ -266,9 +265,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	@Nullable
 	protected final Parser<Symbol> parser;
 
-	@NotNull
-	public final DFA[] decisionToDFA;
-
 	/**
 	 * When {@code true}, ambiguous alternatives are reported when they are
 	 * encountered within {@link #execATN}. When {@code false}, these messages
@@ -288,8 +284,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	 */
 	protected boolean userWantsCtxSensitive = true;
 
-	protected final Map<Integer, Integer> LL1Table = new HashMap<Integer, Integer>();
-
 	/** Testing only! */
 	public ParserATNSimulator(@NotNull ATN atn) {
 		this(null, atn);
@@ -298,13 +292,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public ParserATNSimulator(@Nullable Parser<Symbol> parser, @NotNull ATN atn) {
 		super(atn);
 		this.parser = parser;
-//		ctxToDFAs = new HashMap<RuleContext, DFA[]>();
-		// TODO (sam): why distinguish on parser != null?
-		decisionToDFA = new DFA[atn.getNumberOfDecisions() + (parser != null ? 1 : 0)];
-		//		DOTGenerator dot = new DOTGenerator(null);
-		//		System.out.println(dot.getDOT(atn.rules.get(0), parser.getRuleNames()));
-		//		System.out.println(dot.getDOT(atn.rules.get(1), parser.getRuleNames()));
-
 		implicit_context_rules = new BitSet(atn.ruleToStopState.length);
 		for (int i = 0; i < atn.ruleToStartState.length; i++) {
 			if (atn.ruleToStopState[i].getNumberOfTransitions() == 1) {
@@ -329,12 +316,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							   boolean useContext)
 	{
 		predict_calls++;
-		DFA dfa = decisionToDFA[decision];
-		if (optimize_ll1 && dfa != null) {
+		DFA dfa = atn.decisionToDFA[decision];
+		assert dfa != null;
+		if (optimize_ll1 && !dfa.isEmpty()) {
 			int ll_1 = input.LA(1);
 			if (ll_1 >= 0 && ll_1 <= Short.MAX_VALUE) {
 				int key = (decision << 16) + ll_1;
-				Integer alt = LL1Table.get(key);
+				Integer alt = atn.LL1Table.get(key);
 				if (alt != null) {
 					return alt;
 				}
@@ -354,16 +342,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 
 		SimulatorState<Symbol> state = null;
-		if (dfa != null) {
+		if (!dfa.isEmpty()) {
 			state = getStartState(dfa, input, outerContext, useContext);
 		}
 
 		if ( state==null ) {
-			if ( dfa==null ) {
-				DecisionState startState = atn.decisionToState.get(decision);
-				decisionToDFA[decision] = dfa = new DFA(startState, decision);
-			}
-
 			return predictATN(dfa, input, outerContext, useContext);
 		}
 		else {
@@ -388,16 +371,16 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 										boolean useContext) {
 
 		if (!useContext) {
-			if (dfa.s0 == null) {
+			if (dfa.s0.get() == null) {
 				return null;
 			}
 
-			return new SimulatorState<Symbol>(outerContext, dfa.s0, false, outerContext);
+			return new SimulatorState<Symbol>(outerContext, dfa.s0.get(), false, outerContext);
 		}
 
 		RuleContext<Symbol> remainingContext = getInitialContext(outerContext);
 		assert outerContext != null;
-		DFAState s0 = dfa.s0full;
+		DFAState s0 = dfa.s0full.get();
 		while (remainingContext != null && s0 != null && s0.isCtxSensitive) {
 			s0 = s0.getContextTarget(getInvokingState(remainingContext));
 			if (remainingContext.isEmpty()) {
@@ -687,7 +670,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				{
 					if (t >= 0 && t <= Short.MAX_VALUE) {
 						int key = (dfa.decision << 16) + t;
-						LL1Table.put(key, predictedAlt);
+						atn.LL1Table.put(key, predictedAlt);
 					}
 				}
 
@@ -852,7 +835,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 											ParserRuleContext<Symbol> globalContext,
 											boolean useContext)
 	{
-		DFAState s0 = useContext ? dfa.s0full : dfa.s0;
+		DFAState s0 = useContext ? dfa.s0full.get() : dfa.s0.get();
 		if (s0 != null) {
 			if (!useContext) {
 				return new SimulatorState<Symbol>(globalContext, s0, useContext, globalContext);
@@ -925,10 +908,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 			DFAState next = addDFAState(dfa, configs, contextCache);
 			if (s0 == null) {
-				if (useContext) {
-					dfa.s0full = next;
-				} else {
-					dfa.s0 = next;
+				AtomicReference<DFAState> reference = useContext ? dfa.s0full : dfa.s0;
+				if (!reference.compareAndSet(null, next)) {
+					next = reference.get();
 				}
 			}
 			else {
@@ -1754,9 +1736,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			predicateDFAState(newState, configs, decisionState.getNumberOfTransitions());
 		}
 
-		dfa.addState(newState);
-        if ( debug ) System.out.println("adding new DFA state: "+newState);
-		return newState;
+		DFAState added = dfa.addState(newState);
+        if ( debug && added == newState ) System.out.println("adding new DFA state: "+newState);
+		return added;
 	}
 
 	@NotNull

@@ -29,6 +29,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -37,10 +38,7 @@ import org.antlr.v4.runtime.misc.Tuple;
 import org.antlr.v4.runtime.misc.Tuple2;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 
 public abstract class ATNSimulator {
 	/** Must distinguish between missing edge and edge we know leads nowhere */
@@ -49,9 +47,6 @@ public abstract class ATNSimulator {
 	@NotNull
 	public final ATN atn;
 
-	private final Map<PredictionContext, PredictionContext> contextCache =
-		new HashMap<PredictionContext, PredictionContext>();
-
 	static {
 		ERROR = new DFAState(new ATNConfigSet(), 0, 0);
 		ERROR.stateNumber = Integer.MAX_VALUE;
@@ -59,10 +54,6 @@ public abstract class ATNSimulator {
 
 	public ATNSimulator(@NotNull ATN atn) {
 		this.atn = atn;
-	}
-
-	public PredictionContext getCachedContext(PredictionContext context) {
-		return PredictionContext.getCachedContext(context, contextCache, new IdentityHashMap<PredictionContext, PredictionContext>());
 	}
 
 	public abstract void reset();
@@ -150,6 +141,11 @@ public abstract class ATNSimulator {
 			atn.modeToStartState.add((TokensStartState)atn.states.get(s));
 		}
 
+		atn.modeToDFA = new DFA[nmodes];
+		for (int i = 0; i < nmodes; i++) {
+			atn.modeToDFA[i] = new DFA(atn.modeToStartState.get(i));
+		}
+
 		//
 		// SETS
 		//
@@ -231,6 +227,11 @@ public abstract class ATNSimulator {
 			atn.decisionToState.add(decState);
 			decState.decision = i-1;
 			decState.isGreedy = isGreedy==1;
+		}
+
+		atn.decisionToDFA = new DFA[ndecisions];
+		for (int i = 0; i < ndecisions; i++) {
+			atn.decisionToDFA[i] = new DFA(atn.decisionToState.get(i), i);
 		}
 
 		while (true) {

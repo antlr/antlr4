@@ -241,6 +241,14 @@ public class TestPerformance extends BaseTest {
         for (int i = 0; i < PASSES - 1; i++) {
             currentPass = i + 1;
             if (CLEAR_DFA) {
+				if (sharedLexers.length > 0) {
+					sharedLexers[0].getATN().clearDFA();
+				}
+
+				if (sharedParsers.length > 0) {
+					sharedParsers[0].getATN().clearDFA();
+				}
+
 				Arrays.fill(sharedLexers, null);
 				Arrays.fill(sharedParsers, null);
             }
@@ -401,9 +409,10 @@ public class TestPerformance extends BaseTest {
                           tokenCount.get(),
                           System.currentTimeMillis() - startTime);
 
-		for (Lexer lexer : sharedLexers) {
+		if (sharedLexers.length > 0) {
+			Lexer lexer = sharedLexers[0];
 			final LexerATNSimulator lexerInterpreter = lexer.getInterpreter();
-			final DFA[] modeToDFA = lexerInterpreter.dfa;
+			final DFA[] modeToDFA = lexerInterpreter.atn.modeToDFA;
 			if (SHOW_DFA_STATE_STATS) {
 				int states = 0;
 				int configs = 0;
@@ -426,10 +435,11 @@ public class TestPerformance extends BaseTest {
 			}
 		}
 
-		for (Parser<?> parser : sharedParsers) {
+		if (sharedParsers.length > 0) {
+			Parser<?> parser = sharedParsers[0];
             // make sure the individual DFAState objects actually have unique ATNConfig arrays
 			final ParserATNSimulator<?> interpreter = parser.getInterpreter();
-            final DFA[] decisionToDFA = interpreter.decisionToDFA;
+            final DFA[] decisionToDFA = interpreter.atn.decisionToDFA;
 
             if (SHOW_DFA_STATE_STATS) {
                 int states = 0;

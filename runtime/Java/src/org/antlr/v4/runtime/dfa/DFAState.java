@@ -154,13 +154,13 @@ public class DFAState {
 		this.maxSymbol = maxSymbol;
 	}
 
-	public void setContextSensitive(ATN atn) {
+	public synchronized void setContextSensitive(ATN atn) {
 		assert !configset.isOutermostConfigSet();
 
 		if (!isCtxSensitive) {
-			isCtxSensitive = true;
 			contextEdges = new SingletonEdgeMap<DFAState>(-1, atn.states.size() - 1);
 			contextSymbols = new HashSet<Integer>();
+			isCtxSensitive = true;
 		}
 	}
 
@@ -172,7 +172,7 @@ public class DFAState {
 		return edges.get(symbol);
 	}
 
-	public void setTarget(int symbol, DFAState target) {
+	public synchronized void setTarget(int symbol, DFAState target) {
 		if (edges == null) {
 			edges = new SingletonEdgeMap<DFAState>(minSymbol, maxSymbol);
 		}
@@ -200,7 +200,7 @@ public class DFAState {
 		return contextEdges.get(invokingState);
 	}
 
-	public void setContextTarget(int invokingState, DFAState target) {
+	public synchronized void setContextTarget(int invokingState, DFAState target) {
 		if (contextEdges == null) {
 			throw new IllegalStateException("The state is not context sensitive.");
 		}

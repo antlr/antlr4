@@ -31,13 +31,11 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.NotNull;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Deque;
 import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 public abstract class PredictionContext {
 	@NotNull
@@ -224,7 +222,7 @@ public abstract class PredictionContext {
 
 	public static PredictionContext getCachedContext(
 		@NotNull PredictionContext context,
-		@NotNull Map<PredictionContext, PredictionContext> contextCache,
+		@NotNull ConcurrentMap<PredictionContext, PredictionContext> contextCache,
 		@NotNull IdentityHashMap<PredictionContext, PredictionContext> visited) {
 		if (context.isEmpty()) {
 			return context;
@@ -260,8 +258,8 @@ public abstract class PredictionContext {
 		}
 
 		if (!changed) {
-			contextCache.put(context, context);
-			visited.put(context, context);
+			existing = contextCache.putIfAbsent(context, context);
+			visited.put(context, existing != null ? existing : context);
 			return context;
 		}
 
@@ -277,9 +275,9 @@ public abstract class PredictionContext {
 			updated = new ArrayPredictionContext(parents, arrayPredictionContext.invokingStates, context.cachedHashCode);
 		}
 
-		contextCache.put(updated, updated);
-		visited.put(updated, updated);
-		visited.put(context, updated);
+		existing = contextCache.putIfAbsent(updated, updated);
+		visited.put(updated, existing != null ? existing : updated);
+		visited.put(context, existing != null ? existing : updated);
 
 		return updated;
 	}

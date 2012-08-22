@@ -32,21 +32,23 @@ import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DFA {
 	/** A set of all DFA states. Use Map so we can get old state back
 	 *  (Set only allows you to see if it's there).
      */
     @NotNull
-	public final Map<DFAState, DFAState> states = new LinkedHashMap<DFAState, DFAState>();
+	public final ConcurrentMap<DFAState, DFAState> states = new ConcurrentHashMap<DFAState, DFAState>();
 
 	@Nullable
-	public DFAState s0;
+	public final AtomicReference<DFAState> s0 = new AtomicReference<DFAState>();
 
 	@Nullable
-	public DFAState s0full;
+	public final AtomicReference<DFAState> s0full = new AtomicReference<DFAState>();
 
 	public final int decision;
 
@@ -54,7 +56,7 @@ public class DFA {
 	@NotNull
 	public final ATNState atnStartState;
 
-	private int nextStateNumber;
+	private final AtomicInteger nextStateNumber = new AtomicInteger();
 
 	/** Set of configs for a DFA state with at least one conflict? Mainly used as "return value"
 	 *  from predictATN() for retry.
@@ -70,32 +72,41 @@ public class DFA {
 		this.decision = decision;
 	}
 
-	public boolean isContextSensitive() {
-		return s0full != null;
+	public boolean isEmpty() {
+		return s0.get() == null && s0full.get() == null;
 	}
 
-	public void addState(DFAState state) {
-		state.stateNumber = nextStateNumber++;
-		states.put(state, state);
+	public boolean isContextSensitive() {
+		return s0full.get() != null;
+	}
+
+	public DFAState addState(DFAState state) {
+		state.stateNumber = nextStateNumber.getAndIncrement();
+		DFAState existing = states.putIfAbsent(state, state);
+		if (existing != null) {
+			return existing;
+		}
+
+		return state;
 	}
 
 	@Override
 	public String toString() { return toString(null); }
 
 	public String toString(@Nullable String[] tokenNames) {
-		if ( s0==null ) return "";
+		if ( s0.get()==null ) return "";
 		DFASerializer serializer = new DFASerializer(this,tokenNames);
 		return serializer.toString();
 	}
 
 	public String toString(@Nullable String[] tokenNames, @Nullable String[] ruleNames) {
-		if ( s0==null ) return "";
+		if ( s0.get()==null ) return "";
 		DFASerializer serializer = new DFASerializer(this,tokenNames,ruleNames,atnStartState.atn);
 		return serializer.toString();
 	}
 
 	public String toLexerString() {
-		if ( s0==null ) return "";
+		if ( s0.get()==null ) return "";
 		DFASerializer serializer = new LexerDFASerializer(this);
 		return serializer.toString();
 	}

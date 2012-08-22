@@ -105,8 +105,6 @@ public class LexerATNSimulator extends ATNSimulator {
 	/** The index of the character relative to the beginning of the line 0..n-1 */
 	protected int charPositionInLine = 0;
 
-	@NotNull
-	public final DFA[] dfa;
 	protected int mode = Lexer.DEFAULT_MODE;
 
 	/** Used during DFA/ATN exec to record the most recent accept configuration info */
@@ -122,10 +120,6 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	public LexerATNSimulator(@Nullable Lexer recog, @NotNull ATN atn) {
 		super(atn);
-		dfa = new DFA[atn.modeToStartState.size()];
-		for (int i=0; i<atn.modeToStartState.size(); i++) {
-			dfa[i] = new DFA(atn.modeToStartState.get(i));
-		}
 		this.recog = recog;
 
 		for (int i = 0; i < atn.ruleToStartState.length; i++) {
@@ -165,7 +159,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		int mark = input.mark();
 		traceBeginMatch(input, mode);
 		try {
-			DFAState s0 = dfa[mode].s0;
+			DFAState s0 = atn.modeToDFA[mode].s0.get();
 			if ( s0==null ) {
 				return matchATN(input);
 			}
@@ -202,11 +196,14 @@ public class LexerATNSimulator extends ATNSimulator {
 		ATNConfigSet s0_closure = computeStartState(input, startState);
 		int old_mode = mode;
 		DFAState next = addDFAState(s0_closure);
-		dfa[mode].s0 = next;
+		if (!atn.modeToDFA[mode].s0.compareAndSet(null, next)) {
+			next = atn.modeToDFA[mode].s0.get();
+		}
+
 		int predict = execATN(input, s0_closure, next);
 
 		if ( debug ) {
-			System.out.format("DFA after matchATN: %s\n", dfa[old_mode].toLexerString());
+			System.out.format("DFA after matchATN: %s\n", atn.modeToDFA[old_mode].toLexerString());
 		}
 
 		tracePredict(predict);
@@ -709,7 +706,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		if ( dfa_debug ) {
 			System.out.format("back from DFA update, ttype=%d, dfa[mode %d]=\n%s\n",
-				ttype, mode, dfa[mode].toLexerString());
+				ttype, mode, atn.modeToDFA[mode].toLexerString());
 		}
 
 		// action already executed by ATN
@@ -779,7 +776,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( configs.hasSemanticContext() ) return null;
 
 		DFAState proposed = new DFAState(configs, 0, MAX_DFA_EDGE);
-		DFAState existing = dfa[mode].states.get(proposed);
+		DFAState existing = atn.modeToDFA[mode].states.get(proposed);
 		if ( existing!=null ) return existing;
 
 		configs.optimizeConfigs(this);
@@ -800,13 +797,12 @@ public class LexerATNSimulator extends ATNSimulator {
 			newState.prediction = atn.ruleToTokenType[newState.lexerRuleIndex];
 		}
 
-		dfa[mode].addState(newState);
-		return newState;
+		return atn.modeToDFA[mode].addState(newState);
 	}
 
-	@Nullable
-	public DFA getDFA(int mode) {
-		return dfa[mode];
+	@NotNull
+	public final DFA getDFA(int mode) {
+		return atn.modeToDFA[mode];
 	}
 
 	/** Get the text of the current token from an *action* in lexer not
