@@ -1725,7 +1725,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	/** See comment on LexerInterpreter.addDFAState. */
 	@NotNull
 	protected DFAState addDFAState(@NotNull DFA dfa, @NotNull ATNConfigSet configs, PredictionContextCache contextCache) {
-		DFAState proposed = new DFAState(configs, -1, atn.maxTokenType);
+		DFAState proposed = createDFAState(configs);
 		DFAState existing = dfa.states.get(proposed);
 		if ( existing!=null ) return existing;
 
@@ -1737,7 +1737,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					int size = configs.size();
 					configs.stripHiddenConfigs();
 					if (configs.size() < size) {
-						proposed = new DFAState(configs, -1, atn.maxTokenType);
+						proposed = createDFAState(configs);
 						existing = dfa.states.get(proposed);
 						if ( existing!=null ) return existing;
 					}
@@ -1745,11 +1745,16 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 		}
 
-		DFAState newState = new DFAState(configs.clone(true), -1, atn.maxTokenType);
+		DFAState newState = createDFAState(configs.clone(true));
 		newState.stateNumber = dfa.states.size();
 		dfa.states.put(newState, newState);
         if ( debug ) System.out.println("adding new DFA state: "+newState);
 		return newState;
+	}
+
+	@NotNull
+	protected DFAState createDFAState(@NotNull ATNConfigSet configs) {
+		return new DFAState(configs, -1, atn.maxTokenType);
 	}
 
 //	public void reportConflict(int startIndex, int stopIndex,
