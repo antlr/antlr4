@@ -1746,8 +1746,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 
 		DFAState newState = createDFAState(configs.clone(true));
-		newState.stateNumber = dfa.states.size();
-		dfa.states.put(newState, newState);
+		dfa.addState(newState);
         if ( debug ) System.out.println("adding new DFA state: "+newState);
 		return newState;
 	}

@@ -800,8 +800,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			newState.prediction = atn.ruleToTokenType[newState.lexerRuleIndex];
 		}
 
-		newState.stateNumber = dfa[mode].states.size();
-		dfa[mode].states.put(newState, newState);
+		dfa[mode].addState(newState);
 		return newState;
 	}
 

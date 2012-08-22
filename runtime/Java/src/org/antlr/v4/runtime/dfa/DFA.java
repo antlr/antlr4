@@ -55,6 +55,8 @@ public class DFA {
 	@NotNull
 	public final ATNState atnStartState;
 
+	private int nextStateNumber;
+
 	/** Set of configs for a DFA state with at least one conflict? Mainly used as "return value"
 	 *  from predictATN() for retry.
 	 */
@@ -120,6 +122,11 @@ public class DFA {
 		}
 
 		return atnStates;
+	}
+
+	public void addState(DFAState state) {
+		state.stateNumber = nextStateNumber++;
+		states.put(state, state);
 	}
 
 	@Override
