@@ -161,9 +161,6 @@ public class DFAState {
 			isCtxSensitive = true;
 			contextEdges = new SingletonEdgeMap<DFAState>(-1, atn.states.size() - 1);
 			contextSymbols = new HashSet<Integer>();
-			if (edges != null) {
-				edges = edges.clear();
-			}
 		}
 	}
 
