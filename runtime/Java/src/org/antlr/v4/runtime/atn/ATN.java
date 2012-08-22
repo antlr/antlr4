@@ -113,6 +113,12 @@ public class ATN {
 		states.set(state.stateNumber, null); // just free mem, don't shift states in list
 	}
 
+	public void defineMode(@NotNull String name, @NotNull TokensStartState s) {
+		modeNameToStartState.put(name, s);
+		modeToStartState.add(s);
+		defineDecisionState(s);
+	}
+
 	public int defineDecisionState(@NotNull DecisionState s) {
 		decisionToState.add(s);
 		s.decision = decisionToState.size()-1;

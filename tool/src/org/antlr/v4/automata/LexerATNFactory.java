@@ -74,11 +74,8 @@ public class LexerATNFactory extends ParserATNFactory {
 		Set<String> modes = ((LexerGrammar) g).modes.keySet();
 		for (String modeName : modes) {
 			// create s0, start state; implied Tokens rule node
-			TokensStartState startState =
-				newState(TokensStartState.class, null);
-			atn.modeNameToStartState.put(modeName, startState);
-			atn.modeToStartState.add(startState);
-			atn.defineDecisionState(startState);
+			TokensStartState startState = newState(TokensStartState.class, null);
+			atn.defineMode(modeName, startState);
 		}
 
 		// INIT ACTION, RULE->TOKEN_TYPE MAP
