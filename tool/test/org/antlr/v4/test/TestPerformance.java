@@ -86,44 +86,64 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TestPerformance extends BaseTest {
-    /** Parse all java files under this package within the JDK_SOURCE_ROOT. */
+    /**
+     * Parse all java files under this package within the JDK_SOURCE_ROOT
+     * (environment variable or property defined on the Java command line).
+     */
     private static final String TOP_PACKAGE = "java.lang";
-    /** True to load java files from sub-packages of {@link #TOP_PACKAGE}. */
+    /**
+     * {@code true} to load java files from sub-packages of
+     * {@link #TOP_PACKAGE}.
+     */
     private static final boolean RECURSIVE = true;
 
     /**
-     *  True to use the Java grammar with expressions in the v4 left-recursive syntax (Java-LR.g4). False to use
-     *  the standard grammar (Java.g4). In either case, the grammar is renamed in the temporary directory to Java.g4
-     *  before compiling.
+     * {@code true} to use the Java grammar with expressions in the v4
+     * left-recursive syntax (Java-LR.g4). {@code false} to use the standard
+     * grammar (Java.g4). In either case, the grammar is renamed in the
+     * temporary directory to Java.g4 before compiling.
      */
-    private static final boolean USE_LR_GRAMMAR = true;
+    private static final boolean USE_LR_GRAMMAR = false;
     /**
-     *  True to specify the -Xforce-atn option when generating the grammar, forcing all decisions in JavaParser to
-     *  be handled by {@link ParserATNSimulator#adaptivePredict}.
+     * {@code true} to specify the {@code -Xforce-atn} option when generating
+     * the grammar, forcing all decisions in {@code JavaParser} to be handled by
+     * {@link ParserATNSimulator#adaptivePredict}.
      */
     private static final boolean FORCE_ATN = false;
     /**
-     *  True to specify the -atn option when generating the grammar. This will cause ANTLR
-     *  to export the ATN for each decision as a DOT (GraphViz) file.
+     * {@code true} to specify the {@code -atn} option when generating the
+     * grammar. This will cause ANTLR to export the ATN for each decision as a
+     * DOT (GraphViz) file.
      */
     private static final boolean EXPORT_ATN_GRAPHS = true;
     /**
-     *  True to delete temporary (generated and compiled) files when the test completes.
+     * {@code true} to delete temporary (generated and compiled) files when the
+     * test completes.
      */
     private static final boolean DELETE_TEMP_FILES = true;
 
     private static final boolean PAUSE_FOR_HEAP_DUMP = false;
 
-    /** Parse each file with JavaParser.compilationUnit */
+    /**
+     * Parse each file with {@code JavaParser.compilationUnit}.
+     */
     private static final boolean RUN_PARSER = true;
-    /** True to use {@link BailErrorStrategy}, False to use {@link DefaultErrorStrategy} */
+    /**
+     * {@code true} to use {@link BailErrorStrategy}, {@code false} to use
+     * {@link DefaultErrorStrategy}.
+     */
     private static final boolean BAIL_ON_ERROR = true;
-    /** This value is passed to {@link Parser#setBuildParseTree}. */
+    /**
+     * This value is passed to {@link Parser#setBuildParseTree}.
+     */
     private static final boolean BUILD_PARSE_TREES = false;
     /**
-     *  Use ParseTreeWalker.DEFAULT.walk with the BlankJavaParserListener to show parse tree walking overhead.
-     *  If {@link #BUILD_PARSE_TREES} is false, the listener will instead be called during the parsing process via
-     *  {@link Parser#addParseListener}.
+     * Use
+     * {@link ParseTreeWalker#DEFAULT}{@code .}{@link ParseTreeWalker#walk walk}
+     * with the {@code BlankJavaParserListener} to show parse tree walking
+     * overhead. If {@link #BUILD_PARSE_TREES} is {@code false}, the listener
+     * will instead be called during the parsing process via
+     * {@link Parser#addParseListener}.
      */
     private static final boolean BLANK_LISTENER = false;
 
@@ -152,25 +172,35 @@ public class TestPerformance extends BaseTest {
 	private static final boolean REPORT_CONTEXT_SENSITIVITY = REPORT_FULL_CONTEXT;
 
     /**
-     *  If true, a single JavaLexer will be used, and {@link Lexer#setInputStream} will be called to initialize it
-     *  for each source file. In this mode, the cached DFA will be persisted throughout the lexing process.
+     * If {@code true}, a single {@code JavaLexer} will be used, and
+     * {@link Lexer#setInputStream} will be called to initialize it for each
+     * source file. In this mode, the cached DFA will be persisted throughout
+     * the lexing process.
      */
     private static final boolean REUSE_LEXER = true;
     /**
-     *  If true, a single JavaParser will be used, and {@link Parser#setInputStream} will be called to initialize it
-     *  for each source file. In this mode, the cached DFA will be persisted throughout the parsing process.
+     * If {@code true}, a single {@code JavaParser} will be used, and
+     * {@link Parser#setInputStream} will be called to initialize it for each
+     * source file. In this mode, the cached DFA will be persisted throughout
+     * the parsing process.
      */
     private static final boolean REUSE_PARSER = true;
     /**
-     * If true, the shared lexer and parser are reset after each pass. If false, all passes after the first will
-     * be fully "warmed up", which makes them faster and can compare them to the first warm-up pass, but it will
-     * not distinguish bytecode load/JIT time from warm-up time during the first pass.
+     * If {@code true}, the shared lexer and parser are reset after each pass.
+     * If {@code false}, all passes after the first will be fully "warmed up",
+     * which makes them faster and can compare them to the first warm-up pass,
+     * but it will not distinguish bytecode load/JIT time from warm-up time
+     * during the first pass.
      */
     private static final boolean CLEAR_DFA = false;
-
-    /** Total number of passes to make over the source */
+    /**
+     * Total number of passes to make over the source.
+     */
     private static final int PASSES = 4;
 
+	/**
+	 * Number of parser threads to use.
+	 */
 	private static final int NUMBER_OF_THREADS = 1;
 
     private static final Lexer[] sharedLexers = new Lexer[NUMBER_OF_THREADS];
