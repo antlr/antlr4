@@ -354,7 +354,9 @@ public class TestPerformance extends BaseTest {
 					try {
 						factory.parseFile(input, ((NumberedThread)Thread.currentThread()).getThreadNumber());
 					} catch (IllegalStateException ex) {
-						ex.printStackTrace(System.out);
+						ex.printStackTrace(System.err);
+					} catch (Throwable t) {
+						t.printStackTrace(System.err);
 					}
 				}
 			});
@@ -554,6 +556,8 @@ public class TestPerformance extends BaseTest {
                 @SuppressWarnings("unused")
 				@Override
                 public void parseFile(CharStream input, int thread) {
+					assert thread >= 0 && thread < NUMBER_OF_THREADS;
+
                     try {
 						if (sharedListeners[thread] == null) {
 							sharedListeners[thread] = listenerClass.newInstance();
@@ -804,7 +808,9 @@ public class TestPerformance extends BaseTest {
 
 		@Override
 		public Thread newThread(Runnable r) {
-			return new NumberedThread(r, nextThread.getAndIncrement());
+			int threadNumber = nextThread.getAndIncrement();
+			assert threadNumber < NUMBER_OF_THREADS;
+			return new NumberedThread(r, threadNumber);
 		}
 
 	}
