@@ -110,9 +110,6 @@ public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extend
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
 
-	@Override
-	public ATN getATN() { return _ATN; }
-
 	<namedActions.members>
 	<extras>
 	<parser:(ctor)()>
@@ -715,9 +712,6 @@ public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends 
 
 	@Override
 	public String[] getModeNames() { return modeNames; }
-
-	@Override
-	public ATN getATN() { return _ATN; }
 
 	<lexer.namedActions.members>
 
