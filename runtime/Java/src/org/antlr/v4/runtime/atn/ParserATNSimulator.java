@@ -674,9 +674,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			DFAState D = nextState.s0;
-			ATNConfigSet reach = nextState.s0.configset;
+			ATNConfigSet reach = D.configset;
 
-			int predictedAlt = getUniqueAlt(reach);
+			int predictedAlt = reach.getConflictingAlts() == null ? getUniqueAlt(reach) : ATN.INVALID_ALT_NUMBER;
 			if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
 				if (optimize_ll1
 					&& input.index() == startIndex
@@ -1511,11 +1511,21 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if (optimize_hidden_conflicted_configs) {
 				for (int j = firstIndexCurrentState; j <= lastIndexCurrentStateMinAlt; j++) {
 					ATNConfig checkConfig = configs.get(j);
-					if (checkConfig.getSemanticContext() == SemanticContext.NONE
-						|| checkConfig.getSemanticContext().equals(config.getSemanticContext()))
+
+					if (checkConfig.getSemanticContext() != SemanticContext.NONE
+						&& !checkConfig.getSemanticContext().equals(config.getSemanticContext()))
 					{
-						config.setHidden(true);
+						continue;
 					}
+
+					if (joinedCheckContext != checkConfig.getContext()) {
+						check = contextCache.join(checkConfig.getContext(), config.getContext());
+						if (!checkConfig.getContext().equals(check)) {
+							continue;
+						}
+					}
+
+					config.setHidden(true);
 				}
 			}
 		}
