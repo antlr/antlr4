@@ -158,6 +158,7 @@ public class TestPerformance extends BaseTest {
     private static final boolean DISABLE_GLOBAL_CONTEXT = false;
     private static final boolean FORCE_GLOBAL_CONTEXT = false;
     private static final boolean TRY_LOCAL_CONTEXT_FIRST = true;
+	private static final boolean OPTIMIZE_LL1 = true;
 	private static final boolean OPTIMIZE_UNIQUE_CLOSURE = true;
 	private static final boolean OPTIMIZE_IMPLICIT_CONTEXTS = true;
 	private static final boolean OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS = true;
@@ -629,6 +630,7 @@ public class TestPerformance extends BaseTest {
 						sharedParsers[thread].getInterpreter().disable_global_context = DISABLE_GLOBAL_CONTEXT || TWO_STAGE_PARSING;
 						sharedParsers[thread].getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT && !TWO_STAGE_PARSING;
 						sharedParsers[thread].getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST || TWO_STAGE_PARSING;
+						sharedParsers[thread].getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
 						sharedParsers[thread].getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
 						sharedParsers[thread].getInterpreter().optimize_implicit_contexts = OPTIMIZE_IMPLICIT_CONTEXTS;
 						sharedParsers[thread].getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
@@ -676,6 +678,7 @@ public class TestPerformance extends BaseTest {
 							sharedParsers[thread].getInterpreter().disable_global_context = false;
 							sharedParsers[thread].getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT;
 							sharedParsers[thread].getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
+							sharedParsers[thread].getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
 							sharedParsers[thread].getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
 							sharedParsers[thread].getInterpreter().optimize_implicit_contexts = OPTIMIZE_IMPLICIT_CONTEXTS;
 							sharedParsers[thread].getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
