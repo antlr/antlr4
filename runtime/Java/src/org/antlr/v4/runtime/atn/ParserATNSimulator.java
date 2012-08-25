@@ -1692,12 +1692,15 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	/** See comment on LexerInterpreter.addDFAState. */
 	@NotNull
 	protected DFAState addDFAState(@NotNull DFA dfa, @NotNull ATNConfigSet configs, PredictionContextCache contextCache) {
+		if (!configs.isReadOnly()) {
+			configs.optimizeConfigs(this);
+		}
+
 		DFAState proposed = createDFAState(configs);
 		DFAState existing = dfa.states.get(proposed);
 		if ( existing!=null ) return existing;
 
 		if (!configs.isReadOnly()) {
-			configs.optimizeConfigs(this);
 			if (configs.getConflictingAlts() == null) {
 				configs.setConflictingAlts(isConflicted(configs, contextCache));
 				if (optimize_hidden_conflicted_configs && configs.getConflictingAlts() != null) {
