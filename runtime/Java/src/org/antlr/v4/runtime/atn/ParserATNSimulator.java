@@ -1524,14 +1524,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	protected BitSet getConflictingAltsFromConfigSet(ATNConfigSet configs) {
-		BitSet conflictingAlts;
-		if ( configs.getUniqueAlt()!= ATN.INVALID_ALT_NUMBER ) {
+		BitSet conflictingAlts = configs.getConflictingAlts();
+		if ( conflictingAlts == null && configs.getUniqueAlt()!= ATN.INVALID_ALT_NUMBER ) {
 			conflictingAlts = new BitSet();
 			conflictingAlts.set(configs.getUniqueAlt());
 		}
-		else {
-			conflictingAlts = configs.getConflictingAlts();
-		}
+
 		return conflictingAlts;
 	}
 
