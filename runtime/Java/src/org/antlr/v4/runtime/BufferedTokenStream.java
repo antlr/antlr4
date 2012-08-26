@@ -33,9 +33,8 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.BitSet;
 import java.util.List;
-import java.util.Set;
 
 /** Buffer all input tokens but do on-demand fetching of new tokens from
  *  lexer. Useful when the parser or lexer has to set context/mode info before
@@ -262,7 +261,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
      *  the token type BitSet.  Return null if no tokens were found.  This
      *  method looks at both on and off channel tokens.
      */
-    public List<T> getTokens(int start, int stop, Set<Integer> types) {
+    public List<T> getTokens(int start, int stop, BitSet types) {
         lazyInit();
 		if ( start<0 || stop>=tokens.size() ||
 			 stop<0  || start>=tokens.size() )
@@ -270,13 +269,14 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
 			throw new IndexOutOfBoundsException("start "+start+" or stop "+stop+
 												" not in 0.."+(tokens.size()-1));
 		}
+
         if ( start>stop ) return null;
 
         // list = tokens[start:stop]:{T t, t.getType() in types}
         List<T> filteredTokens = new ArrayList<T>();
         for (int i=start; i<=stop; i++) {
             T t = tokens.get(i);
-            if ( types==null || types.contains(t.getType()) ) {
+            if ( types==null || types.get(t.getType()) ) {
                 filteredTokens.add(t);
             }
         }
@@ -287,8 +287,8 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
     }
 
     public List<T> getTokens(int start, int stop, int ttype) {
-		HashSet<Integer> s = new HashSet<Integer>(ttype);
-		s.add(ttype);
+		BitSet s = new BitSet(ttype);
+		s.set(ttype);
 		return getTokens(start,stop, s);
     }
 
