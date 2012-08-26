@@ -1,6 +1,7 @@
 grammar T;
 
 s : A | B ;
-x : (A|B);
-A : 'a'|'c';
-B : 'b' ;
+
+e : e '+' e
+  | INT
+  ;
