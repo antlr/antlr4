@@ -55,6 +55,18 @@ public class Utils {
         return buf.toString();
     }
 
+	public static boolean equals(Object x, Object y) {
+		if (x == y) {
+			return true;
+		}
+
+		if (x == null || y == null) {
+			return false;
+		}
+
+		return x.equals(y);
+	}
+
 	public static int numNonnull(Object[] data) {
 		int n = 0;
 		if ( data == null ) return n;

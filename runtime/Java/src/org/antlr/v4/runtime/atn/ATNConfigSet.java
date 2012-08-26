@@ -29,6 +29,7 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -431,6 +432,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 		ATNConfigSet other = (ATNConfigSet)obj;
 		return this.outermostConfigSet == other.outermostConfigSet
+			&& Utils.equals(conflictingAlts, other.conflictingAlts)
 			&& configs.equals(other.configs);
 	}
 
