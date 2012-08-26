@@ -40,14 +40,14 @@ import java.util.List;
  *  lexer. Useful when the parser or lexer has to set context/mode info before
  *  proper lexing of future tokens. The ST template parser needs this,
  *  for example, because it has to constantly flip back and forth between
- *  inside/output templates. E.g., <names:{hi, <it>}> has to parse names
- *  as part of an expression but "hi, <it>" as a nested template.
+ *  inside/output templates. E.g., {@code <names:{hi, <it>}>} has to parse names
+ *  as part of an expression but {@code "hi, <it>"} as a nested template.
  *
  *  You can't use this stream if you pass whitespace or other off-channel
  *  tokens to the parser. The stream can't ignore off-channel tokens.
- *  (UnbufferedTokenStream is the same way.)  Use CommonTokenStream.
+ *  ({@link UnbufferedTokenStream} is the same way.)  Use {@link CommonTokenStream}.
  *
- *  This is not a subclass of UnbufferedTokenStream because I don't want
+ *  This is not a subclass of {@code UnbufferedTokenStream} because I don't want
  *  to confuse small moving window of tokens it uses for the full buffer.
  */
 public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
@@ -55,16 +55,15 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
     protected TokenSource<? extends T> tokenSource;
 
     /** Record every single token pulled from the source so we can reproduce
-     *  chunks of it later.  The buffer in LookaheadStream overlaps sometimes
-     *  as its moving window moves through the input.  This list captures
-     *  everything so we can access complete input text.
+     *  chunks of it later. This list captures everything so we can access
+     *  complete input text.
      */
     protected List<T> tokens = new ArrayList<T>(100);
 
     /** The index into the tokens list of the current token (next token
-     *  to consume).  tokens[p] should be LT(1).  p=-1 indicates need
+     *  to consume).  {@code tokens[p]} should be {@code LT(1)}.  {@code p==-1} indicates need
      *  to initialize with first token.  The ctor doesn't get a token.
-     *  First call to LT(1) or whatever gets the first token and sets p=0;
+     *  First call to {@code LT(1)} or whatever gets the first token and sets {@code p=0;}.
      */
     protected int p = -1;
 
@@ -116,8 +115,8 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
     public int size() { return tokens.size(); }
 
     /** Move the input pointer to the next incoming token.  The stream
-     *  must become active with LT(1) available.  consume() simply
-     *  moves the input pointer so that LT(1) points at the next
+     *  must become active with {@code LT(1)} available.  {@code consume()} simply
+     *  moves the input pointer so that {@code LT(1)} points at the next
      *  input symbol. Consume at least one token, unless EOF has been reached.
      */
     @Override
@@ -178,7 +177,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
         return tokens.get(i);
     }
 
-	/** Get all tokens from start..stop inclusively */
+	/** Get all tokens from start..stop inclusively. */
 	public List<T> get(int start, int stop) {
 		if ( start<0 || stop<0 ) return null;
 		lazyInit();
@@ -257,8 +256,8 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
         return getTokens(start, stop, null);
     }
 
-    /** Given a start and stop index, return a List of all tokens in
-     *  the token type BitSet.  Return null if no tokens were found.  This
+    /** Given a start and stop index, return a {@code List} of all tokens in
+     *  the token type {@code BitSet}.  Return {@code null} if no tokens were found.  This
      *  method looks at both on and off channel tokens.
      */
     public List<T> getTokens(int start, int stop, BitSet types) {
@@ -293,8 +292,8 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
     }
 
 	/** Given a starting index, return the index of the next token on channel.
-	 *  Return i if tokens[i] is on channel.  Return -1 if there are no tokens
-	 *  on channel between i and EOF.
+	 *  Return {@code i} if {@code tokens[i]} is on channel.  Return {@code -1} if there are no tokens
+	 *  on channel between {@code i} and EOF.
 	 */
 	protected int nextTokenOnChannel(int i, int channel) {
 		sync(i);
@@ -310,8 +309,8 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
 	}
 
 	/** Given a starting index, return the index of the previous token on channel.
-	 *  Return i if tokens[i] is on channel. Return -1 if there are no tokens
-	 *  on channel between i and 0.
+	 *  Return {@code i} if {@code tokens[i]} is on channel. Return {@code -1} if there are no tokens
+	 *  on channel between {@code i} and {@code 0}.
 	 */
 	protected int previousTokenOnChannel(int i, int channel) {
 		while ( i>=0 && tokens.get(i).getChannel()!=channel ) {
@@ -321,8 +320,8 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
 	}
 
 	/** Collect all tokens on specified channel to the right of
-	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL or
-	 *  EOF. If channel is -1, find any non default channel token.
+	 *  the current token up until we see a token on {@link Lexer#DEFAULT_TOKEN_CHANNEL} or
+	 *  EOF. If {@code channel} is {@code -1}, find any non default channel token.
 	 */
 	public List<T> getHiddenTokensToRight(int tokenIndex, int channel) {
 		lazyInit();
@@ -342,16 +341,16 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
 	}
 
 	/** Collect all hidden tokens (any off-default channel) to the right of
-	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL
-	 *  of EOF.
+	 *  the current token up until we see a token on {@link Lexer#DEFAULT_TOKEN_CHANNEL}
+	 *  or EOF.
 	 */
 	public List<T> getHiddenTokensToRight(int tokenIndex) {
 		return getHiddenTokensToRight(tokenIndex, -1);
 	}
 
 	/** Collect all tokens on specified channel to the left of
-	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
-	 *  If channel is -1, find any non default channel token.
+	 *  the current token up until we see a token on {@link ANTLRErrorListener#DEFAULT_TOKEN_CHANNEL}.
+	 *  If {@code channel} is {@code -1}, find any non default channel token.
 	 */
 	public List<T> getHiddenTokensToLeft(int tokenIndex, int channel) {
 		lazyInit();
@@ -370,7 +369,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
 	}
 
 	/** Collect all hidden tokens (any off-default channel) to the left of
-	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
+	 *  the current token up until we see a token on {@link Lexer#DEFAULT_TOKEN_CHANNEL}.
 	 */
 	public List<T> getHiddenTokensToLeft(int tokenIndex) {
 		return getHiddenTokensToLeft(tokenIndex, -1);
@@ -429,7 +428,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
         return null;
     }
 
-    /** Get all tokens from lexer until EOF */
+    /** Get all tokens from lexer until EOF. */
     public void fill() {
         lazyInit();
 		final int blockSize = 1000;
