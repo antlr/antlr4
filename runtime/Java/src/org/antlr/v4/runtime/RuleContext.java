@@ -53,7 +53,7 @@ import java.io.IOException;
  *  The parent contexts are useful for computing lookahead sets and
  *  getting error information.
  *
- *  These objects are used during lexing, parsing, and prediction.
+ *  These objects are used during parsing and prediction.
  *  For the special case of parsers and tree parsers, we use the subclass
  *  ParserRuleContext.
  *
