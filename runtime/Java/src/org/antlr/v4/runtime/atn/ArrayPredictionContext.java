@@ -249,6 +249,10 @@ public class ArrayPredictionContext extends PredictionContext {
 
 				PredictionContext selfParent = operands.getX().getParent(i);
 				PredictionContext otherParent = operands.getY().getParent(i);
+				if (selfParent.hashCode() != otherParent.hashCode()) {
+					return false;
+				}
+
 				if (selfParent != otherParent) {
 					selfWorkList.push(selfParent);
 					otherWorkList.push(otherParent);
