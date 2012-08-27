@@ -229,6 +229,14 @@ public class ArrayPredictionContext extends PredictionContext {
 			}
 
 			int selfSize = operands.getX().size();
+			if (selfSize == 0) {
+				if (!operands.getX().equals(operands.getY())) {
+					return false;
+				}
+
+				continue;
+			}
+
 			int otherSize = operands.getY().size();
 			if (selfSize != otherSize) {
 				return false;
