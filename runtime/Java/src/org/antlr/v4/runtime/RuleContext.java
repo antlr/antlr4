@@ -263,11 +263,13 @@ public class RuleContext implements RuleNode {
 	@Override
 	public <T> T accept(ParseTreeVisitor<? extends T> visitor) { return visitor.visitChildren(this); }
 
+	/** Call this method to view a parse tree in a dialog box visually. */
 	public void inspect(Parser parser) {
 		TreeViewer viewer = new TreeViewer(parser, this);
 		viewer.open();
 	}
 
+	/** Save this tree in a postscript file */
 	public void save(Parser parser, String fileName)
 		throws IOException, PrintException
 	{
@@ -276,6 +278,7 @@ public class RuleContext implements RuleNode {
 		Trees.writePS(this, parser, fileName); // parrt routine
 	}
 
+	/** Save this tree in a postscript file using a particular font name and size */
 	public void save(Parser parser, String fileName,
 					 String fontName, int fontSize)
 		throws IOException
