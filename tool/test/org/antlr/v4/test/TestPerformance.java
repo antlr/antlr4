@@ -454,7 +454,7 @@ public class TestPerformance extends BaseTest {
 			}
 		}
 
-		if (sharedParsers.length > 0) {
+		if (RUN_PARSER && sharedParsers.length > 0) {
 			Parser<?> parser = sharedParsers[0];
             // make sure the individual DFAState objects actually have unique ATNConfig arrays
 			final ParserATNSimulator<?> interpreter = parser.getInterpreter();
