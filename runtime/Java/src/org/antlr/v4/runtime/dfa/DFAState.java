@@ -290,9 +290,8 @@ public class DFAState {
 		}
 
 		DFAState other = (DFAState)o;
-		// TODO (sam): what to do when configs==null?
 		boolean sameSet = this.configset.equals(other.configset);
-//		System.out.println("DFAState.equals: "+configs+(sameSet?"==":"!=")+other.configs);
+		//System.out.println("DFAState.equals: "+configset+(sameSet?"==":"!=")+other.configset);
 		return sameSet;
 	}
 

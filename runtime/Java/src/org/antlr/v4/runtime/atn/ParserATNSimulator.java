@@ -657,9 +657,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			DFAState D = nextState.s0;
-			ATNConfigSet reach = nextState.s0.configset;
+			ATNConfigSet reach = D.configset;
 
-			int predictedAlt = getUniqueAlt(reach);
+			int predictedAlt = reach.getConflictingAlts() == null ? getUniqueAlt(reach) : ATN.INVALID_ALT_NUMBER;
 			if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
 				if (optimize_ll1
 					&& input.index() == startIndex
@@ -757,8 +757,38 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	protected SimulatorState<Symbol> computeReachSet(DFA dfa, SimulatorState<Symbol> previous, int t, boolean greedy, PredictionContextCache contextCache) {
 		final boolean useContext = previous.useContext;
-		RuleContext<Symbol> remainingGlobalContext = previous.remainingOuterContext;
-		List<ATNConfig> closureConfigs = new ArrayList<ATNConfig>(previous.s0.configset);
+		ParserRuleContext<Symbol> remainingGlobalContext = previous.remainingOuterContext;
+
+		DFAState s = previous.s0;
+		if ( useContext ) {
+			while ( s.isCtxSensitive && s.contextSymbols.contains(t) ) {
+				DFAState next = null;
+				if (remainingGlobalContext != null) {
+					next = s.getContextTarget(getInvokingState(remainingGlobalContext));
+				}
+
+				if ( next == null ) {
+					break;
+				}
+
+				remainingGlobalContext = (ParserRuleContext<Symbol>)getParent(remainingGlobalContext);
+				s = next;
+			}
+		}
+
+		assert !s.isAcceptState;
+		if ( s.isAcceptState ) {
+			return new SimulatorState<Symbol>(previous.outerContext, s, useContext, remainingGlobalContext);
+		}
+
+		final DFAState s0 = s;
+
+		DFAState existingTarget = s0 != null ? s0.getTarget(t) : null;
+		if (existingTarget != null) {
+			return new SimulatorState<Symbol>(previous.outerContext, existingTarget, useContext, remainingGlobalContext);
+		}
+
+		List<ATNConfig> closureConfigs = new ArrayList<ATNConfig>(s0.configset);
 		IntegerList contextElements = null;
 		ATNConfigSet reach = new ATNConfigSet();
 		boolean stepIntoGlobal;
@@ -805,7 +835,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if (remainingGlobalContext.isEmpty()) {
 					remainingGlobalContext = null;
 				} else {
-					remainingGlobalContext = getParent(remainingGlobalContext);
+					remainingGlobalContext = (ParserRuleContext<Symbol>)getParent(remainingGlobalContext);
 				}
 
 				contextElements.add(nextContextElement);
@@ -822,12 +852,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 
 		DFAState dfaState = null;
-		if (previous.s0 != null) {
-			dfaState = addDFAEdge(dfa, previous.s0, t, contextElements, reach, contextCache);
+		if (s0 != null) {
+			dfaState = addDFAEdge(dfa, s0, t, contextElements, reach, contextCache);
 		}
 
 		assert !useContext || !dfaState.configset.getDipsIntoOuterContext();
-		return new SimulatorState<Symbol>(previous.outerContext, dfaState, useContext, (ParserRuleContext<Symbol>)remainingGlobalContext);
+		return new SimulatorState<Symbol>(previous.outerContext, dfaState, useContext, remainingGlobalContext);
 	}
 
 	@NotNull
@@ -1493,11 +1523,21 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if (optimize_hidden_conflicted_configs) {
 				for (int j = firstIndexCurrentState; j <= lastIndexCurrentStateMinAlt; j++) {
 					ATNConfig checkConfig = configs.get(j);
-					if (checkConfig.getSemanticContext() == SemanticContext.NONE
-						|| checkConfig.getSemanticContext().equals(config.getSemanticContext()))
+
+					if (checkConfig.getSemanticContext() != SemanticContext.NONE
+						&& !checkConfig.getSemanticContext().equals(config.getSemanticContext()))
 					{
-						config.setHidden(true);
+						continue;
 					}
+
+					if (joinedCheckContext != checkConfig.getContext()) {
+						check = contextCache.join(checkConfig.getContext(), config.getContext());
+						if (!checkConfig.getContext().equals(check)) {
+							continue;
+						}
+					}
+
+					config.setHidden(true);
 				}
 			}
 		}
@@ -1506,14 +1546,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	protected BitSet getConflictingAltsFromConfigSet(ATNConfigSet configs) {
-		BitSet conflictingAlts;
-		if ( configs.getUniqueAlt()!= ATN.INVALID_ALT_NUMBER ) {
+		BitSet conflictingAlts = configs.getConflictingAlts();
+		if ( conflictingAlts == null && configs.getUniqueAlt()!= ATN.INVALID_ALT_NUMBER ) {
 			conflictingAlts = new BitSet();
 			conflictingAlts.set(configs.getUniqueAlt());
 		}
-		else {
-			conflictingAlts = configs.getConflictingAlts();
-		}
+
 		return conflictingAlts;
 	}
 
@@ -1674,12 +1712,15 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	/** See comment on LexerInterpreter.addDFAState. */
 	@NotNull
 	protected DFAState addDFAState(@NotNull DFA dfa, @NotNull ATNConfigSet configs, PredictionContextCache contextCache) {
+		if (!configs.isReadOnly()) {
+			configs.optimizeConfigs(this);
+		}
+
 		DFAState proposed = createDFAState(configs);
 		DFAState existing = dfa.states.get(proposed);
 		if ( existing!=null ) return existing;
 
 		if (!configs.isReadOnly()) {
-			configs.optimizeConfigs(this);
 			if (configs.getConflictingAlts() == null) {
 				configs.setConflictingAlts(isConflicted(configs, contextCache));
 				if (optimize_hidden_conflicted_configs && configs.getConflictingAlts() != null) {

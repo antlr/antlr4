@@ -44,8 +44,8 @@ public class ArrayPredictionContext extends PredictionContext {
 	@NotNull
 	public final int[] invokingStates;
 
-	/*package*/ ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] invokingStates, int parentHashCode, int invokingStateHashCode) {
-		super(calculateHashCode(parentHashCode, invokingStateHashCode));
+	/*package*/ ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] invokingStates) {
+		super(calculateHashCode(calculateParentHashCode(parents), calculateInvokingStatesHashCode(invokingStates)));
 		assert parents.length == invokingStates.length;
 		assert invokingStates.length > 1 || invokingStates[0] != EMPTY_FULL_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
 
@@ -102,9 +102,7 @@ public class ArrayPredictionContext extends PredictionContext {
 		int[] invokingStates2 = Arrays.copyOf(invokingStates, invokingStates.length + 1);
 		parents2[parents2.length - 1] = PredictionContext.EMPTY_FULL;
 		invokingStates2[invokingStates2.length - 1] = PredictionContext.EMPTY_FULL_STATE_KEY;
-		int newParentHashCode = calculateParentHashCode(parents2);
-		int newInvokingStateHashCode = calculateInvokingStatesHashCode(invokingStates2);
-		return new ArrayPredictionContext(parents2, invokingStates2, newParentHashCode, newInvokingStateHashCode);
+		return new ArrayPredictionContext(parents2, invokingStates2);
 	}
 
 	@Override
@@ -146,20 +144,16 @@ public class ArrayPredictionContext extends PredictionContext {
 					updatedInvokingStates[i] = context.getInvokingState(i);
 				}
 
-				int updatedParentHashCode = 1;
-				int updatedInvokingStateHashCode = 1;
 				for (int i = 0; i < parentCount; i++) {
 					updatedParents[i] = appendContext(context.getParent(i), suffix, visited);
-					updatedParentHashCode = 31 * updatedParentHashCode ^ updatedParents[i].hashCode();
-					updatedInvokingStateHashCode = 31 * updatedInvokingStateHashCode ^ context.getInvokingState(i);
 				}
 
 				if (updatedParents.length == 1) {
 					result = new SingletonPredictionContext(updatedParents[0], updatedInvokingStates[0]);
 				}
 				else {
-					assert updatedParents.length > 0;
-					result = new ArrayPredictionContext(updatedParents, updatedInvokingStates, updatedParentHashCode, updatedInvokingStateHashCode);
+					assert updatedParents.length > 1;
+					result = new ArrayPredictionContext(updatedParents, updatedInvokingStates);
 				}
 
 				if (context.hasEmpty()) {
@@ -229,6 +223,14 @@ public class ArrayPredictionContext extends PredictionContext {
 			}
 
 			int selfSize = operands.getX().size();
+			if (selfSize == 0) {
+				if (!operands.getX().equals(operands.getY())) {
+					return false;
+				}
+
+				continue;
+			}
+
 			int otherSize = operands.getY().size();
 			if (selfSize != otherSize) {
 				return false;
@@ -241,6 +243,10 @@ public class ArrayPredictionContext extends PredictionContext {
 
 				PredictionContext selfParent = operands.getX().getParent(i);
 				PredictionContext otherParent = operands.getY().getParent(i);
+				if (selfParent.hashCode() != otherParent.hashCode()) {
+					return false;
+				}
+
 				if (selfParent != otherParent) {
 					selfWorkList.push(selfParent);
 					otherWorkList.push(otherParent);
