@@ -36,7 +36,7 @@ public final class EmptyPredictionContext extends PredictionContext {
 	private final boolean fullContext;
 
 	private EmptyPredictionContext(boolean fullContext) {
-		super(calculateHashCode(1, 1));
+		super(calculateHashCode(calculateEmptyParentHashCode(), calculateEmptyInvokingStateHashCode()));
 		this.fullContext = fullContext;
 	}
 

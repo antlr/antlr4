@@ -36,7 +36,7 @@ public class SingletonPredictionContext extends PredictionContext {
 	public final int invokingState;
 
 	/*package*/ SingletonPredictionContext(@NotNull PredictionContext parent, int invokingState) {
-		super(calculateHashCode(31 ^ parent.hashCode(), 31 ^ invokingState));
+		super(calculateHashCode(calculateParentHashCode(parent), calculateInvokingStateHashCode(invokingState)));
 		assert invokingState != EMPTY_FULL_STATE_KEY && invokingState != EMPTY_LOCAL_STATE_KEY;
 		this.parent = parent;
 		this.invokingState = invokingState;
@@ -92,7 +92,7 @@ public class SingletonPredictionContext extends PredictionContext {
 	protected PredictionContext addEmptyContext() {
 		PredictionContext[] parents = new PredictionContext[] { parent, EMPTY_FULL };
 		int[] invokingStates = new int[] { invokingState, EMPTY_FULL_STATE_KEY };
-		return new ArrayPredictionContext(parents, invokingStates, calculateParentHashCode(parents), calculateInvokingStatesHashCode(invokingStates));
+		return new ArrayPredictionContext(parents, invokingStates);
 	}
 
 	@Override
