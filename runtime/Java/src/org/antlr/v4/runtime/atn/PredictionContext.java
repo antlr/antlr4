@@ -299,11 +299,9 @@ public abstract class PredictionContext {
 			return context;
 		}
 
+		// We know parents.length>0 because context.isEmpty() is checked at the beginning of the method.
 		PredictionContext updated;
-		if (parents.length == 0) {
-			updated = isEmptyLocal(context) ? EMPTY_LOCAL : EMPTY_FULL;
-		}
-		else if (parents.length == 1) {
+		if (parents.length == 1) {
 			updated = new SingletonPredictionContext(parents[0], context.getInvokingState(0));
 		}
 		else {
