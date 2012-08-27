@@ -103,7 +103,7 @@ public class TestPerformance extends BaseTest {
      * grammar (Java.g4). In either case, the grammar is renamed in the
      * temporary directory to Java.g4 before compiling.
      */
-    private static final boolean USE_LR_GRAMMAR = false;
+    private static final boolean USE_LR_GRAMMAR = true;
     /**
      * {@code true} to specify the {@code -Xforce-atn} option when generating
      * the grammar, forcing all decisions in {@code JavaParser} to be handled by
