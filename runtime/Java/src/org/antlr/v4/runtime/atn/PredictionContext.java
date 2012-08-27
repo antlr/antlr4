@@ -48,32 +48,74 @@ public abstract class PredictionContext {
 	public static final int EMPTY_LOCAL_STATE_KEY = Integer.MIN_VALUE;
 	public static final int EMPTY_FULL_STATE_KEY = Integer.MAX_VALUE;
 
+	private static final int INITIAL_HASH = 1;
+	private static final int HASH_MULTIPLIER = 31;
+
+	/**
+	 * Stores the computed hash code of this PredictionContext. The hash code is
+	 * computed in parts to match the following reference algorithm.
+	 *
+	 * <pre>
+	 *  private int referenceHashCode() {
+	 *  	int invokingStateHashCode = {@link #INITIAL_HASH INITIAL_HASH};
+	 *  	for (int i = 0; i &lt; size(); i++) {
+	 *  		invokingStateHashCode = invokingStateHashCode * {@link #HASH_MULTIPLIER HASH_MULTIPLIER} ^ getInvokingState(i);
+	 *  	}
+	 *
+	 *  	int parentHashCode = INITIAL_HASH;
+	 *  	for (int i = 0; i &lt; size(); i++) {
+	 *  		parentHashCode = parentHashCode * HASH_MULTIPLIER ^ getParent(i).hashCode();
+	 *  	}
+	 *
+	 *  	int hashCode = INITIAL_HASH;
+	 *  	hashCode = hashCode * HASH_MULTIPLIER ^ parentHashCode;
+	 *  	hashCode = hashCode * HASH_MULTIPLIER ^ invokingStateHashCode;
+	 *  	return hashCode;
+	 *  }
+	 * </pre>
+	 */
 	private final int cachedHashCode;
 
 	protected PredictionContext(int cachedHashCode) {
 		this.cachedHashCode = cachedHashCode;
 	}
 
+	protected static int calculateEmptyParentHashCode() {
+		return INITIAL_HASH;
+	}
+
+	protected static int calculateParentHashCode(PredictionContext parent) {
+		return INITIAL_HASH * HASH_MULTIPLIER ^ parent.hashCode();
+	}
+
 	protected static int calculateParentHashCode(PredictionContext[] parents) {
-		int hashCode = 1;
+		int hashCode = INITIAL_HASH;
 		for (PredictionContext context : parents) {
-			hashCode = hashCode * 31 ^ context.hashCode();
+			hashCode = hashCode * HASH_MULTIPLIER ^ context.hashCode();
 		}
 
 		return hashCode;
 	}
 
+	protected static int calculateEmptyInvokingStateHashCode() {
+		return INITIAL_HASH;
+	}
+
+	protected static int calculateInvokingStateHashCode(int invokingState) {
+		return INITIAL_HASH * HASH_MULTIPLIER ^ invokingState;
+	}
+
 	protected static int calculateInvokingStatesHashCode(int[] invokingStates) {
-		int hashCode = 1;
+		int hashCode = INITIAL_HASH;
 		for (int state : invokingStates) {
-			hashCode = hashCode * 31 ^ state;
+			hashCode = hashCode * HASH_MULTIPLIER ^ state;
 		}
 
 		return hashCode;
 	}
 
 	protected static int calculateHashCode(int parentHashCode, int invokingStateHashCode) {
-		return 5 * 5 * 7 + 5 * parentHashCode + invokingStateHashCode;
+		return (INITIAL_HASH * HASH_MULTIPLIER ^ parentHashCode) * HASH_MULTIPLIER ^ invokingStateHashCode;
 	}
 
 	public abstract int size();
@@ -138,8 +180,6 @@ public abstract class PredictionContext {
 		}
 
 		int count = 0;
-		int parentHashCode = 1;
-		int invokingStateHashCode = 1;
 		PredictionContext[] parentsList = new PredictionContext[context0size + context1size];
 		int[] invokingStatesList = new int[parentsList.length];
 		int leftIndex = 0;
@@ -169,8 +209,6 @@ public abstract class PredictionContext {
 				rightIndex++;
 			}
 
-			parentHashCode = 31 * parentHashCode ^ parentsList[count].hashCode();
-			invokingStateHashCode = 31 * invokingStateHashCode ^ invokingStatesList[count];
 			count++;
 		}
 
@@ -179,8 +217,6 @@ public abstract class PredictionContext {
 			invokingStatesList[count] = context0.getInvokingState(leftIndex);
 			leftIndex++;
 			canReturnRight = false;
-			parentHashCode = 31 * parentHashCode ^ parentsList[count].hashCode();
-			invokingStateHashCode = 31 * invokingStateHashCode ^ invokingStatesList[count];
 			count++;
 		}
 
@@ -189,8 +225,6 @@ public abstract class PredictionContext {
 			invokingStatesList[count] = context1.getInvokingState(rightIndex);
 			rightIndex++;
 			canReturnLeft = false;
-			parentHashCode = 31 * parentHashCode ^ parentsList[count].hashCode();
-			invokingStateHashCode = 31 * invokingStateHashCode ^ invokingStatesList[count];
 			count++;
 		}
 
@@ -214,7 +248,7 @@ public abstract class PredictionContext {
 			return new SingletonPredictionContext(parentsList[0], invokingStatesList[0]);
 		}
 		else {
-			return new ArrayPredictionContext(parentsList, invokingStatesList, parentHashCode, invokingStateHashCode);
+			return new ArrayPredictionContext(parentsList, invokingStatesList);
 		}
 	}
 
@@ -265,11 +299,9 @@ public abstract class PredictionContext {
 			return context;
 		}
 
+		// We know parents.length>0 because context.isEmpty() is checked at the beginning of the method.
 		PredictionContext updated;
-		if (parents.length == 0) {
-			updated = isEmptyLocal(context) ? EMPTY_LOCAL : EMPTY_FULL;
-		}
-		else if (parents.length == 1) {
+		if (parents.length == 1) {
 			updated = new SingletonPredictionContext(parents[0], context.getInvokingState(0));
 		}
 		else {
