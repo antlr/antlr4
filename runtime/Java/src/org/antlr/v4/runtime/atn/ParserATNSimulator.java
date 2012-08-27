@@ -774,8 +774,38 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	protected SimulatorState<Symbol> computeReachSet(DFA dfa, SimulatorState<Symbol> previous, int t, boolean greedy, PredictionContextCache contextCache) {
 		final boolean useContext = previous.useContext;
-		RuleContext<Symbol> remainingGlobalContext = previous.remainingOuterContext;
-		List<ATNConfig> closureConfigs = new ArrayList<ATNConfig>(previous.s0.configset);
+		ParserRuleContext<Symbol> remainingGlobalContext = previous.remainingOuterContext;
+
+		DFAState s = previous.s0;
+		if ( useContext ) {
+			while ( s.isCtxSensitive && s.contextSymbols.contains(t) ) {
+				DFAState next = null;
+				if (remainingGlobalContext != null) {
+					next = s.getContextTarget(getInvokingState(remainingGlobalContext));
+				}
+
+				if ( next == null ) {
+					break;
+				}
+
+				remainingGlobalContext = (ParserRuleContext<Symbol>)getParent(remainingGlobalContext);
+				s = next;
+			}
+		}
+
+		assert !s.isAcceptState;
+		if ( s.isAcceptState ) {
+			return new SimulatorState<Symbol>(previous.outerContext, s, useContext, remainingGlobalContext);
+		}
+
+		final DFAState s0 = s;
+
+		DFAState existingTarget = s0 != null ? s0.getTarget(t) : null;
+		if (existingTarget != null) {
+			return new SimulatorState<Symbol>(previous.outerContext, existingTarget, useContext, remainingGlobalContext);
+		}
+
+		List<ATNConfig> closureConfigs = new ArrayList<ATNConfig>(s0.configset);
 		IntegerList contextElements = null;
 		ATNConfigSet reach = new ATNConfigSet();
 		boolean stepIntoGlobal;
@@ -822,7 +852,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if (remainingGlobalContext.isEmpty()) {
 					remainingGlobalContext = null;
 				} else {
-					remainingGlobalContext = getParent(remainingGlobalContext);
+					remainingGlobalContext = (ParserRuleContext<Symbol>)getParent(remainingGlobalContext);
 				}
 
 				contextElements.add(nextContextElement);
@@ -839,12 +869,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 
 		DFAState dfaState = null;
-		if (previous.s0 != null) {
-			dfaState = addDFAEdge(dfa, previous.s0, t, contextElements, reach, contextCache);
+		if (s0 != null) {
+			dfaState = addDFAEdge(dfa, s0, t, contextElements, reach, contextCache);
 		}
 
 		assert !useContext || !dfaState.configset.getDipsIntoOuterContext();
-		return new SimulatorState<Symbol>(previous.outerContext, dfaState, useContext, (ParserRuleContext<Symbol>)remainingGlobalContext);
+		return new SimulatorState<Symbol>(previous.outerContext, dfaState, useContext, remainingGlobalContext);
 	}
 
 	@NotNull
