@@ -162,8 +162,9 @@ public class TestPerformance extends BaseTest {
     private static final boolean TRY_LOCAL_CONTEXT_FIRST = true;
 	private static final boolean OPTIMIZE_LL1 = true;
 	private static final boolean OPTIMIZE_UNIQUE_CLOSURE = true;
-	private static final boolean OPTIMIZE_IMPLICIT_CONTEXTS = true;
+	private static final boolean OPTIMIZE_IMPLICIT_CONTEXTS = false;
 	private static final boolean OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS = true;
+	private static final boolean OPTIMIZE_TAIL_CALLS = true;
 
 	private static final boolean TWO_STAGE_PARSING = true;
 
@@ -450,7 +451,7 @@ public class TestPerformance extends BaseTest {
 					}
 				}
 
-				System.out.format("There are %d lexer DFAState instances, %d configs (%d unique).\n", states, configs, uniqueConfigs.size());
+				System.out.format("There are %d lexer DFAState instances, %d configs (%d unique), %d prediction contexts.\n", states, configs, uniqueConfigs.size(), lexerInterpreter.atn.getContextCacheSize());
 			}
 		}
 
@@ -478,7 +479,7 @@ public class TestPerformance extends BaseTest {
 					}
                 }
 
-                System.out.format("There are %d parser DFAState instances, %d configs (%d unique).\n", states, configs, uniqueConfigs.size());
+                System.out.format("There are %d parser DFAState instances, %d configs (%d unique), %d prediction contexts.\n", states, configs, uniqueConfigs.size(), interpreter.atn.getContextCacheSize());
             }
 
             int localDfaCount = 0;
@@ -649,6 +650,8 @@ public class TestPerformance extends BaseTest {
 							}
                         }
 
+						sharedLexers[thread].getInterpreter().optimize_implicit_contexts = OPTIMIZE_IMPLICIT_CONTEXTS;
+						sharedLexers[thread].getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
 						if (ENABLE_LEXER_DFA && !REUSE_LEXER_DFA) {
 							sharedLexers[thread].getInterpreter().atn.clearDFA();
 						}
@@ -692,6 +695,7 @@ public class TestPerformance extends BaseTest {
 						sharedParsers[thread].getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
 						sharedParsers[thread].getInterpreter().optimize_implicit_contexts = OPTIMIZE_IMPLICIT_CONTEXTS;
 						sharedParsers[thread].getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
+						sharedParsers[thread].getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
 						sharedParsers[thread].setBuildParseTree(BUILD_PARSE_TREES);
 						if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
 							sharedParsers[thread].addParseListener(sharedListeners[thread]);
@@ -740,6 +744,7 @@ public class TestPerformance extends BaseTest {
 							sharedParsers[thread].getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
 							sharedParsers[thread].getInterpreter().optimize_implicit_contexts = OPTIMIZE_IMPLICIT_CONTEXTS;
 							sharedParsers[thread].getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
+							sharedParsers[thread].getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
 							sharedParsers[thread].setBuildParseTree(BUILD_PARSE_TREES);
 							if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
 								sharedParsers[thread].addParseListener(sharedListeners[thread]);

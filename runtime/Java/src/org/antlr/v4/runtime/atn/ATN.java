@@ -110,6 +110,10 @@ public class ATN {
 		LL1Table.clear();
 	}
 
+	public int getContextCacheSize() {
+		return contextCache.size();
+	}
+
 	public PredictionContext getCachedContext(PredictionContext context) {
 		return PredictionContext.getCachedContext(context, contextCache, new IdentityHashMap<PredictionContext, PredictionContext>());
 	}

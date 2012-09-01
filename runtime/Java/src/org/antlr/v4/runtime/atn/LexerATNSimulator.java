@@ -52,6 +52,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	public static final int MAX_DFA_EDGE = 127; // forces unicode to stay in ATN
 
 	public boolean optimize_implicit_contexts = true;
+	public boolean optimize_tail_calls = true;
 	private final BitSet implicit_context_rules = new BitSet();
 
 	private boolean trace = false;
@@ -621,7 +622,20 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		switch (t.getSerializationType()) {
 		case Transition.RULE:
-			if (keepContext(t.target.ruleIndex)) {
+			boolean suppressFrame;
+			if (optimize_implicit_contexts) {
+				suppressFrame = keepContext(t.target.ruleIndex);
+				if (optimize_tail_calls && !suppressFrame && ((RuleTransition)t).optimizedTailCall) {
+					if (!keepContext(config.getState().ruleIndex)) {
+						suppressFrame = true;
+					}
+				}
+			}
+			else {
+				suppressFrame = optimize_tail_calls && ((RuleTransition)t).optimizedTailCall;
+			}
+
+			if (suppressFrame) {
 				c = config.transform(t.target);
 			}
 			else {

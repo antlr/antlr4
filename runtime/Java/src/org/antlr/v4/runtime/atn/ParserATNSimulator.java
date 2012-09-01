@@ -253,6 +253,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public boolean optimize_ll1 = true;
 	public boolean optimize_hidden_conflicted_configs = true;
 	public boolean optimize_implicit_contexts = true;
+	public boolean optimize_tail_calls = true;
 	private final BitSet implicit_context_rules;
 
 	public static boolean optimize_closure_busy = true;
@@ -820,8 +821,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			final boolean collectPredicates = false;
-			final boolean loopsSimulateTailRecursion = useContext;
-			closure(reachIntermediate, reach, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContext, contextCache);
+			closure(reachIntermediate, reach, collectPredicates, greedy, hasMoreContext, contextCache);
 			stepIntoGlobal = reach.getDipsIntoOuterContext();
 
 			if (useContext && stepIntoGlobal) {
@@ -932,8 +932,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			final boolean collectPredicates = true;
-			final boolean loopsSimulateTailRecursion = useContext;
-			closure(reachIntermediate, configs, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContext, contextCache);
+			closure(reachIntermediate, configs, collectPredicates, greedy, hasMoreContext, contextCache);
 			boolean stepIntoGlobal = configs.getDipsIntoOuterContext();
 
 			DFAState next = addDFAState(dfa, configs, contextCache);
@@ -1168,7 +1167,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	protected void closure(ATNConfigSet sourceConfigs,
 						   @NotNull ATNConfigSet configs,
 						   boolean collectPredicates,
-						   boolean greedy, boolean loopsSimulateTailRecursion,
+						   boolean greedy,
 						   boolean hasMoreContext,
 						   @Nullable PredictionContextCache contextCache)
 	{
@@ -1185,7 +1184,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					continue;
 				}
 
-				closure(config, configs, intermediate, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContext, contextCache, 0);
+				closure(config, configs, intermediate, closureBusy, collectPredicates, greedy, hasMoreContext, contextCache, 0);
 			}
 
 			currentConfigs = intermediate;
@@ -1197,7 +1196,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						   @Nullable ATNConfigSet intermediate,
 						   @NotNull Set<ATNConfig> closureBusy,
 						   boolean collectPredicates,
-						   boolean greedy, boolean loopsSimulateTailRecursion,
+						   boolean greedy,
 						   boolean hasMoreContexts,
 						   @NotNull PredictionContextCache contextCache,
 						   int depth)
@@ -1222,7 +1221,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if (keepContext) {
 				// the step out operates as a continuation of the current rule, but at a different depth
 				ATNConfig c = config.transform(config.getState().transition(0).target);
-				closure(c, configs, intermediate, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContexts, contextCache, depth - 1);
+				closure(c, configs, intermediate, closureBusy, collectPredicates, greedy, hasMoreContexts, contextCache, depth - 1);
 				return;
 			}
 
@@ -1244,7 +1243,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						continue;
 					}
 
-					closure(c, configs, intermediate, closureBusy, collectPredicates, greedy, loopsSimulateTailRecursion, hasMoreContexts, contextCache, depth - 1);
+					closure(c, configs, intermediate, closureBusy, collectPredicates, greedy, hasMoreContexts, contextCache, depth - 1);
 				}
 
 				if (!hasEmpty || !hasMoreContexts) {
@@ -1277,19 +1276,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				!(t instanceof ActionTransition) && collectPredicates;
             ATNConfig c = getEpsilonTarget(config, t, continueCollecting, depth == 0, contextCache);
 			if ( c!=null ) {
-				if (loopsSimulateTailRecursion) {
-					if ( config.getState() instanceof StarLoopbackState || config.getState() instanceof PlusLoopbackState ) {
-						c.setContext(contextCache.getChild(c.getContext(), config.getState().stateNumber));
-						if ( debug ) System.out.println("Loop back; push "+config.getState().stateNumber+", stack="+c.getContext());
-					}
-				}
-
-				if (config.getState() instanceof LoopEndState) {
-					if ( debug ) System.out.println("Loop end; pop, stack="+c.getContext());
-					LoopEndState end = (LoopEndState)config.getState();
-					c.setContext(c.getContext().popAll(end.loopBackState.stateNumber, contextCache));
-				}
-
 				if (t instanceof RuleTransition) {
 					if (intermediate != null && !collectPredicates) {
 						intermediate.add(c, contextCache);
@@ -1336,7 +1322,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					}
 				}
 
-				closure(c, configs, intermediate, closureBusy, continueCollecting, greedy, loopsSimulateTailRecursion, hasMoreContexts, contextCache, newDepth);
+				closure(c, configs, intermediate, closureBusy, continueCollecting, greedy, hasMoreContexts, contextCache, newDepth);
 			}
 		}
 	}
@@ -1351,7 +1337,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public ATNConfig getEpsilonTarget(@NotNull ATNConfig config, @NotNull Transition t, boolean collectPredicates, boolean inContext, PredictionContextCache contextCache) {
 		switch (t.getSerializationType()) {
 		case Transition.RULE:
-			return ruleTransition(config, t, contextCache);
+			return ruleTransition(config, (RuleTransition)t, contextCache);
 
 		case Transition.PREDICATE:
 			return predTransition(config, (PredicateTransition)t, collectPredicates, inContext);
@@ -1405,7 +1391,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	}
 
 	@NotNull
-	public ATNConfig ruleTransition(@NotNull ATNConfig config, @NotNull Transition t, @Nullable PredictionContextCache contextCache) {
+	public ATNConfig ruleTransition(@NotNull ATNConfig config, @NotNull RuleTransition t, @Nullable PredictionContextCache contextCache) {
 		if ( debug ) {
 			System.out.println("CALL rule "+getRuleName(t.target.ruleIndex)+
 							   ", ctx="+config.getContext());
@@ -1414,7 +1400,20 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		ATNState p = config.getState();
 		PredictionContext newContext;
 
-		if (keepContext(t.target)) {
+		boolean suppressFrame;
+		if (optimize_implicit_contexts) {
+			suppressFrame = keepContext(t.target);
+			if (optimize_tail_calls && !suppressFrame && t.optimizedTailCall) {
+				if (!keepContext(config.getState())) {
+					suppressFrame = true;
+				}
+			}
+		}
+		else {
+			suppressFrame = optimize_tail_calls && t.optimizedTailCall;
+		}
+
+		if (suppressFrame) {
 			newContext = config.getContext();
 		}
 		else if (contextCache != null) {
