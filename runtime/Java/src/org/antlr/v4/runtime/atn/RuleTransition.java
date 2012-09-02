@@ -40,6 +40,9 @@ public final class RuleTransition extends Transition {
 	@NotNull
 	public ATNState followState;
 
+	public boolean tailCall;
+	public boolean optimizedTailCall;
+
 	public RuleTransition(@NotNull RuleStartState ruleStart,
 						  int ruleIndex,
 						  @NotNull ATNState followState)

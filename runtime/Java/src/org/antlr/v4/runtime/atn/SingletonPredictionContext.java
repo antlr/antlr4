@@ -65,15 +65,6 @@ public class SingletonPredictionContext extends PredictionContext {
 	}
 
 	@Override
-	public PredictionContext popAll(int invokingState, PredictionContextCache contextCache) {
-		if (this.invokingState == invokingState) {
-			return this.parent.popAll(invokingState, contextCache);
-		}
-
-		return this;
-	}
-
-	@Override
 	public boolean isEmpty() {
 		return false;
 	}

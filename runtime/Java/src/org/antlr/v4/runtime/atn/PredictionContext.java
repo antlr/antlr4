@@ -320,8 +320,6 @@ public abstract class PredictionContext {
 
 	public abstract PredictionContext appendContext(PredictionContext suffix, PredictionContextCache contextCache);
 
-	public abstract PredictionContext popAll(int invokingState, PredictionContextCache contextCache);
-
 	public PredictionContext getChild(int invokingState) {
 		return new SingletonPredictionContext(this, invokingState);
 	}

@@ -37,7 +37,10 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Tuple;
 import org.antlr.v4.runtime.misc.Tuple2;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Deque;
 import java.util.List;
 
 public abstract class ATNSimulator {
@@ -243,6 +246,8 @@ public abstract class ATNSimulator {
 				break;
 			}
 		}
+
+		identifyTailCalls(atn);
 
 		verifyATN(atn);
 		return atn;
@@ -582,6 +587,72 @@ public abstract class ATNSimulator {
 		}
 
 		return removedPaths;
+	}
+
+	private static void identifyTailCalls(ATN atn) {
+		for (ATNState state : atn.states) {
+			for (Transition transition : state.transitions) {
+				if (!(transition instanceof RuleTransition)) {
+					continue;
+				}
+
+				RuleTransition ruleTransition = (RuleTransition)transition;
+				ruleTransition.tailCall = testTailCall(atn, ruleTransition, false);
+				ruleTransition.optimizedTailCall = testTailCall(atn, ruleTransition, true);
+			}
+
+			if (!state.isOptimized()) {
+				continue;
+			}
+
+			for (Transition transition : state.optimizedTransitions) {
+				if (!(transition instanceof RuleTransition)) {
+					continue;
+				}
+
+				RuleTransition ruleTransition = (RuleTransition)transition;
+				ruleTransition.tailCall = testTailCall(atn, ruleTransition, false);
+				ruleTransition.optimizedTailCall = testTailCall(atn, ruleTransition, true);
+			}
+		}
+	}
+
+	private static boolean testTailCall(ATN atn, RuleTransition transition, boolean optimizedPath) {
+		if (!optimizedPath && transition.tailCall) {
+			return true;
+		}
+		if (optimizedPath && transition.optimizedTailCall) {
+			return true;
+		}
+
+		BitSet reachable = new BitSet(atn.states.size());
+		Deque<ATNState> worklist = new ArrayDeque<ATNState>();
+		worklist.add(transition.followState);
+		while (!worklist.isEmpty()) {
+			ATNState state = worklist.pop();
+			if (reachable.get(state.stateNumber)) {
+				continue;
+			}
+
+			if (state instanceof RuleStopState) {
+				continue;
+			}
+
+			if (!state.onlyHasEpsilonTransitions()) {
+				return false;
+			}
+
+			List<Transition> transitions = optimizedPath ? state.optimizedTransitions : state.transitions;
+			for (Transition t : transitions) {
+				if (t.getSerializationType() != Transition.EPSILON) {
+					return false;
+				}
+
+				worklist.add(t.target);
+			}
+		}
+
+		return true;
 	}
 
 	public static int toInt(char c) {

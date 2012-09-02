@@ -80,11 +80,6 @@ public final class EmptyPredictionContext extends PredictionContext {
 	}
 
 	@Override
-	public EmptyPredictionContext popAll(int invokingState, PredictionContextCache contextCache) {
-		return this;
-	}
-
-	@Override
 	public boolean isEmpty() {
 		return true;
 	}
