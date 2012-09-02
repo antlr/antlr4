@@ -575,9 +575,14 @@ public class LexerATNSimulator extends ATNSimulator {
 			// keepContext only for fragment rule referenced from only one location
 			boolean keepContext = keepContext((RuleStopState)config.getState());
 			PredictionContext context = config.getContext();
-			if ( context.isEmpty() && !keepContext ) {
-				configs.add(config);
-				return;
+			if (!keepContext) {
+				if ( context.isEmpty() ) {
+					configs.add(config);
+					return;
+				}
+				else if ( context.hasEmpty() ) {
+					configs.add(config.transform(config.getState(), PredictionContext.EMPTY_FULL));
+				}
 			}
 
 			if (keepContext) {
@@ -586,8 +591,13 @@ public class LexerATNSimulator extends ATNSimulator {
 			}
 			else {
 				for (int i = 0; i < context.size(); i++) {
+					int invokingStateNumber = context.getInvokingState(i);
+					if (invokingStateNumber == PredictionContext.EMPTY_FULL_STATE_KEY) {
+						continue;
+					}
+
 					PredictionContext newContext = context.getParent(i); // "pop" invoking state
-					ATNState invokingState = atn.states.get(context.getInvokingState(i));
+					ATNState invokingState = atn.states.get(invokingStateNumber);
 					RuleTransition rt = (RuleTransition)invokingState.transition(0);
 					ATNState retState = rt.followState;
 					ATNConfig c = ATNConfig.create(retState, config.getAlt(), newContext);
