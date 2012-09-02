@@ -1303,9 +1303,19 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					if ( debug ) System.out.println("dips into outer ctx: "+c);
 				}
 				else if (t instanceof RuleTransition) {
-					// latch when newDepth goes negative - once we step out of the entry context we can't return
-					if (newDepth >= 0) {
-						newDepth++;
+					if (optimize_tail_calls && ((RuleTransition)t).optimizedTailCall) {
+						assert c.getContext() == config.getContext();
+						if (newDepth <= 0) {
+							// the pop/push of a tail call would keep the depth
+							// constant, except we latch if it goes negative
+							newDepth--;
+						}
+					}
+					else {
+						// latch when newDepth goes negative - once we step out of the entry context we can't return
+						if (newDepth >= 0) {
+							newDepth++;
+						}
 					}
 				}
 
