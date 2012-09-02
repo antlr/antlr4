@@ -76,8 +76,8 @@ public class ATNSerializer {
 		IntegerList data = new IntegerList();
 		// convert grammar type to ATN const to avoid dependence on ANTLRParser
 		if ( g.getType()== ANTLRParser.LEXER ) data.add(ATN.LEXER);
-		else if ( g.getType()== ANTLRParser.PARSER ) data.add(ATN.PARSER);
-		else data.add(ATN.TREE_PARSER);
+		else if ( g.getType()== ANTLRParser.PARSER || g.getType() == ANTLRParser.COMBINED ) data.add(ATN.PARSER);
+		else throw new UnsupportedOperationException("Unrecognized grammar type " + String.valueOf(g.getType()) + ".");
 		data.add(g.getMaxTokenType());
 		int nedges = 0;
 

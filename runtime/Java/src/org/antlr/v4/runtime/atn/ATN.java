@@ -45,7 +45,6 @@ public class ATN {
 
 	public static final int PARSER = 1;
 	public static final int LEXER = 2;
-	public static final int TREE_PARSER = 3;
 
 	@NotNull
 	public final List<ATNState> states = new ArrayList<ATNState>();
