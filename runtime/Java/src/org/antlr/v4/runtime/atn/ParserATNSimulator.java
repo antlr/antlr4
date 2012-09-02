@@ -413,7 +413,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		int index = input.index();
 		try {
 			SimulatorState<Symbol> state = computeStartState(dfa, outerContext, useContext);
-			alt = execATN(dfa, input, index, state);
+			if (state.s0.isAcceptState) {
+				return execDFA(dfa, input, index, state);
+			}
+			else {
+				alt = execATN(dfa, input, index, state);
+			}
 		}
 		catch (NoViableAltException nvae) {
 			if ( debug ) dumpDeadEndConfigs(nvae);
