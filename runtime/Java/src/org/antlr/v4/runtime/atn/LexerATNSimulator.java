@@ -632,7 +632,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 			}
 			else {
-				suppressFrame = optimize_tail_calls && ((RuleTransition)t).optimizedTailCall;
+				suppressFrame = optimize_tail_calls && ((RuleTransition)t).optimizedTailCall && !config.getContext().hasEmpty();
 			}
 
 			if (suppressFrame) {
