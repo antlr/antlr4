@@ -138,15 +138,10 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 
 	// Double dispatch methods for listeners
 
-	// parse listener
-	public void enterRule(ParseListener<Symbol> listener) { }
-	public void exitRule(ParseListener<Symbol> listener) { }
-
-	// parse tree listener
 	public void enterRule(ParseTreeListener<Symbol> listener) { }
 	public void exitRule(ParseTreeListener<Symbol> listener) { }
 
-	/** Does not set parent link; other add methods do */
+	/** Does not set parent link; other add methods do that */
 	public void addChild(TerminalNode<Symbol> t) {
 		if ( children==null ) children = new ArrayList<ParseTree>();
 		children.add(t);

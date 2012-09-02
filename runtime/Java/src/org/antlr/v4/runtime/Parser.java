@@ -36,41 +36,53 @@ import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.tree.ErrorNode;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
 public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>> {
-	public class TraceListener implements ParseListener<Token> {
+	public class TraceListener implements ParseTreeListener<Token> {
 		@Override
-		public void enterNonLRRule(ParserRuleContext<Token> ctx) {
-			System.out.println("enter   " + getRuleNames()[ctx.getRuleIndex()] + ", LT(1)=" + _input.LT(1).getText());
+		public void enterEveryRule(ParserRuleContext<Token> ctx) {
+			System.out.println("enter   " + getRuleNames()[ctx.getRuleIndex()] +
+							   ", LT(1)=" + _input.LT(1).getText());
+		}
+
+		@Override
+		public void visitTerminal(TerminalNode<Token> node) {
+			System.out.println("consume "+node.getSymbol()+" rule "+
+							   getRuleNames()[_ctx.getRuleIndex()]+
+							   " alt="+_ctx.altNum);
+		}
+
+		@Override
+		public void visitErrorNode(ErrorNode<Token> node) {
 		}
 
 		@Override
 		public void exitEveryRule(ParserRuleContext<Token> ctx) {
-			System.out.println("exit    "+getRuleNames()[ctx.getRuleIndex()]+", LT(1)="+_input.LT(1).getText());
-		}
-
-		@Override
-		public void visitTerminal(ParserRuleContext<Token> parent, Token token) {
-			System.out.println("consume "+token+" rule "+
-							   getRuleNames()[parent.getRuleIndex()]+
-							   " alt="+parent.altNum);
+			System.out.println("exit    "+getRuleNames()[ctx.getRuleIndex()]+
+							   ", LT(1)="+_input.LT(1).getText());
 		}
 	}
 
-	public static class TrimToSizeListener implements ParseListener<Token> {
+	public static class TrimToSizeListener implements ParseTreeListener<Token> {
 		public static final TrimToSizeListener INSTANCE = new TrimToSizeListener();
 
 		@Override
-		public void visitTerminal(ParserRuleContext<Token> parent, Token token) {
-		}
+		public void enterEveryRule(ParserRuleContext<Token> ctx) { }
 
 		@Override
-		public void enterNonLRRule(ParserRuleContext<Token> ctx) {
-		}
+		public void visitTerminal(TerminalNode<Token> node) { }
+
+		@Override
+		public void visitErrorNode(ErrorNode<Token> node) {	}
 
 		@Override
 		public void exitEveryRule(ParserRuleContext<Token> ctx) {
@@ -78,7 +90,6 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 				((ArrayList<?>)ctx.children).trimToSize();
 			}
 		}
-
 	}
 
 	protected ANTLRErrorStrategy _errHandler = new DefaultErrorStrategy();
@@ -100,9 +111,11 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
      *  *during* the parse. This is typically done only when not building
      *  parse trees for later visiting. We either trigger events during
      *  the parse or during tree walks later. Both could be done.
-     *  Not intended for tree parsing but would work.
+     *  Not intended for average user!!!  Most people should use
+	 *  ParseTreeListener with ParseTreeWalker.
+	 *  @see ParseTreeWalker
      */
-    protected List<ParseListener<Token>> _parseListeners;
+    protected List<ParseTreeListener<Token>> _parseListeners;
 
 	/** Did the recognizer encounter a syntax error?  Track how many. */
 	protected int _syntaxErrors = 0;
@@ -191,7 +204,6 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	}
 
 	/**
-	 *
 	 * @return {@code true} if the {@link ParserRuleContext#children} list is trimmed
 	 * using the default {@link Parser.TrimToSizeListener} during the parse process.
 	 */
@@ -208,20 +220,28 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 //		return traceATNStates;
 //	}
 
-    public List<ParseListener<Token>> getParseListeners() {
+    public List<ParseTreeListener<Token>> getParseListeners() {
         return _parseListeners;
     }
 
-	// TODO: make comment directing people to ParseTreeListener
-    public void addParseListener(ParseListener<Token> listener) {
+	/** Provide a listener that gets notified about token matches,
+	 *  and rule entry/exit events DURING the parse. It's a little bit
+	 *  weird for left recursive rule entry events but it's
+	 *  deterministic.
+	 *
+	 *  THIS IS ONLY FOR ADVANCED USERS. Please give your
+	 *  ParseTreeListener to a ParseTreeWalker instead of giving it to
+	 *  the parser!!!!
+	 */
+    public void addParseListener(ParseTreeListener<Token> listener) {
 		if ( listener==null ) return;
 		if ( _parseListeners==null ) {
-			_parseListeners = new ArrayList<ParseListener<Token>>();
+			_parseListeners = new ArrayList<ParseTreeListener<Token>>();
 		}
         this._parseListeners.add(listener);
     }
 
-	public void removeParseListener(ParseListener<Token> l) {
+	public void removeParseListener(ParseTreeListener<Token> l) {
 		if ( l==null ) return;
 		if ( _parseListeners!=null ) {
 			_parseListeners.remove(l);
@@ -235,17 +255,27 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 		_parseListeners = null;
 	}
 
+	/** Notify any parse listeners (implemented as ParseTreeListener's)
+	 *  of an enter rule event. This is not involved with
+	 *  parse tree walking in any way; it's just reusing the
+	 *  ParseTreeListener interface. This is not for the average user.
+	 */
 	public void triggerEnterRuleEvent() {
-		for (ParseListener<Token> l : _parseListeners) {
-			l.enterNonLRRule(_ctx);
+		for (ParseTreeListener<Token> l : _parseListeners) {
+			l.enterEveryRule(_ctx);
 			_ctx.enterRule(l);
 		}
 	}
 
+	/** Notify any parse listeners (implemented as ParseTreeListener's)
+	 *  of an exit rule event. This is not involved with
+	 *  parse tree walking in any way; it's just reusing the
+	 *  ParseTreeListener interface. This is not for the average user.
+	 */
 	public void triggerExitRuleEvent() {
 		// reverse order walk of listeners
 		for (int i = _parseListeners.size()-1; i >= 0; i--) {
-			ParseListener<Token> l = _parseListeners.get(i);
+			ParseTreeListener<Token> l = _parseListeners.get(i);
 			_ctx.exitRule(l);
 			l.exitEveryRule(_ctx);
 		}
@@ -336,15 +366,15 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 		Token o = getCurrentToken();
 		getInputStream().consume();
 		if (_buildParseTrees) {
-			// TODO: tree parsers?
 			if ( _errHandler.inErrorRecoveryMode(this) ) {
-//				System.out.println("consume in error recovery mode for "+o);
 				_ctx.addErrorNode(o);
 			}
 			else _ctx.addChild(o);
 		}
 		if ( _parseListeners != null) {
-			for (ParseListener<Token> l : _parseListeners) l.visitTerminal(_ctx, o);
+			for (ParseTreeListener<Token> l : _parseListeners) {
+				l.visitTerminal(new TerminalNodeImpl<Token>(o));
+			}
 		}
 		return o;
 	}
@@ -390,10 +420,13 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 		_ctx.altNum = altNum;
 	}
 
-	/* like enterRule but for recursive rules; no enter events for recursive rules. */
+	/* like enterRule but for recursive rules */
 	public void pushNewRecursionContext(ParserRuleContext<Token> localctx, int ruleIndex) {
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
+		if ( _parseListeners != null ) {
+			triggerEnterRuleEvent(); // simulates rule entry for left-recursive rules
+		}
 	}
 
 	public void unrollRecursionContexts(ParserRuleContext<Token> _parentctx) {
@@ -589,7 +622,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 //		if ( traceATNStates ) _ctx.trace(atnState);
 	}
 
-	/** During a parse is extremely useful to listen in on the rule entry and exit
+	/** During a parse is sometimes useful to listen in on the rule entry and exit
 	 *  events as well as token matches. This is for quick and dirty debugging.
 	 */
 	public void setTrace(boolean trace) {
