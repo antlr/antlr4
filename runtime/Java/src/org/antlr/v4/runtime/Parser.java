@@ -567,8 +567,8 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
     /** For debugging and other purposes */
     public List<String> getDFAStrings() {
         List<String> s = new ArrayList<String>();
-        for (int d = 0; d < _interp.decisionToDFA.length; d++) {
-            DFA dfa = _interp.decisionToDFA[d];
+        for (int d = 0; d < _interp.atn.decisionToDFA.length; d++) {
+            DFA dfa = _interp.atn.decisionToDFA[d];
             s.add( dfa.toString(getTokenNames(), getRuleNames()) );
         }
         return s;
@@ -577,9 +577,9 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
     /** For debugging and other purposes */
     public void dumpDFA() {
         boolean seenOne = false;
-        for (int d = 0; d < _interp.decisionToDFA.length; d++) {
-            DFA dfa = _interp.decisionToDFA[d];
-            if ( dfa!=null ) {
+        for (int d = 0; d < _interp.atn.decisionToDFA.length; d++) {
+            DFA dfa = _interp.atn.decisionToDFA[d];
+            if ( !dfa.isEmpty() ) {
                 if ( seenOne ) System.out.println();
                 System.out.println("Decision " + dfa.decision + ":");
                 System.out.print(dfa.toString(getTokenNames(), getRuleNames()));

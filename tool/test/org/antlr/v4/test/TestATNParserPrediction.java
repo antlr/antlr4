@@ -35,7 +35,10 @@ import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.DecisionState;
+import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.tool.DOTGenerator;
@@ -580,7 +583,7 @@ public class TestATNParserPrediction extends BaseTest {
 			catch (NoViableAltException nvae) {
 				nvae.printStackTrace(System.err);
 			}
-			DFA dfa = interp.getATNSimulator().decisionToDFA[decision];
+			DFA dfa = interp.getATNSimulator().atn.decisionToDFA[decision];
 			assertEquals(dfaString[i], dfa.toString(g.getTokenDisplayNames(), g.rules.keySet().toArray(new String[g.rules.size()])));
 		}
 	}

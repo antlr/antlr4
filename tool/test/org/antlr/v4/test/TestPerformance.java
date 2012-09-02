@@ -47,6 +47,7 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.SimulatorState;
@@ -66,6 +67,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -175,17 +177,29 @@ public class TestPerformance extends BaseTest {
     /**
      * If {@code true}, a single {@code JavaLexer} will be used, and
      * {@link Lexer#setInputStream} will be called to initialize it for each
-     * source file. In this mode, the cached DFA will be persisted throughout
-     * the lexing process.
+     * source file. Otherwise, a new instance will be created for each file.
      */
     private static final boolean REUSE_LEXER = true;
+	/**
+	 * If {@code true}, a single DFA will be used for lexing which is shared
+	 * across all threads and files. Otherwise, each file will be lexed with its
+	 * own DFA which is accomplished by creating one ATN instance per thread and
+	 * clearing its DFA cache before lexing each file.
+	 */
+	private static final boolean REUSE_LEXER_DFA = true;
     /**
      * If {@code true}, a single {@code JavaParser} will be used, and
      * {@link Parser#setInputStream} will be called to initialize it for each
-     * source file. In this mode, the cached DFA will be persisted throughout
-     * the parsing process.
+     * source file. Otherwise, a new instance will be created for each file.
      */
     private static final boolean REUSE_PARSER = true;
+	/**
+	 * If {@code true}, a single DFA will be used for parsing which is shared
+	 * across all threads and files. Otherwise, each file will be parsed with
+	 * its own DFA which is accomplished by creating one ATN instance per thread
+	 * and clearing its DFA cache before parsing each file.
+	 */
+	private static final boolean REUSE_PARSER_DFA = true;
     /**
      * If {@code true}, the shared lexer and parser are reset after each pass.
      * If {@code false}, all passes after the first will be fully "warmed up",
@@ -205,8 +219,12 @@ public class TestPerformance extends BaseTest {
 	private static final int NUMBER_OF_THREADS = 1;
 
     private static final Lexer[] sharedLexers = new Lexer[NUMBER_OF_THREADS];
+	private static final ATN[] sharedLexerATNs = new ATN[NUMBER_OF_THREADS];
+
 	@SuppressWarnings("unchecked")
     private static final Parser<Token>[] sharedParsers = (Parser<Token>[])new Parser<?>[NUMBER_OF_THREADS];
+	private static final ATN[] sharedParserATNs = new ATN[NUMBER_OF_THREADS];
+
 	@SuppressWarnings("unchecked")
     private static final ParseTreeListener<Token>[] sharedListeners = (ParseTreeListener<Token>[])new ParseTreeListener<?>[NUMBER_OF_THREADS];
 
@@ -242,6 +260,14 @@ public class TestPerformance extends BaseTest {
         for (int i = 0; i < PASSES - 1; i++) {
             currentPass = i + 1;
             if (CLEAR_DFA) {
+				if (sharedLexers.length > 0) {
+					sharedLexers[0].getATN().clearDFA();
+				}
+
+				if (sharedParsers.length > 0) {
+					sharedParsers[0].getATN().clearDFA();
+				}
+
 				Arrays.fill(sharedLexers, null);
 				Arrays.fill(sharedParsers, null);
             }
@@ -402,9 +428,10 @@ public class TestPerformance extends BaseTest {
                           tokenCount.get(),
                           System.currentTimeMillis() - startTime);
 
-		for (Lexer lexer : sharedLexers) {
+		if (sharedLexers.length > 0) {
+			Lexer lexer = sharedLexers[0];
 			final LexerATNSimulator lexerInterpreter = lexer.getInterpreter();
-			final DFA[] modeToDFA = lexerInterpreter.dfa;
+			final DFA[] modeToDFA = lexerInterpreter.atn.modeToDFA;
 			if (SHOW_DFA_STATE_STATS) {
 				int states = 0;
 				int configs = 0;
@@ -427,10 +454,11 @@ public class TestPerformance extends BaseTest {
 			}
 		}
 
-		for (Parser<?> parser : sharedParsers) {
+		if (RUN_PARSER && sharedParsers.length > 0) {
+			Parser<?> parser = sharedParsers[0];
             // make sure the individual DFAState objects actually have unique ATNConfig arrays
 			final ParserATNSimulator<?> interpreter = parser.getInterpreter();
-            final DFA[] decisionToDFA = interpreter.decisionToDFA;
+            final DFA[] decisionToDFA = interpreter.atn.decisionToDFA;
 
             if (SHOW_DFA_STATE_STATS) {
                 int states = 0;
@@ -583,6 +611,22 @@ public class TestPerformance extends BaseTest {
             TokenSource<Token> tokenSource = lexerCtor.newInstance(new ANTLRInputStream(""));
             parserCtor.newInstance(new CommonTokenStream(tokenSource));
 
+			if (!REUSE_LEXER_DFA) {
+				Field lexerSerializedATNField = lexerClass.getField("_serializedATN");
+				String lexerSerializedATN = (String)lexerSerializedATNField.get(null);
+				for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+					sharedLexerATNs[i] = ATNSimulator.deserialize(lexerSerializedATN.toCharArray());
+				}
+			}
+
+			if (RUN_PARSER && !REUSE_PARSER_DFA) {
+				Field parserSerializedATNField = parserClass.getField("_serializedATN");
+				String parserSerializedATN = (String)parserSerializedATNField.get(null);
+				for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+					sharedParserATNs[i] = ATNSimulator.deserialize(parserSerializedATN.toCharArray());
+				}
+			}
+
             return new ParserFactory() {
                 @SuppressWarnings("unused")
 				@Override
@@ -600,8 +644,14 @@ public class TestPerformance extends BaseTest {
                             sharedLexers[thread] = lexerCtor.newInstance(input);
 							if (!ENABLE_LEXER_DFA) {
 								sharedLexers[thread].setInterpreter(new NonCachingLexerATNSimulator(sharedLexers[thread], sharedLexers[thread].getATN()));
+							} else if (!REUSE_LEXER_DFA) {
+								sharedLexers[thread].setInterpreter(new LexerATNSimulator(sharedLexers[thread], sharedLexerATNs[thread]));
 							}
                         }
+
+						if (ENABLE_LEXER_DFA && !REUSE_LEXER_DFA) {
+							sharedLexers[thread].getInterpreter().atn.clearDFA();
+						}
 
                         CommonTokenStream tokens = new CommonTokenStream(sharedLexers[thread]);
                         tokens.fill();
@@ -624,9 +674,17 @@ public class TestPerformance extends BaseTest {
 							sharedParsers[thread].addErrorListener(DescriptiveErrorListener.INSTANCE);
 							sharedParsers[thread].addErrorListener(new SummarizingDiagnosticErrorListener());
 						}
+
 						if (!ENABLE_PARSER_DFA) {
 							sharedParsers[thread].setInterpreter(new NonCachingParserATNSimulator<Token>(sharedParsers[thread], sharedParsers[thread].getATN()));
+						} else if (!REUSE_PARSER_DFA) {
+							sharedParsers[thread].setInterpreter(new ParserATNSimulator<Token>(sharedParsers[thread], sharedParserATNs[thread]));
 						}
+
+						if (ENABLE_PARSER_DFA && !REUSE_PARSER_DFA) {
+							sharedParsers[thread].getInterpreter().atn.clearDFA();
+						}
+
 						sharedParsers[thread].getInterpreter().disable_global_context = DISABLE_GLOBAL_CONTEXT || TWO_STAGE_PARSING;
 						sharedParsers[thread].getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT && !TWO_STAGE_PARSING;
 						sharedParsers[thread].getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST || TWO_STAGE_PARSING;

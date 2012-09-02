@@ -64,7 +64,9 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	 */
 	public abstract String getGrammarFileName();
 
-	public abstract ATN getATN();
+	public ATN getATN() {
+		return _interp.atn;
+	}
 
 	public ATNInterpreter getInterpreter() {
 		return _interp;

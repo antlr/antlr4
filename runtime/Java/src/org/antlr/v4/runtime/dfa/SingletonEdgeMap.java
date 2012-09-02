@@ -39,11 +39,13 @@ import java.util.Set;
  */
 public class SingletonEdgeMap<T> extends AbstractEdgeMap<T> {
 
-	private int key;
-	private T value;
+	private final int key;
+	private final T value;
 
 	public SingletonEdgeMap(int minIndex, int maxIndex) {
 		super(minIndex, maxIndex);
+		this.key = 0;
+		this.value = null;
 	}
 
 	public SingletonEdgeMap(int minIndex, int maxIndex, int key, T value) {
@@ -51,6 +53,9 @@ public class SingletonEdgeMap<T> extends AbstractEdgeMap<T> {
 		if (key >= minIndex && key <= maxIndex) {
 			this.key = key;
 			this.value = value;
+		} else {
+			this.key = 0;
+			this.value = null;
 		}
 	}
 
@@ -93,9 +98,7 @@ public class SingletonEdgeMap<T> extends AbstractEdgeMap<T> {
 		}
 
 		if (key == this.key || this.value == null) {
-			this.key = key;
-			this.value = value;
-			return this;
+			return new SingletonEdgeMap<T>(minIndex, maxIndex, key, value);
 		} else if (value != null) {
 			AbstractEdgeMap<T> result = new SparseEdgeMap<T>(minIndex, maxIndex);
 			result = result.put(this.key, this.value);
@@ -108,8 +111,8 @@ public class SingletonEdgeMap<T> extends AbstractEdgeMap<T> {
 
 	@Override
 	public SingletonEdgeMap<T> remove(int key) {
-		if (key == this.key) {
-			this.value = null;
+		if (key == this.key && this.value != null) {
+			return new SingletonEdgeMap<T>(minIndex, maxIndex);
 		}
 
 		return this;
@@ -117,7 +120,10 @@ public class SingletonEdgeMap<T> extends AbstractEdgeMap<T> {
 
 	@Override
 	public SingletonEdgeMap<T> clear() {
-		this.value = null;
+		if (this.value != null) {
+			return new SingletonEdgeMap<T>(minIndex, maxIndex);
+		}
+
 		return this;
 	}
 

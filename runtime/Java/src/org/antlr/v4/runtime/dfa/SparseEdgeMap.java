@@ -117,56 +117,69 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 			return remove(key);
 		}
 
-		int index = Arrays.binarySearch(keys, 0, size(), key);
-		if (index >= 0) {
-			// replace existing entry
-			values.set(index, value);
-			return this;
-		}
+		synchronized (values) {
+			int index = Arrays.binarySearch(keys, 0, size(), key);
+			if (index >= 0) {
+				// replace existing entry
+				values.set(index, value);
+				return this;
+			}
 
-		assert index < 0 && value != null;
-		if (size() < getMaxSparseSize()) {
-			// stay sparse and add new entry
+			assert index < 0 && value != null;
 			int insertIndex = -index - 1;
-			System.arraycopy(keys, insertIndex, keys, insertIndex + 1, keys.length - insertIndex - 1);
-			keys[insertIndex] = key;
-			values.add(insertIndex, value);
-			return this;
-		}
+			if (size() < getMaxSparseSize() && insertIndex == size()) {
+				// stay sparse and add new entry
+				keys[insertIndex] = key;
+				values.add(value);
+				return this;
+			}
 
-		assert size() == getMaxSparseSize();
-
-		int desiredSize = getMaxSparseSize() * 2;
-		int space = maxIndex - minIndex + 1;
-		// SparseEdgeMap only uses less memory than ArrayEdgeMap up to half the size of the symbol space
-		if (desiredSize >= space / 2) {
-			ArrayEdgeMap<T> arrayMap = new ArrayEdgeMap<T>(minIndex, maxIndex);
-			arrayMap = arrayMap.putAll(this);
-			arrayMap.put(key, value);
-			return arrayMap;
-		}
-		else {
-			SparseEdgeMap<T> resized = new SparseEdgeMap<T>(this, desiredSize);
-			resized.put(key, value);
-			return resized;
+			int desiredSize = size() >= getMaxSparseSize() ? getMaxSparseSize() * 2 : getMaxSparseSize();
+			int space = maxIndex - minIndex + 1;
+			// SparseEdgeMap only uses less memory than ArrayEdgeMap up to half the size of the symbol space
+			if (desiredSize >= space / 2) {
+				ArrayEdgeMap<T> arrayMap = new ArrayEdgeMap<T>(minIndex, maxIndex);
+				arrayMap = arrayMap.putAll(this);
+				arrayMap.put(key, value);
+				return arrayMap;
+			}
+			else {
+				SparseEdgeMap<T> resized = new SparseEdgeMap<T>(this, desiredSize);
+				System.arraycopy(resized.keys, insertIndex, resized.keys, insertIndex + 1, resized.keys.length - insertIndex - 1);
+				resized.keys[insertIndex] = key;
+				resized.values.add(insertIndex, value);
+				return resized;
+			}
 		}
 	}
 
 	@Override
 	public SparseEdgeMap<T> remove(int key) {
 		int index = Arrays.binarySearch(keys, 0, size(), key);
-		if (index >= 0) {
-			System.arraycopy(keys, index + 1, keys, index, size() - index - 1);
-			values.remove(index);
+		if (index < 0) {
+			return this;
 		}
 
-		return this;
+		if (index == values.size() - 1) {
+			values.remove(index);
+			return this;
+		}
+
+		SparseEdgeMap<T> result = new SparseEdgeMap<T>(this, getMaxSparseSize());
+		System.arraycopy(result.keys, index + 1, result.keys, index, size() - index - 1);
+		result.values.remove(index);
+		return result;
 	}
 
 	@Override
 	public SparseEdgeMap<T> clear() {
-		values.clear();
-		return this;
+		if (isEmpty()) {
+			return this;
+		}
+
+		SparseEdgeMap<T> result = new SparseEdgeMap<T>(this, getMaxSparseSize());
+		result.values.clear();
+		return result;
 	}
 
 	@Override
