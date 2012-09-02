@@ -51,9 +51,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	public static boolean dfa_debug = false;
 	public static final int MAX_DFA_EDGE = 127; // forces unicode to stay in ATN
 
-	public boolean optimize_implicit_contexts = true;
 	public boolean optimize_tail_calls = true;
-	private final BitSet implicit_context_rules = new BitSet();
 
 	private boolean trace = false;
 	private OutputStream traceStream = null;
@@ -122,15 +120,6 @@ public class LexerATNSimulator extends ATNSimulator {
 	public LexerATNSimulator(@Nullable Lexer recog, @NotNull ATN atn) {
 		super(atn);
 		this.recog = recog;
-
-		for (int i = 0; i < atn.ruleToStartState.length; i++) {
-			if (atn.ruleToStopState[i].getNumberOfTransitions() == 1
-				&& atn.ruleToActionIndex[i] == -1
-				&& atn.ruleToTokenType[i] == Token.INVALID_TYPE) {
-
-				implicit_context_rules.set(i);
-			}
-		}
 	}
 
 	public void copyState(@NotNull LexerATNSimulator simulator) {
@@ -572,37 +561,27 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 			}
 
-			// keepContext only for fragment rule referenced from only one location
-			boolean keepContext = keepContext((RuleStopState)config.getState());
 			PredictionContext context = config.getContext();
-			if (!keepContext) {
-				if ( context.isEmpty() ) {
-					configs.add(config);
-					return;
-				}
-				else if ( context.hasEmpty() ) {
-					configs.add(config.transform(config.getState(), PredictionContext.EMPTY_FULL));
-				}
+			if ( context.isEmpty() ) {
+				configs.add(config);
+				return;
+			}
+			else if ( context.hasEmpty() ) {
+				configs.add(config.transform(config.getState(), PredictionContext.EMPTY_FULL));
 			}
 
-			if (keepContext) {
-				ATNConfig c = config.transform(config.getState().transition(0).target);
+			for (int i = 0; i < context.size(); i++) {
+				int invokingStateNumber = context.getInvokingState(i);
+				if (invokingStateNumber == PredictionContext.EMPTY_FULL_STATE_KEY) {
+					continue;
+				}
+
+				PredictionContext newContext = context.getParent(i); // "pop" invoking state
+				ATNState invokingState = atn.states.get(invokingStateNumber);
+				RuleTransition rt = (RuleTransition)invokingState.transition(0);
+				ATNState retState = rt.followState;
+				ATNConfig c = ATNConfig.create(retState, config.getAlt(), newContext);
 				closure(c, configs);
-			}
-			else {
-				for (int i = 0; i < context.size(); i++) {
-					int invokingStateNumber = context.getInvokingState(i);
-					if (invokingStateNumber == PredictionContext.EMPTY_FULL_STATE_KEY) {
-						continue;
-					}
-
-					PredictionContext newContext = context.getParent(i); // "pop" invoking state
-					ATNState invokingState = atn.states.get(invokingStateNumber);
-					RuleTransition rt = (RuleTransition)invokingState.transition(0);
-					ATNState retState = rt.followState;
-					ATNConfig c = ATNConfig.create(retState, config.getAlt(), newContext);
-					closure(c, configs);
-				}
 			}
 
 			return;
@@ -632,20 +611,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		switch (t.getSerializationType()) {
 		case Transition.RULE:
-			boolean suppressFrame;
-			if (optimize_implicit_contexts) {
-				suppressFrame = keepContext(t.target.ruleIndex);
-				if (optimize_tail_calls && !suppressFrame && ((RuleTransition)t).optimizedTailCall) {
-					if (!keepContext(config.getState().ruleIndex)) {
-						suppressFrame = true;
-					}
-				}
-			}
-			else {
-				suppressFrame = optimize_tail_calls && ((RuleTransition)t).optimizedTailCall && !config.getContext().hasEmpty();
-			}
-
-			if (suppressFrame) {
+			if (optimize_tail_calls && ((RuleTransition)t).optimizedTailCall && !config.getContext().hasEmpty()) {
 				c = config.transform(t.target);
 			}
 			else {
@@ -707,14 +673,6 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		return c;
-	}
-
-	private boolean keepContext(int ruleIndex) {
-		return optimize_implicit_contexts && implicit_context_rules.get(ruleIndex);
-	}
-
-	private boolean keepContext(RuleStopState state) {
-		return keepContext(state.ruleIndex);
 	}
 
 	protected int failOverToATN(@NotNull CharStream input, @NotNull DFAState s) {
