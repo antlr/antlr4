@@ -146,8 +146,6 @@ public class TestTokenTypeAssignment extends BaseTest {
 	}
 
 	@Test public void testTokenInTokensSectionAndTokenRuleDef() throws Exception {
-		// this must return A not I to the parser; calling a nonfragment rule
-		// from a nonfragment rule does not set the overall token.
 		String grammar =
 			"grammar P;\n" +
 			"tokens { B='}'; }\n"+
@@ -161,8 +159,6 @@ public class TestTokenTypeAssignment extends BaseTest {
 	}
 
 	@Test public void testTokenInTokensSectionAndTokenRuleDef2() throws Exception {
-		// this must return A not I to the parser; calling a nonfragment rule
-		// from a nonfragment rule does not set the overall token.
 		String grammar =
 			"grammar P;\n" +
 			"tokens { B='}'; }\n"+

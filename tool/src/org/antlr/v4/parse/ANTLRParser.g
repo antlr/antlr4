@@ -784,8 +784,7 @@ atom
 
     |
     	*/
-        range  // Range x..y - only valid in lexers
-	|	terminal
+		terminal
     |   ruleref
     |	notSet
     |	wildcard

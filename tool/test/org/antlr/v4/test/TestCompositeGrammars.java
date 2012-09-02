@@ -251,7 +251,6 @@ public class TestCompositeGrammars extends BaseTest {
 	}
 
 	@Test public void testCombinedImportsCombined() throws Exception {
-		// for now, we don't allow combined to import combined
 		ErrorQueue equeue = new ErrorQueue();
 		String slave =
 			"grammar S;\n" + // A, B, C token type order
