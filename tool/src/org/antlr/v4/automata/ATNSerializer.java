@@ -247,7 +247,7 @@ public class ATNSerializer {
 				int loopBackStateNumber = ATNSimulator.toInt(data[p++]);
 				arg = " "+loopBackStateNumber;
 			}
-			else if ( stype == ATNState.PLUS_BLOCK_START || stype == ATNState.STAR_BLOCK_START ) {
+			else if ( stype == ATNState.PLUS_BLOCK_START || stype == ATNState.STAR_BLOCK_START || stype == ATNState.BLOCK_START ) {
 				int endStateNumber = ATNSimulator.toInt(data[p++]);
 				arg = " "+endStateNumber;
 			}

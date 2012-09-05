@@ -153,23 +153,23 @@ public class TestATNSerialization extends BaseTest {
 			"a : A | A B ;");
 		String expecting =
 			"max type 2\n" +
-			"0:RULE_START 0\n" +
-			"1:RULE_STOP 0\n" +
-			"2:BASIC 0\n" +
-			"4:BASIC 0\n" +
-			"6:BASIC 0\n" +
-			"8:BLOCK_START 0\n" +
-			"9:BLOCK_END 0\n" +
-			"10:BASIC 0\n" +
-			"rule 0:0\n" +
-			"0->8 EPSILON 0,0,0\n" +
-			"2->9 ATOM 1,0,0\n" +
-			"4->6 ATOM 1,0,0\n" +
-			"6->9 ATOM 2,0,0\n" +
-			"8->2 EPSILON 0,0,0\n" +
-			"8->4 EPSILON 0,0,0\n" +
-			"9->1 EPSILON 0,0,0\n" +
-			"0:8 1\n";
+				"0:RULE_START 0\n" +
+				"1:RULE_STOP 0\n" +
+				"2:BASIC 0\n" +
+				"3:BASIC 0\n" +
+				"4:BASIC 0\n" +
+				"5:BLOCK_START 0 6\n" +
+				"6:BLOCK_END 0\n" +
+				"7:BASIC 0\n" +
+				"rule 0:0\n" +
+				"0->5 EPSILON 0,0,0\n" +
+				"2->6 ATOM 1,0,0\n" +
+				"3->4 ATOM 1,0,0\n" +
+				"4->6 ATOM 2,0,0\n" +
+				"5->2 EPSILON 0,0,0\n" +
+				"5->3 EPSILON 0,0,0\n" +
+				"6->1 EPSILON 0,0,0\n" +
+				"0:5 1\n";
 		ATN atn = createATN(g);
 		String result = ATNSerializer.getDecoded(g, atn);
 		assertEquals(expecting, result);
@@ -181,31 +181,30 @@ public class TestATNSerialization extends BaseTest {
 			"a : A | A B | A B C ;");
 		String expecting =
 			"max type 3\n" +
-			"0:RULE_START 0\n" +
-			"1:RULE_STOP 0\n" +
-			"2:BASIC 0\n" +
-			"4:BASIC 0\n" +
-			"6:BASIC 0\n" +
-			"8:BASIC 0\n" +
-			"10:BASIC 0\n" +
-			"12:BASIC 0\n" +
-			"14:BLOCK_START 0\n" +
-			"15:BLOCK_END 0\n" +
-			"16:BASIC 0\n" +
-			"rule 0:0\n" +
-			"0->14 EPSILON 0,0,0\n" +
-			"1->16 ATOM -1,0,0\n" +
-			"2->15 ATOM 1,0,0\n" +
-			"4->6 ATOM 1,0,0\n" +
-			"6->15 ATOM 2,0,0\n" +
-			"8->10 ATOM 1,0,0\n" +
-			"10->12 ATOM 2,0,0\n" +
-			"12->15 ATOM 3,0,0\n" +
-			"14->2 EPSILON 0,0,0\n" +
-			"14->4 EPSILON 0,0,0\n" +
-			"14->8 EPSILON 0,0,0\n" +
-			"15->1 EPSILON 0,0,0\n" +
-			"0:14 1\n";
+				"0:RULE_START 0\n" +
+				"1:RULE_STOP 0\n" +
+				"2:BASIC 0\n" +
+				"3:BASIC 0\n" +
+				"4:BASIC 0\n" +
+				"5:BASIC 0\n" +
+				"6:BASIC 0\n" +
+				"7:BASIC 0\n" +
+				"8:BLOCK_START 0 9\n" +
+				"9:BLOCK_END 0\n" +
+				"10:BASIC 0\n" +
+				"rule 0:0\n" +
+				"0->8 EPSILON 0,0,0\n" +
+				"2->9 ATOM 1,0,0\n" +
+				"3->4 ATOM 1,0,0\n" +
+				"4->9 ATOM 2,0,0\n" +
+				"5->6 ATOM 1,0,0\n" +
+				"6->7 ATOM 2,0,0\n" +
+				"7->9 ATOM 3,0,0\n" +
+				"8->2 EPSILON 0,0,0\n" +
+				"8->3 EPSILON 0,0,0\n" +
+				"8->5 EPSILON 0,0,0\n" +
+				"9->1 EPSILON 0,0,0\n" +
+				"0:8 1\n";
 		ATN atn = createATN(g);
 		String result = ATNSerializer.getDecoded(g, atn);
 		assertEquals(expecting, result);
@@ -359,26 +358,24 @@ public class TestATNSerialization extends BaseTest {
 			"INT : 'a' (EOF|'\n') ;\n");
 		String expecting =
 			"max type 1\n" +
-			"0:TOKEN_START -1\n" +
-			"1:RULE_START 0\n" +
-			"2:RULE_STOP 0\n" +
-			"3:BASIC 0\n" +
-			"5:BASIC 0\n" +
-			"7:BASIC 0\n" +
-			"9:BLOCK_START 0\n" +
-			"10:BLOCK_END 0\n" +
-			"rule 0:1 1,-1\n" +
-			"mode 0:0\n" +
-			"0->1 EPSILON 0,0,0\n" +
-			"1->3 EPSILON 0,0,0\n" +
-			"3->9 ATOM 97,0,0\n" +
-			"5->10 ATOM -1,0,0\n" +
-			"7->10 ATOM 10,0,0\n" +
-			"9->5 EPSILON 0,0,0\n" +
-			"9->7 EPSILON 0,0,0\n" +
-			"10->2 EPSILON 0,0,0\n" +
-			"0:0 1\n" +
-			"1:9 1\n";
+				"0:TOKEN_START -1\n" +
+				"1:RULE_START 0\n" +
+				"2:RULE_STOP 0\n" +
+				"3:BASIC 0\n" +
+				"4:BASIC 0\n" +
+				"5:BLOCK_START 0 6\n" +
+				"6:BLOCK_END 0\n" +
+				"rule 0:1 1,-1\n" +
+				"mode 0:0\n" +
+				"0:EOF..EOF, '\\n'..'\\n'\n" +
+				"0->1 EPSILON 0,0,0\n" +
+				"1->3 EPSILON 0,0,0\n" +
+				"3->5 ATOM 97,0,0\n" +
+				"4->6 SET 0,0,0\n" +
+				"5->4 EPSILON 0,0,0\n" +
+				"6->2 EPSILON 0,0,0\n" +
+				"0:0 1\n" +
+				"1:5 1\n";
 		ATN atn = createATN(lg);
 		String result = ATNSerializer.getDecoded(lg, atn);
 		assertEquals(expecting, result);
