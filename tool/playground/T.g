@@ -1,10 +1,14 @@
 grammar T;
 
-s : e ';' ;
+options
+{
+ output=AST;
+ backtrack=true;
+}
 
-e : e '+' e
-  | INT
-  ;
-
-INT : [0-9]+ ;
-WS : [ \r\n\t]+ -> skip ;
+Integer :  '0' .. '9';
+    
+ 
+myID : Integer*;
+  
+public json : myID+   -> ^(myID); 

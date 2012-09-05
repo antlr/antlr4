@@ -28,10 +28,7 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ErrorNodeImpl;
@@ -296,24 +293,6 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 
 	public Symbol getStart() { return start; }
 	public Symbol getStop() { return stop; }
-
-	@Override
-	public String toString(@NotNull Recognizer<?,?> recog, RuleContext stop) {
-		if ( recog==null ) return super.toString(recog, stop);
-		StringBuilder buf = new StringBuilder();
-		RuleContext p = this;
-		buf.append("[");
-		String[] ruleNames = recog.getRuleNames();
-		while ( p != null && p != stop ) {
-			int ruleIndex = p.getRuleIndex();
-			String ruleName = ruleIndex >= 0 && ruleIndex < ruleNames.length ? ruleNames[ruleIndex] : Integer.toString(ruleIndex);
-			buf.append(ruleName);
-			if ( p.parent != null ) buf.append(" ");
-			p = p.parent;
-		}
-		buf.append("]");
-		return buf.toString();
-	}
 
     /** Used for rule context info debugging during parse-time, not so much for ATN debugging */
     public String toInfoString(Parser recognizer) {
