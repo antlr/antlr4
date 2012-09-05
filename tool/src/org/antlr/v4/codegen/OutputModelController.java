@@ -34,7 +34,6 @@ import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
 import org.antlr.v4.codegen.model.Action;
 import org.antlr.v4.codegen.model.AltBlock;
 import org.antlr.v4.codegen.model.BaseListenerFile;
-import org.antlr.v4.codegen.model.BaseParseListenerFile;
 import org.antlr.v4.codegen.model.BaseVisitorFile;
 import org.antlr.v4.codegen.model.Choice;
 import org.antlr.v4.codegen.model.CodeBlockForAlt;
@@ -45,7 +44,6 @@ import org.antlr.v4.codegen.model.Lexer;
 import org.antlr.v4.codegen.model.LexerFile;
 import org.antlr.v4.codegen.model.ListenerFile;
 import org.antlr.v4.codegen.model.OutputModelObject;
-import org.antlr.v4.codegen.model.ParseListenerFile;
 import org.antlr.v4.codegen.model.Parser;
 import org.antlr.v4.codegen.model.ParserFile;
 import org.antlr.v4.codegen.model.RuleActionFunction;
@@ -144,16 +142,6 @@ public class OutputModelController {
 	public OutputModelObject buildBaseListenerOutputModel() {
 		CodeGenerator gen = delegate.getGenerator();
 		return new BaseListenerFile(delegate, gen.getBaseListenerFileName());
-	}
-
-	public OutputModelObject buildParseListenerOutputModel() {
-		CodeGenerator gen = delegate.getGenerator();
-		return new ParseListenerFile(delegate, gen.getParseListenerFileName());
-	}
-
-	public OutputModelObject buildBaseParseListenerOutputModel() {
-		CodeGenerator gen = delegate.getGenerator();
-		return new BaseParseListenerFile(delegate, gen.getBaseParseListenerFileName());
 	}
 
 	public OutputModelObject buildVisitorOutputModel() {

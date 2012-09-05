@@ -476,7 +476,6 @@ public abstract class BaseTest {
 														grammarStr,
 														parserName,
 														lexerName,
-														"-parse-listener",
 														"-visitor");
 		assertTrue(success);
 		writeFile(tmpdir, "input", input);
@@ -522,9 +521,6 @@ public abstract class BaseTest {
 			}
 			if (optionsSet.contains("-visitor")) {
 				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseVisitor.java");
-			}
-			if (optionsSet.contains("-parse-listener")) {
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseParseListener.java");
 			}
 		}
 		allIsWell = compile(files.toArray(new String[files.size()]));

@@ -55,10 +55,6 @@ public class CodeGenPipeline {
 				gen.writeListener(gen.generateListener());
 				gen.writeBaseListener(gen.generateBaseListener());
 			}
-			if ( g.tool.gen_parse_listener ) {
-				gen.writeParseListener(gen.generateParseListener());
-				gen.writeBaseParseListener(gen.generateBaseParseListener());
-			}
 			if ( g.tool.gen_visitor ) {
 				gen.writeVisitor(gen.generateVisitor());
 				gen.writeBaseVisitor(gen.generateBaseVisitor());

@@ -32,9 +32,7 @@ package org.antlr.v4.codegen.model.decl;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.DispatchMethod;
 import org.antlr.v4.codegen.model.ListenerDispatchMethod;
-import org.antlr.v4.codegen.model.ParseListenerDispatchMethod;
 import org.antlr.v4.codegen.model.VisitorDispatchMethod;
-import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.Rule;
 
 import java.util.ArrayList;
@@ -62,13 +60,6 @@ public class AltLabelStructDecl extends StructDecl {
 		if ( factory.getGrammar().tool.gen_visitor ) {
 			dispatchMethods.add(new VisitorDispatchMethod(factory));
 		}
-		if ( factory.getGrammar().tool.gen_parse_listener ) {
-			if ( !(r instanceof LeftRecursiveRule) ) {
-				dispatchMethods.add(new ParseListenerDispatchMethod(factory, true));
-			}
-			dispatchMethods.add(new ParseListenerDispatchMethod(factory, false));
-		}
-
 	}
 
 	@Override
