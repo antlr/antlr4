@@ -2,11 +2,9 @@
  [The "BSD license"]
   Copyright (c) 2011 Terence Parr
   All rights reserved.
-
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
   are met:
-
   1. Redistributions of source code must retain the above copyright
      notice, this list of conditions and the following disclaimer.
   2. Redistributions in binary form must reproduce the above copyright
@@ -14,7 +12,6 @@
      documentation and/or other materials provided with the distribution.
   3. The name of the author may not be used to endorse or promote products
      derived from this software without specific prior written permission.
-
   THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
   IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -26,9 +23,7 @@
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.antlr.v4.test;
-
 import org.antlr.v4.automata.ATNPrinter;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
@@ -37,7 +32,6 @@ import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
-
 public class TestATNConstruction extends BaseTest {
 	@Test
 	public void testA() throws Exception {
@@ -51,132 +45,117 @@ public class TestATNConstruction extends BaseTest {
 			"RuleStop_a_1-EOF->s4\n";
 		checkRuleATN(g, "a", expecting);
 	}
-
 	@Test public void testAB() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : A B ;");
 		String expecting =
 			"RuleStart_a_0->s2\n" +
-			"s2-A->s4\n" +
-			"s4-B->s5\n" +
-			"s5->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s6\n";
+				"s2-A->s3\n" +
+				"s3-B->s4\n" +
+				"s4->RuleStop_a_1\n" +
+				"RuleStop_a_1-EOF->s5\n";
 		checkRuleATN(g, "a", expecting);
 	}
-
 	@Test public void testAorB() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : A | B {;} ;");
 		String expecting =
-			"RuleStart_a_0->BlockStart_8\n" +
-			"BlockStart_8->s2\n" +
-			"BlockStart_8->s4\n" +
-			"s2-A->BlockEnd_9\n" +
-			"s4-B->s6\n" +
-			"BlockEnd_9->RuleStop_a_1\n" +
-			"s6-action_0:-1->BlockEnd_9\n" +
-			"RuleStop_a_1-EOF->s10\n";
+			"RuleStart_a_0->BlockStart_5\n" +
+				"BlockStart_5->s2\n" +
+				"BlockStart_5->s3\n" +
+				"s2-A->BlockEnd_6\n" +
+				"s3-B->s4\n" +
+				"BlockEnd_6->RuleStop_a_1\n" +
+				"s4-action_0:-1->BlockEnd_6\n" +
+				"RuleStop_a_1-EOF->s7\n";
 		checkRuleATN(g, "a", expecting);
 	}
-
 	@Test public void testSetAorB() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : A | B ;");
 		String expecting =
-			"RuleStart_a_0->BlockStart_6\n" +
-			"BlockStart_6->s2\n" +
-			"BlockStart_6->s4\n" +
-			"s2-A->BlockEnd_7\n" +
-			"s4-B->BlockEnd_7\n" +
-			"BlockEnd_7->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s8\n";
+			"RuleStart_a_0->s2\n" +
+				"s2-{A, B}->s3\n" +
+				"s3->RuleStop_a_1\n" +
+				"RuleStop_a_1-EOF->s4\n";
 		checkRuleATN(g, "a", expecting);
 	}
-
 	@Test public void testLexerIsntSetMultiCharString() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"lexer grammar P;\n"+
 			"A : ('0x' | '0X') ;");
 		String expecting =
-			"BlockStart_0->RuleStart_A_1\n" +
-			"RuleStart_A_1->BlockStart_9\n" +
-			"BlockStart_9->s3\n" +
-			"BlockStart_9->s6\n" +
-			"s3-'0'->s4\n" +
-			"s6-'0'->s7\n" +
-			"s4-'x'->BlockEnd_10\n" +
-			"s7-'X'->BlockEnd_10\n" +
-			"BlockEnd_10->RuleStop_A_2\n";
+			"s0->RuleStart_A_1\n" +
+				"RuleStart_A_1->BlockStart_7\n" +
+				"BlockStart_7->s3\n" +
+				"BlockStart_7->s5\n" +
+				"s3-'0'->s4\n" +
+				"s5-'0'->s6\n" +
+				"s4-'x'->BlockEnd_8\n" +
+				"s6-'X'->BlockEnd_8\n" +
+				"BlockEnd_8->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
-
 	@Test public void testRange() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"lexer grammar P;\n"+
 			"A : 'a'..'c' ;"
 		);
 		String expecting =
-			"BlockStart_0->RuleStart_A_1\n" +
-			"RuleStart_A_1->s3\n" +
-			"s3-'a'..'c'->s4\n" +
-			"s4->RuleStop_A_2\n";
+			"s0->RuleStart_A_1\n" +
+				"RuleStart_A_1->s3\n" +
+				"s3-'a'..'c'->s4\n" +
+				"s4->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
-
 	@Test public void testRangeOrRange() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"lexer grammar P;\n"+
 			"A : ('a'..'c' 'h' | 'q' 'j'..'l') ;"
 		);
 		String expecting =
-			"BlockStart_0->RuleStart_A_1\n" +
-			"RuleStart_A_1->BlockStart_11\n" +
-			"BlockStart_11->s3\n" +
-			"BlockStart_11->s7\n" +
-			"s3-'a'..'c'->s5\n" +
-			"s7-'q'->s9\n" +
-			"s5-'h'->BlockEnd_12\n" +
-			"s9-'j'..'l'->BlockEnd_12\n" +
-			"BlockEnd_12->RuleStop_A_2\n";
+			"s0->RuleStart_A_1\n" +
+				"RuleStart_A_1->BlockStart_7\n" +
+				"BlockStart_7->s3\n" +
+				"BlockStart_7->s5\n" +
+				"s3-'a'..'c'->s4\n" +
+				"s5-'q'->s6\n" +
+				"s4-'h'->BlockEnd_8\n" +
+				"s6-'j'..'l'->BlockEnd_8\n" +
+				"BlockEnd_8->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
-
 	@Test public void testStringLiteralInParser() throws Exception {
 		Grammar g = new Grammar(
 			"grammar P;\n"+
 			"a : A|'b' ;"
 		);
 		String expecting =
-			"RuleStart_a_0->BlockStart_6\n" +
-			"BlockStart_6->s2\n" +
-			"BlockStart_6->s4\n" +
-			"s2-A->BlockEnd_7\n" +
-			"s4-'b'->BlockEnd_7\n" +
-			"BlockEnd_7->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s8\n";
+			"RuleStart_a_0->s2\n" +
+				"s2-{'b', A}->s3\n" +
+				"s3->RuleStop_a_1\n" +
+				"RuleStop_a_1-EOF->s4\n";
 		checkRuleATN(g, "a", expecting);
 	}
-
 	@Test public void testABorCD() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : A B | C D;");
 		String expecting =
-			"RuleStart_a_0->BlockStart_10\n" +
-			"BlockStart_10->s2\n" +
-			"BlockStart_10->s6\n" +
-			"s2-A->s4\n" +
-			"s6-C->s8\n" +
-			"s4-B->BlockEnd_11\n" +
-			"s8-D->BlockEnd_11\n" +
-			"BlockEnd_11->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s12\n";
+			"RuleStart_a_0->BlockStart_6\n" +
+				"BlockStart_6->s2\n" +
+				"BlockStart_6->s4\n" +
+				"s2-A->s3\n" +
+				"s4-C->s5\n" +
+				"s3-B->BlockEnd_7\n" +
+				"s5-D->BlockEnd_7\n" +
+				"BlockEnd_7->RuleStop_a_1\n" +
+				"RuleStop_a_1-EOF->s8\n";
 		checkRuleATN(g, "a", expecting);
 	}
-
 	@Test public void testbA() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
@@ -184,19 +163,18 @@ public class TestATNConstruction extends BaseTest {
 			"b : B ;");
 		String expecting =
 			"RuleStart_a_0->s4\n" +
-            "s4-b->RuleStart_b_2\n" +
-            "s6-A->s7\n" +
-            "s7->RuleStop_a_1\n" +
-            "RuleStop_a_1-EOF->s10\n";
+				"s4-b->RuleStart_b_2\n" +
+				"s5-A->s6\n" +
+				"s6->RuleStop_a_1\n" +
+				"RuleStop_a_1-EOF->s9\n";
 		checkRuleATN(g, "a", expecting);
 		expecting =
-			"RuleStart_b_2->s8\n" +
-			"s8-B->s9\n" +
-			"s9->RuleStop_b_3\n" +
-			"RuleStop_b_3->s6\n";
+			"RuleStart_b_2->s7\n" +
+				"s7-B->s8\n" +
+				"s8->RuleStop_b_3\n" +
+				"RuleStop_b_3->s5\n";
 		checkRuleATN(g, "b", expecting);
 	}
-
 	@Test public void testFollow() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
@@ -204,220 +182,207 @@ public class TestATNConstruction extends BaseTest {
 			"b : B ;\n"+
 			"c : b C;");
 		String expecting =
-			"RuleStart_b_2->s10\n" +
-            "s10-B->s11\n" +
-            "s11->RuleStop_b_3\n" +
-            "RuleStop_b_3->s8\n" +
-            "RuleStop_b_3->s14\n";
+			"RuleStart_b_2->s9\n" +
+				"s9-B->s10\n" +
+				"s10->RuleStop_b_3\n" +
+				"RuleStop_b_3->s7\n" +
+				"RuleStop_b_3->s12\n";
 		checkRuleATN(g, "b", expecting);
 	}
-
 	@Test public void testAorEpsilon() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : A | ;");
 		String expecting =
-			"RuleStart_a_0->BlockStart_6\n" +
-			"BlockStart_6->s2\n" +
-			"BlockStart_6->s4\n" +
-			"s2-A->BlockEnd_7\n" +
-			"s4->BlockEnd_7\n" +
-			"BlockEnd_7->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s8\n";
+			"RuleStart_a_0->BlockStart_4\n" +
+				"BlockStart_4->s2\n" +
+				"BlockStart_4->s3\n" +
+				"s2-A->BlockEnd_5\n" +
+				"s3->BlockEnd_5\n" +
+				"BlockEnd_5->RuleStop_a_1\n" +
+				"RuleStop_a_1-EOF->s6\n";
 		checkRuleATN(g, "a", expecting);
 	}
-
 	@Test public void testAOptional() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : A?;");
 		String expecting =
-			"RuleStart_a_0->BlockStart_4\n" +
-			"BlockStart_4->s2\n" +
-			"BlockStart_4->BlockEnd_5\n" +
-			"s2-A->BlockEnd_5\n" +
-			"BlockEnd_5->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s6\n";
+			"RuleStart_a_0->BlockStart_3\n" +
+				"BlockStart_3->s2\n" +
+				"BlockStart_3->BlockEnd_4\n" +
+				"s2-A->BlockEnd_4\n" +
+				"BlockEnd_4->RuleStop_a_1\n" +
+				"RuleStop_a_1-EOF->s5\n";
 		checkRuleATN(g, "a", expecting);
 	}
-
 	@Test public void testAorBoptional() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : (A{;}|B)?;");
 		String expecting =
-			"RuleStart_a_0->BlockStart_8\n" +
-			"BlockStart_8->s2\n" +
-			"BlockStart_8->s6\n" +
-			"BlockStart_8->BlockEnd_9\n" +
-			"s2-A->s4\n" +
-			"s6-B->BlockEnd_9\n" +
-			"BlockEnd_9->RuleStop_a_1\n" +
-			"s4-action_0:-1->BlockEnd_9\n" +
-			"RuleStop_a_1-EOF->s10\n";
+			"RuleStart_a_0->BlockStart_5\n" +
+				"BlockStart_5->s2\n" +
+				"BlockStart_5->s4\n" +
+				"BlockStart_5->BlockEnd_6\n" +
+				"s2-A->s3\n" +
+				"s4-B->BlockEnd_6\n" +
+				"BlockEnd_6->RuleStop_a_1\n" +
+				"s3-action_0:-1->BlockEnd_6\n" +
+				"RuleStop_a_1-EOF->s7\n";
 		checkRuleATN(g, "a", expecting);
 	}
-
 	@Test public void testSetAorBoptional() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : (A|B)?;");
 		String expecting =
-			"RuleStart_a_0->BlockStart_4\n" +
-			"BlockStart_4->s2\n" +
-			"BlockStart_4->BlockEnd_5\n" +
-			"s2-{A, B}->BlockEnd_5\n" +
-			"BlockEnd_5->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s6\n";
+			"RuleStart_a_0->BlockStart_3\n" +
+				"BlockStart_3->s2\n" +
+				"BlockStart_3->BlockEnd_4\n" +
+				"s2-{A, B}->BlockEnd_4\n" +
+				"BlockEnd_4->RuleStop_a_1\n" +
+				"RuleStop_a_1-EOF->s5\n";
 		checkRuleATN(g, "a", expecting);
 	}
-
 	@Test public void testAorBthenC() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : (A | B) C;");
 		String expecting =
 			"RuleStart_a_0->s2\n" +
-			"s2-{A, B}->s4\n" +
-			"s4-C->s5\n" +
-			"s5->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s6\n";
+				"s2-{A, B}->s3\n" +
+				"s3-C->s4\n" +
+				"s4->RuleStop_a_1\n" +
+				"RuleStop_a_1-EOF->s5\n";
 		checkRuleATN(g, "a", expecting);
 	}
-
 	@Test public void testAplus() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : A+;");
 		String expecting =
-			"RuleStart_a_0->PlusBlockStart_4\n" +
-			"PlusBlockStart_4->s2\n" +
-			"s2-A->BlockEnd_5\n" +
-			"BlockEnd_5->PlusLoopBack_6\n" +
-			"PlusLoopBack_6->PlusBlockStart_4\n" +
-			"PlusLoopBack_6->s7\n" +
-			"s7->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s8\n";
+			"RuleStart_a_0->PlusBlockStart_3\n" +
+				"PlusBlockStart_3->s2\n" +
+				"s2-A->BlockEnd_4\n" +
+				"BlockEnd_4->PlusLoopBack_5\n" +
+				"PlusLoopBack_5->PlusBlockStart_3\n" +
+				"PlusLoopBack_5->s6\n" +
+				"s6->RuleStop_a_1\n" +
+				"RuleStop_a_1-EOF->s7\n";
 		checkRuleATN(g, "a", expecting);
 	}
-
 	@Test public void testAorBplus() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : (A|B{;})+;");
 		String expecting =
-			"RuleStart_a_0->PlusBlockStart_8\n" +
-			"PlusBlockStart_8->s2\n" +
-			"PlusBlockStart_8->s4\n" +
-			"s2-A->BlockEnd_9\n" +
-			"s4-B->s6\n" +
-			"BlockEnd_9->PlusLoopBack_10\n" +
-			"s6-action_0:-1->BlockEnd_9\n" +
-			"PlusLoopBack_10->PlusBlockStart_8\n" +
-			"PlusLoopBack_10->s11\n" +
-			"s11->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s12\n";
+			"RuleStart_a_0->PlusBlockStart_5\n" +
+				"PlusBlockStart_5->s2\n" +
+				"PlusBlockStart_5->s3\n" +
+				"s2-A->BlockEnd_6\n" +
+				"s3-B->s4\n" +
+				"BlockEnd_6->PlusLoopBack_7\n" +
+				"s4-action_0:-1->BlockEnd_6\n" +
+				"PlusLoopBack_7->PlusBlockStart_5\n" +
+				"PlusLoopBack_7->s8\n" +
+				"s8->RuleStop_a_1\n" +
+				"RuleStop_a_1-EOF->s9\n";
 		checkRuleATN(g, "a", expecting);
 	}
-
 	@Test public void testAorBorEmptyPlus() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : (A | B | )+ ;");
 		String expecting =
-			"RuleStart_a_0->PlusBlockStart_8\n" +
-			"PlusBlockStart_8->s2\n" +
-			"PlusBlockStart_8->s4\n" +
-			"PlusBlockStart_8->s6\n" +
-			"s2-A->BlockEnd_9\n" +
-			"s4-B->BlockEnd_9\n" +
-			"s6->BlockEnd_9\n" +
-			"BlockEnd_9->PlusLoopBack_10\n" +
-			"PlusLoopBack_10->PlusBlockStart_8\n" +
-			"PlusLoopBack_10->s11\n" +
-			"s11->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s12\n";
+			"RuleStart_a_0->PlusBlockStart_5\n" +
+				"PlusBlockStart_5->s2\n" +
+				"PlusBlockStart_5->s3\n" +
+				"PlusBlockStart_5->s4\n" +
+				"s2-A->BlockEnd_6\n" +
+				"s3-B->BlockEnd_6\n" +
+				"s4->BlockEnd_6\n" +
+				"BlockEnd_6->PlusLoopBack_7\n" +
+				"PlusLoopBack_7->PlusBlockStart_5\n" +
+				"PlusLoopBack_7->s8\n" +
+				"s8->RuleStop_a_1\n" +
+				"RuleStop_a_1-EOF->s9\n";
 		checkRuleATN(g, "a", expecting);
 	}
-
 	@Test public void testAStar() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : A*;");
 		String expecting =
-			"RuleStart_a_0->StarLoopEntry_6\n" +
-			"StarLoopEntry_6->StarBlockStart_4\n" +
-			"StarLoopEntry_6->s7\n" +
-			"StarBlockStart_4->s2\n" +
-			"s7->RuleStop_a_1\n" +
-			"s2-A->BlockEnd_5\n" +
-			"RuleStop_a_1-EOF->s9\n" +
-			"BlockEnd_5->StarLoopBack_8\n" +
-			"StarLoopBack_8->StarLoopEntry_6\n";
+			"RuleStart_a_0->StarLoopEntry_5\n" +
+				"StarLoopEntry_5->StarBlockStart_3\n" +
+				"StarLoopEntry_5->s6\n" +
+				"StarBlockStart_3->s2\n" +
+				"s6->RuleStop_a_1\n" +
+				"s2-A->BlockEnd_4\n" +
+				"RuleStop_a_1-EOF->s8\n" +
+				"BlockEnd_4->StarLoopBack_7\n" +
+				"StarLoopBack_7->StarLoopEntry_5\n";
 		checkRuleATN(g, "a", expecting);
 	}
-
 	@Test public void testNestedAstar() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : (COMMA ID*)*;");
 		String expecting =
-			"RuleStart_a_0->StarLoopEntry_13\n" +
-			"StarLoopEntry_13->StarBlockStart_11\n" +
-			"StarLoopEntry_13->s14\n" +
-			"StarBlockStart_11->s2\n" +
-			"s14->RuleStop_a_1\n" +
-			"s2-COMMA->StarLoopEntry_8\n" +
-			"RuleStop_a_1-EOF->s16\n" +
-			"StarLoopEntry_8->StarBlockStart_6\n" +
-			"StarLoopEntry_8->s9\n" +
-			"StarBlockStart_6->s4\n" +
-			"s9->BlockEnd_12\n" +
-			"s4-ID->BlockEnd_7\n" +
-			"BlockEnd_12->StarLoopBack_15\n" +
-			"BlockEnd_7->StarLoopBack_10\n" +
-			"StarLoopBack_15->StarLoopEntry_13\n" +
-			"StarLoopBack_10->StarLoopEntry_8\n";
+			"RuleStart_a_0->StarLoopEntry_11\n" +
+				"StarLoopEntry_11->StarBlockStart_9\n" +
+				"StarLoopEntry_11->s12\n" +
+				"StarBlockStart_9->s2\n" +
+				"s12->RuleStop_a_1\n" +
+				"s2-COMMA->StarLoopEntry_6\n" +
+				"RuleStop_a_1-EOF->s14\n" +
+				"StarLoopEntry_6->StarBlockStart_4\n" +
+				"StarLoopEntry_6->s7\n" +
+				"StarBlockStart_4->s3\n" +
+				"s7->BlockEnd_10\n" +
+				"s3-ID->BlockEnd_5\n" +
+				"BlockEnd_10->StarLoopBack_13\n" +
+				"BlockEnd_5->StarLoopBack_8\n" +
+				"StarLoopBack_13->StarLoopEntry_11\n" +
+				"StarLoopBack_8->StarLoopEntry_6\n";
 		checkRuleATN(g, "a", expecting);
 	}
-
 	@Test public void testAorBstar() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : (A | B{;})* ;");
 		String expecting =
-			"RuleStart_a_0->StarLoopEntry_10\n" +
-			"StarLoopEntry_10->StarBlockStart_8\n" +
-			"StarLoopEntry_10->s11\n" +
-			"StarBlockStart_8->s2\n" +
-			"StarBlockStart_8->s4\n" +
-			"s11->RuleStop_a_1\n" +
-			"s2-A->BlockEnd_9\n" +
-			"s4-B->s6\n" +
-			"RuleStop_a_1-EOF->s13\n" +
-			"BlockEnd_9->StarLoopBack_12\n" +
-			"s6-action_0:-1->BlockEnd_9\n" +
-			"StarLoopBack_12->StarLoopEntry_10\n";
+			"RuleStart_a_0->StarLoopEntry_7\n" +
+				"StarLoopEntry_7->StarBlockStart_5\n" +
+				"StarLoopEntry_7->s8\n" +
+				"StarBlockStart_5->s2\n" +
+				"StarBlockStart_5->s3\n" +
+				"s8->RuleStop_a_1\n" +
+				"s2-A->BlockEnd_6\n" +
+				"s3-B->s4\n" +
+				"RuleStop_a_1-EOF->s10\n" +
+				"BlockEnd_6->StarLoopBack_9\n" +
+				"s4-action_0:-1->BlockEnd_6\n" +
+				"StarLoopBack_9->StarLoopEntry_7\n";
 		checkRuleATN(g, "a", expecting);
 	}
-
 	@Test public void testPredicatedAorB() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : {p1}? A | {p2}? B ;");
 		String expecting =
-			"RuleStart_a_0->BlockStart_10\n" +
-			"BlockStart_10->s2\n" +
-			"BlockStart_10->s6\n" +
-			"s2-pred_0:0->s4\n" +
-			"s6-pred_0:1->s8\n" +
-			"s4-A->BlockEnd_11\n" +
-			"s8-B->BlockEnd_11\n" +
-			"BlockEnd_11->RuleStop_a_1\n" +
-			"RuleStop_a_1-EOF->s12\n";
+			"RuleStart_a_0->BlockStart_6\n" +
+				"BlockStart_6->s2\n" +
+				"BlockStart_6->s4\n" +
+				"s2-pred_0:0->s3\n" +
+				"s4-pred_0:1->s5\n" +
+				"s3-A->BlockEnd_7\n" +
+				"s5-B->BlockEnd_7\n" +
+				"BlockEnd_7->RuleStop_a_1\n" +
+				"RuleStop_a_1-EOF->s8\n";
 		checkRuleATN(g, "a", expecting);
 	}
-
 /*
 	@Test public void testMultiplePredicates() throws Exception {
 		Grammar g = new Grammar(
@@ -428,7 +393,6 @@ public class TestATNConstruction extends BaseTest {
 			"\n";
 		checkRule(g, "a", expecting);
 	}
-
 	@Test public void testSets() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
@@ -453,7 +417,6 @@ public class TestATNConstruction extends BaseTest {
 			"\n";
 		checkRule(g, "e", expecting);
 	}
-
 	@Test public void testNotSet() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
@@ -462,9 +425,7 @@ public class TestATNConstruction extends BaseTest {
 		String expecting =
 			"\n";
 		checkRule(g, "a", expecting);
-
 	}
-
 	@Test public void testNotSingletonBlockSet() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
@@ -474,7 +435,6 @@ public class TestATNConstruction extends BaseTest {
 			"\n";
 		checkRule(g, "a", expecting);
 	}
-
 	@Test public void testNotCharSet() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
@@ -485,7 +445,6 @@ public class TestATNConstruction extends BaseTest {
 			"s6->RuleStop_A_2\n";
 		checkRule(g, "A", expecting);
 	}
-
 	@Test public void testNotBlockSet() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
@@ -494,7 +453,6 @@ public class TestATNConstruction extends BaseTest {
 			"\n";
 		checkRule(g, "A", expecting);
 	}
-
 	@Test public void testNotSetLoop() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
@@ -503,7 +461,6 @@ public class TestATNConstruction extends BaseTest {
 			"\n";
 		checkRule(g, "A", expecting);
 	}
-
 	@Test public void testNotBlockSetLoop() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
@@ -512,7 +469,6 @@ public class TestATNConstruction extends BaseTest {
 			"\n";
 		checkRule(g, "A", expecting);
 	}
-
 	@Test public void testLabeledNotSet() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
@@ -526,7 +482,6 @@ public class TestATNConstruction extends BaseTest {
 			":s4-EOF->.s5\n";
 		checkRule(g, "a", expecting);
 	}
-
 	@Test public void testLabeledNotCharSet() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
@@ -539,7 +494,6 @@ public class TestATNConstruction extends BaseTest {
 			":s4-<EOT>->.s5\n";
 		checkRule(g, "A", expecting);
 	}
-
 	@Test public void testLabeledNotBlockSet() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
@@ -552,7 +506,6 @@ public class TestATNConstruction extends BaseTest {
 			":s4-<EOT>->.s5\n";
 		checkRule(g, "A", expecting);
 	}
-
 	@Test public void testEscapedCharLiteral() throws Exception {
 		Grammar g = new Grammar(
 			"grammar P;\n"+
@@ -565,7 +518,6 @@ public class TestATNConstruction extends BaseTest {
 			":s4-EOF->.s5\n";
 		checkRule(g, "a", expecting);
 	}
-
 	@Test public void testEscapedStringLiteral() throws Exception {
 		Grammar g = new Grammar(
 			"grammar P;\n"+
@@ -577,9 +529,7 @@ public class TestATNConstruction extends BaseTest {
 			"RuleStop_a_1-EOF->s4\n";
 		checkRule(g, "a", expecting);
 	}
-
 	// AUTO BACKTRACKING STUFF
-
 	@Test public void testAutoBacktracking_RuleBlock() throws Exception {
 		Grammar g = new Grammar(
 			"grammar t;\n" +
@@ -601,7 +551,6 @@ public class TestATNConstruction extends BaseTest {
 			":s7-EOF->.s8\n";
 		checkRule(g, "a", expecting);
 	}
-
 	@Test public void testAutoBacktracking_RuleSetBlock() throws Exception {
 		Grammar g = new Grammar(
 			"grammar t;\n" +
@@ -616,7 +565,6 @@ public class TestATNConstruction extends BaseTest {
 			":s4-EOF->.s5\n";
 		checkRule(g, "a", expecting);
 	}
-
 	@Test public void testAutoBacktracking_SimpleBlock() throws Exception {
 		Grammar g = new Grammar(
 			"grammar t;\n" +
@@ -639,7 +587,6 @@ public class TestATNConstruction extends BaseTest {
 			":s8-EOF->.s9\n";
 		checkRule(g, "a", expecting);
 	}
-
 	@Test public void testAutoBacktracking_SetBlock() throws Exception {
 		Grammar g = new Grammar(
 			"grammar t;\n" +
@@ -654,7 +601,6 @@ public class TestATNConstruction extends BaseTest {
 			":s4-EOF->.s5\n";
 		checkRule(g, "a", expecting);
 	}
-
 	@Test public void testAutoBacktracking_StarBlock() throws Exception {
 		Grammar g = new Grammar(
 			"grammar t;\n" +
@@ -683,7 +629,6 @@ public class TestATNConstruction extends BaseTest {
 			":s10-EOF->.s11\n";
 		checkRule(g, "a", expecting);
 	}
-
 	@Test public void testAutoBacktracking_StarSetBlock_IgnoresPreds() throws Exception {
 		Grammar g = new Grammar(
 			"grammar t;\n" +
@@ -704,7 +649,6 @@ public class TestATNConstruction extends BaseTest {
 			":s7-EOF->.s8\n";
 		checkRule(g, "a", expecting);
 	}
-
 	@Test public void testAutoBacktracking_StarSetBlock() throws Exception {
 		Grammar g = new Grammar(
 			"grammar t;\n" +
@@ -733,7 +677,6 @@ public class TestATNConstruction extends BaseTest {
 			":s9-EOF->.s10\n";
 		checkRule(g, "a", expecting);
 	}
-
 	@Test public void testAutoBacktracking_StarBlock1Alt() throws Exception {
 		Grammar g = new Grammar(
 			"grammar t;\n" +
@@ -755,7 +698,6 @@ public class TestATNConstruction extends BaseTest {
 			":s8-EOF->.s9\n";
 		checkRule(g, "a", expecting);
 	}
-
 	@Test public void testAutoBacktracking_PlusBlock() throws Exception {
 		Grammar g = new Grammar(
 			"grammar t;\n" +
@@ -782,7 +724,6 @@ public class TestATNConstruction extends BaseTest {
 			":s10-EOF->.s11\n";
 		checkRule(g, "a", expecting);
 	}
-
 	@Test public void testAutoBacktracking_PlusSetBlock() throws Exception {
 		Grammar g = new Grammar(
 			"grammar t;\n" +
@@ -809,7 +750,6 @@ public class TestATNConstruction extends BaseTest {
 			":s9-EOF->.s10\n";
 		checkRule(g, "a", expecting);
 	}
-
 	@Test public void testAutoBacktracking_PlusBlock1Alt() throws Exception {
 		Grammar g = new Grammar(
 			"grammar t;\n" +
@@ -829,7 +769,6 @@ public class TestATNConstruction extends BaseTest {
 			":s8-EOF->.s9\n";
 		checkRule(g, "a", expecting);
 	}
-
 	@Test public void testAutoBacktracking_OptionalBlock2Alts() throws Exception {
 		Grammar g = new Grammar(
 			"grammar t;\n" +
@@ -855,7 +794,6 @@ public class TestATNConstruction extends BaseTest {
 			":s8-EOF->.s9\n";
 		checkRule(g, "a", expecting);
 	}
-
 	@Test public void testAutoBacktracking_OptionalBlock1Alt() throws Exception {
 		Grammar g = new Grammar(
 			"grammar t;\n" +
@@ -875,7 +813,6 @@ public class TestATNConstruction extends BaseTest {
 			":s7-EOF->.s8\n";
 		checkRule(g, "a", expecting);
 	}
-
 	@Test public void testAutoBacktracking_ExistingPred() throws Exception {
 		Grammar g = new Grammar(
 			"grammar t;\n" +
@@ -897,7 +834,6 @@ public class TestATNConstruction extends BaseTest {
 		checkRule(g, "a", expecting);
 	}
 */
-
 	@Test public void testDefaultMode() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"lexer grammar L;\n"+
@@ -907,17 +843,16 @@ public class TestATNConstruction extends BaseTest {
 			"B : 'b' ;\n" +
 			"C : 'c' ;\n");
 		String expecting =
-			"BlockStart_0->RuleStart_A_2\n" +
-			"BlockStart_0->RuleStart_X_4\n" +
-			"RuleStart_A_2->s10\n" +
-			"RuleStart_X_4->s12\n" +
-			"s10-'a'->s11\n" +
-			"s12-'x'->s13\n" +
-			"s11->RuleStop_A_3\n" +
-			"s13->RuleStop_X_5\n";
+			"s0->RuleStart_A_2\n" +
+				"s0->RuleStart_X_4\n" +
+				"RuleStart_A_2->s10\n" +
+				"RuleStart_X_4->s12\n" +
+				"s10-'a'->s11\n" +
+				"s12-'x'->s13\n" +
+				"s11->RuleStop_A_3\n" +
+				"s13->RuleStop_X_5\n";
 		checkTokensRule(g, "DEFAULT_MODE", expecting);
 	}
-
 	@Test public void testMode() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"lexer grammar L;\n"+
@@ -927,17 +862,16 @@ public class TestATNConstruction extends BaseTest {
 			"B : 'b' ;\n" +
 			"C : 'c' ;\n");
 		String expecting =
-			"BlockStart_1->RuleStart_B_6\n" +
-			"BlockStart_1->RuleStart_C_8\n" +
-			"RuleStart_B_6->s14\n" +
-			"RuleStart_C_8->s16\n" +
-			"s14-'b'->s15\n" +
-			"s16-'c'->s17\n" +
-			"s15->RuleStop_B_7\n" +
-			"s17->RuleStop_C_9\n";
+			"s1->RuleStart_B_6\n" +
+				"s1->RuleStart_C_8\n" +
+				"RuleStart_B_6->s14\n" +
+				"RuleStart_C_8->s16\n" +
+				"s14-'b'->s15\n" +
+				"s16-'c'->s17\n" +
+				"s15->RuleStop_B_7\n" +
+				"s17->RuleStop_C_9\n";
 		checkTokensRule(g, "FOO", expecting);
 	}
-
 	void checkTokensRule(LexerGrammar g, String modeName, String expecting) {
 //		if ( g.ast!=null && !g.ast.hasErrors ) {
 //			System.out.println(g.ast.toStringTree());
@@ -950,21 +884,17 @@ public class TestATNConstruction extends BaseTest {
 //				}
 //			}
 //		}
-
 		if ( modeName==null ) modeName = "DEFAULT_MODE";
 		if ( g.modes.get(modeName)==null ) {
 			System.err.println("no such mode "+modeName);
 			return;
 		}
-
 		ParserATNFactory f = new LexerATNFactory((LexerGrammar)g);
 		ATN nfa = f.createATN();
 		ATNState startState = nfa.modeNameToStartState.get(modeName);
 		ATNPrinter serializer = new ATNPrinter(g, startState);
 		String result = serializer.asString();
-
 		//System.out.print(result);
 		assertEquals(expecting, result);
 	}
-
 }
