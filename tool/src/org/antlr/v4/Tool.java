@@ -64,8 +64,9 @@ import org.stringtemplate.v4.STGroup;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
@@ -542,8 +543,15 @@ public class Tool {
 		if (!outputDir.exists()) {
 			outputDir.mkdirs();
 		}
-		FileWriter fw = new FileWriter(outputFile);
-		return new BufferedWriter(fw);
+		FileOutputStream fos = new FileOutputStream(outputFile);
+		OutputStreamWriter osw;
+		if ( grammarEncoding!=null ) {
+			osw = new OutputStreamWriter(fos, grammarEncoding);
+		}
+		else {
+			osw = new OutputStreamWriter(fos);
+		}
+		return new BufferedWriter(osw);
 	}
 
 	public File getImportedGrammarFile(Grammar g, String fileName) {
