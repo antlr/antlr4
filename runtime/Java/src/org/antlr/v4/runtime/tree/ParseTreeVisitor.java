@@ -1,6 +1,7 @@
 /*
  [The "BSD license"]
   Copyright (c) 2012 Terence Parr
+  Copyright (c) 2012 Sam Harwell
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -28,27 +29,48 @@
  */
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.misc.NotNull;
 
-/** {@code T} is return type of {@code visit} methods. Use {@link Void} for no return type.
+/**
  *
  * @author Sam Harwell
+ * @param <Symbol> A superclass of the parse tree's symbol type.
+ * @param <Result> The return type of the visit operation. Use {@link Void} for
+ * operations with no return type.
  */
 public interface ParseTreeVisitor<Symbol, Result> {
 
-	Result visit(ParseTree<? extends Symbol> ctx);
-
-	/** Visit all rule, non-leaf children. This returns value returned from last
-	 *  child visited, losing all computations from first n-1 children.  Works
-	 *  fine for contexts with one child then.
-	 *  Handy if you are just walking the tree with a visitor and only
-	 *  care about some nodes.  The {@link ParserRuleContext#accept} method
-	 *  walks all children by default; i.e., calls this method.
+	/**
+	 * Visit a parse tree, and return a user-defined result of the operation.
+	 *
+	 * @param tree The {@link ParseTree} to visit.
+	 * @return The result of visiting the parse tree.
 	 */
-	Result visitChildren(RuleNode<? extends Symbol> node);
+	Result visit(@NotNull ParseTree<? extends Symbol> tree);
 
-	Result visitTerminal(TerminalNode<? extends Symbol> node);
+	/**
+	 * Visit the children of a node, and return a user-defined result
+	 * of the operation.
+	 *
+	 * @param node The {@link RuleNode} whose children should be visited.
+	 * @return The result of visiting the children of the node.
+	 */
+	Result visitChildren(@NotNull RuleNode<? extends Symbol> node);
 
-	Result visitErrorNode(ErrorNode<? extends Symbol> node);
+	/**
+	 * Visit a terminal node, and return a user-defined result of the operation.
+	 *
+	 * @param node The {@link TerminalNode} to visit.
+	 * @return The result of visiting the node.
+	 */
+	Result visitTerminal(@NotNull TerminalNode<? extends Symbol> node);
+
+	/**
+	 * Visit an error node, and return a user-defined result of the operation.
+	 *
+	 * @param node The {@link ErrorNode} to visit.
+	 * @return The result of visiting the node.
+	 */
+	Result visitErrorNode(@NotNull ErrorNode<? extends Symbol> node);
 
 }
