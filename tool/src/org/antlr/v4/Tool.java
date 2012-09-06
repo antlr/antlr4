@@ -205,9 +205,9 @@ public class Tool {
 
 	public Tool(String[] args) {
 		this.args = args;
-		handleArgs();
 		errMgr = new ErrorManager(this);
 		errMgr.setFormat(msgFormat);
+		handleArgs();
 	}
 
 	protected void handleArgs() {
