@@ -1441,7 +1441,26 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		BitSet alts = new BitSet();
 		int minAlt = configs.get(0).getAlt();
 		alts.set(minAlt);
+
+		/* Quick checks come first (single pass, no context joining):
+		 *  1. Make sure first config in the sorted list predicts the minimum
+		 *     represented alternative.
+		 *  2. Make sure every represented state has at least one configuration
+		 *     which predicts the minimum represented alternative.
+		 */
 		int currentState = configs.get(0).getState().stateNumber;
+		for (int i = 0; i < configs.size(); i++) {
+			ATNConfig config = configs.get(i);
+			if (config.getState().stateNumber != currentState) {
+				if (config.getAlt() != minAlt) {
+					return null;
+				}
+
+				currentState = config.getState().stateNumber;
+			}
+		}
+
+		currentState = configs.get(0).getState().stateNumber;
 		int firstIndexCurrentState = 0;
 		int lastIndexCurrentStateMinAlt = 0;
 		PredictionContext joinedCheckContext = configs.get(0).getContext();
@@ -1464,10 +1483,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			ATNState state = config.getState();
 			alts.set(config.getAlt());
 			if (state.stateNumber != currentState) {
-				if (config.getAlt() != minAlt) {
-					return null;
-				}
-
 				currentState = state.stateNumber;
 				firstIndexCurrentState = i;
 				lastIndexCurrentStateMinAlt = i;
