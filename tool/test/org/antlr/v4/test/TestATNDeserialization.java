@@ -33,7 +33,7 @@ public class TestATNDeserialization extends BaseTest {
 	@Test public void testNot() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"tokens {A; B; C;}\n" +
+			"tokens {A, B, C}\n" +
 			"a : ~A ;");
 		checkDeserializationIsStable(g);
 	}
@@ -41,7 +41,7 @@ public class TestATNDeserialization extends BaseTest {
 	@Test public void testWildcard() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"tokens {A; B; C;}\n" +
+			"tokens {A, B, C}\n" +
 			"a : . ;");
 		checkDeserializationIsStable(g);
 	}

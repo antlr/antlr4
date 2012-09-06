@@ -186,7 +186,7 @@ public class TestATNParserPrediction extends BaseTest {
 			"C : 'c' ;\n");
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"tokens {A;B;C;}\n" +
+			"tokens {A,B,C}\n" +
 			"a : x B ;\n" +
 			"b : x C ;\n" +
 			"x : A | ;\n");
@@ -302,7 +302,7 @@ public class TestATNParserPrediction extends BaseTest {
 		);
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"tokens {A;B;C;LP;RP;INT;}\n" +
+			"tokens {A,B,C,LP,RP,INT}\n" +
 			"a : e B | e C ;\n" +
 			"e : LP e RP\n" +
 			"  | INT\n" +
@@ -361,7 +361,7 @@ public class TestATNParserPrediction extends BaseTest {
 		);
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"tokens {A;B;C;LP;RP;INT;}\n" +
+			"tokens {A,B,C,LP,RP,INT}\n" +
 			"a : e A | e A B ;\n" +
 			"e : LP e RP\n" +
 			"  | INT\n" +
@@ -425,7 +425,7 @@ public class TestATNParserPrediction extends BaseTest {
 		);
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"tokens {ID;SEMI;INT;}\n" +
+			"tokens {ID,SEMI,INT}\n" +
 			"a : (ID | ID ID?) SEMI ;");
 		int decision = 1;
 		checkPredictedAlt(lg, g, decision, "a;", 1);

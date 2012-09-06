@@ -81,18 +81,10 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void tokenAlias(GrammarAST ID, GrammarAST literal) {
-		if ( literal==null ) {
-			terminals.add(ID);
-			tokenIDRefs.add(ID);
-			tokensDefs.add(ID);
-		}
-		else {
-			terminals.add(ID);
-			tokenIDRefs.add(ID);
-			tokensDefs.add((GrammarAST)ID.getParent());
-			strings.add(literal.getText());
-		}
+	public void defineToken(GrammarAST ID) {
+		terminals.add(ID);
+		tokenIDRefs.add(ID);
+		tokensDefs.add(ID);
 	}
 
 	@Override

@@ -90,7 +90,6 @@ public class SymbolChecks {
 		// done in sem pipe for now
         checkForRuleConflicts(g.rules.values());         // sets nameToRuleMap
 		checkActionRedefinitions(collector.namedActions);
-        checkTokenAliasRedefinitions(collector.tokensDefs);
         //checkRuleArgs(collector.rulerefs);
         checkForTokenConflicts(collector.tokenIDRefs);  // sets tokenIDs
         checkForLabelConflicts(g.rules.values());
@@ -139,57 +138,6 @@ public class SymbolChecks {
             }
         }
     }
-
-	/** Catch:
-		tokens { A='a'; A; }		can't redefine token type if has alias
-	 	tokens { A; A='a'; }		can't redefine token type if has alias
-	 	tokens { A='a'; A='b'; }	can't have two aliases for single token type
-		tokens { A='a'; B='a'; }	can't have to token types for same string alias
-	 */
-    public void checkTokenAliasRedefinitions(List<GrammarAST> aliases) {
-        if ( aliases==null ) return;
-
-		// map names, strings to root of A or (= A 'a')
-        Map<String, GrammarAST> aliasTokenNames = new HashMap<String, GrammarAST>();
-		Map<String, GrammarAST> aliasStringValues = new HashMap<String, GrammarAST>();
-        for (int i=0; i<aliases.size(); i++) {
-            GrammarAST a = aliases.get(i);
-			GrammarAST idNode = a;
-			if ( a.getChildCount()>0 ) idNode = (GrammarAST)a.getChild(0);
-			GrammarAST prevToken = aliasTokenNames.get(idNode.getText());
-			GrammarAST stringNode = null;
-			if ( a.getChildCount()>0 ) stringNode = (GrammarAST)a.getChild(1);
-			GrammarAST prevString = null;
-			if ( stringNode!=null ) prevString = aliasStringValues.get(stringNode.getText());
-            if ( a.getType() == ANTLRParser.ASSIGN ) { // A='a'
-                idNode = (GrammarAST)a.getChild(0);
-				if ( prevString==null ) { // not seen string before
-					if ( stringNode!=null ) aliasStringValues.put(stringNode.getText(), a);
-				}
-            }
-			if ( prevToken==null ) { // not seen before, define it
-				aliasTokenNames.put(idNode.getText(), a);
-			}
-
-			// we've defined token names and strings at this point if not seen previously.
-			// now, look for trouble.
-			if ( prevToken!=null ) {
-				if ( !(prevToken.getChildCount()==0 && a.getChildCount()==0) ) {
-					// one or both have strings; disallow
-					errMgr.grammarError(ErrorType.TOKEN_NAME_REASSIGNMENT,
-										a.g.fileName, idNode.token, idNode.getText());
-				}
-			}
-			if ( prevString!=null ) {
-				// A='a' and A='a' are ok but not B='a' and A='a' are ok
-				if ( !prevString.getChild(0).getText().equals(idNode.getText()) ) {
-					errMgr.grammarError(ErrorType.TOKEN_STRING_REASSIGNMENT,
-										a.g.fileName, idNode.token, idNode.getText()+"="+stringNode.getText(),
-										prevString.getChild(0).getText());
-				}
-			}
-		}
-	}
 
     public void checkForTokenConflicts(List<GrammarAST> tokenIDRefs) {
 //        for (GrammarAST a : tokenIDRefs) {

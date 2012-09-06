@@ -40,7 +40,7 @@ public class TestATNInterpreter extends BaseTest {
 			"C : 'c' ;\n");
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"tokens {A; B; C;}\n" +
+			"tokens {A,B,C}\n" +
 			"a : ~A ;");
 		checkMatchedAlt(lg, g, "b", 1);
 	}
@@ -254,7 +254,7 @@ public class TestATNInterpreter extends BaseTest {
 		);
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"tokens {A;B;C;LP;RP;INT;}\n" +
+			"tokens {A,B,C,LP,RP,INT}\n" +
 			"a : e B | e C ;\n" +
 			"e : LP e RP\n" +
 			"  | INT\n" +

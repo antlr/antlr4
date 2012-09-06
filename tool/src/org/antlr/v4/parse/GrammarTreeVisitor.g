@@ -121,7 +121,7 @@ public void finishGrammar(GrammarRootAST root, GrammarAST ID) { }
 public void grammarOption(GrammarAST ID, GrammarAST valueAST) { }
 public void ruleOption(GrammarAST ID, GrammarAST valueAST) { }
 public void blockOption(GrammarAST ID, GrammarAST valueAST) { }
-public void tokenAlias(GrammarAST ID, GrammarAST literal) { }
+public void defineToken(GrammarAST ID) { }
 public void globalNamedAction(GrammarAST scope, GrammarAST ID, ActionAST action) { }
 public void importGrammar(GrammarAST label, GrammarAST ID) { }
 
@@ -225,8 +225,7 @@ tokensSpec
 	;
 
 tokenSpec
-	:	^(ASSIGN ID STRING_LITERAL)	{tokenAlias($ID, $STRING_LITERAL);}
-	|	ID							{tokenAlias($ID, null);}
+	:	ID							{defineToken($ID);}
 	;
 
 action
