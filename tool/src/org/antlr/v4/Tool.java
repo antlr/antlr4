@@ -143,7 +143,7 @@ public class Tool {
 		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
 		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
 		new Option("abstract_recognizer", "-abstract", "generate abstract recognizer classes"),
-		new Option("-D<option>=value",	"-message-format", "set a grammar-level option"),
+		new Option("",					"-D<option>=value", "set a grammar-level option"),
 
 
         new Option("saveLexer",			"-Xsave-lexer", "save temp lexer file created for combined grammars"),
