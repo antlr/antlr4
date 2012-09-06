@@ -82,11 +82,6 @@ public class ErrorManager {
 
 	public ErrorManager(Tool tool) {
 		this.tool = tool;
-		// try to load the message format group
-		// the user might have specified one on the command line
-		// if not, or if the user has given an illegal value, we will fall back to "antlr"
-		setFormat("antlr");
-		//org.stringtemplate.v4.misc.ErrorManager.setErrorListener(theDefaultSTListener);
 	}
 
 	public void resetErrorState() {

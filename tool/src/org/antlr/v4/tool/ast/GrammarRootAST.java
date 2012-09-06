@@ -39,7 +39,8 @@ import java.util.Map;
 public class GrammarRootAST extends GrammarASTWithOptions {
 	public static final Map<String, String> defaultOptions =
          new HashMap<String, String>() {{
-             put("language","Java");
+			 put("language","Java");
+			 put("abstract","false");
 		 }};
     public int grammarType; // LEXER, PARSER, GRAMMAR (combined)
 	public boolean hasErrors;

@@ -402,8 +402,7 @@ public class Grammar implements AttributeResolver {
     }
 
 	public boolean isAbstract() {
-		return Boolean.parseBoolean(getOptionString("abstract"))
-			|| (tool != null && tool.abstract_recognizer);
+		return Boolean.parseBoolean(getOptionString("abstract"));
 	}
 
     /** Get the name of the generated recognizer; may or may not be same
@@ -728,25 +727,6 @@ public class Grammar implements AttributeResolver {
 	}
 
 	public String getOptionString(String key) { return ast.getOptionString(key); }
-
-	/** Manually get language option from tree */
-	// TODO: move to general tree visitor/parser class?
-	// TODO: don't need anymore as i set optins in parser?
-	public static String getLanguageOption(GrammarRootAST ast) {
-		GrammarAST options = (GrammarAST)ast.getFirstChildWithType(ANTLRParser.OPTIONS);
-		String language = "Java";
-		if ( options!=null ) {
-			for (Object o : options.getChildren()) {
-				GrammarAST c = (GrammarAST)o;
-				if ( c.getType() == ANTLRParser.ASSIGN &&
-				c.getChild(0).getText().equals("language") )
-				{
-					language = c.getChild(1).getText();
-				}
-			}
-		}
-		return language;
-	}
 
 	/** Given ^(TOKEN_REF ^(OPTIONS ^(ELEMENT_OPTIONS (= assoc right))))
 	 *  set option assoc=right in TOKEN_REF.

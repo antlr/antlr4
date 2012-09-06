@@ -125,24 +125,24 @@ public class Tool {
 	public boolean verbose_dfa = false;
 	public boolean gen_listener = true;
 	public boolean gen_visitor = false;
-	public boolean abstract_recognizer = false;
 	public Map<String, String> grammarOptions = null;
 
     public static Option[] optionDefs = {
         new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
         new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
+/*
         new Option("report",			"-report", "print out a report about the grammar(s) processed"),
         new Option("printGrammar",		"-print", "print out the grammar without actions"),
         new Option("debug",				"-debug", "generate a parser that emits debugging events"),
         new Option("profile",			"-profile", "generate a parser that computes profiling information"),
+         */
         new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition network diagrams"),
 		new Option("grammarEncoding",	"-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
-		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages"),
+		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages in antlr, gnu, vs2005"),
 		new Option("gen_listener",		"-listener", "generate parse tree listener (default)"),
 		new Option("gen_listener",		"-no-listener", "don't generate parse tree listener"),
 		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
 		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
-		new Option("abstract_recognizer", "-abstract", "generate abstract recognizer classes"),
 		new Option("",					"-D<option>=value", "set a grammar-level option"),
 
 
@@ -166,7 +166,7 @@ public class Tool {
 
 	protected List<String> grammarFiles = new ArrayList<String>();
 
-	public ErrorManager errMgr = new ErrorManager(this);
+	public ErrorManager errMgr;
     public LogManager logMgr = new LogManager();
 
 	List<ANTLRToolListener> listeners = new CopyOnWriteArrayList<ANTLRToolListener>();
@@ -207,6 +207,8 @@ public class Tool {
 	public Tool(String[] args) {
 		this.args = args;
 		handleArgs();
+		errMgr = new ErrorManager(this);
+		errMgr.setFormat(msgFormat);
 	}
 
 	protected void handleArgs() {
