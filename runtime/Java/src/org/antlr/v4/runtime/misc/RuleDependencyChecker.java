@@ -1,6 +1,7 @@
 /*
  [The "BSD license"]
  Copyright (c) 2012 Terence Parr
+ Copyright (c) 2012 Sam Harwell
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
