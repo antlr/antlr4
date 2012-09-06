@@ -70,12 +70,42 @@ import java.util.Set;
 public class Grammar implements AttributeResolver {
 	public static final String GRAMMAR_FROM_STRING_NAME = "<string>";
 
+	public static final Set<String> parserOptions = new HashSet<String>() {{
+		add("superClass");
+		add("TokenLabelType");
+		add("abstract");
+		add("tokenVocab");
+		add("language");
+	}};
+
+	public static final Set<String> lexerOptions = parserOptions;
+
+	public static final Set<String> ruleOptions = new HashSet<String>() {{
+	}};
+
+	public static final Set<String> subruleOptions = new HashSet<String>() {{
+		add("greedy");
+	}};
+
+	/** Legal options for terminal refs like ID<assoc=right> */
+	public static final Set<String> tokenOptions = new HashSet<String>() {{
+		add("assoc");
+	}};
+
+	public static final Set<String> actionOptions = new HashSet<String>() {{
+	}};
+
+	public static final Set<String> semPredOptions = new HashSet<String>() {{
+		add("fail");
+	}};
+
 	public static final Set doNotCopyOptionsToLexer =
-        new HashSet() {
-            {
-                add("TokenLabelType"); add("superClass");
-            }
-        };
+        new HashSet() {{
+				add("superClass");
+                add("TokenLabelType");
+				add("abstract");
+				add("tokenVocab");
+        }};
 
     public static Map<String, AttributeDict> grammarAndLabelRefTypeToScope =
         new HashMap<String, AttributeDict>() {{
