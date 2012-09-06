@@ -728,13 +728,6 @@ public class Grammar implements AttributeResolver {
 	}
 
 	public String getOptionString(String key) { return ast.getOptionString(key); }
-	public GrammarAST getOption(String key) { return ast.getOption(key); }
-
-	public String getOptionString(String key, String defaultValue) {
-		String v = ast.getOptionString(key);
-		if ( v!=null ) return v;
-		return defaultValue;
-	}
 
 	/** Manually get language option from tree */
 	// TODO: move to general tree visitor/parser class?

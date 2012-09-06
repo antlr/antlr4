@@ -87,7 +87,7 @@ public class SemanticPipeline {
 
 		// TRANSFORM LEFT-RECURSIVE RULES
 		LeftRecursiveRuleTransformer lrtrans =
-			new LeftRecursiveRuleTransformer(g.ast, ruleCollector.rules.values(), g.tool);
+			new LeftRecursiveRuleTransformer(g.ast, ruleCollector.rules.values(), g);
 		lrtrans.translateLeftRecursiveRules();
 
 		// STORE RULES IN GRAMMAR

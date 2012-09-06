@@ -73,7 +73,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Tool {
@@ -124,6 +126,7 @@ public class Tool {
 	public boolean gen_listener = true;
 	public boolean gen_visitor = false;
 	public boolean abstract_recognizer = false;
+	public Map<String, String> grammarOptions = null;
 
     public static Option[] optionDefs = {
         new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
@@ -140,6 +143,8 @@ public class Tool {
 		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
 		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
 		new Option("abstract_recognizer", "-abstract", "generate abstract recognizer classes"),
+		new Option("-D<option>=value",	"-message-format", "set a grammar-level option"),
+
 
         new Option("saveLexer",			"-Xsave-lexer", "save temp lexer file created for combined grammars"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
@@ -209,6 +214,10 @@ public class Tool {
 		while ( args!=null && i<args.length ) {
 			String arg = args[i];
 			i++;
+			if ( arg.startsWith("-D") ) { // -Dlanguage=Java syntax
+				handleOptionSetArg(arg);
+				continue;
+			}
 			if ( arg.charAt(0)!='-' ) { // file name
 				grammarFiles.add(arg);
 				continue;
@@ -274,6 +283,34 @@ public class Tool {
 		if ( launch_ST_inspector ) {
 			STGroup.trackCreationEvents = true;
 			return_dont_exit = true;
+		}
+		System.out.println(grammarOptions);
+	}
+
+	protected void handleOptionSetArg(String arg) {
+		int eq = arg.indexOf('=');
+		if ( eq>0 && arg.length()>3 ) {
+			String option = arg.substring("-D".length(), eq);
+			String value = arg.substring(eq+1);
+			if ( value.length()==0 ) {
+				errMgr.toolError(ErrorType.BAD_OPTION_SET_SYNTAX, arg);
+				return;
+			}
+			if ( Grammar.parserOptions.contains(option) ||
+				 Grammar.lexerOptions.contains(option) )
+			{
+				if ( grammarOptions==null ) grammarOptions = new HashMap<String, String>();
+				grammarOptions.put(option, value);
+			}
+			else {
+				errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
+									null,
+									null,
+									option);
+			}
+		}
+		else {
+			errMgr.toolError(ErrorType.BAD_OPTION_SET_SYNTAX, arg);
 		}
 	}
 
@@ -432,6 +469,9 @@ public class Tool {
 			if ( root instanceof GrammarRootAST) {
 				((GrammarRootAST)root).hasErrors = p.getNumberOfSyntaxErrors()>0;
 				((GrammarRootAST)root).tokens = tokens;
+				if ( grammarOptions!=null ) {
+					((GrammarRootAST)root).cmdLineOptions = grammarOptions;
+				}
 				return ((GrammarRootAST)root);
 			}
 			return null;

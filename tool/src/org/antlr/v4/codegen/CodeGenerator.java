@@ -70,7 +70,7 @@ public class CodeGenerator {
 	public int lineWidth = 72;
 
 	public CodeGenerator(@NotNull Grammar g) {
-		this(g.tool, g, g.getOptionString("language", "Java"));
+		this(g.tool, g, g.getOptionString("language"));
 	}
 
 	public CodeGenerator(@NotNull Tool tool, @NotNull Grammar g, String language) {

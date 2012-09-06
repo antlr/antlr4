@@ -52,7 +52,7 @@ public enum ErrorType {
 	OUTPUT_DIR_IS_FILE(6, "output directory is a file: <arg>", ErrorSeverity.ERROR),
 	CANNOT_OPEN_FILE(7, "cannot find or open file: <arg><if(exception)>; reason: <exception><endif>", ErrorSeverity.ERROR),
 	FILE_AND_GRAMMAR_NAME_DIFFER(8, "grammar name <arg> and file name <arg2> differ", ErrorSeverity.ERROR),
-//	FILENAME_EXTENSION_ERROR("", ErrorSeverity.ERROR),
+	BAD_OPTION_SET_SYNTAX(9, "invalid -Dname=value syntax: <arg>", ErrorSeverity.ERROR),
 
 	INTERNAL_ERROR(20, "internal error: <arg> <arg2><if(exception)>: <exception><endif>\n" +
 				   "<stackTrace; separator=\"\\n\">", ErrorSeverity.ERROR),
