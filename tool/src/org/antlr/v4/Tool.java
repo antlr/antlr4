@@ -284,7 +284,6 @@ public class Tool {
 			STGroup.trackCreationEvents = true;
 			return_dont_exit = true;
 		}
-		System.out.println(grammarOptions);
 	}
 
 	protected void handleOptionSetArg(String arg) {
