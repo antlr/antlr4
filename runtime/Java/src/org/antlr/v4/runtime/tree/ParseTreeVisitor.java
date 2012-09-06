@@ -3,9 +3,19 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
-/** {@code T} is return type of {@code visit} methods. Use {@link Void} for no return type.
+/** This class defines the basic notion of a parse tree visitor
+ *  object. Generated visitors extend this class and implement the XVisitor
+ *  interface for grammar X.
+ *
+ * @param <T> The return type of the visit operation. Use {@link Void} for
+ * operations with no return type.
  */
 public class ParseTreeVisitor<T> {
+	/** Visit a parse tree, and return a user-defined result of the operation.
+	 *
+	 * @param tree The {@link ParseTree} to visit.
+	 * @return The result of visiting the parse tree.
+	 */
 	public T visit(ParseTree tree) {
 		return tree.accept(this);
 	}
@@ -27,6 +37,17 @@ public class ParseTreeVisitor<T> {
 		return result;
 	}
 
+	/** Visit a terminal node, and return a user-defined result of the operation.
+	 *
+	 * @param node The {@link TerminalNode} to visit.
+	 * @return The result of visiting the node.
+	 */
 	public T visitTerminal(TerminalNode<? extends Token> node) { return null; }
+
+	/** Visit an error node, and return a user-defined result of the operation.
+	 *
+	 * @param node The {@link ErrorNode} to visit.
+	 * @return The result of visiting the node.
+	 */
 	public T visitErrorNode(ErrorNode<? extends Token> node) { return null; }
 }
