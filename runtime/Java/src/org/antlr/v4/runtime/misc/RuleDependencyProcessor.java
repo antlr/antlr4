@@ -59,15 +59,22 @@ import java.lang.annotation.AnnotationTypeMismatchException;
  *
  * @author Sam Harwell
  */
-@SupportedAnnotationTypes({"org.antlr.v4.runtime.RuleDependency", "org.antlr.v4.runtime.RuleDependencies"})
+@SupportedAnnotationTypes({RuleDependencyProcessor.RuleDependencyClassName, RuleDependencyProcessor.RuleDependenciesClassName})
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class RuleDependencyProcessor extends AbstractProcessor {
+	public static final String RuleDependencyClassName = "org.antlr.v4.runtime.RuleDependency";
+	public static final String RuleDependenciesClassName = "org.antlr.v4.runtime.RuleDependencies";
+	public static final String RuleVersionClassName = "org.antlr.v4.runtime.RuleVersion";
 
 	public RuleDependencyProcessor() {
 	}
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+		if (!checkClassNameConstants()) {
+			return true;
+		}
+
 		List<Tuple2<RuleDependency, Element>> dependencies = getDependencies(roundEnv);
 		Map<TypeMirror, List<Tuple2<RuleDependency, Element>>> recognizerDependencies
 			= new HashMap<TypeMirror, List<Tuple2<RuleDependency, Element>>>();
@@ -90,10 +97,29 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 		return true;
 	}
 
+	private boolean checkClassNameConstants() {
+		boolean success = checkClassNameConstant(RuleDependencyClassName, RuleDependency.class);
+		success &= checkClassNameConstant(RuleDependenciesClassName, RuleDependencies.class);
+		success &= checkClassNameConstant(RuleVersionClassName, RuleVersion.class);
+		return success;
+	}
+
+	private boolean checkClassNameConstant(String className, Class<?> clazz) {
+		Args.notNull("className", className);
+		Args.notNull("clazz", clazz);
+		if (!className.equals(clazz.getCanonicalName())) {
+			processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, String.format("Unable to process rule dependencies due to class name mismatch: %s != %s", className, clazz.getCanonicalName()));
+			return false;
+		}
+
+		return true;
+	}
+
 	private static TypeMirror getRecognizerType(RuleDependency dependency) {
 		try {
 			dependency.recognizer();
-			throw new UnsupportedOperationException("Expected MirroredTypeException to get the TypeMirror.");
+			String message = String.format("Expected %s to get the %s.", MirroredTypeException.class.getSimpleName(), TypeMirror.class.getSimpleName());
+			throw new UnsupportedOperationException(message);
 		}
 		catch (MirroredTypeException ex) {
 			return ex.getTypeMirror();
@@ -199,7 +225,7 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 	}
 
 	private boolean hasRuleVersionAnnotation(ExecutableElement method) {
-		TypeElement ruleVersionAnnotationElement = processingEnv.getElementUtils().getTypeElement("org.antlr.v4.runtime.RuleVersion");
+		TypeElement ruleVersionAnnotationElement = processingEnv.getElementUtils().getTypeElement(RuleVersionClassName);
 		if (ruleVersionAnnotationElement == null) {
 			return false;
 		}
