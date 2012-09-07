@@ -33,7 +33,11 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /** An ATN transition between any two ATN states.  Subclasses define
  *  atom, set, epsilon, action, predicate, rule transitions.

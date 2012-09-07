@@ -1,9 +1,6 @@
 package org.antlr.v4.test;
 
 import org.antlr.v4.automata.ParserATNFactory;
-import org.antlr.v4.runtime.NoViableAltException;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.BlockStartState;
@@ -41,7 +38,7 @@ public class TestATNInterpreter extends BaseTest {
 			"C : 'c' ;\n");
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"tokens {A; B; C;}\n" +
+			"tokens {A,B,C}\n" +
 			"a : ~A ;");
 		checkMatchedAlt(lg, g, "b", 1);
 	}
@@ -215,7 +212,7 @@ public class TestATNInterpreter extends BaseTest {
 		);
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"tokens {A;B;C;LP;RP;INT;}\n" +
+			"tokens {A,B,C,LP,RP,INT}\n" +
 			"a : e B | e C ;\n" +
 			"e : LP e RP\n" +
 			"  | INT\n" +
@@ -237,14 +234,13 @@ public class TestATNInterpreter extends BaseTest {
 		IntegerList types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
 
-		semanticProcess(lg);
 		g.importVocab(lg);
-		semanticProcess(g);
 
 		ParserATNFactory f = new ParserATNFactory(g);
 		ATN atn = f.createATN();
 
-		TokenStream<Token> input = new IntTokenStream(types);
+		IntTokenStream input = new IntTokenStream(types);
+		System.out.println("input="+input.types);
 		ParserInterpreter interp = new ParserInterpreter(g, input);
 		ATNState startState = atn.ruleToStartState[g.getRule("a").index];
 		if ( startState.transition(0).target instanceof BlockStartState ) {

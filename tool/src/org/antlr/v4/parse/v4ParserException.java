@@ -29,7 +29,8 @@
 
 package org.antlr.v4.parse;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.IntStream;
+import org.antlr.runtime.RecognitionException;
 
 /** */
 public class v4ParserException extends RecognitionException {

@@ -162,7 +162,7 @@ public class DFASerializer {
 
 		if ( s.isCtxSensitive ) {
 			stateStr += "*";
-			for (ATNConfig config : s.configset) {
+			for (ATNConfig config : s.configs) {
 				if (config.getReachesIntoOuterContext()) {
 					stateStr += "*";
 					break;

@@ -208,7 +208,7 @@ public class TestParserExec extends BaseTest {
 			"ifStmt : 'if' ID stmt ('else' stmt | {_input.LA(1) != ELSE}?);\n" +
 			"ELSE : 'else';\n" +
 			"ID : [a-zA-Z]+;\n" +
-			"WS : (' ' | '\\t')+ -> skip;\n"
+			"WS : [ \\n\\t]+ -> skip;\n"
 			;
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "stmt",

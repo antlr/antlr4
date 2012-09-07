@@ -46,7 +46,6 @@ import org.antlr.v4.runtime.atn.TokensStartState;
 import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
@@ -63,7 +62,7 @@ public class LexerATNFactory extends ParserATNFactory {
 	public LexerATNFactory(LexerGrammar g) {
 		super(g);
 		// use codegen to get correct language templates for lexer commands
-		String language = Grammar.getLanguageOption(g.ast);
+		String language = g.getOptionString("language");
 		CodeGenerator gen = new CodeGenerator(g.tool, null, language);
 		codegenTemplates = gen.templates;
 	}

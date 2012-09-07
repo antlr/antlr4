@@ -30,8 +30,10 @@
 package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.codegen.model.DispatchMethod;
+import org.antlr.v4.codegen.model.ListenerDispatchMethod;
+import org.antlr.v4.codegen.model.VisitorDispatchMethod;
+import org.antlr.v4.tool.Rule;
 
 import java.util.ArrayList;
 

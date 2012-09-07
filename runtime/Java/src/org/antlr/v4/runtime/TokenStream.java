@@ -35,7 +35,7 @@ import org.antlr.v4.runtime.misc.Interval;
 public interface TokenStream<Symbol> extends IntStream {
     /** Get Token at current input pointer + i ahead where i=1 is next Token.
 	 *  i&lt;0 indicates tokens in the past.  So -1 is previous token and -2 is
-	 *  two tokens ago. LT(0) is undefined.  For i>=n, return Token.EOFToken.
+	 *  two tokens ago. LT(0) is undefined.  For i>=n, return eof token.
 	 *  Return null for LT(0) and any index that results in an absolute address
 	 *  that is negative.
      *  TODO (Sam): Throw exception for invalid k?

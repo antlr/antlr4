@@ -445,8 +445,8 @@ public class TestPerformance extends BaseTest {
 
 					states += dfa.states.size();
 					for (DFAState state : dfa.states.values()) {
-						configs += state.configset.size();
-						uniqueConfigs.addAll(state.configset);
+						configs += state.configs.size();
+						uniqueConfigs.addAll(state.configs);
 					}
 				}
 
@@ -473,8 +473,8 @@ public class TestPerformance extends BaseTest {
 
                     states += dfa.states.size();
 					for (DFAState state : dfa.states.values()) {
-						configs += state.configset.size();
-						uniqueConfigs.addAll(state.configset);
+						configs += state.configs.size();
+						uniqueConfigs.addAll(state.configs);
 					}
                 }
 
@@ -495,13 +495,13 @@ public class TestPerformance extends BaseTest {
 
                 if (SHOW_CONFIG_STATS) {
                     for (DFAState state : dfa.states.keySet()) {
-                        if (state.configset.size() >= contextsInDFAState.length) {
-                            contextsInDFAState = Arrays.copyOf(contextsInDFAState, state.configset.size() + 1);
+                        if (state.configs.size() >= contextsInDFAState.length) {
+                            contextsInDFAState = Arrays.copyOf(contextsInDFAState, state.configs.size() + 1);
                         }
 
                         if (state.isAcceptState) {
                             boolean hasGlobal = false;
-                            for (ATNConfig config : state.configset) {
+                            for (ATNConfig config : state.configs) {
                                 if (config.getReachesIntoOuterContext()) {
                                     globalConfigCount++;
                                     hasGlobal = true;
@@ -517,13 +517,13 @@ public class TestPerformance extends BaseTest {
                             }
                         }
 
-                        contextsInDFAState[state.configset.size()]++;
+                        contextsInDFAState[state.configs.size()]++;
                     }
                 }
 
                 if (EXPORT_LARGEST_CONFIG_CONTEXTS) {
                     for (DFAState state : dfa.states.keySet()) {
-                        for (ATNConfig config : state.configset) {
+                        for (ATNConfig config : state.configs) {
                             String configOutput = config.toDotString();
                             if (configOutput.length() <= configOutputSize) {
                                 continue;

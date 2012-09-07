@@ -34,7 +34,9 @@ import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Predicate;
 import org.antlr.v4.tool.ast.GrammarAST;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /** */
 public class Utils {

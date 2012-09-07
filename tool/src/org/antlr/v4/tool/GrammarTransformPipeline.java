@@ -34,10 +34,10 @@ import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
 import org.antlr.v4.Tool;
-import org.antlr.v4.misc.DoubleKeyMap;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.BlockSetTransformer;
 import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.antlr.v4.runtime.misc.Tuple2;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.BlockAST;
@@ -359,12 +359,14 @@ public class GrammarTransformPipeline {
 		// add strings from combined grammar (and imported grammars) into lexer
 		// put them first as they are keywords; must resolve ambigs to these rules
 //		tool.log("grammar", "strings from parser: "+stringLiterals);
-nextLit:
+		nextLit:
 		for (String lit : stringLiterals) {
 			// if lexer already has a rule for literal, continue
-			for (Tuple2<GrammarAST,GrammarAST> pair : litAliases) {
-				GrammarAST litAST = pair.getItem2();
-				if ( lit.equals(litAST.getText()) ) continue nextLit;
+			if ( litAliases!=null ) {
+				for (Tuple2<GrammarAST,GrammarAST> pair : litAliases) {
+					GrammarAST litAST = pair.getItem2();
+					if ( lit.equals(litAST.getText()) ) continue nextLit;
+				}
 			}
 			// create for each literal: (RULE <uniquename> (BLOCK (ALT <lit>))
 			String rname = combinedGrammar.getStringLiteralLexerRuleName(lit);

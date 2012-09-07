@@ -75,6 +75,7 @@ public class ATN {
 	// runtime for lexer only
 	public int[] ruleToTokenType;
 	public int[] ruleToActionIndex;
+
 	@NotNull
 	public final List<TokensStartState> modeToStartState = new ArrayList<TokensStartState>();
 

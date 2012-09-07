@@ -144,7 +144,7 @@ public class ATNOptimizer {
 			}
 		}
 
-		System.out.println("ATN optimizer removed " + removedStates + " states by collapsing sets.");
+//		System.out.println("ATN optimizer removed " + removedStates + " states by collapsing sets.");
 	}
 
 	private static void optimizeStates(ATN atn) {
@@ -166,7 +166,7 @@ public class ATNOptimizer {
 			current++;
 		}
 
-		System.out.println("ATN optimizer removed " + (states.size() - current) + " null states.");
+//		System.out.println("ATN optimizer removed " + (states.size() - current) + " null states.");
 		states.subList(current, states.size()).clear();
 	}
 

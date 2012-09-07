@@ -42,7 +42,6 @@ import org.antlr.v4.runtime.misc.Nullable;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.BitSet;
 
 /** "dup" of ParserInterpreter */
 public class LexerATNSimulator extends ATNSimulator {
@@ -248,7 +247,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			t = input.LA(1);
 		}
 
-		ATNConfigSet reach = prevAccept.dfaState != null ? prevAccept.dfaState.configset : null;
+		ATNConfigSet reach = prevAccept.dfaState != null ? prevAccept.dfaState.configs : null;
 		return failOrAccept(prevAccept, input, reach, t);
 	}
 
@@ -289,7 +288,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			DFAState target = null;
 			ATNConfigSet reach = null;
 			if (s != null) {
-				closure = s.configset;
+				closure = s.configs;
 				target = s.getTarget(t);
 				if (target == ERROR) {
 					break;
@@ -299,7 +298,7 @@ public class LexerATNSimulator extends ATNSimulator {
 						System.out.println("reuse state "+s.stateNumber+
 										   " edge to "+target.stateNumber);
 					}
-					reach = target.configset;
+					reach = target.configs;
 				}
 			}
 
@@ -681,10 +680,10 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( dfa_debug ) {
 			System.out.format("no edge for %s\n", getTokenName(input.LA(1)));
 			System.out.format("ATN exec upon %s at DFA state %d = %s\n",
-							  input.getText(Interval.of(startIndex, input.index())), s.stateNumber, s.configset);
+							  input.getText(Interval.of(startIndex, input.index())), s.stateNumber, s.configs);
 		}
 
-		int ttype = execATN(input, s.configset, s);
+		int ttype = execATN(input, s.configs, s);
 
 		if ( dfa_debug ) {
 			System.out.format("back from DFA update, ttype=%d, dfa[mode %d]=\n%s\n",

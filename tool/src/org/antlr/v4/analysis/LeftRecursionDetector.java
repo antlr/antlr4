@@ -29,11 +29,20 @@
 
 package org.antlr.v4.analysis;
 
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.RuleStartState;
+import org.antlr.v4.runtime.atn.RuleStopState;
+import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class LeftRecursionDetector {
 	Grammar g;

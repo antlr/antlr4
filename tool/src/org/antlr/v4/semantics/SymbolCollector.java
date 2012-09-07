@@ -33,7 +33,13 @@ import org.antlr.v4.parse.GrammarTreeVisitor;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LabelElementPair;
 import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarASTWithOptions;
+import org.antlr.v4.tool.ast.PredAST;
+import org.antlr.v4.tool.ast.RuleAST;
+import org.antlr.v4.tool.ast.TerminalAST;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -75,18 +81,10 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void tokenAlias(GrammarAST ID, GrammarAST literal) {
-		if ( literal==null ) {
-			terminals.add(ID);
-			tokenIDRefs.add(ID);
-			tokensDefs.add(ID);
-		}
-		else {
-			terminals.add(ID);
-			tokenIDRefs.add(ID);
-			tokensDefs.add((GrammarAST)ID.getParent());
-			strings.add(literal.getText());
-		}
+	public void defineToken(GrammarAST ID) {
+		terminals.add(ID);
+		tokenIDRefs.add(ID);
+		tokensDefs.add(ID);
 	}
 
 	@Override
@@ -162,7 +160,7 @@ public class SymbolCollector extends GrammarTreeVisitor {
 
 	@Override
 	public void ruleRef(GrammarAST ref, ActionAST arg) {
-		if ( inContext("DOT ...") ) qualifiedRulerefs.add((GrammarAST)ref.getParent());
+//		if ( inContext("DOT ...") ) qualifiedRulerefs.add((GrammarAST)ref.getParent());
 		rulerefs.add(ref);
     	if ( currentRule!=null ) {
     		currentRule.alt[currentOuterAltNumber].ruleRefs.map(ref.getText(), ref);

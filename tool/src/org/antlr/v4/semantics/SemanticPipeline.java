@@ -87,7 +87,7 @@ public class SemanticPipeline {
 
 		// TRANSFORM LEFT-RECURSIVE RULES
 		LeftRecursiveRuleTransformer lrtrans =
-			new LeftRecursiveRuleTransformer(g.ast, ruleCollector.rules.values(), g.tool);
+			new LeftRecursiveRuleTransformer(g.ast, ruleCollector.rules.values(), g);
 		lrtrans.translateLeftRecursiveRules();
 
 		// STORE RULES IN GRAMMAR
@@ -171,9 +171,10 @@ public class SemanticPipeline {
 					G.defineTokenAlias(nameAST.getText(), litAST.getText());
 				}
 				else {
-					g.tool.errMgr.grammarError(ErrorType.ALIAS_REASSIGNMENT,
-											   g.fileName, nameAST.token,
-											   litAST.getText(), nameAST.getText());
+					// oops two literal defs in two rules (within or across
+					// modes). Remove literal in either case so it's not
+					// found by parser.
+					G.stringLiteralToTypeMap.remove(litAST.getText());
 				}
 			}
 		}

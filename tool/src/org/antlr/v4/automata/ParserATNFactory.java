@@ -38,7 +38,27 @@ import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.ATNBuilder;
 import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ActionTransition;
+import org.antlr.v4.runtime.atn.AtomTransition;
+import org.antlr.v4.runtime.atn.BlockEndState;
+import org.antlr.v4.runtime.atn.BlockStartState;
+import org.antlr.v4.runtime.atn.EpsilonTransition;
+import org.antlr.v4.runtime.atn.LoopEndState;
+import org.antlr.v4.runtime.atn.NotSetTransition;
+import org.antlr.v4.runtime.atn.PlusBlockStartState;
+import org.antlr.v4.runtime.atn.PlusLoopbackState;
+import org.antlr.v4.runtime.atn.PredicateTransition;
+import org.antlr.v4.runtime.atn.RuleStartState;
+import org.antlr.v4.runtime.atn.RuleStopState;
+import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.SetTransition;
+import org.antlr.v4.runtime.atn.StarBlockStartState;
+import org.antlr.v4.runtime.atn.StarLoopEntryState;
+import org.antlr.v4.runtime.atn.StarLoopbackState;
+import org.antlr.v4.runtime.atn.Transition;
+import org.antlr.v4.runtime.atn.WildcardTransition;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -47,7 +67,12 @@ import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.BlockAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.PredAST;
+import org.antlr.v4.tool.ast.TerminalAST;
 
 import java.lang.reflect.Constructor;
 import java.util.Collection;
@@ -205,8 +230,6 @@ public class ParserATNFactory implements ATNFactory {
 	@Override
 	public Handle ruleRef(GrammarAST node) {
 		Handle h = _ruleRef(node);
-//		Rule r = g.getRule(node.getText());
-//		addFollowLink(r, h.right);
 		return h;
 	}
 

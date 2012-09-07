@@ -250,7 +250,7 @@ public class TestFullContextParsing extends BaseTest {
 			"prog: expr_or_assign*;\n" +
 			"expr_or_assign\n" +
 			"    :   expr '++' {System.out.println(\"fail.\");}\n" +
-			"    |   expr {System.out.println(\"pass.\");}\n" +
+			"    |   expr {System.out.println(\"pass: \"+$expr.text);}\n" +
 			"    ;\n" +
 			"expr: expr_primary ('<-' ID)? ;\n" +
 			"expr_primary\n" +

@@ -30,13 +30,23 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.v4.analysis.LeftRecursiveRuleAnalyzer;
-import org.antlr.v4.misc.*;
-import org.antlr.v4.parse.*;
-import org.antlr.v4.runtime.misc.MultiMap;
-import org.antlr.v4.tool.*;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.misc.OrderedHashMap;
+import org.antlr.v4.misc.Utils;
+import org.antlr.v4.parse.GrammarTreeVisitor;
+import org.antlr.v4.parse.ScopeParser;
+import org.antlr.v4.tool.AttributeDict;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LeftRecursiveRule;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.RuleAST;
+import org.stringtemplate.v4.misc.MultiMap;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class RuleCollector extends GrammarTreeVisitor {
 	/** which grammar are we checking */

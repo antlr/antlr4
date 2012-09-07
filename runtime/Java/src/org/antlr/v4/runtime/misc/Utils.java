@@ -29,6 +29,10 @@
 
 package org.antlr.v4.runtime.misc;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -91,6 +95,13 @@ public class Utils {
 			else buf.append(c);
 		}
 		return buf.toString();
+	}
+
+	public static void writeFile(String fileName, String content) throws IOException {
+		FileWriter fw = new FileWriter(fileName);
+		Writer w = new BufferedWriter(fw);
+		w.write(content);
+		w.close();
 	}
 
 	public static <T> void removeAll(@NotNull List<T> list, @NotNull Predicate<? super T> predicate) {

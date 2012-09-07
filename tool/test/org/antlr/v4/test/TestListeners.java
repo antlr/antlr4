@@ -9,7 +9,7 @@ public class TestListeners extends BaseTest {
 			"@header {import org.antlr.v4.runtime.tree.ParseTree;}\n"+
 			"@members {\n" +
 			"public static class LeafListener extends TBaseListener {\n" +
-			"    public void visitTerminal(ParseTree.TerminalNode<? extends Token> node) {\n" +
+			"    public void visitTerminal(TerminalNode<? extends Token> node) {\n" +
 			"      System.out.println(node.getSymbol().getText());\n" +
 			"    }\n" +
 			"  }}\n" +

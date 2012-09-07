@@ -82,12 +82,12 @@ public class <file.grammarName>BaseVisitor\<Result> extends AbstractParseTreeVis
 }
 >>
 
-Parser(parser, funcs, atn, sempredFuncs, superclass) ::= <<
+Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 <Parser_(ctor="parser_ctor", ...)>
 >>
 
-Parser_(parser, funcs, atn, sempredFuncs, ctor, extras, superclass) ::= <<
-public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extends <superclass> {
+Parser_(parser, funcs, atn, sempredFuncs, ctor, extras, superClass) ::= <<
+public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extends <superClass> {
 	<if(parser.tokens)>
 	public static final int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
@@ -480,6 +480,7 @@ LexerModeCommand(arg)      ::= "_mode = <arg>;"
 LexerPushModeCommand(arg)  ::= "pushMode(<arg>);"
 
 DefaultParserSuperClass(s) ::= "Parser\<<InputSymbolType()>>"
+DefaultLexerSuperClass(s)  ::= "Lexer"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
@@ -677,8 +678,8 @@ import org.antlr.v4.runtime.misc.*;
 <lexer>
 >>
 
-Lexer(lexer, atn, actionFuncs, sempredFuncs) ::= <<
-public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends Lexer {
+Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
+public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends <superClass> {
 	public static final int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<rest(lexer.modes):{m| public static final int <m> = <i>;}; separator="\n">

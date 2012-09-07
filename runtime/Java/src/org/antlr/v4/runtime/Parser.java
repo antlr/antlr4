@@ -38,6 +38,7 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
@@ -48,21 +49,18 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	public class TraceListener implements ParseTreeListener<Token> {
 		@Override
 		public void enterEveryRule(ParserRuleContext<? extends Token> ctx) {
-			System.out.println("enter   " + getRuleNames()[ctx.getRuleIndex()] + ", LT(1)=" + _input.LT(1).getText());
+			System.out.println("enter   " + getRuleNames()[ctx.getRuleIndex()] +
+							   ", LT(1)=" + _input.LT(1).getText());
 		}
 
 		@Override
 		public void exitEveryRule(ParserRuleContext<? extends Token> ctx) {
-			System.out.println("exit    "+getRuleNames()[ctx.getRuleIndex()]+", LT(1)="+_input.LT(1).getText());
+			System.out.println("exit    "+getRuleNames()[ctx.getRuleIndex()]+
+							   ", LT(1)="+_input.LT(1).getText());
 		}
 
 		@Override
 		public void visitErrorNode(ErrorNode<? extends Token> node) {
-			ParserRuleContext<?> parent = (ParserRuleContext<?>)node.getParent().getRuleContext();
-			Token token = node.getSymbol();
-			System.out.println("consume "+token+" rule "+
-							   getRuleNames()[parent.getRuleIndex()]+
-							   " alt="+parent.altNum);
 		}
 
 		@Override
@@ -96,7 +94,6 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 				((ArrayList<?>)ctx.children).trimToSize();
 			}
 		}
-
 	}
 
 	protected ANTLRErrorStrategy<? super Symbol> _errHandler = new DefaultErrorStrategy<Symbol>();
@@ -118,7 +115,9 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
      *  *during* the parse. This is typically done only when not building
      *  parse trees for later visiting. We either trigger events during
      *  the parse or during tree walks later. Both could be done.
-     *  Not intended for tree parsing but would work.
+     *  Not intended for average user!!!  Most people should use
+	 *  ParseTreeListener with ParseTreeWalker.
+	 *  @see ParseTreeWalker
      */
     protected List<ParseTreeListener<? super Symbol>> _parseListeners;
 
@@ -212,7 +211,6 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	}
 
 	/**
-	 *
 	 * @return {@code true} if the {@link ParserRuleContext#children} list is trimmed
 	 * using the default {@link Parser.TrimToSizeListener} during the parse process.
 	 */
@@ -236,6 +234,15 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
         return _parseListeners;
     }
 
+	/** Provide a listener that gets notified about token matches,
+	 *  and rule entry/exit events DURING the parse. It's a little bit
+	 *  weird for left recursive rule entry events but it's
+	 *  deterministic.
+	 *
+	 *  THIS IS ONLY FOR ADVANCED USERS. Please give your
+	 *  ParseTreeListener to a ParseTreeWalker instead of giving it to
+	 *  the parser!!!!
+	 */
     public void addParseListener(ParseTreeListener<? super Symbol> listener) {
 		if ( listener==null ) return;
 		if ( _parseListeners==null ) {
@@ -258,6 +265,11 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		_parseListeners = null;
 	}
 
+	/** Notify any parse listeners (implemented as ParseTreeListener's)
+	 *  of an enter rule event. This is not involved with
+	 *  parse tree walking in any way; it's just reusing the
+	 *  ParseTreeListener interface. This is not for the average user.
+	 */
 	public void triggerEnterRuleEvent() {
 		for (ParseTreeListener<? super Symbol> l : _parseListeners) {
 			l.enterEveryRule(_ctx);
@@ -265,6 +277,11 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		}
 	}
 
+	/** Notify any parse listeners (implemented as ParseTreeListener's)
+	 *  of an exit rule event. This is not involved with
+	 *  parse tree walking in any way; it's just reusing the
+	 *  ParseTreeListener interface. This is not for the average user.
+	 */
 	public void triggerExitRuleEvent() {
 		// reverse order walk of listeners
 		for (int i = _parseListeners.size()-1; i >= 0; i--) {
@@ -413,11 +430,14 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		_ctx.altNum = altNum;
 	}
 
-	/* like enterRule but for recursive rules; no enter events for recursive rules. */
+	/* like enterRule but for recursive rules */
 	public void pushNewRecursionContext(ParserRuleContext<Symbol> localctx, int state, int ruleIndex) {
 		setState(state);
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
+		if ( _parseListeners != null ) {
+			triggerEnterRuleEvent(); // simulates rule entry for left-recursive rules
+		}
 	}
 
 	public void unrollRecursionContexts(ParserRuleContext<Symbol> _parentctx, int _parentState) {
@@ -604,7 +624,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		return strings;
 	}
 
-	/** During a parse is extremely useful to listen in on the rule entry and exit
+	/** During a parse is sometimes useful to listen in on the rule entry and exit
 	 *  events as well as token matches. This is for quick and dirty debugging.
 	 */
 	public void setTrace(boolean trace) {

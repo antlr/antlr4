@@ -33,12 +33,22 @@ import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.tool.*;
-import org.stringtemplate.v4.*;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
+import org.stringtemplate.v4.AutoIndentWriter;
+import org.stringtemplate.v4.NumberRenderer;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
+import org.stringtemplate.v4.STWriter;
+import org.stringtemplate.v4.StringRenderer;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 /** General controller for code gen.  Can instantiate sub generator(s).
  */
@@ -60,7 +70,7 @@ public class CodeGenerator {
 	public int lineWidth = 72;
 
 	public CodeGenerator(@NotNull Grammar g) {
-		this(g.tool, g, g.getOptionString("language", "Java"));
+		this(g.tool, g, g.getOptionString("language"));
 	}
 
 	public CodeGenerator(@NotNull Tool tool, @NotNull Grammar g, String language) {
@@ -108,7 +118,7 @@ public class CodeGenerator {
 		}
 		catch (IllegalArgumentException iae) {
 			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-									iae,
+									null,
 						 			language);
 		}
 	}

@@ -147,7 +147,7 @@ public class DOTGenerator {
 				IntegerList altList = new IntegerList();
 				altList.addAll(alts);
 				altList.sort();
-				Set<ATNConfig> configurations = s.configset;
+				Set<ATNConfig> configurations = s.configs;
 				for (int altIndex = 0; altIndex < altList.size(); altIndex++) {
 					int alt = altList.get(altIndex);
 					if ( altIndex>0 ) {

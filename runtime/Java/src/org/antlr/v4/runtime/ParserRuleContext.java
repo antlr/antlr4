@@ -41,19 +41,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/** A rule invocation record for parsing and tree parsing.
+/** A rule invocation record for parsing.
  *
  *  Contains all of the information about the current rule not stored in the
  *  RuleContext. It handles parse tree children list, Any ATN state
  *  tracing, and the default values available for rule indications:
- *  start, stop, ST, rule index, current alt number, current
+ *  start, stop, rule index, current alt number, current
  *  ATN state.
  *
  *  Subclasses made for each rule and grammar track the parameters,
  *  return values, locals, and labels specific to that rule. These
  *  are the objects that are returned from rules.
  *
- *  Note text is not an actual property of the return value, it is computed
+ *  Note text is not an actual field of a rule return value; it is computed
  *  from start and stop using the input stream's toString() method.  I
  *  could add a ctor to this so that we can pass in and store the input
  *  stream, but I'm not sure we want to do that.  It would seem to be undefined
@@ -69,7 +69,7 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext<Symbol>
 
 	/** If we are debugging or building a parse tree for a visitor,
 	 *  we need to track all of the tokens and rule invocations associated
-	 *  with this rule's context. This is empty for normal parsing
+	 *  with this rule's context. This is empty for parsing w/o tree constr.
 	 *  operation because we don't the need to track the details about
 	 *  how we parse this rule.
 	 */
@@ -130,11 +130,10 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext<Symbol>
 
 	// Double dispatch methods for listeners
 
-	// parse tree listener
 	public void enterRule(ParseTreeListener<? super Symbol> listener) { }
 	public void exitRule(ParseTreeListener<? super Symbol> listener) { }
 
-	/** Does not set parent link; other add methods do */
+	/** Does not set parent link; other add methods do that */
 	public void addChild(TerminalNode<Symbol> t) {
 		if ( children==null ) children = new ArrayList<ParseTree<Symbol>>();
 		children.add(t);

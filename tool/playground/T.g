@@ -1,6 +1,5 @@
 grammar T;
 
-s : A | B ;
-x : (A|B);
-A : 'a'|'c';
-B : 'b' ;
+tokens { A,B }
+
+s : A ;

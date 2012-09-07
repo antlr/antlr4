@@ -64,20 +64,22 @@ import org.stringtemplate.v4.STGroup;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Tool {
-	public String VERSION = "4.0-"+new Date();
+	public static final String VERSION = "4.0b1";
 
 	public static final String GRAMMAR_EXTENSION = ".g4";
 	public static final String LEGACY_GRAMMAR_EXTENSION = ".g";
@@ -124,23 +126,26 @@ public class Tool {
 	public boolean verbose_dfa = false;
 	public boolean gen_listener = true;
 	public boolean gen_visitor = false;
-	public boolean abstract_recognizer = false;
+	public Map<String, String> grammarOptions = null;
 
     public static Option[] optionDefs = {
         new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
         new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
+/*
         new Option("report",			"-report", "print out a report about the grammar(s) processed"),
         new Option("printGrammar",		"-print", "print out the grammar without actions"),
         new Option("debug",				"-debug", "generate a parser that emits debugging events"),
         new Option("profile",			"-profile", "generate a parser that computes profiling information"),
+         */
         new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition network diagrams"),
 		new Option("grammarEncoding",	"-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
-		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages"),
+		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages in antlr, gnu, vs2005"),
 		new Option("gen_listener",		"-listener", "generate parse tree listener (default)"),
 		new Option("gen_listener",		"-no-listener", "don't generate parse tree listener"),
 		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
 		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
-		new Option("abstract_recognizer", "-abstract", "generate abstract recognizer classes"),
+		new Option("",					"-D<option>=value", "set/override a grammar-level option"),
+
 
         new Option("saveLexer",			"-Xsave-lexer", "save temp lexer file created for combined grammars"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
@@ -162,7 +167,7 @@ public class Tool {
 
 	protected List<String> grammarFiles = new ArrayList<String>();
 
-	public ErrorManager errMgr = new ErrorManager(this);
+	public ErrorManager errMgr;
     public LogManager logMgr = new LogManager();
 
 	List<ANTLRToolListener> listeners = new CopyOnWriteArrayList<ANTLRToolListener>();
@@ -202,6 +207,8 @@ public class Tool {
 
 	public Tool(String[] args) {
 		this.args = args;
+		errMgr = new ErrorManager(this);
+		errMgr.setFormat(msgFormat);
 		handleArgs();
 	}
 
@@ -210,6 +217,10 @@ public class Tool {
 		while ( args!=null && i<args.length ) {
 			String arg = args[i];
 			i++;
+			if ( arg.startsWith("-D") ) { // -Dlanguage=Java syntax
+				handleOptionSetArg(arg);
+				continue;
+			}
 			if ( arg.charAt(0)!='-' ) { // file name
 				grammarFiles.add(arg);
 				continue;
@@ -275,6 +286,33 @@ public class Tool {
 		if ( launch_ST_inspector ) {
 			STGroup.trackCreationEvents = true;
 			return_dont_exit = true;
+		}
+	}
+
+	protected void handleOptionSetArg(String arg) {
+		int eq = arg.indexOf('=');
+		if ( eq>0 && arg.length()>3 ) {
+			String option = arg.substring("-D".length(), eq);
+			String value = arg.substring(eq+1);
+			if ( value.length()==0 ) {
+				errMgr.toolError(ErrorType.BAD_OPTION_SET_SYNTAX, arg);
+				return;
+			}
+			if ( Grammar.parserOptions.contains(option) ||
+				 Grammar.lexerOptions.contains(option) )
+			{
+				if ( grammarOptions==null ) grammarOptions = new HashMap<String, String>();
+				grammarOptions.put(option, value);
+			}
+			else {
+				errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
+									null,
+									null,
+									option);
+			}
+		}
+		else {
+			errMgr.toolError(ErrorType.BAD_OPTION_SET_SYNTAX, arg);
 		}
 	}
 
@@ -438,6 +476,9 @@ public class Tool {
 			if ( root instanceof GrammarRootAST) {
 				((GrammarRootAST)root).hasErrors = p.getNumberOfSyntaxErrors()>0;
 				((GrammarRootAST)root).tokens = tokens;
+				if ( grammarOptions!=null ) {
+					((GrammarRootAST)root).cmdLineOptions = grammarOptions;
+				}
 				return ((GrammarRootAST)root);
 			}
 			return null;
@@ -508,8 +549,15 @@ public class Tool {
 		if (!outputDir.exists()) {
 			outputDir.mkdirs();
 		}
-		FileWriter fw = new FileWriter(outputFile);
-		return new BufferedWriter(fw);
+		FileOutputStream fos = new FileOutputStream(outputFile);
+		OutputStreamWriter osw;
+		if ( grammarEncoding!=null ) {
+			osw = new OutputStreamWriter(fos, grammarEncoding);
+		}
+		else {
+			osw = new OutputStreamWriter(fos);
+		}
+		return new BufferedWriter(osw);
 	}
 
 	public File getImportedGrammarFile(Grammar g, String fileName) {

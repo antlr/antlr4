@@ -72,12 +72,48 @@ public class Grammar implements AttributeResolver {
 	public static final String GRAMMAR_FROM_STRING_NAME = "<string>";
 
 	@SuppressWarnings("serial")
+	public static final Set<String> parserOptions = new HashSet<String>() {{
+		add("superClass");
+		add("TokenLabelType");
+		add("abstract");
+		add("tokenVocab");
+		add("language");
+	}};
+
+	public static final Set<String> lexerOptions = parserOptions;
+
+	@SuppressWarnings("serial")
+	public static final Set<String> ruleOptions = new HashSet<String>() {{
+	}};
+
+	@SuppressWarnings("serial")
+	public static final Set<String> subruleOptions = new HashSet<String>() {{
+		add("greedy");
+	}};
+
+	/** Legal options for terminal refs like ID<assoc=right> */
+	@SuppressWarnings("serial")
+	public static final Set<String> tokenOptions = new HashSet<String>() {{
+		add("assoc");
+	}};
+
+	@SuppressWarnings("serial")
+	public static final Set<String> actionOptions = new HashSet<String>() {{
+	}};
+
+	@SuppressWarnings("serial")
+	public static final Set<String> semPredOptions = new HashSet<String>() {{
+		add("fail");
+	}};
+
+	@SuppressWarnings("serial")
 	public static final Set<String> doNotCopyOptionsToLexer =
-        new HashSet<String>() {
-            {
-                add("TokenLabelType"); add("superClass");
-            }
-        };
+        new HashSet<String>() {{
+				add("superClass");
+                add("TokenLabelType");
+				add("abstract");
+				add("tokenVocab");
+        }};
 
     @SuppressWarnings("serial")
     public static Map<String, AttributeDict> grammarAndLabelRefTypeToScope =
@@ -375,8 +411,7 @@ public class Grammar implements AttributeResolver {
     }
 
 	public boolean isAbstract() {
-		return Boolean.parseBoolean(getOptionString("abstract"))
-			|| (tool != null && tool.abstract_recognizer);
+		return Boolean.parseBoolean(getOptionString("abstract"));
 	}
 
     /** Get the name of the generated recognizer; may or may not be same
@@ -701,32 +736,6 @@ public class Grammar implements AttributeResolver {
 	}
 
 	public String getOptionString(String key) { return ast.getOptionString(key); }
-	public GrammarAST getOption(String key) { return ast.getOption(key); }
-
-	public String getOptionString(String key, String defaultValue) {
-		String v = ast.getOptionString(key);
-		if ( v!=null ) return v;
-		return defaultValue;
-	}
-
-	/** Manually get language option from tree */
-	// TODO: move to general tree visitor/parser class?
-	// TODO: don't need anymore as i set optins in parser?
-	public static String getLanguageOption(GrammarRootAST ast) {
-		GrammarAST options = (GrammarAST)ast.getFirstChildWithType(ANTLRParser.OPTIONS);
-		String language = "Java";
-		if ( options!=null ) {
-			for (Object o : options.getChildren()) {
-				GrammarAST c = (GrammarAST)o;
-				if ( c.getType() == ANTLRParser.ASSIGN &&
-				c.getChild(0).getText().equals("language") )
-				{
-					language = c.getChild(1).getText();
-				}
-			}
-		}
-		return language;
-	}
 
 	/** Given ^(TOKEN_REF ^(OPTIONS ^(ELEMENT_OPTIONS (= assoc right))))
 	 *  set option assoc=right in TOKEN_REF.

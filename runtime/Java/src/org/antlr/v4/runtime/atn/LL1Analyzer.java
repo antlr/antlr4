@@ -87,7 +87,7 @@ public class LL1Analyzer {
    		return r;
    	}
 
-    /** Computer set of tokens that can come next. If the context is {@link PredictionContext#EMPTY_FULL},
+    /** Compute set of tokens that can come next. If the context is {@link PredictionContext#EMPTY_FULL},
      *  then we don't go anywhere when we hit the end of the rule. We have
      *  the correct set.  If the context is {@link PredictionContext#EMPTY_LOCAL},
 	 *  that means that we did not want any tokens following this rule--just the
@@ -155,5 +155,4 @@ public class LL1Analyzer {
 			}
 		}
 	}
-
 }

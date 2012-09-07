@@ -55,7 +55,7 @@ import java.util.List;
  *  The parent contexts are useful for computing lookahead sets and
  *  getting error information.
  *
- *  These objects are used during lexing, parsing, and prediction.
+ *  These objects are used during parsing and prediction.
  *  For the special case of parsers and tree parsers, we use the subclass
  *  ParserRuleContext.
  *
@@ -154,11 +154,13 @@ public class RuleContext<Symbol> implements RuleNode<Symbol> {
 		return visitor.visitChildren(this);
 	}
 
+	/** Call this method to view a parse tree in a dialog box visually. */
 	public void inspect(Parser<?> parser) {
 		TreeViewer viewer = new TreeViewer(parser, this);
 		viewer.open();
 	}
 
+	/** Save this tree in a postscript file */
 	public void save(Parser<?> parser, String fileName)
 		throws IOException, PrintException
 	{
@@ -167,6 +169,7 @@ public class RuleContext<Symbol> implements RuleNode<Symbol> {
 		Trees.writePS(this, parser, fileName); // parrt routine
 	}
 
+	/** Save this tree in a postscript file using a particular font name and size */
 	public void save(Parser<?> parser, String fileName,
 					 String fontName, int fontSize)
 		throws IOException

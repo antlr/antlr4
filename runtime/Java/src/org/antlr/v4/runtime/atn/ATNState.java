@@ -31,7 +31,12 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.IntervalSet;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ATNState {
 	public static final int INITIAL_NUM_TRANSITIONS = 4;

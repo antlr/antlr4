@@ -31,7 +31,19 @@ package org.antlr.v4.automata;
 
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ActionTransition;
+import org.antlr.v4.runtime.atn.AtomTransition;
+import org.antlr.v4.runtime.atn.BlockStartState;
+import org.antlr.v4.runtime.atn.DecisionState;
+import org.antlr.v4.runtime.atn.LoopEndState;
+import org.antlr.v4.runtime.atn.PredicateTransition;
+import org.antlr.v4.runtime.atn.RangeTransition;
+import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.SetTransition;
+import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -236,7 +248,7 @@ public class ATNSerializer {
 				int loopBackStateNumber = ATNSimulator.toInt(data[p++]);
 				arg = " "+loopBackStateNumber;
 			}
-			else if ( stype == ATNState.PLUS_BLOCK_START || stype == ATNState.STAR_BLOCK_START ) {
+			else if ( stype == ATNState.PLUS_BLOCK_START || stype == ATNState.STAR_BLOCK_START || stype == ATNState.BLOCK_START ) {
 				int endStateNumber = ATNSimulator.toInt(data[p++]);
 				arg = " "+endStateNumber;
 			}

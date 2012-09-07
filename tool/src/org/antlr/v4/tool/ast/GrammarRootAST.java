@@ -38,25 +38,22 @@ import java.util.Map;
 
 public class GrammarRootAST extends GrammarASTWithOptions {
     @SuppressWarnings("serial")
-    public static final Map<String, String> defaultOptions =
-            new HashMap<String, String>() {
-                {
-                    put("language","Java");
-                }
-            };
-    public int grammarType; // LEXER, PARSER, TREE, GRAMMAR (combined)
+	public static final Map<String, String> defaultOptions =
+         new HashMap<String, String>() {{
+			 put("language","Java");
+			 put("abstract","false");
+		 }};
+    public int grammarType; // LEXER, PARSER, GRAMMAR (combined)
 	public boolean hasErrors;
 	/** Track stream used to create this tree */
 	public TokenStream tokens;
+	public Map<String, String> cmdLineOptions; // -DsuperClass=T on command line
 
 	public GrammarRootAST(GrammarAST node) {
 		super(node);
 		this.grammarType = ((GrammarRootAST)node).grammarType;
 		this.hasErrors = ((GrammarRootAST)node).hasErrors;
 	}
-
-	@Override
-	public Tree dupNode() { return new GrammarRootAST(this); }
 
 	public GrammarRootAST(int type) { super(type); }
     public GrammarRootAST(Token t) { super(t); }
@@ -66,5 +63,20 @@ public class GrammarRootAST extends GrammarASTWithOptions {
     }
 
 	@Override
+	public String getOptionString(String key) {
+		if ( cmdLineOptions!=null && cmdLineOptions.containsKey(key) ) {
+			return cmdLineOptions.get(key);
+		}
+		String value = super.getOptionString(key);
+		if ( value==null ) {
+			value = defaultOptions.get(key);
+		}
+		return value;
+	}
+
+	@Override
 	public Object visit(GrammarASTVisitor v) { return v.visit(this); }
+
+	@Override
+	public Tree dupNode() { return new GrammarRootAST(this); }
 }
