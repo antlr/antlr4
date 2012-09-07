@@ -31,6 +31,9 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.model.chunk.ActionChunk;
+import org.antlr.v4.codegen.model.chunk.ActionText;
+import org.antlr.v4.codegen.model.chunk.DefaultParserSuperClass;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
@@ -50,6 +53,7 @@ public class Lexer extends OutputModelObject {
 	public Set<String> ruleNames;
 	public Collection<String> modes;
 	public boolean abstractRecognizer;
+	@ModelElement public ActionChunk superClass;
 
 	@ModelElement public SerializedATN atn;
 	@ModelElement public LinkedHashMap<Rule, RuleActionFunction> actionFuncs =
@@ -90,6 +94,14 @@ public class Lexer extends OutputModelObject {
             }
         }
 		ruleNames = g.rules.keySet();
+
+		if (g.getOptionString("superClass") != null) {
+			superClass = new ActionText(null, g.getOptionString("superClass"));
+		}
+		else {
+			superClass = new DefaultParserSuperClass();
+		}
+
 		abstractRecognizer = g.isAbstract();
 	}
 

@@ -82,13 +82,13 @@ public class <file.grammarName>BaseVisitor\<T> extends ParseTreeVisitor\<T> impl
 }
 >>
 
-Parser(parser, funcs, atn, sempredFuncs, superclass) ::= <<
+Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 <Parser_(ctor="parser_ctor", ...)>
 >>
 
-Parser_(parser, funcs, atn, sempredFuncs, ctor, extras, superclass) ::= <<
+Parser_(parser, funcs, atn, sempredFuncs, ctor, extras, superClass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extends <superclass> {
+public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extends <superClass> {
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
@@ -678,9 +678,9 @@ import org.antlr.v4.runtime.misc.*;
 <lexer>
 >>
 
-Lexer(lexer, atn, actionFuncs, sempredFuncs) ::= <<
+Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends Lexer {
+public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends <superClass> {
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
