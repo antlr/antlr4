@@ -525,9 +525,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		if ( acceptState.configs.getConflictingAlts()!=null ) {
 			if ( dfa.atnStartState instanceof DecisionState && ((DecisionState)dfa.atnStartState).isGreedy ) {
-				int k = input.index() - startIndex + 1; // how much input we used
-				if ( k == 1 || // SLL(1) == LL(1)
-					!userWantsCtxSensitive ||
+				if (!userWantsCtxSensitive ||
 					!acceptState.configs.getDipsIntoOuterContext() )
 				{
 					// we don't report the ambiguity again
