@@ -42,6 +42,8 @@ public class CodeGenPipeline {
 	public void process() {
 		CodeGenerator gen = new CodeGenerator(g);
 
+		if ( gen.templates==null ) return;
+
 		if ( g.isLexer() ) {
 			ST lexer = gen.generateLexer();
 			if ( g.tool.launch_ST_inspector ) lexer.inspect();

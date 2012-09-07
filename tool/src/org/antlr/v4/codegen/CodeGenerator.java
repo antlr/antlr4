@@ -118,7 +118,7 @@ public class CodeGenerator {
 		}
 		catch (IllegalArgumentException iae) {
 			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-									iae,
+									null,
 						 			language);
 		}
 	}
