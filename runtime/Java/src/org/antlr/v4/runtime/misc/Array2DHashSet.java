@@ -24,6 +24,7 @@ public class Array2DHashSet<T> implements EquivalenceSet<T> {
 		this(INITAL_CAPACITY, INITAL_BUCKET_CAPACITY);
 	}
 
+	@SuppressWarnings("unchecked")
 	public Array2DHashSet(int initialCapacity, int initialBucketCapacity) {
 		buckets = (T[][])new Object[initialCapacity][];
 		this.initialBucketCapacity = initialBucketCapacity;
@@ -37,6 +38,7 @@ public class Array2DHashSet<T> implements EquivalenceSet<T> {
 		return absorb_(o);
 	}
 
+	@SuppressWarnings("unchecked")
 	protected T absorb_(T o) {
 		int b = getBucket(o);
 		T[] bucket = buckets[b];
@@ -112,6 +114,7 @@ public class Array2DHashSet<T> implements EquivalenceSet<T> {
 		T[][] old = buckets;
 		currentPrime += 4;
 		int newCapacity = buckets.length * 2;
+		@SuppressWarnings("unchecked")
 		T[][] newTable = (T[][])new Object[newCapacity][];
 		buckets = newTable;
 		threshold = (int)(newCapacity * LOAD_FACTOR);
@@ -155,6 +158,7 @@ public class Array2DHashSet<T> implements EquivalenceSet<T> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean contains(Object o) {
 		return get((T)o) != null;
 	}
@@ -196,6 +200,7 @@ public class Array2DHashSet<T> implements EquivalenceSet<T> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public <U> U[] toArray(U[] a) {
 		int i = 0;
 		for (T[] bucket : buckets) {
@@ -209,6 +214,7 @@ public class Array2DHashSet<T> implements EquivalenceSet<T> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean remove(Object o) {
 		if ( o==null ) return false;
 		int b = getBucket((T)o);
@@ -229,6 +235,7 @@ public class Array2DHashSet<T> implements EquivalenceSet<T> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean containsAll(Collection<?> collection) {
 		if ( collection instanceof Array2DHashSet ) {
 			Array2DHashSet<T> s = (Array2DHashSet<T>)collection;
@@ -242,7 +249,7 @@ public class Array2DHashSet<T> implements EquivalenceSet<T> {
 		}
 		else {
 			for (Object o : collection) {
-				if ( !this.contains(o) ) return false;
+				if ( !this.contains((T)o) ) return false;
 			}
 		}
 		return true;
@@ -269,6 +276,7 @@ public class Array2DHashSet<T> implements EquivalenceSet<T> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void clear() {
 		buckets = (T[][])new Object[INITAL_CAPACITY][];
 		n = 0;
