@@ -53,6 +53,8 @@ import org.antlr.v4.runtime.RuleDependencies;
 import org.antlr.v4.runtime.RuleDependency;
 import org.antlr.v4.runtime.RuleVersion;
 
+import java.lang.annotation.AnnotationTypeMismatchException;
+
 /**
  *
  * @author Sam Harwell
@@ -103,24 +105,32 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 		int[] ruleVersions = getRuleVersions(recognizerType, ruleNames);
 
 		for (Tuple2<RuleDependency, Element> dependency : dependencies) {
-			if (!processingEnv.getTypeUtils().isAssignable(getRecognizerType(dependency.getItem1()), recognizerType)) {
-				continue;
-			}
+			try {
+				if (!processingEnv.getTypeUtils().isAssignable(getRecognizerType(dependency.getItem1()), recognizerType)) {
+					continue;
+				}
 
-			if (dependency.getItem1().rule() < 0 || dependency.getItem1().rule() >= ruleVersions.length) {
-				processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, String.format("Element %s dependent on unknown rule %d@%d in %s\n",
-												  dependency.getItem2().toString(),
-												  dependency.getItem1().rule(),
-												  dependency.getItem1().version(),
-												  getRecognizerType(dependency.getItem1()).toString()));
+				if (dependency.getItem1().rule() < 0 || dependency.getItem1().rule() >= ruleVersions.length) {
+					processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, String.format("Element %s dependent on unknown rule %d@%d in %s\n",
+													  dependency.getItem2().toString(),
+													  dependency.getItem1().rule(),
+													  dependency.getItem1().version(),
+													  getRecognizerType(dependency.getItem1()).toString()),
+													  dependency.getItem2());
+				}
+				else if (ruleVersions[dependency.getItem1().rule()] != dependency.getItem1().version()) {
+					processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, String.format("Element %s dependent on rule %s@%d (found @%d) in %s\n",
+													  dependency.getItem2().toString(),
+													  ruleNames[dependency.getItem1().rule()],
+													  dependency.getItem1().version(),
+													  ruleVersions[dependency.getItem1().rule()],
+													  getRecognizerType(dependency.getItem1()).toString()),
+													  dependency.getItem2());
+				}
 			}
-			else if (ruleVersions[dependency.getItem1().rule()] != dependency.getItem1().version()) {
-				processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, String.format("Element %s dependent on rule %s@%d (found @%d) in %s\n",
-												  dependency.getItem2().toString(),
-												  ruleNames[dependency.getItem1().rule()],
-												  dependency.getItem1().version(),
-												  ruleVersions[dependency.getItem1().rule()],
-												  getRecognizerType(dependency.getItem1()).toString()));
+			catch (AnnotationTypeMismatchException ex) {
+				processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, String.format("Could not validate rule dependencies for element %s\n", dependency.getItem2().toString()),
+														 dependency.getItem2());
 			}
 		}
 	}
@@ -149,14 +159,14 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 					int index = (Integer)constantValue;
 					if (index < 0 || index >= versions.length) {
 						String message = String.format("Rule index %d for rule '%s' out of bounds for recognizer %s.", index, name, recognizerClass.toString());
-						processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message);
+						processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message, element);
 						continue;
 					}
 
 					ExecutableElement ruleMethod = getRuleMethod(recognizerClass, name);
 					if (ruleMethod == null) {
 						String message = String.format("Could not find rule method for rule '%s' in recognizer %s.", name, recognizerClass.toString());
-						processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message);
+						processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message, element);
 						continue;
 					}
 
@@ -164,7 +174,7 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 					int version = ruleVersion != null ? ruleVersion.value() : 0;
 					versions[index] = version;
 				} catch (IllegalArgumentException ex) {
-					processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Exception occurred while validating rule dependencies.");
+					processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Exception occurred while validating rule dependencies.", element);
 				}
 			}
 		}
@@ -235,7 +245,7 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 
 					result.set(index, name);
 				} catch (IllegalArgumentException ex) {
-					processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Exception occurred while validating rule dependencies.");
+					processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Exception occurred while validating rule dependencies.", element);
 				}
 			}
 		}
