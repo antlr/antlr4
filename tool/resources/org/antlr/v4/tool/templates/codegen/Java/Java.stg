@@ -526,7 +526,7 @@ SetNonLocalAttr(s, rhsChunks)	  ::=
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.add(<labelref(a.label)>);"
 
-TokenDecl(t) ::= "public Token <t.name>;"
+TokenDecl(t) ::= "public <TokenLabelType()> <t.name>;"
 TokenTypeDecl(t) ::= "int <t.name>;"
 TokenListDecl(t) ::= "public List\<Token> <t.name> = new ArrayList\<Token>();"
 RuleContextDecl(r) ::= "public <r.ctxName> <r.name>;"
