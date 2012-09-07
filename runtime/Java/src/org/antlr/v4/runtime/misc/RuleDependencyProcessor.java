@@ -40,6 +40,7 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -137,21 +138,37 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 				}
 
 				if (dependency.getItem1().rule() < 0 || dependency.getItem1().rule() >= ruleVersions.length) {
-					processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, String.format("Element %s dependent on unknown rule %d@%d in %s\n",
-													  dependency.getItem2().toString(),
-													  dependency.getItem1().rule(),
-													  dependency.getItem1().version(),
-													  getRecognizerType(dependency.getItem1()).toString()),
+					Tuple2<AnnotationMirror, AnnotationValue> ruleReferenceElement = findRuleDependencyProperty(dependency, RuleDependencyProperty.RULE);
+					String message = String.format("Rule dependency on unknown rule %d@%d in %s\n",
+												   dependency.getItem1().rule(),
+												   dependency.getItem1().version(),
+												   getRecognizerType(dependency.getItem1()).toString());
+
+					if (ruleReferenceElement != null) {
+						processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message,
+													  dependency.getItem2(), ruleReferenceElement.getItem1(), ruleReferenceElement.getItem2());
+					}
+					else {
+						processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message,
 													  dependency.getItem2());
+					}
 				}
 				else if (ruleVersions[dependency.getItem1().rule()] != dependency.getItem1().version()) {
-					processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, String.format("Element %s dependent on rule %s@%d (found @%d) in %s\n",
-													  dependency.getItem2().toString(),
-													  ruleNames[dependency.getItem1().rule()],
-													  dependency.getItem1().version(),
-													  ruleVersions[dependency.getItem1().rule()],
-													  getRecognizerType(dependency.getItem1()).toString()),
-													  dependency.getItem2());
+					Tuple2<AnnotationMirror, AnnotationValue> versionElement = findRuleDependencyProperty(dependency, RuleDependencyProperty.VERSION);
+					String message = String.format("Rule dependency version mismatch on rule %s@%d (found @%d) in %s\n",
+												   ruleNames[dependency.getItem1().rule()],
+												   dependency.getItem1().version(),
+												   ruleVersions[dependency.getItem1().rule()],
+												   getRecognizerType(dependency.getItem1()).toString());
+
+					if (versionElement != null) {
+						processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message,
+														  dependency.getItem2(), versionElement.getItem1(), versionElement.getItem2());
+					}
+					else {
+						processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message,
+														  dependency.getItem2());
+					}
 				}
 			}
 			catch (AnnotationTypeMismatchException ex) {
@@ -304,6 +321,143 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 		}
 
 		return result;
+	}
+
+	public enum RuleDependencyProperty {
+		RECOGNIZER,
+		RULE,
+		VERSION,
+	}
+
+	@Nullable
+	private Tuple2<AnnotationMirror, AnnotationValue> findRuleDependencyProperty(@NotNull Tuple2<RuleDependency, Element> dependency, @NotNull RuleDependencyProperty property) {
+		TypeElement ruleDependencyTypeElement = processingEnv.getElementUtils().getTypeElement(RuleDependencyClassName);
+		TypeElement ruleDependenciesTypeElement = processingEnv.getElementUtils().getTypeElement(RuleDependenciesClassName);
+		List<? extends AnnotationMirror> mirrors = dependency.getItem2().getAnnotationMirrors();
+		for (AnnotationMirror annotationMirror : mirrors) {
+			if (processingEnv.getTypeUtils().isSameType(ruleDependencyTypeElement.asType(), annotationMirror.getAnnotationType())) {
+				AnnotationValue element = findRuleDependencyProperty(dependency, annotationMirror, property);
+				if (element != null) {
+					return Tuple.create(annotationMirror, element);
+				}
+			}
+			else if (processingEnv.getTypeUtils().isSameType(ruleDependenciesTypeElement.asType(), annotationMirror.getAnnotationType())) {
+				Map<? extends ExecutableElement, ? extends AnnotationValue> values = annotationMirror.getElementValues();
+				for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> value : values.entrySet()) {
+					if ("value()".equals(value.getKey().toString())) {
+						AnnotationValue annotationValue = value.getValue();
+						if (!(annotationValue.getValue() instanceof List)) {
+							processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Expected array of RuleDependency annotations for annotation property 'value()'.", dependency.getItem2(), annotationMirror, annotationValue);
+							break;
+						}
+
+						List<?> annotationValueList = (List<?>)annotationValue.getValue();
+						for (Object obj : annotationValueList) {
+							if (!(obj instanceof AnnotationMirror)) {
+								processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Expected RuleDependency annotation mirror for element of property 'value()'.", dependency.getItem2(), annotationMirror, annotationValue);
+								break;
+							}
+
+							AnnotationValue element = findRuleDependencyProperty(dependency, (AnnotationMirror)obj, property);
+							if (element != null) {
+								return Tuple.create((AnnotationMirror)obj, element);
+							}
+						}
+					}
+					else {
+						processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, String.format("Unexpected annotation property %s.", value.getKey().toString()), dependency.getItem2(), annotationMirror, value.getValue());
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	@Nullable
+	private AnnotationValue findRuleDependencyProperty(@NotNull Tuple2<RuleDependency, Element> dependency, @NotNull AnnotationMirror annotationMirror, @NotNull RuleDependencyProperty property) {
+		AnnotationValue recognizerValue = null;
+		AnnotationValue ruleValue = null;
+		AnnotationValue versionValue = null;
+
+		Map<? extends ExecutableElement, ? extends AnnotationValue> values = annotationMirror.getElementValues();
+		for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> value : values.entrySet()) {
+			AnnotationValue annotationValue = value.getValue();
+			if ("rule()".equals(value.getKey().toString())) {
+				ruleValue = annotationValue;
+				if (!(annotationValue.getValue() instanceof Integer)) {
+					processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Expected int constant for annotation property 'rule()'.", dependency.getItem2(), annotationMirror, annotationValue);
+					return null;
+				}
+
+				if ((Integer)annotationValue.getValue() != dependency.getItem1().rule()) {
+					// this is a valid dependency annotation, but not the one we're looking for
+					return null;
+				}
+			}
+			else if ("recognizer()".equals(value.getKey().toString())) {
+				recognizerValue = annotationValue;
+				if (!(annotationValue.getValue() instanceof TypeMirror)) {
+					processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Expected Class constant for annotation property 'recognizer()'.", dependency.getItem2(), annotationMirror, annotationValue);
+					return null;
+				}
+
+				TypeMirror annotationRecognizer = (TypeMirror)annotationValue.getValue();
+				TypeMirror expectedRecognizer = getRecognizerType(dependency.getItem1());
+				if (!processingEnv.getTypeUtils().isSameType(expectedRecognizer, annotationRecognizer)) {
+					// this is a valid dependency annotation, but not the one we're looking for
+					return null;
+				}
+			}
+			else if ("version()".equals(value.getKey().toString())) {
+				versionValue = annotationValue;
+				if (!(annotationValue.getValue() instanceof Integer)) {
+					processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Expected int constant for annotation property 'version()'.", dependency.getItem2(), annotationMirror, annotationValue);
+					return null;
+				}
+
+				if ((Integer)annotationValue.getValue() != dependency.getItem1().version()) {
+					// this is a valid dependency annotation, but not the one we're looking for
+					return null;
+				}
+			}
+		}
+
+		if (recognizerValue != null) {
+			if (property == RuleDependencyProperty.RECOGNIZER) {
+				return recognizerValue;
+			}
+			else if (ruleValue != null) {
+				if (property == RuleDependencyProperty.RULE) {
+					return ruleValue;
+				}
+				else if (versionValue != null && property == RuleDependencyProperty.VERSION) {
+					return versionValue;
+				}
+			}
+		}
+
+		if (recognizerValue == null) {
+			processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Could not find 'recognizer()' element in annotation.", dependency.getItem2(), annotationMirror);
+		}
+
+		if (property == RuleDependencyProperty.RECOGNIZER) {
+			return null;
+		}
+
+		if (ruleValue == null) {
+			processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Could not find 'rule()' element in annotation.", dependency.getItem2(), annotationMirror);
+		}
+
+		if (property == RuleDependencyProperty.RULE) {
+			return null;
+		}
+
+		if (versionValue == null) {
+			processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Could not find 'version()' element in annotation.", dependency.getItem2(), annotationMirror);
+		}
+
+		return null;
 	}
 
 }
