@@ -373,10 +373,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			return new SimulatorState<Symbol>(outerContext, dfa.s0.get(), false, outerContext);
 		}
 
-		RuleContext<Symbol> remainingContext = outerContext;
+		ParserRuleContext<Symbol> remainingContext = outerContext;
 		assert outerContext != null;
 		DFAState s0 = dfa.s0full.get();
 		while (remainingContext != null && s0 != null && s0.isCtxSensitive) {
+			remainingContext = skipTailCalls(remainingContext);
 			s0 = s0.getContextTarget(getInvokingState(remainingContext));
 			if (remainingContext.isEmpty()) {
 				assert s0 == null || !s0.isCtxSensitive;
@@ -447,6 +448,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				while ( s.isCtxSensitive && s.contextSymbols.contains(t) ) {
 					DFAState next = null;
 					if (remainingOuterContext != null) {
+						remainingOuterContext = skipTailCalls(remainingOuterContext);
 						next = s.getContextTarget(getInvokingState(remainingOuterContext));
 					}
 
@@ -764,6 +766,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			while ( s.isCtxSensitive && s.contextSymbols.contains(t) ) {
 				DFAState next = null;
 				if (remainingGlobalContext != null) {
+					remainingGlobalContext = skipTailCalls(remainingGlobalContext);
 					next = s.getContextTarget(getInvokingState(remainingGlobalContext));
 				}
 
@@ -826,6 +829,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if (useContext && stepIntoGlobal) {
 				reach.clear();
 
+				remainingGlobalContext = skipTailCalls(remainingGlobalContext);
 				int nextContextElement = getInvokingState(remainingGlobalContext);
 				if (contextElements == null) {
 					contextElements = new IntegerList();
@@ -878,12 +882,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		final ATNState p = dfa.atnStartState;
 
 		int previousContext = 0;
-		RuleContext<Symbol> remainingGlobalContext = globalContext;
+		ParserRuleContext<Symbol> remainingGlobalContext = globalContext;
 		PredictionContext initialContext = useContext ? PredictionContext.EMPTY_FULL : PredictionContext.EMPTY_LOCAL; // always at least the implicit call to start rule
 		PredictionContextCache contextCache = new PredictionContextCache();
 		if (useContext) {
 			while (s0 != null && s0.isCtxSensitive && remainingGlobalContext != null) {
 				DFAState next;
+				remainingGlobalContext = skipTailCalls(remainingGlobalContext);
 				if (remainingGlobalContext.isEmpty()) {
 					next = s0.getContextTarget(PredictionContext.EMPTY_FULL_STATE_KEY);
 					previousContext = PredictionContext.EMPTY_FULL_STATE_KEY;
@@ -905,7 +910,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 
 		if (s0 != null && !s0.isCtxSensitive) {
-			return new SimulatorState<Symbol>(globalContext, s0, useContext, (ParserRuleContext<Symbol>)remainingGlobalContext);
+			return new SimulatorState<Symbol>(globalContext, s0, useContext, remainingGlobalContext);
 		}
 
 		ATNConfigSet configs = new ATNConfigSet();
@@ -954,6 +959,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			next.setContextSensitive(atn);
 
 			configs.clear();
+			remainingGlobalContext = skipTailCalls(remainingGlobalContext);
 			int nextContextElement = getInvokingState(remainingGlobalContext);
 
 			if (remainingGlobalContext.isEmpty()) {
@@ -1844,6 +1850,25 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 
 		return context.invokingState;
+	}
+
+	protected final <T extends Token> ParserRuleContext<T> skipTailCalls(ParserRuleContext<T> context) {
+		if (!optimize_tail_calls) {
+			return context;
+		}
+
+		while (!context.isEmpty()) {
+			ATNState state = atn.states.get(context.invokingState);
+			assert state.getNumberOfTransitions() == 1 && state.transition(0).getSerializationType() == Transition.RULE;
+			RuleTransition transition = (RuleTransition)state.transition(0);
+			if (!transition.tailCall) {
+				break;
+			}
+
+			context = context.getParent();
+		}
+
+		return context;
 	}
 
 }
