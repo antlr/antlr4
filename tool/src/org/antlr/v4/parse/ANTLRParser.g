@@ -285,7 +285,7 @@ delegateGrammar
  *  {tree} parser.
  */
 tokensSpec
-	: TOKENS_SPEC id (COMMA id)* RBRACE -> ^(TOKENS_SPEC id+)
+	: TOKENS_SPEC id (COMMA id)* COMMA? RBRACE -> ^(TOKENS_SPEC id+)
 	;
 
 // A declaration of a language target specifc section,
