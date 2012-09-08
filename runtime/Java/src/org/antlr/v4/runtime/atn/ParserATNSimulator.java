@@ -391,7 +391,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			return null;
 		}
 
-		return new SimulatorState<Symbol>(outerContext, s0, useContext, (ParserRuleContext<Symbol>)remainingContext);
+		return new SimulatorState<Symbol>(outerContext, s0, useContext, remainingContext);
 	}
 
 	public int predictATN(@NotNull DFA dfa, @NotNull TokenStream<? extends Symbol> input,
@@ -975,7 +975,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			previousContext = nextContextElement;
 		}
 
-		return new SimulatorState<Symbol>(globalContext, s0, useContext, (ParserRuleContext<Symbol>)remainingGlobalContext);
+		return new SimulatorState<Symbol>(globalContext, s0, useContext, remainingGlobalContext);
 	}
 
 	@Nullable
