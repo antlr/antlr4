@@ -253,6 +253,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public boolean optimize_ll1 = true;
 	public boolean optimize_hidden_conflicted_configs = true;
 	public boolean optimize_tail_calls = true;
+	public boolean tail_call_preserves_sll = true;
 
 	public static boolean optimize_closure_busy = true;
 
@@ -1296,12 +1297,16 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					if ( debug ) System.out.println("dips into outer ctx: "+c);
 				}
 				else if (t instanceof RuleTransition) {
-					if (optimize_tail_calls && ((RuleTransition)t).optimizedTailCall && !PredictionContext.isEmptyLocal(config.getContext())) {
+					if (optimize_tail_calls && ((RuleTransition)t).optimizedTailCall && (!tail_call_preserves_sll || !PredictionContext.isEmptyLocal(config.getContext()))) {
 						assert c.getContext() == config.getContext();
-						if (newDepth <= 0) {
+						if (newDepth == 0) {
 							// the pop/push of a tail call would keep the depth
 							// constant, except we latch if it goes negative
 							newDepth--;
+							if (!tail_call_preserves_sll && PredictionContext.isEmptyLocal(config.getContext())) {
+								// make sure the SLL config "dips into the outer context" or prediction may not fall back to LL on conflict
+								c.setOuterContextDepth(c.getOuterContextDepth() + 1);
+							}
 						}
 					}
 					else {
@@ -1390,7 +1395,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		ATNState p = config.getState();
 		PredictionContext newContext;
 
-		if (optimize_tail_calls && t.optimizedTailCall && !PredictionContext.isEmptyLocal(config.getContext())) {
+		if (optimize_tail_calls && t.optimizedTailCall && (!tail_call_preserves_sll || !PredictionContext.isEmptyLocal(config.getContext()))) {
 			newContext = config.getContext();
 		}
 		else if (contextCache != null) {
