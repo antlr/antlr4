@@ -27,6 +27,8 @@
  */
 package org.antlr.v4.misc;
 
+import org.antlr.v4.runtime.misc.OrderedHashSet;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,7 +86,7 @@ public class Graph<T> {
 	 *  I want.
 	 */
 	public List<T> sort() {
-		Set<Node<T>> visited = new org.antlr.misc.OrderedHashSet<Node<T>>();
+		Set<Node<T>> visited = new OrderedHashSet<Node<T>>();
 		ArrayList<T> sorted = new ArrayList<T>();
 		while ( visited.size() < nodes.size() ) {
 			// pick any unvisited node, n
