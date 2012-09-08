@@ -39,7 +39,9 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /** Do as much semantic checking as we can and fill in grammar
  *  with rules, actions, and token definitions.
@@ -163,6 +165,7 @@ public class SemanticPipeline {
 
 		// FOR ALL X : 'xxx'; RULES, DEFINE 'xxx' AS TYPE X
 		List<Tuple2<GrammarAST,GrammarAST>> litAliases = Grammar.getStringLiteralAliasesFromLexerRules(g.ast);
+		Set<String> conflictingLiterals = new HashSet<String>();
 		if ( litAliases!=null ) {
 			for (Tuple2<GrammarAST,GrammarAST> pair : litAliases) {
 				GrammarAST nameAST = pair.getItem1();
@@ -171,11 +174,14 @@ public class SemanticPipeline {
 					G.defineTokenAlias(nameAST.getText(), litAST.getText());
 				}
 				else {
-					// oops two literal defs in two rules (within or across
-					// modes). Remove literal in either case so it's not
-					// found by parser.
-					G.stringLiteralToTypeMap.remove(litAST.getText());
+					// oops two literal defs in two rules (within or across modes).
+					conflictingLiterals.add(litAST.getText());
 				}
+			}
+			for (String lit : conflictingLiterals) {
+				// Remove literal if repeated across rules so it's not
+				// found by parser grammar.
+				G.stringLiteralToTypeMap.remove(lit);
 			}
 		}
 

@@ -29,6 +29,7 @@
 
 package org.antlr.v4;
 
+import org.antlr.misc.Graph;
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CharStream;
@@ -79,7 +80,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Tool {
-	public static final String VERSION = "4.0b1";
+	public static final String getVersion() { return "4.0b1"; }
 
 	public static final String GRAMMAR_EXTENSION = ".g4";
 	public static final String LEGACY_GRAMMAR_EXTENSION = ".g";
@@ -222,7 +223,7 @@ public class Tool {
 				continue;
 			}
 			if ( arg.charAt(0)!='-' ) { // file name
-				grammarFiles.add(arg);
+				if ( !grammarFiles.contains(arg) ) grammarFiles.add(arg);
 				continue;
 			}
 			boolean found = false;
@@ -317,14 +318,11 @@ public class Tool {
 	}
 
 	public void processGrammarsOnCommandLine() {
-		for (String fileName : grammarFiles) {
-			GrammarAST t = loadGrammar(fileName);
-			if ( t==null || t instanceof GrammarASTErrorNode) return; // came back as error node
-			if ( ((GrammarRootAST)t).hasErrors ) return;
-			GrammarRootAST ast = (GrammarRootAST)t;
+		List<GrammarRootAST> sortedGrammars = sortGrammarByTokenVocab(grammarFiles);
 
-			final Grammar g = createGrammar(ast);
-			g.fileName = fileName;
+		for (GrammarRootAST t : sortedGrammars) {
+			final Grammar g = createGrammar(t);
+			g.fileName = t.fileName;
 			process(g, true);
 		}
 	}
@@ -337,7 +335,6 @@ public class Tool {
 	 */
 	public void process(Grammar g, boolean gencode) {
 		g.loadImportedGrammars();
-
 
 		GrammarTransformPipeline transform = new GrammarTransformPipeline(g, this);
 		transform.process();
@@ -368,13 +365,12 @@ public class Tool {
 		if ( g.ast!=null && internalOption_PrintGrammarTree ) System.out.println(g.ast.toStringTree());
 		//g.ast.inspect();
 
-		if ( errMgr.getNumErrors()>0 ) return;
-
+		int prevErrors = errMgr.getNumErrors();
 		// MAKE SURE GRAMMAR IS SEMANTICALLY CORRECT (FILL IN GRAMMAR OBJECT)
 		SemanticPipeline sem = new SemanticPipeline(g);
 		sem.process();
 
-		if ( errMgr.getNumErrors()>0 ) return;
+		if ( errMgr.getNumErrors()>prevErrors ) return;
 
 		// BUILD ATN FROM AST
 		ATNFactory factory;
@@ -390,7 +386,7 @@ public class Tool {
 
 		//if ( generate_DFA_dot ) generateDFAs(g);
 
-		if ( g.tool.getNumErrors()>0 ) return;
+		if ( g.tool.getNumErrors()>prevErrors ) return;
 
 		// GENERATE CODE
 		if ( gencode ) {
@@ -398,6 +394,63 @@ public class Tool {
 			gen.process();
 		}
 	}
+
+	public List<GrammarRootAST> sortGrammarByTokenVocab(List<String> fileNames) {
+//		System.out.println(fileNames);
+		Graph<String> g = new Graph<String>();
+		List<GrammarRootAST> roots = new ArrayList<GrammarRootAST>();
+		for (String fileName : fileNames) {
+			GrammarAST t = loadGrammar(fileName);
+			if ( t==null || t instanceof GrammarASTErrorNode) continue; // came back as error node
+			if ( ((GrammarRootAST)t).hasErrors ) continue;
+			GrammarRootAST root = (GrammarRootAST)t;
+			roots.add(root);
+			root.fileName = fileName;
+			String grammarName = root.getChild(0).getText();
+
+			GrammarAST tokenVocabNode = findOptionValueAST(root, "tokenVocab");
+			// Make grammars depend on any tokenVocab options
+			if ( tokenVocabNode!=null ) {
+				String vocabName = tokenVocabNode.getText();
+				g.addEdge(grammarName, vocabName);
+			}
+			// add cycle to graph so we always process a grammar if no error
+			// even if no dependency
+			g.addEdge(grammarName, grammarName);
+		}
+
+		List<String> sortedGrammarNames = g.sort();
+//		System.out.println("sortedGrammarNames="+sortedGrammarNames);
+
+		List<GrammarRootAST> sortedRoots = new ArrayList<GrammarRootAST>();
+		for (String grammarName : sortedGrammarNames) {
+			for (GrammarRootAST root : roots) {
+				if ( root.getGrammarName().equals(grammarName) ) {
+					sortedRoots.add(root);
+					break;
+				}
+			}
+		}
+
+		return sortedRoots;
+	}
+
+	/** Manually get option node from tree; return null if no defined. */
+	public static GrammarAST findOptionValueAST(GrammarRootAST root, String option) {
+		GrammarAST options = (GrammarAST)root.getFirstChildWithType(ANTLRParser.OPTIONS);
+		if ( options!=null ) {
+			for (Object o : options.getChildren()) {
+				GrammarAST c = (GrammarAST)o;
+				if ( c.getType() == ANTLRParser.ASSIGN &&
+					 c.getChild(0).getText().equals(option) )
+				{
+					return (GrammarAST)c.getChild(1);
+				}
+			}
+		}
+		return null;
+	}
+
 
 	/** Given the raw AST of a grammar, create a grammar object
 		associated with the AST. Once we have the grammar object, ensure
@@ -646,7 +699,7 @@ public class Tool {
 	}
 
 	public void help() {
-		info("ANTLR Parser Generator  Version " + new Tool().VERSION);
+		info("ANTLR Parser Generator  Version " + Tool.getVersion());
 		for (Option o : optionDefs) {
 			String name = o.name + (o.argType!=OptionArgType.NONE? " ___" : "");
 			String s = String.format(" %-19s %s", name, o.description);
@@ -689,7 +742,7 @@ public class Tool {
 	}
 
 	public void version() {
-		info("ANTLR Parser Generator  Version " + new Tool().VERSION);
+		info("ANTLR Parser Generator  Version " + getVersion());
 	}
 
 	public void exit(int e) { System.exit(e); }

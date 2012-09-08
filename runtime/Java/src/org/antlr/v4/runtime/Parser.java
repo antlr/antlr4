@@ -365,9 +365,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		getInputStream().consume();
 		boolean hasListener = _parseListeners != null && !_parseListeners.isEmpty();
 		if (_buildParseTrees || hasListener) {
-			// TODO: tree parsers?
 			if ( _errHandler.inErrorRecoveryMode(this) ) {
-//				System.out.println("consume in error recovery mode for "+o);
 				ErrorNode<Symbol> node = _ctx.addErrorNode(o);
 				if (_parseListeners != null) {
 					for (ParseTreeListener<? super Symbol> listener : _parseListeners) {

@@ -41,13 +41,13 @@ public class GrammarRootAST extends GrammarASTWithOptions {
 	public static final Map<String, String> defaultOptions =
          new HashMap<String, String>() {{
 			 put("language","Java");
-			 put("abstract","false");
 		 }};
     public int grammarType; // LEXER, PARSER, GRAMMAR (combined)
 	public boolean hasErrors;
 	/** Track stream used to create this tree */
 	public TokenStream tokens;
 	public Map<String, String> cmdLineOptions; // -DsuperClass=T on command line
+	public String fileName;
 
 	public GrammarRootAST(GrammarAST node) {
 		super(node);
@@ -61,6 +61,12 @@ public class GrammarRootAST extends GrammarASTWithOptions {
     public GrammarRootAST(int type, Token t, String text) {
         super(type,t,text);
     }
+
+	public String getGrammarName() {
+		Tree t = getChild(0);
+		if ( t!=null ) return t.getText();
+		return null;
+	}
 
 	@Override
 	public String getOptionString(String key) {
