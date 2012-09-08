@@ -87,7 +87,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 >>
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, extras, superClass) ::= <<
-public class <parser.name> extends <superClass> {
+public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extends <superClass> {
 	<if(parser.tokens)>
 	public static final int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
@@ -679,7 +679,7 @@ import org.antlr.v4.runtime.misc.*;
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
-public class <lexer.name> extends <superClass> {
+public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends <superClass> {
 	public static final int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<rest(lexer.modes):{m| public static final int <m> = <i>;}; separator="\n">
