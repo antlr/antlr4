@@ -258,11 +258,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	public static boolean optimize_closure_busy = true;
 
-	public static int ATN_failover = 0;
-	public static int predict_calls = 0;
-	public static int retry_with_context = 0;
-	public static int retry_with_context_indicates_no_conflict = 0;
-
 	@Nullable
 	protected final Parser<Symbol> parser;
 
@@ -310,7 +305,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							   @Nullable ParserRuleContext<Symbol> outerContext,
 							   boolean useContext)
 	{
-		predict_calls++;
 		DFA dfa = atn.decisionToDFA[decision];
 		assert dfa != null;
 		if (optimize_ll1 && !dfa.isEmpty()) {
@@ -626,7 +620,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					   @NotNull SimulatorState<Symbol> initialState)
 	{
 		if ( debug ) System.out.println("execATN decision "+dfa.decision+" exec LA(1)=="+ getLookaheadName(input));
-		ATN_failover++;
 
 		final ParserRuleContext<Symbol> outerContext = initialState.outerContext;
 		final boolean useContext = initialState.useContext;
@@ -676,7 +669,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				}
 
 				if (useContext && always_try_local_context) {
-					retry_with_context_indicates_no_conflict++;
 					reportContextSensitivity(dfa, nextState, startIndex, input.index());
 				}
 			}
