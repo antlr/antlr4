@@ -79,7 +79,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Tool {
-	public static final String VERSION = "4.0b1";
+	public final String VERSION = "4.0b1";
 
 	public static final String GRAMMAR_EXTENSION = ".g4";
 	public static final String LEGACY_GRAMMAR_EXTENSION = ".g";
