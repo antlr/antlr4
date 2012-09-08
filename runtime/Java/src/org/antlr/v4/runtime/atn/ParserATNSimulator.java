@@ -254,6 +254,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public boolean optimize_hidden_conflicted_configs = true;
 	public boolean optimize_tail_calls = true;
 	public boolean tail_call_preserves_sll = true;
+	public boolean treat_sllk1_conflict_as_ambiguity = false;
 
 	public static boolean optimize_closure_busy = true;
 
@@ -527,7 +528,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		if ( acceptState.configs.getConflictingAlts()!=null ) {
 			if ( dfa.atnStartState instanceof DecisionState && ((DecisionState)dfa.atnStartState).isGreedy ) {
 				if (!userWantsCtxSensitive ||
-					!acceptState.configs.getDipsIntoOuterContext() )
+					!acceptState.configs.getDipsIntoOuterContext() ||
+					(treat_sllk1_conflict_as_ambiguity && input.index() == startIndex))
 				{
 					// we don't report the ambiguity again
 					//if ( !acceptState.configset.hasSemanticContext() ) {
@@ -683,7 +685,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 //						int k = input.index() - startIndex + 1; // how much input we used
 //						System.out.println("used k="+k);
 						if ( !userWantsCtxSensitive ||
-							 !D.configs.getDipsIntoOuterContext() )
+							 !D.configs.getDipsIntoOuterContext() ||
+							 (treat_sllk1_conflict_as_ambiguity && input.index() == startIndex))
 						{
 							if ( reportAmbiguities && !D.configs.hasSemanticContext() ) {
 								reportAmbiguity(dfa, D, startIndex, input.index(), D.configs.getConflictingAlts(), D.configs);
