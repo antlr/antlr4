@@ -370,11 +370,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		ParserRuleContext<Symbol> remainingContext = outerContext;
 		assert outerContext != null;
 		DFAState s0 = dfa.s0full.get();
-		while (remainingContext != null && s0 != null && s0.isCtxSensitive) {
+		while (remainingContext != null && s0 != null && s0.isContextSensitive()) {
 			remainingContext = skipTailCalls(remainingContext);
 			s0 = s0.getContextTarget(getInvokingState(remainingContext));
 			if (remainingContext.isEmpty()) {
-				assert s0 == null || !s0.isCtxSensitive;
+				assert s0 == null || !s0.isContextSensitive();
 			}
 			else {
 				remainingContext = remainingContext.getParent();
@@ -439,7 +439,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		while ( true ) {
 			if ( dfa_debug ) System.out.println("DFA state "+s.stateNumber+" LA(1)=="+getLookaheadName(input));
 			if ( state.useContext ) {
-				while ( s.isCtxSensitive && s.contextSymbols.contains(t) ) {
+				while ( s.isContextSensitive() && s.contextSymbols.contains(t) ) {
 					DFAState next = null;
 					if (remainingOuterContext != null) {
 						remainingOuterContext = skipTailCalls(remainingOuterContext);
@@ -755,7 +755,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		DFAState s = previous.s0;
 		if ( useContext ) {
-			while ( s.isCtxSensitive && s.contextSymbols.contains(t) ) {
+			while ( s.isContextSensitive() && s.contextSymbols.contains(t) ) {
 				DFAState next = null;
 				if (remainingGlobalContext != null) {
 					remainingGlobalContext = skipTailCalls(remainingGlobalContext);
@@ -878,7 +878,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		PredictionContext initialContext = useContext ? PredictionContext.EMPTY_FULL : PredictionContext.EMPTY_LOCAL; // always at least the implicit call to start rule
 		PredictionContextCache contextCache = new PredictionContextCache();
 		if (useContext) {
-			while (s0 != null && s0.isCtxSensitive && remainingGlobalContext != null) {
+			while (s0 != null && s0.isContextSensitive() && remainingGlobalContext != null) {
 				DFAState next;
 				remainingGlobalContext = skipTailCalls(remainingGlobalContext);
 				if (remainingGlobalContext.isEmpty()) {
@@ -901,7 +901,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 		}
 
-		if (s0 != null && !s0.isCtxSensitive) {
+		if (s0 != null && !s0.isContextSensitive()) {
 			return new SimulatorState<Symbol>(globalContext, s0, useContext, remainingGlobalContext);
 		}
 
@@ -1649,10 +1649,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					}
 				}
 
-				if (!from.isCtxSensitive) {
-					from.setContextSensitive(atn);
-				}
-
+				from.setContextSensitive(atn);
 				from.contextSymbols.add(t);
 				DFAState next = from.getContextTarget(context);
 				if (next != null) {

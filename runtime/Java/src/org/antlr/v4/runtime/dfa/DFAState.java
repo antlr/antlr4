@@ -91,13 +91,6 @@ public class DFAState {
 	public int lexerRuleIndex = -1;		// if accept, exec action in what rule?
 	public int lexerActionIndex = -1;	// if accept, exec what action?
 
-	/** Indicates that this state was created during SLL prediction
-	 *  that discovered a conflict between the configurations in the state.
-	 *  Future execDFA() invocations immediately jumped doing full context
-	 *  prediction if this field is true.
-	 */
-	public boolean isCtxSensitive;
-
 	/** These keys for these edges are the top level element of the global context. */
 	@Nullable
 	private AbstractEdgeMap<DFAState> contextEdges;
@@ -141,14 +134,18 @@ public class DFAState {
 		this.maxSymbol = maxSymbol;
 	}
 
+	public final boolean isContextSensitive() {
+		return contextEdges != null;
+	}
+
 	public synchronized void setContextSensitive(ATN atn) {
 		assert !configs.isOutermostConfigSet();
-
-		if (!isCtxSensitive) {
-			contextEdges = new SingletonEdgeMap<DFAState>(-1, atn.states.size() - 1);
-			contextSymbols = new HashSet<Integer>();
-			isCtxSensitive = true;
+		if (isContextSensitive()) {
+			return;
 		}
+
+		contextSymbols = new HashSet<Integer>();
+		contextEdges = new SingletonEdgeMap<DFAState>(-1, atn.states.size() - 1);
 	}
 
 	public DFAState getTarget(int symbol) {

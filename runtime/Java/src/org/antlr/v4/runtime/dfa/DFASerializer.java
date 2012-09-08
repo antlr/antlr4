@@ -80,13 +80,13 @@ public class DFASerializer {
 				Map<Integer, DFAState> edges = s.getEdgeMap();
 				Map<Integer, DFAState> contextEdges = s.getContextEdgeMap();
 				for (Map.Entry<Integer, DFAState> entry : edges.entrySet()) {
-					if ((entry.getValue() == null || entry.getValue() == ATNSimulator.ERROR) && (!s.isCtxSensitive || !s.contextSymbols.contains(entry.getKey()))) {
+					if ((entry.getValue() == null || entry.getValue() == ATNSimulator.ERROR) && (!s.isContextSensitive() || !s.contextSymbols.contains(entry.getKey()))) {
 						continue;
 					}
 
 					boolean contextSymbol = false;
 					buf.append(getStateString(s)).append("-").append(getEdgeLabel(entry.getKey())).append("->");
-					if (s.isCtxSensitive && s.contextSymbols.contains(entry.getKey())) { // indexing in the edges array starts with -1 (EOF)
+					if (s.isContextSensitive() && s.contextSymbols.contains(entry.getKey())) { // indexing in the edges array starts with -1 (EOF)
 						buf.append("!");
 						contextSymbol = true;
 					}
@@ -100,7 +100,7 @@ public class DFASerializer {
 					}
 				}
 
-				if (s.isCtxSensitive) {
+				if (s.isContextSensitive()) {
 					for (Map.Entry<Integer, DFAState> entry : contextEdges.entrySet()) {
 						buf.append(getStateString(s))
 							.append("-")
@@ -160,7 +160,7 @@ public class DFASerializer {
             }
 		}
 
-		if ( s.isCtxSensitive ) {
+		if ( s.isContextSensitive() ) {
 			stateStr += "*";
 			for (ATNConfig config : s.configs) {
 				if (config.getReachesIntoOuterContext()) {
