@@ -73,7 +73,6 @@ public class Grammar implements AttributeResolver {
 	public static final Set<String> parserOptions = new HashSet<String>() {{
 		add("superClass");
 		add("TokenLabelType");
-		add("abstract");
 		add("tokenVocab");
 		add("language");
 	}};
@@ -103,7 +102,6 @@ public class Grammar implements AttributeResolver {
         new HashSet() {{
 				add("superClass");
                 add("TokenLabelType");
-				add("abstract");
 				add("tokenVocab");
         }};
 
@@ -401,10 +399,6 @@ public class Grammar implements AttributeResolver {
         return parent.getOutermostGrammar();
     }
 
-	public boolean isAbstract() {
-		return Boolean.parseBoolean(getOptionString("abstract"));
-	}
-
     /** Get the name of the generated recognizer; may or may not be same
      *  as grammar name.
      *  Recognizer is TParser and TLexer from T if combined, else
@@ -420,15 +414,9 @@ public class Grammar implements AttributeResolver {
                 buf.append(g.name);
                 buf.append('_');
             }
-			if (isAbstract()) {
-				buf.append("Abstract");
-			}
             buf.append(name);
             qualifiedName = buf.toString();
         }
-		else if (isAbstract()) {
-			qualifiedName = "Abstract" + name;
-		}
 
         if ( isCombined() || (isLexer() && implicitLexer!=null) )
         {

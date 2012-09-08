@@ -88,7 +88,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, extras, superClass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extends <superClass> {
+public class <parser.name> extends <superClass> {
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
@@ -681,7 +681,7 @@ import org.antlr.v4.runtime.misc.*;
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends <superClass> {
+public class <lexer.name> extends <superClass> {
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();

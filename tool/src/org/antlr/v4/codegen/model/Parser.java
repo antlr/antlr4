@@ -56,7 +56,6 @@ public class Parser extends OutputModelObject {
 	public Set<String> ruleNames;
 	public Collection<Rule> rules;
 	public ParserFile file;
-	public boolean abstractRecognizer;
 
 	@ModelElement public List<RuleFunction> funcs = new ArrayList<RuleFunction>();
 	@ModelElement public SerializedATN atn;
@@ -100,7 +99,5 @@ public class Parser extends OutputModelObject {
 		else {
 			superClass = new DefaultParserSuperClass();
 		}
-
-		abstractRecognizer = g.isAbstract();
 	}
 }

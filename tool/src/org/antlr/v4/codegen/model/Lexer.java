@@ -52,7 +52,6 @@ public class Lexer extends OutputModelObject {
 	public String[] tokenNames;
 	public Set<String> ruleNames;
 	public Collection<String> modes;
-	public boolean abstractRecognizer;
 	@ModelElement public ActionChunk superClass;
 
 	@ModelElement public SerializedATN atn;
@@ -101,8 +100,6 @@ public class Lexer extends OutputModelObject {
 		else {
 			superClass = new DefaultLexerSuperClass();
 		}
-
-		abstractRecognizer = g.isAbstract();
 	}
 
 }
