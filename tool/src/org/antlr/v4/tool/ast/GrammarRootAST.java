@@ -46,6 +46,7 @@ public class GrammarRootAST extends GrammarASTWithOptions {
 	/** Track stream used to create this tree */
 	public TokenStream tokens;
 	public Map<String, String> cmdLineOptions; // -DsuperClass=T on command line
+	public String fileName;
 
 	public GrammarRootAST(GrammarAST node) {
 		super(node);
@@ -60,6 +61,11 @@ public class GrammarRootAST extends GrammarASTWithOptions {
         super(type,t,text);
     }
 
+	public String getGrammarName() {
+		Tree t = getChild(0);
+		if ( t!=null ) return t.getText();
+		return null;
+	}
 
 	@Override
 	public String getOptionString(String key) {

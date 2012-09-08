@@ -1,5 +1,2 @@
-grammar T;
-
-tokens { A,B }
-
-s : A ;
+lexer grammar T;
+A : 'a';
