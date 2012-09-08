@@ -30,17 +30,15 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.Recognizer;
-import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
-/** An ATN state, predicted alt, and syntactic/semantic context.
- *  The syntactic context is a pointer into the rule invocation
+/** A tuple: (ATN state, predicted alt, syntactic, semantic context).
+ *  The syntactic context is a graph-structured stack node whose
+ *  path(s) to the root is the rule invocation(s)
  *  chain used to arrive at the state.  The semantic context is
- *  the unordered set semantic predicates encountered before reaching
+ *  the tree of semantic predicates encountered before reaching
  *  an ATN state.
- *
- *  (state, alt, rule context, semantic context)
  */
 public class ATNConfig {
 	/** The ATN state associated with this configuration */
@@ -55,7 +53,7 @@ public class ATNConfig {
 	 *  execution of the ATN simulator.
 	 */
 	@Nullable
-	public RuleContext context;
+	public PredictionContext context;
 
 	/**
 	 * We cannot execute predicates dependent upon local context unless
@@ -70,22 +68,19 @@ public class ATNConfig {
 	 */
 	public int reachesIntoOuterContext;
 
-	/** Capture lexer action we traverse */
-	public int lexerActionIndex = -1; // TOOD: move to subclass
-
     @NotNull
     public final SemanticContext semanticContext;
 
 	public ATNConfig(@NotNull ATNState state,
 					 int alt,
-					 @Nullable RuleContext context)
+					 @Nullable PredictionContext context)
 	{
 		this(state, alt, context, SemanticContext.NONE);
 	}
 
 	public ATNConfig(@NotNull ATNState state,
 					 int alt,
-					 @Nullable RuleContext context,
+					 @Nullable PredictionContext context,
 					 @NotNull SemanticContext semanticContext)
 	{
 		this.state = state;
@@ -102,19 +97,18 @@ public class ATNConfig {
    		this(c, state, c.context, semanticContext);
    	}
 
-    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable RuleContext context) {
+    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context) {
         this(c, state, context, c.semanticContext);
     }
 
-	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable RuleContext context,
+	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context,
                      @NotNull SemanticContext semanticContext)
     {
 		this.state = state;
 		this.alt = c.alt;
 		this.context = context;
+		this.semanticContext = semanticContext;
 		this.reachesIntoOuterContext = c.reachesIntoOuterContext;
-        this.semanticContext = semanticContext;
-		this.lexerActionIndex = c.lexerActionIndex;
 	}
 
 	/** An ATN configuration is equal to another if both have
@@ -171,8 +165,9 @@ public class ATNConfig {
             buf.append(alt);
         }
         if ( context!=null ) {
-            buf.append(",");
-            buf.append(context.toString(recog));
+            buf.append(",[");
+            buf.append(context.toString());
+			buf.append("]");
         }
         if ( semanticContext!=null && semanticContext != SemanticContext.NONE ) {
             buf.append(",");

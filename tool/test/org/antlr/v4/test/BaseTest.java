@@ -55,8 +55,8 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRMessage;
-import org.antlr.v4.tool.DefaultToolListener;
 import org.antlr.v4.tool.DOTGenerator;
+import org.antlr.v4.tool.DefaultToolListener;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.antlr.v4.tool.LexerGrammar;
@@ -212,7 +212,7 @@ public abstract class BaseTest {
 									  CharStream input,
 									  boolean adaptive)
 	{
-		LexerATNSimulator interp = new LexerATNSimulator(atn);
+		LexerATNSimulator interp = new LexerATNSimulator(atn,new DFA[1],null);
 		List<String> tokenTypes = new ArrayList<String>();
 		int ttype;
 		boolean hitEOF = false;
@@ -476,7 +476,6 @@ public abstract class BaseTest {
 														grammarStr,
 														parserName,
 														lexerName,
-														"-parse-listener",
 														"-visitor");
 		assertTrue(success);
 		writeFile(tmpdir, "input", input);
@@ -522,9 +521,6 @@ public abstract class BaseTest {
 			}
 			if (optionsSet.contains("-visitor")) {
 				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseVisitor.java");
-			}
-			if (optionsSet.contains("-parse-listener")) {
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseParseListener.java");
 			}
 		}
 		allIsWell = compile(files.toArray(new String[files.size()]));

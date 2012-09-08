@@ -31,7 +31,19 @@ package org.antlr.v4.automata;
 
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ActionTransition;
+import org.antlr.v4.runtime.atn.AtomTransition;
+import org.antlr.v4.runtime.atn.BlockStartState;
+import org.antlr.v4.runtime.atn.DecisionState;
+import org.antlr.v4.runtime.atn.LoopEndState;
+import org.antlr.v4.runtime.atn.PredicateTransition;
+import org.antlr.v4.runtime.atn.RangeTransition;
+import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.SetTransition;
+import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -79,9 +91,10 @@ public class ATNSerializer {
 		else if ( g.getType()== ANTLRParser.PARSER ) data.add(ATN.PARSER);
 		else data.add(ATN.TREE_PARSER);
 		data.add(g.getMaxTokenType());
-		data.add(atn.states.size());
 		int nedges = 0;
+
 		// dump states, count edges and collect sets while doing so
+		data.add(atn.states.size());
 		for (ATNState s : atn.states) {
 			if ( s==null ) { // might be optimized away
 				data.add(ATNState.INVALID_TYPE);
@@ -95,7 +108,12 @@ public class ATNSerializer {
 			else if ( s instanceof BlockStartState ) {
 				data.add(((BlockStartState)s).endState.stateNumber);
 			}
-			nedges += s.getNumberOfTransitions();
+
+			if (s.getStateType() != ATNState.RULE_STOP) {
+				// the deserializer can trivially derive these edges, so there's no need to serialize them
+				nedges += s.getNumberOfTransitions();
+			}
+
 			for (int i=0; i<s.getNumberOfTransitions(); i++) {
 				Transition t = s.transition(i);
 				int edgeType = Transition.serializationTypes.get(t.getClass());
@@ -105,6 +123,7 @@ public class ATNSerializer {
 				}
 			}
 		}
+
 		int nrules = atn.ruleToStartState.length;
 		data.add(nrules);
 		for (int r=0; r<nrules; r++) {
@@ -117,6 +136,7 @@ public class ATNSerializer {
 				data.add(rule.actionIndex);
 			}
 		}
+
 		int nmodes = atn.modeToStartState.size();
 		data.add(nmodes);
 		if ( nmodes>0 ) {
@@ -124,6 +144,7 @@ public class ATNSerializer {
 				data.add(modeStartState.stateNumber);
 			}
 		}
+
 		int nsets = sets.size();
 		data.add(nsets);
 		for (IntervalSet set : sets) {
@@ -133,10 +154,19 @@ public class ATNSerializer {
 				data.add(I.b);
 			}
 		}
+
 		data.add(nedges);
 		int setIndex = 0;
 		for (ATNState s : atn.states) {
-			if ( s==null ) continue; // might be optimized away
+			if ( s==null ) {
+				// might be optimized away
+				continue;
+			}
+
+			if (s.getStateType() == ATNState.RULE_STOP) {
+				continue;
+			}
+
 			for (int i=0; i<s.getNumberOfTransitions(); i++) {
 				Transition t = s.transition(i);
 
@@ -217,7 +247,7 @@ public class ATNSerializer {
 				int loopBackStateNumber = ATNSimulator.toInt(data[p++]);
 				arg = " "+loopBackStateNumber;
 			}
-			else if ( stype == ATNState.PLUS_BLOCK_START || stype == ATNState.STAR_BLOCK_START ) {
+			else if ( stype == ATNState.PLUS_BLOCK_START || stype == ATNState.STAR_BLOCK_START || stype == ATNState.BLOCK_START ) {
 				int endStateNumber = ATNSimulator.toInt(data[p++]);
 				arg = " "+endStateNumber;
 			}

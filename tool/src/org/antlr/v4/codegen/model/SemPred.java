@@ -47,7 +47,7 @@ public class SemPred extends Action {
 
 	public SemPred(OutputModelFactory factory, GrammarAST ast) {
 		super(factory,ast);
-		GrammarAST failNode = ((PredAST)ast).getOption("fail");
+		GrammarAST failNode = ((PredAST)ast).getOptionAST("fail");
 		CodeGenerator gen = factory.getGenerator();
 		if ( failNode==null ) {
 			msg = ast.getText();

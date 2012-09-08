@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
 
 public abstract class ATNSimulator {
@@ -44,16 +45,51 @@ public abstract class ATNSimulator {
 	@NotNull
 	public final ATN atn;
 
+	/** The context cache maps all PredictionContext objects that are equals()
+	 *  to a single cached copy. This cache is shared across all contexts
+	 *  in all ATNConfigs in all DFA states.  We rebuild each ATNConfigSet
+	 *  to use only cached nodes/graphs in addDFAState(). We don't want to
+	 *  fill this during closure() since there are lots of contexts that
+	 *  pop up but are not used ever again. It also greatly slows down closure().
+	 *
+	 *  This cache makes a huge difference in memory and a little bit in speed.
+	 *  For the Java grammar on java.*, it dropped the memory requirements
+	 *  at the end from 25M to 16M. We don't store any of the full context
+	 *  graphs in the DFA because they are limited to local context only,
+	 *  but apparently there's a lot of repetition there as well. We optimize
+	 *  the config contexts before storing the config set in the DFA states
+	 *  by literally rebuilding them with cached subgraphs only.
+	 *
+	 *  I tried a cache for use during closure operations, that was
+	 *  whacked after each adaptivePredict(). It cost a little bit
+	 *  more time I think and doesn't save on the overall footprint
+	 *  so it's not worth the complexity.
+ 	 */
+	protected final PredictionContextCache sharedContextCache;
+
 	static {
 		ERROR = new DFAState(new ATNConfigSet());
 		ERROR.stateNumber = Integer.MAX_VALUE;
 	}
 
-	public ATNSimulator(@NotNull ATN atn) {
+	public ATNSimulator(@NotNull ATN atn,
+						@NotNull PredictionContextCache sharedContextCache)
+	{
 		this.atn = atn;
+		this.sharedContextCache = sharedContextCache;
 	}
 
 	public abstract void reset();
+
+	public PredictionContext getCachedContext(PredictionContext context) {
+		if ( sharedContextCache==null ) return context;
+
+		IdentityHashMap<PredictionContext, PredictionContext> visited =
+			new IdentityHashMap<PredictionContext, PredictionContext>();
+		return PredictionContext.getCachedContext(context,
+												  sharedContextCache,
+												  visited);
+	}
 
 	public static ATN deserialize(@NotNull char[] data) {
 		ATN atn = new ATN();
@@ -174,17 +210,16 @@ public abstract class ATNSimulator {
 			p += 6;
 		}
 
-		if (atn.grammarType == ATN.LEXER) {
-			for (ATNState state : atn.states) {
-				for (int i = 0; i < state.getNumberOfTransitions(); i++) {
-					Transition t = state.transition(i);
-					if (!(t instanceof RuleTransition)) {
-						continue;
-					}
-
-					RuleTransition ruleTransition = (RuleTransition)t;
-					atn.ruleToStopState[ruleTransition.target.ruleIndex].addTransition(new EpsilonTransition(ruleTransition.followState));
+		// edges for rule stop states can be derived, so they aren't serialized
+		for (ATNState state : atn.states) {
+			for (int i = 0; i < state.getNumberOfTransitions(); i++) {
+				Transition t = state.transition(i);
+				if (!(t instanceof RuleTransition)) {
+					continue;
 				}
+
+				RuleTransition ruleTransition = (RuleTransition)t;
+				atn.ruleToStopState[ruleTransition.target.ruleIndex].addTransition(new EpsilonTransition(ruleTransition.followState));
 			}
 		}
 

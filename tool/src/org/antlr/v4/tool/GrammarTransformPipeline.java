@@ -34,10 +34,11 @@ import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
 import org.antlr.v4.Tool;
-import org.antlr.v4.misc.DoubleKeyMap;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.BlockSetTransformer;
 import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.runtime.misc.DoubleKeyMap;
+import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -50,7 +51,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /** Handle left-recursion and block-set transforms */
@@ -114,6 +114,7 @@ public class GrammarTransformPipeline {
 
     /** Utility visitor that sets grammar ptr in each node */
 	public static void setGrammarPtr(final Grammar g, GrammarAST tree) {
+		if ( tree==null ) return;
 		// ensure each node has pointer to surrounding grammar
 		TreeVisitor v = new TreeVisitor(new GrammarASTAdaptor());
 		v.visit(tree, new TreeVisitorAction() {
@@ -351,15 +352,22 @@ public class GrammarTransformPipeline {
 		}
 
 		// Will track 'if' from IF : 'if' ; rules to avoid defining new token for 'if'
-		Map<String,String> litAliases =
+		List<Pair<GrammarAST,GrammarAST>> litAliases =
 			Grammar.getStringLiteralAliasesFromLexerRules(lexerAST);
 
 		Set<String> stringLiterals = combinedGrammar.getStringLiterals();
 		// add strings from combined grammar (and imported grammars) into lexer
 		// put them first as they are keywords; must resolve ambigs to these rules
 //		tool.log("grammar", "strings from parser: "+stringLiterals);
+		nextLit:
 		for (String lit : stringLiterals) {
-			if ( litAliases!=null && litAliases.containsKey(lit) ) continue; // already has rule
+			// if lexer already has a rule for literal, continue
+			if ( litAliases!=null ) {
+				for (Pair<GrammarAST,GrammarAST> pair : litAliases) {
+					GrammarAST litAST = pair.b;
+					if ( lit.equals(litAST.getText()) ) continue nextLit;
+				}
+			}
 			// create for each literal: (RULE <uniquename> (BLOCK (ALT <lit>))
 			String rname = combinedGrammar.getStringLiteralLexerRuleName(lit);
 			// can't use wizard; need special node types

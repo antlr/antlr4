@@ -2,11 +2,11 @@ package org.antlr.v4.test;
 
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.runtime.NoViableAltException;
-import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.BlockStartState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
@@ -40,7 +40,7 @@ public class TestATNInterpreter extends BaseTest {
 			"C : 'c' ;\n");
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"tokens {A; B; C;}\n" +
+			"tokens {A,B,C}\n" +
 			"a : ~A ;");
 		checkMatchedAlt(lg, g, "b", 1);
 	}
@@ -254,7 +254,7 @@ public class TestATNInterpreter extends BaseTest {
 		);
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"tokens {A;B;C;LP;RP;INT;}\n" +
+			"tokens {A,B,C,LP,RP,INT}\n" +
 			"a : e B | e C ;\n" +
 			"e : LP e RP\n" +
 			"  | INT\n" +
@@ -272,18 +272,17 @@ public class TestATNInterpreter extends BaseTest {
 								int expected)
 	{
 		ATN lexatn = createATN(lg);
-		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn);
+		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn,new DFA[1],null);
 		IntegerList types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
 
-		semanticProcess(lg);
 		g.importVocab(lg);
-		semanticProcess(g);
 
 		ParserATNFactory f = new ParserATNFactory(g);
 		ATN atn = f.createATN();
 
-		TokenStream input = new IntTokenStream(types);
+		IntTokenStream input = new IntTokenStream(types);
+		System.out.println("input="+input.types);
 		ParserInterpreter interp = new ParserInterpreter(g, input);
 		ATNState startState = atn.ruleToStartState[g.getRule("a").index];
 		if ( startState.transition(0).target instanceof BlockStartState ) {

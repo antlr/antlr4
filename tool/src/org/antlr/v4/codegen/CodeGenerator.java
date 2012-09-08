@@ -33,13 +33,22 @@ import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.tool.*;
-import org.stringtemplate.v4.*;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
+import org.stringtemplate.v4.AutoIndentWriter;
+import org.stringtemplate.v4.NumberRenderer;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
+import org.stringtemplate.v4.STWriter;
+import org.stringtemplate.v4.StringRenderer;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
-import org.antlr.v4.misc.Utils.Func1;
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 /** General controller for code gen.  Can instantiate sub generator(s).
  */
@@ -61,7 +70,7 @@ public class CodeGenerator {
 	public int lineWidth = 72;
 
 	public CodeGenerator(@NotNull Grammar g) {
-		this(g.tool, g, g.getOptionString("language", "Java"));
+		this(g.tool, g, g.getOptionString("language"));
 	}
 
 	public CodeGenerator(@NotNull Tool tool, @NotNull Grammar g, String language) {
@@ -109,7 +118,7 @@ public class CodeGenerator {
 		}
 		catch (IllegalArgumentException iae) {
 			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-									iae,
+									null,
 						 			language);
 		}
 	}
@@ -132,8 +141,6 @@ public class CodeGenerator {
 	public ST generateParser() { return walk(createController().buildParserOutputModel()); }
 	public ST generateListener() { return walk(createController().buildListenerOutputModel()); }
 	public ST generateBaseListener() { return walk(createController().buildBaseListenerOutputModel()); }
-	public ST generateParseListener() { return walk(createController().buildParseListenerOutputModel()); }
-	public ST generateBaseParseListener() { return walk(createController().buildBaseParseListenerOutputModel()); }
 	public ST generateVisitor() { return walk(createController().buildVisitorOutputModel()); }
 	public ST generateBaseVisitor() { return walk(createController().buildBaseVisitorOutputModel()); }
 
@@ -179,14 +186,6 @@ public class CodeGenerator {
 
 	public void writeBaseListener(ST outputFileST) {
 		target.genFile(g,outputFileST, getBaseListenerFileName());
-	}
-
-	public void writeParseListener(ST outputFileST) {
-		target.genFile(g,outputFileST, getParseListenerFileName());
-	}
-
-	public void writeBaseParseListener(ST outputFileST) {
-		target.genFile(g,outputFileST, getBaseParseListenerFileName());
 	}
 
 	public void writeVisitor(ST outputFileST) {
@@ -293,20 +292,6 @@ public class CodeGenerator {
 		assert g.name != null;
 		ST extST = templates.getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "BaseListener";
-		return listenerName+extST.render();
-	}
-
-	public String getParseListenerFileName() {
-		assert g.name != null;
-		ST extST = templates.getInstanceOf("codeFileExtension");
-		String listenerName = g.name + "ParseListener";
-		return listenerName+extST.render();
-	}
-
-	public String getBaseParseListenerFileName() {
-		assert g.name != null;
-		ST extST = templates.getInstanceOf("codeFileExtension");
-		String listenerName = g.name + "BaseParseListener";
 		return listenerName+extST.render();
 	}
 

@@ -446,7 +446,6 @@ OR           : '|'                    ;
 DOLLAR       : '$'                    ;
 DOT		     : '.'                    ; // can be WILDCARD or DOT in qid or imported rule ref
 RANGE        : '..'                   ;
-ETC          : '...'                  ;
 AT           : '@'                    ;
 POUND        : '#'                    ;
 NOT          : '~'                    ;

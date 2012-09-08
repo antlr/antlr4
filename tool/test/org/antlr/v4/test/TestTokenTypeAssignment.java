@@ -27,8 +27,8 @@ public class TestTokenTypeAssignment extends BaseTest {
 		Grammar g = new Grammar(
 				"parser grammar t;\n" +
 				"tokens {\n" +
-				"  C;\n" +
-				"  D;" +
+				"  C,\n" +
+				"  D" +
 				"}\n"+
 				"a : A | B;\n" +
 				"b : C ;");
@@ -41,27 +41,13 @@ public class TestTokenTypeAssignment extends BaseTest {
 		LexerGrammar g = new LexerGrammar(
 				"lexer grammar t;\n" +
 				"tokens {\n" +
-				"  C;\n" +
-				"  D;" +
+				"  C,\n" +
+				"  D" +
 				"}\n"+
 				"A : 'a';\n" +
 				"C : 'c' ;");
 		String rules = "A, C";
 		String tokenNames = "A, C, D";
-		checkSymbols(g, rules, tokenNames);
-	}
-
-	@Test public void testTokensSectionWithAssignmentSection() throws Exception {
-		Grammar g = new Grammar(
-				"grammar t;\n" +
-				"tokens {\n" +
-				"  C='c';\n" +
-				"  D;" +
-				"}\n"+
-				"a : A | B;\n" +
-				"b : C ;");
-		String rules = "a, b";
-		String tokenNames = "A, B, C, D, 'c'";
 		checkSymbols(g, rules, tokenNames);
 	}
 
@@ -143,36 +129,6 @@ public class TestTokenTypeAssignment extends BaseTest {
 		Set literals = g.stringLiteralToTypeMap.keySet();
 		// must store literals how they appear in the antlr grammar
 		assertEquals("'\\n'", literals.toArray()[0]);
-	}
-
-	@Test public void testTokenInTokensSectionAndTokenRuleDef() throws Exception {
-		// this must return A not I to the parser; calling a nonfragment rule
-		// from a nonfragment rule does not set the overall token.
-		String grammar =
-			"grammar P;\n" +
-			"tokens { B='}'; }\n"+
-			"a : A B {System.out.println(_input.getText());} ;\n"+
-			"A : 'a' ;\n" +
-			"B : '}' ;\n"+
-			"WS : (' '|'\\n') {skip();} ;";
-		String found = execParser("P.g4", grammar, "PParser", "PLexer",
-								  "a", "a}", false);
-		assertEquals("a}\n", found);
-	}
-
-	@Test public void testTokenInTokensSectionAndTokenRuleDef2() throws Exception {
-		// this must return A not I to the parser; calling a nonfragment rule
-		// from a nonfragment rule does not set the overall token.
-		String grammar =
-			"grammar P;\n" +
-			"tokens { B='}'; }\n"+
-			"a : A '}' {System.out.println(_input.getText());} ;\n"+
-			"A : 'a' ;\n" +
-			"B : '}' ;\n"+
-			"WS : (' '|'\\n') {skip();} ;";
-		String found = execParser("P.g4", grammar, "PParser", "PLexer",
-								  "a", "a}", false);
-		assertEquals("a}\n", found);
 	}
 
 	protected void checkSymbols(Grammar g,

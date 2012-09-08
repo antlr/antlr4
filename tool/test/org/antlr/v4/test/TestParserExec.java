@@ -199,6 +199,13 @@ public class TestParserExec extends BaseTest {
 	 */
 	@Test
 	public void testIfIfElse() throws Exception {
+		/*
+		With the predicate, this looks to be context sensitive to the full
+		LL prediction because that edge literally disappears. With SLL
+		prediction, it sees a conflict. Even though there's a predicate,
+		it can't be sure that context would not resolve the conflict. Hence,
+	    it retries with full context and sees no conflict.
+	    */
 		String grammar =
 			"grammar T;\n" +
 			"s : stmt EOF ;\n" +
@@ -206,7 +213,7 @@ public class TestParserExec extends BaseTest {
 			"ifStmt : 'if' ID stmt ('else' stmt | {_input.LA(1) != ELSE}?);\n" +
 			"ELSE : 'else';\n" +
 			"ID : [a-zA-Z]+;\n" +
-			"WS : (' ' | '\\t')+ -> skip;\n"
+			"WS : [ \\n\\t]+ -> skip;\n"
 			;
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",

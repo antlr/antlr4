@@ -46,6 +46,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -144,30 +145,24 @@ public class ATNOptimizer {
 			}
 		}
 
-		System.out.println("ATN optimizer removed " + removedStates + " states by collapsing sets.");
+//		System.out.println("ATN optimizer removed " + removedStates + " states by collapsing sets.");
 	}
 
 	private static void optimizeStates(ATN atn) {
-		List<ATNState> states = atn.states;
-
-		int current = 0;
-		for (int i = 0; i < states.size(); i++) {
-			ATNState state = states.get(i);
-			if (state == null) {
-				continue;
+//		System.out.println(atn.states);
+		List<ATNState> compressed = new ArrayList<ATNState>();
+		int i = 0; // new state number
+		for (ATNState s : atn.states) {
+			if ( s!=null ) {
+				compressed.add(s);
+				s.stateNumber = i; // reset state number as we shift to new position
+				i++;
 			}
-
-			if (i != current) {
-				state.stateNumber = current;
-				states.set(current, state);
-				states.set(i, null);
-			}
-
-			current++;
 		}
-
-		System.out.println("ATN optimizer removed " + (states.size() - current) + " null states.");
-		states.subList(current, states.size()).clear();
+//		System.out.println(compressed);
+//		System.out.println("ATN optimizer removed " + (atn.states.size() - compressed.size()) + " null states.");
+		atn.states.clear();
+		atn.states.addAll(compressed);
 	}
 
 	private ATNOptimizer() {

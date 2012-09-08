@@ -59,36 +59,6 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 }
 >>
 
-ParseListenerFile(file, header) ::= <<
-<header>
-import org.antlr.v4.runtime.tree.*;
-import org.antlr.v4.runtime.*;
-
-public interface <file.grammarName>ParseListener extends ParseListener\<<InputSymbolType()>\> {
-	<file.listenerEnterNames:{lname |
-void enter<lname; format="cap">(ParserRuleContext\<<InputSymbolType()>\> ctx);}; separator="\n">
-	<file.listenerExitNames:{lname |
-void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
-}
->>
-
-BaseParseListenerFile(file, header) ::= <<
-<header>
-
-import org.antlr.v4.runtime.*;
-
-public class <file.grammarName>BaseParseListener implements <file.grammarName>ParseListener {
-	<file.listenerEnterNames:{lname |
-@Override public void enter<lname; format="cap">(ParserRuleContext\<<InputSymbolType()>\> ctx) { \}}; separator="\n">
-	<file.listenerExitNames:{lname |
-@Override public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
-
-	@Override public void enterNonLRRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	@Override public void visitTerminal(ParserRuleContext\<<InputSymbolType()>\> ctx, <InputSymbolType()> symbol) { }
-}
->>
-
 VisitorFile(file, header) ::= <<
 <header>
 import org.antlr.v4.runtime.tree.*;
@@ -112,13 +82,16 @@ public class <file.grammarName>BaseVisitor\<T> extends ParseTreeVisitor\<T> impl
 }
 >>
 
-Parser(parser, funcs, atn, sempredFuncs, superclass) ::= <<
+Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 <Parser_(ctor="parser_ctor", ...)>
 >>
 
-Parser_(parser, funcs, atn, sempredFuncs, ctor, extras, superclass) ::= <<
+Parser_(parser, funcs, atn, sempredFuncs, ctor, extras, superClass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extends <superclass> {
+public class <parser.name> extends <superClass> {
+	protected static final DFA[] _decisionToDFA;
+	protected static final PredictionContextCache _sharedContextCache =
+		new PredictionContextCache();
 	<if(parser.tokens)>
 	public static final int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
@@ -191,7 +164,7 @@ case <f.ruleIndex> : return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);
 parser_ctor(p) ::= <<
 public <p.name>(TokenStream input) {
 	super(input);
-	_interp = new ParserATNSimulator\<Token>(this,_ATN);
+	_interp = new ParserATNSimulator\<Token>(this,_ATN,_decisionToDFA,_sharedContextCache);
 }
 >>
 
@@ -511,6 +484,7 @@ LexerModeCommand(arg)      ::= "_mode = <arg>;"
 LexerPushModeCommand(arg)  ::= "pushMode(<arg>);"
 
 DefaultParserSuperClass(s) ::= "Parser"
+DefaultLexerSuperClass(s)  ::= "Lexer"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
@@ -552,7 +526,7 @@ SetNonLocalAttr(s, rhsChunks)	  ::=
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.add(<labelref(a.label)>);"
 
-TokenDecl(t) ::= "public Token <t.name>;"
+TokenDecl(t) ::= "public <TokenLabelType()> <t.name>;"
 TokenTypeDecl(t) ::= "int <t.name>;"
 TokenListDecl(t) ::= "public List\<Token> <t.name> = new ArrayList\<Token>();"
 RuleContextDecl(r) ::= "public <r.ctxName> <r.name>;"
@@ -645,13 +619,6 @@ public \<T> T accept(ParseTreeVisitor\<? extends T> visitor) {
 }
 >>
 
-ParseListenerDispatchMethod(method) ::= <<
-@Override
-public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseListener\<<InputSymbolType()>\> listener) {
-	if ( listener instanceof <parser.grammarName>ParseListener ) ((<parser.grammarName>ParseListener)listener).<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
-}
->>
-
 AttributeDecl(d) ::= "public <d.decl>;"
 
 /** If we don't know location of label def x, use this template */
@@ -712,9 +679,12 @@ import org.antlr.v4.runtime.misc.*;
 <lexer>
 >>
 
-Lexer(lexer, atn, actionFuncs, sempredFuncs) ::= <<
+Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends Lexer {
+public class <lexer.name> extends <superClass> {
+	protected static final DFA[] _decisionToDFA;
+	protected static final PredictionContextCache _sharedContextCache =
+		new PredictionContextCache();
 	public static final int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<rest(lexer.modes):{m| public static final int <m> = <i>;}; separator="\n">
@@ -734,7 +704,7 @@ public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends 
 
 	public <lexer.name>(CharStream input) {
 		super(input);
-		_interp = new LexerATNSimulator(this,_ATN);
+		_interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 
 	@Override
@@ -766,6 +736,7 @@ public static final String _serializedATN =
 public static final ATN _ATN =
 	ATNSimulator.deserialize(_serializedATN.toCharArray());
 static {
+    _decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
 	//org.antlr.v4.tool.DOTGenerator dot = new org.antlr.v4.tool.DOTGenerator(null);
 	//System.out.println(dot.getDOT(_ATN.decisionToState.get(0), ruleNames, false));
 	//System.out.println(dot.getDOT(_ATN.ruleToStartState[2], ruleNames, false));

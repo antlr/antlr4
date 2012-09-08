@@ -9,7 +9,6 @@ import org.antlr.runtime.TokenSource;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeAdaptor;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.Constructor;
@@ -70,7 +69,7 @@ public class TestASTStructure {
 
 	@Test public void test_grammarSpec2() throws Exception {
 		// gunit test on line 18
-		RuleReturnScope rstruct = (RuleReturnScope)execParser("grammarSpec", "\n    parser grammar P;\n    tokens { A; B='33'; }\n    @header {foo}\n    a : A;\n    ", 18);
+		RuleReturnScope rstruct = (RuleReturnScope)execParser("grammarSpec", "\n    parser grammar P;\n    tokens { A, B }\n    @header {foo}\n    a : A;\n    ", 18);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
 		Object expecting = "(PARSER_GRAMMAR P (tokens { A (= B '33')) (@ header {foo}) (RULES (RULE a (BLOCK (ALT A)))))";
 		assertEquals("testing rule grammarSpec", expecting, actual);
@@ -78,7 +77,7 @@ public class TestASTStructure {
 
 	@Test public void test_grammarSpec3() throws Exception {
 		// gunit test on line 30
-		RuleReturnScope rstruct = (RuleReturnScope)execParser("grammarSpec", "\n    parser grammar P;\n    @header {foo}\n    tokens { A; B='33'; }\n    a : A;\n    ", 30);
+		RuleReturnScope rstruct = (RuleReturnScope)execParser("grammarSpec", "\n    parser grammar P;\n    @header {foo}\n    tokens { A,B }\n    a : A;\n    ", 30);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
 		Object expecting = "(PARSER_GRAMMAR P (@ header {foo}) (tokens { A (= B '33')) (RULES (RULE a (BLOCK (ALT A)))))";
 		assertEquals("testing rule grammarSpec", expecting, actual);

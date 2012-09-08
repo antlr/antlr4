@@ -283,16 +283,7 @@ delegateGrammar
  *  {tree} parser.
  */
 tokensSpec
-	: TOKENS_SPEC tokenSpec+ RBRACE -> ^(TOKENS_SPEC tokenSpec+)
-	;
-
-tokenSpec
-	:	id
-		(	ASSIGN STRING_LITERAL	-> ^(ASSIGN id STRING_LITERAL<TerminalAST>)
-		|							-> id
-		)
-		SEMI
-	|	RULE_REF // INVALID! (an error alt)
+	: TOKENS_SPEC id (COMMA id)* RBRACE -> ^(TOKENS_SPEC id+)
 	;
 
 // A declaration of a language target specifc section,

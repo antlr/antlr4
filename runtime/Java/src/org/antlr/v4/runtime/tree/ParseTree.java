@@ -30,9 +30,6 @@
 package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.Interval;
 
 /** An interface to access the tree of RuleContext objects created
  *  during a parse that makes the data structure look like a simple parse tree.

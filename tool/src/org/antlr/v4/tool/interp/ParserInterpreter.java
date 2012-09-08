@@ -38,17 +38,23 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.Grammar;
 
 public class ParserInterpreter {
-	class DummyParser extends Parser {
+	public static class DummyParser extends Parser {
+		public final DFA[] decisionToDFA; // not shared for interp
+		public final PredictionContextCache sharedContextCache =
+			new PredictionContextCache();
+
 		public Grammar g;
 		public DummyParser(Grammar g, TokenStream input) {
 			super(input);
 			this.g = g;
+			decisionToDFA = new DFA[100];
 		}
 
 		@Override
@@ -70,9 +76,12 @@ public class ParserInterpreter {
 		public ATN getATN() {
 			return null;
 		}
+		static {
+		}
 	}
 
 	protected Grammar g;
+	public DummyParser parser;
 	protected ParserATNSimulator<Token> atnSimulator;
 	protected TokenStream input;
 
@@ -83,13 +92,17 @@ public class ParserInterpreter {
 	public ParserInterpreter(@NotNull Grammar g, @NotNull TokenStream input) {
 		Tool antlr = new Tool();
 		antlr.process(g,false);
-		atnSimulator = new ParserATNSimulator<Token>(new DummyParser(g, input), g.atn);
+		parser = new DummyParser(g, input);
+		atnSimulator =
+			new ParserATNSimulator<Token>(parser, g.atn, parser.decisionToDFA,
+										  parser.sharedContextCache);
 	}
 
-	public int predictATN(@NotNull DFA dfa, @NotNull TokenStream input,
-						  @Nullable ParserRuleContext outerContext,
-						  boolean useContext)
+	public synchronized int predictATN(@NotNull DFA dfa, @NotNull TokenStream input,
+									   @Nullable ParserRuleContext outerContext,
+									   boolean useContext)
 	{
+		// sync to ensure this entry doesn't race for dfa access
 		return atnSimulator.predictATN(dfa, input, outerContext);
 	}
 

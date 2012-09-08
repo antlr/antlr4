@@ -34,7 +34,6 @@ import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -119,7 +118,7 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	@NotNull
 	public List<? extends ANTLRErrorListener> getErrorListeners() {
-		return new ArrayList<ANTLRErrorListener>(_listeners);
+		return _listeners;
 	}
 
 	public ANTLRErrorListener getErrorListenerDispatch() {

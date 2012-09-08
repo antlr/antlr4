@@ -34,7 +34,8 @@ import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.misc.IntegerList;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SerializedATN extends OutputModelObject {
 	// TODO: make this into a kind of decl or multiple?

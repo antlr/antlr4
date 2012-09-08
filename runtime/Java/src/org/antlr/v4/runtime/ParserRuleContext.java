@@ -28,10 +28,7 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ErrorNodeImpl;
@@ -44,19 +41,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/** A rule invocation record for parsing and tree parsing.
+/** A rule invocation record for parsing.
  *
  *  Contains all of the information about the current rule not stored in the
  *  RuleContext. It handles parse tree children list, Any ATN state
  *  tracing, and the default values available for rule indications:
- *  start, stop, ST, rule index, current alt number, current
+ *  start, stop, rule index, current alt number, current
  *  ATN state.
  *
  *  Subclasses made for each rule and grammar track the parameters,
  *  return values, locals, and labels specific to that rule. These
  *  are the objects that are returned from rules.
  *
- *  Note text is not an actual property of the return value, it is computed
+ *  Note text is not an actual field of a rule return value; it is computed
  *  from start and stop using the input stream's toString() method.  I
  *  could add a ctor to this so that we can pass in and store the input
  *  stream, but I'm not sure we want to do that.  It would seem to be undefined
@@ -68,11 +65,9 @@ import java.util.List;
  *  satisfy the superclass interface.
  */
 public class ParserRuleContext<Symbol extends Token> extends RuleContext {
-	public static final ParserRuleContext<Token> EMPTY = new ParserRuleContext<Token>();
-
 	/** If we are debugging or building a parse tree for a visitor,
 	 *  we need to track all of the tokens and rule invocations associated
-	 *  with this rule's context. This is empty for normal parsing
+	 *  with this rule's context. This is empty for parsing w/o tree constr.
 	 *  operation because we don't the need to track the details about
 	 *  how we parse this rule.
 	 */
@@ -140,23 +135,20 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 
 	// Double dispatch methods for listeners
 
-	// parse listener
-	public void enterRule(ParseListener<Symbol> listener) { }
-	public void exitRule(ParseListener<Symbol> listener) { }
-
-	// parse tree listener
 	public void enterRule(ParseTreeListener<Symbol> listener) { }
 	public void exitRule(ParseTreeListener<Symbol> listener) { }
 
-	/** Does not set parent link; other add methods do */
-	public void addChild(TerminalNode<Symbol> t) {
+	/** Does not set parent link; other add methods do that */
+	public TerminalNode addChild(TerminalNode<Symbol> t) {
 		if ( children==null ) children = new ArrayList<ParseTree>();
 		children.add(t);
+		return t;
 	}
 
-	public void addChild(RuleContext ruleInvocation) {
+	public RuleContext addChild(RuleContext ruleInvocation) {
 		if ( children==null ) children = new ArrayList<ParseTree>();
 		children.add(ruleInvocation);
+		return ruleInvocation;
 	}
 
 	/** Used by enterOuterAlt to toss out a RuleContext previously added as
@@ -174,10 +166,11 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 //		states.add(s);
 //	}
 
-	public void addChild(Symbol matchedToken) {
+	public TerminalNode addChild(Symbol matchedToken) {
 		TerminalNodeImpl<Symbol> t = new TerminalNodeImpl<Symbol>(matchedToken);
 		addChild(t);
 		t.parent = this;
+		return t;
 	}
 
 	public ErrorNode<Symbol> addErrorNode(Symbol badToken) {
@@ -303,24 +296,6 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 
 	public Symbol getStart() { return start; }
 	public Symbol getStop() { return stop; }
-
-	@Override
-	public String toString(@NotNull Recognizer<?,?> recog, RuleContext stop) {
-		if ( recog==null ) return super.toString(recog, stop);
-		StringBuilder buf = new StringBuilder();
-		ParserRuleContext<?> p = this;
-		buf.append("[");
-		while ( p != null && p != stop ) {
-			ATN atn = recog.getATN();
-			ATNState s = atn.states.get(p.s);
-			String ruleName = recog.getRuleNames()[s.ruleIndex];
-			buf.append(ruleName);
-			if ( p.parent != null ) buf.append(" ");
-			p = (ParserRuleContext<?>)p.parent;
-		}
-		buf.append("]");
-		return buf.toString();
-	}
 
     /** Used for rule context info debugging during parse-time, not so much for ATN debugging */
     public String toInfoString(Parser recognizer) {

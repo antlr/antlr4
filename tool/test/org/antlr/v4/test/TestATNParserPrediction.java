@@ -35,7 +35,11 @@ import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.DecisionState;
+import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.tool.DOTGenerator;
@@ -182,7 +186,7 @@ public class TestATNParserPrediction extends BaseTest {
 			"C : 'c' ;\n");
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"tokens {A;B;C;}\n" +
+			"tokens {A,B,C}\n" +
 			"a : x B ;\n" +
 			"b : x C ;\n" +
 			"x : A | ;\n");
@@ -298,7 +302,7 @@ public class TestATNParserPrediction extends BaseTest {
 		);
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"tokens {A;B;C;LP;RP;INT;}\n" +
+			"tokens {A,B,C,LP,RP,INT}\n" +
 			"a : e B | e C ;\n" +
 			"e : LP e RP\n" +
 			"  | INT\n" +
@@ -357,7 +361,7 @@ public class TestATNParserPrediction extends BaseTest {
 		);
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"tokens {A;B;C;LP;RP;INT;}\n" +
+			"tokens {A,B,C,LP,RP,INT}\n" +
 			"a : e A | e A B ;\n" +
 			"e : LP e RP\n" +
 			"  | INT\n" +
@@ -421,7 +425,7 @@ public class TestATNParserPrediction extends BaseTest {
 		);
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"tokens {ID;SEMI;INT;}\n" +
+			"tokens {ID,SEMI,INT}\n" +
 			"a : (ID | ID ID?) SEMI ;");
 		int decision = 1;
 		checkPredictedAlt(lg, g, decision, "a;", 1);
@@ -475,7 +479,8 @@ public class TestATNParserPrediction extends BaseTest {
 	{
 		Tool.internalOption_ShowATNConfigsInDFA = true;
 		ATN lexatn = createATN(lg);
-		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn);
+		LexerATNSimulator lexInterp =
+			new LexerATNSimulator(lexatn,new DFA[1],new PredictionContextCache());
 		IntegerList types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
 
@@ -521,12 +526,13 @@ public class TestATNParserPrediction extends BaseTest {
 		assertEquals(expectedAlt, alt);
 	}
 
-	public DFA getDFA(LexerGrammar lg, Grammar g, String ruleName,
-					  String inputString, ParserRuleContext<?> ctx)
+	public synchronized DFA getDFA(LexerGrammar lg, Grammar g, String ruleName,
+								   String inputString, ParserRuleContext<?> ctx)
 	{
+		// sync to ensure multiple tests don't race on dfa access
 		Tool.internalOption_ShowATNConfigsInDFA = true;
 		ATN lexatn = createATN(lg);
-		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn);
+		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn,null,null);
 
 		semanticProcess(lg);
 		g.importVocab(lg);
@@ -540,7 +546,8 @@ public class TestATNParserPrediction extends BaseTest {
 //		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("b"))));
 //		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("e"))));
 
-		ParserATNSimulator<Token> interp = new ParserATNSimulator<Token>(atn);
+		ParserATNSimulator<Token> interp =
+			new ParserATNSimulator<Token>(atn, new DFA[atn.getNumberOfDecisions()],null);
 		IntegerList types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
 		TokenStream input = new IntTokenStream(types);
@@ -562,7 +569,8 @@ public class TestATNParserPrediction extends BaseTest {
 	{
 //		Tool.internalOption_ShowATNConfigsInDFA = true;
 		ATN lexatn = createATN(lg);
-		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn);
+		LexerATNSimulator lexInterp =
+			new LexerATNSimulator(lexatn,new DFA[1], new PredictionContextCache());
 
 		semanticProcess(lg);
 		g.importVocab(lg);
@@ -580,7 +588,7 @@ public class TestATNParserPrediction extends BaseTest {
 			catch (NoViableAltException nvae) {
 				nvae.printStackTrace(System.err);
 			}
-			DFA dfa = interp.getATNSimulator().decisionToDFA[decision];
+			DFA dfa = interp.parser.decisionToDFA[decision];
 			assertEquals(dfaString[i], dfa.toString(g.getTokenDisplayNames()));
 		}
 	}

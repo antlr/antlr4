@@ -29,7 +29,6 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -63,7 +62,7 @@ public class LL1Analyzer {
 			Set<ATNConfig> lookBusy = new HashSet<ATNConfig>();
 			boolean seeThruPreds = false; // fail to get lookahead upon pred
 			_LOOK(s.transition(alt - 1).target,
-				  ParserRuleContext.EMPTY,
+				  PredictionContext.EMPTY,
 				  look[alt], lookBusy, seeThruPreds);
 			// Wipe out lookahead for this alternative if we found nothing
 			// or we had a predicate when we !seeThruPreds
@@ -81,18 +80,19 @@ public class LL1Analyzer {
    	public IntervalSet LOOK(@NotNull ATNState s, @Nullable RuleContext ctx) {
    		IntervalSet r = new IntervalSet();
 		boolean seeThruPreds = true; // ignore preds; get all lookahead
-   		_LOOK(s, ctx, r, new HashSet<ATNConfig>(), seeThruPreds);
+   		_LOOK(s, PredictionContext.fromRuleContext(ctx),
+			  r, new HashSet<ATNConfig>(), seeThruPreds);
    		return r;
    	}
 
-    /** Computer set of tokens that can come next. If the context is EMPTY,
+    /** Compute set of tokens that can come next. If the context is EMPTY,
      *  then we don't go anywhere when we hit the end of the rule. We have
      *  the correct set.  If the context is null, that means that we did not want
      *  any tokens following this rule--just the tokens that could be found within this
      *  rule. Add EPSILON to the set indicating we reached the end of the ruled out having
      *  to match a token.
      */
-    protected void _LOOK(@NotNull ATNState s, @Nullable RuleContext ctx,
+    protected void _LOOK(@NotNull ATNState s, @Nullable PredictionContext ctx,
 						 @NotNull IntervalSet look,
                          @NotNull Set<ATNConfig> lookBusy,
 						 boolean seeThruPreds)
@@ -106,21 +106,25 @@ public class LL1Analyzer {
                 look.add(Token.EPSILON);
                 return;
             }
-            if ( ctx.invokingState!=-1 ) {
-                ATNState invokingState = atn.states.get(ctx.invokingState);
-                RuleTransition rt = (RuleTransition)invokingState.transition(0);
-                ATNState retState = rt.followState;
-//			System.out.println("popping back to "+retState);
-                _LOOK(retState, ctx.parent, look, lookBusy, seeThruPreds);
-                return;
-            }
+			if ( ctx != PredictionContext.EMPTY ) {
+				// run thru all possible stack tops in ctx
+				for (SingletonPredictionContext p : ctx) {
+					ATNState invokingState = atn.states.get(p.invokingState);
+					RuleTransition rt = (RuleTransition)invokingState.transition(0);
+					ATNState retState = rt.followState;
+//					System.out.println("popping back to "+retState);
+					_LOOK(retState, p.parent, look, lookBusy, seeThruPreds);
+				}
+				return;
+			}
         }
 
         int n = s.getNumberOfTransitions();
         for (int i=0; i<n; i++) {
 			Transition t = s.transition(i);
 			if ( t.getClass() == RuleTransition.class ) {
-				RuleContext newContext = new RuleContext(ctx, s.stateNumber);
+				PredictionContext newContext =
+					new SingletonPredictionContext(ctx, s.stateNumber);
 				_LOOK(t.target, newContext, look, lookBusy, seeThruPreds);
 			}
 			else if ( t instanceof PredicateTransition ) {
@@ -149,5 +153,4 @@ public class LL1Analyzer {
 			}
 		}
 	}
-
 }

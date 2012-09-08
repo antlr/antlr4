@@ -33,7 +33,6 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.LexerNoViableAltException;
-import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
@@ -46,8 +45,6 @@ import java.io.OutputStream;
 
 /** "dup" of ParserInterpreter */
 public class LexerATNSimulator extends ATNSimulator {
-	public static final RuleContext EMPTY_LEXER_RULE_CONTEXT = new RuleContext();
-
 	public static boolean debug = false;
 	public static boolean dfa_debug = false;
 	public static final int MAX_DFA_EDGE = 127; // forces unicode to stay in ATN
@@ -76,7 +73,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		protected int line = 0;
 		protected int charPos = -1;
 		protected DFAState dfaState;
-		protected ATNConfig config;
+		protected LexerATNConfig config;
 
 		protected void reset() {
 			index = -1;
@@ -104,7 +101,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	protected int charPositionInLine = 0;
 
 	@NotNull
-	public final DFA[] dfa;
+	public final DFA[] decisionToDFA;
 	protected int mode = Lexer.DEFAULT_MODE;
 
 	/** Used during DFA/ATN exec to record the most recent accept configuration info */
@@ -114,15 +111,26 @@ public class LexerATNSimulator extends ATNSimulator {
 	public static int ATN_failover = 0;
 	public static int match_calls = 0;
 
-	public LexerATNSimulator(@NotNull ATN atn) {
-		this(null, atn);
+	public LexerATNSimulator(@NotNull ATN atn, @NotNull DFA[] decisionToDFA,
+							 @NotNull PredictionContextCache sharedContextCache)
+	{
+		this(null, atn, decisionToDFA,sharedContextCache);
 	}
 
-	public LexerATNSimulator(@Nullable Lexer recog, @NotNull ATN atn) {
-		super(atn);
-		dfa = new DFA[atn.modeToStartState.size()];
-		for (int i=0; i<atn.modeToStartState.size(); i++) {
-			dfa[i] = new DFA(atn.modeToStartState.get(i));
+	public LexerATNSimulator(@Nullable Lexer recog, @NotNull ATN atn,
+							 @NotNull DFA[] decisionToDFA,
+							 @NotNull PredictionContextCache sharedContextCache)
+	{
+		super(atn,sharedContextCache);
+		this.decisionToDFA = decisionToDFA;
+		if ( decisionToDFA[Lexer.DEFAULT_MODE]==null ) { // create all mode dfa
+			synchronized (this.decisionToDFA) {
+				if ( decisionToDFA[Lexer.DEFAULT_MODE]==null ) { // create all mode dfa
+					for (int i=0; i<atn.modeToStartState.size(); i++) {
+						this.decisionToDFA[i] = new DFA(atn.modeToStartState.get(i));
+					}
+				}
+			}
 		}
 		this.recog = recog;
 	}
@@ -154,14 +162,15 @@ public class LexerATNSimulator extends ATNSimulator {
 		int mark = input.mark();
 		traceBeginMatch(input, mode);
 		try {
-			if ( dfa[mode].s0==null ) {
+			DFA dfa = decisionToDFA[mode];
+			if ( dfa.s0==null ) {
 				return matchATN(input);
 			}
 			else {
-				return execDFA(input, dfa[mode].s0);
+				return execDFA(input, dfa.s0);
 			}
 		}
-        finally {
+		finally {
 			traceEndMatch();
 			input.release(mark);
 		}
@@ -189,11 +198,11 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		ATNConfigSet s0_closure = computeStartState(input, startState);
 		int old_mode = mode;
-		dfa[mode].s0 = addDFAState(s0_closure);
-		int predict = execATN(input, s0_closure, dfa[mode].s0);
+		decisionToDFA[mode].s0 = addDFAState(s0_closure);
+		int predict = execATN(input, s0_closure, decisionToDFA[mode].s0);
 
 		if ( debug ) {
-			System.out.format("DFA after matchATN: %s\n", dfa[old_mode].toLexerString());
+			System.out.format("DFA after matchATN: %s\n", decisionToDFA[old_mode].toLexerString());
 		}
 
 		tracePredict(predict);
@@ -247,7 +256,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			t = input.LA(1);
 		}
 
-		ATNConfigSet reach = prevAccept.dfaState != null ? prevAccept.dfaState.configset : null;
+		ATNConfigSet reach = prevAccept.dfaState != null ? prevAccept.dfaState.configs : null;
 		return failOrAccept(prevAccept, input, reach, t);
 	}
 
@@ -289,7 +298,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			ATNConfigSet reach = null;
 			if (s != null) {
 				if ( s.edges != null && t < s.edges.length && t > CharStream.EOF ) {
-					closure = s.configset;
+					closure = s.configs;
 					target = s.edges[t];
 					if (target == ERROR) {
 						break;
@@ -299,7 +308,7 @@ public class LexerATNSimulator extends ATNSimulator {
 							System.out.println("reuse state "+s.stateNumber+
 											   " edge to "+target.stateNumber);
 						}
-						reach = target.configset;
+						reach = target.configs;
 					}
 				}
 			}
@@ -325,7 +334,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 
 				// Did we hit a stop state during reach op?
-				processAcceptConfigs(input, reach);
+				reach = processAcceptConfigs(input, reach);
 
 				// Add an edge from s to target DFA found/created for reach
 				target = addDFAEdge(s, t, reach);
@@ -387,19 +396,19 @@ public class LexerATNSimulator extends ATNSimulator {
 				Transition trans = c.state.transition(ti);
 				ATNState target = getReachableTarget(trans, t);
 				if ( target!=null ) {
-					closure(new ATNConfig(c, target), reach);
+					closure(new LexerATNConfig((LexerATNConfig)c, target), reach);
 				}
 			}
 		}
 	}
 
-	protected void processAcceptConfigs(@NotNull CharStream input, @NotNull ATNConfigSet reach) {
+	protected ATNConfigSet processAcceptConfigs(@NotNull CharStream input, @NotNull ATNConfigSet reach) {
 		if ( debug ) {
 			System.out.format("processAcceptConfigs: reach=%s, prevAccept=%s, prevIndex=%d\n",
 						 	  reach, prevAccept.config, prevAccept.index);
 		}
 		for (int ci=0; ci<reach.size(); ci++) {
-			ATNConfig c = reach.get(ci);
+			LexerATNConfig c = (LexerATNConfig)reach.get(ci);
 			if ( c.state instanceof RuleStopState) {
 				if ( debug ) {
 					System.out.format("processAcceptConfigs: hit accept config %s index %d\n",
@@ -419,18 +428,19 @@ public class LexerATNSimulator extends ATNSimulator {
 					if ( debug ) {
 						System.out.format("markExecSettings for %s @ index=%d, line %d:%d\n", c, index, prevAccept.line, prevAccept.charPos);
 					}
-					captureSimState(prevAccept, input, reach, c);
+					captureSimState(prevAccept, input, c);
 				}
 
 				// if we reach lexer accept state, toss out any configs in rest
 				// of configs work list associated with this rule (config.alt);
 				// that rule is done. this is how we cut off nongreedy .+ loops.
-				deleteWildcardConfigsForAlt(reach, ci, c.alt); // CAUSES INF LOOP if reach not closure
+				reach = deleteWildcardConfigsForAlt(reach, ci, c.alt);
 
 				 // move to next char, looking for longer match
 				// (we continue processing if there are states in reach)
 			}
 		}
+		return reach;
 	}
 
 	protected void accept(@NotNull CharStream input, int ruleIndex, int actionIndex,
@@ -476,7 +486,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			}
 
 			return null;
-			
+
 		case Transition.SET:
 			SetTransition st = (SetTransition)trans;
 			if ( st.set.contains(t) ) {
@@ -501,51 +511,54 @@ public class LexerATNSimulator extends ATNSimulator {
 			}
 
 			return null;
-			
+
 		case Transition.WILDCARD:
 			if (t != CharStream.EOF) {
 				return trans.target;
 			}
-			
+
 			return null;
-			
+
 		default:
 			return null;
 		}
 	}
 
-	public void deleteWildcardConfigsForAlt(@NotNull ATNConfigSet closure, int ci, int alt) {
+	/** Delete configs for alt following ci. Closure is unmodified; copy returned. */
+	public ATNConfigSet deleteWildcardConfigsForAlt(@NotNull ATNConfigSet closure, int ci, int alt) {
+		ATNConfigSet dup = new ATNConfigSet(closure);
 		int j=ci+1;
-		while ( j<closure.size() ) {
-			ATNConfig c = closure.get(j);
-			boolean isWildcard = c.state.getClass() == ATNState.class &&
-				c.state.transition(0).getClass() == WildcardTransition.class;
+		while ( j < dup.size() ) {
+			ATNConfig c = dup.get(j);
+			boolean isWildcard = c.state.getClass() == ATNState.class && // plain state only, not rulestop etc..
+				c.state.transition(0) instanceof WildcardTransition;
 			if ( c.alt == alt && isWildcard ) {
 				if ( debug ) {
 					System.out.format("deleteWildcardConfigsForAlt %s\n", c);
 				}
 
-				closure.remove(j);
+				dup.remove(j);
 			}
 			else j++;
 		}
+		return dup;
 	}
 
 	@NotNull
 	protected ATNConfigSet computeStartState(@NotNull IntStream input,
 											 @NotNull ATNState p)
 	{
-		RuleContext initialContext = EMPTY_LEXER_RULE_CONTEXT;
+		PredictionContext initialContext = PredictionContext.EMPTY;
 		ATNConfigSet configs = new ATNConfigSet();
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
-			ATNConfig c = new ATNConfig(target, i+1, initialContext);
+			LexerATNConfig c = new LexerATNConfig(target, i+1, initialContext);
 			closure(c, configs);
 		}
 		return configs;
 	}
 
-	protected void closure(@NotNull ATNConfig config, @NotNull ATNConfigSet configs) {
+	protected void closure(@NotNull LexerATNConfig config, @NotNull ATNConfigSet configs) {
 		if ( debug ) {
 			System.out.println("closure("+config.toString(recog, true)+")");
 		}
@@ -566,12 +579,18 @@ public class LexerATNSimulator extends ATNSimulator {
 				configs.add(config);
 				return;
 			}
-			RuleContext newContext = config.context.parent; // "pop" invoking state
-			ATNState invokingState = atn.states.get(config.context.invokingState);
-			RuleTransition rt = (RuleTransition)invokingState.transition(0);
-			ATNState retState = rt.followState;
-			ATNConfig c = new ATNConfig(retState, config.alt, newContext);
-			closure(c, configs);
+			if ( config.context!=null && !config.context.isEmpty() ) {
+				for (SingletonPredictionContext ctx : config.context) {
+					if ( !ctx.isEmpty() ) {
+						PredictionContext newContext = ctx.parent; // "pop" invoking state
+						ATNState invokingState = atn.states.get(ctx.invokingState);
+						RuleTransition rt = (RuleTransition)invokingState.transition(0);
+						ATNState retState = rt.followState;
+						LexerATNConfig c = new LexerATNConfig(retState, config.alt, newContext);
+						closure(c, configs);
+					}
+				}
+			}
 			return;
 		}
 
@@ -583,77 +602,65 @@ public class LexerATNSimulator extends ATNSimulator {
 		ATNState p = config.state;
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			Transition t = p.transition(i);
-			ATNConfig c = getEpsilonTarget(config, t, configs);
+			LexerATNConfig c = getEpsilonTarget(config, t, configs);
 			if ( c!=null ) closure(c, configs);
 		}
 	}
 
 	// side-effect: can alter configs.hasSemanticContext
 	@Nullable
-	public ATNConfig getEpsilonTarget(@NotNull ATNConfig config,
+	public LexerATNConfig getEpsilonTarget(@NotNull LexerATNConfig config,
 									  @NotNull Transition t,
 									  @NotNull ATNConfigSet configs)
 	{
 		ATNState p = config.state;
-		ATNConfig c;
 
+		LexerATNConfig c = null;
 		switch (t.getSerializationType()) {
-		case Transition.RULE:
-			RuleContext newContext =
-				new RuleContext(config.context, p.stateNumber);
-			c = new ATNConfig(config, t.target, newContext);
-			break;
-			
-		case Transition.PREDICATE:
-			if (recog == null) {
-				System.out.format("Predicates cannot be evaluated without a recognizer; assuming true.\n");
-			}
+			case Transition.RULE:
+				PredictionContext newContext =
+					new SingletonPredictionContext(config.context, p.stateNumber);
+				c = new LexerATNConfig(config, t.target, newContext);
+				break;
+			case Transition.PREDICATE:
+//				if (recog == null) {
+//					System.out.format("Predicates cannot be evaluated without a recognizer; assuming true.\n");
+//				}
 
-			/*  Track traversing semantic predicates. If we traverse,
-			    we cannot add a DFA state for this "reach" computation
-				because the DFA would not test the predicate again in the
-				future. Rather than creating collections of semantic predicates
-				like v3 and testing them on prediction, v4 will test them on the
-				fly all the time using the ATN not the DFA. This is slower but
-				semantically it's not used that often. One of the key elements to
-				this predicate mechanism is not adding DFA states that see
-				predicates immediately afterwards in the ATN. For example,
+				/*  Track traversing semantic predicates. If we traverse,
+				 we cannot add a DFA state for this "reach" computation
+				 because the DFA would not test the predicate again in the
+				 future. Rather than creating collections of semantic predicates
+				 like v3 and testing them on prediction, v4 will test them on the
+				 fly all the time using the ATN not the DFA. This is slower but
+				 semantically it's not used that often. One of the key elements to
+				 this predicate mechanism is not adding DFA states that see
+				 predicates immediately afterwards in the ATN. For example,
 
-				a : ID {p1}? | ID {p2}? ;
+				 a : ID {p1}? | ID {p2}? ;
 
-				should create the start state for rule 'a' (to save start state
-				competition), but should not create target of ID state. The
-				collection of ATN states the following ID references includes
-				states reached by traversing predicates. Since this is when we
-				test them, we cannot cash the DFA state target of ID.
-			*/
-			PredicateTransition pt = (PredicateTransition)t;
-			if ( debug ) {
-				System.out.println("EVAL rule "+pt.ruleIndex+":"+pt.predIndex);
-			}
-			configs.hasSemanticContext = true;
-			if ( recog == null || recog.sempred(null, pt.ruleIndex, pt.predIndex) ) {
-				c = new ATNConfig(config, t.target, pt.getPredicate());
-			}
-			else {
-				c = null;
-			}
-			
-			break;
-			
-		case Transition.ACTION:
+				 should create the start state for rule 'a' (to save start state
+				 competition), but should not create target of ID state. The
+				 collection of ATN states the following ID references includes
+				 states reached by traversing predicates. Since this is when we
+				 test them, we cannot cash the DFA state target of ID.
+			 */
+				PredicateTransition pt = (PredicateTransition)t;
+				if ( debug ) {
+					System.out.println("EVAL rule "+pt.ruleIndex+":"+pt.predIndex);
+				}
+				configs.hasSemanticContext = true;
+				if ( recog == null || recog.sempred(null, pt.ruleIndex, pt.predIndex) ) {
+					c = new LexerATNConfig(config, t.target, pt.getPredicate());
+				}
+				break;
 			// ignore actions; just exec one per rule upon accept
-			c = new ATNConfig(config, t.target);
-			c.lexerActionIndex = ((ActionTransition)t).actionIndex;
-			break;
-			
-		case Transition.EPSILON:
-			c = new ATNConfig(config, t.target);
-			break;
-
-		default:
-			c = null;
-			break;
+			case Transition.ACTION:
+				c = new LexerATNConfig(config, t.target, ((ActionTransition)t).actionIndex);
+				break;
+			case Transition.EPSILON:
+				c = new LexerATNConfig(config, t.target);
+				break;
 		}
 
 		return c;
@@ -665,14 +672,14 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( dfa_debug ) {
 			System.out.format("no edge for %s\n", getTokenName(input.LA(1)));
 			System.out.format("ATN exec upon %s at DFA state %d = %s\n",
-							  input.getText(Interval.of(startIndex, input.index())), s.stateNumber, s.configset);
+							  input.getText(Interval.of(startIndex, input.index())), s.stateNumber, s.configs);
 		}
 
-		int ttype = execATN(input, s.configset, s);
+		int ttype = execATN(input, s.configs, s);
 
 		if ( dfa_debug ) {
 			System.out.format("back from DFA update, ttype=%d, dfa[mode %d]=\n%s\n",
-				ttype, mode, dfa[mode].toLexerString());
+							  ttype, mode, decisionToDFA[mode].toLexerString());
 		}
 
 		// action already executed by ATN
@@ -694,8 +701,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	protected void captureSimState(@NotNull SimState settings,
 								   @NotNull CharStream input,
-								   @NotNull ATNConfigSet ATNConfigs,
-								   @NotNull ATNConfig config)
+								   @NotNull LexerATNConfig config)
 	{
 		settings.index = input.index();
 		settings.line = line;
@@ -727,11 +733,14 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	protected void addDFAEdge(@NotNull DFAState p, int t, @NotNull DFAState q) {
 		if (t < 0 || t > MAX_DFA_EDGE) return; // Only track edges within the DFA bounds
-		if ( p.edges==null ) {
-			//  make room for tokens 1..n and -1 masquerading as index 0
-			p.edges = new DFAState[MAX_DFA_EDGE+1]; // TODO: make adaptive
+		DFA dfa = decisionToDFA[mode];
+		synchronized (dfa) {
+			if ( p.edges==null ) {
+				//  make room for tokens 1..n and -1 masquerading as index 0
+				p.edges = new DFAState[MAX_DFA_EDGE+1]; // TODO: make adaptive
+			}
+			p.edges[t] = q; // connect
 		}
-		p.edges[t] = q; // connect
 	}
 
 	/** Add a new DFA state if there isn't one with this set of
@@ -745,11 +754,6 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( configs.hasSemanticContext ) return null;
 
 		DFAState proposed = new DFAState(configs);
-		DFAState existing = dfa[mode].states.get(proposed);
-		if ( existing!=null ) return existing;
-
-		DFAState newState = proposed;
-
 		ATNConfig firstConfigWithRuleStopState = null;
 		for (ATNConfig c : configs) {
 			if ( c.state instanceof RuleStopState )	{
@@ -759,22 +763,31 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		if ( firstConfigWithRuleStopState!=null ) {
-			newState.isAcceptState = true;
-			newState.lexerRuleIndex = firstConfigWithRuleStopState.state.ruleIndex;
-			newState.lexerActionIndex = firstConfigWithRuleStopState.lexerActionIndex;
-			newState.prediction = atn.ruleToTokenType[newState.lexerRuleIndex];
+			proposed.isAcceptState = true;
+			proposed.lexerRuleIndex = firstConfigWithRuleStopState.state.ruleIndex;
+			proposed.lexerActionIndex =
+				((LexerATNConfig)firstConfigWithRuleStopState).lexerActionIndex;
+			proposed.prediction = atn.ruleToTokenType[proposed.lexerRuleIndex];
 		}
 
-		newState.stateNumber = dfa[mode].states.size();
-		newState.configset = new ATNConfigSet();
-		newState.configset.addAll(configs);
-		dfa[mode].states.put(newState, newState);
-		return newState;
+		DFA dfa = decisionToDFA[mode];
+		synchronized (dfa) {
+			DFAState existing = dfa.states.get(proposed);
+			if ( existing!=null ) return existing;
+
+			DFAState newState = proposed;
+
+			newState.stateNumber = dfa.states.size();
+			configs.setReadonly(true);
+			newState.configs = configs;
+			decisionToDFA[mode].states.put(newState, newState);
+			return newState;
+		}
 	}
 
 	@Nullable
 	public DFA getDFA(int mode) {
-		return dfa[mode];
+		return decisionToDFA[mode];
 	}
 
 	/** Get the text of the current token from an *action* in lexer not
@@ -896,7 +909,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	public final void tracePushMode(int mode) {
 		if (trace) {
-			traceByteSlow(LexerOpCode.PushMode, (byte)mode);
+			traceByteSlow(LexerOpCode.PushMode, (byte) mode);
 		}
 	}
 
