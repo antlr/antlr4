@@ -364,18 +364,23 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	public Token consume() {
 		Token o = getCurrentToken();
 		getInputStream().consume();
-		TerminalNode tnode = null;
-		if (_buildParseTrees) {
+		boolean hasListener = _parseListeners != null && !_parseListeners.isEmpty();
+		if (_buildParseTrees || hasListener) {
 			if ( _errHandler.inErrorRecoveryMode(this) ) {
-				tnode = _ctx.addErrorNode(o);
+				ErrorNode<Token> node = _ctx.addErrorNode(o);
+				if (_parseListeners != null) {
+					for (ParseTreeListener<Token> listener : _parseListeners) {
+						listener.visitErrorNode(node);
+					}
+				}
 			}
 			else {
-				tnode = _ctx.addChild(o);
-			}
-		}
-		if ( _parseListeners != null) {
-			for (ParseTreeListener<Token> l : _parseListeners) {
-				l.visitTerminal(tnode);
+				TerminalNode<Token> node = _ctx.addChild(o);
+				if (_parseListeners != null) {
+					for (ParseTreeListener<Token> listener : _parseListeners) {
+						listener.visitTerminal(node);
+					}
+				}
 			}
 		}
 		return o;
