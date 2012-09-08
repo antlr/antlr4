@@ -139,14 +139,16 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 	public void exitRule(ParseTreeListener<Symbol> listener) { }
 
 	/** Does not set parent link; other add methods do that */
-	public void addChild(TerminalNode<Symbol> t) {
+	public TerminalNode addChild(TerminalNode<Symbol> t) {
 		if ( children==null ) children = new ArrayList<ParseTree>();
 		children.add(t);
+		return t;
 	}
 
-	public void addChild(RuleContext ruleInvocation) {
+	public RuleContext addChild(RuleContext ruleInvocation) {
 		if ( children==null ) children = new ArrayList<ParseTree>();
 		children.add(ruleInvocation);
+		return ruleInvocation;
 	}
 
 	/** Used by enterOuterAlt to toss out a RuleContext previously added as
@@ -164,10 +166,11 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext {
 //		states.add(s);
 //	}
 
-	public void addChild(Symbol matchedToken) {
+	public TerminalNode addChild(Symbol matchedToken) {
 		TerminalNodeImpl<Symbol> t = new TerminalNodeImpl<Symbol>(matchedToken);
 		addChild(t);
 		t.parent = this;
+		return t;
 	}
 
 	public ErrorNode<Symbol> addErrorNode(Symbol badToken) {
