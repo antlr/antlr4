@@ -1296,7 +1296,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					if ( debug ) System.out.println("dips into outer ctx: "+c);
 				}
 				else if (t instanceof RuleTransition) {
-					if (optimize_tail_calls && ((RuleTransition)t).optimizedTailCall) {
+					if (optimize_tail_calls && ((RuleTransition)t).optimizedTailCall && !PredictionContext.isEmptyLocal(config.getContext())) {
 						assert c.getContext() == config.getContext();
 						if (newDepth <= 0) {
 							// the pop/push of a tail call would keep the depth
@@ -1390,7 +1390,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		ATNState p = config.getState();
 		PredictionContext newContext;
 
-		if (optimize_tail_calls && t.optimizedTailCall) {
+		if (optimize_tail_calls && t.optimizedTailCall && !PredictionContext.isEmptyLocal(config.getContext())) {
 			newContext = config.getContext();
 		}
 		else if (contextCache != null) {
