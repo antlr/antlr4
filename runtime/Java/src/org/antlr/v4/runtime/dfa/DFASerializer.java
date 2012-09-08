@@ -89,7 +89,7 @@ public class DFASerializer {
                 stateStr = ":s"+n+"=>"+s.prediction;
             }
 		}
-		else if ( s.isCtxSensitive ) {
+		else if ( s.requiresFullContext) {
 			stateStr = "s"+n+"^";
 		}
 		return stateStr;

@@ -139,7 +139,7 @@ public class DOTGenerator {
 		if ( s.isAcceptState ) {
 			buf.append("=>").append(s.prediction);
 		}
-		if ( s.isCtxSensitive ) {
+		if ( s.requiresFullContext) {
 			buf.append("^");
 		}
 		if ( grammar!=null && grammar.tool.verbose_dfa ) {

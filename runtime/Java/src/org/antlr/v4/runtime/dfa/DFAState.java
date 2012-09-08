@@ -89,7 +89,7 @@ public class DFAState {
 	 *  Future execDFA() invocations immediately jumped doing full context
 	 *  prediction if this field is true.
 	 */
-	public boolean isCtxSensitive;
+	public boolean requiresFullContext;
 
 	/** During SLL parsing, this is a list of predicates associated with the
 	 *  ATN configurations of the DFA state. When we have predicates,
