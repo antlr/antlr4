@@ -169,6 +169,7 @@ public class Grammar implements AttributeResolver {
 	 *  field will have entries both mapped to 35.
 	 */
 	public Map<String, Integer> stringLiteralToTypeMap = new LinkedHashMap<String, Integer>();
+
 	/** Reverse index for stringLiteralToTypeMap.  Indexed with raw token type.
 	 *  0 is invalid. */
 	public List<String> typeToStringLiteralList = new ArrayList<String>();

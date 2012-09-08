@@ -1,5 +1,6 @@
 package org.antlr.v4.test;
 
+import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
 /** */
@@ -90,4 +91,24 @@ public class TestSymbolIssues extends BaseTest {
     @Test public void testB() { super.testErrors(B, false); }
 	@Test public void testD() { super.testErrors(D, false); }
 	@Test public void testE() { super.testErrors(E, false); }
+
+	@Test public void testStringLiteralRedefs() throws Exception {
+		String grammar =
+			"lexer grammar L;\n" +
+			"A : 'a' ;\n" +
+			"mode X;\n"+
+			"B : 'a' ;\n"+
+			"mode Y;\n"+
+			"C : 'a' ;\n";
+
+		LexerGrammar g = new LexerGrammar(grammar);
+
+		String expectedTokenIDToTypeMap = "{EOF=-1, A=1, B=2, C=3}";
+		String expectedStringLiteralToTypeMap = "{}";
+		String expectedTypeToTokenList = "[A, B, C]";
+
+		assertEquals(expectedTokenIDToTypeMap, g.tokenNameToTypeMap.toString());
+		assertEquals(expectedStringLiteralToTypeMap, g.stringLiteralToTypeMap.toString());
+		assertEquals(expectedTypeToTokenList, realElements(g.typeToTokenList).toString());
+	}
 }
