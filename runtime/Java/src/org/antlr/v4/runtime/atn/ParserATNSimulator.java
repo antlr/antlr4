@@ -606,7 +606,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 												 loopsSimulateTailRecursion,
 												 false);
 			if ( reach==null ) {
-				// TODO: if any configs in previous dipped into outer context, that
+				// if any configs in previous dipped into outer context, that
 				// means that input up to t actually finished entry rule
 				// at least for SLL decision. Full LL doesn't dip into outer
 				// so don't need special case.
@@ -683,7 +683,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 												  greedy,
 												  loopsSimulateTailRecursion,
 												  true);
-							// we have write lock already, no need to relock
 							predictedAlt = execATNWithFullContext(dfa, D, s0_closure,
 																  input, startIndex,
 																  outerContext,
@@ -804,7 +803,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 //							   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
 			reach = computeReachSet(previous, t, greedy, true, fullCtx);
 			if ( reach==null ) {
-				// TODO: if any configs in previous dipped into outer context, that
+				// if any configs in previous dipped into outer context, that
 				// means that input up to t actually finished entry rule
 				// at least for LL decision. Full LL doesn't dip into outer
 				// so don't need special case.

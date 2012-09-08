@@ -220,8 +220,7 @@ public class TestParserExec extends BaseTest {
 								  "if x if x a else b", true);
 		String expecting = "";
 		assertEquals(expecting, found);
-		assertEquals("line 1:12 reportAttemptingFullContext d=1, input='else'\n",
-					 this.stderrDuringParse);
+		assertNull(this.stderrDuringParse);
 	}
 
 }
