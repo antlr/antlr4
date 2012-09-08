@@ -40,7 +40,6 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -365,15 +364,18 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	public Token consume() {
 		Token o = getCurrentToken();
 		getInputStream().consume();
+		TerminalNode tnode = null;
 		if (_buildParseTrees) {
 			if ( _errHandler.inErrorRecoveryMode(this) ) {
-				_ctx.addErrorNode(o);
+				tnode = _ctx.addErrorNode(o);
 			}
-			else _ctx.addChild(o);
+			else {
+				tnode = _ctx.addChild(o);
+			}
 		}
 		if ( _parseListeners != null) {
 			for (ParseTreeListener<Token> l : _parseListeners) {
-				l.visitTerminal(new TerminalNodeImpl<Token>(o));
+				l.visitTerminal(tnode);
 			}
 		}
 		return o;
