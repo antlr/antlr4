@@ -364,6 +364,8 @@ public class Tool {
 		if ( g.ast!=null && internalOption_PrintGrammarTree ) System.out.println(g.ast.toStringTree());
 		//g.ast.inspect();
 
+		if ( g.ast.hasErrors ) return;
+
 		int prevErrors = errMgr.getNumErrors();
 		// MAKE SURE GRAMMAR IS SEMANTICALLY CORRECT (FILL IN GRAMMAR OBJECT)
 		SemanticPipeline sem = new SemanticPipeline(g);
