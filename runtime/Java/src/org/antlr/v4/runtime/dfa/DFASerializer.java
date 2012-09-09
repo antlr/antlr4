@@ -80,13 +80,13 @@ public class DFASerializer {
 				Map<Integer, DFAState> edges = s.getEdgeMap();
 				Map<Integer, DFAState> contextEdges = s.getContextEdgeMap();
 				for (Map.Entry<Integer, DFAState> entry : edges.entrySet()) {
-					if ((entry.getValue() == null || entry.getValue() == ATNSimulator.ERROR) && (!s.isContextSensitive() || !s.contextSymbols.contains(entry.getKey()))) {
+					if ((entry.getValue() == null || entry.getValue() == ATNSimulator.ERROR) && !s.isContextSymbol(entry.getKey())) {
 						continue;
 					}
 
 					boolean contextSymbol = false;
 					buf.append(getStateString(s)).append("-").append(getEdgeLabel(entry.getKey())).append("->");
-					if (s.isContextSensitive() && s.contextSymbols.contains(entry.getKey())) { // indexing in the edges array starts with -1 (EOF)
+					if (s.isContextSymbol(entry.getKey())) {
 						buf.append("!");
 						contextSymbol = true;
 					}

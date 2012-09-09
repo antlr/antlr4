@@ -439,7 +439,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		while ( true ) {
 			if ( dfa_debug ) System.out.println("DFA state "+s.stateNumber+" LA(1)=="+getLookaheadName(input));
 			if ( state.useContext ) {
-				while ( s.isContextSensitive() && s.contextSymbols.contains(t) ) {
+				while ( s.isContextSymbol(t) ) {
 					DFAState next = null;
 					if (remainingOuterContext != null) {
 						remainingOuterContext = skipTailCalls(remainingOuterContext);
@@ -755,7 +755,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		DFAState s = previous.s0;
 		if ( useContext ) {
-			while ( s.isContextSensitive() && s.contextSymbols.contains(t) ) {
+			while ( s.isContextSymbol(t) ) {
 				DFAState next = null;
 				if (remainingGlobalContext != null) {
 					remainingGlobalContext = skipTailCalls(remainingGlobalContext);
@@ -1650,7 +1650,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				}
 
 				from.setContextSensitive(atn);
-				from.contextSymbols.add(t);
+				from.setContextSymbol(t);
 				DFAState next = from.getContextTarget(context);
 				if (next != null) {
 					from = next;

@@ -38,6 +38,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -97,7 +98,7 @@ public class DFAState {
 
 	/** Symbols in this set require a global context transition before matching an input symbol. */
 	@Nullable
-	public Set<Integer> contextSymbols;
+	private BitSet contextSymbols;
 
 	/** During SLL parsing, this is a list of predicates associated with the
 	 *  ATN configurations of the DFA state. When we have predicates,
@@ -138,13 +139,30 @@ public class DFAState {
 		return contextEdges != null;
 	}
 
+	public final boolean isContextSymbol(int symbol) {
+		if (!isContextSensitive() || symbol < minSymbol) {
+			return false;
+		}
+
+		return contextSymbols.get(symbol - minSymbol);
+	}
+
+	public final void setContextSymbol(int symbol) {
+		assert isContextSensitive();
+		if (symbol < minSymbol) {
+			return;
+		}
+
+		contextSymbols.set(symbol - minSymbol);
+	}
+
 	public synchronized void setContextSensitive(ATN atn) {
 		assert !configs.isOutermostConfigSet();
 		if (isContextSensitive()) {
 			return;
 		}
 
-		contextSymbols = new HashSet<Integer>();
+		contextSymbols = new BitSet();
 		contextEdges = new SingletonEdgeMap<DFAState>(-1, atn.states.size() - 1);
 	}
 
