@@ -28,6 +28,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Utils;
 
@@ -127,6 +128,24 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		}
 
 		// if (!readonly && set.isReadOnly()) -> addAll is called from clone()
+	}
+
+	/**
+	 * Get the set of all alternatives represented by configurations in this
+	 * set.
+	 */
+	@NotNull
+	public BitSet getRepresentedAlternatives() {
+		if (conflictingAlts != null) {
+			return (BitSet)conflictingAlts.clone();
+		}
+
+		BitSet alts = new BitSet();
+		for (ATNConfig config : this) {
+			alts.set(config.getAlt());
+		}
+
+		return alts;
 	}
 
 	public boolean isReadOnly() {

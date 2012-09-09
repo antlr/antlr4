@@ -30,7 +30,6 @@
 package org.antlr.v4.runtime.dfa;
 
 import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.atn.SemanticContext;
@@ -40,10 +39,8 @@ import org.antlr.v4.runtime.misc.Nullable;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 /** A DFA state represents a set of possible ATN configurations.
  *  As Aho, Sethi, Ullman p. 117 says "The DFA uses its state
@@ -236,20 +233,6 @@ public class DFAState {
 		}
 
 		return map;
-	}
-
-	/** Get the set of all alts mentioned by all ATN configurations in this
-	 *  DFA state.
-	 */
-	public Set<Integer> getAltSet() {
-		Set<Integer> alts = new HashSet<Integer>();
-		if ( configs!=null ) {
-			for (ATNConfig c : configs) {
-				alts.add(c.getAlt());
-			}
-		}
-		if ( alts.isEmpty() ) return null;
-		return alts;
 	}
 
 	/** A decent hash for a DFA state is the sum of the ATN state/alt pairs. */

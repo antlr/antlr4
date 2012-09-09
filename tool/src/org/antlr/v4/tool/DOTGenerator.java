@@ -51,14 +51,13 @@ import org.antlr.v4.runtime.atn.StarLoopbackState;
 import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
-import org.antlr.v4.runtime.misc.IntegerList;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupDir;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -140,41 +139,33 @@ public class DOTGenerator {
 			buf.append("=>").append(s.prediction);
 		}
 		if ( grammar!=null && grammar.tool.verbose_dfa ) {
-			Set<Integer> alts = s.getAltSet();
-			if ( alts!=null ) {
-				buf.append("\\n");
-				// separate alts
-				IntegerList altList = new IntegerList();
-				altList.addAll(alts);
-				altList.sort();
-				Set<ATNConfig> configurations = s.configs;
-				for (int altIndex = 0; altIndex < altList.size(); altIndex++) {
-					int alt = altList.get(altIndex);
-					if ( altIndex>0 ) {
+			BitSet alts = s.configs.getRepresentedAlternatives();
+			buf.append("\\n");
+			Set<ATNConfig> configurations = s.configs;
+			for (int alt = alts.nextSetBit(0); alt >= 0; alt = alts.nextSetBit(alt + 1)) {
+				if ( alt>alts.nextSetBit(0) ) {
+					buf.append("\\n");
+				}
+				buf.append("alt");
+				buf.append(alt);
+				buf.append(':');
+				// get a list of configs for just this alt
+				// it will help us print better later
+				List<ATNConfig> configsInAlt = new ArrayList<ATNConfig>();
+				for (ATNConfig c : configurations) {
+					if ( c.getAlt()!=alt ) continue;
+					configsInAlt.add(c);
+				}
+				int n = 0;
+				for (int cIndex = 0; cIndex < configsInAlt.size(); cIndex++) {
+					ATNConfig c = configsInAlt.get(cIndex);
+					n++;
+					buf.append(c.toString(null, false));
+					if ( (cIndex+1)<configsInAlt.size() ) {
+						buf.append(", ");
+					}
+					if ( n%5==0 && (configsInAlt.size()-cIndex)>3 ) {
 						buf.append("\\n");
-					}
-					buf.append("alt");
-					buf.append(alt);
-					buf.append(':');
-					// get a list of configs for just this alt
-					// it will help us print better later
-					List<ATNConfig> configsInAlt = new ArrayList<ATNConfig>();
-					for (Iterator<ATNConfig> it = configurations.iterator(); it.hasNext();) {
-						ATNConfig c = it.next();
-						if ( c.getAlt()!=alt ) continue;
-						configsInAlt.add(c);
-					}
-					int n = 0;
-					for (int cIndex = 0; cIndex < configsInAlt.size(); cIndex++) {
-						ATNConfig c = configsInAlt.get(cIndex);
-						n++;
-						buf.append(c.toString(null, false));
-						if ( (cIndex+1)<configsInAlt.size() ) {
-							buf.append(", ");
-						}
-						if ( n%5==0 && (configsInAlt.size()-cIndex)>3 ) {
-							buf.append("\\n");
-						}
 					}
 				}
 			}
