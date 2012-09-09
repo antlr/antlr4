@@ -164,6 +164,8 @@ public class TestPerformance extends BaseTest {
 	private static final boolean OPTIMIZE_UNIQUE_CLOSURE = true;
 	private static final boolean OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS = true;
 	private static final boolean OPTIMIZE_TAIL_CALLS = true;
+	private static final boolean TAIL_CALL_PRESERVES_SLL = true;
+	private static final boolean TREAT_SLLK1_CONFLICT_AS_AMBIGUITY = false;
 
 	private static final boolean TWO_STAGE_PARSING = true;
 
@@ -693,6 +695,8 @@ public class TestPerformance extends BaseTest {
 						sharedParsers[thread].getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
 						sharedParsers[thread].getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
 						sharedParsers[thread].getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
+						sharedParsers[thread].getInterpreter().tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
+						sharedParsers[thread].getInterpreter().treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
 						sharedParsers[thread].setBuildParseTree(BUILD_PARSE_TREES);
 						if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
 							sharedParsers[thread].addParseListener(sharedListeners[thread]);
@@ -741,6 +745,8 @@ public class TestPerformance extends BaseTest {
 							sharedParsers[thread].getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
 							sharedParsers[thread].getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
 							sharedParsers[thread].getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
+							sharedParsers[thread].getInterpreter().tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
+							sharedParsers[thread].getInterpreter().treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
 							sharedParsers[thread].setBuildParseTree(BUILD_PARSE_TREES);
 							if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
 								sharedParsers[thread].addParseListener(sharedListeners[thread]);
