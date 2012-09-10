@@ -640,27 +640,32 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			DFAState D = nextState.s0;
 			ATNConfigSet reach = D.configs;
 
-			int predictedAlt = reach.getConflictingAlts() == null ? getUniqueAlt(reach) : ATN.INVALID_ALT_NUMBER;
-			if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
-				if (optimize_ll1
-					&& input.index() == startIndex
-					&& nextState.outerContext == nextState.remainingOuterContext
-					&& dfa.decision >= 0
-					&& greedy
-					&& !D.configs.hasSemanticContext())
-				{
-					if (t >= 0 && t <= Short.MAX_VALUE) {
-						int key = (dfa.decision << 16) + t;
-						atn.LL1Table.put(key, predictedAlt);
+			// predicted alt => accept state
+			assert D.isAcceptState || getUniqueAlt(reach) == ATN.INVALID_ALT_NUMBER;
+			// conflicted => accept state
+			assert D.isAcceptState || D.configs.getConflictingAlts() == null;
+
+			if (D.isAcceptState) {
+				int predictedAlt = reach.getConflictingAlts() == null ? getUniqueAlt(reach) : ATN.INVALID_ALT_NUMBER;
+				if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
+					if (optimize_ll1
+						&& input.index() == startIndex
+						&& nextState.outerContext == nextState.remainingOuterContext
+						&& dfa.decision >= 0
+						&& greedy
+						&& !D.configs.hasSemanticContext())
+					{
+						if (t >= 0 && t <= Short.MAX_VALUE) {
+							int key = (dfa.decision << 16) + t;
+							atn.LL1Table.put(key, predictedAlt);
+						}
+					}
+
+					if (useContext && always_try_local_context) {
+						reportContextSensitivity(dfa, nextState, startIndex, input.index());
 					}
 				}
-
-				if (useContext && always_try_local_context) {
-					reportContextSensitivity(dfa, nextState, startIndex, input.index());
-				}
-			}
-			else {
-				if ( D.configs.getConflictingAlts()!=null ) {
+				else if ( D.configs.getConflictingAlts()!=null ) {
 					predictedAlt = D.prediction;
 					if ( greedy ) {
 //						int k = input.index() - startIndex + 1; // how much input we used
@@ -699,36 +704,36 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						}
 					}
 				}
-			}
 
-			if ( !greedy && D.isAcceptState ) {
-				predictedAlt = D.prediction;
-			}
-
-			if ( D.isAcceptState && D.predicates != null ) {
-				int stopIndex = input.index();
-				input.seek(startIndex);
-				BitSet alts = evalSemanticContext(D.predicates, outerContext, reportAmbiguities);
-				D.prediction = ATN.INVALID_ALT_NUMBER;
-				switch (alts.cardinality()) {
-				case 0:
-					throw noViableAlt(input, outerContext, D.configs, startIndex);
-
-				case 1:
-					return alts.nextSetBit(0);
-
-				default:
-					// report ambiguity after predicate evaluation to make sure the correct
-					// set of ambig alts is reported.
-					if (reportAmbiguities) {
-						reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
-					}
-
-					return alts.nextSetBit(0);
+				if ( !greedy ) {
+					predictedAlt = D.prediction;
 				}
-			}
 
-			if ( D.isAcceptState ) return predictedAlt;
+				if ( D.predicates != null ) {
+					int stopIndex = input.index();
+					input.seek(startIndex);
+					BitSet alts = evalSemanticContext(D.predicates, outerContext, reportAmbiguities);
+					D.prediction = ATN.INVALID_ALT_NUMBER;
+					switch (alts.cardinality()) {
+					case 0:
+						throw noViableAlt(input, outerContext, D.configs, startIndex);
+
+					case 1:
+						return alts.nextSetBit(0);
+
+					default:
+						// report ambiguity after predicate evaluation to make sure the correct
+						// set of ambig alts is reported.
+						if (reportAmbiguities) {
+							reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
+						}
+
+						return alts.nextSetBit(0);
+					}
+				}
+
+				return predictedAlt;
+			}
 
 			previous = nextState;
 			input.consume();
