@@ -40,6 +40,8 @@ public abstract class AbstractEdgeMap<T> implements EdgeMap<T> {
 	protected final int maxIndex;
 
 	public AbstractEdgeMap(int minIndex, int maxIndex) {
+		// the allowed range (with minIndex and maxIndex inclusive) should be less than 2^32
+		assert maxIndex - minIndex + 1 >= 0;
 		this.minIndex = minIndex;
 		this.maxIndex = maxIndex;
 	}
