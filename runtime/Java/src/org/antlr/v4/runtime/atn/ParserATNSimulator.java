@@ -38,6 +38,7 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -1339,6 +1340,21 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	/**
 	 SLL analysis termination.
 
+	 This function is used just for SLL.  SLL can decide to give up any
+	 point, even immediately, failing over to full LL.  To be as efficient
+	 as possible, SLL only fails over when it's positive it can't get
+	 anywhere on more look ahead without seeing a conflict.
+
+	 assuming one stage parsing, an SLL confg set with only conflicting
+	 subsets should force failover to full LL, even if the config sets
+	 don't resolve to the same alternative like {1,2} and {3,4}. The only
+	 time SLL keeps going when there exists a conflicting subset, is when
+	 there is a set of nonconflicting conflicts.
+
+	 SLL stops when it sees only conflicting config subsets
+	 LL keeps going when there is uncertainty
+
+	 SLL can't evaluate them 1st because it needs to create the DFA cache.
 	 */
 	public boolean needMoreLookaheadSLL(@NotNull ATNConfigSet configs) {
 		return false;
@@ -1448,10 +1464,58 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	     => continue
 
 	 The function implementation tries to bail out as soon as
-	 possible. That means we can stop as soon as our final alt set gets
+	 possible. That means we can stop as soon as our viable alt set gets
 	 more than a single alternative in it.
+
+	 // First, map (s,_,x,_) -> altset for all configs
+	 for c in configs:
+	   map[c] U= c.alt  # map hash/equals uses s and x, not	alt and	not pred
+	 // Then, any singleton alternative sets do not conflict.
+	 nonconflicting = set [map[c] for c in configs if len(map[c])=1]
+	 viable_alts = nonconflicting
+	 // All other sets must be in a conflicting subset
+	 viable_alts = set [min(map[c]) for c in configs if len(map[c])>1]
+	 continue if len(viable_alts)>1
+
+	 or
+
+	 boolean continue(configs):
+	  for c in configs:
+	    map[c] U= c.alt  # map hash/equals uses s and x, not alt and not pred
+	  viable_alts = set()
+	  for e in map.entries:
+	    if len(e.value)==1:
+	      viable_alts.add(e.value)
+	      if len(viable_alts)>1: return true
+	    else:
+	      viable_alts.add(min(e.value))
+	  return len(viable_alts)>1
+
 	 */
 	public boolean needMoreLookaheadLL(@NotNull ATNConfigSet configs) {
+		class AltAndContextHashSet extends Array2DHashSet<ATNConfig> {
+			public AltAndContextHashSet() {
+				super(16,2);
+			}
+
+			/** Code is function of (s, _, ctx, _) */
+			@Override
+			public int hashCode(ATNConfig o) {
+				int hashCode = 7;
+				hashCode = 31 * hashCode + o.state.stateNumber;
+				hashCode = 31 * hashCode + o.context.hashCode();
+		        return hashCode;
+			}
+
+			@Override
+			public boolean equals(ATNConfig a, ATNConfig b) {
+				if ( a==b ) return true;
+				if ( a==null || b==null ) return false;
+				if ( hashCode(a) != hashCode(b) ) return false;
+				return a.state.stateNumber==b.state.stateNumber
+					&& b.context.equals(b.context);
+			}
+		}
 		return false;
 	}
 
