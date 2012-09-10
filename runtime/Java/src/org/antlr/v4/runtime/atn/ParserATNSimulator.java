@@ -38,8 +38,8 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
-import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
+import org.antlr.v4.runtime.misc.FlexibleHashMap;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -48,6 +48,7 @@ import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -654,7 +655,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				D.prediction = predictedAlt;
 			}
 			else {
-				boolean cont = needMoreLookaheadSLL(reach);
+//				boolean cont = needMoreLookaheadLL(reach);
 				D.configs.conflictingAlts = getConflictingAlts(reach);
 				if ( D.configs.conflictingAlts!=null ) {
 					if ( greedy ) {
@@ -826,6 +827,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 			reach.uniqueAlt = getUniqueAlt(reach);
 			if ( reach.uniqueAlt!=ATN.INVALID_ALT_NUMBER ) break;
+//			boolean cont = needMoreLookaheadLL(reach);
 			reach.conflictingAlts = getConflictingAlts(reach);
 			if ( reach.conflictingAlts!=null ) break;
 			previous = reach;
@@ -1492,31 +1494,54 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	  return len(viable_alts)>1
 
 	 */
+	class AltAndContextMap extends FlexibleHashMap<ATNConfig,BitSet> {
+		/** Code is function of (s, _, ctx, _) */
+		@Override
+		public int hashCode(ATNConfig o) {
+			int hashCode = 7;
+			hashCode = 31 * hashCode + o.state.stateNumber;
+			hashCode = 31 * hashCode + o.context.hashCode();
+	        return hashCode;
+		}
+
+		@Override
+		public boolean equals(ATNConfig a, ATNConfig b) {
+			if ( a==b ) return true;
+			if ( a==null || b==null ) return false;
+			if ( hashCode(a) != hashCode(b) ) return false;
+			return a.state.stateNumber==b.state.stateNumber
+				&& b.context.equals(b.context);
+		}
+	}
 	public boolean needMoreLookaheadLL(@NotNull ATNConfigSet configs) {
-		class AltAndContextHashSet extends Array2DHashSet<ATNConfig> {
-			public AltAndContextHashSet() {
-				super(16,2);
+		// for c in configs:
+        //   map[c] U= c.alt  # map hash/equals uses s and x, not alt and not pred
+		System.out.println(configs);
+		AltAndContextMap configToAlts = new AltAndContextMap();
+		for (ATNConfig c : configs) {
+			BitSet alts = configToAlts.get(c);
+			if ( alts==null ) {
+				alts = new BitSet();
+				configToAlts.put(c, alts);
 			}
-
-			/** Code is function of (s, _, ctx, _) */
-			@Override
-			public int hashCode(ATNConfig o) {
-				int hashCode = 7;
-				hashCode = 31 * hashCode + o.state.stateNumber;
-				hashCode = 31 * hashCode + o.context.hashCode();
-		        return hashCode;
+			alts.set(c.alt);
+		}
+		System.out.println(configToAlts);
+		BitSet viableAlts = new BitSet();
+		for (BitSet alts : configToAlts.values()) {
+			int firstOnBit = alts.nextSetBit(0);
+			if ( alts.cardinality()==1 ) {
+				int singleton = firstOnBit;
+				viableAlts.set(singleton);
 			}
-
-			@Override
-			public boolean equals(ATNConfig a, ATNConfig b) {
-				if ( a==b ) return true;
-				if ( a==null || b==null ) return false;
-				if ( hashCode(a) != hashCode(b) ) return false;
-				return a.state.stateNumber==b.state.stateNumber
-					&& b.context.equals(b.context);
+			else { // > 1
+				int minAlt = firstOnBit;
+				viableAlts.set(minAlt);
 			}
 		}
-		return false;
+		boolean go =  viableAlts.cardinality() > 1;
+		System.out.println("stop="+!go);
+		return go;
 	}
 
 	/**

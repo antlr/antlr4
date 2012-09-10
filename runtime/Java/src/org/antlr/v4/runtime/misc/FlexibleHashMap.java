@@ -1,7 +1,9 @@
 package org.antlr.v4.runtime.misc;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -92,6 +94,7 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 		}
 		// not there
 		bucket.add(new Entry(key, value));
+		n++;
 		return null;
 	}
 
@@ -112,7 +115,14 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 
 	@Override
 	public Collection<V> values() {
-		throw new UnsupportedOperationException();
+		List<V> a = new ArrayList<V>(size());
+		for (LinkedList<Entry> bucket : buckets) {
+			if ( bucket==null ) continue;
+			for (Entry e : bucket) {
+				a.add(e.value);
+			}
+		}
+		return a;
 	}
 
 	@Override
