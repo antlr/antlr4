@@ -653,6 +653,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				D.prediction = predictedAlt;
 			}
 			else {
+				boolean cont = needMoreLookaheadSLL(reach);
 				D.configs.conflictingAlts = getConflictingAlts(reach);
 				if ( D.configs.conflictingAlts!=null ) {
 					if ( greedy ) {
@@ -1333,6 +1334,125 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		PredictionContext newContext =
 			new SingletonPredictionContext(config.context, config.state.stateNumber);
 		return new ATNConfig(config, t.target, newContext);
+	}
+
+	/**
+	 SLL analysis termination.
+
+	 */
+	public boolean needMoreLookaheadSLL(@NotNull ATNConfigSet configs) {
+		return false;
+	}
+
+	/**
+	 Full LL analysis termination.
+
+	 Can we stop looking ahead during ATN simulation or is there some
+	 uncertainty as to which alternative we will ultimately pick, after
+	 consuming more input?  Even if there are partial conflicts, we might
+	 know that everything is going to resolve to the same minimum
+	 alt. That means we can stop since no more lookahead will change that
+	 fact. On the other hand, there might be multiple conflicts that
+	 resolve to different minimums.  That means we need more look ahead to
+	 decide which of those alternatives we should predict.
+
+	 The basic idea is to split the set of configurations down into a set
+	 with all configs that don't conflict with each other and then
+	 (possibly multiple) subsets of configurations that are mutually
+	 conflicting. Then reduce each set of configurations to the set of
+	 possible alternatives.  This is just the set of all alternatives
+	 within the nonconflicting set. It is the minimum alt of each
+	 conflicting subset. If the union of these alternatives sets is a
+	 singleton, then no amount of more lookahead will help us. We will
+	 always pick that alternative. If, however, there are more
+	 alternatives then we are uncertain which alt to predict and must
+	 continue looking for resolution. We may or may not discover an
+	 ambiguity in the future, even if there are no conflicting subsets
+	 this round.
+
+	 The biggest sin is to terminate early because it means we've made a
+	 decision but were uncertain as to the eventual outcome. We haven't
+	 used enough lookahead.  On the other hand, announcing a conflict too
+	 late is no big deal; you will still have the conflict. It's just
+	 inefficient.
+
+	 Semantic predicates for full LL aren't involved in this decision
+	 because the predicates are evaluated during start state computation.
+	 This set of configurations was derived from the initial subset with
+	 configurations holding false predicate stripped out.
+
+	 CONFLICTING CONFIGS
+
+	 Two configurations, (s, i, x) and (s, j, x'), conflict when i!=j but
+	 x = x'. Because we merge all (s, i, _) configurations together, that
+	 means that there are at most n configurations associated with state s
+	 for n possible alternatives in the decision. The merged stacks
+	 complicate the comparison of config contexts, x and x'. Sam checks to
+	 see if one is a subset of the other by calling merge and checking to
+	 see if the merged result is either x or x'. If the x associated with
+	 lowest alternative i is the superset, then i is the only possible
+	 prediction since the others resolve to min i as well. If, however, x
+	 is associated with j>i then at least one stack configuration for j is
+	 not in conflict with alt i. The algorithm should keep going, looking
+	 for more lookahead due to the uncertainty.
+
+	 For simplicity, I'm doing a simple equality check between x and x'
+	 that lets the algorithm continue to consume lookahead longer than
+	 necessary. I will check to see if it is efficient enough. The reason
+	 I like the simple equality is of course the simplicity but also
+	 because that is the test you need to detect the alternatives that are
+	 actually in conflict.  If all states report the same conflicting alt
+	 set, then we know we have the real ambiguity set.
+
+	 CONTINUE/STOP RULE
+
+	 Ok, here's the decision to keep going: continue if union of resolved
+	 alt sets from nonconflicting and conflicting subsets has more than
+	 one alt. The complete set of alternatives, [i for (_,i,_)], tells us
+	 which alternatives are still in the running for the amount of input
+	 we've consumed at this point. The conflicting sets let us to strip
+	 away configurations that won't lead to more states (because we
+	 resolve conflicts to the configuration with a minimum alternate for
+	 given conflicting set.)  The set of viable alternatives for a
+	 configuration set is therefore a subset of the complete [i for
+	 (_,i,_)] set.
+
+	 CASES:
+
+	 * no conflicts & > 1 alt in set => continue
+
+	 * (s, 1, x), (s, 2, x), (s, 3, z)
+	   (s', 1, y), (s', 2, y)
+	   yields nonconflicting set {3} U conflicting sets {1} U {1} = {1,3}
+	     => continue
+
+	 * (s, 1, x), (s, 2, x),
+	   (s', 1, y), (s', 2, y)
+	   (s'', 1, z)
+	   yields nonconflicting set you this {1} U conflicting sets {1} U {1} = {1}
+	     => stop and predict 1, announce ambiguity {1,2}
+
+	 * (s, 1, x), (s, 2, x),
+	   (s', 1, y), (s', 2, y)
+	   yields conflicting sets {1} U {1} = {1}
+	     => stop and predict 1, announce ambiguity {1,2}
+
+	 * (s, 1, x), (s, 2, x)
+	   (s', 2, y), (s', 3, y)
+	   yields conflicting sets {1} U {2} = {1,2}
+	     => continue
+
+	 * (s, 1, x), (s, 2, x)
+	   (s', 3, y), (s', 4, y)
+	   yields conflicting sets {1} U {3} = {1,3}
+	     => continue
+
+	 The function implementation tries to bail out as soon as
+	 possible. That means we can stop as soon as our final alt set gets
+	 more than a single alternative in it.
+	 */
+	public boolean needMoreLookaheadLL(@NotNull ATNConfigSet configs) {
+		return false;
 	}
 
 	/**
