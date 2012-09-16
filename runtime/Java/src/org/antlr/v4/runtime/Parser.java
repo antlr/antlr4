@@ -147,7 +147,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	 */
 	public Symbol match(int ttype) throws RecognitionException {
 		Symbol t = getCurrentToken();
-		if ( getInputStream().LA(1)==ttype ) {
+		if ( t.getType()==ttype ) {
 			_errHandler.endErrorCondition(this);
 			consume();
 		}
@@ -159,6 +159,24 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 				_ctx.addErrorNode(t);
 			}
 		}
+		return t;
+	}
+
+	public Symbol matchWildcard() throws RecognitionException {
+		Symbol t = getCurrentToken();
+		if (t.getType() > 0) {
+			_errHandler.endErrorCondition(this);
+			consume();
+		}
+		else {
+			t = _errHandler.recoverInline(this);
+			if (_buildParseTrees && t.getTokenIndex() == -1) {
+				// we must have conjured up a new token during single token insertion
+				// if it's not the current symbol
+				_ctx.addErrorNode(t);
+			}
+		}
+
 		return t;
 	}
 

@@ -446,7 +446,7 @@ CommonSetStuff(m, expr, capture, invert) ::= <<
 setState(<m.stateNumber>);
 <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>_input.LT(1);
 <capture>
-if ( <if(!invert)>!<endif>(<expr>) ) {
+if ( <if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>) ) {
 	<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>_errHandler.recoverInline(this);
 }
 consume();
@@ -454,7 +454,7 @@ consume();
 
 Wildcard(w) ::= <<
 setState(<w.stateNumber>);
-<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>_input.LT(1); consume();
+<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>matchWildcard();
 >>
 
 // ACTION STUFF
