@@ -797,7 +797,12 @@ public class TestPerformance extends BaseTest {
 			}
 
 			String sourceName = recognizer.getInputStream().getSourceName();
-			sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName+": " : "";
+			if (sourceName == null) {
+				sourceName = "";
+			} else if (!sourceName.isEmpty()) {
+				sourceName = String.format("%s:%d:%d: ", sourceName, line, charPositionInLine);
+			}
+
 			System.err.println(sourceName+"line "+line+":"+charPositionInLine+" "+msg);
 		}
 
