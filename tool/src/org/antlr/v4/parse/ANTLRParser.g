@@ -354,12 +354,6 @@ parserRule
     : // A rule may start with an optional documentation comment
       DOC_COMMENT?
 
-      // Following the documentation, we can declare a rule to be
-      // public, private and so on. This is only valid for some
-      // language targets of course but the target will ignore these
-      // modifiers if they make no sense in that language.
-      ruleModifiers?
-
 	  // Next comes the rule name. Here we do not distinguish between
 	  // parser or lexer rules, the semantic verification phase will
 	  // reject any rules that make no sense, such as lexer rules in
@@ -405,7 +399,7 @@ parserRule
 
       exceptionGroup
 
-      -> ^( RULE<RuleAST> RULE_REF DOC_COMMENT? ruleModifiers? ARG_ACTION<ActionAST>?
+      -> ^( RULE<RuleAST> RULE_REF DOC_COMMENT? ARG_ACTION<ActionAST>?
       		ruleReturns? throwsSpec? localsSpec? rulePrequels? ruleBlock exceptionGroup*
       	  )
     ;
@@ -485,28 +479,6 @@ ruleAction
 	:	AT id ACTION -> ^(AT id ACTION<ActionAST>)
 	;
 
-// A set of access modifiers that may be applied to rule declarations
-// and which may or may not mean something to the target language.
-// Note that the parser allows any number of these in any order and the
-// semantic pass will throw out invalid combinations.
-//
-ruleModifiers
-    : ruleModifier+ -> ^(RULEMODIFIERS ruleModifier+)
-    ;
-
-// An individual access modifier for a rule. The 'fragment' modifier
-// is an internal indication for lexer rules that they do not match
-// from the input but are like subroutines for other lexer rules to
-// reuse for certain lexical patterns. The other modifiers are passed
-// to the code generation templates and may be ignored by the template
-// if they are of no use in that language.
-ruleModifier
-    : PUBLIC
-    | PRIVATE
-    | PROTECTED
-    | FRAGMENT
-    ;
-
 // A set of alts, rewritten as a BLOCK for generic processing
 // in tree walkers. Used by the rule 'rule' so that the list of
 // alts for a rule appears as a BLOCK containing the alts and
@@ -531,7 +503,6 @@ labeledAlt
 		(	POUND! id! {((AltAST)$alternative.tree).altLabel=$id.tree;}
 		)?
 	;
-
 
 lexerRule
 @init { paraphrases.push("matching a lexer rule"); }
