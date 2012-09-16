@@ -15,9 +15,9 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 	public static final int INITAL_BUCKET_CAPACITY = 8;
 	public static final double LOAD_FACTOR = 0.75;
 
-	public class Entry {
-		K key;
-		V value;
+	public static class Entry<K, V> {
+		public final K key;
+		public V value;
 
 		public Entry(K key, V value) { this.key = key; this.value = value; }
 
@@ -27,7 +27,7 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 		}
 	}
 
-	protected LinkedList<Entry>[] buckets;
+	protected LinkedList<Entry<K, V>>[] buckets;
 
 	/** How many elements in set */
 	protected int n = 0;
@@ -42,13 +42,19 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 	}
 
 	public FlexibleHashMap(int initialCapacity, int initialBucketCapacity) {
-		buckets = (LinkedList<Entry>[])new LinkedList[initialCapacity];
+		buckets = createEntryListArray(initialBucketCapacity);
 		this.initialBucketCapacity = initialBucketCapacity;
 	}
 
+	private static <K, V> LinkedList<Entry<K, V>>[] createEntryListArray(int length) {
+		@SuppressWarnings("unchecked")
+		LinkedList<Entry<K, V>>[] result = (LinkedList<Entry<K, V>>[])new LinkedList<?>[length];
+		return result;
+	}
+
 	@Override
-	public boolean equals(K a, K b) {
-		return a.equals(b);
+	public boolean equals(K keyA, K keyB) {
+		return keyA.equals(keyB);
 	}
 
 	@Override
@@ -63,14 +69,15 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 	}
 
 	@Override
-	public V get(Object o) {
-		K key = (K)o;
+	public V get(Object key) {
+		@SuppressWarnings("unchecked")
+		K typedKey = (K)key;
 		if ( key==null ) return null;
-		int b = getBucket(key);
-		LinkedList<Entry> bucket = buckets[b];
+		int b = getBucket(typedKey);
+		LinkedList<Entry<K, V>> bucket = buckets[b];
 		if ( bucket==null ) return null; // no bucket
-		for (Entry e : bucket) {
-			if ( equals(e.key, key) ) return e.value; // use special equals
+		for (Entry<K, V> e : bucket) {
+			if ( equals(e.key, typedKey) ) return e.value; // use special equals
 		}
 		return null;
 	}
@@ -80,11 +87,11 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 		if ( key==null ) return null;
 		if ( n > threshold ) expand();
 		int b = getBucket(key);
-		LinkedList<Entry> bucket = buckets[b];
+		LinkedList<Entry<K, V>> bucket = buckets[b];
 		if ( bucket==null ) {
-			bucket = buckets[b] = new LinkedList<Entry>();
+			bucket = buckets[b] = new LinkedList<Entry<K, V>>();
 		}
-		for (Entry e : bucket) {
+		for (Entry<K, V> e : bucket) {
 			if ( equals(e.key, key) ) {
 				V prev = e.value;
 				e.value = value;
@@ -93,7 +100,7 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 			}
 		}
 		// not there
-		bucket.add(new Entry(key, value));
+		bucket.add(new Entry<K, V>(key, value));
 		n++;
 		return null;
 	}
@@ -116,9 +123,9 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 	@Override
 	public Collection<V> values() {
 		List<V> a = new ArrayList<V>(size());
-		for (LinkedList<Entry> bucket : buckets) {
+		for (LinkedList<Entry<K, V>> bucket : buckets) {
 			if ( bucket==null ) continue;
-			for (Entry e : bucket) {
+			for (Entry<K, V> e : bucket) {
 				a.add(e.value);
 			}
 		}
@@ -143,9 +150,9 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 	@Override
 	public int hashCode() {
 		int h = 0;
-		for (LinkedList<Entry> bucket : buckets) {
+		for (LinkedList<Entry<K, V>> bucket : buckets) {
 			if ( bucket==null ) continue;
-			for (Entry e : bucket) {
+			for (Entry<K, V> e : bucket) {
 				if ( e==null ) break;
 				h += hashCode(e.key);
 			}
@@ -159,18 +166,18 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 	}
 
 	protected void expand() {
-		LinkedList<Entry>[] old = buckets;
+		LinkedList<Entry<K, V>>[] old = buckets;
 		currentPrime += 4;
 		int newCapacity = buckets.length * 2;
-		LinkedList<Entry>[] newTable = (LinkedList<Entry>[])new LinkedList[newCapacity];
+		LinkedList<Entry<K, V>>[] newTable = createEntryListArray(newCapacity);
 		buckets = newTable;
 		threshold = (int)(newCapacity * LOAD_FACTOR);
 //		System.out.println("new size="+newCapacity+", thres="+threshold);
 		// rehash all existing entries
 		int oldSize = size();
-		for (LinkedList<Entry> bucket : old) {
+		for (LinkedList<Entry<K, V>> bucket : old) {
 			if ( bucket==null ) continue;
-			for (Entry e : bucket) {
+			for (Entry<K, V> e : bucket) {
 				if ( e==null ) break;
 				put(e.key, e.value);
 			}
@@ -190,19 +197,20 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 
 	@Override
 	public void clear() {
-		buckets = (LinkedList<Entry>[])new LinkedList[INITAL_CAPACITY];
+		buckets = createEntryListArray(INITAL_CAPACITY);
 		n = 0;
 	}
 
+	@Override
 	public String toString() {
 		if ( size()==0 ) return "{}";
 
 		StringBuilder buf = new StringBuilder();
 		buf.append('{');
 		boolean first = true;
-		for (LinkedList<Entry> bucket : buckets) {
+		for (LinkedList<Entry<K, V>> bucket : buckets) {
 			if ( bucket==null ) continue;
-			for (Entry e : bucket) {
+			for (Entry<K, V> e : bucket) {
 				if ( e==null ) break;
 				if ( first ) first=false;
 				else buf.append(", ");
@@ -215,14 +223,14 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 
 	public String toTableString() {
 		StringBuilder buf = new StringBuilder();
-		for (LinkedList<Entry> bucket : buckets) {
+		for (LinkedList<Entry<K, V>> bucket : buckets) {
 			if ( bucket==null ) {
 				buf.append("null\n");
 				continue;
 			}
 			buf.append('[');
 			boolean first = true;
-			for (Entry e : bucket) {
+			for (Entry<K, V> e : bucket) {
 				if ( first ) first=false;
 				else buf.append(" ");
 				if ( e==null ) buf.append("_");
