@@ -142,7 +142,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 	 */
 	public Token match(int ttype) throws RecognitionException {
 		Token t = getCurrentToken();
-		if ( getInputStream().LA(1)==ttype ) {
+		if ( t.getType()==ttype ) {
 			_errHandler.endErrorCondition(this);
 			consume();
 		}
@@ -154,6 +154,24 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>
 				_ctx.addErrorNode(t);
 			}
 		}
+		return t;
+	}
+
+	public Token matchWildcard() throws RecognitionException {
+		Token t = getCurrentToken();
+		if (t.getType() > 0) {
+			_errHandler.endErrorCondition(this);
+			consume();
+		}
+		else {
+			t = _errHandler.recoverInline(this);
+			if (_buildParseTrees && t.getTokenIndex() == -1) {
+				// we must have conjured up a new token during single token insertion
+				// if it's not the current symbol
+				_ctx.addErrorNode(t);
+			}
+		}
+
 		return t;
 	}
 
