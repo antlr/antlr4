@@ -205,6 +205,7 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 		<postamble; separator="\n">
 		<namedActions.after>
 	}
+	<currentRule.exceptions>
 	catch (RecognitionException re) {
 		_localctx.exception = re;
 		_errHandler.reportError(this, re);

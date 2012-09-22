@@ -47,6 +47,7 @@ import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.runtime.misc.Triple;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 
@@ -116,7 +117,11 @@ public class RuleFunction extends OutputModelObject {
 
 		ruleLabels = r.getElementLabelNames();
 		tokenLabels = r.getTokenRefs();
-		exceptions = Utils.nodesToStrings(r.exceptionActions);
+		for (GrammarAST e : r.exceptions) {
+			// TODO:Made new exception object here!!!
+			ActionAST a = (ActionAST)e.getChild(1);
+			exceptions = Utils.nodesToStrings(r.exceptions);
+		}
 		if ( r.finallyAction!=null ) finallyAction = new Action(factory, r.finallyAction);
 
 		startState = factory.getGrammar().atn.ruleToStartState[r.index];

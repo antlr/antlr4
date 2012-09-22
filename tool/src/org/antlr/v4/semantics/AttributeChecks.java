@@ -41,6 +41,7 @@ import org.antlr.v4.tool.LabelElementPair;
 import org.antlr.v4.tool.LabelType;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.List;
 
@@ -83,7 +84,8 @@ public class AttributeChecks implements ActionSplitterListener {
                     checker.examineAction();
                 }
             }
-            for (ActionAST a : r.exceptionActions) {
+            for (GrammarAST e : r.exceptions) {
+				ActionAST a = (ActionAST)e.getChild(1);
                 AttributeChecks checker = new AttributeChecks(g, r, null, a, a.token);
                 checker.examineAction();
 			}
