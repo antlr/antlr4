@@ -118,6 +118,12 @@ public class AttributeChecks implements ActionSplitterListener {
 	// $x.y
 	@Override
 	public void qualifiedAttr(String expr, Token x, Token y) {
+		if ( node.resolver.resolveToAttribute(x.getText(), node)!=null ) {
+			// must be a member access to a predefined attribute like $ctx.foo
+			attr(expr, x);
+			return;
+		}
+
 		if ( node.resolver.resolveToAttribute(x.getText(), y.getText(), node)==null ) {
 			Rule rref = isolatedRuleRef(x.getText());
 			if ( rref!=null ) {
