@@ -31,7 +31,7 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.ActionAST;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +45,7 @@ public class LexerFile extends OutputFile {
 		namedActions = new HashMap<String, Action>();
 		Grammar g = factory.getGrammar();
 		for (String name : g.namedActions.keySet()) {
-			GrammarAST ast = g.namedActions.get(name);
+			ActionAST ast = g.namedActions.get(name);
 			namedActions.put(name, new Action(factory, ast));
 		}
 	}

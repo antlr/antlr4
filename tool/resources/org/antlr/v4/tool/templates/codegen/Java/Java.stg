@@ -187,7 +187,7 @@ case <index> : return <actions.(index)>;}; separator="\n">
 }
 >>
 
-RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble) ::= <<
+RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
 
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
@@ -205,12 +205,15 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 		<postamble; separator="\n">
 		<namedActions.after>
 	}
-	<currentRule.exceptions>
-	catch (RecognitionException re) {
-		_localctx.exception = re;
-		_errHandler.reportError(this, re);
-		_errHandler.recover(this, re);
-	}
+    <if(exceptions)>
+    <exceptions; separator="\n">
+    <else>
+    catch (RecognitionException re) {
+        _localctx.exception = re;
+        _errHandler.reportError(this, re);
+        _errHandler.recover(this, re);
+    }
+    <endif>
 	finally {
 		<finallyAction>
 		exitRule();
@@ -471,6 +474,12 @@ ArgAction(a, chunks) ::= "<chunks>"
 SemPred(p, chunks, failChunks) ::= <<
 setState(<p.stateNumber>);
 if (!(<chunks>)) throw new FailedPredicateException(this, <if(p.msg)><p.msg><else><failChunks><endif>);
+>>
+
+ExceptionClause(e, catchArg, catchAction) ::= <<
+catch (<catchArg>) {
+    <catchAction>
+}
 >>
 
 // lexer actions are not associated with model objects

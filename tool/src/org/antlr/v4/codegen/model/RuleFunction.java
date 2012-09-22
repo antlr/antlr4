@@ -71,7 +71,6 @@ public class RuleFunction extends OutputModelObject {
 	public String ctxType;
 	public Collection<String> ruleLabels;
 	public Collection<String> tokenLabels;
-	public List<String> exceptions;
 	public ATNState startState;
 	public int index;
 	public Collection<Attribute> args = null;
@@ -85,6 +84,7 @@ public class RuleFunction extends OutputModelObject {
 	@ModelElement public Map<String,AltLabelStructDecl> altLabelCtxs;
 	@ModelElement public Map<String,Action> namedActions;
 	@ModelElement public Action finallyAction;
+	@ModelElement public List<ExceptionClause> exceptions;
 	@ModelElement public List<SrcOp> postamble;
 
 	public RuleFunction(OutputModelFactory factory, Rule r) {
@@ -117,10 +117,13 @@ public class RuleFunction extends OutputModelObject {
 
 		ruleLabels = r.getElementLabelNames();
 		tokenLabels = r.getTokenRefs();
-		for (GrammarAST e : r.exceptions) {
-			// TODO:Made new exception object here!!!
-			ActionAST a = (ActionAST)e.getChild(1);
-			exceptions = Utils.nodesToStrings(r.exceptions);
+		if ( r.exceptions!=null ) {
+			exceptions = new ArrayList<ExceptionClause>();
+			for (GrammarAST e : r.exceptions) {
+				ActionAST catchArg = (ActionAST)e.getChild(0);
+				ActionAST catchAction = (ActionAST)e.getChild(1);
+				exceptions.add(new ExceptionClause(factory, catchArg, catchAction));
+			}
 		}
 		if ( r.finallyAction!=null ) finallyAction = new Action(factory, r.finallyAction);
 
@@ -156,7 +159,7 @@ public class RuleFunction extends OutputModelObject {
 	public void fillNamedActions(OutputModelFactory factory, Rule r) {
 		namedActions = new HashMap<String, Action>();
 		for (String name : r.namedActions.keySet()) {
-			GrammarAST ast = r.namedActions.get(name);
+			ActionAST ast = r.namedActions.get(name);
 			namedActions.put(name, new Action(factory, ast));
 		}
 	}

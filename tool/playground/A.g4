@@ -1,10 +1,9 @@
 grammar A;
 
-s : e ;
-
-e : e '*' e 		# Mult
-  | INT        		# primary
-  ;
+s : INT ;
+catch[T x] {foo}
+catch[U y] {bar}
+finally { xxxxx }
 
 INT : [0-9]+ ;
 WS : [ \t\n]+ -> skip ;
