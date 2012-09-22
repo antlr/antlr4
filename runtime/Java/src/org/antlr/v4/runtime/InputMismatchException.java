@@ -29,7 +29,7 @@
 package org.antlr.v4.runtime;
 
 /** This signifies any kind of mismatched input exceptions such as
- *  when the current input does not match the expected token or tree node.
+ *  when the current input does not match the expected token.
  */
 public class InputMismatchException extends RecognitionException {
 	public InputMismatchException(Parser recognizer) {
