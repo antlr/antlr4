@@ -38,6 +38,7 @@ import java.util.Map;
 
 /** */
 public class ParserFile extends OutputFile {
+	public String genPackage; // from -package cmd-line
 	@ModelElement public Parser parser;
 	@ModelElement public Map<String, Action> namedActions;
 
@@ -49,5 +50,6 @@ public class ParserFile extends OutputFile {
 			ActionAST ast = g.namedActions.get(name);
 			namedActions.put(name, new Action(factory, ast));
 		}
+		genPackage = factory.getGrammar().tool.genPackage;
 	}
 }

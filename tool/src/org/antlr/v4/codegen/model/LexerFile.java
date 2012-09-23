@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LexerFile extends OutputFile {
+	public String genPackage; // from -package cmd-line
 	@ModelElement public Lexer lexer;
 	@ModelElement public Map<String, Action> namedActions;
 
@@ -48,5 +49,6 @@ public class LexerFile extends OutputFile {
 			ActionAST ast = g.namedActions.get(name);
 			namedActions.put(name, new Action(factory, ast));
 		}
+		genPackage = factory.getGrammar().tool.genPackage;
 	}
 }

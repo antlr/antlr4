@@ -14,7 +14,11 @@ javaTypeInitMap ::= [
 
 ParserFile(file, parser, namedActions) ::= <<
 // $ANTLR ANTLRVersion> <file.fileName> generatedTimestamp>
+<if(file.genPackage)>
+package <file.genPackage>;
+<else>
 <namedActions.header>
+<endif>
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -676,7 +680,11 @@ _prevctx.stop = _input.LT(-1);
 
 LexerFile(lexerFile, lexer, namedActions) ::= <<
 // $ANTLR ANTLRVersion> <lexerFile.fileName> generatedTimestamp>
+<if(lexerFile.genPackage)>
+package <lexerFile.genPackage>;
+<else>
 <namedActions.header>
+<endif>
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
