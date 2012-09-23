@@ -4,5 +4,6 @@ September 22, 2012
 
 * Rule exception handlers weren't passed to the generated code
 * $ruleattribute.foo weren't handled properly
+* Added -package option
 
 September 18, 2012 -- 4.0b1 release
