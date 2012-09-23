@@ -54,9 +54,12 @@ public class TerminalNodeImpl<Symbol> implements TerminalNode<Symbol> {
 
 	@Override
 	public Interval getSourceInterval() {
-		if ( !(symbol instanceof Token) ) return Interval.INVALID;
+		if (symbol instanceof Token) {
+			int tokenIndex = ((Token)symbol).getTokenIndex();
+			return new Interval(tokenIndex, tokenIndex);
+		}
 
-		return new Interval(((Token)symbol).getStartIndex(), ((Token)symbol).getStopIndex());
+		return Interval.INVALID;
 	}
 
 	@Override
