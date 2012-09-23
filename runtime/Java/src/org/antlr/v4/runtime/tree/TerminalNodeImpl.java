@@ -56,7 +56,8 @@ public class TerminalNodeImpl<Symbol extends Token> implements TerminalNode<Symb
 	public Interval getSourceInterval() {
 		if ( symbol ==null ) return Interval.INVALID;
 
-		return new Interval(symbol.getStartIndex(), symbol.getStopIndex());
+		int tokenIndex = symbol.getTokenIndex();
+		return new Interval(tokenIndex, tokenIndex);
 	}
 
 	@Override
