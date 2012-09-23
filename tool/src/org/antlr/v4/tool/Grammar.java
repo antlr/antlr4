@@ -118,7 +118,7 @@ public class Grammar implements AttributeResolver {
     @SuppressWarnings("serial")
     public static Map<String, AttributeDict> grammarAndLabelRefTypeToScope =
         new HashMap<String, AttributeDict>() {{
-//            put("lexer:RULE_LABEL", Rule.predefinedLexerRulePropertiesDict);
+            put("lexer:RULE_LABEL", Rule.predefinedLexerRulePropertiesDict);
 //            put("lexer:LEXER_STRING_LABEL", Rule.predefinedLexerRulePropertiesDict);
 //			put("lexer:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
             put("parser:RULE_LABEL", Rule.predefinedRulePropertiesDict);
