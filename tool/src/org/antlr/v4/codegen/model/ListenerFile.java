@@ -43,6 +43,7 @@ import java.util.Set;
  *  These are the rules specific events triggered by a parse tree visitor.
  */
 public class ListenerFile extends OutputFile {
+	public String genPackage; // from -package cmd-line
 	public String grammarName;
 	public String parserName;
 	public Set<String> listenerNames = new HashSet<String>();
@@ -68,5 +69,6 @@ public class ListenerFile extends OutputFile {
 		}
 		ActionAST ast = g.namedActions.get("header");
 		if ( ast!=null ) header = new Action(factory, ast);
+		genPackage = factory.getGrammar().tool.genPackage;
 	}
 }
