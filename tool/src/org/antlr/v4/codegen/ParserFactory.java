@@ -30,13 +30,50 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.analysis.AnalysisPipeline;
-import org.antlr.v4.codegen.model.*;
-import org.antlr.v4.codegen.model.decl.*;
+import org.antlr.v4.codegen.model.Action;
+import org.antlr.v4.codegen.model.AddToLabelList;
+import org.antlr.v4.codegen.model.AltBlock;
+import org.antlr.v4.codegen.model.Choice;
+import org.antlr.v4.codegen.model.CodeBlockForAlt;
+import org.antlr.v4.codegen.model.CodeBlockForOuterMostAlt;
+import org.antlr.v4.codegen.model.InvokeRule;
+import org.antlr.v4.codegen.model.LL1AltBlock;
+import org.antlr.v4.codegen.model.LL1OptionalBlock;
+import org.antlr.v4.codegen.model.LL1OptionalBlockSingleAlt;
+import org.antlr.v4.codegen.model.LL1PlusBlock;
+import org.antlr.v4.codegen.model.LL1PlusBlockSingleAlt;
+import org.antlr.v4.codegen.model.LL1StarBlock;
+import org.antlr.v4.codegen.model.LL1StarBlockSingleAlt;
+import org.antlr.v4.codegen.model.LabeledOp;
+import org.antlr.v4.codegen.model.LeftRecursiveRuleFunction;
+import org.antlr.v4.codegen.model.MatchNotSet;
+import org.antlr.v4.codegen.model.MatchSet;
+import org.antlr.v4.codegen.model.MatchToken;
+import org.antlr.v4.codegen.model.OptionalBlock;
+import org.antlr.v4.codegen.model.Parser;
+import org.antlr.v4.codegen.model.ParserFile;
+import org.antlr.v4.codegen.model.PlusBlock;
+import org.antlr.v4.codegen.model.RuleFunction;
+import org.antlr.v4.codegen.model.SemPred;
+import org.antlr.v4.codegen.model.SrcOp;
+import org.antlr.v4.codegen.model.StarBlock;
+import org.antlr.v4.codegen.model.TestSetInline;
+import org.antlr.v4.codegen.model.decl.Decl;
+import org.antlr.v4.codegen.model.decl.RuleContextDecl;
+import org.antlr.v4.codegen.model.decl.TokenDecl;
+import org.antlr.v4.codegen.model.decl.TokenListDecl;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.DecisionState;
+import org.antlr.v4.runtime.atn.PlusBlockStartState;
+import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.tool.*;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.tool.Alternative;
+import org.antlr.v4.tool.LeftRecursiveRule;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.BlockAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.TerminalAST;
 
 import java.util.List;
 
@@ -83,10 +120,10 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	}
 
 	@Override
-	public List<SrcOp> action(GrammarAST ast) { return list(new Action(this, ast)); }
+	public List<SrcOp> action(ActionAST ast) { return list(new Action(this, ast)); }
 
 	@Override
-	public List<SrcOp> sempred(GrammarAST ast) { return list(new SemPred(this, ast)); }
+	public List<SrcOp> sempred(ActionAST ast) { return list(new SemPred(this, ast)); }
 
 	@Override
 	public List<SrcOp> ruleRef(GrammarAST ID, GrammarAST label, GrammarAST args) {

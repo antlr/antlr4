@@ -127,6 +127,7 @@ public class Tool {
 	public boolean verbose_dfa = false;
 	public boolean gen_listener = true;
 	public boolean gen_visitor = false;
+	public String genPackage = null;
 	public Map<String, String> grammarOptions = null;
 
     public static Option[] optionDefs = {
@@ -145,6 +146,7 @@ public class Tool {
 		new Option("gen_listener",		"-no-listener", "don't generate parse tree listener"),
 		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
 		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
+		new Option("genPackage",		"-package", OptionArgType.STRING, "specify a package/namespace for the generated code"),
 		new Option("",					"-D<option>=value", "set/override a grammar-level option"),
 
 

@@ -173,13 +173,13 @@ public class TestCompositeGrammars extends BaseTest {
 	@Test public void testDelegatesSeeSameTokenType() throws Exception {
 		String slave =
 			"parser grammar S;\n" + // A, B, C token type order
-			"tokens { A; B; C; }\n" +
+			"tokens { A, B, C }\n" +
 			"x : A {System.out.println(\"S.x\");} ;\n";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave);
 		String slave2 =
 			"parser grammar T;\n" +
-			"tokens { C; B; A; }\n" + // reverse order
+			"tokens { C, B, A }\n" + // reverse order
 			"y : A {System.out.println(\"T.y\");} ;\n";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "T.g4", slave2);
@@ -212,13 +212,13 @@ public class TestCompositeGrammars extends BaseTest {
 		ErrorQueue equeue = new ErrorQueue();
 		String slave =
 			"parser grammar S;\n" + // A, B, C token type order
-			"tokens { A; B; C; }\n" +
+			"tokens { A, B, C }\n" +
 			"x : A {System.out.println(\"S.x\");} ;\n";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave);
 		String slave2 =
 			"parser grammar T;\n" +
-			"tokens { C; B; A; }\n" + // reverse order
+			"tokens { C, B, A }\n" + // reverse order
 			"y : A {System.out.println(\"T.y\");} ;\n";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "T.g4", slave2);
@@ -254,7 +254,7 @@ public class TestCompositeGrammars extends BaseTest {
 		ErrorQueue equeue = new ErrorQueue();
 		String slave =
 			"grammar S;\n" + // A, B, C token type order
-			"tokens { A; B; C; }\n" +
+			"tokens { A, B, C }\n" +
 			"x : 'x' INT {System.out.println(\"S.x\");} ;\n" +
 			"INT : '0'..'9'+ ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n";
@@ -281,7 +281,7 @@ public class TestCompositeGrammars extends BaseTest {
 		String slave =
 			"parser grammar S;\n" +
 			"options {tokenVocab=whatever;}\n" +
-			"tokens { A='a'; }\n" +
+			"tokens { A }\n" +
 			"x : A {System.out.println(\"S.x\");} ;\n";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave);
@@ -376,7 +376,7 @@ public class TestCompositeGrammars extends BaseTest {
 
         String slave2 =
             "parser grammar T;\n" +
-            "tokens { A='x'; }\n" +
+            "tokens { A }\n" +
             "b : 'b' {System.out.println(\"T.b\");} ;\n";
         writeFile(tmpdir, "T.g4", slave2);
 
@@ -502,34 +502,34 @@ public class TestCompositeGrammars extends BaseTest {
 		ErrorQueue equeue = new ErrorQueue();
 		String slave =
 			"parser grammar T;\n" +
-			"tokens{T;}\n" +
+			"tokens{T}\n" +
 			"x : T ;\n" ;
 		mkdir(tmpdir);
 		writeFile(tmpdir, "T.g4", slave);
 		slave =
 			"parser grammar S;\n" +
 			"import T;\n" +
-			"tokens{S;}\n" +
+			"tokens{S}\n" +
 			"y : S ;\n" ;
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave);
 
 		slave =
 			"parser grammar C;\n" +
-			"tokens{C;}\n" +
+			"tokens{C}\n" +
 			"i : C ;\n" ;
 		mkdir(tmpdir);
 		writeFile(tmpdir, "C.g4", slave);
 		slave =
 			"parser grammar B;\n" +
-			"tokens{B;}\n" +
+			"tokens{B}\n" +
 			"j : B ;\n" ;
 		mkdir(tmpdir);
 		writeFile(tmpdir, "B.g4", slave);
 		slave =
 			"parser grammar A;\n" +
 			"import B,C;\n" +
-			"tokens{A;}\n" +
+			"tokens{A}\n" +
 			"k : A ;\n" ;
 		mkdir(tmpdir);
 		writeFile(tmpdir, "A.g4", slave);
@@ -537,7 +537,7 @@ public class TestCompositeGrammars extends BaseTest {
 		String master =
 			"grammar M;\n" +
 			"import S,A;\n" +
-			"tokens{M;}\n" +
+			"tokens{M}\n" +
 			"a : M ;\n" ;
 		writeFile(tmpdir, "M.g4", master);
 		Grammar g = new Grammar(tmpdir+"/M.g4", master, equeue);

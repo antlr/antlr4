@@ -29,11 +29,25 @@
 
 package org.antlr.v4.codegen;
 
-import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.Choice;
+import org.antlr.v4.codegen.model.CodeBlockForAlt;
+import org.antlr.v4.codegen.model.CodeBlockForOuterMostAlt;
+import org.antlr.v4.codegen.model.LabeledOp;
+import org.antlr.v4.codegen.model.Lexer;
+import org.antlr.v4.codegen.model.LexerFile;
+import org.antlr.v4.codegen.model.OutputModelObject;
+import org.antlr.v4.codegen.model.Parser;
+import org.antlr.v4.codegen.model.ParserFile;
+import org.antlr.v4.codegen.model.RuleFunction;
+import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.tool.*;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.tool.Alternative;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.BlockAST;
+import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.List;
 
@@ -76,11 +90,9 @@ public interface OutputModelFactory {
 
 	List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST);
 
-	List<SrcOp> action(GrammarAST ast);
+	List<SrcOp> action(ActionAST ast);
 
-	List<SrcOp> forcedAction(GrammarAST ast);
-
-	List<SrcOp> sempred(GrammarAST ast);
+	List<SrcOp> sempred(ActionAST ast);
 
 	Choice getChoiceBlock(BlockAST blkAST, List<CodeBlockForAlt> alts, GrammarAST label);
 

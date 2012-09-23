@@ -124,7 +124,8 @@ public class SymbolCollector extends GrammarTreeVisitor {
 
 	@Override
 	public void ruleCatch(GrammarAST arg, ActionAST action) {
-		currentRule.exceptionActions.add(action);
+		GrammarAST catchme = (GrammarAST)action.getParent();
+		currentRule.exceptions.add(catchme);
 		action.resolver = currentRule;
 	}
 

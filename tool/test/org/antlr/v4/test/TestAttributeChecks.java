@@ -10,7 +10,7 @@ public class TestAttributeChecks extends BaseTest {
     String attributeTemplate =
         "parser grammar A;\n"+
         "@members {<members>}\n" +
-		"tokens{ID;}\n" +
+		"tokens{ID}\n" +
         "a[int x] returns [int y]\n" +
         "@init {<init>}\n" +
         "    :   id=ID ids+=ID lab=b[34] {\n" +

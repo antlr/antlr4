@@ -51,9 +51,6 @@ public class RecognitionException extends RuntimeException {
 
 	protected IntStream input;
 
-	/** What is index of token/char were we looking at when the error occurred? */
-//	public int offendingTokenIndex;
-
 	/** The current Token when an error occurred.  Since not all streams
 	 *  can retrieve the ith Token, we have to track the Token object.
 	 *  For parsers.  Even when it's a tree parser, token might be set.

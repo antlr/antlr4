@@ -14,7 +14,11 @@ javaTypeInitMap ::= [
 
 ParserFile(file, parser, namedActions) ::= <<
 // $ANTLR ANTLRVersion> <file.fileName> generatedTimestamp>
+<if(file.genPackage)>
+package <file.genPackage>;
+<else>
 <namedActions.header>
+<endif>
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -28,7 +32,11 @@ import java.util.ArrayList;
 >>
 
 ListenerFile(file, header) ::= <<
+<if(file.genPackage)>
+package <file.genPackage>;
+<else>
 <header>
+<endif>
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
 
@@ -40,7 +48,11 @@ void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ct
 >>
 
 BaseListenerFile(file, header) ::= <<
+<if(file.genPackage)>
+package <file.genPackage>;
+<else>
 <header>
+<endif>
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -60,7 +72,11 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 >>
 
 VisitorFile(file, header) ::= <<
+<if(file.genPackage)>
+package <file.genPackage>;
+<else>
 <header>
+<endif>
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
 
@@ -71,7 +87,11 @@ Result visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context
 >>
 
 BaseVisitorFile(file, header) ::= <<
+<if(file.genPackage)>
+package <file.genPackage>;
+<else>
 <header>
+<endif>
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -180,7 +200,7 @@ case <index> : return <actions.(index)>;}; separator="\n">
 }
 >>
 
-RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble) ::= <<
+RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
 
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
@@ -199,11 +219,15 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 		<postamble; separator="\n">
 		<namedActions.after>
 	}
-	catch (RecognitionException re) {
-		_localctx.exception = re;
-		_errHandler.reportError(this, re);
-		_errHandler.recover(this, re);
-	}
+    <if(exceptions)>
+    <exceptions; separator="\n">
+    <else>
+    catch (RecognitionException re) {
+        _localctx.exception = re;
+        _errHandler.reportError(this, re);
+        _errHandler.recover(this, re);
+    }
+    <endif>
 	finally {
 		<finallyAction>
 		exitRule();
@@ -468,6 +492,12 @@ setState(<p.stateNumber>);
 if (!(<chunks>)) throw new FailedPredicateException(this, <if(p.msg)><p.msg><else><failChunks><endif>);
 >>
 
+ExceptionClause(e, catchArg, catchAction) ::= <<
+catch (<catchArg>) {
+    <catchAction>
+}
+>>
+
 // lexer actions are not associated with model objects
 
 LexerSkipCommand()  ::= "skip();"
@@ -665,7 +695,11 @@ _prevctx.stop = _input.LT(-1);
 
 LexerFile(file, lexer, namedActions) ::= <<
 // $ANTLR ANTLRVersion> <file.fileName> generatedTimestamp>
+<if(file.genPackage)>
+package <file.genPackage>;
+<else>
 <namedActions.header>
+<endif>
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

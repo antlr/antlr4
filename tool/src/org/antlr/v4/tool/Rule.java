@@ -59,13 +59,13 @@ public class Rule implements AttributeResolver {
             add(new Attribute("ctx"));
         }};
 
-    public static AttributeDict predefinedLexerRulePropertiesDict =
-        new AttributeDict(AttributeDict.DictType.PREDEFINED_LEXER_RULE) {{
-            add(new Attribute("text"));
-            add(new Attribute("type"));
-			add(new Attribute("channel"));
-			add(new Attribute("mode"));
-        }};
+//    public static AttributeDict predefinedLexerRulePropertiesDict =
+//        new AttributeDict(AttributeDict.DictType.PREDEFINED_LEXER_RULE) {{
+//            add(new Attribute("text"));
+//            add(new Attribute("type"));
+//			add(new Attribute("channel"));
+//			add(new Attribute("mode"));
+//        }};
 
 	@SuppressWarnings("serial")
 	public static Set<String> validLexerCommands = new HashSet<String>() {{
@@ -103,10 +103,10 @@ public class Rule implements AttributeResolver {
     public Map<String, ActionAST> namedActions =
         new HashMap<String, ActionAST>();
 
-    /** Track exception handler actions (exception type is prev child);
+    /** Track exception handlers; points at "catch" node of (catch exception action)
 	 *  don't track finally action
 	 */
-    public List<ActionAST> exceptionActions = new ArrayList<ActionAST>();
+    public List<GrammarAST> exceptions = new ArrayList<GrammarAST>();
 
 	/** Track all executable actions other than named actions like @init
 	 *  and catch/finally (not in an alt). Also tracks predicates, rewrite actions.

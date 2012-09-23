@@ -410,13 +410,13 @@ public class OutputModelController {
 		return ops;
 	}
 
-	public List<SrcOp> action(GrammarAST ast) {
+	public List<SrcOp> action(ActionAST ast) {
 		List<SrcOp> ops = delegate.action(ast);
 		for (CodeGeneratorExtension ext : extensions) ops = ext.action(ops);
 		return ops;
 	}
 
-	public List<SrcOp> sempred(GrammarAST ast) {
+	public List<SrcOp> sempred(ActionAST ast) {
 		List<SrcOp> ops = delegate.sempred(ast);
 		for (CodeGeneratorExtension ext : extensions) ops = ext.sempred(ops);
 		return ops;

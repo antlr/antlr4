@@ -32,7 +32,36 @@ package org.antlr.v4.codegen;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.Token;
 import org.antlr.v4.codegen.model.RuleFunction;
-import org.antlr.v4.codegen.model.chunk.*;
+import org.antlr.v4.codegen.model.chunk.ActionChunk;
+import org.antlr.v4.codegen.model.chunk.ActionText;
+import org.antlr.v4.codegen.model.chunk.ArgRef;
+import org.antlr.v4.codegen.model.chunk.LabelRef;
+import org.antlr.v4.codegen.model.chunk.LexerSetAttr;
+import org.antlr.v4.codegen.model.chunk.ListLabelRef;
+import org.antlr.v4.codegen.model.chunk.LocalRef;
+import org.antlr.v4.codegen.model.chunk.NonLocalAttrRef;
+import org.antlr.v4.codegen.model.chunk.QRetValueRef;
+import org.antlr.v4.codegen.model.chunk.RetValueRef;
+import org.antlr.v4.codegen.model.chunk.RulePropertyRef;
+import org.antlr.v4.codegen.model.chunk.RulePropertyRef_ctx;
+import org.antlr.v4.codegen.model.chunk.RulePropertyRef_start;
+import org.antlr.v4.codegen.model.chunk.RulePropertyRef_stop;
+import org.antlr.v4.codegen.model.chunk.RulePropertyRef_text;
+import org.antlr.v4.codegen.model.chunk.SetAttr;
+import org.antlr.v4.codegen.model.chunk.SetNonLocalAttr;
+import org.antlr.v4.codegen.model.chunk.ThisRulePropertyRef_ctx;
+import org.antlr.v4.codegen.model.chunk.ThisRulePropertyRef_start;
+import org.antlr.v4.codegen.model.chunk.ThisRulePropertyRef_stop;
+import org.antlr.v4.codegen.model.chunk.ThisRulePropertyRef_text;
+import org.antlr.v4.codegen.model.chunk.TokenPropertyRef;
+import org.antlr.v4.codegen.model.chunk.TokenPropertyRef_channel;
+import org.antlr.v4.codegen.model.chunk.TokenPropertyRef_index;
+import org.antlr.v4.codegen.model.chunk.TokenPropertyRef_int;
+import org.antlr.v4.codegen.model.chunk.TokenPropertyRef_line;
+import org.antlr.v4.codegen.model.chunk.TokenPropertyRef_pos;
+import org.antlr.v4.codegen.model.chunk.TokenPropertyRef_text;
+import org.antlr.v4.codegen.model.chunk.TokenPropertyRef_type;
+import org.antlr.v4.codegen.model.chunk.TokenRef;
 import org.antlr.v4.codegen.model.decl.StructDecl;
 import org.antlr.v4.parse.ActionSplitter;
 import org.antlr.v4.parse.ActionSplitterListener;
@@ -175,12 +204,18 @@ public class ActionTranslator implements ActionSplitterListener {
 	@Override
 	public void qualifiedAttr(String expr, Token x, Token y) {
 		gen.g.tool.log("action-translator", "qattr "+x+"."+y);
+		if ( node.resolver.resolveToAttribute(x.getText(), node)!=null ) {
+			// must be a member access to a predefined attribute like $ctx.foo
+			attr(expr, x);
+			chunks.add(new ActionText(nodeContext, "."+y.getText()));
+			return;
+		}
 		Attribute a = node.resolver.resolveToAttribute(x.getText(), y.getText(), node);
 		switch ( a.dict.type ) {
 			case ARG: chunks.add(new ArgRef(nodeContext,y.getText())); break; // has to be current rule
 			case RET:
 				if ( factory.getCurrentRuleFunction()!=null &&
-					 factory.getCurrentRuleFunction().name.equals(x.getText()) )
+					factory.getCurrentRuleFunction().name.equals(x.getText()) )
 				{
 					chunks.add(new RetValueRef(rf.ruleCtx, y.getText())); break;
 				}
@@ -189,7 +224,7 @@ public class ActionTranslator implements ActionSplitterListener {
 				}
 			case PREDEFINED_RULE:
 				if ( factory.getCurrentRuleFunction()!=null &&
-					 factory.getCurrentRuleFunction().name.equals(x.getText()) )
+					factory.getCurrentRuleFunction().name.equals(x.getText()) )
 				{
 					chunks.add(getRulePropertyRef(y));
 				}

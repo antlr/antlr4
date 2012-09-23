@@ -29,10 +29,21 @@
 
 package org.antlr.v4.codegen;
 
-import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.Choice;
+import org.antlr.v4.codegen.model.CodeBlockForAlt;
+import org.antlr.v4.codegen.model.LabeledOp;
+import org.antlr.v4.codegen.model.Lexer;
+import org.antlr.v4.codegen.model.LexerFile;
+import org.antlr.v4.codegen.model.Parser;
+import org.antlr.v4.codegen.model.ParserFile;
+import org.antlr.v4.codegen.model.RuleFunction;
+import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.tool.*;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.tool.Alternative;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.BlockAST;
+import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.List;
 
@@ -84,13 +95,10 @@ public abstract class BlankOutputModelFactory implements OutputModelFactory {
 	// ACTIONS
 
 	@Override
-	public List<SrcOp> action(GrammarAST ast) { return null; }
+	public List<SrcOp> action(ActionAST ast) { return null; }
 
 	@Override
-	public List<SrcOp> forcedAction(GrammarAST ast) { return null; }
-
-	@Override
-	public List<SrcOp> sempred(GrammarAST ast) { return null; }
+	public List<SrcOp> sempred(ActionAST ast) { return null; }
 
 	// BLOCKS
 
