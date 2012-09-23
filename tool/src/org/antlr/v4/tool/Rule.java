@@ -58,13 +58,13 @@ public class Rule implements AttributeResolver {
             add(new Attribute("ctx"));
         }};
 
-//    public static AttributeDict predefinedLexerRulePropertiesDict =
-//        new AttributeDict(AttributeDict.DictType.PREDEFINED_LEXER_RULE) {{
-//            add(new Attribute("text"));
-//            add(new Attribute("type"));
-//			add(new Attribute("channel"));
-//			add(new Attribute("mode"));
-//        }};
+    public static AttributeDict predefinedLexerRulePropertiesDict =
+        new AttributeDict(AttributeDict.DictType.PREDEFINED_LEXER_RULE) {{
+            add(new Attribute("text"));
+            add(new Attribute("type"));
+			add(new Attribute("channel"));
+			add(new Attribute("mode"));
+        }};
 
 	public static Set<String> validLexerCommands = new HashSet<String>() {{
 		// CALLS
