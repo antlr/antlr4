@@ -112,7 +112,7 @@ public class <parser.name> extends <superClass> {
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<endif>
 	public static final String[] tokenNames = {
-        <parser.tokenNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor>
+		<parser.tokenNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor>
 	};
 	public static final int
 		<parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
@@ -220,15 +220,15 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 		<postamble; separator="\n">
 		<namedActions.after>
 	}
-    <if(exceptions)>
-    <exceptions; separator="\n">
-    <else>
-    catch (RecognitionException re) {
-        _localctx.exception = re;
-        _errHandler.reportError(this, re);
-        _errHandler.recover(this, re);
-    }
-    <endif>
+	<if(exceptions)>
+	<exceptions; separator="\n">
+	<else>
+	catch (RecognitionException re) {
+		_localctx.exception = re;
+		_errHandler.reportError(this, re);
+		_errHandler.recover(this, re);
+	}
+	<endif>
 	finally {
 		<finallyAction>
 		exitRule();
@@ -493,7 +493,7 @@ if (!(<chunks>)) throw new FailedPredicateException(this, <if(p.msg)><p.msg><els
 
 ExceptionClause(e, catchArg, catchAction) ::= <<
 catch (<catchArg>) {
-    <catchAction>
+	<catchAction>
 }
 >>
 
@@ -563,22 +563,22 @@ ContextTokenListGetterDecl(t)  ::=
     "public List\<TerminalNode\<<TokenLabelType()>>> <t.name>() { return getTokens(<parser.name>.<t.name>); }"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
 public TerminalNode\<<TokenLabelType()>\> <t.name>(int i) {
-    return getToken(<parser.name>.<t.name>, i);
+	return getToken(<parser.name>.<t.name>, i);
 }
 >>
 ContextRuleGetterDecl(r)       ::= <<
 public <r.ctxName> <r.name>() {
-    return getRuleContext(<r.ctxName>.class,0);
+	return getRuleContext(<r.ctxName>.class,0);
 }
 >>
 ContextRuleListGetterDecl(r)   ::= <<
 public List\<? extends <r.ctxName>\> <r.name>() {
-    return getRuleContexts(<r.ctxName>.class);
+	return getRuleContexts(<r.ctxName>.class);
 }
 >>
 ContextRuleListIndexedGetterDecl(r)   ::= <<
 public <r.ctxName> <r.name>(int i) {
-    return getRuleContext(<r.ctxName>.class,i);
+	return getRuleContext(<r.ctxName>.class,i);
 }
 >>
 
