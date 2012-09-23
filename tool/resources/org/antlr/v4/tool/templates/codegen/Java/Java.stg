@@ -16,9 +16,8 @@ ParserFile(file, parser, namedActions) ::= <<
 // $ANTLR ANTLRVersion> <file.fileName> generatedTimestamp>
 <if(file.genPackage)>
 package <file.genPackage>;
-<else>
-<namedActions.header>
 <endif>
+<namedActions.header>
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -34,9 +33,8 @@ import java.util.ArrayList;
 ListenerFile(file, header) ::= <<
 <if(file.genPackage)>
 package <file.genPackage>;
-<else>
-<header>
 <endif>
+<header>
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
 
@@ -50,9 +48,8 @@ void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ct
 BaseListenerFile(file, header) ::= <<
 <if(file.genPackage)>
 package <file.genPackage>;
-<else>
-<header>
 <endif>
+<header>
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -74,9 +71,8 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 VisitorFile(file, header) ::= <<
 <if(file.genPackage)>
 package <file.genPackage>;
-<else>
-<header>
 <endif>
+<header>
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
 
@@ -89,9 +85,8 @@ T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx)
 BaseVisitorFile(file, header) ::= <<
 <if(file.genPackage)>
 package <file.genPackage>;
-<else>
-<header>
 <endif>
+<header>
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -698,9 +693,8 @@ LexerFile(lexerFile, lexer, namedActions) ::= <<
 // $ANTLR ANTLRVersion> <lexerFile.fileName> generatedTimestamp>
 <if(lexerFile.genPackage)>
 package <lexerFile.genPackage>;
-<else>
-<namedActions.header>
 <endif>
+<namedActions.header>
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
