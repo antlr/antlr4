@@ -1,6 +1,7 @@
 grammar T;
 
-s : INT { System.out.println($start.getText());} ;
+s : INT+ ;
 
-INT : [0-9]+ {$x.type = 3; String x = $text; $channel, $mode} ;
+ID : [a-z]+ ;
+INT : [0-9]+ ;
 WS : [ \t\n]+ -> skip ;
