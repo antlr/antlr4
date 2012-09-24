@@ -118,6 +118,11 @@ public class AttributeChecks implements ActionSplitterListener {
 	// $x.y
 	@Override
 	public void qualifiedAttr(String expr, Token x, Token y) {
+		if ( g.isLexer() ) {
+			errMgr.grammarError(ErrorType.ATTRIBUTE_IN_LEXER_ACTION,
+								g.fileName, x, x.getText()+"."+y.getText(), expr);
+			return;
+		}
 		if ( node.resolver.resolveToAttribute(x.getText(), node)!=null ) {
 			// must be a member access to a predefined attribute like $ctx.foo
 			attr(expr, x);
@@ -149,15 +154,25 @@ public class AttributeChecks implements ActionSplitterListener {
 
 	@Override
 	public void setAttr(String expr, Token x, Token rhs) {
+		if ( g.isLexer() ) {
+			errMgr.grammarError(ErrorType.ATTRIBUTE_IN_LEXER_ACTION,
+								g.fileName, x, x.getText(), expr);
+			return;
+		}
 		if ( node.resolver.resolveToAttribute(x.getText(), node)==null ) {
-            errMgr.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
-                                      g.fileName, x, x.getText(), expr);
-        }
-        new AttributeChecks(g, r, alt, node, rhs).examineAction();
-    }
+			errMgr.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
+								g.fileName, x, x.getText(), expr);
+		}
+		new AttributeChecks(g, r, alt, node, rhs).examineAction();
+	}
 
 	@Override
     public void attr(String expr, Token x) {
+		if ( g.isLexer() ) {
+			errMgr.grammarError(ErrorType.ATTRIBUTE_IN_LEXER_ACTION,
+								g.fileName, x, x.getText(), expr);
+			return;
+		}
 		if ( node.resolver.resolveToAttribute(x.getText(), node)==null ) {
 			if ( node.resolver.resolvesToToken(x.getText(), node) ) {
 				return; // $ID for token ref or label of token
