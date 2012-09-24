@@ -436,7 +436,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				// that rule is done. this is how we cut off nongreedy .+ loops.
 				reach = deleteWildcardConfigsForAlt(reach, ci, c.alt);
 
-				 // move to next char, looking for longer match
+			 	// move to next char, looking for longer match
 				// (we continue processing if there are states in reach)
 			}
 		}
@@ -583,6 +583,13 @@ public class LexerATNSimulator extends ATNSimulator {
 				for (SingletonPredictionContext ctx : config.context) {
 					if ( !ctx.isEmpty() ) {
 						PredictionContext newContext = ctx.parent; // "pop" invoking state
+						if ( ctx.invokingState==PredictionContext.EMPTY_FULL_CTX_INVOKING_STATE ) {
+							// we have no context info. Don't pursue.
+							if ( debug ) System.out.println("FALLING off token "+
+														    recog.getRuleNames()[config.state.ruleIndex]);
+							configs.add(config);
+							continue;
+						}
 						ATNState invokingState = atn.states.get(ctx.invokingState);
 						RuleTransition rt = (RuleTransition)invokingState.transition(0);
 						ATNState retState = rt.followState;
