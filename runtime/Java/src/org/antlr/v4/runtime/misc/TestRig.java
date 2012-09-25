@@ -154,13 +154,18 @@ public class TestRig {
 
 		Constructor<Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
 		Lexer lexer = lexerCtor.newInstance((CharStream)null);
-		String parserName = grammarName+"Parser";
-		Class parserClass = cl.loadClass(parserName);
-		if ( parserClass==null ) {
-			System.err.println("Can't load "+parserName);
+
+		Class parserClass = null;
+		Parser parser = null;
+		if ( !startRuleName.equals(LEXER_START_RULE_NAME) ) {
+			String parserName = grammarName+"Parser";
+			parserClass = cl.loadClass(parserName);
+			if ( parserClass==null ) {
+				System.err.println("Can't load "+parserName);
+			}
+			Constructor<Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
+			parser = parserCtor.newInstance((TokenStream)null);
 		}
-		Constructor<Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
-		Parser parser = parserCtor.newInstance((TokenStream)null);
 
 		if ( inputFiles.size()==0 ) {
 			InputStream is = System.in;
