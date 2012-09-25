@@ -1,2 +1,3 @@
-lexer grammar T;
+grammar T;
+s : A ;
 A : 'a';
