@@ -179,6 +179,10 @@ public class ArrayPredictionContext extends PredictionContext {
 		buf.append("[");
 		for (int i=0; i<invokingStates.length; i++) {
 			if ( i>0 ) buf.append(", ");
+			if ( invokingStates[i]==EMPTY_FULL_CTX_INVOKING_STATE ) {
+				buf.append("$");
+				continue;
+			}
 			buf.append(invokingStates[i]);
 			if ( parents[i]!=null ) {
 				buf.append(' ');

@@ -21,5 +21,7 @@ wouldn't it get to the end of the rule also by the wild-card route?
  alternatives?
 
 */
+//STRING : '"' ( 'x' | . )* '"' ;
+
 ACTION : '{' ( ACTION | . )* '}' ;
 WS     : [ \r\t\n]+ -> skip ;

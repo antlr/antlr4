@@ -92,7 +92,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
-			"HASH : '#' -> type(HASH), skip, more  ;";
+			"HASH : '#' -> type(100), skip, more  ;";
 		String found = execLexer("L.g4", grammar, "L", "34#11");
 		String expecting =
 			"I\n" +

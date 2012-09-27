@@ -42,6 +42,8 @@ import org.antlr.v4.runtime.misc.Nullable;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 /** "dup" of ParserInterpreter */
 public class LexerATNSimulator extends ATNSimulator {
@@ -431,10 +433,11 @@ public class LexerATNSimulator extends ATNSimulator {
 					captureSimState(prevAccept, input, c);
 				}
 
-				// if we reach lexer accept state, toss out any configs in rest
-				// of configs work list associated with this rule (config.alt);
-				// that rule is done. this is how we cut off nongreedy .+ loops.
-				reach = deleteWildcardConfigsForAlt(reach, ci, c.alt);
+				// if we reach lexer accept state, toss out any configs pointing
+				// at wildcard edges in rest of configs work list associated
+				// with this rule (config.alt); that rule is done. this is how
+				// we cut off nongreedy .+ loops.
+				reach = deleteWildcardConfigsForAlt(reach, ci, c);
 
 			 	// move to next char, looking for longer match
 				// (we continue processing if there are states in reach)
@@ -524,22 +527,62 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 	}
 
-	/** Delete configs for alt following ci. Closure is unmodified; copy returned. */
-	public ATNConfigSet deleteWildcardConfigsForAlt(@NotNull ATNConfigSet closure, int ci, int alt) {
+	/** Delete configs for alt following ci that have a wildcard edge but
+	 *  only for configs with same stack. E.g., if we want to kill after
+	 *  config (2,1,[$]), then we need to wack only configs with $ stack:
+	 *
+	 *  	[..., (2,1,[$]), ..., (7,1,[[$, 6 $]])]
+	 *
+	 *  That means wacking (7,1,[$]) but not (7,1,[6 $]).  If incoming config
+	 *  has multiple stacks, must look for each one in other configs. :(
+	 *
+	 *  Closure is unmodified; copy returned.
+	 */
+	public ATNConfigSet deleteWildcardConfigsForAlt(@NotNull ATNConfigSet closure,
+													int ci,
+													ATNConfig config)
+	{
+		int alt = config.alt;
+		if ( debug ) {
+			System.out.printf("deleteWildcardConfigsForAlt for alt %d after config %d\n", alt, ci);
+		}
+
+		// collect ctxs from incoming config; must wack all of those.
+		Set<SingletonPredictionContext> contextsToKill =
+			new HashSet<SingletonPredictionContext>();
+		if ( config.context!=null && !config.context.isEmpty() ) {
+			for (SingletonPredictionContext ctx : config.context) {
+				contextsToKill.add(ctx);
+			}
+		}
+
 		ATNConfigSet dup = new ATNConfigSet(closure);
 		int j=ci+1;
 		while ( j < dup.size() ) {
 			ATNConfig c = dup.get(j);
 			boolean isWildcard = c.state.getClass() == ATNState.class && // plain state only, not rulestop etc..
 				c.state.transition(0) instanceof WildcardTransition;
+			boolean killed = false;
 			if ( c.alt == alt && isWildcard ) {
-				if ( debug ) {
-					System.out.format("deleteWildcardConfigsForAlt %s\n", c);
+				// found config to kill but must check stack.
+				// find c stacks that are in contextsToKill
+				if ( c.context!=null && !c.context.isEmpty() ) {
+					for (SingletonPredictionContext ctx : c.context) {
+						if ( !ctx.isEmpty() ) {
+							if ( contextsToKill.contains(ctx) ) {
+								// c.alt, c.ctx matches and j > ci => kill it
+								if ( debug ) {
+									System.out.format("delete config %s since alt %d and %d leads to wildcard\n",
+													  c, c.alt, c.state.stateNumber);
+								}
+								dup.remove(j);
+								killed = true;
+							}
+						}
+					}
 				}
-
-				dup.remove(j);
 			}
-			else j++;
+			if ( !killed ) j++;
 		}
 		return dup;
 	}
@@ -584,10 +627,13 @@ public class LexerATNSimulator extends ATNSimulator {
 					if ( !ctx.isEmpty() ) {
 						PredictionContext newContext = ctx.parent; // "pop" invoking state
 						if ( ctx.invokingState==PredictionContext.EMPTY_FULL_CTX_INVOKING_STATE ) {
-							// we have no context info. Don't pursue.
+							// we have no context info. Don't pursue but
+							// record a config that indicates how we hit end
+							LexerATNConfig c = new LexerATNConfig(config, config.state, ctx);
 							if ( debug ) System.out.println("FALLING off token "+
-														    recog.getRuleNames()[config.state.ruleIndex]);
-							configs.add(config);
+														    recog.getRuleNames()[config.state.ruleIndex]+
+														    " record "+c);
+							configs.add(c);
 							continue;
 						}
 						ATNState invokingState = atn.states.get(ctx.invokingState);

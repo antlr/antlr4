@@ -76,13 +76,19 @@ public class SingletonPredictionContext extends PredictionContext {
 		}
 
 		SingletonPredictionContext s = (SingletonPredictionContext)o;
-		return invokingState == s.invokingState && parent.equals(s.parent);
+		return invokingState == s.invokingState &&
+			(parent!=null && parent.equals(s.parent));
 	}
 
 	@Override
 	public String toString() {
 		String up = parent!=null ? parent.toString() : "";
-		if ( up.length()==0 ) return String.valueOf(invokingState);
+		if ( up.length()==0 ) {
+			if ( invokingState == EMPTY_FULL_CTX_INVOKING_STATE ) {
+				return "$";
+			}
+			return String.valueOf(invokingState);
+		}
 		return String.valueOf(invokingState)+" "+up;
 	}
 }
