@@ -534,7 +534,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	 *  	[..., (2,1,[$]), ..., (7,1,[[$, 6 $]])]
 	 *
 	 *  That means wacking (7,1,[$]) but not (7,1,[6 $]).  If incoming config
-	 *  has multiple stacks, must look for each one in other configs. :(
+	 *  has multiple stacks, must look for each one in other configs.
 	 *
 	 *  Closure is unmodified; copy returned.
 	 */
@@ -550,39 +550,40 @@ public class LexerATNSimulator extends ATNSimulator {
 		// collect ctxs from incoming config; must wack all of those.
 		Set<SingletonPredictionContext> contextsToKill =
 			new HashSet<SingletonPredictionContext>();
-		if ( config.context!=null && !config.context.isEmpty() ) {
-			for (SingletonPredictionContext ctx : config.context) {
-				contextsToKill.add(ctx);
-			}
+		for (SingletonPredictionContext ctx : config.context) {
+			contextsToKill.add(ctx);
 		}
 
-		ATNConfigSet dup = new ATNConfigSet(closure);
+		ATNConfigSet dup = new ATNConfigSet(); // build up as we go thru loop
+		for (int j=0; j<=ci; j++) dup.add(closure.get(j)); // add stuff up to ci
 		int j=ci+1;
-		while ( j < dup.size() ) {
-			ATNConfig c = dup.get(j);
+		while ( j < closure.size() ) {
+			LexerATNConfig c = (LexerATNConfig)closure.get(j);
 			boolean isWildcard = c.state.getClass() == ATNState.class && // plain state only, not rulestop etc..
-				c.state.transition(0) instanceof WildcardTransition;
-			boolean killed = false;
+				    c.state.transition(0) instanceof WildcardTransition;
 			if ( c.alt == alt && isWildcard ) {
-				// found config to kill but must check stack.
+				// found config to kill but only if same stack.
 				// find c stacks that are in contextsToKill
-				if ( c.context!=null && !c.context.isEmpty() ) {
-					for (SingletonPredictionContext ctx : c.context) {
-						if ( !ctx.isEmpty() ) {
-							if ( contextsToKill.contains(ctx) ) {
-								// c.alt, c.ctx matches and j > ci => kill it
-								if ( debug ) {
-									System.out.format("delete config %s since alt %d and %d leads to wildcard\n",
-													  c, c.alt, c.state.stateNumber);
-								}
-								dup.remove(j);
-								killed = true;
-							}
+				for (SingletonPredictionContext ctx : c.context) {
+					if ( contextsToKill.contains(ctx) ) {
+						// c.alt, c.ctx matches and j > ci => kill it
+						if ( debug ) {
+							System.out.format("delete config %s since alt %d and %d leads to wildcard\n",
+											  c, c.alt, c.state.stateNumber);
 						}
+						// don't add
+					}
+					else {
+						LexerATNConfig splitConfig =
+							new LexerATNConfig(c.state, c.alt, ctx, c.lexerActionIndex);
+						dup.add(splitConfig);
 					}
 				}
 			}
-			if ( !killed ) j++;
+			else {
+				dup.add(c); // add entire config
+			}
+			j++;
 		}
 		return dup;
 	}

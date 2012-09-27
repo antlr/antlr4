@@ -5,13 +5,22 @@ import org.antlr.v4.runtime.misc.Nullable;
 
 public class LexerATNConfig extends ATNConfig {
 	/** Capture lexer action we traverse */
-	public int lexerActionIndex = -1; // TOOD: move to subclass
+	public int lexerActionIndex = -1;
 
 	public LexerATNConfig(@NotNull ATNState state,
-					 int alt,
-					 @Nullable PredictionContext context)
+						  int alt,
+						  @Nullable PredictionContext context)
 	{
 		super(state, alt, context, SemanticContext.NONE);
+	}
+
+	public LexerATNConfig(@NotNull ATNState state,
+						  int alt,
+						  @Nullable PredictionContext context,
+						  int actionIndex)
+	{
+		super(state, alt, context, SemanticContext.NONE);
+		this.lexerActionIndex = actionIndex;
 	}
 
 	public LexerATNConfig(@NotNull LexerATNConfig c, @NotNull ATNState state) {
