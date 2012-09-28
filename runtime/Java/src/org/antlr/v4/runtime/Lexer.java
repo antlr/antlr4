@@ -334,6 +334,22 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		this._token = _token;
 	}
 
+	public void setType(int ttype) {
+		_type = ttype;
+	}
+
+	public int getType() {
+		return _type;
+	}
+
+	public void setChannel(int channel) {
+		_channel = channel;
+	}
+
+	public int getChannel() {
+		return _channel;
+	}
+
 	public String[] getModeNames() {
 		return null;
 	}

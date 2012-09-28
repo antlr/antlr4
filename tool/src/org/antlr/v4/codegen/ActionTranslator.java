@@ -36,7 +36,6 @@ import org.antlr.v4.codegen.model.chunk.ActionChunk;
 import org.antlr.v4.codegen.model.chunk.ActionText;
 import org.antlr.v4.codegen.model.chunk.ArgRef;
 import org.antlr.v4.codegen.model.chunk.LabelRef;
-import org.antlr.v4.codegen.model.chunk.LexerSetAttr;
 import org.antlr.v4.codegen.model.chunk.ListLabelRef;
 import org.antlr.v4.codegen.model.chunk.LocalRef;
 import org.antlr.v4.codegen.model.chunk.NonLocalAttrRef;
@@ -243,7 +242,6 @@ public class ActionTranslator implements ActionSplitterListener {
 		gen.g.tool.log("action-translator", "setAttr "+x+" "+rhs);
 		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
 		SetAttr s = new SetAttr(nodeContext, x.getText(), rhsChunks);
-		if ( factory.getGrammar().isLexer() ) s = new LexerSetAttr(nodeContext, x.getText(), rhsChunks);
 		chunks.add(s);
 	}
 

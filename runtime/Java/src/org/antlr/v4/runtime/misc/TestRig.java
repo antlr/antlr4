@@ -154,14 +154,22 @@ public class TestRig {
 
 		Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
 		Lexer lexer = lexerCtor.newInstance((CharStream)null);
-		String parserName = grammarName+"Parser";
-		@SuppressWarnings("unchecked")
-		Class<? extends Parser<Token>> parserClass = (Class<? extends Parser<Token>>)cl.loadClass(parserName).asSubclass(Parser.class);
-		if ( parserClass==null ) {
-			System.err.println("Can't load "+parserName);
+
+		Class<? extends Parser<Token>> parserClass = null;
+		Parser<Token> parser = null;
+		if ( !startRuleName.equals(LEXER_START_RULE_NAME) ) {
+			String parserName = grammarName+"Parser";
+
+			@SuppressWarnings("unchecked")
+			Class<? extends Parser<Token>> uncheckedParserClass = (Class<? extends Parser<Token>>)cl.loadClass(parserName);
+
+			parserClass = uncheckedParserClass;
+			if ( parserClass==null ) {
+				System.err.println("Can't load "+parserName);
+			}
+			Constructor<? extends Parser<Token>> parserCtor = parserClass.getConstructor(TokenStream.class);
+			parser = parserCtor.newInstance((TokenStream)null);
 		}
-		Constructor<? extends Parser<Token>> parserCtor = (Constructor<? extends Parser<Token>>)parserClass.getConstructor(TokenStream.class);
-		Parser<Token> parser = parserCtor.newInstance((TokenStream)null);
 
 		if ( inputFiles.isEmpty() ) {
 			InputStream is = System.in;

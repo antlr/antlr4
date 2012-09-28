@@ -425,7 +425,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				// that rule is done. this is how we cut off nongreedy .+ loops.
 				deleteWildcardConfigsForAlt(reach, ci, c.getAlt()); // CAUSES INF LOOP if reach not closure
 
-				 // move to next char, looking for longer match
+			 	// move to next char, looking for longer match
 				// (we continue processing if there are states in reach)
 			}
 		}
