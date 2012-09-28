@@ -284,6 +284,7 @@ delegateGrammar
  */
 tokensSpec
 	: TOKENS_SPEC id (COMMA id)* RBRACE -> ^(TOKENS_SPEC id+)
+    | TOKENS_SPEC RBRACE ->
 	;
 
 // A declaration of a language target specifc section,

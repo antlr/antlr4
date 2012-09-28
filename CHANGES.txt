@@ -1,5 +1,9 @@
 ANTLR v4 Honey Badger
 
+September 28, 2012
+
+* empty "tokens {}" is ok now.
+
 September 22, 2012
 
 * Rule exception handlers weren't passed to the generated code
