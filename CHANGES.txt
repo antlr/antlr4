@@ -2,6 +2,10 @@ ANTLR v4 Honey Badger
 
 September 28, 2012
 
+* no nongreedy or wildcard in parser.
+
+September 28, 2012
+
 * empty "tokens {}" is ok now.
 
 September 22, 2012
