@@ -43,7 +43,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testInsertBeforeIndex0() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -59,7 +59,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testInsertAfterLastIndex() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -76,7 +76,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void test2InsertBeforeAfterMiddleIndex() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -94,7 +94,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testReplaceIndex0() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -111,7 +111,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testReplaceLastIndex() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -128,7 +128,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testReplaceMiddleIndex() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -145,7 +145,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testToStringStartStop() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "ID : 'a'..'z'+;\n" +
 											 "INT : '0'..'9'+;\n" +
 											 "SEMI : ';';\n" +
@@ -182,7 +182,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testToStringStartStop2() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "ID : 'a'..'z'+;\n" +
 											 "INT : '0'..'9'+;\n" +
 											 "SEMI : ';';\n" +
@@ -240,7 +240,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void test2ReplaceMiddleIndex() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -258,7 +258,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void test2ReplaceMiddleIndex1InsertBefore() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -277,7 +277,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testReplaceThenDeleteMiddleIndex() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -295,7 +295,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testInsertInPriorReplace() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -320,7 +320,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testInsertThenReplaceSameIndex() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -340,7 +340,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void test2InsertMiddleIndex() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -358,7 +358,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void test2InsertThenReplaceIndex0() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -377,7 +377,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testReplaceThenInsertBeforeLastIndex() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -395,7 +395,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testInsertThenReplaceLastIndex() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -413,7 +413,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testReplaceThenInsertAfterLastIndex() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -431,7 +431,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testReplaceRangeThenInsertAtLeftEdge() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -449,7 +449,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testReplaceRangeThenInsertAtRightEdge() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -475,7 +475,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testReplaceRangeThenInsertAfterRightEdge() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -493,7 +493,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testReplaceAll() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -510,7 +510,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testReplaceSubsetThenFetch() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -527,7 +527,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testReplaceThenReplaceSuperset() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -554,7 +554,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testReplaceThenReplaceLowerIndexedSuperset() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -581,7 +581,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testReplaceSingleMiddleThenOverlappingSuperset() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -599,7 +599,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testCombineInserts() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -617,7 +617,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testCombine3Inserts() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -636,7 +636,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testCombineInsertOnLeftWithReplace() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -656,7 +656,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testCombineInsertOnLeftWithDelete() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -678,7 +678,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testDisjointInserts() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -697,7 +697,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testOverlappingReplace() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -717,7 +717,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testOverlappingReplace2() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -744,7 +744,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testOverlappingReplace3() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -764,7 +764,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testOverlappingReplace4() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -784,7 +784,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testDropIdenticalReplace() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -804,7 +804,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testDropPrevCoveredInsert() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -824,7 +824,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testLeaveAloneDisjointInsert() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -842,7 +842,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testLeaveAloneDisjointInsert2() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
@@ -860,7 +860,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 
 	@Test public void testInsertBeforeTokenThenDeleteThatToken() throws Exception {
 		LexerGrammar g = new LexerGrammar(
-											 "lexer grammar t;\n"+
+											 "lexer grammar T;\n"+
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");

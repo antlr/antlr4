@@ -6,7 +6,7 @@ public class TestListeners extends BaseTest {
 	@Test public void testBasic() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"@header {import org.antlr.v4.runtime.tree.ParseTree;}\n"+
+			"@header {import org.antlr.v4.runtime.tree.*;}\n"+
 			"@members {\n" +
 			"public static class LeafListener extends TBaseListener {\n" +
 			"    public void visitTerminal(TerminalNode<Token> node) {\n" +
@@ -14,7 +14,6 @@ public class TestListeners extends BaseTest {
 			"    }\n" +
 			"  }}\n" +
 			"s\n" +
-			"@init {setBuildParseTree(true);}\n" +
 			"@after {" +
 			"  System.out.println($r.ctx.toStringTree(this));" +
 			"  ParseTreeWalker walker = new ParseTreeWalker();\n" +
@@ -47,7 +46,6 @@ public class TestListeners extends BaseTest {
 			"    }\n" +
 			"  }}\n" +
 			"s\n" +
-			"@init {setBuildParseTree(true);}\n" +
 			"@after {" +
 			"  System.out.println($r.ctx.toStringTree(this));" +
 			"  ParseTreeWalker walker = new ParseTreeWalker();\n" +
@@ -88,7 +86,6 @@ public class TestListeners extends BaseTest {
 			"    }\n" +
 			"  }}\n" +
 			"s\n" +
-			"@init {setBuildParseTree(true);}\n" +
 			"@after {" +
 			"  System.out.println($r.ctx.toStringTree(this));" +
 			"  ParseTreeWalker walker = new ParseTreeWalker();\n" +
@@ -131,7 +128,6 @@ public class TestListeners extends BaseTest {
 			"  }" +
 			"}\n" +
 			"s\n" +
-			"@init {setBuildParseTree(true);}\n" +
 			"@after {" +
 			"  System.out.println($r.ctx.toStringTree(this));" +
 			"  ParseTreeWalker walker = new ParseTreeWalker();\n" +
@@ -172,7 +168,6 @@ public class TestListeners extends BaseTest {
 			"  }\n" +
 			"}\n" +
 			"s\n" +
-			"@init {setBuildParseTree(true);}\n" +
 			"@after {" +
 			"  System.out.println($r.ctx.toStringTree(this));" +
 			"  ParseTreeWalker walker = new ParseTreeWalker();\n" +

@@ -298,7 +298,9 @@ public class GrammarTransformPipeline {
 			GrammarAST[] options = ((List<?>)optionsRoot.getChildren()).toArray(new GrammarAST[0]);
 			for (GrammarAST o : options) {
 				String optionName = o.getChild(0).getText();
-				if ( !Grammar.doNotCopyOptionsToLexer.contains(optionName) ) {
+				if ( Grammar.lexerOptions.contains(optionName) &&
+					 !Grammar.doNotCopyOptionsToLexer.contains(optionName) )
+				{
 					lexerOptionsRoot.addChild((Tree)adaptor.dupTree(o));
 				}
 			}

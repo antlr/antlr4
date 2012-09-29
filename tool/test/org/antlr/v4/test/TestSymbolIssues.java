@@ -22,20 +22,21 @@ public class TestSymbolIssues extends BaseTest {
         "ID : 'a'..'z'+ ID ;",
         // YIELDS
         "warning(83): A.g4:2:10: illegal option opt\n" +
-        "warning(83): A.g4:2:21: illegal option k\n" +
-		"error(94): A.g4:7:1: redefinition of header action\n" +
-		"warning(51): A.g4:2:10: illegal option opt\n" +
-		"error(19): A.g4:11:0: rule a redefinition\n" +
-		"error(60): A.g4:5:1: redefinition of members action\n" +
-		"error(47): A.g4:9:37: rule b has no defined parameters\n" +
-		"error(24): A.g4:9:43: reference to undefined rule: q\n" +
-		"error(46): A.g4:10:31: missing parameter(s) on rule reference: a\n"
+			"warning(83): A.g4:2:21: illegal option k\n" +
+			"error(94): A.g4:5:1: redefinition of members action\n" +
+			"error(94): A.g4:7:1: redefinition of header action\n" +
+			"warning(125): A.g4:9:27: implicit definition of token X in parser\n" +
+			"warning(125): A.g4:10:20: implicit definition of token Y in parser\n" +
+			"warning(125): A.g4:11:4: implicit definition of token FJKD in parser\n" +
+			"error(80): A.g4:9:32: rule a has no defined parameters\n" +
+			"error(80): A.g4:9:37: rule b has no defined parameters\n" +
+			"error(56): A.g4:9:43: reference to undefined rule: q\n"
     };
 
     static String[] B = {
         // INPUT
         "parser grammar B;\n" +
-        "tokens { ID; FOO; X='x'; Y; }\n" +
+        "tokens { ID, FOO, X, Y }\n" +
         "\n" +
         "a : s=ID b+=ID X=ID '.' ;\n" +
         "\n" +
@@ -54,7 +55,7 @@ public class TestSymbolIssues extends BaseTest {
     static String[] D = {
         // INPUT
         "parser grammar D;\n" +
-		"tokens{ID;}\n" +
+		"tokens{ID}\n" +
         "a[int j] \n" +
         "        :       i=ID j=ID ;\n" +
         "\n" +
@@ -72,11 +73,9 @@ public class TestSymbolIssues extends BaseTest {
 		// INPUT
 		"grammar E;\n" +
 		"tokens {\n" +
-		"	A; A;\n" +
-		"	B='b'; B;\n" +
-		"	C; C='c';\n" +
-		"	D='d'; D='d';\n" +
-		"	E='e'; X='e';\n" +
+		"	A, A,\n" +
+		"	B,\n" +
+		"	C,\n" +
 		"}\n" +
 		"a : A ;\n",
 
