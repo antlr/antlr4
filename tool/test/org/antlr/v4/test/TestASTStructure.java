@@ -71,7 +71,7 @@ public class TestASTStructure {
 		// gunit test on line 18
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("grammarSpec", "\n    parser grammar P;\n    tokens { A, B }\n    @header {foo}\n    a : A;\n    ", 18);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(PARSER_GRAMMAR P (tokens { A (= B '33')) (@ header {foo}) (RULES (RULE a (BLOCK (ALT A)))))";
+		Object expecting = "(PARSER_GRAMMAR P (tokens { A B) (@ header {foo}) (RULES (RULE a (BLOCK (ALT A)))))";
 		assertEquals("testing rule grammarSpec", expecting, actual);
 	}
 
@@ -79,7 +79,7 @@ public class TestASTStructure {
 		// gunit test on line 30
 		RuleReturnScope rstruct = (RuleReturnScope)execParser("grammarSpec", "\n    parser grammar P;\n    @header {foo}\n    tokens { A,B }\n    a : A;\n    ", 30);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(PARSER_GRAMMAR P (@ header {foo}) (tokens { A (= B '33')) (RULES (RULE a (BLOCK (ALT A)))))";
+		Object expecting = "(PARSER_GRAMMAR P (@ header {foo}) (tokens { A B) (RULES (RULE a (BLOCK (ALT A)))))";
 		assertEquals("testing rule grammarSpec", expecting, actual);
 	}
 
@@ -113,9 +113,9 @@ public class TestASTStructure {
 
 	@Test public void test_rule3() throws Exception {
 		// gunit test on line 60
-		RuleReturnScope rstruct = (RuleReturnScope)execParser("rule", "\n    public a[int i] returns [int y]\n    options {backtrack=true;}\n    @init {blort}\n      : ID ;\n    ", 60);
+		RuleReturnScope rstruct = (RuleReturnScope)execParser("rule", "\n    a[int i] returns [int y]\n    @init {blort}\n      : ID ;\n    ", 60);
 		Object actual = ((Tree)rstruct.getTree()).toStringTree();
-		Object expecting = "(RULE a (RULEMODIFIERS public) int i (returns int y) (OPTIONS (= backtrack true)) (@ init {blort}) (BLOCK (ALT ID)))";
+		Object expecting = "(RULE a int i (returns int y) (@ init {blort}) (BLOCK (ALT ID)))";
 		assertEquals("testing rule rule", expecting, actual);
 	}
 
