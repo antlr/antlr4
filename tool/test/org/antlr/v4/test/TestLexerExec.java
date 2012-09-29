@@ -125,12 +125,12 @@ public class TestLexerExec extends BaseTest {
 			"STRING_START : '\"' -> pushMode(STRING_MODE), more ;\n" +
 			"WS : (' '|'\n') -> skip ;\n"+
 			"mode STRING_MODE;\n"+
-			"STRING : '\"' -> popMode ;\n"+
+			"STRING : '\"' -> popMode ;\n"+  // token type 2
 			"ANY : . -> more ;\n";
 		String found = execLexer("L.g4", grammar, "L", "\"abc\" \"ab\"");
 		String expecting =
-			"[@0,0:4='\"abc\"',<3>,1:0]\n" +
-			"[@1,6:9='\"ab\"',<3>,1:6]\n" +
+			"[@0,0:4='\"abc\"',<2>,1:0]\n" +
+			"[@1,6:9='\"ab\"',<2>,1:6]\n" +
 			"[@2,10:9='<EOF>',<-1>,1:10]\n";
 		assertEquals(expecting, found);
 	}
@@ -141,12 +141,12 @@ public class TestLexerExec extends BaseTest {
 			"STRING_START : '\"' -> mode(STRING_MODE), more ;\n" +
 			"WS : (' '|'\n') -> skip ;\n"+
 			"mode STRING_MODE;\n"+
-			"STRING : '\"' -> mode(DEFAULT_MODE) ;\n"+
+			"STRING : '\"' -> mode(DEFAULT_MODE) ;\n"+ // ttype 2 since '"' ambiguity
 			"ANY : . -> more ;\n";
 		String found = execLexer("L.g4", grammar, "L", "\"abc\" \"ab\"");
 		String expecting =
-			"[@0,0:4='\"abc\"',<3>,1:0]\n" +
-			"[@1,6:9='\"ab\"',<3>,1:6]\n" +
+			"[@0,0:4='\"abc\"',<2>,1:0]\n" +
+			"[@1,6:9='\"ab\"',<2>,1:6]\n" +
 			"[@2,10:9='<EOF>',<-1>,1:10]\n";
 		assertEquals(expecting, found);
 	}

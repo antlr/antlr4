@@ -42,8 +42,6 @@ import org.antlr.v4.runtime.misc.Nullable;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashSet;
-import java.util.Set;
 
 /** "dup" of ParserInterpreter */
 public class LexerATNSimulator extends ATNSimulator {
@@ -433,10 +431,11 @@ public class LexerATNSimulator extends ATNSimulator {
 					captureSimState(prevAccept, input, c);
 				}
 
-				// if we reach lexer accept state, toss out any configs pointing
-				// at wildcard edges in rest of configs work list associated
-				// with this rule (config.alt); that rule is done. this is how
-				// we cut off nongreedy .+ loops.
+				// if we reach lexer accept state with empty stack,
+				// toss out any configs pointing at wildcard edges
+				// in rest of configs work list associated with this
+				// rule (config.alt); that rule is done. this is how we
+				// cut off nongreedy .+ loops.
 				reach = deleteWildcardConfigsForAlt(reach, ci, c);
 
 			 	// move to next char, looking for longer match
@@ -528,13 +527,16 @@ public class LexerATNSimulator extends ATNSimulator {
 	}
 
 	/** Delete configs for alt following ci that have a wildcard edge but
-	 *  only for configs with same stack. E.g., if we want to kill after
+	 *  only for configs with empty stack. E.g., if we want to kill after
 	 *  config (2,1,[$]), then we need to wack only configs with $ stack:
 	 *
 	 *  	[..., (2,1,[$]), ..., (7,1,[[$, 6 $]])]
 	 *
-	 *  That means wacking (7,1,[$]) but not (7,1,[6 $]).  If incoming config
-	 *  has multiple stacks, must look for each one in other configs.
+	 *  That means wacking (7,1,[$]) but not (7,1,[6 $]).
+	 *
+	 *  Incoming config could have multiple stacks but we only care about
+	 *  empty stack since that means we reached end of a lexer rule from
+	 *  nextToken directly.
 	 *
 	 *  Closure is unmodified; copy returned.
 	 */
@@ -547,13 +549,6 @@ public class LexerATNSimulator extends ATNSimulator {
 			System.out.printf("deleteWildcardConfigsForAlt for alt %d after config %d\n", alt, ci);
 		}
 
-		// collect ctxs from incoming config; must wack all of those.
-		Set<SingletonPredictionContext> contextsToKill =
-			new HashSet<SingletonPredictionContext>();
-		for (SingletonPredictionContext ctx : config.context) {
-			contextsToKill.add(ctx);
-		}
-
 		ATNConfigSet dup = new ATNConfigSet(); // build up as we go thru loop
 		for (int j=0; j<=ci; j++) dup.add(closure.get(j)); // add stuff up to ci
 		int j=ci+1;
@@ -562,11 +557,10 @@ public class LexerATNSimulator extends ATNSimulator {
 			boolean isWildcard = c.state.getClass() == ATNState.class && // plain state only, not rulestop etc..
 				    c.state.transition(0) instanceof WildcardTransition;
 			if ( c.alt == alt && isWildcard ) {
-				// found config to kill but only if same stack.
-				// find c stacks that are in contextsToKill
+				// found config to kill but only if empty stack.
 				for (SingletonPredictionContext ctx : c.context) {
-					if ( contextsToKill.contains(ctx) ) {
-						// c.alt, c.ctx matches and j > ci => kill it
+					if ( ctx.isEmpty() ) {
+						// c.alt matches, empty stack, and j > ci => kill it
 						if ( debug ) {
 							System.out.format("delete config %s since alt %d and %d leads to wildcard\n",
 											  c, c.alt, c.state.stateNumber);
