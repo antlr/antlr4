@@ -454,8 +454,7 @@ public class ParserATNFactory implements ATNFactory {
 		epsilon(blkEnd, loop);		// blk can see loop back
 
 		BlockAST blkAST = (BlockAST)plusAST.getChild(0);
-		loop.isGreedy = isGreedy(blkAST);
-		if ( !g.isLexer() || loop.isGreedy ) {
+		if ( !g.isLexer() || isGreedy(blkAST) ) {
 			epsilon(loop, blkStart);	// loop back to start
 			epsilon(loop, end);			// or exit
 		}
@@ -494,8 +493,7 @@ public class ParserATNFactory implements ATNFactory {
 		end.loopBackState = loop;
 
 		BlockAST blkAST = (BlockAST)starAST.getChild(0);
-		entry.isGreedy = isGreedy(blkAST);
-		if ( !g.isLexer() || entry.isGreedy ) {
+		if ( !g.isLexer() || isGreedy(blkAST) ) {
 			epsilon(entry, blkStart);	// loop enter edge (alt 1)
 			epsilon(entry, end);		// bypass loop edge (alt 2)
 		}

@@ -138,7 +138,18 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 
 	@Override
 	public void modeDef(GrammarAST m, GrammarAST ID) {
-		checkMode(ID.token);
+		if ( !g.isLexer() ) {
+			g.tool.errMgr.grammarError(ErrorType.MODE_NOT_IN_LEXER, g.fileName,
+									   ID.token, ID.token.getText(), g);
+		}
+	}
+
+	@Override
+	public void wildcardRef(GrammarAST ref) {
+		if ( !g.isLexer() ) {
+			g.tool.errMgr.grammarError(ErrorType.WILDCARD_IN_PARSER, g.fileName,
+									   ref.getToken(), ref.getText(), g);
+		}
 	}
 
 	@Override
@@ -261,13 +272,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		}
 	}
 
-	void checkMode(Token modeNameToken) {
-		if ( !g.isLexer() ) {
-			g.tool.errMgr.grammarError(ErrorType.MODE_NOT_IN_LEXER, g.fileName,
-									   modeNameToken, modeNameToken.getText(), g);
-		}
-	}
-
 	void checkNumPrequels(List<GrammarAST> options,
 						  List<GrammarAST> imports,
 						  List<GrammarAST> tokens)
@@ -337,7 +341,14 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	{
 		boolean ok = true;
 		if ( parent.getType()==ANTLRParser.BLOCK ) {
-			if ( !Grammar.subruleOptions.contains(optionID.getText()) ) { // block
+			if ( g.isLexer() && Grammar.LexerSubruleOptions.contains(optionID.getText()) ) { // block
+				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
+										   g.fileName,
+										   optionID,
+										   optionID.getText());
+				ok = false;
+			}
+			if ( !g.isLexer() && Grammar.ParserSubruleOptions.contains(optionID.getText()) ) { // block
 				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
 										   g.fileName,
 										   optionID,

@@ -522,7 +522,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 //		}
 
 		if ( acceptState.configs.getConflictingAlts()!=null ) {
-			if ( dfa.atnStartState instanceof DecisionState && ((DecisionState)dfa.atnStartState).isGreedy ) {
+			if ( dfa.atnStartState instanceof DecisionState ) {
 				if (!userWantsCtxSensitive ||
 					!acceptState.configs.getDipsIntoOuterContext() ||
 					(treat_sllk1_conflict_as_ambiguity && input.index() == startIndex))
@@ -627,12 +627,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		int t = input.LA(1);
 
         DecisionState decState = atn.getDecisionState(dfa.decision);
-		boolean greedy = decState.isGreedy;
 		SimulatorState<Symbol> previous = initialState;
 
 		PredictionContextCache contextCache = new PredictionContextCache();
 		while (true) { // while more work
-			SimulatorState<Symbol> nextState = computeReachSet(dfa, previous, t, greedy, contextCache);
+			SimulatorState<Symbol> nextState = computeReachSet(dfa, previous, t, contextCache);
 			if (nextState == null) {
 				return handleNoViableAlt(input, startIndex, previous);
 			}
@@ -652,7 +651,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						&& input.index() == startIndex
 						&& nextState.outerContext == nextState.remainingOuterContext
 						&& dfa.decision >= 0
-						&& greedy
 						&& !D.configs.hasSemanticContext())
 					{
 						if (t >= 0 && t <= Short.MAX_VALUE) {
@@ -667,7 +665,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				}
 				else if ( D.configs.getConflictingAlts()!=null ) {
 					predictedAlt = D.prediction;
-					if ( greedy ) {
 //						int k = input.index() - startIndex + 1; // how much input we used
 //						System.out.println("used k="+k);
 						if ( !userWantsCtxSensitive ||
@@ -702,11 +699,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							input.seek(startIndex);
 							return execATN(dfa, input, startIndex, fullContextState);
 						}
-					}
-				}
-
-				if ( !greedy ) {
-					predictedAlt = D.prediction;
 				}
 
 				if ( D.predicates != null ) {
@@ -758,7 +750,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		throw noViableAlt(input, previous.outerContext, previous.s0.configs, startIndex);
 	}
 
-	protected SimulatorState<Symbol> computeReachSet(DFA dfa, SimulatorState<Symbol> previous, int t, boolean greedy, PredictionContextCache contextCache) {
+	protected SimulatorState<Symbol> computeReachSet(DFA dfa, SimulatorState<Symbol> previous, int t, PredictionContextCache contextCache) {
 		final boolean useContext = previous.useContext;
 		ParserRuleContext<Symbol> remainingGlobalContext = previous.remainingOuterContext;
 
@@ -817,14 +809,14 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				}
 			}
 
-			if (optimize_unique_closure && greedy && reachIntermediate.getUniqueAlt() != ATN.INVALID_ALT_NUMBER) {
+			if (optimize_unique_closure && reachIntermediate.getUniqueAlt() != ATN.INVALID_ALT_NUMBER) {
 				reachIntermediate.setOutermostConfigSet(reach.isOutermostConfigSet());
 				reach = reachIntermediate;
 				break;
 			}
 
 			final boolean collectPredicates = false;
-			closure(reachIntermediate, reach, collectPredicates, greedy, hasMoreContext, contextCache);
+			closure(reachIntermediate, reach, collectPredicates, hasMoreContext, contextCache);
 			stepIntoGlobal = reach.getDipsIntoOuterContext();
 
 			if (useContext && stepIntoGlobal) {
@@ -915,13 +907,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 
 		ATNConfigSet configs = new ATNConfigSet();
-
-		DecisionState decState = null;
-		if ( atn.decisionToState.size()>0 ) {
-			decState = atn.decisionToState.get(decision);
-		}
-
-		boolean greedy = decState == null || decState.isGreedy;
 		while (true) {
 			ATNConfigSet reachIntermediate = new ATNConfigSet();
 			int n = p.getNumberOfTransitions();
@@ -937,7 +922,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			final boolean collectPredicates = true;
-			closure(reachIntermediate, configs, collectPredicates, greedy, hasMoreContext, contextCache);
+			closure(reachIntermediate, configs, collectPredicates, hasMoreContext, contextCache);
 			boolean stepIntoGlobal = configs.getDipsIntoOuterContext();
 
 			DFAState next = addDFAState(dfa, configs, contextCache);
@@ -1168,7 +1153,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	protected void closure(ATNConfigSet sourceConfigs,
 						   @NotNull ATNConfigSet configs,
 						   boolean collectPredicates,
-						   boolean greedy,
 						   boolean hasMoreContext,
 						   @Nullable PredictionContextCache contextCache)
 	{
@@ -1185,7 +1169,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					continue;
 				}
 
-				closure(config, configs, intermediate, closureBusy, collectPredicates, greedy, hasMoreContext, contextCache, 0);
+				closure(config, configs, intermediate, closureBusy, collectPredicates, hasMoreContext, contextCache, 0);
 			}
 
 			currentConfigs = intermediate;
@@ -1197,7 +1181,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						   @Nullable ATNConfigSet intermediate,
 						   @NotNull Set<ATNConfig> closureBusy,
 						   boolean collectPredicates,
-						   boolean greedy,
 						   boolean hasMoreContexts,
 						   @NotNull PredictionContextCache contextCache,
 						   int depth)
@@ -1210,14 +1193,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		boolean hasEmpty = config.getContext().hasEmpty();
 		if ( config.getState() instanceof RuleStopState ) {
-			if ( !greedy ) {
-				// don't see past end of a rule for any nongreedy decision
-				if ( debug ) System.out.println("NONGREEDY at stop state of "+
-												getRuleName(config.getState().ruleIndex));
-				configs.add(config, contextCache);
-				return;
-			}
-
 			// We hit rule end. If we have context info, use it
 			if ( config.getContext()!=null && !config.getContext().isEmpty() ) {
 				int nonEmptySize = config.getContext().size() - (hasEmpty ? 1 : 0);
@@ -1236,7 +1211,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						continue;
 					}
 
-					closure(c, configs, intermediate, closureBusy, collectPredicates, greedy, hasMoreContexts, contextCache, depth - 1);
+					closure(c, configs, intermediate, closureBusy, collectPredicates, hasMoreContexts, contextCache, depth - 1);
 				}
 
 				if (!hasEmpty || !hasMoreContexts) {
@@ -1327,7 +1302,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					}
 				}
 
-				closure(c, configs, intermediate, closureBusy, continueCollecting, greedy, hasMoreContexts, contextCache, newDepth);
+				closure(c, configs, intermediate, closureBusy, continueCollecting, hasMoreContexts, contextCache, newDepth);
 			}
 		}
 	}
@@ -1732,40 +1707,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		DFAState newState = createDFAState(configs.clone(true));
 		DecisionState decisionState = atn.getDecisionState(dfa.decision);
-		boolean greedy = decisionState.isGreedy;
 		int predictedAlt = getUniqueAlt(configs);
 		if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
 			newState.isAcceptState = true;
 			newState.prediction = predictedAlt;
 		} else if (configs.getConflictingAlts() != null) {
-			if (greedy) {
-				newState.isAcceptState = true;
-				newState.prediction = resolveToMinAlt(newState, newState.configs.getConflictingAlts());
-			} else {
-				// upon ambiguity for nongreedy, default to exit branch to avoid inf loop
-				// this handles case where we find ambiguity that stops DFA construction
-				// before a config hits rule stop state. Was leaving prediction blank.
-				final int exitAlt = 2;
-				newState.isAcceptState = true; // when ambig or ctx sens or nongreedy or .* loop hitting rule stop
-				newState.prediction = exitAlt;
-			}
-		}
-
-		if ( !greedy ) {
-			final int exitAlt = 2;
-			if ( predictedAlt != ATN.INVALID_ALT_NUMBER && configWithAltAtStopState(configs, 1) ) {
-				if ( debug ) System.out.println("nongreedy loop but unique alt "+newState.configs.getUniqueAlt()+" at "+configs);
-				// reaches end via .* means nothing after.
-				newState.isAcceptState = true;
-				newState.prediction = exitAlt;
-			}
-			else {// if we reached end of rule via exit branch and decision nongreedy, we matched
-				if ( configWithAltAtStopState(configs, exitAlt) ) {
-					if ( debug ) System.out.println("nongreedy at stop state for exit branch");
-					newState.isAcceptState = true;
-					newState.prediction = exitAlt;
-				}
-			}
+			newState.isAcceptState = true;
+			newState.prediction = resolveToMinAlt(newState, newState.configs.getConflictingAlts());
 		}
 
 		if (newState.isAcceptState && configs.hasSemanticContext()) {

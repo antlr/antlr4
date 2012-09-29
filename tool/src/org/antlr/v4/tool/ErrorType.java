@@ -136,7 +136,7 @@ public enum ErrorType {
 	IMPORT_NAME_CLASH(113, "<arg.typeString> grammar <arg.name> and imported <arg2.typeString> grammar <arg2.name> both generate <arg2.recognizerName>", ErrorSeverity.ERROR),
 	AST_OP_WITH_NON_AST_OUTPUT_OPTION(114, " <arg>", ErrorSeverity.ERROR),
 	AST_OP_IN_ALT_WITH_REWRITE(115, "", ErrorSeverity.ERROR),
-    WILDCARD_AS_ROOT(116, "", ErrorSeverity.ERROR),
+//    WILDCARD_AS_ROOT(116, "", ErrorSeverity.ERROR),
     CONFLICTING_OPTION_IN_TREE_FILTER(117, "", ErrorSeverity.ERROR),
 	ALL_OPS_NEED_SAME_ASSOC(118, "all operators of alt <arg> of left-recursive rule must have same associativity", ErrorSeverity.WARNING),
 	LEFT_RECURSION_CYCLES(119, "The following sets of rules are mutually left-recursive <arg:{c| [<c:{r|<r.name>}; separator=\", \">]}; separator=\" and \">", ErrorSeverity.ERROR),
@@ -149,6 +149,7 @@ public enum ErrorType {
 	IMPLICIT_STRING_DEFINITION(126, "cannot create implicit token for string literal <arg> in non-combined grammar", ErrorSeverity.ERROR),
 //	ALIAS_REASSIGNMENT(127, "token literal <arg> aliased to new token name <arg2>", ErrorSeverity.WARNING),
 	ATTRIBUTE_IN_LEXER_ACTION(128, "attribute references not allowed in lexer actions: $<arg>", ErrorSeverity.ERROR),
+	WILDCARD_IN_PARSER(129, "wildcard '.' not allowed in parsers", ErrorSeverity.ERROR),
 
 	/** Documentation comment is unterminated */
     //UNTERMINATED_DOC_COMMENT(, "", ErrorSeverity.ERROR),

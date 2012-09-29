@@ -50,6 +50,11 @@ public final class EmptyPredictionContext extends PredictionContext {
 	}
 
 	@Override
+	protected PredictionContext removeEmptyContext() {
+		throw new UnsupportedOperationException("Cannot remove the empty context from itself.");
+	}
+
+	@Override
 	public PredictionContext getParent(int index) {
 		throw new IndexOutOfBoundsException();
 	}

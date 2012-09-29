@@ -420,10 +420,12 @@ public class LexerATNSimulator extends ATNSimulator {
 					captureSimState(prevAccept, input, reach, c);
 				}
 
-				// if we reach lexer accept state, toss out any configs in rest
-				// of configs work list associated with this rule (config.alt);
-				// that rule is done. this is how we cut off nongreedy .+ loops.
-				deleteWildcardConfigsForAlt(reach, ci, c.getAlt()); // CAUSES INF LOOP if reach not closure
+				// if we reach lexer accept state with empty stack,
+				// toss out any configs pointing at wildcard edges
+				// in rest of configs work list associated with this
+				// rule (config.alt); that rule is done. this is how we
+				// cut off nongreedy .+ loops.
+				deleteWildcardConfigsForAlt(reach, ci, c);
 
 			 	// move to next char, looking for longer match
 				// (we continue processing if there are states in reach)
@@ -512,7 +514,23 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 	}
 
-	public void deleteWildcardConfigsForAlt(@NotNull ATNConfigSet closure, int ci, int alt) {
+	/** Delete configs for alt following ci that have a wildcard edge but
+	 *  only for configs with empty stack. E.g., if we want to kill after
+	 *  config (2,1,[$]), then we need to wack only configs with $ stack:
+	 *
+	 *  	[..., (2,1,[$]), ..., (7,1,[[$, 6 $]])]
+	 *
+	 *  That means wacking (7,1,[$]) but not (7,1,[6 $]).
+	 *
+	 *  Incoming config could have multiple stacks but we only care about
+	 *  empty stack since that means we reached end of a lexer rule from
+	 *  nextToken directly.
+	 */
+	public void deleteWildcardConfigsForAlt(@NotNull ATNConfigSet closure,
+											int ci,
+											ATNConfig config)
+	{
+		int alt = config.getAlt();
 		int j=ci+1;
 		while ( j<closure.size() ) {
 			ATNConfig c = closure.get(j);
@@ -523,7 +541,13 @@ public class LexerATNSimulator extends ATNSimulator {
 					System.out.format("deleteWildcardConfigsForAlt %s\n", c);
 				}
 
-				closure.remove(j);
+				if (c.getContext().isEmpty()) {
+					closure.remove(j);
+				}
+				else {
+					c.setContext(c.getContext().removeEmptyContext());
+					j++;
+				}
 			}
 			else j++;
 		}

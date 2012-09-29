@@ -87,6 +87,11 @@ public class SingletonPredictionContext extends PredictionContext {
 	}
 
 	@Override
+	protected PredictionContext removeEmptyContext() {
+		return this;
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if (o == this) {
 			return true;

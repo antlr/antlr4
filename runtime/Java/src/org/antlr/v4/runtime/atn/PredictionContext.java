@@ -127,6 +127,8 @@ public abstract class PredictionContext {
 
 	protected abstract PredictionContext addEmptyContext();
 
+	protected abstract PredictionContext removeEmptyContext();
+
 	public static PredictionContext fromRuleContext(@NotNull RuleContext<?> outerContext) {
 		return fromRuleContext(outerContext, true);
 	}
@@ -147,6 +149,10 @@ public abstract class PredictionContext {
 
 	private static PredictionContext addEmptyContext(PredictionContext context) {
 		return context.addEmptyContext();
+	}
+
+	private static PredictionContext removeEmptyContext(PredictionContext context) {
+		return context.removeEmptyContext();
 	}
 
 	public static PredictionContext join(PredictionContext context0, PredictionContext context1) {

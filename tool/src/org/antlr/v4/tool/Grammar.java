@@ -87,8 +87,11 @@ public class Grammar implements AttributeResolver {
 	}};
 
 	@SuppressWarnings("serial")
-	public static final Set<String> subruleOptions = new HashSet<String>() {{
-		add("greedy");
+	public static final Set<String> ParserSubruleOptions = new HashSet<String>() {{
+	}};
+
+	@SuppressWarnings("serial")
+	public static final Set<String> LexerSubruleOptions = new HashSet<String>() {{
 	}};
 
 	/** Legal options for terminal refs like ID<assoc=right> */

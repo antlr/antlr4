@@ -106,6 +106,22 @@ public class ArrayPredictionContext extends PredictionContext {
 	}
 
 	@Override
+	protected PredictionContext removeEmptyContext() {
+		if (!hasEmpty()) {
+			return this;
+		}
+
+		if (invokingStates.length == 2) {
+			return new SingletonPredictionContext(parents[0], invokingStates[0]);
+		}
+		else {
+			PredictionContext[] parents2 = Arrays.copyOf(parents, parents.length - 1);
+			int[] invokingStates2 = Arrays.copyOf(invokingStates, invokingStates.length - 1);
+			return new ArrayPredictionContext(parents2, invokingStates2);
+		}
+	}
+
+	@Override
 	public PredictionContext appendContext(PredictionContext suffix, PredictionContextCache contextCache) {
 		return appendContext(this, suffix, new IdentityHashMap<PredictionContext, PredictionContext>());
 	}

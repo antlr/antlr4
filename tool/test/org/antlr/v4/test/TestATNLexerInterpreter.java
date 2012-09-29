@@ -148,6 +148,27 @@ public class TestATNLexerInterpreter extends BaseTest {
 		checkLexerMatches(lg, "/* ick */\n/* /*nested*/ */", expecting);
 	}
 
+	@Test public void testRecursiveLexerRuleRefWithWildcard() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"CMT : '/*' (CMT | .)+ '*/' ;\n" +
+			"WS : (' '|'\n')+ ;");
+		String expecting = "CMT, WS, CMT, WS, CMT, WS, EOF";
+		// stuff on end of comment matches another rule
+		checkLexerMatches(lg,
+						  "/* ick */\n" +
+						  "/* /* */\n" +
+						  "/* /*nested*/ */\n",
+						  expecting);
+		// stuff on end of comment doesn't match another rule
+		expecting = "CMT, WS, CMT, WS, CMT, WS, EOF";
+		checkLexerMatches(lg,
+						  "/* ick */x\n" +
+						  "/* /* */x\n" +
+						  "/* /*nested*/ */x\n",
+						  expecting);
+	}
+
 	@Test public void testLexerWildcardNonGreedyLoopByDefault() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
