@@ -6,32 +6,32 @@ University of San Francisco
 
 INTRODUCTION
 
-Hi and welcome to the Honey Badger 4.0b1 release of ANTLR!
+Hi and welcome to the Honey Badger 4.0b2 release of ANTLR!
 
 INSTALLATION
 
 $ cd /usr/local/lib
-$ curl -O --silent http://www.antlr.org/download/antlr-4.0b1-complete.jar
+$ curl -O --silent http://www.antlr.org/download/antlr-4.0b2-complete.jar
 
-Or just download from http://www.antlr.org/download/antlr-4.0b1-complete.jar
+Or just download from http://www.antlr.org/download/antlr-4.0b2-complete.jar
 and put it somewhere rational for your operating system.
 
 You can either add to your CLASSPATH:
 
-$ export CLASSPATH=".:/usr/local/lib/antlr-4.0b1-complete.jar:$CLASSPATH"
+$ export CLASSPATH=".:/usr/local/lib/antlr-4.0b2-complete.jar:$CLASSPATH"
 
 and launch org.antlr.v4.Tool directly:
 
 $ java org.antlr.v4.Tool
-ANTLR Parser Generator Version 4.0b1
+ANTLR Parser Generator Version 4.0b2
     -o ___              specify output directory where all output is generated
     -lib ___            specify location of .tokens files
 ...
 
 or use -jar option on java:
 
-$ java -jar /usr/local/lib/antlr-4.0b1-complete.jar
-ANTLR Parser Generator Version 4.0b1
+$ java -jar /usr/local/lib/antlr-4.0b2-complete.jar
+ANTLR Parser Generator Version 4.0b2
     -o ___              specify output directory where all output is generated
     -lib ___            specify location of .tokens files
 ...
@@ -44,11 +44,11 @@ java -cp "/usr/local/lib/antlr4-complete.jar:$CLASSPATH" org.antlr.v4.Tool $*
 On Windows, you can do something like this (assuming you put the
 jar in C:\libraries) for antlr4.bat:
 
-java -cp C:\libraries\antlr-4.0-complete.jar;%CLASSPATH% org.antlr.v4.Tool %*
+java -cp C:\libraries\antlr-4.0b2-complete.jar;%CLASSPATH% org.antlr.v4.Tool %*
 
 You can also use an alias
 
-$ alias antlr4='java -jar /usr/local/lib/antlr-4.0-complete.jar'
+$ alias antlr4='java -jar /usr/local/lib/antlr-4.0b2-complete.jar'
 
 Either way, say just antlr4 to run ANTLR now.
 

@@ -1,6 +1,8 @@
 ANTLR v4 Honey Badger
 
-September 28, 2012
+October ?, 2012 -- 4.0b2 release
+
+September 29, 2012
 
 * no nongreedy or wildcard in parser.
 
