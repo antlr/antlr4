@@ -86,7 +86,6 @@ public class Grammar implements AttributeResolver {
 	}};
 
 	public static final Set<String> LexerSubruleOptions = new HashSet<String>() {{
-		add("greedy");
 	}};
 
 	/** Legal options for terminal refs like ID<assoc=right> */
