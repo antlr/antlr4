@@ -50,8 +50,8 @@ public class LexerInterpreter implements TokenSource {
 	/** How to create token objects */
 	protected TokenFactory<?> _factory = CommonTokenFactory.DEFAULT;
 
-	protected static final DFA[] _decisionToDFA = new DFA[1];
-	protected static final PredictionContextCache _sharedContextCache =
+	protected final DFA[] _decisionToDFA = new DFA[1];
+	protected final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 
 	public LexerInterpreter(LexerGrammar g, String inputString) {
