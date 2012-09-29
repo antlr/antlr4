@@ -341,7 +341,7 @@ public class TestPerformance extends BaseTest {
 
         if (RUN_PARSER) {
             // make sure the individual DFAState objects actually have unique ATNConfig arrays
-            final ParserATNSimulator<?> interpreter = sharedParser.getInterpreter();
+            final ParserATNSimulator interpreter = sharedParser.getInterpreter();
             final DFA[] decisionToDFA = interpreter.decisionToDFA;
 
             if (SHOW_DFA_STATE_STATS) {

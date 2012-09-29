@@ -29,7 +29,7 @@
 
 package org.antlr.v4.runtime.atn;
 
-public class ParserATNPathFinder /*extends ParserATNSimulator<Token>*/ {
+public class ParserATNPathFinder /*extends ParserATNSimulator*/ {
 
 //	public ParserATNPathFinder(@Nullable Parser parser, @NotNull ATN atn, @NotNull DFA[] decisionToDFA) {
 //		super(parser, atn, decisionToDFA);

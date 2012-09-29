@@ -32,7 +32,6 @@ package org.antlr.v4.tool.interp;
 import org.antlr.v4.Tool;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
@@ -82,7 +81,7 @@ public class ParserInterpreter {
 
 	protected Grammar g;
 	public DummyParser parser;
-	protected ParserATNSimulator<Token> atnSimulator;
+	protected ParserATNSimulator atnSimulator;
 	protected TokenStream input;
 
 	public ParserInterpreter(@NotNull Grammar g) {
@@ -94,7 +93,7 @@ public class ParserInterpreter {
 		antlr.process(g,false);
 		parser = new DummyParser(g, input);
 		atnSimulator =
-			new ParserATNSimulator<Token>(parser, g.atn, parser.decisionToDFA,
+			new ParserATNSimulator(parser, g.atn, parser.decisionToDFA,
 										  parser.sharedContextCache);
 	}
 
@@ -129,7 +128,7 @@ public class ParserInterpreter {
 		}
 	}
 
-	public ParserATNSimulator<Token> getATNSimulator() {
+	public ParserATNSimulator getATNSimulator() {
 		return atnSimulator;
 	}
 

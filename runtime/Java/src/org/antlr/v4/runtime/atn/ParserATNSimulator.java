@@ -254,7 +254,7 @@ import java.util.Set;
  passes over the input.
 
 */
-public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
+public class ParserATNSimulator extends ATNSimulator {
 	public static boolean debug = false;
 	public static boolean debug_list_atn_decisions = false;
 	public static boolean dfa_debug = false;

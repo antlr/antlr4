@@ -33,7 +33,6 @@ import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.DecisionState;
@@ -62,7 +61,7 @@ public class TestATNParserPrediction extends BaseTest {
 			"C : 'c' ;\n");
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"a : A | B ;");
+			"a : A{;} | B ;");
 		int decision = 0;
 		checkPredictedAlt(lg, g, decision, "a", 1);
 		checkPredictedAlt(lg, g, decision, "b", 2);
@@ -505,7 +504,7 @@ public class TestATNParserPrediction extends BaseTest {
 		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
 
 		// Check ATN prediction
-//		ParserATNSimulator<Token> interp = new ParserATNSimulator<Token>(atn);
+//		ParserATNSimulator interp = new ParserATNSimulator(atn);
 		TokenStream input = new IntTokenStream(types);
 		ParserInterpreter interp = new ParserInterpreter(g, input);
 		DecisionState startState = atn.decisionToState.get(decision);
@@ -546,8 +545,8 @@ public class TestATNParserPrediction extends BaseTest {
 //		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("b"))));
 //		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("e"))));
 
-		ParserATNSimulator<Token> interp =
-			new ParserATNSimulator<Token>(atn, new DFA[atn.getNumberOfDecisions()],null);
+		ParserATNSimulator interp =
+			new ParserATNSimulator(atn, new DFA[atn.getNumberOfDecisions()],null);
 		IntegerList types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
 		TokenStream input = new IntTokenStream(types);
