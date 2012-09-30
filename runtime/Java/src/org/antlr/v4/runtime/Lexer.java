@@ -222,6 +222,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		this._factory = factory;
 	}
 
+	public TokenFactory<? extends Token> getTokenFactory() {
+		return _factory;
+	}
+
 	/** Set the char stream and reset the lexer */
 	@Override
 	public void setInputStream(IntStream input) {

@@ -19,20 +19,23 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 	 */
 	protected int n;
 
-	/** 0..n-1 index into tokens of next token; tokens[p] is LA(1). */
+	/** 0..n-1 index into tokens of next token; tokens[p] is LT(1).
+	 *  If p == n, we are out of buffered tokens.
+	 */
 	protected int p=0;
 
-	protected int earliestMarker = -1;
+	/** Count up with mark() and down with release(). When we release()
+	 *  and hit zero, reset buffer to beginning. Copy data[p]..data[n-1]
+	 *  to data[0]..data[(n-1)-p].
+	 */
+	protected int numMarkers = 0;
+
+	protected Token lastToken;
 
 	/** Absolute token index. It's the index of the token about to be
 	 *  read via LA(1). Goes from 0 to numtokens-1 in entire stream.
 	 */
 	protected int currentTokenIndex = 0; // simple counter to set token index in tokens
-
-	/** Buf is window into stream. This is absolute token index into entire
-	 *  stream of tokens[0]
-	 */
-	protected int bufferStartTokenIndex = 0;
 
     /** Skip tokens on any channel but this one; this is how we skip whitespace... */
 	//  TODO: skip off-channel tokens!!!
@@ -45,20 +48,37 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 	public UnbufferedTokenStream(TokenSource tokenSource, int bufferSize) {
 		this.tokenSource = tokenSource;
 		tokens = new Token[bufferSize];
+		n = 0;
 		fill(1); // prime the pump
 	}
 
 	@Override
-	public Token get(int i) {
-		return null;
+	public Token get(int i) { // get absolute index
+		int bufferStartIndex = getBufferStartIndex();
+		if (i < bufferStartIndex || i >= bufferStartIndex + n) {
+			throw new IndexOutOfBoundsException("get("+i+") outside buffer: "+
+			                    bufferStartIndex+".."+(bufferStartIndex+n));
+		}
+		return tokens[i - bufferStartIndex];
 	}
 
 	@Override
 	public Token LT(int i) {
-		sync(i);
-		int index = p + i - 1;
-		if ( index < 0 || index > n ) throw new IndexOutOfBoundsException();
-		return tokens[index];
+		if ( i==-1 ) return lastToken; // special case
+        sync(i);
+        int index = p + i - 1;
+        if ( index < 0 ) throw new IndexOutOfBoundsException("LT("+i+") gives negative index");
+		if ( index > n ) {
+			TokenFactory<?> factory = tokenSource.getTokenFactory();
+			int cpos = tokenSource.getCharPositionInLine();
+			// The character position for EOF is one beyond the position of
+			// the previous token's last character
+			Token eof = factory.create(tokenSource, Token.EOF, null, Token.DEFAULT_CHANNEL,
+									   index(), index()-1,
+									   tokenSource.getLine(), cpos);
+			return eof;
+		}
+        return tokens[index];
 	}
 
 	@Override
@@ -76,26 +96,31 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 
 	@Override
 	public String getText(RuleContext ctx) {
-		return null;
+		return getText(ctx.getSourceInterval());
 	}
 
 	@Override
 	public String getText(Token start, Token stop) {
-		return null;
+		return getText(Interval.of(start.getTokenIndex(), stop.getTokenIndex()));
 	}
 
 	@Override
 	public void consume() {
+		// buf always has at least data[p==0] in this method due to ctor
+		if ( p==0 ) lastToken = null; // we're at first token; no LA(-1)
+		else lastToken = tokens[p];   // track last char for LT(-1)
+
+		// if we're at last token and no markers, opportunity to flush buffer
+		if ( p == n-1 && numMarkers==0 ) { // can we release buffer?
+//			System.out.println("consume: reset");
+			n = 0;
+			p = -1; // p++ will leave this at 0
+		}
+
 		p++;
 		currentTokenIndex++;
-		// have we hit end of buffer when no markers?
-		if ( p==n && earliestMarker < 0 ) {
-			// if so, it's an opportunity to start filling at index 0 again
-			// System.out.println("p=="+n+", no marker; reset buf start index="+currentCharIndex);
-			p = 0;
-			n = 0;
-			bufferStartTokenIndex = currentTokenIndex;
-		}
+//		System.out.println("consume p="+p+", numMarkers="+numMarkers+
+//						   ", currentCharIndex="+currentCharIndex+", n="+n);
 		sync(1);
 	}
 
@@ -135,39 +160,41 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 	@Override
 	public int mark() {
 		int m = p;
-		if ( p < earliestMarker) {
-			// they must have done seek to before min marker
-			throw new IllegalArgumentException("can't set marker earlier than previous existing marker: "+p+"<"+ earliestMarker);
-		}
-		if ( earliestMarker < 0 ) earliestMarker = m; // set first marker
+		numMarkers++;
 		return m;
 	}
 
 	@Override
 	public void release(int marker) {
-		// release is noop unless we remove earliest. then we don't need to
-		// keep anything in buffer. We only care about earliest. Releasing
-		// marker other than earliest does nothing as we can just keep in
-		// buffer.
-		if ( marker < earliestMarker || marker >= n ) {
-			throw new IllegalArgumentException("invalid marker: "+
-											   marker+" not in "+0+".."+n);
+		if ( numMarkers==0 ) {
+			throw new IllegalStateException("release() called w/o prior matching mark()");
 		}
-		if ( marker == earliestMarker) earliestMarker = -1;
+//		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+//		System.out.println(stackTrace[2].getMethodName()+": release " + marker);
+		numMarkers--;
+		if ( numMarkers==0 ) { // can we release buffer?
+			System.out.println("release: shift "+p+".."+(n-1)+" to 0: '"+
+								   Arrays.toString(Arrays.copyOfRange(tokens,p,n))+"'");
+			// Copy data[p]..data[n-1] to data[0]..data[(n-1)-p], reset ptrs
+			// p is last valid token; move nothing if p==n as we have no valid char
+			System.arraycopy(tokens, p, tokens, 0, n - p); // shift n-p char from p to 0
+			n = n - p;
+			p = 0;
+		}
 	}
 
 	@Override
 	public int index() {
-		return p + bufferStartTokenIndex;
+		return currentTokenIndex;
 	}
 
 	@Override
-	public void seek(int index) {
-		// index == to bufferStartIndex should set p to 0
-		int i = index - bufferStartTokenIndex;
+	public void seek(int index) { // seek to absolute index
+		int bufferStartIndex = getBufferStartIndex();
+		int i = index - bufferStartIndex;
 		if ( i < 0 || i >= n ) {
 			throw new UnsupportedOperationException("seek to index outside buffer: "+
-													index+" not in "+ bufferStartTokenIndex +".."+(bufferStartTokenIndex +n));
+													index+" not in "+ bufferStartIndex +".."+(bufferStartIndex +n));
 		}
 		p = i;
 	}
@@ -184,7 +211,7 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 
 	@Override
 	public String getText(Interval interval) {
-		int bufferStartIndex = currentTokenIndex - p;
+		int bufferStartIndex = getBufferStartIndex();
 		int bufferStopIndex = bufferStartIndex + tokens.length - 1;
 
 		int start = interval.a;
@@ -194,19 +221,35 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 													bufferStartIndex+".."+bufferStopIndex);
 		}
 
+		int a = start - bufferStartIndex;
+		int b = stop - bufferStartIndex;
+
 		StringBuilder buf = new StringBuilder();
-		for (int i = start; i <= stop; i++) {
-			Token t = tokens[i - bufferStartIndex];
+		for (int i = a; i <= b; i++) {
+			Token t = tokens[i];
 			buf.append(t.getText());
 		}
 
 		return buf.toString();
 	}
 
-	/** For testing.  What's in moving window into tokens stream? */
+	/** For testing.  What's in moving window into token stream from
+	 *  current index, LT(1) or tokens[p], to end of buffer?
+	 */
+	public List<T> getRemainingBuffer() {
+		if ( n==0 ) return null;
+		return (List<T>)Arrays.asList(Arrays.copyOfRange(tokens, p, n));
+	}
+
+	/** For testing.  What's in moving window buffer into data stream.
+	 *  From 0..p-1 have been consume.
+	 */
 	public List<T> getBuffer() {
 		if ( n==0 ) return null;
 		return (List<T>)Arrays.asList(Arrays.copyOfRange(tokens, 0, n));
 	}
 
+	public int getBufferStartIndex() {
+		return currentTokenIndex - p;
+	}
 }

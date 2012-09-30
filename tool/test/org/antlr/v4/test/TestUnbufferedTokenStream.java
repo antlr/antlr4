@@ -60,22 +60,21 @@ public class TestUnbufferedTokenStream extends BaseTest {
 
 		assertEquals("[[@0,0:0='x',<1>,1:0]]", tokens.getBuffer().toString());
 		assertEquals("x", tokens.LT(1).getText());
-		assertEquals("[[@0,0:0='x',<1>,1:0]]", tokens.getBuffer().toString());
-		tokens.consume();
+		tokens.consume(); // move to WS
 		assertEquals(" ", tokens.LT(1).getText());
-		assertEquals("[[@1,1:1=' ',<7>,1:1]]", tokens.getBuffer().toString());
+		assertEquals("[[@1,1:1=' ',<7>,1:1]]", tokens.getRemainingBuffer().toString());
 		tokens.consume();
 		assertEquals("=", tokens.LT(1).getText());
-		assertEquals("[[@2,2:2='=',<4>,1:2]]", tokens.getBuffer().toString());
+		assertEquals("[[@2,2:2='=',<4>,1:2]]", tokens.getRemainingBuffer().toString());
 		tokens.consume();
 		assertEquals(" ", tokens.LT(1).getText());
-		assertEquals("[[@3,3:3=' ',<7>,1:3]]", tokens.getBuffer().toString());
+		assertEquals("[[@3,3:3=' ',<7>,1:3]]", tokens.getRemainingBuffer().toString());
 		tokens.consume();
 		assertEquals("302", tokens.LT(1).getText());
-		assertEquals("[[@4,4:6='302',<2>,1:4]]", tokens.getBuffer().toString());
+		assertEquals("[[@4,4:6='302',<2>,1:4]]", tokens.getRemainingBuffer().toString());
 		tokens.consume();
 		assertEquals(";", tokens.LT(1).getText());
-		assertEquals("[[@5,7:7=';',<3>,1:7]]", tokens.getBuffer().toString());
+		assertEquals("[[@5,7:7=';',<3>,1:7]]", tokens.getRemainingBuffer().toString());
     }
 
 	@Test public void testMarkStart() throws Exception {
@@ -142,7 +141,7 @@ public class TestUnbufferedTokenStream extends BaseTest {
 		tokens.consume(); // =
 		tokens.consume(); // ' '
 		assertEquals("302", tokens.LT(1).getText());
-		tokens.release(m); // "x = 302" is in buffer. next consume() should kill buffer
+		tokens.release(m); // "x = 302" is in buffer. will kill buffer
 		tokens.consume(); // 302
 		tokens.consume(); // ' '
 		m = tokens.mark(); // mark at the +
@@ -152,9 +151,11 @@ public class TestUnbufferedTokenStream extends BaseTest {
 		tokens.consume(); // 1
 		tokens.consume(); // ;
 		assertEquals("<EOF>", tokens.LT(1).getText());
+		// we marked at the +, so that should be the start of the buffer
 		assertEquals("[[@6,8:8='+',<5>,1:8], [@7,9:9=' ',<7>,1:9]," +
 					 " [@8,10:10='1',<2>,1:10], [@9,11:11=';',<3>,1:11]," +
 					 " [@10,12:11='<EOF>',<-1>,1:12]]",
 					 tokens.getBuffer().toString());
+		tokens.release(m);
     }
 }

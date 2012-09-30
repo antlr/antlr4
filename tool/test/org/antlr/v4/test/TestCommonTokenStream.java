@@ -56,6 +56,11 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
 				@Override
 				public void setTokenFactory(TokenFactory<?> factory) {
 				}
+
+				@Override
+				public TokenFactory<?> getTokenFactory() {
+					return null;
+				}
 			};
 
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -121,6 +126,11 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
 
 				@Override
 				public void setTokenFactory(TokenFactory<?> factory) {
+				}
+
+				@Override
+				public TokenFactory<?> getTokenFactory() {
+					return null;
 				}
 			};
 

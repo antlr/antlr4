@@ -82,6 +82,11 @@ public class LexerInterpreter implements TokenSource {
 	}
 
 	@Override
+	public TokenFactory<?> getTokenFactory() {
+		return _factory;
+	}
+
+	@Override
 	public int getCharPositionInLine() {
 		return 0;
 	}
