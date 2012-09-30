@@ -58,7 +58,9 @@ public class TestUnbufferedCharStream extends BaseTest {
 		assertEquals('x', input.LA(1));
 		input.consume();
 		assertEquals(CharStream.EOF, input.LA(1));
-		assertEquals("\uFFFF", input.getBuffer()); // shouldn't include x
+		String r = input.getRemainingBuffer();
+		assertEquals("\uFFFF", r); // shouldn't include x
+		assertEquals("x\uFFFF", input.getBuffer()); // whole buffer
 	}
 
 	@Test public void test2Char() throws Exception {
@@ -68,7 +70,8 @@ public class TestUnbufferedCharStream extends BaseTest {
 		assertEquals('x', input.LA(1));
 		input.consume();
 		assertEquals('y', input.LA(1));
-		assertEquals("y", input.getBuffer()); // shouldn't include x
+		assertEquals("y", input.getRemainingBuffer()); // shouldn't include x
+		assertEquals("xy", input.getBuffer());
 		input.consume();
 		assertEquals(CharStream.EOF, input.LA(1));
 	}
@@ -154,8 +157,9 @@ public class TestUnbufferedCharStream extends BaseTest {
 		input.consume(); // y
 		input.consume(); // z, moves to EOF
 		assertEquals(CharStream.EOF, input.LA(1));
-		input.release(m);
 		assertEquals("xyz\uFFFF", input.getBuffer());
+		input.release(m); // wipes buffer
+		assertEquals("\uFFFF", input.getBuffer());
 	}
 
     @Test public void test2Mark() throws Exception {
@@ -166,19 +170,17 @@ public class TestUnbufferedCharStream extends BaseTest {
    		assertEquals('x', input.LA(1));
         input.consume(); // reset buffer index (p) to 0
         int m1 = input.mark();
-		assertEquals(0, m1); // first marker dropped at buffer index 0
+		assertEquals(1, m1);
    		assertEquals('y', input.LA(1));
         input.consume();
         int m2 = input.mark();
-		assertEquals(1, m2); // 2nd marker dropped at buffer index 1
-		assertEquals("yz", input.getBuffer());
-   		assertEquals('z', input.LA(1)); // forces load
-		assertEquals("yz", input.getBuffer());
-        input.release(m2); // noop since not earliest in buf
+		assertEquals(2, m2); // 2nd consume leaves p==2
+		assertEquals("xyz", input.getBuffer());
+        input.release(m2); // drop to 1 marker
         input.consume();
-        input.release(m1);
+        input.release(m1); // shifts remaining char to beginning
    		assertEquals(CharStream.EOF, input.LA(1));
-		assertEquals("yz\uFFFF", input.getBuffer());
+		assertEquals("\uFFFF", input.getBuffer());
    	}
 
     @Test public void testAFewTokens() throws Exception {
@@ -194,7 +196,7 @@ public class TestUnbufferedCharStream extends BaseTest {
         // Tokens: 012345678901234567
         // Input:  x = 3 * 0 + 2 * 0;
 		UnbufferedCharStream input = new UnbufferedCharStream(
-        	new StringReader("x = 302 * 91 + 20234234 * 0;")
+			new StringReader("x = 302 * 91 + 20234234 * 0;")
         );
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 		// copy text into tokens from char stream

@@ -42,10 +42,20 @@ public interface IntStream {
 	int LA(int i);
 
 	/** Tell the stream to start buffering if it hasn't already.  Return
-     *  a marker, usually current input position, index().
+     *  a marker, usually a function of current input position, index().
 	 *  Calling release(mark()) should not affect the input cursor.
 	 *  Can seek to any index between where we were when mark() was called
-	 *  and current index() until we release this marker.
+	 *  and current index() until we release this marker. No mark can appear
+	 *  at an index before the first mark.
+	 *
+	 *  A resource leak may occur if the value returned from a call to
+	 *  mark() is not passed to release() afterwards. When calls to mark()
+	 *  are nested, release() must be called in reverse order of the calls
+	 *  to mark(), otherwise the behavior is unspecified.
+	 *
+	 *  @return An opaque marker which should be passed to release
+	 *          when the range of symbols from where the marker was dropped
+	 *          to the current input symbol is no longer required.
      */
 	int mark();
 
@@ -72,7 +82,7 @@ public interface IntStream {
 	 *  first element in the stream.
      *
      *  For unbuffered streams, index i might not be in buffer. That throws
-     *  index exception
+     *  index exception.
 	 */
 	void seek(int index);
 
