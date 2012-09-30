@@ -71,11 +71,6 @@ public class UnbufferedCharStream implements CharStream {
 	 */
     protected int currentCharIndex = 0;
 
-    /** Buf is window into stream. This is absolute char index into entire
-	 *  stream of data[0]
-	 */
-    protected int bufferStartIndex = 0;
-
     protected Reader input;
 
 	/** What is name or source of this char stream? */
@@ -202,7 +197,6 @@ public class UnbufferedCharStream implements CharStream {
 			System.arraycopy(data, p, data, 0, n - p); // shift n-p char from p to 0
 			n = n - p;
 			p = 0;
-			bufferStartIndex = currentCharIndex;
 		}
     }
 
@@ -218,10 +212,10 @@ public class UnbufferedCharStream implements CharStream {
     public void seek(int index) {
 //		System.out.println("seek "+index);
         // index == to bufferStartIndex should set p to 0
-        int i = index - bufferStartIndex;
+        int i = index - getBufferStartIndex();
         if ( i < 0 || i >= n ) {
             throw new UnsupportedOperationException("seek to index outside buffer: "+
-                    index+" not in "+bufferStartIndex+".."+(bufferStartIndex+n));
+                    index+" not in "+getBufferStartIndex()+".."+(getBufferStartIndex()+n));
         }
         p = i;
 		currentCharIndex = index;
@@ -239,6 +233,7 @@ public class UnbufferedCharStream implements CharStream {
 
 	@Override
 	public String getText(Interval interval) {
+		int bufferStartIndex = getBufferStartIndex();
 		if (interval.a < bufferStartIndex || interval.b >= bufferStartIndex + n) {
 			throw new IndexOutOfBoundsException("interval "+interval+" outside buffer: "+
 			                    bufferStartIndex+".."+(bufferStartIndex+n));
