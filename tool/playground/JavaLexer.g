@@ -141,10 +141,10 @@ fragment
 UnicodeEscape
     :   '\\' 'u' HexDigit HexDigit HexDigit HexDigit
     ;// $ANTLR src "JavaCombined.g" 963
-ENUM:   'enum' {if (!enumIsKeyword) $type=Identifier;}
+ENUM:   'enum' {if (!enumIsKeyword) setType(Identifier);}
     ;// $ANTLR src "JavaCombined.g" 966
 ASSERT
-    :   'assert' {if (!assertIsKeyword) $type=Identifier;}
+    :   'assert' {if (!assertIsKeyword) setType(Identifier);}
     ;// $ANTLR src "JavaCombined.g" 970
 Identifier
     :   Letter (Letter|JavaIDDigit)*
