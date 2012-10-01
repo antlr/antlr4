@@ -244,11 +244,14 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 
 		numMarkers--;
 		if ( numMarkers==0 ) { // can we release buffer?
-			// Copy tokens[p]..tokens[n-1] to tokens[0]..tokens[(n-1)-p], reset ptrs
-			// p is last valid token; move nothing if p==n as we have no valid char
-			System.arraycopy(tokens, p, tokens, 0, n - p); // shift n-p tokens from p to 0
-			n = n - p;
-			p = 0;
+			if (p > 0) {
+				// Copy tokens[p]..tokens[n-1] to tokens[0]..tokens[(n-1)-p], reset ptrs
+				// p is last valid token; move nothing if p==n as we have no valid char
+				System.arraycopy(tokens, p, tokens, 0, n - p); // shift n-p tokens from p to 0
+				n = n - p;
+				p = 0;
+			}
+
 			lastTokenBufferStart = lastToken;
 		}
 	}
