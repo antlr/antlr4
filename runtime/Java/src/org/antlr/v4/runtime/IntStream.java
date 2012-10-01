@@ -34,7 +34,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 
 /**
  * A simple stream of symbols whose values are represented as integers. This
- * interface provides <em>marked ranges</em> which support for a minimum level
+ * interface provides <em>marked ranges</em> with support for a minimum level
  * of buffering necessary to implement arbitrary lookahead during prediction.
  * For more information on marked ranges, see {@link #mark}.
  * <p/>
@@ -112,7 +112,7 @@ public interface IntStream {
 	 * If {@code i} represents a position at or beyond the end of the stream,
 	 * this method returns {@link #EOF}.
 	 * <p/>
-	 * The return value is unspecified if {@code i<0} and fewer than {@code -i}
+	 * The return value is unspecified if {@code i&lt;0} and fewer than {@code -i}
 	 * calls to {@link #consume consume()} have occurred from the beginning of
 	 * the stream before calling this method.
 	 *
