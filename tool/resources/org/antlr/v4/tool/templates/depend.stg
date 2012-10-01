@@ -1,5 +1,4 @@
 /** templates used to generate make-compatible dependencies */
-group depend;
 
 /** Generate "f : x, y, z" dependencies for input
  *  dependencies and generated files. in and out

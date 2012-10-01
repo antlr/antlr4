@@ -9,6 +9,8 @@ September 30, 2012
 
 * Added a getter to IntStream for the token factory
 
+* Added -depend cmd-line option.
+
 September 29, 2012
 
 * no nongreedy or wildcard in parser.
