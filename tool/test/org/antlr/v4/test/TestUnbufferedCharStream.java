@@ -1,30 +1,31 @@
 /*
- [The "BSD license"]
-  Copyright (c) 2011 Terence Parr
-  All rights reserved.
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions
-  are met:
-
-  1. Redistributions of source code must retain the above copyright
-     notice, this list of conditions and the following disclaimer.
-  2. Redistributions in binary form must reproduce the above copyright
-     notice, this list of conditions and the following disclaimer in the
-     documentation and/or other materials provided with the distribution.
-  3. The name of the author may not be used to endorse or promote products
-     derived from this software without specific prior written permission.
-
-  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * [The "BSD license"]
+ *  Copyright (c) 2012 Terence Parr
+ *  Copyright (c) 2012 Sam Harwell
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.antlr.v4.test;
@@ -34,6 +35,7 @@ import org.antlr.v4.runtime.CommonTokenFactory;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.UnbufferedCharStream;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.interp.LexerInterpreter;
 import org.junit.Test;
@@ -43,55 +45,178 @@ import java.io.StringReader;
 
 public class TestUnbufferedCharStream extends BaseTest {
 	@Test public void testNoChar() throws Exception {
-		CharStream input = new TestingUnbufferedCharStream(
-				new StringReader("")
-		);
+		CharStream input = createStream("");
+		assertEquals(IntStream.EOF, input.LA(1));
+		assertEquals(IntStream.EOF, input.LA(2));
+	}
+
+	/**
+	 * The {@link IntStream} interface does not specify the behavior when the
+	 * EOF symbol is consumed, but {@link UnbufferedCharStream} handles this
+	 * particular case by throwing an {@link IllegalStateException}.
+	 */
+	@Test(expected = IllegalStateException.class)
+	public void testConsumeEOF() throws Exception {
+		CharStream input = createStream("");
 		assertEquals(IntStream.EOF, input.LA(1));
 		input.consume();
-		assertEquals(IntStream.EOF, input.LA(1));
 		input.consume();
-		assertEquals(IntStream.EOF, input.LA(1));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testNegativeSeek() {
+		CharStream input = createStream("");
+		input.seek(-1);
+	}
+
+	@Test
+	public void testSeekPastEOF() {
+		CharStream input = createStream("");
+		assertEquals(0, input.index());
+		input.seek(1);
+		assertEquals(0, input.index());
+	}
+
+	/**
+	 * The {@link IntStream} interface does not specify the behavior when marks
+	 * are not released in the reversed order they were created, but
+	 * {@link UnbufferedCharStream} handles this case by throwing an
+	 * {@link IllegalStateException}.
+	 */
+	@Test(expected = IllegalStateException.class)
+	public void testMarkReleaseOutOfOrder() {
+		CharStream input = createStream("");
+		int m1 = input.mark();
+		int m2 = input.mark();
+		input.release(m1);
+	}
+
+	/**
+	 * The {@link IntStream} interface does not specify the behavior when a mark
+	 * is released twice, but {@link UnbufferedCharStream} handles this case by
+	 * throwing an {@link IllegalStateException}.
+	 */
+	@Test(expected = IllegalStateException.class)
+	public void testMarkReleasedTwice() {
+		CharStream input = createStream("");
+		int m1 = input.mark();
+		input.release(m1);
+		input.release(m1);
+	}
+
+	/**
+	 * The {@link IntStream} interface does not specify the behavior when a mark
+	 * is released twice, but {@link UnbufferedCharStream} handles this case by
+	 * throwing an {@link IllegalStateException}.
+	 */
+	@Test(expected = IllegalStateException.class)
+	public void testNestedMarkReleasedTwice() {
+		CharStream input = createStream("");
+		int m1 = input.mark();
+		int m2 = input.mark();
+		input.release(m2);
+		input.release(m2);
+	}
+
+	/**
+	 * It is not valid to pass a mark to {@link IntStream#seek}, but
+	 * {@link UnbufferedCharStream} creates marks in such a way that this
+	 * invalid usage results in an {@link IllegalArgumentException}.
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void testMarkPassedToSeek() {
+		CharStream input = createStream("");
+		int m1 = input.mark();
+		input.seek(m1);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testSeekBeforeBufferStart() {
+		CharStream input = createStream("xyz");
+		input.consume();
+		int m1 = input.mark();
+		assertEquals(1, input.index());
+		input.consume();
+		input.seek(0);
+	}
+
+	@Test(expected = UnsupportedOperationException.class)
+	public void testGetTextBeforeBufferStart() {
+		CharStream input = createStream("xyz");
+		input.consume();
+		int m1 = input.mark();
+		assertEquals(1, input.index());
+		input.getText(new Interval(0, 1));
+	}
+
+	@Test
+	public void testGetTextInMarkedRange() {
+		CharStream input = createStream("xyz");
+		input.consume();
+		int m1 = input.mark();
+		assertEquals(1, input.index());
+		input.consume();
+		input.consume();
+		assertEquals("yz", input.getText(new Interval(1, 2)));
+	}
+
+	@Test
+	public void testLastChar() {
+		CharStream input = createStream("abcdef");
+
+		input.consume();
+		assertEquals('a', input.LA(-1));
+
+		int m1 = input.mark();
+		input.consume();
+		input.consume();
+		input.consume();
+		assertEquals('d', input.LA(-1));
+
+		input.seek(2);
+		assertEquals('b', input.LA(-1));
+
+		input.release(m1);
+		input.seek(3);
+		assertEquals('c', input.LA(-1));
+		// this special case is not required by the IntStream interface, but
+		// UnbufferedCharStream allows it so we have to make sure the resulting
+		// state is consistent
+		input.seek(2);
+		assertEquals('b', input.LA(-1));
 	}
 
 	@Test public void test1Char() throws Exception {
-		TestingUnbufferedCharStream input = new TestingUnbufferedCharStream(
-				new StringReader("x")
-		);
+		TestingUnbufferedCharStream input = createStream("x");
 		assertEquals('x', input.LA(1));
 		input.consume();
 		assertEquals(IntStream.EOF, input.LA(1));
 		String r = input.getRemainingBuffer();
 		assertEquals("\uFFFF", r); // shouldn't include x
-		assertEquals("x\uFFFF", input.getBuffer()); // whole buffer
+		assertEquals("\uFFFF", input.getBuffer()); // whole buffer
 	}
 
 	@Test public void test2Char() throws Exception {
-		TestingUnbufferedCharStream input = new TestingUnbufferedCharStream(
-				new StringReader("xy")
-		);
+		TestingUnbufferedCharStream input = createStream("xy");
 		assertEquals('x', input.LA(1));
 		input.consume();
 		assertEquals('y', input.LA(1));
 		assertEquals("y", input.getRemainingBuffer()); // shouldn't include x
-		assertEquals("xy", input.getBuffer());
+		assertEquals("y", input.getBuffer());
 		input.consume();
 		assertEquals(IntStream.EOF, input.LA(1));
+		assertEquals("\uFFFF", input.getBuffer());
 	}
 
     @Test public void test2CharAhead() throws Exception {
-   		CharStream input = new TestingUnbufferedCharStream(
-   				new StringReader("xy")
-   		);
+   		CharStream input = createStream("xy");
    		assertEquals('x', input.LA(1));
    		assertEquals('y', input.LA(2));
    		assertEquals(IntStream.EOF, input.LA(3));
    	}
 
     @Test public void testBufferExpand() throws Exception {
-		TestingUnbufferedCharStream input = new TestingUnbufferedCharStream(
-   				new StringReader("01234"),
-                2 // buff size 2
-   		);
+		TestingUnbufferedCharStream input = createStream("01234", 2);
    		assertEquals('0', input.LA(1));
         assertEquals('1', input.LA(2));
         assertEquals('2', input.LA(3));
@@ -102,10 +227,7 @@ public class TestUnbufferedCharStream extends BaseTest {
    	}
 
     @Test public void testBufferWrapSize1() throws Exception {
-   		CharStream input = new TestingUnbufferedCharStream(
-   				new StringReader("01234"),
-                1 // buff size 1
-   		);
+   		CharStream input = createStream("01234", 1);
         assertEquals('0', input.LA(1));
         input.consume();
         assertEquals('1', input.LA(1));
@@ -120,10 +242,7 @@ public class TestUnbufferedCharStream extends BaseTest {
    	}
 
     @Test public void testBufferWrapSize2() throws Exception {
-   		CharStream input = new TestingUnbufferedCharStream(
-   				new StringReader("01234"),
-                2 // buff size 2
-   		);
+   		CharStream input = createStream("01234", 2);
         assertEquals('0', input.LA(1));
         input.consume();
         assertEquals('1', input.LA(1));
@@ -138,9 +257,7 @@ public class TestUnbufferedCharStream extends BaseTest {
    	}
 
 	@Test public void test1Mark() throws Exception {
-		TestingUnbufferedCharStream input = new TestingUnbufferedCharStream(
-			new StringReader("xyz")
-		);
+		TestingUnbufferedCharStream input = createStream("xyz");
 		int m = input.mark();
 		assertEquals('x', input.LA(1));
 		assertEquals('y', input.LA(2));
@@ -151,9 +268,7 @@ public class TestUnbufferedCharStream extends BaseTest {
 	}
 
 	@Test public void test1MarkWithConsumesInSequence() throws Exception {
-		TestingUnbufferedCharStream input = new TestingUnbufferedCharStream(
-			new StringReader("xyz")
-		);
+		TestingUnbufferedCharStream input = createStream("xyz");
 		int m = input.mark();
 		input.consume(); // x, moves to y
 		input.consume(); // y
@@ -165,19 +280,14 @@ public class TestUnbufferedCharStream extends BaseTest {
 	}
 
     @Test public void test2Mark() throws Exception {
-		TestingUnbufferedCharStream input = new TestingUnbufferedCharStream(
-   				new StringReader("xyz"),
-                100
-   		);
+		TestingUnbufferedCharStream input = createStream("xyz", 100);
    		assertEquals('x', input.LA(1));
         input.consume(); // reset buffer index (p) to 0
         int m1 = input.mark();
-		assertEquals(1, m1);
    		assertEquals('y', input.LA(1));
         input.consume();
         int m2 = input.mark();
-		assertEquals(2, m2); // 2nd consume leaves p==2
-		assertEquals("xyz", input.getBuffer());
+		assertEquals("yz", input.getBuffer());
         input.release(m2); // drop to 1 marker
         input.consume();
         input.release(m1); // shifts remaining char to beginning
@@ -197,9 +307,7 @@ public class TestUnbufferedCharStream extends BaseTest {
 				"WS : ' '+;\n");
         // Tokens: 012345678901234567
         // Input:  x = 3 * 0 + 2 * 0;
-		TestingUnbufferedCharStream input = new TestingUnbufferedCharStream(
-			new StringReader("x = 302 * 91 + 20234234 * 0;")
-        );
+		TestingUnbufferedCharStream input = createStream("x = 302 * 91 + 20234234 * 0;");
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 		// copy text into tokens from char stream
 		lexEngine.setTokenFactory(new CommonTokenFactory(true));
@@ -219,6 +327,14 @@ public class TestUnbufferedCharStream extends BaseTest {
 			" [@17,27:27=';',<3>,1:27], [@18,28:27='',<-1>,1:28]]";
 		assertEquals(expecting, tokens.getTokens().toString());
     }
+
+	protected static TestingUnbufferedCharStream createStream(String text) {
+		return new TestingUnbufferedCharStream(new StringReader(text));
+	}
+
+	protected static TestingUnbufferedCharStream createStream(String text, int bufferSize) {
+		return new TestingUnbufferedCharStream(new StringReader(text), bufferSize);
+	}
 
 	protected static class TestingUnbufferedCharStream extends UnbufferedCharStream {
 
