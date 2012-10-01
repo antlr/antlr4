@@ -33,7 +33,7 @@ import org.antlr.runtime.CommonToken;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.ActionTransition;
@@ -271,7 +271,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		if ( node.getText().equals("EOF") ) {
 			ATNState left = newState(node);
 			ATNState right = newState(node);
-			left.addTransition(new AtomTransition(right, CharStream.EOF));
+			left.addTransition(new AtomTransition(right, IntStream.EOF));
 			return new Handle(left, right);
 		}
 		return _ruleRef(node);

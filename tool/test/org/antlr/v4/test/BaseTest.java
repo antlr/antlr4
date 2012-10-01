@@ -39,6 +39,7 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
@@ -232,7 +233,7 @@ public abstract class BaseTest {
 				tokenTypes.add(lg.typeToTokenList.get(ttype));
 			}
 
-			if ( t==CharStream.EOF ) {
+			if ( t==IntStream.EOF ) {
 				hitEOF = true;
 			}
 		} while ( ttype!=Token.EOF );

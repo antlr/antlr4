@@ -1,8 +1,39 @@
+/*
+ * [The "BSD license"]
+ *  Copyright (c) 2012 Terence Parr
+ *  Copyright (c) 2012 Sam Harwell
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.antlr.v4.test;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.UnbufferedTokenStream;
 import org.antlr.v4.tool.LexerGrammar;
@@ -10,6 +41,9 @@ import org.antlr.v4.tool.interp.LexerInterpreter;
 import org.junit.Test;
 
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class TestUnbufferedTokenStream extends BaseTest {
 	@Test public void testLookahead() throws Exception {
@@ -56,7 +90,7 @@ public class TestUnbufferedTokenStream extends BaseTest {
 		);
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 			lexEngine.setInput(input);
-		UnbufferedTokenStream<Token> tokens = new UnbufferedTokenStream<Token>(lexEngine);
+		TestingUnbufferedTokenStream<Token> tokens = new TestingUnbufferedTokenStream<Token>(lexEngine);
 
 		assertEquals("[[@0,0:0='x',<1>,1:0]]", tokens.getBuffer().toString());
 		assertEquals("x", tokens.LT(1).getText());
@@ -94,7 +128,7 @@ public class TestUnbufferedTokenStream extends BaseTest {
 		);
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 			lexEngine.setInput(input);
-		UnbufferedTokenStream<Token> tokens = new UnbufferedTokenStream<Token>(lexEngine);
+		TestingUnbufferedTokenStream<Token> tokens = new TestingUnbufferedTokenStream<Token>(lexEngine);
 
 		int m = tokens.mark();
 		assertEquals("[[@0,0:0='x',<1>,1:0]]", tokens.getBuffer().toString());
@@ -130,7 +164,7 @@ public class TestUnbufferedTokenStream extends BaseTest {
 		);
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 		lexEngine.setInput(input);
-		UnbufferedTokenStream<Token> tokens = new UnbufferedTokenStream<Token>(lexEngine);
+		TestingUnbufferedTokenStream<Token> tokens = new TestingUnbufferedTokenStream<Token>(lexEngine);
 
 		int m = tokens.mark();
 		assertEquals("[[@0,0:0='x',<1>,1:0]]", tokens.getBuffer().toString());
@@ -158,4 +192,34 @@ public class TestUnbufferedTokenStream extends BaseTest {
 					 tokens.getBuffer().toString());
 		tokens.release(m);
     }
+
+	protected static class TestingUnbufferedTokenStream<T extends Token> extends UnbufferedTokenStream<T> {
+
+		public TestingUnbufferedTokenStream(TokenSource tokenSource) {
+			super(tokenSource);
+		}
+
+		/** For testing.  What's in moving window into token stream from
+		 *  current index, LT(1) or tokens[p], to end of buffer?
+		 */
+		protected List<? extends Token> getRemainingBuffer() {
+			if ( n==0 ) {
+				return Collections.emptyList();
+			}
+
+			return Arrays.asList(tokens).subList(p, n);
+		}
+
+		/** For testing.  What's in moving window buffer into data stream.
+		 *  From 0..p-1 have been consume.
+		 */
+		protected List<? extends Token> getBuffer() {
+			if ( n==0 ) {
+				return Collections.emptyList();
+			}
+
+			return Arrays.asList(tokens).subList(0, n);
+		}
+
+	}
 }

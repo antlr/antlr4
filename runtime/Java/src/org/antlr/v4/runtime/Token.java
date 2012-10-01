@@ -43,7 +43,7 @@ public interface Token {
 
 	public static final int MIN_USER_TOKEN_TYPE = 1;
 
-    public static final int EOF = CharStream.EOF;
+    public static final int EOF = IntStream.EOF;
 
 	/** All tokens go to the parser (unless skip() is called in that rule)
 	 *  on a particular "channel".  The parser tunes to a particular channel

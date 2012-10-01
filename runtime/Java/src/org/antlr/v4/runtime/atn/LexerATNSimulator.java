@@ -229,7 +229,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			}
 
 			// if no edge, pop over to ATN interpreter, update DFA and return
-			if ( s.edges == null || t >= s.edges.length || t <= CharStream.EOF ||
+			if ( s.edges == null || t >= s.edges.length || t <= IntStream.EOF ||
 				 s.edges[t] == null )
 			{
 				ATN_failover++;
@@ -248,7 +248,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				captureSimState(prevAccept, input, s);
 				// keep going unless we're at EOF; check if something else could match
 				// EOF never in DFA
-				if ( t==CharStream.EOF ) break;
+				if ( t==IntStream.EOF ) break;
 			}
 
 			consume(input);
@@ -297,7 +297,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			DFAState target = null;
 			ATNConfigSet reach = null;
 			if (s != null) {
-				if ( s.edges != null && t < s.edges.length && t > CharStream.EOF ) {
+				if ( s.edges != null && t < s.edges.length && t > IntStream.EOF ) {
 					closure = s.configs;
 					target = s.edges[t];
 					if (target == ERROR) {
@@ -374,7 +374,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 		else {
 			// if no accept and EOF is first char, return EOF
-			if ( t==CharStream.EOF && input.index()==startIndex ) {
+			if ( t==IntStream.EOF && input.index()==startIndex ) {
 				return Token.EOF;
 			}
 
@@ -503,7 +503,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		case Transition.NOT_SET:
 			NotSetTransition nst = (NotSetTransition)trans;
-			if (!nst.set.contains(t) && t!=CharStream.EOF) // ~set doesn't not match EOF
+			if (!nst.set.contains(t) && t!=IntStream.EOF) // ~set doesn't not match EOF
 			{
 				if ( debug ) {
 					System.out.format("match ~set %s\n", nst.set.toString(true));
@@ -515,7 +515,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			return null;
 
 		case Transition.WILDCARD:
-			if (t != CharStream.EOF) {
+			if (t != IntStream.EOF) {
 				return trans.target;
 			}
 
