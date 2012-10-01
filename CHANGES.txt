@@ -1,6 +1,6 @@
 ANTLR v4 Honey Badger
 
-October ?, 2012 -- 4.0b2 release
+October 1, 2012 -- 4.0b2 release
 
 September 30, 2012
 
