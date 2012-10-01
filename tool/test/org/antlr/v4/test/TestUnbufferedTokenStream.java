@@ -3,6 +3,7 @@ package org.antlr.v4.test;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.UnbufferedTokenStream;
 import org.antlr.v4.tool.LexerGrammar;
@@ -10,6 +11,9 @@ import org.antlr.v4.tool.interp.LexerInterpreter;
 import org.junit.Test;
 
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class TestUnbufferedTokenStream extends BaseTest {
 	@Test public void testLookahead() throws Exception {
@@ -56,7 +60,7 @@ public class TestUnbufferedTokenStream extends BaseTest {
 		);
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 			lexEngine.setInput(input);
-		UnbufferedTokenStream<Token> tokens = new UnbufferedTokenStream<Token>(lexEngine);
+		TestingUnbufferedTokenStream<Token> tokens = new TestingUnbufferedTokenStream<Token>(lexEngine);
 
 		assertEquals("[[@0,0:0='x',<1>,1:0]]", tokens.getBuffer().toString());
 		assertEquals("x", tokens.LT(1).getText());
@@ -94,7 +98,7 @@ public class TestUnbufferedTokenStream extends BaseTest {
 		);
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 			lexEngine.setInput(input);
-		UnbufferedTokenStream<Token> tokens = new UnbufferedTokenStream<Token>(lexEngine);
+		TestingUnbufferedTokenStream<Token> tokens = new TestingUnbufferedTokenStream<Token>(lexEngine);
 
 		int m = tokens.mark();
 		assertEquals("[[@0,0:0='x',<1>,1:0]]", tokens.getBuffer().toString());
@@ -130,7 +134,7 @@ public class TestUnbufferedTokenStream extends BaseTest {
 		);
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 		lexEngine.setInput(input);
-		UnbufferedTokenStream<Token> tokens = new UnbufferedTokenStream<Token>(lexEngine);
+		TestingUnbufferedTokenStream<Token> tokens = new TestingUnbufferedTokenStream<Token>(lexEngine);
 
 		int m = tokens.mark();
 		assertEquals("[[@0,0:0='x',<1>,1:0]]", tokens.getBuffer().toString());
@@ -158,4 +162,34 @@ public class TestUnbufferedTokenStream extends BaseTest {
 					 tokens.getBuffer().toString());
 		tokens.release(m);
     }
+
+	protected static class TestingUnbufferedTokenStream<T extends Token> extends UnbufferedTokenStream<T> {
+
+		public TestingUnbufferedTokenStream(TokenSource tokenSource) {
+			super(tokenSource);
+		}
+
+		/** For testing.  What's in moving window into token stream from
+		 *  current index, LT(1) or tokens[p], to end of buffer?
+		 */
+		protected List<? extends Token> getRemainingBuffer() {
+			if ( n==0 ) {
+				return Collections.emptyList();
+			}
+
+			return Arrays.asList(tokens).subList(p, n);
+		}
+
+		/** For testing.  What's in moving window buffer into data stream.
+		 *  From 0..p-1 have been consume.
+		 */
+		protected List<? extends Token> getBuffer() {
+			if ( n==0 ) {
+				return Collections.emptyList();
+			}
+
+			return Arrays.asList(tokens).subList(0, n);
+		}
+
+	}
 }

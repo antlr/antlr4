@@ -3,7 +3,6 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.misc.Interval;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 	protected TokenSource tokenSource;
@@ -231,22 +230,6 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 		}
 
 		return buf.toString();
-	}
-
-	/** For testing.  What's in moving window into token stream from
-	 *  current index, LT(1) or tokens[p], to end of buffer?
-	 */
-	public List<T> getRemainingBuffer() {
-		if ( n==0 ) return null;
-		return (List<T>)Arrays.asList(Arrays.copyOfRange(tokens, p, n));
-	}
-
-	/** For testing.  What's in moving window buffer into data stream.
-	 *  From 0..p-1 have been consume.
-	 */
-	public List<T> getBuffer() {
-		if ( n==0 ) return null;
-		return (List<T>)Arrays.asList(Arrays.copyOfRange(tokens, 0, n));
 	}
 
 	public int getBufferStartIndex() {
