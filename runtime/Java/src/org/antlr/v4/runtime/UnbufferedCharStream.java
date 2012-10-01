@@ -161,9 +161,9 @@ public class UnbufferedCharStream implements CharStream {
         sync(i);
         int index = p + i - 1;
         if ( index < 0 ) throw new IndexOutOfBoundsException();
-		if ( index > n ) return CharStream.EOF;
+		if ( index > n ) return IntStream.EOF;
         int c = data[index];
-        if ( c==(char)CharStream.EOF ) return CharStream.EOF;
+        if ( c==(char)IntStream.EOF ) return IntStream.EOF;
         return c;
     }
 

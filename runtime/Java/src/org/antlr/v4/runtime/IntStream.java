@@ -32,6 +32,12 @@ package org.antlr.v4.runtime;
  *  or token type sequence (such as interpretation).
  */
 public interface IntStream {
+	/**
+	 * The value returned by {@link #LA LA()} when the end of the stream is
+	 * reached.
+	 */
+	public static final int EOF = -1;
+
 	void consume();
 
 	/** Get int at current input pointer + i ahead where i=1 is next int.

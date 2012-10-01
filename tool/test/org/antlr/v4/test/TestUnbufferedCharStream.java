@@ -32,6 +32,7 @@ package org.antlr.v4.test;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenFactory;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.UnbufferedCharStream;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.interp.LexerInterpreter;
@@ -45,11 +46,11 @@ public class TestUnbufferedCharStream extends BaseTest {
 		CharStream input = new TestingUnbufferedCharStream(
 				new StringReader("")
 		);
-		assertEquals(CharStream.EOF, input.LA(1));
+		assertEquals(IntStream.EOF, input.LA(1));
 		input.consume();
-		assertEquals(CharStream.EOF, input.LA(1));
+		assertEquals(IntStream.EOF, input.LA(1));
 		input.consume();
-		assertEquals(CharStream.EOF, input.LA(1));
+		assertEquals(IntStream.EOF, input.LA(1));
 	}
 
 	@Test public void test1Char() throws Exception {
@@ -58,7 +59,7 @@ public class TestUnbufferedCharStream extends BaseTest {
 		);
 		assertEquals('x', input.LA(1));
 		input.consume();
-		assertEquals(CharStream.EOF, input.LA(1));
+		assertEquals(IntStream.EOF, input.LA(1));
 		String r = input.getRemainingBuffer();
 		assertEquals("\uFFFF", r); // shouldn't include x
 		assertEquals("x\uFFFF", input.getBuffer()); // whole buffer
@@ -74,7 +75,7 @@ public class TestUnbufferedCharStream extends BaseTest {
 		assertEquals("y", input.getRemainingBuffer()); // shouldn't include x
 		assertEquals("xy", input.getBuffer());
 		input.consume();
-		assertEquals(CharStream.EOF, input.LA(1));
+		assertEquals(IntStream.EOF, input.LA(1));
 	}
 
     @Test public void test2CharAhead() throws Exception {
@@ -83,7 +84,7 @@ public class TestUnbufferedCharStream extends BaseTest {
    		);
    		assertEquals('x', input.LA(1));
    		assertEquals('y', input.LA(2));
-   		assertEquals(CharStream.EOF, input.LA(3));
+   		assertEquals(IntStream.EOF, input.LA(3));
    	}
 
     @Test public void testBufferExpand() throws Exception {
@@ -97,7 +98,7 @@ public class TestUnbufferedCharStream extends BaseTest {
         assertEquals('3', input.LA(4));
         assertEquals('4', input.LA(5));
 		assertEquals("01234", input.getBuffer());
-   		assertEquals(CharStream.EOF, input.LA(6));
+   		assertEquals(IntStream.EOF, input.LA(6));
    	}
 
     @Test public void testBufferWrapSize1() throws Exception {
@@ -115,7 +116,7 @@ public class TestUnbufferedCharStream extends BaseTest {
         input.consume();
         assertEquals('4', input.LA(1));
         input.consume();
-   		assertEquals(CharStream.EOF, input.LA(1));
+   		assertEquals(IntStream.EOF, input.LA(1));
    	}
 
     @Test public void testBufferWrapSize2() throws Exception {
@@ -133,7 +134,7 @@ public class TestUnbufferedCharStream extends BaseTest {
         input.consume();
         assertEquals('4', input.LA(1));
         input.consume();
-   		assertEquals(CharStream.EOF, input.LA(1));
+   		assertEquals(IntStream.EOF, input.LA(1));
    	}
 
 	@Test public void test1Mark() throws Exception {
@@ -145,7 +146,7 @@ public class TestUnbufferedCharStream extends BaseTest {
 		assertEquals('y', input.LA(2));
 		assertEquals('z', input.LA(3));
 		input.release(m);
-		assertEquals(CharStream.EOF, input.LA(4));
+		assertEquals(IntStream.EOF, input.LA(4));
 		assertEquals("xyz\uFFFF", input.getBuffer());
 	}
 
@@ -157,7 +158,7 @@ public class TestUnbufferedCharStream extends BaseTest {
 		input.consume(); // x, moves to y
 		input.consume(); // y
 		input.consume(); // z, moves to EOF
-		assertEquals(CharStream.EOF, input.LA(1));
+		assertEquals(IntStream.EOF, input.LA(1));
 		assertEquals("xyz\uFFFF", input.getBuffer());
 		input.release(m); // wipes buffer
 		assertEquals("\uFFFF", input.getBuffer());
@@ -180,7 +181,7 @@ public class TestUnbufferedCharStream extends BaseTest {
         input.release(m2); // drop to 1 marker
         input.consume();
         input.release(m1); // shifts remaining char to beginning
-   		assertEquals(CharStream.EOF, input.LA(1));
+   		assertEquals(IntStream.EOF, input.LA(1));
 		assertEquals("\uFFFF", input.getBuffer());
    	}
 
