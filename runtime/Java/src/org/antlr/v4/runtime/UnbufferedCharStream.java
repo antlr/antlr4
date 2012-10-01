@@ -243,22 +243,6 @@ public class UnbufferedCharStream implements CharStream {
 		return new String(data, i, interval.length());
 	}
 
-	/** For testing.  What's in moving window into data stream from
-	 *  current index, LA(1) or data[p], to end of buffer?
-	 */
-	public String getRemainingBuffer() {
-		if ( n==0 ) return null;
-		return new String(data,p,n-p);
-	}
-
-	/** For testing.  What's in moving window buffer into data stream.
-	 *  From 0..p-1 have been consume.
-	 */
-	public String getBuffer() {
-		if ( n==0 ) return null;
-		return new String(data,0,n);
-	}
-
 	public int getBufferStartIndex() {
 		return currentCharIndex - p;
 	}

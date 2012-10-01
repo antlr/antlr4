@@ -37,11 +37,12 @@ import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.interp.LexerInterpreter;
 import org.junit.Test;
 
+import java.io.Reader;
 import java.io.StringReader;
 
 public class TestUnbufferedCharStream extends BaseTest {
 	@Test public void testNoChar() throws Exception {
-		CharStream input = new UnbufferedCharStream(
+		CharStream input = new TestingUnbufferedCharStream(
 				new StringReader("")
 		);
 		assertEquals(CharStream.EOF, input.LA(1));
@@ -52,7 +53,7 @@ public class TestUnbufferedCharStream extends BaseTest {
 	}
 
 	@Test public void test1Char() throws Exception {
-		UnbufferedCharStream input = new UnbufferedCharStream(
+		TestingUnbufferedCharStream input = new TestingUnbufferedCharStream(
 				new StringReader("x")
 		);
 		assertEquals('x', input.LA(1));
@@ -64,7 +65,7 @@ public class TestUnbufferedCharStream extends BaseTest {
 	}
 
 	@Test public void test2Char() throws Exception {
-		UnbufferedCharStream input = new UnbufferedCharStream(
+		TestingUnbufferedCharStream input = new TestingUnbufferedCharStream(
 				new StringReader("xy")
 		);
 		assertEquals('x', input.LA(1));
@@ -77,7 +78,7 @@ public class TestUnbufferedCharStream extends BaseTest {
 	}
 
     @Test public void test2CharAhead() throws Exception {
-   		CharStream input = new UnbufferedCharStream(
+   		CharStream input = new TestingUnbufferedCharStream(
    				new StringReader("xy")
    		);
    		assertEquals('x', input.LA(1));
@@ -86,7 +87,7 @@ public class TestUnbufferedCharStream extends BaseTest {
    	}
 
     @Test public void testBufferExpand() throws Exception {
-		UnbufferedCharStream input = new UnbufferedCharStream(
+		TestingUnbufferedCharStream input = new TestingUnbufferedCharStream(
    				new StringReader("01234"),
                 2 // buff size 2
    		);
@@ -100,7 +101,7 @@ public class TestUnbufferedCharStream extends BaseTest {
    	}
 
     @Test public void testBufferWrapSize1() throws Exception {
-   		CharStream input = new UnbufferedCharStream(
+   		CharStream input = new TestingUnbufferedCharStream(
    				new StringReader("01234"),
                 1 // buff size 1
    		);
@@ -118,7 +119,7 @@ public class TestUnbufferedCharStream extends BaseTest {
    	}
 
     @Test public void testBufferWrapSize2() throws Exception {
-   		CharStream input = new UnbufferedCharStream(
+   		CharStream input = new TestingUnbufferedCharStream(
    				new StringReader("01234"),
                 2 // buff size 2
    		);
@@ -136,7 +137,7 @@ public class TestUnbufferedCharStream extends BaseTest {
    	}
 
 	@Test public void test1Mark() throws Exception {
-		UnbufferedCharStream input = new UnbufferedCharStream(
+		TestingUnbufferedCharStream input = new TestingUnbufferedCharStream(
 			new StringReader("xyz")
 		);
 		int m = input.mark();
@@ -149,7 +150,7 @@ public class TestUnbufferedCharStream extends BaseTest {
 	}
 
 	@Test public void test1MarkWithConsumesInSequence() throws Exception {
-		UnbufferedCharStream input = new UnbufferedCharStream(
+		TestingUnbufferedCharStream input = new TestingUnbufferedCharStream(
 			new StringReader("xyz")
 		);
 		int m = input.mark();
@@ -163,7 +164,7 @@ public class TestUnbufferedCharStream extends BaseTest {
 	}
 
     @Test public void test2Mark() throws Exception {
-		UnbufferedCharStream input = new UnbufferedCharStream(
+		TestingUnbufferedCharStream input = new TestingUnbufferedCharStream(
    				new StringReader("xyz"),
                 100
    		);
@@ -195,7 +196,7 @@ public class TestUnbufferedCharStream extends BaseTest {
 				"WS : ' '+;\n");
         // Tokens: 012345678901234567
         // Input:  x = 3 * 0 + 2 * 0;
-		UnbufferedCharStream input = new UnbufferedCharStream(
+		TestingUnbufferedCharStream input = new TestingUnbufferedCharStream(
 			new StringReader("x = 302 * 91 + 20234234 * 0;")
         );
         LexerInterpreter lexEngine = new LexerInterpreter(g);
@@ -217,4 +218,32 @@ public class TestUnbufferedCharStream extends BaseTest {
 			" [@17,27:27=';',<3>,1:27], [@18,28:27='',<-1>,1:28]]";
 		assertEquals(expecting, tokens.getTokens().toString());
     }
+
+	protected static class TestingUnbufferedCharStream extends UnbufferedCharStream {
+
+		public TestingUnbufferedCharStream(Reader input) {
+			super(input);
+		}
+
+		public TestingUnbufferedCharStream(Reader input, int bufferSize) {
+			super(input, bufferSize);
+		}
+
+		/** For testing.  What's in moving window into data stream from
+		 *  current index, LA(1) or data[p], to end of buffer?
+		 */
+		public String getRemainingBuffer() {
+			if ( n==0 ) return "";
+			return new String(data,p,n-p);
+		}
+
+		/** For testing.  What's in moving window buffer into data stream.
+		 *  From 0..p-1 have been consume.
+		 */
+		public String getBuffer() {
+			if ( n==0 ) return "";
+			return new String(data,0,n);
+		}
+
+	}
 }
