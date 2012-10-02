@@ -61,7 +61,7 @@ public class TestATNParserPrediction extends BaseTest {
 			"C : 'c' ;\n");
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"a : A | B ;");
+			"a : A{;} | B ;");
 		int decision = 0;
 		checkPredictedAlt(lg, g, decision, "a", 1);
 		checkPredictedAlt(lg, g, decision, "b", 2);

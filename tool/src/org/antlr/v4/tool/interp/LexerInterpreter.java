@@ -101,46 +101,16 @@ public class LexerInterpreter implements TokenSource<Token> {
 		int start = input.index();
 		int tokenStartCharPositionInLine = interp.getCharPositionInLine();
 		int tokenStartLine = interp.getLine();
-		int ttype = interp.match(input, Lexer.DEFAULT_MODE);
-		int stop = input.index()-1;
+		int mark = input.mark(); // make sure unuffered stream holds chars long enough to get text
+		try {
+			int ttype = interp.match(input, Lexer.DEFAULT_MODE);
+			int stop = input.index()-1;
 
-		Token t =
-			_factory.create(this, ttype, null, Token.DEFAULT_CHANNEL, start, stop,
-							tokenStartLine, tokenStartCharPositionInLine);
-		return t;
-
-		/*
-		outer:
-		while (true) {
-			token = null;
-			channel = Token.DEFAULT_CHANNEL;
-			tokenStartCharIndex = input.index();
-			tokenStartCharPositionInLine = input.getCharPositionInLine();
-			tokenStartLine = input.getLine();
-			text = null;
-			do {
-				type = Token.INVALID_TYPE;
-				if ( input.LA(1)==CharStream.EOF ) {
-					Token eof = new CommonToken(input,Token.EOF,
-												Token.DEFAULT_CHANNEL,
-												input.index(),input.index());
-					eof.setLine(getLine());
-					eof.setCharPositionInLine(getCharPositionInLine());
-					return eof;
-				}
-//				System.out.println("nextToken at "+((char)input.LA(1))+
-//								   " in mode "+mode+
-//								   " at index "+input.index());
-				int ttype = _interp.match(input, mode);
-//				System.out.println("accepted ttype "+ttype);
-				if ( type == Token.INVALID_TYPE) type = ttype;
-				if ( type==SKIP ) {
-					continue outer;
-				}
-			} while ( type==MORE );
-			if ( token==null ) emit();
-			return token;
+			return _factory.create(this, ttype, null, Token.DEFAULT_CHANNEL, start, stop,
+								   tokenStartLine, tokenStartCharPositionInLine);
 		}
-*/
+		finally {
+			input.release(mark);
+		}
 	}
 }

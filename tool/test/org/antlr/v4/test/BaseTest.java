@@ -39,6 +39,7 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
@@ -91,6 +92,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -232,7 +234,7 @@ public abstract class BaseTest {
 				tokenTypes.add(lg.typeToTokenList.get(ttype));
 			}
 
-			if ( t==CharStream.EOF ) {
+			if ( t==IntStream.EOF ) {
 				hitEOF = true;
 			}
 		} while ( ttype!=Token.EOF );
@@ -1165,5 +1167,25 @@ public abstract class BaseTest {
 		public String getText(Object start, Object stop) {
 			return null;
 		}
+	}
+
+	/** Sort a list */
+	public <T extends Comparable<? super T>> List<T> sort(List<T> data) {
+		List<T> dup = new ArrayList<T>();
+		dup.addAll(data);
+		Collections.sort(dup);
+		return dup;
+	}
+
+	/** Return map sorted by key */
+	public <K extends Comparable<? super K>,V> LinkedHashMap<K,V> sort(Map<K,V> data) {
+		LinkedHashMap<K,V> dup = new LinkedHashMap<K, V>();
+		List<K> keys = new ArrayList<K>();
+		keys.addAll(data.keySet());
+		Collections.sort(keys);
+		for (K k : keys) {
+			dup.put(k, data.get(k));
+		}
+		return dup;
 	}
 }

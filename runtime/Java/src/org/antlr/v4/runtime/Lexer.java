@@ -163,7 +163,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 						recover(e);
 						ttype = SKIP;
 					}
-					if ( _input.LA(1)==CharStream.EOF ) {
+					if ( _input.LA(1)==IntStream.EOF ) {
 						_hitEOF = true;
 					}
 					if ( _type == Token.INVALID_TYPE ) _type = ttype;

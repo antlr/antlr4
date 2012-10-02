@@ -40,6 +40,7 @@ import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenPipeline;
+import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.Graph;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
@@ -50,6 +51,7 @@ import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.ANTLRToolListener;
+import org.antlr.v4.tool.BuildDependencyGenerator;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.DefaultToolListener;
 import org.antlr.v4.tool.ErrorManager;
@@ -127,6 +129,7 @@ public class Tool {
 	public boolean verbose_dfa = false;
 	public boolean gen_listener = true;
 	public boolean gen_visitor = false;
+	public boolean gen_dependencies = false;
 	public String genPackage = null;
 	public Map<String, String> grammarOptions = null;
 
@@ -147,10 +150,10 @@ public class Tool {
 		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
 		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
 		new Option("genPackage",		"-package", OptionArgType.STRING, "specify a package/namespace for the generated code"),
+		new Option("gen_dependencies",	"-depend", "generate file dependencies"),
 		new Option("",					"-D<option>=value", "set/override a grammar-level option"),
 
-
-        new Option("saveLexer",			"-Xsave-lexer", "save temp lexer file created for combined grammars"),
+		new Option("saveLexer",			"-Xsave-lexer", "save temp lexer file created for combined grammars"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
         new Option("force_atn",			"-Xforce-atn", "use the ATN simulator for all predictions"),
 		new Option("log",   			"-Xlog", "dump lots of logging info to antlr-timestamp.log"),
@@ -325,7 +328,21 @@ public class Tool {
 		for (GrammarRootAST t : sortedGrammars) {
 			final Grammar g = createGrammar(t);
 			g.fileName = t.fileName;
-			process(g, true);
+			if ( gen_dependencies ) {
+				BuildDependencyGenerator dep =
+					new BuildDependencyGenerator(this, g);
+				/*
+					List outputFiles = dep.getGeneratedFileList();
+					List dependents = dep.getDependenciesFileList();
+					System.out.println("output: "+outputFiles);
+					System.out.println("dependents: "+dependents);
+					 */
+				System.out.println(dep.getDependencies().render());
+
+			}
+			else {
+				process(g, true);
+			}
 		}
 	}
 
@@ -595,7 +612,7 @@ public class Tool {
 		// be the base output directory (or current directory if there is not a -o)
 		//
 		File outputDir;
-		if ( fileName.endsWith(".tokens") ) {// CodeGenerator.VOCAB_FILE_EXTENSION)) {
+		if ( fileName.endsWith(CodeGenerator.VOCAB_FILE_EXTENSION) ) {
 			outputDir = new File(outputDirectory);
 		}
 		else {

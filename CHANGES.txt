@@ -1,6 +1,15 @@
 ANTLR v4 Honey Badger
 
-October ?, 2012 -- 4.0b2 release
+October 1, 2012 -- 4.0b2 release
+
+September 30, 2012
+
+* Fixed the unbuffered streams, which actually buffered everything
+  up by mistake. tweaked a few comments.
+
+* Added a getter to IntStream for the token factory
+
+* Added -depend cmd-line option.
 
 September 29, 2012
 

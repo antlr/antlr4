@@ -29,7 +29,6 @@
 
 package org.antlr.v4.test;
 
-import org.antlr.v4.Tool;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
@@ -37,24 +36,6 @@ import org.junit.Test;
 
 public class TestCompositeGrammars extends BaseTest {
 	protected boolean debug = false;
-
-	@Test public void testWildcardStillWorks() throws Exception {
-		String grammar =
-			"parser grammar S;\n" +
-			"a : B . C ;\n"; // not qualified ID
-		mkdir(tmpdir);
-		Grammar g = new Grammar(tmpdir + "/S.g4", grammar);
-		g.name = "S";
-
-		ErrorQueue equeue = new ErrorQueue();
-		Tool antlr = g.tool;
-		antlr.outputDirectory = tmpdir;
-		antlr.libDirectory = tmpdir;
-		antlr.addListener(equeue);
-		antlr.process(g,true);
-
-		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
-	}
 
 	@Test public void testDelegatorInvokesDelegateRule() throws Exception {
 		String slave =
@@ -235,11 +216,11 @@ public class TestCompositeGrammars extends BaseTest {
 		Grammar g = new Grammar(tmpdir+"/M.g4", master, equeue);
 
 		String expectedTokenIDToTypeMap = "{EOF=-1, B=1, A=2, C=3, WS=4}";
-		String expectedStringLiteralToTypeMap = "{'c'=3, 'a'=2, 'b'=1}";
+		String expectedStringLiteralToTypeMap = "{'a'=2, 'b'=1, 'c'=3}";
 		String expectedTypeToTokenList = "[B, A, C, WS]";
 
 		assertEquals(expectedTokenIDToTypeMap, g.tokenNameToTypeMap.toString());
-		assertEquals(expectedStringLiteralToTypeMap, g.stringLiteralToTypeMap.toString());
+		assertEquals(expectedStringLiteralToTypeMap, sort(g.stringLiteralToTypeMap).toString());
 		assertEquals(expectedTypeToTokenList, realElements(g.typeToTokenList).toString());
 
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
