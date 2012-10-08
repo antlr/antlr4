@@ -438,8 +438,10 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		// that is previous child of parse tree
 		if ( _buildParseTrees && _ctx != localctx ) {
 			ParserRuleContext<?> parent = (ParserRuleContext<?>)_ctx.parent;
-			parent.removeLastChild();
-			if ( parent!=null )	parent.addChild(localctx);
+			if ( parent!=null )	{
+				parent.removeLastChild();
+				parent.addChild(localctx);
+			}
 		}
 		_ctx = localctx;
 		_ctx.altNum = altNum;
