@@ -445,10 +445,26 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		_ctx.altNum = altNum;
 	}
 
-	/* like enterRule but for recursive rules */
-	public void pushNewRecursionContext(ParserRuleContext<Token> localctx, int ruleIndex) {
+	public void enterRecursionRule(ParserRuleContext<Token> localctx, int ruleIndex) {
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
+		if (_parseListeners != null) {
+			triggerEnterRuleEvent(); // simulates rule entry for left-recursive rules
+		}
+	}
+
+	/* like enterRule but for recursive rules */
+	public void pushNewRecursionContext(ParserRuleContext<Token> localctx, int ruleIndex) {
+		ParserRuleContext<Token> previous = _ctx;
+		previous.parent = localctx;
+		previous.stop = _input.LT(-1);
+
+		_ctx = localctx;
+		_ctx.start = previous.start;
+		if (_buildParseTrees) {
+			_ctx.addChild(previous);
+		}
+
 		if ( _parseListeners != null ) {
 			triggerEnterRuleEvent(); // simulates rule entry for left-recursive rules
 		}
