@@ -1,5 +1,10 @@
 ANTLR v4 Honey Badger
 
+October 8, 2012
+
+* Fixed a bug where labeling the alternatives of the start rule caused
+  a null pointer exception.
+
 October 1, 2012 -- 4.0b2 release
 
 September 30, 2012
