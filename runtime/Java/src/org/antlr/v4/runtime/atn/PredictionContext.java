@@ -234,15 +234,15 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		else {
 			if ( a == EMPTY && b == EMPTY ) return EMPTY; // $ + $ = $
 			if ( a == EMPTY ) { // $ + x = [$,x]
-				int[] payloads = {EMPTY_FULL_CTX_INVOKING_STATE, b.invokingState};
-				PredictionContext[] parents = {null, b.parent};
+				int[] payloads = {b.invokingState, EMPTY_FULL_CTX_INVOKING_STATE};
+				PredictionContext[] parents = {b.parent, null};
 				PredictionContext joined =
 					new ArrayPredictionContext(parents, payloads);
 				return joined;
 			}
 			if ( b == EMPTY ) { // x + $ = [$,x] ($ is always first if present)
-				int[] payloads = {EMPTY_FULL_CTX_INVOKING_STATE, a.invokingState};
-				PredictionContext[] parents = {null, a.parent};
+				int[] payloads = {a.invokingState, EMPTY_FULL_CTX_INVOKING_STATE};
+				PredictionContext[] parents = {a.parent, null};
 				PredictionContext joined =
 					new ArrayPredictionContext(parents, payloads);
 				return joined;
