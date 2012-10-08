@@ -446,17 +446,33 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		_ctx.altNum = altNum;
 	}
 
-	/* like enterRule but for recursive rules */
-	public void pushNewRecursionContext(ParserRuleContext<Symbol> localctx, int state, int ruleIndex) {
-		setState(state);
+	public void enterRecursionRule(ParserRuleContext<Symbol> localctx, int ruleIndex) {
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
+		if (_parseListeners != null) {
+			triggerEnterRuleEvent(); // simulates rule entry for left-recursive rules
+		}
+	}
+
+	/* like enterRule but for recursive rules */
+	public void pushNewRecursionContext(ParserRuleContext<Symbol> localctx, int state, int ruleIndex) {
+		ParserRuleContext<Symbol> previous = _ctx;
+		previous.parent = localctx;
+		previous.invokingState = state;
+		previous.stop = _input.LT(-1);
+
+		_ctx = localctx;
+		_ctx.start = previous.start;
+		if (_buildParseTrees) {
+			_ctx.addChild(previous);
+		}
+
 		if ( _parseListeners != null ) {
 			triggerEnterRuleEvent(); // simulates rule entry for left-recursive rules
 		}
 	}
 
-	public void unrollRecursionContexts(ParserRuleContext<Symbol> _parentctx, int _parentState) {
+	public void unrollRecursionContexts(ParserRuleContext<Symbol> _parentctx) {
 		_ctx.stop = _input.LT(-1);
 		ParserRuleContext<Symbol> retctx = _ctx; // save current ctx (return value)
 
@@ -464,16 +480,13 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		if ( _parseListeners != null ) {
 			while ( _ctx != _parentctx ) {
 				triggerExitRuleEvent();
-				setState(_ctx.invokingState);
 				_ctx = (ParserRuleContext<Symbol>)_ctx.parent;
 			}
 		}
 		else {
-			setState(_parentState);
 			_ctx = _parentctx;
 		}
 		// hook into tree
-		retctx.invokingState = _parentState;
 		retctx.parent = _parentctx;
 		if (_buildParseTrees) _parentctx.addChild(retctx); // add return ctx into invoking rule's tree
 	}

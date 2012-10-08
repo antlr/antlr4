@@ -245,7 +245,7 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>);
 	<currentRule.ctxType> _prevctx = _localctx;
 	int _startState = <currentRule.startState>;
-	pushNewRecursionContext(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
+	enterRecursionRule(_localctx, RULE_<currentRule.name>);
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
@@ -263,7 +263,7 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 	}
 	finally {
 		<finallyAction>
-		unrollRecursionContexts(_parentctx, _parentState);
+		unrollRecursionContexts(_parentctx);
 	}
 	return _localctx;
 }
@@ -660,18 +660,14 @@ recRuleSetStopToken()                 ::= "_ctx.stop = _input.LT(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
 _localctx = new <ctxName>Context(_parentctx, _parentState, _p);
-_localctx.addChild(_prevctx);
 <if(label)>_localctx.<label> = _prevctx;<endif>
 pushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
-_localctx.start = _prevctx.start;
 >>
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label) ::= <<
 _localctx = new <currentAltLabel; format="cap">Context(new <ruleName; format="cap">Context(_parentctx, _parentState, _p));
-_localctx.addChild(_prevctx);
 <if(label)>((<currentAltLabel; format="cap">Context)_localctx).<label> = _prevctx;<endif>
 pushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
-_localctx.start = _prevctx.start;
 >>
 
 recRuleReplaceContext(ctxName) ::= <<
@@ -683,7 +679,6 @@ _prevctx = _localctx;
 recRuleSetPrevCtx() ::= <<
 if ( _parseListeners!=null ) triggerExitRuleEvent();
 _prevctx = _localctx;
-_prevctx.stop = _input.LT(-1);
 >>
 
 
