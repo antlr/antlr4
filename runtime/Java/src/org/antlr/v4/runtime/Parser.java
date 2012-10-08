@@ -454,9 +454,10 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
 	/* like enterRule but for recursive rules */
-	public void pushNewRecursionContext(ParserRuleContext<Token> localctx, int ruleIndex) {
+	public void pushNewRecursionContext(ParserRuleContext<Token> localctx, int state, int ruleIndex) {
 		ParserRuleContext<Token> previous = _ctx;
 		previous.parent = localctx;
+		previous.invokingState = state;
 		previous.stop = _input.LT(-1);
 
 		_ctx = localctx;
