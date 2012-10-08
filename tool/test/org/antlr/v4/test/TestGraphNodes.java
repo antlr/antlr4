@@ -375,6 +375,7 @@ public class TestGraphNodes extends TestCase {
 	}
 
 	@Test public void test_aex_bfx() {
+		// TJP: this is inefficient as it leaves the top x nodes unmerged.
 		PredictionContext x1 = x();
 		PredictionContext x2 = x();
 		PredictionContext e = createSingleton(x1, 5);
