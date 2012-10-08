@@ -73,6 +73,12 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ErrorNode;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.RuleNode;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -906,6 +912,7 @@ public abstract class BaseTest {
 		f.mkdirs();
 	}
 
+
 	protected void writeTestFile(String parserName,
 								 String lexerName,
 								 String parserStartRuleName,
@@ -922,8 +929,25 @@ public abstract class BaseTest {
 			"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
 			"        <createParser>\n"+
 			"		 parser.setBuildParseTree(true);\n" +
-			"        parser.<parserStartRuleName>();\n" +
+			"        ParserRuleContext\\<Token> tree = parser.<parserStartRuleName>();\n" +
+			"        ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
 			"    }\n" +
+			"\n" +
+			"	static class TreeShapeListener implements ParseTreeListener\\<Token> {\n" +
+			"		@Override public void visitTerminal(TerminalNode\\<Token> node) { }\n" +
+			"		@Override public void visitErrorNode(ErrorNode\\<Token> node) { }\n" +
+			"		@Override public void exitEveryRule(ParserRuleContext\\<Token> ctx) { }\n" +
+			"\n" +
+			"		@Override\n" +
+			"		public void enterEveryRule(ParserRuleContext\\<Token> ctx) {\n" +
+			"			for (int i = 0; i \\< ctx.getChildCount(); i++) {\n" +
+			"				ParseTree parent = ctx.getChild(i).getParent();\n" +
+			"				if (!(parent instanceof RuleNode) || ((RuleNode)parent).getRuleContext() != ctx) {\n" +
+			"					throw new IllegalStateException(\"Invalid parse tree shape detected.\");\n" +
+			"				}\n" +
+			"			}\n" +
+			"		}\n" +
+			"	}\n" +
 			"}"
 			);
         ST createParserST = new ST("        <parserName> parser = new <parserName>(tokens);\n");
