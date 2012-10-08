@@ -439,8 +439,10 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		// that is previous child of parse tree
 		if ( _buildParseTrees && _ctx != localctx ) {
 			ParserRuleContext<Symbol> parent = (ParserRuleContext<Symbol>)_ctx.parent;
-			parent.removeLastChild();
-			if ( parent!=null )	parent.addChild(localctx);
+			if ( parent!=null )	{
+				parent.removeLastChild();
+				parent.addChild(localctx);
+			}
 		}
 		_ctx = localctx;
 		_ctx.altNum = altNum;
