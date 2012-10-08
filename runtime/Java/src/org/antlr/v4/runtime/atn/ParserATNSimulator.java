@@ -1115,7 +1115,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				 config.state.getClass()==PlusLoopbackState.class )
 			{
 				config.context =
-					new SingletonPredictionContext(config.context, config.state.stateNumber);
+					SingletonPredictionContext.create(config.context, config.state.stateNumber);
 				// alter config; it's ok, since all calls to closure pass in a fresh config for us to chase
 				if ( debug ) System.out.println("Loop back; push "+config.state.stateNumber+", stack="+config.context);
 			}
@@ -1286,7 +1286,7 @@ public class ParserATNSimulator extends ATNSimulator {
 							   ", ctx="+config.context);
 		}
 		PredictionContext newContext =
-			new SingletonPredictionContext(config.context, config.state.stateNumber);
+			SingletonPredictionContext.create(config.context, config.state.stateNumber);
 		return new ATNConfig(config, t.target, newContext);
 	}
 

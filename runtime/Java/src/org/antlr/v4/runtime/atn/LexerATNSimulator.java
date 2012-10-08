@@ -667,7 +667,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		switch (t.getSerializationType()) {
 			case Transition.RULE:
 				PredictionContext newContext =
-					new SingletonPredictionContext(config.context, p.stateNumber);
+					SingletonPredictionContext.create(config.context, p.stateNumber);
 				c = new LexerATNConfig(config, t.target, newContext);
 				break;
 			case Transition.PREDICATE:

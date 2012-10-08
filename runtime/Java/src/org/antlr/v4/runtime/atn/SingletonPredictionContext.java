@@ -8,13 +8,21 @@ public class SingletonPredictionContext extends PredictionContext {
 	public final PredictionContext parent;
 	public final int invokingState;
 
-	public SingletonPredictionContext(PredictionContext parent, int invokingState) {
+	SingletonPredictionContext(PredictionContext parent, int invokingState) {
 		super(calculateHashCode(parent!=null ? 31 ^ parent.hashCode() : 1,
 								31 ^ invokingState));
 		assert invokingState!=EMPTY_FULL_CTX_INVOKING_STATE &&
 		       invokingState!=ATNState.INVALID_STATE_NUMBER;
 		this.parent = parent;
 		this.invokingState = invokingState;
+	}
+
+	public static SingletonPredictionContext create(PredictionContext parent, int invokingState) {
+		if ( invokingState == EMPTY_FULL_CTX_INVOKING_STATE && parent == null ) {
+			// someone can pass in the bits of an array ctx that mean $
+			return EMPTY;
+		}
+		return new SingletonPredictionContext(parent, invokingState);
 	}
 
 	@Override

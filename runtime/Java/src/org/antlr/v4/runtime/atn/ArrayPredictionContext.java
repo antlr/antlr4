@@ -84,7 +84,7 @@ public class ArrayPredictionContext extends PredictionContext {
 			@Override
 			public SingletonPredictionContext next() {
 				SingletonPredictionContext ctx =
-					new SingletonPredictionContext(parents[i], invokingStates[i]);
+					SingletonPredictionContext.create(parents[i], invokingStates[i]);
 				i++;
 				return ctx;
 			}
@@ -144,8 +144,8 @@ public class ArrayPredictionContext extends PredictionContext {
 				next = PredictionContext.EMPTY;
 			}
 			else {
-				next = new SingletonPredictionContext(this.parents[i],
-													  this.invokingStates[i]);
+				next = SingletonPredictionContext.create(this.parents[i],
+														 this.invokingStates[i]);
 			}
 			boolean rootIsWildcard = fullCtx;
 			newCtx = merge(newCtx, next, rootIsWildcard, mergeCache);

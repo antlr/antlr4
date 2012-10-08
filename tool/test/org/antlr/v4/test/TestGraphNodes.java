@@ -2,7 +2,6 @@ package org.antlr.v4.test;
 
 import junit.framework.TestCase;
 import org.antlr.v4.runtime.atn.ArrayPredictionContext;
-import org.antlr.v4.runtime.atn.EmptyPredictionContext;
 import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.atn.SingletonPredictionContext;
@@ -763,7 +762,7 @@ public class TestGraphNodes extends TestCase {
 	}
 
 	public SingletonPredictionContext createSingleton(PredictionContext parent, int payload) {
-		SingletonPredictionContext a = new SingletonPredictionContext(parent, payload);
+		SingletonPredictionContext a = SingletonPredictionContext.create(parent, payload);
 		return a;
 	}
 
@@ -820,7 +819,7 @@ public class TestGraphNodes extends TestCase {
 			}
 
 			for (int i = 0; i < current.size(); i++) {
-				if (current.getInvokingState(i) == EmptyPredictionContext.EMPTY_INVOKING_STATE) {
+				if (current.getInvokingState(i) == PredictionContext.EMPTY_FULL_CTX_INVOKING_STATE) {
 					continue;
 				}
 

@@ -124,7 +124,7 @@ public class LL1Analyzer {
 			Transition t = s.transition(i);
 			if ( t.getClass() == RuleTransition.class ) {
 				PredictionContext newContext =
-					new SingletonPredictionContext(ctx, s.stateNumber);
+					SingletonPredictionContext.create(ctx, s.stateNumber);
 				_LOOK(t.target, newContext, look, lookBusy, seeThruPreds);
 			}
 			else if ( t instanceof PredicateTransition ) {

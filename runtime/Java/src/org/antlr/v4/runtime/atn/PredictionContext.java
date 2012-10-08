@@ -53,7 +53,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			parent = PredictionContext.fromRuleContext(outerContext.parent);
 		}
 
-		return new SingletonPredictionContext(parent, outerContext.invokingState);
+		return SingletonPredictionContext.create(parent, outerContext.invokingState);
 	}
 
 	@Override
@@ -123,7 +123,8 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		boolean rootIsWildcard,
 		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
 	{
-		if ( (a==null&&b==null) || a==b || a.equals(b) ) return a; // share same graph if both same
+		// share same graph if both same
+		if ( (a==null&&b==null) || a==b || (a!=null&&a.equals(b)) ) return a;
 
 		if ( a instanceof SingletonPredictionContext && b instanceof SingletonPredictionContext) {
 			return mergeSingletons((SingletonPredictionContext)a,
@@ -178,17 +179,13 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			// merge parents x and y, giving array node with x,y then remainders
 			// of those graphs.  dup a, a' points at merged array
 			// new joined parent so create new singleton pointing to it, a'
-			PredictionContext a_ = new SingletonPredictionContext(parent, a.invokingState);
+			PredictionContext a_ = SingletonPredictionContext.create(parent, a.invokingState);
 			if ( mergeCache!=null ) mergeCache.put(a, b, a_);
 			return a_;
 		}
 		else { // a != b payloads differ
 			// see if we can collapse parents due to $+x parents if local ctx
 			PredictionContext singleParent = null;
-			if ( rootIsWildcard ) {
-				if ( a.parent == EMPTY ) singleParent = EMPTY;  // $ + b = $
-				if ( b.parent == EMPTY ) singleParent = EMPTY;  // a + $ = $
-			}
 			if ( a==b || (a.parent!=null && a.parent.equals(b.parent)) ) { // ax + bx = [a,b]x
 				singleParent = a.parent;
 			}
@@ -338,8 +335,9 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			if ( p < lastSlot ) {
 				int n = p+1; // how many slots we really used in merge
 				if ( n == 1 ) { // for just one merged element, return singleton top
-					PredictionContext a_ = new SingletonPredictionContext(mergedParents[0],
-																		  mergedInvokingStates[0]);
+					PredictionContext a_ =
+						SingletonPredictionContext.create(mergedParents[0],
+														  mergedInvokingStates[0]);
 					if ( mergeCache!=null ) mergeCache.put(a,b,a_);
 					return a_;
 				}
@@ -490,7 +488,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			updated = EMPTY;
 		}
 		else if (parents.length == 1) {
-			updated = new SingletonPredictionContext(parents[0], context.getInvokingState(0));
+			updated = SingletonPredictionContext.create(parents[0], context.getInvokingState(0));
 		}
 		else {
 			ArrayPredictionContext arrayPredictionContext = (ArrayPredictionContext)context;
