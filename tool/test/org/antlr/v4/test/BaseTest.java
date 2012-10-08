@@ -73,12 +73,6 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.RuleNode;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -911,7 +905,6 @@ public abstract class BaseTest {
 		File f = new File(dir);
 		f.mkdirs();
 	}
-
 
 	protected void writeTestFile(String parserName,
 								 String lexerName,
