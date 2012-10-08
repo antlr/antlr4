@@ -201,7 +201,7 @@ public class TestAttributeChecks extends BaseTest {
 	@Test public void testTokenRef() throws RecognitionException {
 		String grammar =
 			"parser grammar S;\n" +
-			"tokens{ID;}\n" +
+			"tokens{ID}\n" +
 			"a : x=ID {Token t = $x; t = $ID;} ;\n";
 		String expected =
 			"";
