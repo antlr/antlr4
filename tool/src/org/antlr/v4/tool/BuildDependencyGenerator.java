@@ -47,6 +47,18 @@ import java.util.List;
  *  	T.tokens : T.g
  *  	TLexer.java : T.g
  *
+ *  If we are using the listener pattern (-listener on the command line)
+ *  then we add:
+ *
+ *      TListener.java : T.g
+ *      TBaseListener.jave : T.g
+ *
+ *  If we are using the visitor pattern (-visitor on the command line)
+ *  then we add:
+ *
+ *      TVisitor.java : T.g
+ *      TBaseVisitor.java : T.g
+ *
  *  If "-lib libdir" is used on command-line with -depend and option
  *  tokenVocab=A in grammar, then include the path like this:
  *
@@ -109,6 +121,8 @@ public class BuildDependencyGenerator {
             String suffix = Grammar.getGrammarTypeToFileNameSuffix(ANTLRParser.LEXER);
             String lexer = g.name + suffix + extST.render();
             files.add(getOutputFile(lexer));
+            String lexerTokens = g.name + suffix + ".tokens";
+            files.add(getOutputFile(lexerTokens));
 
             // TLexer.h
             if (headerExtST != null) {
@@ -117,6 +131,21 @@ public class BuildDependencyGenerator {
             }
         	// for combined, don't generate TLexer.tokens
         }
+
+        if ( g.tool.gen_listener ) {
+          // add generated listener; e.g., TListener.java
+          files.add(getOutputFile(generator.getListenerFileName()));
+          // add generated base listener; e.g., TBaseListener.java
+          files.add(getOutputFile(generator.getBaseListenerFileName()));
+        }
+
+        if ( g.tool.gen_visitor ) {
+          // add generated visitor; e.g., TVisitor.java
+          files.add(getOutputFile(generator.getVisitorFileName()));
+          // add generated base visitor; e.g., TBaseVisitor.java
+          files.add(getOutputFile(generator.getBaseVisitorFileName()));
+        }
+
 
 		// handle generated files for imported grammars
 		List<Grammar> imports = g.getAllImportedGrammars();
