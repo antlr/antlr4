@@ -71,6 +71,14 @@ public class ATNConfig {
     @NotNull
     public final SemanticContext semanticContext;
 
+	public ATNConfig(ATNConfig old) { // dup
+		this.state = old.state;
+		this.alt = old.alt;
+		this.context = old.context;
+		this.semanticContext = old.semanticContext;
+		this.reachesIntoOuterContext = old.reachesIntoOuterContext;
+	}
+
 	public ATNConfig(@NotNull ATNState state,
 					 int alt,
 					 @Nullable PredictionContext context)
@@ -93,15 +101,26 @@ public class ATNConfig {
    		this(c, state, c.context, c.semanticContext);
    	}
 
-    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @NotNull SemanticContext semanticContext) {
-   		this(c, state, c.context, semanticContext);
-   	}
+	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state,
+		 @NotNull SemanticContext semanticContext)
+{
+		this(c, state, c.context, semanticContext);
+	}
 
-    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context) {
+	public ATNConfig(@NotNull ATNConfig c,
+					 @NotNull SemanticContext semanticContext)
+	{
+		this(c, c.state, c.context, semanticContext);
+	}
+
+    public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state,
+					 @Nullable PredictionContext context)
+	{
         this(c, state, context, c.semanticContext);
     }
 
-	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context,
+	public ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state,
+					 @Nullable PredictionContext context,
                      @NotNull SemanticContext semanticContext)
     {
 		this.state = state;

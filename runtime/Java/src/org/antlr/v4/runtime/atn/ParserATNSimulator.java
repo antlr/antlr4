@@ -273,6 +273,29 @@ public class ParserATNSimulator extends ATNSimulator {
 	public static int retry_with_context_predicts_same_as_alt = 0;
 	public static int retry_with_context_from_dfa = 0;
 
+	/** A Map that uses just the state and the stack context as the key.
+	 *  Used by needMoreLookaheadLL.
+	 */
+	class AltAndContextMap extends FlexibleHashMap<ATNConfig,BitSet> {
+		/** Code is function of (s, _, ctx, _) */
+		@Override
+		public int hashCode(ATNConfig o) {
+			int hashCode = 7;
+			hashCode = 31 * hashCode + o.state.stateNumber;
+			hashCode = 31 * hashCode + o.context.hashCode();
+	        return hashCode;
+		}
+
+		@Override
+		public boolean equals(ATNConfig a, ATNConfig b) {
+			if ( a==b ) return true;
+			if ( a==null || b==null ) return false;
+			if ( hashCode(a) != hashCode(b) ) return false;
+			return a.state.stateNumber==b.state.stateNumber
+				&& b.context.equals(b.context);
+		}
+	}
+
 	@Nullable
 	protected final Parser parser;
 
@@ -650,7 +673,8 @@ public class ParserATNSimulator extends ATNSimulator {
 				D.prediction = predictedAlt;
 			}
 			else {
-//				boolean cont = needMoreLookaheadLL(reach);
+				boolean cont = needMoreLookaheadSLL(reach);
+				cont = needMoreLookaheadLL(reach);
 				D.configs.conflictingAlts = getConflictingAlts(reach);
 				if ( D.configs.conflictingAlts!=null ) {
 					// CONFLICT, GREEDY (TYPICAL SITUATION)
@@ -1378,9 +1402,54 @@ public class ParserATNSimulator extends ATNSimulator {
 	 viable alternative (even in the presence of conflicts) and we
 	 have to keep going since there is no fail over to a more
 	 powerful algorithm.
+
+	 The function implementation tries to bail out as soon as
+	 possible. That means we can stop as soon as we see a nonconflicting
+	 alt set (1 alt in it). We know to continue in that case.
+
+	 // First, map (s,_,x,_) -> altset for all configs
+	 for c in configs:
+	   map[c] U= c.alt  # map hash/equals uses s and x, not	alt and	not pred
+	 return (there exists len(m)==1 for some m in map.values)
+
+	 or
+
+	 boolean continue(configs):
+	   for c in configs:
+	     map[c] U= c.alt  # map hash/equals uses s and x, not alt and not pred
+	   for altset in map.values:
+	     if len(altset)==1: return true;
+	   return false; # all sets conflict with len(viable_alts)>1, stop
+
 	*/
 	public boolean needMoreLookaheadSLL(@NotNull ATNConfigSet configs) {
-		return false;
+		// pure SLL mode parsing
+		if ( SLL ) {
+			if ( configs.hasSemanticContext ) {
+				// dup configs, tossing out semantic predicates
+				ATNConfigSet dup = new ATNConfigSet();
+				for (ATNConfig c : configs) {
+					c = new ATNConfig(c,SemanticContext.NONE);
+					dup.add(c);
+				}
+				configs = dup;
+			}
+			// do usual full LL termination test
+			return needMoreLookaheadLL(configs);
+		}
+		// combined SLL+LL mode parsing
+		System.out.println("configs: "+configs);
+		// map (s,_,x,_) -> altset for all configs
+		Collection<BitSet> altsets = getConflictingAltSubsets(configs);
+		System.out.println("altsets: "+altsets);
+		for (BitSet alts : altsets) {
+			if ( alts.cardinality()==1 ) { // more than 1 viable alt
+				System.out.println("go; found nonconflicting alt: "+alts);
+				return true; // use more lookahead
+			}
+		}
+		System.out.println("stop");
+		return false; // all sets conflict with len(viable_alts)>1, stop
 	}
 
 	/**
@@ -1493,32 +1562,43 @@ public class ParserATNSimulator extends ATNSimulator {
 	 // First, map (s,_,x,_) -> altset for all configs
 	 for c in configs:
 	   map[c] U= c.alt  # map hash/equals uses s and x, not	alt and	not pred
-	 // Then, any singleton alternative sets do not conflict.
-	 nonconflicting = set [map[c] for c in configs if len(map[c])=1]
-	 viable_alts = nonconflicting
-	 // All other sets must be in a conflicting subset
-	 viable_alts = set [min(map[c]) for c in configs if len(map[c])>1]
+	 viable_alts = [min(m) for m in map.values]
 	 continue if len(viable_alts)>1
 
 	 or
 
 	 boolean continue(configs):
-	  for c in configs:
-	    map[c] U= c.alt  # map hash/equals uses s and x, not alt and not pred
-	  viable_alts = set()
-	  for e in map.entries:
-	    if len(e.value)==1:
-	      viable_alts.add(e.value)
-	      if len(viable_alts)>1: return true
-	    else:
-	      viable_alts.add(min(e.value))
-	  return len(viable_alts)>1
-
+	   for c in configs:
+	     map[c] U= c.alt  # map hash/equals uses s and x, not alt and not pred
+	   viable_alts = set()
+	   for altset in map.values:
+	     viable_alts.add(min(altset))
+	     if len(viable_alts)>1: return true
+	   return false; # len(viable_alts)==1, stop
 	 */
 	public boolean needMoreLookaheadLL(@NotNull ATNConfigSet configs) {
-		// for c in configs:
-        //   map[c] U= c.alt  # map hash/equals uses s and x, not alt and not pred
-		System.out.println(configs);
+		System.out.println("configs: "+configs);
+		// map (s,_,x,_) -> altset for all configs
+		Collection<BitSet> altsets = getConflictingAltSubsets(configs);
+		System.out.println("altsets: "+altsets);
+		BitSet viableAlts = new BitSet();
+		for (BitSet alts : altsets) {
+			int minAlt = alts.nextSetBit(0);
+			viableAlts.set(minAlt);
+			if ( viableAlts.cardinality()>1 ) { // more than 1 viable alt
+				System.out.println("go; viableAlts="+viableAlts);
+				return true; // try using more lookahead
+			}
+		}
+		System.out.println("stop");
+		return false; // len(viable_alts)==1, stop
+	}
+
+	/** Get the conflicting alt subsets from a configuration set.
+	 * for c in configs:
+     *    map[c] U= c.alt  # map hash/equals uses s and x, not alt and not pred
+	 */
+	public Collection<BitSet> getConflictingAltSubsets(ATNConfigSet configs) {
 		AltAndContextMap configToAlts = new AltAndContextMap();
 		for (ATNConfig c : configs) {
 			BitSet alts = configToAlts.get(c);
@@ -1528,45 +1608,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 			alts.set(c.alt);
 		}
-		System.out.println(configToAlts);
-		BitSet viableAlts = new BitSet();
-		for (BitSet alts : configToAlts.values()) {
-			int firstOnBit = alts.nextSetBit(0);
-			if ( alts.cardinality()==1 ) {
-				int singleton = firstOnBit;
-				viableAlts.set(singleton);
-			}
-			else { // > 1
-				int minAlt = firstOnBit;
-				viableAlts.set(minAlt);
-			}
-		}
-		boolean go =  viableAlts.cardinality() > 1;
-		System.out.println("stop="+!go);
-		return go;
-	}
-
-	/** A Map that uses just the state and the stack context as the key.
-	 *  Used by needMoreLookaheadLL.
-	 */
-	class AltAndContextMap extends FlexibleHashMap<ATNConfig,BitSet> {
-		/** Code is function of (s, _, ctx, _) */
-		@Override
-		public int hashCode(ATNConfig o) {
-			int hashCode = 7;
-			hashCode = 31 * hashCode + o.state.stateNumber;
-			hashCode = 31 * hashCode + o.context.hashCode();
-	        return hashCode;
-		}
-
-		@Override
-		public boolean equals(ATNConfig a, ATNConfig b) {
-			if ( a==b ) return true;
-			if ( a==null || b==null ) return false;
-			if ( hashCode(a) != hashCode(b) ) return false;
-			return a.state.stateNumber==b.state.stateNumber
-				&& b.context.equals(b.context);
-		}
+		return configToAlts.values();
 	}
 
 	/**
