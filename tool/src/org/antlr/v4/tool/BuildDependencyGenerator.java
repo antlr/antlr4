@@ -51,7 +51,7 @@ import java.util.List;
  *  then we add:
  *
  *      TListener.java : T.g
- *      TBaseListener.jave : T.g
+ *      TBaseListener.java : T.g
  *
  *  If we are using the visitor pattern (-visitor on the command line)
  *  then we add:
@@ -121,7 +121,7 @@ public class BuildDependencyGenerator {
             String suffix = Grammar.getGrammarTypeToFileNameSuffix(ANTLRParser.LEXER);
             String lexer = g.name + suffix + extST.render();
             files.add(getOutputFile(lexer));
-            String lexerTokens = g.name + suffix + ".tokens";
+            String lexerTokens = g.name + suffix + CodeGenerator.VOCAB_FILE_EXTENSION;
             files.add(getOutputFile(lexerTokens));
 
             // TLexer.h
@@ -129,7 +129,6 @@ public class BuildDependencyGenerator {
                 String header = g.name + suffix + headerExtST.render();
                 files.add(getOutputFile(header));
             }
-        	// for combined, don't generate TLexer.tokens
         }
 
         if ( g.tool.gen_listener ) {
