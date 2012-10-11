@@ -1291,30 +1291,100 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	/**
-	 SLL analysis termination.
+	 SLL prediction termination.
 
-	 This function is used just for SLL.  SLL can decide to give up any
-	 point, even immediately, failing over to full LL.  To be as efficient
-	 as possible, SLL only fails over when it's positive it can't get
-	 anywhere on more look ahead without seeing a conflict.
+	 There are two cases: the usual combined SLL+LL parsing and
+	 pure SLL parsing that has no fail over to full LL.
 
-	 assuming one stage parsing, an SLL confg set with only conflicting
-	 subsets should force failover to full LL, even if the config sets
-	 don't resolve to the same alternative like {1,2} and {3,4}. The only
-	 time SLL keeps going when there exists a conflicting subset, is when
-	 there is a set of nonconflicting conflicts.
+	 COMBINED SLL+LL PARSING
 
-	 SLL stops when it sees only conflicting config subsets
-	 LL keeps going when there is uncertainty
+	 SLL can decide to give up any point, even immediately,
+	 failing over to full LL.  To be as efficient as possible,
+	 though, SLL only fails over when it's positive it can't get
+	 anywhere on more lookahead without seeing a conflict.
 
-	 SLL can't evaluate them 1st because it needs to create the DFA cache.
-	 */
+	 Assuming combined SLL+LL parsing, an SLL confg set with only
+	 conflicting subsets should failover to full LL, even if the
+	 config sets don't resolve to the same alternative like {1,2}
+	 and {3,4}.  If there is at least one nonconflicting set of
+	 configs, SLL can continue with the hopes that more lookahead
+	 will resolve via one of those nonconflicting configs.
+
+	 Here's the prediction termination rule them: SLL (for SLL+LL
+	 parsing) stops when it sees only conflicting config subsets.
+	 In contrast, full LL keeps going when there is uncertainty.
+
+	 PREDICATES IN SLL+LL PARSING
+
+	 SLL does not evaluate predicates until after it reaches a DFA
+	 stop state because it needs to create the DFA cache that
+	 works in all (semantic) situations.  (In contrast, full LL
+	 evaluates predicates collected during start state computation
+	 so it can ignore predicates thereafter.) This means that SLL
+	 termination can totally ignore semantic predicates.
+
+	 Of course, implementation-wise, ATNConfigSets combine stack
+	 contexts but not semantic predicate contexts so we might see
+	 two configs like this:
+
+	 (s, 1, x, {}), (s, 1, x', {p})
+
+	 Before testing these configurations against others, we have
+	 to merge x and x' (w/o modifying the existing configs). For
+	 example, we test (x+x')==x'' when looking for conflicts in
+	 the following configs.
+
+	 (s, 1, x, {}), (s, 1, x', {p}), (s, 2, x'', {})
+
+	 If the configuration set has predicates, which we can test
+	 quickly, this algorithm can make a copy of the configs and
+	 strip out all of the predicates so that a standard
+	 ATNConfigSet will emerge everything ignoring
+	 predicates.
+
+	 CASES:
+
+	 * no conflicts & > 1 alt in set => continue
+
+	 * (s, 1, x), (s, 2, x), (s, 3, z)
+	   (s', 1, y), (s', 2, y)
+	   yields nonconflicting set {3} (and 2 conflicting)
+	     => continue
+
+	 * (s, 1, x), (s, 2, x),
+	   (s', 1, y), (s', 2, y)
+	   (s'', 1, z)
+	   yields nonconflicting set {1} (and 2 conflicting)
+	     => continue
+
+	 * (s, 1, x), (s, 2, x),
+	   (s', 1, y), (s', 2, y)
+	   yields conflicting sets only
+	     => stop and fail over to full LL
+
+	 COMBINED SLL+LL PARSING
+
+	 To handle pure SLL parsing, we can simply make the assumption
+	 that an SLL conflict is a "real" full LL conflict. That way,
+	 this algorithm can behave exactly like the full LL case
+	 except for the presence of semantic predicates. But, we
+	 ignore the semantic predicates anyway. So, we make a copy
+	 stripped of semantic predicates and then call needMoreLookaheadSLL()
+	 instead.
+
+	 Pure SLL lookahead must continue like full LL if the union of
+	 resolved alt sets from nonconflicting and conflicting subsets
+	 has more than one alt. That means there's more than one
+	 viable alternative (even in the presence of conflicts) and we
+	 have to keep going since there is no fail over to a more
+	 powerful algorithm.
+	*/
 	public boolean needMoreLookaheadSLL(@NotNull ATNConfigSet configs) {
 		return false;
 	}
 
 	/**
-	 Full LL analysis termination.
+	 Full LL prediction termination.
 
 	 Can we stop looking ahead during ATN simulation or is there some
 	 uncertainty as to which alternative we will ultimately pick, after
@@ -1445,25 +1515,6 @@ public class ParserATNSimulator extends ATNSimulator {
 	  return len(viable_alts)>1
 
 	 */
-	class AltAndContextMap extends FlexibleHashMap<ATNConfig,BitSet> {
-		/** Code is function of (s, _, ctx, _) */
-		@Override
-		public int hashCode(ATNConfig o) {
-			int hashCode = 7;
-			hashCode = 31 * hashCode + o.state.stateNumber;
-			hashCode = 31 * hashCode + o.context.hashCode();
-	        return hashCode;
-		}
-
-		@Override
-		public boolean equals(ATNConfig a, ATNConfig b) {
-			if ( a==b ) return true;
-			if ( a==null || b==null ) return false;
-			if ( hashCode(a) != hashCode(b) ) return false;
-			return a.state.stateNumber==b.state.stateNumber
-				&& b.context.equals(b.context);
-		}
-	}
 	public boolean needMoreLookaheadLL(@NotNull ATNConfigSet configs) {
 		// for c in configs:
         //   map[c] U= c.alt  # map hash/equals uses s and x, not alt and not pred
@@ -1493,6 +1544,29 @@ public class ParserATNSimulator extends ATNSimulator {
 		boolean go =  viableAlts.cardinality() > 1;
 		System.out.println("stop="+!go);
 		return go;
+	}
+
+	/** A Map that uses just the state and the stack context as the key.
+	 *  Used by needMoreLookaheadLL.
+	 */
+	class AltAndContextMap extends FlexibleHashMap<ATNConfig,BitSet> {
+		/** Code is function of (s, _, ctx, _) */
+		@Override
+		public int hashCode(ATNConfig o) {
+			int hashCode = 7;
+			hashCode = 31 * hashCode + o.state.stateNumber;
+			hashCode = 31 * hashCode + o.context.hashCode();
+	        return hashCode;
+		}
+
+		@Override
+		public boolean equals(ATNConfig a, ATNConfig b) {
+			if ( a==b ) return true;
+			if ( a==null || b==null ) return false;
+			if ( hashCode(a) != hashCode(b) ) return false;
+			return a.state.stateNumber==b.state.stateNumber
+				&& b.context.equals(b.context);
+		}
 	}
 
 	/**
