@@ -30,12 +30,11 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.IntervalSet;
 
+import java.util.BitSet;
 import java.util.Collection;
 
 /**
- *
  * @author Sam Harwell
  */
 public class ProxyErrorListener implements ANTLRErrorListener {
@@ -63,7 +62,7 @@ public class ProxyErrorListener implements ANTLRErrorListener {
 								DFA dfa,
 								int startIndex,
 								int stopIndex,
-								IntervalSet ambigAlts,
+								BitSet ambigAlts,
 								ATNConfigSet configs)
 	{
 		for (ANTLRErrorListener listener : delegates) {

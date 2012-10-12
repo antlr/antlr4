@@ -30,10 +30,10 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.IntervalSet;
+
+import java.util.BitSet;
 
 /**
- *
  * @author Sam Harwell
  */
 public class BaseErrorListener implements ANTLRErrorListener {
@@ -52,7 +52,7 @@ public class BaseErrorListener implements ANTLRErrorListener {
 								DFA dfa,
 								int startIndex,
 								int stopIndex,
-								IntervalSet ambigAlts,
+								BitSet ambigAlts,
 								ATNConfigSet configs)
 	{
 	}

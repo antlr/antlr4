@@ -29,6 +29,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -97,6 +98,9 @@ public abstract class ATNSimulator {
 		int p = 0;
 		atn.grammarType = toInt(data[p++]);
 		atn.maxTokenType = toInt(data[p++]);
+
+		// Set up target of all EOF edges emanating from rule stop states
+		ATNState eofTarget = new ATNState();
 
 		//
 		// STATES
@@ -220,6 +224,14 @@ public abstract class ATNSimulator {
 
 				RuleTransition ruleTransition = (RuleTransition)t;
 				atn.ruleToStopState[ruleTransition.target.ruleIndex].addTransition(new EpsilonTransition(ruleTransition.followState));
+			}
+		}
+
+		// If no edges out of stop state, add EOF transition
+		for (RuleStopState ruleStopState : atn.ruleToStopState) {
+			if ( ruleStopState.getNumberOfTransitions()==0 ) {
+				Transition t = new AtomTransition(eofTarget, Token.EOF);
+				ruleStopState.addTransition(t);
 			}
 		}
 
