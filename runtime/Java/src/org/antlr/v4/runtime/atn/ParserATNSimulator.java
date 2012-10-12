@@ -255,7 +255,7 @@ import java.util.Set;
 
 */
 public class ParserATNSimulator extends ATNSimulator {
-	public static boolean debug = false;
+	public static boolean debug = true;
 	public static boolean debug_list_atn_decisions = false;
 	public static boolean dfa_debug = false;
 	public static boolean retry_debug = false;
@@ -672,6 +672,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 			if ( debug ) {
 				System.out.println("SLL altSubSets="+altSubSets+
+								   ", configs="+reach+
 								   ", predict="+predictedAlt+", allSubsetsConflict="+
 								   allSubsetsConflict(altSubSets)+", conflictingAlts="+
 								   getConflictingAlts(reach));
@@ -753,7 +754,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					BitSet alts = evalSemanticContext(D.predicates, outerContext, true);
 					D.prediction = ATN.INVALID_ALT_NUMBER; // indicate we have preds
 					addDFAEdge(dfa, previousD, t, D);
-					switch (alts.size()) {
+					switch (alts.cardinality()) {
 					case 0:
 						throw noViableAlt(input, outerContext, D.configs, startIndex);
 
@@ -828,15 +829,12 @@ public class ParserATNSimulator extends ATNSimulator {
 				System.out.println("LL altSubSets="+altSubSets+
 								   ", predict="+getUniqueAlt(altSubSets)+
 								   ", resolvesToJustOneViableAlt="+
-								   resolvesToJustOneViableAlt(altSubSets)+
-								   ", conflictingAlts="+
-								   getConflictingAlts(reach));
+								   resolvesToJustOneViableAlt(altSubSets));
 			}
 
 //			System.out.println("altSubSets: "+altSubSets);
 			reach.uniqueAlt = getUniqueAlt(altSubSets);
 			if ( reach.uniqueAlt!=ATN.INVALID_ALT_NUMBER ) break;
-			reach.conflictingAlts = getConflictingAlts(reach);
 			if ( resolvesToJustOneViableAlt(altSubSets) ) break;
 			previous = reach;
 			input.consume();
@@ -878,7 +876,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			reportAmbiguity(dfa, D, startIndex, input.index(), reach.conflictingAlts, reach);
 		}
 
-		return reach.conflictingAlts.nextSetBit(0);
+		return getConflictingAlts(reach).nextSetBit(0);
 	}
 
 	protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t,

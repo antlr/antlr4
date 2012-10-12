@@ -1,10 +1,12 @@
 grammar T;
-s   : expr expr 
-    | expr
+s   :   expr[0] ;
+
+expr[int _p]
+    :   ID
+        ( {5 >= $_p}? '*' expr[6]
+        | {4 >= $_p}? '+' expr[5]
+        )*
     ;
-expr: '@'
-    | ID '@'
-    | ID
-    ;
-ID  : [a-z]+ ;
-WS  : [ \r\n\t]+ -> skip ;
+
+ID  :   [a-zA-Z]+ ;      // match identifiers
+WS  :   [ \t\r\n]+ -> skip ; // toss out whitespace

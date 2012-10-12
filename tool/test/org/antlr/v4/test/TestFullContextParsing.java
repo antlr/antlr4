@@ -247,8 +247,33 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("pass: a(i)<-x\n", found);
 
 		String expecting =
-			"line 1:3 reportAttemptingFullContext d=3, input='a(i)'\n" +
-			"line 1:7 reportAmbiguity d=3: ambigAlts={2..3}, input='a(i)<-x'\n";
+			"line 1:7 reportAttemptingFullContext d=3, input='a(i)<-x'\n" +
+			"line 1:7 reportAmbiguity d=3: ambigAlts={2, 3}, input='a(i)<-x'\n";
+		assertEquals(expecting, this.stderrDuringParse);
+	}
+
+	@Test
+	public void testTrueAmbiguityNoLoop() throws Exception {
+		// simpler version of testLoopsSimulateTailRecursion, no loops
+		String grammar =
+			"grammar T;\n" +
+			"prog: expr expr {System.out.println(\"alt 1\");}\n" +
+			"    | expr\n" +
+			"    ;\n" +
+			"expr: '@'\n" +
+			"    | ID '@'\n" +
+			"    | ID\n" +
+			"    ;\n" +
+			"ID  : [a-z]+ ;\n" +
+			"WS  : [ \r\n\t]+ -> skip ;\n";
+
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "prog", "a@", true);
+		assertEquals("alt 1\n", found);
+
+		String expecting =
+			"line 1:2 reportAmbiguity d=0: ambigAlts={1, 2}, input='a@'\n" +
+			"line 1:2 reportAttemptingFullContext d=1, input='a@'\n" +
+			"line 1:2 reportContextSensitivity d=1, input='a@'\n";
 		assertEquals(expecting, this.stderrDuringParse);
 	}
 
