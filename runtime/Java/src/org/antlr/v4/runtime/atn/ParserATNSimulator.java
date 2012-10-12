@@ -255,7 +255,7 @@ import java.util.Set;
 
 */
 public class ParserATNSimulator extends ATNSimulator {
-	public static boolean debug = true;
+	public static boolean debug = false;
 	public static boolean debug_list_atn_decisions = false;
 	public static boolean dfa_debug = false;
 	public static boolean retry_debug = false;
