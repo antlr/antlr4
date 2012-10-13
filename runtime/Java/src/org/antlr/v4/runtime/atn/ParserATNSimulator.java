@@ -859,7 +859,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		// looking further.
 
 		if ( /* TODO: len(all subsets)>1 or input consistent with a subset with len=1 */ true ) {
-			reportAmbiguity(dfa, D, startIndex, input.index(), reach.conflictingAlts, reach);
+			reportAmbiguity(dfa, D, startIndex, input.index(), getConflictingAlts(reach), reach);
 		}
 
 		return getConflictingAlts(reach).nextSetBit(0);
