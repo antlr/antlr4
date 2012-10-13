@@ -253,7 +253,7 @@ public class TestFullContextParsing extends BaseTest {
 	}
 
 	@Test
-	public void testTrueAmbiguityNoLoop() throws Exception {
+	public void testAmbiguityNoLoop() throws Exception {
 		// simpler version of testLoopsSimulateTailRecursion, no loops
 		String grammar =
 			"grammar T;\n" +
@@ -274,6 +274,42 @@ public class TestFullContextParsing extends BaseTest {
 			"line 1:2 reportAmbiguity d=0: ambigAlts={1, 2}, input='a@'\n" +
 			"line 1:2 reportAttemptingFullContext d=1, input='a@'\n" +
 			"line 1:2 reportContextSensitivity d=1, input='a@'\n";
+		assertEquals(expecting, this.stderrDuringParse);
+	}
+
+	@Test
+	public void testExprAmbiguity() throws Exception {
+		// translated left-recursive expr rule to test ambig detection
+		String grammar =
+			"grammar T;\n" +
+			"s   :   expr[0] {System.out.println($expr.ctx.toStringTree(this));} ;\n" +
+			"\n" +
+			"expr[int _p]\n" +
+			"    :   ID\n" +
+			"        ( {5 >= $_p}? '*' expr[6]\n" +
+			"        | {4 >= $_p}? '+' expr[5]\n" +
+			"        )*\n" +
+			"    ;\n" +
+			"\n" +
+			"ID  :   [a-zA-Z]+ ;      // match identifiers\n" +
+			"WS  :   [ \\t\\r\\n]+ -> skip ; // toss out whitespace\n";
+
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "a+b", true);
+		assertEquals("(expr a + (expr b))\n", found);
+
+		String expecting =
+			"line 1:1 reportAttemptingFullContext d=1, input='+'\n" +
+			"line 1:1 reportContextSensitivity d=1, input='+'\n";
+		assertEquals(expecting, this.stderrDuringParse);
+
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "a+b*c", true);
+		assertEquals("(expr a + (expr b * (expr c)))\n", found);
+
+		expecting =
+			"line 1:1 reportAttemptingFullContext d=1, input='+'\n" +
+			"line 1:1 reportContextSensitivity d=1, input='+'\n" +
+			"line 1:3 reportAttemptingFullContext d=1, input='*'\n" +
+			"line 1:5 reportAmbiguity d=1: ambigAlts={1, 2}, input='*c'\n";
 		assertEquals(expecting, this.stderrDuringParse);
 	}
 
