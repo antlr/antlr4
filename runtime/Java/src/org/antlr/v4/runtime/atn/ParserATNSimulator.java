@@ -52,6 +52,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -298,6 +299,16 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	/** Do only local context prediction (SLL(k) style). */
 	protected boolean SLL = false;
+
+	/** Tell the full LL prediction algorithm to pursue lookahead until
+	 *  it has uniquely predicted alternative without conflict or it's
+	 *  certain that it's found and ambiguous input sequence.  For speed
+	 *  reasons, we terminate the prediction process early when this
+	 *  variable is false. When true, the prediction process will
+	 *  continue looking for the exact ambiguous sequence even if
+	 *  it has already figured out which alternative to predict.
+	 */
+	protected boolean exactAmbig = false;
 
 	/** Each prediction operation uses a cache for merge of prediction contexts.
 	 *  Don't keep around as it wastes huge amounts of memory. DoubleKeyMap
@@ -674,7 +685,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 			else {
 				// MORE THAN ONE VIABLE ALTERNATIVE
-				if ( allSubsetsConflict(altSubSets) ) {
+				if ( hasConflictingAltSet(altSubSets) && !hasStateAssociatedWithOneAlt(reach) ) {
 					D.configs.conflictingAlts = getConflictingAlts(reach);
 					if ( outerContext == ParserRuleContext.EMPTY || // in grammar start rule
 						 !D.configs.dipsIntoOuterContext ||         // didn't fall out of rule
@@ -810,7 +821,6 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 
 			Collection<BitSet> altSubSets = getConflictingAltSubsets(reach);
-
 			if ( debug ) {
 				System.out.println("LL altSubSets="+altSubSets+
 								   ", predict="+getUniqueAlt(altSubSets)+
@@ -821,7 +831,17 @@ public class ParserATNSimulator extends ATNSimulator {
 //			System.out.println("altSubSets: "+altSubSets);
 			reach.uniqueAlt = getUniqueAlt(altSubSets);
 			if ( reach.uniqueAlt!=ATN.INVALID_ALT_NUMBER ) break;
-			if ( resolvesToJustOneViableAlt(altSubSets) ) break;
+			if ( exactAmbig ) {
+				if ( allSubsetsConflict(altSubSets) && allSubsetsEqual(altSubSets) ) {
+					break;
+				}
+			}
+			else if ( (hasConflictingAltSet(altSubSets) &&
+				       !hasStateAssociatedWithOneAlt(reach)) ||
+				      resolvesToJustOneViableAlt(altSubSets) )
+			{
+				break;
+			}
 			previous = reach;
 			input.consume();
 			t = input.LA(1);
@@ -858,7 +878,11 @@ public class ParserATNSimulator extends ATNSimulator {
 		// We just can't say for sure that there is an ambiguity without
 		// looking further.
 
-		if ( /* TODO: len(all subsets)>1 or input consistent with a subset with len=1 */ true ) {
+//		if ( /* TODO: len(all subsets)>1 or input consistent with a subset with len=1 */ true ) {
+//			reportAmbiguity(dfa, D, startIndex, input.index(), getConflictingAlts(reach), reach);
+//		}
+
+		if ( exactAmbig ) {
 			reportAmbiguity(dfa, D, startIndex, input.index(), getConflictingAlts(reach), reach);
 		}
 
@@ -1443,17 +1467,36 @@ public class ParserATNSimulator extends ATNSimulator {
 		return !hasNonConflictingAltSet(altsets);
 	}
 
-	/** return (there exists len(m)==1 for some m in altsets) */
+	/** return (there exists len(A_i)==1 for some A_i in altsets A) */
 	public boolean hasNonConflictingAltSet(Collection<BitSet> altsets) {
 		for (BitSet alts : altsets) {
-			if ( alts.cardinality()==1 ) { // more than 1 viable alt
-//				System.out.println("SLL go; found nonconflicting alt: "+alts);
-				return true; // use more lookahead
+			if ( alts.cardinality()==1 ) {
+				return true;
 			}
 		}
-//		System.out.println("SLL stop");
-		return false; // all sets conflict with len(viable_alts)>1, stop
+		return false;
 	}
+
+	/** return (there exists len(A_i)>1 for some A_i in altsets A) */
+	public boolean hasConflictingAltSet(Collection<BitSet> altsets) {
+		for (BitSet alts : altsets) {
+			if ( alts.cardinality()>1 ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean allSubsetsEqual(Collection<BitSet> altsets) {
+		Iterator<BitSet> it = altsets.iterator();
+		BitSet first = it.next();
+		while ( it.hasNext() ) {
+			BitSet next = it.next();
+			if ( !next.equals(first) ) return false;
+		}
+		return true;
+	}
+
 
 	public int getUniqueAlt(Collection<BitSet> altsets) {
 		BitSet all = getAlts(altsets);
@@ -1612,7 +1655,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	/** Get the conflicting alt subsets from a configuration set.
-	 * for c in configs:
+	 *  for c in configs:
      *    map[c] U= c.alt  # map hash/equals uses s and x, not alt and not pred
 	 */
 	public Collection<BitSet> getConflictingAltSubsets(ATNConfigSet configs) {
@@ -1626,6 +1669,31 @@ public class ParserATNSimulator extends ATNSimulator {
 			alts.set(c.alt);
 		}
 		return configToAlts.values();
+	}
+
+	/** Get a map from state to alt subset from a configuration set.
+	 *  for c in configs:
+     *    map[c.state] U= c.alt
+	 */
+	public Map<ATNState, BitSet> getStateToAltMap(ATNConfigSet configs) {
+		Map<ATNState, BitSet> m = new HashMap<ATNState, BitSet>();
+		for (ATNConfig c : configs) {
+			BitSet alts = m.get(c.state);
+			if ( alts==null ) {
+				alts = new BitSet();
+				m.put(c.state, alts);
+			}
+			alts.set(c.alt);
+		}
+		return m;
+	}
+
+	public boolean hasStateAssociatedWithOneAlt(ATNConfigSet configs) {
+		Map<ATNState, BitSet> x = getStateToAltMap(configs);
+		for (BitSet alts : x.values()) {
+			if ( alts.cardinality()==1 ) return true;
+		}
+		return false;
 	}
 
 	public boolean resolvesToJustOneViableAlt(Collection<BitSet> altsets) {
@@ -1667,8 +1735,9 @@ public class ParserATNSimulator extends ATNSimulator {
 	 8  -> (8,1,1), (8,2)
 	 11 -> (11,1,4), (11,2,8), (11,1,8 1)
 
-	 Walk and find state config lists with > 1 alt. If none, no conflict. return null. Here, states 11
-	 and 8 have lists with both alts 1 and 2. Must check these config lists for conflicting configs.
+	 Walk and find state config lists with > 1 alt. If none, no conflict.
+	 return null. Here, states 11 and 8 have lists with both alts 1 and 2.
+	 Must check these config lists for conflicting configs.
 
 	 Sam pointed out a problem with the previous definition, v3, of
 	 ambiguous states. If we have another state associated with conflicting
@@ -1718,6 +1787,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	 TODO: now we know contexts are merged, can we optimize?  Use big int -> config array?
 	 */
+
 	@Nullable
 	public IntervalSet getConflictingAlts_old(@NotNull ATNConfigSet configs) {
 		if ( debug ) System.out.println("### check ambiguous  "+configs);
@@ -2010,5 +2080,9 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	public void setSLL(boolean SLL) {
 		this.SLL = SLL;
+	}
+
+	public void setExactAmbig(boolean exactAmbig) {
+		this.exactAmbig = exactAmbig;
 	}
 }
