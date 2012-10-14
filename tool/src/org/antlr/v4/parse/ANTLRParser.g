@@ -595,8 +595,17 @@ labeledLexerElement
 	;
 
 lexerBlock
- 	:	LPAREN lexerAltList RPAREN
-      -> ^(BLOCK<BlockAST>[$LPAREN,"BLOCK"] lexerAltList )
+@after {
+GrammarAST options = (GrammarAST)$tree.getFirstChildWithType(ANTLRParser.OPTIONS);
+if ( options!=null ) {
+	Grammar.setNodeOptions($tree, options);
+}
+}
+ 	:	LPAREN
+        ( optionsSpec COLON )?
+        lexerAltList
+        RPAREN
+      -> ^(BLOCK<BlockAST>[$LPAREN,"BLOCK"] optionsSpec? lexerAltList )
     ;
 
 // channel=HIDDEN, skip, more, mode(INSIDE), push(INSIDE), pop

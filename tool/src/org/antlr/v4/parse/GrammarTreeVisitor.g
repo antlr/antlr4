@@ -381,7 +381,7 @@ labeledLexerElement
 	;
 	
 lexerBlock
- 	:	^(BLOCK lexerAlternative+)
+ 	:	^(BLOCK optionsSpec? lexerAlternative+)
     ;
 
 lexerAtom
