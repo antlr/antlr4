@@ -32,6 +32,7 @@ package org.antlr.v4.test;
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.ATNPrinter;
+import org.antlr.v4.automata.ATNSerializer;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenerator;
@@ -47,6 +48,7 @@ import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.WritableToken;
 import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
@@ -148,15 +150,28 @@ public abstract class BaseTest {
 		return tool;
 	}
 
-	ATN createATN(Grammar g) {
-		if ( g.atn!=null ) return g.atn;
-		semanticProcess(g);
+	protected ATN createATN(Grammar g, boolean useSerializer) {
+		if ( g.atn==null ) {
+			semanticProcess(g);
 
-		ParserATNFactory f = new ParserATNFactory(g);
-		if ( g.isLexer() ) f = new LexerATNFactory((LexerGrammar)g);
-		g.atn = f.createATN();
+			ParserATNFactory f;
+			if ( g.isLexer() ) {
+				f = new LexerATNFactory((LexerGrammar)g);
+			}
+			else {
+				f = new ParserATNFactory(g);
+			}
 
-		return g.atn;
+			g.atn = f.createATN();
+		}
+
+		ATN atn = g.atn;
+		if (useSerializer) {
+			char[] serialized = ATNSerializer.getSerializedAsChars(g, atn);
+			return ATNSimulator.deserialize(serialized);
+		}
+
+		return atn;
 	}
 
 	protected void semanticProcess(Grammar g) {
@@ -245,7 +260,7 @@ public abstract class BaseTest {
 	{
 		ErrorQueue equeue = new ErrorQueue();
 		Grammar g = new Grammar(gtext, equeue);
-		ATN atn = createATN(g);
+		ATN atn = createATN(g, false);
 		ATNState s = atn.ruleToStartState[g.getRule(ruleName).index];
 		if ( s==null ) {
 			System.err.println("no such rule: "+ruleName);
@@ -266,7 +281,7 @@ public abstract class BaseTest {
 	{
 		ErrorQueue equeue = new ErrorQueue();
 		Grammar g = new Grammar(gtext, equeue);
-		ATN atn = createATN(g);
+		ATN atn = createATN(g, false);
 		DecisionState blk = atn.decisionToState.get(decision);
 		checkRuleDFA(g, blk, expecting);
 		return equeue.all;
@@ -292,7 +307,7 @@ public abstract class BaseTest {
 	{
 		ErrorQueue equeue = new ErrorQueue();
 		LexerGrammar g = new LexerGrammar(gtext, equeue);
-		g.atn = createATN(g);
+		g.atn = createATN(g, false);
 //		LexerATNToDFAConverter conv = new LexerATNToDFAConverter(g);
 //		DFA dfa = conv.createDFA(modeName);
 //		g.setLookaheadDFA(0, dfa); // only one decision to worry about

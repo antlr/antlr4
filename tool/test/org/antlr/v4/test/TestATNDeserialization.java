@@ -144,7 +144,7 @@ public class TestATNDeserialization extends BaseTest {
 	}
 
 	protected void checkDeserializationIsStable(Grammar g) {
-		ATN atn = createATN(g);
+		ATN atn = createATN(g, false);
 		char[] data = Utils.toCharArray(ATNSerializer.getSerialized(g, atn));
 		String atnData = ATNSerializer.getDecoded(g, atn);
 		ATN atn2 = ParserATNSimulator.deserialize(data);

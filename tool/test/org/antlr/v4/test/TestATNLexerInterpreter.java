@@ -266,7 +266,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 	}
 
 	protected RecognitionException checkLexerMatches(LexerGrammar lg, String inputString, String expecting) {
-		ATN atn = createATN(lg);
+		ATN atn = createATN(lg, true);
 		CharStream input = new ANTLRInputStream(inputString);
 		ATNState startState = atn.modeNameToStartState.get("DEFAULT_MODE");
 		DOTGenerator dot = new DOTGenerator(lg);

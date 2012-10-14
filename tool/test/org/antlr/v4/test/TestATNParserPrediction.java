@@ -455,7 +455,7 @@ public class TestATNParserPrediction extends BaseTest {
 								  String inputString, int expectedAlt)
 	{
 		Tool.internalOption_ShowATNConfigsInDFA = true;
-		ATN lexatn = createATN(lg);
+		ATN lexatn = createATN(lg, true);
 		LexerATNSimulator lexInterp =
 			new LexerATNSimulator(lexatn,new DFA[1],new PredictionContextCache());
 		IntegerList types = getTokenTypesViaATN(inputString, lexInterp);
@@ -508,7 +508,7 @@ public class TestATNParserPrediction extends BaseTest {
 	{
 		// sync to ensure multiple tests don't race on dfa access
 		Tool.internalOption_ShowATNConfigsInDFA = true;
-		ATN lexatn = createATN(lg);
+		ATN lexatn = createATN(lg, true);
 		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn,null,null);
 
 		semanticProcess(lg);
@@ -545,7 +545,7 @@ public class TestATNParserPrediction extends BaseTest {
 									 String[] inputString, String[] dfaString)
 	{
 //		Tool.internalOption_ShowATNConfigsInDFA = true;
-		ATN lexatn = createATN(lg);
+		ATN lexatn = createATN(lg, true);
 		LexerATNSimulator lexInterp =
 			new LexerATNSimulator(lexatn,new DFA[1], new PredictionContextCache());
 
