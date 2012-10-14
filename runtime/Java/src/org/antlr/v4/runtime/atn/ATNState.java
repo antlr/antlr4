@@ -117,6 +117,10 @@ public class ATNState {
 		return false;
 	}
 
+	public boolean isNonGreedyExitState() {
+		return false;
+	}
+
 	@Override
 	public String toString() {
 		return String.valueOf(stateNumber);

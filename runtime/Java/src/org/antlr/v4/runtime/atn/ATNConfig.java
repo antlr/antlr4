@@ -71,6 +71,14 @@ public class ATNConfig {
     @NotNull
     public final SemanticContext semanticContext;
 
+	public boolean isGreedy() {
+		return true;
+	}
+
+	public int getNonGreedyDepth() {
+		return 0;
+	}
+
 	public ATNConfig(ATNConfig old) { // dup
 		this.state = old.state;
 		this.alt = old.alt;

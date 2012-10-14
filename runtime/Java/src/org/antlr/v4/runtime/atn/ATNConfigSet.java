@@ -31,6 +31,7 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
+import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -38,6 +39,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /** Specialized OrderedHashSet that can track info about the set.
@@ -246,6 +248,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			int hashCode = 7;
 			hashCode = 31 * hashCode + o.state.stateNumber;
 			hashCode = 31 * hashCode + o.alt;
+			hashCode = 31 * hashCode + o.getNonGreedyDepth();
 			hashCode = 31 * hashCode + o.semanticContext.hashCode();
 	        return hashCode;
 		}
@@ -257,6 +260,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			if ( hashCode(a) != hashCode(b) ) return false;
 			return a.state.stateNumber==b.state.stateNumber
 				&& a.alt==b.alt
+				&& a.getNonGreedyDepth() == b.getNonGreedyDepth()
 				&& b.semanticContext.equals(b.semanticContext);
 		}
 	}
@@ -433,6 +437,26 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	@Override
 	public Iterator<ATNConfig> iterator() {
 		return configs.iterator();
+	}
+
+	public void removeNonGreedyConfigsInAlts(@NotNull BitSet alts) {
+		if ( readonly ) throw new IllegalStateException("This set is readonly");
+
+		if (this.configLookup != null) {
+			for (Iterator<ATNConfig> it = this.configLookup.iterator(); it.hasNext(); ) {
+				ATNConfig entry = it.next();
+				if (!entry.isGreedy() && alts.get(entry.alt)) {
+					it.remove();
+				}
+			}
+		}
+
+		for (Iterator<ATNConfig> it = this.configs.iterator(); it.hasNext(); ) {
+			ATNConfig value = it.next();
+			if (!value.isGreedy() && alts.get(value.alt)) {
+				it.remove();
+			}
+		}
 	}
 
 	@Override
