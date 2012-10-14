@@ -236,6 +236,20 @@ public abstract class ATNSimulator {
 		}
 
 		for (ATNState state : atn.states) {
+			if (state instanceof BlockStartState) {
+				// we need to know the end state to set its start state
+				if (((BlockStartState)state).endState == null) {
+					throw new IllegalStateException();
+				}
+
+				// block end states can only be associated to a single block start state
+				if (((BlockStartState)state).endState.startState != null) {
+					throw new IllegalStateException();
+				}
+
+				((BlockStartState)state).endState.startState = (BlockStartState)state;
+			}
+
 			if (state instanceof PlusLoopbackState) {
 				PlusLoopbackState loopbackState = (PlusLoopbackState)state;
 				for (int i = 0; i < loopbackState.getNumberOfTransitions(); i++) {
@@ -306,6 +320,12 @@ public abstract class ATNSimulator {
 
 			if (state instanceof BlockStartState) {
 				if (((BlockStartState)state).endState == null) {
+					throw new IllegalStateException();
+				}
+			}
+
+			if (state instanceof BlockEndState) {
+				if (((BlockEndState)state).startState == null) {
 					throw new IllegalStateException();
 				}
 			}
