@@ -82,10 +82,10 @@ public class Grammar implements AttributeResolver {
 	public static final Set<String> ruleOptions = new HashSet<String>() {{
 	}};
 
-	public static final Set<String> ParserSubruleOptions = new HashSet<String>() {{
+	public static final Set<String> ParserBlockOptions = new HashSet<String>() {{
 	}};
 
-	public static final Set<String> LexerSubruleOptions = new HashSet<String>() {{
+	public static final Set<String> LexerBlockOptions = new HashSet<String>() {{
 	}};
 
 	/** Legal options for terminal refs like ID<assoc=right> */
