@@ -36,6 +36,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionMode;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -260,7 +261,7 @@ class TestJavaLR {
 			JavaLRParser parser = new JavaLRParser(tokens);
 			if ( diag ) parser.addErrorListener(new DiagnosticErrorListener());
 			if ( bail ) parser.setErrorHandler(new BailErrorStrategy());
-			if ( SLL ) parser.getInterpreter().setSLL(true);
+			if ( SLL ) parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
 
 			// start parsing at the compilationUnit rule
 			ParserRuleContext<Token> t = parser.compilationUnit();
