@@ -425,10 +425,11 @@ public class ParserATNFactory implements ATNFactory {
 		BlockStartState blkStart = (BlockStartState)blk.left;
 
 		BlockAST blkAST = (BlockAST)optAST.getChild(0);
-		if (isGreedy(blkAST)) {
+		blkStart.nonGreedy = !isGreedy(blkAST);
+
+		if (!blkStart.nonGreedy) {
 			epsilon(blkStart, blk.right);
-		}
-		else {
+		} else {
 			Transition existing = blkStart.removeTransition(0);
 			epsilon(blkStart, blk.right);
 			blkStart.addTransition(existing);
@@ -463,7 +464,8 @@ public class ParserATNFactory implements ATNFactory {
 		epsilon(blkEnd, loop);		// blk can see loop back
 
 		BlockAST blkAST = (BlockAST)plusAST.getChild(0);
-		if ( isGreedy(blkAST) ) {
+		loop.nonGreedy = !isGreedy(blkAST);
+		if ( !loop.nonGreedy ) {
 			epsilon(loop, blkStart);	// loop back to start
 			epsilon(loop, end);			// or exit
 		}
@@ -502,7 +504,8 @@ public class ParserATNFactory implements ATNFactory {
 		end.loopBackState = loop;
 
 		BlockAST blkAST = (BlockAST)starAST.getChild(0);
-		if ( isGreedy(blkAST) ) {
+		entry.nonGreedy = !isGreedy(blkAST);
+		if ( !entry.nonGreedy ) {
 			epsilon(entry, blkStart);	// loop enter edge (alt 1)
 			epsilon(entry, end);		// bypass loop edge (alt 2)
 		}
