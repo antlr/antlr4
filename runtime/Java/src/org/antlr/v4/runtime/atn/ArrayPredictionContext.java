@@ -18,8 +18,7 @@ public class ArrayPredictionContext extends PredictionContext {
 	public final int[] invokingStates;
 
 	public ArrayPredictionContext(SingletonPredictionContext a) {
-		this(new PredictionContext[] {a.parent},
-			 new int[] {a==PredictionContext.EMPTY ? EMPTY_FULL_CTX_INVOKING_STATE : a.invokingState});
+		this(new PredictionContext[] {a.parent}, new int[] {a.invokingState});
 	}
 
 	public ArrayPredictionContext(PredictionContext[] parents, int[] invokingStates) {
@@ -97,7 +96,7 @@ public class ArrayPredictionContext extends PredictionContext {
 	@Override
 	public boolean isEmpty() {
 		return size()==1 &&
-			   invokingStates[0]==EmptyPredictionContext.EMPTY_INVOKING_STATE;
+			   invokingStates[0]==EMPTY_INVOKING_STATE;
 	}
 
 	@Override
@@ -140,7 +139,7 @@ public class ArrayPredictionContext extends PredictionContext {
 		for (int i = 0; i < this.invokingStates.length; i++) {
 			if (i == index) continue;
 			PredictionContext next;
-			if ( this.invokingStates[i] == EMPTY_FULL_CTX_INVOKING_STATE ) {
+			if ( this.invokingStates[i] == EMPTY_INVOKING_STATE ) {
 				next = PredictionContext.EMPTY;
 			}
 			else {
@@ -179,7 +178,7 @@ public class ArrayPredictionContext extends PredictionContext {
 		buf.append("[");
 		for (int i=0; i<invokingStates.length; i++) {
 			if ( i>0 ) buf.append(", ");
-			if ( invokingStates[i]==EMPTY_FULL_CTX_INVOKING_STATE ) {
+			if ( invokingStates[i]==EMPTY_INVOKING_STATE ) {
 				buf.append("$");
 				continue;
 			}

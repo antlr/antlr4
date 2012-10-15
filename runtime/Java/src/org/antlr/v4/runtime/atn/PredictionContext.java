@@ -22,9 +22,9 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	public static final EmptyPredictionContext EMPTY = new EmptyPredictionContext();
 
 	/** Represents $ in an array in full ctx mode, when $ doesn't mean wildcard:
-	 *  $ + x = [$,x]. Here, $ = EMPTY_FULL_CTX_INVOKING_STATE.
+	 *  $ + x = [$,x]. Here, $ = EMPTY_INVOKING_STATE.
 	 */
-	public static final int EMPTY_FULL_CTX_INVOKING_STATE = Integer.MAX_VALUE;
+	public static final int EMPTY_INVOKING_STATE = Integer.MAX_VALUE;
 
 	public static int globalNodeCount = 0;
 	public final int id = globalNodeCount++;
@@ -231,14 +231,14 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		else {
 			if ( a == EMPTY && b == EMPTY ) return EMPTY; // $ + $ = $
 			if ( a == EMPTY ) { // $ + x = [$,x]
-				int[] payloads = {b.invokingState, EMPTY_FULL_CTX_INVOKING_STATE};
+				int[] payloads = {b.invokingState, EMPTY_INVOKING_STATE};
 				PredictionContext[] parents = {b.parent, null};
 				PredictionContext joined =
 					new ArrayPredictionContext(parents, payloads);
 				return joined;
 			}
 			if ( b == EMPTY ) { // x + $ = [$,x] ($ is always first if present)
-				int[] payloads = {a.invokingState, EMPTY_FULL_CTX_INVOKING_STATE};
+				int[] payloads = {a.invokingState, EMPTY_INVOKING_STATE};
 				PredictionContext[] parents = {a.parent, null};
 				PredictionContext joined =
 					new ArrayPredictionContext(parents, payloads);
@@ -279,7 +279,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 				// same payload (stack tops are equal), must yield merged singleton
 				int payload = a.invokingStates[i];
 				// $+$ = $
-				boolean both$ = payload == EMPTY_FULL_CTX_INVOKING_STATE &&
+				boolean both$ = payload == EMPTY_INVOKING_STATE &&
 								a_parent == null && b_parent == null;
 				boolean ax_ax = (a_parent!=null && b_parent!=null) &&
 								a_parent.equals(b_parent); // ax+ax -> ax
@@ -331,7 +331,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			int p = lastSlot; // walk backwards from last index until we find non-null parent
 			while ( p>=0 && mergedParents[p]==null ) { p--; }
 			// p is now last non-null index
-			assert p>0; // could only happen to be <0 if two arrays with $
+			assert p>=0; // could only happen to be <0 if two arrays with $
 			if ( p < lastSlot ) {
 				int n = p+1; // how many slots we really used in merge
 				if ( n == 1 ) { // for just one merged element, return singleton top
@@ -408,7 +408,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			boolean first = true;
 			for (int inv : arr.invokingStates) {
 				if ( !first ) buf.append(", ");
-				if ( inv == EMPTY_FULL_CTX_INVOKING_STATE ) buf.append("$");
+				if ( inv == EMPTY_INVOKING_STATE ) buf.append("$");
 				else buf.append(inv);
 				first = false;
 			}
@@ -610,7 +610,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 					String ruleName = recognizer.getRuleNames()[s.ruleIndex];
 					localBuffer.append(ruleName);
 				}
-				else if ( p.getInvokingState(index)!= EMPTY_FULL_CTX_INVOKING_STATE) {
+				else if ( p.getInvokingState(index)!= EMPTY_INVOKING_STATE) {
 					if ( !p.isEmpty() ) {
 						if (localBuffer.length() > 1) {
 							// first char is '[', if more than that this isn't the first rule
