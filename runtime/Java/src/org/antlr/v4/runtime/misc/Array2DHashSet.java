@@ -2,6 +2,7 @@ package org.antlr.v4.runtime.misc;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 /** Set impl with closed hashing (open addressing). */
@@ -159,24 +160,37 @@ public class Array2DHashSet<T> implements EquivalenceSet<T> {
 
 	@Override
 	public Iterator<T> iterator() {
-//		return new Iterator<T>() {
-//			int i = -1;
-//			@Override
-//			public boolean hasNext() { return (i+1) < table.length; }
-//
-//			@Override
-//			public T next() {
-//				i++;
-//				if ( i > table.length ) throw new NoSuchElementException();
-//				while ( table[i]==null ) i++;
-//				return table[i];
-//			}
-//
-//			@Override
-//			public void remove() {
-//			}
-//		}
-		throw new UnsupportedOperationException();
+		final Object[] data = toArray();
+		return new Iterator<T>() {
+			int nextIndex = 0;
+			boolean removed = true;
+
+			@Override
+			public boolean hasNext() {
+				return nextIndex < data.length;
+			}
+
+			@Override
+			public T next() {
+				if (!hasNext()) {
+					throw new NoSuchElementException();
+				}
+
+				removed = false;
+				return (T)data[nextIndex++];
+			}
+
+			@Override
+			public void remove() {
+				if (removed) {
+					throw new IllegalStateException();
+				}
+
+				Array2DHashSet.this.remove(data[nextIndex - 1]);
+				removed = true;
+			}
+
+		};
 	}
 
 	@Override
