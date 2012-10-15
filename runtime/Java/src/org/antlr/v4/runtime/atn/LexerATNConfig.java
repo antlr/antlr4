@@ -76,7 +76,7 @@ public class LexerATNConfig extends ATNConfig {
 	}
 
 	public LexerATNConfig exitNonGreedyBlock() {
-		if (!isGreedy()) {
+		if (isGreedy()) {
 			return this;
 		}
 

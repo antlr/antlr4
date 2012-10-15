@@ -417,6 +417,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			}
 
 			if (!((LexerATNConfig)config).isGreedy()) {
+				assert !(config.state instanceof RuleStopState);
 				nonGreedyAlts.set(config.alt);
 			}
 		}
@@ -602,13 +603,13 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		ATNState p = config.state;
+		boolean nonGreedy = p instanceof DecisionState && ((DecisionState)p).nonGreedy
+			|| p instanceof PlusBlockStartState && ((PlusBlockStartState)p).loopBackState.nonGreedy;
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			Transition t = p.transition(i);
 			LexerATNConfig c = getEpsilonTarget(config, t, configs);
 			if ( c!=null ) {
-				final int NON_GREEDY_ENTER_ALT = 2;
-				if (i == NON_GREEDY_ENTER_ALT - 1 && ((DecisionState)p).nonGreedy) {
-					assert p.getNumberOfTransitions() == 2;
+				if (nonGreedy) {
 					c = c.enterNonGreedyBlock();
 				}
 
@@ -624,8 +625,34 @@ public class LexerATNSimulator extends ATNSimulator {
 									  @NotNull ATNConfigSet configs)
 	{
 		ATNState p = config.state;
-		if (p.isNonGreedyExitState()) {
+		switch (p.getStateType()) {
+		case ATNState.PLUS_LOOP_BACK:
+			if (t.target instanceof PlusBlockStartState && ((PlusBlockStartState)t.target).nonGreedy) {
+				config = config.exitNonGreedyBlock();
+			}
+
+			break;
+
+		case ATNState.STAR_LOOP_BACK:
 			config = config.exitNonGreedyBlock();
+			break;
+
+		case ATNState.LOOP_END:
+			ATNState loopEntry = ((LoopEndState)p).loopBackState.transition(0).target;
+			if (loopEntry instanceof StarLoopEntryState && ((StarLoopEntryState)loopEntry).nonGreedy) {
+				config = config.exitNonGreedyBlock();
+			}
+
+			break;
+
+		case ATNState.BLOCK_END:
+			if (p.isNonGreedyExitState()) {
+				config = config.exitNonGreedyBlock();
+			}
+			break;
+
+		default:
+			break;
 		}
 
 		LexerATNConfig c = null;
