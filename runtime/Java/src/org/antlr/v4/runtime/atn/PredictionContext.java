@@ -331,7 +331,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			int p = lastSlot; // walk backwards from last index until we find non-null parent
 			while ( p>=0 && mergedParents[p]==null ) { p--; }
 			// p is now last non-null index
-			assert p>0; // could only happen to be <0 if two arrays with $
+			assert p>=0; // could only happen to be <0 if two arrays with $
 			if ( p < lastSlot ) {
 				int n = p+1; // how many slots we really used in merge
 				if ( n == 1 ) { // for just one merged element, return singleton top
