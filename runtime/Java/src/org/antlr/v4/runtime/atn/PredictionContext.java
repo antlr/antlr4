@@ -331,23 +331,15 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 		// trim merged if we combined a few that had same stack tops
 		if ( k < mergedParents.length ) { // write index < last position; trim
-			int lastSlot = mergedParents.length - 1;
-			int p = lastSlot; // walk backwards from last index until we find non-null parent
-			while ( p>=0 && mergedParents[p]==null ) { p--; }
-			// p is now last non-null index
-			assert p>=0; // could only happen to be <0 if two arrays with $
-			if ( p < lastSlot ) {
-				int n = p+1; // how many slots we really used in merge
-				if ( n == 1 ) { // for just one merged element, return singleton top
-					PredictionContext a_ =
-						SingletonPredictionContext.create(mergedParents[0],
-														  mergedInvokingStates[0]);
-					if ( mergeCache!=null ) mergeCache.put(a,b,a_);
-					return a_;
-				}
-				mergedParents = Arrays.copyOf(mergedParents, n);
-				mergedInvokingStates = Arrays.copyOf(mergedInvokingStates, n);
+			if ( k == 1 ) { // for just one merged element, return singleton top
+				PredictionContext a_ =
+					SingletonPredictionContext.create(mergedParents[0],
+													  mergedInvokingStates[0]);
+				if ( mergeCache!=null ) mergeCache.put(a,b,a_);
+				return a_;
 			}
+			mergedParents = Arrays.copyOf(mergedParents, k);
+			mergedInvokingStates = Arrays.copyOf(mergedInvokingStates, k);
 		}
 
 		PredictionContext M =
