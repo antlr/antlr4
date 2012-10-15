@@ -75,7 +75,7 @@ public class UnbufferedCharStream implements CharStream {
 	/**
 	 * This is the {@code LA(-1)} character for the current position.
 	 */
-	protected int lastChar = -2; // can't be -1 (EOF)
+	protected int lastChar = -1;
 
 	/**
 	 * When {@code numMarkers > 0}, this is the {@code LA(-1)} character for the
@@ -129,7 +129,7 @@ public class UnbufferedCharStream implements CharStream {
 
 	@Override
 	public void consume() {
-		if ( lastChar == CharStream.EOF ) {
+		if (LA(1) == CharStream.EOF) {
 			throw new IllegalStateException("cannot consume EOF");
 		}
 
