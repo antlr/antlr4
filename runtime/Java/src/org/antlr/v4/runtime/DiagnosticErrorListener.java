@@ -32,18 +32,20 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
+
+import java.util.BitSet;
 
 public class DiagnosticErrorListener extends BaseErrorListener {
     @Override
     public void reportAmbiguity(@NotNull Parser recognizer,
-								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
+								DFA dfa, int startIndex, int stopIndex,
+								@NotNull BitSet ambigAlts,
 								@NotNull ATNConfigSet configs)
     {
         recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision +
-										": ambigAlts=" + ambigAlts + ", input='" +
-										recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
+			": ambigAlts=" + ambigAlts + ", input='" +
+			recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
     }
 
 	@Override
@@ -53,16 +55,18 @@ public class DiagnosticErrorListener extends BaseErrorListener {
 											@NotNull ATNConfigSet configs)
 	{
 		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" +
-										dfa.decision + ", input='" +
-										recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
+			dfa.decision + ", input='" +
+			recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
 	}
 
 	@Override
-	public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
-                                         int startIndex, int stopIndex, @NotNull ATNConfigSet configs)
+	public void reportContextSensitivity(@NotNull Parser recognizer,
+										 @NotNull DFA dfa,
+                                         int startIndex, int stopIndex,
+										 @NotNull ATNConfigSet configs)
     {
         recognizer.notifyErrorListeners("reportContextSensitivity d=" +
-										dfa.decision + ", input='" +
-										recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
+			dfa.decision + ", input='" +
+			recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
     }
 }

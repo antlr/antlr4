@@ -36,6 +36,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionMode;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -197,7 +198,7 @@ class TestJavaLR {
 		System.out.println(ParserATNSimulator.predict_calls +" parser predict calls");
 		System.out.println(ParserATNSimulator.retry_with_context +" retry_with_context after SLL conflict");
 		System.out.println(ParserATNSimulator.retry_with_context_indicates_no_conflict +" retry sees no conflict");
-		System.out.println(ParserATNSimulator.retry_with_context_predicts_same_as_alt +" retry predicts same alt as resolving conflict");
+		System.out.println(ParserATNSimulator.retry_with_context_predicts_same_alt +" retry predicts same alt as resolving conflict");
 		System.out.println(ParserATNSimulator.retry_with_context_from_dfa +" retry from DFA");
 	}
 
@@ -260,7 +261,7 @@ class TestJavaLR {
 			JavaLRParser parser = new JavaLRParser(tokens);
 			if ( diag ) parser.addErrorListener(new DiagnosticErrorListener());
 			if ( bail ) parser.setErrorHandler(new BailErrorStrategy());
-			if ( SLL ) parser.getInterpreter().setSLL(true);
+			if ( SLL ) parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
 
 			// start parsing at the compilationUnit rule
 			ParserRuleContext<Token> t = parser.compilationUnit();

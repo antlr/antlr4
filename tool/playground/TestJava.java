@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionMode;
 
 import java.io.File;
 
@@ -127,7 +128,7 @@ class TestJava {
 				parser.setTokenStream(tokens);
 
 				if ( diag ) parser.addErrorListener(new DiagnosticErrorListener());
-				if ( SLL ) parser.getInterpreter().setSLL(true);
+				if ( SLL ) parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
 				// start parsing at the compilationUnit rule
 				ParserRuleContext<Token> tree = parser.compilationUnit();
 				if ( showTree ) tree.inspect(parser);

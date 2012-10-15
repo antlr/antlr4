@@ -37,6 +37,24 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test public void testSimpleValidate() throws Exception {
 		String grammar =
 			"grammar T;\n" +
+				"s : a ;\n" +
+				"a : {false}? ID  {System.out.println(\"alt 1\");}\n" +
+				"  | {true}?  INT {System.out.println(\"alt 2\");}\n" +
+				"  ;\n" +
+				"ID : 'a'..'z'+ ;\n" +
+				"INT : '0'..'9'+;\n" +
+				"WS : (' '|'\\n') {skip();} ;\n";
+
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
+								  "x", false);
+
+		String expecting = "line 1:0 no viable alternative at input 'x'\n";
+		assertEquals(expecting, stderrDuringParse);
+	}
+
+	@Test public void testSimpleValidate2() throws Exception {
+		String grammar =
+			"grammar T;\n" +
 				"s : a a a;\n" +
 				"a : {false}? ID  {System.out.println(\"alt 1\");}\n" +
 				"  | {true}?  INT {System.out.println(\"alt 2\");}\n" +
@@ -129,16 +147,14 @@ public class TestSemPredEvalParser extends BaseTest {
 	}
 
 	@Test public void test2UnpredicatedAlts() throws Exception {
-		// We have n-2 predicates for n alternatives. We have no choice
-		// but to pick the first on predicated alternative if the n-2
-		// predicates fail.
-		// this should call reportInsufficientPredicates()
+		// We have n-2 predicates for n alternatives. pick first alt
 		String grammar =
 			"grammar T;\n" +
 			"@header {" +
 			"import java.util.*;" +
 			"}" +
-			"s : a ';' a;\n" + // do 2x: once in ATN, next in DFA
+			"s : {_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);}\n" +
+			"    a ';' a;\n" + // do 2x: once in ATN, next in DFA
 			"a :          ID {System.out.println(\"alt 1\");}\n" +
 			"  |          ID {System.out.println(\"alt 2\");}\n" +
 			"  | {false}? ID {System.out.println(\"alt 3\");}\n" +
@@ -154,23 +170,20 @@ public class TestSemPredEvalParser extends BaseTest {
 			"alt 1\n";
 		assertEquals(expecting, found);
 		assertEquals("line 1:0 reportAttemptingFullContext d=0, input='x'\n" +
-					 "line 1:0 reportAmbiguity d=0: ambigAlts={1..2}, input='x'\n" +
+					 "line 1:0 reportAmbiguity d=0: ambigAlts={1, 2}, input='x'\n" +
 					 "line 1:3 reportAttemptingFullContext d=0, input='y'\n" +
-					 "line 1:3 reportAmbiguity d=0: ambigAlts={1..2}, input='y'\n",
+					 "line 1:3 reportAmbiguity d=0: ambigAlts={1, 2}, input='y'\n",
                      this.stderrDuringParse);
 	}
 
 	@Test public void test2UnpredicatedAltsAndOneOrthogonalAlt() throws Exception {
-		// We have n-2 predicates for n alternatives. We have no choice
-		// but to pick the first on predicated alternative if the n-2
-		// predicates fail.
-		// this should call reportInsufficientPredicates()
 		String grammar =
 			"grammar T;\n" +
 			"@header {" +
 			"import java.util.*;" +
 			"}" +
-			"s : a ';' a ';' a;\n" +
+			"s : {_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);}\n" +
+			"    a ';' a ';' a;\n" +
 			"a : INT         {System.out.println(\"alt 1\");}\n" +
 			"  |          ID {System.out.println(\"alt 2\");}\n" + // must pick this one for ID since pred is false
 			"  |          ID {System.out.println(\"alt 3\");}\n" +
@@ -188,9 +201,9 @@ public class TestSemPredEvalParser extends BaseTest {
 			"alt 2\n";
 		assertEquals(expecting, found);
 		assertEquals("line 1:4 reportAttemptingFullContext d=0, input='x'\n" +
-					 "line 1:4 reportAmbiguity d=0: ambigAlts={2..3}, input='x'\n" +
+					 "line 1:4 reportAmbiguity d=0: ambigAlts={2, 3}, input='x'\n" +
 					 "line 1:7 reportAttemptingFullContext d=0, input='y'\n" +
-					 "line 1:7 reportAmbiguity d=0: ambigAlts={2..3}, input='y'\n",
+					 "line 1:7 reportAmbiguity d=0: ambigAlts={2, 3}, input='y'\n",
 					 this.stderrDuringParse);
 	}
 

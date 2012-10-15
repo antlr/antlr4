@@ -31,9 +31,9 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
-import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -280,7 +280,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	// TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
 	// TODO: can we track conflicts as they are added to save scanning configs later?
 	public int uniqueAlt;
-	protected IntervalSet conflictingAlts;
+	protected BitSet conflictingAlts;
+
 	// Used in parser and lexer. In lexer, it indicates we hit a pred
 	// while computing a closure operation.  Don't make a DFA state from this.
 	public boolean hasSemanticContext;

@@ -39,21 +39,17 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
-import org.antlr.v4.runtime.misc.FlexibleHashMap;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.stringtemplate.v4.misc.MultiMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -260,17 +256,11 @@ public class ParserATNSimulator extends ATNSimulator {
 	public static boolean dfa_debug = false;
 	public static boolean retry_debug = false;
 
-	/** Should we simulate tail recursion for loops in SLL mode? Costs
-	 *  about 10% in time to turn on so let's leave off. Full LL turns
-	 *  it on for sure.
-	 */
-	public static final boolean SLL_loopsSimulateTailRecursion = false;
-
 	public static int ATN_failover = 0;
 	public static int predict_calls = 0;
 	public static int retry_with_context = 0;
 	public static int retry_with_context_indicates_no_conflict = 0;
-	public static int retry_with_context_predicts_same_as_alt = 0;
+	public static int retry_with_context_predicts_same_alt = 0;
 	public static int retry_with_context_from_dfa = 0;
 
 	@Nullable
@@ -279,8 +269,8 @@ public class ParserATNSimulator extends ATNSimulator {
 	@NotNull
 	public final DFA[] decisionToDFA;
 
-	/** Do only local context prediction (SLL(k) style). */
-	protected boolean SLL = false;
+	/** SLL, LL, or LL + exact ambig detection? */
+	protected PredictionMode mode = PredictionMode.LL;
 
 	/** Each prediction operation uses a cache for merge of prediction contexts.
 	 *  Don't keep around as it wastes huge amounts of memory. DoubleKeyMap
@@ -383,13 +373,10 @@ public class ParserATNSimulator extends ATNSimulator {
 							   " exec LA(1)=="+ getLookaheadName(input) +
 							   ", outerContext="+outerContext.toString(parser));
 		}
-		DecisionState decState = atn.getDecisionState(dfa.decision);
-		boolean loopsSimulateTailRecursion = SLL_loopsSimulateTailRecursion;
 		boolean fullCtx = false;
 		ATNConfigSet s0_closure =
 			computeStartState(dfa.atnStartState,
 							  ParserRuleContext.EMPTY,
-							  loopsSimulateTailRecursion,
 							  fullCtx);
 		dfa.s0 = addDFAState(dfa, new DFAState(s0_closure));
 
@@ -426,19 +413,14 @@ public class ParserATNSimulator extends ATNSimulator {
 		DFAState acceptState = null;
 		DFAState s = s0;
 
-		DecisionState decState = atn.getDecisionState(dfa.decision);
-
 		int t = input.LA(1);
-	loop:
 		while ( true ) {
 			if ( dfa_debug ) System.out.println("DFA state "+s.stateNumber+" LA(1)=="+getLookaheadName(input));
-			if ( s.requiresFullContext && !SLL ) {
+			if ( s.requiresFullContext && mode != PredictionMode.SLL ) {
 				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+" in "+s);
-				boolean loopsSimulateTailRecursion = true;
 				boolean fullCtx = true;
 				ATNConfigSet s0_closure =
 					computeStartState(dfa.atnStartState, outerContext,
-									  loopsSimulateTailRecursion,
 									  fullCtx);
 				retry_with_context_from_dfa++;
 				int alt = execATNWithFullContext(dfa, s, s0_closure,
@@ -518,12 +500,12 @@ public class ParserATNSimulator extends ATNSimulator {
 			input.seek(startIndex);
 			// since we don't report ambiguities in execDFA, we never need to
 			// use complete predicate evaluation here
-			IntervalSet alts = evalSemanticContext(s.predicates, outerContext, false);
-			if (alts.isNil()) {
+			BitSet alts = evalSemanticContext(s.predicates, outerContext, false);
+			if (alts.isEmpty()) {
 				throw noViableAlt(input, outerContext, s.configs, startIndex);
 			}
 
-			return alts.getMinElement();
+			return alts.nextSetBit(0);
 		}
 
 		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
@@ -541,7 +523,6 @@ public class ParserATNSimulator extends ATNSimulator {
 	       * does the state uniquely predict an alternative?
 	       * does the state have a conflict that would prevent us from
 	         putting it on the work list?
-	       * if in non-greedy decision is there a config at a rule stop state?
 
 	 We also have some key operations to do:
 	       * add an edge from previous DFA state to potentially new DFA state, D,
@@ -555,24 +536,12 @@ public class ParserATNSimulator extends ATNSimulator {
 	       * reporting a context sensitivity
 	       * reporting insufficient predicates
 
-	 We should isolate those operations, which are side-effecting, to the
-	 main work loop. We can isolate lots of code into other functions, but
-	 they should be side effect free. They can return package that
-	 indicates whether we should report something, whether we need to add a
-	 DFA edge, whether we need to augment accept state with semantic
-	 context or rule invocation context. Actually, it seems like we always
-	 add predicates if they exist, so that can simply be done in the main
-	 loop for any accept state creation or modification request.
-
 	 cover these cases:
 	    dead end
 	    single alt
 	    single alt + preds
 	    conflict
 	    conflict + preds
-
-	 TODO: greedy + those
-
 	 */
 	public int execATN(@NotNull DFA dfa, @NotNull DFAState s0,
 					   @NotNull TokenStream input, int startIndex,
@@ -588,7 +557,6 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		ATNConfigSet previous = s0.configs;
 		DFAState previousD = s0;
-		ATNConfigSet fullCtxSet;
 
 		if ( debug ) System.out.println("s0 = "+s0);
 
@@ -597,11 +565,8 @@ public class ParserATNSimulator extends ATNSimulator {
         DecisionState decState = atn.getDecisionState(dfa.decision);
 
 		while (true) { // while more work
-			boolean loopsSimulateTailRecursion = SLL_loopsSimulateTailRecursion;
 //			System.out.println("REACH "+getLookaheadName(input));
-			ATNConfigSet reach = computeReachSet(previous, t,
-												 loopsSimulateTailRecursion,
-												 false);
+			ATNConfigSet reach = computeReachSet(previous, t, false);
 			if ( reach==null ) {
 				// if any configs in previous dipped into outer context, that
 				// means that input up to t actually finished entry rule
@@ -642,56 +607,63 @@ public class ParserATNSimulator extends ATNSimulator {
 //				}
 //			}
 
+
 			int predictedAlt = getUniqueAlt(reach);
+
+			if ( debug ) {
+				Collection<BitSet> altSubSets = PredictionMode.getConflictingAltSubsets(reach);
+				System.out.println("SLL altSubSets="+altSubSets+
+								   ", configs="+reach+
+								   ", predict="+predictedAlt+", allSubsetsConflict="+
+									   PredictionMode.allSubsetsConflict(altSubSets)+", conflictingAlts="+
+								   getConflictingAlts(reach));
+			}
+
 			if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
-				// NO CONFLICT, UNIQUE PREDICTED ALT
+				// NO CONFLICT, UNIQUELY PREDICTED ALT
 				D.isAcceptState = true;
 				D.configs.uniqueAlt = predictedAlt;
 				D.prediction = predictedAlt;
 			}
-			else {
-//				boolean cont = needMoreLookaheadLL(reach);
+			else if ( PredictionMode.hasSLLConflictTerminatingPrediction(mode, reach) ) {
+				// MORE THAN ONE VIABLE ALTERNATIVE
 				D.configs.conflictingAlts = getConflictingAlts(reach);
-				if ( D.configs.conflictingAlts!=null ) {
-					// CONFLICT, GREEDY (TYPICAL SITUATION)
+				if ( mode == PredictionMode.SLL ) {
+					// stop w/o failover for sure
 					if ( outerContext == ParserRuleContext.EMPTY || // in grammar start rule
-						!D.configs.dipsIntoOuterContext ||         // didn't fall out of rule
-						SLL )                                      // forcing SLL only
+						 !D.configs.dipsIntoOuterContext )          // didn't fall out of rule
 					{
 						// SPECIAL CASE WHERE SLL KNOWS CONFLICT IS AMBIGUITY
-						if ( !D.configs.hasSemanticContext ) {
-							reportAmbiguity(dfa, D, startIndex, input.index(),
-											D.configs.conflictingAlts, D.configs);
-						}
-						D.isAcceptState = true;
-						D.prediction = D.configs.conflictingAlts.getMinElement();
-						if ( debug ) System.out.println("RESOLVED TO "+D.prediction+" for "+D);
-						predictedAlt = D.prediction;
-						// Falls through to check predicates below
+						// report even if preds
+						reportAmbiguity(dfa, D, startIndex, input.index(),
+										D.configs.conflictingAlts, D.configs);
 					}
-					else {
-						// SLL CONFLICT; RETRY WITH FULL LL CONTEXT
-						// (it's possible SLL with preds could resolve to single alt
-						//  which would mean we could avoid full LL, but not worth
-						//  code complexity.)
-						if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
-						// don't look up context in cache now since we're just creating state D
-						loopsSimulateTailRecursion = true;
-						ATNConfigSet s0_closure =
-							computeStartState(dfa.atnStartState,
-											  outerContext,
-											  loopsSimulateTailRecursion,
-											  true);
-						predictedAlt = execATNWithFullContext(dfa, D, s0_closure,
-															  input, startIndex,
-															  outerContext,
-															  D.configs.conflictingAlts.getMinElement());
-						// not accept state: isCtxSensitive
-						D.requiresFullContext = true; // always force DFA to ATN simulate
-						D.prediction = ATN.INVALID_ALT_NUMBER;
-						addDFAEdge(dfa, previousD, t, D);
-						return predictedAlt; // all done with preds, etc...
-					}
+					// always stop at D
+					D.isAcceptState = true;
+					D.prediction = D.configs.conflictingAlts.nextSetBit(0);
+					if ( debug ) System.out.println("SLL RESOLVED TO "+D.prediction+" for "+D);
+					predictedAlt = D.prediction;
+					// Falls through to check predicates below
+				}
+				else {
+					// RETRY WITH FULL LL CONTEXT
+					if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
+					ATNConfigSet s0_closure =
+						computeStartState(dfa.atnStartState,
+										  outerContext,
+										  true);
+					predictedAlt = execATNWithFullContext(dfa, D, s0_closure,
+														  input, startIndex,
+														  outerContext,
+														  D.configs.conflictingAlts.nextSetBit(0));
+					// TODO: if true conflict found and same answer as we got with SLL,
+					// then make it non ctx sensitive DFA state
+
+					// not accept state: isCtxSensitive
+					D.requiresFullContext = true; // always force DFA to ATN simulate
+					D.prediction = ATN.INVALID_ALT_NUMBER;
+					addDFAEdge(dfa, previousD, t, D);
+					return predictedAlt; // all done with preds, etc...
 				}
 			}
 
@@ -701,7 +673,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				int nalts = decState.getNumberOfTransitions();
 				// Update DFA so reach becomes accept state with (predicate,alt)
 				// pairs if preds found for conflicting alts
-				IntervalSet altsToCollectPredsFrom = getConflictingAltsOrUniqueAlt(D.configs);
+				BitSet altsToCollectPredsFrom = getConflictingAltsOrUniqueAlt(D.configs);
 				SemanticContext[] altToPred = getPredsForAmbigAlts(altsToCollectPredsFrom, D.configs, nalts);
 				if ( altToPred!=null ) {
 					D.predicates = getPredicatePredictions(altsToCollectPredsFrom, altToPred);
@@ -711,27 +683,27 @@ public class ParserATNSimulator extends ATNSimulator {
 					// There are preds in configs but they might go away
 					// when OR'd together like {p}? || NONE == NONE. If neither
 					// alt has preds, resolve to min alt
-					D.prediction = altsToCollectPredsFrom.getMinElement();
+					D.prediction = altsToCollectPredsFrom.nextSetBit(0);
 				}
 
 				if ( D.predicates!=null ) {
 					int stopIndex = input.index();
 					input.seek(startIndex);
-					IntervalSet alts = evalSemanticContext(D.predicates, outerContext, true);
+					BitSet alts = evalSemanticContext(D.predicates, outerContext, true);
 					D.prediction = ATN.INVALID_ALT_NUMBER; // indicate we have preds
 					addDFAEdge(dfa, previousD, t, D);
-					switch (alts.size()) {
+					switch (alts.cardinality()) {
 					case 0:
 						throw noViableAlt(input, outerContext, D.configs, startIndex);
 
 					case 1:
-						return alts.getMinElement();
+						return alts.nextSetBit(0);
 
 					default:
 						// report ambiguity after predicate evaluation to make sure the correct
 						// set of ambig alts is reported.
 						reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
-						return alts.getMinElement();
+						return alts.nextSetBit(0);
 					}
 				}
 			}
@@ -763,15 +735,17 @@ public class ParserATNSimulator extends ATNSimulator {
 			System.out.println("execATNWithFullContext "+s0);
 		}
 		boolean fullCtx = true;
+		boolean foundExactAmbig = false;
 		ATNConfigSet reach = null;
 		ATNConfigSet previous = s0;
 		input.seek(startIndex);
 		int t = input.LA(1);
+		int predictedAlt;
 		while (true) { // while more work
 //			System.out.println("LL REACH "+getLookaheadName(input)+
 //							   " from configs.size="+previous.size()+
 //							   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
-			reach = computeReachSet(previous, t, true, fullCtx);
+			reach = computeReachSet(previous, t, fullCtx);
 			if ( reach==null ) {
 				// if any configs in previous dipped into outer context, that
 				// means that input up to t actually finished entry rule
@@ -788,36 +762,94 @@ public class ParserATNSimulator extends ATNSimulator {
 				}
 				throw noViableAlt(input, outerContext, previous, startIndex);
 			}
+
+			Collection<BitSet> altSubSets = PredictionMode.getConflictingAltSubsets(reach);
+			if ( debug ) {
+				System.out.println("LL altSubSets="+altSubSets+
+								   ", predict="+PredictionMode.getUniqueAlt(altSubSets)+
+								   ", resolvesToJustOneViableAlt="+
+									   PredictionMode.resolvesToJustOneViableAlt(altSubSets));
+			}
+
+//			System.out.println("altSubSets: "+altSubSets);
 			reach.uniqueAlt = getUniqueAlt(reach);
-			if ( reach.uniqueAlt!=ATN.INVALID_ALT_NUMBER ) break;
-//			boolean cont = needMoreLookaheadLL(reach);
-			reach.conflictingAlts = getConflictingAlts(reach);
-			if ( reach.conflictingAlts!=null ) break;
+			// unique prediction?
+			if ( reach.uniqueAlt!=ATN.INVALID_ALT_NUMBER ) {
+				predictedAlt = reach.uniqueAlt;
+				break;
+			}
+			if ( mode != PredictionMode.LL_EXACT_AMBIG_DETECTION ) {
+				predictedAlt = PredictionMode.resolvesToJustOneViableAlt(altSubSets);
+				if ( predictedAlt != ATN.INVALID_ALT_NUMBER ) {
+					break;
+				}
+			}
+			else {
+				// In exact ambiguity mode, we never try to terminate early.
+				// Just keeps scarfing until we know what the conflict is
+				if ( PredictionMode.allSubsetsConflict(altSubSets) &&
+					 PredictionMode.allSubsetsEqual(altSubSets) )
+				{
+					foundExactAmbig = true;
+					predictedAlt = PredictionMode.getSingleViableAlt(altSubSets);
+					break;
+				}
+				// else there are multiple non-conflicting subsets or
+				// we're not sure what the ambiguity is yet.
+				// So, keep going.
+			}
 			previous = reach;
 			input.consume();
 			t = input.LA(1);
 		}
 
+		// If the configuration set uniquely predicts an alternative,
+		// without conflict, then we know that it's a full LL decision
+		// not SLL.
 		if ( reach.uniqueAlt != ATN.INVALID_ALT_NUMBER ) {
 			retry_with_context_indicates_no_conflict++;
 			reportContextSensitivity(dfa, reach, startIndex, input.index());
-			if ( reach.uniqueAlt == SLL_min_alt ) {
-				retry_with_context_predicts_same_as_alt++;
+			if ( predictedAlt == SLL_min_alt ) {
+				retry_with_context_predicts_same_alt++;
 			}
-			return reach.uniqueAlt;
+			return predictedAlt;
 		}
 
 		// We do not check predicates here because we have checked them
 		// on-the-fly when doing full context prediction.
 
-		// must have conflict
-		reportAmbiguity(dfa, D, startIndex, input.index(), reach.conflictingAlts, reach);
+		/*
+		In non-exact ambiguity detection mode, we might	actually be able to
+		detect an exact ambiguity, but I'm not going to spend the cycles
+		needed to check. We only emit ambiguity warnings in exact ambiguity
+		mode.
 
-		return reach.conflictingAlts.getMinElement();
+		For example, we might know that we have conflicting configurations.
+		But, that does not mean that there is no way forward without a
+		conflict. It's possible to have nonconflicting alt subsets as in:
+
+		   LL altSubSets=[{1, 2}, {1, 2}, {1}, {1, 2}]
+
+		from
+
+		   [(17,1,[5 $]), (13,1,[5 10 $]), (21,1,[5 10 $]), (11,1,[$]),
+			(13,2,[5 10 $]), (21,2,[5 10 $]), (11,2,[$])]
+
+		In this case, (17,1,[5 $]) indicates there is some next sequence that
+		would resolve this without conflict to alternative 1. Any other viable
+		next sequence, however, is associated with a conflict.  We stop
+		looking for input because no amount of further lookahead will alter
+		the fact that we should predict alternative 1.  We just can't say for
+		sure that there is an ambiguity without looking further.
+		*/
+		if ( foundExactAmbig ) {
+			reportAmbiguity(dfa, D, startIndex, input.index(), getConflictingAlts(reach), reach);
+		}
+
+		return predictedAlt;
 	}
 
 	protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t,
-										   boolean loopsSimulateTailRecursion,
 										   boolean fullCtx)
 	{
 		if ( debug ) System.out.println("in computeReachSet, starting closure: " + closure);
@@ -845,15 +877,14 @@ public class ParserATNSimulator extends ATNSimulator {
 			// among the configurations.
 			reach = new ATNConfigSet(intermediate);
 		}
-		else if ( ParserATNSimulator.getUniqueAlt(intermediate)==1 ) {
+		else if ( getUniqueAlt(intermediate)==1 ) {
 			// Also don't pursue the closure if there is unique alternative
 			// among the configurations.
 			reach = new ATNConfigSet(intermediate);
 		}
 		else {
 			for (ATNConfig c : intermediate) {
-				closure(c, reach, closureBusy, false,
-						loopsSimulateTailRecursion, fullCtx);
+				closure(c, reach, closureBusy, false, fullCtx);
 			}
 		}
 
@@ -864,7 +895,6 @@ public class ParserATNSimulator extends ATNSimulator {
 	@NotNull
 	public ATNConfigSet computeStartState(@NotNull ATNState p,
 										  @Nullable RuleContext ctx,
-										  boolean loopsSimulateTailRecursion,
 										  boolean fullCtx)
 	{
 		// always at least the implicit call to start rule
@@ -875,8 +905,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			ATNState target = p.transition(i).target;
 			ATNConfig c = new ATNConfig(target, i+1, initialContext);
 			Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
-			closure(c, configs, closureBusy, true,
-					loopsSimulateTailRecursion, fullCtx);
+			closure(c, configs, closureBusy, true, fullCtx);
 		}
 
 		return configs;
@@ -924,7 +953,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 	}
 
-	public SemanticContext[] getPredsForAmbigAlts(@NotNull IntervalSet ambigAlts,
+	public SemanticContext[] getPredsForAmbigAlts(@NotNull BitSet ambigAlts,
 												  @NotNull ATNConfigSet configs,
 												  int nalts)
 	{
@@ -942,7 +971,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		 */
 		SemanticContext[] altToPred = new SemanticContext[nalts + 1];
 		for (ATNConfig c : configs) {
-			if ( ambigAlts.contains(c.alt) ) {
+			if ( ambigAlts.get(c.alt) ) {
 				altToPred[c.alt] = SemanticContext.or(altToPred[c.alt], c.semanticContext);
 			}
 		}
@@ -968,7 +997,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return altToPred;
 	}
 
-	public List<DFAState.PredPrediction> getPredicatePredictions(IntervalSet ambigAlts,
+	public List<DFAState.PredPrediction> getPredicatePredictions(BitSet ambigAlts,
 																 SemanticContext[] altToPred)
 	{
 		List<DFAState.PredPrediction> pairs = new ArrayList<DFAState.PredPrediction>();
@@ -979,7 +1008,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			// unpredicated is indicated by SemanticContext.NONE
 			assert pred != null;
 
-			if (ambigAlts!=null && ambigAlts.contains(i)) {
+			if (ambigAlts!=null && ambigAlts.get(i)) {
 				pairs.add(new DFAState.PredPrediction(pred, i));
 			}
 			if ( pred!=SemanticContext.NONE ) containsPredicate = true;
@@ -1008,14 +1037,14 @@ public class ParserATNSimulator extends ATNSimulator {
 	 *  then we stop at the first predicate that evaluates to true. This
 	 *  includes pairs with null predicates.
 	 */
-	public IntervalSet evalSemanticContext(List<DFAState.PredPrediction> predPredictions,
-										   ParserRuleContext<?> outerContext,
-										   boolean complete)
+	public BitSet evalSemanticContext(List<DFAState.PredPrediction> predPredictions,
+									  ParserRuleContext<?> outerContext,
+									  boolean complete)
 	{
-		IntervalSet predictions = new IntervalSet();
+		BitSet predictions = new BitSet();
 		for (DFAState.PredPrediction pair : predPredictions) {
 			if ( pair.pred==SemanticContext.NONE ) {
-				predictions.add(pair.alt);
+				predictions.set(pair.alt);
 				if (!complete) {
 					break;
 				}
@@ -1029,7 +1058,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 			if ( predicateEvaluationResult ) {
 				if ( debug || dfa_debug ) System.out.println("PREDICT "+pair.alt);
-				predictions.add(pair.alt);
+				predictions.set(pair.alt);
 				if (!complete) {
 					break;
 				}
@@ -1047,17 +1076,14 @@ public class ParserATNSimulator extends ATNSimulator {
 		 ambig detection thought :(
 		  */
 
-	// TODO: loopsSimulateTailRecursion might not be necessary. seems slow without it. see what that is 12/29/11
 	protected void closure(@NotNull ATNConfig config,
 						   @NotNull ATNConfigSet configs,
 						   @NotNull Set<ATNConfig> closureBusy,
 						   boolean collectPredicates,
-						   boolean loopsSimulateTailRecursion,
 						   boolean fullCtx)
 	{
 		final int initialDepth = 0;
 		closureCheckingStopStateAndLoopRecursion(config, configs, closureBusy, collectPredicates,
-												 loopsSimulateTailRecursion,
 												 fullCtx,
 												 initialDepth);
 	}
@@ -1066,7 +1092,6 @@ public class ParserATNSimulator extends ATNSimulator {
 															@NotNull ATNConfigSet configs,
 															@NotNull Set<ATNConfig> closureBusy,
 															boolean collectPredicates,
-															boolean loopsSimulateTailRecursion,
 															boolean fullCtx,
 															int depth)
 	{
@@ -1084,7 +1109,7 @@ public class ParserATNSimulator extends ATNSimulator {
 						if ( debug ) System.out.println("FALLING off rule "+
 														getRuleName(config.state.ruleIndex));
 						closure_(config, configs, closureBusy, collectPredicates,
-								 loopsSimulateTailRecursion, fullCtx, depth);
+								 fullCtx, depth);
 						continue;
 					}
 					ATNState invokingState = atn.states.get(ctx.invokingState);
@@ -1099,7 +1124,6 @@ public class ParserATNSimulator extends ATNSimulator {
 					c.reachesIntoOuterContext = config.reachesIntoOuterContext;
 					assert depth > Integer.MIN_VALUE;
 					closureCheckingStopStateAndLoopRecursion(c, configs, closureBusy, collectPredicates,
-															 loopsSimulateTailRecursion,
 															 fullCtx, depth - 1);
 				}
 				return;
@@ -1110,29 +1134,9 @@ public class ParserATNSimulator extends ATNSimulator {
 												getRuleName(config.state.ruleIndex));
 			}
 		}
-		else if ( loopsSimulateTailRecursion ) {
-			if ( config.state.getClass()==StarLoopbackState.class ||
-				 config.state.getClass()==PlusLoopbackState.class )
-			{
-				config.context =
-					SingletonPredictionContext.create(config.context, config.state.stateNumber);
-				// alter config; it's ok, since all calls to closure pass in a fresh config for us to chase
-				if ( debug ) System.out.println("Loop back; push "+config.state.stateNumber+", stack="+config.context);
-			}
-			else if ( config.state.getClass()==LoopEndState.class ) {
-				if ( debug ) System.out.print("Loop end; pop, stack=" + config.context);
-				LoopEndState end = (LoopEndState)config.state;
-				// pop all the way back until we don't see the loopback state anymore
-				int loopBackStateNumber = end.loopBackState.stateNumber;
-				config.context = config.context.popAll(loopBackStateNumber,
-													   configs.fullCtx,
-													   mergeCache);
-				if ( debug ) System.out.println(" becomes "+config.context);
-			}
-		}
 
 		closure_(config, configs, closureBusy, collectPredicates,
-				 loopsSimulateTailRecursion, fullCtx, depth);
+				 fullCtx, depth);
 	}
 
 	/** Do the actual work of walking epsilon edges */
@@ -1140,7 +1144,6 @@ public class ParserATNSimulator extends ATNSimulator {
 							@NotNull ATNConfigSet configs,
 							@NotNull Set<ATNConfig> closureBusy,
 							boolean collectPredicates,
-							boolean loopsSimulateTailRecursion,
 							boolean fullCtx,
 							int depth)
 	{
@@ -1185,7 +1188,6 @@ public class ParserATNSimulator extends ATNSimulator {
 				}
 
 				closureCheckingStopStateAndLoopRecursion(c, configs, closureBusy, continueCollecting,
-														 loopsSimulateTailRecursion,
 														 fullCtx, newDepth);
 			}
 		}
@@ -1290,232 +1292,12 @@ public class ParserATNSimulator extends ATNSimulator {
 		return new ATNConfig(config, t.target, newContext);
 	}
 
-	/**
-	 SLL analysis termination.
-
-	 This function is used just for SLL.  SLL can decide to give up any
-	 point, even immediately, failing over to full LL.  To be as efficient
-	 as possible, SLL only fails over when it's positive it can't get
-	 anywhere on more look ahead without seeing a conflict.
-
-	 assuming one stage parsing, an SLL confg set with only conflicting
-	 subsets should force failover to full LL, even if the config sets
-	 don't resolve to the same alternative like {1,2} and {3,4}. The only
-	 time SLL keeps going when there exists a conflicting subset, is when
-	 there is a set of nonconflicting conflicts.
-
-	 SLL stops when it sees only conflicting config subsets
-	 LL keeps going when there is uncertainty
-
-	 SLL can't evaluate them 1st because it needs to create the DFA cache.
-	 */
-	public boolean needMoreLookaheadSLL(@NotNull ATNConfigSet configs) {
-		return false;
+	public BitSet getConflictingAlts(ATNConfigSet configs) {
+		Collection<BitSet> altsets = PredictionMode.getConflictingAltSubsets(configs);
+		return PredictionMode.getAlts(altsets);
 	}
 
 	/**
-	 Full LL analysis termination.
-
-	 Can we stop looking ahead during ATN simulation or is there some
-	 uncertainty as to which alternative we will ultimately pick, after
-	 consuming more input?  Even if there are partial conflicts, we might
-	 know that everything is going to resolve to the same minimum
-	 alt. That means we can stop since no more lookahead will change that
-	 fact. On the other hand, there might be multiple conflicts that
-	 resolve to different minimums.  That means we need more look ahead to
-	 decide which of those alternatives we should predict.
-
-	 The basic idea is to split the set of configurations down into a set
-	 with all configs that don't conflict with each other and then
-	 (possibly multiple) subsets of configurations that are mutually
-	 conflicting. Then reduce each set of configurations to the set of
-	 possible alternatives.  This is just the set of all alternatives
-	 within the nonconflicting set. It is the minimum alt of each
-	 conflicting subset. If the union of these alternatives sets is a
-	 singleton, then no amount of more lookahead will help us. We will
-	 always pick that alternative. If, however, there are more
-	 alternatives then we are uncertain which alt to predict and must
-	 continue looking for resolution. We may or may not discover an
-	 ambiguity in the future, even if there are no conflicting subsets
-	 this round.
-
-	 The biggest sin is to terminate early because it means we've made a
-	 decision but were uncertain as to the eventual outcome. We haven't
-	 used enough lookahead.  On the other hand, announcing a conflict too
-	 late is no big deal; you will still have the conflict. It's just
-	 inefficient.
-
-	 Semantic predicates for full LL aren't involved in this decision
-	 because the predicates are evaluated during start state computation.
-	 This set of configurations was derived from the initial subset with
-	 configurations holding false predicate stripped out.
-
-	 CONFLICTING CONFIGS
-
-	 Two configurations, (s, i, x) and (s, j, x'), conflict when i!=j but
-	 x = x'. Because we merge all (s, i, _) configurations together, that
-	 means that there are at most n configurations associated with state s
-	 for n possible alternatives in the decision. The merged stacks
-	 complicate the comparison of config contexts, x and x'. Sam checks to
-	 see if one is a subset of the other by calling merge and checking to
-	 see if the merged result is either x or x'. If the x associated with
-	 lowest alternative i is the superset, then i is the only possible
-	 prediction since the others resolve to min i as well. If, however, x
-	 is associated with j>i then at least one stack configuration for j is
-	 not in conflict with alt i. The algorithm should keep going, looking
-	 for more lookahead due to the uncertainty.
-
-	 For simplicity, I'm doing a simple equality check between x and x'
-	 that lets the algorithm continue to consume lookahead longer than
-	 necessary. I will check to see if it is efficient enough. The reason
-	 I like the simple equality is of course the simplicity but also
-	 because that is the test you need to detect the alternatives that are
-	 actually in conflict.  If all states report the same conflicting alt
-	 set, then we know we have the real ambiguity set.
-
-	 CONTINUE/STOP RULE
-
-	 Ok, here's the decision to keep going: continue if union of resolved
-	 alt sets from nonconflicting and conflicting subsets has more than
-	 one alt. The complete set of alternatives, [i for (_,i,_)], tells us
-	 which alternatives are still in the running for the amount of input
-	 we've consumed at this point. The conflicting sets let us to strip
-	 away configurations that won't lead to more states (because we
-	 resolve conflicts to the configuration with a minimum alternate for
-	 given conflicting set.)  The set of viable alternatives for a
-	 configuration set is therefore a subset of the complete [i for
-	 (_,i,_)] set.
-
-	 CASES:
-
-	 * no conflicts & > 1 alt in set => continue
-
-	 * (s, 1, x), (s, 2, x), (s, 3, z)
-	   (s', 1, y), (s', 2, y)
-	   yields nonconflicting set {3} U conflicting sets {1} U {1} = {1,3}
-	     => continue
-
-	 * (s, 1, x), (s, 2, x),
-	   (s', 1, y), (s', 2, y)
-	   (s'', 1, z)
-	   yields nonconflicting set you this {1} U conflicting sets {1} U {1} = {1}
-	     => stop and predict 1, announce ambiguity {1,2}
-
-	 * (s, 1, x), (s, 2, x),
-	   (s', 1, y), (s', 2, y)
-	   yields conflicting sets {1} U {1} = {1}
-	     => stop and predict 1, announce ambiguity {1,2}
-
-	 * (s, 1, x), (s, 2, x)
-	   (s', 2, y), (s', 3, y)
-	   yields conflicting sets {1} U {2} = {1,2}
-	     => continue
-
-	 * (s, 1, x), (s, 2, x)
-	   (s', 3, y), (s', 4, y)
-	   yields conflicting sets {1} U {3} = {1,3}
-	     => continue
-
-	 The function implementation tries to bail out as soon as
-	 possible. That means we can stop as soon as our viable alt set gets
-	 more than a single alternative in it.
-
-	 // First, map (s,_,x,_) -> altset for all configs
-	 for c in configs:
-	   map[c] U= c.alt  # map hash/equals uses s and x, not	alt and	not pred
-	 // Then, any singleton alternative sets do not conflict.
-	 nonconflicting = set [map[c] for c in configs if len(map[c])=1]
-	 viable_alts = nonconflicting
-	 // All other sets must be in a conflicting subset
-	 viable_alts = set [min(map[c]) for c in configs if len(map[c])>1]
-	 continue if len(viable_alts)>1
-
-	 or
-
-	 boolean continue(configs):
-	  for c in configs:
-	    map[c] U= c.alt  # map hash/equals uses s and x, not alt and not pred
-	  viable_alts = set()
-	  for e in map.entries:
-	    if len(e.value)==1:
-	      viable_alts.add(e.value)
-	      if len(viable_alts)>1: return true
-	    else:
-	      viable_alts.add(min(e.value))
-	  return len(viable_alts)>1
-
-	 */
-	class AltAndContextMap extends FlexibleHashMap<ATNConfig,BitSet> {
-		/** Code is function of (s, _, ctx, _) */
-		@Override
-		public int hashCode(ATNConfig o) {
-			int hashCode = 7;
-			hashCode = 31 * hashCode + o.state.stateNumber;
-			hashCode = 31 * hashCode + o.context.hashCode();
-	        return hashCode;
-		}
-
-		@Override
-		public boolean equals(ATNConfig a, ATNConfig b) {
-			if ( a==b ) return true;
-			if ( a==null || b==null ) return false;
-			if ( hashCode(a) != hashCode(b) ) return false;
-			return a.state.stateNumber==b.state.stateNumber
-				&& b.context.equals(b.context);
-		}
-	}
-	public boolean needMoreLookaheadLL(@NotNull ATNConfigSet configs) {
-		// for c in configs:
-        //   map[c] U= c.alt  # map hash/equals uses s and x, not alt and not pred
-		System.out.println(configs);
-		AltAndContextMap configToAlts = new AltAndContextMap();
-		for (ATNConfig c : configs) {
-			BitSet alts = configToAlts.get(c);
-			if ( alts==null ) {
-				alts = new BitSet();
-				configToAlts.put(c, alts);
-			}
-			alts.set(c.alt);
-		}
-		System.out.println(configToAlts);
-		BitSet viableAlts = new BitSet();
-		for (BitSet alts : configToAlts.values()) {
-			int firstOnBit = alts.nextSetBit(0);
-			if ( alts.cardinality()==1 ) {
-				int singleton = firstOnBit;
-				viableAlts.set(singleton);
-			}
-			else { // > 1
-				int minAlt = firstOnBit;
-				viableAlts.set(minAlt);
-			}
-		}
-		boolean go =  viableAlts.cardinality() > 1;
-		System.out.println("stop="+!go);
-		return go;
-	}
-
-	/**
-	 * From grammar:
-
-	 s' : s s ;
-	 s : x? | x ;
-	 x : 'a' ;
-
-	 config list: (4,1), (11,1,4), (7,1), (3,1,1), (4,1,1), (8,1,1), (7,1,1),
-	 (8,2), (11,2,8), (11,1,[8 1])
-
-	 state to config list:
-
-	 3  -> (3,1,1)
-	 4  -> (4,1), (4,1,1)
-	 7  -> (7,1), (7,1,1)
-	 8  -> (8,1,1), (8,2)
-	 11 -> (11,1,4), (11,2,8), (11,1,8 1)
-
-	 Walk and find state config lists with > 1 alt. If none, no conflict. return null. Here, states 11
-	 and 8 have lists with both alts 1 and 2. Must check these config lists for conflicting configs.
-
 	 Sam pointed out a problem with the previous definition, v3, of
 	 ambiguous states. If we have another state associated with conflicting
 	 alternatives, we should keep going. For example, the following grammar
@@ -1550,147 +1332,18 @@ public class ParserATNSimulator extends ATNSimulator {
 	 looking for input reasonably, I don't declare the state done. We
 	 ignore a set of conflicting alts when we have an alternative
 	 that we still need to pursue.
-
-	 So, in summary, as long as there is a single configuration that is
-	 not conflicting with any other configuration for that state, then
-	 there is more input we can use to keep going. E.g.,
-	 s->[(s,1,[x]), (s,2,[x]), (s,2,[y])]
-	 s->[(s,1,_)]
-	 s->[(s,1,[y]), (s,2,[x])]
-	 Regardless of what goes on for the other states, this is
-	 sufficient to force us to add this new state to the ATN-to-DFA work list.
-
-	 TODO: split into "has nonconflict config--add to work list" and getambigalts functions
-
-	 TODO: now we know contexts are merged, can we optimize?  Use big int -> config array?
 	 */
-	@Nullable
-	public IntervalSet getConflictingAlts(@NotNull ATNConfigSet configs) {
-		if ( debug ) System.out.println("### check ambiguous  "+configs);
-//		System.out.println("getConflictingAlts; set size="+configs.size());
-		// First get a list of configurations for each state.
-		// Most of the time, each state will have one associated configuration.
-		MultiMap<Integer, ATNConfig> stateToConfigListMap = new MultiMap<Integer, ATNConfig>();
-		Map<Integer, IntervalSet> stateToAltListMap = new HashMap<Integer, IntervalSet>();
 
-		for (ATNConfig c : configs) {
-			stateToConfigListMap.map(c.state.stateNumber, c);
-			IntervalSet alts = stateToAltListMap.get(c.state.stateNumber);
-			if ( alts==null ) {
-				alts = new IntervalSet();
-				stateToAltListMap.put(c.state.stateNumber, alts);
-			}
-			alts.add(c.alt);
-		}
-		// potential conflicts are states, s, with > 1 configurations and diff alts
-		// find all alts with potential conflicts
-		int numPotentialConflicts = 0;
-		IntervalSet altsToIgnore = new IntervalSet();
-		for (int state : stateToConfigListMap.keySet()) { // for each state
-			IntervalSet alts = stateToAltListMap.get(state);
-			if ( alts.size()==1 ) {
-				if ( !atn.states.get(state).onlyHasEpsilonTransitions() ) {
-					List<ATNConfig> configsPerState = stateToConfigListMap.get(state);
-					ATNConfig anyConfig = configsPerState.get(0);
-					altsToIgnore.add(anyConfig.alt);
-					if ( debug ) System.out.println("### one alt and all non-ep: "+configsPerState);
-				}
-				// remove state's configurations from further checking; no issues with them.
-				// (can't remove as it's concurrent modification; set to null)
-//				return null;
-				stateToConfigListMap.put(state, null);
-			}
-			else {
-				numPotentialConflicts++;
-			}
-		}
-
-		if ( debug ) System.out.println("### altsToIgnore: "+altsToIgnore);
-		if ( debug ) System.out.println("### stateToConfigListMap="+stateToConfigListMap);
-
-		if ( numPotentialConflicts==0 ) {
-			return null;
-		}
-
-		// compare each pair of configs in sets for states with > 1 alt in config list, looking for
-		// (s, i, ctx) and (s, j, ctx') where ctx==ctx' or one is suffix of the other.
-		IntervalSet ambigAlts = new IntervalSet();
-		for (int state : stateToConfigListMap.keySet()) {
-			List<ATNConfig> configsPerState = stateToConfigListMap.get(state);
-			if (configsPerState == null) continue;
-			IntervalSet alts = stateToAltListMap.get(state);
-// Sam's correction to ambig def is here:
-			if ( !altsToIgnore.isNil() && alts.and(altsToIgnore).size()<=1 ) {
-//				System.err.println("ignoring alt since "+alts+"&"+altsToIgnore+
-//								   ".size is "+alts.and(altsToIgnore).size());
-				continue;
-			}
-			int size = configsPerState.size();
-			for (int i = 0; i < size; i++) {
-				ATNConfig c = configsPerState.get(i);
-				for (int j = i+1; j < size; j++) {
-					ATNConfig d = configsPerState.get(j);
-					if ( c.alt != d.alt ) {
-						boolean conflicting = c.context.equals(d.context);
-						if ( conflicting ) {
-							if ( debug ) {
-								System.out.println("we reach state "+c.state.stateNumber+
-												   " in rule "+
-												   (parser !=null ? getRuleName(c.state.ruleIndex) :"n/a")+
-												   " alts "+c.alt+","+d.alt+" from ctx "+c.context.toString(parser)
-												   +" and "+ d.context.toString(parser));
-							}
-							ambigAlts.add(c.alt);
-							ambigAlts.add(d.alt);
-						}
-					}
-				}
-			}
-		}
-
-		if ( debug ) System.out.println("### ambigAlts="+ambigAlts);
-
-		if ( ambigAlts.isNil() ) return null;
-
-		// are any configs not represented in ambig alt sets
-//		for (ATNConfig config : configs) {
-//			if (!ambigAlts.contains(config.alt)) {
-//				return null;
-//			}
-//		}
-		return ambigAlts;
-	}
-
-	protected IntervalSet getConflictingAltsOrUniqueAlt(ATNConfigSet configs) {
-		IntervalSet conflictingAlts;
+	protected BitSet getConflictingAltsOrUniqueAlt(ATNConfigSet configs) {
+		BitSet conflictingAlts;
 		if ( configs.uniqueAlt!= ATN.INVALID_ALT_NUMBER ) {
-			conflictingAlts = IntervalSet.of(configs.uniqueAlt);
+			conflictingAlts = new BitSet();
+			conflictingAlts.set(configs.uniqueAlt);
 		}
 		else {
 			conflictingAlts = configs.conflictingAlts;
 		}
 		return conflictingAlts;
-	}
-
-//	protected int resolveToMinAlt(@NotNull DFAState D, IntervalSet conflictingAlts) {
-//		// kill dead alts so we don't chase them ever
-////		killAlts(conflictingAlts, D.configset);
-//		D.prediction = conflictingAlts.getMinElement();
-//		if ( debug ) System.out.println("RESOLVED TO "+D.prediction+" for "+D);
-//		return D.prediction;
-//	}
-
-	protected int resolveNongreedyToExitBranch(@NotNull ATNConfigSet reach,
-											   @NotNull IntervalSet conflictingAlts)
-	{
-		// exit branch is alt 2 always; alt 1 is entry or loopback branch
-		// since we're predicting, create DFA accept state for exit alt
-		int exitAlt = 2;
-		conflictingAlts.remove(exitAlt);
-		// kill dead alts so we don't chase them ever
-//		killAlts(conflictingAlts, reach);
-		if ( debug ) System.out.println("RESOLVED TO "+reach);
-		return exitAlt;
 	}
 
 	@NotNull
@@ -1745,7 +1398,7 @@ public class ParserATNSimulator extends ATNSimulator {
 											configs, outerContext);
 	}
 
-	public static int getUniqueAlt(@NotNull Collection<ATNConfig> configs) {
+	public static int getUniqueAlt(@NotNull ATNConfigSet configs) {
 		int alt = ATN.INVALID_ALT_NUMBER;
 		for (ATNConfig c : configs) {
 			if ( alt == ATN.INVALID_ALT_NUMBER ) {
@@ -1756,18 +1409,6 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 		}
 		return alt;
-	}
-
-	@Nullable
-	public boolean configWithAltAtStopState(@NotNull Collection<ATNConfig> configs, int alt) {
-		for (ATNConfig c : configs) {
-			if ( c.alt == alt ) {
-				if ( c.state.getClass() == RuleStopState.class ) {
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 
 	protected void addDFAEdge(@NotNull DFA dfa,
@@ -1824,7 +1465,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
     /** If context sensitive parsing, we know it's ambiguity not conflict */
     public void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex,
-								@NotNull IntervalSet ambigAlts,
+								@NotNull BitSet ambigAlts,
 								@NotNull ATNConfigSet configs)
 	{
 		if ( debug || retry_debug ) {
@@ -1853,7 +1494,9 @@ public class ParserATNSimulator extends ATNSimulator {
 																			  ambigAlts, configs);
     }
 
-	public void setSLL(boolean SLL) {
-		this.SLL = SLL;
+	public void setPredictionMode(PredictionMode mode) {
+		this.mode = mode;
 	}
+
+	public PredictionMode getPredictionMode() { return mode; }
 }
