@@ -260,7 +260,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	public static int predict_calls = 0;
 	public static int retry_with_context = 0;
 	public static int retry_with_context_indicates_no_conflict = 0;
-	public static int retry_with_context_predicts_same_as_alt = 0;
+	public static int retry_with_context_predicts_same_alt = 0;
 	public static int retry_with_context_from_dfa = 0;
 
 	@Nullable
@@ -607,12 +607,11 @@ public class ParserATNSimulator extends ATNSimulator {
 //				}
 //			}
 
-			Collection<BitSet> altSubSets = PredictionMode.getConflictingAltSubsets(reach);
-//			System.out.println("SLL altsets: "+altSubSets);
 
-			int predictedAlt = PredictionMode.getUniqueAlt(altSubSets);
+			int predictedAlt = getUniqueAlt(reach);
 
 			if ( debug ) {
+				Collection<BitSet> altSubSets = PredictionMode.getConflictingAltSubsets(reach);
 				System.out.println("SLL altSubSets="+altSubSets+
 								   ", configs="+reach+
 								   ", predict="+predictedAlt+", allSubsetsConflict="+
@@ -635,10 +634,9 @@ public class ParserATNSimulator extends ATNSimulator {
 						 !D.configs.dipsIntoOuterContext )          // didn't fall out of rule
 					{
 						// SPECIAL CASE WHERE SLL KNOWS CONFLICT IS AMBIGUITY
-						if ( !D.configs.hasSemanticContext ) {
-							reportAmbiguity(dfa, D, startIndex, input.index(),
-											D.configs.conflictingAlts, D.configs);
-						}
+						// report even if preds
+						reportAmbiguity(dfa, D, startIndex, input.index(),
+										D.configs.conflictingAlts, D.configs);
 					}
 					// always stop at D
 					D.isAcceptState = true;
@@ -737,10 +735,12 @@ public class ParserATNSimulator extends ATNSimulator {
 			System.out.println("execATNWithFullContext "+s0);
 		}
 		boolean fullCtx = true;
+		boolean foundExactAmbig = false;
 		ATNConfigSet reach = null;
 		ATNConfigSet previous = s0;
 		input.seek(startIndex);
 		int t = input.LA(1);
+		int predictedAlt;
 		while (true) { // while more work
 //			System.out.println("LL REACH "+getLookaheadName(input)+
 //							   " from configs.size="+previous.size()+
@@ -772,63 +772,81 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 
 //			System.out.println("altSubSets: "+altSubSets);
-			reach.uniqueAlt = PredictionMode.getUniqueAlt(altSubSets);
-			if ( reach.uniqueAlt!=ATN.INVALID_ALT_NUMBER ) break;
-			if ( mode == PredictionMode.LL_EXACT_AMBIG_DETECTION) {
-				if ( PredictionMode.allSubsetsConflict(altSubSets) &&
-					PredictionMode.allSubsetsEqual(altSubSets) )
-				{
+			reach.uniqueAlt = getUniqueAlt(reach);
+			// unique prediction?
+			if ( reach.uniqueAlt!=ATN.INVALID_ALT_NUMBER ) {
+				predictedAlt = reach.uniqueAlt;
+				break;
+			}
+			if ( mode != PredictionMode.LL_EXACT_AMBIG_DETECTION ) {
+				predictedAlt = PredictionMode.resolvesToJustOneViableAlt(altSubSets);
+				if ( predictedAlt != ATN.INVALID_ALT_NUMBER ) {
 					break;
 				}
 			}
-			else if ( PredictionMode.resolvesToJustOneViableAlt(altSubSets) ) {
-				break;
+			else {
+				// In exact ambiguity mode, we never try to terminate early.
+				// Just keeps scarfing until we know what the conflict is
+				if ( PredictionMode.allSubsetsConflict(altSubSets) &&
+					 PredictionMode.allSubsetsEqual(altSubSets) )
+				{
+					foundExactAmbig = true;
+					predictedAlt = PredictionMode.getSingleViableAlt(altSubSets);
+					break;
+				}
+				// else there are multiple non-conflicting subsets or
+				// we're not sure what the ambiguity is yet.
+				// So, keep going.
 			}
 			previous = reach;
 			input.consume();
 			t = input.LA(1);
 		}
 
+		// If the configuration set uniquely predicts an alternative,
+		// without conflict, then we know that it's a full LL decision
+		// not SLL.
 		if ( reach.uniqueAlt != ATN.INVALID_ALT_NUMBER ) {
 			retry_with_context_indicates_no_conflict++;
 			reportContextSensitivity(dfa, reach, startIndex, input.index());
-			if ( reach.uniqueAlt == SLL_min_alt ) {
-				retry_with_context_predicts_same_as_alt++;
+			if ( predictedAlt == SLL_min_alt ) {
+				retry_with_context_predicts_same_alt++;
 			}
-			return reach.uniqueAlt;
+			return predictedAlt;
 		}
 
 		// We do not check predicates here because we have checked them
 		// on-the-fly when doing full context prediction.
 
-		// At this point, we know that we have conflicting configurations.
-		// But, that does not mean that there is no way forward without
-		// a conflict. It's possible to have nonconflicting alt subsets; e.g.,
-		//
-		//    LL altSubSets=[{1, 2}, {1, 2}, {1}, {1, 2}]
-		//
-		// from
-		//
-		//    [(17,1,[5 $]), (13,1,[5 10 $]), (21,1,[5 10 $]), (11,1,[$]),
-		//     (13,2,[5 10 $]), (21,2,[5 10 $]), (11,2,[$])]
-		//
-		// In this case, (17,1,[5 $]) indicates there is some next sequence
-		// that would resolve this without conflict to alternative 1. Any
-		// other viable next sequence, however, is associated with a conflict.
-		// We stop looking for input because no amount of further lookahead
-		// will alter the fact that we should predict alternative 1.
-		// We just can't say for sure that there is an ambiguity without
-		// looking further.
+		/*
+		In non-exact ambiguity detection mode, we might	actually be able to
+		detect an exact ambiguity, but I'm not going to spend the cycles
+		needed to check. We only emit ambiguity warnings in exact ambiguity
+		mode.
 
-//		if ( /* TODO: len(all subsets)>1 or input consistent with a subset with len=1 */ true ) {
-//			reportAmbiguity(dfa, D, startIndex, input.index(), getConflictingAlts(reach), reach);
-//		}
+		For example, we might know that we have conflicting configurations.
+		But, that does not mean that there is no way forward without a
+		conflict. It's possible to have nonconflicting alt subsets as in:
 
-		if ( mode == PredictionMode.LL_EXACT_AMBIG_DETECTION) {
+		   LL altSubSets=[{1, 2}, {1, 2}, {1}, {1, 2}]
+
+		from
+
+		   [(17,1,[5 $]), (13,1,[5 10 $]), (21,1,[5 10 $]), (11,1,[$]),
+			(13,2,[5 10 $]), (21,2,[5 10 $]), (11,2,[$])]
+
+		In this case, (17,1,[5 $]) indicates there is some next sequence that
+		would resolve this without conflict to alternative 1. Any other viable
+		next sequence, however, is associated with a conflict.  We stop
+		looking for input because no amount of further lookahead will alter
+		the fact that we should predict alternative 1.  We just can't say for
+		sure that there is an ambiguity without looking further.
+		*/
+		if ( foundExactAmbig ) {
 			reportAmbiguity(dfa, D, startIndex, input.index(), getConflictingAlts(reach), reach);
 		}
 
-		return getConflictingAlts(reach).nextSetBit(0);
+		return predictedAlt;
 	}
 
 	protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t,

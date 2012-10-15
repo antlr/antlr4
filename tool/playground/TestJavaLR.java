@@ -198,7 +198,7 @@ class TestJavaLR {
 		System.out.println(ParserATNSimulator.predict_calls +" parser predict calls");
 		System.out.println(ParserATNSimulator.retry_with_context +" retry_with_context after SLL conflict");
 		System.out.println(ParserATNSimulator.retry_with_context_indicates_no_conflict +" retry sees no conflict");
-		System.out.println(ParserATNSimulator.retry_with_context_predicts_same_as_alt +" retry predicts same alt as resolving conflict");
+		System.out.println(ParserATNSimulator.retry_with_context_predicts_same_alt +" retry predicts same alt as resolving conflict");
 		System.out.println(ParserATNSimulator.retry_with_context_from_dfa +" retry from DFA");
 	}
 

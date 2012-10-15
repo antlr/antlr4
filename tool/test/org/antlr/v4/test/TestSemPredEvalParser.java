@@ -147,16 +147,14 @@ public class TestSemPredEvalParser extends BaseTest {
 	}
 
 	@Test public void test2UnpredicatedAlts() throws Exception {
-		// We have n-2 predicates for n alternatives. We have no choice
-		// but to pick the first on predicated alternative if the n-2
-		// predicates fail.
-		// this should call reportInsufficientPredicates()
+		// We have n-2 predicates for n alternatives. pick first alt
 		String grammar =
 			"grammar T;\n" +
 			"@header {" +
 			"import java.util.*;" +
 			"}" +
-			"s : a ';' a;\n" + // do 2x: once in ATN, next in DFA
+			"s : {_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);}\n" +
+			"    a ';' a;\n" + // do 2x: once in ATN, next in DFA
 			"a :          ID {System.out.println(\"alt 1\");}\n" +
 			"  |          ID {System.out.println(\"alt 2\");}\n" +
 			"  | {false}? ID {System.out.println(\"alt 3\");}\n" +
@@ -179,16 +177,13 @@ public class TestSemPredEvalParser extends BaseTest {
 	}
 
 	@Test public void test2UnpredicatedAltsAndOneOrthogonalAlt() throws Exception {
-		// We have n-2 predicates for n alternatives. We have no choice
-		// but to pick the first on predicated alternative if the n-2
-		// predicates fail.
-		// this should call reportInsufficientPredicates()
 		String grammar =
 			"grammar T;\n" +
 			"@header {" +
 			"import java.util.*;" +
 			"}" +
-			"s : a ';' a ';' a;\n" +
+			"s : {_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);}\n" +
+			"    a ';' a ';' a;\n" +
 			"a : INT         {System.out.println(\"alt 1\");}\n" +
 			"  |          ID {System.out.println(\"alt 2\");}\n" + // must pick this one for ID since pred is false
 			"  |          ID {System.out.println(\"alt 3\");}\n" +

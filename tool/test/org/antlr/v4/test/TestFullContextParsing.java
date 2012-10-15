@@ -41,7 +41,7 @@ import org.junit.Test;
 
  */
 public class TestFullContextParsing extends BaseTest {
-	@Test public void testAmbigYieldsNonCtxSensitiveDFA() {
+	@Test public void testAmbigYieldsCtxSensitiveDFA() {
 		String grammar =
 			"grammar T;\n"+
 			"s" +
@@ -53,9 +53,9 @@ public class TestFullContextParsing extends BaseTest {
 								   "abc", true);
 		String expecting =
 			"Decision 0:\n" +
-			"s0-ID->:s1=>1\n"; // not ctx sensitive
+			"s0-ID->s1^\n"; // ctx sensitive
 		assertEquals(expecting, result);
-		assertEquals("line 1:0 reportAmbiguity d=0: ambigAlts={1, 2}, input='abc'\n",
+		assertEquals("line 1:0 reportAttemptingFullContext d=0, input='abc'\n",
 					 this.stderrDuringParse);
 	}
 
@@ -122,6 +122,7 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar =
 			"grammar T;\n"+
 			"s" +
+			"@init {_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);}\n" +
 			"@after {dumpDFA();}\n" +
 			"    : '{' stat* '}'" +
 			"    ;\n" +
@@ -166,16 +167,15 @@ public class TestFullContextParsing extends BaseTest {
 			"s0-'}'->:s2=>2\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:29 reportAttemptingFullContext d=1, input='else'\n" +
-					 "line 1:34 reportAmbiguity d=1: ambigAlts={1, 2}, input='elsefoo'\n",
+					 "line 1:38 reportAmbiguity d=1: ambigAlts={1, 2}, input='elsefoo}'\n",
 					 this.stderrDuringParse);
 
-		// should not be ambiguous because the second 'else foo' clearly
+		// should not be ambiguous because the second 'else bar' clearly
 		// indicates that the first else should match to the innermost if.
-		// but, current ambig detection doesn't know that. It stops at 'else foo'
-		// instead of seeing the next else. See to-do in execATNWithFullContext()
+		// LL_EXACT_AMBIG_DETECTION makes us keep going to resolve
 
 		input =
-			"{ if x then if y then return else foo else foo }";
+			"{ if x then if y then return else foo else bar }";
 		result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 							input, true);
 		expecting =
@@ -183,7 +183,7 @@ public class TestFullContextParsing extends BaseTest {
 			"s0-'else'->s1^\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:29 reportAttemptingFullContext d=1, input='else'\n" +
-					 "line 1:34 reportAmbiguity d=1: ambigAlts={1, 2}, input='elsefoo'\n" +
+					 "line 1:38 reportContextSensitivity d=1, input='elsefooelse'\n" +
 					 "line 1:38 reportAttemptingFullContext d=1, input='else'\n" +
 					 "line 1:38 reportContextSensitivity d=1, input='else'\n",
 					 this.stderrDuringParse);
@@ -201,7 +201,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("line 1:19 reportAttemptingFullContext d=1, input='else'\n" +
 					 "line 1:19 reportContextSensitivity d=1, input='else'\n" +
 					 "line 2:27 reportAttemptingFullContext d=1, input='else'\n" +
-					 "line 2:32 reportAmbiguity d=1: ambigAlts={1, 2}, input='elsefoo'\n",
+					 "line 2:36 reportAmbiguity d=1: ambigAlts={1, 2}, input='elsefoo}'\n",
 					 this.stderrDuringParse);
 
 		input =
@@ -217,7 +217,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("line 1:19 reportAttemptingFullContext d=1, input='else'\n" +
 					 "line 1:19 reportContextSensitivity d=1, input='else'\n" +
 					 "line 2:27 reportAttemptingFullContext d=1, input='else'\n" +
-					 "line 2:32 reportAmbiguity d=1: ambigAlts={1, 2}, input='elsefoo'\n",
+					 "line 2:36 reportAmbiguity d=1: ambigAlts={1, 2}, input='elsefoo}'\n",
 					 this.stderrDuringParse);
 	}
 
@@ -229,7 +229,9 @@ public class TestFullContextParsing extends BaseTest {
 	public void testLoopsSimulateTailRecursion() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"prog: expr_or_assign*;\n" +
+			"prog\n" +
+			"@init {_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);}\n" +
+			"    : expr_or_assign*;\n" +
 			"expr_or_assign\n" +
 			"    :   expr '++' {System.out.println(\"fail.\");}\n" +
 			"    |   expr {System.out.println(\"pass: \"+$expr.text);}\n" +
@@ -247,7 +249,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("pass: a(i)<-x\n", found);
 
 		String expecting =
-			"line 1:7 reportAttemptingFullContext d=3, input='a(i)<-x'\n" +
+			"line 1:3 reportAttemptingFullContext d=3, input='a(i)'\n" +
 			"line 1:7 reportAmbiguity d=3: ambigAlts={2, 3}, input='a(i)<-x'\n";
 		assertEquals(expecting, this.stderrDuringParse);
 	}
@@ -257,7 +259,9 @@ public class TestFullContextParsing extends BaseTest {
 		// simpler version of testLoopsSimulateTailRecursion, no loops
 		String grammar =
 			"grammar T;\n" +
-			"prog: expr expr {System.out.println(\"alt 1\");}\n" +
+			"prog\n" +
+			"@init {_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);}\n" +
+			"    : expr expr {System.out.println(\"alt 1\");}\n" +
 			"    | expr\n" +
 			"    ;\n" +
 			"expr: '@'\n" +
@@ -271,6 +275,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("alt 1\n", found);
 
 		String expecting =
+			"line 1:2 reportAttemptingFullContext d=0, input='a@'\n" +
 			"line 1:2 reportAmbiguity d=0: ambigAlts={1, 2}, input='a@'\n" +
 			"line 1:2 reportAttemptingFullContext d=1, input='a@'\n" +
 			"line 1:2 reportContextSensitivity d=1, input='a@'\n";
@@ -282,7 +287,9 @@ public class TestFullContextParsing extends BaseTest {
 		// translated left-recursive expr rule to test ambig detection
 		String grammar =
 			"grammar T;\n" +
-			"s   :   expr[0] {System.out.println($expr.ctx.toStringTree(this));} ;\n" +
+			"s\n" +
+			"@init {_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);}\n" +
+			"    :   expr[0] {System.out.println($expr.ctx.toStringTree(this));} ;\n" +
 			"\n" +
 			"expr[int _p]\n" +
 			"    :   ID\n" +

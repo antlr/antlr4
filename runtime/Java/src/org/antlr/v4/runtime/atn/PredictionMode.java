@@ -297,8 +297,8 @@ public enum PredictionMode {
 	 going. We can only stop prediction when we need exact ambiguity
 	 detection when the sets look like A={{1,2}} or {{1,2},{1,2}} etc...
 	 */
-	public static boolean resolvesToJustOneViableAlt(Collection<BitSet> altsets) {
-		return !hasMoreThanOneViableAlt(altsets);
+	public static int resolvesToJustOneViableAlt(Collection<BitSet> altsets) {
+		return getSingleViableAlt(altsets);
 	}
 
 	public static boolean allSubsetsConflict(Collection<BitSet> altsets) {
@@ -393,16 +393,16 @@ public enum PredictionMode {
 		return false;
 	}
 
-	public static boolean hasMoreThanOneViableAlt(Collection<BitSet> altsets) {
+	public static int getSingleViableAlt(Collection<BitSet> altsets) {
 		BitSet viableAlts = new BitSet();
 		for (BitSet alts : altsets) {
 			int minAlt = alts.nextSetBit(0);
 			viableAlts.set(minAlt);
 			if ( viableAlts.cardinality()>1 ) { // more than 1 viable alt
-				return true;
+				return ATN.INVALID_ALT_NUMBER;
 			}
 		}
-		return false;
+		return viableAlts.nextSetBit(0);
 	}
 
 }
