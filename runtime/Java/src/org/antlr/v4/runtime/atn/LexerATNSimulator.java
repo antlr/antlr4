@@ -568,10 +568,15 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 			}
 
-			if ( config.context == null || config.context.isEmpty() ) {
-				configs.add(config);
-				return;
+			if ( config.context == null || config.context.hasEmpty() ) {
+				if (config.context == null || config.context.isEmpty()) {
+					configs.add(config);
+					return;
+				}
+
+				configs.add(new LexerATNConfig(config, config.state, PredictionContext.EMPTY));
 			}
+
 			if ( config.context!=null && !config.context.isEmpty() ) {
 				for (SingletonPredictionContext ctx : config.context) {
 					if ( !ctx.isEmpty() ) {
@@ -603,8 +608,8 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		ATNState p = config.state;
-		boolean nonGreedy = p instanceof DecisionState && ((DecisionState)p).nonGreedy
-			|| p instanceof PlusBlockStartState && ((PlusBlockStartState)p).loopBackState.nonGreedy;
+		boolean nonGreedy = (p instanceof DecisionState && ((DecisionState)p).nonGreedy && !(p instanceof PlusLoopbackState))
+			|| (p instanceof PlusBlockStartState && ((PlusBlockStartState)p).loopBackState.nonGreedy);
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			Transition t = p.transition(i);
 			LexerATNConfig c = getEpsilonTarget(config, t, configs);
@@ -627,7 +632,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		ATNState p = config.state;
 		switch (p.getStateType()) {
 		case ATNState.PLUS_LOOP_BACK:
-			if (t.target instanceof PlusBlockStartState && ((PlusBlockStartState)t.target).nonGreedy) {
+			if (((PlusLoopbackState)p).nonGreedy) {
 				config = config.exitNonGreedyBlock();
 			}
 
@@ -638,9 +643,18 @@ public class LexerATNSimulator extends ATNSimulator {
 			break;
 
 		case ATNState.LOOP_END:
-			ATNState loopEntry = ((LoopEndState)p).loopBackState.transition(0).target;
-			if (loopEntry instanceof StarLoopEntryState && ((StarLoopEntryState)loopEntry).nonGreedy) {
-				config = config.exitNonGreedyBlock();
+			ATNState loopBackState = ((LoopEndState)p).loopBackState;
+			if (loopBackState instanceof PlusLoopbackState) {
+				if (((PlusLoopbackState)loopBackState).nonGreedy) {
+					config = config.exitNonGreedyBlock();
+				}
+			}
+			else {
+				assert loopBackState instanceof StarLoopbackState;
+				ATNState loopEntry = loopBackState.transition(0).target;
+				if (loopEntry instanceof StarLoopEntryState && ((StarLoopEntryState)loopEntry).nonGreedy) {
+					config = config.exitNonGreedyBlock();
+				}
 			}
 
 			break;

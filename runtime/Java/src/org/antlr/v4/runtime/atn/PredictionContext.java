@@ -70,6 +70,10 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		return this == EMPTY;
 	}
 
+	public boolean hasEmpty() {
+		return getInvokingState(size() - 1) == EMPTY_INVOKING_STATE;
+	}
+
 	public abstract PredictionContext popAll(
 		int invokingState,
 		boolean fullCtx,
