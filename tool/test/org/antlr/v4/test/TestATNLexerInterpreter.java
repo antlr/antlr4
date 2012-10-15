@@ -69,22 +69,22 @@ public class TestATNLexerInterpreter extends BaseTest {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
 			"A : 'xy'\n" +
-			"  | 'xy' .\n" +  // should not pursue '.' since xy already hit stop
+			"  | 'xy' .\n" +  // should pursue '.' since A is greedy
 			"  ;\n");
 		checkLexerMatches(lg, "xy", "A, EOF");
 		RecognitionException e = checkLexerMatches(lg, "xyz", "A, EOF");
-		assertEquals("NoViableAltException('z')", e.toString());
+		assertNull(e);
 	}
 
 	@Test public void testWildcardQuirk() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
 			"A : 'xy'\n" +
-			"  | 'xy' . 'z'\n" + // will not pursue '.' since xy already hit stop (prior alt)
+			"  | 'xy' . 'z'\n" + // will pursue '.' since A is greedy
 			"  ;\n");
 //		checkLexerMatches(lg, "xy", "A, EOF");
 		RecognitionException e = checkLexerMatches(lg, "xyqz", "A, EOF");
-		assertEquals("NoViableAltException('q')", e.toString());
+		assertNull(e);
 	}
 
 	@Test public void testWildcardNonQuirkWhenSplitBetweenTwoRules() throws Exception {
