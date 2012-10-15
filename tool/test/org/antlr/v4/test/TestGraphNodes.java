@@ -805,7 +805,7 @@ public class TestGraphNodes extends TestCase {
 					}
 
 					nodes.append("<p").append(i).append('>');
-					if (current.getInvokingState(i) == PredictionContext.EMPTY_FULL_CTX_INVOKING_STATE) {
+					if (current.getInvokingState(i) == PredictionContext.EMPTY_INVOKING_STATE) {
 						nodes.append(rootIsWildcard ? '*' : '$');
 					}
 				}
@@ -820,7 +820,7 @@ public class TestGraphNodes extends TestCase {
 			}
 
 			for (int i = 0; i < current.size(); i++) {
-				if (current.getInvokingState(i) == PredictionContext.EMPTY_FULL_CTX_INVOKING_STATE) {
+				if (current.getInvokingState(i) == PredictionContext.EMPTY_INVOKING_STATE) {
 					continue;
 				}
 

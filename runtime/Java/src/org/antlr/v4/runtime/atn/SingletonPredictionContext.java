@@ -11,14 +11,13 @@ public class SingletonPredictionContext extends PredictionContext {
 	SingletonPredictionContext(PredictionContext parent, int invokingState) {
 		super(calculateHashCode(parent!=null ? 31 ^ parent.hashCode() : 1,
 								31 ^ invokingState));
-		assert invokingState!=EMPTY_FULL_CTX_INVOKING_STATE &&
-		       invokingState!=ATNState.INVALID_STATE_NUMBER;
+		assert invokingState!=ATNState.INVALID_STATE_NUMBER;
 		this.parent = parent;
 		this.invokingState = invokingState;
 	}
 
 	public static SingletonPredictionContext create(PredictionContext parent, int invokingState) {
-		if ( invokingState == EMPTY_FULL_CTX_INVOKING_STATE && parent == null ) {
+		if ( invokingState == EMPTY_INVOKING_STATE && parent == null ) {
 			// someone can pass in the bits of an array ctx that mean $
 			return EMPTY;
 		}
@@ -92,7 +91,7 @@ public class SingletonPredictionContext extends PredictionContext {
 	public String toString() {
 		String up = parent!=null ? parent.toString() : "";
 		if ( up.length()==0 ) {
-			if ( invokingState == EMPTY_FULL_CTX_INVOKING_STATE ) {
+			if ( invokingState == EMPTY_INVOKING_STATE ) {
 				return "$";
 			}
 			return String.valueOf(invokingState);

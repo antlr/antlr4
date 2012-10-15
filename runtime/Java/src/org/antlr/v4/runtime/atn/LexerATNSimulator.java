@@ -621,7 +621,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				for (SingletonPredictionContext ctx : config.context) {
 					if ( !ctx.isEmpty() ) {
 						PredictionContext newContext = ctx.parent; // "pop" invoking state
-						if ( ctx.invokingState==PredictionContext.EMPTY_FULL_CTX_INVOKING_STATE ) {
+						if ( ctx.invokingState==PredictionContext.EMPTY_INVOKING_STATE ) {
 							// we have no context info. Don't pursue but
 							// record a config that indicates how we hit end
 							LexerATNConfig c = new LexerATNConfig(config, config.state, ctx);

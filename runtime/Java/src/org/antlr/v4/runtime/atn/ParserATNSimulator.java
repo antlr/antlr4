@@ -1104,7 +1104,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			// run thru all possible stack tops in ctx
 			if ( config.context!=null && !config.context.isEmpty() ) {
 				for (SingletonPredictionContext ctx : config.context) {
-					if ( ctx.invokingState==PredictionContext.EMPTY_FULL_CTX_INVOKING_STATE ) {
+					if ( ctx.invokingState==PredictionContext.EMPTY_INVOKING_STATE ) {
 						// we have no context info, just chase follow links (if greedy)
 						if ( debug ) System.out.println("FALLING off rule "+
 														getRuleName(config.state.ruleIndex));
