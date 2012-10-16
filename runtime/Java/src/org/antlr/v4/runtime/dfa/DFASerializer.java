@@ -38,7 +38,11 @@ import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 /** A DFA walker that knows how to dump them to serialized strings. */
@@ -74,9 +78,18 @@ public class DFASerializer {
 	public String toString() {
 		if ( dfa.s0.get()==null ) return null;
 		StringBuilder buf = new StringBuilder();
-		Map<DFAState,DFAState> states = dfa.states;
-		if ( states!=null ) {
-			for (DFAState s : states.values()) {
+
+		if ( dfa.states!=null ) {
+			List<DFAState> states = new ArrayList<DFAState>(dfa.states.values());
+			Collections.sort(states, new Comparator<DFAState>(){
+
+				@Override
+				public int compare(DFAState o1, DFAState o2) {
+					return o1.stateNumber - o2.stateNumber;
+				}
+			});
+
+			for (DFAState s : states) {
 				Map<Integer, DFAState> edges = s.getEdgeMap();
 				Map<Integer, DFAState> contextEdges = s.getContextEdgeMap();
 				for (Map.Entry<Integer, DFAState> entry : edges.entrySet()) {
