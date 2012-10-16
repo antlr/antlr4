@@ -1,5 +1,11 @@
 ANTLR v4 Honey Badger
 
+October 14, 2012
+
+* Rebuild how ANTLR detects SLL conflict and failover to full LL.  LL is
+  a bit slower but correct now.  Added ability to ask for exact ambiguity
+  detection.
+
 October 8, 2012
 
 * Fixed a bug where labeling the alternatives of the start rule caused

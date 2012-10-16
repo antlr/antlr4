@@ -314,7 +314,7 @@ public class TestParseErrors extends BaseTest {
 			"WS : [ \\t\\r\\n]+ -> skip;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "a.", false);
 		String expecting =
-				"exec stderrVacuum: line 1:1 mismatched input '.' expecting '!'";
+				"line 1:1 mismatched input '.' expecting '!'\n";
 		String result = stderrDuringParse;
 		assertEquals(expecting, result);
 	}

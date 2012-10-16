@@ -411,7 +411,7 @@ public class TestATNParserPrediction extends BaseTest {
 		checkDFAConstruction(lg, g, decision, inputs, dfa);
 	}
 
-	@Test public void testAmbigDef() throws Exception {
+	@Test public void testContinuePrediction() throws Exception {
 		// Sam found prev def of ambiguity was too restrictive.
 		// E.g., (13, 1, []), (13, 2, []), (12, 2, []) should not
 		// be declared ambig since (12, 2, []) can take us to
@@ -429,45 +429,23 @@ public class TestATNParserPrediction extends BaseTest {
 		int decision = 1;
 		checkPredictedAlt(lg, g, decision, "a;", 1);
 		checkPredictedAlt(lg, g, decision, "ab;", 2);
+	}
 
-		// After matching these inputs for decision, what is DFA after each prediction?
-//		String[] inputs = {
-//			"34a",
-//			"34ab",
-//			"((34))a",
-//			"((34))ab",
-//		};
-//		String[] dfa = {
-//			"s0-INT->s1\n" +
-//			"s1-'a'->s2\n" +
-//			"s2-EOF->:s3=>1\n",
-//
-//			"s0-INT->s1\n" +
-//			"s1-'a'->s2\n" +
-//			"s2-EOF->:s3=>1\n" +
-//			"s2-'b'->:s4=>2\n",
-//
-//			"s0-'('->s5\n" +
-//			"s0-INT->s1\n" +
-//			"s1-'a'->s2\n" +
-//			"s2-EOF->:s3=>1\n" +
-//			"s2-'b'->:s4=>2\n" +
-//			"s5-'('->s6\n" +
-//			"s6-INT->s7\n" +
-//			"s7-')'->s8\n" +
-//			"s8-')'->s1\n",
-//
-//			"s0-'('->s5\n" +
-//			"s0-INT->s1\n" +
-//			"s1-'a'->s2\n" +
-//			"s2-EOF->:s3=>1\n" +
-//			"s2-'b'->:s4=>2\n" +
-//			"s5-'('->s6\n" +
-//			"s6-INT->s7\n" +
-//			"s7-')'->s8\n" +
-//			"s8-')'->s1\n",
-//		};
-//		checkDFAConstruction(lg, g, decision, inputs, dfa);
+	@Test public void testContinuePrediction2() throws Exception {
+		// ID is ambig for first two alts, but ID SEMI lets us move forward with alt 3
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"ID : 'a'..'z' ;\n" + // one char
+			"SEMI : ';' ;\n"+
+			"INT : '0'..'9'+ ;\n"
+		);
+		Grammar g = new Grammar(
+			"parser grammar T;\n"+
+			"tokens {ID,SEMI,INT}\n" +
+			"a : ID | ID | ID SEMI ;\n");
+		int decision = 0;
+		checkPredictedAlt(lg, g, decision, "a", 1);
+		checkPredictedAlt(lg, g, decision, "a;", 3);
 	}
 
 	/** first check that the ATN predicts right alt.

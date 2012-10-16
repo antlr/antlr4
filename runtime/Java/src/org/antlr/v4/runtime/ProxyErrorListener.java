@@ -31,7 +31,6 @@ package org.antlr.v4.runtime;
 import java.util.Collection;
 
 /**
- *
  * @author Sam Harwell
  */
 public class ProxyErrorListener<Symbol> implements ANTLRErrorListener<Symbol> {

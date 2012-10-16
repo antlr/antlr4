@@ -164,7 +164,8 @@ public class TestParserExec extends BaseTest {
 
 
 	/**
-	 * Related to https://github.com/antlr/antlr4/issues/41.
+	 * This test is meant to detect regressions of bug antlr/antlr4#41.
+	 * https://github.com/antlr/antlr4/issues/41
 	 */
 	@Test
 	public void testOptional() throws Exception {
@@ -185,15 +186,11 @@ public class TestParserExec extends BaseTest {
 
 		found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if x", false);
 		assertEquals("", found);
-		assertNull(null, this.stderrDuringParse);
+		assertNull(this.stderrDuringParse);
 
 		found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if if x else x", false);
 		assertEquals("", found);
-		assertNull(null, this.stderrDuringParse);
-
-		found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if if x else x if", false);
-		assertEquals("", found);
-		assertNull(null, this.stderrDuringParse);
+		assertNull(this.stderrDuringParse);
 	}
 
 	/**

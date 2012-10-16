@@ -1,5 +1,5 @@
 grammar T;
-options {tokenVocab=A;}
-s : ID ;
+s@after {dumpDFA();}
+    : ID | ID {;} ;
 ID : 'a'..'z'+ ;
-WS : (' '|'\n') {skip();} ;
+WS : (' '|'\t'|'\n')+ {skip();} ;
