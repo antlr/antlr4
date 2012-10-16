@@ -43,6 +43,11 @@ public final class EpsilonTransition extends Transition {
 	public boolean isEpsilon() { return true; }
 
 	@Override
+	public boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+		return false;
+	}
+
+	@Override
 	@NotNull
 	public String toString() {
 		return "epsilon";

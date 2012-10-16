@@ -966,49 +966,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	@Nullable
 	public ATNState getReachableTarget(@NotNull ATNConfig source, @NotNull Transition trans, int ttype) {
-		switch (trans.getSerializationType()) {
-		case Transition.ATOM:
-			AtomTransition at = (AtomTransition)trans;
-			if ( at.label == ttype ) {
-				return at.target;
-			}
-
-			return null;
-
-		case Transition.SET:
-			SetTransition st = (SetTransition)trans;
-			if ( st.set.contains(ttype) ) {
-				return st.target;
-			}
-
-			return null;
-
-		case Transition.NOT_SET:
-			NotSetTransition nst = (NotSetTransition)trans;
-			if ( !nst.set.contains(ttype) ) {
-				return nst.target;
-			}
-
-			return null;
-
-		case Transition.RANGE:
-			RangeTransition rt = (RangeTransition)trans;
-			if ( ttype>=rt.from && ttype<=rt.to ) {
-				return rt.target;
-			}
-
-			return null;
-
-		case Transition.WILDCARD:
-			if (ttype != Token.EOF) {
-				return trans.target;
-			}
-
-			return null;
-
-		default:
-			return null;
+		if (trans.matches(ttype, 0, atn.maxTokenType)) {
+			return trans.target;
 		}
+
+		return null;
 	}
 
 	/** collect and set D's semantic context */

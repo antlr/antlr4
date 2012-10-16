@@ -111,4 +111,6 @@ public abstract class Transition {
 
 	@Nullable
 	public IntervalSet label() { return null; }
+
+	public abstract boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol);
 }
