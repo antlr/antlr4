@@ -211,6 +211,20 @@ public abstract class ATNSimulator {
 		}
 
 		for (ATNState state : atn.states) {
+			if (state instanceof BlockStartState) {
+				// we need to know the end state to set its start state
+				if (((BlockStartState)state).endState == null) {
+					throw new IllegalStateException();
+				}
+
+				// block end states can only be associated to a single block start state
+				if (((BlockStartState)state).endState.startState != null) {
+					throw new IllegalStateException();
+				}
+
+				((BlockStartState)state).endState.startState = (BlockStartState)state;
+			}
+
 			if (state instanceof PlusLoopbackState) {
 				PlusLoopbackState loopbackState = (PlusLoopbackState)state;
 				for (int i = 0; i < loopbackState.getNumberOfTransitions(); i++) {
@@ -237,9 +251,11 @@ public abstract class ATNSimulator {
 		int ndecisions = toInt(data[p++]);
 		for (int i=1; i<=ndecisions; i++) {
 			int s = toInt(data[p++]);
+			int nonGreedy = toInt(data[p++]);
 			DecisionState decState = (DecisionState)atn.states.get(s);
 			atn.decisionToState.add(decState);
 			decState.decision = i-1;
+			decState.nonGreedy = nonGreedy != 0;
 		}
 
 		atn.decisionToDFA = new DFA[ndecisions];
@@ -296,6 +312,12 @@ public abstract class ATNSimulator {
 
 			if (state instanceof BlockStartState) {
 				if (((BlockStartState)state).endState == null) {
+					throw new IllegalStateException();
+				}
+			}
+
+			if (state instanceof BlockEndState) {
+				if (((BlockEndState)state).startState == null) {
 					throw new IllegalStateException();
 				}
 			}

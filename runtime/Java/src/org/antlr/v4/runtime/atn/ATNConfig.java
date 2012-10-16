@@ -116,7 +116,7 @@ public class ATNConfig {
 		return altAndOuterContextDepth < 0;
 	}
 
-	public final void setHidden(boolean value) {
+	public void setHidden(boolean value) {
 		if (value) {
 			altAndOuterContextDepth |= 0x80000000;
 		} else {
@@ -128,7 +128,7 @@ public class ATNConfig {
 		return context;
 	}
 
-	public final void setContext(@NotNull PredictionContext context) {
+	public void setContext(@NotNull PredictionContext context) {
 		this.context = context;
 	}
 
@@ -151,7 +151,7 @@ public class ATNConfig {
 		return (altAndOuterContextDepth >>> 24) & 0x7F;
 	}
 
-	public final void setOuterContextDepth(int outerContextDepth) {
+	public void setOuterContextDepth(int outerContextDepth) {
 		assert outerContextDepth >= 0 && outerContextDepth <= 0x7F;
 		this.altAndOuterContextDepth = (outerContextDepth << 24) | (altAndOuterContextDepth & ~0x7F000000);
 	}
@@ -163,6 +163,14 @@ public class ATNConfig {
 	@NotNull
 	public SemanticContext getSemanticContext() {
 		return SemanticContext.NONE;
+	}
+
+	public boolean isGreedy() {
+		return true;
+	}
+
+	public int getNonGreedyDepth() {
+		return 0;
 	}
 
 	@Override
@@ -186,7 +194,20 @@ public class ATNConfig {
 		return transform(state, context, this.getSemanticContext(), actionIndex);
 	}
 
+	public ATNConfig enterNonGreedyBlock() {
+		return new NonGreedyATNConfig(this, 1);
+	}
+
+	public ATNConfig exitNonGreedyBlock() {
+		return this;
+	}
+
 	private ATNConfig transform(@NotNull ATNState state, @Nullable PredictionContext context, @NotNull SemanticContext semanticContext, int actionIndex) {
+		if (this instanceof NonGreedyATNConfig) {
+			ATNConfig transformed = ((NonGreedyATNConfig)this).config.transform(state, context, semanticContext, actionIndex);
+			return new NonGreedyATNConfig(transformed, ((NonGreedyATNConfig)this).nonGreedyDepth);
+		}
+
 		if (semanticContext != SemanticContext.NONE) {
 			if (actionIndex != -1) {
 				return new ActionSemanticContextATNConfig(actionIndex, semanticContext, this, state, context);
@@ -439,6 +460,80 @@ public class ATNConfig {
 		@Override
 		public int getActionIndex() {
 			return actionIndex;
+		}
+
+	}
+
+	private static class NonGreedyATNConfig extends ATNConfig {
+		private final ATNConfig config;
+		private final int nonGreedyDepth;
+
+		public NonGreedyATNConfig(ATNConfig config, int nonGreedyDepth) {
+			super(config, config.state, config.context);
+			this.nonGreedyDepth = nonGreedyDepth;
+			this.config = config;
+		}
+
+		public NonGreedyATNConfig(int nonGreedyDepth, ATNConfig config, ATNState state, int alt, PredictionContext context) {
+			super(state, alt, context);
+			this.nonGreedyDepth = nonGreedyDepth;
+			this.config = config;
+		}
+
+		public ATNConfig getConfig() {
+			return config;
+		}
+
+		@Override
+		public boolean isGreedy() {
+			return false;
+		}
+
+		@Override
+		public int getNonGreedyDepth() {
+			return nonGreedyDepth;
+		}
+
+		@Override
+		public int getActionIndex() {
+			return config.getActionIndex();
+		}
+
+		@Override
+		public SemanticContext getSemanticContext() {
+			return config.getSemanticContext();
+		}
+
+		@Override
+		public void setContext(PredictionContext context) {
+			super.setContext(context);
+			config.setContext(context);
+		}
+
+		@Override
+		public void setHidden(boolean value) {
+			super.setHidden(value);
+			config.setHidden(value);
+		}
+
+		@Override
+		public void setOuterContextDepth(int outerContextDepth) {
+			super.setOuterContextDepth(outerContextDepth);
+			config.setOuterContextDepth(outerContextDepth);
+		}
+
+		@Override
+		public ATNConfig enterNonGreedyBlock() {
+			return new NonGreedyATNConfig(config, nonGreedyDepth + 1);
+		}
+
+		@Override
+		public ATNConfig exitNonGreedyBlock() {
+			if (nonGreedyDepth == 1) {
+				return config;
+			}
+
+			return new NonGreedyATNConfig(config, nonGreedyDepth - 1);
 		}
 
 	}

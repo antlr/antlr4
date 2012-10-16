@@ -226,6 +226,7 @@ public class ATNSerializer {
 		data.add(ndecisions);
 		for (DecisionState decStartState : atn.decisionToState) {
 			data.add(decStartState.stateNumber);
+			data.add(decStartState.nonGreedy ? 1 : 0);
 		}
 		return data;
 	}
@@ -300,6 +301,7 @@ public class ATNSerializer {
 		int ndecisions = ATNSimulator.toInt(data[p++]);
 		for (int i=1; i<=ndecisions; i++) {
 			int s = ATNSimulator.toInt(data[p++]);
+			boolean nonGreedy = ATNSimulator.toInt(data[p++]) != 0;
 			buf.append(i-1).append(":").append(s).append("\n");
 		}
 		return buf.toString();

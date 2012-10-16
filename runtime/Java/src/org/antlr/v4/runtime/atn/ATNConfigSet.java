@@ -148,7 +148,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		return alts;
 	}
 
-	public boolean isReadOnly() {
+	public final boolean isReadOnly() {
 		return mergedConfigs == null;
 	}
 
@@ -260,6 +260,35 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		return configs.toArray();
 	}
 
+	public void removeNonGreedyConfigsInAlts(@NotNull BitSet alts) {
+		ensureWritable();
+
+		if (this.mergedConfigs != null) {
+			for (Iterator<Map.Entry<Long, ATNConfig>> it = this.mergedConfigs.entrySet().iterator(); it.hasNext(); ) {
+				Map.Entry<Long, ATNConfig> entry = it.next();
+				if (!entry.getValue().isGreedy() && alts.get(entry.getValue().getAlt())) {
+					it.remove();
+				}
+			}
+		}
+
+		if (this.unmerged != null) {
+			for (Iterator<ATNConfig> it = this.unmerged.iterator(); it.hasNext(); ) {
+				ATNConfig value = it.next();
+				if (!value.isGreedy() && alts.get(value.getAlt())) {
+					it.remove();
+				}
+			}
+		}
+
+		for (Iterator<ATNConfig> it = this.configs.iterator(); it.hasNext(); ) {
+			ATNConfig value = it.next();
+			if (!value.isGreedy() && alts.get(value.getAlt())) {
+				it.remove();
+			}
+		}
+	}
+
 	@Override
 	public <T> T[] toArray(T[] a) {
 		return configs.toArray(a);
@@ -364,14 +393,15 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			return false;
 		}
 
-		return left.getSemanticContext().equals(right.getSemanticContext());
+		return left.getNonGreedyDepth() == right.getNonGreedyDepth()
+			&& left.getSemanticContext().equals(right.getSemanticContext());
 	}
 
 	private static long getKey(ATNConfig e) {
-		long key = ((long)e.getState().stateNumber << 32) + (e.getAlt() << 3);
-		//key |= e.reachesIntoOuterContext != 0 ? 1 : 0;
-		//key |= e.resolveWithPredicate ? 1 << 1 : 0;
-		//key |= e.traversedPredicate ? 1 << 2 : 0;
+		long key = e.getState().stateNumber;
+		key = (key << 12) | (e.getAlt() & 0xFFF);
+		key = (key << 8) | (e.getNonGreedyDepth() & 0xFF);
+		//key = (key << 1) | (e.getReachesIntoOuterContext() ? 1 : 0);
 		return key;
 	}
 

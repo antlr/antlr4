@@ -455,7 +455,7 @@ public class TestATNParserPrediction extends BaseTest {
 								  String inputString, int expectedAlt)
 	{
 		Tool.internalOption_ShowATNConfigsInDFA = true;
-		ATN lexatn = createATN(lg);
+		ATN lexatn = createATN(lg, true);
 		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn);
 		IntegerList types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
@@ -506,7 +506,7 @@ public class TestATNParserPrediction extends BaseTest {
 					  String inputString, ParserRuleContext<Token> ctx)
 	{
 		Tool.internalOption_ShowATNConfigsInDFA = true;
-		ATN lexatn = createATN(lg);
+		ATN lexatn = createATN(lg, true);
 		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn);
 
 		semanticProcess(lg);
@@ -542,7 +542,7 @@ public class TestATNParserPrediction extends BaseTest {
 									 String[] inputString, String[] dfaString)
 	{
 //		Tool.internalOption_ShowATNConfigsInDFA = true;
-		ATN lexatn = createATN(lg);
+		ATN lexatn = createATN(lg, true);
 		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn);
 
 		semanticProcess(lg);

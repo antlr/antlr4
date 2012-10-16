@@ -29,6 +29,229 @@ public class TestLexerExec extends BaseTest {
    		assertEquals(expecting, found);
    	}
 
+	@Test
+	public void testImplicitGreedyOptional() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"
+			+ "CMT : '//' .* '\\n' CMT?;\n"
+			+ "WS : (' '|'\\t')+;";
+
+		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
+		assertEquals(
+			"[@0,0:13='//blah\\n//blah\\n',<1>,1:0]\n" +
+			"[@1,14:13='<EOF>',<-1>,3:14]\n", found);
+		assertNull(stderrDuringParse);
+	}
+
+	@Test
+	public void testExplicitGreedyOptional() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"
+			+ "CMT : '//' .* '\\n' (options{greedy=true;} : CMT)?;\n"
+			+ "WS : (' '|'\\t')+;";
+
+		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
+		assertEquals(
+			"[@0,0:13='//blah\\n//blah\\n',<1>,1:0]\n" +
+			"[@1,14:13='<EOF>',<-1>,3:14]\n", found);
+		assertNull(stderrDuringParse);
+	}
+
+	@Test
+	public void testExplicitNonGreedyOptional() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"
+			+ "CMT : '//' .* '\\n' (options{greedy=false;} : CMT)?;\n"
+			+ "WS : (' '|'\\t')+;";
+
+		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
+		assertEquals(
+			"[@0,0:6='//blah\\n',<1>,1:0]\n" +
+			"[@1,7:13='//blah\\n',<1>,2:0]\n" +
+			"[@2,14:13='<EOF>',<-1>,3:7]\n", found);
+		assertNull(stderrDuringParse);
+	}
+
+	@Test
+	public void testImplicitGreedyClosure() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"
+			+ "CMT : '//' .* '\\n' CMT*;\n"
+			+ "WS : (' '|'\\t')+;";
+
+		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
+		assertEquals(
+			"[@0,0:13='//blah\\n//blah\\n',<1>,1:0]\n" +
+			"[@1,14:13='<EOF>',<-1>,3:14]\n", found);
+		assertNull(stderrDuringParse);
+	}
+
+	@Test
+	public void testExplicitGreedyClosure() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"
+			+ "CMT : '//' .* '\\n' (options{greedy=true;} : CMT)*;\n"
+			+ "WS : (' '|'\\t')+;";
+
+		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
+		assertEquals(
+			"[@0,0:13='//blah\\n//blah\\n',<1>,1:0]\n" +
+			"[@1,14:13='<EOF>',<-1>,3:14]\n", found);
+		assertNull(stderrDuringParse);
+	}
+
+	@Test
+	public void testExplicitNonGreedyClosure() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"
+			+ "CMT : '//' .* '\\n' (options{greedy=false;} : CMT)*;\n"
+			+ "WS : (' '|'\\t')+;";
+
+		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
+		assertEquals(
+			"[@0,0:6='//blah\\n',<1>,1:0]\n" +
+			"[@1,7:13='//blah\\n',<1>,2:0]\n" +
+			"[@2,14:13='<EOF>',<-1>,3:7]\n", found);
+		assertNull(stderrDuringParse);
+	}
+
+	@Test
+	public void testImplicitGreedyPositiveClosure() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"
+			+ "CMT : ('//' .* '\\n')+;\n"
+			+ "WS : (' '|'\\t')+;";
+
+		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
+		assertEquals(
+			"[@0,0:13='//blah\\n//blah\\n',<1>,1:0]\n" +
+			"[@1,14:13='<EOF>',<-1>,3:14]\n", found);
+		assertNull(stderrDuringParse);
+	}
+
+	@Test
+	public void testExplicitGreedyPositiveClosure() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"
+			+ "CMT : (options{greedy=true;} : '//' .* '\\n')+;\n"
+			+ "WS : (' '|'\\t')+;";
+
+		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
+		assertEquals(
+			"[@0,0:13='//blah\\n//blah\\n',<1>,1:0]\n" +
+			"[@1,14:13='<EOF>',<-1>,3:14]\n", found);
+		assertNull(stderrDuringParse);
+	}
+
+	@Test
+	public void testExplicitNonGreedyPositiveClosure() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"
+			+ "CMT : (options{greedy=false;} : '//' .* '\\n')+;\n"
+			+ "WS : (' '|'\\t')+;";
+
+		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
+		assertEquals(
+			"[@0,0:6='//blah\\n',<1>,1:0]\n" +
+			"[@1,7:13='//blah\\n',<1>,2:0]\n" +
+			"[@2,14:13='<EOF>',<-1>,3:7]\n", found);
+		assertNull(stderrDuringParse);
+	}
+
+	@Test public void testRecursiveLexerRuleRefWithWildcardStar() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"CMT : '/*' (CMT | .)* '*/' ;\n" +
+			"WS : (' '|'\n')+ ;\n"
+			/*+ "ANY : .;"*/;
+
+		String expecting =
+			"[@0,0:8='/* ick */',<1>,1:0]\n" +
+			"[@1,9:9='\\n',<2>,1:9]\n" +
+			"[@2,10:17='/* /* */',<1>,2:0]\n" +
+			"[@3,18:18='\\n',<2>,2:8]\n" +
+			"[@4,19:31='/* /*nested*/',<1>,3:0]\n" +
+			"[@5,32:32=' ',<2>,3:13]\n" +
+			"[@6,36:35='<EOF>',<-1>,4:0]\n";
+
+		// stuff on end of comment matches another rule
+		String found = execLexer("L.g4", grammar, "L",
+						  "/* ick */\n" +
+						  "/* /* */\n" +
+						  "/* /*nested*/ */\n");
+		assertEquals(expecting, found);
+		assertEquals(
+			"line 3:14 token recognition error at: '*'\n" +
+			"line 3:15 token recognition error at: '/\n'\n", stderrDuringParse);
+		// stuff on end of comment doesn't match another rule
+		expecting =
+			"[@0,0:8='/* ick */',<1>,1:0]\n" +
+			"[@1,10:10='\\n',<2>,1:10]\n" +
+			"[@2,11:18='/* /* */',<1>,2:0]\n" +
+			"[@3,20:20='\\n',<2>,2:9]\n" +
+			"[@4,21:33='/* /*nested*/',<1>,3:0]\n" +
+			"[@5,34:34=' ',<2>,3:13]\n" +
+			"[@6,38:38='\\n',<2>,3:17]\n" +
+			"[@7,39:38='<EOF>',<-1>,4:18]\n";
+		found = execLexer("L.g4", grammar, "L",
+						  "/* ick */x\n" +
+						  "/* /* */x\n" +
+						  "/* /*nested*/ */x\n");
+		assertEquals(expecting, found);
+		assertEquals(
+			"line 1:9 token recognition error at: 'x'\n" +
+			"line 2:8 token recognition error at: 'x'\n" +
+			"line 3:14 token recognition error at: '*'\n" +
+			"line 3:15 token recognition error at: '/x'\n", stderrDuringParse);
+	}
+
+	@Test public void testRecursiveLexerRuleRefWithWildcardPlus() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"CMT : '/*' (CMT | .)+ '*/' ;\n" +
+			"WS : (' '|'\n')+ ;\n"
+			/*+ "ANY : .;"*/;
+
+		String expecting =
+			"[@0,0:8='/* ick */',<1>,1:0]\n" +
+			"[@1,9:9='\\n',<2>,1:9]\n" +
+			"[@2,10:17='/* /* */',<1>,2:0]\n" +
+			"[@3,18:18='\\n',<2>,2:8]\n" +
+			"[@4,19:31='/* /*nested*/',<1>,3:0]\n" +
+			"[@5,32:32=' ',<2>,3:13]\n" +
+			"[@6,36:35='<EOF>',<-1>,4:0]\n";
+
+		// stuff on end of comment matches another rule
+		String found = execLexer("L.g4", grammar, "L",
+						  "/* ick */\n" +
+						  "/* /* */\n" +
+						  "/* /*nested*/ */\n");
+		assertEquals(expecting, found);
+		assertEquals(
+			"line 3:14 token recognition error at: '*'\n" +
+			"line 3:15 token recognition error at: '/\n'\n", stderrDuringParse);
+		// stuff on end of comment doesn't match another rule
+		expecting =
+			"[@0,0:8='/* ick */',<1>,1:0]\n" +
+			"[@1,10:10='\\n',<2>,1:10]\n" +
+			"[@2,11:18='/* /* */',<1>,2:0]\n" +
+			"[@3,20:20='\\n',<2>,2:9]\n" +
+			"[@4,21:33='/* /*nested*/',<1>,3:0]\n" +
+			"[@5,34:34=' ',<2>,3:13]\n" +
+			"[@6,38:38='\\n',<2>,3:17]\n" +
+			"[@7,39:38='<EOF>',<-1>,4:18]\n";
+		found = execLexer("L.g4", grammar, "L",
+						  "/* ick */x\n" +
+						  "/* /* */x\n" +
+						  "/* /*nested*/ */x\n");
+		assertEquals(expecting, found);
+		assertEquals(
+			"line 1:9 token recognition error at: 'x'\n" +
+			"line 2:8 token recognition error at: 'x'\n" +
+			"line 3:14 token recognition error at: '*'\n" +
+			"line 3:15 token recognition error at: '/x'\n", stderrDuringParse);
+	}
+
 	@Test public void testActionExecutedInDFA() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+

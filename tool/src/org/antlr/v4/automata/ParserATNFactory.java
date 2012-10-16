@@ -422,9 +422,19 @@ public class ParserATNFactory implements ATNFactory {
 	@NotNull
 	@Override
 	public Handle optional(@NotNull GrammarAST optAST, @NotNull Handle blk) {
-		// TODO: no such thing as nongreedy ()? so give error
 		BlockStartState blkStart = (BlockStartState)blk.left;
-		epsilon(blkStart, blk.right);
+
+		BlockAST blkAST = (BlockAST)optAST.getChild(0);
+		blkStart.nonGreedy = !isGreedy(blkAST);
+
+		if (!blkStart.nonGreedy) {
+			epsilon(blkStart, blk.right);
+		} else {
+			Transition existing = blkStart.removeTransition(0);
+			epsilon(blkStart, blk.right);
+			blkStart.addTransition(existing);
+		}
+
 		optAST.atnState = blk.left;
 		return blk;
 	}
@@ -454,11 +464,12 @@ public class ParserATNFactory implements ATNFactory {
 		epsilon(blkEnd, loop);		// blk can see loop back
 
 		BlockAST blkAST = (BlockAST)plusAST.getChild(0);
-		if ( !g.isLexer() || isGreedy(blkAST) ) {
+		loop.nonGreedy = !isGreedy(blkAST);
+		if ( !loop.nonGreedy ) {
 			epsilon(loop, blkStart);	// loop back to start
 			epsilon(loop, end);			// or exit
 		}
-		else { // only lexers flip entry/exit branches for nongreedy
+		else {
 			// if not greedy, priority to exit branch; make it first
 			epsilon(loop, end);			// exit
 			epsilon(loop, blkStart);	// loop back to start
@@ -493,11 +504,12 @@ public class ParserATNFactory implements ATNFactory {
 		end.loopBackState = loop;
 
 		BlockAST blkAST = (BlockAST)starAST.getChild(0);
-		if ( !g.isLexer() || isGreedy(blkAST) ) {
+		entry.nonGreedy = !isGreedy(blkAST);
+		if ( !entry.nonGreedy ) {
 			epsilon(entry, blkStart);	// loop enter edge (alt 1)
 			epsilon(entry, end);		// bypass loop edge (alt 2)
 		}
-		else { // only lexers flip entry/exit branches for nongreedy
+		else {
 			// if not greedy, priority to exit branch; make it first
 			epsilon(entry, end);		// bypass loop edge (alt 1)
 			epsilon(entry, blkStart);	// loop enter edge (alt 2)
@@ -622,7 +634,11 @@ public class ParserATNFactory implements ATNFactory {
 	public boolean isGreedy(@NotNull BlockAST blkAST) {
 		boolean greedy = true;
 		String greedyOption = blkAST.getOptionString("greedy");
-		if ( blockHasWildcardAlt(blkAST) || greedyOption!=null&&greedyOption.equals("false") ) {
+		if (greedyOption != null) {
+			return Boolean.parseBoolean(greedyOption);
+		}
+
+		if ( blockHasWildcardAlt(blkAST) ) {
 			greedy = false;
 		}
 		return greedy;

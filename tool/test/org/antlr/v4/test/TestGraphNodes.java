@@ -156,6 +156,26 @@ public class TestGraphNodes extends TestCase {
 		assertEquals(expecting, toDOTString(r));
 	}
 
+	@Test public void test_aa$_a$_$_fullCtx() {
+		PredictionContext empty = PredictionContext.EMPTY_FULL;
+		PredictionContext child1 = createSingleton(empty, 8);
+		PredictionContext right = contextCache.join(empty, child1);
+		PredictionContext left = createSingleton(right, 8);
+		PredictionContext merged = contextCache.join(left, right);
+		String actual = toDOTString(merged);
+		System.out.println(actual);
+		String expecting =
+			"digraph G {\n" +
+			"rankdir=LR;\n" +
+			"  s0[shape=record, label=\"<p0>|<p1>$\"];\n" +
+			"  s1[shape=record, label=\"<p0>|<p1>$\"];\n" +
+			"  s2[label=\"$\"];\n" +
+			"  s0:p0->s1[label=\"8\"];\n" +
+			"  s1:p0->s2[label=\"8\"];\n" +
+			"}\n";
+		assertEquals(expecting, actual);
+	}
+
 	@Test public void test_ax$_a$_fullctx() {
 		PredictionContext x = x(true);
 		PredictionContext a1 = createSingleton(x, 1);
