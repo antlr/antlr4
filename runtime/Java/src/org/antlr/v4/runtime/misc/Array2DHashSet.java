@@ -177,6 +177,7 @@ public class Array2DHashSet<T> implements EquivalenceSet<T> {
 			}
 
 			@Override
+			@SuppressWarnings("unchecked")
 			public T next() {
 				if (!hasNext()) {
 					throw new NoSuchElementException();
