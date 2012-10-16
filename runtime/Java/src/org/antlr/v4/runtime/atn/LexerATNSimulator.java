@@ -639,7 +639,9 @@ public class LexerATNSimulator extends ATNSimulator {
 			break;
 
 		case ATNState.STAR_LOOP_BACK:
-			config = config.exitNonGreedyBlock();
+			if (((StarLoopbackState)p).getLoopEntryState().nonGreedy) {
+				config = config.exitNonGreedyBlock();
+			}
 			break;
 
 		case ATNState.LOOP_END:
@@ -650,9 +652,8 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 			}
 			else {
-				assert loopBackState instanceof StarLoopbackState;
-				ATNState loopEntry = loopBackState.transition(0).target;
-				if (loopEntry instanceof StarLoopEntryState && ((StarLoopEntryState)loopEntry).nonGreedy) {
+				StarLoopbackState starLoopbackState = (StarLoopbackState)loopBackState;
+				if (starLoopbackState.getLoopEntryState().nonGreedy) {
 					config = config.exitNonGreedyBlock();
 				}
 			}
