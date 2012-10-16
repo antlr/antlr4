@@ -58,6 +58,11 @@ public final class ActionTransition extends Transition {
 	}
 
 	@Override
+	public boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+		return false;
+	}
+
+	@Override
 	public String toString() {
 		return "action_"+ruleIndex+":"+actionIndex;
 	}

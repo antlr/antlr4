@@ -52,6 +52,11 @@ public final class AtomTransition extends Transition {
 	public IntervalSet label() { return IntervalSet.of(label); }
 
 	@Override
+	public boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+		return label == symbol;
+	}
+
+	@Override
 	@NotNull
 	public String toString() {
 		return String.valueOf(label);

@@ -464,66 +464,11 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	@Nullable
 	public ATNState getReachableTarget(Transition trans, int t) {
-		switch (trans.getSerializationType()) {
-		case Transition.ATOM:
-			AtomTransition at = (AtomTransition)trans;
-			if ( at.label == t ) {
-				if ( debug ) {
-					System.out.format("match %s\n", getTokenName(at.label));
-				}
-
-				return at.target;
-			}
-
-			return null;
-
-		case Transition.RANGE:
-			RangeTransition rt = (RangeTransition)trans;
-			if ( t>=rt.from && t<=rt.to ) {
-				if ( debug ) {
-					System.out.format("match range %s\n", rt);
-				}
-
-				return rt.target;
-			}
-
-			return null;
-
-		case Transition.SET:
-			SetTransition st = (SetTransition)trans;
-			if ( st.set.contains(t) ) {
-				if ( debug ) {
-					System.out.format("match set %s\n", st.set.toString(true));
-				}
-
-				return st.target;
-			}
-
-			return null;
-
-		case Transition.NOT_SET:
-			NotSetTransition nst = (NotSetTransition)trans;
-			if (!nst.set.contains(t) && t!=IntStream.EOF) // ~set doesn't not match EOF
-			{
-				if ( debug ) {
-					System.out.format("match ~set %s\n", nst.set.toString(true));
-				}
-
-				return nst.target;
-			}
-
-			return null;
-
-		case Transition.WILDCARD:
-			if (t != IntStream.EOF) {
-				return trans.target;
-			}
-
-			return null;
-
-		default:
-			return null;
+		if (trans.matches(t, Lexer.MIN_CHAR_VALUE, Lexer.MAX_CHAR_VALUE)) {
+			return trans.target;
 		}
+
+		return null;
 	}
 
 	/** Delete configs for alt following ci that have a wildcard edge but

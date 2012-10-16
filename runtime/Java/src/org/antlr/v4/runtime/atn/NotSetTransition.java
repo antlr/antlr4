@@ -44,6 +44,13 @@ public final class NotSetTransition extends SetTransition {
 	}
 
 	@Override
+	public boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+		return symbol >= minVocabSymbol
+			&& symbol <= maxVocabSymbol
+			&& !super.matches(symbol, minVocabSymbol, maxVocabSymbol);
+	}
+
+	@Override
 	public String toString() {
 		return '~'+super.toString();
 	}

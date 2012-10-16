@@ -57,6 +57,11 @@ public final class PredicateTransition extends Transition {
 	@Override
 	public boolean isEpsilon() { return true; }
 
+	@Override
+	public boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+		return false;
+	}
+
     public SemanticContext.Predicate getPredicate() {
    		return new SemanticContext.Predicate(ruleIndex, predIndex, isCtxDependent);
    	}

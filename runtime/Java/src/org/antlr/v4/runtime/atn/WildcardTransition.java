@@ -40,6 +40,11 @@ public final class WildcardTransition extends Transition {
 	}
 
 	@Override
+	public boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+		return symbol >= minVocabSymbol && symbol <= maxVocabSymbol;
+	}
+
+	@Override
 	@NotNull
 	public String toString() {
 		return ".";
