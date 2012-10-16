@@ -409,11 +409,39 @@ public class LexerATNSimulator extends ATNSimulator {
 						 	  reach, prevAccept.config, prevAccept.index);
 		}
 
+		/* Non-greedy handling works by removing all non-greedy configurations
+		 * from reach when an accept state is reached for the same token. For
+		 * example, consider the following two tokens:
+		 *
+		 * BLOCK : '{' .* '}';
+		 * OPTIONAL_BLOCK : '{' .* '}' '?';
+		 *
+		 * With the following input:
+		 *
+		 * {stuff}?
+		 *
+		 * After matching '}', an accept state at the end of BLOCK is reached,
+		 * so any configurations inside the non-greedy .* loop in BLOCK will be
+		 * removed from reach. The configuration(s) inside the non-greedy .*
+		 * loop in OPTIONAL_BLOCK are unaffected by this because no
+		 * configuration is in an accept state for OPTIONAL_BLOCK at this input
+		 * symbol.
+		 */
 		BitSet altsAtAcceptState = new BitSet();
 		BitSet nonGreedyAlts = new BitSet();
+		LexerATNConfig acceptConfig = null;
 		for (ATNConfig config : reach) {
 			if (config.state instanceof RuleStopState) {
 				altsAtAcceptState.set(config.alt);
+
+				if ( debug ) {
+					System.out.format("processAcceptConfigs: hit accept config %s index %d\n",
+									  config, input.index());
+				}
+
+				if (acceptConfig == null) {
+					acceptConfig = (LexerATNConfig)config;
+				}
 			}
 
 			if (!((LexerATNConfig)config).isGreedy()) {
@@ -423,38 +451,24 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		nonGreedyAlts.and(altsAtAcceptState);
+		// this is now "alts with at least one non-greedy config and one accept config"
 		if (!nonGreedyAlts.isEmpty()) {
 			reach.removeNonGreedyConfigsInAlts(nonGreedyAlts);
 		}
 
-		for (int ci=0; ci<reach.size(); ci++) {
-			LexerATNConfig c = (LexerATNConfig)reach.get(ci);
-			if ( c.state instanceof RuleStopState) {
-				if ( debug ) {
-					System.out.format("processAcceptConfigs: hit accept config %s index %d\n",
-									  c, input.index());
+		// mark the new preferred accept state
+		if (acceptConfig != null && input.index() > prevAccept.index) {
+			if ( debug ) {
+				if ( prevAccept.index>=0 ) {
+					System.out.println("processAcceptConfigs: found longer token");
 				}
-
-				int index = input.index();
-				if ( index > prevAccept.index ) {
-					if ( debug ) {
-						if ( prevAccept.index>=0 ) {
-							System.out.println("processAcceptConfigs: found longer token");
-						}
-					}
-					// condition > not >= will favor prev accept at same index.
-					// This way, "int" is keyword not ID if listed first.
-					traceAcceptState(c.alt);
-					if ( debug ) {
-						System.out.format("markExecSettings for %s @ index=%d, line %d:%d\n", c, index, prevAccept.line, prevAccept.charPos);
-					}
-					captureSimState(prevAccept, input, c);
-				}
-
-			 	// move to next char, looking for longer match
-				// (we continue processing if there are states in reach)
 			}
+			// condition > not >= will favor prev accept at same index.
+			// This way, "int" is keyword not ID if listed first.
+			traceAcceptState(acceptConfig.alt);
+			captureSimState(prevAccept, input, acceptConfig);
 		}
+
 		return reach;
 	}
 
