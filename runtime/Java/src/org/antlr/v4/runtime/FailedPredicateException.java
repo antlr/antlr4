@@ -40,6 +40,7 @@ import org.antlr.v4.runtime.misc.Nullable;
 public class FailedPredicateException extends RecognitionException {
 	public int ruleIndex;
 	public int predIndex;
+	public String predicate;
 	public String msg;
 
 	public FailedPredicateException(Parser recognizer) {
@@ -52,8 +53,25 @@ public class FailedPredicateException extends RecognitionException {
 		PredicateTransition trans = (PredicateTransition)s.transition(0);
 		ruleIndex = trans.ruleIndex;
 		predIndex = trans.predIndex;
+		this.predicate = predicate;
 		this.msg = String.format("failed predicate: {%s}?", predicate);
 		Token la = recognizer.getCurrentToken();
 		this.offendingToken = la;
 	}
+
+	public FailedPredicateException(Parser recognizer,
+									@Nullable String predicate,
+									@Nullable String msg)
+	{
+		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
+		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer._ctx.s);
+		PredicateTransition trans = (PredicateTransition)s.transition(0);
+		ruleIndex = trans.ruleIndex;
+		predIndex = trans.predIndex;
+		this.predicate = predicate;
+		this.msg = msg;
+		Token la = recognizer.getCurrentToken();
+		this.offendingToken = la;
+	}
+
 }

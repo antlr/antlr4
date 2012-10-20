@@ -489,7 +489,7 @@ ArgAction(a, chunks) ::= "<chunks>"
 
 SemPred(p, chunks, failChunks) ::= <<
 setState(<p.stateNumber>);
-if (!(<chunks>)) throw new FailedPredicateException(this, <if(p.msg)><p.msg><else><failChunks><endif>);
+if (!(<chunks>)) throw new FailedPredicateException(this, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><endif>);
 >>
 
 ExceptionClause(e, catchArg, catchAction) ::= <<
