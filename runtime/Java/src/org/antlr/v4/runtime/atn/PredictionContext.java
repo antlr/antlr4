@@ -70,7 +70,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		return this == EMPTY;
 	}
 
-	public boolean hasEmpty() {
+	public boolean hasEmptyPath() {
 		return getInvokingState(size() - 1) == EMPTY_INVOKING_STATE;
 	}
 

@@ -444,7 +444,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 			}
 
-			if (!((LexerATNConfig)config).isGreedy()) {
+			if ( !config.isGreedy() ) {
 				assert !(config.state instanceof RuleStopState);
 				nonGreedyAlts.set(config.alt);
 			}
@@ -582,7 +582,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 			}
 
-			if ( config.context == null || config.context.hasEmpty() ) {
+			if ( config.context == null || config.context.hasEmptyPath() ) {
 				if (config.context == null || config.context.isEmpty()) {
 					configs.add(config);
 					return;

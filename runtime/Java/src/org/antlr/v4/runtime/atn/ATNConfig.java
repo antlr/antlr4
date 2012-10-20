@@ -75,6 +75,14 @@ public class ATNConfig {
 		return true;
 	}
 
+	/** Lexer non-greedy implementations need to track information per
+	 *  ATNConfig. When the lexer reaches an accept state for a lexer
+	 *  rule, it needs to wipe out any configurations associated with
+	 *  that rule that are part of a non-greedy subrule. To do that it
+	 *  has to make sure that it tracks when a configuration was derived
+	 *  from an element within a non-greedy subrule. We use depth for
+	 *  that. We're greedy when the depth is 0.
+	 */
 	public int getNonGreedyDepth() {
 		return 0;
 	}
