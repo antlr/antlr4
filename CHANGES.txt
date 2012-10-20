@@ -1,5 +1,10 @@
 ANTLR v4 Honey Badger
 
+October 20, 2012
+
+* Merged Sam's fix for nongreedy lexer/parser. lots of unit tests. A fix in
+  prediction ctx merge. https://github.com/parrt/antlr4/pull/99
+
 October 14, 2012
 
 * Rebuild how ANTLR detects SLL conflict and failover to full LL.  LL is
