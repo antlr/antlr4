@@ -1,30 +1,31 @@
 /*
- [The "BSD license"]
-  Copyright (c) 2011 Terence Parr
-  All rights reserved.
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions
-  are met:
-
-  1. Redistributions of source code must retain the above copyright
-     notice, this list of conditions and the following disclaimer.
-  2. Redistributions in binary form must reproduce the above copyright
-     notice, this list of conditions and the following disclaimer in the
-     documentation and/or other materials provided with the distribution.
-  3. The name of the author may not be used to endorse or promote products
-     derived from this software without specific prior written permission.
-
-  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * [The "BSD license"]
+ *  Copyright (c) 2012 Terence Parr
+ *  Copyright (c) 2012 Sam Harwell
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.antlr.v4.runtime.atn;
@@ -42,7 +43,6 @@ import org.antlr.v4.runtime.misc.Nullable;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.BitSet;
 
 /** "dup" of ParserInterpreter */
 public class LexerATNSimulator extends ATNSimulator {
@@ -315,7 +315,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			}
 
 			if (target == null) {
-				reach = new ATNConfigSet();
+				reach = new OrderedATNConfigSet();
 
 				// if we don't find an existing DFA state
 				// Fill reach starting from closure, following t transitions
@@ -387,7 +387,14 @@ public class LexerATNSimulator extends ATNSimulator {
 	 *  we can reach upon input t. Parameter reach is a return parameter.
 	 */
 	protected void getReachableConfigSet(ATNConfigSet closure, ATNConfigSet reach, int t) {
+		// this is used to skip processing for configs which have a lower priority
+		// than a config that already reached an accept state for the same rule
+		int skipAlt = ATN.INVALID_ALT_NUMBER;
 		for (ATNConfig c : closure) {
+			if (c.alt == skipAlt) {
+				continue;
+			}
+
 			if ( debug ) {
 				System.out.format("testing %s at %s\n", getTokenName(t), c.toString(recog, true));
 			}
@@ -397,7 +404,12 @@ public class LexerATNSimulator extends ATNSimulator {
 				Transition trans = c.state.transition(ti);
 				ATNState target = getReachableTarget(trans, t);
 				if ( target!=null ) {
-					closure(new LexerATNConfig((LexerATNConfig)c, target), reach);
+					if (closure(new LexerATNConfig((LexerATNConfig)c, target), reach)) {
+						// any remaining configs for this alt have a lower priority than
+						// the one that just reached an accept state.
+						skipAlt = c.alt;
+						break;
+					}
 				}
 			}
 		}
@@ -409,51 +421,12 @@ public class LexerATNSimulator extends ATNSimulator {
 						 	  reach, prevAccept.config, prevAccept.index);
 		}
 
-		/* Non-greedy handling works by removing all non-greedy configurations
-		 * from reach when an accept state is reached for the same token. For
-		 * example, consider the following two tokens:
-		 *
-		 * BLOCK : '{' .* '}';
-		 * OPTIONAL_BLOCK : '{' .* '}' '?';
-		 *
-		 * With the following input:
-		 *
-		 * {stuff}?
-		 *
-		 * After matching '}', an accept state at the end of BLOCK is reached,
-		 * so any configurations inside the non-greedy .* loop in BLOCK will be
-		 * removed from reach. The configuration(s) inside the non-greedy .*
-		 * loop in OPTIONAL_BLOCK are unaffected by this because no
-		 * configuration is in an accept state for OPTIONAL_BLOCK at this input
-		 * symbol.
-		 */
-		BitSet altsAtAcceptState = new BitSet();
-		BitSet nonGreedyAlts = new BitSet();
 		LexerATNConfig acceptConfig = null;
 		for (ATNConfig config : reach) {
 			if (config.state instanceof RuleStopState) {
-				altsAtAcceptState.set(config.alt);
-
-				if ( debug ) {
-					System.out.format("processAcceptConfigs: hit accept config %s index %d\n",
-									  config, input.index());
-				}
-
-				if (acceptConfig == null) {
-					acceptConfig = (LexerATNConfig)config;
-				}
+				acceptConfig = (LexerATNConfig)config;
+				break;
 			}
-
-			if ( !config.isGreedy() ) {
-				assert !(config.state instanceof RuleStopState);
-				nonGreedyAlts.set(config.alt);
-			}
-		}
-
-		nonGreedyAlts.and(altsAtAcceptState);
-		// this is now "alts with at least one non-greedy config and one accept config"
-		if (!nonGreedyAlts.isEmpty()) {
-			reach.removeNonGreedyConfigsInAlts(nonGreedyAlts);
 		}
 
 		// mark the new preferred accept state
@@ -463,6 +436,7 @@ public class LexerATNSimulator extends ATNSimulator {
 					System.out.println("processAcceptConfigs: found longer token");
 				}
 			}
+
 			// condition > not >= will favor prev accept at same index.
 			// This way, "int" is keyword not ID if listed first.
 			traceAcceptState(acceptConfig.alt);
@@ -558,7 +532,7 @@ public class LexerATNSimulator extends ATNSimulator {
 											 @NotNull ATNState p)
 	{
 		PredictionContext initialContext = PredictionContext.EMPTY;
-		ATNConfigSet configs = new ATNConfigSet();
+		ATNConfigSet configs = new OrderedATNConfigSet();
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
 			LexerATNConfig c = new LexerATNConfig(target, i+1, initialContext);
@@ -567,7 +541,17 @@ public class LexerATNSimulator extends ATNSimulator {
 		return configs;
 	}
 
-	protected void closure(@NotNull LexerATNConfig config, @NotNull ATNConfigSet configs) {
+	/**
+	 * Since the alternatives within any lexer decision are ordered by
+	 * preference, this method stops pursuing the closure as soon as an accept
+	 * state is reached. After the first accept state is reached by depth-first
+	 * search from {@code config}, all other (potentially reachable) states for
+	 * this rule would have a lower priority.
+	 *
+	 * @return {@code true} if an accept state is reached, otherwise
+	 * {@code false}.
+	 */
+	protected boolean closure(@NotNull LexerATNConfig config, @NotNull ATNConfigSet configs) {
 		if ( debug ) {
 			System.out.println("closure("+config.toString(recog, true)+")");
 		}
@@ -585,10 +569,12 @@ public class LexerATNSimulator extends ATNSimulator {
 			if ( config.context == null || config.context.hasEmptyPath() ) {
 				if (config.context == null || config.context.isEmpty()) {
 					configs.add(config);
-					return;
+				}
+				else {
+					configs.add(new LexerATNConfig(config, config.state, PredictionContext.EMPTY));
 				}
 
-				configs.add(new LexerATNConfig(config, config.state, PredictionContext.EMPTY));
+				return true;
 			}
 
 			if ( config.context!=null && !config.context.isEmpty() ) {
@@ -609,11 +595,13 @@ public class LexerATNSimulator extends ATNSimulator {
 						RuleTransition rt = (RuleTransition)invokingState.transition(0);
 						ATNState retState = rt.followState;
 						LexerATNConfig c = new LexerATNConfig(retState, config.alt, newContext);
-						closure(c, configs);
+						if (closure(c, configs)) {
+							return true;
+						}
 					}
 				}
 			}
-			return;
+			return false;
 		}
 
 		// optimization
@@ -622,19 +610,17 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		ATNState p = config.state;
-		boolean nonGreedy = (p instanceof DecisionState && ((DecisionState)p).nonGreedy && !(p instanceof PlusLoopbackState))
-			|| (p instanceof PlusBlockStartState && ((PlusBlockStartState)p).loopBackState.nonGreedy);
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			Transition t = p.transition(i);
 			LexerATNConfig c = getEpsilonTarget(config, t, configs);
 			if ( c!=null ) {
-				if (nonGreedy) {
-					c = c.enterNonGreedyBlock();
+				if (closure(c, configs)) {
+					return true;
 				}
-
-				closure(c, configs);
 			}
 		}
+
+		return false;
 	}
 
 	// side-effect: can alter configs.hasSemanticContext
@@ -644,46 +630,6 @@ public class LexerATNSimulator extends ATNSimulator {
 									  @NotNull ATNConfigSet configs)
 	{
 		ATNState p = config.state;
-		switch (p.getStateType()) {
-		case ATNState.PLUS_LOOP_BACK:
-			if (((PlusLoopbackState)p).nonGreedy) {
-				config = config.exitNonGreedyBlock();
-			}
-
-			break;
-
-		case ATNState.STAR_LOOP_BACK:
-			if (((StarLoopbackState)p).getLoopEntryState().nonGreedy) {
-				config = config.exitNonGreedyBlock();
-			}
-			break;
-
-		case ATNState.LOOP_END:
-			ATNState loopBackState = ((LoopEndState)p).loopBackState;
-			if (loopBackState instanceof PlusLoopbackState) {
-				if (((PlusLoopbackState)loopBackState).nonGreedy) {
-					config = config.exitNonGreedyBlock();
-				}
-			}
-			else {
-				StarLoopbackState starLoopbackState = (StarLoopbackState)loopBackState;
-				if (starLoopbackState.getLoopEntryState().nonGreedy) {
-					config = config.exitNonGreedyBlock();
-				}
-			}
-
-			break;
-
-		case ATNState.BLOCK_END:
-			if (p.isNonGreedyExitState()) {
-				config = config.exitNonGreedyBlock();
-			}
-			break;
-
-		default:
-			break;
-		}
-
 		LexerATNConfig c = null;
 		switch (t.getSerializationType()) {
 			case Transition.RULE:

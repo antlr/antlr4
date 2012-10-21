@@ -1,37 +1,37 @@
 /*
- [The "BSD license"]
- Copyright (c) 2011 Terence Parr
- All rights reserved.
-
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions
- are met:
-
- 1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
- 2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
- 3. The name of the author may not be used to endorse or promote products
-    derived from this software without specific prior written permission.
-
- THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * [The "BSD license"]
+ *  Copyright (c) 2012 Terence Parr
+ *  Copyright (c) 2012 Sam Harwell
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -39,7 +39,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /** Specialized OrderedHashSet that can track info about the set.
@@ -248,7 +247,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			int hashCode = 7;
 			hashCode = 31 * hashCode + o.state.stateNumber;
 			hashCode = 31 * hashCode + o.alt;
-			hashCode = 31 * hashCode + o.getNonGreedyDepth();
 			hashCode = 31 * hashCode + o.semanticContext.hashCode();
 	        return hashCode;
 		}
@@ -260,7 +258,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			if ( hashCode(a) != hashCode(b) ) return false;
 			return a.state.stateNumber==b.state.stateNumber
 				&& a.alt==b.alt
-				&& a.getNonGreedyDepth() == b.getNonGreedyDepth()
 				&& b.semanticContext.equals(b.semanticContext);
 		}
 	}
@@ -437,26 +434,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	@Override
 	public Iterator<ATNConfig> iterator() {
 		return configs.iterator();
-	}
-
-	public void removeNonGreedyConfigsInAlts(@NotNull BitSet alts) {
-		if ( readonly ) throw new IllegalStateException("This set is readonly");
-
-		if (this.configLookup != null) {
-			for (Iterator<ATNConfig> it = this.configLookup.iterator(); it.hasNext(); ) {
-				ATNConfig entry = it.next();
-				if (!entry.isGreedy() && alts.get(entry.alt)) {
-					it.remove();
-				}
-			}
-		}
-
-		for (Iterator<ATNConfig> it = this.configs.iterator(); it.hasNext(); ) {
-			ATNConfig value = it.next();
-			if (!value.isGreedy() && alts.get(value.alt)) {
-				it.remove();
-			}
-		}
 	}
 
 	@Override
