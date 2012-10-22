@@ -1368,7 +1368,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	public void dumpDeadEndConfigs(@NotNull NoViableAltException nvae) {
 		System.err.println("dead end configs: ");
-		for (ATNConfig c : nvae.deadEndConfigs) {
+		for (ATNConfig c : nvae.getDeadEndConfigs()) {
 			String trans = "no edges";
 			if ( c.state.getNumberOfTransitions()>0 ) {
 				Transition t = c.state.transition(0);
