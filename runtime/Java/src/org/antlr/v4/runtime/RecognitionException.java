@@ -66,6 +66,16 @@ public class RecognitionException extends RuntimeException {
 		if ( ctx!=null ) this.offendingState = ctx.s;
 	}
 
+	public RecognitionException(String message, @Nullable Recognizer<?, ?> recognizer, IntStream input,
+								@Nullable ParserRuleContext ctx)
+	{
+		super(message);
+		this.recognizer = recognizer;
+		this.input = input;
+		this.ctx = ctx;
+		if ( ctx!=null ) this.offendingState = ctx.s;
+	}
+
 	/** Where was the parser in the ATN when the error occurred?
 	 *  For No viable alternative exceptions, this is the decision state number.
 	 *  For others, it is the state whose emanating edge we couldn't match.

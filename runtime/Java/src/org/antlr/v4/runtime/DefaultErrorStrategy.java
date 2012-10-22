@@ -229,7 +229,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		throws RecognitionException
 	{
 		String ruleName = recognizer.getRuleNames()[recognizer._ctx.getRuleIndex()];
-		String msg = "rule "+ruleName+" "+e.msg;
+		String msg = "rule "+ruleName+" "+e.getMessage();
 		recognizer.notifyErrorListeners((Token) e.offendingToken, msg, e);
 	}
 
