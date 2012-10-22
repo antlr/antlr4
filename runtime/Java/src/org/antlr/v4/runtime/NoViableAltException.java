@@ -69,7 +69,7 @@ public class NoViableAltException extends RecognitionException {
 		super(recognizer, input, ctx);
 		this.deadEndConfigs = deadEndConfigs;
 		this.startToken = startToken;
-		this.offendingToken = offendingToken;
+		this.setOffendingToken(offendingToken);
 	}
 
 	@NotNull

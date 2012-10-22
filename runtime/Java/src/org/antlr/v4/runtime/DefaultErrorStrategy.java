@@ -110,7 +110,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		else {
 			System.err.println("unknown recognition error type: "+e.getClass().getName());
 			if ( recognizer!=null ) {
-				recognizer.notifyErrorListeners((Token) e.offendingToken, e.getMessage(), e);
+				recognizer.notifyErrorListeners(e.getOffendingToken(), e.getMessage(), e);
 			}
 		}
 	}
@@ -206,22 +206,22 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		String input;
 		if (tokens instanceof TokenStream) {
 			if ( e.getStartToken().getType()==Token.EOF ) input = "<EOF>";
-			else input = ((TokenStream)tokens).getText(e.getStartToken(), e.offendingToken);
+			else input = tokens.getText(e.getStartToken(), e.getOffendingToken());
 		}
 		else {
 			input = "<unknown input>";
 		}
 		String msg = "no viable alternative at input "+escapeWSAndQuote(input);
-		recognizer.notifyErrorListeners((Token) e.offendingToken, msg, e);
+		recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);
 	}
 
 	public void reportInputMismatch(Parser recognizer,
 									InputMismatchException e)
 		throws RecognitionException
 	{
-		String msg = "mismatched input "+getTokenErrorDisplay((Token)e.offendingToken)+
+		String msg = "mismatched input "+getTokenErrorDisplay(e.getOffendingToken())+
 		" expecting "+e.getExpectedTokens().toString(recognizer.getTokenNames());
-		recognizer.notifyErrorListeners((Token) e.offendingToken, msg, e);
+		recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);
 	}
 
 	public void reportFailedPredicate(Parser recognizer,
@@ -230,7 +230,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	{
 		String ruleName = recognizer.getRuleNames()[recognizer._ctx.getRuleIndex()];
 		String msg = "rule "+ruleName+" "+e.getMessage();
-		recognizer.notifyErrorListeners((Token) e.offendingToken, msg, e);
+		recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);
 	}
 
 	public void reportUnwantedToken(Parser recognizer) {
@@ -412,21 +412,11 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	}
 
 	protected String getSymbolText(@NotNull Token symbol) {
-		if (symbol instanceof Token) {
-			return ((Token)symbol).getText();
-		}
-		else {
-			return symbol.toString();
-		}
+		return symbol.getText();
 	}
 
 	protected int getSymbolType(@NotNull Token symbol) {
-		if (symbol instanceof Token) {
-			return ((Token)symbol).getType();
-		}
-		else {
-			return Token.INVALID_TYPE;
-		}
+		return symbol.getType();
 	}
 
 	protected String escapeWSAndQuote(String s) {

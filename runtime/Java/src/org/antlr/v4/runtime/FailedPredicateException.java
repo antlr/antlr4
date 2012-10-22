@@ -61,7 +61,7 @@ public class FailedPredicateException extends RecognitionException {
 		this.ruleIndex = trans.ruleIndex;
 		this.predicateIndex = trans.predIndex;
 		this.predicate = predicate;
-		this.offendingToken = recognizer.getCurrentToken();
+		this.setOffendingToken(recognizer.getCurrentToken());
 	}
 
 	public int getRuleIndex() {

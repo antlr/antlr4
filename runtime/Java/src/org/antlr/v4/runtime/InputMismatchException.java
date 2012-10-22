@@ -34,7 +34,6 @@ package org.antlr.v4.runtime;
 public class InputMismatchException extends RecognitionException {
 	public InputMismatchException(Parser recognizer) {
 		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
-		Token la = recognizer.getCurrentToken();
-		this.offendingToken = la;
+		this.setOffendingToken(recognizer.getCurrentToken());
 	}
 }
