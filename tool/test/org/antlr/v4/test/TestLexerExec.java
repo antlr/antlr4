@@ -1,3 +1,33 @@
+/*
+ * [The "BSD license"]
+ *  Copyright (c) 2012 Terence Parr
+ *  Copyright (c) 2012 Sam Harwell
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.antlr.v4.test;
 
 import org.junit.Test;
@@ -28,6 +58,20 @@ public class TestLexerExec extends BaseTest {
    			"[@3,8:7='<EOF>',<-1>,1:8]\n"; // EOF has no length so range is 8:7 not 8:8
    		assertEquals(expecting, found);
    	}
+
+	@Test
+	public void testImplicitNonGreedyTermination() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"
+			+ "STRING : '\"' ('\"\"' | .)* '\"';";
+
+		String found = execLexer("L.g4", grammar, "L", "\"hi\"\"mom\"");
+		assertEquals(
+			"[@0,0:3='\"hi\"',<1>,1:0]\n" +
+			"[@1,4:8='\"mom\"',<1>,1:4]\n" +
+			"[@2,9:8='<EOF>',<-1>,1:9]\n", found);
+		assertNull(stderrDuringParse);
+	}
 
 	@Test
 	public void testImplicitGreedyOptional() throws Exception {
@@ -168,11 +212,9 @@ public class TestLexerExec extends BaseTest {
 		String expecting =
 			"[@0,0:8='/* ick */',<1>,1:0]\n" +
 			"[@1,9:9='\\n',<2>,1:9]\n" +
-			"[@2,10:17='/* /* */',<1>,2:0]\n" +
-			"[@3,18:18='\\n',<2>,2:8]\n" +
-			"[@4,19:31='/* /*nested*/',<1>,3:0]\n" +
-			"[@5,32:32=' ',<2>,3:13]\n" +
-			"[@6,36:35='<EOF>',<-1>,4:0]\n";
+			"[@2,10:34='/* /* */\\n/* /*nested*/ */',<1>,2:0]\n" +
+			"[@3,35:35='\\n',<2>,3:16]\n" +
+			"[@4,36:35='<EOF>',<-1>,4:17]\n";
 
 		// stuff on end of comment matches another rule
 		String found = execLexer("L.g4", grammar, "L",
@@ -180,19 +222,14 @@ public class TestLexerExec extends BaseTest {
 						  "/* /* */\n" +
 						  "/* /*nested*/ */\n");
 		assertEquals(expecting, found);
-		assertEquals(
-			"line 3:14 token recognition error at: '*'\n" +
-			"line 3:15 token recognition error at: '/\n'\n", stderrDuringParse);
+		assertNull(stderrDuringParse);
 		// stuff on end of comment doesn't match another rule
 		expecting =
 			"[@0,0:8='/* ick */',<1>,1:0]\n" +
 			"[@1,10:10='\\n',<2>,1:10]\n" +
-			"[@2,11:18='/* /* */',<1>,2:0]\n" +
-			"[@3,20:20='\\n',<2>,2:9]\n" +
-			"[@4,21:33='/* /*nested*/',<1>,3:0]\n" +
-			"[@5,34:34=' ',<2>,3:13]\n" +
-			"[@6,38:38='\\n',<2>,3:17]\n" +
-			"[@7,39:38='<EOF>',<-1>,4:18]\n";
+			"[@2,11:36='/* /* */x\\n/* /*nested*/ */',<1>,2:0]\n" +
+			"[@3,38:38='\\n',<2>,3:17]\n" +
+			"[@4,39:38='<EOF>',<-1>,4:18]\n";
 		found = execLexer("L.g4", grammar, "L",
 						  "/* ick */x\n" +
 						  "/* /* */x\n" +
@@ -200,9 +237,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(expecting, found);
 		assertEquals(
 			"line 1:9 token recognition error at: 'x'\n" +
-			"line 2:8 token recognition error at: 'x'\n" +
-			"line 3:14 token recognition error at: '*'\n" +
-			"line 3:15 token recognition error at: '/x'\n", stderrDuringParse);
+			"line 3:16 token recognition error at: 'x'\n", stderrDuringParse);
 	}
 
 	@Test public void testRecursiveLexerRuleRefWithWildcardPlus() throws Exception {
@@ -215,11 +250,9 @@ public class TestLexerExec extends BaseTest {
 		String expecting =
 			"[@0,0:8='/* ick */',<1>,1:0]\n" +
 			"[@1,9:9='\\n',<2>,1:9]\n" +
-			"[@2,10:17='/* /* */',<1>,2:0]\n" +
-			"[@3,18:18='\\n',<2>,2:8]\n" +
-			"[@4,19:31='/* /*nested*/',<1>,3:0]\n" +
-			"[@5,32:32=' ',<2>,3:13]\n" +
-			"[@6,36:35='<EOF>',<-1>,4:0]\n";
+			"[@2,10:34='/* /* */\\n/* /*nested*/ */',<1>,2:0]\n" +
+			"[@3,35:35='\\n',<2>,3:16]\n" +
+			"[@4,36:35='<EOF>',<-1>,4:17]\n";
 
 		// stuff on end of comment matches another rule
 		String found = execLexer("L.g4", grammar, "L",
@@ -227,19 +260,14 @@ public class TestLexerExec extends BaseTest {
 						  "/* /* */\n" +
 						  "/* /*nested*/ */\n");
 		assertEquals(expecting, found);
-		assertEquals(
-			"line 3:14 token recognition error at: '*'\n" +
-			"line 3:15 token recognition error at: '/\n'\n", stderrDuringParse);
+		assertNull(stderrDuringParse);
 		// stuff on end of comment doesn't match another rule
 		expecting =
 			"[@0,0:8='/* ick */',<1>,1:0]\n" +
 			"[@1,10:10='\\n',<2>,1:10]\n" +
-			"[@2,11:18='/* /* */',<1>,2:0]\n" +
-			"[@3,20:20='\\n',<2>,2:9]\n" +
-			"[@4,21:33='/* /*nested*/',<1>,3:0]\n" +
-			"[@5,34:34=' ',<2>,3:13]\n" +
-			"[@6,38:38='\\n',<2>,3:17]\n" +
-			"[@7,39:38='<EOF>',<-1>,4:18]\n";
+			"[@2,11:36='/* /* */x\\n/* /*nested*/ */',<1>,2:0]\n" +
+			"[@3,38:38='\\n',<2>,3:17]\n" +
+			"[@4,39:38='<EOF>',<-1>,4:18]\n";
 		found = execLexer("L.g4", grammar, "L",
 						  "/* ick */x\n" +
 						  "/* /* */x\n" +
@@ -247,9 +275,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(expecting, found);
 		assertEquals(
 			"line 1:9 token recognition error at: 'x'\n" +
-			"line 2:8 token recognition error at: 'x'\n" +
-			"line 3:14 token recognition error at: '*'\n" +
-			"line 3:15 token recognition error at: '/x'\n", stderrDuringParse);
+			"line 3:16 token recognition error at: 'x'\n", stderrDuringParse);
 	}
 
 	@Test public void testActionExecutedInDFA() throws Exception {

@@ -1,30 +1,31 @@
 /*
- [The "BSD license"]
-  Copyright (c) 2011 Terence Parr
-  All rights reserved.
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions
-  are met:
-
-  1. Redistributions of source code must retain the above copyright
-     notice, this list of conditions and the following disclaimer.
-  2. Redistributions in binary form must reproduce the above copyright
-     notice, this list of conditions and the following disclaimer in the
-     documentation and/or other materials provided with the distribution.
-  3. The name of the author may not be used to endorse or promote products
-     derived from this software without specific prior written permission.
-
-  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * [The "BSD license"]
+ *  Copyright (c) 2012 Terence Parr
+ *  Copyright (c) 2012 Sam Harwell
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.antlr.v4.runtime.atn;
@@ -165,22 +166,6 @@ public class ATNConfig {
 		return SemanticContext.NONE;
 	}
 
-	public boolean isGreedy() {
-		return true;
-	}
-
-	/** Lexer non-greedy implementations need to track information per
-	 *  ATNConfig. When the lexer reaches an accept state for a lexer
-	 *  rule, it needs to wipe out any configurations associated with
-	 *  that rule that are part of a non-greedy subrule. To do that it
-	 *  has to make sure that it tracks when a configuration was derived
-	 *  from an element within a non-greedy subrule. We use depth for
-	 *  that. We're greedy when the depth is 0.
-	 */
-	public int getNonGreedyDepth() {
-		return 0;
-	}
-
 	@Override
 	public final ATNConfig clone() {
 		return transform(this.getState());
@@ -202,20 +187,7 @@ public class ATNConfig {
 		return transform(state, context, this.getSemanticContext(), actionIndex);
 	}
 
-	public ATNConfig enterNonGreedyBlock() {
-		return new NonGreedyATNConfig(this, 1);
-	}
-
-	public ATNConfig exitNonGreedyBlock() {
-		return this;
-	}
-
 	private ATNConfig transform(@NotNull ATNState state, @Nullable PredictionContext context, @NotNull SemanticContext semanticContext, int actionIndex) {
-		if (this instanceof NonGreedyATNConfig) {
-			ATNConfig transformed = ((NonGreedyATNConfig)this).config.transform(state, context, semanticContext, actionIndex);
-			return new NonGreedyATNConfig(transformed, ((NonGreedyATNConfig)this).nonGreedyDepth);
-		}
-
 		if (semanticContext != SemanticContext.NONE) {
 			if (actionIndex != -1) {
 				return new ActionSemanticContextATNConfig(actionIndex, semanticContext, this, state, context);
@@ -309,7 +281,7 @@ public class ATNConfig {
 		return this.getState().stateNumber==other.getState().stateNumber
 			&& this.getAlt()==other.getAlt()
 			&& this.getReachesIntoOuterContext() == other.getReachesIntoOuterContext()
-			&& (this.getContext()==other.getContext() || (this.getContext() != null && this.getContext().equals(other.getContext())))
+			&& this.getContext().equals(other.getContext())
 			&& this.getSemanticContext().equals(other.getSemanticContext())
 			&& this.getActionIndex() == other.getActionIndex();
 	}
@@ -472,77 +444,4 @@ public class ATNConfig {
 
 	}
 
-	private static class NonGreedyATNConfig extends ATNConfig {
-		private final ATNConfig config;
-		private final int nonGreedyDepth;
-
-		public NonGreedyATNConfig(ATNConfig config, int nonGreedyDepth) {
-			super(config, config.state, config.context);
-			this.nonGreedyDepth = nonGreedyDepth;
-			this.config = config;
-		}
-
-		public NonGreedyATNConfig(int nonGreedyDepth, ATNConfig config, ATNState state, int alt, PredictionContext context) {
-			super(state, alt, context);
-			this.nonGreedyDepth = nonGreedyDepth;
-			this.config = config;
-		}
-
-		public ATNConfig getConfig() {
-			return config;
-		}
-
-		@Override
-		public boolean isGreedy() {
-			return false;
-		}
-
-		@Override
-		public int getNonGreedyDepth() {
-			return nonGreedyDepth;
-		}
-
-		@Override
-		public int getActionIndex() {
-			return config.getActionIndex();
-		}
-
-		@Override
-		public SemanticContext getSemanticContext() {
-			return config.getSemanticContext();
-		}
-
-		@Override
-		public void setContext(PredictionContext context) {
-			super.setContext(context);
-			config.setContext(context);
-		}
-
-		@Override
-		public void setHidden(boolean value) {
-			super.setHidden(value);
-			config.setHidden(value);
-		}
-
-		@Override
-		public void setOuterContextDepth(int outerContextDepth) {
-			super.setOuterContextDepth(outerContextDepth);
-			config.setOuterContextDepth(outerContextDepth);
-		}
-
-		@Override
-		public ATNConfig enterNonGreedyBlock() {
-			return new NonGreedyATNConfig(config, nonGreedyDepth + 1);
-		}
-
-		@Override
-		public ATNConfig exitNonGreedyBlock() {
-			if (nonGreedyDepth == 1) {
-				return config;
-			}
-
-			return new NonGreedyATNConfig(config, nonGreedyDepth - 1);
-		}
-
-	}
 }

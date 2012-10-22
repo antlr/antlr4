@@ -1,18 +1,20 @@
 /*
  * [The "BSD license"]
+ *  Copyright (c) 2012 Terence Parr
  *  Copyright (c) 2012 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
+ *
  *  1. Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
+ *     notice, this list of conditions and the following disclaimer.
  *  2. Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in the
- *      documentation and/or other materials provided with the distribution.
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
  *  3. The name of the author may not be used to endorse or promote products
- *      derived from this software without specific prior written permission.
+ *     derived from this software without specific prior written permission.
  *
  *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -104,7 +106,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	}
 
 	@SuppressWarnings("unchecked")
-	private ATNConfigSet(ATNConfigSet set, boolean readonly) {
+	protected ATNConfigSet(ATNConfigSet set, boolean readonly) {
 		if (readonly) {
 			this.mergedConfigs = null;
 			this.unmerged = null;
@@ -236,8 +238,9 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		}
 
 		ATNConfig config = (ATNConfig)o;
-		ATNConfig mergedConfig = mergedConfigs.get(getKey(config));
-		if (mergedConfig != null && canMerge(config, mergedConfig)) {
+		long configKey = getKey(config);
+		ATNConfig mergedConfig = mergedConfigs.get(configKey);
+		if (mergedConfig != null && canMerge(config, configKey, mergedConfig)) {
 			return mergedConfig.contains(config);
 		}
 
@@ -258,35 +261,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	@Override
 	public Object[] toArray() {
 		return configs.toArray();
-	}
-
-	public void removeNonGreedyConfigsInAlts(@NotNull BitSet alts) {
-		ensureWritable();
-
-		if (this.mergedConfigs != null) {
-			for (Iterator<Map.Entry<Long, ATNConfig>> it = this.mergedConfigs.entrySet().iterator(); it.hasNext(); ) {
-				Map.Entry<Long, ATNConfig> entry = it.next();
-				if (!entry.getValue().isGreedy() && alts.get(entry.getValue().getAlt())) {
-					it.remove();
-				}
-			}
-		}
-
-		if (this.unmerged != null) {
-			for (Iterator<ATNConfig> it = this.unmerged.iterator(); it.hasNext(); ) {
-				ATNConfig value = it.next();
-				if (!value.isGreedy() && alts.get(value.getAlt())) {
-					it.remove();
-				}
-			}
-		}
-
-		for (Iterator<ATNConfig> it = this.configs.iterator(); it.hasNext(); ) {
-			ATNConfig value = it.next();
-			if (!value.isGreedy() && alts.get(value.getAlt())) {
-				it.remove();
-			}
-		}
 	}
 
 	@Override
@@ -376,15 +350,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		assert !outermostConfigSet || !dipsIntoOuterContext;
 	}
 
-	private static boolean canMerge(ATNConfig left, ATNConfig right) {
-		if (getKey(left) != getKey(right)) {
-			return false;
-		}
-
-		return left.getSemanticContext().equals(right.getSemanticContext());
-	}
-
-	private static boolean canMerge(ATNConfig left, long leftKey, ATNConfig right) {
+	protected boolean canMerge(ATNConfig left, long leftKey, ATNConfig right) {
 		if (left.getState().stateNumber != right.getState().stateNumber) {
 			return false;
 		}
@@ -393,15 +359,12 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			return false;
 		}
 
-		return left.getNonGreedyDepth() == right.getNonGreedyDepth()
-			&& left.getSemanticContext().equals(right.getSemanticContext());
+		return left.getSemanticContext().equals(right.getSemanticContext());
 	}
 
-	private static long getKey(ATNConfig e) {
+	protected long getKey(ATNConfig e) {
 		long key = e.getState().stateNumber;
 		key = (key << 12) | (e.getAlt() & 0xFFF);
-		key = (key << 8) | (e.getNonGreedyDepth() & 0xFF);
-		//key = (key << 1) | (e.getReachesIntoOuterContext() ? 1 : 0);
 		return key;
 	}
 
