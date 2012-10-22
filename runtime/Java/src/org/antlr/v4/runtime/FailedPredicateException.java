@@ -61,12 +61,12 @@ public class FailedPredicateException extends RecognitionException {
 		this.offendingToken = la;
 	}
 
-	public FailedPredicateException(Parser recognizer,
-									@Nullable String predicate,
-									@Nullable String msg)
+	public <Symbol extends Token> FailedPredicateException(Parser<Symbol> recognizer,
+														   @Nullable String predicate,
+														   @Nullable String msg)
 	{
 		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
-		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer._ctx.s);
+		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer.getState());
 		PredicateTransition trans = (PredicateTransition)s.transition(0);
 		ruleIndex = trans.ruleIndex;
 		predIndex = trans.predIndex;
