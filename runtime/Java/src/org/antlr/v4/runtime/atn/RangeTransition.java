@@ -52,6 +52,11 @@ public final class RangeTransition extends Transition {
 	public IntervalSet label() { return IntervalSet.of(from, to); }
 
 	@Override
+	public boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+		return symbol >= from && symbol <= to;
+	}
+
+	@Override
 	@NotNull
 	public String toString() {
 		return "'"+(char)from+"'..'"+(char)to+"'";

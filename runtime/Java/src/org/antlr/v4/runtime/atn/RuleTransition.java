@@ -56,4 +56,9 @@ public final class RuleTransition extends Transition {
 
 	@Override
 	public boolean isEpsilon() { return true; }
+
+	@Override
+	public boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+		return false;
+	}
 }
