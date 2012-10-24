@@ -67,8 +67,8 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	/** What is the error header, normally line/character position information? */
 	public String getErrorHeader(RecognitionException e) {
-		int line = e.offendingToken.getLine();
-		int charPositionInLine = e.offendingToken.getCharPositionInLine();
+		int line = e.getOffendingToken().getLine();
+		int charPositionInLine = e.getOffendingToken().getCharPositionInLine();
 		return "line "+line+":"+charPositionInLine;
 	}
 

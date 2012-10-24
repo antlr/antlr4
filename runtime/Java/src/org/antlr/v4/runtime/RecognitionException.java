@@ -39,27 +39,37 @@ import org.antlr.v4.runtime.misc.Nullable;
  */
 public class RecognitionException extends RuntimeException {
 	/** Who threw the exception? */
-	protected Recognizer<?, ?> recognizer;
+	private Recognizer<?, ?> recognizer;
 
 	// TODO: make a dummy recognizer for the interpreter to use?
 	// Next two (ctx,input) should be what is in recognizer, but
 	// won't work when interpreting
 
-	protected RuleContext ctx;
+	private RuleContext ctx;
 
-	protected IntStream input;
+	private IntStream input;
 
 	/** The current Token when an error occurred.  Since not all streams
 	 *  can retrieve the ith Token, we have to track the Token object.
 	 *  For parsers.  Even when it's a tree parser, token might be set.
 	 */
-	protected Token offendingToken;
+	private Token offendingToken;
 
-	protected int offendingState;
+	private int offendingState;
 
 	public RecognitionException(@Nullable Recognizer<?, ?> recognizer, IntStream input,
 								@Nullable ParserRuleContext ctx)
 	{
+		this.recognizer = recognizer;
+		this.input = input;
+		this.ctx = ctx;
+		if ( ctx!=null ) this.offendingState = ctx.s;
+	}
+
+	public RecognitionException(String message, @Nullable Recognizer<?, ?> recognizer, IntStream input,
+								@Nullable ParserRuleContext ctx)
+	{
+		super(message);
 		this.recognizer = recognizer;
 		this.input = input;
 		this.ctx = ctx;
@@ -72,7 +82,13 @@ public class RecognitionException extends RuntimeException {
 	 *  This will help us tie into the grammar and syntax diagrams in
 	 *  ANTLRWorks v2.
 	 */
-	public int getOffendingState() { return offendingState; }
+	public int getOffendingState() {
+		return offendingState;
+	}
+
+	protected final void setOffendingState(int offendingState) {
+		this.offendingState = offendingState;
+	}
 
 	public IntervalSet getExpectedTokens() {
         // TODO: do we really need this type check?
@@ -92,6 +108,10 @@ public class RecognitionException extends RuntimeException {
 
 	public Token getOffendingToken() {
 		return offendingToken;
+	}
+
+	protected final void setOffendingToken(Token offendingToken) {
+		this.offendingToken = offendingToken;
 	}
 
 	public Recognizer<?, ?> getRecognizer() {
