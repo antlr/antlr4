@@ -1,8 +1,37 @@
+/*
+ * [The "BSD license"]
+ *  Copyright (c) 2012 Terence Parr
+ *  Copyright (c) 2012 Sam Harwell
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.antlr.v4.test;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.Utils;
@@ -39,10 +68,12 @@ public class TestATNLexerInterpreter extends BaseTest {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
 			"A : 'xy'\n" +
-			"  | 'xyz'\n" +  // make sure nongreedy mech cut off doesn't kill this alt
+			"  | 'xyz'\n" +  // this alt shouldn't be reachable since the alts are ordered
+			"  ;\n" +
+			"Z : 'z'\n" +
 			"  ;\n");
 		checkLexerMatches(lg, "xy", "A, EOF");
-		checkLexerMatches(lg, "xyz", "A, EOF");
+		checkLexerMatches(lg, "xyz", "A, Z, EOF");
 	}
 
 	@Test public void testShortLongRule2() throws Exception {
@@ -60,6 +91,8 @@ public class TestATNLexerInterpreter extends BaseTest {
 			"lexer grammar L;\n"+
 			"A : 'xy' .\n" + // should pursue '.' since xyz hits stop first, before 2nd alt
 			"  | 'xy'\n" +
+			"  ;\n" +
+			"Z : 'z'\n" +
 			"  ;\n");
 		checkLexerMatches(lg, "xy", "A, EOF");
 		checkLexerMatches(lg, "xyz", "A, EOF");
@@ -69,22 +102,12 @@ public class TestATNLexerInterpreter extends BaseTest {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
 			"A : 'xy'\n" +
-			"  | 'xy' .\n" +  // should pursue '.' since A is greedy
+			"  | 'xy' .\n" +  // should not pursue '.' since alts are ordered
+			"  ;\n" +
+			"Z : 'z'\n" +
 			"  ;\n");
 		checkLexerMatches(lg, "xy", "A, EOF");
-		RecognitionException e = checkLexerMatches(lg, "xyz", "A, EOF");
-		assertNull(e);
-	}
-
-	@Test public void testWildcardQuirk() throws Exception {
-		LexerGrammar lg = new LexerGrammar(
-			"lexer grammar L;\n"+
-			"A : 'xy'\n" +
-			"  | 'xy' . 'z'\n" + // will pursue '.' since A is greedy
-			"  ;\n");
-//		checkLexerMatches(lg, "xy", "A, EOF");
-		RecognitionException e = checkLexerMatches(lg, "xyqz", "A, EOF");
-		assertNull(e);
+		checkLexerMatches(lg, "xyz", "A, Z, EOF");
 	}
 
 	@Test public void testWildcardNonQuirkWhenSplitBetweenTwoRules() throws Exception {
@@ -93,7 +116,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 			"A : 'xy' ;\n" +
 			"B : 'xy' . 'z' ;\n");
 		checkLexerMatches(lg, "xy", "A, EOF");
-		checkLexerMatches(lg, "xyz", "B, EOF");
+		checkLexerMatches(lg, "xyqz", "B, EOF");
 	}
 
 	@Test public void testLexerLoops() throws Exception {
@@ -151,21 +174,14 @@ public class TestATNLexerInterpreter extends BaseTest {
 	@Test public void testRecursiveLexerRuleRefWithWildcard() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
-			"CMT : '/*' (CMT | .)+ '*/' ;\n" +
+			"CMT : '/*' (CMT | .)* '*/' ;\n" +
 			"WS : (' '|'\n')+ ;");
-		String expecting = "CMT, WS, CMT, WS, CMT, WS, EOF";
-		// stuff on end of comment matches another rule
+
+		String expecting = "CMT, WS, CMT, WS, EOF";
 		checkLexerMatches(lg,
 						  "/* ick */\n" +
 						  "/* /* */\n" +
 						  "/* /*nested*/ */\n",
-						  expecting);
-		// stuff on end of comment doesn't match another rule
-		expecting = "CMT, WS, CMT, WS, CMT, WS, EOF";
-		checkLexerMatches(lg,
-						  "/* ick */x\n" +
-						  "/* /* */x\n" +
-						  "/* /*nested*/ */x\n",
 						  expecting);
 	}
 
@@ -265,20 +281,14 @@ public class TestATNLexerInterpreter extends BaseTest {
 		checkLexerMatches(lg, "a", expecting);
 	}
 
-	protected RecognitionException checkLexerMatches(LexerGrammar lg, String inputString, String expecting) {
+	protected void checkLexerMatches(LexerGrammar lg, String inputString, String expecting) {
 		ATN atn = createATN(lg, true);
 		CharStream input = new ANTLRInputStream(inputString);
 		ATNState startState = atn.modeNameToStartState.get("DEFAULT_MODE");
 		DOTGenerator dot = new DOTGenerator(lg);
 		System.out.println(dot.getDOT(startState, true));
 
-		List<String> tokenTypes = null;
-		RecognitionException retException = null;
-		try {
-			tokenTypes = getTokenTypes(lg, atn, input, false);
-		}
-		catch (RecognitionException lre) { retException = lre; }
-		if ( retException!=null ) return retException;
+		List<String> tokenTypes = getTokenTypes(lg, atn, input, false);
 
 		String result = Utils.join(tokenTypes.iterator(), ", ");
 		System.out.println(tokenTypes);
@@ -288,7 +298,6 @@ public class TestATNLexerInterpreter extends BaseTest {
 		input.seek(0);
 		List<String> tokenTypes2 = getTokenTypes(lg, atn, input, true);
 		assertEquals("interp vs adaptive types differ", tokenTypes, tokenTypes2);
-		return null;
 	}
 
 }

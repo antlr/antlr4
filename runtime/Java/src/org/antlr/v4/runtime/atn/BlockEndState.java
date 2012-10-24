@@ -32,9 +32,4 @@ package org.antlr.v4.runtime.atn;
 /** Terminal node of a simple (a|b|c) block */
 public class BlockEndState extends ATNState {
 	public BlockStartState startState;
-
-	@Override
-	public boolean isNonGreedyExitState() {
-		return startState != null && startState.nonGreedy;
-	}
 }
