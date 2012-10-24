@@ -31,24 +31,36 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Utils;
 
 public class LexerNoViableAltException extends RecognitionException {
 	private static final long serialVersionUID = -730999203913001726L;
 
 	/** Matching attempted at what input index? */
-	public int startIndex;
+	private final int startIndex;
 
 	/** Which configurations did we try at input.index() that couldn't match input.LA(1)? */
-	public ATNConfigSet deadEndConfigs;
+	@Nullable
+	private final ATNConfigSet deadEndConfigs;
 
-	public LexerNoViableAltException(Lexer lexer,
-									 CharStream input,
+	public LexerNoViableAltException(@Nullable Lexer lexer,
+									 @NotNull CharStream input,
 									 int startIndex,
-									 ATNConfigSet deadEndConfigs) {
+									 @Nullable ATNConfigSet deadEndConfigs) {
 		super(lexer, input);
 		this.startIndex = startIndex;
 		this.deadEndConfigs = deadEndConfigs;
+	}
+
+	public int getStartIndex() {
+		return startIndex;
+	}
+
+	@Nullable
+	public ATNConfigSet getDeadEndConfigs() {
+		return deadEndConfigs;
 	}
 
 	@Override
@@ -59,11 +71,11 @@ public class LexerNoViableAltException extends RecognitionException {
 	@Override
 	public String toString() {
 		String symbol = "";
-		if (startIndex >= 0 && startIndex < input.size()) {
+		if (startIndex >= 0 && startIndex < getInputStream().size()) {
 			symbol = getInputStream().getText(Interval.of(startIndex,startIndex));
 			symbol = Utils.escapeWhitespace(symbol, false);
 		}
 
-		return "NoViableAltException('" + symbol + "')";
+		return String.format("%s('%s')", LexerNoViableAltException.class.getSimpleName(), symbol);
 	}
 }

@@ -29,6 +29,8 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 
 /** Indicates that the parser could not decide which of two or more paths
  *  to take based upon the remaining input. It tracks the starting token
@@ -39,38 +41,51 @@ public class NoViableAltException extends RecognitionException {
 	private static final long serialVersionUID = 5096000008992867052L;
 
 	/** Which configurations did we try at input.index() that couldn't match input.LT(1)? */
-	public ATNConfigSet deadEndConfigs;
+	@Nullable
+	private final ATNConfigSet deadEndConfigs;
 
 	/** The token object at the start index; the input stream might
 	 * 	not be buffering tokens so get a reference to it. (At the
 	 *  time the error occurred, of course the stream needs to keep a
 	 *  buffer all of the tokens but later we might not have access to those.)
 	 */
-	public Token startToken;
+	@NotNull
+	private final Token startToken;
 
-	public <Symbol extends Token> NoViableAltException(Parser<Symbol> recognizer) { // LL(1) error
-		this(recognizer,recognizer.getInputStream(),
+	public <Symbol extends Token> NoViableAltException(@NotNull Parser<Symbol> recognizer) { // LL(1) error
+		this(recognizer,
+			 recognizer.getInputStream(),
 			 recognizer.getCurrentToken(),
 			 recognizer.getCurrentToken(),
 			 null,
 			 recognizer._ctx);
 	}
 
-	public <Symbol extends Token> NoViableAltException(Recognizer<Symbol, ?> recognizer,
-													   TokenStream<? extends Symbol> input,
-													   Symbol startToken,
-													   Symbol offendingToken,
-													   ATNConfigSet deadEndConfigs,
-													   ParserRuleContext<Symbol> ctx)
+	public <Symbol extends Token> NoViableAltException(@NotNull Recognizer<Symbol, ?> recognizer,
+													   @NotNull TokenStream<? extends Symbol> input,
+													   @NotNull Symbol startToken,
+													   @NotNull Symbol offendingToken,
+													   @Nullable ATNConfigSet deadEndConfigs,
+													   @NotNull ParserRuleContext<Symbol> ctx)
 	{
 		super(recognizer, input, ctx);
 		this.deadEndConfigs = deadEndConfigs;
 		this.startToken = startToken;
-		this.offendingToken = offendingToken;
+		this.setOffendingToken(recognizer, offendingToken);
+	}
+
+	public Token getStartToken() {
+		return startToken;
 	}
 
 	@SuppressWarnings("unchecked") // safe
 	public <T> T getStartToken(Recognizer<T, ?> recognizer) {
-		return this.recognizer == recognizer ? (T)startToken : null;
+		return this.getRecognizer() == recognizer ? (T)startToken : null;
 	}
+
+	@Nullable
+	public ATNConfigSet getDeadEndConfigs() {
+		return deadEndConfigs;
+	}
+
 }

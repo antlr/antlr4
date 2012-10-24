@@ -202,8 +202,8 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 		TokenStream<? extends Symbol> tokens = recognizer.getInputStream();
 		String input;
 		if (tokens instanceof TokenStream<?>) {
-			if ( e.startToken.getType()==Token.EOF ) input = "<EOF>";
-			else input = ((TokenStream<?>)tokens).getText(e.getStartToken(recognizer), e.getOffendingToken(recognizer));
+			if ( e.getStartToken().getType()==Token.EOF ) input = "<EOF>";
+			else input = tokens.getText(e.getStartToken(), e.getOffendingToken());
 		}
 		else {
 			input = "<unknown input>";
@@ -226,7 +226,7 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 		throws RecognitionException
 	{
 		String ruleName = recognizer.getRuleNames()[recognizer._ctx.getRuleIndex()];
-		String msg = "rule "+ruleName+" "+e.msg;
+		String msg = "rule "+ruleName+" "+e.getMessage();
 		notifyErrorListeners(recognizer, msg, e);
 	}
 

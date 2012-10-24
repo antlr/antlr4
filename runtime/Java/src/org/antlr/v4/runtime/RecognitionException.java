@@ -41,23 +41,23 @@ public class RecognitionException extends RuntimeException {
 	private static final long serialVersionUID = -3861826954750022374L;
 
 	/** Who threw the exception? */
-	protected Recognizer<?, ?> recognizer;
+	private Recognizer<?, ?> recognizer;
 
 	// TODO: make a dummy recognizer for the interpreter to use?
 	// Next two (ctx,input) should be what is in recognizer, but
 	// won't work when interpreting
 
-	protected RuleContext<?> ctx;
+	private RuleContext<?> ctx;
 
-	protected IntStream input;
+	private IntStream input;
 
 	/** The current Token when an error occurred.  Since not all streams
 	 *  can retrieve the ith Token, we have to track the Token object.
 	 *  For parsers.  Even when it's a tree parser, token might be set.
 	 */
-	protected Token offendingToken;
+	private Token offendingToken;
 
-	protected int offendingState;
+	private int offendingState;
 
 	public RecognitionException(@Nullable Lexer lexer,
 								CharStream input)
@@ -76,13 +76,29 @@ public class RecognitionException extends RuntimeException {
 		if ( recognizer!=null ) this.offendingState = recognizer.getState();
 	}
 
+	public <Symbol extends Token> RecognitionException(String message, @Nullable Recognizer<Symbol, ?> recognizer, IntStream input,
+								@Nullable ParserRuleContext<Symbol> ctx)
+	{
+		super(message);
+		this.recognizer = recognizer;
+		this.input = input;
+		this.ctx = ctx;
+		if ( recognizer!=null ) this.offendingState = recognizer.getState();
+	}
+
 	/** Where was the parser in the ATN when the error occurred?
 	 *  For No viable alternative exceptions, this is the decision state number.
 	 *  For others, it is the state whose emanating edge we couldn't match.
 	 *  This will help us tie into the grammar and syntax diagrams in
 	 *  ANTLRWorks v2.
 	 */
-	public int getOffendingState() { return offendingState; }
+	public int getOffendingState() {
+		return offendingState;
+	}
+
+	protected final void setOffendingState(int offendingState) {
+		this.offendingState = offendingState;
+	}
 
 	public IntervalSet getExpectedTokens() {
         // TODO: do we really need this type check?
@@ -102,6 +118,12 @@ public class RecognitionException extends RuntimeException {
 
 	public Token getOffendingToken() {
 		return offendingToken;
+	}
+
+	protected final <Symbol extends Token> void setOffendingToken(Recognizer<Symbol, ?> recognizer, Symbol offendingToken) {
+		if (recognizer == this.recognizer) {
+			this.offendingToken = offendingToken;
+		}
 	}
 
 	public Recognizer<?, ?> getRecognizer() {

@@ -36,7 +36,6 @@ public class InputMismatchException extends RecognitionException {
 
 	public <T extends Token> InputMismatchException(Parser<T> recognizer) {
 		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
-		T la = recognizer.getCurrentToken();
-		this.offendingToken = la;
+		this.setOffendingToken(recognizer, recognizer.getCurrentToken());
 	}
 }

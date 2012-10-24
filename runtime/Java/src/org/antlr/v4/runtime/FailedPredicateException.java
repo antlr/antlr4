@@ -30,6 +30,7 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.PredicateTransition;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
 /** A semantic predicate failed during validation.  Validation of predicates
@@ -40,40 +41,50 @@ import org.antlr.v4.runtime.misc.Nullable;
 public class FailedPredicateException extends RecognitionException {
 	private static final long serialVersionUID = 5379330841495778709L;
 
-	public int ruleIndex;
-	public int predIndex;
-	public String predicate;
-	public String msg;
+	private final int ruleIndex;
+	private final int predicateIndex;
+	private final String predicate;
 
-	public <Symbol extends Token> FailedPredicateException(Parser<Symbol> recognizer) {
+	public <Symbol extends Token> FailedPredicateException(@NotNull Parser<Symbol> recognizer) {
 		this(recognizer, null);
 	}
 
-	public <Symbol extends Token> FailedPredicateException(Parser<Symbol> recognizer, @Nullable String predicate) {
-		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
-		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer.getState());
-		PredicateTransition trans = (PredicateTransition)s.transition(0);
-		ruleIndex = trans.ruleIndex;
-		predIndex = trans.predIndex;
-		this.predicate = predicate;
-		this.msg = String.format("failed predicate: {%s}?", predicate);
-		Token la = recognizer.getCurrentToken();
-		this.offendingToken = la;
+	public <Symbol extends Token> FailedPredicateException(@NotNull Parser<Symbol> recognizer, @Nullable String predicate) {
+		this(recognizer, predicate, null);
 	}
 
-	public <Symbol extends Token> FailedPredicateException(Parser<Symbol> recognizer,
+	public <Symbol extends Token> FailedPredicateException(@NotNull Parser<Symbol> recognizer,
 														   @Nullable String predicate,
-														   @Nullable String msg)
+														   @Nullable String message)
 	{
-		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
+		super(formatMessage(predicate, message), recognizer, recognizer.getInputStream(), recognizer._ctx);
 		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer.getState());
 		PredicateTransition trans = (PredicateTransition)s.transition(0);
-		ruleIndex = trans.ruleIndex;
-		predIndex = trans.predIndex;
+		this.ruleIndex = trans.ruleIndex;
+		this.predicateIndex = trans.predIndex;
 		this.predicate = predicate;
-		this.msg = msg;
-		Token la = recognizer.getCurrentToken();
-		this.offendingToken = la;
+		this.setOffendingToken(recognizer, recognizer.getCurrentToken());
 	}
 
+	public int getRuleIndex() {
+		return ruleIndex;
+	}
+
+	public int getPredIndex() {
+		return predicateIndex;
+	}
+
+	@Nullable
+	public String getPredicate() {
+		return predicate;
+	}
+
+	@NotNull
+	private static String formatMessage(@Nullable String predicate, @Nullable String message) {
+		if (message != null) {
+			return message;
+		}
+
+		return String.format("failed predicate: {%s}?", predicate);
+	}
 }
