@@ -255,9 +255,26 @@ public class TestParseErrors extends BaseTest {
 	}
 
 	/**
+	 * This is a regression test for #6 "NullPointerException in getMissingSymbol".
+	 * https://github.com/antlr/antlr4/issues/6
+	 */
+	@Test
+	public void testInvalidEmptyInput() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"start : ID+;\n" +
+			"ID : [a-z]+;\n" +
+			"\n";
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "", true);
+		String expecting = "";
+		assertEquals(expecting, result);
+		assertEquals("line 1:0 missing ID at '<EOF>'\n", this.stderrDuringParse);
+	}
+
+	/**
 	 * This is a regression test for #45 "NullPointerException in ATNConfig.hashCode".
 	 * https://github.com/antlr/antlr4/issues/45
-	 *
+	 * <p/>
 	 * The original cause of this issue was an error in the tool's ATN state optimization,
 	 * which is now detected early in {@link ATNSerializer} by ensuring that all
 	 * serialized transitions point to states which were not removed.
