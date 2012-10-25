@@ -272,6 +272,31 @@ public class TestParseErrors extends BaseTest {
 	}
 
 	/**
+	 * Regression test for "Getter for context is not a list when it should be".
+	 * https://github.com/antlr/antlr4/issues/19
+	 */
+	@Test
+	public void testContextListGetters() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"@parser::members{\n" +
+			"  void foo() {\n" +
+			"    SContext s = null;\n" +
+			"    List<? extends AContext> a = s.a();\n" +
+			"    List<? extends BContext> b = s.b();\n" +
+			"  }\n" +
+			"}\n" +
+			"s : (a | b)+;\n" +
+			"a : 'a' {System.out.print('a');};\n" +
+			"b : 'b' {System.out.print('b');};\n" +
+			"";
+		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "abab", true);
+		String expecting = "abab\n";
+		assertEquals(expecting, result);
+		assertNull(this.stderrDuringParse);
+	}
+
+	/**
 	 * This is a regression test for #45 "NullPointerException in ATNConfig.hashCode".
 	 * https://github.com/antlr/antlr4/issues/45
 	 * <p/>
