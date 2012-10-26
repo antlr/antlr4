@@ -32,9 +32,23 @@ package org.antlr.v4.tool.ast;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 
-public class OptionalBlockAST extends GrammarAST implements RuleElementAST {
-	public OptionalBlockAST(GrammarAST node) { super(node); }
-	public OptionalBlockAST(int type, Token t) { super(type, t); }
+public class OptionalBlockAST extends GrammarAST implements RuleElementAST, QuantifierAST {
+	private final boolean _greedy;
+
+	public OptionalBlockAST(OptionalBlockAST node) {
+		super(node);
+		_greedy = node._greedy;
+	}
+
+	public OptionalBlockAST(int type, Token t, Token nongreedy) {
+		super(type, t);
+		_greedy = nongreedy == null;
+	}
+
+	@Override
+	public boolean isGreedy() {
+		return _greedy;
+	}
 
 	@Override
 	public Tree dupNode() { return new OptionalBlockAST(this); }

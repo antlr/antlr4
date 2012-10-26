@@ -174,7 +174,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 	@Test public void testRecursiveLexerRuleRefWithWildcard() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
-			"CMT : '/*' (CMT | .)* '*/' ;\n" +
+			"CMT : '/*' (CMT | .)*? '*/' ;\n" +
 			"WS : (' '|'\n')+ ;");
 
 		String expecting = "CMT, WS, CMT, WS, EOF";
@@ -185,10 +185,18 @@ public class TestATNLexerInterpreter extends BaseTest {
 						  expecting);
 	}
 
-	@Test public void testLexerWildcardNonGreedyLoopByDefault() throws Exception {
+	@Test public void testLexerWildcardGreedyLoopByDefault() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
 			"CMT : '//' .* '\\n' ;\n");
+		String expecting = "CMT, EOF";
+		checkLexerMatches(lg, "//x\n//y\n", expecting);
+	}
+
+	@Test public void testLexerWildcardLoopExplicitNonGreedy() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"CMT : '//' .*? '\\n' ;\n");
 		String expecting = "CMT, CMT, EOF";
 		checkLexerMatches(lg, "//x\n//y\n", expecting);
 	}
@@ -201,10 +209,18 @@ public class TestATNLexerInterpreter extends BaseTest {
 		checkLexerMatches(lg, "[a]", "STR, EOF");
 	}
 
-	@Test public void testLexerWildcardNonGreedyPlusLoopByDefault() throws Exception {
+	@Test public void testLexerWildcardGreedyPlusLoopByDefault() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
 			"CMT : '//' .+ '\\n' ;\n");
+		String expecting = "CMT, EOF";
+		checkLexerMatches(lg, "//x\n//y\n", expecting);
+	}
+
+	@Test public void testLexerWildcardExplicitNonGreedyPlusLoop() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"CMT : '//' .+? '\\n' ;\n");
 		String expecting = "CMT, CMT, EOF";
 		checkLexerMatches(lg, "//x\n//y\n", expecting);
 	}
@@ -218,11 +234,20 @@ public class TestATNLexerInterpreter extends BaseTest {
 		checkLexerMatches(lg, "/**/", expecting);
 	}
 
-	@Test public void testNonGreedyBetweenRules() throws Exception {
+	@Test public void testGreedyBetweenRules() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
 			"A : '<a>' ;\n" +
 			"B : '<' .+ '>' ;\n");
+		String expecting = "B, EOF";
+		checkLexerMatches(lg, "<a><x>", expecting);
+	}
+
+	@Test public void testNonGreedyBetweenRules() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"A : '<a>' ;\n" +
+			"B : '<' .+? '>' ;\n");
 		String expecting = "A, B, EOF";
 		checkLexerMatches(lg, "<a><x>", expecting);
 	}

@@ -1,6 +1,7 @@
 /*
  [The "BSD license"]
- Copyright (c) 2011 Terence Parr
+ Copyright (c) 2012 Terence Parr
+ Copyright (c) 2012 Sam Harwell
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -29,33 +30,12 @@
 
 package org.antlr.v4.tool.ast;
 
-import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.Tree;
+/**
+ *
+ * @author Sam Harwell
+ */
+public interface QuantifierAST {
 
-import java.util.HashMap;
-import java.util.Map;
+	boolean isGreedy();
 
-public class BlockAST extends GrammarASTWithOptions implements RuleElementAST {
-    // TODO: maybe I need a Subrule object like Rule so these options mov to that?
-    /** What are the default options for a subrule? */
-    public static final Map<String, String> defaultBlockOptions =
-            new HashMap<String, String>();
-
-    public static final Map<String, String> defaultLexerBlockOptions =
-            new HashMap<String, String>();
-
-	public BlockAST(GrammarAST node) {
-		super(node);
-	}
-
-	public BlockAST(Token t) { super(t); }
-    public BlockAST(int type) { super(type); }
-    public BlockAST(int type, Token t) { super(type, t); }
-	public BlockAST(int type, Token t, String text) { super(type,t,text); }
-
-	@Override
-	public Tree dupNode() { return new BlockAST(this); }
-
-	@Override
-	public Object visit(GrammarASTVisitor v) { return v.visit(this); }
 }
