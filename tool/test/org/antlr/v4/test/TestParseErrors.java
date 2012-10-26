@@ -297,6 +297,49 @@ public class TestParseErrors extends BaseTest {
 	}
 
 	/**
+	 * This is a regression test for #26 "an exception upon simple rule with double recursion in an alternative".
+	 * https://github.com/antlr/antlr4/issues/26
+	 */
+	@Test
+	public void testDuplicatedLeftRecursiveCall() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"start : expr EOF;\n" +
+			"expr : 'x'\n" +
+			"     | expr expr\n" +
+			"     ;\n" +
+			"\n";
+
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "x", true);
+		assertEquals("", result);
+		assertNull(this.stderrDuringParse);
+
+		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xx", true);
+		assertEquals("", result);
+		assertEquals(
+			"line 1:1 reportAttemptingFullContext d=0, input='x'\n" +
+			"line 1:1 reportContextSensitivity d=0, input='x'\n",
+			this.stderrDuringParse);
+
+		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xxx", true);
+		assertEquals("", result);
+		assertEquals(
+			"line 1:1 reportAttemptingFullContext d=0, input='x'\n" +
+			"line 1:1 reportContextSensitivity d=0, input='x'\n" +
+			"line 1:2 reportAttemptingFullContext d=0, input='x'\n",
+			this.stderrDuringParse);
+
+		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xxxx", true);
+		assertEquals("", result);
+		assertEquals(
+			"line 1:1 reportAttemptingFullContext d=0, input='x'\n" +
+			"line 1:1 reportContextSensitivity d=0, input='x'\n" +
+			"line 1:2 reportAttemptingFullContext d=0, input='x'\n" +
+			"line 1:3 reportAttemptingFullContext d=0, input='x'\n",
+			this.stderrDuringParse);
+	}
+
+	/**
 	 * This is a regression test for #45 "NullPointerException in ATNConfig.hashCode".
 	 * https://github.com/antlr/antlr4/issues/45
 	 * <p/>
