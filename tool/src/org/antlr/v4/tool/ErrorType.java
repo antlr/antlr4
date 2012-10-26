@@ -150,6 +150,7 @@ public enum ErrorType {
 //	ALIAS_REASSIGNMENT(127, "token literal <arg> aliased to new token name <arg2>", ErrorSeverity.WARNING),
 	ATTRIBUTE_IN_LEXER_ACTION(128, "attribute references not allowed in lexer actions: $<arg>", ErrorSeverity.ERROR),
 	WILDCARD_IN_PARSER(129, "wildcard '.' not allowed in parsers", ErrorSeverity.ERROR),
+	LABEL_BLOCK_NOT_A_SET(130, "label <arg> assigned to a block which is not a set", ErrorSeverity.ERROR),
 
 	/** Documentation comment is unterminated */
     //UNTERMINATED_DOC_COMMENT(, "", ErrorSeverity.ERROR),
