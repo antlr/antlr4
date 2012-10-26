@@ -157,7 +157,7 @@ public enum ErrorType {
     // Dependency sorting errors
     //
     /** t1.g4 -> t2.g4 -> t3.g4 ->t1.g4 */
-    CIRCULAR_DEPENDENCY(130, "your grammars contain a circular dependency and cannot be sorted into a valid build order", ErrorSeverity.ERROR),
+    CIRCULAR_DEPENDENCY(200, "your grammars contain a circular dependency and cannot be sorted into a valid build order", ErrorSeverity.ERROR),
 
     // Simple informational messages
     //
