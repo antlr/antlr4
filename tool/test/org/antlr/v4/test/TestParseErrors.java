@@ -256,6 +256,91 @@ public class TestParseErrors extends BaseTest {
 	}
 
 	/**
+	 * This is a regression test for #6 "NullPointerException in getMissingSymbol".
+	 * https://github.com/antlr/antlr4/issues/6
+	 */
+	@Test
+	public void testInvalidEmptyInput() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"start : ID+;\n" +
+			"ID : [a-z]+;\n" +
+			"\n";
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "", true);
+		String expecting = "";
+		assertEquals(expecting, result);
+		assertEquals("line 1:0 missing ID at '<EOF>'\n", this.stderrDuringParse);
+	}
+
+	/**
+	 * Regression test for "Getter for context is not a list when it should be".
+	 * https://github.com/antlr/antlr4/issues/19
+	 */
+	@Test
+	public void testContextListGetters() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"@parser::members{\n" +
+			"  void foo() {\n" +
+			"    SContext s = null;\n" +
+			"    List<? extends AContext> a = s.a();\n" +
+			"    List<? extends BContext> b = s.b();\n" +
+			"  }\n" +
+			"}\n" +
+			"s : (a | b)+;\n" +
+			"a : 'a' {System.out.print('a');};\n" +
+			"b : 'b' {System.out.print('b');};\n" +
+			"";
+		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "abab", true);
+		String expecting = "abab\n";
+		assertEquals(expecting, result);
+		assertNull(this.stderrDuringParse);
+	}
+
+	/**
+	 * This is a regression test for #26 "an exception upon simple rule with double recursion in an alternative".
+	 * https://github.com/antlr/antlr4/issues/26
+	 */
+	@Test
+	public void testDuplicatedLeftRecursiveCall() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"start : expr EOF;\n" +
+			"expr : 'x'\n" +
+			"     | expr expr\n" +
+			"     ;\n" +
+			"\n";
+
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "x", true);
+		assertEquals("", result);
+		assertNull(this.stderrDuringParse);
+
+		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xx", true);
+		assertEquals("", result);
+		assertEquals(
+			"line 1:1 reportAttemptingFullContext d=0, input='x'\n" +
+			"line 1:1 reportContextSensitivity d=0, input='x'\n",
+			this.stderrDuringParse);
+
+		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xxx", true);
+		assertEquals("", result);
+		assertEquals(
+			"line 1:1 reportAttemptingFullContext d=0, input='x'\n" +
+			"line 1:1 reportContextSensitivity d=0, input='x'\n" +
+			"line 1:2 reportAttemptingFullContext d=0, input='x'\n",
+			this.stderrDuringParse);
+
+		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xxxx", true);
+		assertEquals("", result);
+		assertEquals(
+			"line 1:1 reportAttemptingFullContext d=0, input='x'\n" +
+			"line 1:1 reportContextSensitivity d=0, input='x'\n" +
+			"line 1:2 reportAttemptingFullContext d=0, input='x'\n" +
+			"line 1:3 reportAttemptingFullContext d=0, input='x'\n",
+			this.stderrDuringParse);
+	}
+
+	/**
 	 * Regression test for "Ambiguity at k=1 prevents full context parsing".
 	 * https://github.com/antlr/antlr4/issues/44
 	 */
@@ -279,7 +364,7 @@ public class TestParseErrors extends BaseTest {
 	/**
 	 * This is a regression test for #45 "NullPointerException in ATNConfig.hashCode".
 	 * https://github.com/antlr/antlr4/issues/45
-	 *
+	 * <p/>
 	 * The original cause of this issue was an error in the tool's ATN state optimization,
 	 * which is now detected early in {@link ATNSerializer} by ensuring that all
 	 * serialized transitions point to states which were not removed.

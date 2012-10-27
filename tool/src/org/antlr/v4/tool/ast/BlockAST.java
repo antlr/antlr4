@@ -40,11 +40,11 @@ public class BlockAST extends GrammarASTWithOptions implements RuleElementAST {
     /** What are the default options for a subrule? */
     @SuppressWarnings("serial")
     public static final Map<String, String> defaultBlockOptions =
-            new HashMap<String, String>() {{put("greedy","true");}};
+            new HashMap<String, String>();
 
     @SuppressWarnings("serial")
     public static final Map<String, String> defaultLexerBlockOptions =
-            new HashMap<String, String>() {{put("greedy","true");}};
+            new HashMap<String, String>();
 
 	public BlockAST(GrammarAST node) {
 		super(node);

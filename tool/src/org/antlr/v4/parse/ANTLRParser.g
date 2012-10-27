@@ -729,9 +729,9 @@ blockSuffix
     ;
 
 ebnfSuffix
-	:	QUESTION	-> OPTIONAL<OptionalBlockAST>[$start]
-  	|	STAR 		-> CLOSURE<StarBlockAST>[$start]
-   	|	PLUS	 	-> POSITIVE_CLOSURE<PlusBlockAST>[$start]
+	:	QUESTION nongreedy=QUESTION?	-> OPTIONAL<OptionalBlockAST>[$start, $nongreedy]
+  	|	STAR nongreedy=QUESTION?		-> CLOSURE<StarBlockAST>[$start, $nongreedy]
+   	|	PLUS nongreedy=QUESTION?		-> POSITIVE_CLOSURE<PlusBlockAST>[$start, $nongreedy]
 	;
 
 lexerAtom

@@ -66,4 +66,23 @@ public class TestBasicSemanticErrors extends BaseTest {
     };
 
 	@Test public void testU() { super.testErrors(U, false); }
+
+	/**
+	 * Regression test for #25 "Don't allow labels on not token set subrules".
+	 * https://github.com/antlr/antlr4/issues/25
+	 */
+	@Test
+	public void testIllegalNonSetLabel() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"ss : op=('=' | '+=' | expr) EOF;\n" +
+			"expr : '=' '=';\n" +
+			"";
+
+		String expected =
+			"error(130): T.g4:2:5: label op assigned to a block which is not a set\n";
+
+		testErrors(new String[] { grammar, expected }, false);
+	}
+
 }

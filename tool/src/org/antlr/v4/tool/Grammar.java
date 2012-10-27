@@ -88,12 +88,10 @@ public class Grammar implements AttributeResolver {
 
 	@SuppressWarnings("serial")
 	public static final Set<String> ParserBlockOptions = new HashSet<String>() {{
-		add("greedy");
 	}};
 
 	@SuppressWarnings("serial")
 	public static final Set<String> LexerBlockOptions = new HashSet<String>() {{
-		add("greedy");
 	}};
 
 	/** Legal options for terminal refs like ID<assoc=right> */

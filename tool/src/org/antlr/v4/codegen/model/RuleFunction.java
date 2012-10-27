@@ -125,7 +125,6 @@ public class RuleFunction extends OutputModelObject {
 				exceptions.add(new ExceptionClause(factory, catchArg, catchAction));
 			}
 		}
-		if ( r.finallyAction!=null ) finallyAction = new Action(factory, r.finallyAction);
 
 		startState = factory.getGrammar().atn.ruleToStartState[r.index];
 	}
@@ -157,6 +156,10 @@ public class RuleFunction extends OutputModelObject {
 	}
 
 	public void fillNamedActions(OutputModelFactory factory, Rule r) {
+		if ( r.finallyAction!=null ) {
+			finallyAction = new Action(factory, r.finallyAction);
+		}
+
 		namedActions = new HashMap<String, Action>();
 		for (String name : r.namedActions.keySet()) {
 			ActionAST ast = r.namedActions.get(name);

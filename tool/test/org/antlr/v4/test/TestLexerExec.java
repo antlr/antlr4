@@ -60,10 +60,10 @@ public class TestLexerExec extends BaseTest {
    	}
 
 	@Test
-	public void testImplicitNonGreedyTermination() throws Exception {
+	public void testNonGreedyTermination() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"
-			+ "STRING : '\"' ('\"\"' | .)* '\"';";
+			+ "STRING : '\"' ('\"\"' | .)*? '\"';";
 
 		String found = execLexer("L.g4", grammar, "L", "\"hi\"\"mom\"");
 		assertEquals(
@@ -74,10 +74,10 @@ public class TestLexerExec extends BaseTest {
 	}
 
 	@Test
-	public void testImplicitGreedyOptional() throws Exception {
+	public void testGreedyOptional() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"
-			+ "CMT : '//' .* '\\n' CMT?;\n"
+			+ "CMT : '//' .*? '\\n' CMT?;\n"
 			+ "WS : (' '|'\\t')+;";
 
 		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
@@ -88,24 +88,10 @@ public class TestLexerExec extends BaseTest {
 	}
 
 	@Test
-	public void testExplicitGreedyOptional() throws Exception {
+	public void testNonGreedyOptional() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"
-			+ "CMT : '//' .* '\\n' (options{greedy=true;} : CMT)?;\n"
-			+ "WS : (' '|'\\t')+;";
-
-		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
-		assertEquals(
-			"[@0,0:13='//blah\\n//blah\\n',<1>,1:0]\n" +
-			"[@1,14:13='<EOF>',<-1>,3:14]\n", found);
-		assertNull(stderrDuringParse);
-	}
-
-	@Test
-	public void testExplicitNonGreedyOptional() throws Exception {
-		String grammar =
-			"lexer grammar L;\n"
-			+ "CMT : '//' .* '\\n' (options{greedy=false;} : CMT)?;\n"
+			+ "CMT : '//' .*? '\\n' CMT??;\n"
 			+ "WS : (' '|'\\t')+;";
 
 		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
@@ -117,10 +103,10 @@ public class TestLexerExec extends BaseTest {
 	}
 
 	@Test
-	public void testImplicitGreedyClosure() throws Exception {
+	public void testGreedyClosure() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"
-			+ "CMT : '//' .* '\\n' CMT*;\n"
+			+ "CMT : '//' .*? '\\n' CMT*;\n"
 			+ "WS : (' '|'\\t')+;";
 
 		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
@@ -131,24 +117,10 @@ public class TestLexerExec extends BaseTest {
 	}
 
 	@Test
-	public void testExplicitGreedyClosure() throws Exception {
+	public void testNonGreedyClosure() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"
-			+ "CMT : '//' .* '\\n' (options{greedy=true;} : CMT)*;\n"
-			+ "WS : (' '|'\\t')+;";
-
-		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
-		assertEquals(
-			"[@0,0:13='//blah\\n//blah\\n',<1>,1:0]\n" +
-			"[@1,14:13='<EOF>',<-1>,3:14]\n", found);
-		assertNull(stderrDuringParse);
-	}
-
-	@Test
-	public void testExplicitNonGreedyClosure() throws Exception {
-		String grammar =
-			"lexer grammar L;\n"
-			+ "CMT : '//' .* '\\n' (options{greedy=false;} : CMT)*;\n"
+			+ "CMT : '//' .*? '\\n' CMT*?;\n"
 			+ "WS : (' '|'\\t')+;";
 
 		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
@@ -160,10 +132,10 @@ public class TestLexerExec extends BaseTest {
 	}
 
 	@Test
-	public void testImplicitGreedyPositiveClosure() throws Exception {
+	public void testGreedyPositiveClosure() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"
-			+ "CMT : ('//' .* '\\n')+;\n"
+			+ "CMT : ('//' .*? '\\n')+;\n"
 			+ "WS : (' '|'\\t')+;";
 
 		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
@@ -174,24 +146,10 @@ public class TestLexerExec extends BaseTest {
 	}
 
 	@Test
-	public void testExplicitGreedyPositiveClosure() throws Exception {
+	public void testNonGreedyPositiveClosure() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"
-			+ "CMT : (options{greedy=true;} : '//' .* '\\n')+;\n"
-			+ "WS : (' '|'\\t')+;";
-
-		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
-		assertEquals(
-			"[@0,0:13='//blah\\n//blah\\n',<1>,1:0]\n" +
-			"[@1,14:13='<EOF>',<-1>,3:14]\n", found);
-		assertNull(stderrDuringParse);
-	}
-
-	@Test
-	public void testExplicitNonGreedyPositiveClosure() throws Exception {
-		String grammar =
-			"lexer grammar L;\n"
-			+ "CMT : (options{greedy=false;} : '//' .* '\\n')+;\n"
+			+ "CMT : ('//' .*? '\\n')+?;\n"
 			+ "WS : (' '|'\\t')+;";
 
 		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
@@ -205,7 +163,7 @@ public class TestLexerExec extends BaseTest {
 	@Test public void testRecursiveLexerRuleRefWithWildcardStar() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"CMT : '/*' (CMT | .)* '*/' ;\n" +
+			"CMT : '/*' (CMT | .)*? '*/' ;\n" +
 			"WS : (' '|'\n')+ ;\n"
 			/*+ "ANY : .;"*/;
 
@@ -243,7 +201,7 @@ public class TestLexerExec extends BaseTest {
 	@Test public void testRecursiveLexerRuleRefWithWildcardPlus() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"CMT : '/*' (CMT | .)+ '*/' ;\n" +
+			"CMT : '/*' (CMT | .)+? '*/' ;\n" +
 			"WS : (' '|'\n')+ ;\n"
 			/*+ "ANY : .;"*/;
 
