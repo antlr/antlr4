@@ -41,7 +41,7 @@ public class TestParserExec extends BaseTest {
 			"b : id=ID val+=INT*;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "abc 34", false);
@@ -52,10 +52,10 @@ public class TestParserExec extends BaseTest {
 	@Test public void testBasic() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ID INT {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
+			"a : ID INT {System.out.println($text);} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "abc 34", false);
@@ -70,7 +70,7 @@ public class TestParserExec extends BaseTest {
 				";\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "34", false);
@@ -80,9 +80,9 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAPlus() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ID+ {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
+			"a : ID+ {System.out.println($text);} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "a b c", false);
@@ -93,9 +93,9 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAorAPlus() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : (ID|ID)+ {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
+			"a : (ID|ID)+ {System.out.println($text);} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "a b c", false);
@@ -139,9 +139,9 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAStar() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ID* {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
+			"a : ID* {System.out.println($text);} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "", false);
@@ -155,9 +155,9 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAorAStar() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : (ID|ID)* {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
+			"a : (ID|ID)* {System.out.println($text);} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "", false);
@@ -170,10 +170,10 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAorBPlus() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : (ID|INT{;})+ {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
+			"a : (ID|INT{;})+ {System.out.println($text);} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "a 34 c", false);
@@ -183,10 +183,10 @@ public class TestParserExec extends BaseTest {
 	@Test public void testAorBStar() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : (ID|INT{;})* {System.out.println(_input.getText(Interval.of(0,_input.index()-1)));} ;\n" +
+			"a : (ID|INT{;})* {System.out.println($text);} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "", false);
