@@ -54,7 +54,7 @@ import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupDir;
+import org.stringtemplate.v4.STGroupFile;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -70,8 +70,8 @@ public class DOTGenerator {
 	protected String arrowhead="normal";
 	protected String rankdir="LR";
 
-	/** Library of output templates; use <attrname> format */
-    public static STGroup stlib = new STGroupDir("org/antlr/v4/tool/templates/dot");
+	/** Library of output templates; use {@code <attrname>} format. */
+    public static STGroup stlib = new STGroupFile("org/antlr/v4/tool/templates/dot/graphs.stg");
 
     protected Grammar grammar;
 
