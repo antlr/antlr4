@@ -139,9 +139,9 @@ public class <parser.name> extends <superClass> {
 
 <if(sempredFuncs)>
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
-		switch ( ruleIndex ) {
-			<parser.sempredFuncs.values:{f|
-	case <f.ruleIndex> : return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
+		switch (ruleIndex) {
+		<parser.sempredFuncs.values:{f|
+case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
 		}
 		return true;
 	}
@@ -156,9 +156,9 @@ dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
 @Override
 public void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
-	switch ( ruleIndex ) {
-		<recog.actionFuncs.values:{f|
-case <f.ruleIndex> : <f.name>_action((<f.ctxType>)_localctx, actionIndex); break;}; separator="\n">
+	switch (ruleIndex) {
+	<recog.actionFuncs.values:{f|
+case <f.ruleIndex>: <f.name>_action((<f.ctxType>)_localctx, actionIndex); break;}; separator="\n">
 	}
 }
 <actionFuncs.values; separator="\n">
@@ -166,9 +166,9 @@ case <f.ruleIndex> : <f.name>_action((<f.ctxType>)_localctx, actionIndex); break
 <if(sempredFuncs)>
 @Override
 public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
-	switch ( ruleIndex ) {
-		<recog.sempredFuncs.values:{f|
-case <f.ruleIndex> : return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
+	switch (ruleIndex) {
+	<recog.sempredFuncs.values:{f|
+case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
 	}
 	return true;
 }
@@ -185,18 +185,18 @@ public <p.name>(TokenStream input) {
 
 RuleActionFunction(r, actions) ::= <<
 public void <r.name>_action(<r.ctxType> _localctx, int actionIndex) {
-	switch ( actionIndex ) {
-		<actions:{index|
-case <index> : <actions.(index)> break;}; separator="\n">
+	switch (actionIndex) {
+	<actions:{index|
+case <index>: <actions.(index)> break;}; separator="\n">
 	}
 }
 >>
 
 RuleSempredFunction(r, actions) ::= <<
 public boolean <r.name>_sempred(<r.ctxType> _localctx, int predIndex) {
-	switch ( predIndex ) {
-		<actions:{index|
-case <index> : return <actions.(index)>;}; separator="\n">
+	switch (predIndex) {
+	<actions:{index|
+case <index>: return <actions.(index)>;}; separator="\n">
 	}
 	return true;
 }
@@ -290,35 +290,35 @@ CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
 
 LL1AltBlock(choice, preamble, alts, error) ::= <<
 setState(<choice.stateNumber>);
-//_errHandler.sync(this);
+<!_errHandler.sync(this);!>
 <if(choice.label)><labelref(choice.label)> = _input.LT(1);<endif>
 <preamble; separator="\n">
-switch ( _input.LA(1) ) {
-	<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+switch (_input.LA(1)) {
+<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
 	break;}; separator="\n">
-	default :
-		<error>
+default:
+	<error>
 }
 >>
 
 LL1OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>);
-//_errHandler.sync(this);
-switch ( _input.LA(1) ) {
-	<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+<!_errHandler.sync(this);!>
+switch (_input.LA(1)) {
+<choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
 	break;}; separator="\n">
-	default :
-		<error>
+default:
+	<error>
 }
 >>
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
 setState(<choice.stateNumber>);
-//_errHandler.sync(this);
+<!_errHandler.sync(this);!>
 <preamble; separator="\n">
-if ( <expr> ) {
+if (<expr>) {
 	<alts; separator="\n">
 }
 <!else if ( !(<followExpr>) ) <error>!>
@@ -329,12 +329,12 @@ setState(<choice.stateNumber>);
 _errHandler.sync(this);
 <choice.loopLabel>:
 while (true) {
-	switch ( _input.LA(1) ) {
-		<choice.altLook,alts:{look,alt| <cases(look)>
+	switch (_input.LA(1)) {
+	<choice.altLook,alts:{look,alt| <cases(look)>
 	<alt>
-		break;}; separator="\n">
-		<cases(choice.exitLook)>
-			break <choice.loopLabel>;
+	break;}; separator="\n">
+	<cases(choice.exitLook)>
+		break <choice.loopLabel>;
 	}
 	setState(<choice.loopBackStateNumber>);
 	_errHandler.sync(this);
@@ -345,7 +345,7 @@ LL1StarBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
 setState(<choice.stateNumber>);
 _errHandler.sync(this);
 <preamble; separator="\n">
-while ( <loopExpr> ) {
+while (<loopExpr>) {
 	<alts; separator="\n">
 	setState(<choice.loopBackStateNumber>);
 	_errHandler.sync(this);
@@ -357,12 +357,12 @@ LL1PlusBlock(choice, alts, iteration, loopExpr, error) ::= <<
 setState(<choice.blockStartStateNumber>); <! alt block decision !>
 _errHandler.sync(this);
 do {
-	switch ( _input.LA(1) ) {
-		<choice.altLook,alts:{look,alt| <cases(look)>
+	switch (_input.LA(1)) {
+	<choice.altLook,alts:{look,alt| <cases(look)>
 	<alt>
 	break;}; separator="\n">
-		default :
-			<error>
+	default:
+		<error>
 	}
 	setState(<choice.stateNumber>);
 	_errHandler.sync(this);
@@ -386,11 +386,11 @@ do {
 
 AltBlock(choice, preamble, alts, error) ::= <<
 setState(<choice.stateNumber>);
-//_errHandler.sync(this);
+<!_errHandler.sync(this);!>
 <if(choice.label)><labelref(choice.label)> = _input.LT(1);<endif>
 <preamble; separator="\n">
 switch ( getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx) ) {
-	<alts:{alt |
+<alts:{alt |
 case <i>:
 	<alt>
 	break;}; separator="\n">
@@ -399,9 +399,9 @@ case <i>:
 
 OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>);
-//_errHandler.sync(this);
+<!_errHandler.sync(this);!>
 switch ( getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx) ) {
-	<alts:{alt |
+<alts:{alt |
 case <i><if(!choice.ast.greedy)>+1<endif>:
 	<alt>
 	break;}; separator="\n">
@@ -428,13 +428,13 @@ setState(<choice.blockStartStateNumber>); <! alt block decision !>
 _errHandler.sync(this);
 _alt = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
 do {
-	switch ( _alt ) {
-		<alts:{alt|
+	switch (_alt) {
+	<alts:{alt|
 case <i><if(!choice.ast.greedy)>+1<endif>:
 	<alt>
 	break;}; separator="\n">
-		default :
-			<error>
+	default:
+		<error>
 	}
 	setState(<choice.loopBackStateNumber>); <! loopback/exit decision !>
 	_errHandler.sync(this);
@@ -760,9 +760,9 @@ public static final ATN _ATN =
 	ATNSimulator.deserialize(_serializedATN.toCharArray());
 static {
     _decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
-	//org.antlr.v4.tool.DOTGenerator dot = new org.antlr.v4.tool.DOTGenerator(null);
-	//System.out.println(dot.getDOT(_ATN.decisionToState.get(0), ruleNames, false));
-	//System.out.println(dot.getDOT(_ATN.ruleToStartState[2], ruleNames, false));
+<!	org.antlr.v4.tool.DOTGenerator dot = new org.antlr.v4.tool.DOTGenerator(null);!>
+<!	System.out.println(dot.getDOT(_ATN.decisionToState.get(0), ruleNames, false));!>
+<!	System.out.println(dot.getDOT(_ATN.ruleToStartState[2], ruleNames, false));!>
 }
 >>
 
