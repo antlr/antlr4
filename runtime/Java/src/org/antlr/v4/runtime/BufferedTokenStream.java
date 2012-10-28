@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -342,12 +343,15 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
     public String getSourceName() {	return tokenSource.getSourceName();	}
 
 	/** Get the text of all tokens in this buffer. */
+	@NotNull
+	@Override
 	public String getText() {
 		if ( p == -1 ) setup();
 		fill();
 		return getText(Interval.of(0,size()-1));
 	}
 
+	@NotNull
     @Override
     public String getText(Interval interval) {
 		int start = interval.a;
@@ -365,15 +369,20 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 		return buf.toString();
     }
 
+	@NotNull
 	@Override
-	public String getText(RuleContext ctx) { return getText(ctx.getSourceInterval()); }
+	public String getText(RuleContext ctx) {
+		return getText(ctx.getSourceInterval());
+	}
 
+	@NotNull
     @Override
     public String getText(Token start, Token stop) {
         if ( start!=null && stop!=null ) {
             return getText(Interval.of(start.getTokenIndex(), stop.getTokenIndex()));
         }
-        return null;
+
+		return "";
     }
 
     /** Get all tokens from lexer until EOF */
