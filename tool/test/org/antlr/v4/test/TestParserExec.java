@@ -102,6 +102,40 @@ public class TestParserExec extends BaseTest {
 		assertEquals("abc\n", found);
 	}
 
+	private static final String ifIfElseGrammarFormat =
+		"grammar T;\n" +
+		"start : statement+ ;\n" +
+		"statement : 'x' | ifStatement;\n" +
+		"ifStatement : 'if' 'y' statement %s {System.out.println($text);};\n" +
+		"ID : 'a'..'z'+ ;\n" +
+		"WS : (' '|'\\n') -> channel(HIDDEN);\n";
+
+	@Test public void testIfIfElseGreedyBinding() throws Exception {
+		final String input = "if y if y x else x";
+		final String expectedInnerBound = "if y x else x\nif y if y x else x\n";
+
+		String grammar = String.format(ifIfElseGrammarFormat, "('else' statement)?");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start", input, false);
+		assertEquals(expectedInnerBound, found);
+
+		grammar = String.format(ifIfElseGrammarFormat, "('else' statement|)");
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "start", input, false);
+		assertEquals(expectedInnerBound, found);
+	}
+
+	@Test public void testIfIfElseNonGreedyBinding() throws Exception {
+		final String input = "if y if y x else x";
+		final String expectedOuterBound = "if y x\nif y if y x else x\n";
+
+		String grammar = String.format(ifIfElseGrammarFormat, "('else' statement)??");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start", input, false);
+		assertEquals(expectedOuterBound, found);
+
+		grammar = String.format(ifIfElseGrammarFormat, "(|'else' statement)");
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "start", input, false);
+		assertEquals(expectedOuterBound, found);
+	}
+
 	@Test public void testAStar() throws Exception {
 		String grammar =
 			"grammar T;\n" +
@@ -198,7 +232,7 @@ public class TestParserExec extends BaseTest {
 	 * https://github.com/antlr/antlr4/issues/42
 	 */
 	@Test
-	public void testIfIfElse() throws Exception {
+	public void testPredicatedIfIfElse() throws Exception {
 		// Sam's works here but mine doesn't since I fail over to LL even
 		// though SLL + preds evals to single alt; i could avoid but
 		// code complexity wasn't worth it. see branch SLL-w-preds-avoids-LL
