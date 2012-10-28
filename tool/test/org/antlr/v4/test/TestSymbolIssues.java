@@ -21,10 +21,11 @@ public class TestSymbolIssues extends BaseTest {
         "\n" +
         "ID : 'a'..'z'+ ID ;",
         // YIELDS
-        "warning(83): A.g4:2:10: illegal option opt\n" +
-			"warning(83): A.g4:2:21: illegal option k\n" +
 			"error(94): A.g4:5:1: redefinition of members action\n" +
 			"error(94): A.g4:7:1: redefinition of header action\n" +
+			"warning(83): A.g4:2:10: illegal option opt\n" +
+			"warning(83): A.g4:2:21: illegal option k\n" +
+			"error(94): A.g4:5:1: redefinition of members action\n" +
 			"warning(125): A.g4:9:27: implicit definition of token X in parser\n" +
 			"warning(125): A.g4:10:20: implicit definition of token Y in parser\n" +
 			"warning(125): A.g4:11:4: implicit definition of token FJKD in parser\n" +
@@ -44,7 +45,6 @@ public class TestSymbolIssues extends BaseTest {
         "\n" +
         "s : FOO ;",
         // YIELDS
-        "error(59): B.g4:2:18: can't assign string value to token name X in non-combined grammar\n" +
 		"error(69): B.g4:4:4: label s conflicts with rule with same name\n" +
 		"error(69): B.g4:4:9: label b conflicts with rule with same name\n" +
 		"error(70): B.g4:4:15: label X conflicts with token with same name\n" +
@@ -75,15 +75,12 @@ public class TestSymbolIssues extends BaseTest {
 		"tokens {\n" +
 		"	A, A,\n" +
 		"	B,\n" +
-		"	C,\n" +
+		"	C\n" +
 		"}\n" +
 		"a : A ;\n",
 
 		// YIELDS
-		"error(108): E.g4:4:8: cannot redefine B; token name already defined\n" +
-		"error(108): E.g4:5:4: cannot redefine C; token name already defined\n" +
-		"error(108): E.g4:6:8: cannot redefine D; token name already defined\n" +
-		"error(107): E.g4:7:8: cannot alias X='e'; string already assigned to E\n"
+		"warning(108): E.g4:3:4: token name A is already defined\n"
 	};
 
     @Test public void testA() { super.testErrors(A, false); }
