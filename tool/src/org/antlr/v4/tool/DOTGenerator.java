@@ -304,6 +304,11 @@ public class DOTGenerator {
 				edgeST.add("src", "s"+s.stateNumber);
 				edgeST.add("target", "s"+edge.target.stateNumber);
 				edgeST.add("arrowhead", arrowhead);
+				if (s.getNumberOfTransitions() > 1) {
+					edgeST.add("transitionIndex", i);
+				} else {
+					edgeST.add("transitionIndex", false);
+				}
 				dot.add("edges", edgeST);
 				work.add(edge.target);
 			}
@@ -327,11 +332,13 @@ public class DOTGenerator {
 			st.add("label", getStateLabel(s));
 			dot.add("states", st);
 		}
+
 		for (ATNState s : markedStates) {
 			if ( s instanceof RuleStopState ) continue;
 			ST st = stlib.getInstanceOf("state");
 			st.add("name", "s"+s.stateNumber);
 			st.add("label", getStateLabel(s));
+			st.add("transitions", s.getTransitions());
 			dot.add("states", st);
 		}
 

@@ -126,7 +126,13 @@ public class ATNState {
 		return String.valueOf(stateNumber);
 	}
 
-	public int getNumberOfTransitions() { return transitions.size(); }
+	public Transition[] getTransitions() {
+		return transitions.toArray(new Transition[transitions.size()]);
+	}
+
+	public int getNumberOfTransitions() {
+		return transitions.size();
+	}
 
 	public void addTransition(Transition e) {
 		if (transitions.isEmpty()) {
