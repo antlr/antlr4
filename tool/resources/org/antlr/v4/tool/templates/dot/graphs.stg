@@ -32,9 +32,28 @@ epsilon-edge(src,label,target,arrowhead,transitionIndex,loopback=false) ::= <<
 <src><if(transitionIndex)>:p<transitionIndex><endif> -> <target> [fontname="Times-Italic", label="&epsilon;"<if(loopback)>, style="dashed"<endif>];
 >>
 
-state(state, label, name, transitions) ::= <<
-<name>[fontsize=11, label="<if(rest(transitions))>{<endif><label><if(rest(transitions))>|{<transitions:{t|\<p<i0>\>}; separator="|">}}<endif>", <if(rest(transitions))>shape=record, fixedsize=false<else>shape=circle, fixedsize=true, width=.55<endif>, peripheries=1];
->>
+state(state, label, name, transitions) ::= <%
+<name>[fontsize=11,
+    label="
+        <! rest(transition) tests for decision states: these nodes have a non-empty set of transitions after the first one. !>
+        <if(rest(transitions))>
+            {
+            <! Label on the left side of the record node. !>
+            <label>
+            |
+            <! Named ports in order on right side of record node, no display text. !>
+            {<transitions:{t|\<p<i0>>}; separator="|">}}
+        <else>
+            <label>
+        <endif>
+        "
+    <if(rest(transitions))>
+        , shape=record, fixedsize=false
+    <else>
+        , shape=circle, fixedsize=true, width=.55
+    <endif>
+    , peripheries=1];
+%>
 
 stopstate(name,label,actionIndex,useBox) ::= <<
 <name>[fontsize=11, label="<label><if(actionIndex)>,\naction:<actionIndex><endif>", <if(useBox)>shape=polygon,sides=4,peripheries=2,fixedsize=false<else>shape=doublecircle, fixedsize=true, width=.6<endif>];
