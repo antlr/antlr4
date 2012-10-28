@@ -402,7 +402,7 @@ setState(<choice.stateNumber>);
 //_errHandler.sync(this);
 switch ( getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx) ) {
 	<alts:{alt |
-case <i>:
+case <i><if(!choice.ast.greedy)>+1<endif>:
 	<alt>
 	break;}; separator="\n">
 }
@@ -413,7 +413,7 @@ setState(<choice.stateNumber>);
 _errHandler.sync(this);
 _alt = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
 while ( _alt!=<choice.exitAlt> && _alt!=-1 ) {
-	if ( _alt==1 ) {
+	if ( _alt==1<if(!choice.ast.greedy)>+1<endif> ) {
 		<iteration>
 		<alts> <! should only be one !>
 	}
@@ -430,7 +430,7 @@ _alt = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
 do {
 	switch ( _alt ) {
 		<alts:{alt|
-case <i>:
+case <i><if(!choice.ast.greedy)>+1<endif>:
 	<alt>
 	break;}; separator="\n">
 		default :
