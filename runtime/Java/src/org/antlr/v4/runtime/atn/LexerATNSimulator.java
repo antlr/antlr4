@@ -585,10 +585,6 @@ public class LexerATNSimulator extends ATNSimulator {
 				break;
 
 			case Transition.PREDICATE:
-//				if (recog == null) {
-//					System.out.format("Predicates cannot be evaluated without a recognizer; assuming true.\n");
-//				}
-
 				/*  Track traversing semantic predicates. If we traverse,
 				 we cannot add a DFA state for this "reach" computation
 				 because the DFA would not test the predicate again in the
@@ -613,7 +609,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 				configs.hasSemanticContext = true;
 				if ( recog == null || recog.sempred(null, pt.ruleIndex, pt.predIndex) ) {
-					c = new LexerATNConfig(config, t.target, pt.getPredicate());
+					c = new LexerATNConfig(config, t.target);
 				}
 				break;
 			// ignore actions; just exec one per rule upon accept
@@ -676,6 +672,15 @@ public class LexerATNSimulator extends ATNSimulator {
 								  int t,
 								  @NotNull ATNConfigSet q)
 	{
+		/* leading to this call, ATNConfigSet.hasSemanticContext is used as a
+		 * marker indicating dynamic predicate evaluation makes this edge
+		 * dependent on the specific input sequence, so the static edge in the
+		 * DFA should be omitted. The target DFAState is still created since
+		 * execATN has the ability to resynchronize with the DFA state cache
+		 * following the predicate evaluation step.
+		 */
+		boolean suppressEdge = q.hasSemanticContext;
+		q.hasSemanticContext = false;
 		DFAState to = addDFAState(q);
 
 		// even if we can add the states, we can't add an edge for labels out of range
@@ -683,7 +688,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			return to;
 		}
 
-		if (from == null || to == null) {
+		if (from == null || to == null || suppressEdge) {
 			return to;
 		}
 
@@ -712,8 +717,10 @@ public class LexerATNSimulator extends ATNSimulator {
 	 */
 	@Nullable
 	protected DFAState addDFAState(@NotNull ATNConfigSet configs) {
-		// If we eval'd a predicate while filling configs, mustn't create DFA state
-		if ( configs.hasSemanticContext ) return null;
+		/* the lexer evaluates predicates on-the-fly; by this point configs
+		 * should not contain any configurations with unevaluated predicates.
+		 */
+		assert !configs.hasSemanticContext;
 
 		DFAState proposed = new DFAState(configs);
 		ATNConfig firstConfigWithRuleStopState = null;

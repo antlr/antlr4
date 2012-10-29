@@ -64,13 +64,6 @@ public class LexerATNConfig extends ATNConfig {
 	}
 
 	public LexerATNConfig(@NotNull LexerATNConfig c, @NotNull ATNState state,
-						  @NotNull SemanticContext semanticContext) {
-		super(c, state, c.context, semanticContext);
-		this.lexerActionIndex = c.lexerActionIndex;
-		this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
-	}
-
-	public LexerATNConfig(@NotNull LexerATNConfig c, @NotNull ATNState state,
 						  int actionIndex)
 	{
 		super(c, state, c.context, c.semanticContext);
