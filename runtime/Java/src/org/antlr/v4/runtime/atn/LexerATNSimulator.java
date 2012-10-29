@@ -46,8 +46,8 @@ import java.io.OutputStream;
 
 /** "dup" of ParserInterpreter */
 public class LexerATNSimulator extends ATNSimulator {
-	public static boolean debug = false;
-	public static boolean dfa_debug = false;
+	public static final boolean debug = false;
+	public static final boolean dfa_debug = false;
 
 	public static final int MIN_DFA_EDGE = 0;
 	public static final int MAX_DFA_EDGE = 127; // forces unicode to stay in ATN
