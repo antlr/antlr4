@@ -48,6 +48,8 @@ import java.io.OutputStream;
 public class LexerATNSimulator extends ATNSimulator {
 	public static boolean debug = false;
 	public static boolean dfa_debug = false;
+
+	public static final int MIN_DFA_EDGE = 0;
 	public static final int MAX_DFA_EDGE = 127; // forces unicode to stay in ATN
 
 	private boolean trace = false;
@@ -230,8 +232,8 @@ public class LexerATNSimulator extends ATNSimulator {
 			}
 
 			DFAState target = null;
-			if (s.edges != null && t > IntStream.EOF && t <= MAX_DFA_EDGE) {
-				target = s.edges[t];
+			if (s.edges != null && t >= MIN_DFA_EDGE && t <= MAX_DFA_EDGE) {
+				target = s.edges[t - MIN_DFA_EDGE];
 			}
 
 			// if no edge, pop over to ATN interpreter, update DFA and return
@@ -300,9 +302,9 @@ public class LexerATNSimulator extends ATNSimulator {
 			// that already has lots of edges out of it. e.g., .* in comments.
 			DFAState target = null;
 			ATNConfigSet reach = null;
-			if ( s.edges != null && t <= MAX_DFA_EDGE && t > IntStream.EOF ) {
+			if ( s.edges != null && t >= MIN_DFA_EDGE && t <= MAX_DFA_EDGE ) {
 				closure = s.configs;
-				target = s.edges[t];
+				target = s.edges[t - MIN_DFA_EDGE];
 				if (target == ERROR) {
 					break;
 				}
@@ -696,7 +698,10 @@ public class LexerATNSimulator extends ATNSimulator {
 	}
 
 	protected void addDFAEdge(@NotNull DFAState p, int t, @NotNull DFAState q) {
-		if (t < 0 || t > MAX_DFA_EDGE) return; // Only track edges within the DFA bounds
+		if (t < MIN_DFA_EDGE || t > MAX_DFA_EDGE) {
+			// Only track edges within the DFA bounds
+			return;
+		}
 
 		if ( debug ) {
 			System.out.println("EDGE "+p+" -> "+q+" upon "+((char)t));
@@ -706,9 +711,9 @@ public class LexerATNSimulator extends ATNSimulator {
 		synchronized (dfa) {
 			if ( p.edges==null ) {
 				//  make room for tokens 1..n and -1 masquerading as index 0
-				p.edges = new DFAState[MAX_DFA_EDGE+1]; // TODO: make adaptive
+				p.edges = new DFAState[MAX_DFA_EDGE-MIN_DFA_EDGE+1];
 			}
-			p.edges[t] = q; // connect
+			p.edges[t - MIN_DFA_EDGE] = q; // connect
 		}
 	}
 
