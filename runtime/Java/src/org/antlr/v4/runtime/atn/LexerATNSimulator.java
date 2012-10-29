@@ -682,6 +682,10 @@ public class LexerATNSimulator extends ATNSimulator {
 		 * DFA should be omitted. The target DFAState is still created since
 		 * execATN has the ability to resynchronize with the DFA state cache
 		 * following the predicate evaluation step.
+		 *
+		 * TJP notes: next time through the DFA, we see a pred again and eval.
+		 * If that gets us to a previously created (but dangling) DFA
+		 * state, we can continue in pure DFA mode from there.
 		 */
 		boolean suppressEdge = q.hasSemanticContext;
 		q.hasSemanticContext = false;

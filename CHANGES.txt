@@ -4,6 +4,7 @@ October 29, 2012
 
 * Sam fixes nongreedy more.
 * -Werror added.
+* Sam made speed improvement re preds in lexer.
 
 October 20, 2012
 
