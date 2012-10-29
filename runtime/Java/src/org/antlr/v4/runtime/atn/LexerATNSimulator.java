@@ -685,23 +685,21 @@ public class LexerATNSimulator extends ATNSimulator {
 		@NotNull
 		DFAState to = addDFAState(q);
 
-		// even if we can add the states, we can't add an edge for labels out of range
-		if (t < 0 || t > MAX_DFA_EDGE) {
-			return to;
-		}
-
 		if (suppressEdge) {
 			return to;
 		}
 
-		if ( debug ) System.out.println("EDGE "+from+" -> "+to+" upon "+((char)t));
 		addDFAEdge(from, t, to);
-
 		return to;
 	}
 
 	protected void addDFAEdge(@NotNull DFAState p, int t, @NotNull DFAState q) {
 		if (t < 0 || t > MAX_DFA_EDGE) return; // Only track edges within the DFA bounds
+
+		if ( debug ) {
+			System.out.println("EDGE "+p+" -> "+q+" upon "+((char)t));
+		}
+
 		DFA dfa = decisionToDFA[mode];
 		synchronized (dfa) {
 			if ( p.edges==null ) {
