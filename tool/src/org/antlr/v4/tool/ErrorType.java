@@ -55,6 +55,7 @@ public enum ErrorType {
 	CANNOT_OPEN_FILE(7, "cannot find or open file: <arg><if(exception)>; reason: <exception><endif>", ErrorSeverity.ERROR),
 	FILE_AND_GRAMMAR_NAME_DIFFER(8, "grammar name <arg> and file name <arg2> differ", ErrorSeverity.ERROR),
 	BAD_OPTION_SET_SYNTAX(9, "invalid -Dname=value syntax: <arg>", ErrorSeverity.ERROR),
+	WARNING_TREATED_AS_ERROR(10, "warning treated as error", ErrorSeverity.ERROR),
 
 	INTERNAL_ERROR(20, "internal error: <arg> <arg2><if(exception)>: <exception><endif>\n" +
 				   "<stackTrace; separator=\"\\n\">", ErrorSeverity.ERROR),
@@ -126,7 +127,7 @@ public enum ErrorType {
 	NO_SUCH_GRAMMAR_SCOPE(105, "reference to undefined grammar in rule reference: <arg>.<arg2>", ErrorSeverity.ERROR),
 	NO_SUCH_RULE_IN_SCOPE(106, "rule <arg2> is not defined in grammar <arg>", ErrorSeverity.ERROR),
 //	TOKEN_STRING_REASSIGNMENT(107, "cannot alias <arg> in tokens {}; string already assigned to <arg2>", ErrorSeverity.ERROR),
-//	TOKEN_NAME_REASSIGNMENT(108, "cannot redefine <arg>; token name already <if(arg2)>assigned to <arg2><else>defined<endif>", ErrorSeverity.ERROR),
+	TOKEN_NAME_REASSIGNMENT(108, "token name <arg> is already defined", ErrorSeverity.WARNING),
 	//TOKEN_VOCAB_IN_DELEGATE(, "tokenVocab option ignored in imported grammar <arg>", ErrorSeverity.ERROR),
 	OPTIONS_IN_DELEGATE(109, "options ignored in imported grammar <arg>", ErrorSeverity.WARNING),
 //	TOKEN_ALIAS_IN_DELEGATE(, "can't assign string to token name <arg> to string in imported grammar <arg2>", ErrorSeverity.ERROR),

@@ -46,6 +46,9 @@ import java.util.Deque;
 import java.util.List;
 
 public abstract class ATNSimulator {
+	public static final int SERIALIZED_NON_GREEDY_MASK = 0x8000;
+	public static final int SERIALIZED_STATE_TYPE_MASK = 0x7FFF;
+
 	/** Must distinguish between missing edge and edge we know leads nowhere */
 	@NotNull
 	public static final DFAState ERROR;
@@ -86,7 +89,13 @@ public abstract class ATNSimulator {
 				atn.addState(null);
 				continue;
 			}
+
+			boolean nonGreedy = (stype & SERIALIZED_NON_GREEDY_MASK) != 0;
+			stype &= SERIALIZED_STATE_TYPE_MASK;
 			ATNState s = stateFactory(stype, i);
+			if (s instanceof DecisionState) {
+				((DecisionState)s).nonGreedy = nonGreedy;
+			}
 			s.ruleIndex = toInt(data[p++]);
 			if ( stype == ATNState.LOOP_END ) { // special case
 				int loopBackStateNumber = toInt(data[p++]);

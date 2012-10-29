@@ -394,12 +394,14 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
     public String getSourceName() {	return tokenSource.getSourceName();	}
 
 	/** Get the text of all tokens in this buffer. */
+	@NotNull
 	@Override
 	public String getText() {
 		fill();
 		return getText(Interval.of(0,size()-1));
 	}
 
+	@NotNull
     @Override
     public String getText(Interval interval) {
 		int start = interval.a;
@@ -417,15 +419,20 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
 		return buf.toString();
     }
 
+	@NotNull
 	@Override
-	public String getText(RuleContext<?> ctx) { return getText(ctx.getSourceInterval()); }
+	public String getText(RuleContext<?> ctx) {
+		return getText(ctx.getSourceInterval());
+	}
 
+	@NotNull
     @Override
     public String getText(Object start, Object stop) {
         if ( start instanceof Token && stop instanceof Token ) {
             return getText(Interval.of(((Token)start).getTokenIndex(), ((Token)stop).getTokenIndex()));
         }
-        return null;
+
+		return "";
     }
 
     /** Get all tokens from lexer until EOF. */

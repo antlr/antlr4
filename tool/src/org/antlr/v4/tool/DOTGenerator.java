@@ -53,7 +53,7 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupDir;
+import org.stringtemplate.v4.STGroupFile;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -70,8 +70,8 @@ public class DOTGenerator {
 	protected String arrowhead="normal";
 	protected String rankdir="LR";
 
-	/** Library of output templates; use <attrname> format */
-    public static STGroup stlib = new STGroupDir("org/antlr/v4/tool/templates/dot");
+	/** Library of output templates; use {@code <attrname>} format. */
+    public static STGroup stlib = new STGroupFile("org/antlr/v4/tool/templates/dot/graphs.stg");
 
     protected Grammar grammar;
 
@@ -292,6 +292,11 @@ public class DOTGenerator {
 				edgeST.add("src", "s"+s.stateNumber);
 				edgeST.add("target", "s"+edge.target.stateNumber);
 				edgeST.add("arrowhead", arrowhead);
+				if (s.getNumberOfTransitions() > 1) {
+					edgeST.add("transitionIndex", i);
+				} else {
+					edgeST.add("transitionIndex", false);
+				}
 				dot.add("edges", edgeST);
 				work.add(edge.target);
 			}
@@ -315,11 +320,13 @@ public class DOTGenerator {
 			st.add("label", getStateLabel(s));
 			dot.add("states", st);
 		}
+
 		for (ATNState s : markedStates) {
 			if ( s instanceof RuleStopState ) continue;
 			ST st = stlib.getInstanceOf("state");
 			st.add("name", "s"+s.stateNumber);
 			st.add("label", getStateLabel(s));
+			st.add("transitions", s.getTransitions());
 			dot.add("states", st);
 		}
 

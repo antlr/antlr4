@@ -47,6 +47,5 @@ public class StarBlock extends Loop {
 		StarLoopEntryState star = (StarLoopEntryState)blkOrEbnfRootAST.atnState;
 		loopBackStateNumber = star.loopBackState.stateNumber;
 		decision = star.decision;
-		exitAlt = alts.size()+1;
 	}
 }

@@ -140,16 +140,19 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream<T> {
 		return tokenSource;
 	}
 
+	@NotNull
 	@Override
 	public String getText() {
-		return null;
+		return "";
 	}
 
+	@NotNull
 	@Override
 	public String getText(RuleContext<?> ctx) {
 		return getText(ctx.getSourceInterval());
 	}
 
+	@NotNull
 	@Override
 	public String getText(Object start, Object stop) {
 		if (start instanceof Token && stop instanceof Token) {
@@ -309,6 +312,7 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream<T> {
 		return tokenSource.getSourceName();
 	}
 
+	@NotNull
 	@Override
 	public String getText(Interval interval) {
 		int bufferStartIndex = getBufferStartIndex();

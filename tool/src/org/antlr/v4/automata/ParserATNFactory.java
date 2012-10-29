@@ -426,6 +426,7 @@ public class ParserATNFactory implements ATNFactory {
 	public Handle optional(@NotNull GrammarAST optAST, @NotNull Handle blk) {
 		BlockStartState blkStart = (BlockStartState)blk.left;
 
+		blkStart.nonGreedy = !((QuantifierAST)optAST).isGreedy();
 		if (((QuantifierAST)optAST).isGreedy()) {
 			epsilon(blkStart, blk.right);
 		} else {
@@ -454,6 +455,7 @@ public class ParserATNFactory implements ATNFactory {
 		BlockEndState blkEnd = (BlockEndState)blk.right;
 
 		PlusLoopbackState loop = newState(PlusLoopbackState.class, plusAST);
+		loop.nonGreedy = !((QuantifierAST)plusAST).isGreedy();
 		atn.defineDecisionState(loop);
 		LoopEndState end = newState(LoopEndState.class, plusAST);
 		blkStart.loopBackState = loop;
@@ -499,6 +501,7 @@ public class ParserATNFactory implements ATNFactory {
 		BlockEndState blkEnd = (BlockEndState)elem.right;
 
 		StarLoopEntryState entry = newState(StarLoopEntryState.class, starAST);
+		entry.nonGreedy = !((QuantifierAST)starAST).isGreedy();
 		atn.defineDecisionState(entry);
 		LoopEndState end = newState(LoopEndState.class, starAST);
 		StarLoopbackState loop = newState(StarLoopbackState.class, starAST);

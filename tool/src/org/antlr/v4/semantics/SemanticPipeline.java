@@ -220,16 +220,13 @@ public class SemanticPipeline {
 	{
 		//Grammar G = g.getOutermostGrammar(); // put in root, even if imported
 
-		// DEFINE tokens { X='x'; } ALIASES
+		// create token types for tokens { A, B, C } ALIASES
 		for (GrammarAST alias : tokensDefs) {
-			if ( alias.getType()== ANTLRParser.ASSIGN ) {
-				String name = alias.getChild(0).getText();
-				String lit = alias.getChild(1).getText();
-				g.defineTokenAlias(name, lit);
+			if (g.getTokenType(alias.getText()) != Token.INVALID_TYPE) {
+				g.tool.errMgr.grammarError(ErrorType.TOKEN_NAME_REASSIGNMENT, g.fileName, alias.token, alias.getText());
 			}
-			else {
-				g.defineTokenName(alias.getText());
-			}
+
+			g.defineTokenName(alias.getText());
 		}
 
 		// DEFINE TOKEN TYPES FOR TOKEN REFS LIKE ID, INT

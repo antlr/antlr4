@@ -503,6 +503,11 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		return hasSemanticContext;
 	}
 
+	public void clearExplicitSemanticContext() {
+		ensureWritable();
+		hasSemanticContext = false;
+	}
+
 	public void markExplicitSemanticContext() {
 		ensureWritable();
 		hasSemanticContext = true;

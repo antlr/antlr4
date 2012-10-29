@@ -101,7 +101,14 @@ public class ATNSerializer {
 				data.add(ATNState.INVALID_TYPE);
 				continue;
 			}
-			data.add(s.getStateType());
+
+			// encode the nongreedy bit with the state type
+			int stateType = s.getStateType();
+			assert stateType >= 0;
+			if (s instanceof DecisionState && ((DecisionState)s).nonGreedy) {
+				stateType |= ATNSimulator.SERIALIZED_NON_GREEDY_MASK;
+			}
+			data.add(stateType);
 			data.add(s.ruleIndex);
 			if ( s.getStateType() == ATNState.LOOP_END ) {
 				data.add(((LoopEndState)s).loopBackState.stateNumber);
@@ -242,6 +249,7 @@ public class ATNSerializer {
 		for (int i=1; i<=nstates; i++) {
 			int stype = ATNSimulator.toInt(data[p++]);
             if ( stype==ATNState.INVALID_TYPE ) continue; // ignore bad type of states
+			stype = stype & ATNSimulator.SERIALIZED_STATE_TYPE_MASK;
 			int ruleIndex = ATNSimulator.toInt(data[p++]);
 			String arg = "";
 			if ( stype == ATNState.LOOP_END ) {

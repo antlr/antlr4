@@ -557,6 +557,7 @@ public class TestPerformance extends BaseTest {
         String sourceName = leftRecursive ? "Java-LR.g4" : "Java.g4";
         String body = load(sourceName, null);
         List<String> extraOptions = new ArrayList<String>();
+		extraOptions.add("-Werror");
         if (FORCE_ATN) {
             extraOptions.add("-Xforce-atn");
         }
