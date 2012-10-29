@@ -229,15 +229,17 @@ public class LexerATNSimulator extends ATNSimulator {
 				System.out.format("state %d LA(1)==%s\n", s.stateNumber, getTokenName(t));
 			}
 
+			DFAState target = null;
+			if (s.edges != null && t > IntStream.EOF && t < s.edges.length) {
+				target = s.edges[t];
+			}
+
 			// if no edge, pop over to ATN interpreter, update DFA and return
-			if ( s.edges == null || t >= s.edges.length || t <= IntStream.EOF ||
-				 s.edges[t] == null )
-			{
+			if (target == null) {
 				ATN_failover++;
 				return failOverToATN(input, s);
 			}
 
-			DFAState target = s.edges[t];
 			if ( target == ERROR ) break;
 			s = target;
 
