@@ -298,20 +298,18 @@ public class LexerATNSimulator extends ATNSimulator {
 			// that already has lots of edges out of it. e.g., .* in comments.
 			DFAState target = null;
 			ATNConfigSet reach = null;
-			if (s != null) {
-				if ( s.edges != null && t < s.edges.length && t > IntStream.EOF ) {
-					closure = s.configs;
-					target = s.edges[t];
-					if (target == ERROR) {
-						break;
+			if ( s.edges != null && t < s.edges.length && t > IntStream.EOF ) {
+				closure = s.configs;
+				target = s.edges[t];
+				if (target == ERROR) {
+					break;
+				}
+				else if (target != null) {
+					if ( debug ) {
+						System.out.println("reuse state "+s.stateNumber+
+										   " edge to "+target.stateNumber);
 					}
-					else if (target != null) {
-						if ( debug ) {
-							System.out.println("reuse state "+s.stateNumber+
-											   " edge to "+target.stateNumber);
-						}
-						reach = target.configs;
-					}
+					reach = target.configs;
 				}
 			}
 
@@ -330,9 +328,7 @@ public class LexerATNSimulator extends ATNSimulator {
 					DFAState from = s != null ? s : addDFAState(closure);
 					// we got nowhere on t, don't throw out this knowledge; it'd
 					// cause a failover from DFA later.
-					if (from != null) {
-						addDFAEdge(from, t, ERROR);
-					}
+					addDFAEdge(from, t, ERROR);
 					break; // stop when we can't match any more char
 				}
 
@@ -694,7 +690,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			return to;
 		}
 
-		if (from == null || to == null || suppressEdge) {
+		if (suppressEdge) {
 			return to;
 		}
 
