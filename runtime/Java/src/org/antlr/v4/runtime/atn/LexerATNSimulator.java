@@ -230,7 +230,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			}
 
 			DFAState target = null;
-			if (s.edges != null && t > IntStream.EOF && t < s.edges.length) {
+			if (s.edges != null && t > IntStream.EOF && t <= MAX_DFA_EDGE) {
 				target = s.edges[t];
 			}
 
@@ -300,7 +300,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			// that already has lots of edges out of it. e.g., .* in comments.
 			DFAState target = null;
 			ATNConfigSet reach = null;
-			if ( s.edges != null && t < s.edges.length && t > IntStream.EOF ) {
+			if ( s.edges != null && t <= MAX_DFA_EDGE && t > IntStream.EOF ) {
 				closure = s.configs;
 				target = s.edges[t];
 				if (target == ERROR) {
