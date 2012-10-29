@@ -32,6 +32,7 @@ package org.antlr.v4.runtime.dfa;
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.SemanticContext;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.HashSet;
@@ -65,6 +66,7 @@ import java.util.Set;
 public class DFAState {
 	public int stateNumber = -1;
 
+	@NotNull
 	public ATNConfigSet configs = new ATNConfigSet();
 
 	/** edges[symbol] points to target of symbol. Shift up by 1 so (-1)
@@ -124,7 +126,7 @@ public class DFAState {
 
 	public DFAState(int stateNumber) { this.stateNumber = stateNumber; }
 
-	public DFAState(ATNConfigSet configs) { this.configs = configs; }
+	public DFAState(@NotNull ATNConfigSet configs) { this.configs = configs; }
 
 	/** Get the set of all alts mentioned by all ATN configurations in this
 	 *  DFA state.
