@@ -426,6 +426,7 @@ public class TestPerformance extends BaseTest {
         String body = load(sourceName, null);
         @SuppressWarnings({"ConstantConditions"})
         List<String> extraOptions = new ArrayList<String>();
+		extraOptions.add("-Werror");
         if (FORCE_ATN) {
             extraOptions.add("-Xforce-atn");
         }

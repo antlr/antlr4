@@ -132,6 +132,7 @@ public class Tool {
 	public boolean gen_dependencies = false;
 	public String genPackage = null;
 	public Map<String, String> grammarOptions = null;
+	public boolean warnings_are_errors = false;
 
     public static Option[] optionDefs = {
         new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
@@ -152,7 +153,7 @@ public class Tool {
 		new Option("genPackage",		"-package", OptionArgType.STRING, "specify a package/namespace for the generated code"),
 		new Option("gen_dependencies",	"-depend", "generate file dependencies"),
 		new Option("",					"-D<option>=value", "set/override a grammar-level option"),
-
+		new Option("warnings_are_errors", "-Werror", "treat warnings as errors"),
 		new Option("saveLexer",			"-Xsave-lexer", "save temp lexer file created for combined grammars"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
         new Option("force_atn",			"-Xforce-atn", "use the ATN simulator for all predictions"),
@@ -757,9 +758,14 @@ public class Tool {
 	public void warning(ANTLRMessage msg) {
 		if ( listeners.isEmpty() ) {
 			defaultListener.warning(msg);
-			return;
 		}
-		for (ANTLRToolListener l : listeners) l.warning(msg);
+		else {
+			for (ANTLRToolListener l : listeners) l.warning(msg);
+		}
+
+		if (warnings_are_errors) {
+			errMgr.emit(ErrorType.WARNING_TREATED_AS_ERROR, new ANTLRMessage(ErrorType.WARNING_TREATED_AS_ERROR));
+		}
 	}
 
 	public void version() {
