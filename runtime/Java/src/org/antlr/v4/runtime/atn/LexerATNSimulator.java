@@ -384,14 +384,16 @@ public class LexerATNSimulator extends ATNSimulator {
 	}
 
 	/** Given a starting configuration set, figure out all ATN configurations
-	 *  we can reach upon input t. Parameter reach is a return parameter.
+	 *  we can reach upon input {@code t}. Parameter {@code reach} is a return
+	 *  parameter.
 	 */
 	protected void getReachableConfigSet(ATNConfigSet closure, ATNConfigSet reach, int t) {
 		// this is used to skip processing for configs which have a lower priority
 		// than a config that already reached an accept state for the same rule
 		int skipAlt = ATN.INVALID_ALT_NUMBER;
 		for (ATNConfig c : closure) {
-			if (c.alt == skipAlt) {
+			boolean currentAltReachedAcceptState = c.alt == skipAlt;
+			if (currentAltReachedAcceptState && ((LexerATNConfig)c).hasPassedThroughNonGreedyDecision()) {
 				continue;
 			}
 
@@ -404,7 +406,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				Transition trans = c.state.transition(ti);
 				ATNState target = getReachableTarget(trans, t);
 				if ( target!=null ) {
-					if (closure(new LexerATNConfig((LexerATNConfig)c, target), reach)) {
+					if (closure(new LexerATNConfig((LexerATNConfig)c, target), reach, currentAltReachedAcceptState)) {
 						// any remaining configs for this alt have a lower priority than
 						// the one that just reached an accept state.
 						skipAlt = c.alt;
@@ -481,7 +483,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
 			LexerATNConfig c = new LexerATNConfig(target, i+1, initialContext);
-			closure(c, configs);
+			closure(c, configs, false);
 		}
 		return configs;
 	}
@@ -496,7 +498,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	 * @return {@code true} if an accept state is reached, otherwise
 	 * {@code false}.
 	 */
-	protected boolean closure(@NotNull LexerATNConfig config, @NotNull ATNConfigSet configs) {
+	protected boolean closure(@NotNull LexerATNConfig config, @NotNull ATNConfigSet configs, boolean currentAltReachedAcceptState) {
 		if ( debug ) {
 			System.out.println("closure("+config.toString(recog, true)+")");
 		}
@@ -514,12 +516,12 @@ public class LexerATNSimulator extends ATNSimulator {
 			if ( config.context == null || config.context.hasEmptyPath() ) {
 				if (config.context == null || config.context.isEmpty()) {
 					configs.add(config);
+					return true;
 				}
 				else {
 					configs.add(new LexerATNConfig(config, config.state, PredictionContext.EMPTY));
+					currentAltReachedAcceptState = true;
 				}
-
-				return true;
 			}
 
 			if ( config.context!=null && !config.context.isEmpty() ) {
@@ -540,18 +542,19 @@ public class LexerATNSimulator extends ATNSimulator {
 						RuleTransition rt = (RuleTransition)invokingState.transition(0);
 						ATNState retState = rt.followState;
 						LexerATNConfig c = new LexerATNConfig(retState, config.alt, newContext);
-						if (closure(c, configs)) {
-							return true;
-						}
+						currentAltReachedAcceptState = closure(c, configs, currentAltReachedAcceptState);
 					}
 				}
 			}
-			return false;
+
+			return currentAltReachedAcceptState;
 		}
 
 		// optimization
-		if ( !config.state.onlyHasEpsilonTransitions() )	{
-			configs.add(config);
+		if ( !config.state.onlyHasEpsilonTransitions() ) {
+			if (!currentAltReachedAcceptState || !config.hasPassedThroughNonGreedyDecision()) {
+				configs.add(config);
+			}
 		}
 
 		ATNState p = config.state;
@@ -559,13 +562,11 @@ public class LexerATNSimulator extends ATNSimulator {
 			Transition t = p.transition(i);
 			LexerATNConfig c = getEpsilonTarget(config, t, configs);
 			if ( c!=null ) {
-				if (closure(c, configs)) {
-					return true;
-				}
+				currentAltReachedAcceptState = closure(c, configs, currentAltReachedAcceptState);
 			}
 		}
 
-		return false;
+		return currentAltReachedAcceptState;
 	}
 
 	// side-effect: can alter configs.hasSemanticContext
@@ -582,6 +583,7 @@ public class LexerATNSimulator extends ATNSimulator {
 					SingletonPredictionContext.create(config.context, p.stateNumber);
 				c = new LexerATNConfig(config, t.target, newContext);
 				break;
+
 			case Transition.PREDICATE:
 //				if (recog == null) {
 //					System.out.format("Predicates cannot be evaluated without a recognizer; assuming true.\n");

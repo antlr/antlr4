@@ -37,11 +37,14 @@ public class LexerATNConfig extends ATNConfig {
 	/** Capture lexer action we traverse */
 	public int lexerActionIndex = -1;
 
+	private final boolean passedThroughNonGreedyDecision;
+
 	public LexerATNConfig(@NotNull ATNState state,
 						  int alt,
 						  @Nullable PredictionContext context)
 	{
 		super(state, alt, context, SemanticContext.NONE);
+		this.passedThroughNonGreedyDecision = false;
 	}
 
 	public LexerATNConfig(@NotNull ATNState state,
@@ -51,17 +54,20 @@ public class LexerATNConfig extends ATNConfig {
 	{
 		super(state, alt, context, SemanticContext.NONE);
 		this.lexerActionIndex = actionIndex;
+		this.passedThroughNonGreedyDecision = false;
 	}
 
 	public LexerATNConfig(@NotNull LexerATNConfig c, @NotNull ATNState state) {
 		super(c, state, c.context, c.semanticContext);
 		this.lexerActionIndex = c.lexerActionIndex;
+		this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
 	}
 
 	public LexerATNConfig(@NotNull LexerATNConfig c, @NotNull ATNState state,
 						  @NotNull SemanticContext semanticContext) {
 		super(c, state, c.context, semanticContext);
 		this.lexerActionIndex = c.lexerActionIndex;
+		this._passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
 	}
 
 	public LexerATNConfig(@NotNull LexerATNConfig c, @NotNull ATNState state,
@@ -69,11 +75,46 @@ public class LexerATNConfig extends ATNConfig {
 	{
 		super(c, state, c.context, c.semanticContext);
 		this.lexerActionIndex = actionIndex;
+		this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
 	}
 
 	public LexerATNConfig(@NotNull LexerATNConfig c, @NotNull ATNState state,
 						  @Nullable PredictionContext context) {
 		super(c, state, context, c.semanticContext);
 		this.lexerActionIndex = c.lexerActionIndex;
+		this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
+	}
+
+	public final boolean hasPassedThroughNonGreedyDecision() {
+		return passedThroughNonGreedyDecision;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = super.hashCode();
+		hashCode = 35 * hashCode ^ (passedThroughNonGreedyDecision ? 1 : 0);
+		return hashCode;
+	}
+
+	@Override
+	public boolean equals(ATNConfig other) {
+		if (this == other) {
+			return true;
+		}
+		else if (!(other instanceof LexerATNConfig)) {
+			return false;
+		}
+
+		LexerATNConfig lexerOther = (LexerATNConfig)other;
+		if (passedThroughNonGreedyDecision != lexerOther.passedThroughNonGreedyDecision) {
+			return false;
+		}
+
+		return super.equals(other);
+	}
+
+	private static boolean checkNonGreedyDecision(LexerATNConfig source, ATNState target) {
+		return source.passedThroughNonGreedyDecision
+			|| target instanceof DecisionState && ((DecisionState)target).nonGreedy;
 	}
 }
