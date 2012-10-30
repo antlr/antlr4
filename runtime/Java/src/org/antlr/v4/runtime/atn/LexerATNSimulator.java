@@ -199,10 +199,18 @@ public class LexerATNSimulator extends ATNSimulator {
 			System.out.format("matchATN mode %d start: %s\n", mode, startState);
 		}
 
-		ATNConfigSet s0_closure = computeStartState(input, startState);
 		int old_mode = mode;
-		decisionToDFA[mode].s0 = addDFAState(s0_closure);
-		int predict = execATN(input, s0_closure, decisionToDFA[mode].s0);
+
+		ATNConfigSet s0_closure = computeStartState(input, startState);
+		boolean suppressEdge = s0_closure.hasSemanticContext;
+		s0_closure.hasSemanticContext = false;
+
+		DFAState next = addDFAState(s0_closure);
+		if (!suppressEdge) {
+			decisionToDFA[mode].s0 = next;
+		}
+
+		int predict = execATN(input, s0_closure, next);
 
 		if ( debug ) {
 			System.out.format("DFA after matchATN: %s\n", decisionToDFA[old_mode].toLexerString());
