@@ -313,16 +313,11 @@ public class TestATNLexerInterpreter extends BaseTest {
 		DOTGenerator dot = new DOTGenerator(lg);
 		System.out.println(dot.getDOT(startState, true));
 
-		List<String> tokenTypes = getTokenTypes(lg, atn, input, false);
+		List<String> tokenTypes = getTokenTypes(lg, atn, input);
 
 		String result = Utils.join(tokenTypes.iterator(), ", ");
 		System.out.println(tokenTypes);
 		assertEquals(expecting, result);
-
-		// try now adaptive DFA
-		input.seek(0);
-		List<String> tokenTypes2 = getTokenTypes(lg, atn, input, true);
-		assertEquals("interp vs adaptive types differ", tokenTypes, tokenTypes2);
 	}
 
 }

@@ -76,14 +76,12 @@ public class LexerATNSimulator extends ATNSimulator {
 		protected int line = 0;
 		protected int charPos = -1;
 		protected DFAState dfaState;
-		protected LexerATNConfig config;
 
 		protected void reset() {
 			index = -1;
 			line = 0;
 			charPos = -1;
 			dfaState = null;
-			config = null;
 		}
 	}
 
@@ -111,7 +109,6 @@ public class LexerATNSimulator extends ATNSimulator {
 	@NotNull
 	protected final SimState prevAccept = new SimState();
 
-	public static int ATN_failover = 0;
 	public static int match_calls = 0;
 
 	public LexerATNSimulator(@NotNull ATN atn, @NotNull DFA[] decisionToDFA,
@@ -165,12 +162,14 @@ public class LexerATNSimulator extends ATNSimulator {
 		int mark = input.mark();
 		traceBeginMatch(input, mode);
 		try {
+			this.startIndex = input.index();
+			this.prevAccept.reset();
 			DFA dfa = decisionToDFA[mode];
 			if ( dfa.s0==null ) {
 				return matchATN(input);
 			}
 			else {
-				return execDFA(input, dfa.s0);
+				return execATN(input, dfa.s0);
 			}
 		}
 		finally {
@@ -189,10 +188,8 @@ public class LexerATNSimulator extends ATNSimulator {
 	}
 
 	// only called from test code from outside
-	public int matchATN(@NotNull CharStream input) {
+	protected int matchATN(@NotNull CharStream input) {
 		traceMatchATN();
-		startIndex = input.index();
-		this.prevAccept.reset();
 		ATNState startState = atn.modeToStartState.get(mode);
 
 		if ( debug ) {
@@ -210,7 +207,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			decisionToDFA[mode].s0 = next;
 		}
 
-		int predict = execATN(input, s0_closure, next);
+		int predict = execATN(input, next);
 
 		if ( debug ) {
 			System.out.format("DFA after matchATN: %s\n", decisionToDFA[old_mode].toLexerString());
@@ -220,65 +217,10 @@ public class LexerATNSimulator extends ATNSimulator {
 		return predict;
 	}
 
-	protected int execDFA(@NotNull CharStream input, @NotNull DFAState s0) {
-		traceMatchDFA();
-
-		if ( dfa_debug ) {
-			System.out.format("DFA[mode %d] exec LA(1)==%s\n", recog == null ? 0 : recog._mode, getTokenName(input.LA(1)));
-		}
-
-		//System.out.println("DFA start of execDFA: "+dfa[mode].toLexerString());
-		startIndex = input.index();
-		this.prevAccept.reset();
-		DFAState s = s0;
-		traceLookahead1();
-		int t = input.LA(1);
-	loop:
-		while ( true ) {
-			if ( dfa_debug ) {
-				System.out.format("state %d LA(1)==%s\n", s.stateNumber, getTokenName(t));
-			}
-
-			DFAState target = null;
-			if (s.edges != null && t >= MIN_DFA_EDGE && t <= MAX_DFA_EDGE) {
-				target = s.edges[t - MIN_DFA_EDGE];
-			}
-
-			// if no edge, pop over to ATN interpreter, update DFA and return
-			if (target == null) {
-				ATN_failover++;
-				return failOverToATN(input, s);
-			}
-
-			if ( target == ERROR ) break;
-			s = target;
-
-			if ( s.isAcceptState ) {
-				if ( dfa_debug ) {
-					System.out.format("accept; predict %d in state %d\n", s.prediction, s.stateNumber);
-				}
-
-				captureSimState(prevAccept, input, s);
-				// keep going unless we're at EOF; check if something else could match
-				// EOF never in DFA
-				if ( t==IntStream.EOF ) break;
-			}
-
-			consume(input);
-			traceLookahead1();
-			t = input.LA(1);
-		}
-
-		ATNConfigSet reach = prevAccept.dfaState != null ? prevAccept.dfaState.configs : null;
-		return failOrAccept(prevAccept, input, reach, t);
-	}
-
-	protected int execATN(@NotNull CharStream input, @NotNull ATNConfigSet s0, @NotNull DFAState ds0) {
-		//System.out.println("enter exec index "+input.index()+" from "+s0);
-		@NotNull
-		ATNConfigSet closure = s0;
+	protected int execATN(@NotNull CharStream input, @NotNull DFAState ds0) {
+		//System.out.println("enter exec index "+input.index()+" from "+ds0.configs);
 		if ( debug ) {
-			System.out.format("start state closure=%s\n", closure);
+			System.out.format("start state closure=%s\n", ds0.configs);
 		}
 
 		traceLookahead1();
@@ -288,7 +230,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		while ( true ) { // while more work
 			if ( debug ) {
-				System.out.format("execATN loop starting closure: %s\n", closure);
+				System.out.format("execATN loop starting closure: %s\n", s.configs);
 			}
 
 			// As we move src->trg, src->trg, we keep track of the previous trg to
@@ -308,25 +250,22 @@ public class LexerATNSimulator extends ATNSimulator {
 			// This optimization makes a lot of sense for loops within DFA.
 			// A character will take us back to an existing DFA state
 			// that already has lots of edges out of it. e.g., .* in comments.
+			ATNConfigSet closure = s.configs;
 			DFAState target = null;
-			ATNConfigSet reach = null;
 			if ( s.edges != null && t >= MIN_DFA_EDGE && t <= MAX_DFA_EDGE ) {
-				closure = s.configs;
 				target = s.edges[t - MIN_DFA_EDGE];
 				if (target == ERROR) {
 					break;
 				}
-				else if (target != null) {
-					if ( debug ) {
-						System.out.println("reuse state "+s.stateNumber+
-										   " edge to "+target.stateNumber);
-					}
-					reach = target.configs;
+
+				if (debug && target != null) {
+					System.out.println("reuse state "+s.stateNumber+
+									   " edge to "+target.stateNumber);
 				}
 			}
 
 			if (target == null) {
-				reach = new OrderedATNConfigSet();
+				ATNConfigSet reach = new OrderedATNConfigSet();
 
 				// if we don't find an existing DFA state
 				// Fill reach starting from closure, following t transitions
@@ -344,13 +283,11 @@ public class LexerATNSimulator extends ATNSimulator {
 					break; // stop when we can't match any more char
 				}
 
-				// Did we hit a stop state during reach op?
-				reach = processAcceptConfigs(input, reach);
-
 				// Add an edge from s to target DFA found/created for reach
 				target = addDFAEdge(s, t, reach);
 			}
-			else if (target.isAcceptState) {
+
+			if (target.isAcceptState) {
 				traceAcceptState(target.prediction);
 				captureSimState(prevAccept, input, target);
 			}
@@ -358,12 +295,10 @@ public class LexerATNSimulator extends ATNSimulator {
 			consume(input);
 			traceLookahead1();
 			t = input.LA(1);
-
-			closure = reach;
 			s = target; // flip; current DFA target becomes new src/from state
 		}
 
-		return failOrAccept(prevAccept, input, closure, t);
+		return failOrAccept(prevAccept, input, s.configs, t);
 	}
 
 	protected int failOrAccept(SimState prevAccept, CharStream input,
@@ -376,12 +311,6 @@ public class LexerATNSimulator extends ATNSimulator {
 				prevAccept.index, prevAccept.line, prevAccept.charPos);
 			tracePredict(prevAccept.dfaState.prediction);
 			return prevAccept.dfaState.prediction;
-		}
-		else if (prevAccept.config != null) {
-			int ruleIndex = prevAccept.config.state.ruleIndex;
-			accept(input, ruleIndex, prevAccept.config.lexerActionIndex,
-				prevAccept.index, prevAccept.line, prevAccept.charPos);
-			return atn.ruleToTokenType[ruleIndex];
 		}
 		else {
 			// if no accept and EOF is first char, return EOF
@@ -425,38 +354,6 @@ public class LexerATNSimulator extends ATNSimulator {
 				}
 			}
 		}
-	}
-
-	@NotNull
-	protected ATNConfigSet processAcceptConfigs(@NotNull CharStream input, @NotNull ATNConfigSet reach) {
-		if ( debug ) {
-			System.out.format("processAcceptConfigs: reach=%s, prevAccept=%s, prevIndex=%d\n",
-						 	  reach, prevAccept.config, prevAccept.index);
-		}
-
-		LexerATNConfig acceptConfig = null;
-		for (ATNConfig config : reach) {
-			if (config.state instanceof RuleStopState) {
-				acceptConfig = (LexerATNConfig)config;
-				break;
-			}
-		}
-
-		// mark the new preferred accept state
-		if (acceptConfig != null && input.index() > prevAccept.index) {
-			if ( debug ) {
-				if ( prevAccept.index>=0 ) {
-					System.out.println("processAcceptConfigs: found longer token");
-				}
-			}
-
-			// condition > not >= will favor prev accept at same index.
-			// This way, "int" is keyword not ID if listed first.
-			traceAcceptState(acceptConfig.alt);
-			captureSimState(prevAccept, input, acceptConfig);
-		}
-
-		return reach;
 	}
 
 	protected void accept(@NotNull CharStream input, int ruleIndex, int actionIndex,
@@ -635,28 +532,6 @@ public class LexerATNSimulator extends ATNSimulator {
 		return c;
 	}
 
-	protected int failOverToATN(@NotNull CharStream input, @NotNull DFAState s) {
-		traceFailOverToATN();
-
-		if ( dfa_debug ) {
-			System.out.format("no edge for %s\n", getTokenName(input.LA(1)));
-			System.out.format("ATN exec upon %s at DFA state %d = %s\n",
-							  input.getText(Interval.of(startIndex, input.index())), s.stateNumber, s.configs);
-		}
-
-		int ttype = execATN(input, s.configs, s);
-
-		if ( dfa_debug ) {
-			System.out.format("back from DFA update, ttype=%d, dfa[mode %d]=\n%s\n",
-							  ttype, mode, decisionToDFA[mode].toLexerString());
-		}
-
-		// action already executed by ATN
-		// we've updated DFA, exec'd action, and have our deepest answer
-		tracePredict(ttype);
-		return ttype;
-	}
-
 	protected void captureSimState(@NotNull SimState settings,
 								   @NotNull CharStream input,
 								   @NotNull DFAState dfaState)
@@ -664,19 +539,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		settings.index = input.index();
 		settings.line = line;
 		settings.charPos = charPositionInLine;
-		settings.config = null;
 		settings.dfaState = dfaState;
-	}
-
-	protected void captureSimState(@NotNull SimState settings,
-								   @NotNull CharStream input,
-								   @NotNull LexerATNConfig config)
-	{
-		settings.index = input.index();
-		settings.line = line;
-		settings.charPos = charPositionInLine;
-		settings.config = config;
-		settings.dfaState = null;
 	}
 
 	@NotNull

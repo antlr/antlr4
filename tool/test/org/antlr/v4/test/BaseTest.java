@@ -222,7 +222,7 @@ public abstract class BaseTest {
 		IntegerList tokenTypes = new IntegerList();
 		int ttype;
 		do {
-			ttype = lexerATN.matchATN(in);
+			ttype = lexerATN.match(in, Lexer.DEFAULT_MODE);
 			tokenTypes.add(ttype);
 		} while ( ttype!= Token.EOF );
 		return tokenTypes;
@@ -230,8 +230,7 @@ public abstract class BaseTest {
 
 	public List<String> getTokenTypes(LexerGrammar lg,
 									  ATN atn,
-									  CharStream input,
-									  boolean adaptive)
+									  CharStream input)
 	{
 		LexerATNSimulator interp = new LexerATNSimulator(atn,new DFA[1],null);
 		List<String> tokenTypes = new ArrayList<String>();
@@ -243,8 +242,7 @@ public abstract class BaseTest {
 				break;
 			}
 			int t = input.LA(1);
-			if ( adaptive ) ttype = interp.match(input, Lexer.DEFAULT_MODE);
-			else ttype = interp.matchATN(input);
+			ttype = interp.match(input, Lexer.DEFAULT_MODE);
 			if ( ttype == Token.EOF ) {
 				tokenTypes.add("EOF");
 			}
