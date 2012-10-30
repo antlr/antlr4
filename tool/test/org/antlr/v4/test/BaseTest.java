@@ -105,6 +105,9 @@ import java.util.logging.Logger;
 
 
 public abstract class BaseTest {
+	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
+	private static final Logger LOGGER = Logger.getLogger(BaseTest.class.getName());
+
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
@@ -571,8 +574,6 @@ public abstract class BaseTest {
 
 	public String execClass(String className) {
 		if (TEST_IN_SAME_PROCESS) {
-			PrintStream originalOut = System.out;
-			PrintStream originalErr = System.err;
 			try {
 				ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
                 final Class<?> mainClass = (Class<?>)loader.loadClass(className);
@@ -581,17 +582,27 @@ public abstract class BaseTest {
 				PipedInputStream stderrIn = new PipedInputStream();
 				PipedOutputStream stdoutOut = new PipedOutputStream(stdoutIn);
 				PipedOutputStream stderrOut = new PipedOutputStream(stderrIn);
-				System.setOut(new PrintStream(stdoutOut));
-				System.setErr(new PrintStream(stderrOut));
 				StreamVacuum stdoutVacuum = new StreamVacuum(stdoutIn);
 				StreamVacuum stderrVacuum = new StreamVacuum(stderrIn);
-				stdoutVacuum.start();
-				stderrVacuum.start();
-				mainMethod.invoke(null, (Object)new String[] { new File(tmpdir, "input").getAbsolutePath() });
-				System.setOut(originalOut);
-				originalOut = null;
-				System.setErr(originalErr);
-				originalErr = null;
+
+				PrintStream originalOut = System.out;
+				System.setOut(new PrintStream(stdoutOut));
+				try {
+					PrintStream originalErr = System.err;
+					try {
+						System.setErr(new PrintStream(stderrOut));
+						stdoutVacuum.start();
+						stderrVacuum.start();
+						mainMethod.invoke(null, (Object)new String[] { new File(tmpdir, "input").getAbsolutePath() });
+					}
+					finally {
+						System.setErr(originalErr);
+					}
+				}
+				finally {
+					System.setOut(originalOut);
+				}
+
 				stdoutOut.close();
 				stderrOut.close();
 				stdoutVacuum.join();
@@ -603,30 +614,23 @@ public abstract class BaseTest {
 				}
 				return output;
 			} catch (MalformedURLException ex) {
-				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.log(Level.SEVERE, null, ex);
 			} catch (IOException ex) {
-				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.log(Level.SEVERE, null, ex);
 			} catch (InterruptedException ex) {
-				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.log(Level.SEVERE, null, ex);
 			} catch (IllegalAccessException ex) {
-				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.log(Level.SEVERE, null, ex);
 			} catch (IllegalArgumentException ex) {
-				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.log(Level.SEVERE, null, ex);
 			} catch (InvocationTargetException ex) {
-				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.log(Level.SEVERE, null, ex);
 			} catch (NoSuchMethodException ex) {
-				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.log(Level.SEVERE, null, ex);
 			} catch (SecurityException ex) {
-				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.log(Level.SEVERE, null, ex);
 			} catch (ClassNotFoundException ex) {
-				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
-			} finally {
-				if (originalOut != null) {
-					System.setOut(originalOut);
-				}
-				if (originalErr != null) {
-					System.setErr(originalErr);
-				}
+				LOGGER.log(Level.SEVERE, null, ex);
 			}
 		}
 
