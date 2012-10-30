@@ -876,11 +876,11 @@ UnicodeEscape
     :   '\\' 'u' HexDigit HexDigit HexDigit HexDigit
     ;
 
-ENUM:   'enum' {if (!enumIsKeyword) $type=Identifier;}
+ENUM:   'enum' {enumIsKeyword}?
     ;
     
 ASSERT
-    :   'assert' {if (!assertIsKeyword) $type=Identifier;}
+    :   'assert' {assertIsKeyword}?
     ;
     
 Identifier 
@@ -930,7 +930,7 @@ WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ -> channel(HIDDEN)
     ;
 
 COMMENT
-    :   '/*' .* '*/' -> channel(HIDDEN)
+    :   '/*' .*? '*/' -> channel(HIDDEN)
     ;
 
 LINE_COMMENT

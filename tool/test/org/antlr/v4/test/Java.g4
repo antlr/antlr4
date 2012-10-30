@@ -969,11 +969,11 @@ UnicodeEscape
     :   '\\' 'u' HexDigit HexDigit HexDigit HexDigit
     ;
 
-ENUM:   'enum' {if (!enumIsKeyword) $type=Identifier;}
+ENUM:   'enum' {enumIsKeyword}?
     ;
     
 ASSERT
-    :   'assert' {if (!assertIsKeyword) $type=Identifier;}
+    :   'assert' {assertIsKeyword}?
     ;
     
 Identifier 
@@ -1019,13 +1019,13 @@ JavaIDDigit
        '\u1040'..'\u1049'
    ;
 
-WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ {$channel=HIDDEN;}
+WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ -> channel(HIDDEN)
     ;
 
 COMMENT
-    :   '/*' .* '*/' {$channel=HIDDEN;}
+    :   '/*' .*? '*/' -> channel(HIDDEN)
     ;
 
 LINE_COMMENT
-    : '//' ~('\n'|'\r')* '\r'? '\n' {$channel=HIDDEN;}
+    : '//' ~('\n'|'\r')* '\r'? '\n' -> channel(HIDDEN)
     ;
