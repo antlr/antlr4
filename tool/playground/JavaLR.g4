@@ -852,7 +852,7 @@ WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ {setChannel(HIDDEN);}
     ;
 
 COMMENT
-    :   '/*' .* '*/' {setChannel(HIDDEN);}
+    :   '/*' .*? '*/' {setChannel(HIDDEN);}
     ;
 
 LINE_COMMENT
