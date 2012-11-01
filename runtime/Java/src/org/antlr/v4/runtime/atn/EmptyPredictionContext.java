@@ -2,7 +2,7 @@ package org.antlr.v4.runtime.atn;
 
 public class EmptyPredictionContext extends SingletonPredictionContext {
 	public EmptyPredictionContext() {
-		super(null, EMPTY_INVOKING_STATE);
+		super(null, EMPTY_RETURN_STATE);
 	}
 
 	public boolean isEmpty() { return true; }
@@ -18,8 +18,8 @@ public class EmptyPredictionContext extends SingletonPredictionContext {
 	}
 
 	@Override
-	public int getInvokingState(int index) {
-		return invokingState;
+	public int getReturnState(int index) {
+		return returnState;
 	}
 
 	@Override

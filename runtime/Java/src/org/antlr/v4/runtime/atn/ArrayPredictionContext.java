@@ -8,49 +8,49 @@ import java.util.Iterator;
 public class ArrayPredictionContext extends PredictionContext {
 	/** Parent can be null only if full ctx mode and we make an array
 	 *  from EMPTY and non-empty. We merge EMPTY by using null parent and
-	 *  invokingState == EMPTY_FULL_INVOKING_STATE
+	 *  returnState == EMPTY_FULL_RETURN_STATE
 	 */
 	public final PredictionContext[] parents;
 
 	/** Sorted for merge, no duplicates; if present,
-	 *  EMPTY_FULL_INVOKING_STATE is always first
+	 *  EMPTY_FULL_RETURN_STATE is always first
  	 */
-	public final int[] invokingStates;
+	public final int[] returnStates;
 
 	public ArrayPredictionContext(SingletonPredictionContext a) {
-		this(new PredictionContext[] {a.parent}, new int[] {a.invokingState});
+		this(new PredictionContext[] {a.parent}, new int[] {a.returnState});
 	}
 
-	public ArrayPredictionContext(PredictionContext[] parents, int[] invokingStates) {
-		super(calculateHashCode(parents, invokingStates));
+	public ArrayPredictionContext(PredictionContext[] parents, int[] returnStates) {
+		super(calculateHashCode(parents, returnStates));
 		assert parents!=null && parents.length>0;
-		assert invokingStates!=null && invokingStates.length>0;
-//		System.err.println("CREATE ARRAY: "+Arrays.toString(parents)+", "+Arrays.toString(invokingStates));
+		assert returnStates!=null && returnStates.length>0;
+//		System.err.println("CREATE ARRAY: "+Arrays.toString(parents)+", "+Arrays.toString(returnStates));
 		this.parents = parents;
-		this.invokingStates = invokingStates;
+		this.returnStates = returnStates;
 	}
 
-//ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] invokingStates, int parentHashCode, int invokingStateHashCode) {
-//		super(calculateHashCode(parentHashCode, invokingStateHashCode));
-//		assert parents.length == invokingStates.length;
-//		assert invokingStates.length > 1 || invokingStates[0] != EMPTY_FULL_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
+//ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] returnStates, int parentHashCode, int returnStateHashCode) {
+//		super(calculateHashCode(parentHashCode, returnStateHashCode));
+//		assert parents.length == returnStates.length;
+//		assert returnStates.length > 1 || returnStates[0] != EMPTY_FULL_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
 //
 //		this.parents = parents;
-//		this.invokingStates = invokingStates;
+//		this.returnStates = returnStates;
 //	}
 //
-//ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] invokingStates, int hashCode) {
+//ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] returnStates, int hashCode) {
 //		super(hashCode);
-//		assert parents.length == invokingStates.length;
-//		assert invokingStates.length > 1 || invokingStates[0] != EMPTY_FULL_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
+//		assert parents.length == returnStates.length;
+//		assert returnStates.length > 1 || returnStates[0] != EMPTY_FULL_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
 //
 //		this.parents = parents;
-//		this.invokingStates = invokingStates;
+//		this.returnStates = returnStates;
 //	}
 
-	protected static int calculateHashCode(PredictionContext[] parents, int[] invokingStates) {
+	protected static int calculateHashCode(PredictionContext[] parents, int[] returnStates) {
 		return calculateHashCode(calculateParentHashCode(parents),
-								 calculateInvokingStatesHashCode(invokingStates));
+								 calculateReturnStatesHashCode(returnStates));
 	}
 
 	protected static int calculateParentHashCode(PredictionContext[] parents) {
@@ -64,9 +64,9 @@ public class ArrayPredictionContext extends PredictionContext {
 		return hashCode;
 	}
 
-	protected static int calculateInvokingStatesHashCode(int[] invokingStates) {
+	protected static int calculateReturnStatesHashCode(int[] returnStates) {
 		int hashCode = 1;
-		for (int state : invokingStates) {
+		for (int state : returnStates) {
 			hashCode = hashCode * 31 ^ state;
 		}
 
@@ -83,7 +83,7 @@ public class ArrayPredictionContext extends PredictionContext {
 			@Override
 			public SingletonPredictionContext next() {
 				SingletonPredictionContext ctx =
-					SingletonPredictionContext.create(parents[i], invokingStates[i]);
+					SingletonPredictionContext.create(parents[i], returnStates[i]);
 				i++;
 				return ctx;
 			}
@@ -96,12 +96,12 @@ public class ArrayPredictionContext extends PredictionContext {
 	@Override
 	public boolean isEmpty() {
 		return size()==1 &&
-			   invokingStates[0]==EMPTY_INVOKING_STATE;
+			   returnStates[0]==EMPTY_RETURN_STATE;
 	}
 
 	@Override
 	public int size() {
-		return invokingStates.length;
+		return returnStates.length;
 	}
 
 	@Override
@@ -110,48 +110,14 @@ public class ArrayPredictionContext extends PredictionContext {
 	}
 
 	@Override
-	public int getInvokingState(int index) {
-		return invokingStates[index];
+	public int getReturnState(int index) {
+		return returnStates[index];
 	}
 
 //	@Override
-//	public int findInvokingState(int invokingState) {
-//		return Arrays.binarySearch(invokingStates, invokingState);
+//	public int findReturnState(int returnState) {
+//		return Arrays.binarySearch(returnStates, returnState);
 //	}
-
-	/** Find invokingState parameter (call it x) in this.invokingStates,
-	 *  if present.  Call pop on all x's parent(s) and then pull other
-	 *  elements from this context and merge into new context.
-	 */
-	@Override
-	public PredictionContext popAll(
-		int invokingState,
-		boolean fullCtx,
-		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
-	{
-		int index = Arrays.binarySearch(this.invokingStates, invokingState);
-		if ( index < 0 ) {
-			return this;
-		}
-
-		PredictionContext newCtx =
-			this.parents[index].popAll(invokingState, fullCtx, mergeCache);
-		for (int i = 0; i < this.invokingStates.length; i++) {
-			if (i == index) continue;
-			PredictionContext next;
-			if ( this.invokingStates[i] == EMPTY_INVOKING_STATE ) {
-				next = PredictionContext.EMPTY;
-			}
-			else {
-				next = SingletonPredictionContext.create(this.parents[i],
-														 this.invokingStates[i]);
-			}
-			boolean rootIsWildcard = fullCtx;
-			newCtx = merge(newCtx, next, rootIsWildcard, mergeCache);
-		}
-
-		return newCtx;
-	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -167,7 +133,7 @@ public class ArrayPredictionContext extends PredictionContext {
 		}
 
 		ArrayPredictionContext a = (ArrayPredictionContext)o;
-		return Arrays.equals(invokingStates, a.invokingStates) &&
+		return Arrays.equals(returnStates, a.returnStates) &&
 		       Arrays.equals(parents, a.parents);
 	}
 
@@ -176,13 +142,13 @@ public class ArrayPredictionContext extends PredictionContext {
 		if ( isEmpty() ) return "[]";
 		StringBuilder buf = new StringBuilder();
 		buf.append("[");
-		for (int i=0; i<invokingStates.length; i++) {
+		for (int i=0; i<returnStates.length; i++) {
 			if ( i>0 ) buf.append(", ");
-			if ( invokingStates[i]==EMPTY_INVOKING_STATE ) {
+			if ( returnStates[i]==EMPTY_RETURN_STATE ) {
 				buf.append("$");
 				continue;
 			}
-			buf.append(invokingStates[i]);
+			buf.append(returnStates[i]);
 			if ( parents[i]!=null ) {
 				buf.append(' ');
 				buf.append(parents[i].toString());

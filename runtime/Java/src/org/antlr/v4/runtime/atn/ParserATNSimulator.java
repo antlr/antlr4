@@ -1071,7 +1071,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			// run thru all possible stack tops in ctx
 			if ( config.context!=null && !config.context.isEmpty() ) {
 				for (SingletonPredictionContext ctx : config.context) {
-					if ( ctx.invokingState==PredictionContext.EMPTY_INVOKING_STATE ) {
+					if ( ctx.returnState==PredictionContext.EMPTY_RETURN_STATE ) {
 						// we have no context info, just chase follow links (if greedy)
 						if ( debug ) System.out.println("FALLING off rule "+
 														getRuleName(config.state.ruleIndex));
@@ -1079,8 +1079,8 @@ public class ParserATNSimulator extends ATNSimulator {
 								 fullCtx, depth);
 						continue;
 					}
-					ATNState returnState = atn.states.get(ctx.invokingState);
-					PredictionContext newContext = ctx.parent; // "pop" invoking state
+					ATNState returnState = atn.states.get(ctx.returnState);
+					PredictionContext newContext = ctx.parent; // "pop" return state
 					ATNConfig c = new ATNConfig(returnState, config.alt, newContext,
 												config.semanticContext);
 					// While we have context to pop back from, we may have

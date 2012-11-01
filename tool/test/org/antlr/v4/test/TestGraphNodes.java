@@ -795,7 +795,7 @@ public class TestGraphNodes {
 		int[] invokingStates = new int[nodes.length];
 		for (int i=0; i<nodes.length; i++) {
 			parents[i] = nodes[i].parent;
-			invokingStates[i] = nodes[i].invokingState;
+			invokingStates[i] = nodes[i].returnState;
 		}
 		return new ArrayPredictionContext(parents, invokingStates);
 	}
@@ -828,7 +828,7 @@ public class TestGraphNodes {
 					}
 
 					nodes.append("<p").append(i).append('>');
-					if (current.getInvokingState(i) == PredictionContext.EMPTY_INVOKING_STATE) {
+					if (current.getReturnState(i) == PredictionContext.EMPTY_RETURN_STATE) {
 						nodes.append(rootIsWildcard ? '*' : '$');
 					}
 				}
@@ -843,7 +843,7 @@ public class TestGraphNodes {
 			}
 
 			for (int i = 0; i < current.size(); i++) {
-				if (current.getInvokingState(i) == PredictionContext.EMPTY_INVOKING_STATE) {
+				if (current.getReturnState(i) == PredictionContext.EMPTY_RETURN_STATE) {
 					continue;
 				}
 
@@ -859,7 +859,7 @@ public class TestGraphNodes {
 
 				edges.append("->");
 				edges.append('s').append(contextIds.get(current.getParent(i)));
-				edges.append("[label=\"").append(current.getInvokingState(i)).append("\"]");
+				edges.append("[label=\"").append(current.getReturnState(i)).append("\"]");
 				edges.append(";\n");
 			}
 		}
