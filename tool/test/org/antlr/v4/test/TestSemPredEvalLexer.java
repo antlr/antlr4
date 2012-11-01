@@ -16,13 +16,13 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"[@0,0:3='enum',<2>,1:0]\n" +
 			"[@1,5:7='abc',<3>,1:5]\n" +
 			"[@2,8:7='<EOF>',<-1>,1:8]\n" +
-			"s0-' '->:s4=>4\n" +
-			"s0-'a'->:s5=>3\n" +
+			"s0-' '->:s5=>4\n" +
+			"s0-'a'->:s6=>3\n" +
 			"s0-'e'->:s1=>3\n" +
 			":s1=>3-'n'->:s2=>3\n" +
 			":s2=>3-'u'->:s3=>3\n" +
-			":s5=>3-'b'->:s5=>3\n" +
-			":s5=>3-'c'->:s5=>3\n";
+			":s6=>3-'b'->:s6=>3\n" +
+			":s6=>3-'c'->:s6=>3\n";
 		assertEquals(expecting, found);
 	}
 
@@ -38,13 +38,13 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"[@1,5:7='abc',<2>,1:5]\n" +
 			"[@2,9:12='enum',<2>,1:9]\n" +
 			"[@3,13:12='<EOF>',<-1>,1:13]\n" +
-			"s0-' '->:s4=>3\n" +
-			"s0-'a'->:s5=>2\n" +
+			"s0-' '->:s5=>3\n" +
+			"s0-'a'->:s4=>2\n" +
 			"s0-'e'->:s1=>2\n" +
 			":s1=>2-'n'->:s2=>2\n" +
 			":s2=>2-'u'->:s3=>2\n" +
-			":s5=>2-'b'->:s5=>2\n" +
-			":s5=>2-'c'->:s5=>2\n"; // no 'm'-> transition...conflicts with pred
+			":s4=>2-'b'->:s4=>2\n" +
+			":s4=>2-'c'->:s4=>2\n"; // no 'm'-> transition...conflicts with pred
 		assertEquals(expecting, found);
 	}
 
@@ -60,7 +60,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"[@1,5:7='abc',<2>,1:5]\n" +
 			"[@2,9:12='enum',<2>,1:9]\n" +
 			"[@3,13:12='<EOF>',<-1>,1:13]\n" +
-			"s0-' '->:s1=>3\n"; // no DFA for enum/id. all paths lead to pred.
+			"s0-' '->:s2=>3\n"; // no edges in DFA for enum/id. all paths lead to pred.
 		assertEquals(expecting, found);
 	}
 
@@ -76,7 +76,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"[@1,5:7='abc',<2>,1:5]\n" +
 			"[@2,9:12='enum',<1>,1:9]\n" +
 			"[@3,13:12='<EOF>',<-1>,1:13]\n" +
-			"s0-' '->:s1=>3\n"; // no DFA for enum/id. all paths lead to pred.
+			"s0-' '->:s3=>3\n"; // no edges in DFA for enum/id. all paths lead to pred.
 		assertEquals(expecting, found);
 	}
 
