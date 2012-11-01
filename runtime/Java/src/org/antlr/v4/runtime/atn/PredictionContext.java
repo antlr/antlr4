@@ -38,7 +38,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	/** Convert a RuleContext tree to a PredictionContext graph.
 	 *  Return EMPTY if outerContext is empty or null.
 	 */
-	public static PredictionContext fromRuleContext(RuleContext outerContext) {
+	public static PredictionContext fromRuleContext(@NotNull ATN atn, RuleContext outerContext) {
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
 
 		// if we are in RuleContext of start rule, s, then PredictionContext
@@ -50,10 +50,12 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		// If we have a parent, convert it to a PredictionContext graph
 		PredictionContext parent = EMPTY;
 		if ( outerContext.parent != null ) {
-			parent = PredictionContext.fromRuleContext(outerContext.parent);
+			parent = PredictionContext.fromRuleContext(atn, outerContext.parent);
 		}
 
-		return SingletonPredictionContext.create(parent, outerContext.invokingState);
+		ATNState state = atn.states.get(outerContext.invokingState);
+		RuleTransition transition = (RuleTransition)state.transition(0);
+		return SingletonPredictionContext.create(parent, transition.followState.stateNumber);
 	}
 
 	@Override

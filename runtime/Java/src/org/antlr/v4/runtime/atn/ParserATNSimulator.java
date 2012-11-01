@@ -898,7 +898,7 @@ public class ParserATNSimulator extends ATNSimulator {
 										  boolean fullCtx)
 	{
 		// always at least the implicit call to start rule
-		PredictionContext initialContext = PredictionContext.fromRuleContext(ctx);
+		PredictionContext initialContext = PredictionContext.fromRuleContext(atn, ctx);
 		ATNConfigSet configs = new ATNConfigSet(fullCtx);
 
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
@@ -1079,11 +1079,9 @@ public class ParserATNSimulator extends ATNSimulator {
 								 fullCtx, depth);
 						continue;
 					}
-					ATNState invokingState = atn.states.get(ctx.invokingState);
-					RuleTransition rt = (RuleTransition)invokingState.transition(0);
-					ATNState retState = rt.followState;
+					ATNState returnState = atn.states.get(ctx.invokingState);
 					PredictionContext newContext = ctx.parent; // "pop" invoking state
-					ATNConfig c = new ATNConfig(retState, config.alt, newContext,
+					ATNConfig c = new ATNConfig(returnState, config.alt, newContext,
 												config.semanticContext);
 					// While we have context to pop back from, we may have
 					// gotten that context AFTER having falling off a rule.
@@ -1175,7 +1173,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	{
 		switch (t.getSerializationType()) {
 		case Transition.RULE:
-			return ruleTransition(config, t);
+			return ruleTransition(config, (RuleTransition)t);
 
 		case Transition.PREDICATE:
 			return predTransition(config, (PredicateTransition)t,
@@ -1249,13 +1247,15 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	@NotNull
-	public ATNConfig ruleTransition(@NotNull ATNConfig config, @NotNull Transition t) {
+	public ATNConfig ruleTransition(@NotNull ATNConfig config, @NotNull RuleTransition t) {
 		if ( debug ) {
 			System.out.println("CALL rule "+getRuleName(t.target.ruleIndex)+
 							   ", ctx="+config.context);
 		}
+
+		ATNState returnState = t.followState;
 		PredictionContext newContext =
-			SingletonPredictionContext.create(config.context, config.state.stateNumber);
+			SingletonPredictionContext.create(config.context, returnState.stateNumber);
 		return new ATNConfig(config, t.target, newContext);
 	}
 
