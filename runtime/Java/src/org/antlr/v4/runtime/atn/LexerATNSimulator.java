@@ -698,15 +698,6 @@ public class LexerATNSimulator extends ATNSimulator {
 		return input.getText(Interval.of(startIndex, input.index()-1));
 	}
 
-	/** Get the text from start of token to current lookahead char.
-	 *  Use this in predicates to test text matched so far in a lexer rule.
-	 */
-	@NotNull
-	public String getSpeculativeText(@NotNull CharStream input) {
-		// index is first lookahead char, don't include.
-		return input.getText(Interval.of(startIndex, input.index()));
-	}
-
 	public int getLine() {
 		return line;
 	}

@@ -67,7 +67,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 	@Test public void testEnumNotID() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"ENUM : [a-z]+ {getSpeculativeText().equals(\"enum\")}? ;\n" +
+			"ENUM : [a-z]+ {getText().equals(\"enum\")}? ;\n" +
 			"ID   : [a-z]+ ;\n"+
 			"WS : (' '|'\\n') {skip();} ;";
 		String found = execLexer("L.g4", grammar, "L", "enum abc enum", true);

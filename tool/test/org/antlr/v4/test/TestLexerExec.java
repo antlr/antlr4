@@ -267,9 +267,6 @@ public class TestLexerExec extends BaseTest {
 	}
 
 	@Test public void testLexerInputPositionSensitivePredicates() throws Exception {
-		// The predicates here make sense on the left edge, but are currently
-		// only working on the right edge... resolving this would remove the
-		// need for Lexer.getSpeculativeText as well.
 		String grammar =
 			"lexer grammar L;\n"+
 			"WORD1 : ID1+ {System.out.println(getText());} ;\n"+
