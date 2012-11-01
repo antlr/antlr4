@@ -266,28 +266,6 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	@Test public void testLexerInputPositionSensitivePredicates() throws Exception {
-		String grammar =
-			"lexer grammar L;\n"+
-			"WORD1 : ID1+ {System.out.println(getText());} ;\n"+
-			"WORD2 : ID2+ {System.out.println(getText());} ;\n"+
-			"fragment ID1 : {getCharPositionInLine()<2}? [a-zA-Z];\n"+
-			"fragment ID2 : {getCharPositionInLine()>=2}? [a-zA-Z];\n"+
-			"WS : (' '|'\\n') -> skip;\n";
-		String found = execLexer("L.g4", grammar, "L", "a cde\nabcde\n");
-		String expecting =
-			"a\n" +
-			"cde\n" +
-			"ab\n" +
-			"cde\n" +
-			"[@0,0:0='a',<1>,1:0]\n" +
-			"[@1,2:4='cde',<2>,1:2]\n" +
-			"[@2,6:7='ab',<1>,2:0]\n" +
-			"[@3,8:10='cde',<2>,2:2]\n" +
-			"[@4,12:11='<EOF>',<-1>,3:0]\n";
-		assertEquals(expecting, found);
-	}
-
 	@Test public void testActionExecutedInDFA() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
