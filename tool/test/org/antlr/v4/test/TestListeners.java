@@ -9,7 +9,7 @@ public class TestListeners extends BaseTest {
 			"@header {import org.antlr.v4.runtime.tree.*;}\n"+
 			"@members {\n" +
 			"public static class LeafListener extends TBaseListener {\n" +
-			"    public void visitTerminal(TerminalNode<Token> node) {\n" +
+			"    public void visitTerminal(TerminalNode node) {\n" +
 			"      System.out.println(node.getSymbol().getText());\n" +
 			"    }\n" +
 			"  }}\n" +

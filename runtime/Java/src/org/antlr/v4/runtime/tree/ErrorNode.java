@@ -29,7 +29,5 @@
 
 package org.antlr.v4.runtime.tree;
 
-import org.antlr.v4.runtime.Token;
-
-public interface ErrorNode<Symbol extends Token> extends TerminalNode<Symbol> {
+public interface ErrorNode extends TerminalNode {
 }

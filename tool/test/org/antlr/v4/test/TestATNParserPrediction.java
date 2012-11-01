@@ -504,7 +504,7 @@ public class TestATNParserPrediction extends BaseTest {
 	}
 
 	public synchronized DFA getDFA(LexerGrammar lg, Grammar g, String ruleName,
-								   String inputString, ParserRuleContext<?> ctx)
+								   String inputString, ParserRuleContext ctx)
 	{
 		// sync to ensure multiple tests don't race on dfa access
 		Tool.internalOption_ShowATNConfigsInDFA = true;

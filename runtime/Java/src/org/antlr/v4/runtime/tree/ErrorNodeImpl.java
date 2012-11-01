@@ -37,11 +37,8 @@ import org.antlr.v4.runtime.Token;
  *  and deletion as well as during "consume until error recovery set"
  *  upon no viable alternative exceptions.
  */
-public class ErrorNodeImpl<Symbol extends Token> extends
-	TerminalNodeImpl<Symbol>
-	implements ErrorNode<Symbol>
-{
-	public ErrorNodeImpl(Symbol token) {
+public class ErrorNodeImpl extends TerminalNodeImpl implements ErrorNode {
+	public ErrorNodeImpl(Token token) {
 		super(token);
 	}
 

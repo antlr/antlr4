@@ -285,7 +285,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	// LAME globals to avoid parameters!!!!! I need these down deep in predTransition
 	protected TokenStream _input;
 	protected int _startIndex;
-	protected ParserRuleContext<?> _outerContext;
+	protected ParserRuleContext _outerContext;
 
 	/** Testing only! */
 	public ParserATNSimulator(@NotNull ATN atn, @NotNull DFA[] decisionToDFA,
@@ -311,7 +311,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	public int adaptivePredict(@NotNull TokenStream input, int decision,
-							   @Nullable ParserRuleContext<?> outerContext)
+							   @Nullable ParserRuleContext outerContext)
 	{
 		if ( debug || debug_list_atn_decisions )  {
 			System.out.println("adaptivePredict decision "+decision+
@@ -364,7 +364,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	public int predictATN(@NotNull DFA dfa, @NotNull TokenStream input,
-						  @Nullable ParserRuleContext<?> outerContext)
+						  @Nullable ParserRuleContext outerContext)
 	{
 		// caller must have write lock on dfa
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
@@ -400,7 +400,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	public int execDFA(@NotNull DFA dfa, @NotNull DFAState s0,
 					   @NotNull TokenStream input, int startIndex,
-                       @Nullable ParserRuleContext<?> outerContext)
+                       @Nullable ParserRuleContext outerContext)
     {
 		// caller must have read lock on dfa
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
@@ -545,7 +545,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 */
 	public int execATN(@NotNull DFA dfa, @NotNull DFAState s0,
 					   @NotNull TokenStream input, int startIndex,
-					   ParserRuleContext<?> outerContext)
+					   ParserRuleContext outerContext)
 	{
 		// caller is expected to have write lock on dfa
 		if ( debug || debug_list_atn_decisions) {
@@ -724,7 +724,7 @@ public class ParserATNSimulator extends ATNSimulator {
 									  DFAState D, // how far we got before failing over
 									  @NotNull ATNConfigSet s0,
 									  @NotNull TokenStream input, int startIndex,
-									  ParserRuleContext<?> outerContext,
+									  ParserRuleContext outerContext,
 									  int SLL_min_alt) // todo: is this in D as min ambig alts?
 	{
 		// caller must have write lock on dfa
@@ -1005,7 +1005,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 *  includes pairs with null predicates.
 	 */
 	public BitSet evalSemanticContext(List<DFAState.PredPrediction> predPredictions,
-									  ParserRuleContext<?> outerContext,
+									  ParserRuleContext outerContext,
 									  boolean complete)
 	{
 		BitSet predictions = new BitSet();
@@ -1355,7 +1355,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	@NotNull
 	public NoViableAltException noViableAlt(@NotNull TokenStream input,
-											@NotNull ParserRuleContext<?> outerContext,
+											@NotNull ParserRuleContext outerContext,
 											@NotNull ATNConfigSet configs,
 											int startIndex)
 	{

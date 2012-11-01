@@ -940,17 +940,17 @@ public abstract class BaseTest {
 			"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
 			"        <createParser>\n"+
 			"		 parser.setBuildParseTree(true);\n" +
-			"        ParserRuleContext\\<Token> tree = parser.<parserStartRuleName>();\n" +
+			"        ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
 			"        ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
 			"    }\n" +
 			"\n" +
-			"	static class TreeShapeListener implements ParseTreeListener\\<Token> {\n" +
-			"		@Override public void visitTerminal(TerminalNode\\<Token> node) { }\n" +
-			"		@Override public void visitErrorNode(ErrorNode\\<Token> node) { }\n" +
-			"		@Override public void exitEveryRule(ParserRuleContext\\<Token> ctx) { }\n" +
+			"	static class TreeShapeListener implements ParseTreeListener {\n" +
+			"		@Override public void visitTerminal(TerminalNode node) { }\n" +
+			"		@Override public void visitErrorNode(ErrorNode node) { }\n" +
+			"		@Override public void exitEveryRule(ParserRuleContext ctx) { }\n" +
 			"\n" +
 			"		@Override\n" +
-			"		public void enterEveryRule(ParserRuleContext\\<Token> ctx) {\n" +
+			"		public void enterEveryRule(ParserRuleContext ctx) {\n" +
 			"			for (int i = 0; i \\< ctx.getChildCount(); i++) {\n" +
 			"				ParseTree parent = ctx.getChild(i).getParent();\n" +
 			"				if (!(parent instanceof RuleNode) || ((RuleNode)parent).getRuleContext() != ctx) {\n" +

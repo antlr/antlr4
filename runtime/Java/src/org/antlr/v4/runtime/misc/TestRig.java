@@ -139,32 +139,32 @@ public class TestRig {
 //		System.out.println("exec "+grammarName+"."+startRuleName);
 		String lexerName = grammarName+"Lexer";
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		Class lexerClass;
+		Class<? extends Lexer> lexerClass;
 		try {
-			lexerClass = cl.loadClass(lexerName);
+			lexerClass = cl.loadClass(lexerName).asSubclass(Lexer.class);
 		}
 		catch (java.lang.ClassNotFoundException cnfe) {
 			// might be pure lexer grammar; no Lexer suffix then
 			lexerName = grammarName;
-			lexerClass = cl.loadClass(lexerName);
+			lexerClass = cl.loadClass(lexerName).asSubclass(Lexer.class);
 		}
 		if ( lexerClass==null ) {
 			System.err.println("Can't load "+lexerName);
 			return;
 		}
 
-		Constructor<Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
+		Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
 		Lexer lexer = lexerCtor.newInstance((CharStream)null);
 
-		Class parserClass = null;
+		Class<? extends Parser> parserClass = null;
 		Parser parser = null;
 		if ( !startRuleName.equals(LEXER_START_RULE_NAME) ) {
 			String parserName = grammarName+"Parser";
-			parserClass = cl.loadClass(parserName);
+			parserClass = cl.loadClass(parserName).asSubclass(Parser.class);
 			if ( parserClass==null ) {
 				System.err.println("Can't load "+parserName);
 			}
-			Constructor<Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
+			Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
 			parser = parserCtor.newInstance((TokenStream)null);
 		}
 
@@ -201,7 +201,7 @@ public class TestRig {
 		}
 	}
 
-	static void process(Lexer lexer, Class parserClass, Parser parser, InputStream is, Reader r) throws IOException, IllegalAccessException, InvocationTargetException, PrintException {
+	static void process(Lexer lexer, Class<? extends Parser> parserClass, Parser parser, InputStream is, Reader r) throws IOException, IllegalAccessException, InvocationTargetException, PrintException {
 		try {
 			ANTLRInputStream input = new ANTLRInputStream(r);
 			lexer.setInputStream(input);
@@ -232,8 +232,8 @@ public class TestRig {
 			parser.setTrace(trace);
 
 			try {
-				Method startRule = parserClass.getMethod(startRuleName, (Class[])null);
-				ParserRuleContext<Token> tree = (ParserRuleContext<Token>)startRule.invoke(parser, (Object[])null);
+				Method startRule = parserClass.getMethod(startRuleName);
+				ParserRuleContext tree = (ParserRuleContext)startRule.invoke(parser, (Object[])null);
 
 				if ( printTree ) {
 					System.out.println(tree.toStringTree(parser));

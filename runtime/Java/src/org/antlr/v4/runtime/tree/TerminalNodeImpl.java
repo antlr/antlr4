@@ -33,24 +33,24 @@ import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 
-public class TerminalNodeImpl<Symbol extends Token> implements TerminalNode<Symbol> {
-	public Symbol symbol;
+public class TerminalNodeImpl implements TerminalNode {
+	public Token symbol;
 	public ParseTree parent;
 	/** Which ATN node matched this token? */
 	public int s;
-	public TerminalNodeImpl(Symbol symbol) {	this.symbol = symbol;	}
+	public TerminalNodeImpl(Token symbol) {	this.symbol = symbol;	}
 
 	@Override
 	public ParseTree getChild(int i) {return null;}
 
 	@Override
-	public Symbol getSymbol() {return symbol;}
+	public Token getSymbol() {return symbol;}
 
 	@Override
 	public ParseTree getParent() { return parent; }
 
 	@Override
-	public Symbol getPayload() { return symbol; }
+	public Token getPayload() { return symbol; }
 
 	@Override
 	public Interval getSourceInterval() {

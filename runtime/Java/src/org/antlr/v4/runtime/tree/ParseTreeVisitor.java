@@ -42,12 +42,12 @@ public class ParseTreeVisitor<T> {
 	 * @param node The {@link TerminalNode} to visit.
 	 * @return The result of visiting the node.
 	 */
-	public T visitTerminal(TerminalNode<? extends Token> node) { return null; }
+	public T visitTerminal(TerminalNode node) { return null; }
 
 	/** Visit an error node, and return a user-defined result of the operation.
 	 *
 	 * @param node The {@link ErrorNode} to visit.
 	 * @return The result of visiting the node.
 	 */
-	public T visitErrorNode(ErrorNode<? extends Token> node) { return null; }
+	public T visitErrorNode(ErrorNode node) { return null; }
 }

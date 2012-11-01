@@ -132,9 +132,9 @@ public class Trees {
 				return t.toString();
 			}
 			else if ( t instanceof TerminalNode) {
-				Object symbol = ((TerminalNode<?>)t).getSymbol();
-				if (symbol instanceof Token) {
-					String s = ((Token)symbol).getText();
+				Token symbol = ((TerminalNode)t).getSymbol();
+				if (symbol != null) {
+					String s = symbol.getText();
 					return s;
 				}
 			}
