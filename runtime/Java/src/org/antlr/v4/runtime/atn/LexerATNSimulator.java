@@ -41,7 +41,6 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 /** "dup" of ParserInterpreter */
@@ -54,10 +53,6 @@ public class LexerATNSimulator extends ATNSimulator {
 	public static final int MAX_DFA_EDGE = 127; // forces unicode to stay in ATN
 
 	public boolean optimize_tail_calls = true;
-
-	private boolean trace = false;
-	private OutputStream traceStream = null;
-	private boolean traceFailed = false;
 
 	/** When we hit an accept state in either the DFA or the ATN, we
 	 *  have to notify the character stream to start buffering characters
@@ -126,27 +121,12 @@ public class LexerATNSimulator extends ATNSimulator {
 		this.line = simulator.line;
 		this.mode = simulator.mode;
 		this.startIndex = simulator.startIndex;
-
-		this.trace = simulator.trace;
-		this.traceStream = simulator.traceStream;
-		this.traceFailed = simulator.traceFailed;
-	}
-
-	public OutputStream getTraceStream() {
-		return this.traceStream;
-	}
-
-	public void setTraceStream(OutputStream traceStream) {
-		this.traceStream = traceStream;
-		this.trace = traceStream != null;
-		this.traceFailed = false;
 	}
 
 	public int match(@NotNull CharStream input, int mode) {
 		match_calls++;
 		this.mode = mode;
 		int mark = input.mark();
-		traceBeginMatch(input, mode);
 		try {
 			this.startIndex = input.index();
 			this.prevAccept.reset();
@@ -159,7 +139,6 @@ public class LexerATNSimulator extends ATNSimulator {
 			}
 		}
         finally {
-			traceEndMatch();
 			input.release(mark);
 		}
 	}
@@ -175,7 +154,6 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	// only called from test code from outside
 	protected int matchATN(@NotNull CharStream input) {
-		traceMatchATN();
 		ATNState startState = atn.modeToStartState.get(mode);
 
 		if ( debug ) {
@@ -203,7 +181,6 @@ public class LexerATNSimulator extends ATNSimulator {
 			System.out.format("DFA after matchATN: %s\n", atn.modeToDFA[old_mode].toLexerString());
 		}
 
-		tracePredict(predict);
 		return predict;
 	}
 
@@ -213,7 +190,6 @@ public class LexerATNSimulator extends ATNSimulator {
 			System.out.format("start state closure=%s\n", ds0.configs);
 		}
 
-		traceLookahead1();
 		int t = input.LA(1);
 		@NotNull
 		DFAState s = ds0; // s is current/from DFA state
@@ -276,12 +252,10 @@ public class LexerATNSimulator extends ATNSimulator {
 			}
 
 			if (target.isAcceptState) {
-				traceAcceptState(target.prediction);
 				captureSimState(prevAccept, input, target);
 			}
 
 			consume(input);
-			traceLookahead1();
 			t = input.LA(1);
 			s = target; // flip; current DFA target becomes new src/from state
 		}
@@ -297,7 +271,6 @@ public class LexerATNSimulator extends ATNSimulator {
 			int actionIndex = prevAccept.dfaState.lexerActionIndex;
 			accept(input, ruleIndex, actionIndex,
 				prevAccept.index, prevAccept.line, prevAccept.charPos);
-			tracePredict(prevAccept.dfaState.prediction);
 			return prevAccept.dfaState.prediction;
 		}
 		else {
@@ -353,7 +326,6 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( actionIndex>=0 && recog!=null ) recog.action(null, ruleIndex, actionIndex);
 
 		// seek to after last char in token
-		traceSeek(index);
 		input.seek(index);
 		this.line = line;
 		this.charPositionInLine = charPos;
@@ -703,7 +675,6 @@ public class LexerATNSimulator extends ATNSimulator {
 			charPositionInLine++;
 		}
 		input.consume();
-		traceConsume(input, curChar);
 	}
 
 	@NotNull
@@ -711,245 +682,5 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( t==-1 ) return "EOF";
 		//if ( atn.g!=null ) return atn.g.getTokenDisplayName(t);
 		return "'"+(char)t+"'";
-	}
-
-	/*
-	 * Trace helpers (API and file format are work in progress)
-	 */
-
-	public void traceEndMatch() {
-		if (trace) {
-			traceSlow(LexerOpCode.EndMatch);
-		}
-	}
-
-	public void traceMatchATN() {
-		if (trace) {
-			traceSlow(LexerOpCode.MatchATN);
-		}
-	}
-
-	public void traceMatchDFA() {
-		if (trace) {
-			traceSlow(LexerOpCode.MatchDFA);
-		}
-	}
-
-	public void traceLookahead1() {
-		if (trace) {
-			traceSlow(LexerOpCode.Lookahead1);
-		}
-	}
-
-	public void traceFailOverToATN() {
-		if (trace) {
-			traceSlow(LexerOpCode.FailOverToATN);
-		}
-	}
-
-	public void tracePredict(int prediction) {
-		if (trace) {
-			traceIntSlow(LexerOpCode.Predict, prediction);
-		}
-	}
-
-	public void traceAcceptState(int prediction) {
-		if (trace) {
-			traceIntSlow(LexerOpCode.AcceptState, prediction);
-		}
-	}
-
-	public void traceSeek(int index) {
-		if (trace) {
-			traceIntSlow(LexerOpCode.Seek, index);
-		}
-	}
-
-	public final void traceBeginMatch(CharStream input, int mode) {
-		if (trace) {
-			traceBeginMatchSlow(input, mode);
-		}
-	}
-
-	public final void traceConsume(CharStream input, int c) {
-		if (trace) {
-			traceConsumeSlow(input, c);
-		}
-	}
-
-	public final void tracePushMode(int mode) {
-		if (trace) {
-			traceByteSlow(LexerOpCode.PushMode, (byte)mode);
-		}
-	}
-
-	public final void tracePopMode() {
-		if (trace) {
-			traceSlow(LexerOpCode.PopMode);
-		}
-	}
-
-	public final void traceEmit(Token token) {
-		if (trace) {
-			traceEmitSlow(token);
-		}
-	}
-
-	private void traceSlow(LexerOpCode opcode) {
-		assert traceStream != null;
-		assert opcode.getArgumentSize() == 0;
-
-		if (!traceFailed) {
-			try {
-				traceStream.write(opcode.ordinal());
-			} catch (IOException e) {
-				e.printStackTrace();
-				traceFailed = true;
-			}
-		}
-	}
-
-	private void traceByteSlow(LexerOpCode opcode, byte arg) {
-		assert traceStream != null;
-		assert opcode.getArgumentSize() == 1;
-
-		if (!traceFailed) {
-			try {
-				traceStream.write(opcode.ordinal());
-				traceStream.write(arg);
-			} catch (IOException e) {
-				e.printStackTrace();
-				traceFailed = true;
-			}
-		}
-	}
-
-	private void traceByteIntSlow(LexerOpCode opcode, byte arg1, int arg2) {
-		assert traceStream != null;
-		assert opcode.getArgumentSize() == 5;
-
-		if (!traceFailed) {
-			try {
-				traceStream.write(opcode.ordinal());
-				traceStream.write(arg1);
-				traceIntSlow(arg2);
-			} catch (IOException e) {
-				e.printStackTrace();
-				traceFailed = true;
-			}
-		}
-	}
-
-	private void traceIntSlow(LexerOpCode opcode, int arg) {
-		assert traceStream != null;
-		assert opcode.getArgumentSize() == 4;
-
-		if (!traceFailed) {
-			try {
-				traceStream.write(opcode.ordinal());
-				traceIntSlow(arg);
-			} catch (IOException e) {
-				e.printStackTrace();
-				traceFailed = true;
-			}
-		}
-	}
-
-	private void traceIntIntSlow(LexerOpCode opcode, int arg1, int arg2) {
-		assert traceStream != null;
-		assert opcode.getArgumentSize() == 8;
-
-		if (!traceFailed) {
-			try {
-				traceStream.write(opcode.ordinal());
-				traceIntSlow(arg1);
-				traceIntSlow(arg2);
-			} catch (IOException e) {
-				e.printStackTrace();
-				traceFailed = true;
-			}
-		}
-	}
-
-	private void traceIntIntIntIntSlow(LexerOpCode opcode, int arg1, int arg2, int arg3, int arg4) {
-		assert traceStream != null;
-		assert opcode.getArgumentSize() == 16;
-
-		if (!traceFailed) {
-			try {
-				traceStream.write(opcode.ordinal());
-				traceIntSlow(arg1);
-				traceIntSlow(arg2);
-				traceIntSlow(arg3);
-				traceIntSlow(arg4);
-			} catch (IOException e) {
-				e.printStackTrace();
-				traceFailed = true;
-			}
-		}
-	}
-
-	private void traceIntSlow(int arg) {
-		assert traceStream != null;
-
-		if (!traceFailed) {
-			try {
-				traceStream.write(arg);
-				traceStream.write(arg >> 8);
-				traceStream.write(arg >> 16);
-				traceStream.write(arg >> 24);
-			} catch (IOException e) {
-				e.printStackTrace();
-				traceFailed = true;
-			}
-		}
-	}
-
-	private void traceBeginMatchSlow(CharStream input, int mode) {
-		traceByteIntSlow(LexerOpCode.BeginMatch, (byte)mode, input.index());
-	}
-
-	private void traceConsumeSlow(CharStream input, int c) {
-		assert traceStream != null;
-
-		if (!traceFailed) {
-			traceIntIntSlow(LexerOpCode.Consume, c, input.index());
-		}
-	}
-
-	private void traceEmitSlow(Token token) {
-		assert traceStream != null;
-
-		if (token != null && !traceFailed) {
-			traceIntIntIntIntSlow(LexerOpCode.Emit, token.getStartIndex(), token.getStopIndex(), token.getType(), token.getChannel());
-		}
-	}
-
-	public enum LexerOpCode {
-		BeginMatch(5),
-		EndMatch(0),
-		MatchATN(0),
-		MatchDFA(0),
-		FailOverToATN(0),
-		AcceptState(4),
-		Predict(4),
-
-		Seek(4),
-		Consume(8),
-		Lookahead1(0),
-
-		PushMode(1),
-		PopMode(0),
-		Emit(16);
-
-		private final int argumentSize;
-
-		private LexerOpCode(int argumentSize) {
-			this.argumentSize = argumentSize;
-		}
-
-		public int getArgumentSize() {
-			return argumentSize;
-		}
 	}
 }

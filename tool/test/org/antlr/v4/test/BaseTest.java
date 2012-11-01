@@ -1046,6 +1046,10 @@ public abstract class BaseTest {
     }
 
     protected void eraseFiles() {
+		if (tmpdir == null) {
+			return;
+		}
+
         File tmpdirF = new File(tmpdir);
         String[] files = tmpdirF.list();
         for(int i = 0; files!=null && i < files.length; i++) {

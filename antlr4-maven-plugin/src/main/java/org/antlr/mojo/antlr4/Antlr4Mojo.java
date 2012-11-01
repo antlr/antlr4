@@ -496,8 +496,7 @@ public class Antlr4Mojo
         SourceInclusionScanner scan = new SimpleSourceInclusionScanner(includes, excludes);
 
         scan.addSourceMapping(mapping);
-        @SuppressWarnings("unchecked")
-        Set<File> grammarFiles = (Set<File>)scan.getIncludedSources(sourceDirectory, null);
+        Set<?> grammarFiles = scan.getIncludedSources(sourceDirectory, null);
 
         if (grammarFiles.isEmpty()) {
             if (getLog().isInfoEnabled()) {
@@ -512,14 +511,21 @@ public class Antlr4Mojo
             // Iterate each grammar file we were given and add it into the tool's list of
             // grammars to process.
             //
-            for (File grammar : grammarFiles) {
+            for (Object grammarObject : grammarFiles) {
+				if (!(grammarObject instanceof File)) {
+					getLog().error(String.format("Expected %s from %s.getIncludedSources, found %s.",
+						File.class.getName(),
+						grammarObject != null ? grammarObject.getClass().getName() : "null"));
+				}
+
+				File grammarFile = (File)grammarObject;
 
                 if (getLog().isDebugEnabled()) {
-                    getLog().debug("Grammar file '" + grammar.getPath() + "' detected.");
+                    getLog().debug("Grammar file '" + grammarFile.getPath() + "' detected.");
                 }
 
 
-                String relPath = findSourceSubdir(sourceDirectory, grammar.getPath()) + grammar.getName();
+                String relPath = findSourceSubdir(sourceDirectory, grammarFile.getPath()) + grammarFile.getName();
 
                 if (getLog().isDebugEnabled()) {
                     getLog().debug("  ... relative path is: " + relPath);

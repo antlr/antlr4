@@ -1,8 +1,10 @@
 package org.antlr.v4.test;
 
-import junit.framework.TestCase;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.atn.PredictionContext;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayDeque;
@@ -10,11 +12,11 @@ import java.util.Deque;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-public class TestGraphNodes extends TestCase {
+public class TestGraphNodes {
 	PredictionContextCache contextCache;
 
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() {
 		contextCache = new PredictionContextCache();
 	}
 

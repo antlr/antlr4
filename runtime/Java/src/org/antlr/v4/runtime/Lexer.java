@@ -202,7 +202,6 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 
 	public void pushMode(int m) {
 		if ( LexerATNSimulator.debug ) System.out.println("pushMode "+m);
-		getInterpreter().tracePushMode(m);
 		_modeStack.push(_mode);
 		mode(m);
 	}
@@ -210,7 +209,6 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	public int popMode() {
 		if ( _modeStack.isEmpty() ) throw new EmptyStackException();
 		if ( LexerATNSimulator.debug ) System.out.println("popMode back to "+ _modeStack.peek());
-		getInterpreter().tracePopMode();
 		mode( _modeStack.pop() );
 		return _mode;
 	}
@@ -248,7 +246,6 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 *  rather than a single variable as this implementation does).
 	 */
 	public void emit(Token token) {
-		getInterpreter().traceEmit(token);
 		//System.err.println("emit "+token);
 		this._token = token;
 	}
