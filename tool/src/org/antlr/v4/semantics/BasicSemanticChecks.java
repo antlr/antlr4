@@ -330,6 +330,28 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		}
 	}
 
+	@Override
+	public void label(GrammarAST op, GrammarAST ID, GrammarAST element) {
+		switch (element.getType()) {
+		// token atoms
+		case TOKEN_REF:
+		case STRING_LITERAL:
+		case RANGE:
+		// token sets
+		case SET:
+		case NOT:
+		// rule atoms
+		case RULE_REF:
+		case WILDCARD:
+			return;
+
+		default:
+			String fileName = ID.token.getInputStream().getSourceName();
+			g.tool.errMgr.grammarError(ErrorType.LABEL_BLOCK_NOT_A_SET, fileName, ID.token, ID.getText());
+			break;
+		}
+	}
+
 	/** Check option is appropriate for grammar, rule, subrule */
 	boolean checkOptions(GrammarAST parent,
 						 Token optionID,
