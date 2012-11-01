@@ -55,9 +55,12 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -79,13 +82,18 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 public class TestPerformance extends BaseTest {
     /**
@@ -135,6 +143,11 @@ public class TestPerformance extends BaseTest {
      * {@link DefaultErrorStrategy}.
      */
     private static final boolean BAIL_ON_ERROR = true;
+	/**
+	 * {@code true} to compute a checksum for verifying consistency across
+	 * optimizations and multiple passes.
+	 */
+	private static final boolean COMPUTE_CHECKSUM = true;
     /**
      * This value is passed to {@link Parser#setBuildParseTree}.
      */
@@ -401,33 +414,53 @@ public class TestPerformance extends BaseTest {
         tokenCount.set(0);
         int inputSize = 0;
 
+		Collection<Future<Integer>> results = new ArrayList<Future<Integer>>();
 		ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS, new NumberedThreadFactory());
         for (final CharStream input : sources) {
             input.seek(0);
             inputSize += input.size();
-			executorService.execute(new Runnable() {
+			Future<Integer> futureChecksum = executorService.submit(new Callable<Integer>() {
 				@Override
-				public void run() {
+				public Integer call() {
 					// this incurred a great deal of overhead and was causing significant variations in performance results.
 					//System.out.format("Parsing file %s\n", input.getSourceName());
 					try {
-						factory.parseFile(input, ((NumberedThread)Thread.currentThread()).getThreadNumber());
+						return factory.parseFile(input, ((NumberedThread)Thread.currentThread()).getThreadNumber());
 					} catch (IllegalStateException ex) {
 						ex.printStackTrace(System.err);
 					} catch (Throwable t) {
 						t.printStackTrace(System.err);
 					}
+
+					return -1;
 				}
 			});
+
+			results.add(futureChecksum);
         }
+
+		Checksum checksum = new CRC32();
+		for (Future<Integer> future : results) {
+			int value = 0;
+			try {
+				value = future.get();
+			} catch (ExecutionException ex) {
+				Logger.getLogger(TestPerformance.class.getName()).log(Level.SEVERE, null, ex);
+			}
+
+			if (COMPUTE_CHECKSUM) {
+				updateChecksum(checksum, value);
+			}
+		}
 
 		executorService.shutdown();
 		executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
-        System.out.format("Total parse time for %d files (%d KB, %d tokens): %dms\n",
+        System.out.format("Total parse time for %d files (%d KB, %d tokens, checksum 0x%8X): %dms\n",
                           sources.size(),
                           inputSize / 1024,
                           tokenCount.get(),
+						  COMPUTE_CHECKSUM ? checksum.getValue() : 0,
                           System.currentTimeMillis() - startTime);
 
 		if (sharedLexers.length > 0) {
@@ -597,6 +630,27 @@ public class TestPerformance extends BaseTest {
         }
     }
 
+	private static void updateChecksum(Checksum checksum, int value) {
+		checksum.update((value) & 0xFF);
+		checksum.update((value >>> 8) & 0xFF);
+		checksum.update((value >>> 16) & 0xFF);
+		checksum.update((value >>> 24) & 0xFF);
+	}
+
+	private static void updateChecksum(Checksum checksum, Token token) {
+		if (token == null) {
+			checksum.update(0);
+			return;
+		}
+
+		updateChecksum(checksum, token.getStartIndex());
+		updateChecksum(checksum, token.getStopIndex());
+		updateChecksum(checksum, token.getLine());
+		updateChecksum(checksum, token.getCharPositionInLine());
+		updateChecksum(checksum, token.getType());
+		updateChecksum(checksum, token.getChannel());
+	}
+
     protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, final String entryPoint) {
         try {
             ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
@@ -633,7 +687,9 @@ public class TestPerformance extends BaseTest {
             return new ParserFactory() {
                 @SuppressWarnings("unused")
 				@Override
-                public void parseFile(CharStream input, int thread) {
+                public int parseFile(CharStream input, int thread) {
+					final Checksum checksum = new CRC32();
+
 					assert thread >= 0 && thread < NUMBER_OF_THREADS;
 
                     try {
@@ -661,8 +717,14 @@ public class TestPerformance extends BaseTest {
                         tokens.fill();
                         tokenCount.addAndGet(tokens.size());
 
+						if (COMPUTE_CHECKSUM) {
+							for (Token token : tokens.getTokens()) {
+								updateChecksum(checksum, token);
+							}
+						}
+
                         if (!RUN_PARSER) {
-                            return;
+                            return (int)checksum.getValue();
                         }
 
                         if (REUSE_PARSER && sharedParsers[thread] != null) {
@@ -709,7 +771,13 @@ public class TestPerformance extends BaseTest {
                         Method parseMethod = parserClass.getMethod(entryPoint);
                         Object parseResult;
 
+						ParseTreeListener<Token> checksumParserListener = null;
+
 						try {
+							if (COMPUTE_CHECKSUM) {
+								checksumParserListener = new ChecksumParseTreeListener(checksum);
+								sharedParsers[thread].addParseListener(checksumParserListener);
+							}
 							parseResult = parseMethod.invoke(sharedParsers[thread]);
 						} catch (InvocationTargetException ex) {
 							if (!TWO_STAGE_PARSING) {
@@ -720,7 +788,7 @@ public class TestPerformance extends BaseTest {
 							sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName+": " : "";
 							System.err.println(sourceName+"Forced to retry with full context.");
 
-							if (!(ex.getCause() instanceof RuntimeException) || !(ex.getCause().getCause() instanceof RecognitionException)) {
+							if (!(ex.getCause() instanceof ParseCancellationException)) {
 								throw ex;
 							}
 
@@ -758,6 +826,11 @@ public class TestPerformance extends BaseTest {
 
 							parseResult = parseMethod.invoke(sharedParsers[thread]);
 						}
+						finally {
+							if (checksumParserListener != null) {
+								sharedParsers[thread].removeParseListener(checksumParserListener);
+							}
+						}
 
                         Assert.assertTrue(parseResult instanceof ParseTree);
 
@@ -765,15 +838,15 @@ public class TestPerformance extends BaseTest {
                             ParseTreeWalker.DEFAULT.walk(sharedListeners[thread], (ParserRuleContext<?>)parseResult);
                         }
                     } catch (Exception e) {
-						if (BAIL_ON_ERROR && !REPORT_SYNTAX_ERRORS) {
-							if ((e.getCause() instanceof RuntimeException) && (e.getCause().getCause() instanceof RecognitionException)) {
-								return;
-							}
+						if (!REPORT_SYNTAX_ERRORS && e instanceof ParseCancellationException) {
+							return (int)checksum.getValue();
 						}
 
                         e.printStackTrace(System.out);
                         throw new IllegalStateException(e);
                     }
+
+					return (int)checksum.getValue();
                 }
             };
         } catch (Exception e) {
@@ -785,7 +858,7 @@ public class TestPerformance extends BaseTest {
     }
 
     protected interface ParserFactory {
-        void parseFile(CharStream input, int thread);
+        int parseFile(CharStream input, int thread);
     }
 
 	private static class DescriptiveErrorListener extends BaseErrorListener<Token> {
@@ -915,6 +988,46 @@ public class TestPerformance extends BaseTest {
 			int threadNumber = nextThread.getAndIncrement();
 			assert threadNumber < NUMBER_OF_THREADS;
 			return new NumberedThread(r, threadNumber);
+		}
+
+	}
+
+	protected static class ChecksumParseTreeListener implements ParseTreeListener<Token> {
+		private static final int VISIT_TERMINAL = 1;
+		private static final int VISIT_ERROR_NODE = 2;
+		private static final int ENTER_RULE = 3;
+		private static final int EXIT_RULE = 4;
+
+		private final Checksum checksum;
+
+		public ChecksumParseTreeListener(Checksum checksum) {
+			this.checksum = checksum;
+		}
+
+		@Override
+		public void visitTerminal(TerminalNode<? extends Token> node) {
+			checksum.update(VISIT_TERMINAL);
+			updateChecksum(checksum, node.getSymbol());
+		}
+
+		@Override
+		public void visitErrorNode(ErrorNode<? extends Token> node) {
+			checksum.update(VISIT_ERROR_NODE);
+			updateChecksum(checksum, node.getSymbol());
+		}
+
+		@Override
+		public void enterEveryRule(ParserRuleContext<? extends Token> ctx) {
+			checksum.update(ENTER_RULE);
+			updateChecksum(checksum, ctx.getRuleIndex());
+			updateChecksum(checksum, ctx.getStart());
+		}
+
+		@Override
+		public void exitEveryRule(ParserRuleContext<? extends Token> ctx) {
+			checksum.update(EXIT_RULE);
+			updateChecksum(checksum, ctx.getRuleIndex());
+			updateChecksum(checksum, ctx.getStop());
 		}
 
 	}

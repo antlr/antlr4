@@ -16,13 +16,13 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"[@0,0:3='enum',<2>,1:0]\n" +
 			"[@1,5:7='abc',<3>,1:5]\n" +
 			"[@2,8:7='<EOF>',<-1>,1:8]\n" +
-			"s0-' '->:s4=>4\n" +
-			"s0-'a'->:s5=>3\n" +
+			"s0-' '->:s5=>4\n" +
+			"s0-'a'->:s6=>3\n" +
 			"s0-'e'->:s1=>3\n" +
 			":s1=>3-'n'->:s2=>3\n" +
 			":s2=>3-'u'->:s3=>3\n" +
-			":s5=>3-'b'->:s5=>3\n" +
-			":s5=>3-'c'->:s5=>3\n";
+			":s6=>3-'b'->:s6=>3\n" +
+			":s6=>3-'c'->:s6=>3\n";
 		assertEquals(expecting, found);
 	}
 
@@ -38,13 +38,13 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"[@1,5:7='abc',<2>,1:5]\n" +
 			"[@2,9:12='enum',<2>,1:9]\n" +
 			"[@3,13:12='<EOF>',<-1>,1:13]\n" +
-			"s0-' '->:s4=>3\n" +
-			"s0-'a'->:s5=>2\n" +
+			"s0-' '->:s5=>3\n" +
+			"s0-'a'->:s4=>2\n" +
 			"s0-'e'->:s1=>2\n" +
 			":s1=>2-'n'->:s2=>2\n" +
 			":s2=>2-'u'->:s3=>2\n" +
-			":s5=>2-'b'->:s5=>2\n" +
-			":s5=>2-'c'->:s5=>2\n"; // no 'm'-> transition...conflicts with pred
+			":s4=>2-'b'->:s4=>2\n" +
+			":s4=>2-'c'->:s4=>2\n"; // no 'm'-> transition...conflicts with pred
 		assertEquals(expecting, found);
 	}
 
@@ -60,14 +60,14 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"[@1,5:7='abc',<2>,1:5]\n" +
 			"[@2,9:12='enum',<2>,1:9]\n" +
 			"[@3,13:12='<EOF>',<-1>,1:13]\n" +
-			"s0-' '->:s1=>3\n"; // no DFA for enum/id. all paths lead to pred.
+			"s0-' '->:s2=>3\n"; // no edges in DFA for enum/id. all paths lead to pred.
 		assertEquals(expecting, found);
 	}
 
 	@Test public void testEnumNotID() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"ENUM : [a-z]+ {getSpeculativeText().equals(\"enum\")}? ;\n" +
+			"ENUM : [a-z]+ {getText().equals(\"enum\")}? ;\n" +
 			"ID   : [a-z]+ ;\n"+
 			"WS : (' '|'\\n') {skip();} ;";
 		String found = execLexer("L.g4", grammar, "L", "enum abc enum", true);
@@ -76,7 +76,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"[@1,5:7='abc',<2>,1:5]\n" +
 			"[@2,9:12='enum',<1>,1:9]\n" +
 			"[@3,13:12='<EOF>',<-1>,1:13]\n" +
-			"s0-' '->:s1=>3\n"; // no DFA for enum/id. all paths lead to pred.
+			"s0-' '->:s3=>3\n"; // no edges in DFA for enum/id. all paths lead to pred.
 		assertEquals(expecting, found);
 	}
 
@@ -106,6 +106,28 @@ public class TestSemPredEvalLexer extends BaseTest {
 			":s1=>1-'c'->:s1=>1\n" +
 			":s1=>1-'e'->:s1=>1\n" +
 			":s1=>1-'f'->:s1=>1\n";
+		assertEquals(expecting, found);
+	}
+
+	@Test public void testLexerInputPositionSensitivePredicates() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"WORD1 : ID1+ {System.out.println(getText());} ;\n"+
+			"WORD2 : ID2+ {System.out.println(getText());} ;\n"+
+			"fragment ID1 : {getCharPositionInLine()<2}? [a-zA-Z];\n"+
+			"fragment ID2 : {getCharPositionInLine()>=2}? [a-zA-Z];\n"+
+			"WS : (' '|'\\n') -> skip;\n";
+		String found = execLexer("L.g4", grammar, "L", "a cde\nabcde\n");
+		String expecting =
+			"a\n" +
+			"cde\n" +
+			"ab\n" +
+			"cde\n" +
+			"[@0,0:0='a',<1>,1:0]\n" +
+			"[@1,2:4='cde',<2>,1:2]\n" +
+			"[@2,6:7='ab',<1>,2:0]\n" +
+			"[@3,8:10='cde',<2>,2:2]\n" +
+			"[@4,12:11='<EOF>',<-1>,3:0]\n";
 		assertEquals(expecting, found);
 	}
 }
