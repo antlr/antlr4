@@ -372,7 +372,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		DFAState s0 = dfa.s0full.get();
 		while (remainingContext != null && s0 != null && s0.isContextSensitive()) {
 			remainingContext = skipTailCalls(remainingContext);
-			s0 = s0.getContextTarget(getInvokingState(remainingContext));
+			s0 = s0.getContextTarget(getReturnState(remainingContext));
 			if (remainingContext.isEmpty()) {
 				assert s0 == null || !s0.isContextSensitive();
 			}
@@ -443,7 +443,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					DFAState next = null;
 					if (remainingOuterContext != null) {
 						remainingOuterContext = skipTailCalls(remainingOuterContext);
-						next = s.getContextTarget(getInvokingState(remainingOuterContext));
+						next = s.getContextTarget(getReturnState(remainingOuterContext));
 					}
 
 					if ( next == null ) {
@@ -760,7 +760,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				DFAState next = null;
 				if (remainingGlobalContext != null) {
 					remainingGlobalContext = skipTailCalls(remainingGlobalContext);
-					next = s.getContextTarget(getInvokingState(remainingGlobalContext));
+					next = s.getContextTarget(getReturnState(remainingGlobalContext));
 				}
 
 				if ( next == null ) {
@@ -823,7 +823,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				reach.clear();
 
 				remainingGlobalContext = skipTailCalls(remainingGlobalContext);
-				int nextContextElement = getInvokingState(remainingGlobalContext);
+				int nextContextElement = getReturnState(remainingGlobalContext);
 				if (contextElements == null) {
 					contextElements = new IntegerList();
 				}
@@ -888,7 +888,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					remainingGlobalContext = null;
 				}
 				else {
-					previousContext = getInvokingState(remainingGlobalContext);
+					previousContext = getReturnState(remainingGlobalContext);
 					next = s0.getContextTarget(previousContext);
 					initialContext = initialContext.appendContext(previousContext, contextCache);
 					remainingGlobalContext = remainingGlobalContext.getParent();
@@ -946,7 +946,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 			configs.clear();
 			remainingGlobalContext = skipTailCalls(remainingGlobalContext);
-			int nextContextElement = getInvokingState(remainingGlobalContext);
+			int nextContextElement = getReturnState(remainingGlobalContext);
 
 			if (remainingGlobalContext.isEmpty()) {
 				remainingGlobalContext = null;
@@ -1159,11 +1159,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			if ( config.getContext()!=null && !config.getContext().isEmpty() ) {
 				int nonEmptySize = config.getContext().size() - (hasEmpty ? 1 : 0);
 				for (int i = 0; i < nonEmptySize; i++) {
-					PredictionContext newContext = config.getContext().getParent(i); // "pop" invoking state
-					ATNState invokingState = atn.states.get(config.getContext().getInvokingState(i));
-					RuleTransition rt = (RuleTransition)invokingState.transition(0);
-					ATNState retState = rt.followState;
-					ATNConfig c = ATNConfig.create(retState, config.getAlt(), newContext, config.getSemanticContext());
+					PredictionContext newContext = config.getContext().getParent(i); // "pop" return state
+					ATNState returnState = atn.states.get(config.getContext().getReturnState(i));
+					ATNConfig c = ATNConfig.create(returnState, config.getAlt(), newContext, config.getSemanticContext());
 					// While we have context to pop back from, we may have
 					// gotten that context AFTER having fallen off a rule.
 					// Make sure we track that we are now out of context.
@@ -1339,17 +1337,17 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							   ", ctx="+config.getContext());
 		}
 
-		ATNState p = config.getState();
+		ATNState returnState = t.followState;
 		PredictionContext newContext;
 
 		if (optimize_tail_calls && t.optimizedTailCall && (!tail_call_preserves_sll || !PredictionContext.isEmptyLocal(config.getContext()))) {
 			newContext = config.getContext();
 		}
 		else if (contextCache != null) {
-			newContext = contextCache.getChild(config.getContext(), p.stateNumber);
+			newContext = contextCache.getChild(config.getContext(), returnState.stateNumber);
 		}
 		else {
-			newContext = config.getContext().getChild(p.stateNumber);
+			newContext = config.getContext().getChild(returnState.stateNumber);
 		}
 
 		return config.transform(t.target, newContext);
@@ -1624,11 +1622,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	/** See comment on LexerInterpreter.addDFAState. */
 	@NotNull
-	protected DFAState addDFAContextState(@NotNull DFA dfa, @NotNull ATNConfigSet configs, int invokingContext, PredictionContextCache contextCache) {
-		if (invokingContext != PredictionContext.EMPTY_FULL_STATE_KEY) {
+	protected DFAState addDFAContextState(@NotNull DFA dfa, @NotNull ATNConfigSet configs, int returnContext, PredictionContextCache contextCache) {
+		if (returnContext != PredictionContext.EMPTY_FULL_STATE_KEY) {
 			ATNConfigSet contextConfigs = new ATNConfigSet();
 			for (ATNConfig config : configs) {
-				contextConfigs.add(config.appendContext(invokingContext, contextCache));
+				contextConfigs.add(config.appendContext(returnContext, contextCache));
 			}
 
 			return addDFAState(dfa, contextConfigs, contextCache);
@@ -1752,12 +1750,14 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
                                                                      ambigAlts, configs);
     }
 
-	protected final int getInvokingState(RuleContext<?> context) {
+	protected final int getReturnState(RuleContext<?> context) {
 		if (context.isEmpty()) {
 			return PredictionContext.EMPTY_FULL_STATE_KEY;
 		}
 
-		return context.invokingState;
+		ATNState state = atn.states.get(context.invokingState);
+		RuleTransition transition = (RuleTransition)state.transition(0);
+		return transition.followState.stateNumber;
 	}
 
 	protected final <T extends Token> ParserRuleContext<T> skipTailCalls(ParserRuleContext<T> context) {

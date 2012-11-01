@@ -42,24 +42,24 @@ public class ArrayPredictionContext extends PredictionContext {
 	@NotNull
 	public final PredictionContext[] parents;
 	@NotNull
-	public final int[] invokingStates;
+	public final int[] returnStates;
 
-	/*package*/ ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] invokingStates) {
-		super(calculateHashCode(calculateParentHashCode(parents), calculateInvokingStatesHashCode(invokingStates)));
-		assert parents.length == invokingStates.length;
-		assert invokingStates.length > 1 || invokingStates[0] != EMPTY_FULL_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
+	/*package*/ ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] returnStates) {
+		super(calculateHashCode(calculateParentHashCode(parents), calculateReturnStatesHashCode(returnStates)));
+		assert parents.length == returnStates.length;
+		assert returnStates.length > 1 || returnStates[0] != EMPTY_FULL_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
 
 		this.parents = parents;
-		this.invokingStates = invokingStates;
+		this.returnStates = returnStates;
 	}
 
-	/*package*/ ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] invokingStates, int hashCode) {
+	/*package*/ ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] returnStates, int hashCode) {
 		super(hashCode);
-		assert parents.length == invokingStates.length;
-		assert invokingStates.length > 1 || invokingStates[0] != EMPTY_FULL_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
+		assert parents.length == returnStates.length;
+		assert returnStates.length > 1 || returnStates[0] != EMPTY_FULL_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
 
 		this.parents = parents;
-		this.invokingStates = invokingStates;
+		this.returnStates = returnStates;
 	}
 
 	@Override
@@ -68,18 +68,18 @@ public class ArrayPredictionContext extends PredictionContext {
 	}
 
 	@Override
-	public int getInvokingState(int index) {
-		return invokingStates[index];
+	public int getReturnState(int index) {
+		return returnStates[index];
 	}
 
 	@Override
-	public int findInvokingState(int invokingState) {
-		return Arrays.binarySearch(invokingStates, invokingState);
+	public int findReturnState(int returnState) {
+		return Arrays.binarySearch(returnStates, returnState);
 	}
 
 	@Override
 	public int size() {
-		return invokingStates.length;
+		return returnStates.length;
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class ArrayPredictionContext extends PredictionContext {
 
 	@Override
 	public boolean hasEmpty() {
-		return invokingStates[invokingStates.length - 1] == EMPTY_FULL_STATE_KEY;
+		return returnStates[returnStates.length - 1] == EMPTY_FULL_STATE_KEY;
 	}
 
 	@Override
@@ -99,10 +99,10 @@ public class ArrayPredictionContext extends PredictionContext {
 		}
 
 		PredictionContext[] parents2 = Arrays.copyOf(parents, parents.length + 1);
-		int[] invokingStates2 = Arrays.copyOf(invokingStates, invokingStates.length + 1);
+		int[] returnStates2 = Arrays.copyOf(returnStates, returnStates.length + 1);
 		parents2[parents2.length - 1] = PredictionContext.EMPTY_FULL;
-		invokingStates2[invokingStates2.length - 1] = PredictionContext.EMPTY_FULL_STATE_KEY;
-		return new ArrayPredictionContext(parents2, invokingStates2);
+		returnStates2[returnStates2.length - 1] = PredictionContext.EMPTY_FULL_STATE_KEY;
+		return new ArrayPredictionContext(parents2, returnStates2);
 	}
 
 	@Override
@@ -111,13 +111,13 @@ public class ArrayPredictionContext extends PredictionContext {
 			return this;
 		}
 
-		if (invokingStates.length == 2) {
-			return new SingletonPredictionContext(parents[0], invokingStates[0]);
+		if (returnStates.length == 2) {
+			return new SingletonPredictionContext(parents[0], returnStates[0]);
 		}
 		else {
 			PredictionContext[] parents2 = Arrays.copyOf(parents, parents.length - 1);
-			int[] invokingStates2 = Arrays.copyOf(invokingStates, invokingStates.length - 1);
-			return new ArrayPredictionContext(parents2, invokingStates2);
+			int[] returnStates2 = Arrays.copyOf(returnStates, returnStates.length - 1);
+			return new ArrayPredictionContext(parents2, returnStates2);
 		}
 	}
 
@@ -155,9 +155,9 @@ public class ArrayPredictionContext extends PredictionContext {
 				}
 
 				PredictionContext[] updatedParents = new PredictionContext[parentCount];
-				int[] updatedInvokingStates = new int[parentCount];
+				int[] updatedReturnStates = new int[parentCount];
 				for (int i = 0; i < parentCount; i++) {
-					updatedInvokingStates[i] = context.getInvokingState(i);
+					updatedReturnStates[i] = context.getReturnState(i);
 				}
 
 				for (int i = 0; i < parentCount; i++) {
@@ -165,11 +165,11 @@ public class ArrayPredictionContext extends PredictionContext {
 				}
 
 				if (updatedParents.length == 1) {
-					result = new SingletonPredictionContext(updatedParents[0], updatedInvokingStates[0]);
+					result = new SingletonPredictionContext(updatedParents[0], updatedReturnStates[0]);
 				}
 				else {
 					assert updatedParents.length > 1;
-					result = new ArrayPredictionContext(updatedParents, updatedInvokingStates);
+					result = new ArrayPredictionContext(updatedParents, updatedReturnStates);
 				}
 
 				if (context.hasEmpty()) {
@@ -226,7 +226,7 @@ public class ArrayPredictionContext extends PredictionContext {
 			}
 
 			for (int i = 0; i < selfSize; i++) {
-				if (operands.getX().getInvokingState(i) != operands.getY().getInvokingState(i)) {
+				if (operands.getX().getReturnState(i) != operands.getY().getReturnState(i)) {
 					return false;
 				}
 

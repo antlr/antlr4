@@ -391,16 +391,14 @@ public class LexerATNSimulator extends ATNSimulator {
 			}
 
 			for (int i = 0; i < context.size(); i++) {
-				int invokingStateNumber = context.getInvokingState(i);
-				if (invokingStateNumber == PredictionContext.EMPTY_FULL_STATE_KEY) {
+				int returnStateNumber = context.getReturnState(i);
+				if (returnStateNumber == PredictionContext.EMPTY_FULL_STATE_KEY) {
 					continue;
 				}
 
-				PredictionContext newContext = context.getParent(i); // "pop" invoking state
-				ATNState invokingState = atn.states.get(invokingStateNumber);
-				RuleTransition rt = (RuleTransition)invokingState.transition(0);
-				ATNState retState = rt.followState;
-				ATNConfig c = ATNConfig.create(retState, config.getAlt(), newContext);
+				PredictionContext newContext = context.getParent(i); // "pop" return state
+				ATNState returnState = atn.states.get(returnStateNumber);
+				ATNConfig c = ATNConfig.create(returnState, config.getAlt(), newContext);
 				if (closure(input, c, configs, speculative)) {
 					return true;
 				}
@@ -436,16 +434,16 @@ public class LexerATNSimulator extends ATNSimulator {
 									  @NotNull ATNConfigSet configs,
 									  boolean speculative)
 	{
-		ATNState p = config.getState();
 		ATNConfig c;
 
 		switch (t.getSerializationType()) {
 		case Transition.RULE:
-			if (optimize_tail_calls && ((RuleTransition)t).optimizedTailCall && !config.getContext().hasEmpty()) {
+			RuleTransition ruleTransition = (RuleTransition)t;
+			if (optimize_tail_calls && ruleTransition.optimizedTailCall && !config.getContext().hasEmpty()) {
 				c = config.transform(t.target);
 			}
 			else {
-				PredictionContext newContext = config.getContext().getChild(p.stateNumber);
+				PredictionContext newContext = config.getContext().getChild(ruleTransition.followState.stateNumber);
 				c = config.transform(t.target, newContext);
 			}
 

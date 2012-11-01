@@ -820,10 +820,10 @@ public class TestGraphNodes {
 					}
 
 					nodes.append("<p").append(i).append('>');
-					if (current.getInvokingState(i) == PredictionContext.EMPTY_FULL_STATE_KEY) {
+					if (current.getReturnState(i) == PredictionContext.EMPTY_FULL_STATE_KEY) {
 						nodes.append('$');
 					}
-					else if (current.getInvokingState(i) == PredictionContext.EMPTY_LOCAL_STATE_KEY) {
+					else if (current.getReturnState(i) == PredictionContext.EMPTY_LOCAL_STATE_KEY) {
 						nodes.append('*');
 					}
 				}
@@ -834,8 +834,8 @@ public class TestGraphNodes {
 			nodes.append("\"];\n");
 
 			for (int i = 0; i < current.size(); i++) {
-				if (current.getInvokingState(i) == PredictionContext.EMPTY_FULL_STATE_KEY
-					|| current.getInvokingState(i) == PredictionContext.EMPTY_LOCAL_STATE_KEY)
+				if (current.getReturnState(i) == PredictionContext.EMPTY_FULL_STATE_KEY
+					|| current.getReturnState(i) == PredictionContext.EMPTY_LOCAL_STATE_KEY)
 				{
 					continue;
 				}
@@ -852,7 +852,7 @@ public class TestGraphNodes {
 
 				edges.append("->");
 				edges.append('s').append(contextIds.get(current.getParent(i)));
-				edges.append("[label=\"").append(current.getInvokingState(i)).append("\"]");
+				edges.append("[label=\"").append(current.getReturnState(i)).append("\"]");
 				edges.append(";\n");
 			}
 		}

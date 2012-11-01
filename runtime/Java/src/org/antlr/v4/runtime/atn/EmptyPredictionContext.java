@@ -36,7 +36,7 @@ public final class EmptyPredictionContext extends PredictionContext {
 	private final boolean fullContext;
 
 	private EmptyPredictionContext(boolean fullContext) {
-		super(calculateHashCode(calculateEmptyParentHashCode(), calculateEmptyInvokingStateHashCode()));
+		super(calculateHashCode(calculateEmptyParentHashCode(), calculateEmptyReturnStateHashCode()));
 		this.fullContext = fullContext;
 	}
 
@@ -60,12 +60,12 @@ public final class EmptyPredictionContext extends PredictionContext {
 	}
 
 	@Override
-	public int getInvokingState(int index) {
+	public int getReturnState(int index) {
 		throw new IndexOutOfBoundsException();
 	}
 
 	@Override
-	public int findInvokingState(int invokingState) {
+	public int findReturnState(int returnState) {
 		return -1;
 	}
 
@@ -75,8 +75,8 @@ public final class EmptyPredictionContext extends PredictionContext {
 	}
 
 	@Override
-	public PredictionContext appendContext(int invokingContext, PredictionContextCache contextCache) {
-		return contextCache.getChild(this, invokingContext);
+	public PredictionContext appendContext(int returnContext, PredictionContextCache contextCache) {
+		return contextCache.getChild(this, returnContext);
 	}
 
 	@Override

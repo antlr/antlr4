@@ -55,9 +55,9 @@ public abstract class PredictionContext {
 	 *
 	 * <pre>
 	 *  private int referenceHashCode() {
-	 *  	int invokingStateHashCode = {@link #INITIAL_HASH INITIAL_HASH};
+	 *  	int returnStateHashCode = {@link #INITIAL_HASH INITIAL_HASH};
 	 *  	for (int i = 0; i &lt; size(); i++) {
-	 *  		invokingStateHashCode = invokingStateHashCode * {@link #HASH_MULTIPLIER HASH_MULTIPLIER} ^ getInvokingState(i);
+	 *  		returnStateHashCode = returnStateHashCode * {@link #HASH_MULTIPLIER HASH_MULTIPLIER} ^ getReturnState(i);
 	 *  	}
 	 *
 	 *  	int parentHashCode = INITIAL_HASH;
@@ -67,7 +67,7 @@ public abstract class PredictionContext {
 	 *
 	 *  	int hashCode = INITIAL_HASH;
 	 *  	hashCode = hashCode * HASH_MULTIPLIER ^ parentHashCode;
-	 *  	hashCode = hashCode * HASH_MULTIPLIER ^ invokingStateHashCode;
+	 *  	hashCode = hashCode * HASH_MULTIPLIER ^ returnStateHashCode;
 	 *  	return hashCode;
 	 *  }
 	 * </pre>
@@ -95,32 +95,32 @@ public abstract class PredictionContext {
 		return hashCode;
 	}
 
-	protected static int calculateEmptyInvokingStateHashCode() {
+	protected static int calculateEmptyReturnStateHashCode() {
 		return INITIAL_HASH;
 	}
 
-	protected static int calculateInvokingStateHashCode(int invokingState) {
-		return INITIAL_HASH * HASH_MULTIPLIER ^ invokingState;
+	protected static int calculateReturnStateHashCode(int returnState) {
+		return INITIAL_HASH * HASH_MULTIPLIER ^ returnState;
 	}
 
-	protected static int calculateInvokingStatesHashCode(int[] invokingStates) {
+	protected static int calculateReturnStatesHashCode(int[] returnStates) {
 		int hashCode = INITIAL_HASH;
-		for (int state : invokingStates) {
+		for (int state : returnStates) {
 			hashCode = hashCode * HASH_MULTIPLIER ^ state;
 		}
 
 		return hashCode;
 	}
 
-	protected static int calculateHashCode(int parentHashCode, int invokingStateHashCode) {
-		return (INITIAL_HASH * HASH_MULTIPLIER ^ parentHashCode) * HASH_MULTIPLIER ^ invokingStateHashCode;
+	protected static int calculateHashCode(int parentHashCode, int returnStateHashCode) {
+		return (INITIAL_HASH * HASH_MULTIPLIER ^ parentHashCode) * HASH_MULTIPLIER ^ returnStateHashCode;
 	}
 
 	public abstract int size();
 
-	public abstract int getInvokingState(int index);
+	public abstract int getReturnState(int index);
 
-	public abstract int findInvokingState(int invokingState);
+	public abstract int findReturnState(int returnState);
 
 	@NotNull
 	public abstract PredictionContext getParent(int index);
@@ -129,22 +129,25 @@ public abstract class PredictionContext {
 
 	protected abstract PredictionContext removeEmptyContext();
 
-	public static PredictionContext fromRuleContext(@NotNull RuleContext<?> outerContext) {
-		return fromRuleContext(outerContext, true);
+	public static PredictionContext fromRuleContext(@NotNull ATN atn, @NotNull RuleContext<?> outerContext) {
+		return fromRuleContext(atn, outerContext, true);
 	}
-	public static PredictionContext fromRuleContext(@NotNull RuleContext<?> outerContext, boolean fullContext) {
+
+	public static PredictionContext fromRuleContext(@NotNull ATN atn, @NotNull RuleContext<?> outerContext, boolean fullContext) {
 		if (outerContext.isEmpty()) {
 			return fullContext ? EMPTY_FULL : EMPTY_LOCAL;
 		}
 
 		PredictionContext parent;
 		if (outerContext.parent != null) {
-			parent = PredictionContext.fromRuleContext(outerContext.parent, fullContext);
+			parent = PredictionContext.fromRuleContext(atn, outerContext.parent, fullContext);
 		} else {
 			parent = fullContext ? EMPTY_FULL : EMPTY_LOCAL;
 		}
 
-		return parent.getChild(outerContext.invokingState);
+		ATNState state = atn.states.get(outerContext.invokingState);
+		RuleTransition transition = (RuleTransition)state.transition(0);
+		return parent.getChild(transition.followState.stateNumber);
 	}
 
 	private static PredictionContext addEmptyContext(PredictionContext context) {
@@ -172,43 +175,43 @@ public abstract class PredictionContext {
 
 		final int context0size = context0.size();
 		final int context1size = context1.size();
-		if (context0size == 1 && context1size == 1 && context0.getInvokingState(0) == context1.getInvokingState(0)) {
+		if (context0size == 1 && context1size == 1 && context0.getReturnState(0) == context1.getReturnState(0)) {
 			PredictionContext merged = contextCache.join(context0.getParent(0), context1.getParent(0));
 			if (merged == context0.getParent(0)) {
 				return context0;
 			} else if (merged == context1.getParent(0)) {
 				return context1;
 			} else {
-				return merged.getChild(context0.getInvokingState(0));
+				return merged.getChild(context0.getReturnState(0));
 			}
 		}
 
 		int count = 0;
 		PredictionContext[] parentsList = new PredictionContext[context0size + context1size];
-		int[] invokingStatesList = new int[parentsList.length];
+		int[] returnStatesList = new int[parentsList.length];
 		int leftIndex = 0;
 		int rightIndex = 0;
 		boolean canReturnLeft = true;
 		boolean canReturnRight = true;
 		while (leftIndex < context0size && rightIndex < context1size) {
-			if (context0.getInvokingState(leftIndex) == context1.getInvokingState(rightIndex)) {
+			if (context0.getReturnState(leftIndex) == context1.getReturnState(rightIndex)) {
 				parentsList[count] = contextCache.join(context0.getParent(leftIndex), context1.getParent(rightIndex));
-				invokingStatesList[count] = context0.getInvokingState(leftIndex);
+				returnStatesList[count] = context0.getReturnState(leftIndex);
 				canReturnLeft = canReturnLeft && parentsList[count] == context0.getParent(leftIndex);
 				canReturnRight = canReturnRight && parentsList[count] == context1.getParent(rightIndex);
 				leftIndex++;
 				rightIndex++;
 			}
-			else if (context0.getInvokingState(leftIndex) < context1.getInvokingState(rightIndex)) {
+			else if (context0.getReturnState(leftIndex) < context1.getReturnState(rightIndex)) {
 				parentsList[count] = context0.getParent(leftIndex);
-				invokingStatesList[count] = context0.getInvokingState(leftIndex);
+				returnStatesList[count] = context0.getReturnState(leftIndex);
 				canReturnRight = false;
 				leftIndex++;
 			}
 			else {
-				assert context1.getInvokingState(rightIndex) < context0.getInvokingState(leftIndex);
+				assert context1.getReturnState(rightIndex) < context0.getReturnState(leftIndex);
 				parentsList[count] = context1.getParent(rightIndex);
-				invokingStatesList[count] = context1.getInvokingState(rightIndex);
+				returnStatesList[count] = context1.getReturnState(rightIndex);
 				canReturnLeft = false;
 				rightIndex++;
 			}
@@ -218,7 +221,7 @@ public abstract class PredictionContext {
 
 		while (leftIndex < context0size) {
 			parentsList[count] = context0.getParent(leftIndex);
-			invokingStatesList[count] = context0.getInvokingState(leftIndex);
+			returnStatesList[count] = context0.getReturnState(leftIndex);
 			leftIndex++;
 			canReturnRight = false;
 			count++;
@@ -226,7 +229,7 @@ public abstract class PredictionContext {
 
 		while (rightIndex < context1size) {
 			parentsList[count] = context1.getParent(rightIndex);
-			invokingStatesList[count] = context1.getInvokingState(rightIndex);
+			returnStatesList[count] = context1.getReturnState(rightIndex);
 			rightIndex++;
 			canReturnLeft = false;
 			count++;
@@ -241,7 +244,7 @@ public abstract class PredictionContext {
 
 		if (count < parentsList.length) {
 			parentsList = Arrays.copyOf(parentsList, count);
-			invokingStatesList = Arrays.copyOf(invokingStatesList, count);
+			returnStatesList = Arrays.copyOf(returnStatesList, count);
 		}
 
 		if (parentsList.length == 0) {
@@ -249,10 +252,10 @@ public abstract class PredictionContext {
 			return EMPTY_FULL;
 		}
 		else if (parentsList.length == 1) {
-			return new SingletonPredictionContext(parentsList[0], invokingStatesList[0]);
+			return new SingletonPredictionContext(parentsList[0], returnStatesList[0]);
 		}
 		else {
-			return new ArrayPredictionContext(parentsList, invokingStatesList);
+			return new ArrayPredictionContext(parentsList, returnStatesList);
 		}
 	}
 
@@ -306,11 +309,11 @@ public abstract class PredictionContext {
 		// We know parents.length>0 because context.isEmpty() is checked at the beginning of the method.
 		PredictionContext updated;
 		if (parents.length == 1) {
-			updated = new SingletonPredictionContext(parents[0], context.getInvokingState(0));
+			updated = new SingletonPredictionContext(parents[0], context.getReturnState(0));
 		}
 		else {
 			ArrayPredictionContext arrayPredictionContext = (ArrayPredictionContext)context;
-			updated = new ArrayPredictionContext(parents, arrayPredictionContext.invokingStates, context.cachedHashCode);
+			updated = new ArrayPredictionContext(parents, arrayPredictionContext.returnStates, context.cachedHashCode);
 		}
 
 		existing = contextCache.putIfAbsent(updated, updated);
@@ -320,14 +323,14 @@ public abstract class PredictionContext {
 		return updated;
 	}
 
-	public PredictionContext appendContext(int invokingContext, PredictionContextCache contextCache) {
-		return appendContext(PredictionContext.EMPTY_FULL.getChild(invokingContext), contextCache);
+	public PredictionContext appendContext(int returnContext, PredictionContextCache contextCache) {
+		return appendContext(PredictionContext.EMPTY_FULL.getChild(returnContext), contextCache);
 	}
 
 	public abstract PredictionContext appendContext(PredictionContext suffix, PredictionContextCache contextCache);
 
-	public PredictionContext getChild(int invokingState) {
-		return new SingletonPredictionContext(this, invokingState);
+	public PredictionContext getChild(int returnState) {
+		return new SingletonPredictionContext(this, returnState);
 	}
 
 	public abstract boolean isEmpty();
@@ -390,17 +393,17 @@ public abstract class PredictionContext {
 					String ruleName = recognizer.getRuleNames()[s.ruleIndex];
 					localBuffer.append(ruleName);
 				}
-				else if ( p.getInvokingState(index)!=EMPTY_FULL_STATE_KEY ) {
+				else if ( p.getReturnState(index)!=EMPTY_FULL_STATE_KEY ) {
 					if ( !p.isEmpty() ) {
 						if (localBuffer.length() > 1) {
 							// first char is '[', if more than that this isn't the first rule
 							localBuffer.append(' ');
 						}
 
-						localBuffer.append(p.getInvokingState(index));
+						localBuffer.append(p.getReturnState(index));
 					}
 				}
-				stateNumber = p.getInvokingState(index);
+				stateNumber = p.getReturnState(index);
 				p = p.getParent(index);
 			}
 			localBuffer.append("]");

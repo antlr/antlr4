@@ -33,13 +33,13 @@ public class SingletonPredictionContext extends PredictionContext {
 
 	@NotNull
 	public final PredictionContext parent;
-	public final int invokingState;
+	public final int returnState;
 
-	/*package*/ SingletonPredictionContext(@NotNull PredictionContext parent, int invokingState) {
-		super(calculateHashCode(calculateParentHashCode(parent), calculateInvokingStateHashCode(invokingState)));
-		assert invokingState != EMPTY_FULL_STATE_KEY && invokingState != EMPTY_LOCAL_STATE_KEY;
+	/*package*/ SingletonPredictionContext(@NotNull PredictionContext parent, int returnState) {
+		super(calculateHashCode(calculateParentHashCode(parent), calculateReturnStateHashCode(returnState)));
+		assert returnState != EMPTY_FULL_STATE_KEY && returnState != EMPTY_LOCAL_STATE_KEY;
 		this.parent = parent;
-		this.invokingState = invokingState;
+		this.returnState = returnState;
 	}
 
 	@Override
@@ -49,14 +49,14 @@ public class SingletonPredictionContext extends PredictionContext {
 	}
 
 	@Override
-	public int getInvokingState(int index) {
+	public int getReturnState(int index) {
 		assert index == 0;
-		return invokingState;
+		return returnState;
 	}
 
 	@Override
-	public int findInvokingState(int invokingState) {
-		return this.invokingState == invokingState ? 0 : -1;
+	public int findReturnState(int returnState) {
+		return this.returnState == returnState ? 0 : -1;
 	}
 
 	@Override
@@ -76,14 +76,14 @@ public class SingletonPredictionContext extends PredictionContext {
 
 	@Override
 	public PredictionContext appendContext(PredictionContext suffix, PredictionContextCache contextCache) {
-		return contextCache.getChild(parent.appendContext(suffix, contextCache), invokingState);
+		return contextCache.getChild(parent.appendContext(suffix, contextCache), returnState);
 	}
 
 	@Override
 	protected PredictionContext addEmptyContext() {
 		PredictionContext[] parents = new PredictionContext[] { parent, EMPTY_FULL };
-		int[] invokingStates = new int[] { invokingState, EMPTY_FULL_STATE_KEY };
-		return new ArrayPredictionContext(parents, invokingStates);
+		int[] returnStates = new int[] { returnState, EMPTY_FULL_STATE_KEY };
+		return new ArrayPredictionContext(parents, returnStates);
 	}
 
 	@Override
@@ -105,7 +105,7 @@ public class SingletonPredictionContext extends PredictionContext {
 			return false;
 		}
 
-		return invokingState == other.invokingState
+		return returnState == other.returnState
 			&& parent.equals(other.parent);
 	}
 

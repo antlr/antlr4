@@ -109,13 +109,11 @@ public class LL1Analyzer {
                 return;
             }
 			for (int i = 0; i < ctx.size(); i++) {
-				if ( ctx.getInvokingState(i)!=PredictionContext.EMPTY_FULL_STATE_KEY ) {
-					ATNState invokingState = atn.states.get(ctx.getInvokingState(i));
-					RuleTransition rt = (RuleTransition)invokingState.transition(0);
-					ATNState retState = rt.followState;
+				if ( ctx.getReturnState(i)!=PredictionContext.EMPTY_FULL_STATE_KEY ) {
+					ATNState returnState = atn.states.get(ctx.getReturnState(i));
 //			System.out.println("popping back to "+retState);
 					for (int j = 0; j < ctx.size(); j++) {
-						_LOOK(retState, ctx.getParent(j), look, lookBusy, seeThruPreds);
+						_LOOK(returnState, ctx.getParent(j), look, lookBusy, seeThruPreds);
 					}
 					return;
 				}
@@ -126,7 +124,7 @@ public class LL1Analyzer {
         for (int i=0; i<n; i++) {
 			Transition t = s.transition(i);
 			if ( t.getClass() == RuleTransition.class ) {
-				PredictionContext newContext = ctx.getChild(s.stateNumber);
+				PredictionContext newContext = ctx.getChild(((RuleTransition)t).followState.stateNumber);
 				_LOOK(t.target, newContext, look, lookBusy, seeThruPreds);
 			}
 			else if ( t instanceof PredicateTransition ) {

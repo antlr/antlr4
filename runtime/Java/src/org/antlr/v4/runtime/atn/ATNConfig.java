@@ -243,7 +243,7 @@ public class ATNConfig {
 				return left.hasEmpty();
 			} else {
 				for (int i = 0; i < right.size(); i++) {
-					int index = left.findInvokingState(right.getInvokingState(i));
+					int index = left.findReturnState(right.getReturnState(i));
 					if (index < 0) {
 						// assumes invokingStates has no duplicate entries
 						return false;
@@ -312,7 +312,7 @@ public class ATNConfig {
 				builder.append("  s").append(System.identityHashCode(current));
 				builder.append("->");
 				builder.append("s").append(System.identityHashCode(current.getParent(i)));
-				builder.append("[label=\"").append(current.getInvokingState(i)).append("\"];\n");
+				builder.append("[label=\"").append(current.getReturnState(i)).append("\"];\n");
 				if (visited.put(current.getParent(i), current.getParent(i)) == null) {
 					workList.push(current.getParent(i));
 				}
