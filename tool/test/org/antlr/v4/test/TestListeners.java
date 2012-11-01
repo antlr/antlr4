@@ -9,7 +9,7 @@ public class TestListeners extends BaseTest {
 			"@header {import org.antlr.v4.runtime.tree.*;}\n"+
 			"@members {\n" +
 			"public static class LeafListener extends TBaseListener {\n" +
-			"    public void visitTerminal(TerminalNode<Token> node) {\n" +
+			"    public void visitTerminal(TerminalNode node) {\n" +
 			"      System.out.println(node.getSymbol().getText());\n" +
 			"    }\n" +
 			"  }}\n" +
@@ -188,7 +188,7 @@ public class TestListeners extends BaseTest {
 			"1\n" +
 			"2\n" +
 			"3\n" +
-			"1 [16 6]\n";
+			"1 [13 6]\n";
 		assertEquals(expecting, result);
 	}
 }

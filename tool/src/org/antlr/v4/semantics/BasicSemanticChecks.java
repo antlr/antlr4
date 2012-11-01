@@ -192,6 +192,11 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
+	public void defineToken(GrammarAST ID) {
+		checkTokenDefinition(ID.token);
+	}
+
+	@Override
 	public void elementOption(GrammarASTWithOptions elem, GrammarAST ID, GrammarAST valueAST) {
 		String v = null;
 		boolean ok = checkElementOptions(elem, ID, valueAST);
@@ -315,19 +320,35 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		}
 	}
 
-	void checkTokenAlias(Token tokenID) {
+	void checkTokenDefinition(Token tokenID) {
 		String fileName = tokenID.getInputStream().getSourceName();
-		if ( Character.isLowerCase(tokenID.getText().charAt(0)) ) {
+		if ( !Character.isUpperCase(tokenID.getText().charAt(0)) ) {
 			g.tool.errMgr.grammarError(ErrorType.TOKEN_NAMES_MUST_START_UPPER,
 									   fileName,
 									   tokenID,
 									   tokenID.getText());
 		}
-		if ( !g.isCombined() ) {
-			g.tool.errMgr.grammarError(ErrorType.CANNOT_ALIAS_TOKENS,
-									   fileName,
-									   tokenID,
-									   tokenID.getText());
+	}
+
+	@Override
+	public void label(GrammarAST op, GrammarAST ID, GrammarAST element) {
+		switch (element.getType()) {
+		// token atoms
+		case TOKEN_REF:
+		case STRING_LITERAL:
+		case RANGE:
+		// token sets
+		case SET:
+		case NOT:
+		// rule atoms
+		case RULE_REF:
+		case WILDCARD:
+			return;
+
+		default:
+			String fileName = ID.token.getInputStream().getSourceName();
+			g.tool.errMgr.grammarError(ErrorType.LABEL_BLOCK_NOT_A_SET, fileName, ID.token, ID.getText());
+			break;
 		}
 	}
 

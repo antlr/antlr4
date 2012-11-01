@@ -51,7 +51,7 @@ import java.util.Set;
  *  This is not a subclass of UnbufferedTokenStream because I don't want
  *  to confuse small moving window of tokens it uses for the full buffer.
  */
-public class BufferedTokenStream<T extends Token> implements TokenStream {
+public class BufferedTokenStream implements TokenStream {
     protected TokenSource tokenSource;
 
     /** Record every single token pulled from the source so we can reproduce
@@ -59,7 +59,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
      *  as its moving window moves through the input.  This list captures
      *  everything so we can access complete input text.
      */
-    protected List<T> tokens = new ArrayList<T>(100);
+    protected List<Token> tokens = new ArrayList<Token>(100);
 
     /** Track the last mark() call result value for use in rewind(). */
     protected int lastMarker;
@@ -136,7 +136,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
     /** add n elements to buffer */
     protected void fetch(int n) {
         for (int i=1; i<=n; i++) {
-            T t = (T)tokenSource.nextToken();
+            Token t = tokenSource.nextToken();
             if ( t instanceof WritableToken ) {
                 ((WritableToken)t).setTokenIndex(tokens.size());
             }
@@ -146,7 +146,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
     }
 
     @Override
-    public T get(int i) {
+    public Token get(int i) {
         if ( i < 0 || i >= tokens.size() ) {
             throw new IndexOutOfBoundsException("token index "+i+" out of range 0.."+(tokens.size()-1));
         }
@@ -154,13 +154,13 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
     }
 
 	/** Get all tokens from start..stop inclusively */
-	public List<T> get(int start, int stop) {
+	public List<Token> get(int start, int stop) {
 		if ( start<0 || stop<0 ) return null;
 		if ( p == -1 ) setup();
-		List<T> subset = new ArrayList<T>();
+		List<Token> subset = new ArrayList<Token>();
 		if ( stop>=tokens.size() ) stop = tokens.size()-1;
 		for (int i = start; i <= stop; i++) {
-			T t = tokens.get(i);
+			Token t = tokens.get(i);
 			if ( t.getType()==Token.EOF ) break;
 			subset.add(t);
 		}
@@ -170,13 +170,13 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 	@Override
 	public int LA(int i) { return LT(i).getType(); }
 
-    protected T LB(int k) {
+    protected Token LB(int k) {
         if ( (p-k)<0 ) return null;
         return tokens.get(p-k);
     }
 
     @Override
-    public T LT(int k) {
+    public Token LT(int k) {
         if ( p == -1 ) setup();
         if ( k==0 ) return null;
         if ( k < 0 ) return LB(-k);
@@ -200,9 +200,9 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
         p = -1;
     }
 
-    public List<T> getTokens() { return tokens; }
+    public List<Token> getTokens() { return tokens; }
 
-    public List<T> getTokens(int start, int stop) {
+    public List<Token> getTokens(int start, int stop) {
         return getTokens(start, stop, null);
     }
 
@@ -210,7 +210,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
      *  the token type BitSet.  Return null if no tokens were found.  This
      *  method looks at both on and off channel tokens.
      */
-    public List<T> getTokens(int start, int stop, Set<Integer> types) {
+    public List<Token> getTokens(int start, int stop, Set<Integer> types) {
         if ( p == -1 ) setup();
 		if ( start<0 || stop>=tokens.size() ||
 			 stop<0  || start>=tokens.size() )
@@ -221,9 +221,9 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
         if ( start>stop ) return null;
 
         // list = tokens[start:stop]:{T t, t.getType() in types}
-        List<T> filteredTokens = new ArrayList<T>();
+        List<Token> filteredTokens = new ArrayList<Token>();
         for (int i=start; i<=stop; i++) {
-            T t = tokens.get(i);
+            Token t = tokens.get(i);
             if ( types==null || types.contains(t.getType()) ) {
                 filteredTokens.add(t);
             }
@@ -234,7 +234,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
         return filteredTokens;
     }
 
-    public List<T> getTokens(int start, int stop, int ttype) {
+    public List<Token> getTokens(int start, int stop, int ttype) {
 		HashSet<Integer> s = new HashSet<Integer>(ttype);
 		s.add(ttype);
 		return getTokens(start,stop, s);
@@ -272,7 +272,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL or
 	 *  EOF. If channel is -1, find any non default channel token.
 	 */
-	public List<T> getHiddenTokensToRight(int tokenIndex, int channel) {
+	public List<Token> getHiddenTokensToRight(int tokenIndex, int channel) {
 		if ( p == -1 ) setup();
 		if ( tokenIndex<0 || tokenIndex>=tokens.size() ) {
 			throw new IndexOutOfBoundsException(tokenIndex+" not in 0.."+(tokens.size()-1));
@@ -293,7 +293,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL
 	 *  of EOF.
 	 */
-	public List<T> getHiddenTokensToRight(int tokenIndex) {
+	public List<Token> getHiddenTokensToRight(int tokenIndex) {
 		return getHiddenTokensToRight(tokenIndex, -1);
 	}
 
@@ -301,7 +301,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
 	 *  If channel is -1, find any non default channel token.
 	 */
-	public List<T> getHiddenTokensToLeft(int tokenIndex, int channel) {
+	public List<Token> getHiddenTokensToLeft(int tokenIndex, int channel) {
 		if ( p == -1 ) setup();
 		if ( tokenIndex<0 || tokenIndex>=tokens.size() ) {
 			throw new IndexOutOfBoundsException(tokenIndex+" not in 0.."+(tokens.size()-1));
@@ -320,14 +320,14 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 	/** Collect all hidden tokens (any off-default channel) to the left of
 	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
 	 */
-	public List<T> getHiddenTokensToLeft(int tokenIndex) {
+	public List<Token> getHiddenTokensToLeft(int tokenIndex) {
 		return getHiddenTokensToLeft(tokenIndex, -1);
 	}
 
-	protected List<T> filterForChannel(int from, int to, int channel) {
-		List<T> hidden = new ArrayList<T>();
+	protected List<Token> filterForChannel(int from, int to, int channel) {
+		List<Token> hidden = new ArrayList<Token>();
 		for (int i=from; i<=to; i++) {
-			T t = tokens.get(i);
+			Token t = tokens.get(i);
 			if ( channel==-1 ) {
 				if ( t.getChannel()!= Lexer.DEFAULT_TOKEN_CHANNEL ) hidden.add(t);
 			}
@@ -362,7 +362,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream {
 
 		StringBuilder buf = new StringBuilder();
 		for (int i = start; i <= stop; i++) {
-			T t = tokens.get(i);
+			Token t = tokens.get(i);
 			if ( t.getType()==Token.EOF ) break;
 			buf.append(t.getText());
 		}

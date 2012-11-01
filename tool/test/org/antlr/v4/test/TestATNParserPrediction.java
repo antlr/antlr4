@@ -239,14 +239,14 @@ public class TestATNParserPrediction extends BaseTest {
 		};
 		String[] dfa = {
 			"s0-'a'->s1\n" +
-			"s1-EOF->:s2=>1\n",
+			"s1-EOF->s2^\n",
 
 			"s0-'a'->s1\n" +
-			"s1-EOF->:s2=>1\n" +
+			"s1-EOF->s2^\n" +
 			"s1-'b'->:s3=>3\n",
 
 			"s0-'a'->s1\n" +
-			"s1-EOF->:s2=>1\n" +
+			"s1-EOF->s2^\n" +
 			"s1-'b'->:s3=>3\n",
 		};
 		checkDFAConstruction(lg, g, decision, inputs, dfa);
@@ -274,16 +274,16 @@ public class TestATNParserPrediction extends BaseTest {
 		String[] dfa = {
 			"s0-'a'->s1\n" +
 			"s1-'b'->s2\n" +
-			"s2-EOF->:s3=>1\n",
+			"s2-EOF->s3^\n",
 
 			"s0-'a'->s1\n" +
 			"s1-'b'->s2\n" +
-			"s2-EOF->:s3=>1\n" +
+			"s2-EOF->s3^\n" +
 			"s2-'c'->:s4=>3\n",
 
 			"s0-'a'->s1\n" +
 			"s1-'b'->s2\n" +
-			"s2-EOF->:s3=>1\n" +
+			"s2-EOF->s3^\n" +
 			"s2-'c'->:s4=>3\n",
 		};
 		checkDFAConstruction(lg, g, decision, inputs, dfa);
@@ -504,7 +504,7 @@ public class TestATNParserPrediction extends BaseTest {
 	}
 
 	public synchronized DFA getDFA(LexerGrammar lg, Grammar g, String ruleName,
-								   String inputString, ParserRuleContext<?> ctx)
+								   String inputString, ParserRuleContext ctx)
 	{
 		// sync to ensure multiple tests don't race on dfa access
 		Tool.internalOption_ShowATNConfigsInDFA = true;

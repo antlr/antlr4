@@ -285,7 +285,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	// LAME globals to avoid parameters!!!!! I need these down deep in predTransition
 	protected TokenStream _input;
 	protected int _startIndex;
-	protected ParserRuleContext<?> _outerContext;
+	protected ParserRuleContext _outerContext;
 
 	/** Testing only! */
 	public ParserATNSimulator(@NotNull ATN atn, @NotNull DFA[] decisionToDFA,
@@ -311,7 +311,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	public int adaptivePredict(@NotNull TokenStream input, int decision,
-							   @Nullable ParserRuleContext<?> outerContext)
+							   @Nullable ParserRuleContext outerContext)
 	{
 		if ( debug || debug_list_atn_decisions )  {
 			System.out.println("adaptivePredict decision "+decision+
@@ -364,7 +364,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	public int predictATN(@NotNull DFA dfa, @NotNull TokenStream input,
-						  @Nullable ParserRuleContext<?> outerContext)
+						  @Nullable ParserRuleContext outerContext)
 	{
 		// caller must have write lock on dfa
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
@@ -400,7 +400,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	public int execDFA(@NotNull DFA dfa, @NotNull DFAState s0,
 					   @NotNull TokenStream input, int startIndex,
-                       @Nullable ParserRuleContext<?> outerContext)
+                       @Nullable ParserRuleContext outerContext)
     {
 		// caller must have read lock on dfa
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
@@ -545,7 +545,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 */
 	public int execATN(@NotNull DFA dfa, @NotNull DFAState s0,
 					   @NotNull TokenStream input, int startIndex,
-					   ParserRuleContext<?> outerContext)
+					   ParserRuleContext outerContext)
 	{
 		// caller is expected to have write lock on dfa
 		if ( debug || debug_list_atn_decisions) {
@@ -724,7 +724,7 @@ public class ParserATNSimulator extends ATNSimulator {
 									  DFAState D, // how far we got before failing over
 									  @NotNull ATNConfigSet s0,
 									  @NotNull TokenStream input, int startIndex,
-									  ParserRuleContext<?> outerContext,
+									  ParserRuleContext outerContext,
 									  int SLL_min_alt) // todo: is this in D as min ambig alts?
 	{
 		// caller must have write lock on dfa
@@ -898,7 +898,7 @@ public class ParserATNSimulator extends ATNSimulator {
 										  boolean fullCtx)
 	{
 		// always at least the implicit call to start rule
-		PredictionContext initialContext = PredictionContext.fromRuleContext(ctx);
+		PredictionContext initialContext = PredictionContext.fromRuleContext(atn, ctx);
 		ATNConfigSet configs = new ATNConfigSet(fullCtx);
 
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
@@ -1005,7 +1005,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 *  includes pairs with null predicates.
 	 */
 	public BitSet evalSemanticContext(List<DFAState.PredPrediction> predPredictions,
-									  ParserRuleContext<?> outerContext,
+									  ParserRuleContext outerContext,
 									  boolean complete)
 	{
 		BitSet predictions = new BitSet();
@@ -1071,7 +1071,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			// run thru all possible stack tops in ctx
 			if ( config.context!=null && !config.context.isEmpty() ) {
 				for (SingletonPredictionContext ctx : config.context) {
-					if ( ctx.invokingState==PredictionContext.EMPTY_INVOKING_STATE ) {
+					if ( ctx.returnState==PredictionContext.EMPTY_RETURN_STATE ) {
 						// we have no context info, just chase follow links (if greedy)
 						if ( debug ) System.out.println("FALLING off rule "+
 														getRuleName(config.state.ruleIndex));
@@ -1079,11 +1079,9 @@ public class ParserATNSimulator extends ATNSimulator {
 								 fullCtx, depth);
 						continue;
 					}
-					ATNState invokingState = atn.states.get(ctx.invokingState);
-					RuleTransition rt = (RuleTransition)invokingState.transition(0);
-					ATNState retState = rt.followState;
-					PredictionContext newContext = ctx.parent; // "pop" invoking state
-					ATNConfig c = new ATNConfig(retState, config.alt, newContext,
+					ATNState returnState = atn.states.get(ctx.returnState);
+					PredictionContext newContext = ctx.parent; // "pop" return state
+					ATNConfig c = new ATNConfig(returnState, config.alt, newContext,
 												config.semanticContext);
 					// While we have context to pop back from, we may have
 					// gotten that context AFTER having falling off a rule.
@@ -1175,7 +1173,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	{
 		switch (t.getSerializationType()) {
 		case Transition.RULE:
-			return ruleTransition(config, t);
+			return ruleTransition(config, (RuleTransition)t);
 
 		case Transition.PREDICATE:
 			return predTransition(config, (PredicateTransition)t,
@@ -1249,13 +1247,15 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	@NotNull
-	public ATNConfig ruleTransition(@NotNull ATNConfig config, @NotNull Transition t) {
+	public ATNConfig ruleTransition(@NotNull ATNConfig config, @NotNull RuleTransition t) {
 		if ( debug ) {
 			System.out.println("CALL rule "+getRuleName(t.target.ruleIndex)+
 							   ", ctx="+config.context);
 		}
+
+		ATNState returnState = t.followState;
 		PredictionContext newContext =
-			SingletonPredictionContext.create(config.context, config.state.stateNumber);
+			SingletonPredictionContext.create(config.context, returnState.stateNumber);
 		return new ATNConfig(config, t.target, newContext);
 	}
 
@@ -1355,7 +1355,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	@NotNull
 	public NoViableAltException noViableAlt(@NotNull TokenStream input,
-											@NotNull ParserRuleContext<?> outerContext,
+											@NotNull ParserRuleContext outerContext,
 											@NotNull ATNConfigSet configs,
 											int startIndex)
 	{

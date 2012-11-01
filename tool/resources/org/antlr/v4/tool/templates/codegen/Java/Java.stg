@@ -38,7 +38,7 @@ package <file.genPackage>;
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
 
-public interface <file.grammarName>Listener extends ParseTreeListener\<<InputSymbolType()>\> {
+public interface <file.grammarName>Listener extends ParseTreeListener {
 	<file.listenerNames:{lname |
 void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);
 void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
@@ -61,10 +61,10 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 @Override public void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
 @Override public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
-	@Override public void enterEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	@Override public void exitEveryRule(ParserRuleContext\<<InputSymbolType()>\> ctx) { }
-	@Override public void visitTerminal(TerminalNode\<<InputSymbolType()>\> node) { }
-	@Override public void visitErrorNode(ErrorNode\<<InputSymbolType()>\> node) { }
+	@Override public void enterEveryRule(ParserRuleContext ctx) { }
+	@Override public void exitEveryRule(ParserRuleContext ctx) { }
+	@Override public void visitTerminal(TerminalNode node) { }
+	@Override public void visitErrorNode(ErrorNode node) { }
 }
 >>
 
@@ -245,7 +245,7 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
-	ParserRuleContext\<Token> _parentctx = _ctx;
+	ParserRuleContext _parentctx = _ctx;
 	int _parentState = _ctx.s;
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>);
 	<currentRule.ctxType> _prevctx = _localctx;
@@ -558,11 +558,11 @@ RuleContextDecl(r) ::= "public <r.ctxName> <r.name>;"
 RuleContextListDecl(rdecl) ::= "public List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>();"
 
 ContextTokenGetterDecl(t)      ::=
-    "public TerminalNode\<<TokenLabelType()>> <t.name>() { return getToken(<parser.name>.<t.name>, 0); }"
+    "public TerminalNode <t.name>() { return getToken(<parser.name>.<t.name>, 0); }"
 ContextTokenListGetterDecl(t)  ::=
-    "public List\<TerminalNode\<<TokenLabelType()>>> <t.name>() { return getTokens(<parser.name>.<t.name>); }"
+    "public List\<TerminalNode> <t.name>() { return getTokens(<parser.name>.<t.name>); }"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-public TerminalNode\<<TokenLabelType()>\> <t.name>(int i) {
+public TerminalNode <t.name>(int i) {
 	return getToken(<parser.name>.<t.name>, i);
 }
 >>
@@ -598,12 +598,12 @@ CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 
 StructDecl(struct,attrs,getters,dispatchMethods,interfaces,extensionMembers,
-           superClass={ParserRuleContext\<<InputSymbolType()>>}) ::= <<
+           superClass={ParserRuleContext}) ::= <<
 public static class <struct.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	<if(struct.ctorAttrs)>public <struct.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int state) { super(parent, state); }<endif>
-	public <struct.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int state<struct.ctorAttrs:{a | , <a>}>) {
+	<if(struct.ctorAttrs)>public <struct.name>(ParserRuleContext parent, int state) { super(parent, state); }<endif>
+	public <struct.name>(ParserRuleContext parent, int state<struct.ctorAttrs:{a | , <a>}>) {
 		super(parent, state);
 		<struct.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
 	}
@@ -631,7 +631,7 @@ public static class <struct.name> extends <currentRule.name; format="cap">Contex
 
 ListenerDispatchMethod(method) ::= <<
 @Override
-public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<<InputSymbolType()>\> listener) {
+public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener listener) {
 	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
 }
 >>

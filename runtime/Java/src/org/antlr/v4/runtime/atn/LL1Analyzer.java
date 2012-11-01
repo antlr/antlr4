@@ -80,7 +80,7 @@ public class LL1Analyzer {
    	public IntervalSet LOOK(@NotNull ATNState s, @Nullable RuleContext ctx) {
    		IntervalSet r = new IntervalSet();
 		boolean seeThruPreds = true; // ignore preds; get all lookahead
-   		_LOOK(s, PredictionContext.fromRuleContext(ctx),
+   		_LOOK(s, PredictionContext.fromRuleContext(s.atn, ctx),
 			  r, new HashSet<ATNConfig>(), seeThruPreds);
    		return r;
    	}
@@ -109,11 +109,9 @@ public class LL1Analyzer {
 			if ( ctx != PredictionContext.EMPTY ) {
 				// run thru all possible stack tops in ctx
 				for (SingletonPredictionContext p : ctx) {
-					ATNState invokingState = atn.states.get(p.invokingState);
-					RuleTransition rt = (RuleTransition)invokingState.transition(0);
-					ATNState retState = rt.followState;
+					ATNState returnState = atn.states.get(p.returnState);
 //					System.out.println("popping back to "+retState);
-					_LOOK(retState, p.parent, look, lookBusy, seeThruPreds);
+					_LOOK(returnState, p.parent, look, lookBusy, seeThruPreds);
 				}
 				return;
 			}
@@ -124,7 +122,7 @@ public class LL1Analyzer {
 			Transition t = s.transition(i);
 			if ( t.getClass() == RuleTransition.class ) {
 				PredictionContext newContext =
-					SingletonPredictionContext.create(ctx, s.stateNumber);
+					SingletonPredictionContext.create(ctx, ((RuleTransition)t).followState.stateNumber);
 				_LOOK(t.target, newContext, look, lookBusy, seeThruPreds);
 			}
 			else if ( t instanceof PredicateTransition ) {

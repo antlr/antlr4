@@ -407,8 +407,8 @@ public class LexerATNSimulator extends ATNSimulator {
 			if ( config.context!=null && !config.context.isEmpty() ) {
 				for (SingletonPredictionContext ctx : config.context) {
 					if ( !ctx.isEmpty() ) {
-						PredictionContext newContext = ctx.parent; // "pop" invoking state
-						if ( ctx.invokingState==PredictionContext.EMPTY_INVOKING_STATE ) {
+						PredictionContext newContext = ctx.parent; // "pop" return state
+						if ( ctx.returnState==PredictionContext.EMPTY_RETURN_STATE ) {
 							// we have no context info. Don't pursue but
 							// record a config that indicates how we hit end
 							LexerATNConfig c = new LexerATNConfig(config, config.state, ctx);
@@ -418,10 +418,8 @@ public class LexerATNSimulator extends ATNSimulator {
 							configs.add(c);
 							continue;
 						}
-						ATNState invokingState = atn.states.get(ctx.invokingState);
-						RuleTransition rt = (RuleTransition)invokingState.transition(0);
-						ATNState retState = rt.followState;
-						LexerATNConfig c = new LexerATNConfig(retState, config.alt, newContext);
+						ATNState returnState = atn.states.get(ctx.returnState);
+						LexerATNConfig c = new LexerATNConfig(returnState, config.alt, newContext);
 						currentAltReachedAcceptState = closure(input, c, configs, currentAltReachedAcceptState, speculative);
 					}
 				}
@@ -457,12 +455,12 @@ public class LexerATNSimulator extends ATNSimulator {
 										   @NotNull ATNConfigSet configs,
 										   boolean speculative)
 	{
-		ATNState p = config.state;
 		LexerATNConfig c = null;
 		switch (t.getSerializationType()) {
 			case Transition.RULE:
+				RuleTransition ruleTransition = (RuleTransition)t;
 				PredictionContext newContext =
-					SingletonPredictionContext.create(config.context, p.stateNumber);
+					SingletonPredictionContext.create(config.context, ruleTransition.followState.stateNumber);
 				c = new LexerATNConfig(config, t.target, newContext);
 				break;
 

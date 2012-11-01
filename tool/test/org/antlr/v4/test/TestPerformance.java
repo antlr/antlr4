@@ -220,8 +220,7 @@ public class TestPerformance extends BaseTest {
 
     private static final Parser[] sharedParsers = new Parser[NUMBER_OF_THREADS];
 
-	@SuppressWarnings("unchecked")
-    private static final ParseTreeListener<Token>[] sharedListeners = (ParseTreeListener<Token>[])new ParseTreeListener<?>[NUMBER_OF_THREADS];
+    private static final ParseTreeListener[] sharedListeners = new ParseTreeListener[NUMBER_OF_THREADS];
 
     private final AtomicInteger tokenCount = new AtomicInteger();
     private int currentPass;
@@ -616,8 +615,7 @@ public class TestPerformance extends BaseTest {
             ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
             final Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
             final Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
-            @SuppressWarnings("unchecked")
-            final Class<? extends ParseTreeListener<Token>> listenerClass = (Class<? extends ParseTreeListener<Token>>)loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
+            final Class<? extends ParseTreeListener> listenerClass = loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
 
             final Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
             final Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
@@ -701,7 +699,7 @@ public class TestPerformance extends BaseTest {
                         Method parseMethod = parserClass.getMethod(entryPoint);
                         Object parseResult;
 
-						ParseTreeListener<Token> checksumParserListener = null;
+						ParseTreeListener checksumParserListener = null;
 
 						try {
 							if (COMPUTE_CHECKSUM) {
@@ -879,7 +877,7 @@ public class TestPerformance extends BaseTest {
 
 	}
 
-	protected static class ChecksumParseTreeListener implements ParseTreeListener<Token> {
+	protected static class ChecksumParseTreeListener implements ParseTreeListener {
 		private static final int VISIT_TERMINAL = 1;
 		private static final int VISIT_ERROR_NODE = 2;
 		private static final int ENTER_RULE = 3;
@@ -892,26 +890,26 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public void visitTerminal(TerminalNode<Token> node) {
+		public void visitTerminal(TerminalNode node) {
 			checksum.update(VISIT_TERMINAL);
 			updateChecksum(checksum, node.getSymbol());
 		}
 
 		@Override
-		public void visitErrorNode(ErrorNode<Token> node) {
+		public void visitErrorNode(ErrorNode node) {
 			checksum.update(VISIT_ERROR_NODE);
 			updateChecksum(checksum, node.getSymbol());
 		}
 
 		@Override
-		public void enterEveryRule(ParserRuleContext<Token> ctx) {
+		public void enterEveryRule(ParserRuleContext ctx) {
 			checksum.update(ENTER_RULE);
 			updateChecksum(checksum, ctx.getRuleIndex());
 			updateChecksum(checksum, ctx.getStart());
 		}
 
 		@Override
-		public void exitEveryRule(ParserRuleContext<Token> ctx) {
+		public void exitEveryRule(ParserRuleContext ctx) {
 			checksum.update(EXIT_RULE);
 			updateChecksum(checksum, ctx.getRuleIndex());
 			updateChecksum(checksum, ctx.getStop());

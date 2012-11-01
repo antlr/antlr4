@@ -6,22 +6,22 @@ import java.util.Iterator;
 
 public class SingletonPredictionContext extends PredictionContext {
 	public final PredictionContext parent;
-	public final int invokingState;
+	public final int returnState;
 
-	SingletonPredictionContext(PredictionContext parent, int invokingState) {
+	SingletonPredictionContext(PredictionContext parent, int returnState) {
 		super(calculateHashCode(parent!=null ? 31 ^ parent.hashCode() : 1,
-								31 ^ invokingState));
-		assert invokingState!=ATNState.INVALID_STATE_NUMBER;
+								31 ^ returnState));
+		assert returnState!=ATNState.INVALID_STATE_NUMBER;
 		this.parent = parent;
-		this.invokingState = invokingState;
+		this.returnState = returnState;
 	}
 
-	public static SingletonPredictionContext create(PredictionContext parent, int invokingState) {
-		if ( invokingState == EMPTY_INVOKING_STATE && parent == null ) {
+	public static SingletonPredictionContext create(PredictionContext parent, int returnState) {
+		if ( returnState == EMPTY_RETURN_STATE && parent == null ) {
 			// someone can pass in the bits of an array ctx that mean $
 			return EMPTY;
 		}
-		return new SingletonPredictionContext(parent, invokingState);
+		return new SingletonPredictionContext(parent, returnState);
 	}
 
 	@Override
@@ -52,21 +52,9 @@ public class SingletonPredictionContext extends PredictionContext {
 	}
 
 	@Override
-	public int getInvokingState(int index) {
+	public int getReturnState(int index) {
 		assert index == 0;
-		return invokingState;
-	}
-
-	@Override
-	public PredictionContext popAll(
-		int invokingState,
-		boolean fullCtx,
-		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
-	{
-		if ( invokingState == this.invokingState ) {
-			return parent.popAll(invokingState, fullCtx, mergeCache);
-		}
-		return this;
+		return returnState;
 	}
 
 	@Override
@@ -83,7 +71,7 @@ public class SingletonPredictionContext extends PredictionContext {
 		}
 
 		SingletonPredictionContext s = (SingletonPredictionContext)o;
-		return invokingState == s.invokingState &&
+		return returnState == s.returnState &&
 			(parent!=null && parent.equals(s.parent));
 	}
 
@@ -91,11 +79,11 @@ public class SingletonPredictionContext extends PredictionContext {
 	public String toString() {
 		String up = parent!=null ? parent.toString() : "";
 		if ( up.length()==0 ) {
-			if ( invokingState == EMPTY_INVOKING_STATE ) {
+			if ( returnState == EMPTY_RETURN_STATE ) {
 				return "$";
 			}
-			return String.valueOf(invokingState);
+			return String.valueOf(returnState);
 		}
-		return String.valueOf(invokingState)+" "+up;
+		return String.valueOf(returnState)+" "+up;
 	}
 }
