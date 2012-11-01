@@ -463,17 +463,12 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public Object[] toArray() {
-		ATNConfig[] configs = new ATNConfig[configLookup.size()];
-		int i = 0;
-		for (ATNConfig c : configLookup) configs[i++] = c;
-		return configs;
+		return configLookup.toArray();
 	}
 
 	@Override
 	public <T> T[] toArray(T[] a) {
-		int i = 0;
-		for (ATNConfig c : configLookup) a[i++] = (T)c;
-		return a;
+		return configLookup.toArray(a);
 	}
 
 	@Override
