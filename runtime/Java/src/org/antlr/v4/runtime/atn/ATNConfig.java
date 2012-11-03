@@ -153,7 +153,9 @@ public class ATNConfig {
 	}
 
 	public void setOuterContextDepth(int outerContextDepth) {
-		assert outerContextDepth >= 0 && outerContextDepth <= 0x7F;
+		assert outerContextDepth >= 0;
+		// saturate at 0x7F - everything but zero/positive is only used for debug information anyway
+		outerContextDepth = Math.min(outerContextDepth, 0x7F);
 		this.altAndOuterContextDepth = (outerContextDepth << 24) | (altAndOuterContextDepth & ~0x7F000000);
 	}
 
