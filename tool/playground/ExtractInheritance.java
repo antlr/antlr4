@@ -18,7 +18,7 @@ public class ExtractInheritance extends JavaLRBaseListener {
 	 */
 	@Override
 	public void enterNormalClassDeclaration(JavaLRParser.NormalClassDeclarationContext ctx) {
-		TerminalNode<Token> id = ctx.Identifier();
+		TerminalNode id = ctx.Identifier();
 		String sup = null;
 		if ( ctx.type()!=null ) {
 			sup = ctx.type().getText();
@@ -41,7 +41,7 @@ public class ExtractInheritance extends JavaLRBaseListener {
 
 	@Override
 	public void enterNormalInterfaceDeclaration(JavaLRParser.NormalInterfaceDeclarationContext ctx) {
-		TerminalNode<Token> id = ctx.Identifier();
+		TerminalNode id = ctx.Identifier();
 		System.out.println("###### interface "+id);
 		String args = null;
 		if ( ctx.typeList()!=null ) {
