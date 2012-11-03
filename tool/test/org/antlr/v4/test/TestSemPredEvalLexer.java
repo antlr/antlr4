@@ -130,4 +130,22 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"[@4,12:11='<EOF>',<-1>,3:0]\n";
 		assertEquals(expecting, found);
 	}
+
+	@Test public void testPredicatedKeywords() {
+		String grammar =
+			"lexer grammar A;" +
+			"ENUM : [a-z]+ {getText().equals(\"enum\")}? {System.out.println(\"enum!\");} ;\n" +
+			"ID   : [a-z]+ {System.out.println(\"ID \"+getText());} ;\n" +
+			"WS   : [ \n] -> skip ;";
+		String found = execLexer("A.g4", grammar, "A", "enum enu a");
+		String expecting =
+			"enum!\n" +
+			"ID enu\n" +
+			"ID a\n" +
+			"[@0,0:3='enum',<1>,1:0]\n" +
+			"[@1,5:7='enu',<2>,1:5]\n" +
+			"[@2,9:9='a',<2>,1:9]\n" +
+			"[@3,10:9='<EOF>',<-1>,1:10]\n";
+		assertEquals(expecting, found);
+	}
 }
