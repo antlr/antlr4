@@ -14,7 +14,7 @@ a single rule.
 
  weird though that this one works
 
-STRING : '"' ( '\\' '"' | . )* '"' ;
+STRING : '"' ( '\\' '"' | . )*? '"' ;
 
 wouldn't it get to the end of the rule also by the wild-card route?
  Maybe it's a simple order of operations or order in which i process the
@@ -23,5 +23,5 @@ wouldn't it get to the end of the rule also by the wild-card route?
 */
 //STRING : '"' ( 'x' | . )* '"' ;
 
-ACTION : '{' ( ACTION | . )* '}' ;
+ACTION : '{' ( ACTION | . )*? '}' ;
 WS     : [ \r\t\n]+ -> skip ;

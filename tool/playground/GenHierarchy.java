@@ -26,7 +26,7 @@ public class GenHierarchy {
 			JavaLRLexer lexer = new JavaLRLexer(input);
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
 			JavaLRParser parser = new JavaLRParser(tokens);
-			ParserRuleContext<Token> tree = parser.compilationUnit(); // parse
+			ParserRuleContext tree = parser.compilationUnit(); // parse
 
 			ParseTreeWalker walker = new ParseTreeWalker(); // create standard walker
 			ExtractInheritance extractor = new ExtractInheritance(parser);

@@ -263,7 +263,7 @@ class TestJavaLR {
 			if ( SLL ) parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
 
 			// start parsing at the compilationUnit rule
-			ParserRuleContext<Token> t = parser.compilationUnit();
+			ParserRuleContext t = parser.compilationUnit();
 			if ( notree ) parser.setBuildParseTree(false);
 			if ( gui ) t.inspect(parser);
 			if ( printTree ) System.out.println(t.toStringTree(parser));

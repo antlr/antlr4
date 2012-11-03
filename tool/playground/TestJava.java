@@ -129,7 +129,7 @@ class TestJava {
 				if ( diag ) parser.addErrorListener(new DiagnosticErrorListener());
 				if ( SLL ) parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
 				// start parsing at the compilationUnit rule
-				ParserRuleContext<Token> tree = parser.compilationUnit();
+				ParserRuleContext tree = parser.compilationUnit();
 				if ( showTree ) tree.inspect(parser);
 				if ( printTree ) System.out.println(tree.toStringTree(parser));
 

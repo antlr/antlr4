@@ -74,6 +74,19 @@ public class TestLexerExec extends BaseTest {
 	}
 
 	@Test
+	public void testNonGreedyTermination2() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"
+			+ "STRING : '\"' ('\"\"' | .)+? '\"';";
+
+		String found = execLexer("L.g4", grammar, "L", "\"\"\"mom\"");
+		assertEquals(
+			"[@0,0:6='\"\"\"mom\"',<1>,1:0]\n" +
+			"[@1,7:6='<EOF>',<-1>,1:7]\n", found);
+		assertNull(stderrDuringParse);
+	}
+
+	@Test
 	public void testGreedyOptional() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"
