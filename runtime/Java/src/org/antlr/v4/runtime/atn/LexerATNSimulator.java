@@ -265,10 +265,16 @@ public class LexerATNSimulator extends ATNSimulator {
 
 			if (target.isAcceptState) {
 				captureSimState(prevAccept, input, target);
+				if (t == IntStream.EOF) {
+					break;
+				}
 			}
 
-			consume(input);
-			t = input.LA(1);
+			if (t != IntStream.EOF) {
+				consume(input);
+				t = input.LA(1);
+			}
+
 			s = target; // flip; current DFA target becomes new src/from state
 		}
 
@@ -342,7 +348,9 @@ public class LexerATNSimulator extends ATNSimulator {
 		input.seek(index);
 		this.line = line;
 		this.charPositionInLine = charPos;
-		consume(input);
+		if (input.LA(1) != IntStream.EOF) {
+			consume(input);
+		}
 	}
 
 	@Nullable
