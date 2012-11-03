@@ -79,10 +79,10 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"
 			+ "STRING : '\"' ('\"\"' | .)+? '\"';";
 
-		String found = execLexer("L.g4", grammar, "L", "\"hi\"\"mom\"");
+		String found = execLexer("L.g4", grammar, "L", "\"\"\"mom\"");
 		assertEquals(
-			"[@0,0:3='\"hi\"\"mom\"',<1>,1:0]\n" +
-			"[@2,9:8='<EOF>',<-1>,1:9]\n", found);
+			"[@0,0:6='\"\"\"mom\"',<1>,1:0]\n" +
+			"[@1,7:6='<EOF>',<-1>,1:7]\n", found);
 		assertNull(stderrDuringParse);
 	}
 
