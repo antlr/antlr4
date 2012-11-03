@@ -144,6 +144,11 @@ public class ANTLRInputStream implements CharStream {
 
     @Override
     public void consume() {
+		if (p >= n) {
+			assert LA(1) == CharStream.EOF;
+			throw new IllegalStateException("cannot consume EOF");
+		}
+
 		//System.out.println("prev p="+p+", c="+(char)data[p]);
         if ( p < n ) {
             p++;
