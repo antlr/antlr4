@@ -572,7 +572,7 @@ public <r.ctxName> <r.name>() {
 }
 >>
 ContextRuleListGetterDecl(r)   ::= <<
-public List\<? extends <r.ctxName>\> <r.name>() {
+public List\<<r.ctxName>\> <r.name>() {
 	return getRuleContexts(<r.ctxName>.class);
 }
 >>

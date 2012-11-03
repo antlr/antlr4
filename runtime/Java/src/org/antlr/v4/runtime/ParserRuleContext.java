@@ -260,7 +260,7 @@ public class ParserRuleContext extends RuleContext {
 		return getChild(ctxType, i);
 	}
 
-	public <T extends ParserRuleContext> List<? extends T> getRuleContexts(Class<? extends T> ctxType) {
+	public <T extends ParserRuleContext> List<T> getRuleContexts(Class<? extends T> ctxType) {
 		if ( children==null ) {
 			return Collections.emptyList();
 		}
