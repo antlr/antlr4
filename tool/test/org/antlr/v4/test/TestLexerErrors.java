@@ -47,7 +47,7 @@ public class TestLexerErrors extends BaseTest {
 	}
 
 	@Test
-	public void tesStringsEmbeddedInActions() {
+	public void testStringsEmbeddedInActions() {
 		String grammar =
 			"lexer grammar Actions;\n"
 			+ "ACTION2 : '[' (STRING | ~'\"')*? ']';\n"
