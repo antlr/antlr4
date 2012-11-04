@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -867,6 +868,11 @@ public class ParserATNSimulator extends ATNSimulator {
 					intermediate.add(new ATNConfig(c, target), mergeCache);
 				}
 			}
+
+			if (t == IntStream.EOF && c.state instanceof RuleStopState) {
+				assert c.context.isEmpty();
+				intermediate.add(c, mergeCache);
+			}
 		}
 		// Now figure out where the closure can take us, but only if we'll
 		// need to continue looking for more input.
@@ -992,7 +998,9 @@ public class ParserATNSimulator extends ATNSimulator {
 	public int getAltThatFinishedDecisionEntryRule(ATNConfigSet configs) {
 		IntervalSet alts = new IntervalSet();
 		for (ATNConfig c : configs) {
-			if ( c.reachesIntoOuterContext>0 ) alts.add(c.alt);
+			if ( c.reachesIntoOuterContext>0 || (c.state instanceof RuleStopState && c.context.hasEmptyPath()) ) {
+				alts.add(c.alt);
+			}
 		}
 		if ( alts.size()==0 ) return ATN.INVALID_ALT_NUMBER;
 		return alts.getMinElement();
