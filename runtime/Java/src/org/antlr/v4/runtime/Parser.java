@@ -547,24 +547,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
         ATN atn = getInterpreter().atn;
 		ParserRuleContext ctx = _ctx;
         ATNState s = atn.states.get(ctx.s);
-        IntervalSet following = atn.nextTokens(s);
-//        System.out.println("following "+s+"="+following);
-        if ( !following.contains(Token.EPSILON) ) return following;
-        IntervalSet expected = new IntervalSet();
-        expected.addAll(following);
-        expected.remove(Token.EPSILON);
-        while ( ctx!=null && ctx.invokingState>=0 && following.contains(Token.EPSILON) ) {
-            ATNState invokingState = atn.states.get(ctx.invokingState);
-            RuleTransition rt = (RuleTransition)invokingState.transition(0);
-            following = atn.nextTokens(rt.followState);
-            expected.addAll(following);
-            expected.remove(Token.EPSILON);
-            ctx = (ParserRuleContext)ctx.parent;
-        }
-        if ( following.contains(Token.EPSILON) ) {
-            expected.add(Token.EOF);
-        }
-        return expected;
+		return atn.nextTokens(s, ctx);
    	}
 
     public IntervalSet getExpectedTokensWithinCurrentRule() {

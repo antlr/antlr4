@@ -34,7 +34,6 @@ import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.BlockStartState;
 import org.antlr.v4.runtime.atn.PlusBlockStartState;
 import org.antlr.v4.runtime.atn.PlusLoopbackState;
-import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.atn.StarLoopbackState;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -522,19 +521,8 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	 */
 	protected IntervalSet getErrorRecoverySet(Parser recognizer) {
 		ATN atn = recognizer.getInterpreter().atn;
-		RuleContext ctx = recognizer._ctx;
-		IntervalSet recoverSet = new IntervalSet();
-		while ( ctx!=null && ctx.invokingState>=0 ) {
-			// compute what follows who invoked us
-			ATNState invokingState = atn.states.get(ctx.invokingState);
-			RuleTransition rt = (RuleTransition)invokingState.transition(0);
-			IntervalSet follow = atn.nextTokens(rt.followState);
-			recoverSet.addAll(follow);
-			ctx = ctx.parent;
-		}
-        recoverSet.remove(Token.EPSILON);
-//		System.out.println("recover set "+recoverSet.toString(recognizer.getTokenNames()));
-		return recoverSet;
+		ParserRuleContext ctx = recognizer._ctx;
+		return atn.nextTokens(atn.states.get(ctx.s), ctx);
 	}
 
 	/** Consume tokens until one matches the given token set */
