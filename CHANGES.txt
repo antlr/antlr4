@@ -1,9 +1,5 @@
 ANTLR v4 Honey Badger
 
-November 3, 2012
-
-* add option -exact-ambiguities to TestRig
-
 October 29, 2012
 
 * Sam fixes nongreedy more.

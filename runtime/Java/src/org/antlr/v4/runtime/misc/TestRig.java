@@ -36,6 +36,7 @@ import org.antlr.v4.runtime.DiagnosticErrorListener;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.PredictionMode;
 
@@ -74,7 +75,6 @@ public class TestRig {
 	static boolean diagnostics = false;
 	static String encoding = null;
 	static boolean SLL = false;
-	static boolean exactAmbigDetection = false;
 
 	public static final String LEXER_START_RULE_NAME = "tokens";
 
@@ -83,7 +83,7 @@ public class TestRig {
 		if ( args.length < 2 ) {
 			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName\n" +
 							   "  [-tokens] [-tree] [-gui] [-ps file.ps] [-encoding encodingname]\n" +
-							   "  [-trace] [-diagnostics] [-SLL] [-exact-ambiguities]\n"+
+							   "  [-trace] [-diagnostics] [-SLL]\n"+
 							   "  [input-filename(s)]");
 			System.err.println("Use startRuleName='tokens' if GrammarName is a lexer grammar.");
 			System.err.println("Omitting input-filename makes rig read from stdin.");
@@ -115,9 +115,6 @@ public class TestRig {
 			}
 			else if ( arg.equals("-SLL") ) {
 				SLL = true;
-			}
-			else if ( arg.equals("-exact-ambiguities") ) {
-				exactAmbigDetection = true;
 			}
 			else if ( arg.equals("-diagnostics") ) {
 				diagnostics = true;
@@ -227,10 +224,7 @@ public class TestRig {
 				parser.setBuildParseTree(true);
 			}
 
-			if ( exactAmbigDetection ) {
-				parser.getInterpreter().setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);
-			}
-			if ( SLL ) { // overrides exactAmbigDetection
+			if ( SLL ) {
 				parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
 			}
 
