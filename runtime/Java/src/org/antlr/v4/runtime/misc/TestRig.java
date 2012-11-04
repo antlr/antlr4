@@ -36,7 +36,6 @@ import org.antlr.v4.runtime.DiagnosticErrorListener;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.PredictionMode;
 
@@ -218,13 +217,16 @@ public class TestRig {
 			if ( startRuleName.equals(LEXER_START_RULE_NAME) ) return;
 
 
-			if ( diagnostics ) parser.addErrorListener(new DiagnosticErrorListener());
+			if ( diagnostics ) {
+				parser.addErrorListener(new DiagnosticErrorListener());
+				parser.getInterpreter().setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);
+			}
 
 			if ( printTree || gui || psFile!=null ) {
 				parser.setBuildParseTree(true);
 			}
 
-			if ( SLL ) {
+			if ( SLL ) { // overrides diagnostics
 				parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
 			}
 
