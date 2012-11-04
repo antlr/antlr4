@@ -1,5 +1,9 @@
 ANTLR v4 Honey Badger
 
+November 4, 2012
+
+* Kill box in tree dialog box makes dialog dispose of itself
+
 October 29, 2012
 
 * Sam fixes nongreedy more.

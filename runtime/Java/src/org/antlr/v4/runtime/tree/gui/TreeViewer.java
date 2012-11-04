@@ -303,6 +303,7 @@ public class TreeViewer extends JComponent {
 		bottomPanel.add(scaleSlider, BorderLayout.CENTER);
 
 		// make viz
+		dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
