@@ -145,14 +145,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void wildcardRef(GrammarAST ref) {
-		if ( !g.isLexer() ) {
-			g.tool.errMgr.grammarError(ErrorType.WILDCARD_IN_PARSER, g.fileName,
-									   ref.getToken(), ref.getText(), g);
-		}
-	}
-
-	@Override
 	public void discoverRule(RuleAST rule, GrammarAST ID,
 							 List<GrammarAST> modifiers,
 							 ActionAST arg, ActionAST returns,

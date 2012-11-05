@@ -1,6 +1,7 @@
 package org.antlr.v4.test;
 
 import org.antlr.v4.automata.ParserATNFactory;
+import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.BlockStartState;
@@ -67,7 +68,35 @@ public class TestATNInterpreter extends BaseTest {
 			"parser grammar T;\n"+
 			"a : A | A B ;");
 
+		checkMatchedAlt(lg, g, "a", 1);
+		checkMatchedAlt(lg, g, "ab", 2);
+
 		checkMatchedAlt(lg, g, "ac", 1);
+		checkMatchedAlt(lg, g, "abc", 2);
+	}
+
+	@Test(expected = NoViableAltException.class)
+	public void testMustTrackPreviousGoodAltWithEOF() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : 'a' ;\n" +
+			"B : 'b' ;\n" +
+			"C : 'c' ;\n");
+		Grammar g = new Grammar(
+			"parser grammar T;\n"+
+			"a : (A | A B) EOF;");
+
+		checkMatchedAlt(lg, g, "a", 1);
+		checkMatchedAlt(lg, g, "ab", 2);
+
+		try {
+			checkMatchedAlt(lg, g, "ac", 1);
+		}
+		catch (NoViableAltException re) {
+			assertEquals(1, re.getOffendingToken().getTokenIndex());
+			assertEquals(3, re.getOffendingToken().getType());
+			throw re;
+		}
 	}
 
 	@Test public void testMustTrackPreviousGoodAlt2() throws Exception {
@@ -80,10 +109,40 @@ public class TestATNInterpreter extends BaseTest {
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
 			"a : A | A B | A B C ;");
-		checkMatchedAlt(lg, g, "a", 1	);
+
+		checkMatchedAlt(lg, g, "a", 1);
 		checkMatchedAlt(lg, g, "ab", 2);
 		checkMatchedAlt(lg, g, "abc", 3);
-		checkMatchedAlt(lg, g, "abd", 2); // matched ab, ignores d on end
+
+		checkMatchedAlt(lg, g, "ad", 1);
+		checkMatchedAlt(lg, g, "abd", 2);
+		checkMatchedAlt(lg, g, "abcd", 3);
+	}
+
+	@Test(expected = NoViableAltException.class)
+	public void testMustTrackPreviousGoodAlt2WithEOF() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : 'a' ;\n" +
+			"B : 'b' ;\n" +
+			"C : 'c' ;\n" +
+			"D : 'd' ;\n");
+		Grammar g = new Grammar(
+			"parser grammar T;\n"+
+			"a : (A | A B | A B C) EOF;");
+
+		checkMatchedAlt(lg, g, "a", 1);
+		checkMatchedAlt(lg, g, "ab", 2);
+		checkMatchedAlt(lg, g, "abc", 3);
+
+		try {
+			checkMatchedAlt(lg, g, "abd", 1);
+		}
+		catch (NoViableAltException re) {
+			assertEquals(2, re.getOffendingToken().getTokenIndex());
+			assertEquals(4, re.getOffendingToken().getType());
+			throw re;
+		}
 	}
 
 	@Test public void testMustTrackPreviousGoodAlt3() throws Exception {
@@ -97,7 +156,39 @@ public class TestATNInterpreter extends BaseTest {
 			"parser grammar T;\n"+
 			"a : A B | A | A B C ;");
 
+		checkMatchedAlt(lg, g, "a", 2);
+		checkMatchedAlt(lg, g, "ab", 1);
+		checkMatchedAlt(lg, g, "abc", 3);
+
+		checkMatchedAlt(lg, g, "ad", 2);
 		checkMatchedAlt(lg, g, "abd", 1);
+		checkMatchedAlt(lg, g, "abcd", 3);
+	}
+
+	@Test(expected = NoViableAltException.class)
+	public void testMustTrackPreviousGoodAlt3WithEOF() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : 'a' ;\n" +
+			"B : 'b' ;\n" +
+			"C : 'c' ;\n" +
+			"D : 'd' ;\n");
+		Grammar g = new Grammar(
+			"parser grammar T;\n"+
+			"a : (A B | A | A B C) EOF;");
+
+		checkMatchedAlt(lg, g, "a", 2);
+		checkMatchedAlt(lg, g, "ab", 1);
+		checkMatchedAlt(lg, g, "abc", 3);
+
+		try {
+			checkMatchedAlt(lg, g, "abd", 1);
+		}
+		catch (NoViableAltException re) {
+			assertEquals(2, re.getOffendingToken().getTokenIndex());
+			assertEquals(4, re.getOffendingToken().getType());
+			throw re;
+		}
 	}
 
 	@Test public void testAmbigAltChooseFirst() throws Exception {
@@ -153,10 +244,37 @@ public class TestATNInterpreter extends BaseTest {
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
 			"a : A B | A B | A B C ;");
+
 		checkMatchedAlt(lg, g, "ab", 1);
 		checkMatchedAlt(lg, g, "abc", 3);
-		checkMatchedAlt(lg, g, "abd", 1); // ignores d on end
-		checkMatchedAlt(lg, g, "abcd", 3); // ignores d on end
+
+		checkMatchedAlt(lg, g, "abd", 1);
+		checkMatchedAlt(lg, g, "abcd", 3);
+	}
+
+	@Test(expected = NoViableAltException.class)
+	public void testAmbigAltChooseFirst2WithEOF() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : 'a' ;\n" +
+			"B : 'b' ;\n" +
+			"C : 'c' ;\n" +
+			"D : 'd' ;\n");
+		Grammar g = new Grammar(
+			"parser grammar T;\n"+
+			"a : (A B | A B | A B C) EOF;");
+
+		checkMatchedAlt(lg, g, "ab", 1);
+		checkMatchedAlt(lg, g, "abc", 3);
+
+		try {
+			checkMatchedAlt(lg, g, "abd", 1);
+		}
+		catch (NoViableAltException re) {
+			assertEquals(2, re.getOffendingToken().getTokenIndex());
+			assertEquals(4, re.getOffendingToken().getType());
+			throw re;
+		}
 	}
 
 	@Test public void testSimpleLoop() throws Exception {

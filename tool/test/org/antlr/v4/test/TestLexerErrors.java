@@ -46,6 +46,46 @@ public class TestLexerErrors extends BaseTest {
 		assertEquals(expectingError, error);
 	}
 
+	@Test
+	public void testStringsEmbeddedInActions() {
+		String grammar =
+			"lexer grammar Actions;\n"
+			+ "ACTION2 : '[' (STRING | ~'\"')*? ']';\n"
+			+ "STRING : '\"' ('\\\"' | .)*? '\"';\n"
+			+ "WS : [ \\t\\r\\n]+ -> skip;\n";
+		String tokens = execLexer("Actions.g4", grammar, "Actions", "[\"foo\"]");
+		String expectingTokens =
+			"[@0,0:6='[\"foo\"]',<1>,1:0]\n" +
+			"[@1,7:6='<EOF>',<-1>,1:7]\n";
+		assertEquals(expectingTokens, tokens);
+		assertNull(stderrDuringParse);
+
+		tokens = execLexer("Actions.g4", grammar, "Actions", "[\"foo]");
+		expectingTokens =
+			"[@0,6:5='<EOF>',<-1>,1:6]\n";
+		assertEquals(expectingTokens, tokens);
+		assertEquals("line 1:0 token recognition error at: '[\"foo]'\n", stderrDuringParse);
+	}
+
+	@Test public void testEnforcedGreedyNestedBrances() {
+		String grammar =
+			"lexer grammar R;\n"
+			+ "ACTION : '{' (ACTION | ~[{}])* '}';\n"
+			+ "WS : [ \\r\\n\\t]+ -> skip;\n";
+		String tokens = execLexer("R.g4", grammar, "R", "{ { } }");
+		String expectingTokens =
+			"[@0,0:6='{ { } }',<1>,1:0]\n" +
+			"[@1,7:6='<EOF>',<-1>,1:7]\n";
+		assertEquals(expectingTokens, tokens);
+		assertEquals(null, stderrDuringParse);
+
+		tokens = execLexer("R.g4", grammar, "R", "{ { }");
+		expectingTokens =
+			"[@0,5:4='<EOF>',<-1>,1:5]\n";
+		assertEquals(expectingTokens, tokens);
+		assertEquals("line 1:0 token recognition error at: '{ { }'\n", stderrDuringParse);
+	}
+
 	@Test public void testInvalidCharAtStartAfterDFACache() throws Exception {
 		String grammar =
 			"lexer grammar L;\n" +

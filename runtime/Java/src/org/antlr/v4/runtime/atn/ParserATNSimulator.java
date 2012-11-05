@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -804,8 +805,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					Transition trans = c.getState().getOptimizedTransition(ti);
 					ATNState target = getReachableTarget(c, trans, t);
 					if ( target!=null ) {
-						reachIntermediate.add(c.transform(target));
+						reachIntermediate.add(c.transform(target), contextCache);
 					}
+				}
+
+				if (t == IntStream.EOF && c.getState() instanceof RuleStopState) {
+					assert c.getContext().isEmpty();
+					reachIntermediate.add(c, contextCache);
 				}
 			}
 

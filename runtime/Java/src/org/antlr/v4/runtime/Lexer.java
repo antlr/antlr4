@@ -132,17 +132,17 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 			throw new IllegalStateException("nextToken requires a non-null input stream.");
 		}
 
-		if (_hitEOF) {
-			emitEOF();
-			return _token;
-		}
-
 		// Mark start location in char stream so unbuffered streams are
 		// guaranteed at least have text of current token
 		int tokenStartMarker = _input.mark();
 		try{
 			outer:
 			while (true) {
+				if (_hitEOF) {
+					emitEOF();
+					return _token;
+				}
+
 				_token = null;
 				_channel = Token.DEFAULT_CHANNEL;
 				_tokenStartCharIndex = _input.index();
@@ -367,7 +367,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	}
 
 	public void recover(LexerNoViableAltException e) {
-		getInterpreter().consume(_input); // skip a char and try again
+		if (_input.LA(1) != IntStream.EOF) {
+			// skip a char and try again
+			getInterpreter().consume(_input);
+		}
 	}
 
 	public void notifyListeners(LexerNoViableAltException e) {

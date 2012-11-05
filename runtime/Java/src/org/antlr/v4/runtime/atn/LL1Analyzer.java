@@ -29,6 +29,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Args;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -63,7 +64,7 @@ public class LL1Analyzer {
 			boolean seeThruPreds = false; // fail to get lookahead upon pred
 			_LOOK(s.transition(alt - 1).target,
 				  PredictionContext.EMPTY_FULL,
-				  look[alt], lookBusy, seeThruPreds);
+				  look[alt], lookBusy, seeThruPreds, false);
 			// Wipe out lookahead for this alternative if we found nothing
 			// or we had a predicate when we !seeThruPreds
 			if ( look[alt].size()==0 || look[alt].contains(HIT_PRED) ) {
@@ -73,17 +74,21 @@ public class LL1Analyzer {
 		return look;
 	}
 
-    /** Get lookahead, using {@code ctx} if we reach end of rule. If {@code ctx}
-	 *  is {@link PredictionContext#EMPTY_FULL}, don't chase FOLLOW. If {@code ctx}
-	 *  is {@link PredictionContext#EMPTY_LOCAL}, EPSILON is in set if we can reach
-	 * end of rule.
-     */
+	/**
+	 * Get lookahead, using {@code ctx} if we reach end of rule. If {@code ctx}
+	 * is {@code PredictionContext#EMPTY_LOCAL} or
+	 * {@link PredictionContext#EMPTY_FULL}, don't chase FOLLOW. If {@code ctx}
+	 * is {@code PredictionContext#EMPTY_LOCAL}, {@link Token#EPSILON EPSILON}
+	 * is in set if we can reach end of rule. If {@code ctx} is
+	 * {@link PredictionContext#EMPTY_FULL}, {@link IntStream#EOF EOF} is in set
+	 * if we can reach end of rule.
+	 */
     @NotNull
    	public IntervalSet LOOK(@NotNull ATNState s, @NotNull PredictionContext ctx) {
 		Args.notNull("ctx", ctx);
    		IntervalSet r = new IntervalSet();
 		boolean seeThruPreds = true; // ignore preds; get all lookahead
-   		_LOOK(s, ctx, r, new HashSet<ATNConfig>(), seeThruPreds);
+   		_LOOK(s, ctx, r, new HashSet<ATNConfig>(), seeThruPreds, true);
    		return r;
    	}
 
@@ -97,7 +102,7 @@ public class LL1Analyzer {
     protected void _LOOK(@NotNull ATNState s, @NotNull PredictionContext ctx,
 						 @NotNull IntervalSet look,
                          @NotNull Set<ATNConfig> lookBusy,
-						 boolean seeThruPreds)
+						 boolean seeThruPreds, boolean addEOF)
 	{
 //		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);
         ATNConfig c = ATNConfig.create(s, 0, ctx);
@@ -107,13 +112,17 @@ public class LL1Analyzer {
             if ( PredictionContext.isEmptyLocal(ctx) ) {
                 look.add(Token.EPSILON);
                 return;
-            }
+            } else if (ctx.isEmpty() && addEOF) {
+				look.add(Token.EOF);
+				return;
+			}
+
 			for (int i = 0; i < ctx.size(); i++) {
 				if ( ctx.getReturnState(i)!=PredictionContext.EMPTY_FULL_STATE_KEY ) {
 					ATNState returnState = atn.states.get(ctx.getReturnState(i));
 //			System.out.println("popping back to "+retState);
 					for (int j = 0; j < ctx.size(); j++) {
-						_LOOK(returnState, ctx.getParent(j), look, lookBusy, seeThruPreds);
+						_LOOK(returnState, ctx.getParent(j), look, lookBusy, seeThruPreds, addEOF);
 					}
 					return;
 				}
@@ -125,18 +134,18 @@ public class LL1Analyzer {
 			Transition t = s.transition(i);
 			if ( t.getClass() == RuleTransition.class ) {
 				PredictionContext newContext = ctx.getChild(((RuleTransition)t).followState.stateNumber);
-				_LOOK(t.target, newContext, look, lookBusy, seeThruPreds);
+				_LOOK(t.target, newContext, look, lookBusy, seeThruPreds, addEOF);
 			}
 			else if ( t instanceof PredicateTransition ) {
 				if ( seeThruPreds ) {
-					_LOOK(t.target, ctx, look, lookBusy, seeThruPreds);
+					_LOOK(t.target, ctx, look, lookBusy, seeThruPreds, addEOF);
 				}
 				else {
 					look.add(HIT_PRED);
 				}
 			}
 			else if ( t.isEpsilon() ) {
-				_LOOK(t.target, ctx, look, lookBusy, seeThruPreds);
+				_LOOK(t.target, ctx, look, lookBusy, seeThruPreds, addEOF);
 			}
 			else if ( t.getClass() == WildcardTransition.class ) {
 				look.addAll( IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType) );

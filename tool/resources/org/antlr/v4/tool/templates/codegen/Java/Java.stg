@@ -7,7 +7,7 @@ javaTypeInitMap ::= [
 	"byte":"0",
 	"short":"0",
 	"char":"0",
-	default:"null" // anything other than an atomic type
+	default:"null" // anything other than a primitive type is an object
 ]
 
 // args must be <object-model-object>, <fields-resulting-in-STs>
