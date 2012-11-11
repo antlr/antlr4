@@ -1,5 +1,10 @@
 ANTLR v4 Honey Badger
 
+November 11, 2012
+
+* Change version to 4.0b4 (btw, forgot to push 4.0b3 in build.properties when
+  I made git tag 4.0b3...ooops).
+
 November 4, 2012
 
 * Kill box in tree dialog box makes dialog dispose of itself
