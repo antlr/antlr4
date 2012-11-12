@@ -96,7 +96,7 @@ public ErrorManager getErrorManager() { return null; }
 
 public void visitGrammar(GrammarAST t) { visit(t, "grammarSpec"); }
 public void visit(GrammarAST t, String ruleName) {
-	CommonTreeNodeStream nodes = new CommonTreeNodeStream(t);
+	CommonTreeNodeStream nodes = new CommonTreeNodeStream(new GrammarASTAdaptor(), t);
 	setTreeNodeStream(nodes);
 	try {
 		Method m = getClass().getMethod(ruleName);
