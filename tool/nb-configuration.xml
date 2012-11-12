@@ -32,5 +32,17 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.allowConvertToStaticStarImport>false</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.allowConvertToStaticStarImport>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.importGroupsOrder>*;java</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.importGroupsOrder>
         <netbeans.compile.on.save>test</netbeans.compile.on.save>
+        <org-netbeans-modules-editor-indent.text.x-stringtemplate4.CodeStyle.project.spaces-per-tab>4</org-netbeans-modules-editor-indent.text.x-stringtemplate4.CodeStyle.project.spaces-per-tab>
+        <org-netbeans-modules-editor-indent.text.x-stringtemplate4.CodeStyle.project.tab-size>4</org-netbeans-modules-editor-indent.text.x-stringtemplate4.CodeStyle.project.tab-size>
+        <org-netbeans-modules-editor-indent.text.x-stringtemplate4.CodeStyle.project.indent-shift-width>4</org-netbeans-modules-editor-indent.text.x-stringtemplate4.CodeStyle.project.indent-shift-width>
+        <org-netbeans-modules-editor-indent.text.x-stringtemplate4.CodeStyle.project.expand-tabs>false</org-netbeans-modules-editor-indent.text.x-stringtemplate4.CodeStyle.project.expand-tabs>
+        <org-netbeans-modules-editor-indent.text.x-stringtemplate4.CodeStyle.project.text-limit-width>80</org-netbeans-modules-editor-indent.text.x-stringtemplate4.CodeStyle.project.text-limit-width>
+        <org-netbeans-modules-editor-indent.text.x-stringtemplate4.CodeStyle.project.text-line-wrap>none</org-netbeans-modules-editor-indent.text.x-stringtemplate4.CodeStyle.project.text-line-wrap>
+        <org-netbeans-modules-editor-indent.text.x-antlr3.CodeStyle.project.spaces-per-tab>4</org-netbeans-modules-editor-indent.text.x-antlr3.CodeStyle.project.spaces-per-tab>
+        <org-netbeans-modules-editor-indent.text.x-antlr3.CodeStyle.project.tab-size>4</org-netbeans-modules-editor-indent.text.x-antlr3.CodeStyle.project.tab-size>
+        <org-netbeans-modules-editor-indent.text.x-antlr3.CodeStyle.project.indent-shift-width>4</org-netbeans-modules-editor-indent.text.x-antlr3.CodeStyle.project.indent-shift-width>
+        <org-netbeans-modules-editor-indent.text.x-antlr3.CodeStyle.project.expand-tabs>false</org-netbeans-modules-editor-indent.text.x-antlr3.CodeStyle.project.expand-tabs>
+        <org-netbeans-modules-editor-indent.text.x-antlr3.CodeStyle.project.text-limit-width>80</org-netbeans-modules-editor-indent.text.x-antlr3.CodeStyle.project.text-limit-width>
+        <org-netbeans-modules-editor-indent.text.x-antlr3.CodeStyle.project.text-line-wrap>none</org-netbeans-modules-editor-indent.text.x-antlr3.CodeStyle.project.text-line-wrap>
     </properties>
 </project-shared-configuration>
