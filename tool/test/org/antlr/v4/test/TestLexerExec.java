@@ -30,7 +30,12 @@
 
 package org.antlr.v4.test;
 
+import org.antlr.v4.runtime.misc.Nullable;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class TestLexerExec extends BaseTest {
     @Test public void testQuoteTranslation() throws Exception {
@@ -638,4 +643,60 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	@Test
+	public void testPositionAdjustingLexer() throws Exception {
+		String grammar = load("PositionAdjustingLexer.g4", null);
+		String input =
+			"tokens\n" +
+			"tokens {\n" +
+			"notLabel\n" +
+			"label1 =\n" +
+			"label2 +=\n" +
+			"notLabel\n";
+		String found = execLexer("PositionAdjustingLexer.g4", grammar, "PositionAdjustingLexer", input);
+
+		final int TOKENS = 4;
+		final int LABEL = 5;
+		final int IDENTIFIER = 6;
+		String expecting =
+			"[@0,0:5='tokens',<" + IDENTIFIER + ">,1:0]\n" +
+			"[@1,7:12='tokens',<" + TOKENS + ">,2:0]\n" +
+			"[@2,14:14='{',<3>,2:7]\n" +
+			"[@3,16:23='notLabel',<" + IDENTIFIER + ">,3:0]\n" +
+			"[@4,25:30='label1',<" + LABEL + ">,4:0]\n" +
+			"[@5,32:32='=',<1>,4:7]\n" +
+			"[@6,34:39='label2',<" + LABEL + ">,5:0]\n" +
+			"[@7,41:42='+=',<2>,5:7]\n" +
+			"[@8,44:51='notLabel',<" + IDENTIFIER + ">,6:0]\n" +
+			"[@9,53:52='<EOF>',<-1>,7:0]\n";
+
+		assertEquals(expecting, found);
+	}
+
+	protected String load(String fileName, @Nullable String encoding)
+		throws IOException
+	{
+		if ( fileName==null ) {
+			return null;
+		}
+
+		String fullFileName = getClass().getPackage().getName().replace('.', '/') + '/' + fileName;
+		int size = 65000;
+		InputStreamReader isr;
+		InputStream fis = getClass().getClassLoader().getResourceAsStream(fullFileName);
+		if ( encoding!=null ) {
+			isr = new InputStreamReader(fis, encoding);
+		}
+		else {
+			isr = new InputStreamReader(fis);
+		}
+		try {
+			char[] data = new char[size];
+			int n = isr.read(data);
+			return new String(data, 0, n);
+		}
+		finally {
+			isr.close();
+		}
+	}
 }
