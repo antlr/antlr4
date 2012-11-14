@@ -1,94 +1,59 @@
-ANTLR v4 Honey Badger early access
+ANTLR v4 Honey Badger
 
-Feb 17, 2012
+November 11, 2012
 
-* added -parse-listener option and differentiated between parse and parse
-  tree listener interfaces now.  Only parse tree listener stuff generated
-  by default.
+* Change version to 4.0b4 (btw, forgot to push 4.0b3 in build.properties when
+  I made git tag 4.0b3...ooops).
 
-* names changed. visit() -> visitX(). enter/exit() -> enter/exitX()
-* capitalizing automatically now. rule s -> SContext not sContext
-* no enter/exit method in generic rule context object if rule has alt labels, nor in interfaces.
-* dup labels allowed in same rule
-* label X or x illegal if rule x exists
+November 4, 2012
 
-Feb 14, 2012
+* Kill box in tree dialog box makes dialog dispose of itself
 
-* Fixed https://github.com/antlr/antlr4/issues/8 and lots of other little things.
+October 29, 2012
 
-Jan 30, 2012
+* Sam fixes nongreedy more.
+* -Werror added.
+* Sam made speed improvement re preds in lexer.
 
-* Moving to github.
+October 20, 2012
 
-Jan 28, 2012
+* Merged Sam's fix for nongreedy lexer/parser. lots of unit tests. A fix in
+  prediction ctx merge. https://github.com/parrt/antlr4/pull/99
 
-* ~[] stuff is allowed and works inside sets etc...
+October 14, 2012
 
-Jan 22, 2012
+* Rebuild how ANTLR detects SLL conflict and failover to full LL.  LL is
+  a bit slower but correct now.  Added ability to ask for exact ambiguity
+  detection.
 
-* Added ranges, escapes to [a-z] notation in lexer:
+October 8, 2012
 
-    a-z is the inclusive range
-    escape characters with special meaning: trnbf\'" such as \t
-    \uXXXX Unicode character with text digits
-    \- is the - character
-    \] is the ] character
+* Fixed a bug where labeling the alternatives of the start rule caused
+  a null pointer exception.
 
-    Missing final range value gives just first char.
-    Inverted ranges give nothing
-    Bad escape sequence gives nothing
+October 1, 2012 -- 4.0b2 release
 
-Jan 21, 2012
+September 30, 2012
 
-* Added modeNames to gen'd lexers
-* added lexer commands
-  skip
-  more
-  popMode
-  mode(x)
-  pushMode(x)
-  type(x)
-  channel(x)
+* Fixed the unbuffered streams, which actually buffered everything
+  up by mistake. tweaked a few comments.
 
-  WS : (' '|'\n')+ -> skip ;
+* Added a getter to IntStream for the token factory
 
-  use commas to separate commands: "-> skip, mode(FOO)"
-* Lexer fields mv from x to _x like type changed to _type.
+* Added -depend cmd-line option.
 
-Jan 14, 2012
+September 29, 2012
 
-* labels on tokens in left-recursive rules caused codegen exception.
-* leave start/stop char index alone in CommonTokenFactory; refers to original text.
-* reuse of -> label on multiple alts in rule caused dup ctx object defs.
+* no nongreedy or wildcard in parser.
 
-Jan 11, 2012
+September 28, 2012
 
-* -> id labels work now for outermost alternatives, even for left-recursive
-  rules; e.g.,
+* empty "tokens {}" is ok now.
 
-  | a=e '*' b=e {$v = $a.v * $b.v;}     -> mult
-* Fixed a bug where visitTerminal got a NPE
-* in tree views, spaces/newlines were blanks. I converted to \n and middle dot
-  for space.
+September 22, 2012
 
-Jan 5, 2012
+* Rule exception handlers weren't passed to the generated code
+* $ruleattribute.foo weren't handled properly
+* Added -package option
 
-* Deleted code to call specific listeners by mistake. added back.
-* Labels allowed in left-recursive rules:
-    e returns [int v]
-      : a=e '*' b=e {$v = $a.v * $b.v;}
-      | a=e '+' b=e {$v = $a.v + $b.v;}
-      | INT         {$v = $INT.int;}
-      | '(' x=e ')' {$v = $x.v;}
-      ;
-
-
-Jan 4, 2012
-
-* '_' was allowed first in symbol names in grammar
-* fix unit tests
-* Allow labels in left-recursive rules
-* lr rules now gen only 1 rule e->e not e->e_ etc... altered tests to build parse trees.
-* no more -trace, use Parser.setTrace(true)
-* add context rule option; not hooked up
-* 1+2*3 now gives new parse tree: (e (e 1) + (e (e 2) * (e 3)))
+September 18, 2012 -- 4.0b1 release

@@ -31,13 +31,25 @@ package org.antlr.v4.semantics;
 
 import org.antlr.runtime.Token;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.parse.*;
-import org.antlr.v4.tool.*;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.parse.GrammarTreeVisitor;
+import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.BlockAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarASTWithOptions;
+import org.antlr.v4.tool.ast.GrammarRootAST;
+import org.antlr.v4.tool.ast.RuleAST;
+import org.antlr.v4.tool.ast.TerminalAST;
 import org.stringtemplate.v4.misc.MultiMap;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /** No side-effects except for setting options into the appropriate node.
  *  TODO:  make the side effects into a separate pass this
@@ -67,58 +79,7 @@ import java.util.*;
  * TODO: 1 action per lex rule
  */
 public class BasicSemanticChecks extends GrammarTreeVisitor {
-	public static final Set<String> legalLexerOptions =
-		new HashSet<String>() {
-			{
-				add("language"); add("tokenVocab");
-				add("TokenLabelType");
-				add("superClass");
-				add("filter");
-			}
-		};
-
-	public static final Set<String> legalParserOptions =
-		new HashSet<String>() {
-			{
-				add("tokenVocab");
-				add("TokenLabelType");
-				add("superClass");
-			}
-		};
-
-	public static final Set<String> legalRuleOptions =
-		new HashSet<String>() {
-			{
-				add("context");
-				add("simrecursion_");
-			}
-		};
-
-	public static final Set<String> legalBlockOptions =
-		new HashSet<String>() {
-			{
-				add("greedy");
-				add("simrecursion_");
-			}
-		};
-
-	/** Legal options for terminal refs like ID<node=MyVarNode> */
-	public static final Set<String> legalTokenOptions =
-		new HashSet<String>() {
-			{
-				add("assoc");
-			}
-		};
-
-	public static final Set<String> legalSemPredOptions =
-		new HashSet<String>() {
-			{
-				add("fail");
-			}
-		};
-
-	/** Set of valid imports.  E.g., can only import a tree parser into
-	 *  another tree parser.  Maps delegate to set of delegator grammar types.
+	/** Set of valid imports.  Maps delegate to set of delegator grammar types.
 	 *  validDelegations.get(LEXER) gives list of the kinds of delegators
 	 *  that can import lexers.
 	 */
@@ -165,11 +126,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void tokenAlias(GrammarAST ID, GrammarAST literal) {
-		if ( literal!=null ) checkTokenAlias(ID.token);
-	}
-
-	@Override
 	public void importGrammar(GrammarAST label, GrammarAST ID) {
 		checkImport(ID.token);
 	}
@@ -181,7 +137,10 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 
 	@Override
 	public void modeDef(GrammarAST m, GrammarAST ID) {
-		checkMode(ID.token);
+		if ( !g.isLexer() ) {
+			g.tool.errMgr.grammarError(ErrorType.MODE_NOT_IN_LEXER, g.fileName,
+									   ID.token, ID.token.getText(), g);
+		}
 	}
 
 	@Override
@@ -222,6 +181,11 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	public void grammarOption(GrammarAST ID, GrammarAST valueAST) {
 		boolean ok = checkOptions(g.ast, ID.token, valueAST);
 		//if ( ok ) g.ast.setOption(ID.getText(), value);
+	}
+
+	@Override
+	public void defineToken(GrammarAST ID) {
+		checkTokenDefinition(ID.token);
 	}
 
 	@Override
@@ -302,13 +266,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		}
 	}
 
-	void checkMode(Token modeNameToken) {
-		if ( !g.isLexer() ) {
-			g.tool.errMgr.grammarError(ErrorType.MODE_NOT_IN_LEXER, g.fileName,
-									   modeNameToken, modeNameToken.getText(), g);
-		}
-	}
-
 	void checkNumPrequels(List<GrammarAST> options,
 						  List<GrammarAST> imports,
 						  List<GrammarAST> tokens)
@@ -355,19 +312,35 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		}
 	}
 
-	void checkTokenAlias(Token tokenID) {
+	void checkTokenDefinition(Token tokenID) {
 		String fileName = tokenID.getInputStream().getSourceName();
-		if ( Character.isLowerCase(tokenID.getText().charAt(0)) ) {
+		if ( !Character.isUpperCase(tokenID.getText().charAt(0)) ) {
 			g.tool.errMgr.grammarError(ErrorType.TOKEN_NAMES_MUST_START_UPPER,
 									   fileName,
 									   tokenID,
 									   tokenID.getText());
 		}
-		if ( !g.isCombined() ) {
-			g.tool.errMgr.grammarError(ErrorType.CANNOT_ALIAS_TOKENS,
-									   fileName,
-									   tokenID,
-									   tokenID.getText());
+	}
+
+	@Override
+	public void label(GrammarAST op, GrammarAST ID, GrammarAST element) {
+		switch (element.getType()) {
+		// token atoms
+		case TOKEN_REF:
+		case STRING_LITERAL:
+		case RANGE:
+		// token sets
+		case SET:
+		case NOT:
+		// rule atoms
+		case RULE_REF:
+		case WILDCARD:
+			return;
+
+		default:
+			String fileName = ID.token.getInputStream().getSourceName();
+			g.tool.errMgr.grammarError(ErrorType.LABEL_BLOCK_NOT_A_SET, fileName, ID.token, ID.getText());
+			break;
 		}
 	}
 
@@ -378,7 +351,14 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	{
 		boolean ok = true;
 		if ( parent.getType()==ANTLRParser.BLOCK ) {
-			if ( !legalBlockOptions.contains(optionID.getText()) ) { // block
+			if ( g.isLexer() && !Grammar.LexerBlockOptions.contains(optionID.getText()) ) { // block
+				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
+										   g.fileName,
+										   optionID,
+										   optionID.getText());
+				ok = false;
+			}
+			if ( !g.isLexer() && !Grammar.ParserBlockOptions.contains(optionID.getText()) ) { // block
 				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
 										   g.fileName,
 										   optionID,
@@ -387,7 +367,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 			}
 		}
 		else if ( parent.getType()==ANTLRParser.RULE ) {
-			if ( !legalRuleOptions.contains(optionID.getText()) ) { // rule
+			if ( !Grammar.ruleOptions.contains(optionID.getText()) ) { // rule
 				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
 										   g.fileName,
 										   optionID,
@@ -421,7 +401,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		if ( elem.getType()==ANTLRParser.SEMPRED ) {
 			Token optionID = ID.token;
 			String fileName = optionID.getInputStream().getSourceName();
-			if ( valueAST!=null && !legalSemPredOptions.contains(optionID.getText()) ) {
+			if ( valueAST!=null && !Grammar.semPredOptions.contains(optionID.getText()) ) {
 				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
 										   fileName,
 										   optionID,
@@ -437,7 +417,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		Token optionID = ID.token;
 		String fileName = optionID.getInputStream().getSourceName();
 		// don't care about ID<ASTNodeName> options
-		if ( valueAST!=null && !legalTokenOptions.contains(optionID.getText()) ) {
+		if ( valueAST!=null && !Grammar.tokenOptions.contains(optionID.getText()) ) {
 			g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
 									   fileName,
 									   optionID,
@@ -451,11 +431,11 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	boolean legalGrammarOption(String key) {
 		switch ( g.getType() ) {
 			case ANTLRParser.LEXER :
-				return legalLexerOptions.contains(key);
+				return Grammar.lexerOptions.contains(key);
 			case ANTLRParser.PARSER :
-				return legalParserOptions.contains(key);
+				return Grammar.parserOptions.contains(key);
 			default :
-				return legalParserOptions.contains(key);
+				return Grammar.parserOptions.contains(key);
 		}
 	}
 

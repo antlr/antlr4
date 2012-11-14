@@ -40,6 +40,8 @@ import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenPipeline;
+import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.misc.Graph;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -49,6 +51,7 @@ import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.ANTLRToolListener;
+import org.antlr.v4.tool.BuildDependencyGenerator;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.DefaultToolListener;
 import org.antlr.v4.tool.ErrorManager;
@@ -64,18 +67,28 @@ import org.stringtemplate.v4.STGroup;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Tool {
-	public String VERSION = "4.0-"+new Date();
+	public static final String getVersion() { return "4.0b4"; }
+
+	public static final String GRAMMAR_EXTENSION = ".g4";
+	public static final String LEGACY_GRAMMAR_EXTENSION = ".g";
+
+	public static final List<String> ALL_GRAMMAR_EXTENSIONS =
+		Collections.unmodifiableList(Arrays.asList(GRAMMAR_EXTENSION, LEGACY_GRAMMAR_EXTENSION));
 
 	public static enum OptionArgType { NONE, STRING } // NONE implies boolean
 	public static class Option {
@@ -98,6 +111,7 @@ public class Tool {
 
 	// fields set by option manager
 
+	public File inputDirectory;
 	public String outputDirectory;
 	public String libDirectory;
 	public boolean report = false;
@@ -114,27 +128,33 @@ public class Tool {
     public boolean log = false;
 	public boolean verbose_dfa = false;
 	public boolean gen_listener = true;
-	public boolean gen_parse_listener = false;
 	public boolean gen_visitor = false;
+	public boolean gen_dependencies = false;
+	public String genPackage = null;
+	public Map<String, String> grammarOptions = null;
+	public boolean warnings_are_errors = false;
 
     public static Option[] optionDefs = {
         new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
-        new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of .token files"),
+        new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
+/*
         new Option("report",			"-report", "print out a report about the grammar(s) processed"),
         new Option("printGrammar",		"-print", "print out the grammar without actions"),
         new Option("debug",				"-debug", "generate a parser that emits debugging events"),
         new Option("profile",			"-profile", "generate a parser that computes profiling information"),
+         */
         new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition network diagrams"),
 		new Option("grammarEncoding",	"-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
-		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages"),
+		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages in antlr, gnu, vs2005"),
 		new Option("gen_listener",		"-listener", "generate parse tree listener (default)"),
 		new Option("gen_listener",		"-no-listener", "don't generate parse tree listener"),
-		new Option("gen_parse_listener",  "-parse-listener", "generate parse listener"),
-		new Option("gen_parse_listener",  "-no-parse-listener", "don't generate parse listener (default)"),
 		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
 		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
-
-        new Option("saveLexer",			"-Xsave-lexer", "save temp lexer file created for combined grammars"),
+		new Option("genPackage",		"-package", OptionArgType.STRING, "specify a package/namespace for the generated code"),
+		new Option("gen_dependencies",	"-depend", "generate file dependencies"),
+		new Option("",					"-D<option>=value", "set/override a grammar-level option"),
+		new Option("warnings_are_errors", "-Werror", "treat warnings as errors"),
+		new Option("saveLexer",			"-Xsave-lexer", "save temp lexer file created for combined grammars"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
         new Option("force_atn",			"-Xforce-atn", "use the ATN simulator for all predictions"),
 		new Option("log",   			"-Xlog", "dump lots of logging info to antlr-timestamp.log"),
@@ -154,11 +174,10 @@ public class Tool {
 
 	protected List<String> grammarFiles = new ArrayList<String>();
 
-	public ErrorManager errMgr = new ErrorManager(this);
+	public ErrorManager errMgr;
     public LogManager logMgr = new LogManager();
 
-	List<ANTLRToolListener> listeners =
-	Collections.synchronizedList(new ArrayList<ANTLRToolListener>());
+	List<ANTLRToolListener> listeners = new CopyOnWriteArrayList<ANTLRToolListener>();
 
 	/** Track separately so if someone adds a listener, it's the only one
 	 *  instead of it and the default stderr listener.
@@ -195,6 +214,8 @@ public class Tool {
 
 	public Tool(String[] args) {
 		this.args = args;
+		errMgr = new ErrorManager(this);
+		errMgr.setFormat(msgFormat);
 		handleArgs();
 	}
 
@@ -203,8 +224,12 @@ public class Tool {
 		while ( args!=null && i<args.length ) {
 			String arg = args[i];
 			i++;
+			if ( arg.startsWith("-D") ) { // -Dlanguage=Java syntax
+				handleOptionSetArg(arg);
+				continue;
+			}
 			if ( arg.charAt(0)!='-' ) { // file name
-				grammarFiles.add(arg);
+				if ( !grammarFiles.contains(arg) ) grammarFiles.add(arg);
 				continue;
 			}
 			boolean found = false;
@@ -271,16 +296,54 @@ public class Tool {
 		}
 	}
 
-	public void processGrammarsOnCommandLine() {
-		for (String fileName : grammarFiles) {
-			GrammarAST t = loadGrammar(fileName);
-			if ( t==null || t instanceof GrammarASTErrorNode) return; // came back as error node
-			if ( ((GrammarRootAST)t).hasErrors ) return;
-			GrammarRootAST ast = (GrammarRootAST)t;
+	protected void handleOptionSetArg(String arg) {
+		int eq = arg.indexOf('=');
+		if ( eq>0 && arg.length()>3 ) {
+			String option = arg.substring("-D".length(), eq);
+			String value = arg.substring(eq+1);
+			if ( value.length()==0 ) {
+				errMgr.toolError(ErrorType.BAD_OPTION_SET_SYNTAX, arg);
+				return;
+			}
+			if ( Grammar.parserOptions.contains(option) ||
+				 Grammar.lexerOptions.contains(option) )
+			{
+				if ( grammarOptions==null ) grammarOptions = new HashMap<String, String>();
+				grammarOptions.put(option, value);
+			}
+			else {
+				errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
+									null,
+									null,
+									option);
+			}
+		}
+		else {
+			errMgr.toolError(ErrorType.BAD_OPTION_SET_SYNTAX, arg);
+		}
+	}
 
-			final Grammar g = createGrammar(ast);
-			g.fileName = fileName;
-			process(g, true);
+	public void processGrammarsOnCommandLine() {
+		List<GrammarRootAST> sortedGrammars = sortGrammarByTokenVocab(grammarFiles);
+
+		for (GrammarRootAST t : sortedGrammars) {
+			final Grammar g = createGrammar(t);
+			g.fileName = t.fileName;
+			if ( gen_dependencies ) {
+				BuildDependencyGenerator dep =
+					new BuildDependencyGenerator(this, g);
+				/*
+					List outputFiles = dep.getGeneratedFileList();
+					List dependents = dep.getDependenciesFileList();
+					System.out.println("output: "+outputFiles);
+					System.out.println("dependents: "+dependents);
+					 */
+				System.out.println(dep.getDependencies().render());
+
+			}
+			else {
+				process(g, true);
+			}
 		}
 	}
 
@@ -293,12 +356,11 @@ public class Tool {
 	public void process(Grammar g, boolean gencode) {
 		g.loadImportedGrammars();
 
-
 		GrammarTransformPipeline transform = new GrammarTransformPipeline(g, this);
 		transform.process();
 
-		LexerGrammar lexerg = null;
-		GrammarRootAST lexerAST = null;
+		LexerGrammar lexerg;
+		GrammarRootAST lexerAST;
 		if ( g.ast!=null && g.ast.grammarType== ANTLRParser.COMBINED &&
 			 !g.ast.hasErrors )
 		{
@@ -323,13 +385,14 @@ public class Tool {
 		if ( g.ast!=null && internalOption_PrintGrammarTree ) System.out.println(g.ast.toStringTree());
 		//g.ast.inspect();
 
-		if ( errMgr.getNumErrors()>0 ) return;
+		if ( g.ast.hasErrors ) return;
 
+		int prevErrors = errMgr.getNumErrors();
 		// MAKE SURE GRAMMAR IS SEMANTICALLY CORRECT (FILL IN GRAMMAR OBJECT)
 		SemanticPipeline sem = new SemanticPipeline(g);
 		sem.process();
 
-		if ( errMgr.getNumErrors()>0 ) return;
+		if ( errMgr.getNumErrors()>prevErrors ) return;
 
 		// BUILD ATN FROM AST
 		ATNFactory factory;
@@ -345,7 +408,7 @@ public class Tool {
 
 		//if ( generate_DFA_dot ) generateDFAs(g);
 
-		if ( g.tool.getNumErrors()>0 ) return;
+		if ( g.tool.getNumErrors()>prevErrors ) return;
 
 		// GENERATE CODE
 		if ( gencode ) {
@@ -353,6 +416,63 @@ public class Tool {
 			gen.process();
 		}
 	}
+
+	public List<GrammarRootAST> sortGrammarByTokenVocab(List<String> fileNames) {
+//		System.out.println(fileNames);
+		Graph<String> g = new Graph<String>();
+		List<GrammarRootAST> roots = new ArrayList<GrammarRootAST>();
+		for (String fileName : fileNames) {
+			GrammarAST t = loadGrammar(fileName);
+			if ( t==null || t instanceof GrammarASTErrorNode) continue; // came back as error node
+			if ( ((GrammarRootAST)t).hasErrors ) continue;
+			GrammarRootAST root = (GrammarRootAST)t;
+			roots.add(root);
+			root.fileName = fileName;
+			String grammarName = root.getChild(0).getText();
+
+			GrammarAST tokenVocabNode = findOptionValueAST(root, "tokenVocab");
+			// Make grammars depend on any tokenVocab options
+			if ( tokenVocabNode!=null ) {
+				String vocabName = tokenVocabNode.getText();
+				g.addEdge(grammarName, vocabName);
+			}
+			// add cycle to graph so we always process a grammar if no error
+			// even if no dependency
+			g.addEdge(grammarName, grammarName);
+		}
+
+		List<String> sortedGrammarNames = g.sort();
+//		System.out.println("sortedGrammarNames="+sortedGrammarNames);
+
+		List<GrammarRootAST> sortedRoots = new ArrayList<GrammarRootAST>();
+		for (String grammarName : sortedGrammarNames) {
+			for (GrammarRootAST root : roots) {
+				if ( root.getGrammarName().equals(grammarName) ) {
+					sortedRoots.add(root);
+					break;
+				}
+			}
+		}
+
+		return sortedRoots;
+	}
+
+	/** Manually get option node from tree; return null if no defined. */
+	public static GrammarAST findOptionValueAST(GrammarRootAST root, String option) {
+		GrammarAST options = (GrammarAST)root.getFirstChildWithType(ANTLRParser.OPTIONS);
+		if ( options!=null ) {
+			for (Object o : options.getChildren()) {
+				GrammarAST c = (GrammarAST)o;
+				if ( c.getType() == ANTLRParser.ASSIGN &&
+					 c.getChild(0).getText().equals(option) )
+				{
+					return (GrammarAST)c.getChild(1);
+				}
+			}
+		}
+		return null;
+	}
+
 
 	/** Given the raw AST of a grammar, create a grammar object
 		associated with the AST. Once we have the grammar object, ensure
@@ -372,7 +492,12 @@ public class Tool {
 
 	public GrammarRootAST loadGrammar(String fileName) {
 		try {
-			ANTLRFileStream in = new ANTLRFileStream(fileName, grammarEncoding);
+			File file = new File(fileName);
+			if (!file.isAbsolute()) {
+				file = new File(inputDirectory, fileName);
+			}
+
+			ANTLRFileStream in = new ANTLRFileStream(file.getAbsolutePath(), grammarEncoding);
 			GrammarRootAST t = load(in);
 			return t;
 		}
@@ -382,16 +507,31 @@ public class Tool {
 		return null;
 	}
 
-	/** Try current dir then dir of g then lib dir */
-	public GrammarRootAST loadImportedGrammar(Grammar g, String fileName) throws IOException {
-		g.tool.log("grammar", "load "+fileName + " from " + g.fileName);
-		File importedFile = getImportedGrammarFile(g, fileName);
+	/**
+	 * Try current dir then dir of g then lib dir
+	 * @param g
+	 * @param name The imported grammar name.
+	 */
+	public Grammar loadImportedGrammar(Grammar g, String name) throws IOException {
+		g.tool.log("grammar", "load " + name + " from " + g.fileName);
+		File importedFile = null;
+		for (String extension : ALL_GRAMMAR_EXTENSIONS) {
+			importedFile = getImportedGrammarFile(g, name + extension);
+			if (importedFile != null) {
+				break;
+			}
+		}
+
 		if ( importedFile==null ) {
-			errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_FILE, fileName, g.fileName);
+			errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, name, g.fileName);
 			return null;
 		}
+
 		ANTLRFileStream in = new ANTLRFileStream(importedFile.getAbsolutePath());
-		return load(in);
+		GrammarRootAST root = load(in);
+		Grammar imported = createGrammar(root);
+		imported.fileName = importedFile.getAbsolutePath();
+		return imported;
 	}
 
 	public GrammarRootAST loadFromString(String grammar) {
@@ -411,6 +551,9 @@ public class Tool {
 			if ( root instanceof GrammarRootAST) {
 				((GrammarRootAST)root).hasErrors = p.getNumberOfSyntaxErrors()>0;
 				((GrammarRootAST)root).tokens = tokens;
+				if ( grammarOptions!=null ) {
+					((GrammarRootAST)root).cmdLineOptions = grammarOptions;
+				}
 				return ((GrammarRootAST)root);
 			}
 			return null;
@@ -447,13 +590,13 @@ public class Tool {
 	 *  files. If the outputDir set by -o is not present it will be created.
 	 *  The final filename is sensitive to the output directory and
 	 *  the directory where the grammar file was found.  If -o is /tmp
-	 *  and the original grammar file was foo/t.g then output files
+	 *  and the original grammar file was foo/t.g4 then output files
 	 *  go in /tmp/foo.
 	 *
 	 *  The output dir -o spec takes precedence if it's absolute.
 	 *  E.g., if the grammar file dir is absolute the output dir is given
-	 *  precendence. "-o /tmp /usr/lib/t.g" results in "/tmp/T.java" as
-	 *  output (assuming t.g holds T.java).
+	 *  precendence. "-o /tmp /usr/lib/t.g4" results in "/tmp/T.java" as
+	 *  output (assuming t.g4 holds T.java).
 	 *
 	 *  If no -o is specified, then just write to the directory where the
 	 *  grammar file was found.
@@ -465,12 +608,12 @@ public class Tool {
 			return new StringWriter();
 		}
 		// output directory is a function of where the grammar file lives
-		// for subdir/T.g, you get subdir here.  Well, depends on -o etc...
+		// for subdir/T.g4, you get subdir here.  Well, depends on -o etc...
 		// But, if this is a .tokens file, then we force the output to
 		// be the base output directory (or current directory if there is not a -o)
 		//
 		File outputDir;
-		if ( fileName.endsWith(".tokens") ) {// CodeGenerator.VOCAB_FILE_EXTENSION)) {
+		if ( fileName.endsWith(CodeGenerator.VOCAB_FILE_EXTENSION) ) {
 			outputDir = new File(outputDirectory);
 		}
 		else {
@@ -481,12 +624,19 @@ public class Tool {
 		if (!outputDir.exists()) {
 			outputDir.mkdirs();
 		}
-		FileWriter fw = new FileWriter(outputFile);
-		return new BufferedWriter(fw);
+		FileOutputStream fos = new FileOutputStream(outputFile);
+		OutputStreamWriter osw;
+		if ( grammarEncoding!=null ) {
+			osw = new OutputStreamWriter(fos, grammarEncoding);
+		}
+		else {
+			osw = new OutputStreamWriter(fos);
+		}
+		return new BufferedWriter(osw);
 	}
 
 	public File getImportedGrammarFile(Grammar g, String fileName) {
-		File importedFile = new File(fileName);
+		File importedFile = new File(inputDirectory, fileName);
 		if ( !importedFile.exists() ) {
 			File gfile = new File(g.fileName);
 			String parentDir = gfile.getParent();
@@ -531,9 +681,9 @@ public class Tool {
 			fileDirectory = fileNameWithPath.substring(0, fileNameWithPath.lastIndexOf(File.separatorChar));
 		}
 		if ( haveOutputDir ) {
-			// -o /tmp /var/lib/t.g => /tmp/T.java
-			// -o subdir/output /usr/lib/t.g => subdir/output/T.java
-			// -o . /usr/lib/t.g => ./T.java
+			// -o /tmp /var/lib/t.g4 => /tmp/T.java
+			// -o subdir/output /usr/lib/t.g4 => subdir/output/T.java
+			// -o . /usr/lib/t.g4 => ./T.java
 			if (fileDirectory != null &&
 				(new File(fileDirectory).isAbsolute() ||
 				 fileDirectory.startsWith("~"))) { // isAbsolute doesn't count this :(
@@ -541,7 +691,7 @@ public class Tool {
 				outputDir = new File(outputDirectory);
 			}
 			else {
-				// -o /tmp subdir/t.g => /tmp/subdir/t.g
+				// -o /tmp subdir/t.g4 => /tmp/subdir/t.g4
 				if (fileDirectory != null) {
 					outputDir = new File(outputDirectory, fileDirectory);
 				}
@@ -571,7 +721,7 @@ public class Tool {
 	}
 
 	public void help() {
-		info("ANTLR Parser Generator  Version " + new Tool().VERSION);
+		info("ANTLR Parser Generator  Version " + Tool.getVersion());
 		for (Option o : optionDefs) {
 			String name = o.name + (o.argType!=OptionArgType.NONE? " ___" : "");
 			String s = String.format(" %-19s %s", name, o.description);
@@ -608,13 +758,18 @@ public class Tool {
 	public void warning(ANTLRMessage msg) {
 		if ( listeners.isEmpty() ) {
 			defaultListener.warning(msg);
-			return;
 		}
-		for (ANTLRToolListener l : listeners) l.warning(msg);
+		else {
+			for (ANTLRToolListener l : listeners) l.warning(msg);
+		}
+
+		if (warnings_are_errors) {
+			errMgr.emit(ErrorType.WARNING_TREATED_AS_ERROR, new ANTLRMessage(ErrorType.WARNING_TREATED_AS_ERROR));
+		}
 	}
 
 	public void version() {
-		info("ANTLR Parser Generator  Version " + new Tool().VERSION);
+		info("ANTLR Parser Generator  Version " + getVersion());
 	}
 
 	public void exit(int e) { System.exit(e); }

@@ -30,12 +30,12 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.ActionAST;
 
 public class ArgAction extends Action {
 	/** Context type of invoked rule */
 	public String ctxType;
-	public ArgAction(OutputModelFactory factory, GrammarAST ast, String ctxType) {
+	public ArgAction(OutputModelFactory factory, ActionAST ast, String ctxType) {
 		super(factory, ast);
 		this.ctxType = ctxType;
 	}

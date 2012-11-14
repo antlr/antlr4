@@ -29,7 +29,8 @@
 
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.*;
+import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.runtime.atn.PlusBlockStartState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Grammar;
@@ -46,7 +47,6 @@ public class LL1PlusBlock extends LL1Loop {
 	public String loopCounterVar;
 	public String[] exitLook;
 
-	@ModelElement public SrcOp loopExpr;
 	@ModelElement public ThrowNoViableAlt error;
 
 	public LL1PlusBlock(OutputModelFactory factory, GrammarAST plusRoot, List<CodeBlockForAlt> alts) {

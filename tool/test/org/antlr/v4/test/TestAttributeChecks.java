@@ -9,6 +9,7 @@ public class TestAttributeChecks extends BaseTest {
     String attributeTemplate =
         "parser grammar A;\n"+
         "@members {<members>}\n" +
+		"tokens{ID}\n" +
         "a[int x] returns [int y]\n" +
         "@init {<init>}\n" +
         "    :   id=ID ids+=ID lab=b[34] {\n" +
@@ -24,8 +25,8 @@ public class TestAttributeChecks extends BaseTest {
 		"d	 :   ;\n";
 
     String[] membersChecks = {
-		"$a",			"error(29): A.g:2:11: unknown attribute reference a in $a\n",
-        "$a.y",			"error(29): A.g:2:11: unknown attribute reference a in $a.y\n",
+		"$a",			"error(63): A.g4:2:11: unknown attribute reference a in $a\n",
+        "$a.y",			"error(63): A.g4:2:11: unknown attribute reference a in $a.y\n",
     };
 
     String[] initChecks = {
@@ -36,8 +37,8 @@ public class TestAttributeChecks extends BaseTest {
 		"$lab.e",		"",
 		"$ids",			"",
 
-		"$c",			"error(29): A.g:4:8: unknown attribute reference c in $c\n",
-		"$a.q",			"error(31): A.g:4:10: unknown attribute q for rule a in $a.q\n",
+		"$c",			"error(63): A.g4:5:8: unknown attribute reference c in $c\n",
+		"$a.q",			"error(65): A.g4:5:10: unknown attribute q for rule a in $a.q\n",
     };
 
 	String[] inlineChecks = {
@@ -58,19 +59,19 @@ public class TestAttributeChecks extends BaseTest {
 	};
 
 	String[] bad_inlineChecks = {
-		"$lab",			"error(33): A.g:6:4: missing attribute access on rule reference lab in $lab\n",
-		"$q",           "error(29): A.g:6:4: unknown attribute reference q in $q\n",
-		"$q.y",         "error(29): A.g:6:4: unknown attribute reference q in $q.y\n",
-		"$q = 3",       "error(29): A.g:6:4: unknown attribute reference q in $q\n",
-		"$q = 3;",      "error(29): A.g:6:4: unknown attribute reference q in $q = 3;\n",
-		"$q.y = 3;",    "error(29): A.g:6:4: unknown attribute reference q in $q.y = 3;\n",
-		"$q = $blort;", "error(29): A.g:6:4: unknown attribute reference q in $q = $blort;\n" +
-						"error(29): A.g:6:9: unknown attribute reference blort in $blort\n",
-		"$a.ick",       "error(31): A.g:6:6: unknown attribute ick for rule a in $a.ick\n",
-		"$a.ick = 3;",  "error(31): A.g:6:6: unknown attribute ick for rule a in $a.ick = 3;\n",
-		"$b.d",         "error(30): A.g:6:6: cannot access rule d's parameter: $b.d\n",  // can't see rule ref's arg
-		"$d.text",      "error(29): A.g:6:4: unknown attribute reference d in $d.text\n", // valid rule, but no ref
-		"$lab.d",		"error(30): A.g:6:8: cannot access rule d's parameter: $lab.d\n",
+		"$lab",			"error(67): A.g4:7:4: missing attribute access on rule reference lab in $lab\n",
+		"$q",           "error(63): A.g4:7:4: unknown attribute reference q in $q\n",
+		"$q.y",         "error(63): A.g4:7:4: unknown attribute reference q in $q.y\n",
+		"$q = 3",       "error(63): A.g4:7:4: unknown attribute reference q in $q\n",
+		"$q = 3;",      "error(63): A.g4:7:4: unknown attribute reference q in $q = 3;\n",
+		"$q.y = 3;",    "error(63): A.g4:7:4: unknown attribute reference q in $q.y = 3;\n",
+		"$q = $blort;", "error(63): A.g4:7:4: unknown attribute reference q in $q = $blort;\n" +
+						"error(63): A.g4:7:9: unknown attribute reference blort in $blort\n",
+		"$a.ick",       "error(65): A.g4:7:6: unknown attribute ick for rule a in $a.ick\n",
+		"$a.ick = 3;",  "error(65): A.g4:7:6: unknown attribute ick for rule a in $a.ick = 3;\n",
+		"$b.d",         "error(64): A.g4:7:6: cannot access rule d's parameter: $b.d\n",  // can't see rule ref's arg
+		"$d.text",      "error(63): A.g4:7:4: unknown attribute reference d in $d.text\n", // valid rule, but no ref
+		"$lab.d",		"error(64): A.g4:7:8: cannot access rule d's parameter: $lab.d\n",
 	};
 
 	String[] finallyChecks = {
@@ -84,20 +85,20 @@ public class TestAttributeChecks extends BaseTest {
 		"$id.text",		"",
 		"$ids",			"",
 
-		"$lab",			"error(33): A.g:9:14: missing attribute access on rule reference lab in $lab\n",
-		"$q",           "error(29): A.g:9:14: unknown attribute reference q in $q\n",
-		"$q.y",         "error(29): A.g:9:14: unknown attribute reference q in $q.y\n",
-		"$q = 3",       "error(29): A.g:9:14: unknown attribute reference q in $q\n",
-		"$q = 3;",      "error(29): A.g:9:14: unknown attribute reference q in $q = 3;\n",
-		"$q.y = 3;",    "error(29): A.g:9:14: unknown attribute reference q in $q.y = 3;\n",
-		"$q = $blort;", "error(29): A.g:9:14: unknown attribute reference q in $q = $blort;\n" +
-						"error(29): A.g:9:19: unknown attribute reference blort in $blort\n",
-		"$a.ick",       "error(31): A.g:9:16: unknown attribute ick for rule a in $a.ick\n",
-		"$a.ick = 3;",  "error(31): A.g:9:16: unknown attribute ick for rule a in $a.ick = 3;\n",
-		"$b.e",			"error(29): A.g:9:14: unknown attribute reference b in $b.e\n", // can't see rule refs outside alts
-		"$b.d",         "error(29): A.g:9:14: unknown attribute reference b in $b.d\n",
-		"$c.text",      "error(29): A.g:9:14: unknown attribute reference c in $c.text\n",
-		"$lab.d",		"error(30): A.g:9:18: cannot access rule d's parameter: $lab.d\n",
+		"$lab",			"error(67): A.g4:10:14: missing attribute access on rule reference lab in $lab\n",
+		"$q",           "error(63): A.g4:10:14: unknown attribute reference q in $q\n",
+		"$q.y",         "error(63): A.g4:10:14: unknown attribute reference q in $q.y\n",
+		"$q = 3",       "error(63): A.g4:10:14: unknown attribute reference q in $q\n",
+		"$q = 3;",      "error(63): A.g4:10:14: unknown attribute reference q in $q = 3;\n",
+		"$q.y = 3;",    "error(63): A.g4:10:14: unknown attribute reference q in $q.y = 3;\n",
+		"$q = $blort;", "error(63): A.g4:10:14: unknown attribute reference q in $q = $blort;\n" +
+						"error(63): A.g4:10:19: unknown attribute reference blort in $blort\n",
+		"$a.ick",       "error(65): A.g4:10:16: unknown attribute ick for rule a in $a.ick\n",
+		"$a.ick = 3;",  "error(65): A.g4:10:16: unknown attribute ick for rule a in $a.ick = 3;\n",
+		"$b.e",			"error(63): A.g4:10:14: unknown attribute reference b in $b.e\n", // can't see rule refs outside alts
+		"$b.d",         "error(63): A.g4:10:14: unknown attribute reference b in $b.d\n",
+		"$c.text",      "error(63): A.g4:10:14: unknown attribute reference c in $c.text\n",
+		"$lab.d",		"error(64): A.g4:10:18: cannot access rule d's parameter: $lab.d\n",
 	};
 
 	String[] dynMembersChecks = {
@@ -105,11 +106,11 @@ public class TestAttributeChecks extends BaseTest {
 		"$S::i",		"",
 		"$S::i=$S::i",	"",
 
-		"$b::f",		"error(54): A.g:3:1: unknown dynamic scope: b in $b::f\n",
-		"$S::j",		"error(55): A.g:3:4: unknown dynamically-scoped attribute for scope S: j in $S::j\n",
-		"$S::j = 3;",	"error(55): A.g:3:4: unknown dynamically-scoped attribute for scope S: j in $S::j = 3;\n",
-		"$S::j = $S::k;",	"error(55): A.g:3:4: unknown dynamically-scoped attribute for scope S: j in $S::j = $S::k;\n" +
-							"error(55): A.g:3:12: unknown dynamically-scoped attribute for scope S: k in $S::k\n",
+		"$b::f",		"error(54): A.g4:3:1: unknown dynamic scope: b in $b::f\n",
+		"$S::j",		"error(55): A.g4:3:4: unknown dynamically-scoped attribute for scope S: j in $S::j\n",
+		"$S::j = 3;",	"error(55): A.g4:3:4: unknown dynamically-scoped attribute for scope S: j in $S::j = 3;\n",
+		"$S::j = $S::k;",	"error(55): A.g4:3:4: unknown dynamically-scoped attribute for scope S: j in $S::j = $S::k;\n" +
+							"error(55): A.g4:3:12: unknown dynamically-scoped attribute for scope S: k in $S::k\n",
 	};
 
 	String[] dynInitChecks = {
@@ -122,10 +123,10 @@ public class TestAttributeChecks extends BaseTest {
 		"$a::z",		"",
 		"$S",			"",
 
-		"$S::j",		"error(55): A.g:8:11: unknown dynamically-scoped attribute for scope S: j in $S::j\n",
-		"$S::j = 3;",	"error(55): A.g:8:11: unknown dynamically-scoped attribute for scope S: j in $S::j = 3;\n",
-		"$S::j = $S::k;",	"error(55): A.g:8:11: unknown dynamically-scoped attribute for scope S: j in $S::j = $S::k;\n" +
-							"error(55): A.g:8:19: unknown dynamically-scoped attribute for scope S: k in $S::k\n",
+		"$S::j",		"error(55): A.g4:8:11: unknown dynamically-scoped attribute for scope S: j in $S::j\n",
+		"$S::j = 3;",	"error(55): A.g4:8:11: unknown dynamically-scoped attribute for scope S: j in $S::j = 3;\n",
+		"$S::j = $S::k;",	"error(55): A.g4:8:11: unknown dynamically-scoped attribute for scope S: j in $S::j = $S::k;\n" +
+							"error(55): A.g4:8:19: unknown dynamically-scoped attribute for scope S: k in $S::k\n",
 	};
 
 	String[] dynInlineChecks = {
@@ -138,27 +139,27 @@ public class TestAttributeChecks extends BaseTest {
 		"$S::i=$S::i",		"",
 		"$a::z",			"",
 
-		"$S::j",			"error(55): A.g:10:7: unknown dynamically-scoped attribute for scope S: j in $S::j\n",
-		"$S::j = 3;",		"error(55): A.g:10:7: unknown dynamically-scoped attribute for scope S: j in $S::j = 3;\n",
-		"$S::j = $S::k;",	"error(55): A.g:10:7: unknown dynamically-scoped attribute for scope S: j in $S::j = $S::k;\n" +
-							"error(55): A.g:10:15: unknown dynamically-scoped attribute for scope S: k in $S::k\n",
-		"$Q[-1]::y",        "error(54): A.g:10:4: unknown dynamic scope: Q in $Q[-1]::y\n",
-		"$Q[-i]::y",        "error(54): A.g:10:4: unknown dynamic scope: Q in $Q[-i]::y\n",
-		"$Q[i]::y",    		"error(54): A.g:10:4: unknown dynamic scope: Q in $Q[i]::y\n",
-		"$Q[0]::y",    		"error(54): A.g:10:4: unknown dynamic scope: Q in $Q[0]::y\n",
-		"$Q[-1]::y = 23;",  "error(54): A.g:10:4: unknown dynamic scope: Q in $Q[-1]::y = 23;\n",
-		"$Q[-i]::y = 23;",  "error(54): A.g:10:4: unknown dynamic scope: Q in $Q[-i]::y = 23;\n",
-		"$Q[i]::y = 23;",   "error(54): A.g:10:4: unknown dynamic scope: Q in $Q[i]::y = 23;\n",
-		"$Q[0]::y = 23;",   "error(54): A.g:10:4: unknown dynamic scope: Q in $Q[0]::y = 23;\n",
-		"$S[-1]::y",        "error(55): A.g:10:11: unknown dynamically-scoped attribute for scope S: y in $S[-1]::y\n",
-		"$S[-i]::y",        "error(55): A.g:10:11: unknown dynamically-scoped attribute for scope S: y in $S[-i]::y\n",
-		"$S[i]::y",     	"error(55): A.g:10:10: unknown dynamically-scoped attribute for scope S: y in $S[i]::y\n",
-		"$S[0]::y",     	"error(55): A.g:10:10: unknown dynamically-scoped attribute for scope S: y in $S[0]::y\n",
-		"$S[-1]::y = 23;",  "error(55): A.g:10:11: unknown dynamically-scoped attribute for scope S: y in $S[-1]::y = 23;\n",
-		"$S[-i]::y = 23;",  "error(55): A.g:10:11: unknown dynamically-scoped attribute for scope S: y in $S[-i]::y = 23;\n",
-		"$S[i]::y = 23;",   "error(55): A.g:10:10: unknown dynamically-scoped attribute for scope S: y in $S[i]::y = 23;\n",
-		"$S[0]::y = 23;",   "error(55): A.g:10:10: unknown dynamically-scoped attribute for scope S: y in $S[0]::y = 23;\n",
-		"$S[$S::y]::i",		"error(55): A.g:10:10: unknown dynamically-scoped attribute for scope S: y in $S::y\n"
+		"$S::j",			"error(55): A.g4:10:7: unknown dynamically-scoped attribute for scope S: j in $S::j\n",
+		"$S::j = 3;",		"error(55): A.g4:10:7: unknown dynamically-scoped attribute for scope S: j in $S::j = 3;\n",
+		"$S::j = $S::k;",	"error(55): A.g4:10:7: unknown dynamically-scoped attribute for scope S: j in $S::j = $S::k;\n" +
+							"error(55): A.g4:10:15: unknown dynamically-scoped attribute for scope S: k in $S::k\n",
+		"$Q[-1]::y",        "error(54): A.g4:10:4: unknown dynamic scope: Q in $Q[-1]::y\n",
+		"$Q[-i]::y",        "error(54): A.g4:10:4: unknown dynamic scope: Q in $Q[-i]::y\n",
+		"$Q[i]::y",    		"error(54): A.g4:10:4: unknown dynamic scope: Q in $Q[i]::y\n",
+		"$Q[0]::y",    		"error(54): A.g4:10:4: unknown dynamic scope: Q in $Q[0]::y\n",
+		"$Q[-1]::y = 23;",  "error(54): A.g4:10:4: unknown dynamic scope: Q in $Q[-1]::y = 23;\n",
+		"$Q[-i]::y = 23;",  "error(54): A.g4:10:4: unknown dynamic scope: Q in $Q[-i]::y = 23;\n",
+		"$Q[i]::y = 23;",   "error(54): A.g4:10:4: unknown dynamic scope: Q in $Q[i]::y = 23;\n",
+		"$Q[0]::y = 23;",   "error(54): A.g4:10:4: unknown dynamic scope: Q in $Q[0]::y = 23;\n",
+		"$S[-1]::y",        "error(55): A.g4:10:11: unknown dynamically-scoped attribute for scope S: y in $S[-1]::y\n",
+		"$S[-i]::y",        "error(55): A.g4:10:11: unknown dynamically-scoped attribute for scope S: y in $S[-i]::y\n",
+		"$S[i]::y",     	"error(55): A.g4:10:10: unknown dynamically-scoped attribute for scope S: y in $S[i]::y\n",
+		"$S[0]::y",     	"error(55): A.g4:10:10: unknown dynamically-scoped attribute for scope S: y in $S[0]::y\n",
+		"$S[-1]::y = 23;",  "error(55): A.g4:10:11: unknown dynamically-scoped attribute for scope S: y in $S[-1]::y = 23;\n",
+		"$S[-i]::y = 23;",  "error(55): A.g4:10:11: unknown dynamically-scoped attribute for scope S: y in $S[-i]::y = 23;\n",
+		"$S[i]::y = 23;",   "error(55): A.g4:10:10: unknown dynamically-scoped attribute for scope S: y in $S[i]::y = 23;\n",
+		"$S[0]::y = 23;",   "error(55): A.g4:10:10: unknown dynamically-scoped attribute for scope S: y in $S[0]::y = 23;\n",
+		"$S[$S::y]::i",		"error(55): A.g4:10:10: unknown dynamically-scoped attribute for scope S: y in $S::y\n"
 	};
 
 	String[] dynFinallyChecks = {
@@ -171,10 +172,10 @@ public class TestAttributeChecks extends BaseTest {
 		"$S::i=$S::i",	"",
 		"$a::z",		"",
 
-		"$S::j",		"error(55): A.g:12:17: unknown dynamically-scoped attribute for scope S: j in $S::j\n",
-		"$S::j = 3;",	"error(55): A.g:12:17: unknown dynamically-scoped attribute for scope S: j in $S::j = 3;\n",
-		"$S::j = $S::k;",	"error(55): A.g:12:17: unknown dynamically-scoped attribute for scope S: j in $S::j = $S::k;\n" +
-							"error(55): A.g:12:25: unknown dynamically-scoped attribute for scope S: k in $S::k\n",
+		"$S::j",		"error(55): A.g4:12:17: unknown dynamically-scoped attribute for scope S: j in $S::j\n",
+		"$S::j = 3;",	"error(55): A.g4:12:17: unknown dynamically-scoped attribute for scope S: j in $S::j = 3;\n",
+		"$S::j = $S::k;",	"error(55): A.g4:12:17: unknown dynamically-scoped attribute for scope S: j in $S::j = $S::k;\n" +
+							"error(55): A.g4:12:25: unknown dynamically-scoped attribute for scope S: k in $S::k\n",
 	};
 
     @Test public void testMembersActions() throws RecognitionException {
@@ -200,6 +201,7 @@ public class TestAttributeChecks extends BaseTest {
 	@Test public void testTokenRef() throws RecognitionException {
 		String grammar =
 			"parser grammar S;\n" +
+			"tokens{ID}\n" +
 			"a : x=ID {Token t = $x; t = $ID;} ;\n";
 		String expected =
 			"";

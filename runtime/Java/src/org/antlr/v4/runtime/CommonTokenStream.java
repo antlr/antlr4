@@ -46,7 +46,7 @@ package org.antlr.v4.runtime;
  *  @see UnbufferedTokenStream
  *  @see BufferedTokenStream
  */
-public class CommonTokenStream extends BufferedTokenStream<Token> {
+public class CommonTokenStream extends BufferedTokenStream {
     /** Skip tokens on any channel but this one; this is how we skip whitespace... */
     protected int channel = Token.DEFAULT_CHANNEL;
 
@@ -61,7 +61,7 @@ public class CommonTokenStream extends BufferedTokenStream<Token> {
 
 	@Override
 	protected int adjustSeekIndex(int i) {
-		return skipOffTokenChannels(i);
+		return nextTokenOnChannel(i, channel);
 	}
 
     @Override
@@ -73,7 +73,7 @@ public class CommonTokenStream extends BufferedTokenStream<Token> {
         // find k good tokens looking backwards
         while ( n<=k ) {
             // skip off-channel tokens
-            i = skipOffTokenChannelsReverse(i-1);
+            i = previousTokenOnChannel(i - 1, channel);
             n++;
         }
         if ( i<0 ) return null;
@@ -92,33 +92,12 @@ public class CommonTokenStream extends BufferedTokenStream<Token> {
         while ( n<k ) {
             // skip off-channel tokens, but make sure to not look past EOF
 			if (sync(i + 1)) {
-				i = skipOffTokenChannels(i+1);
+				i = nextTokenOnChannel(i + 1, channel);
 			}
             n++;
         }
 //		if ( i>range ) range = i;
         return tokens.get(i);
-    }
-
-    /** Given a starting index, return the index of the first on-channel
-     *  token.
-     */
-    protected int skipOffTokenChannels(int i) {
-        sync(i);
-        Token token = tokens.get(i);
-        while ( token.getType()!=Token.EOF && token.getChannel()!=channel ) {
-            i++;
-            sync(i);
-            token = tokens.get(i);
-        }
-        return i;
-    }
-
-    protected int skipOffTokenChannelsReverse(int i) {
-        while ( i>=0 && tokens.get(i).getChannel()!=channel ) {
-            i--;
-        }
-        return i;
     }
 
 	/** Count EOF just once. */

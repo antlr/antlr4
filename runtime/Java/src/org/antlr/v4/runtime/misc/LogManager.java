@@ -90,8 +90,8 @@ public class LogManager {
     }
 
     public String save() throws IOException {
-        String dir = System.getProperty("java.io.tmpdir");
-        dir = ".";
+        //String dir = System.getProperty("java.io.tmpdir");
+        String dir = ".";
         String defaultFilename =
             dir + "/antlr-" +
             new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss").format(new Date()) + ".log";

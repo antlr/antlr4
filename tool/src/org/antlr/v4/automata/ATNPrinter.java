@@ -29,7 +29,23 @@
 
 package org.antlr.v4.automata;
 
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ActionTransition;
+import org.antlr.v4.runtime.atn.AtomTransition;
+import org.antlr.v4.runtime.atn.BlockEndState;
+import org.antlr.v4.runtime.atn.BlockStartState;
+import org.antlr.v4.runtime.atn.EpsilonTransition;
+import org.antlr.v4.runtime.atn.NotSetTransition;
+import org.antlr.v4.runtime.atn.PlusBlockStartState;
+import org.antlr.v4.runtime.atn.PlusLoopbackState;
+import org.antlr.v4.runtime.atn.RuleStartState;
+import org.antlr.v4.runtime.atn.RuleStopState;
+import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.SetTransition;
+import org.antlr.v4.runtime.atn.StarBlockStartState;
+import org.antlr.v4.runtime.atn.StarLoopEntryState;
+import org.antlr.v4.runtime.atn.StarLoopbackState;
+import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.tool.Grammar;
 
 import java.util.ArrayList;
@@ -57,9 +73,9 @@ public class ATNPrinter {
 		work.add(start);
 
 		StringBuilder buf = new StringBuilder();
-		ATNState s = null;
+		ATNState s;
 
-		while ( work.size()>0 ) {
+		while ( !work.isEmpty() ) {
 			s = work.remove(0);
 			if ( marked.contains(s) ) continue;
 			int n = s.getNumberOfTransitions();
@@ -73,33 +89,33 @@ public class ATNPrinter {
 				}
 				buf.append(getStateString(s));
 				if ( t instanceof EpsilonTransition ) {
-					buf.append("->"+ getStateString(t.target)+'\n');
+					buf.append("->").append(getStateString(t.target)).append('\n');
 				}
 				else if ( t instanceof RuleTransition ) {
-					buf.append("-"+g.getRule(((RuleTransition)t).ruleIndex).name+"->"+ getStateString(t.target)+'\n');
+					buf.append("-").append(g.getRule(((RuleTransition)t).ruleIndex).name).append("->").append(getStateString(t.target)).append('\n');
 				}
 				else if ( t instanceof ActionTransition ) {
 					ActionTransition a = (ActionTransition)t;
-					buf.append("-"+a.toString()+"->"+ getStateString(t.target)+'\n');
+					buf.append("-").append(a.toString()).append("->").append(getStateString(t.target)).append('\n');
 				}
 				else if ( t instanceof SetTransition ) {
 					SetTransition st = (SetTransition)t;
 					boolean not = st instanceof NotSetTransition;
 					if ( g.isLexer() ) {
-						buf.append("-"+(not?"~":"")+st.toString()+"->"+ getStateString(t.target)+'\n');
+						buf.append("-").append(not?"~":"").append(st.toString()).append("->").append(getStateString(t.target)).append('\n');
 					}
 					else {
-						buf.append("-"+(not?"~":"")+st.label().toString(g.getTokenNames())+"->"+ getStateString(t.target)+'\n');
+						buf.append("-").append(not?"~":"").append(st.label().toString(g.getTokenNames())).append("->").append(getStateString(t.target)).append('\n');
 					}
 				}
 				else if ( t instanceof AtomTransition ) {
 					AtomTransition a = (AtomTransition)t;
 					String label = a.toString();
 					if ( g!=null ) label = g.getTokenDisplayName(a.label);
-					buf.append("-"+label+"->"+ getStateString(t.target)+'\n');
+					buf.append("-").append(label).append("->").append(getStateString(t.target)).append('\n');
 				}
 				else {
-					buf.append("-"+t.toString()+"->"+ getStateString(t.target)+'\n');
+					buf.append("-").append(t.toString()).append("->").append(getStateString(t.target)).append('\n');
 				}
 			}
 		}

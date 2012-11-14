@@ -71,6 +71,7 @@ public class ATN {
 	// runtime for lexer only
 	public int[] ruleToTokenType;
 	public int[] ruleToActionIndex;
+
 	@NotNull
 	public final List<TokensStartState> modeToStartState = new ArrayList<TokensStartState>();
 
@@ -119,7 +120,7 @@ public class ATN {
 	}
 
     public DecisionState getDecisionState(int decision) {
-        if ( decisionToState.size()>0 ) {
+        if ( !decisionToState.isEmpty() ) {
             return decisionToState.get(decision);
         }
         return null;

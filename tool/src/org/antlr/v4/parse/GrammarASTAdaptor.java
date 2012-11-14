@@ -39,7 +39,7 @@ import org.antlr.v4.tool.ast.TerminalAST;
 
 public class GrammarASTAdaptor extends CommonTreeAdaptor {
     org.antlr.runtime.CharStream input; // where we can find chars ref'd by tokens in tree
-    public GrammarASTAdaptor() { ; }
+    public GrammarASTAdaptor() { }
     public GrammarASTAdaptor(org.antlr.runtime.CharStream input) { this.input = input; }
 
     @Override
@@ -50,7 +50,7 @@ public class GrammarASTAdaptor extends CommonTreeAdaptor {
     @Override
     /** Make sure even imaginary nodes know the input stream */
     public Object create(int tokenType, String text) {
-		GrammarAST t = null;
+		GrammarAST t;
 		if ( tokenType==ANTLRParser.RULE ) {
 			// needed by TreeWizard to make RULE tree
         	t = new RuleAST(new CommonToken(tokenType, text));

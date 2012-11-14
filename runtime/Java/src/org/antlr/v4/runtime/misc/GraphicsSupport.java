@@ -30,7 +30,12 @@
 package org.antlr.v4.runtime.misc;
 
 import javax.imageio.ImageIO;
-import javax.print.*;
+import javax.print.DocFlavor;
+import javax.print.DocPrintJob;
+import javax.print.PrintException;
+import javax.print.PrintService;
+import javax.print.SimpleDoc;
+import javax.print.StreamPrintServiceFactory;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.swing.*;
@@ -41,6 +46,7 @@ import java.awt.print.Printable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class GraphicsSupport {
 	/**
@@ -74,11 +80,12 @@ public class GraphicsSupport {
 	public static void saveImage(final JComponent comp, String fileName)
 		throws IOException, PrintException
 	{
-		if (fileName.endsWith(".ps") || fileName.endsWith(".eps")) {
+		if (fileName.endsWith(".ps") || fileName.endsWith(".eps") ) {
 			DocFlavor flavor = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
 			String mimeType = "application/postscript";
 			StreamPrintServiceFactory[] factories =
 				StreamPrintServiceFactory.lookupStreamPrintServiceFactories(flavor, mimeType);
+			System.out.println(Arrays.toString(factories));
 			FileOutputStream out = new FileOutputStream(fileName);
 			if (factories.length > 0) {
 				PrintService service = factories[0].getPrintService(out);
@@ -87,13 +94,17 @@ public class GraphicsSupport {
 					public int print(Graphics g, PageFormat pf, int page) {
 						if (page >= 1) return Printable.NO_SUCH_PAGE;
 						else {
-							double sf1 = pf.getImageableWidth() / (comp.getWidth() + 1);
-							double sf2 = pf.getImageableHeight() / (comp.getHeight() + 1);
-							double s = Math.min(sf1, sf2);
 							Graphics2D g2 = (Graphics2D) g;
 							g2.translate((pf.getWidth() - pf.getImageableWidth()) / 2,
 										 (pf.getHeight() - pf.getImageableHeight()) / 2);
-							g2.scale(s, s);
+							if ( comp.getWidth() > pf.getImageableWidth() ||
+								 comp.getHeight() > pf.getImageableHeight() )
+							{
+								double sf1 = pf.getImageableWidth() / (comp.getWidth() + 1);
+								double sf2 = pf.getImageableHeight() / (comp.getHeight() + 1);
+								double s = Math.min(sf1, sf2);
+								g2.scale(s, s);
+							}
 
 							comp.paint(g);
 							return Printable.PAGE_EXISTS;
@@ -105,16 +116,20 @@ public class GraphicsSupport {
 				job.print(doc, attributes);
 			}
 		} else {
+			// parrt: works with [image/jpeg, image/png, image/x-png, image/vnd.wap.wbmp, image/bmp, image/gif]
 			Rectangle rect = comp.getBounds();
 			BufferedImage image = new BufferedImage(rect.width, rect.height,
 													BufferedImage.TYPE_INT_RGB);
 			Graphics2D g = (Graphics2D) image.getGraphics();
 			g.setColor(Color.WHITE);
 			g.fill(rect);
-			g.setColor(Color.BLACK);
+//			g.setColor(Color.BLACK);
 			comp.paint(g);
 			String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
-			ImageIO.write(image, extension, new File(fileName));
+			boolean result = ImageIO.write(image, extension, new File(fileName));
+			if ( !result ) {
+				System.err.println("Now imager for " + extension);
+			}
 			g.dispose();
 		}
 	}

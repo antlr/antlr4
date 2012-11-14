@@ -69,17 +69,18 @@ import java.util.List;
 public class LeftRecursiveRuleTransformer {
 	public GrammarRootAST ast;
 	public Collection<Rule> rules;
+	public Grammar g;
 	public Tool tool;
 
-	public LeftRecursiveRuleTransformer(GrammarRootAST ast, Collection<Rule> rules, Tool tool) {
+	public LeftRecursiveRuleTransformer(GrammarRootAST ast, Collection<Rule> rules, Grammar g) {
 		this.ast = ast;
 		this.rules = rules;
-		this.tool = tool;
+		this.g = g;
+		this.tool = g.tool;
 	}
 
 	public void translateLeftRecursiveRules() {
-		// TODO: what about -language foo cmd line?
-		String language = Grammar.getLanguageOption(ast);
+		String language = g.getOptionString("language");
 		// translate all recursive rules
 		List<String> leftRecursiveRuleNames = new ArrayList<String>();
 		for (Rule r : rules) {
@@ -115,7 +116,7 @@ public class LeftRecursiveRuleTransformer {
 		String ruleName = prevRuleAST.getChild(0).getText();
 		LeftRecursiveRuleAnalyzer leftRecursiveRuleWalker =
 			new LeftRecursiveRuleAnalyzer(tokens, prevRuleAST, tool, ruleName, language);
-		boolean isLeftRec = false;
+		boolean isLeftRec;
 		try {
 //			System.out.println("TESTING ---------------\n"+
 //							   leftRecursiveRuleWalker.text(ruleAST));

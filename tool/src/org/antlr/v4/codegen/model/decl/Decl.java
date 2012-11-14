@@ -57,11 +57,10 @@ public class Decl extends SrcOp {
 	/** If same name, can't redefine, unless it's a getter */
 	@Override
 	public boolean equals(Object obj) {
-		if ( obj==null ) return false;
+		if ( this==obj ) return true;
+		if ( !(obj instanceof Decl) ) return false;
 		// A() and label A are different
 		if ( obj instanceof ContextGetterDecl ) return false;
-		if ( this==obj ) return true;
-		if ( this.hashCode() != obj.hashCode() ) return false;
 		return name.equals(((Decl) obj).name);
 	}
 }

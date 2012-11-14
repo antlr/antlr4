@@ -32,7 +32,8 @@ package org.antlr.v4.tool.ast;
 import org.antlr.runtime.Token;
 import org.antlr.v4.misc.CharSupport;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class GrammarASTWithOptions extends GrammarAST {
     protected Map<String, GrammarAST> options;
@@ -53,7 +54,7 @@ public abstract class GrammarASTWithOptions extends GrammarAST {
     }
 
 	public String getOptionString(String key) {
-		GrammarAST value = getOption(key);
+		GrammarAST value = getOptionAST(key);
 		if ( value == null ) return null;
 		if ( value instanceof ActionAST ) {
 			return value.getText();
@@ -67,7 +68,10 @@ public abstract class GrammarASTWithOptions extends GrammarAST {
 		}
 	}
 
-    public GrammarAST getOption(String key) {
+	/** Gets AST node holding value for option key; ignores default options
+	 *  and command-line forced options.
+	 */
+    public GrammarAST getOptionAST(String key) {
         if ( options==null ) return null;
         return options.get(key);
     }

@@ -28,6 +28,8 @@
  */
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.Interval;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -72,33 +74,37 @@ public class ANTLRInputStream implements CharStream {
         this(r, INITIAL_BUFFER_SIZE, READ_BUFFER_SIZE);
     }
 
-    public ANTLRInputStream(Reader r, int size) throws IOException {
-        this(r, size, READ_BUFFER_SIZE);
+    public ANTLRInputStream(Reader r, int initialSize) throws IOException {
+        this(r, initialSize, READ_BUFFER_SIZE);
     }
 
-    public ANTLRInputStream(Reader r, int size, int readChunkSize) throws IOException {
-        load(r, size, readChunkSize);
+    public ANTLRInputStream(Reader r, int initialSize, int readChunkSize) throws IOException {
+        load(r, initialSize, readChunkSize);
     }
 
-    public ANTLRInputStream(InputStream input) throws IOException {
-        this(new InputStreamReader(input), INITIAL_BUFFER_SIZE);
-    }
+	public ANTLRInputStream(InputStream input) throws IOException {
+		this(new InputStreamReader(input), INITIAL_BUFFER_SIZE);
+	}
 
-    public ANTLRInputStream(InputStream input, int size) throws IOException {
-        this(new InputStreamReader(input), size);
-    }
+	public ANTLRInputStream(InputStream input, int initialSize) throws IOException {
+		this(new InputStreamReader(input), initialSize);
+	}
 
-    public void load(Reader r, int size, int readChunkSize)
-   		throws IOException
-   	{
-   		if ( r==null ) {
-   			return;
-   		}
-   		if ( size<=0 ) {
-   			size = INITIAL_BUFFER_SIZE;
-   		}
-   		if ( readChunkSize<=0 ) {
-   			readChunkSize = READ_BUFFER_SIZE;
+	public ANTLRInputStream(InputStream input, int initialSize, int readChunkSize) throws IOException {
+		this(new InputStreamReader(input), initialSize, readChunkSize);
+	}
+
+	public void load(Reader r, int size, int readChunkSize)
+		throws IOException
+	{
+		if ( r==null ) {
+			return;
+		}
+		if ( size<=0 ) {
+			size = INITIAL_BUFFER_SIZE;
+		}
+		if ( readChunkSize<=0 ) {
+			readChunkSize = READ_BUFFER_SIZE;
    		}
    		// System.out.println("load "+size+" in chunks of "+readChunkSize);
    		try {
@@ -138,6 +144,11 @@ public class ANTLRInputStream implements CharStream {
 
     @Override
     public void consume() {
+		if (p >= n) {
+			assert LA(1) == CharStream.EOF;
+			throw new IllegalStateException("cannot consume EOF");
+		}
+
 		//System.out.println("prev p="+p+", c="+(char)data[p]);
         if ( p < n ) {
             p++;
@@ -153,13 +164,13 @@ public class ANTLRInputStream implements CharStream {
 		if ( i<0 ) {
 			i++; // e.g., translate LA(-1) to use offset i=0; then data[p+0-1]
 			if ( (p+i-1) < 0 ) {
-				return CharStream.EOF; // invalid; no char before first char
+				return IntStream.EOF; // invalid; no char before first char
 			}
 		}
 
 		if ( (p+i-1) >= n ) {
             //System.out.println("char LA("+i+")=EOF; p="+p);
-            return CharStream.EOF;
+            return IntStream.EOF;
         }
         //System.out.println("char LA("+i+")="+(char)data[p+i-1]+"; p="+p);
 		//System.out.println("LA("+i+"); p="+p+" n="+n+" data.length="+data.length);
@@ -210,7 +221,9 @@ public class ANTLRInputStream implements CharStream {
 	}
 
 	@Override
-	public String substring(int start, int stop) {
+	public String getText(Interval interval) {
+		int start = interval.a;
+		int stop = interval.b;
 		if ( stop >= n ) stop = n-1;
 		int count = stop - start + 1;
 		if ( start >= n ) return "";

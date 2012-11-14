@@ -1,10 +1,14 @@
 package org.antlr.v4.test;
 
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 public class TestTokenTypeAssignment extends BaseTest {
 
@@ -23,8 +27,8 @@ public class TestTokenTypeAssignment extends BaseTest {
 		Grammar g = new Grammar(
 				"parser grammar t;\n" +
 				"tokens {\n" +
-				"  C;\n" +
-				"  D;" +
+				"  C,\n" +
+				"  D" +
 				"}\n"+
 				"a : A | B;\n" +
 				"b : C ;");
@@ -37,27 +41,13 @@ public class TestTokenTypeAssignment extends BaseTest {
 		LexerGrammar g = new LexerGrammar(
 				"lexer grammar t;\n" +
 				"tokens {\n" +
-				"  C;\n" +
-				"  D;" +
+				"  C,\n" +
+				"  D" +
 				"}\n"+
 				"A : 'a';\n" +
 				"C : 'c' ;");
 		String rules = "A, C";
 		String tokenNames = "A, C, D";
-		checkSymbols(g, rules, tokenNames);
-	}
-
-	@Test public void testTokensSectionWithAssignmentSection() throws Exception {
-		Grammar g = new Grammar(
-				"grammar t;\n" +
-				"tokens {\n" +
-				"  C='c';\n" +
-				"  D;" +
-				"}\n"+
-				"a : A | B;\n" +
-				"b : C ;");
-		String rules = "a, b";
-		String tokenNames = "A, B, C, D, 'c'";
 		checkSymbols(g, rules, tokenNames);
 	}
 
@@ -94,6 +84,21 @@ public class TestTokenTypeAssignment extends BaseTest {
 		assertEquals("[E, 'x']", tokens.toString());
 	}
 
+	@Test public void testPredDoesNotHideNameToLiteralMapInLexer() throws Exception {
+		// 'x' is token and char in lexer rule
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"a : 'x' X ; \n" +
+				"X: 'x' {true}?;\n"); // must match as alias even with pred
+
+		assertEquals("{'x'=1}", g.stringLiteralToTypeMap.toString());
+		assertEquals("{EOF=-1, X=1}", g.tokenNameToTypeMap.toString());
+
+		// pushed in lexer from parser
+		assertEquals("{'x'=1}", g.implicitLexer.stringLiteralToTypeMap.toString());
+		assertEquals("{EOF=-1, X=1}", g.implicitLexer.tokenNameToTypeMap.toString());
+	}
+
 	@Test public void testCombinedGrammarWithRefToLiteralButNoTokenIDRef() throws Exception {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
@@ -124,36 +129,6 @@ public class TestTokenTypeAssignment extends BaseTest {
 		Set literals = g.stringLiteralToTypeMap.keySet();
 		// must store literals how they appear in the antlr grammar
 		assertEquals("'\\n'", literals.toArray()[0]);
-	}
-
-	@Test public void testTokenInTokensSectionAndTokenRuleDef() throws Exception {
-		// this must return A not I to the parser; calling a nonfragment rule
-		// from a nonfragment rule does not set the overall token.
-		String grammar =
-			"grammar P;\n" +
-			"tokens { B='}'; }\n"+
-			"a : A B {System.out.println(_input);} ;\n"+
-			"A : 'a' ;\n" +
-			"B : '}' ;\n"+
-			"WS : (' '|'\\n') {skip();} ;";
-		String found = execParser("P.g", grammar, "PParser", "PLexer",
-								  "a", "a}", false);
-		assertEquals("a}\n", found);
-	}
-
-	@Test public void testTokenInTokensSectionAndTokenRuleDef2() throws Exception {
-		// this must return A not I to the parser; calling a nonfragment rule
-		// from a nonfragment rule does not set the overall token.
-		String grammar =
-			"grammar P;\n" +
-			"tokens { B='}'; }\n"+
-			"a : A '}' {System.out.println(_input);} ;\n"+
-			"A : 'a' ;\n" +
-			"B : '}' ;\n"+
-			"WS : (' '|'\\n') {skip();} ;";
-		String found = execParser("P.g", grammar, "PParser", "PLexer",
-								  "a", "a}", false);
-		assertEquals("a}\n", found);
 	}
 
 	protected void checkSymbols(Grammar g,

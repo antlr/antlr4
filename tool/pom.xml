@@ -37,11 +37,6 @@
             <artifactId>ST4</artifactId>
             <version>4.0.4</version>
         </dependency>
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr4-gunit</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 
     <build>

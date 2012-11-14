@@ -33,9 +33,21 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
-public class NotSetTransition extends SetTransition {
+public final class NotSetTransition extends SetTransition {
 	public NotSetTransition(@NotNull ATNState target, @Nullable IntervalSet set) {
 		super(target, set);
+	}
+
+	@Override
+	public int getSerializationType() {
+		return NOT_SET;
+	}
+
+	@Override
+	public boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+		return symbol >= minVocabSymbol
+			&& symbol <= maxVocabSymbol
+			&& !super.matches(symbol, minVocabSymbol, maxVocabSymbol);
 	}
 
 	@Override

@@ -30,17 +30,29 @@
 package org.antlr.v4.tool;
 
 import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
 import org.antlr.v4.Tool;
-import org.antlr.v4.misc.DoubleKeyMap;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.BlockSetTransformer;
 import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.runtime.misc.DoubleKeyMap;
+import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.BlockAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarASTWithOptions;
+import org.antlr.v4.tool.ast.GrammarRootAST;
+import org.antlr.v4.tool.ast.RuleAST;
+import org.antlr.v4.tool.ast.TerminalAST;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /** Handle left-recursion and block-set transforms */
 public class GrammarTransformPipeline {
@@ -65,8 +77,7 @@ public class GrammarTransformPipeline {
 	}
 
 	public void reduceBlocksToSets(GrammarAST root) {
-		org.antlr.runtime.tree.CommonTreeNodeStream nodes =
-			new org.antlr.runtime.tree.CommonTreeNodeStream(root);
+		CommonTreeNodeStream nodes = new CommonTreeNodeStream(new GrammarASTAdaptor(), root);
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
 		BlockSetTransformer transformer = new BlockSetTransformer(nodes, g);
 		transformer.setTreeAdaptor(adaptor);
@@ -103,6 +114,7 @@ public class GrammarTransformPipeline {
 
     /** Utility visitor that sets grammar ptr in each node */
 	public static void setGrammarPtr(final Grammar g, GrammarAST tree) {
+		if ( tree==null ) return;
 		// ensure each node has pointer to surrounding grammar
 		TreeVisitor v = new TreeVisitor(new GrammarASTAdaptor());
 		v.visit(tree, new TreeVisitorAction() {
@@ -257,7 +269,7 @@ public class GrammarTransformPipeline {
 	 *
 	 *  Move rules and actions to new tree, don't dup. Split AST apart.
 	 *  We'll have this Grammar share token symbols later; don't generate
-	 *  tokenVocab or tokens{} section.
+	 *  tokenVocab or tokens{} section.  Copy over named actions.
 	 *
 	 *  Side-effects: it removes children from GRAMMAR & RULES nodes
 	 *                in combined AST.  Anything cut out is dup'd before
@@ -277,7 +289,7 @@ public class GrammarTransformPipeline {
 		lexerAST.token.setInputStream(combinedAST.token.getInputStream());
 		lexerAST.addChild((GrammarAST)adaptor.create(ANTLRParser.ID, lexerName));
 
-		// MOVE OPTIONS
+		// COPY OPTIONS
 		GrammarAST optionsRoot =
 			(GrammarAST)combinedAST.getFirstChildWithType(ANTLRParser.OPTIONS);
 		if ( optionsRoot!=null ) {
@@ -286,18 +298,20 @@ public class GrammarTransformPipeline {
 			GrammarAST[] options = ((List<?>)optionsRoot.getChildren()).toArray(new GrammarAST[0]);
 			for (GrammarAST o : options) {
 				String optionName = o.getChild(0).getText();
-				if ( !Grammar.doNotCopyOptionsToLexer.contains(optionName) ) {
+				if ( Grammar.lexerOptions.contains(optionName) &&
+					 !Grammar.doNotCopyOptionsToLexer.contains(optionName) )
+				{
 					lexerOptionsRoot.addChild((Tree)adaptor.dupTree(o));
 				}
 			}
 		}
 
-		// MOVE lexer:: actions
+		// COPY all named actions, but only move those with lexer:: scope
 		List<GrammarAST> actionsWeMoved = new ArrayList<GrammarAST>();
 		for (GrammarAST e : elements) {
 			if ( e.getType()==ANTLRParser.AT ) {
+				lexerAST.addChild((Tree)adaptor.dupTree(e));
 				if ( e.getChild(0).getText().equals("lexer") ) {
-					lexerAST.addChild((Tree)adaptor.dupTree(e));
 					actionsWeMoved.add(e);
 				}
 			}
@@ -317,7 +331,14 @@ public class GrammarTransformPipeline {
 			(GrammarAST)adaptor.create(ANTLRParser.RULES, "RULES");
 		lexerAST.addChild(lexerRulesRoot);
 		List<GrammarAST> rulesWeMoved = new ArrayList<GrammarAST>();
-		GrammarASTWithOptions[] rules = ((List<?>)combinedRulesRoot.getChildren()).toArray(new GrammarASTWithOptions[0]);
+		GrammarASTWithOptions[] rules;
+		if (combinedRulesRoot.getChildCount() > 0) {
+			rules = ((List<?>)combinedRulesRoot.getChildren()).toArray(new GrammarASTWithOptions[0]);
+		}
+		else {
+			rules = new GrammarASTWithOptions[0];
+		}
+
 		if ( rules!=null ) {
 			for (GrammarASTWithOptions r : rules) {
 				String ruleName = r.getChild(0).getText();
@@ -333,15 +354,22 @@ public class GrammarTransformPipeline {
 		}
 
 		// Will track 'if' from IF : 'if' ; rules to avoid defining new token for 'if'
-		Map<String,String> litAliases =
+		List<Pair<GrammarAST,GrammarAST>> litAliases =
 			Grammar.getStringLiteralAliasesFromLexerRules(lexerAST);
 
 		Set<String> stringLiterals = combinedGrammar.getStringLiterals();
 		// add strings from combined grammar (and imported grammars) into lexer
 		// put them first as they are keywords; must resolve ambigs to these rules
 //		tool.log("grammar", "strings from parser: "+stringLiterals);
+		nextLit:
 		for (String lit : stringLiterals) {
-			if ( litAliases!=null && litAliases.containsKey(lit) ) continue; // already has rule
+			// if lexer already has a rule for literal, continue
+			if ( litAliases!=null ) {
+				for (Pair<GrammarAST,GrammarAST> pair : litAliases) {
+					GrammarAST litAST = pair.b;
+					if ( lit.equals(litAST.getText()) ) continue nextLit;
+				}
+			}
 			// create for each literal: (RULE <uniquename> (BLOCK (ALT <lit>))
 			String rname = combinedGrammar.getStringLiteralLexerRuleName(lit);
 			// can't use wizard; need special node types

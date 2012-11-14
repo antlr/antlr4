@@ -35,28 +35,28 @@ import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.chunk.ActionChunk;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.PredAST;
 
 import java.util.List;
 
 /** */
 public class SemPred extends Action {
-	public String msg; // user-specified in grammar option
+	public String msg;       // user-specified string in fail grammar option
+	public String predicate; // the predicate string with { }? stripped
 
+	/** user-specified action in fail grammar option */
 	@ModelElement public List<ActionChunk> failChunks;
 
-	public SemPred(OutputModelFactory factory, GrammarAST ast) {
+	public SemPred(OutputModelFactory factory, ActionAST ast) {
 		super(factory,ast);
-		GrammarAST failNode = ((PredAST)ast).getOption("fail");
+		GrammarAST failNode = ast.getOptionAST("fail");
 		CodeGenerator gen = factory.getGenerator();
-		if ( failNode==null ) {
-			msg = ast.getText();
-			if (msg.startsWith("{") && msg.endsWith("}?")) {
-				msg = msg.substring(1, msg.length() - 2);
-			}
-			msg = gen.target.getTargetStringLiteralFromString(msg);
-			return;
+		predicate = ast.getText();
+		if (predicate.startsWith("{") && predicate.endsWith("}?")) {
+			predicate = predicate.substring(1, predicate.length() - 2);
 		}
+		predicate = gen.target.getTargetStringLiteralFromString(predicate);
+
+		if ( failNode==null ) return;
 
 		if ( failNode instanceof ActionAST ) {
 			ActionAST failActionNode = (ActionAST)failNode;

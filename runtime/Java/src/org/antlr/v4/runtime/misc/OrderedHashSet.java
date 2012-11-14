@@ -94,6 +94,10 @@ public class OrderedHashSet<T> extends LinkedHashSet<T> {
 
 	@Override
 	public boolean equals(Object o) {
+		if (!(o instanceof OrderedHashSet<?>)) {
+			return false;
+		}
+
 //		System.out.print("equals " + this + ", " + o+" = ");
 		boolean same = elements!=null && elements.equals(((OrderedHashSet<?>)o).elements);
 //		System.out.println(same);
@@ -114,7 +118,7 @@ public class OrderedHashSet<T> extends LinkedHashSet<T> {
 
     @Override
     public Object clone() {
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings("unchecked") // safe (result of clone)
         OrderedHashSet<T> dup = (OrderedHashSet<T>)super.clone();
         dup.elements = new ArrayList<T>(this.elements);
         return dup;

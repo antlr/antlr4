@@ -156,9 +156,9 @@ ID      :   '.'? (LETTER|'_'|'.') (LETTER|DIGIT|'_'|'.')*
 fragment
 LETTER      :   'a'..'z'|'A'..'Z'|'\u0080'..'\u00FF' ;
 
-USER_OP	    :	'%' .* '%' ;
+USER_OP	    :	'%' .*? '%' ;
 
-COMMENT :   '#' .* '\n' {skip();} ;
+COMMENT :   '#' .*? '\n' {skip();} ;
 
 /** Doesn't handle '\n' correctly. it's context-sensitive */
 WS          :   (' '|'\t'|'\n'|'\r')+ {skip();} ;

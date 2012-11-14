@@ -1,6 +1,9 @@
 /** Test ANTLRParser's AST construction.  Translate to junit tests with:
  *
  *  $ java org.antlr.v4.gunit.Gen TestASTStructure.gunit
+
+ NO LONGER using gunit!!!
+
  */
 gunit TestASTStructure;
 

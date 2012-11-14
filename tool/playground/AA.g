@@ -14,7 +14,7 @@ member
 stat:   expr ';'
         {System.out.println("found expr: "+$stat.text);}
     |   ID '=' expr ';'
-        {System.out.println("found assign: "+$stat.text);}
+        {System.out.println("found assign: "+$stat.text+$ID.text);}
     ;
 
 expr:   INT 
@@ -23,4 +23,4 @@ expr:   INT
 
 ID  :   ('a'..'z'|'A'..'Z')+ ;
 INT :   '0'..'9'+ ;
-WS  :   (' '|'\t'|'\n'|'\r')+ {$channel=HIDDEN;} ;
+WS  :   (' '|'\t'|'\n'|'\r')+ {setChannel(HIDDEN);} ;

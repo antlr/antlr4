@@ -106,7 +106,7 @@ alternative returns [ATNFactory.Handle p]
 
 lexerCommands returns [ATNFactory.Handle p]
 @init {StringBuilder cmds = new StringBuilder();}
-    :   (c=lexerCommand {cmds.append($c.cmd+" ");})+
+    :   (c=lexerCommand {cmds.append($c.cmd).append(' ');})+
         {
         $p = factory.action(cmds.toString());
         }

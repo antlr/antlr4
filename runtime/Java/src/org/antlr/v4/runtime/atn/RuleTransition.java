@@ -32,7 +32,7 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.misc.NotNull;
 
 /** */
-public class RuleTransition extends Transition {
+public final class RuleTransition extends Transition {
 	/** Ptr to the rule definition object for this rule ref */
 	public final int ruleIndex;     // no Rule object at runtime
 
@@ -50,5 +50,15 @@ public class RuleTransition extends Transition {
 	}
 
 	@Override
+	public int getSerializationType() {
+		return RULE;
+	}
+
+	@Override
 	public boolean isEpsilon() { return true; }
+
+	@Override
+	public boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+		return false;
+	}
 }

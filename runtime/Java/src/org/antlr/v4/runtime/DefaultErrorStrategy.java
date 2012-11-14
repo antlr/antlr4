@@ -29,8 +29,14 @@
 
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.BlockStartState;
+import org.antlr.v4.runtime.atn.PlusBlockStartState;
+import org.antlr.v4.runtime.atn.PlusLoopbackState;
+import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.StarLoopEntryState;
+import org.antlr.v4.runtime.atn.StarLoopbackState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 
@@ -50,7 +56,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	/** The index into the input stream where the last error occurred.
 	 * 	This is used to prevent infinite loops where an error is found
 	 *  but no token is consumed during recovery...another error is found,
-	 *  ad naseum.  This is a failsafe mechanism to guarantee that at least
+	 *  ad nauseum.  This is a failsafe mechanism to guarantee that at least
 	 *  one token/tree node is consumed for two errors.
 	 */
 	protected int lastErrorIndex = -1;
@@ -104,7 +110,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		else {
 			System.err.println("unknown recognition error type: "+e.getClass().getName());
 			if ( recognizer!=null ) {
-				recognizer.notifyErrorListeners((Token) e.offendingToken, e.getMessage(), e);
+				recognizer.notifyErrorListeners(e.getOffendingToken(), e.getMessage(), e);
 			}
 		}
 	}
@@ -120,7 +126,8 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 //						   lastErrorIndex+
 //						   ", states="+lastErrorStates);
 		if ( lastErrorIndex==recognizer.getInputStream().index() &&
-		lastErrorStates.contains(recognizer._ctx.s) ) {
+			lastErrorStates != null &&
+			lastErrorStates.contains(recognizer._ctx.s) ) {
 			// uh oh, another error at same token index and previously-visited
 			// state in ATN; must be a case where LT(1) is in the recovery
 			// token set so nothing got consumed. Consume a single token
@@ -159,7 +166,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		// If already recovering, don't try to sync
         if ( errorRecoveryMode ) return;
 
-        SymbolStream<Token> tokens = recognizer.getInputStream();
+        TokenStream tokens = recognizer.getInputStream();
         int la = tokens.LA(1);
 
         // try cheaper subset first; might get lucky. seems to shave a wee bit off
@@ -195,26 +202,26 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 										  NoViableAltException e)
 	throws RecognitionException
 	{
-		SymbolStream<Token> tokens = recognizer.getInputStream();
+		TokenStream tokens = recognizer.getInputStream();
 		String input;
 		if (tokens instanceof TokenStream) {
-			if ( e.startToken.getType()==Token.EOF ) input = "<EOF>";
-			else input = ((TokenStream)tokens).toString(e.startToken, e.offendingToken);
+			if ( e.getStartToken().getType()==Token.EOF ) input = "<EOF>";
+			else input = tokens.getText(e.getStartToken(), e.getOffendingToken());
 		}
 		else {
 			input = "<unknown input>";
 		}
 		String msg = "no viable alternative at input "+escapeWSAndQuote(input);
-		recognizer.notifyErrorListeners((Token) e.offendingToken, msg, e);
+		recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);
 	}
 
 	public void reportInputMismatch(Parser recognizer,
 									InputMismatchException e)
 		throws RecognitionException
 	{
-		String msg = "mismatched input "+getTokenErrorDisplay((Token)e.offendingToken)+
+		String msg = "mismatched input "+getTokenErrorDisplay(e.getOffendingToken())+
 		" expecting "+e.getExpectedTokens().toString(recognizer.getTokenNames());
-		recognizer.notifyErrorListeners((Token) e.offendingToken, msg, e);
+		recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);
 	}
 
 	public void reportFailedPredicate(Parser recognizer,
@@ -222,8 +229,8 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		throws RecognitionException
 	{
 		String ruleName = recognizer.getRuleNames()[recognizer._ctx.getRuleIndex()];
-		String msg = "rule "+ruleName+" "+e.msg;
-		recognizer.notifyErrorListeners((Token) e.offendingToken, msg, e);
+		String msg = "rule "+ruleName+" "+e.getMessage();
+		recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);
 	}
 
 	public void reportUnwantedToken(Parser recognizer) {
@@ -311,7 +318,8 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		// is free to conjure up and insert the missing token
 		ATNState currentState = recognizer.getInterpreter().atn.states.get(recognizer._ctx.s);
 		ATNState next = currentState.transition(0).target;
-		IntervalSet expectingAtLL2 = recognizer.getInterpreter().atn.nextTokens(next, recognizer._ctx);
+		ATN atn = recognizer.getInterpreter().atn;
+		IntervalSet expectingAtLL2 = atn.nextTokens(next, recognizer._ctx);
 //		System.out.println("LT(2) set="+expectingAtLL2.toString(recognizer.getTokenNames()));
 		if ( expectingAtLL2.contains(currentSymbolType) ) {
 			reportMissingToken(recognizer);
@@ -367,8 +375,9 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		if ( expectedTokenType== Token.EOF ) tokenText = "<missing EOF>";
 		else tokenText = "<missing "+recognizer.getTokenNames()[expectedTokenType]+">";
 		Token current = currentSymbol;
-		if ( current.getType() == Token.EOF ) {
-			current = recognizer.getInputStream().LT(-1);
+		Token lookback = recognizer.getInputStream().LT(-1);
+		if ( current.getType() == Token.EOF && lookback!=null ) {
+			current = lookback;
 		}
 		return
 			_factory.create(current.getTokenSource(), expectedTokenType, tokenText,
@@ -404,21 +413,11 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	}
 
 	protected String getSymbolText(@NotNull Token symbol) {
-		if (symbol instanceof Token) {
-			return ((Token)symbol).getText();
-		}
-		else {
-			return symbol.toString();
-		}
+		return symbol.getText();
 	}
 
 	protected int getSymbolType(@NotNull Token symbol) {
-		if (symbol instanceof Token) {
-			return ((Token)symbol).getType();
-		}
-		else {
-			return Token.INVALID_TYPE;
-		}
+		return symbol.getType();
 	}
 
 	protected String escapeWSAndQuote(String s) {
@@ -548,26 +547,5 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
             recognizer.consume();
             ttype = recognizer.getInputStream().LA(1);
         }
-    }
-
-    @Override
-    public void reportAmbiguity(@NotNull Parser recognizer,
-								DFA dfa, int startIndex, int stopIndex, @NotNull IntervalSet ambigAlts,
-								@NotNull ATNConfigSet configs)
-    {
-    }
-
-	@Override
-	public void reportAttemptingFullContext(@NotNull Parser recognizer,
-											@NotNull DFA dfa,
-											int startIndex, int stopIndex,
-											@NotNull ATNConfigSet configs)
-	{
-	}
-
-	@Override
-    public void reportContextSensitivity(@NotNull Parser recognizer, @NotNull DFA dfa,
-                                         int startIndex, int stopIndex, @NotNull ATNConfigSet configs)
-    {
     }
 }

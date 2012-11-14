@@ -31,6 +31,7 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.QuantifierAST;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ import java.util.List;
 public class Loop extends Choice {
 	public int blockStartStateNumber;
 	public int loopBackStateNumber;
-	public int exitAlt;
+	public final int exitAlt;
 
 	@ModelElement public List<SrcOp> iteration;
 
@@ -47,6 +48,8 @@ public class Loop extends Choice {
 				List<CodeBlockForAlt> alts)
 	{
 		super(factory, blkOrEbnfRootAST, alts);
+		boolean nongreedy = (blkOrEbnfRootAST instanceof QuantifierAST) && !((QuantifierAST)blkOrEbnfRootAST).isGreedy();
+		exitAlt = nongreedy ? 1 : alts.size() + 1;
 	}
 
 	public void addIterationOp(SrcOp op) {

@@ -30,9 +30,6 @@
 package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.Interval;
 
 /** An interface to access the tree of RuleContext objects created
  *  during a parse that makes the data structure look like a simple parse tree.
@@ -42,90 +39,6 @@ import org.antlr.v4.runtime.misc.Interval;
  *  The payload is either a token or a context object.
  */
 public interface ParseTree extends SyntaxTree {
-	public interface RuleNode extends ParseTree {
-		RuleContext getRuleContext();
-	}
-
-	public interface TerminalNode<Symbol extends Token> extends ParseTree {
-		Symbol getSymbol();
-	}
-
-	public static class TerminalNodeImpl<Symbol extends Token> implements TerminalNode<Symbol> {
-		public Symbol symbol;
-		public ParseTree parent;
-		/** Which ATN node matched this token? */
-		public int s;
-		public TerminalNodeImpl(Symbol symbol) {	this.symbol = symbol;	}
-
-		@Override
-		public ParseTree getChild(int i) {return null;}
-
-		@Override
-		public Symbol getSymbol() {return symbol;}
-
-		@Override
-		public ParseTree getParent() { return parent; }
-
-		@Override
-		public Symbol getPayload() { return symbol; }
-
-		@Override
-		public Interval getSourceInterval() {
-			if ( symbol ==null ) return Interval.INVALID;
-
-			return new Interval(symbol.getStartIndex(), symbol.getStopIndex());
-		}
-
-		@Override
-		public int getChildCount() { return 0; }
-
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			return visitor.visitTerminal(this);
-		}
-
-		@Override
-		public String toStringTree(Parser parser) {
-			return toString();
-		}
-
-		public boolean isErrorNode() { return this instanceof ErrorNode; }
-
-		@Override
-		public String toString() {
-				if ( symbol.getType() == Token.EOF ) return "<EOF>";
-				return symbol.getText();
-		}
-
-		@Override
-		public String toStringTree() {
-			return toString();
-		}
-	}
-
-	public interface ErrorNode<Symbol extends Token> extends TerminalNode<Symbol> {
-	}
-
-	/** Represents a token that was consumed during resynchronization
-	 *  rather than during a valid match operation. For example,
-	 *  we will create this kind of a node during single token insertion
-	 *  and deletion as well as during "consume until error recovery set"
-	 *  upon no viable alternative exceptions.
-	 */
-	public static class ErrorNodeImpl<Symbol extends Token> extends
-		TerminalNodeImpl<Symbol>
-		implements ErrorNode<Symbol>
-	{
-		public ErrorNodeImpl(Symbol token) {
-			super(token);
-		}
-
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			return visitor.visitErrorNode(this);
-		}
-	}
-
 	// the following methods narrow the return type; they are not additional methods
 	@Override
 	ParseTree getParent();
@@ -134,6 +47,12 @@ public interface ParseTree extends SyntaxTree {
 
 	/** The ParseTreeVisitor needs a double dispatch method */
 	public <T> T accept(ParseTreeVisitor<? extends T> visitor);
+
+	/** Return the combined text of all leaf nodes. Does not get any
+	 *  off-channel tokens (if any) so won't return whitespace and
+	 *  comments if they are sent to parser on hidden channel.
+	 */
+	public String getText();
 
 	/** Specialize toStringTree so that it can print out more information
 	 * 	based upon the parser.

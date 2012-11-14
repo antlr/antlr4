@@ -28,100 +28,206 @@
 
 package org.antlr.v4.test;
 
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.dfa.*;
+import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.BailErrorStrategy;
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
+import org.antlr.v4.runtime.DiagnosticErrorListener;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenSource;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionMode;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.net.*;
-import java.util.*;
-import java.util.logging.*;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 public class TestPerformance extends BaseTest {
-    /** Parse all java files under this package within the JDK_SOURCE_ROOT. */
+    /**
+     * Parse all java files under this package within the JDK_SOURCE_ROOT
+     * (environment variable or property defined on the Java command line).
+     */
     private static final String TOP_PACKAGE = "java.lang";
-    /** True to load java files from sub-packages of {@link #TOP_PACKAGE}. */
+    /**
+     * {@code true} to load java files from sub-packages of
+     * {@link #TOP_PACKAGE}.
+     */
     private static final boolean RECURSIVE = true;
 
     /**
-     *  True to use the Java grammar with expressions in the v4 left-recursive syntax (Java-LR.g). False to use
-     *  the standard grammar (Java.g). In either case, the grammar is renamed in the temporary directory to Java.g
-     *  before compiling.
+     * {@code true} to use the Java grammar with expressions in the v4
+     * left-recursive syntax (Java-LR.g4). {@code false} to use the standard
+     * grammar (Java.g4). In either case, the grammar is renamed in the
+     * temporary directory to Java.g4 before compiling.
      */
     private static final boolean USE_LR_GRAMMAR = true;
     /**
-     *  True to specify the -Xforce-atn option when generating the grammar, forcing all decisions in JavaParser to
-     *  be handled by {@link ParserATNSimulator#adaptivePredict}.
+     * {@code true} to specify the {@code -Xforce-atn} option when generating
+     * the grammar, forcing all decisions in {@code JavaParser} to be handled by
+     * {@link ParserATNSimulator#adaptivePredict}.
      */
     private static final boolean FORCE_ATN = false;
     /**
-     *  True to specify the -atn option when generating the grammar. This will cause ANTLR
-     *  to export the ATN for each decision as a DOT (GraphViz) file.
+     * {@code true} to specify the {@code -atn} option when generating the
+     * grammar. This will cause ANTLR to export the ATN for each decision as a
+     * DOT (GraphViz) file.
      */
     private static final boolean EXPORT_ATN_GRAPHS = true;
     /**
-     *  True to delete temporary (generated and compiled) files when the test completes.
+     * {@code true} to delete temporary (generated and compiled) files when the
+     * test completes.
      */
     private static final boolean DELETE_TEMP_FILES = true;
 
     private static final boolean PAUSE_FOR_HEAP_DUMP = false;
 
-    /** Parse each file with JavaParser.compilationUnit */
+    /**
+     * Parse each file with {@code JavaParser.compilationUnit}.
+     */
     private static final boolean RUN_PARSER = true;
-    /** True to use {@link BailErrorStrategy}, False to use {@link DefaultErrorStrategy} */
+    /**
+     * {@code true} to use {@link BailErrorStrategy}, {@code false} to use
+     * {@link DefaultErrorStrategy}.
+     */
     private static final boolean BAIL_ON_ERROR = true;
-    /** This value is passed to {@link Parser#setBuildParseTree}. */
+	/**
+	 * {@code true} to compute a checksum for verifying consistency across
+	 * optimizations and multiple passes.
+	 */
+	private static final boolean COMPUTE_CHECKSUM = true;
+    /**
+     * This value is passed to {@link Parser#setBuildParseTree}.
+     */
     private static final boolean BUILD_PARSE_TREES = false;
     /**
-     *  Use ParseTreeWalker.DEFAULT.walk with the BlankJavaParserListener to show parse tree walking overhead.
-     *  If {@link #BUILD_PARSE_TREES} is false, the listener will instead be called during the parsing process via
-     *  {@link Parser#addParseListener}.
+     * Use
+     * {@link ParseTreeWalker#DEFAULT}{@code .}{@link ParseTreeWalker#walk walk}
+     * with the {@code BlankJavaParserListener} to show parse tree walking
+     * overhead. If {@link #BUILD_PARSE_TREES} is {@code false}, the listener
+     * will instead be called during the parsing process via
+     * {@link Parser#addParseListener}.
      */
     private static final boolean BLANK_LISTENER = false;
 
     private static final boolean SHOW_DFA_STATE_STATS = true;
 
+	private static final PredictionMode PREDICTION_MODE = PredictionMode.LL;
+
+	private static final boolean TWO_STAGE_PARSING = true;
+
     private static final boolean SHOW_CONFIG_STATS = false;
 
+	private static final boolean REPORT_SYNTAX_ERRORS = true;
+	private static final boolean REPORT_AMBIGUITIES = false;
+	private static final boolean REPORT_FULL_CONTEXT = false;
+	private static final boolean REPORT_CONTEXT_SENSITIVITY = REPORT_FULL_CONTEXT;
+
     /**
-     *  If true, a single JavaLexer will be used, and {@link Lexer#setInputStream} will be called to initialize it
-     *  for each source file. In this mode, the cached DFA will be persisted throughout the lexing process.
+     * If {@code true}, a single {@code JavaLexer} will be used, and
+     * {@link Lexer#setInputStream} will be called to initialize it for each
+     * source file. Otherwise, a new instance will be created for each file.
      */
     private static final boolean REUSE_LEXER = true;
+	/**
+	 * If {@code true}, a single DFA will be used for lexing which is shared
+	 * across all threads and files. Otherwise, each file will be lexed with its
+	 * own DFA which is accomplished by creating one ATN instance per thread and
+	 * clearing its DFA cache before lexing each file.
+	 */
+	private static final boolean REUSE_LEXER_DFA = true;
     /**
-     *  If true, a single JavaParser will be used, and {@link Parser#setInputStream} will be called to initialize it
-     *  for each source file. In this mode, the cached DFA will be persisted throughout the parsing process.
+     * If {@code true}, a single {@code JavaParser} will be used, and
+     * {@link Parser#setInputStream} will be called to initialize it for each
+     * source file. Otherwise, a new instance will be created for each file.
      */
     private static final boolean REUSE_PARSER = true;
+	/**
+	 * If {@code true}, a single DFA will be used for parsing which is shared
+	 * across all threads and files. Otherwise, each file will be parsed with
+	 * its own DFA which is accomplished by creating one ATN instance per thread
+	 * and clearing its DFA cache before parsing each file.
+	 */
+	private static final boolean REUSE_PARSER_DFA = true;
     /**
-     * If true, the shared lexer and parser are reset after each pass. If false, all passes after the first will
-     * be fully "warmed up", which makes them faster and can compare them to the first warm-up pass, but it will
-     * not distinguish bytecode load/JIT time from warm-up time during the first pass.
+     * If {@code true}, the shared lexer and parser are reset after each pass.
+     * If {@code false}, all passes after the first will be fully "warmed up",
+     * which makes them faster and can compare them to the first warm-up pass,
+     * but it will not distinguish bytecode load/JIT time from warm-up time
+     * during the first pass.
      */
     private static final boolean CLEAR_DFA = false;
-
-    /** Total number of passes to make over the source */
+    /**
+     * Total number of passes to make over the source.
+     */
     private static final int PASSES = 4;
 
-    private static Lexer sharedLexer;
-    private static Parser sharedParser;
-    @SuppressWarnings({"FieldCanBeLocal"})
-    private static ParseTreeListener<Token> sharedListener;
+	/**
+	 * Number of parser threads to use.
+	 */
+	private static final int NUMBER_OF_THREADS = 1;
 
-    private int tokenCount;
+    private static final Lexer[] sharedLexers = new Lexer[NUMBER_OF_THREADS];
+
+    private static final Parser[] sharedParsers = new Parser[NUMBER_OF_THREADS];
+
+    private static final ParseTreeListener[] sharedListeners = new ParseTreeListener[NUMBER_OF_THREADS];
+
+    private final AtomicInteger tokenCount = new AtomicInteger();
     private int currentPass;
 
     @Test
-    //@Ignore
-    public void compileJdk() throws IOException {
+    //@org.junit.Ignore
+    public void compileJdk() throws IOException, InterruptedException {
         String jdkSourceRoot = getSourceRoot("JDK");
 		assertTrue("The JDK_SOURCE_ROOT environment variable must be set for performance testing.", jdkSourceRoot != null && !jdkSourceRoot.isEmpty());
 
@@ -148,8 +254,16 @@ public class TestPerformance extends BaseTest {
         for (int i = 0; i < PASSES - 1; i++) {
             currentPass = i + 1;
             if (CLEAR_DFA) {
-                sharedLexer = null;
-                sharedParser = null;
+				if (sharedLexers.length > 0) {
+					Arrays.fill(sharedLexers[0].getInterpreter().decisionToDFA, null);
+				}
+
+				if (sharedParsers.length > 0) {
+					Arrays.fill(sharedParsers[0].getInterpreter().decisionToDFA, null);
+				}
+
+				Arrays.fill(sharedLexers, null);
+				Arrays.fill(sharedParsers, null);
             }
 
             parse2(factory, sources);
@@ -218,7 +332,7 @@ public class TestPerformance extends BaseTest {
      *  This method is separate from {@link #parse2} so the first pass can be distinguished when analyzing
      *  profiler results.
      */
-    protected void parse1(ParserFactory factory, Collection<CharStream> sources) {
+    protected void parse1(ParserFactory factory, Collection<CharStream> sources) throws InterruptedException {
         System.gc();
         parseSources(factory, sources);
     }
@@ -227,7 +341,7 @@ public class TestPerformance extends BaseTest {
      *  This method is separate from {@link #parse1} so the first pass can be distinguished when analyzing
      *  profiler results.
      */
-    protected void parse2(ParserFactory factory, Collection<CharStream> sources) {
+    protected void parse2(ParserFactory factory, Collection<CharStream> sources) throws InterruptedException {
         System.gc();
         parseSources(factory, sources);
     }
@@ -267,55 +381,91 @@ public class TestPerformance extends BaseTest {
 
     int configOutputSize = 0;
 
-    protected void parseSources(ParserFactory factory, Collection<CharStream> sources) {
+    @SuppressWarnings("unused")
+	protected void parseSources(final ParserFactory factory, Collection<CharStream> sources) throws InterruptedException {
         long startTime = System.currentTimeMillis();
-        tokenCount = 0;
+        tokenCount.set(0);
         int inputSize = 0;
 
-        for (CharStream input : sources) {
+		Collection<Future<Integer>> results = new ArrayList<Future<Integer>>();
+		ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS, new NumberedThreadFactory());
+        for (final CharStream input : sources) {
             input.seek(0);
             inputSize += input.size();
-            // this incurred a great deal of overhead and was causing significant variations in performance results.
-            //System.out.format("Parsing file %s\n", input.getSourceName());
-            try {
-                factory.parseFile(input);
-            } catch (IllegalStateException ex) {
-                ex.printStackTrace(System.out);
-            }
+			Future<Integer> futureChecksum = executorService.submit(new Callable<Integer>() {
+				@Override
+				public Integer call() {
+					// this incurred a great deal of overhead and was causing significant variations in performance results.
+					//System.out.format("Parsing file %s\n", input.getSourceName());
+					try {
+						return factory.parseFile(input, ((NumberedThread)Thread.currentThread()).getThreadNumber());
+					} catch (IllegalStateException ex) {
+						ex.printStackTrace(System.err);
+					} catch (Throwable t) {
+						t.printStackTrace(System.err);
+					}
+
+					return -1;
+				}
+			});
+
+			results.add(futureChecksum);
         }
 
-        System.out.format("Total parse time for %d files (%d KB, %d tokens): %dms\n",
-                          sources.size(),
-                          inputSize / 1024,
-                          tokenCount,
-                          System.currentTimeMillis() - startTime);
-
-		final LexerATNSimulator lexerInterpreter = sharedLexer.getInterpreter();
-		final DFA[] modeToDFA = lexerInterpreter.dfa;
-		if (SHOW_DFA_STATE_STATS) {
-			int states = 0;
-			int configs = 0;
-			Set<ATNConfig> uniqueConfigs = new HashSet<ATNConfig>();
-
-			for (int i = 0; i < modeToDFA.length; i++) {
-				DFA dfa = modeToDFA[i];
-				if (dfa == null || dfa.states == null) {
-					continue;
-				}
-
-				states += dfa.states.size();
-				for (DFAState state : dfa.states.values()) {
-					configs += state.configset.size();
-					uniqueConfigs.addAll(state.configset);
-				}
+		Checksum checksum = new CRC32();
+		for (Future<Integer> future : results) {
+			int value = 0;
+			try {
+				value = future.get();
+			} catch (ExecutionException ex) {
+				Logger.getLogger(TestPerformance.class.getName()).log(Level.SEVERE, null, ex);
 			}
 
-			System.out.format("There are %d lexer DFAState instances, %d configs (%d unique).\n", states, configs, uniqueConfigs.size());
+			if (COMPUTE_CHECKSUM) {
+				updateChecksum(checksum, value);
+			}
 		}
 
-        if (RUN_PARSER) {
+		executorService.shutdown();
+		executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+
+        System.out.format("Total parse time for %d files (%d KB, %d tokens, checksum 0x%8X): %dms\n",
+                          sources.size(),
+                          inputSize / 1024,
+                          tokenCount.get(),
+						  COMPUTE_CHECKSUM ? checksum.getValue() : 0,
+                          System.currentTimeMillis() - startTime);
+
+		if (sharedLexers.length > 0) {
+			Lexer lexer = sharedLexers[0];
+			final LexerATNSimulator lexerInterpreter = lexer.getInterpreter();
+			final DFA[] modeToDFA = lexerInterpreter.decisionToDFA;
+			if (SHOW_DFA_STATE_STATS) {
+				int states = 0;
+				int configs = 0;
+				Set<ATNConfig> uniqueConfigs = new HashSet<ATNConfig>();
+
+				for (int i = 0; i < modeToDFA.length; i++) {
+					DFA dfa = modeToDFA[i];
+					if (dfa == null || dfa.states == null) {
+						continue;
+					}
+
+					states += dfa.states.size();
+					for (DFAState state : dfa.states.values()) {
+						configs += state.configs.size();
+						uniqueConfigs.addAll(state.configs);
+					}
+				}
+
+				System.out.format("There are %d lexer DFAState instances, %d configs (%d unique).\n", states, configs, uniqueConfigs.size());
+			}
+		}
+
+		if (RUN_PARSER && sharedParsers.length > 0) {
+			Parser parser = sharedParsers[0];
             // make sure the individual DFAState objects actually have unique ATNConfig arrays
-            final ParserATNSimulator<?> interpreter = sharedParser.getInterpreter();
+            final ParserATNSimulator interpreter = parser.getInterpreter();
             final DFA[] decisionToDFA = interpreter.decisionToDFA;
 
             if (SHOW_DFA_STATE_STATS) {
@@ -331,8 +481,8 @@ public class TestPerformance extends BaseTest {
 
                     states += dfa.states.size();
 					for (DFAState state : dfa.states.values()) {
-						configs += state.configset.size();
-						uniqueConfigs.addAll(state.configset);
+						configs += state.configs.size();
+						uniqueConfigs.addAll(state.configs);
 					}
                 }
 
@@ -353,13 +503,13 @@ public class TestPerformance extends BaseTest {
 
                 if (SHOW_CONFIG_STATS) {
                     for (DFAState state : dfa.states.keySet()) {
-                        if (state.configset.size() >= contextsInDFAState.length) {
-                            contextsInDFAState = Arrays.copyOf(contextsInDFAState, state.configset.size() + 1);
+                        if (state.configs.size() >= contextsInDFAState.length) {
+                            contextsInDFAState = Arrays.copyOf(contextsInDFAState, state.configs.size() + 1);
                         }
 
                         if (state.isAcceptState) {
                             boolean hasGlobal = false;
-                            for (ATNConfig config : state.configset) {
+                            for (ATNConfig config : state.configs) {
                                 if (config.reachesIntoOuterContext > 0) {
                                     globalConfigCount++;
                                     hasGlobal = true;
@@ -375,7 +525,7 @@ public class TestPerformance extends BaseTest {
                             }
                         }
 
-                        contextsInDFAState[state.configset.size()]++;
+                        contextsInDFAState[state.configs.size()]++;
                     }
                 }
             }
@@ -395,19 +545,20 @@ public class TestPerformance extends BaseTest {
     }
 
     protected void compileJavaParser(boolean leftRecursive) throws IOException {
-        String grammarFileName = "Java.g";
-        String sourceName = leftRecursive ? "Java-LR.g" : "Java.g";
+        String grammarFileName = "Java.g4";
+        String sourceName = leftRecursive ? "Java-LR.g4" : "Java.g4";
         String body = load(sourceName, null);
-        @SuppressWarnings({"ConstantConditions"})
         List<String> extraOptions = new ArrayList<String>();
+		extraOptions.add("-Werror");
         if (FORCE_ATN) {
             extraOptions.add("-Xforce-atn");
         }
         if (EXPORT_ATN_GRAPHS) {
             extraOptions.add("-atn");
         }
+		extraOptions.add("-visitor");
         String[] extraOptionsArray = extraOptions.toArray(new String[extraOptions.size()]);
-        boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", extraOptionsArray);
+        boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", true, extraOptionsArray);
         assertTrue(success);
     }
 
@@ -438,14 +589,33 @@ public class TestPerformance extends BaseTest {
         }
     }
 
+	private static void updateChecksum(Checksum checksum, int value) {
+		checksum.update((value) & 0xFF);
+		checksum.update((value >>> 8) & 0xFF);
+		checksum.update((value >>> 16) & 0xFF);
+		checksum.update((value >>> 24) & 0xFF);
+	}
+
+	private static void updateChecksum(Checksum checksum, Token token) {
+		if (token == null) {
+			checksum.update(0);
+			return;
+		}
+
+		updateChecksum(checksum, token.getStartIndex());
+		updateChecksum(checksum, token.getStopIndex());
+		updateChecksum(checksum, token.getLine());
+		updateChecksum(checksum, token.getCharPositionInLine());
+		updateChecksum(checksum, token.getType());
+		updateChecksum(checksum, token.getChannel());
+	}
+
     protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, final String entryPoint) {
         try {
             ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
             final Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
             final Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
-            @SuppressWarnings({"unchecked"})
-            final Class<? extends ParseTreeListener<Token>> listenerClass = (Class<? extends ParseTreeListener<Token>>)loader.loadClass(listenerName);
-            TestPerformance.sharedListener = listenerClass.newInstance();
+            final Class<? extends ParseTreeListener> listenerClass = loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
 
             final Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
             final Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
@@ -455,50 +625,144 @@ public class TestPerformance extends BaseTest {
             parserCtor.newInstance(new CommonTokenStream(tokenSource));
 
             return new ParserFactory() {
-                @SuppressWarnings({"PointlessBooleanExpression"})
-                @Override
-                public void parseFile(CharStream input) {
+				@Override
+                public int parseFile(CharStream input, int thread) {
+					final Checksum checksum = new CRC32();
+
+					assert thread >= 0 && thread < NUMBER_OF_THREADS;
+
                     try {
-                        if (REUSE_LEXER && sharedLexer != null) {
-                            sharedLexer.setInputStream(input);
+						if (sharedListeners[thread] == null) {
+							sharedListeners[thread] = listenerClass.newInstance();
+						}
+
+                        if (REUSE_LEXER && sharedLexers[thread] != null) {
+                            sharedLexers[thread].setInputStream(input);
                         } else {
-                            sharedLexer = lexerCtor.newInstance(input);
+                            sharedLexers[thread] = lexerCtor.newInstance(input);
+							if (!REUSE_LEXER_DFA) {
+								Field decisionToDFAField = LexerATNSimulator.class.getDeclaredField("decisionToDFA");
+								decisionToDFAField.setAccessible(true);
+								decisionToDFAField.set(sharedLexers[thread].getInterpreter(), sharedLexers[thread].getInterpreter().decisionToDFA.clone());
+							}
                         }
 
-                        CommonTokenStream tokens = new CommonTokenStream(sharedLexer);
+						if (!REUSE_LEXER_DFA) {
+							Arrays.fill(sharedLexers[thread].getInterpreter().decisionToDFA, null);
+						}
+
+                        CommonTokenStream tokens = new CommonTokenStream(sharedLexers[thread]);
                         tokens.fill();
-                        tokenCount += tokens.size();
+                        tokenCount.addAndGet(tokens.size());
+
+						if (COMPUTE_CHECKSUM) {
+							for (Token token : tokens.getTokens()) {
+								updateChecksum(checksum, token);
+							}
+						}
 
                         if (!RUN_PARSER) {
-                            return;
+                            return (int)checksum.getValue();
                         }
 
-                        if (REUSE_PARSER && sharedParser != null) {
-                            sharedParser.setInputStream(tokens);
+                        if (REUSE_PARSER && sharedParsers[thread] != null) {
+                            sharedParsers[thread].setInputStream(tokens);
                         } else {
-                            sharedParser = parserCtor.newInstance(tokens);
-							sharedParser.addErrorListener(DescriptiveErrorListener.INSTANCE);
-                            sharedParser.setBuildParseTree(BUILD_PARSE_TREES);
-                            if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
-								// TJP commented out for now; changed interface
-//                                sharedParser.addParseListener(sharedListener);
-                            }
-                            if (BAIL_ON_ERROR) {
-                                sharedParser.setErrorHandler(new BailErrorStrategy());
-                            }
+                            sharedParsers[thread] = parserCtor.newInstance(tokens);
                         }
+
+						sharedParsers[thread].removeErrorListeners();
+						if (!TWO_STAGE_PARSING) {
+							sharedParsers[thread].addErrorListener(DescriptiveErrorListener.INSTANCE);
+							sharedParsers[thread].addErrorListener(new SummarizingDiagnosticErrorListener());
+						}
+
+						if (!REUSE_PARSER_DFA) {
+							Field decisionToDFAField = ParserATNSimulator.class.getDeclaredField("decisionToDFA");
+							decisionToDFAField.setAccessible(true);
+							decisionToDFAField.set(sharedParsers[thread].getInterpreter(), sharedParsers[thread].getInterpreter().decisionToDFA.clone());
+						}
+
+						if (!REUSE_PARSER_DFA) {
+							Arrays.fill(sharedParsers[thread].getInterpreter().decisionToDFA, null);
+						}
+
+						sharedParsers[thread].getInterpreter().setPredictionMode(TWO_STAGE_PARSING ? PredictionMode.SLL : PREDICTION_MODE);
+						sharedParsers[thread].setBuildParseTree(BUILD_PARSE_TREES);
+						if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
+							sharedParsers[thread].addParseListener(sharedListeners[thread]);
+						}
+						if (BAIL_ON_ERROR || TWO_STAGE_PARSING) {
+							sharedParsers[thread].setErrorHandler(new BailErrorStrategy());
+						}
 
                         Method parseMethod = parserClass.getMethod(entryPoint);
-                        Object parseResult = parseMethod.invoke(sharedParser);
+                        Object parseResult;
+
+						ParseTreeListener checksumParserListener = null;
+
+						try {
+							if (COMPUTE_CHECKSUM) {
+								checksumParserListener = new ChecksumParseTreeListener(checksum);
+								sharedParsers[thread].addParseListener(checksumParserListener);
+							}
+							parseResult = parseMethod.invoke(sharedParsers[thread]);
+						} catch (InvocationTargetException ex) {
+							if (!TWO_STAGE_PARSING) {
+								throw ex;
+							}
+
+							String sourceName = tokens.getSourceName();
+							sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName+": " : "";
+							System.err.println(sourceName+"Forced to retry with full context.");
+
+							if (!(ex.getCause() instanceof ParseCancellationException)) {
+								throw ex;
+							}
+
+							tokens.reset();
+							if (REUSE_PARSER && sharedParsers[thread] != null) {
+								sharedParsers[thread].setInputStream(tokens);
+							} else {
+								Parser parser = parserCtor.newInstance(tokens);
+								sharedParsers[thread] = parser;
+							}
+
+							sharedParsers[thread].removeErrorListeners();
+							sharedParsers[thread].addErrorListener(DescriptiveErrorListener.INSTANCE);
+							sharedParsers[thread].addErrorListener(new SummarizingDiagnosticErrorListener());
+							sharedParsers[thread].getInterpreter().setPredictionMode(PredictionMode.LL);
+							sharedParsers[thread].setBuildParseTree(BUILD_PARSE_TREES);
+							if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
+								sharedParsers[thread].addParseListener(sharedListeners[thread]);
+							}
+							if (BAIL_ON_ERROR) {
+								sharedParsers[thread].setErrorHandler(new BailErrorStrategy());
+							}
+
+							parseResult = parseMethod.invoke(sharedParsers[thread]);
+						}
+						finally {
+							if (checksumParserListener != null) {
+								sharedParsers[thread].removeParseListener(checksumParserListener);
+							}
+						}
+
                         Assert.assertTrue(parseResult instanceof ParseTree);
 
                         if (BUILD_PARSE_TREES && BLANK_LISTENER) {
-                            ParseTreeWalker.DEFAULT.walk(sharedListener, (ParseTree)parseResult);
+                            ParseTreeWalker.DEFAULT.walk(sharedListeners[thread], (ParseTree)parseResult);
                         }
                     } catch (Exception e) {
+						if (!REPORT_SYNTAX_ERRORS && e instanceof ParseCancellationException) {
+							return (int)checksum.getValue();
+						}
+
                         e.printStackTrace(System.out);
                         throw new IllegalStateException(e);
                     }
+
+					return (int)checksum.getValue();
                 }
             };
         } catch (Exception e) {
@@ -510,17 +774,60 @@ public class TestPerformance extends BaseTest {
     }
 
     protected interface ParserFactory {
-        void parseFile(CharStream input);
+        int parseFile(CharStream input, int thread);
     }
 
-	private static class DescriptiveErrorListener implements ANTLRErrorListener<Token> {
+	private static class DescriptiveErrorListener extends BaseErrorListener {
 		public static DescriptiveErrorListener INSTANCE = new DescriptiveErrorListener();
 
 		@Override
-		public <T extends Token> void error(Recognizer<T, ?> recognizer, T offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+		public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
+								int line, int charPositionInLine,
+								String msg, RecognitionException e)
+		{
+			if (!REPORT_SYNTAX_ERRORS) {
+				return;
+			}
+
 			String sourceName = recognizer.getInputStream().getSourceName();
-			sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName+": " : "";
+			if (sourceName == null) {
+				sourceName = "";
+			} else if (!sourceName.isEmpty()) {
+				sourceName = String.format("%s:%d:%d: ", sourceName, line, charPositionInLine);
+			}
+
 			System.err.println(sourceName+"line "+line+":"+charPositionInLine+" "+msg);
+		}
+
+	}
+
+	private static class SummarizingDiagnosticErrorListener extends DiagnosticErrorListener {
+
+		@Override
+		public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet ambigAlts, ATNConfigSet configs) {
+			if (!REPORT_AMBIGUITIES) {
+				return;
+			}
+
+			super.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, ambigAlts, configs);
+		}
+
+		@Override
+		public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, ATNConfigSet configs) {
+			if (!REPORT_FULL_CONTEXT) {
+				return;
+			}
+
+			super.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, configs);
+		}
+
+		@Override
+		public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, ATNConfigSet configs) {
+			if (!REPORT_CONTEXT_SENSITIVITY) {
+				return;
+			}
+
+			super.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, configs);
 		}
 
 	}
@@ -543,4 +850,71 @@ public class TestPerformance extends BaseTest {
 		}
 
 	}
+
+	protected static class NumberedThread extends Thread {
+		private final int threadNumber;
+
+		public NumberedThread(Runnable target, int threadNumber) {
+			super(target);
+			this.threadNumber = threadNumber;
+		}
+
+		public final int getThreadNumber() {
+			return threadNumber;
+		}
+
+	}
+
+	protected static class NumberedThreadFactory implements ThreadFactory {
+		private final AtomicInteger nextThread = new AtomicInteger();
+
+		@Override
+		public Thread newThread(Runnable r) {
+			int threadNumber = nextThread.getAndIncrement();
+			assert threadNumber < NUMBER_OF_THREADS;
+			return new NumberedThread(r, threadNumber);
+		}
+
+	}
+
+	protected static class ChecksumParseTreeListener implements ParseTreeListener {
+		private static final int VISIT_TERMINAL = 1;
+		private static final int VISIT_ERROR_NODE = 2;
+		private static final int ENTER_RULE = 3;
+		private static final int EXIT_RULE = 4;
+
+		private final Checksum checksum;
+
+		public ChecksumParseTreeListener(Checksum checksum) {
+			this.checksum = checksum;
+		}
+
+		@Override
+		public void visitTerminal(TerminalNode node) {
+			checksum.update(VISIT_TERMINAL);
+			updateChecksum(checksum, node.getSymbol());
+		}
+
+		@Override
+		public void visitErrorNode(ErrorNode node) {
+			checksum.update(VISIT_ERROR_NODE);
+			updateChecksum(checksum, node.getSymbol());
+		}
+
+		@Override
+		public void enterEveryRule(ParserRuleContext ctx) {
+			checksum.update(ENTER_RULE);
+			updateChecksum(checksum, ctx.getRuleIndex());
+			updateChecksum(checksum, ctx.getStart());
+		}
+
+		@Override
+		public void exitEveryRule(ParserRuleContext ctx) {
+			checksum.update(EXIT_RULE);
+			updateChecksum(checksum, ctx.getRuleIndex());
+			updateChecksum(checksum, ctx.getStop());
+		}
+
+	}
+
 }

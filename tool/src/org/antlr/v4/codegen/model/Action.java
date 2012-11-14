@@ -30,20 +30,24 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.runtime.CommonToken;
-import org.antlr.v4.codegen.*;
-import org.antlr.v4.codegen.model.chunk.*;
+import org.antlr.v4.codegen.ActionTranslator;
+import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.model.chunk.ActionChunk;
+import org.antlr.v4.codegen.model.chunk.ActionTemplate;
+import org.antlr.v4.codegen.model.chunk.ActionText;
 import org.antlr.v4.codegen.model.decl.StructDecl;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.tool.ast.ActionAST;
 import org.stringtemplate.v4.ST;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /** */
 public class Action extends RuleElement {
 	@ModelElement public List<ActionChunk> chunks;
 
-	public Action(OutputModelFactory factory, GrammarAST ast) {
+	public Action(OutputModelFactory factory, ActionAST ast) {
 		super(factory,ast);
 		RuleFunction rf = factory.getCurrentRuleFunction();
 		if (ast != null) {
