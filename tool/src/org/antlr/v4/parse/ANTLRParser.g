@@ -590,7 +590,7 @@ lexerElement
 labeledLexerElement
 	:	id (ass=ASSIGN|ass=PLUS_ASSIGN)
 		(	lexerAtom	-> ^($ass id lexerAtom)
-		|	block 		-> ^($ass id block)
+		|	lexerBlock	-> ^($ass id lexerBlock)
 		)
 	;
 
