@@ -29,10 +29,10 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.NotNull;
 
-public class RangeTransition extends Transition {
+public final class RangeTransition extends Transition {
 	public final int from;
 	public final int to;
 
@@ -43,8 +43,18 @@ public class RangeTransition extends Transition {
 	}
 
 	@Override
+	public int getSerializationType() {
+		return RANGE;
+	}
+
+	@Override
 	@NotNull
 	public IntervalSet label() { return IntervalSet.of(from, to); }
+
+	@Override
+	public boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+		return symbol >= from && symbol <= to;
+	}
 
 	@Override
 	@NotNull

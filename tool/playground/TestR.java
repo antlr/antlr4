@@ -29,7 +29,7 @@
 
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.DiagnosticErrorStrategy;
+import org.antlr.v4.runtime.DiagnosticErrorListener;
 
 public class TestR {
 	public static void main(String[] args) throws Exception {
@@ -41,7 +41,7 @@ public class TestR {
 //		}
 		RParser p = new RParser(tokens);
 		p.setBuildParseTree(true);
-		p.setErrorHandler(new DiagnosticErrorStrategy());
+		p.addErrorListener(new DiagnosticErrorListener());
 		p.prog();
 	}
 }

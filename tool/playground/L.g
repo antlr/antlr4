@@ -1,7 +1,6 @@
 lexer grammar L;
-STRING_START : '"' {pushMode(STRING_MODE); more();} ;
-WS : ' '|'
-' {skip();} ;
+STRING_START : '"' -> pushMode(STRING_MODE), more ;
+WS : (' '|'\n') -> skip ;
 mode STRING_MODE;
-STRING : '"' {popMode();} ;
-ANY : . {more();} ;
+STRING : '"' -> popMode ;
+ANY : . -> more ;

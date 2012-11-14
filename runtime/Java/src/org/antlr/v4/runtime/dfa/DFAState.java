@@ -32,6 +32,7 @@ package org.antlr.v4.runtime.dfa;
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.SemanticContext;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.HashSet;
@@ -65,65 +66,51 @@ import java.util.Set;
 public class DFAState {
 	public int stateNumber = -1;
 
-	/** The set of ATN configurations (state,alt,context) for this DFA state */
-//	@Nullable
-//	public OrderedHashSet<ATNConfig> configs = new OrderedHashSet<ATNConfig>();
+	@NotNull
+	public ATNConfigSet configs = new ATNConfigSet();
 
-	// TODO: rename to configs after flipping to new ATN sim
-	public ATNConfigSet configset = new ATNConfigSet();
-
-	/** edges[symbol] points to target of symbol */
+	/** edges[symbol] points to target of symbol. Shift up by 1 so (-1)
+	 *  EOF maps to edges[0].
+	 */
 	@Nullable
 	public DFAState[] edges;
 
 	public boolean isAcceptState = false;
 
-	public int prediction; // if accept state, what ttype do we match? is "else" clause if predicated
+	/** if accept state, what ttype do we match or alt do we predict?
+	 *  This is set to ATN.INVALID_ALT_NUMBER when predicates!=null or
+	 *  isCtxSensitive.
+	 */
+	public int prediction;
 
 	public int lexerRuleIndex = -1;		// if accept, exec action in what rule?
 	public int lexerActionIndex = -1;	// if accept, exec what action?
 
-	// todo: rename as unique?
-	public boolean complete; // all alts predict "prediction"
-	public boolean isCtxSensitive;
+	/** Indicates that this state was created during SLL prediction
+	 *  that discovered a conflict between the configurations in the state.
+	 *  Future execDFA() invocations immediately jumped doing full context
+	 *  prediction if this field is true.
+	 */
+	public boolean requiresFullContext;
 
-	/** DFA accept states use predicates in two situations:
-	 *  disambiguating and validating predicates. If an accept state
-	 *  predicts more than one alternative, It's ambiguous and we
-	 *  try to resolve with predicates.  Disambiguating predicates
-	 *  are evaluated when there is a unique prediction for this accept state.
-	 *  This array tracks the list of predicates to test in either case;
-	 *  there will only be one in the case of a disambiguating predicate.
+	/** During SLL parsing, this is a list of predicates associated with the
+	 *  ATN configurations of the DFA state. When we have predicates,
+	 *  isCtxSensitive=false since full context prediction evaluates predicates
+	 *  on-the-fly. If this is not null, then this.prediction is
+	 *  ATN.INVALID_ALT_NUMBER.
 	 *
-	 *  Because there could be 20 alternatives for a decision,
-	 *  we don't want to map alt to predicates; we might have to walk
-	 *  all of the early alternatives just to get to the predicates.
+	 *  We only use these for non isCtxSensitive but conflicting states. That
+	 *  means we know from the context (it's $ or we don't dip into outer
+	 *  ctx) that it's an ambiguity not a conflict.
 	 *
-	 *  If this is null then there are no predicates involved in
-	 *  decision-making for this state.
-	 *
-	 *  As an example, we might have:
-	 *
-	 *  predicates = [(p,3), (q,4), (null, 2)]
-	 *
-	 *  This means that there are 2 predicates for 3 ambiguous alternatives.
-	 *  If the first 2 predicates fail, then we default to the last
-	 *  PredPrediction pair, which predicts alt 2. This comes from:
-	 *
-	 *  r : B
-     *    |      A
-	 *    | {p}? A
-	 *    | {q}? A
-	 *    ;
-	 *
-	 *  This is used only when isCtxSensitive = false;
+	 *  This list is computed by predicateDFAState() in ATN simulator.
 	 */
 	@Nullable
 	public List<PredPrediction> predicates;
 
 	/** Map a predicate to a predicted alternative */
 	public static class PredPrediction {
-		public SemanticContext pred;
+		public SemanticContext pred; // never null; at least SemanticContext.NONE
 		public int alt;
 		public PredPrediction(SemanticContext pred, int alt) {
 			this.alt = alt;
@@ -139,38 +126,31 @@ public class DFAState {
 
 	public DFAState(int stateNumber) { this.stateNumber = stateNumber; }
 
-	public DFAState(ATNConfigSet configs) { this.configset = configs; }
+	public DFAState(@NotNull ATNConfigSet configs) { this.configs = configs; }
 
 	/** Get the set of all alts mentioned by all ATN configurations in this
 	 *  DFA state.
 	 */
 	public Set<Integer> getAltSet() {
-		// TODO (sam): what to do when configs==null?
 		Set<Integer> alts = new HashSet<Integer>();
-		for (ATNConfig c : configset) {
-			alts.add(c.alt);
+		if ( configs!=null ) {
+			for (ATNConfig c : configs) {
+				alts.add(c.alt);
+			}
 		}
 		if ( alts.isEmpty() ) return null;
 		return alts;
 	}
 
-	/*
-	public void setContextSensitivePrediction(RuleContext ctx, int predictedAlt) {
-		isCtxSensitive = true;
-		if ( ctxToPrediction==null ) {
-			ctxToPrediction = new LinkedHashMap<RuleContext, Integer>();
-		}
-		ctxToPrediction.put(ctx, predictedAlt);
-	}
-	*/
-
 	/** A decent hash for a DFA state is the sum of the ATN state/alt pairs. */
 	@Override
 	public int hashCode() {
-		// TODO (sam): what to do when configs==null?
-		int h = 0;
-		for (ATNConfig c : configset) {
-			h += c.alt;
+		int h = 7;
+		if ( configs!=null ) {
+			for (ATNConfig c : configs) {
+				h = h * 31 ^ c.alt;
+				h = h * 31 ^ c.state.stateNumber;
+			}
 		}
 		return h;
 	}
@@ -190,9 +170,14 @@ public class DFAState {
 	public boolean equals(Object o) {
 		// compare set of ATN configurations in this set with other
 		if ( this==o ) return true;
+
+		if (!(o instanceof DFAState)) {
+			return false;
+		}
+
 		DFAState other = (DFAState)o;
 		// TODO (sam): what to do when configs==null?
-		boolean sameSet = this.configset.equals(other.configset);
+		boolean sameSet = this.configs.equals(other.configs);
 //		System.out.println("DFAState.equals: "+configs+(sameSet?"==":"!=")+other.configs);
 		return sameSet;
 	}
@@ -200,7 +185,7 @@ public class DFAState {
 	@Override
 	public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append(stateNumber + ":" + configset);
+        buf.append(stateNumber).append(":").append(configs);
         if ( isAcceptState ) {
             buf.append("=>");
             if ( predicates!=null ) {

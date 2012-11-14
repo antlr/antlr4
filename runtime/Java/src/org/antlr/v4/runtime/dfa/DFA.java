@@ -29,11 +29,19 @@
 package org.antlr.v4.runtime.dfa;
 
 import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.DecisionState;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class DFA {
 	/** A set of all DFA states. Use Map so we can get old state back
@@ -96,7 +104,7 @@ public class DFA {
 		List<Set<ATNState>> atnStates = new ArrayList<Set<ATNState>>();
 		int i = start;
 		for (DFAState D : dfaStates) {
-			Set<ATNState> fullSet = D.configset.getStates();
+			Set<ATNState> fullSet = D.configs.getStates();
 			Set<ATNState> statesInvolved = new HashSet<ATNState>();
 			for (ATNState astate : fullSet) {
 				Transition t = astate.transition(0);

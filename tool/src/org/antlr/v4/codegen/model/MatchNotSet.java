@@ -33,6 +33,7 @@ import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.tool.ast.GrammarAST;
 
 public class MatchNotSet extends MatchSet {
+	public String varName = "_la";
 	public MatchNotSet(OutputModelFactory factory, GrammarAST ast) {
 		super(factory, ast);
 	}

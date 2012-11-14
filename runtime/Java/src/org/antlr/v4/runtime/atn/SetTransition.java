@@ -29,10 +29,10 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 
 /** A transition containing a set of values */
 public class SetTransition extends Transition {
@@ -47,8 +47,18 @@ public class SetTransition extends Transition {
 	}
 
 	@Override
+	public int getSerializationType() {
+		return SET;
+	}
+
+	@Override
 	@NotNull
 	public IntervalSet label() { return set; }
+
+	@Override
+	public boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+		return set.contains(symbol);
+	}
 
 	@Override
 	@NotNull

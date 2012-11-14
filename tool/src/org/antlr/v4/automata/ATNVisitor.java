@@ -57,5 +57,5 @@ public class ATNVisitor {
 		}
 	}
 
-	public void visitState(ATNState s) { }
+	public void visitState(@NotNull ATNState s) { }
 }

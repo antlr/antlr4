@@ -1,30 +1,31 @@
 /*
- [The "BSD license"]
-  Copyright (c) 2011 Terence Parr
-  All rights reserved.
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions
-  are met:
-
-  1. Redistributions of source code must retain the above copyright
-     notice, this list of conditions and the following disclaimer.
-  2. Redistributions in binary form must reproduce the above copyright
-     notice, this list of conditions and the following disclaimer in the
-     documentation and/or other materials provided with the distribution.
-  3. The name of the author may not be used to endorse or promote products
-     derived from this software without specific prior written permission.
-
-  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * [The "BSD license"]
+ *  Copyright (c) 2012 Terence Parr
+ *  Copyright (c) 2012 Sam Harwell
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.antlr.v4.automata;
@@ -38,7 +39,27 @@ import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.ATNBuilder;
 import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ActionTransition;
+import org.antlr.v4.runtime.atn.AtomTransition;
+import org.antlr.v4.runtime.atn.BlockEndState;
+import org.antlr.v4.runtime.atn.BlockStartState;
+import org.antlr.v4.runtime.atn.EpsilonTransition;
+import org.antlr.v4.runtime.atn.LoopEndState;
+import org.antlr.v4.runtime.atn.NotSetTransition;
+import org.antlr.v4.runtime.atn.PlusBlockStartState;
+import org.antlr.v4.runtime.atn.PlusLoopbackState;
+import org.antlr.v4.runtime.atn.PredicateTransition;
+import org.antlr.v4.runtime.atn.RuleStartState;
+import org.antlr.v4.runtime.atn.RuleStopState;
+import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.SetTransition;
+import org.antlr.v4.runtime.atn.StarBlockStartState;
+import org.antlr.v4.runtime.atn.StarLoopEntryState;
+import org.antlr.v4.runtime.atn.StarLoopbackState;
+import org.antlr.v4.runtime.atn.Transition;
+import org.antlr.v4.runtime.atn.WildcardTransition;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -47,7 +68,13 @@ import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.BlockAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.PredAST;
+import org.antlr.v4.tool.ast.QuantifierAST;
+import org.antlr.v4.tool.ast.TerminalAST;
 
 import java.lang.reflect.Constructor;
 import java.util.Collection;
@@ -58,41 +85,6 @@ import java.util.List;
  *  No side-effects. It builds an ATN object and returns it.
  */
 public class ParserATNFactory implements ATNFactory {
-    class TailEpsilonRemover extends ATNVisitor {
-        @Override
-        public void visitState(ATNState p) {
-            if ( p.getClass() == ATNState.class && p.getNumberOfTransitions()==1 ) {
-                ATNState q = p.transition(0).target;
-				if ( p.transition(0) instanceof RuleTransition ) {
-					q = ((RuleTransition)p.transition(0)).followState;
-				}
-				if ( q.getClass() == ATNState.class ) {
-					// we have p-x->q for x in {rule, action, pred, token, ...}
-					// if edge out of q is single epsilon to block end
-					// we can strip epsilon p-x->q-eps->r
-					Transition trans = q.transition(0);
-					if ( q.getNumberOfTransitions()==1 && trans.isEpsilon() &&
-					     !(trans instanceof ActionTransition) ) {
-						ATNState r = trans.target;
-						if ( r instanceof BlockEndState ||
-							r instanceof PlusLoopbackState ||
-							r instanceof StarLoopbackState )
-						{
-							// skip over q
-							if ( p.transition(0) instanceof RuleTransition ) {
-								((RuleTransition)p.transition(0)).followState = r;
-							}
-							else {
-								p.transition(0).target = r;
-							}
-							atn.removeState(q);
-						}
-					}
-				}
-			}
-		}
-	}
-
 	@NotNull
 	public final Grammar g;
 
@@ -103,7 +95,14 @@ public class ParserATNFactory implements ATNFactory {
 
 	public int currentOuterAlt;
 
-	public ParserATNFactory(@NotNull Grammar g) { this.g = g; atn = new ATN(); }
+	public ParserATNFactory(@NotNull Grammar g) {
+		if (g == null) {
+			throw new NullPointerException("g");
+		}
+
+		this.g = g;
+		this.atn = new ATN();
+	}
 
 	@Override
 	public ATN createATN() {
@@ -111,6 +110,7 @@ public class ParserATNFactory implements ATNFactory {
 		atn.maxTokenType = g.getMaxTokenType();
         addRuleFollowLinks();
 		addEOFTransitionToStartRules();
+		ATNOptimizer.optimize(g, atn);
 		return atn;
 	}
 
@@ -193,11 +193,6 @@ public class ParserATNFactory implements ATNFactory {
 		return new Handle(left, right);
 	}
 
-	@Override
-	public Handle tree(GrammarAST node, List<Handle> els) {
-		throw new UnsupportedOperationException("^(...) not allowed in non-tree grammar");
-	}
-
 	/** Not valid for non-lexers */
 	@Override
 	public Handle range(GrammarAST a, GrammarAST b) {
@@ -237,8 +232,6 @@ public class ParserATNFactory implements ATNFactory {
 	@Override
 	public Handle ruleRef(GrammarAST node) {
 		Handle h = _ruleRef(node);
-//		Rule r = g.getRule(node.getText());
-//		addFollowLink(r, h.right);
 		return h;
 	}
 
@@ -293,7 +286,7 @@ public class ParserATNFactory implements ATNFactory {
 
 	/** Build what amounts to an epsilon transition with an action.
 	 *  The action goes into ATN though it is ignored during prediction
-	 *  if actionIndex < 0.  Only forced are executed during prediction.
+	 *  if actionIndex &lt; 0.  Only forced are executed during prediction.
 	 */
 	@Override
 	public Handle action(ActionAST action) {
@@ -328,7 +321,7 @@ public class ParserATNFactory implements ATNFactory {
 	 *  begin/end.
 	 *
 	 *  Special case: if just a list of tokens/chars/sets, then collapse
-	 *  to a single edge'd o-set->o graph.
+	 *  to a single edged o-set->o graph.
 	 *
 	 *  TODO: Set alt number (1..n) in the states?
 	 */
@@ -373,7 +366,7 @@ public class ParserATNFactory implements ATNFactory {
 			epsilon(alt.right, end);
 			// no back link in ATN so must walk entire alt to see if we can
 			// strip out the epsilon to 'end' state
-			TailEpsilonRemover opt = new TailEpsilonRemover();
+			TailEpsilonRemover opt = new TailEpsilonRemover(atn);
 			opt.visit(alt.left);
 		}
 		Handle h = new Handle(start, end);
@@ -431,9 +424,17 @@ public class ParserATNFactory implements ATNFactory {
 	@NotNull
 	@Override
 	public Handle optional(@NotNull GrammarAST optAST, @NotNull Handle blk) {
-		// TODO: no such thing as nongreedy ()? so give error
 		BlockStartState blkStart = (BlockStartState)blk.left;
-		epsilon(blkStart, blk.right);
+
+		blkStart.nonGreedy = !((QuantifierAST)optAST).isGreedy();
+		if (((QuantifierAST)optAST).isGreedy()) {
+			epsilon(blkStart, blk.right);
+		} else {
+			Transition existing = blkStart.removeTransition(0);
+			epsilon(blkStart, blk.right);
+			blkStart.addTransition(existing);
+		}
+
 		optAST.atnState = blk.left;
 		return blk;
 	}
@@ -454,21 +455,25 @@ public class ParserATNFactory implements ATNFactory {
 		BlockEndState blkEnd = (BlockEndState)blk.right;
 
 		PlusLoopbackState loop = newState(PlusLoopbackState.class, plusAST);
+		loop.nonGreedy = !((QuantifierAST)plusAST).isGreedy();
 		atn.defineDecisionState(loop);
 		LoopEndState end = newState(LoopEndState.class, plusAST);
 		blkStart.loopBackState = loop;
-		end.loopBackStateNumber = loop.stateNumber;
+		end.loopBackState = loop;
 
 		plusAST.atnState = blkStart;
 		epsilon(blkEnd, loop);		// blk can see loop back
 
 		BlockAST blkAST = (BlockAST)plusAST.getChild(0);
-		loop.isGreedy = isGreedy(blkAST);
-		if ( !g.isLexer() || loop.isGreedy ) {
+		if ( ((QuantifierAST)plusAST).isGreedy() ) {
+			if (expectNonGreedy(blkAST)) {
+				g.tool.errMgr.grammarError(ErrorType.EXPECTED_NON_GREEDY_WILDCARD_BLOCK, g.fileName, plusAST.getToken(), plusAST.getToken().getText());
+			}
+
 			epsilon(loop, blkStart);	// loop back to start
 			epsilon(loop, end);			// or exit
 		}
-		else { // only lexers flip entry/exit branches for nongreedy
+		else {
 			// if not greedy, priority to exit branch; make it first
 			epsilon(loop, end);			// exit
 			epsilon(loop, blkStart);	// loop back to start
@@ -496,19 +501,23 @@ public class ParserATNFactory implements ATNFactory {
 		BlockEndState blkEnd = (BlockEndState)elem.right;
 
 		StarLoopEntryState entry = newState(StarLoopEntryState.class, starAST);
+		entry.nonGreedy = !((QuantifierAST)starAST).isGreedy();
 		atn.defineDecisionState(entry);
 		LoopEndState end = newState(LoopEndState.class, starAST);
 		StarLoopbackState loop = newState(StarLoopbackState.class, starAST);
 		entry.loopBackState = loop;
-		end.loopBackStateNumber = loop.stateNumber;
+		end.loopBackState = loop;
 
 		BlockAST blkAST = (BlockAST)starAST.getChild(0);
-		entry.isGreedy = isGreedy(blkAST);
-		if ( !g.isLexer() || entry.isGreedy ) {
+		if ( ((QuantifierAST)starAST).isGreedy() ) {
+			if (expectNonGreedy(blkAST)) {
+				g.tool.errMgr.grammarError(ErrorType.EXPECTED_NON_GREEDY_WILDCARD_BLOCK, g.fileName, starAST.getToken(), starAST.getToken().getText());
+			}
+
 			epsilon(entry, blkStart);	// loop enter edge (alt 1)
 			epsilon(entry, end);		// bypass loop edge (alt 2)
 		}
-		else { // only lexers flip entry/exit branches for nongreedy
+		else {
 			// if not greedy, priority to exit branch; make it first
 			epsilon(entry, end);		// bypass loop edge (alt 1)
 			epsilon(entry, blkStart);	// loop enter edge (alt 2)
@@ -630,13 +639,12 @@ public class ParserATNFactory implements ATNFactory {
 	@Override
 	public ATNState newState() { return newState(null); }
 
-	public boolean isGreedy(@NotNull BlockAST blkAST) {
-		boolean greedy = true;
-		String greedyOption = blkAST.getOptionString("greedy");
-		if ( blockHasWildcardAlt(blkAST) || greedyOption!=null&&greedyOption.equals("false") ) {
-			greedy = false;
+	public boolean expectNonGreedy(@NotNull BlockAST blkAST) {
+		if ( blockHasWildcardAlt(blkAST) ) {
+			return true;
 		}
-		return greedy;
+
+		return false;
 	}
 
 	// (BLOCK (ALT .)) or (BLOCK (ALT 'a') (ALT .))

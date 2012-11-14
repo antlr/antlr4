@@ -30,14 +30,38 @@
 package org.antlr.v4.tool;
 
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATNConfig;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ActionTransition;
+import org.antlr.v4.runtime.atn.AtomTransition;
+import org.antlr.v4.runtime.atn.BlockEndState;
+import org.antlr.v4.runtime.atn.BlockStartState;
+import org.antlr.v4.runtime.atn.DecisionState;
+import org.antlr.v4.runtime.atn.NotSetTransition;
+import org.antlr.v4.runtime.atn.PlusBlockStartState;
+import org.antlr.v4.runtime.atn.PlusLoopbackState;
+import org.antlr.v4.runtime.atn.PredicateTransition;
+import org.antlr.v4.runtime.atn.RangeTransition;
+import org.antlr.v4.runtime.atn.RuleStopState;
+import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.SetTransition;
+import org.antlr.v4.runtime.atn.StarBlockStartState;
+import org.antlr.v4.runtime.atn.StarLoopEntryState;
+import org.antlr.v4.runtime.atn.StarLoopbackState;
+import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupDir;
+import org.stringtemplate.v4.STGroupFile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /** The DOT (part of graphviz) generation aspect. */
 public class DOTGenerator {
@@ -46,8 +70,8 @@ public class DOTGenerator {
 	protected String arrowhead="normal";
 	protected String rankdir="LR";
 
-	/** Library of output templates; use <attrname> format */
-    public static STGroup stlib = new STGroupDir("org/antlr/v4/tool/templates/dot");
+	/** Library of output templates; use {@code <attrname>} format. */
+    public static STGroup stlib = new STGroupFile("org/antlr/v4/tool/templates/dot/graphs.stg");
 
     protected Grammar grammar;
 
@@ -115,15 +139,18 @@ public class DOTGenerator {
 		if ( s.isAcceptState ) {
 			buf.append("=>").append(s.prediction);
 		}
+		if ( s.requiresFullContext) {
+			buf.append("^");
+		}
 		if ( grammar!=null && grammar.tool.verbose_dfa ) {
 			Set<Integer> alts = s.getAltSet();
 			if ( alts!=null ) {
 				buf.append("\\n");
 				// separate alts
-				List<Integer> altList = new ArrayList<Integer>();
+				IntegerList altList = new IntegerList();
 				altList.addAll(alts);
-				Collections.sort(altList);
-				Set<ATNConfig> configurations = s.configset;
+				altList.sort();
+				Set<ATNConfig> configurations = s.configs;
 				for (int altIndex = 0; altIndex < altList.size(); altIndex++) {
 					int alt = altList.get(altIndex);
 					if ( altIndex>0 ) {
@@ -187,7 +214,7 @@ public class DOTGenerator {
 		List<ATNState> work = new LinkedList<ATNState>();
 
 		work.add(startState);
-		while ( work.size()>0 ) {
+		while ( !work.isEmpty() ) {
 			ATNState s = work.get(0);
 			if ( markedStates.contains(s) ) { work.remove(0); continue; }
 			markedStates.add(s);
@@ -277,6 +304,11 @@ public class DOTGenerator {
 				edgeST.add("src", "s"+s.stateNumber);
 				edgeST.add("target", "s"+edge.target.stateNumber);
 				edgeST.add("arrowhead", arrowhead);
+				if (s.getNumberOfTransitions() > 1) {
+					edgeST.add("transitionIndex", i);
+				} else {
+					edgeST.add("transitionIndex", false);
+				}
 				dot.add("edges", edgeST);
 				work.add(edge.target);
 			}
@@ -300,11 +332,13 @@ public class DOTGenerator {
 			st.add("label", getStateLabel(s));
 			dot.add("states", st);
 		}
+
 		for (ATNState s : markedStates) {
 			if ( s instanceof RuleStopState ) continue;
 			ST st = stlib.getInstanceOf("state");
 			st.add("name", "s"+s.stateNumber);
 			st.add("label", getStateLabel(s));
+			st.add("transitions", s.getTransitions());
 			dot.add("states", st);
 		}
 

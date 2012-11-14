@@ -33,7 +33,11 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /** An ATN transition between any two ATN states.  Subclasses define
  *  atom, set, epsilon, action, predicate, rule transitions.
@@ -91,13 +95,21 @@ public abstract class Transition {
 	@NotNull
 	public ATNState target;
 
-	protected Transition(@NotNull ATNState target) { this.target = target; }
+	protected Transition(@NotNull ATNState target) {
+		if (target == null) {
+			throw new NullPointerException("target cannot be null.");
+		}
 
-	public int getSerializationType() { return 0; }
+		this.target = target;
+	}
+
+	public abstract int getSerializationType();
 
 	/** Are we epsilon, action, sempred? */
 	public boolean isEpsilon() { return false; }
 
 	@Nullable
 	public IntervalSet label() { return null; }
+
+	public abstract boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol);
 }

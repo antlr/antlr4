@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.NotNull;
 
 /** A tree that knows about an interval in a token stream
  *  is some kind of syntax tree. Subinterfaces distinguish
@@ -37,11 +38,11 @@ import org.antlr.v4.runtime.misc.Interval;
  */
 public interface SyntaxTree extends Tree {
 	/** Return an interval indicating the index in the TokenStream of
-	 *  the 1st and last token associated with this subtree. If this
+	 *  the first and last token associated with this subtree. If this
 	 *  node is a leaf, then the interval represents a single token.
-	 *
-	 *  If source interval is unknown, this does not return null.
-	 *  It returns an interval of length 0.
+	 * <p/>
+	 *  If source interval is unknown, this returns {@link Interval#INVALID}.
 	 */
+	@NotNull
 	Interval getSourceInterval();
 }

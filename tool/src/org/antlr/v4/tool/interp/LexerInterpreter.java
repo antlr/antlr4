@@ -30,14 +30,29 @@
 package org.antlr.v4.tool.interp;
 
 import org.antlr.v4.Tool;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenFactory;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenFactory;
+import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionContextCache;
+import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.tool.LexerGrammar;
 
 public class LexerInterpreter implements TokenSource {
 	protected LexerGrammar g;
 	protected LexerATNSimulator interp;
 	protected CharStream input;
+
+	/** How to create token objects */
+	protected TokenFactory<?> _factory = CommonTokenFactory.DEFAULT;
+
+	protected final DFA[] _decisionToDFA = new DFA[1];
+	protected final PredictionContextCache _sharedContextCache =
+		new PredictionContextCache();
 
 	public LexerInterpreter(LexerGrammar g, String inputString) {
 		this(g);
@@ -47,7 +62,7 @@ public class LexerInterpreter implements TokenSource {
 	public LexerInterpreter(LexerGrammar g) {
 		Tool antlr = new Tool();
 		antlr.process(g,false);
-		interp = new LexerATNSimulator(g.atn);
+		interp = new LexerATNSimulator(g.atn,_decisionToDFA,_sharedContextCache);
 	}
 
 	public void setInput(String inputString) {
@@ -63,7 +78,12 @@ public class LexerInterpreter implements TokenSource {
 
 	@Override
 	public void setTokenFactory(TokenFactory<?> factory) {
-			// TODO: use TokenFactory
+		this._factory = factory;
+	}
+
+	@Override
+	public TokenFactory<?> getTokenFactory() {
+		return _factory;
 	}
 
 	@Override
@@ -87,46 +107,16 @@ public class LexerInterpreter implements TokenSource {
 		int start = input.index();
 		int tokenStartCharPositionInLine = interp.getCharPositionInLine();
 		int tokenStartLine = interp.getLine();
-		int ttype = interp.match(input, Lexer.DEFAULT_MODE);
-		int stop = input.index()-1;
-		// TODO: use TokenFactory
-		WritableToken t = new CommonToken(this, ttype, Token.DEFAULT_CHANNEL, start, stop);
-		t.setLine(tokenStartLine);
-		t.setCharPositionInLine(tokenStartCharPositionInLine);
-		return t;
+		int mark = input.mark(); // make sure unuffered stream holds chars long enough to get text
+		try {
+			int ttype = interp.match(input, Lexer.DEFAULT_MODE);
+			int stop = input.index()-1;
 
-		/*
-		outer:
-		while (true) {
-			token = null;
-			channel = Token.DEFAULT_CHANNEL;
-			tokenStartCharIndex = input.index();
-			tokenStartCharPositionInLine = input.getCharPositionInLine();
-			tokenStartLine = input.getLine();
-			text = null;
-			do {
-				type = Token.INVALID_TYPE;
-				if ( input.LA(1)==CharStream.EOF ) {
-					Token eof = new CommonToken(input,Token.EOF,
-												Token.DEFAULT_CHANNEL,
-												input.index(),input.index());
-					eof.setLine(getLine());
-					eof.setCharPositionInLine(getCharPositionInLine());
-					return eof;
-				}
-//				System.out.println("nextToken at "+((char)input.LA(1))+
-//								   " in mode "+mode+
-//								   " at index "+input.index());
-				int ttype = _interp.match(input, mode);
-//				System.out.println("accepted ttype "+ttype);
-				if ( type == Token.INVALID_TYPE) type = ttype;
-				if ( type==SKIP ) {
-					continue outer;
-				}
-			} while ( type==MORE );
-			if ( token==null ) emit();
-			return token;
+			return _factory.create(this, ttype, null, Token.DEFAULT_CHANNEL, start, stop,
+								   tokenStartLine, tokenStartCharPositionInLine);
 		}
-*/
+		finally {
+			input.release(mark);
+		}
 	}
 }

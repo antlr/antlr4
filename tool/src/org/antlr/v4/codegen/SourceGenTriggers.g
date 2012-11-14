@@ -107,10 +107,10 @@ element returns [List<? extends SrcOp> omos]
 	:	labeledElement					{$omos = $labeledElement.omos;}
 	|	atom[null,false]			{$omos = $atom.omos;}
 	|	subrule							{$omos = $subrule.omos;}
-	|   ACTION							{$omos = controller.action($ACTION);}
-	|   SEMPRED							{$omos = controller.sempred($SEMPRED);}
-	|	^(ACTION elementOptions)		{$omos = controller.action($ACTION);}
-	|   ^(SEMPRED elementOptions)		{$omos = controller.sempred($SEMPRED);}
+	|   ACTION							{$omos = controller.action((ActionAST)$ACTION);}
+	|   SEMPRED							{$omos = controller.sempred((ActionAST)$SEMPRED);}
+	|	^(ACTION elementOptions)		{$omos = controller.action((ActionAST)$ACTION);}
+	|   ^(SEMPRED elementOptions)		{$omos = controller.sempred((ActionAST)$SEMPRED);}
 	;
 
 labeledElement returns [List<? extends SrcOp> omos]

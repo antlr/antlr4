@@ -32,19 +32,39 @@ package org.antlr.v4.test;
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.ATNPrinter;
+import org.antlr.v4.automata.ATNSerializer;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.misc.Utils;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.IntStream;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenSource;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.WritableToken;
 import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.IntegerList;
+import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ANTLRMessage;
+import org.antlr.v4.tool.DOTGenerator;
+import org.antlr.v4.tool.DefaultToolListener;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.GrammarSemanticsMessage;
+import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.tool.Rule;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -56,18 +76,38 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 public abstract class BaseTest {
+	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
+	private static final Logger LOGGER = Logger.getLogger(BaseTest.class.getName());
+
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
@@ -114,15 +154,28 @@ public abstract class BaseTest {
 		return tool;
 	}
 
-	ATN createATN(Grammar g) {
-		if ( g.atn!=null ) return g.atn;
-		semanticProcess(g);
+	protected ATN createATN(Grammar g, boolean useSerializer) {
+		if ( g.atn==null ) {
+			semanticProcess(g);
 
-		ParserATNFactory f = new ParserATNFactory(g);
-		if ( g.isLexer() ) f = new LexerATNFactory((LexerGrammar)g);
-		g.atn = f.createATN();
+			ParserATNFactory f;
+			if ( g.isLexer() ) {
+				f = new LexerATNFactory((LexerGrammar)g);
+			}
+			else {
+				f = new ParserATNFactory(g);
+			}
 
-		return g.atn;
+			g.atn = f.createATN();
+		}
+
+		ATN atn = g.atn;
+		if (useSerializer) {
+			char[] serialized = ATNSerializer.getSerializedAsChars(g, atn);
+			return ATNSimulator.deserialize(serialized);
+		}
+
+		return atn;
 	}
 
 	protected void semanticProcess(Grammar g) {
@@ -153,8 +206,8 @@ public abstract class BaseTest {
 //		dfa.minimized = dmin.minimize();
 //	}
 
-	List<Integer> getTypesFromString(Grammar g, String expecting) {
-		List<Integer> expectingTokenTypes = new ArrayList<Integer>();
+	IntegerList getTypesFromString(Grammar g, String expecting) {
+		IntegerList expectingTokenTypes = new IntegerList();
 		if ( expecting!=null && !expecting.trim().isEmpty() ) {
 			for (String tname : expecting.replace(" ", "").split(",")) {
 				int ttype = g.getTokenType(tname);
@@ -164,12 +217,12 @@ public abstract class BaseTest {
 		return expectingTokenTypes;
 	}
 
-	public List<Integer> getTokenTypesViaATN(String input, LexerATNSimulator lexerATN) {
+	public IntegerList getTokenTypesViaATN(String input, LexerATNSimulator lexerATN) {
 		ANTLRInputStream in = new ANTLRInputStream(input);
-		List<Integer> tokenTypes = new ArrayList<Integer>();
+		IntegerList tokenTypes = new IntegerList();
 		int ttype;
 		do {
-			ttype = lexerATN.matchATN(in);
+			ttype = lexerATN.match(in, Lexer.DEFAULT_MODE);
 			tokenTypes.add(ttype);
 		} while ( ttype!= Token.EOF );
 		return tokenTypes;
@@ -177,10 +230,9 @@ public abstract class BaseTest {
 
 	public List<String> getTokenTypes(LexerGrammar lg,
 									  ATN atn,
-									  CharStream input,
-									  boolean adaptive)
+									  CharStream input)
 	{
-		LexerATNSimulator interp = new LexerATNSimulator(atn);
+		LexerATNSimulator interp = new LexerATNSimulator(atn,new DFA[1],null);
 		List<String> tokenTypes = new ArrayList<String>();
 		int ttype;
 		boolean hitEOF = false;
@@ -190,8 +242,7 @@ public abstract class BaseTest {
 				break;
 			}
 			int t = input.LA(1);
-			if ( adaptive ) ttype = interp.match(input, Lexer.DEFAULT_MODE);
-			else ttype = interp.matchATN(input);
+			ttype = interp.match(input, Lexer.DEFAULT_MODE);
 			if ( ttype == Token.EOF ) {
 				tokenTypes.add("EOF");
 			}
@@ -199,7 +250,7 @@ public abstract class BaseTest {
 				tokenTypes.add(lg.typeToTokenList.get(ttype));
 			}
 
-			if ( t==CharStream.EOF ) {
+			if ( t==IntStream.EOF ) {
 				hitEOF = true;
 			}
 		} while ( ttype!=Token.EOF );
@@ -211,7 +262,7 @@ public abstract class BaseTest {
 	{
 		ErrorQueue equeue = new ErrorQueue();
 		Grammar g = new Grammar(gtext, equeue);
-		ATN atn = createATN(g);
+		ATN atn = createATN(g, false);
 		ATNState s = atn.ruleToStartState[g.getRule(ruleName).index];
 		if ( s==null ) {
 			System.err.println("no such rule: "+ruleName);
@@ -232,7 +283,7 @@ public abstract class BaseTest {
 	{
 		ErrorQueue equeue = new ErrorQueue();
 		Grammar g = new Grammar(gtext, equeue);
-		ATN atn = createATN(g);
+		ATN atn = createATN(g, false);
 		DecisionState blk = atn.decisionToState.get(decision);
 		checkRuleDFA(g, blk, expecting);
 		return equeue.all;
@@ -258,7 +309,7 @@ public abstract class BaseTest {
 	{
 		ErrorQueue equeue = new ErrorQueue();
 		LexerGrammar g = new LexerGrammar(gtext, equeue);
-		g.atn = createATN(g);
+		g.atn = createATN(g, false);
 //		LexerATNToDFAConverter conv = new LexerATNToDFAConverter(g);
 //		DFA dfa = conv.createDFA(modeName);
 //		g.setLookaheadDFA(0, dfa); // only one decision to worry about
@@ -353,42 +404,54 @@ public abstract class BaseTest {
 
 
 	/** Return true if all is ok, no errors */
-	protected boolean antlr(String fileName, String grammarFileName, String grammarStr, String... extraOptions) {
+	protected boolean antlr(String fileName, String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
 		boolean allIsWell = true;
 		System.out.println("dir "+tmpdir);
 		mkdir(tmpdir);
 		writeFile(tmpdir, fileName, grammarStr);
+		ErrorQueue equeue = new ErrorQueue();
+		final List<String> options = new ArrayList<String>();
+		Collections.addAll(options, extraOptions);
+		options.add("-o");
+		options.add(tmpdir);
+		options.add("-lib");
+		options.add(tmpdir);
+		options.add(new File(tmpdir,grammarFileName).toString());
 		try {
-			final List<String> options = new ArrayList<String>();
-			Collections.addAll(options, extraOptions);
-			options.add("-o");
-			options.add(tmpdir);
-			options.add("-lib");
-			options.add(tmpdir);
-			options.add(new File(tmpdir,grammarFileName).toString());
 			final String[] optionsA = new String[options.size()];
 			options.toArray(optionsA);
-			ErrorQueue equeue = new ErrorQueue();
 			Tool antlr = newTool(optionsA);
 			antlr.addListener(equeue);
-			antlr.processGrammarsOnCommandLine();
-			if ( equeue.errors.size()>0 ) {
-				allIsWell = false;
-				System.err.println("antlr reports errors from "+options);
-				for (int i = 0; i < equeue.errors.size(); i++) {
-					ANTLRMessage msg = equeue.errors.get(i);
-					System.err.println(msg);
-				}
-				System.out.println("!!!\ngrammar:");
-				System.out.println(grammarStr);
-				System.out.println("###");
+			if (defaultListener) {
+				antlr.addListener(new DefaultToolListener(antlr));
 			}
+			antlr.processGrammarsOnCommandLine();
 		}
 		catch (Exception e) {
 			allIsWell = false;
 			System.err.println("problems building grammar: "+e);
 			e.printStackTrace(System.err);
 		}
+
+		allIsWell = equeue.errors.isEmpty();
+		if ( !defaultListener && !equeue.errors.isEmpty() ) {
+			System.err.println("antlr reports errors from "+options);
+			for (int i = 0; i < equeue.errors.size(); i++) {
+				ANTLRMessage msg = equeue.errors.get(i);
+				System.err.println(msg);
+			}
+			System.out.println("!!!\ngrammar:");
+			System.out.println(grammarStr);
+			System.out.println("###");
+		}
+		if ( !defaultListener && !equeue.warnings.isEmpty() ) {
+			System.err.println("antlr reports warnings from "+options);
+			for (int i = 0; i < equeue.warnings.size(); i++) {
+				ANTLRMessage msg = equeue.warnings.get(i);
+				System.err.println(msg);
+			}
+		}
+
 		return allIsWell;
 	}
 
@@ -429,11 +492,10 @@ public abstract class BaseTest {
 								String input, boolean debug)
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
-									  grammarStr,
-									  parserName,
-									  lexerName,
-									  "-parse-listener",
-									  "-visitor");
+														grammarStr,
+														parserName,
+														lexerName,
+														"-visitor");
 		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		return rawExecRecognizer(parserName,
@@ -449,9 +511,23 @@ public abstract class BaseTest {
 													String lexerName,
 													String... extraOptions)
 	{
+		return rawGenerateAndBuildRecognizer(grammarFileName, grammarStr, parserName, lexerName, false, extraOptions);
+	}
+
+	/** Return true if all is well */
+	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
+													String grammarStr,
+													@Nullable String parserName,
+													String lexerName,
+													boolean defaultListener,
+													String... extraOptions)
+	{
 		boolean allIsWell =
-			antlr(grammarFileName, grammarFileName, grammarStr, extraOptions);
-		boolean ok;
+			antlr(grammarFileName, grammarFileName, grammarStr, defaultListener, extraOptions);
+		if (!allIsWell) {
+			return false;
+		}
+
 		List<String> files = new ArrayList<String>();
 		if ( lexerName!=null ) {
 			files.add(lexerName+".java");
@@ -465,12 +541,8 @@ public abstract class BaseTest {
 			if (optionsSet.contains("-visitor")) {
 				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseVisitor.java");
 			}
-			if (optionsSet.contains("-parse-listener")) {
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseParseListener.java");
-			}
 		}
-		ok = compile(files.toArray(new String[files.size()]));
-		if ( !ok ) { allIsWell = false; }
+		allIsWell = compile(files.toArray(new String[files.size()]));
 		return allIsWell;
 	}
 
@@ -500,8 +572,6 @@ public abstract class BaseTest {
 
 	public String execClass(String className) {
 		if (TEST_IN_SAME_PROCESS) {
-			PrintStream originalOut = System.out;
-			PrintStream originalErr = System.err;
 			try {
 				ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
                 final Class<?> mainClass = (Class<?>)loader.loadClass(className);
@@ -510,17 +580,27 @@ public abstract class BaseTest {
 				PipedInputStream stderrIn = new PipedInputStream();
 				PipedOutputStream stdoutOut = new PipedOutputStream(stdoutIn);
 				PipedOutputStream stderrOut = new PipedOutputStream(stderrIn);
-				System.setOut(new PrintStream(stdoutOut));
-				System.setErr(new PrintStream(stderrOut));
 				StreamVacuum stdoutVacuum = new StreamVacuum(stdoutIn);
 				StreamVacuum stderrVacuum = new StreamVacuum(stderrIn);
-				stdoutVacuum.start();
-				stderrVacuum.start();
-				mainMethod.invoke(null, (Object)new String[] { new File(tmpdir, "input").getAbsolutePath() });
-				System.setOut(originalOut);
-				originalOut = null;
-				System.setErr(originalErr);
-				originalErr = null;
+
+				PrintStream originalOut = System.out;
+				System.setOut(new PrintStream(stdoutOut));
+				try {
+					PrintStream originalErr = System.err;
+					try {
+						System.setErr(new PrintStream(stderrOut));
+						stdoutVacuum.start();
+						stderrVacuum.start();
+						mainMethod.invoke(null, (Object)new String[] { new File(tmpdir, "input").getAbsolutePath() });
+					}
+					finally {
+						System.setErr(originalErr);
+					}
+				}
+				finally {
+					System.setOut(originalOut);
+				}
+
 				stdoutOut.close();
 				stderrOut.close();
 				stdoutVacuum.join();
@@ -532,30 +612,23 @@ public abstract class BaseTest {
 				}
 				return output;
 			} catch (MalformedURLException ex) {
-				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.log(Level.SEVERE, null, ex);
 			} catch (IOException ex) {
-				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.log(Level.SEVERE, null, ex);
 			} catch (InterruptedException ex) {
-				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.log(Level.SEVERE, null, ex);
 			} catch (IllegalAccessException ex) {
-				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.log(Level.SEVERE, null, ex);
 			} catch (IllegalArgumentException ex) {
-				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.log(Level.SEVERE, null, ex);
 			} catch (InvocationTargetException ex) {
-				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.log(Level.SEVERE, null, ex);
 			} catch (NoSuchMethodException ex) {
-				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.log(Level.SEVERE, null, ex);
 			} catch (SecurityException ex) {
-				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.log(Level.SEVERE, null, ex);
 			} catch (ClassNotFoundException ex) {
-				Logger.getLogger(BaseTest.class.getName()).log(Level.SEVERE, null, ex);
-			} finally {
-				if (originalOut != null) {
-					System.setOut(originalOut);
-				}
-				if (originalErr != null) {
-					System.setErr(originalErr);
-				}
+				LOGGER.log(Level.SEVERE, null, ex);
 			}
 		}
 
@@ -610,28 +683,9 @@ public abstract class BaseTest {
 			msg = msg.replaceAll("\r","\\\\r");
 			msg = msg.replaceAll("\t","\\\\t");
 
-			// ignore error number
-			if ( expect!=null ) expect = stripErrorNum(expect);
-			actual = stripErrorNum(actual);
             assertEquals("error in: "+msg,expect,actual);
         }
     }
-
-	// can be multi-line
-	//error(29): A.g:2:11: unknown attribute reference a in $a
-	//error(29): A.g:2:11: unknown attribute reference a in $a
-	String stripErrorNum(String errs) {
-		String[] lines = errs.split("\n");
-		for (int i=0; i<lines.length; i++) {
-			String s = lines[i];
-			int lp = s.indexOf("error(");
-			int rp = s.indexOf(')', lp);
-			if ( lp>=0 && rp>=0 ) {
-				lines[i] = s.substring(0, lp) + s.substring(rp+1, s.length());
-			}
-		}
-		return Utils.join(lines, "\n");
-	}
 
 	public String getFilenameFromFirstLineOfGrammar(String line) {
 		String fileName = "<string>";
@@ -639,9 +693,9 @@ public abstract class BaseTest {
 		int semi = line.lastIndexOf(';');
 		if ( grIndex>=0 && semi>=0 ) {
 			int space = line.indexOf(' ', grIndex);
-			fileName = line.substring(space+1, semi)+".g";
+			fileName = line.substring(space+1, semi)+Tool.GRAMMAR_EXTENSION;
 		}
-		if ( fileName.length()==".g".length() ) fileName = "<string>";
+		if ( fileName.length()==Tool.GRAMMAR_EXTENSION.length() ) fileName = "<string>";
 		return fileName;
 	}
 
@@ -738,7 +792,7 @@ public abstract class BaseTest {
 	}
 
 	public static class StreamVacuum implements Runnable {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		BufferedReader in;
 		Thread sucker;
 		public StreamVacuum(InputStream in) {
@@ -824,7 +878,7 @@ public abstract class BaseTest {
 				foundMsg = m;
 			}
 		}
-		assertTrue("no error; "+expectedMessage.errorType+" expected", equeue.errors.size()>0);
+		assertTrue("no error; "+expectedMessage.errorType+" expected", !equeue.errors.isEmpty());
 		assertTrue("too many errors; "+equeue.errors, equeue.errors.size()<=1);
 		assertNotNull("couldn't find expected error: "+expectedMessage.errorType, foundMsg);
 		/*
@@ -886,8 +940,25 @@ public abstract class BaseTest {
 			"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
 			"        <createParser>\n"+
 			"		 parser.setBuildParseTree(true);\n" +
-			"        parser.<parserStartRuleName>();\n" +
+			"        ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
+			"        ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
 			"    }\n" +
+			"\n" +
+			"	static class TreeShapeListener implements ParseTreeListener {\n" +
+			"		@Override public void visitTerminal(TerminalNode node) { }\n" +
+			"		@Override public void visitErrorNode(ErrorNode node) { }\n" +
+			"		@Override public void exitEveryRule(ParserRuleContext ctx) { }\n" +
+			"\n" +
+			"		@Override\n" +
+			"		public void enterEveryRule(ParserRuleContext ctx) {\n" +
+			"			for (int i = 0; i \\< ctx.getChildCount(); i++) {\n" +
+			"				ParseTree parent = ctx.getChild(i).getParent();\n" +
+			"				if (!(parent instanceof RuleNode) || ((RuleNode)parent).getRuleContext() != ctx) {\n" +
+			"					throw new IllegalStateException(\"Invalid parse tree shape detected.\");\n" +
+			"				}\n" +
+			"			}\n" +
+			"		}\n" +
+			"	}\n" +
 			"}"
 			);
         ST createParserST = new ST("        <parserName> parser = new <parserName>(tokens);\n");
@@ -895,7 +966,7 @@ public abstract class BaseTest {
 			createParserST =
 				new ST(
 				"        <parserName> parser = new <parserName>(tokens);\n" +
-                "        parser.setErrorHandler(new DiagnosticErrorStrategy());\n");
+                "        parser.addErrorListener(new DiagnosticErrorListener());\n");
 		}
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);
@@ -952,6 +1023,10 @@ public abstract class BaseTest {
     }
 
     protected void eraseFiles() {
+		if (tmpdir == null) {
+			return;
+		}
+
         File tmpdirF = new File(tmpdir);
         String[] files = tmpdirF.list();
         for(int i = 0; files!=null && i < files.length; i++) {
@@ -1028,9 +1103,9 @@ public abstract class BaseTest {
     public void assertNull(Object object) { try {Assert.assertNull(object);} catch (Error e) {lastTestFailed=true; throw e;} }
 
 	public static class IntTokenStream implements TokenStream {
-		List<Integer> types;
+		IntegerList types;
 		int p=0;
-		public IntTokenStream(List<Integer> types) { this.types = types; }
+		public IntTokenStream(IntegerList types) { this.types = types; }
 
 		@Override
 		public void consume() { p++; }
@@ -1086,14 +1161,48 @@ public abstract class BaseTest {
 			return null;
 		}
 
+		@NotNull
 		@Override
-		public String toString(int start, int stop) {
-			return null;
+		public String getText() {
+			throw new UnsupportedOperationException("can't give strings");
 		}
 
+		@NotNull
 		@Override
-		public String toString(Token start, Token stop) {
-			return null;
+		public String getText(Interval interval) {
+			throw new UnsupportedOperationException("can't give strings");
 		}
+
+		@NotNull
+		@Override
+		public String getText(RuleContext ctx) {
+			throw new UnsupportedOperationException("can't give strings");
+		}
+
+		@NotNull
+		@Override
+		public String getText(Token start, Token stop) {
+			throw new UnsupportedOperationException("can't give strings");
+		}
+	}
+
+	/** Sort a list */
+	public <T extends Comparable<? super T>> List<T> sort(List<T> data) {
+		List<T> dup = new ArrayList<T>();
+		dup.addAll(data);
+		Collections.sort(dup);
+		return dup;
+	}
+
+	/** Return map sorted by key */
+	public <K extends Comparable<? super K>,V> LinkedHashMap<K,V> sort(Map<K,V> data) {
+		LinkedHashMap<K,V> dup = new LinkedHashMap<K, V>();
+		List<K> keys = new ArrayList<K>();
+		keys.addAll(data.keySet());
+		Collections.sort(keys);
+		for (K k : keys) {
+			dup.put(k, data.get(k));
+		}
+		return dup;
 	}
 }

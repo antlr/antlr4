@@ -29,8 +29,23 @@
 
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.Interval;
+
 public class CommonTokenFactory implements TokenFactory<CommonToken> {
 	public static final TokenFactory<CommonToken> DEFAULT = new CommonTokenFactory();
+
+	/** Copy text for token out of input char stream. Useful when input
+	 *  stream is unbuffered.
+	 *  @see UnbufferedCharStream
+ 	 */
+	protected final boolean copyText;
+
+	/** Create factory and indicate whether or not the factory copy
+	 *  text out of the char stream.
+	 */
+	public CommonTokenFactory(boolean copyText) { this.copyText = copyText; }
+
+	public CommonTokenFactory() { this(false); }
 
 	@Override
 	public CommonToken create(TokenSource source, int type, String text,
@@ -42,6 +57,12 @@ public class CommonTokenFactory implements TokenFactory<CommonToken> {
 		t.setCharPositionInLine(charPositionInLine);
 		if ( text!=null ) {
 			t.setText(text);
+		}
+		else {
+			if ( copyText ) {
+				CharStream input = source.getInputStream();
+				t.setText(input.getText(Interval.of(start,stop)));
+			}
 		}
 		return t;
 	}

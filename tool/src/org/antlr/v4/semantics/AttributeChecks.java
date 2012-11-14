@@ -33,8 +33,15 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.Token;
 import org.antlr.v4.parse.ActionSplitter;
 import org.antlr.v4.parse.ActionSplitterListener;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.Alternative;
+import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LabelElementPair;
+import org.antlr.v4.tool.LabelType;
+import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.List;
 
@@ -77,7 +84,8 @@ public class AttributeChecks implements ActionSplitterListener {
                     checker.examineAction();
                 }
             }
-            for (ActionAST a : r.exceptionActions) {
+            for (GrammarAST e : r.exceptions) {
+				ActionAST a = (ActionAST)e.getChild(1);
                 AttributeChecks checker = new AttributeChecks(g, r, null, a, a.token);
                 checker.examineAction();
 			}
@@ -110,6 +118,17 @@ public class AttributeChecks implements ActionSplitterListener {
 	// $x.y
 	@Override
 	public void qualifiedAttr(String expr, Token x, Token y) {
+		if ( g.isLexer() ) {
+			errMgr.grammarError(ErrorType.ATTRIBUTE_IN_LEXER_ACTION,
+								g.fileName, x, x.getText()+"."+y.getText(), expr);
+			return;
+		}
+		if ( node.resolver.resolveToAttribute(x.getText(), node)!=null ) {
+			// must be a member access to a predefined attribute like $ctx.foo
+			attr(expr, x);
+			return;
+		}
+
 		if ( node.resolver.resolveToAttribute(x.getText(), y.getText(), node)==null ) {
 			Rule rref = isolatedRuleRef(x.getText());
 			if ( rref!=null ) {
@@ -135,15 +154,25 @@ public class AttributeChecks implements ActionSplitterListener {
 
 	@Override
 	public void setAttr(String expr, Token x, Token rhs) {
+		if ( g.isLexer() ) {
+			errMgr.grammarError(ErrorType.ATTRIBUTE_IN_LEXER_ACTION,
+								g.fileName, x, x.getText(), expr);
+			return;
+		}
 		if ( node.resolver.resolveToAttribute(x.getText(), node)==null ) {
-            errMgr.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
-                                      g.fileName, x, x.getText(), expr);
-        }
-        new AttributeChecks(g, r, alt, node, rhs).examineAction();
-    }
+			errMgr.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
+								g.fileName, x, x.getText(), expr);
+		}
+		new AttributeChecks(g, r, alt, node, rhs).examineAction();
+	}
 
 	@Override
     public void attr(String expr, Token x) {
+		if ( g.isLexer() ) {
+			errMgr.grammarError(ErrorType.ATTRIBUTE_IN_LEXER_ACTION,
+								g.fileName, x, x.getText(), expr);
+			return;
+		}
 		if ( node.resolver.resolveToAttribute(x.getText(), node)==null ) {
 			if ( node.resolver.resolvesToToken(x.getText(), node) ) {
 				return; // $ID for token ref or label of token
@@ -168,7 +197,7 @@ public class AttributeChecks implements ActionSplitterListener {
 			errMgr.toolError(ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF,
 							 x.getText(), y.getText());
 		}
-		if ( r.resolveToAttribute(y.getText(), null)==null ) {
+		else if ( r.resolveToAttribute(y.getText(), null)==null ) {
 			errMgr.grammarError(ErrorType.UNKNOWN_RULE_ATTRIBUTE,
 								g.fileName, y, y.getText(), x.getText(), expr);
 
@@ -182,7 +211,7 @@ public class AttributeChecks implements ActionSplitterListener {
 			errMgr.toolError(ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF,
 							 x.getText(), y.getText());
 		}
-		if ( r.resolveToAttribute(y.getText(), null)==null ) {
+		else if ( r.resolveToAttribute(y.getText(), null)==null ) {
 			errMgr.grammarError(ErrorType.UNKNOWN_RULE_ATTRIBUTE,
 								g.fileName, y, y.getText(), x.getText(), expr);
 

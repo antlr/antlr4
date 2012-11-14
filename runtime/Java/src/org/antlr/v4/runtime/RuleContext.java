@@ -32,11 +32,14 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.Trees;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
 import javax.print.PrintException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /** A rule context is a record of a single rule invocation. It knows
  *  which context invoked it, if any. If there is no parent context, then
@@ -52,13 +55,15 @@ import java.io.IOException;
  *  The parent contexts are useful for computing lookahead sets and
  *  getting error information.
  *
- *  These objects are used during lexing, parsing, and prediction.
+ *  These objects are used during parsing and prediction.
  *  For the special case of parsers and tree parsers, we use the subclass
  *  ParserRuleContext.
  *
  *  @see ParserRuleContext
  */
-public class RuleContext implements ParseTree.RuleNode {
+public class RuleContext implements RuleNode {
+	public static final ParserRuleContext EMPTY = new ParserRuleContext();
+
 	/** What context invoked this rule? */
 	public RuleContext parent;
 
@@ -181,8 +186,8 @@ public class RuleContext implements ParseTree.RuleNode {
 	 *  that they are now going to track perfectly together.  Once they
 	 *  converged on state 21, there is no way they can separate.  In other
 	 *  words, the prior stack state is not consulted when computing where to
-	 *  go in the closure operation.  ?$ and ??$ are considered the same stack.
-	 *  If ? is popped off then $ and ?$ remain; they are now an empty and
+	 *  go in the closure operation.  x$ and xy$ are considered the same stack.
+	 *  If x is popped off then $ and y$ remain; they are now an empty and
 	 *  nonempty context comparison.  So, if one stack is a suffix of
 	 *  another, then it will still degenerate to the simple empty stack
 	 *  comparison case.
@@ -208,7 +213,12 @@ public class RuleContext implements ParseTree.RuleNode {
 		return invokingState == -1;
 	}
 
-	// satisfy the ParseTree interface
+	// satisfy the ParseTree / SyntaxTree interface
+
+	@Override
+	public Interval getSourceInterval() {
+		return Interval.INVALID;
+	}
 
 	@Override
 	public RuleContext getRuleContext() { return this; }
@@ -218,6 +228,27 @@ public class RuleContext implements ParseTree.RuleNode {
 
 	@Override
 	public RuleContext getPayload() { return this; }
+
+	/** Return the combined text of all child nodes. This method only considers
+	 *  tokens which have been added to the parse tree.
+	 *  <p>
+	 *  Since tokens on hidden channels (e.g. whitespace or comments) are not
+	 *  added to the parse trees, they will not appear in the output of this
+	 *  method.
+	 */
+	@Override
+	public String getText() {
+		if (getChildCount() == 0) {
+			return "";
+		}
+
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < getChildCount(); i++) {
+			builder.append(getChild(i).getText());
+		}
+
+		return builder.toString();
+	}
 
 	public int getRuleIndex() { return -1; }
 
@@ -232,27 +263,24 @@ public class RuleContext implements ParseTree.RuleNode {
 	}
 
 	@Override
-	public Interval getSourceInterval() {
-		if ( getChildCount()==0 ) return Interval.INVALID;
-		int start = getChild(0).getSourceInterval().a;
-		int stop = getChild(getChildCount()-1).getSourceInterval().b;
-		return new Interval(start, stop);
-	}
-
-	@Override
 	public <T> T accept(ParseTreeVisitor<? extends T> visitor) { return visitor.visitChildren(this); }
 
+	/** Call this method to view a parse tree in a dialog box visually. */
 	public void inspect(Parser parser) {
 		TreeViewer viewer = new TreeViewer(parser, this);
 		viewer.open();
 	}
 
+	/** Save this tree in a postscript file */
 	public void save(Parser parser, String fileName)
 		throws IOException, PrintException
 	{
-		Trees.writePS(this, parser, fileName);
+//		TreeViewer viewer = new TreeViewer(parser, this);
+//		viewer.save(fileName);
+		Trees.writePS(this, parser, fileName); // parrt routine
 	}
 
+	/** Save this tree in a postscript file using a particular font name and size */
 	public void save(Parser parser, String fileName,
 					 String fontName, int fontSize)
 		throws IOException
@@ -264,32 +292,65 @@ public class RuleContext implements ParseTree.RuleNode {
 	 *  (root child1 .. childN). Print just a node if this is a leaf.
 	 *  We have to know the recognizer so we can get rule names.
 	 */
-	public String toStringTree(Parser recog) {
+	public String toStringTree(@Nullable Parser recog) {
 		return Trees.toStringTree(this, recog);
 	}
 
+	/** Print out a whole tree, not just a node, in LISP format
+	 *  (root child1 .. childN). Print just a node if this is a leaf.
+	 */
+	public String toStringTree(@Nullable List<String> ruleNames) {
+		return Trees.toStringTree(this, ruleNames);
+	}
+
 	@Override
-	public String toStringTree() { return toStringTree(null); }
+	public String toStringTree() {
+		return toStringTree((List<String>)null);
+	}
 
 	@Override
 	public String toString() {
-		return toString(null);
+		return toString((List<String>)null, (RuleContext)null);
 	}
 
-	public String toString(@Nullable Recognizer<?,?> recog) {
+	public final String toString(@Nullable Recognizer<?,?> recog) {
 		return toString(recog, ParserRuleContext.EMPTY);
 	}
 
+	public final String toString(@Nullable List<String> ruleNames) {
+		return toString(ruleNames, null);
+	}
+
 	// recog null unless ParserRuleContext, in which case we use subclass toString(...)
-	public String toString(@Nullable Recognizer<?,?> recog, RuleContext stop) {
+	public String toString(@Nullable Recognizer<?,?> recog, @Nullable RuleContext stop) {
+		String[] ruleNames = recog != null ? recog.getRuleNames() : null;
+		List<String> ruleNamesList = ruleNames != null ? Arrays.asList(ruleNames) : null;
+		return toString(ruleNamesList, stop);
+	}
+
+	public String toString(@Nullable List<String> ruleNames, @Nullable RuleContext stop) {
 		StringBuilder buf = new StringBuilder();
 		RuleContext p = this;
 		buf.append("[");
-		while ( p != null && p != stop ) {
-			if ( !p.isEmpty() ) buf.append(p.invokingState);
-			if ( p.parent != null && !p.parent.isEmpty() ) buf.append(" ");
+		while (p != null && p != stop) {
+			if (ruleNames == null) {
+				if (!p.isEmpty()) {
+					buf.append(p.invokingState);
+				}
+			}
+			else {
+				int ruleIndex = p.getRuleIndex();
+				String ruleName = ruleIndex >= 0 && ruleIndex < ruleNames.size() ? ruleNames.get(ruleIndex) : Integer.toString(ruleIndex);
+				buf.append(ruleName);
+			}
+
+			if (p.parent != null && (ruleNames != null || !p.parent.isEmpty())) {
+				buf.append(" ");
+			}
+
 			p = p.parent;
 		}
+
 		buf.append("]");
 		return buf.toString();
 	}

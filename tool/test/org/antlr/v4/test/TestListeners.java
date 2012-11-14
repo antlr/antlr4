@@ -6,14 +6,14 @@ public class TestListeners extends BaseTest {
 	@Test public void testBasic() throws Exception {
 		String grammar =
 			"grammar T;\n" +
+			"@header {import org.antlr.v4.runtime.tree.*;}\n"+
 			"@members {\n" +
 			"public static class LeafListener extends TBaseListener {\n" +
-			"    public void visitTerminal(ParseTree.TerminalNode<Token> node) {\n" +
+			"    public void visitTerminal(TerminalNode node) {\n" +
 			"      System.out.println(node.getSymbol().getText());\n" +
 			"    }\n" +
 			"  }}\n" +
 			"s\n" +
-			"@init {setBuildParseTree(true);}\n" +
 			"@after {" +
 			"  System.out.println($r.ctx.toStringTree(this));" +
 			"  ParseTreeWalker walker = new ParseTreeWalker();\n" +
@@ -28,7 +28,7 @@ public class TestListeners extends BaseTest {
 			"INT : [0-9]+ ;\n" +
 			"ID  : [a-z]+ ;\n" +
 			"WS : [ \\t\\n]+ -> skip ;\n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "1 2", false);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "1 2", false);
 		String expecting = "(a 1 2)\n" +
 						   "1\n" +
 						   "2\n";
@@ -46,7 +46,6 @@ public class TestListeners extends BaseTest {
 			"    }\n" +
 			"  }}\n" +
 			"s\n" +
-			"@init {setBuildParseTree(true);}\n" +
 			"@after {" +
 			"  System.out.println($r.ctx.toStringTree(this));" +
 			"  ParseTreeWalker walker = new ParseTreeWalker();\n" +
@@ -61,15 +60,15 @@ public class TestListeners extends BaseTest {
 			"INT : [0-9]+ ;\n" +
 			"ID  : [a-z]+ ;\n" +
 			"WS : [ \\t\\n]+ -> skip ;\n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "1 2", false);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "1 2", false);
 		String expecting =
 			"(a 1 2)\n" +
 			"1 2 [1, 2]\n";
 		assertEquals(expecting, result);
 
-		result = execParser("T.g", grammar, "TParser", "TLexer", "s", "abc", false);
+		result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "abc", false);
 		expecting = "(a abc)\n" +
-					"[@0,0:2='abc',<6>,1:0]\n";
+					"[@0,0:2='abc',<4>,1:0]\n";
 		assertEquals(expecting, result);
 	}
 
@@ -87,7 +86,6 @@ public class TestListeners extends BaseTest {
 			"    }\n" +
 			"  }}\n" +
 			"s\n" +
-			"@init {setBuildParseTree(true);}\n" +
 			"@after {" +
 			"  System.out.println($r.ctx.toStringTree(this));" +
 			"  ParseTreeWalker walker = new ParseTreeWalker();\n" +
@@ -103,12 +101,12 @@ public class TestListeners extends BaseTest {
 			"INT : [0-9]+ ;\n" +
 			"ID  : [a-z]+ ;\n" +
 			"WS : [ \\t\\n]+ -> skip ;\n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "1 2", false);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "1 2", false);
 		String expecting = "(a (b 1) (b 2))\n" +
 						   "1 2 1\n";
 		assertEquals(expecting, result);
 
-		result = execParser("T.g", grammar, "TParser", "TLexer", "s", "abc", false);
+		result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "abc", false);
 		expecting = "(a (b abc))\n" +
 					"abc\n";
 		assertEquals(expecting, result);
@@ -130,7 +128,6 @@ public class TestListeners extends BaseTest {
 			"  }" +
 			"}\n" +
 			"s\n" +
-			"@init {setBuildParseTree(true);}\n" +
 			"@after {" +
 			"  System.out.println($r.ctx.toStringTree(this));" +
 			"  ParseTreeWalker walker = new ParseTreeWalker();\n" +
@@ -145,7 +142,7 @@ public class TestListeners extends BaseTest {
 			"ADD : '+' ;\n" +
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\t\\n]+ -> skip ;\n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "1+2*3", false);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "1+2*3", false);
 		String expecting =
 			"(e (e 1) + (e (e 2) * (e 3)))\n" +
 			"1\n" +
@@ -171,28 +168,27 @@ public class TestListeners extends BaseTest {
 			"  }\n" +
 			"}\n" +
 			"s\n" +
-			"@init {setBuildParseTree(true);}\n" +
 			"@after {" +
 			"  System.out.println($r.ctx.toStringTree(this));" +
 			"  ParseTreeWalker walker = new ParseTreeWalker();\n" +
 			"  walker.walk(new LeafListener(), $r.ctx);" +
 			"}\n" +
 			"  : r=e ;\n" +
-			"e : e '(' eList ')' -> Call\n" +
-			"  | INT             -> Int\n" +
+			"e : e '(' eList ')' # Call\n" +
+			"  | INT             # Int\n" +
 			"  ;     \n" +
 			"eList : e (',' e)* ;\n" +
 			"MULT: '*' ;\n" +
 			"ADD : '+' ;\n" +
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\t\\n]+ -> skip ;\n";
-		String result = execParser("T.g", grammar, "TParser", "TLexer", "s", "1(2,3)", false);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s", "1(2,3)", false);
 		String expecting =
 			"(e (e 1) ( (eList (e 2) , (e 3)) ))\n" +
 			"1\n" +
 			"2\n" +
 			"3\n" +
-			"1 [14 6]\n";
+			"1 [13 6]\n";
 		assertEquals(expecting, result);
 	}
 }

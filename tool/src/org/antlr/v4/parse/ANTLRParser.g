@@ -283,16 +283,8 @@ delegateGrammar
  *  {tree} parser.
  */
 tokensSpec
-	: TOKENS_SPEC tokenSpec+ RBRACE -> ^(TOKENS_SPEC tokenSpec+)
-	;
-
-tokenSpec
-	:	id
-		(	ASSIGN STRING_LITERAL	-> ^(ASSIGN id STRING_LITERAL<TerminalAST>)
-		|							-> id
-		)
-		SEMI
-	|	RULE_REF // INVALID! (an error alt)
+	: TOKENS_SPEC id (COMMA id)* RBRACE -> ^(TOKENS_SPEC id+)
+    | TOKENS_SPEC RBRACE ->
 	;
 
 // A declaration of a language target specifc section,
@@ -361,12 +353,6 @@ parserRule
     : // A rule may start with an optional documentation comment
       DOC_COMMENT?
 
-      // Following the documentation, we can declare a rule to be
-      // public, private and so on. This is only valid for some
-      // language targets of course but the target will ignore these
-      // modifiers if they make no sense in that language.
-      ruleModifiers?
-
 	  // Next comes the rule name. Here we do not distinguish between
 	  // parser or lexer rules, the semantic verification phase will
 	  // reject any rules that make no sense, such as lexer rules in
@@ -412,7 +398,7 @@ parserRule
 
       exceptionGroup
 
-      -> ^( RULE<RuleAST> RULE_REF DOC_COMMENT? ruleModifiers? ARG_ACTION<ActionAST>?
+      -> ^( RULE<RuleAST> RULE_REF DOC_COMMENT? ARG_ACTION<ActionAST>?
       		ruleReturns? throwsSpec? localsSpec? rulePrequels? ruleBlock exceptionGroup*
       	  )
     ;
@@ -492,28 +478,6 @@ ruleAction
 	:	AT id ACTION -> ^(AT id ACTION<ActionAST>)
 	;
 
-// A set of access modifiers that may be applied to rule declarations
-// and which may or may not mean something to the target language.
-// Note that the parser allows any number of these in any order and the
-// semantic pass will throw out invalid combinations.
-//
-ruleModifiers
-    : ruleModifier+ -> ^(RULEMODIFIERS ruleModifier+)
-    ;
-
-// An individual access modifier for a rule. The 'fragment' modifier
-// is an internal indication for lexer rules that they do not match
-// from the input but are like subroutines for other lexer rules to
-// reuse for certain lexical patterns. The other modifiers are passed
-// to the code generation templates and may be ignored by the template
-// if they are of no use in that language.
-ruleModifier
-    : PUBLIC
-    | PRIVATE
-    | PROTECTED
-    | FRAGMENT
-    ;
-
 // A set of alts, rewritten as a BLOCK for generic processing
 // in tree walkers. Used by the rule 'rule' so that the list of
 // alts for a rule appears as a BLOCK containing the alts and
@@ -535,10 +499,9 @@ ruleAltList
 
 labeledAlt
 	:	alternative
-		(	RARROW! id! {((AltAST)$alternative.tree).altLabel=$id.tree;}
+		(	POUND! id! {((AltAST)$alternative.tree).altLabel=$id.tree;}
 		)?
 	;
-
 
 lexerRule
 @init { paraphrases.push("matching a lexer rule"); }
@@ -632,8 +595,17 @@ labeledLexerElement
 	;
 
 lexerBlock
- 	:	LPAREN lexerAltList RPAREN
-      -> ^(BLOCK<BlockAST>[$LPAREN,"BLOCK"] lexerAltList )
+@after {
+GrammarAST options = (GrammarAST)$tree.getFirstChildWithType(ANTLRParser.OPTIONS);
+if ( options!=null ) {
+	Grammar.setNodeOptions($tree, options);
+}
+}
+ 	:	LPAREN
+        ( optionsSpec COLON )?
+        lexerAltList
+        RPAREN
+      -> ^(BLOCK<BlockAST>[$LPAREN,"BLOCK"] optionsSpec? lexerAltList )
     ;
 
 // channel=HIDDEN, skip, more, mode(INSIDE), push(INSIDE), pop
@@ -655,7 +627,7 @@ lexerCommandName
         :       id
         |       MODE    ->ID[$MODE]
         ;
-        
+
 altList
     :	alternative (OR alternative)* -> alternative+
     ;
@@ -755,9 +727,9 @@ blockSuffix
     ;
 
 ebnfSuffix
-	:	QUESTION	-> OPTIONAL<OptionalBlockAST>[$start]
-  	|	STAR 		-> CLOSURE<StarBlockAST>[$start]
-   	|	PLUS	 	-> POSITIVE_CLOSURE<PlusBlockAST>[$start]
+	:	QUESTION nongreedy=QUESTION?	-> OPTIONAL<OptionalBlockAST>[$start, $nongreedy]
+  	|	STAR nongreedy=QUESTION?		-> CLOSURE<StarBlockAST>[$start, $nongreedy]
+   	|	PLUS nongreedy=QUESTION?		-> POSITIVE_CLOSURE<PlusBlockAST>[$start, $nongreedy]
 	;
 
 lexerAtom

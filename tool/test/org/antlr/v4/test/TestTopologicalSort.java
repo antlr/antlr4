@@ -87,12 +87,12 @@ public class TestTopologicalSort extends BaseTest {
     @Test
     public void testSimpleTokenDependence() throws Exception {
         Graph g = new Graph();
-        g.addEdge("Java.g", "MyJava.tokens"); // Java feeds off manual token file
-        g.addEdge("Java.tokens", "Java.g");
-        g.addEdge("Def.g", "Java.tokens");    // walkers feed off generated tokens
-        g.addEdge("Ref.g", "Java.tokens");
+        g.addEdge("Java.g4", "MyJava.tokens"); // Java feeds off manual token file
+        g.addEdge("Java.tokens", "Java.g4");
+        g.addEdge("Def.g4", "Java.tokens");    // walkers feed off generated tokens
+        g.addEdge("Ref.g4", "Java.tokens");
 
-        String expecting = "[MyJava.tokens, Java.g, Java.tokens, Ref.g, Def.g]";
+        String expecting = "[MyJava.tokens, Java.g4, Java.tokens, Ref.g4, Def.g4]";
         List nodes = g.sort();
         String result = nodes.toString();
         assertEquals(expecting, result);
@@ -101,12 +101,12 @@ public class TestTopologicalSort extends BaseTest {
     @Test
     public void testParserLexerCombo() throws Exception {
         Graph g = new Graph();
-        g.addEdge("JavaLexer.tokens", "JavaLexer.g");
-        g.addEdge("JavaParser.g", "JavaLexer.tokens");
-        g.addEdge("Def.g", "JavaLexer.tokens");
-        g.addEdge("Ref.g", "JavaLexer.tokens");
+        g.addEdge("JavaLexer.tokens", "JavaLexer.g4");
+        g.addEdge("JavaParser.g4", "JavaLexer.tokens");
+        g.addEdge("Def.g4", "JavaLexer.tokens");
+        g.addEdge("Ref.g4", "JavaLexer.tokens");
 
-        String expecting = "[JavaLexer.g, JavaLexer.tokens, JavaParser.g, Ref.g, Def.g]";
+        String expecting = "[JavaLexer.g4, JavaLexer.tokens, JavaParser.g4, Ref.g4, Def.g4]";
         List nodes = g.sort();
         String result = nodes.toString();
         assertEquals(expecting, result);

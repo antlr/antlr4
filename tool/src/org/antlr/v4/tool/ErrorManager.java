@@ -82,11 +82,6 @@ public class ErrorManager {
 
 	public ErrorManager(Tool tool) {
 		this.tool = tool;
-		// try to load the message format group
-		// the user might have specified one on the command line
-		// if not, or if the user has given an illegal value, we will fall back to "antlr"
-		setFormat("antlr");
-		//org.stringtemplate.v4.misc.ErrorManager.setErrorListener(theDefaultSTListener);
 	}
 
 	public void resetErrorState() {
@@ -131,7 +126,7 @@ public class ErrorManager {
 			locationValid = true;
 		}
 
-		messageFormatST.add("id", msg.errorType.ordinal());
+		messageFormatST.add("id", msg.errorType.code);
 		messageFormatST.add("text", messageST);
 
 		if (locationValid) reportST.add("location", locationST);
@@ -274,7 +269,7 @@ public class ErrorManager {
         format = new STGroupFile(fileName, "UTF-8");
         format.load();
 
-        if ( initSTListener.errors.size()>0 ) {
+        if ( !initSTListener.errors.isEmpty() ) {
             rawError("ANTLR installation corrupted; can't load messages format file:\n"+
                      initSTListener.toString());
             panic();

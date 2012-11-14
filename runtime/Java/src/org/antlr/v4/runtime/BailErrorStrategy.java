@@ -29,18 +29,25 @@
 
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+
 /** Bail out of parser at first syntax error. Do this to use it:
- *      myparser.setErrorHandler(new BailErrorStrategy<Token>());
+ *  <p/>
+ *  {@code myparser.setErrorHandler(new BailErrorStrategy());}
  */
 public class BailErrorStrategy extends DefaultErrorStrategy {
-    /** Instead of recovering from exception e, Re-throw wrote it wrapped
-     *  in a generic RuntimeException so it is not caught by the
-     *  rule function catches.  Exception e is the "cause" of the
-     *  RuntimeException.
+    /** Instead of recovering from exception {@code e}, re-throw it wrapped
+     *  in a {@link ParseCancellationException} so it is not caught by the
+     *  rule function catches.  Use {@link Exception#getCause()} to get the
+	 *  original {@link RecognitionException}.
      */
     @Override
     public void recover(Parser recognizer, RecognitionException e) {
-        throw new RuntimeException(e);
+		for (ParserRuleContext context = recognizer.getContext(); context != null; context = context.getParent()) {
+			context.exception = e;
+		}
+
+        throw new ParseCancellationException(e);
     }
 
     /** Make sure we don't attempt to recover inline; if the parser
@@ -50,7 +57,12 @@ public class BailErrorStrategy extends DefaultErrorStrategy {
     public Token recoverInline(Parser recognizer)
         throws RecognitionException
     {
-        throw new RuntimeException(new InputMismatchException(recognizer));
+		InputMismatchException e = new InputMismatchException(recognizer);
+		for (ParserRuleContext context = recognizer.getContext(); context != null; context = context.getParent()) {
+			context.exception = e;
+		}
+
+        throw new ParseCancellationException(e);
     }
 
     /** Make sure we don't attempt to recover from problems in subrules. */

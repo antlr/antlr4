@@ -325,6 +325,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		for (int i = 0; i < n; i++) {
 			GrammarAST alt = (GrammarAST)blk.getChildren().get(i);
 			Tree first = alt.getChild(0);
+			if ( first==null ) continue;
 			if ( first.getType()==RULE_REF && first.getText().equals(ruleName) ) return true;
 			Tree rref = first.getChild(1);
 			if ( rref!=null && rref.getType()==RULE_REF && rref.getText().equals(ruleName) ) return true;
@@ -359,7 +360,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		TokenStream tokens = input.getTokenStream();
 		// find =>
 		for (int i=stop; i>=start; i--) {
-			if ( tokens.get(i).getType()==RARROW ) {
+			if ( tokens.get(i).getType()==POUND ) {
 				altAST.setTokenStopIndex(i-1);
 				return;
 			}

@@ -42,6 +42,8 @@ public class CodeGenPipeline {
 	public void process() {
 		CodeGenerator gen = new CodeGenerator(g);
 
+		if ( gen.templates==null ) return;
+
 		if ( g.isLexer() ) {
 			ST lexer = gen.generateLexer();
 			if ( g.tool.launch_ST_inspector ) lexer.inspect();
@@ -54,10 +56,6 @@ public class CodeGenPipeline {
 			if ( g.tool.gen_listener ) {
 				gen.writeListener(gen.generateListener());
 				gen.writeBaseListener(gen.generateBaseListener());
-			}
-			if ( g.tool.gen_parse_listener ) {
-				gen.writeParseListener(gen.generateParseListener());
-				gen.writeBaseParseListener(gen.generateBaseParseListener());
 			}
 			if ( g.tool.gen_visitor ) {
 				gen.writeVisitor(gen.generateVisitor());

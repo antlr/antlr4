@@ -29,19 +29,28 @@
 
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.*;
-import org.antlr.v4.codegen.model.chunk.*;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.model.chunk.ActionChunk;
+import org.antlr.v4.codegen.model.chunk.ActionText;
+import org.antlr.v4.codegen.model.chunk.DefaultParserSuperClass;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /** */
 public class Parser extends OutputModelObject {
 	public String name;
 	public String grammarFileName;
 	public String grammarName;
-	@ModelElement public ActionChunk superclass;
+	@ModelElement public ActionChunk superClass;
 	public Map<String,Integer> tokens;
 	public String[] tokenNames;
 	public Set<String> ruleNames;
@@ -85,9 +94,10 @@ public class Parser extends OutputModelObject {
 		rules = g.rules.values();
 		atn = new SerializedATN(factory, g.atn);
 		if (g.getOptionString("superClass") != null) {
-			superclass = new ActionText(null, g.getOptionString("superClass"));
-		} else {
-			superclass = new DefaultParserSuperClass();
+			superClass = new ActionText(null, g.getOptionString("superClass"));
+		}
+		else {
+			superClass = new DefaultParserSuperClass();
 		}
 	}
 }

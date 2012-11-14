@@ -29,30 +29,36 @@
 
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
+import java.util.BitSet;
+
 /** How to emit recognition errors */
-public interface ANTLRErrorListener<Symbol> {
-	/** Upon syntax error, notify any interested parties. This is not how to
-	 *  recover from errors or compute error messages. The parser
-	 *  ANTLRErrorStrategy specifies how to recover from syntax errors
-	 *  and how to compute error messages. This listener's job is simply to
-	 *  emit a computed message, though it has enough information to
-	 *  create its own message in many cases.
+public interface ANTLRErrorListener {
+	/** Upon syntax error, notify any interested parties. This is not
+	 *  how to recover from errors or compute error messages. The
+	 *  parser ANTLRErrorStrategy specifies how to recover from syntax
+	 *  errors and how to compute error messages. This listener's job
+	 *  is simply to emit a computed message, though it has enough
+	 *  information to create its own message in many cases.
 	 *
-	 *  The RecognitionException is non-null for all syntax errors except
-	 *  when we discover mismatched token errors that we can recover from
-	 *  in-line, without returning from the surrounding rule (via the
-	 *  single token insertion and deletion mechanism).
+	 *  The RecognitionException is non-null for all syntax errors
+	 *  except when we discover mismatched token errors that we can
+	 *  recover from in-line, without returning from the surrounding
+	 *  rule (via the single token insertion and deletion mechanism).
 	 *
 	 * @param recognizer
-	 * 		  What parser got the error. From this object, you
-	 * 		  can access the context as well as the input stream.
+     *        What parser got the error. From this
+	 * 		  object, you can access the context as well
+	 * 		  as the input stream.
 	 * @param offendingSymbol
-	 * 		  The offending token in the input token stream, unless recognizer
-	 * 		  is a lexer (then it's null)
-	 * 		  If no viable alternative error, e has token
-	 * 		  at which we started production for the decision.
+	 *        The offending token in the input token
+	 * 		  stream, unless recognizer is a lexer (then it's null) If
+	 * 		  no viable alternative error, e has token at which we
+	 * 		  started production for the decision.
 	 * @param line
 	 * 		  At what line in input to the error occur? This always refers to
 	 * 		  stopTokenIndex
@@ -66,10 +72,40 @@ public interface ANTLRErrorListener<Symbol> {
 	 *        the parser was able to recover in line without exiting the
 	 *        surrounding rule.
 	 */
-	public <T extends Symbol> void error(Recognizer<T, ?> recognizer,
-										 @Nullable T offendingSymbol,
-										 int line,
-										 int charPositionInLine,
-										 String msg,
-										 @Nullable RecognitionException e);
+	public void syntaxError(Recognizer<?, ?> recognizer,
+							@Nullable Object offendingSymbol,
+							int line,
+							int charPositionInLine,
+							String msg,
+							@Nullable RecognitionException e);
+
+	/** Called when the parser detects a true ambiguity: an input
+	 * sequence can be matched literally by two or more pass through
+	 * the grammar. ANTLR resolves the ambiguity in favor of the
+	 * alternative appearing first in the grammar. The start and stop
+	 * index are zero-based absolute indices into the token
+	 * stream. ambigAlts is a set of alternative numbers that can
+	 * match the input sequence. This method is only called when we
+	 * are parsing with full context.
+     */
+    void reportAmbiguity(@NotNull Parser recognizer,
+						 DFA dfa, int startIndex, int stopIndex,
+						 @NotNull BitSet ambigAlts,
+						 @NotNull ATNConfigSet configs);
+
+	void reportAttemptingFullContext(@NotNull Parser recognizer,
+									 @NotNull DFA dfa,
+									 int startIndex, int stopIndex,
+									 @NotNull ATNConfigSet configs);
+
+	/** Called by the parser when it find a conflict that is resolved
+     *  by retrying the parse with full context. This is not a
+     *  warning; it simply notifies you that your grammar is more
+     *  complicated than Strong LL can handle. The parser moved up to
+     *  full context parsing for that input sequence.
+     */
+    void reportContextSensitivity(@NotNull Parser recognizer,
+                                  @NotNull DFA dfa,
+                                  int startIndex, int stopIndex,
+                                  @NotNull ATNConfigSet configs);
 }

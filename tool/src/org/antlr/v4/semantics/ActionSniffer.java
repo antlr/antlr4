@@ -107,11 +107,11 @@ public class ActionSniffer extends BlankActionSplitterListener {
 
 	public void trackRef(Token x) {
 		List<TerminalAST> xRefs = alt.tokenRefs.get(x.getText());
-		if ( alt!=null && xRefs!=null ) {
+		if ( xRefs!=null ) {
 			alt.tokenRefsInActions.map(x.getText(), node);
 		}
 		List<GrammarAST> rRefs = alt.ruleRefs.get(x.getText());
-		if ( alt!=null && rRefs!=null ) {
+		if ( rRefs!=null ) {
 			alt.ruleRefsInActions.map(x.getText(), node);
 		}
 	}

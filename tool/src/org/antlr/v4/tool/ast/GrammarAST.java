@@ -100,7 +100,7 @@ public class GrammarAST extends CommonTree {
 		List<GrammarAST> work = new LinkedList<GrammarAST>();
 		work.add(this);
 		GrammarAST t;
-		while ( work.size()>0 ) {
+		while ( !work.isEmpty() ) {
 			t = work.remove(0);
 			if ( types.contains(t.getType()) ) nodes.add(t);
 			if ( t.children!=null ) work.addAll((Collection)t.children);

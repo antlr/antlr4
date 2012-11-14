@@ -1,19 +1,27 @@
 import org.antlr.runtime.debug.BlankDebugEventListener;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DiagnosticErrorListener;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionMode;
 
 import java.io.File;
 
 /** Parse a java file or directory of java files using the generated parser
- *  ANTLR builds from java.g
+ *  ANTLR builds from java.g4
  */
 class TestJava {
 	public static long lexerTime = 0;
 	public static boolean profile = false;
 	public static JavaLexer lexer;
 	public static JavaParser parser = null;
+	public static boolean showTree = false;
+	public static boolean printTree = false;
+	public static boolean SLL = false;
+	public static boolean diag = false;
 
 	public static void main(String[] args) {
         doAll(args);
@@ -28,6 +36,10 @@ class TestJava {
             if (args.length > 0 ) {
                 // for each directory/file specified on the command line
                 for(int i=0; i< args.length;i++) {
+					if ( args[i].equals("-tree") ) showTree = true;
+					else if ( args[i].equals("-ptree") ) printTree = true;
+					else if ( args[i].equals("-SLL") ) SLL = true;
+					else if ( args[i].equals("-diag") ) diag = true;
                     doFile(new File(args[i])); // parse it
                 }
             }
@@ -39,7 +51,6 @@ class TestJava {
             System.out.println("Total time " + (stop - start) + "ms.");
 
             System.out.println("finished parsing OK");
-            System.out.println(LexerATNSimulator.ATN_failover+" lexer failovers");
             System.out.println(LexerATNSimulator.match_calls+" lexer match calls");
             System.out.println(ParserATNSimulator.ATN_failover+" parser failovers");
             System.out.println(ParserATNSimulator.predict_calls +" parser predict calls");
@@ -114,8 +125,14 @@ class TestJava {
 //					parser.getInterpreter().setContextSensitive(true);
 				}
 				parser.setTokenStream(tokens);
+
+				if ( diag ) parser.addErrorListener(new DiagnosticErrorListener());
+				if ( SLL ) parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
 				// start parsing at the compilationUnit rule
-				parser.compilationUnit();
+				ParserRuleContext tree = parser.compilationUnit();
+				if ( showTree ) tree.inspect(parser);
+				if ( printTree ) System.out.println(tree.toStringTree(parser));
+
 				//System.err.println("finished "+f);
 //                System.out.println("cache size = "+DefaultErrorStrategy.cache.size());
 			}

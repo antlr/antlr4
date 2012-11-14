@@ -31,9 +31,10 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.tool.*;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.ST;
 
@@ -91,20 +92,12 @@ public class Target {
 	 *  Literals without associated names are converted to the string equivalent
 	 *  of their integer values. Used to generate x==ID and x==34 type comparisons
 	 *  etc...  Essentially we are looking for the most obvious way to refer
-	 *  to a token type in the generated code.  If in the lexer, return the
-	 *  char literal translated to the target language.  For example, ttype=10
-	 *  will yield '\n' from the getTokenDisplayName method.  That must
-	 *  be converted to the target languages literals.  For most C-derived
-	 *  languages no translation is needed.
+	 *  to a token type in the generated code.
 	 */
 	public String getTokenTypeAsTargetLabel(Grammar g, int ttype) {
-		if ( g.getType() == ANTLRParser.LEXER ) {
-//			String name = g.getTokenDisplayName(ttype);
-//			return getTargetCharLiteralFromANTLRCharLiteral(this,name);
-		}
 		String name = g.getTokenDisplayName(ttype);
 		// If name is a literal, return the token type instead
-		if ( name.charAt(0)=='\'' ) {
+		if ( name==null || name.charAt(0)=='\'' ) {
 			return String.valueOf(ttype);
 		}
 		return name;
