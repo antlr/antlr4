@@ -93,13 +93,6 @@ public class ParserRuleContext extends RuleContext {
 	 */
 //	public List<Integer> states;
 
-	/** Current ATN state number we are executing.
-	 *
-	 *  Not used during ATN simulation/prediction; only used during parse that updates
-	 *  current location in ATN.
-	 */
-	public int s = -1;
-
 	public Token start, stop;
 
 	/** Set during parsing to identify which alt of rule parser is in. */
@@ -117,20 +110,14 @@ public class ParserRuleContext extends RuleContext {
 	public void copyFrom(ParserRuleContext ctx) {
 		// from RuleContext
 		this.parent = ctx.parent;
-		this.s = ctx.s;
 		this.invokingState = ctx.invokingState;
 
 		this.start = ctx.start;
 		this.stop = ctx.stop;
 	}
 
-	public ParserRuleContext(@Nullable ParserRuleContext parent, int invokingStateNumber, int stateNumber) {
+	public ParserRuleContext(@Nullable ParserRuleContext parent, int invokingStateNumber) {
 		super(parent, invokingStateNumber);
-		this.s = stateNumber;
-	}
-
-	public ParserRuleContext(@Nullable ParserRuleContext parent, int stateNumber) {
-		this(parent, parent!=null ? parent.s : -1 /* invoking state */, stateNumber);
 	}
 
 	// Double dispatch methods for listeners

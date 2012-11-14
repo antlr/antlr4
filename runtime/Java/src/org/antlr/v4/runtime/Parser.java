@@ -419,7 +419,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 *  This is flexible because users do not have to regenerate parsers
 	 *  to get trace facilities.
 	 */
-	public void enterRule(ParserRuleContext localctx, int ruleIndex) {
+	public void enterRule(ParserRuleContext localctx, int state, int ruleIndex) {
+		setState(state);
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
 		if (_buildParseTrees) addContextToParseTree();
@@ -430,6 +431,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		_ctx.stop = _input.LT(-1);
         // trigger event on _ctx, before it reverts to parent
         if ( _parseListeners != null) triggerExitRuleEvent();
+		setState(_ctx.invokingState);
 		_ctx = (ParserRuleContext)_ctx.parent;
     }
 
@@ -514,7 +516,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 //   		return getInterpreter().atn.nextTokens(_ctx);
         ATN atn = getInterpreter().atn;
 		ParserRuleContext ctx = _ctx;
-        ATNState s = atn.states.get(ctx.s);
+        ATNState s = atn.states.get(getState());
         IntervalSet following = atn.nextTokens(s);
         if (following.contains(symbol)) {
             return true;
@@ -546,7 +548,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
     public IntervalSet getExpectedTokens() {
         ATN atn = getInterpreter().atn;
 		ParserRuleContext ctx = _ctx;
-        ATNState s = atn.states.get(ctx.s);
+        ATNState s = atn.states.get(getState());
         IntervalSet following = atn.nextTokens(s);
 //        System.out.println("following "+s+"="+following);
         if ( !following.contains(Token.EPSILON) ) return following;
@@ -569,7 +571,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 
     public IntervalSet getExpectedTokensWithinCurrentRule() {
         ATN atn = getInterpreter().atn;
-        ATNState s = atn.states.get(_ctx.s);
+        ATNState s = atn.states.get(getState());
    		return atn.nextTokens(s);
    	}
 
@@ -651,19 +653,6 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 			strings.add(tokens.get(i).getText());
 		}
 		return strings;
-	}
-
-	/** Indicate that the recognizer has changed internal state that is
-	 *  consistent with the ATN state passed in.  This way we always know
-	 *  where we are in the ATN as the parser goes along. The rule
-	 *  context objects form a stack that lets us see the stack of
-	 *  invoking rules. Combine this and we have complete ATN
-	 *  configuration information.
-	 */
-	public void setState(int atnState) {
-//		System.err.println("setState "+atnState);
-		_ctx.s = atnState;
-//		if ( traceATNStates ) _ctx.trace(atnState);
 	}
 
 	/** During a parse is sometimes useful to listen in on the rule entry and exit
