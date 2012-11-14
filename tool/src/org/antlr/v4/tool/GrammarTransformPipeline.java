@@ -30,6 +30,7 @@
 package org.antlr.v4.tool;
 
 import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
@@ -76,8 +77,7 @@ public class GrammarTransformPipeline {
 	}
 
 	public void reduceBlocksToSets(GrammarAST root) {
-		org.antlr.runtime.tree.CommonTreeNodeStream nodes =
-			new org.antlr.runtime.tree.CommonTreeNodeStream(root);
+		CommonTreeNodeStream nodes = new CommonTreeNodeStream(new GrammarASTAdaptor(), root);
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
 		BlockSetTransformer transformer = new BlockSetTransformer(nodes, g);
 		transformer.setTreeAdaptor(adaptor);
