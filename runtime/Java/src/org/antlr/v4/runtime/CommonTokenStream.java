@@ -50,8 +50,6 @@ public class CommonTokenStream extends BufferedTokenStream {
     /** Skip tokens on any channel but this one; this is how we skip whitespace... */
     protected int channel = Token.DEFAULT_CHANNEL;
 
-    public CommonTokenStream() { ; }
-
     public CommonTokenStream(TokenSource tokenSource) {
         super(tokenSource);
     }
@@ -61,32 +59,9 @@ public class CommonTokenStream extends BufferedTokenStream {
         this.channel = channel;
     }
 
-    /** Always leave p on an on-channel token. */
-    @Override
-    public void consume() {
-        if ( p == -1 ) setup();
-        p++;
-        sync(p);
-		Token t = tokens.get(p);
-		while ( t.getType()!=Token.EOF && t.getChannel()!=channel ) {
-            p++;
-            sync(p);
-			t = tokens.get(p);
-        }
-    }
-
-    @Override
-    public void seek(int index) {
-        super.seek(index);
-        while (p < index) {
-            consume();
-        }
-    }
-
 	@Override
-	public void reset() {
-		super.reset();
-		p = nextTokenOnChannel(p, channel);
+	protected int adjustSeekIndex(int i) {
+		return nextTokenOnChannel(i, channel);
 	}
 
     @Override
@@ -108,33 +83,21 @@ public class CommonTokenStream extends BufferedTokenStream {
     @Override
     public Token LT(int k) {
         //System.out.println("enter LT("+k+")");
-        if ( p == -1 ) setup();
+        lazyInit();
         if ( k == 0 ) return null;
         if ( k < 0 ) return LB(-k);
         int i = p;
         int n = 1; // we know tokens[p] is a good one
         // find k good tokens
         while ( n<k ) {
-            // skip off-channel tokens
-            i = nextTokenOnChannel(i + 1, channel);
+            // skip off-channel tokens, but make sure to not look past EOF
+			if (sync(i + 1)) {
+				i = nextTokenOnChannel(i + 1, channel);
+			}
             n++;
         }
 //		if ( i>range ) range = i;
         return tokens.get(i);
-    }
-
-    @Override
-    protected void setup() {
-        p = 0;
-        sync(0);
-        int i = 0;
-        Token token = tokens.get(i);
-        while ( token.getType()!=Token.EOF && token.getChannel()!=channel ) {
-            i++;
-            sync(i);
-            token = tokens.get(i);
-        }
-        p = i;
     }
 
 	/** Count EOF just once. */
@@ -148,11 +111,4 @@ public class CommonTokenStream extends BufferedTokenStream {
 		}
 		return n;
 	}
-
-    /** Reset this token stream by setting its token source. */
-    @Override
-    public void setTokenSource(TokenSource tokenSource) {
-        super.setTokenSource(tokenSource);
-        channel = Token.DEFAULT_CHANNEL;
-    }
 }
