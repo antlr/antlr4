@@ -49,7 +49,7 @@ public enum PredictionMode {
 			if ( a==null || b==null ) return false;
 			if ( hashCode(a) != hashCode(b) ) return false;
 			return a.state.stateNumber==b.state.stateNumber
-				&& b.context.equals(b.context);
+				&& a.context.equals(b.context);
 		}
 	}
 

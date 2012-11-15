@@ -258,7 +258,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			if ( hashCode(a) != hashCode(b) ) return false;
 			return a.state.stateNumber==b.state.stateNumber
 				&& a.alt==b.alt
-				&& b.semanticContext.equals(b.semanticContext);
+				&& a.semanticContext.equals(b.semanticContext);
 		}
 	}
 
