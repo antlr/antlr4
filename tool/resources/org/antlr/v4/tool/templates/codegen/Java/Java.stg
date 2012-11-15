@@ -208,8 +208,8 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, <currentRule.startState><currentRule.args:{a | , <a.name>}>);
-	enterRule(_localctx, RULE_<currentRule.name>);
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>);
+	enterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
@@ -246,7 +246,7 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
 	ParserRuleContext _parentctx = _ctx;
-	int _parentState = _ctx.s;
+	int _parentState = getState();
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>);
 	<currentRule.ctxType> _prevctx = _localctx;
 	int _startState = <currentRule.startState>;
@@ -602,9 +602,9 @@ StructDecl(struct,attrs,getters,dispatchMethods,interfaces,extensionMembers,
 public static class <struct.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	<if(struct.ctorAttrs)>public <struct.name>(ParserRuleContext parent, int state) { super(parent, state); }<endif>
-	public <struct.name>(ParserRuleContext parent, int state<struct.ctorAttrs:{a | , <a>}>) {
-		super(parent, state);
+	<if(struct.ctorAttrs)>public <struct.name>(ParserRuleContext parent, int invokingState) { super(parent, invokingState); }<endif>
+	public <struct.name>(ParserRuleContext parent, int invokingState<struct.ctorAttrs:{a | , <a>}>) {
+		super(parent, invokingState);
 		<struct.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
 	}
 	@Override public int getRuleIndex() { return RULE_<struct.derivedFromName>; }

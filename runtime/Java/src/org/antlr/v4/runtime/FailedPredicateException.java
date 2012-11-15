@@ -56,7 +56,7 @@ public class FailedPredicateException extends RecognitionException {
 									@Nullable String message)
 	{
 		super(formatMessage(predicate, message), recognizer, recognizer.getInputStream(), recognizer._ctx);
-		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer._ctx.s);
+		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer.getState());
 		PredicateTransition trans = (PredicateTransition)s.transition(0);
 		this.ruleIndex = trans.ruleIndex;
 		this.predicateIndex = trans.predIndex;
