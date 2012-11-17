@@ -29,6 +29,7 @@
 
 package org.antlr.v4.semantics;
 
+import org.antlr.v4.analysis.LeftFactoringRuleTransformer;
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
@@ -91,6 +92,10 @@ public class SemanticPipeline {
 		LeftRecursiveRuleTransformer lrtrans =
 			new LeftRecursiveRuleTransformer(g.ast, ruleCollector.rules.values(), g);
 		lrtrans.translateLeftRecursiveRules();
+
+		// AUTO LEFT FACTORING
+		LeftFactoringRuleTransformer lftrans = new LeftFactoringRuleTransformer(g.ast, ruleCollector.rules, g);
+		lftrans.translateLeftFactoredRules();
 
 		// STORE RULES IN GRAMMAR
 		for (Rule r : ruleCollector.rules.values()) {
