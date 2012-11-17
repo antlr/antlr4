@@ -83,5 +83,5 @@ public class GrammarRootAST extends GrammarASTWithOptions {
 	public Object visit(GrammarASTVisitor v) { return v.visit(this); }
 
 	@Override
-	public Tree dupNode() { return new GrammarRootAST(this); }
+	public GrammarRootAST dupNode() { return new GrammarRootAST(this); }
 }

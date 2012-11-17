@@ -42,14 +42,19 @@ public class GrammarASTAdaptor extends CommonTreeAdaptor {
     public GrammarASTAdaptor() { }
     public GrammarASTAdaptor(org.antlr.runtime.CharStream input) { this.input = input; }
 
+	@Override
+	public GrammarAST nil() {
+		return (GrammarAST)super.nil();
+	}
+
     @Override
-    public Object create(Token token) {
+    public GrammarAST create(Token token) {
         return new GrammarAST(token);
     }
 
     @Override
     /** Make sure even imaginary nodes know the input stream */
-    public Object create(int tokenType, String text) {
+    public GrammarAST create(int tokenType, String text) {
 		GrammarAST t;
 		if ( tokenType==ANTLRParser.RULE ) {
 			// needed by TreeWizard to make RULE tree
@@ -67,14 +72,24 @@ public class GrammarASTAdaptor extends CommonTreeAdaptor {
         return t;
     }
 
+	@Override
+	public GrammarAST create(int tokenType, Token fromToken, String text) {
+		return (GrammarAST)super.create(tokenType, fromToken, text);
+	}
+
+	@Override
+	public GrammarAST create(int tokenType, Token fromToken) {
+		return (GrammarAST)super.create(tokenType, fromToken);
+	}
+
     @Override
-    public Object dupNode(Object t) {
+    public GrammarAST dupNode(Object t) {
         if ( t==null ) return null;
         return ((GrammarAST)t).dupNode(); //create(((GrammarAST)t).token);
     }
 
     @Override
-    public Object errorNode(org.antlr.runtime.TokenStream input, org.antlr.runtime.Token start, org.antlr.runtime.Token stop,
+    public GrammarASTErrorNode errorNode(org.antlr.runtime.TokenStream input, org.antlr.runtime.Token start, org.antlr.runtime.Token stop,
                             org.antlr.runtime.RecognitionException e)
     {
         return new GrammarASTErrorNode(input, start, stop, e);
