@@ -235,6 +235,18 @@ public class TestParserExec extends BaseTest {
 	@Ignore("Sam's works here but mine doesn't since I fail over to LL even "
 		+ "though SLL + preds evals to single alt; i could avoid but code "
 		+ "complexity wasn't worth it. see branch SLL-w-preds-avoids-LL")
+	/* Would need to add to execDFA, execATN:
+	// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
+					if ( s.predicates!=null ) {
+						if ( debug ) System.out.println("DFA state has preds in DFA sim LL failover");
+						input.seek(startIndex);
+						IntervalSet alts = evalSemanticContext(s.predicates, outerContext, true);
+						if ( alts.size()==1 ) {
+							if ( debug ) System.out.println("Full LL avoided");
+							return alts.getMinElement();
+						}
+					}
+	 */
 	@Test
 	public void testPredicatedIfIfElse() throws Exception {
 		String grammar =
