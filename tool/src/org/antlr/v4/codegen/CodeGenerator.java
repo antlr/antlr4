@@ -213,7 +213,7 @@ public class CodeGenerator {
 		ST tokenVocabSerialization = getTokenVocabOutput();
 		String fileName = getVocabFileName();
 		if ( fileName!=null ) {
-			write(tokenVocabSerialization, fileName);
+			target.genFile(g, tokenVocabSerialization, fileName);
 		}
 	}
 

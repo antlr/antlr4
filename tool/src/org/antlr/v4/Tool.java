@@ -40,7 +40,6 @@ import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenPipeline;
-import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.Graph;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
@@ -609,16 +608,7 @@ public class Tool {
 		}
 		// output directory is a function of where the grammar file lives
 		// for subdir/T.g4, you get subdir here.  Well, depends on -o etc...
-		// But, if this is a .tokens file, then we force the output to
-		// be the base output directory (or current directory if there is not a -o)
-		//
-		File outputDir;
-		if ( fileName.endsWith(CodeGenerator.VOCAB_FILE_EXTENSION) ) {
-			outputDir = new File(outputDirectory);
-		}
-		else {
-			outputDir = getOutputDirectory(g.fileName);
-		}
+		File outputDir = getOutputDirectory(g.fileName);
 		File outputFile = new File(outputDir, fileName);
 
 		if (!outputDir.exists()) {

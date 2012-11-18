@@ -1,5 +1,9 @@
 ANTLR v4 Honey Badger
 
+November 17, 2012
+
+* .tokens files goes in output dir like parser file.
+
 November 11, 2012
 
 * Change version to 4.0b4 (btw, forgot to push 4.0b3 in build.properties when
