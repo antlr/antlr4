@@ -11,6 +11,7 @@ November 18, 2012
 ** tokens {A;B;} syntax
 ** tokens {A='C';} syntax
 ** {...}?=> gate semantic predicates
+** (...)=> syntactic predicates
 
 November 17, 2012
 

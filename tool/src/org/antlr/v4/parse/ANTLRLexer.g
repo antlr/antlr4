@@ -453,6 +453,17 @@ LT           : '<'                    ;
 GT           : '>'                    ;
 ASSIGN       : '='                    ;
 QUESTION     : '?'                    ;
+SYNPRED      : '=>'
+			   {
+			    Token t = new CommonToken(input, state.type, state.channel,
+			                              state.tokenStartCharIndex, getCharIndex()-1);
+				t.setLine(state.tokenStartLine);
+				t.setText(state.text);
+				t.setCharPositionInLine(state.tokenStartCharPositionInLine);
+				grammarError(ErrorType.V3_SYNPRED, t);
+                $channel=HIDDEN;
+				}
+             ;
 STAR         : '*'                    ;
 PLUS         : '+'                    ;
 PLUS_ASSIGN  : '+='                   ;
