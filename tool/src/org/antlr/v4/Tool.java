@@ -367,6 +367,7 @@ public class Tool {
 			if ( lexerAST!=null ) {
 				lexerg = new LexerGrammar(this, lexerAST);
 				lexerg.fileName = g.fileName;
+				lexerg.originalGrammar = g;
 				g.implicitLexer = lexerg;
 				lexerg.implicitLexerOwner = g;
 				processNonCombinedGrammar(lexerg, gencode);

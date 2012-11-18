@@ -4,6 +4,7 @@ November 17, 2012
 
 * .tokens files goes in output dir like parser file.
 * added check: action in lexer rules must be last element of outermost alt
+* properly check for grammar/filename difference
 
 November 11, 2012
 

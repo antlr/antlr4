@@ -121,9 +121,12 @@ public class Grammar implements AttributeResolver {
     public String fileName;
 
     /** Was this parser grammar created from a COMBINED grammar?  If so,
-	 *  this is what we derived.
+	 *  this is what we extracted.
 	 */
     public LexerGrammar implicitLexer;
+
+	/** If this is an extracted/implicit lexer, we point at original grammar */
+	public Grammar originalGrammar;
 
     /** If we're imported, who imported us? If null, implies grammar is root */
     public Grammar parent;

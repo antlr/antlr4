@@ -248,10 +248,10 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	// They are triggered by the visitor methods above.
 
 	void checkGrammarName(Token nameToken) {
-		if ( g.implicitLexer==null ) return;
 		String fullyQualifiedName = nameToken.getInputStream().getSourceName();
 		File f = new File(fullyQualifiedName);
 		String fileName = f.getName();
+		if ( g.originalGrammar!=null ) return; // don't warn about diff if this is implicit lexer
 		if ( !Utils.stripFileExtension(fileName).equals(nameToken.getText()) &&
 		     !fileName.equals(Grammar.GRAMMAR_FROM_STRING_NAME)) {
 			g.tool.errMgr.grammarError(ErrorType.FILE_AND_GRAMMAR_NAME_DIFFER,

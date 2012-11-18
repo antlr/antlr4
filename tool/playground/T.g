@@ -1,8 +1,3 @@
 grammar T;
-s : A ;
+s : EOF ;
 
-A : 'a' ;
-
-B : 'x' -> skip |'y' ;
-
-WS : [ \t\r\n]+ -> skip ;
