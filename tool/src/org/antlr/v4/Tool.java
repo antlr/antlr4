@@ -44,6 +44,7 @@ import org.antlr.v4.misc.Graph;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.GrammarTreeVisitor;
 import org.antlr.v4.parse.ToolANTLRParser;
 import org.antlr.v4.runtime.misc.LogManager;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -59,10 +60,12 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarTransformPipeline;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.GrammarASTErrorNode;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.antlr.v4.tool.ast.RuleAST;
+import org.antlr.v4.tool.ast.TerminalAST;
 import org.stringtemplate.v4.STGroup;
 
 import java.io.BufferedWriter;
@@ -388,7 +391,8 @@ public class Tool {
 
 		if ( g.ast.hasErrors ) return;
 
-		checkForRedefinedRules(g);
+		boolean ruleFail = checkForRuleIssues(g);
+		if ( ruleFail ) return;
 
 		int prevErrors = errMgr.getNumErrors();
 		// MAKE SURE GRAMMAR IS SEMANTICALLY CORRECT (FILL IN GRAMMAR OBJECT)
@@ -422,12 +426,14 @@ public class Tool {
 
 	/** Important enough to avoid multiple defs that we do very early,
 	 *  right after AST construction.  Turn redef'd rule's AST RULE node dead
-	 *  field to true.
+	 *  field to true. Also check for undefined rules in parser/lexer to
+	 *  avoid exceptions later. Return true if we find an undefined rule.
 	 */
-	public void checkForRedefinedRules(Grammar g) {
+	public boolean checkForRuleIssues(final Grammar g) {
+		// check for redefined rules
 		GrammarAST RULES = (GrammarAST)g.ast.getFirstChildWithType(ANTLRParser.RULES);
 		List<RuleAST> rules = (List<RuleAST>)RULES.getChildren();
-		Map<String, RuleAST> ruleToAST = new HashMap<String, RuleAST>();
+		final Map<String, RuleAST> ruleToAST = new HashMap<String, RuleAST>();
 		for (RuleAST r : rules) {
 			GrammarAST ID = (GrammarAST)r.getChild(0);
 			String ruleName = ID.getText();
@@ -444,6 +450,29 @@ public class Tool {
 			}
 			ruleToAST.put(ruleName, r);
 		}
+
+		// check for undefined rules
+		class UndefChecker extends GrammarTreeVisitor {
+			public boolean undefined = false;
+			@Override
+			public void tokenRef(TerminalAST ref) {
+				if ( g.isLexer() ) ruleRef(ref, null);
+			}
+
+			@Override
+			public void ruleRef(GrammarAST ref, ActionAST arg) {
+				RuleAST ruleAST = ruleToAST.get(ref.getText());
+				if ( ruleAST==null ) {
+					undefined = true;
+					errMgr.grammarError(ErrorType.UNDEFINED_RULE_REF,
+										g.fileName, ref.token, ref.getText());
+				}
+			}
+		}
+		UndefChecker chk = new UndefChecker();
+		chk.visitGrammar(g.ast);
+
+		return chk.undefined; // no problem
 	}
 
 	public List<GrammarRootAST> sortGrammarByTokenVocab(List<String> fileNames) {

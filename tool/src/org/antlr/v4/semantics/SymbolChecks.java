@@ -29,7 +29,6 @@
 
 package org.antlr.v4.semantics;
 
-import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
@@ -218,11 +217,6 @@ public class SymbolChecks {
 		for (GrammarAST ref : rulerefs) {
 			String ruleName = ref.getText();
 			Rule r = g.getRule(ruleName);
-			if ( r==null && !ref.hasAncestor(ANTLRParser.DOT)) {
-				// only give error for unqualified rule refs now
-				errMgr.grammarError(ErrorType.UNDEFINED_RULE_REF,
-										  g.fileName, ref.token, ruleName);
-			}
 			GrammarAST arg = (GrammarAST)ref.getChild(0);
 			if ( arg!=null && (r==null || r.args==null) ) {
 				errMgr.grammarError(ErrorType.RULE_HAS_NO_ARGS,

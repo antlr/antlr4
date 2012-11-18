@@ -1,7 +1,7 @@
 grammar T;
 
 s : A # X
-  | B
+  | x
   ;
 
-s : A ;
+A : C ;
