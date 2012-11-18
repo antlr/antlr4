@@ -46,6 +46,7 @@ import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.GrammarTreeVisitor;
 import org.antlr.v4.parse.ToolANTLRParser;
+import org.antlr.v4.parse.v3TreeGrammarException;
 import org.antlr.v4.runtime.misc.LogManager;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
@@ -556,7 +557,7 @@ public class Tool {
 			}
 
 			ANTLRFileStream in = new ANTLRFileStream(file.getAbsolutePath(), grammarEncoding);
-			GrammarRootAST t = load(in);
+			GrammarRootAST t = load(fileName, in);
 			return t;
 		}
 		catch (IOException ioe) {
@@ -586,17 +587,17 @@ public class Tool {
 		}
 
 		ANTLRFileStream in = new ANTLRFileStream(importedFile.getAbsolutePath());
-		GrammarRootAST root = load(in);
+		GrammarRootAST root = load(g.fileName, in);
 		Grammar imported = createGrammar(root);
 		imported.fileName = importedFile.getAbsolutePath();
 		return imported;
 	}
 
 	public GrammarRootAST loadFromString(String grammar) {
-		return load(new ANTLRStringStream(grammar));
+		return load("<string>", new ANTLRStringStream(grammar));
 	}
 
-	public GrammarRootAST load(CharStream in) {
+	public GrammarRootAST load(String fileName, CharStream in) {
 		try {
 			GrammarASTAdaptor adaptor = new GrammarASTAdaptor(in);
 			ANTLRLexer lexer = new ANTLRLexer(in);
@@ -604,15 +605,20 @@ public class Tool {
 			lexer.tokens = tokens;
 			ToolANTLRParser p = new ToolANTLRParser(tokens, this);
 			p.setTreeAdaptor(adaptor);
-			ParserRuleReturnScope r = p.grammarSpec();
-			GrammarAST root = (GrammarAST)r.getTree();
-			if ( root instanceof GrammarRootAST) {
-				((GrammarRootAST)root).hasErrors = p.getNumberOfSyntaxErrors()>0;
-				((GrammarRootAST)root).tokens = tokens;
-				if ( grammarOptions!=null ) {
-					((GrammarRootAST)root).cmdLineOptions = grammarOptions;
+			try {
+				ParserRuleReturnScope r = p.grammarSpec();
+				GrammarAST root = (GrammarAST)r.getTree();
+				if ( root instanceof GrammarRootAST) {
+					((GrammarRootAST)root).hasErrors = p.getNumberOfSyntaxErrors()>0;
+					((GrammarRootAST)root).tokens = tokens;
+					if ( grammarOptions!=null ) {
+						((GrammarRootAST)root).cmdLineOptions = grammarOptions;
+					}
+					return ((GrammarRootAST)root);
 				}
-				return ((GrammarRootAST)root);
+			}
+			catch (v3TreeGrammarException e) {
+				errMgr.grammarError(ErrorType.V3_TREE_GRAMMAR, fileName, e.location);
 			}
 			return null;
 		}

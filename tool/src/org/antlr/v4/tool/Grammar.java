@@ -238,7 +238,7 @@ public class Grammar implements AttributeResolver {
 		org.antlr.runtime.ANTLRStringStream in = new org.antlr.runtime.ANTLRStringStream(grammarText);
 		in.name = fileName;
 
-		this.ast = tool.load(in);
+		this.ast = tool.load(fileName, in);
 		if ( ast==null ) return;
 
 		// ensure each node has pointer to surrounding grammar
