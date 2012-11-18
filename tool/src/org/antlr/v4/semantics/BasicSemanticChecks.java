@@ -30,6 +30,8 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarTreeVisitor;
@@ -319,6 +321,28 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 									   fileName,
 									   tokenID,
 									   tokenID.getText());
+		}
+	}
+
+	@Override
+	protected void enterLexerElement(GrammarAST tree) {
+		if ( tree.getType() == ACTION ) {
+			// Make sure that action is last element in outer alt; here action
+			// and a2 are bad, but a3 is ok.
+			// (RULE A (BLOCK (ALT {action} 'a')))
+			// (RULE B (BLOCK (ALT (BLOCK (ALT {a2} 'x') (ALT 'y')) {a3})))
+			CommonTree alt = tree.parent;
+			CommonTree blk = alt.parent;
+			boolean outerMostAlt = blk.parent.getType() != RULE;
+			Tree rule = tree.getAncestor(RULE);
+			String fileName = tree.getToken().getInputStream().getSourceName();
+			if ( !outerMostAlt || tree.getChildIndex() != alt.getChildCount()-1 ) {
+				g.tool.errMgr.grammarError(ErrorType.LEXER_ACTION_PLACEMENT_ISSUE,
+										   fileName,
+										   tree.getToken(),
+										   rule.getChild(0).getText());
+
+			}
 		}
 	}
 

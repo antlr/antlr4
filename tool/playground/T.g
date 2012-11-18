@@ -1,8 +1,8 @@
 grammar T;
-s : ~(ID|X)* X ;
-b : ~(ID|X)*? X ;
-A : 'a' ;
-B : 'b' ;
-X : 'x' ;
-ID : 'id' ;
+s : A ;
+
+A : {} 'a' ;
+
+B : ('x' {}|{}'y') {} ;
+
 WS : [ \t\r\n]+ -> skip ;
