@@ -1,6 +1,6 @@
 grammar T;
 
-s : rule ;
+s : R ;
 
-rule : A # X
-  ;
+R : 'x' EOF;
+
