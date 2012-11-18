@@ -32,6 +32,7 @@ package org.antlr.v4.codegen.model;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.TreeNodeStream;
+import org.antlr.v4.analysis.LeftFactoringRuleTransformer;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.decl.AltLabelStructDecl;
 import org.antlr.v4.codegen.model.decl.ContextRuleGetterDecl;
@@ -71,6 +72,9 @@ import java.util.Set;
 
 import static org.antlr.v4.parse.ANTLRParser.RULE_REF;
 import static org.antlr.v4.parse.ANTLRParser.TOKEN_REF;
+import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.tool.ast.GrammarASTWithOptions;
+
 
 /** */
 public class RuleFunction extends OutputModelObject {
@@ -85,6 +89,7 @@ public class RuleFunction extends OutputModelObject {
 	public Rule rule;
 	public AltLabelStructDecl[] altToContext;
 	public boolean hasLookaheadBlock;
+	public String variantOf;
 
 	@ModelElement public List<SrcOp> code;
 	@ModelElement public OrderedHashSet<Decl> locals; // TODO: move into ctx?
@@ -106,21 +111,27 @@ public class RuleFunction extends OutputModelObject {
 		modifiers = Utils.nodesToStrings(r.modifiers);
 
 		index = r.index;
-
-		ruleCtx = new StructDecl(factory, r);
-		altToContext = new AltLabelStructDecl[r.getOriginalNumberOfAlts()+1];
-		addContextGetters(factory, r);
-
-		if ( r.args!=null ) {
-			ruleCtx.addDecls(r.args.attributes.values());
-			args = r.args.attributes.values();
-			ruleCtx.ctorAttrs = args;
+		int lfIndex = name.indexOf(ATNSimulator.RULE_VARIANT_MARKER);
+		if (lfIndex >= 0) {
+			variantOf = name.substring(0, lfIndex);
 		}
-		if ( r.retvals!=null ) {
-			ruleCtx.addDecls(r.retvals.attributes.values());
-		}
-		if ( r.locals!=null ) {
-			ruleCtx.addDecls(r.locals.attributes.values());
+
+		if (variantOf == null || true) {
+			ruleCtx = new StructDecl(factory, r);
+			altToContext = new AltLabelStructDecl[r.getOriginalNumberOfAlts()+1];
+			addContextGetters(factory, r);
+
+			if ( r.args!=null ) {
+				ruleCtx.addDecls(r.args.attributes.values());
+				args = r.args.attributes.values();
+				ruleCtx.ctorAttrs = args;
+			}
+			if ( r.retvals!=null ) {
+				ruleCtx.addDecls(r.retvals.attributes.values());
+			}
+			if ( r.locals!=null ) {
+				ruleCtx.addDecls(r.locals.attributes.values());
+			}
 		}
 
 		ruleLabels = r.getElementLabelNames();
@@ -181,6 +192,7 @@ public class RuleFunction extends OutputModelObject {
 	 */
 	public Set<Decl> getDeclsForAllElements(List<AltAST> altASTs) {
 		Set<String> needsList = new HashSet<String>();
+		Set<String> suppress = new HashSet<String>();
 		List<GrammarAST> allRefs = new ArrayList<GrammarAST>();
 		for (AltAST ast : altASTs) {
 			IntervalSet reftypes = new IntervalSet(RULE_REF, TOKEN_REF);
@@ -189,6 +201,9 @@ public class RuleFunction extends OutputModelObject {
 			FrequencySet<String> altFreq = getElementFrequenciesForAlt(ast);
 			for (GrammarAST t : refs) {
 				String refLabelName = t.getText();
+				if (altFreq.count(refLabelName)==0) {
+					suppress.add(refLabelName);
+				}
 				if ( altFreq.count(refLabelName)>1 ) {
 					needsList.add(refLabelName);
 				}
@@ -197,6 +212,9 @@ public class RuleFunction extends OutputModelObject {
 		Set<Decl> decls = new HashSet<Decl>();
 		for (GrammarAST t : allRefs) {
 			String refLabelName = t.getText();
+			if (suppress.contains(refLabelName)) {
+				continue;
+			}
 			List<Decl> d = getDeclForAltElement(t,
 												refLabelName,
 												needsList.contains(refLabelName));
@@ -237,6 +255,10 @@ public class RuleFunction extends OutputModelObject {
 		FrequencySet<String> freq = getElementFrequenciesForAlt(altAST);
 		for (GrammarAST t : refs) {
 			String refLabelName = t.getText();
+			if (freq.count(refLabelName)==0) {
+				continue;
+			}
+
 			boolean needList = freq.count(refLabelName)>1;
 			List<Decl> d = getDeclForAltElement(t, refLabelName, needList);
 			decls.addAll(d);
@@ -245,6 +267,11 @@ public class RuleFunction extends OutputModelObject {
 	}
 
 	public List<Decl> getDeclForAltElement(GrammarAST t, String refLabelName, boolean needList) {
+		int lfIndex = refLabelName.indexOf(ATNSimulator.RULE_VARIANT_MARKER);
+		if (lfIndex >= 0) {
+			refLabelName = refLabelName.substring(0, lfIndex);
+		}
+
 		List<Decl> decls = new ArrayList<Decl>();
 		if ( t.getType()==RULE_REF ) {
 			Rule rref = factory.getGrammar().getRule(t.getText());
@@ -348,6 +375,13 @@ public class RuleFunction extends OutputModelObject {
 
 		@Override
 		public void ruleRef(GrammarAST ref, ActionAST arg) {
+			if (ref instanceof GrammarASTWithOptions) {
+				GrammarASTWithOptions grammarASTWithOptions = (GrammarASTWithOptions)ref;
+				if (Boolean.parseBoolean(grammarASTWithOptions.getOptionString(LeftFactoringRuleTransformer.SUPPRESS_ACCESSOR))) {
+					return;
+				}
+			}
+
 			frequencies.peek().add(ref.getText());
 		}
 

@@ -30,6 +30,8 @@ package org.antlr.v4.analysis;
 import org.antlr.v4.Tool;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -41,6 +43,7 @@ import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.antlr.v4.tool.ast.RuleAST;
+import org.antlr.v4.tool.ast.RuleRefAST;
 import org.antlr.v4.tool.ast.StarBlockAST;
 
 import java.util.ArrayList;
@@ -57,12 +60,17 @@ import java.util.logging.Logger;
  * @author Sam Harwell
  */
 public class LeftFactoringRuleTransformer {
+	public static final String LEFTFACTOR = "leftfactor";
+	public static final String SUPPRESS_ACCESSOR = "suppressAccessor";
+
 	private static final Logger LOGGER = Logger.getLogger(LeftFactoringRuleTransformer.class.getName());
 
 	public GrammarRootAST _ast;
 	public Map<String, Rule> _rules;
 	public Grammar _g;
 	public Tool _tool;
+
+	private final GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
 
 	public LeftFactoringRuleTransformer(@NotNull GrammarRootAST ast, @NotNull Map<String, Rule> rules, @NotNull Grammar g) {
 		this._ast = ast;
@@ -75,7 +83,7 @@ public class LeftFactoringRuleTransformer {
 		// translate all rules marked for auto left factoring
 		for (Rule r : _rules.values()) {
 			if (!Character.isUpperCase(r.name.charAt(0))) {
-				Object leftFactoredRules = r.namedActions.get("leftfactor");
+				Object leftFactoredRules = r.namedActions.get(LEFTFACTOR);
 				if (leftFactoredRules == null) {
 					continue;
 				}
@@ -104,7 +112,11 @@ public class LeftFactoringRuleTransformer {
 						}
 					}
 
-					if (!translateLeftFactoredDecision(block, rules)) {
+					if (rules.length != 1) {
+						throw new UnsupportedOperationException("not yet implemented.");
+					}
+
+					if (!translateLeftFactoredDecision(block, rules[0], true)) {
 						// couldn't translate the decision
 						continue;
 					}
@@ -115,8 +127,8 @@ public class LeftFactoringRuleTransformer {
 		}
 	}
 
-	protected boolean translateLeftFactoredDecision(GrammarAST block, String[] rules) {
-		if (block.getParent() instanceof RuleAST) {
+	protected boolean translateLeftFactoredDecision(GrammarAST block, String factoredRule, boolean outerRule) {
+		if (outerRule && block.getParent() instanceof RuleAST) {
 			// not yet supported
 			return false;
 		}
@@ -125,7 +137,7 @@ public class LeftFactoringRuleTransformer {
 		List<GrammarAST> translatedAlternatives = new ArrayList<GrammarAST>();
 		IntervalSet translatedIntervals = new IntervalSet();
 		for (GrammarAST alternative : alternatives) {
-			GrammarAST translatedAlt = translateLeftFactoredAlternative(alternative, rules);
+			GrammarAST translatedAlt = translateLeftFactoredAlternative(alternative, factoredRule, outerRule);
 			if (translatedAlt != null) {
 				translatedIntervals.add(alternative.getChildIndex());
 			}
@@ -135,6 +147,20 @@ public class LeftFactoringRuleTransformer {
 
 		if (translatedIntervals.isNil()) {
 			return false;
+		}
+
+		if (!outerRule) {
+			if (translatedIntervals.size() != alternatives.size()) {
+				return false;
+			}
+
+			for (GrammarAST translatedAlt : translatedAlternatives) {
+				if (translatedAlt.getChildCount() == 0) {
+					adaptor.addChild(translatedAlt, adaptor.create(ANTLRParser.EPSILON, "EPSILON"));
+				}
+			}
+
+			return true;
 		}
 
 		/* for a, b, c being arbitrary `element` trees, this block performs
@@ -149,7 +175,6 @@ public class LeftFactoringRuleTransformer {
 		 *
 		 * factoredElement (a | b | c | ...)
 		 */
-		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
 		for (int i = translatedIntervals.getIntervals().size() - 1; i >= 0; i--) {
 			Interval interval = translatedIntervals.getIntervals().get(i);
 			GrammarAST factoredElement = (GrammarAST)translatedAlternatives.get(interval.a).getChild(0);
@@ -179,12 +204,12 @@ public class LeftFactoringRuleTransformer {
 		return true;
 	}
 
-	protected GrammarAST translateLeftFactoredAlternative(GrammarAST alternative, String[] rules) {
+	protected GrammarAST translateLeftFactoredAlternative(GrammarAST alternative, String factoredRule, boolean outerRule) {
 		if (alternative.getChild(0).getType() == ANTLRParser.EPSILON) {
 			return null;
 		}
 
-		GrammarAST translatedElement = translateLeftFactoredElement((GrammarAST)alternative.getChild(0), rules);
+		GrammarAST translatedElement = translateLeftFactoredElement((GrammarAST)alternative.getChild(0), factoredRule, outerRule);
 		if (translatedElement == null) {
 			return null;
 		}
@@ -193,13 +218,7 @@ public class LeftFactoringRuleTransformer {
 		return alternative;
 	}
 
-	protected GrammarAST translateLeftFactoredElement(GrammarAST element, String[] rules) {
-		if (rules.length == 0) {
-			return null;
-		}
-
-		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
-
+	protected GrammarAST translateLeftFactoredElement(GrammarAST element, String factoredRule, boolean outerRule) {
 		switch (element.getType()) {
 		case ANTLRParser.ASSIGN:
 		case ANTLRParser.PLUS_ASSIGN:
@@ -211,7 +230,7 @@ public class LeftFactoringRuleTransformer {
 			 * factoredElement label=a_factored
 			 */
 
-			GrammarAST translatedChildElement = translateLeftFactoredElement((GrammarAST)element.getChild(1), rules);
+			GrammarAST translatedChildElement = translateLeftFactoredElement((GrammarAST)element.getChild(1), factoredRule, outerRule);
 			if (translatedChildElement == null) {
 				return null;
 			}
@@ -222,24 +241,60 @@ public class LeftFactoringRuleTransformer {
 
 			GrammarAST root = adaptor.nil();
 			Object factoredElement = adaptor.deleteChild(translatedChildElement, 0);
-			adaptor.addChild(root, factoredElement);
+			if (outerRule) {
+				adaptor.addChild(root, factoredElement);
+			}
 			adaptor.addChild(root, element);
 			adaptor.replaceChildren(element, 1, 1, translatedChildElement);
 			return root;
 		}
 
 		case ANTLRParser.RULE_REF:
-			if (rules.length != 1) {
-				throw new UnsupportedOperationException("not yet implemented");
+		{
+			if (factoredRule.equals(element.getToken().getText())) {
+				if (outerRule) {
+					// this element is already left factored
+					return element;
+				}
+
+				GrammarAST root = adaptor.nil();
+				root.addChild(adaptor.create(Token.EPSILON, "dummy"));
+				root.deleteChild(0);
+				return root;
 			}
 
-			if (rules[0].equals(element.getToken().getText())) {
-				// this element is already left factored
-				return element;
+			Rule targetRule = _rules.get(element.getToken().getText());
+			if (targetRule == null) {
+				return null;
 			}
 
-			// not yet supported
-			return null;
+			if (!createLeftFactoredRuleVariant(targetRule, factoredRule)) {
+				return null;
+			}
+
+			RuleRefAST ruleRefAST = (RuleRefAST)element;
+			element.setText(element.getText() + ATNSimulator.RULE_VARIANT_MARKER + factoredRule);
+//			ruleRefAST.addLeftFactoredElement(factoredRule);
+
+			GrammarAST root = adaptor.nil();
+
+			if (outerRule) {
+				RuleRefAST factoredRuleRef = new RuleRefAST(adaptor.createToken(ANTLRParser.RULE_REF, factoredRule));
+				if (outerRule) {
+					factoredRuleRef.setOption(SUPPRESS_ACCESSOR, adaptor.create(ANTLRParser.ID, "true"));
+				}
+
+				if (_rules.get(factoredRule).args != null && _rules.get(factoredRule).args.size() > 0) {
+					adaptor.addChild(factoredRuleRef, new ActionAST(adaptor.createToken(ANTLRParser.ARG_ACTION, "0")));
+				}
+
+				adaptor.addChild(root, factoredRuleRef);
+			}
+
+			adaptor.addChild(root, element);
+
+			return root;
+		}
 
 		case ANTLRParser.BLOCK:
 			// not yet supported
@@ -255,7 +310,7 @@ public class LeftFactoringRuleTransformer {
 			 */
 
 			GrammarAST originalChildElement = (GrammarAST)element.getChild(0);
-			GrammarAST translatedElement = translateLeftFactoredElement(originalChildElement.dupTree(), rules);
+			GrammarAST translatedElement = translateLeftFactoredElement(originalChildElement.dupTree(), factoredRule, outerRule);
 			if (translatedElement == null) {
 				return null;
 			}
@@ -269,7 +324,9 @@ public class LeftFactoringRuleTransformer {
 
 			GrammarAST root = adaptor.nil();
 			Object factoredElement = adaptor.deleteChild(translatedElement, 0);
-			adaptor.addChild(root, factoredElement);
+			if (outerRule) {
+				adaptor.addChild(root, factoredElement);
+			}
 			adaptor.addChild(root, translatedElement);
 			adaptor.addChild(root, closure);
 			return root;
@@ -303,5 +360,28 @@ public class LeftFactoringRuleTransformer {
 			// unknown
 			return null;
 		}
+	}
+
+	protected boolean createLeftFactoredRuleVariant(Rule rule, String factoredElement) {
+		RuleAST ast = (RuleAST)rule.ast.dupTree();
+		BlockAST block = (BlockAST)ast.getFirstChildWithType(ANTLRParser.BLOCK);
+		if (!translateLeftFactoredDecision(block, factoredElement, false)) {
+			return false;
+		}
+
+		String variantName = ast.getChild(0).getText() + ATNSimulator.RULE_VARIANT_MARKER + factoredElement;
+		((GrammarAST)ast.getChild(0)).token = adaptor.createToken(ast.getChild(0).getType(), variantName);
+		GrammarAST ruleParent = (GrammarAST)rule.ast.getParent();
+		ruleParent.insertChild(rule.ast.getChildIndex() + 1, ast);
+		ruleParent.freshenParentAndChildIndexes(rule.ast.getChildIndex());
+
+		List<GrammarAST> alts = block.getAllChildrenWithType(ANTLRParser.ALT);
+		Rule variant = new Rule(_g, ast.getChild(0).getText(), ast, alts.size());
+		_g.defineRule(variant);
+		for (int i = 0; i < alts.size(); i++) {
+			variant.alt[i + 1].ast = (AltAST)alts.get(i);
+		}
+
+		return true;
 	}
 }

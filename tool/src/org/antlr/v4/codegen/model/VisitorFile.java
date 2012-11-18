@@ -29,6 +29,7 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.misc.Triple;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
@@ -59,7 +60,7 @@ public class VisitorFile extends OutputFile {
 					visitorNames.add(pair.c);
 				}
 			}
-			else {
+			else if (!r.name.contains(ATNSimulator.RULE_VARIANT_MARKER)) {
 				// if labels, must label all. no need for generic rule visitor then
 				visitorNames.add(r.name);
 			}

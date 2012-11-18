@@ -427,6 +427,26 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
         if ( _parseListeners != null) triggerEnterRuleEvent();
 	}
 
+	public void enterLeftFactoredRule(ParserRuleContext localctx, int state, int ruleIndex) {
+		setState(state);
+		if (_buildParseTrees) {
+			ParserRuleContext factoredContext = (ParserRuleContext)_ctx.getChild(_ctx.getChildCount() - 1);
+			_ctx.removeLastChild();
+			factoredContext.parent = localctx;
+			localctx.addChild(factoredContext);
+		}
+
+		_ctx = localctx;
+		_ctx.start = _input.LT(1);
+		if (_buildParseTrees) {
+			addContextToParseTree();
+		}
+
+		if (_parseListeners != null) {
+			triggerEnterRuleEvent();
+		}
+	}
+
     public void exitRule() {
 		_ctx.stop = _input.LT(-1);
         // trigger event on _ctx, before it reverts to parent

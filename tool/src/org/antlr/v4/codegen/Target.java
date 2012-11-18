@@ -33,6 +33,7 @@ import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -349,7 +350,14 @@ public class Target {
 		if ( r.g.isLexer() ) {
 			return gen.templates.getInstanceOf("LexerRuleContext").render();
 		}
-		return Utils.capitalize(r.name)+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
+
+		String baseName = r.name;
+		int lfIndex = baseName.indexOf(ATNSimulator.RULE_VARIANT_MARKER);
+		if (lfIndex >= 0) {
+			baseName = baseName.substring(0, lfIndex);
+		}
+
+		return Utils.capitalize(baseName)+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	public String getAltLabelContextStructName(String label) {
@@ -366,7 +374,9 @@ public class Target {
 		if ( r.g.isLexer() ) {
 			return gen.templates.getInstanceOf("LexerRuleContext").render();
 		}
-		return Utils.capitalize(r.name)+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
+
+		String baseName = function.variantOf != null ? function.variantOf : function.name;
+		return Utils.capitalize(baseName)+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	// should be same for all refs to same token like $ID within single rule function

@@ -44,6 +44,8 @@ public abstract class ATNSimulator {
 	public static final int SERIALIZED_NON_GREEDY_MASK = 0x8000;
 	public static final int SERIALIZED_STATE_TYPE_MASK = 0x7FFF;
 
+	public static final String RULE_VARIANT_MARKER = "$lf$";
+
 	/** Must distinguish between missing edge and edge we know leads nowhere */
 	@NotNull
 	public static final DFAState ERROR;
@@ -156,6 +158,7 @@ public abstract class ATNSimulator {
 		for (int i=0; i<nrules; i++) {
 			int s = toInt(data[p++]);
 			RuleStartState startState = (RuleStartState)atn.states.get(s);
+			startState.leftFactored = toInt(data[p++]) != 0;
 			atn.ruleToStartState[i] = startState;
 			if ( atn.grammarType == ATN.LEXER ) {
 				int tokenType = toInt(data[p++]);
