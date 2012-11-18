@@ -57,7 +57,7 @@ public enum ErrorType {
 	BAD_OPTION_SET_SYNTAX(9, "invalid -Dname=value syntax: <arg>", ErrorSeverity.ERROR),
 	WARNING_TREATED_AS_ERROR(10, "warning treated as error", ErrorSeverity.ERROR),
 
-	INTERNAL_ERROR(20, "internal error: <arg> <arg2><if(exception)>: <exception><endif>\n" +
+	INTERNAL_ERROR(20, "internal error: <arg> <arg2><if(exception)>: <exception><endif>" +
 				   "<stackTrace; separator=\"\\n\">", ErrorSeverity.ERROR),
 	TOKENS_FILE_SYNTAX_ERROR(21, ".tokens file syntax error <arg>:<arg2>", ErrorSeverity.ERROR),
 //	CANNOT_GEN_DOT_FILE("", ErrorSeverity.ERROR),
