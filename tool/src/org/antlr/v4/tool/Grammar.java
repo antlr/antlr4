@@ -358,12 +358,11 @@ public class Grammar implements AttributeResolver {
     public List<Grammar> getAllImportedGrammars() {
         if ( importedGrammars==null ) return null;
         List<Grammar> delegates = new ArrayList<Grammar>();
-        for (int i = 0; i < importedGrammars.size(); i++) {
-            Grammar d = importedGrammars.get(i);
-            delegates.add(d);
-            List<Grammar> ds = d.getAllImportedGrammars();
-            if ( ds!=null ) delegates.addAll( ds );
-        }
+		for (Grammar d : importedGrammars) {
+			delegates.add(d);
+			List<Grammar> ds = d.getAllImportedGrammars();
+			if (ds != null) delegates.addAll(ds);
+		}
         return delegates;
     }
 
@@ -448,7 +447,7 @@ public class Grammar implements AttributeResolver {
 		else { // must be a label like ID
 			I = tokenNameToTypeMap.get(token);
 		}
-		int i = (I!=null)?I.intValue(): Token.INVALID_TYPE;
+		int i = (I!=null)? I : Token.INVALID_TYPE;
 		//tool.log("grammar", "grammar type "+type+" "+tokenName+"->"+i);
 		return i;
 	}

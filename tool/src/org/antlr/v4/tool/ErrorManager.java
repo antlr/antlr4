@@ -39,7 +39,9 @@ import org.stringtemplate.v4.misc.STMessage;
 
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 public class ErrorManager {
 	public static final String FORMATS_DIR = "org/antlr/v4/tool/templates/messages/formats/";
@@ -47,6 +49,9 @@ public class ErrorManager {
 	public Tool tool;
 	public int errors;
 	public int warnings;
+
+	/** All errors that have been generated */
+	public Set<ErrorType> errorTypes = new HashSet<ErrorType>();
 
     /** The group of templates that represent the current message format. */
     STGroup format;
@@ -227,7 +232,7 @@ public class ErrorManager {
         int i = 0;
         for (; i < stack.length; i++) {
             StackTraceElement t = stack[i];
-            if ( t.toString().indexOf("ErrorManager")<0 ) {
+            if (!t.toString().contains("ErrorManager")) {
                 break;
             }
         }
@@ -239,9 +244,18 @@ public class ErrorManager {
 
 	public void emit(ErrorType etype, ANTLRMessage msg) {
 		switch ( etype.severity ) {
-			case WARNING: warnings++; tool.warning(msg); break;
-			case ERROR: errors++; tool.error(msg); break;
+			case WARNING: warnings++;
+				tool.warning(msg);
+				break;
+			case ERROR_ONE_OFF:
+				if ( errorTypes.contains(etype) ) break;
+				// fall thru
+			case ERROR:
+				errors++;
+				tool.error(msg);
+				break;
 		}
+		errorTypes.add(etype);
 	}
 
     /** The format gets reset either from the Tool if the user supplied a command line option to that effect

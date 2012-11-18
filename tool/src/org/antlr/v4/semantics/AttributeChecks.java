@@ -219,12 +219,6 @@ public class AttributeChecks implements ActionSplitterListener {
 	}
 
 	@Override
-	public void unknownSyntax(Token t) {
-		errMgr.grammarError(ErrorType.INVALID_TEMPLATE_ACTION,
-							g.fileName, t, t.getText());
-	}
-
-	@Override
 	public void text(String text) { }
 
 	// don't care

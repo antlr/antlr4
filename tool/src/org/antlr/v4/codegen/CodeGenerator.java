@@ -217,28 +217,6 @@ public class CodeGenerator {
 		}
 	}
 
-//	public void write(ST outputFileST) {
-//		// WRITE FILES
-//		String fileName = "unknown";
-//		try {
-//			fileName = getRecognizerFileName();
-//			target.genRecognizerFile(g,outputFileST);
-//			writeHeaderFile();
-//			// write out the vocab interchange file; used by antlr,
-//			// does not change per target
-//			ST tokenVocabSerialization = getTokenVocabOutput();
-//			fileName = getVocabFileName();
-//			if ( fileName!=null ) {
-//				write(tokenVocabSerialization, fileName);
-//			}
-//		}
-//		catch (IOException ioe) {
-//			tool.errMgr.toolError(ErrorType.CANNOT_WRITE_FILE,
-//									ioe,
-//									fileName);
-//		}
-//	}
-
 	public void write(ST code, String fileName) {
 		try {
 			long start = System.currentTimeMillis();

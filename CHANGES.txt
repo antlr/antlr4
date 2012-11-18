@@ -3,6 +3,8 @@ ANTLR v4 Honey Badger
 November 18, 2012
 
 * fixed: undefined rule refs caused exception
+* cleanup, rm dead etypes, add check for ids that cause code gen issues
+* added notion of one-off error
 
 November 17, 2012
 

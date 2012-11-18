@@ -70,9 +70,8 @@ public class LeftRecursiveRule extends Rule {
 	@Override
 	public List<AltAST> getUnlabeledAltASTs() {
 		List<AltAST> alts = new ArrayList<AltAST>();
-		for (int i = 0; i < recPrimaryAlts.size(); i++) {
-			LeftRecursiveRuleAltInfo altInfo = recPrimaryAlts.get(i);
-			if ( altInfo.altLabel==null ) alts.add(altInfo.originalAltAST);
+		for (LeftRecursiveRuleAltInfo altInfo : recPrimaryAlts) {
+			if (altInfo.altLabel == null) alts.add(altInfo.originalAltAST);
 		}
 		for (int i = 0; i < recOpAlts.size(); i++) {
 			LeftRecursiveRuleAltInfo altInfo = recOpAlts.getElement(i);
@@ -88,12 +87,11 @@ public class LeftRecursiveRule extends Rule {
 		List<Triple<Integer,AltAST,String>> labels = new ArrayList<Triple<Integer,AltAST,String>>();
 		List<Triple<Integer,AltAST,String>> normalAltLabels = super.getAltLabels();
 		if ( normalAltLabels!=null ) labels.addAll(normalAltLabels);
-		for (int i = 0; i < recPrimaryAlts.size(); i++) {
-			LeftRecursiveRuleAltInfo altInfo = recPrimaryAlts.get(i);
-			if ( altInfo.altLabel!=null ) {
-				labels.add(new Triple<Integer,AltAST,String>(altInfo.altNum,
-															 altInfo.originalAltAST,
-															 altInfo.altLabel));
+		for (LeftRecursiveRuleAltInfo altInfo : recPrimaryAlts) {
+			if (altInfo.altLabel != null) {
+				labels.add(new Triple<Integer, AltAST, String>(altInfo.altNum,
+															   altInfo.originalAltAST,
+															   altInfo.altLabel));
 			}
 		}
 		for (int i = 0; i < recOpAlts.size(); i++) {

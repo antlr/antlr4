@@ -58,7 +58,6 @@ import org.stringtemplate.v4.STGroupFile;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -162,9 +161,8 @@ public class DOTGenerator {
 					// get a list of configs for just this alt
 					// it will help us print better later
 					List<ATNConfig> configsInAlt = new ArrayList<ATNConfig>();
-					for (Iterator<ATNConfig> it = configurations.iterator(); it.hasNext();) {
-						ATNConfig c = it.next();
-						if ( c.alt!=alt ) continue;
+					for (ATNConfig c : configurations) {
+						if (c.alt != alt) continue;
 						configsInAlt.add(c);
 					}
 					int n = 0;

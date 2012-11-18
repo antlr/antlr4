@@ -40,7 +40,6 @@ import org.antlr.v4.tool.ast.GrammarAST;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -197,15 +196,14 @@ public class SymbolChecks {
         if ( r.retvals!=null ) {
             Set<String> conflictingKeys = r.retvals.intersection(r.args);
             if (conflictingKeys!=null) {
-                for (Iterator<String> it = conflictingKeys.iterator(); it.hasNext();) {
-                    String key = it.next();
-                    errMgr.grammarError(
-                        ErrorType.ARG_RETVAL_CONFLICT,
-                        g.fileName,
-                        ((GrammarAST)r.ast.getChild(0)).token,
-                        key,
-                        r.name);
-                }
+				for (String key : conflictingKeys) {
+					errMgr.grammarError(
+						ErrorType.ARG_RETVAL_CONFLICT,
+						g.fileName,
+						((GrammarAST) r.ast.getChild(0)).token,
+						key,
+						r.name);
+				}
             }
         }
     }

@@ -29,8 +29,14 @@
 
 package org.antlr.v4.codegen;
 
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.ST;
+
+import java.util.List;
 
 public class CodeGenPipeline {
 	Grammar g;
@@ -41,6 +47,19 @@ public class CodeGenPipeline {
 
 	public void process() {
 		CodeGenerator gen = new CodeGenerator(g);
+
+		IntervalSet idTypes = new IntervalSet();
+		idTypes.add(ANTLRParser.ID);
+		idTypes.add(ANTLRParser.RULE_REF);
+		idTypes.add(ANTLRParser.TOKEN_REF);
+		List<GrammarAST> idNodes = g.ast.getNodesWithType(idTypes);
+		for (GrammarAST idNode : idNodes) {
+			if ( gen.target.grammarSymbolCausesIssueInGeneratedCode(idNode.getText()) ) {
+				g.tool.errMgr.grammarError(ErrorType.USE_OF_BAD_WORD,
+										   g.fileName, idNode.getToken(),
+										   idNode.getText());
+			}
+		}
 
 		if ( gen.templates==null ) return;
 

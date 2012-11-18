@@ -73,10 +73,6 @@ public class BlankActionSplitterListener implements ActionSplitterListener {
 	}
 
 	@Override
-	public void unknownSyntax(Token t) {
-	}
-
-	@Override
 	public void text(String text) {
 	}
 }

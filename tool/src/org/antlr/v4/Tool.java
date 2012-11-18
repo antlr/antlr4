@@ -779,7 +779,7 @@ public class Tool {
 	}
 
     public void log(@Nullable String component, String msg) { logMgr.log(component, msg); }
-    public void log(String msg) { log(msg); }
+    public void log(String msg) { log(null, msg); }
 
 	public int getNumErrors() { return errMgr.getNumErrors(); }
 

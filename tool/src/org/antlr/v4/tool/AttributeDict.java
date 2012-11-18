@@ -32,7 +32,6 @@ package org.antlr.v4.tool;
 import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
@@ -93,12 +92,11 @@ public class AttributeDict {
         }
         Set<String> inter = new HashSet<String>();
         Set<String> thisKeys = attributes.keySet();
-        for (Iterator<String> it = thisKeys.iterator(); it.hasNext();) {
-            String key = it.next();
-            if ( other.attributes.get(key)!=null ) {
-                inter.add(key);
-            }
-        }
+		for (String key : thisKeys) {
+			if (other.attributes.get(key) != null) {
+				inter.add(key);
+			}
+		}
         if ( inter.isEmpty() ) {
             return null;
         }
