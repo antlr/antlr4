@@ -669,23 +669,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 
 			if ( D.isAcceptState && D.configs.hasSemanticContext ) {
-				// We need to test all predicates, even in DFA states that
-				// uniquely predict alternative.
-				int nalts = decState.getNumberOfTransitions();
-				// Update DFA so reach becomes accept state with (predicate,alt)
-				// pairs if preds found for conflicting alts
-				BitSet altsToCollectPredsFrom = getConflictingAltsOrUniqueAlt(D.configs);
-				SemanticContext[] altToPred = getPredsForAmbigAlts(altsToCollectPredsFrom, D.configs, nalts);
-				if ( altToPred!=null ) {
-					D.predicates = getPredicatePredictions(altsToCollectPredsFrom, altToPred);
-					D.prediction = ATN.INVALID_ALT_NUMBER; // make sure we use preds
-				}
-				else {
-					// There are preds in configs but they might go away
-					// when OR'd together like {p}? || NONE == NONE. If neither
-					// alt has preds, resolve to min alt
-					D.prediction = altsToCollectPredsFrom.nextSetBit(0);
-				}
+				predicateDFAState(D, decState);
 
 				if ( D.predicates!=null ) {
 					int stopIndex = input.index();
@@ -717,6 +701,26 @@ public class ParserATNSimulator extends ATNSimulator {
 			previousD = D;
 			input.consume();
 			t = input.LA(1);
+		}
+	}
+
+	protected void predicateDFAState(DFAState dfaState, DecisionState decisionState) {
+		// We need to test all predicates, even in DFA states that
+		// uniquely predict alternative.
+		int nalts = decisionState.getNumberOfTransitions();
+		// Update DFA so reach becomes accept state with (predicate,alt)
+		// pairs if preds found for conflicting alts
+		BitSet altsToCollectPredsFrom = getConflictingAltsOrUniqueAlt(dfaState.configs);
+		SemanticContext[] altToPred = getPredsForAmbigAlts(altsToCollectPredsFrom, dfaState.configs, nalts);
+		if ( altToPred!=null ) {
+			dfaState.predicates = getPredicatePredictions(altsToCollectPredsFrom, altToPred);
+			dfaState.prediction = ATN.INVALID_ALT_NUMBER; // make sure we use preds
+		}
+		else {
+			// There are preds in configs but they might go away
+			// when OR'd together like {p}? || NONE == NONE. If neither
+			// alt has preds, resolve to min alt
+			dfaState.prediction = altsToCollectPredsFrom.nextSetBit(0);
 		}
 	}
 
