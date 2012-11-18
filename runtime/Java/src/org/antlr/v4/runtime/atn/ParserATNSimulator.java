@@ -418,6 +418,17 @@ public class ParserATNSimulator extends ATNSimulator {
 		while ( true ) {
 			if ( dfa_debug ) System.out.println("DFA state "+s.stateNumber+" LA(1)=="+getLookaheadName(input));
 			if ( s.requiresFullContext && mode != PredictionMode.SLL ) {
+				// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
+				if ( s.predicates!=null ) {
+					if ( debug ) System.out.println("DFA state has preds in DFA sim LL failover");
+					input.seek(startIndex);
+					BitSet alts = evalSemanticContext(s.predicates, outerContext, true);
+					if ( alts.cardinality()==1 ) {
+						if ( debug ) System.out.println("Full LL avoided");
+						return alts.nextSetBit(0);
+					}
+				}
+
 				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+" in "+s);
 				boolean fullCtx = true;
 				ATNConfigSet s0_closure =
@@ -647,6 +658,17 @@ public class ParserATNSimulator extends ATNSimulator {
 					// Falls through to check predicates below
 				}
 				else {
+					// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
+					if ( D.configs.hasSemanticContext ) {
+						predicateDFAState(D, decState);
+						input.seek(startIndex);
+						BitSet alts = evalSemanticContext(D.predicates, outerContext, true);
+						if ( alts.cardinality()==1 ) {
+							if ( debug ) System.out.println("Full LL avoided");
+							return alts.nextSetBit(0);
+						}
+					}
+
 					// RETRY WITH FULL LL CONTEXT
 					if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
 					ATNConfigSet s0_closure =
