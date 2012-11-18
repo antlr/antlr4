@@ -77,8 +77,6 @@ import java.util.List;
  * IMPORT_NAME_CLASH
  * REPEATED_PREQUEL
  * TOKEN_NAMES_MUST_START_UPPER
- *
- * TODO: 1 action per lex rule
  */
 public class BasicSemanticChecks extends GrammarTreeVisitor {
 	/** Set of valid imports.  Maps delegate to set of delegator grammar types.
