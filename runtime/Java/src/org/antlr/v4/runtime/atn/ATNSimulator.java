@@ -226,6 +226,7 @@ public abstract class ATNSimulator {
 
 		// edges for rule stop states can be derived, so they aren't serialized
 		for (ATNState state : atn.states) {
+			boolean returningToLeftFactored = state.ruleIndex >= 0 && atn.ruleToStartState[state.ruleIndex].leftFactored;
 			for (int i = 0; i < state.getNumberOfTransitions(); i++) {
 				Transition t = state.transition(i);
 				if (!(t instanceof RuleTransition)) {
@@ -233,6 +234,11 @@ public abstract class ATNSimulator {
 				}
 
 				RuleTransition ruleTransition = (RuleTransition)t;
+				boolean returningFromLeftFactored = atn.ruleToStartState[ruleTransition.target.ruleIndex].leftFactored;
+				if (!returningFromLeftFactored && returningToLeftFactored) {
+					continue;
+				}
+
 				atn.ruleToStopState[ruleTransition.target.ruleIndex].addTransition(new EpsilonTransition(ruleTransition.followState));
 			}
 		}
