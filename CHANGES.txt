@@ -12,6 +12,7 @@ November 18, 2012
 ** tokens {A='C';} syntax
 ** {...}?=> gate semantic predicates
 ** (...)=> syntactic predicates
+* Detect EOF in lexer rule
 
 November 17, 2012
 

@@ -571,17 +571,20 @@ lexerElement
 	;
     catch [RecognitionException re] {
     	retval.tree = (GrammarAST)adaptor.errorNode(input, retval.start, input.LT(-1), re);
-    	int ttype = input.get(input.range()).getType();
+    	int ttype = input.get(input.range()).getType(); // seems to be next token
 	    // look for anything that really belongs at the start of the rule minus the initial ID
-    	if ( ttype==COLON || ttype==RETURNS || ttype==CATCH || ttype==FINALLY || ttype==AT ) {
+    	if ( ttype==COLON || ttype==RETURNS || ttype==CATCH || ttype==FINALLY || ttype==AT || ttype==EOF ) {
 			RecognitionException missingSemi =
 				new v4ParserException("unterminated rule (missing ';') detected at '"+
 									  input.LT(1).getText()+" "+input.LT(2).getText()+"'", input);
 			reportError(missingSemi);
-			if ( ttype==CATCH || ttype==FINALLY ) {
+			if ( ttype==EOF ) {
+				input.seek(input.index()+1);
+			}
+			else if ( ttype==CATCH || ttype==FINALLY ) {
 				input.seek(input.range()); // ignore what's before rule trailer stuff
 			}
-			if ( ttype==RETURNS || ttype==AT ) { // scan back looking for ID of rule header
+			else if ( ttype==RETURNS || ttype==AT ) { // scan back looking for ID of rule header
 				int p = input.index();
 				Token t = input.get(p);
 				while ( t.getType()!=RULE_REF && t.getType()!=TOKEN_REF ) {
@@ -602,6 +605,7 @@ labeledLexerElement
 		|	lexerBlock	-> ^($ass id lexerBlock)
 		)
 	;
+
 
 lexerBlock
 @after {
