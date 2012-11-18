@@ -1,7 +1,6 @@
 grammar T;
 
-s : A # X
-  | x
-  ;
+s : rule ;
 
-A : C ;
+rule : A # X
+  ;
