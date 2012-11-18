@@ -153,7 +153,7 @@ public enum ErrorType {
 //	WILDCARD_IN_PARSER(129, "wildcard '.' not allowed in parsers", ErrorSeverity.ERROR),
 	LABEL_BLOCK_NOT_A_SET(130, "label <arg> assigned to a block which is not a set", ErrorSeverity.ERROR),
 	EXPECTED_NON_GREEDY_WILDCARD_BLOCK(131, "greedy block ()<arg> contains wildcard; the non-greedy syntax ()<arg>? may be preferred", ErrorSeverity.WARNING),
-	LEXER_ACTION_PLACEMENT_ISSUE(132, "action in lexer rule <arg> must be last element of outermost alt", ErrorSeverity.ERROR),
+	LEXER_ACTION_PLACEMENT_ISSUE(132, "action in lexer rule <arg> must be last element of single outermost alt", ErrorSeverity.ERROR),
 
 	/** Documentation comment is unterminated */
     //UNTERMINATED_DOC_COMMENT(, "", ErrorSeverity.ERROR),

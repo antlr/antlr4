@@ -1,8 +1,10 @@
 grammar T;
 s : A ;
 
-A : {} 'a' ;
+A : 'a' ;
 
-B : ('x' {}|{}'y') {} ;
+B : ('x' -> skip |'y') ;
+
+C : 'd' {} | 'e' {} ;
 
 WS : [ \t\r\n]+ -> skip ;
