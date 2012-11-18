@@ -327,25 +327,36 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	@Override
 	protected void enterLexerElement(GrammarAST tree) {
 		if ( tree.getType() == ACTION ) {
-			// Make sure that action is last element in outer alt; here action,
-			// a2, z, and zz are bad, but a3 is ok:
-			// (RULE A (BLOCK (ALT {action} 'a')))
-			// (RULE B (BLOCK (ALT (BLOCK (ALT {a2} 'x') (ALT 'y')) {a3})))
-			// (RULE C (BLOCK (ALT 'd' {z}) (ALT 'e' {zz})))
-			CommonTree alt = tree.parent;
-			CommonTree blk = alt.parent;
-			boolean outerMostAlt = blk.parent.getType() == RULE;
-			Tree rule = tree.getAncestor(RULE);
-			String fileName = tree.getToken().getInputStream().getSourceName();
-			if ( !outerMostAlt || tree.getChildIndex() != alt.getChildCount()-1 ||
-				 blk.getChildCount()>1 )
-			{
-				g.tool.errMgr.grammarError(ErrorType.LEXER_ACTION_PLACEMENT_ISSUE,
-										   fileName,
-										   tree.getToken(),
-										   rule.getChild(0).getText());
+			checkElementIsOuterMostInSingleAlt(tree);
+		}
+	}
 
-			}
+	@Override
+	protected void enterLexerCommand(GrammarAST tree) {
+		checkElementIsOuterMostInSingleAlt(tree);
+	}
+
+	/**
+	 Make sure that action is last element in outer alt; here action,
+	 a2, z, and zz are bad, but a3 is ok:
+	 (RULE A (BLOCK (ALT {action} 'a')))
+	 (RULE B (BLOCK (ALT (BLOCK (ALT {a2} 'x') (ALT 'y')) {a3})))
+	 (RULE C (BLOCK (ALT 'd' {z}) (ALT 'e' {zz})))
+	 */
+	protected void checkElementIsOuterMostInSingleAlt(GrammarAST tree) {
+		CommonTree alt = tree.parent;
+		CommonTree blk = alt.parent;
+		boolean outerMostAlt = blk.parent.getType() == RULE;
+		Tree rule = tree.getAncestor(RULE);
+		String fileName = tree.getToken().getInputStream().getSourceName();
+		if ( !outerMostAlt || tree.getChildIndex() != alt.getChildCount()-1 ||
+			 blk.getChildCount()>1 )
+		{
+			g.tool.errMgr.grammarError(ErrorType.LEXER_ACTION_PLACEMENT_ISSUE,
+									   fileName,
+									   tree.getToken(),
+									   rule.getChild(0).getText());
+
 		}
 	}
 

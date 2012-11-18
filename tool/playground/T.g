@@ -3,8 +3,6 @@ s : A ;
 
 A : 'a' ;
 
-B : ('x' -> skip |'y') ;
-
-C : 'd' {} | 'e' {} ;
+B : 'x' -> skip |'y' ;
 
 WS : [ \t\r\n]+ -> skip ;
