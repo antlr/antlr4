@@ -1,5 +1,9 @@
 ANTLR v4 Honey Badger
 
+November 18, 2012
+
+* fixed: undefined rule refs caused exception
+
 November 17, 2012
 
 * .tokens files goes in output dir like parser file.
@@ -10,7 +14,6 @@ November 17, 2012
 * wasn't checking soon enough for rule redef; now it sets a dead flag in
   AST so no more walking dup.
   error(51): T.g:7:0: rule s redefinition (ignoring); previous at line 3
-* fixed: undefined rule refs caused exception
 
 November 11, 2012
 

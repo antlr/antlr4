@@ -350,7 +350,9 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		if ( !outerMostAlt || tree.getChildIndex() != alt.getChildCount()-1 ||
 			 blk.getChildCount()>1 )
 		{
-			g.tool.errMgr.grammarError(ErrorType.LEXER_ACTION_PLACEMENT_ISSUE,
+			ErrorType e = ErrorType.LEXER_COMMAND_PLACEMENT_ISSUE;
+			if ( tree.getType() == ACTION ) e = ErrorType.LEXER_ACTION_PLACEMENT_ISSUE;
+			g.tool.errMgr.grammarError(e,
 									   fileName,
 									   tree.getToken(),
 									   rule.getChild(0).getText());

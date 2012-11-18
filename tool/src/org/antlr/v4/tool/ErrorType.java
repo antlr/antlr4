@@ -60,7 +60,6 @@ public enum ErrorType {
 	INTERNAL_ERROR(20, "internal error: <arg> <arg2><if(exception)>: <exception><endif>" +
 				   "<stackTrace; separator=\"\\n\">", ErrorSeverity.ERROR),
 	TOKENS_FILE_SYNTAX_ERROR(21, ".tokens file syntax error <arg>:<arg2>", ErrorSeverity.ERROR),
-//	CANNOT_GEN_DOT_FILE("", ErrorSeverity.ERROR),
 
 	// Code generation errors
 	MISSING_CODE_GEN_TEMPLATES(30, "can't find code generation templates: <arg>", ErrorSeverity.ERROR),
@@ -126,18 +125,14 @@ public enum ErrorType {
 	HETERO_ILLEGAL_IN_REWRITE_ALT(104, "", ErrorSeverity.ERROR),
 	NO_SUCH_GRAMMAR_SCOPE(105, "reference to undefined grammar in rule reference: <arg>.<arg2>", ErrorSeverity.ERROR),
 	NO_SUCH_RULE_IN_SCOPE(106, "rule <arg2> is not defined in grammar <arg>", ErrorSeverity.ERROR),
-//	TOKEN_STRING_REASSIGNMENT(107, "cannot alias <arg> in tokens {}; string already assigned to <arg2>", ErrorSeverity.ERROR),
 	TOKEN_NAME_REASSIGNMENT(108, "token name <arg> is already defined", ErrorSeverity.WARNING),
-	//TOKEN_VOCAB_IN_DELEGATE(, "tokenVocab option ignored in imported grammar <arg>", ErrorSeverity.ERROR),
 	OPTIONS_IN_DELEGATE(109, "options ignored in imported grammar <arg>", ErrorSeverity.WARNING),
-//	TOKEN_ALIAS_IN_DELEGATE(, "can't assign string to token name <arg> to string in imported grammar <arg2>", ErrorSeverity.ERROR),
 	CANNOT_FIND_IMPORTED_GRAMMAR(110, "can't find or load grammar <arg> from <arg2>", ErrorSeverity.ERROR),
 	INVALID_IMPORT(111, "<arg.typeString> grammar <arg.name> cannot import <arg2.typeString> grammar <arg2.name>", ErrorSeverity.ERROR),
 	IMPORTED_TOKENS_RULE_EMPTY(112, "", ErrorSeverity.ERROR),
 	IMPORT_NAME_CLASH(113, "<arg.typeString> grammar <arg.name> and imported <arg2.typeString> grammar <arg2.name> both generate <arg2.recognizerName>", ErrorSeverity.ERROR),
 	AST_OP_WITH_NON_AST_OUTPUT_OPTION(114, " <arg>", ErrorSeverity.ERROR),
 	AST_OP_IN_ALT_WITH_REWRITE(115, "", ErrorSeverity.ERROR),
-//    WILDCARD_AS_ROOT(116, "", ErrorSeverity.ERROR),
     CONFLICTING_OPTION_IN_TREE_FILTER(117, "", ErrorSeverity.ERROR),
 	ALL_OPS_NEED_SAME_ASSOC(118, "all operators of alt <arg> of left-recursive rule must have same associativity", ErrorSeverity.WARNING),
 	LEFT_RECURSION_CYCLES(119, "The following sets of rules are mutually left-recursive <arg:{c| [<c:{r|<r.name>}; separator=\", \">]}; separator=\" and \">", ErrorSeverity.ERROR),
@@ -148,53 +143,17 @@ public enum ErrorType {
 	ALT_LABEL_CONFLICTS_WITH_RULE(124, "rule alt label <arg> conflicts with rule <arg2>", ErrorSeverity.ERROR),
 	IMPLICIT_TOKEN_DEFINITION(125, "implicit definition of token <arg> in parser", ErrorSeverity.WARNING),
 	IMPLICIT_STRING_DEFINITION(126, "cannot create implicit token for string literal <arg> in non-combined grammar", ErrorSeverity.ERROR),
-//	ALIAS_REASSIGNMENT(127, "token literal <arg> aliased to new token name <arg2>", ErrorSeverity.WARNING),
 	ATTRIBUTE_IN_LEXER_ACTION(128, "attribute references not allowed in lexer actions: $<arg>", ErrorSeverity.ERROR),
-//	WILDCARD_IN_PARSER(129, "wildcard '.' not allowed in parsers", ErrorSeverity.ERROR),
 	LABEL_BLOCK_NOT_A_SET(130, "label <arg> assigned to a block which is not a set", ErrorSeverity.ERROR),
 	EXPECTED_NON_GREEDY_WILDCARD_BLOCK(131, "greedy block ()<arg> contains wildcard; the non-greedy syntax ()<arg>? may be preferred", ErrorSeverity.WARNING),
-	LEXER_ACTION_PLACEMENT_ISSUE(132, "action or ->command in lexer rule <arg> must be last element of single outermost alt", ErrorSeverity.ERROR),
-
-	/** Documentation comment is unterminated */
-    //UNTERMINATED_DOC_COMMENT(, "", ErrorSeverity.ERROR),
+	LEXER_ACTION_PLACEMENT_ISSUE(132, "action in lexer rule <arg> must be last element of single outermost alt", ErrorSeverity.ERROR),
+	LEXER_COMMAND_PLACEMENT_ISSUE(133, "->command in lexer rule <arg> must be last element of single outermost alt", ErrorSeverity.ERROR),
 
     // Dependency sorting errors
-    //
+
     /** t1.g4 -> t2.g4 -> t3.g4 ->t1.g4 */
     CIRCULAR_DEPENDENCY(200, "your grammars contain a circular dependency and cannot be sorted into a valid build order", ErrorSeverity.ERROR),
-
-    // Simple informational messages
-    //
-    /** A standby generic message that jsut spits out the arguments it is given */
-//    GENERIC_INFO("", ErrorSeverity.INFO, false, false),
-//    /** How to print out the version of the ANTLR tool that we are */
-//    ANTLR_VERSION("", ErrorSeverity.INFO, false, false),
-//
-//    // Command line tool errors/warnings
-//    /** -fo option was incorrectly formed */
-//    MISSING_OUTPUT_FO("", ErrorSeverity.WARNING, false, false),
-//    /** -lib option is missing a directory argument */
-//    MISSING_LIBDIR("", ErrorSeverity.WARNING, false, false),
-//    /** -format option was not given the name of a message format */
-//    MISSING_FORMAT("", ErrorSeverity.WARNING, false, false),
-//    /** Max state count missing from the option */
-//    MISSING_MAXSTATES("", ErrorSeverity.WARNING, false, false),
-//    /** Max labels in a switch argument is missing */
-//    MISSING_MAXSWITCH("", ErrorSeverity.WARNING, false, false),
-//    /** Min labels in a switch argument is missing */
-//    MISSING_MINSWITCH("", ErrorSeverity.WARNING, false, false),
-//    /** Missing recursion limit argument */
-//    MISSING_MAXRECUR("", ErrorSeverity.WARNING, false, false),
-//    /** Missing max edges argument */
-//    MISSING_MAXEDGE("", ErrorSeverity.WARNING, false, false),
-//    /** Misng ms timeout argument */
-//    MISSING_MAXTIME("", ErrorSeverity.WARNING, false, false),
-//
-//    // Help messages
-//    HELP_USAGE("", ErrorSeverity.INFO, false, false),
-//    HELP_EXTENDED("", ErrorSeverity.INFO, false, false),
-
-    ;
+	;
 
 	public final String msg;
     public final int code; // unique, deterministic unchanging error code once we release
@@ -209,15 +168,4 @@ public enum ErrorType {
 		this.abortsAnalysis = false;
 		this.abortsCodegen = false;
 	}
-
-//	ErrorType(String msg, ErrorSeverity severity, boolean abortsAnalysis) {
-//		this(msg, severity, abortsAnalysis, false);
-//	}
-
-//    ErrorType(String msg, ErrorSeverity severity, boolean abortsAnalysis, boolean abortsCodegen) {
-//		this.msg = msg;
-//        this.severity       = severity;
-//        this.abortsAnalysis = abortsAnalysis;
-//		this.abortsCodegen = abortsCodegen;
-//    }
 }
