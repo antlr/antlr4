@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
- Copyright (c) 2010 Jim Idle, Terence Parr
+ Copyright (c) 2012 Jim Idle, Terence Parr
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -99,7 +99,7 @@ tokens {
 @header {
 /*
  [The "BSD licence"]
- Copyright (c) 2005-2009 Terence Parr
+ Copyright (c) 2005-20012 Terence Parr
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -202,6 +202,7 @@ if ( options!=null ) {
 
 grammarType
 @after {
+	if ( $tg!=null ) throw new v3TreeGrammarException(tg);
 	if ( $t!=null ) ((GrammarRootAST)$tree).grammarType = $t.type;
 	else ((GrammarRootAST)$tree).grammarType=COMBINED;
 }
@@ -211,6 +212,8 @@ grammarType
 
 		// A combined lexer and parser specification
 		| 	g=GRAMMAR          -> GRAMMAR<GrammarRootAST>[$g, "COMBINED_GRAMMAR"]
+		|   tg=TREE_GRAMMAR
+			
 		)
     ;
 

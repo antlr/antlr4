@@ -116,6 +116,9 @@ public enum ErrorType {
 	LEXER_COMMAND_PLACEMENT_ISSUE(133, "->command in lexer rule <arg> must be last element of single outermost alt", ErrorSeverity.ERROR),
 	USE_OF_BAD_WORD(134, "symbol <arg> conflicts with generated code in target language or runtime", ErrorSeverity.ERROR),
 
+	// Backward incompatibility errors
+	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR v4", ErrorSeverity.ERROR_ONE_OFF),
+
     // Dependency sorting errors
 
     /** t1.g4 -> t2.g4 -> t3.g4 ->t1.g4 */
