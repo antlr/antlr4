@@ -8,6 +8,8 @@ November 18, 2012
 * added check for v3 backward incompatibilities:
 ** tree grammars
 ** labels in lexer rules
+** tokens {A;B;} syntax
+** tokens {A='C';} syntax
 
 November 17, 2012
 

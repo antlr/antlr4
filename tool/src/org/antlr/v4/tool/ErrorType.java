@@ -117,10 +117,12 @@ public enum ErrorType {
 	USE_OF_BAD_WORD(134, "symbol <arg> conflicts with generated code in target language or runtime", ErrorSeverity.ERROR),
 
 	// Backward incompatibility errors
-	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR v4", ErrorSeverity.ERROR_ONE_OFF),
+	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR v4", ErrorSeverity.ERROR),
 	V3_LEXER_LABEL(201, "labels in lexer rules are not supported in ANTLR v4; " +
 		"actions cannot reference elements of lexical rules but you can use " +
-		"getText() to get the entire text matched for the rule", ErrorSeverity.WARNING),
+		"getText() to get the entire text matched for the rule", ErrorSeverity.WARNING_ONE_OFF),
+	V3_TOKENS_SYNTAX(202, "'tokens {A; B;}' syntax is now 'tokens {A, B}' in ANTLR v4", ErrorSeverity.WARNING),
+	V3_ASSIGN_IN_TOKENS(203, "assignments in tokens{} are not supported in ANTLR v4; use lexical rule '<arg> : <arg2>;' instead", ErrorSeverity.WARNING_ONE_OFF),
 
     // Dependency sorting errors
 

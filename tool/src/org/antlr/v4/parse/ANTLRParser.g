@@ -132,10 +132,7 @@ import org.antlr.v4.tool.ast.*;
 
 @members {
 Stack paraphrases = new Stack();
-/** Affects tree construction; no SET collapsing if AST (ID|INT) would hide them from rewrite.
- *  Could use for just AST ops, but we can't see -> until after building sets.
-boolean buildAST;
- */
+public void grammarError(ErrorType etype, org.antlr.runtime.Token token, Object... args) { }
 }
 
 // The main entry point for parsing a V3 grammar from top to toe. This is
@@ -279,15 +276,24 @@ delegateGrammar
     |   id
     ;
 
-/** The declaration of any token types we need that are not already
- *  specified by a preceeding grammar, such as when a parser declares
- *  imaginary tokens with which to construct the AST, or a rewriting
- *  tree parser adds further imaginary tokens to ones defined in a prior
- *  {tree} parser.
- */
 tokensSpec
-	: TOKENS_SPEC id (COMMA id)* RBRACE -> ^(TOKENS_SPEC id+)
+	: TOKENS_SPEC TOKEN_REF (COMMA TOKEN_REF)* RBRACE -> ^(TOKENS_SPEC TOKEN_REF+)
     | TOKENS_SPEC RBRACE ->
+    | TOKENS_SPEC^ v3tokenSpec+ RBRACE!
+      {grammarError(ErrorType.V3_TOKENS_SYNTAX, $TOKENS_SPEC);}
+	;
+	
+v3tokenSpec
+	:	TOKEN_REF
+		(	ASSIGN lit=STRING_LITERAL
+            {
+            grammarError(ErrorType.V3_ASSIGN_IN_TOKENS, $TOKEN_REF,
+                         $TOKEN_REF.getText(), $lit.getText());
+            }
+						            	-> TOKEN_REF // ignore assignment
+		|								-> TOKEN_REF
+		)
+		SEMI
 	;
 
 // A declaration of a language target specifc section,

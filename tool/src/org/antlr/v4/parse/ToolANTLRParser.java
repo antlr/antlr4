@@ -76,5 +76,8 @@ public class ToolANTLRParser extends ANTLRParser {
 		return msg;
 	}
 
-
+	@Override
+	public void grammarError(ErrorType etype, org.antlr.runtime.Token token, Object... args) {
+		tool.errMgr.grammarError(etype, getSourceName(), token, args);
+	}
 }

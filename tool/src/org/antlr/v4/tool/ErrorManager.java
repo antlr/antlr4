@@ -244,7 +244,11 @@ public class ErrorManager {
 
 	public void emit(ErrorType etype, ANTLRMessage msg) {
 		switch ( etype.severity ) {
-			case WARNING: warnings++;
+			case WARNING_ONE_OFF:
+				if ( errorTypes.contains(etype) ) break;
+				// fall thru
+			case WARNING:
+				warnings++;
 				tool.warning(msg);
 				break;
 			case ERROR_ONE_OFF:

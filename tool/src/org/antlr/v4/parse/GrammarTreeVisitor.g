@@ -442,7 +442,7 @@ tokenSpec
 @after {
 	exitTokenSpec($start);
 }
-	:	ID							{defineToken($ID);}
+	:	TOKEN_REF					{defineToken($TOKEN_REF);}
 	;
 
 action
