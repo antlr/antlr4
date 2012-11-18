@@ -85,43 +85,28 @@ public class SymbolChecks {
 
     public void process() {
         // methods affect fields, but no side-effects outside this object
-        // So, call order sensitive
-		//checkForImportedRuleIssues(collector.qualifiedRulerefs);
-		// done in sem pipe for now
-        checkForRuleConflicts(g.rules.values());         // sets nameToRuleMap
+		// So, call order sensitive
+		// First collect all rules for later use in checkForLabelConflict()
+		if ( g.rules!=null ) {
+			for (Rule r : g.rules.values()) nameToRuleMap.put(r.name, r);
+		}
 		checkActionRedefinitions(collector.namedActions);
-        //checkRuleArgs(collector.rulerefs);
-        checkForTokenConflicts(collector.tokenIDRefs);  // sets tokenIDs
-        checkForLabelConflicts(g.rules.values());
-    }
+		checkForTokenConflicts(collector.tokenIDRefs);  // sets tokenIDs
+		checkForLabelConflicts(g.rules.values());
+	}
 
-    public void checkForRuleConflicts(Collection<Rule> rules) {
-        if ( rules==null ) return;
-        for (Rule r : rules) {
-			Rule prevRule = nameToRuleMap.get(r.name);
-			if ( prevRule==null ) {
-                nameToRuleMap.put(r.name, r);
-            }
-            else {
-                GrammarAST idNode = (GrammarAST)r.ast.getChild(0);
-                errMgr.grammarError(ErrorType.RULE_REDEFINITION,
-                                          r.g.fileName, idNode.token, r.name);
-            }
-        }
-    }
-
-	  public void checkActionRedefinitions(List<GrammarAST> actions) {
-        if ( actions==null ) return;
-        String scope = g.getDefaultActionScope();
-        String name;
-        GrammarAST nameNode;
-        for (GrammarAST ampersandAST : actions) {
-            nameNode = (GrammarAST)ampersandAST.getChild(0);
-            if ( ampersandAST.getChildCount()==2 ) {
-                name = nameNode.getText();
-            }
-            else {
-                scope = nameNode.getText();
+	public void checkActionRedefinitions(List<GrammarAST> actions) {
+		if ( actions==null ) return;
+		String scope = g.getDefaultActionScope();
+		String name;
+		GrammarAST nameNode;
+		for (GrammarAST ampersandAST : actions) {
+			nameNode = (GrammarAST)ampersandAST.getChild(0);
+			if ( ampersandAST.getChildCount()==2 ) {
+				name = nameNode.getText();
+			}
+			else {
+				scope = nameNode.getText();
                 name = ampersandAST.getChild(1).getText();
             }
             Set<String> scopeActions = actionScopeToActionNames.get(scope);

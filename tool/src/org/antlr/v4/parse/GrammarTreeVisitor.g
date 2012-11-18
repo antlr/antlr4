@@ -498,7 +498,8 @@ rule
 @after {
 	exitRule($start);
 }
-	:   ^(	RULE RULE_REF {currentRuleName=$RULE_REF.text; currentRuleAST=$RULE;}
+	:   {!((RuleAST)$start).dead}?
+        ^(	RULE RULE_REF {currentRuleName=$RULE_REF.text; currentRuleAST=$RULE;}
 			DOC_COMMENT? (^(RULEMODIFIERS (m=ruleModifier{mods.add($m.start);})+))?
 			ARG_ACTION?
       		ret=ruleReturns?
@@ -515,6 +516,20 @@ rule
       		ruleBlock exceptionGroup
       		{finishRule((RuleAST)$RULE, $RULE_REF, $ruleBlock.start); currentRuleName=null; currentRuleAST=null;}
       	 )
+    |   // ugly repeated alt w/o actions but needed to force ANTLR to use
+    	// sem pred to avoid actions when rule dead
+    	{((RuleAST)$start).dead}?
+        ^(	RULE RULE_REF
+			DOC_COMMENT? (^(RULEMODIFIERS (m=ruleModifier)+))?
+			ARG_ACTION?
+      		ret=ruleReturns?
+      		thr=throwsSpec?
+      		loc=locals?
+      		(	opts=optionsSpec
+		    |   a=ruleAction
+		    )*
+      		ruleBlock exceptionGroup
+         )
     ;
 
 exceptionGroup
@@ -643,7 +658,7 @@ lexerOuterAlternative
 	finishOuterAlt((AltAST)$start);
 	exitLexerOuterAlternative((AltAST)$start);
 }
-	:	lexerAlternative 
+	:	lexerAlternative
 	;
 
 
@@ -656,7 +671,7 @@ outerAlternative
 	finishOuterAlt((AltAST)$start);
 	exitOuterAlternative((AltAST)$start);
 }
-	:	alternative 
+	:	alternative
 	;
 
 lexerAlternative
@@ -705,7 +720,7 @@ labeledLexerElement
 }
     :   ^((ASSIGN|PLUS_ASSIGN) ID (lexerAtom|block))
 	;
-	
+
 lexerBlock
 @init {
 	enterLexerBlock($start);
@@ -744,7 +759,7 @@ actionElement
 	|   SEMPRED
 	|   ^(SEMPRED elementOptions)
 	;
-    
+
 alternative
 @init {
 	enterAlternative((AltAST)$start);
@@ -778,10 +793,10 @@ lexerCommandExpr
 @after {
 	exitLexerCommandExpr($start);
 }
-	:	ID 
+	:	ID
 	|	INT
 	;
-	
+
 element
 @init {
 	enterElement($start);
@@ -796,7 +811,7 @@ element
 	|   SEMPRED						{sempredInAlt((PredAST)$SEMPRED);}
 	|   ^(ACTION elementOptions)	{actionInAlt((ActionAST)$ACTION);}
 	|   ^(SEMPRED elementOptions)	{sempredInAlt((PredAST)$SEMPRED);}
-	
+
 	|	^(NOT blockSet)
 	|	^(NOT block)
 	;

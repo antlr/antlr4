@@ -7,6 +7,9 @@ November 17, 2012
 * properly check for grammar/filename difference
 * if labels, don't allow set collapse for
   a : A # X | B ;
+* wasn't checking soon enough for rule redef; now it sets a dead flag in
+  AST so no more walking dup.
+  error(51): T.g:7:0: rule s redefinition (ignoring); previous at line 3
 
 November 11, 2012
 

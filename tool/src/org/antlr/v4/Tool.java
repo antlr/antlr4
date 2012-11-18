@@ -62,6 +62,7 @@ import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.GrammarASTErrorNode;
 import org.antlr.v4.tool.ast.GrammarRootAST;
+import org.antlr.v4.tool.ast.RuleAST;
 import org.stringtemplate.v4.STGroup;
 
 import java.io.BufferedWriter;
@@ -387,6 +388,8 @@ public class Tool {
 
 		if ( g.ast.hasErrors ) return;
 
+		checkForRedefinedRules(g);
+
 		int prevErrors = errMgr.getNumErrors();
 		// MAKE SURE GRAMMAR IS SEMANTICALLY CORRECT (FILL IN GRAMMAR OBJECT)
 		SemanticPipeline sem = new SemanticPipeline(g);
@@ -414,6 +417,32 @@ public class Tool {
 		if ( gencode ) {
 			CodeGenPipeline gen = new CodeGenPipeline(g);
 			gen.process();
+		}
+	}
+
+	/** Important enough to avoid multiple defs that we do very early,
+	 *  right after AST construction.  Turn redef'd rule's AST RULE node dead
+	 *  field to true.
+	 */
+	public void checkForRedefinedRules(Grammar g) {
+		GrammarAST RULES = (GrammarAST)g.ast.getFirstChildWithType(ANTLRParser.RULES);
+		List<RuleAST> rules = (List<RuleAST>)RULES.getChildren();
+		Map<String, RuleAST> ruleToAST = new HashMap<String, RuleAST>();
+		for (RuleAST r : rules) {
+			GrammarAST ID = (GrammarAST)r.getChild(0);
+			String ruleName = ID.getText();
+			RuleAST prev = ruleToAST.get(ruleName);
+			if ( prev !=null ) {
+				GrammarAST prevChild = (GrammarAST)prev.getChild(0);
+				g.tool.errMgr.grammarError(ErrorType.RULE_REDEFINITION,
+										   g.fileName,
+										   ID.getToken(),
+										   ruleName,
+										   prevChild.getToken().getLine());
+				r.dead = true;
+				continue;
+			}
+			ruleToAST.put(ruleName, r);
 		}
 	}
 

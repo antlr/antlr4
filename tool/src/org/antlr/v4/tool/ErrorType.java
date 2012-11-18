@@ -71,7 +71,7 @@ public enum ErrorType {
 
 	// Grammar errors
 	SYNTAX_ERROR(50, "<arg>", ErrorSeverity.ERROR),
-	RULE_REDEFINITION(51, "rule <arg> redefinition", ErrorSeverity.ERROR),
+	RULE_REDEFINITION(51, "rule <arg> redefinition (ignoring); previous at line <arg2>", ErrorSeverity.ERROR),
 	LEXER_RULES_NOT_ALLOWED(52, "lexer rule <arg> not allowed in parser", ErrorSeverity.ERROR),
 	PARSER_RULES_NOT_ALLOWED(53, "parser rule <arg> not allowed in lexer", ErrorSeverity.ERROR),
     REPEATED_PREQUEL(54, "repeated grammar prequel spec (option, token, or import); please merge", ErrorSeverity.ERROR),
