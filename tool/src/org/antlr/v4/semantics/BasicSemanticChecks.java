@@ -382,6 +382,15 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		}
 	}
 
+	@Override
+	protected void enterLabeledLexerElement(GrammarAST tree) {
+		Token label = ((GrammarAST)tree.getChild(0)).getToken();
+		g.tool.errMgr.grammarError(ErrorType.V3_LEXER_LABEL,
+								   g.fileName,
+								   label,
+								   label.getText());
+	}
+
 	/** Check option is appropriate for grammar, rule, subrule */
 	boolean checkOptions(GrammarAST parent,
 						 Token optionID,

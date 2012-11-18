@@ -7,6 +7,7 @@ November 18, 2012
 * added notion of one-off error
 * added check for v3 backward incompatibilities:
 ** tree grammars
+** labels in lexer rules
 
 November 17, 2012
 

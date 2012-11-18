@@ -118,6 +118,9 @@ public enum ErrorType {
 
 	// Backward incompatibility errors
 	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR v4", ErrorSeverity.ERROR_ONE_OFF),
+	V3_LEXER_LABEL(201, "labels in lexer rules are not supported in ANTLR v4; " +
+		"actions cannot reference elements of lexical rules but you can use " +
+		"getText() to get the entire text matched for the rule", ErrorSeverity.ERROR_ONE_OFF),
 
     // Dependency sorting errors
 
