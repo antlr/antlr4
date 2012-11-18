@@ -123,6 +123,7 @@ public enum ErrorType {
 		"getText() to get the entire text matched for the rule", ErrorSeverity.WARNING_ONE_OFF),
 	V3_TOKENS_SYNTAX(202, "'tokens {A; B;}' syntax is now 'tokens {A, B}' in ANTLR v4", ErrorSeverity.WARNING),
 	V3_ASSIGN_IN_TOKENS(203, "assignments in tokens{} are not supported in ANTLR v4; use lexical rule '<arg> : <arg2>;' instead", ErrorSeverity.ERROR_ONE_OFF),
+	V3_GATED_SEMPRED(204, "{...}?=> gate semantic predicates in v3 behave like normal predicates in ANTLR v4; use {...}? instead", ErrorSeverity.WARNING_ONE_OFF),
 
     // Dependency sorting errors
 

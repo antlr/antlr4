@@ -297,7 +297,17 @@ ARG_ACTION
 // the delimiting {} is no additional overhead.
 //
 ACTION
-	:	NESTED_ACTION ('?' {$type = SEMPRED;} )?
+	:	NESTED_ACTION
+		('?' {$type = SEMPRED;} )?
+		(	'=>' // v3 gated sempred
+			{
+			Token t = new CommonToken(input, state.type, state.channel, state.tokenStartCharIndex, getCharIndex()-1);
+			t.setLine(state.tokenStartLine);
+			t.setText(state.text);
+			t.setCharPositionInLine(state.tokenStartCharPositionInLine);
+            grammarError(ErrorType.V3_GATED_SEMPRED, t);
+			}
+		)?
 	;
 
 // ----------------
