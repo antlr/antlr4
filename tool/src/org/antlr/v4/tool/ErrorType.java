@@ -122,7 +122,7 @@ public enum ErrorType {
 		"actions cannot reference elements of lexical rules but you can use " +
 		"getText() to get the entire text matched for the rule", ErrorSeverity.WARNING_ONE_OFF),
 	V3_TOKENS_SYNTAX(202, "'tokens {A; B;}' syntax is now 'tokens {A, B}' in ANTLR v4", ErrorSeverity.WARNING),
-	V3_ASSIGN_IN_TOKENS(203, "assignments in tokens{} are not supported in ANTLR v4; use lexical rule '<arg> : <arg2>;' instead", ErrorSeverity.WARNING_ONE_OFF),
+	V3_ASSIGN_IN_TOKENS(203, "assignments in tokens{} are not supported in ANTLR v4; use lexical rule '<arg> : <arg2>;' instead", ErrorSeverity.ERROR_ONE_OFF),
 
     // Dependency sorting errors
 
