@@ -1,3 +1,8 @@
 grammar T;
-s : EOF ;
 
+s : A # X
+  | B
+  ;
+b : A # Y
+  | B{}
+  ;
