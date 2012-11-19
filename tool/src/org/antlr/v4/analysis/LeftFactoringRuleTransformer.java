@@ -235,18 +235,32 @@ public class LeftFactoringRuleTransformer {
 				return null;
 			}
 
-			if (!translatedChildElement.isNil() || translatedChildElement.getChildCount() != 2) {
-				throw new UnsupportedOperationException("not yet implemented");
-			}
-
-			GrammarAST root = adaptor.nil();
-			Object factoredElement = adaptor.deleteChild(translatedChildElement, 0);
-			if (outerRule) {
-				adaptor.addChild(root, factoredElement);
-			}
-			adaptor.addChild(root, element);
-			adaptor.replaceChildren(element, 1, 1, translatedChildElement);
-			return root;
+			RuleAST ruleAST = (RuleAST)element.getAncestor(ANTLRParser.RULE);
+			LOGGER.log(Level.WARNING, "Could not left factor ''{0}'' out of decision in rule ''{1}'': labeled rule references are not yet supported.",
+				new Object[] { factoredRule, ruleAST.getChild(0).getText() });
+			return null;
+			//if (!translatedChildElement.isNil()) {
+			//	GrammarAST root = adaptor.nil();
+			//	Object factoredElement = translatedChildElement;
+			//	if (outerRule) {
+			//		adaptor.addChild(root, factoredElement);
+			//	}
+			//
+			//	String action = String.format("_localctx.%s = (ContextType)_localctx.getParent().getChild(_localctx.getParent().getChildCount() - 1);", element.getChild(0).getText());
+			//	adaptor.addChild(root, new ActionAST(adaptor.createToken(ANTLRParser.ACTION, action)));
+			//	return root;
+			//}
+			//else {
+			//	GrammarAST root = adaptor.nil();
+			//	Object factoredElement = adaptor.deleteChild(translatedChildElement, 0);
+			//	if (outerRule) {
+			//		adaptor.addChild(root, factoredElement);
+			//	}
+			//
+			//	adaptor.addChild(root, element);
+			//	adaptor.replaceChildren(element, 1, 1, translatedChildElement);
+			//	return root;
+			//}
 		}
 
 		case ANTLRParser.RULE_REF:
