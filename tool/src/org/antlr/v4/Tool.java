@@ -463,6 +463,11 @@ public class Tool {
 			public boolean undefined = false;
 			@Override
 			public void tokenRef(TerminalAST ref) {
+				if ("EOF".equals(ref.getText())) {
+					// this is a special predefined reference
+					return;
+				}
+
 				if ( g.isLexer() ) ruleRef(ref, null);
 			}
 
