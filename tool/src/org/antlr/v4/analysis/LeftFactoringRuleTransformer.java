@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
@@ -128,11 +129,6 @@ public class LeftFactoringRuleTransformer {
 	}
 
 	protected boolean translateLeftFactoredDecision(GrammarAST block, String factoredRule, boolean outerRule) {
-		if (outerRule && block.getParent() instanceof RuleAST) {
-			// not yet supported
-			return false;
-		}
-
 		List<GrammarAST> alternatives = block.getAllChildrenWithType(ANTLRParser.ALT);
 		List<GrammarAST> translatedAlternatives = new ArrayList<GrammarAST>();
 		IntervalSet translatedIntervals = new IntervalSet();
@@ -199,6 +195,21 @@ public class LeftFactoringRuleTransformer {
 			GrammarAST root = adaptor.nil();
 			root.addChild(block1);
 			block.replaceChildren(interval.a, interval.b, root);
+		}
+
+		if (outerRule && block.getParent() instanceof RuleAST) {
+			RuleAST ruleAST = (RuleAST)block.getParent();
+			String ruleName = ruleAST.getChild(0).getText();
+			Rule r = _rules.get(ruleName);
+			List<GrammarAST> blockAlts = block.getAllChildrenWithType(ANTLRParser.ALT);
+			if (r.alt.length != blockAlts.size()) {
+				r.numberOfAlts = blockAlts.size();
+				r.alt = new Alternative[blockAlts.size() + 1];
+				for (int i = 0; i < blockAlts.size(); i++) {
+					r.alt[i + 1] = new Alternative(r, i + 1);
+					r.alt[i + 1].ast = (AltAST)blockAlts.get(i);
+				}
+			}
 		}
 
 		return true;
