@@ -29,7 +29,6 @@
 
 package org.antlr.v4.semantics;
 
-import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
@@ -41,7 +40,6 @@ import org.antlr.v4.tool.ast.GrammarAST;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -85,43 +83,28 @@ public class SymbolChecks {
 
     public void process() {
         // methods affect fields, but no side-effects outside this object
-        // So, call order sensitive
-		//checkForImportedRuleIssues(collector.qualifiedRulerefs);
-		// done in sem pipe for now
-        checkForRuleConflicts(g.rules.values());         // sets nameToRuleMap
+		// So, call order sensitive
+		// First collect all rules for later use in checkForLabelConflict()
+		if ( g.rules!=null ) {
+			for (Rule r : g.rules.values()) nameToRuleMap.put(r.name, r);
+		}
 		checkActionRedefinitions(collector.namedActions);
-        //checkRuleArgs(collector.rulerefs);
-        checkForTokenConflicts(collector.tokenIDRefs);  // sets tokenIDs
-        checkForLabelConflicts(g.rules.values());
-    }
+		checkForTokenConflicts(collector.tokenIDRefs);  // sets tokenIDs
+		checkForLabelConflicts(g.rules.values());
+	}
 
-    public void checkForRuleConflicts(Collection<Rule> rules) {
-        if ( rules==null ) return;
-        for (Rule r : rules) {
-			Rule prevRule = nameToRuleMap.get(r.name);
-			if ( prevRule==null ) {
-                nameToRuleMap.put(r.name, r);
-            }
-            else {
-                GrammarAST idNode = (GrammarAST)r.ast.getChild(0);
-                errMgr.grammarError(ErrorType.RULE_REDEFINITION,
-                                          r.g.fileName, idNode.token, r.name);
-            }
-        }
-    }
-
-	  public void checkActionRedefinitions(List<GrammarAST> actions) {
-        if ( actions==null ) return;
-        String scope = g.getDefaultActionScope();
-        String name;
-        GrammarAST nameNode;
-        for (GrammarAST ampersandAST : actions) {
-            nameNode = (GrammarAST)ampersandAST.getChild(0);
-            if ( ampersandAST.getChildCount()==2 ) {
-                name = nameNode.getText();
-            }
-            else {
-                scope = nameNode.getText();
+	public void checkActionRedefinitions(List<GrammarAST> actions) {
+		if ( actions==null ) return;
+		String scope = g.getDefaultActionScope();
+		String name;
+		GrammarAST nameNode;
+		for (GrammarAST ampersandAST : actions) {
+			nameNode = (GrammarAST)ampersandAST.getChild(0);
+			if ( ampersandAST.getChildCount()==2 ) {
+				name = nameNode.getText();
+			}
+			else {
+				scope = nameNode.getText();
                 name = ampersandAST.getChild(1).getText();
             }
             Set<String> scopeActions = actionScopeToActionNames.get(scope);
@@ -213,15 +196,14 @@ public class SymbolChecks {
         if ( r.retvals!=null ) {
             Set<String> conflictingKeys = r.retvals.intersection(r.args);
             if (conflictingKeys!=null) {
-                for (Iterator<String> it = conflictingKeys.iterator(); it.hasNext();) {
-                    String key = it.next();
-                    errMgr.grammarError(
-                        ErrorType.ARG_RETVAL_CONFLICT,
-                        g.fileName,
-                        ((GrammarAST)r.ast.getChild(0)).token,
-                        key,
-                        r.name);
-                }
+				for (String key : conflictingKeys) {
+					errMgr.grammarError(
+						ErrorType.ARG_RETVAL_CONFLICT,
+						g.fileName,
+						((GrammarAST) r.ast.getChild(0)).token,
+						key,
+						r.name);
+				}
             }
         }
     }
@@ -233,11 +215,6 @@ public class SymbolChecks {
 		for (GrammarAST ref : rulerefs) {
 			String ruleName = ref.getText();
 			Rule r = g.getRule(ruleName);
-			if ( r==null && !ref.hasAncestor(ANTLRParser.DOT)) {
-				// only give error for unqualified rule refs now
-				errMgr.grammarError(ErrorType.UNDEFINED_RULE_REF,
-										  g.fileName, ref.token, ruleName);
-			}
 			GrammarAST arg = (GrammarAST)ref.getChild(0);
 			if ( arg!=null && (r==null || r.args==null) ) {
 				errMgr.grammarError(ErrorType.RULE_HAS_NO_ARGS,

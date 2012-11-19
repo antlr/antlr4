@@ -41,6 +41,5 @@ public interface ActionSplitterListener {
 	void setNonLocalAttr(String expr, Token x, Token y, Token rhs);
 	void nonLocalAttr(String expr, Token x, Token y);
 
-    void unknownSyntax(Token t);
     void text(String text);
 }

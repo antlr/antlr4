@@ -151,7 +151,7 @@ public class SemanticPipeline {
 	void assignLexerTokenTypes(Grammar g, List<GrammarAST> tokensDefs) {
 		Grammar G = g.getOutermostGrammar(); // put in root, even if imported
 		for (GrammarAST def : tokensDefs) {
-			if ( def.getType()== ANTLRParser.ID ) G.defineTokenName(def.getText());
+			if ( def.getType()== ANTLRParser.TOKEN_REF ) G.defineTokenName(def.getText());
 		}
 
 		/* Define token types for nonfragment rules which do not include a 'type(...)'

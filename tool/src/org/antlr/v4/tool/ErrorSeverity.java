@@ -37,8 +37,10 @@ package org.antlr.v4.tool;
  */
 public enum ErrorSeverity {
     INFO    ("info"),
-    WARNING ("warning"),
-    ERROR   ("error"),
+	WARNING ("warning"),
+	WARNING_ONE_OFF ("warning"),
+	ERROR   ("error"),
+	ERROR_ONE_OFF   ("error"),
     FATAL   ("fatal"),  // TODO: add fatal for which phase? sync with ErrorManager
     ;
 

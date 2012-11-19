@@ -133,9 +133,12 @@ public class Grammar implements AttributeResolver {
     public String fileName;
 
     /** Was this parser grammar created from a COMBINED grammar?  If so,
-	 *  this is what we derived.
+	 *  this is what we extracted.
 	 */
     public LexerGrammar implicitLexer;
+
+	/** If this is an extracted/implicit lexer, we point at original grammar */
+	public Grammar originalGrammar;
 
     /** If we're imported, who imported us? If null, implies grammar is root */
     public Grammar parent;
@@ -247,7 +250,7 @@ public class Grammar implements AttributeResolver {
 		org.antlr.runtime.ANTLRStringStream in = new org.antlr.runtime.ANTLRStringStream(grammarText);
 		in.name = fileName;
 
-		this.ast = tool.load(in);
+		this.ast = tool.load(fileName, in);
 		if ( ast==null ) return;
 
 		// ensure each node has pointer to surrounding grammar
@@ -367,12 +370,11 @@ public class Grammar implements AttributeResolver {
     public List<Grammar> getAllImportedGrammars() {
         if ( importedGrammars==null ) return null;
         List<Grammar> delegates = new ArrayList<Grammar>();
-        for (int i = 0; i < importedGrammars.size(); i++) {
-            Grammar d = importedGrammars.get(i);
-            delegates.add(d);
-            List<Grammar> ds = d.getAllImportedGrammars();
-            if ( ds!=null ) delegates.addAll( ds );
-        }
+		for (Grammar d : importedGrammars) {
+			delegates.add(d);
+			List<Grammar> ds = d.getAllImportedGrammars();
+			if (ds != null) delegates.addAll(ds);
+		}
         return delegates;
     }
 
@@ -467,7 +469,7 @@ public class Grammar implements AttributeResolver {
 		else { // must be a label like ID
 			I = tokenNameToTypeMap.get(token);
 		}
-		int i = (I!=null)?I.intValue(): Token.INVALID_TYPE;
+		int i = (I!=null)? I : Token.INVALID_TYPE;
 		//tool.log("grammar", "grammar type "+type+" "+tokenName+"->"+i);
 		return i;
 	}

@@ -1,5 +1,30 @@
 ANTLR v4 Honey Badger
 
+November 18, 2012
+
+* fixed: undefined rule refs caused exception
+* cleanup, rm dead etypes, add check for ids that cause code gen issues
+* added notion of one-off error
+* added check for v3 backward incompatibilities:
+** tree grammars
+** labels in lexer rules
+** tokens {A;B;} syntax
+** tokens {A='C';} syntax
+** {...}?=> gate semantic predicates
+** (...)=> syntactic predicates
+* Detect EOF in lexer rule
+
+November 17, 2012
+
+* .tokens files goes in output dir like parser file.
+* added check: action in lexer rules must be last element of outermost alt
+* properly check for grammar/filename difference
+* if labels, don't allow set collapse for
+  a : A # X | B ;
+* wasn't checking soon enough for rule redef; now it sets a dead flag in
+  AST so no more walking dup.
+  error(51): T.g:7:0: rule s redefinition (ignoring); previous at line 3
+
 November 11, 2012
 
 * Change version to 4.0b4 (btw, forgot to push 4.0b3 in build.properties when

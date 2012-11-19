@@ -138,18 +138,20 @@ public class TestRig {
 //		System.out.println("exec "+grammarName+"."+startRuleName);
 		String lexerName = grammarName+"Lexer";
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		Class<? extends Lexer> lexerClass;
+		Class<? extends Lexer> lexerClass = null;
 		try {
 			lexerClass = cl.loadClass(lexerName).asSubclass(Lexer.class);
 		}
 		catch (java.lang.ClassNotFoundException cnfe) {
 			// might be pure lexer grammar; no Lexer suffix then
 			lexerName = grammarName;
-			lexerClass = cl.loadClass(lexerName).asSubclass(Lexer.class);
-		}
-		if ( lexerClass==null ) {
-			System.err.println("Can't load "+lexerName);
-			return;
+			try {
+				lexerClass = cl.loadClass(lexerName).asSubclass(Lexer.class);
+			}
+			catch (ClassNotFoundException cnfe2) {
+				System.err.println("Can't load "+lexerName+" as lexer or parser");
+				return;
+			}
 		}
 
 		Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);

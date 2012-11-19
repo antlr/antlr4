@@ -30,6 +30,8 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarTreeVisitor;
@@ -75,8 +77,6 @@ import java.util.List;
  * IMPORT_NAME_CLASH
  * REPEATED_PREQUEL
  * TOKEN_NAMES_MUST_START_UPPER
- *
- * TODO: 1 action per lex rule
  */
 public class BasicSemanticChecks extends GrammarTreeVisitor {
 	/** Set of valid imports.  Maps delegate to set of delegator grammar types.
@@ -249,10 +249,10 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	// They are triggered by the visitor methods above.
 
 	void checkGrammarName(Token nameToken) {
-		if ( g.implicitLexer==null ) return;
 		String fullyQualifiedName = nameToken.getInputStream().getSourceName();
 		File f = new File(fullyQualifiedName);
 		String fileName = f.getName();
+		if ( g.originalGrammar!=null ) return; // don't warn about diff if this is implicit lexer
 		if ( !Utils.stripFileExtension(fileName).equals(nameToken.getText()) &&
 		     !fileName.equals(Grammar.GRAMMAR_FROM_STRING_NAME)) {
 			g.tool.errMgr.grammarError(ErrorType.FILE_AND_GRAMMAR_NAME_DIFFER,
@@ -326,6 +326,43 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
+	protected void enterLexerElement(GrammarAST tree) {
+		if ( tree.getType() == ACTION ) {
+			checkElementIsOuterMostInSingleAlt(tree);
+		}
+	}
+
+	@Override
+	protected void enterLexerCommand(GrammarAST tree) {
+		checkElementIsOuterMostInSingleAlt(tree);
+	}
+
+	/**
+	 Make sure that action is last element in outer alt; here action,
+	 a2, z, and zz are bad, but a3 is ok:
+	 (RULE A (BLOCK (ALT {action} 'a')))
+	 (RULE B (BLOCK (ALT (BLOCK (ALT {a2} 'x') (ALT 'y')) {a3})))
+	 (RULE C (BLOCK (ALT 'd' {z}) (ALT 'e' {zz})))
+	 */
+	protected void checkElementIsOuterMostInSingleAlt(GrammarAST tree) {
+		CommonTree alt = tree.parent;
+		CommonTree blk = alt.parent;
+		boolean outerMostAlt = blk.parent.getType() == RULE;
+		Tree rule = tree.getAncestor(RULE);
+		String fileName = tree.getToken().getInputStream().getSourceName();
+		if ( !outerMostAlt || blk.getChildCount()>1 )
+		{
+			ErrorType e = ErrorType.LEXER_COMMAND_PLACEMENT_ISSUE;
+			if ( tree.getType() == ACTION ) e = ErrorType.LEXER_ACTION_PLACEMENT_ISSUE;
+			g.tool.errMgr.grammarError(e,
+									   fileName,
+									   tree.getToken(),
+									   rule.getChild(0).getText());
+
+		}
+	}
+
+	@Override
 	public void label(GrammarAST op, GrammarAST ID, GrammarAST element) {
 		switch (element.getType()) {
 		// token atoms
@@ -345,6 +382,15 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 			g.tool.errMgr.grammarError(ErrorType.LABEL_BLOCK_NOT_A_SET, fileName, ID.token, ID.getText());
 			break;
 		}
+	}
+
+	@Override
+	protected void enterLabeledLexerElement(GrammarAST tree) {
+		Token label = ((GrammarAST)tree.getChild(0)).getToken();
+		g.tool.errMgr.grammarError(ErrorType.V3_LEXER_LABEL,
+								   g.fileName,
+								   label,
+								   label.getText());
 	}
 
 	/** Check option is appropriate for grammar, rule, subrule */

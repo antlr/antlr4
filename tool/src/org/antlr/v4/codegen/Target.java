@@ -38,6 +38,10 @@ import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.ST;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /** */
 public class Target {
 	/** For pure strings of Java 16-bit unicode char, how can we display
@@ -55,6 +59,20 @@ public class Target {
 
 	public CodeGenerator gen;
 
+	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
+	public Set<String> badWords = new HashSet<String>();
+
+	public static String[] javaKeywords = {
+		"abstract", "assert", "boolean", "break", "byte", "case", "catch",
+		"char", "class", "const", "continue", "default", "do", "double", "else",
+		"enum", "extends", "false", "final", "finally", "float", "for",
+		"if", "implements", "import", "instanceof", "int", "interface",
+		"long", "native", "new", "null", "package", "private", "protected",
+		"public", "return", "short", "static", "strictfp", "super", "switch",
+		"synchronized", "this", "throw", "throws", "transient", "true", "try",
+		"void", "volatile", "while"
+	};
+
 	public Target(CodeGenerator gen) {
 		targetCharValueEscape['\n'] = "\\n";
 		targetCharValueEscape['\r'] = "\\r";
@@ -65,6 +83,13 @@ public class Target {
 		targetCharValueEscape['\''] = "\\'";
 		targetCharValueEscape['"'] = "\\\"";
 		this.gen = gen;
+		addBadWords();
+	}
+
+	public void addBadWords() {
+		badWords.addAll(Arrays.asList(javaKeywords));
+		badWords.add("rule");
+		badWords.add("parserRule");
 	}
 
 	protected void genFile(Grammar g,
@@ -234,7 +259,7 @@ public class Target {
 		String literal, boolean addQuotes)
 	{
 		StringBuilder sb = new StringBuilder();
-		StringBuilder is = new StringBuilder(literal);
+		String is = literal;
 
         if ( addQuotes ) sb.append('"');
 
@@ -382,4 +407,9 @@ public class Target {
 		if ( ttype==Token.INVALID_TYPE ) return name;
 		return getTokenTypeAsTargetLabel(gen.g, ttype);
 	}
+
+	public boolean grammarSymbolCausesIssueInGeneratedCode(String id) {
+		return badWords.contains(id);
+	}
+
 }

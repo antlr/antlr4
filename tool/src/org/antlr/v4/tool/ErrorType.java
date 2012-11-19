@@ -57,10 +57,9 @@ public enum ErrorType {
 	BAD_OPTION_SET_SYNTAX(9, "invalid -Dname=value syntax: <arg>", ErrorSeverity.ERROR),
 	WARNING_TREATED_AS_ERROR(10, "warning treated as error", ErrorSeverity.ERROR),
 
-	INTERNAL_ERROR(20, "internal error: <arg> <arg2><if(exception)>: <exception><endif>\n" +
+	INTERNAL_ERROR(20, "internal error: <arg> <arg2><if(exception)>: <exception><endif>" +
 				   "<stackTrace; separator=\"\\n\">", ErrorSeverity.ERROR),
 	TOKENS_FILE_SYNTAX_ERROR(21, ".tokens file syntax error <arg>:<arg2>", ErrorSeverity.ERROR),
-//	CANNOT_GEN_DOT_FILE("", ErrorSeverity.ERROR),
 
 	// Code generation errors
 	MISSING_CODE_GEN_TEMPLATES(30, "can't find code generation templates: <arg>", ErrorSeverity.ERROR),
@@ -71,74 +70,36 @@ public enum ErrorType {
 
 	// Grammar errors
 	SYNTAX_ERROR(50, "<arg>", ErrorSeverity.ERROR),
-	RULE_REDEFINITION(51, "rule <arg> redefinition", ErrorSeverity.ERROR),
+	RULE_REDEFINITION(51, "rule <arg> redefinition (ignoring); previous at line <arg2>", ErrorSeverity.ERROR),
 	LEXER_RULES_NOT_ALLOWED(52, "lexer rule <arg> not allowed in parser", ErrorSeverity.ERROR),
 	PARSER_RULES_NOT_ALLOWED(53, "parser rule <arg> not allowed in lexer", ErrorSeverity.ERROR),
     REPEATED_PREQUEL(54, "repeated grammar prequel spec (option, token, or import); please merge", ErrorSeverity.ERROR),
-	NO_TOKEN_DEFINITION(55, "no lexer rule corresponding to token: <arg>", ErrorSeverity.ERROR),
 	UNDEFINED_RULE_REF(56, "reference to undefined rule: <arg>", ErrorSeverity.ERROR),
 	UNDEFINED_RULE_IN_NONLOCAL_REF(57, "reference to undefined rule in nonlocal ref: <arg>::<arg2>", ErrorSeverity.ERROR),
-	LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE(58, "", ErrorSeverity.ERROR),
-	CANNOT_ALIAS_TOKENS(59, "can't assign string value to token name <arg> in non-combined grammar", ErrorSeverity.ERROR),
     TOKEN_NAMES_MUST_START_UPPER(60, "token names must start with an uppercase letter: <arg>", ErrorSeverity.ERROR),
-	ATTRIBUTE_REF_NOT_IN_RULE(61, "", ErrorSeverity.ERROR),
-	INVALID_RULE_SCOPE_ATTRIBUTE_REF(62, "", ErrorSeverity.ERROR),
 	UNKNOWN_SIMPLE_ATTRIBUTE(63, "unknown attribute reference <arg> in <arg2>", ErrorSeverity.ERROR),
 	INVALID_RULE_PARAMETER_REF(64, "cannot access rule <arg>'s parameter: <arg2>", ErrorSeverity.ERROR),
 	UNKNOWN_RULE_ATTRIBUTE(65, "unknown attribute <arg> for rule <arg2> in <arg3>", ErrorSeverity.ERROR),
     UNKNOWN_ATTRIBUTE_IN_SCOPE(66, "attribute <arg> isn't a valid property in <arg2>", ErrorSeverity.ERROR),
 	ISOLATED_RULE_REF(67, "missing attribute access on rule reference <arg> in <arg2>", ErrorSeverity.ERROR),
-	SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE(68, "", ErrorSeverity.ERROR), // not used
 	LABEL_CONFLICTS_WITH_RULE(69, "label <arg> conflicts with rule with same name", ErrorSeverity.ERROR),
 	LABEL_CONFLICTS_WITH_TOKEN(70, "label <arg> conflicts with token with same name", ErrorSeverity.ERROR),
 	LABEL_CONFLICTS_WITH_RULE_ARG_RETVAL(72, "label <arg> conflicts with rule <arg2>'s return value or parameter with same name", ErrorSeverity.ERROR),
-	ATTRIBUTE_CONFLICTS_WITH_RULE(73, "rule <arg2>'s dynamically-scoped attribute <arg> conflicts with the rule name", ErrorSeverity.ERROR),
-	ATTRIBUTE_CONFLICTS_WITH_RULE_ARG_RETVAL(74, "rule <arg2>'s dynamically-scoped attribute <arg> conflicts with <arg2>'s return value or parameter", ErrorSeverity.ERROR),
 	LABEL_TYPE_CONFLICT(75, "label <arg> type mismatch with previous definition: <arg2>", ErrorSeverity.ERROR),
 	ARG_RETVAL_CONFLICT(76, "rule <arg2>'s argument <arg> conflicts a return value with same name", ErrorSeverity.ERROR),
-	NONUNIQUE_REF(77, "", ErrorSeverity.ERROR), // not used
-	FORWARD_ELEMENT_REF(78, "", ErrorSeverity.ERROR),
 	MISSING_RULE_ARGS(79, "missing parameter(s) on rule reference: <arg>", ErrorSeverity.ERROR),
 	RULE_HAS_NO_ARGS(80, "rule <arg> has no defined parameters", ErrorSeverity.ERROR),
-	ARGS_ON_TOKEN_REF(81, "token reference <arg> may not have parameters", ErrorSeverity.ERROR),
-	RULE_REF_AMBIG_WITH_RULE_IN_ALT(82, "", ErrorSeverity.ERROR),
 	ILLEGAL_OPTION(83, "illegal option <arg>", ErrorSeverity.WARNING),
 	ILLEGAL_OPTION_VALUE(84, "illegal option value <arg>=<arg2>", ErrorSeverity.WARNING),
-	LIST_LABEL_INVALID_UNLESS_RETVAL_STRUCT(85, "", ErrorSeverity.ERROR),
-	REWRITE_ELEMENT_NOT_PRESENT_ON_LHS(86, "", ErrorSeverity.ERROR),
-    UNDEFINED_TOKEN_REF_IN_REWRITE(87, "", ErrorSeverity.ERROR),
-	NO_GRAMMAR_START_RULE(88, "", ErrorSeverity.ERROR),
-	EMPTY_COMPLEMENT(89, "empty complement", ErrorSeverity.ERROR),
-	UNKNOWN_DYNAMIC_SCOPE(90, "unknown dynamic scope: <arg> in <arg2>", ErrorSeverity.ERROR),
-	UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE(91, "unknown dynamically-scoped attribute for scope <arg>: <arg2> in <arg3>", ErrorSeverity.ERROR),
-	ISOLATED_RULE_ATTRIBUTE(92, "", ErrorSeverity.ERROR),
-	INVALID_ACTION_SCOPE(93, "", ErrorSeverity.ERROR),
     ACTION_REDEFINITION(94, "redefinition of <arg> action", ErrorSeverity.ERROR),
-    SCOPE_REDEFINITION(95, "scope <arg> redefinition", ErrorSeverity.ERROR),
-	INVALID_TEMPLATE_ACTION(96, "", ErrorSeverity.ERROR),
-	ARG_INIT_VALUES_ILLEGAL(97, "", ErrorSeverity.ERROR),
-	REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION(98, "", ErrorSeverity.ERROR),
 	NO_RULES(99, "<if(arg2.implicitLexerOwner)>implicitly generated <endif>grammar <arg> has no rules", ErrorSeverity.ERROR),
-	WRITE_TO_READONLY_ATTR(100, "", ErrorSeverity.ERROR),
-	MISSING_AST_TYPE_IN_TREE_GRAMMAR(101, "", ErrorSeverity.ERROR),
-	REWRITE_FOR_MULTI_ELEMENT_ALT(102, "", ErrorSeverity.ERROR),
-	RULE_INVALID_SET(103, "", ErrorSeverity.ERROR),
-	HETERO_ILLEGAL_IN_REWRITE_ALT(104, "", ErrorSeverity.ERROR),
 	NO_SUCH_GRAMMAR_SCOPE(105, "reference to undefined grammar in rule reference: <arg>.<arg2>", ErrorSeverity.ERROR),
 	NO_SUCH_RULE_IN_SCOPE(106, "rule <arg2> is not defined in grammar <arg>", ErrorSeverity.ERROR),
-//	TOKEN_STRING_REASSIGNMENT(107, "cannot alias <arg> in tokens {}; string already assigned to <arg2>", ErrorSeverity.ERROR),
 	TOKEN_NAME_REASSIGNMENT(108, "token name <arg> is already defined", ErrorSeverity.WARNING),
-	//TOKEN_VOCAB_IN_DELEGATE(, "tokenVocab option ignored in imported grammar <arg>", ErrorSeverity.ERROR),
 	OPTIONS_IN_DELEGATE(109, "options ignored in imported grammar <arg>", ErrorSeverity.WARNING),
-//	TOKEN_ALIAS_IN_DELEGATE(, "can't assign string to token name <arg> to string in imported grammar <arg2>", ErrorSeverity.ERROR),
 	CANNOT_FIND_IMPORTED_GRAMMAR(110, "can't find or load grammar <arg> from <arg2>", ErrorSeverity.ERROR),
 	INVALID_IMPORT(111, "<arg.typeString> grammar <arg.name> cannot import <arg2.typeString> grammar <arg2.name>", ErrorSeverity.ERROR),
-	IMPORTED_TOKENS_RULE_EMPTY(112, "", ErrorSeverity.ERROR),
 	IMPORT_NAME_CLASH(113, "<arg.typeString> grammar <arg.name> and imported <arg2.typeString> grammar <arg2.name> both generate <arg2.recognizerName>", ErrorSeverity.ERROR),
-	AST_OP_WITH_NON_AST_OUTPUT_OPTION(114, " <arg>", ErrorSeverity.ERROR),
-	AST_OP_IN_ALT_WITH_REWRITE(115, "", ErrorSeverity.ERROR),
-//    WILDCARD_AS_ROOT(116, "", ErrorSeverity.ERROR),
-    CONFLICTING_OPTION_IN_TREE_FILTER(117, "", ErrorSeverity.ERROR),
 	ALL_OPS_NEED_SAME_ASSOC(118, "all operators of alt <arg> of left-recursive rule must have same associativity", ErrorSeverity.WARNING),
 	LEFT_RECURSION_CYCLES(119, "The following sets of rules are mutually left-recursive <arg:{c| [<c:{r|<r.name>}; separator=\", \">]}; separator=\" and \">", ErrorSeverity.ERROR),
 	MODE_NOT_IN_LEXER(120, "lexical modes are only allowed in lexer grammars", ErrorSeverity.ERROR),
@@ -148,75 +109,36 @@ public enum ErrorType {
 	ALT_LABEL_CONFLICTS_WITH_RULE(124, "rule alt label <arg> conflicts with rule <arg2>", ErrorSeverity.ERROR),
 	IMPLICIT_TOKEN_DEFINITION(125, "implicit definition of token <arg> in parser", ErrorSeverity.WARNING),
 	IMPLICIT_STRING_DEFINITION(126, "cannot create implicit token for string literal <arg> in non-combined grammar", ErrorSeverity.ERROR),
-//	ALIAS_REASSIGNMENT(127, "token literal <arg> aliased to new token name <arg2>", ErrorSeverity.WARNING),
 	ATTRIBUTE_IN_LEXER_ACTION(128, "attribute references not allowed in lexer actions: $<arg>", ErrorSeverity.ERROR),
-//	WILDCARD_IN_PARSER(129, "wildcard '.' not allowed in parsers", ErrorSeverity.ERROR),
 	LABEL_BLOCK_NOT_A_SET(130, "label <arg> assigned to a block which is not a set", ErrorSeverity.ERROR),
 	EXPECTED_NON_GREEDY_WILDCARD_BLOCK(131, "greedy block ()<arg> contains wildcard; the non-greedy syntax ()<arg>? may be preferred", ErrorSeverity.WARNING),
+	LEXER_ACTION_PLACEMENT_ISSUE(132, "action in lexer rule <arg> must be last element of single outermost alt", ErrorSeverity.ERROR),
+	LEXER_COMMAND_PLACEMENT_ISSUE(133, "->command in lexer rule <arg> must be last element of single outermost alt", ErrorSeverity.ERROR),
+	USE_OF_BAD_WORD(134, "symbol <arg> conflicts with generated code in target language or runtime", ErrorSeverity.ERROR),
 
-	/** Documentation comment is unterminated */
-    //UNTERMINATED_DOC_COMMENT(, "", ErrorSeverity.ERROR),
+	// Backward incompatibility errors
+	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR v4", ErrorSeverity.ERROR),
+	V3_LEXER_LABEL(201, "labels in lexer rules are not supported in ANTLR v4; " +
+		"actions cannot reference elements of lexical rules but you can use " +
+		"getText() to get the entire text matched for the rule", ErrorSeverity.WARNING_ONE_OFF),
+	V3_TOKENS_SYNTAX(202, "'tokens {A; B;}' syntax is now 'tokens {A, B}' in ANTLR v4", ErrorSeverity.WARNING),
+	V3_ASSIGN_IN_TOKENS(203, "assignments in tokens{} are not supported in ANTLR v4; use lexical rule '<arg> : <arg2>;' instead", ErrorSeverity.ERROR_ONE_OFF),
+	V3_GATED_SEMPRED(204, "{...}?=> gate semantic predicates in v3 behave like normal predicates in ANTLR v4; use {...}? instead", ErrorSeverity.WARNING_ONE_OFF),
+	V3_SYNPRED(205, "(...)=> syntactic predicates are not needed or supported ANTLR v4; just delete them", ErrorSeverity.ERROR_ONE_OFF),
 
     // Dependency sorting errors
-    //
+
     /** t1.g4 -> t2.g4 -> t3.g4 ->t1.g4 */
-    CIRCULAR_DEPENDENCY(200, "your grammars contain a circular dependency and cannot be sorted into a valid build order", ErrorSeverity.ERROR),
-
-    // Simple informational messages
-    //
-    /** A standby generic message that jsut spits out the arguments it is given */
-//    GENERIC_INFO("", ErrorSeverity.INFO, false, false),
-//    /** How to print out the version of the ANTLR tool that we are */
-//    ANTLR_VERSION("", ErrorSeverity.INFO, false, false),
-//
-//    // Command line tool errors/warnings
-//    /** -fo option was incorrectly formed */
-//    MISSING_OUTPUT_FO("", ErrorSeverity.WARNING, false, false),
-//    /** -lib option is missing a directory argument */
-//    MISSING_LIBDIR("", ErrorSeverity.WARNING, false, false),
-//    /** -format option was not given the name of a message format */
-//    MISSING_FORMAT("", ErrorSeverity.WARNING, false, false),
-//    /** Max state count missing from the option */
-//    MISSING_MAXSTATES("", ErrorSeverity.WARNING, false, false),
-//    /** Max labels in a switch argument is missing */
-//    MISSING_MAXSWITCH("", ErrorSeverity.WARNING, false, false),
-//    /** Min labels in a switch argument is missing */
-//    MISSING_MINSWITCH("", ErrorSeverity.WARNING, false, false),
-//    /** Missing recursion limit argument */
-//    MISSING_MAXRECUR("", ErrorSeverity.WARNING, false, false),
-//    /** Missing max edges argument */
-//    MISSING_MAXEDGE("", ErrorSeverity.WARNING, false, false),
-//    /** Misng ms timeout argument */
-//    MISSING_MAXTIME("", ErrorSeverity.WARNING, false, false),
-//
-//    // Help messages
-//    HELP_USAGE("", ErrorSeverity.INFO, false, false),
-//    HELP_EXTENDED("", ErrorSeverity.INFO, false, false),
-
-    ;
+    //CIRCULAR_DEPENDENCY(200, "your grammars contain a circular dependency and cannot be sorted into a valid build order", ErrorSeverity.ERROR),
+	;
 
 	public final String msg;
     public final int code; // unique, deterministic unchanging error code once we release
     public final ErrorSeverity severity;
-    public final Boolean abortsAnalysis;
-    public final Boolean abortsCodegen;
 
 	ErrorType(int code, String msg, ErrorSeverity severity) {
         this.code = code;
 		this.msg = msg;
         this.severity = severity;
-		this.abortsAnalysis = false;
-		this.abortsCodegen = false;
 	}
-
-//	ErrorType(String msg, ErrorSeverity severity, boolean abortsAnalysis) {
-//		this(msg, severity, abortsAnalysis, false);
-//	}
-
-//    ErrorType(String msg, ErrorSeverity severity, boolean abortsAnalysis, boolean abortsCodegen) {
-//		this.msg = msg;
-//        this.severity       = severity;
-//        this.abortsAnalysis = abortsAnalysis;
-//		this.abortsCodegen = abortsCodegen;
-//    }
 }

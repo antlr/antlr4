@@ -262,10 +262,6 @@ public class ActionTranslator implements ActionSplitterListener {
 	}
 
 	@Override
-	public void unknownSyntax(Token t) {
-	}
-
-	@Override
 	public void text(String text) {
 		chunks.add(new ActionText(nodeContext,text));
 	}

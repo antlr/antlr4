@@ -115,12 +115,15 @@ tokens { SEMPRED; TOKEN_REF; RULE_REF; LEXER_CHAR_SET; ARG_ACTION; }
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.v4.parse;
+import org.antlr.v4.tool.*;
 }
 
 
 @members {
     public CommonTokenStream tokens; // track stream we push to; need for context info
     public boolean isLexerRule = false;
+
+	public void grammarError(ErrorType etype, org.antlr.runtime.Token token, Object... args) { }
 
 	/** scan backwards from current point in this.tokens list
 	 *  looking for the start of the rule or subrule.
@@ -294,7 +297,18 @@ ARG_ACTION
 // the delimiting {} is no additional overhead.
 //
 ACTION
-	:	NESTED_ACTION ('?' {$type = SEMPRED;} )?
+	:	NESTED_ACTION
+		(	'?' {$type = SEMPRED;}
+			(	(WSNLCHARS* '=>') => WSNLCHARS* '=>' // v3 gated sempred
+				{
+				Token t = new CommonToken(input, state.type, state.channel, state.tokenStartCharIndex, getCharIndex()-1);
+				t.setLine(state.tokenStartLine);
+				t.setText(state.text);
+				t.setCharPositionInLine(state.tokenStartCharPositionInLine);
+				grammarError(ErrorType.V3_GATED_SEMPRED, t);
+				}
+			)?
+		)?
 	;
 
 // ----------------
@@ -398,6 +412,7 @@ FRAGMENT     : 'fragment'             ;
 LEXER        : 'lexer'                ;
 PARSER       : 'parser'               ;
 GRAMMAR      : 'grammar'              ;
+TREE_GRAMMAR : 'tree' WSNLCHARS* 'grammar' ;
 PROTECTED    : 'protected'            ;
 PUBLIC       : 'public'               ;
 PRIVATE      : 'private'              ;
@@ -439,6 +454,17 @@ LT           : '<'                    ;
 GT           : '>'                    ;
 ASSIGN       : '='                    ;
 QUESTION     : '?'                    ;
+SYNPRED      : '=>'
+			   {
+			    Token t = new CommonToken(input, state.type, state.channel,
+			                              state.tokenStartCharIndex, getCharIndex()-1);
+				t.setLine(state.tokenStartLine);
+				t.setText(state.text);
+				t.setCharPositionInLine(state.tokenStartCharPositionInLine);
+				grammarError(ErrorType.V3_SYNPRED, t);
+                $channel=HIDDEN;
+				}
+             ;
 STAR         : '*'                    ;
 PLUS         : '+'                    ;
 PLUS_ASSIGN  : '+='                   ;

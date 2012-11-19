@@ -132,14 +132,13 @@ public class LeftRecursionDetector {
 	protected void addRulesToCycle(Rule enclosingRule, Rule targetRule) {
 		//System.err.println("left-recursion to "+targetRule.name+" from "+enclosingRule.name);
 		boolean foundCycle = false;
-		for (int i = 0; i < listOfRecursiveCycles.size(); i++) {
-			Set<Rule> rulesInCycle = listOfRecursiveCycles.get(i);
+		for (Set<Rule> rulesInCycle : listOfRecursiveCycles) {
 			// ensure both rules are in same cycle
-			if ( rulesInCycle.contains(targetRule) ) {
+			if (rulesInCycle.contains(targetRule)) {
 				rulesInCycle.add(enclosingRule);
 				foundCycle = true;
 			}
-			if ( rulesInCycle.contains(enclosingRule) ) {
+			if (rulesInCycle.contains(enclosingRule)) {
 				rulesInCycle.add(targetRule);
 				foundCycle = true;
 			}

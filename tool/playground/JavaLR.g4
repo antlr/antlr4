@@ -509,8 +509,7 @@ statement
     |   'while' parExpression statement
     |   'do' statement 'while' parExpression ';'
     |   'try' block
-        ( catches 'finally' block
-        | catches
+        ( catches ('finally' block)?
         | 'finally' block
         )
     |   'switch' parExpression '{' switchBlockStatementGroups '}'
@@ -537,7 +536,7 @@ formalParameter
     ;
 
 switchBlockStatementGroups
-    :   (switchBlockStatementGroup)*
+    :   switchBlockStatementGroup* switchLabel*
     ;
 
 /* The change here (switchLabel -> switchLabel+) technically makes this grammar
@@ -545,7 +544,7 @@ switchBlockStatementGroups
    appropriate AST, one in which each group, except possibly the last one, has
    labels and statements. */
 switchBlockStatementGroup
-    :   switchLabel+ blockStatement*
+    :   switchLabel+ blockStatement+
     ;
 
 switchLabel

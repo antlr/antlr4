@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
- Copyright (c) 2010 Jim Idle, Terence Parr
+ Copyright (c) 2012 Jim Idle, Terence Parr
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -99,7 +99,7 @@ tokens {
 @header {
 /*
  [The "BSD licence"]
- Copyright (c) 2005-2009 Terence Parr
+ Copyright (c) 2005-20012 Terence Parr
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -134,10 +134,7 @@ import java.util.Deque;
 
 @members {
 Deque<String> paraphrases = new ArrayDeque<String>();
-/** Affects tree construction; no SET collapsing if AST (ID|INT) would hide them from rewrite.
- *  Could use for just AST ops, but we can't see -> until after building sets.
-boolean buildAST;
- */
+public void grammarError(ErrorType etype, org.antlr.runtime.Token token, Object... args) { }
 }
 
 // The main entry point for parsing a V3 grammar from top to toe. This is
@@ -204,6 +201,7 @@ if ( options!=null ) {
 
 grammarType
 @after {
+	if ( $tg!=null ) throw new v3TreeGrammarException(tg);
 	if ( $t!=null ) ((GrammarRootAST)$tree).grammarType = $t.type;
 	else ((GrammarRootAST)$tree).grammarType=COMBINED;
 }
@@ -213,6 +211,8 @@ grammarType
 
 		// A combined lexer and parser specification
 		| 	g=GRAMMAR          -> GRAMMAR<GrammarRootAST>[$g, "COMBINED_GRAMMAR"]
+		|   tg=TREE_GRAMMAR
+			
 		)
     ;
 
@@ -278,15 +278,24 @@ delegateGrammar
     |   id
     ;
 
-/** The declaration of any token types we need that are not already
- *  specified by a preceeding grammar, such as when a parser declares
- *  imaginary tokens with which to construct the AST, or a rewriting
- *  tree parser adds further imaginary tokens to ones defined in a prior
- *  {tree} parser.
- */
 tokensSpec
-	: TOKENS_SPEC id (COMMA id)* COMMA? RBRACE -> ^(TOKENS_SPEC id+)
+	: TOKENS_SPEC TOKEN_REF (COMMA TOKEN_REF)* COMMA? RBRACE -> ^(TOKENS_SPEC TOKEN_REF+)
     | TOKENS_SPEC RBRACE ->
+    | TOKENS_SPEC^ v3tokenSpec+ RBRACE!
+      {grammarError(ErrorType.V3_TOKENS_SYNTAX, $TOKENS_SPEC);}
+	;
+	
+v3tokenSpec
+	:	TOKEN_REF
+		(	ASSIGN lit=STRING_LITERAL
+            {
+            grammarError(ErrorType.V3_ASSIGN_IN_TOKENS, $TOKEN_REF,
+                         $TOKEN_REF.getText(), $lit.getText());
+            }
+						            	-> TOKEN_REF // ignore assignment
+		|								-> TOKEN_REF
+		)
+		SEMI
 	;
 
 // A declaration of a language target specifc section,
@@ -564,17 +573,20 @@ lexerElement
 	;
     catch [RecognitionException re] {
     	retval.tree = (GrammarAST)adaptor.errorNode(input, retval.start, input.LT(-1), re);
-    	int ttype = input.get(input.range()).getType();
+    	int ttype = input.get(input.range()).getType(); // seems to be next token
 	    // look for anything that really belongs at the start of the rule minus the initial ID
-    	if ( ttype==COLON || ttype==RETURNS || ttype==CATCH || ttype==FINALLY || ttype==AT ) {
+    	if ( ttype==COLON || ttype==RETURNS || ttype==CATCH || ttype==FINALLY || ttype==AT || ttype==EOF ) {
 			RecognitionException missingSemi =
 				new v4ParserException("unterminated rule (missing ';') detected at '"+
 									  input.LT(1).getText()+" "+input.LT(2).getText()+"'", input);
 			reportError(missingSemi);
-			if ( ttype==CATCH || ttype==FINALLY ) {
+			if ( ttype==EOF ) {
+				input.seek(input.index()+1);
+			}
+			else if ( ttype==CATCH || ttype==FINALLY ) {
 				input.seek(input.range()); // ignore what's before rule trailer stuff
 			}
-			if ( ttype==RETURNS || ttype==AT ) { // scan back looking for ID of rule header
+			else if ( ttype==RETURNS || ttype==AT ) { // scan back looking for ID of rule header
 				int p = input.index();
 				Token t = input.get(p);
 				while ( t.getType()!=RULE_REF && t.getType()!=TOKEN_REF ) {
@@ -595,6 +607,7 @@ labeledLexerElement
 		|	lexerBlock	-> ^($ass id lexerBlock)
 		)
 	;
+
 
 lexerBlock
 @after {
