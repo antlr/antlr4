@@ -53,6 +53,7 @@ import javax.tools.Diagnostic;
 import org.antlr.v4.runtime.RuleDependencies;
 import org.antlr.v4.runtime.RuleDependency;
 import org.antlr.v4.runtime.RuleVersion;
+import org.antlr.v4.runtime.atn.ATNSimulator;
 
 import java.lang.annotation.AnnotationTypeMismatchException;
 
@@ -203,6 +204,11 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 					if (index < 0 || index >= versions.length) {
 						String message = String.format("Rule index %d for rule '%s' out of bounds for recognizer %s.", index, name, recognizerClass.toString());
 						processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message, element);
+						continue;
+					}
+
+					if (name.contains(ATNSimulator.RULE_VARIANT_MARKER)) {
+						// ignore left-factored pseudo-rules
 						continue;
 					}
 
