@@ -426,10 +426,10 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
         if ( _parseListeners != null) triggerEnterRuleEvent();
 	}
 
-	public void enterLeftFactoredRule(ParserRuleContext localctx, int state, int ruleIndex) {
+	public void enterLeftFactoredRule(ParserRuleContext<Symbol> localctx, int state, int ruleIndex) {
 		setState(state);
 		if (_buildParseTrees) {
-			ParserRuleContext factoredContext = (ParserRuleContext)_ctx.getChild(_ctx.getChildCount() - 1);
+			ParserRuleContext<Symbol> factoredContext = (ParserRuleContext<Symbol>)_ctx.getChild(_ctx.getChildCount() - 1);
 			_ctx.removeLastChild();
 			factoredContext.parent = localctx;
 			localctx.addChild(factoredContext);
