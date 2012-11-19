@@ -299,7 +299,7 @@ ARG_ACTION
 ACTION
 	:	NESTED_ACTION
 		(	'?' {$type = SEMPRED;}
-			(	'=>' // v3 gated sempred
+			(	(WSNLCHARS* '=>') => WSNLCHARS* '=>' // v3 gated sempred
 				{
 				Token t = new CommonToken(input, state.type, state.channel, state.tokenStartCharIndex, getCharIndex()-1);
 				t.setLine(state.tokenStartLine);
