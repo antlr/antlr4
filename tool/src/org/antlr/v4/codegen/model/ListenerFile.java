@@ -29,6 +29,7 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.misc.Tuple3;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
@@ -62,7 +63,7 @@ public class ListenerFile extends OutputFile {
 					listenerNames.add(pair.getItem3());
 				}
 			}
-			else {
+			else if (!r.name.contains(ATNSimulator.RULE_VARIANT_MARKER)) {
 				// only add rule context if no labels
 				listenerNames.add(r.name);
 			}

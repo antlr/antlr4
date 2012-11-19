@@ -155,7 +155,7 @@ public class GrammarTransformPipeline {
 		GrammarAST RULES = (GrammarAST)root.getFirstChildWithType(ANTLRParser.RULES);
 		Set<String> rootRuleNames = new HashSet<String>();
 		if ( RULES==null ) { // no rules in root, make RULES node, hook in
-			RULES = (GrammarAST)adaptor.create(ANTLRParser.RULES, "RULES");
+			RULES = adaptor.create(ANTLRParser.RULES, "RULES");
 			RULES.g = rootGrammar;
 			root.addChild(RULES);
 		}
@@ -171,7 +171,7 @@ public class GrammarTransformPipeline {
 			if ( imp_tokensRoot!=null ) {
 				rootGrammar.tool.log("grammar", "imported tokens: "+imp_tokensRoot.getChildren());
 				if ( tokensRoot==null ) {
-					tokensRoot = (GrammarAST)adaptor.create(ANTLRParser.TOKENS_SPEC, "TOKENS");
+					tokensRoot = adaptor.create(ANTLRParser.TOKENS_SPEC, "TOKENS");
 					tokensRoot.g = rootGrammar;
 					root.insertChild(1, tokensRoot); // ^(GRAMMAR ID TOKENS...)
 				}
@@ -287,13 +287,13 @@ public class GrammarTransformPipeline {
 		    new GrammarRootAST(new CommonToken(ANTLRParser.GRAMMAR,"LEXER_GRAMMAR"));
 		lexerAST.grammarType = ANTLRParser.LEXER;
 		lexerAST.token.setInputStream(combinedAST.token.getInputStream());
-		lexerAST.addChild((GrammarAST)adaptor.create(ANTLRParser.ID, lexerName));
+		lexerAST.addChild(adaptor.create(ANTLRParser.ID, lexerName));
 
 		// COPY OPTIONS
 		GrammarAST optionsRoot =
 			(GrammarAST)combinedAST.getFirstChildWithType(ANTLRParser.OPTIONS);
 		if ( optionsRoot!=null ) {
-			GrammarAST lexerOptionsRoot = (GrammarAST)adaptor.dupNode(optionsRoot);
+			GrammarAST lexerOptionsRoot = adaptor.dupNode(optionsRoot);
 			lexerAST.addChild(lexerOptionsRoot);
 			GrammarAST[] options = optionsRoot.getChildren().toArray(new GrammarAST[0]);
 			for (GrammarAST o : options) {
@@ -327,8 +327,7 @@ public class GrammarTransformPipeline {
 
 		// MOVE lexer rules
 
-		GrammarAST lexerRulesRoot =
-			(GrammarAST)adaptor.create(ANTLRParser.RULES, "RULES");
+		GrammarAST lexerRulesRoot = adaptor.create(ANTLRParser.RULES, "RULES");
 		lexerAST.addChild(lexerRulesRoot);
 		List<GrammarAST> rulesWeMoved = new ArrayList<GrammarAST>();
 		GrammarASTWithOptions[] rules;

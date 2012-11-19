@@ -56,7 +56,7 @@ public class RuleAST extends GrammarASTWithOptions {
 	}
 
 	@Override
-	public Tree dupNode() { return new RuleAST(this); }
+	public RuleAST dupNode() { return new RuleAST(this); }
 
 	public ActionAST getLexerAction() {
 		Tree blk = getFirstChildWithType(ANTLRParser.BLOCK);

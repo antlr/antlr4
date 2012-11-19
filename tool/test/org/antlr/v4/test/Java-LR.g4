@@ -622,6 +622,7 @@ variableModifiers
     ;
 
 statement
+@leftfactor{catches}
     : block
     |   ASSERT expression (':' expression)? ';'
     |   'if' parExpression statement ('else' statement)?

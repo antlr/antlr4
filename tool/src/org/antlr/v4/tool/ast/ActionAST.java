@@ -51,7 +51,7 @@ public class ActionAST extends GrammarASTWithOptions implements RuleElementAST {
     public ActionAST(int type, Token t) { super(type, t); }
 
 	@Override
-	public Tree dupNode() { return new ActionAST(this); }
+	public ActionAST dupNode() { return new ActionAST(this); }
 
 	@Override
 	public Object visit(GrammarASTVisitor v) { return v.visit(this); }

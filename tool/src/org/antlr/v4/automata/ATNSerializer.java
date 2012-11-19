@@ -137,6 +137,8 @@ public class ATNSerializer {
 		for (int r=0; r<nrules; r++) {
 			ATNState ruleStartState = atn.ruleToStartState[r];
 			data.add(ruleStartState.stateNumber);
+			boolean leftFactored = g.getRule(ruleStartState.ruleIndex).name.contains(ATNSimulator.RULE_VARIANT_MARKER);
+			data.add(leftFactored ? 1 : 0);
 			if ( g.isLexer() ) {
 				data.add(atn.ruleToTokenType[r]);
 				String ruleName = g.rules.getKey(r);
@@ -267,6 +269,8 @@ public class ATNSerializer {
 		int nrules = ATNSimulator.toInt(data[p++]);
 		for (int i=0; i<nrules; i++) {
 			int s = ATNSimulator.toInt(data[p++]);
+			@SuppressWarnings("unused")
+			boolean leftFactored = ATNSimulator.toInt(data[p++]) != 0;
             if ( g.isLexer() ) {
                 int arg1 = ATNSimulator.toInt(data[p++]);
                 int arg2 = ATNSimulator.toInt(data[p++]);

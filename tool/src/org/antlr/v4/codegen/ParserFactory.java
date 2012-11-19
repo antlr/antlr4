@@ -45,6 +45,7 @@ import org.antlr.v4.codegen.model.LL1PlusBlockSingleAlt;
 import org.antlr.v4.codegen.model.LL1StarBlock;
 import org.antlr.v4.codegen.model.LL1StarBlockSingleAlt;
 import org.antlr.v4.codegen.model.LabeledOp;
+import org.antlr.v4.codegen.model.LeftFactoredRuleFunction;
 import org.antlr.v4.codegen.model.LeftRecursiveRuleFunction;
 import org.antlr.v4.codegen.model.MatchNotSet;
 import org.antlr.v4.codegen.model.MatchSet;
@@ -63,6 +64,7 @@ import org.antlr.v4.codegen.model.decl.RuleContextDecl;
 import org.antlr.v4.codegen.model.decl.TokenDecl;
 import org.antlr.v4.codegen.model.decl.TokenListDecl;
 import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.PlusBlockStartState;
 import org.antlr.v4.runtime.atn.StarLoopEntryState;
@@ -95,6 +97,9 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	public RuleFunction rule(Rule r) {
 		if ( r instanceof LeftRecursiveRule ) {
 			return new LeftRecursiveRuleFunction(this, (LeftRecursiveRule)r);
+		}
+		else if (r.name.contains(ATNSimulator.RULE_VARIANT_MARKER)) {
+			return new LeftFactoredRuleFunction(this, r);
 		}
 		else {
 			RuleFunction rf = new RuleFunction(this, r);
