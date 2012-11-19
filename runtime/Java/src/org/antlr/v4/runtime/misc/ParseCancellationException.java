@@ -44,7 +44,7 @@ import java.util.concurrent.CancellationException;
  * @author Sam Harwell
  */
 public class ParseCancellationException extends CancellationException {
-	static final long serialVersionUID = -3529552099366979683L;
+	private static final long serialVersionUID = -3529552099366979683L;
 
 	public ParseCancellationException() {
 	}
