@@ -347,8 +347,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		boolean outerMostAlt = blk.parent.getType() == RULE;
 		Tree rule = tree.getAncestor(RULE);
 		String fileName = tree.getToken().getInputStream().getSourceName();
-		if ( !outerMostAlt || tree.getChildIndex() != alt.getChildCount()-1 ||
-			 blk.getChildCount()>1 )
+		if ( !outerMostAlt || blk.getChildCount()>1 )
 		{
 			ErrorType e = ErrorType.LEXER_COMMAND_PLACEMENT_ISSUE;
 			if ( tree.getType() == ACTION ) e = ErrorType.LEXER_ACTION_PLACEMENT_ISSUE;
