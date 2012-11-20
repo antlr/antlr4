@@ -202,13 +202,11 @@ public class LeftFactoringRuleTransformer {
 			String ruleName = ruleAST.getChild(0).getText();
 			Rule r = _rules.get(ruleName);
 			List<GrammarAST> blockAlts = block.getAllChildrenWithType(ANTLRParser.ALT);
-			if (r.alt.length != blockAlts.size()) {
-				r.numberOfAlts = blockAlts.size();
-				r.alt = new Alternative[blockAlts.size() + 1];
-				for (int i = 0; i < blockAlts.size(); i++) {
-					r.alt[i + 1] = new Alternative(r, i + 1);
-					r.alt[i + 1].ast = (AltAST)blockAlts.get(i);
-				}
+			r.numberOfAlts = blockAlts.size();
+			r.alt = new Alternative[blockAlts.size() + 1];
+			for (int i = 0; i < blockAlts.size(); i++) {
+				r.alt[i + 1] = new Alternative(r, i + 1);
+				r.alt[i + 1].ast = (AltAST)blockAlts.get(i);
 			}
 		}
 
