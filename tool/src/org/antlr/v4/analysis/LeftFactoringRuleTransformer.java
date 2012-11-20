@@ -128,7 +128,64 @@ public class LeftFactoringRuleTransformer {
 		}
 	}
 
+	protected boolean expandOptionalQuantifiersForBlock(GrammarAST block) {
+		List<GrammarAST> children = new ArrayList<GrammarAST>();
+		for (int i = 0; i < block.getChildCount(); i++) {
+			GrammarAST child = (GrammarAST)block.getChild(i);
+			if (child.getType() != ANTLRParser.ALT) {
+				children.add(child);
+				continue;
+			}
+
+			GrammarAST expandedAlt = expandOptionalQuantifiersForAlt(child);
+			if (expandedAlt == null) {
+				return false;
+			}
+
+			children.add(expandedAlt);
+		}
+
+		GrammarAST newChildren = adaptor.nil();
+		newChildren.addChildren(children);
+		block.replaceChildren(0, block.getChildCount() - 1, newChildren);
+		block.freshenParentAndChildIndexesDeeply();
+		return true;
+	}
+
+	protected GrammarAST expandOptionalQuantifiersForAlt(GrammarAST alt) {
+		if (alt.getChildCount() == 0) {
+			return null;
+		}
+
+		if (alt.getChild(0).getType() == ANTLRParser.OPTIONAL) {
+			GrammarAST root = adaptor.nil();
+
+			GrammarAST alt2 = alt.dupTree();
+			alt2.deleteChild(0);
+
+			alt.setChild(0, alt.getChild(0).getChild(0));
+			if (alt.getChild(0).getType() == ANTLRParser.BLOCK && alt.getChild(0).getChildCount() == 1 && alt.getChild(0).getChild(0).getType() == ANTLRParser.ALT) {
+				GrammarAST list = adaptor.nil();
+				for (Object tree : ((GrammarAST)alt.getChild(0).getChild(0)).getChildren()) {
+					adaptor.addChild(list, tree);
+				}
+
+				adaptor.replaceChildren(alt, 0, 0, list);
+			}
+
+			adaptor.addChild(root, alt);
+			adaptor.addChild(root, alt2);
+			return root;
+		}
+
+		return alt;
+	}
+
 	protected boolean translateLeftFactoredDecision(GrammarAST block, String factoredRule, boolean outerRule) {
+		if (!expandOptionalQuantifiersForBlock(block)) {
+			return false;
+		}
+
 		List<GrammarAST> alternatives = block.getAllChildrenWithType(ANTLRParser.ALT);
 		List<GrammarAST> translatedAlternatives = new ArrayList<GrammarAST>();
 		IntervalSet translatedIntervals = new IntervalSet();
@@ -320,8 +377,23 @@ public class LeftFactoringRuleTransformer {
 		}
 
 		case ANTLRParser.BLOCK:
-			// not yet supported
-			return null;
+		{
+			GrammarAST cloned = element.dupTree();
+			if (!translateLeftFactoredDecision(cloned, factoredRule, outerRule)) {
+				return null;
+			}
+
+			if (cloned.getChildCount() != 1) {
+				return null;
+			}
+
+			GrammarAST root = adaptor.nil();
+			for (int i = 0; i < cloned.getChild(0).getChildCount(); i++) {
+				adaptor.addChild(root, cloned.getChild(0).getChild(i));
+			}
+
+			return root;
+		}
 
 		case ANTLRParser.POSITIVE_CLOSURE:
 		{
