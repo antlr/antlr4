@@ -43,6 +43,7 @@ import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.GrammarRootAST;
+import org.antlr.v4.tool.ast.PlusBlockAST;
 import org.antlr.v4.tool.ast.RuleAST;
 import org.antlr.v4.tool.ast.RuleRefAST;
 import org.antlr.v4.tool.ast.StarBlockAST;
@@ -172,6 +173,23 @@ public class LeftFactoringRuleTransformer {
 
 				adaptor.replaceChildren(alt, 0, 0, list);
 			}
+
+			adaptor.addChild(root, alt);
+			adaptor.addChild(root, alt2);
+			return root;
+		}
+		else if (alt.getChild(0).getType() == ANTLRParser.CLOSURE) {
+			GrammarAST root = adaptor.nil();
+
+			GrammarAST alt2 = alt.dupTree();
+			alt2.deleteChild(0);
+
+			PlusBlockAST plusBlockAST = new PlusBlockAST(ANTLRParser.POSITIVE_CLOSURE, adaptor.createToken(ANTLRParser.POSITIVE_CLOSURE, "+"), null);
+			for (int i = 0; i < alt.getChild(0).getChildCount(); i++) {
+				plusBlockAST.addChild(alt.getChild(0).getChild(i));
+			}
+
+			alt.setChild(0, plusBlockAST);
 
 			adaptor.addChild(root, alt);
 			adaptor.addChild(root, alt2);
