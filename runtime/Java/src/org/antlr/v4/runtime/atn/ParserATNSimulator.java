@@ -1084,17 +1084,17 @@ public class ParserATNSimulator extends ATNSimulator {
 						   boolean fullCtx)
 	{
 		final int initialDepth = 0;
-		closureCheckingStopStateAndLoopRecursion(config, configs, closureBusy, collectPredicates,
-												 fullCtx,
-												 initialDepth);
+		closureCheckingStopState(config, configs, closureBusy, collectPredicates,
+								 fullCtx,
+								 initialDepth);
 	}
 
-	protected void closureCheckingStopStateAndLoopRecursion(@NotNull ATNConfig config,
-															@NotNull ATNConfigSet configs,
-															@NotNull Set<ATNConfig> closureBusy,
-															boolean collectPredicates,
-															boolean fullCtx,
-															int depth)
+	protected void closureCheckingStopState(@NotNull ATNConfig config,
+											@NotNull ATNConfigSet configs,
+											@NotNull Set<ATNConfig> closureBusy,
+											boolean collectPredicates,
+											boolean fullCtx,
+											int depth)
 	{
 		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
 
@@ -1122,8 +1122,8 @@ public class ParserATNSimulator extends ATNSimulator {
 					// Make sure we track that we are now out of context.
 					c.reachesIntoOuterContext = config.reachesIntoOuterContext;
 					assert depth > Integer.MIN_VALUE;
-					closureCheckingStopStateAndLoopRecursion(c, configs, closureBusy, collectPredicates,
-															 fullCtx, depth - 1);
+					closureCheckingStopState(c, configs, closureBusy, collectPredicates,
+											 fullCtx, depth - 1);
 				}
 				return;
 			}
@@ -1186,8 +1186,8 @@ public class ParserATNSimulator extends ATNSimulator {
 					}
 				}
 
-				closureCheckingStopStateAndLoopRecursion(c, configs, closureBusy, continueCollecting,
-														 fullCtx, newDepth);
+				closureCheckingStopState(c, configs, closureBusy, continueCollecting,
+										 fullCtx, newDepth);
 			}
 		}
 	}
