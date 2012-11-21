@@ -207,7 +207,7 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 						continue;
 					}
 
-					if (name.contains(ATNSimulator.RULE_VARIANT_MARKER)) {
+					if (name.indexOf(ATNSimulator.RULE_VARIANT_DELIMITER) >= 0) {
 						// ignore left-factored pseudo-rules
 						continue;
 					}
