@@ -111,7 +111,7 @@ public class RuleFunction extends OutputModelObject {
 		modifiers = Utils.nodesToStrings(r.modifiers);
 
 		index = r.index;
-		int lfIndex = name.indexOf(ATNSimulator.RULE_VARIANT_MARKER);
+		int lfIndex = name.indexOf(ATNSimulator.RULE_VARIANT_DELIMITER);
 		if (lfIndex >= 0) {
 			variantOf = name.substring(0, lfIndex);
 		}
@@ -267,7 +267,7 @@ public class RuleFunction extends OutputModelObject {
 	}
 
 	public List<Decl> getDeclForAltElement(GrammarAST t, String refLabelName, boolean needList) {
-		int lfIndex = refLabelName.indexOf(ATNSimulator.RULE_VARIANT_MARKER);
+		int lfIndex = refLabelName.indexOf(ATNSimulator.RULE_VARIANT_DELIMITER);
 		if (lfIndex >= 0) {
 			refLabelName = refLabelName.substring(0, lfIndex);
 		}

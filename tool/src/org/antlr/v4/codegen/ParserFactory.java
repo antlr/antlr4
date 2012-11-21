@@ -98,7 +98,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		if ( r instanceof LeftRecursiveRule ) {
 			return new LeftRecursiveRuleFunction(this, (LeftRecursiveRule)r);
 		}
-		else if (r.name.contains(ATNSimulator.RULE_VARIANT_MARKER)) {
+		else if (r.name.contains(ATNSimulator.RULE_LF_VARIANT_MARKER)) {
 			return new LeftFactoredRuleFunction(this, r);
 		}
 		else {

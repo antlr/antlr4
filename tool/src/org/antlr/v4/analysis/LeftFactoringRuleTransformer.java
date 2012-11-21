@@ -371,7 +371,7 @@ public class LeftFactoringRuleTransformer {
 			}
 
 			RuleRefAST ruleRefAST = (RuleRefAST)element;
-			element.setText(element.getText() + ATNSimulator.RULE_VARIANT_MARKER + factoredRule);
+			element.setText(element.getText() + ATNSimulator.RULE_LF_VARIANT_MARKER + factoredRule);
 //			ruleRefAST.addLeftFactoredElement(factoredRule);
 
 			GrammarAST root = adaptor.nil();
@@ -482,7 +482,7 @@ public class LeftFactoringRuleTransformer {
 			return false;
 		}
 
-		String variantName = ast.getChild(0).getText() + ATNSimulator.RULE_VARIANT_MARKER + factoredElement;
+			String variantName = ast.getChild(0).getText() + ATNSimulator.RULE_LF_VARIANT_MARKER + factoredElement;
 		((GrammarAST)ast.getChild(0)).token = adaptor.createToken(ast.getChild(0).getType(), variantName);
 		GrammarAST ruleParent = (GrammarAST)rule.ast.getParent();
 		ruleParent.insertChild(rule.ast.getChildIndex() + 1, ast);
