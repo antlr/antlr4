@@ -47,6 +47,7 @@ import org.antlr.v4.codegen.model.LL1StarBlockSingleAlt;
 import org.antlr.v4.codegen.model.LabeledOp;
 import org.antlr.v4.codegen.model.LeftFactoredRuleFunction;
 import org.antlr.v4.codegen.model.LeftRecursiveRuleFunction;
+import org.antlr.v4.codegen.model.LeftUnfactoredRuleFunction;
 import org.antlr.v4.codegen.model.MatchNotSet;
 import org.antlr.v4.codegen.model.MatchSet;
 import org.antlr.v4.codegen.model.MatchToken;
@@ -100,6 +101,9 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		}
 		else if (r.name.contains(ATNSimulator.RULE_LF_VARIANT_MARKER)) {
 			return new LeftFactoredRuleFunction(this, r);
+		}
+		else if (r.name.contains(ATNSimulator.RULE_NOLF_VARIANT_MARKER)) {
+			return new LeftUnfactoredRuleFunction(this, r);
 		}
 		else {
 			RuleFunction rf = new RuleFunction(this, r);

@@ -46,6 +46,7 @@ public abstract class ATNSimulator {
 
 	public static final char RULE_VARIANT_DELIMITER = '$';
 	public static final String RULE_LF_VARIANT_MARKER =  "$lf$";
+	public static final String RULE_NOLF_VARIANT_MARKER = "$nolf$";
 
 	/** Must distinguish between missing edge and edge we know leads nowhere */
 	@NotNull
