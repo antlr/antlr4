@@ -63,7 +63,7 @@ public class ListenerFile extends OutputFile {
 					listenerNames.add(pair.getItem3());
 				}
 			}
-			else if (!r.name.contains(ATNSimulator.RULE_VARIANT_MARKER)) {
+			else if (r.name.indexOf(ATNSimulator.RULE_VARIANT_DELIMITER) < 0) {
 				// only add rule context if no labels
 				listenerNames.add(r.name);
 			}

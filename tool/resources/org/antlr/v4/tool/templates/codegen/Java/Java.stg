@@ -260,6 +260,38 @@ LeftFactoredRuleFunction(currentRule,code,locals,namedActions,finallyAction,post
 }
 >>
 
+// This behaves similar to RuleFunction (enterRule is called, and no adjustments
+// are made to the parse tree), but since it's still a variant no context class
+// needs to be generated.
+LeftUnfactoredRuleFunction(currentRule,code,locals,namedActions,finallyAction,postamble) ::=
+<<
+
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>);
+	enterRule(_localctx, <currentRule.startState>, RULE_<currentRule.variantOf>);
+	<namedActions.init>
+	<locals; separator="\n">
+	try {
+<if(currentRule.hasLookaheadBlock)>
+		int _alt;
+<endif>
+		<code>
+		<postamble; separator="\n">
+		<namedActions.after>
+	}
+	catch (RecognitionException re) {
+		_localctx.exception = re;
+		_errHandler.reportError(this, re);
+		_errHandler.recover(this, re);
+	}
+	finally {
+		<finallyAction>
+		exitRule();
+	}
+	return _localctx;
+}
+>>
+
 LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 	namedActions,finallyAction,postamble) ::=
 <<

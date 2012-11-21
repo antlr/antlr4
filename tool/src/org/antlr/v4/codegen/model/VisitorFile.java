@@ -60,7 +60,7 @@ public class VisitorFile extends OutputFile {
 					visitorNames.add(pair.getItem3());
 				}
 			}
-			else if (!r.name.contains(ATNSimulator.RULE_VARIANT_MARKER)) {
+			else if (r.name.indexOf(ATNSimulator.RULE_VARIANT_DELIMITER) < 0) {
 				// if labels, must label all. no need for generic rule visitor then
 				visitorNames.add(r.name);
 			}

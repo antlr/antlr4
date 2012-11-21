@@ -49,7 +49,9 @@ public abstract class ATNSimulator {
 	public static final int SERIALIZED_NON_GREEDY_MASK = 0x8000;
 	public static final int SERIALIZED_STATE_TYPE_MASK = 0x7FFF;
 
-	public static final String RULE_VARIANT_MARKER = "$lf$";
+	public static final char RULE_VARIANT_DELIMITER = '$';
+	public static final String RULE_LF_VARIANT_MARKER =  "$lf$";
+	public static final String RULE_NOLF_VARIANT_MARKER = "$nolf$";
 
 	/** Must distinguish between missing edge and edge we know leads nowhere */
 	@NotNull

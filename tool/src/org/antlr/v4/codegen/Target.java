@@ -353,7 +353,7 @@ public class Target {
 		}
 
 		String baseName = r.name;
-		int lfIndex = baseName.indexOf(ATNSimulator.RULE_VARIANT_MARKER);
+		int lfIndex = baseName.indexOf(ATNSimulator.RULE_VARIANT_DELIMITER);
 		if (lfIndex >= 0) {
 			baseName = baseName.substring(0, lfIndex);
 		}
