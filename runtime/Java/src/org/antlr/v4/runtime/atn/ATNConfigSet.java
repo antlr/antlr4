@@ -30,6 +30,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.misc.AbstractEqualityComparator;
 import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
 
@@ -239,7 +240,14 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 */
 	public static class ConfigHashSet extends Array2DHashSet<ATNConfig> {
 		public ConfigHashSet() {
-			super(16,2);
+			super(ConfigEqualityComparator.INSTANCE,16,2);
+		}
+	}
+
+	public static final class ConfigEqualityComparator extends AbstractEqualityComparator<ATNConfig> {
+		public static final ConfigEqualityComparator INSTANCE = new ConfigEqualityComparator();
+
+		private ConfigEqualityComparator() {
 		}
 
 		@Override
@@ -273,7 +281,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	/** All configs but hashed by (s, i, _, pi) not incl context.  Wiped out
 	 *  when we go readonly as this set becomes a DFA state.
 	 */
-	public ConfigHashSet configLookup;
+	public Array2DHashSet<ATNConfig> configLookup;
 
 	/** Track the elements as they are added to the set; supports get(i) */
 	public final ArrayList<ATNConfig> configs = new ArrayList<ATNConfig>(7);

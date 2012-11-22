@@ -27,25 +27,33 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package org.antlr.v4.runtime.atn;
-
-import org.antlr.v4.runtime.misc.Array2DHashSet;
-import org.antlr.v4.runtime.misc.ObjectEqualityComparator;
+package org.antlr.v4.runtime.misc;
 
 /**
+ * This interface provides an abstract concept of object equality independent of
+ * {@link Object#equals} (object equality) and the {@code ==} operator
+ * (reference equality). It can be used to provide algorithm-specific unordered
+ * comparisons without requiring changes to the object itself.
  *
  * @author Sam Harwell
  */
-public class OrderedATNConfigSet extends ATNConfigSet {
+public interface EqualityComparator<T> {
 
-	public OrderedATNConfigSet() {
-		this.configLookup = new LexerConfigHashSet();
-	}
+	/**
+	 * This method returns a hash code for the specified object.
+	 *
+	 * @param obj The object.
+	 * @return The hash code for {@code obj}.
+	 */
+	int hashCode(T obj);
 
-	public static class LexerConfigHashSet extends Array2DHashSet<ATNConfig> {
-		public LexerConfigHashSet() {
-			super(ObjectEqualityComparator.INSTANCE, 16, 2);
-		}
-	}
+	/**
+	 * This method tests if two objects are equal.
+	 *
+	 * @param a The first object to compare.
+	 * @param b The second object to compare.
+	 * @return {@code true} if {@code a} equals {@code b}, otherwise {@code false}.
+	 */
+	boolean equals(T a, T b);
+
 }

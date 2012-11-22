@@ -6,10 +6,13 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 /** Set impl with closed hashing (open addressing). */
-public class Array2DHashSet<T> implements EquivalenceSet<T> {
+public class Array2DHashSet<T> implements Set<T> {
 	public static final int INITAL_CAPACITY = 16; // must be power of 2
 	public static final int INITAL_BUCKET_CAPACITY = 8;
 	public static final double LOAD_FACTOR = 0.75;
+
+	@NotNull
+	protected final AbstractEqualityComparator<? super T> comparator;
 
 	protected T[][] buckets;
 
@@ -22,11 +25,20 @@ public class Array2DHashSet<T> implements EquivalenceSet<T> {
 	protected int initialBucketCapacity = INITAL_BUCKET_CAPACITY;
 
 	public Array2DHashSet() {
-		this(INITAL_CAPACITY, INITAL_BUCKET_CAPACITY);
+		this(null, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY);
 	}
 
-	public Array2DHashSet(int initialCapacity, int initialBucketCapacity) {
-		buckets = (T[][])new Object[initialCapacity][];
+	public Array2DHashSet(@Nullable AbstractEqualityComparator<? super T> comparator) {
+		this(comparator, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY);
+	}
+
+	public Array2DHashSet(@Nullable AbstractEqualityComparator<? super T> comparator, int initialCapacity, int initialBucketCapacity) {
+		if (comparator == null) {
+			comparator = ObjectEqualityComparator.INSTANCE;
+		}
+
+		this.comparator = comparator;
+		this.buckets = (T[][])new Object[initialCapacity][];
 		this.initialBucketCapacity = initialBucketCapacity;
 	}
 
@@ -56,7 +68,7 @@ public class Array2DHashSet<T> implements EquivalenceSet<T> {
 				n++;
 				return o;
 			}
-			if ( equals(existing, o) ) return existing; // found existing, quit
+			if ( comparator.equals(existing, o) ) return existing; // found existing, quit
 		}
 		// FULL BUCKET, expand and add to end
 		T[] old = bucket;
@@ -75,13 +87,13 @@ public class Array2DHashSet<T> implements EquivalenceSet<T> {
 		if ( bucket==null ) return null; // no bucket
 		for (T e : bucket) {
 			if ( e==null ) return null; // empty slot; not there
-			if ( equals(e, o) ) return e;
+			if ( comparator.equals(e, o) ) return e;
 		}
 		return null;
 	}
 
 	protected int getBucket(T o) {
-		int hash = hashCode(o);
+		int hash = comparator.hashCode(o);
 		int b = hash & (buckets.length-1); // assumes len is power of 2
 		return b;
 	}
@@ -93,7 +105,7 @@ public class Array2DHashSet<T> implements EquivalenceSet<T> {
 			if ( bucket==null ) continue;
 			for (T o : bucket) {
 				if ( o==null ) break;
-				h += hashCode(o);
+				h += comparator.hashCode(o);
 			}
 		}
 		return h;
@@ -127,14 +139,6 @@ public class Array2DHashSet<T> implements EquivalenceSet<T> {
 			}
 		}
 		n = oldSize;
-	}
-
-	public int hashCode(T o) {
-		return o.hashCode();
-	}
-
-	public boolean equals(T a, T b) {
-		return a.equals(b);
 	}
 
 	@Override
@@ -229,7 +233,7 @@ public class Array2DHashSet<T> implements EquivalenceSet<T> {
 		for (int i=0; i<bucket.length; i++) {
 			T e = bucket[i];
 			if ( e==null ) return false;  // empty slot; not there
-			if ( equals(e, (T) o) ) {          // found it
+			if ( comparator.equals(e, (T) o) ) {          // found it
 				// shift all elements to the right down one
 //				for (int j=i; j<bucket.length-1; j++) bucket[j] = bucket[j+1];
 				System.arraycopy(bucket, i+1, bucket, i, bucket.length-i-1);
