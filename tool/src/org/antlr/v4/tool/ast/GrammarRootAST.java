@@ -44,7 +44,7 @@ public class GrammarRootAST extends GrammarASTWithOptions {
     public int grammarType; // LEXER, PARSER, GRAMMAR (combined)
 	public boolean hasErrors;
 	/** Track stream used to create this tree */
-	public TokenStream tokens;
+	public TokenStream tokenStream;
 	public Map<String, String> cmdLineOptions; // -DsuperClass=T on command line
 	public String fileName;
 

@@ -34,7 +34,6 @@ import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.TokenStream;
 import org.antlr.v4.Tool;
 import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.parse.ANTLRLexer;
@@ -110,12 +109,11 @@ public class LeftRecursiveRuleTransformer {
 											  String language)
 	{
 		//tool.log("grammar", ruleAST.toStringTree());
+		Grammar g = r.ast.g;
 		GrammarAST prevRuleAST = r.ast;
-		TokenStream tokens = ast.tokens;
-		Grammar g = ast.g;
 		String ruleName = prevRuleAST.getChild(0).getText();
 		LeftRecursiveRuleAnalyzer leftRecursiveRuleWalker =
-			new LeftRecursiveRuleAnalyzer(tokens, prevRuleAST, tool, ruleName, language);
+			new LeftRecursiveRuleAnalyzer(prevRuleAST, tool, ruleName, language);
 		boolean isLeftRec;
 		try {
 //			System.out.println("TESTING ---------------\n"+

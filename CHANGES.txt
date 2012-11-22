@@ -1,5 +1,9 @@
 ANTLR v4 Honey Badger
 
+November 22, 2012
+
+* make sure left-recur rule translation uses token stream from correct imported file.
+
 November 18, 2012
 
 * fixed: undefined rule refs caused exception

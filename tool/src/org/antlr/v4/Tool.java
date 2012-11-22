@@ -553,6 +553,7 @@ public class Tool {
 		final Grammar g;
 		if ( ast.grammarType==ANTLRParser.LEXER ) g = new LexerGrammar(this, ast);
 		else g = new Grammar(this, ast);
+		g.tokenStream = ast.tokenStream;
 
 		// ensure each node has pointer to surrounding grammar
 		GrammarTransformPipeline.setGrammarPtr(g, ast);
@@ -620,7 +621,7 @@ public class Tool {
 				GrammarAST root = (GrammarAST)r.getTree();
 				if ( root instanceof GrammarRootAST) {
 					((GrammarRootAST)root).hasErrors = p.getNumberOfSyntaxErrors()>0;
-					((GrammarRootAST)root).tokens = tokens;
+					((GrammarRootAST)root).tokenStream = tokens;
 					if ( grammarOptions!=null ) {
 						((GrammarRootAST)root).cmdLineOptions = grammarOptions;
 					}
