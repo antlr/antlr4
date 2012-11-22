@@ -27,25 +27,14 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package org.antlr.v4.runtime.atn;
-
-import org.antlr.v4.runtime.misc.Array2DHashSet;
-import org.antlr.v4.runtime.misc.ObjectEqualityComparator;
+package org.antlr.v4.runtime.misc;
 
 /**
+ * This abstract base class is provided so performance-critical applications can
+ * use virtual- instead of interface-dispatch when calling comparator methods.
  *
  * @author Sam Harwell
  */
-public class OrderedATNConfigSet extends ATNConfigSet {
+public abstract class AbstractEqualityComparator<T> implements EqualityComparator<T> {
 
-	public OrderedATNConfigSet() {
-		this.configLookup = new LexerConfigHashSet();
-	}
-
-	public static class LexerConfigHashSet extends Array2DHashSet<ATNConfig> {
-		public LexerConfigHashSet() {
-			super(ObjectEqualityComparator.INSTANCE, 16, 2);
-		}
-	}
 }

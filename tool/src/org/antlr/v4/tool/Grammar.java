@@ -699,6 +699,11 @@ public class Grammar implements AttributeResolver {
 	public boolean isParser() { return getType()==ANTLRParser.PARSER; }
 	public boolean isCombined() { return getType()==ANTLRParser.COMBINED; }
 
+	/** Is id a valid token name? Does id start with an uppercase letter? */
+	public static boolean isTokenName(String id) {
+		return Character.isUpperCase(id.charAt(0));
+	}
+
     public String getTypeString() {
         if ( ast==null ) return null;
         return ANTLRParser.tokenNames[getType()].toLowerCase();

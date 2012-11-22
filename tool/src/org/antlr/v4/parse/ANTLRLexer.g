@@ -271,7 +271,7 @@ LEXER_CHAR_SET
 //
 fragment
 ARG_ACTION
-	: '[' 
+	: '['
          (
              ARG_ACTION
 
@@ -480,7 +480,7 @@ RBRACE       : '}'                    ;
 /** Allow unicode rule/token names */
 ID			:	a=NameStartChar NameChar*
 				{
-				if ( Character.isUpperCase($a.text.charAt(0)) ) $type = TOKEN_REF;
+				if ( Grammar.isTokenName($a.text) ) $type = TOKEN_REF;
 				else $type = RULE_REF;
 				}
 			;

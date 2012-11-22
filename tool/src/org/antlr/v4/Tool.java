@@ -433,14 +433,13 @@ public class Tool {
 	public boolean checkForRuleIssues(final Grammar g) {
 		// check for redefined rules
 		GrammarAST RULES = (GrammarAST)g.ast.getFirstChildWithType(ANTLRParser.RULES);
-
-		List<?> rules = (List<?>)RULES.getChildren();
-		if (rules == null) {
-			rules = Collections.emptyList();
+		List<GrammarAST> rules = new ArrayList<GrammarAST>(RULES.getAllChildrenWithType(ANTLRParser.RULE));
+		for (GrammarAST mode : g.ast.getAllChildrenWithType(ANTLRParser.MODE)) {
+			rules.addAll(mode.getAllChildrenWithType(ANTLRParser.RULE));
 		}
 
 		final Map<String, RuleAST> ruleToAST = new HashMap<String, RuleAST>();
-		for (Object r : rules) {
+		for (GrammarAST r : rules) {
 			RuleAST ruleAST = (RuleAST)r;
 			GrammarAST ID = (GrammarAST)ruleAST.getChild(0);
 			String ruleName = ID.getText();

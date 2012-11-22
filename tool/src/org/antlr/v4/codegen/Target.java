@@ -31,6 +31,7 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.misc.Utils;
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATNSimulator;
@@ -418,8 +419,38 @@ public class Target {
 		return getTokenTypeAsTargetLabel(gen.g, ttype);
 	}
 
-	public boolean grammarSymbolCausesIssueInGeneratedCode(String id) {
-		return badWords.contains(id);
+	public boolean grammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
+		switch (idNode.getParent().getType()) {
+		case ANTLRParser.ASSIGN:
+			switch (idNode.getParent().getParent().getType()) {
+			case ANTLRParser.ELEMENT_OPTIONS:
+			case ANTLRParser.OPTIONS:
+				return false;
+
+			default:
+				break;
+			}
+
+			break;
+
+		case ANTLRParser.AT:
+		case ANTLRParser.ELEMENT_OPTIONS:
+			return false;
+
+		case ANTLRParser.LEXER_ACTION_CALL:
+			if (idNode.getChildIndex() == 0) {
+				// first child is the command name which is part of the ANTLR language
+				return false;
+			}
+
+			// arguments to the command should be checked
+			break;
+
+		default:
+			break;
+		}
+
+		return badWords.contains(idNode.getText());
 	}
 
 }
