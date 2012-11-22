@@ -59,7 +59,7 @@ ebnfSuffix
 
 blockSet
 @init {
-boolean inLexer = Character.isUpperCase(currentRuleName.charAt(0));
+boolean inLexer = Grammar.isTokenName(currentRuleName);
 }
 @after {
 	GrammarTransformPipeline.setGrammarPtr(g, $tree);

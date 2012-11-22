@@ -84,7 +84,7 @@ public class LeftRecursiveRuleTransformer {
 		// translate all recursive rules
 		List<String> leftRecursiveRuleNames = new ArrayList<String>();
 		for (Rule r : rules) {
-			if ( !Character.isUpperCase(r.name.charAt(0)) ) {
+			if ( !Grammar.isTokenName(r.name) ) {
 				if ( LeftRecursiveRuleAnalyzer.hasImmediateRecursiveRuleRefs(r.ast, r.name) ) {
 					boolean fitsPattern = translateLeftRecursiveRule(ast, (LeftRecursiveRule)r, language);
 					if ( fitsPattern ) leftRecursiveRuleNames.add(r.name);
