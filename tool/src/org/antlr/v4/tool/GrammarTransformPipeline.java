@@ -193,7 +193,7 @@ public class GrammarTransformPipeline {
 					String scopeName = rootGrammar.getDefaultActionScope();
 					GrammarAST scope, name, action;
 					if ( at.getChildCount()>2 ) { // must have a scope
-						scope = (GrammarAST)at.getChild(1);
+						scope = (GrammarAST)at.getChild(0);
 						scopeName = scope.getText();
 						name = (GrammarAST)at.getChild(1);
 						action = (GrammarAST)at.getChild(2);
