@@ -15,9 +15,9 @@ public class TestSymbolIssues extends BaseTest {
         "@lexer::header {package jj;}\n" +
         "@lexer::header {package kk;}\n" +
         "\n" +
-        "a[int i] returns [foo f] : X ID a[3] b[34] q ;\n" +
+        "a[int i] returns [foo f] : X ID a[3] b[34] c ;\n" +
         "b returns [int g] : Y 'y' 'if' a ;\n" +
-        "a : FJKD ;\n" +
+        "c : FJKD ;\n" +
         "\n" +
         "ID : 'a'..'z'+ ID ;",
         // YIELDS
@@ -29,9 +29,8 @@ public class TestSymbolIssues extends BaseTest {
 			"warning(125): A.g4:9:27: implicit definition of token X in parser\n" +
 			"warning(125): A.g4:10:20: implicit definition of token Y in parser\n" +
 			"warning(125): A.g4:11:4: implicit definition of token FJKD in parser\n" +
-			"error(80): A.g4:9:32: rule a has no defined parameters\n" +
 			"error(80): A.g4:9:37: rule b has no defined parameters\n" +
-			"error(56): A.g4:9:43: reference to undefined rule: q\n"
+			"error(79): A.g4:10:31: missing parameter(s) on rule reference: a\n"
     };
 
     static String[] B = {
