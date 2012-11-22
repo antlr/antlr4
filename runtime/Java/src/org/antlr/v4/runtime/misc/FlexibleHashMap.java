@@ -10,7 +10,7 @@ import java.util.Set;
 /** A limited map (many unsupported operations) that lets me use
  *  varying hashCode/equals.
  */
-public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
+public class FlexibleHashMap<K,V> implements Map<K, V> {
 	public static final int INITAL_CAPACITY = 16; // must be power of 2
 	public static final int INITAL_BUCKET_CAPACITY = 8;
 	public static final double LOAD_FACTOR = 0.75;
@@ -27,6 +27,9 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 		}
 	}
 
+	@NotNull
+	protected final AbstractEqualityComparator<? super K> comparator;
+
 	protected LinkedList<Entry<K, V>>[] buckets;
 
 	/** How many elements in set */
@@ -38,11 +41,20 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 	protected int initialBucketCapacity = INITAL_BUCKET_CAPACITY;
 
 	public FlexibleHashMap() {
-		this(INITAL_CAPACITY, INITAL_BUCKET_CAPACITY);
+		this(null, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY);
 	}
 
-	public FlexibleHashMap(int initialCapacity, int initialBucketCapacity) {
-		buckets = createEntryListArray(initialBucketCapacity);
+	public FlexibleHashMap(@Nullable AbstractEqualityComparator<? super K> comparator) {
+		this(comparator, INITAL_CAPACITY, INITAL_BUCKET_CAPACITY);
+	}
+
+	public FlexibleHashMap(@Nullable AbstractEqualityComparator<? super K> comparator, int initialCapacity, int initialBucketCapacity) {
+		if (comparator == null) {
+			comparator = ObjectEqualityComparator.INSTANCE;
+		}
+
+		this.comparator = comparator;
+		this.buckets = createEntryListArray(initialBucketCapacity);
 		this.initialBucketCapacity = initialBucketCapacity;
 	}
 
@@ -52,18 +64,8 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 		return result;
 	}
 
-	@Override
-	public boolean equals(K keyA, K keyB) {
-		return keyA.equals(keyB);
-	}
-
-	@Override
-	public int hashCode(K o) {
-		return o.hashCode();
-	}
-
 	protected int getBucket(K key) {
-		int hash = hashCode(key);
+		int hash = comparator.hashCode(key);
 		int b = hash & (buckets.length-1); // assumes len is power of 2
 		return b;
 	}
@@ -77,7 +79,9 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 		LinkedList<Entry<K, V>> bucket = buckets[b];
 		if ( bucket==null ) return null; // no bucket
 		for (Entry<K, V> e : bucket) {
-			if ( equals(e.key, typedKey) ) return e.value; // use special equals
+			if ( comparator.equals(e.key, typedKey) ) {
+				return e.value;
+			}
 		}
 		return null;
 	}
@@ -92,7 +96,7 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 			bucket = buckets[b] = new LinkedList<Entry<K, V>>();
 		}
 		for (Entry<K, V> e : bucket) {
-			if ( equals(e.key, key) ) {
+			if ( comparator.equals(e.key, key) ) {
 				V prev = e.value;
 				e.value = value;
 				n++;
@@ -154,7 +158,7 @@ public class FlexibleHashMap<K,V> implements EquivalenceMap<K,V> {
 			if ( bucket==null ) continue;
 			for (Entry<K, V> e : bucket) {
 				if ( e==null ) break;
-				h += hashCode(e.key);
+				h += comparator.hashCode(e.key);
 			}
 		}
 		return h;
