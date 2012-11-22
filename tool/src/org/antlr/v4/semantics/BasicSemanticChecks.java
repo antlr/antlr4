@@ -300,7 +300,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 									   fileName, ruleID, ruleID.getText());
 		}
 		if ( g.isParser() &&
-			 Character.isUpperCase(ruleID.getText().charAt(0)) )
+			Grammar.isTokenName(ruleID.getText()) )
 		{
 			g.tool.errMgr.grammarError(ErrorType.LEXER_RULES_NOT_ALLOWED,
 									   fileName, ruleID, ruleID.getText());
@@ -317,7 +317,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 
 	void checkTokenDefinition(Token tokenID) {
 		String fileName = tokenID.getInputStream().getSourceName();
-		if ( !Character.isUpperCase(tokenID.getText().charAt(0)) ) {
+		if ( !Grammar.isTokenName(tokenID.getText()) ) {
 			g.tool.errMgr.grammarError(ErrorType.TOKEN_NAMES_MUST_START_UPPER,
 									   fileName,
 									   tokenID,

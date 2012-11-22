@@ -32,6 +32,7 @@ package org.antlr.v4.tool.ast;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.tool.Grammar;
 
 public class RuleAST extends GrammarASTWithOptions {
 	/** Kill redef of rules */
@@ -46,7 +47,7 @@ public class RuleAST extends GrammarASTWithOptions {
 
 	public boolean isLexerRule() {
 		String name = getRuleName();
-		return name!=null && Character.isUpperCase(name.charAt(0));
+		return name!=null && Grammar.isTokenName(name);
 	}
 
 	public String getRuleName() {

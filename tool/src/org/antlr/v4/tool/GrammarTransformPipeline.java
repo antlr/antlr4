@@ -341,7 +341,7 @@ public class GrammarTransformPipeline {
 		if ( rules!=null ) {
 			for (GrammarASTWithOptions r : rules) {
 				String ruleName = r.getChild(0).getText();
-				if ( Character.isUpperCase(ruleName.charAt(0)) ) {
+				if (Grammar.isTokenName(ruleName)) {
 					lexerRulesRoot.addChild((Tree)adaptor.dupTree(r));
 					rulesWeMoved.add(r);
 				}
@@ -397,4 +397,5 @@ public class GrammarTransformPipeline {
 		if ( lexerRulesRoot.getChildCount()==0 )	return null;
 		return lexerAST;
 	}
+
 }

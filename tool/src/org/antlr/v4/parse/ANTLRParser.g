@@ -279,21 +279,21 @@ delegateGrammar
     ;
 
 tokensSpec
-	: TOKENS_SPEC TOKEN_REF (COMMA TOKEN_REF)* COMMA? RBRACE -> ^(TOKENS_SPEC TOKEN_REF+)
+	: TOKENS_SPEC id (COMMA id)* COMMA? RBRACE -> ^(TOKENS_SPEC id+)
     | TOKENS_SPEC RBRACE ->
     | TOKENS_SPEC^ v3tokenSpec+ RBRACE!
       {grammarError(ErrorType.V3_TOKENS_SYNTAX, $TOKENS_SPEC);}
 	;
 	
 v3tokenSpec
-	:	TOKEN_REF
+	:	id
 		(	ASSIGN lit=STRING_LITERAL
             {
-            grammarError(ErrorType.V3_ASSIGN_IN_TOKENS, $TOKEN_REF,
-                         $TOKEN_REF.getText(), $lit.getText());
+            grammarError(ErrorType.V3_ASSIGN_IN_TOKENS, $id.start,
+                         $id.text, $lit.getText());
             }
-						            	-> TOKEN_REF // ignore assignment
-		|								-> TOKEN_REF
+						            	-> id // ignore assignment
+		|								-> id
 		)
 		SEMI
 	;
