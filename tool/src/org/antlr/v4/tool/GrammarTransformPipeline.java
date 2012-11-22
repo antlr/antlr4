@@ -179,7 +179,7 @@ public class GrammarTransformPipeline {
 			}
 
 			List<GrammarAST> all_actionRoots = new ArrayList<GrammarAST>();
-			List<GrammarAST> imp_actionRoots = imp.ast.getNodesWithType(ANTLRParser.AT);
+			List<GrammarAST> imp_actionRoots = imp.ast.getAllChildrenWithType(ANTLRParser.AT);
 			if ( actionRoots!=null ) all_actionRoots.addAll(actionRoots);
 			all_actionRoots.addAll(imp_actionRoots);
 
