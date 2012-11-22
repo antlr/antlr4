@@ -83,47 +83,49 @@ public class LeftFactoringRuleTransformer {
 	public void translateLeftFactoredRules() {
 		// translate all rules marked for auto left factoring
 		for (Rule r : _rules.values()) {
-			if (!Character.isUpperCase(r.name.charAt(0))) {
-				Object leftFactoredRules = r.namedActions.get(LEFTFACTOR);
-				if (leftFactoredRules == null) {
+			if (Grammar.isTokenName(r.name)) {
+				continue;
+			}
+
+			Object leftFactoredRules = r.namedActions.get(LEFTFACTOR);
+			if (leftFactoredRules == null) {
+				continue;
+			}
+
+			if (!(leftFactoredRules instanceof ActionAST)) {
+				continue;
+			}
+
+			String leftFactoredRuleAction = leftFactoredRules.toString();
+			leftFactoredRuleAction = leftFactoredRuleAction.substring(1, leftFactoredRuleAction.length() - 1);
+			String[] rules = leftFactoredRuleAction.split(",\\s*");
+			if (rules.length == 0) {
+				continue;
+			}
+
+			LOGGER.log(Level.FINE, "Left factoring {0} out of alts in grammar rule {1}", new Object[] { Arrays.toString(rules), r.name });
+
+			Set<GrammarAST> translatedBlocks = new HashSet<GrammarAST>();
+			List<GrammarAST> blocks = r.ast.getNodesWithType(ANTLRParser.BLOCK);
+			blockLoop:
+			for (GrammarAST block : blocks) {
+				for (GrammarAST current = (GrammarAST)block.getParent(); current != null; current = (GrammarAST)current.getAncestor(ANTLRParser.BLOCK)) {
+					if (translatedBlocks.contains(current)) {
+						// an enclosing decision was already factored
+						continue blockLoop;
+					}
+				}
+
+				if (rules.length != 1) {
+					throw new UnsupportedOperationException("Chained left factoring is not yet implemented.");
+				}
+
+				if (!translateLeftFactoredDecision(block, rules[0], false, DecisionFactorMode.COMBINED_FACTOR, true)) {
+					// couldn't translate the decision
 					continue;
 				}
 
-				if (!(leftFactoredRules instanceof ActionAST)) {
-					continue;
-				}
-
-				String leftFactoredRuleAction = leftFactoredRules.toString();
-				leftFactoredRuleAction = leftFactoredRuleAction.substring(1, leftFactoredRuleAction.length() - 1);
-				String[] rules = leftFactoredRuleAction.split(",\\s*");
-				if (rules.length == 0) {
-					continue;
-				}
-
-				LOGGER.log(Level.FINE, "Left factoring {0} out of alts in grammar rule {1}", new Object[] { Arrays.toString(rules), r.name });
-
-				Set<GrammarAST> translatedBlocks = new HashSet<GrammarAST>();
-				List<GrammarAST> blocks = r.ast.getNodesWithType(ANTLRParser.BLOCK);
-				blockLoop:
-				for (GrammarAST block : blocks) {
-					for (GrammarAST current = (GrammarAST)block.getParent(); current != null; current = (GrammarAST)current.getAncestor(ANTLRParser.BLOCK)) {
-						if (translatedBlocks.contains(current)) {
-							// an enclosing decision was already factored
-							continue blockLoop;
-						}
-					}
-
-					if (rules.length != 1) {
-						throw new UnsupportedOperationException("Chained left factoring is not yet implemented.");
-					}
-
-					if (!translateLeftFactoredDecision(block, rules[0], false, DecisionFactorMode.COMBINED_FACTOR, true)) {
-						// couldn't translate the decision
-						continue;
-					}
-
-					translatedBlocks.add(block);
-				}
+				translatedBlocks.add(block);
 			}
 		}
 	}
