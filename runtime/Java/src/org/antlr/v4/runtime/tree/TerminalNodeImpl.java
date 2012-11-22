@@ -36,8 +36,7 @@ import org.antlr.v4.runtime.misc.Interval;
 public class TerminalNodeImpl<Symbol> implements TerminalNode<Symbol> {
 	public Symbol symbol;
 	public RuleNode<Symbol> parent;
-	/** Which ATN node matched this token? */
-	public int s;
+
 	public TerminalNodeImpl(Symbol symbol) {	this.symbol = symbol;	}
 
 	@Override
