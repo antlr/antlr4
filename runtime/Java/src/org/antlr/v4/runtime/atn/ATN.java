@@ -37,7 +37,6 @@ import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +114,7 @@ public class ATN {
 	}
 
 	public PredictionContext getCachedContext(PredictionContext context) {
-		return PredictionContext.getCachedContext(context, contextCache, new IdentityHashMap<PredictionContext, PredictionContext>());
+		return PredictionContext.getCachedContext(context, contextCache, new PredictionContext.IdentityHashMap());
 	}
 
 	public final DFA[] getDecisionToDFA() {

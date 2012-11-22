@@ -34,7 +34,6 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.Set;
 
 public class ArrayPredictionContext extends PredictionContext {
@@ -123,10 +122,10 @@ public class ArrayPredictionContext extends PredictionContext {
 
 	@Override
 	public PredictionContext appendContext(PredictionContext suffix, PredictionContextCache contextCache) {
-		return appendContext(this, suffix, new IdentityHashMap<PredictionContext, PredictionContext>());
+		return appendContext(this, suffix, new PredictionContext.IdentityHashMap());
 	}
 
-	private static PredictionContext appendContext(PredictionContext context, PredictionContext suffix, IdentityHashMap<PredictionContext, PredictionContext> visited) {
+	private static PredictionContext appendContext(PredictionContext context, PredictionContext suffix, PredictionContext.IdentityHashMap visited) {
 		if (suffix.isEmpty()) {
 			if (isEmptyLocal(suffix)) {
 				if (context.hasEmpty()) {

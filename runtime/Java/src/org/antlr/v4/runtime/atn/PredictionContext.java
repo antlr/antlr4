@@ -29,11 +29,12 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.misc.AbstractEqualityComparator;
+import org.antlr.v4.runtime.misc.FlexibleHashMap;
 import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 
@@ -266,7 +267,7 @@ public abstract class PredictionContext {
 	public static PredictionContext getCachedContext(
 		@NotNull PredictionContext context,
 		@NotNull ConcurrentMap<PredictionContext, PredictionContext> contextCache,
-		@NotNull IdentityHashMap<PredictionContext, PredictionContext> visited) {
+		@NotNull PredictionContext.IdentityHashMap visited) {
 		if (context.isEmpty()) {
 			return context;
 		}
@@ -415,5 +416,29 @@ public abstract class PredictionContext {
 		}
 
 		return result.toArray(new String[result.size()]);
+	}
+
+	public static final class IdentityHashMap extends FlexibleHashMap<PredictionContext, PredictionContext> {
+
+		public IdentityHashMap() {
+			super(IdentityEqualityComparator.INSTANCE);
+		}
+	}
+
+	public static final class IdentityEqualityComparator extends AbstractEqualityComparator<PredictionContext> {
+		public static final IdentityEqualityComparator INSTANCE = new IdentityEqualityComparator();
+
+		private IdentityEqualityComparator() {
+		}
+
+		@Override
+		public int hashCode(PredictionContext obj) {
+			return obj.hashCode();
+		}
+
+		@Override
+		public boolean equals(PredictionContext a, PredictionContext b) {
+			return a == b;
+		}
 	}
 }
