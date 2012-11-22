@@ -1,5 +1,6 @@
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.misc.AbstractEqualityComparator;
 import org.antlr.v4.runtime.misc.FlexibleHashMap;
 import org.antlr.v4.runtime.misc.NotNull;
 
@@ -34,6 +35,17 @@ public enum PredictionMode {
 
 	/** A Map that uses just the state and the stack context as the key. */
 	static class AltAndContextMap extends FlexibleHashMap<ATNConfig,BitSet> {
+		public AltAndContextMap() {
+			super(AltAndContextConfigEqualityComparator.INSTANCE);
+		}
+	}
+
+	private static final class AltAndContextConfigEqualityComparator extends AbstractEqualityComparator<ATNConfig> {
+		public static final AltAndContextConfigEqualityComparator INSTANCE = new AltAndContextConfigEqualityComparator();
+
+		private AltAndContextConfigEqualityComparator() {
+		}
+
 		/** Code is function of (s, _, ctx, _) */
 		@Override
 		public int hashCode(ATNConfig o) {
