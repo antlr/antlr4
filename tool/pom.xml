@@ -17,10 +17,6 @@
     <name>antlr4</name>
     <url>http://www.antlr.org</url>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
