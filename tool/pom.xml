@@ -49,6 +49,11 @@
         </resources>
 
         <testSourceDirectory>test</testSourceDirectory>
+        <testResources>
+            <testResource>
+                <directory>test</directory>
+            </testResource>
+        </testResources>
 
         <plugins>
            <plugin>
