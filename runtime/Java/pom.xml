@@ -10,13 +10,9 @@
         <relativePath>../..</relativePath>
     </parent>
 
-    <groupId>org.antlr</groupId>
     <artifactId>antlr4-runtime</artifactId>
-    <version>4.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
 
     <name>ANTLR 4 Runtime</name>
-    <url>http://www.antlr.org</url>
 
     <dependencies>
         <dependency>

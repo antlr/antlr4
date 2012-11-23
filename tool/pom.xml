@@ -9,13 +9,9 @@
         <version>4.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.antlr</groupId>
     <artifactId>antlr4</artifactId>
-    <version>4.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
 
     <name>ANTLR 4 Tool</name>
-    <url>http://www.antlr.org</url>
 
     <dependencies>
         <dependency>
