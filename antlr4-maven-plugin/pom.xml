@@ -71,7 +71,7 @@
          and MUST update <version> in this pom manually!
          -->
     <version>4.0-SNAPSHOT</version>
-    <name>Maven plugin for ANTLR V4</name>
+    <name>ANTLR 4 Maven plugin</name>
     <prerequisites>
         <maven>3.0</maven>
     </prerequisites>

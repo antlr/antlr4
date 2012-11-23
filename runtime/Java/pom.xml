@@ -15,7 +15,7 @@
     <version>4.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>antlr4-runtime</name>
+    <name>ANTLR 4 Runtime</name>
     <url>http://www.antlr.org</url>
 
     <dependencies>
