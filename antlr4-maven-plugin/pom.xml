@@ -151,13 +151,6 @@ Jim Idle - March 2009
 
     </developers>
 
-    <!-- Where do we track bugs for this project?
-      -->
-    <issueManagement>
-        <system>JIRA</system>
-        <url>http://antlr.org/jira/browse/ANTLR</url>
-    </issueManagement>
-
     <!-- Location of the license description for this project
       -->
     <licenses>

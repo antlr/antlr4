@@ -19,6 +19,11 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/antlr/antlr4/issues</url>
+    </issueManagement>
+
     <scm>
         <connection>scm:git:git://github.com/antlr/antlr4.git</connection>
         <url>scm:git:git://github.com/antlr/antlr4.git</url>
