@@ -1,5 +1,14 @@
-/tool/target/
-/runtime/Java/target/
-/gunit/target/
+# intellij project files
+*.ipr
+*.iml
+*.iws
+.idea
+
+# all Maven target dirs
+target/
+output/
+
+# all Ant build dirs
+build/
+
 *.hprof
-/antlr4-maven-plugin/target/
