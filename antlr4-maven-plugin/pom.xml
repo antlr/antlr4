@@ -59,18 +59,26 @@
     <developers>
 
         <developer>
-            <name>Jim Idle</name>
-            <url>http://www.temporal-wave.com</url>
-            <roles>
-                <role>Originator, version 4.0</role>
-            </roles>
-        </developer>
-
-        <developer>
             <name>Terence Parr</name>
             <url>http://antlr.org/wiki/display/~admin/Home</url>
             <roles>
                 <role>Project lead - ANTLR</role>
+            </roles>
+        </developer>
+
+        <developer>
+            <name>Sam Harwell</name>
+            <url>http://tunnelvisionlabs.com</url>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+
+        <developer>
+            <name>Jim Idle</name>
+            <url>http://www.temporal-wave.com</url>
+            <roles>
+                <role>Originator, version 4.0</role>
             </roles>
         </developer>
 
