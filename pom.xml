@@ -25,8 +25,8 @@
     </issueManagement>
 
     <scm>
+        <url>https://github.com/antlr/antlr4</url>
         <connection>scm:git:git://github.com/antlr/antlr4.git</connection>
-        <url>scm:git:git://github.com/antlr/antlr4.git</url>
     </scm>
 
     <repositories>
