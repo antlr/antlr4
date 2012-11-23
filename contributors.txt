@@ -51,3 +51,4 @@ YYYY/MM/DD, github id, Full name, email
 2012/07/12, parrt, Terence Parr, parrt@antlr.org
 2012/09/18, sharwell, Sam Harwell, sam@tunnelvisionlabs.com
 2012/10/10, stephengaito, Stephen Gaito, stephen@percepitsys.co.uk
+2012/11/23, maguro, Alan Cabrera, adc@toolazydogs.com
