@@ -5,8 +5,10 @@
     <groupId>org.antlr</groupId>
     <artifactId>project</artifactId>
     <version>4.0-SNAPSHOT</version>
-    <name>ANTLR 4</name>
     <packaging>pom</packaging>
+
+    <name>ANTLR 4</name>
+    <url>http://www.antlr.org</url>
 
     <modules>
         <module>runtime/Java</module>
