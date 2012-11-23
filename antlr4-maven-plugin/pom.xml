@@ -36,8 +36,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <!-- Maven model we are inheriting from
-      -->
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -46,70 +44,17 @@
         <version>4.0-SNAPSHOT</version>
     </parent>
 
-    <!--
-
-     Now that the ANTLR project has adopted Maven with a vengence,
-     all ANTLR tools will be grouped under org.antlr and will be
-     controlled by a project member.
-     -->
     <groupId>org.antlr</groupId>
-
-
-    <!--
-
-     This is the ANTLR plugin for ANTLR version 4.0 and above. It might
-     have been best to change the name of the plugin as the 4.0 plugins
-     behave a little differently, however for the sake of one transitional
-     phase to a much better plugin, it was decided that the name should
-     remain the same.
-      -->
     <artifactId>antlr4-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-
-    <!-- Note that as this plugin depends on the ANTLR tool itself
-         we cannot use the paren pom to control the version number
-         and MUST update <version> in this pom manually!
-         -->
     <version>4.0-SNAPSHOT</version>
+
     <name>ANTLR 4 Maven plugin</name>
+    <url>http://antlr.org</url>
+
     <prerequisites>
         <maven>3.0</maven>
     </prerequisites>
-
-    <!--
-     Where does our actual project live on the interwebs.
-      -->
-    <url>http://antlr.org</url>
-
-    <description>
-
-This is the brand new, re-written from scratch plugin for ANTLR v4.
-
-Previous valiant efforts all suffered from being unable to modify the ANTLR Tool
-itself to provide support not just for Maven oriented things but any other tool
-that might wish to invoke ANTLR without resorting to the command line interface.
-
-Rather than try to shoe-horn new code into the existing Mojo (in fact I think that
-by incorporating a patch supplied by someone I ended up with tow versions of the
-Mojo, I elected to rewrite everything from scratch, including the documentation, so
-that we might end up with a perfect Mojo that can do everything that ANTLR v4 supports
-such as imported grammar processing, proper support for library directories and
-locating token files from generated sources, and so on.
-
-In the end I decided to also change the the ANTLR Tool.java code so that it
-would be the provider of all the things that a build tool needs, rather than
-delegating things to 5 different tools. So, things like dependencies, dependency
-sorting, option tracking, generating sources and so on are all folded back
-in to ANTLR's Tool.java code, where they belong, and they now provide a
-public interface to anyone that might want to interface with them.
-
-One other goal of this rewrite was to completely document the whole thing
-to death. Hence even this pom has more comments than funcitonal elements,
-in case I get run over by a bus or fall off a cliff while skiing.
-
-Jim Idle - March 2009
-
-    </description>
 
     <developers>
 
