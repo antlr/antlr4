@@ -71,6 +71,9 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 	public List<Tuple2<GrammarAST,String>> leftRecursiveRuleRefLabels =
 		new ArrayList<Tuple2<GrammarAST,String>>();
 
+	/** Tokens from which rule AST comes from */
+	public TokenStream tokenStream;
+
 	public GrammarAST retvals;
 
 	public STGroup recRuleTemplates;
@@ -79,14 +82,14 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 	public Map<Integer, ASSOC> altAssociativity = new HashMap<Integer, ASSOC>();
 
-	public LeftRecursiveRuleAnalyzer(TokenStream tokens, GrammarAST ruleAST,
+	public LeftRecursiveRuleAnalyzer(GrammarAST ruleAST,
 									 Tool tool, String ruleName, String language)
 	{
 		super(new CommonTreeNodeStream(new GrammarASTAdaptor(ruleAST.token.getInputStream()), ruleAST));
-		((CommonTreeNodeStream)input).setTokenStream(tokens);
 		this.tool = tool;
 		this.ruleName = ruleName;
 		this.language = language;
+		tokenStream = ruleAST.g.tokenStream;
 		loadPrecRuleTemplates();
 	}
 
@@ -358,10 +361,9 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 	public void stripAltLabel(GrammarAST altAST) {
 		int start = altAST.getTokenStartIndex();
 		int stop = altAST.getTokenStopIndex();
-		TokenStream tokens = input.getTokenStream();
 		// find =>
 		for (int i=stop; i>=start; i--) {
-			if ( tokens.get(i).getType()==POUND ) {
+			if ( tokenStream.get(i).getType()==POUND ) {
 				altAST.setTokenStopIndex(i-1);
 				return;
 			}
@@ -370,10 +372,9 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 	public String text(GrammarAST t) {
 		if ( t==null ) return "";
-		TokenStream tokens = input.getTokenStream();
-		CommonToken ta = (CommonToken)tokens.get(t.getTokenStartIndex());
-		CommonToken tb = (CommonToken)tokens.get(t.getTokenStopIndex());
-		return tokens.toString(ta, tb);
+		CommonToken ta = (CommonToken) tokenStream.get(t.getTokenStartIndex());
+		CommonToken tb = (CommonToken) tokenStream.get(t.getTokenStopIndex());
+		return tokenStream.toString(ta, tb);
 	}
 
 	public int precedence(int alt) {

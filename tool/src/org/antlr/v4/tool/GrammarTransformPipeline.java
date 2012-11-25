@@ -179,7 +179,7 @@ public class GrammarTransformPipeline {
 			}
 
 			List<GrammarAST> all_actionRoots = new ArrayList<GrammarAST>();
-			List<GrammarAST> imp_actionRoots = imp.ast.getNodesWithType(ANTLRParser.AT);
+			List<GrammarAST> imp_actionRoots = imp.ast.getAllChildrenWithType(ANTLRParser.AT);
 			if ( actionRoots!=null ) all_actionRoots.addAll(actionRoots);
 			all_actionRoots.addAll(imp_actionRoots);
 
@@ -193,7 +193,7 @@ public class GrammarTransformPipeline {
 					String scopeName = rootGrammar.getDefaultActionScope();
 					GrammarAST scope, name, action;
 					if ( at.getChildCount()>2 ) { // must have a scope
-						scope = (GrammarAST)at.getChild(1);
+						scope = (GrammarAST)at.getChild(0);
 						scopeName = scope.getText();
 						name = (GrammarAST)at.getChild(1);
 						action = (GrammarAST)at.getChild(2);

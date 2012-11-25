@@ -3,17 +3,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.antlr</groupId>
+    <parent>
+        <groupId>org.antlr</groupId>
+        <artifactId>project</artifactId>
+        <version>4.0-SNAPSHOT</version>
+    </parent>
+
     <artifactId>antlr4</artifactId>
-    <version>4.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
 
-    <name>antlr4</name>
-    <url>http://www.antlr.org</url>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <name>ANTLR 4 Tool</name>
 
     <dependencies>
         <dependency>
@@ -49,6 +47,11 @@
         </resources>
 
         <testSourceDirectory>test</testSourceDirectory>
+        <testResources>
+            <testResource>
+                <directory>test</directory>
+            </testResource>
+        </testResources>
 
         <plugins>
            <plugin>

@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.antlr</groupId>
+    <artifactId>project</artifactId>
+    <version>4.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>ANTLR 4</name>
+    <url>http://www.antlr.org</url>
+
+    <modules>
+        <module>runtime/Java</module>
+        <module>tool</module>
+        <module>antlr4-maven-plugin</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/antlr/antlr4/issues</url>
+    </issueManagement>
+
+    <scm>
+        <url>https://github.com/antlr/antlr4</url>
+        <connection>scm:git:git://github.com/antlr/antlr4.git</connection>
+    </scm>
+
+    <repositories>
+        <repository>
+            <id>antlr.snapshots</id>
+            <name>ANTLR Snapshots Repository</name>
+            <url>http://antlr.org/antlr-snapshot</url>
+        </repository>
+    </repositories>
+
+</project>

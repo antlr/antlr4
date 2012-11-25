@@ -644,4 +644,23 @@ public class TestCompositeGrammars extends BaseTest {
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, ok);
 	}
+
+	@Test public void testImportedRuleWithAction() throws Exception {
+		// wasn't terminating. @after was injected into M as if it were @members
+		String slave =
+			"parser grammar S;\n" +
+			"a @after {int x;} : B ;\n";
+		mkdir(tmpdir);
+		writeFile(tmpdir, "S.g4", slave);
+		String master =
+			"grammar M;\n" +
+			"import S;\n" +
+			"s : a ;\n" +
+			"B : 'b' ;" +
+			"WS : (' '|'\\n') {skip();} ;\n" ;
+		String found = execParser("M.g4", master, "MParser", "MLexer",
+								  "s", "b", debug);
+		assertEquals("", found);
+	}
+
 }

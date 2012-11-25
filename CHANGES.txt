@@ -1,5 +1,11 @@
 ANTLR v4 Honey Badger
 
+November 22, 2012
+
+* make sure left-recur rule translation uses token stream from correct imported file.
+* actions like @after in imported rules caused inf loop.
+* This misidentified scope lexer/parser: @lexer::members { } @parser::members { }
+
 November 18, 2012
 
 * fixed: undefined rule refs caused exception

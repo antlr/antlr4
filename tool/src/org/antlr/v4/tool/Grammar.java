@@ -29,6 +29,7 @@
 
 package org.antlr.v4.tool;
 
+import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
@@ -129,6 +130,8 @@ public class Grammar implements AttributeResolver {
 
 	public String name;
     public GrammarRootAST ast;
+	/** Track stream used to create this grammar */
+	public TokenStream tokenStream;
     public String text; // testing only
     public String fileName;
 
@@ -216,7 +219,7 @@ public class Grammar implements AttributeResolver {
         if ( ast==null ) throw new IllegalArgumentException("can't pass null tree");
         this.tool = tool;
         this.ast = ast;
-        this.name = ((GrammarAST)ast.getChild(0)).getText();
+        this.name = (ast.getChild(0)).getText();
 		initTokenSymbolTables();
     }
 
@@ -713,7 +716,7 @@ public class Grammar implements AttributeResolver {
     }
 
 	public org.antlr.runtime.TokenStream getTokenStream() {
-		if ( ast!=null ) return ast.tokens;
+		if ( ast!=null ) return ast.tokenStream;
 		return null;
 	}
 

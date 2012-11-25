@@ -3,17 +3,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.antlr</groupId>
+    <parent>
+        <groupId>org.antlr</groupId>
+        <artifactId>project</artifactId>
+        <version>4.0-SNAPSHOT</version>
+        <relativePath>../..</relativePath>
+    </parent>
+
     <artifactId>antlr4-runtime</artifactId>
-    <version>4.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
 
-    <name>antlr4-runtime</name>
-    <url>http://www.antlr.org</url>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <name>ANTLR 4 Runtime</name>
 
     <dependencies>
         <dependency>
