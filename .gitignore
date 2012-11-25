@@ -1,5 +1,14 @@
+# Maven build folders
 /tool/target/
 /runtime/Java/target/
 /gunit/target/
-*.hprof
 /antlr4-maven-plugin/target/
+
+# IntelliJ projects
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Profiler results
+*.hprof
