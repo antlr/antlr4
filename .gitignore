@@ -4,6 +4,10 @@
 /gunit/target/
 /antlr4-maven-plugin/target/
 
+# Ant build folders
+/build/
+/dist/
+
 # IntelliJ projects
 *.iml
 *.ipr
