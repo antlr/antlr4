@@ -1,5 +1,18 @@
 ANTLR v4 Honey Badger
 
+November 26, 2012
+
+* Don't generate action methods for lexer rules not containing an action
+* Generated action and sempred methods are private
+* Remove unused / problematic methods:
+** (unused) TerminalNodeImpl.isErrorNode
+** (unused) RuleContext.conflictsWith, RuleContext.suffix.
+** (problematic) RuleContext.hashCode, RuleContext.equals.
+
+November 23, 2012
+
+* Updated Maven build (added master POM, cleaned up module POMs)
+
 November 22, 2012
 
 * make sure left-recur rule translation uses token stream from correct imported file.
