@@ -75,8 +75,6 @@ public class TerminalNodeImpl implements TerminalNode {
 		return toString();
 	}
 
-	public boolean isErrorNode() { return this instanceof ErrorNode; }
-
 	@Override
 	public String toString() {
 			if ( symbol.getType() == Token.EOF ) return "<EOF>";
