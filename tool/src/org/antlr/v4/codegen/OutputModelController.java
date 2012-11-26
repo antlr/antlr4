@@ -305,6 +305,10 @@ public class OutputModelController {
 	}
 
 	public void buildLexerRuleActions(Lexer lexer, final Rule r) {
+		if (r.actions.isEmpty()) {
+			return;
+		}
+
 		CodeGenerator gen = delegate.getGenerator();
 		Grammar g = delegate.getGrammar();
 		String ctxType = gen.target.getRuleFunctionContextStructName(r);
