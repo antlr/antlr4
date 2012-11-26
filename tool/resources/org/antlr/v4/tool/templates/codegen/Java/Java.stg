@@ -176,8 +176,11 @@ public <p.name>(TokenStream\<? extends <InputSymbolType()>\> input) {
 }
 >>
 
+/* This generates a private method since the actionIndex is generated, making an
+ * overriding implementation impossible to maintain.
+ */
 RuleActionFunction(r, actions) ::= <<
-public void <r.name>_action(<r.ctxType> _localctx, int actionIndex) {
+private void <r.name>_action(<r.ctxType> _localctx, int actionIndex) {
 	switch (actionIndex) {
 	<actions:{index|
 case <index>: <actions.(index)> break;}; separator="\n">
@@ -185,8 +188,11 @@ case <index>: <actions.(index)> break;}; separator="\n">
 }
 >>
 
+/* This generates a private method since the predIndex is generated, making an
+ * overriding implementation impossible to maintain.
+ */
 RuleSempredFunction(r, actions) ::= <<
-public boolean <r.name>_sempred(<r.ctxType> _localctx, int predIndex) {
+private boolean <r.name>_sempred(<r.ctxType> _localctx, int predIndex) {
 	switch (predIndex) {
 	<actions:{index|
 case <index>: return <actions.(index)>;}; separator="\n">

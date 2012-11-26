@@ -82,8 +82,6 @@ public class TerminalNodeImpl<Symbol> implements TerminalNode<Symbol> {
 		return toString();
 	}
 
-	public boolean isErrorNode() { return this instanceof ErrorNode; }
-
 	@Override
 	public String toString() {
 		if (symbol instanceof Token) {
