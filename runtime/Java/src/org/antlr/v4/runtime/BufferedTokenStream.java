@@ -349,7 +349,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
 	}
 
 	/** Collect all tokens on specified channel to the left of
-	 *  the current token up until we see a token on {@link ANTLRErrorListener#DEFAULT_TOKEN_CHANNEL}.
+	 *  the current token up until we see a token on {@link Lexer#DEFAULT_TOKEN_CHANNEL}.
 	 *  If {@code channel} is {@code -1}, find any non default channel token.
 	 */
 	public List<T> getHiddenTokensToLeft(int tokenIndex, int channel) {

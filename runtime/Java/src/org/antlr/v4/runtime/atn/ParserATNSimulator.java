@@ -1074,9 +1074,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	/** Look through a list of predicate/alt pairs, returning alts for the
 	 *  pairs that win. A {@code null} predicate indicates an alt containing an
 	 *  unpredicated config which behaves as "always true."
-	 *
-	 * @param checkUniqueMatch If true, {@link ATN#INVALID_ALT_NUMBER} will be returned
-	 *      if the match in not unique.
 	 */
 	public BitSet evalSemanticContext(@NotNull DFAState.PredPrediction[] predPredictions,
 										   ParserRuleContext<Symbol> outerContext,

@@ -118,7 +118,7 @@ public abstract class AbstractParseTreeVisitor<Symbol, Result> implements ParseT
 	 *
 	 * @param aggregate The previous aggregate value. In the default
 	 * implementation, the aggregate value is initialized to
-	 * {@link #defaultValue}, which is passed as the {@code aggregate} argument
+	 * {@link #defaultResult}, which is passed as the {@code aggregate} argument
 	 * to this method after the first child node is visited.
 	 * @param nextResult The result of the immediately preceeding call to visit
 	 * a child node.
@@ -134,7 +134,7 @@ public abstract class AbstractParseTreeVisitor<Symbol, Result> implements ParseT
 	 * {@link #visitChildren}. This method is first called before the first
 	 * child is visited; at that point {@code currentResult} will be the initial
 	 * value (in the default implementation, the initial value is returned by a
-	 * call to {@link #defaultValue}. This method is not called after the last
+	 * call to {@link #defaultResult}. This method is not called after the last
 	 * child is visited.
 	 * <p/>
 	 * The default implementation always returns {@code true}, indicating that
