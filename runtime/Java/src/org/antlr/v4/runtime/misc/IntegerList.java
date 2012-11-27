@@ -31,6 +31,7 @@ package org.antlr.v4.runtime.misc;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 /**
  *
@@ -191,14 +192,14 @@ public class IntegerList {
 
 	/**
 	 * Compares the specified object with this list for equality.  Returns
-	 * {@code true} if and only if the specified object is also an {@code IntegerList},
+	 * {@code true} if and only if the specified object is also an {@link IntegerList},
 	 * both lists have the same size, and all corresponding pairs of elements in
 	 * the two lists are equal.  In other words, two lists are defined to be
 	 * equal if they contain the same elements in the same order.
 	 * <p>
 	 * This implementation first checks if the specified object is this
 	 * list. If so, it returns {@code true}; if not, it checks if the
-	 * specified object is an {@code IntegerList}. If not, it returns {@code false};
+	 * specified object is an {@link IntegerList}. If not, it returns {@code false};
 	 * if so, it checks the size of both lists. If the lists are not the same size,
 	 * it returns {@code false}; otherwise it iterates over both lists, comparing
 	 * corresponding pairs of elements.  If any comparison returns {@code false},
@@ -233,8 +234,8 @@ public class IntegerList {
 
 	/**
 	 * Returns the hash code value for this list.
-	 *
-	 * <p>This implementation uses exactly the code that is used to define the
+	 * <p/>
+	 * This implementation uses exactly the code that is used to define the
 	 * list hash function in the documentation for the {@link List#hashCode}
 	 * method.
 	 *
