@@ -724,7 +724,6 @@ public class Tool {
 	 * given relative to the input directory.
 	 *
 	 * @param fileNameWithPath path to input source
-	 * @return
 	 */
 	public File getOutputDirectory(String fileNameWithPath) {
 		File outputDir;
