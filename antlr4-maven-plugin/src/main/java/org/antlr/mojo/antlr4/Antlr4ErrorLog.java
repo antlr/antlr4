@@ -55,7 +55,7 @@ public class Antlr4ErrorLog implements ANTLRToolListener {
 
     /**
      * Sends an informational message to the Maven log sink.
-     * @param s The message to send to Maven
+     * @param message The message to send to Maven
      */
     @Override
     public void info(String message) {
