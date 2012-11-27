@@ -110,7 +110,7 @@ public class ParseTreeVisitor<T> {
 	 *
 	 * @param aggregate The previous aggregate value. In the default
 	 * implementation, the aggregate value is initialized to
-	 * {@link #defaultValue}, which is passed as the {@code aggregate} argument
+	 * {@link #defaultResult}, which is passed as the {@code aggregate} argument
 	 * to this method after the first child node is visited.
 	 * @param nextResult The result of the immediately preceeding call to visit
 	 * a child node.
@@ -126,7 +126,7 @@ public class ParseTreeVisitor<T> {
 	 * {@link #visitChildren}. This method is first called before the first
 	 * child is visited; at that point {@code currentResult} will be the initial
 	 * value (in the default implementation, the initial value is returned by a
-	 * call to {@link #defaultValue}.
+	 * call to {@link #defaultResult}.
 	 * <p/>
 	 * The default implementation always returns {@code true}, indicating that
 	 * {@code visitChildren} should only return after all children are visited.
