@@ -466,7 +466,7 @@ public class Antlr4Mojo
             throws TokenStreamException, RecognitionException, IOException, InclusionScanException {
         // Which files under the source set should we be looking for as grammar files
         //
-        SourceMapping mapping = new SuffixMapping("g4", Collections.EMPTY_SET);
+        SourceMapping mapping = new SuffixMapping("g4", Collections.<String>emptySet());
 
         // What are the sets of includes (defaulted or otherwise).
         //
