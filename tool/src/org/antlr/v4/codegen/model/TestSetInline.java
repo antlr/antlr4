@@ -33,13 +33,39 @@ import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.ast.GrammarAST;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /** */
 public class TestSetInline extends SrcOp {
 	public String varName;
-	public String[] ttypes;
+	public Bitset[] bitsets;
+
 	public TestSetInline(OutputModelFactory factory, GrammarAST ast, IntervalSet set) {
 		super(factory, ast);
-		this.ttypes = factory.getGenerator().target.getTokenTypesAsTargetLabels(factory.getGrammar(), set.toArray());
+
+		this.bitsets = createBitsets(factory, set);
 		this.varName = "_la";
+	}
+
+	private static Bitset[] createBitsets(OutputModelFactory factory, IntervalSet set) {
+		List<Bitset> bitsetList = new ArrayList<Bitset>();
+		for (int ttype : set.toArray()) {
+			Bitset current = !bitsetList.isEmpty() ? bitsetList.get(bitsetList.size() - 1) : null;
+			if (current == null || ttype > (current.shift + 63)) {
+				current = new Bitset();
+				current.shift = ttype;
+				bitsetList.add(current);
+			}
+
+			current.ttypes.add(factory.getGenerator().target.getTokenTypeAsTargetLabel(factory.getGrammar(), ttype));
+		}
+
+		return bitsetList.toArray(new Bitset[bitsetList.size()]);
+	}
+
+	public static final class Bitset {
+		public int shift;
+		public final List<String> ttypes = new ArrayList<String>();
 	}
 }

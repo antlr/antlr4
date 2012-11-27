@@ -453,7 +453,12 @@ Sync(s) ::= "sync(<s.expecting.name>);"
 ThrowNoViableAlt(t) ::= "throw new NoViableAltException(this);"
 
 TestSetInline(s) ::= <<
-<s.ttypes:{ttype | <s.varName>==<ttype>}; separator=" || ">
+<s.bitsets:{bits | <testShiftInRange({<s.varName> - <bits.shift>})> && ((1L \<\< (<s.varName> - <bits.shift>)) & (<bits.ttypes:{ttype | (1L \<\< (<ttype> - <bits.shift>))}; separator=" | ">)) != 0}; separator=" || ">
+>>
+
+// Java language spec 15.19 - shift operators mask operands rather than overflow to 0... need range test
+testShiftInRange(shiftAmount) ::= <<
+((<shiftAmount>) & ~0x3f) == 0
 >>
 
 cases(ttypes) ::= <<
