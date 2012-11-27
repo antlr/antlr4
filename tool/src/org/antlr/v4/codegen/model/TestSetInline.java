@@ -44,17 +44,25 @@ public class TestSetInline extends SrcOp {
 	public TestSetInline(OutputModelFactory factory, GrammarAST ast, IntervalSet set) {
 		super(factory, ast);
 
-		this.bitsets = createBitsets(factory, set);
+		Bitset[] withZeroOffset = createBitsets(factory, set, true);
+		Bitset[] withoutZeroOffset = createBitsets(factory, set, false);
+		this.bitsets = withZeroOffset.length <= withoutZeroOffset.length ? withZeroOffset : withoutZeroOffset;
 		this.varName = "_la";
 	}
 
-	private static Bitset[] createBitsets(OutputModelFactory factory, IntervalSet set) {
+	private static Bitset[] createBitsets(OutputModelFactory factory, IntervalSet set, boolean useZeroOffset) {
 		List<Bitset> bitsetList = new ArrayList<Bitset>();
 		for (int ttype : set.toArray()) {
 			Bitset current = !bitsetList.isEmpty() ? bitsetList.get(bitsetList.size() - 1) : null;
 			if (current == null || ttype > (current.shift + 63)) {
 				current = new Bitset();
-				current.shift = ttype;
+				if (useZeroOffset && ttype >= 0 && ttype < 63) {
+					current.shift = 0;
+				}
+				else {
+					current.shift = ttype;
+				}
+
 				bitsetList.add(current);
 			}
 
