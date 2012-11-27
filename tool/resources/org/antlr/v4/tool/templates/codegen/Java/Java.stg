@@ -453,8 +453,32 @@ Sync(s) ::= "sync(<s.expecting.name>);"
 ThrowNoViableAlt(t) ::= "throw new NoViableAltException(this);"
 
 TestSetInline(s) ::= <<
-<s.ttypes:{ttype | <s.varName>==<ttype>}; separator=" || ">
+<s.bitsets:{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
 >>
+
+// Java language spec 15.19 - shift operators mask operands rather than overflow to 0... need range test
+testShiftInRange(shiftAmount) ::= <<
+((<shiftAmount>) & ~0x3f) == 0
+>>
+
+// produces smaller bytecode only when bits.ttypes contains more than two items
+bitsetBitfieldComparison(s, bits) ::= <%
+(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((1L \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (1L \<\< <offsetShift(ttype, bits.shift)>)}; separator=" | ">)) != 0)
+%>
+
+isZero ::= [
+"0":true,
+default:false
+]
+
+offsetShift(shiftAmount, offset) ::= <%
+<if(!isZero.(offset))>(<shiftAmount> - <offset>)<else><shiftAmount><endif>
+%>
+
+// produces more efficient bytecode when bits.ttypes contains at most two items
+bitsetInlineComparison(s, bits) ::= <%
+<bits.ttypes:{ttype | <s.varName>==<ttype>}; separator=" || ">
+%>
 
 cases(ttypes) ::= <<
 <ttypes:{t | case <t>:}; separator="\n">
