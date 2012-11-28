@@ -1,6 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.antlr</groupId>
     <artifactId>project</artifactId>
@@ -8,7 +14,36 @@
     <packaging>pom</packaging>
 
     <name>ANTLR 4</name>
+    <description>ANTLR 4 Master Build POM</description>
     <url>http://www.antlr.org</url>
+
+    <licenses>
+        <license>
+            <name>The BSD License</name>
+            <url>http://www.antlr.org/license.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+
+        <developer>
+            <name>Terence Parr</name>
+            <url>http://antlr.org/wiki/display/~admin/Home</url>
+            <roles>
+                <role>Project lead - ANTLR</role>
+            </roles>
+        </developer>
+
+        <developer>
+            <name>Sam Harwell</name>
+            <url>http://tunnelvisionlabs.com</url>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+
+    </developers>
 
     <modules>
         <module>runtime/Java</module>
@@ -27,16 +62,27 @@
     </issueManagement>
 
     <scm>
-        <url>https://github.com/antlr/antlr4</url>
+        <url>git://github.com/antlr/antlr4.git</url>
         <connection>scm:git:git://github.com/antlr/antlr4.git</connection>
+        <developerConnection>scm:git:git@github.com:antlr/antlr4.git</developerConnection>
     </scm>
 
-    <repositories>
-        <repository>
-            <id>antlr.snapshots</id>
-            <name>ANTLR Snapshots Repository</name>
-            <url>http://antlr.org/antlr-snapshot</url>
-        </repository>
-    </repositories>
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

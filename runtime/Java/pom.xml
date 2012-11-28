@@ -13,6 +13,7 @@
     <artifactId>antlr4-runtime</artifactId>
 
     <name>ANTLR 4 Runtime</name>
+    <description>The ANTLR 4 Runtime</description>
 
     <dependencies>
         <dependency>
