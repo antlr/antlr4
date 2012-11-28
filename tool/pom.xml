@@ -12,6 +12,7 @@
     <artifactId>antlr4</artifactId>
 
     <name>ANTLR 4 Tool</name>
+    <description>The ANTLR 4 grammar compiler.</description>
 
     <dependencies>
         <dependency>
@@ -28,12 +29,12 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr-runtime</artifactId>
-            <version>3.4.1-SNAPSHOT</version>
+            <version>3.5.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>ST4</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.7-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
@@ -57,7 +58,7 @@
            <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr3-maven-plugin</artifactId>
-                <version>3.4</version>
+                <version>3.5.1-SNAPSHOT</version>
                 <configuration>
                     <sourceDirectory>src</sourceDirectory>
                     <verbose>true</verbose>
