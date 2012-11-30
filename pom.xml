@@ -89,7 +89,6 @@
                         <configuration>
                             <source>1.6</source>
                             <target>1.6</target>
-                            <compilerArgument>-Xlint:-serial</compilerArgument>
                             <compilerArguments>
                                 <bootclasspath>${bootclasspath.compile}</bootclasspath>
                                 <Xlint/>
@@ -101,7 +100,6 @@
                         <configuration>
                             <source>1.6</source>
                             <target>1.6</target>
-                            <compilerArgument>-Xlint:-serial</compilerArgument>
                             <compilerArguments>
                                 <bootclasspath>${bootclasspath.testCompile}</bootclasspath>
                                 <Xlint/>
