@@ -29,22 +29,6 @@
         <sourceDirectory>src</sourceDirectory>
         <resources/>
 
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                    <showWarnings>true</showWarnings>
-                    <showDeprecation>true</showDeprecation>
-                    <compilerArguments>
-                        <Xlint/>
-                    </compilerArguments>
-                    <compilerArgument>-Xlint:-serial</compilerArgument>
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
 
 </project>

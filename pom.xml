@@ -54,6 +54,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java5.home>${env.JAVA5_HOME}</java5.home>
+        <java6.home>${env.JAVA6_HOME}</java6.home>
+        <bootclasspath.compile>${java6.home}/jre/lib/rt.jar</bootclasspath.compile>
+        <bootclasspath.testCompile>${java6.home}/jre/lib/rt.jar</bootclasspath.testCompile>
     </properties>
 
     <issueManagement>
@@ -69,6 +73,44 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.0</version>
+                <configuration>
+                    <sourceDirectory>src</sourceDirectory>
+                    <showWarnings>true</showWarnings>
+                    <showDeprecation>true</showDeprecation>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <configuration>
+                            <source>1.6</source>
+                            <target>1.6</target>
+                            <compilerArgument>-Xlint:-serial</compilerArgument>
+                            <compilerArguments>
+                                <bootclasspath>${bootclasspath.compile}</bootclasspath>
+                                <Xlint/>
+                            </compilerArguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <configuration>
+                            <source>1.6</source>
+                            <target>1.6</target>
+                            <compilerArgument>-Xlint:-serial</compilerArgument>
+                            <compilerArguments>
+                                <bootclasspath>${bootclasspath.testCompile}</bootclasspath>
+                                <Xlint/>
+                            </compilerArguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
