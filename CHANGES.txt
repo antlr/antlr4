@@ -1,7 +1,21 @@
 ANTLR v4 Honey Badger
 
+November 30, 2012
+
+* Maven updates (cleanup, unification, and specify Java 6 bootstrap classpath)
+
+November 28, 2012
+
+* Maven updates (uber-jar, manifest details)
+
+November 27, 2012
+
+* Maven updates (prepare for deploying to Sonatype OSS)
+* Use efficient bitset tests instead of long chains of operator ==
+
 November 26, 2012
 
+* Maven updates (include sources and javadocs, fix warnings)
 * Don't generate action methods for lexer rules not containing an action
 * Generated action and sempred methods are private
 * Remove unused / problematic methods:
