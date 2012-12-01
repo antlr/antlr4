@@ -85,8 +85,16 @@ public class Antlr4Mojo extends AbstractMojo {
     @Parameter(defaultValue = "false")
     protected boolean atn;
 
+	/**
+	 * add config set to DFA states
+	 */
+	@Parameter(defaultValue = "false")
 	protected boolean verbose_dfa;
 
+	/**
+	 * use the ATN simulator for all predictions
+	 */
+	@Parameter(defaultValue = "false")
 	protected boolean force_atn;
 
     /* --------------------------------------------------------------------
