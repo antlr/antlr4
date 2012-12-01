@@ -222,36 +222,7 @@ public class Antlr4Mojo
             outputDir.mkdirs();
         }
 
-		List<String> args = new ArrayList<String>();
-
-		if (getOutputDirectory() != null) {
-			args.add("-o");
-			args.add(outputDir.getAbsolutePath());
-		}
-
-		// Where do we want ANTLR to look for .tokens and import grammars?
-		//
-		if (getLibDirectory() != null && getLibDirectory().exists()) {
-			args.add("-lib");
-			args.add(libDirectory.getAbsolutePath());
-		}
-
-        // Next we need to set the options given to us in the pom into the
-        // tool instance we have created.
-        //
-		if (atn) {
-			args.add("-atn");
-		}
-		if (verbose_dfa) {
-			args.add("-Xverbose-dfa");
-		}
-		if (messageFormat != null && !"".equals(messageFormat)) {
-			args.add("-message-format");
-			args.add(messageFormat);
-		}
-		if (force_atn) {
-			args.add("-Xforce-atn");
-		}
+		List<String> args = getCommandArguments();
 
         try {
 
@@ -325,6 +296,40 @@ public class Antlr4Mojo
 
     }
 
+	private List<String> getCommandArguments() {
+		List<String> args = new ArrayList<String>();
+
+		if (getOutputDirectory() != null) {
+			args.add("-o");
+			args.add(outputDirectory.getAbsolutePath());
+		}
+
+		// Where do we want ANTLR to look for .tokens and import grammars?
+		//
+		if (getLibDirectory() != null && getLibDirectory().exists()) {
+			args.add("-lib");
+			args.add(libDirectory.getAbsolutePath());
+		}
+
+        // Next we need to set the options given to us in the pom into the
+        // tool instance we have created.
+        //
+		if (atn) {
+			args.add("-atn");
+		}
+		if (verbose_dfa) {
+			args.add("-Xverbose-dfa");
+		}
+		if (messageFormat != null && !"".equals(messageFormat)) {
+			args.add("-message-format");
+			args.add(messageFormat);
+		}
+		if (force_atn) {
+			args.add("-Xforce-atn");
+		}
+
+		return args;
+	}
 
     /**
      *
