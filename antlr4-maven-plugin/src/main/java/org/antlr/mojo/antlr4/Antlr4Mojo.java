@@ -326,7 +326,7 @@ public class Antlr4Mojo extends AbstractMojo {
 
         SourceInclusionScanner scan = new SimpleSourceInclusionScanner(includes, excludes);
         scan.addSourceMapping(mapping);
-        Set<?> grammarFiles = scan.getIncludedSources(sourceDirectory, null);
+        Set<File> grammarFiles = scan.getIncludedSources(sourceDirectory, null);
 
         if (grammarFiles.isEmpty()) {
             if (getLog().isInfoEnabled()) {
@@ -335,15 +335,7 @@ public class Antlr4Mojo extends AbstractMojo {
         } else {
             // Iterate each grammar file we were given and add it into the tool's list of
             // grammars to process.
-            for (Object grammarObject : grammarFiles) {
-				if (!(grammarObject instanceof File)) {
-					getLog().error(String.format("Expected %s from %s.getIncludedSources, found %s.",
-						File.class.getName(),
-						grammarObject != null ? grammarObject.getClass().getName() : "null"));
-				}
-
-				File grammarFile = (File)grammarObject;
-
+            for (File grammarFile : grammarFiles) {
                 if (getLog().isDebugEnabled()) {
                     getLog().debug("Grammar file '" + grammarFile.getPath() + "' detected.");
                 }
