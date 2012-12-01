@@ -269,45 +269,7 @@ public class Antlr4Mojo
 		// Create an instance of the ANTLR 4 build tool
 		//
 		try {
-			tool = new Tool(args.toArray(new String[args.size()])) {
-
-				@Override
-				public void process(Grammar g, boolean gencode) {
-					getLog().info("Processing grammar: " + g.fileName);
-					super.process(g, gencode);
-				}
-
-				@Override
-				public Writer getOutputFileWriter(Grammar g, String fileName) throws IOException {
-					if (outputDirectory == null) {
-						return new StringWriter();
-					}
-					// output directory is a function of where the grammar file lives
-					// for subdir/T.g4, you get subdir here.  Well, depends on -o etc...
-					// But, if this is a .tokens file, then we force the output to
-					// be the base output directory (or current directory if there is not a -o)
-					//
-					File outputDir;
-					if ( fileName.endsWith(CodeGenerator.VOCAB_FILE_EXTENSION) ) {
-						outputDir = new File(outputDirectory);
-					}
-					else {
-						outputDir = getOutputDirectory(g.fileName);
-					}
-
-					File outputFile = new File(outputDir, fileName);
-					if (!outputDir.exists()) {
-						outputDir.mkdirs();
-					}
-
-					URI relativePath = project.getBasedir().toURI().relativize(outputFile.toURI());
-					getLog().info("  Writing file: " + relativePath);
-					FileWriter fw = new FileWriter(outputFile);
-					return new BufferedWriter(fw);
-				}
-
-			};
-			tool.addListener(new Antlr4ErrorLog(log));
+			tool = new CustomTool(args.toArray(new String[args.size()]));
 
 			// Where do we want ANTLR to produce its output? (Base directory)
 			//
@@ -462,4 +424,47 @@ public class Antlr4Mojo
 
         return unprefixedGrammarFileName.getParent() + File.separator;
     }
+
+	private final class CustomTool extends Tool {
+
+		public CustomTool(String[] args) {
+			super(args);
+			addListener(new Antlr4ErrorLog(getLog()));
+		}
+
+		@Override
+		public void process(Grammar g, boolean gencode) {
+			getLog().info("Processing grammar: " + g.fileName);
+			super.process(g, gencode);
+		}
+
+		@Override
+		public Writer getOutputFileWriter(Grammar g, String fileName) throws IOException {
+			if (outputDirectory == null) {
+				return new StringWriter();
+			}
+			// output directory is a function of where the grammar file lives
+			// for subdir/T.g4, you get subdir here.  Well, depends on -o etc...
+			// But, if this is a .tokens file, then we force the output to
+			// be the base output directory (or current directory if there is not a -o)
+			//
+			File outputDir;
+			if ( fileName.endsWith(CodeGenerator.VOCAB_FILE_EXTENSION) ) {
+				outputDir = new File(outputDirectory);
+			}
+			else {
+				outputDir = getOutputDirectory(g.fileName);
+			}
+
+			File outputFile = new File(outputDir, fileName);
+			if (!outputDir.exists()) {
+				outputDir.mkdirs();
+			}
+
+			URI relativePath = project.getBasedir().toURI().relativize(outputFile.toURI());
+			getLog().info("  Writing file: " + relativePath);
+			FileWriter fw = new FileWriter(outputFile);
+			return new BufferedWriter(fw);
+		}
+	}
 }
