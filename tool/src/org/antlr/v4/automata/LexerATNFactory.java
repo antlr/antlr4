@@ -46,6 +46,7 @@ import org.antlr.v4.runtime.atn.TokensStartState;
 import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
@@ -179,9 +180,20 @@ public class LexerATNFactory extends ParserATNFactory {
 			else if ( t.getType()==ANTLRParser.LEXER_CHAR_SET ) {
 				set.addAll(getSetFromCharSetLiteral(t));
 			}
-			else {
+			else if ( t.getType()==ANTLRParser.STRING_LITERAL ) {
 				int c = CharSupport.getCharValueFromGrammarCharLiteral(t.getText());
-				set.add(c);
+				if ( c != -1 ) {
+					set.add(c);
+				}
+				else {
+					g.tool.errMgr.grammarError(ErrorType.INVALID_LEXER_SET_ELEMENT,
+											   g.fileName, t.getToken(), t.getText());
+
+				}
+			}
+			else if ( t.getType()==ANTLRParser.TOKEN_REF ) {
+				g.tool.errMgr.grammarError(ErrorType.INVALID_LEXER_SET_ELEMENT,
+										   g.fileName, t.getToken(), t.getText());
 			}
 		}
 		if ( invert ) {

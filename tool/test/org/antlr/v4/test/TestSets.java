@@ -227,48 +227,24 @@ public class TestSets extends BaseTest {
 	}
 
 	@Test public void testNotCharSetWithRuleRef() throws Exception {
-		String grammar =
+		// might be a useful feature to add someday
+		String[] pair = new String[] {
 			"grammar T;\n" +
 			"a : A {System.out.println($A.text);} ;\n" +
 			"A : ~('a'|B) ;\n" +
-			"B : 'b' ;\n";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-								  "a", "x", debug);
-		assertEquals("x\n", found);
-	}
-
-	@Test public void testNotCharSetWithRuleRef2() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"a : A {System.out.println($A.text);} ;\n" +
-			"A : ~('a'|B) ;\n" +
-			"B : 'b'|'c' ;\n";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-								  "a", "x", debug);
-		assertEquals("x\n", found);
+			"B : 'b' ;\n",
+			"error(134): T.g4:3:10: lexer set element B is invalid (either lexer rule ref or literal with > 1 char)\n"
+		};
+		super.testErrors(pair, true);
 	}
 
 	@Test public void testNotCharSetWithRuleRef3() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : A {System.out.println($A.text);} ;\n" +
-			"A : ('a'|B) ;\n" +
+			"A : ('a'|B) ;\n" +  // this doesn't collapse to set but works
 			"fragment\n" +
 			"B : ~('a'|'c') ;\n";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-								  "a", "x", debug);
-		assertEquals("x\n", found);
-	}
-
-	@Test public void testNotCharSetWithRuleRef4() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"a : A {System.out.println($A.text);} ;\n" +
-			"A : ('a'|B) ;\n" +
-			"fragment\n" +
-			"B : ~('a'|C) ;\n" +
-			"fragment\n" +
-			"C : 'c'|'d' ;\n ";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "a", "x", debug);
 		assertEquals("x\n", found);
