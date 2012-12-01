@@ -48,135 +48,16 @@
     <packaging>maven-plugin</packaging>
 
     <name>ANTLR 4 Maven plugin</name>
+    <description>Maven plugin for ANTLR 4 grammars</description>
 
     <prerequisites>
         <maven>3.0</maven>
     </prerequisites>
-
-    <developers>
-
-        <developer>
-            <name>Terence Parr</name>
-            <url>http://antlr.org/wiki/display/~admin/Home</url>
-            <roles>
-                <role>Project lead - ANTLR</role>
-            </roles>
-        </developer>
-
-        <developer>
-            <name>Sam Harwell</name>
-            <url>http://tunnelvisionlabs.com</url>
-            <roles>
-                <role>Developer</role>
-            </roles>
-        </developer>
-
-        <developer>
-            <name>Jim Idle</name>
-            <url>http://www.temporal-wave.com</url>
-            <roles>
-                <role>Originator, version 4.0</role>
-            </roles>
-        </developer>
-
-        <developer>
-            <name>David Holroyd</name>
-            <url>http://david.holroyd.me.uk/</url>
-            <roles>
-                <role>Originator - prior version</role>
-            </roles>
-        </developer>
-
-        <developer>
-            <name>Kenny MacDermid</name>
-            <url>mailto:kenny "at" kmdconsulting.ca</url>
-            <roles>
-                <role>Contributor - prior versions</role>
-            </roles>
-        </developer>
-
-    </developers>
-
-    <!-- Location of the license description for this project
-      -->
-    <licenses>
-        <license>
-            <distribution>repo</distribution>
-            <name>The BSD License</name>
-            <url>http://www.antlr.org/LICENSE.txt </url>
-        </license>
-    </licenses>
-
-    <distributionManagement>
-
-        <repository>
-            <id>antlr-repo</id>
-            <name>ANTLR Testing repository</name>
-            <url>scpexe://antlr.org/home/mavensync/antlr-repo</url>
-        </repository>
-
-        <snapshotRepository>
-            <id>antlr-snapshot</id>
-            <name>ANTLR Testing Snapshot Repository</name>
-            <url>scpexe://antlr.org/home/mavensync/antlr-snapshot</url>
-        </snapshotRepository>
-
-        <site>
-            <id>antlr-repo</id>
-            <name>ANTLR Maven Plugin Web Site</name>
-            <url>scpexe://antlr.org/home/mavensync/antlr-maven-webs/antlr4-maven-plugin</url>
-        </site>
-    </distributionManagement>
-
-    <!--
-
-    Inform Maven of the ANTLR snapshot repository, which it will
-    need to consult to get the latest snapshot build of the runtime and tool
-    if it was not built and installed locally.
-    -->
-    <repositories>
-
-      <!--
-        This is the ANTLR repository.
-        -->
-        <repository>
-            <id>antlr-snapshot</id>
-            <name>ANTLR Testing Snapshot Repository</name>
-            <url>http://antlr.org/antlr-snapshot</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            
-        </repository>
-
-    </repositories>
     
     <!-- Ancilliary information for completeness
       -->
     <inceptionYear>2009</inceptionYear>
 
-    <mailingLists>
-        <mailingList>
-            <archive>http://antlr.markmail.org/</archive>
-            <otherArchives>
-                <otherArchive>http://www.antlr.org/pipermail/antlr-interest/</otherArchive>
-            </otherArchives>
-            <name>ANTLR Users</name>
-            <subscribe>http://www.antlr.org/mailman/listinfo/antlr-interest/</subscribe>
-            <unsubscribe>http://www.antlr.org/mailman/options/antlr-interest/</unsubscribe>
-            <post>antlr-interest@antlr.org</post>
-        </mailingList>
-    </mailingLists>
-
-    <organization>
-        <name>ANTLR.org</name>
-        <url>http://www.antlr.org</url>
-    </organization>
     <!-- ============================================================================= -->
 
     <!--
@@ -253,29 +134,7 @@
 
         <defaultGoal>install</defaultGoal>
 
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh-external</artifactId>
-                <version>2.2</version>
-            </extension>
-        </extensions>
-
         <plugins>
-
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                    <showDeprecation>true</showDeprecation>
-                    <showWarnings>true</showWarnings>
-                    <compilerArguments>
-                        <Xlint/>
-                    </compilerArguments>
-                </configuration>
-            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -314,34 +173,6 @@
                 <configuration>
                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
         </plugins>
