@@ -84,13 +84,6 @@ public class Antlr4Mojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "false")
     protected boolean atn;
-    /**
-     * If this parameter is set, it indicates that any warning or error messages returned
-     * by ANLTR, shoould be formatted in the specified way. Currently, ANTLR suports the
-     * built-in formats of antlr, gnu and vs2005.
-     */
-    @Parameter(defaultValue = "antlr")
-    protected String messageFormat;
 
 	protected boolean verbose_dfa;
 
@@ -285,10 +278,6 @@ public class Antlr4Mojo extends AbstractMojo {
 		}
 		if (verbose_dfa) {
 			args.add("-Xverbose-dfa");
-		}
-		if (messageFormat != null && !"".equals(messageFormat)) {
-			args.add("-message-format");
-			args.add(messageFormat);
 		}
 		if (force_atn) {
 			args.add("-Xforce-atn");
