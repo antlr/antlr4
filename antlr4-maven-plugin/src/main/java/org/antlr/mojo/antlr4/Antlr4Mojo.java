@@ -91,6 +91,12 @@ public class Antlr4Mojo extends AbstractMojo {
     protected boolean atn;
 
 	/**
+	 * specify grammar file encoding; e.g., euc-jp
+	 */
+	@Parameter
+	protected String encoding;
+
+	/**
 	 * generate parse tree listener (default)
 	 */
 	@Parameter(defaultValue = "true")
@@ -101,6 +107,12 @@ public class Antlr4Mojo extends AbstractMojo {
 	 */
 	@Parameter(defaultValue = "false")
 	protected boolean visitor;
+
+	/**
+	 * treat warnings as errors
+	 */
+	@Parameter(defaultValue = "false")
+	protected boolean treatWarningsAsErrors;
 
 	/**
 	 * add config set to DFA states
@@ -300,6 +312,11 @@ public class Antlr4Mojo extends AbstractMojo {
 			args.add("-atn");
 		}
 
+		if (encoding != null && !encoding.isEmpty()) {
+			args.add("-encoding");
+			args.add(encoding);
+		}
+
 		if (listener) {
 			args.add("-listener");
 		}
@@ -312,6 +329,10 @@ public class Antlr4Mojo extends AbstractMojo {
 		}
 		else {
 			args.add("-no-visitor");
+		}
+
+		if (treatWarningsAsErrors) {
+			args.add("-Werror");
 		}
 
 		if (verbose_dfa) {
