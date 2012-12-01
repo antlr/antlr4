@@ -87,7 +87,7 @@ public class Antlr4Mojo extends AbstractMojo {
      * If set to true then the ANTLR tool will generate a description of the atn
      * for each rule in <a href="http://www.graphviz.org">Dot format</a>
      */
-    @Parameter(defaultValue = "false")
+    @Parameter(property = "antlr4.atn", defaultValue = "false")
     protected boolean atn;
 
 	/**
@@ -99,19 +99,19 @@ public class Antlr4Mojo extends AbstractMojo {
 	/**
 	 * generate parse tree listener (default)
 	 */
-	@Parameter(defaultValue = "true")
+	@Parameter(property = "antlr4.listener", defaultValue = "true")
 	protected boolean listener;
 
 	/**
 	 * generate parse tree visitor
 	 */
-	@Parameter(defaultValue = "false")
+	@Parameter(property = "antlr4.visitor", defaultValue = "false")
 	protected boolean visitor;
 
 	/**
 	 * treat warnings as errors
 	 */
-	@Parameter(defaultValue = "false")
+	@Parameter(property = "antlr4.treatWarningsAsErrors", defaultValue = "false")
 	protected boolean treatWarningsAsErrors;
 
 	/**
@@ -123,7 +123,7 @@ public class Antlr4Mojo extends AbstractMojo {
 	/**
 	 * use the ATN simulator for all predictions
 	 */
-	@Parameter(defaultValue = "false")
+	@Parameter(property = "antlr4.forceATN", defaultValue = "false")
 	protected boolean forceATN;
 
     /* --------------------------------------------------------------------
