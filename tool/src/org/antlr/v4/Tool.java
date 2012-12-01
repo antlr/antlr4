@@ -118,11 +118,6 @@ public class Tool {
 	public File inputDirectory;
 	public String outputDirectory;
 	public String libDirectory;
-	public boolean report = false;
-	public boolean printGrammar = false;
-	public boolean debug = false;
-	public boolean profile = false;
-	public boolean trace = false;
 	public boolean generate_ATN_dot = false;
 	public String grammarEncoding = null; // use default locale's encoding
 	public String msgFormat = "antlr";
@@ -141,12 +136,6 @@ public class Tool {
     public static Option[] optionDefs = {
         new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
         new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
-/*
-        new Option("report",			"-report", "print out a report about the grammar(s) processed"),
-        new Option("printGrammar",		"-print", "print out the grammar without actions"),
-        new Option("debug",				"-debug", "generate a parser that emits debugging events"),
-        new Option("profile",			"-profile", "generate a parser that computes profiling information"),
-         */
         new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition network diagrams"),
 		new Option("grammarEncoding",	"-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
 		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages in antlr, gnu, vs2005"),
