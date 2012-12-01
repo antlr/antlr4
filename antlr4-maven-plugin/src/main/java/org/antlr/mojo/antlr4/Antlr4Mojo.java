@@ -126,6 +126,14 @@ public class Antlr4Mojo extends AbstractMojo {
 	@Parameter(property = "antlr4.forceATN", defaultValue = "false")
 	protected boolean forceATN;
 
+	/**
+	 * A list of grammar options to explicitly specify to the tool. These
+	 * options are passed to the tool using the
+	 * <code>-D&lt;option&gt;=&lt;value&gt;</code> syntax.
+	 */
+	@Parameter
+	protected Map<String, String> options;
+
     /* --------------------------------------------------------------------
      * The following are Maven specific parameters, rather than specificlly
      * options that the ANTLR tool can use.
@@ -341,6 +349,12 @@ public class Antlr4Mojo extends AbstractMojo {
 
 		if (forceATN) {
 			args.add("-Xforce-atn");
+		}
+
+		if (options != null) {
+			for (Map.Entry<String, String> option : options.entrySet()) {
+				args.add(String.format("-D%s=%s", option.getKey(), option.getValue()));
+			}
 		}
 
 		return args;
