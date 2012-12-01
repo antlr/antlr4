@@ -32,8 +32,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.antlr.mojo.antlr4;
 
-import antlr.RecognitionException;
-import antlr.TokenStreamException;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.tool.Grammar;
@@ -266,10 +264,6 @@ public class Antlr4Mojo
             log.error(ie);
             throw new MojoExecutionException("Fatal error occured while evaluating the names of the grammar files to analyze");
 
-        } catch (Exception e) {
-
-            getLog().error(e);
-            throw new MojoExecutionException(e.getMessage());
         }
 
 		// Create an instance of the ANTLR 4 build tool
@@ -374,13 +368,10 @@ public class Antlr4Mojo
      *
      * @param sourceDirectory
      * @param outputDirectory
-     * @throws antlr.TokenStreamException
-     * @throws antlr.RecognitionException
-     * @throws java.io.IOException
      * @throws org.codehaus.plexus.compiler.util.scan.InclusionScanException
      */
     private void processGrammarFiles(List<String> args, File sourceDirectory, File outputDirectory)
-            throws TokenStreamException, RecognitionException, IOException, InclusionScanException {
+        throws InclusionScanException {
         // Which files under the source set should we be looking for as grammar files
         //
         SourceMapping mapping = new SuffixMapping("g4", Collections.<String>emptySet());
