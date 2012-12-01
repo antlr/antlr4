@@ -237,26 +237,24 @@ public class Antlr4Mojo extends AbstractMojo {
             throw new MojoExecutionException("Fatal error occured while evaluating the names of the grammar files to analyze");
         }
 
-		// Create an instance of the ANTLR 4 build tool
+		if (log.isDebugEnabled()) {
+			log.debug("Output directory base will be " + outputDirectory.getAbsolutePath());
+		}
+
+		if (log.isInfoEnabled()) {
+			log.info("ANTLR 4: Processing source directory " + sourceDirectory.getAbsolutePath());
+		}
+
 		try {
+			// Create an instance of the ANTLR 4 build tool
 			tool = new CustomTool(args.toArray(new String[args.size()]));
-
-			// Where do we want ANTLR to produce its output? (Base directory)
-			if (log.isDebugEnabled())
-			{
-				log.debug("Output directory base will be " + outputDirectory.getAbsolutePath());
-			}
-
-			// Set working directory for ANTLR to be the base source directory
-			tool.inputDirectory = sourceDirectory;
-
-			if (log.isInfoEnabled()) {
-				log.info("ANTLR 4: Processing source directory " + sourceDirectory.getAbsolutePath());
-			}
         } catch (Exception e) {
             log.error("The attempt to create the ANTLR 4 build tool failed, see exception report for details", e);
             throw new MojoFailureException("Jim failed you!");
         }
+
+		// Set working directory for ANTLR to be the base source directory
+		tool.inputDirectory = sourceDirectory;
 
 		tool.processGrammarsOnCommandLine();
 
