@@ -237,14 +237,8 @@ public class Antlr4Mojo extends AbstractMojo {
             throw new MojoExecutionException("Fatal error occured while evaluating the names of the grammar files to analyze");
         }
 
-		if (log.isDebugEnabled()) {
-			log.debug("Output directory base will be " + outputDirectory.getAbsolutePath());
-		}
-
-		if (log.isInfoEnabled()) {
-			log.info("ANTLR 4: Processing source directory " + sourceDirectory.getAbsolutePath());
-		}
-
+		log.debug("Output directory base will be " + outputDirectory.getAbsolutePath());
+		log.info("ANTLR 4: Processing source directory " + sourceDirectory.getAbsolutePath());
 		try {
 			// Create an instance of the ANTLR 4 build tool
 			tool = new CustomTool(args.toArray(new String[args.size()]));
@@ -327,21 +321,15 @@ public class Antlr4Mojo extends AbstractMojo {
         Set<File> grammarFiles = scan.getIncludedSources(sourceDirectory, null);
 
         if (grammarFiles.isEmpty()) {
-            if (getLog().isInfoEnabled()) {
-                getLog().info("No grammars to process");
-            }
+            getLog().info("No grammars to process");
         } else {
             // Iterate each grammar file we were given and add it into the tool's list of
             // grammars to process.
             for (File grammarFile : grammarFiles) {
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug("Grammar file '" + grammarFile.getPath() + "' detected.");
-                }
+                getLog().debug("Grammar file '" + grammarFile.getPath() + "' detected.");
 
                 String relPath = findSourceSubdir(sourceDirectory, grammarFile.getPath()) + grammarFile.getName();
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug("  ... relative path is: " + relPath);
-                }
+                getLog().debug("  ... relative path is: " + relPath);
 
 				args.add(relPath);
             }
