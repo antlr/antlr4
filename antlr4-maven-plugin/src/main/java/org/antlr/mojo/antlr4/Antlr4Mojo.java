@@ -31,6 +31,8 @@ package org.antlr.mojo.antlr4;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.runtime.misc.MultiMap;
+import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.tool.Grammar;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -55,9 +57,11 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -237,10 +241,10 @@ public class Antlr4Mojo extends AbstractMojo {
 		// Now pick up all the files and process them with the Tool
 		//
 
-		List<String> args = getCommandArguments();
-
+		List<List<String>> argumentSets;
         try {
-            processGrammarFiles(args, sourceDirectory, outputDirectory);
+			List<String> args = getCommandArguments();
+            argumentSets = processGrammarFiles(args, sourceDirectory, outputDirectory);
         } catch (InclusionScanException ie) {
             log.error(ie);
             throw new MojoExecutionException("Fatal error occured while evaluating the names of the grammar files to analyze", ie);
@@ -248,24 +252,26 @@ public class Antlr4Mojo extends AbstractMojo {
 
 		log.debug("Output directory base will be " + outputDirectory.getAbsolutePath());
 		log.info("ANTLR 4: Processing source directory " + sourceDirectory.getAbsolutePath());
-		try {
-			// Create an instance of the ANTLR 4 build tool
-			tool = new CustomTool(args.toArray(new String[args.size()]));
-        } catch (Exception e) {
-            log.error("The attempt to create the ANTLR 4 build tool failed, see exception report for details", e);
-            throw new MojoFailureException("Error creating an instanceof the ANTLR tool.", e);
-        }
+		for (List<String> args : argumentSets) {
+			try {
+				// Create an instance of the ANTLR 4 build tool
+				tool = new CustomTool(args.toArray(new String[args.size()]));
+			} catch (Exception e) {
+				log.error("The attempt to create the ANTLR 4 build tool failed, see exception report for details", e);
+				throw new MojoFailureException("Error creating an instanceof the ANTLR tool.", e);
+			}
 
-		// Set working directory for ANTLR to be the base source directory
-		tool.inputDirectory = sourceDirectory;
+			// Set working directory for ANTLR to be the base source directory
+			tool.inputDirectory = sourceDirectory;
 
-		tool.processGrammarsOnCommandLine();
+			tool.processGrammarsOnCommandLine();
 
-        // If any of the grammar files caused errors but did nto throw exceptions
-        // then we should have accumulated errors in the counts
-        if (tool.getNumErrors() > 0) {
-            throw new MojoExecutionException("ANTLR 4 caught " + tool.getNumErrors() + " build errors.");
-        }
+			// If any of the grammar files caused errors but did nto throw exceptions
+			// then we should have accumulated errors in the counts
+			if (tool.getNumErrors() > 0) {
+				throw new MojoExecutionException("ANTLR 4 caught " + tool.getNumErrors() + " build errors.");
+			}
+		}
 
         if (project != null) {
             // Tell Maven that there are some new source files underneath the output directory.
@@ -324,7 +330,7 @@ public class Antlr4Mojo extends AbstractMojo {
      * @param outputDirectory
      * @throws org.codehaus.plexus.compiler.util.scan.InclusionScanException
      */
-    private void processGrammarFiles(List<String> args, File sourceDirectory, File outputDirectory)
+    private List<List<String>> processGrammarFiles(List<String> args, File sourceDirectory, File outputDirectory)
         throws InclusionScanException {
         // Which files under the source set should we be looking for as grammar files
         SourceMapping mapping = new SuffixMapping("g4", Collections.<String>emptySet());
@@ -343,19 +349,52 @@ public class Antlr4Mojo extends AbstractMojo {
 
         if (grammarFiles.isEmpty()) {
             getLog().info("No grammars to process");
-        } else {
-            // Iterate each grammar file we were given and add it into the tool's list of
-            // grammars to process.
-            for (File grammarFile : grammarFiles) {
-                getLog().debug("Grammar file '" + grammarFile.getPath() + "' detected.");
+			return Collections.emptyList();
+		}
 
-                String relPath = findSourceSubdir(sourceDirectory, grammarFile.getPath()) + grammarFile.getName();
-                getLog().debug("  ... relative path is: " + relPath);
+		MultiMap<String, File> grammarFileByFolder = new MultiMap<String, File>();
+		// Iterate each grammar file we were given and add it into the tool's list of
+		// grammars to process.
+		for (File grammarFile : grammarFiles) {
+			getLog().debug("Grammar file '" + grammarFile.getPath() + "' detected.");
 
-				args.add(relPath);
-            }
-        }
-    }
+			String relPathBase = findSourceSubdir(sourceDirectory, grammarFile.getPath());
+			String relPath = relPathBase + grammarFile.getName();
+			getLog().debug("  ... relative path is: " + relPath);
+
+			grammarFileByFolder.map(relPathBase, grammarFile);
+		}
+
+		List<List<String>> result = new ArrayList<List<String>>();
+		for (Map.Entry<String, List<File>> entry : grammarFileByFolder.entrySet()) {
+			List<String> folderArgs = new ArrayList<String>(args);
+			if (!folderArgs.contains("-package")) {
+				folderArgs.add("-package");
+				folderArgs.add(getPackageName(entry.getKey()));
+			}
+
+			for (File file : entry.getValue()) {
+				folderArgs.add(entry.getKey() + file.getName());
+			}
+
+			result.add(folderArgs);
+		}
+
+		return result;
+	}
+
+	private static String getPackageName(String relativeFolderPath) {
+		if (relativeFolderPath.contains("..")) {
+			throw new UnsupportedOperationException("Cannot handle relative paths containing '..'");
+		}
+
+		List<String> parts = new ArrayList<String>(Arrays.asList(relativeFolderPath.split("[/\\\\\\.]+")));
+		while (parts.remove("")) {
+			// intentionally blank
+		}
+
+		return Utils.join(parts.iterator(), ".");
+	}
 
     public Set<String> getIncludesPatterns() {
         if (includes == null || includes.isEmpty()) {
