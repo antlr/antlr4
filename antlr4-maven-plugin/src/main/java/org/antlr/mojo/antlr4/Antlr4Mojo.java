@@ -498,7 +498,7 @@ public class Antlr4Mojo extends AbstractMojo {
 			}
 
 			URI relativePath = project.getBasedir().toURI().relativize(outputFile.toURI());
-			getLog().info("  Writing file: " + relativePath);
+			getLog().debug("  Writing file: " + relativePath);
 			FileWriter fw = new FileWriter(outputFile);
 			return new BufferedWriter(fw);
 		}
