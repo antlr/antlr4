@@ -211,6 +211,11 @@ public class Antlr4Mojo extends AbstractMojo {
             //
         }
 
+		if (!sourceDirectory.exists()) {
+			log.info("No ANTLR 4 grammars to compile in " + sourceDirectory.getAbsolutePath());
+			return;
+		}
+
         // Ensure that the output directory path is all in tact so that
         // ANTLR can just write into it.
         //
@@ -245,17 +250,9 @@ public class Antlr4Mojo extends AbstractMojo {
 			// Set working directory for ANTLR to be the base source directory
 			tool.inputDirectory = sourceDirectory;
 
-			if (!sourceDirectory.exists()) {
-				if (log.isInfoEnabled()) {
-					log.info("No ANTLR 4 grammars to compile in " + sourceDirectory.getAbsolutePath());
-				}
-				return;
-			} else {
-				if (log.isInfoEnabled()) {
-					log.info("ANTLR 4: Processing source directory " + sourceDirectory.getAbsolutePath());
-				}
+			if (log.isInfoEnabled()) {
+				log.info("ANTLR 4: Processing source directory " + sourceDirectory.getAbsolutePath());
 			}
-
         } catch (Exception e) {
             log.error("The attempt to create the ANTLR 4 build tool failed, see exception report for details", e);
             throw new MojoFailureException("Jim failed you!");
