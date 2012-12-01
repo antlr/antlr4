@@ -141,15 +141,13 @@ public class Antlr4Mojo extends AbstractMojo {
     protected MavenProject project;
 
     /**
-     * Specifies the Antlr directory containing grammar files.
+     * Specifies the ANTLR directory containing grammar files.
      */
 	@Parameter(defaultValue = "${basedir}/src/main/antlr4", required = true)
     private File sourceDirectory;
 
     /**
-     * Location for generated Java files. For antlr version 4.x we default
-     * this to a directory in the tree called antlr4 because the antlr
-     * directory is occupied by version 2.x grammars.
+     * Specify output directory where the Java files are generated.
      */
 	@Parameter(defaultValue = "${project.build.directory}/generated-sources/antlr4", required = true)
     private File outputDirectory;
