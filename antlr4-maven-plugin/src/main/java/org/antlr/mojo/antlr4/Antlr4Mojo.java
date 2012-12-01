@@ -32,6 +32,7 @@ package org.antlr.mojo.antlr4;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.runtime.misc.MultiMap;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.tool.Grammar;
 import org.apache.maven.plugin.AbstractMojo;
@@ -244,7 +245,7 @@ public class Antlr4Mojo extends AbstractMojo {
 		List<List<String>> argumentSets;
         try {
 			List<String> args = getCommandArguments();
-            argumentSets = processGrammarFiles(args, sourceDirectory, outputDirectory);
+            argumentSets = processGrammarFiles(args, sourceDirectory);
         } catch (InclusionScanException ie) {
             log.error(ie);
             throw new MojoExecutionException("Fatal error occured while evaluating the names of the grammar files to analyze", ie);
@@ -327,11 +328,10 @@ public class Antlr4Mojo extends AbstractMojo {
     /**
      *
      * @param sourceDirectory
-     * @param outputDirectory
      * @throws org.codehaus.plexus.compiler.util.scan.InclusionScanException
      */
-    private List<List<String>> processGrammarFiles(List<String> args, File sourceDirectory, File outputDirectory)
-        throws InclusionScanException {
+    @NotNull
+    private List<List<String>> processGrammarFiles(List<String> args, File sourceDirectory) throws InclusionScanException {
         // Which files under the source set should we be looking for as grammar files
         SourceMapping mapping = new SuffixMapping("g4", Collections.<String>emptySet());
 
