@@ -211,7 +211,7 @@ public class Antlr4Mojo extends AbstractMojo {
             //
         }
 
-		if (!sourceDirectory.exists()) {
+		if (!sourceDirectory.isDirectory()) {
 			log.info("No ANTLR 4 grammars to compile in " + sourceDirectory.getAbsolutePath());
 			return;
 		}
@@ -273,7 +273,7 @@ public class Antlr4Mojo extends AbstractMojo {
 		}
 
 		// Where do we want ANTLR to look for .tokens and import grammars?
-		if (getLibDirectory() != null && getLibDirectory().exists()) {
+		if (getLibDirectory() != null && getLibDirectory().isDirectory()) {
 			args.add("-lib");
 			args.add(libDirectory.getAbsolutePath());
 		}
