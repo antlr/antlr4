@@ -134,6 +134,12 @@ public class Antlr4Mojo extends AbstractMojo {
 	@Parameter
 	protected Map<String, String> options;
 
+	/**
+	 * A list of additional command line arguments to pass to the ANTLR tool.
+	 */
+	@Parameter
+	protected List<String> arguments;
+
     /* --------------------------------------------------------------------
      * The following are Maven specific parameters, rather than specificlly
      * options that the ANTLR tool can use.
@@ -355,6 +361,10 @@ public class Antlr4Mojo extends AbstractMojo {
 			for (Map.Entry<String, String> option : options.entrySet()) {
 				args.add(String.format("-D%s=%s", option.getKey(), option.getValue()));
 			}
+		}
+
+		if (arguments != null) {
+			args.addAll(arguments);
 		}
 
 		return args;
