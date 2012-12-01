@@ -1,5 +1,11 @@
 ANTLR v4 Honey Badger
 
+December 1, 2012
+
+* escape [\n\r\t] in lexical error messages; e.g,:
+  line 2:3 token recognition error at: '\t'
+  line 2:4 token recognition error at: '\n'
+
 November 26, 2012
 
 * Don't generate action methods for lexer rules not containing an action

@@ -376,14 +376,22 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	}
 
 	public void notifyListeners(LexerNoViableAltException e) {
-		String msg = "token recognition error at: '"+
-			_input.getText(Interval.of(_tokenStartCharIndex, _input.index()))+"'";
+		String text = _input.getText(Interval.of(_tokenStartCharIndex, _input.index()));
+		String msg = "token recognition error at: '"+ getErrorDisplay(text) + "'";
 
 		ANTLRErrorListener listener = getErrorListenerDispatch();
 		listener.syntaxError(this, null, _tokenStartLine, _tokenStartCharPositionInLine, msg, e);
 	}
 
-	public String getCharErrorDisplay(int c) {
+	public String getErrorDisplay(String s) {
+		StringBuilder buf = new StringBuilder();
+		for (char c : s.toCharArray()) {
+			buf.append(getErrorDisplay(c));
+		}
+		return buf.toString();
+	}
+
+	public String getErrorDisplay(int c) {
 		String s = String.valueOf((char)c);
 		switch ( c ) {
 			case Token.EOF :
@@ -399,6 +407,11 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 				s = "\\r";
 				break;
 		}
+		return s;
+	}
+
+	public String getCharErrorDisplay(int c) {
+		String s = getErrorDisplay(c);
 		return "'"+s+"'";
 	}
 
