@@ -86,6 +86,18 @@ public class Antlr4Mojo extends AbstractMojo {
     protected boolean atn;
 
 	/**
+	 * generate parse tree listener (default)
+	 */
+	@Parameter(defaultValue = "true")
+	protected boolean listener;
+
+	/**
+	 * generate parse tree visitor
+	 */
+	@Parameter(defaultValue = "false")
+	protected boolean visitor;
+
+	/**
 	 * add config set to DFA states
 	 */
 	@Parameter(defaultValue = "false")
@@ -282,9 +294,25 @@ public class Antlr4Mojo extends AbstractMojo {
 		if (atn) {
 			args.add("-atn");
 		}
+
+		if (listener) {
+			args.add("-listener");
+		}
+		else {
+			args.add("-no-listener");
+		}
+
+		if (visitor) {
+			args.add("-visitor");
+		}
+		else {
+			args.add("-no-visitor");
+		}
+
 		if (verbose_dfa) {
 			args.add("-Xverbose-dfa");
 		}
+
 		if (force_atn) {
 			args.add("-Xforce-atn");
 		}
