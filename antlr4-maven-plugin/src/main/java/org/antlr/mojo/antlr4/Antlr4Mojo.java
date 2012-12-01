@@ -107,7 +107,7 @@ public class Antlr4Mojo extends AbstractMojo {
 	 * use the ATN simulator for all predictions
 	 */
 	@Parameter(defaultValue = "false")
-	protected boolean force_atn;
+	protected boolean forceATN;
 
     /* --------------------------------------------------------------------
      * The following are Maven specific parameters, rather than specificlly
@@ -313,7 +313,7 @@ public class Antlr4Mojo extends AbstractMojo {
 			args.add("-Xverbose-dfa");
 		}
 
-		if (force_atn) {
+		if (forceATN) {
 			args.add("-Xforce-atn");
 		}
 
