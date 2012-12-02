@@ -29,6 +29,8 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Pair;
 
 import java.io.Serializable;
 
@@ -37,8 +39,7 @@ public class CommonToken implements WritableToken, Serializable {
 	protected int line;
 	protected int charPositionInLine = -1; // set to invalid position
 	protected int channel=DEFAULT_CHANNEL;
-	protected TokenSource source;
-	// TODO: rm protected transient CharStream input;
+	protected Pair<TokenSource, CharStream> source;
 
 	/** We need to be able to change the text once in a while.  If
 	 *  this is non-null, then getText should return this.  Note that
@@ -60,15 +61,15 @@ public class CommonToken implements WritableToken, Serializable {
 		this.type = type;
 	}
 
-	public CommonToken(TokenSource source, int type, int channel, int start, int stop) {
+	public CommonToken(@NotNull Pair<TokenSource, CharStream> source, int type, int channel, int start, int stop) {
 		this.source = source;
 		this.type = type;
 		this.channel = channel;
 		this.start = start;
 		this.stop = stop;
-		if (source != null) {
-			this.line = source.getLine();
-			this.charPositionInLine = source.getCharPositionInLine();
+		if (source.a != null) {
+			this.line = source.a.getLine();
+			this.charPositionInLine = source.a.getCharPositionInLine();
 		}
 	}
 
@@ -85,9 +86,15 @@ public class CommonToken implements WritableToken, Serializable {
 		index = oldToken.getTokenIndex();
 		charPositionInLine = oldToken.getCharPositionInLine();
 		channel = oldToken.getChannel();
-        source = oldToken.getTokenSource();
 		start = oldToken.getStartIndex();
 		stop = oldToken.getStopIndex();
+
+		if (oldToken instanceof CommonToken) {
+			source = ((CommonToken)oldToken).source;
+		}
+		else {
+			source = new Pair<TokenSource, CharStream>(oldToken.getTokenSource(), oldToken.getInputStream());
+		}
 	}
 
 	@Override
@@ -105,9 +112,8 @@ public class CommonToken implements WritableToken, Serializable {
 		if ( text!=null ) {
 			return text;
 		}
-		TokenSource tokens = getTokenSource();
-		if ( tokens==null ) return null;
-		CharStream input = tokens.getInputStream();
+
+		CharStream input = getInputStream();
 		if ( input==null ) return null;
 		int n = input.size();
 		if ( start<n && stop<n) {
@@ -188,11 +194,12 @@ public class CommonToken implements WritableToken, Serializable {
 
 	@Override
 	public TokenSource getTokenSource() {
-		return source;
+		return source.a;
 	}
 
+	@Override
 	public CharStream getInputStream() {
-		return source != null ? source.getInputStream() : null;
+		return source.b;
 	}
 
 	@Override

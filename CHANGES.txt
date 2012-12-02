@@ -14,6 +14,8 @@ December 1, 2012
 * label+='foo' wasn't generating good code. It was generating token type as
   variable name. Now, I gen "s<ttype>" for implicit labels on string literals.
 
+* tokens now have token and char source to draw from.
+
 November 30, 2012
 
 * Maven updates (cleanup, unification, and specify Java 6 bootstrap classpath)

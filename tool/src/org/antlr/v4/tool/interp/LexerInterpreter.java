@@ -40,12 +40,14 @@ import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.LexerGrammar;
 
 public class LexerInterpreter implements TokenSource {
 	protected LexerGrammar g;
 	protected LexerATNSimulator interp;
 	protected CharStream input;
+	protected Pair<TokenSource, CharStream> tokenFactorySourcePair;
 
 	/** How to create token objects */
 	protected TokenFactory<?> _factory = CommonTokenFactory.DEFAULT;
@@ -66,11 +68,12 @@ public class LexerInterpreter implements TokenSource {
 	}
 
 	public void setInput(String inputString) {
-		input = new ANTLRInputStream(inputString);
+		setInput(new ANTLRInputStream(inputString));
 	}
 
 	public void setInput(CharStream input) {
 		this.input = input;
+		this.tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, input);
 	}
 
 	@Override
@@ -112,7 +115,7 @@ public class LexerInterpreter implements TokenSource {
 			int ttype = interp.match(input, Lexer.DEFAULT_MODE);
 			int stop = input.index()-1;
 
-			return _factory.create(this, ttype, null, Token.DEFAULT_CHANNEL, start, stop,
+			return _factory.create(tokenFactorySourcePair, ttype, null, Token.DEFAULT_CHANNEL, start, stop,
 								   tokenStartLine, tokenStartCharPositionInLine);
 		}
 		finally {

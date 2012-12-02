@@ -31,6 +31,7 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.misc.IntegerStack;
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.ArrayList;
 import java.util.EmptyStackException;
@@ -54,6 +55,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	public static final int MAX_CHAR_VALUE = '\uFFFE';
 
 	public CharStream _input;
+	protected Pair<TokenSource, CharStream> _tokenFactorySourcePair;
 
 	/** How to create token objects */
 	protected TokenFactory<?> _factory = CommonTokenFactory.DEFAULT;
@@ -103,6 +105,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 
 	public Lexer(CharStream input) {
 		this._input = input;
+		this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, input);
 	}
 
 	public void reset() {
@@ -228,8 +231,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	@Override
 	public void setInputStream(IntStream input) {
 		this._input = null;
+		this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, _input);
 		reset();
 		this._input = (CharStream)input;
+		this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, _input);
 	}
 
 	@Override
@@ -259,7 +264,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 *  custom Token objects or provide a new factory.
 	 */
 	public Token emit() {
-		Token t = _factory.create(this, _type, _text, _channel, _tokenStartCharIndex, getCharIndex()-1,
+		Token t = _factory.create(_tokenFactorySourcePair, _type, _text, _channel, _tokenStartCharIndex, getCharIndex()-1,
 								  _tokenStartLine, _tokenStartCharPositionInLine);
 		emit(t);
 		return t;
@@ -273,7 +278,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 			int n = _token.getStopIndex() - _token.getStartIndex() + 1;
 			cpos = _token.getCharPositionInLine()+n;
 		}
-		Token eof = _factory.create(this, Token.EOF, null, Token.DEFAULT_CHANNEL, _input.index(), _input.index()-1,
+		Token eof = _factory.create(_tokenFactorySourcePair, Token.EOF, null, Token.DEFAULT_CHANNEL, _input.index(), _input.index()-1,
 									getLine(), cpos);
 		emit(eof);
 		return eof;

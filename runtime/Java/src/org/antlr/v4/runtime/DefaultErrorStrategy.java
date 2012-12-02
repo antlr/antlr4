@@ -39,6 +39,7 @@ import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.atn.StarLoopbackState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Pair;
 
 /** This is the default error handling mechanism for ANTLR parsers
  *  and tree parsers.
@@ -380,7 +381,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 			current = lookback;
 		}
 		return
-			_factory.create(current.getTokenSource(), expectedTokenType, tokenText,
+			_factory.create(new Pair<TokenSource, CharStream>(current.getTokenSource(), current.getTokenSource().getInputStream()), expectedTokenType, tokenText,
 							Token.DEFAULT_CHANNEL,
 							-1, -1,
 							current.getLine(), current.getCharPositionInLine());

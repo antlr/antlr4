@@ -97,8 +97,12 @@ public interface Token {
 	 */
 	int getStopIndex();
 
-	/** Where does this token come from? You can get the
-	 *  character input stream from the token source.
+	/** Gets the {@link TokenSource} which created this token.
 	 */
 	TokenSource getTokenSource();
+
+	/**
+	 * Gets the {@link CharStream} from which this token was derived.
+	 */
+	CharStream getInputStream();
 }

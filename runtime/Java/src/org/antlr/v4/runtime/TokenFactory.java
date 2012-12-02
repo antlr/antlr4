@@ -29,6 +29,8 @@
 
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.Pair;
+
 /** The default mechanism for creating tokens. It's used by default in Lexer and
  *  the error handling strategy (to create missing tokens).  Notifying the parser
  *  of a new factory means that it notifies it's token source and error strategy.
@@ -38,7 +40,7 @@ public interface TokenFactory<Symbol extends Token> {
 	 *  error handling strategy. If text!=null, than the start and stop positions
 	 *  are wiped to -1 in the text override is set in the CommonToken.
 	 */
-	Symbol create(TokenSource source, int type, String text,
+	Symbol create(Pair<TokenSource, CharStream> source, int type, String text,
 				  int channel, int start, int stop,
 				  int line, int charPositionInLine);
 
