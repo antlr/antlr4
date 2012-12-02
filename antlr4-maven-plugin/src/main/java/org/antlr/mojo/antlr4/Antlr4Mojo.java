@@ -115,12 +115,6 @@ public class Antlr4Mojo extends AbstractMojo {
 	protected boolean treatWarningsAsErrors;
 
 	/**
-	 * add config set to DFA states
-	 */
-	@Parameter(defaultValue = "false")
-	protected boolean verbose_dfa;
-
-	/**
 	 * use the ATN simulator for all predictions
 	 */
 	@Parameter(property = "antlr4.forceATN", defaultValue = "false")
@@ -347,10 +341,6 @@ public class Antlr4Mojo extends AbstractMojo {
 
 		if (treatWarningsAsErrors) {
 			args.add("-Werror");
-		}
-
-		if (verbose_dfa) {
-			args.add("-Xverbose-dfa");
 		}
 
 		if (forceATN) {
