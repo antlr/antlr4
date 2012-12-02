@@ -121,7 +121,6 @@ public class Tool {
 	public boolean generate_ATN_dot = false;
 	public String grammarEncoding = null; // use default locale's encoding
 	public String msgFormat = "antlr";
-	public boolean saveLexer = false;
 	public boolean launch_ST_inspector = false;
     public boolean force_atn = false;
     public boolean log = false;
@@ -147,7 +146,6 @@ public class Tool {
 		new Option("gen_dependencies",	"-depend", "generate file dependencies"),
 		new Option("",					"-D<option>=value", "set/override a grammar-level option"),
 		new Option("warnings_are_errors", "-Werror", "treat warnings as errors"),
-		new Option("saveLexer",			"-Xsave-lexer", "save temp lexer file created for combined grammars"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
         new Option("force_atn",			"-Xforce-atn", "use the ATN simulator for all predictions"),
 		new Option("log",   			"-Xlog", "dump lots of logging info to antlr-timestamp.log"),

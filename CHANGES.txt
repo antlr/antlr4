@@ -16,6 +16,8 @@ December 1, 2012
 
 * tokens now have token and char source to draw from.
 
+* remove -Xsave-lexer option; log file as implicit lexer AST.
+
 November 30, 2012
 
 * Maven updates (cleanup, unification, and specify Java 6 bootstrap classpath)
