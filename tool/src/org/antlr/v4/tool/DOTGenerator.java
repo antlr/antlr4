@@ -141,7 +141,7 @@ public class DOTGenerator {
 		if ( s.requiresFullContext) {
 			buf.append("^");
 		}
-		if ( grammar!=null && grammar.tool.verbose_dfa ) {
+		if ( grammar!=null ) {
 			Set<Integer> alts = s.getAltSet();
 			if ( alts!=null ) {
 				buf.append("\\n");

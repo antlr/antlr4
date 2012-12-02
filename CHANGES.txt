@@ -1,5 +1,9 @@
 ANTLR v4 Honey Badger
 
+December 2, 2012
+
+* Remove -Xverbose-dfa option
+
 December 1, 2012
 
 * escape [\n\r\t] in lexical error messages; e.g,:

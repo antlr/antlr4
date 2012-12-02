@@ -124,7 +124,6 @@ public class Tool {
 	public boolean launch_ST_inspector = false;
     public boolean force_atn = false;
     public boolean log = false;
-	public boolean verbose_dfa = false;
 	public boolean gen_listener = true;
 	public boolean gen_visitor = false;
 	public boolean gen_dependencies = false;
@@ -149,7 +148,6 @@ public class Tool {
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
         new Option("force_atn",			"-Xforce-atn", "use the ATN simulator for all predictions"),
 		new Option("log",   			"-Xlog", "dump lots of logging info to antlr-timestamp.log"),
-		new Option("verbose_dfa",   	"-Xverbose-dfa", "add config set to DFA states"),
 	};
 
 	// helper vars for option management
