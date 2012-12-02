@@ -403,7 +403,7 @@ public class Antlr4Mojo extends AbstractMojo {
 		List<List<String>> result = new ArrayList<List<String>>();
 		for (Map.Entry<String, List<File>> entry : grammarFileByFolder.entrySet()) {
 			List<String> folderArgs = new ArrayList<String>(args);
-			if (!folderArgs.contains("-package")) {
+			if (!folderArgs.contains("-package") && !entry.getKey().isEmpty()) {
 				folderArgs.add("-package");
 				folderArgs.add(getPackageName(entry.getKey()));
 			}
@@ -457,6 +457,9 @@ public class Antlr4Mojo extends AbstractMojo {
         }
 
         File unprefixedGrammarFileName = new File(grammarFileName.substring(srcPath.length()));
+		if (unprefixedGrammarFileName.getParent() == null) {
+			return "";
+		}
 
         return unprefixedGrammarFileName.getParent() + File.separator;
     }
