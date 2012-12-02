@@ -328,14 +328,14 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 	public void defineImplicitLabel(GrammarAST ast, LabeledOp op) {
 		Decl d;
-		Rule r = g.getRule(ast.getText());
 		if ( ast.getType()==ANTLRParser.SET || ast.getType()==ANTLRParser.WILDCARD ) {
 			String implLabel =
 				gen.target.getImplicitSetLabel(String.valueOf(ast.token.getTokenIndex()));
 			d = getTokenLabelDecl(implLabel);
 			((TokenDecl)d).isImplicit = true;
 		}
-		else if ( r!=null ) {
+		else if ( ast.getType()==ANTLRParser.RULE_REF ) { // a rule reference?
+			Rule r = g.getRule(ast.getText());
 			String implLabel = gen.target.getImplicitRuleLabel(ast.getText());
 			String ctxName =
 				gen.target.getRuleFunctionContextStructName(r);
