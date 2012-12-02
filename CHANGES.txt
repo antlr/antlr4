@@ -3,6 +3,8 @@ ANTLR v4 Honey Badger
 December 2, 2012
 
 * Remove -Xverbose-dfa option
+* Create the ParseTreeVisitor interface for all visitors, rename previous base
+  visitor class to AbstractParseTreeVisitor
 
 December 1, 2012
 
