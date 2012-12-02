@@ -37,14 +37,14 @@ public class TestParserExec extends BaseTest {
 	@Test public void testLabels() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : b1=b b2+=b*;\n" +
+			"a : b1=b b2+=b* b3+=';' ;\n" +
 			"b : id=ID val+=INT*;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
-								  "abc 34", false);
+								  "abc 34;", false);
 		assertEquals("", found);
 		assertEquals(null, stderrDuringParse);
 	}

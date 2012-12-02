@@ -11,6 +11,9 @@ December 1, 2012
   some tests in TestSets appeared to allow ~('a'|B) but it was randomly working.
   ('a'|B) works, though doesn't collapse to a set.
 
+* label+='foo' wasn't generating good code. It was generating token type as
+  variable name. Now, I gen "s<ttype>" for implicit labels on string literals.
+
 November 30, 2012
 
 * Maven updates (cleanup, unification, and specify Java 6 bootstrap classpath)

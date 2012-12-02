@@ -370,10 +370,14 @@ public class Target {
 		return Utils.capitalize(r.name)+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
 	}
 
-	// should be same for all refs to same token like $ID within single rule function
+	// should be same for all refs to same token like ctx.ID within single rule function
+	// for literals like 'while', we gen _s<ttype>
 	public String getImplicitTokenLabel(String tokenName) {
 		ST st = gen.templates.getInstanceOf("ImplicitTokenLabel");
 		int ttype = gen.g.getTokenType(tokenName);
+		if ( tokenName.startsWith("'") ) {
+			return "s"+ttype;
+		}
 		String text = getTokenTypeAsTargetLabel(gen.g, ttype);
 		st.add("tokenName", text);
 		return st.render();
