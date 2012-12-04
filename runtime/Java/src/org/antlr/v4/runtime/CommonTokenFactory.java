@@ -31,7 +31,7 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.misc.Tuple2;
 
 public class CommonTokenFactory implements TokenFactory<CommonToken> {
 	public static final TokenFactory<CommonToken> DEFAULT = new CommonTokenFactory();
@@ -50,7 +50,7 @@ public class CommonTokenFactory implements TokenFactory<CommonToken> {
 	public CommonTokenFactory() { this(false); }
 
 	@Override
-	public CommonToken create(Pair<TokenSource, CharStream> source, int type, String text,
+	public CommonToken create(Tuple2<? extends TokenSource<? super CommonToken>, CharStream> source, int type, String text,
 							  int channel, int start, int stop,
 							  int line, int charPositionInLine)
 	{
@@ -60,8 +60,8 @@ public class CommonTokenFactory implements TokenFactory<CommonToken> {
 		if ( text!=null ) {
 			t.setText(text);
 		}
-		else if ( copyText && source.b != null ) {
-			t.setText(source.b.getText(Interval.of(start,stop)));
+		else if ( copyText && source.getItem2() != null ) {
+			t.setText(source.getItem2().getText(Interval.of(start,stop)));
 		}
 
 		return t;

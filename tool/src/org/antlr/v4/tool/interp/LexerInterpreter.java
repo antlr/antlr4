@@ -39,14 +39,15 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenFactory;
 import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
-import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.misc.Tuple;
+import org.antlr.v4.runtime.misc.Tuple2;
 import org.antlr.v4.tool.LexerGrammar;
 
 public class LexerInterpreter implements TokenSource<Token> {
 	protected LexerGrammar g;
 	protected LexerATNSimulator interp;
 	protected CharStream input;
-	protected Pair<TokenSource, CharStream> tokenFactorySourcePair;
+	protected Tuple2<? extends TokenSource<? super Token>, CharStream> tokenFactorySourcePair;
 
 	/** How to create token objects */
 	protected TokenFactory<? extends Token> _factory = CommonTokenFactory.DEFAULT;
@@ -68,7 +69,7 @@ public class LexerInterpreter implements TokenSource<Token> {
 
 	public void setInput(CharStream input) {
 		this.input = input;
-		this.tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, input);
+		this.tokenFactorySourcePair = Tuple.create(this, input);
 	}
 
 	@Override

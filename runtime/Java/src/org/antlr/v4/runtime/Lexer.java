@@ -32,7 +32,8 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.misc.IntegerStack;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.misc.Tuple;
+import org.antlr.v4.runtime.misc.Tuple2;
 
 import java.util.ArrayList;
 import java.util.EmptyStackException;
@@ -56,7 +57,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	public static final int MAX_CHAR_VALUE = '\uFFFE';
 
 	public CharStream _input;
-	protected Pair<TokenSource, CharStream> _tokenFactorySourcePair;
+	protected Tuple2<? extends TokenSource<Token>, CharStream> _tokenFactorySourcePair;
 
 	/** How to create token objects */
 	protected TokenFactory<?> _factory = CommonTokenFactory.DEFAULT;
@@ -104,7 +105,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 
 	public Lexer(CharStream input) {
 		this._input = input;
-		this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, input);
+		this._tokenFactorySourcePair = Tuple.create(this, input);
 	}
 
 	public void reset() {
@@ -230,10 +231,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	/** Set the char stream and reset the lexer */
 	public void setInputStream(CharStream input) {
 		this._input = null;
-		this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, _input);
+		this._tokenFactorySourcePair = Tuple.create(this, _input);
 		reset();
 		this._input = input;
-		this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, _input);
+		this._tokenFactorySourcePair = Tuple.create(this, _input);
 	}
 
 	@Override

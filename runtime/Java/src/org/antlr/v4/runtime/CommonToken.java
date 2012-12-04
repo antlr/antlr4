@@ -31,7 +31,8 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.misc.Tuple;
+import org.antlr.v4.runtime.misc.Tuple2;
 
 import java.io.Serializable;
 
@@ -42,7 +43,7 @@ public class CommonToken implements WritableToken, Serializable {
 	protected int line;
 	protected int charPositionInLine = -1; // set to invalid position
 	protected int channel=DEFAULT_CHANNEL;
-	protected Pair<TokenSource, CharStream> source;
+	protected Tuple2<? extends TokenSource<?>, CharStream> source;
 
 	/** We need to be able to change the text once in a while.  If
 	 *  this is non-null, then getText should return this.  Note that
@@ -64,15 +65,15 @@ public class CommonToken implements WritableToken, Serializable {
 		this.type = type;
 	}
 
-	public CommonToken(@NotNull Pair<TokenSource, CharStream> source, int type, int channel, int start, int stop) {
+	public CommonToken(@NotNull Tuple2<? extends TokenSource<?>, CharStream> source, int type, int channel, int start, int stop) {
 		this.source = source;
 		this.type = type;
 		this.channel = channel;
 		this.start = start;
 		this.stop = stop;
-		if (source.a != null) {
-			this.line = source.a.getLine();
-			this.charPositionInLine = source.a.getCharPositionInLine();
+		if (source.getItem1() != null) {
+			this.line = source.getItem1().getLine();
+			this.charPositionInLine = source.getItem1().getCharPositionInLine();
 		}
 	}
 
@@ -96,7 +97,7 @@ public class CommonToken implements WritableToken, Serializable {
 			source = ((CommonToken)oldToken).source;
 		}
 		else {
-			source = new Pair<TokenSource, CharStream>(oldToken.getTokenSource(), oldToken.getInputStream());
+			source = Tuple.create(oldToken.getTokenSource(), oldToken.getInputStream());
 		}
 	}
 
@@ -197,12 +198,12 @@ public class CommonToken implements WritableToken, Serializable {
 
 	@Override
 	public TokenSource<?> getTokenSource() {
-		return source.a;
+		return source.getItem1();
 	}
 
 	@Override
 	public CharStream getInputStream() {
-		return source.b;
+		return source.getItem2();
 	}
 
 	@Override

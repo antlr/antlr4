@@ -42,6 +42,8 @@ import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Grammar;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /** Create output objects for elements *within* rule functions except
