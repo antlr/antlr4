@@ -1,18 +1,20 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2010 Terence Parr
+ *  Copyright (c) 2012 Terence Parr
+ *  Copyright (c) 2012 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
+ *
  *  1. Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
+ *     notice, this list of conditions and the following disclaimer.
  *  2. Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in the
- *      documentation and/or other materials provided with the distribution.
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
  *  3. The name of the author may not be used to endorse or promote products
- *      derived from this software without specific prior written permission.
+ *     derived from this software without specific prior written permission.
  *
  *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -227,48 +229,24 @@ public class TestSets extends BaseTest {
 	}
 
 	@Test public void testNotCharSetWithRuleRef() throws Exception {
-		String grammar =
+		// might be a useful feature to add someday
+		String[] pair = new String[] {
 			"grammar T;\n" +
 			"a : A {System.out.println($A.text);} ;\n" +
 			"A : ~('a'|B) ;\n" +
-			"B : 'b' ;\n";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-								  "a", "x", debug);
-		assertEquals("x\n", found);
-	}
-
-	@Test public void testNotCharSetWithRuleRef2() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"a : A {System.out.println($A.text);} ;\n" +
-			"A : ~('a'|B) ;\n" +
-			"B : 'b'|'c' ;\n";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-								  "a", "x", debug);
-		assertEquals("x\n", found);
+			"B : 'b' ;\n",
+			"error(134): T.g4:3:10: lexer set element B is invalid (either lexer rule ref or literal with > 1 char)\n"
+		};
+		super.testErrors(pair, true);
 	}
 
 	@Test public void testNotCharSetWithRuleRef3() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : A {System.out.println($A.text);} ;\n" +
-			"A : ('a'|B) ;\n" +
+			"A : ('a'|B) ;\n" +  // this doesn't collapse to set but works
 			"fragment\n" +
 			"B : ~('a'|'c') ;\n";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer",
-								  "a", "x", debug);
-		assertEquals("x\n", found);
-	}
-
-	@Test public void testNotCharSetWithRuleRef4() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"a : A {System.out.println($A.text);} ;\n" +
-			"A : ('a'|B) ;\n" +
-			"fragment\n" +
-			"B : ~('a'|C) ;\n" +
-			"fragment\n" +
-			"C : 'c'|'d' ;\n ";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "a", "x", debug);
 		assertEquals("x\n", found);

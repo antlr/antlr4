@@ -45,8 +45,8 @@ public class GenHierarchy {
 		// If this is a directory, walk each file/dir in that directory
 		if (f.isDirectory()) {
 			String flist[] = f.list();
-			for(int i=0; i < flist.length; i++) {
-				getFilenames_(new File(f, flist[i]), files);
+			for (String aFlist : flist) {
+				getFilenames_(new File(f, aFlist), files);
 			}
 		}
 

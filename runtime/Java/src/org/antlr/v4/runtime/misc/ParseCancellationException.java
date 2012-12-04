@@ -1,6 +1,6 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2011 Terence Parr
+ *  Copyright (c) 2012 Terence Parr
  *  Copyright (c) 2012 Sam Harwell
  *  All rights reserved.
  *

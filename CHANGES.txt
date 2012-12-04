@@ -1,5 +1,29 @@
 ANTLR v4 Honey Badger
 
+December 2, 2012
+
+* Remove -Xverbose-dfa option
+* Create the ParseTreeVisitor interface for all visitors, rename previous base
+  visitor class to AbstractParseTreeVisitor
+
+December 1, 2012
+
+* escape [\n\r\t] in lexical error messages; e.g,:
+  line 2:3 token recognition error at: '\t'
+  line 2:4 token recognition error at: '\n'
+
+* added error for bad sets in lexer; e.g.:
+  lexer set element A is invalid (either rule ref or literal with > 1 char)
+  some tests in TestSets appeared to allow ~('a'|B) but it was randomly working.
+  ('a'|B) works, though doesn't collapse to a set.
+
+* label+='foo' wasn't generating good code. It was generating token type as
+  variable name. Now, I gen "s<ttype>" for implicit labels on string literals.
+
+* tokens now have token and char source to draw from.
+
+* remove -Xsave-lexer option; log file as implicit lexer AST.
+
 November 30, 2012
 
 * Maven updates (cleanup, unification, and specify Java 6 bootstrap classpath)

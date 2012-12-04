@@ -1,30 +1,31 @@
 /*
- [The "BSD license"]
-  Copyright (c) 2011 Terence Parr
-  All rights reserved.
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions
-  are met:
-
-  1. Redistributions of source code must retain the above copyright
-     notice, this list of conditions and the following disclaimer.
-  2. Redistributions in binary form must reproduce the above copyright
-     notice, this list of conditions and the following disclaimer in the
-     documentation and/or other materials provided with the distribution.
-  3. The name of the author may not be used to endorse or promote products
-     derived from this software without specific prior written permission.
-
-  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * [The "BSD license"]
+ *  Copyright (c) 2012 Terence Parr
+ *  Copyright (c) 2012 Sam Harwell
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.antlr.v4;
@@ -118,19 +119,12 @@ public class Tool {
 	public File inputDirectory;
 	public String outputDirectory;
 	public String libDirectory;
-	public boolean report = false;
-	public boolean printGrammar = false;
-	public boolean debug = false;
-	public boolean profile = false;
-	public boolean trace = false;
 	public boolean generate_ATN_dot = false;
 	public String grammarEncoding = null; // use default locale's encoding
 	public String msgFormat = "antlr";
-	public boolean saveLexer = false;
 	public boolean launch_ST_inspector = false;
     public boolean force_atn = false;
     public boolean log = false;
-	public boolean verbose_dfa = false;
 	public boolean gen_listener = true;
 	public boolean gen_visitor = false;
 	public boolean gen_dependencies = false;
@@ -141,12 +135,6 @@ public class Tool {
     public static Option[] optionDefs = {
         new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
         new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
-/*
-        new Option("report",			"-report", "print out a report about the grammar(s) processed"),
-        new Option("printGrammar",		"-print", "print out the grammar without actions"),
-        new Option("debug",				"-debug", "generate a parser that emits debugging events"),
-        new Option("profile",			"-profile", "generate a parser that computes profiling information"),
-         */
         new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition network diagrams"),
 		new Option("grammarEncoding",	"-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
 		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages in antlr, gnu, vs2005"),
@@ -158,11 +146,9 @@ public class Tool {
 		new Option("gen_dependencies",	"-depend", "generate file dependencies"),
 		new Option("",					"-D<option>=value", "set/override a grammar-level option"),
 		new Option("warnings_are_errors", "-Werror", "treat warnings as errors"),
-		new Option("saveLexer",			"-Xsave-lexer", "save temp lexer file created for combined grammars"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
         new Option("force_atn",			"-Xforce-atn", "use the ATN simulator for all predictions"),
 		new Option("log",   			"-Xlog", "dump lots of logging info to antlr-timestamp.log"),
-		new Option("verbose_dfa",   	"-Xverbose-dfa", "add config set to DFA states"),
 	};
 
 	// helper vars for option management

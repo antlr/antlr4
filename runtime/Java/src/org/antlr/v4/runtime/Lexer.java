@@ -1,36 +1,38 @@
 /*
- [The "BSD license"]
-  Copyright (c) 2011 Terence Parr
-  All rights reserved.
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions
-  are met:
-
-  1. Redistributions of source code must retain the above copyright
-     notice, this list of conditions and the following disclaimer.
-  2. Redistributions in binary form must reproduce the above copyright
-     notice, this list of conditions and the following disclaimer in the
-     documentation and/or other materials provided with the distribution.
-  3. The name of the author may not be used to endorse or promote products
-     derived from this software without specific prior written permission.
-
-  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * [The "BSD license"]
+ *  Copyright (c) 2012 Terence Parr
+ *  Copyright (c) 2012 Sam Harwell
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.misc.IntegerStack;
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.ArrayList;
 import java.util.EmptyStackException;
@@ -54,6 +56,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	public static final int MAX_CHAR_VALUE = '\uFFFE';
 
 	public CharStream _input;
+	protected Pair<TokenSource, CharStream> _tokenFactorySourcePair;
 
 	/** How to create token objects */
 	protected TokenFactory<?> _factory = CommonTokenFactory.DEFAULT;
@@ -101,6 +104,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 
 	public Lexer(CharStream input) {
 		this._input = input;
+		this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, input);
 	}
 
 	public void reset() {
@@ -226,8 +230,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	/** Set the char stream and reset the lexer */
 	public void setInputStream(CharStream input) {
 		this._input = null;
+		this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, _input);
 		reset();
 		this._input = input;
+		this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, _input);
 	}
 
 	@Override
@@ -257,7 +263,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 *  custom Token objects or provide a new factory.
 	 */
 	public Token emit() {
-		Token t = _factory.create(this, _type, _text, _channel, _tokenStartCharIndex, getCharIndex()-1,
+		Token t = _factory.create(_tokenFactorySourcePair, _type, _text, _channel, _tokenStartCharIndex, getCharIndex()-1,
 								  _tokenStartLine, _tokenStartCharPositionInLine);
 		emit(t);
 		return t;
@@ -271,7 +277,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 			int n = _token.getStopIndex() - _token.getStartIndex() + 1;
 			cpos = _token.getCharPositionInLine()+n;
 		}
-		Token eof = _factory.create(this, Token.EOF, null, Token.DEFAULT_CHANNEL, _input.index(), _input.index()-1,
+		Token eof = _factory.create(_tokenFactorySourcePair, Token.EOF, null, Token.DEFAULT_CHANNEL, _input.index(), _input.index()-1,
 									getLine(), cpos);
 		emit(eof);
 		return eof;
@@ -374,14 +380,22 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	}
 
 	public void notifyListeners(LexerNoViableAltException e) {
-		String msg = "token recognition error at: '"+
-			_input.getText(Interval.of(_tokenStartCharIndex, _input.index()))+"'";
+		String text = _input.getText(Interval.of(_tokenStartCharIndex, _input.index()));
+		String msg = "token recognition error at: '"+ getErrorDisplay(text) + "'";
 
 		ANTLRErrorListener<? super Integer> listener = getErrorListenerDispatch();
 		listener.syntaxError(this, null, _tokenStartLine, _tokenStartCharPositionInLine, msg, e);
 	}
 
-	public String getCharErrorDisplay(int c) {
+	public String getErrorDisplay(String s) {
+		StringBuilder buf = new StringBuilder();
+		for (char c : s.toCharArray()) {
+			buf.append(getErrorDisplay(c));
+		}
+		return buf.toString();
+	}
+
+	public String getErrorDisplay(int c) {
 		String s = String.valueOf((char)c);
 		switch ( c ) {
 			case Token.EOF :
@@ -397,6 +411,11 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 				s = "\\r";
 				break;
 		}
+		return s;
+	}
+
+	public String getCharErrorDisplay(int c) {
+		String s = getErrorDisplay(c);
 		return "'"+s+"'";
 	}
 
