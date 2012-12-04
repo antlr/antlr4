@@ -56,8 +56,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java5.home>${env.JAVA5_HOME}</java5.home>
         <java6.home>${env.JAVA6_HOME}</java6.home>
-        <bootclasspath.compile>${java6.home}/jre/lib/rt.jar</bootclasspath.compile>
-        <bootclasspath.testCompile>${java6.home}/jre/lib/rt.jar</bootclasspath.testCompile>
+        <bootclasspath.compile>${java6.home}/lib/rt.jar</bootclasspath.compile>
+        <bootclasspath.testCompile>${java6.home}/lib/rt.jar</bootclasspath.testCompile>
     </properties>
 
     <issueManagement>
