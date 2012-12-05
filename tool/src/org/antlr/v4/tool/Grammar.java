@@ -90,6 +90,12 @@ public class Grammar implements AttributeResolver {
 	public static final Set<String> LexerBlockOptions = new HashSet<String>() {{
 	}};
 
+	/** Legal options for rule refs like id<key=value> */
+	public static final Set<String> ruleRefOptions = new HashSet<String>();
+	static {
+		// currently no rule ref options
+	}
+
 	/** Legal options for terminal refs like ID<assoc=right> */
 	public static final Set<String> tokenOptions = new HashSet<String>() {{
 		add("assoc");

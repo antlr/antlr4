@@ -95,7 +95,7 @@ public class LeftRecursiveRuleTransformer {
 		// update all refs to recursive rules to have [0] argument
 		for (GrammarAST r : ast.getNodesWithType(ANTLRParser.RULE_REF)) {
 			if ( r.getParent().getType()==ANTLRParser.RULE ) continue; // must be rule def
-			if ( r.getChildCount()>0 ) continue; // already has arg; must be in rewritten rule
+			if ( r.getFirstChildWithType(ANTLRParser.ARG_ACTION)!=null ) continue; // already has arg; must be in rewritten rule
 			if ( leftRecursiveRuleNames.contains(r.getText()) ) {
 				// found ref to recursive rule not already rewritten with arg
 				ActionAST arg = new ActionAST(new CommonToken(ANTLRParser.ARG_ACTION, "0"));
