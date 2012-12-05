@@ -70,6 +70,7 @@ import org.antlr.v4.semantics.UseDefAnalyzer;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
@@ -572,6 +573,7 @@ public class ParserATNFactory implements ATNFactory {
 			RuleStartState start = newState(RuleStartState.class, r.ast);
 			RuleStopState stop = newState(RuleStopState.class, r.ast);
 			start.stopState = stop;
+			start.isPrecedenceRule = r instanceof LeftRecursiveRule;
 			start.setRuleIndex(r.index);
 			stop.setRuleIndex(r.index);
 			atn.ruleToStartState[r.index] = start;
