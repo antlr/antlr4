@@ -214,6 +214,7 @@ public class ATNSerializer {
 						trg = ((RuleTransition)t).followState.stateNumber;
 						arg1 = ((RuleTransition)t).target.stateNumber;
 						arg2 = ((RuleTransition)t).ruleIndex;
+						arg3 = ((RuleTransition)t).precedence;
 						break;
 					case Transition.PRECEDENCE:
 						PrecedencePredicateTransition ppt = (PrecedencePredicateTransition)t;

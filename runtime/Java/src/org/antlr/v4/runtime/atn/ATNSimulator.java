@@ -43,7 +43,7 @@ import java.util.List;
 public abstract class ATNSimulator {
 	public static final int SERIALIZED_VERSION;
 	static {
-		SERIALIZED_VERSION = 2;
+		SERIALIZED_VERSION = 3;
 	}
 
 	/** Must distinguish between missing edge and edge we know leads nowhere */
@@ -365,7 +365,7 @@ public abstract class ATNSimulator {
 			case Transition.EPSILON : return new EpsilonTransition(target);
 			case Transition.RANGE : return new RangeTransition(target, arg1, arg2);
 			case Transition.RULE :
-				RuleTransition rt = new RuleTransition((RuleStartState)atn.states.get(arg1), arg2, target);
+				RuleTransition rt = new RuleTransition((RuleStartState)atn.states.get(arg1), arg2, arg3, target);
 				return rt;
 			case Transition.PREDICATE :
 				PredicateTransition pt = new PredicateTransition(target, arg1, arg2, arg3 != 0);
