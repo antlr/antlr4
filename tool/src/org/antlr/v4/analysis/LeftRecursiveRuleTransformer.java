@@ -43,6 +43,8 @@ import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.ScopeParser;
 import org.antlr.v4.parse.ToolANTLRParser;
 import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.semantics.BasicSemanticChecks;
+import org.antlr.v4.semantics.RuleCollector;
 import org.antlr.v4.tool.AttributeDict;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
@@ -140,6 +142,12 @@ public class LeftRecursiveRuleTransformer {
 		GrammarTransformPipeline transform = new GrammarTransformPipeline(g, g.tool);
 		transform.reduceBlocksToSets(r.ast);
 		transform.expandParameterizedLoops(r.ast);
+
+		// Rerun semantic checks on the new rule
+		RuleCollector ruleCollector = new RuleCollector(g);
+		ruleCollector.visit(t, "rule");
+		BasicSemanticChecks basics = new BasicSemanticChecks(g, ruleCollector);
+		basics.visit(t, "rule");
 
 		// track recursive alt info for codegen
 		r.recPrimaryAlts = new ArrayList<LeftRecursiveRuleAltInfo>();
