@@ -989,4 +989,5 @@ elementOption[GrammarASTWithOptions t]
     |   ^(ASSIGN id=ID v=ID)			{elementOption(t, $id, $v);}
     |   ^(ASSIGN ID v=STRING_LITERAL)	{elementOption(t, $ID, $v);}
     |   ^(ASSIGN ID v=ACTION)			{elementOption(t, $ID, $v);}
+    |   ^(ASSIGN ID v=INT)				{elementOption(t, $ID, $v);}
     ;

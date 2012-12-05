@@ -177,6 +177,8 @@ elementOption
     :	ID
     |   ^(ASSIGN ID ID)
     |   ^(ASSIGN ID STRING_LITERAL)
+    |   ^(ASSIGN ID ACTION)
+    |   ^(ASSIGN ID INT)
     ;
 
 element
