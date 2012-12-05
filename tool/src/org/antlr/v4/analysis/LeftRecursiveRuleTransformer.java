@@ -181,7 +181,7 @@ public class LeftRecursiveRuleTransformer {
 
 	public RuleAST parseArtificialRule(final Grammar g, String ruleText) {
 		ANTLRLexer lexer = new ANTLRLexer(new ANTLRStringStream(ruleText));
-		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
+		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(lexer.getCharStream());
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		lexer.tokens = tokens;
 		ToolANTLRParser p = new ToolANTLRParser(tokens, tool);
