@@ -472,6 +472,9 @@ public class LexerATNSimulator extends ATNSimulator {
 				c = new LexerATNConfig(config, t.target, newContext);
 				break;
 
+			case Transition.PRECEDENCE:
+				throw new UnsupportedOperationException("Precedence predicates are not supported in lexers.");
+
 			case Transition.PREDICATE:
 				/*  Track traversing semantic predicates. If we traverse,
 				 we cannot add a DFA state for this "reach" computation

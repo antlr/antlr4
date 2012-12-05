@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.IntegerStack;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -96,6 +97,12 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 
 	protected TokenStream _input;
 
+	protected final IntegerStack _precedenceStack;
+	{
+		_precedenceStack = new IntegerStack();
+		_precedenceStack.push(0);
+	}
+
 	/** The RuleContext object for the currently executing rule. This
 	 *  must be non-null during parsing, but is initially null.
 	 *  When somebody calls the start rule, this gets set to the
@@ -131,6 +138,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		_ctx = null;
 		_syntaxErrors = 0;
 		_tracer = null;
+		_precedenceStack.clear();
+		_precedenceStack.push(0);
 		ATNSimulator interpreter = getInterpreter();
 		if (interpreter != null) {
 			interpreter.reset();
@@ -450,7 +459,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		_ctx.altNum = altNum;
 	}
 
-	public void enterRecursionRule(ParserRuleContext localctx, int ruleIndex) {
+	public void enterRecursionRule(ParserRuleContext localctx, int ruleIndex, int precedence) {
+		_precedenceStack.push(precedence);
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
 		if (_parseListeners != null) {
@@ -477,6 +487,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
 	public void unrollRecursionContexts(ParserRuleContext _parentctx) {
+		_precedenceStack.pop();
 		_ctx.stop = _input.LT(-1);
 		ParserRuleContext retctx = _ctx; // save current ctx (return value)
 
@@ -506,6 +517,11 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 
 	public ParserRuleContext getContext() {
 		return _ctx;
+	}
+
+	@Override
+	public boolean precpred(RuleContext localctx, int precedence) {
+		return precedence >= _precedenceStack.peek();
 	}
 
 	public boolean inContext(String context) {

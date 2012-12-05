@@ -36,6 +36,7 @@ import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
 import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.v4.Tool;
+import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.misc.Utils;
@@ -93,7 +94,7 @@ public class Grammar implements AttributeResolver {
 	/** Legal options for rule refs like id<key=value> */
 	public static final Set<String> ruleRefOptions = new HashSet<String>();
 	static {
-		// currently no rule ref options
+		ruleRefOptions.add(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME);
 	}
 
 	/** Legal options for terminal refs like ID<assoc=right> */
@@ -105,6 +106,7 @@ public class Grammar implements AttributeResolver {
 	}};
 
 	public static final Set<String> semPredOptions = new HashSet<String>() {{
+		add(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME);
 		add("fail");
 	}};
 

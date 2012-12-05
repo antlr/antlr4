@@ -28,24 +28,16 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** How to generate rules derived from left-recursive rules.
- *  These rely on recRuleAltPredicate(),
- *  recRuleArg(), recRuleSetResultAction(), recRuleSetReturnAction()
- *  templates in main language.stg
+package org.antlr.v4.runtime.atn;
+
+/**
+ *
+ * @author Sam Harwell
  */
-group LeftRecursiveRules;
+public abstract class AbstractPredicateTransition extends Transition {
 
-recRule(ruleName, argName, primaryAlts, opAlts, setResultAction,
-        userRetvals, leftRecursiveRuleRefLabels) ::=
-<<
-<ruleName><if(userRetvals)> returns [<userRetvals>]<endif>
-    :   ( {} <primaryAlts:{alt | <alt.altText> }; separator="\n        | ">
-        )
-        ( <opAlts; separator="\n        | ">
-        )*
-    ;
->>
+	public AbstractPredicateTransition(ATNState target) {
+		super(target);
+	}
 
-recRuleAlt(alt, precOption, opPrec, pred) ::= <<
-{<pred>}?\<<precOption>=<opPrec>\> <alt.altText>
->>
+}

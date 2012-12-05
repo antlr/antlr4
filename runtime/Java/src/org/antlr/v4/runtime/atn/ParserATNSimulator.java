@@ -1210,6 +1210,9 @@ public class ParserATNSimulator extends ATNSimulator {
 		case Transition.RULE:
 			return ruleTransition(config, (RuleTransition)t);
 
+		case Transition.PRECEDENCE:
+			return precedenceTransition(config, (PrecedencePredicateTransition)t, collectPredicates, inContext, fullCtx);
+
 		case Transition.PREDICATE:
 			return predTransition(config, (PredicateTransition)t,
 								  collectPredicates,
@@ -1231,6 +1234,52 @@ public class ParserATNSimulator extends ATNSimulator {
 	public ATNConfig actionTransition(@NotNull ATNConfig config, @NotNull ActionTransition t) {
 		if ( debug ) System.out.println("ACTION edge "+t.ruleIndex+":"+t.actionIndex);
 		return new ATNConfig(config, t.target);
+	}
+
+	@Nullable
+	public ATNConfig precedenceTransition(@NotNull ATNConfig config,
+									@NotNull PrecedencePredicateTransition pt,
+									boolean collectPredicates,
+									boolean inContext,
+									boolean fullCtx)
+	{
+		if ( debug ) {
+			System.out.println("PRED (collectPredicates="+collectPredicates+") "+
+                    pt.precedence+">=_p"+
+					", ctx dependent=true");
+			if ( parser != null ) {
+                System.out.println("context surrounding pred is "+
+                                   parser.getRuleInvocationStack());
+            }
+		}
+
+        ATNConfig c = null;
+        if (collectPredicates && inContext) {
+			if ( fullCtx ) {
+				// In full context mode, we can evaluate predicates on-the-fly
+				// during closure, which dramatically reduces the size of
+				// the config sets. It also obviates the need to test predicates
+				// later during conflict resolution.
+				int currentPosition = _input.index();
+				_input.seek(_startIndex);
+				boolean predSucceeds = pt.getPredicate().eval(parser, _outerContext);
+				_input.seek(currentPosition);
+				if ( predSucceeds ) {
+					c = new ATNConfig(config, pt.target); // no pred context
+				}
+			}
+			else {
+				SemanticContext newSemCtx =
+					SemanticContext.and(config.semanticContext, pt.getPredicate());
+				c = new ATNConfig(config, pt.target, newSemCtx);
+			}
+        }
+		else {
+			c = new ATNConfig(config, pt.target);
+		}
+
+		if ( debug ) System.out.println("config from pred transition="+c);
+        return c;
 	}
 
 	@Nullable

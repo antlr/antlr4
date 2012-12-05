@@ -56,6 +56,7 @@ import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarASTWithOptions;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.antlr.v4.tool.ast.RuleAST;
 
@@ -69,6 +70,8 @@ import java.util.List;
  *  MODIFIES grammar AST in place.
  */
 public class LeftRecursiveRuleTransformer {
+	public static final String PRECEDENCE_OPTION_NAME = "p";
+
 	public GrammarRootAST ast;
 	public Collection<Rule> rules;
 	public Grammar g;
@@ -97,11 +100,10 @@ public class LeftRecursiveRuleTransformer {
 		// update all refs to recursive rules to have [0] argument
 		for (GrammarAST r : ast.getNodesWithType(ANTLRParser.RULE_REF)) {
 			if ( r.getParent().getType()==ANTLRParser.RULE ) continue; // must be rule def
-			if ( r.getFirstChildWithType(ANTLRParser.ARG_ACTION)!=null ) continue; // already has arg; must be in rewritten rule
+			if ( ((GrammarASTWithOptions)r).getOptionString(PRECEDENCE_OPTION_NAME) != null ) continue; // already has arg; must be in rewritten rule
 			if ( leftRecursiveRuleNames.contains(r.getText()) ) {
 				// found ref to recursive rule not already rewritten with arg
-				ActionAST arg = new ActionAST(new CommonToken(ANTLRParser.ARG_ACTION, "0"));
-				r.addChild(arg);
+				((GrammarASTWithOptions)r).setOption(PRECEDENCE_OPTION_NAME, (GrammarAST)new GrammarASTAdaptor().create(ANTLRParser.INT, "0"));
 			}
 		}
 	}

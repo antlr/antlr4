@@ -113,6 +113,49 @@ public abstract class SemanticContext {
         }
     }
 
+	public static class PrecedencePredicate extends SemanticContext {
+		public final int precedence;
+
+		protected PrecedencePredicate() {
+			this.precedence = 0;
+		}
+
+		public PrecedencePredicate(int precedence) {
+			this.precedence = precedence;
+		}
+
+		@Override
+		public boolean eval(Recognizer<?, ?> parser, RuleContext outerContext) {
+			return parser.precpred(outerContext, precedence);
+		}
+
+		@Override
+		public int hashCode() {
+			int hashCode = 1;
+			hashCode = 31 * hashCode + precedence;
+			return hashCode;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (!(obj instanceof PrecedencePredicate)) {
+				return false;
+			}
+
+			if (this == obj) {
+				return true;
+			}
+
+			PrecedencePredicate other = (PrecedencePredicate)obj;
+			return this.precedence == other.precedence;
+		}
+
+		@Override
+		public String toString() {
+			return super.toString();
+		}
+	}
+
     public static class AND extends SemanticContext {
 		@NotNull public Set<SemanticContext> opnds = new HashSet<SemanticContext>();
         public AND() { }

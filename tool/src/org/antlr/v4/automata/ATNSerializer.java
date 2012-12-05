@@ -40,6 +40,7 @@ import org.antlr.v4.runtime.atn.AtomTransition;
 import org.antlr.v4.runtime.atn.BlockStartState;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LoopEndState;
+import org.antlr.v4.runtime.atn.PrecedencePredicateTransition;
 import org.antlr.v4.runtime.atn.PredicateTransition;
 import org.antlr.v4.runtime.atn.RangeTransition;
 import org.antlr.v4.runtime.atn.RuleTransition;
@@ -201,6 +202,10 @@ public class ATNSerializer {
 						trg = ((RuleTransition)t).followState.stateNumber;
 						arg1 = ((RuleTransition)t).target.stateNumber;
 						arg2 = ((RuleTransition)t).ruleIndex;
+						break;
+					case Transition.PRECEDENCE:
+						PrecedencePredicateTransition ppt = (PrecedencePredicateTransition)t;
+						arg1 = ppt.precedence;
 						break;
 					case Transition.PREDICATE :
 						PredicateTransition pt = (PredicateTransition)t;

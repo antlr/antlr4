@@ -28,24 +28,44 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** How to generate rules derived from left-recursive rules.
- *  These rely on recRuleAltPredicate(),
- *  recRuleArg(), recRuleSetResultAction(), recRuleSetReturnAction()
- *  templates in main language.stg
+package org.antlr.v4.runtime.atn;
+
+import org.antlr.v4.runtime.misc.NotNull;
+
+/**
+ *
+ * @author Sam Harwell
  */
-group LeftRecursiveRules;
+public final class PrecedencePredicateTransition extends AbstractPredicateTransition {
+	public final int precedence;
 
-recRule(ruleName, argName, primaryAlts, opAlts, setResultAction,
-        userRetvals, leftRecursiveRuleRefLabels) ::=
-<<
-<ruleName><if(userRetvals)> returns [<userRetvals>]<endif>
-    :   ( {} <primaryAlts:{alt | <alt.altText> }; separator="\n        | ">
-        )
-        ( <opAlts; separator="\n        | ">
-        )*
-    ;
->>
+	public PrecedencePredicateTransition(@NotNull ATNState target, int precedence) {
+		super(target);
+		this.precedence = precedence;
+	}
 
-recRuleAlt(alt, precOption, opPrec, pred) ::= <<
-{<pred>}?\<<precOption>=<opPrec>\> <alt.altText>
->>
+	@Override
+	public int getSerializationType() {
+		return PRECEDENCE;
+	}
+
+	@Override
+	public boolean isEpsilon() {
+		return true;
+	}
+
+	@Override
+	public boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+		return false;
+	}
+
+	public SemanticContext.PrecedencePredicate getPredicate() {
+		return new SemanticContext.PrecedencePredicate(precedence);
+	}
+
+	@Override
+	public String toString() {
+		return precedence + " >= _p";
+	}
+
+}
