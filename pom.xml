@@ -135,6 +135,9 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                        <configuration>
+                            <quiet>true</quiet>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
