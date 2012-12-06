@@ -30,17 +30,21 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Pair;
 
+import java.io.InvalidClassException;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 
 public abstract class ATNSimulator {
+	public static final int SERIALIZED_VERSION;
+	static {
+		SERIALIZED_VERSION = 1;
+	}
 
 	/** Must distinguish between missing edge and edge we know leads nowhere */
 	@NotNull
@@ -98,6 +102,12 @@ public abstract class ATNSimulator {
 		ATN atn = new ATN();
 		List<IntervalSet> sets = new ArrayList<IntervalSet>();
 		int p = 0;
+		int version = toInt(data[p++]);
+		if (version != SERIALIZED_VERSION) {
+			String reason = String.format("Could not deserialize ATN with version %d (expected %d).", version, SERIALIZED_VERSION);
+			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
+		}
+
 		atn.grammarType = toInt(data[p++]);
 		atn.maxTokenType = toInt(data[p++]);
 
