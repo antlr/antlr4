@@ -49,7 +49,7 @@ import java.util.List;
 public abstract class ATNSimulator {
 	public static final int SERIALIZED_VERSION;
 	static {
-		SERIALIZED_VERSION = 1;
+		SERIALIZED_VERSION = 3;
 	}
 
 	public static final char RULE_VARIANT_DELIMITER = '$';
@@ -126,6 +126,12 @@ public abstract class ATNSimulator {
 		for (int i = 0; i < numNonGreedyStates; i++) {
 			int stateNumber = toInt(data[p++]);
 			((DecisionState)atn.states.get(stateNumber)).nonGreedy = true;
+		}
+
+		int numPrecedenceStates = toInt(data[p++]);
+		for (int i = 0; i < numPrecedenceStates; i++) {
+			int stateNumber = toInt(data[p++]);
+			((RuleStartState)atn.states.get(stateNumber)).isPrecedenceRule = true;
 		}
 
 		//
@@ -725,11 +731,13 @@ public abstract class ATNSimulator {
 			case Transition.EPSILON : return new EpsilonTransition(target);
 			case Transition.RANGE : return new RangeTransition(target, arg1, arg2);
 			case Transition.RULE :
-				RuleTransition rt = new RuleTransition((RuleStartState)atn.states.get(arg1), arg2, target);
+				RuleTransition rt = new RuleTransition((RuleStartState)atn.states.get(arg1), arg2, arg3, target);
 				return rt;
 			case Transition.PREDICATE :
 				PredicateTransition pt = new PredicateTransition(target, arg1, arg2, arg3 != 0);
 				return pt;
+			case Transition.PRECEDENCE:
+				return new PrecedencePredicateTransition(target, arg1);
 			case Transition.ATOM : return new AtomTransition(target, arg1);
 			case Transition.ACTION :
 				ActionTransition a = new ActionTransition(target, arg1, arg2, arg3 != 0);

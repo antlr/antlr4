@@ -32,41 +32,40 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.NotNull;
 
-/** */
-public final class RuleTransition extends Transition {
-	/** Ptr to the rule definition object for this rule ref */
-	public final int ruleIndex;     // no Rule object at runtime
-
+/**
+ *
+ * @author Sam Harwell
+ */
+public final class PrecedencePredicateTransition extends AbstractPredicateTransition {
 	public final int precedence;
 
-	/** What node to begin computations following ref to rule */
-	@NotNull
-	public ATNState followState;
-
-	public boolean tailCall;
-	public boolean optimizedTailCall;
-
-	public RuleTransition(@NotNull RuleStartState ruleStart,
-						  int ruleIndex,
-						  int precedence,
-						  @NotNull ATNState followState)
-	{
-		super(ruleStart);
-		this.ruleIndex = ruleIndex;
+	public PrecedencePredicateTransition(@NotNull ATNState target, int precedence) {
+		super(target);
 		this.precedence = precedence;
-		this.followState = followState;
 	}
 
 	@Override
 	public int getSerializationType() {
-		return RULE;
+		return PRECEDENCE;
 	}
 
 	@Override
-	public boolean isEpsilon() { return true; }
+	public boolean isEpsilon() {
+		return true;
+	}
 
 	@Override
 	public boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
 		return false;
 	}
+
+	public SemanticContext.PrecedencePredicate getPredicate() {
+		return new SemanticContext.PrecedencePredicate(precedence);
+	}
+
+	@Override
+	public String toString() {
+		return precedence + " >= _p";
+	}
+
 }

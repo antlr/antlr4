@@ -1283,6 +1283,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		case Transition.RULE:
 			return ruleTransition(config, (RuleTransition)t, contextCache);
 
+		case Transition.PRECEDENCE:
+			return precedenceTransition(config, (PrecedencePredicateTransition)t, collectPredicates, inContext);
+
 		case Transition.PREDICATE:
 			return predTransition(config, (PredicateTransition)t, collectPredicates, inContext);
 
@@ -1301,6 +1304,35 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public ATNConfig actionTransition(@NotNull ATNConfig config, @NotNull ActionTransition t) {
 		if ( debug ) System.out.println("ACTION edge "+t.ruleIndex+":"+t.actionIndex);
 		return config.transform(t.target);
+	}
+
+	@Nullable
+	public ATNConfig precedenceTransition(@NotNull ATNConfig config,
+									@NotNull PrecedencePredicateTransition pt,
+									boolean collectPredicates,
+									boolean inContext)
+	{
+		if ( debug ) {
+			System.out.println("PRED (collectPredicates="+collectPredicates+") "+
+                    pt.precedence+">=_p"+
+					", ctx dependent=true");
+			if ( parser != null ) {
+                System.out.println("context surrounding pred is "+
+                                   parser.getRuleInvocationStack());
+            }
+		}
+
+        ATNConfig c = null;
+        if (collectPredicates && inContext) {
+            SemanticContext newSemCtx = SemanticContext.and(config.getSemanticContext(), pt.getPredicate());
+            c = config.transform(pt.target, newSemCtx);
+        }
+		else {
+			c = config.transform(pt.target);
+		}
+
+		if ( debug ) System.out.println("config from pred transition="+c);
+        return c;
 	}
 
 	@Nullable

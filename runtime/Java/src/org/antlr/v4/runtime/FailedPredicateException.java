@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.AbstractPredicateTransition;
 import org.antlr.v4.runtime.atn.PredicateTransition;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -60,9 +61,17 @@ public class FailedPredicateException extends RecognitionException {
 	{
 		super(formatMessage(predicate, message), recognizer, recognizer.getInputStream(), recognizer._ctx);
 		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer.getState());
-		PredicateTransition trans = (PredicateTransition)s.transition(0);
-		this.ruleIndex = trans.ruleIndex;
-		this.predicateIndex = trans.predIndex;
+
+		AbstractPredicateTransition trans = (AbstractPredicateTransition)s.transition(0);
+		if (trans instanceof PredicateTransition) {
+			this.ruleIndex = ((PredicateTransition)trans).ruleIndex;
+			this.predicateIndex = ((PredicateTransition)trans).predIndex;
+		}
+		else {
+			this.ruleIndex = 0;
+			this.predicateIndex = 0;
+		}
+
 		this.predicate = predicate;
 		this.setOffendingToken(recognizer, recognizer.getCurrentToken());
 	}

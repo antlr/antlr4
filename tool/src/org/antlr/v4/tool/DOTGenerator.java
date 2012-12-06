@@ -33,6 +33,7 @@ package org.antlr.v4.tool;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.AbstractPredicateTransition;
 import org.antlr.v4.runtime.atn.ActionTransition;
 import org.antlr.v4.runtime.atn.AtomTransition;
 import org.antlr.v4.runtime.atn.BlockEndState;
@@ -41,7 +42,6 @@ import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.NotSetTransition;
 import org.antlr.v4.runtime.atn.PlusBlockStartState;
 import org.antlr.v4.runtime.atn.PlusLoopbackState;
-import org.antlr.v4.runtime.atn.PredicateTransition;
 import org.antlr.v4.runtime.atn.RangeTransition;
 import org.antlr.v4.runtime.atn.RuleStopState;
 import org.antlr.v4.runtime.atn.RuleTransition;
@@ -245,7 +245,7 @@ public class DOTGenerator {
 					edgeST = stlib.getInstanceOf("action-edge");
 					edgeST.add("label", getEdgeLabel(edge.toString()));
 				}
-				else if ( edge instanceof PredicateTransition ) {
+				else if ( edge instanceof AbstractPredicateTransition ) {
 					edgeST = stlib.getInstanceOf("edge");
 					edgeST.add("label", getEdgeLabel(edge.toString()));
 				}

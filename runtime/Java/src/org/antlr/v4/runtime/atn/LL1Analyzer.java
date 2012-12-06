@@ -137,7 +137,7 @@ public class LL1Analyzer {
 				PredictionContext newContext = ctx.getChild(((RuleTransition)t).followState.stateNumber);
 				_LOOK(t.target, newContext, look, lookBusy, seeThruPreds, addEOF);
 			}
-			else if ( t instanceof PredicateTransition ) {
+			else if ( t instanceof AbstractPredicateTransition ) {
 				if ( seeThruPreds ) {
 					_LOOK(t.target, ctx, look, lookBusy, seeThruPreds, addEOF);
 				}
