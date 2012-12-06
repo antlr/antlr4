@@ -95,6 +95,7 @@ public class ATNSerializer {
 		int nedges = 0;
 
 		// dump states, count edges and collect sets while doing so
+		IntegerList nonGreedyStates = new IntegerList();
 		data.add(atn.states.size());
 		for (ATNState s : atn.states) {
 			if ( s==null ) { // might be optimized away
@@ -102,12 +103,11 @@ public class ATNSerializer {
 				continue;
 			}
 
-			// encode the nongreedy bit with the state type
 			int stateType = s.getStateType();
-			assert stateType >= 0;
 			if (s instanceof DecisionState && ((DecisionState)s).nonGreedy) {
-				stateType |= ATNSimulator.SERIALIZED_NON_GREEDY_MASK;
+				nonGreedyStates.add(s.stateNumber);
 			}
+
 			data.add(stateType);
 			data.add(s.ruleIndex);
 			if ( s.getStateType() == ATNState.LOOP_END ) {
@@ -130,6 +130,12 @@ public class ATNSerializer {
 					sets.add(st.set);
 				}
 			}
+		}
+
+		// non-greedy states
+		data.add(nonGreedyStates.size());
+		for (int i = 0; i < nonGreedyStates.size(); i++) {
+			data.add(nonGreedyStates.get(i));
 		}
 
 		int nrules = atn.ruleToStartState.length;
@@ -248,7 +254,6 @@ public class ATNSerializer {
 		for (int i=1; i<=nstates; i++) {
 			int stype = ATNSimulator.toInt(data[p++]);
             if ( stype==ATNState.INVALID_TYPE ) continue; // ignore bad type of states
-			stype = stype & ATNSimulator.SERIALIZED_STATE_TYPE_MASK;
 			int ruleIndex = ATNSimulator.toInt(data[p++]);
 			String arg = "";
 			if ( stype == ATNState.LOOP_END ) {
@@ -262,6 +267,10 @@ public class ATNSerializer {
 			buf.append(i - 1).append(":")
 				.append(ATNState.serializationNames.get(stype)).append(" ")
 				.append(ruleIndex).append(arg).append("\n");
+		}
+		int numNonGreedyStates = ATNSimulator.toInt(data[p++]);
+		for (int i = 0; i < numNonGreedyStates; i++) {
+			int stateNumber = ATNSimulator.toInt(data[p++]);
 		}
 		int nrules = ATNSimulator.toInt(data[p++]);
 		for (int i=0; i<nrules; i++) {

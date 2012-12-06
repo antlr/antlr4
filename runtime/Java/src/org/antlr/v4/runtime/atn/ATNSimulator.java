@@ -41,8 +41,6 @@ import java.util.IdentityHashMap;
 import java.util.List;
 
 public abstract class ATNSimulator {
-	public static final int SERIALIZED_NON_GREEDY_MASK = 0x8000;
-	public static final int SERIALIZED_STATE_TYPE_MASK = 0x7FFF;
 
 	/** Must distinguish between missing edge and edge we know leads nowhere */
 	@NotNull
@@ -117,12 +115,7 @@ public abstract class ATNSimulator {
 				continue;
 			}
 
-			boolean nonGreedy = (stype & SERIALIZED_NON_GREEDY_MASK) != 0;
-			stype &= SERIALIZED_STATE_TYPE_MASK;
 			ATNState s = stateFactory(stype, i);
-			if (s instanceof DecisionState) {
-				((DecisionState)s).nonGreedy = nonGreedy;
-			}
 			s.ruleIndex = toInt(data[p++]);
 			if ( stype == ATNState.LOOP_END ) { // special case
 				int loopBackStateNumber = toInt(data[p++]);
@@ -142,6 +135,12 @@ public abstract class ATNSimulator {
 
 		for (Pair<BlockStartState, Integer> pair : endStateNumbers) {
 			pair.a.endState = (BlockEndState)atn.states.get(pair.b);
+		}
+
+		int numNonGreedyStates = toInt(data[p++]);
+		for (int i = 0; i < numNonGreedyStates; i++) {
+			int stateNumber = toInt(data[p++]);
+			((DecisionState)atn.states.get(stateNumber)).nonGreedy = true;
 		}
 
 		//
