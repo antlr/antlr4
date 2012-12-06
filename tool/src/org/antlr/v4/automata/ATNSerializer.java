@@ -51,6 +51,7 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
+import java.io.InvalidClassException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,6 +88,7 @@ public class ATNSerializer {
 	 */
 	public IntegerList serialize() {
 		IntegerList data = new IntegerList();
+		data.add(ATNSimulator.SERIALIZED_VERSION);
 		// convert grammar type to ATN const to avoid dependence on ANTLRParser
 		if ( g.getType()== ANTLRParser.LEXER ) data.add(ATN.LEXER);
 		else if ( g.getType()== ANTLRParser.PARSER ) data.add(ATN.PARSER);
@@ -95,6 +97,7 @@ public class ATNSerializer {
 		int nedges = 0;
 
 		// dump states, count edges and collect sets while doing so
+		IntegerList nonGreedyStates = new IntegerList();
 		data.add(atn.states.size());
 		for (ATNState s : atn.states) {
 			if ( s==null ) { // might be optimized away
@@ -102,12 +105,11 @@ public class ATNSerializer {
 				continue;
 			}
 
-			// encode the nongreedy bit with the state type
 			int stateType = s.getStateType();
-			assert stateType >= 0;
 			if (s instanceof DecisionState && ((DecisionState)s).nonGreedy) {
-				stateType |= ATNSimulator.SERIALIZED_NON_GREEDY_MASK;
+				nonGreedyStates.add(s.stateNumber);
 			}
+
 			data.add(stateType);
 			data.add(s.ruleIndex);
 			if ( s.getStateType() == ATNState.LOOP_END ) {
@@ -130,6 +132,12 @@ public class ATNSerializer {
 					sets.add(st.set);
 				}
 			}
+		}
+
+		// non-greedy states
+		data.add(nonGreedyStates.size());
+		for (int i = 0; i < nonGreedyStates.size(); i++) {
+			data.add(nonGreedyStates.get(i));
 		}
 
 		int nrules = atn.ruleToStartState.length;
@@ -243,6 +251,12 @@ public class ATNSerializer {
 	public String decode(char[] data) {
 		StringBuilder buf = new StringBuilder();
 		int p = 0;
+		int version = ATNSimulator.toInt(data[p++]);
+		if (version != ATNSimulator.SERIALIZED_VERSION) {
+			String reason = String.format("Could not deserialize ATN with version %d (expected %d).", version, ATNSimulator.SERIALIZED_VERSION);
+			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
+		}
+
 		int grammarType = ATNSimulator.toInt(data[p++]);
 		int maxType = ATNSimulator.toInt(data[p++]);
 		buf.append("max type ").append(maxType).append("\n");
@@ -250,7 +264,6 @@ public class ATNSerializer {
 		for (int i=1; i<=nstates; i++) {
 			int stype = ATNSimulator.toInt(data[p++]);
             if ( stype==ATNState.INVALID_TYPE ) continue; // ignore bad type of states
-			stype = stype & ATNSimulator.SERIALIZED_STATE_TYPE_MASK;
 			int ruleIndex = ATNSimulator.toInt(data[p++]);
 			String arg = "";
 			if ( stype == ATNState.LOOP_END ) {
@@ -264,6 +277,10 @@ public class ATNSerializer {
 			buf.append(i - 1).append(":")
 				.append(ATNState.serializationNames.get(stype)).append(" ")
 				.append(ruleIndex).append(arg).append("\n");
+		}
+		int numNonGreedyStates = ATNSimulator.toInt(data[p++]);
+		for (int i = 0; i < numNonGreedyStates; i++) {
+			int stateNumber = ATNSimulator.toInt(data[p++]);
 		}
 		int nrules = ATNSimulator.toInt(data[p++]);
 		for (int i=0; i<nrules; i++) {

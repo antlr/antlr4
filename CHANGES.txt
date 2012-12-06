@@ -1,5 +1,62 @@
 ANTLR v4 Honey Badger
 
+December 2, 2012
+
+* Remove -Xverbose-dfa option
+* Create the ParseTreeVisitor interface for all visitors, rename previous base
+  visitor class to AbstractParseTreeVisitor
+
+December 1, 2012
+
+* escape [\n\r\t] in lexical error messages; e.g,:
+  line 2:3 token recognition error at: '\t'
+  line 2:4 token recognition error at: '\n'
+
+* added error for bad sets in lexer; e.g.:
+  lexer set element A is invalid (either rule ref or literal with > 1 char)
+  some tests in TestSets appeared to allow ~('a'|B) but it was randomly working.
+  ('a'|B) works, though doesn't collapse to a set.
+
+* label+='foo' wasn't generating good code. It was generating token type as
+  variable name. Now, I gen "s<ttype>" for implicit labels on string literals.
+
+* tokens now have token and char source to draw from.
+
+* remove -Xsave-lexer option; log file as implicit lexer AST.
+
+November 30, 2012
+
+* Maven updates (cleanup, unification, and specify Java 6 bootstrap classpath)
+
+November 28, 2012
+
+* Maven updates (uber-jar, manifest details)
+
+November 27, 2012
+
+* Maven updates (prepare for deploying to Sonatype OSS)
+* Use efficient bitset tests instead of long chains of operator ==
+
+November 26, 2012
+
+* Maven updates (include sources and javadocs, fix warnings)
+* Don't generate action methods for lexer rules not containing an action
+* Generated action and sempred methods are private
+* Remove unused / problematic methods:
+** (unused) TerminalNodeImpl.isErrorNode
+** (unused) RuleContext.conflictsWith, RuleContext.suffix.
+** (problematic) RuleContext.hashCode, RuleContext.equals.
+
+November 23, 2012
+
+* Updated Maven build (added master POM, cleaned up module POMs)
+
+November 22, 2012
+
+* make sure left-recur rule translation uses token stream from correct imported file.
+* actions like @after in imported rules caused inf loop.
+* This misidentified scope lexer/parser: @lexer::members { } @parser::members { }
+
 November 18, 2012
 
 * fixed: undefined rule refs caused exception

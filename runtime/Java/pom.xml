@@ -3,25 +3,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.antlr</groupId>
+    <parent>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr4-master</artifactId>
+        <version>4.0-SNAPSHOT</version>
+        <relativePath>../..</relativePath>
+    </parent>
+
     <artifactId>antlr4-runtime</artifactId>
-    <version>4.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
 
-    <name>antlr4-runtime</name>
-    <url>http://www.antlr.org</url>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <name>ANTLR 4 Runtime</name>
+    <description>The ANTLR 4 Runtime</description>
 
     <dependencies>
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>ST4</artifactId>
-            <version>4.0.4</version>
-            <scope>compile</scope>
-        </dependency>
         <dependency>
             <groupId>org.abego.treelayout</groupId>
             <artifactId>org.abego.treelayout.core</artifactId>
@@ -35,22 +29,6 @@
         <sourceDirectory>src</sourceDirectory>
         <resources/>
 
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                    <showWarnings>true</showWarnings>
-                    <showDeprecation>true</showDeprecation>
-                    <compilerArguments>
-                        <Xlint/>
-                    </compilerArguments>
-                    <compilerArgument>-Xlint:-serial</compilerArgument>
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
 
 </project>

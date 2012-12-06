@@ -36,202 +36,28 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <!-- Maven model we are inheriting from
-      -->
     <modelVersion>4.0.0</modelVersion>
 
-    <!--
+    <parent>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr4-master</artifactId>
+        <version>4.0-SNAPSHOT</version>
+    </parent>
 
-     Now that the ANTLR project has adopted Maven with a vengence,
-     all ANTLR tools will be grouped under org.antlr and will be
-     controlled by a project member.
-     -->
-    <groupId>org.antlr</groupId>
-
-
-    <!--
-
-     This is the ANTLR plugin for ANTLR version 4.0 and above. It might
-     have been best to change the name of the plugin as the 4.0 plugins
-     behave a little differently, however for the sake of one transitional
-     phase to a much better plugin, it was decided that the name should
-     remain the same.
-      -->
     <artifactId>antlr4-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
 
-    <!-- Note that as this plugin depends on the ANTLR tool itself
-         we cannot use the paren pom to control the version number
-         and MUST update <version> in this pom manually!
-         -->
-    <version>4.0-SNAPSHOT</version>
-    <name>Maven plugin for ANTLR V4</name>
+    <name>ANTLR 4 Maven plugin</name>
+    <description>Maven plugin for ANTLR 4 grammars</description>
+
     <prerequisites>
         <maven>3.0</maven>
     </prerequisites>
-
-    <!--
-     Where does our actual project live on the interwebs.
-      -->
-    <url>http://antlr.org</url>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
-    <description>
-
-This is the brand new, re-written from scratch plugin for ANTLR v4.
-
-Previous valiant efforts all suffered from being unable to modify the ANTLR Tool
-itself to provide support not just for Maven oriented things but any other tool
-that might wish to invoke ANTLR without resorting to the command line interface.
-
-Rather than try to shoe-horn new code into the existing Mojo (in fact I think that
-by incorporating a patch supplied by someone I ended up with tow versions of the
-Mojo, I elected to rewrite everything from scratch, including the documentation, so
-that we might end up with a perfect Mojo that can do everything that ANTLR v4 supports
-such as imported grammar processing, proper support for library directories and
-locating token files from generated sources, and so on.
-
-In the end I decided to also change the the ANTLR Tool.java code so that it
-would be the provider of all the things that a build tool needs, rather than
-delegating things to 5 different tools. So, things like dependencies, dependency
-sorting, option tracking, generating sources and so on are all folded back
-in to ANTLR's Tool.java code, where they belong, and they now provide a
-public interface to anyone that might want to interface with them.
-
-One other goal of this rewrite was to completely document the whole thing
-to death. Hence even this pom has more comments than funcitonal elements,
-in case I get run over by a bus or fall off a cliff while skiing.
-
-Jim Idle - March 2009
-
-    </description>
-
-    <developers>
-
-        <developer>
-            <name>Jim Idle</name>
-            <url>http://www.temporal-wave.com</url>
-            <roles>
-                <role>Originator, version 4.0</role>
-            </roles>
-        </developer>
-
-        <developer>
-            <name>Terence Parr</name>
-            <url>http://antlr.org/wiki/display/~admin/Home</url>
-            <roles>
-                <role>Project lead - ANTLR</role>
-            </roles>
-        </developer>
-
-        <developer>
-            <name>David Holroyd</name>
-            <url>http://david.holroyd.me.uk/</url>
-            <roles>
-                <role>Originator - prior version</role>
-            </roles>
-        </developer>
-
-        <developer>
-            <name>Kenny MacDermid</name>
-            <url>mailto:kenny "at" kmdconsulting.ca</url>
-            <roles>
-                <role>Contributor - prior versions</role>
-            </roles>
-        </developer>
-
-    </developers>
-
-    <!-- Where do we track bugs for this project?
-      -->
-    <issueManagement>
-        <system>JIRA</system>
-        <url>http://antlr.org/jira/browse/ANTLR</url>
-    </issueManagement>
-
-    <!-- Location of the license description for this project
-      -->
-    <licenses>
-        <license>
-            <distribution>repo</distribution>
-            <name>The BSD License</name>
-            <url>http://www.antlr.org/LICENSE.txt </url>
-        </license>
-    </licenses>
-
-    <distributionManagement>
-
-        <repository>
-            <id>antlr-repo</id>
-            <name>ANTLR Testing repository</name>
-            <url>scpexe://antlr.org/home/mavensync/antlr-repo</url>
-        </repository>
-
-        <snapshotRepository>
-            <id>antlr-snapshot</id>
-            <name>ANTLR Testing Snapshot Repository</name>
-            <url>scpexe://antlr.org/home/mavensync/antlr-snapshot</url>
-        </snapshotRepository>
-
-        <site>
-            <id>antlr-repo</id>
-            <name>ANTLR Maven Plugin Web Site</name>
-            <url>scpexe://antlr.org/home/mavensync/antlr-maven-webs/antlr4-maven-plugin</url>
-        </site>
-    </distributionManagement>
-
-    <!--
-
-    Inform Maven of the ANTLR snapshot repository, which it will
-    need to consult to get the latest snapshot build of the runtime and tool
-    if it was not built and installed locally.
-    -->
-    <repositories>
-
-      <!--
-        This is the ANTLR repository.
-        -->
-        <repository>
-            <id>antlr-snapshot</id>
-            <name>ANTLR Testing Snapshot Repository</name>
-            <url>http://antlr.org/antlr-snapshot</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            
-        </repository>
-
-    </repositories>
     
     <!-- Ancilliary information for completeness
       -->
     <inceptionYear>2009</inceptionYear>
 
-    <mailingLists>
-        <mailingList>
-            <archive>http://antlr.markmail.org/</archive>
-            <otherArchives>
-                <otherArchive>http://www.antlr.org/pipermail/antlr-interest/</otherArchive>
-            </otherArchives>
-            <name>ANTLR Users</name>
-            <subscribe>http://www.antlr.org/mailman/listinfo/antlr-interest/</subscribe>
-            <unsubscribe>http://www.antlr.org/mailman/options/antlr-interest/</unsubscribe>
-            <post>antlr-interest@antlr.org</post>
-        </mailingList>
-    </mailingLists>
-
-    <organization>
-        <name>ANTLR.org</name>
-        <url>http://www.antlr.org</url>
-    </organization>
     <!-- ============================================================================= -->
 
     <!--
@@ -249,20 +75,20 @@ Jim Idle - March 2009
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
-            <version>2.0</version>
+            <version>3.0.4</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-project</artifactId>
-            <version>2.0</version>
+            <version>2.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-compiler-api</artifactId>
-            <version>1.8.6</version>
+            <version>2.0</version>
         </dependency>
 
         <!--
@@ -283,7 +109,7 @@ Jim Idle - March 2009
 
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
+            <version>4.11</version>
             <scope>test</scope>
 
         </dependency>
@@ -294,64 +120,59 @@ Jim Idle - March 2009
             <version>1.1</version>
             <scope>test</scope>
         </dependency>
-        
+
+        <dependency>
+            <groupId>org.apache.maven.plugin-tools</groupId>
+            <artifactId>maven-plugin-annotations</artifactId>
+            <version>3.2</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
     
     <build>
 
         <defaultGoal>install</defaultGoal>
 
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh-external</artifactId>
-                <version>2.2</version>
-            </extension>
-        </extensions>
-
         <plugins>
 
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+                <version>3.2</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                    <showDeprecation>true</showDeprecation>
-                    <showWarnings>true</showWarnings>
-                    <compilerArguments>
-                        <Xlint/>
-                    </compilerArguments>
+                    <!-- see http://jira.codehaus.org/browse/MNG-5346 -->
+                    <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>mojo-descriptor</id>
+                        <goals>
+                            <goal>descriptor</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>help-goal</id>
+                        <goals>
+                            <goal>helpmojo</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.0</version>
+                <version>3.2</version>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.6</version>
                 <configuration>
                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.1.2</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
         </plugins>

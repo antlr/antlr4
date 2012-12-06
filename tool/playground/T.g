@@ -1,6 +1,5 @@
 grammar T;
 
-s : R ;
+s : ID ;
 
-R : 'x' EOF;
-
+ID : [a-z]+ ;

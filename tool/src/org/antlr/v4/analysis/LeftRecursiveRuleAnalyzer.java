@@ -1,30 +1,31 @@
 /*
- [The "BSD license"]
-  Copyright (c) 2011 Terence Parr
-  All rights reserved.
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions
-  are met:
-
-  1. Redistributions of source code must retain the above copyright
-     notice, this list of conditions and the following disclaimer.
-  2. Redistributions in binary form must reproduce the above copyright
-     notice, this list of conditions and the following disclaimer in the
-     documentation and/or other materials provided with the distribution.
-  3. The name of the author may not be used to endorse or promote products
-     derived from this software without specific prior written permission.
-
-  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * [The "BSD license"]
+ *  Copyright (c) 2012 Terence Parr
+ *  Copyright (c) 2012 Sam Harwell
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.antlr.v4.analysis;
@@ -70,6 +71,9 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 	public List<Pair<GrammarAST,String>> leftRecursiveRuleRefLabels =
 		new ArrayList<Pair<GrammarAST,String>>();
 
+	/** Tokens from which rule AST comes from */
+	public TokenStream tokenStream;
+
 	public GrammarAST retvals;
 
 	public STGroup recRuleTemplates;
@@ -78,14 +82,14 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 	public Map<Integer, ASSOC> altAssociativity = new HashMap<Integer, ASSOC>();
 
-	public LeftRecursiveRuleAnalyzer(TokenStream tokens, GrammarAST ruleAST,
+	public LeftRecursiveRuleAnalyzer(GrammarAST ruleAST,
 									 Tool tool, String ruleName, String language)
 	{
 		super(new CommonTreeNodeStream(new GrammarASTAdaptor(ruleAST.token.getInputStream()), ruleAST));
-		((CommonTreeNodeStream)input).setTokenStream(tokens);
 		this.tool = tool;
 		this.ruleName = ruleName;
 		this.language = language;
+		tokenStream = ruleAST.g.tokenStream;
 		loadPrecRuleTemplates();
 	}
 
@@ -357,10 +361,9 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 	public void stripAltLabel(GrammarAST altAST) {
 		int start = altAST.getTokenStartIndex();
 		int stop = altAST.getTokenStopIndex();
-		TokenStream tokens = input.getTokenStream();
 		// find =>
 		for (int i=stop; i>=start; i--) {
-			if ( tokens.get(i).getType()==POUND ) {
+			if ( tokenStream.get(i).getType()==POUND ) {
 				altAST.setTokenStopIndex(i-1);
 				return;
 			}
@@ -369,10 +372,9 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 	public String text(GrammarAST t) {
 		if ( t==null ) return "";
-		TokenStream tokens = input.getTokenStream();
-		CommonToken ta = (CommonToken)tokens.get(t.getTokenStartIndex());
-		CommonToken tb = (CommonToken)tokens.get(t.getTokenStopIndex());
-		return tokens.toString(ta, tb);
+		CommonToken ta = (CommonToken) tokenStream.get(t.getTokenStartIndex());
+		CommonToken tb = (CommonToken) tokenStream.get(t.getTokenStopIndex());
+		return tokenStream.toString(ta, tb);
 	}
 
 	public int precedence(int alt) {
