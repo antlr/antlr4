@@ -243,9 +243,9 @@ import java.util.concurrent.atomic.AtomicReference;
  	 *  holds the decision were evaluating
 */
 public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
-	public static boolean debug = false;
-	public static boolean dfa_debug = false;
-	public static boolean retry_debug = false;
+	public static final boolean debug = false;
+	public static final boolean dfa_debug = false;
+	public static final boolean retry_debug = false;
 
 	public boolean disable_global_context = false;
 	public boolean force_global_context = false;
