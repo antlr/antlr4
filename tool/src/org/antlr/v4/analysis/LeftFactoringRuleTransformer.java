@@ -36,12 +36,12 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.GrammarASTWithOptions;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.antlr.v4.tool.ast.PlusBlockAST;
 import org.antlr.v4.tool.ast.RuleAST;
@@ -537,8 +537,9 @@ public class LeftFactoringRuleTransformer {
 				assert mode.includeFactoredAlts();
 				RuleRefAST factoredRuleRef = new RuleRefAST(adaptor.createToken(ANTLRParser.RULE_REF, factoredRule));
 				factoredRuleRef.setOption(SUPPRESS_ACCESSOR, adaptor.create(ANTLRParser.ID, "true"));
-				if (((GrammarASTWithOptions)element).getOptions() != null) {
-					factoredRuleRef.getOptions().putAll(((GrammarASTWithOptions)element).getOptions());
+				Rule factoredRuleDef = _rules.get(factoredRule);
+				if (factoredRuleDef instanceof LeftRecursiveRule) {
+					factoredRuleRef.setOption(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME, adaptor.create(ANTLRParser.INT, "0"));
 				}
 
 				if (_rules.get(factoredRule).args != null && _rules.get(factoredRule).args.size() > 0) {
