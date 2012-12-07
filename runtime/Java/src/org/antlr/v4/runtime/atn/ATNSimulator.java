@@ -349,6 +349,7 @@ public abstract class ATNSimulator {
 		return c==65535 ? -1 : c;
 	}
 
+	@NotNull
 	public static Transition edgeFactory(@NotNull ATN atn,
 										 int type, int src, int trg,
 										 int arg1, int arg2, int arg3,
@@ -372,11 +373,12 @@ public abstract class ATNSimulator {
 			case Transition.NOT_SET : return new NotSetTransition(target, sets.get(arg1));
 			case Transition.WILDCARD : return new WildcardTransition(target);
 		}
-		return null;
+
+		throw new IllegalArgumentException("The specified transition type is not valid.");
 	}
 
 	public static ATNState stateFactory(int type, int stateNumber) {
-		ATNState s = null;
+		ATNState s;
 		switch (type) {
 			case ATNState.INVALID_TYPE: return null;
 			case ATNState.BASIC : s = new ATNState(); break;
@@ -392,9 +394,10 @@ public abstract class ATNSimulator {
 			case ATNState.PLUS_LOOP_BACK : s = new PlusLoopbackState(); break;
 			case ATNState.LOOP_END : s = new LoopEndState(); break;
             default :
-                System.err.println("invalid state type in ATN deserialization: "+type+" for state "+stateNumber);
-                break;
+				String message = String.format("The specified state type %d for state %d is not valid.", type, stateNumber);
+				throw new IllegalArgumentException(message);
 		}
+
 		s.stateNumber = stateNumber;
 		return s;
 	}

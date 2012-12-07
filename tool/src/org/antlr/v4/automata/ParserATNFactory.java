@@ -77,6 +77,7 @@ import org.antlr.v4.tool.ast.QuantifierAST;
 import org.antlr.v4.tool.ast.TerminalAST;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 
@@ -621,9 +622,13 @@ public class ParserATNFactory implements ATNFactory {
 		return t;
 	}
 
-	// TODO (sam): should we allow this to throw an exception instead of returning null?
-	@Nullable
+	@NotNull
 	public <T extends ATNState> T newState(@NotNull Class<T> nodeType, GrammarAST node) {
+		if (!ATNState.class.isAssignableFrom(nodeType)) {
+			throw new IllegalArgumentException(String.format("%s is not a %s.", nodeType.getName(), ATNState.class.getName()));
+		}
+
+		Exception cause;
 		try {
 			Constructor<T> ctor = nodeType.getConstructor();
 			T s = ctor.newInstance();
@@ -631,11 +636,22 @@ public class ParserATNFactory implements ATNFactory {
 			else s.setRuleIndex(currentRule.index);
 			atn.addState(s);
 			return s;
+		} catch (InstantiationException ex) {
+			cause = ex;
+		} catch (IllegalAccessException ex) {
+			cause = ex;
+		} catch (IllegalArgumentException ex) {
+			cause = ex;
+		} catch (InvocationTargetException ex) {
+			cause = ex;
+		} catch (NoSuchMethodException ex) {
+			cause = ex;
+		} catch (SecurityException ex) {
+			cause = ex;
 		}
-		catch (Exception e) {
-			ErrorManager.internalError("can't create ATN node: "+nodeType.getName(), e);
-		}
-		return null;
+
+		String message = String.format("Could not create %s of type %s.", ATNState.class.getName(), nodeType.getName());
+		throw new UnsupportedOperationException(message, cause);
 	}
 
 	@NotNull
