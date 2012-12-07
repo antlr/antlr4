@@ -31,10 +31,9 @@
 package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.Tree;
 
 public class PredAST extends ActionAST {
-	public PredAST(GrammarAST node) {
+	public PredAST(PredAST node) {
 		super(node);
 	}
 
@@ -43,7 +42,7 @@ public class PredAST extends ActionAST {
     public PredAST(int type, Token t) { super(type, t); }
 
 	@Override
-	public Tree dupNode() { return new PredAST(this); }
+	public PredAST dupNode() { return new PredAST(this); }
 
 	@Override
 	public Object visit(GrammarASTVisitor v) { return v.visit(this); }

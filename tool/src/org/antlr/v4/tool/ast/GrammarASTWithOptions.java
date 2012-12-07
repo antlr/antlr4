@@ -39,9 +39,9 @@ import java.util.Map;
 public abstract class GrammarASTWithOptions extends GrammarAST {
     protected Map<String, GrammarAST> options;
 
-	public GrammarASTWithOptions(GrammarAST node) {
+	public GrammarASTWithOptions(GrammarASTWithOptions node) {
 		super(node);
-		this.options = ((GrammarASTWithOptions)node).options;
+		this.options = node.options;
 	}
 
 	public GrammarASTWithOptions(Token t) { super(t); }
@@ -80,6 +80,9 @@ public abstract class GrammarASTWithOptions extends GrammarAST {
 	public int getNumberOfOptions() {
 		return options==null ? 0 : options.size();
 	}
+
+	@Override
+	public abstract GrammarASTWithOptions dupNode();
 
     public Map<String, GrammarAST> getOptions() { return options; }
 }

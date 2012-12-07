@@ -31,7 +31,6 @@
 package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.Tree;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +44,7 @@ public class BlockAST extends GrammarASTWithOptions implements RuleElementAST {
     public static final Map<String, String> defaultLexerBlockOptions =
             new HashMap<String, String>();
 
-	public BlockAST(GrammarAST node) {
+	public BlockAST(BlockAST node) {
 		super(node);
 	}
 
@@ -55,7 +54,7 @@ public class BlockAST extends GrammarASTWithOptions implements RuleElementAST {
 	public BlockAST(int type, Token t, String text) { super(type,t,text); }
 
 	@Override
-	public Tree dupNode() { return new BlockAST(this); }
+	public BlockAST dupNode() { return new BlockAST(this); }
 
 	@Override
 	public Object visit(GrammarASTVisitor v) { return v.visit(this); }

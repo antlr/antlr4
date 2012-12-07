@@ -39,7 +39,7 @@ public class RuleAST extends GrammarASTWithOptions {
 	/** Kill redef of rules */
 	public boolean dead;
 
-	public RuleAST(GrammarAST node) {
+	public RuleAST(RuleAST node) {
 		super(node);
 	}
 
@@ -58,7 +58,7 @@ public class RuleAST extends GrammarASTWithOptions {
 	}
 
 	@Override
-	public Tree dupNode() { return new RuleAST(this); }
+	public RuleAST dupNode() { return new RuleAST(this); }
 
 	public ActionAST getLexerAction() {
 		Tree blk = getFirstChildWithType(ANTLRParser.BLOCK);
