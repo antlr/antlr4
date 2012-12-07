@@ -540,12 +540,6 @@ public class ParserATNFactory implements ATNFactory {
 		return new Handle(left, right);
 	}
 
-	/** Build a subrule matching ^(. .*) (any tree or node). Let's use
-	 *  (^(. .+) | .) to be safe.
-	 */
-	@Override
-	public Handle wildcardTree(GrammarAST associatedAST) { throw new UnsupportedOperationException(); }
-
 	void epsilon(ATNState a, @NotNull ATNState b) {
 		if ( a!=null ) a.addTransition(new EpsilonTransition(b));
 	}
