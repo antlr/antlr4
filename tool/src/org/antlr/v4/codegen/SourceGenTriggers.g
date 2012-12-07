@@ -170,7 +170,7 @@ atom[GrammarAST label, boolean invert] returns [List<SrcOp> omos]
 	;
 
 ruleref[GrammarAST label] returns [List<SrcOp> omos]
-    :	^(RULE_REF ARG_ACTION?)		{$omos = controller.ruleRef($RULE_REF, $label, $ARG_ACTION);}
+    :	^(RULE_REF ARG_ACTION? elementOptions?)		{$omos = controller.ruleRef($RULE_REF, $label, $ARG_ACTION);}
     ;
 
 range[GrammarAST label] returns [List<SrcOp> omos]

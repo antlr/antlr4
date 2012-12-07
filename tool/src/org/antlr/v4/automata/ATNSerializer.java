@@ -40,8 +40,10 @@ import org.antlr.v4.runtime.atn.AtomTransition;
 import org.antlr.v4.runtime.atn.BlockStartState;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LoopEndState;
+import org.antlr.v4.runtime.atn.PrecedencePredicateTransition;
 import org.antlr.v4.runtime.atn.PredicateTransition;
 import org.antlr.v4.runtime.atn.RangeTransition;
+import org.antlr.v4.runtime.atn.RuleStartState;
 import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.atn.SetTransition;
 import org.antlr.v4.runtime.atn.Transition;
@@ -98,6 +100,7 @@ public class ATNSerializer {
 
 		// dump states, count edges and collect sets while doing so
 		IntegerList nonGreedyStates = new IntegerList();
+		IntegerList precedenceStates = new IntegerList();
 		data.add(atn.states.size());
 		for (ATNState s : atn.states) {
 			if ( s==null ) { // might be optimized away
@@ -108,6 +111,10 @@ public class ATNSerializer {
 			int stateType = s.getStateType();
 			if (s instanceof DecisionState && ((DecisionState)s).nonGreedy) {
 				nonGreedyStates.add(s.stateNumber);
+			}
+
+			if (s instanceof RuleStartState && ((RuleStartState)s).isPrecedenceRule) {
+				precedenceStates.add(s.stateNumber);
 			}
 
 			data.add(stateType);
@@ -138,6 +145,12 @@ public class ATNSerializer {
 		data.add(nonGreedyStates.size());
 		for (int i = 0; i < nonGreedyStates.size(); i++) {
 			data.add(nonGreedyStates.get(i));
+		}
+
+		// precedence states
+		data.add(precedenceStates.size());
+		for (int i = 0; i < precedenceStates.size(); i++) {
+			data.add(precedenceStates.get(i));
 		}
 
 		int nrules = atn.ruleToStartState.length;
@@ -203,6 +216,11 @@ public class ATNSerializer {
 						trg = ((RuleTransition)t).followState.stateNumber;
 						arg1 = ((RuleTransition)t).target.stateNumber;
 						arg2 = ((RuleTransition)t).ruleIndex;
+						arg3 = ((RuleTransition)t).precedence;
+						break;
+					case Transition.PRECEDENCE:
+						PrecedencePredicateTransition ppt = (PrecedencePredicateTransition)t;
+						arg1 = ppt.precedence;
 						break;
 					case Transition.PREDICATE :
 						PredicateTransition pt = (PredicateTransition)t;
@@ -280,6 +298,10 @@ public class ATNSerializer {
 		}
 		int numNonGreedyStates = ATNSimulator.toInt(data[p++]);
 		for (int i = 0; i < numNonGreedyStates; i++) {
+			int stateNumber = ATNSimulator.toInt(data[p++]);
+		}
+		int numPrecedenceStates = ATNSimulator.toInt(data[p++]);
+		for (int i = 0; i < numPrecedenceStates; i++) {
 			int stateNumber = ATNSimulator.toInt(data[p++]);
 		}
 		int nrules = ATNSimulator.toInt(data[p++]);

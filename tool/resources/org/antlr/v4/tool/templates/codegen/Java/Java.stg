@@ -341,13 +341,13 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(int _p<currentRule.args:{a | , <a>}>) throws RecognitionException {
 	ParserRuleContext _parentctx = _ctx;
 	int _parentState = getState();
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>);
 	<currentRule.ctxType> _prevctx = _localctx;
 	int _startState = <currentRule.startState>;
-	enterRecursionRule(_localctx, RULE_<currentRule.name>);
+	enterRecursionRule(_localctx, RULE_<currentRule.name>, _p);
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
@@ -576,7 +576,7 @@ cases(ttypes) ::= <<
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
-setState(<r.stateNumber>); <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<argExprsChunks>);
+setState(<r.stateNumber>); <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
 >>
 
 MatchToken(m) ::= <<
@@ -774,21 +774,18 @@ labelref(x) ::= "<if(!x.isLocal)>((<x.ctx.name>)_localctx).<endif><x.name>"
 ctx(actionChunk) ::= "((<actionChunk.ctx.name>)_localctx)"
 
 // used for left-recursive rules
-recRuleDefArg()						  ::= "int _p"
-recRuleArg()						  ::= "$_p"
-recRuleAltPredicate(ruleName,opPrec)  ::= "<opPrec> >= <recRuleArg()>"
-recRuleSetResultAction()			  ::= "$tree=$<ruleName>.tree;"
+recRuleAltPredicate(ruleName,opPrec)  ::= "precpred(_ctx, <opPrec>)"
 recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>;"
 recRuleSetStopToken()                 ::= "_ctx.stop = _input.LT(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
-_localctx = new <ctxName>Context(_parentctx, _parentState, _p);
+_localctx = new <ctxName>Context(_parentctx, _parentState);
 <if(label)>_localctx.<label> = _prevctx;<endif>
 pushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
 >>
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label) ::= <<
-_localctx = new <currentAltLabel; format="cap">Context(new <ruleName; format="cap">Context(_parentctx, _parentState, _p));
+_localctx = new <currentAltLabel; format="cap">Context(new <ruleName; format="cap">Context(_parentctx, _parentState));
 <if(label)>((<currentAltLabel; format="cap">Context)_localctx).<label> = _prevctx;<endif>
 pushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
 >>

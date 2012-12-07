@@ -30,40 +30,14 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.misc.NotNull;
+/**
+ *
+ * @author Sam Harwell
+ */
+public abstract class AbstractPredicateTransition extends Transition {
 
-/** */
-public final class RuleTransition extends Transition {
-	/** Ptr to the rule definition object for this rule ref */
-	public final int ruleIndex;     // no Rule object at runtime
-
-	public final int precedence;
-
-	/** What node to begin computations following ref to rule */
-	@NotNull
-	public ATNState followState;
-
-	public RuleTransition(@NotNull RuleStartState ruleStart,
-						  int ruleIndex,
-						  int precedence,
-						  @NotNull ATNState followState)
-	{
-		super(ruleStart);
-		this.ruleIndex = ruleIndex;
-		this.precedence = precedence;
-		this.followState = followState;
+	public AbstractPredicateTransition(ATNState target) {
+		super(target);
 	}
 
-	@Override
-	public int getSerializationType() {
-		return RULE;
-	}
-
-	@Override
-	public boolean isEpsilon() { return true; }
-
-	@Override
-	public boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
-		return false;
-	}
 }

@@ -35,12 +35,14 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
+import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.ATNBuilder;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.AbstractPredicateTransition;
 import org.antlr.v4.runtime.atn.ActionTransition;
 import org.antlr.v4.runtime.atn.AtomTransition;
 import org.antlr.v4.runtime.atn.BlockEndState;
@@ -50,6 +52,7 @@ import org.antlr.v4.runtime.atn.LoopEndState;
 import org.antlr.v4.runtime.atn.NotSetTransition;
 import org.antlr.v4.runtime.atn.PlusBlockStartState;
 import org.antlr.v4.runtime.atn.PlusLoopbackState;
+import org.antlr.v4.runtime.atn.PrecedencePredicateTransition;
 import org.antlr.v4.runtime.atn.PredicateTransition;
 import org.antlr.v4.runtime.atn.RuleStartState;
 import org.antlr.v4.runtime.atn.RuleStopState;
@@ -67,11 +70,13 @@ import org.antlr.v4.semantics.UseDefAnalyzer;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarASTWithOptions;
 import org.antlr.v4.tool.ast.PredAST;
 import org.antlr.v4.tool.ast.QuantifierAST;
 import org.antlr.v4.tool.ast.TerminalAST;
@@ -244,7 +249,11 @@ public class ParserATNFactory implements ATNFactory {
 		RuleStartState start = atn.ruleToStartState[r.index];
 		ATNState left = newState(node);
 		ATNState right = newState(node);
-		RuleTransition call = new RuleTransition(start, r.index, right);
+		int precedence = 0;
+		if (((GrammarASTWithOptions)node).getOptionString(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME) != null) {
+			precedence = Integer.parseInt(((GrammarASTWithOptions)node).getOptionString(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME));
+		}
+		RuleTransition call = new RuleTransition(start, r.index, precedence, right);
 		left.addTransition(call);
 
 		node.atnState = left;
@@ -277,8 +286,17 @@ public class ParserATNFactory implements ATNFactory {
 		//System.out.println("sempred: "+ pred);
 		ATNState left = newState(pred);
 		ATNState right = newState(pred);
-		boolean isCtxDependent = UseDefAnalyzer.actionIsContextDependent(pred);
-		PredicateTransition p = new PredicateTransition(right, currentRule.index, g.sempreds.get(pred), isCtxDependent);
+
+		AbstractPredicateTransition p;
+		if (pred.getOptionString(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME) != null) {
+			int precedence = Integer.parseInt(pred.getOptionString(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME));
+			p = new PrecedencePredicateTransition(right, precedence);
+		}
+		else {
+			boolean isCtxDependent = UseDefAnalyzer.actionIsContextDependent(pred);
+			p = new PredicateTransition(right, currentRule.index, g.sempreds.get(pred), isCtxDependent);
+		}
+
 		left.addTransition(p);
 		pred.atnState = left;
 		return new Handle(left, right);
@@ -560,6 +578,7 @@ public class ParserATNFactory implements ATNFactory {
 			RuleStartState start = newState(RuleStartState.class, r.ast);
 			RuleStopState stop = newState(RuleStopState.class, r.ast);
 			start.stopState = stop;
+			start.isPrecedenceRule = r instanceof LeftRecursiveRule;
 			start.setRuleIndex(r.index);
 			stop.setRuleIndex(r.index);
 			atn.ruleToStartState[r.index] = start;
