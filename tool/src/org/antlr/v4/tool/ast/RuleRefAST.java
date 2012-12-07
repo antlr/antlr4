@@ -34,7 +34,7 @@ import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 
 public class RuleRefAST extends GrammarASTWithOptions implements RuleElementAST {
-	public RuleRefAST(GrammarAST node) {
+	public RuleRefAST(RuleRefAST node) {
 		super(node);
 	}
 

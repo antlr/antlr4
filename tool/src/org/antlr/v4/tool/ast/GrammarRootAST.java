@@ -51,10 +51,10 @@ public class GrammarRootAST extends GrammarASTWithOptions {
 	public Map<String, String> cmdLineOptions; // -DsuperClass=T on command line
 	public String fileName;
 
-	public GrammarRootAST(GrammarAST node) {
+	public GrammarRootAST(GrammarRootAST node) {
 		super(node);
-		this.grammarType = ((GrammarRootAST)node).grammarType;
-		this.hasErrors = ((GrammarRootAST)node).hasErrors;
+		this.grammarType = node.grammarType;
+		this.hasErrors = node.hasErrors;
 	}
 
 	public GrammarRootAST(int type) { super(type); }

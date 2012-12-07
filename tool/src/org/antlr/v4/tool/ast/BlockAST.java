@@ -46,7 +46,7 @@ public class BlockAST extends GrammarASTWithOptions implements RuleElementAST {
     public static final Map<String, String> defaultLexerBlockOptions =
             new HashMap<String, String>();
 
-	public BlockAST(GrammarAST node) {
+	public BlockAST(BlockAST node) {
 		super(node);
 	}
 

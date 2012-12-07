@@ -31,7 +31,6 @@
 package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.tool.AttributeResolver;
 
 import java.util.List;
@@ -41,10 +40,10 @@ public class ActionAST extends GrammarASTWithOptions implements RuleElementAST {
     public AttributeResolver resolver;
 	public List<Token> chunks; // useful for ANTLR IDE developers
 
-	public ActionAST(GrammarAST node) {
+	public ActionAST(ActionAST node) {
 		super(node);
-		this.resolver = ((ActionAST)node).resolver;
-		this.chunks = ((ActionAST)node).chunks;
+		this.resolver = node.resolver;
+		this.chunks = node.chunks;
 	}
 
 	public ActionAST(Token t) { super(t); }

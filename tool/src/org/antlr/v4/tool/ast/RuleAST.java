@@ -39,7 +39,7 @@ public class RuleAST extends GrammarASTWithOptions {
 	/** Kill redef of rules */
 	public boolean dead;
 
-	public RuleAST(GrammarAST node) {
+	public RuleAST(RuleAST node) {
 		super(node);
 	}
 

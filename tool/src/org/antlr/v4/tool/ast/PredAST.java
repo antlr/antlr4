@@ -33,7 +33,7 @@ package org.antlr.v4.tool.ast;
 import org.antlr.runtime.Token;
 
 public class PredAST extends ActionAST {
-	public PredAST(GrammarAST node) {
+	public PredAST(PredAST node) {
 		super(node);
 	}
 

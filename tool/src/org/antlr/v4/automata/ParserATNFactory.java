@@ -82,6 +82,7 @@ import org.antlr.v4.tool.ast.QuantifierAST;
 import org.antlr.v4.tool.ast.TerminalAST;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 
@@ -164,7 +165,7 @@ public class ParserATNFactory implements ATNFactory {
 		return h;
 	}
 
-	/** From label A build Graph o-A->o */
+	/** From label {@code A} build graph {@code o-A->o}. */
 	@Override
 	public Handle tokenRef(TerminalAST node) {
 		ATNState left = newState(node);
@@ -175,9 +176,9 @@ public class ParserATNFactory implements ATNFactory {
 		return new Handle(left, right);
 	}
 
-	/** From set build single edge graph o->o-set->o.  To conform to
+	/** From set build single edge graph {@code o->o-set->o}.  To conform to
      *  what an alt block looks like, must have extra state on left.
-	 *  This handles ~A also, converted to ~{A} set.
+	 *  This also handles {@code ~A}, converted to {@code ~{A}} set.
      */
 	@Override
 	public Handle set(GrammarAST associatedAST, List<GrammarAST> terminals, boolean invert) {
@@ -198,7 +199,7 @@ public class ParserATNFactory implements ATNFactory {
 		return new Handle(left, right);
 	}
 
-	/** Not valid for non-lexers */
+	/** Not valid for non-lexers. */
 	@Override
 	public Handle range(GrammarAST a, GrammarAST b) {
 		throw new UnsupportedOperationException();
@@ -221,18 +222,22 @@ public class ParserATNFactory implements ATNFactory {
 		return tokenRef(stringLiteralAST);
 	}
 
-	/** [Aa] char sets not allowed in parser */
+	/** {@code [Aa]} char sets not allowed in parser */
 	@Override
 	public Handle charSetLiteral(GrammarAST charSetAST) {
 		return null;
 	}
 
-	/** For reference to rule r, build
+	/**
+	 * For reference to rule {@code r}, build
 	 *
+	 * <pre>
 	 *  o->(r)  o
+	 * </pre>
 	 *
-	 *  where (r) is the start of rule r and the trailing o is not linked
-	 *  to from rule ref state directly (uses followState).
+	 * where {@code (r)} is the start of rule {@code r} and the trailing
+	 * {@code o} is not linked to from rule ref state directly (uses
+	 * {@link RuleTransition#followState}).
 	 */
 	@Override
 	public Handle ruleRef(GrammarAST node) {
@@ -267,7 +272,7 @@ public class ParserATNFactory implements ATNFactory {
 		epsilon(stop, right);
 	}
 
-	/** From an empty alternative build  o-e->o */
+	/** From an empty alternative build {@code o-e->o}. */
 	@Override
 	public Handle epsilon(GrammarAST node) {
 		ATNState left = newState(node);
@@ -278,8 +283,8 @@ public class ParserATNFactory implements ATNFactory {
 	}
 
 	/** Build what amounts to an epsilon transition with a semantic
-	 *  predicate action.  The pred is a pointer into the AST of
-	 *  the SEMPRED token.
+	 *  predicate action.  The {@code pred} is a pointer into the AST of
+	 *  the {@link ANTLRParser#SEMPRED} token.
 	 */
 	@Override
 	public Handle sempred(PredAST pred) {
@@ -304,7 +309,7 @@ public class ParserATNFactory implements ATNFactory {
 
 	/** Build what amounts to an epsilon transition with an action.
 	 *  The action goes into ATN though it is ignored during prediction
-	 *  if actionIndex &lt; 0.  Only forced are executed during prediction.
+	 *  if {@link ActionTransition#actionIndex actionIndex}{@code <0}.
 	 */
 	@Override
 	public Handle action(ActionAST action) {
@@ -322,26 +327,29 @@ public class ParserATNFactory implements ATNFactory {
 		return null;
 	}
 
-	/** From A|B|..|Z alternative block build
-     *
-     *  o->o-A->o->o (last ATNState is BlockEndState pointed to by all alts)
-     *  |          ^
-     *  |->o-B->o--|
-     *  |          |
-     *  ...        |
-     *  |          |
-     *  |->o-Z->o--|
-     *
-     *  So start node points at every alternative with epsilon transition
-	 *  and every alt right side points at a block end ATNState.
+	/**
+	 * From {@code A|B|..|Z} alternative block build
 	 *
-	 *  Special case: only one alternative: don't make a block with alt
-	 *  begin/end.
+	 * <pre>
+	 *  o->o-A->o->o (last ATNState is BlockEndState pointed to by all alts)
+	 *  |          ^
+	 *  |->o-B->o--|
+	 *  |          |
+	 *  ...        |
+	 *  |          |
+	 *  |->o-Z->o--|
+	 * </pre>
 	 *
-	 *  Special case: if just a list of tokens/chars/sets, then collapse
-	 *  to a single edged o-set->o graph.
-	 *
-	 *  TODO: Set alt number (1..n) in the states?
+	 * So start node points at every alternative with epsilon transition and
+	 * every alt right side points at a block end ATNState.
+	 * <p/>
+	 * Special case: only one alternative: don't make a block with alt
+	 * begin/end.
+	 * <p/>
+	 * Special case: if just a list of tokens/chars/sets, then collapse to a
+	 * single edged o-set->o graph.
+	 * <p/>
+	 * TODO: Set alt number (1..n) in the states?
 	 */
 	@Override
 	public Handle block(BlockAST blkAST, GrammarAST ebnfRoot, List<Handle> alts) {
@@ -431,13 +439,17 @@ public class ParserATNFactory implements ATNFactory {
 		return new Handle(first.left, last.right);
 	}
 
-	/** From (A)? build either:
+	/**
+	 * From {@code (A)?} build either:
 	 *
+	 * <pre>
 	 *  o--A->o
 	 *  |     ^
 	 *  o---->|
+	 * </pre>
 	 *
-	 *  or, if A is a block, just add an empty alt to the end of the block
+	 * or, if {@code A} is a block, just add an empty alt to the end of the
+	 * block
 	 */
 	@NotNull
 	@Override
@@ -457,14 +469,17 @@ public class ParserATNFactory implements ATNFactory {
 		return blk;
 	}
 
-	/** From (blk)+ build
+	/**
+	 * From {@code (blk)+} build
 	 *
+	 * <pre>
 	 *   |---------|
 	 *   v         |
 	 *  [o-blk-o]->o->o
+	 * </pre>
 	 *
-	 *  We add a decision for loop back node to the existing one at
-	 *  blk start.
+	 * We add a decision for loop back node to the existing one at {@code blk}
+	 * start.
 	 */
 	@NotNull
 	@Override
@@ -500,17 +515,20 @@ public class ParserATNFactory implements ATNFactory {
 		return new Handle(blkStart, end);
 	}
 
-	/** From (blk)* build ( blk+ )? with *two* decisions, one for entry
-	 *  and one for choosing alts of blk.
+	/**
+	 * From {@code (blk)*} build {@code ( blk+ )?} with *two* decisions, one for
+	 * entry and one for choosing alts of {@code blk}.
 	 *
+	 * <pre>
 	 *   |-------------|
 	 *   v             |
 	 *   o--[o-blk-o]->o  o
 	 *   |                ^
 	 *   -----------------|
+	 * </pre>
 	 *
-	 *  Note that the optional bypass must jump outside the loop as (A|B)* is
-	 *  not the same thing as (A|B|)+.
+	 * Note that the optional bypass must jump outside the loop as
+	 * {@code (A|B)*} is not the same thing as {@code (A|B|)+}.
 	 */
 	@NotNull
 	@Override
@@ -547,7 +565,7 @@ public class ParserATNFactory implements ATNFactory {
 		return new Handle(entry, end);
 	}
 
-	/** Build an atom with all possible values in its label */
+	/** Build an atom with all possible values in its label. */
 	@NotNull
 	@Override
 	public Handle wildcard(GrammarAST node) {
@@ -557,12 +575,6 @@ public class ParserATNFactory implements ATNFactory {
 		node.atnState = left;
 		return new Handle(left, right);
 	}
-
-	/** Build a subrule matching ^(. .*) (any tree or node). Let's use
-	 *  (^(. .+) | .) to be safe.
-	 */
-	@Override
-	public Handle wildcardTree(GrammarAST associatedAST) { throw new UnsupportedOperationException(); }
 
 	void epsilon(ATNState a, @NotNull ATNState b) {
 		if ( a!=null ) a.addTransition(new EpsilonTransition(b));
@@ -598,7 +610,7 @@ public class ParserATNFactory implements ATNFactory {
         }
     }
 
-	/** add an EOF transition to any rule end ATNState that points to nothing
+	/** Add an EOF transition to any rule end ATNState that points to nothing
      *  (i.e., for all those rules not invoked by another rule).  These
      *  are start symbols then.
 	 *
@@ -629,9 +641,13 @@ public class ParserATNFactory implements ATNFactory {
 		return t;
 	}
 
-	// TODO (sam): should we allow this to throw an exception instead of returning null?
-	@Nullable
+	@NotNull
 	public <T extends ATNState> T newState(@NotNull Class<T> nodeType, GrammarAST node) {
+		if (!ATNState.class.isAssignableFrom(nodeType)) {
+			throw new IllegalArgumentException(String.format("%s is not a %s.", nodeType.getName(), ATNState.class.getName()));
+		}
+
+		Exception cause;
 		try {
 			Constructor<T> ctor = nodeType.getConstructor();
 			T s = ctor.newInstance();
@@ -639,11 +655,22 @@ public class ParserATNFactory implements ATNFactory {
 			else s.setRuleIndex(currentRule.index);
 			atn.addState(s);
 			return s;
+		} catch (InstantiationException ex) {
+			cause = ex;
+		} catch (IllegalAccessException ex) {
+			cause = ex;
+		} catch (IllegalArgumentException ex) {
+			cause = ex;
+		} catch (InvocationTargetException ex) {
+			cause = ex;
+		} catch (NoSuchMethodException ex) {
+			cause = ex;
+		} catch (SecurityException ex) {
+			cause = ex;
 		}
-		catch (Exception e) {
-			ErrorManager.internalError("can't create ATN node: "+nodeType.getName(), e);
-		}
-		return null;
+
+		String message = String.format("Could not create %s of type %s.", ATNState.class.getName(), nodeType.getName());
+		throw new UnsupportedOperationException(message, cause);
 	}
 
 	@NotNull
@@ -666,7 +693,9 @@ public class ParserATNFactory implements ATNFactory {
 		return false;
 	}
 
-	// (BLOCK (ALT .)) or (BLOCK (ALT 'a') (ALT .))
+	/**
+	 * {@code (BLOCK (ALT .))} or {@code (BLOCK (ALT 'a') (ALT .))}.
+	 */
 	public static boolean blockHasWildcardAlt(@NotNull GrammarAST block) {
 		for (Object alt : block.getChildren()) {
 			if ( !(alt instanceof AltAST) ) continue;

@@ -34,7 +34,7 @@ import org.antlr.runtime.Token;
 
 public class TerminalAST extends GrammarASTWithOptions implements RuleElementAST {
 
-	public TerminalAST(GrammarAST node) {
+	public TerminalAST(TerminalAST node) {
 		super(node);
 	}
 
