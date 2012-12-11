@@ -115,7 +115,7 @@ public class CodeGenerator {
 
 	public void loadTemplates(String language) {
 		try {
-			templates = new STGroupFile(TEMPLATE_ROOT+"/"+language+"/"+language+".stg");
+			templates = new STGroupFile(TEMPLATE_ROOT+"/"+language+"/"+language+STGroup.GROUP_FILE_EXTENSION);
 			templates.registerRenderer(Integer.class, new NumberRenderer());
 			templates.registerRenderer(String.class, new StringRenderer());
 			templates.setListener(new STErrorListener() {

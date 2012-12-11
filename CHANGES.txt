@@ -8,6 +8,7 @@ December 11, 2012
 * Fix template issues
 * GrammarASTWithOptions.getOptions never returns null
 * Use EnumSet instead of HashSet
+* Use new STGroup.GROUP_FILE_EXTENSION value
 
 December 2, 2012
 

@@ -36,7 +36,7 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>ST4</artifactId>
-            <version>4.0.7-rc-1</version>
+            <version>4.0.7-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

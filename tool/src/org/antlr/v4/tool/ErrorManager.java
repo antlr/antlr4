@@ -270,7 +270,7 @@ public class ErrorManager {
      */
     public void setFormat(String formatName) {
         this.formatName = formatName;
-        String fileName = FORMATS_DIR +formatName+".stg";
+        String fileName = FORMATS_DIR +formatName+STGroup.GROUP_FILE_EXTENSION;
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         URL url = cl.getResource(fileName);
         if ( url==null ) {
