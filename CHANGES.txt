@@ -1,5 +1,9 @@
 ANTLR v4 Honey Badger
 
+December 11, 2012
+
+* Add -long-messages option; only show exceptions with errors when set
+
 December 2, 2012
 
 * Remove -Xverbose-dfa option

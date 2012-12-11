@@ -101,6 +101,7 @@ public class ErrorManager {
 		ST reportST = getReportFormat(msg.errorType.severity);
 		ST messageFormatST = getMessageFormat();
 
+		messageST.add("verbose", tool.longMessages);
 		if ( msg.args!=null ) { // fill in arg1, arg2, ...
 			for (int i=0; i<msg.args.length; i++) {
 				String attr = "arg";
@@ -109,6 +110,7 @@ public class ErrorManager {
 			}
 			if ( msg.args.length<2 ) messageST.add("arg2", null); // some messages ref arg2
 		}
+
 		if ( msg.getCause()!=null ) {
 			messageST.add("exception", msg.getCause());
 			messageST.add("stackTrace", msg.getCause().getStackTrace());
