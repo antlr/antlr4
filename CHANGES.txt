@@ -5,6 +5,7 @@ December 11, 2012
 * Add -long-messages option; only show exceptions with errors when set
 * "warning treated as error" is a one-off error
 * Listen for issues reported by StringTemplate, report them as warnings
+* Fix template issues
 
 December 2, 2012
 

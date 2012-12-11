@@ -131,7 +131,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 <Parser_(ctor="parser_ctor", ...)>
 >>
 
-Parser_(parser, funcs, atn, sempredFuncs, ctor, extras, superClass) ::= <<
+Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class <parser.name> extends <superClass> {
 	protected static final DFA[] _decisionToDFA;
@@ -163,7 +163,6 @@ public class <parser.name> extends <superClass> {
 	public ATN getATN() { return _ATN; }
 
 	<namedActions.members>
-	<extras>
 	<parser:(ctor)()>
 	<funcs; separator="\n">
 
@@ -804,8 +803,6 @@ public class <lexer.name> extends <superClass> {
 
 	@Override
 	public ATN getATN() { return _ATN; }
-
-	<lexer.namedActions.members>
 
 	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 	<atn>
