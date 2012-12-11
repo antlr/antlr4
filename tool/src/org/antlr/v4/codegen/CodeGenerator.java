@@ -39,10 +39,12 @@ import org.antlr.v4.tool.Grammar;
 import org.stringtemplate.v4.AutoIndentWriter;
 import org.stringtemplate.v4.NumberRenderer;
 import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STErrorListener;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.STWriter;
 import org.stringtemplate.v4.StringRenderer;
+import org.stringtemplate.v4.misc.STMessage;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -116,6 +118,31 @@ public class CodeGenerator {
 			templates = new STGroupFile(TEMPLATE_ROOT+"/"+language+"/"+language+".stg");
 			templates.registerRenderer(Integer.class, new NumberRenderer());
 			templates.registerRenderer(String.class, new StringRenderer());
+			templates.setListener(new STErrorListener() {
+				@Override
+				public void compileTimeError(STMessage msg) {
+					reportError(msg);
+				}
+
+				@Override
+				public void runTimeError(STMessage msg) {
+					reportError(msg);
+				}
+
+				@Override
+				public void IOError(STMessage msg) {
+					reportError(msg);
+				}
+
+				@Override
+				public void internalError(STMessage msg) {
+					reportError(msg);
+				}
+
+				private void reportError(STMessage msg) {
+					tool.errMgr.toolError(ErrorType.STRING_TEMPLATE_WARNING, msg.cause, msg.toString());
+				}
+			});
 		}
 		catch (IllegalArgumentException iae) {
 			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
