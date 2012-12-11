@@ -131,7 +131,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 <Parser_(ctor="parser_ctor", ...)>
 >>
 
-Parser_(parser, funcs, atn, sempredFuncs, ctor, extras, superClass) ::= <<
+Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extends <superClass> {
 	<if(parser.tokens)>
 	public static final int
@@ -156,7 +156,6 @@ public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extend
 	public String[] getRuleNames() { return ruleNames; }
 
 	<namedActions.members>
-	<extras>
 	<parser:(ctor)()>
 	<funcs; separator="\n">
 
@@ -853,8 +852,6 @@ public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends 
 
 	@Override
 	public String[] getModeNames() { return modeNames; }
-
-	<lexer.namedActions.members>
 
 	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 	<atn>

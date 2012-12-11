@@ -131,6 +131,7 @@ public class Tool {
 	public String genPackage = null;
 	public Map<String, String> grammarOptions = null;
 	public boolean warnings_are_errors = false;
+	public boolean longMessages = false;
 
     public static Option[] optionDefs = {
         new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
@@ -138,6 +139,7 @@ public class Tool {
         new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition network diagrams"),
 		new Option("grammarEncoding",	"-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
 		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages in antlr, gnu, vs2005"),
+		new Option("longMessages",		"-long-messages", "show exception details when available for errors and warnings"),
 		new Option("gen_listener",		"-listener", "generate parse tree listener (default)"),
 		new Option("gen_listener",		"-no-listener", "don't generate parse tree listener"),
 		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
