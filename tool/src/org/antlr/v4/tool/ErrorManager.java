@@ -40,7 +40,7 @@ import org.stringtemplate.v4.misc.STMessage;
 
 import java.net.URL;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Set;
 
@@ -52,7 +52,7 @@ public class ErrorManager {
 	public int warnings;
 
 	/** All errors that have been generated */
-	public Set<ErrorType> errorTypes = new HashSet<ErrorType>();
+	public Set<ErrorType> errorTypes = EnumSet.noneOf(ErrorType.class);
 
     /** The group of templates that represent the current message format. */
     STGroup format;

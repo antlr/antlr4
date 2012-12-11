@@ -7,6 +7,7 @@ December 11, 2012
 * Listen for issues reported by StringTemplate, report them as warnings
 * Fix template issues
 * GrammarASTWithOptions.getOptions never returns null
+* Use EnumSet instead of HashSet
 
 December 2, 2012
 
