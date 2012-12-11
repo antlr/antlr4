@@ -56,7 +56,7 @@ public enum ErrorType {
 	CANNOT_OPEN_FILE(7, "cannot find or open file: <arg><if(exception&&verbose)>; reason: <exception><endif>", ErrorSeverity.ERROR),
 	FILE_AND_GRAMMAR_NAME_DIFFER(8, "grammar name <arg> and file name <arg2> differ", ErrorSeverity.ERROR),
 	BAD_OPTION_SET_SYNTAX(9, "invalid -Dname=value syntax: <arg>", ErrorSeverity.ERROR),
-	WARNING_TREATED_AS_ERROR(10, "warning treated as error", ErrorSeverity.ERROR),
+	WARNING_TREATED_AS_ERROR(10, "warning treated as error", ErrorSeverity.ERROR_ONE_OFF),
 
 	INTERNAL_ERROR(20, "internal error: <arg> <arg2><if(exception&&verbose)>: <exception>" +
 				   "<stackTrace; separator=\"\\n\"><endif>", ErrorSeverity.ERROR),
