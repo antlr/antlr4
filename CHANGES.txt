@@ -1,5 +1,11 @@
 ANTLR v4 Honey Badger
 
+December 12, 2012
+
+* Use arrays instead of HashSet to save memory in SemanticContext.AND/OR
+* Use arrays instead of HashSet to save memory in cached DFA
+* Reduce single-operand SemanticContext.and/or operations
+
 December 11, 2012
 
 * Add -long-messages option; only show exceptions with errors when set
