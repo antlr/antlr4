@@ -35,8 +35,13 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /** A tree structure used to record the semantic context in which
@@ -114,7 +119,7 @@ public abstract class SemanticContext {
         }
     }
 
-	public static class PrecedencePredicate extends SemanticContext {
+	public static class PrecedencePredicate extends SemanticContext implements Comparable<PrecedencePredicate> {
 		public final int precedence;
 
 		protected PrecedencePredicate() {
@@ -128,6 +133,11 @@ public abstract class SemanticContext {
 		@Override
 		public boolean eval(Recognizer<?, ?> parser, RuleContext outerContext) {
 			return parser.precpred(outerContext, precedence);
+		}
+
+		@Override
+		public int compareTo(PrecedencePredicate o) {
+			return precedence - o.precedence;
 		}
 
 		@Override
@@ -166,6 +176,13 @@ public abstract class SemanticContext {
 			else operands.add(a);
 			if ( b instanceof AND ) operands.addAll(Arrays.asList(((AND)b).opnds));
 			else operands.add(b);
+
+			List<PrecedencePredicate> precedencePredicates = filterPrecedencePredicates(operands);
+			if (!precedencePredicates.isEmpty()) {
+				// interested in the transition with the lowest precedence
+				PrecedencePredicate reduced = Collections.min(precedencePredicates);
+				operands.add(reduced);
+			}
 
 			opnds = operands.toArray(new SemanticContext[operands.size()]);
         }
@@ -206,6 +223,13 @@ public abstract class SemanticContext {
 			else operands.add(a);
 			if ( b instanceof OR ) operands.addAll(Arrays.asList(((OR)b).opnds));
 			else operands.add(b);
+
+			List<PrecedencePredicate> precedencePredicates = filterPrecedencePredicates(operands);
+			if (!precedencePredicates.isEmpty()) {
+				// interested in the transition with the highest precedence
+				PrecedencePredicate reduced = Collections.max(precedencePredicates);
+				operands.add(reduced);
+			}
 
 			this.opnds = operands.toArray(new SemanticContext[operands.size()]);
         }
@@ -259,6 +283,27 @@ public abstract class SemanticContext {
 		OR result = new OR(a, b);
 		if (result.opnds.length == 1) {
 			return result.opnds[0];
+		}
+
+		return result;
+	}
+
+	private static List<PrecedencePredicate> filterPrecedencePredicates(Collection<? extends SemanticContext> collection) {
+		ArrayList<PrecedencePredicate> result = null;
+		for (Iterator<? extends SemanticContext> iterator = collection.iterator(); iterator.hasNext(); ) {
+			SemanticContext context = iterator.next();
+			if (context instanceof PrecedencePredicate) {
+				if (result == null) {
+					result = new ArrayList<PrecedencePredicate>();
+				}
+
+				result.add((PrecedencePredicate)context);
+				iterator.remove();
+			}
+		}
+
+		if (result == null) {
+			return Collections.emptyList();
 		}
 
 		return result;
