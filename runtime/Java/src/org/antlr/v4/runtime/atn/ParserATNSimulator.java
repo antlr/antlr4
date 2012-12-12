@@ -997,8 +997,8 @@ public class ParserATNSimulator extends ATNSimulator {
 		return altToPred;
 	}
 
-	public List<DFAState.PredPrediction> getPredicatePredictions(BitSet ambigAlts,
-																 SemanticContext[] altToPred)
+	public DFAState.PredPrediction[] getPredicatePredictions(BitSet ambigAlts,
+															 SemanticContext[] altToPred)
 	{
 		List<DFAState.PredPrediction> pairs = new ArrayList<DFAState.PredPrediction>();
 		boolean containsPredicate = false;
@@ -1019,7 +1019,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 
 //		System.out.println(Arrays.toString(altToPred)+"->"+pairs);
-		return pairs;
+		return pairs.toArray(new DFAState.PredPrediction[pairs.size()]);
 	}
 
 	public int getAltThatFinishedDecisionEntryRule(ATNConfigSet configs) {
@@ -1039,7 +1039,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 *  then we stop at the first predicate that evaluates to true. This
 	 *  includes pairs with null predicates.
 	 */
-	public BitSet evalSemanticContext(List<DFAState.PredPrediction> predPredictions,
+	public BitSet evalSemanticContext(@NotNull DFAState.PredPrediction[] predPredictions,
 									  ParserRuleContext outerContext,
 									  boolean complete)
 	{

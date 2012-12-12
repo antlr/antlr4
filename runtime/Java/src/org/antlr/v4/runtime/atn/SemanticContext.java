@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Utils;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -114,13 +115,16 @@ public abstract class SemanticContext {
     }
 
     public static class AND extends SemanticContext {
-		@NotNull public Set<SemanticContext> opnds = new HashSet<SemanticContext>();
-        public AND() { }
+		@NotNull public final SemanticContext[] opnds;
+
 		public AND(@NotNull SemanticContext a, @NotNull SemanticContext b) {
-			if ( a instanceof AND ) opnds.addAll(((AND)a).opnds);
-			else opnds.add(a);
-			if ( b instanceof AND ) opnds.addAll(((AND)b).opnds);
-			else opnds.add(b);
+			Set<SemanticContext> operands = new HashSet<SemanticContext>();
+			if ( a instanceof AND ) operands.addAll(Arrays.asList(((AND)a).opnds));
+			else operands.add(a);
+			if ( b instanceof AND ) operands.addAll(Arrays.asList(((AND)b).opnds));
+			else operands.add(b);
+
+			opnds = operands.toArray(new SemanticContext[operands.size()]);
         }
 
 		@Override
@@ -128,12 +132,12 @@ public abstract class SemanticContext {
 			if ( this==obj ) return true;
 			if ( !(obj instanceof AND) ) return false;
 			AND other = (AND)obj;
-			return this.opnds.equals(other.opnds);
+			return Arrays.equals(this.opnds, other.opnds);
 		}
 
 		@Override
 		public int hashCode() {
-			return opnds.hashCode();
+			return Arrays.hashCode(opnds);
 		}
 
 		@Override
@@ -146,18 +150,21 @@ public abstract class SemanticContext {
 
 		@Override
 		public String toString() {
-			return Utils.join(opnds.iterator(), "&&");
+			return Utils.join(Arrays.asList(opnds).iterator(), "&&");
         }
     }
 
     public static class OR extends SemanticContext {
-		@NotNull public Set<SemanticContext> opnds = new HashSet<SemanticContext>();
-        public OR() { }
-        public OR(@NotNull SemanticContext a, @NotNull SemanticContext b) {
-			if ( a instanceof OR ) opnds.addAll(((OR)a).opnds);
-			else opnds.add(a);
-			if ( b instanceof OR ) opnds.addAll(((OR)b).opnds);
-			else opnds.add(b);
+		@NotNull public final SemanticContext[] opnds;
+
+		public OR(@NotNull SemanticContext a, @NotNull SemanticContext b) {
+			Set<SemanticContext> operands = new HashSet<SemanticContext>();
+			if ( a instanceof OR ) operands.addAll(Arrays.asList(((OR)a).opnds));
+			else operands.add(a);
+			if ( b instanceof OR ) operands.addAll(Arrays.asList(((OR)b).opnds));
+			else operands.add(b);
+
+			this.opnds = operands.toArray(new SemanticContext[operands.size()]);
         }
 
 		@Override
@@ -165,12 +172,12 @@ public abstract class SemanticContext {
 			if ( this==obj ) return true;
 			if ( !(obj instanceof OR) ) return false;
 			OR other = (OR)obj;
-			return this.opnds.equals(other.opnds);
+			return Arrays.equals(this.opnds, other.opnds);
 		}
 
 		@Override
 		public int hashCode() {
-			return opnds.hashCode() + 1; // differ from AND slightly
+			return Arrays.hashCode(opnds) + 1; // differ from AND slightly
 		}
 
 		@Override
@@ -183,7 +190,7 @@ public abstract class SemanticContext {
 
         @Override
         public String toString() {
-			return Utils.join(opnds.iterator(), "||");
+			return Utils.join(Arrays.asList(opnds).iterator(), "||");
         }
     }
 
