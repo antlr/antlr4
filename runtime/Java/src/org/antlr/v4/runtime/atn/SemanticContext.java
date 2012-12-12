@@ -197,7 +197,12 @@ public abstract class SemanticContext {
 	public static SemanticContext and(SemanticContext a, SemanticContext b) {
 		if ( a == null || a == NONE ) return b;
 		if ( b == null || b == NONE ) return a;
-		return new AND(a, b);
+		AND result = new AND(a, b);
+		if (result.opnds.length == 1) {
+			return result.opnds[0];
+		}
+
+		return result;
 	}
 
 	/**
@@ -208,6 +213,11 @@ public abstract class SemanticContext {
 		if ( a == null ) return b;
 		if ( b == null ) return a;
 		if ( a == NONE || b == NONE ) return NONE;
-		return new OR(a, b);
+		OR result = new OR(a, b);
+		if (result.opnds.length == 1) {
+			return result.opnds[0];
+		}
+
+		return result;
 	}
 }
