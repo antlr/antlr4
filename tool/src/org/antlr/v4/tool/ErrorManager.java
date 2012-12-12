@@ -40,7 +40,7 @@ import org.stringtemplate.v4.misc.STMessage;
 
 import java.net.URL;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Set;
 
@@ -52,7 +52,7 @@ public class ErrorManager {
 	public int warnings;
 
 	/** All errors that have been generated */
-	public Set<ErrorType> errorTypes = new HashSet<ErrorType>();
+	public Set<ErrorType> errorTypes = EnumSet.noneOf(ErrorType.class);
 
     /** The group of templates that represent the current message format. */
     STGroup format;
@@ -101,6 +101,7 @@ public class ErrorManager {
 		ST reportST = getReportFormat(msg.errorType.severity);
 		ST messageFormatST = getMessageFormat();
 
+		messageST.add("verbose", tool.longMessages);
 		if ( msg.args!=null ) { // fill in arg1, arg2, ...
 			for (int i=0; i<msg.args.length; i++) {
 				String attr = "arg";
@@ -109,6 +110,7 @@ public class ErrorManager {
 			}
 			if ( msg.args.length<2 ) messageST.add("arg2", null); // some messages ref arg2
 		}
+
 		if ( msg.getCause()!=null ) {
 			messageST.add("exception", msg.getCause());
 			messageST.add("stackTrace", msg.getCause().getStackTrace());
@@ -268,7 +270,7 @@ public class ErrorManager {
      */
     public void setFormat(String formatName) {
         this.formatName = formatName;
-        String fileName = FORMATS_DIR +formatName+".stg";
+        String fileName = FORMATS_DIR +formatName+STGroup.GROUP_FILE_EXTENSION;
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         URL url = cl.getResource(fileName);
         if ( url==null ) {

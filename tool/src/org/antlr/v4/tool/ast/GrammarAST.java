@@ -213,7 +213,7 @@ public class GrammarAST extends CommonTree {
 //	}
 
 	@Override
-    public Tree dupNode() {
+    public GrammarAST dupNode() {
         return new GrammarAST(this);
     }
 

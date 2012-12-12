@@ -31,11 +31,10 @@
 package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.Tree;
 
 public class TerminalAST extends GrammarASTWithOptions implements RuleElementAST {
 
-	public TerminalAST(GrammarAST node) {
+	public TerminalAST(TerminalAST node) {
 		super(node);
 	}
 
@@ -44,7 +43,7 @@ public class TerminalAST extends GrammarASTWithOptions implements RuleElementAST
     public TerminalAST(int type, Token t) { super(type, t); }
 
 	@Override
-	public Tree dupNode() { return new TerminalAST(this); }
+	public TerminalAST dupNode() { return new TerminalAST(this); }
 
 	@Override
 	public Object visit(GrammarASTVisitor v) { return v.visit(this); }

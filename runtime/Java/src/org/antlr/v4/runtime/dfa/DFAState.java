@@ -36,6 +36,7 @@ import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -107,7 +108,7 @@ public class DFAState {
 	 *  This list is computed by predicateDFAState() in ATN simulator.
 	 */
 	@Nullable
-	public List<PredPrediction> predicates;
+	public PredPrediction[] predicates;
 
 	/** Map a predicate to a predicted alternative */
 	public static class PredPrediction {
@@ -190,7 +191,7 @@ public class DFAState {
         if ( isAcceptState ) {
             buf.append("=>");
             if ( predicates!=null ) {
-                buf.append(predicates);
+                buf.append(Arrays.toString(predicates));
             }
             else {
                 buf.append(prediction);

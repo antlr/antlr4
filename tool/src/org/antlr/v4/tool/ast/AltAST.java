@@ -31,7 +31,6 @@
 package org.antlr.v4.tool.ast;
 
 import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
 import org.antlr.v4.tool.Alternative;
 
@@ -47,11 +46,11 @@ public class AltAST extends GrammarAST {
 	 */
 	public GrammarAST altLabel;
 
-	public AltAST(GrammarAST node) {
+	public AltAST(AltAST node) {
 		super(node);
-		this.alt = ((AltAST)node).alt;
-		this.altLabel = ((AltAST)node).altLabel;
-		this.leftRecursiveAltInfo = ((AltAST)node).leftRecursiveAltInfo;
+		this.alt = node.alt;
+		this.altLabel = node.altLabel;
+		this.leftRecursiveAltInfo = node.leftRecursiveAltInfo;
 	}
 
 	public AltAST(Token t) { super(t); }
@@ -60,7 +59,7 @@ public class AltAST extends GrammarAST {
 	public AltAST(int type, Token t, String text) { super(type,t,text); }
 
 	@Override
-	public Tree dupNode() { return new AltAST(this); }
+	public AltAST dupNode() { return new AltAST(this); }
 
 	@Override
 	public Object visit(GrammarASTVisitor v) { return v.visit(this); }

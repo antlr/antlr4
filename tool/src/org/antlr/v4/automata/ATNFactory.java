@@ -212,11 +212,6 @@ public interface ATNFactory {
 	/** Build an atom with all possible values in its label */
 	Handle wildcard(GrammarAST associatedAST);
 
-	/** Build a subrule matching ^(. .*) (any tree or node). Let's use
-	 *  (^(. .+) | .) to be safe.
-	 */
-	Handle wildcardTree(GrammarAST associatedAST);
-
 	Handle lexerAltCommands(ATNFactory.Handle alt, ATNFactory.Handle cmds);
 
 	String lexerCallCommand(GrammarAST ID, GrammarAST arg);

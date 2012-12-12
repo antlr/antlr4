@@ -53,14 +53,16 @@ public enum ErrorType {
 	ERROR_READING_TOKENS_FILE(4, "cannot find tokens file <arg>: <arg2>", ErrorSeverity.ERROR),
 	DIR_NOT_FOUND(5, "directory not found: <arg>", ErrorSeverity.ERROR),
 	OUTPUT_DIR_IS_FILE(6, "output directory is a file: <arg>", ErrorSeverity.ERROR),
-	CANNOT_OPEN_FILE(7, "cannot find or open file: <arg><if(exception)>; reason: <exception><endif>", ErrorSeverity.ERROR),
+	CANNOT_OPEN_FILE(7, "cannot find or open file: <arg><if(exception&&verbose)>; reason: <exception><endif>", ErrorSeverity.ERROR),
 	FILE_AND_GRAMMAR_NAME_DIFFER(8, "grammar name <arg> and file name <arg2> differ", ErrorSeverity.ERROR),
 	BAD_OPTION_SET_SYNTAX(9, "invalid -Dname=value syntax: <arg>", ErrorSeverity.ERROR),
-	WARNING_TREATED_AS_ERROR(10, "warning treated as error", ErrorSeverity.ERROR),
+	WARNING_TREATED_AS_ERROR(10, "warning treated as error", ErrorSeverity.ERROR_ONE_OFF),
 
-	INTERNAL_ERROR(20, "internal error: <arg> <arg2><if(exception)>: <exception><endif>" +
-				   "<stackTrace; separator=\"\\n\">", ErrorSeverity.ERROR),
+	INTERNAL_ERROR(20, "internal error: <arg> <arg2><if(exception&&verbose)>: <exception>" +
+				   "<stackTrace; separator=\"\\n\"><endif>", ErrorSeverity.ERROR),
 	TOKENS_FILE_SYNTAX_ERROR(21, ".tokens file syntax error <arg>:<arg2>", ErrorSeverity.ERROR),
+	STRING_TEMPLATE_WARNING(22, "template error: <arg> <arg2><if(exception&&verbose)>: <exception>" +
+				   "<stackTrace; separator=\"\\n\"><endif>", ErrorSeverity.WARNING),
 
 	// Code generation errors
 	MISSING_CODE_GEN_TEMPLATES(30, "can't find code generation templates: <arg>", ErrorSeverity.ERROR),
