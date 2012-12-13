@@ -324,20 +324,20 @@ public class TestPerformance extends BaseTest {
         builder.append(", Grammar=").append(USE_LR_GRAMMAR ? "LR" : "Standard");
         builder.append(", ForceAtn=").append(FORCE_ATN);
 
-        builder.append('\n');
+        builder.append(newline);
 
         builder.append("Op=Lex").append(RUN_PARSER ? "+Parse" : " only");
         builder.append(", Strategy=").append(BAIL_ON_ERROR ? BailErrorStrategy.class.getSimpleName() : DefaultErrorStrategy.class.getSimpleName());
         builder.append(", BuildParseTree=").append(BUILD_PARSE_TREES);
         builder.append(", WalkBlankListener=").append(BLANK_LISTENER);
 
-        builder.append('\n');
+        builder.append(newline);
 
         builder.append("Lexer=").append(REUSE_LEXER ? "setInputStream" : "newInstance");
         builder.append(", Parser=").append(REUSE_PARSER ? "setInputStream" : "newInstance");
         builder.append(", AfterPass=").append(CLEAR_DFA ? "newInstance" : "setInputStream");
 
-        builder.append('\n');
+        builder.append(newline);
 
         return builder.toString();
     }
@@ -443,7 +443,7 @@ public class TestPerformance extends BaseTest {
 		executorService.shutdown();
 		executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
-        System.out.format("Total parse time for %d files (%d KB, %d tokens, checksum 0x%8X): %dms\n",
+        System.out.format("Total parse time for %d files (%d KB, %d tokens, checksum 0x%8X): %dms%n",
                           sources.size(),
                           inputSize / 1024,
                           tokenCount.get(),
@@ -472,7 +472,7 @@ public class TestPerformance extends BaseTest {
 					}
 				}
 
-				System.out.format("There are %d lexer DFAState instances, %d configs (%d unique).\n", states, configs, uniqueConfigs.size());
+				System.out.format("There are %d lexer DFAState instances, %d configs (%d unique).%n", states, configs, uniqueConfigs.size());
 			}
 		}
 
@@ -500,7 +500,7 @@ public class TestPerformance extends BaseTest {
 					}
                 }
 
-                System.out.format("There are %d parser DFAState instances, %d configs (%d unique).\n", states, configs, uniqueConfigs.size());
+                System.out.format("There are %d parser DFAState instances, %d configs (%d unique).%n", states, configs, uniqueConfigs.size());
             }
 
             int localDfaCount = 0;
@@ -545,12 +545,12 @@ public class TestPerformance extends BaseTest {
             }
 
             if (SHOW_CONFIG_STATS && currentPass == 0) {
-                System.out.format("  DFA accept states: %d total, %d with only local context, %d with a global context\n", localDfaCount + globalDfaCount, localDfaCount, globalDfaCount);
-                System.out.format("  Config stats: %d total, %d local, %d global\n", localConfigCount + globalConfigCount, localConfigCount, globalConfigCount);
+                System.out.format("  DFA accept states: %d total, %d with only local context, %d with a global context%n", localDfaCount + globalDfaCount, localDfaCount, globalDfaCount);
+                System.out.format("  Config stats: %d total, %d local, %d global%n", localConfigCount + globalConfigCount, localConfigCount, globalConfigCount);
                 if (SHOW_DFA_STATE_STATS) {
                     for (int i = 0; i < contextsInDFAState.length; i++) {
                         if (contextsInDFAState[i] != 0) {
-                            System.out.format("  %d configs = %d\n", i, contextsInDFAState[i]);
+                            System.out.format("  %d configs = %d%n", i, contextsInDFAState[i]);
                         }
                     }
                 }
@@ -810,9 +810,7 @@ public class TestPerformance extends BaseTest {
 			}
 
 			String sourceName = recognizer.getInputStream().getSourceName();
-			if (sourceName == null) {
-				sourceName = "";
-			} else if (!sourceName.isEmpty()) {
+			if (!sourceName.isEmpty()) {
 				sourceName = String.format("%s:%d:%d: ", sourceName, line, charPositionInLine);
 			}
 
