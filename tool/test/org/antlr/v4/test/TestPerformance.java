@@ -179,7 +179,7 @@ public class TestPerformance extends BaseTest {
      * {@link Lexer#setInputStream} will be called to initialize it for each
      * source file. Otherwise, a new instance will be created for each file.
      */
-    private static final boolean REUSE_LEXER = true;
+    private static final boolean REUSE_LEXER = false;
 	/**
 	 * If {@code true}, a single DFA will be used for lexing which is shared
 	 * across all threads and files. Otherwise, each file will be lexed with its
@@ -192,7 +192,7 @@ public class TestPerformance extends BaseTest {
      * {@link Parser#setInputStream} will be called to initialize it for each
      * source file. Otherwise, a new instance will be created for each file.
      */
-    private static final boolean REUSE_PARSER = true;
+    private static final boolean REUSE_PARSER = false;
 	/**
 	 * If {@code true}, a single DFA will be used for parsing which is shared
 	 * across all threads and files. Otherwise, each file will be parsed with
