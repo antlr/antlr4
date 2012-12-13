@@ -131,6 +131,11 @@ public class TestPerformance extends BaseTest {
      */
     private static final boolean DELETE_TEMP_FILES = true;
 
+	/**
+	 * {@code true} to call {@link System#gc} and then wait for 5 seconds at the
+	 * end of the test to make it easier for a profiler to grab a heap dump at
+	 * the end of the test run.
+	 */
     private static final boolean PAUSE_FOR_HEAP_DUMP = false;
 
     /**
@@ -154,13 +159,20 @@ public class TestPerformance extends BaseTest {
     /**
      * Use
      * {@link ParseTreeWalker#DEFAULT}{@code .}{@link ParseTreeWalker#walk walk}
-     * with the {@code BlankJavaParserListener} to show parse tree walking
+     * with the {@code JavaParserBaseListener} to show parse tree walking
      * overhead. If {@link #BUILD_PARSE_TREES} is {@code false}, the listener
      * will instead be called during the parsing process via
      * {@link Parser#addParseListener}.
      */
     private static final boolean BLANK_LISTENER = false;
 
+	/**
+	 * Shows the number of {@link DFAState} and {@link ATNConfig} instances in
+	 * the DFA cache at the end of each pass. If {@link #REUSE_LEXER_DFA} and/or
+	 * {@link #REUSE_PARSER_DFA} are false, the corresponding instance numbers
+	 * will only apply to one file (the last file if {@link #NUMBER_OF_THREADS}
+	 * is 0, otherwise the last file which was parsed on the first thread).
+	 */
     private static final boolean SHOW_DFA_STATE_STATS = true;
 
 	private static final PredictionMode PREDICTION_MODE = PredictionMode.LL;
