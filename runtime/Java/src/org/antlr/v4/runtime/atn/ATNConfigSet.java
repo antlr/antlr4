@@ -263,7 +263,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		public boolean equals(ATNConfig a, ATNConfig b) {
 			if ( a==b ) return true;
 			if ( a==null || b==null ) return false;
-			if ( hashCode(a) != hashCode(b) ) return false;
 			return a.state.stateNumber==b.state.stateNumber
 				&& a.alt==b.alt
 				&& a.semanticContext.equals(b.semanticContext);
