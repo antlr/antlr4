@@ -36,7 +36,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-/** Set impl with closed hashing (open addressing). */
+/** {@link Set} implementation with closed hashing (open addressing). */
 public class Array2DHashSet<T> implements Set<T> {
 	public static final int INITAL_CAPACITY = 16; // must be power of 2
 	public static final int INITAL_BUCKET_CAPACITY = 8;
@@ -282,7 +282,6 @@ public class Array2DHashSet<T> implements Set<T> {
 			if ( e==null ) return false;  // empty slot; not there
 			if ( comparator.equals(e, obj) ) {          // found it
 				// shift all elements to the right down one
-//				for (int j=i; j<bucket.length-1; j++) bucket[j] = bucket[j+1];
 				System.arraycopy(bucket, i+1, bucket, i, bucket.length-i-1);
 				bucket[bucket.length - 1] = null;
 				n--;
