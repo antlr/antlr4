@@ -43,7 +43,7 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Grammar;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -81,6 +81,10 @@ public class GrammarAST extends CommonTree {
 		token.setTokenIndex(t.getTokenIndex());
     }
 
+	public GrammarAST[] getChildrenAsArray() {
+		return children.toArray(new GrammarAST[children.size()]);
+	}
+
 	public List<GrammarAST> getNodesWithType(int ttype) {
 		return getNodesWithType(IntervalSet.of(ttype));
 	}
@@ -104,7 +108,9 @@ public class GrammarAST extends CommonTree {
 		while ( !work.isEmpty() ) {
 			t = work.remove(0);
 			if ( types.contains(t.getType()) ) nodes.add(t);
-			if ( t.children!=null ) work.addAll((Collection)t.children);
+			if ( t.children!=null ) {
+				work.addAll(Arrays.asList(t.getChildrenAsArray()));
+			}
 		}
 		return nodes;
 	}
