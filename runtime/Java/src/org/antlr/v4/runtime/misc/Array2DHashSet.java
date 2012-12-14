@@ -162,6 +162,7 @@ public class Array2DHashSet<T> implements Set<T> {
 		currentPrime += 4;
 		int newCapacity = buckets.length * 2;
 		T[][] newTable = createBuckets(newCapacity);
+		int[] newBucketLengths = new int[newTable.length];
 		buckets = newTable;
 		threshold = (int)(newCapacity * LOAD_FACTOR);
 //		System.out.println("new size="+newCapacity+", thres="+threshold);
@@ -171,10 +172,29 @@ public class Array2DHashSet<T> implements Set<T> {
 			if ( bucket==null ) continue;
 			for (T o : bucket) {
 				if ( o==null ) break;
-				getOrAddImpl(o);
+				int b = getBucket(o);
+				int bucketLength = newBucketLengths[b];
+				T[] newBucket;
+				if (bucketLength == 0) {
+					// new bucket
+					newBucket = createBucket(initialBucketCapacity);
+					newTable[b] = newBucket;
+				}
+				else {
+					newBucket = newTable[b];
+					if (bucketLength == newBucket.length) {
+						// expand
+						newBucket = Arrays.copyOf(newBucket, newBucket.length * 2);
+						newTable[b] = newBucket;
+					}
+				}
+
+				newBucket[bucketLength] = o;
+				newBucketLengths[b]++;
 			}
 		}
-		n = oldSize;
+
+		assert n == oldSize;
 	}
 
 	@Override
