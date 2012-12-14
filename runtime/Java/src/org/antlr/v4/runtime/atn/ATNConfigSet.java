@@ -374,14 +374,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	public ATNConfig get(int i) { return configs.get(i); }
 
-	// TODO: very expensive, used in lexer to kill after wildcard config
-	public void remove(int i) {
-		if ( readonly ) throw new IllegalStateException("This set is readonly");
-		ATNConfig c = elements().get(i);
-		configLookup.remove(c);
-		configs.remove(c); // slow linear search. ugh but not worse than it was
-	}
-
 	public void optimizeConfigs(ATNSimulator interpreter) {
 		if ( readonly ) throw new IllegalStateException("This set is readonly");
 		if ( configLookup.isEmpty() ) return;
