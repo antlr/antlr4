@@ -227,6 +227,10 @@ public class Array2DHashSet<T> implements Set<T> {
 
 	@Override
 	public <U> U[] toArray(U[] a) {
+		if (a.length < size()) {
+			a = Arrays.copyOf(a, size());
+		}
+
 		int i = 0;
 		for (T[] bucket : buckets) {
 			if ( bucket==null ) continue;
