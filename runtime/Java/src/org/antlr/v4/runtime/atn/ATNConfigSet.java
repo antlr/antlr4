@@ -394,6 +394,13 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+		else if (!(o instanceof ATNConfigSet)) {
+			return false;
+		}
+
 //		System.out.print("equals " + this + ", " + o+" = ");
 		ATNConfigSet other = (ATNConfigSet)o;
 		boolean same = configs!=null &&
