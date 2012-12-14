@@ -333,7 +333,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		if ( config.semanticContext!=SemanticContext.NONE ) {
 			hasSemanticContext = true;
 		}
-		ATNConfig existing = configLookup.absorb(config);
+		ATNConfig existing = configLookup.getOrAdd(config);
 		if ( existing==config ) { // we added this new one
 			configs.add(config);  // track order here
 			return true;

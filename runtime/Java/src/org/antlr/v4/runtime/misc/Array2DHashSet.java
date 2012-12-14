@@ -72,15 +72,17 @@ public class Array2DHashSet<T> implements Set<T> {
 		this.initialBucketCapacity = initialBucketCapacity;
 	}
 
-	/** Add o to set if not there; return existing value if already there.
-	 *  Absorb is used as synonym for add.
+	/**
+	 * Add {@code o} to set if not there; return existing value if already
+	 * there. This method performs the same operation as {@link #add} aside from
+	 * the return value.
 	 */
-	public T absorb(T o) {
+	public final T getOrAdd(T o) {
 		if ( n > threshold ) expand();
-		return absorb_(o);
+		return getOrAddImpl(o);
 	}
 
-	protected T absorb_(T o) {
+	protected T getOrAddImpl(T o) {
 		int b = getBucket(o);
 		T[] bucket = buckets[b];
 		// NEW BUCKET
@@ -165,7 +167,7 @@ public class Array2DHashSet<T> implements Set<T> {
 			if ( bucket==null ) continue;
 			for (T o : bucket) {
 				if ( o==null ) break;
-				absorb_(o);
+				getOrAddImpl(o);
 			}
 		}
 		n = oldSize;
@@ -173,7 +175,7 @@ public class Array2DHashSet<T> implements Set<T> {
 
 	@Override
 	public boolean add(T t) {
-		T existing = absorb(t);
+		T existing = getOrAdd(t);
 		return existing==t;
 	}
 
@@ -298,7 +300,7 @@ public class Array2DHashSet<T> implements Set<T> {
 	public boolean addAll(Collection<? extends T> c) {
 		boolean changed = false;
 		for (T o : c) {
-			T existing = absorb(o);
+			T existing = getOrAdd(o);
 			if ( existing!=o ) changed=true;
 		}
 		return changed;
