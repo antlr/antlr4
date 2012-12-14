@@ -38,10 +38,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GrammarRootAST extends GrammarASTWithOptions {
-	public static final Map<String, String> defaultOptions =
-         new HashMap<String, String>() {{
-			 put("language","Java");
-		 }};
+	public static final Map<String, String> defaultOptions = new HashMap<String, String>();
+	static {
+		defaultOptions.put("language","Java");
+	}
+
     public int grammarType; // LEXER, PARSER, GRAMMAR (combined)
 	public boolean hasErrors;
 	/** Track stream used to create this tree */

@@ -52,15 +52,16 @@ public class AttributeDict {
      *  of predefined attributes.  I keep this out of the runtime.Token
      *  object to avoid a runtime type leakage.
      */
-    public static AttributeDict predefinedTokenDict = new AttributeDict(DictType.TOKEN) {{
-        add(new Attribute("text"));
-        add(new Attribute("type"));
-        add(new Attribute("line"));
-        add(new Attribute("index"));
-        add(new Attribute("pos"));
-        add(new Attribute("channel"));
-        add(new Attribute("int"));
-    }};
+    public static final AttributeDict predefinedTokenDict = new AttributeDict(DictType.TOKEN);
+    static {
+        predefinedTokenDict.add(new Attribute("text"));
+        predefinedTokenDict.add(new Attribute("type"));
+        predefinedTokenDict.add(new Attribute("line"));
+        predefinedTokenDict.add(new Attribute("index"));
+        predefinedTokenDict.add(new Attribute("pos"));
+        predefinedTokenDict.add(new Attribute("channel"));
+        predefinedTokenDict.add(new Attribute("int"));
+    }
 
     public static enum DictType {
         ARG, RET, LOCAL, TOKEN,

@@ -72,50 +72,50 @@ import java.util.Set;
 public class Grammar implements AttributeResolver {
 	public static final String GRAMMAR_FROM_STRING_NAME = "<string>";
 
-	public static final Set<String> parserOptions = new HashSet<String>() {{
-		add("superClass");
-		add("TokenLabelType");
-		add("tokenVocab");
-		add("language");
-	}};
+	public static final Set<String> parserOptions = new HashSet<String>();
+	static {
+		parserOptions.add("superClass");
+		parserOptions.add("TokenLabelType");
+		parserOptions.add("tokenVocab");
+		parserOptions.add("language");
+	}
 
 	public static final Set<String> lexerOptions = parserOptions;
 
-	public static final Set<String> ruleOptions = new HashSet<String>() {{
-	}};
+	public static final Set<String> ruleOptions = new HashSet<String>();
 
-	public static final Set<String> ParserBlockOptions = new HashSet<String>() {{
-	}};
+	public static final Set<String> ParserBlockOptions = new HashSet<String>();
 
-	public static final Set<String> LexerBlockOptions = new HashSet<String>() {{
-	}};
+	public static final Set<String> LexerBlockOptions = new HashSet<String>();
 
 	/** Legal options for terminal refs like ID<assoc=right> */
-	public static final Set<String> tokenOptions = new HashSet<String>() {{
-		add("assoc");
-	}};
+	public static final Set<String> tokenOptions = new HashSet<String>();
+	static {
+		tokenOptions.add("assoc");
+	}
 
-	public static final Set<String> actionOptions = new HashSet<String>() {{
-	}};
+	public static final Set<String> actionOptions = new HashSet<String>();
 
-	public static final Set<String> semPredOptions = new HashSet<String>() {{
-		add("fail");
-	}};
+	public static final Set<String> semPredOptions = new HashSet<String>();
+	static {
+		semPredOptions.add("fail");
+	}
 
-	public static final Set doNotCopyOptionsToLexer =
-        new HashSet() {{
-				add("superClass");
-                add("TokenLabelType");
-				add("tokenVocab");
-        }};
+	public static final Set<String> doNotCopyOptionsToLexer = new HashSet<String>();
+	static {
+		doNotCopyOptionsToLexer.add("superClass");
+		doNotCopyOptionsToLexer.add("TokenLabelType");
+		doNotCopyOptionsToLexer.add("tokenVocab");
+	}
 
-    public static Map<String, AttributeDict> grammarAndLabelRefTypeToScope =
-        new HashMap<String, AttributeDict>() {{
-            put("parser:RULE_LABEL", Rule.predefinedRulePropertiesDict);
-            put("parser:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
-            put("combined:RULE_LABEL", Rule.predefinedRulePropertiesDict);
-            put("combined:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
-		}};
+	public static final Map<String, AttributeDict> grammarAndLabelRefTypeToScope =
+		new HashMap<String, AttributeDict>();
+	static {
+		grammarAndLabelRefTypeToScope.put("parser:RULE_LABEL", Rule.predefinedRulePropertiesDict);
+		grammarAndLabelRefTypeToScope.put("parser:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
+		grammarAndLabelRefTypeToScope.put("combined:RULE_LABEL", Rule.predefinedRulePropertiesDict);
+		grammarAndLabelRefTypeToScope.put("combined:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
+	}
 
 	public String name;
     public GrammarRootAST ast;
