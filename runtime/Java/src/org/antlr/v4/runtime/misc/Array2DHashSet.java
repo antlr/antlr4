@@ -195,7 +195,10 @@ public class Array2DHashSet<T> implements Set<T> {
 
 	@Override
 	public boolean contains(Object o) {
-		T obj = asElementType(o);
+		return containsFast(asElementType(o));
+	}
+
+	public boolean containsFast(@Nullable T obj) {
 		if (obj == null) {
 			return false;
 		}
@@ -239,7 +242,10 @@ public class Array2DHashSet<T> implements Set<T> {
 
 	@Override
 	public boolean remove(Object o) {
-		T obj = asElementType(o);
+		return removeFast(asElementType(o));
+	}
+
+	public boolean removeFast(@Nullable T obj) {
 		if (obj == null) {
 			return false;
 		}
