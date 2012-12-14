@@ -234,8 +234,8 @@ public class Array2DHashSet<T> implements Set<T> {
 	}
 
 	@Override
-	public Object[] toArray() {
-		Object[] a = new Object[size()];
+	public T[] toArray() {
+		T[] a = createBucket(size());
 		int i = 0;
 		for (T[] bucket : buckets) {
 			if ( bucket==null ) continue;
