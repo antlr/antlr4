@@ -238,9 +238,9 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	the number of objects associated with ATNConfigs. The other solution is to
 	use a hash table that lets us specify the equals/hashcode operation.
 	 */
-	public static class ConfigHashSet extends Array2DHashSet<ATNConfig> {
+	public static class ConfigHashSet extends AbstractConfigHashSet {
 		public ConfigHashSet() {
-			super(ConfigEqualityComparator.INSTANCE,16,2);
+			super(ConfigEqualityComparator.INSTANCE);
 		}
 	}
 
@@ -281,7 +281,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	/** All configs but hashed by (s, i, _, pi) not incl context.  Wiped out
 	 *  when we go readonly as this set becomes a DFA state.
 	 */
-	public Array2DHashSet<ATNConfig> configLookup;
+	public AbstractConfigHashSet configLookup;
 
 	/** Track the elements as they are added to the set; supports get(i) */
 	public final ArrayList<ATNConfig> configs = new ArrayList<ATNConfig>(7);
@@ -498,5 +498,16 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	@Override
 	public boolean removeAll(Collection<?> c) {
 		throw new UnsupportedOperationException();
+	}
+
+	public static abstract class AbstractConfigHashSet extends Array2DHashSet<ATNConfig> {
+
+		public AbstractConfigHashSet(AbstractEqualityComparator<? super ATNConfig> comparator) {
+			this(comparator, 16, 2);
+		}
+
+		public AbstractConfigHashSet(AbstractEqualityComparator<? super ATNConfig> comparator, int initialCapacity, int initialBucketCapacity) {
+			super(comparator, initialCapacity, initialBucketCapacity);
+		}
 	}
 }
