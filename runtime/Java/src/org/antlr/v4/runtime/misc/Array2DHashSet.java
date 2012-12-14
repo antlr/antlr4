@@ -195,7 +195,12 @@ public class Array2DHashSet<T> implements Set<T> {
 
 	@Override
 	public boolean contains(Object o) {
-		return get((T)o) != null;
+		T obj = asElementType(o);
+		if (obj == null) {
+			return false;
+		}
+
+		return get(obj) != null;
 	}
 
 	@Override
@@ -234,14 +239,18 @@ public class Array2DHashSet<T> implements Set<T> {
 
 	@Override
 	public boolean remove(Object o) {
-		if ( o==null ) return false;
-		int b = getBucket((T)o);
+		T obj = asElementType(o);
+		if (obj == null) {
+			return false;
+		}
+
+		int b = getBucket(obj);
 		T[] bucket = buckets[b];
 		if ( bucket==null ) return false; // no bucket
 		for (int i=0; i<bucket.length; i++) {
 			T e = bucket[i];
 			if ( e==null ) return false;  // empty slot; not there
-			if ( comparator.equals(e, (T) o) ) {          // found it
+			if ( comparator.equals(e, obj) ) {          // found it
 				// shift all elements to the right down one
 //				for (int j=i; j<bucket.length-1; j++) bucket[j] = bucket[j+1];
 				System.arraycopy(bucket, i+1, bucket, i, bucket.length-i-1);
@@ -336,6 +345,24 @@ public class Array2DHashSet<T> implements Set<T> {
 			buf.append("]\n");
 		}
 		return buf.toString();
+	}
+
+	/**
+	 * Return {@code o} as an instance of the element type {@link T}. If
+	 * {@code o} is non-null but known to not be an instance of {@link T}, this
+	 * method returns {@code null}. The base implementation does not perform any
+	 * type checks; override this method to provide strong type checks for the
+	 * {@link #contains} and {@link #remove} methods to ensure the arguments to
+	 * the {@link EqualityComparator} for the set always have the expected
+	 * types.
+	 *
+	 * @param o the object to try and cast to the element type of the set
+	 * @return {@code o} if it could be an instance of {@link T}, otherwise
+	 * {@code null}.
+	 */
+	@SuppressWarnings("unchecked")
+	protected T asElementType(Object o) {
+		return (T)o;
 	}
 
 	/**

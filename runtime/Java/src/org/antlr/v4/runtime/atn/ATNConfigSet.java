@@ -509,6 +509,15 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		}
 
 		@Override
+		protected final ATNConfig asElementType(Object o) {
+			if (!(o instanceof ATNConfig)) {
+				return null;
+			}
+
+			return (ATNConfig)o;
+		}
+
+		@Override
 		protected final ATNConfig[][] createBuckets(int capacity) {
 			return new ATNConfig[capacity][];
 		}
