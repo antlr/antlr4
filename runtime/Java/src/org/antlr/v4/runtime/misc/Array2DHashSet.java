@@ -260,6 +260,7 @@ public class Array2DHashSet<T> implements Set<T> {
 				// shift all elements to the right down one
 //				for (int j=i; j<bucket.length-1; j++) bucket[j] = bucket[j+1];
 				System.arraycopy(bucket, i+1, bucket, i, bucket.length-i-1);
+				bucket[bucket.length - 1] = null;
 				n--;
 				return true;
 			}
