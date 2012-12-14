@@ -275,13 +275,13 @@ public class Array2DHashSet<T> implements Set<T> {
 				if ( bucket==null ) continue;
 				for (Object o : bucket) {
 					if ( o==null ) break;
-					if ( !this.contains(o) ) return false;
+					if ( !this.containsFast(asElementType(o)) ) return false;
 				}
 			}
 		}
 		else {
 			for (Object o : collection) {
-				if ( !this.contains(o) ) return false;
+				if ( !this.containsFast(asElementType(o)) ) return false;
 			}
 		}
 		return true;
