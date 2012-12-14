@@ -245,6 +245,7 @@ public class ErrorManager {
 
     // S U P P O R T  C O D E
 
+	@SuppressWarnings("fallthrough")
 	public void emit(ErrorType etype, ANTLRMessage msg) {
 		switch ( etype.severity ) {
 			case WARNING_ONE_OFF:
