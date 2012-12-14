@@ -128,7 +128,7 @@ public class Array2DHashSet<T> implements Set<T> {
 		return null;
 	}
 
-	protected int getBucket(T o) {
+	protected final int getBucket(T o) {
 		int hash = comparator.hashCode(o);
 		int b = hash & (buckets.length-1); // assumes len is power of 2
 		return b;
@@ -150,7 +150,7 @@ public class Array2DHashSet<T> implements Set<T> {
 	@Override
 	public boolean equals(Object o) {
 		if (o == this) return true;
-		if ( !(o instanceof Array2DHashSet) || o==null ) return false;
+		if ( !(o instanceof Array2DHashSet) ) return false;
 		Array2DHashSet<?> other = (Array2DHashSet<?>)o;
 		if ( other.size() != size() ) return false;
 		boolean same = this.containsAll(other);
@@ -178,23 +178,23 @@ public class Array2DHashSet<T> implements Set<T> {
 	}
 
 	@Override
-	public boolean add(T t) {
+	public final boolean add(T t) {
 		T existing = getOrAdd(t);
 		return existing==t;
 	}
 
 	@Override
-	public int size() {
+	public final int size() {
 		return n;
 	}
 
 	@Override
-	public boolean isEmpty() {
+	public final boolean isEmpty() {
 		return n==0;
 	}
 
 	@Override
-	public boolean contains(Object o) {
+	public final boolean contains(Object o) {
 		return containsFast(asElementType(o));
 	}
 
@@ -241,7 +241,7 @@ public class Array2DHashSet<T> implements Set<T> {
 	}
 
 	@Override
-	public boolean remove(Object o) {
+	public final boolean remove(Object o) {
 		return removeFast(asElementType(o));
 	}
 
