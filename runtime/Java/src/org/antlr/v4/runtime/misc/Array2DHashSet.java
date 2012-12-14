@@ -169,9 +169,15 @@ public class Array2DHashSet<T> implements Set<T> {
 		// rehash all existing entries
 		int oldSize = size();
 		for (T[] bucket : old) {
-			if ( bucket==null ) continue;
+			if ( bucket==null ) {
+				continue;
+			}
+
 			for (T o : bucket) {
-				if ( o==null ) break;
+				if ( o==null ) {
+					break;
+				}
+
 				int b = getBucket(o);
 				int bucketLength = newBucketLengths[b];
 				T[] newBucket;
@@ -236,12 +242,19 @@ public class Array2DHashSet<T> implements Set<T> {
 		T[] a = createBucket(size());
 		int i = 0;
 		for (T[] bucket : buckets) {
-			if ( bucket==null ) continue;
+			if ( bucket==null ) {
+				continue;
+			}
+
 			for (T o : bucket) {
-				if ( o==null ) break;
+				if ( o==null ) {
+					break;
+				}
+
 				a[i++] = o;
 			}
 		}
+
 		return a;
 	}
 
@@ -253,9 +266,15 @@ public class Array2DHashSet<T> implements Set<T> {
 
 		int i = 0;
 		for (T[] bucket : buckets) {
-			if ( bucket==null ) continue;
+			if ( bucket==null ) {
+				continue;
+			}
+
 			for (T o : bucket) {
-				if ( o==null ) break;
+				if ( o==null ) {
+					break;
+				}
+
 				@SuppressWarnings("unchecked") // array store will check this
 				U targetElement = (U)o;
 				a[i++] = targetElement;
@@ -276,10 +295,18 @@ public class Array2DHashSet<T> implements Set<T> {
 
 		int b = getBucket(obj);
 		T[] bucket = buckets[b];
-		if ( bucket==null ) return false; // no bucket
+		if ( bucket==null ) {
+			// no bucket
+			return false;
+		}
+
 		for (int i=0; i<bucket.length; i++) {
 			T e = bucket[i];
-			if ( e==null ) return false;  // empty slot; not there
+			if ( e==null ) {
+				// empty slot; not there
+				return false;
+			}
+
 			if ( comparator.equals(e, obj) ) {          // found it
 				// shift all elements to the right down one
 				System.arraycopy(bucket, i+1, bucket, i, bucket.length-i-1);
@@ -288,6 +315,7 @@ public class Array2DHashSet<T> implements Set<T> {
 				return true;
 			}
 		}
+
 		return false;
 	}
 
