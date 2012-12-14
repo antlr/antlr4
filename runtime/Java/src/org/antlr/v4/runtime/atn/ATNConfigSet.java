@@ -507,5 +507,16 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		public AbstractConfigHashSet(AbstractEqualityComparator<? super ATNConfig> comparator, int initialCapacity, int initialBucketCapacity) {
 			super(comparator, initialCapacity, initialBucketCapacity);
 		}
+
+		@Override
+		protected final ATNConfig[][] createBuckets(int capacity) {
+			return new ATNConfig[capacity][];
+		}
+
+		@Override
+		protected final ATNConfig[] createBucket(int capacity) {
+			return new ATNConfig[capacity];
+		}
+
 	}
 }

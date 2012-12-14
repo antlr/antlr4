@@ -30,6 +30,7 @@
 
 package org.antlr.v4.runtime.misc;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -68,7 +69,7 @@ public class Array2DHashSet<T> implements Set<T> {
 		}
 
 		this.comparator = comparator;
-		this.buckets = (T[][])new Object[initialCapacity][];
+		this.buckets = createBuckets(initialCapacity);
 		this.initialBucketCapacity = initialBucketCapacity;
 	}
 
@@ -85,13 +86,16 @@ public class Array2DHashSet<T> implements Set<T> {
 	protected T getOrAddImpl(T o) {
 		int b = getBucket(o);
 		T[] bucket = buckets[b];
+
 		// NEW BUCKET
 		if ( bucket==null ) {
-			buckets[b] = (T[])new Object[initialBucketCapacity];
-			buckets[b][0] = o;
+			bucket = createBucket(initialBucketCapacity);
+			bucket[0] = o;
+			buckets[b] = bucket;
 			n++;
 			return o;
 		}
+
 		// LOOK FOR IT IN BUCKET
 		for (int i=0; i<bucket.length; i++) {
 			T existing = bucket[i];
@@ -102,12 +106,12 @@ public class Array2DHashSet<T> implements Set<T> {
 			}
 			if ( comparator.equals(existing, o) ) return existing; // found existing, quit
 		}
+
 		// FULL BUCKET, expand and add to end
-		T[] old = bucket;
-		bucket = (T[])new Object[old.length * 2];
+		int oldLength = bucket.length;
+		bucket = Arrays.copyOf(bucket, bucket.length * 2);
 		buckets[b] = bucket;
-		System.arraycopy(old, 0, bucket, 0, old.length);
-		bucket[old.length] = o; // add to end
+		bucket[oldLength] = o; // add to end
 		n++;
 		return o;
 	}
@@ -157,7 +161,7 @@ public class Array2DHashSet<T> implements Set<T> {
 		T[][] old = buckets;
 		currentPrime += 4;
 		int newCapacity = buckets.length * 2;
-		T[][] newTable = (T[][])new Object[newCapacity][];
+		T[][] newTable = createBuckets(newCapacity);
 		buckets = newTable;
 		threshold = (int)(newCapacity * LOAD_FACTOR);
 //		System.out.println("new size="+newCapacity+", thres="+threshold);
@@ -318,7 +322,7 @@ public class Array2DHashSet<T> implements Set<T> {
 
 	@Override
 	public void clear() {
-		buckets = (T[][])new Object[INITAL_CAPACITY][];
+		buckets = createBuckets(INITAL_CAPACITY);
 		n = 0;
 	}
 
@@ -362,20 +366,25 @@ public class Array2DHashSet<T> implements Set<T> {
 		return buf.toString();
 	}
 
-	public static void main(String[] args) {
-		Array2DHashSet<String> clset = new Array2DHashSet<String>();
-		Set<String> set = clset;
-		set.add("hi");
-		set.add("mom");
-		set.add("foo");
-		set.add("ach");
-		set.add("cbba");
-		set.add("d");
-		set.add("edf");
-		set.add("f");
-		set.add("gab");
-		set.remove("ach");
-		System.out.println(set);
-		System.out.println(clset.toTableString());
+	/**
+	 * Return an array of {@code T[]} with length {@code capacity}.
+	 *
+	 * @param capacity the length of the array to return
+	 * @return the newly constructed array
+	 */
+	@SuppressWarnings("unchecked")
+	protected T[][] createBuckets(int capacity) {
+		return (T[][])new Object[capacity][];
+	}
+
+	/**
+	 * Return an array of {@code T} with length {@code capacity}.
+	 *
+	 * @param capacity the length of the array to return
+	 * @return the newly constructed array
+	 */
+	@SuppressWarnings("unchecked")
+	protected T[] createBucket(int capacity) {
+		return (T[])new Object[capacity];
 	}
 }
