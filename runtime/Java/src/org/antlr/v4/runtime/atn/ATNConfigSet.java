@@ -469,7 +469,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	// satisfy interface
 
 	@Override
-	public Object[] toArray() {
+	public ATNConfig[] toArray() {
 		return configLookup.toArray();
 	}
 
