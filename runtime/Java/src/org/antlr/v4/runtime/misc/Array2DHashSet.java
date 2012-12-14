@@ -323,12 +323,54 @@ public class Array2DHashSet<T> implements Set<T> {
 
 	@Override
 	public boolean retainAll(Collection<?> c) {
-		throw new UnsupportedOperationException();
+		int newsize = 0;
+		for (T[] bucket : buckets) {
+			if (bucket == null) {
+				continue;
+			}
+
+			int i;
+			int j;
+			for (i = 0, j = 0; i < bucket.length; i++) {
+				if (bucket[i] == null) {
+					break;
+				}
+
+				if (!c.contains(bucket[i])) {
+					// removed
+					continue;
+				}
+
+				// keep
+				if (i != j) {
+					bucket[j] = bucket[i];
+				}
+
+				j++;
+				newsize++;
+			}
+
+			newsize += j;
+
+			while (j < i) {
+				bucket[j] = null;
+				j++;
+			}
+		}
+
+		boolean changed = newsize != n;
+		n = newsize;
+		return changed;
 	}
 
 	@Override
 	public boolean removeAll(Collection<?> c) {
-		throw new UnsupportedOperationException();
+		boolean changed = false;
+		for (Object o : c) {
+			changed |= removeFast(asElementType(o));
+		}
+
+		return changed;
 	}
 
 	@Override
