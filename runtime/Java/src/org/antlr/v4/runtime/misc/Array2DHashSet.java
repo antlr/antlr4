@@ -151,7 +151,7 @@ public class Array2DHashSet<T> implements Set<T> {
 	public boolean equals(Object o) {
 		if (o == this) return true;
 		if ( !(o instanceof Array2DHashSet) || o==null ) return false;
-		Array2DHashSet<T> other = (Array2DHashSet<T>)o;
+		Array2DHashSet<?> other = (Array2DHashSet<?>)o;
 		if ( other.size() != size() ) return false;
 		boolean same = this.containsAll(other);
 		return same;
@@ -224,7 +224,9 @@ public class Array2DHashSet<T> implements Set<T> {
 			if ( bucket==null ) continue;
 			for (T o : bucket) {
 				if ( o==null ) break;
-				a[i++] = (U)o;
+				@SuppressWarnings("unchecked") // array store will check this
+				U targetElement = (U)o;
+				a[i++] = targetElement;
 			}
 		}
 		return a;
@@ -253,10 +255,10 @@ public class Array2DHashSet<T> implements Set<T> {
 	@Override
 	public boolean containsAll(Collection<?> collection) {
 		if ( collection instanceof Array2DHashSet ) {
-			Array2DHashSet<T> s = (Array2DHashSet<T>)collection;
-			for (T[] bucket : s.buckets) {
+			Array2DHashSet<?> s = (Array2DHashSet<?>)collection;
+			for (Object[] bucket : s.buckets) {
 				if ( bucket==null ) continue;
-				for (T o : bucket) {
+				for (Object o : bucket) {
 					if ( o==null ) break;
 					if ( !this.contains(o) ) return false;
 				}
