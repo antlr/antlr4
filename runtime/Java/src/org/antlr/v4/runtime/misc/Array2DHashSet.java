@@ -200,37 +200,7 @@ public class Array2DHashSet<T> implements Set<T> {
 
 	@Override
 	public Iterator<T> iterator() {
-		final Object[] data = toArray();
-		return new Iterator<T>() {
-			int nextIndex = 0;
-			boolean removed = true;
-
-			@Override
-			public boolean hasNext() {
-				return nextIndex < data.length;
-			}
-
-			@Override
-			public T next() {
-				if (!hasNext()) {
-					throw new NoSuchElementException();
-				}
-
-				removed = false;
-				return (T)data[nextIndex++];
-			}
-
-			@Override
-			public void remove() {
-				if (removed) {
-					throw new IllegalStateException();
-				}
-
-				Array2DHashSet.this.remove(data[nextIndex - 1]);
-				removed = true;
-			}
-
-		};
+		return new SetIterator(toArray());
 	}
 
 	@Override
@@ -386,5 +356,40 @@ public class Array2DHashSet<T> implements Set<T> {
 	@SuppressWarnings("unchecked")
 	protected T[] createBucket(int capacity) {
 		return (T[])new Object[capacity];
+	}
+
+	protected class SetIterator implements Iterator<T> {
+		final T[] data;
+		int nextIndex = 0;
+		boolean removed = true;
+
+		public SetIterator(T[] data) {
+			this.data = data;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return nextIndex < data.length;
+		}
+
+		@Override
+		public T next() {
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+
+			removed = false;
+			return data[nextIndex++];
+		}
+
+		@Override
+		public void remove() {
+			if (removed) {
+				throw new IllegalStateException();
+			}
+
+			Array2DHashSet.this.remove(data[nextIndex - 1]);
+			removed = true;
+		}
 	}
 }
