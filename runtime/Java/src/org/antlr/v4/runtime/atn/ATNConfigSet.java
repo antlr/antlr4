@@ -238,9 +238,9 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	the number of objects associated with ATNConfigs. The other solution is to
 	use a hash table that lets us specify the equals/hashcode operation.
 	 */
-	public static class ConfigHashSet extends Array2DHashSet<ATNConfig> {
+	public static class ConfigHashSet extends AbstractConfigHashSet {
 		public ConfigHashSet() {
-			super(ConfigEqualityComparator.INSTANCE,16,2);
+			super(ConfigEqualityComparator.INSTANCE);
 		}
 	}
 
@@ -263,7 +263,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		public boolean equals(ATNConfig a, ATNConfig b) {
 			if ( a==b ) return true;
 			if ( a==null || b==null ) return false;
-			if ( hashCode(a) != hashCode(b) ) return false;
 			return a.state.stateNumber==b.state.stateNumber
 				&& a.alt==b.alt
 				&& a.semanticContext.equals(b.semanticContext);
@@ -281,7 +280,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	/** All configs but hashed by (s, i, _, pi) not incl context.  Wiped out
 	 *  when we go readonly as this set becomes a DFA state.
 	 */
-	public Array2DHashSet<ATNConfig> configLookup;
+	public AbstractConfigHashSet configLookup;
 
 	/** Track the elements as they are added to the set; supports get(i) */
 	public final ArrayList<ATNConfig> configs = new ArrayList<ATNConfig>(7);
@@ -334,7 +333,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		if ( config.semanticContext!=SemanticContext.NONE ) {
 			hasSemanticContext = true;
 		}
-		ATNConfig existing = configLookup.absorb(config);
+		ATNConfig existing = configLookup.getOrAdd(config);
 		if ( existing==config ) { // we added this new one
 			configs.add(config);  // track order here
 			return true;
@@ -375,14 +374,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	public ATNConfig get(int i) { return configs.get(i); }
 
-	// TODO: very expensive, used in lexer to kill after wildcard config
-	public void remove(int i) {
-		if ( readonly ) throw new IllegalStateException("This set is readonly");
-		ATNConfig c = elements().get(i);
-		configLookup.remove(c);
-		configs.remove(c); // slow linear search. ugh but not worse than it was
-	}
-
 	public void optimizeConfigs(ATNSimulator interpreter) {
 		if ( readonly ) throw new IllegalStateException("This set is readonly");
 		if ( configLookup.isEmpty() ) return;
@@ -403,6 +394,13 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+		else if (!(o instanceof ATNConfigSet)) {
+			return false;
+		}
+
 //		System.out.print("equals " + this + ", " + o+" = ");
 		ATNConfigSet other = (ATNConfigSet)o;
 		boolean same = configs!=null &&
@@ -434,10 +432,19 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public boolean contains(Object o) {
-		if ( o instanceof ATNConfig ) {
-			return configLookup.contains(o);
+		if (configLookup == null) {
+			throw new UnsupportedOperationException("This method is not implemented for readonly sets.");
 		}
-		return false;
+
+		return configLookup.contains(o);
+	}
+
+	public boolean containsFast(ATNConfig obj) {
+		if (configLookup == null) {
+			throw new UnsupportedOperationException("This method is not implemented for readonly sets.");
+		}
+
+		return configLookup.containsFast(obj);
 	}
 
 	@Override
@@ -471,7 +478,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	// satisfy interface
 
 	@Override
-	public Object[] toArray() {
+	public ATNConfig[] toArray() {
 		return configLookup.toArray();
 	}
 
@@ -498,5 +505,36 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	@Override
 	public boolean removeAll(Collection<?> c) {
 		throw new UnsupportedOperationException();
+	}
+
+	public static abstract class AbstractConfigHashSet extends Array2DHashSet<ATNConfig> {
+
+		public AbstractConfigHashSet(AbstractEqualityComparator<? super ATNConfig> comparator) {
+			this(comparator, 16, 2);
+		}
+
+		public AbstractConfigHashSet(AbstractEqualityComparator<? super ATNConfig> comparator, int initialCapacity, int initialBucketCapacity) {
+			super(comparator, initialCapacity, initialBucketCapacity);
+		}
+
+		@Override
+		protected final ATNConfig asElementType(Object o) {
+			if (!(o instanceof ATNConfig)) {
+				return null;
+			}
+
+			return (ATNConfig)o;
+		}
+
+		@Override
+		protected final ATNConfig[][] createBuckets(int capacity) {
+			return new ATNConfig[capacity][];
+		}
+
+		@Override
+		protected final ATNConfig[] createBucket(int capacity) {
+			return new ATNConfig[capacity];
+		}
+
 	}
 }
