@@ -219,7 +219,7 @@ public class ErrorManager {
 
 	}
 
-	public void leftRecursionCycles(String fileName, Collection cycles) {
+	public void leftRecursionCycles(String fileName, Collection<? extends Collection<Rule>> cycles) {
 		errors++;
 		ANTLRMessage msg = new LeftRecursionCyclesMessage(fileName, cycles);
 		tool.error(msg);
@@ -245,6 +245,7 @@ public class ErrorManager {
 
     // S U P P O R T  C O D E
 
+	@SuppressWarnings("fallthrough")
 	public void emit(ErrorType etype, ANTLRMessage msg) {
 		switch ( etype.severity ) {
 			case WARNING_ONE_OFF:

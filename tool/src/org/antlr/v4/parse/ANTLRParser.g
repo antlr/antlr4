@@ -130,10 +130,13 @@ package org.antlr.v4.parse;
 
 import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.*;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
 }
 
 @members {
-Stack paraphrases = new Stack();
+Deque<String> paraphrases = new ArrayDeque<String>();
 public void grammarError(ErrorType etype, org.antlr.runtime.Token token, Object... args) { }
 }
 

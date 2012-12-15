@@ -51,26 +51,28 @@ public class Rule implements AttributeResolver {
      *
      *  These must be consistent with ActionTranslator.rulePropToModelMap, ...
      */
-    public static AttributeDict predefinedRulePropertiesDict =
-        new AttributeDict(AttributeDict.DictType.PREDEFINED_RULE) {{
-            add(new Attribute("text"));
-            add(new Attribute("start"));
-            add(new Attribute("stop"));
-            add(new Attribute("ctx"));
-        }};
+	public static final AttributeDict predefinedRulePropertiesDict =
+		new AttributeDict(AttributeDict.DictType.PREDEFINED_RULE);
+	static {
+		predefinedRulePropertiesDict.add(new Attribute("text"));
+		predefinedRulePropertiesDict.add(new Attribute("start"));
+		predefinedRulePropertiesDict.add(new Attribute("stop"));
+		predefinedRulePropertiesDict.add(new Attribute("ctx"));
+	}
 
-	public static Set<String> validLexerCommands = new HashSet<String>() {{
+	public static final Set<String> validLexerCommands = new HashSet<String>();
+	static {
 		// CALLS
-		add("mode");
-		add("pushMode");
-		add("type");
-		add("channel");
+		validLexerCommands.add("mode");
+		validLexerCommands.add("pushMode");
+		validLexerCommands.add("type");
+		validLexerCommands.add("channel");
 
 		// ACTIONS
-		add("popMode");
-		add("skip");
-		add("more");
-	}};
+		validLexerCommands.add("popMode");
+		validLexerCommands.add("skip");
+		validLexerCommands.add("more");
+	}
 
 	public String name;
 	public List<GrammarAST> modifiers;

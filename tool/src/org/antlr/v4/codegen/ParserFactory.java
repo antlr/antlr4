@@ -137,7 +137,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 	@Override
 	public List<SrcOp> tokenRef(GrammarAST ID, GrammarAST labelAST, GrammarAST args) {
-		LabeledOp matchOp = new MatchToken(this, (TerminalAST) ID);
+		MatchToken matchOp = new MatchToken(this, (TerminalAST) ID);
 		if ( labelAST!=null ) {
 			String label = labelAST.getText();
 			RuleFunction rf = getCurrentRuleFunction();
@@ -149,7 +149,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 			}
 			else {
 				Decl d = getTokenLabelDecl(label);
-				((MatchToken) matchOp).labels.add(d);
+				matchOp.labels.add(d);
 				rf.addContextDecl(ID.getAltLabel(), d);
 			}
 
@@ -176,13 +176,13 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 	@Override
 	public List<SrcOp> set(GrammarAST setAST, GrammarAST labelAST, boolean invert) {
-		LabeledOp matchOp;
+		MatchSet matchOp;
 		if ( invert ) matchOp = new MatchNotSet(this, setAST);
 		else matchOp = new MatchSet(this, setAST);
 		if ( labelAST!=null ) {
 			String label = labelAST.getText();
 			Decl d = getTokenLabelDecl(label);
-			((MatchSet)matchOp).labels.add(d);
+			matchOp.labels.add(d);
 			getCurrentRuleFunction().addContextDecl(setAST.getAltLabel(), d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN ) {
 				TokenListDecl l = getTokenListLabelDecl(label);

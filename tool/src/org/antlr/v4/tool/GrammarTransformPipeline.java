@@ -280,7 +280,7 @@ public class GrammarTransformPipeline {
 		GrammarRootAST combinedAST = combinedGrammar.ast;
 		//tool.log("grammar", "before="+combinedAST.toStringTree());
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(combinedAST.token.getInputStream());
-		GrammarAST[] elements = (GrammarAST[])combinedAST.getChildren().toArray(new GrammarAST[0]);
+		GrammarAST[] elements = combinedAST.getChildren().toArray(new GrammarAST[0]);
 
 		// MAKE A GRAMMAR ROOT and ID
 		String lexerName = combinedAST.getChild(0).getText()+"Lexer";
@@ -296,7 +296,7 @@ public class GrammarTransformPipeline {
 		if ( optionsRoot!=null ) {
 			GrammarAST lexerOptionsRoot = (GrammarAST)adaptor.dupNode(optionsRoot);
 			lexerAST.addChild(lexerOptionsRoot);
-			GrammarAST[] options = (GrammarAST[])optionsRoot.getChildren().toArray(new GrammarAST[0]);
+			GrammarAST[] options = optionsRoot.getChildren().toArray(new GrammarAST[0]);
 			for (GrammarAST o : options) {
 				String optionName = o.getChild(0).getText();
 				if ( Grammar.lexerOptions.contains(optionName) &&

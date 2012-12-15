@@ -178,6 +178,7 @@ public class RuleContext implements RuleNode {
 	 *  (root child1 .. childN). Print just a node if this is a leaf.
 	 *  We have to know the recognizer so we can get rule names.
 	 */
+	@Override
 	public String toStringTree(@Nullable Parser recog) {
 		return Trees.toStringTree(this, recog);
 	}

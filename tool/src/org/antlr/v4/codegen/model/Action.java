@@ -52,7 +52,7 @@ public class Action extends RuleElement {
 		super(factory,ast);
 		RuleFunction rf = factory.getCurrentRuleFunction();
 		if (ast != null) {
-			chunks = ActionTranslator.translateAction(factory, rf, ast.token, (ActionAST)ast);
+			chunks = ActionTranslator.translateAction(factory, rf, ast.token, ast);
 		}
 		else {
 			chunks = new ArrayList<ActionChunk>();

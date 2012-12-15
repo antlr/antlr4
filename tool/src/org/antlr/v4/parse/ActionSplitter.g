@@ -46,11 +46,6 @@ public ActionSplitter(CharStream input, ActionSplitterListener delegate) {
     this.delegate = delegate;
 }
 
-public void emit(Token token) {
-	super.emit(token);
-
-}
-
 /** force filtering (and return tokens). triggers all above actions. */
 public List<Token> getActionTokens() {
     List<Token> chunks = new ArrayList<Token>();
