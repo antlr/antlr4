@@ -887,7 +887,7 @@ public abstract class BaseTest {
 		assertTrue("error is not a GrammarSemanticsMessage",
 				   foundMsg instanceof GrammarSemanticsMessage);
 		 */
-		assertTrue(Arrays.equals(expectedMessage.getArgs(), foundMsg.getArgs()));
+		assertArrayEquals(expectedMessage.getArgs(), foundMsg.getArgs());
 	}
 
     public static class FilteringTokenStream extends CommonTokenStream {

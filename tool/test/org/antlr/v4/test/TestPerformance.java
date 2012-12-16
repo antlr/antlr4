@@ -94,6 +94,7 @@ import java.util.logging.Logger;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 public class TestPerformance extends BaseTest {
@@ -770,8 +771,7 @@ public class TestPerformance extends BaseTest {
 							}
 						}
 
-                        Assert.assertTrue(parseResult instanceof ParseTree);
-
+						assertThat(parseResult, instanceOf(ParseTree.class));
                         if (BUILD_PARSE_TREES && BLANK_LISTENER) {
                             ParseTreeWalker.DEFAULT.walk(listener, (ParseTree)parseResult);
                         }
