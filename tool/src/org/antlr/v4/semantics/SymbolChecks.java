@@ -174,7 +174,7 @@ public class SymbolChecks {
     }
 
     public void checkForLabelConflict(Rule r, GrammarAST labelID) {
-        ErrorType etype = ErrorType.INVALID;
+        ErrorType etype = null;
         Object arg2 = null;
         String name = labelID.getText();
         if ( nameToRuleMap.containsKey(name) ) {
@@ -189,7 +189,7 @@ public class SymbolChecks {
             etype = ErrorType.LABEL_CONFLICTS_WITH_RULE_ARG_RETVAL;
             arg2 = r.name;
         }
-        if ( etype!=ErrorType.INVALID ) {
+        if ( etype!=null ) {
             errMgr.grammarError(etype,g.fileName,labelID.token,name,arg2);
         }
     }

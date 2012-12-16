@@ -305,7 +305,7 @@ public class TestCompositeGrammars extends BaseTest {
 		@SuppressWarnings("unused")
 		Grammar g = new Grammar(tmpdir+"/M.g4", master, equeue);
 
-		assertEquals(ErrorType.SYNTAX_ERROR, equeue.errors.get(0).errorType);
+		assertEquals(ErrorType.SYNTAX_ERROR, equeue.errors.get(0).getErrorType());
 	}
 
 	@Test public void testDelegatorRuleOverridesDelegate() throws Exception {

@@ -881,14 +881,14 @@ public abstract class BaseTest {
 		ANTLRMessage foundMsg = null;
 		for (int i = 0; i < equeue.errors.size(); i++) {
 			ANTLRMessage m = equeue.errors.get(i);
-			if (m.errorType==expectedMessage.errorType ) {
+			if (m.getErrorType()==expectedMessage.getErrorType() ) {
 				foundMsg = m;
 			}
 		}
-		assertNotNull("no error; "+expectedMessage.errorType+" expected", foundMsg);
+		assertNotNull("no error; "+expectedMessage.getErrorType()+" expected", foundMsg);
 		assertTrue("error is not a GrammarSemanticsMessage",
 				   foundMsg instanceof GrammarSemanticsMessage);
-		assertEquals(Arrays.toString(expectedMessage.args), Arrays.toString(foundMsg.args));
+		assertEquals(Arrays.toString(expectedMessage.getArgs()), Arrays.toString(foundMsg.getArgs()));
 		if ( equeue.size()!=1 ) {
 			System.err.println(equeue);
 		}
@@ -901,14 +901,14 @@ public abstract class BaseTest {
 		ANTLRMessage foundMsg = null;
 		for (int i = 0; i < equeue.warnings.size(); i++) {
 			ANTLRMessage m = equeue.warnings.get(i);
-			if (m.errorType==expectedMessage.errorType ) {
+			if (m.getErrorType()==expectedMessage.getErrorType() ) {
 				foundMsg = m;
 			}
 		}
-		assertNotNull("no error; "+expectedMessage.errorType+" expected", foundMsg);
+		assertNotNull("no error; "+expectedMessage.getErrorType()+" expected", foundMsg);
 		assertTrue("error is not a GrammarSemanticsMessage",
 				   foundMsg instanceof GrammarSemanticsMessage);
-		assertEquals(Arrays.toString(expectedMessage.args), Arrays.toString(foundMsg.args));
+		assertEquals(Arrays.toString(expectedMessage.getArgs()), Arrays.toString(foundMsg.getArgs()));
 		if ( equeue.size()!=1 ) {
 			System.err.println(equeue);
 		}
@@ -922,18 +922,18 @@ public abstract class BaseTest {
 		ANTLRMessage foundMsg = null;
 		for (int i = 0; i < equeue.errors.size(); i++) {
 			ANTLRMessage m = equeue.errors.get(i);
-			if (m.errorType==expectedMessage.errorType ) {
+			if (m.getErrorType()==expectedMessage.getErrorType() ) {
 				foundMsg = m;
 			}
 		}
-		assertTrue("no error; "+expectedMessage.errorType+" expected", !equeue.errors.isEmpty());
+		assertTrue("no error; "+expectedMessage.getErrorType()+" expected", !equeue.errors.isEmpty());
 		assertTrue("too many errors; "+equeue.errors, equeue.errors.size()<=1);
-		assertNotNull("couldn't find expected error: "+expectedMessage.errorType, foundMsg);
+		assertNotNull("couldn't find expected error: "+expectedMessage.getErrorType(), foundMsg);
 		/*
 		assertTrue("error is not a GrammarSemanticsMessage",
 				   foundMsg instanceof GrammarSemanticsMessage);
 		 */
-		assertTrue(Arrays.equals(expectedMessage.args, foundMsg.args));
+		assertArrayEquals(expectedMessage.getArgs(), foundMsg.getArgs());
 	}
 
     public static class FilteringTokenStream extends CommonTokenStream {

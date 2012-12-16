@@ -1,5 +1,11 @@
 ANTLR v4 Honey Badger
 
+December 16, 2012
+
+* Encapsulate some fields in ANTLRMessage
+* Remove ErrorType.INVALID
+* Update error/warning messages, show all v3 compatibility messages
+
 December 12, 2012
 
 * Use arrays instead of HashSet to save memory in SemanticContext.AND/OR

@@ -30,11 +30,18 @@
 
 package org.antlr.v4.tool;
 
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 import java.util.Arrays;
 
 public class ANTLRMessage {
-    public ErrorType errorType;
-    public Object[] args;
+	private static final Object[] EMPTY_ARGS = new Object[0];
+
+	@NotNull
+    private final ErrorType errorType;
+	@Nullable
+    private final Object[] args;
+	@Nullable
     private final Throwable e;
 
     // used for location template
@@ -42,32 +49,35 @@ public class ANTLRMessage {
     public int line = -1;
     public int charPosition = -1;
 
-    public ANTLRMessage() {
-        this(ErrorType.INVALID, (Throwable)null);
-    }
-
-    public ANTLRMessage(ErrorType errorType) {
+    public ANTLRMessage(@NotNull ErrorType errorType) {
         this(errorType, (Throwable)null);
     }
 
-    public ANTLRMessage(ErrorType errorType, Object... args) {
+    public ANTLRMessage(@NotNull ErrorType errorType, Object... args) {
         this(errorType, null, args);
     }
 
-    public ANTLRMessage(ErrorType errorType, /*@Nullable*/ Throwable e, Object... args) {
+    public ANTLRMessage(@NotNull ErrorType errorType, @Nullable Throwable e, Object... args) {
         this.errorType = errorType;
         this.e = e;
         this.args = args;
     }
 
+	@NotNull
     public ErrorType getErrorType() {
         return errorType;
     }
 
+	@NotNull
     public Object[] getArgs() {
-        return args;
+		if (args == null) {
+			return EMPTY_ARGS;
+		}
+
+		return args;
     }
 
+	@Nullable
     public Throwable getCause() {
         return e;
     }
@@ -75,9 +85,9 @@ public class ANTLRMessage {
 	@Override
 	public String toString() {
 		return "Message{" +
-			   "errorType=" + errorType +
-			   ", args=" + (args == null ? null : Arrays.asList(args)) +
-			   ", e=" + e +
+			   "errorType=" + getErrorType() +
+			   ", args=" + Arrays.asList(getArgs()) +
+			   ", e=" + getCause() +
 			   ", fileName='" + fileName + '\'' +
 			   ", line=" + line +
 			   ", charPosition=" + charPosition +
