@@ -96,24 +96,24 @@ public class ErrorManager {
 	}
 
 	public ST getMessageTemplate(ANTLRMessage msg) {
-		ST messageST = new ST(msg.errorType.msg);
+		ST messageST = new ST(msg.getErrorType().msg);
 		ST locationST = getLocationFormat();
-		ST reportST = getReportFormat(msg.errorType.severity);
+		ST reportST = getReportFormat(msg.getErrorType().severity);
 		ST messageFormatST = getMessageFormat();
 
 		messageST.add("verbose", tool.longMessages);
-		if ( msg.args!=null ) { // fill in arg1, arg2, ...
-			for (int i=0; i<msg.args.length; i++) {
-				String attr = "arg";
-				if ( i>0 ) attr += i + 1;
-				messageST.add(attr, msg.args[i]);
-			}
-			if ( msg.args.length<2 ) messageST.add("arg2", null); // some messages ref arg2
+		Object[] args = msg.getArgs();
+		for (int i=0; i<args.length; i++) {
+			String attr = "arg";
+			if ( i>0 ) attr += i + 1;
+			messageST.add(attr, args[i]);
 		}
+		if ( args.length<2 ) messageST.add("arg2", null); // some messages ref arg2
 
-		if ( msg.getCause()!=null ) {
-			messageST.add("exception", msg.getCause());
-			messageST.add("stackTrace", msg.getCause().getStackTrace());
+		Throwable cause = msg.getCause();
+		if ( cause!=null ) {
+			messageST.add("exception", cause);
+			messageST.add("stackTrace", cause.getStackTrace());
 		}
 		else {
 			messageST.add("exception", null); // avoid ST error msg
@@ -134,7 +134,7 @@ public class ErrorManager {
 			locationValid = true;
 		}
 
-		messageFormatST.add("id", msg.errorType.code);
+		messageFormatST.add("id", msg.getErrorType().code);
 		messageFormatST.add("text", messageST);
 
 		if (locationValid) reportST.add("location", locationST);
