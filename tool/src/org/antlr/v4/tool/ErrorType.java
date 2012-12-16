@@ -44,8 +44,6 @@ import org.antlr.v4.Tool;
  * @since 4.0
  */
 public enum ErrorType {
-    INVALID(0, "<INVALID>", ErrorSeverity.ERROR),
-
 	// Tool errors
 	CANNOT_WRITE_FILE(1, "cannot write file <arg>: <arg2>", ErrorSeverity.ERROR),
 	INVALID_CMDLINE_ARG(2, "unknown command-line option <arg>", ErrorSeverity.ERROR),
