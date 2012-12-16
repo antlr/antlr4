@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-master</artifactId>
-        <version>4.0-SNAPSHOT</version>
+        <version>4.0-rc-1</version>
         <relativePath>../..</relativePath>
     </parent>
 
