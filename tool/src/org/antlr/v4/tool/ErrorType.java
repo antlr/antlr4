@@ -120,11 +120,11 @@ public enum ErrorType {
 	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR 4", ErrorSeverity.ERROR),
 	V3_LEXER_LABEL(201, "labels in lexer rules are not supported in ANTLR 4; " +
 		"actions cannot reference elements of lexical rules but you can use " +
-		"getText() to get the entire text matched for the rule", ErrorSeverity.WARNING_ONE_OFF),
+		"getText() to get the entire text matched for the rule", ErrorSeverity.WARNING),
 	V3_TOKENS_SYNTAX(202, "'tokens {A; B;}' syntax is now 'tokens {A, B}' in ANTLR 4", ErrorSeverity.WARNING),
-	V3_ASSIGN_IN_TOKENS(203, "assignments in tokens{} are not supported in ANTLR 4; use lexical rule '<arg> : <arg2>;' instead", ErrorSeverity.ERROR_ONE_OFF),
-	V3_GATED_SEMPRED(204, "{...}?=> explicitly gated semantic predicates are deprecated in ANTLR 4; use {...}? instead", ErrorSeverity.WARNING_ONE_OFF),
-	V3_SYNPRED(205, "(...)=> syntactic predicates are not supported in ANTLR 4", ErrorSeverity.ERROR_ONE_OFF),
+	V3_ASSIGN_IN_TOKENS(203, "assignments in tokens{} are not supported in ANTLR 4; use lexical rule '<arg> : <arg2>;' instead", ErrorSeverity.ERROR),
+	V3_GATED_SEMPRED(204, "{...}?=> explicitly gated semantic predicates are deprecated in ANTLR 4; use {...}? instead", ErrorSeverity.WARNING),
+	V3_SYNPRED(205, "(...)=> syntactic predicates are not supported in ANTLR 4", ErrorSeverity.ERROR),
 
     // Dependency sorting errors
 
