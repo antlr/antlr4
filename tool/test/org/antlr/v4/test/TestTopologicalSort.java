@@ -34,6 +34,8 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.junit.Assert.*;
+
 /** Test topo sort in GraphNode. */
 public class TestTopologicalSort extends BaseTest {
     @Test

@@ -32,6 +32,8 @@ package org.antlr.v4.test;
 
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 /** Test parser execution.
  *
  *  For the non-greedy stuff, the rule is that .* or any other non-greedy loop

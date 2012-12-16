@@ -36,6 +36,9 @@ import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
+
 public class TestATNConstruction extends BaseTest {
 	@Test
 	public void testA() throws Exception {

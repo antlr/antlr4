@@ -1,18 +1,14 @@
 # Maven build folders
-/target/
-/tool/target/
-/runtime/Java/target/
-/antlr4-maven-plugin/target/
+target/
 
 # Ant build folders
-/build/
-/dist/
+build/
+dist/
 
 # NetBeans user configuration files
-/nbactions.xml
-/tool/nbactions.xml
-/runtime/Java/nbactions.xml
-/antlr4-maven-plugin/nbactions.xml
+nbactions.xml
+/nbproject/private/
+*/nbproject/private/
 
 # IntelliJ projects
 *.iml
