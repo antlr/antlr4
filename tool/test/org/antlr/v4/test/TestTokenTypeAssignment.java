@@ -40,6 +40,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import static org.junit.Assert.*;
+
 public class TestTokenTypeAssignment extends BaseTest {
 
 	@Test

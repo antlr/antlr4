@@ -31,6 +31,8 @@ package org.antlr.v4.test;
 
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 /** Test the set stuff in lexer and parser */
 public class TestSets extends BaseTest {
 	protected boolean debug = false;

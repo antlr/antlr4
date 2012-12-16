@@ -41,6 +41,8 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.junit.Assert.*;
+
 /**
  * Lexer rules are little quirky when it comes to wildcards. Problem
  * stems from the fact that we want the longest match to win among

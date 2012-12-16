@@ -32,6 +32,8 @@ package org.antlr.v4.test;
 
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 /** */
 public class TestLeftRecursion extends BaseTest {
 	protected boolean debug = false;

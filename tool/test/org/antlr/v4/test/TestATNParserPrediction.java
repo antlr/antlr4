@@ -49,6 +49,8 @@ import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.interp.ParserInterpreter;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH

@@ -33,6 +33,8 @@ package org.antlr.v4.test;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 /** */
 public class TestSymbolIssues extends BaseTest {
     static String[] A = {

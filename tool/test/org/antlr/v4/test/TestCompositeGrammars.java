@@ -35,6 +35,8 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 public class TestCompositeGrammars extends BaseTest {
 	protected boolean debug = false;
 

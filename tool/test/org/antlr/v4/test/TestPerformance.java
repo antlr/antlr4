@@ -94,6 +94,8 @@ import java.util.logging.Logger;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
+import static org.junit.Assert.*;
+
 public class TestPerformance extends BaseTest {
     /**
      * Parse all java files under this package within the JDK_SOURCE_ROOT
@@ -787,7 +789,6 @@ public class TestPerformance extends BaseTest {
             };
         } catch (Exception e) {
             e.printStackTrace(System.out);
-            lastTestFailed = true;
             Assert.fail(e.getMessage());
             throw new IllegalStateException(e);
         }

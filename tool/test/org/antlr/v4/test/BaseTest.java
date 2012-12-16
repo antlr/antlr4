@@ -29,7 +29,6 @@
  */
 package org.antlr.v4.test;
 
-
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.ATNPrinter;
@@ -65,9 +64,6 @@ import org.antlr.v4.tool.DefaultToolListener;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.antlr.v4.tool.LexerGrammar;
-import org.antlr.v4.tool.Rule;
-import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -77,6 +73,10 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
+import org.antlr.v4.tool.Rule;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -104,6 +104,7 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.junit.Assert.*;
 
 public abstract class BaseTest {
 	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
@@ -121,28 +122,28 @@ public abstract class BaseTest {
 
 	public String tmpdir = null;
 
-    /** reset during setUp and set to true if we find a problem */
-    protected boolean lastTestFailed = false;
-
 	/** If error during parser execution, store stderr here; can't return
      *  stdout and stderr.  This doesn't trap errors from running antlr.
      */
 	protected String stderrDuringParse;
 
+	@org.junit.Rule
+	public final TestRule testWatcher = new TestWatcher() {
+
+		@Override
+		protected void succeeded(Description description) {
+			// remove tmpdir if no error.
+			eraseTempDir();
+		}
+
+	};
+
     @Before
 	public void setUp() throws Exception {
-        lastTestFailed = false; // hope for the best, but set to true in asserts that fail
         // new output dir for each test
         tmpdir = new File(System.getProperty("java.io.tmpdir"),
 						  getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
 //		tmpdir = "/tmp";
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        // remove tmpdir if no error.
-        if ( !lastTestFailed ) eraseTempDir();
-
     }
 
     protected org.antlr.v4.Tool newTool(String[] args) {
@@ -1089,24 +1090,15 @@ public abstract class BaseTest {
 		return elements.subList(Token.MIN_USER_TOKEN_TYPE, elements.size());
 	}
 
-    // override to track errors
+	public void assertNotNullOrEmpty(String message, String text) {
+		assertNotNull(message, text);
+		assertFalse(message, text.isEmpty());
+	}
 
-    public void assertEquals(String msg, Object expected, Object actual) { try {Assert.assertEquals(msg,expected,actual);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertEquals(Object expected, Object actual) { try {Assert.assertEquals(expected,actual);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertEquals(String msg, long expected, long actual) { try {Assert.assertEquals(msg,expected,actual);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertEquals(long expected, long actual) { try {Assert.assertEquals(expected,actual);} catch (Error e) {lastTestFailed=true; throw e;} }
-
-    public void assertTrue(String message, boolean condition) { try {Assert.assertTrue(message,condition);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertTrue(boolean condition) { try {Assert.assertTrue(condition);} catch (Error e) {lastTestFailed=true; throw e;} }
-
-    public void assertFalse(String message, boolean condition) { try {Assert.assertFalse(message,condition);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertFalse(boolean condition) { try {Assert.assertFalse(condition);} catch (Error e) {lastTestFailed=true; throw e;} }
-
-    public void assertNotNull(String message, Object object) { try {Assert.assertNotNull(message, object);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertNotNull(Object object) { try {Assert.assertNotNull(object);} catch (Error e) {lastTestFailed=true; throw e;} }
-
-    public void assertNull(String message, Object object) { try {Assert.assertNull(message, object);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertNull(Object object) { try {Assert.assertNull(object);} catch (Error e) {lastTestFailed=true; throw e;} }
+	public void assertNotNullOrEmpty(String text) {
+		assertNotNull(text);
+		assertFalse(text.isEmpty());
+	}
 
 	public static class IntTokenStream implements TokenStream {
 		IntegerList types;
