@@ -346,6 +346,17 @@ public abstract class BaseTest {
 
 		List<String> compileOptions = new ArrayList<String>();
 		compileOptions.add("-g");
+		compileOptions.add("-source");
+		compileOptions.add("1.6");
+		compileOptions.add("-target");
+		compileOptions.add("1.6");
+
+		String bootclasspath = getBootClassPath();
+		if (bootclasspath != null) {
+			compileOptions.add("-bootclasspath");
+			compileOptions.add(bootclasspath);
+		}
+
 		if (STRICT_COMPILE_CHECKS) {
 			compileOptions.add("-Xlint");
 			compileOptions.add("-Xlint:-serial");
@@ -410,6 +421,23 @@ public abstract class BaseTest {
 		*/
 	}
 
+	public String getBootClassPath() {
+		String path = System.getProperty("bootclasspath.java6");
+		if (path != null) {
+			return path;
+		}
+
+		path = System.getProperty("java6.home");
+		if (path == null) {
+			path = System.getenv("JAVA6_HOME");
+		}
+
+		if (path != null) {
+			return path + File.separatorChar + "lib" + File.separatorChar + "rt.jar";
+		}
+
+		return null;
+	}
 
 
 	/** Return true if all is ok, no errors */
