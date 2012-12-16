@@ -27,7 +27,23 @@
     <build>
 
         <sourceDirectory>src</sourceDirectory>
-        <resources/>
+        <resources>
+            <resource>
+                <directory>resources</directory>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArguments>
+                        <proc:none/>
+                    </compilerArguments>
+                </configuration>
+            </plugin>
+        </plugins>
 
     </build>
 
