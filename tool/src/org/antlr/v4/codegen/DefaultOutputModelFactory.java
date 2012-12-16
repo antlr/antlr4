@@ -43,7 +43,7 @@ import org.antlr.v4.tool.Grammar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 
 /** Create output objects for elements *within* rule functions except
@@ -109,12 +109,11 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 
 	@NotNull
 	public static List<SrcOp> list(SrcOp... values) {
-		return Arrays.asList(values);
+		return new ArrayList<SrcOp>(Arrays.asList(values));
 	}
 
 	@NotNull
-	public static List<SrcOp> list(List<? extends SrcOp> values) {
-		assert Collections.checkedList(new ArrayList<SrcOp>(values), SrcOp.class) != null;
+	public static List<SrcOp> list(Collection<? extends SrcOp> values) {
 		return new ArrayList<SrcOp>(values);
 	}
 

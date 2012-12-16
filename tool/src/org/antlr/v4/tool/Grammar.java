@@ -74,28 +74,22 @@ import java.util.Set;
 public class Grammar implements AttributeResolver {
 	public static final String GRAMMAR_FROM_STRING_NAME = "<string>";
 
-	@SuppressWarnings("serial")
-	public static final Set<String> parserOptions = new HashSet<String>() {{
-		add("superClass");
-		add("TokenLabelType");
-		add("abstract");
-		add("tokenVocab");
-		add("language");
-	}};
+	public static final Set<String> parserOptions = new HashSet<String>();
+	static {
+		parserOptions.add("superClass");
+		parserOptions.add("TokenLabelType");
+		parserOptions.add("abstract");
+		parserOptions.add("tokenVocab");
+		parserOptions.add("language");
+	}
 
 	public static final Set<String> lexerOptions = parserOptions;
 
-	@SuppressWarnings("serial")
-	public static final Set<String> ruleOptions = new HashSet<String>() {{
-	}};
+	public static final Set<String> ruleOptions = new HashSet<String>();
 
-	@SuppressWarnings("serial")
-	public static final Set<String> ParserBlockOptions = new HashSet<String>() {{
-	}};
+	public static final Set<String> ParserBlockOptions = new HashSet<String>();
 
-	@SuppressWarnings("serial")
-	public static final Set<String> LexerBlockOptions = new HashSet<String>() {{
-	}};
+	public static final Set<String> LexerBlockOptions = new HashSet<String>();
 
 	/** Legal options for rule refs like id<key=value> */
 	public static final Set<String> ruleRefOptions = new HashSet<String>();
@@ -104,38 +98,35 @@ public class Grammar implements AttributeResolver {
 	}
 
 	/** Legal options for terminal refs like ID<assoc=right> */
-	@SuppressWarnings("serial")
-	public static final Set<String> tokenOptions = new HashSet<String>() {{
-		add("assoc");
-	}};
+	public static final Set<String> tokenOptions = new HashSet<String>();
+	static {
+		tokenOptions.add("assoc");
+	}
 
-	@SuppressWarnings("serial")
-	public static final Set<String> actionOptions = new HashSet<String>() {{
-	}};
+	public static final Set<String> actionOptions = new HashSet<String>();
 
-	@SuppressWarnings("serial")
-	public static final Set<String> semPredOptions = new HashSet<String>() {{
-		add(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME);
-		add("fail");
-	}};
+	public static final Set<String> semPredOptions = new HashSet<String>();
+	static {
+		semPredOptions.add(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME);
+		semPredOptions.add("fail");
+	}
 
-	@SuppressWarnings("serial")
-	public static final Set<String> doNotCopyOptionsToLexer =
-        new HashSet<String>() {{
-				add("superClass");
-                add("TokenLabelType");
-				add("abstract");
-				add("tokenVocab");
-        }};
+	public static final Set<String> doNotCopyOptionsToLexer = new HashSet<String>();
+	static {
+		doNotCopyOptionsToLexer.add("superClass");
+		doNotCopyOptionsToLexer.add("TokenLabelType");
+		doNotCopyOptionsToLexer.add("abstract");
+		doNotCopyOptionsToLexer.add("tokenVocab");
+	}
 
-    @SuppressWarnings("serial")
-    public static Map<String, AttributeDict> grammarAndLabelRefTypeToScope =
-        new HashMap<String, AttributeDict>() {{
-            put("parser:RULE_LABEL", Rule.predefinedRulePropertiesDict);
-            put("parser:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
-            put("combined:RULE_LABEL", Rule.predefinedRulePropertiesDict);
-            put("combined:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
-		}};
+	public static final Map<String, AttributeDict> grammarAndLabelRefTypeToScope =
+		new HashMap<String, AttributeDict>();
+	static {
+		grammarAndLabelRefTypeToScope.put("parser:RULE_LABEL", Rule.predefinedRulePropertiesDict);
+		grammarAndLabelRefTypeToScope.put("parser:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
+		grammarAndLabelRefTypeToScope.put("combined:RULE_LABEL", Rule.predefinedRulePropertiesDict);
+		grammarAndLabelRefTypeToScope.put("combined:TOKEN_LABEL", AttributeDict.predefinedTokenDict);
+	}
 
 	public String name;
     public GrammarRootAST ast;

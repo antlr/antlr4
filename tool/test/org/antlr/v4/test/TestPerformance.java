@@ -134,6 +134,11 @@ public class TestPerformance extends BaseTest {
      */
     private static final boolean DELETE_TEMP_FILES = true;
 
+	/**
+	 * {@code true} to call {@link System#gc} and then wait for 5 seconds at the
+	 * end of the test to make it easier for a profiler to grab a heap dump at
+	 * the end of the test run.
+	 */
     private static final boolean PAUSE_FOR_HEAP_DUMP = false;
 
     /**
@@ -157,7 +162,7 @@ public class TestPerformance extends BaseTest {
     /**
      * Use
      * {@link ParseTreeWalker#DEFAULT}{@code .}{@link ParseTreeWalker#walk walk}
-     * with the {@code BlankJavaParserListener} to show parse tree walking
+     * with the {@code JavaParserBaseListener} to show parse tree walking
      * overhead. If {@link #BUILD_PARSE_TREES} is {@code false}, the listener
      * will instead be called during the parsing process via
      * {@link Parser#addParseListener}.
@@ -166,6 +171,13 @@ public class TestPerformance extends BaseTest {
 
     private static final boolean EXPORT_LARGEST_CONFIG_CONTEXTS = false;
 
+	/**
+	 * Shows the number of {@link DFAState} and {@link ATNConfig} instances in
+	 * the DFA cache at the end of each pass. If {@link #REUSE_LEXER_DFA} and/or
+	 * {@link #REUSE_PARSER_DFA} are false, the corresponding instance numbers
+	 * will only apply to one file (the last file if {@link #NUMBER_OF_THREADS}
+	 * is 0, otherwise the last file which was parsed on the first thread).
+	 */
     private static final boolean SHOW_DFA_STATE_STATS = true;
 
 	private static final boolean ENABLE_LEXER_DFA = true;
@@ -196,7 +208,7 @@ public class TestPerformance extends BaseTest {
      * {@link Lexer#setInputStream} will be called to initialize it for each
      * source file. Otherwise, a new instance will be created for each file.
      */
-    private static final boolean REUSE_LEXER = true;
+    private static final boolean REUSE_LEXER = false;
 	/**
 	 * If {@code true}, a single DFA will be used for lexing which is shared
 	 * across all threads and files. Otherwise, each file will be lexed with its
@@ -209,7 +221,7 @@ public class TestPerformance extends BaseTest {
      * {@link Parser#setInputStream} will be called to initialize it for each
      * source file. Otherwise, a new instance will be created for each file.
      */
-    private static final boolean REUSE_PARSER = true;
+    private static final boolean REUSE_PARSER = false;
 	/**
 	 * If {@code true}, a single DFA will be used for parsing which is shared
 	 * across all threads and files. Otherwise, each file will be parsed with
@@ -335,14 +347,14 @@ public class TestPerformance extends BaseTest {
 		builder.append(", Lexer:").append(ENABLE_LEXER_DFA ? "DFA" : "ATN");
 		builder.append(", Parser:").append(ENABLE_PARSER_DFA ? "DFA" : "ATN");
 
-        builder.append('\n');
+        builder.append(newline);
 
         builder.append("Op=Lex").append(RUN_PARSER ? "+Parse" : " only");
         builder.append(", Strategy=").append(BAIL_ON_ERROR ? BailErrorStrategy.class.getSimpleName() : DefaultErrorStrategy.class.getSimpleName());
         builder.append(", BuildParseTree=").append(BUILD_PARSE_TREES);
         builder.append(", WalkBlankListener=").append(BLANK_LISTENER);
 
-        builder.append('\n');
+        builder.append(newline);
 
         builder.append("Lexer=").append(REUSE_LEXER ? "setInputStream" : "newInstance");
         builder.append(", Parser=").append(REUSE_PARSER ? "setInputStream" : "newInstance");
@@ -352,7 +364,7 @@ public class TestPerformance extends BaseTest {
 
 		builder.append("UniqueClosure=").append(OPTIMIZE_UNIQUE_CLOSURE ? "optimize" : "complete");
 
-		builder.append('\n');
+        builder.append(newline);
 
         return builder.toString();
     }
@@ -458,7 +470,7 @@ public class TestPerformance extends BaseTest {
 		executorService.shutdown();
 		executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
-        System.out.format("Total parse time for %d files (%d KB, %d tokens, checksum 0x%8X): %dms\n",
+        System.out.format("Total parse time for %d files (%d KB, %d tokens, checksum 0x%8X): %dms%n",
                           sources.size(),
                           inputSize / 1024,
                           tokenCount.get(),
@@ -487,7 +499,7 @@ public class TestPerformance extends BaseTest {
 					}
 				}
 
-				System.out.format("There are %d lexer DFAState instances, %d configs (%d unique), %d prediction contexts.\n", states, configs, uniqueConfigs.size(), lexerInterpreter.atn.getContextCacheSize());
+				System.out.format("There are %d lexer DFAState instances, %d configs (%d unique), %d prediction contexts.%n", states, configs, uniqueConfigs.size(), lexerInterpreter.atn.getContextCacheSize());
 			}
 		}
 
@@ -515,7 +527,7 @@ public class TestPerformance extends BaseTest {
 					}
                 }
 
-                System.out.format("There are %d parser DFAState instances, %d configs (%d unique), %d prediction contexts.\n", states, configs, uniqueConfigs.size(), interpreter.atn.getContextCacheSize());
+                System.out.format("There are %d parser DFAState instances, %d configs (%d unique), %d prediction contexts.%n", states, configs, uniqueConfigs.size(), interpreter.atn.getContextCacheSize());
             }
 
             int localDfaCount = 0;
@@ -574,12 +586,12 @@ public class TestPerformance extends BaseTest {
             }
 
             if (SHOW_CONFIG_STATS && currentPass == 0) {
-                System.out.format("  DFA accept states: %d total, %d with only local context, %d with a global context\n", localDfaCount + globalDfaCount, localDfaCount, globalDfaCount);
-                System.out.format("  Config stats: %d total, %d local, %d global\n", localConfigCount + globalConfigCount, localConfigCount, globalConfigCount);
+                System.out.format("  DFA accept states: %d total, %d with only local context, %d with a global context%n", localDfaCount + globalDfaCount, localDfaCount, globalDfaCount);
+                System.out.format("  Config stats: %d total, %d local, %d global%n", localConfigCount + globalConfigCount, localConfigCount, globalConfigCount);
                 if (SHOW_DFA_STATE_STATS) {
                     for (int i = 0; i < contextsInDFAState.length; i++) {
                         if (contextsInDFAState[i] != 0) {
-                            System.out.format("  %d configs = %d\n", i, contextsInDFAState[i]);
+                            System.out.format("  %d configs = %d%n", i, contextsInDFAState[i]);
                         }
                     }
                 }
@@ -695,27 +707,31 @@ public class TestPerformance extends BaseTest {
 					assert thread >= 0 && thread < NUMBER_OF_THREADS;
 
                     try {
-						if (sharedListeners[thread] == null) {
-							sharedListeners[thread] = listenerClass.newInstance();
+						ParseTreeListener<Token> listener = sharedListeners[thread];
+						if (listener == null) {
+							listener = listenerClass.newInstance();
+							sharedListeners[thread] = listener;
 						}
 
-                        if (REUSE_LEXER && sharedLexers[thread] != null) {
-                            sharedLexers[thread].setInputStream(input);
+						Lexer lexer = sharedLexers[thread];
+                        if (REUSE_LEXER && lexer != null) {
+                            lexer.setInputStream(input);
                         } else {
-                            sharedLexers[thread] = lexerCtor.newInstance(input);
+                            lexer = lexerCtor.newInstance(input);
+							sharedLexers[thread] = lexer;
 							if (!ENABLE_LEXER_DFA) {
-								sharedLexers[thread].setInterpreter(new NonCachingLexerATNSimulator(sharedLexers[thread], sharedLexers[thread].getATN()));
+								lexer.setInterpreter(new NonCachingLexerATNSimulator(lexer, lexer.getATN()));
 							} else if (!REUSE_LEXER_DFA) {
-								sharedLexers[thread].setInterpreter(new LexerATNSimulator(sharedLexers[thread], sharedLexerATNs[thread]));
+								lexer.setInterpreter(new LexerATNSimulator(lexer, sharedLexerATNs[thread]));
 							}
                         }
 
-						sharedLexers[thread].getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
+						lexer.getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
 						if (ENABLE_LEXER_DFA && !REUSE_LEXER_DFA) {
-							sharedLexers[thread].getInterpreter().atn.clearDFA();
+							lexer.getInterpreter().atn.clearDFA();
 						}
 
-                        CommonTokenStream tokens = new CommonTokenStream(sharedLexers[thread]);
+                        CommonTokenStream tokens = new CommonTokenStream(lexer);
                         tokens.fill();
                         tokenCount.addAndGet(tokens.size());
 
@@ -729,45 +745,47 @@ public class TestPerformance extends BaseTest {
                             return (int)checksum.getValue();
                         }
 
-                        if (REUSE_PARSER && sharedParsers[thread] != null) {
-                            sharedParsers[thread].setInputStream(tokens);
+						Parser<Token> parser = sharedParsers[thread];
+                        if (REUSE_PARSER && parser != null) {
+                            parser.setInputStream(tokens);
                         } else {
 							@SuppressWarnings("unchecked")
-							Parser<Token> parser = parserCtor.newInstance(tokens);
+							Parser<Token> newParser = parserCtor.newInstance(tokens);
+							parser = newParser;
                             sharedParsers[thread] = parser;
                         }
 
-						sharedParsers[thread].removeErrorListeners();
+						parser.removeErrorListeners();
 						if (!TWO_STAGE_PARSING) {
-							sharedParsers[thread].addErrorListener(DescriptiveErrorListener.INSTANCE);
-							sharedParsers[thread].addErrorListener(new SummarizingDiagnosticErrorListener());
+							parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
+							parser.addErrorListener(new SummarizingDiagnosticErrorListener());
 						}
 
 						if (!ENABLE_PARSER_DFA) {
-							sharedParsers[thread].setInterpreter(new NonCachingParserATNSimulator<Token>(sharedParsers[thread], sharedParsers[thread].getATN()));
+							parser.setInterpreter(new NonCachingParserATNSimulator<Token>(parser, parser.getATN()));
 						} else if (!REUSE_PARSER_DFA) {
-							sharedParsers[thread].setInterpreter(new ParserATNSimulator<Token>(sharedParsers[thread], sharedParserATNs[thread]));
+							parser.setInterpreter(new ParserATNSimulator<Token>(parser, sharedParserATNs[thread]));
 						}
 
 						if (ENABLE_PARSER_DFA && !REUSE_PARSER_DFA) {
-							sharedParsers[thread].getInterpreter().atn.clearDFA();
+							parser.getInterpreter().atn.clearDFA();
 						}
 
-						sharedParsers[thread].getInterpreter().disable_global_context = DISABLE_GLOBAL_CONTEXT || TWO_STAGE_PARSING;
-						sharedParsers[thread].getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT && !TWO_STAGE_PARSING;
-						sharedParsers[thread].getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST || TWO_STAGE_PARSING;
-						sharedParsers[thread].getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
-						sharedParsers[thread].getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
-						sharedParsers[thread].getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
-						sharedParsers[thread].getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
-						sharedParsers[thread].getInterpreter().tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
-						sharedParsers[thread].getInterpreter().treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
-						sharedParsers[thread].setBuildParseTree(BUILD_PARSE_TREES);
+						parser.getInterpreter().disable_global_context = DISABLE_GLOBAL_CONTEXT || TWO_STAGE_PARSING;
+						parser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT && !TWO_STAGE_PARSING;
+						parser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST || TWO_STAGE_PARSING;
+						parser.getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
+						parser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
+						parser.getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
+						parser.getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
+						parser.getInterpreter().tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
+						parser.getInterpreter().treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
+						parser.setBuildParseTree(BUILD_PARSE_TREES);
 						if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
-							sharedParsers[thread].addParseListener(sharedListeners[thread]);
+							parser.addParseListener(listener);
 						}
 						if (BAIL_ON_ERROR || TWO_STAGE_PARSING) {
-							sharedParsers[thread].setErrorHandler(new BailErrorStrategy<Token>());
+							parser.setErrorHandler(new BailErrorStrategy<Token>());
 						}
 
                         Method parseMethod = parserClass.getMethod(entryPoint);
@@ -778,9 +796,9 @@ public class TestPerformance extends BaseTest {
 						try {
 							if (COMPUTE_CHECKSUM) {
 								checksumParserListener = new ChecksumParseTreeListener(checksum);
-								sharedParsers[thread].addParseListener(checksumParserListener);
+								parser.addParseListener(checksumParserListener);
 							}
-							parseResult = parseMethod.invoke(sharedParsers[thread]);
+							parseResult = parseMethod.invoke(parser);
 						} catch (InvocationTargetException ex) {
 							if (!TWO_STAGE_PARSING) {
 								throw ex;
@@ -796,48 +814,49 @@ public class TestPerformance extends BaseTest {
 
 							tokens.reset();
 							if (REUSE_PARSER && sharedParsers[thread] != null) {
-								sharedParsers[thread].setInputStream(tokens);
+								parser.setInputStream(tokens);
 							} else {
 								@SuppressWarnings("unchecked")
-								Parser<Token> parser = parserCtor.newInstance(tokens);
+								Parser<Token> newParser = parserCtor.newInstance(tokens);
+								parser = newParser;
 								sharedParsers[thread] = parser;
 							}
 
-							sharedParsers[thread].removeErrorListeners();
-							sharedParsers[thread].addErrorListener(DescriptiveErrorListener.INSTANCE);
-							sharedParsers[thread].addErrorListener(new SummarizingDiagnosticErrorListener());
+							parser.removeErrorListeners();
+							parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
+							parser.addErrorListener(new SummarizingDiagnosticErrorListener());
 							if (!ENABLE_PARSER_DFA) {
-								sharedParsers[thread].setInterpreter(new NonCachingParserATNSimulator<Token>(sharedParsers[thread], sharedParsers[thread].getATN()));
+								parser.setInterpreter(new NonCachingParserATNSimulator<Token>(parser, parser.getATN()));
 							}
-							sharedParsers[thread].getInterpreter().disable_global_context = false;
-							sharedParsers[thread].getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT;
-							sharedParsers[thread].getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
-							sharedParsers[thread].getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
-							sharedParsers[thread].getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
-							sharedParsers[thread].getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
-							sharedParsers[thread].getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
-							sharedParsers[thread].getInterpreter().tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
-							sharedParsers[thread].getInterpreter().treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
-							sharedParsers[thread].setBuildParseTree(BUILD_PARSE_TREES);
+							parser.getInterpreter().disable_global_context = false;
+							parser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT;
+							parser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
+							parser.getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
+							parser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
+							parser.getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
+							parser.getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
+							parser.getInterpreter().tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
+							parser.getInterpreter().treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
+							parser.setBuildParseTree(BUILD_PARSE_TREES);
 							if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
-								sharedParsers[thread].addParseListener(sharedListeners[thread]);
+								parser.addParseListener(listener);
 							}
 							if (BAIL_ON_ERROR) {
-								sharedParsers[thread].setErrorHandler(new BailErrorStrategy<Token>());
+								parser.setErrorHandler(new BailErrorStrategy<Token>());
 							}
 
-							parseResult = parseMethod.invoke(sharedParsers[thread]);
+							parseResult = parseMethod.invoke(parser);
 						}
 						finally {
 							if (checksumParserListener != null) {
-								sharedParsers[thread].removeParseListener(checksumParserListener);
+								parser.removeParseListener(checksumParserListener);
 							}
 						}
 
                         Assert.assertTrue(parseResult instanceof ParseTree);
 
                         if (BUILD_PARSE_TREES && BLANK_LISTENER) {
-                            ParseTreeWalker.DEFAULT.walk(sharedListeners[thread], (ParserRuleContext<?>)parseResult);
+                            ParseTreeWalker.DEFAULT.walk(listener, (ParserRuleContext<?>)parseResult);
                         }
                     } catch (Exception e) {
 						if (!REPORT_SYNTAX_ERRORS && e instanceof ParseCancellationException) {
@@ -873,9 +892,7 @@ public class TestPerformance extends BaseTest {
 			}
 
 			String sourceName = recognizer.getInputStream().getSourceName();
-			if (sourceName == null) {
-				sourceName = "";
-			} else if (!sourceName.isEmpty()) {
+			if (!sourceName.isEmpty()) {
 				sourceName = String.format("%s:%d:%d: ", sourceName, line, charPositionInLine);
 			}
 

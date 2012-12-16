@@ -61,25 +61,20 @@ public class TestASTStructure {
 	throws Exception
 	{
 		ANTLRStringStream is = new ANTLRStringStream(input);
-		Class<? extends Lexer> lexerClass = Class.forName(lexerClassName).asSubclass(Lexer.class);
-		Class[] lexArgTypes = new Class<?>[]{CharStream.class};
-		Constructor<? extends Lexer> lexConstructor = lexerClass.getConstructor(lexArgTypes);
-		Object[] lexArgs = new Object[]{is};
-		TokenSource lexer = (TokenSource)lexConstructor.newInstance(lexArgs);
+		Class<? extends TokenSource> lexerClass = Class.forName(lexerClassName).asSubclass(TokenSource.class);
+		Constructor<? extends TokenSource> lexConstructor = lexerClass.getConstructor(CharStream.class);
+		TokenSource lexer = lexConstructor.newInstance(is);
 		is.setLine(scriptLine);
 
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 
 		Class<? extends Parser> parserClass = Class.forName(parserClassName).asSubclass(Parser.class);
-		Class[] parArgTypes = new Class<?>[]{TokenStream.class};
-		Constructor<? extends Parser> parConstructor = parserClass.getConstructor(parArgTypes);
-		Object[] parArgs = new Object[]{tokens};
-		Parser parser = (Parser)parConstructor.newInstance(parArgs);
+		Constructor<? extends Parser> parConstructor = parserClass.getConstructor(TokenStream.class);
+		Parser parser = parConstructor.newInstance(tokens);
 
 		// set up customized tree adaptor if necessary
 		if ( adaptorClassName!=null ) {
-			parArgTypes = new Class<?>[]{TreeAdaptor.class};
-			Method m = parserClass.getMethod("setTreeAdaptor", parArgTypes);
+			Method m = parserClass.getMethod("setTreeAdaptor", TreeAdaptor.class);
 			Class<? extends TreeAdaptor> adaptorClass = Class.forName(adaptorClassName).asSubclass(TreeAdaptor.class);
 			m.invoke(parser, adaptorClass.newInstance());
 		}

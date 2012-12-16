@@ -39,6 +39,7 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.compiler.FormalArgument;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -127,18 +128,15 @@ public class OutputModelWalker {
 //					System.out.println("set ModelElement "+fieldName+"="+nestedST+" in "+templateName);
 					st.add(fieldName, nestedST);
 				}
-				else if ( o instanceof Collection<?> || o instanceof OutputModelObject[] ) {
+				else if ( o instanceof Collection || o instanceof OutputModelObject[] ) {
 					// LIST OF MODEL OBJECTS?
-					OutputModelObject[] nestedOmos;
 					if ( o instanceof OutputModelObject[] ) {
-						nestedOmos = (OutputModelObject[])o;
+						o = Arrays.asList((OutputModelObject[])o);
 					}
-					else {
-						nestedOmos = ((Collection<?>)o).toArray(new OutputModelObject[0]);
-					}
-					for (OutputModelObject nestedOmo : nestedOmos) {
+					Collection<?> nestedOmos = (Collection<?>)o;
+					for (Object nestedOmo : nestedOmos) {
 						if ( nestedOmo==null ) continue;
-						ST nestedST = walk(nestedOmo);
+						ST nestedST = walk((OutputModelObject)nestedOmo);
 //						System.out.println("set ModelElement "+fieldName+"="+nestedST+" in "+templateName);
 						st.add(fieldName, nestedST);
 					}
@@ -147,11 +145,9 @@ public class OutputModelWalker {
 					Map<?, ?> nestedOmoMap = (Map<?, ?>)o;
 					Map<Object, ST> m = new HashMap<Object, ST>();
 					for (Map.Entry<?, ?> entry : nestedOmoMap.entrySet()) {
-						Object key = entry.getKey();
-						OutputModelObject value = (OutputModelObject)entry.getValue();
-						ST nestedST = walk(value);
+						ST nestedST = walk((OutputModelObject)entry.getValue());
 //						System.out.println("set ModelElement "+fieldName+"="+nestedST+" in "+templateName);
-						m.put(key, nestedST);
+						m.put(entry.getKey(), nestedST);
 					}
 					st.add(fieldName, m);
 				}

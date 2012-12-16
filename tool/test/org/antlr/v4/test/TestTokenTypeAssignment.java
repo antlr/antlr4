@@ -156,7 +156,7 @@ public class TestTokenTypeAssignment extends BaseTest {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : '\\n';\n");
-		Set<String> literals = g.stringLiteralToTypeMap.keySet();
+		Set<?> literals = g.stringLiteralToTypeMap.keySet();
 		// must store literals how they appear in the antlr grammar
 		assertEquals("'\\n'", literals.toArray()[0]);
 	}
@@ -179,8 +179,7 @@ public class TestTokenTypeAssignment extends BaseTest {
 			tokens.remove(tokenName);
 		}
 		// make sure there are not any others (other than <EOF> etc...)
-		for (Iterator<String> iter = tokens.iterator(); iter.hasNext();) {
-			String tokenName = iter.next();
+		for (String tokenName : tokens) {
 			assertTrue("unexpected token name "+tokenName,
 					   g.getTokenType(tokenName) < Token.MIN_USER_TOKEN_TYPE);
 		}
