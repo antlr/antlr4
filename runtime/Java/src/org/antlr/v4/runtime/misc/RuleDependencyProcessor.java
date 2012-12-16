@@ -50,18 +50,28 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
+import org.antlr.v4.runtime.Dependents;
 import org.antlr.v4.runtime.RuleDependencies;
 import org.antlr.v4.runtime.RuleDependency;
 import org.antlr.v4.runtime.RuleVersion;
+import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.Transition;
 
 import java.lang.annotation.AnnotationTypeMismatchException;
+import java.util.BitSet;
+import java.util.EnumSet;
 
 /**
+ * A compile-time validator for rule dependencies.
  *
+ * @see RuleDependency
+ * @see RuleDependencies
  * @author Sam Harwell
  */
-@SupportedAnnotationTypes({RuleDependencyProcessor.RuleDependencyClassName, RuleDependencyProcessor.RuleDependenciesClassName})
+@SupportedAnnotationTypes({RuleDependencyProcessor.RuleDependencyClassName, RuleDependencyProcessor.RuleDependenciesClassName, RuleDependencyProcessor.RuleVersionClassName})
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class RuleDependencyProcessor extends AbstractProcessor {
 	public static final String RuleDependencyClassName = "org.antlr.v4.runtime.RuleDependency";
@@ -131,6 +141,7 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 	private void checkDependencies(List<Tuple2<RuleDependency, Element>> dependencies, TypeMirror recognizerType) {
 		String[] ruleNames = getRuleNames(recognizerType);
 		int[] ruleVersions = getRuleVersions(recognizerType, ruleNames);
+		RuleRelations relations = extractRuleRelations(recognizerType);
 
 		for (Tuple2<RuleDependency, Element> dependency : dependencies) {
 			try {
@@ -138,9 +149,11 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 					continue;
 				}
 
-				if (dependency.getItem1().rule() < 0 || dependency.getItem1().rule() >= ruleVersions.length) {
+				// this is the rule in the dependency set with the highest version number
+				int effectiveRule = dependency.getItem1().rule();
+				if (effectiveRule < 0 || effectiveRule >= ruleVersions.length) {
 					Tuple2<AnnotationMirror, AnnotationValue> ruleReferenceElement = findRuleDependencyProperty(dependency, RuleDependencyProperty.RULE);
-					String message = String.format("Rule dependency on unknown rule %d@%d in %s\n",
+					String message = String.format("Rule dependency on unknown rule %d@%d in %s",
 												   dependency.getItem1().rule(),
 												   dependency.getItem1().version(),
 												   getRecognizerType(dependency.getItem1()).toString());
@@ -153,28 +166,124 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 						processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message,
 													  dependency.getItem2());
 					}
-				}
-				else if (ruleVersions[dependency.getItem1().rule()] != dependency.getItem1().version()) {
-					Tuple2<AnnotationMirror, AnnotationValue> versionElement = findRuleDependencyProperty(dependency, RuleDependencyProperty.VERSION);
-					String message = String.format("Rule dependency version mismatch on rule %s@%d (found @%d) in %s\n",
-												   ruleNames[dependency.getItem1().rule()],
-												   dependency.getItem1().version(),
-												   ruleVersions[dependency.getItem1().rule()],
-												   getRecognizerType(dependency.getItem1()).toString());
 
-					if (versionElement != null) {
-						processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message,
-														  dependency.getItem2(), versionElement.getItem1(), versionElement.getItem2());
+					continue;
+				}
+
+				EnumSet<Dependents> dependents = EnumSet.of(Dependents.SELF, dependency.getItem1().dependents());
+				reportUnimplementedDependents(dependency, dependents);
+
+				BitSet checked = new BitSet();
+
+				if (dependents.contains(Dependents.PARENTS)) {
+					BitSet parents = relations.parents[dependency.getItem1().rule()];
+					for (int parent = parents.nextSetBit(0); parent >= 0; parent = parents.nextSetBit(parent + 1)) {
+						if (parent < 0 || parent >= ruleVersions.length || checked.get(parent)) {
+							continue;
+						}
+
+						checked.set(parent);
+						checkDependencyVersion(dependency, ruleNames, ruleVersions, parent, "parent");
 					}
-					else {
-						processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message,
-														  dependency.getItem2());
+				}
+
+				if (dependents.contains(Dependents.CHILDREN)) {
+					BitSet children = relations.children[dependency.getItem1().rule()];
+					for (int child = children.nextSetBit(0); child >= 0; child = children.nextSetBit(child + 1)) {
+						if (child < 0 || child >= ruleVersions.length || checked.get(child)) {
+							continue;
+						}
+
+						checked.set(child);
+						checkDependencyVersion(dependency, ruleNames, ruleVersions, child, "child");
+					}
+				}
+
+				if (dependents.contains(Dependents.ANCESTORS)) {
+					BitSet ancestors = relations.getAncestors(dependency.getItem1().rule());
+					for (int ancestor = ancestors.nextSetBit(0); ancestor >= 0; ancestor = ancestors.nextSetBit(ancestor + 1)) {
+						if (ancestor < 0 || ancestor >= ruleVersions.length || checked.get(ancestor)) {
+							continue;
+						}
+
+						checked.set(ancestor);
+						checkDependencyVersion(dependency, ruleNames, ruleVersions, ancestor, "ancestor");
+					}
+				}
+
+				if (dependents.contains(Dependents.DESCENDANTS)) {
+					BitSet descendants = relations.getDescendants(dependency.getItem1().rule());
+					for (int descendant = descendants.nextSetBit(0); descendant >= 0; descendant = descendants.nextSetBit(descendant + 1)) {
+						if (descendant < 0 || descendant >= ruleVersions.length || checked.get(descendant)) {
+							continue;
+						}
+
+						checked.set(descendant);
+						checkDependencyVersion(dependency, ruleNames, ruleVersions, descendant, "descendant");
 					}
 				}
 			}
 			catch (AnnotationTypeMismatchException ex) {
-				processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, String.format("Could not validate rule dependencies for element %s\n", dependency.getItem2().toString()),
+				processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, String.format("Could not validate rule dependencies for element %s", dependency.getItem2().toString()),
 														 dependency.getItem2());
+			}
+		}
+	}
+
+	private static final Set<Dependents> IMPLEMENTED_DEPENDENTS = EnumSet.of(Dependents.SELF, Dependents.PARENTS, Dependents.CHILDREN, Dependents.ANCESTORS, Dependents.DESCENDANTS);
+
+	private void reportUnimplementedDependents(Tuple2<RuleDependency, Element> dependency, EnumSet<Dependents> dependents) {
+		EnumSet<Dependents> unimplemented = dependents.clone();
+		unimplemented.removeAll(IMPLEMENTED_DEPENDENTS);
+		if (!unimplemented.isEmpty()) {
+			Tuple2<AnnotationMirror, AnnotationValue> dependentsElement = findRuleDependencyProperty(dependency, RuleDependencyProperty.DEPENDENTS);
+			if (dependentsElement == null) {
+				dependentsElement = findRuleDependencyProperty(dependency, RuleDependencyProperty.RULE);
+			}
+
+			String message = String.format("Cannot validate the following dependents of rule %d: %s",
+										   dependency.getItem1().rule(),
+										   unimplemented);
+
+			if (dependentsElement != null) {
+				processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, message,
+											  dependency.getItem2(), dependentsElement.getItem1(), dependentsElement.getItem2());
+			}
+			else {
+				processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, message,
+											  dependency.getItem2());
+			}
+		}
+	}
+
+	private void checkDependencyVersion(Tuple2<RuleDependency, Element> dependency, String[] ruleNames, int[] ruleVersions, int relatedRule, String relation) {
+		String ruleName = ruleNames[dependency.getItem1().rule()];
+		String path;
+		if (relation == null) {
+			path = ruleName;
+		}
+		else {
+			String mismatchedRuleName = ruleNames[relatedRule];
+			path = String.format("rule %s (%s of %s)", ruleName, relation, mismatchedRuleName);
+		}
+
+		int declaredVersion = dependency.getItem1().version();
+		int actualVersion = ruleVersions[relatedRule];
+		if (actualVersion > declaredVersion) {
+			Tuple2<AnnotationMirror, AnnotationValue> versionElement = findRuleDependencyProperty(dependency, RuleDependencyProperty.VERSION);
+			String message = String.format("Rule dependency version mismatch: %s has version %d (expected <= %d) in %s",
+										   path,
+										   actualVersion,
+										   declaredVersion,
+										   getRecognizerType(dependency.getItem1()).toString());
+
+			if (versionElement != null) {
+				processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message,
+												  dependency.getItem2(), versionElement.getItem1(), versionElement.getItem2());
+			}
+			else {
+				processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message,
+												  dependency.getItem2());
 			}
 		}
 	}
@@ -333,6 +442,7 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 		RECOGNIZER,
 		RULE,
 		VERSION,
+		DEPENDENTS,
 	}
 
 	@Nullable
@@ -385,6 +495,7 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 		AnnotationValue recognizerValue = null;
 		AnnotationValue ruleValue = null;
 		AnnotationValue versionValue = null;
+		AnnotationValue dependentsValue = null;
 
 		Map<? extends ExecutableElement, ? extends AnnotationValue> values = annotationMirror.getElementValues();
 		for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> value : values.entrySet()) {
@@ -437,8 +548,13 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 				if (property == RuleDependencyProperty.RULE) {
 					return ruleValue;
 				}
-				else if (versionValue != null && property == RuleDependencyProperty.VERSION) {
-					return versionValue;
+				else if (versionValue != null) {
+					if (property == RuleDependencyProperty.VERSION) {
+						return versionValue;
+					}
+					else if (property == RuleDependencyProperty.DEPENDENTS) {
+						return dependentsValue;
+					}
 				}
 			}
 		}
@@ -466,4 +582,119 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 		return null;
 	}
 
+	private RuleRelations extractRuleRelations(TypeMirror recognizer) {
+		String serializedATN = getSerializedATN(recognizer);
+		if (serializedATN == null) {
+			return null;
+		}
+
+		ATN atn = ATNSimulator.deserialize(serializedATN.toCharArray());
+		RuleRelations relations = new RuleRelations(atn.ruleToStartState.length);
+		for (ATNState state : atn.states) {
+			if (!state.epsilonOnlyTransitions) {
+				continue;
+			}
+
+			for (Transition transition : state.getTransitions()) {
+				if (transition.getSerializationType() != Transition.RULE) {
+					continue;
+				}
+
+				RuleTransition ruleTransition = (RuleTransition)transition;
+				relations.addRuleInvocation(state.ruleIndex, ruleTransition.target.ruleIndex);
+			}
+		}
+
+		return relations;
+	}
+
+	private String getSerializedATN(TypeMirror recognizerClass) {
+		List<? extends Element> elements = processingEnv.getElementUtils().getAllMembers((TypeElement)processingEnv.getTypeUtils().asElement(recognizerClass));
+		for (Element element : elements) {
+			if (element.getKind() != ElementKind.FIELD) {
+				continue;
+			}
+
+			VariableElement field = (VariableElement)element;
+			boolean isStatic = element.getModifiers().contains(Modifier.STATIC);
+			Object constantValue = field.getConstantValue();
+			boolean isString = constantValue instanceof String;
+			String name = field.getSimpleName().toString();
+			if (isStatic && isString && name.equals("_serializedATN")) {
+				return (String)constantValue;
+			}
+		}
+
+		processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Could not retrieve serialized ATN from grammar.");
+		return null;
+	}
+
+	private static final class RuleRelations {
+		private final BitSet[] parents;
+		private final BitSet[] children;
+
+		public RuleRelations(int ruleCount) {
+			parents = new BitSet[ruleCount];
+			for (int i = 0; i < ruleCount; i++) {
+				parents[i] = new BitSet();
+			}
+
+			children = new BitSet[ruleCount];
+			for (int i = 0; i < ruleCount; i++) {
+				children[i] = new BitSet();
+			}
+		}
+
+		public boolean addRuleInvocation(int caller, int callee) {
+			if (caller < 0) {
+				// tokens rule
+				return false;
+			}
+
+			if (children[caller].get(callee)) {
+				// already added
+				return false;
+			}
+
+			children[caller].set(callee);
+			parents[callee].set(caller);
+			return true;
+		}
+
+		public BitSet getAncestors(int rule) {
+			BitSet ancestors = new BitSet();
+			ancestors.or(parents[rule]);
+			while (true) {
+				int cardinality = ancestors.cardinality();
+				for (int i = ancestors.nextSetBit(0); i >= 0; i = ancestors.nextSetBit(i + 1)) {
+					ancestors.or(parents[i]);
+				}
+
+				if (ancestors.cardinality() == cardinality) {
+					// nothing changed
+					break;
+				}
+			}
+
+			return ancestors;
+		}
+
+		public BitSet getDescendants(int rule) {
+			BitSet descendants = new BitSet();
+			descendants.or(children[rule]);
+			while (true) {
+				int cardinality = descendants.cardinality();
+				for (int i = descendants.nextSetBit(0); i >= 0; i = descendants.nextSetBit(i + 1)) {
+					descendants.or(children[i]);
+				}
+
+				if (descendants.cardinality() == cardinality) {
+					// nothing changed
+					break;
+				}
+			}
+
+			return descendants;
+		}
+	}
 }
