@@ -37,6 +37,8 @@ import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.interp.LexerInterpreter;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 public class TestTokenStreamRewriter extends BaseTest {
 
 	/** Public default constructor used by TestRig */

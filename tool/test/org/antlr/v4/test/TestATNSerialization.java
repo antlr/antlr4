@@ -37,6 +37,8 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 public class TestATNSerialization extends BaseTest {
 	@Test public void testSimpleNoBlock() throws Exception {
 		Grammar g = new Grammar(

@@ -42,6 +42,8 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.WritableToken;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 public class TestCommonTokenStream extends TestBufferedTokenStream {
 
 	@Override

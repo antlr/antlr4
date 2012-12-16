@@ -32,6 +32,8 @@ package org.antlr.v4.test;
 
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 public class TestListeners extends BaseTest {
 	@Test public void testBasic() throws Exception {
 		String grammar =

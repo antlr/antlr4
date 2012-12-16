@@ -45,6 +45,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.*;
+
 public class TestUnbufferedTokenStream extends BaseTest {
 	@Test public void testLookahead() throws Exception {
         LexerGrammar g = new LexerGrammar(

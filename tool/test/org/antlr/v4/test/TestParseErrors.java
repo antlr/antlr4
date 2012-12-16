@@ -33,6 +33,8 @@ package org.antlr.v4.test;
 import org.antlr.v4.automata.ATNSerializer;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 /** test runtime parse errors */
 @SuppressWarnings("unused")
 public class TestParseErrors extends BaseTest {
