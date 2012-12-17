@@ -582,7 +582,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		// disambiguating or validating predicates to evaluate
 		if ( s.predicates != null ) {
 			int stopIndex = input.index();
-			input.seek(startIndex);
+			if (startIndex != stopIndex) {
+				input.seek(startIndex);
+			}
+
 			BitSet alts = evalSemanticContext(s.predicates, outerContext, reportAmbiguities && predictionMode == PredictionMode.LL_EXACT_AMBIG_DETECTION);
 			switch (alts.cardinality()) {
 			case 0:
@@ -594,7 +597,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			default:
 				// report ambiguity after predicate evaluation to make sure the correct
 				// set of ambig alts is reported.
-				input.seek(stopIndex);
+				if (startIndex != stopIndex) {
+					input.seek(stopIndex);
+				}
+
 				reportAmbiguity(dfa, s, startIndex, stopIndex, alts, s.configs);
 				return alts.nextSetBit(0);
 			}
@@ -749,7 +755,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 				if ( D.predicates != null ) {
 					int stopIndex = input.index();
-					input.seek(startIndex);
+					if (startIndex != stopIndex) {
+						input.seek(startIndex);
+					}
+
 					BitSet alts = evalSemanticContext(D.predicates, outerContext, reportAmbiguities && predictionMode == PredictionMode.LL_EXACT_AMBIG_DETECTION);
 					D.prediction = ATN.INVALID_ALT_NUMBER;
 					switch (alts.cardinality()) {
@@ -762,9 +771,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					default:
 						// report ambiguity after predicate evaluation to make sure the correct
 						// set of ambig alts is reported.
-						input.seek(stopIndex);
-						reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
+						if (startIndex != stopIndex) {
+							input.seek(stopIndex);
+						}
 
+						reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
 						return alts.nextSetBit(0);
 					}
 				}
