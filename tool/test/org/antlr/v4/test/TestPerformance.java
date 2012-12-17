@@ -52,6 +52,7 @@ import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.atn.SimulatorState;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
@@ -187,7 +188,7 @@ public class TestPerformance extends BaseTest {
 
 	private static final boolean ENABLE_PARSER_DFA = true;
 
-    private static final boolean DISABLE_GLOBAL_CONTEXT = false;
+    private static final PredictionMode PREDICTION_MODE = PredictionMode.LL;
     private static final boolean FORCE_GLOBAL_CONTEXT = false;
     private static final boolean TRY_LOCAL_CONTEXT_FIRST = true;
 	private static final boolean OPTIMIZE_LL1 = true;
@@ -774,7 +775,7 @@ public class TestPerformance extends BaseTest {
 							parser.getInterpreter().atn.clearDFA();
 						}
 
-						parser.getInterpreter().disable_global_context = DISABLE_GLOBAL_CONTEXT || TWO_STAGE_PARSING;
+						parser.getInterpreter().setPredictionMode(TWO_STAGE_PARSING ? PredictionMode.SLL : PREDICTION_MODE);
 						parser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT && !TWO_STAGE_PARSING;
 						parser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST || TWO_STAGE_PARSING;
 						parser.getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
@@ -831,7 +832,7 @@ public class TestPerformance extends BaseTest {
 							if (!ENABLE_PARSER_DFA) {
 								parser.setInterpreter(new NonCachingParserATNSimulator<Token>(parser, parser.getATN()));
 							}
-							parser.getInterpreter().disable_global_context = false;
+							parser.getInterpreter().setPredictionMode(PREDICTION_MODE);
 							parser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT;
 							parser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
 							parser.getInterpreter().optimize_ll1 = OPTIMIZE_LL1;

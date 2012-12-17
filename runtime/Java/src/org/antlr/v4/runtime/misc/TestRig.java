@@ -39,6 +39,7 @@ import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.atn.PredictionMode;
 
 import javax.print.PrintException;
 import java.io.FileInputStream;
@@ -226,7 +227,7 @@ public class TestRig {
 
 			if ( diagnostics ) {
 				parser.addErrorListener(new DiagnosticErrorListener<Token>());
-				//parser.getInterpreter().setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);
+				parser.getInterpreter().setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);
 			}
 
 			if ( printTree || gui || psFile!=null ) {
@@ -234,7 +235,7 @@ public class TestRig {
 			}
 
 			if ( SLL ) { // overrides diagnostics
-				parser.getInterpreter().disable_global_context = true;
+				parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
 			}
 
 			parser.setInputStream(tokens);

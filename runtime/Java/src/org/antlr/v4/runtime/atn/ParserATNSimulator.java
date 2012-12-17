@@ -247,7 +247,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public static final boolean dfa_debug = false;
 	public static final boolean retry_debug = false;
 
-	public boolean disable_global_context = false;
+	private PredictionMode predictionMode = PredictionMode.LL;
 	public boolean force_global_context = false;
 	public boolean always_try_local_context = true;
 
@@ -292,6 +292,15 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		this.parser = parser;
 	}
 
+	@NotNull
+	public final PredictionMode getPredictionMode() {
+		return predictionMode;
+	}
+
+	public final void setPredictionMode(@NotNull PredictionMode predictionMode) {
+		this.predictionMode = predictionMode;
+	}
+
 	@Override
 	public void reset() {
 	}
@@ -327,7 +336,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			useContext |= dfa != null && dfa.isContextSensitive();
 		}
 
-		userWantsCtxSensitive = useContext || (!disable_global_context && (outerContext != null));
+		userWantsCtxSensitive = useContext || (predictionMode != PredictionMode.SLL && (outerContext != null));
 		if (outerContext == null) {
 			outerContext = ParserRuleContext.emptyContext();
 		}
@@ -1463,19 +1472,70 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		 *     represented alternative.
 		 *  2. Make sure every represented state has at least one configuration
 		 *     which predicts the minimum represented alternative.
+		 *  3. (exact only) make sure every represented state has at least one
+		 *     configuration which predicts each represented alternative.
 		 */
+
+		// quick check 1 & 2 => if we assume #1 holds and check #2 against the
+		// minAlt from the first state, #2 will fail if the assumption was
+		// incorrect
 		int currentState = configs.get(0).getState().stateNumber;
 		for (int i = 0; i < configs.size(); i++) {
 			ATNConfig config = configs.get(i);
-			if (config.getState().stateNumber != currentState) {
+			int stateNumber = config.getState().stateNumber;
+			if (stateNumber != currentState) {
 				if (config.getAlt() != minAlt) {
 					return null;
 				}
 
-				currentState = config.getState().stateNumber;
+				currentState = stateNumber;
 			}
 		}
 
+		BitSet representedAlts = null;
+		if (predictionMode != PredictionMode.LL_EXACT_AMBIG_DETECTION) {
+			currentState = configs.get(0).getState().stateNumber;
+
+			// get the represented alternatives of the first state
+			representedAlts = new BitSet();
+			int maxAlt = minAlt;
+			for (int i = 0; i < configs.size(); i++) {
+				ATNConfig config = configs.get(i);
+				if (config.getState().stateNumber != currentState) {
+					break;
+				}
+
+				int alt = config.getAlt();
+				representedAlts.set(alt);
+				maxAlt = alt;
+			}
+
+			// quick check #3:
+			currentState = configs.get(0).getState().stateNumber;
+			int currentAlt = minAlt;
+			for (int i = 0; i < configs.size(); i++) {
+				ATNConfig config = configs.get(i);
+				int stateNumber = config.getState().stateNumber;
+				int alt = config.getAlt();
+				if (stateNumber != currentState) {
+					if (currentAlt != maxAlt) {
+						return null;
+					}
+
+					currentState = stateNumber;
+					currentAlt = minAlt;
+				}
+				else if (alt != currentAlt) {
+					if (alt != representedAlts.nextSetBit(currentAlt + 1)) {
+						return null;
+					}
+					
+					currentAlt = alt;
+				}
+			}
+		}
+
+		final boolean exactCheck = representedAlts != null;
 		currentState = configs.get(0).getState().stateNumber;
 		int firstIndexCurrentState = 0;
 		int lastIndexCurrentStateMinAlt = 0;
@@ -1513,7 +1573,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						break;
 					}
 
-					lastIndexCurrentStateMinAlt = i;
+					lastIndexCurrentStateMinAlt = j;
 					joinedCheckContext = contextCache.join(joinedCheckContext, config2.getContext());
 				}
 
@@ -1521,12 +1581,38 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				continue;
 			}
 
-			PredictionContext check = contextCache.join(joinedCheckContext, config.getContext());
-			if (!joinedCheckContext.equals(check)) {
-				return null;
+			PredictionContext joinedCheckContext2 = config.getContext();
+			int currentAlt = config.getAlt();
+			int lastIndexCurrentStateCurrentAlt = i;
+			for (int j = lastIndexCurrentStateCurrentAlt + 1; j < configs.size(); j++) {
+				ATNConfig config2 = configs.get(j);
+				if (config2.getAlt() != currentAlt) {
+					break;
+				}
+
+				if (config2.getState().stateNumber != currentState) {
+					break;
+				}
+
+				lastIndexCurrentStateCurrentAlt = j;
+				joinedCheckContext2 = contextCache.join(joinedCheckContext2, config2.getContext());
 			}
 
-			if (optimize_hidden_conflicted_configs) {
+			i = lastIndexCurrentStateCurrentAlt;
+
+			if (exactCheck) {
+				if (!joinedCheckContext.equals(joinedCheckContext2)) {
+					return null;
+				}
+			}
+			else {
+				PredictionContext check = contextCache.join(joinedCheckContext, joinedCheckContext2);
+				if (!joinedCheckContext.equals(check)) {
+					return null;
+				}
+			}
+
+			if (!exactCheck && optimize_hidden_conflicted_configs) {
 				for (int j = firstIndexCurrentState; j <= lastIndexCurrentStateMinAlt; j++) {
 					ATNConfig checkConfig = configs.get(j);
 
@@ -1537,7 +1623,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					}
 
 					if (joinedCheckContext != checkConfig.getContext()) {
-						check = contextCache.join(checkConfig.getContext(), config.getContext());
+						PredictionContext check = contextCache.join(checkConfig.getContext(), config.getContext());
 						if (!checkConfig.getContext().equals(check)) {
 							continue;
 						}
