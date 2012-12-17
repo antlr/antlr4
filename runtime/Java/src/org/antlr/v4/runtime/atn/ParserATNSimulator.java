@@ -580,16 +580,24 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		// Before jumping to prediction, check to see if there are
 		// disambiguating or validating predicates to evaluate
-		if ( s.predicates!=null ) {
-			// rewind input so pred's LT(i) calls make sense
+		if ( s.predicates != null ) {
+			int stopIndex = input.index();
 			input.seek(startIndex);
-			// since we don't report ambiguities in execDFA, we never need to use complete predicate evaluation here
-			BitSet alts = evalSemanticContext(s.predicates, outerContext, false);
-			if (alts.isEmpty()) {
+			BitSet alts = evalSemanticContext(s.predicates, outerContext, reportAmbiguities && predictionMode == PredictionMode.LL_EXACT_AMBIG_DETECTION);
+			switch (alts.cardinality()) {
+			case 0:
 				throw noViableAlt(input, outerContext, s.configs, startIndex);
-			}
 
-			return alts.nextSetBit(0);
+			case 1:
+				return alts.nextSetBit(0);
+
+			default:
+				// report ambiguity after predicate evaluation to make sure the correct
+				// set of ambig alts is reported.
+				input.seek(stopIndex);
+				reportAmbiguity(dfa, s, startIndex, stopIndex, alts, s.configs);
+				return alts.nextSetBit(0);
+			}
 		}
 
 		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
@@ -742,7 +750,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if ( D.predicates != null ) {
 					int stopIndex = input.index();
 					input.seek(startIndex);
-					BitSet alts = evalSemanticContext(D.predicates, outerContext, reportAmbiguities);
+					BitSet alts = evalSemanticContext(D.predicates, outerContext, reportAmbiguities && predictionMode == PredictionMode.LL_EXACT_AMBIG_DETECTION);
 					D.prediction = ATN.INVALID_ALT_NUMBER;
 					switch (alts.cardinality()) {
 					case 0:
@@ -754,10 +762,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					default:
 						// report ambiguity after predicate evaluation to make sure the correct
 						// set of ambig alts is reported.
-						if (reportAmbiguities) {
-							input.seek(stopIndex);
-							reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
-						}
+						input.seek(stopIndex);
+						reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
 
 						return alts.nextSetBit(0);
 					}

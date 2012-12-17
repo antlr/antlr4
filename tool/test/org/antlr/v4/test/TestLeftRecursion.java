@@ -362,8 +362,7 @@ public class TestLeftRecursion extends BaseTest {
 		result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "a+b*2\n", true);
 		assertEquals("line 1:1 reportAttemptingFullContext d=3, input='+'\n" +
 					 "line 1:1 reportContextSensitivity d=3, input='+'\n" +
-					 "line 1:3 reportAttemptingFullContext d=3, input='*'\n" +
-					 "line 1:3 reportAmbiguity d=3: ambigAlts={1, 2}, input='*'\n",
+					 "line 1:3 reportAttemptingFullContext d=3, input='*'\n",
 					 stderrDuringParse);
 
 		result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "(1+2)*3\n", true);
