@@ -263,6 +263,13 @@ public class TestRuleVersioning extends BaseTest {
 		return group;
 	}
 
+	@Override
+	public List<String> getCompileOptions() {
+		List<String> result = new ArrayList<String>(super.getCompileOptions());
+		result.add(0, "-proc:none");
+		return result;
+	}
+
 	private static class PropertiesWrapper extends AbstractMap<String, Object> {
 		private final Properties properties;
 		private final List<Tuple2<String, Integer>> prefixes;

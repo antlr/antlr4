@@ -345,27 +345,7 @@ public abstract class BaseTest {
 		Iterable<? extends JavaFileObject> compilationUnits =
 			fileManager.getJavaFileObjectsFromFiles(files);
 
-		List<String> compileOptions = new ArrayList<String>();
-		compileOptions.add("-g");
-		compileOptions.add("-source");
-		compileOptions.add("1.6");
-		compileOptions.add("-target");
-		compileOptions.add("1.6");
-
-		String bootclasspath = getBootClassPath();
-		if (bootclasspath != null) {
-			compileOptions.add("-bootclasspath");
-			compileOptions.add(bootclasspath);
-		}
-
-		if (STRICT_COMPILE_CHECKS) {
-			compileOptions.add("-Xlint");
-			compileOptions.add("-Xlint:-serial");
-			compileOptions.add("-Werror");
-		}
-
-		compileOptions.addAll(Arrays.asList("-d", tmpdir, "-cp", tmpdir+pathSep+CLASSPATH));
-
+		List<String> compileOptions = getCompileOptions();
 		JavaCompiler.CompilationTask task =
 			compiler.getTask(null, fileManager, null, compileOptions, null,
 							 compilationUnits);
@@ -420,6 +400,30 @@ public abstract class BaseTest {
 			return false;
 		}
 		*/
+	}
+
+	public List<String> getCompileOptions() {
+		List<String> compileOptions = new ArrayList<String>();
+		compileOptions.add("-g");
+		compileOptions.add("-source");
+		compileOptions.add("1.6");
+		compileOptions.add("-target");
+		compileOptions.add("1.6");
+
+		String bootclasspath = getBootClassPath();
+		if (bootclasspath != null) {
+			compileOptions.add("-bootclasspath");
+			compileOptions.add(bootclasspath);
+		}
+
+		if (STRICT_COMPILE_CHECKS) {
+			compileOptions.add("-Xlint");
+			compileOptions.add("-Xlint:-serial");
+			compileOptions.add("-Werror");
+		}
+
+		compileOptions.addAll(Arrays.asList("-d", tmpdir, "-cp", tmpdir+pathSep+CLASSPATH));
+		return compileOptions;
 	}
 
 	public String getBootClassPath() {
