@@ -746,6 +746,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						// report ambiguity after predicate evaluation to make sure the correct
 						// set of ambig alts is reported.
 						if (reportAmbiguities) {
+							input.seek(stopIndex);
 							reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
 						}
 
