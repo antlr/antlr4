@@ -193,7 +193,7 @@ public class TestPerformance extends BaseTest {
     private static final boolean TRY_LOCAL_CONTEXT_FIRST = true;
 	private static final boolean OPTIMIZE_LL1 = true;
 	private static final boolean OPTIMIZE_UNIQUE_CLOSURE = true;
-	private static final boolean OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS = true;
+	private static final boolean OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS = false;
 	private static final boolean OPTIMIZE_TAIL_CALLS = true;
 	private static final boolean TAIL_CALL_PRESERVES_SLL = true;
 	private static final boolean TREAT_SLLK1_CONFLICT_AS_AMBIGUITY = false;

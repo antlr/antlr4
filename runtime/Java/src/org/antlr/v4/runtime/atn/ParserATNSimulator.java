@@ -253,7 +253,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 	public boolean optimize_unique_closure = true;
 	public boolean optimize_ll1 = true;
-	public boolean optimize_hidden_conflicted_configs = true;
+	public boolean optimize_hidden_conflicted_configs = false;
 	public boolean optimize_tail_calls = true;
 	public boolean tail_call_preserves_sll = true;
 	public boolean treat_sllk1_conflict_as_ambiguity = false;
