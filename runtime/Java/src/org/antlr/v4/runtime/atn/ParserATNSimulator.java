@@ -1244,14 +1244,23 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 				if (optimize_closure_busy) {
 					boolean checkClosure = false;
-					if (c.getState() instanceof StarLoopEntryState || c.getState() instanceof BlockEndState || c.getState() instanceof LoopEndState) {
+					switch (c.getState().getStateType()) {
+					case ATNState.STAR_LOOP_ENTRY:
+					case ATNState.BLOCK_END:
+					case ATNState.LOOP_END:
 						checkClosure = true;
-					}
-					else if (c.getState() instanceof PlusBlockStartState) {
+						break;
+
+					case ATNState.PLUS_BLOCK_START:
 						checkClosure = true;
-					}
-					else if (config.getState() instanceof RuleStopState && c.getContext().isEmpty()) {
-						checkClosure = true;
+						break;
+
+					case ATNState.RULE_STOP:
+						checkClosure = c.getContext().isEmpty();
+						break;
+
+					default:
+						break;
 					}
 
 					if (checkClosure && !closureBusy.add(c)) {
