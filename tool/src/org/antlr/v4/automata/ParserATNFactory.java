@@ -45,6 +45,8 @@ import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.AbstractPredicateTransition;
 import org.antlr.v4.runtime.atn.ActionTransition;
 import org.antlr.v4.runtime.atn.AtomTransition;
+import org.antlr.v4.runtime.atn.BasicBlockStartState;
+import org.antlr.v4.runtime.atn.BasicState;
 import org.antlr.v4.runtime.atn.BlockEndState;
 import org.antlr.v4.runtime.atn.BlockStartState;
 import org.antlr.v4.runtime.atn.EpsilonTransition;
@@ -359,13 +361,13 @@ public class ParserATNFactory implements ATNFactory {
 				blkAST.atnState = h.left;
 				return h;
 			}
-			BlockStartState start = newState(BlockStartState.class, blkAST);
+			BlockStartState start = newState(BasicBlockStartState.class, blkAST);
 			if ( alts.size()>1 ) atn.defineDecisionState(start);
 			return makeBlock(start, blkAST, alts);
 		}
 		switch ( ebnfRoot.getType() ) {
 			case ANTLRParser.OPTIONAL :
-				BlockStartState start = newState(BlockStartState.class, blkAST);
+				BlockStartState start = newState(BasicBlockStartState.class, blkAST);
 				atn.defineDecisionState(start);
 				Handle h = makeBlock(start, blkAST, alts);
 				return optional(ebnfRoot, h);
@@ -418,8 +420,8 @@ public class ParserATNFactory implements ATNFactory {
             Transition tr = null;
             if ( el.left.getNumberOfTransitions()==1 ) tr = el.left.transition(0);
             boolean isRuleTrans = tr instanceof RuleTransition;
-            if ( el.left.getClass() == ATNState.class &&
-				el.right.getClass() == ATNState.class &&
+            if ( el.left.getStateType() == ATNState.BASIC &&
+				el.right.getStateType()== ATNState.BASIC &&
 				tr!=null && (isRuleTrans || tr.target == el.right) )
 			{
 				// we can avoid epsilon edge to next el
@@ -601,7 +603,7 @@ public class ParserATNFactory implements ATNFactory {
     public void addRuleFollowLinks() {
         for (ATNState p : atn.states) {
             if ( p!=null &&
-                 p.getClass() == ATNState.class && p.getNumberOfTransitions()==1 &&
+                 p.getStateType() == ATNState.BASIC && p.getNumberOfTransitions()==1 &&
                  p.transition(0) instanceof RuleTransition )
             {
                 RuleTransition rt = (RuleTransition) p.transition(0);
@@ -643,10 +645,6 @@ public class ParserATNFactory implements ATNFactory {
 
 	@NotNull
 	public <T extends ATNState> T newState(@NotNull Class<T> nodeType, GrammarAST node) {
-		if (!ATNState.class.isAssignableFrom(nodeType)) {
-			throw new IllegalArgumentException(String.format("%s is not a %s.", nodeType.getName(), ATNState.class.getName()));
-		}
-
 		Exception cause;
 		try {
 			Constructor<T> ctor = nodeType.getConstructor();
@@ -675,7 +673,7 @@ public class ParserATNFactory implements ATNFactory {
 
 	@NotNull
 	public ATNState newState(@Nullable GrammarAST node) {
-		ATNState n = new ATNState();
+		ATNState n = new BasicState();
 		n.setRuleIndex(currentRule.index);
 		atn.addState(n);
 		return n;
