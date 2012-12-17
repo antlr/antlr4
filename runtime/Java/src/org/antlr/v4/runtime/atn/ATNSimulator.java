@@ -74,6 +74,10 @@ public abstract class ATNSimulator {
 	public abstract void reset();
 
 	public static ATN deserialize(@NotNull char[] data) {
+		return deserialize(data, true);
+	}
+
+	public static ATN deserialize(@NotNull char[] data, boolean optimize) {
 		ATN atn = new ATN();
 		List<IntervalSet> sets = new ArrayList<IntervalSet>();
 		int p = 0;
@@ -287,14 +291,16 @@ public abstract class ATNSimulator {
 			atn.decisionToDFA[i] = new DFA(atn.decisionToState.get(i), i);
 		}
 
-		while (true) {
-			int optimizationCount = 0;
-			optimizationCount += inlineSetRules(atn);
-			optimizationCount += combineChainedEpsilons(atn);
-			boolean preserveOrder = atn.grammarType == ATN.LEXER;
-			optimizationCount += optimizeSets(atn, preserveOrder);
-			if (optimizationCount == 0) {
-				break;
+		if (optimize) {
+			while (true) {
+				int optimizationCount = 0;
+				optimizationCount += inlineSetRules(atn);
+				optimizationCount += combineChainedEpsilons(atn);
+				boolean preserveOrder = atn.grammarType == ATN.LEXER;
+				optimizationCount += optimizeSets(atn, preserveOrder);
+				if (optimizationCount == 0) {
+					break;
+				}
 			}
 		}
 

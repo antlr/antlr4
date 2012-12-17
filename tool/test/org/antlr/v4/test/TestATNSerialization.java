@@ -269,7 +269,7 @@ public class TestATNSerialization extends BaseTest {
 				"5->1 EPSILON 0,0,0\n" +
 				"6->7 ATOM 1,0,0\n" +
 				"7->3 EPSILON 0,0,0\n";
-		ATN atn = createATN(g, true);
+		ATN atn = createATN(g, false);
 		String result = ATNSerializer.getDecoded(g, atn);
 		assertEquals(expecting, result);
 	}
