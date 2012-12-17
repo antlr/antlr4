@@ -1479,6 +1479,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		List<ATNConfig> configs = new ArrayList<ATNConfig>(configset);
 		Collections.sort(configs, STATE_ALT_SORT_COMPARATOR);
 
+		boolean exact = !configset.getDipsIntoOuterContext() && predictionMode == PredictionMode.LL_EXACT_AMBIG_DETECTION;
 		BitSet alts = new BitSet();
 		int minAlt = configs.get(0).getAlt();
 		alts.set(minAlt);
@@ -1509,7 +1510,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 
 		BitSet representedAlts = null;
-		if (predictionMode != PredictionMode.LL_EXACT_AMBIG_DETECTION) {
+		if (exact) {
 			currentState = configs.get(0).getState().getNonStopStateNumber();
 
 			// get the represented alternatives of the first state
@@ -1551,7 +1552,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 		}
 
-		final boolean exactCheck = representedAlts != null;
 		currentState = configs.get(0).getState().getNonStopStateNumber();
 		int firstIndexCurrentState = 0;
 		int lastIndexCurrentStateMinAlt = 0;
@@ -1616,7 +1616,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 			i = lastIndexCurrentStateCurrentAlt;
 
-			if (exactCheck) {
+			if (exact) {
 				if (!joinedCheckContext.equals(joinedCheckContext2)) {
 					return null;
 				}
@@ -1628,7 +1628,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				}
 			}
 
-			if (!exactCheck && optimize_hidden_conflicted_configs) {
+			if (!exact && optimize_hidden_conflicted_configs) {
 				for (int j = firstIndexCurrentState; j <= lastIndexCurrentStateMinAlt; j++) {
 					ATNConfig checkConfig = configs.get(j);
 
