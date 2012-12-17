@@ -265,7 +265,6 @@ public class TestLexerExec extends BaseTest {
 		String found = execLexer("L.g4", grammar, "L", "ab");
 		String expecting =
 			"a\n" +
-			"b\n" +
 			"[@0,0:0='a',<1>,1:0]\n" +
 			"[@1,1:1='b',<3>,1:1]\n" +
 			"[@2,2:1='<EOF>',<-1>,1:2]\n";
