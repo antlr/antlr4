@@ -266,13 +266,13 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	/**
 	 * When {@code true}, ambiguous alternatives are reported when they are
 	 * encountered within {@link #execATN}. When {@code false}, these messages
-	 * are suppressed. The default is {@code true}.
+	 * are suppressed. The default is {@code false}.
 	 * <p>
 	 * When messages about ambiguous alternatives are not required, setting this
 	 * to {@code false} enables additional internal optimizations which may lose
 	 * this information.
 	 */
-	public boolean reportAmbiguities = true;
+	public boolean reportAmbiguities = false;
 
 	/** By default we do full context-sensitive LL(*) parsing not
 	 *  Strong LL(*) parsing. If we fail with Strong LL(*) we

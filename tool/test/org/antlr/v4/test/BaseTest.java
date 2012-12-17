@@ -997,6 +997,7 @@ public abstract class BaseTest {
 			"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
 			"        <createParser>\n"+
 			"		 parser.setBuildParseTree(true);\n" +
+			"		 parser.getInterpreter().reportAmbiguities = true;\n" +
 			"        ParserRuleContext\\<Token> tree = parser.<parserStartRuleName>();\n" +
 			"        ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
 			"    }\n" +
