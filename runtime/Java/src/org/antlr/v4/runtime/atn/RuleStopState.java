@@ -38,6 +38,11 @@ package org.antlr.v4.runtime.atn;
 public final class RuleStopState extends ATNState {
 
 	@Override
+	public int getNonStopStateNumber() {
+		return -1;
+	}
+
+	@Override
 	public int getStateType() {
 		return RULE_STOP;
 	}

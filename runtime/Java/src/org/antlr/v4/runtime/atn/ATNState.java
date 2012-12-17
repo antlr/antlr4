@@ -94,6 +94,25 @@ public abstract class ATNState {
 	/** Used to cache lookahead during parsing, not used during construction */
     public IntervalSet nextTokenWithinRule;
 
+	/**
+	 * Gets the state number.
+	 *
+	 * @return the state number
+	 */
+	public final int getStateNumber() {
+		return stateNumber;
+	}
+
+	/**
+	 * For all states except {@link RuleStopState}, this returns the state
+	 * number. Returns -1 for stop states.
+	 *
+	 * @return -1 for {@link RuleStopState}, otherwise the state number
+	 */
+	public int getNonStopStateNumber() {
+		return getStateNumber();
+	}
+
 	@Override
 	public int hashCode() { return stateNumber; }
 

@@ -1440,7 +1440,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 			@Override
 			public int compare(ATNConfig o1, ATNConfig o2) {
-				int diff = o1.getState().stateNumber - o2.getState().stateNumber;
+				int diff = o1.getState().getNonStopStateNumber() - o2.getState().getNonStopStateNumber();
 				if (diff != 0) {
 					return diff;
 				}
@@ -1479,10 +1479,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		// quick check 1 & 2 => if we assume #1 holds and check #2 against the
 		// minAlt from the first state, #2 will fail if the assumption was
 		// incorrect
-		int currentState = configs.get(0).getState().stateNumber;
+		int currentState = configs.get(0).getState().getNonStopStateNumber();
 		for (int i = 0; i < configs.size(); i++) {
 			ATNConfig config = configs.get(i);
-			int stateNumber = config.getState().stateNumber;
+			int stateNumber = config.getState().getNonStopStateNumber();
 			if (stateNumber != currentState) {
 				if (config.getAlt() != minAlt) {
 					return null;
@@ -1494,14 +1494,14 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		BitSet representedAlts = null;
 		if (predictionMode != PredictionMode.LL_EXACT_AMBIG_DETECTION) {
-			currentState = configs.get(0).getState().stateNumber;
+			currentState = configs.get(0).getState().getNonStopStateNumber();
 
 			// get the represented alternatives of the first state
 			representedAlts = new BitSet();
 			int maxAlt = minAlt;
 			for (int i = 0; i < configs.size(); i++) {
 				ATNConfig config = configs.get(i);
-				if (config.getState().stateNumber != currentState) {
+				if (config.getState().getNonStopStateNumber() != currentState) {
 					break;
 				}
 
@@ -1511,11 +1511,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			// quick check #3:
-			currentState = configs.get(0).getState().stateNumber;
+			currentState = configs.get(0).getState().getNonStopStateNumber();
 			int currentAlt = minAlt;
 			for (int i = 0; i < configs.size(); i++) {
 				ATNConfig config = configs.get(i);
-				int stateNumber = config.getState().stateNumber;
+				int stateNumber = config.getState().getNonStopStateNumber();
 				int alt = config.getAlt();
 				if (stateNumber != currentState) {
 					if (currentAlt != maxAlt) {
@@ -1536,7 +1536,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		}
 
 		final boolean exactCheck = representedAlts != null;
-		currentState = configs.get(0).getState().stateNumber;
+		currentState = configs.get(0).getState().getNonStopStateNumber();
 		int firstIndexCurrentState = 0;
 		int lastIndexCurrentStateMinAlt = 0;
 		PredictionContext joinedCheckContext = configs.get(0).getContext();
@@ -1546,7 +1546,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				break;
 			}
 
-			if (config.getState().stateNumber != currentState) {
+			if (config.getState().getNonStopStateNumber() != currentState) {
 				break;
 			}
 
@@ -1558,8 +1558,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			ATNConfig config = configs.get(i);
 			ATNState state = config.getState();
 			alts.set(config.getAlt());
-			if (state.stateNumber != currentState) {
-				currentState = state.stateNumber;
+			if (state.getNonStopStateNumber() != currentState) {
+				currentState = state.getNonStopStateNumber();
 				firstIndexCurrentState = i;
 				lastIndexCurrentStateMinAlt = i;
 				joinedCheckContext = config.getContext();
@@ -1569,7 +1569,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						break;
 					}
 
-					if (config2.getState().stateNumber != currentState) {
+					if (config2.getState().getNonStopStateNumber() != currentState) {
 						break;
 					}
 
@@ -1590,7 +1590,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					break;
 				}
 
-				if (config2.getState().stateNumber != currentState) {
+				if (config2.getState().getNonStopStateNumber() != currentState) {
 					break;
 				}
 
