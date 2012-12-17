@@ -1210,10 +1210,10 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			return; // avoid infinite recursion
 		}
 
-		boolean hasEmpty = config.getContext().hasEmpty();
 		if ( config.getState() instanceof RuleStopState ) {
 			// We hit rule end. If we have context info, use it
-			if ( config.getContext()!=null && !config.getContext().isEmpty() ) {
+			if ( !config.getContext().isEmpty() ) {
+				boolean hasEmpty = config.getContext().hasEmpty();
 				int nonEmptySize = config.getContext().size() - (hasEmpty ? 1 : 0);
 				for (int i = 0; i < nonEmptySize; i++) {
 					PredictionContext newContext = config.getContext().getParent(i); // "pop" return state
