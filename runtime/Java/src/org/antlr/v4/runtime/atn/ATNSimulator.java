@@ -381,9 +381,9 @@ public abstract class ATNSimulator {
 		ATNState s;
 		switch (type) {
 			case ATNState.INVALID_TYPE: return null;
-			case ATNState.BASIC : s = new ATNState(); break;
+			case ATNState.BASIC : s = new BasicState(); break;
 			case ATNState.RULE_START : s = new RuleStartState(); break;
-			case ATNState.BLOCK_START : s = new BlockStartState(); break;
+			case ATNState.BLOCK_START : s = new BasicBlockStartState(); break;
 			case ATNState.PLUS_BLOCK_START : s = new PlusBlockStartState(); break;
 			case ATNState.STAR_BLOCK_START : s = new StarBlockStartState(); break;
 			case ATNState.TOKEN_START : s = new TokensStartState(); break;

@@ -30,6 +30,11 @@
 
 package org.antlr.v4.runtime.atn;
 
-public class StarLoopEntryState extends DecisionState {
+public final class StarLoopEntryState extends DecisionState {
 	public StarLoopbackState loopBackState;
+
+	@Override
+	public int getStateType() {
+		return STAR_LOOP_ENTRY;
+	}
 }

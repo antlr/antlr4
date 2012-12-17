@@ -39,7 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ATNState {
+public abstract class ATNState {
 	public static final int INITIAL_NUM_TRANSITIONS = 4;
 
 	// constants for serialization
@@ -73,22 +73,6 @@ public class ATNState {
 			"PLUS_LOOP_BACK",
 			"LOOP_END"
 		));
-
-	public static final Map<Class<? extends ATNState>, Integer> serializationTypes =
-		Collections.unmodifiableMap(new HashMap<Class<? extends ATNState>, Integer>() {{
-            put(ATNState.class, BASIC);
-            put(RuleStartState.class, RULE_START);
-            put(BlockStartState.class, BLOCK_START);
-            put(PlusBlockStartState.class, PLUS_BLOCK_START);
-            put(StarBlockStartState.class, STAR_BLOCK_START);
-            put(TokensStartState.class, TOKEN_START);
-            put(RuleStopState.class, RULE_STOP);
-            put(BlockEndState.class, BLOCK_END);
-            put(PlusLoopbackState.class, PLUS_LOOP_BACK);
-            put(StarLoopbackState.class, STAR_LOOP_BACK);
-			put(StarLoopEntryState.class, STAR_LOOP_ENTRY);
-			put(LoopEndState.class, LOOP_END);
-        }});
 
 	public static final int INVALID_STATE_NUMBER = -1;
 
@@ -157,9 +141,7 @@ public class ATNState {
 		return transitions.remove(index);
 	}
 
-	public int getStateType() {
-		return serializationTypes.get(this.getClass());
-	}
+	public abstract int getStateType();
 
 	public final boolean onlyHasEpsilonTransitions() {
 		return epsilonOnlyTransitions;

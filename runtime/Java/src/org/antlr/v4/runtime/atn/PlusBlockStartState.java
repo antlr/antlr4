@@ -35,6 +35,11 @@ package org.antlr.v4.runtime.atn;
  *  it for completeness. In reality, the PlusLoopbackState node is the
  *  real decision-making note for A+
  */
-public class PlusBlockStartState extends BlockStartState {
+public final class PlusBlockStartState extends BlockStartState {
 	public PlusLoopbackState loopBackState;
+
+	@Override
+	public int getStateType() {
+		return PLUS_BLOCK_START;
+	}
 }

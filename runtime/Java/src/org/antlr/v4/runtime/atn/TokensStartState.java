@@ -31,5 +31,10 @@
 package org.antlr.v4.runtime.atn;
 
 /** The Tokens rule start state linking to each lexer rule start state */
-public class TokensStartState extends DecisionState {
+public final class TokensStartState extends DecisionState {
+
+	@Override
+	public int getStateType() {
+		return TOKEN_START;
+	}
 }
