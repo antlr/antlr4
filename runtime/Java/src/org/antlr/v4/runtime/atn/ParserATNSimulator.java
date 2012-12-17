@@ -716,10 +716,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						}
 						else {
 							assert !useContext;
+							assert D.isAcceptState;
 
-							int ambigIndex = input.index();
-
-							if ( D.isAcceptState && D.configs.hasSemanticContext() ) {
+							if ( D.configs.hasSemanticContext() ) {
 								int nalts = decState.getNumberOfTransitions();
 								DFAState.PredPrediction[] predPredictions = D.predicates;
 								if (predPredictions != null) {
