@@ -258,12 +258,50 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
 		assertEquals(Token.EOF, tokens.LA(1));
 		assertEquals(0, tokens.index());
 		assertEquals(1, tokens.size());
-		tokens.consume();
+	}
 
-		assertEquals(Token.EOF, tokens.LA(1));
-		assertEquals(0, tokens.index());
-		assertEquals(1, tokens.size());
-		tokens.consume();
+	@Test(expected = IllegalStateException.class)
+	public void testCannotConsumeEOF() throws Exception {
+		TokenSource<Token> lexer = new TokenSource<Token>() {
+
+			@Override
+			public Token nextToken() {
+				return new CommonToken(Token.EOF);
+			}
+
+			@Override
+			public int getLine() {
+				return 0;
+			}
+
+			@Override
+			public int getCharPositionInLine() {
+				return 0;
+			}
+
+			@Override
+			public CharStream getInputStream() {
+				return null;
+			}
+
+			@Override
+			public String getSourceName() {
+				return null;
+			}
+
+			@Override
+			public TokenFactory<? extends Token> getTokenFactory() {
+				throw new UnsupportedOperationException("Not supported yet.");
+			}
+
+			@Override
+			public void setTokenFactory(TokenFactory<? extends Token> factory) {
+				throw new UnsupportedOperationException("Not supported yet.");
+			}
+		};
+
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		tokens.fill();
 
 		assertEquals(Token.EOF, tokens.LA(1));
 		assertEquals(0, tokens.index());

@@ -390,7 +390,9 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	 */
 	public Symbol consume() {
 		Symbol o = getCurrentToken();
-		getInputStream().consume();
+		if (o.getType() != EOF) {
+			getInputStream().consume();
+		}
 		boolean hasListener = _parseListeners != null && !_parseListeners.isEmpty();
 		if (_buildParseTrees || hasListener) {
 			if ( _errHandler.inErrorRecoveryMode(this) ) {

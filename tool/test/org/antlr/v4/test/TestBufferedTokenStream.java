@@ -145,10 +145,6 @@ public class TestBufferedTokenStream extends BaseTest {
             tokens.consume();
             t = tokens.LT(1);
         }
-        tokens.consume();
-        tokens.LT(1); // push it past end
-        tokens.consume();
-        tokens.LT(1);
 
         String result = tokens.getText();
         String expecting = "x = 3 * 0 + 2 * 0;";
