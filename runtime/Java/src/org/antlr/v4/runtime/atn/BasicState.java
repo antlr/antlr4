@@ -30,11 +30,15 @@
 
 package org.antlr.v4.runtime.atn;
 
-/** The block that begins a closure loop. */
-public final class StarBlockStartState extends BlockStartState {
+/**
+ *
+ * @author Sam Harwell
+ */
+public final class BasicState extends ATNState {
 
 	@Override
 	public int getStateType() {
-		return STAR_BLOCK_START;
+		return BASIC;
 	}
+
 }

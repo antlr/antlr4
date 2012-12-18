@@ -54,12 +54,12 @@ public class TailEpsilonRemover extends ATNVisitor {
 
 	@Override
 	public void visitState(@NotNull ATNState p) {
-		if (p.getClass() == ATNState.class && p.getNumberOfTransitions() == 1) {
+		if (p.getStateType() == ATNState.BASIC && p.getNumberOfTransitions() == 1) {
 			ATNState q = p.transition(0).target;
 			if (p.transition(0) instanceof RuleTransition) {
 				q = ((RuleTransition) p.transition(0)).followState;
 			}
-			if (q.getClass() == ATNState.class) {
+			if (q.getStateType() == ATNState.BASIC) {
 				// we have p-x->q for x in {rule, action, pred, token, ...}
 				// if edge out of q is single epsilon to block end
 				// we can strip epsilon p-x->q-eps->r
