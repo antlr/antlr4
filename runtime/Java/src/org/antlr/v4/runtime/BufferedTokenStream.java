@@ -117,14 +117,12 @@ public class BufferedTokenStream implements TokenStream {
     @Override
     public int size() { return tokens.size(); }
 
-    /** Move the input pointer to the next incoming token.  The stream
-     *  must become active with LT(1) available.  consume() simply
-     *  moves the input pointer so that LT(1) points at the next
-     *  input symbol. Consume at least one token, unless EOF has been reached.
-     */
     @Override
     public void consume() {
-        lazyInit();
+		if (LA(1) == EOF) {
+			throw new IllegalStateException("cannot consume EOF");
+		}
+
 		if (sync(p + 1)) {
 			p = adjustSeekIndex(p + 1);
 		}
