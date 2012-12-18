@@ -117,14 +117,12 @@ public class BufferedTokenStream implements TokenStream {
     @Override
     public int size() { return tokens.size(); }
 
-    /** Move the input pointer to the next incoming token.  The stream
-     *  must become active with LT(1) available.  consume() simply
-     *  moves the input pointer so that LT(1) points at the next
-     *  input symbol. Consume at least one token, unless EOF has been reached.
-     */
     @Override
     public void consume() {
-        lazyInit();
+		if (LA(1) == EOF) {
+			throw new IllegalStateException("cannot consume EOF");
+		}
+
 		if (sync(p + 1)) {
 			p = adjustSeekIndex(p + 1);
 		}
@@ -224,7 +222,7 @@ public class BufferedTokenStream implements TokenStream {
 	 * operation. The default implementation simply returns {@code i}. If an
 	 * exception is thrown in this method, the current stream index should not be
 	 * changed.
-	 * <p>
+	 * <p/>
 	 * For example, {@link CommonTokenStream} overrides this method to ensure that
 	 * the seek target is always an on-channel token.
 	 *

@@ -38,11 +38,11 @@ package org.antlr.v4.runtime;
  *  from the tokens source on demand. In other words, until you ask for a
  *  token using consume(), LT(), etc. the stream does not pull from the lexer.
  *
- *  The only difference between this stream and BufferedTokenStream superclass
+ *  The only difference between this stream and {@link BufferedTokenStream} superclass
  *  is that this stream knows how to ignore off channel tokens. There may be
  *  a performance advantage to using the superclass if you don't pass
  *  whitespace and comments etc. to the parser on a hidden channel (i.e.,
- *  you set $channel instead of calling skip() in lexer rules.)
+ *  you set {@code $channel} instead of calling {@code skip()} in lexer rules.)
  *
  *  @see UnbufferedTokenStream
  *  @see BufferedTokenStream
