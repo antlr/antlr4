@@ -1245,6 +1245,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				// else if we have no context info, just chase follow links (if greedy)
 				if ( debug ) System.out.println("FALLING off rule "+
 												getRuleName(config.getState().ruleIndex));
+
+				if (config.getContext() == PredictionContext.EMPTY_FULL) {
+					// no need to keep full context overhead when we step out
+					config = config.transform(config.getState(), PredictionContext.EMPTY_LOCAL);
+				}
 			}
 		}
 
