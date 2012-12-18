@@ -264,7 +264,7 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 		}
 		else {
 			String mismatchedRuleName = ruleNames[relatedRule];
-			path = String.format("rule %s (%s of %s)", ruleName, relation, mismatchedRuleName);
+			path = String.format("rule %s (%s of %s)", mismatchedRuleName, relation, ruleName);
 		}
 
 		int declaredVersion = dependency.getItem1().version();
