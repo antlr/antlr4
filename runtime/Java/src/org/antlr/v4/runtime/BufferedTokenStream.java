@@ -222,7 +222,7 @@ public class BufferedTokenStream implements TokenStream {
 	 * operation. The default implementation simply returns {@code i}. If an
 	 * exception is thrown in this method, the current stream index should not be
 	 * changed.
-	 * <p>
+	 * <p/>
 	 * For example, {@link CommonTokenStream} overrides this method to ensure that
 	 * the seek target is always an on-channel token.
 	 *
