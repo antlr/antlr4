@@ -34,18 +34,37 @@ import org.abego.treelayout.NodeExtentProvider;
 import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
-import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.misc.GraphicsSupport;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.Tree;
 import org.antlr.v4.runtime.tree.Trees;
 
 import javax.print.PrintException;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.CubicCurve2D;
@@ -53,21 +72,25 @@ import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @SuppressWarnings("serial")
 public class TreeViewer extends JComponent {
 	public static final Color LIGHT_RED = new Color(244, 213, 211);
 
 	public static class DefaultTreeTextProvider implements TreeTextProvider {
-		Parser<?> parser;
+		private final List<String> ruleNames;
 
-		public DefaultTreeTextProvider(Parser<?> parser) {
-			this.parser = parser;
+		public DefaultTreeTextProvider(@Nullable List<String> ruleNames) {
+			this.ruleNames = ruleNames;
 		}
 
 		@Override
 		public String getText(Tree node) {
-			return String.valueOf(Trees.getNodeText(node, parser));
+			return String.valueOf(Trees.getNodeText(node, ruleNames));
 		}
 	}
 
@@ -117,11 +140,8 @@ public class TreeViewer extends JComponent {
 	protected Color borderColor = null;
 	protected Color textColor = Color.black;
 
-	protected Parser<?> parser;
-
-	public TreeViewer(Parser<?> parser, Tree tree) {
-		this.parser = parser;
-		setTreeTextProvider(new DefaultTreeTextProvider(parser));
+	public TreeViewer(@Nullable List<String> ruleNames, Tree tree) {
+		setTreeTextProvider(new DefaultTreeTextProvider(ruleNames));
         boolean useIdentity = true; // compare node identity
 		this.treeLayout =
 			new TreeLayout<Tree>(new TreeLayoutAdaptor(tree),
@@ -258,7 +278,8 @@ public class TreeViewer extends JComponent {
 
 	// ----------------------------------------------------------------------
 
-	protected static void showInDialog(final TreeViewer viewer) {
+	@NotNull
+	protected static JDialog showInDialog(final TreeViewer viewer) {
 		final JDialog dialog = new JDialog();
 
 		// Make new content pane
@@ -309,6 +330,7 @@ public class TreeViewer extends JComponent {
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
+		return dialog;
 	}
 
 	private Dimension getScaledTreeSize() {
@@ -319,15 +341,28 @@ public class TreeViewer extends JComponent {
 		return scaledTreeSize;
 	}
 
-	public void open() {
+	@NotNull
+	public Future<JDialog> open() {
 		final TreeViewer viewer = this;
 		viewer.setScale(1.5);
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-				showInDialog(viewer);
-            }
-        });
+		Callable<JDialog> callable = new Callable<JDialog>() {
+			JDialog result;
+
+			@Override
+			public JDialog call() throws Exception {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
+					public void run() {
+						result = showInDialog(viewer);
+					}
+				});
+
+				return result;
+			}
+		};
+
+		Future<JDialog> result = Executors.newSingleThreadExecutor().submit(callable);
+		return result;
 	}
 
 	public void save(String fileName) throws IOException, PrintException {
