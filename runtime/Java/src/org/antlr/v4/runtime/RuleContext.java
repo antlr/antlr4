@@ -38,9 +38,11 @@ import org.antlr.v4.runtime.tree.Trees;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
 import javax.print.PrintException;
+import javax.swing.JDialog;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Future;
 
 /** A rule context is a record of a single rule invocation. It knows
  *  which context invoked it, if any. If there is no parent context, then
@@ -152,26 +154,46 @@ public class RuleContext implements RuleNode {
 	public <T> T accept(ParseTreeVisitor<? extends T> visitor) { return visitor.visitChildren(this); }
 
 	/** Call this method to view a parse tree in a dialog box visually. */
-	public void inspect(Parser parser) {
-		TreeViewer viewer = new TreeViewer(parser, this);
-		viewer.open();
+	public Future<JDialog> inspect(@Nullable Parser parser) {
+		List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
+		return inspect(ruleNames);
+	}
+
+	public Future<JDialog> inspect(@Nullable List<String> ruleNames) {
+		TreeViewer viewer = new TreeViewer(ruleNames, this);
+		return viewer.open();
 	}
 
 	/** Save this tree in a postscript file */
-	public void save(Parser parser, String fileName)
+	public void save(@Nullable Parser parser, String fileName)
 		throws IOException, PrintException
 	{
-//		TreeViewer viewer = new TreeViewer(parser, this);
-//		viewer.save(fileName);
-		Trees.writePS(this, parser, fileName); // parrt routine
+		List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
+		save(ruleNames, fileName);
 	}
 
 	/** Save this tree in a postscript file using a particular font name and size */
-	public void save(Parser parser, String fileName,
+	public void save(@Nullable Parser parser, String fileName,
 					 String fontName, int fontSize)
 		throws IOException
 	{
-		Trees.writePS(this, parser, fileName, fontName, fontSize);
+		List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
+		save(ruleNames, fileName, fontName, fontSize);
+	}
+
+	/** Save this tree in a postscript file */
+	public void save(@Nullable List<String> ruleNames, String fileName)
+		throws IOException, PrintException
+	{
+		Trees.writePS(this, ruleNames, fileName);
+	}
+
+	/** Save this tree in a postscript file using a particular font name and size */
+	public void save(@Nullable List<String> ruleNames, String fileName,
+					 String fontName, int fontSize)
+		throws IOException
+	{
+		Trees.writePS(this, ruleNames, fileName, fontName, fontSize);
 	}
 
 	/** Print out a whole tree, not just a node, in LISP format
