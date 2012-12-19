@@ -34,18 +34,35 @@ import org.abego.treelayout.NodeExtentProvider;
 import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
-import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.misc.GraphicsSupport;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.Tree;
 import org.antlr.v4.runtime.tree.Trees;
 
 import javax.print.PrintException;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.CubicCurve2D;
@@ -53,20 +70,21 @@ import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class TreeViewer extends JComponent {
 	public static final Color LIGHT_RED = new Color(244, 213, 211);
 
 	public static class DefaultTreeTextProvider implements TreeTextProvider {
-		Parser parser;
+		private final List<String> ruleNames;
 
-		public DefaultTreeTextProvider(Parser parser) {
-			this.parser = parser;
+		public DefaultTreeTextProvider(@Nullable List<String> ruleNames) {
+			this.ruleNames = ruleNames;
 		}
 
 		@Override
 		public String getText(Tree node) {
-			return String.valueOf(Trees.getNodeText(node, parser));
+			return String.valueOf(Trees.getNodeText(node, ruleNames));
 		}
 	}
 
@@ -116,11 +134,8 @@ public class TreeViewer extends JComponent {
 	protected Color borderColor = null;
 	protected Color textColor = Color.black;
 
-	protected Parser parser;
-
-	public TreeViewer(Parser parser, Tree tree) {
-		this.parser = parser;
-		setTreeTextProvider(new DefaultTreeTextProvider(parser));
+	public TreeViewer(@Nullable List<String> ruleNames, Tree tree) {
+		setTreeTextProvider(new DefaultTreeTextProvider(ruleNames));
         boolean useIdentity = true; // compare node identity
 		this.treeLayout =
 			new TreeLayout<Tree>(new TreeLayoutAdaptor(tree),

@@ -48,34 +48,34 @@ import java.util.List;
 /** A set of utility routines useful for all kinds of ANTLR trees */
 public class Trees {
 
-	public static String getPS(Tree t, Parser recog,
+	public static String getPS(Tree t, @Nullable List<String> ruleNames,
 							   String fontName, int fontSize)
 	{
 		TreePostScriptGenerator psgen =
-			new TreePostScriptGenerator(recog, t, fontName, fontSize);
+			new TreePostScriptGenerator(ruleNames, t, fontName, fontSize);
 		return psgen.getPS();
 	}
 
-	public static String getPS(Tree t, Parser recog) {
-		return getPS(t, recog, "Helvetica", 11);
+	public static String getPS(Tree t, @Nullable List<String> ruleNames) {
+		return getPS(t, ruleNames, "Helvetica", 11);
 	}
 
-	public static void writePS(Tree t, Parser recog,
+	public static void writePS(Tree t, @Nullable List<String> ruleNames,
 							   String fileName,
 							   String fontName, int fontSize)
 		throws IOException
 	{
-		String ps = getPS(t, recog, fontName, fontSize);
+		String ps = getPS(t, ruleNames, fontName, fontSize);
 		FileWriter f = new FileWriter(fileName);
 		BufferedWriter bw = new BufferedWriter(f);
 		bw.write(ps);
 		bw.close();
 	}
 
-	public static void writePS(Tree t, Parser recog, String fileName)
+	public static void writePS(Tree t, @Nullable List<String> ruleNames, String fileName)
 		throws IOException
 	{
-		writePS(t, recog, fileName, "Helvetica", 11);
+		writePS(t, ruleNames, fileName, "Helvetica", 11);
 	}
 
 	/** Print out a whole tree in LISP form. {@link #getNodeText} is used on the
