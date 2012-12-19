@@ -35,6 +35,7 @@ import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.antlr.v4.runtime.misc.GraphicsSupport;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -50,6 +51,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.BasicStroke;
@@ -71,6 +73,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class TreeViewer extends JComponent {
 	public static final Color LIGHT_RED = new Color(244, 213, 211);
@@ -272,7 +277,8 @@ public class TreeViewer extends JComponent {
 
 	// ----------------------------------------------------------------------
 
-	protected static void showInDialog(final TreeViewer viewer) {
+	@NotNull
+	protected static JDialog showInDialog(final TreeViewer viewer) {
 		final JDialog dialog = new JDialog();
 
 		// Make new content pane
@@ -323,6 +329,7 @@ public class TreeViewer extends JComponent {
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
+		return dialog;
 	}
 
 	private Dimension getScaledTreeSize() {
@@ -333,15 +340,28 @@ public class TreeViewer extends JComponent {
 		return scaledTreeSize;
 	}
 
-	public void open() {
+	@NotNull
+	public Future<JDialog> open() {
 		final TreeViewer viewer = this;
 		viewer.setScale(1.5);
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-				showInDialog(viewer);
-            }
-        });
+		Callable<JDialog> callable = new Callable<JDialog>() {
+			JDialog result;
+
+			@Override
+			public JDialog call() throws Exception {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
+					public void run() {
+						result = showInDialog(viewer);
+					}
+				});
+
+				return result;
+			}
+		};
+
+		Future<JDialog> result = Executors.newSingleThreadExecutor().submit(callable);
+		return result;
 	}
 
 	public void save(String fileName) throws IOException, PrintException {

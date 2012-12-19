@@ -38,9 +38,11 @@ import org.antlr.v4.runtime.tree.Trees;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
 import javax.print.PrintException;
+import javax.swing.JDialog;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Future;
 
 /** A rule context is a record of a single rule invocation. It knows
  *  which context invoked it, if any. If there is no parent context, then
@@ -152,14 +154,14 @@ public class RuleContext implements RuleNode {
 	public <T> T accept(ParseTreeVisitor<? extends T> visitor) { return visitor.visitChildren(this); }
 
 	/** Call this method to view a parse tree in a dialog box visually. */
-	public void inspect(@Nullable Parser parser) {
+	public Future<JDialog> inspect(@Nullable Parser parser) {
 		List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
-		inspect(ruleNames);
+		return inspect(ruleNames);
 	}
 
-	public void inspect(@Nullable List<String> ruleNames) {
+	public Future<JDialog> inspect(@Nullable List<String> ruleNames) {
 		TreeViewer viewer = new TreeViewer(ruleNames, this);
-		viewer.open();
+		return viewer.open();
 	}
 
 	/** Save this tree in a postscript file */
