@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Arrays;
 
 /** Do not buffer up the entire char stream. It does keep a small buffer
  *  for efficiency and also buffers while a mark exists (set by the
@@ -194,9 +195,7 @@ public class UnbufferedCharStream implements CharStream {
 
 	protected void add(int c) {
 		if ( n>=data.length ) {
-			char[] newdata = new char[data.length*2]; // resize
-            System.arraycopy(data, 0, newdata, 0, data.length);
-            data = newdata;
+			data = Arrays.copyOf(data, data.length * 2);
         }
         data[n++] = (char)c;
     }

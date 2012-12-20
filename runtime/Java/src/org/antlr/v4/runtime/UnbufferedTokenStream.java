@@ -33,6 +33,8 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
 
+import java.util.Arrays;
+
 public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 	protected TokenSource tokenSource;
 
@@ -208,9 +210,7 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 
 	protected void add(@NotNull Token t) {
 		if ( n>=tokens.length ) {
-			Token[] newtokens = new Token[tokens.length*2]; // resize
-			System.arraycopy(tokens, 0, newtokens, 0, tokens.length);
-			tokens = newtokens;
+			tokens = Arrays.copyOf(tokens, tokens.length * 2);
 		}
 
 		if (t instanceof WritableToken) {
