@@ -146,7 +146,7 @@ public class ANTLRInputStream implements CharStream {
     @Override
     public void consume() {
 		if (p >= n) {
-			assert LA(1) == CharStream.EOF;
+			assert LA(1) == IntStream.EOF;
 			throw new IllegalStateException("cannot consume EOF");
 		}
 

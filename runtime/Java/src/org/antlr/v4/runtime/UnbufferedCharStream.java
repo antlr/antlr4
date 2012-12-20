@@ -130,7 +130,7 @@ public class UnbufferedCharStream implements CharStream {
 
 	@Override
 	public void consume() {
-		if (LA(1) == CharStream.EOF) {
+		if (LA(1) == IntStream.EOF) {
 			throw new IllegalStateException("cannot consume EOF");
 		}
 
@@ -168,7 +168,7 @@ public class UnbufferedCharStream implements CharStream {
 	 */
 	protected int fill(int n) {
 		for (int i=0; i<n; i++) {
-			if (this.n > 0 && data[this.n - 1] == CharStream.EOF) {
+			if (this.n > 0 && data[this.n - 1] == IntStream.EOF) {
 				return i;
 			}
 
