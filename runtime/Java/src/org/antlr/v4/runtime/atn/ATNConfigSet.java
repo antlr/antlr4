@@ -56,7 +56,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	/**
 	 * This maps (state, alt) -> merged {@link ATNConfig}. The key does not account for
-	 * the {@link ATNConfig#semanticContext} of the value, which is only a problem if a single
+	 * the {@link ATNConfig#getSemanticContext} of the value, which is only a problem if a single
 	 * {@code ATNConfigSet} contains two configs with the same state and alternative
 	 * but different semantic contexts. When this case arises, the first config
 	 * added to this map stays, and the remaining configs are placed in {@link #unmerged}.
