@@ -16,5 +16,10 @@ nbactions.xml
 *.iws
 .idea/
 
+# Eclipse projects
+.classpath
+.project
+.settings/
+
 # Profiler results
 *.hprof

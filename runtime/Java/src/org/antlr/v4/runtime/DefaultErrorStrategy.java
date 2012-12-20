@@ -179,25 +179,32 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 			return;
 		}
 
-		if ( s instanceof PlusBlockStartState ||
-			 s instanceof StarLoopEntryState ||
-			 s instanceof BlockStartState )
-		{
+		switch (s.getStateType()) {
+		case ATNState.BLOCK_START:
+		case ATNState.STAR_BLOCK_START:
+		case ATNState.PLUS_BLOCK_START:
+		case ATNState.STAR_LOOP_ENTRY:
 			// report error and recover if possible
-			if ( singleTokenDeletion(recognizer)!=null ) return;
+			if ( singleTokenDeletion(recognizer)!=null ) {
+				return;
+			}
+
 			throw new InputMismatchException(recognizer);
-		}
-		if ( s instanceof PlusLoopbackState ||
-			 s instanceof StarLoopbackState )
-		{
+
+		case ATNState.PLUS_LOOP_BACK:
+		case ATNState.STAR_LOOP_BACK:
 //			System.err.println("at loop back: "+s.getClass().getSimpleName());
 			reportUnwantedToken(recognizer);
 			IntervalSet expecting = recognizer.getExpectedTokens();
 			IntervalSet whatFollowsLoopIterationOrRule =
 				expecting.or(getErrorRecoverySet(recognizer));
 			consumeUntil(recognizer, whatFollowsLoopIterationOrRule);
+			break;
+
+		default:
+			// do nothing if we can't identify the exact kind of ATN state
+			break;
 		}
-		// do nothing if we can't identify the exact kind of ATN state
 	}
 
 	public void reportNoViableAlternative(Parser recognizer,

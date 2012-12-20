@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Arrays;
 
 /** Do not buffer up the entire char stream. It does keep a small buffer
  *  for efficiency and also buffers while a mark exists (set by the
@@ -130,7 +131,7 @@ public class UnbufferedCharStream implements CharStream {
 
 	@Override
 	public void consume() {
-		if (LA(1) == CharStream.EOF) {
+		if (LA(1) == IntStream.EOF) {
 			throw new IllegalStateException("cannot consume EOF");
 		}
 
@@ -168,7 +169,7 @@ public class UnbufferedCharStream implements CharStream {
 	 */
 	protected int fill(int n) {
 		for (int i=0; i<n; i++) {
-			if (this.n > 0 && data[this.n - 1] == CharStream.EOF) {
+			if (this.n > 0 && data[this.n - 1] == IntStream.EOF) {
 				return i;
 			}
 
@@ -194,9 +195,7 @@ public class UnbufferedCharStream implements CharStream {
 
 	protected void add(int c) {
 		if ( n>=data.length ) {
-			char[] newdata = new char[data.length*2]; // resize
-            System.arraycopy(data, 0, newdata, 0, data.length);
-            data = newdata;
+			data = Arrays.copyOf(data, data.length * 2);
         }
         data[n++] = (char)c;
     }
