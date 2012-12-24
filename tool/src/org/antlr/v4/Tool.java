@@ -87,7 +87,11 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Tool {
-	public static final String getVersion() { return "4.0b4"; }
+	public static final String VERSION;
+	static {
+		String version = Tool.class.getPackage().getImplementationVersion();
+		VERSION = version != null ? version : "4.x";
+	}
 
 	public static final String GRAMMAR_EXTENSION = ".g4";
 	public static final String LEGACY_GRAMMAR_EXTENSION = ".g";
@@ -774,7 +778,7 @@ public class Tool {
 	}
 
 	public void help() {
-		info("ANTLR Parser Generator  Version " + Tool.getVersion());
+		info("ANTLR Parser Generator  Version " + Tool.VERSION);
 		for (Option o : optionDefs) {
 			String name = o.name + (o.argType!=OptionArgType.NONE? " ___" : "");
 			String s = String.format(" %-19s %s", name, o.description);
@@ -822,7 +826,7 @@ public class Tool {
 	}
 
 	public void version() {
-		info("ANTLR Parser Generator  Version " + getVersion());
+		info("ANTLR Parser Generator  Version " + VERSION);
 	}
 
 	public void exit(int e) { System.exit(e); }
