@@ -1,5 +1,7 @@
 grammar T;
 
+//if new ArrayList<String>() {{ add(1); }} else return;
+
 s : a | b ;
 a : c ID ;
 b : c INT ID ;
