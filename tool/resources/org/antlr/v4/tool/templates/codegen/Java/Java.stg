@@ -699,7 +699,7 @@ VisitorDispatchMethod(method) ::= <<
 @Override
 public \<T> T accept(ParseTreeVisitor\<? extends T> visitor) {
 	if ( visitor instanceof <parser.grammarName>Visitor ) return ((<parser.grammarName>Visitor\<? extends T>)visitor).visit<struct.derivedFromName; format="cap">(this);
-	else return null;
+	else return visitor.visitChildren(this);
 }
 >>
 
