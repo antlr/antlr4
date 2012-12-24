@@ -34,7 +34,9 @@ import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TestIntervalSet extends BaseTest {
 
@@ -223,7 +225,7 @@ public class TestIntervalSet extends BaseTest {
         assertEquals(s, s2);
 
         IntervalSet s3 = IntervalSet.of(15,55);
-        assertNotEquals(s, s3);
+        assertFalse(s.equals(s3));
     }
 
     @Test public void testEquals() throws Exception {
@@ -237,7 +239,7 @@ public class TestIntervalSet extends BaseTest {
 
         IntervalSet s3 = IntervalSet.of(10,20);
         s3.add(2);
-        assertNotEquals(s, s3);
+		assertFalse(s.equals(s3));
     }
 
     @Test public void testSingleElementMinusDisjointSet() throws Exception {
