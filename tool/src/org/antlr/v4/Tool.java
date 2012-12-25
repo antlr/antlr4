@@ -362,6 +362,10 @@ public class Tool {
 		{
 			lexerAST = transform.extractImplicitLexer(g); // alters g.ast
 			if ( lexerAST!=null ) {
+				if (grammarOptions != null) {
+					lexerAST.cmdLineOptions = grammarOptions;
+				}
+
 				lexerg = new LexerGrammar(this, lexerAST);
 				lexerg.fileName = g.fileName;
 				lexerg.originalGrammar = g;
