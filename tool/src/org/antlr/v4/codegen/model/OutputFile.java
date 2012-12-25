@@ -30,11 +30,14 @@
 
 package org.antlr.v4.codegen.model;
 
+import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.tool.Grammar;
 
 public abstract class OutputFile extends OutputModelObject {
-    public final String fileName;
+	public final String fileName;
+	public final String grammarFileName;
+	public final String ANTLRVersion;
     public final String TokenLabelType;
     public final String InputSymbolType;
 
@@ -42,6 +45,8 @@ public abstract class OutputFile extends OutputModelObject {
         super(factory);
         this.fileName = fileName;
         Grammar g = factory.getGrammar();
+		grammarFileName = g.fileName;
+		ANTLRVersion = Tool.VERSION;
         TokenLabelType = g.getOptionString("TokenLabelType");
         InputSymbolType = TokenLabelType;
     }

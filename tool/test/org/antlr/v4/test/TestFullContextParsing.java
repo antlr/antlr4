@@ -32,7 +32,7 @@ package org.antlr.v4.test;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /*
 	 cover these cases:
@@ -128,6 +128,30 @@ public class TestFullContextParsing extends BaseTest {
 					 "line 1:2 reportContextSensitivity d=2, input='34'\n" +
 					 "line 1:14 reportAttemptingFullContext d=2, input='34abc'\n" +
 					 "line 1:14 reportContextSensitivity d=2, input='34abc'\n",
+					 this.stderrDuringParse);
+	}
+
+	@Test public void testSLLSeesEOFInLLGrammar() {
+		String grammar =
+			"grammar T;\n"+
+			"s @after {dumpDFA();}\n" +
+			"  : a ;\n" +
+			"a : e ID ;\n" +
+			"b : e INT ID ;\n" +
+			"e : INT | ;\n" +
+			"ID : 'a'..'z'+ ;\n"+
+			"INT : '0'..'9'+ ;\n"+
+			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
+								   "34 abc", true);
+		String expecting =
+			"Decision 0:\n" +
+			"s0-INT->s1\n" +
+			"s1-ID->s2\n" +
+			"s2-EOF->s3^\n"; // Must point at accept state
+		assertEquals(expecting, result);
+		assertEquals("line 1:6 reportAttemptingFullContext d=0, input='34abc'\n" +
+					 "line 1:0 reportContextSensitivity d=0, input='34'\n",
 					 this.stderrDuringParse);
 	}
 
