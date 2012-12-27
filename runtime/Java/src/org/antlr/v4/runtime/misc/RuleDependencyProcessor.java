@@ -175,6 +175,8 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 
 				BitSet checked = new BitSet();
 
+				checkDependencyVersion(dependency, ruleNames, ruleVersions, effectiveRule, null);
+
 				if (dependents.contains(Dependents.PARENTS)) {
 					BitSet parents = relations.parents[dependency.getItem1().rule()];
 					for (int parent = parents.nextSetBit(0); parent >= 0; parent = parents.nextSetBit(parent + 1)) {
