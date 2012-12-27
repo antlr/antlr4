@@ -175,7 +175,7 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 
 				BitSet checked = new BitSet();
 
-				checkDependencyVersion(dependency, ruleNames, ruleVersions, effectiveRule, null);
+				int highestRequiredDependency = checkDependencyVersion(dependency, ruleNames, ruleVersions, effectiveRule, null);
 
 				if (dependents.contains(Dependents.PARENTS)) {
 					BitSet parents = relations.parents[dependency.getItem1().rule()];
@@ -185,7 +185,8 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 						}
 
 						checked.set(parent);
-						checkDependencyVersion(dependency, ruleNames, ruleVersions, parent, "parent");
+						int required = checkDependencyVersion(dependency, ruleNames, ruleVersions, parent, "parent");
+						highestRequiredDependency = Math.max(highestRequiredDependency, required);
 					}
 				}
 
@@ -197,7 +198,8 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 						}
 
 						checked.set(child);
-						checkDependencyVersion(dependency, ruleNames, ruleVersions, child, "child");
+						int required = checkDependencyVersion(dependency, ruleNames, ruleVersions, child, "child");
+						highestRequiredDependency = Math.max(highestRequiredDependency, required);
 					}
 				}
 
@@ -209,7 +211,8 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 						}
 
 						checked.set(ancestor);
-						checkDependencyVersion(dependency, ruleNames, ruleVersions, ancestor, "ancestor");
+						int required = checkDependencyVersion(dependency, ruleNames, ruleVersions, ancestor, "ancestor");
+						highestRequiredDependency = Math.max(highestRequiredDependency, required);
 					}
 				}
 
@@ -221,7 +224,27 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 						}
 
 						checked.set(descendant);
-						checkDependencyVersion(dependency, ruleNames, ruleVersions, descendant, "descendant");
+						int required = checkDependencyVersion(dependency, ruleNames, ruleVersions, descendant, "descendant");
+						highestRequiredDependency = Math.max(highestRequiredDependency, required);
+					}
+				}
+
+				int declaredVersion = dependency.getItem1().version();
+				if (declaredVersion > highestRequiredDependency) {
+					Tuple2<AnnotationMirror, AnnotationValue> versionElement = findRuleDependencyProperty(dependency, RuleDependencyProperty.VERSION);
+					String message = String.format("Rule dependency version mismatch: %s has maximum dependency version %d (expected %d) in %s",
+												   ruleNames[dependency.getItem1().rule()],
+												   highestRequiredDependency,
+												   declaredVersion,
+												   getRecognizerType(dependency.getItem1()).toString());
+
+					if (versionElement != null) {
+						processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message,
+														  dependency.getItem2(), versionElement.getItem1(), versionElement.getItem2());
+					}
+					else {
+						processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message,
+														  dependency.getItem2());
 					}
 				}
 			}
@@ -258,7 +281,7 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 		}
 	}
 
-	private void checkDependencyVersion(Tuple2<RuleDependency, Element> dependency, String[] ruleNames, int[] ruleVersions, int relatedRule, String relation) {
+	private int checkDependencyVersion(Tuple2<RuleDependency, Element> dependency, String[] ruleNames, int[] ruleVersions, int relatedRule, String relation) {
 		String ruleName = ruleNames[dependency.getItem1().rule()];
 		String path;
 		if (relation == null) {
@@ -288,6 +311,8 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 												  dependency.getItem2());
 			}
 		}
+
+		return actualVersion;
 	}
 
 	private int[] getRuleVersions(TypeMirror recognizerClass, String[] ruleNames) {
