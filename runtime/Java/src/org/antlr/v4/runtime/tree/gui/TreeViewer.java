@@ -74,6 +74,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
@@ -360,8 +361,14 @@ public class TreeViewer extends JComponent {
 			}
 		};
 
-		Future<JDialog> result = Executors.newSingleThreadExecutor().submit(callable);
-		return result;
+		ExecutorService executor = Executors.newSingleThreadExecutor();
+
+		try {
+			return executor.submit(callable);
+		}
+		finally {
+			executor.shutdown();
+		}
 	}
 
 	public void save(String fileName) throws IOException, PrintException {
