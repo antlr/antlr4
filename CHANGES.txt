@@ -1,5 +1,11 @@
 ANTLR v4 Honey Badger
 
+December 31, 2012
+
+* I altered Target.getTargetStringLiteralFromANTLRStringLiteral() so that
+  it converts \uXXXX in an ANTLR string to \\uXXXX, thus, avoiding Java's
+  conversion to a single character before compilation.
+
 December 16, 2012
 
 * Encapsulate some fields in ANTLRMessage
