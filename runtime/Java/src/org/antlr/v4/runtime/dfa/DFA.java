@@ -73,31 +73,6 @@ public class DFA {
 		this.decision = decision;
 	}
 
-	/** Find the path in DFA from s0 to s, returning list of states encountered (inclusively) */
-//	public List<DFAState> getPathToState(DFAState finalState, TokenStream input, int start, int stop) {
-//		if ( s0==null ) return null;
-//		List<DFAState> states = new ArrayList<DFAState>();
-//		states.add(s0);
-//		DFAState p = s0;
-//		int i = start;
-//		Token t = input.get(i);
-//		while ( p != finalState && i<stop ) {
-//			int la = t.getType();
-//			if ( p.edges == null || la >= p.edges.length || la < -1 || p.edges[la+1] == null ) {
-//				return states;
-//			}
-//			DFAState target = p.edges[la+1];
-//			if ( target == ATNSimulator.ERROR ) {
-//				return states;
-//			}
-//			states.add(target);
-//			p = target;
-//			i++;
-//			t = input.get(i);
-//		}
-//		return states;
-//	}
-
 	public List<Set<ATNState>> getATNStatesAlongPath(ParserATNSimulator atn,
 													 List<DFAState> dfaStates,
 													 TokenStream input, int start, int stop)
