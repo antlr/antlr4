@@ -672,21 +672,23 @@ public class ParserATNSimulator extends ATNSimulator {
 					// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
 					if ( D.configs.hasSemanticContext ) {
 						predicateDFAState(D, decState);
-						int conflictIndex = input.index();
-						if (conflictIndex != startIndex) {
-							input.seek(startIndex);
-						}
+						if (D.predicates != null) {
+							int conflictIndex = input.index();
+							if (conflictIndex != startIndex) {
+								input.seek(startIndex);
+							}
 
-						BitSet alts = evalSemanticContext(D.predicates, outerContext, true);
-						if ( alts.cardinality()==1 ) {
-							if ( debug ) System.out.println("Full LL avoided");
-							return alts.nextSetBit(0);
-						}
+							BitSet alts = evalSemanticContext(D.predicates, outerContext, true);
+							if ( alts.cardinality()==1 ) {
+								if ( debug ) System.out.println("Full LL avoided");
+								return alts.nextSetBit(0);
+							}
 
-						if (conflictIndex != startIndex) {
-							// restore the index so reporting the fallback to full
-							// context occurs with the index at the correct spot
-							input.seek(conflictIndex);
+							if (conflictIndex != startIndex) {
+								// restore the index so reporting the fallback to full
+								// context occurs with the index at the correct spot
+								input.seek(conflictIndex);
+							}
 						}
 					}
 
