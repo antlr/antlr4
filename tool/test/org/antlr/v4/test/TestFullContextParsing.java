@@ -333,7 +333,7 @@ public class TestFullContextParsing extends BaseTest {
 
 		String expecting =
 			"line 1:1 reportAttemptingFullContext d=1, input='+'\n" +
-			"line 1:1 reportContextSensitivity d=1, input='+'\n";
+			"line 1:2 reportContextSensitivity d=1, input='+b'\n";
 		assertEquals(expecting, this.stderrDuringParse);
 
 		found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "a+b*c", true);
@@ -341,7 +341,7 @@ public class TestFullContextParsing extends BaseTest {
 
 		expecting =
 			"line 1:1 reportAttemptingFullContext d=1, input='+'\n" +
-			"line 1:1 reportContextSensitivity d=1, input='+'\n" +
+			"line 1:2 reportContextSensitivity d=1, input='+b'\n" +
 			"line 1:3 reportAttemptingFullContext d=1, input='*'\n" +
 			"line 1:5 reportAmbiguity d=1: ambigAlts={1, 2}, input='*c'\n";
 		assertEquals(expecting, this.stderrDuringParse);
