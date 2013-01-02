@@ -115,6 +115,7 @@ public class DFAState {
 
 	/** Map a predicate to a predicted alternative. */
 	public static class PredPrediction {
+		@NotNull
 		public SemanticContext pred; // never null; at least SemanticContext.NONE
 		public int alt;
 		public PredPrediction(SemanticContext pred, int alt) {
