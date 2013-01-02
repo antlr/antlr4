@@ -30,17 +30,20 @@
 package org.antlr.v4.runtime.dfa;
 
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class DFA {
-	/** A set of all DFA states. Use Map so we can get old state back
-	 *  (Set only allows you to see if it's there).
+	/** A set of all DFA states. Use {@link Map} so we can get old state back
+	 *  ({@link Set} only allows you to see if it's there).
      */
     @NotNull
 	public final ConcurrentMap<DFAState, DFAState> states = new ConcurrentHashMap<DFAState, DFAState>();
@@ -60,7 +63,7 @@ public class DFA {
 	private final AtomicInteger nextStateNumber = new AtomicInteger();
 
 	/** Set of configs for a DFA state with at least one conflict? Mainly used as "return value"
-	 *  from predictATN() for retry.
+	 *  from {@link ParserATNSimulator#predictATN} for retry.
 	 */
 //	public OrderedHashSet<ATNConfig> conflictSet;
 

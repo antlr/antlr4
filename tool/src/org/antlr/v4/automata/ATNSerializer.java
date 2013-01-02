@@ -92,9 +92,20 @@ public class ATNSerializer {
 		IntegerList data = new IntegerList();
 		data.add(ATNSimulator.SERIALIZED_VERSION);
 		// convert grammar type to ATN const to avoid dependence on ANTLRParser
-		if ( g.getType()== ANTLRParser.LEXER ) data.add(ATN.LEXER);
-		else if ( g.getType()== ANTLRParser.PARSER || g.getType() == ANTLRParser.COMBINED ) data.add(ATN.PARSER);
-		else throw new UnsupportedOperationException("Unrecognized grammar type " + String.valueOf(g.getType()) + ".");
+		switch (g.getType()) {
+		case ANTLRParser.LEXER:
+			data.add(ATN.LEXER);
+			break;
+
+		case ANTLRParser.PARSER:
+		case ANTLRParser.COMBINED:
+			data.add(ATN.PARSER);
+			break;
+
+		default:
+			throw new UnsupportedOperationException("Invalid grammar type.");
+		}
+
 		data.add(g.getMaxTokenType());
 		int nedges = 0;
 

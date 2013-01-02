@@ -45,7 +45,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-/** A set of utility routines useful for all kinds of ANTLR trees */
+/** A set of utility routines useful for all kinds of ANTLR trees. */
 public class Trees {
 
 	public static String getPS(Tree t, @Nullable List<String> ruleNames,
@@ -163,4 +163,6 @@ public class Trees {
 		return ancestors;
 	}
 
+	private Trees() {
+	}
 }

@@ -183,6 +183,10 @@ public enum PredictionMode {
 	 predicates.
 	*/
 	public static boolean hasSLLConflictTerminatingPrediction(PredictionMode mode, @NotNull ATNConfigSet configs) {
+		if (onlyRuleStopStates(configs)) {
+			return true;
+		}
+
 		// pure SLL mode parsing
 		if ( mode == PredictionMode.SLL ) {
 			// Don't bother with combining configs from different semantic
@@ -208,6 +212,25 @@ public enum PredictionMode {
 		return heuristic;
 	}
 
+	public static boolean hasConfigAtRuleStopState(ATNConfigSet configs) {
+		for (ATNConfig c : configs) {
+			if (c.getState() instanceof RuleStopState) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public static boolean onlyRuleStopStates(@NotNull ATNConfigSet configs) {
+		for (ATNConfig config : configs) {
+			if (!(config.getState() instanceof RuleStopState)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 
 	/**
 	 Full LL prediction termination.

@@ -104,8 +104,8 @@ public abstract class ATNSimulator {
 				continue;
 			}
 
-			ATNState s = stateFactory(stype, i);
-			s.ruleIndex = toInt(data[p++]);
+			int ruleIndex = toInt(data[p++]);
+			ATNState s = stateFactory(stype, ruleIndex);
 			if ( stype == ATNState.LOOP_END ) { // special case
 				int loopBackStateNumber = toInt(data[p++]);
 				loopBackStateNumbers.add(Tuple.create((LoopEndState)s, loopBackStateNumber));
@@ -317,48 +317,68 @@ public abstract class ATNSimulator {
 				continue;
 			}
 
+			checkCondition(state.onlyHasEpsilonTransitions() || state.getNumberOfTransitions() <= 1);
+
 			if (state instanceof PlusBlockStartState) {
-				if (((PlusBlockStartState)state).loopBackState == null) {
-					throw new IllegalStateException();
-				}
+				checkCondition(((PlusBlockStartState)state).loopBackState != null);
 			}
 
 			if (state instanceof StarLoopEntryState) {
-				if (((StarLoopEntryState)state).loopBackState == null) {
+				StarLoopEntryState starLoopEntryState = (StarLoopEntryState)state;
+				checkCondition(starLoopEntryState.loopBackState != null);
+				checkCondition(starLoopEntryState.getNumberOfTransitions() == 2);
+
+				if (starLoopEntryState.transition(0).target instanceof StarBlockStartState) {
+					checkCondition(starLoopEntryState.transition(1).target instanceof LoopEndState);
+					checkCondition(!starLoopEntryState.nonGreedy);
+				}
+				else if (starLoopEntryState.transition(0).target instanceof LoopEndState) {
+					checkCondition(starLoopEntryState.transition(1).target instanceof StarBlockStartState);
+					checkCondition(starLoopEntryState.nonGreedy);
+				}
+				else {
 					throw new IllegalStateException();
 				}
+			}
+
+			if (state instanceof StarLoopbackState) {
+				checkCondition(state.getNumberOfTransitions() == 1);
+				checkCondition(state.transition(0).target instanceof StarLoopEntryState);
 			}
 
 			if (state instanceof LoopEndState) {
-				if (((LoopEndState)state).loopBackState == null) {
-					throw new IllegalStateException();
-				}
+				checkCondition(((LoopEndState)state).loopBackState != null);
 			}
 
 			if (state instanceof RuleStartState) {
-				if (((RuleStartState)state).stopState == null) {
-					throw new IllegalStateException();
-				}
+				checkCondition(((RuleStartState)state).stopState != null);
 			}
 
 			if (state instanceof BlockStartState) {
-				if (((BlockStartState)state).endState == null) {
-					throw new IllegalStateException();
-				}
+				checkCondition(((BlockStartState)state).endState != null);
 			}
 
 			if (state instanceof BlockEndState) {
-				if (((BlockEndState)state).startState == null) {
-					throw new IllegalStateException();
-				}
+				checkCondition(((BlockEndState)state).startState != null);
 			}
 
 			if (state instanceof DecisionState) {
 				DecisionState decisionState = (DecisionState)state;
-				if (decisionState.getNumberOfTransitions() > 1 && decisionState.decision < 0) {
-					throw new IllegalStateException();
-				}
+				checkCondition(decisionState.getNumberOfTransitions() <= 1 || decisionState.decision >= 0);
 			}
+			else {
+				checkCondition(state.getNumberOfTransitions() <= 1 || state instanceof RuleStopState);
+			}
+		}
+	}
+
+	public static void checkCondition(boolean condition) {
+		checkCondition(condition, null);
+	}
+
+	public static void checkCondition(boolean condition, String message) {
+		if (!condition) {
+			throw new IllegalStateException(message);
 		}
 	}
 
@@ -757,7 +777,7 @@ public abstract class ATNSimulator {
 		throw new IllegalArgumentException("The specified transition type is not valid.");
 	}
 
-	public static ATNState stateFactory(int type, int stateNumber) {
+	public static ATNState stateFactory(int type, int ruleIndex) {
 		ATNState s;
 		switch (type) {
 			case ATNState.INVALID_TYPE: return null;
@@ -774,11 +794,11 @@ public abstract class ATNSimulator {
 			case ATNState.PLUS_LOOP_BACK : s = new PlusLoopbackState(); break;
 			case ATNState.LOOP_END : s = new LoopEndState(); break;
             default :
-				String message = String.format("The specified state type %d for state %d is not valid.", type, stateNumber);
+				String message = String.format("The specified state type %d is not valid.", type);
 				throw new IllegalArgumentException(message);
 		}
 
-		s.stateNumber = stateNumber;
+		s.ruleIndex = ruleIndex;
 		return s;
 	}
 

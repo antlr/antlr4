@@ -285,7 +285,8 @@ public class Target {
                     case    'f':
                     case    '\\':
                     case    'u':    // Assume unnnn
-                        sb.append('\\');    // Pass the escape through
+						sb.append('\\');    // Pass the escape through as double \\
+						sb.append('\\');    // so that Java leaves as \u0000 string not char
                         break;
                     default:
                         // Remove the escape by virtue of not adding it here

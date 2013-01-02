@@ -30,6 +30,7 @@
 
 package org.antlr.v4.test;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -278,6 +279,30 @@ public class TestParserExec extends BaseTest {
 								  "if x if x a else b", true);
 		String expecting = "";
 		assertEquals(expecting, found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#110.
+	 * https://github.com/antlr/antlr4/issues/110
+	 */
+	@Ignore("Performance impact of passing this test may not be worthwhile")
+	@Test public void testStartRuleWithoutEOF() {
+		String grammar =
+			"grammar T;\n"+
+			"s @after {dumpDFA();}\n" +
+			"  : ID | ID INT ID ;\n" +
+			"ID : 'a'..'z'+ ;\n"+
+			"INT : '0'..'9'+ ;\n"+
+			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
+								   "abc 34", true);
+		String expecting =
+			"Decision 0:\n" +
+			"s0-ID->s1\n" +
+			"s1-INT->s2\n" +
+			"s2-EOF->:s3=>1\n"; // Must point at accept state
+		assertEquals(expecting, result);
 		assertNull(this.stderrDuringParse);
 	}
 

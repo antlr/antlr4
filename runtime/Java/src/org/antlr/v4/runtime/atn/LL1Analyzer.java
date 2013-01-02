@@ -51,8 +51,9 @@ public class LL1Analyzer {
 
 	public LL1Analyzer(@NotNull ATN atn) { this.atn = atn; }
 
-	/** From an ATN state, s, find the set of all labels reachable from s at
-	 *  depth k.  Only for DecisionStates.
+	/**
+	 * From an ATN state, {@code s}, find the set of all labels reachable from
+	 * {@code s} at depth k. Only for DecisionStates.
 	 */
 	@Nullable
 	public IntervalSet[] getDecisionLookahead(@Nullable ATNState s) {

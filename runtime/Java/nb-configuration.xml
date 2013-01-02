@@ -34,5 +34,6 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.continuationIndentSize>4</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.continuationIndentSize>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.importGroupsOrder>*;javax;java</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.importGroupsOrder>
         <netbeans.compile.on.save>test</netbeans.compile.on.save>
+        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.spaceAfterTypeCast>false</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.spaceAfterTypeCast>
     </properties>
 </project-shared-configuration>

@@ -32,6 +32,7 @@ package org.antlr.v4.runtime.dfa;
 
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -58,11 +59,11 @@ import java.util.Map;
  *  jump from rule to rule, emulating rule invocations (method calls).
  *  I have to add a stack to simulate the proper lookahead sequences for
  *  the underlying LL grammar from which the ATN was derived.
- *
+ * <p/>
  *  I use a set of ATNConfig objects not simple states.  An ATNConfig
  *  is both a state (ala normal conversion) and a RuleContext describing
  *  the chain of rules (if any) followed to arrive at that state.
- *
+ * <p/>
  *  A DFA state may have multiple references to a particular state,
  *  but with different ATN contexts (with same or different alts)
  *  meaning that state was reached via a different set of rule invocations.
@@ -73,7 +74,8 @@ public class DFAState {
 	@NotNull
 	public final ATNConfigSet configs;
 
-	/** edges[symbol] points to target of symbol */
+	/** {@code edges.get(symbol)} points to target of symbol.
+	 */
 	@Nullable
 	private AbstractEdgeMap<DFAState> edges;
 	private final int minSymbol;
@@ -82,8 +84,7 @@ public class DFAState {
 	public boolean isAcceptState = false;
 
 	/** if accept state, what ttype do we match or alt do we predict?
-	 *  This is set to ATN.INVALID_ALT_NUMBER when predicates!=null or
-	 *  isCtxSensitive.
+	 *  This is set to {@link ATN#INVALID_ALT_NUMBER} when {@link #predicates}{@code !=null}.
 	 */
 	public int prediction;
 
@@ -98,23 +99,15 @@ public class DFAState {
 	@Nullable
 	private BitSet contextSymbols;
 
-	/** During SLL parsing, this is a list of predicates associated with the
-	 *  ATN configurations of the DFA state. When we have predicates,
-	 *  isCtxSensitive=false since full context prediction evaluates predicates
-	 *  on-the-fly. If this is not null, then this.prediction is
-	 *  ATN.INVALID_ALT_NUMBER.
-	 *
-	 *  We only use these for non isCtxSensitive but conflicting states. That
-	 *  means we know from the context (it's $ or we don't dip into outer
-	 *  ctx) that it's an ambiguity not a conflict.
-	 *
-	 *  This list is computed by predicateDFAState() in ATN simulator.
+	/**
+	 * This list is computed by {@link ParserATNSimulator#predicateDFAState}.
 	 */
 	@Nullable
 	public PredPrediction[] predicates;
 
-	/** Map a predicate to a predicted alternative */
+	/** Map a predicate to a predicted alternative. */
 	public static class PredPrediction {
+		@NotNull
 		public SemanticContext pred; // never null; at least SemanticContext.NONE
 		public int alt;
 		public PredPrediction(SemanticContext pred, int alt) {
@@ -236,7 +229,6 @@ public class DFAState {
 		return map;
 	}
 
-	/** A decent hash for a DFA state is the sum of the ATN state/alt pairs. */
 	@Override
 	public int hashCode() {
 		if (configs == null) {
@@ -246,16 +238,18 @@ public class DFAState {
 		return configs.hashCode();
 	}
 
-	/** Two DFAStates are equal if their ATN configuration sets are the
-	 *  same. This method is used to see if a DFA state already exists.
-	 *
-	 *  Because the number of alternatives and number of ATN configurations are
-	 *  finite, there is a finite number of DFA states that can be processed.
-	 *  This is necessary to show that the algorithm terminates.
-	 *
-	 *  Cannot test the DFA state numbers here because in DFA.addState we need
-	 *  to know if any other state exists that has this exact set of ATN
-	 *  configurations.  The DFAState state number is irrelevant.
+	/**
+	 * Two {@link DFAState} instances are equal if their ATN configuration sets
+	 * are the same. This method is used to see if a state already exists.
+	 * <p/>
+	 * Because the number of alternatives and number of ATN configurations are
+	 * finite, there is a finite number of DFA states that can be processed.
+	 * This is necessary to show that the algorithm terminates.
+	 * <p/>
+	 * Cannot test the DFA state numbers here because in
+	 * {@link ParserATNSimulator#addDFAState} we need to know if any other state
+	 * exists that has this exact set of ATN configurations. The
+	 * {@link #stateNumber} is irrelevant.
 	 */
 	@Override
 	public boolean equals(Object o) {

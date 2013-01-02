@@ -522,7 +522,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				throw noViableAlt(input, outerContext, s.configs, startIndex);
 			}
 			s = target;
-			if (!s.isAcceptState) {
+			if (!s.isAcceptState && t != IntStream.EOF) {
 				input.consume();
 				t = input.LA(1);
 			}
@@ -783,8 +783,11 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			previous = nextState;
-			input.consume();
-			t = input.LA(1);
+
+			if (t != IntStream.EOF) {
+				input.consume();
+				t = input.LA(1);
+			}
 		}
 	}
 
@@ -850,10 +853,25 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			}
 
 			ATNConfigSet reachIntermediate = new ATNConfigSet();
-			int ncl = closureConfigs.size();
-			for (int ci=0; ci<ncl; ci++) { // TODO: foreach
-				ATNConfig c = closureConfigs.get(ci);
+			List<ATNConfig> skippedStopStates = null;
+			for (ATNConfig c : closureConfigs) {
 				if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString());
+				if (c.getState() instanceof RuleStopState) {
+					assert c.getContext().isEmpty();
+					if (useContext && !c.getReachesIntoOuterContext()) {
+						if (skippedStopStates == null) {
+							skippedStopStates = new ArrayList<ATNConfig>();
+						}
+
+						skippedStopStates.add(c);
+					}
+					else if (t == IntStream.EOF) {
+						reachIntermediate.add(c, contextCache);
+					}
+
+					continue;
+				}
+
 				int n = c.getState().getNumberOfOptimizedTransitions();
 				for (int ti=0; ti<n; ti++) {               // for each optimized transition
 					Transition trans = c.getState().getOptimizedTransition(ti);
@@ -862,14 +880,9 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 						reachIntermediate.add(c.transform(target), contextCache);
 					}
 				}
-
-				if (t == IntStream.EOF && c.getState() instanceof RuleStopState) {
-					assert c.getContext().isEmpty();
-					reachIntermediate.add(c, contextCache);
-				}
 			}
 
-			if (optimize_unique_closure && reachIntermediate.getUniqueAlt() != ATN.INVALID_ALT_NUMBER) {
+			if (optimize_unique_closure && skippedStopStates == null && reachIntermediate.getUniqueAlt() != ATN.INVALID_ALT_NUMBER) {
 				reachIntermediate.setOutermostConfigSet(reach.isOutermostConfigSet());
 				reach = reachIntermediate;
 				break;
@@ -878,6 +891,17 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			final boolean collectPredicates = false;
 			closure(reachIntermediate, reach, collectPredicates, hasMoreContext, contextCache);
 			stepIntoGlobal = reach.getDipsIntoOuterContext();
+
+			if (t == IntStream.EOF) {
+				reach = removeNonRuleStopStates(reach, contextCache);
+			}
+
+			if (skippedStopStates != null && !PredictionMode.hasConfigAtRuleStopState(reach)) {
+				for (ATNConfig c : skippedStopStates) {
+					assert !c.getReachesIntoOuterContext() && c.getSemanticContext() == SemanticContext.NONE;
+					reach.add(c, contextCache);
+				}
+			}
 
 			if (useContext && stepIntoGlobal) {
 				reach.clear();
@@ -914,6 +938,23 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		assert !useContext || !dfaState.configs.getDipsIntoOuterContext();
 		return new SimulatorState<Symbol>(previous.outerContext, dfaState, useContext, remainingGlobalContext);
+	}
+
+	protected ATNConfigSet removeNonRuleStopStates(ATNConfigSet configs, PredictionContextCache contextCache) {
+		if (PredictionMode.onlyRuleStopStates(configs)) {
+			return configs;
+		}
+
+		ATNConfigSet result = new ATNConfigSet();
+		for (ATNConfig config : configs) {
+			if (!(config.getState() instanceof RuleStopState)) {
+				continue;
+			}
+
+			result.add(config, contextCache);
+		}
+
+		return result;
 	}
 
 	@NotNull

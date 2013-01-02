@@ -132,6 +132,16 @@ public class TestPerformance extends BaseTest {
      * DOT (GraphViz) file.
      */
     private static final boolean EXPORT_ATN_GRAPHS = true;
+	/**
+	 * {@code true} to specify the {@code -XdbgST} option when generating the
+	 * grammar.
+	 */
+	private static final boolean DEBUG_TEMPLATES = false;
+	/**
+	 * {@code true} to specify the {@code -XdbgSTWait} option when generating the
+	 * grammar.
+	 */
+	private static final boolean DEBUG_TEMPLATES_WAIT = DEBUG_TEMPLATES;
     /**
      * {@code true} to delete temporary (generated and compiled) files when the
      * test completes.
@@ -615,6 +625,12 @@ public class TestPerformance extends BaseTest {
         if (EXPORT_ATN_GRAPHS) {
             extraOptions.add("-atn");
         }
+		if (DEBUG_TEMPLATES) {
+			extraOptions.add("-XdbgST");
+			if (DEBUG_TEMPLATES_WAIT) {
+				extraOptions.add("-XdbgSTWait");
+			}
+		}
 		extraOptions.add("-visitor");
         String[] extraOptionsArray = extraOptions.toArray(new String[extraOptions.size()]);
         boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", true, extraOptionsArray);

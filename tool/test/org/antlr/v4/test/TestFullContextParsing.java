@@ -131,7 +131,8 @@ public class TestFullContextParsing extends BaseTest {
 					 this.stderrDuringParse);
 	}
 
-	@Test public void testSLLSeesEOFInLLGrammar() {
+	@Test
+	public void testSLLSeesEOFInLLGrammar() {
 		String grammar =
 			"grammar T;\n"+
 			"s @after {dumpDFA();}\n" +
@@ -147,10 +148,9 @@ public class TestFullContextParsing extends BaseTest {
 		String expecting =
 			"Decision 0:\n" +
 			"s0-INT->s1\n" +
-			"s1-ID->s2\n" +
-			"s2-EOF->s3^\n"; // Must point at accept state
+			"s1-ID->s2^\n"; // Must point at accept state
 		assertEquals(expecting, result);
-		assertEquals("line 1:6 reportAttemptingFullContext d=0, input='34abc'\n" +
+		assertEquals("line 1:3 reportAttemptingFullContext d=0, input='34abc'\n" +
 					 "line 1:0 reportContextSensitivity d=0, input='34'\n",
 					 this.stderrDuringParse);
 	}
@@ -370,7 +370,7 @@ public class TestFullContextParsing extends BaseTest {
 
 		String expecting =
 			"line 1:1 reportAttemptingFullContext d=1, input='+'\n" +
-			"line 1:1 reportContextSensitivity d=1, input='+'\n";
+			"line 1:2 reportContextSensitivity d=1, input='+b'\n";
 		assertEquals(expecting, this.stderrDuringParse);
 
 		found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "a+b*c", true);
@@ -378,7 +378,7 @@ public class TestFullContextParsing extends BaseTest {
 
 		expecting =
 			"line 1:1 reportAttemptingFullContext d=1, input='+'\n" +
-			"line 1:1 reportContextSensitivity d=1, input='+'\n" +
+			"line 1:2 reportContextSensitivity d=1, input='+b'\n" +
 			"line 1:3 reportAttemptingFullContext d=1, input='*'\n" +
 			"line 1:5 reportAmbiguity d=1: ambigAlts={1, 2}, input='*c'\n";
 		assertEquals(expecting, this.stderrDuringParse);
