@@ -1153,7 +1153,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		if ( config.state instanceof RuleStopState ) {
 			// We hit rule end. If we have context info, use it
 			// run thru all possible stack tops in ctx
-			if ( config.context!=null && !config.context.isEmpty() ) {
+			if ( !config.context.isEmpty() ) {
 				for (SingletonPredictionContext ctx : config.context) {
 					if ( ctx.returnState==PredictionContext.EMPTY_RETURN_STATE ) {
 						// we have no context info, just chase follow links (if greedy)
@@ -1200,7 +1200,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		// optimization
 		if ( !p.onlyHasEpsilonTransitions() ) {
             configs.add(config, mergeCache);
-			if ( config.semanticContext!=null && config.semanticContext!= SemanticContext.NONE ) {
+			if ( config.semanticContext!= SemanticContext.NONE ) {
 				configs.hasSemanticContext = true;
 			}
 			if ( config.reachesIntoOuterContext>0 ) {
