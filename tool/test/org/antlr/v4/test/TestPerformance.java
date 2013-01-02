@@ -132,7 +132,7 @@ public class TestPerformance extends BaseTest {
 	 * {@code true} to specify the {@code -XdbgST} option when generating the
 	 * grammar.
 	 */
-	private static final boolean DEBUG_TEMPLATES = true;
+	private static final boolean DEBUG_TEMPLATES = false;
 	/**
 	 * {@code true} to specify the {@code -XdbgSTWait} option when generating the
 	 * grammar.
