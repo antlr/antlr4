@@ -300,12 +300,33 @@ public abstract class ATNSimulator {
 				continue;
 			}
 
+			checkCondition(state.onlyHasEpsilonTransitions() || state.getNumberOfTransitions() <= 1);
+
 			if (state instanceof PlusBlockStartState) {
 				checkCondition(((PlusBlockStartState)state).loopBackState != null);
 			}
 
 			if (state instanceof StarLoopEntryState) {
-				checkCondition(((StarLoopEntryState)state).loopBackState != null);
+				StarLoopEntryState starLoopEntryState = (StarLoopEntryState)state;
+				checkCondition(starLoopEntryState.loopBackState != null);
+				checkCondition(starLoopEntryState.getNumberOfTransitions() == 2);
+
+				if (starLoopEntryState.transition(0).target instanceof StarBlockStartState) {
+					checkCondition(starLoopEntryState.transition(1).target instanceof LoopEndState);
+					checkCondition(!starLoopEntryState.nonGreedy);
+				}
+				else if (starLoopEntryState.transition(0).target instanceof LoopEndState) {
+					checkCondition(starLoopEntryState.transition(1).target instanceof StarBlockStartState);
+					checkCondition(starLoopEntryState.nonGreedy);
+				}
+				else {
+					throw new IllegalStateException();
+				}
+			}
+
+			if (state instanceof StarLoopbackState) {
+				checkCondition(state.getNumberOfTransitions() == 1);
+				checkCondition(state.transition(0).target instanceof StarLoopEntryState);
 			}
 
 			if (state instanceof LoopEndState) {
@@ -327,6 +348,9 @@ public abstract class ATNSimulator {
 			if (state instanceof DecisionState) {
 				DecisionState decisionState = (DecisionState)state;
 				checkCondition(decisionState.getNumberOfTransitions() <= 1 || decisionState.decision >= 0);
+			}
+			else {
+				checkCondition(state.getNumberOfTransitions() <= 1 || state instanceof RuleStopState);
 			}
 		}
 	}
