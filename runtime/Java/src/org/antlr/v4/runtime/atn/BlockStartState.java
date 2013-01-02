@@ -30,7 +30,7 @@
 
 package org.antlr.v4.runtime.atn;
 
-/**  The start of a regular (...) block */
+/**  The start of a regular {@code (...)} block. */
 public abstract class BlockStartState extends DecisionState {
 	public BlockEndState endState;
 }

@@ -65,8 +65,8 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		this.cachedHashCode = cachedHashCode;
 	}
 
-	/** Convert a RuleContext tree to a PredictionContext graph.
-	 *  Return EMPTY if outerContext is empty or null.
+	/** Convert a {@link RuleContext} tree to a {@link PredictionContext} graph.
+	 *  Return {@link #EMPTY} if {@code outerContext} is empty or null.
 	 */
 	public static PredictionContext fromRuleContext(@NotNull ATN atn, RuleContext outerContext) {
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
@@ -97,7 +97,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 	public abstract int getReturnState(int index);
 
-	/** This means only the EMPTY context is in set */
+	/** This means only the {@link #EMPTY} context is in set */
 	public boolean isEmpty() {
 		return this == EMPTY;
 	}

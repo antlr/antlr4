@@ -45,8 +45,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class DFA {
-	/** A set of all DFA states. Use Map so we can get old state back
-	 *  (Set only allows you to see if it's there).
+	/** A set of all DFA states. Use {@link Map} so we can get old state back
+	 *  ({@link Set} only allows you to see if it's there).
      */
     @NotNull
 	public final Map<DFAState, DFAState> states = new LinkedHashMap<DFAState, DFAState>();
@@ -60,7 +60,7 @@ public class DFA {
 	public final DecisionState atnStartState;
 
 	/** Set of configs for a DFA state with at least one conflict? Mainly used as "return value"
-	 *  from predictATN() for retry.
+	 *  from {@link ParserATNSimulator#predictATN} for retry.
 	 */
 //	public OrderedHashSet<ATNConfig> conflictSet;
 
