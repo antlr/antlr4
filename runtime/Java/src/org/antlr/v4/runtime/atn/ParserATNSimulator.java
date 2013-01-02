@@ -510,7 +510,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				throw noViableAlt(input, outerContext, s.configs, startIndex);
 			}
 			s = target;
-			if (!s.requiresFullContext && !s.isAcceptState) {
+			if (!s.requiresFullContext && !s.isAcceptState && t != IntStream.EOF) {
 				input.consume();
 				t = input.LA(1);
 			}
@@ -742,8 +742,11 @@ public class ParserATNSimulator extends ATNSimulator {
 
 			previous = reach;
 			previousD = D;
-			input.consume();
-			t = input.LA(1);
+
+			if (t != IntStream.EOF) {
+				input.consume();
+				t = input.LA(1);
+			}
 		}
 	}
 
@@ -846,9 +849,12 @@ public class ParserATNSimulator extends ATNSimulator {
 				// we're not sure what the ambiguity is yet.
 				// So, keep going.
 			}
+
 			previous = reach;
-			input.consume();
-			t = input.LA(1);
+			if (t != IntStream.EOF) {
+				input.consume();
+				t = input.LA(1);
+			}
 		}
 
 		// If the configuration set uniquely predicts an alternative,
