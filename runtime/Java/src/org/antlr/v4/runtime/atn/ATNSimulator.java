@@ -125,8 +125,8 @@ public abstract class ATNSimulator {
 				continue;
 			}
 
-			ATNState s = stateFactory(stype, i);
-			s.ruleIndex = toInt(data[p++]);
+			int ruleIndex = toInt(data[p++]);
+			ATNState s = stateFactory(stype, ruleIndex);
 			if ( stype == ATNState.LOOP_END ) { // special case
 				int loopBackStateNumber = toInt(data[p++]);
 				loopBackStateNumbers.add(new Pair<LoopEndState, Integer>((LoopEndState)s, loopBackStateNumber));
@@ -377,7 +377,7 @@ public abstract class ATNSimulator {
 		throw new IllegalArgumentException("The specified transition type is not valid.");
 	}
 
-	public static ATNState stateFactory(int type, int stateNumber) {
+	public static ATNState stateFactory(int type, int ruleIndex) {
 		ATNState s;
 		switch (type) {
 			case ATNState.INVALID_TYPE: return null;
@@ -394,11 +394,11 @@ public abstract class ATNSimulator {
 			case ATNState.PLUS_LOOP_BACK : s = new PlusLoopbackState(); break;
 			case ATNState.LOOP_END : s = new LoopEndState(); break;
             default :
-				String message = String.format("The specified state type %d for state %d is not valid.", type, stateNumber);
+				String message = String.format("The specified state type %d is not valid.", type);
 				throw new IllegalArgumentException(message);
 		}
 
-		s.stateNumber = stateNumber;
+		s.ruleIndex = ruleIndex;
 		return s;
 	}
 
