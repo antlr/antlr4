@@ -916,13 +916,19 @@ public class ParserATNSimulator extends ATNSimulator {
 		// First figure out where we can reach on input t
 		for (ATNConfig c : closure) {
 			if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString());
-			if (fullCtx && c.state instanceof RuleStopState) {
+			if (c.state instanceof RuleStopState) {
 				assert c.context.isEmpty();
-				if (skippedStopStates == null) {
-					skippedStopStates = new ArrayList<ATNConfig>();
+				if (fullCtx) {
+					if (skippedStopStates == null) {
+						skippedStopStates = new ArrayList<ATNConfig>();
+					}
+
+					skippedStopStates.add(c);
+				}
+				else if (t == IntStream.EOF) {
+					intermediate.add(c, mergeCache);
 				}
 
-				skippedStopStates.add(c);
 				continue;
 			}
 
@@ -933,11 +939,6 @@ public class ParserATNSimulator extends ATNSimulator {
 				if ( target!=null ) {
 					intermediate.add(new ATNConfig(c, target), mergeCache);
 				}
-			}
-
-			if (t == IntStream.EOF && c.state instanceof RuleStopState) {
-				assert c.context.isEmpty();
-				intermediate.add(c, mergeCache);
 			}
 		}
 
