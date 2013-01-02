@@ -1,5 +1,12 @@
 ANTLR v4 Honey Badger
 
+January 1, 2012
+
+* Updated documentation
+* Minor code cleanup
+* Added the `-XdbgSTWait` command line option for the Tool
+* Removed method override since bug was fixed in V3 runtime
+
 December 31, 2012
 
 * I altered Target.getTargetStringLiteralFromANTLRStringLiteral() so that
