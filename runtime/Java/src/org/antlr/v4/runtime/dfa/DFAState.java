@@ -160,16 +160,18 @@ public class DFAState {
 		return h;
 	}
 
-	/** Two DFAStates are equal if their ATN configuration sets are the
-	 *  same. This method is used to see if a DFA state already exists.
+	/**
+	 * Two {@link DFAState} instances are equal if their ATN configuration sets
+	 * are the same. This method is used to see if a state already exists.
 	 * <p/>
-	 *  Because the number of alternatives and number of ATN configurations are
-	 *  finite, there is a finite number of DFA states that can be processed.
-	 *  This is necessary to show that the algorithm terminates.
+	 * Because the number of alternatives and number of ATN configurations are
+	 * finite, there is a finite number of DFA states that can be processed.
+	 * This is necessary to show that the algorithm terminates.
 	 * <p/>
-	 *  Cannot test the DFA state numbers here because in {@link DFA#addState} we need
-	 *  to know if any other state exists that has this exact set of ATN
-	 *  configurations.  The {@link DFAState#stateNumber} is irrelevant.
+	 * Cannot test the DFA state numbers here because in
+	 * {@link ParserATNSimulator#addDFAState} we need to know if any other state
+	 * exists that has this exact set of ATN configurations. The
+	 * {@link #stateNumber} is irrelevant.
 	 */
 	@Override
 	public boolean equals(Object o) {

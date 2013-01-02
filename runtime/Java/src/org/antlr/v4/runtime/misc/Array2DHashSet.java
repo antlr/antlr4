@@ -448,8 +448,8 @@ public class Array2DHashSet<T> implements Set<T> {
 	}
 
 	/**
-	 * Return {@code o} as an instance of the element type {@link T}. If
-	 * {@code o} is non-null but known to not be an instance of {@link T}, this
+	 * Return {@code o} as an instance of the element type {@code T}. If
+	 * {@code o} is non-null but known to not be an instance of {@code T}, this
 	 * method returns {@code null}. The base implementation does not perform any
 	 * type checks; override this method to provide strong type checks for the
 	 * {@link #contains} and {@link #remove} methods to ensure the arguments to
@@ -457,7 +457,7 @@ public class Array2DHashSet<T> implements Set<T> {
 	 * types.
 	 *
 	 * @param o the object to try and cast to the element type of the set
-	 * @return {@code o} if it could be an instance of {@link T}, otherwise
+	 * @return {@code o} if it could be an instance of {@code T}, otherwise
 	 * {@code null}.
 	 */
 	@SuppressWarnings("unchecked")
