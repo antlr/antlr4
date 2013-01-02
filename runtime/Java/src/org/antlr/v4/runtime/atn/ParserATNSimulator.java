@@ -912,9 +912,26 @@ public class ParserATNSimulator extends ATNSimulator {
 		ATNConfigSet reach = new ATNConfigSet(fullCtx);
 		Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
 		ATNConfigSet intermediate = new ATNConfigSet(fullCtx);
+		List<ATNConfig> skippedStopStates = null;
 		// First figure out where we can reach on input t
 		for (ATNConfig c : closure) {
 			if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString());
+			if (c.state instanceof RuleStopState) {
+				assert c.context.isEmpty();
+				if (fullCtx) {
+					if (skippedStopStates == null) {
+						skippedStopStates = new ArrayList<ATNConfig>();
+					}
+
+					skippedStopStates.add(c);
+				}
+				else if (t == IntStream.EOF) {
+					intermediate.add(c, mergeCache);
+				}
+
+				continue;
+			}
+
 			int n = c.state.getNumberOfTransitions();
 			for (int ti=0; ti<n; ti++) {               // for each transition
 				Transition trans = c.state.transition(ti);
@@ -923,22 +940,18 @@ public class ParserATNSimulator extends ATNSimulator {
 					intermediate.add(new ATNConfig(c, target), mergeCache);
 				}
 			}
-
-			if (t == IntStream.EOF && c.state instanceof RuleStopState) {
-				assert c.context.isEmpty();
-				intermediate.add(c, mergeCache);
-			}
 		}
+
 		// Now figure out where the closure can take us, but only if we'll
 		// need to continue looking for more input.
-		if ( intermediate.size()==1 ) {
+		if ( skippedStopStates == null && intermediate.size()==1 ) {
 			// Don't pursue the closure if there is just one state.
 			// It can only have one alternative; just add to result
 			// Also don't pursue the closure if there is unique alternative
 			// among the configurations.
 			reach = new ATNConfigSet(intermediate);
 		}
-		else if ( getUniqueAlt(intermediate)==1 ) {
+		else if ( skippedStopStates == null && getUniqueAlt(intermediate)==1 ) {
 			// Also don't pursue the closure if there is unique alternative
 			// among the configurations.
 			reach = new ATNConfigSet(intermediate);
@@ -951,6 +964,13 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		if (t == IntStream.EOF) {
 			reach = removeNonRuleStopStates(reach);
+		}
+
+		if (skippedStopStates != null && !PredictionMode.hasConfigAtRuleStopState(reach)) {
+			for (ATNConfig c : skippedStopStates) {
+				assert c.reachesIntoOuterContext == 0 && c.semanticContext == SemanticContext.NONE;
+				reach.add(c, mergeCache);
+			}
 		}
 
 		if ( reach.isEmpty() ) return null;
@@ -1137,6 +1157,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		closureCheckingStopState(config, configs, closureBusy, collectPredicates,
 								 fullCtx,
 								 initialDepth);
+		assert !fullCtx || !configs.dipsIntoOuterContext;
 	}
 
 	protected void closureCheckingStopState(@NotNull ATNConfig config,
@@ -1153,14 +1174,20 @@ public class ParserATNSimulator extends ATNSimulator {
 		if ( config.state instanceof RuleStopState ) {
 			// We hit rule end. If we have context info, use it
 			// run thru all possible stack tops in ctx
-			if ( config.context!=null && !config.context.isEmpty() ) {
+			if ( !config.context.isEmpty() ) {
 				for (SingletonPredictionContext ctx : config.context) {
 					if ( ctx.returnState==PredictionContext.EMPTY_RETURN_STATE ) {
-						// we have no context info, just chase follow links (if greedy)
-						if ( debug ) System.out.println("FALLING off rule "+
-														getRuleName(config.state.ruleIndex));
-						closure_(config, configs, closureBusy, collectPredicates,
-								 fullCtx, depth);
+						if (fullCtx) {
+							configs.add(new ATNConfig(config, config.state, PredictionContext.EMPTY), mergeCache);
+							continue;
+						}
+						else {
+							// we have no context info, just chase follow links (if greedy)
+							if ( debug ) System.out.println("FALLING off rule "+
+															getRuleName(config.state.ruleIndex));
+							closure_(config, configs, closureBusy, collectPredicates,
+									 fullCtx, depth);
+						}
 						continue;
 					}
 					ATNState returnState = atn.states.get(ctx.returnState);
@@ -1175,6 +1202,11 @@ public class ParserATNSimulator extends ATNSimulator {
 					closureCheckingStopState(c, configs, closureBusy, collectPredicates,
 											 fullCtx, depth - 1);
 				}
+				return;
+			}
+			else if (fullCtx) {
+				// reached end of start rule
+				configs.add(config, mergeCache);
 				return;
 			}
 			else {
@@ -1200,7 +1232,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		// optimization
 		if ( !p.onlyHasEpsilonTransitions() ) {
             configs.add(config, mergeCache);
-			if ( config.semanticContext!=null && config.semanticContext!= SemanticContext.NONE ) {
+			if ( config.semanticContext!= SemanticContext.NONE ) {
 				configs.hasSemanticContext = true;
 			}
 			if ( config.reachesIntoOuterContext>0 ) {
@@ -1218,6 +1250,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			if ( c!=null ) {
 				int newDepth = depth;
 				if ( config.state instanceof RuleStopState) {
+					assert !fullCtx;
 					// target fell off end of rule; mark resulting c as having dipped into outer context
 					// We can't get here if incoming config was rule stop and we had context
 					// track how far we dip into outer context.  Might

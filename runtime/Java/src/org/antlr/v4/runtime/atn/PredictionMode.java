@@ -212,6 +212,16 @@ public enum PredictionMode {
 		return heuristic;
 	}
 
+	public static boolean hasConfigAtRuleStopState(ATNConfigSet configs) {
+		for (ATNConfig c : configs) {
+			if (c.state instanceof RuleStopState) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public static boolean onlyRuleStopStates(@NotNull ATNConfigSet configs) {
 		for (ATNConfig config : configs) {
 			if (!(config.state instanceof RuleStopState)) {
