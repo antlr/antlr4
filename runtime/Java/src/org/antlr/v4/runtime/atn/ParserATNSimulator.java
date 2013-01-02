@@ -947,8 +947,29 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 		}
 
-		if ( reach.size()==0 ) return null;
+		if (t == IntStream.EOF) {
+			reach = removeNonRuleStopStates(reach);
+		}
+
+		if ( reach.isEmpty() ) return null;
 		return reach;
+	}
+
+	protected ATNConfigSet removeNonRuleStopStates(ATNConfigSet configs) {
+		if (PredictionMode.onlyRuleStopStates(configs)) {
+			return configs;
+		}
+
+		ATNConfigSet result = new ATNConfigSet(configs.fullCtx);
+		for (ATNConfig config : configs) {
+			if (!(config.state instanceof RuleStopState)) {
+				continue;
+			}
+
+			result.add(config, mergeCache);
+		}
+
+		return result;
 	}
 
 	@NotNull
