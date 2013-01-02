@@ -282,4 +282,27 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#110.
+	 * https://github.com/antlr/antlr4/issues/110
+	 */
+	@Test public void testStartRuleWithoutEOF() {
+		String grammar =
+			"grammar T;\n"+
+			"s @after {dumpDFA();}\n" +
+			"  : ID | ID INT ID ;\n" +
+			"ID : 'a'..'z'+ ;\n"+
+			"INT : '0'..'9'+ ;\n"+
+			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
+								   "abc 34", true);
+		String expecting =
+			"Decision 0:\n" +
+			"s0-ID->s1\n" +
+			"s1-INT->s2\n" +
+			"s2-EOF->:s3=>1\n"; // Must point at accept state
+		assertEquals(expecting, result);
+		assertNull(this.stderrDuringParse);
+	}
+
 }
