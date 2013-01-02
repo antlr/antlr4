@@ -127,6 +127,7 @@ public class Tool {
 	public String grammarEncoding = null; // use default locale's encoding
 	public String msgFormat = "antlr";
 	public boolean launch_ST_inspector = false;
+	public boolean ST_inspector_wait_for_close = false;
     public boolean force_atn = false;
     public boolean log = false;
 	public boolean gen_listener = true;
@@ -153,6 +154,7 @@ public class Tool {
 		new Option("",					"-D<option>=value", "set/override a grammar-level option"),
 		new Option("warnings_are_errors", "-Werror", "treat warnings as errors"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
+		new Option("ST_inspector_wait_for_close", "-XdbgSTWait", "wait for STViz to close before continuing"),
         new Option("force_atn",			"-Xforce-atn", "use the ATN simulator for all predictions"),
 		new Option("log",   			"-Xlog", "dump lots of logging info to antlr-timestamp.log"),
 	};
