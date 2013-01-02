@@ -121,7 +121,8 @@ public class TestFullContextParsing extends BaseTest {
 					 this.stderrDuringParse);
 	}
 
-	@Test public void testSLLSeesEOFInLLGrammar() {
+	@Test(timeout = 5000)
+	public void testSLLSeesEOFInLLGrammar() {
 		String grammar =
 			"grammar T;\n"+
 			"s @after {dumpDFA();}\n" +
