@@ -30,7 +30,7 @@
 
 package org.antlr.v4.runtime.atn;
 
-/** Terminal node of a simple (a|b|c) block */
+/** Terminal node of a simple {@code (a|b|c)} block. */
 public final class BlockEndState extends ATNState {
 	public BlockStartState startState;
 

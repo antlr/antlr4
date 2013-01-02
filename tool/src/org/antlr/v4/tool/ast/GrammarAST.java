@@ -154,19 +154,6 @@ public class GrammarAST extends CommonTree {
 		return false;
 	}
 
-	/** Fix bug */
-	@Override
-	public void insertChild(int i, Object t) {
-		if (i < 0 || i > getChildCount()) {
-			throw new IndexOutOfBoundsException(i+" out or range");
-		}
-		if ( children==null ) children = createChildrenList();
-		children.add(i, t);
-		// walk others to increment their child indexes
-		// set index, parent of this one too
-		this.freshenParentAndChildIndexes(i);
-	}
-
     // TODO: move to basetree when i settle on how runtime works
     // TODO: don't include this node!!
 	// TODO: reuse other method

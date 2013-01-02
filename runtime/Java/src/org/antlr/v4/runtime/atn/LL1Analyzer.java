@@ -51,8 +51,9 @@ public class LL1Analyzer {
 
 	public LL1Analyzer(@NotNull ATN atn) { this.atn = atn; }
 
-	/** From an ATN state, s, find the set of all labels reachable from s at
-	 *  depth k.  Only for DecisionStates.
+	/**
+	 * From an ATN state, {@code s}, find the set of all labels reachable from
+	 * {@code s} at depth k. Only for DecisionStates.
 	 */
 	@Nullable
 	public IntervalSet[] getDecisionLookahead(@Nullable ATNState s) {
@@ -93,11 +94,11 @@ public class LL1Analyzer {
    		return r;
    	}
 
-    /** Compute set of tokens that can come next. If the context is EMPTY,
+    /** Compute set of tokens that can come next. If the {@code ctx} is {@link PredictionContext#EMPTY},
      *  then we don't go anywhere when we hit the end of the rule. We have
-     *  the correct set.  If the context is null, that means that we did not want
+     *  the correct set.  If {@code ctx} is null, that means that we did not want
      *  any tokens following this rule--just the tokens that could be found within this
-     *  rule. Add EPSILON to the set indicating we reached the end of the ruled out having
+     *  rule. Add {@link Token#EPSILON} to the set indicating we reached the end of the ruled out having
      *  to match a token.
      */
     protected void _LOOK(@NotNull ATNState s, @Nullable PredictionContext ctx,

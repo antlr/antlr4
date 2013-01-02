@@ -30,7 +30,7 @@
 
 package org.antlr.v4.runtime.atn;
 
-/** Mark the end of a * or + loop */
+/** Mark the end of a * or + loop. */
 public final class LoopEndState extends ATNState {
 	public ATNState loopBackState;
 

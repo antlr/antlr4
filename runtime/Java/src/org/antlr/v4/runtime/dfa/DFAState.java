@@ -30,15 +30,17 @@
 
 package org.antlr.v4.runtime.dfa;
 
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /** A DFA state represents a set of possible ATN configurations.
@@ -56,11 +58,11 @@ import java.util.Set;
  *  jump from rule to rule, emulating rule invocations (method calls).
  *  I have to add a stack to simulate the proper lookahead sequences for
  *  the underlying LL grammar from which the ATN was derived.
- *
+ * <p/>
  *  I use a set of ATNConfig objects not simple states.  An ATNConfig
  *  is both a state (ala normal conversion) and a RuleContext describing
  *  the chain of rules (if any) followed to arrive at that state.
- *
+ * <p/>
  *  A DFA state may have multiple references to a particular state,
  *  but with different ATN contexts (with same or different alts)
  *  meaning that state was reached via a different set of rule invocations.
@@ -71,8 +73,8 @@ public class DFAState {
 	@NotNull
 	public ATNConfigSet configs = new ATNConfigSet();
 
-	/** edges[symbol] points to target of symbol. Shift up by 1 so (-1)
-	 *  EOF maps to edges[0].
+	/** {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
+	 *  {@link Token#EOF} maps to {@code edges[0]}.
 	 */
 	@Nullable
 	public DFAState[] edges;
@@ -80,38 +82,40 @@ public class DFAState {
 	public boolean isAcceptState = false;
 
 	/** if accept state, what ttype do we match or alt do we predict?
-	 *  This is set to ATN.INVALID_ALT_NUMBER when predicates!=null or
-	 *  isCtxSensitive.
+	 *  This is set to {@link ATN#INVALID_ALT_NUMBER} when {@link #predicates}{@code !=null} or
+	 *  {@link #requiresFullContext}.
 	 */
 	public int prediction;
 
 	public int lexerRuleIndex = -1;		// if accept, exec action in what rule?
 	public int lexerActionIndex = -1;	// if accept, exec what action?
 
-	/** Indicates that this state was created during SLL prediction
-	 *  that discovered a conflict between the configurations in the state.
-	 *  Future execDFA() invocations immediately jumped doing full context
-	 *  prediction if this field is true.
+	/**
+	 * Indicates that this state was created during SLL prediction that
+	 * discovered a conflict between the configurations in the state. Future
+	 * {@link ParserATNSimulator#execDFA} invocations immediately jumped doing
+	 * full context prediction if this field is true.
 	 */
 	public boolean requiresFullContext;
 
 	/** During SLL parsing, this is a list of predicates associated with the
 	 *  ATN configurations of the DFA state. When we have predicates,
-	 *  isCtxSensitive=false since full context prediction evaluates predicates
-	 *  on-the-fly. If this is not null, then this.prediction is
-	 *  ATN.INVALID_ALT_NUMBER.
-	 *
-	 *  We only use these for non isCtxSensitive but conflicting states. That
+	 *  {@link #requiresFullContext} is {@code false} since full context prediction evaluates predicates
+	 *  on-the-fly. If this is not null, then {@link #prediction} is
+	 *  {@link ATN#INVALID_ALT_NUMBER}.
+	 * <p/>
+	 *  We only use these for non-{@link #requiresFullContext} but conflicting states. That
 	 *  means we know from the context (it's $ or we don't dip into outer
-	 *  ctx) that it's an ambiguity not a conflict.
-	 *
-	 *  This list is computed by predicateDFAState() in ATN simulator.
+	 *  context) that it's an ambiguity not a conflict.
+	 * <p/>
+	 *  This list is computed by {@link ParserATNSimulator#predicateDFAState}.
 	 */
 	@Nullable
 	public PredPrediction[] predicates;
 
-	/** Map a predicate to a predicted alternative */
+	/** Map a predicate to a predicted alternative. */
 	public static class PredPrediction {
+		@NotNull
 		public SemanticContext pred; // never null; at least SemanticContext.NONE
 		public int alt;
 		public PredPrediction(SemanticContext pred, int alt) {
@@ -144,7 +148,6 @@ public class DFAState {
 		return alts;
 	}
 
-	/** A decent hash for a DFA state is the sum of the ATN state/alt pairs. */
 	@Override
 	public int hashCode() {
 		int h = 7;
@@ -159,14 +162,14 @@ public class DFAState {
 
 	/** Two DFAStates are equal if their ATN configuration sets are the
 	 *  same. This method is used to see if a DFA state already exists.
-	 *
+	 * <p/>
 	 *  Because the number of alternatives and number of ATN configurations are
 	 *  finite, there is a finite number of DFA states that can be processed.
 	 *  This is necessary to show that the algorithm terminates.
-	 *
-	 *  Cannot test the DFA state numbers here because in DFA.addState we need
+	 * <p/>
+	 *  Cannot test the DFA state numbers here because in {@link DFA#addState} we need
 	 *  to know if any other state exists that has this exact set of ATN
-	 *  configurations.  The DFAState state number is irrelevant.
+	 *  configurations.  The {@link DFAState#stateNumber} is irrelevant.
 	 */
 	@Override
 	public boolean equals(Object o) {

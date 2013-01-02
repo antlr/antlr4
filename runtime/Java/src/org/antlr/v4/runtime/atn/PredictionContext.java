@@ -65,8 +65,8 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		this.cachedHashCode = cachedHashCode;
 	}
 
-	/** Convert a RuleContext tree to a PredictionContext graph.
-	 *  Return EMPTY if outerContext is empty or null.
+	/** Convert a {@link RuleContext} tree to a {@link PredictionContext} graph.
+	 *  Return {@link #EMPTY} if {@code outerContext} is empty or null.
 	 */
 	public static PredictionContext fromRuleContext(@NotNull ATN atn, RuleContext outerContext) {
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
@@ -97,7 +97,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 	public abstract int getReturnState(int index);
 
-	/** This means only the EMPTY context is in set */
+	/** This means only the {@link #EMPTY} context is in set */
 	public boolean isEmpty() {
 		return this == EMPTY;
 	}
@@ -119,34 +119,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	protected static int calculateHashCode(int parentHashCode, int returnStateHashCode) {
 		return 5 * 5 * 7 + 5 * parentHashCode + returnStateHashCode;
 	}
-
-	/** Two contexts conflict() if they are equals() or one is a stack suffix
-	 *  of the other.  For example, contexts [21 12 $] and [21 9 $] do not
-	 *  conflict, but [21 $] and [21 12 $] do conflict.  Note that I should
-	 *  probably not show the $ in this case.  There is a dummy node for each
-	 *  stack that just means empty; $ is a marker that's all.
-	 *
-	 *  This is used in relation to checking conflicts associated with a
-	 *  single NFA state's configurations within a single DFA state.
-	 *  If there are configurations s and t within a DFA state such that
-	 *  s.state=t.state && s.alt != t.alt && s.ctx conflicts t.ctx then
-	 *  the DFA state predicts more than a single alt--it's nondeterministic.
-	 *  Two contexts conflict if they are the same or if one is a suffix
-	 *  of the other.
-	 *
-	 *  When comparing contexts, if one context has a stack and the other
-	 *  does not then they should be considered the same context.  The only
-	 *  way for an NFA state p to have an empty context and a nonempty context
-	 *  is the case when closure falls off end of rule without a call stack
-	 *  and re-enters the rule with a context.  This resolves the issue I
-	 *  discussed with Sriram Srinivasan Feb 28, 2005 about not terminating
-	 *  fast enough upon nondeterminism.
-	 *
-	 *  UPDATE FOR GRAPH STACK; no suffix
-	 */
-//	public boolean conflictsWith(PredictionContext other) {
-//		return this.equals(other);
-//	}
 
 	// dispatch
 	public static PredictionContext merge(

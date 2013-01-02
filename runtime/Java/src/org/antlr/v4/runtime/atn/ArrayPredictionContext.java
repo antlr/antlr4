@@ -35,13 +35,13 @@ import java.util.Iterator;
 
 public class ArrayPredictionContext extends PredictionContext {
 	/** Parent can be null only if full ctx mode and we make an array
-	 *  from EMPTY and non-empty. We merge EMPTY by using null parent and
-	 *  returnState == EMPTY_FULL_RETURN_STATE
+	 *  from {@link #EMPTY} and non-empty. We merge {@link #EMPTY} by using null parent and
+	 *  returnState == {@link #EMPTY_RETURN_STATE}.
 	 */
 	public final PredictionContext[] parents;
 
 	/** Sorted for merge, no duplicates; if present,
-	 *  EMPTY_FULL_RETURN_STATE is always first
+	 *  {@link #EMPTY_RETURN_STATE} is always last.
  	 */
 	public final int[] returnStates;
 
