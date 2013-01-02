@@ -163,4 +163,6 @@ public class Trees {
 		return ancestors;
 	}
 
+	private Trees() {
+	}
 }
