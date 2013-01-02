@@ -148,7 +148,9 @@ public class TestFullContextParsing extends BaseTest {
 		String expecting =
 			"Decision 0:\n" +
 			"s0-INT->s1\n" +
-			"s1-ID->s2^\n"; // Must point at accept state
+			"s1-ID->:s2=>1\n" +
+			"s3**-ctx:11(a)->s4\n" +
+			"s4-INT->:s5=>1\n"; // Must point at accept state
 		assertEquals(expecting, result);
 		assertEquals("line 1:3 reportAttemptingFullContext d=0, input='34abc'\n" +
 					 "line 1:0 reportContextSensitivity d=0, input='34'\n",
