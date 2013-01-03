@@ -968,7 +968,6 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		if (skippedStopStates != null && !PredictionMode.hasConfigAtRuleStopState(reach)) {
 			for (ATNConfig c : skippedStopStates) {
-				assert c.reachesIntoOuterContext == 0 && c.semanticContext == SemanticContext.NONE;
 				reach.add(c, mergeCache);
 			}
 		}
@@ -1232,12 +1231,6 @@ public class ParserATNSimulator extends ATNSimulator {
 		// optimization
 		if ( !p.onlyHasEpsilonTransitions() ) {
             configs.add(config, mergeCache);
-			if ( config.semanticContext!= SemanticContext.NONE ) {
-				configs.hasSemanticContext = true;
-			}
-			if ( config.reachesIntoOuterContext>0 ) {
-				configs.dipsIntoOuterContext = true;
-			}
 //            if ( debug ) System.out.println("added config "+configs);
         }
 

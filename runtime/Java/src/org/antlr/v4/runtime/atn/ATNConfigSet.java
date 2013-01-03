@@ -33,6 +33,8 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.misc.AbstractEqualityComparator;
 import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -317,21 +319,27 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	}
 
 	@Override
-	public boolean add(ATNConfig config) {
+	public boolean add(@NotNull ATNConfig config) {
 		return add(config, null);
 	}
 
 	/** Adding a new config means merging contexts with existing configs for
 	 *  (s, i, pi, _)
 	 *  We use (s,i,pi) as key
+	 * <p/>
+	 * This method updates {@link #dipsIntoOuterContext} and
+	 * {@link #hasSemanticContext} when necessary.
 	 */
 	public boolean add(
-		ATNConfig config,
-		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
+		@NotNull ATNConfig config,
+		@Nullable DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
 	{
 		if ( readonly ) throw new IllegalStateException("This set is readonly");
 		if ( config.semanticContext!=SemanticContext.NONE ) {
 			hasSemanticContext = true;
+		}
+		if (config.reachesIntoOuterContext > 0) {
+			dipsIntoOuterContext = true;
 		}
 		ATNConfig existing = configLookup.getOrAdd(config);
 		if ( existing==config ) { // we added this new one
