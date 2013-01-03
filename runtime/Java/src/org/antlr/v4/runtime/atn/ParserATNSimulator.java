@@ -909,24 +909,32 @@ public class ParserATNSimulator extends ATNSimulator {
 										   boolean fullCtx)
 	{
 		if ( debug ) System.out.println("in computeReachSet, starting closure: " + closure);
-		ATNConfigSet reach = new ATNConfigSet(fullCtx);
-		Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
 		ATNConfigSet intermediate = new ATNConfigSet(fullCtx);
+
+		/* Configurations already in a rule stop state indicate reaching the end
+		 * of the decision rule (local context) or end of the start rule (full
+		 * context). Once reached, these configurations are never updated by a
+		 * closure operation, so they are handled separately for the performance
+		 * advantage of having a smaller intermediate set when calling closure.
+		 *
+		 * For full-context reach operations, separate handling is required to
+		 * ensure that the alternative matching the longest overall sequence is
+		 * chosen when multiple such configurations can match the input.
+		 */
 		List<ATNConfig> skippedStopStates = null;
+
 		// First figure out where we can reach on input t
 		for (ATNConfig c : closure) {
 			if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString());
+
 			if (c.state instanceof RuleStopState) {
 				assert c.context.isEmpty();
-				if (fullCtx) {
+				if (fullCtx || t == IntStream.EOF) {
 					if (skippedStopStates == null) {
 						skippedStopStates = new ArrayList<ATNConfig>();
 					}
 
 					skippedStopStates.add(c);
-				}
-				else if (t == IntStream.EOF) {
-					intermediate.add(c, mergeCache);
 				}
 
 				continue;
@@ -942,33 +950,72 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 		}
 
-		// Now figure out where the closure can take us, but only if we'll
-		// need to continue looking for more input.
-		if ( skippedStopStates == null && intermediate.size()==1 ) {
-			// Don't pursue the closure if there is just one state.
-			// It can only have one alternative; just add to result
-			// Also don't pursue the closure if there is unique alternative
-			// among the configurations.
-			reach = new ATNConfigSet(intermediate);
+		// Now figure out where the reach operation can take us...
+
+		ATNConfigSet reach = null;
+
+		/* This block optimizes the reach operation for intermediate sets which
+		 * trivially indicate a termination state for the overall
+		 * adaptivePredict operation.
+		 *
+		 * The conditions assume that intermediate
+		 * contains all configurations relevant to the reach set, but this
+		 * condition is not true when one or more configurations have been
+		 * withheld in skippedStopStates.
+		 */
+		if (skippedStopStates == null) {
+			if ( intermediate.size()==1 ) {
+				// Don't pursue the closure if there is just one state.
+				// It can only have one alternative; just add to result
+				// Also don't pursue the closure if there is unique alternative
+				// among the configurations.
+				reach = intermediate;
+			}
+			else if ( getUniqueAlt(intermediate)!=ATN.INVALID_ALT_NUMBER ) {
+				// Also don't pursue the closure if there is unique alternative
+				// among the configurations.
+				reach = intermediate;
+			}
 		}
-		else if ( skippedStopStates == null && getUniqueAlt(intermediate)==1 ) {
-			// Also don't pursue the closure if there is unique alternative
-			// among the configurations.
-			reach = new ATNConfigSet(intermediate);
-		}
-		else {
+
+		/* If the reach set could not be trivially determined, perform a closure
+		 * operation on the intermediate set to compute its initial value.
+		 */
+		if (reach == null) {
+			reach = new ATNConfigSet(fullCtx);
+			Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
 			for (ATNConfig c : intermediate) {
 				closure(c, reach, closureBusy, false, fullCtx);
 			}
 		}
 
 		if (t == IntStream.EOF) {
-			reach = removeNonRuleStopStates(reach);
+			/* After consuming EOF no additional input is possible, so we are
+			 * only interested in configurations which reached the end of the
+			 * decision rule (local context) or end of the start rule (full
+			 * context). Update reach to contain only these configurations. This
+			 * handles both explicit EOF transitions in the grammar and implicit
+			 * EOF transitions following the end of the decision or start rule.
+			 *
+			 * This is handled before the configurations in skippedStopStates,
+			 * because any configurations potentially added from that list are
+			 * already guaranteed to meet this condition whether or not it's
+			 * required.
+			 */
+			reach = removeAllConfigsNotInRuleStopState(reach);
 		}
 
-		if (skippedStopStates != null && !PredictionMode.hasConfigAtRuleStopState(reach)) {
+		/* If skippedStopStates is not null, then it contains at least one
+		 * configuration. For full-context reach operations, these
+		 * configurations reached the end of the start rule, in which case we
+		 * only add them back to reach if no configuration during the current
+		 * closure operation reached such a state. This ensures adaptivePredict
+		 * chooses an alternative matching the longest overall sequence when
+		 * multiple alternatives are viable.
+		 */
+		if (skippedStopStates != null && (!fullCtx || !PredictionMode.hasConfigInRuleStopState(reach))) {
+			assert !skippedStopStates.isEmpty();
 			for (ATNConfig c : skippedStopStates) {
-				assert c.reachesIntoOuterContext == 0 && c.semanticContext == SemanticContext.NONE;
 				reach.add(c, mergeCache);
 			}
 		}
@@ -977,8 +1024,20 @@ public class ParserATNSimulator extends ATNSimulator {
 		return reach;
 	}
 
-	protected ATNConfigSet removeNonRuleStopStates(ATNConfigSet configs) {
-		if (PredictionMode.onlyRuleStopStates(configs)) {
+	/**
+	 * Return a configuration set containing only the configurations from
+	 * {@code configs} which are in a {@link RuleStopState}. If all
+	 * configurations in {@code configs} are already in a rule stop state, this
+	 * method simply returns {@code configs}.
+	 *
+	 * @param configs the configuration set to update
+	 * @return {@code configs} if all configurations in {@code configs} are in a
+	 * rule stop state, otherwise return a new configuration set containing only
+	 * the configurations from {@code configs} which are in a rule stop state
+	 */
+	@NotNull
+	protected ATNConfigSet removeAllConfigsNotInRuleStopState(@NotNull ATNConfigSet configs) {
+		if (PredictionMode.allConfigsInRuleStopStates(configs)) {
 			return configs;
 		}
 
@@ -1232,12 +1291,6 @@ public class ParserATNSimulator extends ATNSimulator {
 		// optimization
 		if ( !p.onlyHasEpsilonTransitions() ) {
             configs.add(config, mergeCache);
-			if ( config.semanticContext!= SemanticContext.NONE ) {
-				configs.hasSemanticContext = true;
-			}
-			if ( config.reachesIntoOuterContext>0 ) {
-				configs.dipsIntoOuterContext = true;
-			}
 //            if ( debug ) System.out.println("added config "+configs);
         }
 
