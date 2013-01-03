@@ -283,8 +283,8 @@ public class TestParserExec extends BaseTest {
 	}
 
 	/**
-	 * This is a regression test for antlr/antlr4#110.
-	 * https://github.com/antlr/antlr4/issues/110
+	 * This is a regression test for antlr/antlr4#118.
+	 * https://github.com/antlr/antlr4/issues/118
 	 */
 	@Ignore("Performance impact of passing this test may not be worthwhile")
 	@Test public void testStartRuleWithoutEOF() {
