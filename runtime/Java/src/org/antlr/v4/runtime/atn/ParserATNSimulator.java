@@ -976,6 +976,17 @@ public class ParserATNSimulator extends ATNSimulator {
 		return reach;
 	}
 
+	/**
+	 * Return a configuration set containing only the configurations from
+	 * {@code configs} which are in a {@link RuleStopState}. If all
+	 * configurations in {@code configs} are already in a rule stop state, this
+	 * method simply returns {@code configs}.
+	 *
+	 * @param configs the configuration set to update
+	 * @return {@code configs} if all configurations in {@code configs} are in a
+	 * rule stop state, otherwise return a new configuration set containing only
+	 * the configurations from {@code configs} which are in a rule stop state
+	 */
 	protected ATNConfigSet removeNonRuleStopStates(ATNConfigSet configs) {
 		if (PredictionMode.onlyRuleStopStates(configs)) {
 			return configs;

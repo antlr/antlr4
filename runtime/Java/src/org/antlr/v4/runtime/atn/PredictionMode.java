@@ -212,6 +212,16 @@ public enum PredictionMode {
 		return heuristic;
 	}
 
+	/**
+	 * Checks if any configuration in {@code configs} is in a
+	 * {@link RuleStopState}. Configurations meeting this condition have reached
+	 * the end of the decision rule (local context) or end of start rule (full
+	 * context).
+	 *
+	 * @param configs the configuration set to test
+	 * @return {@code true} if any configuration in {@code configs} is in a
+	 * {@link RuleStopState}, otherwise {@code false}
+	 */
 	public static boolean hasConfigAtRuleStopState(ATNConfigSet configs) {
 		for (ATNConfig c : configs) {
 			if (c.state instanceof RuleStopState) {
@@ -222,6 +232,16 @@ public enum PredictionMode {
 		return false;
 	}
 
+	/**
+	 * Checks if all configurations in {@code configs} are in a
+	 * {@link RuleStopState}. Configurations meeting this condition have reached
+	 * the end of the decision rule (local context) or end of start rule (full
+	 * context).
+	 *
+	 * @param configs the configuration set to test
+	 * @return {@code true} if all configurations in {@code configs} are in a
+	 * {@link RuleStopState}, otherwise {@code false}
+	 */
 	public static boolean onlyRuleStopStates(@NotNull ATNConfigSet configs) {
 		for (ATNConfig config : configs) {
 			if (!(config.state instanceof RuleStopState)) {
