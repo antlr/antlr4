@@ -270,7 +270,7 @@ public class TestParserExec extends BaseTest {
 			"grammar T;\n" +
 			"s : stmt EOF ;\n" +
 			"stmt : ifStmt | ID;\n" +
-			"ifStmt : 'if' ID stmt ('else' stmt | {_input.LA(1) != ELSE}?);\n" +
+			"ifStmt : 'if' ID stmt (options{sll=true;} : 'else' stmt | );\n" +
 			"ELSE : 'else';\n" +
 			"ID : [a-zA-Z]+;\n" +
 			"WS : [ \\n\\t]+ -> skip;\n"

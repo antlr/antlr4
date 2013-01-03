@@ -651,7 +651,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			else if ( PredictionMode.hasSLLConflictTerminatingPrediction(mode, reach) ) {
 				// MORE THAN ONE VIABLE ALTERNATIVE
 				D.configs.conflictingAlts = getConflictingAlts(reach);
-				if ( mode == PredictionMode.SLL ) {
+				if ( mode == PredictionMode.SLL || dfa.atnStartState.sll ) {
 					// stop w/o failover for sure
 					if ( outerContext == ParserRuleContext.EMPTY || // in grammar start rule
 						 !D.configs.dipsIntoOuterContext )          // didn't fall out of rule

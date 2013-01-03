@@ -367,7 +367,9 @@ public class ParserATNFactory implements ATNFactory {
 		return null;
 	}
 
-	protected Handle makeBlock(BlockStartState start, GrammarAST blkAST, List<Handle> alts) {
+	protected Handle makeBlock(BlockStartState start, BlockAST blkAST, List<Handle> alts) {
+		start.sll = isSLLDecision(blkAST);
+
 		BlockEndState end = newState(BlockEndState.class, blkAST);
 		start.endState = end;
 		for (Handle alt : alts) {
@@ -441,6 +443,7 @@ public class ParserATNFactory implements ATNFactory {
 		BlockStartState blkStart = (BlockStartState)blk.left;
 
 		blkStart.nonGreedy = !((QuantifierAST)optAST).isGreedy();
+		blkStart.sll = false; // no way to express SLL restriction
 		if (((QuantifierAST)optAST).isGreedy()) {
 			epsilon(blkStart, blk.right);
 		} else {
@@ -473,6 +476,7 @@ public class ParserATNFactory implements ATNFactory {
 
 		PlusLoopbackState loop = newState(PlusLoopbackState.class, plusAST);
 		loop.nonGreedy = !((QuantifierAST)plusAST).isGreedy();
+		loop.sll = false; // no way to express SLL restriction
 		atn.defineDecisionState(loop);
 		LoopEndState end = newState(LoopEndState.class, plusAST);
 		blkStart.loopBackState = loop;
@@ -522,6 +526,7 @@ public class ParserATNFactory implements ATNFactory {
 
 		StarLoopEntryState entry = newState(StarLoopEntryState.class, starAST);
 		entry.nonGreedy = !((QuantifierAST)starAST).isGreedy();
+		entry.sll = false; // no way to express SLL restriction
 		atn.defineDecisionState(entry);
 		LoopEndState end = newState(LoopEndState.class, starAST);
 		StarLoopbackState loop = newState(StarLoopbackState.class, starAST);
@@ -670,6 +675,10 @@ public class ParserATNFactory implements ATNFactory {
 		}
 
 		return false;
+	}
+
+	public boolean isSLLDecision(@NotNull BlockAST blkAST) {
+		return Boolean.toString(true).equalsIgnoreCase(blkAST.getOptionString("sll"));
 	}
 
 	/**
