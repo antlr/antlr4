@@ -183,7 +183,12 @@ public enum PredictionMode {
 	 predicates.
 	*/
 	public static boolean hasSLLConflictTerminatingPrediction(PredictionMode mode, @NotNull ATNConfigSet configs) {
-		if (onlyRuleStopStates(configs)) {
+		/* Configs in rule stop states indicate reaching the end of the decision
+		 * rule (local context) or end of start rule (full context). If all
+		 * configs meet this condition, then none of the configurations is able
+		 * to match additional input so we terminate prediction.
+		 */
+		if (allConfigsInRuleStopStates(configs)) {
 			return true;
 		}
 
@@ -222,7 +227,7 @@ public enum PredictionMode {
 	 * @return {@code true} if any configuration in {@code configs} is in a
 	 * {@link RuleStopState}, otherwise {@code false}
 	 */
-	public static boolean hasConfigAtRuleStopState(ATNConfigSet configs) {
+	public static boolean hasConfigInRuleStopState(ATNConfigSet configs) {
 		for (ATNConfig c : configs) {
 			if (c.state instanceof RuleStopState) {
 				return true;
@@ -242,7 +247,7 @@ public enum PredictionMode {
 	 * @return {@code true} if all configurations in {@code configs} are in a
 	 * {@link RuleStopState}, otherwise {@code false}
 	 */
-	public static boolean onlyRuleStopStates(@NotNull ATNConfigSet configs) {
+	public static boolean allConfigsInRuleStopStates(@NotNull ATNConfigSet configs) {
 		for (ATNConfig config : configs) {
 			if (!(config.state instanceof RuleStopState)) {
 				return false;
