@@ -1,5 +1,10 @@
 ANTLR v4 Honey Badger
 
+January 3, 2012
+
+* Allow restriction of individual decisions to SLL prediction; blocks in parsers
+  support an "sll=true;" option to explicitly specify
+
 January 2, 2012
 
 * Fix EOF handling (antlr/antlr4#110)
