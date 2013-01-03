@@ -323,9 +323,12 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		return add(config, null);
 	}
 
-	/** Adding a new config means merging contexts with existing configs for
-	 *  (s, i, pi, _)
-	 *  We use (s,i,pi) as key
+	/**
+	 * Adding a new config means merging contexts with existing configs for
+	 * {@code (s, i, pi, _)}, where {@code s} is the
+	 * {@link ATNConfig#state}, {@code i} is the {@link ATNConfig#alt}, and
+	 * {@code pi} is the {@link ATNConfig#semanticContext}. We use
+	 * {@code (s,i,pi)} as key.
 	 * <p/>
 	 * This method updates {@link #dipsIntoOuterContext} and
 	 * {@link #hasSemanticContext} when necessary.
