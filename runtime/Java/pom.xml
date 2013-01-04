@@ -24,6 +24,32 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>sonatype-oss-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>us.bryon</groupId>
+                        <artifactId>graphviz-maven-plugin</artifactId>
+                        <version>1.0</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>dot</goal>
+                                </goals>
+                                <configuration>
+                                    <destdir>${project.build.directory}/apidocs</destdir>
+                                    <output>svg</output>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <build>
 
         <sourceDirectory>src</sourceDirectory>

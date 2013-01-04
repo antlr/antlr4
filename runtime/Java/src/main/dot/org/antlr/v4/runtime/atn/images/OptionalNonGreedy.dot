@@ -1,0 +1,29 @@
+digraph "" {
+    graph[fontname="Consolas,Courier";rankdir="LR";pad="0.25"];
+    node[fontname="Consolas,Courier";target="_parent"];
+    edge[fontname="Consolas,Courier"];
+    subgraph cluster0 {
+        subgraph[color="white"];
+        {   node[shape="record"];
+            BasicBlockStartState[URL="../BasicBlockStartState.html";label="{BasicBlockStartState | {<alt1> alt 1 |<alt2> alt 2}}"];
+            BlockEndState[URL="../BlockEndState.html"];
+        }
+
+        {   node[style="dashed"];
+            content[label="alt"];
+        }
+    }
+
+    {   node[style="dashed"];
+        begin;
+        end;
+    }
+
+    begin -> BasicBlockStartState[style="dashed"];
+    BlockEndState -> end[label="&#0949;"];
+
+    BasicBlockStartState:alt2 -> content[label="&#0949;"];
+    content -> BlockEndState[style="dashed"];
+
+    BasicBlockStartState:alt1 -> BlockEndState[label="&#0949;"];
+}

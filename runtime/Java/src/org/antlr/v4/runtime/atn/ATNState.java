@@ -35,10 +35,60 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * The following images show the relation of states and
+ * {@link ATNState#transitions} for various grammar constructs.
+ *
+ * <ul>
+ * <li>Solid edges marked with an &#0949; indicate a required
+ * {@link EpsilonTransition}.</li>
+ * <li>Dashed edges indicate locations where any transition derived from
+ * {@link Transition} might appear.</li>
+ * <li>Dashed nodes are place holders for either a sequence of linked
+ * {@link BasicState} states or the inclusion of a block representing a nested
+ * construct in one of the forms below.</li>
+ * </ul>
+ *
+ * <h2>Basic Blocks</h2>
+ *
+ * <h3>Rule</h3>
+ *
+ * <embed src="images/Rule.svg" type="image/svg+xml"/>
+ *
+ * <h3>Block of 1 or more alternatives</h3>
+ *
+ * <embed src="images/Block.svg" type="image/svg+xml"/>
+ *
+ * <h2>Greedy Loops</h2>
+ *
+ * <h3>Greedy Closure: {@code (...)*}</h3>
+ *
+ * <embed src="images/ClosureGreedy.svg" type="image/svg+xml"/>
+ *
+ * <h3>Greedy Positive Closure: {@code (...)+}</h3>
+ *
+ * <embed src="images/PositiveClosureGreedy.svg" type="image/svg+xml"/>
+ *
+ * <h3>Greedy Optional: {@code (...)?}</h3>
+ *
+ * <embed src="images/OptionalGreedy.svg" type="image/svg+xml"/>
+ *
+ * <h2>Non-Greedy Loops</h2>
+ *
+ * <h3>Non-Greedy Closure: {@code (...)*?}</h3>
+ *
+ * <embed src="images/ClosureNonGreedy.svg" type="image/svg+xml"/>
+ *
+ * <h3>Non-Greedy Positive Closure: {@code (...)+?}</h3>
+ *
+ * <embed src="images/PositiveClosureNonGreedy.svg" type="image/svg+xml"/>
+ *
+ * <h3>Non-Greedy Optional: {@code (...)??}</h3>
+ *
+ * <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
+ */
 public abstract class ATNState {
 	public static final int INITIAL_NUM_TRANSITIONS = 4;
 
