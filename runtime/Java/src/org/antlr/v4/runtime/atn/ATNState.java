@@ -42,13 +42,21 @@ import java.util.List;
  * {@link ATNState#transitions} for various grammar constructs.
  *
  * <ul>
+ *
  * <li>Solid edges marked with an &#0949; indicate a required
  * {@link EpsilonTransition}.</li>
+ *
  * <li>Dashed edges indicate locations where any transition derived from
  * {@link Transition} might appear.</li>
+ *
  * <li>Dashed nodes are place holders for either a sequence of linked
  * {@link BasicState} states or the inclusion of a block representing a nested
  * construct in one of the forms below.</li>
+ *
+ * <li>Nodes showing multiple outgoing alternatives with a {@code ...} support
+ * any number of alternatives (one or more). Nodes without the {@code ...} only
+ * support the exact number of alternatives shown in the diagram.</li>
+ *
  * </ul>
  *
  * <h2>Basic Blocks</h2>
