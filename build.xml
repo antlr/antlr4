@@ -137,6 +137,7 @@ build.sysclasspath=ignore
 				<include name="**/*.st"/>
 				<include name="**/*.stg"/>
 			</fileset>
+			<fileset dir="${antlr3.gen.dir}"/>
         </copy>
 
         <copy todir="${install.root.dir}">
