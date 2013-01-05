@@ -84,7 +84,9 @@ build.sysclasspath=ignore
                 target="1.5"
                 debug="true"
                 excludes="org/antlr/v4/test/**">
-			<classpath refid="classpath"/>
+            <compilerarg value="-Xlint"/>
+            <compilerarg value="-Xlint:-serial"/>
+            <classpath refid="classpath"/>
             <src path="${build.dir}/src:${build.dir}/gen"/>
         </javac>
     </target>
