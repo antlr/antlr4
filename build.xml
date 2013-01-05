@@ -83,12 +83,6 @@ build.sysclasspath=ignore
 
     <target name="compile" depends="antlr" description="Compile for generic OS">
         <mkdir dir="${build.dir}/classes"/>
-        <mkdir dir="${build.dir}/src"/>
-		<copy todir="${build.dir}/src" >
-			<fileset dir="${basedir}/tool/src/"/>
-			<fileset dir="${basedir}/runtime/Java/src/"/>
-		</copy>
-		<replace dir="${build.dir}/src" token="@version@" value="${version}"/>
         <javac
                 destdir="${build.dir}/classes"
                 source="1.5"
@@ -98,7 +92,7 @@ build.sysclasspath=ignore
             <compilerarg value="-Xlint"/>
             <compilerarg value="-Xlint:-serial"/>
             <classpath refid="classpath"/>
-            <src path="${build.dir}/src:${antlr3.gen.dir}"/>
+            <src path="${basedir}/tool/src:${basedir}/runtime/Java/src:${antlr3.gen.dir}"/>
         </javac>
     </target>
 
