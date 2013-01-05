@@ -34,16 +34,21 @@ build.sysclasspath=ignore
 
     <target name="init">
         <!-- Create the build directory structure used by compile -->
-        <mkdir dir="${build.dir}/gen/org/antlr/v4" />
+        <property name="antlr3.gen.dir" value="${build.dir}/generated-sources/antlr3" />
+        <mkdir dir="${antlr3.gen.dir}" />
     </target>
-
-
 
 	<target name="antlr" depends="init">
 		<echo>parse grammars</echo>
-		<java classname="org.antlr.Tool" fork="true" failonerror="false" maxmemory="300m"
-			dir="${basedir}/tool/src/org/antlr/v4/parse">
+		<java classname="org.antlr.Tool" fork="false" failonerror="true">
+			<arg value="-verbose"/>
 			<arg value="-make"/>
+			<arg value="-o"/>
+			<arg value="${antlr3.gen.dir}/org/antlr/v4/parse"/>
+			<arg value="-in"/>
+			<arg value="${basedir}/tool/src/org/antlr/v4/parse"/>
+			<arg value="-lib"/>
+			<arg value="${basedir}/tool/src/org/antlr/v4/parse"/>
 			<arg value="ANTLRParser.g"/>
 			<arg value="ANTLRLexer.g"/>
 			<arg value="ActionSplitter.g"/>
@@ -57,29 +62,16 @@ build.sysclasspath=ignore
 			</classpath>
 		</java>
 
-<!--
-		<echo>semantics grammars</echo>
-		<java classname="org.antlr.Tool" fork="true" failonerror="false" maxmemory="300m"
-			dir="${basedir}/tool/src/org/antlr/v4/semantics">
-			<arg value="-make"/>
-			<arg value="-lib"/>
-			<arg value="../parse"/>
-			<arg value="BasicSemanticTriggers.g"/>
-			<arg value="CollectSymbols.g"/>
-			<arg value="Refs.g"/>
-			<classpath>
-				<pathelement location="${antlr3.jar}"/>
-				<pathelement path="${java.class.path}"/>
-			</classpath>
-		</java>
-		-->
-
 		<echo>codegen grammars</echo>
-		<java classname="org.antlr.Tool" fork="true" failonerror="false" maxmemory="300m"
-			dir="${basedir}/tool/src/org/antlr/v4/codegen">
+		<java classname="org.antlr.Tool" fork="false" failonerror="true">
+			<arg value="-verbose"/>
 			<arg value="-make"/>
+			<arg value="-o"/>
+			<arg value="${antlr3.gen.dir}/org/antlr/v4/codegen"/>
+			<arg value="-in"/>
+			<arg value="${basedir}/tool/src/org/antlr/v4/codegen"/>
 			<arg value="-lib"/>
-			<arg value="../parse"/>
+			<arg value="${antlr3.gen.dir}/org/antlr/v4/parse"/>
 			<arg value="SourceGenTriggers.g"/>
 			<classpath>
 				<pathelement location="${antlr3.jar}"/>
@@ -87,40 +79,20 @@ build.sysclasspath=ignore
 			</classpath>
 		</java>
 
-		<!--
-		<echo>gunit grammars</echo>
-		<java classname="org.antlr.Tool" fork="true" failonerror="false" maxmemory="300m"
-			dir="${basedir}/gunit/src/org/antlr/v4/gunit">
-			<arg value="-make"/>
-			<arg value="ASTVerifier.g"/>
-			<arg value="gUnit.g"/>
-			<arg value="jUnitGen.g"/>
-			<arg value="Semantics.g"/>
-			<classpath>
-				<pathelement location="${antlr3.jar}"/>
-				<pathelement path="${java.class.path}"/>
-			</classpath>
-		</java>
-		-->
 	</target>
 
     <target name="compile" depends="antlr" description="Compile for generic OS">
         <mkdir dir="${build.dir}/classes"/>
-        <mkdir dir="${build.dir}/src"/>
-		<copy todir="${build.dir}/src" >
-			<fileset dir="${basedir}/tool/src/"/>
-			<fileset dir="${basedir}/runtime/Java/src/"/>
-			<!-- <fileset dir="${basedir}/gunit/src/"/> -->
-		</copy>
-		<replace dir="${build.dir}/src" token="@version@" value="${version}"/>
         <javac
                 destdir="${build.dir}/classes"
                 source="1.5"
                 target="1.5"
                 debug="true"
                 excludes="org/antlr/v4/test/**">
-			<classpath refid="classpath"/>
-            <src path="${build.dir}/src:${build.dir}/gen"/>
+            <compilerarg value="-Xlint"/>
+            <compilerarg value="-Xlint:-serial"/>
+            <classpath refid="classpath"/>
+            <src path="${basedir}/tool/src:${basedir}/runtime/Java/src:${antlr3.gen.dir}"/>
         </javac>
     </target>
 
@@ -163,14 +135,7 @@ build.sysclasspath=ignore
 				<include name="**/*.st"/>
 				<include name="**/*.stg"/>
 			</fileset>
-			<!--
-			<fileset dir="${basedir}/gunit/src/">
-				<include name="**/*.java"/>
-				<include name="**/*.g"/>
-				<include name="**/*.st"/>
-				<include name="**/*.stg"/>
-			</fileset>
-			-->
+			<fileset dir="${antlr3.gen.dir}"/>
         </copy>
 
         <copy todir="${install.root.dir}">

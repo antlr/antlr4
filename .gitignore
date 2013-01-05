@@ -6,7 +6,7 @@ build/
 dist/
 
 # NetBeans user configuration files
-nbactions.xml
+nbactions*.xml
 /nbproject/private/
 */nbproject/private/
 
