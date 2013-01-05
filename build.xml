@@ -40,12 +40,15 @@ build.sysclasspath=ignore
 
 	<target name="antlr" depends="init">
 		<echo>parse grammars</echo>
-		<java classname="org.antlr.Tool" fork="true" failonerror="true" maxmemory="300m"
-			dir="${basedir}/tool/src/org/antlr/v4/parse">
+		<java classname="org.antlr.Tool" fork="false" failonerror="true">
 			<arg value="-verbose"/>
 			<arg value="-make"/>
 			<arg value="-o"/>
 			<arg value="${antlr3.gen.dir}/org/antlr/v4/parse"/>
+			<arg value="-in"/>
+			<arg value="${basedir}/tool/src/org/antlr/v4/parse"/>
+			<arg value="-lib"/>
+			<arg value="${basedir}/tool/src/org/antlr/v4/parse"/>
 			<arg value="ANTLRParser.g"/>
 			<arg value="ANTLRLexer.g"/>
 			<arg value="ActionSplitter.g"/>
@@ -60,12 +63,13 @@ build.sysclasspath=ignore
 		</java>
 
 		<echo>codegen grammars</echo>
-		<java classname="org.antlr.Tool" fork="true" failonerror="true" maxmemory="300m"
-			dir="${basedir}/tool/src/org/antlr/v4/codegen">
+		<java classname="org.antlr.Tool" fork="false" failonerror="true">
 			<arg value="-verbose"/>
 			<arg value="-make"/>
 			<arg value="-o"/>
 			<arg value="${antlr3.gen.dir}/org/antlr/v4/codegen"/>
+			<arg value="-in"/>
+			<arg value="${basedir}/tool/src/org/antlr/v4/codegen"/>
 			<arg value="-lib"/>
 			<arg value="${antlr3.gen.dir}/org/antlr/v4/parse"/>
 			<arg value="SourceGenTriggers.g"/>
