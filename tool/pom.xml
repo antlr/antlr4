@@ -18,7 +18,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <version>4.10</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -30,13 +30,13 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr-runtime</artifactId>
-            <version>3.5-SNAPSHOT</version>
+            <version>3.5</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>ST4</artifactId>
-            <version>4.0.7-SNAPSHOT</version>
+            <version>4.0.7</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -106,7 +106,7 @@
            <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr3-maven-plugin</artifactId>
-                <version>3.5-rc-2</version>
+                <version>3.5</version>
                 <configuration>
                     <sourceDirectory>src</sourceDirectory>
                     <verbose>true</verbose>
