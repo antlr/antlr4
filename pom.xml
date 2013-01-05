@@ -60,6 +60,7 @@
         <bootclasspath.java6>${java6.home}/lib/rt.jar</bootclasspath.java6>
         <bootclasspath.compile>${bootclasspath.java6}</bootclasspath.compile>
         <bootclasspath.testCompile>${bootclasspath.java6}</bootclasspath.testCompile>
+        <antlr.testinprocess>true</antlr.testinprocess>
     </properties>
 
     <issueManagement>
