@@ -16,6 +16,7 @@
         <path id="cp.antlr3" path="${antlr3.jar}"/>
 
         <property name="build.antlr3.dir" value="${build.dir}/generated-sources/antlr3" />
+        <property name="antlr3.touch" value="${build.dir}/antlr3-${antlr3.version}.touch"/>
     </target>
 
     <target name="build-init" depends="basic-init">
@@ -34,6 +35,46 @@
         <delete dir="${lib.dir}" includeemptydirs="true"/>
     </target>
 
+    <target name="antlr3-up-to-date" depends="basic-init,antlr3-init">
+        <uptodate targetfile="${antlr3.touch}" property="is.antlr3.uptodate">
+            <srcfiles dir="${basedir}/tool/src">
+                <include name="**/*.g"/>
+                <include name="**/*.tokens"/>
+            </srcfiles>
+            <srcfiles file="${antlr3.jar}"/>
+        </uptodate>
+    </target>
+
+    <target name="up-to-date" depends="antlr3-up-to-date,build-init">
+        <uptodate targetfile="${jar.file}" property="is.source.uptodate">
+            <srcfiles dir="${basedir}/tool/src">
+                <include name="**/*.java"/>
+                <include name="**/*.g"/>
+                <include name="**/*.tokens"/>
+            </srcfiles>
+            <srcfiles dir="${basedir}/tool/resources">
+                <include name="**/*.st"/>
+                <include name="**/*.stg"/>
+            </srcfiles>
+            <srcfiles dir="${basedir}/runtime/Java/src/">
+                <include name="**/*.java"/>
+                <include name="**/*.g"/>
+                <include name="**/*.st"/>
+                <include name="**/*.stg"/>
+            </srcfiles>
+            <srcfiles dir="${build.antlr3.dir}"/>
+            <srcfiles file="${basedir}/runtime/Java/lib/org.abego.treelayout.core.jar"/>
+            <srcfiles file="${antlr3.jar}"/>
+        </uptodate>
+
+        <condition property="is.jar.uptodate">
+            <and>
+                <istrue value="${is.source.uptodate}"/>
+                <istrue value="${is.antlr3.uptodate}"/>
+            </and>
+        </condition>
+    </target>
+
     <macrodef name="antlr3">
         <attribute name="srcpath"/>
         <element name="args" optional="true"/>
@@ -41,7 +82,6 @@
             <mkdir dir="${build.antlr3.dir}/@{srcpath}"/>
             <java classname="org.antlr.Tool" fork="true" failonerror="true" maxmemory="300m"
                   dir="${basedir}/tool/src/@{srcpath}">
-                <arg value="-make"/>
                 <arg value="-o"/>
                 <arg value="${build.antlr3.dir}/@{srcpath}"/>
                 <args/>
@@ -54,13 +94,19 @@
         </sequential>
     </macrodef>
 
-	<target name="antlr3" depends="build-init,antlr3-init">
+	<target name="antlr3" depends="build-init,antlr3-init,antlr3-up-to-date" unless="is.antlr3.uptodate">
         <mkdir dir="${build.antlr3.dir}" />
 
-		<echo>parse grammars</echo>
+        <path id="sources.antlr3">
+            <fileset dir="${basedir}/tool/src" includes="**/*.g"/>
+        </path>
+        <pathconvert pathsep="${line.separator}  " property="echo.sources.antlr3" refid="sources.antlr3">
+            <map from="${basedir}/tool/src" to="src"/>
+        </pathconvert>
+        <echo message="Generating ANTLR 3 grammars:${line.separator}  ${echo.sources.antlr3}"/>
+
         <antlr3 srcpath="org/antlr/v4/parse"/>
 
-		<echo>codegen grammars</echo>
         <antlr3 srcpath="org/antlr/v4/codegen">
             <args>
                 <arg value="-lib"/>
@@ -68,9 +114,10 @@
             </args>
         </antlr3>
 
+        <touch file="${antlr3.touch}" mkdirs="true"/>
 	</target>
 
-    <target name="compile" depends="build-init,antlr3" description="Compile for generic OS">
+    <target name="compile" depends="build-init,antlr3,up-to-date" description="Compile for generic OS" unless="is.jar.uptodate">
         <mkdir dir="${build.dir}/classes"/>
         <javac
                 destdir="${build.dir}/classes"
@@ -88,7 +135,7 @@
         </javac>
     </target>
 
-    <target name="build-jar" depends="compile" description="Build ANTLR 4.jar">
+    <target name="build-jar" depends="up-to-date,compile" description="Build ANTLR 4.jar" unless="is.jar.uptodate">
         <mkdir dir="${dist.dir}"/>
 
         <jar jarfile="${jar.file}">
