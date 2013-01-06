@@ -5,6 +5,7 @@ target/
 build/
 dist/
 lib/
+user.build.properties
 
 # NetBeans user configuration files
 nbactions*.xml

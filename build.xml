@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="ANTLR4" default="distribute" basedir=".">
     <target name="basic-init">
+        <property file="user.build.properties"/>
         <property name="dist.dir" value="${basedir}/dist" />
         <property name="build.dir" value="${basedir}/build" />
         <property name="lib.dir" value="${basedir}/lib" />
