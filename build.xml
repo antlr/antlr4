@@ -16,8 +16,8 @@
         <path id="cp.antlr3" path="${antlr3.jar}"/>
 
         <!-- Create the build directory structure used by compile -->
-        <property name="antlr3.gen.dir" value="${build.dir}/generated-sources/antlr3" />
-        <mkdir dir="${antlr3.gen.dir}" />
+        <property name="build.antlr3.dir" value="${build.dir}/generated-sources/antlr3" />
+        <mkdir dir="${build.antlr3.dir}" />
     </target>
 
     <target name="build-init" depends="basic-init">
@@ -43,7 +43,7 @@
 			<arg value="-verbose"/>
 			<arg value="-make"/>
 			<arg value="-o"/>
-			<arg value="${antlr3.gen.dir}/org/antlr/v4/parse"/>
+			<arg value="${build.antlr3.dir}/org/antlr/v4/parse"/>
 			<arg value="ANTLRParser.g"/>
 			<arg value="ANTLRLexer.g"/>
 			<arg value="ActionSplitter.g"/>
@@ -63,9 +63,9 @@
 			<arg value="-verbose"/>
 			<arg value="-make"/>
 			<arg value="-o"/>
-			<arg value="${antlr3.gen.dir}/org/antlr/v4/codegen"/>
+			<arg value="${build.antlr3.dir}/org/antlr/v4/codegen"/>
 			<arg value="-lib"/>
-			<arg value="${antlr3.gen.dir}/org/antlr/v4/parse"/>
+			<arg value="${build.antlr3.dir}/org/antlr/v4/parse"/>
 			<arg value="SourceGenTriggers.g"/>
 			<classpath>
 				<path refid="cp.antlr3"/>
@@ -89,7 +89,7 @@
                 <path refid="cp.antlr3"/>
                 <pathelement location="${basedir}/runtime/Java/lib/org.abego.treelayout.core.jar"/>
             </classpath>
-            <src path="${basedir}/tool/src:${basedir}/runtime/Java/src:${antlr3.gen.dir}"/>
+            <src path="${basedir}/tool/src:${basedir}/runtime/Java/src:${build.antlr3.dir}"/>
         </javac>
     </target>
 
@@ -132,7 +132,7 @@
 				<include name="**/*.st"/>
 				<include name="**/*.stg"/>
 			</fileset>
-			<fileset dir="${antlr3.gen.dir}"/>
+			<fileset dir="${build.antlr3.dir}"/>
         </copy>
 
         <copy todir="${install.root.dir}">
