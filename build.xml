@@ -34,44 +34,39 @@
         <delete dir="${lib.dir}" includeemptydirs="true"/>
     </target>
 
+    <macrodef name="antlr3">
+        <attribute name="srcpath"/>
+        <element name="args" optional="true"/>
+        <sequential>
+            <mkdir dir="${build.antlr3.dir}/@{srcpath}"/>
+            <java classname="org.antlr.Tool" fork="true" failonerror="true" maxmemory="300m"
+                  dir="${basedir}/tool/src/@{srcpath}">
+                <arg value="-make"/>
+                <arg value="-o"/>
+                <arg value="${build.antlr3.dir}/@{srcpath}"/>
+                <args/>
+                <arg value="*.g"/>
+                <classpath>
+                    <path refid="cp.antlr3"/>
+                    <pathelement location="${java.class.path}"/>
+                </classpath>
+            </java>
+        </sequential>
+    </macrodef>
+
 	<target name="antlr3" depends="build-init,antlr3-init">
         <mkdir dir="${build.antlr3.dir}" />
 
 		<echo>parse grammars</echo>
-		<java classname="org.antlr.Tool" fork="true" failonerror="true" maxmemory="300m"
-			dir="${basedir}/tool/src/org/antlr/v4/parse">
-			<arg value="-verbose"/>
-			<arg value="-make"/>
-			<arg value="-o"/>
-			<arg value="${build.antlr3.dir}/org/antlr/v4/parse"/>
-			<arg value="ANTLRParser.g"/>
-			<arg value="ANTLRLexer.g"/>
-			<arg value="ActionSplitter.g"/>
-			<arg value="ATNBuilder.g"/>
-			<arg value="BlockSetTransformer.g"/>
-			<arg value="GrammarTreeVisitor.g"/>
-			<arg value="LeftRecursiveRuleWalker.g"/>
-			<classpath>
-				<path refid="cp.antlr3"/>
-				<pathelement path="${java.class.path}"/>
-			</classpath>
-		</java>
+        <antlr3 srcpath="org/antlr/v4/parse"/>
 
 		<echo>codegen grammars</echo>
-		<java classname="org.antlr.Tool" fork="true" failonerror="true" maxmemory="300m"
-			dir="${basedir}/tool/src/org/antlr/v4/codegen">
-			<arg value="-verbose"/>
-			<arg value="-make"/>
-			<arg value="-o"/>
-			<arg value="${build.antlr3.dir}/org/antlr/v4/codegen"/>
-			<arg value="-lib"/>
-			<arg value="${build.antlr3.dir}/org/antlr/v4/parse"/>
-			<arg value="SourceGenTriggers.g"/>
-			<classpath>
-				<path refid="cp.antlr3"/>
-				<pathelement path="${java.class.path}"/>
-			</classpath>
-		</java>
+        <antlr3 srcpath="org/antlr/v4/codegen">
+            <args>
+                <arg value="-lib"/>
+                <arg value="${build.antlr3.dir}/org/antlr/v4/parse"/>
+            </args>
+        </antlr3>
 
 	</target>
 
