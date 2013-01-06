@@ -101,7 +101,7 @@
             <fileset dir="${basedir}/tool/src" includes="**/*.g"/>
         </path>
         <pathconvert pathsep="${line.separator}  " property="echo.sources.antlr3" refid="sources.antlr3">
-            <map from="${basedir}/tool/src" to="src"/>
+            <map from="${basedir}/tool/src/" to=""/>
         </pathconvert>
         <echo message="Generating ANTLR 3 grammars:${line.separator}  ${echo.sources.antlr3}"/>
 
