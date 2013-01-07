@@ -1,0 +1,47 @@
+digraph "" {
+    graph[fontname="Consolas,Courier";rankdir="LR";pad="0.25"];
+    node[fontname="Consolas,Courier";target="_parent"];
+    edge[fontname="Consolas,Courier"];
+    subgraph cluster0 {
+        subgraph[color="white"];
+        {   node[shape="record"];
+            {   rank="source";
+                PlusBlockStartState[URL="../PlusBlockStartState.html";label="{PlusBlockStartState | {<alt1> alt 1 |<alt2> alt 2 | &#0183;\n&#0183;\n&#0183; |<altn> alt n}}"];
+            }
+
+            PlusLoopbackState[URL="../PlusLoopbackState.html";label="{PlusLoopbackState | {<alt1> alt 1 |<alt2> alt 2}}"];
+            BlockEndState[URL="../BlockEndState.html"];
+
+            {   rank="sink";
+                LoopEndState[URL="../LoopEndState.html"];
+            }
+        }
+
+        {   node[style="dashed"];
+            content1[label="alt 1"];
+            content2[label="alt 2"];
+            more[label="alt n"];
+        }
+    }
+
+    {   node[style="dashed"];
+        begin;
+        end;
+    }
+
+    begin -> PlusBlockStartState[style="dashed"];
+    LoopEndState -> end[label="&#0949;"];
+
+    PlusBlockStartState:alt1 -> content1[label="&#0949;"];
+    content1 -> BlockEndState[style="dashed"];
+
+    PlusBlockStartState:alt2 -> content2[label="&#0949;"];
+    content2 -> BlockEndState[style="dashed"];
+
+    PlusBlockStartState:altn -> more[label="&#0949;"];
+    more -> BlockEndState[style="dashed"];
+
+    BlockEndState -> PlusLoopbackState[label="&#0949;"];
+    PlusLoopbackState:alt1:n -> PlusBlockStartState:n[label="&#0949;"];
+    PlusLoopbackState:alt2 -> LoopEndState[label="&#0949;"];
+}

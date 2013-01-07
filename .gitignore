@@ -4,9 +4,11 @@ target/
 # Ant build folders
 build/
 dist/
+lib/
+user.build.properties
 
 # NetBeans user configuration files
-nbactions.xml
+nbactions*.xml
 /nbproject/private/
 */nbproject/private/
 
