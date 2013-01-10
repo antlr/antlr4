@@ -1,6 +1,11 @@
 ANTLR v4 Honey Badger
 
-January 2, 2012
+January 10, 2013
+
+* Add error 135: cannot assign a value to list label: $label
+  (fixes antlr/antlr4#128)
+
+January 2, 2013
 
 * Fix EOF handling (antlr/antlr4#110)
 * Remove TREE_PARSER reference
@@ -8,7 +13,7 @@ January 2, 2012
 * Fix potential NPE in parser predicate evaluation
 * Fix termination condition detection in full-context parsing
 
-January 1, 2012
+January 1, 2013
 
 * Updated documentation
 * Minor code cleanup
