@@ -257,7 +257,12 @@ public class Rule implements AttributeResolver {
 				return g.getRule(anyLabelDef.element.getText()).resolveRetvalOrProperty(y);
 			}
 			else {
-				return getPredefinedScope(anyLabelDef.type).get(y);
+				AttributeDict scope = getPredefinedScope(anyLabelDef.type);
+				if (scope == null) {
+					return null;
+				}
+
+				return scope.get(y);
 			}
 		}
 		return null;
