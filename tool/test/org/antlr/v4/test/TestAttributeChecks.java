@@ -102,6 +102,7 @@ public class TestAttributeChecks extends BaseTest {
 		"$b.d",         "error(64): A.g4:7:6: cannot access rule d's parameter: $b.d\n",  // can't see rule ref's arg
 		"$d.text",      "error(63): A.g4:7:4: unknown attribute reference d in $d.text\n", // valid rule, but no ref
 		"$lab.d",		"error(64): A.g4:7:8: cannot access rule d's parameter: $lab.d\n",
+		"$ids = null;",	"error(135): A.g4:7:4: cannot assign a value to list label: $ids\n",
 	};
 
 	String[] finallyChecks = {

@@ -115,6 +115,7 @@ public enum ErrorType {
 	LEXER_COMMAND_PLACEMENT_ISSUE(133, "->command in lexer rule <arg> must be last element of single outermost alt", ErrorSeverity.ERROR),
 	USE_OF_BAD_WORD(134, "symbol <arg> conflicts with generated code in target language or runtime", ErrorSeverity.ERROR),
 	INVALID_LEXER_SET_ELEMENT(134, "lexer set element <arg> is invalid (either lexer rule ref or literal with > 1 char)", ErrorSeverity.ERROR),
+	ASSIGNMENT_TO_LIST_LABEL(135, "cannot assign a value to list label: $<arg>", ErrorSeverity.ERROR),
 
 	// Backward incompatibility errors
 	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR 4", ErrorSeverity.ERROR),
