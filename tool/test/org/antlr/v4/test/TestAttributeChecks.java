@@ -42,7 +42,7 @@ public class TestAttributeChecks extends BaseTest {
 		"tokens{ID}\n" +
         "a[int x] returns [int y]\n" +
         "@init {<init>}\n" +
-        "    :   id=ID ids+=ID lab=b[34] {\n" +
+        "    :   id=ID ids+=ID lab=b[34] labs+=b[34] {\n" +
 		"		 <inline>\n" +
 		"		 }\n" +
 		"		 c\n" +
@@ -66,6 +66,7 @@ public class TestAttributeChecks extends BaseTest {
 		"$y = $x",		"",
 		"$lab.e",		"",
 		"$ids",			"",
+		"$labs",		"",
 
 		"$c",			"error(63): A.g4:5:8: unknown attribute reference c in $c\n",
 		"$a.q",			"error(65): A.g4:5:10: unknown attribute q for rule a in $a.q\n",
@@ -86,6 +87,7 @@ public class TestAttributeChecks extends BaseTest {
 		"$id",			"",
 		"$id.text",		"",
 		"$ids",			"",
+		"$labs",		"",
 	};
 
 	String[] bad_inlineChecks = {
@@ -103,6 +105,7 @@ public class TestAttributeChecks extends BaseTest {
 		"$d.text",      "error(63): A.g4:7:4: unknown attribute reference d in $d.text\n", // valid rule, but no ref
 		"$lab.d",		"error(64): A.g4:7:8: cannot access rule d's parameter: $lab.d\n",
 		"$ids = null;",	"error(135): A.g4:7:4: cannot assign a value to list label: $ids\n",
+		"$labs = null;","error(135): A.g4:7:4: cannot assign a value to list label: $labs\n",
 	};
 
 	String[] finallyChecks = {
@@ -115,6 +118,7 @@ public class TestAttributeChecks extends BaseTest {
 		"$id",			"",
 		"$id.text",		"",
 		"$ids",			"",
+		"$labs",		"",
 
 		"$lab",			"error(67): A.g4:10:14: missing attribute access on rule reference lab in $lab\n",
 		"$q",           "error(63): A.g4:10:14: unknown attribute reference q in $q\n",
