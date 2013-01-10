@@ -30,8 +30,29 @@
 
 package org.antlr.v4.runtime.tree.gui;
 
+import java.awt.Font;
+import java.util.HashMap;
+import java.util.Map;
+
 public class PostScriptDocument {
 	public static final String DEFAULT_FONT = "Courier New";
+
+	public static final Map<String, String> POSTSCRIPT_FONT_NAMES;
+	static {
+		POSTSCRIPT_FONT_NAMES = new HashMap<String, String>();
+		POSTSCRIPT_FONT_NAMES.put(Font.SANS_SERIF + ".plain", "ArialMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.SANS_SERIF + ".bold", "Arial-BoldMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.SANS_SERIF + ".italic", "Arial-ItalicMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.SANS_SERIF + ".bolditalic", "Arial-BoldItalicMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.SERIF + ".plain", "TimesNewRomanPSMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.SERIF + ".bold", "TimesNewRomanPS-BoldMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.SERIF + ".italic", "TimesNewRomanPS-ItalicMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.SERIF + ".bolditalic", "TimesNewRomanPS-BoldItalicMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.MONOSPACED + ".plain", "CourierNewPSMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.MONOSPACED + ".bold", "CourierNewPS-BoldMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.MONOSPACED + ".italic", "CourierNewPS-ItalicMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.MONOSPACED + ".bolditalic", "CourierNewPS-BoldItalicMT");
+	}
 
 	protected int boundingBoxWidth;
 	protected int boundingBoxHeight;
@@ -103,12 +124,17 @@ public class PostScriptDocument {
 		return b;
 	}
 
-	// Courier, Helvetica, Times, ... should be available
 	public void setFont(String fontName, int fontSize) {
 		this.fontMetrics = new SystemFontMetrics(fontName);
 		this.fontName = fontMetrics.getFont().getPSName();
 		this.fontSize = fontSize;
-		ps.append(String.format("/%s findfont %d scalefont setfont\n", this.fontName, fontSize));
+
+		String psname = POSTSCRIPT_FONT_NAMES.get(this.fontName);
+		if (psname == null) {
+			psname = this.fontName;
+		}
+
+		ps.append(String.format("/%s findfont %d scalefont setfont\n", psname, fontSize));
 	}
 
 	public void lineWidth(double w) {
