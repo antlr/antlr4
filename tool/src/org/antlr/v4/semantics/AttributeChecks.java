@@ -161,7 +161,13 @@ public class AttributeChecks implements ActionSplitterListener {
 			return;
 		}
 		if ( node.resolver.resolveToAttribute(x.getText(), node)==null ) {
-			errMgr.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
+			ErrorType errorType = ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE;
+			if ( node.resolver.resolvesToListLabel(x.getText(), node) ) {
+				// $ids for ids+=ID etc...
+				errorType = ErrorType.ASSIGNMENT_TO_LIST_LABEL;
+			}
+
+			errMgr.grammarError(errorType,
 								g.fileName, x, x.getText(), expr);
 		}
 		new AttributeChecks(g, r, alt, node, rhs).examineAction();
