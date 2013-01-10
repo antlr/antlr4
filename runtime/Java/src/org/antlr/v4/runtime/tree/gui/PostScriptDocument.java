@@ -31,10 +31,12 @@
 package org.antlr.v4.runtime.tree.gui;
 
 public class PostScriptDocument {
+	public static final String DEFAULT_FONT = "Courier New";
+
 	protected int boundingBoxWidth;
 	protected int boundingBoxHeight;
 
-	protected BasicFontMetrics fontMetrics;
+	protected SystemFontMetrics fontMetrics;
 	protected String fontName;
 	protected int fontSize = 12;
 	protected double lineWidth = 0.3;
@@ -44,7 +46,7 @@ public class PostScriptDocument {
 	protected boolean closed = false;
 
 	public PostScriptDocument() {
-		this("CourierNew", 12);
+		this(DEFAULT_FONT, 12);
 	}
 
 	public PostScriptDocument(String fontName, int fontSize) {
@@ -96,23 +98,17 @@ public class PostScriptDocument {
 				 "        fill\n" +
 				 "        grestore\n" +
 				 "        end\n" +
-				 "} def");
+				 "} def\n");
 
 		return b;
 	}
 
 	// Courier, Helvetica, Times, ... should be available
 	public void setFont(String fontName, int fontSize) {
-		this.fontName = fontName;
+		this.fontMetrics = new SystemFontMetrics(fontName);
+		this.fontName = fontMetrics.getFont().getPSName();
 		this.fontSize = fontSize;
-		try {
-			Class<?> c = Class.forName("org.antlr.v4.runtime.tree.gui." + fontName);
-			this.fontMetrics = (BasicFontMetrics)c.newInstance();
-		}
-		catch (Exception e) {
-			throw new UnsupportedOperationException("No font metrics for "+fontName);
-		}
-		ps.append(String.format("/%s findfont\n%d scalefont setfont\n", fontName, fontSize));
+		ps.append(String.format("/%s findfont %d scalefont setfont\n", this.fontName, fontSize));
 	}
 
 	public void lineWidth(double w) {
