@@ -1,5 +1,14 @@
 ANTLR v4 Honey Badger
 
+January 11, 2013
+
+* Updated error 72, 76; added 73-74 and 136-143: detailed errors about name
+  conflicts
+* Report exact location for parameter/retval/local name conflicts
+* Add error 144: multi-character literals are not allowed in lexer sets
+* Error 134 now only applies to rule references in lexer sets
+* Updated error messages (cleanup)
+
 January 10, 2013
 
 * Add error 135: cannot assign a value to list label: $label
