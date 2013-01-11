@@ -242,15 +242,13 @@ public class SymbolChecks {
 		}
 
 		Set<String> conflictingKeys = attributes.intersection(referenceAttributes);
-		if (conflictingKeys!=null) {
-			for (String key : conflictingKeys) {
-				errMgr.grammarError(
-					errorType,
-					g.fileName,
-					attributes.get(key).token != null ? attributes.get(key).token : ((GrammarAST) r.ast.getChild(0)).token,
-					key,
-					r.name);
-			}
+		for (String key : conflictingKeys) {
+			errMgr.grammarError(
+				errorType,
+				g.fileName,
+				attributes.get(key).token != null ? attributes.get(key).token : ((GrammarAST) r.ast.getChild(0)).token,
+				key,
+				r.name);
 		}
 	}
 

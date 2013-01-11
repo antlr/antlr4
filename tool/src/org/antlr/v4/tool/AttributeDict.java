@@ -30,14 +30,18 @@
 
 package org.antlr.v4.tool;
 
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.ast.GrammarAST;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
 /** Track the attributes within retval, arg lists etc...
- *
+ *  <p/>
  *  Each rule has potentially 3 scopes: return values,
  *  parameters, and an implicitly-named scope (i.e., a scope defined in a rule).
  *  Implicitly-defined scopes are named after the rule; rules and scopes then
@@ -48,9 +52,9 @@ public class AttributeDict {
     public GrammarAST ast;
 	public DictType type;
 
-    /** All token scopes (token labels) share the same fixed scope of
-     *  of predefined attributes.  I keep this out of the runtime.Token
-     *  object to avoid a runtime type leakage.
+    /** All {@link Token} scopes (token labels) share the same fixed scope of
+     *  of predefined attributes.  I keep this out of the {@link Token}
+     *  interface to avoid a runtime type leakage.
      */
     public static final AttributeDict predefinedTokenDict = new AttributeDict(DictType.TOKEN);
     static {
@@ -68,9 +72,9 @@ public class AttributeDict {
 		PREDEFINED_RULE, PREDEFINED_LEXER_RULE,
     }
 
-    /** The list of Attribute objects */
-
-    public LinkedHashMap<String, Attribute> attributes =
+    /** The list of {@link Attribute} objects. */
+	@NotNull
+    public final LinkedHashMap<String, Attribute> attributes =
         new LinkedHashMap<String, Attribute>();
 
 	public AttributeDict() {}
@@ -83,26 +87,20 @@ public class AttributeDict {
         return name;
     }
 
-    public int size() { return attributes==null?0:attributes.size(); }
+    public int size() { return attributes.size(); }
 
     /** Return the set of keys that collide from
-     *  this and other.
+     *  {@code this} and {@code other}.
      */
-    public Set<String> intersection(AttributeDict other) {
+	@NotNull
+    public Set<String> intersection(@Nullable AttributeDict other) {
         if ( other==null || other.size()==0 || size()==0 ) {
-            return null;
+            return Collections.emptySet();
         }
-        Set<String> inter = new HashSet<String>();
-        Set<String> thisKeys = attributes.keySet();
-		for (String key : thisKeys) {
-			if (other.attributes.get(key) != null) {
-				inter.add(key);
-			}
-		}
-        if ( inter.isEmpty() ) {
-            return null;
-        }
-        return inter;
+
+		Set<String> result = new HashSet<String>(attributes.keySet());
+		result.retainAll(other.attributes.keySet());
+		return result;
     }
 
     @Override
