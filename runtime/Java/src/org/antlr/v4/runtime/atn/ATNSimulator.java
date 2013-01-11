@@ -43,7 +43,7 @@ import java.util.List;
 public abstract class ATNSimulator {
 	public static final int SERIALIZED_VERSION;
 	static {
-		SERIALIZED_VERSION = 1;
+		SERIALIZED_VERSION = 2;
 	}
 
 	/** Must distinguish between missing edge and edge we know leads nowhere */
@@ -99,6 +99,12 @@ public abstract class ATNSimulator {
 	}
 
 	public static ATN deserialize(@NotNull char[] data) {
+		data = data.clone();
+		// don't adjust the first value since that's the version number
+		for (int i = 1; i < data.length; i++) {
+			data[i] = (char)(data[i] - 2);
+		}
+
 		ATN atn = new ATN();
 		List<IntervalSet> sets = new ArrayList<IntervalSet>();
 		int p = 0;

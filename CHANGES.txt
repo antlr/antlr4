@@ -8,6 +8,9 @@ January 11, 2013
 * Add error 144: multi-character literals are not allowed in lexer sets
 * Error 134 now only applies to rule references in lexer sets
 * Updated error messages (cleanup)
+* Reduce size of _serializedATN by adding 2 to each element: new representation
+  avoids embedded values 0 and 0xFFFF which are common and have multi-byte
+  representations in Java's modified UTF-8
 
 January 10, 2013
 
