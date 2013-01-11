@@ -30,7 +30,9 @@
 
 package org.antlr.v4.test;
 
+import org.antlr.v4.tool.ErrorType;
 import org.junit.Test;
+import org.stringtemplate.v4.ST;
 
 public class TestBasicSemanticErrors extends BaseTest {
     static String[] U = {
@@ -85,4 +87,31 @@ public class TestBasicSemanticErrors extends BaseTest {
 		testErrors(new String[] { grammar, expected }, false);
 	}
 
+	@Test
+	public void testArgumentRetvalLocalConflicts() throws Exception {
+		String grammarTemplate =
+			"grammar T;\n" +
+			"ss<if(args)>[<args>]<endif> <if(retvals)>returns [<retvals>]<endif>\n" +
+			"<if(locals)>locals [<locals>]<endif>\n" +
+			"  : <body> EOF;\n" +
+			"expr : '=';\n";
+
+		String expected =
+			"error(" + ErrorType.ARG_CONFLICTS_WITH_RULE.code + "): T.g4:2:7: parameter expr conflicts with rule with same name\n" +
+			"error(" + ErrorType.RETVAL_CONFLICTS_WITH_RULE.code + "): T.g4:2:26: return value expr conflicts with rule with same name\n" +
+			"error(" + ErrorType.LOCAL_CONFLICTS_WITH_RULE.code + "): T.g4:3:12: local expr conflicts with rule with same name\n" +
+			"error(" + ErrorType.RETVAL_CONFLICTS_WITH_ARG.code + "): T.g4:2:26: return value expr conflicts with parameter with same name\n" +
+			"error(" + ErrorType.LOCAL_CONFLICTS_WITH_ARG.code + "): T.g4:3:12: local expr conflicts with parameter with same name\n" +
+			"error(" + ErrorType.LOCAL_CONFLICTS_WITH_RETVAL.code + "): T.g4:3:12: local expr conflicts with return value with same name\n" +
+			"error(" + ErrorType.LABEL_CONFLICTS_WITH_RULE.code + "): T.g4:4:4: label expr conflicts with rule with same name\n" +
+			"error(" + ErrorType.LABEL_CONFLICTS_WITH_ARG.code + "): T.g4:4:4: label expr conflicts with parameter with same name\n" +
+			"error(" + ErrorType.LABEL_CONFLICTS_WITH_RETVAL.code + "): T.g4:4:4: label expr conflicts with return value with same name\n" +
+			"error(" + ErrorType.LABEL_CONFLICTS_WITH_LOCAL.code + "): T.g4:4:4: label expr conflicts with local with same name\n";
+		ST grammarST = new ST(grammarTemplate);
+		grammarST.add("args", "int expr");
+		grammarST.add("retvals", "int expr");
+		grammarST.add("locals", "int expr");
+		grammarST.add("body", "expr=expr");
+		testErrors(new String[] { grammarST.render(), expected }, false);
+	}
 }

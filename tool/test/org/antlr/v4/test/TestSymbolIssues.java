@@ -96,8 +96,8 @@ public class TestSymbolIssues extends BaseTest {
         "        :       ID ;",
 
         // YIELDS
-        "error(72): D.g4:4:21: label j conflicts with rule a's return value or parameter with same name\n" +
-		"error(76): D.g4:6:6: rule b's argument i conflicts a return value with same name\n"
+        "error(72): D.g4:4:21: label j conflicts with parameter with same name\n" +
+		"error(76): D.g4:6:22: return value i conflicts with parameter with same name\n"
     };
 
 	static String[] E = {

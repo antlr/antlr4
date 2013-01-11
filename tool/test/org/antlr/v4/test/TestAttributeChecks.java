@@ -51,8 +51,7 @@ public class TestAttributeChecks extends BaseTest {
         "b[int d] returns [int e]\n" +
         "    :   {<inline2>}\n" +
         "    ;\n" +
-        "c   :   ;\n" +
-		"d	 :   ;\n";
+        "c   :   ;\n";
 
     String[] membersChecks = {
 		"$a",			"error(63): A.g4:2:11: unknown attribute reference a in $a\n",
