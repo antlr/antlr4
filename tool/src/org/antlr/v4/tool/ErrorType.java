@@ -116,7 +116,7 @@ public enum ErrorType {
 	LEXER_ACTION_PLACEMENT_ISSUE(132, "action in lexer rule <arg> must be last element of single outermost alt", ErrorSeverity.ERROR),
 	LEXER_COMMAND_PLACEMENT_ISSUE(133, "->command in lexer rule <arg> must be last element of single outermost alt", ErrorSeverity.ERROR),
 	USE_OF_BAD_WORD(134, "symbol <arg> conflicts with generated code in target language or runtime", ErrorSeverity.ERROR),
-	INVALID_LEXER_SET_ELEMENT(134, "lexer set element <arg> is invalid (either lexer rule ref or literal with > 1 char)", ErrorSeverity.ERROR),
+	UNSUPPORTED_REFERENCE_IN_LEXER_SET(134, "rule reference <arg> is not currently supported in a set", ErrorSeverity.ERROR),
 	ASSIGNMENT_TO_LIST_LABEL(135, "cannot assign a value to list label: $<arg>", ErrorSeverity.ERROR),
 	RETVAL_CONFLICTS_WITH_RULE(136, "return value <arg> conflicts with rule with same name", ErrorSeverity.ERROR),
 	RETVAL_CONFLICTS_WITH_TOKEN(137, "return value <arg> conflicts with token with same name", ErrorSeverity.ERROR),
@@ -126,6 +126,7 @@ public enum ErrorType {
 	LOCAL_CONFLICTS_WITH_TOKEN(141, "local <arg> conflicts with rule token same name", ErrorSeverity.ERROR),
 	LOCAL_CONFLICTS_WITH_ARG(142, "local <arg> conflicts with parameter with same name", ErrorSeverity.ERROR),
 	LOCAL_CONFLICTS_WITH_RETVAL(143, "local <arg> conflicts with return value with same name", ErrorSeverity.ERROR),
+	INVALID_LITERAL_IN_LEXER_SET(144, "multi-character literals are not allowed in lexer sets: <arg>", ErrorSeverity.ERROR),
 
 	// Backward incompatibility errors
 	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR 4", ErrorSeverity.ERROR),
