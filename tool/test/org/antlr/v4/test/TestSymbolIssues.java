@@ -53,16 +53,16 @@ public class TestSymbolIssues extends BaseTest {
         "\n" +
         "ID : 'a'..'z'+ ID ;",
         // YIELDS
-			"error(94): A.g4:5:1: redefinition of members action\n" +
-			"error(94): A.g4:7:1: redefinition of header action\n" +
-			"warning(83): A.g4:2:10: illegal option opt\n" +
-			"warning(83): A.g4:2:21: illegal option k\n" +
-			"error(94): A.g4:5:1: redefinition of members action\n" +
-			"warning(125): A.g4:9:27: implicit definition of token X in parser\n" +
-			"warning(125): A.g4:10:20: implicit definition of token Y in parser\n" +
-			"warning(125): A.g4:11:4: implicit definition of token FJKD in parser\n" +
-			"error(80): A.g4:9:37: rule b has no defined parameters\n" +
-			"error(79): A.g4:10:31: missing parameter(s) on rule reference: a\n"
+			"error(94): A.g4:5:1: redefinition of 'members' action\n" +
+			"error(94): A.g4:7:1: redefinition of 'header' action\n" +
+			"warning(83): A.g4:2:10: illegal option 'opt'\n" +
+			"warning(83): A.g4:2:21: illegal option 'k'\n" +
+			"error(94): A.g4:5:1: redefinition of 'members' action\n" +
+			"warning(125): A.g4:9:27: implicit definition of token 'X' in parser\n" +
+			"warning(125): A.g4:10:20: implicit definition of token 'Y' in parser\n" +
+			"warning(125): A.g4:11:4: implicit definition of token 'FJKD' in parser\n" +
+			"error(80): A.g4:9:37: rule 'b' has no defined parameters\n" +
+			"error(79): A.g4:10:31: missing arguments(s) on rule reference: a\n"
     };
 
     static String[] B = {
@@ -76,11 +76,11 @@ public class TestSymbolIssues extends BaseTest {
         "\n" +
         "s : FOO ;",
         // YIELDS
-		"error(69): B.g4:4:4: label s conflicts with rule with same name\n" +
-		"error(69): B.g4:4:9: label b conflicts with rule with same name\n" +
-		"error(70): B.g4:4:15: label X conflicts with token with same name\n" +
-		"error(75): B.g4:6:9: label x type mismatch with previous definition: TOKEN_LIST_LABEL!=TOKEN_LABEL\n" +
-		"error(126): B.g4:4:20: cannot create implicit token for string literal '.' in non-combined grammar\n"
+		"error(69): B.g4:4:4: label 's' conflicts with rule with same name\n" +
+		"error(69): B.g4:4:9: label 'b' conflicts with rule with same name\n" +
+		"error(70): B.g4:4:15: label 'X' conflicts with token with same name\n" +
+		"error(75): B.g4:6:9: label 'x' type mismatch with previous definition: TOKEN_LIST_LABEL!=TOKEN_LABEL\n" +
+		"error(126): B.g4:4:20: cannot create implicit token for string literal in non-combined grammar: '.'\n"
     };
 
     static String[] D = {
@@ -96,8 +96,8 @@ public class TestSymbolIssues extends BaseTest {
         "        :       ID ;",
 
         // YIELDS
-        "error(72): D.g4:4:21: label j conflicts with parameter with same name\n" +
-		"error(76): D.g4:6:22: return value i conflicts with parameter with same name\n"
+        "error(72): D.g4:4:21: label 'j' conflicts with parameter with same name\n" +
+		"error(76): D.g4:6:22: return value 'i' conflicts with parameter with same name\n"
     };
 
 	static String[] E = {
@@ -111,7 +111,7 @@ public class TestSymbolIssues extends BaseTest {
 		"a : A ;\n",
 
 		// YIELDS
-		"warning(108): E.g4:3:4: token name A is already defined\n"
+		"warning(108): E.g4:3:4: token name 'A' is already defined\n"
 	};
 
     @Test public void testA() { super.testErrors(A, false); }

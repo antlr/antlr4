@@ -237,7 +237,7 @@ public class TestSets extends BaseTest {
 			"a : A {System.out.println($A.text);} ;\n" +
 			"A : ~('a'|B) ;\n" +
 			"B : 'b' ;\n",
-			"error(134): T.g4:3:10: rule reference B is not currently supported in a set\n"
+			"error(134): T.g4:3:10: rule reference 'B' is not currently supported in a set\n"
 		};
 		super.testErrors(pair, true);
 	}
