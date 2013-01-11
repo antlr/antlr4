@@ -132,7 +132,7 @@ public void discoverRules(GrammarAST rules) { }
 public void finishRules(GrammarAST rule) { }
 public void discoverRule(RuleAST rule, GrammarAST ID, List<GrammarAST> modifiers,
 						 ActionAST arg, ActionAST returns, GrammarAST thrws,
-						 GrammarAST options, GrammarAST locals,
+						 GrammarAST options, ActionAST locals,
 						 List<GrammarAST> actions,
 						 GrammarAST block) { }
 public void finishRule(RuleAST rule, GrammarAST ID, GrammarAST block) { }
