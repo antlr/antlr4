@@ -75,7 +75,7 @@ public class TreePostScriptGenerator {
 	protected PostScriptDocument doc;
 
 	public TreePostScriptGenerator(@Nullable List<String> ruleNames, Tree root) {
-		this(ruleNames, root, "CourierNew", 11);
+		this(ruleNames, root, PostScriptDocument.DEFAULT_FONT, 11);
 	}
 
 	public TreePostScriptGenerator(@Nullable List<String> ruleNames, Tree root,

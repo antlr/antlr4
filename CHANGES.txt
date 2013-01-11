@@ -1,6 +1,20 @@
 ANTLR v4 Honey Badger
 
-January 2, 2012
+January 11, 2013
+
+* Updated error 72, 76; added 73-74 and 136-143: detailed errors about name
+  conflicts
+* Report exact location for parameter/retval/local name conflicts
+* Add error 144: multi-character literals are not allowed in lexer sets
+* Error 134 now only applies to rule references in lexer sets
+* Updated error messages (cleanup)
+
+January 10, 2013
+
+* Add error 135: cannot assign a value to list label: $label
+  (fixes antlr/antlr4#128)
+
+January 2, 2013
 
 * Fix EOF handling (antlr/antlr4#110)
 * Remove TREE_PARSER reference
@@ -8,7 +22,7 @@ January 2, 2012
 * Fix potential NPE in parser predicate evaluation
 * Fix termination condition detection in full-context parsing
 
-January 1, 2012
+January 1, 2013
 
 * Updated documentation
 * Minor code cleanup

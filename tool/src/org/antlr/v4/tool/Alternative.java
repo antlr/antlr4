@@ -122,7 +122,12 @@ public class Alternative implements AttributeResolver {
 			return rule.g.getRule(anyLabelDef.element.getText()).resolveRetvalOrProperty(y);
 		}
 		else if ( anyLabelDef!=null ) {
-			return rule.getPredefinedScope(anyLabelDef.type).get(y);
+			AttributeDict scope = rule.getPredefinedScope(anyLabelDef.type);
+			if (scope == null) {
+				return null;
+			}
+
+			return scope.get(y);
 		}
 		return null;
 	}

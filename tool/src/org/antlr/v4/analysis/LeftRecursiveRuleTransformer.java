@@ -167,7 +167,7 @@ public class LeftRecursiveRuleTransformer {
 		// update Rule to just one alt and add prec alt
 		ActionAST arg = (ActionAST)r.ast.getFirstChildWithType(ANTLRParser.ARG_ACTION);
 		if ( arg!=null ) {
-			r.args = ScopeParser.parseTypedArgList(arg.getText(), g.tool.errMgr);
+			r.args = ScopeParser.parseTypedArgList(arg, arg.getText(), g.tool.errMgr);
 			r.args.type = AttributeDict.DictType.ARG;
 			r.args.ast = arg;
 			arg.resolver = r.alt[1]; // todo: isn't this Rule or something?

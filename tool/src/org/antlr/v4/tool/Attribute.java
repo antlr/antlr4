@@ -30,6 +30,8 @@
 
 package org.antlr.v4.tool;
 
+import org.antlr.runtime.Token;
+
 /** Track the names of attributes define in arg lists, return values,
  *  scope blocks etc...
  */
@@ -43,7 +45,10 @@ public class Attribute {
     /** The name of the attribute "foo" */
     public String name;
 
-    /** The optional attribute intialization expression */
+	/** A {@link Token} giving the position of the name of this attribute in the grammar. */
+	public Token token;
+
+    /** The optional attribute initialization expression */
     public String initValue;
 
 	/** Who contains us? */

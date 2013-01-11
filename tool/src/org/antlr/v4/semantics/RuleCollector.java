@@ -68,7 +68,7 @@ public class RuleCollector extends GrammarTreeVisitor {
 	public void discoverRule(RuleAST rule, GrammarAST ID,
 							 List<GrammarAST> modifiers, ActionAST arg,
 							 ActionAST returns, GrammarAST thrws,
-							 GrammarAST options, GrammarAST locals,
+							 GrammarAST options, ActionAST locals,
 							 List<GrammarAST> actions,
 							 GrammarAST block)
 	{
@@ -83,20 +83,20 @@ public class RuleCollector extends GrammarTreeVisitor {
 		rules.put(r.name, r);
 
 		if ( arg!=null ) {
-			r.args = ScopeParser.parseTypedArgList(arg.getText(), g.tool.errMgr);
+			r.args = ScopeParser.parseTypedArgList(arg, arg.getText(), g.tool.errMgr);
 			r.args.type = AttributeDict.DictType.ARG;
 			r.args.ast = arg;
 			arg.resolver = r.alt[currentOuterAltNumber];
 		}
 
 		if ( returns!=null ) {
-			r.retvals = ScopeParser.parseTypedArgList(returns.getText(), g.tool.errMgr);
+			r.retvals = ScopeParser.parseTypedArgList(returns, returns.getText(), g.tool.errMgr);
 			r.retvals.type = AttributeDict.DictType.RET;
 			r.retvals.ast = returns;
 		}
 
 		if ( locals!=null ) {
-			r.locals = ScopeParser.parseTypedArgList(locals.getText(), g.tool.errMgr);
+			r.locals = ScopeParser.parseTypedArgList(locals, locals.getText(), g.tool.errMgr);
 			r.locals.type = AttributeDict.DictType.LOCAL;
 			r.locals.ast = returns;
 		}

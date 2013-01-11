@@ -184,13 +184,13 @@ public class LexerATNFactory extends ParserATNFactory {
 					set.add(c);
 				}
 				else {
-					g.tool.errMgr.grammarError(ErrorType.INVALID_LEXER_SET_ELEMENT,
+					g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
 											   g.fileName, t.getToken(), t.getText());
 
 				}
 			}
 			else if ( t.getType()==ANTLRParser.TOKEN_REF ) {
-				g.tool.errMgr.grammarError(ErrorType.INVALID_LEXER_SET_ELEMENT,
+				g.tool.errMgr.grammarError(ErrorType.UNSUPPORTED_REFERENCE_IN_LEXER_SET,
 										   g.fileName, t.getToken(), t.getText());
 			}
 		}
