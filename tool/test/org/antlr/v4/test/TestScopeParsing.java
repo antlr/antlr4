@@ -59,7 +59,7 @@ public class TestScopeParsing extends BaseTest {
         for (int i = 0; i < argPairs.length; i+=2) {
             String input = argPairs[i];
             String expected = argPairs[i+1];
-            String actual = ScopeParser.parseTypedArgList(input, new ErrorManager(null)).attributes.toString();
+            String actual = ScopeParser.parseTypedArgList(null, input, new ErrorManager(null)).attributes.toString();
             assertEquals(expected, actual);
         }
     }

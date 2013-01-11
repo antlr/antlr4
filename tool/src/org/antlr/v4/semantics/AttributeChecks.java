@@ -135,7 +135,7 @@ public class AttributeChecks implements ActionSplitterListener {
 			if ( rref!=null ) {
 				if ( rref.args!=null && rref.args.get(y.getText())!=null ) {
 					g.tool.errMgr.grammarError(ErrorType.INVALID_RULE_PARAMETER_REF,
-											  g.fileName, y, y.getText(), expr);
+											  g.fileName, y, y.getText(), rref.name, expr);
 				}
 				else {
 					errMgr.grammarError(ErrorType.UNKNOWN_RULE_ATTRIBUTE,

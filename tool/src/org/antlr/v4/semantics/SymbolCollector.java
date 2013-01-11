@@ -92,7 +92,7 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	public void discoverRule(RuleAST rule, GrammarAST ID,
 							 List<GrammarAST> modifiers, ActionAST arg,
 							 ActionAST returns, GrammarAST thrws,
-							 GrammarAST options, GrammarAST locals,
+							 GrammarAST options, ActionAST locals,
 							 List<GrammarAST> actions,
 							 GrammarAST block)
 	{

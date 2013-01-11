@@ -237,7 +237,19 @@ public class TestSets extends BaseTest {
 			"a : A {System.out.println($A.text);} ;\n" +
 			"A : ~('a'|B) ;\n" +
 			"B : 'b' ;\n",
-			"error(134): T.g4:3:10: lexer set element B is invalid (either lexer rule ref or literal with > 1 char)\n"
+			"error(134): T.g4:3:10: rule reference 'B' is not currently supported in a set\n"
+		};
+		super.testErrors(pair, true);
+	}
+
+	@Test public void testNotCharSetWithString() throws Exception {
+		// might be a useful feature to add someday
+		String[] pair = new String[] {
+			"grammar T;\n" +
+			"a : A {System.out.println($A.text);} ;\n" +
+			"A : ~('a'|'aa') ;\n" +
+			"B : 'b' ;\n",
+			"error(144): T.g4:3:10: multi-character literals are not allowed in lexer sets: 'aa'\n"
 		};
 		super.testErrors(pair, true);
 	}

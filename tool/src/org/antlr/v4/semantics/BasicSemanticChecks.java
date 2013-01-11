@@ -149,7 +149,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 							 List<GrammarAST> modifiers,
 							 ActionAST arg, ActionAST returns,
 							 GrammarAST thrws, GrammarAST options,
-							 GrammarAST locals,
+							 ActionAST locals,
 							 List<GrammarAST> actions, GrammarAST block)
 	{
 		// TODO: chk that all or no alts have "# label"
