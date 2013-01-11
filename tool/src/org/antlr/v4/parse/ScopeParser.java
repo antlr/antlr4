@@ -30,10 +30,16 @@
 
 package org.antlr.v4.parse;
 
+import org.antlr.runtime.BaseRecognizer;
+import org.antlr.runtime.CommonToken;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.AttributeDict;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.ast.ActionAST;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,15 +62,17 @@ public class ScopeParser {
      *
      *  convert to an attribute scope.
      */
-    public static AttributeDict parseTypedArgList(String s, ErrorManager errMgr) { return parse(s, ',', errMgr); }
+	public static AttributeDict parseTypedArgList(@Nullable ActionAST action, String s, ErrorManager errMgr) {
+		return parse(action, s, ',', errMgr);
+	}
 
-    public static AttributeDict parse(String s, char separator, ErrorManager errMgr) {
+    public static AttributeDict parse(@Nullable ActionAST action, String s, char separator, ErrorManager errMgr) {
         AttributeDict dict = new AttributeDict();
-		List<String> decls = splitDecls(s, separator);
-		for (String decl : decls) {
+		List<Pair<String, Integer>> decls = splitDecls(s, separator);
+		for (Pair<String, Integer> decl : decls) {
 //            System.out.println("decl="+decl);
-            if ( decl.trim().length()>0 ) {
-                Attribute a = parseAttributeDef(decl, errMgr);
+            if ( decl.a.trim().length()>0 ) {
+                Attribute a = parseAttributeDef(action, decl, errMgr);
                 dict.add(a);
             }
 		}
@@ -76,27 +84,27 @@ public class ScopeParser {
      *  but if the separator is ',' you cannot use ',' in the initvalue
      *  unless you escape use "\," escape.
      */
-    public static Attribute parseAttributeDef(String decl, ErrorManager errMgr) {
-        if ( decl==null ) return null;
+    public static Attribute parseAttributeDef(@Nullable ActionAST action, @NotNull Pair<String, Integer> decl, ErrorManager errMgr) {
+        if ( decl.a==null ) return null;
         Attribute attr = new Attribute();
         boolean inID = false;
         int start = -1;
-        int rightEdgeOfDeclarator = decl.length()-1;
-        int equalsIndex = decl.indexOf('=');
+        int rightEdgeOfDeclarator = decl.a.length()-1;
+        int equalsIndex = decl.a.indexOf('=');
         if ( equalsIndex>0 ) {
             // everything after the '=' is the init value
-            attr.initValue = decl.substring(equalsIndex+1,decl.length());
+            attr.initValue = decl.a.substring(equalsIndex+1,decl.a.length());
             rightEdgeOfDeclarator = equalsIndex-1;
         }
         // walk backwards looking for start of an ID
         for (int i=rightEdgeOfDeclarator; i>=0; i--) {
             // if we haven't found the end yet, keep going
-            if ( !inID && Character.isLetterOrDigit(decl.charAt(i)) ) {
+            if ( !inID && Character.isLetterOrDigit(decl.a.charAt(i)) ) {
                 inID = true;
             }
             else if ( inID &&
-                      !(Character.isLetterOrDigit(decl.charAt(i))||
-                       decl.charAt(i)=='_') ) {
+                      !(Character.isLetterOrDigit(decl.a.charAt(i))||
+                       decl.a.charAt(i)=='_') ) {
                 start = i+1;
                 break;
             }
@@ -111,8 +119,8 @@ public class ScopeParser {
         int stop=-1;
         for (int i=start; i<=rightEdgeOfDeclarator; i++) {
             // if we haven't found the end yet, keep going
-            if ( !(Character.isLetterOrDigit(decl.charAt(i))||
-                decl.charAt(i)=='_') )
+            if ( !(Character.isLetterOrDigit(decl.a.charAt(i))||
+                decl.a.charAt(i)=='_') )
             {
                 stop = i;
                 break;
@@ -123,19 +131,63 @@ public class ScopeParser {
         }
 
         // the name is the last ID
-        attr.name = decl.substring(start,stop);
+        attr.name = decl.a.substring(start,stop);
 
         // the type is the decl minus the ID (could be empty)
-        attr.type = decl.substring(0,start);
+        attr.type = decl.a.substring(0,start);
         if ( stop<=rightEdgeOfDeclarator ) {
-            attr.type += decl.substring(stop,rightEdgeOfDeclarator+1);
+            attr.type += decl.a.substring(stop,rightEdgeOfDeclarator+1);
         }
         attr.type = attr.type.trim();
         if ( attr.type.length()==0 ) {
             attr.type = null;
         }
 
-        attr.decl = decl;
+        attr.decl = decl.a;
+
+		if (action != null) {
+			String actionText = action.getText();
+			int[] lines = new int[actionText.length()];
+			int[] charPositionInLines = new int[actionText.length()];
+			for (int i = 0, line = 0, col = 0; i < actionText.length(); i++, col++) {
+				lines[i] = line;
+				charPositionInLines[i] = col;
+				if (actionText.charAt(i) == '\n') {
+					line++;
+					col = -1;
+				}
+			}
+
+			int[] charIndexes = new int[actionText.length()];
+			for (int i = 0, j = 0; i < actionText.length(); i++, j++) {
+				charIndexes[j] = i;
+				if (i < actionText.length() - 1 && actionText.charAt(i) == '/' && actionText.charAt(i + 1) == '/') {
+					while (i < actionText.length() && actionText.charAt(i) != '\n') {
+						i++;
+					}
+				}
+			}
+
+			int declOffset = charIndexes[decl.b];
+			int declLine = lines[declOffset + start];
+
+			int line = action.getToken().getLine() + declLine;
+			int charPositionInLine = charPositionInLines[declOffset + start];
+			if (declLine == 0) {
+				/* offset for the start position of the ARG_ACTION token, plus 1
+				 * since the ARG_ACTION text had the leading '[' stripped before
+				 * reaching the scope parser.
+				 */
+				charPositionInLine += action.getToken().getCharPositionInLine() + 1;
+			}
+
+			int offset = ((CommonToken)action.getToken()).getStartIndex();
+			attr.token = new CommonToken(action.getToken().getInputStream(), ANTLRParser.ID, BaseRecognizer.DEFAULT_TOKEN_CHANNEL, offset + declOffset + start + 1, offset + declOffset + stop);
+			attr.token.setLine(line);
+			attr.token.setCharPositionInLine(charPositionInLine);
+			assert attr.name.equals(attr.token.getText()) : "Attribute text should match the pseudo-token text at this point.";
+		}
+
         return attr;
     }
 
@@ -147,8 +199,8 @@ public class ScopeParser {
      *  convert to a list of attributes.  Allow nested square brackets etc...
      *  Set separatorChar to ';' or ',' or whatever you want.
      */
-    public static List<String> splitDecls(String s, int separatorChar) {
-        List<String> args = new ArrayList<String>();
+    public static List<Pair<String, Integer>> splitDecls(String s, int separatorChar) {
+        List<Pair<String, Integer>> args = new ArrayList<Pair<String, Integer>>();
         _splitArgumentList(s, 0, -1, separatorChar, args);
         return args;
     }
@@ -157,12 +209,13 @@ public class ScopeParser {
                                          int start,
                                          int targetChar,
                                          int separatorChar,
-                                         List<String> args)
+                                         List<Pair<String, Integer>> args)
     {
         if ( actionText==null ) {
             return -1;
         }
-        actionText = actionText.replaceAll("//.*\n", "");
+
+        actionText = actionText.replaceAll("//[^\\n]*", "");
         int n = actionText.length();
         //System.out.println("actionText@"+start+"->"+(char)targetChar+"="+actionText.substring(start,n));
         int p = start;
@@ -216,8 +269,12 @@ public class ScopeParser {
                 default :
                     if ( c==separatorChar && targetChar==-1 ) {
                         String arg = actionText.substring(last, p);
+						int index = last;
+						while (index < p && Character.isWhitespace(actionText.charAt(index))) {
+							index++;
+						}
                         //System.out.println("arg="+arg);
-                        args.add(arg.trim());
+                        args.add(new Pair<String, Integer>(arg.trim(), index));
                         last = p+1;
                     }
                     p++;
@@ -226,9 +283,13 @@ public class ScopeParser {
         }
         if ( targetChar==-1 && p<=n ) {
             String arg = actionText.substring(last, p).trim();
+			int index = last;
+			while (index < p && Character.isWhitespace(actionText.charAt(index))) {
+				index++;
+			}
             //System.out.println("arg="+arg);
             if ( arg.length()>0 ) {
-                args.add(arg.trim());
+                args.add(new Pair<String, Integer>(arg.trim(), index));
             }
         }
         p++;
