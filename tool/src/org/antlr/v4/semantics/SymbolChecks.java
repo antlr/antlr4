@@ -201,7 +201,7 @@ public class SymbolChecks {
 					errMgr.grammarError(
 						ErrorType.ARG_RETVAL_CONFLICT,
 						g.fileName,
-						((GrammarAST) r.ast.getChild(0)).token,
+						r.args.get(key).token != null ? r.args.get(key).token : ((GrammarAST) r.ast.getChild(0)).token,
 						key,
 						r.name);
 				}
