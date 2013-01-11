@@ -8,6 +8,8 @@ January 11, 2013
 * Add error 144: multi-character literals are not allowed in lexer sets
 * Error 134 now only applies to rule references in lexer sets
 * Updated error messages (cleanup)
+* Allow restriction of individual decisions to SLL prediction; blocks in parsers
+  support an "sll=true;" option to explicitly specify
 
 January 10, 2013
 

@@ -49,7 +49,7 @@ import java.util.List;
 public abstract class ATNSimulator {
 	public static final int SERIALIZED_VERSION;
 	static {
-		SERIALIZED_VERSION = 3;
+		SERIALIZED_VERSION = 4;
 	}
 
 	public static final char RULE_VARIANT_DELIMITER = '$';
@@ -130,6 +130,12 @@ public abstract class ATNSimulator {
 		for (int i = 0; i < numNonGreedyStates; i++) {
 			int stateNumber = toInt(data[p++]);
 			((DecisionState)atn.states.get(stateNumber)).nonGreedy = true;
+		}
+
+		int numSllDecisions = toInt(data[p++]);
+		for (int i = 0; i < numSllDecisions; i++) {
+			int stateNumber = toInt(data[p++]);
+			((DecisionState)atn.states.get(stateNumber)).sll = true;
 		}
 
 		int numPrecedenceStates = toInt(data[p++]);

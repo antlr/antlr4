@@ -336,7 +336,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			useContext |= dfa != null && dfa.isContextSensitive();
 		}
 
-		userWantsCtxSensitive = useContext || (predictionMode != PredictionMode.SLL && (outerContext != null));
+		userWantsCtxSensitive = useContext || (predictionMode != PredictionMode.SLL && outerContext != null && !atn.decisionToState.get(decision).sll);
 		if (outerContext == null) {
 			outerContext = ParserRuleContext.emptyContext();
 		}

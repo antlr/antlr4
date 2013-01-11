@@ -111,6 +111,7 @@ public class ATNSerializer {
 
 		// dump states, count edges and collect sets while doing so
 		IntegerList nonGreedyStates = new IntegerList();
+		IntegerList sllStates = new IntegerList();
 		IntegerList precedenceStates = new IntegerList();
 		data.add(atn.states.size());
 		for (ATNState s : atn.states) {
@@ -120,8 +121,15 @@ public class ATNSerializer {
 			}
 
 			int stateType = s.getStateType();
-			if (s instanceof DecisionState && ((DecisionState)s).nonGreedy) {
-				nonGreedyStates.add(s.stateNumber);
+			if (s instanceof DecisionState) {
+				DecisionState decisionState = (DecisionState)s;
+				if (decisionState.nonGreedy) {
+					nonGreedyStates.add(s.stateNumber);
+				}
+
+				if (decisionState.sll) {
+					sllStates.add(s.stateNumber);
+				}
 			}
 
 			if (s instanceof RuleStartState && ((RuleStartState)s).isPrecedenceRule) {
@@ -156,6 +164,12 @@ public class ATNSerializer {
 		data.add(nonGreedyStates.size());
 		for (int i = 0; i < nonGreedyStates.size(); i++) {
 			data.add(nonGreedyStates.get(i));
+		}
+
+		// SLL decisions
+		data.add(sllStates.size());
+		for (int i = 0; i < sllStates.size(); i++) {
+			data.add(sllStates.get(i));
 		}
 
 		// precedence states
@@ -307,14 +321,22 @@ public class ATNSerializer {
 				.append(ATNState.serializationNames.get(stype)).append(" ")
 				.append(ruleIndex).append(arg).append("\n");
 		}
+
 		int numNonGreedyStates = ATNSimulator.toInt(data[p++]);
 		for (int i = 0; i < numNonGreedyStates; i++) {
 			int stateNumber = ATNSimulator.toInt(data[p++]);
 		}
+
+		int numSllStates = ATNSimulator.toInt(data[p++]);
+		for (int i = 0; i < numSllStates; i++) {
+			int stateNumber = ATNSimulator.toInt(data[p++]);
+		}
+
 		int numPrecedenceStates = ATNSimulator.toInt(data[p++]);
 		for (int i = 0; i < numPrecedenceStates; i++) {
 			int stateNumber = ATNSimulator.toInt(data[p++]);
 		}
+
 		int nrules = ATNSimulator.toInt(data[p++]);
 		for (int i=0; i<nrules; i++) {
 			int s = ATNSimulator.toInt(data[p++]);
