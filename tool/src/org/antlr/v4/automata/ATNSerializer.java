@@ -55,6 +55,7 @@ import org.antlr.v4.tool.Rule;
 
 import java.io.InvalidClassException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ATNSerializer {
@@ -288,10 +289,28 @@ public class ATNSerializer {
 		for (DecisionState decStartState : atn.decisionToState) {
 			data.add(decStartState.stateNumber);
 		}
+
+		// don't adjust the first value since that's the version number
+		for (int i = 1; i < data.size(); i++) {
+			assert data.get(i) >= -1 && data.get(i) < 0xFFFF;
+			int value = (data.get(i) + 2) & 0xFFFF;
+			if (value == 0xFFFF) {
+				value = -1;
+			}
+
+			data.set(i, value);
+		}
+
 		return data;
 	}
 
 	public String decode(char[] data) {
+		data = data.clone();
+		// don't adjust the first value since that's the version number
+		for (int i = 1; i < data.length; i++) {
+			data[i] = (char)(data[i] - 2);
+		}
+
 		StringBuilder buf = new StringBuilder();
 		int p = 0;
 		int version = ATNSimulator.toInt(data[p++]);
@@ -397,7 +416,7 @@ public class ATNSerializer {
 
 	/** Used by Java target to encode short/int array as chars in string. */
 	public static String getSerializedAsString(Grammar g, ATN atn) {
-		return new String(Utils.toCharArray(getSerialized(g, atn)));
+		return new String(getSerializedAsChars(g, atn));
 	}
 
 	public static IntegerList getSerialized(Grammar g, ATN atn) {
@@ -405,7 +424,7 @@ public class ATNSerializer {
 	}
 
 	public static char[] getSerializedAsChars(Grammar g, ATN atn) {
-		return Utils.toCharArray(new ATNSerializer(g, atn).serialize());
+		return Utils.toCharArray(getSerialized(g, atn));
 	}
 
 	public static String getDecoded(Grammar g, ATN atn) {
