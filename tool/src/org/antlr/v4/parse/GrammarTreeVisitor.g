@@ -468,7 +468,15 @@ rules
     : ^(RULES {discoverRules($RULES);} (rule|lexerRule)* {finishRules($RULES);})
     ;
 
-mode : ^( MODE ID {currentModeName=$ID.text; modeDef($MODE, $ID);} lexerRule+ ) ;
+mode
+@init {
+	enterMode($start);
+}
+@after {
+	exitMode($start);
+}
+	:	^( MODE ID {currentModeName=$ID.text; modeDef($MODE, $ID);} lexerRule+ )
+	;
 
 lexerRule
 @init {
@@ -963,6 +971,12 @@ range
     ;
 
 terminal
+@init {
+	enterTerminal($start);
+}
+@after {
+	exitTerminal($start);
+}
     :  ^(STRING_LITERAL elementOptions)
     								{stringRef((TerminalAST)$STRING_LITERAL);}
     |	STRING_LITERAL				{stringRef((TerminalAST)$STRING_LITERAL);}
