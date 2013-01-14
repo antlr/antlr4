@@ -673,7 +673,11 @@ public abstract class BaseTest {
             try {
                 String[] lines = input.split("\n");
 				String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
-                g = new Grammar(fileName, input, equeue);
+				if (input.startsWith("lexer ")) {
+					g = new LexerGrammar(fileName, input, equeue);
+				} else {
+					g = new Grammar(fileName, input, equeue);
+				}
             }
             catch (org.antlr.runtime.RecognitionException re) {
                 re.printStackTrace(System.err);

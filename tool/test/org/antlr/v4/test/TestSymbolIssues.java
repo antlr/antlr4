@@ -30,6 +30,7 @@
 
 package org.antlr.v4.test;
 
+import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
@@ -137,5 +138,18 @@ public class TestSymbolIssues extends BaseTest {
 		assertEquals(expectedTokenIDToTypeMap, g.tokenNameToTypeMap.toString());
 		assertEquals(expectedStringLiteralToTypeMap, g.stringLiteralToTypeMap.toString());
 		assertEquals(expectedTypeToTokenList, realElements(g.typeToTokenList).toString());
+	}
+
+	@Test public void testEmptyLexerModeDetection() throws Exception {
+		String[] test = {
+			"lexer grammar L;\n" +
+			"A : 'a';\n" +
+			"mode X;\n" +
+			"fragment B : 'b';",
+
+			"error(" + ErrorType.MODE_WITHOUT_RULES.code + "): L.g4:3:5: lexer mode 'X' must contain at least one non-fragment rule\n"
+		};
+
+		testErrors(test, false);
 	}
 }

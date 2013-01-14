@@ -127,6 +127,7 @@ public enum ErrorType {
 	LOCAL_CONFLICTS_WITH_ARG(142, "local '<arg>' conflicts with parameter with same name", ErrorSeverity.ERROR),
 	LOCAL_CONFLICTS_WITH_RETVAL(143, "local '<arg>' conflicts with return value with same name", ErrorSeverity.ERROR),
 	INVALID_LITERAL_IN_LEXER_SET(144, "multi-character literals are not allowed in lexer sets: <arg>", ErrorSeverity.ERROR),
+	MODE_WITHOUT_RULES(145, "lexer mode '<arg>' must contain at least one non-fragment rule", ErrorSeverity.ERROR),
 
 	// Backward incompatibility errors
 	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR 4", ErrorSeverity.ERROR),
