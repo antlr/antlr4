@@ -720,6 +720,7 @@ lexerElement
 	|   SEMPRED						{sempredInAlt((PredAST)$SEMPRED);}
 	|   ^(ACTION elementOptions)	{actionInAlt((ActionAST)$ACTION);}
 	|   ^(SEMPRED elementOptions)	{sempredInAlt((PredAST)$SEMPRED);}
+	|	EPSILON
 	;
 
 labeledLexerElement
@@ -991,7 +992,7 @@ elementOptions
 @after {
 	exitElementOptions($start);
 }
-    :	^(ELEMENT_OPTIONS elementOption[(GrammarASTWithOptions)$start.getParent()]+)
+    :	^(ELEMENT_OPTIONS elementOption[(GrammarASTWithOptions)$start.getParent()]*)
     ;
 
 elementOption[GrammarASTWithOptions t]
