@@ -34,6 +34,7 @@ import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LL1Analyzer;
+import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
@@ -72,7 +73,7 @@ public class AnalysisPipeline {
 			}
 
 			LL1Analyzer analyzer = new LL1Analyzer(g.atn);
-			IntervalSet look = analyzer.LOOK(g.atn.ruleToStartState[rule.index], null);
+			IntervalSet look = analyzer.LOOK(g.atn.ruleToStartState[rule.index], PredictionContext.EMPTY_LOCAL);
 			if (look.contains(Token.EPSILON)) {
 				g.tool.errMgr.grammarError(ErrorType.EPSILON_TOKEN, g.fileName, ((GrammarAST)rule.ast.getChild(0)).getToken(), rule.name);
 			}
