@@ -46,15 +46,15 @@ import java.util.Set;
 
 /** */
 public class Target {
-	/** For pure strings of Java 16-bit unicode char, how can we display
+	/** For pure strings of Java 16-bit Unicode char, how can we display
 	 *  it in the target language as a literal.  Useful for dumping
 	 *  predicates and such that may refer to chars that need to be escaped
 	 *  when represented as strings.  Also, templates need to be escaped so
 	 *  that the target language can hold them as a string.
-	 *
+	 *  <p/>
 	 *  I have defined (via the constructor) the set of typical escapes,
-	 *  but your Target subclass is free to alter the translated chars or
-	 *  add more definitions.  This is nonstatic so each target can have
+	 *  but your {@link Target} subclass is free to alter the translated chars
+	 *  or add more definitions.  This is non-static so each target can have
 	 *  a different set in memory at same time.
 	 */
 	protected String[] targetCharValueEscape = new String[255];
@@ -245,16 +245,16 @@ public class Target {
 		return getTargetStringLiteralFromString(s, true);
 	}
 
-	/** Convert from an ANTLR string literal found in a grammar file to
-	 *  an equivalent string literal in the target language.  For Java, this
-	 *  is the translation 'a\n"' -> "a\n\"".  Expect single quotes
-	 *  around the incoming literal.  Just flip the quotes and replace
-	 *  double quotes with \"
-     *
-     *  Note that we have decided to allow people to use '\"' without
-	 *  penalty, so we must build the target string in a loop as Utils.replae
-	 *  cannot handle both \" and " without a lot of messing around.
-	 *
+	/**
+	 * Convert from an ANTLR string literal found in a grammar file to an
+	 * equivalent string literal in the target language. For Java, this is the
+	 * translation {@code 'a\n"'} &rarr; {@code "a\n\""}. Expect single quotes
+	 * around the incoming literal. Just flip the quotes and replace double
+	 * quotes with {@code \"}.
+	 * <p/>
+	 * Note that we have decided to allow people to use '\"' without penalty, so
+	 * we must build the target string in a loop as {@link Utils#replace} cannot
+	 * handle both {@code \"} and {@code "} without a lot of messing around.
 	 */
 	public String getTargetStringLiteralFromANTLRStringLiteral(
 		CodeGenerator generator,
@@ -283,10 +283,17 @@ public class Target {
                     case    'b':
                     case    'f':
                     case    '\\':
-                    case    'u':    // Assume unnnn
-						sb.append('\\');    // Pass the escape through as double \\
-						sb.append('\\');    // so that Java leaves as \u0000 string not char
+						// Pass the escape through
+						sb.append('\\');
                         break;
+
+					case    'u':    // Assume unnnn
+						// Pass the escape through as double \\
+						// so that Java leaves as \u0000 string not char
+						sb.append('\\');
+						sb.append('\\');
+                        break;
+
                     default:
                         // Remove the escape by virtue of not adding it here
                         // Thus \' becomes ' and so on
