@@ -136,92 +136,104 @@ public class TestAttributeChecks extends BaseTest {
 	};
 
 	String[] dynMembersChecks = {
-		"$S",			"",
-		"$S::i",		"",
-		"$S::i=$S::i",	"",
+		"$S",			"error(63): A.g4:2:11: unknown attribute reference 'S' in '$S'\n",
+		"$S::i",		"error(57): A.g4:2:11: reference to undefined rule 'S' in non-local ref '$S::i'\n",
+		"$S::i=$S::i",	"error(57): A.g4:2:11: reference to undefined rule 'S' in non-local ref '$S::i'\n" +
+						"error(57): A.g4:2:17: reference to undefined rule 'S' in non-local ref '$S::i'\n",
 
-		"$b::f",		"error(54): A.g4:3:1: unknown dynamic scope: b in $b::f\n",
-		"$S::j",		"error(55): A.g4:3:4: unknown dynamically-scoped attribute for scope S: j in $S::j\n",
-		"$S::j = 3;",	"error(55): A.g4:3:4: unknown dynamically-scoped attribute for scope S: j in $S::j = 3;\n",
-		"$S::j = $S::k;",	"error(55): A.g4:3:4: unknown dynamically-scoped attribute for scope S: j in $S::j = $S::k;\n" +
-							"error(55): A.g4:3:12: unknown dynamically-scoped attribute for scope S: k in $S::k\n",
+		"$b::f",		"error(65): A.g4:2:14: unknown attribute 'f' for rule 'b' in '$b::f'\n",
+		"$S::j",		"error(57): A.g4:2:11: reference to undefined rule 'S' in non-local ref '$S::j'\n",
+		"$S::j = 3;",	"error(57): A.g4:2:11: reference to undefined rule 'S' in non-local ref '$S::j = 3;'\n",
+		"$S::j = $S::k;",	"error(57): A.g4:2:11: reference to undefined rule 'S' in non-local ref '$S::j = $S::k;'\n",
 	};
 
 	String[] dynInitChecks = {
-		"$a",			"",
-		"$b",			"",
-		"$lab",			"",
-		"$b::f",		"",
-		"$S::i",		"",
-		"$S::i=$S::i",	"",
-		"$a::z",		"",
-		"$S",			"",
+		"$a",			"error(67): A.g4:5:8: missing attribute access on rule reference 'a' in '$a'\n",
+		"$b",			"error(63): A.g4:5:8: unknown attribute reference 'b' in '$b'\n",
+		"$lab",			"error(67): A.g4:5:8: missing attribute access on rule reference 'lab' in '$lab'\n",
+		"$b::f",		"error(65): A.g4:5:11: unknown attribute 'f' for rule 'b' in '$b::f'\n",
+		"$S::i",		"error(57): A.g4:5:8: reference to undefined rule 'S' in non-local ref '$S::i'\n",
+		"$S::i=$S::i",	"error(57): A.g4:5:8: reference to undefined rule 'S' in non-local ref '$S::i'\n" +
+						"error(57): A.g4:5:14: reference to undefined rule 'S' in non-local ref '$S::i'\n",
+		"$a::z",		"error(65): A.g4:5:11: unknown attribute 'z' for rule 'a' in '$a::z'\n",
+		"$S",			"error(63): A.g4:5:8: unknown attribute reference 'S' in '$S'\n",
 
-		"$S::j",		"error(55): A.g4:8:11: unknown dynamically-scoped attribute for scope S: j in $S::j\n",
-		"$S::j = 3;",	"error(55): A.g4:8:11: unknown dynamically-scoped attribute for scope S: j in $S::j = 3;\n",
-		"$S::j = $S::k;",	"error(55): A.g4:8:11: unknown dynamically-scoped attribute for scope S: j in $S::j = $S::k;\n" +
-							"error(55): A.g4:8:19: unknown dynamically-scoped attribute for scope S: k in $S::k\n",
+		"$S::j",		"error(57): A.g4:5:8: reference to undefined rule 'S' in non-local ref '$S::j'\n",
+		"$S::j = 3;",	"error(57): A.g4:5:8: reference to undefined rule 'S' in non-local ref '$S::j = 3;'\n",
+		"$S::j = $S::k;",	"error(57): A.g4:5:8: reference to undefined rule 'S' in non-local ref '$S::j = $S::k;'\n",
 	};
 
 	String[] dynInlineChecks = {
-		"$a",				"",
-		"$b",				"",
-		"$lab",				"",
-		"$b::f",			"",
-		"$S",				"",
-		"$S::i",			"",
-		"$S::i=$S::i",		"",
-		"$a::z",			"",
+		"$a",			"error(67): A.g4:7:4: missing attribute access on rule reference 'a' in '$a'\n",
+		"$b",			"error(67): A.g4:7:4: missing attribute access on rule reference 'b' in '$b'\n",
+		"$lab",			"error(67): A.g4:7:4: missing attribute access on rule reference 'lab' in '$lab'\n",
+		"$b::f",		"error(65): A.g4:7:7: unknown attribute 'f' for rule 'b' in '$b::f'\n",
+		"$S::i",		"error(57): A.g4:7:4: reference to undefined rule 'S' in non-local ref '$S::i'\n",
+		"$S::i=$S::i",	"error(57): A.g4:7:4: reference to undefined rule 'S' in non-local ref '$S::i'\n" +
+						"error(57): A.g4:7:10: reference to undefined rule 'S' in non-local ref '$S::i'\n",
+		"$a::z",		"error(65): A.g4:7:7: unknown attribute 'z' for rule 'a' in '$a::z'\n",
 
-		"$S::j",			"error(55): A.g4:10:7: unknown dynamically-scoped attribute for scope S: j in $S::j\n",
-		"$S::j = 3;",		"error(55): A.g4:10:7: unknown dynamically-scoped attribute for scope S: j in $S::j = 3;\n",
-		"$S::j = $S::k;",	"error(55): A.g4:10:7: unknown dynamically-scoped attribute for scope S: j in $S::j = $S::k;\n" +
-							"error(55): A.g4:10:15: unknown dynamically-scoped attribute for scope S: k in $S::k\n",
-		"$Q[-1]::y",        "error(54): A.g4:10:4: unknown dynamic scope: Q in $Q[-1]::y\n",
-		"$Q[-i]::y",        "error(54): A.g4:10:4: unknown dynamic scope: Q in $Q[-i]::y\n",
-		"$Q[i]::y",    		"error(54): A.g4:10:4: unknown dynamic scope: Q in $Q[i]::y\n",
-		"$Q[0]::y",    		"error(54): A.g4:10:4: unknown dynamic scope: Q in $Q[0]::y\n",
-		"$Q[-1]::y = 23;",  "error(54): A.g4:10:4: unknown dynamic scope: Q in $Q[-1]::y = 23;\n",
-		"$Q[-i]::y = 23;",  "error(54): A.g4:10:4: unknown dynamic scope: Q in $Q[-i]::y = 23;\n",
-		"$Q[i]::y = 23;",   "error(54): A.g4:10:4: unknown dynamic scope: Q in $Q[i]::y = 23;\n",
-		"$Q[0]::y = 23;",   "error(54): A.g4:10:4: unknown dynamic scope: Q in $Q[0]::y = 23;\n",
-		"$S[-1]::y",        "error(55): A.g4:10:11: unknown dynamically-scoped attribute for scope S: y in $S[-1]::y\n",
-		"$S[-i]::y",        "error(55): A.g4:10:11: unknown dynamically-scoped attribute for scope S: y in $S[-i]::y\n",
-		"$S[i]::y",     	"error(55): A.g4:10:10: unknown dynamically-scoped attribute for scope S: y in $S[i]::y\n",
-		"$S[0]::y",     	"error(55): A.g4:10:10: unknown dynamically-scoped attribute for scope S: y in $S[0]::y\n",
-		"$S[-1]::y = 23;",  "error(55): A.g4:10:11: unknown dynamically-scoped attribute for scope S: y in $S[-1]::y = 23;\n",
-		"$S[-i]::y = 23;",  "error(55): A.g4:10:11: unknown dynamically-scoped attribute for scope S: y in $S[-i]::y = 23;\n",
-		"$S[i]::y = 23;",   "error(55): A.g4:10:10: unknown dynamically-scoped attribute for scope S: y in $S[i]::y = 23;\n",
-		"$S[0]::y = 23;",   "error(55): A.g4:10:10: unknown dynamically-scoped attribute for scope S: y in $S[0]::y = 23;\n",
-		"$S[$S::y]::i",		"error(55): A.g4:10:10: unknown dynamically-scoped attribute for scope S: y in $S::y\n"
+		"$S::j",			"error(57): A.g4:7:4: reference to undefined rule 'S' in non-local ref '$S::j'\n",
+		"$S::j = 3;",		"error(57): A.g4:7:4: reference to undefined rule 'S' in non-local ref '$S::j = 3;'\n",
+		"$S::j = $S::k;",	"error(57): A.g4:7:4: reference to undefined rule 'S' in non-local ref '$S::j = $S::k;'\n",
+		"$Q[-1]::y",        "error(63): A.g4:7:4: unknown attribute reference 'Q' in '$Q'\n",
+		"$Q[-i]::y",        "error(63): A.g4:7:4: unknown attribute reference 'Q' in '$Q'\n",
+		"$Q[i]::y",    		"error(63): A.g4:7:4: unknown attribute reference 'Q' in '$Q'\n",
+		"$Q[0]::y",    		"error(63): A.g4:7:4: unknown attribute reference 'Q' in '$Q'\n",
+		"$Q[-1]::y = 23;",  "error(63): A.g4:7:4: unknown attribute reference 'Q' in '$Q'\n",
+		"$Q[-i]::y = 23;",  "error(63): A.g4:7:4: unknown attribute reference 'Q' in '$Q'\n",
+		"$Q[i]::y = 23;",   "error(63): A.g4:7:4: unknown attribute reference 'Q' in '$Q'\n",
+		"$Q[0]::y = 23;",   "error(63): A.g4:7:4: unknown attribute reference 'Q' in '$Q'\n",
+		"$S[-1]::y",        "error(63): A.g4:7:4: unknown attribute reference 'S' in '$S'\n",
+		"$S[-i]::y",        "error(63): A.g4:7:4: unknown attribute reference 'S' in '$S'\n",
+		"$S[i]::y",     	"error(63): A.g4:7:4: unknown attribute reference 'S' in '$S'\n",
+		"$S[0]::y",     	"error(63): A.g4:7:4: unknown attribute reference 'S' in '$S'\n",
+		"$S[-1]::y = 23;",  "error(63): A.g4:7:4: unknown attribute reference 'S' in '$S'\n",
+		"$S[-i]::y = 23;",  "error(63): A.g4:7:4: unknown attribute reference 'S' in '$S'\n",
+		"$S[i]::y = 23;",   "error(63): A.g4:7:4: unknown attribute reference 'S' in '$S'\n",
+		"$S[0]::y = 23;",   "error(63): A.g4:7:4: unknown attribute reference 'S' in '$S'\n",
+		"$S[$S::y]::i",		"error(63): A.g4:7:4: unknown attribute reference 'S' in '$S'\n" +
+							"error(57): A.g4:7:7: reference to undefined rule 'S' in non-local ref '$S::y'\n"
 	};
 
 	String[] dynFinallyChecks = {
-		"$a",			"",
-		"$b",			"",
-		"$lab",			"",
-		"$b::f",		"",
-		"$S",			"",
-		"$S::i",		"",
-		"$S::i=$S::i",	"",
-		"$a::z",		"",
+		"$a",			"error(67): A.g4:10:14: missing attribute access on rule reference 'a' in '$a'\n",
+		"$b",			"error(63): A.g4:10:14: unknown attribute reference 'b' in '$b'\n",
+		"$lab",			"error(67): A.g4:10:14: missing attribute access on rule reference 'lab' in '$lab'\n",
+		"$b::f",		"error(65): A.g4:10:17: unknown attribute 'f' for rule 'b' in '$b::f'\n",
+		"$S",			"error(63): A.g4:10:14: unknown attribute reference 'S' in '$S'\n",
+		"$S::i",		"error(57): A.g4:10:14: reference to undefined rule 'S' in non-local ref '$S::i'\n",
+		"$S::i=$S::i",	"error(57): A.g4:10:14: reference to undefined rule 'S' in non-local ref '$S::i'\n" +
+						"error(57): A.g4:10:20: reference to undefined rule 'S' in non-local ref '$S::i'\n",
+		"$a::z",		"error(65): A.g4:10:17: unknown attribute 'z' for rule 'a' in '$a::z'\n",
 
-		"$S::j",		"error(55): A.g4:12:17: unknown dynamically-scoped attribute for scope S: j in $S::j\n",
-		"$S::j = 3;",	"error(55): A.g4:12:17: unknown dynamically-scoped attribute for scope S: j in $S::j = 3;\n",
-		"$S::j = $S::k;",	"error(55): A.g4:12:17: unknown dynamically-scoped attribute for scope S: j in $S::j = $S::k;\n" +
-							"error(55): A.g4:12:25: unknown dynamically-scoped attribute for scope S: k in $S::k\n",
+		"$S::j",		"error(57): A.g4:10:14: reference to undefined rule 'S' in non-local ref '$S::j'\n",
+		"$S::j = 3;",	"error(57): A.g4:10:14: reference to undefined rule 'S' in non-local ref '$S::j = 3;'\n",
+		"$S::j = $S::k;",	"error(57): A.g4:10:14: reference to undefined rule 'S' in non-local ref '$S::j = $S::k;'\n",
 	};
 
     @Test public void testMembersActions() throws RecognitionException {
         testActions("members", membersChecks, attributeTemplate);
     }
 
+    @Test public void testDynamicMembersActions() throws RecognitionException {
+        testActions("members", dynMembersChecks, attributeTemplate);
+    }
+
     @Test public void testInitActions() throws RecognitionException {
         testActions("init", initChecks, attributeTemplate);
     }
 
+    @Test public void testDynamicInitActions() throws RecognitionException {
+        testActions("init", dynInitChecks, attributeTemplate);
+    }
+
 	@Test public void testInlineActions() throws RecognitionException {
 		testActions("inline", inlineChecks, attributeTemplate);
+	}
+
+	@Test public void testDynamicInlineActions() throws RecognitionException {
+		testActions("inline", dynInlineChecks, attributeTemplate);
 	}
 
 	@Test public void testBadInlineActions() throws RecognitionException {
@@ -230,6 +242,10 @@ public class TestAttributeChecks extends BaseTest {
 
 	@Test public void testFinallyActions() throws RecognitionException {
 		testActions("finally", finallyChecks, attributeTemplate);
+	}
+
+	@Test public void testDynamicFinallyActions() throws RecognitionException {
+		testActions("finally", dynFinallyChecks, attributeTemplate);
 	}
 
 	@Test public void testTokenRef() throws RecognitionException {
@@ -241,24 +257,6 @@ public class TestAttributeChecks extends BaseTest {
 			"";
 		testErrors(new String[] {grammar, expected}, false);
 	}
-
-	@Test public void testNonDynamicAttributeOutsideRule() throws Exception {
-		String action = "public void foo() { $x; }";
-	}
-	@Test public void testNonDynamicAttributeOutsideRule2() throws Exception {
-		String action = "public void foo() { $x.y; }";
-	}
-    @Test public void testUnknownGlobalScope() throws Exception {
-        String action = "$Symbols::names.add($id.text);";
-    }
-	@Test public void testUnknownDynamicAttribute() throws Exception {
-		String action = "$a::x";
-	}
-
-	@Test public void testUnknownGlobalDynamicAttribute() throws Exception {
-		String action = "$Symbols::x";
-	}
-
 
     public void testActions(String location, String[] pairs, String template) {
         for (int i = 0; i < pairs.length; i+=2) {
