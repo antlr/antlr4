@@ -58,8 +58,6 @@ public class RuleCollector extends GrammarTreeVisitor {
 	public MultiMap<String,GrammarAST> ruleToAltLabels = new MultiMap<String, GrammarAST>();
 	public Map<String,String> altLabelToRuleName = new HashMap<String, String>();
 
-	public Rule currentRule;
-
 	public RuleCollector(Grammar g) { this.g = g; }
 
 	public void process(GrammarAST ast) { visitGrammar(ast); }

@@ -246,7 +246,7 @@ prequelConstruct
 
 // A list of options that affect analysis and/or code generation
 optionsSpec
-	:	OPTIONS (option SEMI)* RBRACE -> ^(OPTIONS[$OPTIONS, "OPTIONS"] option+)
+	:	OPTIONS (option SEMI)* RBRACE -> ^(OPTIONS[$OPTIONS, "OPTIONS"] option*)
     ;
 
 option
@@ -319,7 +319,7 @@ actionScopeName
 	;
 
 modeSpec
-    :	MODE id SEMI sync (lexerRule sync)+  -> ^(MODE id lexerRule+)
+    :	MODE id SEMI sync (lexerRule sync)*  -> ^(MODE id lexerRule*)
     ;
 
 rules
@@ -547,6 +547,7 @@ lexerAlt
 		(	lexerCommands	-> ^(LEXER_ALT_ACTION<AltAST> lexerElements lexerCommands)
 		|					-> lexerElements
 		)
+	|						-> ^(ALT<AltAST> EPSILON) // empty alt
 	;
 
 lexerElements
@@ -883,7 +884,7 @@ if ( options!=null ) {
 // Terminals may be adorned with certain options when
 // reference in the grammar: TOK<,,,>
 elementOptions
-    : LT elementOption (COMMA elementOption)* GT -> ^(ELEMENT_OPTIONS[$LT,"ELEMENT_OPTIONS"] elementOption+)
+    : LT (elementOption (COMMA elementOption)*)? GT -> ^(ELEMENT_OPTIONS[$LT,"ELEMENT_OPTIONS"] elementOption*)
     ;
 
 // When used with elements we can specify what the tree node type can

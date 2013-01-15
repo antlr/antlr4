@@ -468,7 +468,15 @@ rules
     : ^(RULES {discoverRules($RULES);} (rule|lexerRule)* {finishRules($RULES);})
     ;
 
-mode : ^( MODE ID {currentModeName=$ID.text; modeDef($MODE, $ID);} lexerRule+ ) ;
+mode
+@init {
+	enterMode($start);
+}
+@after {
+	exitMode($start);
+}
+	:	^( MODE ID {currentModeName=$ID.text; modeDef($MODE, $ID);} lexerRule+ )
+	;
 
 lexerRule
 @init {
@@ -712,6 +720,7 @@ lexerElement
 	|   SEMPRED						{sempredInAlt((PredAST)$SEMPRED);}
 	|   ^(ACTION elementOptions)	{actionInAlt((ActionAST)$ACTION);}
 	|   ^(SEMPRED elementOptions)	{sempredInAlt((PredAST)$SEMPRED);}
+	|	EPSILON
 	;
 
 labeledLexerElement
@@ -963,6 +972,12 @@ range
     ;
 
 terminal
+@init {
+	enterTerminal($start);
+}
+@after {
+	exitTerminal($start);
+}
     :  ^(STRING_LITERAL elementOptions)
     								{stringRef((TerminalAST)$STRING_LITERAL);}
     |	STRING_LITERAL				{stringRef((TerminalAST)$STRING_LITERAL);}
@@ -977,7 +992,7 @@ elementOptions
 @after {
 	exitElementOptions($start);
 }
-    :	^(ELEMENT_OPTIONS elementOption[(GrammarASTWithOptions)$start.getParent()]+)
+    :	^(ELEMENT_OPTIONS elementOption[(GrammarASTWithOptions)$start.getParent()]*)
     ;
 
 elementOption[GrammarASTWithOptions t]
