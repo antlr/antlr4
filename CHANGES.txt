@@ -1,5 +1,11 @@
 ANTLR v4 Honey Badger
 
+January 14, 2013
+
+* Relax parser in favor of errors during semantic analysis
+* Add error 145: lexer mode must contain at least one non-fragment rule
+* Add error 146: non-fragment lexer rule can match the empty string
+
 January 11, 2013
 
 * Updated error 72, 76; added 73-74 and 136-143: detailed errors about name

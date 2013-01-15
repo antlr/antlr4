@@ -102,6 +102,12 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	public RuleCollector ruleCollector;
 	public ErrorManager errMgr;
 
+	/**
+	 * This field is used for reporting the {@link ErrorType#MODE_WITHOUT_RULES}
+	 * error when necessary.
+	 */
+	protected int nonFragmentRuleCount;
+
 	public BasicSemanticChecks(Grammar g, RuleCollector ruleCollector) {
 		this.g = g;
 		this.ruleCollector = ruleCollector;
@@ -138,6 +144,29 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
+	protected void enterMode(GrammarAST tree) {
+		nonFragmentRuleCount = 0;
+	}
+
+	@Override
+	protected void exitMode(GrammarAST tree) {
+		if (nonFragmentRuleCount == 0) {
+			Token token = tree.getToken();
+			String name = "?";
+			if (tree.getChildCount() > 0) {
+				name = tree.getChild(0).getText();
+				if (name == null || name.isEmpty()) {
+					name = "?";
+				}
+
+				token = ((GrammarAST)tree.getChild(0)).getToken();
+			}
+
+			g.tool.errMgr.grammarError(ErrorType.MODE_WITHOUT_RULES, g.fileName, token, name, g);
+		}
+	}
+
+	@Override
 	public void modeDef(GrammarAST m, GrammarAST ID) {
 		if ( !g.isLexer() ) {
 			g.tool.errMgr.grammarError(ErrorType.MODE_NOT_IN_LEXER, g.fileName,
@@ -162,6 +191,19 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 								  GrammarAST block)
 	{
 		checkInvalidRuleDef(ID.token);
+
+		boolean fragmentRule = false;
+		if (modifiers != null) {
+			for (GrammarAST tree : modifiers) {
+				if (tree.getType() == ANTLRParser.FRAGMENT) {
+					fragmentRule = true;
+				}
+			}
+		}
+
+		if (!fragmentRule) {
+			nonFragmentRuleCount++;
+		}
 	}
 
 	@Override

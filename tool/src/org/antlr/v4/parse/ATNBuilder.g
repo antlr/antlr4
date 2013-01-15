@@ -86,7 +86,7 @@ ruleBlock[GrammarAST ebnfRoot] returns [ATNFactory.Handle p]
     factory.setCurrentOuterAlt(alt);
 }
     :	^(BLOCK
-            (^(OPTIONS .+))?
+            (^(OPTIONS .*))?
             (   a=alternative
                 {alts.add($a.p); factory.setCurrentOuterAlt(++alt);}
             )+
@@ -96,7 +96,7 @@ ruleBlock[GrammarAST ebnfRoot] returns [ATNFactory.Handle p]
 
 block[GrammarAST ebnfRoot] returns [ATNFactory.Handle p]
 @init {List<ATNFactory.Handle> alts = new ArrayList<ATNFactory.Handle>();}
-    :	^(BLOCK (^(OPTIONS .+))? (a=alternative {alts.add($a.p);})+)
+    :	^(BLOCK (^(OPTIONS .*))? (a=alternative {alts.add($a.p);})+)
     	{$p = factory.block((BlockAST)$BLOCK, ebnfRoot, alts);}
     ;
 

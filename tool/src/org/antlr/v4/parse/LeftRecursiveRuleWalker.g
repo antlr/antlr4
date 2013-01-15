@@ -170,7 +170,7 @@ token returns [GrammarAST t=null]
 	;
 
 elementOptions
-    :	^(ELEMENT_OPTIONS elementOption+)
+    :	^(ELEMENT_OPTIONS elementOption*)
     ;
 
 elementOption
