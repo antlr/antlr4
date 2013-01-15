@@ -46,8 +46,8 @@ import java.util.regex.Pattern;
 
 /** */
 public class TokenVocabParser {
-	Tool tool;
-	String vocabName;
+	protected final Tool tool;
+	protected final String vocabName;
 
 	public TokenVocabParser(Tool tool, String vocabName) {
 		this.tool = tool;
