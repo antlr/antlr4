@@ -475,7 +475,7 @@ mode
 @after {
 	exitMode($start);
 }
-	:	^( MODE ID {currentModeName=$ID.text; modeDef($MODE, $ID);} lexerRule+ )
+	:	^( MODE ID {currentModeName=$ID.text; modeDef($MODE, $ID);} lexerRule* )
 	;
 
 lexerRule
