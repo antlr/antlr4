@@ -66,6 +66,24 @@ public class TestLexerExec extends BaseTest {
    		assertEquals(expecting, found);
    	}
 
+	@Test public void testSlashes() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"Backslash : '\\\\';\n" +
+			"Slash : '/';\n" +
+			"Vee : '\\\\/';\n" +
+			"Wedge : '/\\\\';\n"+
+			"WS : [ \\t] -> skip;";
+		String found = execLexer("L.g4", grammar, "L", "\\ / \\/ /\\");
+		String expecting =
+			"[@0,0:0='\\',<1>,1:0]\n" +
+			"[@1,2:2='/',<2>,1:2]\n" +
+			"[@2,4:5='\\/',<3>,1:4]\n" +
+			"[@3,7:8='/\\',<4>,1:7]\n" +
+			"[@4,9:8='<EOF>',<-1>,1:9]\n";
+		assertEquals(expecting, found);
+	}
+
 	@Test
 	public void testNonGreedyTermination() throws Exception {
 		String grammar =
