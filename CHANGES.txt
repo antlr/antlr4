@@ -1,5 +1,11 @@
 ANTLR v4 Honey Badger
 
+January 15, 2013
+
+* Tweak error messages
+* (Tool) Make TokenVocabParser fields `protected final`
+* Fix generated escape sequences for literals containing backslashes
+
 January 14, 2013
 
 * Relax parser in favor of errors during semantic analysis

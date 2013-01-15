@@ -74,7 +74,7 @@ public enum ErrorType {
 	PARSER_RULES_NOT_ALLOWED(53, "parser rule '<arg>' not allowed in lexer", ErrorSeverity.ERROR),
     REPEATED_PREQUEL(54, "repeated grammar prequel spec (option, token, or import); please merge", ErrorSeverity.ERROR),
 	UNDEFINED_RULE_REF(56, "reference to undefined rule: <arg>", ErrorSeverity.ERROR),
-	UNDEFINED_RULE_IN_NONLOCAL_REF(57, "reference to undefined rule in nonlocal ref: <arg>::<arg2>", ErrorSeverity.ERROR),
+	UNDEFINED_RULE_IN_NONLOCAL_REF(57, "reference to undefined rule '<arg>' in non-local ref '<arg3>'", ErrorSeverity.ERROR),
     TOKEN_NAMES_MUST_START_UPPER(60, "token names must start with an uppercase letter: <arg>", ErrorSeverity.ERROR),
 	UNKNOWN_SIMPLE_ATTRIBUTE(63, "unknown attribute reference '<arg>' in '<arg2>'", ErrorSeverity.ERROR),
 	INVALID_RULE_PARAMETER_REF(64, "parameter '<arg>' of rule '<arg2>' is not accessible in this scope: <arg3>", ErrorSeverity.ERROR),
