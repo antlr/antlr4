@@ -90,8 +90,8 @@ public enum ErrorType {
 	RETVAL_CONFLICTS_WITH_ARG(76, "return value '<arg>' conflicts with parameter with same name", ErrorSeverity.ERROR),
 	MISSING_RULE_ARGS(79, "missing arguments(s) on rule reference: <arg>", ErrorSeverity.ERROR),
 	RULE_HAS_NO_ARGS(80, "rule '<arg>' has no defined parameters", ErrorSeverity.ERROR),
-	ILLEGAL_OPTION(83, "illegal option '<arg>'", ErrorSeverity.WARNING),
-	ILLEGAL_OPTION_VALUE(84, "illegal option value '<arg>=<arg2>'", ErrorSeverity.WARNING),
+	ILLEGAL_OPTION(83, "unsupported option '<arg>'", ErrorSeverity.WARNING),
+	ILLEGAL_OPTION_VALUE(84, "unsupported option value '<arg>=<arg2>'", ErrorSeverity.WARNING),
     ACTION_REDEFINITION(94, "redefinition of '<arg>' action", ErrorSeverity.ERROR),
 	NO_RULES(99, "<if(arg2.implicitLexerOwner)>implicitly generated <endif>grammar '<arg>' has no rules", ErrorSeverity.ERROR),
 	NO_SUCH_GRAMMAR_SCOPE(105, "reference to undefined grammar in rule reference: <arg>.<arg2>", ErrorSeverity.ERROR),
@@ -128,7 +128,49 @@ public enum ErrorType {
 	LOCAL_CONFLICTS_WITH_RETVAL(143, "local '<arg>' conflicts with return value with same name", ErrorSeverity.ERROR),
 	INVALID_LITERAL_IN_LEXER_SET(144, "multi-character literals are not allowed in lexer sets: <arg>", ErrorSeverity.ERROR),
 	MODE_WITHOUT_RULES(145, "lexer mode '<arg>' must contain at least one non-fragment rule", ErrorSeverity.ERROR),
+	/**
+	 * All non-fragment lexer rules must match at least one character.
+	 * <p/>
+	 * The following example shows this error.
+	 *
+	 * <pre>
+	 * Whitespace : [ \t]+;  // ok
+	 * Whitespace : [ \t];   // ok
+	 *
+	 * fragment WS : [ \t]*; // ok
+	 *
+	 * Whitespace : [ \t]*;  // error 146
+	 * </pre>
+	 */
 	EPSILON_TOKEN(146, "non-fragment lexer rule '<arg>' can match the empty string", ErrorSeverity.ERROR),
+	/**
+	 * Left-recursive rules must contain at least one alternative which is not
+	 * left recursive.
+	 * <p/>
+	 * The following rule produces this error.
+	 *
+	 * <pre>
+	 * // error 147:
+	 * a : a ID
+	 *   | a INT
+	 *   ;
+	 * </pre>
+	 */
+	NO_NON_LR_ALTS(147, "left recursive rule '<arg>' must contain an alternative which is not left recursive", ErrorSeverity.ERROR),
+	/**
+	 * In left-recursive rules, all left-recursive alternatives must match at
+	 * least one symbol following the recursive rule invocation.
+	 * <p/>
+	 * The following rule produces this error.
+	 *
+	 * <pre>
+	 * a : ID    // ok        (alternative is not left recursive)
+	 *   | a INT // ok        (a must be follow by INT)
+	 *   | a ID? // error 148 (the ID following a is optional)
+	 *   ;
+	 * </pre>
+	 */
+	EPSILON_LR_FOLLOW(148, "left recursive rule '<arg>' contains a left recursive alternative which can be followed by the empty string", ErrorSeverity.ERROR),
 
 	// Backward incompatibility errors
 	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR 4", ErrorSeverity.ERROR),

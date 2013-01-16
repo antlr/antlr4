@@ -669,7 +669,7 @@ public abstract class BaseTest {
             String input = pairs[i];
             String expect = pairs[i+1];
             ErrorQueue equeue = new ErrorQueue();
-			Grammar g=null;
+			Grammar g = null;
             try {
                 String[] lines = input.split("\n");
 				String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
@@ -679,10 +679,12 @@ public abstract class BaseTest {
 					g = new Grammar(fileName, input, equeue);
 				}
             }
+			catch (UnsupportedOperationException ex) {
+			}
             catch (org.antlr.runtime.RecognitionException re) {
                 re.printStackTrace(System.err);
             }
-            String actual = equeue.toString(g.tool);
+            String actual = equeue.toString(g != null ? g.tool : new Tool());
 			System.err.println(actual);
 			String msg = input;
 			msg = msg.replaceAll("\n","\\\\n");

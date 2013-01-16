@@ -47,7 +47,9 @@ import org.antlr.v4.runtime.atn.BasicBlockStartState;
 import org.antlr.v4.runtime.atn.BasicState;
 import org.antlr.v4.runtime.atn.BlockEndState;
 import org.antlr.v4.runtime.atn.BlockStartState;
+import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.EpsilonTransition;
+import org.antlr.v4.runtime.atn.LL1Analyzer;
 import org.antlr.v4.runtime.atn.LoopEndState;
 import org.antlr.v4.runtime.atn.NotSetTransition;
 import org.antlr.v4.runtime.atn.PlusBlockStartState;
@@ -65,10 +67,12 @@ import org.antlr.v4.runtime.atn.WildcardTransition;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.semantics.UseDefAnalyzer;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
@@ -80,6 +84,7 @@ import org.antlr.v4.tool.ast.TerminalAST;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -98,6 +103,9 @@ public class ParserATNFactory implements ATNFactory {
 
 	public int currentOuterAlt;
 
+	protected final List<Pair<Rule, DecisionState>> preventEpsilonDecisions =
+		new ArrayList<Pair<Rule, DecisionState>>();
+
 	public ParserATNFactory(@NotNull Grammar g) {
 		if (g == null) {
 			throw new NullPointerException("g");
@@ -114,10 +122,19 @@ public class ParserATNFactory implements ATNFactory {
         addRuleFollowLinks();
 		addEOFTransitionToStartRules();
 		ATNOptimizer.optimize(g, atn);
+
+		for (Pair<Rule, DecisionState> pair : preventEpsilonDecisions) {
+			LL1Analyzer analyzer = new LL1Analyzer(atn);
+			if (analyzer.LOOK(pair.b, null).contains(org.antlr.v4.runtime.Token.EPSILON)) {
+				LeftRecursiveRule r;
+				g.tool.errMgr.grammarError(ErrorType.EPSILON_LR_FOLLOW, g.fileName, ((GrammarAST)pair.a.ast.getChild(0)).getToken(), pair.a.name);
+			}
+		}
+
 		return atn;
 	}
 
-    public void _createATN(Collection<Rule> rules) {
+	protected void _createATN(Collection<Rule> rules) {
 		createRuleStartAndStopATNStates();
 
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
@@ -367,7 +384,7 @@ public class ParserATNFactory implements ATNFactory {
 		return null;
 	}
 
-	protected Handle makeBlock(BlockStartState start, GrammarAST blkAST, List<Handle> alts) {
+	protected Handle makeBlock(BlockStartState start, BlockAST blkAST, List<Handle> alts) {
 		BlockEndState end = newState(BlockEndState.class, blkAST);
 		start.endState = end;
 		for (Handle alt : alts) {
@@ -383,6 +400,11 @@ public class ParserATNFactory implements ATNFactory {
 //		FASerializer ser = new FASerializer(g, h.left);
 //		System.out.println(blkAST.toStringTree()+":\n"+ser);
 		blkAST.atnState = start;
+
+		if (Boolean.valueOf(blkAST.getOptionString("preventepsilon"))) {
+			preventEpsilonDecisions.add(new Pair<Rule, DecisionState>(currentRule, start));
+		}
+
 		return h;
 	}
 

@@ -41,7 +41,8 @@ recRule(ruleName, precArgDef, argName, primaryAlts, opAlts, setResultAction,
 <ruleName>[<precArgDef>]<if(userRetvals)> returns [<userRetvals>]<endif>
     :   ( {} <primaryAlts:{alt | <alt.altText> }; separator="\n        | ">
         )
-        ( <opAlts; separator="\n        | ">
+        ( options{preventepsilon=true;}:
+          <opAlts; separator="\n        | ">
         )*
     ;
 >>
