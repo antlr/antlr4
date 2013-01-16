@@ -33,6 +33,7 @@ package org.antlr.v4.tool.ast;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.Tree;
+import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +48,8 @@ public class GrammarRootAST extends GrammarASTWithOptions {
     public int grammarType; // LEXER, PARSER, GRAMMAR (combined)
 	public boolean hasErrors;
 	/** Track stream used to create this tree */
-	public TokenStream tokenStream;
+	@NotNull
+	public final TokenStream tokenStream;
 	public Map<String, String> cmdLineOptions; // -DsuperClass=T on command line
 	public String fileName;
 
@@ -55,13 +57,34 @@ public class GrammarRootAST extends GrammarASTWithOptions {
 		super(node);
 		this.grammarType = node.grammarType;
 		this.hasErrors = node.hasErrors;
+		this.tokenStream = node.tokenStream;
 	}
 
-	public GrammarRootAST(int type) { super(type); }
-    public GrammarRootAST(Token t) { super(t); }
-    public GrammarRootAST(int type, Token t) { super(type, t); }
-    public GrammarRootAST(int type, Token t, String text) {
-        super(type,t,text);
+	public GrammarRootAST(Token t, TokenStream tokenStream) {
+		super(t);
+		if (tokenStream == null) {
+			throw new NullPointerException("tokenStream");
+		}
+
+		this.tokenStream = tokenStream;
+	}
+
+	public GrammarRootAST(int type, Token t, TokenStream tokenStream) {
+		super(type, t);
+		if (tokenStream == null) {
+			throw new NullPointerException("tokenStream");
+		}
+
+		this.tokenStream = tokenStream;
+	}
+
+	public GrammarRootAST(int type, Token t, String text, TokenStream tokenStream) {
+		super(type,t,text);
+		if (tokenStream == null) {
+			throw new NullPointerException("tokenStream");
+		}
+
+		this.tokenStream = tokenStream;
     }
 
 	public String getGrammarName() {

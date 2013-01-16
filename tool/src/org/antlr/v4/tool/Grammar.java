@@ -30,6 +30,8 @@
 
 package org.antlr.v4.tool;
 
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeVisitor;
@@ -89,6 +91,8 @@ public class Grammar implements AttributeResolver {
 
 	public static final Set<String> ParserBlockOptions = new HashSet<String>();
 	static {
+		// LR rule transformation sets this to help with reporting EPSILON_LR_FOLLOW
+		ParserBlockOptions.add("preventepsilon");
 		ParserBlockOptions.add("sll");
 	}
 
@@ -134,7 +138,8 @@ public class Grammar implements AttributeResolver {
 	public String name;
     public GrammarRootAST ast;
 	/** Track stream used to create this grammar */
-	public TokenStream tokenStream;
+	@NotNull
+	public final TokenStream tokenStream;
     public String text; // testing only
     public String fileName;
 
@@ -218,46 +223,63 @@ public class Grammar implements AttributeResolver {
 
 	public static final String AUTO_GENERATED_TOKEN_NAME_PREFIX = "T__";
 
-	public Grammar(Tool tool, GrammarRootAST ast) {
-        if ( ast==null ) throw new IllegalArgumentException("can't pass null tree");
+	public Grammar(Tool tool, @NotNull GrammarRootAST ast) {
+		if ( ast==null ) {
+			throw new NullPointerException("ast");
+		}
+
+		if (ast.tokenStream == null) {
+			throw new IllegalArgumentException("ast must have a token stream");
+		}
+
         this.tool = tool;
         this.ast = ast;
         this.name = (ast.getChild(0)).getText();
+		this.tokenStream = ast.tokenStream;
+
 		initTokenSymbolTables();
     }
 
 	/** For testing */
-	public Grammar(String grammarText) throws org.antlr.runtime.RecognitionException {
+	public Grammar(String grammarText) throws RecognitionException {
 		this(GRAMMAR_FROM_STRING_NAME, grammarText, null);
 	}
 
 	/** For testing */
 	public Grammar(String grammarText, ANTLRToolListener listener)
-		throws org.antlr.runtime.RecognitionException
+		throws RecognitionException
 	{
 		this(GRAMMAR_FROM_STRING_NAME, grammarText, listener);
 	}
 
 	/** For testing; builds trees, does sem anal */
 	public Grammar(String fileName, String grammarText)
-		throws org.antlr.runtime.RecognitionException
+		throws RecognitionException
 	{
 		this(fileName, grammarText, null);
 	}
 
 	/** For testing; builds trees, does sem anal */
 	public Grammar(String fileName, String grammarText, @Nullable ANTLRToolListener listener)
-		throws org.antlr.runtime.RecognitionException
+		throws RecognitionException
 	{
         this.text = grammarText;
 		this.fileName = fileName;
 		this.tool = new Tool();
 		this.tool.addListener(listener);
-		org.antlr.runtime.ANTLRStringStream in = new org.antlr.runtime.ANTLRStringStream(grammarText);
+		ANTLRStringStream in = new ANTLRStringStream(grammarText);
 		in.name = fileName;
 
 		this.ast = tool.load(fileName, in);
-		if ( ast==null ) return;
+		if ( ast==null ) {
+			throw new UnsupportedOperationException();
+		}
+
+		if (ast.tokenStream == null) {
+			throw new IllegalStateException("expected ast to have a token stream");
+		}
+
+		this.tokenStream = ast.tokenStream;
 
 		// ensure each node has pointer to surrounding grammar
 		final Grammar thiz = this;
@@ -718,7 +740,7 @@ public class Grammar implements AttributeResolver {
         return 0;
     }
 
-	public org.antlr.runtime.TokenStream getTokenStream() {
+	public TokenStream getTokenStream() {
 		if ( ast!=null ) return ast.tokenStream;
 		return null;
 	}

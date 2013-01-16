@@ -56,8 +56,8 @@ public class TestSymbolIssues extends BaseTest {
         // YIELDS
 			"error(94): A.g4:5:1: redefinition of 'members' action\n" +
 			"error(94): A.g4:7:1: redefinition of 'header' action\n" +
-			"warning(83): A.g4:2:10: illegal option 'opt'\n" +
-			"warning(83): A.g4:2:21: illegal option 'k'\n" +
+			"warning(83): A.g4:2:10: unsupported option 'opt'\n" +
+			"warning(83): A.g4:2:21: unsupported option 'k'\n" +
 			"error(94): A.g4:5:1: redefinition of 'members' action\n" +
 			"warning(125): A.g4:9:27: implicit definition of token 'X' in parser\n" +
 			"warning(125): A.g4:10:20: implicit definition of token 'Y' in parser\n" +

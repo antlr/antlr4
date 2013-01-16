@@ -49,13 +49,16 @@ import org.antlr.v4.runtime.atn.BasicBlockStartState;
 import org.antlr.v4.runtime.atn.BasicState;
 import org.antlr.v4.runtime.atn.BlockEndState;
 import org.antlr.v4.runtime.atn.BlockStartState;
+import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.EpsilonTransition;
+import org.antlr.v4.runtime.atn.LL1Analyzer;
 import org.antlr.v4.runtime.atn.LoopEndState;
 import org.antlr.v4.runtime.atn.NotSetTransition;
 import org.antlr.v4.runtime.atn.PlusBlockStartState;
 import org.antlr.v4.runtime.atn.PlusLoopbackState;
 import org.antlr.v4.runtime.atn.PrecedencePredicateTransition;
 import org.antlr.v4.runtime.atn.PredicateTransition;
+import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.atn.RuleStartState;
 import org.antlr.v4.runtime.atn.RuleStopState;
 import org.antlr.v4.runtime.atn.RuleTransition;
@@ -68,6 +71,8 @@ import org.antlr.v4.runtime.atn.WildcardTransition;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.Tuple;
+import org.antlr.v4.runtime.misc.Tuple2;
 import org.antlr.v4.semantics.UseDefAnalyzer;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
@@ -85,6 +90,7 @@ import org.antlr.v4.tool.ast.TerminalAST;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -103,6 +109,9 @@ public class ParserATNFactory implements ATNFactory {
 
 	public int currentOuterAlt;
 
+	protected final List<Tuple2<? extends Rule, ? extends DecisionState>> preventEpsilonDecisions =
+		new ArrayList<Tuple2<? extends Rule, ? extends DecisionState>>();
+
 	public ParserATNFactory(@NotNull Grammar g) {
 		if (g == null) {
 			throw new NullPointerException("g");
@@ -119,10 +128,18 @@ public class ParserATNFactory implements ATNFactory {
         addRuleFollowLinks();
 		addEOFTransitionToStartRules();
 		ATNOptimizer.optimize(g, atn);
+
+		for (Tuple2<? extends Rule, ? extends DecisionState> pair : preventEpsilonDecisions) {
+			LL1Analyzer analyzer = new LL1Analyzer(atn);
+			if (analyzer.LOOK(pair.getItem2(), PredictionContext.EMPTY_LOCAL).contains(org.antlr.v4.runtime.Token.EPSILON)) {
+				g.tool.errMgr.grammarError(ErrorType.EPSILON_LR_FOLLOW, g.fileName, ((GrammarAST)pair.getItem1().ast.getChild(0)).getToken(), pair.getItem1().name);
+			}
+		}
+
 		return atn;
 	}
 
-    public void _createATN(Collection<Rule> rules) {
+	protected void _createATN(Collection<Rule> rules) {
 		createRuleStartAndStopATNStates();
 
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
@@ -403,6 +420,11 @@ public class ParserATNFactory implements ATNFactory {
 //		FASerializer ser = new FASerializer(g, h.left);
 //		System.out.println(blkAST.toStringTree()+":\n"+ser);
 		blkAST.atnState = start;
+
+		if (Boolean.valueOf(blkAST.getOptionString("preventepsilon"))) {
+			preventEpsilonDecisions.add(Tuple.create(currentRule, start));
+		}
+
 		return h;
 	}
 

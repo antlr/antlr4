@@ -208,12 +208,12 @@ grammarType
 	if ( $t!=null ) ((GrammarRootAST)$tree).grammarType = $t.type;
 	else ((GrammarRootAST)$tree).grammarType=COMBINED;
 }
-    :	(	t=LEXER g=GRAMMAR  -> GRAMMAR<GrammarRootAST>[$g, "LEXER_GRAMMAR"]
+    :	(	t=LEXER g=GRAMMAR  -> GRAMMAR<GrammarRootAST>[$g, "LEXER_GRAMMAR", getTokenStream()]
 		| // A standalone parser specification
-		  	t=PARSER g=GRAMMAR -> GRAMMAR<GrammarRootAST>[$g, "PARSER_GRAMMAR"]
+		  	t=PARSER g=GRAMMAR -> GRAMMAR<GrammarRootAST>[$g, "PARSER_GRAMMAR", getTokenStream()]
 
 		// A combined lexer and parser specification
-		| 	g=GRAMMAR          -> GRAMMAR<GrammarRootAST>[$g, "COMBINED_GRAMMAR"]
+		| 	g=GRAMMAR          -> GRAMMAR<GrammarRootAST>[$g, "COMBINED_GRAMMAR", getTokenStream()]
 		|   tg=TREE_GRAMMAR
 
 		)

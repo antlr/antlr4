@@ -30,6 +30,7 @@
 
 package org.antlr.v4.test;
 
+import org.antlr.v4.tool.ErrorType;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -371,6 +372,33 @@ public class TestLeftRecursion extends BaseTest {
 					 "line 1:5 reportAttemptingFullContext d=3, input='*'\n" +
 					 "line 1:5 reportContextSensitivity d=3, input='*'\n",
 					 stderrDuringParse);
+	}
+
+	@Test public void testCheckForNonLeftRecursiveRule() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"s @after {System.out.println($ctx.toStringTree(this));} : a ;\n" +
+			"a : a ID\n" +
+			"  ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n";
+		String expected =
+			"error(" + ErrorType.NO_NON_LR_ALTS.code + "): T.g4:3:0: left recursive rule 'a' must contain an alternative which is not left recursive\n";
+		testErrors(new String[] { grammar, expected }, false);
+	}
+
+	@Test public void testCheckForLeftRecursiveEmptyFollow() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"s @after {System.out.println($ctx.toStringTree(this));} : a ;\n" +
+			"a : a ID?\n" +
+			"  | ID\n" +
+			"  ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n";
+		String expected =
+			"error(" + ErrorType.EPSILON_LR_FOLLOW.code + "): T.g4:3:0: left recursive rule 'a' contains a left recursive alternative which can be followed by the empty string\n";
+		testErrors(new String[] { grammar, expected }, false);
 	}
 
 	public void runTests(String grammar, String[] tests, String startRule) {

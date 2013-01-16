@@ -285,7 +285,7 @@ public class GrammarTransformPipeline {
 		// MAKE A GRAMMAR ROOT and ID
 		String lexerName = combinedAST.getChild(0).getText()+"Lexer";
 		GrammarRootAST lexerAST =
-		    new GrammarRootAST(new CommonToken(ANTLRParser.GRAMMAR,"LEXER_GRAMMAR"));
+		    new GrammarRootAST(new CommonToken(ANTLRParser.GRAMMAR, "LEXER_GRAMMAR"), combinedGrammar.ast.tokenStream);
 		lexerAST.grammarType = ANTLRParser.LEXER;
 		lexerAST.token.setInputStream(combinedAST.token.getInputStream());
 		lexerAST.addChild(adaptor.create(ANTLRParser.ID, lexerName));
