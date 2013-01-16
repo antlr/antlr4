@@ -120,7 +120,8 @@ public class Grammar implements AttributeResolver {
 	public String name;
     public GrammarRootAST ast;
 	/** Track stream used to create this grammar */
-	public TokenStream tokenStream;
+	@NotNull
+	public final TokenStream tokenStream;
     public String text; // testing only
     public String fileName;
 
@@ -204,11 +205,20 @@ public class Grammar implements AttributeResolver {
 
 	public static final String AUTO_GENERATED_TOKEN_NAME_PREFIX = "T__";
 
-	public Grammar(Tool tool, GrammarRootAST ast) {
-        if ( ast==null ) throw new IllegalArgumentException("can't pass null tree");
+	public Grammar(Tool tool, @NotNull GrammarRootAST ast) {
+		if ( ast==null ) {
+			throw new NullPointerException("ast");
+		}
+
+		if (ast.tokenStream == null) {
+			throw new IllegalArgumentException("ast must have a token stream");
+		}
+
         this.tool = tool;
         this.ast = ast;
         this.name = (ast.getChild(0)).getText();
+		this.tokenStream = ast.tokenStream;
+
 		initTokenSymbolTables();
     }
 
@@ -243,7 +253,15 @@ public class Grammar implements AttributeResolver {
 		in.name = fileName;
 
 		this.ast = tool.load(fileName, in);
-		if ( ast==null ) return;
+		if ( ast==null ) {
+			throw new UnsupportedOperationException();
+		}
+
+		if (ast.tokenStream == null) {
+			throw new IllegalStateException("expected ast to have a token stream");
+		}
+
+		this.tokenStream = ast.tokenStream;
 
 		// ensure each node has pointer to surrounding grammar
 		final Grammar thiz = this;

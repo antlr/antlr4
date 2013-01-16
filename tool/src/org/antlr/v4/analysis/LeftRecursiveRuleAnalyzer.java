@@ -72,7 +72,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		new ArrayList<Pair<GrammarAST,String>>();
 
 	/** Tokens from which rule AST comes from */
-	public TokenStream tokenStream;
+	public final TokenStream tokenStream;
 
 	public GrammarAST retvals;
 
@@ -89,7 +89,11 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		this.tool = tool;
 		this.ruleName = ruleName;
 		this.language = language;
-		tokenStream = ruleAST.g.tokenStream;
+		this.tokenStream = ruleAST.g.tokenStream;
+		if (this.tokenStream == null) {
+			throw new NullPointerException("grammar must have a token stream");
+		}
+
 		loadPrecRuleTemplates();
 	}
 
