@@ -54,17 +54,17 @@ public class TestBasicSemanticErrors extends BaseTest {
         "b : ( options { ick=bar; greedy=true; } : ID )+ ;\n" +
         "c : ID<blue> ID<x=y> ;",
         // YIELDS
-		"warning(83): U.g4:2:10: illegal option 'foo'\n" +
-		"warning(83): U.g4:2:19: illegal option 'k'\n" +
+		"warning(83): U.g4:2:10: unsupported option 'foo'\n" +
+		"warning(83): U.g4:2:19: unsupported option 'k'\n" +
 		"error(60): U.g4:5:8: token names must start with an uppercase letter: f\n" +
-		"warning(83): U.g4:9:10: illegal option 'x'\n" +
+		"warning(83): U.g4:9:10: unsupported option 'x'\n" +
 		"error(54): U.g4:9:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
 		"error(54): U.g4:8:0: repeated grammar prequel spec (option, token, or import); please merge\n" +
-		"warning(83): U.g4:12:10: illegal option 'blech'\n" +
-		"warning(83): U.g4:12:21: illegal option 'greedy'\n" +
-		"warning(83): U.g4:15:16: illegal option 'ick'\n" +
-		"warning(83): U.g4:15:25: illegal option 'greedy'\n" +
-		"warning(83): U.g4:16:16: illegal option 'x'\n",
+		"warning(83): U.g4:12:10: unsupported option 'blech'\n" +
+		"warning(83): U.g4:12:21: unsupported option 'greedy'\n" +
+		"warning(83): U.g4:15:16: unsupported option 'ick'\n" +
+		"warning(83): U.g4:15:25: unsupported option 'greedy'\n" +
+		"warning(83): U.g4:16:16: unsupported option 'x'\n",
     };
 
 	@Test public void testU() { super.testErrors(U, false); }
