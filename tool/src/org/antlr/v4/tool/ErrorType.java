@@ -129,6 +129,7 @@ public enum ErrorType {
 	INVALID_LITERAL_IN_LEXER_SET(144, "multi-character literals are not allowed in lexer sets: <arg>", ErrorSeverity.ERROR),
 	MODE_WITHOUT_RULES(145, "lexer mode '<arg>' must contain at least one non-fragment rule", ErrorSeverity.ERROR),
 	EPSILON_TOKEN(146, "non-fragment lexer rule '<arg>' can match the empty string", ErrorSeverity.ERROR),
+	NO_NON_LR_ALTS(147, "left recursive rule '<arg>' must contain an alternative which is not left recursive", ErrorSeverity.ERROR),
 
 	// Backward incompatibility errors
 	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR 4", ErrorSeverity.ERROR),

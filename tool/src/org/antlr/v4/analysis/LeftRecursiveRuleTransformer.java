@@ -145,6 +145,10 @@ public class LeftRecursiveRuleTransformer {
 		r.recPrimaryAlts = new ArrayList<LeftRecursiveRuleAltInfo>();
 		r.recPrimaryAlts.addAll(leftRecursiveRuleWalker.prefixAlts);
 		r.recPrimaryAlts.addAll(leftRecursiveRuleWalker.otherAlts);
+		if (r.recPrimaryAlts.isEmpty()) {
+			tool.errMgr.grammarError(ErrorType.NO_NON_LR_ALTS, g.fileName, ((GrammarAST)prevRuleAST.getChild(0)).getToken(), r.name);
+		}
+
 		r.recOpAlts = new OrderedHashMap<Integer, LeftRecursiveRuleAltInfo>();
 		r.recOpAlts.putAll(leftRecursiveRuleWalker.binaryAlts);
 		r.recOpAlts.putAll(leftRecursiveRuleWalker.ternaryAlts);
