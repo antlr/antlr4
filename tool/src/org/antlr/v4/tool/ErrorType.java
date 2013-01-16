@@ -130,6 +130,7 @@ public enum ErrorType {
 	MODE_WITHOUT_RULES(145, "lexer mode '<arg>' must contain at least one non-fragment rule", ErrorSeverity.ERROR),
 	EPSILON_TOKEN(146, "non-fragment lexer rule '<arg>' can match the empty string", ErrorSeverity.ERROR),
 	NO_NON_LR_ALTS(147, "left recursive rule '<arg>' must contain an alternative which is not left recursive", ErrorSeverity.ERROR),
+	EPSILON_LR_FOLLOW(148, "left recursive rule '<arg>' contains a left recursive alternative which can be followed by the empty string", ErrorSeverity.ERROR),
 
 	// Backward incompatibility errors
 	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR 4", ErrorSeverity.ERROR),

@@ -132,6 +132,9 @@ public class LeftRecursiveRuleTransformer {
 //		System.out.println("created: "+newRuleText);
 		RuleAST t = parseArtificialRule(g, newRuleText);
 
+		// reuse the name token from the original AST since it refers to the proper source location in the original grammar
+		((GrammarAST)t.getChild(0)).token = ((GrammarAST)prevRuleAST.getChild(0)).getToken();
+
 		// update grammar AST and set rule's AST.
 		RULES.setChild(prevRuleAST.getChildIndex(), t);
 		r.ast = t;
@@ -146,7 +149,7 @@ public class LeftRecursiveRuleTransformer {
 		r.recPrimaryAlts.addAll(leftRecursiveRuleWalker.prefixAlts);
 		r.recPrimaryAlts.addAll(leftRecursiveRuleWalker.otherAlts);
 		if (r.recPrimaryAlts.isEmpty()) {
-			tool.errMgr.grammarError(ErrorType.NO_NON_LR_ALTS, g.fileName, ((GrammarAST)prevRuleAST.getChild(0)).getToken(), r.name);
+			tool.errMgr.grammarError(ErrorType.NO_NON_LR_ALTS, g.fileName, ((GrammarAST)r.ast.getChild(0)).getToken(), r.name);
 		}
 
 		r.recOpAlts = new OrderedHashMap<Integer, LeftRecursiveRuleAltInfo>();
@@ -205,18 +208,20 @@ public class LeftRecursiveRuleTransformer {
 	}
 
 	/**
-	 (RULE e int _p (returns int v)
-	 	(BLOCK
-	 	  (ALT
-	 		(BLOCK
-	 			(ALT INT {$v = $INT.int;})
-	 			(ALT '(' (= x e) ')' {$v = $x.v;})
-	 			(ALT ID))
-	 		(* (BLOCK
-	 			(ALT {7 >= $_p}? '*' (= b e) {$v = $a.v * $b.v;})
-	 			(ALT {6 >= $_p}? '+' (= b e) {$v = $a.v + $b.v;})
-	 			(ALT {3 >= $_p}? '++') (ALT {2 >= $_p}? '--'))))))
-
+	 * <pre>
+	 * (RULE e int _p (returns int v)
+	 * 	(BLOCK
+	 * 	  (ALT
+	 * 		(BLOCK
+	 * 			(ALT INT {$v = $INT.int;})
+	 * 			(ALT '(' (= x e) ')' {$v = $x.v;})
+	 * 			(ALT ID))
+	 * 		(* (BLOCK
+	 *			(OPTIONS ...)
+	 * 			(ALT {7 >= $_p}? '*' (= b e) {$v = $a.v * $b.v;})
+	 * 			(ALT {6 >= $_p}? '+' (= b e) {$v = $a.v + $b.v;})
+	 * 			(ALT {3 >= $_p}? '++') (ALT {2 >= $_p}? '--'))))))
+	 * </pre>
 	 */
 	public void setAltASTPointers(LeftRecursiveRule r, RuleAST t) {
 //		System.out.println("RULE: "+t.toStringTree());
@@ -234,7 +239,7 @@ public class LeftRecursiveRuleTransformer {
 		}
 		for (int i = 0; i < r.recOpAlts.size(); i++) {
 			LeftRecursiveRuleAltInfo altInfo = r.recOpAlts.getElement(i);
-			altInfo.altAST = (AltAST)opsBlk.getChild(i);
+			altInfo.altAST = (AltAST)opsBlk.getChild(i + 1);
 			altInfo.altAST.leftRecursiveAltInfo = altInfo;
 			altInfo.originalAltAST.leftRecursiveAltInfo = altInfo;
 //			altInfo.originalAltAST.parent = altInfo.altAST.parent;

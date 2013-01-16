@@ -87,6 +87,10 @@ public class Grammar implements AttributeResolver {
 	public static final Set<String> ruleOptions = new HashSet<String>();
 
 	public static final Set<String> ParserBlockOptions = new HashSet<String>();
+	static {
+		// LR rule transformation sets this to help with reporting EPSILON_LR_FOLLOW
+		ParserBlockOptions.add("preventepsilon");
+	}
 
 	public static final Set<String> LexerBlockOptions = new HashSet<String>();
 

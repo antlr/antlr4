@@ -387,6 +387,20 @@ public class TestLeftRecursion extends BaseTest {
 		testErrors(new String[] { grammar, expected }, false);
 	}
 
+	@Test public void testCheckForLeftRecursiveEmptyFollow() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"s @after {System.out.println($ctx.toStringTree(this));} : a ;\n" +
+			"a : a ID?\n" +
+			"  | ID\n" +
+			"  ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n";
+		String expected =
+			"error(" + ErrorType.EPSILON_LR_FOLLOW.code + "): T.g4:3:0: left recursive rule 'a' contains a left recursive alternative which can be followed by the empty string\n";
+		testErrors(new String[] { grammar, expected }, false);
+	}
+
 	public void runTests(String grammar, String[] tests, String startRule) {
 		rawGenerateAndBuildRecognizer("T.g4", grammar, "TParser", "TLexer");
 		writeRecognizerAndCompile("TParser",
