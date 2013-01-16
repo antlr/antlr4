@@ -30,6 +30,8 @@
 
 package org.antlr.v4.tool;
 
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeVisitor;
@@ -223,33 +225,33 @@ public class Grammar implements AttributeResolver {
     }
 
 	/** For testing */
-	public Grammar(String grammarText) throws org.antlr.runtime.RecognitionException {
+	public Grammar(String grammarText) throws RecognitionException {
 		this(GRAMMAR_FROM_STRING_NAME, grammarText, null);
 	}
 
 	/** For testing */
 	public Grammar(String grammarText, ANTLRToolListener listener)
-		throws org.antlr.runtime.RecognitionException
+		throws RecognitionException
 	{
 		this(GRAMMAR_FROM_STRING_NAME, grammarText, listener);
 	}
 
 	/** For testing; builds trees, does sem anal */
 	public Grammar(String fileName, String grammarText)
-		throws org.antlr.runtime.RecognitionException
+		throws RecognitionException
 	{
 		this(fileName, grammarText, null);
 	}
 
 	/** For testing; builds trees, does sem anal */
 	public Grammar(String fileName, String grammarText, @Nullable ANTLRToolListener listener)
-		throws org.antlr.runtime.RecognitionException
+		throws RecognitionException
 	{
         this.text = grammarText;
 		this.fileName = fileName;
 		this.tool = new Tool();
 		this.tool.addListener(listener);
-		org.antlr.runtime.ANTLRStringStream in = new org.antlr.runtime.ANTLRStringStream(grammarText);
+		ANTLRStringStream in = new ANTLRStringStream(grammarText);
 		in.name = fileName;
 
 		this.ast = tool.load(fileName, in);
@@ -712,7 +714,7 @@ public class Grammar implements AttributeResolver {
         return 0;
     }
 
-	public org.antlr.runtime.TokenStream getTokenStream() {
+	public TokenStream getTokenStream() {
 		if ( ast!=null ) return ast.tokenStream;
 		return null;
 	}
