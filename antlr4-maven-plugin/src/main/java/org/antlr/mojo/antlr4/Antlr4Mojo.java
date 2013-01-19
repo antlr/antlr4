@@ -73,8 +73,8 @@ import java.util.Set;
  * @author Sam Harwell
  */
 @Mojo(
-	name = "antlr",
-	defaultPhase = LifecyclePhase.PROCESS_SOURCES,
+	name = "antlr4",
+	defaultPhase = LifecyclePhase.GENERATE_SOURCES,
 	requiresDependencyResolution = ResolutionScope.COMPILE,
 	requiresProject = true)
 public class Antlr4Mojo extends AbstractMojo {
