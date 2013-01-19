@@ -168,13 +168,13 @@ public class Antlr4Mojo extends AbstractMojo {
     /**
      * Specifies the ANTLR directory containing grammar files.
      */
-	@Parameter(defaultValue = "${basedir}/src/main/antlr4", required = true)
+	@Parameter(defaultValue = "${basedir}/src/main/antlr4")
     private File sourceDirectory;
 
     /**
      * Specify output directory where the Java files are generated.
      */
-	@Parameter(defaultValue = "${project.build.directory}/generated-sources/antlr4", required = true)
+	@Parameter(defaultValue = "${project.build.directory}/generated-sources/antlr4")
     private File outputDirectory;
 
     /**
