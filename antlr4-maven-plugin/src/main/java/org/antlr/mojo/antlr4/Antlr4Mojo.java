@@ -93,7 +93,7 @@ public class Antlr4Mojo extends AbstractMojo {
 	/**
 	 * specify grammar file encoding; e.g., euc-jp
 	 */
-	@Parameter
+	@Parameter(property = "project.build.sourceEncoding")
 	protected String encoding;
 
 	/**
