@@ -27,7 +27,7 @@ Libraries
 <plugin>
     <groupId>org.antlr</groupId>
     <artifactId>antlr4-maven-plugin</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>${project.version}</version>
 
     <executions>
         <execution>
