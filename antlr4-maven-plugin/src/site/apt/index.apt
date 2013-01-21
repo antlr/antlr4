@@ -28,7 +28,7 @@ ANTLR v4 Maven plugin
  use version 4.0 of the plugin, you will build your grammars using version 4.0 of the
  ANTLR tool, version 4.2 of the plugin will use version 4.2 of the ANTLR tool and so on.
 
- You may also find that there are patch versions of the plugin suchas 4.0-1 4.0-2 and
+ You may also find that there are patch versions of the plugin such as 4.0-1 4.0-2 and
  so on. Use the latest patch release of the plugin.
 
  The current version of the plugin is shown at the top of this page after the <<Last Deployed>> date.
@@ -49,10 +49,10 @@ ANTLR v4 Maven plugin
              +--- imports/  .g4 files that are imported by other grammars.
 +--
 
- If your grammar is intended to be part of a package called org.foo.bar then you would
+ If your grammar is intended to be part of a package called <<<org.foo.bar>>> then you would
  place it in the directory <<<src/main/antlr4/org/foo/bar>>>. The plugin will then produce
- .java and .tokens files in the output directory <<<target/generated-sources/antlr4/org/foo/bar>>>
- When the Java files are compiled they will be in the correct location for the javac
+ <<<.java>>> and <<<.tokens>>> files in the output directory <<<target/generated-sources/antlr4/org/foo/bar>>>
+ When the Java files are compiled they will be in the correct location for the Javac
  compiler without any special configuration. The generated java files are automatically
  submitted for compilation by the plugin.
 
@@ -60,4 +60,3 @@ ANTLR v4 Maven plugin
  any grammar files that are imported by other grammar files (do not make subdirectories here.)
  Such files are never built on their own, but the plugin will automatically tell the ANTLR
  tool to look in this directory for library files.
-
