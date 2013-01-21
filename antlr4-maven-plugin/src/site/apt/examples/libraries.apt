@@ -33,7 +33,7 @@ Libraries
         <execution>
             <configuration>
                 <goals>
-                    <goal>antlr</goal>
+                    <goal>antlr4</goal>
                 </goals>
                 <libDirectory>src/main/antlr4_imports</libDirectory>
             </configuration>
