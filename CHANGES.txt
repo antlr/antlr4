@@ -1,5 +1,7 @@
 ANTLR v4 Honey Badger
 
+January 21, 2013 -- Release 4.0
+
 January 15, 2013
 
 * Tweak error messages
