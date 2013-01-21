@@ -48,11 +48,16 @@ import java.util.Map;
 public abstract class PredictionContext implements Iterable<SingletonPredictionContext>,
 													   Comparable<PredictionContext> // to sort node lists by id
 {
-	/** Represents $ in local ctx prediction, which means wildcard. *+x = *. */
+	/**
+	 * Represents {@code $} in local context prediction, which means wildcard.
+	 * {@code *+x = *}.
+	 */
 	public static final EmptyPredictionContext EMPTY = new EmptyPredictionContext();
 
-	/** Represents $ in an array in full ctx mode, when $ doesn't mean wildcard:
-	 *  $ + x = [$,x]. Here, $ = EMPTY_RETURN_STATE.
+	/**
+	 * Represents {@code $} in an array in full context mode, when {@code $}
+	 * doesn't mean wildcard: {@code $ + x = [$,x]}. Here,
+	 * {@code $} = {@link #EMPTY_RETURN_STATE}.
 	 */
 	public static final int EMPTY_RETURN_STATE = Integer.MAX_VALUE;
 
@@ -97,7 +102,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 	public abstract int getReturnState(int index);
 
-	/** This means only the {@link #EMPTY} context is in set */
+	/** This means only the {@link #EMPTY} context is in set. */
 	public boolean isEmpty() {
 		return this == EMPTY;
 	}
@@ -153,7 +158,42 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 						   rootIsWildcard, mergeCache);
 	}
 
-	// http://www.antlr.org/wiki/download/attachments/32014352/singleton-merge.png
+	/**
+	 * Merge two {@link SingletonPredictionContext} instances.
+	 *
+	 * <p/>
+	 *
+	 * Stack tops equal, parents merge is same; return left graph.<br/>
+	 * <embed src="images/SingletonMerge_SameRootSamePar.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * Same stack top, parents differ; merge parents giving array node, then
+	 * remainders of those graphs. A new root node is created to point to the
+	 * merged parents.<br/>
+	 * <embed src="images/SingletonMerge_SameRootDiffPar.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * Different stack tops pointing to same parent. Make array node for the
+	 * root where both element in the root point to the same (original)
+	 * parent.<br/>
+	 * <embed src="images/SingletonMerge_DiffRootSamePar.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * Different stack tops pointing to different parents. Make array node for
+	 * the root where each element points to the corresponding original
+	 * parent.<br/>
+	 * <embed src="images/SingletonMerge_DiffRootDiffPar.svg" type="image/svg+xml"/>
+	 *
+	 * @param a the first {@link SingletonPredictionContext}
+	 * @param b the second {@link SingletonPredictionContext}
+	 * @param rootIsWildcard {@code true} if this is a local-context merge,
+	 * otherwise false to indicate a full-context merge
+	 * @param mergeCache
+	 * @return
+	 */
 	public static PredictionContext mergeSingletons(
 		SingletonPredictionContext a,
 		SingletonPredictionContext b,
@@ -220,9 +260,56 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		}
 	}
 
-	// http://www.antlr.org/wiki/download/attachments/32014352/local-ctx-root-merge.png
-	// http://www.antlr.org/wiki/download/attachments/32014352/full-ctx-root-merge.png
-	/** Handle case where at least one of a or b is $ (EMPTY) */
+	/**
+	 * Handle case where at least one of {@code a} or {@code b} is
+	 * {@link #EMPTY}. In the following diagrams, the symbol {@code $} is used
+	 * to represent {@link #EMPTY}.
+	 *
+	 * <h2>Local-Context Merges</h2>
+	 *
+	 * These local-context merge operations are used when {@code rootIsWildcard}
+	 * is true.
+	 *
+	 * <p/>
+	 *
+	 * {@link #EMPTY} is superset of any graph; return {@link #EMPTY}.<br/>
+	 * <embed src="images/LocalMerge_EmptyRoot.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * {@link #EMPTY} and anything is {@code #EMPTY}, so merged parent is
+	 * {@code #EMPTY}; return left graph.<br/>
+	 * <embed src="images/LocalMerge_EmptyParent.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * Special case of last merge if local context.<br/>
+	 * <embed src="images/LocalMerge_DiffRoots.svg" type="image/svg+xml"/>
+	 *
+	 * <h2>Full-Context Merges</h2>
+	 *
+	 * These full-context merge operations are used when {@code rootIsWildcard}
+	 * is false.
+	 *
+	 * <p/>
+	 *
+	 * <embed src="images/FullMerge_EmptyRoots.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * Must keep all contexts; {@link #EMPTY} in array is a special value (and
+	 * null parent).<br/>
+	 * <embed src="images/FullMerge_EmptyRoot.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * <embed src="images/FullMerge_SameRoot.svg" type="image/svg+xml"/>
+	 *
+	 * @param a the first {@link SingletonPredictionContext}
+	 * @param b the second {@link SingletonPredictionContext}
+	 * @param rootIsWildcard {@code true} if this is a local-context merge,
+	 * otherwise false to indicate a full-context merge
+	 */
 	public static PredictionContext mergeRoot(SingletonPredictionContext a,
 											  SingletonPredictionContext b,
 											  boolean rootIsWildcard)
@@ -251,7 +338,35 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		return null;
 	}
 
-	// http://www.antlr.org/wiki/download/attachments/32014352/array-merge.png
+	/**
+	 * Merge two {@link ArrayPredictionContext} instances.
+	 *
+	 * <p/>
+	 *
+	 * Different tops, different parents.<br/>
+	 * <embed src="images/ArrayMerge_DiffTopDiffPar.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * Shared top, same parents.<br/>
+	 * <embed src="images/ArrayMerge_ShareTopSamePar.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * Shared top, different parents.<br/>
+	 * <embed src="images/ArrayMerge_ShareTopDiffPar.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * Shared top, all shared parents.<br/>
+	 * <embed src="images/ArrayMerge_ShareTopSharePar.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * Equal tops, merge parents and reduce top to
+	 * {@link SingletonPredictionContext}.<br/>
+	 * <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/>
+	 */
 	public static PredictionContext mergeArrays(
 		ArrayPredictionContext a,
 		ArrayPredictionContext b,
@@ -361,7 +476,10 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		return M;
 	}
 
-	/** make pass over all M parents; merge any equals() ones */
+	/**
+	 * Make pass over all <em>M</em> {@code parents}; merge any {@code equals()}
+	 * ones.
+	 */
 	protected static void combineCommonParents(PredictionContext[] parents) {
 		Map<PredictionContext, PredictionContext> uniqueParents =
 			new HashMap<PredictionContext, PredictionContext>();
