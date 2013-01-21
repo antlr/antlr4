@@ -1,0 +1,46 @@
+digraph "" {
+    graph[dpi="60";compound="true"];
+
+    subgraph L {
+        node[shape="none"];
+        lefttree[label=""];
+        left[label="$"];
+
+        lefttree -> left[style="invisible";dir="none"];
+    }
+
+    subgraph AB {
+        optree[shape="none";label=""];
+        temp1[shape="none";label="+"];
+
+        optree -> temp1[style="invisible";dir="none"];
+    }
+
+    subgraph R {
+        righttree[shape="none";label=""];
+        right[shape="invtriangle";label="x"];
+
+        righttree -> right[style="invisible";dir="none"];
+    }
+
+    subgraph BC {
+        node[color="invis";shape="point"];
+        temp2a;
+        {   rank="same";
+            temp2b;
+            temp2c;
+        }
+
+        temp2a -> temp2b[style="invisible";dir="none"];
+        temp2a -> temp2c[style="invisible";dir="none"];
+        temp2b -> temp2c[constraint="false";label="wwwwwww"];
+    }
+
+    subgraph Res {
+        node[shape="none"];
+        resulttree[shape="invtriangle";label=""];
+        result[shape="record";label="{ | $} | {<x> | x}"];
+
+        resulttree -> result:x:n[dir="back"];
+    }
+}

@@ -112,7 +112,7 @@ public interface IntStream {
 	 * If {@code i} represents a position at or beyond the end of the stream,
 	 * this method returns {@link #EOF}.
 	 * <p/>
-	 * The return value is unspecified if {@code i&lt;0} and fewer than {@code -i}
+	 * The return value is unspecified if {@code i<0} and fewer than {@code -i}
 	 * calls to {@link #consume consume()} have occurred from the beginning of
 	 * the stream before calling this method.
 	 *

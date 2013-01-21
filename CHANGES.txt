@@ -2,6 +2,10 @@ ANTLR v4 Honey Badger
 
 January 21, 2013 -- Release 4.0
 
+* Updated PredictionContext Javadocs
+* Updated Maven site documentation
+* Minor tweaks in Java.stg
+
 January 15, 2013
 
 * Tweak error messages
