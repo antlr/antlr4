@@ -27,13 +27,13 @@ Libraries
 <plugin>
     <groupId>org.antlr</groupId>
     <artifactId>antlr4-maven-plugin</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>${project.version}</version>
 
     <executions>
         <execution>
             <configuration>
                 <goals>
-                    <goal>antlr</goal>
+                    <goal>antlr4</goal>
                 </goals>
                 <libDirectory>src/main/antlr4_imports</libDirectory>
             </configuration>

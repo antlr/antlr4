@@ -1,9 +1,9 @@
 digraph "" {
-    graph[fontname="Consolas,Courier";rankdir="LR";pad="0.25"];
-    node[fontname="Consolas,Courier";target="_parent"];
-    edge[fontname="Consolas,Courier"];
+    graph[fontname="Courier New";rankdir="LR";pad="0.25"];
+    node[fontname="Courier New";target="_parent"];
+    edge[fontname="Courier New"];
     subgraph cluster0 {
-        subgraph[color="white"];
+        color="invis";
         {   node[shape="record"];
             StarLoopEntryState[URL="../StarLoopEntryState.html";label="{StarLoopEntryState | {<alt1> alt 1 |<alt2> alt 2}}"];
             StarLoopbackState[URL="../StarLoopbackState.html"];

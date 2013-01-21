@@ -42,7 +42,7 @@ Usage
           <execution>
             <id>antlr</id>
             <goals>
-              <goal>antlr</goal>
+              <goal>antlr4</goal>
             </goals>
           </execution>
         </executions>

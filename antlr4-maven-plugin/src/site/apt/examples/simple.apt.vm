@@ -8,11 +8,11 @@ Simple configuration
 <plugin>
     <groupId>org.antlr</groupId>
     <artifactId>antlr4-maven-plugin</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>${project.version}</version>
     <executions>
         <execution>
             <goals>
-                <goal>antlr</goal>
+                <goal>antlr4</goal>
             </goals>
         </execution>
     </executions>
