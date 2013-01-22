@@ -883,6 +883,3 @@ initValue(typeName) ::= <<
 >>
 
 codeFileExtension() ::= ".java"
-
-true() ::= "true"
-false() ::= "false"

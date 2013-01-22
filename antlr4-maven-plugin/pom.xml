@@ -49,6 +49,7 @@
 
     <name>ANTLR 4 Maven plugin</name>
     <description>Maven plugin for ANTLR 4 grammars</description>
+    <url>http://www.antlr.org</url>
 
     <prerequisites>
         <maven>3.0</maven>
@@ -179,4 +180,22 @@
 
     </build>
 
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                    <quiet>true</quiet>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>2.3</version>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>

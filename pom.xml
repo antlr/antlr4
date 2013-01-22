@@ -16,6 +16,11 @@
     <name>ANTLR 4</name>
     <description>ANTLR 4 Master Build POM</description>
     <url>http://www.antlr.org</url>
+    <inceptionYear>1992</inceptionYear>
+    <organization>
+        <name>ANTLR</name>
+        <url>http://www.antlr.org</url>
+    </organization>
 
     <licenses>
         <license>
@@ -63,13 +68,20 @@
         <antlr.testinprocess>true</antlr.testinprocess>
     </properties>
 
+    <mailingLists>
+        <mailingList>
+            <name>antlr-discussion</name>
+            <archive>https://groups.google.com/forum/?fromgroups#!forum/antlr-discussion</archive>
+        </mailingList>
+    </mailingLists>
+
     <issueManagement>
         <system>GitHub Issues</system>
         <url>https://github.com/antlr/antlr4/issues</url>
     </issueManagement>
 
     <scm>
-        <url>git://github.com/antlr/antlr4.git</url>
+        <url>https://github.com/antlr/antlr4/tree/master</url>
         <connection>scm:git:git://github.com/antlr/antlr4.git</connection>
         <developerConnection>scm:git:git@github.com:antlr/antlr4.git</developerConnection>
     </scm>

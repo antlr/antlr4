@@ -1,0 +1,40 @@
+digraph "" {
+    graph[dpi="60";compound="true"];
+
+    subgraph L {
+        node[shape="none"];
+        left[shape="invtriangle";label="x"];
+        leftroot[label="a"];
+
+        left -> leftroot[dir="back"];
+    }
+
+    subgraph AB {
+        temp1[shape="none";label="+"];
+    }
+
+    subgraph R {
+        right[shape="invtriangle";label="y"];
+        rightroot[shape="none";label="b"];
+
+        right -> rightroot[dir="back"];
+    }
+
+    subgraph BC {
+        node[color="invis";shape="point"];
+        temp2b;
+        temp2c;
+
+        temp2b -> temp2c[constraint="false";label="wwwwwww"];
+    }
+
+    subgraph clusterRes {
+        color="invis";
+        resulttree1[shape="invtriangle";label="x"];
+        resulttree2[shape="invtriangle";label="y"];
+        result[shape="record";label="{<a> | a} | {<b> | b}"];
+
+        resulttree1:s -> result:a:n[dir="back"];
+        resulttree2:s -> result:b:n[dir="back"];
+    }
+}

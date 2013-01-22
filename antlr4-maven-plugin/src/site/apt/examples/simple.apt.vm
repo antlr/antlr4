@@ -1,0 +1,40 @@
+Simple configuration
+
+ If your grammar files are organized into the default locations as described in the {{{../index.html}introduction}},
+ then configuring the <<<pom.xml>>> file for your project is as simple as adding this to it
+
++--
+<plugins>
+<plugin>
+    <groupId>org.antlr</groupId>
+    <artifactId>antlr4-maven-plugin</artifactId>
+    <version>${project.version}</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>antlr4</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+...
+</plugins>
++--
+
+ When the <<<mvn>>> command is executed all grammar files under <<<src/main/antlr4>>>, except any
+ import grammars under <<<src/main/antlr4/imports>>> will be analyzed and converted to
+ Java source code in the output directory <<<target/generated-sources/antlr4>>>.
+
+ Your input files under <<<antlr4>>> should be stored in sub directories that
+ reflect the package structure of your java parsers. If your grammar file <<<parser.g4>>> contains:
+
++---
+@header {
+package org.jimi.themuss;
+}
++---
+
+ Then the <<<.g4>>> file should be stored in: <<<src/main/antlr4/org/jimi/themuss/parser.g4>>>. This way
+ the generated <<<.java>>> files will correctly reflect the package structure in which they will
+ finally rest as classes.
+

@@ -1,0 +1,54 @@
+digraph "" {
+    graph[dpi="60";compound="true"];
+
+    subgraph L {
+        node[shape="none"];
+        lefttree[label=""];
+        left[shape="invtriangle";label="x"];
+        leftroot[label="a"];
+
+        lefttree -> left[style="invisible";dir="none"];
+        left -> leftroot[dir="back"];
+    }
+
+    subgraph AB {
+        optree[shape="none";label=""];
+        temp1[shape="none";label="+"];
+
+        optree -> temp1[style="invisible";dir="none"];
+    }
+
+    subgraph R {
+        righttree[shape="none";label=""];
+        right[shape="invtriangle";label="y"];
+        rightroot[shape="none";label="a"];
+
+        righttree -> right[style="invisible";dir="none"];
+        right -> rightroot[dir="back"];
+    }
+
+    subgraph BC {
+        node[color="invis";shape="point"];
+        temp2a;
+        {   rank="same";
+            temp2b;
+            temp2c;
+        }
+
+        temp2a -> temp2b[style="invisible";dir="none"];
+        temp2a -> temp2c[style="invisible";dir="none"];
+        temp2b -> temp2c[constraint="false";label="wwwwwww"];
+    }
+
+    subgraph clusterRes {
+        color="invis";
+        resulttree1[shape="invtriangle";label=""];
+        resulttree2[shape="invtriangle";label=""];
+        result[shape="record";label="{<x> | x} | {<y> | y}"];
+        resultroot[shape="none";label="a'"];
+
+        resulttree1:s -> result:x:n[dir="back"];
+        resulttree2:s -> result:y:n[dir="back"];
+        result -> resultroot[dir="back"];
+    }
+}
