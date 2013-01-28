@@ -268,7 +268,7 @@ public class Tool {
 			haveOutputDir = true;
 			if (outDir.exists() && !outDir.isDirectory()) {
 				errMgr.toolError(ErrorType.OUTPUT_DIR_IS_FILE, outputDirectory);
-				libDirectory = ".";
+				outputDirectory = ".";
 			}
 		}
 		else {
