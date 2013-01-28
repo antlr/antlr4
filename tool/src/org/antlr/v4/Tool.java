@@ -123,6 +123,7 @@ public class Tool {
 	public String inputDirectory;
 	public String outputDirectory;
 	public String libDirectory;
+	public boolean recursive = false;
 	public boolean generate_ATN_dot = false;
 	public String grammarEncoding = null; // use default locale's encoding
 	public String msgFormat = "antlr";
@@ -142,6 +143,7 @@ public class Tool {
 		new Option("inputDirectory",	"-in", OptionArgType.STRING, "specify directory to search for input files"),
 		new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
 		new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
+		new Option("recursive",			"-r", "recursively process al grammars in input directory"),
 		new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition network diagrams"),
 		new Option("grammarEncoding",	"-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
 		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages in antlr, gnu, vs2005"),
@@ -307,9 +309,29 @@ public class Tool {
 		else {
 			libDirectory = ".";
 		}
+		if ( recursive ) {
+			if (inputDirectory==null) {
+				errMgr.toolError(ErrorType.NO_INPUT_DIRECTORY);
+			} else if (!grammarFiles.isEmpty()) {
+				errMgr.toolError(ErrorType.GRAMMAR_LIST_NOT_EMPTY);
+			} else {
+				File inDir = new File(inputDirectory);
+				findGrammars(inDir, "");
+			}
+		}
 		if ( launch_ST_inspector ) {
 			STGroup.trackCreationEvents = true;
 			return_dont_exit = true;
+		}
+	}
+
+	protected void findGrammars(File dir, String path) {
+		for (File f: dir.listFiles()) {
+			if (f.isDirectory()) {
+				findGrammars(f, path + f.getName() + File.separator);
+			} else if (f.getName().endsWith(GRAMMAR_EXTENSION)) {
+				grammarFiles.add(path + f.getName());
+			}
 		}
 	}
 
