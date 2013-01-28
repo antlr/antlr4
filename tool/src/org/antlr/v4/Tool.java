@@ -279,8 +279,8 @@ public class Tool {
 				libDirectory.endsWith("\\")) {
 				libDirectory = libDirectory.substring(0, libDirectory.length() - 1);
 			}
-			File outDir = new File(libDirectory);
-			if (!outDir.exists()) {
+			File libDir = new File(libDirectory);
+			if (!libDir.exists()) {
 				errMgr.toolError(ErrorType.DIR_NOT_FOUND, libDirectory);
 				libDirectory = ".";
 			}
