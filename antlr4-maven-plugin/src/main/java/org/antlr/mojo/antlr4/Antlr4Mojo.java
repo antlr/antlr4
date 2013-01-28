@@ -267,7 +267,7 @@ public class Antlr4Mojo extends AbstractMojo {
 			}
 
 			// Set working directory for ANTLR to be the base source directory
-			tool.inputDirectory = sourceDirectory;
+			tool.inputDirectory = sourceDirectory.getAbsolutePath();
 
 			tool.processGrammarsOnCommandLine();
 
