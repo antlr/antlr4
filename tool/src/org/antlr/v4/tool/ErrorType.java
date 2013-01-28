@@ -53,6 +53,10 @@ public enum ErrorType {
 	FILE_AND_GRAMMAR_NAME_DIFFER(8, "grammar name '<arg>' and file name '<arg2>' differ", ErrorSeverity.ERROR),
 	BAD_OPTION_SET_SYNTAX(9, "invalid -Dname=value syntax: '<arg>'", ErrorSeverity.ERROR),
 	WARNING_TREATED_AS_ERROR(10, "warning treated as error", ErrorSeverity.ERROR_ONE_OFF),
+	INPUT_DIR_IS_FILE(11, "input directory is a file: <arg>", ErrorSeverity.ERROR),
+	INPUT_DIR_NONEXISTENT(12, "input directory does not exist: <arg>", ErrorSeverity.ERROR),
+	NO_INPUT_DIRECTORY(13, "input directory must be given if -r is used", ErrorSeverity.ERROR),
+	GRAMMAR_LIST_NOT_EMPTY(14, "no grammars may be given if -r is used", ErrorSeverity.ERROR),
 
 	INTERNAL_ERROR(20, "internal error: <arg> <arg2><if(exception&&verbose)>: <exception>" +
 				   "<stackTrace; separator=\"\\n\"><endif>", ErrorSeverity.ERROR),

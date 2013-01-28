@@ -120,16 +120,17 @@ public class Tool {
 
 	// fields set by option manager
 
-	public File inputDirectory;
+	public String inputDirectory;
 	public String outputDirectory;
 	public String libDirectory;
+	public boolean recursive = false;
 	public boolean generate_ATN_dot = false;
 	public String grammarEncoding = null; // use default locale's encoding
 	public String msgFormat = "antlr";
 	public boolean launch_ST_inspector = false;
 	public boolean ST_inspector_wait_for_close = false;
-    public boolean force_atn = false;
-    public boolean log = false;
+	public boolean force_atn = false;
+	public boolean log = false;
 	public boolean gen_listener = true;
 	public boolean gen_visitor = false;
 	public boolean gen_dependencies = false;
@@ -138,10 +139,12 @@ public class Tool {
 	public boolean warnings_are_errors = false;
 	public boolean longMessages = false;
 
-    public static Option[] optionDefs = {
-        new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
-        new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
-        new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition network diagrams"),
+	public static Option[] optionDefs = {
+		new Option("inputDirectory",	"-in", OptionArgType.STRING, "specify directory to search for input files"),
+		new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
+		new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
+		new Option("recursive",			"-r", "recursively process al grammars in input directory"),
+		new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition network diagrams"),
 		new Option("grammarEncoding",	"-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
 		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages in antlr, gnu, vs2005"),
 		new Option("longMessages",		"-long-messages", "show exception details when available for errors and warnings"),
@@ -153,9 +156,9 @@ public class Tool {
 		new Option("gen_dependencies",	"-depend", "generate file dependencies"),
 		new Option("",					"-D<option>=value", "set/override a grammar-level option"),
 		new Option("warnings_are_errors", "-Werror", "treat warnings as errors"),
-        new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
+		new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
 		new Option("ST_inspector_wait_for_close", "-XdbgSTWait", "wait for STViz to close before continuing"),
-        new Option("force_atn",			"-Xforce-atn", "use the ATN simulator for all predictions"),
+		new Option("force_atn",			"-Xforce-atn", "use the ATN simulator for all predictions"),
 		new Option("log",   			"-Xlog", "dump lots of logging info to antlr-timestamp.log"),
 	};
 
@@ -163,9 +166,9 @@ public class Tool {
 	protected boolean haveOutputDir = false;
 	protected boolean return_dont_exit = false;
 
-    // The internal options are for my use on the command line during dev
-    public static boolean internalOption_PrintGrammarTree = false;
-    public static boolean internalOption_ShowATNConfigsInDFA = false;
+	// The internal options are for my use on the command line during dev
+	public static boolean internalOption_PrintGrammarTree = false;
+	public static boolean internalOption_ShowATNConfigsInDFA = false;
 
 
 	public final String[] args;
@@ -173,7 +176,7 @@ public class Tool {
 	protected List<String> grammarFiles = new ArrayList<String>();
 
 	public ErrorManager errMgr;
-    public LogManager logMgr = new LogManager();
+	public LogManager logMgr = new LogManager();
 
 	List<ANTLRToolListener> listeners = new CopyOnWriteArrayList<ANTLRToolListener>();
 
@@ -183,23 +186,23 @@ public class Tool {
 	DefaultToolListener defaultListener = new DefaultToolListener(this);
 
 	public static void main(String[] args) {
-        Tool antlr = new Tool(args);
-        if ( args.length == 0 ) { antlr.help(); antlr.exit(0); }
+		Tool antlr = new Tool(args);
+		if ( args.length == 0 ) { antlr.help(); antlr.exit(0); }
 
-        try {
-            antlr.processGrammarsOnCommandLine();
-        }
-        finally {
-            if ( antlr.log ) {
-                try {
-                    String logname = antlr.logMgr.save();
-                    System.out.println("wrote "+logname);
-                }
-                catch (IOException ioe) {
-                    antlr.errMgr.toolError(ErrorType.INTERNAL_ERROR, ioe);
-                }
-            }
-        }
+		try {
+			antlr.processGrammarsOnCommandLine();
+		}
+		finally {
+			if ( antlr.log ) {
+				try {
+					String logname = antlr.logMgr.save();
+					System.out.println("wrote "+logname);
+				}
+				catch (IOException ioe) {
+					antlr.errMgr.toolError(ErrorType.INTERNAL_ERROR, ioe);
+				}
+			}
+		}
 		if ( antlr.return_dont_exit ) return;
 
 		if (antlr.errMgr.getNumErrors() > 0) {
@@ -258,6 +261,24 @@ public class Tool {
 				errMgr.toolError(ErrorType.INVALID_CMDLINE_ARG, arg);
 			}
 		}
+		if ( inputDirectory!=null ) {
+			if (inputDirectory.endsWith("/") ||
+				inputDirectory.endsWith("\\")) {
+				inputDirectory =
+					inputDirectory.substring(0, inputDirectory.length() - 1);
+			}
+			File inDir = new File(inputDirectory);
+			if (!inDir.exists() ) {
+				errMgr.toolError(ErrorType.INPUT_DIR_NONEXISTENT, inputDirectory);
+				inputDirectory = null;
+			} else if (!inDir.isDirectory()) {
+				errMgr.toolError(ErrorType.INPUT_DIR_IS_FILE, inputDirectory);
+				inputDirectory = null;
+			}
+		}
+		else {
+			inputDirectory = ".";
+		}
 		if ( outputDirectory!=null ) {
 			if (outputDirectory.endsWith("/") ||
 				outputDirectory.endsWith("\\")) {
@@ -268,7 +289,7 @@ public class Tool {
 			haveOutputDir = true;
 			if (outDir.exists() && !outDir.isDirectory()) {
 				errMgr.toolError(ErrorType.OUTPUT_DIR_IS_FILE, outputDirectory);
-				libDirectory = ".";
+				outputDirectory = ".";
 			}
 		}
 		else {
@@ -279,8 +300,8 @@ public class Tool {
 				libDirectory.endsWith("\\")) {
 				libDirectory = libDirectory.substring(0, libDirectory.length() - 1);
 			}
-			File outDir = new File(libDirectory);
-			if (!outDir.exists()) {
+			File libDir = new File(libDirectory);
+			if (!libDir.exists()) {
 				errMgr.toolError(ErrorType.DIR_NOT_FOUND, libDirectory);
 				libDirectory = ".";
 			}
@@ -288,9 +309,29 @@ public class Tool {
 		else {
 			libDirectory = ".";
 		}
+		if ( recursive ) {
+			if (inputDirectory==null) {
+				errMgr.toolError(ErrorType.NO_INPUT_DIRECTORY);
+			} else if (!grammarFiles.isEmpty()) {
+				errMgr.toolError(ErrorType.GRAMMAR_LIST_NOT_EMPTY);
+			} else {
+				File inDir = new File(inputDirectory);
+				findGrammars(inDir, "");
+			}
+		}
 		if ( launch_ST_inspector ) {
 			STGroup.trackCreationEvents = true;
 			return_dont_exit = true;
+		}
+	}
+
+	protected void findGrammars(File dir, String path) {
+		for (File f: dir.listFiles()) {
+			if (f.isDirectory()) {
+				findGrammars(f, path + f.getName() + File.separator);
+			} else if (f.getName().endsWith(GRAMMAR_EXTENSION)) {
+				grammarFiles.add(path + f.getName());
+			}
 		}
 	}
 
@@ -651,7 +692,7 @@ public class Tool {
 						writeDOTFile(g, r, dot);
 					}
 				}
-                catch (IOException ioe) {
+				catch (IOException ioe) {
 					errMgr.toolError(ErrorType.CANNOT_WRITE_FILE, ioe);
 				}
 			}
@@ -791,8 +832,8 @@ public class Tool {
 		}
 	}
 
-    public void log(@Nullable String component, String msg) { logMgr.log(component, msg); }
-    public void log(String msg) { log(null, msg); }
+	public void log(@Nullable String component, String msg) { logMgr.log(component, msg); }
+	public void log(String msg) { log(null, msg); }
 
 	public int getNumErrors() { return errMgr.getNumErrors(); }
 
