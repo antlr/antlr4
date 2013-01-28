@@ -120,7 +120,7 @@ public class Tool {
 
 	// fields set by option manager
 
-	public File inputDirectory;
+	public String inputDirectory;
 	public String outputDirectory;
 	public String libDirectory;
 	public boolean generate_ATN_dot = false;
@@ -139,6 +139,7 @@ public class Tool {
 	public boolean longMessages = false;
 
     public static Option[] optionDefs = {
+		new Option("inputDirectory",	"-in", OptionArgType.STRING, "specify directory to search for input files"),
         new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
         new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
         new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition network diagrams"),
@@ -257,6 +258,24 @@ public class Tool {
 			if ( !found ) {
 				errMgr.toolError(ErrorType.INVALID_CMDLINE_ARG, arg);
 			}
+		}
+		if ( inputDirectory!=null ) {
+			if (inputDirectory.endsWith("/") ||
+				inputDirectory.endsWith("\\")) {
+				inputDirectory =
+					inputDirectory.substring(0, inputDirectory.length() - 1);
+			}
+			File inDir = new File(inputDirectory);
+			if (!inDir.exists() ) {
+				errMgr.toolError(ErrorType.INPUT_DIR_NONEXISTENT, inputDirectory);
+				inputDirectory = null;
+			} else if (!inDir.isDirectory()) {
+				errMgr.toolError(ErrorType.INPUT_DIR_IS_FILE, inputDirectory);
+				inputDirectory = null;
+			}
+		}
+		else {
+			inputDirectory = ".";
 		}
 		if ( outputDirectory!=null ) {
 			if (outputDirectory.endsWith("/") ||
