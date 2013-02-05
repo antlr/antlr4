@@ -340,6 +340,21 @@ public class TestIntervalSet extends BaseTest {
         assertEquals(expecting, result);
     }
 
+	/**
+	 * This case is responsible for antlr/antlr4#153.
+	 * https://github.com/antlr/antlr4/issues/153
+	 */
+	@Test public void testMergeWhereAdditionMergesThreeExistingIntervals() throws Exception {
+		IntervalSet s = new IntervalSet();
+		s.add(0);
+		s.add(3);
+		s.add(5);
+		s.add(0, 7);
+		String expecting = "{0..7}";
+		String result = s.toString();
+		assertEquals(expecting, result);
+	}
+
 	@Test public void testMergeWithDoubleOverlap() throws Exception {
 		IntervalSet s = IntervalSet.of(1,10);
 		s.add(20,30);
