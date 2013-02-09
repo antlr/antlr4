@@ -32,9 +32,10 @@ Hi and welcome to the Honey Badger 4.0 release of ANTLR!
 1. Download http://antlr.org/download/antlr-4.0-complete.jar
    Save to your directory for 3rd party Java libraries, say `C:\Javalib`
 2. Add `antlr-4.0-complete.jar` to CLASSPATH, either:
- * Permanently: Using System Properties dialog > Environment variables >
+ * Permanently:<br> 
+   using System Properties dialog > Environment variables >
    Create or append to CLASSPATH variable
- * Temporarily, at command line:
+ * Temporarily: at command line:<br>
    `SET CLASSPATH=C:\Javalib\antlr-4.0-complete.jar;%CLASSPATH%`
 3. Create short convenient commands for the ANTLR Tool, and TestRig,
    using batch files or doskey commands:
@@ -98,8 +99,9 @@ hello parrt
 (r hello parrt)
 ```
 
-(That `^D` means EOF on unix; it's `^Z` in Windows.) The `-tree` option prints
-the parse tree in LISP notation.
+(That `^D` means EOF on unix; it's `^Z` in Windows.) 
+
+The `-tree` option prints the parse tree in LISP notation.
 
 ###BOOK SOURCE CODE
 
