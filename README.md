@@ -115,7 +115,7 @@ hello parrt
 (r hello parrt)
 ```
 
-(That ^D means EOF on unix; it's ^Z in Windows.) The -tree option prints
+(That `^D` means EOF on unix; it's `^Z` in Windows.) The `-tree` option prints
 the parse tree in LISP notation.
 
 ###BOOK SOURCE CODE
