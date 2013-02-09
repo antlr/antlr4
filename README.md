@@ -1,14 +1,16 @@
-ANTLR v4
+## ANTLR v4
 
 Terence Parr, parrt at cs usfca edu
+
 ANTLR project lead and supreme dictator for life
+
 University of San Francisco
 
-INTRODUCTION
+## INTRODUCTION
 
 Hi and welcome to the Honey Badger 4.0 release of ANTLR!
 
-INSTALLATION
+## INSTALLATION
 
 UNIX
 
