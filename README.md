@@ -71,7 +71,7 @@ ANTLR Parser Generator Version 4.0
 
 In a temporary directory, put the following grammar inside file Hello.g4:
 
-```
+```java
 // Define a grammar called Hello
 // match keyword hello followed by an identifier
 // match lower-case identifiers
