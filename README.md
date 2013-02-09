@@ -13,7 +13,6 @@ Hi and welcome to the Honey Badger 4.0 release of ANTLR!
 #### UNIX
 
 0. Install Java (version 1.6 or higher)
-
 1. Download
    `$ cd /usr/local/lib`
    `$ curl -O http://www.antlr4.org/download/antlr-4.0-complete.jar`
