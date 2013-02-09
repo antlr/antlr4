@@ -1,9 +1,7 @@
 ## ANTLR v4
 
 Terence Parr, parrt at cs usfca edu
-
 ANTLR project lead and supreme dictator for life
-
 University of San Francisco
 
 ## INTRODUCTION
