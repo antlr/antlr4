@@ -27,57 +27,15 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using Antlr4.Runtime.Misc;
-using Java.Awt;
-using Java.Awt.Event;
 using Sharpen;
 
 namespace Antlr4.Runtime.Misc
 {
 	public class Utils
 	{
-		public static string Join<_T0>(IEnumerable<_T0> iter, string separator)
-		{
-			return Join(iter.GetEnumerator(), separator);
-		}
-
-		public static string Join<T>(T[] array, string separator)
-		{
-			return Join(Arrays.AsList(array), separator);
-		}
-
-		// Seriously: why isn't this built in to java? ugh!
-		public static string Join<T>(IEnumerator<T> iter, string separator)
-		{
-			StringBuilder buf = new StringBuilder();
-			while (iter.HasNext())
-			{
-				buf.Append(iter.Next());
-				if (iter.HasNext())
-				{
-					buf.Append(separator);
-				}
-			}
-			return buf.ToString();
-		}
-
-		public static bool Equals(object x, object y)
-		{
-			if (x == y)
-			{
-				return true;
-			}
-			if (x == null || y == null)
-			{
-				return false;
-			}
-			return x.Equals(y);
-		}
-
 		public static int NumNonnull(object[] data)
 		{
 			int n = 0;
@@ -145,15 +103,6 @@ namespace Antlr4.Runtime.Misc
 			return buf.ToString();
 		}
 
-		/// <exception cref="System.IO.IOException"></exception>
-		public static void WriteFile(string fileName, string content)
-		{
-			FileWriter fw = new FileWriter(fileName);
-			TextWriter w = new BufferedWriter(fw);
-			w.Write(content);
-			w.Close();
-		}
-
 		public static void RemoveAll<T, _T1>(IList<T> list, IPredicate<_T1> predicate)
 		{
 			int j = 0;
@@ -191,68 +140,6 @@ namespace Antlr4.Runtime.Misc
 					iterator.Remove();
 				}
 			}
-		}
-
-		/// <exception cref="System.Exception"></exception>
-		public static void WaitForClose(Window window)
-		{
-			object Lock = new object();
-			Sharpen.Thread t = new _Thread_146(Lock, window);
-			t.Start();
-			window.AddWindowListener(new _WindowAdapter_162(Lock, window));
-			t.Join();
-		}
-
-		private sealed class _Thread_146 : Sharpen.Thread
-		{
-			public _Thread_146(object Lock, Window window)
-			{
-				this.Lock = Lock;
-				this.window = window;
-			}
-
-			public override void Run()
-			{
-				lock (Lock)
-				{
-					while (window.IsVisible())
-					{
-						try
-						{
-							Sharpen.Runtime.Wait(Lock, 500);
-						}
-						catch (Exception)
-						{
-						}
-					}
-				}
-			}
-
-			private readonly object Lock;
-
-			private readonly Window window;
-		}
-
-		private sealed class _WindowAdapter_162 : WindowAdapter
-		{
-			public _WindowAdapter_162(object Lock, Window window)
-			{
-				this.Lock = Lock;
-				this.window = window;
-			}
-
-			public override void WindowClosing(WindowEvent arg0)
-			{
-				lock (Lock)
-				{
-					window.SetVisible(false);
-					Sharpen.Runtime.Notify(Lock);
-				}
-			}
-
-			private readonly object Lock;
-
-			private readonly Window window;
 		}
 	}
 }
