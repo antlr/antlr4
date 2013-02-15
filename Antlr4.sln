@@ -1,6 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{47C0086D-577C-43DA-ADC7-544F27656E45}"
+	ProjectSection(SolutionItems) = preProject
+		reference\sharpen-all-options.txt = reference\sharpen-all-options.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
