@@ -39,8 +39,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ANTLRFileStream.cs" />
-    <Compile Include="ANTLRInputStream.cs" />
+    <Compile Include="AntlrFileStream.cs" />
+    <Compile Include="AntlrInputStream.cs" />
     <Compile Include="Atn\AbstractPredicateTransition.cs" />
     <Compile Include="Atn\ActionTransition.cs" />
     <Compile Include="Atn\ArrayPredictionContext.cs" />
