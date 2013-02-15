@@ -1,0 +1,3 @@
+[submodule "reference/antlr4"]
+	path = reference/antlr4
+	url = git://github.com/sharwell/antlr4.git
