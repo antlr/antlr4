@@ -182,14 +182,14 @@ namespace Antlr4.Runtime
 
 		/// <summary>Call this method to view a parse tree in a dialog box visually.</summary>
 		/// <remarks>Call this method to view a parse tree in a dialog box visually.</remarks>
-		public virtual Future<JDialog> Inspect(Parser parser)
+		public virtual IFuture<JDialog> Inspect(Parser parser)
 		{
 			IList<string> ruleNames = parser != null ? Arrays.AsList(parser.GetRuleNames()) : 
 				null;
 			return Inspect(ruleNames);
 		}
 
-		public virtual Future<JDialog> Inspect(IList<string> ruleNames)
+		public virtual IFuture<JDialog> Inspect(IList<string> ruleNames)
 		{
 			TreeViewer viewer = new TreeViewer(ruleNames, this);
 			return viewer.Open();

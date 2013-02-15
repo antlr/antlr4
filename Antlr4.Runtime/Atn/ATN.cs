@@ -44,7 +44,7 @@ namespace Antlr4.Runtime.Atn
 		public const int Lexer = 2;
 
 		[NotNull]
-		public readonly IList<ATNState> states = new AList<ATNState>();
+		public readonly IList<ATNState> states = new List<ATNState>();
 
 		/// <summary>
 		/// Each subrule/rule is a decision point and we must track them so we
@@ -56,7 +56,7 @@ namespace Antlr4.Runtime.Atn
 		/// all the rules, subrules, optional blocks, ()+, ()* etc...
 		/// </remarks>
 		[NotNull]
-		public readonly IList<DecisionState> decisionToState = new AList<DecisionState>();
+		public readonly IList<DecisionState> decisionToState = new List<DecisionState>();
 
 		public RuleStartState[] ruleToStartState;
 
@@ -75,13 +75,13 @@ namespace Antlr4.Runtime.Atn
 		public int[] ruleToActionIndex;
 
 		[NotNull]
-		public readonly IList<TokensStartState> modeToStartState = new AList<TokensStartState
+		public readonly IList<TokensStartState> modeToStartState = new List<TokensStartState
 			>();
 
 		/// <summary>used during construction from grammar AST</summary>
 		internal int stateNumber = 0;
 
-		private readonly ConcurrentMap<PredictionContext, PredictionContext> contextCache
+		private readonly IConcurrentMap<PredictionContext, PredictionContext> contextCache
 			 = new ConcurrentHashMap<PredictionContext, PredictionContext>();
 
 		[NotNull]
@@ -90,7 +90,7 @@ namespace Antlr4.Runtime.Atn
 		[NotNull]
 		public DFA[] modeToDFA = new DFA[0];
 
-		protected internal readonly ConcurrentMap<int, int> LL1Table = new ConcurrentHashMap
+		protected internal readonly IConcurrentMap<int, int> LL1Table = new ConcurrentHashMap
 			<int, int>();
 
 		/// <summary>Used for runtime deserialization of ATNs from strings</summary>

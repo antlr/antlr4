@@ -81,7 +81,7 @@ namespace Antlr4.Runtime.Dfa
 			StringBuilder buf = new StringBuilder();
 			if (dfa.states != null)
 			{
-				IList<DFAState> states = new AList<DFAState>(dfa.states.Values);
+				IList<DFAState> states = new List<DFAState>(dfa.states.Values);
 				states.Sort(new _IComparer_85());
 				foreach (DFAState s in states)
 				{

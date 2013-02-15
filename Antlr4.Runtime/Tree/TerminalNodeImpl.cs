@@ -29,17 +29,18 @@
  */
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Tree;
 using Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
 	public class TerminalNodeImpl : ITerminalNode
 	{
-		public Token symbol;
+		public IToken symbol;
 
 		public IRuleNode parent;
 
-		public TerminalNodeImpl(Token symbol)
+		public TerminalNodeImpl(IToken symbol)
 		{
 			this.symbol = symbol;
 		}
@@ -49,7 +50,7 @@ namespace Antlr4.Runtime.Tree
 			return null;
 		}
 
-		public virtual Token GetSymbol()
+		public virtual IToken GetSymbol()
 		{
 			return symbol;
 		}
@@ -59,7 +60,7 @@ namespace Antlr4.Runtime.Tree
 			return parent;
 		}
 
-		public virtual Token GetPayload()
+		public virtual IToken GetPayload()
 		{
 			return symbol;
 		}
@@ -102,7 +103,7 @@ namespace Antlr4.Runtime.Tree
 		{
 			if (symbol != null)
 			{
-				if (symbol.GetType() == Token.Eof)
+				if (symbol.GetType() == IToken.Eof)
 				{
 					return "<EOF>";
 				}

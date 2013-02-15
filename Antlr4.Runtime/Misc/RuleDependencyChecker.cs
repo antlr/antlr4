@@ -54,7 +54,7 @@ namespace Antlr4.Runtime.Misc
 			{
 				return;
 			}
-			IList<Type> typesToCheck = new AList<Type>();
+			IList<Type> typesToCheck = new List<Type>();
 			typesToCheck.AddItem(dependentClass);
 			Sharpen.Collections.AddAll(typesToCheck, dependentClass.GetDeclaredClasses());
 			foreach (Type clazz in typesToCheck)
@@ -63,7 +63,7 @@ namespace Antlr4.Runtime.Misc
 				{
 					continue;
 				}
-				IList<Tuple<RuleDependency, AnnotatedElement>> dependencies = GetDependencies(clazz
+				IList<Tuple<RuleDependency, IAnnotatedElement>> dependencies = GetDependencies(clazz
 					);
 				if (dependencies.IsEmpty())
 				{
@@ -89,13 +89,13 @@ namespace Antlr4.Runtime.Misc
 			}
 		}
 
-		private static void CheckDependencies<_T0>(IList<Tuple<RuleDependency, AnnotatedElement
+		private static void CheckDependencies<_T0>(IList<Tuple<RuleDependency, IAnnotatedElement
 			>> dependencies, Type<_T0> recognizerClass) where _T0:Recognizer<object, object>
 		{
 			string[] ruleNames = GetRuleNames(recognizerClass);
 			int[] ruleVersions = GetRuleVersions(recognizerClass, ruleNames);
 			StringBuilder incompatible = new StringBuilder();
-			foreach (Tuple<RuleDependency, AnnotatedElement> dependency in dependencies)
+			foreach (Tuple<RuleDependency, IAnnotatedElement> dependency in dependencies)
 			{
 				if (!recognizerClass.IsAssignableFrom(dependency.GetItem1().Recognizer()))
 				{
@@ -218,11 +218,11 @@ namespace Antlr4.Runtime.Misc
 			return new string[0];
 		}
 
-		public static IList<Tuple<RuleDependency, AnnotatedElement>> GetDependencies<_T0>
-			(Type<_T0> clazz)
+		public static IList<Tuple<RuleDependency, IAnnotatedElement>> GetDependencies<_T0
+			>(Type<_T0> clazz)
 		{
-			IList<Tuple<RuleDependency, AnnotatedElement>> result = new AList<Tuple<RuleDependency
-				, AnnotatedElement>>();
+			IList<Tuple<RuleDependency, IAnnotatedElement>> result = new List<Tuple<RuleDependency
+				, IAnnotatedElement>>();
 			IList<ElementType> supportedTarget = Arrays.AsList(typeof(RuleDependency).GetAnnotation
 				<Target>().Value());
 			foreach (ElementType target in supportedTarget)
@@ -298,8 +298,8 @@ namespace Antlr4.Runtime.Misc
 			return result;
 		}
 
-		private static void GetElementDependencies(AnnotatedElement annotatedElement, IList
-			<Tuple<RuleDependency, AnnotatedElement>> result)
+		private static void GetElementDependencies(IAnnotatedElement annotatedElement, IList
+			<Tuple<RuleDependency, IAnnotatedElement>> result)
 		{
 			RuleDependency dependency = annotatedElement.GetAnnotation<RuleDependency>();
 			if (dependency != null)

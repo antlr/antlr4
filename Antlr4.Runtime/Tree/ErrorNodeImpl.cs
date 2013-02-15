@@ -46,7 +46,7 @@ namespace Antlr4.Runtime.Tree
 	/// </remarks>
 	public class ErrorNodeImpl : TerminalNodeImpl, IErrorNode
 	{
-		public ErrorNodeImpl(Token token) : base(token)
+		public ErrorNodeImpl(IToken token) : base(token)
 		{
 		}
 

@@ -232,7 +232,8 @@ namespace Antlr4.Runtime.Atn
 		/// <code>true</code>
 		/// , ambiguous alternatives are reported when they are
 		/// encountered within
-		/// <see cref="ExecATN(Antlr4.Runtime.Dfa.DFA, ITokenStream, int, SimulatorState)">ExecATN(Antlr4.Runtime.Dfa.DFA, ITokenStream, int, SimulatorState)
+		/// <see cref="ExecATN(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.ITokenStream, int, SimulatorState)
+		/// 	">ExecATN(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.ITokenStream, int, SimulatorState)
 		/// 	</see>
 		/// . When
 		/// <code>false</code>
@@ -507,7 +508,7 @@ namespace Antlr4.Runtime.Atn
 					}
 				}
 				s = target;
-				if (!s.isAcceptState && t != IntStream.Eof)
+				if (!s.isAcceptState && t != IIntStream.Eof)
 				{
 					input.Consume();
 					t = input.La(1);
@@ -786,7 +787,7 @@ namespace Antlr4.Runtime.Atn
 					return predictedAlt;
 				}
 				previous = nextState;
-				if (t != IntStream.Eof)
+				if (t != IIntStream.Eof)
 				{
 					input.Consume();
 					t = input.La(1);
@@ -852,7 +853,7 @@ namespace Antlr4.Runtime.Atn
 				return new SimulatorState(previous.outerContext, existingTarget, useContext, remainingGlobalContext
 					);
 			}
-			IList<ATNConfig> closureConfigs = new AList<ATNConfig>(s0.configs);
+			IList<ATNConfig> closureConfigs = new List<ATNConfig>(s0.configs);
 			IntegerList contextElements = null;
 			ATNConfigSet reach = new ATNConfigSet();
 			bool stepIntoGlobal;
@@ -870,11 +871,11 @@ namespace Antlr4.Runtime.Atn
 					if (c.GetState() is RuleStopState)
 					{
 						System.Diagnostics.Debug.Assert(c.GetContext().IsEmpty());
-						if (useContext && !c.GetReachesIntoOuterContext() || t == IntStream.Eof)
+						if (useContext && !c.GetReachesIntoOuterContext() || t == IIntStream.Eof)
 						{
 							if (skippedStopStates == null)
 							{
-								skippedStopStates = new AList<ATNConfig>();
+								skippedStopStates = new List<ATNConfig>();
 							}
 							skippedStopStates.AddItem(c);
 						}
@@ -903,7 +904,7 @@ namespace Antlr4.Runtime.Atn
 				Closure(reachIntermediate, reach, collectPredicates, hasMoreContext, contextCache
 					);
 				stepIntoGlobal = reach.GetDipsIntoOuterContext();
-				if (t == IntStream.Eof)
+				if (t == IIntStream.Eof)
 				{
 					reach = RemoveAllConfigsNotInRuleStopState(reach, contextCache);
 				}
@@ -1193,7 +1194,7 @@ namespace Antlr4.Runtime.Atn
 		public virtual DFAState.PredPrediction[] GetPredicatePredictions(BitSet ambigAlts
 			, SemanticContext[] altToPred)
 		{
-			IList<DFAState.PredPrediction> pairs = new AList<DFAState.PredPrediction>();
+			IList<DFAState.PredPrediction> pairs = new List<DFAState.PredPrediction>();
 			bool containsPredicate = false;
 			for (int i = 1; i < altToPred.Length; i++)
 			{
@@ -1619,7 +1620,7 @@ namespace Antlr4.Runtime.Atn
 			{
 				return null;
 			}
-			IList<ATNConfig> configs = new AList<ATNConfig>(configset);
+			IList<ATNConfig> configs = new List<ATNConfig>(configset);
 			configs.Sort(StateAltSortComparator);
 			bool exact = !configset.GetDipsIntoOuterContext() && predictionMode == PredictionMode
 				.LlExactAmbigDetection;
@@ -1823,7 +1824,7 @@ namespace Antlr4.Runtime.Atn
 		[NotNull]
 		public virtual string GetTokenName(int t)
 		{
-			if (t == Token.Eof)
+			if (t == IToken.Eof)
 			{
 				return "EOF";
 			}

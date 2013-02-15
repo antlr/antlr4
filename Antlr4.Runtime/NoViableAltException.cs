@@ -65,7 +65,7 @@ namespace Antlr4.Runtime
 		/// buffer all of the tokens but later we might not have access to those.)
 		/// </remarks>
 		[NotNull]
-		private readonly Token startToken;
+		private readonly IToken startToken;
 
 		public NoViableAltException(Parser recognizer) : this(recognizer, ((ITokenStream)
 			recognizer.GetInputStream()), recognizer.GetCurrentToken(), recognizer.GetCurrentToken
@@ -73,8 +73,8 @@ namespace Antlr4.Runtime
 		{
 		}
 
-		public NoViableAltException(Recognizer<Token, object> recognizer, ITokenStream input
-			, Token startToken, Token offendingToken, ATNConfigSet deadEndConfigs, ParserRuleContext
+		public NoViableAltException(Recognizer<IToken, object> recognizer, ITokenStream input
+			, IToken startToken, IToken offendingToken, ATNConfigSet deadEndConfigs, ParserRuleContext
 			 ctx) : base(recognizer, input, ctx)
 		{
 			// LL(1) error
@@ -83,7 +83,7 @@ namespace Antlr4.Runtime
 			this.SetOffendingToken(offendingToken);
 		}
 
-		public virtual Token GetStartToken()
+		public virtual IToken GetStartToken()
 		{
 			return startToken;
 		}

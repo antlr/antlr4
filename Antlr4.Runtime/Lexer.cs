@@ -52,17 +52,17 @@ namespace Antlr4.Runtime
 
 		public const int Skip = -3;
 
-		public const int DefaultTokenChannel = Token.DefaultChannel;
+		public const int DefaultTokenChannel = IToken.DefaultChannel;
 
-		public const int Hidden = Token.HiddenChannel;
+		public const int Hidden = IToken.HiddenChannel;
 
 		public const int MinCharValue = '\u0000';
 
 		public const int MaxCharValue = '\uFFFE';
 
-		public CharStream _input;
+		public ICharStream _input;
 
-		protected internal Tuple<ITokenSource, CharStream> _tokenFactorySourcePair;
+		protected internal Tuple<ITokenSource, ICharStream> _tokenFactorySourcePair;
 
 		/// <summary>How to create token objects</summary>
 		protected internal ITokenFactory _factory = CommonTokenFactory.Default;
@@ -77,7 +77,7 @@ namespace Antlr4.Runtime
 		/// something nonnull so that the auto token emit mechanism will not
 		/// emit another token.
 		/// </remarks>
-		public Token _token;
+		public IToken _token;
 
 		/// <summary>
 		/// What character index in the stream did the current token start at?
@@ -123,7 +123,7 @@ namespace Antlr4.Runtime
 		/// </remarks>
 		public string _text;
 
-		public Lexer(CharStream input)
+		public Lexer(ICharStream input)
 		{
 			this._input = input;
 			this._tokenFactorySourcePair = Tuple.Create(this, input);
@@ -138,8 +138,8 @@ namespace Antlr4.Runtime
 			}
 			// rewind the input
 			_token = null;
-			_type = Token.InvalidType;
-			_channel = Token.DefaultChannel;
+			_type = IToken.InvalidType;
+			_channel = IToken.DefaultChannel;
 			_tokenStartCharIndex = -1;
 			_tokenStartCharPositionInLine = -1;
 			_tokenStartLine = -1;
@@ -158,7 +158,7 @@ namespace Antlr4.Runtime
 		/// Return a token from this source; i.e., match a token on the char
 		/// stream.
 		/// </remarks>
-		public virtual Token NextToken()
+		public virtual IToken NextToken()
 		{
 			if (_input == null)
 			{
@@ -178,14 +178,14 @@ namespace Antlr4.Runtime
 						return _token;
 					}
 					_token = null;
-					_channel = Token.DefaultChannel;
+					_channel = IToken.DefaultChannel;
 					_tokenStartCharIndex = _input.Index();
 					_tokenStartCharPositionInLine = GetInterpreter().GetCharPositionInLine();
 					_tokenStartLine = GetInterpreter().GetLine();
 					_text = null;
 					do
 					{
-						_type = Token.InvalidType;
+						_type = IToken.InvalidType;
 						//				System.out.println("nextToken line "+tokenStartLine+" at "+((char)input.LA(1))+
 						//								   " in mode "+mode+
 						//								   " at index "+input.index());
@@ -201,11 +201,11 @@ namespace Antlr4.Runtime
 							Recover(e);
 							ttype = Skip;
 						}
-						if (_input.La(1) == IntStream.Eof)
+						if (_input.La(1) == IIntStream.Eof)
 						{
 							_hitEOF = true;
 						}
-						if (_type == Token.InvalidType)
+						if (_type == IToken.InvalidType)
 						{
 							_type = ttype;
 						}
@@ -285,7 +285,7 @@ outer_break: ;
 		}
 
 		/// <summary>Set the char stream and reset the lexer</summary>
-		public virtual void SetInputStream(CharStream input)
+		public virtual void SetInputStream(ICharStream input)
 		{
 			this._input = null;
 			this._tokenFactorySourcePair = Tuple.Create(this, _input);
@@ -299,7 +299,7 @@ outer_break: ;
 			return _input.GetSourceName();
 		}
 
-		public override IntStream GetInputStream()
+		public override IIntStream GetInputStream()
 		{
 			return _input;
 		}
@@ -314,7 +314,7 @@ outer_break: ;
 		/// and getToken (to push tokens into a list and pull from that list
 		/// rather than a single variable as this implementation does).
 		/// </remarks>
-		public virtual void Emit(Token token)
+		public virtual void Emit(IToken token)
 		{
 			//System.err.println("emit "+token);
 			this._token = token;
@@ -331,15 +331,15 @@ outer_break: ;
 		/// use that to set the token's text.  Override this method to emit
 		/// custom Token objects or provide a new factory.
 		/// </remarks>
-		public virtual Token Emit()
+		public virtual IToken Emit()
 		{
-			Token t = _factory.Create(_tokenFactorySourcePair, _type, _text, _channel, _tokenStartCharIndex
+			IToken t = _factory.Create(_tokenFactorySourcePair, _type, _text, _channel, _tokenStartCharIndex
 				, GetCharIndex() - 1, _tokenStartLine, _tokenStartCharPositionInLine);
 			Emit(t);
 			return t;
 		}
 
-		public virtual Token EmitEOF()
+		public virtual IToken EmitEOF()
 		{
 			int cpos = GetCharPositionInLine();
 			// The character position for EOF is one beyond the position of
@@ -349,7 +349,7 @@ outer_break: ;
 				int n = _token.GetStopIndex() - _token.GetStartIndex() + 1;
 				cpos = _token.GetCharPositionInLine() + n;
 			}
-			Token eof = _factory.Create(_tokenFactorySourcePair, Token.Eof, null, Token.DefaultChannel
+			IToken eof = _factory.Create(_tokenFactorySourcePair, IToken.Eof, null, IToken.DefaultChannel
 				, _input.Index(), _input.Index() - 1, GetLine(), cpos);
 			Emit(eof);
 			return eof;
@@ -413,12 +413,12 @@ outer_break: ;
 
 		/// <summary>Override if emitting multiple tokens.</summary>
 		/// <remarks>Override if emitting multiple tokens.</remarks>
-		public virtual Token GetToken()
+		public virtual IToken GetToken()
 		{
 			return _token;
 		}
 
-		public virtual void SetToken(Token _token)
+		public virtual void SetToken(IToken _token)
 		{
 			this._token = _token;
 		}
@@ -467,11 +467,11 @@ outer_break: ;
 		/// Return a list of all Token objects in input char stream.
 		/// Forces load of all tokens. Does not include EOF token.
 		/// </remarks>
-		public virtual IList<Token> GetAllTokens()
+		public virtual IList<IToken> GetAllTokens()
 		{
-			IList<Token> tokens = new AList<Token>();
-			Token t = NextToken();
-			while (t.GetType() != Token.Eof)
+			IList<IToken> tokens = new List<IToken>();
+			IToken t = NextToken();
+			while (t.GetType() != IToken.Eof)
 			{
 				tokens.AddItem(t);
 				t = NextToken();
@@ -481,7 +481,7 @@ outer_break: ;
 
 		public virtual void Recover(LexerNoViableAltException e)
 		{
-			if (_input.La(1) != IntStream.Eof)
+			if (_input.La(1) != IIntStream.Eof)
 			{
 				// skip a char and try again
 				GetInterpreter().Consume(_input);
@@ -512,7 +512,7 @@ outer_break: ;
 			string s = (char)c.ToString();
 			switch (c)
 			{
-				case Token.Eof:
+				case IToken.Eof:
 				{
 					s = "<EOF>";
 					break;

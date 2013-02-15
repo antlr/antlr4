@@ -27,67 +27,32 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
 using Sharpen;
 
 namespace Antlr4.Runtime.Misc
 {
 	/// <author>Sam Harwell</author>
-	public class Tuple<T1, T2, T3>
+	public sealed class Tuple
 	{
-		private readonly T1 item1;
-
-		private readonly T2 item2;
-
-		private readonly T3 item3;
-
-		public Tuple(T1 item1, T2 item2, T3 item3)
+		public static System.Tuple<T1, T2> Create<T1, T2>(T1 item1, T2 item2)
 		{
-			this.item1 = item1;
-			this.item2 = item2;
-			this.item3 = item3;
+			return new System.Tuple<T1, T2>(item1, item2);
 		}
 
-		public T1 GetItem1()
+		public static System.Tuple<T1, T2, T3> Create<T1, T2, T3>(T1 item1, T2 item2, T3 
+			item3)
 		{
-			return item1;
+			return new System.Tuple<T1, T2, T3>(item1, item2, item3);
 		}
 
-		public T2 GetItem2()
+		internal static bool Equals(object x, object y)
 		{
-			return item2;
+			return x == y || (x != null && x.Equals(y));
 		}
 
-		public T3 GetItem3()
+		public Tuple()
 		{
-			return item3;
 		}
-
-		public override bool Equals(object obj)
-		{
-			if (obj == this)
-			{
-				return true;
-			}
-			else
-			{
-				if (!(obj is Tuple<object, object, object>))
-				{
-					return false;
-				}
-			}
-			Tuple<object, object, object> other = (Tuple<object, object, object>)obj;
-			return Tuple.Equals(this.item1, other.item1) && Tuple.Equals(this.item2, other.item2
-				) && Tuple.Equals(this.item3, other.item3);
-		}
-
-		public override int GetHashCode()
-		{
-			int hash = 5;
-			hash = 79 * hash + (this.item1 != null ? this.item1.GetHashCode() : 0);
-			hash = 79 * hash + (this.item2 != null ? this.item2.GetHashCode() : 0);
-			hash = 79 * hash + (this.item3 != null ? this.item3.GetHashCode() : 0);
-			return hash;
-		}
+		// static utility class
 	}
 }

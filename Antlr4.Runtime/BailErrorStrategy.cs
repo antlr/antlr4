@@ -73,7 +73,7 @@ namespace Antlr4.Runtime
 		/// successfully recovers, it won't throw an exception.
 		/// </remarks>
 		/// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
-		public override Token RecoverInline(Parser recognizer)
+		public override IToken RecoverInline(Parser recognizer)
 		{
 			InputMismatchException e = new InputMismatchException(recognizer);
 			for (ParserRuleContext context = recognizer.GetContext(); context != null; context

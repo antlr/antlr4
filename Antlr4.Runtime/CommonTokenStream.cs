@@ -64,7 +64,7 @@ namespace Antlr4.Runtime
 		/// 	</summary>
 		/// <remarks>Skip tokens on any channel but this one; this is how we skip whitespace...
 		/// 	</remarks>
-		protected internal int channel = Token.DefaultChannel;
+		protected internal int channel = IToken.DefaultChannel;
 
 		public CommonTokenStream(ITokenSource tokenSource) : base(tokenSource)
 		{
@@ -81,7 +81,7 @@ namespace Antlr4.Runtime
 			return NextTokenOnChannel(i, channel);
 		}
 
-		protected internal override Token Lb(int k)
+		protected internal override IToken Lb(int k)
 		{
 			if (k == 0 || (p - k) < 0)
 			{
@@ -103,7 +103,7 @@ namespace Antlr4.Runtime
 			return tokens[i];
 		}
 
-		public override Token Lt(int k)
+		public override IToken Lt(int k)
 		{
 			//System.out.println("enter LT("+k+")");
 			LazyInit();
@@ -140,12 +140,12 @@ namespace Antlr4.Runtime
 			Fill();
 			for (int i = 0; i < tokens.Count; i++)
 			{
-				Token t = tokens[i];
+				IToken t = tokens[i];
 				if (t.GetChannel() == channel)
 				{
 					n++;
 				}
-				if (t.GetType() == Token.Eof)
+				if (t.GetType() == IToken.Eof)
 				{
 					break;
 				}

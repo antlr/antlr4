@@ -33,6 +33,7 @@ using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Tree;
 using Sharpen;
 
 namespace Antlr4.Runtime
@@ -41,7 +42,7 @@ namespace Antlr4.Runtime
 	/// 	</summary>
 	/// <remarks>This is all the parsing support code essentially; most of it is error recovery stuff.
 	/// 	</remarks>
-	public abstract class Parser : Recognizer<Token, ParserATNSimulator>
+	public abstract class Parser : Recognizer<IToken, ParserATNSimulator>
 	{
 		public class TraceListener : IParseTreeListener
 		{
@@ -64,7 +65,7 @@ namespace Antlr4.Runtime
 			public virtual void VisitTerminal(ITerminalNode node)
 			{
 				ParserRuleContext parent = (ParserRuleContext)node.GetParent().GetRuleContext();
-				Token token = node.GetSymbol();
+				IToken token = node.GetSymbol();
 				System.Console.Out.WriteLine("consume " + token + " rule " + this._enclosing.GetRuleNames
 					()[parent.GetRuleIndex()] + " alt=" + parent.altNum);
 			}
@@ -98,7 +99,7 @@ namespace Antlr4.Runtime
 			{
 				if (ctx.children is ArrayList)
 				{
-					((AList<object>)ctx.children).TrimToSize();
+					((List<object>)ctx.children).TrimToSize();
 				}
 			}
 		}
@@ -178,9 +179,9 @@ namespace Antlr4.Runtime
 		/// that fails, throw MismatchedTokenException.
 		/// </remarks>
 		/// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
-		public virtual Token Match(int ttype)
+		public virtual IToken Match(int ttype)
 		{
-			Token t = GetCurrentToken();
+			IToken t = GetCurrentToken();
 			if (t.GetType() == ttype)
 			{
 				_errHandler.EndErrorCondition(this);
@@ -200,9 +201,9 @@ namespace Antlr4.Runtime
 		}
 
 		/// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
-		public virtual Token MatchWildcard()
+		public virtual IToken MatchWildcard()
 		{
-			Token t = GetCurrentToken();
+			IToken t = GetCurrentToken();
 			if (t.GetType() > 0)
 			{
 				_errHandler.EndErrorCondition(this);
@@ -336,7 +337,7 @@ namespace Antlr4.Runtime
 			}
 			if (_parseListeners == null)
 			{
-				_parseListeners = new AList<IParseTreeListener>();
+				_parseListeners = new List<IParseTreeListener>();
 			}
 			this._parseListeners.AddItem(listener);
 		}
@@ -425,7 +426,7 @@ namespace Antlr4.Runtime
 			this._errHandler = handler;
 		}
 
-		public override IntStream GetInputStream()
+		public override IIntStream GetInputStream()
 		{
 			return _input;
 		}
@@ -446,7 +447,7 @@ namespace Antlr4.Runtime
 		/// Match needs to return the current input symbol, which gets put
 		/// into the label for the associated token ref; e.g., x=ID.
 		/// </remarks>
-		public virtual Token GetCurrentToken()
+		public virtual IToken GetCurrentToken()
 		{
 			return _input.Lt(1);
 		}
@@ -456,7 +457,7 @@ namespace Antlr4.Runtime
 			NotifyErrorListeners(GetCurrentToken(), msg, null);
 		}
 
-		public virtual void NotifyErrorListeners(Token offendingToken, string msg, RecognitionException
+		public virtual void NotifyErrorListeners(IToken offendingToken, string msg, RecognitionException
 			 e)
 		{
 			int line = -1;
@@ -466,7 +467,7 @@ namespace Antlr4.Runtime
 				line = offendingToken.GetLine();
 				charPositionInLine = offendingToken.GetCharPositionInLine();
 			}
-			IAntlrErrorListener<Token> listener = ((IParserErrorListener)GetErrorListenerDispatch
+			IAntlrErrorListener<IToken> listener = ((IParserErrorListener)GetErrorListenerDispatch
 				());
 			listener.SyntaxError(this, offendingToken, line, charPositionInLine, msg, e);
 		}
@@ -482,9 +483,9 @@ namespace Antlr4.Runtime
 		/// would also be added as a child to the current context (node).
 		/// Trigger listener events if there's a listener.
 		/// </remarks>
-		public virtual Token Consume()
+		public virtual IToken Consume()
 		{
-			Token o = GetCurrentToken();
+			IToken o = GetCurrentToken();
 			if (o.GetType() != Eof)
 			{
 				((ITokenStream)GetInputStream()).Consume();
@@ -690,7 +691,7 @@ namespace Antlr4.Runtime
 			return precedence >= _precedenceStack.Peek();
 		}
 
-		public override IAntlrErrorListener<Token> GetErrorListenerDispatch()
+		public override IAntlrErrorListener<IToken> GetErrorListenerDispatch()
 		{
 			return new ProxyParserErrorListener(GetErrorListeners());
 		}
@@ -713,12 +714,12 @@ namespace Antlr4.Runtime
 				return true;
 			}
 			//        System.out.println("following "+s+"="+following);
-			if (!following.Contains(Token.Epsilon))
+			if (!following.Contains(IToken.Epsilon))
 			{
 				return false;
 			}
-			while (ctx != null && ctx.invokingState >= 0 && following.Contains(Token.Epsilon)
-				)
+			while (ctx != null && ctx.invokingState >= 0 && following.Contains(IToken.Epsilon
+				))
 			{
 				ATNState invokingState = atn.states[ctx.invokingState];
 				RuleTransition rt = (RuleTransition)invokingState.Transition(0);
@@ -729,7 +730,7 @@ namespace Antlr4.Runtime
 				}
 				ctx = (ParserRuleContext)ctx.parent;
 			}
-			if (following.Contains(Token.Epsilon) && symbol == Token.Eof)
+			if (following.Contains(IToken.Epsilon) && symbol == IToken.Eof)
 			{
 				return true;
 			}
@@ -751,26 +752,26 @@ namespace Antlr4.Runtime
 			ATNState s = atn.states[GetState()];
 			IntervalSet following = atn.NextTokens(s);
 			//        System.out.println("following "+s+"="+following);
-			if (!following.Contains(Token.Epsilon))
+			if (!following.Contains(IToken.Epsilon))
 			{
 				return following;
 			}
 			IntervalSet expected = new IntervalSet();
 			expected.AddAll(following);
-			expected.Remove(Token.Epsilon);
-			while (ctx != null && ctx.invokingState >= 0 && following.Contains(Token.Epsilon)
-				)
+			expected.Remove(IToken.Epsilon);
+			while (ctx != null && ctx.invokingState >= 0 && following.Contains(IToken.Epsilon
+				))
 			{
 				ATNState invokingState = atn.states[ctx.invokingState];
 				RuleTransition rt = (RuleTransition)invokingState.Transition(0);
 				following = atn.NextTokens(rt.followState);
 				expected.AddAll(following);
-				expected.Remove(Token.Epsilon);
+				expected.Remove(IToken.Epsilon);
 				ctx = (ParserRuleContext)ctx.parent;
 			}
-			if (following.Contains(Token.Epsilon))
+			if (following.Contains(IToken.Epsilon))
 			{
-				expected.Add(Token.Eof);
+				expected.Add(IToken.Eof);
 			}
 			return expected;
 		}
@@ -815,7 +816,7 @@ namespace Antlr4.Runtime
 		public virtual IList<string> GetRuleInvocationStack(RuleContext p)
 		{
 			string[] ruleNames = GetRuleNames();
-			IList<string> stack = new AList<string>();
+			IList<string> stack = new List<string>();
 			while (p != null)
 			{
 				// compute what follows who invoked us
@@ -836,7 +837,7 @@ namespace Antlr4.Runtime
 		/// <summary>For debugging and other purposes</summary>
 		public virtual IList<string> GetDFAStrings()
 		{
-			IList<string> s = new AList<string>();
+			IList<string> s = new List<string>();
 			for (int d = 0; d < _interp.atn.decisionToDFA.Length; d++)
 			{
 				DFA dfa = _interp.atn.decisionToDFA[d];
@@ -875,13 +876,13 @@ namespace Antlr4.Runtime
 		/// A convenience method for use most often with template rewrites.
 		/// Convert a List<Token> to List<String>
 		/// </remarks>
-		public virtual IList<string> ToStrings<_T0>(IList<_T0> tokens) where _T0:Token
+		public virtual IList<string> ToStrings<_T0>(IList<_T0> tokens) where _T0:IToken
 		{
 			if (tokens == null)
 			{
 				return null;
 			}
-			IList<string> strings = new AList<string>(tokens.Count);
+			IList<string> strings = new List<string>(tokens.Count);
 			for (int i = 0; i < tokens.Count; i++)
 			{
 				strings.AddItem(tokens[i].GetText());

@@ -42,7 +42,7 @@ namespace Antlr4.Runtime
 	/// lookahead prediction in parser). "Unbuffered" here refers to fact
 	/// that it doesn't buffer all data, not that's it's on demand loading of char.
 	/// </remarks>
-	public class UnbufferedCharStream : CharStream
+	public class UnbufferedCharStream : ICharStream
 	{
 		/// <summary>A moving window buffer of the data being scanned.</summary>
 		/// <remarks>
@@ -173,7 +173,7 @@ namespace Antlr4.Runtime
 		// prime
 		public virtual void Consume()
 		{
-			if (La(1) == IntStream.Eof)
+			if (La(1) == IIntStream.Eof)
 			{
 				throw new InvalidOperationException("cannot consume EOF");
 			}
@@ -234,7 +234,7 @@ namespace Antlr4.Runtime
 		{
 			for (int i = 0; i < n; i++)
 			{
-				if (this.n > 0 && data[this.n - 1] == IntStream.Eof)
+				if (this.n > 0 && data[this.n - 1] == IIntStream.Eof)
 				{
 					return i;
 				}
@@ -286,12 +286,12 @@ namespace Antlr4.Runtime
 			}
 			if (index > n)
 			{
-				return IntStream.Eof;
+				return IIntStream.Eof;
 			}
 			int c = data[index];
-			if (c == (char)IntStream.Eof)
+			if (c == (char)IIntStream.Eof)
 			{
-				return IntStream.Eof;
+				return IIntStream.Eof;
 			}
 			return c;
 		}

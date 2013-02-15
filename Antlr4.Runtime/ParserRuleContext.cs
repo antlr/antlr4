@@ -96,7 +96,7 @@ namespace Antlr4.Runtime
 		/// if we are debugging/tracing.
 		/// This does not trace states visited during prediction.
 		/// </remarks>
-		public Token start;
+		public IToken start;
 
 		/// <summary>
 		/// For debugging/tracing purposes, we want to track all of the nodes in
@@ -118,7 +118,7 @@ namespace Antlr4.Runtime
 		/// if we are debugging/tracing.
 		/// This does not trace states visited during prediction.
 		/// </remarks>
-		public Token stop;
+		public IToken stop;
 
 		/// <summary>Set during parsing to identify which alt of rule parser is in.</summary>
 		/// <remarks>Set during parsing to identify which alt of rule parser is in.</remarks>
@@ -172,7 +172,7 @@ namespace Antlr4.Runtime
 		{
 			if (children == null)
 			{
-				children = new AList<IParseTree>();
+				children = new List<IParseTree>();
 			}
 			children.AddItem(t);
 		}
@@ -181,7 +181,7 @@ namespace Antlr4.Runtime
 		{
 			if (children == null)
 			{
-				children = new AList<IParseTree>();
+				children = new List<IParseTree>();
 			}
 			children.AddItem(ruleInvocation);
 		}
@@ -207,7 +207,7 @@ namespace Antlr4.Runtime
 		//		if ( states==null ) states = new ArrayList<Integer>();
 		//		states.add(s);
 		//	}
-		public virtual ITerminalNode AddChild(Token matchedToken)
+		public virtual ITerminalNode AddChild(IToken matchedToken)
 		{
 			TerminalNodeImpl t = new TerminalNodeImpl(matchedToken);
 			AddChild(t);
@@ -215,7 +215,7 @@ namespace Antlr4.Runtime
 			return t;
 		}
 
-		public virtual IErrorNode AddErrorNode(Token badToken)
+		public virtual IErrorNode AddErrorNode(IToken badToken)
 		{
 			ErrorNodeImpl t = new ErrorNodeImpl(badToken);
 			AddChild(t);
@@ -269,7 +269,7 @@ namespace Antlr4.Runtime
 				if (o is ITerminalNode)
 				{
 					ITerminalNode tnode = (ITerminalNode)o;
-					Token symbol = tnode.GetSymbol();
+					IToken symbol = tnode.GetSymbol();
 					if (symbol.GetType() == ttype)
 					{
 						j++;
@@ -295,12 +295,12 @@ namespace Antlr4.Runtime
 				if (o is ITerminalNode)
 				{
 					ITerminalNode tnode = (ITerminalNode)o;
-					Token symbol = tnode.GetSymbol();
+					IToken symbol = tnode.GetSymbol();
 					if (symbol.GetType() == ttype)
 					{
 						if (tokens == null)
 						{
-							tokens = new AList<ITerminalNode>();
+							tokens = new List<ITerminalNode>();
 						}
 						tokens.AddItem(tnode);
 					}
@@ -333,7 +333,7 @@ namespace Antlr4.Runtime
 				{
 					if (contexts == null)
 					{
-						contexts = new AList<T>();
+						contexts = new List<T>();
 					}
 					contexts.AddItem(ctxType.Cast(o));
 				}
@@ -359,12 +359,12 @@ namespace Antlr4.Runtime
 			return Interval.Of(start.GetTokenIndex(), stop.GetTokenIndex());
 		}
 
-		public virtual Token GetStart()
+		public virtual IToken GetStart()
 		{
 			return start;
 		}
 
-		public virtual Token GetStop()
+		public virtual IToken GetStop()
 		{
 			return stop;
 		}

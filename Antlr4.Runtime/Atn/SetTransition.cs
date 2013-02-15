@@ -46,7 +46,7 @@ namespace Antlr4.Runtime.Atn
 			// TODO (sam): should we really allow null here?
 			if (set == null)
 			{
-				set = IntervalSet.Of(Token.InvalidType);
+				set = IntervalSet.Of(IToken.InvalidType);
 			}
 			this.set = set;
 		}

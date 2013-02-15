@@ -47,7 +47,7 @@ namespace Antlr4.Runtime
 
 		protected internal int channel = DefaultChannel;
 
-		protected internal Tuple<ITokenSource, CharStream> source;
+		protected internal Tuple<ITokenSource, ICharStream> source;
 
 		/// <summary>We need to be able to change the text once in a while.</summary>
 		/// <remarks>
@@ -74,8 +74,8 @@ namespace Antlr4.Runtime
 			this.type = type;
 		}
 
-		public CommonToken(Tuple<ITokenSource, CharStream> source, int type, int channel, 
-			int start, int stop)
+		public CommonToken(Tuple<ITokenSource, ICharStream> source, int type, int channel
+			, int start, int stop)
 		{
 			this.source = source;
 			this.type = type;
@@ -96,7 +96,7 @@ namespace Antlr4.Runtime
 			this.text = text;
 		}
 
-		public CommonToken(Token oldToken)
+		public CommonToken(IToken oldToken)
 		{
 			text = oldToken.GetText();
 			type = oldToken.GetType();
@@ -132,7 +132,7 @@ namespace Antlr4.Runtime
 			{
 				return text;
 			}
-			CharStream input = GetInputStream();
+			ICharStream input = GetInputStream();
 			if (input == null)
 			{
 				return null;
@@ -225,7 +225,7 @@ namespace Antlr4.Runtime
 			return source.GetItem1();
 		}
 
-		public virtual CharStream GetInputStream()
+		public virtual ICharStream GetInputStream()
 		{
 			return source.GetItem2();
 		}

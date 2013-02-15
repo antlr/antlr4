@@ -196,7 +196,7 @@ namespace Antlr4.Runtime
 			ITokenStream tokens = ((ITokenStream)recognizer.GetInputStream());
 			int la = tokens.La(1);
 			// try cheaper subset first; might get lucky. seems to shave a wee bit off
-			if (recognizer.GetATN().NextTokens(s).Contains(la) || la == Token.Eof)
+			if (recognizer.GetATN().NextTokens(s).Contains(la) || la == IToken.Eof)
 			{
 				return;
 			}
@@ -249,7 +249,7 @@ namespace Antlr4.Runtime
 			string input;
 			if (tokens != null)
 			{
-				if (e.GetStartToken().GetType() == Token.Eof)
+				if (e.GetStartToken().GetType() == IToken.Eof)
 				{
 					input = "<EOF>";
 				}
@@ -292,7 +292,7 @@ namespace Antlr4.Runtime
 			}
 			recognizer._syntaxErrors++;
 			BeginErrorCondition(recognizer);
-			Token t = recognizer.GetCurrentToken();
+			IToken t = recognizer.GetCurrentToken();
 			string tokenName = GetTokenErrorDisplay(t);
 			IntervalSet expecting = GetExpectedTokens(recognizer);
 			string msg = "extraneous input " + tokenName + " expecting " + expecting.ToString
@@ -308,7 +308,7 @@ namespace Antlr4.Runtime
 			}
 			recognizer._syntaxErrors++;
 			BeginErrorCondition(recognizer);
-			Token t = recognizer.GetCurrentToken();
+			IToken t = recognizer.GetCurrentToken();
 			IntervalSet expecting = GetExpectedTokens(recognizer);
 			string msg = "missing " + expecting.ToString(recognizer.GetTokenNames()) + " at "
 				 + GetTokenErrorDisplay(t);
@@ -340,10 +340,10 @@ namespace Antlr4.Runtime
 		/// reference in rule atom.  It can assume that you forgot the ')'.
 		/// </remarks>
 		/// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
-		public virtual Token RecoverInline(Parser recognizer)
+		public virtual IToken RecoverInline(Parser recognizer)
 		{
 			// SINGLE TOKEN DELETION
-			Token matchedSymbol = SingleTokenDeletion(recognizer);
+			IToken matchedSymbol = SingleTokenDeletion(recognizer);
 			if (matchedSymbol != null)
 			{
 				// we have deleted the extra token.
@@ -382,7 +382,7 @@ namespace Antlr4.Runtime
 			return false;
 		}
 
-		public virtual Token SingleTokenDeletion(Parser recognizer)
+		public virtual IToken SingleTokenDeletion(Parser recognizer)
 		{
 			int nextTokenType = ((ITokenStream)recognizer.GetInputStream()).La(2);
 			IntervalSet expecting = GetExpectedTokens(recognizer);
@@ -392,7 +392,7 @@ namespace Antlr4.Runtime
 				recognizer.Consume();
 				// simply delete extra token
 				// we want to return the token we're actually matching
-				Token matchedSymbol = recognizer.GetCurrentToken();
+				IToken matchedSymbol = recognizer.GetCurrentToken();
 				EndErrorCondition(recognizer);
 				// we know current token is correct
 				return matchedSymbol;
@@ -420,14 +420,14 @@ namespace Antlr4.Runtime
 		/// If you change what tokens must be created by the lexer,
 		/// override this method to create the appropriate tokens.
 		/// </remarks>
-		protected internal virtual Token GetMissingSymbol(Parser recognizer)
+		protected internal virtual IToken GetMissingSymbol(Parser recognizer)
 		{
-			Token currentSymbol = recognizer.GetCurrentToken();
+			IToken currentSymbol = recognizer.GetCurrentToken();
 			IntervalSet expecting = GetExpectedTokens(recognizer);
 			int expectedTokenType = expecting.GetMinElement();
 			// get any element
 			string tokenText;
-			if (expectedTokenType == Token.Eof)
+			if (expectedTokenType == IToken.Eof)
 			{
 				tokenText = "<missing EOF>";
 			}
@@ -435,9 +435,9 @@ namespace Antlr4.Runtime
 			{
 				tokenText = "<missing " + recognizer.GetTokenNames()[expectedTokenType] + ">";
 			}
-			Token current = currentSymbol;
-			Token lookback = ((ITokenStream)recognizer.GetInputStream()).Lt(-1);
-			if (current.GetType() == Token.Eof && lookback != null)
+			IToken current = currentSymbol;
+			IToken lookback = ((ITokenStream)recognizer.GetInputStream()).Lt(-1);
+			if (current.GetType() == IToken.Eof && lookback != null)
 			{
 				current = lookback;
 			}
@@ -445,12 +445,12 @@ namespace Antlr4.Runtime
 				), expectedTokenType, tokenText, current);
 		}
 
-		protected internal virtual Token ConstructToken(ITokenSource tokenSource, int expectedTokenType
-			, string tokenText, Token current)
+		protected internal virtual IToken ConstructToken(ITokenSource tokenSource, int expectedTokenType
+			, string tokenText, IToken current)
 		{
 			ITokenFactory factory = tokenSource.GetTokenFactory();
 			return factory.Create(Tuple.Create(tokenSource, current.GetTokenSource().GetInputStream
-				()), expectedTokenType, tokenText, Token.DefaultChannel, -1, -1, current.GetLine
+				()), expectedTokenType, tokenText, IToken.DefaultChannel, -1, -1, current.GetLine
 				(), current.GetCharPositionInLine());
 		}
 
@@ -473,7 +473,7 @@ namespace Antlr4.Runtime
 		/// your token objects because you don't have to go modify your lexer
 		/// so that it creates a new Java type.
 		/// </remarks>
-		public virtual string GetTokenErrorDisplay(Token t)
+		public virtual string GetTokenErrorDisplay(IToken t)
 		{
 			if (t == null)
 			{
@@ -482,7 +482,7 @@ namespace Antlr4.Runtime
 			string s = GetSymbolText(t);
 			if (s == null)
 			{
-				if (GetSymbolType(t) == Token.Eof)
+				if (GetSymbolType(t) == IToken.Eof)
 				{
 					s = "<EOF>";
 				}
@@ -494,12 +494,12 @@ namespace Antlr4.Runtime
 			return EscapeWSAndQuote(s);
 		}
 
-		protected internal virtual string GetSymbolText(Token symbol)
+		protected internal virtual string GetSymbolText(IToken symbol)
 		{
 			return symbol.GetText();
 		}
 
-		protected internal virtual int GetSymbolType(Token symbol)
+		protected internal virtual int GetSymbolType(IToken symbol)
 		{
 			return symbol.GetType();
 		}
@@ -527,7 +527,7 @@ namespace Antlr4.Runtime
 				recoverSet.AddAll(follow);
 				ctx = ctx.parent;
 			}
-			recoverSet.Remove(Token.Epsilon);
+			recoverSet.Remove(IToken.Epsilon);
 			//		System.out.println("recover set "+recoverSet.toString(recognizer.getTokenNames()));
 			return recoverSet;
 		}
@@ -537,7 +537,7 @@ namespace Antlr4.Runtime
 		{
 			//		System.err.println("consumeUntil("+set.toString(recognizer.getTokenNames())+")");
 			int ttype = ((ITokenStream)recognizer.GetInputStream()).La(1);
-			while (ttype != Token.Eof && !set.Contains(ttype))
+			while (ttype != IToken.Eof && !set.Contains(ttype))
 			{
 				//System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
 				//			recognizer.getInputStream().consume();

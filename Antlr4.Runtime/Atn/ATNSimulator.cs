@@ -86,7 +86,7 @@ namespace Antlr4.Runtime.Atn
 				data[i] = (char)(data[i] - 2);
 			}
 			ATN atn = new ATN();
-			IList<IntervalSet> sets = new AList<IntervalSet>();
+			IList<IntervalSet> sets = new List<IntervalSet>();
 			int p = 0;
 			int version = ToInt(data[p++]);
 			if (version != SerializedVersion)
@@ -101,9 +101,9 @@ namespace Antlr4.Runtime.Atn
 			//
 			// STATES
 			//
-			IList<Tuple<LoopEndState, int>> loopBackStateNumbers = new AList<Tuple<LoopEndState
+			IList<Tuple<LoopEndState, int>> loopBackStateNumbers = new List<Tuple<LoopEndState
 				, int>>();
-			IList<Tuple<BlockStartState, int>> endStateNumbers = new AList<Tuple<BlockStartState
+			IList<Tuple<BlockStartState, int>> endStateNumbers = new List<Tuple<BlockStartState
 				, int>>();
 			int nstates = ToInt(data[p++]);
 			for (int i_1 = 1; i_1 <= nstates; i_1++)
@@ -517,7 +517,7 @@ namespace Antlr4.Runtime.Atn
 					}
 					if (optimizedTransitions == null)
 					{
-						optimizedTransitions = new AList<Transition>();
+						optimizedTransitions = new List<Transition>();
 						for (int j = 0; j < i_1; j++)
 						{
 							optimizedTransitions.AddItem(state.GetOptimizedTransition(i_1));
@@ -612,7 +612,7 @@ namespace Antlr4.Runtime.Atn
 					removedEdges++;
 					if (optimizedTransitions == null)
 					{
-						optimizedTransitions = new AList<Transition>();
+						optimizedTransitions = new List<Transition>();
 						for (int j_1 = 0; j_1 < i; j_1++)
 						{
 							optimizedTransitions.AddItem(state.GetOptimizedTransition(j_1));
@@ -688,7 +688,7 @@ nextState_break: ;
 				{
 					continue;
 				}
-				IList<Transition> optimizedTransitions = new AList<Transition>();
+				IList<Transition> optimizedTransitions = new List<Transition>();
 				for (int i_1 = 0; i_1 < decision.GetNumberOfOptimizedTransitions(); i_1++)
 				{
 					if (!setTransitions.Contains(i_1))
@@ -800,7 +800,7 @@ nextState_break: ;
 				return true;
 			}
 			BitSet reachable = new BitSet(atn.states.Count);
-			Deque<ATNState> worklist = new ArrayDeque<ATNState>();
+			IDeque<ATNState> worklist = new ArrayDeque<ATNState>();
 			worklist.AddItem(transition.followState);
 			while (!worklist.IsEmpty())
 			{

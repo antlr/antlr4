@@ -139,7 +139,7 @@ namespace Antlr4.Runtime.Atn
 		/// <summary>Track the transitions emanating from this ATN state.</summary>
 		/// <remarks>Track the transitions emanating from this ATN state.</remarks>
 		protected internal readonly IList<Antlr4.Runtime.Atn.Transition> transitions = new 
-			AList<Antlr4.Runtime.Atn.Transition>(InitialNumTransitions);
+			List<Antlr4.Runtime.Atn.Transition>(InitialNumTransitions);
 
 		protected internal IList<Antlr4.Runtime.Atn.Transition> optimizedTransitions;
 
@@ -272,7 +272,7 @@ namespace Antlr4.Runtime.Atn
 		{
 			if (!IsOptimized())
 			{
-				optimizedTransitions = new AList<Antlr4.Runtime.Atn.Transition>();
+				optimizedTransitions = new List<Antlr4.Runtime.Atn.Transition>();
 			}
 			optimizedTransitions.AddItem(e);
 		}

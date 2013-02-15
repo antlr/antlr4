@@ -61,7 +61,7 @@ namespace Antlr4.Runtime.Misc
 
 		protected internal string startRuleName;
 
-		protected internal readonly IList<string> inputFiles = new AList<string>();
+		protected internal readonly IList<string> inputFiles = new List<string>();
 
 		protected internal bool printTree = false;
 
@@ -202,8 +202,8 @@ namespace Antlr4.Runtime.Misc
 					return;
 				}
 			}
-			Constructor<Lexer> lexerCtor = lexerClass.GetConstructor(typeof(CharStream));
-			Lexer lexer = lexerCtor.NewInstance((CharStream)null);
+			Constructor<Lexer> lexerCtor = lexerClass.GetConstructor(typeof(ICharStream));
+			Lexer lexer = lexerCtor.NewInstance((ICharStream)null);
 			Type parserClass = null;
 			Parser parser = null;
 			if (!startRuleName.Equals(LexerStartRuleName))
@@ -265,7 +265,7 @@ namespace Antlr4.Runtime.Misc
 		{
 			try
 			{
-				ANTLRInputStream input = new ANTLRInputStream(r);
+				AntlrInputStream input = new AntlrInputStream(r);
 				lexer.SetInputStream(input);
 				CommonTokenStream tokens = new CommonTokenStream(lexer);
 				tokens.Fill();

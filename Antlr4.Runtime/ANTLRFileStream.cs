@@ -28,7 +28,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using System.IO;
-using Antlr4.Runtime;
 using Sharpen;
 
 namespace Antlr4.Runtime
@@ -43,17 +42,17 @@ namespace Antlr4.Runtime
 	/// since we know the exact size of the object to load.  We can avoid lots
 	/// of data copying.
 	/// </remarks>
-	public class ANTLRFileStream : ANTLRInputStream
+	public class AntlrFileStream : AntlrInputStream
 	{
 		protected internal string fileName;
 
 		/// <exception cref="System.IO.IOException"></exception>
-		public ANTLRFileStream(string fileName) : this(fileName, null)
+		public AntlrFileStream(string fileName) : this(fileName, null)
 		{
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		public ANTLRFileStream(string fileName, string encoding)
+		public AntlrFileStream(string fileName, string encoding)
 		{
 			this.fileName = fileName;
 			Load(fileName, encoding);

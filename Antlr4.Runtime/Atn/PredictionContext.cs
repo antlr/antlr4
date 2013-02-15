@@ -336,7 +336,7 @@ namespace Antlr4.Runtime.Atn
 		}
 
 		public static Antlr4.Runtime.Atn.PredictionContext GetCachedContext(Antlr4.Runtime.Atn.PredictionContext
-			 context, ConcurrentMap<Antlr4.Runtime.Atn.PredictionContext, Antlr4.Runtime.Atn.PredictionContext
+			 context, IConcurrentMap<Antlr4.Runtime.Atn.PredictionContext, Antlr4.Runtime.Atn.PredictionContext
 			> contextCache, PredictionContext.IdentityHashMap visited)
 		{
 			if (context.IsEmpty())
@@ -439,7 +439,7 @@ namespace Antlr4.Runtime.Atn
 		public virtual string[] ToStrings<_T0>(Recognizer<_T0> recognizer, Antlr4.Runtime.Atn.PredictionContext
 			 stop, int currentState)
 		{
-			IList<string> result = new AList<string>();
+			IList<string> result = new List<string>();
 			for (int perm = 0; ; perm++)
 			{
 				int offset = 0;

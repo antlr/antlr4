@@ -47,7 +47,7 @@ namespace Antlr4.Runtime
 		/// resets so
 		/// we start filling at index 0 again.
 		/// </remarks>
-		protected internal Token[] tokens;
+		protected internal IToken[] tokens;
 
 		/// <summary>
 		/// The number of tokens currently in
@@ -98,7 +98,7 @@ namespace Antlr4.Runtime
 		/// <code>LT(-1)</code>
 		/// token for the current position.
 		/// </summary>
-		protected internal Token lastToken;
+		protected internal IToken lastToken;
 
 		/// <summary>
 		/// When
@@ -112,7 +112,7 @@ namespace Antlr4.Runtime
 		/// <code>null</code>
 		/// .
 		/// </summary>
-		protected internal Token lastTokenBufferStart;
+		protected internal IToken lastTokenBufferStart;
 
 		/// <summary>Absolute token index.</summary>
 		/// <remarks>
@@ -135,14 +135,14 @@ namespace Antlr4.Runtime
 		public UnbufferedTokenStream(ITokenSource tokenSource, int bufferSize)
 		{
 			this.tokenSource = tokenSource;
-			Token[] tokens = new Token[bufferSize];
+			IToken[] tokens = new IToken[bufferSize];
 			this.tokens = tokens;
 			n = 0;
 			Fill(1);
 		}
 
 		// prime the pump
-		public virtual Token Get(int i)
+		public virtual IToken Get(int i)
 		{
 			int bufferStartIndex = GetBufferStartIndex();
 			if (i < bufferStartIndex || i >= bufferStartIndex + n)
@@ -153,7 +153,7 @@ namespace Antlr4.Runtime
 			return tokens[i - bufferStartIndex];
 		}
 
-		public virtual Token Lt(int i)
+		public virtual IToken Lt(int i)
 		{
 			if (i == -1)
 			{
@@ -167,7 +167,7 @@ namespace Antlr4.Runtime
 			}
 			if (index >= n)
 			{
-				System.Diagnostics.Debug.Assert(n > 0 && tokens[n - 1].GetType() == Token.Eof);
+				System.Diagnostics.Debug.Assert(n > 0 && tokens[n - 1].GetType() == IToken.Eof);
 				return tokens[n - 1];
 			}
 			return tokens[index];
@@ -196,7 +196,7 @@ namespace Antlr4.Runtime
 		}
 
 		[NotNull]
-		public virtual string GetText(Token start, Token stop)
+		public virtual string GetText(IToken start, IToken stop)
 		{
 			if (start != null && stop != null)
 			{
@@ -208,7 +208,7 @@ namespace Antlr4.Runtime
 
 		public virtual void Consume()
 		{
-			if (La(1) == Token.Eof)
+			if (La(1) == IToken.Eof)
 			{
 				throw new InvalidOperationException("cannot consume EOF");
 			}
@@ -269,17 +269,17 @@ namespace Antlr4.Runtime
 		{
 			for (int i = 0; i < n; i++)
 			{
-				if (this.n > 0 && tokens[this.n - 1].GetType() == Token.Eof)
+				if (this.n > 0 && tokens[this.n - 1].GetType() == IToken.Eof)
 				{
 					return i;
 				}
-				Token t = tokenSource.NextToken();
+				IToken t = tokenSource.NextToken();
 				Add(t);
 			}
 			return n;
 		}
 
-		protected internal virtual void Add(Token t)
+		protected internal virtual void Add(IToken t)
 		{
 			if (n >= tokens.Length)
 			{
@@ -408,7 +408,7 @@ namespace Antlr4.Runtime
 			StringBuilder buf = new StringBuilder();
 			for (int i = a; i <= b; i++)
 			{
-				Token t = tokens[i];
+				IToken t = tokens[i];
 				buf.Append(t.GetText());
 			}
 			return buf.ToString();

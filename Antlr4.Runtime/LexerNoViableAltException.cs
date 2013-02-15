@@ -47,8 +47,8 @@ namespace Antlr4.Runtime
 		[Nullable]
 		private readonly ATNConfigSet deadEndConfigs;
 
-		public LexerNoViableAltException(Lexer lexer, CharStream input, int startIndex, ATNConfigSet
-			 deadEndConfigs) : base(lexer, input)
+		public LexerNoViableAltException(Lexer lexer, ICharStream input, int startIndex, 
+			ATNConfigSet deadEndConfigs) : base(lexer, input)
 		{
 			this.startIndex = startIndex;
 			this.deadEndConfigs = deadEndConfigs;
@@ -65,17 +65,17 @@ namespace Antlr4.Runtime
 			return deadEndConfigs;
 		}
 
-		public override IntStream GetInputStream()
+		public override IIntStream GetInputStream()
 		{
-			return (CharStream)base.GetInputStream();
+			return (ICharStream)base.GetInputStream();
 		}
 
 		public override string ToString()
 		{
 			string symbol = string.Empty;
-			if (startIndex >= 0 && startIndex < ((CharStream)GetInputStream()).Size())
+			if (startIndex >= 0 && startIndex < ((ICharStream)GetInputStream()).Size())
 			{
-				symbol = ((CharStream)GetInputStream()).GetText(Interval.Of(startIndex, startIndex
+				symbol = ((ICharStream)GetInputStream()).GetText(Interval.Of(startIndex, startIndex
 					));
 				symbol = Utils.EscapeWhitespace(symbol, false);
 			}

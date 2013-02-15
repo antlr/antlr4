@@ -43,12 +43,12 @@ namespace Antlr4.Runtime.Dfa
 		/// 	</see>
 		/// so we can get old state back
 		/// (
-		/// <see cref="Sharpen.Set{E}">Sharpen.Set&lt;E&gt;</see>
+		/// <see cref="Sharpen.ISet{E}">Sharpen.ISet&lt;E&gt;</see>
 		/// only allows you to see if it's there).
 		/// </remarks>
 		[NotNull]
-		public readonly ConcurrentMap<DFAState, DFAState> states = new ConcurrentHashMap<
-			DFAState, DFAState>();
+		public readonly IConcurrentMap<DFAState, DFAState> states = new ConcurrentHashMap
+			<DFAState, DFAState>();
 
 		[Nullable]
 		public readonly AtomicReference<DFAState> s0 = new AtomicReference<DFAState>();
@@ -68,8 +68,8 @@ namespace Antlr4.Runtime.Dfa
 		/// <summary>
 		/// Set of configs for a DFA state with at least one conflict? Mainly used as "return value"
 		/// from
-		/// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.PredictATN(DFA, ITokenStream, Antlr4.Runtime.ParserRuleContext, bool)
-		/// 	">Antlr4.Runtime.Atn.ParserATNSimulator.PredictATN(DFA, ITokenStream, Antlr4.Runtime.ParserRuleContext, bool)
+		/// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.PredictATN(DFA, Antlr4.Runtime.ITokenStream, Antlr4.Runtime.ParserRuleContext, bool)
+		/// 	">Antlr4.Runtime.Atn.ParserATNSimulator.PredictATN(DFA, Antlr4.Runtime.ITokenStream, Antlr4.Runtime.ParserRuleContext, bool)
 		/// 	</see>
 		/// for retry.
 		/// </summary>

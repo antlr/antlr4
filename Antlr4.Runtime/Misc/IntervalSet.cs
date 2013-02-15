@@ -81,12 +81,12 @@ namespace Antlr4.Runtime.Misc
 		{
 			if (els == null)
 			{
-				intervals = new AList<Interval>(2);
+				intervals = new List<Interval>(2);
 			}
 			else
 			{
 				// most sets are 1 or 2 elements
-				intervals = new AList<Interval>(els.Length);
+				intervals = new List<Interval>(els.Length);
 				foreach (int e in els)
 				{
 					Add(e);
@@ -163,7 +163,7 @@ namespace Antlr4.Runtime.Misc
 			}
 			// find position in list
 			// Use iterators as we modify list in place
-			for (ListIterator<Interval> iter = intervals.ListIterator(); iter.HasNext(); )
+			for (IListIterator<Interval> iter = intervals.ListIterator(); iter.HasNext(); )
 			{
 				Interval r = iter.Next();
 				if (addition.Equals(r))
@@ -483,14 +483,14 @@ namespace Antlr4.Runtime.Misc
 					return I.a;
 				}
 			}
-			return Token.InvalidType;
+			return IToken.InvalidType;
 		}
 
 		public virtual int GetMaxElement()
 		{
 			if (IsNil())
 			{
-				return Token.InvalidType;
+				return IToken.InvalidType;
 			}
 			Interval last = intervals[intervals.Count - 1];
 			return last.b;
@@ -501,7 +501,7 @@ namespace Antlr4.Runtime.Misc
 		{
 			if (IsNil())
 			{
-				return Token.InvalidType;
+				return IToken.InvalidType;
 			}
 			int n = intervals.Count;
 			for (int i = 0; i < n; i++)
@@ -517,7 +517,7 @@ namespace Antlr4.Runtime.Misc
 					}
 				}
 			}
-			return Token.InvalidType;
+			return IToken.InvalidType;
 		}
 
 		/// <summary>Return a list of Interval objects.</summary>
@@ -672,13 +672,13 @@ namespace Antlr4.Runtime.Misc
 
 		protected internal virtual string ElementName(string[] tokenNames, int a)
 		{
-			if (a == Token.Eof)
+			if (a == IToken.Eof)
 			{
 				return "<EOF>";
 			}
 			else
 			{
-				if (a == Token.Epsilon)
+				if (a == IToken.Epsilon)
 				{
 					return "<EPSILON>";
 				}
@@ -725,7 +725,7 @@ namespace Antlr4.Runtime.Misc
 
 		public virtual IList<int> ToList()
 		{
-			IList<int> values = new AList<int>();
+			IList<int> values = new List<int>();
 			int n = intervals.Count;
 			for (int i = 0; i < n; i++)
 			{

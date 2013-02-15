@@ -293,8 +293,8 @@ namespace Antlr4.Runtime.Atn
 			{
 				return false;
 			}
-			Deque<PredictionContext> leftWorkList = new ArrayDeque<PredictionContext>();
-			Deque<PredictionContext> rightWorkList = new ArrayDeque<PredictionContext>();
+			IDeque<PredictionContext> leftWorkList = new ArrayDeque<PredictionContext>();
+			IDeque<PredictionContext> rightWorkList = new ArrayDeque<PredictionContext>();
 			leftWorkList.AddItem(GetContext());
 			rightWorkList.AddItem(subconfig.GetContext());
 			while (!leftWorkList.IsEmpty())
@@ -388,7 +388,7 @@ namespace Antlr4.Runtime.Atn
 			builder.Append("rankdir=LR;\n");
 			IDictionary<PredictionContext, PredictionContext> visited = new IdentityHashMap<PredictionContext
 				, PredictionContext>();
-			Deque<PredictionContext> workList = new ArrayDeque<PredictionContext>();
+			IDeque<PredictionContext> workList = new ArrayDeque<PredictionContext>();
 			workList.AddItem(GetContext());
 			visited.Put(GetContext(), GetContext());
 			while (!workList.IsEmpty())

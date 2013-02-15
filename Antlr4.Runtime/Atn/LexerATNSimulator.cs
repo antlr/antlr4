@@ -53,7 +53,7 @@ namespace Antlr4.Runtime.Atn
 		/// When we hit an accept state in either the DFA or the ATN, we
 		/// have to notify the character stream to start buffering characters
 		/// via
-		/// <see cref="Antlr4.Runtime.IntStream.Mark()">Antlr4.Runtime.IntStream.Mark()</see>
+		/// <see cref="Antlr4.Runtime.IIntStream.Mark()">Antlr4.Runtime.IIntStream.Mark()</see>
 		/// and record the current state. The current sim state
 		/// includes the current index into the input, the current line,
 		/// and current character position in that line. Note that the Lexer is
@@ -132,7 +132,7 @@ namespace Antlr4.Runtime.Atn
 			this.startIndex = simulator.startIndex;
 		}
 
-		public virtual int Match(CharStream input, int mode)
+		public virtual int Match(ICharStream input, int mode)
 		{
 			match_calls++;
 			this.mode = mode;
@@ -167,7 +167,7 @@ namespace Antlr4.Runtime.Atn
 		}
 
 		// only called from test code from outside
-		protected internal virtual int MatchATN(CharStream input)
+		protected internal virtual int MatchATN(ICharStream input)
 		{
 			ATNState startState = atn.modeToStartState[mode];
 			int old_mode = mode;
@@ -189,7 +189,7 @@ namespace Antlr4.Runtime.Atn
 			return predict;
 		}
 
-		protected internal virtual int ExecATN(CharStream input, DFAState ds0)
+		protected internal virtual int ExecATN(ICharStream input, DFAState ds0)
 		{
 			//System.out.println("enter exec index "+input.index()+" from "+ds0.configs);
 			int t = input.La(1);
@@ -252,12 +252,12 @@ namespace Antlr4.Runtime.Atn
 				if (target.isAcceptState)
 				{
 					CaptureSimState(prevAccept, input, target);
-					if (t == IntStream.Eof)
+					if (t == IIntStream.Eof)
 					{
 						break;
 					}
 				}
-				if (t != IntStream.Eof)
+				if (t != IIntStream.Eof)
 				{
 					Consume(input);
 					t = input.La(1);
@@ -269,7 +269,7 @@ namespace Antlr4.Runtime.Atn
 		}
 
 		protected internal virtual int FailOrAccept(LexerATNSimulator.SimState prevAccept
-			, CharStream input, ATNConfigSet reach, int t)
+			, ICharStream input, ATNConfigSet reach, int t)
 		{
 			if (prevAccept.dfaState != null)
 			{
@@ -282,9 +282,9 @@ namespace Antlr4.Runtime.Atn
 			else
 			{
 				// if no accept and EOF is first char, return EOF
-				if (t == IntStream.Eof && input.Index() == startIndex)
+				if (t == IIntStream.Eof && input.Index() == startIndex)
 				{
-					return Token.Eof;
+					return IToken.Eof;
 				}
 				throw new LexerNoViableAltException(recog, input, startIndex, reach);
 			}
@@ -299,7 +299,7 @@ namespace Antlr4.Runtime.Atn
 		/// is a return
 		/// parameter.
 		/// </summary>
-		protected internal virtual void GetReachableConfigSet(CharStream input, ATNConfigSet
+		protected internal virtual void GetReachableConfigSet(ICharStream input, ATNConfigSet
 			 closure, ATNConfigSet reach, int t)
 		{
 			// this is used to skip processing for configs which have a lower priority
@@ -331,7 +331,7 @@ namespace Antlr4.Runtime.Atn
 			}
 		}
 
-		protected internal virtual void Accept(CharStream input, int ruleIndex, int actionIndex
+		protected internal virtual void Accept(ICharStream input, int ruleIndex, int actionIndex
 			, int index, int line, int charPos)
 		{
 			if (actionIndex >= 0 && recog != null)
@@ -342,7 +342,7 @@ namespace Antlr4.Runtime.Atn
 			input.Seek(index);
 			this.line = line;
 			this.charPositionInLine = charPos;
-			if (input.La(1) != IntStream.Eof)
+			if (input.La(1) != IIntStream.Eof)
 			{
 				Consume(input);
 			}
@@ -359,7 +359,7 @@ namespace Antlr4.Runtime.Atn
 		}
 
 		[NotNull]
-		protected internal virtual ATNConfigSet ComputeStartState(CharStream input, ATNState
+		protected internal virtual ATNConfigSet ComputeStartState(ICharStream input, ATNState
 			 p)
 		{
 			PredictionContext initialContext = PredictionContext.EmptyFull;
@@ -394,7 +394,7 @@ namespace Antlr4.Runtime.Atn
 		/// <code>false</code>
 		/// .
 		/// </returns>
-		protected internal virtual bool Closure(CharStream input, ATNConfig config, ATNConfigSet
+		protected internal virtual bool Closure(ICharStream input, ATNConfig config, ATNConfigSet
 			 configs, bool speculative)
 		{
 			if (config.GetState() is RuleStopState)
@@ -454,7 +454,7 @@ namespace Antlr4.Runtime.Atn
 
 		// side-effect: can alter configs.hasSemanticContext
 		[Nullable]
-		public virtual ATNConfig GetEpsilonTarget(CharStream input, ATNConfig config, Transition
+		public virtual ATNConfig GetEpsilonTarget(ICharStream input, ATNConfig config, Transition
 			 t, ATNConfigSet configs, bool speculative)
 		{
 			ATNConfig c;
@@ -530,10 +530,10 @@ namespace Antlr4.Runtime.Atn
 		/// is
 		/// <code>true</code>
 		/// , this method was called before
-		/// <see cref="Consume(Antlr4.Runtime.CharStream)">Consume(Antlr4.Runtime.CharStream)
+		/// <see cref="Consume(Antlr4.Runtime.ICharStream)">Consume(Antlr4.Runtime.ICharStream)
 		/// 	</see>
 		/// for the matched character. This method should call
-		/// <see cref="Consume(Antlr4.Runtime.CharStream)">Consume(Antlr4.Runtime.CharStream)
+		/// <see cref="Consume(Antlr4.Runtime.ICharStream)">Consume(Antlr4.Runtime.ICharStream)
 		/// 	</see>
 		/// before evaluating the predicate to ensure position
 		/// sensitive values, including
@@ -550,7 +550,7 @@ namespace Antlr4.Runtime.Atn
 		/// and the simulator
 		/// to the original state before returning (i.e. undo the actions made by the
 		/// call to
-		/// <see cref="Consume(Antlr4.Runtime.CharStream)">Consume(Antlr4.Runtime.CharStream)
+		/// <see cref="Consume(Antlr4.Runtime.ICharStream)">Consume(Antlr4.Runtime.ICharStream)
 		/// 	</see>
 		/// .
 		/// </remarks>
@@ -572,7 +572,7 @@ namespace Antlr4.Runtime.Atn
 		/// <code>true</code>
 		/// .
 		/// </returns>
-		protected internal virtual bool EvaluatePredicate(CharStream input, int ruleIndex
+		protected internal virtual bool EvaluatePredicate(ICharStream input, int ruleIndex
 			, int predIndex, bool speculative)
 		{
 			// assume true if no recognizer was provided
@@ -603,7 +603,7 @@ namespace Antlr4.Runtime.Atn
 		}
 
 		protected internal virtual void CaptureSimState(LexerATNSimulator.SimState settings
-			, CharStream input, DFAState dfaState)
+			, ICharStream input, DFAState dfaState)
 		{
 			settings.index = input.Index();
 			settings.line = line;
@@ -687,7 +687,7 @@ namespace Antlr4.Runtime.Atn
 		/// <summary>Get the text matched so far for the current token.</summary>
 		/// <remarks>Get the text matched so far for the current token.</remarks>
 		[NotNull]
-		public virtual string GetText(CharStream input)
+		public virtual string GetText(ICharStream input)
 		{
 			// index is first lookahead char, don't include.
 			return input.GetText(Interval.Of(startIndex, input.Index() - 1));
@@ -713,7 +713,7 @@ namespace Antlr4.Runtime.Atn
 			this.charPositionInLine = charPositionInLine;
 		}
 
-		public virtual void Consume(CharStream input)
+		public virtual void Consume(ICharStream input)
 		{
 			int curChar = input.La(1);
 			if (curChar == '\n')

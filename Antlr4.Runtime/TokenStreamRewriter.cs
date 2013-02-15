@@ -156,7 +156,7 @@ namespace Antlr4.Runtime
 			public override int Execute(StringBuilder buf)
 			{
 				buf.Append(text);
-				if (tokens.Get(index).GetType() != Token.Eof)
+				if (tokens.Get(index).GetType() != IToken.Eof)
 				{
 					buf.Append(tokens.Get(index).GetText());
 				}
@@ -221,8 +221,8 @@ namespace Antlr4.Runtime
 		{
 			this.tokens = tokens;
 			programs = new Dictionary<string, IList<TokenStreamRewriter.RewriteOperation>>();
-			programs.Put(DefaultProgramName, new AList<TokenStreamRewriter.RewriteOperation>(
-				ProgramInitSize));
+			programs.Put(DefaultProgramName, new List<TokenStreamRewriter.RewriteOperation>(ProgramInitSize
+				));
 			lastRewriteTokenIndexes = new Dictionary<string, int>();
 		}
 
@@ -266,7 +266,7 @@ namespace Antlr4.Runtime
 			Rollback(programName, MinTokenIndex);
 		}
 
-		public virtual void InsertAfter(Token t, object text)
+		public virtual void InsertAfter(IToken t, object text)
 		{
 			InsertAfter(DefaultProgramName, t, text);
 		}
@@ -276,7 +276,7 @@ namespace Antlr4.Runtime
 			InsertAfter(DefaultProgramName, index, text);
 		}
 
-		public virtual void InsertAfter(string programName, Token t, object text)
+		public virtual void InsertAfter(string programName, IToken t, object text)
 		{
 			InsertAfter(programName, t.GetTokenIndex(), text);
 		}
@@ -287,7 +287,7 @@ namespace Antlr4.Runtime
 			InsertBefore(programName, index + 1, text);
 		}
 
-		public virtual void InsertBefore(Token t, object text)
+		public virtual void InsertBefore(IToken t, object text)
 		{
 			InsertBefore(DefaultProgramName, t, text);
 		}
@@ -297,7 +297,7 @@ namespace Antlr4.Runtime
 			InsertBefore(DefaultProgramName, index, text);
 		}
 
-		public virtual void InsertBefore(string programName, Token t, object text)
+		public virtual void InsertBefore(string programName, IToken t, object text)
 		{
 			InsertBefore(programName, t.GetTokenIndex(), text);
 		}
@@ -321,12 +321,12 @@ namespace Antlr4.Runtime
 			Replace(DefaultProgramName, from, to, text);
 		}
 
-		public virtual void Replace(Token indexT, object text)
+		public virtual void Replace(IToken indexT, object text)
 		{
 			Replace(DefaultProgramName, indexT, indexT, text);
 		}
 
-		public virtual void Replace(Token from, Token to, object text)
+		public virtual void Replace(IToken from, IToken to, object text)
 		{
 			Replace(DefaultProgramName, from, to, text);
 		}
@@ -345,7 +345,7 @@ namespace Antlr4.Runtime
 			rewrites.AddItem(op);
 		}
 
-		public virtual void Replace(string programName, Token from, Token to, object text
+		public virtual void Replace(string programName, IToken from, IToken to, object text
 			)
 		{
 			Replace(programName, from.GetTokenIndex(), to.GetTokenIndex(), text);
@@ -361,12 +361,12 @@ namespace Antlr4.Runtime
 			Delete(DefaultProgramName, from, to);
 		}
 
-		public virtual void Delete(Token indexT)
+		public virtual void Delete(IToken indexT)
 		{
 			Delete(DefaultProgramName, indexT, indexT);
 		}
 
-		public virtual void Delete(Token from, Token to)
+		public virtual void Delete(IToken from, IToken to)
 		{
 			Delete(DefaultProgramName, from, to);
 		}
@@ -376,7 +376,7 @@ namespace Antlr4.Runtime
 			Replace(programName, from, to, null);
 		}
 
-		public virtual void Delete(string programName, Token from, Token to)
+		public virtual void Delete(string programName, IToken from, IToken to)
 		{
 			Replace(programName, from, to, null);
 		}
@@ -416,7 +416,7 @@ namespace Antlr4.Runtime
 		private IList<TokenStreamRewriter.RewriteOperation> InitializeProgram(string name
 			)
 		{
-			IList<TokenStreamRewriter.RewriteOperation> @is = new AList<TokenStreamRewriter.RewriteOperation
+			IList<TokenStreamRewriter.RewriteOperation> @is = new List<TokenStreamRewriter.RewriteOperation
 				>(ProgramInitSize);
 			programs.Put(name, @is);
 			return @is;
@@ -484,11 +484,11 @@ namespace Antlr4.Runtime
 				TokenStreamRewriter.RewriteOperation op = indexToOp.Get(i);
 				Sharpen.Collections.Remove(indexToOp, i);
 				// remove so any left have index size-1
-				Token t = tokens.Get(i);
+				IToken t = tokens.Get(i);
 				if (op == null)
 				{
 					// no operation at that index, just dump token
-					if (t.GetType() != Token.Eof)
+					if (t.GetType() != IToken.Eof)
 					{
 						buf.Append(t.GetText());
 					}
@@ -725,7 +725,7 @@ namespace Antlr4.Runtime
 			 before) where T:TokenStreamRewriter.RewriteOperation where _T1:TokenStreamRewriter.RewriteOperation
 		{
 			System.Type kind = typeof(T);
-			IList<T> ops = new AList<T>();
+			IList<T> ops = new List<T>();
 			for (int i = 0; i < before && i < rewrites.Count; i++)
 			{
 				TokenStreamRewriter.RewriteOperation op = rewrites[i];

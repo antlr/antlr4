@@ -59,32 +59,30 @@ namespace Antlr4.Runtime.Misc
 		{
 		}
 
-		public override bool Process<_T0>(ICollection<_T0> annotations, RoundEnvironment 
-			roundEnv)
+		public override bool Process<_T0>(ICollection<_T0> annotations, IRoundEnvironment
+			 roundEnv)
 		{
 			if (!CheckClassNameConstants())
 			{
 				return true;
 			}
-			IList<Tuple<RuleDependency, Javax.Lang.Model.Element.Element>> dependencies = GetDependencies
-				(roundEnv);
-			IDictionary<TypeMirror, IList<Tuple<RuleDependency, Javax.Lang.Model.Element.Element
-				>>> recognizerDependencies = new Dictionary<TypeMirror, IList<Tuple<RuleDependency
-				, Javax.Lang.Model.Element.Element>>>();
-			foreach (Tuple<RuleDependency, Javax.Lang.Model.Element.Element> dependency in dependencies)
+			IList<Tuple<RuleDependency, IElement>> dependencies = GetDependencies(roundEnv);
+			IDictionary<ITypeMirror, IList<Tuple<RuleDependency, IElement>>> recognizerDependencies
+				 = new Dictionary<ITypeMirror, IList<Tuple<RuleDependency, IElement>>>();
+			foreach (Tuple<RuleDependency, IElement> dependency in dependencies)
 			{
-				TypeMirror recognizerType = GetRecognizerType(dependency.GetItem1());
-				IList<Tuple<RuleDependency, Javax.Lang.Model.Element.Element>> list = recognizerDependencies
-					.Get(recognizerType);
+				ITypeMirror recognizerType = GetRecognizerType(dependency.GetItem1());
+				IList<Tuple<RuleDependency, IElement>> list = recognizerDependencies.Get(recognizerType
+					);
 				if (list == null)
 				{
-					list = new AList<Tuple<RuleDependency, Javax.Lang.Model.Element.Element>>();
+					list = new List<Tuple<RuleDependency, IElement>>();
 					recognizerDependencies.Put(recognizerType, list);
 				}
 				list.AddItem(dependency);
 			}
-			foreach (KeyValuePair<TypeMirror, IList<Tuple<RuleDependency, Javax.Lang.Model.Element.Element
-				>>> entry in recognizerDependencies.EntrySet())
+			foreach (KeyValuePair<ITypeMirror, IList<Tuple<RuleDependency, IElement>>> entry in 
+				recognizerDependencies.EntrySet())
 			{
 				processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Note, string.Format("ANTLR 4: Validating %d dependencies on rules in %s."
 					, entry.Value.Count, entry.Key.ToString()));
@@ -117,13 +115,13 @@ namespace Antlr4.Runtime.Misc
 			return true;
 		}
 
-		private static TypeMirror GetRecognizerType(RuleDependency dependency)
+		private static ITypeMirror GetRecognizerType(RuleDependency dependency)
 		{
 			try
 			{
 				dependency.Recognizer();
 				string message = string.Format("Expected %s to get the %s.", typeof(MirroredTypeException
-					).Name, typeof(TypeMirror).Name);
+					).Name, typeof(ITypeMirror).Name);
 				throw new NotSupportedException(message);
 			}
 			catch (MirroredTypeException ex)
@@ -132,14 +130,14 @@ namespace Antlr4.Runtime.Misc
 			}
 		}
 
-		private void CheckDependencies(IList<Tuple<RuleDependency, Javax.Lang.Model.Element.Element
-			>> dependencies, TypeMirror recognizerType)
+		private void CheckDependencies(IList<Tuple<RuleDependency, IElement>> dependencies
+			, ITypeMirror recognizerType)
 		{
 			string[] ruleNames = GetRuleNames(recognizerType);
 			int[] ruleVersions = GetRuleVersions(recognizerType, ruleNames);
 			RuleDependencyProcessor.RuleRelations relations = ExtractRuleRelations(recognizerType
 				);
-			foreach (Tuple<RuleDependency, Javax.Lang.Model.Element.Element> dependency in dependencies)
+			foreach (Tuple<RuleDependency, IElement> dependency in dependencies)
 			{
 				try
 				{
@@ -152,7 +150,7 @@ namespace Antlr4.Runtime.Misc
 					int effectiveRule = dependency.GetItem1().Rule();
 					if (effectiveRule < 0 || effectiveRule >= ruleVersions.Length)
 					{
-						Tuple<AnnotationMirror, AnnotationValue> ruleReferenceElement = FindRuleDependencyProperty
+						Tuple<IAnnotationMirror, IAnnotationValue> ruleReferenceElement = FindRuleDependencyProperty
 							(dependency, RuleDependencyProcessor.RuleDependencyProperty.Rule);
 						string message = string.Format("Rule dependency on unknown rule %d@%d in %s", dependency
 							.GetItem1().Rule(), dependency.GetItem1().Version(), GetRecognizerType(dependency
@@ -243,7 +241,7 @@ namespace Antlr4.Runtime.Misc
 					int declaredVersion = dependency.GetItem1().Version();
 					if (declaredVersion > highestRequiredDependency)
 					{
-						Tuple<AnnotationMirror, AnnotationValue> versionElement = FindRuleDependencyProperty
+						Tuple<IAnnotationMirror, IAnnotationValue> versionElement = FindRuleDependencyProperty
 							(dependency, RuleDependencyProcessor.RuleDependencyProperty.Version);
 						string message = string.Format("Rule dependency version mismatch: %s has maximum dependency version %d (expected %d) in %s"
 							, ruleNames[dependency.GetItem1().Rule()], highestRequiredDependency, declaredVersion
@@ -272,14 +270,14 @@ namespace Antlr4.Runtime.Misc
 			(Dependents.Self, Dependents.Parents, Dependents.Children, Dependents.Ancestors, 
 			Dependents.Descendants);
 
-		private void ReportUnimplementedDependents(Tuple<RuleDependency, Javax.Lang.Model.Element.Element
-			> dependency, EnumSet<Dependents> dependents)
+		private void ReportUnimplementedDependents(Tuple<RuleDependency, IElement> dependency
+			, EnumSet<Dependents> dependents)
 		{
 			EnumSet<Dependents> unimplemented = dependents.Clone();
 			unimplemented.RemoveAll(ImplementedDependents);
 			if (!unimplemented.IsEmpty())
 			{
-				Tuple<AnnotationMirror, AnnotationValue> dependentsElement = FindRuleDependencyProperty
+				Tuple<IAnnotationMirror, IAnnotationValue> dependentsElement = FindRuleDependencyProperty
 					(dependency, RuleDependencyProcessor.RuleDependencyProperty.Dependents);
 				if (dependentsElement == null)
 				{
@@ -301,9 +299,8 @@ namespace Antlr4.Runtime.Misc
 			}
 		}
 
-		private int CheckDependencyVersion(Tuple<RuleDependency, Javax.Lang.Model.Element.Element
-			> dependency, string[] ruleNames, int[] ruleVersions, int relatedRule, string relation
-			)
+		private int CheckDependencyVersion(Tuple<RuleDependency, IElement> dependency, string
+			[] ruleNames, int[] ruleVersions, int relatedRule, string relation)
 		{
 			string ruleName = ruleNames[dependency.GetItem1().Rule()];
 			string path;
@@ -321,7 +318,7 @@ namespace Antlr4.Runtime.Misc
 			int actualVersion = ruleVersions[relatedRule];
 			if (actualVersion > declaredVersion)
 			{
-				Tuple<AnnotationMirror, AnnotationValue> versionElement = FindRuleDependencyProperty
+				Tuple<IAnnotationMirror, IAnnotationValue> versionElement = FindRuleDependencyProperty
 					(dependency, RuleDependencyProcessor.RuleDependencyProperty.Version);
 				string message = string.Format("Rule dependency version mismatch: %s has version %d (expected <= %d) in %s"
 					, path, actualVersion, declaredVersion, GetRecognizerType(dependency.GetItem1())
@@ -340,19 +337,18 @@ namespace Antlr4.Runtime.Misc
 			return actualVersion;
 		}
 
-		private int[] GetRuleVersions(TypeMirror recognizerClass, string[] ruleNames)
+		private int[] GetRuleVersions(ITypeMirror recognizerClass, string[] ruleNames)
 		{
 			int[] versions = new int[ruleNames.Length];
-			IList<Javax.Lang.Model.Element.Element> elements = processingEnv.GetElementUtils(
-				).GetAllMembers((TypeElement)processingEnv.GetTypeUtils().AsElement(recognizerClass
-				));
-			foreach (Javax.Lang.Model.Element.Element element in elements)
+			IList<IElement> elements = processingEnv.GetElementUtils().GetAllMembers((ITypeElement
+				)processingEnv.GetTypeUtils().AsElement(recognizerClass));
+			foreach (IElement element in elements)
 			{
 				if (element.GetKind() != ElementKind.Field)
 				{
 					continue;
 				}
-				VariableElement field = (VariableElement)element;
+				IVariableElement field = (IVariableElement)element;
 				bool isStatic = element.GetModifiers().Contains(Modifier.Static);
 				object constantValue = field.GetConstantValue();
 				bool isInteger = constantValue is int;
@@ -379,7 +375,7 @@ namespace Antlr4.Runtime.Misc
 							// ignore left-factored pseudo-rules
 							continue;
 						}
-						ExecutableElement ruleMethod = GetRuleMethod(recognizerClass, name);
+						IExecutableElement ruleMethod = GetRuleMethod(recognizerClass, name);
 						if (ruleMethod == null)
 						{
 							string message = string.Format("Could not find rule method for rule '%s' in recognizer %s."
@@ -401,18 +397,18 @@ namespace Antlr4.Runtime.Misc
 			return versions;
 		}
 
-		private ExecutableElement GetRuleMethod(TypeMirror recognizerClass, string name)
+		private IExecutableElement GetRuleMethod(ITypeMirror recognizerClass, string name
+			)
 		{
-			IList<Javax.Lang.Model.Element.Element> elements = processingEnv.GetElementUtils(
-				).GetAllMembers((TypeElement)processingEnv.GetTypeUtils().AsElement(recognizerClass
-				));
-			foreach (Javax.Lang.Model.Element.Element element in elements)
+			IList<IElement> elements = processingEnv.GetElementUtils().GetAllMembers((ITypeElement
+				)processingEnv.GetTypeUtils().AsElement(recognizerClass));
+			foreach (IElement element in elements)
 			{
 				if (element.GetKind() != ElementKind.Method)
 				{
 					continue;
 				}
-				ExecutableElement method = (ExecutableElement)element;
+				IExecutableElement method = (IExecutableElement)element;
 				if (method.GetSimpleName().ContentEquals(name) && HasRuleVersionAnnotation(method
 					))
 				{
@@ -422,15 +418,15 @@ namespace Antlr4.Runtime.Misc
 			return null;
 		}
 
-		private bool HasRuleVersionAnnotation(ExecutableElement method)
+		private bool HasRuleVersionAnnotation(IExecutableElement method)
 		{
-			TypeElement ruleVersionAnnotationElement = processingEnv.GetElementUtils().GetTypeElement
+			ITypeElement ruleVersionAnnotationElement = processingEnv.GetElementUtils().GetTypeElement
 				(RuleVersionClassName);
 			if (ruleVersionAnnotationElement == null)
 			{
 				return false;
 			}
-			foreach (AnnotationMirror annotation in method.GetAnnotationMirrors())
+			foreach (IAnnotationMirror annotation in method.GetAnnotationMirrors())
 			{
 				if (processingEnv.GetTypeUtils().IsSameType(annotation.GetAnnotationType(), ruleVersionAnnotationElement
 					.AsType()))
@@ -441,19 +437,18 @@ namespace Antlr4.Runtime.Misc
 			return false;
 		}
 
-		private string[] GetRuleNames(TypeMirror recognizerClass)
+		private string[] GetRuleNames(ITypeMirror recognizerClass)
 		{
-			IList<string> result = new AList<string>();
-			IList<Javax.Lang.Model.Element.Element> elements = processingEnv.GetElementUtils(
-				).GetAllMembers((TypeElement)processingEnv.GetTypeUtils().AsElement(recognizerClass
-				));
-			foreach (Javax.Lang.Model.Element.Element element in elements)
+			IList<string> result = new List<string>();
+			IList<IElement> elements = processingEnv.GetElementUtils().GetAllMembers((ITypeElement
+				)processingEnv.GetTypeUtils().AsElement(recognizerClass));
+			foreach (IElement element in elements)
 			{
 				if (element.GetKind() != ElementKind.Field)
 				{
 					continue;
 				}
-				VariableElement field = (VariableElement)element;
+				IVariableElement field = (IVariableElement)element;
 				bool isStatic = element.GetModifiers().Contains(Modifier.Static);
 				object constantValue = field.GetConstantValue();
 				bool isInteger = constantValue is int;
@@ -488,14 +483,14 @@ namespace Antlr4.Runtime.Misc
 			return Sharpen.Collections.ToArray(result, new string[result.Count]);
 		}
 
-		public static IList<Tuple<RuleDependency, Javax.Lang.Model.Element.Element>> GetDependencies
-			(RoundEnvironment roundEnv)
+		public static IList<Tuple<RuleDependency, IElement>> GetDependencies(IRoundEnvironment
+			 roundEnv)
 		{
-			IList<Tuple<RuleDependency, Javax.Lang.Model.Element.Element>> result = new AList
-				<Tuple<RuleDependency, Javax.Lang.Model.Element.Element>>();
-			ICollection<Javax.Lang.Model.Element.Element> elements = roundEnv.GetElementsAnnotatedWith
-				(typeof(RuleDependency));
-			foreach (Javax.Lang.Model.Element.Element element in elements)
+			IList<Tuple<RuleDependency, IElement>> result = new List<Tuple<RuleDependency, IElement
+				>>();
+			ICollection<IElement> elements = roundEnv.GetElementsAnnotatedWith(typeof(RuleDependency
+				));
+			foreach (IElement element in elements)
 			{
 				RuleDependency dependency = element.GetAnnotation<RuleDependency>();
 				if (dependency == null)
@@ -505,7 +500,7 @@ namespace Antlr4.Runtime.Misc
 				result.AddItem(Tuple.Create(dependency, element));
 			}
 			elements = roundEnv.GetElementsAnnotatedWith(typeof(RuleDependencies));
-			foreach (Javax.Lang.Model.Element.Element element_1 in elements)
+			foreach (IElement element_1 in elements)
 			{
 				RuleDependencies dependencies = element_1.GetAnnotation<RuleDependencies>();
 				if (dependencies == null || dependencies.Value() == null)
@@ -529,21 +524,21 @@ namespace Antlr4.Runtime.Misc
 		}
 
 		[Nullable]
-		private Tuple<AnnotationMirror, AnnotationValue> FindRuleDependencyProperty(Tuple
-			<RuleDependency, Javax.Lang.Model.Element.Element> dependency, RuleDependencyProcessor.RuleDependencyProperty
+		private Tuple<IAnnotationMirror, IAnnotationValue> FindRuleDependencyProperty(Tuple
+			<RuleDependency, IElement> dependency, RuleDependencyProcessor.RuleDependencyProperty
 			 property)
 		{
-			TypeElement ruleDependencyTypeElement = processingEnv.GetElementUtils().GetTypeElement
+			ITypeElement ruleDependencyTypeElement = processingEnv.GetElementUtils().GetTypeElement
 				(RuleDependencyClassName);
-			TypeElement ruleDependenciesTypeElement = processingEnv.GetElementUtils().GetTypeElement
+			ITypeElement ruleDependenciesTypeElement = processingEnv.GetElementUtils().GetTypeElement
 				(RuleDependenciesClassName);
-			IList<AnnotationMirror> mirrors = dependency.GetItem2().GetAnnotationMirrors();
-			foreach (AnnotationMirror annotationMirror in mirrors)
+			IList<IAnnotationMirror> mirrors = dependency.GetItem2().GetAnnotationMirrors();
+			foreach (IAnnotationMirror annotationMirror in mirrors)
 			{
 				if (processingEnv.GetTypeUtils().IsSameType(ruleDependencyTypeElement.AsType(), annotationMirror
 					.GetAnnotationType()))
 				{
-					AnnotationValue element = FindRuleDependencyProperty(dependency, annotationMirror
+					IAnnotationValue element = FindRuleDependencyProperty(dependency, annotationMirror
 						, property);
 					if (element != null)
 					{
@@ -555,14 +550,14 @@ namespace Antlr4.Runtime.Misc
 					if (processingEnv.GetTypeUtils().IsSameType(ruleDependenciesTypeElement.AsType(), 
 						annotationMirror.GetAnnotationType()))
 					{
-						IDictionary<ExecutableElement, AnnotationValue> values = annotationMirror.GetElementValues
+						IDictionary<IExecutableElement, IAnnotationValue> values = annotationMirror.GetElementValues
 							();
-						foreach (KeyValuePair<ExecutableElement, AnnotationValue> value in values.EntrySet
+						foreach (KeyValuePair<IExecutableElement, IAnnotationValue> value in values.EntrySet
 							())
 						{
 							if ("value()".Equals(value.Key.ToString()))
 							{
-								AnnotationValue annotationValue = value.Value;
+								IAnnotationValue annotationValue = value.Value;
 								if (!(annotationValue.GetValue() is IList))
 								{
 									processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Expected array of RuleDependency annotations for annotation property 'value()'."
@@ -572,17 +567,17 @@ namespace Antlr4.Runtime.Misc
 								IList<object> annotationValueList = (IList<object>)annotationValue.GetValue();
 								foreach (object obj in annotationValueList)
 								{
-									if (!(obj is AnnotationMirror))
+									if (!(obj is IAnnotationMirror))
 									{
 										processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Expected RuleDependency annotation mirror for element of property 'value()'."
 											, dependency.GetItem2(), annotationMirror, annotationValue);
 										break;
 									}
-									AnnotationValue element = FindRuleDependencyProperty(dependency, (AnnotationMirror
+									IAnnotationValue element = FindRuleDependencyProperty(dependency, (IAnnotationMirror
 										)obj, property);
 									if (element != null)
 									{
-										return Tuple.Create((AnnotationMirror)obj, element);
+										return Tuple.Create((IAnnotationMirror)obj, element);
 									}
 								}
 							}
@@ -599,20 +594,20 @@ namespace Antlr4.Runtime.Misc
 		}
 
 		[Nullable]
-		private AnnotationValue FindRuleDependencyProperty(Tuple<RuleDependency, Javax.Lang.Model.Element.Element
-			> dependency, AnnotationMirror annotationMirror, RuleDependencyProcessor.RuleDependencyProperty
+		private IAnnotationValue FindRuleDependencyProperty(Tuple<RuleDependency, IElement
+			> dependency, IAnnotationMirror annotationMirror, RuleDependencyProcessor.RuleDependencyProperty
 			 property)
 		{
-			AnnotationValue recognizerValue = null;
-			AnnotationValue ruleValue = null;
-			AnnotationValue versionValue = null;
-			AnnotationValue dependentsValue = null;
-			IDictionary<ExecutableElement, AnnotationValue> values = annotationMirror.GetElementValues
+			IAnnotationValue recognizerValue = null;
+			IAnnotationValue ruleValue = null;
+			IAnnotationValue versionValue = null;
+			IAnnotationValue dependentsValue = null;
+			IDictionary<IExecutableElement, IAnnotationValue> values = annotationMirror.GetElementValues
 				();
-			foreach (KeyValuePair<ExecutableElement, AnnotationValue> value in values.EntrySet
+			foreach (KeyValuePair<IExecutableElement, IAnnotationValue> value in values.EntrySet
 				())
 			{
-				AnnotationValue annotationValue = value.Value;
+				IAnnotationValue annotationValue = value.Value;
 				if ("rule()".Equals(value.Key.ToString()))
 				{
 					ruleValue = annotationValue;
@@ -633,14 +628,14 @@ namespace Antlr4.Runtime.Misc
 					if ("recognizer()".Equals(value.Key.ToString()))
 					{
 						recognizerValue = annotationValue;
-						if (!(annotationValue.GetValue() is TypeMirror))
+						if (!(annotationValue.GetValue() is ITypeMirror))
 						{
 							processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Expected Class constant for annotation property 'recognizer()'."
 								, dependency.GetItem2(), annotationMirror, annotationValue);
 							return null;
 						}
-						TypeMirror annotationRecognizer = (TypeMirror)annotationValue.GetValue();
-						TypeMirror expectedRecognizer = GetRecognizerType(dependency.GetItem1());
+						ITypeMirror annotationRecognizer = (ITypeMirror)annotationValue.GetValue();
+						ITypeMirror expectedRecognizer = GetRecognizerType(dependency.GetItem1());
 						if (!processingEnv.GetTypeUtils().IsSameType(expectedRecognizer, annotationRecognizer
 							))
 						{
@@ -728,7 +723,7 @@ namespace Antlr4.Runtime.Misc
 			return null;
 		}
 
-		private RuleDependencyProcessor.RuleRelations ExtractRuleRelations(TypeMirror recognizer
+		private RuleDependencyProcessor.RuleRelations ExtractRuleRelations(ITypeMirror recognizer
 			)
 		{
 			string serializedATN = GetSerializedATN(recognizer);
@@ -758,18 +753,17 @@ namespace Antlr4.Runtime.Misc
 			return relations;
 		}
 
-		private string GetSerializedATN(TypeMirror recognizerClass)
+		private string GetSerializedATN(ITypeMirror recognizerClass)
 		{
-			IList<Javax.Lang.Model.Element.Element> elements = processingEnv.GetElementUtils(
-				).GetAllMembers((TypeElement)processingEnv.GetTypeUtils().AsElement(recognizerClass
-				));
-			foreach (Javax.Lang.Model.Element.Element element in elements)
+			IList<IElement> elements = processingEnv.GetElementUtils().GetAllMembers((ITypeElement
+				)processingEnv.GetTypeUtils().AsElement(recognizerClass));
+			foreach (IElement element in elements)
 			{
 				if (element.GetKind() != ElementKind.Field)
 				{
 					continue;
 				}
-				VariableElement field = (VariableElement)element;
+				IVariableElement field = (IVariableElement)element;
 				bool isStatic = element.GetModifiers().Contains(Modifier.Static);
 				object constantValue = field.GetConstantValue();
 				bool isString = constantValue is string;

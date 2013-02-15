@@ -36,9 +36,9 @@ using Sharpen;
 namespace Antlr4.Runtime
 {
 	/// <author>Sam Harwell</author>
-	public class ProxyParserErrorListener : ProxyErrorListener<Token>, IParserErrorListener
+	public class ProxyParserErrorListener : ProxyErrorListener<IToken>, IParserErrorListener
 	{
-		public ProxyParserErrorListener(ICollection<IAntlrErrorListener<Token>> delegates
+		public ProxyParserErrorListener(ICollection<IAntlrErrorListener<IToken>> delegates
 			) : base(delegates)
 		{
 		}
@@ -46,7 +46,7 @@ namespace Antlr4.Runtime
 		public virtual void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int
 			 stopIndex, BitSet ambigAlts, ATNConfigSet configs)
 		{
-			foreach (IAntlrErrorListener<Token> listener in GetDelegates())
+			foreach (IAntlrErrorListener<IToken> listener in GetDelegates())
 			{
 				if (!(listener is IParserErrorListener))
 				{
@@ -61,7 +61,7 @@ namespace Antlr4.Runtime
 		public virtual void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex
 			, int stopIndex, SimulatorState initialState)
 		{
-			foreach (IAntlrErrorListener<Token> listener in GetDelegates())
+			foreach (IAntlrErrorListener<IToken> listener in GetDelegates())
 			{
 				if (!(listener is IParserErrorListener))
 				{
@@ -76,7 +76,7 @@ namespace Antlr4.Runtime
 		public virtual void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex
 			, int stopIndex, SimulatorState acceptState)
 		{
-			foreach (IAntlrErrorListener<Token> listener in GetDelegates())
+			foreach (IAntlrErrorListener<IToken> listener in GetDelegates())
 			{
 				if (!(listener is IParserErrorListener))
 				{

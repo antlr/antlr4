@@ -154,7 +154,7 @@ namespace Antlr4.Runtime.Misc
 			w.Close();
 		}
 
-		public static void RemoveAll<T, _T1>(IList<T> list, Predicate<_T1> predicate)
+		public static void RemoveAll<T, _T1>(IList<T> list, IPredicate<_T1> predicate)
 		{
 			int j = 0;
 			for (int i = 0; i < list.Count; i++)
@@ -175,7 +175,7 @@ namespace Antlr4.Runtime.Misc
 			}
 		}
 
-		public static void RemoveAll<T, _T1>(IEnumerable<T> iterable, Predicate<_T1> predicate
+		public static void RemoveAll<T, _T1>(IEnumerable<T> iterable, IPredicate<_T1> predicate
 			)
 		{
 			if (iterable is IList<object>)

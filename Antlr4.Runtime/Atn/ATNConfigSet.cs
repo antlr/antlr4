@@ -73,11 +73,11 @@ namespace Antlr4.Runtime.Atn
 		/// <code>null</code>
 		/// for read-only sets stored in the DFA.
 		/// </summary>
-		private readonly AList<ATNConfig> unmerged;
+		private readonly List<ATNConfig> unmerged;
 
 		/// <summary>This is a list of all configs in this set.</summary>
 		/// <remarks>This is a list of all configs in this set.</remarks>
-		private readonly AList<ATNConfig> configs;
+		private readonly List<ATNConfig> configs;
 
 		private int uniqueAlt;
 
@@ -112,8 +112,8 @@ namespace Antlr4.Runtime.Atn
 			// Used in parser and lexer. In lexer, it indicates we hit a pred
 			// while computing a closure operation.  Don't make a DFA state from this.
 			this.mergedConfigs = new Dictionary<long, ATNConfig>();
-			this.unmerged = new AList<ATNConfig>();
-			this.configs = new AList<ATNConfig>();
+			this.unmerged = new List<ATNConfig>();
+			this.configs = new List<ATNConfig>();
 			this.uniqueAlt = ATN.InvalidAltNumber;
 		}
 
@@ -130,15 +130,15 @@ namespace Antlr4.Runtime.Atn
 				if (!set.IsReadOnly())
 				{
 					this.mergedConfigs = (Dictionary<long, ATNConfig>)set.mergedConfigs.Clone();
-					this.unmerged = (AList<ATNConfig>)set.unmerged.Clone();
+					this.unmerged = (List<ATNConfig>)set.unmerged.Clone();
 				}
 				else
 				{
 					this.mergedConfigs = new Dictionary<long, ATNConfig>(set.configs.Count);
-					this.unmerged = new AList<ATNConfig>();
+					this.unmerged = new List<ATNConfig>();
 				}
 			}
-			this.configs = (AList<ATNConfig>)set.configs.Clone();
+			this.configs = (List<ATNConfig>)set.configs.Clone();
 			this.dipsIntoOuterContext = set.dipsIntoOuterContext;
 			this.hasSemanticContext = set.hasSemanticContext;
 			this.outermostConfigSet = set.outermostConfigSet;
@@ -190,7 +190,7 @@ namespace Antlr4.Runtime.Atn
 					iterator.Remove();
 				}
 			}
-			ListIterator<ATNConfig> iterator2 = unmerged.ListIterator();
+			IListIterator<ATNConfig> iterator2 = unmerged.ListIterator();
 			while (iterator2.HasNext())
 			{
 				if (iterator2.Next().IsHidden())
@@ -517,7 +517,7 @@ namespace Antlr4.Runtime.Atn
 		public virtual string ToString(bool showContext)
 		{
 			StringBuilder buf = new StringBuilder();
-			IList<ATNConfig> sortedConfigs = new AList<ATNConfig>(configs);
+			IList<ATNConfig> sortedConfigs = new List<ATNConfig>(configs);
 			sortedConfigs.Sort(new _IComparer_467());
 			buf.Append("[");
 			for (int i = 0; i < sortedConfigs.Count; i++)

@@ -78,7 +78,7 @@ namespace Antlr4.Runtime
 		/// chunks of it later. This list captures everything so we can access
 		/// complete input text.
 		/// </remarks>
-		protected internal IList<Token> tokens = new AList<Token>(100);
+		protected internal IList<IToken> tokens = new List<IToken>(100);
 
 		/// <summary>
 		/// The index into the tokens list of the current token (next token
@@ -214,13 +214,13 @@ namespace Antlr4.Runtime
 			}
 			for (int i = 0; i < n; i++)
 			{
-				Token t = tokenSource.NextToken();
+				IToken t = tokenSource.NextToken();
 				if (t is IWritableToken)
 				{
 					((IWritableToken)t).SetTokenIndex(tokens.Count);
 				}
 				tokens.AddItem(t);
-				if (t.GetType() == Token.Eof)
+				if (t.GetType() == IToken.Eof)
 				{
 					fetchedEOF = true;
 					return i + 1;
@@ -229,7 +229,7 @@ namespace Antlr4.Runtime
 			return n;
 		}
 
-		public virtual Token Get(int i)
+		public virtual IToken Get(int i)
 		{
 			if (i < 0 || i >= tokens.Count)
 			{
@@ -241,22 +241,22 @@ namespace Antlr4.Runtime
 
 		/// <summary>Get all tokens from start..stop inclusively.</summary>
 		/// <remarks>Get all tokens from start..stop inclusively.</remarks>
-		public virtual IList<Token> Get(int start, int stop)
+		public virtual IList<IToken> Get(int start, int stop)
 		{
 			if (start < 0 || stop < 0)
 			{
 				return null;
 			}
 			LazyInit();
-			IList<Token> subset = new AList<Token>();
+			IList<IToken> subset = new List<IToken>();
 			if (stop >= tokens.Count)
 			{
 				stop = tokens.Count - 1;
 			}
 			for (int i = start; i <= stop; i++)
 			{
-				Token t = tokens[i];
-				if (t.GetType() == Token.Eof)
+				IToken t = tokens[i];
+				if (t.GetType() == IToken.Eof)
 				{
 					break;
 				}
@@ -270,7 +270,7 @@ namespace Antlr4.Runtime
 			return Lt(i).GetType();
 		}
 
-		protected internal virtual Token Lb(int k)
+		protected internal virtual IToken Lb(int k)
 		{
 			if ((p - k) < 0)
 			{
@@ -279,7 +279,7 @@ namespace Antlr4.Runtime
 			return tokens[p - k];
 		}
 
-		public virtual Token Lt(int k)
+		public virtual IToken Lt(int k)
 		{
 			LazyInit();
 			if (k == 0)
@@ -351,12 +351,12 @@ namespace Antlr4.Runtime
 			p = -1;
 		}
 
-		public virtual IList<Token> GetTokens()
+		public virtual IList<IToken> GetTokens()
 		{
 			return tokens;
 		}
 
-		public virtual IList<Token> GetTokens(int start, int stop)
+		public virtual IList<IToken> GetTokens(int start, int stop)
 		{
 			return GetTokens(start, stop, null);
 		}
@@ -372,7 +372,7 @@ namespace Antlr4.Runtime
 		/// if no tokens were found.  This
 		/// method looks at both on and off channel tokens.
 		/// </summary>
-		public virtual IList<Token> GetTokens(int start, int stop, BitSet types)
+		public virtual IList<IToken> GetTokens(int start, int stop, BitSet types)
 		{
 			LazyInit();
 			if (start < 0 || stop >= tokens.Count || stop < 0 || start >= tokens.Count)
@@ -385,10 +385,10 @@ namespace Antlr4.Runtime
 				return null;
 			}
 			// list = tokens[start:stop]:{T t, t.getType() in types}
-			IList<Token> filteredTokens = new AList<Token>();
+			IList<IToken> filteredTokens = new List<IToken>();
 			for (int i = start; i <= stop; i++)
 			{
-				Token t = tokens[i];
+				IToken t = tokens[i];
 				if (types == null || types.Get(t.GetType()))
 				{
 					filteredTokens.AddItem(t);
@@ -401,7 +401,7 @@ namespace Antlr4.Runtime
 			return filteredTokens;
 		}
 
-		public virtual IList<Token> GetTokens(int start, int stop, int ttype)
+		public virtual IList<IToken> GetTokens(int start, int stop, int ttype)
 		{
 			BitSet s = new BitSet(ttype);
 			s.Set(ttype);
@@ -425,14 +425,14 @@ namespace Antlr4.Runtime
 		protected internal virtual int NextTokenOnChannel(int i, int channel)
 		{
 			Sync(i);
-			Token token = tokens[i];
+			IToken token = tokens[i];
 			if (i >= Size())
 			{
 				return -1;
 			}
 			while (token.GetChannel() != channel)
 			{
-				if (token.GetType() == Token.Eof)
+				if (token.GetType() == IToken.Eof)
 				{
 					return -1;
 				}
@@ -480,7 +480,7 @@ namespace Antlr4.Runtime
 		/// <code>-1</code>
 		/// , find any non default channel token.
 		/// </summary>
-		public virtual IList<Token> GetHiddenTokensToRight(int tokenIndex, int channel)
+		public virtual IList<IToken> GetHiddenTokensToRight(int tokenIndex, int channel)
 		{
 			LazyInit();
 			if (tokenIndex < 0 || tokenIndex >= tokens.Count)
@@ -509,7 +509,7 @@ namespace Antlr4.Runtime
 		/// <see cref="Lexer.DefaultTokenChannel">Lexer.DefaultTokenChannel</see>
 		/// or EOF.
 		/// </summary>
-		public virtual IList<Token> GetHiddenTokensToRight(int tokenIndex)
+		public virtual IList<IToken> GetHiddenTokensToRight(int tokenIndex)
 		{
 			return GetHiddenTokensToRight(tokenIndex, -1);
 		}
@@ -525,7 +525,7 @@ namespace Antlr4.Runtime
 		/// <code>-1</code>
 		/// , find any non default channel token.
 		/// </summary>
-		public virtual IList<Token> GetHiddenTokensToLeft(int tokenIndex, int channel)
+		public virtual IList<IToken> GetHiddenTokensToLeft(int tokenIndex, int channel)
 		{
 			LazyInit();
 			if (tokenIndex < 0 || tokenIndex >= tokens.Count)
@@ -551,18 +551,18 @@ namespace Antlr4.Runtime
 		/// <see cref="Lexer.DefaultTokenChannel">Lexer.DefaultTokenChannel</see>
 		/// .
 		/// </summary>
-		public virtual IList<Token> GetHiddenTokensToLeft(int tokenIndex)
+		public virtual IList<IToken> GetHiddenTokensToLeft(int tokenIndex)
 		{
 			return GetHiddenTokensToLeft(tokenIndex, -1);
 		}
 
-		protected internal virtual IList<Token> FilterForChannel(int from, int to, int channel
+		protected internal virtual IList<IToken> FilterForChannel(int from, int to, int channel
 			)
 		{
-			IList<Token> hidden = new AList<Token>();
+			IList<IToken> hidden = new List<IToken>();
 			for (int i = from; i <= to; i++)
 			{
-				Token t = tokens[i];
+				IToken t = tokens[i];
 				if (channel == -1)
 				{
 					if (t.GetChannel() != Lexer.DefaultTokenChannel)
@@ -616,8 +616,8 @@ namespace Antlr4.Runtime
 			StringBuilder buf = new StringBuilder();
 			for (int i = start; i <= stop; i++)
 			{
-				Token t = tokens[i];
-				if (t.GetType() == Token.Eof)
+				IToken t = tokens[i];
+				if (t.GetType() == IToken.Eof)
 				{
 					break;
 				}
@@ -633,7 +633,7 @@ namespace Antlr4.Runtime
 		}
 
 		[NotNull]
-		public virtual string GetText(Token start, Token stop)
+		public virtual string GetText(IToken start, IToken stop)
 		{
 			if (start != null && stop != null)
 			{

@@ -34,7 +34,7 @@ namespace Antlr4.Runtime.Misc
 {
 	/// <summary>
 	/// This default implementation of
-	/// <see cref="EqualityComparator{T}">EqualityComparator&lt;T&gt;</see>
+	/// <see cref="IEqualityComparator{T}">IEqualityComparator&lt;T&gt;</see>
 	/// uses object equality
 	/// for comparisons by calling
 	/// <see cref="object.GetHashCode()">object.GetHashCode()</see>

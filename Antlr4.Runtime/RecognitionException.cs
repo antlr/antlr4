@@ -51,7 +51,7 @@ namespace Antlr4.Runtime
 
 		private RuleContext ctx;
 
-		private IntStream input;
+		private IIntStream input;
 
 		/// <summary>The current Token when an error occurred.</summary>
 		/// <remarks>
@@ -59,11 +59,11 @@ namespace Antlr4.Runtime
 		/// can retrieve the ith Token, we have to track the Token object.
 		/// For parsers.  Even when it's a tree parser, token might be set.
 		/// </remarks>
-		private Token offendingToken;
+		private IToken offendingToken;
 
 		private int offendingState;
 
-		public RecognitionException(Lexer lexer, CharStream input)
+		public RecognitionException(Lexer lexer, ICharStream input)
 		{
 			// TODO: make a dummy recognizer for the interpreter to use?
 			// Next two (ctx,input) should be what is in recognizer, but
@@ -72,7 +72,7 @@ namespace Antlr4.Runtime
 			this.input = input;
 		}
 
-		public RecognitionException(Recognizer<Token, object> recognizer, IntStream input
+		public RecognitionException(Recognizer<IToken, object> recognizer, IIntStream input
 			, ParserRuleContext ctx)
 		{
 			this.recognizer = recognizer;
@@ -84,8 +84,8 @@ namespace Antlr4.Runtime
 			}
 		}
 
-		public RecognitionException(string message, Recognizer<Token, object> recognizer, 
-			IntStream input, ParserRuleContext ctx) : base(message)
+		public RecognitionException(string message, Recognizer<IToken, object> recognizer
+			, IIntStream input, ParserRuleContext ctx) : base(message)
 		{
 			this.recognizer = recognizer;
 			this.input = input;
@@ -132,17 +132,17 @@ namespace Antlr4.Runtime
 			return ctx;
 		}
 
-		public virtual IntStream GetInputStream()
+		public virtual IIntStream GetInputStream()
 		{
 			return input;
 		}
 
-		public virtual Token GetOffendingToken()
+		public virtual IToken GetOffendingToken()
 		{
 			return offendingToken;
 		}
 
-		protected internal void SetOffendingToken(Token offendingToken)
+		protected internal void SetOffendingToken(IToken offendingToken)
 		{
 			this.offendingToken = offendingToken;
 		}

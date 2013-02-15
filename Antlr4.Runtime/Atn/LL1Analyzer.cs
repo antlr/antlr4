@@ -45,7 +45,7 @@ namespace Antlr4.Runtime.Atn
 		/// Special value added to the lookahead sets to indicate that we hit
 		/// a predicate during analysis if seeThruPreds==false.
 		/// </remarks>
-		public const int HitPred = Token.InvalidType;
+		public const int HitPred = IToken.InvalidType;
 
 		[NotNull]
 		public readonly ATN atn;
@@ -103,13 +103,13 @@ namespace Antlr4.Runtime.Atn
 		/// is
 		/// <code>PredictionContext#EMPTY_LOCAL</code>
 		/// ,
-		/// <see cref="Antlr4.Runtime.Token.Epsilon">EPSILON</see>
+		/// <see cref="Antlr4.Runtime.IToken.Epsilon">EPSILON</see>
 		/// is in set if we can reach end of rule. If
 		/// <code>ctx</code>
 		/// is
 		/// <see cref="PredictionContext.EmptyFull">PredictionContext.EmptyFull</see>
 		/// ,
-		/// <see cref="Antlr4.Runtime.IntStream.Eof">EOF</see>
+		/// <see cref="Antlr4.Runtime.IIntStream.Eof">EOF</see>
 		/// is in set
 		/// if we can reach end of rule.
 		/// </summary>
@@ -150,14 +150,14 @@ namespace Antlr4.Runtime.Atn
 			{
 				if (PredictionContext.IsEmptyLocal(ctx))
 				{
-					look.Add(Token.Epsilon);
+					look.Add(IToken.Epsilon);
 					return;
 				}
 				else
 				{
 					if (ctx.IsEmpty() && addEOF)
 					{
-						look.Add(Token.Eof);
+						look.Add(IToken.Eof);
 						return;
 					}
 				}
@@ -208,7 +208,7 @@ namespace Antlr4.Runtime.Atn
 						{
 							if (t.GetType() == typeof(WildcardTransition))
 							{
-								look.AddAll(IntervalSet.Of(Token.MinUserTokenType, atn.maxTokenType));
+								look.AddAll(IntervalSet.Of(IToken.MinUserTokenType, atn.maxTokenType));
 							}
 							else
 							{
@@ -218,7 +218,7 @@ namespace Antlr4.Runtime.Atn
 								{
 									if (t is NotSetTransition)
 									{
-										set = set.Complement(IntervalSet.Of(Token.MinUserTokenType, atn.maxTokenType));
+										set = set.Complement(IntervalSet.Of(IToken.MinUserTokenType, atn.maxTokenType));
 									}
 									look.AddAll(set);
 								}

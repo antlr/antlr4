@@ -32,6 +32,7 @@ using System.IO;
 using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Tree;
 using Antlr4.Runtime.Tree.Gui;
 using Sharpen;
 
@@ -162,9 +163,9 @@ namespace Antlr4.Runtime.Tree
 						if (t is ITerminalNode)
 						{
 							object symbol = ((ITerminalNode)t).GetSymbol();
-							if (symbol is Token)
+							if (symbol is IToken)
 							{
-								string s = ((Token)symbol).GetText();
+								string s = ((IToken)symbol).GetText();
 								return s;
 							}
 						}
@@ -173,9 +174,9 @@ namespace Antlr4.Runtime.Tree
 			}
 			// no recog for rule names
 			object payload = t.GetPayload();
-			if (payload is Token)
+			if (payload is IToken)
 			{
-				return ((Token)payload).GetText();
+				return ((IToken)payload).GetText();
 			}
 			return t.GetPayload().ToString();
 		}
@@ -192,7 +193,7 @@ namespace Antlr4.Runtime.Tree
 			{
 				return Sharpen.Collections.EmptyList();
 			}
-			IList<ITree> ancestors = new AList<ITree>();
+			IList<ITree> ancestors = new List<ITree>();
 			t = t.GetParent();
 			while (t != null)
 			{

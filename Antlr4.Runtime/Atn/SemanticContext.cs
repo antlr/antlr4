@@ -142,7 +142,7 @@ namespace Antlr4.Runtime.Atn
 			}
 		}
 
-		public class PrecedencePredicate : SemanticContext, Comparable<SemanticContext.PrecedencePredicate
+		public class PrecedencePredicate : SemanticContext, IComparable<SemanticContext.PrecedencePredicate
 			>
 		{
 			public readonly int precedence;
@@ -393,7 +393,7 @@ namespace Antlr4.Runtime.Atn
 		private static IList<SemanticContext.PrecedencePredicate> FilterPrecedencePredicates
 			<_T0>(ICollection<_T0> collection) where _T0:SemanticContext
 		{
-			AList<SemanticContext.PrecedencePredicate> result = null;
+			List<SemanticContext.PrecedencePredicate> result = null;
 			for (IEnumerator<SemanticContext> iterator = collection.GetEnumerator(); iterator
 				.HasNext(); )
 			{
@@ -402,7 +402,7 @@ namespace Antlr4.Runtime.Atn
 				{
 					if (result == null)
 					{
-						result = new AList<SemanticContext.PrecedencePredicate>();
+						result = new List<SemanticContext.PrecedencePredicate>();
 					}
 					result.AddItem((SemanticContext.PrecedencePredicate)context);
 					iterator.Remove();
