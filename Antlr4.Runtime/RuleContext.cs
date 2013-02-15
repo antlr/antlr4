@@ -57,7 +57,7 @@ namespace Antlr4.Runtime
 	/// ParserRuleContext.
 	/// </remarks>
 	/// <seealso cref="ParserRuleContext">ParserRuleContext</seealso>
-	public class RuleContext : RuleNode
+	public class RuleContext : IRuleNode
 	{
 		/// <summary>What context invoked this rule?</summary>
 		public Antlr4.Runtime.RuleContext parent;
@@ -165,7 +165,7 @@ namespace Antlr4.Runtime
 			return -1;
 		}
 
-		public virtual ParseTree GetChild(int i)
+		public virtual IParseTree GetChild(int i)
 		{
 			return null;
 		}
@@ -175,7 +175,7 @@ namespace Antlr4.Runtime
 			return 0;
 		}
 
-		public virtual T Accept<T, _T1>(ParseTreeVisitor<_T1> visitor) where _T1:T
+		public virtual T Accept<T, _T1>(IParseTreeVisitor<_T1> visitor) where _T1:T
 		{
 			return visitor.VisitChildren(this);
 		}

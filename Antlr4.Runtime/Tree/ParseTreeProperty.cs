@@ -50,20 +50,20 @@ namespace Antlr4.Runtime.Tree
 	/// </remarks>
 	public class ParseTreeProperty<V>
 	{
-		protected internal IDictionary<ParseTree, V> annotations = new IdentityHashMap<ParseTree
+		protected internal IDictionary<IParseTree, V> annotations = new IdentityHashMap<IParseTree
 			, V>();
 
-		public virtual V Get(ParseTree node)
+		public virtual V Get(IParseTree node)
 		{
 			return annotations.Get(node);
 		}
 
-		public virtual void Put(ParseTree node, V value)
+		public virtual void Put(IParseTree node, V value)
 		{
 			annotations.Put(node, value);
 		}
 
-		public virtual V RemoveFrom(ParseTree node)
+		public virtual V RemoveFrom(IParseTree node)
 		{
 			return Sharpen.Collections.Remove(annotations, node);
 		}

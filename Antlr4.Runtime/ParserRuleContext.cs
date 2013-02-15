@@ -74,7 +74,7 @@ namespace Antlr4.Runtime
 		/// operation because we don't the need to track the details about
 		/// how we parse this rule.
 		/// </remarks>
-		public IList<ParseTree> children;
+		public IList<IParseTree> children;
 
 		/// <summary>
 		/// For debugging/tracing purposes, we want to track all of the nodes in
@@ -159,20 +159,20 @@ namespace Antlr4.Runtime
 		}
 
 		// Double dispatch methods for listeners
-		public virtual void EnterRule(ParseTreeListener listener)
+		public virtual void EnterRule(IParseTreeListener listener)
 		{
 		}
 
-		public virtual void ExitRule(ParseTreeListener listener)
+		public virtual void ExitRule(IParseTreeListener listener)
 		{
 		}
 
 		/// <summary>Does not set parent link; other add methods do that</summary>
-		public virtual void AddChild(TerminalNode t)
+		public virtual void AddChild(ITerminalNode t)
 		{
 			if (children == null)
 			{
-				children = new AList<ParseTree>();
+				children = new AList<IParseTree>();
 			}
 			children.AddItem(t);
 		}
@@ -181,7 +181,7 @@ namespace Antlr4.Runtime
 		{
 			if (children == null)
 			{
-				children = new AList<ParseTree>();
+				children = new AList<IParseTree>();
 			}
 			children.AddItem(ruleInvocation);
 		}
@@ -207,7 +207,7 @@ namespace Antlr4.Runtime
 		//		if ( states==null ) states = new ArrayList<Integer>();
 		//		states.add(s);
 		//	}
-		public virtual TerminalNode AddChild(Token matchedToken)
+		public virtual ITerminalNode AddChild(Token matchedToken)
 		{
 			TerminalNodeImpl t = new TerminalNodeImpl(matchedToken);
 			AddChild(t);
@@ -215,7 +215,7 @@ namespace Antlr4.Runtime
 			return t;
 		}
 
-		public virtual ErrorNode AddErrorNode(Token badToken)
+		public virtual IErrorNode AddErrorNode(Token badToken)
 		{
 			ErrorNodeImpl t = new ErrorNodeImpl(badToken);
 			AddChild(t);
@@ -228,12 +228,12 @@ namespace Antlr4.Runtime
 			return (Antlr4.Runtime.ParserRuleContext)base.GetParent();
 		}
 
-		public override ParseTree GetChild(int i)
+		public override IParseTree GetChild(int i)
 		{
 			return children != null && i >= 0 && i < children.Count ? children[i] : null;
 		}
 
-		public virtual T GetChild<T, _T1>(Type<_T1> ctxType, int i) where T:ParseTree where 
+		public virtual T GetChild<T, _T1>(Type<_T1> ctxType, int i) where T:IParseTree where 
 			_T1:T
 		{
 			if (children == null || i < 0 || i >= children.Count)
@@ -242,7 +242,7 @@ namespace Antlr4.Runtime
 			}
 			int j = -1;
 			// what element have we found with ctxType?
-			foreach (ParseTree o in children)
+			foreach (IParseTree o in children)
 			{
 				if (ctxType.IsInstanceOfType(o))
 				{
@@ -256,7 +256,7 @@ namespace Antlr4.Runtime
 			return null;
 		}
 
-		public virtual TerminalNode GetToken(int ttype, int i)
+		public virtual ITerminalNode GetToken(int ttype, int i)
 		{
 			if (children == null || i < 0 || i >= children.Count)
 			{
@@ -264,11 +264,11 @@ namespace Antlr4.Runtime
 			}
 			int j = -1;
 			// what token with ttype have we found?
-			foreach (ParseTree o in children)
+			foreach (IParseTree o in children)
 			{
-				if (o is TerminalNode)
+				if (o is ITerminalNode)
 				{
-					TerminalNode tnode = (TerminalNode)o;
+					ITerminalNode tnode = (ITerminalNode)o;
 					Token symbol = tnode.GetSymbol();
 					if (symbol.GetType() == ttype)
 					{
@@ -283,24 +283,24 @@ namespace Antlr4.Runtime
 			return null;
 		}
 
-		public virtual IList<TerminalNode> GetTokens(int ttype)
+		public virtual IList<ITerminalNode> GetTokens(int ttype)
 		{
 			if (children == null)
 			{
 				return Sharpen.Collections.EmptyList();
 			}
-			IList<TerminalNode> tokens = null;
-			foreach (ParseTree o in children)
+			IList<ITerminalNode> tokens = null;
+			foreach (IParseTree o in children)
 			{
-				if (o is TerminalNode)
+				if (o is ITerminalNode)
 				{
-					TerminalNode tnode = (TerminalNode)o;
+					ITerminalNode tnode = (ITerminalNode)o;
 					Token symbol = tnode.GetSymbol();
 					if (symbol.GetType() == ttype)
 					{
 						if (tokens == null)
 						{
-							tokens = new AList<TerminalNode>();
+							tokens = new AList<ITerminalNode>();
 						}
 						tokens.AddItem(tnode);
 					}
@@ -327,7 +327,7 @@ namespace Antlr4.Runtime
 				return Sharpen.Collections.EmptyList();
 			}
 			IList<T> contexts = null;
-			foreach (ParseTree o in children)
+			foreach (IParseTree o in children)
 			{
 				if (ctxType.IsInstanceOfType(o))
 				{

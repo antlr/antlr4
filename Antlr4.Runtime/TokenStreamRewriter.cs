@@ -102,7 +102,7 @@ namespace Antlr4.Runtime
 
 		public class RewriteOperation
 		{
-			protected internal readonly TokenStream tokens;
+			protected internal readonly ITokenStream tokens;
 
 			/// <summary>What index into rewrites List are we?</summary>
 			protected internal int instructionIndex;
@@ -113,14 +113,14 @@ namespace Antlr4.Runtime
 
 			protected internal object text;
 
-			protected internal RewriteOperation(TokenStream tokens, int index)
+			protected internal RewriteOperation(ITokenStream tokens, int index)
 			{
 				// Define the rewrite operation hierarchy
 				this.tokens = tokens;
 				this.index = index;
 			}
 
-			protected internal RewriteOperation(TokenStream tokens, int index, object text)
+			protected internal RewriteOperation(ITokenStream tokens, int index, object text)
 			{
 				this.tokens = tokens;
 				this.index = index;
@@ -148,8 +148,8 @@ namespace Antlr4.Runtime
 
 		internal class InsertBeforeOp : TokenStreamRewriter.RewriteOperation
 		{
-			protected internal InsertBeforeOp(TokenStream tokens, int index, object text) : base
-				(tokens, index, text)
+			protected internal InsertBeforeOp(ITokenStream tokens, int index, object text) : 
+				base(tokens, index, text)
 			{
 			}
 
@@ -176,7 +176,7 @@ namespace Antlr4.Runtime
 		{
 			protected internal int lastIndex;
 
-			public ReplaceOp(TokenStream tokens, int from, int to, object text) : base(tokens
+			public ReplaceOp(ITokenStream tokens, int from, int to, object text) : base(tokens
 				, from, text)
 			{
 				lastIndex = to;
@@ -203,7 +203,7 @@ namespace Antlr4.Runtime
 		}
 
 		/// <summary>Our source stream</summary>
-		protected internal readonly TokenStream tokens;
+		protected internal readonly ITokenStream tokens;
 
 		/// <summary>You may have multiple, named streams of rewrite operations.</summary>
 		/// <remarks>
@@ -217,7 +217,7 @@ namespace Antlr4.Runtime
 		/// <summary>Map String (program name) -&gt; Integer index</summary>
 		protected internal readonly IDictionary<string, int> lastRewriteTokenIndexes;
 
-		public TokenStreamRewriter(TokenStream tokens)
+		public TokenStreamRewriter(ITokenStream tokens)
 		{
 			this.tokens = tokens;
 			programs = new Dictionary<string, IList<TokenStreamRewriter.RewriteOperation>>();
@@ -226,7 +226,7 @@ namespace Antlr4.Runtime
 			lastRewriteTokenIndexes = new Dictionary<string, int>();
 		}
 
-		public TokenStream GetTokenStream()
+		public ITokenStream GetTokenStream()
 		{
 			return tokens;
 		}

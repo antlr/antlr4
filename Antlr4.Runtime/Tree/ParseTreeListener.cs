@@ -28,16 +28,15 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using Antlr4.Runtime;
-using Antlr4.Runtime.Tree;
 using Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
 	public interface ParseTreeListener
 	{
-		void VisitTerminal(TerminalNode node);
+		void VisitTerminal(ITerminalNode node);
 
-		void VisitErrorNode(ErrorNode node);
+		void VisitErrorNode(IErrorNode node);
 
 		void EnterEveryRule(ParserRuleContext ctx);
 

@@ -35,7 +35,7 @@ using Sharpen;
 namespace Antlr4.Runtime
 {
 	/// <author>Sam Harwell</author>
-	public class BaseErrorListener : ParserErrorListener
+	public class BaseErrorListener : IParserErrorListener
 	{
 		public virtual void SyntaxError<T>(Recognizer<T, object> recognizer, T offendingSymbol
 			, int line, int charPositionInLine, string msg, RecognitionException e) where T:

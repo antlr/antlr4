@@ -35,9 +35,9 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-	public class UnbufferedTokenStream : TokenStream
+	public class UnbufferedTokenStream : ITokenStream
 	{
-		protected internal TokenSource tokenSource;
+		protected internal ITokenSource tokenSource;
 
 		/// <summary>A moving window buffer of the data being scanned.</summary>
 		/// <remarks>
@@ -123,16 +123,16 @@ namespace Antlr4.Runtime
 		/// <p/>
 		/// This value is used to set the token indexes if the stream provides tokens
 		/// that implement
-		/// <see cref="WritableToken">WritableToken</see>
+		/// <see cref="IWritableToken">IWritableToken</see>
 		/// .
 		/// </remarks>
 		protected internal int currentTokenIndex = 0;
 
-		public UnbufferedTokenStream(TokenSource tokenSource) : this(tokenSource, 256)
+		public UnbufferedTokenStream(ITokenSource tokenSource) : this(tokenSource, 256)
 		{
 		}
 
-		public UnbufferedTokenStream(TokenSource tokenSource, int bufferSize)
+		public UnbufferedTokenStream(ITokenSource tokenSource, int bufferSize)
 		{
 			this.tokenSource = tokenSource;
 			Token[] tokens = new Token[bufferSize];
@@ -178,7 +178,7 @@ namespace Antlr4.Runtime
 			return Lt(i).GetType();
 		}
 
-		public virtual TokenSource GetTokenSource()
+		public virtual ITokenSource GetTokenSource()
 		{
 			return tokenSource;
 		}
@@ -285,9 +285,9 @@ namespace Antlr4.Runtime
 			{
 				tokens = Arrays.CopyOf(tokens, tokens.Length * 2);
 			}
-			if (t is WritableToken)
+			if (t is IWritableToken)
 			{
-				((WritableToken)t).SetTokenIndex(GetBufferStartIndex() + n);
+				((IWritableToken)t).SetTokenIndex(GetBufferStartIndex() + n);
 			}
 			tokens[n++] = t;
 		}

@@ -27,12 +27,11 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using Antlr4.Runtime.Tree;
 using Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
-	public interface ErrorNode : TerminalNode
+	public interface ErrorNode : ITerminalNode
 	{
 	}
 }

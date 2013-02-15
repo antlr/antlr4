@@ -37,22 +37,22 @@ namespace Antlr4.Runtime.Tree
 	{
 		public static readonly ParseTreeWalker Default = new ParseTreeWalker();
 
-		public virtual void Walk(ParseTreeListener listener, ParseTree t)
+		public virtual void Walk(IParseTreeListener listener, IParseTree t)
 		{
-			if (t is ErrorNode)
+			if (t is IErrorNode)
 			{
-				listener.VisitErrorNode((ErrorNode)t);
+				listener.VisitErrorNode((IErrorNode)t);
 				return;
 			}
 			else
 			{
-				if (t is TerminalNode)
+				if (t is ITerminalNode)
 				{
-					listener.VisitTerminal((TerminalNode)t);
+					listener.VisitTerminal((ITerminalNode)t);
 					return;
 				}
 			}
-			RuleNode r = (RuleNode)t;
+			IRuleNode r = (IRuleNode)t;
 			EnterRule(listener, r);
 			int n = r.GetChildCount();
 			for (int i = 0; i < n; i++)
@@ -64,21 +64,23 @@ namespace Antlr4.Runtime.Tree
 
 		/// <summary>
 		/// The discovery of a rule node, involves sending two events: the generic
-		/// <see cref="ParseTreeListener.EnterEveryRule(Antlr4.Runtime.ParserRuleContext)">ParseTreeListener.EnterEveryRule(Antlr4.Runtime.ParserRuleContext)
+		/// <see cref="IParseTreeListener.EnterEveryRule(Antlr4.Runtime.ParserRuleContext)">IParseTreeListener.EnterEveryRule(Antlr4.Runtime.ParserRuleContext)
 		/// 	</see>
 		/// and a
 		/// <see cref="Antlr4.Runtime.RuleContext">Antlr4.Runtime.RuleContext</see>
 		/// -specific event. First we trigger the generic and then
 		/// the rule specific. We to them in reverse order upon finishing the node.
 		/// </summary>
-		protected internal virtual void EnterRule(ParseTreeListener listener, RuleNode r)
+		protected internal virtual void EnterRule(IParseTreeListener listener, IRuleNode 
+			r)
 		{
 			ParserRuleContext ctx = (ParserRuleContext)r.GetRuleContext();
 			listener.EnterEveryRule(ctx);
 			ctx.EnterRule(listener);
 		}
 
-		protected internal virtual void ExitRule(ParseTreeListener listener, RuleNode r)
+		protected internal virtual void ExitRule(IParseTreeListener listener, IRuleNode r
+			)
 		{
 			ParserRuleContext ctx = (ParserRuleContext)r.GetRuleContext();
 			ctx.ExitRule(listener);

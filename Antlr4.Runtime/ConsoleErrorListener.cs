@@ -33,7 +33,7 @@ using Sharpen;
 namespace Antlr4.Runtime
 {
 	/// <author>Sam Harwell</author>
-	public class ConsoleErrorListener : ANTLRErrorListener<object>
+	public class ConsoleErrorListener : IAntlrErrorListener<object>
 	{
 		public static readonly ConsoleErrorListener Instance = new ConsoleErrorListener();
 

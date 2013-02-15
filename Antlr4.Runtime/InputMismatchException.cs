@@ -45,7 +45,7 @@ namespace Antlr4.Runtime
 	{
 		private const long serialVersionUID = 1532568338707443067L;
 
-		public InputMismatchException(Parser recognizer) : base(recognizer, ((TokenStream
+		public InputMismatchException(Parser recognizer) : base(recognizer, ((ITokenStream
 			)recognizer.GetInputStream()), recognizer._ctx)
 		{
 			this.SetOffendingToken(recognizer.GetCurrentToken());

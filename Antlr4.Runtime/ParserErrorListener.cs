@@ -35,7 +35,7 @@ using Sharpen;
 namespace Antlr4.Runtime
 {
 	/// <summary>How to emit recognition errors</summary>
-	public interface ParserErrorListener : ANTLRErrorListener<Token>
+	public interface ParserErrorListener : IAntlrErrorListener<Token>
 	{
 		/// <summary>
 		/// Called when the parser detects a true ambiguity: an input sequence can be matched

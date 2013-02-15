@@ -68,8 +68,8 @@ namespace Antlr4.Runtime.Dfa
 		/// <summary>
 		/// Set of configs for a DFA state with at least one conflict? Mainly used as "return value"
 		/// from
-		/// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.PredictATN(DFA, Antlr4.Runtime.TokenStream, Antlr4.Runtime.ParserRuleContext, bool)
-		/// 	">Antlr4.Runtime.Atn.ParserATNSimulator.PredictATN(DFA, Antlr4.Runtime.TokenStream, Antlr4.Runtime.ParserRuleContext, bool)
+		/// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.PredictATN(DFA, ITokenStream, Antlr4.Runtime.ParserRuleContext, bool)
+		/// 	">Antlr4.Runtime.Atn.ParserATNSimulator.PredictATN(DFA, ITokenStream, Antlr4.Runtime.ParserRuleContext, bool)
 		/// 	</see>
 		/// for retry.
 		/// </summary>

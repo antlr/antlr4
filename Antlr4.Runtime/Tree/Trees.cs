@@ -32,7 +32,6 @@ using System.IO;
 using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Tree;
 using Antlr4.Runtime.Tree.Gui;
 using Sharpen;
 
@@ -42,22 +41,22 @@ namespace Antlr4.Runtime.Tree
 	/// <remarks>A set of utility routines useful for all kinds of ANTLR trees.</remarks>
 	public class Trees
 	{
-		public static string GetPS(Antlr4.Runtime.Tree.Tree t, IList<string> ruleNames, string
-			 fontName, int fontSize)
+		public static string GetPS(ITree t, IList<string> ruleNames, string fontName, int
+			 fontSize)
 		{
 			TreePostScriptGenerator psgen = new TreePostScriptGenerator(ruleNames, t, fontName
 				, fontSize);
 			return psgen.GetPS();
 		}
 
-		public static string GetPS(Antlr4.Runtime.Tree.Tree t, IList<string> ruleNames)
+		public static string GetPS(ITree t, IList<string> ruleNames)
 		{
 			return GetPS(t, ruleNames, "Helvetica", 11);
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		public static void WritePS(Antlr4.Runtime.Tree.Tree t, IList<string> ruleNames, string
-			 fileName, string fontName, int fontSize)
+		public static void WritePS(ITree t, IList<string> ruleNames, string fileName, string
+			 fontName, int fontSize)
 		{
 			string ps = GetPS(t, ruleNames, fontName, fontSize);
 			FileWriter f = new FileWriter(fileName);
@@ -67,8 +66,7 @@ namespace Antlr4.Runtime.Tree
 		}
 
 		/// <exception cref="System.IO.IOException"></exception>
-		public static void WritePS(Antlr4.Runtime.Tree.Tree t, IList<string> ruleNames, string
-			 fileName)
+		public static void WritePS(ITree t, IList<string> ruleNames, string fileName)
 		{
 			WritePS(t, ruleNames, fileName, "Helvetica", 11);
 		}
@@ -76,13 +74,13 @@ namespace Antlr4.Runtime.Tree
 		/// <summary>Print out a whole tree in LISP form.</summary>
 		/// <remarks>
 		/// Print out a whole tree in LISP form.
-		/// <see cref="GetNodeText(Tree, Antlr4.Runtime.Parser)">GetNodeText(Tree, Antlr4.Runtime.Parser)
+		/// <see cref="GetNodeText(ITree, Antlr4.Runtime.Parser)">GetNodeText(ITree, Antlr4.Runtime.Parser)
 		/// 	</see>
 		/// is used on the
 		/// node payloads to get the text for the nodes.  Detect
 		/// parse trees and extract data appropriately.
 		/// </remarks>
-		public static string ToStringTree(Antlr4.Runtime.Tree.Tree t)
+		public static string ToStringTree(ITree t)
 		{
 			return ToStringTree(t, (IList<string>)null);
 		}
@@ -90,13 +88,13 @@ namespace Antlr4.Runtime.Tree
 		/// <summary>Print out a whole tree in LISP form.</summary>
 		/// <remarks>
 		/// Print out a whole tree in LISP form.
-		/// <see cref="GetNodeText(Tree, Antlr4.Runtime.Parser)">GetNodeText(Tree, Antlr4.Runtime.Parser)
+		/// <see cref="GetNodeText(ITree, Antlr4.Runtime.Parser)">GetNodeText(ITree, Antlr4.Runtime.Parser)
 		/// 	</see>
 		/// is used on the
 		/// node payloads to get the text for the nodes.  Detect
 		/// parse trees and extract data appropriately.
 		/// </remarks>
-		public static string ToStringTree(Antlr4.Runtime.Tree.Tree t, Parser recog)
+		public static string ToStringTree(ITree t, Parser recog)
 		{
 			string[] ruleNames = recog != null ? recog.GetRuleNames() : null;
 			IList<string> ruleNamesList = ruleNames != null ? Arrays.AsList(ruleNames) : null;
@@ -106,14 +104,13 @@ namespace Antlr4.Runtime.Tree
 		/// <summary>Print out a whole tree in LISP form.</summary>
 		/// <remarks>
 		/// Print out a whole tree in LISP form.
-		/// <see cref="GetNodeText(Tree, Antlr4.Runtime.Parser)">GetNodeText(Tree, Antlr4.Runtime.Parser)
+		/// <see cref="GetNodeText(ITree, Antlr4.Runtime.Parser)">GetNodeText(ITree, Antlr4.Runtime.Parser)
 		/// 	</see>
 		/// is used on the
 		/// node payloads to get the text for the nodes.  Detect
 		/// parse trees and extract data appropriately.
 		/// </remarks>
-		public static string ToStringTree(Antlr4.Runtime.Tree.Tree t, IList<string> ruleNames
-			)
+		public static string ToStringTree(ITree t, IList<string> ruleNames)
 		{
 			string s = Utils.EscapeWhitespace(GetNodeText(t, ruleNames), false);
 			if (t.GetChildCount() == 0)
@@ -137,35 +134,34 @@ namespace Antlr4.Runtime.Tree
 			return buf.ToString();
 		}
 
-		public static string GetNodeText(Antlr4.Runtime.Tree.Tree t, Parser recog)
+		public static string GetNodeText(ITree t, Parser recog)
 		{
 			string[] ruleNames = recog != null ? recog.GetRuleNames() : null;
 			IList<string> ruleNamesList = ruleNames != null ? Arrays.AsList(ruleNames) : null;
 			return GetNodeText(t, ruleNamesList);
 		}
 
-		public static string GetNodeText(Antlr4.Runtime.Tree.Tree t, IList<string> ruleNames
-			)
+		public static string GetNodeText(ITree t, IList<string> ruleNames)
 		{
 			if (ruleNames != null)
 			{
-				if (t is RuleNode)
+				if (t is IRuleNode)
 				{
-					int ruleIndex = ((RuleNode)t).GetRuleContext().GetRuleIndex();
+					int ruleIndex = ((IRuleNode)t).GetRuleContext().GetRuleIndex();
 					string ruleName = ruleNames[ruleIndex];
 					return ruleName;
 				}
 				else
 				{
-					if (t is ErrorNode)
+					if (t is IErrorNode)
 					{
 						return t.ToString();
 					}
 					else
 					{
-						if (t is TerminalNode)
+						if (t is ITerminalNode)
 						{
-							object symbol = ((TerminalNode)t).GetSymbol();
+							object symbol = ((ITerminalNode)t).GetSymbol();
 							if (symbol is Token)
 							{
 								string s = ((Token)symbol).GetText();
@@ -190,14 +186,13 @@ namespace Antlr4.Runtime.Tree
 		/// list is the root and the last is the parent of this node.
 		/// </remarks>
 		[NotNull]
-		public static IList<Antlr4.Runtime.Tree.Tree> GetAncestors(Antlr4.Runtime.Tree.Tree
-			 t)
+		public static IList<ITree> GetAncestors(ITree t)
 		{
 			if (t.GetParent() == null)
 			{
 				return Sharpen.Collections.EmptyList();
 			}
-			IList<Antlr4.Runtime.Tree.Tree> ancestors = new AList<Antlr4.Runtime.Tree.Tree>();
+			IList<ITree> ancestors = new AList<ITree>();
 			t = t.GetParent();
 			while (t != null)
 			{

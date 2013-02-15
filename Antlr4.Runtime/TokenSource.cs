@@ -88,9 +88,9 @@ namespace Antlr4.Runtime
 
 		/// <summary>Gets the factory used for constructing tokens.</summary>
 		/// <remarks>Gets the factory used for constructing tokens.</remarks>
-		TokenFactory GetTokenFactory();
+		ITokenFactory GetTokenFactory();
 
 		/// <summary>Optional method that lets users set factory in lexer or other source</summary>
-		void SetTokenFactory(TokenFactory factory);
+		void SetTokenFactory(ITokenFactory factory);
 	}
 }

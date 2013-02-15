@@ -35,7 +35,7 @@ using Sharpen;
 namespace Antlr4.Runtime.Dfa
 {
 	/// <author>Sam Harwell</author>
-	public abstract class AbstractEdgeMap<T> : EdgeMap<T>
+	public abstract class AbstractEdgeMap<T> : IEdgeMap<T>
 	{
 		protected internal readonly int minIndex;
 
@@ -51,8 +51,8 @@ namespace Antlr4.Runtime.Dfa
 
 		public abstract Antlr4.Runtime.Dfa.AbstractEdgeMap<T> Put(int key, T value);
 
-		public virtual Antlr4.Runtime.Dfa.AbstractEdgeMap<T> PutAll<_T0>(EdgeMap<_T0> m) where 
-			_T0:T
+		public virtual Antlr4.Runtime.Dfa.AbstractEdgeMap<T> PutAll<_T0>(IEdgeMap<_T0> m)
+			 where _T0:T
 		{
 			Antlr4.Runtime.Dfa.AbstractEdgeMap<T> result = this;
 			foreach (KeyValuePair<int, T> entry in m.EntrySet())

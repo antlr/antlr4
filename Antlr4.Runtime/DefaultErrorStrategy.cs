@@ -43,7 +43,7 @@ namespace Antlr4.Runtime
 	/// This is the default error handling mechanism for ANTLR parsers
 	/// and tree parsers.
 	/// </remarks>
-	public class DefaultErrorStrategy : ANTLRErrorStrategy
+	public class DefaultErrorStrategy : IAntlrErrorStrategy
 	{
 		/// <summary>
 		/// This is true after we see an error and before having successfully
@@ -145,7 +145,7 @@ namespace Antlr4.Runtime
 			//						   ", lastErrorIndex="+
 			//						   lastErrorIndex+
 			//						   ", states="+lastErrorStates);
-			if (lastErrorIndex == ((TokenStream)recognizer.GetInputStream()).Index() && lastErrorStates
+			if (lastErrorIndex == ((ITokenStream)recognizer.GetInputStream()).Index() && lastErrorStates
 				 != null && lastErrorStates.Contains(recognizer.GetState()))
 			{
 				// uh oh, another error at same token index and previously-visited
@@ -157,7 +157,7 @@ namespace Antlr4.Runtime
 				//			System.err.println("FAILSAFE consumes "+recognizer.getTokenNames()[recognizer.getInputStream().LA(1)]);
 				recognizer.Consume();
 			}
-			lastErrorIndex = ((TokenStream)recognizer.GetInputStream()).Index();
+			lastErrorIndex = ((ITokenStream)recognizer.GetInputStream()).Index();
 			if (lastErrorStates == null)
 			{
 				lastErrorStates = new IntervalSet();
@@ -193,7 +193,7 @@ namespace Antlr4.Runtime
 			{
 				return;
 			}
-			TokenStream tokens = ((TokenStream)recognizer.GetInputStream());
+			ITokenStream tokens = ((ITokenStream)recognizer.GetInputStream());
 			int la = tokens.La(1);
 			// try cheaper subset first; might get lucky. seems to shave a wee bit off
 			if (recognizer.GetATN().NextTokens(s).Contains(la) || la == Token.Eof)
@@ -245,7 +245,7 @@ namespace Antlr4.Runtime
 		public virtual void ReportNoViableAlternative(Parser recognizer, NoViableAltException
 			 e)
 		{
-			TokenStream tokens = ((TokenStream)recognizer.GetInputStream());
+			ITokenStream tokens = ((ITokenStream)recognizer.GetInputStream());
 			string input;
 			if (tokens != null)
 			{
@@ -363,7 +363,7 @@ namespace Antlr4.Runtime
 		// if next token is what we are looking for then "delete" this token
 		public virtual bool SingleTokenInsertion(Parser recognizer)
 		{
-			int currentSymbolType = ((TokenStream)recognizer.GetInputStream()).La(1);
+			int currentSymbolType = ((ITokenStream)recognizer.GetInputStream()).La(1);
 			// if current token is consistent with what could come after current
 			// ATN state, then we know we're missing a token; error recovery
 			// is free to conjure up and insert the missing token
@@ -384,7 +384,7 @@ namespace Antlr4.Runtime
 
 		public virtual Token SingleTokenDeletion(Parser recognizer)
 		{
-			int nextTokenType = ((TokenStream)recognizer.GetInputStream()).La(2);
+			int nextTokenType = ((ITokenStream)recognizer.GetInputStream()).La(2);
 			IntervalSet expecting = GetExpectedTokens(recognizer);
 			if (expecting.Contains(nextTokenType))
 			{
@@ -436,19 +436,19 @@ namespace Antlr4.Runtime
 				tokenText = "<missing " + recognizer.GetTokenNames()[expectedTokenType] + ">";
 			}
 			Token current = currentSymbol;
-			Token lookback = ((TokenStream)recognizer.GetInputStream()).Lt(-1);
+			Token lookback = ((ITokenStream)recognizer.GetInputStream()).Lt(-1);
 			if (current.GetType() == Token.Eof && lookback != null)
 			{
 				current = lookback;
 			}
-			return ConstructToken(((TokenStream)recognizer.GetInputStream()).GetTokenSource()
-				, expectedTokenType, tokenText, current);
+			return ConstructToken(((ITokenStream)recognizer.GetInputStream()).GetTokenSource(
+				), expectedTokenType, tokenText, current);
 		}
 
-		protected internal virtual Token ConstructToken(TokenSource tokenSource, int expectedTokenType
+		protected internal virtual Token ConstructToken(ITokenSource tokenSource, int expectedTokenType
 			, string tokenText, Token current)
 		{
-			TokenFactory factory = tokenSource.GetTokenFactory();
+			ITokenFactory factory = tokenSource.GetTokenFactory();
 			return factory.Create(Tuple.Create(tokenSource, current.GetTokenSource().GetInputStream
 				()), expectedTokenType, tokenText, Token.DefaultChannel, -1, -1, current.GetLine
 				(), current.GetCharPositionInLine());
@@ -536,13 +536,13 @@ namespace Antlr4.Runtime
 		public virtual void ConsumeUntil(Parser recognizer, IntervalSet set)
 		{
 			//		System.err.println("consumeUntil("+set.toString(recognizer.getTokenNames())+")");
-			int ttype = ((TokenStream)recognizer.GetInputStream()).La(1);
+			int ttype = ((ITokenStream)recognizer.GetInputStream()).La(1);
 			while (ttype != Token.Eof && !set.Contains(ttype))
 			{
 				//System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
 				//			recognizer.getInputStream().consume();
 				recognizer.Consume();
-				ttype = ((TokenStream)recognizer.GetInputStream()).La(1);
+				ttype = ((ITokenStream)recognizer.GetInputStream()).La(1);
 			}
 		}
 	}

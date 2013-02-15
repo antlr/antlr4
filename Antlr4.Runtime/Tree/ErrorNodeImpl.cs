@@ -44,13 +44,13 @@ namespace Antlr4.Runtime.Tree
 	/// and deletion as well as during "consume until error recovery set"
 	/// upon no viable alternative exceptions.
 	/// </remarks>
-	public class ErrorNodeImpl : TerminalNodeImpl, ErrorNode
+	public class ErrorNodeImpl : TerminalNodeImpl, IErrorNode
 	{
 		public ErrorNodeImpl(Token token) : base(token)
 		{
 		}
 
-		public override T Accept<T, _T1>(ParseTreeVisitor<_T1> visitor)
+		public override T Accept<T, _T1>(IParseTreeVisitor<_T1> visitor)
 		{
 			return visitor.VisitErrorNode(this);
 		}

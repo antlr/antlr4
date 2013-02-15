@@ -100,12 +100,12 @@ namespace Antlr4.Runtime
 
 		/// <summary>
 		/// Gets the underlying
-		/// <see cref="TokenSource">TokenSource</see>
+		/// <see cref="ITokenSource">ITokenSource</see>
 		/// which provides tokens for this
 		/// stream.
 		/// </summary>
 		[NotNull]
-		TokenSource GetTokenSource();
+		ITokenSource GetTokenSource();
 
 		/// <summary>
 		/// Return the text of all tokens within the specified

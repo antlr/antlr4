@@ -96,7 +96,7 @@ namespace Antlr4.Runtime.Dfa
 			return ((Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)Put(key, null));
 		}
 
-		public override AbstractEdgeMap<T> PutAll<_T0>(EdgeMap<_T0> m)
+		public override AbstractEdgeMap<T> PutAll<_T0>(IEdgeMap<_T0> m)
 		{
 			if (m.IsEmpty())
 			{

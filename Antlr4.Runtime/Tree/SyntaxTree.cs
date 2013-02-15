@@ -28,7 +28,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Tree;
 using Sharpen;
 
 namespace Antlr4.Runtime.Tree
@@ -42,13 +41,13 @@ namespace Antlr4.Runtime.Tree
 	/// is some kind of syntax tree. Subinterfaces distinguish
 	/// between parse trees and other kinds of syntax trees we might want to create.
 	/// </remarks>
-	public interface SyntaxTree : Antlr4.Runtime.Tree.Tree
+	public interface SyntaxTree : ITree
 	{
 		/// <summary>
 		/// Return an
 		/// <see cref="Antlr4.Runtime.Misc.Interval">Antlr4.Runtime.Misc.Interval</see>
 		/// indicating the index in the
-		/// <see cref="Antlr4.Runtime.TokenStream">Antlr4.Runtime.TokenStream</see>
+		/// <see cref="ITokenStream">ITokenStream</see>
 		/// of the first and last token associated with this
 		/// subtree. If this node is a leaf, then the interval represents a single
 		/// token.

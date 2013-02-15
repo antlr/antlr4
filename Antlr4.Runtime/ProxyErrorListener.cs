@@ -34,16 +34,17 @@ using Sharpen;
 namespace Antlr4.Runtime
 {
 	/// <author>Sam Harwell</author>
-	public class ProxyErrorListener<Symbol> : ANTLRErrorListener<Symbol>
+	public class ProxyErrorListener<Symbol> : IAntlrErrorListener<Symbol>
 	{
-		private readonly ICollection<ANTLRErrorListener<Symbol>> delegates;
+		private readonly ICollection<IAntlrErrorListener<Symbol>> delegates;
 
-		public ProxyErrorListener(ICollection<ANTLRErrorListener<Symbol>> delegates)
+		public ProxyErrorListener(ICollection<IAntlrErrorListener<Symbol>> delegates)
 		{
 			this.delegates = delegates;
 		}
 
-		protected internal virtual ICollection<ANTLRErrorListener<Symbol>> GetDelegates()
+		protected internal virtual ICollection<IAntlrErrorListener<Symbol>> GetDelegates(
+			)
 		{
 			return delegates;
 		}
@@ -52,7 +53,7 @@ namespace Antlr4.Runtime
 			, int line, int charPositionInLine, string msg, RecognitionException e) where T:
 			Symbol
 		{
-			foreach (ANTLRErrorListener<Symbol> listener in delegates)
+			foreach (IAntlrErrorListener<Symbol> listener in delegates)
 			{
 				listener.SyntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, 
 					e);

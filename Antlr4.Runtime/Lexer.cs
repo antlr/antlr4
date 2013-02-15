@@ -44,7 +44,7 @@ namespace Antlr4.Runtime
 	/// uses simplified match() and error recovery mechanisms in the interest
 	/// of speed.
 	/// </remarks>
-	public abstract class Lexer : Recognizer<int, LexerATNSimulator>, TokenSource
+	public abstract class Lexer : Recognizer<int, LexerATNSimulator>, ITokenSource
 	{
 		public const int DefaultMode = 0;
 
@@ -62,10 +62,10 @@ namespace Antlr4.Runtime
 
 		public CharStream _input;
 
-		protected internal Tuple<TokenSource, CharStream> _tokenFactorySourcePair;
+		protected internal Tuple<ITokenSource, CharStream> _tokenFactorySourcePair;
 
 		/// <summary>How to create token objects</summary>
-		protected internal TokenFactory _factory = CommonTokenFactory.Default;
+		protected internal ITokenFactory _factory = CommonTokenFactory.Default;
 
 		/// <summary>The goal of all lexer rules/methods is to create a token object.</summary>
 		/// <remarks>
@@ -274,12 +274,12 @@ outer_break: ;
 			return _mode;
 		}
 
-		public virtual TokenFactory GetTokenFactory()
+		public virtual ITokenFactory GetTokenFactory()
 		{
 			return _factory;
 		}
 
-		public virtual void SetTokenFactory(TokenFactory factory)
+		public virtual void SetTokenFactory(ITokenFactory factory)
 		{
 			this._factory = factory;
 		}
@@ -492,7 +492,7 @@ outer_break: ;
 		{
 			string text = _input.GetText(Interval.Of(_tokenStartCharIndex, _input.Index()));
 			string msg = "token recognition error at: '" + GetErrorDisplay(text) + "'";
-			ANTLRErrorListener<int> listener = GetErrorListenerDispatch();
+			IAntlrErrorListener<int> listener = GetErrorListenerDispatch();
 			listener.SyntaxError(this, null, _tokenStartLine, _tokenStartCharPositionInLine, 
 				msg, e);
 		}

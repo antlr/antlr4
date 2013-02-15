@@ -64,10 +64,10 @@ namespace Antlr4.Runtime
 	/// because I don't want
 	/// to confuse small moving window of tokens it uses for the full buffer.
 	/// </remarks>
-	public class BufferedTokenStream : TokenStream
+	public class BufferedTokenStream : ITokenStream
 	{
 		[NotNull]
-		protected internal TokenSource tokenSource;
+		protected internal ITokenSource tokenSource;
 
 		/// <summary>
 		/// Record every single token pulled from the source so we can reproduce
@@ -113,7 +113,7 @@ namespace Antlr4.Runtime
 		/// <seealso cref="Fetch(int)">Fetch(int)</seealso>
 		protected internal bool fetchedEOF;
 
-		public BufferedTokenStream(TokenSource tokenSource)
+		public BufferedTokenStream(ITokenSource tokenSource)
 		{
 			if (tokenSource == null)
 			{
@@ -122,7 +122,7 @@ namespace Antlr4.Runtime
 			this.tokenSource = tokenSource;
 		}
 
-		public virtual TokenSource GetTokenSource()
+		public virtual ITokenSource GetTokenSource()
 		{
 			return tokenSource;
 		}
@@ -215,9 +215,9 @@ namespace Antlr4.Runtime
 			for (int i = 0; i < n; i++)
 			{
 				Token t = tokenSource.NextToken();
-				if (t is WritableToken)
+				if (t is IWritableToken)
 				{
-					((WritableToken)t).SetTokenIndex(tokens.Count);
+					((IWritableToken)t).SetTokenIndex(tokens.Count);
 				}
 				tokens.AddItem(t);
 				if (t.GetType() == Token.Eof)
@@ -344,7 +344,7 @@ namespace Antlr4.Runtime
 
 		/// <summary>Reset this token stream by setting its token source.</summary>
 		/// <remarks>Reset this token stream by setting its token source.</remarks>
-		public virtual void SetTokenSource(TokenSource tokenSource)
+		public virtual void SetTokenSource(ITokenSource tokenSource)
 		{
 			this.tokenSource = tokenSource;
 			tokens.Clear();

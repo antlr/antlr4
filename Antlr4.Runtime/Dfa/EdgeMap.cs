@@ -28,7 +28,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using System.Collections.Generic;
-using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
 using Sharpen;
 
@@ -47,16 +46,16 @@ namespace Antlr4.Runtime.Dfa
 		T Get(int key);
 
 		[NotNull]
-		EdgeMap<T> Put(int key, T value);
+		IEdgeMap<T> Put(int key, T value);
 
 		[NotNull]
-		EdgeMap<T> Remove(int key);
+		IEdgeMap<T> Remove(int key);
 
 		[NotNull]
-		EdgeMap<T> PutAll<_T0>(EdgeMap<_T0> m) where _T0:T;
+		IEdgeMap<T> PutAll<_T0>(IEdgeMap<_T0> m) where _T0:T;
 
 		[NotNull]
-		EdgeMap<T> Clear();
+		IEdgeMap<T> Clear();
 
 		[NotNull]
 		IDictionary<int, T> ToMap();

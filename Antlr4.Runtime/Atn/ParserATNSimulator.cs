@@ -232,8 +232,7 @@ namespace Antlr4.Runtime.Atn
 		/// <code>true</code>
 		/// , ambiguous alternatives are reported when they are
 		/// encountered within
-		/// <see cref="ExecATN(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.TokenStream, int, SimulatorState)
-		/// 	">ExecATN(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.TokenStream, int, SimulatorState)
+		/// <see cref="ExecATN(Antlr4.Runtime.Dfa.DFA, ITokenStream, int, SimulatorState)">ExecATN(Antlr4.Runtime.Dfa.DFA, ITokenStream, int, SimulatorState)
 		/// 	</see>
 		/// . When
 		/// <code>false</code>
@@ -288,13 +287,13 @@ namespace Antlr4.Runtime.Atn
 		{
 		}
 
-		public virtual int AdaptivePredict(TokenStream input, int decision, ParserRuleContext
+		public virtual int AdaptivePredict(ITokenStream input, int decision, ParserRuleContext
 			 outerContext)
 		{
 			return AdaptivePredict(input, decision, outerContext, false);
 		}
 
-		public virtual int AdaptivePredict(TokenStream input, int decision, ParserRuleContext
+		public virtual int AdaptivePredict(ITokenStream input, int decision, ParserRuleContext
 			 outerContext, bool useContext)
 		{
 			DFA dfa = atn.decisionToDFA[decision];
@@ -357,7 +356,7 @@ namespace Antlr4.Runtime.Atn
 			}
 		}
 
-		public virtual SimulatorState GetStartState(DFA dfa, TokenStream input, ParserRuleContext
+		public virtual SimulatorState GetStartState(DFA dfa, ITokenStream input, ParserRuleContext
 			 outerContext, bool useContext)
 		{
 			if (!useContext)
@@ -391,7 +390,7 @@ namespace Antlr4.Runtime.Atn
 			return new SimulatorState(outerContext, s0, useContext, remainingContext);
 		}
 
-		public virtual int PredictATN(DFA dfa, TokenStream input, ParserRuleContext outerContext
+		public virtual int PredictATN(DFA dfa, ITokenStream input, ParserRuleContext outerContext
 			, bool useContext)
 		{
 			if (outerContext == null)
@@ -425,7 +424,7 @@ namespace Antlr4.Runtime.Atn
 			return alt;
 		}
 
-		public virtual int ExecDFA(DFA dfa, TokenStream input, int startIndex, SimulatorState
+		public virtual int ExecDFA(DFA dfa, ITokenStream input, int startIndex, SimulatorState
 			 state)
 		{
 			ParserRuleContext outerContext = state.outerContext;
@@ -648,7 +647,7 @@ namespace Antlr4.Runtime.Atn
 		/// conflict + preds
 		/// TODO: greedy + those
 		/// </remarks>
-		public virtual int ExecATN(DFA dfa, TokenStream input, int startIndex, SimulatorState
+		public virtual int ExecATN(DFA dfa, ITokenStream input, int startIndex, SimulatorState
 			 initialState)
 		{
 			ParserRuleContext outerContext = initialState.outerContext;
@@ -795,7 +794,7 @@ namespace Antlr4.Runtime.Atn
 			}
 		}
 
-		protected internal virtual int HandleNoViableAlt(TokenStream input, int startIndex
+		protected internal virtual int HandleNoViableAlt(ITokenStream input, int startIndex
 			, SimulatorState previous)
 		{
 			if (previous.s0 != null)
@@ -1835,7 +1834,7 @@ namespace Antlr4.Runtime.Atn
 				{
 					System.Console.Error.WriteLine(t + " ttype out of range: " + Arrays.ToString(tokensNames
 						));
-					System.Console.Error.WriteLine(((CommonTokenStream)((TokenStream)parser.GetInputStream
+					System.Console.Error.WriteLine(((CommonTokenStream)((ITokenStream)parser.GetInputStream
 						())).GetTokens());
 				}
 				else
@@ -1846,7 +1845,7 @@ namespace Antlr4.Runtime.Atn
 			return t.ToString();
 		}
 
-		public virtual string GetLookaheadName(TokenStream input)
+		public virtual string GetLookaheadName(ITokenStream input)
 		{
 			return GetTokenName(input.La(1));
 		}
@@ -1880,7 +1879,7 @@ namespace Antlr4.Runtime.Atn
 		}
 
 		[NotNull]
-		public virtual NoViableAltException NoViableAlt(TokenStream input, ParserRuleContext
+		public virtual NoViableAltException NoViableAlt(ITokenStream input, ParserRuleContext
 			 outerContext, ATNConfigSet configs, int startIndex)
 		{
 			return new NoViableAltException(parser, input, input.Get(startIndex), input.Lt(1)
@@ -2085,12 +2084,12 @@ namespace Antlr4.Runtime.Atn
 			{
 				Interval interval = Interval.Of(startIndex, stopIndex);
 				System.Console.Out.WriteLine("reportAttemptingFullContext decision=" + dfa.decision
-					 + ":" + initialState.s0.configs + ", input=" + ((TokenStream)parser.GetInputStream
+					 + ":" + initialState.s0.configs + ", input=" + ((ITokenStream)parser.GetInputStream
 					()).GetText(interval));
 			}
 			if (parser != null)
 			{
-				((ParserErrorListener)parser.GetErrorListenerDispatch()).ReportAttemptingFullContext
+				((IParserErrorListener)parser.GetErrorListenerDispatch()).ReportAttemptingFullContext
 					(parser, dfa, startIndex, stopIndex, initialState);
 			}
 		}
@@ -2102,12 +2101,12 @@ namespace Antlr4.Runtime.Atn
 			{
 				Interval interval = Interval.Of(startIndex, stopIndex);
 				System.Console.Out.WriteLine("reportContextSensitivity decision=" + dfa.decision 
-					+ ":" + acceptState.s0.configs + ", input=" + ((TokenStream)parser.GetInputStream
+					+ ":" + acceptState.s0.configs + ", input=" + ((ITokenStream)parser.GetInputStream
 					()).GetText(interval));
 			}
 			if (parser != null)
 			{
-				((ParserErrorListener)parser.GetErrorListenerDispatch()).ReportContextSensitivity
+				((IParserErrorListener)parser.GetErrorListenerDispatch()).ReportContextSensitivity
 					(parser, dfa, startIndex, stopIndex, acceptState);
 			}
 		}
@@ -2136,11 +2135,11 @@ namespace Antlr4.Runtime.Atn
 				//			}
 				Interval interval = Interval.Of(startIndex, stopIndex);
 				System.Console.Out.WriteLine("reportAmbiguity " + ambigAlts + ":" + configs + ", input="
-					 + ((TokenStream)parser.GetInputStream()).GetText(interval));
+					 + ((ITokenStream)parser.GetInputStream()).GetText(interval));
 			}
 			if (parser != null)
 			{
-				((ParserErrorListener)parser.GetErrorListenerDispatch()).ReportAmbiguity(parser, 
+				((IParserErrorListener)parser.GetErrorListenerDispatch()).ReportAmbiguity(parser, 
 					dfa, startIndex, stopIndex, ambigAlts, configs);
 			}
 		}

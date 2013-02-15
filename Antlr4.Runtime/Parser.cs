@@ -33,7 +33,6 @@ using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Tree;
 using Sharpen;
 
 namespace Antlr4.Runtime
@@ -44,7 +43,7 @@ namespace Antlr4.Runtime
 	/// 	</remarks>
 	public abstract class Parser : Recognizer<Token, ParserATNSimulator>
 	{
-		public class TraceListener : ParseTreeListener
+		public class TraceListener : IParseTreeListener
 		{
 			public virtual void EnterEveryRule(ParserRuleContext ctx)
 			{
@@ -58,11 +57,11 @@ namespace Antlr4.Runtime
 					()] + ", LT(1)=" + this._enclosing._input.Lt(1).GetText());
 			}
 
-			public virtual void VisitErrorNode(ErrorNode node)
+			public virtual void VisitErrorNode(IErrorNode node)
 			{
 			}
 
-			public virtual void VisitTerminal(TerminalNode node)
+			public virtual void VisitTerminal(ITerminalNode node)
 			{
 				ParserRuleContext parent = (ParserRuleContext)node.GetParent().GetRuleContext();
 				Token token = node.GetSymbol();
@@ -78,16 +77,16 @@ namespace Antlr4.Runtime
 			private readonly Parser _enclosing;
 		}
 
-		public class TrimToSizeListener : ParseTreeListener
+		public class TrimToSizeListener : IParseTreeListener
 		{
 			public static readonly Parser.TrimToSizeListener Instance = new Parser.TrimToSizeListener
 				();
 
-			public virtual void VisitTerminal(TerminalNode node)
+			public virtual void VisitTerminal(ITerminalNode node)
 			{
 			}
 
-			public virtual void VisitErrorNode(ErrorNode node)
+			public virtual void VisitErrorNode(IErrorNode node)
 			{
 			}
 
@@ -104,9 +103,9 @@ namespace Antlr4.Runtime
 			}
 		}
 
-		protected internal ANTLRErrorStrategy _errHandler = new DefaultErrorStrategy();
+		protected internal IAntlrErrorStrategy _errHandler = new DefaultErrorStrategy();
 
-		protected internal TokenStream _input;
+		protected internal ITokenStream _input;
 
 		protected internal readonly IntegerStack _precedenceStack;
 
@@ -137,13 +136,13 @@ namespace Antlr4.Runtime
 		/// </remarks>
 		/// <seealso cref="Antlr4.Runtime.Tree.ParseTreeWalker">Antlr4.Runtime.Tree.ParseTreeWalker
 		/// 	</seealso>
-		protected internal IList<ParseTreeListener> _parseListeners;
+		protected internal IList<IParseTreeListener> _parseListeners;
 
 		/// <summary>Did the recognizer encounter a syntax error?  Track how many.</summary>
 		/// <remarks>Did the recognizer encounter a syntax error?  Track how many.</remarks>
 		protected internal int _syntaxErrors = 0;
 
-		public Parser(TokenStream input)
+		public Parser(ITokenStream input)
 		{
 			{
 				_precedenceStack = new IntegerStack();
@@ -155,9 +154,9 @@ namespace Antlr4.Runtime
 		/// <summary>reset the parser's state</summary>
 		public virtual void Reset()
 		{
-			if (((TokenStream)GetInputStream()) != null)
+			if (((ITokenStream)GetInputStream()) != null)
 			{
-				((TokenStream)GetInputStream()).Seek(0);
+				((ITokenStream)GetInputStream()).Seek(0);
 			}
 			_errHandler.EndErrorCondition(this);
 			_ctx = null;
@@ -311,7 +310,7 @@ namespace Antlr4.Runtime
 		//	public boolean getTraceATNStates() {
 		//		return traceATNStates;
 		//	}
-		public virtual IList<ParseTreeListener> GetParseListeners()
+		public virtual IList<IParseTreeListener> GetParseListeners()
 		{
 			return _parseListeners;
 		}
@@ -329,7 +328,7 @@ namespace Antlr4.Runtime
 		/// ParseTreeListener to a ParseTreeWalker instead of giving it to
 		/// the parser!!!!
 		/// </remarks>
-		public virtual void AddParseListener(ParseTreeListener listener)
+		public virtual void AddParseListener(IParseTreeListener listener)
 		{
 			if (listener == null)
 			{
@@ -337,12 +336,12 @@ namespace Antlr4.Runtime
 			}
 			if (_parseListeners == null)
 			{
-				_parseListeners = new AList<ParseTreeListener>();
+				_parseListeners = new AList<IParseTreeListener>();
 			}
 			this._parseListeners.AddItem(listener);
 		}
 
-		public virtual void RemoveParseListener(ParseTreeListener l)
+		public virtual void RemoveParseListener(IParseTreeListener l)
 		{
 			if (l == null)
 			{
@@ -375,7 +374,7 @@ namespace Antlr4.Runtime
 		/// </remarks>
 		public virtual void TriggerEnterRuleEvent()
 		{
-			foreach (ParseTreeListener l in _parseListeners)
+			foreach (IParseTreeListener l in _parseListeners)
 			{
 				l.EnterEveryRule(_ctx);
 				_ctx.EnterRule(l);
@@ -397,7 +396,7 @@ namespace Antlr4.Runtime
 			// reverse order walk of listeners
 			for (int i = _parseListeners.Count - 1; i >= 0; i--)
 			{
-				ParseTreeListener l = _parseListeners[i];
+				IParseTreeListener l = _parseListeners[i];
 				_ctx.ExitRule(l);
 				l.ExitEveryRule(_ctx);
 			}
@@ -416,12 +415,12 @@ namespace Antlr4.Runtime
 			return _syntaxErrors;
 		}
 
-		public virtual ANTLRErrorStrategy GetErrorHandler()
+		public virtual IAntlrErrorStrategy GetErrorHandler()
 		{
 			return _errHandler;
 		}
 
-		public virtual void SetErrorHandler(ANTLRErrorStrategy handler)
+		public virtual void SetErrorHandler(IAntlrErrorStrategy handler)
 		{
 			this._errHandler = handler;
 		}
@@ -432,7 +431,7 @@ namespace Antlr4.Runtime
 		}
 
 		/// <summary>Set the token stream and reset the parser</summary>
-		public virtual void SetInputStream(TokenStream input)
+		public virtual void SetInputStream(ITokenStream input)
 		{
 			this._input = null;
 			Reset();
@@ -467,7 +466,7 @@ namespace Antlr4.Runtime
 				line = offendingToken.GetLine();
 				charPositionInLine = offendingToken.GetCharPositionInLine();
 			}
-			ANTLRErrorListener<Token> listener = ((ParserErrorListener)GetErrorListenerDispatch
+			IAntlrErrorListener<Token> listener = ((IParserErrorListener)GetErrorListenerDispatch
 				());
 			listener.SyntaxError(this, offendingToken, line, charPositionInLine, msg, e);
 		}
@@ -488,17 +487,17 @@ namespace Antlr4.Runtime
 			Token o = GetCurrentToken();
 			if (o.GetType() != Eof)
 			{
-				((TokenStream)GetInputStream()).Consume();
+				((ITokenStream)GetInputStream()).Consume();
 			}
 			bool hasListener = _parseListeners != null && !_parseListeners.IsEmpty();
 			if (_buildParseTrees || hasListener)
 			{
 				if (_errHandler.InErrorRecoveryMode(this))
 				{
-					ErrorNode node = _ctx.AddErrorNode(o);
+					IErrorNode node = _ctx.AddErrorNode(o);
 					if (_parseListeners != null)
 					{
-						foreach (ParseTreeListener listener in _parseListeners)
+						foreach (IParseTreeListener listener in _parseListeners)
 						{
 							listener.VisitErrorNode(node);
 						}
@@ -506,10 +505,10 @@ namespace Antlr4.Runtime
 				}
 				else
 				{
-					TerminalNode node = _ctx.AddChild(o);
+					ITerminalNode node = _ctx.AddChild(o);
 					if (_parseListeners != null)
 					{
-						foreach (ParseTreeListener listener in _parseListeners)
+						foreach (IParseTreeListener listener in _parseListeners)
 						{
 							listener.VisitTerminal(node);
 						}
@@ -691,7 +690,7 @@ namespace Antlr4.Runtime
 			return precedence >= _precedenceStack.Peek();
 		}
 
-		public override ANTLRErrorListener<Token> GetErrorListenerDispatch()
+		public override IAntlrErrorListener<Token> GetErrorListenerDispatch()
 		{
 			return new ProxyParserErrorListener(GetErrorListeners());
 		}

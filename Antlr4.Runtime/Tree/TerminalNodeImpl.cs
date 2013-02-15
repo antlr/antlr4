@@ -29,23 +29,22 @@
  */
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Tree;
 using Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
-	public class TerminalNodeImpl : TerminalNode
+	public class TerminalNodeImpl : ITerminalNode
 	{
 		public Token symbol;
 
-		public RuleNode parent;
+		public IRuleNode parent;
 
 		public TerminalNodeImpl(Token symbol)
 		{
 			this.symbol = symbol;
 		}
 
-		public virtual ParseTree GetChild(int i)
+		public virtual IParseTree GetChild(int i)
 		{
 			return null;
 		}
@@ -55,7 +54,7 @@ namespace Antlr4.Runtime.Tree
 			return symbol;
 		}
 
-		public virtual RuleNode GetParent()
+		public virtual IRuleNode GetParent()
 		{
 			return parent;
 		}
@@ -80,7 +79,7 @@ namespace Antlr4.Runtime.Tree
 			return 0;
 		}
 
-		public virtual T Accept<T, _T1>(ParseTreeVisitor<_T1> visitor) where _T1:T
+		public virtual T Accept<T, _T1>(IParseTreeVisitor<_T1> visitor) where _T1:T
 		{
 			return visitor.VisitTerminal(this);
 		}

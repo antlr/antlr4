@@ -36,23 +36,23 @@ using Sharpen;
 namespace Antlr4.Runtime
 {
 	/// <author>Sam Harwell</author>
-	public class ProxyParserErrorListener : ProxyErrorListener<Token>, ParserErrorListener
+	public class ProxyParserErrorListener : ProxyErrorListener<Token>, IParserErrorListener
 	{
-		public ProxyParserErrorListener(ICollection<ANTLRErrorListener<Token>> delegates)
-			 : base(delegates)
+		public ProxyParserErrorListener(ICollection<IAntlrErrorListener<Token>> delegates
+			) : base(delegates)
 		{
 		}
 
 		public virtual void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int
 			 stopIndex, BitSet ambigAlts, ATNConfigSet configs)
 		{
-			foreach (ANTLRErrorListener<Token> listener in GetDelegates())
+			foreach (IAntlrErrorListener<Token> listener in GetDelegates())
 			{
-				if (!(listener is ParserErrorListener))
+				if (!(listener is IParserErrorListener))
 				{
 					continue;
 				}
-				ParserErrorListener parserErrorListener = (ParserErrorListener)listener;
+				IParserErrorListener parserErrorListener = (IParserErrorListener)listener;
 				parserErrorListener.ReportAmbiguity(recognizer, dfa, startIndex, stopIndex, ambigAlts
 					, configs);
 			}
@@ -61,13 +61,13 @@ namespace Antlr4.Runtime
 		public virtual void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex
 			, int stopIndex, SimulatorState initialState)
 		{
-			foreach (ANTLRErrorListener<Token> listener in GetDelegates())
+			foreach (IAntlrErrorListener<Token> listener in GetDelegates())
 			{
-				if (!(listener is ParserErrorListener))
+				if (!(listener is IParserErrorListener))
 				{
 					continue;
 				}
-				ParserErrorListener parserErrorListener = (ParserErrorListener)listener;
+				IParserErrorListener parserErrorListener = (IParserErrorListener)listener;
 				parserErrorListener.ReportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex
 					, initialState);
 			}
@@ -76,13 +76,13 @@ namespace Antlr4.Runtime
 		public virtual void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex
 			, int stopIndex, SimulatorState acceptState)
 		{
-			foreach (ANTLRErrorListener<Token> listener in GetDelegates())
+			foreach (IAntlrErrorListener<Token> listener in GetDelegates())
 			{
-				if (!(listener is ParserErrorListener))
+				if (!(listener is IParserErrorListener))
 				{
 					continue;
 				}
-				ParserErrorListener parserErrorListener = (ParserErrorListener)listener;
+				IParserErrorListener parserErrorListener = (IParserErrorListener)listener;
 				parserErrorListener.ReportContextSensitivity(recognizer, dfa, startIndex, stopIndex
 					, acceptState);
 			}

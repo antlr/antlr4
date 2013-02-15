@@ -28,15 +28,14 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using Antlr4.Runtime;
-using Antlr4.Runtime.Tree;
 using Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
-	public interface TerminalNode : ParseTree
+	public interface TerminalNode : IParseTree
 	{
 		Token GetSymbol();
 
-		RuleNode GetParent();
+		IRuleNode GetParent();
 	}
 }

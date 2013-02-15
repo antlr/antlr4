@@ -136,10 +136,10 @@ namespace Antlr4.Runtime
 
 		/// <summary>
 		/// Gets the
-		/// <see cref="TokenSource">TokenSource</see>
+		/// <see cref="ITokenSource">ITokenSource</see>
 		/// which created this token.
 		/// </summary>
-		public abstract TokenSource GetTokenSource();
+		public abstract ITokenSource GetTokenSource();
 
 		/// <summary>
 		/// Gets the

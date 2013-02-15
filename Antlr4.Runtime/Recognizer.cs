@@ -39,7 +39,7 @@ namespace Antlr4.Runtime
 	{
 		public const int Eof = -1;
 
-		private sealed class _CopyOnWriteArrayList_49 : CopyOnWriteArrayList<ANTLRErrorListener
+		private sealed class _CopyOnWriteArrayList_49 : CopyOnWriteArrayList<IAntlrErrorListener
 			<Symbol>>
 		{
 			public _CopyOnWriteArrayList_49()
@@ -51,7 +51,7 @@ namespace Antlr4.Runtime
 		}
 
 		[NotNull]
-		private IList<ANTLRErrorListener<Symbol>> _listeners = new _CopyOnWriteArrayList_49
+		private IList<IAntlrErrorListener<Symbol>> _listeners = new _CopyOnWriteArrayList_49
 			();
 
 		protected internal ATNInterpreter _interp;
@@ -146,13 +146,13 @@ namespace Antlr4.Runtime
 		/// <code>null</code>
 		/// .
 		/// </exception>
-		public virtual void AddErrorListener<_T0>(ANTLRErrorListener<_T0> listener)
+		public virtual void AddErrorListener<_T0>(IAntlrErrorListener<_T0> listener)
 		{
 			Args.NotNull("listener", listener);
 			_listeners.AddItem(listener);
 		}
 
-		public virtual void RemoveErrorListener<_T0>(ANTLRErrorListener<_T0> listener)
+		public virtual void RemoveErrorListener<_T0>(IAntlrErrorListener<_T0> listener)
 		{
 			_listeners.Remove(listener);
 		}
@@ -163,12 +163,12 @@ namespace Antlr4.Runtime
 		}
 
 		[NotNull]
-		public virtual IList<ANTLRErrorListener<Symbol>> GetErrorListeners()
+		public virtual IList<IAntlrErrorListener<Symbol>> GetErrorListeners()
 		{
-			return new AList<ANTLRErrorListener<Symbol>>(_listeners);
+			return new AList<IAntlrErrorListener<Symbol>>(_listeners);
 		}
 
-		public virtual ANTLRErrorListener<Symbol> GetErrorListenerDispatch()
+		public virtual IAntlrErrorListener<Symbol> GetErrorListenerDispatch()
 		{
 			return new ProxyErrorListener<Symbol>(GetErrorListeners());
 		}

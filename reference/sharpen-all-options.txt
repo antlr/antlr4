@@ -183,3 +183,23 @@
 -typeMapping org.antlr.v4.runtime.misc.Tuple2<,> System.Tuple
 -typeMapping org.antlr.v4.runtime.misc.Tuple3<,,> System.Tuple
 
+-typeMapping org.antlr.v4.runtime.ANTLRErrorListener<> IAntlrErrorListener
+-typeMapping org.antlr.v4.runtime.ANTLRErrorStrategy IAntlrErrorStrategy
+-typeMapping org.antlr.v4.runtime.ParserErrorListener IParserErrorListener
+-typeMapping org.antlr.v4.runtime.TokenFactory ITokenFactory
+-typeMapping org.antlr.v4.runtime.TokenSource ITokenSource
+-typeMapping org.antlr.v4.runtime.TokenStream ITokenStream
+-typeMapping org.antlr.v4.runtime.WritableToken IWritableToken
+
+-typeMapping org.antlr.v4.runtime.dfa.EdgeMap<> IEdgeMap
+
+-typeMapping org.antlr.v4.runtime.misc.IntSet IIntSet
+
+-typeMapping org.antlr.v4.runtime.tree.ErrorNode IErrorNode
+-typeMapping org.antlr.v4.runtime.tree.ParseTree IParseTree
+-typeMapping org.antlr.v4.runtime.tree.ParseTreeListener IParseTreeListener
+-typeMapping org.antlr.v4.runtime.tree.ParseTreeVisitor<> IParseTreeVisitor
+-typeMapping org.antlr.v4.runtime.tree.RuleNode IRuleNode
+-typeMapping org.antlr.v4.runtime.tree.SyntaxTree ISyntaxTree
+-typeMapping org.antlr.v4.runtime.tree.TerminalNode ITerminalNode
+-typeMapping org.antlr.v4.runtime.tree.Tree ITree

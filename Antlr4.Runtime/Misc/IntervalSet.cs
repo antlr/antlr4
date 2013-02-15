@@ -53,7 +53,7 @@ namespace Antlr4.Runtime.Misc
 	/// elements are encoded with an index pair where both intervals are the same.
 	/// The ranges are ordered and disjoint so that 2..6 appears before 101..103.
 	/// </remarks>
-	public class IntervalSet : IntSet
+	public class IntervalSet : IIntSet
 	{
 		public static readonly Antlr4.Runtime.Misc.IntervalSet CompleteCharSet = Antlr4.Runtime.Misc.IntervalSet
 			.Of(0, Lexer.MaxCharValue);
@@ -219,7 +219,7 @@ namespace Antlr4.Runtime.Misc
 			return r;
 		}
 
-		public virtual Antlr4.Runtime.Misc.IntervalSet AddAll(IntSet set)
+		public virtual Antlr4.Runtime.Misc.IntervalSet AddAll(IIntSet set)
 		{
 			if (set == null)
 			{
@@ -259,7 +259,7 @@ namespace Antlr4.Runtime.Misc
 		/// this.  The computation is (vocabulary - this).
 		/// 'this' is assumed to be either a subset or equal to vocabulary.
 		/// </remarks>
-		public virtual Antlr4.Runtime.Misc.IntervalSet Complement(IntSet vocabulary)
+		public virtual Antlr4.Runtime.Misc.IntervalSet Complement(IIntSet vocabulary)
 		{
 			if (vocabulary == null)
 			{
@@ -318,7 +318,7 @@ namespace Antlr4.Runtime.Misc
 		/// other is assumed to be a subset of this;
 		/// anything that is in other but not in this will be ignored.
 		/// </remarks>
-		public virtual Antlr4.Runtime.Misc.IntervalSet Subtract(IntSet other)
+		public virtual Antlr4.Runtime.Misc.IntervalSet Subtract(IIntSet other)
 		{
 			// assume the whole unicode range here for the complement
 			// because it doesn't matter.  Anything beyond the max of this' set
@@ -330,7 +330,7 @@ namespace Antlr4.Runtime.Misc
 				));
 		}
 
-		public virtual Antlr4.Runtime.Misc.IntervalSet Or(IntSet a)
+		public virtual Antlr4.Runtime.Misc.IntervalSet Or(IIntSet a)
 		{
 			Antlr4.Runtime.Misc.IntervalSet o = new Antlr4.Runtime.Misc.IntervalSet();
 			o.AddAll(this);
@@ -345,7 +345,7 @@ namespace Antlr4.Runtime.Misc
 		/// just walk them together.  This is roughly O(min(n,m)) for interval
 		/// list lengths n and m.
 		/// </remarks>
-		public virtual Antlr4.Runtime.Misc.IntervalSet And(IntSet other)
+		public virtual Antlr4.Runtime.Misc.IntervalSet And(IIntSet other)
 		{
 			if (other == null)
 			{

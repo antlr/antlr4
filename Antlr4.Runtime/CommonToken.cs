@@ -35,7 +35,7 @@ using Sharpen;
 namespace Antlr4.Runtime
 {
 	[System.Serializable]
-	public class CommonToken : WritableToken
+	public class CommonToken : IWritableToken
 	{
 		private const long serialVersionUID = -6708843461296520577L;
 
@@ -47,7 +47,7 @@ namespace Antlr4.Runtime
 
 		protected internal int channel = DefaultChannel;
 
-		protected internal Tuple<TokenSource, CharStream> source;
+		protected internal Tuple<ITokenSource, CharStream> source;
 
 		/// <summary>We need to be able to change the text once in a while.</summary>
 		/// <remarks>
@@ -74,7 +74,7 @@ namespace Antlr4.Runtime
 			this.type = type;
 		}
 
-		public CommonToken(Tuple<TokenSource, CharStream> source, int type, int channel, 
+		public CommonToken(Tuple<ITokenSource, CharStream> source, int type, int channel, 
 			int start, int stop)
 		{
 			this.source = source;
@@ -220,7 +220,7 @@ namespace Antlr4.Runtime
 			this.index = index;
 		}
 
-		public virtual TokenSource GetTokenSource()
+		public virtual ITokenSource GetTokenSource()
 		{
 			return source.GetItem1();
 		}

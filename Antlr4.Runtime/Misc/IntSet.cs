@@ -28,7 +28,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using System.Collections.Generic;
-using Antlr4.Runtime.Misc;
 using Sharpen;
 
 namespace Antlr4.Runtime.Misc
@@ -46,7 +45,7 @@ namespace Antlr4.Runtime.Misc
 		/// Add all elements from incoming set to this set.  Can limit
 		/// to set of its own type. Return "this" so we can chain calls.
 		/// </remarks>
-		IntSet AddAll(IntSet set);
+		IIntSet AddAll(IIntSet set);
 
 		/// <summary>
 		/// Return the intersection of this set with the argument, creating
@@ -56,13 +55,13 @@ namespace Antlr4.Runtime.Misc
 		/// Return the intersection of this set with the argument, creating
 		/// a new set.
 		/// </remarks>
-		IntSet And(IntSet a);
+		IIntSet And(IIntSet a);
 
-		IntSet Complement(IntSet elements);
+		IIntSet Complement(IIntSet elements);
 
-		IntSet Or(IntSet a);
+		IIntSet Or(IIntSet a);
 
-		IntSet Subtract(IntSet a);
+		IIntSet Subtract(IIntSet a);
 
 		/// <summary>
 		/// Return the size of this set (not the underlying implementation's

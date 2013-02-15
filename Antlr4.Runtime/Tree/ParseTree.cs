@@ -28,7 +28,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using Antlr4.Runtime;
-using Antlr4.Runtime.Tree;
 using Sharpen;
 
 namespace Antlr4.Runtime.Tree
@@ -47,19 +46,19 @@ namespace Antlr4.Runtime.Tree
 	/// <see cref="Antlr4.Runtime.RuleContext">Antlr4.Runtime.RuleContext</see>
 	/// object.
 	/// </summary>
-	public interface ParseTree : SyntaxTree
+	public interface ParseTree : ISyntaxTree
 	{
 		// the following methods narrow the return type; they are not additional methods
-		ParseTree GetParent();
+		IParseTree GetParent();
 
-		ParseTree GetChild(int i);
+		IParseTree GetChild(int i);
 
 		/// <summary>
 		/// The
 		/// <see cref="ParseTreeVisitor{Result}">ParseTreeVisitor&lt;Result&gt;</see>
 		/// needs a double dispatch method.
 		/// </summary>
-		T Accept<T, _T1>(ParseTreeVisitor<_T1> visitor) where _T1:T;
+		T Accept<T, _T1>(IParseTreeVisitor<_T1> visitor) where _T1:T;
 
 		/// <summary>Return the combined text of all leaf nodes.</summary>
 		/// <remarks>

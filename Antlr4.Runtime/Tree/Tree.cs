@@ -44,7 +44,7 @@ namespace Antlr4.Runtime.Tree
 		/// The parent of this node. If the return value is null, then this
 		/// node is the root of the tree.
 		/// </remarks>
-		Antlr4.Runtime.Tree.Tree GetParent();
+		ITree GetParent();
 
 		/// <summary>This method returns whatever object represents the data at this note.</summary>
 		/// <remarks>
@@ -66,7 +66,7 @@ namespace Antlr4.Runtime.Tree
 		/// <code>i</code>
 		/// th value indexed from 0.
 		/// </summary>
-		Antlr4.Runtime.Tree.Tree GetChild(int i);
+		ITree GetChild(int i);
 
 		/// <summary>
 		/// How many children are there? If there is none, then this

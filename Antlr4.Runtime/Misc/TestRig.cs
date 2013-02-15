@@ -214,8 +214,8 @@ namespace Antlr4.Runtime.Misc
 				{
 					System.Console.Error.WriteLine("Can't load " + parserName);
 				}
-				Constructor<Parser> parserCtor = parserClass.GetConstructor(typeof(TokenStream));
-				parser = parserCtor.NewInstance((TokenStream)null);
+				Constructor<Parser> parserCtor = parserClass.GetConstructor(typeof(ITokenStream));
+				parser = parserCtor.NewInstance((ITokenStream)null);
 			}
 			if (inputFiles.IsEmpty())
 			{
