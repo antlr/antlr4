@@ -1,0 +1,349 @@
+/*
+ * [The "BSD license"]
+ *  Copyright (c) 2013 Terence Parr
+ *  Copyright (c) 2013 Sam Harwell
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+using System;
+using System.Collections.Generic;
+using System.Text;
+using Antlr4.Runtime.Atn;
+using Antlr4.Runtime.Dfa;
+using Antlr4.Runtime.Misc;
+using Sharpen;
+
+namespace Antlr4.Runtime.Dfa
+{
+	/// <summary>A DFA state represents a set of possible ATN configurations.</summary>
+	/// <remarks>
+	/// A DFA state represents a set of possible ATN configurations.
+	/// As Aho, Sethi, Ullman p. 117 says "The DFA uses its state
+	/// to keep track of all possible states the ATN can be in after
+	/// reading each input symbol.  That is to say, after reading
+	/// input a1a2..an, the DFA is in a state that represents the
+	/// subset T of the states of the ATN that are reachable from the
+	/// ATN's start state along some path labeled a1a2..an."
+	/// In conventional NFA-&gt;DFA conversion, therefore, the subset T
+	/// would be a bitset representing the set of states the
+	/// ATN could be in.  We need to track the alt predicted by each
+	/// state as well, however.  More importantly, we need to maintain
+	/// a stack of states, tracking the closure operations as they
+	/// jump from rule to rule, emulating rule invocations (method calls).
+	/// I have to add a stack to simulate the proper lookahead sequences for
+	/// the underlying LL grammar from which the ATN was derived.
+	/// <p/>
+	/// I use a set of ATNConfig objects not simple states.  An ATNConfig
+	/// is both a state (ala normal conversion) and a RuleContext describing
+	/// the chain of rules (if any) followed to arrive at that state.
+	/// <p/>
+	/// A DFA state may have multiple references to a particular state,
+	/// but with different ATN contexts (with same or different alts)
+	/// meaning that state was reached via a different set of rule invocations.
+	/// </remarks>
+	public class DFAState
+	{
+		public int stateNumber = -1;
+
+		[NotNull]
+		public readonly ATNConfigSet configs;
+
+		/// <summary>
+		/// <code>edges.get(symbol)</code>
+		/// points to target of symbol.
+		/// </summary>
+		[Nullable]
+		private AbstractEdgeMap<Antlr4.Runtime.Dfa.DFAState> edges;
+
+		private readonly int minSymbol;
+
+		private readonly int maxSymbol;
+
+		public bool isAcceptState = false;
+
+		/// <summary>
+		/// if accept state, what ttype do we match or alt do we predict?
+		/// This is set to
+		/// <see cref="Antlr4.Runtime.Atn.ATN.InvalidAltNumber">Antlr4.Runtime.Atn.ATN.InvalidAltNumber
+		/// 	</see>
+		/// when
+		/// <see cref="predicates">predicates</see>
+		/// <code>!=null</code>
+		/// .
+		/// </summary>
+		public int prediction;
+
+		public int lexerRuleIndex = -1;
+
+		public int lexerActionIndex = -1;
+
+		/// <summary>These keys for these edges are the top level element of the global context.
+		/// 	</summary>
+		/// <remarks>These keys for these edges are the top level element of the global context.
+		/// 	</remarks>
+		[Nullable]
+		private AbstractEdgeMap<Antlr4.Runtime.Dfa.DFAState> contextEdges;
+
+		/// <summary>Symbols in this set require a global context transition before matching an input symbol.
+		/// 	</summary>
+		/// <remarks>Symbols in this set require a global context transition before matching an input symbol.
+		/// 	</remarks>
+		[Nullable]
+		private BitSet contextSymbols;
+
+		/// <summary>
+		/// This list is computed by
+		/// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.PredicateDFAState(DFAState, Antlr4.Runtime.Atn.ATNConfigSet, int)
+		/// 	">Antlr4.Runtime.Atn.ParserATNSimulator.PredicateDFAState(DFAState, Antlr4.Runtime.Atn.ATNConfigSet, int)
+		/// 	</see>
+		/// .
+		/// </summary>
+		[Nullable]
+		public DFAState.PredPrediction[] predicates;
+
+		/// <summary>Map a predicate to a predicted alternative.</summary>
+		/// <remarks>Map a predicate to a predicted alternative.</remarks>
+		public class PredPrediction
+		{
+			[NotNull]
+			public SemanticContext pred;
+
+			public int alt;
+
+			public PredPrediction(SemanticContext pred, int alt)
+			{
+				// if accept, exec action in what rule?
+				// if accept, exec what action?
+				// never null; at least SemanticContext.NONE
+				this.alt = alt;
+				this.pred = pred;
+			}
+
+			public override string ToString()
+			{
+				return "(" + pred + ", " + alt + ")";
+			}
+		}
+
+		public DFAState(ATNConfigSet configs, int minSymbol, int maxSymbol)
+		{
+			this.configs = configs;
+			this.minSymbol = minSymbol;
+			this.maxSymbol = maxSymbol;
+		}
+
+		public bool IsContextSensitive()
+		{
+			return contextEdges != null;
+		}
+
+		public bool IsContextSymbol(int symbol)
+		{
+			if (!IsContextSensitive() || symbol < minSymbol)
+			{
+				return false;
+			}
+			return contextSymbols.Get(symbol - minSymbol);
+		}
+
+		public void SetContextSymbol(int symbol)
+		{
+			System.Diagnostics.Debug.Assert(IsContextSensitive());
+			if (symbol < minSymbol)
+			{
+				return;
+			}
+			contextSymbols.Set(symbol - minSymbol);
+		}
+
+		public virtual void SetContextSensitive(ATN atn)
+		{
+			lock (this)
+			{
+				System.Diagnostics.Debug.Assert(!configs.IsOutermostConfigSet());
+				if (IsContextSensitive())
+				{
+					return;
+				}
+				contextSymbols = new BitSet();
+				contextEdges = new SingletonEdgeMap<DFAState>(-1, atn.states.Count - 1);
+			}
+		}
+
+		public virtual DFAState GetTarget(int symbol)
+		{
+			if (edges == null)
+			{
+				return null;
+			}
+			return edges.Get(symbol);
+		}
+
+		public virtual void SetTarget(int symbol, DFAState target)
+		{
+			lock (this)
+			{
+				if (edges == null)
+				{
+					edges = new SingletonEdgeMap<DFAState>(minSymbol, maxSymbol);
+				}
+				edges = edges.Put(symbol, target);
+			}
+		}
+
+		public virtual IDictionary<int, DFAState> GetEdgeMap()
+		{
+			if (edges == null)
+			{
+				return Sharpen.Collections.EmptyMap();
+			}
+			return edges.ToMap();
+		}
+
+		public virtual DFAState GetContextTarget(int invokingState)
+		{
+			if (contextEdges == null)
+			{
+				return null;
+			}
+			if (invokingState == PredictionContext.EmptyFullStateKey)
+			{
+				invokingState = -1;
+			}
+			return contextEdges.Get(invokingState);
+		}
+
+		public virtual void SetContextTarget(int invokingState, DFAState target)
+		{
+			lock (this)
+			{
+				if (contextEdges == null)
+				{
+					throw new InvalidOperationException("The state is not context sensitive.");
+				}
+				if (invokingState == PredictionContext.EmptyFullStateKey)
+				{
+					invokingState = -1;
+				}
+				contextEdges = contextEdges.Put(invokingState, target);
+			}
+		}
+
+		public virtual IDictionary<int, DFAState> GetContextEdgeMap()
+		{
+			if (contextEdges == null)
+			{
+				return Sharpen.Collections.EmptyMap();
+			}
+			IDictionary<int, DFAState> map = contextEdges.ToMap();
+			if (map.ContainsKey(-1))
+			{
+				if (map.Count == 1)
+				{
+					return Sharpen.Collections.SingletonMap(PredictionContext.EmptyFullStateKey, map.
+						Get(-1));
+				}
+				else
+				{
+					try
+					{
+						map.Put(PredictionContext.EmptyFullStateKey, Sharpen.Collections.Remove(map, -1));
+					}
+					catch (NotSupportedException)
+					{
+						// handles read only, non-singleton maps
+						map = new LinkedHashMap<int, DFAState>(map);
+						map.Put(PredictionContext.EmptyFullStateKey, Sharpen.Collections.Remove(map, -1));
+					}
+				}
+			}
+			return map;
+		}
+
+		public override int GetHashCode()
+		{
+			if (configs == null)
+			{
+				return 1;
+			}
+			return configs.GetHashCode();
+		}
+
+		/// <summary>
+		/// Two
+		/// <see cref="DFAState">DFAState</see>
+		/// instances are equal if their ATN configuration sets
+		/// are the same. This method is used to see if a state already exists.
+		/// <p/>
+		/// Because the number of alternatives and number of ATN configurations are
+		/// finite, there is a finite number of DFA states that can be processed.
+		/// This is necessary to show that the algorithm terminates.
+		/// <p/>
+		/// Cannot test the DFA state numbers here because in
+		/// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.AddDFAState(DFA, Antlr4.Runtime.Atn.ATNConfigSet, Antlr4.Runtime.Atn.PredictionContextCache)
+		/// 	">Antlr4.Runtime.Atn.ParserATNSimulator.AddDFAState(DFA, Antlr4.Runtime.Atn.ATNConfigSet, Antlr4.Runtime.Atn.PredictionContextCache)
+		/// 	</see>
+		/// we need to know if any other state
+		/// exists that has this exact set of ATN configurations. The
+		/// <see cref="stateNumber">stateNumber</see>
+		/// is irrelevant.
+		/// </summary>
+		public override bool Equals(object o)
+		{
+			// compare set of ATN configurations in this set with other
+			if (this == o)
+			{
+				return true;
+			}
+			if (!(o is DFAState))
+			{
+				return false;
+			}
+			DFAState other = (DFAState)o;
+			bool sameSet = this.configs.Equals(other.configs);
+			//		System.out.println("DFAState.equals: "+configs+(sameSet?"==":"!=")+other.configs);
+			return sameSet;
+		}
+
+		public override string ToString()
+		{
+			StringBuilder buf = new StringBuilder();
+			buf.Append(stateNumber).Append(":").Append(configs);
+			if (isAcceptState)
+			{
+				buf.Append("=>");
+				if (predicates != null)
+				{
+					buf.Append(Arrays.ToString(predicates));
+				}
+				else
+				{
+					buf.Append(prediction);
+				}
+			}
+			return buf.ToString();
+		}
+	}
+}
