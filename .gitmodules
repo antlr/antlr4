@@ -1,3 +1,6 @@
 [submodule "reference/antlr4"]
 	path = reference/antlr4
 	url = git://github.com/sharwell/antlr4.git
+[submodule "reference/sharpen"]
+	path = reference/sharpen
+	url = git://github.com/sharwell/sharpen.git
