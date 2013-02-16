@@ -67,12 +67,12 @@ namespace Antlr4.Runtime.Atn
 
 		public override PredictionContext GetParent(int index)
 		{
-			throw new IndexOutOfRangeException();
+			throw new ArgumentOutOfRangeException();
 		}
 
 		public override int GetReturnState(int index)
 		{
-			throw new IndexOutOfRangeException();
+			throw new ArgumentOutOfRangeException();
 		}
 
 		public override int FindReturnState(int returnState)

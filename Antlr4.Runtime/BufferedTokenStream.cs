@@ -242,8 +242,8 @@ namespace Antlr4.Runtime
 		{
 			if (i < 0 || i >= tokens.Count)
 			{
-				throw new IndexOutOfRangeException("token index " + i + " out of range 0.." + (tokens
-					.Count - 1));
+				throw new ArgumentOutOfRangeException("token index " + i + " out of range 0.." + 
+					(tokens.Count - 1));
 			}
 			return tokens[i];
 		}
@@ -386,7 +386,7 @@ namespace Antlr4.Runtime
 			LazyInit();
 			if (start < 0 || stop >= tokens.Count || stop < 0 || start >= tokens.Count)
 			{
-				throw new IndexOutOfRangeException("start " + start + " or stop " + stop + " not in 0.."
+				throw new ArgumentOutOfRangeException("start " + start + " or stop " + stop + " not in 0.."
 					 + (tokens.Count - 1));
 			}
 			if (start > stop)
@@ -494,8 +494,8 @@ namespace Antlr4.Runtime
 			LazyInit();
 			if (tokenIndex < 0 || tokenIndex >= tokens.Count)
 			{
-				throw new IndexOutOfRangeException(tokenIndex + " not in 0.." + (tokens.Count - 1
-					));
+				throw new ArgumentOutOfRangeException(tokenIndex + " not in 0.." + (tokens.Count 
+					- 1));
 			}
 			int nextOnChannel = NextTokenOnChannel(tokenIndex + 1, Lexer.DefaultTokenChannel);
 			int to;
@@ -539,8 +539,8 @@ namespace Antlr4.Runtime
 			LazyInit();
 			if (tokenIndex < 0 || tokenIndex >= tokens.Count)
 			{
-				throw new IndexOutOfRangeException(tokenIndex + " not in 0.." + (tokens.Count - 1
-					));
+				throw new ArgumentOutOfRangeException(tokenIndex + " not in 0.." + (tokens.Count 
+					- 1));
 			}
 			int prevOnChannel = PreviousTokenOnChannel(tokenIndex - 1, Lexer.DefaultTokenChannel
 				);

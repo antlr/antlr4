@@ -147,7 +147,7 @@ namespace Antlr4.Runtime
 			int bufferStartIndex = GetBufferStartIndex();
 			if (i < bufferStartIndex || i >= bufferStartIndex + n)
 			{
-				throw new IndexOutOfRangeException("get(" + i + ") outside buffer: " + bufferStartIndex
+				throw new ArgumentOutOfRangeException("get(" + i + ") outside buffer: " + bufferStartIndex
 					 + ".." + (bufferStartIndex + n));
 			}
 			return tokens[i - bufferStartIndex];
@@ -163,7 +163,7 @@ namespace Antlr4.Runtime
 			int index = p + i - 1;
 			if (index < 0)
 			{
-				throw new IndexOutOfRangeException("LT(" + i + ") gives negative index");
+				throw new ArgumentOutOfRangeException("LT(" + i + ") gives negative index");
 			}
 			if (index >= n)
 			{

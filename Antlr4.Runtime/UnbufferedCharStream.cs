@@ -282,7 +282,7 @@ namespace Antlr4.Runtime
 			int index = p + i - 1;
 			if (index < 0)
 			{
-				throw new IndexOutOfRangeException();
+				throw new ArgumentOutOfRangeException();
 			}
 			if (index > n)
 			{

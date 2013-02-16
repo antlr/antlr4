@@ -179,6 +179,7 @@
 
 -typeMapping org.antlr.v4.runtime.misc.ParseCancellationException ParseCanceledException
 -typeMapping java.util.concurrent.CancellationException System.OperationCanceledException
+-typeMapping java.lang.IndexOutOfBoundsException ArgumentOutOfRangeException
 
 -typeMapping org.antlr.v4.runtime.misc.Tuple System.Tuple
 -typeMapping org.antlr.v4.runtime.misc.Tuple2<,> System.Tuple
