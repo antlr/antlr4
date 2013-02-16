@@ -229,7 +229,7 @@ namespace Antlr4.Runtime.Atn
             ISet<ATNState> states = new HashSet<ATNState>();
             foreach (ATNConfig c in this.configs)
             {
-                states.AddItem(c.GetState());
+                states.Add(c.GetState());
             }
             return states;
         }
@@ -359,20 +359,20 @@ namespace Antlr4.Runtime.Atn
                     unmergedConfig.SetContext(joined);
                     if (addKey)
                     {
-                        mergedConfigs.Put(key, unmergedConfig);
+                        mergedConfigs[key] = unmergedConfig;
                         unmerged.Remove(i);
                     }
                     return true;
                 }
             }
-            configs.AddItem(e);
+            configs.Add(e);
             if (addKey)
             {
-                mergedConfigs.Put(key, e);
+                mergedConfigs[key] = e;
             }
             else
             {
-                unmerged.AddItem(e);
+                unmerged.Add(e);
             }
             UpdatePropertiesForAddedConfig(e);
             return true;
