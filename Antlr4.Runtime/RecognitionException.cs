@@ -27,6 +27,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+using System;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Sharpen;
@@ -42,7 +44,7 @@ namespace Antlr4.Runtime
     /// and what kind of problem occurred.
     /// </remarks>
     [System.Serializable]
-    public class RecognitionException : RuntimeException
+    public class RecognitionException : Exception
     {
         private const long serialVersionUID = -3861826954750022374L;
 
