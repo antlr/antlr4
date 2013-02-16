@@ -48,8 +48,6 @@ namespace Antlr4.Runtime.Misc
     [System.Serializable]
     public class ParseCanceledException : OperationCanceledException
     {
-        private const long serialVersionUID = -3529552099366979683L;
-
         public ParseCanceledException()
         {
         }
@@ -59,13 +57,13 @@ namespace Antlr4.Runtime.Misc
         }
 
         public ParseCanceledException(Exception cause)
+            : base("The parse operation was cancelled.", cause)
         {
-            Sharpen.Extensions.InitCause(this, cause);
         }
 
-        public ParseCanceledException(string message, Exception cause) : base(message)
+        public ParseCanceledException(string message, Exception cause)
+            : base(message, cause)
         {
-            Sharpen.Extensions.InitCause(this, cause);
         }
     }
 }
