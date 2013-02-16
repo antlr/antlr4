@@ -444,7 +444,7 @@ namespace Antlr4.Runtime.Atn
 				RuleStartState startState = atn.ruleToStartState[i];
 				ATNState middleState = startState;
 				while (middleState.OnlyHasEpsilonTransitions() && middleState.GetNumberOfOptimizedTransitions
-					() == 1 && middleState.GetOptimizedTransition(0).GetSerializationType() == Transition
+					() == 1 && middleState.GetOptimizedTransition(0).SerializationType == Transition
 					.Epsilon)
 				{
 					middleState = middleState.GetOptimizedTransition(0).target;
@@ -455,13 +455,13 @@ namespace Antlr4.Runtime.Atn
 				}
 				Transition matchTransition = middleState.GetOptimizedTransition(0);
 				ATNState matchTarget = matchTransition.target;
-				if (matchTransition.IsEpsilon() || !matchTarget.OnlyHasEpsilonTransitions() || matchTarget
+				if (matchTransition.IsEpsilon || !matchTarget.OnlyHasEpsilonTransitions() || matchTarget
 					.GetNumberOfOptimizedTransitions() != 1 || !(matchTarget.GetOptimizedTransition(
 					0).target is RuleStopState))
 				{
 					continue;
 				}
-				switch (matchTransition.GetSerializationType())
+				switch (matchTransition.SerializationType)
 				{
 					case Transition.Atom:
 					case Transition.Range:
@@ -529,7 +529,7 @@ namespace Antlr4.Runtime.Atn
 					intermediateState.SetRuleIndex(target.ruleIndex);
 					atn.AddState(intermediateState);
 					optimizedTransitions.AddItem(new EpsilonTransition(intermediateState));
-					switch (effective.GetSerializationType())
+					switch (effective.SerializationType)
 					{
 						case Transition.Atom:
 						{
@@ -547,7 +547,7 @@ namespace Antlr4.Runtime.Atn
 
 						case Transition.Set:
 						{
-							intermediateState.AddTransition(new SetTransition(target, effective.Label()));
+							intermediateState.AddTransition(new SetTransition(target, effective.Label));
 							break;
 						}
 
@@ -589,7 +589,7 @@ namespace Antlr4.Runtime.Atn
 				{
 					Transition transition = state.GetOptimizedTransition(i);
 					ATNState intermediate = transition.target;
-					if (transition.GetSerializationType() != Transition.Epsilon || intermediate.GetStateType
+					if (transition.SerializationType != Transition.Epsilon || intermediate.GetStateType
 						() != ATNState.Basic || !intermediate.OnlyHasEpsilonTransitions())
 					{
 						if (optimizedTransitions != null)
@@ -600,7 +600,7 @@ namespace Antlr4.Runtime.Atn
 					}
 					for (int j = 0; j < intermediate.GetNumberOfOptimizedTransitions(); j++)
 					{
-						if (intermediate.GetOptimizedTransition(j).GetSerializationType() != Transition.Epsilon)
+						if (intermediate.GetOptimizedTransition(j).SerializationType != Transition.Epsilon)
 						{
 							if (optimizedTransitions != null)
 							{
@@ -712,7 +712,7 @@ nextState_break: ;
 						}
 						else
 						{
-							matchSet.AddAll(matchTransition.Label());
+							matchSet.AddAll(matchTransition.Label);
 						}
 					}
 				}
@@ -821,7 +821,7 @@ nextState_break: ;
 					.transitions;
 				foreach (Transition t in transitions)
 				{
-					if (t.GetSerializationType() != Transition.Epsilon)
+					if (t.SerializationType != Transition.Epsilon)
 					{
 						return false;
 					}

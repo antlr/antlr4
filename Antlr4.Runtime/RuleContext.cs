@@ -116,25 +116,37 @@ namespace Antlr4.Runtime
 			return invokingState == -1;
 		}
 
-		// satisfy the ParseTree / SyntaxTree interface
-		public virtual Interval GetSourceInterval()
+		public virtual Interval SourceInterval
 		{
-			return Interval.Invalid;
+			get
+			{
+				// satisfy the ParseTree / SyntaxTree interface
+				return Interval.Invalid;
+			}
 		}
 
-		public virtual Antlr4.Runtime.RuleContext GetRuleContext()
+		public virtual Antlr4.Runtime.RuleContext RuleContext
 		{
-			return this;
+			get
+			{
+				return this;
+			}
 		}
 
-		public virtual Antlr4.Runtime.RuleContext GetParent()
+		public virtual Antlr4.Runtime.RuleContext Parent
 		{
-			return parent;
+			get
+			{
+				return parent;
+			}
 		}
 
-		public virtual Antlr4.Runtime.RuleContext GetPayload()
+		public virtual Antlr4.Runtime.RuleContext Payload
 		{
-			return this;
+			get
+			{
+				return this;
+			}
 		}
 
 		/// <summary>Return the combined text of all child nodes.</summary>
@@ -148,12 +160,12 @@ namespace Antlr4.Runtime
 		/// </remarks>
 		public virtual string GetText()
 		{
-			if (GetChildCount() == 0)
+			if (ChildCount == 0)
 			{
 				return string.Empty;
 			}
 			StringBuilder builder = new StringBuilder();
-			for (int i = 0; i < GetChildCount(); i++)
+			for (int i = 0; i < ChildCount; i++)
 			{
 				builder.Append(GetChild(i).GetText());
 			}
@@ -170,9 +182,12 @@ namespace Antlr4.Runtime
 			return null;
 		}
 
-		public virtual int GetChildCount()
+		public virtual int ChildCount
 		{
-			return 0;
+			get
+			{
+				return 0;
+			}
 		}
 
 		public virtual T Accept<T, _T1>(IParseTreeVisitor<_T1> visitor) where _T1:T

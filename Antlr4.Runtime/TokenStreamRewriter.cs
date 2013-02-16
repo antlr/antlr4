@@ -156,9 +156,9 @@ namespace Antlr4.Runtime
 			public override int Execute(StringBuilder buf)
 			{
 				buf.Append(text);
-				if (tokens.Get(index).GetType() != IToken.Eof)
+				if (tokens.Get(index).Type != IToken.Eof)
 				{
-					buf.Append(tokens.Get(index).GetText());
+					buf.Append(tokens.Get(index).Text);
 				}
 				return index + 1;
 			}
@@ -278,7 +278,7 @@ namespace Antlr4.Runtime
 
 		public virtual void InsertAfter(string programName, IToken t, object text)
 		{
-			InsertAfter(programName, t.GetTokenIndex(), text);
+			InsertAfter(programName, t.TokenIndex, text);
 		}
 
 		public virtual void InsertAfter(string programName, int index, object text)
@@ -299,7 +299,7 @@ namespace Antlr4.Runtime
 
 		public virtual void InsertBefore(string programName, IToken t, object text)
 		{
-			InsertBefore(programName, t.GetTokenIndex(), text);
+			InsertBefore(programName, t.TokenIndex, text);
 		}
 
 		public virtual void InsertBefore(string programName, int index, object text)
@@ -333,10 +333,10 @@ namespace Antlr4.Runtime
 
 		public virtual void Replace(string programName, int from, int to, object text)
 		{
-			if (from > to || from < 0 || to < 0 || to >= tokens.Size())
+			if (from > to || from < 0 || to < 0 || to >= tokens.Size)
 			{
 				throw new ArgumentException("replace: range invalid: " + from + ".." + to + "(size="
-					 + tokens.Size() + ")");
+					 + tokens.Size + ")");
 			}
 			TokenStreamRewriter.RewriteOperation op = new TokenStreamRewriter.ReplaceOp(tokens
 				, from, to, text);
@@ -348,7 +348,7 @@ namespace Antlr4.Runtime
 		public virtual void Replace(string programName, IToken from, IToken to, object text
 			)
 		{
-			Replace(programName, from.GetTokenIndex(), to.GetTokenIndex(), text);
+			Replace(programName, from.TokenIndex, to.TokenIndex, text);
 		}
 
 		public virtual void Delete(int index)
@@ -432,7 +432,7 @@ namespace Antlr4.Runtime
 		/// </remarks>
 		public virtual string GetText()
 		{
-			return GetText(DefaultProgramName, Interval.Of(0, tokens.Size() - 1));
+			return GetText(DefaultProgramName, Interval.Of(0, tokens.Size - 1));
 		}
 
 		/// <summary>
@@ -460,9 +460,9 @@ namespace Antlr4.Runtime
 			int start = interval.a;
 			int stop = interval.b;
 			// ensure start/end are in range
-			if (stop > tokens.Size() - 1)
+			if (stop > tokens.Size - 1)
 			{
-				stop = tokens.Size() - 1;
+				stop = tokens.Size - 1;
 			}
 			if (start < 0)
 			{
@@ -479,7 +479,7 @@ namespace Antlr4.Runtime
 				(rewrites);
 			// Walk buffer, executing instructions and emitting tokens
 			int i = start;
-			while (i <= stop && i < tokens.Size())
+			while (i <= stop && i < tokens.Size)
 			{
 				TokenStreamRewriter.RewriteOperation op = indexToOp.Get(i);
 				Sharpen.Collections.Remove(indexToOp, i);
@@ -488,9 +488,9 @@ namespace Antlr4.Runtime
 				if (op == null)
 				{
 					// no operation at that index, just dump token
-					if (t.GetType() != IToken.Eof)
+					if (t.Type != IToken.Eof)
 					{
-						buf.Append(t.GetText());
+						buf.Append(t.Text);
 					}
 					i++;
 				}
@@ -504,13 +504,13 @@ namespace Antlr4.Runtime
 			// include stuff after end if it's last index in buffer
 			// So, if they did an insertAfter(lastValidIndex, "foo"), include
 			// foo if end==lastValidIndex.
-			if (stop == tokens.Size() - 1)
+			if (stop == tokens.Size - 1)
 			{
 				// Scan any remaining operations after last token
 				// should be included (they will be inserts).
 				foreach (TokenStreamRewriter.RewriteOperation op in indexToOp.Values)
 				{
-					if (op.index >= tokens.Size() - 1)
+					if (op.index >= tokens.Size - 1)
 					{
 						buf.Append(op.text);
 					}

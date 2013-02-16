@@ -73,7 +73,7 @@ namespace Antlr4.Runtime
 		public override string ToString()
 		{
 			string symbol = string.Empty;
-			if (startIndex >= 0 && startIndex < ((ICharStream)GetInputStream()).Size())
+			if (startIndex >= 0 && startIndex < ((ICharStream)GetInputStream()).Size)
 			{
 				symbol = ((ICharStream)GetInputStream()).GetText(Interval.Of(startIndex, startIndex
 					));

@@ -85,8 +85,8 @@ namespace Antlr4.Runtime.Dfa
 				states.Sort(new _IComparer_85());
 				foreach (DFAState s in states)
 				{
-					IDictionary<int, DFAState> edges = s.GetEdgeMap();
-					IDictionary<int, DFAState> contextEdges = s.GetContextEdgeMap();
+					IDictionary<int, DFAState> edges = s.EdgeMap;
+					IDictionary<int, DFAState> contextEdges = s.ContextEdgeMap;
 					foreach (KeyValuePair<int, DFAState> entry in edges.EntrySet())
 					{
 						if ((entry.Value == null || entry.Value == ATNSimulator.Error) && !s.IsContextSymbol
@@ -115,7 +115,7 @@ namespace Antlr4.Runtime.Dfa
 							}
 						}
 					}
-					if (s.IsContextSensitive())
+					if (s.IsContextSensitive)
 					{
 						foreach (KeyValuePair<int, DFAState> entry_1 in contextEdges.EntrySet())
 						{
@@ -204,7 +204,7 @@ namespace Antlr4.Runtime.Dfa
 					stateStr = ":s" + n + "=>" + s.prediction;
 				}
 			}
-			if (s.IsContextSensitive())
+			if (s.IsContextSensitive)
 			{
 				stateStr += "*";
 				foreach (ATNConfig config in s.configs)

@@ -139,7 +139,7 @@ namespace Antlr4.Runtime.Atn
 			int mark = input.Mark();
 			try
 			{
-				this.startIndex = input.Index();
+				this.startIndex = input.Index;
 				this.prevAccept.Reset();
 				DFAState s0 = atn.modeToDFA[mode].s0.Get();
 				if (s0 == null)
@@ -282,7 +282,7 @@ namespace Antlr4.Runtime.Atn
 			else
 			{
 				// if no accept and EOF is first char, return EOF
-				if (t == IIntStream.Eof && input.Index() == startIndex)
+				if (t == IIntStream.Eof && input.Index == startIndex)
 				{
 					return IToken.Eof;
 				}
@@ -400,20 +400,20 @@ namespace Antlr4.Runtime.Atn
 			if (config.GetState() is RuleStopState)
 			{
 				PredictionContext context = config.GetContext();
-				if (context.IsEmpty())
+				if (context.IsEmpty)
 				{
 					configs.AddItem(config);
 					return true;
 				}
 				else
 				{
-					if (context.HasEmpty())
+					if (context.HasEmpty)
 					{
 						configs.AddItem(config.Transform(config.GetState(), PredictionContext.EmptyFull));
 						return true;
 					}
 				}
-				for (int i = 0; i < context.Size(); i++)
+				for (int i = 0; i < context.Size; i++)
 				{
 					int returnStateNumber = context.GetReturnState(i);
 					if (returnStateNumber == PredictionContext.EmptyFullStateKey)
@@ -458,13 +458,13 @@ namespace Antlr4.Runtime.Atn
 			 t, ATNConfigSet configs, bool speculative)
 		{
 			ATNConfig c;
-			switch (t.GetSerializationType())
+			switch (t.SerializationType)
 			{
 				case Transition.Rule:
 				{
 					RuleTransition ruleTransition = (RuleTransition)t;
 					if (optimize_tail_calls && ruleTransition.optimizedTailCall && !config.GetContext
-						().HasEmpty())
+						().HasEmpty)
 					{
 						c = config.Transform(t.target);
 					}
@@ -539,11 +539,10 @@ namespace Antlr4.Runtime.Atn
 		/// sensitive values, including
 		/// <see cref="Antlr4.Runtime.Lexer.GetText()">Antlr4.Runtime.Lexer.GetText()</see>
 		/// ,
-		/// <see cref="Antlr4.Runtime.Lexer.GetLine()">Antlr4.Runtime.Lexer.GetLine()</see>
+		/// <see cref="Antlr4.Runtime.Lexer.Line()">Antlr4.Runtime.Lexer.Line()</see>
 		/// ,
 		/// and
-		/// <see cref="Antlr4.Runtime.Lexer.GetCharPositionInLine()">Antlr4.Runtime.Lexer.GetCharPositionInLine()
-		/// 	</see>
+		/// <see cref="Antlr4.Runtime.Lexer.Column()">Antlr4.Runtime.Lexer.Column()</see>
 		/// , properly reflect the current
 		/// lexer state. This method should restore
 		/// <code>input</code>
@@ -586,7 +585,7 @@ namespace Antlr4.Runtime.Atn
 			}
 			int savedCharPositionInLine = charPositionInLine;
 			int savedLine = line;
-			int index = input.Index();
+			int index = input.Index;
 			int marker = input.Mark();
 			try
 			{
@@ -605,7 +604,7 @@ namespace Antlr4.Runtime.Atn
 		protected internal virtual void CaptureSimState(LexerATNSimulator.SimState settings
 			, ICharStream input, DFAState dfaState)
 		{
-			settings.index = input.Index();
+			settings.index = input.Index;
 			settings.line = line;
 			settings.charPos = charPositionInLine;
 			settings.dfaState = dfaState;
@@ -690,7 +689,7 @@ namespace Antlr4.Runtime.Atn
 		public virtual string GetText(ICharStream input)
 		{
 			// index is first lookahead char, don't include.
-			return input.GetText(Interval.Of(startIndex, input.Index() - 1));
+			return input.GetText(Interval.Of(startIndex, input.Index - 1));
 		}
 
 		public virtual int GetLine()

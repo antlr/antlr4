@@ -154,14 +154,17 @@ namespace Antlr4.Runtime.Dfa
 			this.maxSymbol = maxSymbol;
 		}
 
-		public bool IsContextSensitive()
+		public bool IsContextSensitive
 		{
-			return contextEdges != null;
+			get
+			{
+				return contextEdges != null;
+			}
 		}
 
 		public bool IsContextSymbol(int symbol)
 		{
-			if (!IsContextSensitive() || symbol < minSymbol)
+			if (!IsContextSensitive || symbol < minSymbol)
 			{
 				return false;
 			}
@@ -170,7 +173,7 @@ namespace Antlr4.Runtime.Dfa
 
 		public void SetContextSymbol(int symbol)
 		{
-			System.Diagnostics.Debug.Assert(IsContextSensitive());
+			System.Diagnostics.Debug.Assert(IsContextSensitive);
 			if (symbol < minSymbol)
 			{
 				return;
@@ -183,7 +186,7 @@ namespace Antlr4.Runtime.Dfa
 			lock (this)
 			{
 				System.Diagnostics.Debug.Assert(!configs.IsOutermostConfigSet());
-				if (IsContextSensitive())
+				if (IsContextSensitive)
 				{
 					return;
 				}
@@ -213,13 +216,16 @@ namespace Antlr4.Runtime.Dfa
 			}
 		}
 
-		public virtual IDictionary<int, DFAState> GetEdgeMap()
+		public virtual IDictionary<int, DFAState> EdgeMap
 		{
-			if (edges == null)
+			get
 			{
-				return Sharpen.Collections.EmptyMap();
+				if (edges == null)
+				{
+					return Sharpen.Collections.EmptyMap();
+				}
+				return edges.ToMap();
 			}
-			return edges.ToMap();
 		}
 
 		public virtual DFAState GetContextTarget(int invokingState)
@@ -251,35 +257,38 @@ namespace Antlr4.Runtime.Dfa
 			}
 		}
 
-		public virtual IDictionary<int, DFAState> GetContextEdgeMap()
+		public virtual IDictionary<int, DFAState> ContextEdgeMap
 		{
-			if (contextEdges == null)
+			get
 			{
-				return Sharpen.Collections.EmptyMap();
-			}
-			IDictionary<int, DFAState> map = contextEdges.ToMap();
-			if (map.ContainsKey(-1))
-			{
-				if (map.Count == 1)
+				if (contextEdges == null)
 				{
-					return Sharpen.Collections.SingletonMap(PredictionContext.EmptyFullStateKey, map.
-						Get(-1));
+					return Sharpen.Collections.EmptyMap();
 				}
-				else
+				IDictionary<int, DFAState> map = contextEdges.ToMap();
+				if (map.ContainsKey(-1))
 				{
-					try
+					if (map.Count == 1)
 					{
-						map.Put(PredictionContext.EmptyFullStateKey, Sharpen.Collections.Remove(map, -1));
+						return Sharpen.Collections.SingletonMap(PredictionContext.EmptyFullStateKey, map.
+							Get(-1));
 					}
-					catch (NotSupportedException)
+					else
 					{
-						// handles read only, non-singleton maps
-						map = new LinkedHashMap<int, DFAState>(map);
-						map.Put(PredictionContext.EmptyFullStateKey, Sharpen.Collections.Remove(map, -1));
+						try
+						{
+							map.Put(PredictionContext.EmptyFullStateKey, Sharpen.Collections.Remove(map, -1));
+						}
+						catch (NotSupportedException)
+						{
+							// handles read only, non-singleton maps
+							map = new LinkedHashMap<int, DFAState>(map);
+							map.Put(PredictionContext.EmptyFullStateKey, Sharpen.Collections.Remove(map, -1));
+						}
 					}
 				}
+				return map;
 			}
-			return map;
 		}
 
 		public override int GetHashCode()

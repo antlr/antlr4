@@ -54,7 +54,7 @@ namespace Antlr4.Runtime.Tree
 			}
 			IRuleNode r = (IRuleNode)t;
 			EnterRule(listener, r);
-			int n = r.GetChildCount();
+			int n = r.ChildCount;
 			for (int i = 0; i < n; i++)
 			{
 				Walk(listener, r.GetChild(i));
@@ -74,7 +74,7 @@ namespace Antlr4.Runtime.Tree
 		protected internal virtual void EnterRule(IParseTreeListener listener, IRuleNode 
 			r)
 		{
-			ParserRuleContext ctx = (ParserRuleContext)r.GetRuleContext();
+			ParserRuleContext ctx = (ParserRuleContext)r.RuleContext;
 			listener.EnterEveryRule(ctx);
 			ctx.EnterRule(listener);
 		}
@@ -82,7 +82,7 @@ namespace Antlr4.Runtime.Tree
 		protected internal virtual void ExitRule(IParseTreeListener listener, IRuleNode r
 			)
 		{
-			ParserRuleContext ctx = (ParserRuleContext)r.GetRuleContext();
+			ParserRuleContext ctx = (ParserRuleContext)r.RuleContext;
 			ctx.ExitRule(listener);
 			listener.ExitEveryRule(ctx);
 		}

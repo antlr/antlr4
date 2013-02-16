@@ -114,7 +114,7 @@ namespace Antlr4.Runtime.Tree
 		public static string ToStringTree(ITree t, IList<string> ruleNames)
 		{
 			string s = Utils.EscapeWhitespace(GetNodeText(t, ruleNames), false);
-			if (t.GetChildCount() == 0)
+			if (t.ChildCount == 0)
 			{
 				return s;
 			}
@@ -123,7 +123,7 @@ namespace Antlr4.Runtime.Tree
 			s = Utils.EscapeWhitespace(GetNodeText(t, ruleNames), false);
 			buf.Append(s);
 			buf.Append(' ');
-			for (int i = 0; i < t.GetChildCount(); i++)
+			for (int i = 0; i < t.ChildCount; i++)
 			{
 				if (i > 0)
 				{
@@ -148,7 +148,7 @@ namespace Antlr4.Runtime.Tree
 			{
 				if (t is IRuleNode)
 				{
-					int ruleIndex = ((IRuleNode)t).GetRuleContext().GetRuleIndex();
+					int ruleIndex = ((IRuleNode)t).RuleContext.GetRuleIndex();
 					string ruleName = ruleNames[ruleIndex];
 					return ruleName;
 				}
@@ -162,10 +162,10 @@ namespace Antlr4.Runtime.Tree
 					{
 						if (t is ITerminalNode)
 						{
-							object symbol = ((ITerminalNode)t).GetSymbol();
+							object symbol = ((ITerminalNode)t).Symbol;
 							if (symbol is IToken)
 							{
-								string s = ((IToken)symbol).GetText();
+								string s = ((IToken)symbol).Text;
 								return s;
 							}
 						}
@@ -173,12 +173,12 @@ namespace Antlr4.Runtime.Tree
 				}
 			}
 			// no recog for rule names
-			object payload = t.GetPayload();
+			object payload = t.Payload;
 			if (payload is IToken)
 			{
-				return ((IToken)payload).GetText();
+				return ((IToken)payload).Text;
 			}
-			return t.GetPayload().ToString();
+			return t.Payload.ToString();
 		}
 
 		/// <summary>Return a list of all ancestors of this node.</summary>
@@ -189,17 +189,17 @@ namespace Antlr4.Runtime.Tree
 		[NotNull]
 		public static IList<ITree> GetAncestors(ITree t)
 		{
-			if (t.GetParent() == null)
+			if (t.Parent == null)
 			{
 				return Sharpen.Collections.EmptyList();
 			}
 			IList<ITree> ancestors = new List<ITree>();
-			t = t.GetParent();
+			t = t.Parent;
 			while (t != null)
 			{
 				ancestors.Add(0, t);
 				// insert at start
-				t = t.GetParent();
+				t = t.Parent;
 			}
 			return ancestors;
 		}

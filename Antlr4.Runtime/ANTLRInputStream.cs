@@ -233,14 +233,20 @@ namespace Antlr4.Runtime
 		/// last symbol has been read.  The index is the index of char to
 		/// be returned from LA(1).
 		/// </remarks>
-		public virtual int Index()
+		public virtual int Index
 		{
-			return p;
+			get
+			{
+				return p;
+			}
 		}
 
-		public virtual int Size()
+		public virtual int Size
 		{
-			return n;
+			get
+			{
+				return n;
+			}
 		}
 
 		/// <summary>mark/release do nothing; we have entire buffer</summary>
@@ -295,9 +301,12 @@ namespace Antlr4.Runtime
 			return new string(data, start, count);
 		}
 
-		public virtual string GetSourceName()
+		public virtual string SourceName
 		{
-			return name;
+			get
+			{
+				return name;
+			}
 		}
 
 		public override string ToString()

@@ -58,7 +58,9 @@ namespace Antlr4.Runtime.Tree
 		/// 	</see>
 		/// .
 		/// </summary>
-		[NotNull]
-		Interval GetSourceInterval();
+		Interval SourceInterval
+		{
+			get;
+		}
 	}
 }

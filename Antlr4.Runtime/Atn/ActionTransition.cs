@@ -54,14 +54,20 @@ namespace Antlr4.Runtime.Atn
 			this.isCtxDependent = isCtxDependent;
 		}
 
-		public override int GetSerializationType()
+		public override int SerializationType
 		{
-			return Action;
+			get
+			{
+				return Action;
+			}
 		}
 
-		public override bool IsEpsilon()
+		public override bool IsEpsilon
 		{
-			return true;
+			get
+			{
+				return true;
+			}
 		}
 
 		// we are to be ignored by analysis 'cept for predicates

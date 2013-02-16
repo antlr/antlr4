@@ -96,8 +96,8 @@ namespace Antlr4.Runtime
 		/// <summary>What is the error header, normally line/character position information?</summary>
 		public virtual string GetErrorHeader(RecognitionException e)
 		{
-			int line = e.GetOffendingToken().GetLine();
-			int charPositionInLine = e.GetOffendingToken().GetCharPositionInLine();
+			int line = e.GetOffendingToken().Line;
+			int charPositionInLine = e.GetOffendingToken().Column;
 			return "line " + line + ":" + charPositionInLine;
 		}
 
@@ -121,16 +121,16 @@ namespace Antlr4.Runtime
 			{
 				return "<no token>";
 			}
-			string s = t.GetText();
+			string s = t.Text;
 			if (s == null)
 			{
-				if (t.GetType() == IToken.Eof)
+				if (t.Type == IToken.Eof)
 				{
 					s = "<EOF>";
 				}
 				else
 				{
-					s = "<" + t.GetType() + ">";
+					s = "<" + t.Type + ">";
 				}
 			}
 			s = s.ReplaceAll("\n", "\\\\n");

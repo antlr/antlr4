@@ -81,23 +81,37 @@ namespace Antlr4.Runtime
 		/// </remarks>
 		public const int HiddenChannel = 1;
 
-		/// <summary>Get the text of the token</summary>
-		public abstract string GetText();
+		/// <summary>Get the text of the token.</summary>
+		/// <remarks>Get the text of the token.</remarks>
+		internal abstract string Text
+		{
+			get;
+		}
 
-		/// <summary>Get the token type of the token</summary>
-		public abstract int GetType();
+		/// <summary>Get the token type of the token.</summary>
+		/// <remarks>Get the token type of the token.</remarks>
+		internal abstract int Type
+		{
+			get;
+		}
 
 		/// <summary>
 		/// The line number on which the 1st character of this token was matched,
 		/// line=1..n
 		/// </summary>
-		public abstract int GetLine();
+		internal abstract int Line
+		{
+			get;
+		}
 
 		/// <summary>
 		/// The index of the first character of this token relative to the
 		/// beginning of the line at which it occurs, 0..n-1
 		/// </summary>
-		public abstract int GetCharPositionInLine();
+		internal abstract int Column
+		{
+			get;
+		}
 
 		/// <summary>Return the channel this token.</summary>
 		/// <remarks>
@@ -105,7 +119,10 @@ namespace Antlr4.Runtime
 		/// on a different channel, but the parser only "tunes" to a single channel.
 		/// The parser ignores everything not on DEFAULT_CHANNEL.
 		/// </remarks>
-		public abstract int GetChannel();
+		internal abstract int Channel
+		{
+			get;
+		}
 
 		/// <summary>An index from 0..n-1 of the token object in the input stream.</summary>
 		/// <remarks>
@@ -115,7 +132,10 @@ namespace Antlr4.Runtime
 		/// Return -1 to indicate that this token was conjured up since
 		/// it doesn't have a valid index.
 		/// </remarks>
-		public abstract int GetTokenIndex();
+		internal abstract int TokenIndex
+		{
+			get;
+		}
 
 		/// <summary>
 		/// The starting character index of the token
@@ -125,27 +145,39 @@ namespace Antlr4.Runtime
 		/// The starting character index of the token
 		/// This method is optional; return -1 if not implemented.
 		/// </remarks>
-		public abstract int GetStartIndex();
+		internal abstract int StartIndex
+		{
+			get;
+		}
 
 		/// <summary>The last character index of the token.</summary>
 		/// <remarks>
 		/// The last character index of the token.
 		/// This method is optional; return -1 if not implemented.
 		/// </remarks>
-		public abstract int GetStopIndex();
+		internal abstract int StopIndex
+		{
+			get;
+		}
 
 		/// <summary>
 		/// Gets the
 		/// <see cref="ITokenSource">ITokenSource</see>
 		/// which created this token.
 		/// </summary>
-		public abstract ITokenSource GetTokenSource();
+		internal abstract ITokenSource TokenSource
+		{
+			get;
+		}
 
 		/// <summary>
 		/// Gets the
 		/// <see cref="ICharStream">ICharStream</see>
 		/// from which this token was derived.
 		/// </summary>
-		public abstract ICharStream GetInputStream();
+		internal abstract ICharStream InputStream
+		{
+			get;
+		}
 	}
 }

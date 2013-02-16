@@ -57,7 +57,7 @@ namespace Antlr4.Runtime
 		public override void Recover(Parser recognizer, RecognitionException e)
 		{
 			for (ParserRuleContext context = recognizer.GetContext(); context != null; context
-				 = ((ParserRuleContext)context.GetParent()))
+				 = ((ParserRuleContext)context.Parent))
 			{
 				context.exception = e;
 			}
@@ -77,7 +77,7 @@ namespace Antlr4.Runtime
 		{
 			InputMismatchException e = new InputMismatchException(recognizer);
 			for (ParserRuleContext context = recognizer.GetContext(); context != null; context
-				 = ((ParserRuleContext)context.GetParent()))
+				 = ((ParserRuleContext)context.Parent))
 			{
 				context.exception = e;
 			}

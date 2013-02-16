@@ -72,7 +72,7 @@ namespace Antlr4.Runtime.Tree
 		public virtual Result VisitChildren(IRuleNode node)
 		{
 			Result result = DefaultResult();
-			int n = node.GetChildCount();
+			int n = node.ChildCount;
 			for (int i = 0; i < n; i++)
 			{
 				if (!ShouldVisitNextChild(node, result))

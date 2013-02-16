@@ -122,14 +122,20 @@ namespace Antlr4.Runtime
 			this.tokenSource = tokenSource;
 		}
 
-		public virtual ITokenSource GetTokenSource()
+		public virtual ITokenSource TokenSource
 		{
-			return tokenSource;
+			get
+			{
+				return tokenSource;
+			}
 		}
 
-		public virtual int Index()
+		public virtual int Index
 		{
-			return p;
+			get
+			{
+				return p;
+			}
 		}
 
 		//	public int range() { return range; }
@@ -154,9 +160,12 @@ namespace Antlr4.Runtime
 			p = AdjustSeekIndex(index);
 		}
 
-		public virtual int Size()
+		public virtual int Size
 		{
-			return tokens.Count;
+			get
+			{
+				return tokens.Count;
+			}
 		}
 
 		public virtual void Consume()
@@ -217,10 +226,10 @@ namespace Antlr4.Runtime
 				IToken t = tokenSource.NextToken();
 				if (t is IWritableToken)
 				{
-					((IWritableToken)t).SetTokenIndex(tokens.Count);
+					((IWritableToken)t).TokenIndex = tokens.Count;
 				}
 				tokens.AddItem(t);
-				if (t.GetType() == IToken.Eof)
+				if (t.Type == IToken.Eof)
 				{
 					fetchedEOF = true;
 					return i + 1;
@@ -256,7 +265,7 @@ namespace Antlr4.Runtime
 			for (int i = start; i <= stop; i++)
 			{
 				IToken t = tokens[i];
-				if (t.GetType() == IToken.Eof)
+				if (t.Type == IToken.Eof)
 				{
 					break;
 				}
@@ -267,7 +276,7 @@ namespace Antlr4.Runtime
 
 		public virtual int La(int i)
 		{
-			return Lt(i).GetType();
+			return Lt(i).Type;
 		}
 
 		protected internal virtual IToken Lb(int k)
@@ -389,7 +398,7 @@ namespace Antlr4.Runtime
 			for (int i = start; i <= stop; i++)
 			{
 				IToken t = tokens[i];
-				if (types == null || types.Get(t.GetType()))
+				if (types == null || types.Get(t.Type))
 				{
 					filteredTokens.AddItem(t);
 				}
@@ -426,13 +435,13 @@ namespace Antlr4.Runtime
 		{
 			Sync(i);
 			IToken token = tokens[i];
-			if (i >= Size())
+			if (i >= Size)
 			{
 				return -1;
 			}
-			while (token.GetChannel() != channel)
+			while (token.Channel != channel)
 			{
-				if (token.GetType() == IToken.Eof)
+				if (token.Type == IToken.Eof)
 				{
 					return -1;
 				}
@@ -462,7 +471,7 @@ namespace Antlr4.Runtime
 		/// </remarks>
 		protected internal virtual int PreviousTokenOnChannel(int i, int channel)
 		{
-			while (i >= 0 && tokens[i].GetChannel() != channel)
+			while (i >= 0 && tokens[i].Channel != channel)
 			{
 				i--;
 			}
@@ -494,7 +503,7 @@ namespace Antlr4.Runtime
 			// if none onchannel to right, nextOnChannel=-1 so set to = last token
 			if (nextOnChannel == -1)
 			{
-				to = Size() - 1;
+				to = Size - 1;
 			}
 			else
 			{
@@ -565,14 +574,14 @@ namespace Antlr4.Runtime
 				IToken t = tokens[i];
 				if (channel == -1)
 				{
-					if (t.GetChannel() != Lexer.DefaultTokenChannel)
+					if (t.Channel != Lexer.DefaultTokenChannel)
 					{
 						hidden.AddItem(t);
 					}
 				}
 				else
 				{
-					if (t.GetChannel() == channel)
+					if (t.Channel == channel)
 					{
 						hidden.AddItem(t);
 					}
@@ -585,9 +594,12 @@ namespace Antlr4.Runtime
 			return hidden;
 		}
 
-		public virtual string GetSourceName()
+		public virtual string SourceName
 		{
-			return tokenSource.GetSourceName();
+			get
+			{
+				return tokenSource.SourceName;
+			}
 		}
 
 		/// <summary>Get the text of all tokens in this buffer.</summary>
@@ -596,7 +608,7 @@ namespace Antlr4.Runtime
 		public virtual string GetText()
 		{
 			Fill();
-			return GetText(Interval.Of(0, Size() - 1));
+			return GetText(Interval.Of(0, Size - 1));
 		}
 
 		[NotNull]
@@ -617,11 +629,11 @@ namespace Antlr4.Runtime
 			for (int i = start; i <= stop; i++)
 			{
 				IToken t = tokens[i];
-				if (t.GetType() == IToken.Eof)
+				if (t.Type == IToken.Eof)
 				{
 					break;
 				}
-				buf.Append(t.GetText());
+				buf.Append(t.Text);
 			}
 			return buf.ToString();
 		}
@@ -629,7 +641,7 @@ namespace Antlr4.Runtime
 		[NotNull]
 		public virtual string GetText(RuleContext ctx)
 		{
-			return GetText(ctx.GetSourceInterval());
+			return GetText(ctx.SourceInterval);
 		}
 
 		[NotNull]
@@ -637,7 +649,7 @@ namespace Antlr4.Runtime
 		{
 			if (start != null && stop != null)
 			{
-				return GetText(Interval.Of(start.GetTokenIndex(), stop.GetTokenIndex()));
+				return GetText(Interval.Of(start.TokenIndex, stop.TokenIndex));
 			}
 			return string.Empty;
 		}

@@ -43,14 +43,20 @@ namespace Antlr4.Runtime.Atn
 			this.precedence = precedence;
 		}
 
-		public override int GetSerializationType()
+		public override int SerializationType
 		{
-			return Precedence;
+			get
+			{
+				return Precedence;
+			}
 		}
 
-		public override bool IsEpsilon()
+		public override bool IsEpsilon
 		{
-			return true;
+			get
+			{
+				return true;
+			}
 		}
 
 		public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)

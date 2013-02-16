@@ -141,11 +141,11 @@ namespace Antlr4.Runtime
 			for (int i = 0; i < tokens.Count; i++)
 			{
 				IToken t = tokens[i];
-				if (t.GetChannel() == channel)
+				if (t.Channel == channel)
 				{
 					n++;
 				}
-				if (t.GetType() == IToken.Eof)
+				if (t.Type == IToken.Eof)
 				{
 					break;
 				}

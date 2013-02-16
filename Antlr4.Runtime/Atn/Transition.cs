@@ -115,18 +115,26 @@ namespace Antlr4.Runtime.Atn
 			this.target = target;
 		}
 
-		public abstract int GetSerializationType();
-
-		/// <summary>Are we epsilon, action, sempred?</summary>
-		public virtual bool IsEpsilon()
+		public abstract int SerializationType
 		{
-			return false;
+			get;
 		}
 
-		[Nullable]
-		public virtual IntervalSet Label()
+		/// <summary>Are we epsilon, action, sempred?</summary>
+		public virtual bool IsEpsilon
 		{
-			return null;
+			get
+			{
+				return false;
+			}
+		}
+
+		public virtual IntervalSet Label
+		{
+			get
+			{
+				return null;
+			}
 		}
 
 		public abstract bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol);

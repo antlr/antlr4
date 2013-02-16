@@ -174,14 +174,20 @@ namespace Antlr4.Runtime.Atn
 				this.y = y;
 			}
 
-			public PredictionContext GetX()
+			public PredictionContext X
 			{
-				return x;
+				get
+				{
+					return x;
+				}
 			}
 
-			public PredictionContext GetY()
+			public PredictionContext Y
 			{
-				return y;
+				get
+				{
+					return y;
+				}
 			}
 
 			public override bool Equals(object obj)

@@ -35,8 +35,14 @@ namespace Antlr4.Runtime.Tree
 {
 	public interface ITerminalNode : IParseTree
 	{
-		IToken GetSymbol();
+		IToken Symbol
+		{
+			get;
+		}
 
-		IRuleNode GetParent();
+		IRuleNode Parent
+		{
+			get;
+		}
 	}
 }

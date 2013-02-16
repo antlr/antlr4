@@ -68,17 +68,17 @@ namespace Antlr4.Runtime
 			int channel, int start, int stop, int line, int charPositionInLine) where _T0:ITokenSource
 		{
 			CommonToken t = new CommonToken(source, type, channel, start, stop);
-			t.SetLine(line);
-			t.SetCharPositionInLine(charPositionInLine);
+			t.Line = line;
+			t.Column = charPositionInLine;
 			if (text != null)
 			{
-				t.SetText(text);
+				t.Text = text;
 			}
 			else
 			{
 				if (copyText && source.GetItem2() != null)
 				{
-					t.SetText(source.GetItem2().GetText(Interval.Of(start, stop)));
+					t.Text = source.GetItem2().GetText(Interval.Of(start, stop));
 				}
 			}
 			return t;

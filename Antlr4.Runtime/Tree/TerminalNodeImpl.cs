@@ -50,34 +50,49 @@ namespace Antlr4.Runtime.Tree
 			return null;
 		}
 
-		public virtual IToken GetSymbol()
+		public virtual IToken Symbol
 		{
-			return symbol;
-		}
-
-		public virtual IRuleNode GetParent()
-		{
-			return parent;
-		}
-
-		public virtual IToken GetPayload()
-		{
-			return symbol;
-		}
-
-		public virtual Interval GetSourceInterval()
-		{
-			if (symbol != null)
+			get
 			{
-				int tokenIndex = symbol.GetTokenIndex();
-				return new Interval(tokenIndex, tokenIndex);
+				return symbol;
 			}
-			return Interval.Invalid;
 		}
 
-		public virtual int GetChildCount()
+		public virtual IRuleNode Parent
 		{
-			return 0;
+			get
+			{
+				return parent;
+			}
+		}
+
+		public virtual IToken Payload
+		{
+			get
+			{
+				return symbol;
+			}
+		}
+
+		public virtual Interval SourceInterval
+		{
+			get
+			{
+				if (symbol != null)
+				{
+					int tokenIndex = symbol.TokenIndex;
+					return new Interval(tokenIndex, tokenIndex);
+				}
+				return Interval.Invalid;
+			}
+		}
+
+		public virtual int ChildCount
+		{
+			get
+			{
+				return 0;
+			}
 		}
 
 		public virtual T Accept<T, _T1>(IParseTreeVisitor<_T1> visitor) where _T1:T
@@ -89,7 +104,7 @@ namespace Antlr4.Runtime.Tree
 		{
 			if (symbol != null)
 			{
-				return symbol.GetText();
+				return symbol.Text;
 			}
 			return null;
 		}
@@ -103,11 +118,11 @@ namespace Antlr4.Runtime.Tree
 		{
 			if (symbol != null)
 			{
-				if (symbol.GetType() == IToken.Eof)
+				if (symbol.Type == IToken.Eof)
 				{
 					return "<EOF>";
 				}
-				return symbol.GetText();
+				return symbol.Text;
 			}
 			else
 			{

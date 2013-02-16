@@ -45,15 +45,20 @@ namespace Antlr4.Runtime.Atn
 			this.label = label;
 		}
 
-		public override int GetSerializationType()
+		public override int SerializationType
 		{
-			return Atom;
+			get
+			{
+				return Atom;
+			}
 		}
 
-		[NotNull]
-		public override IntervalSet Label()
+		public override IntervalSet Label
 		{
-			return IntervalSet.Of(label);
+			get
+			{
+				return IntervalSet.Of(label);
+			}
 		}
 
 		public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)

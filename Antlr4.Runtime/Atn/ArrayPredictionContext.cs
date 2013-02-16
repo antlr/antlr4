@@ -79,24 +79,33 @@ namespace Antlr4.Runtime.Atn
 			return System.Array.BinarySearch(returnStates, returnState);
 		}
 
-		public override int Size()
+		public override int Size
 		{
-			return returnStates.Length;
+			get
+			{
+				return returnStates.Length;
+			}
 		}
 
-		public override bool IsEmpty()
+		public override bool IsEmpty
 		{
-			return false;
+			get
+			{
+				return false;
+			}
 		}
 
-		public override bool HasEmpty()
+		public override bool HasEmpty
 		{
-			return returnStates[returnStates.Length - 1] == EmptyFullStateKey;
+			get
+			{
+				return returnStates[returnStates.Length - 1] == EmptyFullStateKey;
+			}
 		}
 
 		protected internal override PredictionContext AddEmptyContext()
 		{
-			if (HasEmpty())
+			if (HasEmpty)
 			{
 				return this;
 			}
@@ -109,7 +118,7 @@ namespace Antlr4.Runtime.Atn
 
 		protected internal override PredictionContext RemoveEmptyContext()
 		{
-			if (!HasEmpty())
+			if (!HasEmpty)
 			{
 				return this;
 			}
@@ -134,11 +143,11 @@ namespace Antlr4.Runtime.Atn
 		private static PredictionContext AppendContext(PredictionContext context, PredictionContext
 			 suffix, PredictionContext.IdentityHashMap visited)
 		{
-			if (suffix.IsEmpty())
+			if (suffix.IsEmpty)
 			{
 				if (IsEmptyLocal(suffix))
 				{
-					if (context.HasEmpty())
+					if (context.HasEmpty)
 					{
 						return EmptyLocal;
 					}
@@ -146,21 +155,21 @@ namespace Antlr4.Runtime.Atn
 				}
 				return context;
 			}
-			if (suffix.Size() != 1)
+			if (suffix.Size != 1)
 			{
 				throw new NotSupportedException("Appending a tree suffix is not yet supported.");
 			}
 			PredictionContext result = visited.Get(context);
 			if (result == null)
 			{
-				if (context.IsEmpty())
+				if (context.IsEmpty)
 				{
 					result = suffix;
 				}
 				else
 				{
-					int parentCount = context.Size();
-					if (context.HasEmpty())
+					int parentCount = context.Size;
+					if (context.HasEmpty)
 					{
 						parentCount--;
 					}
@@ -185,7 +194,7 @@ namespace Antlr4.Runtime.Atn
 						result = new Antlr4.Runtime.Atn.ArrayPredictionContext(updatedParents, updatedReturnStates
 							);
 					}
-					if (context.HasEmpty())
+					if (context.HasEmpty)
 					{
 						result = PredictionContext.Join(result, suffix);
 					}
@@ -235,28 +244,28 @@ namespace Antlr4.Runtime.Atn
 				{
 					continue;
 				}
-				int selfSize = operands.GetX().Size();
+				int selfSize = operands.X.Size;
 				if (selfSize == 0)
 				{
-					if (!operands.GetX().Equals(operands.GetY()))
+					if (!operands.X.Equals(operands.Y))
 					{
 						return false;
 					}
 					continue;
 				}
-				int otherSize = operands.GetY().Size();
+				int otherSize = operands.Y.Size;
 				if (selfSize != otherSize)
 				{
 					return false;
 				}
 				for (int i = 0; i < selfSize; i++)
 				{
-					if (operands.GetX().GetReturnState(i) != operands.GetY().GetReturnState(i))
+					if (operands.X.GetReturnState(i) != operands.Y.GetReturnState(i))
 					{
 						return false;
 					}
-					PredictionContext selfParent = operands.GetX().GetParent(i);
-					PredictionContext otherParent = operands.GetY().GetParent(i);
+					PredictionContext selfParent = operands.X.GetParent(i);
+					PredictionContext otherParent = operands.Y.GetParent(i);
 					if (selfParent.GetHashCode() != otherParent.GetHashCode())
 					{
 						return false;

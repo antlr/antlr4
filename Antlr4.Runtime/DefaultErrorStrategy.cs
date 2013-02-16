@@ -145,7 +145,7 @@ namespace Antlr4.Runtime
 			//						   ", lastErrorIndex="+
 			//						   lastErrorIndex+
 			//						   ", states="+lastErrorStates);
-			if (lastErrorIndex == ((ITokenStream)recognizer.GetInputStream()).Index() && lastErrorStates
+			if (lastErrorIndex == ((ITokenStream)recognizer.GetInputStream()).Index && lastErrorStates
 				 != null && lastErrorStates.Contains(recognizer.GetState()))
 			{
 				// uh oh, another error at same token index and previously-visited
@@ -157,7 +157,7 @@ namespace Antlr4.Runtime
 				//			System.err.println("FAILSAFE consumes "+recognizer.getTokenNames()[recognizer.getInputStream().LA(1)]);
 				recognizer.Consume();
 			}
-			lastErrorIndex = ((ITokenStream)recognizer.GetInputStream()).Index();
+			lastErrorIndex = ((ITokenStream)recognizer.GetInputStream()).Index;
 			if (lastErrorStates == null)
 			{
 				lastErrorStates = new IntervalSet();
@@ -249,7 +249,7 @@ namespace Antlr4.Runtime
 			string input;
 			if (tokens != null)
 			{
-				if (e.GetStartToken().GetType() == IToken.Eof)
+				if (e.GetStartToken().Type == IToken.Eof)
 				{
 					input = "<EOF>";
 				}
@@ -437,21 +437,21 @@ namespace Antlr4.Runtime
 			}
 			IToken current = currentSymbol;
 			IToken lookback = ((ITokenStream)recognizer.GetInputStream()).Lt(-1);
-			if (current.GetType() == IToken.Eof && lookback != null)
+			if (current.Type == IToken.Eof && lookback != null)
 			{
 				current = lookback;
 			}
-			return ConstructToken(((ITokenStream)recognizer.GetInputStream()).GetTokenSource(
-				), expectedTokenType, tokenText, current);
+			return ConstructToken(((ITokenStream)recognizer.GetInputStream()).TokenSource, expectedTokenType
+				, tokenText, current);
 		}
 
 		protected internal virtual IToken ConstructToken(ITokenSource tokenSource, int expectedTokenType
 			, string tokenText, IToken current)
 		{
-			ITokenFactory factory = tokenSource.GetTokenFactory();
-			return factory.Create(Tuple.Create(tokenSource, current.GetTokenSource().GetInputStream
-				()), expectedTokenType, tokenText, IToken.DefaultChannel, -1, -1, current.GetLine
-				(), current.GetCharPositionInLine());
+			ITokenFactory factory = tokenSource.TokenFactory;
+			return factory.Create(Tuple.Create(tokenSource, current.TokenSource.InputStream), 
+				expectedTokenType, tokenText, IToken.DefaultChannel, -1, -1, current.Line, current
+				.Column);
 		}
 
 		public virtual IntervalSet GetExpectedTokens(Parser recognizer)
@@ -496,12 +496,12 @@ namespace Antlr4.Runtime
 
 		protected internal virtual string GetSymbolText(IToken symbol)
 		{
-			return symbol.GetText();
+			return symbol.Text;
 		}
 
 		protected internal virtual int GetSymbolType(IToken symbol)
 		{
-			return symbol.GetType();
+			return symbol.Type;
 		}
 
 		protected internal virtual string EscapeWSAndQuote(string s)

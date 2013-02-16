@@ -212,11 +212,11 @@ namespace Antlr4.Runtime.Atn
 		{
 			if (transitions.IsEmpty())
 			{
-				epsilonOnlyTransitions = e.IsEpsilon();
+				epsilonOnlyTransitions = e.IsEpsilon;
 			}
 			else
 			{
-				if (epsilonOnlyTransitions != e.IsEpsilon())
+				if (epsilonOnlyTransitions != e.IsEpsilon)
 				{
 					System.Console.Error.Format("ATN state %d has both epsilon and non-epsilon transitions.\n"
 						, stateNumber);

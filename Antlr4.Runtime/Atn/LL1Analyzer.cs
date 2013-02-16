@@ -155,19 +155,19 @@ namespace Antlr4.Runtime.Atn
 				}
 				else
 				{
-					if (ctx.IsEmpty() && addEOF)
+					if (ctx.IsEmpty && addEOF)
 					{
 						look.Add(IToken.Eof);
 						return;
 					}
 				}
-				for (int i = 0; i < ctx.Size(); i++)
+				for (int i = 0; i < ctx.Size; i++)
 				{
 					if (ctx.GetReturnState(i) != PredictionContext.EmptyFullStateKey)
 					{
 						ATNState returnState = atn.states[ctx.GetReturnState(i)];
 						//			System.out.println("popping back to "+retState);
-						for (int j = 0; j < ctx.Size(); j++)
+						for (int j = 0; j < ctx.Size; j++)
 						{
 							Look(returnState, ctx.GetParent(j), look, lookBusy, seeThruPreds, addEOF);
 						}
@@ -200,7 +200,7 @@ namespace Antlr4.Runtime.Atn
 					}
 					else
 					{
-						if (t.IsEpsilon())
+						if (t.IsEpsilon)
 						{
 							Look(t.target, ctx, look, lookBusy, seeThruPreds, addEOF);
 						}
@@ -213,7 +213,7 @@ namespace Antlr4.Runtime.Atn
 							else
 							{
 								//				System.out.println("adding "+ t);
-								IntervalSet set = t.Label();
+								IntervalSet set = t.Label;
 								if (set != null)
 								{
 									if (t is NotSetTransition)

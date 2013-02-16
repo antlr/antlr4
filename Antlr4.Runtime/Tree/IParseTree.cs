@@ -49,9 +49,12 @@ namespace Antlr4.Runtime.Tree
 	/// </summary>
 	public interface IParseTree : ISyntaxTree
 	{
-		// the following methods narrow the return type; they are not additional methods
-		IParseTree GetParent();
+		IParseTree Parent
+		{
+			get;
+		}
 
+		// the following methods narrow the return type; they are not additional methods
 		IParseTree GetChild(int i);
 
 		/// <summary>

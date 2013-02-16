@@ -67,19 +67,28 @@ namespace Antlr4.Runtime.Atn
 			return this.returnState == returnState ? 0 : -1;
 		}
 
-		public override int Size()
+		public override int Size
 		{
-			return 1;
+			get
+			{
+				return 1;
+			}
 		}
 
-		public override bool IsEmpty()
+		public override bool IsEmpty
 		{
-			return false;
+			get
+			{
+				return false;
+			}
 		}
 
-		public override bool HasEmpty()
+		public override bool HasEmpty
 		{
-			return false;
+			get
+			{
+				return false;
+			}
 		}
 
 		public override PredictionContext AppendContext(PredictionContext suffix, PredictionContextCache

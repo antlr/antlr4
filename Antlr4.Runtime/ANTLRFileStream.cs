@@ -88,9 +88,12 @@ namespace Antlr4.Runtime
 			}
 		}
 
-		public override string GetSourceName()
+		public override string SourceName
 		{
-			return fileName;
+			get
+			{
+				return fileName;
+			}
 		}
 	}
 }

@@ -342,9 +342,12 @@ namespace Antlr4.Runtime
 			}
 		}
 
-		public virtual int Index()
+		public virtual int Index
 		{
-			return currentCharIndex;
+			get
+			{
+				return currentCharIndex;
+			}
 		}
 
 		/// <summary>
@@ -396,14 +399,20 @@ namespace Antlr4.Runtime
 			}
 		}
 
-		public virtual int Size()
+		public virtual int Size
 		{
-			throw new NotSupportedException("Unbuffered stream cannot know its size");
+			get
+			{
+				throw new NotSupportedException("Unbuffered stream cannot know its size");
+			}
 		}
 
-		public virtual string GetSourceName()
+		public virtual string SourceName
 		{
-			return name;
+			get
+			{
+				return name;
+			}
 		}
 
 		public override string GetText(Interval interval)

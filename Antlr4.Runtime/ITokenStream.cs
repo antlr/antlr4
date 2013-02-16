@@ -104,8 +104,10 @@ namespace Antlr4.Runtime
 		/// which provides tokens for this
 		/// stream.
 		/// </summary>
-		[NotNull]
-		ITokenSource GetTokenSource();
+		ITokenSource TokenSource
+		{
+			get;
+		}
 
 		/// <summary>
 		/// Return the text of all tokens within the specified
@@ -213,7 +215,7 @@ namespace Antlr4.Runtime
 		/// token, the behavior is unspecified.
 		/// <p/>
 		/// For streams which ensure that the
-		/// <see cref="IToken.GetTokenIndex()">IToken.GetTokenIndex()</see>
+		/// <see cref="IToken.TokenIndex()">IToken.TokenIndex()</see>
 		/// method is
 		/// accurate for all of its provided tokens, this method behaves like the
 		/// following code. Other streams may implement this method in other ways

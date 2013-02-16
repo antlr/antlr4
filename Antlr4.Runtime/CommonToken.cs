@@ -84,8 +84,8 @@ namespace Antlr4.Runtime
 			this.stop = stop;
 			if (source.GetItem1() != null)
 			{
-				this.line = source.GetItem1().GetLine();
-				this.charPositionInLine = source.GetItem1().GetCharPositionInLine();
+				this.line = source.GetItem1().Line;
+				this.charPositionInLine = source.GetItem1().Column;
 			}
 		}
 
@@ -98,53 +98,47 @@ namespace Antlr4.Runtime
 
 		public CommonToken(IToken oldToken)
 		{
-			text = oldToken.GetText();
-			type = oldToken.GetType();
-			line = oldToken.GetLine();
-			index = oldToken.GetTokenIndex();
-			charPositionInLine = oldToken.GetCharPositionInLine();
-			channel = oldToken.GetChannel();
-			start = oldToken.GetStartIndex();
-			stop = oldToken.GetStopIndex();
+			text = oldToken.Text;
+			type = oldToken.Type;
+			line = oldToken.Line;
+			index = oldToken.TokenIndex;
+			charPositionInLine = oldToken.Column;
+			channel = oldToken.Channel;
+			start = oldToken.StartIndex;
+			stop = oldToken.StopIndex;
 			if (oldToken is Antlr4.Runtime.CommonToken)
 			{
 				source = ((Antlr4.Runtime.CommonToken)oldToken).source;
 			}
 			else
 			{
-				source = Tuple.Create(oldToken.GetTokenSource(), oldToken.GetInputStream());
+				source = Tuple.Create(oldToken.TokenSource, oldToken.InputStream);
 			}
 		}
 
-		public virtual int GetType()
+		public virtual int Type
 		{
-			return type;
+			get
+			{
+				return type;
+			}
+			set
+			{
+				int type = value;
+				this.type = type;
+			}
 		}
 
-		public virtual void SetLine(int line)
+		public virtual int Line
 		{
-			this.line = line;
-		}
-
-		public virtual string GetText()
-		{
-			if (text != null)
+			get
 			{
-				return text;
+				return line;
 			}
-			ICharStream input = GetInputStream();
-			if (input == null)
+			set
 			{
-				return null;
-			}
-			int n = input.Size();
-			if (start < n && stop < n)
-			{
-				return input.GetText(Interval.Of(start, stop));
-			}
-			else
-			{
-				return "<EOF>";
+				int line = value;
+				this.line = line;
 			}
 		}
 
@@ -155,44 +149,68 @@ namespace Antlr4.Runtime
 		/// that start/stop indexes are not valid.  It means that that input
 		/// was converted to a new string in the token object.
 		/// </remarks>
-		public virtual void SetText(string text)
+		public virtual string Text
 		{
-			this.text = text;
+			get
+			{
+				if (text != null)
+				{
+					return text;
+				}
+				ICharStream input = InputStream;
+				if (input == null)
+				{
+					return null;
+				}
+				int n = input.Size;
+				if (start < n && stop < n)
+				{
+					return input.GetText(Interval.Of(start, stop));
+				}
+				else
+				{
+					return "<EOF>";
+				}
+			}
+			set
+			{
+				string text = value;
+				this.text = text;
+			}
 		}
 
-		public virtual int GetLine()
+		public virtual int Column
 		{
-			return line;
+			get
+			{
+				return charPositionInLine;
+			}
+			set
+			{
+				int charPositionInLine = value;
+				this.charPositionInLine = charPositionInLine;
+			}
 		}
 
-		public virtual int GetCharPositionInLine()
+		public virtual int Channel
 		{
-			return charPositionInLine;
+			get
+			{
+				return channel;
+			}
+			set
+			{
+				int channel = value;
+				this.channel = channel;
+			}
 		}
 
-		public virtual void SetCharPositionInLine(int charPositionInLine)
+		public virtual int StartIndex
 		{
-			this.charPositionInLine = charPositionInLine;
-		}
-
-		public virtual int GetChannel()
-		{
-			return channel;
-		}
-
-		public virtual void SetChannel(int channel)
-		{
-			this.channel = channel;
-		}
-
-		public virtual void SetType(int type)
-		{
-			this.type = type;
-		}
-
-		public virtual int GetStartIndex()
-		{
-			return start;
+			get
+			{
+				return start;
+			}
 		}
 
 		public virtual void SetStartIndex(int start)
@@ -200,9 +218,12 @@ namespace Antlr4.Runtime
 			this.start = start;
 		}
 
-		public virtual int GetStopIndex()
+		public virtual int StopIndex
 		{
-			return stop;
+			get
+			{
+				return stop;
+			}
 		}
 
 		public virtual void SetStopIndex(int stop)
@@ -210,24 +231,33 @@ namespace Antlr4.Runtime
 			this.stop = stop;
 		}
 
-		public virtual int GetTokenIndex()
+		public virtual int TokenIndex
 		{
-			return index;
+			get
+			{
+				return index;
+			}
+			set
+			{
+				int index = value;
+				this.index = index;
+			}
 		}
 
-		public virtual void SetTokenIndex(int index)
+		public virtual ITokenSource TokenSource
 		{
-			this.index = index;
+			get
+			{
+				return source.GetItem1();
+			}
 		}
 
-		public virtual ITokenSource GetTokenSource()
+		public virtual ICharStream InputStream
 		{
-			return source.GetItem1();
-		}
-
-		public virtual ICharStream GetInputStream()
-		{
-			return source.GetItem2();
+			get
+			{
+				return source.GetItem2();
+			}
 		}
 
 		public override string ToString()
@@ -237,7 +267,7 @@ namespace Antlr4.Runtime
 			{
 				channelStr = ",channel=" + channel;
 			}
-			string txt = GetText();
+			string txt = Text;
 			if (txt != null)
 			{
 				txt = txt.ReplaceAll("\n", "\\\\n");
@@ -248,8 +278,8 @@ namespace Antlr4.Runtime
 			{
 				txt = "<no text>";
 			}
-			return "[@" + GetTokenIndex() + "," + start + ":" + stop + "='" + txt + "',<" + type
-				 + ">" + channelStr + "," + line + ":" + GetCharPositionInLine() + "]";
+			return "[@" + TokenIndex + "," + start + ":" + stop + "='" + txt + "',<" + type +
+				 ">" + channelStr + "," + line + ":" + Column + "]";
 		}
 	}
 }

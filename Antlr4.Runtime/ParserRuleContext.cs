@@ -223,9 +223,12 @@ namespace Antlr4.Runtime
 			return t;
 		}
 
-		public override RuleContext GetParent()
+		public override RuleContext Parent
 		{
-			return (Antlr4.Runtime.ParserRuleContext)base.GetParent();
+			get
+			{
+				return (Antlr4.Runtime.ParserRuleContext)base.Parent;
+			}
 		}
 
 		public override IParseTree GetChild(int i)
@@ -269,8 +272,8 @@ namespace Antlr4.Runtime
 				if (o is ITerminalNode)
 				{
 					ITerminalNode tnode = (ITerminalNode)o;
-					IToken symbol = tnode.GetSymbol();
-					if (symbol.GetType() == ttype)
+					IToken symbol = tnode.Symbol;
+					if (symbol.Type == ttype)
 					{
 						j++;
 						if (j == i)
@@ -295,8 +298,8 @@ namespace Antlr4.Runtime
 				if (o is ITerminalNode)
 				{
 					ITerminalNode tnode = (ITerminalNode)o;
-					IToken symbol = tnode.GetSymbol();
-					if (symbol.GetType() == ttype)
+					IToken symbol = tnode.Symbol;
+					if (symbol.Type == ttype)
 					{
 						if (tokens == null)
 						{
@@ -345,18 +348,24 @@ namespace Antlr4.Runtime
 			return contexts;
 		}
 
-		public override int GetChildCount()
+		public override int ChildCount
 		{
-			return children != null ? children.Count : 0;
+			get
+			{
+				return children != null ? children.Count : 0;
+			}
 		}
 
-		public override Interval GetSourceInterval()
+		public override Interval SourceInterval
 		{
-			if (start == null || stop == null)
+			get
 			{
-				return Interval.Invalid;
+				if (start == null || stop == null)
+				{
+					return Interval.Invalid;
+				}
+				return Interval.Of(start.TokenIndex, stop.TokenIndex);
 			}
-			return Interval.Of(start.GetTokenIndex(), stop.GetTokenIndex());
 		}
 
 		public virtual IToken GetStart()

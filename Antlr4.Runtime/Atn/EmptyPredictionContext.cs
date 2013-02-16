@@ -80,9 +80,12 @@ namespace Antlr4.Runtime.Atn
 			return -1;
 		}
 
-		public override int Size()
+		public override int Size
 		{
-			return 0;
+			get
+			{
+				return 0;
+			}
 		}
 
 		public override PredictionContext AppendContext(int returnContext, PredictionContextCache
@@ -97,14 +100,20 @@ namespace Antlr4.Runtime.Atn
 			return suffix;
 		}
 
-		public override bool IsEmpty()
+		public override bool IsEmpty
 		{
-			return true;
+			get
+			{
+				return true;
+			}
 		}
 
-		public override bool HasEmpty()
+		public override bool HasEmpty
 		{
-			return true;
+			get
+			{
+				return true;
+			}
 		}
 
 		public override bool Equals(object o)

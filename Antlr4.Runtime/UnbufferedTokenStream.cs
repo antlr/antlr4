@@ -167,7 +167,7 @@ namespace Antlr4.Runtime
 			}
 			if (index >= n)
 			{
-				System.Diagnostics.Debug.Assert(n > 0 && tokens[n - 1].GetType() == IToken.Eof);
+				System.Diagnostics.Debug.Assert(n > 0 && tokens[n - 1].Type == IToken.Eof);
 				return tokens[n - 1];
 			}
 			return tokens[index];
@@ -175,12 +175,15 @@ namespace Antlr4.Runtime
 
 		public virtual int La(int i)
 		{
-			return Lt(i).GetType();
+			return Lt(i).Type;
 		}
 
-		public virtual ITokenSource GetTokenSource()
+		public virtual ITokenSource TokenSource
 		{
-			return tokenSource;
+			get
+			{
+				return tokenSource;
+			}
 		}
 
 		[NotNull]
@@ -192,7 +195,7 @@ namespace Antlr4.Runtime
 		[NotNull]
 		public virtual string GetText(RuleContext ctx)
 		{
-			return GetText(ctx.GetSourceInterval());
+			return GetText(ctx.SourceInterval);
 		}
 
 		[NotNull]
@@ -200,7 +203,7 @@ namespace Antlr4.Runtime
 		{
 			if (start != null && stop != null)
 			{
-				return GetText(Interval.Of(start.GetTokenIndex(), stop.GetTokenIndex()));
+				return GetText(Interval.Of(start.TokenIndex, stop.TokenIndex));
 			}
 			throw new NotSupportedException("The specified start and stop symbols are not supported."
 				);
@@ -269,7 +272,7 @@ namespace Antlr4.Runtime
 		{
 			for (int i = 0; i < n; i++)
 			{
-				if (this.n > 0 && tokens[this.n - 1].GetType() == IToken.Eof)
+				if (this.n > 0 && tokens[this.n - 1].Type == IToken.Eof)
 				{
 					return i;
 				}
@@ -287,7 +290,7 @@ namespace Antlr4.Runtime
 			}
 			if (t is IWritableToken)
 			{
-				((IWritableToken)t).SetTokenIndex(GetBufferStartIndex() + n);
+				((IWritableToken)t).TokenIndex = GetBufferStartIndex() + n;
 			}
 			tokens[n++] = t;
 		}
@@ -338,9 +341,12 @@ namespace Antlr4.Runtime
 			}
 		}
 
-		public virtual int Index()
+		public virtual int Index
 		{
-			return currentTokenIndex;
+			get
+			{
+				return currentTokenIndex;
+			}
 		}
 
 		public virtual void Seek(int index)
@@ -381,14 +387,20 @@ namespace Antlr4.Runtime
 			}
 		}
 
-		public virtual int Size()
+		public virtual int Size
 		{
-			throw new NotSupportedException("Unbuffered stream cannot know its size");
+			get
+			{
+				throw new NotSupportedException("Unbuffered stream cannot know its size");
+			}
 		}
 
-		public virtual string GetSourceName()
+		public virtual string SourceName
 		{
-			return tokenSource.GetSourceName();
+			get
+			{
+				return tokenSource.SourceName;
+			}
 		}
 
 		[NotNull]
@@ -409,7 +421,7 @@ namespace Antlr4.Runtime
 			for (int i = a; i <= b; i++)
 			{
 				IToken t = tokens[i];
-				buf.Append(t.GetText());
+				buf.Append(t.Text);
 			}
 			return buf.ToString();
 		}

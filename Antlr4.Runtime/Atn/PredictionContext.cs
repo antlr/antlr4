@@ -134,7 +134,10 @@ namespace Antlr4.Runtime.Atn
 			return (InitialHash * HashMultiplier ^ parentHashCode) * HashMultiplier ^ returnStateHashCode;
 		}
 
-		public abstract int Size();
+		public abstract int Size
+		{
+			get;
+		}
 
 		public abstract int GetReturnState(int index);
 
@@ -203,19 +206,19 @@ namespace Antlr4.Runtime.Atn
 			{
 				return context0;
 			}
-			if (context0.IsEmpty())
+			if (context0.IsEmpty)
 			{
 				return IsEmptyLocal(context0) ? context0 : AddEmptyContext(context1);
 			}
 			else
 			{
-				if (context1.IsEmpty())
+				if (context1.IsEmpty)
 				{
 					return IsEmptyLocal(context1) ? context1 : AddEmptyContext(context0);
 				}
 			}
-			int context0size = context0.Size();
-			int context1size = context1.Size();
+			int context0size = context0.Size;
+			int context1size = context1.Size;
 			if (context0size == 1 && context1size == 1 && context0.GetReturnState(0) == context1
 				.GetReturnState(0))
 			{
@@ -339,7 +342,7 @@ namespace Antlr4.Runtime.Atn
 			 context, IConcurrentMap<Antlr4.Runtime.Atn.PredictionContext, Antlr4.Runtime.Atn.PredictionContext
 			> contextCache, PredictionContext.IdentityHashMap visited)
 		{
-			if (context.IsEmpty())
+			if (context.IsEmpty)
 			{
 				return context;
 			}
@@ -356,7 +359,7 @@ namespace Antlr4.Runtime.Atn
 			}
 			bool changed = false;
 			Antlr4.Runtime.Atn.PredictionContext[] parents = new Antlr4.Runtime.Atn.PredictionContext
-				[context.Size()];
+				[context.Size];
 			for (int i = 0; i < parents.Length; i++)
 			{
 				Antlr4.Runtime.Atn.PredictionContext parent = GetCachedContext(context.GetParent(
@@ -365,8 +368,8 @@ namespace Antlr4.Runtime.Atn
 				{
 					if (!changed)
 					{
-						parents = new Antlr4.Runtime.Atn.PredictionContext[context.Size()];
-						for (int j = 0; j < context.Size(); j++)
+						parents = new Antlr4.Runtime.Atn.PredictionContext[context.Size];
+						for (int j = 0; j < context.Size; j++)
 						{
 							parents[j] = context.GetParent(j);
 						}
@@ -414,9 +417,15 @@ namespace Antlr4.Runtime.Atn
 			return new SingletonPredictionContext(this, returnState);
 		}
 
-		public abstract bool IsEmpty();
+		public abstract bool IsEmpty
+		{
+			get;
+		}
 
-		public abstract bool HasEmpty();
+		public abstract bool HasEmpty
+		{
+			get;
+		}
 
 		public sealed override int GetHashCode()
 		{
@@ -448,20 +457,20 @@ namespace Antlr4.Runtime.Atn
 				int stateNumber = currentState;
 				StringBuilder localBuffer = new StringBuilder();
 				localBuffer.Append("[");
-				while (!p.IsEmpty() && p != stop)
+				while (!p.IsEmpty && p != stop)
 				{
 					int index = 0;
-					if (p.Size() > 0)
+					if (p.Size > 0)
 					{
 						int bits = 1;
-						while ((1 << bits) < p.Size())
+						while ((1 << bits) < p.Size)
 						{
 							bits++;
 						}
 						int mask = (1 << bits) - 1;
 						index = (perm >> offset) & mask;
-						last &= index >= p.Size() - 1;
-						if (index >= p.Size())
+						last &= index >= p.Size - 1;
+						if (index >= p.Size)
 						{
 							goto outer_continue;
 						}
@@ -483,7 +492,7 @@ namespace Antlr4.Runtime.Atn
 					{
 						if (p.GetReturnState(index) != EmptyFullStateKey)
 						{
-							if (!p.IsEmpty())
+							if (!p.IsEmpty)
 							{
 								if (localBuffer.Length > 1)
 								{

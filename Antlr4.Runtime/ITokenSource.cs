@@ -60,9 +60,15 @@ namespace Antlr4.Runtime
 		/// </remarks>
 		IToken NextToken();
 
-		int GetLine();
+		int Line
+		{
+			get;
+		}
 
-		int GetCharPositionInLine();
+		int Column
+		{
+			get;
+		}
 
 		/// <summary>
 		/// From what character stream was this token created?  You don't have to
@@ -74,7 +80,10 @@ namespace Antlr4.Runtime
 		/// implement but it's nice to know where a Token comes from if you have
 		/// include files etc... on the input.
 		/// </remarks>
-		ICharStream GetInputStream();
+		ICharStream InputStream
+		{
+			get;
+		}
 
 		/// <summary>
 		/// Where are you getting tokens from? normally the implication will simply
@@ -84,13 +93,18 @@ namespace Antlr4.Runtime
 		/// Where are you getting tokens from? normally the implication will simply
 		/// ask lexers input stream.
 		/// </remarks>
-		string GetSourceName();
+		string SourceName
+		{
+			get;
+		}
 
 		/// <summary>Gets the factory used for constructing tokens.</summary>
 		/// <remarks>Gets the factory used for constructing tokens.</remarks>
-		ITokenFactory GetTokenFactory();
-
 		/// <summary>Optional method that lets users set factory in lexer or other source</summary>
-		void SetTokenFactory(ITokenFactory factory);
+		ITokenFactory TokenFactory
+		{
+			get;
+			set;
+		}
 	}
 }

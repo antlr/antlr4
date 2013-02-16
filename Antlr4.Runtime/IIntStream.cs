@@ -28,7 +28,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using Antlr4.Runtime;
-using Antlr4.Runtime.Misc;
 using Sharpen;
 
 namespace Antlr4.Runtime
@@ -69,7 +68,7 @@ namespace Antlr4.Runtime
 
 		/// <summary>
 		/// The value returned by
-		/// <see cref="GetSourceName()">GetSourceName()</see>
+		/// <see cref="SourceName()">SourceName()</see>
 		/// when the actual name of the
 		/// underlying source is not known.
 		/// </summary>
@@ -282,7 +281,10 @@ namespace Antlr4.Runtime
 		/// has occurred after this stream was
 		/// constructed.
 		/// </summary>
-		public abstract int Index();
+		internal abstract int Index
+		{
+			get;
+		}
 
 		/// <summary>
 		/// Set the input cursor to the position indicated by
@@ -346,7 +348,10 @@ namespace Antlr4.Runtime
 		/// if the size of the stream is
 		/// unknown.
 		/// </exception>
-		public abstract int Size();
+		internal abstract int Size
+		{
+			get;
+		}
 
 		/// <summary>Gets the name of the underlying symbol source.</summary>
 		/// <remarks>
@@ -356,7 +361,9 @@ namespace Antlr4.Runtime
 		/// <see cref="UnknownSourceName">UnknownSourceName</see>
 		/// .
 		/// </remarks>
-		[NotNull]
-		public abstract string GetSourceName();
+		public abstract string SourceName
+		{
+			get;
+		}
 	}
 }

@@ -305,17 +305,17 @@ namespace Antlr4.Runtime.Atn
 				{
 					return true;
 				}
-				if (left.Size() < right.Size())
+				if (left.Size < right.Size)
 				{
 					return false;
 				}
-				if (right.IsEmpty())
+				if (right.IsEmpty)
 				{
-					return left.HasEmpty();
+					return left.HasEmpty;
 				}
 				else
 				{
-					for (int i = 0; i < right.Size(); i++)
+					for (int i = 0; i < right.Size; i++)
 					{
 						int index = left.FindReturnState(right.GetReturnState(i));
 						if (index < 0)
@@ -394,7 +394,7 @@ namespace Antlr4.Runtime.Atn
 			while (!workList.IsEmpty())
 			{
 				PredictionContext current = workList.Pop();
-				for (int i = 0; i < current.Size(); i++)
+				for (int i = 0; i < current.Size; i++)
 				{
 					builder.Append("  s").Append(Sharpen.Runtime.IdentityHashCode(current));
 					builder.Append("->");

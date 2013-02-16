@@ -39,9 +39,12 @@ namespace Antlr4.Runtime.Atn
 		{
 		}
 
-		public override int GetSerializationType()
+		public override int SerializationType
 		{
-			return NotSet;
+			get
+			{
+				return NotSet;
+			}
 		}
 
 		public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)

@@ -179,7 +179,7 @@ namespace Antlr4.Runtime
 					}
 					_token = null;
 					_channel = IToken.DefaultChannel;
-					_tokenStartCharIndex = _input.Index();
+					_tokenStartCharIndex = _input.Index;
 					_tokenStartCharPositionInLine = GetInterpreter().GetCharPositionInLine();
 					_tokenStartLine = GetInterpreter().GetLine();
 					_text = null;
@@ -274,14 +274,17 @@ outer_break: ;
 			return _mode;
 		}
 
-		public virtual ITokenFactory GetTokenFactory()
+		public virtual ITokenFactory TokenFactory
 		{
-			return _factory;
-		}
-
-		public virtual void SetTokenFactory(ITokenFactory factory)
-		{
-			this._factory = factory;
+			get
+			{
+				return _factory;
+			}
+			set
+			{
+				ITokenFactory factory = value;
+				this._factory = factory;
+			}
 		}
 
 		/// <summary>Set the char stream and reset the lexer</summary>
@@ -294,9 +297,12 @@ outer_break: ;
 			this._tokenFactorySourcePair = Tuple.Create(this, _input);
 		}
 
-		public virtual string GetSourceName()
+		public virtual string SourceName
 		{
-			return _input.GetSourceName();
+			get
+			{
+				return _input.SourceName;
+			}
 		}
 
 		public override IIntStream GetInputStream()
@@ -341,28 +347,34 @@ outer_break: ;
 
 		public virtual IToken EmitEOF()
 		{
-			int cpos = GetCharPositionInLine();
+			int cpos = Column;
 			// The character position for EOF is one beyond the position of
 			// the previous token's last character
 			if (_token != null)
 			{
-				int n = _token.GetStopIndex() - _token.GetStartIndex() + 1;
-				cpos = _token.GetCharPositionInLine() + n;
+				int n = _token.StopIndex - _token.StartIndex + 1;
+				cpos = _token.Column + n;
 			}
 			IToken eof = _factory.Create(_tokenFactorySourcePair, IToken.Eof, null, IToken.DefaultChannel
-				, _input.Index(), _input.Index() - 1, GetLine(), cpos);
+				, _input.Index, _input.Index - 1, Line, cpos);
 			Emit(eof);
 			return eof;
 		}
 
-		public virtual int GetLine()
+		public virtual int Line
 		{
-			return GetInterpreter().GetLine();
+			get
+			{
+				return GetInterpreter().GetLine();
+			}
 		}
 
-		public virtual int GetCharPositionInLine()
+		public virtual int Column
 		{
-			return GetInterpreter().GetCharPositionInLine();
+			get
+			{
+				return GetInterpreter().GetCharPositionInLine();
+			}
 		}
 
 		public virtual void SetLine(int line)
@@ -378,7 +390,7 @@ outer_break: ;
 		/// <summary>What is the index of the current character of lookahead?</summary>
 		public virtual int GetCharIndex()
 		{
-			return _input.Index();
+			return _input.Index;
 		}
 
 		/// <summary>
@@ -471,7 +483,7 @@ outer_break: ;
 		{
 			IList<IToken> tokens = new List<IToken>();
 			IToken t = NextToken();
-			while (t.GetType() != IToken.Eof)
+			while (t.Type != IToken.Eof)
 			{
 				tokens.AddItem(t);
 				t = NextToken();
@@ -490,7 +502,7 @@ outer_break: ;
 
 		public virtual void NotifyListeners(LexerNoViableAltException e)
 		{
-			string text = _input.GetText(Interval.Of(_tokenStartCharIndex, _input.Index()));
+			string text = _input.GetText(Interval.Of(_tokenStartCharIndex, _input.Index));
 			string msg = "token recognition error at: '" + GetErrorDisplay(text) + "'";
 			IAntlrErrorListener<int> listener = GetErrorListenerDispatch();
 			listener.SyntaxError(this, null, _tokenStartLine, _tokenStartCharPositionInLine, 

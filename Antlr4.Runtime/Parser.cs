@@ -49,13 +49,13 @@ namespace Antlr4.Runtime
 			public virtual void EnterEveryRule(ParserRuleContext ctx)
 			{
 				System.Console.Out.WriteLine("enter   " + this._enclosing.GetRuleNames()[ctx.GetRuleIndex
-					()] + ", LT(1)=" + this._enclosing._input.Lt(1).GetText());
+					()] + ", LT(1)=" + this._enclosing._input.Lt(1).Text);
 			}
 
 			public virtual void ExitEveryRule(ParserRuleContext ctx)
 			{
 				System.Console.Out.WriteLine("exit    " + this._enclosing.GetRuleNames()[ctx.GetRuleIndex
-					()] + ", LT(1)=" + this._enclosing._input.Lt(1).GetText());
+					()] + ", LT(1)=" + this._enclosing._input.Lt(1).Text);
 			}
 
 			public virtual void VisitErrorNode(IErrorNode node)
@@ -64,8 +64,8 @@ namespace Antlr4.Runtime
 
 			public virtual void VisitTerminal(ITerminalNode node)
 			{
-				ParserRuleContext parent = (ParserRuleContext)node.GetParent().GetRuleContext();
-				IToken token = node.GetSymbol();
+				ParserRuleContext parent = (ParserRuleContext)((IRuleNode)node.Parent).RuleContext;
+				IToken token = node.Symbol;
 				System.Console.Out.WriteLine("consume " + token + " rule " + this._enclosing.GetRuleNames
 					()[parent.GetRuleIndex()] + " alt=" + parent.altNum);
 			}
@@ -182,7 +182,7 @@ namespace Antlr4.Runtime
 		public virtual IToken Match(int ttype)
 		{
 			IToken t = GetCurrentToken();
-			if (t.GetType() == ttype)
+			if (t.Type == ttype)
 			{
 				_errHandler.EndErrorCondition(this);
 				Consume();
@@ -190,7 +190,7 @@ namespace Antlr4.Runtime
 			else
 			{
 				t = _errHandler.RecoverInline(this);
-				if (_buildParseTrees && t.GetTokenIndex() == -1)
+				if (_buildParseTrees && t.TokenIndex == -1)
 				{
 					// we must have conjured up a new token during single token insertion
 					// if it's not the current symbol
@@ -204,7 +204,7 @@ namespace Antlr4.Runtime
 		public virtual IToken MatchWildcard()
 		{
 			IToken t = GetCurrentToken();
-			if (t.GetType() > 0)
+			if (t.Type > 0)
 			{
 				_errHandler.EndErrorCondition(this);
 				Consume();
@@ -212,7 +212,7 @@ namespace Antlr4.Runtime
 			else
 			{
 				t = _errHandler.RecoverInline(this);
-				if (_buildParseTrees && t.GetTokenIndex() == -1)
+				if (_buildParseTrees && t.TokenIndex == -1)
 				{
 					// we must have conjured up a new token during single token insertion
 					// if it's not the current symbol
@@ -464,8 +464,8 @@ namespace Antlr4.Runtime
 			int charPositionInLine = -1;
 			if (offendingToken != null)
 			{
-				line = offendingToken.GetLine();
-				charPositionInLine = offendingToken.GetCharPositionInLine();
+				line = offendingToken.Line;
+				charPositionInLine = offendingToken.Column;
 			}
 			IAntlrErrorListener<IToken> listener = ((IParserErrorListener)GetErrorListenerDispatch
 				());
@@ -486,7 +486,7 @@ namespace Antlr4.Runtime
 		public virtual IToken Consume()
 		{
 			IToken o = GetCurrentToken();
-			if (o.GetType() != Eof)
+			if (o.Type != Eof)
 			{
 				((ITokenStream)GetInputStream()).Consume();
 			}
@@ -559,8 +559,8 @@ namespace Antlr4.Runtime
 			SetState(state);
 			if (_buildParseTrees)
 			{
-				ParserRuleContext factoredContext = (ParserRuleContext)_ctx.GetChild(_ctx.GetChildCount
-					() - 1);
+				ParserRuleContext factoredContext = (ParserRuleContext)_ctx.GetChild(_ctx.ChildCount
+					 - 1);
 				_ctx.RemoveLastChild();
 				factoredContext.parent = localctx;
 				localctx.AddChild(factoredContext);
@@ -868,7 +868,7 @@ namespace Antlr4.Runtime
 
 		public virtual string GetSourceName()
 		{
-			return _input.GetSourceName();
+			return _input.SourceName;
 		}
 
 		/// <summary>A convenience method for use most often with template rewrites.</summary>
@@ -885,7 +885,7 @@ namespace Antlr4.Runtime
 			IList<string> strings = new List<string>(tokens.Count);
 			for (int i = 0; i < tokens.Count; i++)
 			{
-				strings.AddItem(tokens[i].GetText());
+				strings.AddItem(tokens[i].Text);
 			}
 			return strings;
 		}

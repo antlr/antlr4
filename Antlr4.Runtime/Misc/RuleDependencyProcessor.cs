@@ -742,7 +742,7 @@ namespace Antlr4.Runtime.Misc
 				}
 				foreach (Transition transition in state.GetTransitions())
 				{
-					if (transition.GetSerializationType() != Transition.Rule)
+					if (transition.SerializationType != Transition.Rule)
 					{
 						continue;
 					}
