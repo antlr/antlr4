@@ -396,10 +396,11 @@ namespace Antlr4.Runtime.Atn
                 PredictionContext current = workList.Pop();
                 for (int i = 0; i < current.Size; i++)
                 {
-                    builder.Append("  s").Append(Sharpen.Runtime.IdentityHashCode(current));
+                    builder.Append("  s").Append(System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode
+                        (current));
                     builder.Append("->");
-                    builder.Append("s").Append(Sharpen.Runtime.IdentityHashCode(current.GetParent(i))
-                        );
+                    builder.Append("s").Append(System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode
+                        (current.GetParent(i)));
                     builder.Append("[label=\"").Append(current.GetReturnState(i)).Append("\"];\n");
                     if (visited.Put(current.GetParent(i), current.GetParent(i)) == null)
                     {

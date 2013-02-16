@@ -137,11 +137,11 @@ namespace Antlr4.Runtime.Atn
             // delay the assignment of loop back and end states until we know all the state instances have been initialized
             foreach (Tuple<LoopEndState, int> pair in loopBackStateNumbers)
             {
-                pair.GetItem1().loopBackState = atn.states[pair.GetItem2()];
+                pair.Item1.loopBackState = atn.states[pair.Item2];
             }
             foreach (Tuple<BlockStartState, int> pair_1 in endStateNumbers)
             {
-                pair_1.GetItem1().endState = (BlockEndState)atn.states[pair_1.GetItem2()];
+                pair_1.Item1.endState = (BlockEndState)atn.states[pair_1.Item2];
             }
             int numNonGreedyStates = ToInt(data[p++]);
             for (int i_2 = 0; i_2 < numNonGreedyStates; i_2++)

@@ -46,7 +46,7 @@ namespace Antlr4.Runtime.Misc
         private static readonly Logger Logger = Logger.GetLogger(typeof(Antlr4.Runtime.Misc.RuleDependencyChecker
             ).FullName);
 
-        private static readonly ICollection<Type> checkedTypes = new HashSet<Type>();
+        private static readonly ISet<Type> checkedTypes = new HashSet<Type>();
 
         public static void CheckDependencies<_T0>(Type<_T0> dependentClass)
         {
@@ -69,7 +69,7 @@ namespace Antlr4.Runtime.Misc
                 {
                     continue;
                 }
-                CheckDependencies(dependencies, dependencies[0].GetItem1().Recognizer());
+                CheckDependencies(dependencies, dependencies[0].Item1.Recognizer());
             }
         }
 
@@ -98,25 +98,24 @@ namespace Antlr4.Runtime.Misc
             StringBuilder incompatible = new StringBuilder();
             foreach (Tuple<RuleDependency, IAnnotatedElement> dependency in dependencies)
             {
-                if (!recognizerClass.IsAssignableFrom(dependency.GetItem1().Recognizer()))
+                if (!recognizerClass.IsAssignableFrom(dependency.Item1.Recognizer()))
                 {
                     continue;
                 }
-                if (dependency.GetItem1().Rule() < 0 || dependency.GetItem1().Rule() >= ruleVersions
-                    .Length)
+                if (dependency.Item1.Rule() < 0 || dependency.Item1.Rule() >= ruleVersions.Length)
                 {
                     incompatible.Append(string.Format("Element %s dependent on unknown rule %d@%d in %s\n"
-                        , dependency.GetItem2().ToString(), dependency.GetItem1().Rule(), dependency.
-                        GetItem1().Version(), dependency.GetItem1().Recognizer().Name));
+                        , dependency.Item2.ToString(), dependency.Item1.Rule(), dependency.Item1.Version
+                        (), dependency.Item1.Recognizer().Name));
                 }
                 else
                 {
-                    if (ruleVersions[dependency.GetItem1().Rule()] != dependency.GetItem1().Version())
+                    if (ruleVersions[dependency.Item1.Rule()] != dependency.Item1.Version())
                     {
                         incompatible.Append(string.Format("Element %s dependent on rule %s@%d (found @%d) in %s\n"
-                            , dependency.GetItem2().ToString(), ruleNames[dependency.GetItem1().Rule()], 
-                            dependency.GetItem1().Version(), ruleVersions[dependency.GetItem1().Rule()], 
-                            dependency.GetItem1().Recognizer().Name));
+                            , dependency.Item2.ToString(), ruleNames[dependency.Item1.Rule()], dependency
+                            .Item1.Version(), ruleVersions[dependency.Item1.Rule()], dependency.Item1.Recognizer
+                            ().Name));
                     }
                 }
             }

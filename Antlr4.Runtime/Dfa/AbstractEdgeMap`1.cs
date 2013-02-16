@@ -104,7 +104,7 @@ namespace Antlr4.Runtime.Dfa
 
         public abstract bool ContainsKey(int arg1);
 
-        public abstract ICollection<KeyValuePair<int, T>> EntrySet();
+        public abstract ISet<KeyValuePair<int, T>> EntrySet();
 
         public abstract T Get(int arg1);
 

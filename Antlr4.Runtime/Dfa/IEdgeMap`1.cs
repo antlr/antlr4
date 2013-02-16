@@ -62,6 +62,6 @@ namespace Antlr4.Runtime.Dfa
         IDictionary<int, T> ToMap();
 
         [NotNull]
-        ICollection<KeyValuePair<int, T>> EntrySet();
+        ISet<KeyValuePair<int, T>> EntrySet();
     }
 }

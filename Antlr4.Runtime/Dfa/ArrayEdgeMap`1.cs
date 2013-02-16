@@ -175,7 +175,7 @@ namespace Antlr4.Runtime.Dfa
             return result;
         }
 
-        public override ICollection<KeyValuePair<int, T>> EntrySet()
+        public override ISet<KeyValuePair<int, T>> EntrySet()
         {
             return new ArrayEdgeMap.EntrySet(this);
         }

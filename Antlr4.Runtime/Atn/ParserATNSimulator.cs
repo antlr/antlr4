@@ -1286,7 +1286,7 @@ namespace Antlr4.Runtime.Atn
                 contextCache = PredictionContextCache.Uncached;
             }
             ATNConfigSet currentConfigs = sourceConfigs;
-            ICollection<ATNConfig> closureBusy = new HashSet<ATNConfig>();
+            ISet<ATNConfig> closureBusy = new HashSet<ATNConfig>();
             while (currentConfigs.Count > 0)
             {
                 ATNConfigSet intermediate = new ATNConfigSet();
@@ -1304,8 +1304,8 @@ namespace Antlr4.Runtime.Atn
         }
 
         protected internal virtual void Closure(ATNConfig config, ATNConfigSet configs, ATNConfigSet
-             intermediate, ICollection<ATNConfig> closureBusy, bool collectPredicates, bool
-             hasMoreContexts, PredictionContextCache contextCache, int depth)
+             intermediate, ISet<ATNConfig> closureBusy, bool collectPredicates, bool hasMoreContexts
+            , PredictionContextCache contextCache, int depth)
         {
             if (!optimize_closure_busy && !closureBusy.AddItem(config))
             {

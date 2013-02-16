@@ -189,7 +189,7 @@ namespace Antlr4.Runtime.Misc
             throw new NotSupportedException();
         }
 
-        public virtual ICollection<K> Keys
+        public virtual ISet<K> Keys
         {
             get
             {
@@ -217,7 +217,7 @@ namespace Antlr4.Runtime.Misc
             }
         }
 
-        public virtual ICollection<KeyValuePair<K, V>> EntrySet()
+        public virtual ISet<KeyValuePair<K, V>> EntrySet()
         {
             throw new NotSupportedException();
         }
