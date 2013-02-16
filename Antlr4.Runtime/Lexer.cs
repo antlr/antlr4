@@ -268,7 +268,7 @@ outer_break: ;
         {
             if (_modeStack.IsEmpty())
             {
-                throw new EmptyStackException();
+                throw new InvalidOperationException();
             }
             Mode(_modeStack.Pop());
             return _mode;
