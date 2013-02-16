@@ -43,11 +43,11 @@ namespace Antlr4.Runtime.Atn
             this.precedence = precedence;
         }
 
-        public override int SerializationType
+        public override Antlr4.Runtime.Atn.TransitionType TransitionType
         {
             get
             {
-                return Precedence;
+                return Antlr4.Runtime.Atn.TransitionType.Precedence;
             }
         }
 

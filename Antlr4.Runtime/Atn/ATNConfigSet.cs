@@ -38,7 +38,7 @@ using Sharpen;
 namespace Antlr4.Runtime.Atn
 {
     /// <author>Sam Harwell</author>
-    public class ATNConfigSet : ICollection<ATNConfig>
+    public class ATNConfigSet : ISet<ATNConfig>
     {
         /// <summary>
         /// This maps (state, alt) -&gt; merged
@@ -224,9 +224,9 @@ namespace Antlr4.Runtime.Atn
             this.outermostConfigSet = outermostConfigSet;
         }
 
-        public virtual ICollection<ATNState> GetStates()
+        public virtual ISet<ATNState> GetStates()
         {
-            ICollection<ATNState> states = new HashSet<ATNState>();
+            ISet<ATNState> states = new HashSet<ATNState>();
             foreach (ATNConfig c in this.configs)
             {
                 states.AddItem(c.GetState());

@@ -77,9 +77,9 @@ namespace Antlr4.Runtime
             }
             else
             {
-                if (copyText && source.GetItem2() != null)
+                if (copyText && source.Item2 != null)
                 {
-                    t.Text = source.GetItem2().GetText(Interval.Of(start, stop));
+                    t.Text = source.Item2.GetText(Interval.Of(start, stop));
                 }
             }
             return t;

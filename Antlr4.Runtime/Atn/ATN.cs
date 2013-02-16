@@ -27,6 +27,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
@@ -81,8 +82,8 @@ namespace Antlr4.Runtime.Atn
         /// <summary>used during construction from grammar AST</summary>
         internal int stateNumber = 0;
 
-        private readonly IConcurrentMap<PredictionContext, PredictionContext> contextCache
-             = new ConcurrentHashMap<PredictionContext, PredictionContext>();
+        private readonly ConcurrentDictionary<PredictionContext, PredictionContext> contextCache
+             = new ConcurrentDictionary<PredictionContext, PredictionContext>();
 
         [NotNull]
         public DFA[] decisionToDFA = new DFA[0];
@@ -90,7 +91,7 @@ namespace Antlr4.Runtime.Atn
         [NotNull]
         public DFA[] modeToDFA = new DFA[0];
 
-        protected internal readonly IConcurrentMap<int, int> LL1Table = new ConcurrentHashMap
+        protected internal readonly ConcurrentDictionary<int, int> LL1Table = new ConcurrentDictionary
             <int, int>();
 
         /// <summary>Used for runtime deserialization of ATNs from strings</summary>

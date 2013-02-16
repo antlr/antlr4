@@ -40,9 +40,12 @@ namespace Antlr4.Runtime.Atn
 
         public bool leftFactored;
 
-        public override int GetStateType()
+        public override Antlr4.Runtime.Atn.StateType StateType
         {
-            return RuleStart;
+            get
+            {
+                return Antlr4.Runtime.Atn.StateType.RuleStart;
+            }
         }
     }
 }

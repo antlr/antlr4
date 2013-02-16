@@ -61,11 +61,11 @@ namespace Antlr4.Runtime.Atn
             this.isCtxDependent = isCtxDependent;
         }
 
-        public override int SerializationType
+        public override Antlr4.Runtime.Atn.TransitionType TransitionType
         {
             get
             {
-                return Predicate;
+                return Antlr4.Runtime.Atn.TransitionType.Predicate;
             }
         }
 

@@ -82,10 +82,10 @@ namespace Antlr4.Runtime
             this.channel = channel;
             this.start = start;
             this.stop = stop;
-            if (source.GetItem1() != null)
+            if (source.Item1 != null)
             {
-                this.line = source.GetItem1().Line;
-                this.charPositionInLine = source.GetItem1().Column;
+                this.line = source.Item1.Line;
+                this.charPositionInLine = source.Item1.Column;
             }
         }
 
@@ -248,7 +248,7 @@ namespace Antlr4.Runtime
         {
             get
             {
-                return source.GetItem1();
+                return source.Item1;
             }
         }
 
@@ -256,7 +256,7 @@ namespace Antlr4.Runtime
         {
             get
             {
-                return source.GetItem2();
+                return source.Item2;
             }
         }
 

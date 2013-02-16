@@ -740,9 +740,9 @@ namespace Antlr4.Runtime.Misc
             return values;
         }
 
-        public virtual ICollection<int> ToSet()
+        public virtual ISet<int> ToSet()
         {
-            ICollection<int> s = new HashSet<int>();
+            ISet<int> s = new HashSet<int>();
             foreach (Interval I in intervals)
             {
                 int a = I.a;

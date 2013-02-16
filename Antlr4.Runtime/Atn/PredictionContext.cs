@@ -27,6 +27,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime;
@@ -339,7 +340,7 @@ namespace Antlr4.Runtime.Atn
         }
 
         public static Antlr4.Runtime.Atn.PredictionContext GetCachedContext(Antlr4.Runtime.Atn.PredictionContext
-             context, IConcurrentMap<Antlr4.Runtime.Atn.PredictionContext, Antlr4.Runtime.Atn.PredictionContext
+             context, ConcurrentDictionary<Antlr4.Runtime.Atn.PredictionContext, Antlr4.Runtime.Atn.PredictionContext
             > contextCache, PredictionContext.IdentityHashMap visited)
         {
             if (context.IsEmpty)

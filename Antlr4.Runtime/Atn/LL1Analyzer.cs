@@ -70,11 +70,11 @@ namespace Antlr4.Runtime.Atn
             {
                 return null;
             }
-            IntervalSet[] look = new IntervalSet[s.GetNumberOfTransitions() + 1];
-            for (int alt = 1; alt <= s.GetNumberOfTransitions(); alt++)
+            IntervalSet[] look = new IntervalSet[s.NumberOfTransitions + 1];
+            for (int alt = 1; alt <= s.NumberOfTransitions; alt++)
             {
                 look[alt] = new IntervalSet();
-                ICollection<ATNConfig> lookBusy = new HashSet<ATNConfig>();
+                ISet<ATNConfig> lookBusy = new HashSet<ATNConfig>();
                 bool seeThruPreds = false;
                 // fail to get lookahead upon pred
                 Look(s.Transition(alt - 1).target, PredictionContext.EmptyFull, look[alt], lookBusy
@@ -138,7 +138,7 @@ namespace Antlr4.Runtime.Atn
         /// indicating we reached the end of the ruled out having to match a token.
         /// </remarks>
         protected internal virtual void Look(ATNState s, PredictionContext ctx, IntervalSet
-             look, ICollection<ATNConfig> lookBusy, bool seeThruPreds, bool addEOF)
+             look, ISet<ATNConfig> lookBusy, bool seeThruPreds, bool addEOF)
         {
             //		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);
             ATNConfig c = ATNConfig.Create(s, 0, ctx);
@@ -175,7 +175,7 @@ namespace Antlr4.Runtime.Atn
                     }
                 }
             }
-            int n = s.GetNumberOfTransitions();
+            int n = s.NumberOfTransitions;
             for (int i_1 = 0; i_1 < n; i_1++)
             {
                 Transition t = s.Transition(i_1);

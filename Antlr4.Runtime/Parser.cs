@@ -99,7 +99,7 @@ namespace Antlr4.Runtime
             {
                 if (ctx.children is ArrayList)
                 {
-                    ((List<object>)ctx.children).TrimToSize();
+                    ((List<object>)ctx.children).TrimExcess();
                 }
             }
         }

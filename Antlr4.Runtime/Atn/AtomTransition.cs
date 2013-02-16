@@ -45,11 +45,11 @@ namespace Antlr4.Runtime.Atn
             this.label = label;
         }
 
-        public override int SerializationType
+        public override Antlr4.Runtime.Atn.TransitionType TransitionType
         {
             get
             {
-                return Atom;
+                return Antlr4.Runtime.Atn.TransitionType.Atom;
             }
         }
 

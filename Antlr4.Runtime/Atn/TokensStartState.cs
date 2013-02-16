@@ -35,9 +35,12 @@ namespace Antlr4.Runtime.Atn
     /// <summary>The Tokens rule start state linking to each lexer rule start state</summary>
     public sealed class TokensStartState : DecisionState
     {
-        public override int GetStateType()
+        public override Antlr4.Runtime.Atn.StateType StateType
         {
-            return TokenStart;
+            get
+            {
+                return Antlr4.Runtime.Atn.StateType.TokenStart;
+            }
         }
     }
 }

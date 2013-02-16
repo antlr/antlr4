@@ -38,9 +38,12 @@ namespace Antlr4.Runtime.Atn
     {
         public ATNState loopBackState;
 
-        public override int GetStateType()
+        public override Antlr4.Runtime.Atn.StateType StateType
         {
-            return LoopEnd;
+            get
+            {
+                return Antlr4.Runtime.Atn.StateType.LoopEnd;
+            }
         }
     }
 }

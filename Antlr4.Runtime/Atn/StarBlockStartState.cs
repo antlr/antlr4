@@ -36,9 +36,12 @@ namespace Antlr4.Runtime.Atn
     /// <remarks>The block that begins a closure loop.</remarks>
     public sealed class StarBlockStartState : BlockStartState
     {
-        public override int GetStateType()
+        public override Antlr4.Runtime.Atn.StateType StateType
         {
-            return StarBlockStart;
+            get
+            {
+                return Antlr4.Runtime.Atn.StateType.StarBlockStart;
+            }
         }
     }
 }

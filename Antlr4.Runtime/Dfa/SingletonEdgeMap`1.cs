@@ -149,7 +149,7 @@ namespace Antlr4.Runtime.Dfa
             return Sharpen.Collections.SingletonMap(key, value);
         }
 
-        public override ICollection<KeyValuePair<int, T>> EntrySet()
+        public override ISet<KeyValuePair<int, T>> EntrySet()
         {
             return new SingletonEdgeMap.EntrySet(this);
         }

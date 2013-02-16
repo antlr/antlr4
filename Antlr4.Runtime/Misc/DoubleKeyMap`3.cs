@@ -89,13 +89,13 @@ namespace Antlr4.Runtime.Misc
         }
 
         /// <summary>get all primary keys</summary>
-        public virtual ICollection<Key1> KeySet()
+        public virtual ISet<Key1> KeySet()
         {
             return data.Keys;
         }
 
         /// <summary>get all secondary keys associated with a primary key</summary>
-        public virtual ICollection<Key2> KeySet(Key1 k1)
+        public virtual ISet<Key2> KeySet(Key1 k1)
         {
             IDictionary<Key2, Value> data2 = data.Get(k1);
             if (data2 == null)

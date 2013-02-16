@@ -42,9 +42,12 @@ namespace Antlr4.Runtime.Atn
     /// </summary>
     public sealed class PlusLoopbackState : DecisionState
     {
-        public override int GetStateType()
+        public override Antlr4.Runtime.Atn.StateType StateType
         {
-            return PlusLoopBack;
+            get
+            {
+                return Antlr4.Runtime.Atn.StateType.PlusLoopBack;
+            }
         }
     }
 }

@@ -39,11 +39,11 @@ namespace Antlr4.Runtime.Atn
         {
         }
 
-        public override int SerializationType
+        public override Antlr4.Runtime.Atn.TransitionType TransitionType
         {
             get
             {
-                return Epsilon;
+                return Antlr4.Runtime.Atn.TransitionType.Epsilon;
             }
         }
 
