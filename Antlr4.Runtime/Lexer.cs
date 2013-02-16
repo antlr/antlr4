@@ -48,10 +48,6 @@ namespace Antlr4.Runtime
     {
         public const int DefaultMode = 0;
 
-        public const int More = -2;
-
-        public const int Skip = -3;
-
         public const int DefaultTokenChannel = IToken.DefaultChannel;
 
         public const int Hidden = IToken.HiddenChannel;

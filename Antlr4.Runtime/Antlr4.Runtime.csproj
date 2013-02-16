@@ -148,6 +148,7 @@
     <Compile Include="Sharpen\Arrays.cs" />
     <Compile Include="Sharpen\Runtime.cs" />
     <Compile Include="TokenStreamRewriter.cs" />
+    <Compile Include="TokenTypes.cs" />
     <Compile Include="Tree\AbstractParseTreeVisitor`1.cs" />
     <Compile Include="Tree\ErrorNodeImpl.cs" />
     <Compile Include="Tree\IErrorNode.cs" />
