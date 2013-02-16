@@ -11,8 +11,8 @@
 -methodMapping java.util.Iterator.hasNext HasNext
 -methodMapping java.util.Iterator.next Next
 
--typeMapping java.util.Comparator System.Collections.IEnumerator   
--typeMapping java.util.ArrayList System.Collections.ArrayList 
+-typeMapping java.util.Comparator System.Collections.IComparer
+-typeMapping java.util.ArrayList System.Collections.ArrayList
 
 -methodMapping java.util.List.addAll AddRange 
 -methodMapping java.util.AbstractList.addAll AddRange 

@@ -70,6 +70,7 @@
     <Compile Include="Atn\PredicateTransition.cs" />
     <Compile Include="Atn\PredictionContext.cs" />
     <Compile Include="Atn\PredictionContextCache.cs" />
+    <Compile Include="Atn\PredictionMode.cs" />
     <Compile Include="Atn\RangeTransition.cs" />
     <Compile Include="Atn\RuleStartState.cs" />
     <Compile Include="Atn\RuleStopState.cs" />
