@@ -109,7 +109,7 @@ namespace Antlr4.Runtime
         /// <summary>The token type for the current token</summary>
         public int _type;
 
-        public readonly IntegerStack _modeStack = new IntegerStack();
+        public readonly List<int> _modeStack = new List<int>();
 
         public int _mode = Antlr4.Runtime.Lexer.DefaultMode;
 
@@ -260,7 +260,7 @@ outer_break: ;
 
         public virtual void PushMode(int m)
         {
-            _modeStack.Push(_mode);
+            _modeStack.Add(_mode);
             Mode(m);
         }
 

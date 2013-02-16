@@ -108,7 +108,7 @@ namespace Antlr4.Runtime
 
         protected internal ITokenStream _input;
 
-        protected internal readonly IntegerStack _precedenceStack;
+        protected internal readonly List<int> _precedenceStack;
 
         /// <summary>The RuleContext object for the currently executing rule.</summary>
         /// <remarks>
@@ -146,8 +146,8 @@ namespace Antlr4.Runtime
         public Parser(ITokenStream input)
         {
             {
-                _precedenceStack = new IntegerStack();
-                _precedenceStack.Push(0);
+                _precedenceStack = new List<int>();
+                _precedenceStack.Add(0);
             }
             SetInputStream(input);
         }
@@ -164,7 +164,7 @@ namespace Antlr4.Runtime
             _syntaxErrors = 0;
             _tracer = null;
             _precedenceStack.Clear();
-            _precedenceStack.Push(0);
+            _precedenceStack.Add(0);
             ATNSimulator interpreter = Interpreter;
             if (interpreter != null)
             {
@@ -630,7 +630,7 @@ namespace Antlr4.Runtime
         public virtual void EnterRecursionRule(ParserRuleContext localctx, int ruleIndex, 
             int precedence)
         {
-            _precedenceStack.Push(precedence);
+            _precedenceStack.Add(precedence);
             _ctx = localctx;
             _ctx.start = _input.Lt(1);
             if (_parseListeners != null)
