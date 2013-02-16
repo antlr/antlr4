@@ -40,12 +40,7 @@ namespace Antlr4.Runtime.Atn
 {
     public abstract class ATNSimulator
     {
-        public static readonly int SerializedVersion;
-
-        static ATNSimulator()
-        {
-            SerializedVersion = 5;
-        }
+        public static readonly int SerializedVersion = 5;
 
         public const char RuleVariantDelimiter = '$';
 
