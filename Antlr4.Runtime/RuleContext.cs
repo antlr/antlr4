@@ -125,7 +125,7 @@ namespace Antlr4.Runtime
             }
         }
 
-        public virtual Antlr4.Runtime.RuleContext RuleContext
+        RuleContext IRuleNode.RuleContext
         {
             get
             {
