@@ -48,7 +48,7 @@ namespace Antlr4.Runtime.Misc
         public const double LoadFactor = 0.75;
 
         [NotNull]
-        protected internal readonly AbstractEqualityComparator<T> comparator;
+        protected internal readonly EqualityComparer<T> comparator;
 
         protected internal T[][] buckets;
 
@@ -65,13 +65,13 @@ namespace Antlr4.Runtime.Misc
         {
         }
 
-        public Array2DHashSet(AbstractEqualityComparator<T> comparator) : this(comparator
-            , InitalCapacity, InitalBucketCapacity)
+        public Array2DHashSet(EqualityComparer<T> comparator) : this(comparator, InitalCapacity
+            , InitalBucketCapacity)
         {
         }
 
-        public Array2DHashSet(AbstractEqualityComparator<T> comparator, int initialCapacity
-            , int initialBucketCapacity)
+        public Array2DHashSet(EqualityComparer<T> comparator, int initialCapacity, int initialBucketCapacity
+            )
         {
             // must be power of 2
             // when to expand
@@ -174,7 +174,7 @@ namespace Antlr4.Runtime.Misc
 
         protected internal int GetBucket(T o)
         {
-            int hash = comparator.HashCode(o);
+            int hash = comparator.GetHashCode(o);
             int b = hash & (buckets.Length - 1);
             // assumes len is power of 2
             return b;
@@ -195,7 +195,7 @@ namespace Antlr4.Runtime.Misc
                     {
                         break;
                     }
-                    h += comparator.HashCode(o);
+                    h += comparator.GetHashCode(o);
                 }
             }
             return h;
