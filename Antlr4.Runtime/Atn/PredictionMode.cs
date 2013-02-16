@@ -85,8 +85,8 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        private sealed class AltAndContextConfigEqualityComparator : AbstractEqualityComparator
-            <ATNConfig>
+        private sealed class AltAndContextConfigEqualityComparator : EqualityComparer<ATNConfig
+            >
         {
             public static readonly PredictionMode.AltAndContextConfigEqualityComparator Instance
                  = new PredictionMode.AltAndContextConfigEqualityComparator();
@@ -96,7 +96,7 @@ namespace Antlr4.Runtime.Atn
             }
 
             /// <summary>Code is function of (s, _, ctx, _)</summary>
-            public override int HashCode(ATNConfig o)
+            public override int GetHashCode(ATNConfig o)
             {
                 int hashCode = 7;
                 hashCode = 31 * hashCode + o.GetState().stateNumber;
@@ -114,7 +114,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     return false;
                 }
-                if (HashCode(a) != HashCode(b))
+                if (GetHashCode(a) != GetHashCode(b))
                 {
                     return false;
                 }

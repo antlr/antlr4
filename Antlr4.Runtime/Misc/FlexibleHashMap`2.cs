@@ -71,7 +71,7 @@ namespace Antlr4.Runtime.Misc
         }
 
         [NotNull]
-        protected internal readonly AbstractEqualityComparator<K> comparator;
+        protected internal readonly EqualityComparer<K> comparator;
 
         protected internal List<FlexibleHashMap.Entry<K, V>>[] buckets;
 
@@ -88,13 +88,13 @@ namespace Antlr4.Runtime.Misc
         {
         }
 
-        public FlexibleHashMap(AbstractEqualityComparator<K> comparator) : this(comparator
-            , InitalCapacity, InitalBucketCapacity)
+        public FlexibleHashMap(EqualityComparer<K> comparator) : this(comparator, InitalCapacity
+            , InitalBucketCapacity)
         {
         }
 
-        public FlexibleHashMap(AbstractEqualityComparator<K> comparator, int initialCapacity
-            , int initialBucketCapacity)
+        public FlexibleHashMap(EqualityComparer<K> comparator, int initialCapacity, int initialBucketCapacity
+            )
         {
             // when to expand
             // jump by 4 primes each expand or whatever
@@ -117,7 +117,7 @@ namespace Antlr4.Runtime.Misc
 
         protected internal virtual int GetBucket(K key)
         {
-            int hash = comparator.HashCode(key);
+            int hash = comparator.GetHashCode(key);
             int b = hash & (buckets.Length - 1);
             // assumes len is power of 2
             return b;
@@ -247,7 +247,7 @@ namespace Antlr4.Runtime.Misc
                     {
                         break;
                     }
-                    h += comparator.HashCode(e.key);
+                    h += comparator.GetHashCode(e.key);
                 }
             }
             return h;

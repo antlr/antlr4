@@ -188,6 +188,10 @@
 -typeMapping java.lang.IndexOutOfBoundsException ArgumentOutOfRangeException
 -typeMapping java.util.EmptyStackException InvalidOperationException
 
+-typeMapping org.antlr.v4.runtime.misc.EqualityComparator<> System.Collections.Generic.IEqualityComparer
+-methodMapping org.antlr.v4.runtime.misc.EqualityComparator.hashCode GetHashCode
+-typeMapping org.antlr.v4.runtime.misc.AbstractEqualityComparator<> System.Collections.Generic.EqualityComparer
+
 -typeMapping org.antlr.v4.runtime.misc.Tuple System.Tuple
 -typeMapping org.antlr.v4.runtime.misc.Tuple2<,> System.Tuple
 -propertyMapping org.antlr.v4.runtime.misc.Tuple2.getItem1 Item1

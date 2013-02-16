@@ -528,7 +528,7 @@ outer_break: ;
             }
         }
 
-        public sealed class IdentityEqualityComparator : AbstractEqualityComparator<PredictionContext
+        public sealed class IdentityEqualityComparator : EqualityComparer<PredictionContext
             >
         {
             public static readonly PredictionContext.IdentityEqualityComparator Instance = new 
@@ -538,7 +538,7 @@ outer_break: ;
             {
             }
 
-            public override int HashCode(PredictionContext obj)
+            public override int GetHashCode(PredictionContext obj)
             {
                 return obj.GetHashCode();
             }
