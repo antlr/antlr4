@@ -94,32 +94,6 @@ namespace Antlr4.Runtime.Atn
     {
         public const int InitialNumTransitions = 4;
 
-        public const int InvalidType = 0;
-
-        public const int Basic = 1;
-
-        public const int RuleStart = 2;
-
-        public const int BlockStart = 3;
-
-        public const int PlusBlockStart = 4;
-
-        public const int StarBlockStart = 5;
-
-        public const int TokenStart = 6;
-
-        public const int RuleStop = 7;
-
-        public const int BlockEnd = 8;
-
-        public const int StarLoopBack = 9;
-
-        public const int StarLoopEntry = 10;
-
-        public const int PlusLoopBack = 11;
-
-        public const int LoopEnd = 12;
-
         public static readonly IList<string> serializationNames = Sharpen.Collections.UnmodifiableList
             (Arrays.AsList("INVALID", "BASIC", "RULE_START", "BLOCK_START", "PLUS_BLOCK_START"
             , "STAR_BLOCK_START", "TOKEN_START", "RULE_STOP", "BLOCK_END", "STAR_LOOP_BACK"
@@ -146,14 +120,16 @@ namespace Antlr4.Runtime.Atn
         /// <summary>Used to cache lookahead during parsing, not used during construction</summary>
         public IntervalSet nextTokenWithinRule;
 
-        // constants for serialization
-        // at runtime, we don't have Rule objects
         /// <summary>Gets the state number.</summary>
         /// <remarks>Gets the state number.</remarks>
         /// <returns>the state number</returns>
-        public int GetStateNumber()
+        public int StateNumber
         {
-            return stateNumber;
+            get
+            {
+                // at runtime, we don't have Rule objects
+                return stateNumber;
+            }
         }
 
         /// <summary>
@@ -167,9 +143,12 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="RuleStopState">RuleStopState</see>
         /// , otherwise the state number
         /// </returns>
-        public virtual int GetNonStopStateNumber()
+        public virtual int NonStopStateNumber
         {
-            return GetStateNumber();
+            get
+            {
+                return StateNumber;
+            }
         }
 
         public override int GetHashCode()
@@ -187,9 +166,12 @@ namespace Antlr4.Runtime.Atn
             return false;
         }
 
-        public virtual bool IsNonGreedyExitState()
+        public virtual bool IsNonGreedyExitState
         {
-            return false;
+            get
+            {
+                return false;
+            }
         }
 
         public override string ToString()
@@ -203,9 +185,12 @@ namespace Antlr4.Runtime.Atn
                 [transitions.Count]);
         }
 
-        public virtual int GetNumberOfTransitions()
+        public virtual int NumberOfTransitions
         {
-            return transitions.Count;
+            get
+            {
+                return transitions.Count;
+            }
         }
 
         public virtual void AddTransition(Antlr4.Runtime.Atn.Transition e)
@@ -241,11 +226,17 @@ namespace Antlr4.Runtime.Atn
             return transitions.Remove(index);
         }
 
-        public abstract int GetStateType();
-
-        public bool OnlyHasEpsilonTransitions()
+        public abstract Antlr4.Runtime.Atn.StateType StateType
         {
-            return epsilonOnlyTransitions;
+            get;
+        }
+
+        public bool OnlyHasEpsilonTransitions
+        {
+            get
+            {
+                return epsilonOnlyTransitions;
+            }
         }
 
         public virtual void SetRuleIndex(int ruleIndex)
@@ -253,14 +244,20 @@ namespace Antlr4.Runtime.Atn
             this.ruleIndex = ruleIndex;
         }
 
-        public virtual bool IsOptimized()
+        public virtual bool IsOptimized
         {
-            return optimizedTransitions != transitions;
+            get
+            {
+                return optimizedTransitions != transitions;
+            }
         }
 
-        public virtual int GetNumberOfOptimizedTransitions()
+        public virtual int NumberOfOptimizedTransitions
         {
-            return optimizedTransitions.Count;
+            get
+            {
+                return optimizedTransitions.Count;
+            }
         }
 
         public virtual Antlr4.Runtime.Atn.Transition GetOptimizedTransition(int i)
@@ -270,7 +267,7 @@ namespace Antlr4.Runtime.Atn
 
         public virtual void AddOptimizedTransition(Antlr4.Runtime.Atn.Transition e)
         {
-            if (!IsOptimized())
+            if (!IsOptimized)
             {
                 optimizedTransitions = new List<Antlr4.Runtime.Atn.Transition>();
             }
@@ -280,7 +277,7 @@ namespace Antlr4.Runtime.Atn
         public virtual void SetOptimizedTransition(int i, Antlr4.Runtime.Atn.Transition e
             )
         {
-            if (!IsOptimized())
+            if (!IsOptimized)
             {
                 throw new InvalidOperationException();
             }
@@ -289,7 +286,7 @@ namespace Antlr4.Runtime.Atn
 
         public virtual void RemoveOptimizedTransition(int i)
         {
-            if (!IsOptimized())
+            if (!IsOptimized)
             {
                 throw new InvalidOperationException();
             }

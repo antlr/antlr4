@@ -82,8 +82,10 @@
     <Compile Include="Atn\StarBlockStartState.cs" />
     <Compile Include="Atn\StarLoopbackState.cs" />
     <Compile Include="Atn\StarLoopEntryState.cs" />
+    <Compile Include="Atn\StateType.cs" />
     <Compile Include="Atn\TokensStartState.cs" />
     <Compile Include="Atn\Transition.cs" />
+    <Compile Include="Atn\TransitionType.cs" />
     <Compile Include="Atn\WildcardTransition.cs" />
     <Compile Include="BailErrorStrategy.cs" />
     <Compile Include="BaseErrorListener.cs" />

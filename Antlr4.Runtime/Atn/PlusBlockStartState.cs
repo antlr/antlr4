@@ -48,9 +48,12 @@ namespace Antlr4.Runtime.Atn
     {
         public PlusLoopbackState loopBackState;
 
-        public override int GetStateType()
+        public override Antlr4.Runtime.Atn.StateType StateType
         {
-            return PlusBlockStart;
+            get
+            {
+                return Antlr4.Runtime.Atn.StateType.PlusBlockStart;
+            }
         }
     }
 }

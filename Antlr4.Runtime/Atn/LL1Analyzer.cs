@@ -70,8 +70,8 @@ namespace Antlr4.Runtime.Atn
             {
                 return null;
             }
-            IntervalSet[] look = new IntervalSet[s.GetNumberOfTransitions() + 1];
-            for (int alt = 1; alt <= s.GetNumberOfTransitions(); alt++)
+            IntervalSet[] look = new IntervalSet[s.NumberOfTransitions + 1];
+            for (int alt = 1; alt <= s.NumberOfTransitions; alt++)
             {
                 look[alt] = new IntervalSet();
                 ICollection<ATNConfig> lookBusy = new HashSet<ATNConfig>();
@@ -175,7 +175,7 @@ namespace Antlr4.Runtime.Atn
                     }
                 }
             }
-            int n = s.GetNumberOfTransitions();
+            int n = s.NumberOfTransitions;
             for (int i_1 = 0; i_1 < n; i_1++)
             {
                 Transition t = s.Transition(i_1);

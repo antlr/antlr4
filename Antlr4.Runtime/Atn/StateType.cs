@@ -27,55 +27,25 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
-using Antlr4.Runtime.Misc;
 using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-    /// <summary>A transition containing a set of values.</summary>
-    /// <remarks>A transition containing a set of values.</remarks>
-    public class SetTransition : Transition
+    public enum StateType
     {
-        [NotNull]
-        public readonly IntervalSet set;
-
-        public SetTransition(ATNState target, IntervalSet set) : base(target)
-        {
-            // TODO (sam): should we really allow null here?
-            if (set == null)
-            {
-                set = IntervalSet.Of(IToken.InvalidType);
-            }
-            this.set = set;
-        }
-
-        public override Antlr4.Runtime.Atn.TransitionType TransitionType
-        {
-            get
-            {
-                return Antlr4.Runtime.Atn.TransitionType.Set;
-            }
-        }
-
-        public override IntervalSet Label
-        {
-            get
-            {
-                return set;
-            }
-        }
-
-        public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
-        {
-            return set.Contains(symbol);
-        }
-
-        [NotNull]
-        public override string ToString()
-        {
-            return set.ToString();
-        }
+        InvalidType,
+        Basic,
+        RuleStart,
+        BlockStart,
+        PlusBlockStart,
+        StarBlockStart,
+        TokenStart,
+        RuleStop,
+        BlockEnd,
+        StarLoopBack,
+        StarLoopEntry,
+        PlusLoopBack,
+        LoopEnd
     }
 }

@@ -109,16 +109,16 @@ namespace Antlr4.Runtime.Atn
             int nstates = ToInt(data[p++]);
             for (int i_1 = 1; i_1 <= nstates; i_1++)
             {
-                int stype = ToInt(data[p++]);
+                StateType stype = StateType.Values()[ToInt(data[p++])];
                 // ignore bad type of states
-                if (stype == ATNState.InvalidType)
+                if (stype == StateType.InvalidType)
                 {
                     atn.AddState(null);
                     continue;
                 }
                 int ruleIndex = ToInt(data[p++]);
                 ATNState s = StateFactory(stype, ruleIndex);
-                if (stype == ATNState.LoopEnd)
+                if (stype == StateType.LoopEnd)
                 {
                     // special case
                     int loopBackStateNumber = ToInt(data[p++]);
@@ -234,7 +234,7 @@ namespace Antlr4.Runtime.Atn
             {
                 int src = ToInt(data[p]);
                 int trg = ToInt(data[p + 1]);
-                int ttype = ToInt(data[p + 2]);
+                TransitionType ttype = TransitionType.Values()[ToInt(data[p + 2])];
                 int arg1 = ToInt(data[p + 3]);
                 int arg2 = ToInt(data[p + 4]);
                 int arg3 = ToInt(data[p + 5]);
@@ -252,7 +252,7 @@ namespace Antlr4.Runtime.Atn
             {
                 bool returningToLeftFactored = state_1.ruleIndex >= 0 && atn.ruleToStartState[state_1
                     .ruleIndex].leftFactored;
-                for (int i_10 = 0; i_10 < state_1.GetNumberOfTransitions(); i_10++)
+                for (int i_10 = 0; i_10 < state_1.NumberOfTransitions; i_10++)
                 {
                     Transition t = state_1.Transition(i_10);
                     if (!(t is RuleTransition))
@@ -289,7 +289,7 @@ namespace Antlr4.Runtime.Atn
                 if (state_2 is PlusLoopbackState)
                 {
                     PlusLoopbackState loopbackState = (PlusLoopbackState)state_2;
-                    for (int i_10 = 0; i_10 < loopbackState.GetNumberOfTransitions(); i_10++)
+                    for (int i_10 = 0; i_10 < loopbackState.NumberOfTransitions; i_10++)
                     {
                         ATNState target = loopbackState.Transition(i_10).target;
                         if (target is PlusBlockStartState)
@@ -303,7 +303,7 @@ namespace Antlr4.Runtime.Atn
                     if (state_2 is StarLoopbackState)
                     {
                         StarLoopbackState loopbackState = (StarLoopbackState)state_2;
-                        for (int i_10 = 0; i_10 < loopbackState.GetNumberOfTransitions(); i_10++)
+                        for (int i_10 = 0; i_10 < loopbackState.NumberOfTransitions; i_10++)
                         {
                             ATNState target = loopbackState.Transition(i_10).target;
                             if (target is StarLoopEntryState)
@@ -359,8 +359,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     continue;
                 }
-                CheckCondition(state.OnlyHasEpsilonTransitions() || state.GetNumberOfTransitions(
-                    ) <= 1);
+                CheckCondition(state.OnlyHasEpsilonTransitions || state.NumberOfTransitions <= 1);
                 if (state is PlusBlockStartState)
                 {
                     CheckCondition(((PlusBlockStartState)state).loopBackState != null);
@@ -369,7 +368,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     StarLoopEntryState starLoopEntryState = (StarLoopEntryState)state;
                     CheckCondition(starLoopEntryState.loopBackState != null);
-                    CheckCondition(starLoopEntryState.GetNumberOfTransitions() == 2);
+                    CheckCondition(starLoopEntryState.NumberOfTransitions == 2);
                     if (starLoopEntryState.Transition(0).target is StarBlockStartState)
                     {
                         CheckCondition(starLoopEntryState.Transition(1).target is LoopEndState);
@@ -390,7 +389,7 @@ namespace Antlr4.Runtime.Atn
                 }
                 if (state is StarLoopbackState)
                 {
-                    CheckCondition(state.GetNumberOfTransitions() == 1);
+                    CheckCondition(state.NumberOfTransitions == 1);
                     CheckCondition(state.Transition(0).target is StarLoopEntryState);
                 }
                 if (state is LoopEndState)
@@ -412,12 +411,12 @@ namespace Antlr4.Runtime.Atn
                 if (state is DecisionState)
                 {
                     DecisionState decisionState = (DecisionState)state;
-                    CheckCondition(decisionState.GetNumberOfTransitions() <= 1 || decisionState.decision
-                         >= 0);
+                    CheckCondition(decisionState.NumberOfTransitions <= 1 || decisionState.decision >=
+                         0);
                 }
                 else
                 {
-                    CheckCondition(state.GetNumberOfTransitions() <= 1 || state is RuleStopState);
+                    CheckCondition(state.NumberOfTransitions <= 1 || state is RuleStopState);
                 }
             }
         }
@@ -444,36 +443,36 @@ namespace Antlr4.Runtime.Atn
             {
                 RuleStartState startState = atn.ruleToStartState[i];
                 ATNState middleState = startState;
-                while (middleState.OnlyHasEpsilonTransitions() && middleState.GetNumberOfOptimizedTransitions
-                    () == 1 && middleState.GetOptimizedTransition(0).SerializationType == Transition
+                while (middleState.OnlyHasEpsilonTransitions && middleState.NumberOfOptimizedTransitions
+                     == 1 && middleState.GetOptimizedTransition(0).TransitionType == TransitionType
                     .Epsilon)
                 {
                     middleState = middleState.GetOptimizedTransition(0).target;
                 }
-                if (middleState.GetNumberOfOptimizedTransitions() != 1)
+                if (middleState.NumberOfOptimizedTransitions != 1)
                 {
                     continue;
                 }
                 Transition matchTransition = middleState.GetOptimizedTransition(0);
                 ATNState matchTarget = matchTransition.target;
-                if (matchTransition.IsEpsilon || !matchTarget.OnlyHasEpsilonTransitions() || matchTarget
-                    .GetNumberOfOptimizedTransitions() != 1 || !(matchTarget.GetOptimizedTransition
-                    (0).target is RuleStopState))
+                if (matchTransition.IsEpsilon || !matchTarget.OnlyHasEpsilonTransitions || matchTarget
+                    .NumberOfOptimizedTransitions != 1 || !(matchTarget.GetOptimizedTransition(0)
+                    .target is RuleStopState))
                 {
                     continue;
                 }
-                switch (matchTransition.SerializationType)
+                switch (matchTransition.TransitionType)
                 {
-                    case Transition.Atom:
-                    case Transition.Range:
-                    case Transition.Set:
+                    case TransitionType.Atom:
+                    case TransitionType.Range:
+                    case TransitionType.Set:
                     {
                         ruleToInlineTransition[i] = matchTransition;
                         break;
                     }
 
-                    case Transition.NotSet:
-                    case Transition.Wildcard:
+                    case TransitionType.NotSet:
+                    case TransitionType.Wildcard:
                     {
                         // not implemented yet
                         continue;
@@ -495,7 +494,7 @@ namespace Antlr4.Runtime.Atn
                     continue;
                 }
                 IList<Transition> optimizedTransitions = null;
-                for (int i_1 = 0; i_1 < state.GetNumberOfOptimizedTransitions(); i_1++)
+                for (int i_1 = 0; i_1 < state.NumberOfOptimizedTransitions; i_1++)
                 {
                     Transition transition = state.GetOptimizedTransition(i_1);
                     if (!(transition is RuleTransition))
@@ -530,23 +529,23 @@ namespace Antlr4.Runtime.Atn
                     intermediateState.SetRuleIndex(target.ruleIndex);
                     atn.AddState(intermediateState);
                     optimizedTransitions.AddItem(new EpsilonTransition(intermediateState));
-                    switch (effective.SerializationType)
+                    switch (effective.TransitionType)
                     {
-                        case Transition.Atom:
+                        case TransitionType.Atom:
                         {
                             intermediateState.AddTransition(new AtomTransition(target, ((AtomTransition)effective
                                 ).label));
                             break;
                         }
 
-                        case Transition.Range:
+                        case TransitionType.Range:
                         {
                             intermediateState.AddTransition(new RangeTransition(target, ((RangeTransition)effective
                                 ).from, ((RangeTransition)effective).to));
                             break;
                         }
 
-                        case Transition.Set:
+                        case TransitionType.Set:
                         {
                             intermediateState.AddTransition(new SetTransition(target, effective.Label));
                             break;
@@ -560,11 +559,11 @@ namespace Antlr4.Runtime.Atn
                 }
                 if (optimizedTransitions != null)
                 {
-                    if (state.IsOptimized())
+                    if (state.IsOptimized)
                     {
-                        while (state.GetNumberOfOptimizedTransitions() > 0)
+                        while (state.NumberOfOptimizedTransitions > 0)
                         {
-                            state.RemoveOptimizedTransition(state.GetNumberOfOptimizedTransitions() - 1);
+                            state.RemoveOptimizedTransition(state.NumberOfOptimizedTransitions - 1);
                         }
                     }
                     foreach (Transition transition in optimizedTransitions)
@@ -581,17 +580,17 @@ namespace Antlr4.Runtime.Atn
             int removedEdges = 0;
             foreach (ATNState state in atn.states)
             {
-                if (!state.OnlyHasEpsilonTransitions() || state is RuleStopState)
+                if (!state.OnlyHasEpsilonTransitions || state is RuleStopState)
                 {
                     continue;
                 }
                 IList<Transition> optimizedTransitions = null;
-                for (int i = 0; i < state.GetNumberOfOptimizedTransitions(); i++)
+                for (int i = 0; i < state.NumberOfOptimizedTransitions; i++)
                 {
                     Transition transition = state.GetOptimizedTransition(i);
                     ATNState intermediate = transition.target;
-                    if (transition.SerializationType != Transition.Epsilon || intermediate.GetStateType
-                        () != ATNState.Basic || !intermediate.OnlyHasEpsilonTransitions())
+                    if (transition.TransitionType != TransitionType.Epsilon || intermediate.StateType
+                         != StateType.Basic || !intermediate.OnlyHasEpsilonTransitions)
                     {
                         if (optimizedTransitions != null)
                         {
@@ -599,9 +598,9 @@ namespace Antlr4.Runtime.Atn
                         }
                         goto nextTransition_continue;
                     }
-                    for (int j = 0; j < intermediate.GetNumberOfOptimizedTransitions(); j++)
+                    for (int j = 0; j < intermediate.NumberOfOptimizedTransitions; j++)
                     {
-                        if (intermediate.GetOptimizedTransition(j).SerializationType != Transition.Epsilon)
+                        if (intermediate.GetOptimizedTransition(j).TransitionType != TransitionType.Epsilon)
                         {
                             if (optimizedTransitions != null)
                             {
@@ -619,7 +618,7 @@ namespace Antlr4.Runtime.Atn
                             optimizedTransitions.AddItem(state.GetOptimizedTransition(j_1));
                         }
                     }
-                    for (int j_2 = 0; j_2 < intermediate.GetNumberOfOptimizedTransitions(); j_2++)
+                    for (int j_2 = 0; j_2 < intermediate.NumberOfOptimizedTransitions; j_2++)
                     {
                         ATNState target = intermediate.GetOptimizedTransition(j_2).target;
                         optimizedTransitions.AddItem(new EpsilonTransition(target));
@@ -629,11 +628,11 @@ nextTransition_continue: ;
 nextTransition_break: ;
                 if (optimizedTransitions != null)
                 {
-                    if (state.IsOptimized())
+                    if (state.IsOptimized)
                     {
-                        while (state.GetNumberOfOptimizedTransitions() > 0)
+                        while (state.NumberOfOptimizedTransitions > 0)
                         {
-                            state.RemoveOptimizedTransition(state.GetNumberOfOptimizedTransitions() - 1);
+                            state.RemoveOptimizedTransition(state.NumberOfOptimizedTransitions - 1);
                         }
                     }
                     foreach (Transition transition in optimizedTransitions)
@@ -658,14 +657,14 @@ nextState_break: ;
             foreach (DecisionState decision in decisions)
             {
                 IntervalSet setTransitions = new IntervalSet();
-                for (int i = 0; i < decision.GetNumberOfOptimizedTransitions(); i++)
+                for (int i = 0; i < decision.NumberOfOptimizedTransitions; i++)
                 {
                     Transition epsTransition = decision.GetOptimizedTransition(i);
                     if (!(epsTransition is EpsilonTransition))
                     {
                         continue;
                     }
-                    if (epsTransition.target.GetNumberOfOptimizedTransitions() != 1)
+                    if (epsTransition.target.NumberOfOptimizedTransitions != 1)
                     {
                         continue;
                     }
@@ -690,7 +689,7 @@ nextState_break: ;
                     continue;
                 }
                 IList<Transition> optimizedTransitions = new List<Transition>();
-                for (int i_1 = 0; i_1 < decision.GetNumberOfOptimizedTransitions(); i_1++)
+                for (int i_1 = 0; i_1 < decision.NumberOfOptimizedTransitions; i_1++)
                 {
                     if (!setTransitions.Contains(i_1))
                     {
@@ -740,14 +739,12 @@ nextState_break: ;
                 atn.AddState(setOptimizedState);
                 setOptimizedState.AddTransition(newTransition);
                 optimizedTransitions.AddItem(new EpsilonTransition(setOptimizedState));
-                removedPaths += decision.GetNumberOfOptimizedTransitions() - optimizedTransitions
-                    .Count;
-                if (decision.IsOptimized())
+                removedPaths += decision.NumberOfOptimizedTransitions - optimizedTransitions.Count;
+                if (decision.IsOptimized)
                 {
-                    while (decision.GetNumberOfOptimizedTransitions() > 0)
+                    while (decision.NumberOfOptimizedTransitions > 0)
                     {
-                        decision.RemoveOptimizedTransition(decision.GetNumberOfOptimizedTransitions() - 1
-                            );
+                        decision.RemoveOptimizedTransition(decision.NumberOfOptimizedTransitions - 1);
                     }
                 }
                 foreach (Transition transition_1 in optimizedTransitions)
@@ -772,7 +769,7 @@ nextState_break: ;
                     ruleTransition.tailCall = TestTailCall(atn, ruleTransition, false);
                     ruleTransition.optimizedTailCall = TestTailCall(atn, ruleTransition, true);
                 }
-                if (!state.IsOptimized())
+                if (!state.IsOptimized)
                 {
                     continue;
                 }
@@ -814,7 +811,7 @@ nextState_break: ;
                 {
                     continue;
                 }
-                if (!state.OnlyHasEpsilonTransitions())
+                if (!state.OnlyHasEpsilonTransitions)
                 {
                     return false;
                 }
@@ -822,7 +819,7 @@ nextState_break: ;
                     .transitions;
                 foreach (Transition t in transitions)
                 {
-                    if (t.SerializationType != Transition.Epsilon)
+                    if (t.TransitionType != TransitionType.Epsilon)
                     {
                         return false;
                     }
@@ -838,62 +835,62 @@ nextState_break: ;
         }
 
         [NotNull]
-        public static Transition EdgeFactory(ATN atn, int type, int src, int trg, int arg1
-            , int arg2, int arg3, IList<IntervalSet> sets)
+        public static Transition EdgeFactory(ATN atn, TransitionType type, int src, int trg
+            , int arg1, int arg2, int arg3, IList<IntervalSet> sets)
         {
             ATNState target = atn.states[trg];
             switch (type)
             {
-                case Transition.Epsilon:
+                case TransitionType.Epsilon:
                 {
                     return new EpsilonTransition(target);
                 }
 
-                case Transition.Range:
+                case TransitionType.Range:
                 {
                     return new RangeTransition(target, arg1, arg2);
                 }
 
-                case Transition.Rule:
+                case TransitionType.Rule:
                 {
                     RuleTransition rt = new RuleTransition((RuleStartState)atn.states[arg1], arg2, arg3
                         , target);
                     return rt;
                 }
 
-                case Transition.Predicate:
+                case TransitionType.Predicate:
                 {
                     PredicateTransition pt = new PredicateTransition(target, arg1, arg2, arg3 != 0);
                     return pt;
                 }
 
-                case Transition.Precedence:
+                case TransitionType.Precedence:
                 {
                     return new PrecedencePredicateTransition(target, arg1);
                 }
 
-                case Transition.Atom:
+                case TransitionType.Atom:
                 {
                     return new AtomTransition(target, arg1);
                 }
 
-                case Transition.Action:
+                case TransitionType.Action:
                 {
                     ActionTransition a = new ActionTransition(target, arg1, arg2, arg3 != 0);
                     return a;
                 }
 
-                case Transition.Set:
+                case TransitionType.Set:
                 {
                     return new SetTransition(target, sets[arg1]);
                 }
 
-                case Transition.NotSet:
+                case TransitionType.NotSet:
                 {
                     return new NotSetTransition(target, sets[arg1]);
                 }
 
-                case Transition.Wildcard:
+                case TransitionType.Wildcard:
                 {
                     return new WildcardTransition(target);
                 }
@@ -901,83 +898,83 @@ nextState_break: ;
             throw new ArgumentException("The specified transition type is not valid.");
         }
 
-        public static ATNState StateFactory(int type, int ruleIndex)
+        public static ATNState StateFactory(StateType type, int ruleIndex)
         {
             ATNState s;
             switch (type)
             {
-                case ATNState.InvalidType:
+                case StateType.InvalidType:
                 {
                     return null;
                 }
 
-                case ATNState.Basic:
+                case StateType.Basic:
                 {
                     s = new BasicState();
                     break;
                 }
 
-                case ATNState.RuleStart:
+                case StateType.RuleStart:
                 {
                     s = new RuleStartState();
                     break;
                 }
 
-                case ATNState.BlockStart:
+                case StateType.BlockStart:
                 {
                     s = new BasicBlockStartState();
                     break;
                 }
 
-                case ATNState.PlusBlockStart:
+                case StateType.PlusBlockStart:
                 {
                     s = new PlusBlockStartState();
                     break;
                 }
 
-                case ATNState.StarBlockStart:
+                case StateType.StarBlockStart:
                 {
                     s = new StarBlockStartState();
                     break;
                 }
 
-                case ATNState.TokenStart:
+                case StateType.TokenStart:
                 {
                     s = new TokensStartState();
                     break;
                 }
 
-                case ATNState.RuleStop:
+                case StateType.RuleStop:
                 {
                     s = new RuleStopState();
                     break;
                 }
 
-                case ATNState.BlockEnd:
+                case StateType.BlockEnd:
                 {
                     s = new BlockEndState();
                     break;
                 }
 
-                case ATNState.StarLoopBack:
+                case StateType.StarLoopBack:
                 {
                     s = new StarLoopbackState();
                     break;
                 }
 
-                case ATNState.StarLoopEntry:
+                case StateType.StarLoopEntry:
                 {
                     s = new StarLoopEntryState();
                     break;
                 }
 
-                case ATNState.PlusLoopBack:
+                case StateType.PlusLoopBack:
                 {
                     s = new PlusLoopbackState();
                     break;
                 }
 
-                case ATNState.LoopEnd:
+                case StateType.LoopEnd:
                 {
                     s = new LoopEndState();
                     break;

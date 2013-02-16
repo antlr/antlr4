@@ -39,9 +39,12 @@ namespace Antlr4.Runtime.Atn
             return (StarLoopEntryState)Transition(0).target;
         }
 
-        public override int GetStateType()
+        public override Antlr4.Runtime.Atn.StateType StateType
         {
-            return StarLoopBack;
+            get
+            {
+                return Antlr4.Runtime.Atn.StateType.StarLoopBack;
+            }
         }
     }
 }

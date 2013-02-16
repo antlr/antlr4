@@ -311,7 +311,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     continue;
                 }
-                int n = c.GetState().GetNumberOfOptimizedTransitions();
+                int n = c.GetState().NumberOfOptimizedTransitions;
                 for (int ti = 0; ti < n; ti++)
                 {
                     // for each optimized transition
@@ -364,7 +364,7 @@ namespace Antlr4.Runtime.Atn
         {
             PredictionContext initialContext = PredictionContext.EmptyFull;
             ATNConfigSet configs = new OrderedATNConfigSet();
-            for (int i = 0; i < p.GetNumberOfTransitions(); i++)
+            for (int i = 0; i < p.NumberOfTransitions; i++)
             {
                 ATNState target = p.Transition(i).target;
                 ATNConfig c = ATNConfig.Create(target, i + 1, initialContext);
@@ -432,12 +432,12 @@ namespace Antlr4.Runtime.Atn
                 return false;
             }
             // optimization
-            if (!config.GetState().OnlyHasEpsilonTransitions())
+            if (!config.GetState().OnlyHasEpsilonTransitions)
             {
                 configs.AddItem(config);
             }
             ATNState p = config.GetState();
-            for (int i_1 = 0; i_1 < p.GetNumberOfOptimizedTransitions(); i_1++)
+            for (int i_1 = 0; i_1 < p.NumberOfOptimizedTransitions; i_1++)
             {
                 Transition t = p.GetOptimizedTransition(i_1);
                 ATNConfig c = GetEpsilonTarget(input, config, t, configs, speculative);
@@ -458,9 +458,9 @@ namespace Antlr4.Runtime.Atn
              t, ATNConfigSet configs, bool speculative)
         {
             ATNConfig c;
-            switch (t.SerializationType)
+            switch (t.TransitionType)
             {
-                case Transition.Rule:
+                case TransitionType.Rule:
                 {
                     RuleTransition ruleTransition = (RuleTransition)t;
                     if (optimize_tail_calls && ruleTransition.optimizedTailCall && !config.GetContext
@@ -477,13 +477,13 @@ namespace Antlr4.Runtime.Atn
                     break;
                 }
 
-                case Transition.Precedence:
+                case TransitionType.Precedence:
                 {
                     throw new NotSupportedException("Precedence predicates are not supported in lexers."
                         );
                 }
 
-                case Transition.Predicate:
+                case TransitionType.Predicate:
                 {
                     PredicateTransition pt = (PredicateTransition)t;
                     configs.MarkExplicitSemanticContext();
@@ -498,14 +498,14 @@ namespace Antlr4.Runtime.Atn
                     break;
                 }
 
-                case Transition.Action:
+                case TransitionType.Action:
                 {
                     // ignore actions; just exec one per rule upon accept
                     c = config.Transform(t.target, ((ActionTransition)t).actionIndex);
                     break;
                 }
 
-                case Transition.Epsilon:
+                case TransitionType.Epsilon:
                 {
                     c = config.Transform(t.target);
                     break;

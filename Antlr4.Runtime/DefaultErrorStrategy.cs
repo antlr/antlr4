@@ -205,12 +205,12 @@ namespace Antlr4.Runtime
             {
                 return;
             }
-            switch (s.GetStateType())
+            switch (s.StateType)
             {
-                case ATNState.BlockStart:
-                case ATNState.StarBlockStart:
-                case ATNState.PlusBlockStart:
-                case ATNState.StarLoopEntry:
+                case StateType.BlockStart:
+                case StateType.StarBlockStart:
+                case StateType.PlusBlockStart:
+                case StateType.StarLoopEntry:
                 {
                     // report error and recover if possible
                     if (SingleTokenDeletion(recognizer) != null)
@@ -220,8 +220,8 @@ namespace Antlr4.Runtime
                     throw new InputMismatchException(recognizer);
                 }
 
-                case ATNState.PlusLoopBack:
-                case ATNState.StarLoopBack:
+                case StateType.PlusLoopBack:
+                case StateType.StarLoopBack:
                 {
                     //			System.err.println("at loop back: "+s.getClass().getSimpleName());
                     ReportUnwantedToken(recognizer);

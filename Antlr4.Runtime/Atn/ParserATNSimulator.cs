@@ -717,7 +717,7 @@ namespace Antlr4.Runtime.Atn
                                 System.Diagnostics.Debug.Assert(D.isAcceptState);
                                 if (D.configs.HasSemanticContext())
                                 {
-                                    int nalts = decState.GetNumberOfTransitions();
+                                    int nalts = decState.NumberOfTransitions;
                                     DFAState.PredPrediction[] predPredictions = D.predicates;
                                     if (predPredictions != null)
                                     {
@@ -883,7 +883,7 @@ namespace Antlr4.Runtime.Atn
                         }
                         continue;
                     }
-                    int n = c.GetState().GetNumberOfOptimizedTransitions();
+                    int n = c.GetState().NumberOfOptimizedTransitions;
                     for (int ti = 0; ti < n; ti++)
                     {
                         // for each optimized transition
@@ -1068,7 +1068,7 @@ namespace Antlr4.Runtime.Atn
             while (true)
             {
                 ATNConfigSet reachIntermediate = new ATNConfigSet();
-                int n = p.GetNumberOfTransitions();
+                int n = p.NumberOfTransitions;
                 for (int ti = 0; ti < n; ti++)
                 {
                     // for each transition
@@ -1364,11 +1364,11 @@ namespace Antlr4.Runtime.Atn
             }
             ATNState p = config.GetState();
             // optimization
-            if (!p.OnlyHasEpsilonTransitions())
+            if (!p.OnlyHasEpsilonTransitions)
             {
                 configs.Add(config, contextCache);
             }
-            for (int i_1 = 0; i_1 < p.GetNumberOfOptimizedTransitions(); i_1++)
+            for (int i_1 = 0; i_1 < p.NumberOfOptimizedTransitions; i_1++)
             {
                 Transition t = p.GetOptimizedTransition(i_1);
                 bool continueCollecting = !(t is Antlr4.Runtime.Atn.ActionTransition) && collectPredicates;
@@ -1387,23 +1387,23 @@ namespace Antlr4.Runtime.Atn
                     if (optimize_closure_busy)
                     {
                         bool checkClosure = false;
-                        switch (c.GetState().GetStateType())
+                        switch (c.GetState().StateType)
                         {
-                            case ATNState.StarLoopEntry:
-                            case ATNState.BlockEnd:
-                            case ATNState.LoopEnd:
+                            case StateType.StarLoopEntry:
+                            case StateType.BlockEnd:
+                            case StateType.LoopEnd:
                             {
                                 checkClosure = true;
                                 break;
                             }
 
-                            case ATNState.PlusBlockStart:
+                            case StateType.PlusBlockStart:
                             {
                                 checkClosure = true;
                                 break;
                             }
 
-                            case ATNState.RuleStop:
+                            case StateType.RuleStop:
                             {
                                 checkClosure = c.GetContext().IsEmpty;
                                 break;
@@ -1484,31 +1484,31 @@ namespace Antlr4.Runtime.Atn
         public virtual ATNConfig GetEpsilonTarget(ATNConfig config, Transition t, bool collectPredicates
             , bool inContext, PredictionContextCache contextCache)
         {
-            switch (t.SerializationType)
+            switch (t.TransitionType)
             {
-                case Transition.Rule:
+                case TransitionType.Rule:
                 {
                     return RuleTransition(config, (Antlr4.Runtime.Atn.RuleTransition)t, contextCache);
                 }
 
-                case Transition.Precedence:
+                case TransitionType.Precedence:
                 {
                     return PrecedenceTransition(config, (PrecedencePredicateTransition)t, collectPredicates
                         , inContext);
                 }
 
-                case Transition.Predicate:
+                case TransitionType.Predicate:
                 {
                     return PredTransition(config, (PredicateTransition)t, collectPredicates, inContext
                         );
                 }
 
-                case Transition.Action:
+                case TransitionType.Action:
                 {
                     return ActionTransition(config, (Antlr4.Runtime.Atn.ActionTransition)t);
                 }
 
-                case Transition.Epsilon:
+                case TransitionType.Epsilon:
                 {
                     return config.Transform(t.target);
                 }
@@ -1597,8 +1597,7 @@ namespace Antlr4.Runtime.Atn
 
             public int Compare(ATNConfig o1, ATNConfig o2)
             {
-                int diff = o1.GetState().GetNonStopStateNumber() - o2.GetState().GetNonStopStateNumber
-                    ();
+                int diff = o1.GetState().NonStopStateNumber - o2.GetState().NonStopStateNumber;
                 if (diff != 0)
                 {
                     return diff;
@@ -1632,11 +1631,11 @@ namespace Antlr4.Runtime.Atn
             // quick check 1 & 2 => if we assume #1 holds and check #2 against the
             // minAlt from the first state, #2 will fail if the assumption was
             // incorrect
-            int currentState = configs[0].GetState().GetNonStopStateNumber();
+            int currentState = configs[0].GetState().NonStopStateNumber;
             for (int i = 0; i < configs.Count; i++)
             {
                 ATNConfig config = configs[i];
-                int stateNumber = config.GetState().GetNonStopStateNumber();
+                int stateNumber = config.GetState().NonStopStateNumber;
                 if (stateNumber != currentState)
                 {
                     if (config.GetAlt() != minAlt)
@@ -1649,14 +1648,14 @@ namespace Antlr4.Runtime.Atn
             BitArray representedAlts = null;
             if (exact)
             {
-                currentState = configs[0].GetState().GetNonStopStateNumber();
+                currentState = configs[0].GetState().NonStopStateNumber;
                 // get the represented alternatives of the first state
                 representedAlts = new BitArray();
                 int maxAlt = minAlt;
                 for (int i_1 = 0; i_1 < configs.Count; i_1++)
                 {
                     ATNConfig config = configs[i_1];
-                    if (config.GetState().GetNonStopStateNumber() != currentState)
+                    if (config.GetState().NonStopStateNumber != currentState)
                     {
                         break;
                     }
@@ -1665,12 +1664,12 @@ namespace Antlr4.Runtime.Atn
                     maxAlt = alt;
                 }
                 // quick check #3:
-                currentState = configs[0].GetState().GetNonStopStateNumber();
+                currentState = configs[0].GetState().NonStopStateNumber;
                 int currentAlt = minAlt;
                 for (int i_2 = 0; i_2 < configs.Count; i_2++)
                 {
                     ATNConfig config = configs[i_2];
-                    int stateNumber = config.GetState().GetNonStopStateNumber();
+                    int stateNumber = config.GetState().NonStopStateNumber;
                     int alt = config.GetAlt();
                     if (stateNumber != currentState)
                     {
@@ -1694,7 +1693,7 @@ namespace Antlr4.Runtime.Atn
                     }
                 }
             }
-            currentState = configs[0].GetState().GetNonStopStateNumber();
+            currentState = configs[0].GetState().NonStopStateNumber;
             int firstIndexCurrentState = 0;
             int lastIndexCurrentStateMinAlt = 0;
             PredictionContext joinedCheckContext = configs[0].GetContext();
@@ -1705,7 +1704,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     break;
                 }
-                if (config.GetState().GetNonStopStateNumber() != currentState)
+                if (config.GetState().NonStopStateNumber != currentState)
                 {
                     break;
                 }
@@ -1718,9 +1717,9 @@ namespace Antlr4.Runtime.Atn
                 ATNConfig config = configs[i_4];
                 ATNState state = config.GetState();
                 alts.Set(config.GetAlt());
-                if (state.GetNonStopStateNumber() != currentState)
+                if (state.NonStopStateNumber != currentState)
                 {
-                    currentState = state.GetNonStopStateNumber();
+                    currentState = state.NonStopStateNumber;
                     firstIndexCurrentState = i_4;
                     lastIndexCurrentStateMinAlt = i_4;
                     joinedCheckContext = config.GetContext();
@@ -1731,7 +1730,7 @@ namespace Antlr4.Runtime.Atn
                         {
                             break;
                         }
-                        if (config2.GetState().GetNonStopStateNumber() != currentState)
+                        if (config2.GetState().NonStopStateNumber != currentState)
                         {
                             break;
                         }
@@ -1751,7 +1750,7 @@ namespace Antlr4.Runtime.Atn
                     {
                         break;
                     }
-                    if (config2.GetState().GetNonStopStateNumber() != currentState)
+                    if (config2.GetState().NonStopStateNumber != currentState)
                     {
                         break;
                     }
@@ -1859,7 +1858,7 @@ namespace Antlr4.Runtime.Atn
             foreach (ATNConfig c in nvae.GetDeadEndConfigs())
             {
                 string trans = "no edges";
-                if (c.GetState().GetNumberOfOptimizedTransitions() > 0)
+                if (c.GetState().NumberOfOptimizedTransitions > 0)
                 {
                     Transition t = c.GetState().GetOptimizedTransition(0);
                     if (t is AtomTransition)
@@ -2054,7 +2053,7 @@ namespace Antlr4.Runtime.Atn
             }
             if (newState.isAcceptState && configs.HasSemanticContext())
             {
-                PredicateDFAState(newState, configs, decisionState.GetNumberOfTransitions());
+                PredicateDFAState(newState, configs, decisionState.NumberOfTransitions);
             }
             DFAState added = dfa.AddState(newState);
             if (debug && added == newState)
@@ -2168,8 +2167,8 @@ namespace Antlr4.Runtime.Atn
             while (!context.IsEmpty())
             {
                 ATNState state = atn.states[context.invokingState];
-                System.Diagnostics.Debug.Assert(state.GetNumberOfTransitions() == 1 && state.Transition
-                    (0).SerializationType == Transition.Rule);
+                System.Diagnostics.Debug.Assert(state.NumberOfTransitions == 1 && state.Transition
+                    (0).TransitionType == TransitionType.Rule);
                 Antlr4.Runtime.Atn.RuleTransition transition = (Antlr4.Runtime.Atn.RuleTransition
                     )state.Transition(0);
                 if (!transition.tailCall)
