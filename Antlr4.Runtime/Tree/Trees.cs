@@ -28,12 +28,10 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
-using Antlr4.Runtime.Tree.Gui;
 using Sharpen;
 
 namespace Antlr4.Runtime.Tree
@@ -42,36 +40,6 @@ namespace Antlr4.Runtime.Tree
     /// <remarks>A set of utility routines useful for all kinds of ANTLR trees.</remarks>
     public class Trees
     {
-        public static string GetPS(ITree t, IList<string> ruleNames, string fontName, int
-             fontSize)
-        {
-            TreePostScriptGenerator psgen = new TreePostScriptGenerator(ruleNames, t, fontName
-                , fontSize);
-            return psgen.GetPS();
-        }
-
-        public static string GetPS(ITree t, IList<string> ruleNames)
-        {
-            return GetPS(t, ruleNames, "Helvetica", 11);
-        }
-
-        /// <exception cref="System.IO.IOException"></exception>
-        public static void WritePS(ITree t, IList<string> ruleNames, string fileName, string
-             fontName, int fontSize)
-        {
-            string ps = GetPS(t, ruleNames, fontName, fontSize);
-            FileWriter f = new FileWriter(fileName);
-            BufferedWriter bw = new BufferedWriter(f);
-            bw.Write(ps);
-            bw.Close();
-        }
-
-        /// <exception cref="System.IO.IOException"></exception>
-        public static void WritePS(ITree t, IList<string> ruleNames, string fileName)
-        {
-            WritePS(t, ruleNames, fileName, "Helvetica", 11);
-        }
-
         /// <summary>Print out a whole tree in LISP form.</summary>
         /// <remarks>
         /// Print out a whole tree in LISP form.

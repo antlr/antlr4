@@ -856,7 +856,7 @@ namespace Antlr4.Runtime.Atn
                     );
             }
             IList<ATNConfig> closureConfigs = new List<ATNConfig>(s0.configs);
-            IntegerList contextElements = null;
+            List<int> contextElements = null;
             ATNConfigSet reach = new ATNConfigSet();
             bool stepIntoGlobal;
             do
@@ -926,7 +926,7 @@ namespace Antlr4.Runtime.Atn
                     int nextContextElement = GetReturnState(remainingGlobalContext);
                     if (contextElements == null)
                     {
-                        contextElements = new IntegerList();
+                        contextElements = new List<int>();
                     }
                     if (remainingGlobalContext.IsEmpty())
                     {
@@ -1928,7 +1928,7 @@ namespace Antlr4.Runtime.Atn
 
         [NotNull]
         protected internal virtual DFAState AddDFAEdge(DFA dfa, DFAState fromState, int t
-            , IntegerList contextTransitions, ATNConfigSet toConfigs, PredictionContextCache
+            , List<int> contextTransitions, ATNConfigSet toConfigs, PredictionContextCache
              contextCache)
         {
             System.Diagnostics.Debug.Assert(dfa.IsContextSensitive() || contextTransitions ==

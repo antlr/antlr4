@@ -706,9 +706,9 @@ namespace Antlr4.Runtime.Misc
             return n;
         }
 
-        public virtual IntegerList ToIntegerList()
+        public virtual List<int> ToIntegerList()
         {
-            IntegerList values = new IntegerList(Size());
+            List<int> values = new List<int>(Size());
             int n = intervals.Count;
             for (int i = 0; i < n; i++)
             {

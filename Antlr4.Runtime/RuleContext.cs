@@ -32,8 +32,6 @@ using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
-using Antlr4.Runtime.Tree.Gui;
-using Javax.Swing;
 using Sharpen;
 
 namespace Antlr4.Runtime
@@ -193,21 +191,6 @@ namespace Antlr4.Runtime
         public virtual T Accept<T, _T1>(IParseTreeVisitor<_T1> visitor) where _T1:T
         {
             return visitor.VisitChildren(this);
-        }
-
-        /// <summary>Call this method to view a parse tree in a dialog box visually.</summary>
-        /// <remarks>Call this method to view a parse tree in a dialog box visually.</remarks>
-        public virtual IFuture<JDialog> Inspect(Parser parser)
-        {
-            IList<string> ruleNames = parser != null ? Arrays.AsList(parser.GetRuleNames()) : 
-                null;
-            return Inspect(ruleNames);
-        }
-
-        public virtual IFuture<JDialog> Inspect(IList<string> ruleNames)
-        {
-            TreeViewer viewer = new TreeViewer(ruleNames, this);
-            return viewer.Open();
         }
 
         /// <summary>Save this tree in a postscript file</summary>
