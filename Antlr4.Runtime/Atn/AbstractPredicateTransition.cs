@@ -32,11 +32,11 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	/// <author>Sam Harwell</author>
-	public abstract class AbstractPredicateTransition : Transition
-	{
-		protected internal AbstractPredicateTransition(ATNState target) : base(target)
-		{
-		}
-	}
+    /// <author>Sam Harwell</author>
+    public abstract class AbstractPredicateTransition : Transition
+    {
+        protected internal AbstractPredicateTransition(ATNState target) : base(target)
+        {
+        }
+    }
 }

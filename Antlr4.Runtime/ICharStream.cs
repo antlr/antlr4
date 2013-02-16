@@ -33,80 +33,80 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-	/// <summary>A source of characters for an ANTLR lexer.</summary>
-	/// <remarks>A source of characters for an ANTLR lexer.</remarks>
-	public abstract class ICharStream : IIntStream
-	{
-		/// <summary>
-		/// The minimum allowed value for a character in a
-		/// <code>CharStream</code>
-		/// .
-		/// </summary>
-		public const int MinChar = char.MinValue;
+    /// <summary>A source of characters for an ANTLR lexer.</summary>
+    /// <remarks>A source of characters for an ANTLR lexer.</remarks>
+    public abstract class ICharStream : IIntStream
+    {
+        /// <summary>
+        /// The minimum allowed value for a character in a
+        /// <code>CharStream</code>
+        /// .
+        /// </summary>
+        public const int MinChar = char.MinValue;
 
-		/// <summary>
-		/// The maximum allowed value for a character in a
-		/// <code>CharStream</code>
-		/// .
-		/// <p/>
-		/// This value is
-		/// <code>Character.MAX_VALUE - 1</code>
-		/// , which reserves the value
-		/// <code>Character.MAX_VALUE</code>
-		/// for special use within an implementing class.
-		/// For some implementations, the data buffers required for supporting the
-		/// marked ranges of
-		/// <see cref="IIntStream">IIntStream</see>
-		/// are stored as
-		/// <code>char[]</code>
-		/// instead
-		/// of
-		/// <code>int[]</code>
-		/// , with
-		/// <code>Character.MAX_VALUE</code>
-		/// being used instead of
-		/// <code>-1</code>
-		/// to mark the end of the stream internally.
-		/// </summary>
-		public const int MaxChar = char.MaxValue - 1;
+        /// <summary>
+        /// The maximum allowed value for a character in a
+        /// <code>CharStream</code>
+        /// .
+        /// <p/>
+        /// This value is
+        /// <code>Character.MAX_VALUE - 1</code>
+        /// , which reserves the value
+        /// <code>Character.MAX_VALUE</code>
+        /// for special use within an implementing class.
+        /// For some implementations, the data buffers required for supporting the
+        /// marked ranges of
+        /// <see cref="IIntStream">IIntStream</see>
+        /// are stored as
+        /// <code>char[]</code>
+        /// instead
+        /// of
+        /// <code>int[]</code>
+        /// , with
+        /// <code>Character.MAX_VALUE</code>
+        /// being used instead of
+        /// <code>-1</code>
+        /// to mark the end of the stream internally.
+        /// </summary>
+        public const int MaxChar = char.MaxValue - 1;
 
-		/// <summary>
-		/// This method returns the text for a range of characters within this input
-		/// stream.
-		/// </summary>
-		/// <remarks>
-		/// This method returns the text for a range of characters within this input
-		/// stream. This method is guaranteed to not throw an exception if the
-		/// specified
-		/// <code>interval</code>
-		/// lies entirely within a marked range. For more
-		/// information about marked ranges, see
-		/// <see cref="IIntStream.Mark()">IIntStream.Mark()</see>
-		/// .
-		/// </remarks>
-		/// <param name="interval">an interval within the stream</param>
-		/// <returns>the text of the specified interval</returns>
-		/// <exception cref="System.ArgumentNullException">
-		/// if
-		/// <code>interval</code>
-		/// is
-		/// <code>null</code>
-		/// </exception>
-		/// <exception cref="System.ArgumentException">
-		/// if
-		/// <code>interval.a &lt; 0</code>
-		/// , or if
-		/// <code>interval.b &lt; interval.a - 1</code>
-		/// , or if
-		/// <code>interval.b</code>
-		/// lies at or
-		/// past the end of the stream
-		/// </exception>
-		/// <exception cref="System.NotSupportedException">
-		/// if the stream does not support
-		/// getting the text of the specified interval
-		/// </exception>
-		[NotNull]
-		public abstract string GetText(Interval interval);
-	}
+        /// <summary>
+        /// This method returns the text for a range of characters within this input
+        /// stream.
+        /// </summary>
+        /// <remarks>
+        /// This method returns the text for a range of characters within this input
+        /// stream. This method is guaranteed to not throw an exception if the
+        /// specified
+        /// <code>interval</code>
+        /// lies entirely within a marked range. For more
+        /// information about marked ranges, see
+        /// <see cref="IIntStream.Mark()">IIntStream.Mark()</see>
+        /// .
+        /// </remarks>
+        /// <param name="interval">an interval within the stream</param>
+        /// <returns>the text of the specified interval</returns>
+        /// <exception cref="System.ArgumentNullException">
+        /// if
+        /// <code>interval</code>
+        /// is
+        /// <code>null</code>
+        /// </exception>
+        /// <exception cref="System.ArgumentException">
+        /// if
+        /// <code>interval.a &lt; 0</code>
+        /// , or if
+        /// <code>interval.b &lt; interval.a - 1</code>
+        /// , or if
+        /// <code>interval.b</code>
+        /// lies at or
+        /// past the end of the stream
+        /// </exception>
+        /// <exception cref="System.NotSupportedException">
+        /// if the stream does not support
+        /// getting the text of the specified interval
+        /// </exception>
+        [NotNull]
+        public abstract string GetText(Interval interval);
+    }
 }

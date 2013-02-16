@@ -34,111 +34,111 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Dfa
 {
-	public class DFA
-	{
-		/// <summary>A set of all DFA states.</summary>
-		/// <remarks>
-		/// A set of all DFA states. Use
-		/// <see cref="System.Collections.IDictionary{K, V}">System.Collections.IDictionary&lt;K, V&gt;
-		/// 	</see>
-		/// so we can get old state back
-		/// (
-		/// <see cref="Sharpen.ISet{E}">Sharpen.ISet&lt;E&gt;</see>
-		/// only allows you to see if it's there).
-		/// </remarks>
-		[NotNull]
-		public readonly IConcurrentMap<DFAState, DFAState> states = new ConcurrentHashMap
-			<DFAState, DFAState>();
+    public class DFA
+    {
+        /// <summary>A set of all DFA states.</summary>
+        /// <remarks>
+        /// A set of all DFA states. Use
+        /// <see cref="System.Collections.IDictionary{K, V}">System.Collections.IDictionary&lt;K, V&gt;
+        ///     </see>
+        /// so we can get old state back
+        /// (
+        /// <see cref="Sharpen.ISet{E}">Sharpen.ISet&lt;E&gt;</see>
+        /// only allows you to see if it's there).
+        /// </remarks>
+        [NotNull]
+        public readonly IConcurrentMap<DFAState, DFAState> states = new ConcurrentHashMap
+            <DFAState, DFAState>();
 
-		[Nullable]
-		public readonly AtomicReference<DFAState> s0 = new AtomicReference<DFAState>();
+        [Nullable]
+        public readonly AtomicReference<DFAState> s0 = new AtomicReference<DFAState>();
 
-		[Nullable]
-		public readonly AtomicReference<DFAState> s0full = new AtomicReference<DFAState>(
-			);
+        [Nullable]
+        public readonly AtomicReference<DFAState> s0full = new AtomicReference<DFAState>(
+            );
 
-		public readonly int decision;
+        public readonly int decision;
 
-		/// <summary>From which ATN state did we create this DFA?</summary>
-		[NotNull]
-		public readonly ATNState atnStartState;
+        /// <summary>From which ATN state did we create this DFA?</summary>
+        [NotNull]
+        public readonly ATNState atnStartState;
 
-		private readonly AtomicInteger nextStateNumber = new AtomicInteger();
+        private readonly AtomicInteger nextStateNumber = new AtomicInteger();
 
-		/// <summary>
-		/// Set of configs for a DFA state with at least one conflict? Mainly used as "return value"
-		/// from
-		/// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.PredictATN(DFA, Antlr4.Runtime.ITokenStream, Antlr4.Runtime.ParserRuleContext, bool)
-		/// 	">Antlr4.Runtime.Atn.ParserATNSimulator.PredictATN(DFA, Antlr4.Runtime.ITokenStream, Antlr4.Runtime.ParserRuleContext, bool)
-		/// 	</see>
-		/// for retry.
-		/// </summary>
-		public DFA(ATNState atnStartState) : this(atnStartState, 0)
-		{
-		}
+        /// <summary>
+        /// Set of configs for a DFA state with at least one conflict? Mainly used as "return value"
+        /// from
+        /// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.PredictATN(DFA, Antlr4.Runtime.ITokenStream, Antlr4.Runtime.ParserRuleContext, bool)
+        ///     ">Antlr4.Runtime.Atn.ParserATNSimulator.PredictATN(DFA, Antlr4.Runtime.ITokenStream, Antlr4.Runtime.ParserRuleContext, bool)
+        ///     </see>
+        /// for retry.
+        /// </summary>
+        public DFA(ATNState atnStartState) : this(atnStartState, 0)
+        {
+        }
 
-		public DFA(ATNState atnStartState, int decision)
-		{
-			//	public OrderedHashSet<ATNConfig> conflictSet;
-			this.atnStartState = atnStartState;
-			this.decision = decision;
-		}
+        public DFA(ATNState atnStartState, int decision)
+        {
+            //	public OrderedHashSet<ATNConfig> conflictSet;
+            this.atnStartState = atnStartState;
+            this.decision = decision;
+        }
 
-		public virtual bool IsEmpty()
-		{
-			return s0.Get() == null && s0full.Get() == null;
-		}
+        public virtual bool IsEmpty()
+        {
+            return s0.Get() == null && s0full.Get() == null;
+        }
 
-		public virtual bool IsContextSensitive()
-		{
-			return s0full.Get() != null;
-		}
+        public virtual bool IsContextSensitive()
+        {
+            return s0full.Get() != null;
+        }
 
-		public virtual DFAState AddState(DFAState state)
-		{
-			state.stateNumber = nextStateNumber.GetAndIncrement();
-			DFAState existing = states.PutIfAbsent(state, state);
-			if (existing != null)
-			{
-				return existing;
-			}
-			return state;
-		}
+        public virtual DFAState AddState(DFAState state)
+        {
+            state.stateNumber = nextStateNumber.GetAndIncrement();
+            DFAState existing = states.PutIfAbsent(state, state);
+            if (existing != null)
+            {
+                return existing;
+            }
+            return state;
+        }
 
-		public override string ToString()
-		{
-			return ToString(null);
-		}
+        public override string ToString()
+        {
+            return ToString(null);
+        }
 
-		public virtual string ToString(string[] tokenNames)
-		{
-			if (s0.Get() == null)
-			{
-				return string.Empty;
-			}
-			DFASerializer serializer = new DFASerializer(this, tokenNames);
-			return serializer.ToString();
-		}
+        public virtual string ToString(string[] tokenNames)
+        {
+            if (s0.Get() == null)
+            {
+                return string.Empty;
+            }
+            DFASerializer serializer = new DFASerializer(this, tokenNames);
+            return serializer.ToString();
+        }
 
-		public virtual string ToString(string[] tokenNames, string[] ruleNames)
-		{
-			if (s0.Get() == null)
-			{
-				return string.Empty;
-			}
-			DFASerializer serializer = new DFASerializer(this, tokenNames, ruleNames, atnStartState
-				.atn);
-			return serializer.ToString();
-		}
+        public virtual string ToString(string[] tokenNames, string[] ruleNames)
+        {
+            if (s0.Get() == null)
+            {
+                return string.Empty;
+            }
+            DFASerializer serializer = new DFASerializer(this, tokenNames, ruleNames, atnStartState
+                .atn);
+            return serializer.ToString();
+        }
 
-		public virtual string ToLexerString()
-		{
-			if (s0.Get() == null)
-			{
-				return string.Empty;
-			}
-			DFASerializer serializer = new LexerDFASerializer(this);
-			return serializer.ToString();
-		}
-	}
+        public virtual string ToLexerString()
+        {
+            if (s0.Get() == null)
+            {
+                return string.Empty;
+            }
+            DFASerializer serializer = new LexerDFASerializer(this);
+            return serializer.ToString();
+        }
+    }
 }

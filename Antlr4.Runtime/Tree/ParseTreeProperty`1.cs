@@ -33,39 +33,39 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
-	/// <summary>Associate a property with a parse tree node.</summary>
-	/// <remarks>
-	/// Associate a property with a parse tree node. Useful with parse tree listeners
-	/// that need to associate values with particular tree nodes, kind of like
-	/// specifying a return value for the listener event method that visited a
-	/// particular node. Example:
-	/// <pre>
-	/// ParseTreeProperty&lt;Integer&gt; values = new ParseTreeProperty&lt;Integer&gt;();
-	/// values.put(tree, 36);
-	/// int x = values.get(tree);
-	/// values.removeFrom(tree);
-	/// </pre>
-	/// You would make one decl (values here) in the listener and use lots of times
-	/// in your event methods.
-	/// </remarks>
-	public class ParseTreeProperty<V>
-	{
-		protected internal IDictionary<IParseTree, V> annotations = new IdentityHashMap<IParseTree
-			, V>();
+    /// <summary>Associate a property with a parse tree node.</summary>
+    /// <remarks>
+    /// Associate a property with a parse tree node. Useful with parse tree listeners
+    /// that need to associate values with particular tree nodes, kind of like
+    /// specifying a return value for the listener event method that visited a
+    /// particular node. Example:
+    /// <pre>
+    /// ParseTreeProperty&lt;Integer&gt; values = new ParseTreeProperty&lt;Integer&gt;();
+    /// values.put(tree, 36);
+    /// int x = values.get(tree);
+    /// values.removeFrom(tree);
+    /// </pre>
+    /// You would make one decl (values here) in the listener and use lots of times
+    /// in your event methods.
+    /// </remarks>
+    public class ParseTreeProperty<V>
+    {
+        protected internal IDictionary<IParseTree, V> annotations = new IdentityHashMap<IParseTree
+            , V>();
 
-		public virtual V Get(IParseTree node)
-		{
-			return annotations.Get(node);
-		}
+        public virtual V Get(IParseTree node)
+        {
+            return annotations.Get(node);
+        }
 
-		public virtual void Put(IParseTree node, V value)
-		{
-			annotations.Put(node, value);
-		}
+        public virtual void Put(IParseTree node, V value)
+        {
+            annotations.Put(node, value);
+        }
 
-		public virtual V RemoveFrom(IParseTree node)
-		{
-			return Sharpen.Collections.Remove(annotations, node);
-		}
-	}
+        public virtual V RemoveFrom(IParseTree node)
+        {
+            return Sharpen.Collections.Remove(annotations, node);
+        }
+    }
 }

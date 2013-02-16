@@ -32,25 +32,25 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	/// <summary>
-	/// Start of
-	/// <code>(A|B|...)+</code>
-	/// loop. Technically a decision state, but
-	/// we don't use for code generation; somebody might need it, so I'm defining
-	/// it for completeness. In reality, the
-	/// <see cref="PlusLoopbackState">PlusLoopbackState</see>
-	/// node is the
-	/// real decision-making note for
-	/// <code>A+</code>
-	/// .
-	/// </summary>
-	public sealed class PlusBlockStartState : BlockStartState
-	{
-		public PlusLoopbackState loopBackState;
+    /// <summary>
+    /// Start of
+    /// <code>(A|B|...)+</code>
+    /// loop. Technically a decision state, but
+    /// we don't use for code generation; somebody might need it, so I'm defining
+    /// it for completeness. In reality, the
+    /// <see cref="PlusLoopbackState">PlusLoopbackState</see>
+    /// node is the
+    /// real decision-making note for
+    /// <code>A+</code>
+    /// .
+    /// </summary>
+    public sealed class PlusBlockStartState : BlockStartState
+    {
+        public PlusLoopbackState loopBackState;
 
-		public override int GetStateType()
-		{
-			return PlusBlockStart;
-		}
-	}
+        public override int GetStateType()
+        {
+            return PlusBlockStart;
+        }
+    }
 }

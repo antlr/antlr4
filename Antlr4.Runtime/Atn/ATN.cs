@@ -35,189 +35,189 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	public class ATN
-	{
-		public const int InvalidAltNumber = 0;
+    public class ATN
+    {
+        public const int InvalidAltNumber = 0;
 
-		public const int Parser = 1;
+        public const int Parser = 1;
 
-		public const int Lexer = 2;
+        public const int Lexer = 2;
 
-		[NotNull]
-		public readonly IList<ATNState> states = new List<ATNState>();
+        [NotNull]
+        public readonly IList<ATNState> states = new List<ATNState>();
 
-		/// <summary>
-		/// Each subrule/rule is a decision point and we must track them so we
-		/// can go back later and build DFA predictors for them.
-		/// </summary>
-		/// <remarks>
-		/// Each subrule/rule is a decision point and we must track them so we
-		/// can go back later and build DFA predictors for them.  This includes
-		/// all the rules, subrules, optional blocks, ()+, ()* etc...
-		/// </remarks>
-		[NotNull]
-		public readonly IList<DecisionState> decisionToState = new List<DecisionState>();
+        /// <summary>
+        /// Each subrule/rule is a decision point and we must track them so we
+        /// can go back later and build DFA predictors for them.
+        /// </summary>
+        /// <remarks>
+        /// Each subrule/rule is a decision point and we must track them so we
+        /// can go back later and build DFA predictors for them.  This includes
+        /// all the rules, subrules, optional blocks, ()+, ()* etc...
+        /// </remarks>
+        [NotNull]
+        public readonly IList<DecisionState> decisionToState = new List<DecisionState>();
 
-		public RuleStartState[] ruleToStartState;
+        public RuleStartState[] ruleToStartState;
 
-		public RuleStopState[] ruleToStopState;
+        public RuleStopState[] ruleToStopState;
 
-		[NotNull]
-		public readonly IDictionary<string, TokensStartState> modeNameToStartState = new 
-			LinkedHashMap<string, TokensStartState>();
+        [NotNull]
+        public readonly IDictionary<string, TokensStartState> modeNameToStartState = new 
+            LinkedHashMap<string, TokensStartState>();
 
-		public int grammarType;
+        public int grammarType;
 
-		public int maxTokenType;
+        public int maxTokenType;
 
-		public int[] ruleToTokenType;
+        public int[] ruleToTokenType;
 
-		public int[] ruleToActionIndex;
+        public int[] ruleToActionIndex;
 
-		[NotNull]
-		public readonly IList<TokensStartState> modeToStartState = new List<TokensStartState
-			>();
+        [NotNull]
+        public readonly IList<TokensStartState> modeToStartState = new List<TokensStartState
+            >();
 
-		/// <summary>used during construction from grammar AST</summary>
-		internal int stateNumber = 0;
+        /// <summary>used during construction from grammar AST</summary>
+        internal int stateNumber = 0;
 
-		private readonly IConcurrentMap<PredictionContext, PredictionContext> contextCache
-			 = new ConcurrentHashMap<PredictionContext, PredictionContext>();
+        private readonly IConcurrentMap<PredictionContext, PredictionContext> contextCache
+             = new ConcurrentHashMap<PredictionContext, PredictionContext>();
 
-		[NotNull]
-		public DFA[] decisionToDFA = new DFA[0];
+        [NotNull]
+        public DFA[] decisionToDFA = new DFA[0];
 
-		[NotNull]
-		public DFA[] modeToDFA = new DFA[0];
+        [NotNull]
+        public DFA[] modeToDFA = new DFA[0];
 
-		protected internal readonly IConcurrentMap<int, int> LL1Table = new ConcurrentHashMap
-			<int, int>();
+        protected internal readonly IConcurrentMap<int, int> LL1Table = new ConcurrentHashMap
+            <int, int>();
 
-		/// <summary>Used for runtime deserialization of ATNs from strings</summary>
-		public ATN()
-		{
-		}
+        /// <summary>Used for runtime deserialization of ATNs from strings</summary>
+        public ATN()
+        {
+        }
 
-		// runtime for parsers, lexers
-		// ATN.LEXER, ...
-		// runtime for lexer only
-		public void ClearDFA()
-		{
-			decisionToDFA = new DFA[decisionToState.Count];
-			for (int i = 0; i < decisionToDFA.Length; i++)
-			{
-				decisionToDFA[i] = new DFA(decisionToState[i], i);
-			}
-			modeToDFA = new DFA[modeToStartState.Count];
-			for (int i_1 = 0; i_1 < modeToDFA.Length; i_1++)
-			{
-				modeToDFA[i_1] = new DFA(modeToStartState[i_1]);
-			}
-			contextCache.Clear();
-			LL1Table.Clear();
-		}
+        // runtime for parsers, lexers
+        // ATN.LEXER, ...
+        // runtime for lexer only
+        public void ClearDFA()
+        {
+            decisionToDFA = new DFA[decisionToState.Count];
+            for (int i = 0; i < decisionToDFA.Length; i++)
+            {
+                decisionToDFA[i] = new DFA(decisionToState[i], i);
+            }
+            modeToDFA = new DFA[modeToStartState.Count];
+            for (int i_1 = 0; i_1 < modeToDFA.Length; i_1++)
+            {
+                modeToDFA[i_1] = new DFA(modeToStartState[i_1]);
+            }
+            contextCache.Clear();
+            LL1Table.Clear();
+        }
 
-		public virtual int GetContextCacheSize()
-		{
-			return contextCache.Count;
-		}
+        public virtual int GetContextCacheSize()
+        {
+            return contextCache.Count;
+        }
 
-		public virtual PredictionContext GetCachedContext(PredictionContext context)
-		{
-			return PredictionContext.GetCachedContext(context, contextCache, new PredictionContext.IdentityHashMap
-				());
-		}
+        public virtual PredictionContext GetCachedContext(PredictionContext context)
+        {
+            return PredictionContext.GetCachedContext(context, contextCache, new PredictionContext.IdentityHashMap
+                ());
+        }
 
-		public DFA[] GetDecisionToDFA()
-		{
-			System.Diagnostics.Debug.Assert(decisionToDFA != null && decisionToDFA.Length == 
-				decisionToState.Count);
-			return decisionToDFA;
-		}
+        public DFA[] GetDecisionToDFA()
+        {
+            System.Diagnostics.Debug.Assert(decisionToDFA != null && decisionToDFA.Length == 
+                decisionToState.Count);
+            return decisionToDFA;
+        }
 
-		/// <summary>Compute the set of valid tokens that can occur starting in s.</summary>
-		/// <remarks>
-		/// Compute the set of valid tokens that can occur starting in s.
-		/// If ctx is
-		/// <see cref="PredictionContext.EmptyLocal">PredictionContext.EmptyLocal</see>
-		/// , the set of tokens will not include what can follow
-		/// the rule surrounding s. In other words, the set will be
-		/// restricted to tokens reachable staying within s's rule.
-		/// </remarks>
-		public virtual IntervalSet NextTokens(ATNState s, PredictionContext ctx)
-		{
-			Args.NotNull("ctx", ctx);
-			LL1Analyzer anal = new LL1Analyzer(this);
-			IntervalSet next = anal.Look(s, ctx);
-			return next;
-		}
+        /// <summary>Compute the set of valid tokens that can occur starting in s.</summary>
+        /// <remarks>
+        /// Compute the set of valid tokens that can occur starting in s.
+        /// If ctx is
+        /// <see cref="PredictionContext.EmptyLocal">PredictionContext.EmptyLocal</see>
+        /// , the set of tokens will not include what can follow
+        /// the rule surrounding s. In other words, the set will be
+        /// restricted to tokens reachable staying within s's rule.
+        /// </remarks>
+        public virtual IntervalSet NextTokens(ATNState s, PredictionContext ctx)
+        {
+            Args.NotNull("ctx", ctx);
+            LL1Analyzer anal = new LL1Analyzer(this);
+            IntervalSet next = anal.Look(s, ctx);
+            return next;
+        }
 
-		/// <summary>Compute the set of valid tokens that can occur starting in s and staying in same rule.
-		/// 	</summary>
-		/// <remarks>
-		/// Compute the set of valid tokens that can occur starting in s and staying in same rule.
-		/// EPSILON is in set if we reach end of rule.
-		/// </remarks>
-		public virtual IntervalSet NextTokens(ATNState s)
-		{
-			if (s.nextTokenWithinRule != null)
-			{
-				return s.nextTokenWithinRule;
-			}
-			s.nextTokenWithinRule = NextTokens(s, PredictionContext.EmptyLocal);
-			s.nextTokenWithinRule.SetReadonly(true);
-			return s.nextTokenWithinRule;
-		}
+        /// <summary>Compute the set of valid tokens that can occur starting in s and staying in same rule.
+        ///     </summary>
+        /// <remarks>
+        /// Compute the set of valid tokens that can occur starting in s and staying in same rule.
+        /// EPSILON is in set if we reach end of rule.
+        /// </remarks>
+        public virtual IntervalSet NextTokens(ATNState s)
+        {
+            if (s.nextTokenWithinRule != null)
+            {
+                return s.nextTokenWithinRule;
+            }
+            s.nextTokenWithinRule = NextTokens(s, PredictionContext.EmptyLocal);
+            s.nextTokenWithinRule.SetReadonly(true);
+            return s.nextTokenWithinRule;
+        }
 
-		public virtual void AddState(ATNState state)
-		{
-			if (state == null)
-			{
-				states.AddItem(null);
-				stateNumber++;
-				return;
-			}
-			state.atn = this;
-			states.AddItem(state);
-			state.stateNumber = stateNumber++;
-		}
+        public virtual void AddState(ATNState state)
+        {
+            if (state == null)
+            {
+                states.AddItem(null);
+                stateNumber++;
+                return;
+            }
+            state.atn = this;
+            states.AddItem(state);
+            state.stateNumber = stateNumber++;
+        }
 
-		public virtual void RemoveState(ATNState state)
-		{
-			states.Set(state.stateNumber, null);
-		}
+        public virtual void RemoveState(ATNState state)
+        {
+            states.Set(state.stateNumber, null);
+        }
 
-		// just free mem, don't shift states in list
-		public virtual void DefineMode(string name, TokensStartState s)
-		{
-			modeNameToStartState.Put(name, s);
-			modeToStartState.AddItem(s);
-			modeToDFA = Arrays.CopyOf(modeToDFA, modeToStartState.Count);
-			modeToDFA[modeToDFA.Length - 1] = new DFA(s);
-			DefineDecisionState(s);
-		}
+        // just free mem, don't shift states in list
+        public virtual void DefineMode(string name, TokensStartState s)
+        {
+            modeNameToStartState.Put(name, s);
+            modeToStartState.AddItem(s);
+            modeToDFA = Arrays.CopyOf(modeToDFA, modeToStartState.Count);
+            modeToDFA[modeToDFA.Length - 1] = new DFA(s);
+            DefineDecisionState(s);
+        }
 
-		public virtual int DefineDecisionState(DecisionState s)
-		{
-			decisionToState.AddItem(s);
-			s.decision = decisionToState.Count - 1;
-			decisionToDFA = Arrays.CopyOf(decisionToDFA, decisionToState.Count);
-			decisionToDFA[decisionToDFA.Length - 1] = new DFA(s, s.decision);
-			return s.decision;
-		}
+        public virtual int DefineDecisionState(DecisionState s)
+        {
+            decisionToState.AddItem(s);
+            s.decision = decisionToState.Count - 1;
+            decisionToDFA = Arrays.CopyOf(decisionToDFA, decisionToState.Count);
+            decisionToDFA[decisionToDFA.Length - 1] = new DFA(s, s.decision);
+            return s.decision;
+        }
 
-		public virtual DecisionState GetDecisionState(int decision)
-		{
-			if (!decisionToState.IsEmpty())
-			{
-				return decisionToState[decision];
-			}
-			return null;
-		}
+        public virtual DecisionState GetDecisionState(int decision)
+        {
+            if (!decisionToState.IsEmpty())
+            {
+                return decisionToState[decision];
+            }
+            return null;
+        }
 
-		public virtual int GetNumberOfDecisions()
-		{
-			return decisionToState.Count;
-		}
-	}
+        public virtual int GetNumberOfDecisions()
+        {
+            return decisionToState.Count;
+        }
+    }
 }

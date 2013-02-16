@@ -32,9 +32,9 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Misc
 {
-	/// <author>Sam Harwell</author>
-	public interface IPredicate<T>
-	{
-		bool Eval(T arg);
-	}
+    /// <author>Sam Harwell</author>
+    public interface IPredicate<T>
+    {
+        bool Eval(T arg);
+    }
 }

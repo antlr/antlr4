@@ -34,205 +34,205 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Dfa
 {
-	/// <author>Sam Harwell</author>
-	public class SingletonEdgeMap<T> : AbstractEdgeMap<T>
-	{
-		private readonly int key;
+    /// <author>Sam Harwell</author>
+    public class SingletonEdgeMap<T> : AbstractEdgeMap<T>
+    {
+        private readonly int key;
 
-		private readonly T value;
+        private readonly T value;
 
-		public SingletonEdgeMap(int minIndex, int maxIndex) : base(minIndex, maxIndex)
-		{
-			this.key = 0;
-			this.value = null;
-		}
+        public SingletonEdgeMap(int minIndex, int maxIndex) : base(minIndex, maxIndex)
+        {
+            this.key = 0;
+            this.value = null;
+        }
 
-		public SingletonEdgeMap(int minIndex, int maxIndex, int key, T value) : base(minIndex
-			, maxIndex)
-		{
-			if (key >= minIndex && key <= maxIndex)
-			{
-				this.key = key;
-				this.value = value;
-			}
-			else
-			{
-				this.key = 0;
-				this.value = null;
-			}
-		}
+        public SingletonEdgeMap(int minIndex, int maxIndex, int key, T value) : base(minIndex
+            , maxIndex)
+        {
+            if (key >= minIndex && key <= maxIndex)
+            {
+                this.key = key;
+                this.value = value;
+            }
+            else
+            {
+                this.key = 0;
+                this.value = null;
+            }
+        }
 
-		public virtual int GetKey()
-		{
-			return key;
-		}
+        public virtual int GetKey()
+        {
+            return key;
+        }
 
-		public virtual T GetValue()
-		{
-			return value;
-		}
+        public virtual T GetValue()
+        {
+            return value;
+        }
 
-		public override int Size()
-		{
-			return value != null ? 1 : 0;
-		}
+        public override int Size()
+        {
+            return value != null ? 1 : 0;
+        }
 
-		public override bool IsEmpty()
-		{
-			return value == null;
-		}
+        public override bool IsEmpty()
+        {
+            return value == null;
+        }
 
-		public override bool ContainsKey(int key)
-		{
-			return key == this.key && value != null;
-		}
+        public override bool ContainsKey(int key)
+        {
+            return key == this.key && value != null;
+        }
 
-		public override T Get(int key)
-		{
-			if (key == this.key)
-			{
-				return value;
-			}
-			return null;
-		}
+        public override T Get(int key)
+        {
+            if (key == this.key)
+            {
+                return value;
+            }
+            return null;
+        }
 
-		public override AbstractEdgeMap<T> Put(int key, T value)
-		{
-			if (key < minIndex || key > maxIndex)
-			{
-				return this;
-			}
-			if (key == this.key || this.value == null)
-			{
-				return new Antlr4.Runtime.Dfa.SingletonEdgeMap<T>(minIndex, maxIndex, key, value);
-			}
-			else
-			{
-				if (value != null)
-				{
-					AbstractEdgeMap<T> result = new SparseEdgeMap<T>(minIndex, maxIndex);
-					result = result.Put(this.key, this.value);
-					result = result.Put(key, value);
-					return result;
-				}
-				else
-				{
-					return this;
-				}
-			}
-		}
+        public override AbstractEdgeMap<T> Put(int key, T value)
+        {
+            if (key < minIndex || key > maxIndex)
+            {
+                return this;
+            }
+            if (key == this.key || this.value == null)
+            {
+                return new Antlr4.Runtime.Dfa.SingletonEdgeMap<T>(minIndex, maxIndex, key, value);
+            }
+            else
+            {
+                if (value != null)
+                {
+                    AbstractEdgeMap<T> result = new SparseEdgeMap<T>(minIndex, maxIndex);
+                    result = result.Put(this.key, this.value);
+                    result = result.Put(key, value);
+                    return result;
+                }
+                else
+                {
+                    return this;
+                }
+            }
+        }
 
-		public override AbstractEdgeMap<T> Remove(int key)
-		{
-			if (key == this.key && this.value != null)
-			{
-				return new Antlr4.Runtime.Dfa.SingletonEdgeMap<T>(minIndex, maxIndex);
-			}
-			return this;
-		}
+        public override AbstractEdgeMap<T> Remove(int key)
+        {
+            if (key == this.key && this.value != null)
+            {
+                return new Antlr4.Runtime.Dfa.SingletonEdgeMap<T>(minIndex, maxIndex);
+            }
+            return this;
+        }
 
-		public override AbstractEdgeMap<T> Clear()
-		{
-			if (this.value != null)
-			{
-				return new Antlr4.Runtime.Dfa.SingletonEdgeMap<T>(minIndex, maxIndex);
-			}
-			return this;
-		}
+        public override AbstractEdgeMap<T> Clear()
+        {
+            if (this.value != null)
+            {
+                return new Antlr4.Runtime.Dfa.SingletonEdgeMap<T>(minIndex, maxIndex);
+            }
+            return this;
+        }
 
-		public override IDictionary<int, T> ToMap()
-		{
-			if (IsEmpty())
-			{
-				return Sharpen.Collections.EmptyMap();
-			}
-			return Sharpen.Collections.SingletonMap(key, value);
-		}
+        public override IDictionary<int, T> ToMap()
+        {
+            if (IsEmpty())
+            {
+                return Sharpen.Collections.EmptyMap();
+            }
+            return Sharpen.Collections.SingletonMap(key, value);
+        }
 
-		public override ICollection<KeyValuePair<int, T>> EntrySet()
-		{
-			return new SingletonEdgeMap.EntrySet(this);
-		}
+        public override ICollection<KeyValuePair<int, T>> EntrySet()
+        {
+            return new SingletonEdgeMap.EntrySet(this);
+        }
 
-		private class EntrySet : AbstractEdgeMap.AbstractEntrySet
-		{
-			public override IEnumerator<KeyValuePair<int, T>> GetEnumerator()
-			{
-				return new SingletonEdgeMap.EntryIterator(this);
-			}
+        private class EntrySet : AbstractEdgeMap.AbstractEntrySet
+        {
+            public override IEnumerator<KeyValuePair<int, T>> GetEnumerator()
+            {
+                return new SingletonEdgeMap.EntryIterator(this);
+            }
 
-			internal EntrySet(SingletonEdgeMap<T> _enclosing) : base(_enclosing)
-			{
-				this._enclosing = _enclosing;
-			}
+            internal EntrySet(SingletonEdgeMap<T> _enclosing) : base(_enclosing)
+            {
+                this._enclosing = _enclosing;
+            }
 
-			private readonly SingletonEdgeMap<T> _enclosing;
-		}
+            private readonly SingletonEdgeMap<T> _enclosing;
+        }
 
-		private class EntryIterator : IEnumerator<KeyValuePair<int, T>>
-		{
-			private int current;
+        private class EntryIterator : IEnumerator<KeyValuePair<int, T>>
+        {
+            private int current;
 
-			public override bool HasNext()
-			{
-				return this.current < this._enclosing.Size();
-			}
+            public override bool HasNext()
+            {
+                return this.current < this._enclosing.Size();
+            }
 
-			public override KeyValuePair<int, T> Next()
-			{
-				if (this.current >= this._enclosing.Size())
-				{
-					throw new NoSuchElementException();
-				}
-				this.current++;
-				return new _KeyValuePair_166(this);
-			}
+            public override KeyValuePair<int, T> Next()
+            {
+                if (this.current >= this._enclosing.Size())
+                {
+                    throw new NoSuchElementException();
+                }
+                this.current++;
+                return new _KeyValuePair_166(this);
+            }
 
-			private sealed class _KeyValuePair_166 : KeyValuePair<int, T>
-			{
-				public _KeyValuePair_166()
-				{
-					this.key = this._enclosing._enclosing._enclosing.key;
-					this.value = this._enclosing._enclosing._enclosing.value;
-				}
+            private sealed class _KeyValuePair_166 : KeyValuePair<int, T>
+            {
+                public _KeyValuePair_166()
+                {
+                    this.key = this._enclosing._enclosing._enclosing.key;
+                    this.value = this._enclosing._enclosing._enclosing.value;
+                }
 
-				private readonly int key;
+                private readonly int key;
 
-				private readonly T value;
+                private readonly T value;
 
-				public int Key
-				{
-					get
-					{
-						return this.key;
-					}
-				}
+                public int Key
+                {
+                    get
+                    {
+                        return this.key;
+                    }
+                }
 
-				public T Value
-				{
-					get
-					{
-						return this.value;
-					}
-				}
+                public T Value
+                {
+                    get
+                    {
+                        return this.value;
+                    }
+                }
 
-				public T SetValue(T value)
-				{
-					throw new NotSupportedException("Not supported yet.");
-				}
-			}
+                public T SetValue(T value)
+                {
+                    throw new NotSupportedException("Not supported yet.");
+                }
+            }
 
-			public override void Remove()
-			{
-				throw new NotSupportedException("Not supported yet.");
-			}
+            public override void Remove()
+            {
+                throw new NotSupportedException("Not supported yet.");
+            }
 
-			internal EntryIterator(SingletonEdgeMap<T> _enclosing)
-			{
-				this._enclosing = _enclosing;
-			}
+            internal EntryIterator(SingletonEdgeMap<T> _enclosing)
+            {
+                this._enclosing = _enclosing;
+            }
 
-			private readonly SingletonEdgeMap<T> _enclosing;
-		}
-	}
+            private readonly SingletonEdgeMap<T> _enclosing;
+        }
+    }
 }

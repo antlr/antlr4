@@ -33,29 +33,29 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	public sealed class NotSetTransition : SetTransition
-	{
-		public NotSetTransition(ATNState target, IntervalSet set) : base(target, set)
-		{
-		}
+    public sealed class NotSetTransition : SetTransition
+    {
+        public NotSetTransition(ATNState target, IntervalSet set) : base(target, set)
+        {
+        }
 
-		public override int SerializationType
-		{
-			get
-			{
-				return NotSet;
-			}
-		}
+        public override int SerializationType
+        {
+            get
+            {
+                return NotSet;
+            }
+        }
 
-		public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
-		{
-			return symbol >= minVocabSymbol && symbol <= maxVocabSymbol && !base.Matches(symbol
-				, minVocabSymbol, maxVocabSymbol);
-		}
+        public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
+        {
+            return symbol >= minVocabSymbol && symbol <= maxVocabSymbol && !base.Matches(symbol
+                , minVocabSymbol, maxVocabSymbol);
+        }
 
-		public override string ToString()
-		{
-			return '~' + base.ToString();
-		}
-	}
+        public override string ToString()
+        {
+            return '~' + base.ToString();
+        }
+    }
 }

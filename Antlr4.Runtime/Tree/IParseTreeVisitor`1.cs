@@ -32,66 +32,66 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
-	/// <summary>This interface defines the basic notion of a parse tree visitor.</summary>
-	/// <remarks>
-	/// This interface defines the basic notion of a parse tree visitor. Generated
-	/// visitors implement this interface and the
-	/// <code>XVisitor</code>
-	/// interface for
-	/// grammar
-	/// <code>X</code>
-	/// .
-	/// </remarks>
-	/// <author>Sam Harwell</author>
-	/// <?></?>
-	public interface IParseTreeVisitor<Result>
-	{
-		/// <summary>Visit a parse tree, and return a user-defined result of the operation.</summary>
-		/// <remarks>Visit a parse tree, and return a user-defined result of the operation.</remarks>
-		/// <param name="tree">
-		/// The
-		/// <see cref="IParseTree">IParseTree</see>
-		/// to visit.
-		/// </param>
-		/// <returns>The result of visiting the parse tree.</returns>
-		Result Visit(IParseTree tree);
+    /// <summary>This interface defines the basic notion of a parse tree visitor.</summary>
+    /// <remarks>
+    /// This interface defines the basic notion of a parse tree visitor. Generated
+    /// visitors implement this interface and the
+    /// <code>XVisitor</code>
+    /// interface for
+    /// grammar
+    /// <code>X</code>
+    /// .
+    /// </remarks>
+    /// <author>Sam Harwell</author>
+    /// <?></?>
+    public interface IParseTreeVisitor<Result>
+    {
+        /// <summary>Visit a parse tree, and return a user-defined result of the operation.</summary>
+        /// <remarks>Visit a parse tree, and return a user-defined result of the operation.</remarks>
+        /// <param name="tree">
+        /// The
+        /// <see cref="IParseTree">IParseTree</see>
+        /// to visit.
+        /// </param>
+        /// <returns>The result of visiting the parse tree.</returns>
+        Result Visit(IParseTree tree);
 
-		/// <summary>
-		/// Visit the children of a node, and return a user-defined result
-		/// of the operation.
-		/// </summary>
-		/// <remarks>
-		/// Visit the children of a node, and return a user-defined result
-		/// of the operation.
-		/// </remarks>
-		/// <param name="node">
-		/// The
-		/// <see cref="IRuleNode">IRuleNode</see>
-		/// whose children should be visited.
-		/// </param>
-		/// <returns>The result of visiting the children of the node.</returns>
-		Result VisitChildren(IRuleNode node);
+        /// <summary>
+        /// Visit the children of a node, and return a user-defined result
+        /// of the operation.
+        /// </summary>
+        /// <remarks>
+        /// Visit the children of a node, and return a user-defined result
+        /// of the operation.
+        /// </remarks>
+        /// <param name="node">
+        /// The
+        /// <see cref="IRuleNode">IRuleNode</see>
+        /// whose children should be visited.
+        /// </param>
+        /// <returns>The result of visiting the children of the node.</returns>
+        Result VisitChildren(IRuleNode node);
 
-		/// <summary>Visit a terminal node, and return a user-defined result of the operation.
-		/// 	</summary>
-		/// <remarks>Visit a terminal node, and return a user-defined result of the operation.
-		/// 	</remarks>
-		/// <param name="node">
-		/// The
-		/// <see cref="ITerminalNode">ITerminalNode</see>
-		/// to visit.
-		/// </param>
-		/// <returns>The result of visiting the node.</returns>
-		Result VisitTerminal(ITerminalNode node);
+        /// <summary>Visit a terminal node, and return a user-defined result of the operation.
+        ///     </summary>
+        /// <remarks>Visit a terminal node, and return a user-defined result of the operation.
+        ///     </remarks>
+        /// <param name="node">
+        /// The
+        /// <see cref="ITerminalNode">ITerminalNode</see>
+        /// to visit.
+        /// </param>
+        /// <returns>The result of visiting the node.</returns>
+        Result VisitTerminal(ITerminalNode node);
 
-		/// <summary>Visit an error node, and return a user-defined result of the operation.</summary>
-		/// <remarks>Visit an error node, and return a user-defined result of the operation.</remarks>
-		/// <param name="node">
-		/// The
-		/// <see cref="IErrorNode">IErrorNode</see>
-		/// to visit.
-		/// </param>
-		/// <returns>The result of visiting the node.</returns>
-		Result VisitErrorNode(IErrorNode node);
-	}
+        /// <summary>Visit an error node, and return a user-defined result of the operation.</summary>
+        /// <remarks>Visit an error node, and return a user-defined result of the operation.</remarks>
+        /// <param name="node">
+        /// The
+        /// <see cref="IErrorNode">IErrorNode</see>
+        /// to visit.
+        /// </param>
+        /// <returns>The result of visiting the node.</returns>
+        Result VisitErrorNode(IErrorNode node);
+    }
 }

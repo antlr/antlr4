@@ -34,260 +34,260 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Dfa
 {
-	/// <author>Sam Harwell</author>
-	public class SparseEdgeMap<T> : AbstractEdgeMap<T>
-	{
-		private const int DefaultMaxSize = 5;
+    /// <author>Sam Harwell</author>
+    public class SparseEdgeMap<T> : AbstractEdgeMap<T>
+    {
+        private const int DefaultMaxSize = 5;
 
-		private readonly int[] keys;
+        private readonly int[] keys;
 
-		private readonly IList<T> values;
+        private readonly IList<T> values;
 
-		public SparseEdgeMap(int minIndex, int maxIndex) : this(minIndex, maxIndex, DefaultMaxSize
-			)
-		{
-		}
+        public SparseEdgeMap(int minIndex, int maxIndex) : this(minIndex, maxIndex, DefaultMaxSize
+            )
+        {
+        }
 
-		public SparseEdgeMap(int minIndex, int maxIndex, int maxSparseSize) : base(minIndex
-			, maxIndex)
-		{
-			this.keys = new int[maxSparseSize];
-			this.values = new List<T>(maxSparseSize);
-		}
+        public SparseEdgeMap(int minIndex, int maxIndex, int maxSparseSize) : base(minIndex
+            , maxIndex)
+        {
+            this.keys = new int[maxSparseSize];
+            this.values = new List<T>(maxSparseSize);
+        }
 
-		private SparseEdgeMap(Antlr4.Runtime.Dfa.SparseEdgeMap<T> map, int maxSparseSize)
-			 : base(map.minIndex, map.maxIndex)
-		{
-			if (maxSparseSize < map.values.Count)
-			{
-				throw new ArgumentException();
-			}
-			keys = Arrays.CopyOf(map.keys, maxSparseSize);
-			values = new List<T>(maxSparseSize);
-			Sharpen.Collections.AddAll(values, map.values);
-		}
+        private SparseEdgeMap(Antlr4.Runtime.Dfa.SparseEdgeMap<T> map, int maxSparseSize)
+             : base(map.minIndex, map.maxIndex)
+        {
+            if (maxSparseSize < map.values.Count)
+            {
+                throw new ArgumentException();
+            }
+            keys = Arrays.CopyOf(map.keys, maxSparseSize);
+            values = new List<T>(maxSparseSize);
+            Sharpen.Collections.AddAll(values, map.values);
+        }
 
-		public virtual int[] GetKeys()
-		{
-			return keys;
-		}
+        public virtual int[] GetKeys()
+        {
+            return keys;
+        }
 
-		public virtual IList<T> GetValues()
-		{
-			return values;
-		}
+        public virtual IList<T> GetValues()
+        {
+            return values;
+        }
 
-		public virtual int GetMaxSparseSize()
-		{
-			return keys.Length;
-		}
+        public virtual int GetMaxSparseSize()
+        {
+            return keys.Length;
+        }
 
-		public override int Size()
-		{
-			return values.Count;
-		}
+        public override int Size()
+        {
+            return values.Count;
+        }
 
-		public override bool IsEmpty()
-		{
-			return values.IsEmpty();
-		}
+        public override bool IsEmpty()
+        {
+            return values.IsEmpty();
+        }
 
-		public override bool ContainsKey(int key)
-		{
-			return Get(key) != null;
-		}
+        public override bool ContainsKey(int key)
+        {
+            return Get(key) != null;
+        }
 
-		public override T Get(int key)
-		{
-			int index = System.Array.BinarySearch(keys, 0, Size(), key);
-			if (index < 0)
-			{
-				return null;
-			}
-			return values[index];
-		}
+        public override T Get(int key)
+        {
+            int index = System.Array.BinarySearch(keys, 0, Size(), key);
+            if (index < 0)
+            {
+                return null;
+            }
+            return values[index];
+        }
 
-		public override AbstractEdgeMap<T> Put(int key, T value)
-		{
-			if (key < minIndex || key > maxIndex)
-			{
-				return this;
-			}
-			if (value == null)
-			{
-				return ((Antlr4.Runtime.Dfa.SparseEdgeMap<T>)Remove(key));
-			}
-			lock (values)
-			{
-				int index = System.Array.BinarySearch(keys, 0, Size(), key);
-				if (index >= 0)
-				{
-					// replace existing entry
-					values.Set(index, value);
-					return this;
-				}
-				System.Diagnostics.Debug.Assert(index < 0 && value != null);
-				int insertIndex = -index - 1;
-				if (Size() < GetMaxSparseSize() && insertIndex == Size())
-				{
-					// stay sparse and add new entry
-					keys[insertIndex] = key;
-					values.AddItem(value);
-					return this;
-				}
-				int desiredSize = Size() >= GetMaxSparseSize() ? GetMaxSparseSize() * 2 : GetMaxSparseSize
-					();
-				int space = maxIndex - minIndex + 1;
-				// SparseEdgeMap only uses less memory than ArrayEdgeMap up to half the size of the symbol space
-				if (desiredSize >= space / 2)
-				{
-					ArrayEdgeMap<T> arrayMap = new ArrayEdgeMap<T>(minIndex, maxIndex);
-					arrayMap = ((ArrayEdgeMap<T>)arrayMap.PutAll(this));
-					arrayMap.Put(key, value);
-					return arrayMap;
-				}
-				else
-				{
-					Antlr4.Runtime.Dfa.SparseEdgeMap<T> resized = new Antlr4.Runtime.Dfa.SparseEdgeMap
-						<T>(this, desiredSize);
-					System.Array.Copy(resized.keys, insertIndex, resized.keys, insertIndex + 1, resized
-						.keys.Length - insertIndex - 1);
-					resized.keys[insertIndex] = key;
-					resized.values.Add(insertIndex, value);
-					return resized;
-				}
-			}
-		}
+        public override AbstractEdgeMap<T> Put(int key, T value)
+        {
+            if (key < minIndex || key > maxIndex)
+            {
+                return this;
+            }
+            if (value == null)
+            {
+                return ((Antlr4.Runtime.Dfa.SparseEdgeMap<T>)Remove(key));
+            }
+            lock (values)
+            {
+                int index = System.Array.BinarySearch(keys, 0, Size(), key);
+                if (index >= 0)
+                {
+                    // replace existing entry
+                    values.Set(index, value);
+                    return this;
+                }
+                System.Diagnostics.Debug.Assert(index < 0 && value != null);
+                int insertIndex = -index - 1;
+                if (Size() < GetMaxSparseSize() && insertIndex == Size())
+                {
+                    // stay sparse and add new entry
+                    keys[insertIndex] = key;
+                    values.AddItem(value);
+                    return this;
+                }
+                int desiredSize = Size() >= GetMaxSparseSize() ? GetMaxSparseSize() * 2 : GetMaxSparseSize
+                    ();
+                int space = maxIndex - minIndex + 1;
+                // SparseEdgeMap only uses less memory than ArrayEdgeMap up to half the size of the symbol space
+                if (desiredSize >= space / 2)
+                {
+                    ArrayEdgeMap<T> arrayMap = new ArrayEdgeMap<T>(minIndex, maxIndex);
+                    arrayMap = ((ArrayEdgeMap<T>)arrayMap.PutAll(this));
+                    arrayMap.Put(key, value);
+                    return arrayMap;
+                }
+                else
+                {
+                    Antlr4.Runtime.Dfa.SparseEdgeMap<T> resized = new Antlr4.Runtime.Dfa.SparseEdgeMap
+                        <T>(this, desiredSize);
+                    System.Array.Copy(resized.keys, insertIndex, resized.keys, insertIndex + 1, resized
+                        .keys.Length - insertIndex - 1);
+                    resized.keys[insertIndex] = key;
+                    resized.values.Add(insertIndex, value);
+                    return resized;
+                }
+            }
+        }
 
-		public override AbstractEdgeMap<T> Remove(int key)
-		{
-			int index = System.Array.BinarySearch(keys, 0, Size(), key);
-			if (index < 0)
-			{
-				return this;
-			}
-			if (index == values.Count - 1)
-			{
-				values.Remove(index);
-				return this;
-			}
-			Antlr4.Runtime.Dfa.SparseEdgeMap<T> result = new Antlr4.Runtime.Dfa.SparseEdgeMap
-				<T>(this, GetMaxSparseSize());
-			System.Array.Copy(result.keys, index + 1, result.keys, index, Size() - index - 1);
-			result.values.Remove(index);
-			return result;
-		}
+        public override AbstractEdgeMap<T> Remove(int key)
+        {
+            int index = System.Array.BinarySearch(keys, 0, Size(), key);
+            if (index < 0)
+            {
+                return this;
+            }
+            if (index == values.Count - 1)
+            {
+                values.Remove(index);
+                return this;
+            }
+            Antlr4.Runtime.Dfa.SparseEdgeMap<T> result = new Antlr4.Runtime.Dfa.SparseEdgeMap
+                <T>(this, GetMaxSparseSize());
+            System.Array.Copy(result.keys, index + 1, result.keys, index, Size() - index - 1);
+            result.values.Remove(index);
+            return result;
+        }
 
-		public override AbstractEdgeMap<T> Clear()
-		{
-			if (IsEmpty())
-			{
-				return this;
-			}
-			Antlr4.Runtime.Dfa.SparseEdgeMap<T> result = new Antlr4.Runtime.Dfa.SparseEdgeMap
-				<T>(this, GetMaxSparseSize());
-			result.values.Clear();
-			return result;
-		}
+        public override AbstractEdgeMap<T> Clear()
+        {
+            if (IsEmpty())
+            {
+                return this;
+            }
+            Antlr4.Runtime.Dfa.SparseEdgeMap<T> result = new Antlr4.Runtime.Dfa.SparseEdgeMap
+                <T>(this, GetMaxSparseSize());
+            result.values.Clear();
+            return result;
+        }
 
-		public override IDictionary<int, T> ToMap()
-		{
-			if (IsEmpty())
-			{
-				return Sharpen.Collections.EmptyMap();
-			}
-			IDictionary<int, T> result = new LinkedHashMap<int, T>();
-			for (int i = 0; i < Size(); i++)
-			{
-				result.Put(keys[i], values[i]);
-			}
-			return result;
-		}
+        public override IDictionary<int, T> ToMap()
+        {
+            if (IsEmpty())
+            {
+                return Sharpen.Collections.EmptyMap();
+            }
+            IDictionary<int, T> result = new LinkedHashMap<int, T>();
+            for (int i = 0; i < Size(); i++)
+            {
+                result.Put(keys[i], values[i]);
+            }
+            return result;
+        }
 
-		public override ICollection<KeyValuePair<int, T>> EntrySet()
-		{
-			return new SparseEdgeMap.EntrySet(this);
-		}
+        public override ICollection<KeyValuePair<int, T>> EntrySet()
+        {
+            return new SparseEdgeMap.EntrySet(this);
+        }
 
-		private class EntrySet : AbstractEdgeMap.AbstractEntrySet
-		{
-			public override IEnumerator<KeyValuePair<int, T>> GetEnumerator()
-			{
-				return new SparseEdgeMap.EntryIterator(this);
-			}
+        private class EntrySet : AbstractEdgeMap.AbstractEntrySet
+        {
+            public override IEnumerator<KeyValuePair<int, T>> GetEnumerator()
+            {
+                return new SparseEdgeMap.EntryIterator(this);
+            }
 
-			internal EntrySet(SparseEdgeMap<T> _enclosing) : base(_enclosing)
-			{
-				this._enclosing = _enclosing;
-			}
+            internal EntrySet(SparseEdgeMap<T> _enclosing) : base(_enclosing)
+            {
+                this._enclosing = _enclosing;
+            }
 
-			private readonly SparseEdgeMap<T> _enclosing;
-		}
+            private readonly SparseEdgeMap<T> _enclosing;
+        }
 
-		private class EntryIterator : IEnumerator<KeyValuePair<int, T>>
-		{
-			private int current;
+        private class EntryIterator : IEnumerator<KeyValuePair<int, T>>
+        {
+            private int current;
 
-			public override bool HasNext()
-			{
-				return this.current < this._enclosing.Size();
-			}
+            public override bool HasNext()
+            {
+                return this.current < this._enclosing.Size();
+            }
 
-			public override KeyValuePair<int, T> Next()
-			{
-				if (this.current >= this._enclosing.Size())
-				{
-					throw new NoSuchElementException();
-				}
-				this.current++;
-				return new _KeyValuePair_226(this);
-			}
+            public override KeyValuePair<int, T> Next()
+            {
+                if (this.current >= this._enclosing.Size())
+                {
+                    throw new NoSuchElementException();
+                }
+                this.current++;
+                return new _KeyValuePair_226(this);
+            }
 
-			private sealed class _KeyValuePair_226 : KeyValuePair<int, T>
-			{
-				public _KeyValuePair_226()
-				{
-					this.key = this._enclosing._enclosing.keys[this._enclosing.current - 1];
-					this.value = this._enclosing._enclosing.values[this._enclosing.current - 1];
-				}
+            private sealed class _KeyValuePair_226 : KeyValuePair<int, T>
+            {
+                public _KeyValuePair_226()
+                {
+                    this.key = this._enclosing._enclosing.keys[this._enclosing.current - 1];
+                    this.value = this._enclosing._enclosing.values[this._enclosing.current - 1];
+                }
 
-				private readonly int key;
+                private readonly int key;
 
-				private readonly T value;
+                private readonly T value;
 
-				public int Key
-				{
-					get
-					{
-						return this.key;
-					}
-				}
+                public int Key
+                {
+                    get
+                    {
+                        return this.key;
+                    }
+                }
 
-				public T Value
-				{
-					get
-					{
-						return this.value;
-					}
-				}
+                public T Value
+                {
+                    get
+                    {
+                        return this.value;
+                    }
+                }
 
-				public T SetValue(T value)
-				{
-					throw new NotSupportedException("Not supported yet.");
-				}
-			}
+                public T SetValue(T value)
+                {
+                    throw new NotSupportedException("Not supported yet.");
+                }
+            }
 
-			public override void Remove()
-			{
-				throw new NotSupportedException("Not supported yet.");
-			}
+            public override void Remove()
+            {
+                throw new NotSupportedException("Not supported yet.");
+            }
 
-			internal EntryIterator(SparseEdgeMap<T> _enclosing)
-			{
-				this._enclosing = _enclosing;
-			}
+            internal EntryIterator(SparseEdgeMap<T> _enclosing)
+            {
+                this._enclosing = _enclosing;
+            }
 
-			private readonly SparseEdgeMap<T> _enclosing;
-		}
-	}
+            private readonly SparseEdgeMap<T> _enclosing;
+        }
+    }
 }

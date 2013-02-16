@@ -33,49 +33,49 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	public sealed class RuleTransition : Transition
-	{
-		/// <summary>Ptr to the rule definition object for this rule ref</summary>
-		public readonly int ruleIndex;
+    public sealed class RuleTransition : Transition
+    {
+        /// <summary>Ptr to the rule definition object for this rule ref</summary>
+        public readonly int ruleIndex;
 
-		public readonly int precedence;
+        public readonly int precedence;
 
-		/// <summary>What node to begin computations following ref to rule</summary>
-		[NotNull]
-		public ATNState followState;
+        /// <summary>What node to begin computations following ref to rule</summary>
+        [NotNull]
+        public ATNState followState;
 
-		public bool tailCall;
+        public bool tailCall;
 
-		public bool optimizedTailCall;
+        public bool optimizedTailCall;
 
-		public RuleTransition(RuleStartState ruleStart, int ruleIndex, int precedence, ATNState
-			 followState) : base(ruleStart)
-		{
-			// no Rule object at runtime
-			this.ruleIndex = ruleIndex;
-			this.precedence = precedence;
-			this.followState = followState;
-		}
+        public RuleTransition(RuleStartState ruleStart, int ruleIndex, int precedence, ATNState
+             followState) : base(ruleStart)
+        {
+            // no Rule object at runtime
+            this.ruleIndex = ruleIndex;
+            this.precedence = precedence;
+            this.followState = followState;
+        }
 
-		public override int SerializationType
-		{
-			get
-			{
-				return Rule;
-			}
-		}
+        public override int SerializationType
+        {
+            get
+            {
+                return Rule;
+            }
+        }
 
-		public override bool IsEpsilon
-		{
-			get
-			{
-				return true;
-			}
-		}
+        public override bool IsEpsilon
+        {
+            get
+            {
+                return true;
+            }
+        }
 
-		public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
-		{
-			return false;
-		}
-	}
+        public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
+        {
+            return false;
+        }
+    }
 }

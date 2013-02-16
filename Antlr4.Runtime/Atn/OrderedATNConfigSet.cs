@@ -32,38 +32,38 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	/// <author>Sam Harwell</author>
-	public class OrderedATNConfigSet : ATNConfigSet
-	{
-		public OrderedATNConfigSet()
-		{
-		}
+    /// <author>Sam Harwell</author>
+    public class OrderedATNConfigSet : ATNConfigSet
+    {
+        public OrderedATNConfigSet()
+        {
+        }
 
-		protected internal OrderedATNConfigSet(ATNConfigSet set, bool @readonly) : base(set
-			, @readonly)
-		{
-		}
+        protected internal OrderedATNConfigSet(ATNConfigSet set, bool @readonly) : base(set
+            , @readonly)
+        {
+        }
 
-		public override ATNConfigSet Clone(bool @readonly)
-		{
-			Antlr4.Runtime.Atn.OrderedATNConfigSet copy = new Antlr4.Runtime.Atn.OrderedATNConfigSet
-				(this, @readonly);
-			if (!@readonly && this.IsReadOnly())
-			{
-				Sharpen.Collections.AddAll(copy, this);
-			}
-			return copy;
-		}
+        public override ATNConfigSet Clone(bool @readonly)
+        {
+            Antlr4.Runtime.Atn.OrderedATNConfigSet copy = new Antlr4.Runtime.Atn.OrderedATNConfigSet
+                (this, @readonly);
+            if (!@readonly && this.IsReadOnly())
+            {
+                Sharpen.Collections.AddAll(copy, this);
+            }
+            return copy;
+        }
 
-		protected internal override long GetKey(ATNConfig e)
-		{
-			return e.GetHashCode();
-		}
+        protected internal override long GetKey(ATNConfig e)
+        {
+            return e.GetHashCode();
+        }
 
-		protected internal override bool CanMerge(ATNConfig left, long leftKey, ATNConfig
-			 right)
-		{
-			return left.Equals(right);
-		}
-	}
+        protected internal override bool CanMerge(ATNConfig left, long leftKey, ATNConfig
+             right)
+        {
+            return left.Equals(right);
+        }
+    }
 }

@@ -33,31 +33,31 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-	/// <author>Sam Harwell</author>
-	public class ProxyErrorListener<Symbol> : IAntlrErrorListener<Symbol>
-	{
-		private readonly ICollection<IAntlrErrorListener<Symbol>> delegates;
+    /// <author>Sam Harwell</author>
+    public class ProxyErrorListener<Symbol> : IAntlrErrorListener<Symbol>
+    {
+        private readonly ICollection<IAntlrErrorListener<Symbol>> delegates;
 
-		public ProxyErrorListener(ICollection<IAntlrErrorListener<Symbol>> delegates)
-		{
-			this.delegates = delegates;
-		}
+        public ProxyErrorListener(ICollection<IAntlrErrorListener<Symbol>> delegates)
+        {
+            this.delegates = delegates;
+        }
 
-		protected internal virtual ICollection<IAntlrErrorListener<Symbol>> GetDelegates(
-			)
-		{
-			return delegates;
-		}
+        protected internal virtual ICollection<IAntlrErrorListener<Symbol>> GetDelegates(
+            )
+        {
+            return delegates;
+        }
 
-		public virtual void SyntaxError<T>(Recognizer<T, object> recognizer, T offendingSymbol
-			, int line, int charPositionInLine, string msg, RecognitionException e) where T:
-			Symbol
-		{
-			foreach (IAntlrErrorListener<Symbol> listener in delegates)
-			{
-				listener.SyntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, 
-					e);
-			}
-		}
-	}
+        public virtual void SyntaxError<T>(Recognizer<T, object> recognizer, T offendingSymbol
+            , int line, int charPositionInLine, string msg, RecognitionException e) where 
+            T:Symbol
+        {
+            foreach (IAntlrErrorListener<Symbol> listener in delegates)
+            {
+                listener.SyntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, 
+                    e);
+            }
+        }
+    }
 }

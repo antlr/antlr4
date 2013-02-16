@@ -34,34 +34,34 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Dfa
 {
-	/// <author>Sam Harwell</author>
-	public interface IEdgeMap<T>
-	{
-		int Size();
+    /// <author>Sam Harwell</author>
+    public interface IEdgeMap<T>
+    {
+        int Size();
 
-		bool IsEmpty();
+        bool IsEmpty();
 
-		bool ContainsKey(int key);
+        bool ContainsKey(int key);
 
-		[Nullable]
-		T Get(int key);
+        [Nullable]
+        T Get(int key);
 
-		[NotNull]
-		IEdgeMap<T> Put(int key, T value);
+        [NotNull]
+        IEdgeMap<T> Put(int key, T value);
 
-		[NotNull]
-		IEdgeMap<T> Remove(int key);
+        [NotNull]
+        IEdgeMap<T> Remove(int key);
 
-		[NotNull]
-		IEdgeMap<T> PutAll<_T0>(IEdgeMap<_T0> m) where _T0:T;
+        [NotNull]
+        IEdgeMap<T> PutAll<_T0>(IEdgeMap<_T0> m) where _T0:T;
 
-		[NotNull]
-		IEdgeMap<T> Clear();
+        [NotNull]
+        IEdgeMap<T> Clear();
 
-		[NotNull]
-		IDictionary<int, T> ToMap();
+        [NotNull]
+        IDictionary<int, T> ToMap();
 
-		[NotNull]
-		ICollection<KeyValuePair<int, T>> EntrySet();
-	}
+        [NotNull]
+        ICollection<KeyValuePair<int, T>> EntrySet();
+    }
 }

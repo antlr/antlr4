@@ -33,43 +33,43 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	/// <summary>TODO: make all transitions sets? no, should remove set edges</summary>
-	public sealed class AtomTransition : Transition
-	{
-		/// <summary>The token type or character value; or, signifies special label.</summary>
-		/// <remarks>The token type or character value; or, signifies special label.</remarks>
-		public readonly int label;
+    /// <summary>TODO: make all transitions sets? no, should remove set edges</summary>
+    public sealed class AtomTransition : Transition
+    {
+        /// <summary>The token type or character value; or, signifies special label.</summary>
+        /// <remarks>The token type or character value; or, signifies special label.</remarks>
+        public readonly int label;
 
-		public AtomTransition(ATNState target, int label) : base(target)
-		{
-			this.label = label;
-		}
+        public AtomTransition(ATNState target, int label) : base(target)
+        {
+            this.label = label;
+        }
 
-		public override int SerializationType
-		{
-			get
-			{
-				return Atom;
-			}
-		}
+        public override int SerializationType
+        {
+            get
+            {
+                return Atom;
+            }
+        }
 
-		public override IntervalSet Label
-		{
-			get
-			{
-				return IntervalSet.Of(label);
-			}
-		}
+        public override IntervalSet Label
+        {
+            get
+            {
+                return IntervalSet.Of(label);
+            }
+        }
 
-		public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
-		{
-			return label == symbol;
-		}
+        public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
+        {
+            return label == symbol;
+        }
 
-		[NotNull]
-		public override string ToString()
-		{
-			return label.ToString();
-		}
-	}
+        [NotNull]
+        public override string ToString()
+        {
+            return label.ToString();
+        }
+    }
 }

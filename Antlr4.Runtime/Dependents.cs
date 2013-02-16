@@ -32,18 +32,18 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-	/// <author>Sam Harwell</author>
-	public enum Dependents
-	{
-		Self,
-		Parents,
-		Children,
-		Ancestors,
-		Descendants,
-		Siblings,
-		PreceedingSiblings,
-		FollowingSiblings,
-		Preceeding,
-		Following
-	}
+    /// <author>Sam Harwell</author>
+    public enum Dependents
+    {
+        Self,
+        Parents,
+        Children,
+        Ancestors,
+        Descendants,
+        Siblings,
+        PreceedingSiblings,
+        FollowingSiblings,
+        Preceeding,
+        Following
+    }
 }

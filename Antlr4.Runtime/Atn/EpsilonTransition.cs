@@ -33,37 +33,37 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	public sealed class EpsilonTransition : Transition
-	{
-		protected internal EpsilonTransition(ATNState target) : base(target)
-		{
-		}
+    public sealed class EpsilonTransition : Transition
+    {
+        protected internal EpsilonTransition(ATNState target) : base(target)
+        {
+        }
 
-		public override int SerializationType
-		{
-			get
-			{
-				return Epsilon;
-			}
-		}
+        public override int SerializationType
+        {
+            get
+            {
+                return Epsilon;
+            }
+        }
 
-		public override bool IsEpsilon
-		{
-			get
-			{
-				return true;
-			}
-		}
+        public override bool IsEpsilon
+        {
+            get
+            {
+                return true;
+            }
+        }
 
-		public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
-		{
-			return false;
-		}
+        public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
+        {
+            return false;
+        }
 
-		[NotNull]
-		public override string ToString()
-		{
-			return "epsilon";
-		}
-	}
+        [NotNull]
+        public override string ToString()
+        {
+            return "epsilon";
+        }
+    }
 }

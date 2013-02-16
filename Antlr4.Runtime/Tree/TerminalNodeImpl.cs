@@ -34,105 +34,105 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
-	public class TerminalNodeImpl : ITerminalNode
-	{
-		public IToken symbol;
+    public class TerminalNodeImpl : ITerminalNode
+    {
+        public IToken symbol;
 
-		public IRuleNode parent;
+        public IRuleNode parent;
 
-		public TerminalNodeImpl(IToken symbol)
-		{
-			this.symbol = symbol;
-		}
+        public TerminalNodeImpl(IToken symbol)
+        {
+            this.symbol = symbol;
+        }
 
-		public virtual IParseTree GetChild(int i)
-		{
-			return null;
-		}
+        public virtual IParseTree GetChild(int i)
+        {
+            return null;
+        }
 
-		public virtual IToken Symbol
-		{
-			get
-			{
-				return symbol;
-			}
-		}
+        public virtual IToken Symbol
+        {
+            get
+            {
+                return symbol;
+            }
+        }
 
-		public virtual IRuleNode Parent
-		{
-			get
-			{
-				return parent;
-			}
-		}
+        public virtual IRuleNode Parent
+        {
+            get
+            {
+                return parent;
+            }
+        }
 
-		public virtual IToken Payload
-		{
-			get
-			{
-				return symbol;
-			}
-		}
+        public virtual IToken Payload
+        {
+            get
+            {
+                return symbol;
+            }
+        }
 
-		public virtual Interval SourceInterval
-		{
-			get
-			{
-				if (symbol != null)
-				{
-					int tokenIndex = symbol.TokenIndex;
-					return new Interval(tokenIndex, tokenIndex);
-				}
-				return Interval.Invalid;
-			}
-		}
+        public virtual Interval SourceInterval
+        {
+            get
+            {
+                if (symbol != null)
+                {
+                    int tokenIndex = symbol.TokenIndex;
+                    return new Interval(tokenIndex, tokenIndex);
+                }
+                return Interval.Invalid;
+            }
+        }
 
-		public virtual int ChildCount
-		{
-			get
-			{
-				return 0;
-			}
-		}
+        public virtual int ChildCount
+        {
+            get
+            {
+                return 0;
+            }
+        }
 
-		public virtual T Accept<T, _T1>(IParseTreeVisitor<_T1> visitor) where _T1:T
-		{
-			return visitor.VisitTerminal(this);
-		}
+        public virtual T Accept<T, _T1>(IParseTreeVisitor<_T1> visitor) where _T1:T
+        {
+            return visitor.VisitTerminal(this);
+        }
 
-		public virtual string GetText()
-		{
-			if (symbol != null)
-			{
-				return symbol.Text;
-			}
-			return null;
-		}
+        public virtual string GetText()
+        {
+            if (symbol != null)
+            {
+                return symbol.Text;
+            }
+            return null;
+        }
 
-		public virtual string ToStringTree(Parser parser)
-		{
-			return ToString();
-		}
+        public virtual string ToStringTree(Parser parser)
+        {
+            return ToString();
+        }
 
-		public override string ToString()
-		{
-			if (symbol != null)
-			{
-				if (symbol.Type == IToken.Eof)
-				{
-					return "<EOF>";
-				}
-				return symbol.Text;
-			}
-			else
-			{
-				return symbol != null ? symbol.ToString() : "<null>";
-			}
-		}
+        public override string ToString()
+        {
+            if (symbol != null)
+            {
+                if (symbol.Type == IToken.Eof)
+                {
+                    return "<EOF>";
+                }
+                return symbol.Text;
+            }
+            else
+            {
+                return symbol != null ? symbol.ToString() : "<null>";
+            }
+        }
 
-		public virtual string ToStringTree()
-		{
-			return ToString();
-		}
-	}
+        public virtual string ToStringTree()
+        {
+            return ToString();
+        }
+    }
 }

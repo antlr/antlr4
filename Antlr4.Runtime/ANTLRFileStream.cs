@@ -32,68 +32,68 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-	/// <summary>
-	/// This is an ANTLRInputStream that is loaded from a file
-	/// all at once when you construct the object.
-	/// </summary>
-	/// <remarks>
-	/// This is an ANTLRInputStream that is loaded from a file
-	/// all at once when you construct the object.  This is a special case
-	/// since we know the exact size of the object to load.  We can avoid lots
-	/// of data copying.
-	/// </remarks>
-	public class AntlrFileStream : AntlrInputStream
-	{
-		protected internal string fileName;
+    /// <summary>
+    /// This is an ANTLRInputStream that is loaded from a file
+    /// all at once when you construct the object.
+    /// </summary>
+    /// <remarks>
+    /// This is an ANTLRInputStream that is loaded from a file
+    /// all at once when you construct the object.  This is a special case
+    /// since we know the exact size of the object to load.  We can avoid lots
+    /// of data copying.
+    /// </remarks>
+    public class AntlrFileStream : AntlrInputStream
+    {
+        protected internal string fileName;
 
-		/// <exception cref="System.IO.IOException"></exception>
-		public AntlrFileStream(string fileName) : this(fileName, null)
-		{
-		}
+        /// <exception cref="System.IO.IOException"></exception>
+        public AntlrFileStream(string fileName) : this(fileName, null)
+        {
+        }
 
-		/// <exception cref="System.IO.IOException"></exception>
-		public AntlrFileStream(string fileName, string encoding)
-		{
-			this.fileName = fileName;
-			Load(fileName, encoding);
-		}
+        /// <exception cref="System.IO.IOException"></exception>
+        public AntlrFileStream(string fileName, string encoding)
+        {
+            this.fileName = fileName;
+            Load(fileName, encoding);
+        }
 
-		/// <exception cref="System.IO.IOException"></exception>
-		public virtual void Load(string fileName, string encoding)
-		{
-			if (fileName == null)
-			{
-				return;
-			}
-			FilePath f = new FilePath(fileName);
-			int size = (int)f.Length();
-			InputStreamReader isr;
-			FileInputStream fis = new FileInputStream(fileName);
-			if (encoding != null)
-			{
-				isr = new InputStreamReader(fis, encoding);
-			}
-			else
-			{
-				isr = new InputStreamReader(fis);
-			}
-			try
-			{
-				data = new char[size];
-				base.n = isr.Read(data);
-			}
-			finally
-			{
-				isr.Close();
-			}
-		}
+        /// <exception cref="System.IO.IOException"></exception>
+        public virtual void Load(string fileName, string encoding)
+        {
+            if (fileName == null)
+            {
+                return;
+            }
+            FilePath f = new FilePath(fileName);
+            int size = (int)f.Length();
+            InputStreamReader isr;
+            FileInputStream fis = new FileInputStream(fileName);
+            if (encoding != null)
+            {
+                isr = new InputStreamReader(fis, encoding);
+            }
+            else
+            {
+                isr = new InputStreamReader(fis);
+            }
+            try
+            {
+                data = new char[size];
+                base.n = isr.Read(data);
+            }
+            finally
+            {
+                isr.Close();
+            }
+        }
 
-		public override string SourceName
-		{
-			get
-			{
-				return fileName;
-			}
-		}
-	}
+        public override string SourceName
+        {
+            get
+            {
+                return fileName;
+            }
+        }
+    }
 }

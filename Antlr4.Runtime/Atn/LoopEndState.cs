@@ -32,15 +32,15 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	/// <summary>Mark the end of a * or + loop.</summary>
-	/// <remarks>Mark the end of a * or + loop.</remarks>
-	public sealed class LoopEndState : ATNState
-	{
-		public ATNState loopBackState;
+    /// <summary>Mark the end of a * or + loop.</summary>
+    /// <remarks>Mark the end of a * or + loop.</remarks>
+    public sealed class LoopEndState : ATNState
+    {
+        public ATNState loopBackState;
 
-		public override int GetStateType()
-		{
-			return LoopEnd;
-		}
-	}
+        public override int GetStateType()
+        {
+            return LoopEnd;
+        }
+    }
 }

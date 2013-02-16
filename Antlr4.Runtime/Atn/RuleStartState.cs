@@ -32,17 +32,17 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	public sealed class RuleStartState : ATNState
-	{
-		public RuleStopState stopState;
+    public sealed class RuleStartState : ATNState
+    {
+        public RuleStopState stopState;
 
-		public bool isPrecedenceRule;
+        public bool isPrecedenceRule;
 
-		public bool leftFactored;
+        public bool leftFactored;
 
-		public override int GetStateType()
-		{
-			return RuleStart;
-		}
-	}
+        public override int GetStateType()
+        {
+            return RuleStart;
+        }
+    }
 }

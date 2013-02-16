@@ -34,48 +34,48 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	/// <summary>A transition containing a set of values.</summary>
-	/// <remarks>A transition containing a set of values.</remarks>
-	public class SetTransition : Transition
-	{
-		[NotNull]
-		public readonly IntervalSet set;
+    /// <summary>A transition containing a set of values.</summary>
+    /// <remarks>A transition containing a set of values.</remarks>
+    public class SetTransition : Transition
+    {
+        [NotNull]
+        public readonly IntervalSet set;
 
-		public SetTransition(ATNState target, IntervalSet set) : base(target)
-		{
-			// TODO (sam): should we really allow null here?
-			if (set == null)
-			{
-				set = IntervalSet.Of(IToken.InvalidType);
-			}
-			this.set = set;
-		}
+        public SetTransition(ATNState target, IntervalSet set) : base(target)
+        {
+            // TODO (sam): should we really allow null here?
+            if (set == null)
+            {
+                set = IntervalSet.Of(IToken.InvalidType);
+            }
+            this.set = set;
+        }
 
-		public override int SerializationType
-		{
-			get
-			{
-				return Set;
-			}
-		}
+        public override int SerializationType
+        {
+            get
+            {
+                return Set;
+            }
+        }
 
-		public override IntervalSet Label
-		{
-			get
-			{
-				return set;
-			}
-		}
+        public override IntervalSet Label
+        {
+            get
+            {
+                return set;
+            }
+        }
 
-		public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
-		{
-			return set.Contains(symbol);
-		}
+        public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
+        {
+            return set.Contains(symbol);
+        }
 
-		[NotNull]
-		public override string ToString()
-		{
-			return set.ToString();
-		}
-	}
+        [NotNull]
+        public override string ToString()
+        {
+            return set.ToString();
+        }
+    }
 }

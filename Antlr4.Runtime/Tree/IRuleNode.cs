@@ -32,16 +32,16 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
-	public interface IRuleNode : IParseTree
-	{
-		Antlr4.Runtime.RuleContext RuleContext
-		{
-			get;
-		}
+    public interface IRuleNode : IParseTree
+    {
+        Antlr4.Runtime.RuleContext RuleContext
+        {
+            get;
+        }
 
-		IRuleNode Parent
-		{
-			get;
-		}
-	}
+        IRuleNode Parent
+        {
+            get;
+        }
+    }
 }

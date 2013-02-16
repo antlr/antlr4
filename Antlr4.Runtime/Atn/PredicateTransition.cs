@@ -33,64 +33,64 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	/// <summary>
-	/// TODO: this is old comment:
-	/// A tree of semantic predicates from the grammar AST if label==SEMPRED.
-	/// </summary>
-	/// <remarks>
-	/// TODO: this is old comment:
-	/// A tree of semantic predicates from the grammar AST if label==SEMPRED.
-	/// In the ATN, labels will always be exactly one predicate, but the DFA
-	/// may have to combine a bunch of them as it collects predicates from
-	/// multiple ATN configurations into a single DFA state.
-	/// </remarks>
-	public sealed class PredicateTransition : AbstractPredicateTransition
-	{
-		public readonly int ruleIndex;
+    /// <summary>
+    /// TODO: this is old comment:
+    /// A tree of semantic predicates from the grammar AST if label==SEMPRED.
+    /// </summary>
+    /// <remarks>
+    /// TODO: this is old comment:
+    /// A tree of semantic predicates from the grammar AST if label==SEMPRED.
+    /// In the ATN, labels will always be exactly one predicate, but the DFA
+    /// may have to combine a bunch of them as it collects predicates from
+    /// multiple ATN configurations into a single DFA state.
+    /// </remarks>
+    public sealed class PredicateTransition : AbstractPredicateTransition
+    {
+        public readonly int ruleIndex;
 
-		public readonly int predIndex;
+        public readonly int predIndex;
 
-		public readonly bool isCtxDependent;
+        public readonly bool isCtxDependent;
 
-		public PredicateTransition(ATNState target, int ruleIndex, int predIndex, bool isCtxDependent
-			) : base(target)
-		{
-			// e.g., $i ref in pred
-			this.ruleIndex = ruleIndex;
-			this.predIndex = predIndex;
-			this.isCtxDependent = isCtxDependent;
-		}
+        public PredicateTransition(ATNState target, int ruleIndex, int predIndex, bool isCtxDependent
+            ) : base(target)
+        {
+            // e.g., $i ref in pred
+            this.ruleIndex = ruleIndex;
+            this.predIndex = predIndex;
+            this.isCtxDependent = isCtxDependent;
+        }
 
-		public override int SerializationType
-		{
-			get
-			{
-				return Predicate;
-			}
-		}
+        public override int SerializationType
+        {
+            get
+            {
+                return Predicate;
+            }
+        }
 
-		public override bool IsEpsilon
-		{
-			get
-			{
-				return true;
-			}
-		}
+        public override bool IsEpsilon
+        {
+            get
+            {
+                return true;
+            }
+        }
 
-		public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
-		{
-			return false;
-		}
+        public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
+        {
+            return false;
+        }
 
-		public SemanticContext.Predicate GetPredicate()
-		{
-			return new SemanticContext.Predicate(ruleIndex, predIndex, isCtxDependent);
-		}
+        public SemanticContext.Predicate GetPredicate()
+        {
+            return new SemanticContext.Predicate(ruleIndex, predIndex, isCtxDependent);
+        }
 
-		[NotNull]
-		public override string ToString()
-		{
-			return "pred_" + ruleIndex + ":" + predIndex;
-		}
-	}
+        [NotNull]
+        public override string ToString()
+        {
+            return "pred_" + ruleIndex + ":" + predIndex;
+        }
+    }
 }

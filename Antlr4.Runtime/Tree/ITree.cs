@@ -32,67 +32,67 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
-	/// <summary>The basic notion of a tree has a parent, a payload, and a list of children.
-	/// 	</summary>
-	/// <remarks>
-	/// The basic notion of a tree has a parent, a payload, and a list of children.
-	/// It is the most abstract interface for all the trees used by ANTLR.
-	/// </remarks>
-	public interface ITree
-	{
-		/// <summary>The parent of this node.</summary>
-		/// <remarks>
-		/// The parent of this node. If the return value is null, then this
-		/// node is the root of the tree.
-		/// </remarks>
-		ITree Parent
-		{
-			get;
-		}
+    /// <summary>The basic notion of a tree has a parent, a payload, and a list of children.
+    ///     </summary>
+    /// <remarks>
+    /// The basic notion of a tree has a parent, a payload, and a list of children.
+    /// It is the most abstract interface for all the trees used by ANTLR.
+    /// </remarks>
+    public interface ITree
+    {
+        /// <summary>The parent of this node.</summary>
+        /// <remarks>
+        /// The parent of this node. If the return value is null, then this
+        /// node is the root of the tree.
+        /// </remarks>
+        ITree Parent
+        {
+            get;
+        }
 
-		/// <summary>This method returns whatever object represents the data at this note.</summary>
-		/// <remarks>
-		/// This method returns whatever object represents the data at this note. For
-		/// example, for parse trees, the payload can be a
-		/// <see cref="Antlr4.Runtime.IToken">Antlr4.Runtime.IToken</see>
-		/// representing
-		/// a leaf node or a
-		/// <see cref="Antlr4.Runtime.RuleContext">Antlr4.Runtime.RuleContext</see>
-		/// object representing a rule
-		/// invocation. For abstract syntax trees (ASTs), this is a
-		/// <see cref="Antlr4.Runtime.IToken">Antlr4.Runtime.IToken</see>
-		/// object.
-		/// </remarks>
-		object Payload
-		{
-			get;
-		}
+        /// <summary>This method returns whatever object represents the data at this note.</summary>
+        /// <remarks>
+        /// This method returns whatever object represents the data at this note. For
+        /// example, for parse trees, the payload can be a
+        /// <see cref="Antlr4.Runtime.IToken">Antlr4.Runtime.IToken</see>
+        /// representing
+        /// a leaf node or a
+        /// <see cref="Antlr4.Runtime.RuleContext">Antlr4.Runtime.RuleContext</see>
+        /// object representing a rule
+        /// invocation. For abstract syntax trees (ASTs), this is a
+        /// <see cref="Antlr4.Runtime.IToken">Antlr4.Runtime.IToken</see>
+        /// object.
+        /// </remarks>
+        object Payload
+        {
+            get;
+        }
 
-		/// <summary>
-		/// If there are children, get the
-		/// <code>i</code>
-		/// th value indexed from 0.
-		/// </summary>
-		ITree GetChild(int i);
+        /// <summary>
+        /// If there are children, get the
+        /// <code>i</code>
+        /// th value indexed from 0.
+        /// </summary>
+        ITree GetChild(int i);
 
-		/// <summary>
-		/// How many children are there? If there is none, then this
-		/// node represents a leaf node.
-		/// </summary>
-		/// <remarks>
-		/// How many children are there? If there is none, then this
-		/// node represents a leaf node.
-		/// </remarks>
-		int ChildCount
-		{
-			get;
-		}
+        /// <summary>
+        /// How many children are there? If there is none, then this
+        /// node represents a leaf node.
+        /// </summary>
+        /// <remarks>
+        /// How many children are there? If there is none, then this
+        /// node represents a leaf node.
+        /// </remarks>
+        int ChildCount
+        {
+            get;
+        }
 
-		/// <summary>
-		/// Print out a whole tree, not just a node, in LISP format
-		/// <code>(root child1 .. childN)</code>
-		/// . Print just a node if this is a leaf.
-		/// </summary>
-		string ToStringTree();
-	}
+        /// <summary>
+        /// Print out a whole tree, not just a node, in LISP format
+        /// <code>(root child1 .. childN)</code>
+        /// . Print just a node if this is a leaf.
+        /// </summary>
+        string ToStringTree();
+    }
 }

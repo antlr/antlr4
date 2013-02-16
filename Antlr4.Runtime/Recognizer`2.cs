@@ -35,185 +35,185 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-	public abstract class Recognizer<Symbol, ATNInterpreter> where ATNInterpreter:ATNSimulator
-	{
-		public const int Eof = -1;
+    public abstract class Recognizer<Symbol, ATNInterpreter> where ATNInterpreter:ATNSimulator
+    {
+        public const int Eof = -1;
 
-		private sealed class _CopyOnWriteArrayList_49 : CopyOnWriteArrayList<IAntlrErrorListener
-			<Symbol>>
-		{
-			public _CopyOnWriteArrayList_49()
-			{
-				{
-					this.AddItem(ConsoleErrorListener.Instance);
-				}
-			}
-		}
+        private sealed class _CopyOnWriteArrayList_49 : CopyOnWriteArrayList<IAntlrErrorListener
+            <Symbol>>
+        {
+            public _CopyOnWriteArrayList_49()
+            {
+                {
+                    this.AddItem(ConsoleErrorListener.Instance);
+                }
+            }
+        }
 
-		[NotNull]
-		private IList<IAntlrErrorListener<Symbol>> _listeners = new _CopyOnWriteArrayList_49
-			();
+        [NotNull]
+        private IList<IAntlrErrorListener<Symbol>> _listeners = new _CopyOnWriteArrayList_49
+            ();
 
-		protected internal ATNInterpreter _interp;
+        protected internal ATNInterpreter _interp;
 
-		private int _stateNumber = -1;
+        private int _stateNumber = -1;
 
-		/// <summary>
-		/// Used to print out token names like ID during debugging and
-		/// error reporting.
-		/// </summary>
-		/// <remarks>
-		/// Used to print out token names like ID during debugging and
-		/// error reporting.  The generated parsers implement a method
-		/// that overrides this to point to their String[] tokenNames.
-		/// </remarks>
-		public abstract string[] GetTokenNames();
+        /// <summary>
+        /// Used to print out token names like ID during debugging and
+        /// error reporting.
+        /// </summary>
+        /// <remarks>
+        /// Used to print out token names like ID during debugging and
+        /// error reporting.  The generated parsers implement a method
+        /// that overrides this to point to their String[] tokenNames.
+        /// </remarks>
+        public abstract string[] GetTokenNames();
 
-		public abstract string[] GetRuleNames();
+        public abstract string[] GetRuleNames();
 
-		/// <summary>For debugging and other purposes, might want the grammar name.</summary>
-		/// <remarks>
-		/// For debugging and other purposes, might want the grammar name.
-		/// Have ANTLR generate an implementation for this method.
-		/// </remarks>
-		public abstract string GetGrammarFileName();
+        /// <summary>For debugging and other purposes, might want the grammar name.</summary>
+        /// <remarks>
+        /// For debugging and other purposes, might want the grammar name.
+        /// Have ANTLR generate an implementation for this method.
+        /// </remarks>
+        public abstract string GetGrammarFileName();
 
-		public virtual ATN GetATN()
-		{
-			return _interp.atn;
-		}
+        public virtual ATN GetATN()
+        {
+            return _interp.atn;
+        }
 
-		public virtual ATNInterpreter GetInterpreter()
-		{
-			return _interp;
-		}
+        public virtual ATNInterpreter GetInterpreter()
+        {
+            return _interp;
+        }
 
-		public virtual void SetInterpreter(ATNInterpreter interpreter)
-		{
-			_interp = interpreter;
-		}
+        public virtual void SetInterpreter(ATNInterpreter interpreter)
+        {
+            _interp = interpreter;
+        }
 
-		/// <summary>What is the error header, normally line/character position information?</summary>
-		public virtual string GetErrorHeader(RecognitionException e)
-		{
-			int line = e.GetOffendingToken().Line;
-			int charPositionInLine = e.GetOffendingToken().Column;
-			return "line " + line + ":" + charPositionInLine;
-		}
+        /// <summary>What is the error header, normally line/character position information?</summary>
+        public virtual string GetErrorHeader(RecognitionException e)
+        {
+            int line = e.GetOffendingToken().Line;
+            int charPositionInLine = e.GetOffendingToken().Column;
+            return "line " + line + ":" + charPositionInLine;
+        }
 
-		/// <summary>
-		/// How should a token be displayed in an error message? The default
-		/// is to display just the text, but during development you might
-		/// want to have a lot of information spit out.
-		/// </summary>
-		/// <remarks>
-		/// How should a token be displayed in an error message? The default
-		/// is to display just the text, but during development you might
-		/// want to have a lot of information spit out.  Override in that case
-		/// to use t.toString() (which, for CommonToken, dumps everything about
-		/// the token). This is better than forcing you to override a method in
-		/// your token objects because you don't have to go modify your lexer
-		/// so that it creates a new Java type.
-		/// </remarks>
-		public virtual string GetTokenErrorDisplay(IToken t)
-		{
-			if (t == null)
-			{
-				return "<no token>";
-			}
-			string s = t.Text;
-			if (s == null)
-			{
-				if (t.Type == IToken.Eof)
-				{
-					s = "<EOF>";
-				}
-				else
-				{
-					s = "<" + t.Type + ">";
-				}
-			}
-			s = s.ReplaceAll("\n", "\\\\n");
-			s = s.ReplaceAll("\r", "\\\\r");
-			s = s.ReplaceAll("\t", "\\\\t");
-			return "'" + s + "'";
-		}
+        /// <summary>
+        /// How should a token be displayed in an error message? The default
+        /// is to display just the text, but during development you might
+        /// want to have a lot of information spit out.
+        /// </summary>
+        /// <remarks>
+        /// How should a token be displayed in an error message? The default
+        /// is to display just the text, but during development you might
+        /// want to have a lot of information spit out.  Override in that case
+        /// to use t.toString() (which, for CommonToken, dumps everything about
+        /// the token). This is better than forcing you to override a method in
+        /// your token objects because you don't have to go modify your lexer
+        /// so that it creates a new Java type.
+        /// </remarks>
+        public virtual string GetTokenErrorDisplay(IToken t)
+        {
+            if (t == null)
+            {
+                return "<no token>";
+            }
+            string s = t.Text;
+            if (s == null)
+            {
+                if (t.Type == IToken.Eof)
+                {
+                    s = "<EOF>";
+                }
+                else
+                {
+                    s = "<" + t.Type + ">";
+                }
+            }
+            s = s.ReplaceAll("\n", "\\\\n");
+            s = s.ReplaceAll("\r", "\\\\r");
+            s = s.ReplaceAll("\t", "\\\\t");
+            return "'" + s + "'";
+        }
 
-		/// <exception cref="System.ArgumentNullException">
-		/// if
-		/// <code>listener</code>
-		/// is
-		/// <code>null</code>
-		/// .
-		/// </exception>
-		public virtual void AddErrorListener<_T0>(IAntlrErrorListener<_T0> listener)
-		{
-			Args.NotNull("listener", listener);
-			_listeners.AddItem(listener);
-		}
+        /// <exception cref="System.ArgumentNullException">
+        /// if
+        /// <code>listener</code>
+        /// is
+        /// <code>null</code>
+        /// .
+        /// </exception>
+        public virtual void AddErrorListener<_T0>(IAntlrErrorListener<_T0> listener)
+        {
+            Args.NotNull("listener", listener);
+            _listeners.AddItem(listener);
+        }
 
-		public virtual void RemoveErrorListener<_T0>(IAntlrErrorListener<_T0> listener)
-		{
-			_listeners.Remove(listener);
-		}
+        public virtual void RemoveErrorListener<_T0>(IAntlrErrorListener<_T0> listener)
+        {
+            _listeners.Remove(listener);
+        }
 
-		public virtual void RemoveErrorListeners()
-		{
-			_listeners.Clear();
-		}
+        public virtual void RemoveErrorListeners()
+        {
+            _listeners.Clear();
+        }
 
-		[NotNull]
-		public virtual IList<IAntlrErrorListener<Symbol>> GetErrorListeners()
-		{
-			return new List<IAntlrErrorListener<Symbol>>(_listeners);
-		}
+        [NotNull]
+        public virtual IList<IAntlrErrorListener<Symbol>> GetErrorListeners()
+        {
+            return new List<IAntlrErrorListener<Symbol>>(_listeners);
+        }
 
-		public virtual IAntlrErrorListener<Symbol> GetErrorListenerDispatch()
-		{
-			return new ProxyErrorListener<Symbol>(GetErrorListeners());
-		}
+        public virtual IAntlrErrorListener<Symbol> GetErrorListenerDispatch()
+        {
+            return new ProxyErrorListener<Symbol>(GetErrorListeners());
+        }
 
-		// subclass needs to override these if there are sempreds or actions
-		// that the ATN interp needs to execute
-		public virtual bool Sempred(RuleContext _localctx, int ruleIndex, int actionIndex
-			)
-		{
-			return true;
-		}
+        // subclass needs to override these if there are sempreds or actions
+        // that the ATN interp needs to execute
+        public virtual bool Sempred(RuleContext _localctx, int ruleIndex, int actionIndex
+            )
+        {
+            return true;
+        }
 
-		public virtual bool Precpred(RuleContext localctx, int precedence)
-		{
-			return true;
-		}
+        public virtual bool Precpred(RuleContext localctx, int precedence)
+        {
+            return true;
+        }
 
-		public virtual void Action(RuleContext _localctx, int ruleIndex, int actionIndex)
-		{
-		}
+        public virtual void Action(RuleContext _localctx, int ruleIndex, int actionIndex)
+        {
+        }
 
-		public int GetState()
-		{
-			return _stateNumber;
-		}
+        public int GetState()
+        {
+            return _stateNumber;
+        }
 
-		/// <summary>
-		/// Indicate that the recognizer has changed internal state that is
-		/// consistent with the ATN state passed in.
-		/// </summary>
-		/// <remarks>
-		/// Indicate that the recognizer has changed internal state that is
-		/// consistent with the ATN state passed in.  This way we always know
-		/// where we are in the ATN as the parser goes along. The rule
-		/// context objects form a stack that lets us see the stack of
-		/// invoking rules. Combine this and we have complete ATN
-		/// configuration information.
-		/// </remarks>
-		public void SetState(int atnState)
-		{
-			//		System.err.println("setState "+atnState);
-			_stateNumber = atnState;
-		}
+        /// <summary>
+        /// Indicate that the recognizer has changed internal state that is
+        /// consistent with the ATN state passed in.
+        /// </summary>
+        /// <remarks>
+        /// Indicate that the recognizer has changed internal state that is
+        /// consistent with the ATN state passed in.  This way we always know
+        /// where we are in the ATN as the parser goes along. The rule
+        /// context objects form a stack that lets us see the stack of
+        /// invoking rules. Combine this and we have complete ATN
+        /// configuration information.
+        /// </remarks>
+        public void SetState(int atnState)
+        {
+            //		System.err.println("setState "+atnState);
+            _stateNumber = atnState;
+        }
 
-		//		if ( traceATNStates ) _ctx.trace(atnState);
-		public abstract IIntStream GetInputStream();
-	}
+        //		if ( traceATNStates ) _ctx.trace(atnState);
+        public abstract IIntStream GetInputStream();
+    }
 }

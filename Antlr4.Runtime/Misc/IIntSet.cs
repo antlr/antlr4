@@ -33,60 +33,60 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Misc
 {
-	/// <summary>A generic set of ints.</summary>
-	/// <remarks>A generic set of ints.</remarks>
-	/// <seealso cref="IntervalSet">IntervalSet</seealso>
-	public interface IIntSet
-	{
-		/// <summary>Add an element to the set</summary>
-		void Add(int el);
+    /// <summary>A generic set of ints.</summary>
+    /// <remarks>A generic set of ints.</remarks>
+    /// <seealso cref="IntervalSet">IntervalSet</seealso>
+    public interface IIntSet
+    {
+        /// <summary>Add an element to the set</summary>
+        void Add(int el);
 
-		/// <summary>Add all elements from incoming set to this set.</summary>
-		/// <remarks>
-		/// Add all elements from incoming set to this set.  Can limit
-		/// to set of its own type. Return "this" so we can chain calls.
-		/// </remarks>
-		IIntSet AddAll(IIntSet set);
+        /// <summary>Add all elements from incoming set to this set.</summary>
+        /// <remarks>
+        /// Add all elements from incoming set to this set.  Can limit
+        /// to set of its own type. Return "this" so we can chain calls.
+        /// </remarks>
+        IIntSet AddAll(IIntSet set);
 
-		/// <summary>
-		/// Return the intersection of this set with the argument, creating
-		/// a new set.
-		/// </summary>
-		/// <remarks>
-		/// Return the intersection of this set with the argument, creating
-		/// a new set.
-		/// </remarks>
-		IIntSet And(IIntSet a);
+        /// <summary>
+        /// Return the intersection of this set with the argument, creating
+        /// a new set.
+        /// </summary>
+        /// <remarks>
+        /// Return the intersection of this set with the argument, creating
+        /// a new set.
+        /// </remarks>
+        IIntSet And(IIntSet a);
 
-		IIntSet Complement(IIntSet elements);
+        IIntSet Complement(IIntSet elements);
 
-		IIntSet Or(IIntSet a);
+        IIntSet Or(IIntSet a);
 
-		IIntSet Subtract(IIntSet a);
+        IIntSet Subtract(IIntSet a);
 
-		/// <summary>
-		/// Return the size of this set (not the underlying implementation's
-		/// allocated memory size, for example).
-		/// </summary>
-		/// <remarks>
-		/// Return the size of this set (not the underlying implementation's
-		/// allocated memory size, for example).
-		/// </remarks>
-		int Size();
+        /// <summary>
+        /// Return the size of this set (not the underlying implementation's
+        /// allocated memory size, for example).
+        /// </summary>
+        /// <remarks>
+        /// Return the size of this set (not the underlying implementation's
+        /// allocated memory size, for example).
+        /// </remarks>
+        int Size();
 
-		bool IsNil();
+        bool IsNil();
 
-		bool Equals(object obj);
+        bool Equals(object obj);
 
-		int GetSingleElement();
+        int GetSingleElement();
 
-		bool Contains(int el);
+        bool Contains(int el);
 
-		/// <summary>remove this element from this set</summary>
-		void Remove(int el);
+        /// <summary>remove this element from this set</summary>
+        void Remove(int el);
 
-		IList<int> ToList();
+        IList<int> ToList();
 
-		string ToString();
-	}
+        string ToString();
+    }
 }

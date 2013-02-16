@@ -35,39 +35,39 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-	public class DiagnosticErrorListener : BaseErrorListener
-	{
-		public override void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, 
-			int stopIndex, BitSet ambigAlts, ATNConfigSet configs)
-		{
-			string format = "reportAmbiguity d=%s: ambigAlts=%s, input='%s'";
-			recognizer.NotifyErrorListeners(string.Format(format, GetDecisionDescription(recognizer
-				, dfa.decision), ambigAlts, ((ITokenStream)recognizer.GetInputStream()).GetText(
-				Interval.Of(startIndex, stopIndex))));
-		}
+    public class DiagnosticErrorListener : BaseErrorListener
+    {
+        public override void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, 
+            int stopIndex, BitSet ambigAlts, ATNConfigSet configs)
+        {
+            string format = "reportAmbiguity d=%s: ambigAlts=%s, input='%s'";
+            recognizer.NotifyErrorListeners(string.Format(format, GetDecisionDescription(recognizer
+                , dfa.decision), ambigAlts, ((ITokenStream)recognizer.GetInputStream()).GetText
+                (Interval.Of(startIndex, stopIndex))));
+        }
 
-		public override void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int 
-			startIndex, int stopIndex, SimulatorState initialState)
-		{
-			string format = "reportAttemptingFullContext d=%s, input='%s'";
-			recognizer.NotifyErrorListeners(string.Format(format, GetDecisionDescription(recognizer
-				, dfa.decision), ((ITokenStream)recognizer.GetInputStream()).GetText(Interval.Of
-				(startIndex, stopIndex))));
-		}
+        public override void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int 
+            startIndex, int stopIndex, SimulatorState initialState)
+        {
+            string format = "reportAttemptingFullContext d=%s, input='%s'";
+            recognizer.NotifyErrorListeners(string.Format(format, GetDecisionDescription(recognizer
+                , dfa.decision), ((ITokenStream)recognizer.GetInputStream()).GetText(Interval
+                .Of(startIndex, stopIndex))));
+        }
 
-		public override void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex
-			, int stopIndex, SimulatorState acceptState)
-		{
-			string format = "reportContextSensitivity d=%s, input='%s'";
-			recognizer.NotifyErrorListeners(string.Format(format, GetDecisionDescription(recognizer
-				, dfa.decision), ((ITokenStream)recognizer.GetInputStream()).GetText(Interval.Of
-				(startIndex, stopIndex))));
-		}
+        public override void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex
+            , int stopIndex, SimulatorState acceptState)
+        {
+            string format = "reportContextSensitivity d=%s, input='%s'";
+            recognizer.NotifyErrorListeners(string.Format(format, GetDecisionDescription(recognizer
+                , dfa.decision), ((ITokenStream)recognizer.GetInputStream()).GetText(Interval
+                .Of(startIndex, stopIndex))));
+        }
 
-		protected internal virtual string GetDecisionDescription(Parser recognizer, int decision
-			)
-		{
-			return Sharpen.Extensions.ToString(decision);
-		}
-	}
+        protected internal virtual string GetDecisionDescription(Parser recognizer, int decision
+            )
+        {
+            return Sharpen.Extensions.ToString(decision);
+        }
+    }
 }

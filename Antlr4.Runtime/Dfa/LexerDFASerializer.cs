@@ -33,16 +33,16 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Dfa
 {
-	public class LexerDFASerializer : DFASerializer
-	{
-		public LexerDFASerializer(DFA dfa) : base(dfa, (string[])null)
-		{
-		}
+    public class LexerDFASerializer : DFASerializer
+    {
+        public LexerDFASerializer(DFA dfa) : base(dfa, (string[])null)
+        {
+        }
 
-		[NotNull]
-		protected internal override string GetEdgeLabel(int i)
-		{
-			return "'" + (char)i + "'";
-		}
-	}
+        [NotNull]
+        protected internal override string GetEdgeLabel(int i)
+        {
+            return "'" + (char)i + "'";
+        }
+    }
 }

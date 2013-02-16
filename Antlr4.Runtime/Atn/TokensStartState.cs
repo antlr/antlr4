@@ -32,12 +32,12 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	/// <summary>The Tokens rule start state linking to each lexer rule start state</summary>
-	public sealed class TokensStartState : DecisionState
-	{
-		public override int GetStateType()
-		{
-			return TokenStart;
-		}
-	}
+    /// <summary>The Tokens rule start state linking to each lexer rule start state</summary>
+    public sealed class TokensStartState : DecisionState
+    {
+        public override int GetStateType()
+        {
+            return TokenStart;
+        }
+    }
 }

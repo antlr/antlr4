@@ -32,16 +32,16 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-	/// <author>Sam Harwell</author>
-	public class ConsoleErrorListener : IAntlrErrorListener<object>
-	{
-		public static readonly ConsoleErrorListener Instance = new ConsoleErrorListener();
+    /// <author>Sam Harwell</author>
+    public class ConsoleErrorListener : IAntlrErrorListener<object>
+    {
+        public static readonly ConsoleErrorListener Instance = new ConsoleErrorListener();
 
-		public virtual void SyntaxError<T>(Recognizer<T, object> recognizer, T offendingSymbol
-			, int line, int charPositionInLine, string msg, RecognitionException e)
-		{
-			System.Console.Error.WriteLine("line " + line + ":" + charPositionInLine + " " + 
-				msg);
-		}
-	}
+        public virtual void SyntaxError<T>(Recognizer<T, object> recognizer, T offendingSymbol
+            , int line, int charPositionInLine, string msg, RecognitionException e)
+        {
+            System.Console.Error.WriteLine("line " + line + ":" + charPositionInLine + " " + 
+                msg);
+        }
+    }
 }

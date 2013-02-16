@@ -33,29 +33,29 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	public sealed class WildcardTransition : Transition
-	{
-		protected internal WildcardTransition(ATNState target) : base(target)
-		{
-		}
+    public sealed class WildcardTransition : Transition
+    {
+        protected internal WildcardTransition(ATNState target) : base(target)
+        {
+        }
 
-		public override int SerializationType
-		{
-			get
-			{
-				return Wildcard;
-			}
-		}
+        public override int SerializationType
+        {
+            get
+            {
+                return Wildcard;
+            }
+        }
 
-		public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
-		{
-			return symbol >= minVocabSymbol && symbol <= maxVocabSymbol;
-		}
+        public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
+        {
+            return symbol >= minVocabSymbol && symbol <= maxVocabSymbol;
+        }
 
-		[NotNull]
-		public override string ToString()
-		{
-			return ".";
-		}
-	}
+        [NotNull]
+        public override string ToString()
+        {
+            return ".";
+        }
+    }
 }

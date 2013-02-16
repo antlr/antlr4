@@ -32,62 +32,62 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-	/// <summary>Bail out of parser at first syntax error.</summary>
-	/// <remarks>
-	/// Bail out of parser at first syntax error. Do this to use it:
-	/// <p/>
-	/// <code>myparser.setErrorHandler(new BailErrorStrategy<Token>());</code>
-	/// </remarks>
-	public class BailErrorStrategy : DefaultErrorStrategy
-	{
-		/// <summary>
-		/// Instead of recovering from exception
-		/// <code>e</code>
-		/// , re-throw it wrapped
-		/// in a
-		/// <see cref="ParseCanceledException">ParseCanceledException</see>
-		/// so it is not caught by the
-		/// rule function catches.  Use
-		/// <see cref="System.Exception.InnerException()">System.Exception.InnerException()</see>
-		/// to get the
-		/// original
-		/// <see cref="RecognitionException">RecognitionException</see>
-		/// .
-		/// </summary>
-		public override void Recover(Parser recognizer, RecognitionException e)
-		{
-			for (ParserRuleContext context = recognizer.GetContext(); context != null; context
-				 = ((ParserRuleContext)context.Parent))
-			{
-				context.exception = e;
-			}
-			throw new ParseCanceledException(e);
-		}
+    /// <summary>Bail out of parser at first syntax error.</summary>
+    /// <remarks>
+    /// Bail out of parser at first syntax error. Do this to use it:
+    /// <p/>
+    /// <code>myparser.setErrorHandler(new BailErrorStrategy<Token>());</code>
+    /// </remarks>
+    public class BailErrorStrategy : DefaultErrorStrategy
+    {
+        /// <summary>
+        /// Instead of recovering from exception
+        /// <code>e</code>
+        /// , re-throw it wrapped
+        /// in a
+        /// <see cref="ParseCanceledException">ParseCanceledException</see>
+        /// so it is not caught by the
+        /// rule function catches.  Use
+        /// <see cref="System.Exception.InnerException()">System.Exception.InnerException()</see>
+        /// to get the
+        /// original
+        /// <see cref="RecognitionException">RecognitionException</see>
+        /// .
+        /// </summary>
+        public override void Recover(Parser recognizer, RecognitionException e)
+        {
+            for (ParserRuleContext context = recognizer.GetContext(); context != null; context
+                 = ((ParserRuleContext)context.Parent))
+            {
+                context.exception = e;
+            }
+            throw new ParseCanceledException(e);
+        }
 
-		/// <summary>
-		/// Make sure we don't attempt to recover inline; if the parser
-		/// successfully recovers, it won't throw an exception.
-		/// </summary>
-		/// <remarks>
-		/// Make sure we don't attempt to recover inline; if the parser
-		/// successfully recovers, it won't throw an exception.
-		/// </remarks>
-		/// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
-		public override IToken RecoverInline(Parser recognizer)
-		{
-			InputMismatchException e = new InputMismatchException(recognizer);
-			for (ParserRuleContext context = recognizer.GetContext(); context != null; context
-				 = ((ParserRuleContext)context.Parent))
-			{
-				context.exception = e;
-			}
-			throw new ParseCanceledException(e);
-		}
+        /// <summary>
+        /// Make sure we don't attempt to recover inline; if the parser
+        /// successfully recovers, it won't throw an exception.
+        /// </summary>
+        /// <remarks>
+        /// Make sure we don't attempt to recover inline; if the parser
+        /// successfully recovers, it won't throw an exception.
+        /// </remarks>
+        /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
+        public override IToken RecoverInline(Parser recognizer)
+        {
+            InputMismatchException e = new InputMismatchException(recognizer);
+            for (ParserRuleContext context = recognizer.GetContext(); context != null; context
+                 = ((ParserRuleContext)context.Parent))
+            {
+                context.exception = e;
+            }
+            throw new ParseCanceledException(e);
+        }
 
-		/// <summary>Make sure we don't attempt to recover from problems in subrules.</summary>
-		/// <remarks>Make sure we don't attempt to recover from problems in subrules.</remarks>
-		public override void Sync(Parser recognizer)
-		{
-		}
-	}
+        /// <summary>Make sure we don't attempt to recover from problems in subrules.</summary>
+        /// <remarks>Make sure we don't attempt to recover from problems in subrules.</remarks>
+        public override void Sync(Parser recognizer)
+        {
+        }
+    }
 }

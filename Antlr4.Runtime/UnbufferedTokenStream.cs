@@ -35,400 +35,400 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-	public class UnbufferedTokenStream : ITokenStream
-	{
-		protected internal ITokenSource tokenSource;
+    public class UnbufferedTokenStream : ITokenStream
+    {
+        protected internal ITokenSource tokenSource;
 
-		/// <summary>A moving window buffer of the data being scanned.</summary>
-		/// <remarks>
-		/// A moving window buffer of the data being scanned. While there's a marker,
-		/// we keep adding to buffer. Otherwise,
-		/// <see cref="Consume()">consume()</see>
-		/// resets so
-		/// we start filling at index 0 again.
-		/// </remarks>
-		protected internal IToken[] tokens;
+        /// <summary>A moving window buffer of the data being scanned.</summary>
+        /// <remarks>
+        /// A moving window buffer of the data being scanned. While there's a marker,
+        /// we keep adding to buffer. Otherwise,
+        /// <see cref="Consume()">consume()</see>
+        /// resets so
+        /// we start filling at index 0 again.
+        /// </remarks>
+        protected internal IToken[] tokens;
 
-		/// <summary>
-		/// The number of tokens currently in
-		/// <see cref="tokens">tokens</see>
-		/// .
-		/// <p/>
-		/// This is not the buffer capacity, that's
-		/// <code>tokens.length</code>
-		/// .
-		/// </summary>
-		protected internal int n;
+        /// <summary>
+        /// The number of tokens currently in
+        /// <see cref="tokens">tokens</see>
+        /// .
+        /// <p/>
+        /// This is not the buffer capacity, that's
+        /// <code>tokens.length</code>
+        /// .
+        /// </summary>
+        protected internal int n;
 
-		/// <summary>
-		/// 0..n-1 index into
-		/// <see cref="tokens">tokens</see>
-		/// of next token.
-		/// <p/>
-		/// The
-		/// <code>LT(1)</code>
-		/// token is
-		/// <code>tokens[p]</code>
-		/// . If
-		/// <code>p == n</code>
-		/// , we are
-		/// out of buffered tokens.
-		/// </summary>
-		protected internal int p = 0;
+        /// <summary>
+        /// 0..n-1 index into
+        /// <see cref="tokens">tokens</see>
+        /// of next token.
+        /// <p/>
+        /// The
+        /// <code>LT(1)</code>
+        /// token is
+        /// <code>tokens[p]</code>
+        /// . If
+        /// <code>p == n</code>
+        /// , we are
+        /// out of buffered tokens.
+        /// </summary>
+        protected internal int p = 0;
 
-		/// <summary>
-		/// Count up with
-		/// <see cref="Mark()">mark()</see>
-		/// and down with
-		/// <see cref="Release(int)">release()</see>
-		/// . When we
-		/// <code>release()</code>
-		/// the last mark,
-		/// <code>numMarkers</code>
-		/// reaches 0 and we reset the buffer. Copy
-		/// <code>tokens[p]..tokens[n-1]</code>
-		/// to
-		/// <code>tokens[0]..tokens[(n-1)-p]</code>
-		/// .
-		/// </summary>
-		protected internal int numMarkers = 0;
+        /// <summary>
+        /// Count up with
+        /// <see cref="Mark()">mark()</see>
+        /// and down with
+        /// <see cref="Release(int)">release()</see>
+        /// . When we
+        /// <code>release()</code>
+        /// the last mark,
+        /// <code>numMarkers</code>
+        /// reaches 0 and we reset the buffer. Copy
+        /// <code>tokens[p]..tokens[n-1]</code>
+        /// to
+        /// <code>tokens[0]..tokens[(n-1)-p]</code>
+        /// .
+        /// </summary>
+        protected internal int numMarkers = 0;
 
-		/// <summary>
-		/// This is the
-		/// <code>LT(-1)</code>
-		/// token for the current position.
-		/// </summary>
-		protected internal IToken lastToken;
+        /// <summary>
+        /// This is the
+        /// <code>LT(-1)</code>
+        /// token for the current position.
+        /// </summary>
+        protected internal IToken lastToken;
 
-		/// <summary>
-		/// When
-		/// <code>numMarkers &gt; 0</code>
-		/// , this is the
-		/// <code>LT(-1)</code>
-		/// token for the
-		/// first token in
-		/// <see cref="tokens">tokens</see>
-		/// . Otherwise, this is
-		/// <code>null</code>
-		/// .
-		/// </summary>
-		protected internal IToken lastTokenBufferStart;
+        /// <summary>
+        /// When
+        /// <code>numMarkers &gt; 0</code>
+        /// , this is the
+        /// <code>LT(-1)</code>
+        /// token for the
+        /// first token in
+        /// <see cref="tokens">tokens</see>
+        /// . Otherwise, this is
+        /// <code>null</code>
+        /// .
+        /// </summary>
+        protected internal IToken lastTokenBufferStart;
 
-		/// <summary>Absolute token index.</summary>
-		/// <remarks>
-		/// Absolute token index. It's the index of the token about to be read via
-		/// <code>LT(1)</code>
-		/// . Goes from 0 to the number of tokens in the entire stream,
-		/// although the stream size is unknown before the end is reached.
-		/// <p/>
-		/// This value is used to set the token indexes if the stream provides tokens
-		/// that implement
-		/// <see cref="IWritableToken">IWritableToken</see>
-		/// .
-		/// </remarks>
-		protected internal int currentTokenIndex = 0;
+        /// <summary>Absolute token index.</summary>
+        /// <remarks>
+        /// Absolute token index. It's the index of the token about to be read via
+        /// <code>LT(1)</code>
+        /// . Goes from 0 to the number of tokens in the entire stream,
+        /// although the stream size is unknown before the end is reached.
+        /// <p/>
+        /// This value is used to set the token indexes if the stream provides tokens
+        /// that implement
+        /// <see cref="IWritableToken">IWritableToken</see>
+        /// .
+        /// </remarks>
+        protected internal int currentTokenIndex = 0;
 
-		public UnbufferedTokenStream(ITokenSource tokenSource) : this(tokenSource, 256)
-		{
-		}
+        public UnbufferedTokenStream(ITokenSource tokenSource) : this(tokenSource, 256)
+        {
+        }
 
-		public UnbufferedTokenStream(ITokenSource tokenSource, int bufferSize)
-		{
-			this.tokenSource = tokenSource;
-			IToken[] tokens = new IToken[bufferSize];
-			this.tokens = tokens;
-			n = 0;
-			Fill(1);
-		}
+        public UnbufferedTokenStream(ITokenSource tokenSource, int bufferSize)
+        {
+            this.tokenSource = tokenSource;
+            IToken[] tokens = new IToken[bufferSize];
+            this.tokens = tokens;
+            n = 0;
+            Fill(1);
+        }
 
-		// prime the pump
-		public virtual IToken Get(int i)
-		{
-			int bufferStartIndex = GetBufferStartIndex();
-			if (i < bufferStartIndex || i >= bufferStartIndex + n)
-			{
-				throw new ArgumentOutOfRangeException("get(" + i + ") outside buffer: " + bufferStartIndex
-					 + ".." + (bufferStartIndex + n));
-			}
-			return tokens[i - bufferStartIndex];
-		}
+        // prime the pump
+        public virtual IToken Get(int i)
+        {
+            int bufferStartIndex = GetBufferStartIndex();
+            if (i < bufferStartIndex || i >= bufferStartIndex + n)
+            {
+                throw new ArgumentOutOfRangeException("get(" + i + ") outside buffer: " + bufferStartIndex
+                     + ".." + (bufferStartIndex + n));
+            }
+            return tokens[i - bufferStartIndex];
+        }
 
-		public virtual IToken Lt(int i)
-		{
-			if (i == -1)
-			{
-				return lastToken;
-			}
-			Sync(i);
-			int index = p + i - 1;
-			if (index < 0)
-			{
-				throw new ArgumentOutOfRangeException("LT(" + i + ") gives negative index");
-			}
-			if (index >= n)
-			{
-				System.Diagnostics.Debug.Assert(n > 0 && tokens[n - 1].Type == IToken.Eof);
-				return tokens[n - 1];
-			}
-			return tokens[index];
-		}
+        public virtual IToken Lt(int i)
+        {
+            if (i == -1)
+            {
+                return lastToken;
+            }
+            Sync(i);
+            int index = p + i - 1;
+            if (index < 0)
+            {
+                throw new ArgumentOutOfRangeException("LT(" + i + ") gives negative index");
+            }
+            if (index >= n)
+            {
+                System.Diagnostics.Debug.Assert(n > 0 && tokens[n - 1].Type == IToken.Eof);
+                return tokens[n - 1];
+            }
+            return tokens[index];
+        }
 
-		public virtual int La(int i)
-		{
-			return Lt(i).Type;
-		}
+        public virtual int La(int i)
+        {
+            return Lt(i).Type;
+        }
 
-		public virtual ITokenSource TokenSource
-		{
-			get
-			{
-				return tokenSource;
-			}
-		}
+        public virtual ITokenSource TokenSource
+        {
+            get
+            {
+                return tokenSource;
+            }
+        }
 
-		[NotNull]
-		public virtual string GetText()
-		{
-			return string.Empty;
-		}
+        [NotNull]
+        public virtual string GetText()
+        {
+            return string.Empty;
+        }
 
-		[NotNull]
-		public virtual string GetText(RuleContext ctx)
-		{
-			return GetText(ctx.SourceInterval);
-		}
+        [NotNull]
+        public virtual string GetText(RuleContext ctx)
+        {
+            return GetText(ctx.SourceInterval);
+        }
 
-		[NotNull]
-		public virtual string GetText(IToken start, IToken stop)
-		{
-			if (start != null && stop != null)
-			{
-				return GetText(Interval.Of(start.TokenIndex, stop.TokenIndex));
-			}
-			throw new NotSupportedException("The specified start and stop symbols are not supported."
-				);
-		}
+        [NotNull]
+        public virtual string GetText(IToken start, IToken stop)
+        {
+            if (start != null && stop != null)
+            {
+                return GetText(Interval.Of(start.TokenIndex, stop.TokenIndex));
+            }
+            throw new NotSupportedException("The specified start and stop symbols are not supported."
+                );
+        }
 
-		public virtual void Consume()
-		{
-			if (La(1) == IToken.Eof)
-			{
-				throw new InvalidOperationException("cannot consume EOF");
-			}
-			// buf always has at least tokens[p==0] in this method due to ctor
-			lastToken = tokens[p];
-			// track last token for LT(-1)
-			// if we're at last token and no markers, opportunity to flush buffer
-			if (p == n - 1 && numMarkers == 0)
-			{
-				n = 0;
-				p = -1;
-				// p++ will leave this at 0
-				lastTokenBufferStart = lastToken;
-			}
-			p++;
-			currentTokenIndex++;
-			Sync(1);
-		}
+        public virtual void Consume()
+        {
+            if (La(1) == IToken.Eof)
+            {
+                throw new InvalidOperationException("cannot consume EOF");
+            }
+            // buf always has at least tokens[p==0] in this method due to ctor
+            lastToken = tokens[p];
+            // track last token for LT(-1)
+            // if we're at last token and no markers, opportunity to flush buffer
+            if (p == n - 1 && numMarkers == 0)
+            {
+                n = 0;
+                p = -1;
+                // p++ will leave this at 0
+                lastTokenBufferStart = lastToken;
+            }
+            p++;
+            currentTokenIndex++;
+            Sync(1);
+        }
 
-		/// <summary>
-		/// Make sure we have 'need' elements from current position
-		/// <see cref="p">p</see>
-		/// . Last valid
-		/// <code>p</code>
-		/// index is
-		/// <code>tokens.length-1</code>
-		/// .
-		/// <code>p+need-1</code>
-		/// is the tokens index 'need' elements
-		/// ahead.  If we need 1 element,
-		/// <code>(p+1-1)==p</code>
-		/// must be less than
-		/// <code>tokens.length</code>
-		/// .
-		/// </summary>
-		protected internal virtual void Sync(int want)
-		{
-			int need = (p + want - 1) - n + 1;
-			// how many more elements we need?
-			if (need > 0)
-			{
-				Fill(need);
-			}
-		}
+        /// <summary>
+        /// Make sure we have 'need' elements from current position
+        /// <see cref="p">p</see>
+        /// . Last valid
+        /// <code>p</code>
+        /// index is
+        /// <code>tokens.length-1</code>
+        /// .
+        /// <code>p+need-1</code>
+        /// is the tokens index 'need' elements
+        /// ahead.  If we need 1 element,
+        /// <code>(p+1-1)==p</code>
+        /// must be less than
+        /// <code>tokens.length</code>
+        /// .
+        /// </summary>
+        protected internal virtual void Sync(int want)
+        {
+            int need = (p + want - 1) - n + 1;
+            // how many more elements we need?
+            if (need > 0)
+            {
+                Fill(need);
+            }
+        }
 
-		/// <summary>
-		/// Add
-		/// <code>n</code>
-		/// elements to the buffer. Returns the number of tokens
-		/// actually added to the buffer. If the return value is less than
-		/// <code>n</code>
-		/// ,
-		/// then EOF was reached before
-		/// <code>n</code>
-		/// tokens could be added.
-		/// </summary>
-		protected internal virtual int Fill(int n)
-		{
-			for (int i = 0; i < n; i++)
-			{
-				if (this.n > 0 && tokens[this.n - 1].Type == IToken.Eof)
-				{
-					return i;
-				}
-				IToken t = tokenSource.NextToken();
-				Add(t);
-			}
-			return n;
-		}
+        /// <summary>
+        /// Add
+        /// <code>n</code>
+        /// elements to the buffer. Returns the number of tokens
+        /// actually added to the buffer. If the return value is less than
+        /// <code>n</code>
+        /// ,
+        /// then EOF was reached before
+        /// <code>n</code>
+        /// tokens could be added.
+        /// </summary>
+        protected internal virtual int Fill(int n)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                if (this.n > 0 && tokens[this.n - 1].Type == IToken.Eof)
+                {
+                    return i;
+                }
+                IToken t = tokenSource.NextToken();
+                Add(t);
+            }
+            return n;
+        }
 
-		protected internal virtual void Add(IToken t)
-		{
-			if (n >= tokens.Length)
-			{
-				tokens = Arrays.CopyOf(tokens, tokens.Length * 2);
-			}
-			if (t is IWritableToken)
-			{
-				((IWritableToken)t).TokenIndex = GetBufferStartIndex() + n;
-			}
-			tokens[n++] = t;
-		}
+        protected internal virtual void Add(IToken t)
+        {
+            if (n >= tokens.Length)
+            {
+                tokens = Arrays.CopyOf(tokens, tokens.Length * 2);
+            }
+            if (t is IWritableToken)
+            {
+                ((IWritableToken)t).TokenIndex = GetBufferStartIndex() + n;
+            }
+            tokens[n++] = t;
+        }
 
-		/// <summary>Return a marker that we can release later.</summary>
-		/// <remarks>
-		/// Return a marker that we can release later.
-		/// <p/>
-		/// The specific marker value used for this class allows for some level of
-		/// protection against misuse where
-		/// <code>seek()</code>
-		/// is called on a mark or
-		/// <code>release()</code>
-		/// is called in the wrong order.
-		/// </remarks>
-		public virtual int Mark()
-		{
-			if (numMarkers == 0)
-			{
-				lastTokenBufferStart = lastToken;
-			}
-			int mark = -numMarkers - 1;
-			numMarkers++;
-			return mark;
-		}
+        /// <summary>Return a marker that we can release later.</summary>
+        /// <remarks>
+        /// Return a marker that we can release later.
+        /// <p/>
+        /// The specific marker value used for this class allows for some level of
+        /// protection against misuse where
+        /// <code>seek()</code>
+        /// is called on a mark or
+        /// <code>release()</code>
+        /// is called in the wrong order.
+        /// </remarks>
+        public virtual int Mark()
+        {
+            if (numMarkers == 0)
+            {
+                lastTokenBufferStart = lastToken;
+            }
+            int mark = -numMarkers - 1;
+            numMarkers++;
+            return mark;
+        }
 
-		public virtual void Release(int marker)
-		{
-			int expectedMark = -numMarkers;
-			if (marker != expectedMark)
-			{
-				throw new InvalidOperationException("release() called with an invalid marker.");
-			}
-			numMarkers--;
-			if (numMarkers == 0)
-			{
-				// can we release buffer?
-				if (p > 0)
-				{
-					// Copy tokens[p]..tokens[n-1] to tokens[0]..tokens[(n-1)-p], reset ptrs
-					// p is last valid token; move nothing if p==n as we have no valid char
-					System.Array.Copy(tokens, p, tokens, 0, n - p);
-					// shift n-p tokens from p to 0
-					n = n - p;
-					p = 0;
-				}
-				lastTokenBufferStart = lastToken;
-			}
-		}
+        public virtual void Release(int marker)
+        {
+            int expectedMark = -numMarkers;
+            if (marker != expectedMark)
+            {
+                throw new InvalidOperationException("release() called with an invalid marker.");
+            }
+            numMarkers--;
+            if (numMarkers == 0)
+            {
+                // can we release buffer?
+                if (p > 0)
+                {
+                    // Copy tokens[p]..tokens[n-1] to tokens[0]..tokens[(n-1)-p], reset ptrs
+                    // p is last valid token; move nothing if p==n as we have no valid char
+                    System.Array.Copy(tokens, p, tokens, 0, n - p);
+                    // shift n-p tokens from p to 0
+                    n = n - p;
+                    p = 0;
+                }
+                lastTokenBufferStart = lastToken;
+            }
+        }
 
-		public virtual int Index
-		{
-			get
-			{
-				return currentTokenIndex;
-			}
-		}
+        public virtual int Index
+        {
+            get
+            {
+                return currentTokenIndex;
+            }
+        }
 
-		public virtual void Seek(int index)
-		{
-			// seek to absolute index
-			if (index == currentTokenIndex)
-			{
-				return;
-			}
-			if (index > currentTokenIndex)
-			{
-				Sync(index - currentTokenIndex);
-				index = Math.Min(index, GetBufferStartIndex() + n - 1);
-			}
-			int bufferStartIndex = GetBufferStartIndex();
-			int i = index - bufferStartIndex;
-			if (i < 0)
-			{
-				throw new ArgumentException("cannot seek to negative index " + index);
-			}
-			else
-			{
-				if (i >= n)
-				{
-					throw new NotSupportedException("seek to index outside buffer: " + index + " not in "
-						 + bufferStartIndex + ".." + (bufferStartIndex + n));
-				}
-			}
-			p = i;
-			currentTokenIndex = index;
-			if (p == 0)
-			{
-				lastToken = lastTokenBufferStart;
-			}
-			else
-			{
-				lastToken = tokens[p - 1];
-			}
-		}
+        public virtual void Seek(int index)
+        {
+            // seek to absolute index
+            if (index == currentTokenIndex)
+            {
+                return;
+            }
+            if (index > currentTokenIndex)
+            {
+                Sync(index - currentTokenIndex);
+                index = Math.Min(index, GetBufferStartIndex() + n - 1);
+            }
+            int bufferStartIndex = GetBufferStartIndex();
+            int i = index - bufferStartIndex;
+            if (i < 0)
+            {
+                throw new ArgumentException("cannot seek to negative index " + index);
+            }
+            else
+            {
+                if (i >= n)
+                {
+                    throw new NotSupportedException("seek to index outside buffer: " + index + " not in "
+                         + bufferStartIndex + ".." + (bufferStartIndex + n));
+                }
+            }
+            p = i;
+            currentTokenIndex = index;
+            if (p == 0)
+            {
+                lastToken = lastTokenBufferStart;
+            }
+            else
+            {
+                lastToken = tokens[p - 1];
+            }
+        }
 
-		public virtual int Size
-		{
-			get
-			{
-				throw new NotSupportedException("Unbuffered stream cannot know its size");
-			}
-		}
+        public virtual int Size
+        {
+            get
+            {
+                throw new NotSupportedException("Unbuffered stream cannot know its size");
+            }
+        }
 
-		public virtual string SourceName
-		{
-			get
-			{
-				return tokenSource.SourceName;
-			}
-		}
+        public virtual string SourceName
+        {
+            get
+            {
+                return tokenSource.SourceName;
+            }
+        }
 
-		[NotNull]
-		public virtual string GetText(Interval interval)
-		{
-			int bufferStartIndex = GetBufferStartIndex();
-			int bufferStopIndex = bufferStartIndex + tokens.Length - 1;
-			int start = interval.a;
-			int stop = interval.b;
-			if (start < bufferStartIndex || stop > bufferStopIndex)
-			{
-				throw new NotSupportedException("interval " + interval + " not in token buffer window: "
-					 + bufferStartIndex + ".." + bufferStopIndex);
-			}
-			int a = start - bufferStartIndex;
-			int b = stop - bufferStartIndex;
-			StringBuilder buf = new StringBuilder();
-			for (int i = a; i <= b; i++)
-			{
-				IToken t = tokens[i];
-				buf.Append(t.Text);
-			}
-			return buf.ToString();
-		}
+        [NotNull]
+        public virtual string GetText(Interval interval)
+        {
+            int bufferStartIndex = GetBufferStartIndex();
+            int bufferStopIndex = bufferStartIndex + tokens.Length - 1;
+            int start = interval.a;
+            int stop = interval.b;
+            if (start < bufferStartIndex || stop > bufferStopIndex)
+            {
+                throw new NotSupportedException("interval " + interval + " not in token buffer window: "
+                     + bufferStartIndex + ".." + bufferStopIndex);
+            }
+            int a = start - bufferStartIndex;
+            int b = stop - bufferStartIndex;
+            StringBuilder buf = new StringBuilder();
+            for (int i = a; i <= b; i++)
+            {
+                IToken t = tokens[i];
+                buf.Append(t.Text);
+            }
+            return buf.ToString();
+        }
 
-		protected internal int GetBufferStartIndex()
-		{
-			return currentTokenIndex - p;
-		}
-	}
+        protected internal int GetBufferStartIndex()
+        {
+            return currentTokenIndex - p;
+        }
+    }
 }

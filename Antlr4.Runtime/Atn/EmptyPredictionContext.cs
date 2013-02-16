@@ -34,103 +34,103 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	public sealed class EmptyPredictionContext : PredictionContext
-	{
-		public static readonly Antlr4.Runtime.Atn.EmptyPredictionContext LocalContext = new 
-			Antlr4.Runtime.Atn.EmptyPredictionContext(false);
+    public sealed class EmptyPredictionContext : PredictionContext
+    {
+        public static readonly Antlr4.Runtime.Atn.EmptyPredictionContext LocalContext = new 
+            Antlr4.Runtime.Atn.EmptyPredictionContext(false);
 
-		public static readonly Antlr4.Runtime.Atn.EmptyPredictionContext FullContext = new 
-			Antlr4.Runtime.Atn.EmptyPredictionContext(true);
+        public static readonly Antlr4.Runtime.Atn.EmptyPredictionContext FullContext = new 
+            Antlr4.Runtime.Atn.EmptyPredictionContext(true);
 
-		private readonly bool fullContext;
+        private readonly bool fullContext;
 
-		private EmptyPredictionContext(bool fullContext) : base(CalculateHashCode(CalculateEmptyParentHashCode
-			(), CalculateEmptyReturnStateHashCode()))
-		{
-			this.fullContext = fullContext;
-		}
+        private EmptyPredictionContext(bool fullContext) : base(CalculateHashCode(CalculateEmptyParentHashCode
+            (), CalculateEmptyReturnStateHashCode()))
+        {
+            this.fullContext = fullContext;
+        }
 
-		public bool IsFullContext()
-		{
-			return fullContext;
-		}
+        public bool IsFullContext()
+        {
+            return fullContext;
+        }
 
-		protected internal override PredictionContext AddEmptyContext()
-		{
-			return this;
-		}
+        protected internal override PredictionContext AddEmptyContext()
+        {
+            return this;
+        }
 
-		protected internal override PredictionContext RemoveEmptyContext()
-		{
-			throw new NotSupportedException("Cannot remove the empty context from itself.");
-		}
+        protected internal override PredictionContext RemoveEmptyContext()
+        {
+            throw new NotSupportedException("Cannot remove the empty context from itself.");
+        }
 
-		public override PredictionContext GetParent(int index)
-		{
-			throw new ArgumentOutOfRangeException();
-		}
+        public override PredictionContext GetParent(int index)
+        {
+            throw new ArgumentOutOfRangeException();
+        }
 
-		public override int GetReturnState(int index)
-		{
-			throw new ArgumentOutOfRangeException();
-		}
+        public override int GetReturnState(int index)
+        {
+            throw new ArgumentOutOfRangeException();
+        }
 
-		public override int FindReturnState(int returnState)
-		{
-			return -1;
-		}
+        public override int FindReturnState(int returnState)
+        {
+            return -1;
+        }
 
-		public override int Size
-		{
-			get
-			{
-				return 0;
-			}
-		}
+        public override int Size
+        {
+            get
+            {
+                return 0;
+            }
+        }
 
-		public override PredictionContext AppendContext(int returnContext, PredictionContextCache
-			 contextCache)
-		{
-			return contextCache.GetChild(this, returnContext);
-		}
+        public override PredictionContext AppendContext(int returnContext, PredictionContextCache
+             contextCache)
+        {
+            return contextCache.GetChild(this, returnContext);
+        }
 
-		public override PredictionContext AppendContext(PredictionContext suffix, PredictionContextCache
-			 contextCache)
-		{
-			return suffix;
-		}
+        public override PredictionContext AppendContext(PredictionContext suffix, PredictionContextCache
+             contextCache)
+        {
+            return suffix;
+        }
 
-		public override bool IsEmpty
-		{
-			get
-			{
-				return true;
-			}
-		}
+        public override bool IsEmpty
+        {
+            get
+            {
+                return true;
+            }
+        }
 
-		public override bool HasEmpty
-		{
-			get
-			{
-				return true;
-			}
-		}
+        public override bool HasEmpty
+        {
+            get
+            {
+                return true;
+            }
+        }
 
-		public override bool Equals(object o)
-		{
-			return this == o;
-		}
+        public override bool Equals(object o)
+        {
+            return this == o;
+        }
 
-		public override string[] ToStrings<_T0>(Recognizer<_T0> recognizer, int currentState
-			)
-		{
-			return new string[] { "[]" };
-		}
+        public override string[] ToStrings<_T0>(Recognizer<_T0> recognizer, int currentState
+            )
+        {
+            return new string[] { "[]" };
+        }
 
-		public override string[] ToStrings<_T0>(Recognizer<_T0> recognizer, PredictionContext
-			 stop, int currentState)
-		{
-			return new string[] { "[]" };
-		}
-	}
+        public override string[] ToStrings<_T0>(Recognizer<_T0> recognizer, PredictionContext
+             stop, int currentState)
+        {
+            return new string[] { "[]" };
+        }
+    }
 }

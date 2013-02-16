@@ -33,43 +33,43 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	public sealed class RangeTransition : Transition
-	{
-		public readonly int from;
+    public sealed class RangeTransition : Transition
+    {
+        public readonly int from;
 
-		public readonly int to;
+        public readonly int to;
 
-		public RangeTransition(ATNState target, int from, int to) : base(target)
-		{
-			this.from = from;
-			this.to = to;
-		}
+        public RangeTransition(ATNState target, int from, int to) : base(target)
+        {
+            this.from = from;
+            this.to = to;
+        }
 
-		public override int SerializationType
-		{
-			get
-			{
-				return Range;
-			}
-		}
+        public override int SerializationType
+        {
+            get
+            {
+                return Range;
+            }
+        }
 
-		public override IntervalSet Label
-		{
-			get
-			{
-				return IntervalSet.Of(from, to);
-			}
-		}
+        public override IntervalSet Label
+        {
+            get
+            {
+                return IntervalSet.Of(from, to);
+            }
+        }
 
-		public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
-		{
-			return symbol >= from && symbol <= to;
-		}
+        public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
+        {
+            return symbol >= from && symbol <= to;
+        }
 
-		[NotNull]
-		public override string ToString()
-		{
-			return "'" + (char)from + "'..'" + (char)to + "'";
-		}
-	}
+        [NotNull]
+        public override string ToString()
+        {
+            return "'" + (char)from + "'..'" + (char)to + "'";
+        }
+    }
 }

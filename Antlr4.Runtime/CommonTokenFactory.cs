@@ -34,59 +34,60 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-	public class CommonTokenFactory : ITokenFactory
-	{
-		public static readonly ITokenFactory Default = new Antlr4.Runtime.CommonTokenFactory
-			();
+    public class CommonTokenFactory : ITokenFactory
+    {
+        public static readonly ITokenFactory Default = new Antlr4.Runtime.CommonTokenFactory
+            ();
 
-		/// <summary>Copy text for token out of input char stream.</summary>
-		/// <remarks>
-		/// Copy text for token out of input char stream. Useful when input
-		/// stream is unbuffered.
-		/// </remarks>
-		/// <seealso cref="UnbufferedCharStream">UnbufferedCharStream</seealso>
-		protected internal readonly bool copyText;
+        /// <summary>Copy text for token out of input char stream.</summary>
+        /// <remarks>
+        /// Copy text for token out of input char stream. Useful when input
+        /// stream is unbuffered.
+        /// </remarks>
+        /// <seealso cref="UnbufferedCharStream">UnbufferedCharStream</seealso>
+        protected internal readonly bool copyText;
 
-		/// <summary>
-		/// Create factory and indicate whether or not the factory copy
-		/// text out of the char stream.
-		/// </summary>
-		/// <remarks>
-		/// Create factory and indicate whether or not the factory copy
-		/// text out of the char stream.
-		/// </remarks>
-		public CommonTokenFactory(bool copyText)
-		{
-			this.copyText = copyText;
-		}
+        /// <summary>
+        /// Create factory and indicate whether or not the factory copy
+        /// text out of the char stream.
+        /// </summary>
+        /// <remarks>
+        /// Create factory and indicate whether or not the factory copy
+        /// text out of the char stream.
+        /// </remarks>
+        public CommonTokenFactory(bool copyText)
+        {
+            this.copyText = copyText;
+        }
 
-		public CommonTokenFactory() : this(false)
-		{
-		}
+        public CommonTokenFactory() : this(false)
+        {
+        }
 
-		public virtual CommonToken Create<_T0>(Tuple<_T0> source, int type, string text, 
-			int channel, int start, int stop, int line, int charPositionInLine) where _T0:ITokenSource
-		{
-			CommonToken t = new CommonToken(source, type, channel, start, stop);
-			t.Line = line;
-			t.Column = charPositionInLine;
-			if (text != null)
-			{
-				t.Text = text;
-			}
-			else
-			{
-				if (copyText && source.GetItem2() != null)
-				{
-					t.Text = source.GetItem2().GetText(Interval.Of(start, stop));
-				}
-			}
-			return t;
-		}
+        public virtual CommonToken Create<_T0>(Tuple<_T0> source, int type, string text, 
+            int channel, int start, int stop, int line, int charPositionInLine) where _T0:
+            ITokenSource
+        {
+            CommonToken t = new CommonToken(source, type, channel, start, stop);
+            t.Line = line;
+            t.Column = charPositionInLine;
+            if (text != null)
+            {
+                t.Text = text;
+            }
+            else
+            {
+                if (copyText && source.GetItem2() != null)
+                {
+                    t.Text = source.GetItem2().GetText(Interval.Of(start, stop));
+                }
+            }
+            return t;
+        }
 
-		public virtual CommonToken Create(int type, string text)
-		{
-			return new CommonToken(type, text);
-		}
-	}
+        public virtual CommonToken Create(int type, string text)
+        {
+            return new CommonToken(type, text);
+        }
+    }
 }

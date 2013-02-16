@@ -32,12 +32,12 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	/// <author>Sam Harwell</author>
-	public sealed class BasicState : ATNState
-	{
-		public override int GetStateType()
-		{
-			return Basic;
-		}
-	}
+    /// <author>Sam Harwell</author>
+    public sealed class BasicState : ATNState
+    {
+        public override int GetStateType()
+        {
+            return Basic;
+        }
+    }
 }

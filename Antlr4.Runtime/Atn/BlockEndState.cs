@@ -32,18 +32,18 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	/// <summary>
-	/// Terminal node of a simple
-	/// <code>(a|b|c)</code>
-	/// block.
-	/// </summary>
-	public sealed class BlockEndState : ATNState
-	{
-		public BlockStartState startState;
+    /// <summary>
+    /// Terminal node of a simple
+    /// <code>(a|b|c)</code>
+    /// block.
+    /// </summary>
+    public sealed class BlockEndState : ATNState
+    {
+        public BlockStartState startState;
 
-		public override int GetStateType()
-		{
-			return BlockEnd;
-		}
-	}
+        public override int GetStateType()
+        {
+            return BlockEnd;
+        }
+    }
 }

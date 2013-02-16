@@ -33,76 +33,76 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Misc
 {
-	/// <summary>Sometimes we need to map a key to a value but key is two pieces of data.
-	/// 	</summary>
-	/// <remarks>
-	/// Sometimes we need to map a key to a value but key is two pieces of data.
-	/// This nested hash table saves creating a single key each time we access
-	/// map; avoids mem creation.
-	/// </remarks>
-	public class DoubleKeyMap<Key1, Key2, Value>
-	{
-		internal IDictionary<Key1, IDictionary<Key2, Value>> data = new LinkedHashMap<Key1
-			, IDictionary<Key2, Value>>();
+    /// <summary>Sometimes we need to map a key to a value but key is two pieces of data.
+    ///     </summary>
+    /// <remarks>
+    /// Sometimes we need to map a key to a value but key is two pieces of data.
+    /// This nested hash table saves creating a single key each time we access
+    /// map; avoids mem creation.
+    /// </remarks>
+    public class DoubleKeyMap<Key1, Key2, Value>
+    {
+        internal IDictionary<Key1, IDictionary<Key2, Value>> data = new LinkedHashMap<Key1
+            , IDictionary<Key2, Value>>();
 
-		public virtual Value Put(Key1 k1, Key2 k2, Value v)
-		{
-			IDictionary<Key2, Value> data2 = data.Get(k1);
-			Value prev = null;
-			if (data2 == null)
-			{
-				data2 = new LinkedHashMap<Key2, Value>();
-				data.Put(k1, data2);
-			}
-			else
-			{
-				prev = data2.Get(k2);
-			}
-			data2.Put(k2, v);
-			return prev;
-		}
+        public virtual Value Put(Key1 k1, Key2 k2, Value v)
+        {
+            IDictionary<Key2, Value> data2 = data.Get(k1);
+            Value prev = null;
+            if (data2 == null)
+            {
+                data2 = new LinkedHashMap<Key2, Value>();
+                data.Put(k1, data2);
+            }
+            else
+            {
+                prev = data2.Get(k2);
+            }
+            data2.Put(k2, v);
+            return prev;
+        }
 
-		public virtual Value Get(Key1 k1, Key2 k2)
-		{
-			IDictionary<Key2, Value> data2 = data.Get(k1);
-			if (data2 == null)
-			{
-				return null;
-			}
-			return data2.Get(k2);
-		}
+        public virtual Value Get(Key1 k1, Key2 k2)
+        {
+            IDictionary<Key2, Value> data2 = data.Get(k1);
+            if (data2 == null)
+            {
+                return null;
+            }
+            return data2.Get(k2);
+        }
 
-		public virtual IDictionary<Key2, Value> Get(Key1 k1)
-		{
-			return data.Get(k1);
-		}
+        public virtual IDictionary<Key2, Value> Get(Key1 k1)
+        {
+            return data.Get(k1);
+        }
 
-		/// <summary>Get all values associated with primary key</summary>
-		public virtual ICollection<Value> Values(Key1 k1)
-		{
-			IDictionary<Key2, Value> data2 = data.Get(k1);
-			if (data2 == null)
-			{
-				return null;
-			}
-			return data2.Values;
-		}
+        /// <summary>Get all values associated with primary key</summary>
+        public virtual ICollection<Value> Values(Key1 k1)
+        {
+            IDictionary<Key2, Value> data2 = data.Get(k1);
+            if (data2 == null)
+            {
+                return null;
+            }
+            return data2.Values;
+        }
 
-		/// <summary>get all primary keys</summary>
-		public virtual ICollection<Key1> KeySet()
-		{
-			return data.Keys;
-		}
+        /// <summary>get all primary keys</summary>
+        public virtual ICollection<Key1> KeySet()
+        {
+            return data.Keys;
+        }
 
-		/// <summary>get all secondary keys associated with a primary key</summary>
-		public virtual ICollection<Key2> KeySet(Key1 k1)
-		{
-			IDictionary<Key2, Value> data2 = data.Get(k1);
-			if (data2 == null)
-			{
-				return null;
-			}
-			return data2.Keys;
-		}
-	}
+        /// <summary>get all secondary keys associated with a primary key</summary>
+        public virtual ICollection<Key2> KeySet(Key1 k1)
+        {
+            IDictionary<Key2, Value> data2 = data.Get(k1);
+            if (data2 == null)
+            {
+                return null;
+            }
+            return data2.Keys;
+        }
+    }
 }

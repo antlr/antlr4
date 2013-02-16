@@ -34,38 +34,38 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-	/// <summary>How to emit recognition errors</summary>
-	public interface IParserErrorListener : IAntlrErrorListener<IToken>
-	{
-		/// <summary>
-		/// Called when the parser detects a true ambiguity: an input sequence can be matched
-		/// literally by two or more pass through the grammar.
-		/// </summary>
-		/// <remarks>
-		/// Called when the parser detects a true ambiguity: an input sequence can be matched
-		/// literally by two or more pass through the grammar. ANTLR resolves the ambiguity in
-		/// favor of the alternative appearing first in the grammar. The start and stop index are
-		/// zero-based absolute indices into the token stream. ambigAlts is a set of alternative numbers
-		/// that can match the input sequence. This method is only called when we are parsing with
-		/// full context.
-		/// </remarks>
-		void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet
-			 ambigAlts, ATNConfigSet configs);
+    /// <summary>How to emit recognition errors</summary>
+    public interface IParserErrorListener : IAntlrErrorListener<IToken>
+    {
+        /// <summary>
+        /// Called when the parser detects a true ambiguity: an input sequence can be matched
+        /// literally by two or more pass through the grammar.
+        /// </summary>
+        /// <remarks>
+        /// Called when the parser detects a true ambiguity: an input sequence can be matched
+        /// literally by two or more pass through the grammar. ANTLR resolves the ambiguity in
+        /// favor of the alternative appearing first in the grammar. The start and stop index are
+        /// zero-based absolute indices into the token stream. ambigAlts is a set of alternative numbers
+        /// that can match the input sequence. This method is only called when we are parsing with
+        /// full context.
+        /// </remarks>
+        void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet
+             ambigAlts, ATNConfigSet configs);
 
-		void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int 
-			stopIndex, SimulatorState initialState);
+        void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int 
+            stopIndex, SimulatorState initialState);
 
-		/// <summary>
-		/// Called by the parser when it find a conflict that is resolved by retrying the parse
-		/// with full context.
-		/// </summary>
-		/// <remarks>
-		/// Called by the parser when it find a conflict that is resolved by retrying the parse
-		/// with full context. This is not a warning; it simply notifies you that your grammar
-		/// is more complicated than Strong LL can handle. The parser moved up to full context
-		/// parsing for that input sequence.
-		/// </remarks>
-		void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex
-			, SimulatorState acceptState);
-	}
+        /// <summary>
+        /// Called by the parser when it find a conflict that is resolved by retrying the parse
+        /// with full context.
+        /// </summary>
+        /// <remarks>
+        /// Called by the parser when it find a conflict that is resolved by retrying the parse
+        /// with full context. This is not a warning; it simply notifies you that your grammar
+        /// is more complicated than Strong LL can handle. The parser moved up to full context
+        /// parsing for that input sequence.
+        /// </remarks>
+        void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex
+            , SimulatorState acceptState);
+    }
 }

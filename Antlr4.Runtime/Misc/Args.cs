@@ -32,26 +32,26 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Misc
 {
-	/// <author>Sam Harwell</author>
-	public sealed class Args
-	{
-		/// <exception cref="System.ArgumentNullException">
-		/// if
-		/// <code>value</code>
-		/// is
-		/// <code>null</code>
-		/// .
-		/// </exception>
-		public static void NotNull(string parameterName, object value)
-		{
-			if (value == null)
-			{
-				throw new ArgumentNullException(parameterName + " cannot be null.");
-			}
-		}
+    /// <author>Sam Harwell</author>
+    public sealed class Args
+    {
+        /// <exception cref="System.ArgumentNullException">
+        /// if
+        /// <code>value</code>
+        /// is
+        /// <code>null</code>
+        /// .
+        /// </exception>
+        public static void NotNull(string parameterName, object value)
+        {
+            if (value == null)
+            {
+                throw new ArgumentNullException(parameterName + " cannot be null.");
+            }
+        }
 
-		public Args()
-		{
-		}
-	}
+        public Args()
+        {
+        }
+    }
 }

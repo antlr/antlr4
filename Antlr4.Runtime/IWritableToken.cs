@@ -32,36 +32,36 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-	public interface IWritableToken : IToken
-	{
-		string Text
-		{
-			set;
-		}
+    public interface IWritableToken : IToken
+    {
+        string Text
+        {
+            set;
+        }
 
-		int Type
-		{
-			set;
-		}
+        int Type
+        {
+            set;
+        }
 
-		int Line
-		{
-			set;
-		}
+        int Line
+        {
+            set;
+        }
 
-		int Column
-		{
-			set;
-		}
+        int Column
+        {
+            set;
+        }
 
-		int Channel
-		{
-			set;
-		}
+        int Channel
+        {
+            set;
+        }
 
-		int TokenIndex
-		{
-			set;
-		}
-	}
+        int TokenIndex
+        {
+            set;
+        }
+    }
 }

@@ -32,19 +32,19 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	/// <summary>
-	/// Decision state for
-	/// <code>A+</code>
-	/// and
-	/// <code>(A|B)+</code>
-	/// .  It has two transitions:
-	/// one to the loop back to start of the block and one to exit.
-	/// </summary>
-	public sealed class PlusLoopbackState : DecisionState
-	{
-		public override int GetStateType()
-		{
-			return PlusLoopBack;
-		}
-	}
+    /// <summary>
+    /// Decision state for
+    /// <code>A+</code>
+    /// and
+    /// <code>(A|B)+</code>
+    /// .  It has two transitions:
+    /// one to the loop back to start of the block and one to exit.
+    /// </summary>
+    public sealed class PlusLoopbackState : DecisionState
+    {
+        public override int GetStateType()
+        {
+            return PlusLoopBack;
+        }
+    }
 }

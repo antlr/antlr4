@@ -32,7 +32,7 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
-	public interface IErrorNode : ITerminalNode
-	{
-	}
+    public interface IErrorNode : ITerminalNode
+    {
+    }
 }

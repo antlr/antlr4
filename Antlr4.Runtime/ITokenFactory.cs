@@ -33,27 +33,27 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-	/// <summary>The default mechanism for creating tokens.</summary>
-	/// <remarks>
-	/// The default mechanism for creating tokens. It's used by default in Lexer and
-	/// the error handling strategy (to create missing tokens).  Notifying the parser
-	/// of a new factory means that it notifies it's token source and error strategy.
-	/// </remarks>
-	public interface ITokenFactory
-	{
-		/// <summary>
-		/// This is the method used to create tokens in the lexer and in the
-		/// error handling strategy.
-		/// </summary>
-		/// <remarks>
-		/// This is the method used to create tokens in the lexer and in the
-		/// error handling strategy. If text!=null, than the start and stop positions
-		/// are wiped to -1 in the text override is set in the CommonToken.
-		/// </remarks>
-		IToken Create<_T0>(Tuple<_T0> source, int type, string text, int channel, int start
-			, int stop, int line, int charPositionInLine) where _T0:ITokenSource;
+    /// <summary>The default mechanism for creating tokens.</summary>
+    /// <remarks>
+    /// The default mechanism for creating tokens. It's used by default in Lexer and
+    /// the error handling strategy (to create missing tokens).  Notifying the parser
+    /// of a new factory means that it notifies it's token source and error strategy.
+    /// </remarks>
+    public interface ITokenFactory
+    {
+        /// <summary>
+        /// This is the method used to create tokens in the lexer and in the
+        /// error handling strategy.
+        /// </summary>
+        /// <remarks>
+        /// This is the method used to create tokens in the lexer and in the
+        /// error handling strategy. If text!=null, than the start and stop positions
+        /// are wiped to -1 in the text override is set in the CommonToken.
+        /// </remarks>
+        IToken Create<_T0>(Tuple<_T0> source, int type, string text, int channel, int start
+            , int stop, int line, int charPositionInLine) where _T0:ITokenSource;
 
-		/// <summary>Generically useful</summary>
-		IToken Create(int type, string text);
-	}
+        /// <summary>Generically useful</summary>
+        IToken Create(int type, string text);
+    }
 }

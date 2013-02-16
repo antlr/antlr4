@@ -32,9 +32,9 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Misc
 {
-	/// <author>Sam Harwell</author>
-	public interface IFunc1<T1, Result>
-	{
-		Result Eval(T1 arg1);
-	}
+    /// <author>Sam Harwell</author>
+    public interface IFunc1<T1, Result>
+    {
+        Result Eval(T1 arg1);
+    }
 }

@@ -33,16 +33,16 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
-	public interface ITerminalNode : IParseTree
-	{
-		IToken Symbol
-		{
-			get;
-		}
+    public interface ITerminalNode : IParseTree
+    {
+        IToken Symbol
+        {
+            get;
+        }
 
-		IRuleNode Parent
-		{
-			get;
-		}
-	}
+        IRuleNode Parent
+        {
+            get;
+        }
+    }
 }

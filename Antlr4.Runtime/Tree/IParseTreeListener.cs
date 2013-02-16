@@ -33,14 +33,14 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
-	public interface IParseTreeListener
-	{
-		void VisitTerminal(ITerminalNode node);
+    public interface IParseTreeListener
+    {
+        void VisitTerminal(ITerminalNode node);
 
-		void VisitErrorNode(IErrorNode node);
+        void VisitErrorNode(IErrorNode node);
 
-		void EnterEveryRule(ParserRuleContext ctx);
+        void EnterEveryRule(ParserRuleContext ctx);
 
-		void ExitEveryRule(ParserRuleContext ctx);
-	}
+        void ExitEveryRule(ParserRuleContext ctx);
+    }
 }

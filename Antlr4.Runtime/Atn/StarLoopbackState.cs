@@ -32,16 +32,16 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	public sealed class StarLoopbackState : ATNState
-	{
-		public StarLoopEntryState GetLoopEntryState()
-		{
-			return (StarLoopEntryState)Transition(0).target;
-		}
+    public sealed class StarLoopbackState : ATNState
+    {
+        public StarLoopEntryState GetLoopEntryState()
+        {
+            return (StarLoopEntryState)Transition(0).target;
+        }
 
-		public override int GetStateType()
-		{
-			return StarLoopBack;
-		}
-	}
+        public override int GetStateType()
+        {
+            return StarLoopBack;
+        }
+    }
 }

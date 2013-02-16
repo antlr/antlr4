@@ -34,84 +34,84 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Dfa
 {
-	/// <author>Sam Harwell</author>
-	public abstract class AbstractEdgeMap<T> : IEdgeMap<T>
-	{
-		protected internal readonly int minIndex;
+    /// <author>Sam Harwell</author>
+    public abstract class AbstractEdgeMap<T> : IEdgeMap<T>
+    {
+        protected internal readonly int minIndex;
 
-		protected internal readonly int maxIndex;
+        protected internal readonly int maxIndex;
 
-		public AbstractEdgeMap(int minIndex, int maxIndex)
-		{
-			// the allowed range (with minIndex and maxIndex inclusive) should be less than 2^32
-			System.Diagnostics.Debug.Assert(maxIndex - minIndex + 1 >= 0);
-			this.minIndex = minIndex;
-			this.maxIndex = maxIndex;
-		}
+        public AbstractEdgeMap(int minIndex, int maxIndex)
+        {
+            // the allowed range (with minIndex and maxIndex inclusive) should be less than 2^32
+            System.Diagnostics.Debug.Assert(maxIndex - minIndex + 1 >= 0);
+            this.minIndex = minIndex;
+            this.maxIndex = maxIndex;
+        }
 
-		public abstract Antlr4.Runtime.Dfa.AbstractEdgeMap<T> Put(int key, T value);
+        public abstract Antlr4.Runtime.Dfa.AbstractEdgeMap<T> Put(int key, T value);
 
-		public virtual Antlr4.Runtime.Dfa.AbstractEdgeMap<T> PutAll<_T0>(IEdgeMap<_T0> m)
-			 where _T0:T
-		{
-			Antlr4.Runtime.Dfa.AbstractEdgeMap<T> result = this;
-			foreach (KeyValuePair<int, T> entry in m.EntrySet())
-			{
-				result = result.Put(entry.Key, entry.Value);
-			}
-			return result;
-		}
+        public virtual Antlr4.Runtime.Dfa.AbstractEdgeMap<T> PutAll<_T0>(IEdgeMap<_T0> m)
+             where _T0:T
+        {
+            Antlr4.Runtime.Dfa.AbstractEdgeMap<T> result = this;
+            foreach (KeyValuePair<int, T> entry in m.EntrySet())
+            {
+                result = result.Put(entry.Key, entry.Value);
+            }
+            return result;
+        }
 
-		public abstract Antlr4.Runtime.Dfa.AbstractEdgeMap<T> Clear();
+        public abstract Antlr4.Runtime.Dfa.AbstractEdgeMap<T> Clear();
 
-		public abstract Antlr4.Runtime.Dfa.AbstractEdgeMap<T> Remove(int key);
+        public abstract Antlr4.Runtime.Dfa.AbstractEdgeMap<T> Remove(int key);
 
-		protected internal abstract class AbstractEntrySet : AbstractSet<KeyValuePair<int
-			, T>>
-		{
-			public override bool Contains(object o)
-			{
-				if (!(o is DictionaryEntry))
-				{
-					return false;
-				}
-				KeyValuePair<object, object> entry = (KeyValuePair<object, object>)o;
-				if (entry.Key is int)
-				{
-					int key = (int)entry.Key;
-					object value = entry.Value;
-					T existing = this._enclosing._enclosing.Get(key);
-					return value == existing || (existing != null && existing.Equals(value));
-				}
-				return false;
-			}
+        protected internal abstract class AbstractEntrySet : AbstractSet<KeyValuePair<int
+            , T>>
+        {
+            public override bool Contains(object o)
+            {
+                if (!(o is DictionaryEntry))
+                {
+                    return false;
+                }
+                KeyValuePair<object, object> entry = (KeyValuePair<object, object>)o;
+                if (entry.Key is int)
+                {
+                    int key = (int)entry.Key;
+                    object value = entry.Value;
+                    T existing = this._enclosing._enclosing.Get(key);
+                    return value == existing || (existing != null && existing.Equals(value));
+                }
+                return false;
+            }
 
-			public override int Count
-			{
-				get
-				{
-					return this._enclosing._enclosing.Size();
-				}
-			}
+            public override int Count
+            {
+                get
+                {
+                    return this._enclosing._enclosing.Size();
+                }
+            }
 
-			internal AbstractEntrySet(AbstractEdgeMap<T> _enclosing)
-			{
-				this._enclosing = _enclosing;
-			}
+            internal AbstractEntrySet(AbstractEdgeMap<T> _enclosing)
+            {
+                this._enclosing = _enclosing;
+            }
 
-			private readonly AbstractEdgeMap<T> _enclosing;
-		}
+            private readonly AbstractEdgeMap<T> _enclosing;
+        }
 
-		public abstract bool ContainsKey(int arg1);
+        public abstract bool ContainsKey(int arg1);
 
-		public abstract ICollection<KeyValuePair<int, T>> EntrySet();
+        public abstract ICollection<KeyValuePair<int, T>> EntrySet();
 
-		public abstract T Get(int arg1);
+        public abstract T Get(int arg1);
 
-		public abstract bool IsEmpty();
+        public abstract bool IsEmpty();
 
-		public abstract int Size();
+        public abstract int Size();
 
-		public abstract IDictionary<int, T> ToMap();
-	}
+        public abstract IDictionary<int, T> ToMap();
+    }
 }

@@ -32,40 +32,40 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Misc
 {
-	/// <summary>This exception is thrown to cancel a parsing operation.</summary>
-	/// <remarks>
-	/// This exception is thrown to cancel a parsing operation. This exception does
-	/// not extend
-	/// <see cref="Antlr4.Runtime.RecognitionException">Antlr4.Runtime.RecognitionException
-	/// 	</see>
-	/// , allowing it to bypass the standard
-	/// error recovery mechanisms.
-	/// <see cref="Antlr4.Runtime.BailErrorStrategy">Antlr4.Runtime.BailErrorStrategy</see>
-	/// throws this exception in
-	/// response to a parse error.
-	/// </remarks>
-	/// <author>Sam Harwell</author>
-	[System.Serializable]
-	public class ParseCanceledException : OperationCanceledException
-	{
-		private const long serialVersionUID = -3529552099366979683L;
+    /// <summary>This exception is thrown to cancel a parsing operation.</summary>
+    /// <remarks>
+    /// This exception is thrown to cancel a parsing operation. This exception does
+    /// not extend
+    /// <see cref="Antlr4.Runtime.RecognitionException">Antlr4.Runtime.RecognitionException
+    ///     </see>
+    /// , allowing it to bypass the standard
+    /// error recovery mechanisms.
+    /// <see cref="Antlr4.Runtime.BailErrorStrategy">Antlr4.Runtime.BailErrorStrategy</see>
+    /// throws this exception in
+    /// response to a parse error.
+    /// </remarks>
+    /// <author>Sam Harwell</author>
+    [System.Serializable]
+    public class ParseCanceledException : OperationCanceledException
+    {
+        private const long serialVersionUID = -3529552099366979683L;
 
-		public ParseCanceledException()
-		{
-		}
+        public ParseCanceledException()
+        {
+        }
 
-		public ParseCanceledException(string message) : base(message)
-		{
-		}
+        public ParseCanceledException(string message) : base(message)
+        {
+        }
 
-		public ParseCanceledException(Exception cause)
-		{
-			Sharpen.Extensions.InitCause(this, cause);
-		}
+        public ParseCanceledException(Exception cause)
+        {
+            Sharpen.Extensions.InitCause(this, cause);
+        }
 
-		public ParseCanceledException(string message, Exception cause) : base(message)
-		{
-			Sharpen.Extensions.InitCause(this, cause);
-		}
-	}
+        public ParseCanceledException(string message, Exception cause) : base(message)
+        {
+            Sharpen.Extensions.InitCause(this, cause);
+        }
+    }
 }

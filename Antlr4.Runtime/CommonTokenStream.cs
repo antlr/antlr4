@@ -32,125 +32,125 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-	/// <summary>
-	/// The most common stream of tokens where every token is buffered up
-	/// and tokens are filtered for a certain channel (the parser will only
-	/// see these tokens).
-	/// </summary>
-	/// <remarks>
-	/// The most common stream of tokens where every token is buffered up
-	/// and tokens are filtered for a certain channel (the parser will only
-	/// see these tokens).
-	/// Even though it buffers all of the tokens, this token stream pulls tokens
-	/// from the tokens source on demand. In other words, until you ask for a
-	/// token using consume(), LT(), etc. the stream does not pull from the lexer.
-	/// The only difference between this stream and
-	/// <see cref="BufferedTokenStream">BufferedTokenStream</see>
-	/// superclass
-	/// is that this stream knows how to ignore off channel tokens. There may be
-	/// a performance advantage to using the superclass if you don't pass
-	/// whitespace and comments etc. to the parser on a hidden channel (i.e.,
-	/// you set
-	/// <code>$channel</code>
-	/// instead of calling
-	/// <code>skip()</code>
-	/// in lexer rules.)
-	/// </remarks>
-	/// <seealso cref="UnbufferedTokenStream">UnbufferedTokenStream</seealso>
-	/// <seealso cref="BufferedTokenStream">BufferedTokenStream</seealso>
-	public class CommonTokenStream : BufferedTokenStream
-	{
-		/// <summary>Skip tokens on any channel but this one; this is how we skip whitespace...
-		/// 	</summary>
-		/// <remarks>Skip tokens on any channel but this one; this is how we skip whitespace...
-		/// 	</remarks>
-		protected internal int channel = IToken.DefaultChannel;
+    /// <summary>
+    /// The most common stream of tokens where every token is buffered up
+    /// and tokens are filtered for a certain channel (the parser will only
+    /// see these tokens).
+    /// </summary>
+    /// <remarks>
+    /// The most common stream of tokens where every token is buffered up
+    /// and tokens are filtered for a certain channel (the parser will only
+    /// see these tokens).
+    /// Even though it buffers all of the tokens, this token stream pulls tokens
+    /// from the tokens source on demand. In other words, until you ask for a
+    /// token using consume(), LT(), etc. the stream does not pull from the lexer.
+    /// The only difference between this stream and
+    /// <see cref="BufferedTokenStream">BufferedTokenStream</see>
+    /// superclass
+    /// is that this stream knows how to ignore off channel tokens. There may be
+    /// a performance advantage to using the superclass if you don't pass
+    /// whitespace and comments etc. to the parser on a hidden channel (i.e.,
+    /// you set
+    /// <code>$channel</code>
+    /// instead of calling
+    /// <code>skip()</code>
+    /// in lexer rules.)
+    /// </remarks>
+    /// <seealso cref="UnbufferedTokenStream">UnbufferedTokenStream</seealso>
+    /// <seealso cref="BufferedTokenStream">BufferedTokenStream</seealso>
+    public class CommonTokenStream : BufferedTokenStream
+    {
+        /// <summary>Skip tokens on any channel but this one; this is how we skip whitespace...
+        ///     </summary>
+        /// <remarks>Skip tokens on any channel but this one; this is how we skip whitespace...
+        ///     </remarks>
+        protected internal int channel = IToken.DefaultChannel;
 
-		public CommonTokenStream(ITokenSource tokenSource) : base(tokenSource)
-		{
-		}
+        public CommonTokenStream(ITokenSource tokenSource) : base(tokenSource)
+        {
+        }
 
-		public CommonTokenStream(ITokenSource tokenSource, int channel) : this(tokenSource
-			)
-		{
-			this.channel = channel;
-		}
+        public CommonTokenStream(ITokenSource tokenSource, int channel) : this(tokenSource
+            )
+        {
+            this.channel = channel;
+        }
 
-		protected internal override int AdjustSeekIndex(int i)
-		{
-			return NextTokenOnChannel(i, channel);
-		}
+        protected internal override int AdjustSeekIndex(int i)
+        {
+            return NextTokenOnChannel(i, channel);
+        }
 
-		protected internal override IToken Lb(int k)
-		{
-			if (k == 0 || (p - k) < 0)
-			{
-				return null;
-			}
-			int i = p;
-			int n = 1;
-			// find k good tokens looking backwards
-			while (n <= k)
-			{
-				// skip off-channel tokens
-				i = PreviousTokenOnChannel(i - 1, channel);
-				n++;
-			}
-			if (i < 0)
-			{
-				return null;
-			}
-			return tokens[i];
-		}
+        protected internal override IToken Lb(int k)
+        {
+            if (k == 0 || (p - k) < 0)
+            {
+                return null;
+            }
+            int i = p;
+            int n = 1;
+            // find k good tokens looking backwards
+            while (n <= k)
+            {
+                // skip off-channel tokens
+                i = PreviousTokenOnChannel(i - 1, channel);
+                n++;
+            }
+            if (i < 0)
+            {
+                return null;
+            }
+            return tokens[i];
+        }
 
-		public override IToken Lt(int k)
-		{
-			//System.out.println("enter LT("+k+")");
-			LazyInit();
-			if (k == 0)
-			{
-				return null;
-			}
-			if (k < 0)
-			{
-				return Lb(-k);
-			}
-			int i = p;
-			int n = 1;
-			// we know tokens[p] is a good one
-			// find k good tokens
-			while (n < k)
-			{
-				// skip off-channel tokens, but make sure to not look past EOF
-				if (Sync(i + 1))
-				{
-					i = NextTokenOnChannel(i + 1, channel);
-				}
-				n++;
-			}
-			//		if ( i>range ) range = i;
-			return tokens[i];
-		}
+        public override IToken Lt(int k)
+        {
+            //System.out.println("enter LT("+k+")");
+            LazyInit();
+            if (k == 0)
+            {
+                return null;
+            }
+            if (k < 0)
+            {
+                return Lb(-k);
+            }
+            int i = p;
+            int n = 1;
+            // we know tokens[p] is a good one
+            // find k good tokens
+            while (n < k)
+            {
+                // skip off-channel tokens, but make sure to not look past EOF
+                if (Sync(i + 1))
+                {
+                    i = NextTokenOnChannel(i + 1, channel);
+                }
+                n++;
+            }
+            //		if ( i>range ) range = i;
+            return tokens[i];
+        }
 
-		/// <summary>Count EOF just once.</summary>
-		/// <remarks>Count EOF just once.</remarks>
-		public virtual int GetNumberOfOnChannelTokens()
-		{
-			int n = 0;
-			Fill();
-			for (int i = 0; i < tokens.Count; i++)
-			{
-				IToken t = tokens[i];
-				if (t.Channel == channel)
-				{
-					n++;
-				}
-				if (t.Type == IToken.Eof)
-				{
-					break;
-				}
-			}
-			return n;
-		}
-	}
+        /// <summary>Count EOF just once.</summary>
+        /// <remarks>Count EOF just once.</remarks>
+        public virtual int GetNumberOfOnChannelTokens()
+        {
+            int n = 0;
+            Fill();
+            for (int i = 0; i < tokens.Count; i++)
+            {
+                IToken t = tokens[i];
+                if (t.Channel == channel)
+                {
+                    n++;
+                }
+                if (t.Type == IToken.Eof)
+                {
+                    break;
+                }
+            }
+            return n;
+        }
+    }
 }

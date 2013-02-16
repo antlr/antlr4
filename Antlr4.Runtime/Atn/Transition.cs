@@ -35,108 +35,108 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	/// <summary>An ATN transition between any two ATN states.</summary>
-	/// <remarks>
-	/// An ATN transition between any two ATN states.  Subclasses define
-	/// atom, set, epsilon, action, predicate, rule transitions.
-	/// <p/>
-	/// This is a one way link.  It emanates from a state (usually via a list of
-	/// transitions) and has a target state.
-	/// <p/>
-	/// Since we never have to change the ATN transitions once we construct it,
-	/// we can fix these transitions as specific classes. The DFA transitions
-	/// on the other hand need to update the labels as it adds transitions to
-	/// the states. We'll use the term Edge for the DFA to distinguish them from
-	/// ATN transitions.
-	/// </remarks>
-	public abstract class Transition
-	{
-		public const int Epsilon = 1;
+    /// <summary>An ATN transition between any two ATN states.</summary>
+    /// <remarks>
+    /// An ATN transition between any two ATN states.  Subclasses define
+    /// atom, set, epsilon, action, predicate, rule transitions.
+    /// <p/>
+    /// This is a one way link.  It emanates from a state (usually via a list of
+    /// transitions) and has a target state.
+    /// <p/>
+    /// Since we never have to change the ATN transitions once we construct it,
+    /// we can fix these transitions as specific classes. The DFA transitions
+    /// on the other hand need to update the labels as it adds transitions to
+    /// the states. We'll use the term Edge for the DFA to distinguish them from
+    /// ATN transitions.
+    /// </remarks>
+    public abstract class Transition
+    {
+        public const int Epsilon = 1;
 
-		public const int Range = 2;
+        public const int Range = 2;
 
-		public const int Rule = 3;
+        public const int Rule = 3;
 
-		public const int Predicate = 4;
+        public const int Predicate = 4;
 
-		public const int Atom = 5;
+        public const int Atom = 5;
 
-		public const int Action = 6;
+        public const int Action = 6;
 
-		public const int Set = 7;
+        public const int Set = 7;
 
-		public const int NotSet = 8;
+        public const int NotSet = 8;
 
-		public const int Wildcard = 9;
+        public const int Wildcard = 9;
 
-		public const int Precedence = 10;
+        public const int Precedence = 10;
 
-		public static readonly IList<string> serializationNames = Sharpen.Collections.UnmodifiableList
-			(Arrays.AsList("INVALID", "EPSILON", "RANGE", "RULE", "PREDICATE", "ATOM", "ACTION"
-			, "SET", "NOT_SET", "WILDCARD", "PRECEDENCE"));
+        public static readonly IList<string> serializationNames = Sharpen.Collections.UnmodifiableList
+            (Arrays.AsList("INVALID", "EPSILON", "RANGE", "RULE", "PREDICATE", "ATOM", "ACTION"
+            , "SET", "NOT_SET", "WILDCARD", "PRECEDENCE"));
 
-		private sealed class _Dictionary_86 : Dictionary<Type, int>
-		{
-			public _Dictionary_86()
-			{
-				{
-					// constants for serialization
-					// e.g., {isType(input.LT(1))}?
-					// ~(A|B) or ~atom, wildcard, which convert to next 2
-					this.Put(typeof(EpsilonTransition), Antlr4.Runtime.Atn.Transition.Epsilon);
-					this.Put(typeof(RangeTransition), Antlr4.Runtime.Atn.Transition.Range);
-					this.Put(typeof(RuleTransition), Antlr4.Runtime.Atn.Transition.Rule);
-					this.Put(typeof(PredicateTransition), Antlr4.Runtime.Atn.Transition.Predicate);
-					this.Put(typeof(AtomTransition), Antlr4.Runtime.Atn.Transition.Atom);
-					this.Put(typeof(ActionTransition), Antlr4.Runtime.Atn.Transition.Action);
-					this.Put(typeof(SetTransition), Antlr4.Runtime.Atn.Transition.Set);
-					this.Put(typeof(NotSetTransition), Antlr4.Runtime.Atn.Transition.NotSet);
-					this.Put(typeof(WildcardTransition), Antlr4.Runtime.Atn.Transition.Wildcard);
-					this.Put(typeof(PrecedencePredicateTransition), Antlr4.Runtime.Atn.Transition.Precedence
-						);
-				}
-			}
-		}
+        private sealed class _Dictionary_86 : Dictionary<Type, int>
+        {
+            public _Dictionary_86()
+            {
+                {
+                    // constants for serialization
+                    // e.g., {isType(input.LT(1))}?
+                    // ~(A|B) or ~atom, wildcard, which convert to next 2
+                    this.Put(typeof(EpsilonTransition), Antlr4.Runtime.Atn.Transition.Epsilon);
+                    this.Put(typeof(RangeTransition), Antlr4.Runtime.Atn.Transition.Range);
+                    this.Put(typeof(RuleTransition), Antlr4.Runtime.Atn.Transition.Rule);
+                    this.Put(typeof(PredicateTransition), Antlr4.Runtime.Atn.Transition.Predicate);
+                    this.Put(typeof(AtomTransition), Antlr4.Runtime.Atn.Transition.Atom);
+                    this.Put(typeof(ActionTransition), Antlr4.Runtime.Atn.Transition.Action);
+                    this.Put(typeof(SetTransition), Antlr4.Runtime.Atn.Transition.Set);
+                    this.Put(typeof(NotSetTransition), Antlr4.Runtime.Atn.Transition.NotSet);
+                    this.Put(typeof(WildcardTransition), Antlr4.Runtime.Atn.Transition.Wildcard);
+                    this.Put(typeof(PrecedencePredicateTransition), Antlr4.Runtime.Atn.Transition.Precedence
+                        );
+                }
+            }
+        }
 
-		public static readonly IDictionary<Type, int> serializationTypes = Sharpen.Collections
-			.UnmodifiableMap(new _Dictionary_86());
+        public static readonly IDictionary<Type, int> serializationTypes = Sharpen.Collections
+            .UnmodifiableMap(new _Dictionary_86());
 
-		/// <summary>The target of this transition.</summary>
-		/// <remarks>The target of this transition.</remarks>
-		[NotNull]
-		public ATNState target;
+        /// <summary>The target of this transition.</summary>
+        /// <remarks>The target of this transition.</remarks>
+        [NotNull]
+        public ATNState target;
 
-		protected internal Transition(ATNState target)
-		{
-			if (target == null)
-			{
-				throw new ArgumentNullException("target cannot be null.");
-			}
-			this.target = target;
-		}
+        protected internal Transition(ATNState target)
+        {
+            if (target == null)
+            {
+                throw new ArgumentNullException("target cannot be null.");
+            }
+            this.target = target;
+        }
 
-		public abstract int SerializationType
-		{
-			get;
-		}
+        public abstract int SerializationType
+        {
+            get;
+        }
 
-		/// <summary>Are we epsilon, action, sempred?</summary>
-		public virtual bool IsEpsilon
-		{
-			get
-			{
-				return false;
-			}
-		}
+        /// <summary>Are we epsilon, action, sempred?</summary>
+        public virtual bool IsEpsilon
+        {
+            get
+            {
+                return false;
+            }
+        }
 
-		public virtual IntervalSet Label
-		{
-			get
-			{
-				return null;
-			}
-		}
+        public virtual IntervalSet Label
+        {
+            get
+            {
+                return null;
+            }
+        }
 
-		public abstract bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol);
-	}
+        public abstract bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol);
+    }
 }

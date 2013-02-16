@@ -32,13 +32,13 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	public sealed class StarLoopEntryState : DecisionState
-	{
-		public StarLoopbackState loopBackState;
+    public sealed class StarLoopEntryState : DecisionState
+    {
+        public StarLoopbackState loopBackState;
 
-		public override int GetStateType()
-		{
-			return StarLoopEntry;
-		}
-	}
+        public override int GetStateType()
+        {
+            return StarLoopEntry;
+        }
+    }
 }

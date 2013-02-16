@@ -2,6 +2,7 @@
 -nativeTypeSystem 
 -organizeUsings
 -nativeInterfaces
+-tabToSpaces
 
 -methodMapping System.out.println System.Console.WriteLine
 

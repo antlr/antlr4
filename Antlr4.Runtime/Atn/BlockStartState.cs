@@ -32,13 +32,13 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-	/// <summary>
-	/// The start of a regular
-	/// <code>(...)</code>
-	/// block.
-	/// </summary>
-	public abstract class BlockStartState : DecisionState
-	{
-		public BlockEndState endState;
-	}
+    /// <summary>
+    /// The start of a regular
+    /// <code>(...)</code>
+    /// block.
+    /// </summary>
+    public abstract class BlockStartState : DecisionState
+    {
+        public BlockEndState endState;
+    }
 }

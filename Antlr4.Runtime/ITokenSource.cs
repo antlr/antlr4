@@ -32,79 +32,79 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-	/// <summary>
-	/// A source of tokens must provide a sequence of tokens via nextToken()
-	/// and also must reveal it's source of characters; CommonToken's text is
-	/// computed from a CharStream; it only store indices into the char stream.
-	/// </summary>
-	/// <remarks>
-	/// A source of tokens must provide a sequence of tokens via nextToken()
-	/// and also must reveal it's source of characters; CommonToken's text is
-	/// computed from a CharStream; it only store indices into the char stream.
-	/// Errors from the lexer are never passed to the parser.  Either you want
-	/// to keep going or you do not upon token recognition error.  If you do not
-	/// want to continue lexing then you do not want to continue parsing.  Just
-	/// throw an exception not under RecognitionException and Java will naturally
-	/// toss you all the way out of the recognizers.  If you want to continue
-	/// lexing then you should not throw an exception to the parser--it has already
-	/// requested a token.  Keep lexing until you get a valid one.  Just report
-	/// errors and keep going, looking for a valid token.
-	/// </remarks>
-	public interface ITokenSource
-	{
-		/// <summary>Return a Token object from your input stream (usually a CharStream).</summary>
-		/// <remarks>
-		/// Return a Token object from your input stream (usually a CharStream).
-		/// Do not fail/return upon lexing error; keep chewing on the characters
-		/// until you get a good one; errors are not passed through to the parser.
-		/// </remarks>
-		IToken NextToken();
+    /// <summary>
+    /// A source of tokens must provide a sequence of tokens via nextToken()
+    /// and also must reveal it's source of characters; CommonToken's text is
+    /// computed from a CharStream; it only store indices into the char stream.
+    /// </summary>
+    /// <remarks>
+    /// A source of tokens must provide a sequence of tokens via nextToken()
+    /// and also must reveal it's source of characters; CommonToken's text is
+    /// computed from a CharStream; it only store indices into the char stream.
+    /// Errors from the lexer are never passed to the parser.  Either you want
+    /// to keep going or you do not upon token recognition error.  If you do not
+    /// want to continue lexing then you do not want to continue parsing.  Just
+    /// throw an exception not under RecognitionException and Java will naturally
+    /// toss you all the way out of the recognizers.  If you want to continue
+    /// lexing then you should not throw an exception to the parser--it has already
+    /// requested a token.  Keep lexing until you get a valid one.  Just report
+    /// errors and keep going, looking for a valid token.
+    /// </remarks>
+    public interface ITokenSource
+    {
+        /// <summary>Return a Token object from your input stream (usually a CharStream).</summary>
+        /// <remarks>
+        /// Return a Token object from your input stream (usually a CharStream).
+        /// Do not fail/return upon lexing error; keep chewing on the characters
+        /// until you get a good one; errors are not passed through to the parser.
+        /// </remarks>
+        IToken NextToken();
 
-		int Line
-		{
-			get;
-		}
+        int Line
+        {
+            get;
+        }
 
-		int Column
-		{
-			get;
-		}
+        int Column
+        {
+            get;
+        }
 
-		/// <summary>
-		/// From what character stream was this token created?  You don't have to
-		/// implement but it's nice to know where a Token comes from if you have
-		/// include files etc...
-		/// </summary>
-		/// <remarks>
-		/// From what character stream was this token created?  You don't have to
-		/// implement but it's nice to know where a Token comes from if you have
-		/// include files etc... on the input.
-		/// </remarks>
-		ICharStream InputStream
-		{
-			get;
-		}
+        /// <summary>
+        /// From what character stream was this token created?  You don't have to
+        /// implement but it's nice to know where a Token comes from if you have
+        /// include files etc...
+        /// </summary>
+        /// <remarks>
+        /// From what character stream was this token created?  You don't have to
+        /// implement but it's nice to know where a Token comes from if you have
+        /// include files etc... on the input.
+        /// </remarks>
+        ICharStream InputStream
+        {
+            get;
+        }
 
-		/// <summary>
-		/// Where are you getting tokens from? normally the implication will simply
-		/// ask lexers input stream.
-		/// </summary>
-		/// <remarks>
-		/// Where are you getting tokens from? normally the implication will simply
-		/// ask lexers input stream.
-		/// </remarks>
-		string SourceName
-		{
-			get;
-		}
+        /// <summary>
+        /// Where are you getting tokens from? normally the implication will simply
+        /// ask lexers input stream.
+        /// </summary>
+        /// <remarks>
+        /// Where are you getting tokens from? normally the implication will simply
+        /// ask lexers input stream.
+        /// </remarks>
+        string SourceName
+        {
+            get;
+        }
 
-		/// <summary>Gets the factory used for constructing tokens.</summary>
-		/// <remarks>Gets the factory used for constructing tokens.</remarks>
-		/// <summary>Optional method that lets users set factory in lexer or other source</summary>
-		ITokenFactory TokenFactory
-		{
-			get;
-			set;
-		}
-	}
+        /// <summary>Gets the factory used for constructing tokens.</summary>
+        /// <remarks>Gets the factory used for constructing tokens.</remarks>
+        /// <summary>Optional method that lets users set factory in lexer or other source</summary>
+        ITokenFactory TokenFactory
+        {
+            get;
+            set;
+        }
+    }
 }
