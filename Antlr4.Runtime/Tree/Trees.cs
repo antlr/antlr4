@@ -65,7 +65,7 @@ namespace Antlr4.Runtime.Tree
         /// </remarks>
         public static string ToStringTree(ITree t, Parser recog)
         {
-            string[] ruleNames = recog != null ? recog.GetRuleNames() : null;
+            string[] ruleNames = recog != null ? recog.RuleNames : null;
             IList<string> ruleNamesList = ruleNames != null ? Arrays.AsList(ruleNames) : null;
             return ToStringTree(t, ruleNamesList);
         }
@@ -105,7 +105,7 @@ namespace Antlr4.Runtime.Tree
 
         public static string GetNodeText(ITree t, Parser recog)
         {
-            string[] ruleNames = recog != null ? recog.GetRuleNames() : null;
+            string[] ruleNames = recog != null ? recog.RuleNames : null;
             IList<string> ruleNamesList = ruleNames != null ? Arrays.AsList(ruleNames) : null;
             return GetNodeText(t, ruleNamesList);
         }

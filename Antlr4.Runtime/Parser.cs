@@ -48,13 +48,13 @@ namespace Antlr4.Runtime
         {
             public virtual void EnterEveryRule(ParserRuleContext ctx)
             {
-                System.Console.Out.WriteLine("enter   " + this._enclosing.GetRuleNames()[ctx.GetRuleIndex
+                System.Console.Out.WriteLine("enter   " + this._enclosing.RuleNames[ctx.GetRuleIndex
                     ()] + ", LT(1)=" + this._enclosing._input.Lt(1).Text);
             }
 
             public virtual void ExitEveryRule(ParserRuleContext ctx)
             {
-                System.Console.Out.WriteLine("exit    " + this._enclosing.GetRuleNames()[ctx.GetRuleIndex
+                System.Console.Out.WriteLine("exit    " + this._enclosing.RuleNames[ctx.GetRuleIndex
                     ()] + ", LT(1)=" + this._enclosing._input.Lt(1).Text);
             }
 
@@ -66,8 +66,8 @@ namespace Antlr4.Runtime
             {
                 ParserRuleContext parent = (ParserRuleContext)((IRuleNode)node.Parent).RuleContext;
                 IToken token = node.Symbol;
-                System.Console.Out.WriteLine("consume " + token + " rule " + this._enclosing.GetRuleNames
-                    ()[parent.GetRuleIndex()] + " alt=" + parent.altNum);
+                System.Console.Out.WriteLine("consume " + token + " rule " + this._enclosing.RuleNames
+                    [parent.GetRuleIndex()] + " alt=" + parent.altNum);
             }
 
             internal TraceListener(Parser _enclosing)
@@ -151,9 +151,9 @@ namespace Antlr4.Runtime
         /// <summary>reset the parser's state</summary>
         public virtual void Reset()
         {
-            if (((ITokenStream)GetInputStream()) != null)
+            if (((ITokenStream)InputStream) != null)
             {
-                ((ITokenStream)GetInputStream()).Seek(0);
+                ((ITokenStream)InputStream).Seek(0);
             }
             _errHandler.EndErrorCondition(this);
             _ctx = null;
@@ -161,7 +161,7 @@ namespace Antlr4.Runtime
             _tracer = null;
             _precedenceStack.Clear();
             _precedenceStack.Add(0);
-            ATNSimulator interpreter = GetInterpreter();
+            ATNSimulator interpreter = Interpreter;
             if (interpreter != null)
             {
                 interpreter.Reset();
@@ -177,7 +177,7 @@ namespace Antlr4.Runtime
         /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
         public virtual IToken Match(int ttype)
         {
-            IToken t = GetCurrentToken();
+            IToken t = CurrentToken;
             if (t.Type == ttype)
             {
                 _errHandler.EndErrorCondition(this);
@@ -199,7 +199,7 @@ namespace Antlr4.Runtime
         /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
         public virtual IToken MatchWildcard()
         {
-            IToken t = GetCurrentToken();
+            IToken t = CurrentToken;
             if (t.Type > 0)
             {
                 _errHandler.EndErrorCondition(this);
@@ -240,14 +240,17 @@ namespace Antlr4.Runtime
         /// somebody's children list. Contexts are then not candidates
         /// for garbage collection.
         /// </remarks>
-        public virtual void SetBuildParseTree(bool buildParseTrees)
+        public virtual bool BuildParseTree
         {
-            this._buildParseTrees = buildParseTrees;
-        }
-
-        public virtual bool GetBuildParseTree()
-        {
-            return _buildParseTrees;
+            get
+            {
+                return _buildParseTrees;
+            }
+            set
+            {
+                bool buildParseTrees = value;
+                this._buildParseTrees = buildParseTrees;
+            }
         }
 
         /// <summary>Trim the internal lists of the parse tree during parsing to conserve memory.
@@ -258,29 +261,13 @@ namespace Antlr4.Runtime
         /// <code>false</code>
         /// by default for a newly constructed parser.
         /// </remarks>
-        /// <param name="trimParseTrees">
+        /// <value>
         /// 
         /// <code>true</code>
         /// to trim the capacity of the
         /// <see cref="ParserRuleContext.children">ParserRuleContext.children</see>
         /// list to its size after a rule is parsed.
-        /// </param>
-        public virtual void SetTrimParseTree(bool trimParseTrees)
-        {
-            if (trimParseTrees)
-            {
-                if (GetTrimParseTree())
-                {
-                    return;
-                }
-                AddParseListener(Parser.TrimToSizeListener.Instance);
-            }
-            else
-            {
-                RemoveParseListener(Parser.TrimToSizeListener.Instance);
-            }
-        }
-
+        /// </value>
         /// <returns>
         /// 
         /// <code>true</code>
@@ -291,25 +278,47 @@ namespace Antlr4.Runtime
         /// <see cref="TrimToSizeListener">TrimToSizeListener</see>
         /// during the parse process.
         /// </returns>
-        public virtual bool GetTrimParseTree()
+        public virtual bool TrimParseTree
         {
-            if (_parseListeners == null)
+            get
             {
-                return false;
+                if (_parseListeners == null)
+                {
+                    return false;
+                }
+                return _parseListeners.Contains(Parser.TrimToSizeListener.Instance);
             }
-            return _parseListeners.Contains(Parser.TrimToSizeListener.Instance);
+            set
+            {
+                bool trimParseTrees = value;
+                if (trimParseTrees)
+                {
+                    if (TrimParseTree)
+                    {
+                        return;
+                    }
+                    AddParseListener(Parser.TrimToSizeListener.Instance);
+                }
+                else
+                {
+                    RemoveParseListener(Parser.TrimToSizeListener.Instance);
+                }
+            }
         }
 
-        //	public void setTraceATNStates(boolean traceATNStates) {
-        //		this.traceATNStates = traceATNStates;
-        //	}
-        //
-        //	public boolean getTraceATNStates() {
-        //		return traceATNStates;
-        //	}
-        public virtual IList<IParseTreeListener> GetParseListeners()
+        public virtual IList<IParseTreeListener> ParseListeners
         {
-            return _parseListeners;
+            get
+            {
+                //	public void setTraceATNStates(boolean traceATNStates) {
+                //		this.traceATNStates = traceATNStates;
+                //	}
+                //
+                //	public boolean getTraceATNStates() {
+                //		return traceATNStates;
+                //	}
+                return _parseListeners;
+            }
         }
 
         /// <summary>
@@ -407,24 +416,33 @@ namespace Antlr4.Runtime
         /// an error and next valid token match
         /// See also reportError()
         /// </remarks>
-        public virtual int GetNumberOfSyntaxErrors()
+        public virtual int NumberOfSyntaxErrors
         {
-            return _syntaxErrors;
+            get
+            {
+                return _syntaxErrors;
+            }
         }
 
-        public virtual IAntlrErrorStrategy GetErrorHandler()
+        public virtual IAntlrErrorStrategy ErrorHandler
         {
-            return _errHandler;
+            get
+            {
+                return _errHandler;
+            }
+            set
+            {
+                IAntlrErrorStrategy handler = value;
+                this._errHandler = handler;
+            }
         }
 
-        public virtual void SetErrorHandler(IAntlrErrorStrategy handler)
+        public override IIntStream InputStream
         {
-            this._errHandler = handler;
-        }
-
-        public override IIntStream GetInputStream()
-        {
-            return _input;
+            get
+            {
+                return _input;
+            }
         }
 
         /// <summary>Set the token stream and reset the parser</summary>
@@ -443,14 +461,17 @@ namespace Antlr4.Runtime
         /// Match needs to return the current input symbol, which gets put
         /// into the label for the associated token ref; e.g., x=ID.
         /// </remarks>
-        public virtual IToken GetCurrentToken()
+        public virtual IToken CurrentToken
         {
-            return _input.Lt(1);
+            get
+            {
+                return _input.Lt(1);
+            }
         }
 
         public virtual void NotifyErrorListeners(string msg)
         {
-            NotifyErrorListeners(GetCurrentToken(), msg, null);
+            NotifyErrorListeners(CurrentToken, msg, null);
         }
 
         public virtual void NotifyErrorListeners(IToken offendingToken, string msg, RecognitionException
@@ -481,10 +502,10 @@ namespace Antlr4.Runtime
         /// </remarks>
         public virtual IToken Consume()
         {
-            IToken o = GetCurrentToken();
+            IToken o = CurrentToken;
             if (o.Type != Eof)
             {
-                ((ITokenStream)GetInputStream()).Consume();
+                ((ITokenStream)InputStream).Consume();
             }
             bool hasListener = _parseListeners != null && _parseListeners.Count != 0;
             if (_buildParseTrees || hasListener)
@@ -536,7 +557,7 @@ namespace Antlr4.Runtime
         public virtual void EnterRule(ParserRuleContext localctx, int state, int ruleIndex
             )
         {
-            SetState(state);
+            State = state;
             _ctx = localctx;
             _ctx.start = _input.Lt(1);
             if (_buildParseTrees)
@@ -552,7 +573,7 @@ namespace Antlr4.Runtime
         public virtual void EnterLeftFactoredRule(ParserRuleContext localctx, int state, 
             int ruleIndex)
         {
-            SetState(state);
+            State = state;
             if (_buildParseTrees)
             {
                 ParserRuleContext factoredContext = (ParserRuleContext)_ctx.GetChild(_ctx.ChildCount
@@ -581,7 +602,7 @@ namespace Antlr4.Runtime
             {
                 TriggerExitRuleEvent();
             }
-            SetState(_ctx.invokingState);
+            State = _ctx.invokingState;
             _ctx = (ParserRuleContext)_ctx.parent;
         }
 
@@ -677,9 +698,12 @@ namespace Antlr4.Runtime
             return null;
         }
 
-        public virtual ParserRuleContext GetContext()
+        public virtual ParserRuleContext Context
         {
-            return _ctx;
+            get
+            {
+                return _ctx;
+            }
         }
 
         public override bool Precpred(RuleContext localctx, int precedence)
@@ -701,9 +725,9 @@ namespace Antlr4.Runtime
         public virtual bool IsExpectedToken(int symbol)
         {
             //   		return getInterpreter().atn.nextTokens(_ctx);
-            ATN atn = GetInterpreter().atn;
+            ATN atn = Interpreter.atn;
             ParserRuleContext ctx = _ctx;
-            ATNState s = atn.states[GetState()];
+            ATNState s = atn.states[State];
             IntervalSet following = atn.NextTokens(s);
             if (following.Contains(symbol))
             {
@@ -743,9 +767,9 @@ namespace Antlr4.Runtime
         /// </remarks>
         public virtual IntervalSet GetExpectedTokens()
         {
-            ATN atn = GetInterpreter().atn;
+            ATN atn = Interpreter.atn;
             ParserRuleContext ctx = _ctx;
-            ATNState s = atn.states[GetState()];
+            ATNState s = atn.states[State];
             IntervalSet following = atn.NextTokens(s);
             //        System.out.println("following "+s+"="+following);
             if (!following.Contains(IToken.Epsilon))
@@ -774,23 +798,26 @@ namespace Antlr4.Runtime
 
         public virtual IntervalSet GetExpectedTokensWithinCurrentRule()
         {
-            ATN atn = GetInterpreter().atn;
-            ATNState s = atn.states[GetState()];
+            ATN atn = Interpreter.atn;
+            ATNState s = atn.states[State];
             return atn.NextTokens(s);
         }
 
-        //	/** Compute the set of valid tokens reachable from the current
-        //	 *  position in the parse.
-        //	 */
-        //	public IntervalSet nextTokens(@NotNull RuleContext ctx) {
-        //		ATN atn = getInterpreter().atn;
-        //		ATNState s = atn.states.get(ctx.s);
-        //		if ( s == null ) return null;
-        //		return atn.nextTokens(s, ctx);
-        //	}
-        public virtual ParserRuleContext GetRuleContext()
+        public virtual ParserRuleContext RuleContext
         {
-            return _ctx;
+            get
+            {
+                //	/** Compute the set of valid tokens reachable from the current
+                //	 *  position in the parse.
+                //	 */
+                //	public IntervalSet nextTokens(@NotNull RuleContext ctx) {
+                //		ATN atn = getInterpreter().atn;
+                //		ATNState s = atn.states.get(ctx.s);
+                //		if ( s == null ) return null;
+                //		return atn.nextTokens(s, ctx);
+                //	}
+                return _ctx;
+            }
         }
 
         /// <summary>
@@ -811,7 +838,7 @@ namespace Antlr4.Runtime
 
         public virtual IList<string> GetRuleInvocationStack(RuleContext p)
         {
-            string[] ruleNames = GetRuleNames();
+            string[] ruleNames = RuleNames;
             IList<string> stack = new List<string>();
             while (p != null)
             {
@@ -837,7 +864,7 @@ namespace Antlr4.Runtime
             for (int d = 0; d < _interp.atn.decisionToDFA.Length; d++)
             {
                 DFA dfa = _interp.atn.decisionToDFA[d];
-                s.Add(dfa.ToString(GetTokenNames(), GetRuleNames()));
+                s.Add(dfa.ToString(TokenNames, RuleNames));
             }
             return s;
         }
@@ -856,15 +883,18 @@ namespace Antlr4.Runtime
                         System.Console.Out.WriteLine();
                     }
                     System.Console.Out.WriteLine("Decision " + dfa.decision + ":");
-                    System.Console.Out.Write(dfa.ToString(GetTokenNames(), GetRuleNames()));
+                    System.Console.Out.Write(dfa.ToString(TokenNames, RuleNames));
                     seenOne = true;
                 }
             }
         }
 
-        public virtual string GetSourceName()
+        public virtual string SourceName
         {
-            return _input.SourceName;
+            get
+            {
+                return _input.SourceName;
+            }
         }
 
         /// <summary>A convenience method for use most often with template rewrites.</summary>
@@ -894,24 +924,39 @@ namespace Antlr4.Runtime
         /// During a parse is sometimes useful to listen in on the rule entry and exit
         /// events as well as token matches. This is for quick and dirty debugging.
         /// </remarks>
-        public virtual void SetTrace(bool trace)
+        public virtual bool Trace
         {
-            if (!trace)
+            get
             {
-                RemoveParseListener(_tracer);
-                _tracer = null;
+                foreach (object o in ParseListeners)
+                {
+                    if (o is Parser.TraceListener)
+                    {
+                        return true;
+                    }
+                }
+                return false;
             }
-            else
+            set
             {
-                if (_tracer != null)
+                bool trace = value;
+                if (!trace)
                 {
                     RemoveParseListener(_tracer);
+                    _tracer = null;
                 }
                 else
                 {
-                    _tracer = new Parser.TraceListener(this);
+                    if (_tracer != null)
+                    {
+                        RemoveParseListener(_tracer);
+                    }
+                    else
+                    {
+                        _tracer = new Parser.TraceListener(this);
+                    }
+                    AddParseListener(_tracer);
                 }
-                AddParseListener(_tracer);
             }
         }
     }

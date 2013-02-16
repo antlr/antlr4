@@ -67,30 +67,45 @@ namespace Antlr4.Runtime
         /// error reporting.  The generated parsers implement a method
         /// that overrides this to point to their String[] tokenNames.
         /// </remarks>
-        public abstract string[] GetTokenNames();
+        public abstract string[] TokenNames
+        {
+            get;
+        }
 
-        public abstract string[] GetRuleNames();
+        public abstract string[] RuleNames
+        {
+            get;
+        }
 
         /// <summary>For debugging and other purposes, might want the grammar name.</summary>
         /// <remarks>
         /// For debugging and other purposes, might want the grammar name.
         /// Have ANTLR generate an implementation for this method.
         /// </remarks>
-        public abstract string GetGrammarFileName();
-
-        public virtual ATN GetATN()
+        public abstract string GrammarFileName
         {
-            return _interp.atn;
+            get;
         }
 
-        public virtual ATNInterpreter GetInterpreter()
+        public virtual ATN Atn
         {
-            return _interp;
+            get
+            {
+                return _interp.atn;
+            }
         }
 
-        public virtual void SetInterpreter(ATNInterpreter interpreter)
+        public virtual ATNInterpreter Interpreter
         {
-            _interp = interpreter;
+            get
+            {
+                return _interp;
+            }
+            set
+            {
+                ATNInterpreter interpreter = value;
+                _interp = interpreter;
+            }
         }
 
         /// <summary>What is the error header, normally line/character position information?</summary>
@@ -190,11 +205,6 @@ namespace Antlr4.Runtime
         {
         }
 
-        public int GetState()
-        {
-            return _stateNumber;
-        }
-
         /// <summary>
         /// Indicate that the recognizer has changed internal state that is
         /// consistent with the ATN state passed in.
@@ -207,13 +217,24 @@ namespace Antlr4.Runtime
         /// invoking rules. Combine this and we have complete ATN
         /// configuration information.
         /// </remarks>
-        public void SetState(int atnState)
+        public int State
         {
-            //		System.err.println("setState "+atnState);
-            _stateNumber = atnState;
+            get
+            {
+                return _stateNumber;
+            }
+            set
+            {
+                int atnState = value;
+                //		System.err.println("setState "+atnState);
+                _stateNumber = atnState;
+            }
         }
 
+        public abstract IIntStream InputStream
+        {
+            get;
+        }
         //		if ( traceATNStates ) _ctx.trace(atnState);
-        public abstract IIntStream GetInputStream();
     }
 }

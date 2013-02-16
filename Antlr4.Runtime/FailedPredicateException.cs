@@ -63,9 +63,9 @@ namespace Antlr4.Runtime
 
         public FailedPredicateException(Parser recognizer, string predicate, string message
             ) : base(FormatMessage(predicate, message), recognizer, ((ITokenStream)recognizer
-            .GetInputStream()), recognizer._ctx)
+            .InputStream), recognizer._ctx)
         {
-            ATNState s = recognizer.GetInterpreter().atn.states[recognizer.GetState()];
+            ATNState s = recognizer.Interpreter.atn.states[recognizer.State];
             AbstractPredicateTransition trans = (AbstractPredicateTransition)s.Transition(0);
             if (trans is PredicateTransition)
             {
@@ -78,7 +78,7 @@ namespace Antlr4.Runtime
                 this.predicateIndex = 0;
             }
             this.predicate = predicate;
-            this.SetOffendingToken(recognizer.GetCurrentToken());
+            this.SetOffendingToken(recognizer.CurrentToken);
         }
 
         public virtual int GetRuleIndex()

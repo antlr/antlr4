@@ -68,8 +68,8 @@ namespace Antlr4.Runtime
         private readonly IToken startToken;
 
         public NoViableAltException(Parser recognizer) : this(recognizer, ((ITokenStream)
-            recognizer.GetInputStream()), recognizer.GetCurrentToken(), recognizer.GetCurrentToken
-            (), null, recognizer._ctx)
+            recognizer.InputStream), recognizer.CurrentToken, recognizer.CurrentToken, null
+            , recognizer._ctx)
         {
         }
 

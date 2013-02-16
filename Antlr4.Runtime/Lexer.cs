@@ -143,7 +143,7 @@ namespace Antlr4.Runtime
             _hitEOF = false;
             _mode = Antlr4.Runtime.Lexer.DefaultMode;
             _modeStack.Clear();
-            GetInterpreter().Reset();
+            Interpreter.Reset();
         }
 
         /// <summary>
@@ -176,8 +176,8 @@ namespace Antlr4.Runtime
                     _token = null;
                     _channel = IToken.DefaultChannel;
                     _tokenStartCharIndex = _input.Index;
-                    _tokenStartCharPositionInLine = GetInterpreter().GetCharPositionInLine();
-                    _tokenStartLine = GetInterpreter().GetLine();
+                    _tokenStartCharPositionInLine = Interpreter.GetCharPositionInLine();
+                    _tokenStartLine = Interpreter.GetLine();
                     _text = null;
                     do
                     {
@@ -188,7 +188,7 @@ namespace Antlr4.Runtime
                         int ttype;
                         try
                         {
-                            ttype = GetInterpreter().Match(_input, _mode);
+                            ttype = Interpreter.Match(_input, _mode);
                         }
                         catch (LexerNoViableAltException e)
                         {
@@ -301,9 +301,12 @@ outer_break: ;
             }
         }
 
-        public override IIntStream GetInputStream()
+        public override IIntStream InputStream
         {
-            return _input;
+            get
+            {
+                return _input;
+            }
         }
 
         /// <summary>
@@ -361,7 +364,7 @@ outer_break: ;
         {
             get
             {
-                return GetInterpreter().GetLine();
+                return Interpreter.GetLine();
             }
         }
 
@@ -369,18 +372,18 @@ outer_break: ;
         {
             get
             {
-                return GetInterpreter().GetCharPositionInLine();
+                return Interpreter.GetCharPositionInLine();
             }
         }
 
         public virtual void SetLine(int line)
         {
-            GetInterpreter().SetLine(line);
+            Interpreter.SetLine(line);
         }
 
         public virtual void SetCharPositionInLine(int charPositionInLine)
         {
-            GetInterpreter().SetCharPositionInLine(charPositionInLine);
+            Interpreter.SetCharPositionInLine(charPositionInLine);
         }
 
         /// <summary>What is the index of the current character of lookahead?</summary>
@@ -403,7 +406,7 @@ outer_break: ;
             {
                 return _text;
             }
-            return GetInterpreter().GetText(_input);
+            return Interpreter.GetText(_input);
         }
 
         /// <summary>
@@ -465,9 +468,12 @@ outer_break: ;
         /// error reporting.  The generated parsers implement a method
         /// that overrides this to point to their String[] tokenNames.
         /// </remarks>
-        public override string[] GetTokenNames()
+        public override string[] TokenNames
         {
-            return null;
+            get
+            {
+                return null;
+            }
         }
 
         /// <summary>Return a list of all Token objects in input char stream.</summary>
@@ -492,7 +498,7 @@ outer_break: ;
             if (_input.La(1) != IIntStream.Eof)
             {
                 // skip a char and try again
-                GetInterpreter().Consume(_input);
+                Interpreter.Consume(_input);
             }
         }
 

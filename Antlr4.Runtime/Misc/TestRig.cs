@@ -283,19 +283,19 @@ namespace Antlr4.Runtime.Misc
                 if (diagnostics)
                 {
                     parser.AddErrorListener(new DiagnosticErrorListener());
-                    parser.GetInterpreter().SetPredictionMode(PredictionMode.LlExactAmbigDetection);
+                    parser.Interpreter.SetPredictionMode(PredictionMode.LlExactAmbigDetection);
                 }
                 if (printTree || gui || psFile != null)
                 {
-                    parser.SetBuildParseTree(true);
+                    parser.BuildParseTree = true;
                 }
                 if (Sll)
                 {
                     // overrides diagnostics
-                    parser.GetInterpreter().SetPredictionMode(PredictionMode.Sll);
+                    parser.Interpreter.SetPredictionMode(PredictionMode.Sll);
                 }
                 parser.SetInputStream(tokens);
-                parser.SetTrace(trace);
+                parser.Trace = trace;
                 try
                 {
                     MethodInfo startRule = parserClass.GetMethod(startRuleName, (Type[])null);
