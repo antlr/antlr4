@@ -28,6 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
 using Sharpen;
 
 namespace Antlr4.Runtime
