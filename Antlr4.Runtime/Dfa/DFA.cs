@@ -31,6 +31,7 @@ using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
 using Sharpen;
+using Interlocked = System.Threading.Interlocked;
 
 namespace Antlr4.Runtime.Dfa
 {
@@ -63,7 +64,7 @@ namespace Antlr4.Runtime.Dfa
         [NotNull]
         public readonly ATNState atnStartState;
 
-        private readonly AtomicInteger nextStateNumber = new AtomicInteger();
+        private int nextStateNumber;
 
         /// <summary>
         /// Set of configs for a DFA state with at least one conflict? Mainly used as "return value"
@@ -96,7 +97,7 @@ namespace Antlr4.Runtime.Dfa
 
         public virtual DFAState AddState(DFAState state)
         {
-            state.stateNumber = nextStateNumber.GetAndIncrement();
+            state.stateNumber = Interlocked.Increment(ref nextStateNumber);
             DFAState existing = states.PutIfAbsent(state, state);
             if (existing != null)
             {
