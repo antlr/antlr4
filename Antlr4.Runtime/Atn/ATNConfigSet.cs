@@ -28,6 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime.Atn;
@@ -81,7 +82,7 @@ namespace Antlr4.Runtime.Atn
 
         private int uniqueAlt;
 
-        private BitSet conflictingAlts;
+        private BitArray conflictingAlts;
 
         private bool hasSemanticContext;
 
@@ -159,13 +160,13 @@ namespace Antlr4.Runtime.Atn
         /// set.
         /// </remarks>
         [NotNull]
-        public virtual BitSet GetRepresentedAlternatives()
+        public virtual BitArray GetRepresentedAlternatives()
         {
             if (conflictingAlts != null)
             {
-                return (BitSet)conflictingAlts.Clone();
+                return (BitArray)conflictingAlts.Clone();
             }
-            BitSet alts = new BitSet();
+            BitArray alts = new BitArray();
             foreach (ATNConfig config in this)
             {
                 alts.Set(config.GetAlt());
@@ -597,12 +598,12 @@ namespace Antlr4.Runtime.Atn
             hasSemanticContext = true;
         }
 
-        public virtual BitSet GetConflictingAlts()
+        public virtual BitArray GetConflictingAlts()
         {
             return conflictingAlts;
         }
 
-        public virtual void SetConflictingAlts(BitSet conflictingAlts)
+        public virtual void SetConflictingAlts(BitArray conflictingAlts)
         {
             EnsureWritable();
             this.conflictingAlts = conflictingAlts;

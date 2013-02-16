@@ -366,8 +366,9 @@ namespace Antlr4.Runtime.Atn
             return result;
         }
 
-        /// <seealso cref="ParserATNSimulator.GetPredsForAmbigAlts(Sharpen.BitSet, ATNConfigSet, int)
-        ///     ">ParserATNSimulator.GetPredsForAmbigAlts(Sharpen.BitSet, ATNConfigSet, int)</seealso>
+        /// <seealso cref="ParserATNSimulator.GetPredsForAmbigAlts(System.Collections.BitArray, ATNConfigSet, int)
+        ///     ">ParserATNSimulator.GetPredsForAmbigAlts(System.Collections.BitArray, ATNConfigSet, int)
+        ///     </seealso>
         public static SemanticContext Or(SemanticContext a, SemanticContext b)
         {
             if (a == null)
