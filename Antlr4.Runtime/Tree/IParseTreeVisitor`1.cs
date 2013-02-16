@@ -44,7 +44,7 @@ namespace Antlr4.Runtime.Tree
     /// </remarks>
     /// <author>Sam Harwell</author>
     /// <?></?>
-    public interface IParseTreeVisitor<Result>
+    public interface IParseTreeVisitor<out Result>
     {
         /// <summary>Visit a parse tree, and return a user-defined result of the operation.</summary>
         /// <remarks>Visit a parse tree, and return a user-defined result of the operation.</remarks>

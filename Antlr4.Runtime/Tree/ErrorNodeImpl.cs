@@ -50,7 +50,7 @@ namespace Antlr4.Runtime.Tree
         {
         }
 
-        public override T Accept<T, _T1>(IParseTreeVisitor<_T1> visitor)
+        public override T Accept<T>(IParseTreeVisitor<T> visitor)
         {
             return visitor.VisitErrorNode(this);
         }
