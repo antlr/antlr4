@@ -36,6 +36,7 @@ namespace Antlr4.Runtime.Dfa
 {
     /// <author>Sam Harwell</author>
     public abstract class AbstractEdgeMap<T> : IEdgeMap<T>
+        where T : class
     {
         protected internal readonly int minIndex;
 

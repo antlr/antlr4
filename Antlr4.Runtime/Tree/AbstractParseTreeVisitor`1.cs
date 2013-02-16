@@ -132,7 +132,7 @@ namespace Antlr4.Runtime.Tree
         /// <returns>The default value returned by visitor methods.</returns>
         protected internal virtual Result DefaultResult()
         {
-            return null;
+            return default(Result);
         }
 
         /// <summary>Aggregates the results of visiting multiple children of a node.</summary>

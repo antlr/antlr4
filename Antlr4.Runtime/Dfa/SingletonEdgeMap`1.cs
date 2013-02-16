@@ -36,6 +36,7 @@ namespace Antlr4.Runtime.Dfa
 {
     /// <author>Sam Harwell</author>
     public class SingletonEdgeMap<T> : AbstractEdgeMap<T>
+        where T : class
     {
         private readonly int key;
 

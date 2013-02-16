@@ -36,6 +36,7 @@ namespace Antlr4.Runtime.Dfa
 {
     /// <author>sam</author>
     public class ArrayEdgeMap<T> : AbstractEdgeMap<T>
+        where T : class
     {
         private readonly T[] arrayData;
 
