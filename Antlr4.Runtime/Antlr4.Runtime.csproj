@@ -145,6 +145,8 @@
     <Compile Include="RecognitionException.cs" />
     <Compile Include="Recognizer`2.cs" />
     <Compile Include="RuleContext.cs" />
+    <Compile Include="Sharpen\Arrays.cs" />
+    <Compile Include="Sharpen\Runtime.cs" />
     <Compile Include="TokenStreamRewriter.cs" />
     <Compile Include="Tree\AbstractParseTreeVisitor`1.cs" />
     <Compile Include="Tree\ErrorNodeImpl.cs" />
