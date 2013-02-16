@@ -186,6 +186,7 @@
 -typeMapping org.antlr.v4.runtime.misc.ParseCancellationException ParseCanceledException
 -typeMapping java.util.concurrent.CancellationException System.OperationCanceledException
 -typeMapping java.lang.IndexOutOfBoundsException ArgumentOutOfRangeException
+-typeMapping java.util.EmptyStackException InvalidOperationException
 
 -typeMapping org.antlr.v4.runtime.misc.Tuple System.Tuple
 -typeMapping org.antlr.v4.runtime.misc.Tuple2<,> System.Tuple
@@ -197,6 +198,8 @@
 -propertyMapping org.antlr.v4.runtime.misc.Tuple3.getItem3 Item3
 
 -typeMapping org.antlr.v4.runtime.misc.IntegerList System.Collections.Generic.List<int>
+-typeMapping org.antlr.v4.runtime.misc.IntegerStack System.Collections.Generic.List<int>
+-methodMapping org.antlr.v4.runtime.misc.IntegerStack.push Add
 
 -typeMapping org.antlr.v4.runtime.ANTLRErrorListener<> IAntlrErrorListener
 -typeMapping org.antlr.v4.runtime.ANTLRErrorStrategy IAntlrErrorStrategy
