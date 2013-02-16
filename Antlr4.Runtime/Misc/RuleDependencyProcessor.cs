@@ -171,12 +171,12 @@ namespace Antlr4.Runtime.Misc
                     EnumSet<Dependents> dependents = EnumSet.Of(Dependents.Self, dependency.GetItem1(
                         ).Dependents());
                     ReportUnimplementedDependents(dependency, dependents);
-                    BitSet checked = new BitSet();
+                    BitArray checked = new BitArray();
                     int highestRequiredDependency = CheckDependencyVersion(dependency, ruleNames, ruleVersions
                         , effectiveRule, null);
                     if (dependents.Contains(Dependents.Parents))
                     {
-                        BitSet parents = relations.parents[dependency.GetItem1().Rule()];
+                        BitArray parents = relations.parents[dependency.GetItem1().Rule()];
                         for (int parent = parents.NextSetBit(0); parent >= 0; parent = parents.NextSetBit
                             (parent + 1))
                         {
@@ -192,7 +192,7 @@ namespace Antlr4.Runtime.Misc
                     }
                     if (dependents.Contains(Dependents.Children))
                     {
-                        BitSet children = relations.children[dependency.GetItem1().Rule()];
+                        BitArray children = relations.children[dependency.GetItem1().Rule()];
                         for (int child = children.NextSetBit(0); child >= 0; child = children.NextSetBit(
                             child + 1))
                         {
@@ -208,7 +208,7 @@ namespace Antlr4.Runtime.Misc
                     }
                     if (dependents.Contains(Dependents.Ancestors))
                     {
-                        BitSet ancestors = relations.GetAncestors(dependency.GetItem1().Rule());
+                        BitArray ancestors = relations.GetAncestors(dependency.GetItem1().Rule());
                         for (int ancestor = ancestors.NextSetBit(0); ancestor >= 0; ancestor = ancestors.
                             NextSetBit(ancestor + 1))
                         {
@@ -224,7 +224,7 @@ namespace Antlr4.Runtime.Misc
                     }
                     if (dependents.Contains(Dependents.Descendants))
                     {
-                        BitSet descendants = relations.GetDescendants(dependency.GetItem1().Rule());
+                        BitArray descendants = relations.GetDescendants(dependency.GetItem1().Rule());
                         for (int descendant = descendants.NextSetBit(0); descendant >= 0; descendant = descendants
                             .NextSetBit(descendant + 1))
                         {
@@ -782,21 +782,21 @@ namespace Antlr4.Runtime.Misc
 
         private sealed class RuleRelations
         {
-            private readonly BitSet[] parents;
+            private readonly BitArray[] parents;
 
-            private readonly BitSet[] children;
+            private readonly BitArray[] children;
 
             public RuleRelations(int ruleCount)
             {
-                parents = new BitSet[ruleCount];
+                parents = new BitArray[ruleCount];
                 for (int i = 0; i < ruleCount; i++)
                 {
-                    parents[i] = new BitSet();
+                    parents[i] = new BitArray();
                 }
-                children = new BitSet[ruleCount];
+                children = new BitArray[ruleCount];
                 for (int i_1 = 0; i_1 < ruleCount; i_1++)
                 {
-                    children[i_1] = new BitSet();
+                    children[i_1] = new BitArray();
                 }
             }
 
@@ -817,9 +817,9 @@ namespace Antlr4.Runtime.Misc
                 return true;
             }
 
-            public BitSet GetAncestors(int rule)
+            public BitArray GetAncestors(int rule)
             {
-                BitSet ancestors = new BitSet();
+                BitArray ancestors = new BitArray();
                 ancestors.Or(parents[rule]);
                 while (true)
                 {
@@ -837,9 +837,9 @@ namespace Antlr4.Runtime.Misc
                 return ancestors;
             }
 
-            public BitSet GetDescendants(int rule)
+            public BitArray GetDescendants(int rule)
             {
-                BitSet descendants = new BitSet();
+                BitArray descendants = new BitArray();
                 descendants.Or(children[rule]);
                 while (true)
                 {

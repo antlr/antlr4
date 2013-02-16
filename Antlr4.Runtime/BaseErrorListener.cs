@@ -27,6 +27,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using System.Collections;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
@@ -44,7 +45,7 @@ namespace Antlr4.Runtime
         }
 
         public virtual void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int
-             stopIndex, BitSet ambigAlts, ATNConfigSet configs)
+             stopIndex, BitArray ambigAlts, ATNConfigSet configs)
         {
         }
 
