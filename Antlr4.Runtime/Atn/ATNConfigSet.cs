@@ -569,7 +569,7 @@ namespace Antlr4.Runtime.Atn
                     }
                     else
                     {
-                        return Sharpen.Runtime.CompareOrdinal(o1.GetSemanticContext().ToString(), o2.GetSemanticContext
+                        return string.CompareOrdinal(o1.GetSemanticContext().ToString(), o2.GetSemanticContext
                             ().ToString());
                     }
                 }
