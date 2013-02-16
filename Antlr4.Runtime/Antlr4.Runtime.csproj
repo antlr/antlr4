@@ -132,9 +132,9 @@
     <Compile Include="Misc\NotNullAttribute.cs" />
     <Compile Include="Misc\OrderedHashSet`1.cs" />
     <Compile Include="Misc\ParseCanceledException.cs" />
-    <Compile Include="Misc\RuleDependencyChecker.cs" />
-    <Compile Include="Misc\RuleDependencyProcessor.cs" />
-    <Compile Include="Misc\TestRig.cs" />
+    <None Include="Misc\RuleDependencyChecker.cs" />
+    <None Include="Misc\RuleDependencyProcessor.cs" />
+    <None Include="Misc\TestRig.cs" />
     <Compile Include="Misc\Utils.cs" />
     <Compile Include="NoViableAltException.cs" />
     <Compile Include="Parser.cs" />
