@@ -198,8 +198,7 @@ namespace Antlr4.Runtime
         /// <exception cref="Javax.Print.PrintException"></exception>
         public virtual void Save(Parser parser, string fileName)
         {
-            IList<string> ruleNames = parser != null ? Arrays.AsList(parser.GetRuleNames()) : 
-                null;
+            IList<string> ruleNames = parser != null ? Arrays.AsList(parser.RuleNames) : null;
             Save(ruleNames, fileName);
         }
 
@@ -209,8 +208,7 @@ namespace Antlr4.Runtime
         public virtual void Save(Parser parser, string fileName, string fontName, int fontSize
             )
         {
-            IList<string> ruleNames = parser != null ? Arrays.AsList(parser.GetRuleNames()) : 
-                null;
+            IList<string> ruleNames = parser != null ? Arrays.AsList(parser.RuleNames) : null;
             Save(ruleNames, fileName, fontName, fontSize);
         }
 
@@ -282,7 +280,7 @@ namespace Antlr4.Runtime
         public virtual string ToString<_T0>(Recognizer<_T0> recog, Antlr4.Runtime.RuleContext
              stop)
         {
-            string[] ruleNames = recog != null ? recog.GetRuleNames() : null;
+            string[] ruleNames = recog != null ? recog.RuleNames : null;
             IList<string> ruleNamesList = ruleNames != null ? Arrays.AsList(ruleNames) : null;
             return ToString(ruleNamesList, stop);
         }

@@ -80,7 +80,7 @@ namespace Antlr4.Runtime
             this.ctx = ctx;
             if (recognizer != null)
             {
-                this.offendingState = recognizer.GetState();
+                this.offendingState = recognizer.State;
             }
         }
 
@@ -92,7 +92,7 @@ namespace Antlr4.Runtime
             this.ctx = ctx;
             if (recognizer != null)
             {
-                this.offendingState = recognizer.GetState();
+                this.offendingState = recognizer.State;
             }
         }
 

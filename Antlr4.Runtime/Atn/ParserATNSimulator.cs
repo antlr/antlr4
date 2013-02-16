@@ -477,7 +477,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     if (dfa_debug && t >= 0)
                     {
-                        System.Console.Out.WriteLine("no edge for " + parser.GetTokenNames()[t]);
+                        System.Console.Out.WriteLine("no edge for " + parser.TokenNames[t]);
                     }
                     int alt;
                     SimulatorState initialState = new SimulatorState(outerContext, s, state.useContext
@@ -1475,7 +1475,7 @@ namespace Antlr4.Runtime.Atn
         {
             if (parser != null && index >= 0)
             {
-                return parser.GetRuleNames()[index];
+                return parser.RuleNames[index];
             }
             return "<rule " + index + ">";
         }
@@ -1829,15 +1829,15 @@ namespace Antlr4.Runtime.Atn
             {
                 return "EOF";
             }
-            if (parser != null && parser.GetTokenNames() != null)
+            if (parser != null && parser.TokenNames != null)
             {
-                string[] tokensNames = parser.GetTokenNames();
+                string[] tokensNames = parser.TokenNames;
                 if (t >= tokensNames.Length)
                 {
                     System.Console.Error.WriteLine(t + " ttype out of range: " + Arrays.ToString(tokensNames
                         ));
-                    System.Console.Error.WriteLine(((CommonTokenStream)((ITokenStream)parser.GetInputStream
-                        ())).GetTokens());
+                    System.Console.Error.WriteLine(((CommonTokenStream)((ITokenStream)parser.InputStream
+                        )).GetTokens());
                 }
                 else
                 {
@@ -2086,8 +2086,8 @@ namespace Antlr4.Runtime.Atn
             {
                 Interval interval = Interval.Of(startIndex, stopIndex);
                 System.Console.Out.WriteLine("reportAttemptingFullContext decision=" + dfa.decision
-                     + ":" + initialState.s0.configs + ", input=" + ((ITokenStream)parser.GetInputStream
-                    ()).GetText(interval));
+                     + ":" + initialState.s0.configs + ", input=" + ((ITokenStream)parser.InputStream
+                    ).GetText(interval));
             }
             if (parser != null)
             {
@@ -2103,8 +2103,8 @@ namespace Antlr4.Runtime.Atn
             {
                 Interval interval = Interval.Of(startIndex, stopIndex);
                 System.Console.Out.WriteLine("reportContextSensitivity decision=" + dfa.decision 
-                    + ":" + acceptState.s0.configs + ", input=" + ((ITokenStream)parser.GetInputStream
-                    ()).GetText(interval));
+                    + ":" + acceptState.s0.configs + ", input=" + ((ITokenStream)parser.InputStream
+                    ).GetText(interval));
             }
             if (parser != null)
             {
@@ -2137,7 +2137,7 @@ namespace Antlr4.Runtime.Atn
                 //			}
                 Interval interval = Interval.Of(startIndex, stopIndex);
                 System.Console.Out.WriteLine("reportAmbiguity " + ambigAlts + ":" + configs + ", input="
-                     + ((ITokenStream)parser.GetInputStream()).GetText(interval));
+                     + ((ITokenStream)parser.InputStream).GetText(interval));
             }
             if (parser != null)
             {

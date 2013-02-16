@@ -484,9 +484,9 @@ namespace Antlr4.Runtime.Atn
                             // first char is '[', if more than that this isn't the first rule
                             localBuffer.Append(' ');
                         }
-                        ATN atn = recognizer.GetATN();
+                        ATN atn = recognizer.Atn;
                         ATNState s = atn.states[stateNumber];
-                        string ruleName = recognizer.GetRuleNames()[s.ruleIndex];
+                        string ruleName = recognizer.RuleNames[s.ruleIndex];
                         localBuffer.Append(ruleName);
                     }
                     else
