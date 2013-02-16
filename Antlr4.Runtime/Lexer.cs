@@ -195,7 +195,7 @@ namespace Antlr4.Runtime
                             NotifyListeners(e);
                             // report error
                             Recover(e);
-                            ttype = Skip;
+                            ttype = TokenTypes.Skip;
                         }
                         if (_input.La(1) == IIntStream.Eof)
                         {
@@ -205,12 +205,12 @@ namespace Antlr4.Runtime
                         {
                             _type = ttype;
                         }
-                        if (_type == Skip)
+                        if (_type == TokenTypes.Skip)
                         {
                             goto outer_continue;
                         }
                     }
-                    while (_type == More);
+                    while (_type == TokenTypes.More);
                     if (_token == null)
                     {
                         Emit();
@@ -241,12 +241,12 @@ outer_break: ;
         /// </remarks>
         public virtual void Skip()
         {
-            _type = Skip;
+            _type = TokenTypes.Skip;
         }
 
         public virtual void More()
         {
-            _type = More;
+            _type = TokenTypes.More;
         }
 
         public virtual void Mode(int m)
@@ -287,10 +287,10 @@ outer_break: ;
         public virtual void SetInputStream(ICharStream input)
         {
             this._input = null;
-            this._tokenFactorySourcePair = Tuple.Create(this, _input);
+            this._tokenFactorySourcePair = Tuple.Create((ITokenSource)this, _input);
             Reset();
             this._input = input;
-            this._tokenFactorySourcePair = Tuple.Create(this, _input);
+            this._tokenFactorySourcePair = Tuple.Create((ITokenSource)this, _input);
         }
 
         public virtual string SourceName
@@ -487,7 +487,7 @@ outer_break: ;
             IToken t = NextToken();
             while (t.Type != IToken.Eof)
             {
-                tokens.AddItem(t);
+                tokens.Add(t);
                 t = NextToken();
             }
             return tokens;
@@ -523,7 +523,7 @@ outer_break: ;
 
         public virtual string GetErrorDisplay(int c)
         {
-            string s = (char)c.ToString();
+            string s = ((char)c).ToString();
             switch (c)
             {
                 case IToken.Eof:
