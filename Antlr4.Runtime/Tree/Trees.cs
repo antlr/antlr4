@@ -159,13 +159,13 @@ namespace Antlr4.Runtime.Tree
         {
             if (t.Parent == null)
             {
-                return Sharpen.Collections.EmptyList();
+                return new ITree[0];
             }
             IList<ITree> ancestors = new List<ITree>();
             t = t.Parent;
             while (t != null)
             {
-                ancestors.Add(0, t);
+                ancestors.Insert(0, t);
                 // insert at start
                 t = t.Parent;
             }

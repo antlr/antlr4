@@ -108,7 +108,7 @@ namespace Antlr4.Runtime
 
         protected internal ITokenStream _input;
 
-        protected internal readonly IntegerStack _precedenceStack;
+        protected internal readonly List<int> _precedenceStack = new List<int> { 0 };
 
         /// <summary>The RuleContext object for the currently executing rule.</summary>
         /// <remarks>
@@ -145,10 +145,6 @@ namespace Antlr4.Runtime
 
         public Parser(ITokenStream input)
         {
-            {
-                _precedenceStack = new IntegerStack();
-                _precedenceStack.Push(0);
-            }
             SetInputStream(input);
         }
 
@@ -164,7 +160,7 @@ namespace Antlr4.Runtime
             _syntaxErrors = 0;
             _tracer = null;
             _precedenceStack.Clear();
-            _precedenceStack.Push(0);
+            _precedenceStack.Add(0);
             ATNSimulator interpreter = GetInterpreter();
             if (interpreter != null)
             {
@@ -339,7 +335,7 @@ namespace Antlr4.Runtime
             {
                 _parseListeners = new List<IParseTreeListener>();
             }
-            this._parseListeners.AddItem(listener);
+            this._parseListeners.Add(listener);
         }
 
         public virtual void RemoveParseListener(IParseTreeListener l)
@@ -351,7 +347,7 @@ namespace Antlr4.Runtime
             if (_parseListeners != null)
             {
                 _parseListeners.Remove(l);
-                if (_parseListeners.IsEmpty())
+                if (_parseListeners.Count == 0)
                 {
                     _parseListeners = null;
                 }
@@ -490,7 +486,7 @@ namespace Antlr4.Runtime
             {
                 ((ITokenStream)GetInputStream()).Consume();
             }
-            bool hasListener = _parseListeners != null && !_parseListeners.IsEmpty();
+            bool hasListener = _parseListeners != null && _parseListeners.Count != 0;
             if (_buildParseTrees || hasListener)
             {
                 if (_errHandler.InErrorRecoveryMode(this))
@@ -609,7 +605,7 @@ namespace Antlr4.Runtime
         public virtual void EnterRecursionRule(ParserRuleContext localctx, int ruleIndex, 
             int precedence)
         {
-            _precedenceStack.Push(precedence);
+            _precedenceStack.Add(precedence);
             _ctx = localctx;
             _ctx.start = _input.Lt(1);
             if (_parseListeners != null)
@@ -641,7 +637,7 @@ namespace Antlr4.Runtime
         // simulates rule entry for left-recursive rules
         public virtual void UnrollRecursionContexts(ParserRuleContext _parentctx)
         {
-            _precedenceStack.Pop();
+            _precedenceStack.RemoveAt(_precedenceStack.Count - 1);
             _ctx.stop = _input.Lt(-1);
             ParserRuleContext retctx = _ctx;
             // save current ctx (return value)
@@ -688,7 +684,7 @@ namespace Antlr4.Runtime
 
         public override bool Precpred(RuleContext localctx, int precedence)
         {
-            return precedence >= _precedenceStack.Peek();
+            return precedence >= _precedenceStack[_precedenceStack.Count - 1];
         }
 
         public override IAntlrErrorListener<IToken> GetErrorListenerDispatch()
@@ -823,11 +819,11 @@ namespace Antlr4.Runtime
                 int ruleIndex = p.GetRuleIndex();
                 if (ruleIndex < 0)
                 {
-                    stack.AddItem("n/a");
+                    stack.Add("n/a");
                 }
                 else
                 {
-                    stack.AddItem(ruleNames[ruleIndex]);
+                    stack.Add(ruleNames[ruleIndex]);
                 }
                 p = p.parent;
             }
@@ -841,7 +837,7 @@ namespace Antlr4.Runtime
             for (int d = 0; d < _interp.atn.decisionToDFA.Length; d++)
             {
                 DFA dfa = _interp.atn.decisionToDFA[d];
-                s.AddItem(dfa.ToString(GetTokenNames(), GetRuleNames()));
+                s.Add(dfa.ToString(GetTokenNames(), GetRuleNames()));
             }
             return s;
         }
@@ -885,7 +881,7 @@ namespace Antlr4.Runtime
             IList<string> strings = new List<string>(tokens.Count);
             for (int i = 0; i < tokens.Count; i++)
             {
-                strings.AddItem(tokens[i].Text);
+                strings.Add(tokens[i].Text);
             }
             return strings;
         }
