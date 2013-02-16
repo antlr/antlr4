@@ -5,3 +5,5 @@
 # ignore C# build directories
 [Dd]ebug/
 [Rr]elease/
+reference/.metadata/
+reference/antlr4.net/

@@ -1,6 +1,8 @@
 -pascalCase+ 
 -nativeTypeSystem 
 -organizeUsings
+-nativeInterfaces
+-tabToSpaces
 
 -methodMapping System.out.println System.Console.WriteLine
 
@@ -112,7 +114,7 @@
 -typeMapping java.lang.Process Sharpen.SystemProcess
 -typeMapping java.net.InetAddress System.Net.IPAddress
 -typeMapping java.util.TimeZone System.TimeZoneInfo
--typeMapping java.util.ArrayList<> Sharpen.AList
+-typeMapping java.util.ArrayList<> System.Collections.Generic.List
 -typeMapping java.util.zip.Inflater ICSharpCode.SharpZipLib.Zip.Compression.Inflater
 -typeMapping java.util.zip.Deflater ICSharpCode.SharpZipLib.Zip.Compression.Deflater
 -typeMapping java.util.zip.ZipException ICSharpCode.SharpZipLib.SharpZipBaseException
@@ -178,8 +180,13 @@
 
 -typeMapping org.antlr.v4.runtime.misc.ParseCancellationException ParseCanceledException
 -typeMapping java.util.concurrent.CancellationException System.OperationCanceledException
+-typeMapping java.lang.IndexOutOfBoundsException ArgumentOutOfRangeException
 
 -typeMapping org.antlr.v4.runtime.misc.Tuple System.Tuple
 -typeMapping org.antlr.v4.runtime.misc.Tuple2<,> System.Tuple
 -typeMapping org.antlr.v4.runtime.misc.Tuple3<,,> System.Tuple
 
+-typeMapping org.antlr.v4.runtime.ANTLRErrorListener<> IAntlrErrorListener
+-typeMapping org.antlr.v4.runtime.ANTLRErrorStrategy IAntlrErrorStrategy
+-typeMapping org.antlr.v4.runtime.ANTLRFileStream AntlrFileStream
+-typeMapping org.antlr.v4.runtime.ANTLRInputStream AntlrInputStream
