@@ -81,13 +81,13 @@ namespace Antlr4.Runtime.Dfa
             StringBuilder buf = new StringBuilder();
             if (dfa.states != null)
             {
-                IList<DFAState> states = new List<DFAState>(dfa.states.Values);
+                List<DFAState> states = new List<DFAState>(dfa.states.Values);
                 states.Sort(new _IComparer_85());
                 foreach (DFAState s in states)
                 {
                     IDictionary<int, DFAState> edges = s.EdgeMap;
                     IDictionary<int, DFAState> contextEdges = s.ContextEdgeMap;
-                    foreach (KeyValuePair<int, DFAState> entry in edges.EntrySet())
+                    foreach (KeyValuePair<int, DFAState> entry in edges)
                     {
                         if ((entry.Value == null || entry.Value == ATNSimulator.Error) && !s.IsContextSymbol
                             (entry.Key))
@@ -117,7 +117,7 @@ namespace Antlr4.Runtime.Dfa
                     }
                     if (s.IsContextSensitive)
                     {
-                        foreach (KeyValuePair<int, DFAState> entry_1 in contextEdges.EntrySet())
+                        foreach (KeyValuePair<int, DFAState> entry_1 in contextEdges)
                         {
                             buf.Append(GetStateString(s)).Append("-").Append(GetContextLabel(entry_1.Key)).Append
                                 ("->").Append(GetStateString(entry_1.Value)).Append("\n");

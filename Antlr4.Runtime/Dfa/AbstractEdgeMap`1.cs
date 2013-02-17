@@ -56,7 +56,7 @@ namespace Antlr4.Runtime.Dfa
              where _T0:T
         {
             Antlr4.Runtime.Dfa.AbstractEdgeMap<T> result = this;
-            foreach (KeyValuePair<int, T> entry in m.EntrySet())
+            foreach (KeyValuePair<int, _T0> entry in m.EntrySet())
             {
                 result = result.Put(entry.Key, entry.Value);
             }
