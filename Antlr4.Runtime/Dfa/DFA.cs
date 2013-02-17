@@ -99,12 +99,7 @@ namespace Antlr4.Runtime.Dfa
         public virtual DFAState AddState(DFAState state)
         {
             state.stateNumber = Interlocked.Increment(ref nextStateNumber);
-            DFAState existing = states.PutIfAbsent(state, state);
-            if (existing != null)
-            {
-                return existing;
-            }
-            return state;
+            return states.GetOrAdd(state, state);
         }
 
         public override string ToString()
