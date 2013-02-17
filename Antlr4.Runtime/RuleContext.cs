@@ -304,7 +304,7 @@ namespace Antlr4.Runtime
                 {
                     int ruleIndex = p.GetRuleIndex();
                     string ruleName = ruleIndex >= 0 && ruleIndex < ruleNames.Count ? ruleNames[ruleIndex
-                        ] : Sharpen.Extensions.ToString(ruleIndex);
+                        ] : ruleIndex.ToString();
                     buf.Append(ruleName);
                 }
                 if (p.parent != null && (ruleNames != null || !p.parent.IsEmpty()))

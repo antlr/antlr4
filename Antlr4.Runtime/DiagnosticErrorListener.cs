@@ -68,7 +68,7 @@ namespace Antlr4.Runtime
         protected internal virtual string GetDecisionDescription(Parser recognizer, int decision
             )
         {
-            return Sharpen.Extensions.ToString(decision);
+            return decision.ToString();
         }
     }
 }
