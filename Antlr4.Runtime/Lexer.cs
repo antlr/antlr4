@@ -122,7 +122,7 @@ namespace Antlr4.Runtime
         public Lexer(ICharStream input)
         {
             this._input = input;
-            this._tokenFactorySourcePair = Tuple.Create(this, input);
+            this._tokenFactorySourcePair = Tuple.Create((ITokenSource)this, input);
         }
 
         public virtual void Reset()

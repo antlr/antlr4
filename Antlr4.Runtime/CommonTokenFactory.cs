@@ -64,9 +64,8 @@ namespace Antlr4.Runtime
         {
         }
 
-        public virtual CommonToken Create<_T0>(Tuple<_T0> source, int type, string text, 
-            int channel, int start, int stop, int line, int charPositionInLine) where _T0:
-            ITokenSource
+        public virtual CommonToken Create(Tuple<ITokenSource, ICharStream> source, int type, string text,
+            int channel, int start, int stop, int line, int charPositionInLine)
         {
             CommonToken t = new CommonToken(source, type, channel, start, stop);
             t.Line = line;
@@ -83,6 +82,12 @@ namespace Antlr4.Runtime
                 }
             }
             return t;
+        }
+
+        IToken ITokenFactory.Create(Tuple<ITokenSource, ICharStream> source, int type, string text,
+            int channel, int start, int stop, int line, int charPositionInLine)
+        {
+            return Create(source, type, text, channel, start, stop, line, charPositionInLine);
         }
 
         public virtual CommonToken Create(int type, string text)
