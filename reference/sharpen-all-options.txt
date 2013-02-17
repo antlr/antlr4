@@ -188,6 +188,8 @@
 -typeMapping java.util.concurrent.CancellationException System.OperationCanceledException
 -typeMapping java.lang.IndexOutOfBoundsException ArgumentOutOfRangeException
 -typeMapping java.util.EmptyStackException InvalidOperationException
+-typeMapping java.io.InputStream System.IO.Stream
+-typeMapping java.io.InputStreamReader System.IO.StreamReader
 
 -typeMapping org.antlr.v4.runtime.misc.EqualityComparator<> System.Collections.Generic.IEqualityComparer
 -methodMapping org.antlr.v4.runtime.misc.EqualityComparator.hashCode GetHashCode

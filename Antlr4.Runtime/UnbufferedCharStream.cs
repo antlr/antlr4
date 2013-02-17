@@ -148,7 +148,7 @@ namespace Antlr4.Runtime
             data = new char[bufferSize];
         }
 
-        public UnbufferedCharStream(InputStream input) : this(input, 256)
+        public UnbufferedCharStream(Stream input) : this(input, 256)
         {
         }
 
@@ -156,9 +156,9 @@ namespace Antlr4.Runtime
         {
         }
 
-        public UnbufferedCharStream(InputStream input, int bufferSize) : this(bufferSize)
+        public UnbufferedCharStream(Stream input, int bufferSize) : this(bufferSize)
         {
-            this.input = new InputStreamReader(input);
+            this.input = new StreamReader(input);
             Fill(1);
         }
 
