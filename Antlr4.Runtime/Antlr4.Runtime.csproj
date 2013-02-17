@@ -123,13 +123,9 @@
     <Compile Include="Misc\Args.cs" />
     <Compile Include="Misc\Array2DHashSet`1.cs" />
     <Compile Include="Misc\DoubleKeyMap`3.cs" />
-    <Compile Include="Misc\FlexibleHashMap`2.cs" />
-    <Compile Include="Misc\IFunc0`1.cs" />
-    <Compile Include="Misc\IFunc1`2.cs" />
     <Compile Include="Misc\IIntSet.cs" />
     <Compile Include="Misc\Interval.cs" />
     <Compile Include="Misc\IntervalSet.cs" />
-    <Compile Include="Misc\IPredicate`1.cs" />
     <Compile Include="Misc\MultiMap`2.cs" />
     <Compile Include="Misc\OrderedHashSet`1.cs" />
     <Compile Include="Misc\ParseCanceledException.cs" />
