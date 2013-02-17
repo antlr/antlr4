@@ -268,7 +268,7 @@ namespace Antlr4.Runtime
 
         public string ToString<_T0>(Recognizer<_T0> recog)
         {
-            return ToString(recog, ParserRuleContext.EmptyContext());
+            return ToString(recog, ParserRuleContext.EmptyContext);
         }
 
         public string ToString(IList<string> ruleNames)

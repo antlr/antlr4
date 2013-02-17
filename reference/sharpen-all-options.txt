@@ -99,6 +99,7 @@
 -methodMapping java.io.IOException.IOException(java.lang.Throwable) Sharpen.Extensions.CreateIOException
 -fieldMapping java.util.Locale.US InvariantCulture
 -typeMapping java.lang.Comparable System.IComparable
+-typeMapping java.lang.Comparable<> System.IComparable
 -typeMapping java.util.Comparator<> System.Collections.Generic.IComparer
 -typeMapping java.util.HashSet<> System.Collections.Generic.HashSet
 -typeMapping java.util.Set<> System.Collections.Generic.ISet
