@@ -360,7 +360,7 @@ namespace Antlr4.Runtime.Atn
                     if (addKey)
                     {
                         mergedConfigs[key] = unmergedConfig;
-                        unmerged.Remove(i);
+                        unmerged.RemoveAt(i);
                     }
                     return true;
                 }
@@ -635,7 +635,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     if (unmerged[i] == config)
                     {
-                        unmerged.Remove(i);
+                        unmerged.RemoveAt(i);
                         return;
                     }
                 }

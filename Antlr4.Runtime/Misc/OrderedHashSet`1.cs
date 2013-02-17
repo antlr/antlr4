@@ -75,7 +75,7 @@ namespace Antlr4.Runtime.Misc
 
         public virtual bool Remove(int i)
         {
-            T o = elements.Remove(i);
+            T o = elements.RemoveAt(i);
             return base.Remove(o);
         }
 

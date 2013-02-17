@@ -97,20 +97,20 @@ namespace Antlr4.Runtime
         }
 
         /// <exception cref="System.IO.IOException"></exception>
-        public AntlrInputStream(InputStream input) : this(new InputStreamReader(input), InitialBufferSize
+        public AntlrInputStream(Stream input) : this(new StreamReader(input), InitialBufferSize
             )
         {
         }
 
         /// <exception cref="System.IO.IOException"></exception>
-        public AntlrInputStream(InputStream input, int initialSize) : this(new InputStreamReader
-            (input), initialSize)
+        public AntlrInputStream(Stream input, int initialSize) : this(new StreamReader(input
+            ), initialSize)
         {
         }
 
         /// <exception cref="System.IO.IOException"></exception>
-        public AntlrInputStream(InputStream input, int initialSize, int readChunkSize) : 
-            this(new InputStreamReader(input), initialSize, readChunkSize)
+        public AntlrInputStream(Stream input, int initialSize, int readChunkSize) : this(
+            new StreamReader(input), initialSize, readChunkSize)
         {
         }
 

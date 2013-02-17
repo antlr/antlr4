@@ -77,7 +77,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>A Map that uses just the state and the stack context as the key.</summary>
         /// <remarks>A Map that uses just the state and the stack context as the key.</remarks>
-        internal class AltAndContextMap : FlexibleHashMap<ATNConfig, BitArray>
+        internal class AltAndContextMap : Dictionary<ATNConfig, BitArray>
         {
             public AltAndContextMap() : base(PredictionMode.AltAndContextConfigEqualityComparator
                 .Instance)

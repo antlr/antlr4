@@ -219,22 +219,22 @@ namespace Antlr4.Runtime.Misc
             }
             if (inputFiles.IsEmpty())
             {
-                InputStream @is = Sharpen.Runtime.@in;
+                Stream @is = Sharpen.Runtime.@in;
                 StreamReader r;
                 if (encoding != null)
                 {
-                    r = new InputStreamReader(@is, encoding);
+                    r = new StreamReader(@is, encoding);
                 }
                 else
                 {
-                    r = new InputStreamReader(@is);
+                    r = new StreamReader(@is);
                 }
                 Process(lexer, parserClass, parser, @is, r);
                 return;
             }
             foreach (string inputFile in inputFiles)
             {
-                InputStream @is = Sharpen.Runtime.@in;
+                Stream @is = Sharpen.Runtime.@in;
                 if (inputFile != null)
                 {
                     @is = new FileInputStream(inputFile);
@@ -242,11 +242,11 @@ namespace Antlr4.Runtime.Misc
                 StreamReader r;
                 if (encoding != null)
                 {
-                    r = new InputStreamReader(@is, encoding);
+                    r = new StreamReader(@is, encoding);
                 }
                 else
                 {
-                    r = new InputStreamReader(@is);
+                    r = new StreamReader(@is);
                 }
                 if (inputFiles.Count > 1)
                 {
@@ -261,7 +261,7 @@ namespace Antlr4.Runtime.Misc
         /// <exception cref="System.Reflection.TargetInvocationException"></exception>
         /// <exception cref="Javax.Print.PrintException"></exception>
         protected internal virtual void Process<_T0>(Lexer lexer, Type<_T0> parserClass, 
-            Parser parser, InputStream @is, StreamReader r) where _T0:Parser
+            Parser parser, Stream @is, StreamReader r) where _T0:Parser
         {
             try
             {

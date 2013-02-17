@@ -169,13 +169,13 @@ namespace Antlr4.Runtime.Dfa
             }
             if (index == values.Count - 1)
             {
-                values.Remove(index);
+                values.RemoveAt(index);
                 return this;
             }
             Antlr4.Runtime.Dfa.SparseEdgeMap<T> result = new Antlr4.Runtime.Dfa.SparseEdgeMap
                 <T>(this, GetMaxSparseSize());
             System.Array.Copy(result.keys, index + 1, result.keys, index, Size() - index - 1);
-            result.values.Remove(index);
+            result.values.RemoveAt(index);
             return result;
         }
 

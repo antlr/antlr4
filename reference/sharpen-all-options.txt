@@ -14,7 +14,8 @@
 -typeMapping java.util.Comparator System.Collections.IComparer
 -typeMapping java.util.ArrayList System.Collections.ArrayList
 
--methodMapping java.util.List.addAll AddRange 
+-methodMapping java.util.List.addAll AddRange
+-methodMapping java.util.List.remove(int) RemoveAt
 -methodMapping java.util.AbstractList.addAll AddRange 
 -methodMapping java.util.ArrayList.addAll AddRange      
 
@@ -43,9 +44,6 @@
 -namespaceMapping javax.net.ssl Sharpen
 -methodMapping java.lang.Object.memberwiseClone Clone
 -methodMapping java.nio.charset.Charset.forName Sharpen.Extensions.GetEncoding
--methodMapping java.util.List<>.remove RemoveAt
--methodMapping java.util.IList<>.remove RemoveAt
--methodMapping java.util.ArrayList.remove RemoveAt
 -methodMapping java.util.ArrayList.trimToSize TrimExcess
 -methodMapping java.lang.Integer.toOctalString Sharpen.Extensions.ToOctalString
 -methodMapping java.lang.Integer.toHexString Sharpen.Extensions.ToHexString
@@ -188,10 +186,13 @@
 -typeMapping java.util.concurrent.CancellationException System.OperationCanceledException
 -typeMapping java.lang.IndexOutOfBoundsException ArgumentOutOfRangeException
 -typeMapping java.util.EmptyStackException InvalidOperationException
+-typeMapping java.io.InputStream System.IO.Stream
+-typeMapping java.io.InputStreamReader System.IO.StreamReader
 
 -typeMapping org.antlr.v4.runtime.misc.EqualityComparator<> System.Collections.Generic.IEqualityComparer
 -methodMapping org.antlr.v4.runtime.misc.EqualityComparator.hashCode GetHashCode
 -typeMapping org.antlr.v4.runtime.misc.AbstractEqualityComparator<> System.Collections.Generic.EqualityComparer
+-typeMapping org.antlr.v4.runtime.misc.FlexibleHashMap<,> System.Collections.Generic.Dictionary
 
 -typeMapping org.antlr.v4.runtime.misc.Tuple System.Tuple
 -typeMapping org.antlr.v4.runtime.misc.Tuple2<,> System.Tuple

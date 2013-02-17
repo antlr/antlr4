@@ -193,42 +193,6 @@ namespace Antlr4.Runtime
             return visitor.VisitChildren(this);
         }
 
-        /// <summary>Save this tree in a postscript file</summary>
-        /// <exception cref="System.IO.IOException"></exception>
-        /// <exception cref="Javax.Print.PrintException"></exception>
-        public virtual void Save(Parser parser, string fileName)
-        {
-            IList<string> ruleNames = parser != null ? Arrays.AsList(parser.RuleNames) : null;
-            Save(ruleNames, fileName);
-        }
-
-        /// <summary>Save this tree in a postscript file using a particular font name and size
-        ///     </summary>
-        /// <exception cref="System.IO.IOException"></exception>
-        public virtual void Save(Parser parser, string fileName, string fontName, int fontSize
-            )
-        {
-            IList<string> ruleNames = parser != null ? Arrays.AsList(parser.RuleNames) : null;
-            Save(ruleNames, fileName, fontName, fontSize);
-        }
-
-        /// <summary>Save this tree in a postscript file</summary>
-        /// <exception cref="System.IO.IOException"></exception>
-        /// <exception cref="Javax.Print.PrintException"></exception>
-        public virtual void Save(IList<string> ruleNames, string fileName)
-        {
-            Trees.WritePS(this, ruleNames, fileName);
-        }
-
-        /// <summary>Save this tree in a postscript file using a particular font name and size
-        ///     </summary>
-        /// <exception cref="System.IO.IOException"></exception>
-        public virtual void Save(IList<string> ruleNames, string fileName, string fontName
-            , int fontSize)
-        {
-            Trees.WritePS(this, ruleNames, fileName, fontName, fontSize);
-        }
-
         /// <summary>
         /// Print out a whole tree, not just a node, in LISP format
         /// (root child1 ..

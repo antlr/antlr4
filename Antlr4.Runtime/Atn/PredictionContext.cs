@@ -519,7 +519,7 @@ outer_break: ;
             return Sharpen.Collections.ToArray(result, new string[result.Count]);
         }
 
-        public sealed class IdentityHashMap : FlexibleHashMap<PredictionContext, PredictionContext
+        public sealed class IdentityHashMap : Dictionary<PredictionContext, PredictionContext
             >
         {
             public IdentityHashMap() : base(PredictionContext.IdentityEqualityComparator.Instance

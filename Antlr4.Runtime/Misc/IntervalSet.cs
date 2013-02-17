@@ -780,7 +780,7 @@ namespace Antlr4.Runtime.Misc
                 // if whole interval x..x, rm
                 if (el == a && el == b)
                 {
-                    intervals.Remove(i);
+                    intervals.RemoveAt(i);
                     break;
                 }
                 // if on left edge x..b, adjust left

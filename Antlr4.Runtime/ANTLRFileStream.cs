@@ -67,15 +67,15 @@ namespace Antlr4.Runtime
             }
             FilePath f = new FilePath(fileName);
             int size = (int)f.Length();
-            InputStreamReader isr;
+            StreamReader isr;
             FileInputStream fis = new FileInputStream(fileName);
             if (encoding != null)
             {
-                isr = new InputStreamReader(fis, encoding);
+                isr = new StreamReader(fis, encoding);
             }
             else
             {
-                isr = new InputStreamReader(fis);
+                isr = new StreamReader(fis);
             }
             try
             {
