@@ -239,27 +239,26 @@ namespace Antlr4.Runtime
             return children != null && i >= 0 && i < children.Count ? children[i] : null;
         }
 
-        public virtual T GetChild<T, _T1>(Type<_T1> ctxType, int i) where T:IParseTree where 
-            _T1:T
+        public virtual T GetChild<T>(int i) where T:IParseTree
         {
             if (children == null || i < 0 || i >= children.Count)
             {
-                return null;
+                return default(T);
             }
             int j = -1;
             // what element have we found with ctxType?
             foreach (IParseTree o in children)
             {
-                if (ctxType.IsInstanceOfType(o))
+                if (o is T)
                 {
                     j++;
                     if (j == i)
                     {
-                        return ctxType.Cast(o);
+                        return (T)o;
                     }
                 }
             }
-            return null;
+            return default(T);
         }
 
         public virtual ITerminalNode GetToken(int ttype, int i)
@@ -319,14 +318,12 @@ namespace Antlr4.Runtime
             return tokens;
         }
 
-        public virtual T GetRuleContext<T, _T1>(Type<_T1> ctxType, int i) where T:Antlr4.Runtime.ParserRuleContext
-             where _T1:T
+        public virtual T GetRuleContext<T>(int i) where T:Antlr4.Runtime.ParserRuleContext
         {
-            return GetChild(ctxType, i);
+            return GetChild<T>(i);
         }
 
-        public virtual IList<T> GetRuleContexts<T, _T1>(Type<_T1> ctxType) where T:Antlr4.Runtime.ParserRuleContext
-             where _T1:T
+        public virtual IList<T> GetRuleContexts<T>() where T:Antlr4.Runtime.ParserRuleContext
         {
             if (children == null)
             {
@@ -335,13 +332,13 @@ namespace Antlr4.Runtime
             IList<T> contexts = null;
             foreach (IParseTree o in children)
             {
-                if (ctxType.IsInstanceOfType(o))
+                if (o is T)
                 {
                     if (contexts == null)
                     {
                         contexts = new List<T>();
                     }
-                    contexts.Add(ctxType.Cast(o));
+                    contexts.Add((T)o);
                 }
             }
             if (contexts == null)
