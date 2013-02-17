@@ -292,7 +292,7 @@ namespace Antlr4.Runtime
         {
             if (children == null)
             {
-                return Sharpen.Collections.EmptyList();
+                return new ITerminalNode[0];
             }
             IList<ITerminalNode> tokens = null;
             foreach (IParseTree o in children)
@@ -313,7 +313,7 @@ namespace Antlr4.Runtime
             }
             if (tokens == null)
             {
-                return Sharpen.Collections.EmptyList();
+                return new ITerminalNode[0];
             }
             return tokens;
         }
@@ -327,7 +327,7 @@ namespace Antlr4.Runtime
         {
             if (children == null)
             {
-                return Sharpen.Collections.EmptyList();
+                return new T[0];
             }
             IList<T> contexts = null;
             foreach (IParseTree o in children)
@@ -343,7 +343,7 @@ namespace Antlr4.Runtime
             }
             if (contexts == null)
             {
-                return Sharpen.Collections.EmptyList();
+                return new T[0];
             }
             return contexts;
         }
