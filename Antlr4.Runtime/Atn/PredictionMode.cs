@@ -260,8 +260,8 @@ namespace Antlr4.Runtime.Atn
                     ATNConfigSet dup = new ATNConfigSet();
                     foreach (ATNConfig c in configs)
                     {
-                        c = c.Transform(c.GetState(), SemanticContext.None);
-                        dup.AddItem(c);
+                        ATNConfig config = c.Transform(c.GetState(), SemanticContext.None);
+                        dup.AddItem(config);
                     }
                     configs = dup;
                 }
