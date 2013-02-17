@@ -238,15 +238,9 @@ namespace Antlr4.Runtime
                 {
                     return i;
                 }
-                try
-                {
-                    int c = NextChar();
-                    Add(c);
-                }
-                catch (IOException ioe)
-                {
-                    throw new RuntimeException(ioe);
-                }
+
+                int c = NextChar();
+                Add(c);
             }
             return n;
         }
