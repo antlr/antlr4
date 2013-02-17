@@ -148,9 +148,9 @@ namespace Antlr4.Runtime
                     s = "<" + t.Type + ">";
                 }
             }
-            s = s.ReplaceAll("\n", "\\\\n");
-            s = s.ReplaceAll("\r", "\\\\r");
-            s = s.ReplaceAll("\t", "\\\\t");
+            s = s.Replace("\n", "\\n");
+            s = s.Replace("\r", "\\r");
+            s = s.Replace("\t", "\\t");
             return "'" + s + "'";
         }
 

@@ -270,9 +270,9 @@ namespace Antlr4.Runtime
             string txt = Text;
             if (txt != null)
             {
-                txt = txt.ReplaceAll("\n", "\\\\n");
-                txt = txt.ReplaceAll("\r", "\\\\r");
-                txt = txt.ReplaceAll("\t", "\\\\t");
+                txt = txt.Replace("\n", "\\n");
+                txt = txt.Replace("\r", "\\r");
+                txt = txt.Replace("\t", "\\t");
             }
             else
             {
