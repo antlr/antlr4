@@ -588,7 +588,7 @@ namespace Antlr4.Runtime
                     {
                         // E.g., insert before 2, delete 2..2; update replace
                         // text to include insert before, kill insert
-                        rewrites.Set(iop.instructionIndex, null);
+                        rewrites[iop.instructionIndex] = null;
                         rop.text = iop.text.ToString() + (rop.text != null ? rop.text.ToString() : string.Empty
                             );
                     }
@@ -597,7 +597,7 @@ namespace Antlr4.Runtime
                         if (iop.index > rop.index && iop.index <= rop.lastIndex)
                         {
                             // delete insert as it's a no-op.
-                            rewrites.Set(iop.instructionIndex, null);
+                            rewrites[iop.instructionIndex] = null;
                         }
                     }
                 }
@@ -609,7 +609,7 @@ namespace Antlr4.Runtime
                     if (prevRop.index >= rop.index && prevRop.lastIndex <= rop.lastIndex)
                     {
                         // delete replace as it's a no-op.
-                        rewrites.Set(prevRop.instructionIndex, null);
+                        rewrites[prevRop.instructionIndex] = null;
                         continue;
                     }
                     // throw exception unless disjoint or identical
@@ -620,7 +620,7 @@ namespace Antlr4.Runtime
                     if (prevRop.text == null && rop.text == null && !disjoint)
                     {
                         //System.out.println("overlapping deletes: "+prevRop+", "+rop);
-                        rewrites.Set(prevRop.instructionIndex, null);
+                        rewrites[prevRop.instructionIndex] = null;
                         // kill first delete
                         rop.index = Math.Min(prevRop.index, rop.index);
                         rop.lastIndex = Math.Max(prevRop.lastIndex, rop.lastIndex);
@@ -662,7 +662,7 @@ namespace Antlr4.Runtime
                         // whole token buffer so no lazy eval issue with any templates
                         iop.text = CatOpText(iop.text, prevIop.text);
                         // delete redundant prior insert
-                        rewrites.Set(prevIop.instructionIndex, null);
+                        rewrites[prevIop.instructionIndex] = null;
                     }
                 }
                 // look for replaces where iop.index is in range; error
@@ -673,7 +673,7 @@ namespace Antlr4.Runtime
                     if (iop.index == rop.index)
                     {
                         rop.text = CatOpText(iop.text, rop.text);
-                        rewrites.Set(i_1, null);
+                        rewrites[i_1] = null;
                         // delete current insert
                         continue;
                     }

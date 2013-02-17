@@ -124,7 +124,7 @@ namespace Antlr4.Runtime.Dfa
                 if (index >= 0)
                 {
                     // replace existing entry
-                    values.Set(index, value);
+                    values[index] = value;
                     return this;
                 }
                 System.Diagnostics.Debug.Assert(index < 0 && value != null);
