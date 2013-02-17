@@ -328,7 +328,7 @@ namespace Antlr4.Runtime.Atn
                  != null && !atn.decisionToState[decision].sll);
             if (outerContext == null)
             {
-                outerContext = ParserRuleContext.EmptyContext();
+                outerContext = ParserRuleContext.EmptyContext;
             }
             SimulatorState state = null;
             if (!dfa.IsEmpty())
@@ -397,7 +397,7 @@ namespace Antlr4.Runtime.Atn
         {
             if (outerContext == null)
             {
-                outerContext = ParserRuleContext.EmptyContext();
+                outerContext = ParserRuleContext.EmptyContext;
             }
             int alt = 0;
             int m = input.Mark();

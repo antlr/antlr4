@@ -137,10 +137,13 @@ namespace Antlr4.Runtime
         {
         }
 
-        //	public List<Integer> states;
-        public static Antlr4.Runtime.ParserRuleContext EmptyContext()
+        public static Antlr4.Runtime.ParserRuleContext EmptyContext
         {
-            return Empty;
+            get
+            {
+                //	public List<Integer> states;
+                return Empty;
+            }
         }
 
         /// <summary>COPY a ctx (I'm deliberately not using copy constructor)</summary>
@@ -368,14 +371,20 @@ namespace Antlr4.Runtime
             }
         }
 
-        public virtual IToken GetStart()
+        public virtual IToken Start
         {
-            return start;
+            get
+            {
+                return start;
+            }
         }
 
-        public virtual IToken GetStop()
+        public virtual IToken Stop
         {
-            return stop;
+            get
+            {
+                return stop;
+            }
         }
 
         /// <summary>Used for rule context info debugging during parse-time, not so much for ATN debugging

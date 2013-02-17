@@ -47,8 +47,7 @@ namespace Antlr4.Runtime.Atn
         public SimulatorState(ParserRuleContext outerContext, DFAState s0, bool useContext
             , ParserRuleContext remainingOuterContext)
         {
-            this.outerContext = outerContext != null ? outerContext : ParserRuleContext.EmptyContext
-                ();
+            this.outerContext = outerContext != null ? outerContext : ParserRuleContext.EmptyContext;
             this.s0 = s0;
             this.useContext = useContext;
             this.remainingOuterContext = remainingOuterContext;
