@@ -211,7 +211,7 @@ namespace Antlr4.Runtime.Atn
                 }
                 else
                 {
-                    operands.AddItem(a);
+                    operands.Add(a);
                 }
                 if (b is SemanticContext.AND)
                 {
@@ -220,7 +220,7 @@ namespace Antlr4.Runtime.Atn
                 }
                 else
                 {
-                    operands.AddItem(b);
+                    operands.Add(b);
                 }
                 IList<SemanticContext.PrecedencePredicate> precedencePredicates = FilterPrecedencePredicates
                     (operands);
@@ -229,7 +229,7 @@ namespace Antlr4.Runtime.Atn
                     // interested in the transition with the lowest precedence
                     SemanticContext.PrecedencePredicate reduced = Sharpen.Collections.Min(precedencePredicates
                         );
-                    operands.AddItem(reduced);
+                    operands.Add(reduced);
                 }
                 opnds = Sharpen.Collections.ToArray(operands, new SemanticContext[operands.Count]
                     );
@@ -287,7 +287,7 @@ namespace Antlr4.Runtime.Atn
                 }
                 else
                 {
-                    operands.AddItem(a);
+                    operands.Add(a);
                 }
                 if (b is SemanticContext.OR)
                 {
@@ -296,7 +296,7 @@ namespace Antlr4.Runtime.Atn
                 }
                 else
                 {
-                    operands.AddItem(b);
+                    operands.Add(b);
                 }
                 IList<SemanticContext.PrecedencePredicate> precedencePredicates = FilterPrecedencePredicates
                     (operands);
@@ -305,7 +305,7 @@ namespace Antlr4.Runtime.Atn
                     // interested in the transition with the highest precedence
                     SemanticContext.PrecedencePredicate reduced = Sharpen.Collections.Max(precedencePredicates
                         );
-                    operands.AddItem(reduced);
+                    operands.Add(reduced);
                 }
                 this.opnds = Sharpen.Collections.ToArray(operands, new SemanticContext[operands.Count
                     ]);
@@ -406,7 +406,7 @@ namespace Antlr4.Runtime.Atn
                     {
                         result = new List<SemanticContext.PrecedencePredicate>();
                     }
-                    result.AddItem((SemanticContext.PrecedencePredicate)context);
+                    result.Add((SemanticContext.PrecedencePredicate)context);
                     iterator.Remove();
                 }
             }

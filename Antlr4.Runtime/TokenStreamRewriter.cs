@@ -308,7 +308,7 @@ namespace Antlr4.Runtime
                 tokens, index, text);
             IList<TokenStreamRewriter.RewriteOperation> rewrites = GetProgram(programName);
             op.instructionIndex = rewrites.Count;
-            rewrites.AddItem(op);
+            rewrites.Add(op);
         }
 
         public virtual void Replace(int index, object text)
@@ -342,7 +342,7 @@ namespace Antlr4.Runtime
                 , from, to, text);
             IList<TokenStreamRewriter.RewriteOperation> rewrites = GetProgram(programName);
             op.instructionIndex = rewrites.Count;
-            rewrites.AddItem(op);
+            rewrites.Add(op);
         }
 
         public virtual void Replace(string programName, IToken from, IToken to, object text
@@ -736,7 +736,7 @@ namespace Antlr4.Runtime
                 // ignore deleted
                 if (kind.IsInstanceOfType(op))
                 {
-                    ops.AddItem(kind.Cast(op));
+                    ops.Add(kind.Cast(op));
                 }
             }
             return ops;

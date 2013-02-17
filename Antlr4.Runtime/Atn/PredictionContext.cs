@@ -508,7 +508,7 @@ namespace Antlr4.Runtime.Atn
                     p = p.GetParent(index);
                 }
                 localBuffer.Append("]");
-                result.AddItem(localBuffer.ToString());
+                result.Add(localBuffer.ToString());
                 if (last)
                 {
                     break;

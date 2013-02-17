@@ -164,7 +164,7 @@ namespace Antlr4.Runtime
         public virtual void AddErrorListener<_T0>(IAntlrErrorListener<_T0> listener)
         {
             Args.NotNull("listener", listener);
-            _listeners.AddItem(listener);
+            _listeners.Add(listener);
         }
 
         public virtual void RemoveErrorListener<_T0>(IAntlrErrorListener<_T0> listener)
