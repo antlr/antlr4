@@ -154,7 +154,7 @@ namespace Antlr4.Runtime.Dfa
                     System.Array.Copy(resized.keys, insertIndex, resized.keys, insertIndex + 1, resized
                         .keys.Length - insertIndex - 1);
                     resized.keys[insertIndex] = key;
-                    resized.values.Add(insertIndex, value);
+                    resized.values.Insert(insertIndex, value);
                     return resized;
                 }
             }
