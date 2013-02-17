@@ -200,7 +200,7 @@ namespace Antlr4.Runtime.Dfa
             IDictionary<int, T> result = new LinkedHashMap<int, T>();
             for (int i = 0; i < Size(); i++)
             {
-                result.Put(keys[i], values[i]);
+                result[keys[i]] = values[i];
             }
             return result;
         }

@@ -78,7 +78,7 @@ namespace Antlr4.Runtime.Atn
             if (result == null)
             {
                 result = context;
-                contexts.Put(context, context);
+                contexts[context] = context;
             }
             return result;
         }
@@ -97,7 +97,7 @@ namespace Antlr4.Runtime.Atn
             {
                 result = context.GetChild(invokingState);
                 result = GetAsCached(result);
-                childContexts.Put(operands, result);
+                childContexts[operands] = result;
             }
             return result;
         }
@@ -117,7 +117,7 @@ namespace Antlr4.Runtime.Atn
             }
             result = PredictionContext.Join(x, y, this);
             result = GetAsCached(result);
-            joinContexts.Put(operands, result);
+            joinContexts[operands] = result;
             return result;
         }
 
