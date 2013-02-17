@@ -223,7 +223,7 @@ namespace Antlr4.Runtime.Atn
 
         public virtual Antlr4.Runtime.Atn.Transition RemoveTransition(int index)
         {
-            return transitions.Remove(index);
+            return transitions.RemoveAt(index);
         }
 
         public abstract Antlr4.Runtime.Atn.StateType StateType
@@ -290,7 +290,7 @@ namespace Antlr4.Runtime.Atn
             {
                 throw new InvalidOperationException();
             }
-            optimizedTransitions.Remove(i);
+            optimizedTransitions.RemoveAt(i);
         }
 
         public ATNState()

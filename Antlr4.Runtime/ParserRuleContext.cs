@@ -202,7 +202,7 @@ namespace Antlr4.Runtime
         {
             if (children != null)
             {
-                children.Remove(children.Count - 1);
+                children.RemoveAt(children.Count - 1);
             }
         }
 

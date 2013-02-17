@@ -14,7 +14,8 @@
 -typeMapping java.util.Comparator System.Collections.IComparer
 -typeMapping java.util.ArrayList System.Collections.ArrayList
 
--methodMapping java.util.List.addAll AddRange 
+-methodMapping java.util.List.addAll AddRange
+-methodMapping java.util.List.remove(int) RemoveAt
 -methodMapping java.util.AbstractList.addAll AddRange 
 -methodMapping java.util.ArrayList.addAll AddRange      
 
@@ -43,9 +44,6 @@
 -namespaceMapping javax.net.ssl Sharpen
 -methodMapping java.lang.Object.memberwiseClone Clone
 -methodMapping java.nio.charset.Charset.forName Sharpen.Extensions.GetEncoding
--methodMapping java.util.List<>.remove RemoveAt
--methodMapping java.util.IList<>.remove RemoveAt
--methodMapping java.util.ArrayList.remove RemoveAt
 -methodMapping java.util.ArrayList.trimToSize TrimExcess
 -methodMapping java.lang.Integer.toOctalString Sharpen.Extensions.ToOctalString
 -methodMapping java.lang.Integer.toHexString Sharpen.Extensions.ToHexString
