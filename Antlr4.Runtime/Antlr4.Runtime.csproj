@@ -124,13 +124,9 @@
     <None Include="Misc\Array2DHashSet`1.cs" />
     <Compile Include="Misc\NullableAttribute.cs" />
     <None Include="Misc\DoubleKeyMap`3.cs" />
-    <None Include="Misc\FlexibleHashMap`2.cs" />
-    <None Include="Misc\IFunc0`1.cs" />
-    <None Include="Misc\IFunc1`2.cs" />
     <Compile Include="Misc\IIntSet.cs" />
     <Compile Include="Misc\Interval.cs" />
     <Compile Include="Misc\IntervalSet.cs" />
-    <None Include="Misc\IPredicate`1.cs" />
     <None Include="Misc\MultiMap`2.cs" />
     <Compile Include="Misc\NotNullAttribute.cs" />
     <None Include="Misc\OrderedHashSet`1.cs" />
