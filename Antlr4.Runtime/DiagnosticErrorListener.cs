@@ -27,7 +27,6 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System.Collections;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
@@ -39,7 +38,7 @@ namespace Antlr4.Runtime
     public class DiagnosticErrorListener : BaseErrorListener
     {
         public override void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, 
-            int stopIndex, BitArray ambigAlts, ATNConfigSet configs)
+            int stopIndex, BitSet ambigAlts, ATNConfigSet configs)
         {
             string format = "reportAmbiguity d=%s: ambigAlts=%s, input='%s'";
             recognizer.NotifyErrorListeners(string.Format(format, GetDecisionDescription(recognizer

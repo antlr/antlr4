@@ -28,7 +28,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime;
@@ -382,7 +381,7 @@ namespace Antlr4.Runtime
         /// if no tokens were found.  This
         /// method looks at both on and off channel tokens.
         /// </summary>
-        public virtual IList<IToken> GetTokens(int start, int stop, BitArray types)
+        public virtual IList<IToken> GetTokens(int start, int stop, BitSet types)
         {
             LazyInit();
             if (start < 0 || stop >= tokens.Count || stop < 0 || start >= tokens.Count)
@@ -413,7 +412,7 @@ namespace Antlr4.Runtime
 
         public virtual IList<IToken> GetTokens(int start, int stop, int ttype)
         {
-            BitArray s = new BitArray(ttype);
+            BitSet s = new BitSet(ttype);
             s.Set(ttype);
             return GetTokens(start, stop, s);
         }

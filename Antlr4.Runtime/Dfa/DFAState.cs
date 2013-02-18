@@ -28,7 +28,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime.Atn;
@@ -112,7 +111,7 @@ namespace Antlr4.Runtime.Dfa
         /// <remarks>Symbols in this set require a global context transition before matching an input symbol.
         ///     </remarks>
         [Nullable]
-        private BitArray contextSymbols;
+        private BitSet contextSymbols;
 
         /// <summary>
         /// This list is computed by
@@ -191,7 +190,7 @@ namespace Antlr4.Runtime.Dfa
                 {
                     return;
                 }
-                contextSymbols = new BitArray();
+                contextSymbols = new BitSet();
                 contextEdges = new SingletonEdgeMap<DFAState>(-1, atn.states.Count - 1);
             }
         }
