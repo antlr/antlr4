@@ -82,7 +82,7 @@ namespace Antlr4.Runtime.Atn
         /// prediction, so we passed in the outer context here in case of context
         /// dependent predicate evaluation.
         /// </remarks>
-        public abstract bool Eval<_T0>(Recognizer<_T0> parser, RuleContext outerContext);
+        public abstract bool Eval<Symbol, ATNInterpreter>(Recognizer<Symbol, ATNInterpreter> parser, RuleContext outerContext);
 
         public class Predicate : SemanticContext
         {
@@ -107,7 +107,7 @@ namespace Antlr4.Runtime.Atn
                 this.isCtxDependent = isCtxDependent;
             }
 
-            public override bool Eval<_T0>(Recognizer<_T0> parser, RuleContext outerContext)
+            public override bool Eval<Symbol, ATNInterpreter>(Recognizer<Symbol, ATNInterpreter> parser, RuleContext outerContext)
             {
                 RuleContext localctx = isCtxDependent ? outerContext : null;
                 return parser.Sempred(localctx, ruleIndex, predIndex);
@@ -158,7 +158,7 @@ namespace Antlr4.Runtime.Atn
                 this.precedence = precedence;
             }
 
-            public override bool Eval<_T0>(Recognizer<_T0> parser, RuleContext outerContext)
+            public override bool Eval<Symbol, ATNInterpreter>(Recognizer<Symbol, ATNInterpreter> parser, RuleContext outerContext)
             {
                 return parser.Precpred(outerContext, precedence);
             }
@@ -254,7 +254,7 @@ namespace Antlr4.Runtime.Atn
                 return Arrays.HashCode(opnds);
             }
 
-            public override bool Eval<_T0>(Recognizer<_T0> parser, RuleContext outerContext)
+            public override bool Eval<Symbol, ATNInterpreter>(Recognizer<Symbol, ATNInterpreter> parser, RuleContext outerContext)
             {
                 foreach (SemanticContext opnd in opnds)
                 {
@@ -331,7 +331,7 @@ namespace Antlr4.Runtime.Atn
             }
 
             // differ from AND slightly
-            public override bool Eval<_T0>(Recognizer<_T0> parser, RuleContext outerContext)
+            public override bool Eval<Symbol, ATNInterpreter>(Recognizer<Symbol, ATNInterpreter> parser, RuleContext outerContext)
             {
                 foreach (SemanticContext opnd in opnds)
                 {
