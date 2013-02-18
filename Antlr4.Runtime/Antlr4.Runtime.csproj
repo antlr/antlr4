@@ -145,6 +145,7 @@
     <Compile Include="Recognizer`2.cs" />
     <Compile Include="RuleContext.cs" />
     <Compile Include="Sharpen\Arrays.cs" />
+    <Compile Include="Sharpen\AtomicReference`1.cs" />
     <Compile Include="Sharpen\Runtime.cs" />
     <Compile Include="TokenStreamRewriter.cs" />
     <Compile Include="TokenTypes.cs" />
