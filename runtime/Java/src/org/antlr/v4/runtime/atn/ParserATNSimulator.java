@@ -166,8 +166,7 @@ import java.util.Set;
 
  When we start in the DFA and reach an accept state that's predicated,
  we test those and return the minimum semantically viable
- alternative. If no alternatives are viable, we throw an exception.  We
- don't report ambiguities in the DFA, but I'm not sure why anymore.
+ alternative. If no alternatives are viable, we throw an exception.
 
  During full LL ATN simulation, closure always evaluates predicates and
  on-the-fly. This is crucial to reducing the configuration set size
