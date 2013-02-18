@@ -309,6 +309,14 @@ outer_break: ;
             }
         }
 
+        ICharStream ITokenSource.InputStream
+        {
+            get
+            {
+                return (ICharStream)InputStream;
+            }
+        }
+
         /// <summary>
         /// By default does not support multiple emits per nextToken invocation
         /// for efficiency reasons.

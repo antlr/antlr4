@@ -94,5 +94,10 @@ namespace Antlr4.Runtime
         {
             return new CommonToken(type, text);
         }
+
+        IToken ITokenFactory.Create(int type, string text)
+        {
+            return Create(type, text);
+        }
     }
 }

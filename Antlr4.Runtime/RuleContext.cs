@@ -139,11 +139,43 @@ namespace Antlr4.Runtime
             }
         }
 
+        IRuleNode IRuleNode.Parent
+        {
+            get
+            {
+                return Parent;
+            }
+        }
+
+        IParseTree IParseTree.Parent
+        {
+            get
+            {
+                return Parent;
+            }
+        }
+
+        ITree ITree.Parent
+        {
+            get
+            {
+                return Parent;
+            }
+        }
+
         public virtual Antlr4.Runtime.RuleContext Payload
         {
             get
             {
                 return this;
+            }
+        }
+
+        object ITree.Payload
+        {
+            get
+            {
+                return Payload;
             }
         }
 
@@ -178,6 +210,11 @@ namespace Antlr4.Runtime
         public virtual IParseTree GetChild(int i)
         {
             return null;
+        }
+
+        ITree ITree.GetChild(int i)
+        {
+            return GetChild(i);
         }
 
         public virtual int ChildCount

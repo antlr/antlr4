@@ -50,6 +50,11 @@ namespace Antlr4.Runtime.Tree
             return null;
         }
 
+        ITree ITree.GetChild(int i)
+        {
+            return GetChild(i);
+        }
+
         public virtual IToken Symbol
         {
             get
@@ -66,11 +71,35 @@ namespace Antlr4.Runtime.Tree
             }
         }
 
+        IParseTree IParseTree.Parent
+        {
+            get
+            {
+                return Parent;
+            }
+        }
+
+        ITree ITree.Parent
+        {
+            get
+            {
+                return Parent;
+            }
+        }
+
         public virtual IToken Payload
         {
             get
             {
                 return symbol;
+            }
+        }
+
+        object ITree.Payload
+        {
+            get
+            {
+                return Payload;
             }
         }
 
