@@ -193,6 +193,9 @@
 -methodMapping org.antlr.v4.runtime.misc.EqualityComparator.hashCode GetHashCode
 -typeMapping org.antlr.v4.runtime.misc.AbstractEqualityComparator<> System.Collections.Generic.EqualityComparer
 -typeMapping org.antlr.v4.runtime.misc.FlexibleHashMap<,> System.Collections.Generic.Dictionary
+-typeMapping org.antlr.v4.runtime.misc.Predicate<> System.Predicate
+-typeMapping org.antlr.v4.runtime.misc.Func0<> System.Func
+-typeMapping org.antlr.v4.runtime.misc.Func1<,> System.Func
 
 -typeMapping org.antlr.v4.runtime.misc.Tuple System.Tuple
 -typeMapping org.antlr.v4.runtime.misc.Tuple2<,> System.Tuple
