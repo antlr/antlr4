@@ -252,12 +252,12 @@ namespace Antlr4.Runtime.Atn
                 if (target.isAcceptState)
                 {
                     CaptureSimState(prevAccept, input, target);
-                    if (t == IIntStream.Eof)
+                    if (t == IntStreamConstants.Eof)
                     {
                         break;
                     }
                 }
-                if (t != IIntStream.Eof)
+                if (t != IntStreamConstants.Eof)
                 {
                     Consume(input);
                     t = input.La(1);
@@ -282,9 +282,9 @@ namespace Antlr4.Runtime.Atn
             else
             {
                 // if no accept and EOF is first char, return EOF
-                if (t == IIntStream.Eof && input.Index == startIndex)
+                if (t == IntStreamConstants.Eof && input.Index == startIndex)
                 {
-                    return IToken.Eof;
+                    return TokenConstants.Eof;
                 }
                 throw new LexerNoViableAltException(recog, input, startIndex, reach);
             }
@@ -342,7 +342,7 @@ namespace Antlr4.Runtime.Atn
             input.Seek(index);
             this.line = line;
             this.charPositionInLine = charPos;
-            if (input.La(1) != IIntStream.Eof)
+            if (input.La(1) != IntStreamConstants.Eof)
             {
                 Consume(input);
             }

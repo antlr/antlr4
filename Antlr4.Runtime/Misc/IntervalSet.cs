@@ -483,14 +483,14 @@ namespace Antlr4.Runtime.Misc
                     return I.a;
                 }
             }
-            return IToken.InvalidType;
+            return TokenConstants.InvalidType;
         }
 
         public virtual int GetMaxElement()
         {
             if (IsNil())
             {
-                return IToken.InvalidType;
+                return TokenConstants.InvalidType;
             }
             Interval last = intervals[intervals.Count - 1];
             return last.b;
@@ -501,7 +501,7 @@ namespace Antlr4.Runtime.Misc
         {
             if (IsNil())
             {
-                return IToken.InvalidType;
+                return TokenConstants.InvalidType;
             }
             int n = intervals.Count;
             for (int i = 0; i < n; i++)
@@ -517,7 +517,7 @@ namespace Antlr4.Runtime.Misc
                     }
                 }
             }
-            return IToken.InvalidType;
+            return TokenConstants.InvalidType;
         }
 
         /// <summary>Return a list of Interval objects.</summary>
@@ -672,13 +672,13 @@ namespace Antlr4.Runtime.Misc
 
         protected internal virtual string ElementName(string[] tokenNames, int a)
         {
-            if (a == IToken.Eof)
+            if (a == TokenConstants.Eof)
             {
                 return "<EOF>";
             }
             else
             {
-                if (a == IToken.Epsilon)
+                if (a == TokenConstants.Epsilon)
                 {
                     return "<EPSILON>";
                 }

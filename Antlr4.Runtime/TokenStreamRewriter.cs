@@ -156,7 +156,7 @@ namespace Antlr4.Runtime
             public override int Execute(StringBuilder buf)
             {
                 buf.Append(text);
-                if (tokens.Get(index).Type != IToken.Eof)
+                if (tokens.Get(index).Type != TokenConstants.Eof)
                 {
                     buf.Append(tokens.Get(index).Text);
                 }
@@ -488,7 +488,7 @@ namespace Antlr4.Runtime
                 if (op == null)
                 {
                     // no operation at that index, just dump token
-                    if (t.Type != IToken.Eof)
+                    if (t.Type != TokenConstants.Eof)
                     {
                         buf.Append(t.Text);
                     }

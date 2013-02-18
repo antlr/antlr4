@@ -2,7 +2,9 @@
 -nativeTypeSystem 
 -organizeUsings
 -nativeInterfaces
--tabToSpaces
+-indentWithSpaces
+-paramCountFileNames
+-separateInterfaceConstants
 
 -methodMapping System.out.println System.Console.WriteLine
 

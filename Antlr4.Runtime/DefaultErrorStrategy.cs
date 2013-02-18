@@ -196,7 +196,7 @@ namespace Antlr4.Runtime
             ITokenStream tokens = ((ITokenStream)recognizer.InputStream);
             int la = tokens.La(1);
             // try cheaper subset first; might get lucky. seems to shave a wee bit off
-            if (recognizer.Atn.NextTokens(s).Contains(la) || la == IToken.Eof)
+            if (recognizer.Atn.NextTokens(s).Contains(la) || la == TokenConstants.Eof)
             {
                 return;
             }
@@ -249,7 +249,7 @@ namespace Antlr4.Runtime
             string input;
             if (tokens != null)
             {
-                if (e.GetStartToken().Type == IToken.Eof)
+                if (e.GetStartToken().Type == TokenConstants.Eof)
                 {
                     input = "<EOF>";
                 }
@@ -426,7 +426,7 @@ namespace Antlr4.Runtime
             int expectedTokenType = expecting.GetMinElement();
             // get any element
             string tokenText;
-            if (expectedTokenType == IToken.Eof)
+            if (expectedTokenType == TokenConstants.Eof)
             {
                 tokenText = "<missing EOF>";
             }
@@ -436,7 +436,7 @@ namespace Antlr4.Runtime
             }
             IToken current = currentSymbol;
             IToken lookback = ((ITokenStream)recognizer.InputStream).Lt(-1);
-            if (current.Type == IToken.Eof && lookback != null)
+            if (current.Type == TokenConstants.Eof && lookback != null)
             {
                 current = lookback;
             }
@@ -449,8 +449,8 @@ namespace Antlr4.Runtime
         {
             ITokenFactory factory = tokenSource.TokenFactory;
             return factory.Create(Tuple.Create(tokenSource, current.TokenSource.InputStream), 
-                expectedTokenType, tokenText, IToken.DefaultChannel, -1, -1, current.Line, current
-                .Column);
+                expectedTokenType, tokenText, TokenConstants.DefaultChannel, -1, -1, current.
+                Line, current.Column);
         }
 
         public virtual IntervalSet GetExpectedTokens(Parser recognizer)
@@ -481,7 +481,7 @@ namespace Antlr4.Runtime
             string s = GetSymbolText(t);
             if (s == null)
             {
-                if (GetSymbolType(t) == IToken.Eof)
+                if (GetSymbolType(t) == TokenConstants.Eof)
                 {
                     s = "<EOF>";
                 }
@@ -526,7 +526,7 @@ namespace Antlr4.Runtime
                 recoverSet.AddAll(follow);
                 ctx = ctx.parent;
             }
-            recoverSet.Remove(IToken.Epsilon);
+            recoverSet.Remove(TokenConstants.Epsilon);
             //		System.out.println("recover set "+recoverSet.toString(recognizer.getTokenNames()));
             return recoverSet;
         }
@@ -536,7 +536,7 @@ namespace Antlr4.Runtime
         {
             //		System.err.println("consumeUntil("+set.toString(recognizer.getTokenNames())+")");
             int ttype = ((ITokenStream)recognizer.InputStream).La(1);
-            while (ttype != IToken.Eof && !set.Contains(ttype))
+            while (ttype != TokenConstants.Eof && !set.Contains(ttype))
             {
                 //System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
                 //			recognizer.getInputStream().consume();

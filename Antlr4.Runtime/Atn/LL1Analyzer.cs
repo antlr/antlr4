@@ -28,7 +28,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using System.Collections.Generic;
-using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Sharpen;
@@ -45,7 +44,7 @@ namespace Antlr4.Runtime.Atn
         /// Special value added to the lookahead sets to indicate that we hit
         /// a predicate during analysis if seeThruPreds==false.
         /// </remarks>
-        public const int HitPred = IToken.InvalidType;
+        public const int HitPred = TokenConstants.InvalidType;
 
         [NotNull]
         public readonly ATN atn;
@@ -150,14 +149,14 @@ namespace Antlr4.Runtime.Atn
             {
                 if (PredictionContext.IsEmptyLocal(ctx))
                 {
-                    look.Add(IToken.Epsilon);
+                    look.Add(TokenConstants.Epsilon);
                     return;
                 }
                 else
                 {
                     if (ctx.IsEmpty && addEOF)
                     {
-                        look.Add(IToken.Eof);
+                        look.Add(TokenConstants.Eof);
                         return;
                     }
                 }
@@ -208,7 +207,7 @@ namespace Antlr4.Runtime.Atn
                         {
                             if (t.GetType() == typeof(WildcardTransition))
                             {
-                                look.AddAll(IntervalSet.Of(IToken.MinUserTokenType, atn.maxTokenType));
+                                look.AddAll(IntervalSet.Of(TokenConstants.MinUserTokenType, atn.maxTokenType));
                             }
                             else
                             {
@@ -218,7 +217,8 @@ namespace Antlr4.Runtime.Atn
                                 {
                                     if (t is NotSetTransition)
                                     {
-                                        set = set.Complement(IntervalSet.Of(IToken.MinUserTokenType, atn.maxTokenType));
+                                        set = set.Complement(IntervalSet.Of(TokenConstants.MinUserTokenType, atn.maxTokenType
+                                            ));
                                     }
                                     look.AddAll(set);
                                 }

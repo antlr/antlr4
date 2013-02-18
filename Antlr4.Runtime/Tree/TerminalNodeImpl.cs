@@ -118,7 +118,7 @@ namespace Antlr4.Runtime.Tree
         {
             if (symbol != null)
             {
-                if (symbol.Type == IToken.Eof)
+                if (symbol.Type == TokenConstants.Eof)
                 {
                     return "<EOF>";
                 }

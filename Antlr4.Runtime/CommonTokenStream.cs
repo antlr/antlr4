@@ -64,7 +64,7 @@ namespace Antlr4.Runtime
         ///     </summary>
         /// <remarks>Skip tokens on any channel but this one; this is how we skip whitespace...
         ///     </remarks>
-        protected internal int channel = IToken.DefaultChannel;
+        protected internal int channel = TokenConstants.DefaultChannel;
 
         public CommonTokenStream(ITokenSource tokenSource) : base(tokenSource)
         {
@@ -145,7 +145,7 @@ namespace Antlr4.Runtime
                 {
                     n++;
                 }
-                if (t.Type == IToken.Eof)
+                if (t.Type == TokenConstants.Eof)
                 {
                     break;
                 }

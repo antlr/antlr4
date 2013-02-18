@@ -173,7 +173,7 @@ namespace Antlr4.Runtime
         // prime
         public virtual void Consume()
         {
-            if (La(1) == IIntStream.Eof)
+            if (La(1) == IntStreamConstants.Eof)
             {
                 throw new InvalidOperationException("cannot consume EOF");
             }
@@ -234,7 +234,7 @@ namespace Antlr4.Runtime
         {
             for (int i = 0; i < n; i++)
             {
-                if (this.n > 0 && data[this.n - 1] == IIntStream.Eof)
+                if (this.n > 0 && data[this.n - 1] == IntStreamConstants.Eof)
                 {
                     return i;
                 }
@@ -280,12 +280,12 @@ namespace Antlr4.Runtime
             }
             if (index > n)
             {
-                return IIntStream.Eof;
+                return IntStreamConstants.Eof;
             }
             int c = data[index];
-            if (c == (char)IIntStream.Eof)
+            if (c == (char)IntStreamConstants.Eof)
             {
-                return IIntStream.Eof;
+                return IntStreamConstants.Eof;
             }
             return c;
         }

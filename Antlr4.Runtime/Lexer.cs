@@ -48,9 +48,9 @@ namespace Antlr4.Runtime
     {
         public const int DefaultMode = 0;
 
-        public const int DefaultTokenChannel = IToken.DefaultChannel;
+        public const int DefaultTokenChannel = TokenConstants.DefaultChannel;
 
-        public const int Hidden = IToken.HiddenChannel;
+        public const int Hidden = TokenConstants.HiddenChannel;
 
         public const int MinCharValue = '\u0000';
 
@@ -134,8 +134,8 @@ namespace Antlr4.Runtime
             }
             // rewind the input
             _token = null;
-            _type = IToken.InvalidType;
-            _channel = IToken.DefaultChannel;
+            _type = TokenConstants.InvalidType;
+            _channel = TokenConstants.DefaultChannel;
             _tokenStartCharIndex = -1;
             _tokenStartCharPositionInLine = -1;
             _tokenStartLine = -1;
@@ -174,14 +174,14 @@ namespace Antlr4.Runtime
                         return _token;
                     }
                     _token = null;
-                    _channel = IToken.DefaultChannel;
+                    _channel = TokenConstants.DefaultChannel;
                     _tokenStartCharIndex = _input.Index;
                     _tokenStartCharPositionInLine = Interpreter.GetCharPositionInLine();
                     _tokenStartLine = Interpreter.GetLine();
                     _text = null;
                     do
                     {
-                        _type = IToken.InvalidType;
+                        _type = TokenConstants.InvalidType;
                         //				System.out.println("nextToken line "+tokenStartLine+" at "+((char)input.LA(1))+
                         //								   " in mode "+mode+
                         //								   " at index "+input.index());
@@ -197,11 +197,11 @@ namespace Antlr4.Runtime
                             Recover(e);
                             ttype = TokenTypes.Skip;
                         }
-                        if (_input.La(1) == IIntStream.Eof)
+                        if (_input.La(1) == IntStreamConstants.Eof)
                         {
                             _hitEOF = true;
                         }
-                        if (_type == IToken.InvalidType)
+                        if (_type == TokenConstants.InvalidType)
                         {
                             _type = ttype;
                         }
@@ -354,8 +354,8 @@ outer_break: ;
                 int n = _token.StopIndex - _token.StartIndex + 1;
                 cpos = _token.Column + n;
             }
-            IToken eof = _factory.Create(_tokenFactorySourcePair, IToken.Eof, null, IToken.DefaultChannel
-                , _input.Index, _input.Index - 1, Line, cpos);
+            IToken eof = _factory.Create(_tokenFactorySourcePair, TokenConstants.Eof, null, TokenConstants
+                .DefaultChannel, _input.Index, _input.Index - 1, Line, cpos);
             Emit(eof);
             return eof;
         }
@@ -485,7 +485,7 @@ outer_break: ;
         {
             IList<IToken> tokens = new List<IToken>();
             IToken t = NextToken();
-            while (t.Type != IToken.Eof)
+            while (t.Type != TokenConstants.Eof)
             {
                 tokens.Add(t);
                 t = NextToken();
@@ -495,7 +495,7 @@ outer_break: ;
 
         public virtual void Recover(LexerNoViableAltException e)
         {
-            if (_input.La(1) != IIntStream.Eof)
+            if (_input.La(1) != IntStreamConstants.Eof)
             {
                 // skip a char and try again
                 Interpreter.Consume(_input);
@@ -526,7 +526,7 @@ outer_break: ;
             string s = ((char)c).ToString();
             switch (c)
             {
-                case IToken.Eof:
+                case TokenConstants.Eof:
                 {
                     s = "<EOF>";
                     break;

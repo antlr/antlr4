@@ -167,7 +167,8 @@ namespace Antlr4.Runtime
             }
             if (index >= n)
             {
-                System.Diagnostics.Debug.Assert(n > 0 && tokens[n - 1].Type == IToken.Eof);
+                System.Diagnostics.Debug.Assert(n > 0 && tokens[n - 1].Type == TokenConstants.Eof
+                    );
                 return tokens[n - 1];
             }
             return tokens[index];
@@ -211,7 +212,7 @@ namespace Antlr4.Runtime
 
         public virtual void Consume()
         {
-            if (La(1) == IToken.Eof)
+            if (La(1) == TokenConstants.Eof)
             {
                 throw new InvalidOperationException("cannot consume EOF");
             }
@@ -272,7 +273,7 @@ namespace Antlr4.Runtime
         {
             for (int i = 0; i < n; i++)
             {
-                if (this.n > 0 && tokens[this.n - 1].Type == IToken.Eof)
+                if (this.n > 0 && tokens[this.n - 1].Type == TokenConstants.Eof)
                 {
                     return i;
                 }
