@@ -240,7 +240,7 @@ namespace Antlr4.Runtime.Atn
                 PredictionContextCache.IdentityCommutativePredictionContextOperands operands = new 
                     PredictionContextCache.IdentityCommutativePredictionContextOperands(selfWorkList
                     .Pop(), otherWorkList.Pop());
-                if (!visited.AddItem(operands))
+                if (!visited.Add(operands))
                 {
                     continue;
                 }
