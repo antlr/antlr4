@@ -254,7 +254,7 @@ namespace Antlr4.Runtime.Atn
                 // Don't bother with combining configs from different semantic
                 // contexts if we can fail over to full LL; costs more time
                 // since we'll often fail over anyway.
-                if (configs.HasSemanticContext())
+                if (configs.HasSemanticContext)
                 {
                     // dup configs, tossing out semantic predicates
                     ATNConfigSet dup = new ATNConfigSet();

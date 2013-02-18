@@ -186,7 +186,7 @@ namespace Antlr4.Runtime.Dfa
         {
             lock (this)
             {
-                System.Diagnostics.Debug.Assert(!configs.IsOutermostConfigSet());
+                System.Diagnostics.Debug.Assert(!configs.IsOutermostConfigSet);
                 if (IsContextSensitive)
                 {
                     return;

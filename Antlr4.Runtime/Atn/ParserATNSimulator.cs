@@ -519,12 +519,12 @@ namespace Antlr4.Runtime.Atn
             //			if ( debug ) System.out.println("!!! no viable alt in dfa");
             //			return -1;
             //		}
-            if (acceptState.configs.GetConflictingAlts() != null)
+            if (acceptState.configs.ConflictingAlts != null)
             {
                 if (dfa.atnStartState is DecisionState)
                 {
-                    if (!userWantsCtxSensitive || !acceptState.configs.GetDipsIntoOuterContext() || (
-                        treat_sllk1_conflict_as_ambiguity && input.Index == startIndex))
+                    if (!userWantsCtxSensitive || !acceptState.configs.DipsIntoOuterContext || (treat_sllk1_conflict_as_ambiguity
+                         && input.Index == startIndex))
                     {
                     }
                     else
@@ -672,17 +672,15 @@ namespace Antlr4.Runtime.Atn
                 System.Diagnostics.Debug.Assert(D.isAcceptState || GetUniqueAlt(reach) == ATN.InvalidAltNumber
                     );
                 // conflicted => accept state
-                System.Diagnostics.Debug.Assert(D.isAcceptState || D.configs.GetConflictingAlts()
-                     == null);
+                System.Diagnostics.Debug.Assert(D.isAcceptState || D.configs.ConflictingAlts == null
+                    );
                 if (D.isAcceptState)
                 {
-                    int predictedAlt = reach.GetConflictingAlts() == null ? GetUniqueAlt(reach) : ATN
-                        .InvalidAltNumber;
+                    int predictedAlt = reach.ConflictingAlts == null ? GetUniqueAlt(reach) : ATN.InvalidAltNumber;
                     if (predictedAlt != ATN.InvalidAltNumber)
                     {
                         if (optimize_ll1 && input.Index == startIndex && nextState.outerContext == nextState
-                            .remainingOuterContext && dfa.decision >= 0 && !D.configs.HasSemanticContext(
-                            ))
+                            .remainingOuterContext && dfa.decision >= 0 && !D.configs.HasSemanticContext)
                         {
                             if (t >= 0 && t <= short.MaxValue)
                             {
@@ -697,25 +695,25 @@ namespace Antlr4.Runtime.Atn
                     }
                     else
                     {
-                        if (D.configs.GetConflictingAlts() != null)
+                        if (D.configs.ConflictingAlts != null)
                         {
                             predictedAlt = D.prediction;
                             //						int k = input.index() - startIndex + 1; // how much input we used
                             //						System.out.println("used k="+k);
-                            if (!userWantsCtxSensitive || !D.configs.GetDipsIntoOuterContext() || (treat_sllk1_conflict_as_ambiguity
+                            if (!userWantsCtxSensitive || !D.configs.DipsIntoOuterContext || (treat_sllk1_conflict_as_ambiguity
                                  && input.Index == startIndex))
                             {
-                                if (reportAmbiguities && !D.configs.HasSemanticContext())
+                                if (reportAmbiguities && !D.configs.HasSemanticContext)
                                 {
-                                    ReportAmbiguity(dfa, D, startIndex, input.Index, D.configs.GetConflictingAlts(), 
-                                        D.configs);
+                                    ReportAmbiguity(dfa, D, startIndex, input.Index, D.configs.ConflictingAlts, D.configs
+                                        );
                                 }
                             }
                             else
                             {
                                 System.Diagnostics.Debug.Assert(!useContext);
                                 System.Diagnostics.Debug.Assert(D.isAcceptState);
-                                if (D.configs.HasSemanticContext())
+                                if (D.configs.HasSemanticContext)
                                 {
                                     int nalts = decState.NumberOfTransitions;
                                     DFAState.PredPrediction[] predPredictions = D.predicates;
@@ -864,7 +862,7 @@ namespace Antlr4.Runtime.Atn
                 bool hasMoreContext = !useContext || remainingGlobalContext != null;
                 if (!hasMoreContext)
                 {
-                    reach.SetOutermostConfigSet(true);
+                    reach.IsOutermostConfigSet = true;
                 }
                 ATNConfigSet reachIntermediate = new ATNConfigSet();
                 IList<ATNConfig> skippedStopStates = null;
@@ -895,17 +893,17 @@ namespace Antlr4.Runtime.Atn
                         }
                     }
                 }
-                if (optimize_unique_closure && skippedStopStates == null && reachIntermediate.GetUniqueAlt
-                    () != ATN.InvalidAltNumber)
+                if (optimize_unique_closure && skippedStopStates == null && reachIntermediate.UniqueAlt
+                     != ATN.InvalidAltNumber)
                 {
-                    reachIntermediate.SetOutermostConfigSet(reach.IsOutermostConfigSet());
+                    reachIntermediate.IsOutermostConfigSet = reach.IsOutermostConfigSet;
                     reach = reachIntermediate;
                     break;
                 }
                 bool collectPredicates = false;
                 Closure(reachIntermediate, reach, collectPredicates, hasMoreContext, contextCache
                     );
-                stepIntoGlobal = reach.GetDipsIntoOuterContext();
+                stepIntoGlobal = reach.DipsIntoOuterContext;
                 if (t == IntStreamConstants.Eof)
                 {
                     reach = RemoveAllConfigsNotInRuleStopState(reach, contextCache);
@@ -957,8 +955,8 @@ namespace Antlr4.Runtime.Atn
             {
                 dfaState = AddDFAEdge(dfa, s0, t, contextElements, reach, contextCache);
             }
-            System.Diagnostics.Debug.Assert(!useContext || !dfaState.configs.GetDipsIntoOuterContext
-                ());
+            System.Diagnostics.Debug.Assert(!useContext || !dfaState.configs.DipsIntoOuterContext
+                );
             return new SimulatorState(previous.outerContext, dfaState, useContext, remainingGlobalContext
                 );
         }
@@ -1078,12 +1076,12 @@ namespace Antlr4.Runtime.Atn
                 bool hasMoreContext = remainingGlobalContext != null;
                 if (!hasMoreContext)
                 {
-                    configs.SetOutermostConfigSet(true);
+                    configs.IsOutermostConfigSet = true;
                 }
                 bool collectPredicates = true;
                 Closure(reachIntermediate, configs, collectPredicates, hasMoreContext, contextCache
                     );
-                bool stepIntoGlobal = configs.GetDipsIntoOuterContext();
+                bool stepIntoGlobal = configs.DipsIntoOuterContext;
                 DFAState next = AddDFAState(dfa, configs, contextCache);
                 if (s0 == null)
                 {
@@ -1617,14 +1615,14 @@ namespace Antlr4.Runtime.Atn
         private BitArray IsConflicted(ATNConfigSet configset, PredictionContextCache contextCache
             )
         {
-            if (configset.GetUniqueAlt() != ATN.InvalidAltNumber || configset.Count <= 1)
+            if (configset.UniqueAlt != ATN.InvalidAltNumber || configset.Count <= 1)
             {
                 return null;
             }
             IList<ATNConfig> configs = new List<ATNConfig>(configset);
             configs.Sort(StateAltSortComparator);
-            bool exact = !configset.GetDipsIntoOuterContext() && predictionMode == PredictionMode
-                .LlExactAmbigDetection;
+            bool exact = !configset.DipsIntoOuterContext && predictionMode == PredictionMode.
+                LlExactAmbigDetection;
             BitArray alts = new BitArray();
             int minAlt = configs[0].GetAlt();
             alts.Set(minAlt);
@@ -1804,11 +1802,11 @@ namespace Antlr4.Runtime.Atn
         protected internal virtual BitArray GetConflictingAltsFromConfigSet(ATNConfigSet 
             configs)
         {
-            BitArray conflictingAlts = configs.GetConflictingAlts();
-            if (conflictingAlts == null && configs.GetUniqueAlt() != ATN.InvalidAltNumber)
+            BitArray conflictingAlts = configs.ConflictingAlts;
+            if (conflictingAlts == null && configs.UniqueAlt != ATN.InvalidAltNumber)
             {
                 conflictingAlts = new BitArray();
-                conflictingAlts.Set(configs.GetUniqueAlt());
+                conflictingAlts.Set(configs.UniqueAlt);
             }
             return conflictingAlts;
         }
@@ -1940,7 +1938,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     if (context == PredictionContext.EmptyFullStateKey)
                     {
-                        if (from.configs.IsOutermostConfigSet())
+                        if (from.configs.IsOutermostConfigSet)
                         {
                             continue;
                         }
@@ -1955,7 +1953,7 @@ namespace Antlr4.Runtime.Atn
                     }
                     next = AddDFAContextState(dfa, from.configs, context, contextCache);
                     System.Diagnostics.Debug.Assert(context != PredictionContext.EmptyFullStateKey ||
-                         next.configs.IsOutermostConfigSet());
+                         next.configs.IsOutermostConfigSet);
                     from.SetContextTarget(context, next);
                     from = next;
                 }
@@ -1989,10 +1987,10 @@ namespace Antlr4.Runtime.Atn
             }
             else
             {
-                System.Diagnostics.Debug.Assert(!configs.IsOutermostConfigSet(), "Shouldn't be adding a duplicate edge."
+                System.Diagnostics.Debug.Assert(!configs.IsOutermostConfigSet, "Shouldn't be adding a duplicate edge."
                     );
                 configs = configs.Clone(true);
-                configs.SetOutermostConfigSet(true);
+                configs.IsOutermostConfigSet = true;
                 return AddDFAState(dfa, configs, contextCache);
             }
         }
@@ -2003,7 +2001,7 @@ namespace Antlr4.Runtime.Atn
         protected internal virtual DFAState AddDFAState(DFA dfa, ATNConfigSet configs, PredictionContextCache
              contextCache)
         {
-            if (!configs.IsReadOnly())
+            if (!configs.IsReadOnly)
             {
                 configs.OptimizeConfigs(this);
             }
@@ -2013,12 +2011,12 @@ namespace Antlr4.Runtime.Atn
             {
                 return existing;
             }
-            if (!configs.IsReadOnly())
+            if (!configs.IsReadOnly)
             {
-                if (configs.GetConflictingAlts() == null)
+                if (configs.ConflictingAlts == null)
                 {
-                    configs.SetConflictingAlts(IsConflicted(configs, contextCache));
-                    if (optimize_hidden_conflicted_configs && configs.GetConflictingAlts() != null)
+                    configs.ConflictingAlts = IsConflicted(configs, contextCache);
+                    if (optimize_hidden_conflicted_configs && configs.ConflictingAlts != null)
                     {
                         int size = configs.Count;
                         configs.StripHiddenConfigs();
@@ -2044,14 +2042,13 @@ namespace Antlr4.Runtime.Atn
             }
             else
             {
-                if (configs.GetConflictingAlts() != null)
+                if (configs.ConflictingAlts != null)
                 {
                     newState.isAcceptState = true;
-                    newState.prediction = ResolveToMinAlt(newState, newState.configs.GetConflictingAlts
-                        ());
+                    newState.prediction = ResolveToMinAlt(newState, newState.configs.ConflictingAlts);
                 }
             }
-            if (newState.isAcceptState && configs.HasSemanticContext())
+            if (newState.isAcceptState && configs.HasSemanticContext)
             {
                 PredicateDFAState(newState, configs, decisionState.NumberOfTransitions);
             }

@@ -128,7 +128,7 @@ namespace Antlr4.Runtime.Atn
             }
             else
             {
-                if (!set.IsReadOnly())
+                if (!set.IsReadOnly)
                 {
                     this.mergedConfigs = (Dictionary<long, ATNConfig>)set.mergedConfigs.Clone();
                     this.unmerged = (List<ATNConfig>)set.unmerged.Clone();
@@ -143,7 +143,7 @@ namespace Antlr4.Runtime.Atn
             this.dipsIntoOuterContext = set.dipsIntoOuterContext;
             this.hasSemanticContext = set.hasSemanticContext;
             this.outermostConfigSet = set.outermostConfigSet;
-            if (@readonly || !set.IsReadOnly())
+            if (@readonly || !set.IsReadOnly)
             {
                 this.uniqueAlt = set.uniqueAlt;
                 this.conflictingAlts = set.conflictingAlts;
@@ -174,9 +174,12 @@ namespace Antlr4.Runtime.Atn
             return alts;
         }
 
-        public bool IsReadOnly()
+        public bool IsReadOnly
         {
-            return mergedConfigs == null;
+            get
+            {
+                return mergedConfigs == null;
+            }
         }
 
         public void StripHiddenConfigs()
@@ -209,19 +212,22 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        public virtual bool IsOutermostConfigSet()
+        public virtual bool IsOutermostConfigSet
         {
-            return outermostConfigSet;
-        }
-
-        public virtual void SetOutermostConfigSet(bool outermostConfigSet)
-        {
-            if (this.outermostConfigSet && !outermostConfigSet)
+            get
             {
-                throw new InvalidOperationException();
+                return outermostConfigSet;
             }
-            System.Diagnostics.Debug.Assert(!outermostConfigSet || !dipsIntoOuterContext);
-            this.outermostConfigSet = outermostConfigSet;
+            set
+            {
+                bool outermostConfigSet = value;
+                if (this.outermostConfigSet && !outermostConfigSet)
+                {
+                    throw new InvalidOperationException();
+                }
+                System.Diagnostics.Debug.Assert(!outermostConfigSet || !dipsIntoOuterContext);
+                this.outermostConfigSet = outermostConfigSet;
+            }
         }
 
         public virtual ISet<ATNState> GetStates()
@@ -251,7 +257,7 @@ namespace Antlr4.Runtime.Atn
         {
             Antlr4.Runtime.Atn.ATNConfigSet copy = new Antlr4.Runtime.Atn.ATNConfigSet(this, 
                 @readonly);
-            if (!@readonly && this.IsReadOnly())
+            if (!@readonly && this.IsReadOnly)
             {
                 Sharpen.Collections.AddAll(copy, this.configs);
             }
@@ -302,11 +308,6 @@ namespace Antlr4.Runtime.Atn
         public virtual object[] ToArray()
         {
             return Sharpen.Collections.ToArray(configs);
-        }
-
-        public virtual T[] ToArray<T>(T[] a)
-        {
-            return Sharpen.Collections.ToArray(configs, a);
         }
 
         public virtual bool AddItem(ATNConfig e)
@@ -519,7 +520,7 @@ namespace Antlr4.Runtime.Atn
         {
             StringBuilder buf = new StringBuilder();
             IList<ATNConfig> sortedConfigs = new List<ATNConfig>(configs);
-            sortedConfigs.Sort(new _IComparer_467());
+            sortedConfigs.Sort(new _IComparer_479());
             buf.Append("[");
             for (int i = 0; i < sortedConfigs.Count; i++)
             {
@@ -549,9 +550,9 @@ namespace Antlr4.Runtime.Atn
             return buf.ToString();
         }
 
-        private sealed class _IComparer_467 : IComparer<ATNConfig>
+        private sealed class _IComparer_479 : IComparer<ATNConfig>
         {
-            public _IComparer_467()
+            public _IComparer_479()
             {
             }
 
@@ -576,14 +577,20 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        public virtual int GetUniqueAlt()
+        public virtual int UniqueAlt
         {
-            return uniqueAlt;
+            get
+            {
+                return uniqueAlt;
+            }
         }
 
-        public virtual bool HasSemanticContext()
+        public virtual bool HasSemanticContext
         {
-            return hasSemanticContext;
+            get
+            {
+                return hasSemanticContext;
+            }
         }
 
         public virtual void ClearExplicitSemanticContext()
@@ -598,25 +605,34 @@ namespace Antlr4.Runtime.Atn
             hasSemanticContext = true;
         }
 
-        public virtual BitArray GetConflictingAlts()
+        public virtual BitArray ConflictingAlts
         {
-            return conflictingAlts;
+            get
+            {
+                return conflictingAlts;
+            }
+            set
+            {
+                BitArray conflictingAlts = value;
+                EnsureWritable();
+                this.conflictingAlts = conflictingAlts;
+            }
         }
 
-        public virtual void SetConflictingAlts(BitArray conflictingAlts)
+        public virtual bool DipsIntoOuterContext
         {
-            EnsureWritable();
-            this.conflictingAlts = conflictingAlts;
+            get
+            {
+                return dipsIntoOuterContext;
+            }
         }
 
-        public virtual bool GetDipsIntoOuterContext()
+        public virtual ATNConfig this[int index]
         {
-            return dipsIntoOuterContext;
-        }
-
-        public virtual ATNConfig Get(int index)
-        {
-            return configs[index];
+            get
+            {
+                return configs[index];
+            }
         }
 
         public virtual void Remove(int index)
@@ -644,7 +660,7 @@ namespace Antlr4.Runtime.Atn
 
         protected internal void EnsureWritable()
         {
-            if (IsReadOnly())
+            if (IsReadOnly)
             {
                 throw new InvalidOperationException("This ATNConfigSet is read only.");
             }

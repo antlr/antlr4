@@ -48,7 +48,7 @@ namespace Antlr4.Runtime.Atn
         {
             Antlr4.Runtime.Atn.OrderedATNConfigSet copy = new Antlr4.Runtime.Atn.OrderedATNConfigSet
                 (this, @readonly);
-            if (!@readonly && this.IsReadOnly())
+            if (!@readonly && this.IsReadOnly)
             {
                 Sharpen.Collections.AddAll(copy, this);
             }
