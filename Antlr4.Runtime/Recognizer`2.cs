@@ -27,6 +27,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using System;
 using System.Collections.Generic;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
@@ -40,20 +41,8 @@ namespace Antlr4.Runtime
     {
         public const int Eof = -1;
 
-        private sealed class _CopyOnWriteArrayList_49 : CopyOnWriteArrayList<IAntlrErrorListener
-            <Symbol>>
-        {
-            public _CopyOnWriteArrayList_49()
-            {
-                {
-                    this.AddItem(ConsoleErrorListener.Instance);
-                }
-            }
-        }
-
         [NotNull]
-        private IList<IAntlrErrorListener<Symbol>> _listeners = new _CopyOnWriteArrayList_49
-            ();
+        private IAntlrErrorListener<Symbol>[] _listeners = { ConsoleErrorListener<Symbol>.Instance };
 
         protected internal ATNInterpreter _interp;
 
@@ -162,20 +151,31 @@ namespace Antlr4.Runtime
         /// <code>null</code>
         /// .
         /// </exception>
-        public virtual void AddErrorListener<_T0>(IAntlrErrorListener<_T0> listener)
+        public virtual void AddErrorListener(IAntlrErrorListener<Symbol> listener)
         {
             Args.NotNull("listener", listener);
-            _listeners.Add(listener);
+
+            IAntlrErrorListener<Symbol>[] listeners = _listeners;
+            Array.Resize(ref listeners, listeners.Length + 1);
+            listeners[listeners.Length - 1] = listener;
+            _listeners = listeners;
         }
 
-        public virtual void RemoveErrorListener<_T0>(IAntlrErrorListener<_T0> listener)
+        public virtual void RemoveErrorListener(IAntlrErrorListener<Symbol> listener)
         {
-            _listeners.Remove(listener);
+            IAntlrErrorListener<Symbol>[] listeners = _listeners;
+            int removeIndex = Array.IndexOf(listeners, listener);
+            if (removeIndex < 0)
+                return;
+
+            Array.Copy(listeners, removeIndex + 1, listeners, removeIndex, listeners.Length - removeIndex - 1);
+            Array.Resize(ref listeners, listeners.Length - 1);
+            _listeners = listeners;
         }
 
         public virtual void RemoveErrorListeners()
         {
-            _listeners.Clear();
+            _listeners = new IAntlrErrorListener<Symbol>[0];
         }
 
         [NotNull]

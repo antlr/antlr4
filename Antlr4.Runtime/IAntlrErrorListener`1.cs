@@ -33,7 +33,7 @@ using Sharpen;
 namespace Antlr4.Runtime
 {
     /// <summary>How to emit recognition errors</summary>
-    public interface IAntlrErrorListener<Symbol>
+    public interface IAntlrErrorListener<in Symbol>
     {
         /// <summary>Upon syntax error, notify any interested parties.</summary>
         /// <remarks>

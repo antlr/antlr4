@@ -33,9 +33,9 @@ using Sharpen;
 namespace Antlr4.Runtime
 {
     /// <author>Sam Harwell</author>
-    public class ConsoleErrorListener : IAntlrErrorListener<object>
+    public class ConsoleErrorListener<Symbol> : IAntlrErrorListener<Symbol>
     {
-        public static readonly ConsoleErrorListener Instance = new ConsoleErrorListener();
+        public static readonly ConsoleErrorListener<Symbol> Instance = new ConsoleErrorListener<Symbol>();
 
         public virtual void SyntaxError<T>(Recognizer<T, object> recognizer, T offendingSymbol
             , int line, int charPositionInLine, string msg, RecognitionException e)
