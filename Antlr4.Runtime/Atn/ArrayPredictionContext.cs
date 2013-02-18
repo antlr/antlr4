@@ -235,7 +235,7 @@ namespace Antlr4.Runtime.Atn
             IDeque<PredictionContext> otherWorkList = new ArrayDeque<PredictionContext>();
             selfWorkList.Push(this);
             otherWorkList.Push(other);
-            while (!selfWorkList.IsEmpty())
+            while (selfWorkList.Count > 0)
             {
                 PredictionContextCache.IdentityCommutativePredictionContextOperands operands = new 
                     PredictionContextCache.IdentityCommutativePredictionContextOperands(selfWorkList

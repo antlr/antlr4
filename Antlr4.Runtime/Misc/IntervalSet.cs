@@ -469,7 +469,7 @@ namespace Antlr4.Runtime.Misc
         /// <summary>return true if this set has no members</summary>
         public virtual bool IsNil()
         {
-            return intervals == null || intervals.IsEmpty();
+            return intervals == null || intervals.Count == 0;
         }
 
         /// <summary>If this set is a single integer, return it otherwise Token.INVALID_TYPE</summary>
@@ -571,7 +571,7 @@ namespace Antlr4.Runtime.Misc
         public virtual string ToString(bool elemAreChar)
         {
             StringBuilder buf = new StringBuilder();
-            if (this.intervals == null || this.intervals.IsEmpty())
+            if (this.intervals == null || this.intervals.Count == 0)
             {
                 return "{}";
             }
@@ -629,7 +629,7 @@ namespace Antlr4.Runtime.Misc
         public virtual string ToString(string[] tokenNames)
         {
             StringBuilder buf = new StringBuilder();
-            if (this.intervals == null || this.intervals.IsEmpty())
+            if (this.intervals == null || this.intervals.Count == 0)
             {
                 return "{}";
             }

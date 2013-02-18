@@ -468,7 +468,7 @@ namespace Antlr4.Runtime
             {
                 start = 0;
             }
-            if (rewrites == null || rewrites.IsEmpty())
+            if (rewrites == null || rewrites.Count == 0)
             {
                 return tokens.GetText(interval);
             }

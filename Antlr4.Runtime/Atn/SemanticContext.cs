@@ -224,7 +224,7 @@ namespace Antlr4.Runtime.Atn
                 }
                 IList<SemanticContext.PrecedencePredicate> precedencePredicates = FilterPrecedencePredicates
                     (operands);
-                if (!precedencePredicates.IsEmpty())
+                if (precedencePredicates.Count > 0)
                 {
                     // interested in the transition with the lowest precedence
                     SemanticContext.PrecedencePredicate reduced = Sharpen.Collections.Min(precedencePredicates
@@ -300,7 +300,7 @@ namespace Antlr4.Runtime.Atn
                 }
                 IList<SemanticContext.PrecedencePredicate> precedencePredicates = FilterPrecedencePredicates
                     (operands);
-                if (!precedencePredicates.IsEmpty())
+                if (precedencePredicates.Count > 0)
                 {
                     // interested in the transition with the highest precedence
                     SemanticContext.PrecedencePredicate reduced = Sharpen.Collections.Max(precedencePredicates

@@ -65,7 +65,7 @@ namespace Antlr4.Runtime.Misc
                 }
                 IList<Tuple<RuleDependency, IAnnotatedElement>> dependencies = GetDependencies(clazz
                     );
-                if (dependencies.IsEmpty())
+                if (dependencies.Count == 0)
                 {
                     continue;
                 }
@@ -140,7 +140,7 @@ namespace Antlr4.Runtime.Misc
                     try
                     {
                         string name = Sharpen.Runtime.Substring(field.Name, "RULE_".Length);
-                        if (name.IsEmpty() || !System.Char.IsLower(name[0]))
+                        if (name.Length == 0 || !System.Char.IsLower(name[0]))
                         {
                             continue;
                         }

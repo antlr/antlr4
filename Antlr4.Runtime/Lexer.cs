@@ -262,7 +262,7 @@ outer_break: ;
 
         public virtual int PopMode()
         {
-            if (_modeStack.IsEmpty())
+            if (_modeStack.Count == 0)
             {
                 throw new InvalidOperationException();
             }

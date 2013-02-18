@@ -90,7 +90,7 @@ namespace Antlr4.Runtime.Dfa
 
         public override bool IsEmpty()
         {
-            return values.IsEmpty();
+            return values.Count == 0;
         }
 
         public override bool ContainsKey(int key)

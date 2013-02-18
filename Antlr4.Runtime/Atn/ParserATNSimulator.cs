@@ -913,7 +913,7 @@ namespace Antlr4.Runtime.Atn
                 if (skippedStopStates != null && (!useContext || !PredictionMode.HasConfigInRuleStopState
                     (reach)))
                 {
-                    System.Diagnostics.Debug.Assert(!skippedStopStates.IsEmpty());
+                    System.Diagnostics.Debug.Assert(skippedStopStates.Count > 0);
                     foreach (ATNConfig c_1 in skippedStopStates)
                     {
                         reach.Add(c_1, contextCache);
@@ -1931,7 +1931,7 @@ namespace Antlr4.Runtime.Atn
              contextCache)
         {
             System.Diagnostics.Debug.Assert(dfa.IsContextSensitive() || contextTransitions ==
-                 null || contextTransitions.IsEmpty());
+                 null || contextTransitions.Count == 0);
             DFAState from = fromState;
             DFAState to = AddDFAState(dfa, toConfigs, contextCache);
             if (contextTransitions != null)

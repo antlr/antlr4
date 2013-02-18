@@ -233,7 +233,7 @@ namespace Antlr4.Runtime.Atn
                     // if we don't find an existing DFA state
                     // Fill reach starting from closure, following t transitions
                     GetReachableConfigSet(input, closure, reach, t);
-                    if (reach.IsEmpty())
+                    if (reach.Count == 0)
                     {
                         // we got nowhere on t from s
                         // we reached state associated with closure for sure, so

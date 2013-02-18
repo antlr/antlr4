@@ -795,7 +795,7 @@ nextState_break: ;
             BitArray reachable = new BitArray(atn.states.Count);
             IDeque<ATNState> worklist = new ArrayDeque<ATNState>();
             worklist.AddItem(transition.followState);
-            while (!worklist.IsEmpty())
+            while (worklist.Count > 0)
             {
                 ATNState state = worklist.Pop();
                 if (reachable.Get(state.stateNumber))

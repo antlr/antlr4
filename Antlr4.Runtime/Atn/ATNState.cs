@@ -195,7 +195,7 @@ namespace Antlr4.Runtime.Atn
 
         public virtual void AddTransition(Antlr4.Runtime.Atn.Transition e)
         {
-            if (transitions.IsEmpty())
+            if (transitions.Count == 0)
             {
                 epsilonOnlyTransitions = e.IsEpsilon;
             }

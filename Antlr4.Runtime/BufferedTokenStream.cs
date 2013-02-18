@@ -404,7 +404,7 @@ namespace Antlr4.Runtime
                     filteredTokens.Add(t);
                 }
             }
-            if (filteredTokens.IsEmpty())
+            if (filteredTokens.Count == 0)
             {
                 filteredTokens = null;
             }
@@ -588,7 +588,7 @@ namespace Antlr4.Runtime
                     }
                 }
             }
-            if (hidden.IsEmpty())
+            if (hidden.Count == 0)
             {
                 return null;
             }

@@ -236,7 +236,7 @@ namespace Antlr4.Runtime.Atn
 
         public virtual void OptimizeConfigs(ATNSimulator interpreter)
         {
-            if (configs.IsEmpty())
+            if (configs.Count == 0)
             {
                 return;
             }
@@ -268,7 +268,7 @@ namespace Antlr4.Runtime.Atn
 
         public virtual bool IsEmpty()
         {
-            return configs.IsEmpty();
+            return configs.Count == 0;
         }
 
         public virtual bool Contains(object o)
