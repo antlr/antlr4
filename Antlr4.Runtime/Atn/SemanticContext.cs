@@ -82,7 +82,8 @@ namespace Antlr4.Runtime.Atn
         /// prediction, so we passed in the outer context here in case of context
         /// dependent predicate evaluation.
         /// </remarks>
-        public abstract bool Eval<Symbol, ATNInterpreter>(Recognizer<Symbol, ATNInterpreter> parser, RuleContext outerContext);
+        public abstract bool Eval<Symbol, ATNInterpreter>(Recognizer<Symbol, ATNInterpreter> parser, RuleContext outerContext)
+            where ATNInterpreter : ATNSimulator;
 
         public class Predicate : SemanticContext
         {
