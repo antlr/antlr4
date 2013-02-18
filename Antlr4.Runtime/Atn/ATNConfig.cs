@@ -293,11 +293,11 @@ namespace Antlr4.Runtime.Atn
             {
                 return false;
             }
-            IDeque<PredictionContext> leftWorkList = new ArrayDeque<PredictionContext>();
-            IDeque<PredictionContext> rightWorkList = new ArrayDeque<PredictionContext>();
-            leftWorkList.AddItem(GetContext());
-            rightWorkList.AddItem(subconfig.GetContext());
-            while (!leftWorkList.IsEmpty())
+            Stack<PredictionContext> leftWorkList = new Stack<PredictionContext>();
+            Stack<PredictionContext> rightWorkList = new Stack<PredictionContext>();
+            leftWorkList.Push(GetContext());
+            rightWorkList.Push(subconfig.GetContext());
+            while (leftWorkList.Count > 0)
             {
                 PredictionContext left = leftWorkList.Pop();
                 PredictionContext right = rightWorkList.Pop();
@@ -386,12 +386,11 @@ namespace Antlr4.Runtime.Atn
             StringBuilder builder = new StringBuilder();
             builder.Append("digraph G {\n");
             builder.Append("rankdir=LR;\n");
-            IDictionary<PredictionContext, PredictionContext> visited = new IdentityHashMap<PredictionContext
-                , PredictionContext>();
-            IDeque<PredictionContext> workList = new ArrayDeque<PredictionContext>();
-            workList.AddItem(GetContext());
-            visited.Put(GetContext(), GetContext());
-            while (!workList.IsEmpty())
+            ISet<PredictionContext> visited = new HashSet<PredictionContext>();
+            Stack<PredictionContext> workList = new Stack<PredictionContext>();
+            workList.Push(GetContext());
+            visited.Add(GetContext());
+            while (workList.Count > 0)
             {
                 PredictionContext current = workList.Pop();
                 for (int i = 0; i < current.Size; i++)
@@ -402,7 +401,7 @@ namespace Antlr4.Runtime.Atn
                     builder.Append("s").Append(System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode
                         (current.GetParent(i)));
                     builder.Append("[label=\"").Append(current.GetReturnState(i)).Append("\"];\n");
-                    if (visited.Put(current.GetParent(i), current.GetParent(i)) == null)
+                    if (visited.Add(current.GetParent(i)))
                     {
                         workList.Push(current.GetParent(i));
                     }
