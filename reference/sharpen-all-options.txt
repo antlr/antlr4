@@ -120,7 +120,6 @@
 -typeMapping java.net.InetAddress System.Net.IPAddress
 -typeMapping java.util.TimeZone System.TimeZoneInfo
 -typeMapping java.util.ArrayList<> System.Collections.Generic.List
--typeMapping java.util.BitSet System.Collections.BitArray
 -typeMapping java.util.zip.Inflater ICSharpCode.SharpZipLib.Zip.Compression.Inflater
 -typeMapping java.util.zip.Deflater ICSharpCode.SharpZipLib.Zip.Compression.Deflater
 -typeMapping java.util.zip.ZipException ICSharpCode.SharpZipLib.SharpZipBaseException
@@ -188,6 +187,7 @@
 -typeMapping java.util.concurrent.CancellationException System.OperationCanceledException
 -typeMapping java.lang.IndexOutOfBoundsException ArgumentOutOfRangeException
 -typeMapping java.util.EmptyStackException InvalidOperationException
+-typeMapping java.util.NoSuchElementException InvalidOperationException
 -typeMapping java.io.InputStream System.IO.Stream
 -typeMapping java.io.InputStreamReader System.IO.StreamReader
 

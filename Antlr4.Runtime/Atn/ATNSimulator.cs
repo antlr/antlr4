@@ -28,7 +28,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Antlr4.Runtime.Atn;
@@ -792,7 +791,7 @@ nextState_break: ;
             {
                 return true;
             }
-            BitArray reachable = new BitArray(atn.states.Count);
+            BitSet reachable = new BitSet(atn.states.Count);
             Stack<ATNState> worklist = new Stack<ATNState>();
             worklist.Push(transition.followState);
             while (worklist.Count > 0)

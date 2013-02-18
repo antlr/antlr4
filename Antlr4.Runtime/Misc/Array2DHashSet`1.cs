@@ -661,22 +661,22 @@ namespace Antlr4.Runtime.Misc
                 this.data = data;
             }
 
-            public override bool HasNext()
+            public virtual bool HasNext()
             {
                 return this.nextIndex < this.data.Length;
             }
 
-            public override T Next()
+            public virtual T Next()
             {
                 if (!this.HasNext())
                 {
-                    throw new NoSuchElementException();
+                    throw new InvalidOperationException();
                 }
                 this.removed = false;
                 return this.data[this.nextIndex++];
             }
 
-            public override void Remove()
+            public virtual void Remove()
             {
                 if (this.removed)
                 {

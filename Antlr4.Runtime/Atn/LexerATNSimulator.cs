@@ -172,7 +172,7 @@ namespace Antlr4.Runtime.Atn
             ATNState startState = atn.modeToStartState[mode];
             int old_mode = mode;
             ATNConfigSet s0_closure = ComputeStartState(input, startState);
-            bool suppressEdge = s0_closure.HasSemanticContext();
+            bool suppressEdge = s0_closure.HasSemanticContext;
             if (suppressEdge)
             {
                 s0_closure.ClearExplicitSemanticContext();
@@ -614,7 +614,7 @@ namespace Antlr4.Runtime.Atn
         protected internal virtual DFAState AddDFAEdge(DFAState from, int t, ATNConfigSet
              q)
         {
-            bool suppressEdge = q.HasSemanticContext();
+            bool suppressEdge = q.HasSemanticContext;
             if (suppressEdge)
             {
                 q.ClearExplicitSemanticContext();
@@ -649,7 +649,7 @@ namespace Antlr4.Runtime.Atn
         [return: NotNull]
         protected internal virtual DFAState AddDFAState(ATNConfigSet configs)
         {
-            System.Diagnostics.Debug.Assert(!configs.HasSemanticContext());
+            System.Diagnostics.Debug.Assert(!configs.HasSemanticContext);
             DFAState proposed = new DFAState(configs, 0, MaxDfaEdge);
             DFAState existing = atn.modeToDFA[mode].states.Get(proposed);
             if (existing != null)

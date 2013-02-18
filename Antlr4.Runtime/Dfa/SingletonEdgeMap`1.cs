@@ -174,16 +174,16 @@ namespace Antlr4.Runtime.Dfa
         {
             private int current;
 
-            public override bool HasNext()
+            public virtual bool HasNext()
             {
                 return this.current < this._enclosing.Size();
             }
 
-            public override KeyValuePair<int, T> Next()
+            public virtual KeyValuePair<int, T> Next()
             {
                 if (this.current >= this._enclosing.Size())
                 {
-                    throw new NoSuchElementException();
+                    throw new InvalidOperationException();
                 }
                 this.current++;
                 return new _KeyValuePair_166(this);
@@ -223,7 +223,7 @@ namespace Antlr4.Runtime.Dfa
                 }
             }
 
-            public override void Remove()
+            public virtual void Remove()
             {
                 throw new NotSupportedException("Not supported yet.");
             }

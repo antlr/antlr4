@@ -27,7 +27,6 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System.Collections;
 using System.Collections.Generic;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
@@ -519,12 +518,12 @@ namespace Antlr4.Runtime.Atn
             //			if ( debug ) System.out.println("!!! no viable alt in dfa");
             //			return -1;
             //		}
-            if (acceptState.configs.GetConflictingAlts() != null)
+            if (acceptState.configs.ConflictingAlts != null)
             {
                 if (dfa.atnStartState is DecisionState)
                 {
-                    if (!userWantsCtxSensitive || !acceptState.configs.GetDipsIntoOuterContext() || (
-                        treat_sllk1_conflict_as_ambiguity && input.Index == startIndex))
+                    if (!userWantsCtxSensitive || !acceptState.configs.DipsIntoOuterContext || (treat_sllk1_conflict_as_ambiguity
+                         && input.Index == startIndex))
                     {
                     }
                     else
@@ -544,7 +543,7 @@ namespace Antlr4.Runtime.Atn
                             {
                                 input.Seek(startIndex);
                             }
-                            BitArray predictions = EvalSemanticContext(s.predicates, outerContext, true);
+                            BitSet predictions = EvalSemanticContext(s.predicates, outerContext, true);
                             if (predictions.Cardinality() == 1)
                             {
                                 return predictions.NextSetBit(0);
@@ -575,8 +574,8 @@ namespace Antlr4.Runtime.Atn
                 {
                     input.Seek(startIndex);
                 }
-                BitArray alts = EvalSemanticContext(s.predicates, outerContext, reportAmbiguities
-                     && predictionMode == PredictionMode.LlExactAmbigDetection);
+                BitSet alts = EvalSemanticContext(s.predicates, outerContext, reportAmbiguities &&
+                     predictionMode == PredictionMode.LlExactAmbigDetection);
                 switch (alts.Cardinality())
                 {
                     case 0:
@@ -672,17 +671,15 @@ namespace Antlr4.Runtime.Atn
                 System.Diagnostics.Debug.Assert(D.isAcceptState || GetUniqueAlt(reach) == ATN.InvalidAltNumber
                     );
                 // conflicted => accept state
-                System.Diagnostics.Debug.Assert(D.isAcceptState || D.configs.GetConflictingAlts()
-                     == null);
+                System.Diagnostics.Debug.Assert(D.isAcceptState || D.configs.ConflictingAlts == null
+                    );
                 if (D.isAcceptState)
                 {
-                    int predictedAlt = reach.GetConflictingAlts() == null ? GetUniqueAlt(reach) : ATN
-                        .InvalidAltNumber;
+                    int predictedAlt = reach.ConflictingAlts == null ? GetUniqueAlt(reach) : ATN.InvalidAltNumber;
                     if (predictedAlt != ATN.InvalidAltNumber)
                     {
                         if (optimize_ll1 && input.Index == startIndex && nextState.outerContext == nextState
-                            .remainingOuterContext && dfa.decision >= 0 && !D.configs.HasSemanticContext(
-                            ))
+                            .remainingOuterContext && dfa.decision >= 0 && !D.configs.HasSemanticContext)
                         {
                             if (t >= 0 && t <= short.MaxValue)
                             {
@@ -697,25 +694,25 @@ namespace Antlr4.Runtime.Atn
                     }
                     else
                     {
-                        if (D.configs.GetConflictingAlts() != null)
+                        if (D.configs.ConflictingAlts != null)
                         {
                             predictedAlt = D.prediction;
                             //						int k = input.index() - startIndex + 1; // how much input we used
                             //						System.out.println("used k="+k);
-                            if (!userWantsCtxSensitive || !D.configs.GetDipsIntoOuterContext() || (treat_sllk1_conflict_as_ambiguity
+                            if (!userWantsCtxSensitive || !D.configs.DipsIntoOuterContext || (treat_sllk1_conflict_as_ambiguity
                                  && input.Index == startIndex))
                             {
-                                if (reportAmbiguities && !D.configs.HasSemanticContext())
+                                if (reportAmbiguities && !D.configs.HasSemanticContext)
                                 {
-                                    ReportAmbiguity(dfa, D, startIndex, input.Index, D.configs.GetConflictingAlts(), 
-                                        D.configs);
+                                    ReportAmbiguity(dfa, D, startIndex, input.Index, D.configs.ConflictingAlts, D.configs
+                                        );
                                 }
                             }
                             else
                             {
                                 System.Diagnostics.Debug.Assert(!useContext);
                                 System.Diagnostics.Debug.Assert(D.isAcceptState);
-                                if (D.configs.HasSemanticContext())
+                                if (D.configs.HasSemanticContext)
                                 {
                                     int nalts = decState.NumberOfTransitions;
                                     DFAState.PredPrediction[] predPredictions = D.predicates;
@@ -727,7 +724,7 @@ namespace Antlr4.Runtime.Atn
                                             input.Seek(startIndex);
                                         }
                                         // always use complete evaluation here since we'll want to retry with full context if still ambiguous
-                                        BitArray alts = EvalSemanticContext(predPredictions, outerContext, true);
+                                        BitSet alts = EvalSemanticContext(predPredictions, outerContext, true);
                                         if (alts.Cardinality() == 1)
                                         {
                                             return alts.NextSetBit(0);
@@ -757,8 +754,8 @@ namespace Antlr4.Runtime.Atn
                         {
                             input.Seek(startIndex);
                         }
-                        BitArray alts = EvalSemanticContext(D.predicates, outerContext, reportAmbiguities
-                             && predictionMode == PredictionMode.LlExactAmbigDetection);
+                        BitSet alts = EvalSemanticContext(D.predicates, outerContext, reportAmbiguities &&
+                             predictionMode == PredictionMode.LlExactAmbigDetection);
                         D.prediction = ATN.InvalidAltNumber;
                         switch (alts.Cardinality())
                         {
@@ -802,7 +799,7 @@ namespace Antlr4.Runtime.Atn
         {
             if (previous.s0 != null)
             {
-                BitArray alts = new BitArray();
+                BitSet alts = new BitSet();
                 foreach (ATNConfig config in previous.s0.configs)
                 {
                     if (config.GetReachesIntoOuterContext() || config.GetState() is RuleStopState)
@@ -864,7 +861,7 @@ namespace Antlr4.Runtime.Atn
                 bool hasMoreContext = !useContext || remainingGlobalContext != null;
                 if (!hasMoreContext)
                 {
-                    reach.SetOutermostConfigSet(true);
+                    reach.IsOutermostConfigSet = true;
                 }
                 ATNConfigSet reachIntermediate = new ATNConfigSet();
                 IList<ATNConfig> skippedStopStates = null;
@@ -895,17 +892,17 @@ namespace Antlr4.Runtime.Atn
                         }
                     }
                 }
-                if (optimize_unique_closure && skippedStopStates == null && reachIntermediate.GetUniqueAlt
-                    () != ATN.InvalidAltNumber)
+                if (optimize_unique_closure && skippedStopStates == null && reachIntermediate.UniqueAlt
+                     != ATN.InvalidAltNumber)
                 {
-                    reachIntermediate.SetOutermostConfigSet(reach.IsOutermostConfigSet());
+                    reachIntermediate.IsOutermostConfigSet = reach.IsOutermostConfigSet;
                     reach = reachIntermediate;
                     break;
                 }
                 bool collectPredicates = false;
                 Closure(reachIntermediate, reach, collectPredicates, hasMoreContext, contextCache
                     );
-                stepIntoGlobal = reach.GetDipsIntoOuterContext();
+                stepIntoGlobal = reach.DipsIntoOuterContext;
                 if (t == IntStreamConstants.Eof)
                 {
                     reach = RemoveAllConfigsNotInRuleStopState(reach, contextCache);
@@ -957,8 +954,8 @@ namespace Antlr4.Runtime.Atn
             {
                 dfaState = AddDFAEdge(dfa, s0, t, contextElements, reach, contextCache);
             }
-            System.Diagnostics.Debug.Assert(!useContext || !dfaState.configs.GetDipsIntoOuterContext
-                ());
+            System.Diagnostics.Debug.Assert(!useContext || !dfaState.configs.DipsIntoOuterContext
+                );
             return new SimulatorState(previous.outerContext, dfaState, useContext, remainingGlobalContext
                 );
         }
@@ -1078,12 +1075,12 @@ namespace Antlr4.Runtime.Atn
                 bool hasMoreContext = remainingGlobalContext != null;
                 if (!hasMoreContext)
                 {
-                    configs.SetOutermostConfigSet(true);
+                    configs.IsOutermostConfigSet = true;
                 }
                 bool collectPredicates = true;
                 Closure(reachIntermediate, configs, collectPredicates, hasMoreContext, contextCache
                     );
-                bool stepIntoGlobal = configs.GetDipsIntoOuterContext();
+                bool stepIntoGlobal = configs.DipsIntoOuterContext;
                 DFAState next = AddDFAState(dfa, configs, contextCache);
                 if (s0 == null)
                 {
@@ -1139,7 +1136,7 @@ namespace Antlr4.Runtime.Atn
         public virtual DFAState.PredPrediction[] PredicateDFAState(DFAState D, ATNConfigSet
              configs, int nalts)
         {
-            BitArray conflictingAlts = GetConflictingAltsFromConfigSet(configs);
+            BitSet conflictingAlts = GetConflictingAltsFromConfigSet(configs);
             SemanticContext[] altToPred = GetPredsForAmbigAlts(conflictingAlts, configs, nalts
                 );
             // altToPred[uniqueAlt] is now our validating predicate (if any)
@@ -1156,7 +1153,7 @@ namespace Antlr4.Runtime.Atn
             return predPredictions;
         }
 
-        public virtual SemanticContext[] GetPredsForAmbigAlts(BitArray ambigAlts, ATNConfigSet
+        public virtual SemanticContext[] GetPredsForAmbigAlts(BitSet ambigAlts, ATNConfigSet
              configs, int nalts)
         {
             // REACH=[1|1|[]|0:0, 1|2|[]|0:1]
@@ -1193,7 +1190,7 @@ namespace Antlr4.Runtime.Atn
             return altToPred;
         }
 
-        public virtual DFAState.PredPrediction[] GetPredicatePredictions(BitArray ambigAlts
+        public virtual DFAState.PredPrediction[] GetPredicatePredictions(BitSet ambigAlts
             , SemanticContext[] altToPred)
         {
             IList<DFAState.PredPrediction> pairs = new List<DFAState.PredPrediction>();
@@ -1241,10 +1238,10 @@ namespace Antlr4.Runtime.Atn
         /// predicate indicates an alt containing an
         /// unpredicated config which behaves as "always true."
         /// </remarks>
-        public virtual BitArray EvalSemanticContext(DFAState.PredPrediction[] predPredictions
+        public virtual BitSet EvalSemanticContext(DFAState.PredPrediction[] predPredictions
             , ParserRuleContext outerContext, bool complete)
         {
-            BitArray predictions = new BitArray();
+            BitSet predictions = new BitSet();
             foreach (DFAState.PredPrediction pair in predPredictions)
             {
                 if (pair.pred == null)
@@ -1614,18 +1611,18 @@ namespace Antlr4.Runtime.Atn
         private static readonly IComparer<ATNConfig> StateAltSortComparator = new _IComparer_1557
             ();
 
-        private BitArray IsConflicted(ATNConfigSet configset, PredictionContextCache contextCache
+        private BitSet IsConflicted(ATNConfigSet configset, PredictionContextCache contextCache
             )
         {
-            if (configset.GetUniqueAlt() != ATN.InvalidAltNumber || configset.Count <= 1)
+            if (configset.UniqueAlt != ATN.InvalidAltNumber || configset.Count <= 1)
             {
                 return null;
             }
             IList<ATNConfig> configs = new List<ATNConfig>(configset);
             configs.Sort(StateAltSortComparator);
-            bool exact = !configset.GetDipsIntoOuterContext() && predictionMode == PredictionMode
-                .LlExactAmbigDetection;
-            BitArray alts = new BitArray();
+            bool exact = !configset.DipsIntoOuterContext && predictionMode == PredictionMode.
+                LlExactAmbigDetection;
+            BitSet alts = new BitSet();
             int minAlt = configs[0].GetAlt();
             alts.Set(minAlt);
             // quick check 1 & 2 => if we assume #1 holds and check #2 against the
@@ -1645,12 +1642,12 @@ namespace Antlr4.Runtime.Atn
                     currentState = stateNumber;
                 }
             }
-            BitArray representedAlts = null;
+            BitSet representedAlts = null;
             if (exact)
             {
                 currentState = configs[0].GetState().NonStopStateNumber;
                 // get the represented alternatives of the first state
-                representedAlts = new BitArray();
+                representedAlts = new BitSet();
                 int maxAlt = minAlt;
                 for (int i_1 = 0; i_1 < configs.Count; i_1++)
                 {
@@ -1801,19 +1798,19 @@ namespace Antlr4.Runtime.Atn
             return alts;
         }
 
-        protected internal virtual BitArray GetConflictingAltsFromConfigSet(ATNConfigSet 
-            configs)
+        protected internal virtual BitSet GetConflictingAltsFromConfigSet(ATNConfigSet configs
+            )
         {
-            BitArray conflictingAlts = configs.GetConflictingAlts();
-            if (conflictingAlts == null && configs.GetUniqueAlt() != ATN.InvalidAltNumber)
+            BitSet conflictingAlts = configs.ConflictingAlts;
+            if (conflictingAlts == null && configs.UniqueAlt != ATN.InvalidAltNumber)
             {
-                conflictingAlts = new BitArray();
-                conflictingAlts.Set(configs.GetUniqueAlt());
+                conflictingAlts = new BitSet();
+                conflictingAlts.Set(configs.UniqueAlt);
             }
             return conflictingAlts;
         }
 
-        protected internal virtual int ResolveToMinAlt(DFAState D, BitArray conflictingAlts
+        protected internal virtual int ResolveToMinAlt(DFAState D, BitSet conflictingAlts
             )
         {
             // kill dead alts so we don't chase them ever
@@ -1940,7 +1937,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     if (context == PredictionContext.EmptyFullStateKey)
                     {
-                        if (from.configs.IsOutermostConfigSet())
+                        if (from.configs.IsOutermostConfigSet)
                         {
                             continue;
                         }
@@ -1955,7 +1952,7 @@ namespace Antlr4.Runtime.Atn
                     }
                     next = AddDFAContextState(dfa, from.configs, context, contextCache);
                     System.Diagnostics.Debug.Assert(context != PredictionContext.EmptyFullStateKey ||
-                         next.configs.IsOutermostConfigSet());
+                         next.configs.IsOutermostConfigSet);
                     from.SetContextTarget(context, next);
                     from = next;
                 }
@@ -1989,10 +1986,10 @@ namespace Antlr4.Runtime.Atn
             }
             else
             {
-                System.Diagnostics.Debug.Assert(!configs.IsOutermostConfigSet(), "Shouldn't be adding a duplicate edge."
+                System.Diagnostics.Debug.Assert(!configs.IsOutermostConfigSet, "Shouldn't be adding a duplicate edge."
                     );
                 configs = configs.Clone(true);
-                configs.SetOutermostConfigSet(true);
+                configs.IsOutermostConfigSet = true;
                 return AddDFAState(dfa, configs, contextCache);
             }
         }
@@ -2003,7 +2000,7 @@ namespace Antlr4.Runtime.Atn
         protected internal virtual DFAState AddDFAState(DFA dfa, ATNConfigSet configs, PredictionContextCache
              contextCache)
         {
-            if (!configs.IsReadOnly())
+            if (!configs.IsReadOnly)
             {
                 configs.OptimizeConfigs(this);
             }
@@ -2013,12 +2010,12 @@ namespace Antlr4.Runtime.Atn
             {
                 return existing;
             }
-            if (!configs.IsReadOnly())
+            if (!configs.IsReadOnly)
             {
-                if (configs.GetConflictingAlts() == null)
+                if (configs.ConflictingAlts == null)
                 {
-                    configs.SetConflictingAlts(IsConflicted(configs, contextCache));
-                    if (optimize_hidden_conflicted_configs && configs.GetConflictingAlts() != null)
+                    configs.ConflictingAlts = IsConflicted(configs, contextCache);
+                    if (optimize_hidden_conflicted_configs && configs.ConflictingAlts != null)
                     {
                         int size = configs.Count;
                         configs.StripHiddenConfigs();
@@ -2044,14 +2041,13 @@ namespace Antlr4.Runtime.Atn
             }
             else
             {
-                if (configs.GetConflictingAlts() != null)
+                if (configs.ConflictingAlts != null)
                 {
                     newState.isAcceptState = true;
-                    newState.prediction = ResolveToMinAlt(newState, newState.configs.GetConflictingAlts
-                        ());
+                    newState.prediction = ResolveToMinAlt(newState, newState.configs.ConflictingAlts);
                 }
             }
-            if (newState.isAcceptState && configs.HasSemanticContext())
+            if (newState.isAcceptState && configs.HasSemanticContext)
             {
                 PredicateDFAState(newState, configs, decisionState.NumberOfTransitions);
             }
@@ -2115,7 +2111,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>If context sensitive parsing, we know it's ambiguity not conflict</summary>
         public virtual void ReportAmbiguity(DFA dfa, DFAState D, int startIndex, int stopIndex
-            , BitArray ambigAlts, ATNConfigSet configs)
+            , BitSet ambigAlts, ATNConfigSet configs)
         {
             if (debug || retry_debug)
             {
