@@ -113,6 +113,7 @@
     <Compile Include="IIntStream.cs" />
     <Compile Include="InputMismatchException.cs" />
     <Compile Include="IParserErrorListener.cs" />
+    <Compile Include="IRecognizer.cs" />
     <Compile Include="IToken.cs" />
     <Compile Include="ITokenFactory.cs" />
     <Compile Include="ITokenSource.cs" />

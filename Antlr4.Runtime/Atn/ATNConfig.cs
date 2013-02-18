@@ -416,12 +416,12 @@ namespace Antlr4.Runtime.Atn
             return ToString(null, true, false);
         }
 
-        public virtual string ToString<_T0>(Recognizer<_T0> recog, bool showAlt)
+        public virtual string ToString(IRecognizer recog, bool showAlt)
         {
             return ToString(recog, showAlt, true);
         }
 
-        public virtual string ToString<_T0>(Recognizer<_T0> recog, bool showAlt, bool showContext
+        public virtual string ToString(IRecognizer recog, bool showAlt, bool showContext
             )
         {
             StringBuilder buf = new StringBuilder();

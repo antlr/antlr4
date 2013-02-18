@@ -439,14 +439,14 @@ namespace Antlr4.Runtime.Atn
         //public String toString() {
         //	return toString(null, Integer.MAX_VALUE);
         //}
-        public virtual string[] ToStrings<_T0>(Recognizer<_T0> recognizer, int currentState
+        public virtual string[] ToStrings(IRecognizer recognizer, int currentState
             )
         {
             return ToStrings(recognizer, Antlr4.Runtime.Atn.PredictionContext.EmptyFull, currentState
                 );
         }
 
-        public virtual string[] ToStrings<_T0>(Recognizer<_T0> recognizer, Antlr4.Runtime.Atn.PredictionContext
+        public virtual string[] ToStrings(IRecognizer recognizer, Antlr4.Runtime.Atn.PredictionContext
              stop, int currentState)
         {
             IList<string> result = new List<string>();

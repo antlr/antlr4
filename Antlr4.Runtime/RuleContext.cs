@@ -230,7 +230,7 @@ namespace Antlr4.Runtime
             return ToString((IList<string>)null, (Antlr4.Runtime.RuleContext)null);
         }
 
-        public string ToString<_T0>(Recognizer<_T0> recog)
+        public string ToString(IRecognizer recog)
         {
             return ToString(recog, ParserRuleContext.EmptyContext);
         }
@@ -241,7 +241,7 @@ namespace Antlr4.Runtime
         }
 
         // recog null unless ParserRuleContext, in which case we use subclass toString(...)
-        public virtual string ToString<_T0>(Recognizer<_T0> recog, Antlr4.Runtime.RuleContext
+        public virtual string ToString(IRecognizer recog, Antlr4.Runtime.RuleContext
              stop)
         {
             string[] ruleNames = recog != null ? recog.RuleNames : null;

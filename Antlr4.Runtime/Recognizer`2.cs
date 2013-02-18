@@ -35,7 +35,8 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-    public abstract class Recognizer<Symbol, ATNInterpreter> where ATNInterpreter:ATNSimulator
+    public abstract class Recognizer<Symbol, ATNInterpreter> : IRecognizer
+        where ATNInterpreter : ATNSimulator
     {
         public const int Eof = -1;
 

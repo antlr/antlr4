@@ -121,13 +121,13 @@ namespace Antlr4.Runtime.Atn
             return this == o;
         }
 
-        public override string[] ToStrings<_T0>(Recognizer<_T0> recognizer, int currentState
+        public override string[] ToStrings(IRecognizer recognizer, int currentState
             )
         {
             return new string[] { "[]" };
         }
 
-        public override string[] ToStrings<_T0>(Recognizer<_T0> recognizer, PredictionContext
+        public override string[] ToStrings(IRecognizer recognizer, PredictionContext
              stop, int currentState)
         {
             return new string[] { "[]" };
