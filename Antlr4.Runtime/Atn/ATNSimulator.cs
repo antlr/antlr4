@@ -793,8 +793,8 @@ nextState_break: ;
                 return true;
             }
             BitArray reachable = new BitArray(atn.states.Count);
-            IDeque<ATNState> worklist = new ArrayDeque<ATNState>();
-            worklist.AddItem(transition.followState);
+            Stack<ATNState> worklist = new Stack<ATNState>();
+            worklist.Push(transition.followState);
             while (worklist.Count > 0)
             {
                 ATNState state = worklist.Pop();
@@ -818,7 +818,7 @@ nextState_break: ;
                     {
                         return false;
                     }
-                    worklist.AddItem(t.target);
+                    worklist.Push(t.target);
                 }
             }
             return true;
