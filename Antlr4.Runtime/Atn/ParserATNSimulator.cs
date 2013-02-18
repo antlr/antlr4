@@ -509,7 +509,7 @@ namespace Antlr4.Runtime.Atn
                     }
                 }
                 s = target;
-                if (!s.isAcceptState && t != IIntStream.Eof)
+                if (!s.isAcceptState && t != IntStreamConstants.Eof)
                 {
                     input.Consume();
                     t = input.La(1);
@@ -789,7 +789,7 @@ namespace Antlr4.Runtime.Atn
                     return predictedAlt;
                 }
                 previous = nextState;
-                if (t != IIntStream.Eof)
+                if (t != IntStreamConstants.Eof)
                 {
                     input.Consume();
                     t = input.La(1);
@@ -873,7 +873,7 @@ namespace Antlr4.Runtime.Atn
                     if (c.GetState() is RuleStopState)
                     {
                         System.Diagnostics.Debug.Assert(c.GetContext().IsEmpty);
-                        if (useContext && !c.GetReachesIntoOuterContext() || t == IIntStream.Eof)
+                        if (useContext && !c.GetReachesIntoOuterContext() || t == IntStreamConstants.Eof)
                         {
                             if (skippedStopStates == null)
                             {
@@ -906,7 +906,7 @@ namespace Antlr4.Runtime.Atn
                 Closure(reachIntermediate, reach, collectPredicates, hasMoreContext, contextCache
                     );
                 stepIntoGlobal = reach.GetDipsIntoOuterContext();
-                if (t == IIntStream.Eof)
+                if (t == IntStreamConstants.Eof)
                 {
                     reach = RemoveAllConfigsNotInRuleStopState(reach, contextCache);
                 }
@@ -1825,7 +1825,7 @@ namespace Antlr4.Runtime.Atn
         [NotNull]
         public virtual string GetTokenName(int t)
         {
-            if (t == IToken.Eof)
+            if (t == TokenConstants.Eof)
             {
                 return "EOF";
             }

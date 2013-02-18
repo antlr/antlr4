@@ -4,6 +4,7 @@
 -nativeInterfaces
 -indentWithSpaces
 -paramCountFileNames
+-separateInterfaceConstants
 
 -methodMapping System.out.println System.Console.WriteLine
 

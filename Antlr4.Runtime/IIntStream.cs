@@ -56,24 +56,8 @@ namespace Antlr4.Runtime
     /// </li>
     /// </ul>
     /// </remarks>
-    public abstract class IIntStream
+    public interface IIntStream
     {
-        /// <summary>
-        /// The value returned by
-        /// <see cref="La(int)">LA()</see>
-        /// when the end of the stream is
-        /// reached.
-        /// </summary>
-        public const int Eof = -1;
-
-        /// <summary>
-        /// The value returned by
-        /// <see cref="SourceName()">SourceName()</see>
-        /// when the actual name of the
-        /// underlying source is not known.
-        /// </summary>
-        public const string UnknownSourceName = "<unknown>";
-
         /// <summary>Consumes the current symbol in the stream.</summary>
         /// <remarks>
         /// Consumes the current symbol in the stream. This method has the following
@@ -110,7 +94,7 @@ namespace Antlr4.Runtime
         /// <code>consume</code>
         /// ).
         /// </exception>
-        public abstract void Consume();
+        void Consume();
 
         /// <summary>
         /// Gets the value of the symbol at offset
@@ -174,7 +158,7 @@ namespace Antlr4.Runtime
         /// if the stream does not support
         /// retrieving the value of the specified symbol
         /// </exception>
-        public abstract int La(int i);
+        int La(int i);
 
         /// <summary>
         /// A mark provides a guarantee that
@@ -243,7 +227,7 @@ namespace Antlr4.Runtime
         /// <see cref="Release(int)">release()</see>
         /// when the marked range is no longer required.
         /// </returns>
-        public abstract int Mark();
+        int Mark();
 
         /// <summary>
         /// This method releases a marked range created by a call to
@@ -269,7 +253,7 @@ namespace Antlr4.Runtime
         /// .
         /// </param>
         /// <seealso cref="Mark()">Mark()</seealso>
-        public abstract void Release(int marker);
+        void Release(int marker);
 
         /// <summary>
         /// Return the index into the stream of the input symbol referred to by
@@ -281,7 +265,7 @@ namespace Antlr4.Runtime
         /// has occurred after this stream was
         /// constructed.
         /// </summary>
-        public abstract int Index
+        int Index
         {
             get;
         }
@@ -334,7 +318,7 @@ namespace Antlr4.Runtime
         /// if the stream does not support
         /// seeking to the specified index
         /// </exception>
-        public abstract void Seek(int index);
+        void Seek(int index);
 
         /// <summary>
         /// Returns the total number of symbols in the stream, including a single EOF
@@ -348,7 +332,7 @@ namespace Antlr4.Runtime
         /// if the size of the stream is
         /// unknown.
         /// </exception>
-        public abstract int Size
+        int Size
         {
             get;
         }
@@ -361,9 +345,28 @@ namespace Antlr4.Runtime
         /// <see cref="UnknownSourceName">UnknownSourceName</see>
         /// .
         /// </remarks>
-        public abstract string SourceName
+        string SourceName
         {
             get;
         }
+    }
+
+    public static class IntStreamConstants
+    {
+        /// <summary>
+        /// The value returned by
+        /// <see cref="La(int)">LA()</see>
+        /// when the end of the stream is
+        /// reached.
+        /// </summary>
+        public const int Eof = -1;
+
+        /// <summary>
+        /// The value returned by
+        /// <see cref="SourceName()">SourceName()</see>
+        /// when the actual name of the
+        /// underlying source is not known.
+        /// </summary>
+        public const string UnknownSourceName = "<unknown>";
     }
 }

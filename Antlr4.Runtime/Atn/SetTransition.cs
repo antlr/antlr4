@@ -27,7 +27,6 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Sharpen;
@@ -46,7 +45,7 @@ namespace Antlr4.Runtime.Atn
             // TODO (sam): should we really allow null here?
             if (set == null)
             {
-                set = IntervalSet.Of(IToken.InvalidType);
+                set = IntervalSet.Of(TokenConstants.InvalidType);
             }
             this.set = set;
         }

@@ -139,7 +139,7 @@ namespace Antlr4.Runtime
             string s = t.Text;
             if (s == null)
             {
-                if (t.Type == IToken.Eof)
+                if (t.Type == TokenConstants.Eof)
                 {
                     s = "<EOF>";
                 }

@@ -181,7 +181,7 @@ namespace Antlr4.Runtime
         {
             if (p >= n)
             {
-                System.Diagnostics.Debug.Assert(La(1) == IIntStream.Eof);
+                System.Diagnostics.Debug.Assert(La(1) == IntStreamConstants.Eof);
                 throw new InvalidOperationException("cannot consume EOF");
             }
             //System.out.println("prev p="+p+", c="+(char)data[p]);
@@ -205,14 +205,14 @@ namespace Antlr4.Runtime
                 // e.g., translate LA(-1) to use offset i=0; then data[p+0-1]
                 if ((p + i - 1) < 0)
                 {
-                    return IIntStream.Eof;
+                    return IntStreamConstants.Eof;
                 }
             }
             // invalid; no char before first char
             if ((p + i - 1) >= n)
             {
                 //System.out.println("char LA("+i+")=EOF; p="+p);
-                return IIntStream.Eof;
+                return IntStreamConstants.Eof;
             }
             //System.out.println("char LA("+i+")="+(char)data[p+i-1]+"; p="+p);
             //System.out.println("LA("+i+"); p="+p+" n="+n+" data.length="+data.length);

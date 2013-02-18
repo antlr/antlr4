@@ -45,7 +45,7 @@ namespace Antlr4.Runtime
 
         protected internal int charPositionInLine = -1;
 
-        protected internal int channel = DefaultChannel;
+        protected internal int channel = TokenConstants.DefaultChannel;
 
         protected internal Tuple<ITokenSource, ICharStream> source;
 
@@ -92,7 +92,7 @@ namespace Antlr4.Runtime
         public CommonToken(int type, string text)
         {
             this.type = type;
-            this.channel = DefaultChannel;
+            this.channel = TokenConstants.DefaultChannel;
             this.text = text;
         }
 

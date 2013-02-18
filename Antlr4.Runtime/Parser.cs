@@ -738,12 +738,12 @@ namespace Antlr4.Runtime
                 return true;
             }
             //        System.out.println("following "+s+"="+following);
-            if (!following.Contains(IToken.Epsilon))
+            if (!following.Contains(TokenConstants.Epsilon))
             {
                 return false;
             }
-            while (ctx != null && ctx.invokingState >= 0 && following.Contains(IToken.Epsilon
-                ))
+            while (ctx != null && ctx.invokingState >= 0 && following.Contains(TokenConstants
+                .Epsilon))
             {
                 ATNState invokingState = atn.states[ctx.invokingState];
                 RuleTransition rt = (RuleTransition)invokingState.Transition(0);
@@ -754,7 +754,7 @@ namespace Antlr4.Runtime
                 }
                 ctx = (ParserRuleContext)ctx.parent;
             }
-            if (following.Contains(IToken.Epsilon) && symbol == IToken.Eof)
+            if (following.Contains(TokenConstants.Epsilon) && symbol == TokenConstants.Eof)
             {
                 return true;
             }
@@ -776,26 +776,26 @@ namespace Antlr4.Runtime
             ATNState s = atn.states[State];
             IntervalSet following = atn.NextTokens(s);
             //        System.out.println("following "+s+"="+following);
-            if (!following.Contains(IToken.Epsilon))
+            if (!following.Contains(TokenConstants.Epsilon))
             {
                 return following;
             }
             IntervalSet expected = new IntervalSet();
             expected.AddAll(following);
-            expected.Remove(IToken.Epsilon);
-            while (ctx != null && ctx.invokingState >= 0 && following.Contains(IToken.Epsilon
-                ))
+            expected.Remove(TokenConstants.Epsilon);
+            while (ctx != null && ctx.invokingState >= 0 && following.Contains(TokenConstants
+                .Epsilon))
             {
                 ATNState invokingState = atn.states[ctx.invokingState];
                 RuleTransition rt = (RuleTransition)invokingState.Transition(0);
                 following = atn.NextTokens(rt.followState);
                 expected.AddAll(following);
-                expected.Remove(IToken.Epsilon);
+                expected.Remove(TokenConstants.Epsilon);
                 ctx = (ParserRuleContext)ctx.parent;
             }
-            if (following.Contains(IToken.Epsilon))
+            if (following.Contains(TokenConstants.Epsilon))
             {
-                expected.Add(IToken.Eof);
+                expected.Add(TokenConstants.Eof);
             }
             return expected;
         }

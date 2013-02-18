@@ -171,7 +171,7 @@ namespace Antlr4.Runtime
 
         public virtual void Consume()
         {
-            if (La(1) == Eof)
+            if (La(1) == IntStreamConstants.Eof)
             {
                 throw new InvalidOperationException("cannot consume EOF");
             }
@@ -230,7 +230,7 @@ namespace Antlr4.Runtime
                     ((IWritableToken)t).TokenIndex = tokens.Count;
                 }
                 tokens.AddItem(t);
-                if (t.Type == IToken.Eof)
+                if (t.Type == TokenConstants.Eof)
                 {
                     fetchedEOF = true;
                     return i + 1;
@@ -266,7 +266,7 @@ namespace Antlr4.Runtime
             for (int i = start; i <= stop; i++)
             {
                 IToken t = tokens[i];
-                if (t.Type == IToken.Eof)
+                if (t.Type == TokenConstants.Eof)
                 {
                     break;
                 }
@@ -442,7 +442,7 @@ namespace Antlr4.Runtime
             }
             while (token.Channel != channel)
             {
-                if (token.Type == IToken.Eof)
+                if (token.Type == TokenConstants.Eof)
                 {
                     return -1;
                 }
@@ -630,7 +630,7 @@ namespace Antlr4.Runtime
             for (int i = start; i <= stop; i++)
             {
                 IToken t = tokens[i];
-                if (t.Type == IToken.Eof)
+                if (t.Type == TokenConstants.Eof)
                 {
                     break;
                 }
