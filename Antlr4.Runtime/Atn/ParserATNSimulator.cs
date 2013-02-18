@@ -993,7 +993,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>configs</code>
         /// which are in a rule stop state
         /// </returns>
-        [NotNull]
+        [return: NotNull]
         protected internal virtual ATNConfigSet RemoveAllConfigsNotInRuleStopState(ATNConfigSet
              configs, PredictionContextCache contextCache)
         {
@@ -1013,7 +1013,7 @@ namespace Antlr4.Runtime.Atn
             return result;
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual SimulatorState ComputeStartState(DFA dfa, ParserRuleContext globalContext
             , bool useContext)
         {
@@ -1124,7 +1124,7 @@ namespace Antlr4.Runtime.Atn
             return new SimulatorState(globalContext, s0, useContext, remainingGlobalContext);
         }
 
-        [Nullable]
+        [return: Nullable]
         public virtual ATNState GetReachableTarget(ATNConfig source, Transition trans, int
              ttype)
         {
@@ -1470,7 +1470,7 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual string GetRuleName(int index)
         {
             if (parser != null && index >= 0)
@@ -1480,7 +1480,7 @@ namespace Antlr4.Runtime.Atn
             return "<rule " + index + ">";
         }
 
-        [Nullable]
+        [return: Nullable]
         public virtual ATNConfig GetEpsilonTarget(ATNConfig config, Transition t, bool collectPredicates
             , bool inContext, PredictionContextCache contextCache)
         {
@@ -1521,14 +1521,14 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual ATNConfig ActionTransition(ATNConfig config, Antlr4.Runtime.Atn.ActionTransition
              t)
         {
             return config.Transform(t.target);
         }
 
-        [Nullable]
+        [return: Nullable]
         public virtual ATNConfig PrecedenceTransition(ATNConfig config, PrecedencePredicateTransition
              pt, bool collectPredicates, bool inContext)
         {
@@ -1546,7 +1546,7 @@ namespace Antlr4.Runtime.Atn
             return c;
         }
 
-        [Nullable]
+        [return: Nullable]
         public virtual ATNConfig PredTransition(ATNConfig config, PredicateTransition pt, 
             bool collectPredicates, bool inContext)
         {
@@ -1564,7 +1564,7 @@ namespace Antlr4.Runtime.Atn
             return c;
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual ATNConfig RuleTransition(ATNConfig config, Antlr4.Runtime.Atn.RuleTransition
              t, PredictionContextCache contextCache)
         {
@@ -1822,7 +1822,7 @@ namespace Antlr4.Runtime.Atn
             return D.prediction;
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual string GetTokenName(int t)
         {
             if (t == TokenConstants.Eof)
@@ -1880,7 +1880,7 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual NoViableAltException NoViableAlt(ITokenStream input, ParserRuleContext
              outerContext, ATNConfigSet configs, int startIndex)
         {
@@ -1925,7 +1925,7 @@ namespace Antlr4.Runtime.Atn
             return false;
         }
 
-        [NotNull]
+        [return: NotNull]
         protected internal virtual DFAState AddDFAEdge(DFA dfa, DFAState fromState, int t
             , List<int> contextTransitions, ATNConfigSet toConfigs, PredictionContextCache
              contextCache)
@@ -1974,7 +1974,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>See comment on LexerInterpreter.addDFAState.</summary>
         /// <remarks>See comment on LexerInterpreter.addDFAState.</remarks>
-        [NotNull]
+        [return: NotNull]
         protected internal virtual DFAState AddDFAContextState(DFA dfa, ATNConfigSet configs
             , int returnContext, PredictionContextCache contextCache)
         {
@@ -1999,7 +1999,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>See comment on LexerInterpreter.addDFAState.</summary>
         /// <remarks>See comment on LexerInterpreter.addDFAState.</remarks>
-        [NotNull]
+        [return: NotNull]
         protected internal virtual DFAState AddDFAState(DFA dfa, ATNConfigSet configs, PredictionContextCache
              contextCache)
         {
@@ -2063,7 +2063,7 @@ namespace Antlr4.Runtime.Atn
             return added;
         }
 
-        [NotNull]
+        [return: NotNull]
         protected internal virtual DFAState CreateDFAState(ATNConfigSet configs)
         {
             return new DFAState(configs, -1, atn.maxTokenType);

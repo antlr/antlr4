@@ -73,7 +73,7 @@ namespace Antlr4.Runtime
         /// if the stream does not support
         /// getting the text of the specified interval
         /// </exception>
-        [NotNull]
+        [return: NotNull]
         string GetText(Interval interval);
     }
 

@@ -348,7 +348,7 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        [Nullable]
+        [return: Nullable]
         public virtual ATNState GetReachableTarget(Transition trans, int t)
         {
             if (trans.Matches(t, Lexer.MinCharValue, Lexer.MaxCharValue))
@@ -358,7 +358,7 @@ namespace Antlr4.Runtime.Atn
             return null;
         }
 
-        [NotNull]
+        [return: NotNull]
         protected internal virtual ATNConfigSet ComputeStartState(ICharStream input, ATNState
              p)
         {
@@ -453,7 +453,7 @@ namespace Antlr4.Runtime.Atn
         }
 
         // side-effect: can alter configs.hasSemanticContext
-        [Nullable]
+        [return: Nullable]
         public virtual ATNConfig GetEpsilonTarget(ICharStream input, ATNConfig config, Transition
              t, ATNConfigSet configs, bool speculative)
         {
@@ -610,7 +610,7 @@ namespace Antlr4.Runtime.Atn
             settings.dfaState = dfaState;
         }
 
-        [NotNull]
+        [return: NotNull]
         protected internal virtual DFAState AddDFAEdge(DFAState from, int t, ATNConfigSet
              q)
         {
@@ -646,7 +646,7 @@ namespace Antlr4.Runtime.Atn
         /// configuration containing an ATN rule stop state. Later, when
         /// traversing the DFA, we will know which rule to accept.
         /// </remarks>
-        [NotNull]
+        [return: NotNull]
         protected internal virtual DFAState AddDFAState(ATNConfigSet configs)
         {
             System.Diagnostics.Debug.Assert(!configs.HasSemanticContext());
@@ -677,7 +677,7 @@ namespace Antlr4.Runtime.Atn
             return atn.modeToDFA[mode].AddState(newState);
         }
 
-        [NotNull]
+        [return: NotNull]
         public DFA GetDFA(int mode)
         {
             return atn.modeToDFA[mode];
@@ -685,7 +685,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>Get the text matched so far for the current token.</summary>
         /// <remarks>Get the text matched so far for the current token.</remarks>
-        [NotNull]
+        [return: NotNull]
         public virtual string GetText(ICharStream input)
         {
             // index is first lookahead char, don't include.
@@ -727,7 +727,7 @@ namespace Antlr4.Runtime.Atn
             input.Consume();
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual string GetTokenName(int t)
         {
             if (t == -1)

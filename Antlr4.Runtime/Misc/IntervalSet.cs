@@ -96,7 +96,7 @@ namespace Antlr4.Runtime.Misc
 
         /// <summary>Create a set with a single element, el.</summary>
         /// <remarks>Create a set with a single element, el.</remarks>
-        [NotNull]
+        [return: NotNull]
         public static Antlr4.Runtime.Misc.IntervalSet Of(int a)
         {
             Antlr4.Runtime.Misc.IntervalSet s = new Antlr4.Runtime.Misc.IntervalSet();

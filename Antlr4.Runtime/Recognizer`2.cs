@@ -178,7 +178,7 @@ namespace Antlr4.Runtime
             _listeners = new IAntlrErrorListener<Symbol>[0];
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual IList<IAntlrErrorListener<Symbol>> GetErrorListeners()
         {
             return new List<IAntlrErrorListener<Symbol>>(_listeners);

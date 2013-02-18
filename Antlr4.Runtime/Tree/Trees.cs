@@ -154,7 +154,7 @@ namespace Antlr4.Runtime.Tree
         /// Return a list of all ancestors of this node.  The first node of
         /// list is the root and the last is the parent of this node.
         /// </remarks>
-        [NotNull]
+        [return: NotNull]
         public static IList<ITree> GetAncestors(ITree t)
         {
             if (t.Parent == null)

@@ -88,7 +88,7 @@ namespace Antlr4.Runtime
             return startToken;
         }
 
-        [Nullable]
+        [return: Nullable]
         public virtual ATNConfigSet GetDeadEndConfigs()
         {
             return deadEndConfigs;

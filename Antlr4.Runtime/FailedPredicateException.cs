@@ -91,13 +91,13 @@ namespace Antlr4.Runtime
             return predicateIndex;
         }
 
-        [Nullable]
+        [return: Nullable]
         public virtual string GetPredicate()
         {
             return predicate;
         }
 
-        [NotNull]
+        [return: NotNull]
         private static string FormatMessage(string predicate, string message)
         {
             if (message != null)

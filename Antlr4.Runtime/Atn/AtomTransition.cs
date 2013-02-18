@@ -66,7 +66,7 @@ namespace Antlr4.Runtime.Atn
             return label == symbol;
         }
 
-        [NotNull]
+        [return: NotNull]
         public override string ToString()
         {
             return label.ToString();

@@ -605,14 +605,14 @@ namespace Antlr4.Runtime
 
         /// <summary>Get the text of all tokens in this buffer.</summary>
         /// <remarks>Get the text of all tokens in this buffer.</remarks>
-        [NotNull]
+        [return: NotNull]
         public virtual string GetText()
         {
             Fill();
             return GetText(Interval.Of(0, Size - 1));
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual string GetText(Interval interval)
         {
             int start = interval.a;
@@ -639,13 +639,13 @@ namespace Antlr4.Runtime
             return buf.ToString();
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual string GetText(RuleContext ctx)
         {
             return GetText(ctx.SourceInterval);
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual string GetText(IToken start, IToken stop)
         {
             if (start != null && stop != null)

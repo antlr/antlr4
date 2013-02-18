@@ -827,7 +827,7 @@ namespace Antlr4.Runtime.Atn
         /// alt and not pred
         /// </pre>
         /// </remarks>
-        [NotNull]
+        [return: NotNull]
         public static ICollection<BitArray> GetConflictingAltSubsets(ATNConfigSet configs
             )
         {
@@ -861,7 +861,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="ATNConfig.GetAlt()">getAlt()</see>
         /// </pre>
         /// </remarks>
-        [NotNull]
+        [return: NotNull]
         public static IDictionary<ATNState, BitArray> GetStateToAltMap(ATNConfigSet configs
             )
         {

@@ -87,7 +87,7 @@ namespace Antlr4.Runtime.Atn
             return new SemanticContext.Predicate(ruleIndex, predIndex, isCtxDependent);
         }
 
-        [NotNull]
+        [return: NotNull]
         public override string ToString()
         {
             return "pred_" + ruleIndex + ":" + predIndex;

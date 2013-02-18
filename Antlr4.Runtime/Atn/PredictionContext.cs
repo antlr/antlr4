@@ -144,7 +144,7 @@ namespace Antlr4.Runtime.Atn
 
         public abstract int FindReturnState(int returnState);
 
-        [NotNull]
+        [return: NotNull]
         public abstract Antlr4.Runtime.Atn.PredictionContext GetParent(int index);
 
         protected internal abstract Antlr4.Runtime.Atn.PredictionContext AddEmptyContext(

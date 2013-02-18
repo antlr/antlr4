@@ -60,7 +60,7 @@ namespace Antlr4.Runtime.Atn
             return false;
         }
 
-        [NotNull]
+        [return: NotNull]
         public override string ToString()
         {
             return "epsilon";

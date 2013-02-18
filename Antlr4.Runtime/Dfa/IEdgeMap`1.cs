@@ -43,25 +43,25 @@ namespace Antlr4.Runtime.Dfa
 
         bool ContainsKey(int key);
 
-        [Nullable]
+        [return: Nullable]
         T Get(int key);
 
-        [NotNull]
+        [return: NotNull]
         IEdgeMap<T> Put(int key, T value);
 
-        [NotNull]
+        [return: NotNull]
         IEdgeMap<T> Remove(int key);
 
-        [NotNull]
+        [return: NotNull]
         IEdgeMap<T> PutAll<_T0>(IEdgeMap<_T0> m) where _T0:T;
 
-        [NotNull]
+        [return: NotNull]
         IEdgeMap<T> Clear();
 
-        [NotNull]
+        [return: NotNull]
         IDictionary<int, T> ToMap();
 
-        [NotNull]
+        [return: NotNull]
         ISet<KeyValuePair<int, T>> EntrySet();
     }
 }

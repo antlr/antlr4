@@ -187,19 +187,19 @@ namespace Antlr4.Runtime
             }
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual string GetText()
         {
             return string.Empty;
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual string GetText(RuleContext ctx)
         {
             return GetText(ctx.SourceInterval);
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual string GetText(IToken start, IToken stop)
         {
             if (start != null && stop != null)
@@ -404,7 +404,7 @@ namespace Antlr4.Runtime
             }
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual string GetText(Interval interval)
         {
             int bufferStartIndex = GetBufferStartIndex();

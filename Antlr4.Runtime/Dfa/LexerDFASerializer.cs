@@ -39,7 +39,7 @@ namespace Antlr4.Runtime.Dfa
         {
         }
 
-        [NotNull]
+        [return: NotNull]
         protected internal override string GetEdgeLabel(int i)
         {
             return "'" + (char)i + "'";

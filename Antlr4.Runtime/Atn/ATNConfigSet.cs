@@ -159,7 +159,7 @@ namespace Antlr4.Runtime.Atn
         /// Get the set of all alternatives represented by configurations in this
         /// set.
         /// </remarks>
-        [NotNull]
+        [return: NotNull]
         public virtual BitArray GetRepresentedAlternatives()
         {
             if (conflictingAlts != null)

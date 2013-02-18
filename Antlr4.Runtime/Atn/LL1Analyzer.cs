@@ -61,7 +61,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>s</code>
         /// at depth k. Only for DecisionStates.
         /// </summary>
-        [Nullable]
+        [return: Nullable]
         public virtual IntervalSet[] GetDecisionLookahead(ATNState s)
         {
             //		System.out.println("LOOK("+s.stateNumber+")");
@@ -112,7 +112,7 @@ namespace Antlr4.Runtime.Atn
         /// is in set
         /// if we can reach end of rule.
         /// </summary>
-        [NotNull]
+        [return: NotNull]
         public virtual IntervalSet Look(ATNState s, PredictionContext ctx)
         {
             Args.NotNull("ctx", ctx);

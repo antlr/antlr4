@@ -829,7 +829,7 @@ nextState_break: ;
             return c == 65535 ? -1 : c;
         }
 
-        [NotNull]
+        [return: NotNull]
         public static Transition EdgeFactory(ATN atn, TransitionType type, int src, int trg
             , int arg1, int arg2, int arg3, IList<IntervalSet> sets)
         {

@@ -125,7 +125,7 @@ namespace Antlr4.Runtime.Atn
         }
 
         /// <summary>Gets the ATN state associated with this configuration</summary>
-        [NotNull]
+        [return: NotNull]
         public ATNState GetState()
         {
             return state;
@@ -154,7 +154,7 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        [NotNull]
+        [return: NotNull]
         public PredictionContext GetContext()
         {
             return context;
@@ -203,7 +203,7 @@ namespace Antlr4.Runtime.Atn
             return -1;
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual SemanticContext GetSemanticContext()
         {
             return SemanticContext.None;
