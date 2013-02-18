@@ -104,24 +104,24 @@ namespace Antlr4.Runtime.Misc
             return buf.ToString();
         }
 
-        public static void RemoveAll<T, _T1>(IList<T> list, Predicate<_T1> predicate)
+        public static void RemoveAll<T>(IList<T> list, Predicate<T> predicate)
         {
             int j = 0;
             for (int i = 0; i < list.Count; i++)
             {
                 T item = list[i];
-                if (!predicate.Eval(item))
+                if (!predicate(item))
                 {
                     if (j != i)
                     {
-                        list.Set(j, item);
+                        list[j] = item;
                     }
                     j++;
                 }
             }
-            if (j < list.Count)
+            while (j < list.Count)
             {
-                list.SubList(j, list.Count).Clear();
+                list.RemoveAt(list.Count - 1);
             }
         }
     }
