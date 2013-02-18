@@ -145,7 +145,7 @@ namespace Antlr4.Runtime.Dfa
         {
             if (IsEmpty())
             {
-                return Sharpen.Collections.EmptyMap();
+                return Sharpen.Collections.EmptyMap<int, T>();
             }
             return Sharpen.Collections.SingletonMap(key, value);
         }

@@ -223,7 +223,7 @@ namespace Antlr4.Runtime.Dfa
             {
                 if (edges == null)
                 {
-                    return Sharpen.Collections.EmptyMap();
+                    return Sharpen.Collections.EmptyMap<int, DFAState>();
                 }
                 return edges.ToMap();
             }
@@ -264,7 +264,7 @@ namespace Antlr4.Runtime.Dfa
             {
                 if (contextEdges == null)
                 {
-                    return Sharpen.Collections.EmptyMap();
+                    return Sharpen.Collections.EmptyMap<int, DFAState>();
                 }
                 IDictionary<int, DFAState> map = contextEdges.ToMap();
                 if (map.ContainsKey(-1))

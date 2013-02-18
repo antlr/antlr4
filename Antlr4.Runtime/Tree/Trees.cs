@@ -159,7 +159,7 @@ namespace Antlr4.Runtime.Tree
         {
             if (t.Parent == null)
             {
-                return new ITree[0];
+                return Collections.EmptyList<ITree>();
             }
             IList<ITree> ancestors = new List<ITree>();
             t = t.Parent;

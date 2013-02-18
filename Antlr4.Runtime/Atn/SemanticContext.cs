@@ -412,7 +412,7 @@ namespace Antlr4.Runtime.Atn
             }
             if (result == null)
             {
-                return new PrecedencePredicate[0];
+                return Collections.EmptyList<PrecedencePredicate>();
             }
             return result;
         }
