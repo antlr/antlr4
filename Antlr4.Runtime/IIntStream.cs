@@ -281,7 +281,7 @@ namespace Antlr4.Runtime
         /// has occurred after this stream was
         /// constructed.
         /// </summary>
-        internal abstract int Index
+        public abstract int Index
         {
             get;
         }
@@ -348,7 +348,7 @@ namespace Antlr4.Runtime
         /// if the size of the stream is
         /// unknown.
         /// </exception>
-        internal abstract int Size
+        public abstract int Size
         {
             get;
         }

@@ -83,14 +83,14 @@ namespace Antlr4.Runtime
 
         /// <summary>Get the text of the token.</summary>
         /// <remarks>Get the text of the token.</remarks>
-        internal abstract string Text
+        public abstract string Text
         {
             get;
         }
 
         /// <summary>Get the token type of the token.</summary>
         /// <remarks>Get the token type of the token.</remarks>
-        internal abstract int Type
+        public abstract int Type
         {
             get;
         }
@@ -99,7 +99,7 @@ namespace Antlr4.Runtime
         /// The line number on which the 1st character of this token was matched,
         /// line=1..n
         /// </summary>
-        internal abstract int Line
+        public abstract int Line
         {
             get;
         }
@@ -108,7 +108,7 @@ namespace Antlr4.Runtime
         /// The index of the first character of this token relative to the
         /// beginning of the line at which it occurs, 0..n-1
         /// </summary>
-        internal abstract int Column
+        public abstract int Column
         {
             get;
         }
@@ -119,7 +119,7 @@ namespace Antlr4.Runtime
         /// on a different channel, but the parser only "tunes" to a single channel.
         /// The parser ignores everything not on DEFAULT_CHANNEL.
         /// </remarks>
-        internal abstract int Channel
+        public abstract int Channel
         {
             get;
         }
@@ -132,7 +132,7 @@ namespace Antlr4.Runtime
         /// Return -1 to indicate that this token was conjured up since
         /// it doesn't have a valid index.
         /// </remarks>
-        internal abstract int TokenIndex
+        public abstract int TokenIndex
         {
             get;
         }
@@ -145,7 +145,7 @@ namespace Antlr4.Runtime
         /// The starting character index of the token
         /// This method is optional; return -1 if not implemented.
         /// </remarks>
-        internal abstract int StartIndex
+        public abstract int StartIndex
         {
             get;
         }
@@ -155,7 +155,7 @@ namespace Antlr4.Runtime
         /// The last character index of the token.
         /// This method is optional; return -1 if not implemented.
         /// </remarks>
-        internal abstract int StopIndex
+        public abstract int StopIndex
         {
             get;
         }
@@ -165,7 +165,7 @@ namespace Antlr4.Runtime
         /// <see cref="ITokenSource">ITokenSource</see>
         /// which created this token.
         /// </summary>
-        internal abstract ITokenSource TokenSource
+        public abstract ITokenSource TokenSource
         {
             get;
         }
@@ -175,7 +175,7 @@ namespace Antlr4.Runtime
         /// <see cref="ICharStream">ICharStream</see>
         /// from which this token was derived.
         /// </summary>
-        internal abstract ICharStream InputStream
+        public abstract ICharStream InputStream
         {
             get;
         }
