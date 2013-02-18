@@ -27,6 +27,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime.Misc;
@@ -103,7 +104,7 @@ namespace Antlr4.Runtime.Misc
             return buf.ToString();
         }
 
-        public static void RemoveAll<T, _T1>(IList<T> list, IPredicate<_T1> predicate)
+        public static void RemoveAll<T, _T1>(IList<T> list, Predicate<_T1> predicate)
         {
             int j = 0;
             for (int i = 0; i < list.Count; i++)
@@ -121,24 +122,6 @@ namespace Antlr4.Runtime.Misc
             if (j < list.Count)
             {
                 list.SubList(j, list.Count).Clear();
-            }
-        }
-
-        public static void RemoveAll<T, _T1>(IEnumerable<T> iterable, IPredicate<_T1> predicate
-            )
-        {
-            if (iterable is IList<object>)
-            {
-                RemoveAll((IList<T>)iterable, predicate);
-                return;
-            }
-            for (IEnumerator<T> iterator = iterable.GetEnumerator(); iterator.HasNext(); )
-            {
-                T item = iterator.Next();
-                if (predicate.Eval(item))
-                {
-                    iterator.Remove();
-                }
             }
         }
     }
