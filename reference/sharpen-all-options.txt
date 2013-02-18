@@ -188,6 +188,7 @@
 -typeMapping java.util.concurrent.CancellationException System.OperationCanceledException
 -typeMapping java.lang.IndexOutOfBoundsException ArgumentOutOfRangeException
 -typeMapping java.util.EmptyStackException InvalidOperationException
+-typeMapping java.util.NoSuchElementException InvalidOperationException
 -typeMapping java.io.InputStream System.IO.Stream
 -typeMapping java.io.InputStreamReader System.IO.StreamReader
 

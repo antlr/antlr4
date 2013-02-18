@@ -681,7 +681,7 @@ namespace Antlr4.Runtime.Atn
             {
                 if (!this.HasNext())
                 {
-                    throw new NoSuchElementException();
+                    throw new InvalidOperationException();
                 }
                 this.index++;
                 this.removed = false;

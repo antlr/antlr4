@@ -237,7 +237,7 @@ namespace Antlr4.Runtime.Dfa
             {
                 if (this.current >= this._enclosing.Size())
                 {
-                    throw new NoSuchElementException();
+                    throw new InvalidOperationException();
                 }
                 this.current++;
                 return new _KeyValuePair_226(this);

@@ -670,7 +670,7 @@ namespace Antlr4.Runtime.Misc
             {
                 if (!this.HasNext())
                 {
-                    throw new NoSuchElementException();
+                    throw new InvalidOperationException();
                 }
                 this.removed = false;
                 return this.data[this.nextIndex++];
