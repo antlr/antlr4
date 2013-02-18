@@ -225,7 +225,7 @@ namespace Antlr4.Runtime
             }
         }
 
-        public virtual T Accept<T, _T1>(IParseTreeVisitor<_T1> visitor) where _T1:T
+        public virtual T Accept<T>(IParseTreeVisitor<T> visitor)
         {
             return visitor.VisitChildren(this);
         }
