@@ -164,14 +164,14 @@ namespace Antlr4.Runtime.Dfa
             {
                 return Sharpen.Collections.EmptyMap<int, T>();
             }
-            IDictionary<int, T> result = new LinkedHashMap<int, T>();
+            IDictionary<int, T> result = new SortedDictionary<int, T>();
             for (int i = 0; i < arrayData.Length; i++)
             {
                 if (arrayData[i] == null)
                 {
                     continue;
                 }
-                result.Put(i + minIndex, arrayData[i]);
+                result[i + minIndex] = arrayData[i];
             }
             return result;
         }
