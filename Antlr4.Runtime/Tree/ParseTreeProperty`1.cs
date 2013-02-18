@@ -27,6 +27,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Antlr4.Runtime.Tree;
 using Sharpen;
@@ -50,22 +51,30 @@ namespace Antlr4.Runtime.Tree
     /// </remarks>
     public class ParseTreeProperty<V>
     {
-        protected internal IDictionary<IParseTree, V> annotations = new IdentityHashMap<IParseTree
+        protected internal ConcurrentDictionary<IParseTree, V> annotations = new ConcurrentDictionary<IParseTree
             , V>();
 
         public virtual V Get(IParseTree node)
         {
-            return annotations.Get(node);
+            V value;
+            if (!annotations.TryGetValue(node, out value))
+                return default(V);
+
+            return value;
         }
 
         public virtual void Put(IParseTree node, V value)
         {
-            annotations.Put(node, value);
+            annotations[node] = value;
         }
 
         public virtual V RemoveFrom(IParseTree node)
         {
-            return Sharpen.Collections.Remove(annotations, node);
+            V value;
+            if (!annotations.TryRemove(node, out value))
+                return default(V);
+
+            return value;
         }
     }
 }
