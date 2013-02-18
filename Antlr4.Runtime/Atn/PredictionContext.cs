@@ -449,7 +449,7 @@ namespace Antlr4.Runtime.Atn
         public virtual string[] ToStrings(IRecognizer recognizer, Antlr4.Runtime.Atn.PredictionContext
              stop, int currentState)
         {
-            IList<string> result = new List<string>();
+            List<string> result = new List<string>();
             for (int perm = 0; ; perm++)
             {
                 int offset = 0;
@@ -516,7 +516,7 @@ namespace Antlr4.Runtime.Atn
 outer_continue: ;
             }
 outer_break: ;
-            return Sharpen.Collections.ToArray(result, new string[result.Count]);
+            return result.ToArray();
         }
 
         public sealed class IdentityHashMap : Dictionary<PredictionContext, PredictionContext
