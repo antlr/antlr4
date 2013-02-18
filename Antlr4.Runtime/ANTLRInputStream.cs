@@ -282,7 +282,7 @@ namespace Antlr4.Runtime
             }
         }
 
-        public override string GetText(Interval interval)
+        public virtual string GetText(Interval interval)
         {
             int start = interval.a;
             int stop = interval.b;

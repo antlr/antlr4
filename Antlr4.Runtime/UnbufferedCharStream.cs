@@ -415,7 +415,7 @@ namespace Antlr4.Runtime
             }
         }
 
-        public override string GetText(Interval interval)
+        public virtual string GetText(Interval interval)
         {
             if (interval.a < 0 || interval.b < interval.a - 1)
             {

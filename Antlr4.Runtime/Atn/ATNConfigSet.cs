@@ -672,12 +672,12 @@ namespace Antlr4.Runtime.Atn
 
             internal bool removed = false;
 
-            public override bool HasNext()
+            public bool HasNext()
             {
                 return this.index + 1 < this._enclosing.configs.Count;
             }
 
-            public override ATNConfig Next()
+            public ATNConfig Next()
             {
                 if (!this.HasNext())
                 {
@@ -688,7 +688,7 @@ namespace Antlr4.Runtime.Atn
                 return this._enclosing.configs[this.index];
             }
 
-            public override void Remove()
+            public void Remove()
             {
                 if (this.removed || this.index < 0 || this.index >= this._enclosing.configs.Count)
                 {
