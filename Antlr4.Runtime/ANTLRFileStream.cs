@@ -27,8 +27,9 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System.IO;
 using Sharpen;
+using Encoding = System.Text.Encoding;
+using File = System.IO.File;
 
 namespace Antlr4.Runtime
 {
@@ -65,27 +66,11 @@ namespace Antlr4.Runtime
             {
                 return;
             }
-            FilePath f = new FilePath(fileName);
-            int size = (int)f.Length();
-            StreamReader isr;
-            FileInputStream fis = new FileInputStream(fileName);
-            if (encoding != null)
-            {
-                isr = new StreamReader(fis, encoding);
-            }
-            else
-            {
-                isr = new StreamReader(fis);
-            }
-            try
-            {
-                data = new char[size];
-                base.n = isr.Read(data);
-            }
-            finally
-            {
-                isr.Close();
-            }
+
+            Encoding fileEncoding = Encoding.GetEncoding(encoding);
+            string text = File.ReadAllText(fileName, fileEncoding);
+            data = text.ToCharArray();
+            n = data.Length;
         }
 
         public override string SourceName
