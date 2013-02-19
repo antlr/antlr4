@@ -753,10 +753,11 @@ namespace Antlr4.Runtime.Atn
         public static bool AllSubsetsEqual(ICollection<BitSet> altsets)
         {
             IEnumerator<BitSet> it = altsets.GetEnumerator();
-            BitSet first = it.Next();
-            while (it.HasNext())
+            it.MoveNext();
+            BitSet first = it.Current;
+            while (it.MoveNext())
             {
-                BitSet next = it.Next();
+                BitSet next = it.Current;
                 if (!next.Equals(first))
                 {
                     return false;
