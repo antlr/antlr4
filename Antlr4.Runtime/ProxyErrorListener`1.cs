@@ -49,9 +49,8 @@ namespace Antlr4.Runtime
             return delegates;
         }
 
-        public virtual void SyntaxError<T>(Recognizer<T, object> recognizer, T offendingSymbol
-            , int line, int charPositionInLine, string msg, RecognitionException e) where 
-            T:Symbol
+        public virtual void SyntaxError(IRecognizer recognizer, Symbol offendingSymbol
+            , int line, int charPositionInLine, string msg, RecognitionException e)
         {
             foreach (IAntlrErrorListener<Symbol> listener in delegates)
             {

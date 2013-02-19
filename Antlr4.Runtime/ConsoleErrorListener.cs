@@ -37,7 +37,7 @@ namespace Antlr4.Runtime
     {
         public static readonly ConsoleErrorListener<Symbol> Instance = new ConsoleErrorListener<Symbol>();
 
-        public virtual void SyntaxError<T>(Recognizer<T, object> recognizer, T offendingSymbol
+        public virtual void SyntaxError(IRecognizer recognizer, Symbol offendingSymbol
             , int line, int charPositionInLine, string msg, RecognitionException e)
         {
             System.Console.Error.WriteLine("line " + line + ":" + charPositionInLine + " " + 

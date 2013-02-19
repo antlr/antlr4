@@ -33,7 +33,7 @@ using Sharpen;
 namespace Antlr4.Runtime
 {
     /// <summary>How to emit recognition errors</summary>
-    public interface IAntlrErrorListener<in Symbol>
+    public interface IAntlrErrorListener<in TSymbol>
     {
         /// <summary>Upon syntax error, notify any interested parties.</summary>
         /// <remarks>
@@ -72,7 +72,7 @@ namespace Antlr4.Runtime
         /// the parser was able to recover in line without exiting the
         /// surrounding rule.
         /// </param>
-        void SyntaxError<T>(Recognizer<T, object> recognizer, T offendingSymbol, int line
-            , int charPositionInLine, string msg, RecognitionException e) where T:Symbol;
+        void SyntaxError(IRecognizer recognizer, TSymbol offendingSymbol, int line
+            , int charPositionInLine, string msg, RecognitionException e);
     }
 }

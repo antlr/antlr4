@@ -58,7 +58,7 @@ namespace Antlr4.Runtime.Dfa
         {
         }
 
-        public DFASerializer(DFA dfa, Recognizer<object, object> parser) : this(dfa, parser
+        public DFASerializer(DFA dfa, IRecognizer parser) : this(dfa, parser
              != null ? parser.TokenNames : null, parser != null ? parser.RuleNames : null
             , parser != null ? parser.Atn : null)
         {
