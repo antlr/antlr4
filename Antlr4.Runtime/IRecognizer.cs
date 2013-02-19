@@ -23,5 +23,15 @@
         {
             get;
         }
+
+        int State
+        {
+            get;
+        }
+
+        IIntStream InputStream
+        {
+            get;
+        }
     }
 }
