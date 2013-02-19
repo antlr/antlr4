@@ -381,8 +381,8 @@ namespace Antlr4.Runtime.Atn
             }
             if (!changed)
             {
-                existing = contextCache.PutIfAbsent(context, context);
-                visited.Put(context, existing != null ? existing : context);
+                existing = contextCache.GetOrAdd(context, context);
+                visited.Put(context, existing);
                 return context;
             }
             // We know parents.length>0 because context.isEmpty() is checked at the beginning of the method.
@@ -397,9 +397,9 @@ namespace Antlr4.Runtime.Atn
                 updated = new ArrayPredictionContext(parents, arrayPredictionContext.returnStates
                     , context.cachedHashCode);
             }
-            existing = contextCache.PutIfAbsent(updated, updated);
-            visited.Put(updated, existing != null ? existing : updated);
-            visited.Put(context, existing != null ? existing : updated);
+            existing = contextCache.GetOrAdd(updated, updated);
+            visited.Put(updated, existing);
+            visited.Put(context, existing);
             return updated;
         }
 
