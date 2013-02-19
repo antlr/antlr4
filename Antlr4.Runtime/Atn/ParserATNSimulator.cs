@@ -273,7 +273,7 @@ namespace Antlr4.Runtime.Atn
             this.parser = parser;
         }
 
-        [NotNull]
+        [return: NotNull]
         public PredictionMode GetPredictionMode()
         {
             return predictionMode;
