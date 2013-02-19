@@ -50,7 +50,7 @@ namespace Antlr4.Runtime.Atn
                 (this, @readonly);
             if (!@readonly && this.IsReadOnly)
             {
-                Sharpen.Collections.AddAll(copy, this);
+                copy.AddAll(this);
             }
             return copy;
         }
