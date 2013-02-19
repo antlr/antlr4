@@ -131,8 +131,8 @@ namespace Antlr4.Runtime.Atn
             {
                 if (!set.IsReadOnly)
                 {
-                    this.mergedConfigs = (Dictionary<long, ATNConfig>)set.mergedConfigs.Clone();
-                    this.unmerged = (List<ATNConfig>)set.unmerged.Clone();
+                    this.mergedConfigs = new Dictionary<long, ATNConfig>(set.mergedConfigs);
+                    this.unmerged = new List<ATNConfig>(set.unmerged);
                 }
                 else
                 {
@@ -140,7 +140,7 @@ namespace Antlr4.Runtime.Atn
                     this.unmerged = new List<ATNConfig>();
                 }
             }
-            this.configs = (List<ATNConfig>)set.configs.Clone();
+            this.configs = new List<ATNConfig>(set.configs);
             this.dipsIntoOuterContext = set.dipsIntoOuterContext;
             this.hasSemanticContext = set.hasSemanticContext;
             this.outermostConfigSet = set.outermostConfigSet;
@@ -260,7 +260,7 @@ namespace Antlr4.Runtime.Atn
                 @readonly);
             if (!@readonly && this.IsReadOnly)
             {
-                Sharpen.Collections.AddAll(copy, this.configs);
+                copy.AddAll(configs);
             }
             return copy;
         }
@@ -313,7 +313,7 @@ namespace Antlr4.Runtime.Atn
 
         public virtual object[] ToArray()
         {
-            return Sharpen.Collections.ToArray(configs);
+            return configs.ToArray();
         }
 
         public virtual bool AddItem(ATNConfig e)
@@ -524,7 +524,7 @@ namespace Antlr4.Runtime.Atn
         public virtual string ToString(bool showContext)
         {
             StringBuilder buf = new StringBuilder();
-            IList<ATNConfig> sortedConfigs = new List<ATNConfig>(configs);
+            List<ATNConfig> sortedConfigs = new List<ATNConfig>(configs);
             sortedConfigs.Sort(new _IComparer_479());
             buf.Append("[");
             for (int i = 0; i < sortedConfigs.Count; i++)
@@ -648,7 +648,7 @@ namespace Antlr4.Runtime.Atn
             long key = GetKey(config);
             if (mergedConfigs.Get(key) == config)
             {
-                Sharpen.Collections.Remove(mergedConfigs, key);
+                mergedConfigs.Remove(key);
             }
             else
             {
