@@ -29,6 +29,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Sharpen;
@@ -51,34 +52,24 @@ namespace Antlr4.Runtime.Atn
     /// </remarks>
     public abstract class Transition
     {
-        public static readonly IList<string> serializationNames = Sharpen.Collections.UnmodifiableList
+        public static readonly IReadOnlyList<string> serializationNames = new ReadOnlyCollection<string>
             (Arrays.AsList("INVALID", "EPSILON", "RANGE", "RULE", "PREDICATE", "ATOM", "ACTION"
             , "SET", "NOT_SET", "WILDCARD", "PRECEDENCE"));
 
-        private sealed class _Dictionary_74 : Dictionary<Type, Antlr4.Runtime.Atn.TransitionType
-            >
-        {
-            public _Dictionary_74()
-            {
-                {
-                    this.Put(typeof(EpsilonTransition), Antlr4.Runtime.Atn.TransitionType.Epsilon);
-                    this.Put(typeof(RangeTransition), Antlr4.Runtime.Atn.TransitionType.Range);
-                    this.Put(typeof(RuleTransition), Antlr4.Runtime.Atn.TransitionType.Rule);
-                    this.Put(typeof(PredicateTransition), Antlr4.Runtime.Atn.TransitionType.Predicate
-                        );
-                    this.Put(typeof(AtomTransition), Antlr4.Runtime.Atn.TransitionType.Atom);
-                    this.Put(typeof(ActionTransition), Antlr4.Runtime.Atn.TransitionType.Action);
-                    this.Put(typeof(SetTransition), Antlr4.Runtime.Atn.TransitionType.Set);
-                    this.Put(typeof(NotSetTransition), Antlr4.Runtime.Atn.TransitionType.NotSet);
-                    this.Put(typeof(WildcardTransition), Antlr4.Runtime.Atn.TransitionType.Wildcard);
-                    this.Put(typeof(PrecedencePredicateTransition), Antlr4.Runtime.Atn.TransitionType
-                        .Precedence);
-                }
-            }
-        }
-
-        public static readonly IDictionary<Type, Antlr4.Runtime.Atn.TransitionType> serializationTypes
-             = Sharpen.Collections.UnmodifiableMap(new _Dictionary_74());
+        public static readonly IReadOnlyDictionary<Type, TransitionType> serializationTypes =
+             new Dictionary<Type, TransitionType>()
+             {
+                { typeof(EpsilonTransition), TransitionType.Epsilon },
+                { typeof(RangeTransition), TransitionType.Range },
+                { typeof(RuleTransition), TransitionType.Rule },
+                { typeof(PredicateTransition), TransitionType.Predicate },
+                { typeof(AtomTransition), TransitionType.Atom },
+                { typeof(ActionTransition), TransitionType.Action },
+                { typeof(SetTransition), TransitionType.Set },
+                { typeof(NotSetTransition), TransitionType.NotSet },
+                { typeof(WildcardTransition), TransitionType.Wildcard },
+                { typeof(PrecedencePredicateTransition), TransitionType.Precedence },
+             };
 
         /// <summary>The target of this transition.</summary>
         /// <remarks>The target of this transition.</remarks>
@@ -94,7 +85,7 @@ namespace Antlr4.Runtime.Atn
             this.target = target;
         }
 
-        public abstract Antlr4.Runtime.Atn.TransitionType TransitionType
+        public abstract TransitionType TransitionType
         {
             get;
         }
