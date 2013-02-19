@@ -46,7 +46,7 @@ namespace Antlr4.Runtime
         public virtual void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int
              stopIndex, BitSet ambigAlts, ATNConfigSet configs)
         {
-            foreach (IAntlrErrorListener<IToken> listener in GetDelegates())
+            foreach (IAntlrErrorListener<IToken> listener in Delegates)
             {
                 if (!(listener is IParserErrorListener))
                 {
@@ -61,7 +61,7 @@ namespace Antlr4.Runtime
         public virtual void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex
             , int stopIndex, SimulatorState initialState)
         {
-            foreach (IAntlrErrorListener<IToken> listener in GetDelegates())
+            foreach (IAntlrErrorListener<IToken> listener in Delegates)
             {
                 if (!(listener is IParserErrorListener))
                 {
@@ -76,7 +76,7 @@ namespace Antlr4.Runtime
         public virtual void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex
             , int stopIndex, SimulatorState acceptState)
         {
-            foreach (IAntlrErrorListener<IToken> listener in GetDelegates())
+            foreach (IAntlrErrorListener<IToken> listener in Delegates)
             {
                 if (!(listener is IParserErrorListener))
                 {

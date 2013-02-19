@@ -209,7 +209,7 @@ namespace Antlr4.Runtime.Dfa
                 stateStr += "*";
                 foreach (ATNConfig config in s.configs)
                 {
-                    if (config.GetReachesIntoOuterContext())
+                    if (config.ReachesIntoOuterContext)
                     {
                         stateStr += "*";
                         break;
