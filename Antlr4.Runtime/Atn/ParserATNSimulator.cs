@@ -876,7 +876,7 @@ namespace Antlr4.Runtime.Atn
                             {
                                 skippedStopStates = new List<ATNConfig>();
                             }
-                            skippedStopStates.AddItem(c);
+                            skippedStopStates.Add(c);
                         }
                         continue;
                     }
@@ -1193,7 +1193,7 @@ namespace Antlr4.Runtime.Atn
         public virtual DFAState.PredPrediction[] GetPredicatePredictions(BitSet ambigAlts
             , SemanticContext[] altToPred)
         {
-            IList<DFAState.PredPrediction> pairs = new List<DFAState.PredPrediction>();
+            List<DFAState.PredPrediction> pairs = new List<DFAState.PredPrediction>();
             bool containsPredicate = false;
             for (int i = 1; i < altToPred.Length; i++)
             {
@@ -1207,14 +1207,14 @@ namespace Antlr4.Runtime.Atn
                 // if no (null, i), then no default prediction.
                 if (ambigAlts != null && ambigAlts.Get(i) && pred == SemanticContext.None)
                 {
-                    pairs.AddItem(new DFAState.PredPrediction(null, i));
+                    pairs.Add(new DFAState.PredPrediction(null, i));
                 }
                 else
                 {
                     if (pred != SemanticContext.None)
                     {
                         containsPredicate = true;
-                        pairs.AddItem(new DFAState.PredPrediction(pred, i));
+                        pairs.Add(new DFAState.PredPrediction(pred, i));
                     }
                 }
             }
@@ -1223,8 +1223,7 @@ namespace Antlr4.Runtime.Atn
                 pairs = null;
             }
             //		System.out.println(Arrays.toString(altToPred)+"->"+pairs);
-            return Sharpen.Collections.ToArray(pairs, new DFAState.PredPrediction[pairs.Count
-                ]);
+            return pairs.ToArray();
         }
 
         /// <summary>
@@ -1289,7 +1288,7 @@ namespace Antlr4.Runtime.Atn
                 ATNConfigSet intermediate = new ATNConfigSet();
                 foreach (ATNConfig config in currentConfigs)
                 {
-                    if (optimize_closure_busy && !closureBusy.AddItem(config))
+                    if (optimize_closure_busy && !closureBusy.Add(config))
                     {
                         continue;
                     }
@@ -1304,7 +1303,7 @@ namespace Antlr4.Runtime.Atn
              intermediate, ISet<ATNConfig> closureBusy, bool collectPredicates, bool hasMoreContexts
             , PredictionContextCache contextCache, int depth)
         {
-            if (!optimize_closure_busy && !closureBusy.AddItem(config))
+            if (!optimize_closure_busy && !closureBusy.Add(config))
             {
                 return;
             }
@@ -1328,7 +1327,7 @@ namespace Antlr4.Runtime.Atn
                         // Make sure we track that we are now out of context.
                         c.SetOuterContextDepth(config.GetOuterContextDepth());
                         System.Diagnostics.Debug.Assert(depth > int.MinValue);
-                        if (optimize_closure_busy && c.GetContext().IsEmpty && !closureBusy.AddItem(c))
+                        if (optimize_closure_busy && c.GetContext().IsEmpty && !closureBusy.Add(c))
                         {
                             continue;
                         }
@@ -1412,7 +1411,7 @@ namespace Antlr4.Runtime.Atn
                                 break;
                             }
                         }
-                        if (checkClosure && !closureBusy.AddItem(c))
+                        if (checkClosure && !closureBusy.Add(c))
                         {
                             continue;
                         }
@@ -1618,7 +1617,7 @@ namespace Antlr4.Runtime.Atn
             {
                 return null;
             }
-            IList<ATNConfig> configs = new List<ATNConfig>(configset);
+            List<ATNConfig> configs = new List<ATNConfig>(configset);
             configs.Sort(StateAltSortComparator);
             bool exact = !configset.DipsIntoOuterContext && predictionMode == PredictionMode.
                 LlExactAmbigDetection;
