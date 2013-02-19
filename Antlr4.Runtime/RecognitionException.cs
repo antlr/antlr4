@@ -47,7 +47,7 @@ namespace Antlr4.Runtime
         private const long serialVersionUID = -3861826954750022374L;
 
         /// <summary>Who threw the exception?</summary>
-        private Recognizer<object, object> recognizer;
+        private Antlr4.Runtime.Recognizer<object, object> recognizer;
 
         private RuleContext ctx;
 
@@ -72,8 +72,8 @@ namespace Antlr4.Runtime
             this.input = input;
         }
 
-        public RecognitionException(Recognizer<IToken, object> recognizer, IIntStream input
-            , ParserRuleContext ctx)
+        public RecognitionException(Antlr4.Runtime.Recognizer<IToken, object> recognizer, 
+            IIntStream input, ParserRuleContext ctx)
         {
             this.recognizer = recognizer;
             this.input = input;
@@ -84,8 +84,8 @@ namespace Antlr4.Runtime
             }
         }
 
-        public RecognitionException(string message, Recognizer<IToken, object> recognizer
-            , IIntStream input, ParserRuleContext ctx) : base(message)
+        public RecognitionException(string message, Antlr4.Runtime.Recognizer<IToken, object
+            > recognizer, IIntStream input, ParserRuleContext ctx) : base(message)
         {
             this.recognizer = recognizer;
             this.input = input;
@@ -107,14 +107,17 @@ namespace Antlr4.Runtime
         /// This will help us tie into the grammar and syntax diagrams in
         /// ANTLRWorks v2.
         /// </remarks>
-        public virtual int GetOffendingState()
+        protected internal int OffendingState
         {
-            return offendingState;
-        }
-
-        protected internal void SetOffendingState(int offendingState)
-        {
-            this.offendingState = offendingState;
+            get
+            {
+                return offendingState;
+            }
+            set
+            {
+                int offendingState = value;
+                this.offendingState = offendingState;
+            }
         }
 
         public virtual IntervalSet GetExpectedTokens()
@@ -127,29 +130,41 @@ namespace Antlr4.Runtime
             return null;
         }
 
-        public virtual RuleContext GetCtx()
+        public virtual RuleContext Context
         {
-            return ctx;
+            get
+            {
+                return ctx;
+            }
         }
 
-        public virtual IIntStream GetInputStream()
+        public virtual IIntStream InputStream
         {
-            return input;
+            get
+            {
+                return input;
+            }
         }
 
-        public virtual IToken GetOffendingToken()
+        protected internal IToken OffendingToken
         {
-            return offendingToken;
+            get
+            {
+                return offendingToken;
+            }
+            set
+            {
+                IToken offendingToken = value;
+                this.offendingToken = offendingToken;
+            }
         }
 
-        protected internal void SetOffendingToken(IToken offendingToken)
+        public virtual Antlr4.Runtime.Recognizer<object, object> Recognizer
         {
-            this.offendingToken = offendingToken;
-        }
-
-        public virtual Recognizer<object, object> GetRecognizer()
-        {
-            return recognizer;
+            get
+            {
+                return recognizer;
+            }
         }
     }
 }

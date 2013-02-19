@@ -48,7 +48,7 @@ namespace Antlr4.Runtime
         public InputMismatchException(Parser recognizer) : base(recognizer, ((ITokenStream
             )recognizer.InputStream), recognizer._ctx)
         {
-            this.SetOffendingToken(recognizer.CurrentToken);
+            this.OffendingToken = recognizer.CurrentToken;
         }
     }
 }

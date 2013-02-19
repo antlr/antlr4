@@ -78,7 +78,7 @@ namespace Antlr4.Runtime
                 this.predicateIndex = 0;
             }
             this.predicate = predicate;
-            this.SetOffendingToken(recognizer.CurrentToken);
+            this.OffendingToken = recognizer.CurrentToken;
         }
 
         public virtual int GetRuleIndex()

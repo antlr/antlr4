@@ -65,18 +65,20 @@ namespace Antlr4.Runtime
             return deadEndConfigs;
         }
 
-        public override IIntStream GetInputStream()
+        public override IIntStream InputStream
         {
-            return (ICharStream)base.GetInputStream();
+            get
+            {
+                return (ICharStream)base.InputStream;
+            }
         }
 
         public override string ToString()
         {
             string symbol = string.Empty;
-            if (startIndex >= 0 && startIndex < ((ICharStream)GetInputStream()).Size)
+            if (startIndex >= 0 && startIndex < ((ICharStream)InputStream).Size)
             {
-                symbol = ((ICharStream)GetInputStream()).GetText(Interval.Of(startIndex, startIndex
-                    ));
+                symbol = ((ICharStream)InputStream).GetText(Interval.Of(startIndex, startIndex));
                 symbol = Utils.EscapeWhitespace(symbol, false);
             }
             return string.Format("%s('%s')", typeof(Antlr4.Runtime.LexerNoViableAltException)

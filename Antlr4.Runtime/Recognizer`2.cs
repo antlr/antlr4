@@ -111,8 +111,8 @@ namespace Antlr4.Runtime
         /// <summary>What is the error header, normally line/character position information?</summary>
         public virtual string GetErrorHeader(RecognitionException e)
         {
-            int line = e.GetOffendingToken().Line;
-            int charPositionInLine = e.GetOffendingToken().Column;
+            int line = e.OffendingToken.Line;
+            int charPositionInLine = e.OffendingToken.Column;
             return "line " + line + ":" + charPositionInLine;
         }
 
