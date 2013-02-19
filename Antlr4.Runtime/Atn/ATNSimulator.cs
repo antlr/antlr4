@@ -103,7 +103,7 @@ namespace Antlr4.Runtime.Atn
             int nstates = ToInt(data[p++]);
             for (int i_1 = 1; i_1 <= nstates; i_1++)
             {
-                StateType stype = StateType.Values()[ToInt(data[p++])];
+                StateType stype = (StateType)ToInt(data[p++]);
                 // ignore bad type of states
                 if (stype == StateType.InvalidType)
                 {
@@ -228,7 +228,7 @@ namespace Antlr4.Runtime.Atn
             {
                 int src = ToInt(data[p]);
                 int trg = ToInt(data[p + 1]);
-                TransitionType ttype = TransitionType.Values()[ToInt(data[p + 2])];
+                TransitionType ttype = (TransitionType)ToInt(data[p + 2]);
                 int arg1 = ToInt(data[p + 3]);
                 int arg2 = ToInt(data[p + 4]);
                 int arg3 = ToInt(data[p + 5]);
