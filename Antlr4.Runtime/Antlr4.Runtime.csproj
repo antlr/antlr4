@@ -147,6 +147,7 @@
     <Compile Include="RuleContext.cs" />
     <Compile Include="Sharpen\Arrays.cs" />
     <Compile Include="Sharpen\AtomicReference`1.cs" />
+    <Compile Include="Sharpen\BitSet.cs" />
     <Compile Include="Sharpen\Collections.cs" />
     <Compile Include="Sharpen\DictionaryExtensions.cs" />
     <Compile Include="Sharpen\ListExtensions.cs" />
