@@ -65,7 +65,7 @@ namespace Antlr4.Runtime.Atn
 
         [NotNull]
         public readonly IDictionary<string, TokensStartState> modeNameToStartState = new 
-            LinkedHashMap<string, TokensStartState>();
+            Dictionary<string, TokensStartState>();
 
         public int grammarType;
 

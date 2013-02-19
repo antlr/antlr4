@@ -29,6 +29,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Sharpen;
@@ -94,7 +95,7 @@ namespace Antlr4.Runtime.Atn
     {
         public const int InitialNumTransitions = 4;
 
-        public static readonly IList<string> serializationNames = Sharpen.Collections.UnmodifiableList
+        public static readonly IReadOnlyList<string> serializationNames = new ReadOnlyCollection<string>
             (Arrays.AsList("INVALID", "BASIC", "RULE_START", "BLOCK_START", "PLUS_BLOCK_START"
             , "STAR_BLOCK_START", "TOKEN_START", "RULE_STOP", "BLOCK_END", "STAR_LOOP_BACK"
             , "STAR_LOOP_ENTRY", "PLUS_LOOP_BACK", "LOOP_END"));
@@ -112,10 +113,10 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>Track the transitions emanating from this ATN state.</summary>
         /// <remarks>Track the transitions emanating from this ATN state.</remarks>
-        protected internal readonly IList<Antlr4.Runtime.Atn.Transition> transitions = new 
+        protected internal readonly List<Antlr4.Runtime.Atn.Transition> transitions = new 
             List<Antlr4.Runtime.Atn.Transition>(InitialNumTransitions);
 
-        protected internal IList<Antlr4.Runtime.Atn.Transition> optimizedTransitions;
+        protected internal List<Antlr4.Runtime.Atn.Transition> optimizedTransitions;
 
         /// <summary>Used to cache lookahead during parsing, not used during construction</summary>
         public IntervalSet nextTokenWithinRule;
@@ -179,10 +180,9 @@ namespace Antlr4.Runtime.Atn
             return stateNumber.ToString();
         }
 
-        public virtual Antlr4.Runtime.Atn.Transition[] GetTransitions()
+        public virtual Transition[] GetTransitions()
         {
-            return Sharpen.Collections.ToArray(transitions, new Antlr4.Runtime.Atn.Transition
-                [transitions.Count]);
+            return transitions.ToArray();
         }
 
         public virtual int NumberOfTransitions
@@ -203,12 +203,12 @@ namespace Antlr4.Runtime.Atn
             {
                 if (epsilonOnlyTransitions != e.IsEpsilon)
                 {
-                    System.Console.Error.Format("ATN state %d has both epsilon and non-epsilon transitions.\n"
+                    System.Console.Error.WriteLine("ATN state {0} has both epsilon and non-epsilon transitions."
                         , stateNumber);
                     epsilonOnlyTransitions = false;
                 }
             }
-            transitions.AddItem(e);
+            transitions.Add(e);
         }
 
         public virtual Antlr4.Runtime.Atn.Transition Transition(int i)
@@ -221,9 +221,9 @@ namespace Antlr4.Runtime.Atn
             transitions.Set(i, e);
         }
 
-        public virtual Antlr4.Runtime.Atn.Transition RemoveTransition(int index)
+        public virtual void RemoveTransition(int index)
         {
-            return transitions.RemoveAt(index);
+            transitions.RemoveAt(index);
         }
 
         public abstract Antlr4.Runtime.Atn.StateType StateType
@@ -271,7 +271,7 @@ namespace Antlr4.Runtime.Atn
             {
                 optimizedTransitions = new List<Antlr4.Runtime.Atn.Transition>();
             }
-            optimizedTransitions.AddItem(e);
+            optimizedTransitions.Add(e);
         }
 
         public virtual void SetOptimizedTransition(int i, Antlr4.Runtime.Atn.Transition e
