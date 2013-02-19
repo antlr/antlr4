@@ -29,6 +29,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
@@ -204,11 +205,10 @@ namespace Antlr4.Runtime.Atn
 
             public AND(SemanticContext a, SemanticContext b)
             {
-                ISet<SemanticContext> operands = new HashSet<SemanticContext>();
+                HashSet<SemanticContext> operands = new HashSet<SemanticContext>();
                 if (a is SemanticContext.AND)
                 {
-                    Sharpen.Collections.AddAll(operands, Arrays.AsList(((SemanticContext.AND)a).opnds
-                        ));
+                    operands.UnionWith(((AND)a).opnds);
                 }
                 else
                 {
@@ -216,8 +216,7 @@ namespace Antlr4.Runtime.Atn
                 }
                 if (b is SemanticContext.AND)
                 {
-                    Sharpen.Collections.AddAll(operands, Arrays.AsList(((SemanticContext.AND)b).opnds
-                        ));
+                    operands.UnionWith(((AND)b).opnds);
                 }
                 else
                 {
@@ -228,12 +227,10 @@ namespace Antlr4.Runtime.Atn
                 if (precedencePredicates.Count > 0)
                 {
                     // interested in the transition with the lowest precedence
-                    SemanticContext.PrecedencePredicate reduced = Sharpen.Collections.Min(precedencePredicates
-                        );
+                    SemanticContext.PrecedencePredicate reduced = precedencePredicates.Min();
                     operands.Add(reduced);
                 }
-                opnds = Sharpen.Collections.ToArray(operands, new SemanticContext[operands.Count]
-                    );
+                opnds = operands.ToArray();
             }
 
             public override bool Equals(object obj)
@@ -283,8 +280,7 @@ namespace Antlr4.Runtime.Atn
                 ISet<SemanticContext> operands = new HashSet<SemanticContext>();
                 if (a is SemanticContext.OR)
                 {
-                    Sharpen.Collections.AddAll(operands, Arrays.AsList(((SemanticContext.OR)a).opnds)
-                        );
+                    operands.UnionWith(((OR)a).opnds);
                 }
                 else
                 {
@@ -292,8 +288,7 @@ namespace Antlr4.Runtime.Atn
                 }
                 if (b is SemanticContext.OR)
                 {
-                    Sharpen.Collections.AddAll(operands, Arrays.AsList(((SemanticContext.OR)b).opnds)
-                        );
+                    operands.UnionWith(((OR)b).opnds);
                 }
                 else
                 {
@@ -304,12 +299,10 @@ namespace Antlr4.Runtime.Atn
                 if (precedencePredicates.Count > 0)
                 {
                     // interested in the transition with the highest precedence
-                    SemanticContext.PrecedencePredicate reduced = Sharpen.Collections.Max(precedencePredicates
-                        );
+                    SemanticContext.PrecedencePredicate reduced = precedencePredicates.Max();
                     operands.Add(reduced);
                 }
-                this.opnds = Sharpen.Collections.ToArray(operands, new SemanticContext[operands.Count
-                    ]);
+                this.opnds = operands.ToArray();
             }
 
             public override bool Equals(object obj)
