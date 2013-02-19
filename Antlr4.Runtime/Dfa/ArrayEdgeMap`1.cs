@@ -47,28 +47,37 @@ namespace Antlr4.Runtime.Dfa
             arrayData = (T[])new object[maxIndex - minIndex + 1];
         }
 
-        public override int Size()
+        public override int Count
         {
-            return size;
+            get
+            {
+                return size;
+            }
         }
 
-        public override bool IsEmpty()
+        public override bool IsEmpty
         {
-            return size == 0;
+            get
+            {
+                return size == 0;
+            }
         }
 
         public override bool ContainsKey(int key)
         {
-            return Get(key) != null;
+            return this[key] != null;
         }
 
-        public override T Get(int key)
+        public override T this[int key]
         {
-            if (key < minIndex || key > maxIndex)
+            get
             {
-                return null;
+                if (key < minIndex || key > maxIndex)
+                {
+                    return null;
+                }
+                return arrayData[key - minIndex];
             }
-            return arrayData[key - minIndex];
         }
 
         public override AbstractEdgeMap<T> Put(int key, T value)
@@ -99,7 +108,7 @@ namespace Antlr4.Runtime.Dfa
 
         public override AbstractEdgeMap<T> PutAll<_T0>(IEdgeMap<_T0> m)
         {
-            if (m.IsEmpty())
+            if (m.IsEmpty)
             {
                 return this;
             }
@@ -125,7 +134,7 @@ namespace Antlr4.Runtime.Dfa
                 if (m is SingletonEdgeMap<object>)
                 {
                     SingletonEdgeMap<T> other = (SingletonEdgeMap<T>)m;
-                    System.Diagnostics.Debug.Assert(!other.IsEmpty());
+                    System.Diagnostics.Debug.Assert(!other.IsEmpty);
                     return ((Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)Put(other.GetKey(), other.GetValue())
                         );
                 }
@@ -160,7 +169,7 @@ namespace Antlr4.Runtime.Dfa
 
         public override IDictionary<int, T> ToMap()
         {
-            if (IsEmpty())
+            if (IsEmpty)
             {
                 return Sharpen.Collections.EmptyMap<int, T>();
             }
@@ -174,100 +183,6 @@ namespace Antlr4.Runtime.Dfa
                 result[i + minIndex] = arrayData[i];
             }
             return result;
-        }
-
-        public override ISet<KeyValuePair<int, T>> EntrySet()
-        {
-            return new ArrayEdgeMap.EntrySet(this);
-        }
-
-        private class EntrySet : AbstractEdgeMap.AbstractEntrySet
-        {
-            public override IEnumerator<KeyValuePair<int, T>> GetEnumerator()
-            {
-                return new ArrayEdgeMap.EntryIterator(this);
-            }
-
-            internal EntrySet(ArrayEdgeMap<T> _enclosing) : base(_enclosing)
-            {
-                this._enclosing = _enclosing;
-            }
-
-            private readonly ArrayEdgeMap<T> _enclosing;
-        }
-
-        private class EntryIterator : IEnumerator<KeyValuePair<int, T>>
-        {
-            private int current;
-
-            private int currentIndex;
-
-            public virtual bool HasNext()
-            {
-                return this.current < this._enclosing.Size();
-            }
-
-            public virtual KeyValuePair<int, T> Next()
-            {
-                if (this.current >= this._enclosing.Size())
-                {
-                    throw new InvalidOperationException();
-                }
-                while (this._enclosing.arrayData[this.currentIndex] == null)
-                {
-                    this.currentIndex++;
-                }
-                this.current++;
-                this.currentIndex++;
-                return new _KeyValuePair_193(this);
-            }
-
-            private sealed class _KeyValuePair_193 : KeyValuePair<int, T>
-            {
-                public _KeyValuePair_193()
-                {
-                    this.key = this._enclosing._enclosing.minIndex + this._enclosing.currentIndex - 1;
-                    this.value = this._enclosing._enclosing.arrayData[this._enclosing.currentIndex - 
-                        1];
-                }
-
-                private readonly int key;
-
-                private readonly T value;
-
-                public int Key
-                {
-                    get
-                    {
-                        return this.key;
-                    }
-                }
-
-                public T Value
-                {
-                    get
-                    {
-                        return this.value;
-                    }
-                }
-
-                public T SetValue(T value)
-                {
-                    throw new NotSupportedException("Not supported yet.");
-                }
-            }
-
-            public virtual void Remove()
-            {
-                throw new NotSupportedException("Not supported yet.");
-            }
-
-            internal EntryIterator(ArrayEdgeMap<T> _enclosing)
-            {
-                this._enclosing = _enclosing;
-            }
-
-            private readonly ArrayEdgeMap<T> _enclosing;
         }
     }
 }

@@ -27,7 +27,6 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
 using System.Collections.Generic;
 using Antlr4.Runtime.Dfa;
 using Sharpen;
@@ -73,14 +72,20 @@ namespace Antlr4.Runtime.Dfa
             return value;
         }
 
-        public override int Size()
+        public override int Count
         {
-            return value != null ? 1 : 0;
+            get
+            {
+                return value != null ? 1 : 0;
+            }
         }
 
-        public override bool IsEmpty()
+        public override bool IsEmpty
         {
-            return value == null;
+            get
+            {
+                return value == null;
+            }
         }
 
         public override bool ContainsKey(int key)
@@ -88,13 +93,16 @@ namespace Antlr4.Runtime.Dfa
             return key == this.key && value != null;
         }
 
-        public override T Get(int key)
+        public override T this[int key]
         {
-            if (key == this.key)
+            get
             {
-                return value;
+                if (key == this.key)
+                {
+                    return value;
+                }
+                return null;
             }
-            return null;
         }
 
         public override AbstractEdgeMap<T> Put(int key, T value)
@@ -143,97 +151,11 @@ namespace Antlr4.Runtime.Dfa
 
         public override IDictionary<int, T> ToMap()
         {
-            if (IsEmpty())
+            if (IsEmpty)
             {
                 return Sharpen.Collections.EmptyMap<int, T>();
             }
             return Sharpen.Collections.SingletonMap(key, value);
-        }
-
-        public override ISet<KeyValuePair<int, T>> EntrySet()
-        {
-            return new SingletonEdgeMap.EntrySet(this);
-        }
-
-        private class EntrySet : AbstractEdgeMap.AbstractEntrySet
-        {
-            public override IEnumerator<KeyValuePair<int, T>> GetEnumerator()
-            {
-                return new SingletonEdgeMap.EntryIterator(this);
-            }
-
-            internal EntrySet(SingletonEdgeMap<T> _enclosing) : base(_enclosing)
-            {
-                this._enclosing = _enclosing;
-            }
-
-            private readonly SingletonEdgeMap<T> _enclosing;
-        }
-
-        private class EntryIterator : IEnumerator<KeyValuePair<int, T>>
-        {
-            private int current;
-
-            public virtual bool HasNext()
-            {
-                return this.current < this._enclosing.Size();
-            }
-
-            public virtual KeyValuePair<int, T> Next()
-            {
-                if (this.current >= this._enclosing.Size())
-                {
-                    throw new InvalidOperationException();
-                }
-                this.current++;
-                return new _KeyValuePair_166(this);
-            }
-
-            private sealed class _KeyValuePair_166 : KeyValuePair<int, T>
-            {
-                public _KeyValuePair_166()
-                {
-                    this.key = this._enclosing._enclosing._enclosing.key;
-                    this.value = this._enclosing._enclosing._enclosing.value;
-                }
-
-                private readonly int key;
-
-                private readonly T value;
-
-                public int Key
-                {
-                    get
-                    {
-                        return this.key;
-                    }
-                }
-
-                public T Value
-                {
-                    get
-                    {
-                        return this.value;
-                    }
-                }
-
-                public T SetValue(T value)
-                {
-                    throw new NotSupportedException("Not supported yet.");
-                }
-            }
-
-            public virtual void Remove()
-            {
-                throw new NotSupportedException("Not supported yet.");
-            }
-
-            internal EntryIterator(SingletonEdgeMap<T> _enclosing)
-            {
-                this._enclosing = _enclosing;
-            }
-
-            private readonly SingletonEdgeMap<T> _enclosing;
         }
     }
 }

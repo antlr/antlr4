@@ -27,7 +27,6 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System.Collections;
 using System.Collections.Generic;
 using Antlr4.Runtime.Dfa;
 using Sharpen;
@@ -67,51 +66,19 @@ namespace Antlr4.Runtime.Dfa
 
         public abstract Antlr4.Runtime.Dfa.AbstractEdgeMap<T> Remove(int key);
 
-        protected internal abstract class AbstractEntrySet : AbstractSet<KeyValuePair<int
-            , T>>
-        {
-            public override bool Contains(object o)
-            {
-                if (!(o is DictionaryEntry))
-                {
-                    return false;
-                }
-                KeyValuePair<object, object> entry = (KeyValuePair<object, object>)o;
-                if (entry.Key is int)
-                {
-                    int key = (int)entry.Key;
-                    object value = entry.Value;
-                    T existing = this._enclosing._enclosing.Get(key);
-                    return value == existing || (existing != null && existing.Equals(value));
-                }
-                return false;
-            }
-
-            public override int Count
-            {
-                get
-                {
-                    return this._enclosing._enclosing.Size();
-                }
-            }
-
-            internal AbstractEntrySet(AbstractEdgeMap<T> _enclosing)
-            {
-                this._enclosing = _enclosing;
-            }
-
-            private readonly AbstractEdgeMap<T> _enclosing;
-        }
-
         public abstract bool ContainsKey(int arg1);
-
-        public abstract ISet<KeyValuePair<int, T>> EntrySet();
 
         public abstract T Get(int arg1);
 
-        public abstract bool IsEmpty();
+        public abstract bool IsEmpty
+        {
+            get;
+        }
 
-        public abstract int Size();
+        public abstract int Count
+        {
+            get;
+        }
 
         public abstract IDictionary<int, T> ToMap();
 

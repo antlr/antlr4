@@ -670,45 +670,5 @@ namespace Antlr4.Runtime.Atn
                 throw new InvalidOperationException("This ATNConfigSet is read only.");
             }
         }
-
-        private sealed class ATNConfigSetIterator : IEnumerator<ATNConfig>
-        {
-            internal int index = -1;
-
-            internal bool removed = false;
-
-            public bool HasNext()
-            {
-                return this.index + 1 < this._enclosing.configs.Count;
-            }
-
-            public ATNConfig Next()
-            {
-                if (!this.HasNext())
-                {
-                    throw new InvalidOperationException();
-                }
-                this.index++;
-                this.removed = false;
-                return this._enclosing.configs[this.index];
-            }
-
-            public void Remove()
-            {
-                if (this.removed || this.index < 0 || this.index >= this._enclosing.configs.Count)
-                {
-                    throw new InvalidOperationException();
-                }
-                this._enclosing.Remove(this.index);
-                this.removed = true;
-            }
-
-            internal ATNConfigSetIterator(ATNConfigSet _enclosing)
-            {
-                this._enclosing = _enclosing;
-            }
-
-            private readonly ATNConfigSet _enclosing;
-        }
     }
 }
