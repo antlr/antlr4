@@ -307,15 +307,15 @@ namespace Antlr4.Runtime.Atn
             int skipAlt = ATN.InvalidAltNumber;
             foreach (ATNConfig c in closure)
             {
-                if (c.GetAlt() == skipAlt)
+                if (c.Alt == skipAlt)
                 {
                     continue;
                 }
-                int n = c.GetState().NumberOfOptimizedTransitions;
+                int n = c.State.NumberOfOptimizedTransitions;
                 for (int ti = 0; ti < n; ti++)
                 {
                     // for each optimized transition
-                    Transition trans = c.GetState().GetOptimizedTransition(ti);
+                    Transition trans = c.State.GetOptimizedTransition(ti);
                     ATNState target = GetReachableTarget(trans, t);
                     if (target != null)
                     {
@@ -323,7 +323,7 @@ namespace Antlr4.Runtime.Atn
                         {
                             // any remaining configs for this alt have a lower priority than
                             // the one that just reached an accept state.
-                            skipAlt = c.GetAlt();
+                            skipAlt = c.Alt;
                             break;
                         }
                     }
@@ -397,9 +397,9 @@ namespace Antlr4.Runtime.Atn
         protected internal virtual bool Closure(ICharStream input, ATNConfig config, ATNConfigSet
              configs, bool speculative)
         {
-            if (config.GetState() is RuleStopState)
+            if (config.State is RuleStopState)
             {
-                PredictionContext context = config.GetContext();
+                PredictionContext context = config.Context;
                 if (context.IsEmpty)
                 {
                     configs.AddItem(config);
@@ -409,7 +409,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     if (context.HasEmpty)
                     {
-                        configs.AddItem(config.Transform(config.GetState(), PredictionContext.EmptyFull));
+                        configs.AddItem(config.Transform(config.State, PredictionContext.EmptyFull));
                         return true;
                     }
                 }
@@ -423,7 +423,7 @@ namespace Antlr4.Runtime.Atn
                     PredictionContext newContext = context.GetParent(i);
                     // "pop" return state
                     ATNState returnState = atn.states[returnStateNumber];
-                    ATNConfig c = ATNConfig.Create(returnState, config.GetAlt(), newContext);
+                    ATNConfig c = ATNConfig.Create(returnState, config.Alt, newContext);
                     if (Closure(input, c, configs, speculative))
                     {
                         return true;
@@ -432,11 +432,11 @@ namespace Antlr4.Runtime.Atn
                 return false;
             }
             // optimization
-            if (!config.GetState().OnlyHasEpsilonTransitions)
+            if (!config.State.OnlyHasEpsilonTransitions)
             {
                 configs.AddItem(config);
             }
-            ATNState p = config.GetState();
+            ATNState p = config.State;
             for (int i_1 = 0; i_1 < p.NumberOfOptimizedTransitions; i_1++)
             {
                 Transition t = p.GetOptimizedTransition(i_1);
@@ -463,14 +463,13 @@ namespace Antlr4.Runtime.Atn
                 case TransitionType.Rule:
                 {
                     RuleTransition ruleTransition = (RuleTransition)t;
-                    if (optimize_tail_calls && ruleTransition.optimizedTailCall && !config.GetContext
-                        ().HasEmpty)
+                    if (optimize_tail_calls && ruleTransition.optimizedTailCall && !config.Context.HasEmpty)
                     {
                         c = config.Transform(t.target);
                     }
                     else
                     {
-                        PredictionContext newContext = config.GetContext().GetChild(ruleTransition.followState
+                        PredictionContext newContext = config.Context.GetChild(ruleTransition.followState
                             .stateNumber);
                         c = config.Transform(t.target, newContext);
                     }
@@ -661,7 +660,7 @@ namespace Antlr4.Runtime.Atn
             ATNConfig firstConfigWithRuleStopState = null;
             foreach (ATNConfig c in configs)
             {
-                if (c.GetState() is RuleStopState)
+                if (c.State is RuleStopState)
                 {
                     firstConfigWithRuleStopState = c;
                     break;
@@ -670,8 +669,8 @@ namespace Antlr4.Runtime.Atn
             if (firstConfigWithRuleStopState != null)
             {
                 newState.isAcceptState = true;
-                newState.lexerRuleIndex = firstConfigWithRuleStopState.GetState().ruleIndex;
-                newState.lexerActionIndex = firstConfigWithRuleStopState.GetActionIndex();
+                newState.lexerRuleIndex = firstConfigWithRuleStopState.State.ruleIndex;
+                newState.lexerActionIndex = firstConfigWithRuleStopState.ActionIndex;
                 newState.prediction = atn.ruleToTokenType[newState.lexerRuleIndex];
             }
             return atn.modeToDFA[mode].AddState(newState);

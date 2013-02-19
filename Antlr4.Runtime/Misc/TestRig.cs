@@ -283,7 +283,7 @@ namespace Antlr4.Runtime.Misc
                 if (diagnostics)
                 {
                     parser.AddErrorListener(new DiagnosticErrorListener());
-                    parser.Interpreter.SetPredictionMode(PredictionMode.LlExactAmbigDetection);
+                    parser.Interpreter.PredictionMode = PredictionMode.LlExactAmbigDetection;
                 }
                 if (printTree || gui || psFile != null)
                 {
@@ -292,7 +292,7 @@ namespace Antlr4.Runtime.Misc
                 if (Sll)
                 {
                     // overrides diagnostics
-                    parser.Interpreter.SetPredictionMode(PredictionMode.Sll);
+                    parser.Interpreter.PredictionMode = PredictionMode.Sll;
                 }
                 parser.SetInputStream(tokens);
                 parser.Trace = trace;

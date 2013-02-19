@@ -86,19 +86,20 @@ namespace Antlr4.Runtime.Atn
         public static Antlr4.Runtime.Atn.ATNConfig Create(ATNState state, int alt, PredictionContext
              context)
         {
-            return Create(state, alt, context, SemanticContext.None, -1);
+            return Create(state, alt, context, Antlr4.Runtime.Atn.SemanticContext.None, -1);
         }
 
         public static Antlr4.Runtime.Atn.ATNConfig Create(ATNState state, int alt, PredictionContext
-             context, SemanticContext semanticContext)
+             context, Antlr4.Runtime.Atn.SemanticContext semanticContext)
         {
             return Create(state, alt, context, semanticContext, -1);
         }
 
         public static Antlr4.Runtime.Atn.ATNConfig Create(ATNState state, int alt, PredictionContext
-             context, SemanticContext semanticContext, int actionIndex)
+             context, Antlr4.Runtime.Atn.SemanticContext semanticContext, int actionIndex
+            )
         {
-            if (semanticContext != SemanticContext.None)
+            if (semanticContext != Antlr4.Runtime.Atn.SemanticContext.None)
             {
                 if (actionIndex != -1)
                 {
@@ -124,124 +125,143 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        /// <summary>Gets the ATN state associated with this configuration</summary>
-        [return: NotNull]
-        public ATNState GetState()
+        /// <summary>Gets the ATN state associated with this configuration.</summary>
+        /// <remarks>Gets the ATN state associated with this configuration.</remarks>
+        public ATNState State
         {
-            return state;
-        }
-
-        /// <summary>What alt (or lexer rule) is predicted by this configuration</summary>
-        public int GetAlt()
-        {
-            return altAndOuterContextDepth & unchecked((int)(0x00FFFFFF));
-        }
-
-        public bool IsHidden()
-        {
-            return altAndOuterContextDepth < 0;
-        }
-
-        public virtual void SetHidden(bool value)
-        {
-            if (value)
+            get
             {
-                altAndOuterContextDepth |= unchecked((int)(0x80000000));
-            }
-            else
-            {
-                altAndOuterContextDepth &= ~unchecked((int)(0x80000000));
+                return state;
             }
         }
 
-        [return: NotNull]
-        public PredictionContext GetContext()
+        /// <summary>What alt (or lexer rule) is predicted by this configuration.</summary>
+        /// <remarks>What alt (or lexer rule) is predicted by this configuration.</remarks>
+        public int Alt
         {
-            return context;
+            get
+            {
+                return altAndOuterContextDepth & unchecked((int)(0x00FFFFFF));
+            }
         }
 
-        public virtual void SetContext(PredictionContext context)
+        public virtual bool IsHidden
         {
-            this.context = context;
+            get
+            {
+                return altAndOuterContextDepth < 0;
+            }
+            set
+            {
+                if (value)
+                {
+                    altAndOuterContextDepth |= unchecked((int)(0x80000000));
+                }
+                else
+                {
+                    altAndOuterContextDepth &= ~unchecked((int)(0x80000000));
+                }
+            }
         }
 
-        public bool GetReachesIntoOuterContext()
+        public virtual PredictionContext Context
         {
-            return GetOuterContextDepth() != 0;
+            get
+            {
+                return context;
+            }
+            set
+            {
+                PredictionContext context = value;
+                this.context = context;
+            }
+        }
+
+        public bool ReachesIntoOuterContext
+        {
+            get
+            {
+                return OuterContextDepth != 0;
+            }
         }
 
         /// <summary>
-        /// We cannot execute predicates dependent upon local context unless
-        /// we know for sure we are in the correct context.
+        /// We cannot execute predicates dependent upon local context unless we know
+        /// for sure we are in the correct context.
         /// </summary>
         /// <remarks>
-        /// We cannot execute predicates dependent upon local context unless
-        /// we know for sure we are in the correct context. Because there is
-        /// no way to do this efficiently, we simply cannot evaluate
-        /// dependent predicates unless we are in the rule that initially
-        /// invokes the ATN simulator.
-        /// closure() tracks the depth of how far we dip into the
-        /// outer context: depth &gt; 0.  Note that it may not be totally
-        /// accurate depth since I don't ever decrement. TODO: make it a boolean then
+        /// We cannot execute predicates dependent upon local context unless we know
+        /// for sure we are in the correct context. Because there is no way to do
+        /// this efficiently, we simply cannot evaluate dependent predicates unless
+        /// we are in the rule that initially invokes the ATN simulator.
+        /// closure() tracks the depth of how far we dip into the outer context:
+        /// depth &gt; 0. Note that it may not be totally accurate depth since I don't
+        /// ever decrement. TODO: make it a boolean then
         /// </remarks>
-        public int GetOuterContextDepth()
+        public virtual int OuterContextDepth
         {
-            return ((int)(((uint)altAndOuterContextDepth) >> 24)) & unchecked((int)(0x7F));
+            get
+            {
+                return ((int)(((uint)altAndOuterContextDepth) >> 24)) & unchecked((int)(0x7F));
+            }
+            set
+            {
+                int outerContextDepth = value;
+                System.Diagnostics.Debug.Assert(outerContextDepth >= 0);
+                // saturate at 0x7F - everything but zero/positive is only used for debug information anyway
+                outerContextDepth = Math.Min(outerContextDepth, unchecked((int)(0x7F)));
+                this.altAndOuterContextDepth = (outerContextDepth << 24) | (altAndOuterContextDepth
+                     & ~unchecked((int)(0x7F000000)));
+            }
         }
 
-        public virtual void SetOuterContextDepth(int outerContextDepth)
+        public virtual int ActionIndex
         {
-            System.Diagnostics.Debug.Assert(outerContextDepth >= 0);
-            // saturate at 0x7F - everything but zero/positive is only used for debug information anyway
-            outerContextDepth = Math.Min(outerContextDepth, unchecked((int)(0x7F)));
-            this.altAndOuterContextDepth = (outerContextDepth << 24) | (altAndOuterContextDepth
-                 & ~unchecked((int)(0x7F000000)));
+            get
+            {
+                return -1;
+            }
         }
 
-        public virtual int GetActionIndex()
+        public virtual Antlr4.Runtime.Atn.SemanticContext SemanticContext
         {
-            return -1;
-        }
-
-        [return: NotNull]
-        public virtual SemanticContext GetSemanticContext()
-        {
-            return SemanticContext.None;
+            get
+            {
+                return Antlr4.Runtime.Atn.SemanticContext.None;
+            }
         }
 
         public Antlr4.Runtime.Atn.ATNConfig Clone()
         {
-            return Transform(this.GetState());
+            return Transform(this.State);
         }
 
         public Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state)
         {
-            return Transform(state, this.context, this.GetSemanticContext(), this.GetActionIndex
-                ());
+            return Transform(state, this.context, this.SemanticContext, this.ActionIndex);
         }
 
-        public Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, SemanticContext semanticContext
-            )
+        public Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, Antlr4.Runtime.Atn.SemanticContext
+             semanticContext)
         {
-            return Transform(state, this.context, semanticContext, this.GetActionIndex());
+            return Transform(state, this.context, semanticContext, this.ActionIndex);
         }
 
         public Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, PredictionContext context
             )
         {
-            return Transform(state, context, this.GetSemanticContext(), this.GetActionIndex()
-                );
+            return Transform(state, context, this.SemanticContext, this.ActionIndex);
         }
 
         public Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, int actionIndex)
         {
-            return Transform(state, context, this.GetSemanticContext(), actionIndex);
+            return Transform(state, context, this.SemanticContext, actionIndex);
         }
 
         private Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, PredictionContext 
-            context, SemanticContext semanticContext, int actionIndex)
+            context, Antlr4.Runtime.Atn.SemanticContext semanticContext, int actionIndex)
         {
-            if (semanticContext != SemanticContext.None)
+            if (semanticContext != Antlr4.Runtime.Atn.SemanticContext.None)
             {
                 if (actionIndex != -1)
                 {
@@ -270,33 +290,30 @@ namespace Antlr4.Runtime.Atn
         public virtual Antlr4.Runtime.Atn.ATNConfig AppendContext(int context, PredictionContextCache
              contextCache)
         {
-            PredictionContext appendedContext = GetContext().AppendContext(context, contextCache
-                );
-            Antlr4.Runtime.Atn.ATNConfig result = Transform(GetState(), appendedContext);
+            PredictionContext appendedContext = Context.AppendContext(context, contextCache);
+            Antlr4.Runtime.Atn.ATNConfig result = Transform(State, appendedContext);
             return result;
         }
 
         public virtual Antlr4.Runtime.Atn.ATNConfig AppendContext(PredictionContext context
             , PredictionContextCache contextCache)
         {
-            PredictionContext appendedContext = GetContext().AppendContext(context, contextCache
-                );
-            Antlr4.Runtime.Atn.ATNConfig result = Transform(GetState(), appendedContext);
+            PredictionContext appendedContext = Context.AppendContext(context, contextCache);
+            Antlr4.Runtime.Atn.ATNConfig result = Transform(State, appendedContext);
             return result;
         }
 
         public virtual bool Contains(Antlr4.Runtime.Atn.ATNConfig subconfig)
         {
-            if (this.GetState().stateNumber != subconfig.GetState().stateNumber || this.GetAlt
-                () != subconfig.GetAlt() || !this.GetSemanticContext().Equals(subconfig.GetSemanticContext
-                ()))
+            if (this.State.stateNumber != subconfig.State.stateNumber || this.Alt != subconfig
+                .Alt || !this.SemanticContext.Equals(subconfig.SemanticContext))
             {
                 return false;
             }
             Stack<PredictionContext> leftWorkList = new Stack<PredictionContext>();
             Stack<PredictionContext> rightWorkList = new Stack<PredictionContext>();
-            leftWorkList.Push(GetContext());
-            rightWorkList.Push(subconfig.GetContext());
+            leftWorkList.Push(Context);
+            rightWorkList.Push(subconfig.Context);
             while (leftWorkList.Count > 0)
             {
                 PredictionContext left = leftWorkList.Pop();
@@ -363,21 +380,20 @@ namespace Antlr4.Runtime.Atn
                     return false;
                 }
             }
-            return this.GetState().stateNumber == other.GetState().stateNumber && this.GetAlt
-                () == other.GetAlt() && this.GetReachesIntoOuterContext() == other.GetReachesIntoOuterContext
-                () && this.GetContext().Equals(other.GetContext()) && this.GetSemanticContext
-                ().Equals(other.GetSemanticContext()) && this.GetActionIndex() == other.GetActionIndex
-                ();
+            return this.State.stateNumber == other.State.stateNumber && this.Alt == other.Alt
+                 && this.ReachesIntoOuterContext == other.ReachesIntoOuterContext && this.Context
+                .Equals(other.Context) && this.SemanticContext.Equals(other.SemanticContext) 
+                && this.ActionIndex == other.ActionIndex;
         }
 
         public override int GetHashCode()
         {
             int hashCode = 7;
-            hashCode = 5 * hashCode + GetState().stateNumber;
-            hashCode = 5 * hashCode + GetAlt();
-            hashCode = 5 * hashCode + (GetReachesIntoOuterContext() ? 1 : 0);
-            hashCode = 5 * hashCode + (GetContext() != null ? GetContext().GetHashCode() : 0);
-            hashCode = 5 * hashCode + GetSemanticContext().GetHashCode();
+            hashCode = 5 * hashCode + State.stateNumber;
+            hashCode = 5 * hashCode + Alt;
+            hashCode = 5 * hashCode + (ReachesIntoOuterContext ? 1 : 0);
+            hashCode = 5 * hashCode + (Context != null ? Context.GetHashCode() : 0);
+            hashCode = 5 * hashCode + SemanticContext.GetHashCode();
             return hashCode;
         }
 
@@ -388,8 +404,8 @@ namespace Antlr4.Runtime.Atn
             builder.Append("rankdir=LR;\n");
             ISet<PredictionContext> visited = new HashSet<PredictionContext>();
             Stack<PredictionContext> workList = new Stack<PredictionContext>();
-            workList.Push(GetContext());
-            visited.Add(GetContext());
+            workList.Push(Context);
+            visited.Add(Context);
             while (workList.Count > 0)
             {
                 PredictionContext current = workList.Pop();
@@ -432,7 +448,7 @@ namespace Antlr4.Runtime.Atn
             string[] contexts;
             if (showContext)
             {
-                contexts = GetContext().ToStrings(recog, this.GetState().stateNumber);
+                contexts = Context.ToStrings(recog, this.State.stateNumber);
             }
             else
             {
@@ -450,25 +466,26 @@ namespace Antlr4.Runtime.Atn
                     buf.Append(", ");
                 }
                 buf.Append('(');
-                buf.Append(GetState());
+                buf.Append(State);
                 if (showAlt)
                 {
                     buf.Append(",");
-                    buf.Append(GetAlt());
+                    buf.Append(Alt);
                 }
-                if (GetContext() != null)
+                if (Context != null)
                 {
                     buf.Append(",");
                     buf.Append(contextDesc);
                 }
-                if (GetSemanticContext() != null && GetSemanticContext() != SemanticContext.None)
+                if (SemanticContext != null && SemanticContext != Antlr4.Runtime.Atn.SemanticContext
+                    .None)
                 {
                     buf.Append(",");
-                    buf.Append(GetSemanticContext());
+                    buf.Append(SemanticContext);
                 }
-                if (GetReachesIntoOuterContext())
+                if (ReachesIntoOuterContext)
                 {
-                    buf.Append(",up=").Append(GetOuterContextDepth());
+                    buf.Append(",up=").Append(OuterContextDepth);
                 }
                 buf.Append(')');
             }
@@ -478,23 +495,28 @@ namespace Antlr4.Runtime.Atn
         private class SemanticContextATNConfig : ATNConfig
         {
             [NotNull]
-            private readonly SemanticContext semanticContext;
+            private readonly Antlr4.Runtime.Atn.SemanticContext semanticContext;
 
-            public SemanticContextATNConfig(SemanticContext semanticContext, ATNState state, 
-                int alt, PredictionContext context) : base(state, alt, context)
+            public SemanticContextATNConfig(Antlr4.Runtime.Atn.SemanticContext semanticContext
+                , ATNState state, int alt, PredictionContext context) : base(state, alt, context
+                )
             {
                 this.semanticContext = semanticContext;
             }
 
-            public SemanticContextATNConfig(SemanticContext semanticContext, ATNConfig c, ATNState
-                 state, PredictionContext context) : base(c, state, context)
+            public SemanticContextATNConfig(Antlr4.Runtime.Atn.SemanticContext semanticContext
+                , ATNConfig c, ATNState state, PredictionContext context) : base(c, state, context
+                )
             {
                 this.semanticContext = semanticContext;
             }
 
-            public override SemanticContext GetSemanticContext()
+            public override Antlr4.Runtime.Atn.SemanticContext SemanticContext
             {
-                return semanticContext;
+                get
+                {
+                    return semanticContext;
+                }
             }
         }
 
@@ -511,16 +533,19 @@ namespace Antlr4.Runtime.Atn
             protected internal ActionATNConfig(int actionIndex, ATNConfig c, ATNState state, 
                 PredictionContext context) : base(c, state, context)
             {
-                if (c.GetSemanticContext() != SemanticContext.None)
+                if (c.SemanticContext != SemanticContext.None)
                 {
                     throw new NotSupportedException();
                 }
                 this.actionIndex = actionIndex;
             }
 
-            public override int GetActionIndex()
+            public override int ActionIndex
             {
-                return actionIndex;
+                get
+                {
+                    return actionIndex;
+                }
             }
         }
 
@@ -542,9 +567,12 @@ namespace Antlr4.Runtime.Atn
                 this.actionIndex = actionIndex;
             }
 
-            public override int GetActionIndex()
+            public override int ActionIndex
             {
-                return actionIndex;
+                get
+                {
+                    return actionIndex;
+                }
             }
         }
     }

@@ -36,17 +36,19 @@ namespace Antlr4.Runtime
     /// <author>Sam Harwell</author>
     public class ProxyErrorListener<Symbol> : IAntlrErrorListener<Symbol>
     {
-        private readonly ICollection<IAntlrErrorListener<Symbol>> delegates;
+        private readonly IEnumerable<IAntlrErrorListener<Symbol>> delegates;
 
-        public ProxyErrorListener(ICollection<IAntlrErrorListener<Symbol>> delegates)
+        public ProxyErrorListener(IEnumerable<IAntlrErrorListener<Symbol>> delegates)
         {
             this.delegates = delegates;
         }
 
-        protected internal virtual ICollection<IAntlrErrorListener<Symbol>> GetDelegates(
-            )
+        protected internal virtual IEnumerable<IAntlrErrorListener<Symbol>> Delegates
         {
-            return delegates;
+            get
+            {
+                return delegates;
+            }
         }
 
         public virtual void SyntaxError(IRecognizer recognizer, Symbol offendingSymbol

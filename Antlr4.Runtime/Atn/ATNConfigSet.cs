@@ -44,7 +44,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="ATNConfig">ATNConfig</see>
         /// . The key does not account for
         /// the
-        /// <see cref="ATNConfig.GetSemanticContext()">ATNConfig.GetSemanticContext()</see>
+        /// <see cref="ATNConfig.SemanticContext()">ATNConfig.SemanticContext()</see>
         /// of the value, which is only a problem if a single
         /// <code>ATNConfigSet</code>
         /// contains two configs with the same state and alternative
@@ -168,7 +168,7 @@ namespace Antlr4.Runtime.Atn
             BitSet alts = new BitSet();
             foreach (ATNConfig config in this)
             {
-                alts.Set(config.GetAlt());
+                alts.Set(config.Alt);
             }
             return alts;
         }
@@ -188,7 +188,7 @@ namespace Antlr4.Runtime.Atn
                 ();
             while (iterator.HasNext())
             {
-                if (iterator.Next().Value.IsHidden())
+                if (iterator.Next().Value.IsHidden)
                 {
                     iterator.Remove();
                 }
@@ -196,7 +196,7 @@ namespace Antlr4.Runtime.Atn
             IListIterator<ATNConfig> iterator2 = unmerged.ListIterator();
             while (iterator2.HasNext())
             {
-                if (iterator2.Next().IsHidden())
+                if (iterator2.Next().IsHidden)
                 {
                     iterator2.Remove();
                 }
@@ -204,7 +204,7 @@ namespace Antlr4.Runtime.Atn
             iterator2 = configs.ListIterator();
             while (iterator2.HasNext())
             {
-                if (iterator2.Next().IsHidden())
+                if (iterator2.Next().IsHidden)
                 {
                     iterator2.Remove();
                 }
@@ -234,7 +234,7 @@ namespace Antlr4.Runtime.Atn
             ISet<ATNState> states = new HashSet<ATNState>();
             foreach (ATNConfig c in this.configs)
             {
-                states.Add(c.GetState());
+                states.Add(c.State);
             }
             return states;
         }
@@ -248,7 +248,7 @@ namespace Antlr4.Runtime.Atn
             for (int i = 0; i < configs.Count; i++)
             {
                 ATNConfig config = configs[i];
-                config.SetContext(interpreter.atn.GetCachedContext(config.GetContext()));
+                config.Context = interpreter.atn.GetCachedContext(config.Context);
             }
         }
 
@@ -317,9 +317,9 @@ namespace Antlr4.Runtime.Atn
         public virtual bool Add(ATNConfig e, PredictionContextCache contextCache)
         {
             EnsureWritable();
-            System.Diagnostics.Debug.Assert(!outermostConfigSet || !e.GetReachesIntoOuterContext
-                ());
-            System.Diagnostics.Debug.Assert(!e.IsHidden());
+            System.Diagnostics.Debug.Assert(!outermostConfigSet || !e.ReachesIntoOuterContext
+                );
+            System.Diagnostics.Debug.Assert(!e.IsHidden);
             if (contextCache == null)
             {
                 contextCache = PredictionContextCache.Uncached;
@@ -330,16 +330,16 @@ namespace Antlr4.Runtime.Atn
             addKey = (mergedConfig == null);
             if (mergedConfig != null && CanMerge(e, key, mergedConfig))
             {
-                mergedConfig.SetOuterContextDepth(Math.Max(mergedConfig.GetOuterContextDepth(), e
-                    .GetOuterContextDepth()));
-                PredictionContext joined = PredictionContext.Join(mergedConfig.GetContext(), e.GetContext
-                    (), contextCache);
+                mergedConfig.OuterContextDepth = Math.Max(mergedConfig.OuterContextDepth, e.OuterContextDepth
+                    );
+                PredictionContext joined = PredictionContext.Join(mergedConfig.Context, e.Context
+                    , contextCache);
                 UpdatePropertiesForMergedConfig(e);
-                if (mergedConfig.GetContext() == joined)
+                if (mergedConfig.Context == joined)
                 {
                     return false;
                 }
-                mergedConfig.SetContext(joined);
+                mergedConfig.Context = joined;
                 return true;
             }
             for (int i = 0; i < unmerged.Count; i++)
@@ -347,16 +347,16 @@ namespace Antlr4.Runtime.Atn
                 ATNConfig unmergedConfig = unmerged[i];
                 if (CanMerge(e, key, unmergedConfig))
                 {
-                    unmergedConfig.SetOuterContextDepth(Math.Max(unmergedConfig.GetOuterContextDepth(
-                        ), e.GetOuterContextDepth()));
-                    PredictionContext joined = PredictionContext.Join(unmergedConfig.GetContext(), e.
-                        GetContext(), contextCache);
+                    unmergedConfig.OuterContextDepth = Math.Max(unmergedConfig.OuterContextDepth, e.OuterContextDepth
+                        );
+                    PredictionContext joined = PredictionContext.Join(unmergedConfig.Context, e.Context
+                        , contextCache);
                     UpdatePropertiesForMergedConfig(e);
-                    if (unmergedConfig.GetContext() == joined)
+                    if (unmergedConfig.Context == joined)
                     {
                         return false;
                     }
-                    unmergedConfig.SetContext(joined);
+                    unmergedConfig.Context = joined;
                     if (addKey)
                     {
                         mergedConfigs[key] = unmergedConfig;
@@ -381,7 +381,7 @@ namespace Antlr4.Runtime.Atn
         private void UpdatePropertiesForMergedConfig(ATNConfig config)
         {
             // merged configs can't change the alt or semantic context
-            dipsIntoOuterContext |= config.GetReachesIntoOuterContext();
+            dipsIntoOuterContext |= config.ReachesIntoOuterContext;
             System.Diagnostics.Debug.Assert(!outermostConfigSet || !dipsIntoOuterContext);
         }
 
@@ -389,24 +389,24 @@ namespace Antlr4.Runtime.Atn
         {
             if (configs.Count == 1)
             {
-                uniqueAlt = config.GetAlt();
+                uniqueAlt = config.Alt;
             }
             else
             {
-                if (uniqueAlt != config.GetAlt())
+                if (uniqueAlt != config.Alt)
                 {
                     uniqueAlt = ATN.InvalidAltNumber;
                 }
             }
-            hasSemanticContext |= !SemanticContext.None.Equals(config.GetSemanticContext());
-            dipsIntoOuterContext |= config.GetReachesIntoOuterContext();
+            hasSemanticContext |= !SemanticContext.None.Equals(config.SemanticContext);
+            dipsIntoOuterContext |= config.ReachesIntoOuterContext;
             System.Diagnostics.Debug.Assert(!outermostConfigSet || !dipsIntoOuterContext);
         }
 
         protected internal virtual bool CanMerge(ATNConfig left, long leftKey, ATNConfig 
             right)
         {
-            if (left.GetState().stateNumber != right.GetState().stateNumber)
+            if (left.State.stateNumber != right.State.stateNumber)
             {
                 return false;
             }
@@ -414,13 +414,13 @@ namespace Antlr4.Runtime.Atn
             {
                 return false;
             }
-            return left.GetSemanticContext().Equals(right.GetSemanticContext());
+            return left.SemanticContext.Equals(right.SemanticContext);
         }
 
         protected internal virtual long GetKey(ATNConfig e)
         {
-            long key = e.GetState().stateNumber;
-            key = (key << 12) | (e.GetAlt() & unchecked((int)(0xFFF)));
+            long key = e.State.stateNumber;
+            key = (key << 12) | (e.Alt & unchecked((int)(0xFFF)));
             return key;
         }
 
@@ -557,20 +557,20 @@ namespace Antlr4.Runtime.Atn
 
             public int Compare(ATNConfig o1, ATNConfig o2)
             {
-                if (o1.GetAlt() != o2.GetAlt())
+                if (o1.Alt != o2.Alt)
                 {
-                    return o1.GetAlt() - o2.GetAlt();
+                    return o1.Alt - o2.Alt;
                 }
                 else
                 {
-                    if (o1.GetState().stateNumber != o2.GetState().stateNumber)
+                    if (o1.State.stateNumber != o2.State.stateNumber)
                     {
-                        return o1.GetState().stateNumber - o2.GetState().stateNumber;
+                        return o1.State.stateNumber - o2.State.stateNumber;
                     }
                     else
                     {
-                        return string.CompareOrdinal(o1.GetSemanticContext().ToString(), o2.GetSemanticContext
-                            ().ToString());
+                        return string.CompareOrdinal(o1.SemanticContext.ToString(), o2.SemanticContext.ToString
+                            ());
                     }
                 }
             }
