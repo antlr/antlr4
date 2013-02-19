@@ -204,7 +204,7 @@ namespace Antlr4.Runtime.Misc
             // if disjoint and after r, a future iteration will handle it
             // ok, must be after last interval (and disjoint from last interval)
             // just add it
-            intervals.AddItem(addition);
+            intervals.Add(addition);
         }
 
         /// <summary>combine all sets in the array returned the or'd value</summary>
@@ -579,10 +579,14 @@ namespace Antlr4.Runtime.Misc
             {
                 buf.Append("{");
             }
-            IEnumerator<Interval> iter = this.intervals.GetEnumerator();
-            while (iter.HasNext())
+
+            bool first = true;
+            foreach (Interval I in intervals)
             {
-                Interval I = iter.Next();
+                if (!first)
+                    buf.Append(", ");
+
+                first = false;
                 int a = I.a;
                 int b = I.b;
                 if (a == b)
@@ -614,10 +618,6 @@ namespace Antlr4.Runtime.Misc
                         buf.Append(a).Append("..").Append(b);
                     }
                 }
-                if (iter.HasNext())
-                {
-                    buf.Append(", ");
-                }
             }
             if (this.Size() > 1)
             {
@@ -637,10 +637,14 @@ namespace Antlr4.Runtime.Misc
             {
                 buf.Append("{");
             }
-            IEnumerator<Interval> iter = this.intervals.GetEnumerator();
-            while (iter.HasNext())
+
+            bool first = true;
+            foreach (Interval I in intervals)
             {
-                Interval I = iter.Next();
+                if (!first)
+                    buf.Append(", ");
+
+                first = false;
                 int a = I.a;
                 int b = I.b;
                 if (a == b)
@@ -657,10 +661,6 @@ namespace Antlr4.Runtime.Misc
                         }
                         buf.Append(ElementName(tokenNames, i));
                     }
-                }
-                if (iter.HasNext())
-                {
-                    buf.Append(", ");
                 }
             }
             if (this.Size() > 1)
@@ -734,7 +734,7 @@ namespace Antlr4.Runtime.Misc
                 int b = I.b;
                 for (int v = a; v <= b; v++)
                 {
-                    values.AddItem(v);
+                    values.Add(v);
                 }
             }
             return values;
@@ -749,7 +749,7 @@ namespace Antlr4.Runtime.Misc
                 int b = I.b;
                 for (int v = a; v <= b; v++)
                 {
-                    s.AddItem(v);
+                    s.Add(v);
                 }
             }
             return s;
