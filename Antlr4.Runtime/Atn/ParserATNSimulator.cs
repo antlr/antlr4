@@ -1773,9 +1773,9 @@ namespace Antlr4.Runtime.Atn
                 }
                 if (!exact && optimize_hidden_conflicted_configs)
                 {
-                    for (int j = firstIndexCurrentState; j_1 <= lastIndexCurrentStateMinAlt; j_1++)
+                    for (int j = firstIndexCurrentState; j <= lastIndexCurrentStateMinAlt; j++)
                     {
-                        ATNConfig checkConfig = configs[j_1];
+                        ATNConfig checkConfig = configs[j];
                         if (checkConfig.GetSemanticContext() != SemanticContext.None && !checkConfig.GetSemanticContext
                             ().Equals(config.GetSemanticContext()))
                         {
