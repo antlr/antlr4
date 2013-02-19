@@ -37,14 +37,22 @@ namespace Antlr4.Runtime.Dfa
     /// <author>Sam Harwell</author>
     public interface IEdgeMap<T>
     {
-        int Size();
+        int Count
+        {
+            get;
+        }
 
-        bool IsEmpty();
+        bool IsEmpty
+        {
+            get;
+        }
 
         bool ContainsKey(int key);
 
-        [Nullable]
-        T Get(int key);
+        T this[int key]
+        {
+            get;
+        }
 
         [NotNull]
         IEdgeMap<T> Put(int key, T value);
@@ -60,8 +68,5 @@ namespace Antlr4.Runtime.Dfa
 
         [NotNull]
         IDictionary<int, T> ToMap();
-
-        [NotNull]
-        ISet<KeyValuePair<int, T>> EntrySet();
     }
 }

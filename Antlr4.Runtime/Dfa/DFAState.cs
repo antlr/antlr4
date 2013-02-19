@@ -201,7 +201,7 @@ namespace Antlr4.Runtime.Dfa
             {
                 return null;
             }
-            return edges.Get(symbol);
+            return edges[symbol];
         }
 
         public virtual void SetTarget(int symbol, DFAState target)
@@ -238,7 +238,7 @@ namespace Antlr4.Runtime.Dfa
             {
                 invokingState = -1;
             }
-            return contextEdges.Get(invokingState);
+            return contextEdges[invokingState];
         }
 
         public virtual void SetContextTarget(int invokingState, DFAState target)
