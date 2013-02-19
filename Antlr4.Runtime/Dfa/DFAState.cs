@@ -282,7 +282,7 @@ namespace Antlr4.Runtime.Dfa
                         catch (NotSupportedException)
                         {
                             // handles read only, non-singleton maps
-                            map = new LinkedHashMap<int, DFAState>(map);
+                            map = new SortedDictionary<int, DFAState>(map);
                             map.Put(PredictionContext.EmptyFullStateKey, Sharpen.Collections.Remove(map, -1));
                         }
                     }

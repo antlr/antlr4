@@ -206,7 +206,7 @@ namespace Antlr4.Runtime.Dfa
             {
                 return Sharpen.Collections.EmptyMap<int, T>();
             }
-            IDictionary<int, T> result = new LinkedHashMap<int, T>();
+            IDictionary<int, T> result = new SortedDictionary<int, T>();
             for (int i = 0; i < Count; i++)
             {
                 result[keys[i]] = values[i];
