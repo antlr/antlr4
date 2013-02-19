@@ -81,7 +81,7 @@ namespace Antlr4.Runtime
                 symbol = ((ICharStream)InputStream).GetText(Interval.Of(startIndex, startIndex));
                 symbol = Utils.EscapeWhitespace(symbol, false);
             }
-            return string.Format("%s('%s')", typeof(Antlr4.Runtime.LexerNoViableAltException)
+            return string.Format("{0}('{1}')", typeof(Antlr4.Runtime.LexerNoViableAltException)
                 .Name, symbol);
         }
     }

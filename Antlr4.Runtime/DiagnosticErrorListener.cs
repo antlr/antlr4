@@ -40,7 +40,7 @@ namespace Antlr4.Runtime
         public override void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, 
             int stopIndex, BitSet ambigAlts, ATNConfigSet configs)
         {
-            string format = "reportAmbiguity d=%s: ambigAlts=%s, input='%s'";
+            string format = "reportAmbiguity d={0}: ambigAlts={1}, input='{2}'";
             recognizer.NotifyErrorListeners(string.Format(format, GetDecisionDescription(recognizer
                 , dfa.decision), ambigAlts, ((ITokenStream)recognizer.InputStream).GetText(Interval
                 .Of(startIndex, stopIndex))));
@@ -49,7 +49,7 @@ namespace Antlr4.Runtime
         public override void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int 
             startIndex, int stopIndex, SimulatorState initialState)
         {
-            string format = "reportAttemptingFullContext d=%s, input='%s'";
+            string format = "reportAttemptingFullContext d={0}, input='{1}'";
             recognizer.NotifyErrorListeners(string.Format(format, GetDecisionDescription(recognizer
                 , dfa.decision), ((ITokenStream)recognizer.InputStream).GetText(Interval.Of(startIndex
                 , stopIndex))));
@@ -58,7 +58,7 @@ namespace Antlr4.Runtime
         public override void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex
             , int stopIndex, SimulatorState acceptState)
         {
-            string format = "reportContextSensitivity d=%s, input='%s'";
+            string format = "reportContextSensitivity d={0}, input='{1}'";
             recognizer.NotifyErrorListeners(string.Format(format, GetDecisionDescription(recognizer
                 , dfa.decision), ((ITokenStream)recognizer.InputStream).GetText(Interval.Of(startIndex
                 , stopIndex))));
