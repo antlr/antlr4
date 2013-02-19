@@ -163,9 +163,9 @@ namespace Antlr4.Runtime.Misc
             }
             // find position in list
             // Use iterators as we modify list in place
-            for (IListIterator<Interval> iter = intervals.ListIterator(); iter.HasNext(); )
+            for (int i = 0; i < intervals.Count; i++)
             {
-                Interval r = iter.Next();
+                Interval r = intervals[i];
                 if (addition.Equals(r))
                 {
                     return;
@@ -174,20 +174,21 @@ namespace Antlr4.Runtime.Misc
                 {
                     // next to each other, make a single larger interval
                     Interval bigger = addition.Union(r);
-                    iter.Set(bigger);
+                    intervals[i] = bigger;
                     // make sure we didn't just create an interval that
                     // should be merged with next interval in list
-                    if (iter.HasNext())
+                    if (i < intervals.Count - 1)
                     {
-                        Interval next = iter.Next();
+                        i++;
+                        Interval next = intervals[i];
                         if (bigger.Adjacent(next) || !bigger.Disjoint(next))
                         {
                             // if we bump up against or overlap next, merge
-                            iter.Remove();
+                            intervals.RemoveAt(i);
                             // remove this one
-                            iter.Previous();
+                            i--;
                             // move backwards to what we just set
-                            iter.Set(bigger.Union(next));
+                            intervals[i] = bigger.Union(next);
                         }
                     }
                     // set to 3 merged ones
@@ -196,8 +197,8 @@ namespace Antlr4.Runtime.Misc
                 if (addition.StartsBeforeDisjoint(r))
                 {
                     // insert before r
-                    iter.Previous();
-                    iter.Add(addition);
+                    i--;
+                    intervals.Insert(i, addition);
                     return;
                 }
             }
