@@ -515,7 +515,7 @@ outer_break: ;
             string text = _input.GetText(Interval.Of(_tokenStartCharIndex, _input.Index));
             string msg = "token recognition error at: '" + GetErrorDisplay(text) + "'";
             IAntlrErrorListener<int> listener = GetErrorListenerDispatch();
-            listener.SyntaxError(this, null, _tokenStartLine, _tokenStartCharPositionInLine, 
+            listener.SyntaxError(this, 0, _tokenStartLine, _tokenStartCharPositionInLine, 
                 msg, e);
         }
 
