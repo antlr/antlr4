@@ -817,5 +817,30 @@ namespace Antlr4.Runtime.Misc
         {
             this.@readonly = @readonly;
         }
+
+        IIntSet IIntSet.AddAll(IIntSet set)
+        {
+            return AddAll(set);
+        }
+
+        IIntSet IIntSet.And(IIntSet a)
+        {
+            return And(a);
+        }
+
+        IIntSet IIntSet.Complement(IIntSet elements)
+        {
+            return Complement(elements);
+        }
+
+        IIntSet IIntSet.Or(IIntSet a)
+        {
+            return Or(a);
+        }
+
+        IIntSet IIntSet.Subtract(IIntSet a)
+        {
+            return Subtract(a);
+        }
     }
 }
