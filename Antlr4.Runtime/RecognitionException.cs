@@ -49,7 +49,7 @@ namespace Antlr4.Runtime
         private const long serialVersionUID = -3861826954750022374L;
 
         /// <summary>Who threw the exception?</summary>
-        private Antlr4.Runtime.Recognizer<object, object> recognizer;
+        private IRecognizer recognizer;
 
         private RuleContext ctx;
 
@@ -74,7 +74,7 @@ namespace Antlr4.Runtime
             this.input = input;
         }
 
-        public RecognitionException(Antlr4.Runtime.Recognizer<IToken, object> recognizer, 
+        public RecognitionException(IRecognizer recognizer, 
             IIntStream input, ParserRuleContext ctx)
         {
             this.recognizer = recognizer;
@@ -86,8 +86,7 @@ namespace Antlr4.Runtime
             }
         }
 
-        public RecognitionException(string message, Antlr4.Runtime.Recognizer<IToken, object
-            > recognizer, IIntStream input, ParserRuleContext ctx) : base(message)
+        public RecognitionException(string message, IRecognizer recognizer, IIntStream input, ParserRuleContext ctx) : base(message)
         {
             this.recognizer = recognizer;
             this.input = input;
@@ -109,13 +108,13 @@ namespace Antlr4.Runtime
         /// This will help us tie into the grammar and syntax diagrams in
         /// ANTLRWorks v2.
         /// </remarks>
-        protected internal int OffendingState
+        public int OffendingState
         {
             get
             {
                 return offendingState;
             }
-            set
+            protected set
             {
                 int offendingState = value;
                 this.offendingState = offendingState;
@@ -148,20 +147,20 @@ namespace Antlr4.Runtime
             }
         }
 
-        protected internal IToken OffendingToken
+        public IToken OffendingToken
         {
             get
             {
                 return offendingToken;
             }
-            set
+            protected set
             {
                 IToken offendingToken = value;
                 this.offendingToken = offendingToken;
             }
         }
 
-        public virtual Antlr4.Runtime.Recognizer<object, object> Recognizer
+        public virtual IRecognizer Recognizer
         {
             get
             {

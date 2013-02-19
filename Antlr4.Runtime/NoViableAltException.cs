@@ -73,7 +73,7 @@ namespace Antlr4.Runtime
         {
         }
 
-        public NoViableAltException(Recognizer<IToken, object> recognizer, ITokenStream input
+        public NoViableAltException(IRecognizer recognizer, ITokenStream input
             , IToken startToken, IToken offendingToken, ATNConfigSet deadEndConfigs, ParserRuleContext
              ctx) : base(recognizer, input, ctx)
         {
