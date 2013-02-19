@@ -186,31 +186,23 @@ namespace Antlr4.Runtime.Atn
         public void StripHiddenConfigs()
         {
             EnsureWritable();
-            IEnumerator<KeyValuePair<long, ATNConfig>> iterator = mergedConfigs.EntrySet().GetEnumerator
-                ();
-            while (iterator.HasNext())
+
+            List<long> toRemove = new List<long>();
+            foreach (var pair in mergedConfigs)
             {
-                if (iterator.Next().Value.IsHidden)
+                if (pair.Value.IsHidden)
                 {
-                    iterator.Remove();
+                    toRemove.Add(pair.Key);
                 }
             }
-            IListIterator<ATNConfig> iterator2 = unmerged.ListIterator();
-            while (iterator2.HasNext())
+
+            foreach (long key in toRemove)
             {
-                if (iterator2.Next().IsHidden)
-                {
-                    iterator2.Remove();
-                }
+                mergedConfigs.Remove(key);
             }
-            iterator2 = configs.ListIterator();
-            while (iterator2.HasNext())
-            {
-                if (iterator2.Next().IsHidden)
-                {
-                    iterator2.Remove();
-                }
-            }
+
+            unmerged.RemoveAll(config => config.IsHidden);
+            configs.RemoveAll(config => config.IsHidden);
         }
 
         public virtual bool IsOutermostConfigSet
