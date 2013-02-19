@@ -129,7 +129,7 @@ namespace Antlr4.Runtime
         {
             if (recognizer != null)
             {
-                recognizer.NotifyErrorListeners(e.GetOffendingToken(), message, e);
+                recognizer.NotifyErrorListeners(e.OffendingToken, message, e);
             }
         }
 
@@ -255,7 +255,7 @@ namespace Antlr4.Runtime
                 }
                 else
                 {
-                    input = tokens.GetText(e.GetStartToken(), e.GetOffendingToken());
+                    input = tokens.GetText(e.GetStartToken(), e.OffendingToken);
                 }
             }
             else
@@ -270,8 +270,8 @@ namespace Antlr4.Runtime
         public virtual void ReportInputMismatch(Parser recognizer, InputMismatchException
              e)
         {
-            string msg = "mismatched input " + GetTokenErrorDisplay(e.GetOffendingToken()) + 
-                " expecting " + e.GetExpectedTokens().ToString(recognizer.TokenNames);
+            string msg = "mismatched input " + GetTokenErrorDisplay(e.OffendingToken) + " expecting "
+                 + e.GetExpectedTokens().ToString(recognizer.TokenNames);
             NotifyErrorListeners(recognizer, msg, e);
         }
 

@@ -80,7 +80,7 @@ namespace Antlr4.Runtime
             // LL(1) error
             this.deadEndConfigs = deadEndConfigs;
             this.startToken = startToken;
-            this.SetOffendingToken(offendingToken);
+            this.OffendingToken = offendingToken;
         }
 
         public virtual IToken GetStartToken()
