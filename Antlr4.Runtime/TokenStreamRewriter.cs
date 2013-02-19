@@ -482,7 +482,7 @@ namespace Antlr4.Runtime
             while (i <= stop && i < tokens.Size)
             {
                 TokenStreamRewriter.RewriteOperation op = indexToOp.Get(i);
-                Sharpen.Collections.Remove(indexToOp, i);
+                indexToOp.Remove(i);
                 // remove so any left have index size-1
                 IToken t = tokens.Get(i);
                 if (op == null)
