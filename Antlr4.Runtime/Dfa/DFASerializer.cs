@@ -85,8 +85,8 @@ namespace Antlr4.Runtime.Dfa
                 states.Sort(new _IComparer_85());
                 foreach (DFAState s in states)
                 {
-                    IDictionary<int, DFAState> edges = s.EdgeMap;
-                    IDictionary<int, DFAState> contextEdges = s.ContextEdgeMap;
+                    IEnumerable<KeyValuePair<int, DFAState>> edges = s.EdgeMap;
+                    IEnumerable<KeyValuePair<int, DFAState>> contextEdges = s.ContextEdgeMap;
                     foreach (KeyValuePair<int, DFAState> entry in edges)
                     {
                         if ((entry.Value == null || entry.Value == ATNSimulator.Error) && !s.IsContextSymbol

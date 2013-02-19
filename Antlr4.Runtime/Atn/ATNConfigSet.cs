@@ -33,11 +33,13 @@ using System.Text;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Sharpen;
+using IEnumerable = System.Collections.IEnumerable;
+using IEnumerator = System.Collections.IEnumerator;
 
 namespace Antlr4.Runtime.Atn
 {
     /// <author>Sam Harwell</author>
-    public class ATNConfigSet : ISet<ATNConfig>
+    public class ATNConfigSet : IEnumerable<ATNConfig>
     {
         /// <summary>
         /// This maps (state, alt) -&gt; merged
@@ -301,7 +303,12 @@ namespace Antlr4.Runtime.Atn
 
         public virtual IEnumerator<ATNConfig> GetEnumerator()
         {
-            return new ATNConfigSet.ATNConfigSetIterator(this);
+            return configs.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
         public virtual object[] ToArray()
@@ -446,13 +453,12 @@ namespace Antlr4.Runtime.Atn
             return true;
         }
 
-        public virtual bool AddAll<_T0>(ICollection<_T0> c) where _T0:ATNConfig
+        public virtual bool AddAll(IEnumerable<ATNConfig> c)
         {
             return AddAll(c, null);
         }
 
-        public virtual bool AddAll<_T0>(ICollection<_T0> c, PredictionContextCache contextCache
-            ) where _T0:ATNConfig
+        public virtual bool AddAll(IEnumerable<ATNConfig> c, PredictionContextCache contextCache)
         {
             EnsureWritable();
             bool changed = false;

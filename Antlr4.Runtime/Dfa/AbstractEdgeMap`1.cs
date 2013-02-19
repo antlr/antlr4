@@ -114,5 +114,15 @@ namespace Antlr4.Runtime.Dfa
         public abstract int Size();
 
         public abstract IDictionary<int, T> ToMap();
+
+        public virtual IEnumerator<KeyValuePair<int, T>> GetEnumerator()
+        {
+            return ToMap().GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 }

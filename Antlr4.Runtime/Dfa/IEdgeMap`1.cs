@@ -35,7 +35,7 @@ using Sharpen;
 namespace Antlr4.Runtime.Dfa
 {
     /// <author>Sam Harwell</author>
-    public interface IEdgeMap<T>
+    public interface IEdgeMap<T> : IEnumerable<KeyValuePair<int, T>>
     {
         int Size();
 
