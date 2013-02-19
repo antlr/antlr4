@@ -305,8 +305,8 @@ namespace Antlr4.Runtime.Atn
                 if (ll_1 >= 0 && ll_1 <= short.MaxValue)
                 {
                     int key = (decision << 16) + ll_1;
-                    int alt = atn.LL1Table.Get(key);
-                    if (alt != null)
+                    int alt;
+                    if (atn.LL1Table.TryGetValue(key, out alt))
                     {
                         return alt;
                     }
@@ -684,7 +684,7 @@ namespace Antlr4.Runtime.Atn
                             if (t >= 0 && t <= short.MaxValue)
                             {
                                 int key = (dfa.decision << 16) + t;
-                                atn.LL1Table.Put(key, predictedAlt);
+                                atn.LL1Table[key] = predictedAlt;
                             }
                         }
                         if (useContext && always_try_local_context)
