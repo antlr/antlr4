@@ -42,7 +42,7 @@ namespace Antlr4.Runtime.Dfa
 
         private readonly int[] keys;
 
-        private readonly IList<T> values;
+        private readonly List<T> values;
 
         public SparseEdgeMap(int minIndex, int maxIndex) : this(minIndex, maxIndex, DefaultMaxSize
             )
@@ -65,7 +65,7 @@ namespace Antlr4.Runtime.Dfa
             }
             keys = Arrays.CopyOf(map.keys, maxSparseSize);
             values = new List<T>(maxSparseSize);
-            Sharpen.Collections.AddAll(values, map.values);
+            values.AddRange(map.values);
         }
 
         public virtual int[] GetKeys()
