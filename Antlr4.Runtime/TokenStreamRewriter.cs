@@ -697,7 +697,7 @@ namespace Antlr4.Runtime
                 // ignore deleted ops
                 if (m.Get(op.index) != null)
                 {
-                    throw new Error("should only be one op per index");
+                    throw new InvalidOperationException("should only be one op per index");
                 }
                 m.Put(op.index, op);
             }
