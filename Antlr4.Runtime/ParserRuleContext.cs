@@ -388,8 +388,8 @@ namespace Antlr4.Runtime
         ///     </summary>
         public virtual string ToInfoString(Parser recognizer)
         {
-            IList<string> rules = recognizer.GetRuleInvocationStack(this);
-            Sharpen.Collections.Reverse(rules);
+            List<string> rules = new List<string>(recognizer.GetRuleInvocationStack(this));
+            rules.Reverse();
             return "ParserRuleContext" + rules + "{" + "altNum=" + altNum + ", start=" + start
                  + ", stop=" + stop + '}';
         }
