@@ -386,27 +386,13 @@ namespace Antlr4.Runtime.Atn
         }
 
         private static IList<SemanticContext.PrecedencePredicate> FilterPrecedencePredicates
-            <_T0>(ICollection<_T0> collection) where _T0:SemanticContext
+            (ISet<SemanticContext> collection)
         {
-            List<SemanticContext.PrecedencePredicate> result = null;
-            for (IEnumerator<SemanticContext> iterator = collection.GetEnumerator(); iterator
-                .HasNext(); )
-            {
-                SemanticContext context = iterator.Next();
-                if (context is SemanticContext.PrecedencePredicate)
-                {
-                    if (result == null)
-                    {
-                        result = new List<SemanticContext.PrecedencePredicate>();
-                    }
-                    result.Add((SemanticContext.PrecedencePredicate)context);
-                    iterator.Remove();
-                }
-            }
-            if (result == null)
-            {
-                return Collections.EmptyList<PrecedencePredicate>();
-            }
+            if (!collection.OfType<PrecedencePredicate>().Any())
+                Collections.EmptyList<PrecedencePredicate>();
+
+            List<PrecedencePredicate> result = collection.OfType<PrecedencePredicate>().ToList();
+            collection.ExceptWith(result);
             return result;
         }
     }
