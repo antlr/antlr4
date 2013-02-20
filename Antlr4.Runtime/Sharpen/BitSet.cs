@@ -4,9 +4,10 @@
 
     public class BitSet
     {
-        private static readonly uint[] EmptyBits = new uint[0];
+        private static readonly ulong[] EmptyBits = new ulong[0];
+        private const int BitsPerElement = 8 * sizeof(ulong);
 
-        private uint[] data = EmptyBits;
+        private ulong[] _data = EmptyBits;
 
         public BitSet()
         {
@@ -19,15 +20,93 @@
 
             if (nbits > 0)
             {
-                int length = (nbits + (8 * sizeof(uint)) - 1) / (8 * sizeof(uint));
-                data = new uint[length];
+                int length = (nbits + BitsPerElement - 1) / BitsPerElement;
+                _data = new ulong[length];
             }
+        }
+
+        private static int GetBitCount(ulong[] value)
+        {
+            int data = 0;
+            uint size = (uint)value.Length / (sizeof(ulong) / sizeof(int));
+            const ulong m1 = 0x5555555555555555;
+            const ulong m2 = 0x3333333333333333;
+            const ulong m4 = 0x0F0F0F0F0F0F0F0F;
+            const ulong m8 = 0x00FF00FF00FF00FF;
+            const ulong m16 = 0x0000FFFF0000FFFF;
+            const ulong h01 = 0x0101010101010101;
+
+            uint bitCount = 0;
+            uint limit30 = size - size % 30;
+
+            // 64-bit tree merging (merging3)
+            for (uint i = 0; i < limit30; i += 30, data += 30)
+            {
+                ulong acc = 0;
+                for (uint j = 0; j < 30; j += 3)
+                {
+                    ulong count1 = value[data + j];
+                    ulong count2 = value[data + j + 1];
+                    ulong half1 = value[data + j + 2];
+                    ulong half2 = half1;
+                    half1 &= m1;
+                    half2 = (half2 >> 1) & m1;
+                    count1 -= (count1 >> 1) & m1;
+                    count2 -= (count2 >> 1) & m1;
+                    count1 += half1;
+                    count2 += half2;
+                    count1 = (count1 & m2) + ((count1 >> 2) & m2);
+                    count1 += (count2 & m2) + ((count2 >> 2) & m2);
+                    acc += (count1 & m4) + ((count1 >> 4) & m4);
+                }
+
+                acc = (acc & m8) + ((acc >> 8) & m8);
+                acc = (acc + (acc >> 16)) & m16;
+                acc = acc + (acc >> 32);
+                bitCount += (uint)acc;
+            }
+
+            // count the bits of the remaining bytes (MAX 29*8) using 
+            // "Counting bits set, in parallel" from the "Bit Twiddling Hacks",
+            // the code uses wikipedia's 64-bit popcount_3() implementation:
+            // http://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation
+            for (uint i = 0; i < size - limit30; i++)
+            {
+                ulong x = value[data + i];
+                x = x - ((x >> 1) & m1);
+                x = (x & m2) + ((x >> 2) & m2);
+                x = (x + (x >> 4)) & m4;
+                bitCount += (uint)((x * h01) >> 56);
+            }
+
+            return (int)bitCount;
+        }
+
+        private static readonly int[] index64 =
+        {
+            0, 47,  1, 56, 48, 27,  2, 60,
+           57, 49, 41, 37, 28, 16,  3, 61,
+           54, 58, 35, 52, 50, 42, 21, 44,
+           38, 32, 29, 23, 17, 11,  4, 62,
+           46, 55, 26, 59, 40, 36, 15, 53,
+           34, 51, 20, 43, 31, 22, 10, 45,
+           25, 39, 14, 33, 19, 30,  9, 24,
+           13, 18,  8, 12,  7,  6,  5, 63
+        };
+
+        private static int BitScanForward(ulong value)
+        {
+            if (value == 0)
+                return -1;
+
+            const ulong debruijn64 = 0x03f79d71b4cb0a89;
+            return index64[((value ^ (value - 1)) * debruijn64) >> 58];
         }
 
         public BitSet Clone()
         {
             BitSet result = new BitSet();
-            result.data = (uint[])data.Clone();
+            result._data = (ulong[])_data.Clone();
             return result;
         }
 
@@ -36,11 +115,11 @@
             if (index < 0)
                 throw new ArgumentOutOfRangeException("index");
 
-            int element = index / (8 * sizeof(uint));
-            if (element >= data.Length)
+            int element = index / BitsPerElement;
+            if (element >= _data.Length)
                 return false;
 
-            return (data[element] & (1U << (index % (8 * sizeof(uint))))) != 0;
+            return (_data[element] & (1U << (index % BitsPerElement))) != 0;
         }
 
         public void Set(int index)
@@ -48,11 +127,125 @@
             if (index < 0)
                 throw new ArgumentOutOfRangeException("index");
 
-            int element = index / (8 * sizeof(uint));
-            if (element >= data.Length)
-                Array.Resize(ref data, Math.Max(data.Length * 2, element + 1));
+            int element = index / BitsPerElement;
+            if (element >= _data.Length)
+                Array.Resize(ref _data, Math.Max(_data.Length * 2, element + 1));
 
-            data[element] |= 1U << (index % (8 * sizeof(uint)));
+            _data[element] |= 1U << (index % BitsPerElement);
+        }
+
+        public bool IsEmpty()
+        {
+            for (int i = 0; i < _data.Length; i++)
+            {
+                if (_data[i] != 0)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public int Cardinality()
+        {
+            return GetBitCount(_data);
+        }
+
+        public int NextSetBit(int fromIndex)
+        {
+            if (fromIndex < 0)
+                throw new ArgumentOutOfRangeException("fromIndex");
+
+            if (IsEmpty())
+                return -1;
+
+            int i = fromIndex / BitsPerElement;
+            if (i >= _data.Length)
+                return -1;
+
+            ulong current = _data[i] & ((1U << (fromIndex % BitsPerElement)) - 1);
+
+            for (; i < _data.Length; i++)
+            {
+                int bit = BitScanForward(current);
+                if (bit >= 0)
+                    return bit + i * BitsPerElement;
+
+                i++;
+                current = _data[i];
+            }
+
+            return -1;
+        }
+
+        public void And(BitSet set)
+        {
+            if (set == null)
+                throw new ArgumentNullException("set");
+
+            int length = Math.Min(_data.Length, set._data.Length);
+            for (int i = 0; i < length; i++)
+                _data[i] &= set._data[i];
+
+            for (int i = length; i < _data.Length; i++)
+                _data[i] = 0;
+        }
+
+        public void Or(BitSet set)
+        {
+            if (set == null)
+                throw new ArgumentNullException("set");
+
+            if (set._data.Length > _data.Length)
+                Array.Resize(ref _data, set._data.Length);
+
+            for (int i = 0; i < set._data.Length; i++)
+                _data[i] |= set._data[i];
+        }
+
+        public override bool Equals(object obj)
+        {
+            BitSet other = obj as BitSet;
+            if (other == null)
+                return false;
+
+            if (IsEmpty())
+                return other.IsEmpty();
+
+            int minLength = Math.Min(_data.Length, other._data.Length);
+            for (int i = 0; i < minLength; i++)
+            {
+                if (_data[i] != other._data[i])
+                    return false;
+            }
+
+            for (int i = minLength; i < _data.Length; i++)
+            {
+                if (_data[i] != 0)
+                    return false;
+            }
+
+            for (int i = minLength; i < other._data.Length; i++)
+            {
+                if (other._data[i] != 0)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            ulong result = 1;
+            for (uint i = 0; i < _data.Length; i++)
+            {
+                if (_data[i] != 0)
+                {
+                    result = result * 31 ^ i;
+                    result = result * 31 ^ _data[i];
+                }
+            }
+
+            return result.GetHashCode();
         }
     }
 }
