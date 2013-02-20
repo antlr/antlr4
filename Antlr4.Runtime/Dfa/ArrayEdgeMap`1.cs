@@ -29,6 +29,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Antlr4.Runtime.Dfa;
 using Sharpen;
 
@@ -106,7 +107,7 @@ namespace Antlr4.Runtime.Dfa
             return ((Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)Put(key, null));
         }
 
-        public override AbstractEdgeMap<T> PutAll<_T0>(IEdgeMap<_T0> m)
+        public override AbstractEdgeMap<T> PutAll(IEdgeMap<T> m)
         {
             if (m.IsEmpty)
             {
@@ -167,7 +168,7 @@ namespace Antlr4.Runtime.Dfa
             return this;
         }
 
-        public override IDictionary<int, T> ToMap()
+        public override IReadOnlyDictionary<int, T> ToMap()
         {
             if (IsEmpty)
             {
@@ -182,7 +183,7 @@ namespace Antlr4.Runtime.Dfa
                 }
                 result[i + minIndex] = arrayData[i];
             }
-            return result;
+            return new ReadOnlyDictionary<int, T>(result);
         }
     }
 }

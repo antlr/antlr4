@@ -61,12 +61,12 @@ namespace Antlr4.Runtime.Dfa
         IEdgeMap<T> Remove(int key);
 
         [return: NotNull]
-        IEdgeMap<T> PutAll<_T0>(IEdgeMap<_T0> m) where _T0:T;
+        IEdgeMap<T> PutAll(IEdgeMap<T> m);
 
         [return: NotNull]
         IEdgeMap<T> Clear();
 
         [return: NotNull]
-        IDictionary<int, T> ToMap();
+        IReadOnlyDictionary<int, T> ToMap();
     }
 }

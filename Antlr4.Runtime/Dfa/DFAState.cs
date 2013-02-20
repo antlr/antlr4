@@ -29,6 +29,8 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
@@ -216,7 +218,7 @@ namespace Antlr4.Runtime.Dfa
             }
         }
 
-        public virtual IDictionary<int, DFAState> EdgeMap
+        public virtual IReadOnlyDictionary<int, DFAState> EdgeMap
         {
             get
             {
@@ -257,7 +259,7 @@ namespace Antlr4.Runtime.Dfa
             }
         }
 
-        public virtual IDictionary<int, DFAState> ContextEdgeMap
+        public virtual IReadOnlyDictionary<int, DFAState> ContextEdgeMap
         {
             get
             {
@@ -265,26 +267,19 @@ namespace Antlr4.Runtime.Dfa
                 {
                     return Sharpen.Collections.EmptyMap<int, DFAState>();
                 }
-                IDictionary<int, DFAState> map = contextEdges.ToMap();
+                IReadOnlyDictionary<int, DFAState> map = contextEdges.ToMap();
                 if (map.ContainsKey(-1))
                 {
                     if (map.Count == 1)
                     {
-                        return Sharpen.Collections.SingletonMap(PredictionContext.EmptyFullStateKey, map.
-                            Get(-1));
+                        return Sharpen.Collections.SingletonMap(PredictionContext.EmptyFullStateKey, map[-1]);
                     }
                     else
                     {
-                        try
-                        {
-                            map.Put(PredictionContext.EmptyFullStateKey, Sharpen.Collections.Remove(map, -1));
-                        }
-                        catch (NotSupportedException)
-                        {
-                            // handles read only, non-singleton maps
-                            map = new SortedDictionary<int, DFAState>(map);
-                            map.Put(PredictionContext.EmptyFullStateKey, Sharpen.Collections.Remove(map, -1));
-                        }
+                        Dictionary<int, DFAState> result = map.ToDictionary(i => i.Key, i => i.Value);
+                        result.Add(PredictionContext.EmptyFullStateKey, result[-1]);
+                        result.Remove(-1);
+                        map = new ReadOnlyDictionary<int, DFAState>(new SortedDictionary<int, DFAState>(result));
                     }
                 }
                 return map;

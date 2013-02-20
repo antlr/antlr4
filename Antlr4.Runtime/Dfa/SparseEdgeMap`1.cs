@@ -29,6 +29,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Antlr4.Runtime.Dfa;
 using Sharpen;
 
@@ -200,7 +201,7 @@ namespace Antlr4.Runtime.Dfa
             return result;
         }
 
-        public override IDictionary<int, T> ToMap()
+        public override IReadOnlyDictionary<int, T> ToMap()
         {
             if (IsEmpty)
             {
@@ -211,7 +212,7 @@ namespace Antlr4.Runtime.Dfa
             {
                 result[keys[i]] = values[i];
             }
-            return result;
+            return new ReadOnlyDictionary<int, T>(result);
         }
     }
 }

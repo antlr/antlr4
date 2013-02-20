@@ -27,6 +27,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using System.Collections;
 using System.Collections.Generic;
 using Antlr4.Runtime.Dfa;
 using Sharpen;
@@ -51,24 +52,46 @@ namespace Antlr4.Runtime.Dfa
 
         public abstract Antlr4.Runtime.Dfa.AbstractEdgeMap<T> Put(int key, T value);
 
-        public virtual Antlr4.Runtime.Dfa.AbstractEdgeMap<T> PutAll<_T0>(IEdgeMap<_T0> m)
-             where _T0:T
+        IEdgeMap<T> IEdgeMap<T>.Put(int key, T value)
+        {
+            return Put(key, value);
+        }
+
+        public virtual Antlr4.Runtime.Dfa.AbstractEdgeMap<T> PutAll(IEdgeMap<T> m)
         {
             Antlr4.Runtime.Dfa.AbstractEdgeMap<T> result = this;
-            foreach (KeyValuePair<int, _T0> entry in m.EntrySet())
+            foreach (KeyValuePair<int, T> entry in m)
             {
                 result = result.Put(entry.Key, entry.Value);
             }
             return result;
         }
 
+        IEdgeMap<T> IEdgeMap<T>.PutAll(IEdgeMap<T> m)
+        {
+            return PutAll(m);
+        }
+
         public abstract Antlr4.Runtime.Dfa.AbstractEdgeMap<T> Clear();
+
+        IEdgeMap<T> IEdgeMap<T>.Clear()
+        {
+            return Clear();
+        }
 
         public abstract Antlr4.Runtime.Dfa.AbstractEdgeMap<T> Remove(int key);
 
+        IEdgeMap<T> IEdgeMap<T>.Remove(int key)
+        {
+            return Remove(key);
+        }
+
         public abstract bool ContainsKey(int arg1);
 
-        public abstract T Get(int arg1);
+        public abstract T this[int arg1]
+        {
+            get;
+        }
 
         public abstract bool IsEmpty
         {
@@ -80,7 +103,7 @@ namespace Antlr4.Runtime.Dfa
             get;
         }
 
-        public abstract IDictionary<int, T> ToMap();
+        public abstract IReadOnlyDictionary<int, T> ToMap();
 
         public virtual IEnumerator<KeyValuePair<int, T>> GetEnumerator()
         {
