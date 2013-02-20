@@ -266,7 +266,10 @@ outer_break: ;
             {
                 throw new InvalidOperationException();
             }
-            Mode(_modeStack.Pop());
+
+            int mode = _modeStack[_modeStack.Count - 1];
+            _modeStack.RemoveAt(_modeStack.Count - 1);
+            Mode(mode);
             return _mode;
         }
 
