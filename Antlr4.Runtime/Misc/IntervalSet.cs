@@ -29,6 +29,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
@@ -197,7 +198,6 @@ namespace Antlr4.Runtime.Misc
                 if (addition.StartsBeforeDisjoint(r))
                 {
                     // insert before r
-                    i--;
                     intervals.Insert(i, addition);
                     return;
                 }
@@ -561,7 +561,7 @@ namespace Antlr4.Runtime.Misc
                 return false;
             }
             Antlr4.Runtime.Misc.IntervalSet other = (Antlr4.Runtime.Misc.IntervalSet)obj;
-            return this.intervals.Equals(other.intervals);
+            return this.intervals.SequenceEqual(other.intervals);
         }
 
         public override string ToString()
