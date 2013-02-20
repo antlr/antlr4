@@ -882,4 +882,4 @@ initValue(typeName) ::= <<
 <javaTypeInitMap.(typeName)>
 >>
 
-codeFileExtension() ::= ".java"
+codeFileExtension() ::= ".cs"
