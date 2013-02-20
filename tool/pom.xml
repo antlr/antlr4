@@ -1,0 +1,237 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.tunnelvisionlabs</groupId>
+    <artifactId>antlr4-csharp</artifactId>
+    <version>4.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>ANTLR 4 Target C#</name>
+    <description>ANTLR 4 C# Target</description>
+    <url>http://www.antlr.org</url>
+    <inceptionYear>1992</inceptionYear>
+    <organization>
+        <name>ANTLR</name>
+        <url>http://www.antlr.org</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>The BSD License</name>
+            <url>http://www.antlr.org/license.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+
+        <developer>
+            <name>Sam Harwell</name>
+            <url>http://tunnelvisionlabs.com</url>
+            <roles>
+                <role>Developer, maintainer</role>
+            </roles>
+        </developer>
+
+    </developers>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java5.home>${env.JAVA5_HOME}</java5.home>
+        <java6.home>${env.JAVA6_HOME}</java6.home>
+        <bootclasspath.java5>${java5.home}/lib/rt.jar</bootclasspath.java5>
+        <bootclasspath.java6>${java6.home}/lib/rt.jar</bootclasspath.java6>
+        <bootclasspath.compile>${bootclasspath.java6}</bootclasspath.compile>
+        <bootclasspath.testCompile>${bootclasspath.java6}</bootclasspath.testCompile>
+        <antlr.testinprocess>true</antlr.testinprocess>
+    </properties>
+
+    <mailingLists>
+        <mailingList>
+            <name>antlr-discussion</name>
+            <archive>https://groups.google.com/forum/?fromgroups#!forum/antlr-discussion</archive>
+        </mailingList>
+    </mailingLists>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/sharwell/antlr4cs/issues</url>
+    </issueManagement>
+
+    <scm>
+        <url>https://github.com/sharwell/antlr4cs/tree/master</url>
+        <connection>scm:git:git://github.com/sharwell/antlr4cs.git</connection>
+        <developerConnection>scm:git:git@github.com:sharwell/antlr4cs.git</developerConnection>
+    </scm>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4</artifactId>
+            <version>4.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>4.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr-runtime</artifactId>
+            <version>3.5</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>ST4</artifactId>
+            <version>4.0.7</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>sonatype-oss-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>default-compile</id>
+                                <configuration>
+                                    <compilerArguments>
+                                        <bootclasspath>${bootclasspath.compile}</bootclasspath>
+                                    </compilerArguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>default-testCompile</id>
+                                <configuration>
+                                    <compilerArguments>
+                                        <bootclasspath>${bootclasspath.testCompile}</bootclasspath>
+                                    </compilerArguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <build>
+
+        <sourceDirectory>src</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>resources</directory>
+            </resource>
+        </resources>
+
+        <testSourceDirectory>test</testSourceDirectory>
+        <testResources>
+            <testResource>
+                <directory>test</directory>
+            </testResource>
+        </testResources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.0</version>
+                <configuration>
+                    <sourceDirectory>src</sourceDirectory>
+                    <showWarnings>true</showWarnings>
+                    <showDeprecation>true</showDeprecation>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <configuration>
+                            <source>1.6</source>
+                            <target>1.6</target>
+                            <compilerArgument>-Xlint:-serial</compilerArgument>
+                            <compilerArguments>
+                                <Xlint/>
+                            </compilerArguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <configuration>
+                            <source>1.6</source>
+                            <target>1.6</target>
+                            <compilerArgument>-Xlint:-serial</compilerArgument>
+                            <compilerArguments>
+                                <Xlint/>
+                            </compilerArguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.12.4</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <!-- override the version inherited from the parent -->
+                <version>2.2.1</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <!-- override the version inherited from the parent -->
+                <version>2.9</version>
+                <configuration>
+                    <quiet>true</quiet>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <!-- override the version inherited from the parent -->
+                <version>1.4</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>
