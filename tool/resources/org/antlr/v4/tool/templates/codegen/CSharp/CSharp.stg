@@ -28,18 +28,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-javaTypeInitMap ::= [
-	"int":"0",
-	"long":"0",
-	"float":"0.0f",
-	"double":"0.0",
-	"boolean":"false",
-	"byte":"0",
-	"short":"0",
-	"char":"0",
-	default:"null" // anything other than a primitive type is an object
-]
-
 // args must be <object-model-object>, <fields-resulting-in-STs>
 
 ParserFile(file, parser, namedActions) ::= <<
@@ -875,11 +863,8 @@ static {
 }
 >>
 
-/** Using a type to init value map, try to init a type; if not in table
- *	must be an object, default value is "null".
- */
 initValue(typeName) ::= <<
-<javaTypeInitMap.(typeName)>
+default(<typeName>)
 >>
 
 codeFileExtension() ::= ".cs"
