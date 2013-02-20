@@ -29,6 +29,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
@@ -251,7 +252,7 @@ namespace Antlr4.Runtime
             IList<TokenStreamRewriter.RewriteOperation> @is = programs.Get(programName);
             if (@is != null)
             {
-                programs[programName] = @is.SubList(MinTokenIndex, instructionIndex);
+                programs[programName] = new List<RewriteOperation>(@is.Skip(MinTokenIndex).Take(instructionIndex - MinTokenIndex));
             }
         }
 
@@ -388,8 +389,8 @@ namespace Antlr4.Runtime
 
         protected internal virtual int GetLastRewriteTokenIndex(string programName)
         {
-            int I = lastRewriteTokenIndexes.Get(programName);
-            if (I == null)
+            int I;
+            if (!lastRewriteTokenIndexes.TryGetValue(programName, out I))
             {
                 return -1;
             }
@@ -721,25 +722,10 @@ namespace Antlr4.Runtime
         }
 
         /// <summary>Get all operations before an index of a particular kind</summary>
-        protected internal virtual IList<T> GetKindOfOps<T, _T1>(IList<_T1> rewrites, int
-             before) where T:TokenStreamRewriter.RewriteOperation where _T1:TokenStreamRewriter.RewriteOperation
+        protected internal virtual IList<T> GetKindOfOps<T>(IList<RewriteOperation> rewrites, int
+             before)
         {
-            System.Type kind = typeof(T);
-            IList<T> ops = new List<T>();
-            for (int i = 0; i < before && i < rewrites.Count; i++)
-            {
-                TokenStreamRewriter.RewriteOperation op = rewrites[i];
-                if (op == null)
-                {
-                    continue;
-                }
-                // ignore deleted
-                if (kind.IsInstanceOfType(op))
-                {
-                    ops.Add(kind.Cast(op));
-                }
-            }
-            return ops;
+            return rewrites.Take(before).OfType<T>().ToList();
         }
     }
 }
