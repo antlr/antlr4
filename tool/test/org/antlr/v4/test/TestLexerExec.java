@@ -538,7 +538,7 @@ public class TestLexerExec extends BaseTest {
 	@Test public void testCharSetNot() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"I : ~[ab \n] ~[ \ncd]* {System.out.println(\"I\");} ;\n"+
+			"I : ~[ab \\n] ~[ \\ncd]* {System.out.println(\"I\");} ;\n"+
 			"WS : [ \\n\\u000D]+ -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "xaf");
 		String expecting =
@@ -551,7 +551,7 @@ public class TestLexerExec extends BaseTest {
 	@Test public void testCharSetInSet() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"I : (~[ab \n]|'a') {System.out.println(\"I\");} ;\n"+
+			"I : (~[ab \\n]|'a') {System.out.println(\"I\");} ;\n"+
 			"WS : [ \\n\\u000D]+ -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "a x");
 		String expecting =
@@ -568,7 +568,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"I : [0-9]+ {System.out.println(\"I\");} ;\n"+
 			"ID : [a-zA-Z] [a-zA-Z0-9]* {System.out.println(\"ID\");} ;\n"+
-			"WS : [ \\n\\u0009\r]+ -> skip ;";
+			"WS : [ \\n\\u0009\\r]+ -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "34\r 34 a2 abc \n   ");
 		String expecting =
 			"I\n" +
@@ -641,7 +641,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"A : [\"a-z]+ {System.out.println(\"A\");} ;\n"+
-			"WS : [ \n\t]+ -> skip ;";
+			"WS : [ \\n\\t]+ -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "b\"a");
 		String expecting =
 			"A\n" +
@@ -654,7 +654,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"A : [\"\\\\ab]+ {System.out.println(\"A\");} ;\n"+
-			"WS : [ \n\t]+ -> skip ;";
+			"WS : [ \\n\\t]+ -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "b\"\\a");
 		String expecting =
 			"A\n" +
