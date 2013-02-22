@@ -441,10 +441,10 @@ public class DOTGenerator {
 	 *  generate any gated predicates on edge too.
 	 */
     protected String getEdgeLabel(String label) {
-		label = Utils.replace(label,"\\", "\\\\");
-		label = Utils.replace(label,"\"", "\\\"");
-		label = Utils.replace(label,"\n", "\\\\n");
-		label = Utils.replace(label,"\r", "");
+		label = label.replace("\\", "\\\\");
+		label = label.replace("\"", "\\\"");
+		label = label.replace("\n", "\\\\n");
+		label = label.replace("\r", "");
         return label;
     }
 

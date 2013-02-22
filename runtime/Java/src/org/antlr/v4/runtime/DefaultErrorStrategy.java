@@ -431,9 +431,9 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 
 	protected String escapeWSAndQuote(String s) {
 //		if ( s==null ) return s;
-		s = s.replaceAll("\n","\\\\n");
-		s = s.replaceAll("\r","\\\\r");
-		s = s.replaceAll("\t","\\\\t");
+		s = s.replace("\n","\\n");
+		s = s.replace("\r","\\r");
+		s = s.replace("\t","\\t");
 		return "'"+s+"'";
 	}
 
