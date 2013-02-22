@@ -30,10 +30,14 @@
 
 package org.antlr.v4.runtime.misc;
 
-public class Triple<A,B,C> extends Pair<A,B> {
-	public C c;
+public class Triple<A,B,C> {
+	public final A a;
+	public final B b;
+	public final C c;
+
 	public Triple(A a, B b, C c) {
-		super(a,b);
+		this.a = a;
+		this.b = b;
 		this.c = c;
 	}
 
