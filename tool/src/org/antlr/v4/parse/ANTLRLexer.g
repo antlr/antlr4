@@ -621,7 +621,7 @@ STRING_LITERAL
 @init {
    int len = 0;
 }
-    :  '\'' ( ( ESC_SEQ | ~('\\'|'\'') ) {len++;} )* '\''
+    :  '\'' ( ( ESC_SEQ | ~('\\'|'\''|'\r'|'\n') ) {len++;} )* '\''
     ;
 
 // A valid hex digit specification

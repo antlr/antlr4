@@ -159,6 +159,7 @@ public abstract class BaseTest {
 	protected ATN createATN(Grammar g, boolean useSerializer) {
 		if ( g.atn==null ) {
 			semanticProcess(g);
+			assertEquals(0, g.tool.getNumErrors());
 
 			ParserATNFactory f;
 			if ( g.isLexer() ) {
@@ -169,6 +170,7 @@ public abstract class BaseTest {
 			}
 
 			g.atn = f.createATN();
+			assertEquals(0, g.tool.getNumErrors());
 		}
 
 		ATN atn = g.atn;
