@@ -42,7 +42,7 @@ public class DefaultToolListener implements ANTLRToolListener {
 	@Override
 	public void info(String msg) {
 		if (tool.errMgr.formatWantsSingleLineMessage()) {
-			msg = msg.replaceAll("\n", " ");
+			msg = msg.replace('\n', ' ');
 		}
 		System.out.println(msg);
 	}
@@ -52,7 +52,7 @@ public class DefaultToolListener implements ANTLRToolListener {
 		ST msgST = tool.errMgr.getMessageTemplate(msg);
 		String outputMsg = msgST.render();
 		if (tool.errMgr.formatWantsSingleLineMessage()) {
-			outputMsg = outputMsg.replaceAll("\n", " ");
+			outputMsg = outputMsg.replace('\n', ' ');
 		}
 		System.err.println(outputMsg);
 	}
@@ -62,7 +62,7 @@ public class DefaultToolListener implements ANTLRToolListener {
 		ST msgST = tool.errMgr.getMessageTemplate(msg);
 		String outputMsg = msgST.render();
 		if (tool.errMgr.formatWantsSingleLineMessage()) {
-			outputMsg = outputMsg.replaceAll("\n", " ");
+			outputMsg = outputMsg.replace('\n', ' ');
 		}
 		System.err.println(outputMsg);
 	}

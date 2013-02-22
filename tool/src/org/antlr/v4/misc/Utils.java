@@ -89,31 +89,6 @@ public class Utils {
 		return buf.toString();
 	}
 
-	/** Given a source string, src,
-		a string to replace, replacee,
-		and a string to replace with, replacer,
-		return a new string w/ the replacing done.
-		You can use replacer==null to remove replacee from the string.
-
-		This should be faster than Java's String.replaceAll as that one
-		uses regex (I only want to play with strings anyway).
-	*/
-	public static String replace(String src, String replacee, String replacer) {
-		StringBuilder result = new StringBuilder(src.length() + 50);
-		int startIndex = 0;
-		int endIndex = src.indexOf(replacee);
-		while(endIndex != -1) {
-			result.append(src.substring(startIndex,endIndex));
-			if ( replacer!=null ) {
-				result.append(replacer);
-			}
-			startIndex = endIndex + replacee.length();
-			endIndex = src.indexOf(replacee,startIndex);
-		}
-		result.append(src.substring(startIndex,src.length()));
-		return result.toString();
-	}
-
 	public static String sortLinesInString(String s) {
 		String lines[] = s.split("\n");
 		Arrays.sort(lines);

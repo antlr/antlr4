@@ -211,9 +211,9 @@ public class CommonToken implements WritableToken, Serializable {
 		}
 		String txt = getText();
 		if ( txt!=null ) {
-			txt = txt.replaceAll("\n","\\\\n");
-			txt = txt.replaceAll("\r","\\\\r");
-			txt = txt.replaceAll("\t","\\\\t");
+			txt = txt.replace("\n","\\n");
+			txt = txt.replace("\r","\\r");
+			txt = txt.replace("\t","\\t");
 		}
 		else {
 			txt = "<no text>";

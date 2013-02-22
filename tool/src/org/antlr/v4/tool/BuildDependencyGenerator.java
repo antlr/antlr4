@@ -181,9 +181,7 @@ public class BuildDependencyGenerator {
 		}
 
 		if (outputDir.getName().indexOf(' ') >= 0) { // has spaces?
-			String escSpaces = Utils.replace(outputDir.toString(),
-											 " ",
-											 "\\ ");
+			String escSpaces = outputDir.toString().replace(" ", "\\ ");
 			outputDir = new File(escSpaces);
 		}
 		return new File(outputDir, fileName);
@@ -266,9 +264,7 @@ public class BuildDependencyGenerator {
             return fileName;
         }
 		else if (outputDir.indexOf(' ') >= 0) { // has spaces?
-            String escSpaces = Utils.replace(outputDir,
-                    " ",
-                    "\\ ");
+            String escSpaces = outputDir.replace(" ", "\\ ");
             return escSpaces + File.separator + fileName;
         }
 		else {

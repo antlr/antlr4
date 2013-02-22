@@ -687,9 +687,9 @@ public abstract class BaseTest {
             String actual = equeue.toString(g != null ? g.tool : new Tool());
 			System.err.println(actual);
 			String msg = input;
-			msg = msg.replaceAll("\n","\\\\n");
-			msg = msg.replaceAll("\r","\\\\r");
-			msg = msg.replaceAll("\t","\\\\t");
+			msg = msg.replace("\n","\\n");
+			msg = msg.replace("\r","\\r");
+			msg = msg.replace("\t","\\t");
 
             assertEquals("error in: "+msg,expect,actual);
         }
