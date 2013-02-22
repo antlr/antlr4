@@ -168,7 +168,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"lexer grammar A;" +
 			"ENUM : [a-z]+ {getText().equals(\"enum\")}? {System.out.println(\"enum!\");} ;\n" +
 			"ID   : [a-z]+ {System.out.println(\"ID \"+getText());} ;\n" +
-			"WS   : [ \n] -> skip ;";
+			"WS   : [ \\n] -> skip ;";
 		String found = execLexer("A.g4", grammar, "A", "enum enu a");
 		String expecting =
 			"enum!\n" +

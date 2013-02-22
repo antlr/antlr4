@@ -288,8 +288,12 @@ options {k=1;}
 
 fragment
 LEXER_CHAR_SET
-    :   '[' ('\\]'|'\\' ~']'|~('\\'|']'))* ']'
-    ;
+	:	'['
+		(	'\\' ~('\r'|'\n')
+		|	~('\r'|'\n'|'\\'|']')
+		)*
+		']'
+	;
 
 // --------------
 // Argument specs
@@ -617,7 +621,7 @@ STRING_LITERAL
 @init {
    int len = 0;
 }
-    :  '\'' ( ( ESC_SEQ | ~('\\'|'\'') ) {len++;} )* '\''
+    :  '\'' ( ( ESC_SEQ | ~('\\'|'\''|'\r'|'\n') ) {len++;} )* '\''
     ;
 
 // A valid hex digit specification

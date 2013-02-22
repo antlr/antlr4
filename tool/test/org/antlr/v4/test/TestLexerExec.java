@@ -202,7 +202,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"CMT : '/*' (CMT | .)*? '*/' ;\n" +
-			"WS : (' '|'\n')+ ;\n"
+			"WS : (' '|'\\n')+ ;\n"
 			/*+ "ANY : .;"*/;
 
 		String expecting =
@@ -240,7 +240,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"CMT : '/*' (CMT | .)+? '*/' ;\n" +
-			"WS : (' '|'\n')+ ;\n"
+			"WS : (' '|'\\n')+ ;\n"
 			/*+ "ANY : .;"*/;
 
 		String expecting =
@@ -382,7 +382,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n" +
 			"STRING_START : '\"' {pushMode(STRING_MODE); more();} ;\n" +
-			"WS : (' '|'\n') {skip();} ;\n"+
+			"WS : (' '|'\\n') {skip();} ;\n"+
 			"mode STRING_MODE;\n"+
 			"STRING : '\"' {popMode();} ;\n"+
 			"ANY : . {more();} ;\n";
@@ -398,7 +398,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n" +
 			"STRING_START : '\"' -> pushMode(STRING_MODE), more ;\n" +
-			"WS : (' '|'\n') -> skip ;\n"+
+			"WS : (' '|'\\n') -> skip ;\n"+
 			"mode STRING_MODE;\n"+
 			"STRING : '\"' -> popMode ;\n"+  // token type 2
 			"ANY : . -> more ;\n";
@@ -414,7 +414,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n" +
 			"STRING_START : '\"' -> mode(STRING_MODE), more ;\n" +
-			"WS : (' '|'\n') -> skip ;\n"+
+			"WS : (' '|'\\n') -> skip ;\n"+
 			"mode STRING_MODE;\n"+
 			"STRING : '\"' -> mode(DEFAULT_MODE) ;\n"+ // ttype 2 since '"' ambiguity
 			"ANY : . -> more ;\n";
@@ -431,7 +431,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"KEND : 'end' ;\n" + // has priority
 			"ID : 'a'..'z'+ ;\n" +
-			"WS : (' '|'\n')+ ;";
+			"WS : (' '|'\\n')+ ;";
 		String found = execLexer("L.g4", grammar, "L", "end eend ending a");
 		String expecting =
 			"[@0,0:2='end',<1>,1:0]\n" +
@@ -454,7 +454,7 @@ public class TestLexerExec extends BaseTest {
 			"DOT : '.' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"fragment HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;\n" +
-			"WS : (' '|'\n')+ ;";
+			"WS : (' '|'\\n')+ ;";
 		String found = execLexer("L.g4", grammar, "L", "x 0 1 a.b a.l");
 		String expecting =
 			"[@0,0:0='x',<5>,1:0]\n" +
@@ -538,7 +538,7 @@ public class TestLexerExec extends BaseTest {
 	@Test public void testCharSetNot() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"I : ~[ab \n] ~[ \ncd]* {System.out.println(\"I\");} ;\n"+
+			"I : ~[ab \\n] ~[ \\ncd]* {System.out.println(\"I\");} ;\n"+
 			"WS : [ \\n\\u000D]+ -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "xaf");
 		String expecting =
@@ -551,7 +551,7 @@ public class TestLexerExec extends BaseTest {
 	@Test public void testCharSetInSet() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"I : (~[ab \n]|'a') {System.out.println(\"I\");} ;\n"+
+			"I : (~[ab \\n]|'a') {System.out.println(\"I\");} ;\n"+
 			"WS : [ \\n\\u000D]+ -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "a x");
 		String expecting =
@@ -568,7 +568,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"I : [0-9]+ {System.out.println(\"I\");} ;\n"+
 			"ID : [a-zA-Z] [a-zA-Z0-9]* {System.out.println(\"ID\");} ;\n"+
-			"WS : [ \\n\\u0009\r]+ -> skip ;";
+			"WS : [ \\n\\u0009\\r]+ -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "34\r 34 a2 abc \n   ");
 		String expecting =
 			"I\n" +
@@ -641,7 +641,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"A : [\"a-z]+ {System.out.println(\"A\");} ;\n"+
-			"WS : [ \n\t]+ -> skip ;";
+			"WS : [ \\n\\t]+ -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "b\"a");
 		String expecting =
 			"A\n" +
@@ -654,7 +654,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"A : [\"\\\\ab]+ {System.out.println(\"A\");} ;\n"+
-			"WS : [ \n\t]+ -> skip ;";
+			"WS : [ \\n\\t]+ -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "b\"\\a");
 		String expecting =
 			"A\n" +

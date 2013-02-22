@@ -358,7 +358,7 @@ public class TestATNSerialization extends BaseTest {
 	@Test public void testLexerEOFInSet() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
-			"INT : 'a' (EOF|'\n') ;\n");
+			"INT : 'a' (EOF|'\\n') ;\n");
 		String expecting =
 			"max type 1\n" +
 				"0:TOKEN_START -1\n" +

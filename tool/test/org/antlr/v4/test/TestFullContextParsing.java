@@ -296,7 +296,7 @@ public class TestFullContextParsing extends BaseTest {
 			"    | ID\n" +
 			"    ;\n" +
 			"ID  : [a-z]+ ;\n" +
-			"WS  : [ \r\n\t]+ -> skip ;\n";
+			"WS  : [ \\r\\n\\t]+ -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "prog", "a@", true);
 		assertEquals("alt 1\n", found);
