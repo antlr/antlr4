@@ -62,9 +62,9 @@ public class LL1StarBlock extends LL1Loop {
 		System.arraycopy(altLookSets, 0, copy, 0, altLookSets.length-1); // remove last (exit) alt
 		altLookSets = copy;
 		altLook = getAltLookaheadAsStringLists(altLookSets);
-		loopLabel = factory.getGenerator().target.getLoopLabel(starRootAST);
+		loopLabel = factory.getGenerator().getTarget().getLoopLabel(starRootAST);
 
 		this.exitLook =
-			factory.getGenerator().target.getTokenTypesAsTargetLabels(factory.getGrammar(), lastLook.toArray());
+			factory.getGenerator().getTarget().getTokenTypesAsTargetLabels(factory.getGrammar(), lastLook.toArray());
 	}
 }

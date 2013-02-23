@@ -66,7 +66,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		// use codegen to get correct language templates for lexer commands
 		String language = g.getOptionString("language");
 		CodeGenerator gen = new CodeGenerator(g.tool, null, language);
-		codegenTemplates = gen.templates;
+		codegenTemplates = gen.getTemplates();
 	}
 
 	@Override

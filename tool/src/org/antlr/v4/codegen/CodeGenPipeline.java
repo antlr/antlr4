@@ -56,14 +56,14 @@ public class CodeGenPipeline {
 		idTypes.add(ANTLRParser.TOKEN_REF);
 		List<GrammarAST> idNodes = g.ast.getNodesWithType(idTypes);
 		for (GrammarAST idNode : idNodes) {
-			if ( gen.target.grammarSymbolCausesIssueInGeneratedCode(idNode) ) {
+			if ( gen.getTarget().grammarSymbolCausesIssueInGeneratedCode(idNode) ) {
 				g.tool.errMgr.grammarError(ErrorType.USE_OF_BAD_WORD,
 										   g.fileName, idNode.getToken(),
 										   idNode.getText());
 			}
 		}
 
-		if ( gen.templates==null ) return;
+		if ( gen.getTemplates()==null ) return;
 
 		if ( g.isLexer() ) {
 			ST lexer = gen.generateLexer();
