@@ -65,7 +65,7 @@ public class Target {
 	 */
 	protected String[] targetCharValueEscape = new String[255];
 
-	public CodeGenerator gen;
+	private final CodeGenerator gen;
 	private final String language;
 	private STGroup templates;
 
@@ -97,6 +97,14 @@ public class Target {
 		addBadWords();
 	}
 
+	public CodeGenerator getCodeGenerator() {
+		return gen;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
 	public STGroup getTemplates() {
 		if (templates == null) {
 			templates = loadTemplates();
@@ -115,14 +123,14 @@ public class Target {
 						   ST outputFileST,
 						   String fileName)
 	{
-		gen.write(outputFileST, fileName);
+		getCodeGenerator().write(outputFileST, fileName);
 	}
 
 	protected void genListenerFile(Grammar g,
 								   ST outputFileST)
 	{
-		String fileName = gen.getListenerFileName();
-		gen.write(outputFileST, fileName);
+		String fileName = getCodeGenerator().getListenerFileName();
+		getCodeGenerator().write(outputFileST, fileName);
 	}
 
 	protected void genRecognizerHeaderFile(Grammar g,
@@ -343,11 +351,11 @@ public class Target {
 	// for literals like 'while', we gen _s<ttype>
 	public String getImplicitTokenLabel(String tokenName) {
 		ST st = getTemplates().getInstanceOf("ImplicitTokenLabel");
-		int ttype = gen.g.getTokenType(tokenName);
+		int ttype = getCodeGenerator().g.getTokenType(tokenName);
 		if ( tokenName.startsWith("'") ) {
 			return "s"+ttype;
 		}
-		String text = getTokenTypeAsTargetLabel(gen.g, ttype);
+		String text = getTokenTypeAsTargetLabel(getCodeGenerator().g, ttype);
 		st.add("tokenName", text);
 		return st.render();
 	}
@@ -376,10 +384,10 @@ public class Target {
 			return "_wild";
 		}
 
-		if ( gen.g.getRule(name)!=null ) return name;
-		int ttype = gen.g.getTokenType(name);
+		if ( getCodeGenerator().g.getRule(name)!=null ) return name;
+		int ttype = getCodeGenerator().g.getTokenType(name);
 		if ( ttype==Token.INVALID_TYPE ) return name;
-		return getTokenTypeAsTargetLabel(gen.g, ttype);
+		return getTokenTypeAsTargetLabel(getCodeGenerator().g, ttype);
 	}
 
 	public boolean grammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
@@ -421,7 +429,7 @@ public class Target {
 	}
 
 	protected STGroup loadTemplates() {
-		STGroup result = new STGroupFile(CodeGenerator.TEMPLATE_ROOT+"/"+language+"/"+language+STGroup.GROUP_FILE_EXTENSION);
+		STGroup result = new STGroupFile(CodeGenerator.TEMPLATE_ROOT+"/"+getLanguage()+"/"+getLanguage()+STGroup.GROUP_FILE_EXTENSION);
 		result.registerRenderer(Integer.class, new NumberRenderer());
 		result.registerRenderer(String.class, new StringRenderer());
 		result.setListener(new STErrorListener() {
@@ -446,7 +454,7 @@ public class Target {
 			}
 
 			private void reportError(STMessage msg) {
-				gen.tool.errMgr.toolError(ErrorType.STRING_TEMPLATE_WARNING, msg.cause, msg.toString());
+				getCodeGenerator().tool.errMgr.toolError(ErrorType.STRING_TEMPLATE_WARNING, msg.cause, msg.toString());
 			}
 		});
 
