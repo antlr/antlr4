@@ -480,13 +480,14 @@ public class ParserATNSimulator extends ATNSimulator {
 										   " at DFA state "+s.stateNumber);
 				}
 
+				//TODO: recheck synchronization here. don't need if no sync
 				// recheck; another thread might have added edge
 				if ( s.edges == null || t >= s.edges.length || t < -1 || s.edges[t+1] == null ) {
 					alt = execATN(dfa, s, input, startIndex, outerContext);
 					// this adds edge even if next state is accept for
 					// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
 					// TODO: This next stuff kills edge, but extra states remain. :(
-					if ( s.isAcceptState && alt!=-1 ) {
+					if ( s.isAcceptState && alt!=ATN.INVALID_ALT_NUMBER ) {
 						DFAState d = s.edges[input.LA(1)+1];
 						if ( d.isAcceptState && d.prediction==s.prediction ) {
 							// we can carve it out.
@@ -509,6 +510,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				throw noViableAlt(input, outerContext, s.configs, startIndex);
 			}
 			s = target;
+			//TODO: can't be acceptstate here; rm that part of test?
 			if (!s.requiresFullContext && !s.isAcceptState && t != IntStream.EOF) {
 				input.consume();
 				t = input.LA(1);
