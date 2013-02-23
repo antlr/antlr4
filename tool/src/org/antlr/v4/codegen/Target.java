@@ -33,12 +33,18 @@ package org.antlr.v4.codegen;
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.stringtemplate.v4.NumberRenderer;
 import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STErrorListener;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
+import org.stringtemplate.v4.StringRenderer;
+import org.stringtemplate.v4.misc.STMessage;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -60,6 +66,8 @@ public class Target {
 	protected String[] targetCharValueEscape = new String[255];
 
 	public CodeGenerator gen;
+	private final String language;
+	private STGroup templates;
 
 	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
 	public Set<String> badWords = new HashSet<String>();
@@ -75,7 +83,7 @@ public class Target {
 		"void", "volatile", "while"
 	};
 
-	public Target(CodeGenerator gen) {
+	public Target(CodeGenerator gen, String language) {
 		targetCharValueEscape['\n'] = "\\n";
 		targetCharValueEscape['\r'] = "\\r";
 		targetCharValueEscape['\t'] = "\\t";
@@ -85,7 +93,16 @@ public class Target {
 		targetCharValueEscape['\''] = "\\'";
 		targetCharValueEscape['"'] = "\\\"";
 		this.gen = gen;
+		this.language = language;
 		addBadWords();
+	}
+
+	public STGroup getTemplates() {
+		if (templates == null) {
+			templates = loadTemplates();
+		}
+
+		return templates;
 	}
 
 	public void addBadWords() {
@@ -293,20 +310,20 @@ public class Target {
 	}
 
 	public String getListLabel(String label) {
-		ST st = gen.getTemplates().getInstanceOf("ListLabelName");
+		ST st = getTemplates().getInstanceOf("ListLabelName");
 		st.add("label", label);
 		return st.render();
 	}
 
 	public String getRuleFunctionContextStructName(Rule r) {
 		if ( r.g.isLexer() ) {
-			return gen.getTemplates().getInstanceOf("LexerRuleContext").render();
+			return getTemplates().getInstanceOf("LexerRuleContext").render();
 		}
-		return Utils.capitalize(r.name)+gen.getTemplates().getInstanceOf("RuleContextNameSuffix").render();
+		return Utils.capitalize(r.name)+getTemplates().getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	public String getAltLabelContextStructName(String label) {
-		return Utils.capitalize(label)+gen.getTemplates().getInstanceOf("RuleContextNameSuffix").render();
+		return Utils.capitalize(label)+getTemplates().getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	/** If we know which actual function, we can provide the actual ctx type.
@@ -317,15 +334,15 @@ public class Target {
 	public String getRuleFunctionContextStructName(RuleFunction function) {
 		Rule r = function.rule;
 		if ( r.g.isLexer() ) {
-			return gen.getTemplates().getInstanceOf("LexerRuleContext").render();
+			return getTemplates().getInstanceOf("LexerRuleContext").render();
 		}
-		return Utils.capitalize(r.name)+gen.getTemplates().getInstanceOf("RuleContextNameSuffix").render();
+		return Utils.capitalize(r.name)+getTemplates().getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	// should be same for all refs to same token like ctx.ID within single rule function
 	// for literals like 'while', we gen _s<ttype>
 	public String getImplicitTokenLabel(String tokenName) {
-		ST st = gen.getTemplates().getInstanceOf("ImplicitTokenLabel");
+		ST st = getTemplates().getInstanceOf("ImplicitTokenLabel");
 		int ttype = gen.g.getTokenType(tokenName);
 		if ( tokenName.startsWith("'") ) {
 			return "s"+ttype;
@@ -337,19 +354,19 @@ public class Target {
 
 	// x=(A|B)
 	public String getImplicitSetLabel(String id) {
-		ST st = gen.getTemplates().getInstanceOf("ImplicitSetLabel");
+		ST st = getTemplates().getInstanceOf("ImplicitSetLabel");
 		st.add("id", id);
 		return st.render();
 	}
 
 	public String getImplicitRuleLabel(String ruleName) {
-		ST st = gen.getTemplates().getInstanceOf("ImplicitRuleLabel");
+		ST st = getTemplates().getInstanceOf("ImplicitRuleLabel");
 		st.add("ruleName", ruleName);
 		return st.render();
 	}
 
 	public String getElementListName(String name) {
-		ST st = gen.getTemplates().getInstanceOf("ElementListName");
+		ST st = getTemplates().getInstanceOf("ElementListName");
 		st.add("elemName", getElementName(name));
 		return st.render();
 	}
@@ -401,5 +418,38 @@ public class Target {
 
 	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
 		return badWords.contains(idNode.getText());
+	}
+
+	protected STGroup loadTemplates() {
+		STGroup result = new STGroupFile(CodeGenerator.TEMPLATE_ROOT+"/"+language+"/"+language+STGroup.GROUP_FILE_EXTENSION);
+		result.registerRenderer(Integer.class, new NumberRenderer());
+		result.registerRenderer(String.class, new StringRenderer());
+		result.setListener(new STErrorListener() {
+			@Override
+			public void compileTimeError(STMessage msg) {
+				reportError(msg);
+			}
+
+			@Override
+			public void runTimeError(STMessage msg) {
+				reportError(msg);
+			}
+
+			@Override
+			public void IOError(STMessage msg) {
+				reportError(msg);
+			}
+
+			@Override
+			public void internalError(STMessage msg) {
+				reportError(msg);
+			}
+
+			private void reportError(STMessage msg) {
+				gen.tool.errMgr.toolError(ErrorType.STRING_TEMPLATE_WARNING, msg.cause, msg.toString());
+			}
+		});
+
+		return result;
 	}
 }

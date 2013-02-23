@@ -68,7 +68,6 @@ public class CodeGenerator {
 	public final Tool tool;
 
 	private Target target;
-	private STGroup templates;
 
 	public int lineWidth = 72;
 
@@ -80,7 +79,6 @@ public class CodeGenerator {
 		this.g = g;
 		this.tool = tool;
 		loadLanguageTarget(language);
-		loadTemplates(language);
 	}
 
 	public Target getTarget() {
@@ -88,7 +86,7 @@ public class CodeGenerator {
 	}
 
 	public STGroup getTemplates() {
-		return templates;
+		return getTarget().getTemplates();
 	}
 
 	void loadLanguageTarget(String language) {
@@ -99,10 +97,10 @@ public class CodeGenerator {
 			target = ctor.newInstance(this);
 		}
 		catch (ClassNotFoundException cnfe) {
-			target = new Target(this); // use default
+			target = new Target(this, language); // use default
 		}
 		catch (NoSuchMethodException nsme) {
-			target = new Target(this); // use default
+			target = new Target(this, language); // use default
 		}
 		catch (InvocationTargetException ite) {
 			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
@@ -118,44 +116,6 @@ public class CodeGenerator {
 			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
 						 cnfe,
 						 targetName);
-		}
-	}
-
-	public void loadTemplates(String language) {
-		try {
-			templates = new STGroupFile(TEMPLATE_ROOT+"/"+language+"/"+language+STGroup.GROUP_FILE_EXTENSION);
-			templates.registerRenderer(Integer.class, new NumberRenderer());
-			templates.registerRenderer(String.class, new StringRenderer());
-			templates.setListener(new STErrorListener() {
-				@Override
-				public void compileTimeError(STMessage msg) {
-					reportError(msg);
-				}
-
-				@Override
-				public void runTimeError(STMessage msg) {
-					reportError(msg);
-				}
-
-				@Override
-				public void IOError(STMessage msg) {
-					reportError(msg);
-				}
-
-				@Override
-				public void internalError(STMessage msg) {
-					reportError(msg);
-				}
-
-				private void reportError(STMessage msg) {
-					tool.errMgr.toolError(ErrorType.STRING_TEMPLATE_WARNING, msg.cause, msg.toString());
-				}
-			});
-		}
-		catch (IllegalArgumentException iae) {
-			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-									null,
-						 			language);
 		}
 	}
 
