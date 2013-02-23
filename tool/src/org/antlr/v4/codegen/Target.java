@@ -46,10 +46,6 @@ import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.misc.STMessage;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 /** */
 public abstract class Target {
 	/** For pure strings of Java 16-bit Unicode char, how can we display
@@ -69,20 +65,6 @@ public abstract class Target {
 	private final String language;
 	private STGroup templates;
 
-	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
-	public Set<String> badWords = new HashSet<String>();
-
-	public static String[] javaKeywords = {
-		"abstract", "assert", "boolean", "break", "byte", "case", "catch",
-		"char", "class", "const", "continue", "default", "do", "double", "else",
-		"enum", "extends", "false", "final", "finally", "float", "for",
-		"if", "implements", "import", "instanceof", "int", "interface",
-		"long", "native", "new", "null", "package", "private", "protected",
-		"public", "return", "short", "static", "strictfp", "super", "switch",
-		"synchronized", "this", "throw", "throws", "transient", "true", "try",
-		"void", "volatile", "while"
-	};
-
 	protected Target(CodeGenerator gen, String language) {
 		targetCharValueEscape['\n'] = "\\n";
 		targetCharValueEscape['\r'] = "\\r";
@@ -94,7 +76,6 @@ public abstract class Target {
 		targetCharValueEscape['"'] = "\\\"";
 		this.gen = gen;
 		this.language = language;
-		addBadWords();
 	}
 
 	public CodeGenerator getCodeGenerator() {
@@ -111,12 +92,6 @@ public abstract class Target {
 		}
 
 		return templates;
-	}
-
-	public void addBadWords() {
-		badWords.addAll(Arrays.asList(javaKeywords));
-		badWords.add("rule");
-		badWords.add("parserRule");
 	}
 
 	protected void genFile(Grammar g,
@@ -424,9 +399,7 @@ public abstract class Target {
 		return visibleGrammarSymbolCausesIssueInGeneratedCode(idNode);
 	}
 
-	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
-		return badWords.contains(idNode.getText());
-	}
+	protected abstract boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode);
 
 	protected STGroup loadTemplates() {
 		STGroup result = new STGroupFile(CodeGenerator.TEMPLATE_ROOT+"/"+getLanguage()+"/"+getLanguage()+STGroup.GROUP_FILE_EXTENSION);
