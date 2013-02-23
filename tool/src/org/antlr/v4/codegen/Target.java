@@ -138,63 +138,6 @@ public class Target {
 		return labels;
 	}
 
-	/** Convert from an ANTLR char literal found in a grammar file to
-	 *  an equivalent char literal in the target language.  For most
-	 *  languages, this means leaving 'x' as 'x'.  Actually, we need
-	 *  to escape '\u000A' so that it doesn't get converted to \n by
-	 *  the compiler.  Convert the literal to the char value and then
-	 *  to an appropriate target char literal.
-	 *
-	 *  Expect single quotes around the incoming literal.
-	 *  TODO: unused and should call CharSupport.getANTLRCharLiteralForChar anyway
-	 */
-	public String getTargetCharLiteralCharValue(int c) {
-		StringBuilder buf = new StringBuilder();
-		buf.append('\'');
-		if ( c< Lexer.MIN_CHAR_VALUE ) return "'\u0000'";
-		if ( c<targetCharValueEscape.length &&
-			 targetCharValueEscape[c]!=null )
-		{
-			buf.append(targetCharValueEscape[c]);
-		}
-		else if ( Character.UnicodeBlock.of((char)c)==
-				  Character.UnicodeBlock.BASIC_LATIN &&
-				  !Character.isISOControl((char)c) )
-		{
-			// normal char
-			buf.append((char)c);
-		}
-		else {
-			// must be something unprintable...use \\uXXXX
-			// turn on the bit above max "\\uFFFF" value so that we pad with zeros
-			// then only take last 4 digits
-			String hex = Integer.toHexString(c|0x10000).toUpperCase().substring(1,5);
-			buf.append("\\u");
-			buf.append(hex);
-		}
-
-		buf.append('\'');
-		return buf.toString();
-	}
-
-	/** Convert long to 0xNNNNNNNNNNNNNNNN by default for spitting out
-	 *  with bitsets.  I.e., convert bytes to hex string.
-	 */
-	public String getTarget64BitStringFromValue(long word) {
-		int numHexDigits = 8*2;
-		StringBuilder buf = new StringBuilder(numHexDigits+2);
-		buf.append("0x");
-		String digits = Long.toHexString(word);
-		digits = digits.toUpperCase();
-		int padding = numHexDigits - digits.length();
-		// pad left with zeros
-		for (int i=1; i<=padding; i++) {
-			buf.append('0');
-		}
-		buf.append(digits);
-		return buf.toString();
-	}
-
 	/** Given a random string of Java unicode chars, return a new string with
 	 *  optionally appropriate quote characters for target language and possibly
 	 *  with some escaped characters.  For example, if the incoming string has
