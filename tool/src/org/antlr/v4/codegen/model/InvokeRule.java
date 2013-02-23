@@ -64,7 +64,7 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 		this.name = ast.getText();
 		CodeGenerator gen = factory.getGenerator();
 		Rule r = factory.getGrammar().getRule(name);
-		ctxName = gen.target.getRuleFunctionContextStructName(r);
+		ctxName = gen.getTarget().getRuleFunctionContextStructName(r);
 
 		// TODO: move to factory
 		RuleFunction rf = factory.getCurrentRuleFunction();
@@ -73,7 +73,7 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 			String label = labelAST.getText();
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN  ) {
 				factory.defineImplicitLabel(ast, this);
-				String listLabel = gen.target.getListLabel(label);
+				String listLabel = gen.getTarget().getListLabel(label);
 				RuleContextListDecl l = new RuleContextListDecl(factory, listLabel, ctxName);
 				rf.addContextDecl(ast.getAltLabel(), l);
 			}
@@ -90,7 +90,7 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 
 		// If action refs rule as rulename not label, we need to define implicit label
 		if ( factory.getCurrentOuterMostAlt().ruleRefsInActions.containsKey(ast.getText()) ) {
-			String label = gen.target.getImplicitRuleLabel(ast.getText());
+			String label = gen.getTarget().getImplicitRuleLabel(ast.getText());
 			RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
 			labels.add(d);
 			rf.addContextDecl(ast.getAltLabel(), d);

@@ -67,8 +67,8 @@ public class CodeGenerator {
 	@NotNull
 	public final Tool tool;
 
-	public Target target;
-	public STGroup templates;
+	private Target target;
+	private STGroup templates;
 
 	public int lineWidth = 72;
 
@@ -81,6 +81,14 @@ public class CodeGenerator {
 		this.tool = tool;
 		loadLanguageTarget(language);
 		loadTemplates(language);
+	}
+
+	public Target getTarget() {
+		return target;
+	}
+
+	public STGroup getTemplates() {
+		return templates;
 	}
 
 	void loadLanguageTarget(String language) {
@@ -161,7 +169,7 @@ public class CodeGenerator {
 	}
 
 	private ST walk(OutputModelObject outputModel) {
-		OutputModelWalker walker = new OutputModelWalker(tool, templates);
+		OutputModelWalker walker = new OutputModelWalker(tool, getTemplates());
 		return walker.walk(outputModel);
 	}
 
@@ -205,33 +213,33 @@ public class CodeGenerator {
 	}
 
 	public void writeRecognizer(ST outputFileST) {
-		target.genFile(g, outputFileST, getRecognizerFileName());
+		getTarget().genFile(g, outputFileST, getRecognizerFileName());
 	}
 
 	public void writeListener(ST outputFileST) {
-		target.genFile(g,outputFileST, getListenerFileName());
+		getTarget().genFile(g,outputFileST, getListenerFileName());
 	}
 
 	public void writeBaseListener(ST outputFileST) {
-		target.genFile(g,outputFileST, getBaseListenerFileName());
+		getTarget().genFile(g,outputFileST, getBaseListenerFileName());
 	}
 
 	public void writeVisitor(ST outputFileST) {
-		target.genFile(g,outputFileST, getVisitorFileName());
+		getTarget().genFile(g,outputFileST, getVisitorFileName());
 	}
 
 	public void writeBaseVisitor(ST outputFileST) {
-		target.genFile(g,outputFileST, getBaseVisitorFileName());
+		getTarget().genFile(g,outputFileST, getBaseVisitorFileName());
 	}
 
 	public void writeHeaderFile() {
 		String fileName = getHeaderFileName();
 		if ( fileName==null ) return;
-		if ( templates.isDefined("headerFile") ) {
-			ST extST = templates.getInstanceOf("headerFileExtension");
+		if ( getTemplates().isDefined("headerFile") ) {
+			ST extST = getTemplates().getInstanceOf("headerFileExtension");
 			ST headerFileST = null;
 			// TODO:  don't hide this header file generation here!
-			target.genRecognizerHeaderFile(g,headerFileST,extST.render(lineWidth));
+			getTarget().genRecognizerHeaderFile(g,headerFileST,extST.render(lineWidth));
 		}
 	}
 
@@ -241,7 +249,7 @@ public class CodeGenerator {
 		ST tokenVocabSerialization = getTokenVocabOutput();
 		String fileName = getVocabFileName();
 		if ( fileName!=null ) {
-			target.genFile(g, tokenVocabSerialization, fileName);
+			getTarget().genFile(g, tokenVocabSerialization, fileName);
 		}
 	}
 
@@ -266,7 +274,7 @@ public class CodeGenerator {
 	 *  just use T.java as output regardless of type.
 	 */
 	public String getRecognizerFileName() {
-		ST extST = templates.getInstanceOf("codeFileExtension");
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
 		String recognizerName = g.getRecognizerName();
 		return recognizerName+extST.render();
 	}
@@ -276,7 +284,7 @@ public class CodeGenerator {
  	 */
 	public String getListenerFileName() {
 		assert g.name != null;
-		ST extST = templates.getInstanceOf("codeFileExtension");
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "Listener";
 		return listenerName+extST.render();
 	}
@@ -286,7 +294,7 @@ public class CodeGenerator {
  	 */
 	public String getVisitorFileName() {
 		assert g.name != null;
-		ST extST = templates.getInstanceOf("codeFileExtension");
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "Visitor";
 		return listenerName+extST.render();
 	}
@@ -296,7 +304,7 @@ public class CodeGenerator {
  	 */
 	public String getBaseListenerFileName() {
 		assert g.name != null;
-		ST extST = templates.getInstanceOf("codeFileExtension");
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "BaseListener";
 		return listenerName+extST.render();
 	}
@@ -306,7 +314,7 @@ public class CodeGenerator {
  	 */
 	public String getBaseVisitorFileName() {
 		assert g.name != null;
-		ST extST = templates.getInstanceOf("codeFileExtension");
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "BaseVisitor";
 		return listenerName+extST.render();
 	}
@@ -319,7 +327,7 @@ public class CodeGenerator {
 	}
 
 	public String getHeaderFileName() {
-		ST extST = templates.getInstanceOf("headerFileExtension");
+		ST extST = getTemplates().getInstanceOf("headerFileExtension");
 		if ( extST==null ) return null;
 		String recognizerName = g.getRecognizerName();
 		return recognizerName+extST.render();

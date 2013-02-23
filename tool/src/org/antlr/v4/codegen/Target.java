@@ -350,20 +350,20 @@ public class Target {
 	}
 
 	public String getListLabel(String label) {
-		ST st = gen.templates.getInstanceOf("ListLabelName");
+		ST st = gen.getTemplates().getInstanceOf("ListLabelName");
 		st.add("label", label);
 		return st.render();
 	}
 
 	public String getRuleFunctionContextStructName(Rule r) {
 		if ( r.g.isLexer() ) {
-			return gen.templates.getInstanceOf("LexerRuleContext").render();
+			return gen.getTemplates().getInstanceOf("LexerRuleContext").render();
 		}
-		return Utils.capitalize(r.name)+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
+		return Utils.capitalize(r.name)+gen.getTemplates().getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	public String getAltLabelContextStructName(String label) {
-		return Utils.capitalize(label)+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
+		return Utils.capitalize(label)+gen.getTemplates().getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	/** If we know which actual function, we can provide the actual ctx type.
@@ -374,15 +374,15 @@ public class Target {
 	public String getRuleFunctionContextStructName(RuleFunction function) {
 		Rule r = function.rule;
 		if ( r.g.isLexer() ) {
-			return gen.templates.getInstanceOf("LexerRuleContext").render();
+			return gen.getTemplates().getInstanceOf("LexerRuleContext").render();
 		}
-		return Utils.capitalize(r.name)+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
+		return Utils.capitalize(r.name)+gen.getTemplates().getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	// should be same for all refs to same token like ctx.ID within single rule function
 	// for literals like 'while', we gen _s<ttype>
 	public String getImplicitTokenLabel(String tokenName) {
-		ST st = gen.templates.getInstanceOf("ImplicitTokenLabel");
+		ST st = gen.getTemplates().getInstanceOf("ImplicitTokenLabel");
 		int ttype = gen.g.getTokenType(tokenName);
 		if ( tokenName.startsWith("'") ) {
 			return "s"+ttype;
@@ -394,19 +394,19 @@ public class Target {
 
 	// x=(A|B)
 	public String getImplicitSetLabel(String id) {
-		ST st = gen.templates.getInstanceOf("ImplicitSetLabel");
+		ST st = gen.getTemplates().getInstanceOf("ImplicitSetLabel");
 		st.add("id", id);
 		return st.render();
 	}
 
 	public String getImplicitRuleLabel(String ruleName) {
-		ST st = gen.templates.getInstanceOf("ImplicitRuleLabel");
+		ST st = gen.getTemplates().getInstanceOf("ImplicitRuleLabel");
 		st.add("ruleName", ruleName);
 		return st.render();
 	}
 
 	public String getElementListName(String name) {
-		ST st = gen.templates.getInstanceOf("ElementListName");
+		ST st = gen.getTemplates().getInstanceOf("ElementListName");
 		st.add("elemName", getElementName(name));
 		return st.render();
 	}
