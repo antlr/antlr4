@@ -51,7 +51,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /** */
-public class Target {
+public abstract class Target {
 	/** For pure strings of Java 16-bit Unicode char, how can we display
 	 *  it in the target language as a literal.  Useful for dumping
 	 *  predicates and such that may refer to chars that need to be escaped
@@ -83,7 +83,7 @@ public class Target {
 		"void", "volatile", "while"
 	};
 
-	public Target(CodeGenerator gen, String language) {
+	protected Target(CodeGenerator gen, String language) {
 		targetCharValueEscape['\n'] = "\\n";
 		targetCharValueEscape['\r'] = "\\r";
 		targetCharValueEscape['\t'] = "\\t";

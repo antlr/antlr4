@@ -104,10 +104,14 @@ public class CodeGenerator {
 			target = ctor.newInstance(this);
 		}
 		catch (ClassNotFoundException cnfe) {
-			target = new Target(this, language); // use default
+			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
+						 cnfe,
+						 targetName);
 		}
 		catch (NoSuchMethodException nsme) {
-			target = new Target(this, language); // use default
+			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
+						 nsme,
+						 targetName);
 		}
 		catch (InvocationTargetException ite) {
 			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
