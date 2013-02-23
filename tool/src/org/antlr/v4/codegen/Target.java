@@ -396,7 +396,10 @@ public class Target {
 			break;
 		}
 
-		return badWords.contains(idNode.getText());
+		return visibleGrammarSymbolCausesIssueInGeneratedCode(idNode);
 	}
 
+	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
+		return badWords.contains(idNode.getText());
+	}
 }
