@@ -271,7 +271,7 @@ public class TestSets extends BaseTest {
 			"grammar T;\n" +
 			"a : (A {System.out.println($A.text);})+ ;\n" +
 			"A : [AaBb] ;\n" +
-			"WS : (' '|'\\n')+ {skip();} ;\n";
+			"WS : (' '|'\\n')+ -> skip ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "a", "A a B b", debug);
 		assertEquals("A\n" +

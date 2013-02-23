@@ -248,7 +248,7 @@ public class TestParseErrors extends BaseTest {
 			"CAT : 'cat';\n" +
 			"HARDWARE: 'hardware';\n" +
 			"SOFTWARE: 'software';\n" +
-			"WS : ' ' {skip();} ;" +
+			"WS : ' ' -> skip ;" +
 			"acClass\n" +
 			"@init\n" +
 			"{ System.out.println(getExpectedTokens().toString(tokenNames)); }\n" +

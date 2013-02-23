@@ -51,7 +51,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"import S;\n" +
 			"s : a ;\n" +
 			"B : 'b' ;" + // defines B from inherited token space
-			"WS : (' '|'\\n') {skip();} ;\n" ;
+			"WS : (' '|'\\n') -> skip ;\n" ;
 		String found = execParser("M.g4", master, "MParser", "MLexer",
 								  "s", "b", debug);
 		assertEquals("S.a\n", found);
@@ -67,7 +67,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"grammar M;\n" +
 			"import S;\n" +
 			"s : a ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n" ;
+			"WS : (' '|'\\n') -> skip ;\n" ;
 		String found = execParser("M.g4", master, "MParser", "MLexer",
 								  "s", "=a", debug);
 		assertEquals("S.a\n", found);
@@ -87,7 +87,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"import S;\n" +
 			"s : label=a[3] {System.out.println($label.y);} ;\n" +
 			"B : 'b' ;" + // defines B from inherited token space
-			"WS : (' '|'\\n') {skip();} ;\n" ;
+			"WS : (' '|'\\n') -> skip ;\n" ;
 		String found = execParser("M.g4", master, "MParser", "MLexer",
 								  "s", "b", debug);
 		assertEquals("S.a1000\n", found);
@@ -107,7 +107,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"import S;\n" +
 			"s : a {System.out.println($a.text);} ;\n" +
 			"B : 'b' ;" + // defines B from inherited token space
-			"WS : (' '|'\\n') {skip();} ;\n" ;
+			"WS : (' '|'\\n') -> skip ;\n" ;
 		String found = execParser("M.g4", master, "MParser", "MLexer",
 								  "s", "b", debug);
 		assertEquals("S.ab\n", found);
@@ -126,7 +126,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"grammar M;\n" +		// uses no rules from the import
 			"import S;\n" +
 			"s : 'b' {foo();} ;\n" + // gS is import pointer
-			"WS : (' '|'\\n') {skip();} ;\n" ;
+			"WS : (' '|'\\n') -> skip ;\n" ;
 		String found = execParser("M.g4", master, "MParser", "MLexer",
 								  "s", "b", debug);
 		assertEquals("foo\n", found);
@@ -148,7 +148,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"import S,T;\n" +
 			"s : a ;\n" +
 			"B : 'b' ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n" ;
+			"WS : (' '|'\\n') -> skip ;\n" ;
 		String found = execParser("M.g4", master, "MParser", "MLexer",
 								  "s", "b", debug);
 		assertEquals("S.a\n", found);
@@ -185,7 +185,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"B : 'b' ;\n" + // another order: B, A, C
 			"A : 'a' ;\n" +
 			"C : 'c' ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n" ;
+			"WS : (' '|'\\n') -> skip ;\n" ;
 		String found = execParser("M.g4", master, "MParser", "MLexer",
 								  "s", "aa", debug);
 		assertEquals("S.x\n" +
@@ -214,7 +214,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"B : 'b' ;\n" + // another order: B, A, C
 			"A : 'a' ;\n" +
 			"C : 'c' ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n" ;
+			"WS : (' '|'\\n') -> skip ;\n" ;
 		writeFile(tmpdir, "M.g4", master);
 		Grammar g = new Grammar(tmpdir+"/M.g4", master, equeue);
 
@@ -241,7 +241,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"tokens { A, B, C }\n" +
 			"x : 'x' INT {System.out.println(\"S.x\");} ;\n" +
 			"INT : '0'..'9'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave);
 
@@ -273,7 +273,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"grammar M;\n" +
 			"import S;\n" +
 			"s : x ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n" ;
+			"WS : (' '|'\\n') -> skip ;\n" ;
 		writeFile(tmpdir, "M.g4", master);
 		Grammar g = new Grammar(tmpdir+"/M.g4", master, equeue);
 
@@ -299,7 +299,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"grammar M;\n" +
 			"import S;\n" +
 			"s : x ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n" ;
+			"WS : (' '|'\\n') -> skip ;\n" ;
 		writeFile(tmpdir, "M.g4", master);
 		Grammar g = new Grammar(tmpdir+"/M.g4", master, equeue);
 
@@ -317,7 +317,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"grammar M;\n" +
 			"import S;\n" +
 			"b : 'b'|'c' ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n" ;
+			"WS : (' '|'\\n') -> skip ;\n" ;
 		String found = execParser("M.g4", master, "MParser", "MLexer",
 								  "a", "c", debug);
 		assertEquals("S.a\n", found);
@@ -341,7 +341,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"\n" +
 			"ID  : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n" ;
+			"WS : (' '|'\\n') -> skip ;\n" ;
 		// for float to work in decl, type must be overridden
 		String found = execParser("Java.g4", master, "JavaParser", "JavaLexer",
 								  "prog", "float x = 3;", debug);
@@ -366,7 +366,7 @@ public class TestCompositeGrammars extends BaseTest {
             "grammar M;\n" +
             "import S, T;\n" +
             "b : 'b'|'c' {System.out.println(\"M.b\");}|B|A ;\n" +
-            "WS : (' '|'\\n') {skip();} ;\n" ;
+            "WS : (' '|'\\n') -> skip ;\n" ;
         String found = execParser("M.g4", master, "MParser", "MLexer",
                                   "a", "c", debug);
         assertEquals("M.b\n" +
@@ -385,7 +385,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"lexer grammar M;\n" +
 			"import S;\n" +
 			"B : 'b' ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n" ;
+			"WS : (' '|'\\n') -> skip ;\n" ;
 		String expecting =
 			"S.A\n" +
 			"[@0,0:0='a',<3>,1:0]\n" +
@@ -407,7 +407,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"lexer grammar M;\n" +
 			"import S;\n" +
 			"A : 'a' B {System.out.println(\"M.A\");} ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n" ;
+			"WS : (' '|'\\n') -> skip ;\n" ;
 		String found = execLexer("M.g4", master, "M", "ab", debug);
 		assertEquals("M.A\n" +
 					 "[@0,0:1='ab',<1>,1:0]\n" +
@@ -429,7 +429,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"import S;\n" +
 			"a : A {System.out.println(\"M.a: \"+$A);} ;\n" +
 			"A : 'abc' {System.out.println(\"M.A\");} ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n" ;
+			"WS : (' '|'\\n') -> skip ;\n" ;
 		String found = execParser("M.g4", master, "MParser", "MLexer",
 								  "a", "abc", debug);
 
@@ -640,7 +640,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"@header{package mypackage;}\n" +
 			"s : a ;\n" +
 			"B : 'b' ;" + // defines B from inherited token space
-			"WS : (' '|'\\n') {skip();} ;\n" ;
+			"WS : (' '|'\\n') -> skip ;\n" ;
 		boolean ok = antlr("M.g4", "M.g4", master, false);
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, ok);
@@ -658,7 +658,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"import S;\n" +
 			"s : a ;\n" +
 			"B : 'b' ;" +
-			"WS : (' '|'\\n') {skip();} ;\n" ;
+			"WS : (' '|'\\n') -> skip ;\n" ;
 		String found = execParser("M.g4", master, "MParser", "MLexer",
 								  "s", "b", debug);
 		assertEquals("", found);
