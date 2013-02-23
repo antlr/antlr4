@@ -58,6 +58,7 @@ import java.util.Map;
 public class CodeGenerator {
 	public static final String TEMPLATE_ROOT = "org/antlr/v4/tool/templates/codegen";
 	public static final String VOCAB_FILE_EXTENSION = ".tokens";
+	public static final String DEFAULT_LANGUAGE = "Java";
 	public final static String vocabFilePattern =
 		"<tokens.keys:{t | <t>=<tokens.(t)>\n}>" +
 		"<literals.keys:{t | <t>=<literals.(t)>\n}>";
@@ -66,6 +67,8 @@ public class CodeGenerator {
 	public final Grammar g;
 	@NotNull
 	public final Tool tool;
+	@NotNull
+	public final String language;
 
 	private Target target;
 
@@ -78,10 +81,14 @@ public class CodeGenerator {
 	public CodeGenerator(@NotNull Tool tool, @NotNull Grammar g, String language) {
 		this.g = g;
 		this.tool = tool;
-		loadLanguageTarget(language);
+		this.language = language != null ? language : DEFAULT_LANGUAGE;
 	}
 
 	public Target getTarget() {
+		if (target == null) {
+			loadLanguageTarget(language);
+		}
+
 		return target;
 	}
 
@@ -89,7 +96,7 @@ public class CodeGenerator {
 		return getTarget().getTemplates();
 	}
 
-	void loadLanguageTarget(String language) {
+	protected void loadLanguageTarget(String language) {
 		String targetName = "org.antlr.v4.codegen."+language+"Target";
 		try {
 			Class<? extends Target> c = Class.forName(targetName).asSubclass(Target.class);
