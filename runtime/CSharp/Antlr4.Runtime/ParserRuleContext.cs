@@ -288,13 +288,13 @@ namespace Antlr4.Runtime
             return null;
         }
 
-        public virtual IList<ITerminalNode> GetTokens(int ttype)
+        public virtual IReadOnlyList<ITerminalNode> GetTokens(int ttype)
         {
             if (children == null)
             {
                 return Collections.EmptyList<ITerminalNode>();
             }
-            IList<ITerminalNode> tokens = null;
+            List<ITerminalNode> tokens = null;
             foreach (IParseTree o in children)
             {
                 if (o is ITerminalNode)
@@ -323,13 +323,13 @@ namespace Antlr4.Runtime
             return GetChild<T>(i);
         }
 
-        public virtual IList<T> GetRuleContexts<T>() where T:Antlr4.Runtime.ParserRuleContext
+        public virtual IReadOnlyList<T> GetRuleContexts<T>() where T:Antlr4.Runtime.ParserRuleContext
         {
             if (children == null)
             {
                 return Collections.EmptyList<T>();
             }
-            IList<T> contexts = null;
+            List<T> contexts = null;
             foreach (IParseTree o in children)
             {
                 if (o is T)
