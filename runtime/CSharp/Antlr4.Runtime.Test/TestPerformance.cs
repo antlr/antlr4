@@ -811,7 +811,7 @@ namespace Antlr4.Runtime.Test
             int parseFile(CharStream input, int thread);
         }
 
-        private static class DescriptiveErrorListener extends BaseErrorListener {
+        private class DescriptiveErrorListener : BaseErrorListener {
             public static DescriptiveErrorListener INSTANCE = new DescriptiveErrorListener();
 
             public override <T extends Token> void syntaxError(Recognizer<T, ?> recognizer, T offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
@@ -829,7 +829,7 @@ namespace Antlr4.Runtime.Test
 
         }
 
-        private static class SummarizingDiagnosticErrorListener extends DiagnosticErrorListener {
+        private class SummarizingDiagnosticErrorListener : DiagnosticErrorListener {
 
             public override void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet ambigAlts, ATNConfigSet configs) {
                 if (!REPORT_AMBIGUITIES) {
@@ -863,7 +863,7 @@ namespace Antlr4.Runtime.Test
 
         }
 
-        protected static class FileExtensionFilenameFilter implements FilenameFilter {
+        protected class FileExtensionFilenameFilter : FilenameFilter {
 
             private readonly String extension;
 
@@ -881,7 +881,7 @@ namespace Antlr4.Runtime.Test
 
         }
 
-        protected static class NonCachingLexerATNSimulator extends LexerATNSimulator {
+        protected class NonCachingLexerATNSimulator : LexerATNSimulator {
 
             public NonCachingLexerATNSimulator(Lexer recog, ATN atn) {
                 super(recog, atn);
@@ -893,7 +893,7 @@ namespace Antlr4.Runtime.Test
 
         }
 
-        protected static class NonCachingParserATNSimulator extends ParserATNSimulator {
+        protected class NonCachingParserATNSimulator : ParserATNSimulator {
 
             public NonCachingParserATNSimulator(Parser parser, ATN atn) {
                 super(parser, atn);
@@ -906,7 +906,7 @@ namespace Antlr4.Runtime.Test
 
         }
 
-        protected static class NumberedThread extends Thread {
+        protected class NumberedThread : Thread {
             private readonly int threadNumber;
 
             public NumberedThread(Runnable target, int threadNumber) {
@@ -920,7 +920,7 @@ namespace Antlr4.Runtime.Test
 
         }
 
-        protected static class NumberedThreadFactory implements ThreadFactory {
+        protected class NumberedThreadFactory : ThreadFactory {
             private readonly AtomicInteger nextThread = new AtomicInteger();
 
             public override Thread newThread(Runnable r) {
@@ -931,7 +931,7 @@ namespace Antlr4.Runtime.Test
 
         }
 
-        protected static class ChecksumParseTreeListener implements ParseTreeListener {
+        protected class ChecksumParseTreeListener : ParseTreeListener {
             private const int VISIT_TERMINAL = 1;
             private const int VISIT_ERROR_NODE = 2;
             private const int ENTER_RULE = 3;
