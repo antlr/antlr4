@@ -728,7 +728,7 @@ public class <struct.name> : <superClass><if(interfaces)>, <interfaces; separato
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
 	public <struct.name>() { }
 	public virtual void CopyFrom(<struct.name> ctx) {
-		super.CopyFrom(ctx);
+		base.CopyFrom(ctx);
 		<struct.attrs:{a | this.<a.name> = ctx.<a.name>;}; separator="\n">
 	}
 <endif>
