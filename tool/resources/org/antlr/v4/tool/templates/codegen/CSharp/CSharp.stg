@@ -860,11 +860,6 @@ public static readonly string _serializedATN =
 	"<model.serialized; wrap={"+<\n><\t>"}>";
 public static readonly ATN _ATN =
 	ATNSimulator.Deserialize(_serializedATN.ToCharArray());
-static {
-<!	org.antlr.v4.tool.DOTGenerator dot = new org.antlr.v4.tool.DOTGenerator(null);!>
-<!	System.out.println(dot.getDOT(_ATN.decisionToState.get(0), ruleNames, false));!>
-<!	System.out.println(dot.getDOT(_ATN.ruleToStartState[2], ruleNames, false));!>
-}
 >>
 
 initValue(typeName) ::= <<
