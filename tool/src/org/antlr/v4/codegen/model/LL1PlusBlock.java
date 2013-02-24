@@ -71,11 +71,11 @@ public class LL1PlusBlock extends LL1Loop {
 
 		loopExpr = addCodeForLoopLookaheadTempVar(all);
 
-		loopLabel = gen.target.getLoopLabel(plusRoot);
-		loopCounterVar = gen.target.getLoopCounter(plusRoot);
+		loopLabel = gen.getTarget().getLoopLabel(plusRoot);
+		loopCounterVar = gen.getTarget().getLoopCounter(plusRoot);
 
 		IntervalSet exitLookSet = altLookSets[altLookSets.length-1];
-		this.exitLook = gen.target.getTokenTypesAsTargetLabels(g,
+		this.exitLook = gen.getTarget().getTokenTypesAsTargetLabels(g,
 															   exitLookSet.toArray());
 	}
 }

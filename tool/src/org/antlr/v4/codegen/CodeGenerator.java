@@ -58,6 +58,7 @@ import java.util.Map;
 public class CodeGenerator {
 	public static final String TEMPLATE_ROOT = "org/antlr/v4/tool/templates/codegen";
 	public static final String VOCAB_FILE_EXTENSION = ".tokens";
+	public static final String DEFAULT_LANGUAGE = "Java";
 	public final static String vocabFilePattern =
 		"<tokens.keys:{t | <t>=<tokens.(t)>\n}>" +
 		"<literals.keys:{t | <t>=<literals.(t)>\n}>";
@@ -66,9 +67,10 @@ public class CodeGenerator {
 	public final Grammar g;
 	@NotNull
 	public final Tool tool;
+	@NotNull
+	public final String language;
 
-	public Target target;
-	public STGroup templates;
+	private Target target;
 
 	public int lineWidth = 72;
 
@@ -79,11 +81,22 @@ public class CodeGenerator {
 	public CodeGenerator(@NotNull Tool tool, @NotNull Grammar g, String language) {
 		this.g = g;
 		this.tool = tool;
-		loadLanguageTarget(language);
-		loadTemplates(language);
+		this.language = language != null ? language : DEFAULT_LANGUAGE;
 	}
 
-	void loadLanguageTarget(String language) {
+	public Target getTarget() {
+		if (target == null) {
+			loadLanguageTarget(language);
+		}
+
+		return target;
+	}
+
+	public STGroup getTemplates() {
+		return getTarget().getTemplates();
+	}
+
+	protected void loadLanguageTarget(String language) {
 		String targetName = "org.antlr.v4.codegen."+language+"Target";
 		try {
 			Class<? extends Target> c = Class.forName(targetName).asSubclass(Target.class);
@@ -91,10 +104,14 @@ public class CodeGenerator {
 			target = ctor.newInstance(this);
 		}
 		catch (ClassNotFoundException cnfe) {
-			target = new Target(this); // use default
+			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
+						 cnfe,
+						 targetName);
 		}
 		catch (NoSuchMethodException nsme) {
-			target = new Target(this); // use default
+			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
+						 nsme,
+						 targetName);
 		}
 		catch (InvocationTargetException ite) {
 			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
@@ -113,44 +130,6 @@ public class CodeGenerator {
 		}
 	}
 
-	public void loadTemplates(String language) {
-		try {
-			templates = new STGroupFile(TEMPLATE_ROOT+"/"+language+"/"+language+STGroup.GROUP_FILE_EXTENSION);
-			templates.registerRenderer(Integer.class, new NumberRenderer());
-			templates.registerRenderer(String.class, new StringRenderer());
-			templates.setListener(new STErrorListener() {
-				@Override
-				public void compileTimeError(STMessage msg) {
-					reportError(msg);
-				}
-
-				@Override
-				public void runTimeError(STMessage msg) {
-					reportError(msg);
-				}
-
-				@Override
-				public void IOError(STMessage msg) {
-					reportError(msg);
-				}
-
-				@Override
-				public void internalError(STMessage msg) {
-					reportError(msg);
-				}
-
-				private void reportError(STMessage msg) {
-					tool.errMgr.toolError(ErrorType.STRING_TEMPLATE_WARNING, msg.cause, msg.toString());
-				}
-			});
-		}
-		catch (IllegalArgumentException iae) {
-			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-									null,
-						 			language);
-		}
-	}
-
 	// CREATE TEMPLATES BY WALKING MODEL
 
 	private OutputModelController createController() {
@@ -161,7 +140,7 @@ public class CodeGenerator {
 	}
 
 	private ST walk(OutputModelObject outputModel) {
-		OutputModelWalker walker = new OutputModelWalker(tool, templates);
+		OutputModelWalker walker = new OutputModelWalker(tool, getTemplates());
 		return walker.walk(outputModel);
 	}
 
@@ -205,33 +184,33 @@ public class CodeGenerator {
 	}
 
 	public void writeRecognizer(ST outputFileST) {
-		target.genFile(g, outputFileST, getRecognizerFileName());
+		getTarget().genFile(g, outputFileST, getRecognizerFileName());
 	}
 
 	public void writeListener(ST outputFileST) {
-		target.genFile(g,outputFileST, getListenerFileName());
+		getTarget().genFile(g,outputFileST, getListenerFileName());
 	}
 
 	public void writeBaseListener(ST outputFileST) {
-		target.genFile(g,outputFileST, getBaseListenerFileName());
+		getTarget().genFile(g,outputFileST, getBaseListenerFileName());
 	}
 
 	public void writeVisitor(ST outputFileST) {
-		target.genFile(g,outputFileST, getVisitorFileName());
+		getTarget().genFile(g,outputFileST, getVisitorFileName());
 	}
 
 	public void writeBaseVisitor(ST outputFileST) {
-		target.genFile(g,outputFileST, getBaseVisitorFileName());
+		getTarget().genFile(g,outputFileST, getBaseVisitorFileName());
 	}
 
 	public void writeHeaderFile() {
 		String fileName = getHeaderFileName();
 		if ( fileName==null ) return;
-		if ( templates.isDefined("headerFile") ) {
-			ST extST = templates.getInstanceOf("headerFileExtension");
+		if ( getTemplates().isDefined("headerFile") ) {
+			ST extST = getTemplates().getInstanceOf("headerFileExtension");
 			ST headerFileST = null;
 			// TODO:  don't hide this header file generation here!
-			target.genRecognizerHeaderFile(g,headerFileST,extST.render(lineWidth));
+			getTarget().genRecognizerHeaderFile(g,headerFileST,extST.render(lineWidth));
 		}
 	}
 
@@ -241,7 +220,7 @@ public class CodeGenerator {
 		ST tokenVocabSerialization = getTokenVocabOutput();
 		String fileName = getVocabFileName();
 		if ( fileName!=null ) {
-			target.genFile(g, tokenVocabSerialization, fileName);
+			getTarget().genFile(g, tokenVocabSerialization, fileName);
 		}
 	}
 
@@ -266,7 +245,7 @@ public class CodeGenerator {
 	 *  just use T.java as output regardless of type.
 	 */
 	public String getRecognizerFileName() {
-		ST extST = templates.getInstanceOf("codeFileExtension");
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
 		String recognizerName = g.getRecognizerName();
 		return recognizerName+extST.render();
 	}
@@ -276,7 +255,7 @@ public class CodeGenerator {
  	 */
 	public String getListenerFileName() {
 		assert g.name != null;
-		ST extST = templates.getInstanceOf("codeFileExtension");
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "Listener";
 		return listenerName+extST.render();
 	}
@@ -286,7 +265,7 @@ public class CodeGenerator {
  	 */
 	public String getVisitorFileName() {
 		assert g.name != null;
-		ST extST = templates.getInstanceOf("codeFileExtension");
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "Visitor";
 		return listenerName+extST.render();
 	}
@@ -296,7 +275,7 @@ public class CodeGenerator {
  	 */
 	public String getBaseListenerFileName() {
 		assert g.name != null;
-		ST extST = templates.getInstanceOf("codeFileExtension");
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "BaseListener";
 		return listenerName+extST.render();
 	}
@@ -306,7 +285,7 @@ public class CodeGenerator {
  	 */
 	public String getBaseVisitorFileName() {
 		assert g.name != null;
-		ST extST = templates.getInstanceOf("codeFileExtension");
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "BaseVisitor";
 		return listenerName+extST.render();
 	}
@@ -319,7 +298,7 @@ public class CodeGenerator {
 	}
 
 	public String getHeaderFileName() {
-		ST extST = templates.getInstanceOf("headerFileExtension");
+		ST extST = getTemplates().getInstanceOf("headerFileExtension");
 		if ( extST==null ) return null;
 		String recognizerName = g.getRecognizerName();
 		return recognizerName+extST.render();
