@@ -58,7 +58,7 @@ namespace <file.genPackage> {
 using Antlr4.Runtime.Tree;
 using IToken = Antlr4.Runtime.IToken;
 
-public interface <file.grammarName>Listener extends ParseTreeListener {
+public interface I<file.grammarName>Listener : IParseTreeListener {
 	<file.listenerNames:{lname |
 void Enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);
 void Exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
@@ -80,7 +80,7 @@ using ITerminalNode = Antlr4.Runtime.Tree.ITerminalNode;
 using IToken = Antlr4.Runtime.IToken;
 using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 
-public class <file.grammarName>BaseListener implements <file.grammarName>Listener {
+public class <file.grammarName>BaseListener : I<file.grammarName>Listener {
 	<file.listenerNames:{lname |
 @Override public void Enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
 @Override public void Exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
@@ -104,7 +104,7 @@ namespace <file.genPackage> {
 using Antlr4.Runtime.Tree;
 using IToken = Antlr4.Runtime.IToken;
 
-public interface <file.grammarName>Visitor\<Result> extends ParseTreeVisitor\<Result> {
+public interface I<file.grammarName>Visitor\<Result> : IParseTreeVisitor\<Result> {
 	<file.visitorNames:{lname |
 Result Visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
 }
@@ -123,7 +123,7 @@ using Antlr4.Runtime.Tree;
 using IToken = Antlr4.Runtime.IToken;
 using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 
-public class <file.grammarName>BaseVisitor\<Result> extends AbstractParseTreeVisitor\<Result> implements <file.grammarName>Visitor\<Result> {
+public class <file.grammarName>BaseVisitor\<Result> : AbstractParseTreeVisitor\<Result>, I<file.grammarName>Visitor\<Result> {
 	<file.visitorNames:{lname |
 @Override public Result Visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return VisitChildren(ctx); \}}; separator="\n">
 }
@@ -137,7 +137,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 >>
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
-public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extends <superClass> {
+public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> : <superClass> {
 	<if(parser.tokens)>
 	public static final int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
@@ -719,7 +719,7 @@ CaptureNextTokenType(d) ::= "<d.varName> = _input.La(1);"
 
 StructDecl(struct,attrs,getters,dispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext}) ::= <<
-public static class <struct.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
+public class <struct.name> : <superClass><if(interfaces)>, <interfaces; separator=", "><endif> {
 	<attrs:{a | <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
 	<if(struct.ctorAttrs)>public <struct.name>(ParserRuleContext parent, int invokingState) { super(parent, invokingState); }<endif>
@@ -741,7 +741,7 @@ public static class <struct.name> extends <superClass><if(interfaces)> implement
 >>
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
-public static class <struct.name> extends <currentRule.name; format="cap">Context {
+public class <struct.name> : <currentRule.name; format="cap">Context {
 	<attrs:{a | <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
 	public <struct.name>(<currentRule.name; format="cap">Context ctx) { CopyFrom(ctx); }
@@ -822,7 +822,7 @@ using DFA = Antlr4.Runtime.Dfa.DFA;
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
-public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends <superClass> {
+public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> : <superClass> {
 	public static final int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<rest(lexer.modes):{m| public static final int <m> = <i>;}; separator="\n">
