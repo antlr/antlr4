@@ -153,6 +153,7 @@
     <Compile Include="Sharpen\DictionaryExtensions.cs" />
     <Compile Include="Sharpen\ListExtensions.cs" />
     <Compile Include="Sharpen\Runtime.cs" />
+    <Compile Include="Sharpen\SequenceEqualityComparer`1.cs" />
     <Compile Include="TokenStreamRewriter.cs" />
     <Compile Include="TokenTypes.cs" />
     <Compile Include="Tree\AbstractParseTreeVisitor`1.cs" />
