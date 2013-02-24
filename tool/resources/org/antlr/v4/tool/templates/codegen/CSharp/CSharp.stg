@@ -242,7 +242,7 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 
 @RuleVersion(<namedActions.version; null="0">)
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>);
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <a.name>}>);
 	EnterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
 	<namedActions.init>
 	<locals; separator="\n">
@@ -275,7 +275,7 @@ LeftFactoredRuleFunction(currentRule,code,locals,namedActions,finallyAction,post
 <<
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>);
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <a.name>}>);
 	EnterLeftFactoredRule(_localctx, <currentRule.startState>, RULE_<currentRule.variantOf>);
 	<namedActions.init>
 	<locals; separator="\n">
@@ -307,7 +307,7 @@ LeftUnfactoredRuleFunction(currentRule,code,locals,namedActions,finallyAction,po
 <<
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>);
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <a.name>}>);
 	EnterRule(_localctx, <currentRule.startState>, RULE_<currentRule.variantOf>);
 	<namedActions.init>
 	<locals; separator="\n">
@@ -342,7 +342,7 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 @RuleVersion(<namedActions.version; null="0">)
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(int _p<currentRule.args:{a | , <a>}>) throws RecognitionException {
 	ParserRuleContext _parentctx = _ctx;
-	int _parentState = getState();
+	int _parentState = State;
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>);
 	<currentRule.ctxType> _prevctx = _localctx;
 	int _startState = <currentRule.startState>;
@@ -385,7 +385,7 @@ CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
 >>
 
 LL1AltBlock(choice, preamble, alts, error) ::= <<
-setState(<choice.stateNumber>);
+State = <choice.stateNumber>;
 <!_errHandler.sync(this);!>
 <if(choice.label)><labelref(choice.label)> = _input.Lt(1);<endif>
 <preamble; separator="\n">
@@ -399,7 +399,7 @@ default:
 >>
 
 LL1OptionalBlock(choice, alts, error) ::= <<
-setState(<choice.stateNumber>);
+State = <choice.stateNumber>;
 <!_errHandler.sync(this);!>
 switch (_input.La(1)) {
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
@@ -411,7 +411,7 @@ default:
 >>
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
-setState(<choice.stateNumber>);
+State = <choice.stateNumber>;
 <!_errHandler.sync(this);!>
 <preamble; separator="\n">
 if (<expr>) {
@@ -421,7 +421,7 @@ if (<expr>) {
 >>
 
 LL1StarBlock(choice, alts) ::= <<
-setState(<choice.stateNumber>);
+State = <choice.stateNumber>;
 _errHandler.Sync(this);
 <choice.loopLabel>:
 while (true) {
@@ -432,25 +432,25 @@ while (true) {
 	<cases(choice.exitLook)>
 		break <choice.loopLabel>;
 	}
-	setState(<choice.loopBackStateNumber>);
+	State = <choice.loopBackStateNumber>;
 	_errHandler.Sync(this);
 }
 >>
 
 LL1StarBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
-setState(<choice.stateNumber>);
+State = <choice.stateNumber>;
 _errHandler.Sync(this);
 <preamble; separator="\n">
 while (<loopExpr>) {
 	<alts; separator="\n">
-	setState(<choice.loopBackStateNumber>);
+	State = <choice.loopBackStateNumber>;
 	_errHandler.Sync(this);
 	<iteration>
 }
 >>
 
 LL1PlusBlock(choice, alts, iteration, loopExpr, error) ::= <<
-setState(<choice.blockStartStateNumber>); <! alt block decision !>
+State = <choice.blockStartStateNumber>;<! alt block decision !>
 _errHandler.Sync(this);
 do {
 	switch (_input.La(1)) {
@@ -460,19 +460,19 @@ do {
 	default:
 		<error>
 	}
-	setState(<choice.stateNumber>);
+	State = <choice.stateNumber>;
 	_errHandler.Sync(this);
 	<iteration>
 } while ( <loopExpr> );
 >>
 
 LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
-setState(<choice.blockStartStateNumber>); <! alt block decision !>
+State = <choice.blockStartStateNumber>;<! alt block decision !>
 _errHandler.Sync(this);
 <preamble; separator="\n">
 do {
 	<alts; separator="\n">
-	setState(<choice.stateNumber>); <! loopback/exit decision !>
+	State = <choice.stateNumber>;<! loopback/exit decision !>
 	_errHandler.Sync(this);
 	<iteration>
 } while ( <loopExpr> );
@@ -481,11 +481,11 @@ do {
 // LL(*) stuff
 
 AltBlock(choice, preamble, alts, error) ::= <<
-setState(<choice.stateNumber>);
+State = <choice.stateNumber>;
 <!_errHandler.sync(this);!>
 <if(choice.label)><labelref(choice.label)> = _input.Lt(1);<endif>
 <preamble; separator="\n">
-switch ( getInterpreter().AdaptivePredict(_input,<choice.decision>,_ctx) ) {
+switch ( Interpreter.AdaptivePredict(_input,<choice.decision>,_ctx) ) {
 <alts:{alt |
 case <i>:
 	<alt>
@@ -494,9 +494,9 @@ case <i>:
 >>
 
 OptionalBlock(choice, alts, error) ::= <<
-setState(<choice.stateNumber>);
+State = <choice.stateNumber>;
 <!_errHandler.sync(this);!>
-switch ( getInterpreter().AdaptivePredict(_input,<choice.decision>,_ctx) ) {
+switch ( Interpreter.AdaptivePredict(_input,<choice.decision>,_ctx) ) {
 <alts:{alt |
 case <i><if(!choice.ast.greedy)>+1<endif>:
 	<alt>
@@ -505,24 +505,24 @@ case <i><if(!choice.ast.greedy)>+1<endif>:
 >>
 
 StarBlock(choice, alts, sync, iteration) ::= <<
-setState(<choice.stateNumber>);
+State = <choice.stateNumber>;
 _errHandler.Sync(this);
-_alt = getInterpreter().AdaptivePredict(_input,<choice.decision>,_ctx);
+_alt = Interpreter.AdaptivePredict(_input,<choice.decision>,_ctx);
 while ( _alt!=<choice.exitAlt> && _alt!=-1 ) {
 	if ( _alt==1<if(!choice.ast.greedy)>+1<endif> ) {
 		<iteration>
 		<alts> <! should only be one !>
 	}
-	setState(<choice.loopBackStateNumber>);
+	State = <choice.loopBackStateNumber>;
 	_errHandler.Sync(this);
-	_alt = getInterpreter().AdaptivePredict(_input,<choice.decision>,_ctx);
+	_alt = Interpreter.AdaptivePredict(_input,<choice.decision>,_ctx);
 }
 >>
 
 PlusBlock(choice, alts, error) ::= <<
-setState(<choice.blockStartStateNumber>); <! alt block decision !>
+State = <choice.blockStartStateNumber>;<! alt block decision !>
 _errHandler.Sync(this);
-_alt = getInterpreter().AdaptivePredict(_input,<choice.decision>,_ctx);
+_alt = Interpreter.AdaptivePredict(_input,<choice.decision>,_ctx);
 do {
 	switch (_alt) {
 	<alts:{alt|
@@ -532,9 +532,9 @@ case <i><if(!choice.ast.greedy)>+1<endif>:
 	default:
 		<error>
 	}
-	setState(<choice.loopBackStateNumber>); <! loopback/exit decision !>
+	State = <choice.loopBackStateNumber>;<! loopback/exit decision !>
 	_errHandler.Sync(this);
-	_alt = getInterpreter().AdaptivePredict(_input,<choice.decision>,_ctx);
+	_alt = Interpreter.AdaptivePredict(_input,<choice.decision>,_ctx);
 } while ( _alt!=<choice.exitAlt> && _alt!=-1 );
 >>
 
@@ -575,11 +575,11 @@ cases(ttypes) ::= <<
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
-setState(<r.stateNumber>); <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
+State = <r.stateNumber>; <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
 >>
 
 MatchToken(m) ::= <<
-setState(<m.stateNumber>); <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>Match(<m.name>);
+State = <m.stateNumber>; <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>Match(<m.name>);
 >>
 
 MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
@@ -587,7 +587,7 @@ MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
 MatchNotSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, true)>"
 
 CommonSetStuff(m, expr, capture, invert) ::= <<
-setState(<m.stateNumber>);
+State = <m.stateNumber>;
 <if(m.labels)><m.labels:{l | <labelref(l)> = }>_input.Lt(1);<endif>
 <capture>
 if ( <if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>) ) {
@@ -597,7 +597,7 @@ Consume();
 >>
 
 Wildcard(w) ::= <<
-setState(<w.stateNumber>);
+State = <w.stateNumber>;
 <if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>MatchWildcard();
 >>
 
@@ -608,7 +608,7 @@ Action(a, foo, chunks) ::= "<chunks>"
 ArgAction(a, chunks) ::= "<chunks>"
 
 SemPred(p, chunks, failChunks) ::= <<
-setState(<p.stateNumber>);
+State = <p.stateNumber>;
 if (!(<chunks>)) throw new FailedPredicateException(this, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><endif>);
 >>
 
@@ -647,13 +647,13 @@ SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.name> = <rhsChunks>;"
 TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"
 
-TokenPropertyRef_text(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.getText():null)"
-TokenPropertyRef_type(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.getType():0)"
-TokenPropertyRef_line(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.getLine():0)"
-TokenPropertyRef_pos(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.getCharPositionInLine():0)"
-TokenPropertyRef_channel(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.getChannel():0)"
-TokenPropertyRef_index(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.getTokenIndex():0)"
-TokenPropertyRef_int(t) ::= "(<ctx(t)>.<t.label>!=null?Integer.valueOf(<ctx(t)>.<t.label>.getText()):0)"
+TokenPropertyRef_text(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.Text:null)"
+TokenPropertyRef_type(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.Type:0)"
+TokenPropertyRef_line(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.Line:0)"
+TokenPropertyRef_pos(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.CharPositionInLine:0)"
+TokenPropertyRef_channel(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.Channel:0)"
+TokenPropertyRef_index(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.TokenIndex:0)"
+TokenPropertyRef_int(t) ::= "(<ctx(t)>.<t.label>!=null?Integer.valueOf(<ctx(t)>.<t.label>.Text):0)"
 
 RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label>!=null?(<ctx(r)>.<r.label>.start):null)"
 RulePropertyRef_stop(r)	 ::= "(<ctx(r)>.<r.label>!=null?(<ctx(r)>.<r.label>.stop):null)"
