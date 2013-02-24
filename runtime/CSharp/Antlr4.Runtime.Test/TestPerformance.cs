@@ -746,7 +746,7 @@ namespace Antlr4.Runtime.Test
                         sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName+": " : "";
                         Console.Error.WriteLine(sourceName+"Forced to retry with full context.");
 
-                        if (!(ex.getCause() instanceof ParseCancellationException)) {
+                        if (!(ex.getCause() is ParseCancellationException)) {
                             throw ex;
                         }
 
@@ -795,7 +795,7 @@ namespace Antlr4.Runtime.Test
                         ParseTreeWalker.DEFAULT.walk(listener, (ParserRuleContext)parseResult);
                     }
                 } catch (Exception e) {
-                    if (!REPORT_SYNTAX_ERRORS && e instanceof ParseCancellationException) {
+                    if (!REPORT_SYNTAX_ERRORS && e is ParseCancellationException) {
                         return (int)checksum.getValue();
                     }
 
