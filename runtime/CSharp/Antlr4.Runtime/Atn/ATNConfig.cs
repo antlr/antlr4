@@ -186,17 +186,18 @@ namespace Antlr4.Runtime.Atn
         }
 
         /// <summary>
-        /// We cannot execute predicates dependent upon local context unless we know
-        /// for sure we are in the correct context.
+        /// We cannot execute predicates dependent upon local context unless
+        /// we know for sure we are in the correct context.
         /// </summary>
         /// <remarks>
-        /// We cannot execute predicates dependent upon local context unless we know
-        /// for sure we are in the correct context. Because there is no way to do
-        /// this efficiently, we simply cannot evaluate dependent predicates unless
-        /// we are in the rule that initially invokes the ATN simulator.
-        /// closure() tracks the depth of how far we dip into the outer context:
-        /// depth &gt; 0. Note that it may not be totally accurate depth since I don't
-        /// ever decrement. TODO: make it a boolean then
+        /// We cannot execute predicates dependent upon local context unless
+        /// we know for sure we are in the correct context. Because there is
+        /// no way to do this efficiently, we simply cannot evaluate
+        /// dependent predicates unless we are in the rule that initially
+        /// invokes the ATN simulator.
+        /// closure() tracks the depth of how far we dip into the
+        /// outer context: depth &gt; 0.  Note that it may not be totally
+        /// accurate depth since I don't ever decrement. TODO: make it a boolean then
         /// </remarks>
         public virtual int OuterContextDepth
         {

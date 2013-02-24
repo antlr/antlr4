@@ -47,7 +47,7 @@ namespace Antlr4.Runtime.Atn
         /// heuristic which almost always works but is much faster
         /// than precise answer.
         /// </remarks>
-        internal static readonly PredictionMode Sll = new PredictionMode();
+        public static readonly PredictionMode Sll = new PredictionMode();
 
         /// <summary>Full LL(*) that always gets right answer.</summary>
         /// <remarks>
@@ -56,7 +56,7 @@ namespace Antlr4.Runtime.Atn
         /// sure which alt to predict. We don't always know what
         /// the ambiguity is in this mode.
         /// </remarks>
-        internal static readonly PredictionMode Ll = new PredictionMode();
+        public static readonly PredictionMode Ll = new PredictionMode();
 
         /// <summary>
         /// Tell the full LL prediction algorithm to pursue lookahead until
@@ -71,8 +71,8 @@ namespace Antlr4.Runtime.Atn
         /// continue looking for the exact ambiguous sequence even if
         /// it has already figured out which alternative to predict.
         /// </remarks>
-        internal static readonly PredictionMode LlExactAmbigDetection = new PredictionMode
-            ();
+        public static readonly PredictionMode LlExactAmbigDetection = new PredictionMode(
+            );
 
         /// <summary>A Map that uses just the state and the stack context as the key.</summary>
         /// <remarks>A Map that uses just the state and the stack context as the key.</remarks>
