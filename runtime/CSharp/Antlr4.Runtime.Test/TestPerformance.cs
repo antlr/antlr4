@@ -185,7 +185,7 @@ namespace Antlr4.Runtime.Test
 
         [TestMethod]
         //[Ignore]
-        public void compileJdk() throws IOException, InterruptedException {
+        public void compileJdk() {
             String jdkSourceRoot = getSourceRoot("JDK");
             assertTrue("The JDK_SOURCE_ROOT environment variable must be set for performance testing.", jdkSourceRoot != null && !jdkSourceRoot.isEmpty());
 
@@ -295,7 +295,7 @@ namespace Antlr4.Runtime.Test
          *  This method is separate from {@link #parse2} so the first pass can be distinguished when analyzing
          *  profiler results.
          */
-        protected void parse1(ParserFactory factory, Collection<CharStream> sources) throws InterruptedException {
+        protected void parse1(ParserFactory factory, Collection<CharStream> sources) {
             System.gc();
             parseSources(factory, sources);
         }
@@ -304,7 +304,7 @@ namespace Antlr4.Runtime.Test
          *  This method is separate from {@link #parse1} so the first pass can be distinguished when analyzing
          *  profiler results.
          */
-        protected void parse2(ParserFactory factory, Collection<CharStream> sources) throws InterruptedException {
+        protected void parse2(ParserFactory factory, Collection<CharStream> sources) {
             System.gc();
             parseSources(factory, sources);
         }
@@ -344,7 +344,7 @@ namespace Antlr4.Runtime.Test
 
         int configOutputSize = 0;
 
-        protected void parseSources(final ParserFactory factory, Collection<CharStream> sources) throws InterruptedException {
+        protected void parseSources(final ParserFactory factory, Collection<CharStream> sources) {
             long startTime = System.currentTimeMillis();
             tokenCount.set(0);
             int inputSize = 0;
@@ -519,7 +519,7 @@ namespace Antlr4.Runtime.Test
             }
         }
 
-        protected void compileJavaParser(bool leftRecursive) throws IOException {
+        protected void compileJavaParser(bool leftRecursive) {
             String grammarFileName = "Java.g4";
             String sourceName = leftRecursive ? "Java-LR.g4" : "Java.g4";
             String body = load(sourceName, null);
@@ -544,7 +544,6 @@ namespace Antlr4.Runtime.Test
         }
 
         protected String load(String fileName, [Nullable] String encoding)
-            throws IOException
         {
             if ( fileName==null ) {
                 return null;
