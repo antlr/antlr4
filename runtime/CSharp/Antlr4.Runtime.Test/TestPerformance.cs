@@ -900,7 +900,7 @@ namespace Antlr4.Runtime.Test
             }
 
             [return: NotNull]
-            protected override DFAState createDFAState(@NotNull ATNConfigSet configs) {
+            protected override DFAState createDFAState([NotNull] ATNConfigSet configs) {
                 return new DFAState(configs, -1, -1);
             }
 
