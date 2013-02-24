@@ -16,19 +16,15 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Sharpen;
     using CancellationToken = System.Threading.CancellationToken;
-    using CharStream = ICharStream;
     using Debug = System.Diagnostics.Debug;
     using DirectoryInfo = System.IO.DirectoryInfo;
     using FileInfo = System.IO.FileInfo;
     using Interlocked = System.Threading.Interlocked;
-    using ParseTreeListener = Antlr4.Runtime.Tree.IParseTreeListener;
     using Path = System.IO.Path;
     using Stopwatch = System.Diagnostics.Stopwatch;
     using Stream = System.IO.Stream;
     using StreamReader = System.IO.StreamReader;
     using Thread = System.Threading.Thread;
-    using Token = IToken;
-    using TokenSource = ITokenSource;
     using Volatile = System.Threading.Volatile;
 
     public class TestPerformance
@@ -225,7 +221,7 @@
             DirectoryInfo directory = new DirectoryInfo(jdkSourceRoot);
             Assert.IsTrue(directory.Exists);
 
-            IEnumerable<CharStream> sources = loadSources(directory, "*.java", RECURSIVE);
+            IEnumerable<ICharStream> sources = loadSources(directory, "*.java", RECURSIVE);
 
             Console.Out.Write(getOptionsDescription(TOP_PACKAGE));
 
@@ -320,7 +316,7 @@
          *  This method is separate from {@link #parse2} so the first pass can be distinguished when analyzing
          *  profiler results.
          */
-        protected void parse1(ParserFactory factory, IEnumerable<CharStream> sources)
+        protected void parse1(ParserFactory factory, IEnumerable<ICharStream> sources)
         {
             GC.Collect();
             parseSources(factory, sources);
@@ -330,32 +326,32 @@
          *  This method is separate from {@link #parse1} so the first pass can be distinguished when analyzing
          *  profiler results.
          */
-        protected void parse2(ParserFactory factory, IEnumerable<CharStream> sources)
+        protected void parse2(ParserFactory factory, IEnumerable<ICharStream> sources)
         {
             GC.Collect();
             parseSources(factory, sources);
         }
 
-        protected IEnumerable<CharStream> loadSources(DirectoryInfo directory, string filter, bool recursive)
+        protected IEnumerable<ICharStream> loadSources(DirectoryInfo directory, string filter, bool recursive)
         {
             return loadSources(directory, filter, null, recursive);
         }
 
-        protected IEnumerable<CharStream> loadSources(DirectoryInfo directory, string filter, Encoding encoding, bool recursive)
+        protected IEnumerable<ICharStream> loadSources(DirectoryInfo directory, string filter, Encoding encoding, bool recursive)
         {
-            ICollection<CharStream> result = new List<CharStream>();
+            ICollection<ICharStream> result = new List<ICharStream>();
             loadSources(directory, filter, encoding, recursive, result);
             return result;
         }
 
-        protected void loadSources(DirectoryInfo directory, string filter, Encoding encoding, bool recursive, ICollection<CharStream> result)
+        protected void loadSources(DirectoryInfo directory, string filter, Encoding encoding, bool recursive, ICollection<ICharStream> result)
         {
             Debug.Assert(directory.Exists);
 
             FileInfo[] sources = directory.GetFiles(filter);
             foreach (FileInfo file in sources)
             {
-                CharStream input = new AntlrFileStream(file.FullName, encoding);
+                ICharStream input = new AntlrFileStream(file.FullName, encoding);
                 result.Add(input);
             }
 
@@ -371,7 +367,7 @@
 
         int configOutputSize = 0;
 
-        protected void parseSources(ParserFactory factory, IEnumerable<CharStream> sources)
+        protected void parseSources(ParserFactory factory, IEnumerable<ICharStream> sources)
         {
             Stopwatch startTime = Stopwatch.StartNew();
             Volatile.Write(ref tokenCount, 0);
@@ -382,7 +378,7 @@
             ICollection<Task<int>> results = new List<Task<int>>();
             QueuedTaskScheduler executorServiceHost = new QueuedTaskScheduler(NUMBER_OF_THREADS);
             TaskScheduler executorService = executorServiceHost.ActivateNewQueue();
-            foreach (CharStream input in sources)
+            foreach (ICharStream input in sources)
             {
                 sourceCount++;
                 input.Seek(0);
@@ -566,11 +562,11 @@
 
         private class Callable_1
         {
-            private readonly CharStream input;
+            private readonly ICharStream input;
             private readonly ParserFactory factory;
             private readonly BlockingCollection<int> threadNumbers;
 
-            public Callable_1(CharStream input, ParserFactory factory, IProducerConsumerCollection<int> threadNumbers)
+            public Callable_1(ICharStream input, ParserFactory factory, IProducerConsumerCollection<int> threadNumbers)
             {
                 this.input = input;
                 this.factory = factory;
@@ -669,11 +665,11 @@
             Type parserClass = loader.GetType(parserName);
             Type listenerClass = loader.GetType(listenerName);
 
-            ConstructorInfo lexerCtor = lexerClass.GetConstructor(new Type[] { typeof(CharStream) });
+            ConstructorInfo lexerCtor = lexerClass.GetConstructor(new Type[] { typeof(ICharStream) });
             ConstructorInfo parserCtor = parserClass.GetConstructor(new Type[] { typeof(ITokenStream) });
 
             // construct initial instances of the lexer and parser to deserialize their ATNs
-            TokenSource tokenSource = (ITokenSource)lexerCtor.Invoke(new object[] { new AntlrInputStream("") });
+            ITokenSource tokenSource = (ITokenSource)lexerCtor.Invoke(new object[] { new AntlrInputStream("") });
             parserCtor.Invoke(new object[] { new CommonTokenStream(tokenSource) });
 
             if (!REUSE_LEXER_DFA)
@@ -709,7 +705,7 @@
 
             private readonly string entryPoint;
 
-            public int parseFile(CharStream input, int thread)
+            public int parseFile(ICharStream input, int thread)
             {
                 Checksum checksum = new CRC32();
 
@@ -717,7 +713,7 @@
 
                 try
                 {
-                    ParseTreeListener listener = sharedListeners[thread];
+                    IParseTreeListener listener = sharedListeners[thread];
                     if (listener == null)
                     {
                         listener = (IParseTreeListener)Activator.CreateInstance(listenerClass);
@@ -755,7 +751,7 @@
 
                     if (COMPUTE_CHECKSUM)
                     {
-                        foreach (Token token in tokens.GetTokens())
+                        foreach (IToken token in tokens.GetTokens())
                         {
                             updateChecksum(checksum, token);
                         }
@@ -821,7 +817,7 @@
                     MethodInfo parseMethod = parserClass.GetMethod(entryPoint);
                     Object parseResult;
 
-                    ParseTreeListener checksumParserListener = null;
+                    IParseTreeListener checksumParserListener = null;
 
                     try
                     {
@@ -918,7 +914,7 @@
 
         protected interface ParserFactory
         {
-            int parseFile(CharStream input, int thread);
+            int parseFile(ICharStream input, int thread);
         }
 
         private class DescriptiveErrorListener : BaseErrorListener
@@ -1009,7 +1005,7 @@
             }
         }
 
-        protected class ChecksumParseTreeListener : ParseTreeListener
+        protected class ChecksumParseTreeListener : IParseTreeListener
         {
             private const int VISIT_TERMINAL = 1;
             private const int VISIT_ERROR_NODE = 2;
