@@ -604,12 +604,12 @@ namespace Antlr4.Runtime.Test
         protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, String entryPoint) {
             try {
                 ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
-                Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(typeof(Lexer));
-                Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(typeof(Parser));
-                Class<? extends ParseTreeListener> listenerClass = (Class<? extends ParseTreeListener>)loader.loadClass(listenerName).asSubclass(typeof(ParseTreeListener));
+                Class<Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(typeof(Lexer));
+                Class<Parser> parserClass = loader.loadClass(parserName).asSubclass(typeof(Parser));
+                Class<ParseTreeListener> listenerClass = (Class<ParseTreeListener>)loader.loadClass(listenerName).asSubclass(typeof(ParseTreeListener));
 
-                Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(typeof(CharStream));
-                Constructor<? extends Parser> parserCtor = parserClass.getConstructor(typeof(TokenStream));
+                Constructor<Lexer> lexerCtor = lexerClass.getConstructor(typeof(CharStream));
+                Constructor<Parser> parserCtor = parserClass.getConstructor(typeof(TokenStream));
 
                 // construct initial instances of the lexer and parser to deserialize their ATNs
                 TokenSource tokenSource = lexerCtor.newInstance(new ANTLRInputStream(""));
@@ -814,7 +814,7 @@ namespace Antlr4.Runtime.Test
         private class DescriptiveErrorListener : BaseErrorListener {
             public static DescriptiveErrorListener INSTANCE = new DescriptiveErrorListener();
 
-            public override <T extends Token> void syntaxError(Recognizer<T, ?> recognizer, T offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+            public override void SyntaxError(IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e) {
                 if (!REPORT_SYNTAX_ERRORS) {
                     return;
                 }
