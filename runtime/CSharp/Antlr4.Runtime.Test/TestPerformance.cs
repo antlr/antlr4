@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
+using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Antlr4.Runtime.Test
 {
@@ -181,8 +183,8 @@ namespace Antlr4.Runtime.Test
         private readonly AtomicInteger tokenCount = new AtomicInteger();
         private int currentPass;
 
-        @Test
-        //@org.junit.Ignore
+        [TestMethod]
+        //[Ignore]
         public void compileJdk() throws IOException, InterruptedException {
             String jdkSourceRoot = getSourceRoot("JDK");
             assertTrue("The JDK_SOURCE_ROOT environment variable must be set for performance testing.", jdkSourceRoot != null && !jdkSourceRoot.isEmpty());
@@ -246,8 +248,7 @@ namespace Antlr4.Runtime.Test
             return sourceRoot;
         }
 
-        @Override
-        protected void eraseTempDir() {
+        protected override void eraseTempDir() {
             if (DELETE_TEMP_FILES) {
                 super.eraseTempDir();
             }
@@ -343,7 +344,6 @@ namespace Antlr4.Runtime.Test
 
         int configOutputSize = 0;
 
-        @SuppressWarnings("unused")
         protected void parseSources(final ParserFactory factory, Collection<CharStream> sources) throws InterruptedException {
             long startTime = System.currentTimeMillis();
             tokenCount.set(0);
@@ -355,8 +355,7 @@ namespace Antlr4.Runtime.Test
                 input.seek(0);
                 inputSize += input.size();
                 Future<Integer> futureChecksum = executorService.submit(new Callable<Integer>() {
-                    @Override
-                    public Integer call() {
+                    public override Integer call() {
                         // this incurred a great deal of overhead and was causing significant variations in performance results.
                         //System.out.format("Parsing file %s\n", input.getSourceName());
                         try {
@@ -544,7 +543,7 @@ namespace Antlr4.Runtime.Test
             assertTrue(success);
         }
 
-        protected String load(String fileName, @Nullable String encoding)
+        protected String load(String fileName, [Nullable] String encoding)
             throws IOException
         {
             if ( fileName==null ) {
@@ -623,9 +622,7 @@ namespace Antlr4.Runtime.Test
                 }
 
                 return new ParserFactory() {
-                    @SuppressWarnings("unused")
-                    @Override
-                    public int parseFile(CharStream input, int thread) {
+                    public override int parseFile(CharStream input, int thread) {
                         final Checksum checksum = new CRC32();
 
                         assert thread >= 0 && thread < NUMBER_OF_THREADS;
@@ -805,8 +802,7 @@ namespace Antlr4.Runtime.Test
         private static class DescriptiveErrorListener extends BaseErrorListener {
             public static DescriptiveErrorListener INSTANCE = new DescriptiveErrorListener();
 
-            @Override
-            public <T extends Token> void syntaxError(Recognizer<T, ?> recognizer, T offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+            public override <T extends Token> void syntaxError(Recognizer<T, ?> recognizer, T offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
                 if (!REPORT_SYNTAX_ERRORS) {
                     return;
                 }
@@ -823,8 +819,7 @@ namespace Antlr4.Runtime.Test
 
         private static class SummarizingDiagnosticErrorListener extends DiagnosticErrorListener {
 
-            @Override
-            public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet ambigAlts, ATNConfigSet configs) {
+            public override void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet ambigAlts, ATNConfigSet configs) {
                 if (!REPORT_AMBIGUITIES) {
                     return;
                 }
@@ -832,8 +827,7 @@ namespace Antlr4.Runtime.Test
                 super.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, ambigAlts, configs);
             }
 
-            @Override
-            public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, SimulatorState initialState) {
+            public override void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, SimulatorState initialState) {
                 if (!REPORT_FULL_CONTEXT) {
                     return;
                 }
@@ -841,8 +835,7 @@ namespace Antlr4.Runtime.Test
                 super.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, initialState);
             }
 
-            @Override
-            public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, SimulatorState acceptState) {
+            public override void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, SimulatorState acceptState) {
                 if (!REPORT_CONTEXT_SENSITIVITY) {
                     return;
                 }
@@ -850,8 +843,7 @@ namespace Antlr4.Runtime.Test
                 super.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, acceptState);
             }
 
-            @Override
-            protected String getDecisionDescription(Parser recognizer, int decision) {
+            protected override String getDecisionDescription(Parser recognizer, int decision) {
                 String format = "%d(%s)";
                 String ruleName = recognizer.getRuleNames()[recognizer.getATN().decisionToState.get(decision).ruleIndex];
                 return String.format(format, decision, ruleName);
@@ -871,8 +863,7 @@ namespace Antlr4.Runtime.Test
                 this.extension = extension;
             }
 
-            @Override
-            public bool accept(File dir, String name) {
+            public override bool accept(File dir, String name) {
                 return name.toLowerCase().endsWith(extension);
             }
 
@@ -884,8 +875,7 @@ namespace Antlr4.Runtime.Test
                 super(recog, atn);
             }
 
-            @Override
-            protected DFAState addDFAState(ATNConfigSet configs) {
+            protected override DFAState addDFAState(ATNConfigSet configs) {
                 return null;
             }
 
@@ -897,9 +887,8 @@ namespace Antlr4.Runtime.Test
                 super(parser, atn);
             }
 
-            @NotNull
-            @Override
-            protected DFAState createDFAState(@NotNull ATNConfigSet configs) {
+            [return: NotNull]
+            protected override DFAState createDFAState(@NotNull ATNConfigSet configs) {
                 return new DFAState(configs, -1, -1);
             }
 
@@ -922,8 +911,7 @@ namespace Antlr4.Runtime.Test
         protected static class NumberedThreadFactory implements ThreadFactory {
             private final AtomicInteger nextThread = new AtomicInteger();
 
-            @Override
-            public Thread newThread(Runnable r) {
+            public override Thread newThread(Runnable r) {
                 int threadNumber = nextThread.getAndIncrement();
                 assert threadNumber < NUMBER_OF_THREADS;
                 return new NumberedThread(r, threadNumber);
@@ -943,27 +931,23 @@ namespace Antlr4.Runtime.Test
                 this.checksum = checksum;
             }
 
-            @Override
-            public void visitTerminal(TerminalNode node) {
+            public override void visitTerminal(TerminalNode node) {
                 checksum.update(VISIT_TERMINAL);
                 updateChecksum(checksum, node.getSymbol());
             }
 
-            @Override
-            public void visitErrorNode(ErrorNode node) {
+            public override void visitErrorNode(ErrorNode node) {
                 checksum.update(VISIT_ERROR_NODE);
                 updateChecksum(checksum, node.getSymbol());
             }
 
-            @Override
-            public void enterEveryRule(ParserRuleContext ctx) {
+            public override void enterEveryRule(ParserRuleContext ctx) {
                 checksum.update(ENTER_RULE);
                 updateChecksum(checksum, ctx.getRuleIndex());
                 updateChecksum(checksum, ctx.getStart());
             }
 
-            @Override
-            public void exitEveryRule(ParserRuleContext ctx) {
+            public override void exitEveryRule(ParserRuleContext ctx) {
                 checksum.update(EXIT_RULE);
                 updateChecksum(checksum, ctx.getRuleIndex());
                 updateChecksum(checksum, ctx.getStop());
