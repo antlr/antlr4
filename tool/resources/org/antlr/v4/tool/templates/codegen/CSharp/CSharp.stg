@@ -705,10 +705,10 @@ LexerRuleContext() ::= "RuleContext"
  */
 RuleContextNameSuffix() ::= "Context"
 
-ImplicitTokenLabel(tokenName) ::= "<tokenName>"
-ImplicitRuleLabel(ruleName)	  ::= "<ruleName>"
+ImplicitTokenLabel(tokenName) ::= "_<tokenName>"
+ImplicitRuleLabel(ruleName)	  ::= "_<ruleName>"
 ImplicitSetLabel(id)		  ::= "_tset<id>"
-ListLabelName(label)		  ::= "<label>"
+ListLabelName(label)		  ::= "_<label>"
 
 CaptureNextToken(d) ::= "<d.varName> = _input.Lt(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.La(1);"
