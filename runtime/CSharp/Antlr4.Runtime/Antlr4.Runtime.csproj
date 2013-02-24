@@ -145,6 +145,7 @@
     <Compile Include="RecognitionException.cs" />
     <Compile Include="Recognizer`2.cs" />
     <Compile Include="RuleContext.cs" />
+    <Compile Include="RuleVersionAttribute.cs" />
     <Compile Include="Sharpen\Arrays.cs" />
     <Compile Include="Sharpen\AtomicReference`1.cs" />
     <Compile Include="Sharpen\BitSet.cs" />
