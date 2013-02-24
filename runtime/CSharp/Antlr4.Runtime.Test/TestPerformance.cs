@@ -190,10 +190,10 @@ namespace Antlr4.Runtime.Test
             assertTrue("The JDK_SOURCE_ROOT environment variable must be set for performance testing.", jdkSourceRoot != null && !jdkSourceRoot.isEmpty());
 
             compileJavaParser(USE_LR_GRAMMAR);
-            final String lexerName = "JavaLexer";
-            final String parserName = "JavaParser";
-            final String listenerName = "JavaBaseListener";
-            final String entryPoint = "compilationUnit";
+            String lexerName = "JavaLexer";
+            String parserName = "JavaParser";
+            String listenerName = "JavaBaseListener";
+            String entryPoint = "compilationUnit";
             ParserFactory factory = getParserFactory(lexerName, parserName, listenerName, entryPoint);
 
             if (!TOP_PACKAGE.isEmpty()) {
@@ -344,14 +344,14 @@ namespace Antlr4.Runtime.Test
 
         int configOutputSize = 0;
 
-        protected void parseSources(final ParserFactory factory, Collection<CharStream> sources) {
+        protected void parseSources(ParserFactory factory, Collection<CharStream> sources) {
             long startTime = System.currentTimeMillis();
             tokenCount.set(0);
             int inputSize = 0;
 
             Collection<Future<Integer>> results = new ArrayList<Future<Integer>>();
             ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS, new NumberedThreadFactory());
-            for (final CharStream input : sources) {
+            for (CharStream input : sources) {
                 input.seek(0);
                 inputSize += input.size();
                 Future<Integer> futureChecksum = executorService.submit(new Callable<Integer>() {
@@ -399,8 +399,8 @@ namespace Antlr4.Runtime.Test
 
             if (sharedLexers.length > 0) {
                 Lexer lexer = sharedLexers[0];
-                final LexerATNSimulator lexerInterpreter = lexer.getInterpreter();
-                final DFA[] modeToDFA = lexerInterpreter.atn.modeToDFA;
+                LexerATNSimulator lexerInterpreter = lexer.getInterpreter();
+                DFA[] modeToDFA = lexerInterpreter.atn.modeToDFA;
                 if (SHOW_DFA_STATE_STATS) {
                     int states = 0;
                     int configs = 0;
@@ -426,8 +426,8 @@ namespace Antlr4.Runtime.Test
             if (RUN_PARSER && sharedParsers.length > 0) {
                 Parser parser = sharedParsers[0];
                 // make sure the individual DFAState objects actually have unique ATNConfig arrays
-                final ParserATNSimulator interpreter = parser.getInterpreter();
-                final DFA[] decisionToDFA = interpreter.atn.decisionToDFA;
+                ParserATNSimulator interpreter = parser.getInterpreter();
+                DFA[] decisionToDFA = interpreter.atn.decisionToDFA;
 
                 if (SHOW_DFA_STATE_STATS) {
                     int states = 0;
@@ -593,12 +593,12 @@ namespace Antlr4.Runtime.Test
         protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, final String entryPoint) {
             try {
                 ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
-                final Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
-                final Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
-                final Class<? extends ParseTreeListener> listenerClass = (Class<? extends ParseTreeListener>)loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
+                Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
+                Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
+                Class<? extends ParseTreeListener> listenerClass = (Class<? extends ParseTreeListener>)loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
 
-                final Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
-                final Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
+                Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
+                Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
 
                 // construct initial instances of the lexer and parser to deserialize their ATNs
                 TokenSource tokenSource = lexerCtor.newInstance(new ANTLRInputStream(""));
@@ -622,7 +622,7 @@ namespace Antlr4.Runtime.Test
 
                 return new ParserFactory() {
                     public override int parseFile(CharStream input, int thread) {
-                        final Checksum checksum = new CRC32();
+                        Checksum checksum = new CRC32();
 
                         assert thread >= 0 && thread < NUMBER_OF_THREADS;
 
@@ -852,7 +852,7 @@ namespace Antlr4.Runtime.Test
 
         protected static class FileExtensionFilenameFilter implements FilenameFilter {
 
-            private final String extension;
+            private readonly String extension;
 
             public FileExtensionFilenameFilter(String extension) {
                 if (!extension.startsWith(".")) {
@@ -894,21 +894,21 @@ namespace Antlr4.Runtime.Test
         }
 
         protected static class NumberedThread extends Thread {
-            private final int threadNumber;
+            private readonly int threadNumber;
 
             public NumberedThread(Runnable target, int threadNumber) {
                 super(target);
                 this.threadNumber = threadNumber;
             }
 
-            public final int getThreadNumber() {
+            public int getThreadNumber() {
                 return threadNumber;
             }
 
         }
 
         protected static class NumberedThreadFactory implements ThreadFactory {
-            private final AtomicInteger nextThread = new AtomicInteger();
+            private readonly AtomicInteger nextThread = new AtomicInteger();
 
             public override Thread newThread(Runnable r) {
                 int threadNumber = nextThread.getAndIncrement();
@@ -924,7 +924,7 @@ namespace Antlr4.Runtime.Test
             private const int ENTER_RULE = 3;
             private const int EXIT_RULE = 4;
 
-            private final Checksum checksum;
+            private readonly Checksum checksum;
 
             public ChecksumParseTreeListener(Checksum checksum) {
                 this.checksum = checksum;
