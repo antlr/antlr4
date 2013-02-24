@@ -1,17 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Antlr4.Runtime;
-using Antlr4.Runtime.Atn;
-using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Tree;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Debug = System.Diagnostics.Debug;
-
-namespace Antlr4.Runtime.Test
+﻿namespace Antlr4.Runtime.Test
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+    using System.Text;
+    using System.Threading.Tasks;
+    using System.Threading.Tasks.Schedulers;
+    using Antlr4.Runtime;
+    using Antlr4.Runtime.Atn;
+    using Antlr4.Runtime.Dfa;
+    using Antlr4.Runtime.Misc;
+    using Antlr4.Runtime.Tree;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Sharpen;
+    using CancellationToken = System.Threading.CancellationToken;
+    using CharStream = ICharStream;
+    using Debug = System.Diagnostics.Debug;
+    using DirectoryInfo = System.IO.DirectoryInfo;
+    using FileInfo = System.IO.FileInfo;
+    using Interlocked = System.Threading.Interlocked;
+    using ParseTreeListener = Antlr4.Runtime.Tree.IParseTreeListener;
+    using Path = System.IO.Path;
+    using Stopwatch = System.Diagnostics.Stopwatch;
+    using Stream = System.IO.Stream;
+    using StreamReader = System.IO.StreamReader;
+    using Thread = System.Threading.Thread;
+    using Token = IToken;
+    using TokenSource = ITokenSource;
+    using Volatile = System.Threading.Volatile;
+
     public class TestPerformance
     {
         /**
@@ -110,7 +129,7 @@ namespace Antlr4.Runtime.Test
 
         private const bool ENABLE_PARSER_DFA = true;
 
-        private static readonly PredictionMode PREDICTION_MODE = PredictionMode.LL;
+        private static readonly PredictionMode PREDICTION_MODE = PredictionMode.Ll;
         private const bool FORCE_GLOBAL_CONTEXT = false;
         private const bool TRY_LOCAL_CONTEXT_FIRST = true;
         private const bool OPTIMIZE_LL1 = true;
@@ -179,9 +198,9 @@ namespace Antlr4.Runtime.Test
         private static readonly Parser[] sharedParsers = new Parser[NUMBER_OF_THREADS];
         private static readonly ATN[] sharedParserATNs = new ATN[NUMBER_OF_THREADS];
 
-        private static readonly ParseTreeListener[] sharedListeners = new ParseTreeListener[NUMBER_OF_THREADS];
+        private static readonly IParseTreeListener[] sharedListeners = new IParseTreeListener[NUMBER_OF_THREADS];
 
-        private readonly AtomicInteger tokenCount = new AtomicInteger();
+        private static int tokenCount;
         private int currentPass;
 
         [TestMethod]
@@ -189,7 +208,7 @@ namespace Antlr4.Runtime.Test
         public void compileJdk()
         {
             String jdkSourceRoot = getSourceRoot("JDK");
-            assertTrue("The JDK_SOURCE_ROOT environment variable must be set for performance testing.", jdkSourceRoot != null && !jdkSourceRoot.isEmpty());
+            Assert.IsTrue(jdkSourceRoot != null && !string.IsNullOrEmpty(jdkSourceRoot), "The JDK_SOURCE_ROOT environment variable must be set for performance testing.");
 
             compileJavaParser(USE_LR_GRAMMAR);
             String lexerName = "JavaLexer";
@@ -198,15 +217,15 @@ namespace Antlr4.Runtime.Test
             String entryPoint = "compilationUnit";
             ParserFactory factory = getParserFactory(lexerName, parserName, listenerName, entryPoint);
 
-            if (!TOP_PACKAGE.isEmpty())
+            if (!string.IsNullOrEmpty(TOP_PACKAGE))
             {
-                jdkSourceRoot = jdkSourceRoot + '/' + TOP_PACKAGE.replace('.', '/');
+                jdkSourceRoot = jdkSourceRoot + '/' + TOP_PACKAGE.Replace('.', '/');
             }
 
-            File directory = new File(jdkSourceRoot);
-            assertTrue(directory.isDirectory());
+            DirectoryInfo directory = new DirectoryInfo(jdkSourceRoot);
+            Assert.IsTrue(directory.Exists);
 
-            Collection<CharStream> sources = loadSources(directory, new FileExtensionFilenameFilter(".java"), RECURSIVE);
+            IEnumerable<CharStream> sources = loadSources(directory, "*.java", RECURSIVE);
 
             Console.Out.Write(getOptionsDescription(TOP_PACKAGE));
 
@@ -217,47 +236,35 @@ namespace Antlr4.Runtime.Test
                 currentPass = i + 1;
                 if (CLEAR_DFA)
                 {
-                    if (sharedLexers.length > 0)
+                    if (sharedLexers.Length > 0)
                     {
-                        sharedLexers[0].getATN().clearDFA();
+                        sharedLexers[0].Atn.ClearDFA();
                     }
 
-                    if (sharedParsers.length > 0)
+                    if (sharedParsers.Length > 0)
                     {
-                        sharedParsers[0].getATN().clearDFA();
+                        sharedParsers[0].Atn.ClearDFA();
                     }
 
-                    Arrays.fill(sharedLexers, null);
-                    Arrays.fill(sharedParsers, null);
+                    Arrays.Fill(sharedLexers, null);
+                    Arrays.Fill(sharedParsers, null);
                 }
 
                 parse2(factory, sources);
             }
 
-            sources.clear();
+            sources = null;
             if (PAUSE_FOR_HEAP_DUMP)
             {
-                System.gc();
+                GC.Collect();
                 Console.Out.WriteLine("Pausing before application exit.");
-                try
-                {
-                    Thread.sleep(4000);
-                }
-                catch (InterruptedException ex)
-                {
-                    Logger.getLogger(typeof(TestPerformance).getName()).log(Level.SEVERE, null, ex);
-                }
+                Thread.Sleep(4000);
             }
         }
 
         private String getSourceRoot(String prefix)
         {
-            String sourceRoot = System.getenv(prefix + "_SOURCE_ROOT");
-            if (sourceRoot == null)
-            {
-                sourceRoot = System.getProperty(prefix + "_SOURCE_ROOT");
-            }
-
+            String sourceRoot = Environment.GetEnvironmentVariable(prefix + "_SOURCE_ROOT");
             return sourceRoot;
         }
 
@@ -265,57 +272,57 @@ namespace Antlr4.Runtime.Test
         {
             if (DELETE_TEMP_FILES)
             {
-                super.eraseTempDir();
+                base.eraseTempDir();
             }
         }
 
         public static String getOptionsDescription(String topPackage)
         {
             StringBuilder builder = new StringBuilder();
-            builder.append("Input=");
-            if (topPackage.isEmpty())
+            builder.Append("Input=");
+            if (string.IsNullOrEmpty(topPackage))
             {
-                builder.append("*");
+                builder.Append("*");
             }
             else
             {
-                builder.append(topPackage).append(".*");
+                builder.Append(topPackage).Append(".*");
             }
 
-            builder.append(", Grammar=").append(USE_LR_GRAMMAR ? "LR" : "Standard");
-            builder.append(", ForceAtn=").append(FORCE_ATN);
-            builder.append(", Lexer:").append(ENABLE_LEXER_DFA ? "DFA" : "ATN");
-            builder.append(", Parser:").append(ENABLE_PARSER_DFA ? "DFA" : "ATN");
+            builder.Append(", Grammar=").Append(USE_LR_GRAMMAR ? "LR" : "Standard");
+            builder.Append(", ForceAtn=").Append(FORCE_ATN);
+            builder.Append(", Lexer:").Append(ENABLE_LEXER_DFA ? "DFA" : "ATN");
+            builder.Append(", Parser:").Append(ENABLE_PARSER_DFA ? "DFA" : "ATN");
 
-            builder.append(newline);
+            builder.AppendLine();
 
-            builder.append("Op=Lex").append(RUN_PARSER ? "+Parse" : " only");
-            builder.append(", Strategy=").append(BAIL_ON_ERROR ? typeof(BailErrorStrategy).getSimpleName() : typeof(DefaultErrorStrategy).getSimpleName());
-            builder.append(", BuildParseTree=").append(BUILD_PARSE_TREES);
-            builder.append(", WalkBlankListener=").append(BLANK_LISTENER);
+            builder.Append("Op=Lex").Append(RUN_PARSER ? "+Parse" : " only");
+            builder.Append(", Strategy=").Append(BAIL_ON_ERROR ? typeof(BailErrorStrategy).Name : typeof(DefaultErrorStrategy).Name);
+            builder.Append(", BuildParseTree=").Append(BUILD_PARSE_TREES);
+            builder.Append(", WalkBlankListener=").Append(BLANK_LISTENER);
 
-            builder.append(newline);
+            builder.AppendLine();
 
-            builder.append("Lexer=").append(REUSE_LEXER ? "setInputStream" : "newInstance");
-            builder.append(", Parser=").append(REUSE_PARSER ? "setInputStream" : "newInstance");
-            builder.append(", AfterPass=").append(CLEAR_DFA ? "newInstance" : "setInputStream");
+            builder.Append("Lexer=").Append(REUSE_LEXER ? "setInputStream" : "newInstance");
+            builder.Append(", Parser=").Append(REUSE_PARSER ? "setInputStream" : "newInstance");
+            builder.Append(", AfterPass=").Append(CLEAR_DFA ? "newInstance" : "setInputStream");
 
-            builder.append('\n');
+            builder.AppendLine();
 
-            builder.append("UniqueClosure=").append(OPTIMIZE_UNIQUE_CLOSURE ? "optimize" : "complete");
+            builder.Append("UniqueClosure=").Append(OPTIMIZE_UNIQUE_CLOSURE ? "optimize" : "complete");
 
-            builder.append(newline);
+            builder.AppendLine();
 
-            return builder.toString();
+            return builder.ToString();
         }
 
         /**
          *  This method is separate from {@link #parse2} so the first pass can be distinguished when analyzing
          *  profiler results.
          */
-        protected void parse1(ParserFactory factory, Collection<CharStream> sources)
+        protected void parse1(ParserFactory factory, IEnumerable<CharStream> sources)
         {
-            System.gc();
+            GC.Collect();
             parseSources(factory, sources);
         }
 
@@ -323,114 +330,99 @@ namespace Antlr4.Runtime.Test
          *  This method is separate from {@link #parse1} so the first pass can be distinguished when analyzing
          *  profiler results.
          */
-        protected void parse2(ParserFactory factory, Collection<CharStream> sources)
+        protected void parse2(ParserFactory factory, IEnumerable<CharStream> sources)
         {
-            System.gc();
+            GC.Collect();
             parseSources(factory, sources);
         }
 
-        protected Collection<CharStream> loadSources(File directory, FilenameFilter filter, bool recursive)
+        protected IEnumerable<CharStream> loadSources(DirectoryInfo directory, string filter, bool recursive)
         {
             return loadSources(directory, filter, null, recursive);
         }
 
-        protected Collection<CharStream> loadSources(File directory, FilenameFilter filter, String encoding, bool recursive)
+        protected IEnumerable<CharStream> loadSources(DirectoryInfo directory, string filter, Encoding encoding, bool recursive)
         {
-            Collection<CharStream> result = new ArrayList<CharStream>();
+            ICollection<CharStream> result = new List<CharStream>();
             loadSources(directory, filter, encoding, recursive, result);
             return result;
         }
 
-        protected void loadSources(File directory, FilenameFilter filter, String encoding, bool recursive, Collection<CharStream> result)
+        protected void loadSources(DirectoryInfo directory, string filter, Encoding encoding, bool recursive, ICollection<CharStream> result)
         {
-            Debug.Assert(directory.isDirectory());
+            Debug.Assert(directory.Exists);
 
-            File[] sources = directory.listFiles(filter);
-            foreach (File file in sources)
+            FileInfo[] sources = directory.GetFiles(filter);
+            foreach (FileInfo file in sources)
             {
-                try
-                {
-                    CharStream input = new ANTLRFileStream(file.getAbsolutePath(), encoding);
-                    result.add(input);
-                }
-                catch (IOException ex)
-                {
-                }
+                CharStream input = new AntlrFileStream(file.FullName, encoding);
+                result.Add(input);
             }
 
             if (recursive)
             {
-                File[] children = directory.listFiles();
-                foreach (File child in children)
+                DirectoryInfo[] children = directory.GetDirectories();
+                foreach (DirectoryInfo child in children)
                 {
-                    if (child.isDirectory())
-                    {
-                        loadSources(child, filter, encoding, true, result);
-                    }
+                    loadSources(child, filter, encoding, true, result);
                 }
             }
         }
 
         int configOutputSize = 0;
 
-        protected void parseSources(ParserFactory factory, Collection<CharStream> sources)
+        protected void parseSources(ParserFactory factory, IEnumerable<CharStream> sources)
         {
-            long startTime = System.currentTimeMillis();
-            tokenCount.set(0);
+            Stopwatch startTime = Stopwatch.StartNew();
+            Volatile.Write(ref tokenCount, 0);
+            int sourceCount = 0;
             int inputSize = 0;
 
-            Collection<Future<Integer>> results = new ArrayList<Future<Integer>>();
-            ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS, new NumberedThreadFactory());
+            ConcurrentBag<int> threadIdentifiers = new ConcurrentBag<int>(Enumerable.Range(0, NUMBER_OF_THREADS));
+            ICollection<Task<int>> results = new List<Task<int>>();
+            QueuedTaskScheduler executorServiceHost = new QueuedTaskScheduler(NUMBER_OF_THREADS);
+            TaskScheduler executorService = executorServiceHost.ActivateNewQueue();
             foreach (CharStream input in sources)
             {
-                input.seek(0);
-                inputSize += input.size();
-                Future<Integer> futureChecksum = executorService.submit(new Callable_1(input, factory));
+                sourceCount++;
+                input.Seek(0);
+                inputSize += input.Size;
+                Task<int> futureChecksum = Task.Factory.StartNew<int>(new Callable_1(input, factory, threadIdentifiers).call, CancellationToken.None, TaskCreationOptions.None, executorService);
 
-                results.add(futureChecksum);
+                results.Add(futureChecksum);
             }
 
             Checksum checksum = new CRC32();
-            foreach (Future<Integer> future in results)
+            foreach (Task<int> future in results)
             {
-                int value = 0;
-                try
-                {
-                    value = future.get();
-                }
-                catch (ExecutionException ex)
-                {
-                    Logger.getLogger(typeof(TestPerformance).getName()).log(Level.SEVERE, null, ex);
-                }
-
+                int value = future.Result;
                 if (COMPUTE_CHECKSUM)
                 {
                     updateChecksum(checksum, value);
                 }
             }
 
-            executorService.shutdown();
-            executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+            executorServiceHost.Dispose();
 
             Console.Out.WriteLine("Total parse time for {0} files ({1} KB, {2} tokens, checksum 0x{3:8X}): {4}ms",
-                              sources.size(),
+                              sourceCount,
                               inputSize / 1024,
-                              tokenCount.get(),
-                              COMPUTE_CHECKSUM ? checksum.getValue() : 0,
-                              System.currentTimeMillis() - startTime);
+                              Volatile.Read(ref tokenCount),
+                              COMPUTE_CHECKSUM ? checksum.Value : 0,
+                              startTime.ElapsedMilliseconds);
 
-            if (sharedLexers.length > 0)
+            if (sharedLexers.Length > 0)
             {
                 Lexer lexer = sharedLexers[0];
-                LexerATNSimulator lexerInterpreter = lexer.getInterpreter();
+                LexerATNSimulator lexerInterpreter = lexer.Interpreter;
                 DFA[] modeToDFA = lexerInterpreter.atn.modeToDFA;
                 if (SHOW_DFA_STATE_STATS)
                 {
                     int states = 0;
                     int configs = 0;
-                    Set<ATNConfig> uniqueConfigs = new HashSet<ATNConfig>();
+                    ISet<ATNConfig> uniqueConfigs = new HashSet<ATNConfig>();
 
-                    for (int i = 0; i < modeToDFA.length; i++)
+                    for (int i = 0; i < modeToDFA.Length; i++)
                     {
                         DFA dfa = modeToDFA[i];
                         if (dfa == null || dfa.states == null)
@@ -438,32 +430,32 @@ namespace Antlr4.Runtime.Test
                             continue;
                         }
 
-                        states += dfa.states.size();
-                        foreach (DFAState state in dfa.states.values())
+                        states += dfa.states.Count;
+                        foreach (DFAState state in dfa.states.Values)
                         {
-                            configs += state.configs.size();
-                            uniqueConfigs.addAll(state.configs);
+                            configs += state.configs.Count;
+                            uniqueConfigs.UnionWith(state.configs);
                         }
                     }
 
-                    Console.Out.WriteLine("There are {0} lexer DFAState instances, {1} configs ({2} unique), {3} prediction contexts.", states, configs, uniqueConfigs.size(), lexerInterpreter.atn.getContextCacheSize());
+                    Console.Out.WriteLine("There are {0} lexer DFAState instances, {1} configs ({2} unique), {3} prediction contexts.", states, configs, uniqueConfigs.Count, lexerInterpreter.atn.GetContextCacheSize());
                 }
             }
 
-            if (RUN_PARSER && sharedParsers.length > 0)
+            if (RUN_PARSER && sharedParsers.Length > 0)
             {
                 Parser parser = sharedParsers[0];
                 // make sure the individual DFAState objects actually have unique ATNConfig arrays
-                ParserATNSimulator interpreter = parser.getInterpreter();
+                ParserATNSimulator interpreter = parser.Interpreter;
                 DFA[] decisionToDFA = interpreter.atn.decisionToDFA;
 
                 if (SHOW_DFA_STATE_STATS)
                 {
                     int states = 0;
                     int configs = 0;
-                    Set<ATNConfig> uniqueConfigs = new HashSet<ATNConfig>();
+                    ISet<ATNConfig> uniqueConfigs = new HashSet<ATNConfig>();
 
-                    for (int i = 0; i < decisionToDFA.length; i++)
+                    for (int i = 0; i < decisionToDFA.Length; i++)
                     {
                         DFA dfa = decisionToDFA[i];
                         if (dfa == null || dfa.states == null)
@@ -471,15 +463,15 @@ namespace Antlr4.Runtime.Test
                             continue;
                         }
 
-                        states += dfa.states.size();
-                        foreach (DFAState state in dfa.states.values())
+                        states += dfa.states.Count;
+                        foreach (DFAState state in dfa.states.Values)
                         {
-                            configs += state.configs.size();
-                            uniqueConfigs.addAll(state.configs);
+                            configs += state.configs.Count;
+                            uniqueConfigs.UnionWith(state.configs);
                         }
                     }
 
-                    Console.Out.WriteLine("There are {0} parser DFAState instances, {1} configs ({2} unique), {3} prediction contexts.", states, configs, uniqueConfigs.size(), interpreter.atn.getContextCacheSize());
+                    Console.Out.WriteLine("There are {0} parser DFAState instances, {1} configs ({2} unique), {3} prediction contexts.", states, configs, uniqueConfigs.Count, interpreter.atn.GetContextCacheSize());
                 }
 
                 int localDfaCount = 0;
@@ -488,7 +480,7 @@ namespace Antlr4.Runtime.Test
                 int globalConfigCount = 0;
                 int[] contextsInDFAState = new int[0];
 
-                for (int i = 0; i < decisionToDFA.length; i++)
+                for (int i = 0; i < decisionToDFA.Length; i++)
                 {
                     DFA dfa = decisionToDFA[i];
                     if (dfa == null || dfa.states == null)
@@ -498,11 +490,11 @@ namespace Antlr4.Runtime.Test
 
                     if (SHOW_CONFIG_STATS)
                     {
-                        foreach (DFAState state in dfa.states.keySet())
+                        foreach (DFAState state in dfa.states.Keys)
                         {
-                            if (state.configs.size() >= contextsInDFAState.length)
+                            if (state.configs.Count >= contextsInDFAState.Length)
                             {
-                                contextsInDFAState = Arrays.copyOf(contextsInDFAState, state.configs.size() + 1);
+                                Array.Resize(ref contextsInDFAState, state.configs.Count + 1);
                             }
 
                             if (state.isAcceptState)
@@ -510,7 +502,7 @@ namespace Antlr4.Runtime.Test
                                 bool hasGlobal = false;
                                 foreach (ATNConfig config in state.configs)
                                 {
-                                    if (config.getReachesIntoOuterContext())
+                                    if (config.ReachesIntoOuterContext)
                                     {
                                         globalConfigCount++;
                                         hasGlobal = true;
@@ -531,24 +523,24 @@ namespace Antlr4.Runtime.Test
                                 }
                             }
 
-                            contextsInDFAState[state.configs.size()]++;
+                            contextsInDFAState[state.configs.Count]++;
                         }
                     }
 
                     if (EXPORT_LARGEST_CONFIG_CONTEXTS)
                     {
-                        foreach (DFAState state in dfa.states.keySet())
+                        foreach (DFAState state in dfa.states.Keys)
                         {
                             foreach (ATNConfig config in state.configs)
                             {
-                                String configOutput = config.toDotString();
-                                if (configOutput.length() <= configOutputSize)
+                                String configOutput = config.ToDotString();
+                                if (configOutput.Length <= configOutputSize)
                                 {
                                     continue;
                                 }
 
-                                configOutputSize = configOutput.length();
-                                writeFile(tmpdir, "d" + dfa.decision + ".s" + state.stateNumber + ".a" + config.getAlt() + ".config.dot", configOutput);
+                                configOutputSize = configOutput.Length;
+                                writeFile(tmpdir, "d" + dfa.decision + ".s" + state.stateNumber + ".a" + config.Alt + ".config.dot", configOutput);
                             }
                         }
                     }
@@ -560,7 +552,7 @@ namespace Antlr4.Runtime.Test
                     Console.Out.WriteLine("  Config stats: {0} total, {1} local, {2} global", localConfigCount + globalConfigCount, localConfigCount, globalConfigCount);
                     if (SHOW_DFA_STATE_STATS)
                     {
-                        for (int i = 0; i < contextsInDFAState.length; i++)
+                        for (int i = 0; i < contextsInDFAState.Length; i++)
                         {
                             if (contextsInDFAState[i] != 0)
                             {
@@ -572,32 +564,31 @@ namespace Antlr4.Runtime.Test
             }
         }
 
-        private class Callable_1 : Callable<Integer>
+        private class Callable_1
         {
             private readonly CharStream input;
             private readonly ParserFactory factory;
+            private readonly BlockingCollection<int> threadNumbers;
 
-            public Callable_1(CharStream input, ParserFactory factory)
+            public Callable_1(CharStream input, ParserFactory factory, IProducerConsumerCollection<int> threadNumbers)
             {
                 this.input = input;
                 this.factory = factory;
+                this.threadNumbers = new BlockingCollection<int>(threadNumbers);
             }
 
-            public override Integer call()
+            public int call()
             {
                 // this incurred a great deal of overhead and was causing significant variations in performance results.
                 //Console.Out.WriteLine("Parsing file {0}", input.getSourceName());
+                int threadNumber = threadNumbers.Take();
                 try
                 {
-                    return factory.parseFile(input, ((NumberedThread)Thread.currentThread()).getThreadNumber());
+                    return factory.parseFile(input, threadNumber);
                 }
-                catch (IllegalStateException ex)
+                finally
                 {
-                    ex.printStackTrace(System.err);
-                }
-                catch (Throwable t)
-                {
-                    t.printStackTrace(System.err);
+                    threadNumbers.Add(threadNumber);
                 }
 
                 return -1;
@@ -609,134 +600,116 @@ namespace Antlr4.Runtime.Test
             String grammarFileName = "Java.g4";
             String sourceName = leftRecursive ? "Java-LR.g4" : "Java.g4";
             String body = load(sourceName, null);
-            List<String> extraOptions = new ArrayList<String>();
-            extraOptions.add("-Werror");
+            List<String> extraOptions = new List<String>();
+            extraOptions.Add("-Werror");
             if (FORCE_ATN)
             {
-                extraOptions.add("-Xforce-atn");
+                extraOptions.Add("-Xforce-atn");
             }
             if (EXPORT_ATN_GRAPHS)
             {
-                extraOptions.add("-atn");
+                extraOptions.Add("-atn");
             }
             if (DEBUG_TEMPLATES)
             {
-                extraOptions.add("-XdbgST");
+                extraOptions.Add("-XdbgST");
                 if (DEBUG_TEMPLATES_WAIT)
                 {
-                    extraOptions.add("-XdbgSTWait");
+                    extraOptions.Add("-XdbgSTWait");
                 }
             }
-            extraOptions.add("-visitor");
-            String[] extraOptionsArray = extraOptions.toArray(new String[extraOptions.size()]);
+            extraOptions.Add("-visitor");
+            String[] extraOptionsArray = extraOptions.ToArray();
             bool success = rawGenerateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", true, extraOptionsArray);
-            assertTrue(success);
+            Assert.IsTrue(success);
         }
 
-        protected String load(String fileName, [Nullable] String encoding)
+        protected String load(String fileName, [Nullable] Encoding encoding)
         {
             if (fileName == null)
             {
                 return null;
             }
 
-            String fullFileName = getClass().getPackage().getName().replace('.', '/') + '/' + fileName;
-            int size = 65000;
-            InputStreamReader isr;
-            InputStream fis = getClass().getClassLoader().getResourceAsStream(fullFileName);
-            if (encoding != null)
-            {
-                isr = new InputStreamReader(fis, encoding);
-            }
+            Stream stream = typeof(TestPerformance).Assembly.GetManifestResourceStream(typeof(TestPerformance), fileName);
+            if (encoding == null)
+                return new StreamReader(stream).ReadToEnd();
             else
-            {
-                isr = new InputStreamReader(fis);
-            }
-            try
-            {
-                char[] data = new char[size];
-                int n = isr.read(data);
-                return new String(data, 0, n);
-            }
-            finally
-            {
-                isr.close();
-            }
+                return new StreamReader(stream, encoding).ReadToEnd();
         }
 
         private static void updateChecksum(Checksum checksum, int value)
         {
-            checksum.update((value) & 0xFF);
-            checksum.update(((uint)value >> 8) & 0xFF);
-            checksum.update(((uint)value >> 16) & 0xFF);
-            checksum.update(((uint)value >> 24) & 0xFF);
+            checksum.Update((value) & 0xFF);
+            checksum.Update((int)((uint)value >> 8) & 0xFF);
+            checksum.Update((int)((uint)value >> 16) & 0xFF);
+            checksum.Update((int)((uint)value >> 24) & 0xFF);
         }
 
-        private static void updateChecksum(Checksum checksum, Token token)
+        private static void updateChecksum(Checksum checksum, IToken token)
         {
             if (token == null)
             {
-                checksum.update(0);
+                checksum.Update(0);
                 return;
             }
 
-            updateChecksum(checksum, token.getStartIndex());
-            updateChecksum(checksum, token.getStopIndex());
-            updateChecksum(checksum, token.getLine());
-            updateChecksum(checksum, token.getCharPositionInLine());
-            updateChecksum(checksum, token.getType());
-            updateChecksum(checksum, token.getChannel());
+            updateChecksum(checksum, token.StartIndex);
+            updateChecksum(checksum, token.StopIndex);
+            updateChecksum(checksum, token.Line);
+            updateChecksum(checksum, token.Column);
+            updateChecksum(checksum, token.Type);
+            updateChecksum(checksum, token.Channel);
         }
 
         protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, String entryPoint)
         {
-            try
+            Assembly loader = Assembly.LoadFile(Path.Combine(tmpdir, "Parser.dll"));
+            Type lexerClass = loader.GetType(lexerName);
+            Type parserClass = loader.GetType(parserName);
+            Type listenerClass = loader.GetType(listenerName);
+
+            ConstructorInfo lexerCtor = lexerClass.GetConstructor(new Type[] { typeof(CharStream) });
+            ConstructorInfo parserCtor = parserClass.GetConstructor(new Type[] { typeof(ITokenStream) });
+
+            // construct initial instances of the lexer and parser to deserialize their ATNs
+            TokenSource tokenSource = (ITokenSource)lexerCtor.Invoke(new object[] { new AntlrInputStream("") });
+            parserCtor.Invoke(new object[] { new CommonTokenStream(tokenSource) });
+
+            if (!REUSE_LEXER_DFA)
             {
-                ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
-                Class<Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(typeof(Lexer));
-                Class<Parser> parserClass = loader.loadClass(parserName).asSubclass(typeof(Parser));
-                Class<ParseTreeListener> listenerClass = (Class<ParseTreeListener>)loader.loadClass(listenerName).asSubclass(typeof(ParseTreeListener));
-
-                Constructor<Lexer> lexerCtor = lexerClass.getConstructor(typeof(CharStream));
-                Constructor<Parser> parserCtor = parserClass.getConstructor(typeof(TokenStream));
-
-                // construct initial instances of the lexer and parser to deserialize their ATNs
-                TokenSource tokenSource = lexerCtor.newInstance(new ANTLRInputStream(""));
-                parserCtor.newInstance(new CommonTokenStream(tokenSource));
-
-                if (!REUSE_LEXER_DFA)
+                FieldInfo lexerSerializedATNField = lexerClass.GetField("_serializedATN");
+                String lexerSerializedATN = (String)lexerSerializedATNField.GetValue(null);
+                for (int i = 0; i < NUMBER_OF_THREADS; i++)
                 {
-                    Field lexerSerializedATNField = lexerClass.getField("_serializedATN");
-                    String lexerSerializedATN = (String)lexerSerializedATNField.get(null);
-                    for (int i = 0; i < NUMBER_OF_THREADS; i++)
-                    {
-                        sharedLexerATNs[i] = ATNSimulator.deserialize(lexerSerializedATN.toCharArray());
-                    }
+                    sharedLexerATNs[i] = ATNSimulator.Deserialize(lexerSerializedATN.ToCharArray());
                 }
-
-                if (RUN_PARSER && !REUSE_PARSER_DFA)
-                {
-                    Field parserSerializedATNField = parserClass.getField("_serializedATN");
-                    String parserSerializedATN = (String)parserSerializedATNField.get(null);
-                    for (int i = 0; i < NUMBER_OF_THREADS; i++)
-                    {
-                        sharedParserATNs[i] = ATNSimulator.deserialize(parserSerializedATN.toCharArray());
-                    }
-                }
-
-                return new ParserFactory_1();
             }
-            catch (Exception e)
+
+            if (RUN_PARSER && !REUSE_PARSER_DFA)
             {
-                e.printStackTrace(Console.Out);
-                Assert.fail(e.getMessage());
-                throw new IllegalStateException(e);
+                FieldInfo parserSerializedATNField = parserClass.GetField("_serializedATN");
+                String parserSerializedATN = (String)parserSerializedATNField.GetValue(null);
+                for (int i = 0; i < NUMBER_OF_THREADS; i++)
+                {
+                    sharedParserATNs[i] = ATNSimulator.Deserialize(parserSerializedATN.ToCharArray());
+                }
             }
+
+            return new ParserFactory_1();
         }
 
         private class ParserFactory_1 : ParserFactory
         {
-            public override int parseFile(CharStream input, int thread)
+            private readonly Type listenerClass;
+            private readonly Type parserClass;
+
+            private readonly ConstructorInfo lexerCtor;
+            private readonly ConstructorInfo parserCtor;
+
+            private readonly string entryPoint;
+
+            public int parseFile(CharStream input, int thread)
             {
                 Checksum checksum = new CRC32();
 
@@ -747,42 +720,42 @@ namespace Antlr4.Runtime.Test
                     ParseTreeListener listener = sharedListeners[thread];
                     if (listener == null)
                     {
-                        listener = listenerClass.newInstance();
+                        listener = (IParseTreeListener)Activator.CreateInstance(listenerClass);
                         sharedListeners[thread] = listener;
                     }
 
                     Lexer lexer = sharedLexers[thread];
                     if (REUSE_LEXER && lexer != null)
                     {
-                        lexer.setInputStream(input);
+                        lexer.SetInputStream(input);
                     }
                     else
                     {
-                        lexer = lexerCtor.newInstance(input);
+                        lexer = (Lexer)lexerCtor.Invoke(new object[] { input });
                         sharedLexers[thread] = lexer;
                         if (!ENABLE_LEXER_DFA)
                         {
-                            lexer.setInterpreter(new NonCachingLexerATNSimulator(lexer, lexer.getATN()));
+                            lexer.Interpreter = new NonCachingLexerATNSimulator(lexer, lexer.Atn);
                         }
                         else if (!REUSE_LEXER_DFA)
                         {
-                            lexer.setInterpreter(new LexerATNSimulator(lexer, sharedLexerATNs[thread]));
+                            lexer.Interpreter = new LexerATNSimulator(lexer, sharedLexerATNs[thread]);
                         }
                     }
 
-                    lexer.getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
+                    lexer.Interpreter.optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
                     if (ENABLE_LEXER_DFA && !REUSE_LEXER_DFA)
                     {
-                        lexer.getInterpreter().atn.clearDFA();
+                        lexer.Interpreter.atn.ClearDFA();
                     }
 
                     CommonTokenStream tokens = new CommonTokenStream(lexer);
-                    tokens.fill();
-                    tokenCount.addAndGet(tokens.size());
+                    tokens.Fill();
+                    Interlocked.Add(ref tokenCount, tokens.Size);
 
                     if (COMPUTE_CHECKSUM)
                     {
-                        foreach (Token token in tokens.getTokens())
+                        foreach (Token token in tokens.GetTokens())
                         {
                             updateChecksum(checksum, token);
                         }
@@ -790,62 +763,62 @@ namespace Antlr4.Runtime.Test
 
                     if (!RUN_PARSER)
                     {
-                        return (int)checksum.getValue();
+                        return (int)checksum.Value;
                     }
 
                     Parser parser = sharedParsers[thread];
                     if (REUSE_PARSER && parser != null)
                     {
-                        parser.setInputStream(tokens);
+                        parser.SetInputStream(tokens);
                     }
                     else
                     {
-                        Parser newParser = parserCtor.newInstance(tokens);
+                        Parser newParser = (Parser)parserCtor.Invoke(new object[] { tokens });
                         parser = newParser;
                         sharedParsers[thread] = parser;
                     }
 
-                    parser.removeErrorListeners();
+                    parser.RemoveErrorListeners();
                     if (!TWO_STAGE_PARSING)
                     {
-                        parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
-                        parser.addErrorListener(new SummarizingDiagnosticErrorListener());
+                        parser.AddErrorListener(DescriptiveErrorListener.INSTANCE);
+                        parser.AddErrorListener(new SummarizingDiagnosticErrorListener());
                     }
 
                     if (!ENABLE_PARSER_DFA)
                     {
-                        parser.setInterpreter(new NonCachingParserATNSimulator(parser, parser.getATN()));
+                        parser.Interpreter = new NonCachingParserATNSimulator(parser, parser.Atn);
                     }
                     else if (!REUSE_PARSER_DFA)
                     {
-                        parser.setInterpreter(new ParserATNSimulator(parser, sharedParserATNs[thread]));
+                        parser.Interpreter = new ParserATNSimulator(parser, sharedParserATNs[thread]);
                     }
 
                     if (ENABLE_PARSER_DFA && !REUSE_PARSER_DFA)
                     {
-                        parser.getInterpreter().atn.clearDFA();
+                        parser.Interpreter.atn.ClearDFA();
                     }
 
-                    parser.getInterpreter().setPredictionMode(TWO_STAGE_PARSING ? PredictionMode.SLL : PREDICTION_MODE);
-                    parser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT && !TWO_STAGE_PARSING;
-                    parser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST || TWO_STAGE_PARSING;
-                    parser.getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
-                    parser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
-                    parser.getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
-                    parser.getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
-                    parser.getInterpreter().tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
-                    parser.getInterpreter().treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
-                    parser.setBuildParseTree(BUILD_PARSE_TREES);
+                    parser.Interpreter.PredictionMode = TWO_STAGE_PARSING ? PredictionMode.Sll : PREDICTION_MODE;
+                    parser.Interpreter.force_global_context = FORCE_GLOBAL_CONTEXT && !TWO_STAGE_PARSING;
+                    parser.Interpreter.always_try_local_context = TRY_LOCAL_CONTEXT_FIRST || TWO_STAGE_PARSING;
+                    parser.Interpreter.optimize_ll1 = OPTIMIZE_LL1;
+                    parser.Interpreter.optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
+                    parser.Interpreter.optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
+                    parser.Interpreter.optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
+                    parser.Interpreter.tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
+                    parser.Interpreter.treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
+                    parser.BuildParseTree = BUILD_PARSE_TREES;
                     if (!BUILD_PARSE_TREES && BLANK_LISTENER)
                     {
-                        parser.addParseListener(listener);
+                        parser.AddParseListener(listener);
                     }
                     if (BAIL_ON_ERROR || TWO_STAGE_PARSING)
                     {
-                        parser.setErrorHandler(new BailErrorStrategy());
+                        parser.ErrorHandler = new BailErrorStrategy();
                     }
 
-                    Method parseMethod = parserClass.getMethod(entryPoint);
+                    MethodInfo parseMethod = parserClass.GetMethod(entryPoint);
                     Object parseResult;
 
                     ParseTreeListener checksumParserListener = null;
@@ -855,92 +828,91 @@ namespace Antlr4.Runtime.Test
                         if (COMPUTE_CHECKSUM)
                         {
                             checksumParserListener = new ChecksumParseTreeListener(checksum);
-                            parser.addParseListener(checksumParserListener);
+                            parser.AddParseListener(checksumParserListener);
                         }
-                        parseResult = parseMethod.invoke(parser);
+                        parseResult = parseMethod.Invoke(parser, null);
                     }
-                    catch (InvocationTargetException ex)
+                    catch (TargetInvocationException ex)
                     {
                         if (!TWO_STAGE_PARSING)
                         {
-                            throw ex;
+                            throw;
                         }
 
-                        String sourceName = tokens.getSourceName();
-                        sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName + ": " : "";
+                        String sourceName = tokens.SourceName;
+                        sourceName = !string.IsNullOrEmpty(sourceName) ? sourceName + ": " : "";
                         Console.Error.WriteLine(sourceName + "Forced to retry with full context.");
 
-                        if (!(ex.getCause() is ParseCancellationException))
+                        if (!(ex.InnerException is ParseCanceledException))
                         {
-                            throw ex;
+                            throw;
                         }
 
-                        tokens.reset();
+                        tokens.Reset();
                         if (REUSE_PARSER && sharedParsers[thread] != null)
                         {
-                            parser.setInputStream(tokens);
+                            parser.SetInputStream(tokens);
                         }
                         else
                         {
-                            Parser newParser = parserCtor.newInstance(tokens);
+                            Parser newParser = (Parser)parserCtor.Invoke(new object[] { tokens });
                             parser = newParser;
                             sharedParsers[thread] = parser;
                         }
 
-                        parser.removeErrorListeners();
-                        parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
-                        parser.addErrorListener(new SummarizingDiagnosticErrorListener());
+                        parser.RemoveErrorListeners();
+                        parser.AddErrorListener(DescriptiveErrorListener.INSTANCE);
+                        parser.AddErrorListener(new SummarizingDiagnosticErrorListener());
                         if (!ENABLE_PARSER_DFA)
                         {
-                            parser.setInterpreter(new NonCachingParserATNSimulator(parser, parser.getATN()));
+                            parser.Interpreter = new NonCachingParserATNSimulator(parser, parser.Atn);
                         }
-                        parser.getInterpreter().setPredictionMode(PREDICTION_MODE);
-                        parser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT;
-                        parser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
-                        parser.getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
-                        parser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
-                        parser.getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
-                        parser.getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
-                        parser.getInterpreter().tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
-                        parser.getInterpreter().treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
-                        parser.setBuildParseTree(BUILD_PARSE_TREES);
+                        parser.Interpreter.PredictionMode = PREDICTION_MODE;
+                        parser.Interpreter.force_global_context = FORCE_GLOBAL_CONTEXT;
+                        parser.Interpreter.always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
+                        parser.Interpreter.optimize_ll1 = OPTIMIZE_LL1;
+                        parser.Interpreter.optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
+                        parser.Interpreter.optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
+                        parser.Interpreter.optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
+                        parser.Interpreter.tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
+                        parser.Interpreter.treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
+                        parser.BuildParseTree = BUILD_PARSE_TREES;
                         if (!BUILD_PARSE_TREES && BLANK_LISTENER)
                         {
-                            parser.addParseListener(listener);
+                            parser.AddParseListener(listener);
                         }
                         if (BAIL_ON_ERROR)
                         {
-                            parser.setErrorHandler(new BailErrorStrategy());
+                            parser.ErrorHandler = new BailErrorStrategy();
                         }
 
-                        parseResult = parseMethod.invoke(parser);
+                        parseResult = parseMethod.Invoke(parser, null);
                     }
                     finally
                     {
                         if (checksumParserListener != null)
                         {
-                            parser.removeParseListener(checksumParserListener);
+                            parser.RemoveParseListener(checksumParserListener);
                         }
                     }
 
-                    assertThat(parseResult, instanceOf(typeof(ParseTree)));
+                    Assert.IsInstanceOfType(parseResult, typeof(IParseTree));
                     if (BUILD_PARSE_TREES && BLANK_LISTENER)
                     {
-                        ParseTreeWalker.DEFAULT.walk(listener, (ParserRuleContext)parseResult);
+                        ParseTreeWalker.Default.Walk(listener, (ParserRuleContext)parseResult);
                     }
                 }
                 catch (Exception e)
                 {
-                    if (!REPORT_SYNTAX_ERRORS && e is ParseCancellationException)
+                    if (!REPORT_SYNTAX_ERRORS && e is ParseCanceledException)
                     {
-                        return (int)checksum.getValue();
+                        return (int)checksum.Value;
                     }
 
-                    e.printStackTrace(Console.Out);
-                    throw new IllegalStateException(e);
+                    throw;
                 }
 
-                return (int)checksum.getValue();
+                return (int)checksum.Value;
             }
         }
 
@@ -960,10 +932,10 @@ namespace Antlr4.Runtime.Test
                     return;
                 }
 
-                String sourceName = recognizer.getInputStream().getSourceName();
-                if (!sourceName.isEmpty())
+                String sourceName = recognizer.InputStream.SourceName;
+                if (!string.IsNullOrEmpty(sourceName))
                 {
-                    sourceName = String.format("%s:%d:%d: ", sourceName, line, charPositionInLine);
+                    sourceName = String.Format("{0}:{1}:{2}: ", sourceName, line, charPositionInLine);
                 }
 
                 Console.Error.WriteLine(sourceName + "line " + line + ":" + charPositionInLine + " " + msg);
@@ -972,72 +944,52 @@ namespace Antlr4.Runtime.Test
 
         private class SummarizingDiagnosticErrorListener : DiagnosticErrorListener
         {
-            public override void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet ambigAlts, ATNConfigSet configs)
+            public override void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet ambigAlts, ATNConfigSet configs)
             {
                 if (!REPORT_AMBIGUITIES)
                 {
                     return;
                 }
 
-                super.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, ambigAlts, configs);
+                base.ReportAmbiguity(recognizer, dfa, startIndex, stopIndex, ambigAlts, configs);
             }
 
-            public override void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, SimulatorState initialState)
+            public override void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, SimulatorState initialState)
             {
                 if (!REPORT_FULL_CONTEXT)
                 {
                     return;
                 }
 
-                super.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, initialState);
+                base.ReportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, initialState);
             }
 
-            public override void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, SimulatorState acceptState)
+            public override void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, SimulatorState acceptState)
             {
                 if (!REPORT_CONTEXT_SENSITIVITY)
                 {
                     return;
                 }
 
-                super.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, acceptState);
+                base.ReportContextSensitivity(recognizer, dfa, startIndex, stopIndex, acceptState);
             }
 
-            protected override String getDecisionDescription(Parser recognizer, int decision)
+            protected override String GetDecisionDescription(Parser recognizer, int decision)
             {
-                String format = "%d(%s)";
-                String ruleName = recognizer.getRuleNames()[recognizer.getATN().decisionToState.get(decision).ruleIndex];
-                return String.format(format, decision, ruleName);
-            }
-        }
-
-        protected class FileExtensionFilenameFilter : FilenameFilter
-        {
-            private readonly String extension;
-
-            public FileExtensionFilenameFilter(String extension)
-            {
-                if (!extension.startsWith("."))
-                {
-                    extension = '.' + extension;
-                }
-
-                this.extension = extension;
-            }
-
-            public override bool accept(File dir, String name)
-            {
-                return name.toLowerCase().endsWith(extension);
+                String format = "{0}({1})";
+                String ruleName = recognizer.RuleNames[recognizer.Atn.decisionToState[decision].ruleIndex];
+                return string.Format(format, decision, ruleName);
             }
         }
 
         protected class NonCachingLexerATNSimulator : LexerATNSimulator
         {
             public NonCachingLexerATNSimulator(Lexer recog, ATN atn)
+                : base(recog, atn)
             {
-                super(recog, atn);
             }
 
-            protected override DFAState addDFAState(ATNConfigSet configs)
+            protected override DFAState AddDFAState(ATNConfigSet configs)
             {
                 return null;
             }
@@ -1046,44 +998,15 @@ namespace Antlr4.Runtime.Test
         protected class NonCachingParserATNSimulator : ParserATNSimulator
         {
             public NonCachingParserATNSimulator(Parser parser, ATN atn)
+                : base(parser, atn)
             {
-                super(parser, atn);
             }
 
             [return: NotNull]
-            protected override DFAState createDFAState([NotNull] ATNConfigSet configs)
+            protected override DFAState CreateDFAState([NotNull] ATNConfigSet configs)
             {
                 return new DFAState(configs, -1, -1);
             }
-        }
-
-        protected class NumberedThread : Thread
-        {
-            private readonly int threadNumber;
-
-            public NumberedThread(Runnable target, int threadNumber)
-            {
-                super(target);
-                this.threadNumber = threadNumber;
-            }
-
-            public int getThreadNumber()
-            {
-                return threadNumber;
-            }
-        }
-
-        protected class NumberedThreadFactory : ThreadFactory
-        {
-            private readonly AtomicInteger nextThread = new AtomicInteger();
-
-            public override Thread newThread(Runnable r)
-            {
-                int threadNumber = nextThread.getAndIncrement();
-                Debug.Assert(threadNumber < NUMBER_OF_THREADS);
-                return new NumberedThread(r, threadNumber);
-            }
-
         }
 
         protected class ChecksumParseTreeListener : ParseTreeListener
@@ -1100,30 +1023,30 @@ namespace Antlr4.Runtime.Test
                 this.checksum = checksum;
             }
 
-            public override void visitTerminal(TerminalNode node)
+            public void VisitTerminal(ITerminalNode node)
             {
-                checksum.update(VISIT_TERMINAL);
-                updateChecksum(checksum, node.getSymbol());
+                checksum.Update(VISIT_TERMINAL);
+                updateChecksum(checksum, node.Symbol);
             }
 
-            public override void visitErrorNode(ErrorNode node)
+            public void VisitErrorNode(IErrorNode node)
             {
-                checksum.update(VISIT_ERROR_NODE);
-                updateChecksum(checksum, node.getSymbol());
+                checksum.Update(VISIT_ERROR_NODE);
+                updateChecksum(checksum, node.Symbol);
             }
 
-            public override void enterEveryRule(ParserRuleContext ctx)
+            public void EnterEveryRule(ParserRuleContext ctx)
             {
-                checksum.update(ENTER_RULE);
-                updateChecksum(checksum, ctx.getRuleIndex());
-                updateChecksum(checksum, ctx.getStart());
+                checksum.Update(ENTER_RULE);
+                updateChecksum(checksum, ctx.GetRuleIndex());
+                updateChecksum(checksum, ctx.Start);
             }
 
-            public override void exitEveryRule(ParserRuleContext ctx)
+            public void ExitEveryRule(ParserRuleContext ctx)
             {
-                checksum.update(EXIT_RULE);
-                updateChecksum(checksum, ctx.getRuleIndex());
-                updateChecksum(checksum, ctx.getStop());
+                checksum.Update(EXIT_RULE);
+                updateChecksum(checksum, ctx.GetRuleIndex());
+                updateChecksum(checksum, ctx.Stop);
             }
         }
     }
