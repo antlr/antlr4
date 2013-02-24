@@ -33,7 +33,7 @@ namespace Sharpen
     using System.Collections.Generic;
     using StringBuilder = System.Text.StringBuilder;
 
-    internal static class Arrays
+    public static class Arrays
     {
         public static T[] CopyOf<T>(T[] array, int newSize)
         {
