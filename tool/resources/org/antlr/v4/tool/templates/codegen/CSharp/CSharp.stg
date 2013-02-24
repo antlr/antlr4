@@ -753,8 +753,8 @@ public override void <if(method.isEnter)>Enter<else>Exit<endif>Rule(IParseTreeLi
 >>
 
 VisitorDispatchMethod(method) ::= <<
-public override Result Accept\<Result>(IParseTreeVisitor\<Result> visitor) {
-	if ( visitor is I<parser.grammarName>Visitor\<Result> ) return ((I<parser.grammarName>Visitor\<Result>)visitor).Visit<struct.derivedFromName; format="cap">(this);
+public override TResult Accept\<TResult>(IParseTreeVisitor\<TResult> visitor) {
+	if ( visitor is I<parser.grammarName>Visitor\<TResult> ) return ((I<parser.grammarName>Visitor\<TResult>)visitor).Visit<struct.derivedFromName; format="cap">(this);
 	else return visitor.VisitChildren(this);
 }
 >>
