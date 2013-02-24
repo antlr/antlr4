@@ -589,7 +589,7 @@ namespace Antlr4.Runtime.Test
             updateChecksum(checksum, token.getChannel());
         }
 
-        protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, final String entryPoint) {
+        protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, String entryPoint) {
             try {
                 ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
                 Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(typeof(Lexer));
