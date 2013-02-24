@@ -39,6 +39,9 @@ namespace Antlr4.Runtime
     {
         private const long serialVersionUID = -6708843461296520577L;
 
+        protected internal static readonly Tuple<ITokenSource, ICharStream> EmptySource = 
+            Tuple.Create<ITokenSource, ICharStream>(null, null);
+
         protected internal int type;
 
         protected internal int line;
@@ -94,6 +97,7 @@ namespace Antlr4.Runtime
             this.type = type;
             this.channel = TokenConstants.DefaultChannel;
             this.text = text;
+            this.source = EmptySource;
         }
 
         public CommonToken(IToken oldToken)

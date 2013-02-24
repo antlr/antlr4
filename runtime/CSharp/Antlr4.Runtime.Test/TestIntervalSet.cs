@@ -393,6 +393,23 @@ namespace Antlr4.Runtime.Test
             Assert.AreEqual(expecting, result);
         }
 
+        /**
+         * This case is responsible for antlr/antlr4#153.
+         * https://github.com/antlr/antlr4/issues/153
+         */
+        [TestMethod]
+        public void TestMergeWhereAdditionMergesThreeExistingIntervals()
+        {
+            IntervalSet s = new IntervalSet();
+            s.Add(0);
+            s.Add(3);
+            s.Add(5);
+            s.Add(0, 7);
+            String expecting = "{0..7}";
+            String result = s.ToString();
+            Assert.AreEqual(expecting, result);
+        }
+
         [TestMethod]
         public void TestMergeWithDoubleOverlap()
         {

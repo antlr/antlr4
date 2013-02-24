@@ -178,21 +178,23 @@ namespace Antlr4.Runtime.Misc
                     intervals[i] = bigger;
                     // make sure we didn't just create an interval that
                     // should be merged with next interval in list
-                    if (i < intervals.Count - 1)
+                    while (i < intervals.Count - 1)
                     {
                         i++;
                         Interval next = intervals[i];
-                        if (bigger.Adjacent(next) || !bigger.Disjoint(next))
+                        if (!bigger.Adjacent(next) && bigger.Disjoint(next))
                         {
-                            // if we bump up against or overlap next, merge
-                            intervals.RemoveAt(i);
-                            // remove this one
-                            i--;
-                            // move backwards to what we just set
-                            intervals[i] = bigger.Union(next);
+                            break;
                         }
+                        // if we bump up against or overlap next, merge
+                        intervals.RemoveAt(i);
+                        // remove this one
+                        i--;
+                        // move backwards to what we just set
+                        intervals[i] = bigger.Union(next);
+                        // set to 3 merged ones
                     }
-                    // set to 3 merged ones
+                    // first call to next after previous duplicates the result
                     return;
                 }
                 if (addition.StartsBeforeDisjoint(r))
