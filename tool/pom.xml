@@ -11,7 +11,7 @@
     <groupId>com.tunnelvisionlabs</groupId>
     <artifactId>antlr4-csharp</artifactId>
     <version>4.0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <name>ANTLR 4 Target C#</name>
     <description>ANTLR 4 C# Target</description>
