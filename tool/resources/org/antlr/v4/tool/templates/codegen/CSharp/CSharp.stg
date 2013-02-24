@@ -236,7 +236,7 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-@RuleVersion(<namedActions.version; null="0">)
+[RuleVersion(<namedActions.version; null="0">)]
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <a.name>}>);
 	EnterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
@@ -335,7 +335,7 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-@RuleVersion(<namedActions.version; null="0">)
+[RuleVersion(<namedActions.version; null="0">)]
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <currentRule.name>(int _p<currentRule.args:{a | , <a>}>) {
 	ParserRuleContext _parentctx = _ctx;
 	int _parentState = State;
