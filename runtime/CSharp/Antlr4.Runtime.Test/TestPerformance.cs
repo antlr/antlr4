@@ -353,21 +353,7 @@ namespace Antlr4.Runtime.Test
             foreach (CharStream input in sources) {
                 input.seek(0);
                 inputSize += input.size();
-                Future<Integer> futureChecksum = executorService.submit(new Callable<Integer>() {
-                    public override Integer call() {
-                        // this incurred a great deal of overhead and was causing significant variations in performance results.
-                        //Console.Out.WriteLine("Parsing file {0}", input.getSourceName());
-                        try {
-                            return factory.parseFile(input, ((NumberedThread)Thread.currentThread()).getThreadNumber());
-                        } catch (IllegalStateException ex) {
-                            ex.printStackTrace(System.err);
-                        } catch (Throwable t) {
-                            t.printStackTrace(System.err);
-                        }
-
-                        return -1;
-                    }
-                });
+                Future<Integer> futureChecksum = executorService.submit(new Callable_1(input, factory));
 
                 results.add(futureChecksum);
             }
@@ -518,6 +504,31 @@ namespace Antlr4.Runtime.Test
             }
         }
 
+        private class Callable_1 : Callable<Integer> {
+            private readonly CharStream input;
+            private readonly ParserFactory factory;
+
+            public Callable_1(CharStream input, ParserFactory factory)
+            {
+                this.input = input;
+                this.factory = factory;
+            }
+
+            public override Integer call() {
+                // this incurred a great deal of overhead and was causing significant variations in performance results.
+                //Console.Out.WriteLine("Parsing file {0}", input.getSourceName());
+                try {
+                    return factory.parseFile(input, ((NumberedThread)Thread.currentThread()).getThreadNumber());
+                } catch (IllegalStateException ex) {
+                    ex.printStackTrace(System.err);
+                } catch (Throwable t) {
+                    t.printStackTrace(System.err);
+                }
+
+                return -1;
+            }
+        }
+
         protected void compileJavaParser(bool leftRecursive) {
             String grammarFileName = "Java.g4";
             String sourceName = leftRecursive ? "Java-LR.g4" : "Java.g4";
@@ -619,177 +630,179 @@ namespace Antlr4.Runtime.Test
                     }
                 }
 
-                return new ParserFactory() {
-                    public override int parseFile(CharStream input, int thread) {
-                        Checksum checksum = new CRC32();
-
-                        assert thread >= 0 && thread < NUMBER_OF_THREADS;
-
-                        try {
-                            ParseTreeListener listener = sharedListeners[thread];
-                            if (listener == null) {
-                                listener = listenerClass.newInstance();
-                                sharedListeners[thread] = listener;
-                            }
-
-                            Lexer lexer = sharedLexers[thread];
-                            if (REUSE_LEXER && lexer != null) {
-                                lexer.setInputStream(input);
-                            } else {
-                                lexer = lexerCtor.newInstance(input);
-                                sharedLexers[thread] = lexer;
-                                if (!ENABLE_LEXER_DFA) {
-                                    lexer.setInterpreter(new NonCachingLexerATNSimulator(lexer, lexer.getATN()));
-                                } else if (!REUSE_LEXER_DFA) {
-                                    lexer.setInterpreter(new LexerATNSimulator(lexer, sharedLexerATNs[thread]));
-                                }
-                            }
-
-                            lexer.getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
-                            if (ENABLE_LEXER_DFA && !REUSE_LEXER_DFA) {
-                                lexer.getInterpreter().atn.clearDFA();
-                            }
-
-                            CommonTokenStream tokens = new CommonTokenStream(lexer);
-                            tokens.fill();
-                            tokenCount.addAndGet(tokens.size());
-
-                            if (COMPUTE_CHECKSUM) {
-                                foreach (Token token in tokens.getTokens()) {
-                                    updateChecksum(checksum, token);
-                                }
-                            }
-
-                            if (!RUN_PARSER) {
-                                return (int)checksum.getValue();
-                            }
-
-                            Parser parser = sharedParsers[thread];
-                            if (REUSE_PARSER && parser != null) {
-                                parser.setInputStream(tokens);
-                            } else {
-                                Parser newParser = parserCtor.newInstance(tokens);
-                                parser = newParser;
-                                sharedParsers[thread] = parser;
-                            }
-
-                            parser.removeErrorListeners();
-                            if (!TWO_STAGE_PARSING) {
-                                parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
-                                parser.addErrorListener(new SummarizingDiagnosticErrorListener());
-                            }
-
-                            if (!ENABLE_PARSER_DFA) {
-                                parser.setInterpreter(new NonCachingParserATNSimulator(parser, parser.getATN()));
-                            } else if (!REUSE_PARSER_DFA) {
-                                parser.setInterpreter(new ParserATNSimulator(parser, sharedParserATNs[thread]));
-                            }
-
-                            if (ENABLE_PARSER_DFA && !REUSE_PARSER_DFA) {
-                                parser.getInterpreter().atn.clearDFA();
-                            }
-
-                            parser.getInterpreter().setPredictionMode(TWO_STAGE_PARSING ? PredictionMode.SLL : PREDICTION_MODE);
-                            parser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT && !TWO_STAGE_PARSING;
-                            parser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST || TWO_STAGE_PARSING;
-                            parser.getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
-                            parser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
-                            parser.getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
-                            parser.getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
-                            parser.getInterpreter().tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
-                            parser.getInterpreter().treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
-                            parser.setBuildParseTree(BUILD_PARSE_TREES);
-                            if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
-                                parser.addParseListener(listener);
-                            }
-                            if (BAIL_ON_ERROR || TWO_STAGE_PARSING) {
-                                parser.setErrorHandler(new BailErrorStrategy());
-                            }
-
-                            Method parseMethod = parserClass.getMethod(entryPoint);
-                            Object parseResult;
-
-                            ParseTreeListener checksumParserListener = null;
-
-                            try {
-                                if (COMPUTE_CHECKSUM) {
-                                    checksumParserListener = new ChecksumParseTreeListener(checksum);
-                                    parser.addParseListener(checksumParserListener);
-                                }
-                                parseResult = parseMethod.invoke(parser);
-                            } catch (InvocationTargetException ex) {
-                                if (!TWO_STAGE_PARSING) {
-                                    throw ex;
-                                }
-
-                                String sourceName = tokens.getSourceName();
-                                sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName+": " : "";
-                                Console.Error.WriteLine(sourceName+"Forced to retry with full context.");
-
-                                if (!(ex.getCause() instanceof ParseCancellationException)) {
-                                    throw ex;
-                                }
-
-                                tokens.reset();
-                                if (REUSE_PARSER && sharedParsers[thread] != null) {
-                                    parser.setInputStream(tokens);
-                                } else {
-                                    Parser newParser = parserCtor.newInstance(tokens);
-                                    parser = newParser;
-                                    sharedParsers[thread] = parser;
-                                }
-
-                                parser.removeErrorListeners();
-                                parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
-                                parser.addErrorListener(new SummarizingDiagnosticErrorListener());
-                                if (!ENABLE_PARSER_DFA) {
-                                    parser.setInterpreter(new NonCachingParserATNSimulator(parser, parser.getATN()));
-                                }
-                                parser.getInterpreter().setPredictionMode(PREDICTION_MODE);
-                                parser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT;
-                                parser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
-                                parser.getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
-                                parser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
-                                parser.getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
-                                parser.getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
-                                parser.getInterpreter().tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
-                                parser.getInterpreter().treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
-                                parser.setBuildParseTree(BUILD_PARSE_TREES);
-                                if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
-                                    parser.addParseListener(listener);
-                                }
-                                if (BAIL_ON_ERROR) {
-                                    parser.setErrorHandler(new BailErrorStrategy());
-                                }
-
-                                parseResult = parseMethod.invoke(parser);
-                            }
-                            finally {
-                                if (checksumParserListener != null) {
-                                    parser.removeParseListener(checksumParserListener);
-                                }
-                            }
-
-                            assertThat(parseResult, instanceOf(typeof(ParseTree)));
-                            if (BUILD_PARSE_TREES && BLANK_LISTENER) {
-                                ParseTreeWalker.DEFAULT.walk(listener, (ParserRuleContext)parseResult);
-                            }
-                        } catch (Exception e) {
-                            if (!REPORT_SYNTAX_ERRORS && e instanceof ParseCancellationException) {
-                                return (int)checksum.getValue();
-                            }
-
-                            e.printStackTrace(System.out);
-                            throw new IllegalStateException(e);
-                        }
-
-                        return (int)checksum.getValue();
-                    }
-                };
+                return new ParserFactory_1();
             } catch (Exception e) {
                 e.printStackTrace(System.out);
                 Assert.fail(e.getMessage());
                 throw new IllegalStateException(e);
+            }
+        }
+
+        private class ParserFactory_1 : ParserFactory {
+            public override int parseFile(CharStream input, int thread) {
+                Checksum checksum = new CRC32();
+
+                assert thread >= 0 && thread < NUMBER_OF_THREADS;
+
+                try {
+                    ParseTreeListener listener = sharedListeners[thread];
+                    if (listener == null) {
+                        listener = listenerClass.newInstance();
+                        sharedListeners[thread] = listener;
+                    }
+
+                    Lexer lexer = sharedLexers[thread];
+                    if (REUSE_LEXER && lexer != null) {
+                        lexer.setInputStream(input);
+                    } else {
+                        lexer = lexerCtor.newInstance(input);
+                        sharedLexers[thread] = lexer;
+                        if (!ENABLE_LEXER_DFA) {
+                            lexer.setInterpreter(new NonCachingLexerATNSimulator(lexer, lexer.getATN()));
+                        } else if (!REUSE_LEXER_DFA) {
+                            lexer.setInterpreter(new LexerATNSimulator(lexer, sharedLexerATNs[thread]));
+                        }
+                    }
+
+                    lexer.getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
+                    if (ENABLE_LEXER_DFA && !REUSE_LEXER_DFA) {
+                        lexer.getInterpreter().atn.clearDFA();
+                    }
+
+                    CommonTokenStream tokens = new CommonTokenStream(lexer);
+                    tokens.fill();
+                    tokenCount.addAndGet(tokens.size());
+
+                    if (COMPUTE_CHECKSUM) {
+                        foreach (Token token in tokens.getTokens()) {
+                            updateChecksum(checksum, token);
+                        }
+                    }
+
+                    if (!RUN_PARSER) {
+                        return (int)checksum.getValue();
+                    }
+
+                    Parser parser = sharedParsers[thread];
+                    if (REUSE_PARSER && parser != null) {
+                        parser.setInputStream(tokens);
+                    } else {
+                        Parser newParser = parserCtor.newInstance(tokens);
+                        parser = newParser;
+                        sharedParsers[thread] = parser;
+                    }
+
+                    parser.removeErrorListeners();
+                    if (!TWO_STAGE_PARSING) {
+                        parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
+                        parser.addErrorListener(new SummarizingDiagnosticErrorListener());
+                    }
+
+                    if (!ENABLE_PARSER_DFA) {
+                        parser.setInterpreter(new NonCachingParserATNSimulator(parser, parser.getATN()));
+                    } else if (!REUSE_PARSER_DFA) {
+                        parser.setInterpreter(new ParserATNSimulator(parser, sharedParserATNs[thread]));
+                    }
+
+                    if (ENABLE_PARSER_DFA && !REUSE_PARSER_DFA) {
+                        parser.getInterpreter().atn.clearDFA();
+                    }
+
+                    parser.getInterpreter().setPredictionMode(TWO_STAGE_PARSING ? PredictionMode.SLL : PREDICTION_MODE);
+                    parser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT && !TWO_STAGE_PARSING;
+                    parser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST || TWO_STAGE_PARSING;
+                    parser.getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
+                    parser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
+                    parser.getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
+                    parser.getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
+                    parser.getInterpreter().tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
+                    parser.getInterpreter().treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
+                    parser.setBuildParseTree(BUILD_PARSE_TREES);
+                    if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
+                        parser.addParseListener(listener);
+                    }
+                    if (BAIL_ON_ERROR || TWO_STAGE_PARSING) {
+                        parser.setErrorHandler(new BailErrorStrategy());
+                    }
+
+                    Method parseMethod = parserClass.getMethod(entryPoint);
+                    Object parseResult;
+
+                    ParseTreeListener checksumParserListener = null;
+
+                    try {
+                        if (COMPUTE_CHECKSUM) {
+                            checksumParserListener = new ChecksumParseTreeListener(checksum);
+                            parser.addParseListener(checksumParserListener);
+                        }
+                        parseResult = parseMethod.invoke(parser);
+                    } catch (InvocationTargetException ex) {
+                        if (!TWO_STAGE_PARSING) {
+                            throw ex;
+                        }
+
+                        String sourceName = tokens.getSourceName();
+                        sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName+": " : "";
+                        Console.Error.WriteLine(sourceName+"Forced to retry with full context.");
+
+                        if (!(ex.getCause() instanceof ParseCancellationException)) {
+                            throw ex;
+                        }
+
+                        tokens.reset();
+                        if (REUSE_PARSER && sharedParsers[thread] != null) {
+                            parser.setInputStream(tokens);
+                        } else {
+                            Parser newParser = parserCtor.newInstance(tokens);
+                            parser = newParser;
+                            sharedParsers[thread] = parser;
+                        }
+
+                        parser.removeErrorListeners();
+                        parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
+                        parser.addErrorListener(new SummarizingDiagnosticErrorListener());
+                        if (!ENABLE_PARSER_DFA) {
+                            parser.setInterpreter(new NonCachingParserATNSimulator(parser, parser.getATN()));
+                        }
+                        parser.getInterpreter().setPredictionMode(PREDICTION_MODE);
+                        parser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT;
+                        parser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
+                        parser.getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
+                        parser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
+                        parser.getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
+                        parser.getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
+                        parser.getInterpreter().tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
+                        parser.getInterpreter().treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
+                        parser.setBuildParseTree(BUILD_PARSE_TREES);
+                        if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
+                            parser.addParseListener(listener);
+                        }
+                        if (BAIL_ON_ERROR) {
+                            parser.setErrorHandler(new BailErrorStrategy());
+                        }
+
+                        parseResult = parseMethod.invoke(parser);
+                    }
+                    finally {
+                        if (checksumParserListener != null) {
+                            parser.removeParseListener(checksumParserListener);
+                        }
+                    }
+
+                    assertThat(parseResult, instanceOf(typeof(ParseTree)));
+                    if (BUILD_PARSE_TREES && BLANK_LISTENER) {
+                        ParseTreeWalker.DEFAULT.walk(listener, (ParserRuleContext)parseResult);
+                    }
+                } catch (Exception e) {
+                    if (!REPORT_SYNTAX_ERRORS && e instanceof ParseCancellationException) {
+                        return (int)checksum.getValue();
+                    }
+
+                    e.printStackTrace(System.out);
+                    throw new IllegalStateException(e);
+                }
+
+                return (int)checksum.getValue();
             }
         }
 
