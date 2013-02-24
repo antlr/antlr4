@@ -82,13 +82,13 @@ using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 
 public class <file.grammarName>BaseListener : I<file.grammarName>Listener {
 	<file.listenerNames:{lname |
-@Override public void Enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
-@Override public void Exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
+public virtual void Enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
+public virtual void Exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
-	@Override public void EnterEveryRule(ParserRuleContext ctx) { }
-	@Override public void ExitEveryRule(ParserRuleContext ctx) { }
-	@Override public void VisitTerminal(TerminalNode node) { }
-	@Override public void VisitErrorNode(ErrorNode node) { }
+	public virtual void EnterEveryRule(ParserRuleContext ctx) { }
+	public virtual void ExitEveryRule(ParserRuleContext ctx) { }
+	public virtual void VisitTerminal(TerminalNode node) { }
+	public virtual void VisitErrorNode(ErrorNode node) { }
 }
 <if(file.genPackage)>
 } // namespace <file.genPackage>
@@ -125,7 +125,7 @@ using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 
 public class <file.grammarName>BaseVisitor\<Result> : AbstractParseTreeVisitor\<Result>, I<file.grammarName>Visitor\<Result> {
 	<file.visitorNames:{lname |
-@Override public Result Visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return VisitChildren(ctx); \}}; separator="\n">
+public virtual Result Visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return VisitChildren(ctx); \}}; separator="\n">
 }
 <if(file.genPackage)>
 } // namespace <file.genPackage>
@@ -151,21 +151,18 @@ public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> : <sup
 		<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	};
 
-	@Override
-	public string getGrammarFileName() { return "<parser.grammarFileName>"; }
+	public override string getGrammarFileName() { return "<parser.grammarFileName>"; }
 
-	@Override
-	public string[] getTokenNames() { return tokenNames; }
+	public override string[] getTokenNames() { return tokenNames; }
 
-	@Override
-	public string[] getRuleNames() { return ruleNames; }
+	public override string[] getRuleNames() { return ruleNames; }
 
 	<namedActions.members>
 	<parser:(ctor)()>
 	<funcs; separator="\n">
 
 <if(sempredFuncs)>
-	public boolean Sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
+	public override boolean Sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
 		<parser.sempredFuncs.values:{f|
 case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
@@ -181,8 +178,7 @@ case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}
 
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
-@Override
-public void Action(RuleContext _localctx, int ruleIndex, int actionIndex) {
+public override void Action(RuleContext _localctx, int ruleIndex, int actionIndex) {
 	switch (ruleIndex) {
 	<recog.actionFuncs.values:{f|
 case <f.ruleIndex> : <f.name>_action(<if(!recog.modes)>(<f.ctxType>)<endif>_localctx, actionIndex); break;}; separator="\n">
@@ -191,8 +187,7 @@ case <f.ruleIndex> : <f.name>_action(<if(!recog.modes)>(<f.ctxType>)<endif>_loca
 <actionFuncs.values; separator="\n">
 <endif>
 <if(sempredFuncs)>
-@Override
-public boolean Sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
+public override boolean Sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 	switch (ruleIndex) {
 	<recog.sempredFuncs.values:{f|
 case <f.ruleIndex> : return <f.name>_sempred(<if(!recog.modes)>(<f.ctxType>)<endif>_localctx, predIndex);}; separator="\n">
@@ -241,7 +236,7 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 @RuleVersion(<namedActions.version; null="0">)
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <a.name>}>);
 	EnterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
 	<namedActions.init>
@@ -274,7 +269,7 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 LeftFactoredRuleFunction(currentRule,code,locals,namedActions,finallyAction,postamble) ::=
 <<
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <a.name>}>);
 	EnterLeftFactoredRule(_localctx, <currentRule.startState>, RULE_<currentRule.variantOf>);
 	<namedActions.init>
@@ -306,7 +301,7 @@ LeftFactoredRuleFunction(currentRule,code,locals,namedActions,finallyAction,post
 LeftUnfactoredRuleFunction(currentRule,code,locals,namedActions,finallyAction,postamble) ::=
 <<
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <a.name>}>);
 	EnterRule(_localctx, <currentRule.startState>, RULE_<currentRule.variantOf>);
 	<namedActions.init>
@@ -340,7 +335,7 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 @RuleVersion(<namedActions.version; null="0">)
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(int _p<currentRule.args:{a | , <a>}>) throws RecognitionException {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <currentRule.name>(int _p<currentRule.args:{a | , <a>}>) throws RecognitionException {
 	ParserRuleContext _parentctx = _ctx;
 	int _parentState = State;
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>);
@@ -727,10 +722,10 @@ public class <struct.name> : <superClass><if(interfaces)>, <interfaces; separato
 		super(parent, invokingState);
 		<struct.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
 	}
-	@Override public int GetRuleIndex() { return RULE_<struct.derivedFromName>; }
+	public override int GetRuleIndex() { return RULE_<struct.derivedFromName>; }
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
 	public <struct.name>() { }
-	public void CopyFrom(<struct.name> ctx) {
+	public virtual void CopyFrom(<struct.name> ctx) {
 		super.CopyFrom(ctx);
 		<struct.attrs:{a | this.<a.name> = ctx.<a.name>;}; separator="\n">
 	}
@@ -750,15 +745,13 @@ public class <struct.name> : <currentRule.name; format="cap">Context {
 >>
 
 ListenerDispatchMethod(method) ::= <<
-@Override
-public void <if(method.isEnter)>Enter<else>Exit<endif>Rule(ParseTreeListener listener) {
+public override void <if(method.isEnter)>Enter<else>Exit<endif>Rule(ParseTreeListener listener) {
 	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>Enter<else>Exit<endif><struct.derivedFromName; format="cap">(this);
 }
 >>
 
 VisitorDispatchMethod(method) ::= <<
-@Override
-public \<Result> Result Accept(ParseTreeVisitor\<? extends Result> visitor) {
+public override \<Result> Result Accept(ParseTreeVisitor\<? extends Result> visitor) {
 	if ( visitor instanceof <parser.grammarName>Visitor\<?> ) return ((<parser.grammarName>Visitor\<? extends Result>)visitor).Visit<struct.derivedFromName; format="cap">(this);
 	else return visitor.VisitChildren(this);
 }
@@ -845,17 +838,13 @@ public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> : <super
 		_interp = new LexerATNSimulator(this,_ATN);
 	}
 
-	@Override
-	public string getGrammarFileName() { return "<lexer.grammarFileName>"; }
+	public override string getGrammarFileName() { return "<lexer.grammarFileName>"; }
 
-	@Override
-	public string[] getTokenNames() { return tokenNames; }
+	public override string[] getTokenNames() { return tokenNames; }
 
-	@Override
-	public string[] getRuleNames() { return ruleNames; }
+	public override string[] getRuleNames() { return ruleNames; }
 
-	@Override
-	public string[] GetModeNames() { return modeNames; }
+	public override string[] GetModeNames() { return modeNames; }
 
 	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 	<atn>
