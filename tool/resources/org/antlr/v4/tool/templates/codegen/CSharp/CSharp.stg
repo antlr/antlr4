@@ -60,8 +60,8 @@ using IToken = Antlr4.Runtime.IToken;
 
 public interface I<file.grammarName>Listener : IParseTreeListener {
 	<file.listenerNames:{lname |
-void Enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);
-void Exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+void Enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context context);
+void Exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context context);}; separator="\n">
 }
 <if(file.genPackage)>
 } // namespace <file.genPackage>
@@ -82,11 +82,11 @@ using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 
 public class <file.grammarName>BaseListener : I<file.grammarName>Listener {
 	<file.listenerNames:{lname |
-public virtual void Enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
-public virtual void Exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
+public virtual void Enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context context) { \}
+public virtual void Exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context context) { \}}; separator="\n">
 
-	public virtual void EnterEveryRule(ParserRuleContext ctx) { }
-	public virtual void ExitEveryRule(ParserRuleContext ctx) { }
+	public virtual void EnterEveryRule(ParserRuleContext context) { }
+	public virtual void ExitEveryRule(ParserRuleContext context) { }
 	public virtual void VisitTerminal(ITerminalNode node) { }
 	public virtual void VisitErrorNode(IErrorNode node) { }
 }
@@ -106,7 +106,7 @@ using IToken = Antlr4.Runtime.IToken;
 
 public interface I<file.grammarName>Visitor\<Result> : IParseTreeVisitor\<Result> {
 	<file.visitorNames:{lname |
-Result Visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+Result Visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context context);}; separator="\n">
 }
 <if(file.genPackage)>
 } // namespace <file.genPackage>
@@ -125,7 +125,7 @@ using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 
 public class <file.grammarName>BaseVisitor\<Result> : AbstractParseTreeVisitor\<Result>, I<file.grammarName>Visitor\<Result> {
 	<file.visitorNames:{lname |
-public virtual Result Visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return VisitChildren(ctx); \}}; separator="\n">
+public virtual Result Visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context context) { return VisitChildren(context); \}}; separator="\n">
 }
 <if(file.genPackage)>
 } // namespace <file.genPackage>
@@ -727,9 +727,9 @@ public class <struct.name> : <superClass><if(interfaces)>, <interfaces; separato
 	public override int GetRuleIndex() { return RULE_<struct.derivedFromName>; }
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
 	public <struct.name>() { }
-	public virtual void CopyFrom(<struct.name> ctx) {
-		base.CopyFrom(ctx);
-		<struct.attrs:{a | this.<a.name> = ctx.<a.name>;}; separator="\n">
+	public virtual void CopyFrom(<struct.name> context) {
+		base.CopyFrom(context);
+		<struct.attrs:{a | this.<a.name> = context.<a.name>;}; separator="\n">
 	}
 <endif>
 	<dispatchMethods; separator="\n">
@@ -741,7 +741,7 @@ AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
 public class <struct.name> : <currentRule.name; format="cap">Context {
 	<attrs:{a | <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	public <struct.name>(<currentRule.name; format="cap">Context ctx) { CopyFrom(ctx); }
+	public <struct.name>(<currentRule.name; format="cap">Context context) { CopyFrom(context); }
 	<dispatchMethods; separator="\n">
 }
 >>
