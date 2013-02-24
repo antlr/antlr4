@@ -46,7 +46,7 @@ public class TestSemPredEvalParser extends BaseTest {
 				"  ;\n" +
 				"ID : 'a'..'z'+ ;\n" +
 				"INT : '0'..'9'+;\n" +
-				"WS : (' '|'\\n') {skip();} ;\n";
+				"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x", false);
@@ -64,7 +64,7 @@ public class TestSemPredEvalParser extends BaseTest {
 				"  ;\n" +
 				"ID : 'a'..'z'+ ;\n" +
 				"INT : '0'..'9'+;\n" +
-				"WS : (' '|'\\n') {skip();} ;\n";
+				"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "3 4 x", false);
@@ -89,7 +89,7 @@ public class TestSemPredEvalParser extends BaseTest {
 				"  ;\n" +
 				"ID : 'a'..'z'+ ;\n" +
 				"INT : '0'..'9'+;\n" +
-				"WS : (' '|'\\n') {skip();} ;\n";
+				"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x ; y", false);
@@ -114,7 +114,7 @@ public class TestSemPredEvalParser extends BaseTest {
 				"  ;\n" +
 				"ID : 'a'..'z'+ ;\n" +
 				"INT : '0'..'9'+;\n" +
-				"WS : (' '|'\\n') {skip();} ;\n";
+				"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x y 3", false);
@@ -139,7 +139,7 @@ public class TestSemPredEvalParser extends BaseTest {
 				"  ;\n" +
 				"ID : 'a'..'z'+ ;\n" +
 				"INT : '0'..'9'+;\n" +
-				"WS : (' '|'\\n') {skip();} ;\n";
+				"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x y", false);
@@ -164,7 +164,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x; y", true);
@@ -194,7 +194,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "34; x; y", true);
@@ -222,7 +222,7 @@ public class TestSemPredEvalParser extends BaseTest {
 				"  ;\n" +
 				"ID : 'a'..'z'+ ;\n" +
 				"INT : '0'..'9'+;\n" +
-				"WS : (' '|'\\n') {skip();} ;\n";
+				"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "y 3 x 4", false);
@@ -243,7 +243,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 
 		execParser("T.g4", grammar, "TParser", "TLexer", "s",
 				   "y 3 x 4", false);
@@ -261,7 +261,7 @@ public class TestSemPredEvalParser extends BaseTest {
    			"  ;\n" +
    			"ID : 'a'..'z'+ ;\n" +
    			"INT : '0'..'9'+;\n" +
-   			"WS : (' '|'\\n') {skip();} ;\n";
+   			"WS : (' '|'\\n') -> skip ;\n";
 
    		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
    								  "x x y", false);
@@ -286,7 +286,7 @@ public class TestSemPredEvalParser extends BaseTest {
 				"  ;\n" +
 				"ID : 'a'..'z'+ ;\n" +
 				"INT : '0'..'9'+;\n" +
-				"WS : (' '|'\\n') {skip();} ;\n";
+				"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x 4", false);
@@ -309,7 +309,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x x y", false);
@@ -335,7 +335,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x x y", false);
@@ -366,7 +366,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "a b", false);
@@ -396,7 +396,7 @@ public class TestSemPredEvalParser extends BaseTest {
             "  ;\n" +
             "ID : 'a'..'z'+ ;\n" +
             "INT : '0'..'9'+;\n" +
-            "WS : (' '|'\\n') {skip();} ;\n";
+            "WS : (' '|'\\n') -> skip ;\n";
 
         String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
                                   "a b", false);
@@ -417,7 +417,7 @@ public class TestSemPredEvalParser extends BaseTest {
             "  ;" +
             "ID : 'a'..'z'+ ;\n" +
             "INT : '0'..'9'+;\n" +
-            "WS : (' '|'\\n') {skip();} ;\n";
+            "WS : (' '|'\\n') -> skip ;\n";
 
         String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
                                   "a;", false);
@@ -437,7 +437,7 @@ public class TestSemPredEvalParser extends BaseTest {
             "  ;" +
             "ID : 'a'..'z'+ ;\n" +
             "INT : '0'..'9'+;\n" +
-            "WS : (' '|'\\n') {skip();} ;\n";
+            "WS : (' '|'\\n') -> skip ;\n";
 
         String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
                                   "a;", false);
@@ -461,7 +461,7 @@ public class TestSemPredEvalParser extends BaseTest {
         "e : ID | ;\n" + // non-LL(1) so we use ATN
         "ID : 'a'..'z'+ ;\n" +
         "INT : '0'..'9'+;\n" +
-        "WS : (' '|'\\n') {skip();} ;\n";
+        "WS : (' '|'\\n') -> skip ;\n";
 
    		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
    								  "a!", false);
@@ -487,7 +487,7 @@ public class TestSemPredEvalParser extends BaseTest {
    			"e : ID | ;\n" + // non-LL(1) so we use ATN
    			"ID : 'a'..'z'+ ;\n" +
    			"INT : '0'..'9'+;\n" +
-   			"WS : (' '|'\\n') {skip();} ;\n";
+   			"WS : (' '|'\\n') -> skip ;\n";
 
    		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
    								  "a!", false);
@@ -514,7 +514,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"e : ID | ;\n" + // non-LL(1) so we use ATN
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "a!", false);
