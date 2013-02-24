@@ -36,14 +36,12 @@ ParserFile(file, parser, namedActions) ::= <<
 namespace <file.genPackage> {
 <endif>
 <namedActions.header>
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.*;
-import org.antlr.v4.runtime.tree.*;
-import java.util.List;
-import java.util.Iterator;
-import java.util.ArrayList;
+using Antlr4.Runtime;
+using Antlr4.Runtime.Atn;
+using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Tree;
+using System.Collections.Generic;
+using DFA = Antlr4.Runtime.Dfa.DFA;
 
 <parser>
 <if(file.genPackage)>
@@ -57,8 +55,8 @@ ListenerFile(file, header) ::= <<
 namespace <file.genPackage> {
 <endif>
 <header>
-import org.antlr.v4.runtime.tree.*;
-import org.antlr.v4.runtime.Token;
+using Antlr4.Runtime.Tree;
+using IToken = Antlr4.Runtime.IToken;
 
 public interface <file.grammarName>Listener extends ParseTreeListener {
 	<file.listenerNames:{lname |
@@ -77,10 +75,10 @@ namespace <file.genPackage> {
 <endif>
 <header>
 
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.TerminalNode;
-import org.antlr.v4.runtime.tree.ErrorNode;
+using IErrorNode = Antlr4.Runtime.Tree.IErrorNode;
+using ITerminalNode = Antlr4.Runtime.Tree.ITerminalNode;
+using IToken = Antlr4.Runtime.IToken;
+using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 
 public class <file.grammarName>BaseListener implements <file.grammarName>Listener {
 	<file.listenerNames:{lname |
@@ -103,8 +101,8 @@ VisitorFile(file, header) ::= <<
 namespace <file.genPackage> {
 <endif>
 <header>
-import org.antlr.v4.runtime.tree.*;
-import org.antlr.v4.runtime.Token;
+using Antlr4.Runtime.Tree;
+using IToken = Antlr4.Runtime.IToken;
 
 public interface <file.grammarName>Visitor\<Result> extends ParseTreeVisitor\<Result> {
 	<file.visitorNames:{lname |
@@ -121,9 +119,9 @@ BaseVisitorFile(file, header) ::= <<
 namespace <file.genPackage> {
 <endif>
 <header>
-import org.antlr.v4.runtime.tree.*;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.ParserRuleContext;
+using Antlr4.Runtime.Tree;
+using IToken = Antlr4.Runtime.IToken;
+using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 
 public class <file.grammarName>BaseVisitor\<Result> extends AbstractParseTreeVisitor\<Result> implements <file.grammarName>Visitor\<Result> {
 	<file.visitorNames:{lname |
@@ -812,14 +810,10 @@ LexerFile(file, lexer, namedActions) ::= <<
 namespace <file.genPackage> {
 <endif>
 <namedActions.header>
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.*;
+using Antlr4.Runtime;
+using Antlr4.Runtime.Atn;
+using Antlr4.Runtime.Misc;
+using DFA = Antlr4.Runtime.Dfa.DFA;
 
 <lexer>
 <if(file.genPackage)>
