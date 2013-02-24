@@ -29,6 +29,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
@@ -497,14 +498,14 @@ namespace Antlr4.Runtime.Atn
             }
             Antlr4.Runtime.Atn.ATNConfigSet other = (Antlr4.Runtime.Atn.ATNConfigSet)obj;
             return this.outermostConfigSet == other.outermostConfigSet && Utils.Equals(conflictingAlts
-                , other.conflictingAlts) && configs.Equals(other.configs);
+                , other.conflictingAlts) && configs.SequenceEqual(other.configs);
         }
 
         public override int GetHashCode()
         {
             int hashCode = 1;
             hashCode = 5 * hashCode ^ (outermostConfigSet ? 1 : 0);
-            hashCode = 5 * hashCode ^ configs.GetHashCode();
+            hashCode = 5 * hashCode ^ SequenceEqualityComparer<ATNConfig>.Default.GetHashCode(configs);
             return hashCode;
         }
 
