@@ -676,7 +676,7 @@ RuleContextListDecl(rdecl) ::= "public IList\<<rdecl.ctxName>> <rdecl.name> = ne
 ContextTokenGetterDecl(t)      ::=
     "public ITerminalNode <t.name>() { return GetToken(<parser.name>.<t.name>, 0); }"
 ContextTokenListGetterDecl(t)  ::=
-    "public IReadOnlyList\<? extends ITerminalNode> <t.name>() { return GetTokens(<parser.name>.<t.name>); }"
+    "public IReadOnlyList\<ITerminalNode> <t.name>() { return GetTokens(<parser.name>.<t.name>); }"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
 public ITerminalNode <t.name>(int i) {
 	return GetToken(<parser.name>.<t.name>, i);
@@ -684,17 +684,17 @@ public ITerminalNode <t.name>(int i) {
 >>
 ContextRuleGetterDecl(r)       ::= <<
 public <r.ctxName> <r.name>() {
-	return GetRuleContext(<r.ctxName>.class,0);
+	return GetRuleContext\<<r.ctxName>\>(0);
 }
 >>
 ContextRuleListGetterDecl(r)   ::= <<
-public IReadOnlyList\<? extends <r.ctxName>\> <r.name>() {
-	return GetRuleContexts(<r.ctxName>.class);
+public IReadOnlyList\<<r.ctxName>\> <r.name>() {
+	return GetRuleContexts\<<r.ctxName>\>();
 }
 >>
 ContextRuleListIndexedGetterDecl(r)   ::= <<
 public <r.ctxName> <r.name>(int i) {
-	return GetRuleContext(<r.ctxName>.class,i);
+	return GetRuleContext\<<r.ctxName>\>(i);
 }
 >>
 
@@ -752,8 +752,8 @@ public override void <if(method.isEnter)>Enter<else>Exit<endif>Rule(IParseTreeLi
 >>
 
 VisitorDispatchMethod(method) ::= <<
-public override \<Result> Result Accept(IParseTreeVisitor\<? extends Result> visitor) {
-	if ( visitor instanceof I<parser.grammarName>Visitor\<?> ) return ((I<parser.grammarName>Visitor\<? extends Result>)visitor).Visit<struct.derivedFromName; format="cap">(this);
+public override Result Accept\<Result>(IParseTreeVisitor\<Result> visitor) {
+	if ( visitor instanceof I<parser.grammarName>Visitor\<Result> ) return ((I<parser.grammarName>Visitor\<Result>)visitor).Visit<struct.derivedFromName; format="cap">(this);
 	else return visitor.VisitChildren(this);
 }
 >>
