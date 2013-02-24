@@ -581,9 +581,9 @@ namespace Antlr4.Runtime.Test
 
         private static void updateChecksum(Checksum checksum, int value) {
             checksum.update((value) & 0xFF);
-            checksum.update((value >>> 8) & 0xFF);
-            checksum.update((value >>> 16) & 0xFF);
-            checksum.update((value >>> 24) & 0xFF);
+            checksum.update(((uint)value >> 8) & 0xFF);
+            checksum.update(((uint)value >> 16) & 0xFF);
+            checksum.update(((uint)value >> 24) & 0xFF);
         }
 
         private static void updateChecksum(Checksum checksum, Token token) {
