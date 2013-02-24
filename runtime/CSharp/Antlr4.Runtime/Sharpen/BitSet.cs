@@ -30,6 +30,7 @@
 namespace Sharpen
 {
     using System;
+    using System.Text;
 
     public class BitSet
     {
@@ -57,7 +58,7 @@ namespace Sharpen
         private static int GetBitCount(ulong[] value)
         {
             int data = 0;
-            uint size = (uint)value.Length / (sizeof(ulong) / sizeof(int));
+            uint size = (uint)value.Length;
             const ulong m1 = 0x5555555555555555;
             const ulong m2 = 0x3333333333333333;
             const ulong m4 = 0x0F0F0F0F0F0F0F0F;
@@ -148,7 +149,7 @@ namespace Sharpen
             if (element >= _data.Length)
                 return false;
 
-            return (_data[element] & (1U << (index % BitsPerElement))) != 0;
+            return (_data[element] & (1UL << (index % BitsPerElement))) != 0;
         }
 
         public void Set(int index)
@@ -160,7 +161,7 @@ namespace Sharpen
             if (element >= _data.Length)
                 Array.Resize(ref _data, Math.Max(_data.Length * 2, element + 1));
 
-            _data[element] |= 1U << (index % BitsPerElement);
+            _data[element] |= 1UL << (index % BitsPerElement);
         }
 
         public bool IsEmpty()
@@ -191,15 +192,18 @@ namespace Sharpen
             if (i >= _data.Length)
                 return -1;
 
-            ulong current = _data[i] & ((1U << (fromIndex % BitsPerElement)) - 1);
+            ulong current = _data[i] & ~((1UL << (fromIndex % BitsPerElement)) - 1);
 
-            for (; i < _data.Length; i++)
+            while (true)
             {
                 int bit = BitScanForward(current);
                 if (bit >= 0)
                     return bit + i * BitsPerElement;
 
                 i++;
+                if (i >= _data.Length)
+                    break;
+
                 current = _data[i];
             }
 
