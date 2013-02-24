@@ -45,7 +45,7 @@ namespace Antlr4.Runtime.Dfa
 
         public ArrayEdgeMap(int minIndex, int maxIndex) : base(minIndex, maxIndex)
         {
-            arrayData = (T[])new object[maxIndex - minIndex + 1];
+            arrayData = new T[maxIndex - minIndex + 1];
         }
 
         public override int Count
@@ -113,7 +113,7 @@ namespace Antlr4.Runtime.Dfa
             {
                 return this;
             }
-            if (m is Antlr4.Runtime.Dfa.ArrayEdgeMap<object>)
+            if (m is Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)
             {
                 Antlr4.Runtime.Dfa.ArrayEdgeMap<T> other = (Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)m;
                 int minOverlap = Math.Max(minIndex, other.minIndex);
@@ -132,7 +132,7 @@ namespace Antlr4.Runtime.Dfa
             }
             else
             {
-                if (m is SingletonEdgeMap<object>)
+                if (m is SingletonEdgeMap<T>)
                 {
                     SingletonEdgeMap<T> other = (SingletonEdgeMap<T>)m;
                     System.Diagnostics.Debug.Assert(!other.IsEmpty);
@@ -141,7 +141,7 @@ namespace Antlr4.Runtime.Dfa
                 }
                 else
                 {
-                    if (m is SparseEdgeMap<object>)
+                    if (m is SparseEdgeMap<T>)
                     {
                         SparseEdgeMap<T> other = (SparseEdgeMap<T>)m;
                         int[] keys = other.GetKeys();

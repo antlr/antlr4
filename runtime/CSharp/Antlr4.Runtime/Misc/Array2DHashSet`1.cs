@@ -630,7 +630,7 @@ namespace Antlr4.Runtime.Misc
         /// <returns>the newly constructed array</returns>
         protected internal virtual T[][] CreateBuckets(int capacity)
         {
-            return (T[][])new object[capacity][];
+            return new T[capacity][];
         }
 
         /// <summary>
@@ -644,7 +644,7 @@ namespace Antlr4.Runtime.Misc
         /// <returns>the newly constructed array</returns>
         protected internal virtual T[] CreateBucket(int capacity)
         {
-            return (T[])new object[capacity];
+            return new T[capacity];
         }
 
         protected internal class SetIterator : IEnumerator<T>
