@@ -7,3 +7,6 @@
 [Rr]elease/
 reference/.metadata/
 reference/antlr4.net/
+
+# ignore Java (Maven) build directory
+tool/target/
