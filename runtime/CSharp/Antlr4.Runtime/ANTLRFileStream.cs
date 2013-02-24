@@ -53,22 +53,26 @@ namespace Antlr4.Runtime
         }
 
         /// <exception cref="System.IO.IOException"></exception>
-        public AntlrFileStream(string fileName, string encoding)
+        public AntlrFileStream(string fileName, Encoding encoding)
         {
             this.fileName = fileName;
             Load(fileName, encoding);
         }
 
         /// <exception cref="System.IO.IOException"></exception>
-        public virtual void Load(string fileName, string encoding)
+        public virtual void Load(string fileName, Encoding encoding)
         {
             if (fileName == null)
             {
                 return;
             }
 
-            Encoding fileEncoding = Encoding.GetEncoding(encoding);
-            string text = File.ReadAllText(fileName, fileEncoding);
+            string text;
+            if (encoding != null)
+                text = File.ReadAllText(fileName, encoding);
+            else
+                text = File.ReadAllText(fileName);
+
             data = text.ToCharArray();
             n = data.Length;
         }
