@@ -33,7 +33,7 @@
          * Parse all java files under this package within the JDK_SOURCE_ROOT
          * (environment variable or property defined on the Java command line).
          */
-        private const String TOP_PACKAGE = "java.lang";
+        private const string TOP_PACKAGE = "java.lang";
         /**
          * {@code true} to load java files from sub-packages of
          * {@link #TOP_PACKAGE}.
@@ -203,14 +203,14 @@
         //[Ignore]
         public void compileJdk()
         {
-            String jdkSourceRoot = getSourceRoot("JDK");
+            string jdkSourceRoot = getSourceRoot("JDK");
             Assert.IsTrue(jdkSourceRoot != null && !string.IsNullOrEmpty(jdkSourceRoot), "The JDK_SOURCE_ROOT environment variable must be set for performance testing.");
 
             compileJavaParser(USE_LR_GRAMMAR);
-            String lexerName = "JavaLexer";
-            String parserName = "JavaParser";
-            String listenerName = "JavaBaseListener";
-            String entryPoint = "compilationUnit";
+            string lexerName = "JavaLexer";
+            string parserName = "JavaParser";
+            string listenerName = "JavaBaseListener";
+            string entryPoint = "compilationUnit";
             ParserFactory factory = getParserFactory(lexerName, parserName, listenerName, entryPoint);
 
             if (!string.IsNullOrEmpty(TOP_PACKAGE))
@@ -258,9 +258,9 @@
             }
         }
 
-        private String getSourceRoot(String prefix)
+        private string getSourceRoot(string prefix)
         {
-            String sourceRoot = Environment.GetEnvironmentVariable(prefix + "_SOURCE_ROOT");
+            string sourceRoot = Environment.GetEnvironmentVariable(prefix + "_SOURCE_ROOT");
             return sourceRoot;
         }
 
@@ -272,7 +272,7 @@
             }
         }
 
-        public static String getOptionsDescription(String topPackage)
+        public static string getOptionsDescription(string topPackage)
         {
             StringBuilder builder = new StringBuilder();
             builder.Append("Input=");
@@ -529,7 +529,7 @@
                         {
                             foreach (ATNConfig config in state.configs)
                             {
-                                String configOutput = config.ToDotString();
+                                string configOutput = config.ToDotString();
                                 if (configOutput.Length <= configOutputSize)
                                 {
                                     continue;
@@ -593,10 +593,10 @@
 
         protected void compileJavaParser(bool leftRecursive)
         {
-            String grammarFileName = "Java.g4";
-            String sourceName = leftRecursive ? "Java-LR.g4" : "Java.g4";
-            String body = load(sourceName, null);
-            List<String> extraOptions = new List<String>();
+            string grammarFileName = "Java.g4";
+            string sourceName = leftRecursive ? "Java-LR.g4" : "Java.g4";
+            string body = load(sourceName, null);
+            List<string> extraOptions = new List<string>();
             extraOptions.Add("-Werror");
             if (FORCE_ATN)
             {
@@ -615,12 +615,12 @@
                 }
             }
             extraOptions.Add("-visitor");
-            String[] extraOptionsArray = extraOptions.ToArray();
+            string[] extraOptionsArray = extraOptions.ToArray();
             bool success = rawGenerateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", true, extraOptionsArray);
             Assert.IsTrue(success);
         }
 
-        protected String load(String fileName, [Nullable] Encoding encoding)
+        protected string load(string fileName, [Nullable] Encoding encoding)
         {
             if (fileName == null)
             {
@@ -658,7 +658,7 @@
             updateChecksum(checksum, token.Channel);
         }
 
-        protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, String entryPoint)
+        protected ParserFactory getParserFactory(string lexerName, string parserName, string listenerName, string entryPoint)
         {
             Assembly loader = Assembly.LoadFile(Path.Combine(tmpdir, "Parser.dll"));
             Type lexerClass = loader.GetType(lexerName);
@@ -675,7 +675,7 @@
             if (!REUSE_LEXER_DFA)
             {
                 FieldInfo lexerSerializedATNField = lexerClass.GetField("_serializedATN");
-                String lexerSerializedATN = (String)lexerSerializedATNField.GetValue(null);
+                string lexerSerializedATN = (string)lexerSerializedATNField.GetValue(null);
                 for (int i = 0; i < NUMBER_OF_THREADS; i++)
                 {
                     sharedLexerATNs[i] = ATNSimulator.Deserialize(lexerSerializedATN.ToCharArray());
@@ -685,7 +685,7 @@
             if (RUN_PARSER && !REUSE_PARSER_DFA)
             {
                 FieldInfo parserSerializedATNField = parserClass.GetField("_serializedATN");
-                String parserSerializedATN = (String)parserSerializedATNField.GetValue(null);
+                string parserSerializedATN = (string)parserSerializedATNField.GetValue(null);
                 for (int i = 0; i < NUMBER_OF_THREADS; i++)
                 {
                     sharedParserATNs[i] = ATNSimulator.Deserialize(parserSerializedATN.ToCharArray());
@@ -815,7 +815,7 @@
                     }
 
                     MethodInfo parseMethod = parserClass.GetMethod(entryPoint);
-                    Object parseResult;
+                    object parseResult;
 
                     IParseTreeListener checksumParserListener = null;
 
@@ -835,7 +835,7 @@
                             throw;
                         }
 
-                        String sourceName = tokens.SourceName;
+                        string sourceName = tokens.SourceName;
                         sourceName = !string.IsNullOrEmpty(sourceName) ? sourceName + ": " : "";
                         Console.Error.WriteLine(sourceName + "Forced to retry with full context.");
 
@@ -928,10 +928,10 @@
                     return;
                 }
 
-                String sourceName = recognizer.InputStream.SourceName;
+                string sourceName = recognizer.InputStream.SourceName;
                 if (!string.IsNullOrEmpty(sourceName))
                 {
-                    sourceName = String.Format("{0}:{1}:{2}: ", sourceName, line, charPositionInLine);
+                    sourceName = string.Format("{0}:{1}:{2}: ", sourceName, line, charPositionInLine);
                 }
 
                 Console.Error.WriteLine(sourceName + "line " + line + ":" + charPositionInLine + " " + msg);
@@ -970,10 +970,10 @@
                 base.ReportContextSensitivity(recognizer, dfa, startIndex, stopIndex, acceptState);
             }
 
-            protected override String GetDecisionDescription(Parser recognizer, int decision)
+            protected override string GetDecisionDescription(Parser recognizer, int decision)
             {
-                String format = "{0}({1})";
-                String ruleName = recognizer.RuleNames[recognizer.Atn.decisionToState[decision].ruleIndex];
+                string format = "{0}({1})";
+                string ruleName = recognizer.RuleNames[recognizer.Atn.decisionToState[decision].ruleIndex];
                 return string.Format(format, decision, ruleName);
             }
         }
