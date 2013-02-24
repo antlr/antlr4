@@ -234,7 +234,7 @@ namespace Antlr4.Runtime.Test
                 try {
                     Thread.sleep(4000);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(TestPerformance.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(typeof(TestPerformance).getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -272,7 +272,7 @@ namespace Antlr4.Runtime.Test
             builder.append(newline);
 
             builder.append("Op=Lex").append(RUN_PARSER ? "+Parse" : " only");
-            builder.append(", Strategy=").append(BAIL_ON_ERROR ? BailErrorStrategy.class.getSimpleName() : DefaultErrorStrategy.class.getSimpleName());
+            builder.append(", Strategy=").append(BAIL_ON_ERROR ? typeof(BailErrorStrategy).getSimpleName() : typeof(DefaultErrorStrategy).getSimpleName());
             builder.append(", BuildParseTree=").append(BUILD_PARSE_TREES);
             builder.append(", WalkBlankListener=").append(BLANK_LISTENER);
 
@@ -379,7 +379,7 @@ namespace Antlr4.Runtime.Test
                 try {
                     value = future.get();
                 } catch (ExecutionException ex) {
-                    Logger.getLogger(TestPerformance.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(typeof(TestPerformance).getName()).log(Level.SEVERE, null, ex);
                 }
 
                 if (COMPUTE_CHECKSUM) {
@@ -593,12 +593,12 @@ namespace Antlr4.Runtime.Test
         protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, final String entryPoint) {
             try {
                 ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
-                Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
-                Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
-                Class<? extends ParseTreeListener> listenerClass = (Class<? extends ParseTreeListener>)loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
+                Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(typeof(Lexer));
+                Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(typeof(Parser));
+                Class<? extends ParseTreeListener> listenerClass = (Class<? extends ParseTreeListener>)loader.loadClass(listenerName).asSubclass(typeof(ParseTreeListener));
 
-                Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
-                Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
+                Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(typeof(CharStream));
+                Constructor<? extends Parser> parserCtor = parserClass.getConstructor(typeof(TokenStream));
 
                 // construct initial instances of the lexer and parser to deserialize their ATNs
                 TokenSource tokenSource = lexerCtor.newInstance(new ANTLRInputStream(""));
@@ -771,7 +771,7 @@ namespace Antlr4.Runtime.Test
                                 }
                             }
 
-                            assertThat(parseResult, instanceOf(ParseTree.class));
+                            assertThat(parseResult, instanceOf(typeof(ParseTree)));
                             if (BUILD_PARSE_TREES && BLANK_LISTENER) {
                                 ParseTreeWalker.DEFAULT.walk(listener, (ParserRuleContext)parseResult);
                             }
