@@ -151,11 +151,11 @@ public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> : <sup
 		<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	};
 
-	public override string getGrammarFileName() { return "<parser.grammarFileName>"; }
+	public override string GrammarFileName { get { return "<parser.grammarFileName>"; } }
 
-	public override string[] getTokenNames() { return tokenNames; }
+	public override string[] TokenNames { get { return tokenNames; } }
 
-	public override string[] getRuleNames() { return ruleNames; }
+	public override string[] RuleNames { get { return ruleNames; } }
 
 	<namedActions.members>
 	<parser:(ctor)()>
@@ -838,11 +838,11 @@ public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> : <super
 		_interp = new LexerATNSimulator(this,_ATN);
 	}
 
-	public override string getGrammarFileName() { return "<lexer.grammarFileName>"; }
+	public override string GrammarFileName { get { return "<lexer.grammarFileName>"; } }
 
-	public override string[] getTokenNames() { return tokenNames; }
+	public override string[] TokenNames { get { return tokenNames; } }
 
-	public override string[] getRuleNames() { return ruleNames; }
+	public override string[] RuleNames { get { return ruleNames; } }
 
 	public override string[] GetModeNames() { return modeNames; }
 
