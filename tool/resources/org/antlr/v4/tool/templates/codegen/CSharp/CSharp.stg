@@ -87,8 +87,8 @@ public virtual void Exit<lname; format="cap">(<file.parserName>.<lname; format="
 
 	public virtual void EnterEveryRule(ParserRuleContext ctx) { }
 	public virtual void ExitEveryRule(ParserRuleContext ctx) { }
-	public virtual void VisitTerminal(TerminalNode node) { }
-	public virtual void VisitErrorNode(ErrorNode node) { }
+	public virtual void VisitTerminal(ITerminalNode node) { }
+	public virtual void VisitErrorNode(IErrorNode node) { }
 }
 <if(file.genPackage)>
 } // namespace <file.genPackage>
@@ -199,7 +199,7 @@ case <f.ruleIndex> : return <f.name>_sempred(<if(!recog.modes)>(<f.ctxType>)<end
 >>
 
 parser_ctor(p) ::= <<
-public <p.name>(TokenStream input) {
+public <p.name>(ITokenStream input) {
 	super(input);
 	_interp = new ParserATNSimulator(this,_ATN);
 }
@@ -639,8 +639,8 @@ LabelRef(t) ::= "<ctx(t)>.<t.name>"
 ListLabelRef(t) ::= "<ctx(t)>.<ListLabelName(t.name)>"
 SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.name> = <rhsChunks>;"
 
-TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
-InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"
+TokenLabelType() ::= "<file.TokenLabelType; null={IToken}>"
+InputSymbolType() ::= "<file.InputSymbolType; null={IToken}>"
 
 TokenPropertyRef_text(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.Text:null)"
 TokenPropertyRef_type(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.Type:0)"
@@ -668,16 +668,16 @@ AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.Add(<labelref(a.label)>);"
 
 TokenDecl(t) ::= "public <TokenLabelType()> <t.name>;"
 TokenTypeDecl(t) ::= "int <t.name>;"
-TokenListDecl(t) ::= "public List\<Token> <t.name> = new ArrayList\<Token>();"
+TokenListDecl(t) ::= "public IList\<IToken> <t.name> = new List\<IToken>();"
 RuleContextDecl(r) ::= "public <r.ctxName> <r.name>;"
-RuleContextListDecl(rdecl) ::= "public List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>();"
+RuleContextListDecl(rdecl) ::= "public IList\<<rdecl.ctxName>> <rdecl.name> = new List\<<rdecl.ctxName>>();"
 
 ContextTokenGetterDecl(t)      ::=
-    "public TerminalNode <t.name>() { return GetToken(<parser.name>.<t.name>, 0); }"
+    "public ITerminalNode <t.name>() { return GetToken(<parser.name>.<t.name>, 0); }"
 ContextTokenListGetterDecl(t)  ::=
-    "public List\<? extends TerminalNode> <t.name>() { return GetTokens(<parser.name>.<t.name>); }"
+    "public IReadOnlyList\<? extends ITerminalNode> <t.name>() { return GetTokens(<parser.name>.<t.name>); }"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-public TerminalNode <t.name>(int i) {
+public ITerminalNode <t.name>(int i) {
 	return GetToken(<parser.name>.<t.name>, i);
 }
 >>
@@ -687,7 +687,7 @@ public <r.ctxName> <r.name>() {
 }
 >>
 ContextRuleListGetterDecl(r)   ::= <<
-public List\<? extends <r.ctxName>\> <r.name>() {
+public IReadOnlyList\<? extends <r.ctxName>\> <r.name>() {
 	return GetRuleContexts(<r.ctxName>.class);
 }
 >>
@@ -745,14 +745,14 @@ public class <struct.name> : <currentRule.name; format="cap">Context {
 >>
 
 ListenerDispatchMethod(method) ::= <<
-public override void <if(method.isEnter)>Enter<else>Exit<endif>Rule(ParseTreeListener listener) {
-	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>Enter<else>Exit<endif><struct.derivedFromName; format="cap">(this);
+public override void <if(method.isEnter)>Enter<else>Exit<endif>Rule(IParseTreeListener listener) {
+	if ( listener instanceof I<parser.grammarName>Listener ) ((I<parser.grammarName>Listener)listener).<if(method.isEnter)>Enter<else>Exit<endif><struct.derivedFromName; format="cap">(this);
 }
 >>
 
 VisitorDispatchMethod(method) ::= <<
-public override \<Result> Result Accept(ParseTreeVisitor\<? extends Result> visitor) {
-	if ( visitor instanceof <parser.grammarName>Visitor\<?> ) return ((<parser.grammarName>Visitor\<? extends Result>)visitor).Visit<struct.derivedFromName; format="cap">(this);
+public override \<Result> Result Accept(IParseTreeVisitor\<? extends Result> visitor) {
+	if ( visitor instanceof I<parser.grammarName>Visitor\<?> ) return ((I<parser.grammarName>Visitor\<? extends Result>)visitor).Visit<struct.derivedFromName; format="cap">(this);
 	else return visitor.VisitChildren(this);
 }
 >>
@@ -833,7 +833,7 @@ public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> : <super
 
 	<namedActions.members>
 
-	public <lexer.name>(CharStream input) {
+	public <lexer.name>(ICharStream input) {
 		super(input);
 		_interp = new LexerATNSimulator(this,_ATN);
 	}
