@@ -975,7 +975,7 @@ nextState_break: ;
 
                 default:
                 {
-                    string message = string.Format("The specified state type %d is not valid.", type);
+                    string message = string.Format("The specified state type {0} is not valid.", type);
                     throw new ArgumentException(message);
                 }
             }

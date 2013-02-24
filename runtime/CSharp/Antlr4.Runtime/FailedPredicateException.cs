@@ -104,7 +104,7 @@ namespace Antlr4.Runtime
             {
                 return message;
             }
-            return string.Format("failed predicate: {%s}?", predicate);
+            return string.Format("failed predicate: {{{0}}}?", predicate);
         }
     }
 }

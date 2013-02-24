@@ -155,7 +155,7 @@ namespace Antlr4.Runtime.Dfa
                     }
                     else
                     {
-                        throw new NotSupportedException(string.Format("EdgeMap of type %s is supported yet."
+                        throw new NotSupportedException(string.Format("EdgeMap of type {0} is supported yet."
                             , m.GetType().FullName));
                     }
                 }
