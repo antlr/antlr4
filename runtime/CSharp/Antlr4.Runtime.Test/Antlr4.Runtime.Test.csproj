@@ -54,6 +54,7 @@
     <Compile Include="TestBitSet.cs" />
     <Compile Include="TestGraphNodes.cs" />
     <Compile Include="TestIntervalSet.cs" />
+    <Compile Include="TestPerformance.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Antlr4.Runtime\Antlr4.Runtime.csproj">

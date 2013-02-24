@@ -1,0 +1,971 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Antlr4.Runtime.Test
+{
+    public class TestPerformance
+    {
+        /**
+         * Parse all java files under this package within the JDK_SOURCE_ROOT
+         * (environment variable or property defined on the Java command line).
+         */
+        private static final String TOP_PACKAGE = "java.lang";
+        /**
+         * {@code true} to load java files from sub-packages of
+         * {@link #TOP_PACKAGE}.
+         */
+        private static final boolean RECURSIVE = true;
+
+        /**
+         * {@code true} to use the Java grammar with expressions in the v4
+         * left-recursive syntax (Java-LR.g4). {@code false} to use the standard
+         * grammar (Java.g4). In either case, the grammar is renamed in the
+         * temporary directory to Java.g4 before compiling.
+         */
+        private static final boolean USE_LR_GRAMMAR = true;
+        /**
+         * {@code true} to specify the {@code -Xforce-atn} option when generating
+         * the grammar, forcing all decisions in {@code JavaParser} to be handled by
+         * {@link ParserATNSimulator#adaptivePredict}.
+         */
+        private static final boolean FORCE_ATN = false;
+        /**
+         * {@code true} to specify the {@code -atn} option when generating the
+         * grammar. This will cause ANTLR to export the ATN for each decision as a
+         * DOT (GraphViz) file.
+         */
+        private static final boolean EXPORT_ATN_GRAPHS = true;
+        /**
+         * {@code true} to specify the {@code -XdbgST} option when generating the
+         * grammar.
+         */
+        private static final boolean DEBUG_TEMPLATES = false;
+        /**
+         * {@code true} to specify the {@code -XdbgSTWait} option when generating the
+         * grammar.
+         */
+        private static final boolean DEBUG_TEMPLATES_WAIT = DEBUG_TEMPLATES;
+        /**
+         * {@code true} to delete temporary (generated and compiled) files when the
+         * test completes.
+         */
+        private static final boolean DELETE_TEMP_FILES = true;
+
+        /**
+         * {@code true} to call {@link System#gc} and then wait for 5 seconds at the
+         * end of the test to make it easier for a profiler to grab a heap dump at
+         * the end of the test run.
+         */
+        private static final boolean PAUSE_FOR_HEAP_DUMP = false;
+
+        /**
+         * Parse each file with {@code JavaParser.compilationUnit}.
+         */
+        private static final boolean RUN_PARSER = true;
+        /**
+         * {@code true} to use {@link BailErrorStrategy}, {@code false} to use
+         * {@link DefaultErrorStrategy}.
+         */
+        private static final boolean BAIL_ON_ERROR = true;
+        /**
+         * {@code true} to compute a checksum for verifying consistency across
+         * optimizations and multiple passes.
+         */
+        private static final boolean COMPUTE_CHECKSUM = true;
+        /**
+         * This value is passed to {@link Parser#setBuildParseTree}.
+         */
+        private static final boolean BUILD_PARSE_TREES = false;
+        /**
+         * Use
+         * {@link ParseTreeWalker#DEFAULT}{@code .}{@link ParseTreeWalker#walk walk}
+         * with the {@code JavaParserBaseListener} to show parse tree walking
+         * overhead. If {@link #BUILD_PARSE_TREES} is {@code false}, the listener
+         * will instead be called during the parsing process via
+         * {@link Parser#addParseListener}.
+         */
+        private static final boolean BLANK_LISTENER = false;
+
+        private static final boolean EXPORT_LARGEST_CONFIG_CONTEXTS = false;
+
+        /**
+         * Shows the number of {@link DFAState} and {@link ATNConfig} instances in
+         * the DFA cache at the end of each pass. If {@link #REUSE_LEXER_DFA} and/or
+         * {@link #REUSE_PARSER_DFA} are false, the corresponding instance numbers
+         * will only apply to one file (the last file if {@link #NUMBER_OF_THREADS}
+         * is 0, otherwise the last file which was parsed on the first thread).
+         */
+        private static final boolean SHOW_DFA_STATE_STATS = true;
+
+        private static final boolean ENABLE_LEXER_DFA = true;
+
+        private static final boolean ENABLE_PARSER_DFA = true;
+
+        private static final PredictionMode PREDICTION_MODE = PredictionMode.LL;
+        private static final boolean FORCE_GLOBAL_CONTEXT = false;
+        private static final boolean TRY_LOCAL_CONTEXT_FIRST = true;
+        private static final boolean OPTIMIZE_LL1 = true;
+        private static final boolean OPTIMIZE_UNIQUE_CLOSURE = true;
+        private static final boolean OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS = false;
+        private static final boolean OPTIMIZE_TAIL_CALLS = true;
+        private static final boolean TAIL_CALL_PRESERVES_SLL = true;
+        private static final boolean TREAT_SLLK1_CONFLICT_AS_AMBIGUITY = false;
+
+        private static final boolean TWO_STAGE_PARSING = true;
+
+        private static final boolean SHOW_CONFIG_STATS = false;
+
+        private static final boolean REPORT_SYNTAX_ERRORS = true;
+        private static final boolean REPORT_AMBIGUITIES = false;
+        private static final boolean REPORT_FULL_CONTEXT = false;
+        private static final boolean REPORT_CONTEXT_SENSITIVITY = REPORT_FULL_CONTEXT;
+
+        /**
+         * If {@code true}, a single {@code JavaLexer} will be used, and
+         * {@link Lexer#setInputStream} will be called to initialize it for each
+         * source file. Otherwise, a new instance will be created for each file.
+         */
+        private static final boolean REUSE_LEXER = false;
+        /**
+         * If {@code true}, a single DFA will be used for lexing which is shared
+         * across all threads and files. Otherwise, each file will be lexed with its
+         * own DFA which is accomplished by creating one ATN instance per thread and
+         * clearing its DFA cache before lexing each file.
+         */
+        private static final boolean REUSE_LEXER_DFA = true;
+        /**
+         * If {@code true}, a single {@code JavaParser} will be used, and
+         * {@link Parser#setInputStream} will be called to initialize it for each
+         * source file. Otherwise, a new instance will be created for each file.
+         */
+        private static final boolean REUSE_PARSER = false;
+        /**
+         * If {@code true}, a single DFA will be used for parsing which is shared
+         * across all threads and files. Otherwise, each file will be parsed with
+         * its own DFA which is accomplished by creating one ATN instance per thread
+         * and clearing its DFA cache before parsing each file.
+         */
+        private static final boolean REUSE_PARSER_DFA = true;
+        /**
+         * If {@code true}, the shared lexer and parser are reset after each pass.
+         * If {@code false}, all passes after the first will be fully "warmed up",
+         * which makes them faster and can compare them to the first warm-up pass,
+         * but it will not distinguish bytecode load/JIT time from warm-up time
+         * during the first pass.
+         */
+        private static final boolean CLEAR_DFA = false;
+        /**
+         * Total number of passes to make over the source.
+         */
+        private static final int PASSES = 4;
+
+        /**
+         * Number of parser threads to use.
+         */
+        private static final int NUMBER_OF_THREADS = 1;
+
+        private static final Lexer[] sharedLexers = new Lexer[NUMBER_OF_THREADS];
+        private static final ATN[] sharedLexerATNs = new ATN[NUMBER_OF_THREADS];
+
+        private static final Parser[] sharedParsers = new Parser[NUMBER_OF_THREADS];
+        private static final ATN[] sharedParserATNs = new ATN[NUMBER_OF_THREADS];
+
+        private static final ParseTreeListener[] sharedListeners = new ParseTreeListener[NUMBER_OF_THREADS];
+
+        private final AtomicInteger tokenCount = new AtomicInteger();
+        private int currentPass;
+
+        @Test
+        //@org.junit.Ignore
+        public void compileJdk() throws IOException, InterruptedException {
+            String jdkSourceRoot = getSourceRoot("JDK");
+            assertTrue("The JDK_SOURCE_ROOT environment variable must be set for performance testing.", jdkSourceRoot != null && !jdkSourceRoot.isEmpty());
+
+            compileJavaParser(USE_LR_GRAMMAR);
+            final String lexerName = "JavaLexer";
+            final String parserName = "JavaParser";
+            final String listenerName = "JavaBaseListener";
+            final String entryPoint = "compilationUnit";
+            ParserFactory factory = getParserFactory(lexerName, parserName, listenerName, entryPoint);
+
+            if (!TOP_PACKAGE.isEmpty()) {
+                jdkSourceRoot = jdkSourceRoot + '/' + TOP_PACKAGE.replace('.', '/');
+            }
+
+            File directory = new File(jdkSourceRoot);
+            assertTrue(directory.isDirectory());
+
+            Collection<CharStream> sources = loadSources(directory, new FileExtensionFilenameFilter(".java"), RECURSIVE);
+
+            System.out.print(getOptionsDescription(TOP_PACKAGE));
+
+            currentPass = 0;
+            parse1(factory, sources);
+            for (int i = 0; i < PASSES - 1; i++) {
+                currentPass = i + 1;
+                if (CLEAR_DFA) {
+                    if (sharedLexers.length > 0) {
+                        sharedLexers[0].getATN().clearDFA();
+                    }
+
+                    if (sharedParsers.length > 0) {
+                        sharedParsers[0].getATN().clearDFA();
+                    }
+
+                    Arrays.fill(sharedLexers, null);
+                    Arrays.fill(sharedParsers, null);
+                }
+
+                parse2(factory, sources);
+            }
+
+            sources.clear();
+            if (PAUSE_FOR_HEAP_DUMP) {
+                System.gc();
+                System.out.println("Pausing before application exit.");
+                try {
+                    Thread.sleep(4000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(TestPerformance.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+        private String getSourceRoot(String prefix) {
+            String sourceRoot = System.getenv(prefix+"_SOURCE_ROOT");
+            if (sourceRoot == null) {
+                sourceRoot = System.getProperty(prefix+"_SOURCE_ROOT");
+            }
+
+            return sourceRoot;
+        }
+
+        @Override
+        protected void eraseTempDir() {
+            if (DELETE_TEMP_FILES) {
+                super.eraseTempDir();
+            }
+        }
+
+        public static String getOptionsDescription(String topPackage) {
+            StringBuilder builder = new StringBuilder();
+            builder.append("Input=");
+            if (topPackage.isEmpty()) {
+                builder.append("*");
+            }
+            else {
+                builder.append(topPackage).append(".*");
+            }
+
+            builder.append(", Grammar=").append(USE_LR_GRAMMAR ? "LR" : "Standard");
+            builder.append(", ForceAtn=").append(FORCE_ATN);
+            builder.append(", Lexer:").append(ENABLE_LEXER_DFA ? "DFA" : "ATN");
+            builder.append(", Parser:").append(ENABLE_PARSER_DFA ? "DFA" : "ATN");
+
+            builder.append(newline);
+
+            builder.append("Op=Lex").append(RUN_PARSER ? "+Parse" : " only");
+            builder.append(", Strategy=").append(BAIL_ON_ERROR ? BailErrorStrategy.class.getSimpleName() : DefaultErrorStrategy.class.getSimpleName());
+            builder.append(", BuildParseTree=").append(BUILD_PARSE_TREES);
+            builder.append(", WalkBlankListener=").append(BLANK_LISTENER);
+
+            builder.append(newline);
+
+            builder.append("Lexer=").append(REUSE_LEXER ? "setInputStream" : "newInstance");
+            builder.append(", Parser=").append(REUSE_PARSER ? "setInputStream" : "newInstance");
+            builder.append(", AfterPass=").append(CLEAR_DFA ? "newInstance" : "setInputStream");
+
+            builder.append('\n');
+
+            builder.append("UniqueClosure=").append(OPTIMIZE_UNIQUE_CLOSURE ? "optimize" : "complete");
+
+            builder.append(newline);
+
+            return builder.toString();
+        }
+
+        /**
+         *  This method is separate from {@link #parse2} so the first pass can be distinguished when analyzing
+         *  profiler results.
+         */
+        protected void parse1(ParserFactory factory, Collection<CharStream> sources) throws InterruptedException {
+            System.gc();
+            parseSources(factory, sources);
+        }
+
+        /**
+         *  This method is separate from {@link #parse1} so the first pass can be distinguished when analyzing
+         *  profiler results.
+         */
+        protected void parse2(ParserFactory factory, Collection<CharStream> sources) throws InterruptedException {
+            System.gc();
+            parseSources(factory, sources);
+        }
+
+        protected Collection<CharStream> loadSources(File directory, FilenameFilter filter, boolean recursive) {
+            return loadSources(directory, filter, null, recursive);
+        }
+
+        protected Collection<CharStream> loadSources(File directory, FilenameFilter filter, String encoding, boolean recursive) {
+            Collection<CharStream> result = new ArrayList<CharStream>();
+            loadSources(directory, filter, encoding, recursive, result);
+            return result;
+        }
+
+        protected void loadSources(File directory, FilenameFilter filter, String encoding, boolean recursive, Collection<CharStream> result) {
+            assert directory.isDirectory();
+
+            File[] sources = directory.listFiles(filter);
+            for (File file : sources) {
+                try {
+                    CharStream input = new ANTLRFileStream(file.getAbsolutePath(), encoding);
+                    result.add(input);
+                } catch (IOException ex) {
+
+                }
+            }
+
+            if (recursive) {
+                File[] children = directory.listFiles();
+                for (File child : children) {
+                    if (child.isDirectory()) {
+                        loadSources(child, filter, encoding, true, result);
+                    }
+                }
+            }
+        }
+
+        int configOutputSize = 0;
+
+        @SuppressWarnings("unused")
+        protected void parseSources(final ParserFactory factory, Collection<CharStream> sources) throws InterruptedException {
+            long startTime = System.currentTimeMillis();
+            tokenCount.set(0);
+            int inputSize = 0;
+
+            Collection<Future<Integer>> results = new ArrayList<Future<Integer>>();
+            ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS, new NumberedThreadFactory());
+            for (final CharStream input : sources) {
+                input.seek(0);
+                inputSize += input.size();
+                Future<Integer> futureChecksum = executorService.submit(new Callable<Integer>() {
+                    @Override
+                    public Integer call() {
+                        // this incurred a great deal of overhead and was causing significant variations in performance results.
+                        //System.out.format("Parsing file %s\n", input.getSourceName());
+                        try {
+                            return factory.parseFile(input, ((NumberedThread)Thread.currentThread()).getThreadNumber());
+                        } catch (IllegalStateException ex) {
+                            ex.printStackTrace(System.err);
+                        } catch (Throwable t) {
+                            t.printStackTrace(System.err);
+                        }
+
+                        return -1;
+                    }
+                });
+
+                results.add(futureChecksum);
+            }
+
+            Checksum checksum = new CRC32();
+            for (Future<Integer> future : results) {
+                int value = 0;
+                try {
+                    value = future.get();
+                } catch (ExecutionException ex) {
+                    Logger.getLogger(TestPerformance.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                if (COMPUTE_CHECKSUM) {
+                    updateChecksum(checksum, value);
+                }
+            }
+
+            executorService.shutdown();
+            executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+
+            System.out.format("Total parse time for %d files (%d KB, %d tokens, checksum 0x%8X): %dms%n",
+                              sources.size(),
+                              inputSize / 1024,
+                              tokenCount.get(),
+                              COMPUTE_CHECKSUM ? checksum.getValue() : 0,
+                              System.currentTimeMillis() - startTime);
+
+            if (sharedLexers.length > 0) {
+                Lexer lexer = sharedLexers[0];
+                final LexerATNSimulator lexerInterpreter = lexer.getInterpreter();
+                final DFA[] modeToDFA = lexerInterpreter.atn.modeToDFA;
+                if (SHOW_DFA_STATE_STATS) {
+                    int states = 0;
+                    int configs = 0;
+                    Set<ATNConfig> uniqueConfigs = new HashSet<ATNConfig>();
+
+                    for (int i = 0; i < modeToDFA.length; i++) {
+                        DFA dfa = modeToDFA[i];
+                        if (dfa == null || dfa.states == null) {
+                            continue;
+                        }
+
+                        states += dfa.states.size();
+                        for (DFAState state : dfa.states.values()) {
+                            configs += state.configs.size();
+                            uniqueConfigs.addAll(state.configs);
+                        }
+                    }
+
+                    System.out.format("There are %d lexer DFAState instances, %d configs (%d unique), %d prediction contexts.%n", states, configs, uniqueConfigs.size(), lexerInterpreter.atn.getContextCacheSize());
+                }
+            }
+
+            if (RUN_PARSER && sharedParsers.length > 0) {
+                Parser parser = sharedParsers[0];
+                // make sure the individual DFAState objects actually have unique ATNConfig arrays
+                final ParserATNSimulator interpreter = parser.getInterpreter();
+                final DFA[] decisionToDFA = interpreter.atn.decisionToDFA;
+
+                if (SHOW_DFA_STATE_STATS) {
+                    int states = 0;
+                    int configs = 0;
+                    Set<ATNConfig> uniqueConfigs = new HashSet<ATNConfig>();
+
+                    for (int i = 0; i < decisionToDFA.length; i++) {
+                        DFA dfa = decisionToDFA[i];
+                        if (dfa == null || dfa.states == null) {
+                            continue;
+                        }
+
+                        states += dfa.states.size();
+                        for (DFAState state : dfa.states.values()) {
+                            configs += state.configs.size();
+                            uniqueConfigs.addAll(state.configs);
+                        }
+                    }
+
+                    System.out.format("There are %d parser DFAState instances, %d configs (%d unique), %d prediction contexts.%n", states, configs, uniqueConfigs.size(), interpreter.atn.getContextCacheSize());
+                }
+
+                int localDfaCount = 0;
+                int globalDfaCount = 0;
+                int localConfigCount = 0;
+                int globalConfigCount = 0;
+                int[] contextsInDFAState = new int[0];
+
+                for (int i = 0; i < decisionToDFA.length; i++) {
+                    DFA dfa = decisionToDFA[i];
+                    if (dfa == null || dfa.states == null) {
+                        continue;
+                    }
+
+                    if (SHOW_CONFIG_STATS) {
+                        for (DFAState state : dfa.states.keySet()) {
+                            if (state.configs.size() >= contextsInDFAState.length) {
+                                contextsInDFAState = Arrays.copyOf(contextsInDFAState, state.configs.size() + 1);
+                            }
+
+                            if (state.isAcceptState) {
+                                boolean hasGlobal = false;
+                                for (ATNConfig config : state.configs) {
+                                    if (config.getReachesIntoOuterContext()) {
+                                        globalConfigCount++;
+                                        hasGlobal = true;
+                                    } else {
+                                        localConfigCount++;
+                                    }
+                                }
+
+                                if (hasGlobal) {
+                                    globalDfaCount++;
+                                } else {
+                                    localDfaCount++;
+                                }
+                            }
+
+                            contextsInDFAState[state.configs.size()]++;
+                        }
+                    }
+
+                    if (EXPORT_LARGEST_CONFIG_CONTEXTS) {
+                        for (DFAState state : dfa.states.keySet()) {
+                            for (ATNConfig config : state.configs) {
+                                String configOutput = config.toDotString();
+                                if (configOutput.length() <= configOutputSize) {
+                                    continue;
+                                }
+
+                                configOutputSize = configOutput.length();
+                                writeFile(tmpdir, "d" + dfa.decision + ".s" + state.stateNumber + ".a" + config.getAlt() + ".config.dot", configOutput);
+                            }
+                        }
+                    }
+                }
+
+                if (SHOW_CONFIG_STATS && currentPass == 0) {
+                    System.out.format("  DFA accept states: %d total, %d with only local context, %d with a global context%n", localDfaCount + globalDfaCount, localDfaCount, globalDfaCount);
+                    System.out.format("  Config stats: %d total, %d local, %d global%n", localConfigCount + globalConfigCount, localConfigCount, globalConfigCount);
+                    if (SHOW_DFA_STATE_STATS) {
+                        for (int i = 0; i < contextsInDFAState.length; i++) {
+                            if (contextsInDFAState[i] != 0) {
+                                System.out.format("  %d configs = %d%n", i, contextsInDFAState[i]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        protected void compileJavaParser(boolean leftRecursive) throws IOException {
+            String grammarFileName = "Java.g4";
+            String sourceName = leftRecursive ? "Java-LR.g4" : "Java.g4";
+            String body = load(sourceName, null);
+            List<String> extraOptions = new ArrayList<String>();
+            extraOptions.add("-Werror");
+            if (FORCE_ATN) {
+                extraOptions.add("-Xforce-atn");
+            }
+            if (EXPORT_ATN_GRAPHS) {
+                extraOptions.add("-atn");
+            }
+            if (DEBUG_TEMPLATES) {
+                extraOptions.add("-XdbgST");
+                if (DEBUG_TEMPLATES_WAIT) {
+                    extraOptions.add("-XdbgSTWait");
+                }
+            }
+            extraOptions.add("-visitor");
+            String[] extraOptionsArray = extraOptions.toArray(new String[extraOptions.size()]);
+            boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", true, extraOptionsArray);
+            assertTrue(success);
+        }
+
+        protected String load(String fileName, @Nullable String encoding)
+            throws IOException
+        {
+            if ( fileName==null ) {
+                return null;
+            }
+
+            String fullFileName = getClass().getPackage().getName().replace('.', '/') + '/' + fileName;
+            int size = 65000;
+            InputStreamReader isr;
+            InputStream fis = getClass().getClassLoader().getResourceAsStream(fullFileName);
+            if ( encoding!=null ) {
+                isr = new InputStreamReader(fis, encoding);
+            }
+            else {
+                isr = new InputStreamReader(fis);
+            }
+            try {
+                char[] data = new char[size];
+                int n = isr.read(data);
+                return new String(data, 0, n);
+            }
+            finally {
+                isr.close();
+            }
+        }
+
+        private static void updateChecksum(Checksum checksum, int value) {
+            checksum.update((value) & 0xFF);
+            checksum.update((value >>> 8) & 0xFF);
+            checksum.update((value >>> 16) & 0xFF);
+            checksum.update((value >>> 24) & 0xFF);
+        }
+
+        private static void updateChecksum(Checksum checksum, Token token) {
+            if (token == null) {
+                checksum.update(0);
+                return;
+            }
+
+            updateChecksum(checksum, token.getStartIndex());
+            updateChecksum(checksum, token.getStopIndex());
+            updateChecksum(checksum, token.getLine());
+            updateChecksum(checksum, token.getCharPositionInLine());
+            updateChecksum(checksum, token.getType());
+            updateChecksum(checksum, token.getChannel());
+        }
+
+        protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, final String entryPoint) {
+            try {
+                ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
+                final Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
+                final Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
+                final Class<? extends ParseTreeListener> listenerClass = (Class<? extends ParseTreeListener>)loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
+
+                final Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
+                final Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
+
+                // construct initial instances of the lexer and parser to deserialize their ATNs
+                TokenSource tokenSource = lexerCtor.newInstance(new ANTLRInputStream(""));
+                parserCtor.newInstance(new CommonTokenStream(tokenSource));
+
+                if (!REUSE_LEXER_DFA) {
+                    Field lexerSerializedATNField = lexerClass.getField("_serializedATN");
+                    String lexerSerializedATN = (String)lexerSerializedATNField.get(null);
+                    for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+                        sharedLexerATNs[i] = ATNSimulator.deserialize(lexerSerializedATN.toCharArray());
+                    }
+                }
+
+                if (RUN_PARSER && !REUSE_PARSER_DFA) {
+                    Field parserSerializedATNField = parserClass.getField("_serializedATN");
+                    String parserSerializedATN = (String)parserSerializedATNField.get(null);
+                    for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+                        sharedParserATNs[i] = ATNSimulator.deserialize(parserSerializedATN.toCharArray());
+                    }
+                }
+
+                return new ParserFactory() {
+                    @SuppressWarnings("unused")
+                    @Override
+                    public int parseFile(CharStream input, int thread) {
+                        final Checksum checksum = new CRC32();
+
+                        assert thread >= 0 && thread < NUMBER_OF_THREADS;
+
+                        try {
+                            ParseTreeListener listener = sharedListeners[thread];
+                            if (listener == null) {
+                                listener = listenerClass.newInstance();
+                                sharedListeners[thread] = listener;
+                            }
+
+                            Lexer lexer = sharedLexers[thread];
+                            if (REUSE_LEXER && lexer != null) {
+                                lexer.setInputStream(input);
+                            } else {
+                                lexer = lexerCtor.newInstance(input);
+                                sharedLexers[thread] = lexer;
+                                if (!ENABLE_LEXER_DFA) {
+                                    lexer.setInterpreter(new NonCachingLexerATNSimulator(lexer, lexer.getATN()));
+                                } else if (!REUSE_LEXER_DFA) {
+                                    lexer.setInterpreter(new LexerATNSimulator(lexer, sharedLexerATNs[thread]));
+                                }
+                            }
+
+                            lexer.getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
+                            if (ENABLE_LEXER_DFA && !REUSE_LEXER_DFA) {
+                                lexer.getInterpreter().atn.clearDFA();
+                            }
+
+                            CommonTokenStream tokens = new CommonTokenStream(lexer);
+                            tokens.fill();
+                            tokenCount.addAndGet(tokens.size());
+
+                            if (COMPUTE_CHECKSUM) {
+                                for (Token token : tokens.getTokens()) {
+                                    updateChecksum(checksum, token);
+                                }
+                            }
+
+                            if (!RUN_PARSER) {
+                                return (int)checksum.getValue();
+                            }
+
+                            Parser parser = sharedParsers[thread];
+                            if (REUSE_PARSER && parser != null) {
+                                parser.setInputStream(tokens);
+                            } else {
+                                Parser newParser = parserCtor.newInstance(tokens);
+                                parser = newParser;
+                                sharedParsers[thread] = parser;
+                            }
+
+                            parser.removeErrorListeners();
+                            if (!TWO_STAGE_PARSING) {
+                                parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
+                                parser.addErrorListener(new SummarizingDiagnosticErrorListener());
+                            }
+
+                            if (!ENABLE_PARSER_DFA) {
+                                parser.setInterpreter(new NonCachingParserATNSimulator(parser, parser.getATN()));
+                            } else if (!REUSE_PARSER_DFA) {
+                                parser.setInterpreter(new ParserATNSimulator(parser, sharedParserATNs[thread]));
+                            }
+
+                            if (ENABLE_PARSER_DFA && !REUSE_PARSER_DFA) {
+                                parser.getInterpreter().atn.clearDFA();
+                            }
+
+                            parser.getInterpreter().setPredictionMode(TWO_STAGE_PARSING ? PredictionMode.SLL : PREDICTION_MODE);
+                            parser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT && !TWO_STAGE_PARSING;
+                            parser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST || TWO_STAGE_PARSING;
+                            parser.getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
+                            parser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
+                            parser.getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
+                            parser.getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
+                            parser.getInterpreter().tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
+                            parser.getInterpreter().treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
+                            parser.setBuildParseTree(BUILD_PARSE_TREES);
+                            if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
+                                parser.addParseListener(listener);
+                            }
+                            if (BAIL_ON_ERROR || TWO_STAGE_PARSING) {
+                                parser.setErrorHandler(new BailErrorStrategy());
+                            }
+
+                            Method parseMethod = parserClass.getMethod(entryPoint);
+                            Object parseResult;
+
+                            ParseTreeListener checksumParserListener = null;
+
+                            try {
+                                if (COMPUTE_CHECKSUM) {
+                                    checksumParserListener = new ChecksumParseTreeListener(checksum);
+                                    parser.addParseListener(checksumParserListener);
+                                }
+                                parseResult = parseMethod.invoke(parser);
+                            } catch (InvocationTargetException ex) {
+                                if (!TWO_STAGE_PARSING) {
+                                    throw ex;
+                                }
+
+                                String sourceName = tokens.getSourceName();
+                                sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName+": " : "";
+                                System.err.println(sourceName+"Forced to retry with full context.");
+
+                                if (!(ex.getCause() instanceof ParseCancellationException)) {
+                                    throw ex;
+                                }
+
+                                tokens.reset();
+                                if (REUSE_PARSER && sharedParsers[thread] != null) {
+                                    parser.setInputStream(tokens);
+                                } else {
+                                    Parser newParser = parserCtor.newInstance(tokens);
+                                    parser = newParser;
+                                    sharedParsers[thread] = parser;
+                                }
+
+                                parser.removeErrorListeners();
+                                parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
+                                parser.addErrorListener(new SummarizingDiagnosticErrorListener());
+                                if (!ENABLE_PARSER_DFA) {
+                                    parser.setInterpreter(new NonCachingParserATNSimulator(parser, parser.getATN()));
+                                }
+                                parser.getInterpreter().setPredictionMode(PREDICTION_MODE);
+                                parser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT;
+                                parser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
+                                parser.getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
+                                parser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
+                                parser.getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
+                                parser.getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
+                                parser.getInterpreter().tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
+                                parser.getInterpreter().treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
+                                parser.setBuildParseTree(BUILD_PARSE_TREES);
+                                if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
+                                    parser.addParseListener(listener);
+                                }
+                                if (BAIL_ON_ERROR) {
+                                    parser.setErrorHandler(new BailErrorStrategy());
+                                }
+
+                                parseResult = parseMethod.invoke(parser);
+                            }
+                            finally {
+                                if (checksumParserListener != null) {
+                                    parser.removeParseListener(checksumParserListener);
+                                }
+                            }
+
+                            assertThat(parseResult, instanceOf(ParseTree.class));
+                            if (BUILD_PARSE_TREES && BLANK_LISTENER) {
+                                ParseTreeWalker.DEFAULT.walk(listener, (ParserRuleContext)parseResult);
+                            }
+                        } catch (Exception e) {
+                            if (!REPORT_SYNTAX_ERRORS && e instanceof ParseCancellationException) {
+                                return (int)checksum.getValue();
+                            }
+
+                            e.printStackTrace(System.out);
+                            throw new IllegalStateException(e);
+                        }
+
+                        return (int)checksum.getValue();
+                    }
+                };
+            } catch (Exception e) {
+                e.printStackTrace(System.out);
+                Assert.fail(e.getMessage());
+                throw new IllegalStateException(e);
+            }
+        }
+
+        protected interface ParserFactory {
+            int parseFile(CharStream input, int thread);
+        }
+
+        private static class DescriptiveErrorListener extends BaseErrorListener {
+            public static DescriptiveErrorListener INSTANCE = new DescriptiveErrorListener();
+
+            @Override
+            public <T extends Token> void syntaxError(Recognizer<T, ?> recognizer, T offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+                if (!REPORT_SYNTAX_ERRORS) {
+                    return;
+                }
+
+                String sourceName = recognizer.getInputStream().getSourceName();
+                if (!sourceName.isEmpty()) {
+                    sourceName = String.format("%s:%d:%d: ", sourceName, line, charPositionInLine);
+                }
+
+                System.err.println(sourceName+"line "+line+":"+charPositionInLine+" "+msg);
+            }
+
+        }
+
+        private static class SummarizingDiagnosticErrorListener extends DiagnosticErrorListener {
+
+            @Override
+            public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet ambigAlts, ATNConfigSet configs) {
+                if (!REPORT_AMBIGUITIES) {
+                    return;
+                }
+
+                super.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, ambigAlts, configs);
+            }
+
+            @Override
+            public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, SimulatorState initialState) {
+                if (!REPORT_FULL_CONTEXT) {
+                    return;
+                }
+
+                super.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, initialState);
+            }
+
+            @Override
+            public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, SimulatorState acceptState) {
+                if (!REPORT_CONTEXT_SENSITIVITY) {
+                    return;
+                }
+
+                super.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, acceptState);
+            }
+
+            @Override
+            protected String getDecisionDescription(Parser recognizer, int decision) {
+                String format = "%d(%s)";
+                String ruleName = recognizer.getRuleNames()[recognizer.getATN().decisionToState.get(decision).ruleIndex];
+                return String.format(format, decision, ruleName);
+            }
+
+        }
+
+        protected static class FileExtensionFilenameFilter implements FilenameFilter {
+
+            private final String extension;
+
+            public FileExtensionFilenameFilter(String extension) {
+                if (!extension.startsWith(".")) {
+                    extension = '.' + extension;
+                }
+
+                this.extension = extension;
+            }
+
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.toLowerCase().endsWith(extension);
+            }
+
+        }
+
+        protected static class NonCachingLexerATNSimulator extends LexerATNSimulator {
+
+            public NonCachingLexerATNSimulator(Lexer recog, ATN atn) {
+                super(recog, atn);
+            }
+
+            @Override
+            protected DFAState addDFAState(ATNConfigSet configs) {
+                return null;
+            }
+
+        }
+
+        protected static class NonCachingParserATNSimulator extends ParserATNSimulator {
+
+            public NonCachingParserATNSimulator(Parser parser, ATN atn) {
+                super(parser, atn);
+            }
+
+            @NotNull
+            @Override
+            protected DFAState createDFAState(@NotNull ATNConfigSet configs) {
+                return new DFAState(configs, -1, -1);
+            }
+
+        }
+
+        protected static class NumberedThread extends Thread {
+            private final int threadNumber;
+
+            public NumberedThread(Runnable target, int threadNumber) {
+                super(target);
+                this.threadNumber = threadNumber;
+            }
+
+            public final int getThreadNumber() {
+                return threadNumber;
+            }
+
+        }
+
+        protected static class NumberedThreadFactory implements ThreadFactory {
+            private final AtomicInteger nextThread = new AtomicInteger();
+
+            @Override
+            public Thread newThread(Runnable r) {
+                int threadNumber = nextThread.getAndIncrement();
+                assert threadNumber < NUMBER_OF_THREADS;
+                return new NumberedThread(r, threadNumber);
+            }
+
+        }
+
+        protected static class ChecksumParseTreeListener implements ParseTreeListener {
+            private static final int VISIT_TERMINAL = 1;
+            private static final int VISIT_ERROR_NODE = 2;
+            private static final int ENTER_RULE = 3;
+            private static final int EXIT_RULE = 4;
+
+            private final Checksum checksum;
+
+            public ChecksumParseTreeListener(Checksum checksum) {
+                this.checksum = checksum;
+            }
+
+            @Override
+            public void visitTerminal(TerminalNode node) {
+                checksum.update(VISIT_TERMINAL);
+                updateChecksum(checksum, node.getSymbol());
+            }
+
+            @Override
+            public void visitErrorNode(ErrorNode node) {
+                checksum.update(VISIT_ERROR_NODE);
+                updateChecksum(checksum, node.getSymbol());
+            }
+
+            @Override
+            public void enterEveryRule(ParserRuleContext ctx) {
+                checksum.update(ENTER_RULE);
+                updateChecksum(checksum, ctx.getRuleIndex());
+                updateChecksum(checksum, ctx.getStart());
+            }
+
+            @Override
+            public void exitEveryRule(ParserRuleContext ctx) {
+                checksum.update(EXIT_RULE);
+                updateChecksum(checksum, ctx.getRuleIndex());
+                updateChecksum(checksum, ctx.getStop());
+            }
+
+        }
+    }
+}
