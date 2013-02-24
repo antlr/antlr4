@@ -98,7 +98,7 @@ namespace Antlr4.Runtime.Dfa
 
         public virtual DFAState AddState(DFAState state)
         {
-            state.stateNumber = Interlocked.Increment(ref nextStateNumber);
+            state.stateNumber = Interlocked.Increment(ref nextStateNumber) - 1;
             return states.GetOrAdd(state, state);
         }
 
