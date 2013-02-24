@@ -323,18 +323,17 @@ namespace Antlr4.Runtime.Test
             assert directory.isDirectory();
 
             File[] sources = directory.listFiles(filter);
-            for (File file : sources) {
+            foreach (File file in sources) {
                 try {
                     CharStream input = new ANTLRFileStream(file.getAbsolutePath(), encoding);
                     result.add(input);
                 } catch (IOException ex) {
-
                 }
             }
 
             if (recursive) {
                 File[] children = directory.listFiles();
-                for (File child : children) {
+                foreach (File child in children) {
                     if (child.isDirectory()) {
                         loadSources(child, filter, encoding, true, result);
                     }
@@ -351,7 +350,7 @@ namespace Antlr4.Runtime.Test
 
             Collection<Future<Integer>> results = new ArrayList<Future<Integer>>();
             ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS, new NumberedThreadFactory());
-            for (CharStream input : sources) {
+            foreach (CharStream input in sources) {
                 input.seek(0);
                 inputSize += input.size();
                 Future<Integer> futureChecksum = executorService.submit(new Callable<Integer>() {
@@ -374,7 +373,7 @@ namespace Antlr4.Runtime.Test
             }
 
             Checksum checksum = new CRC32();
-            for (Future<Integer> future : results) {
+            foreach (Future<Integer> future in results) {
                 int value = 0;
                 try {
                     value = future.get();
@@ -413,7 +412,7 @@ namespace Antlr4.Runtime.Test
                         }
 
                         states += dfa.states.size();
-                        for (DFAState state : dfa.states.values()) {
+                        foreach (DFAState state in dfa.states.values()) {
                             configs += state.configs.size();
                             uniqueConfigs.addAll(state.configs);
                         }
@@ -441,7 +440,7 @@ namespace Antlr4.Runtime.Test
                         }
 
                         states += dfa.states.size();
-                        for (DFAState state : dfa.states.values()) {
+                        foreach (DFAState state in dfa.states.values()) {
                             configs += state.configs.size();
                             uniqueConfigs.addAll(state.configs);
                         }
@@ -463,14 +462,14 @@ namespace Antlr4.Runtime.Test
                     }
 
                     if (SHOW_CONFIG_STATS) {
-                        for (DFAState state : dfa.states.keySet()) {
+                        foreach (DFAState state in dfa.states.keySet()) {
                             if (state.configs.size() >= contextsInDFAState.length) {
                                 contextsInDFAState = Arrays.copyOf(contextsInDFAState, state.configs.size() + 1);
                             }
 
                             if (state.isAcceptState) {
                                 bool hasGlobal = false;
-                                for (ATNConfig config : state.configs) {
+                                foreach (ATNConfig config in state.configs) {
                                     if (config.getReachesIntoOuterContext()) {
                                         globalConfigCount++;
                                         hasGlobal = true;
@@ -491,8 +490,8 @@ namespace Antlr4.Runtime.Test
                     }
 
                     if (EXPORT_LARGEST_CONFIG_CONTEXTS) {
-                        for (DFAState state : dfa.states.keySet()) {
-                            for (ATNConfig config : state.configs) {
+                        foreach (DFAState state in dfa.states.keySet()) {
+                            foreach (ATNConfig config in state.configs) {
                                 String configOutput = config.toDotString();
                                 if (configOutput.length() <= configOutputSize) {
                                     continue;
@@ -656,7 +655,7 @@ namespace Antlr4.Runtime.Test
                             tokenCount.addAndGet(tokens.size());
 
                             if (COMPUTE_CHECKSUM) {
-                                for (Token token : tokens.getTokens()) {
+                                foreach (Token token in tokens.getTokens()) {
                                     updateChecksum(checksum, token);
                                 }
                             }
