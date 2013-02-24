@@ -33,7 +33,7 @@
 ParserFile(file, parser, namedActions) ::= <<
 // Generated from <file.grammarFileName> by ANTLR <file.ANTLRVersion>
 <if(file.genPackage)>
-package <file.genPackage>;
+namespace <file.genPackage> {
 <endif>
 <namedActions.header>
 import org.antlr.v4.runtime.atn.*;
@@ -46,12 +46,15 @@ import java.util.Iterator;
 import java.util.ArrayList;
 
 <parser>
+<if(file.genPackage)>
+} // namespace <file.genPackage>
+<endif>
 >>
 
 ListenerFile(file, header) ::= <<
 // Generated from <file.grammarFileName> by ANTLR <file.ANTLRVersion>
 <if(file.genPackage)>
-package <file.genPackage>;
+namespace <file.genPackage> {
 <endif>
 <header>
 import org.antlr.v4.runtime.tree.*;
@@ -62,12 +65,15 @@ public interface <file.grammarName>Listener extends ParseTreeListener {
 void Enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);
 void Exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
 }
+<if(file.genPackage)>
+} // namespace <file.genPackage>
+<endif>
 >>
 
 BaseListenerFile(file, header) ::= <<
 // Generated from <file.grammarFileName> by ANTLR <file.ANTLRVersion>
 <if(file.genPackage)>
-package <file.genPackage>;
+namespace <file.genPackage> {
 <endif>
 <header>
 
@@ -86,12 +92,15 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 	@Override public void VisitTerminal(TerminalNode node) { }
 	@Override public void VisitErrorNode(ErrorNode node) { }
 }
+<if(file.genPackage)>
+} // namespace <file.genPackage>
+<endif>
 >>
 
 VisitorFile(file, header) ::= <<
 // Generated from <file.grammarFileName> by ANTLR <file.ANTLRVersion>
 <if(file.genPackage)>
-package <file.genPackage>;
+namespace <file.genPackage> {
 <endif>
 <header>
 import org.antlr.v4.runtime.tree.*;
@@ -101,12 +110,15 @@ public interface <file.grammarName>Visitor\<Result> extends ParseTreeVisitor\<Re
 	<file.visitorNames:{lname |
 Result Visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
 }
+<if(file.genPackage)>
+} // namespace <file.genPackage>
+<endif>
 >>
 
 BaseVisitorFile(file, header) ::= <<
 // Generated from <file.grammarFileName> by ANTLR <file.ANTLRVersion>
 <if(file.genPackage)>
-package <file.genPackage>;
+namespace <file.genPackage> {
 <endif>
 <header>
 import org.antlr.v4.runtime.tree.*;
@@ -117,6 +129,9 @@ public class <file.grammarName>BaseVisitor\<Result> extends AbstractParseTreeVis
 	<file.visitorNames:{lname |
 @Override public Result Visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return VisitChildren(ctx); \}}; separator="\n">
 }
+<if(file.genPackage)>
+} // namespace <file.genPackage>
+<endif>
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
@@ -794,7 +809,7 @@ _prevctx = _localctx;
 LexerFile(file, lexer, namedActions) ::= <<
 // Generated from <file.grammarFileName> by ANTLR <file.ANTLRVersion>
 <if(file.genPackage)>
-package <file.genPackage>;
+namespace <file.genPackage> {
 <endif>
 <namedActions.header>
 import org.antlr.v4.runtime.Lexer;
@@ -807,6 +822,9 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
 
 <lexer>
+<if(file.genPackage)>
+} // namespace <file.genPackage>
+<endif>
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
