@@ -8,6 +8,7 @@ using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Debug = System.Diagnostics.Debug;
 
 namespace Antlr4.Runtime.Test
 {
@@ -320,7 +321,7 @@ namespace Antlr4.Runtime.Test
         }
 
         protected void loadSources(File directory, FilenameFilter filter, String encoding, bool recursive, Collection<CharStream> result) {
-            assert directory.isDirectory();
+            Debug.Assert(directory.isDirectory());
 
             File[] sources = directory.listFiles(filter);
             foreach (File file in sources) {
@@ -642,7 +643,7 @@ namespace Antlr4.Runtime.Test
             public override int parseFile(CharStream input, int thread) {
                 Checksum checksum = new CRC32();
 
-                assert thread >= 0 && thread < NUMBER_OF_THREADS;
+                Debug.Assert(thread >= 0 && thread < NUMBER_OF_THREADS);
 
                 try {
                     ParseTreeListener listener = sharedListeners[thread];
@@ -924,7 +925,7 @@ namespace Antlr4.Runtime.Test
 
             public override Thread newThread(Runnable r) {
                 int threadNumber = nextThread.getAndIncrement();
-                assert threadNumber < NUMBER_OF_THREADS;
+                Debug.Assert(threadNumber < NUMBER_OF_THREADS);
                 return new NumberedThread(r, threadNumber);
             }
 
