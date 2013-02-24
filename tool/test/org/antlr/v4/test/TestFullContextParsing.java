@@ -51,7 +51,7 @@ public class TestFullContextParsing extends BaseTest {
 			"@after {dumpDFA();}\n" +
 			"    : ID | ID {;} ;\n" +
 			"ID : 'a'..'z'+ ;\n"+
-			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
+			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								   "abc", true);
 		String expecting =
@@ -72,7 +72,7 @@ public class TestFullContextParsing extends BaseTest {
 			"e : INT | ;\n" +
 			"ID : 'a'..'z'+ ;\n"+
 			"INT : '0'..'9'+ ;\n"+
-			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
+			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								   "$ 34 abc", true);
 		String expecting =
@@ -111,7 +111,7 @@ public class TestFullContextParsing extends BaseTest {
 			"e : INT | ;\n" +
 			"ID : 'a'..'z'+ ;\n"+
 			"INT : '0'..'9'+ ;\n"+
-			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
+			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								   "$ 34 abc @ 34 abc", true);
 		String expecting =
@@ -142,7 +142,7 @@ public class TestFullContextParsing extends BaseTest {
 			"e : INT | ;\n" +
 			"ID : 'a'..'z'+ ;\n"+
 			"INT : '0'..'9'+ ;\n"+
-			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
+			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								   "34 abc", true);
 		String expecting =
@@ -169,7 +169,7 @@ public class TestFullContextParsing extends BaseTest {
 			"    | 'return'\n" +
 			"    ;" +
 			"ID : 'a'..'z'+ ;\n"+
-			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
+			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
 		String input = "{ if x then return }";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								   input, true);
@@ -336,7 +336,7 @@ public class TestFullContextParsing extends BaseTest {
 			"    | ID\n" +
 			"    ;\n" +
 			"ID  : [a-z]+ ;\n" +
-			"WS  : [ \r\n\t]+ -> skip ;\n";
+			"WS  : [ \\r\\n\\t]+ -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "prog", "a@", true);
 		assertEquals("alt 1\n", found);

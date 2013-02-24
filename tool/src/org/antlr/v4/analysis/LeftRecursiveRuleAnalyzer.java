@@ -108,7 +108,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 		// use codegen to get correct language templates; that's it though
 		CodeGenerator gen = new CodeGenerator(tool, null, language);
-		codegenTemplates = gen.templates;
+		codegenTemplates = gen.getTemplates();
 	}
 
 	@Override

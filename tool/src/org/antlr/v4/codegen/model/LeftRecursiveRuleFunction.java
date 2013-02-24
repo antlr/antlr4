@@ -54,7 +54,7 @@ public class LeftRecursiveRuleFunction extends RuleFunction {
 			GrammarAST rrefAST = (GrammarAST)idAST.getParent().getChild(1);
 			if ( rrefAST.getType() == ANTLRParser.RULE_REF ) {
 				Rule targetRule = factory.getGrammar().getRule(rrefAST.getText());
-				String ctxName = gen.target.getRuleFunctionContextStructName(targetRule);
+				String ctxName = gen.getTarget().getRuleFunctionContextStructName(targetRule);
 				RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
 				StructDecl struct = ruleCtx;
 				if ( altLabelCtxs!=null ) {

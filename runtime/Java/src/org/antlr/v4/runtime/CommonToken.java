@@ -39,6 +39,9 @@ import java.io.Serializable;
 public class CommonToken implements WritableToken, Serializable {
 	private static final long serialVersionUID = -6708843461296520577L;
 
+	protected static final Tuple2<TokenSource<?>, CharStream> EMPTY_SOURCE =
+		Tuple.<TokenSource<?>, CharStream>create(null, null);
+
 	protected int type;
 	protected int line;
 	protected int charPositionInLine = -1; // set to invalid position
@@ -81,6 +84,7 @@ public class CommonToken implements WritableToken, Serializable {
 		this.type = type;
 		this.channel = DEFAULT_CHANNEL;
 		this.text = text;
+		this.source = EMPTY_SOURCE;
 	}
 
 	public CommonToken(Token oldToken) {
@@ -214,9 +218,9 @@ public class CommonToken implements WritableToken, Serializable {
 		}
 		String txt = getText();
 		if ( txt!=null ) {
-			txt = txt.replaceAll("\n","\\\\n");
-			txt = txt.replaceAll("\r","\\\\r");
-			txt = txt.replaceAll("\t","\\\\t");
+			txt = txt.replace("\n","\\n");
+			txt = txt.replace("\r","\\r");
+			txt = txt.replace("\t","\\t");
 		}
 		else {
 			txt = "<no text>";

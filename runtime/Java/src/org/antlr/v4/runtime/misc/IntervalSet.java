@@ -141,14 +141,17 @@ public class IntervalSet implements IntSet {
 				iter.set(bigger);
 				// make sure we didn't just create an interval that
 				// should be merged with next interval in list
-				if ( iter.hasNext() ) {
+				while ( iter.hasNext() ) {
 					Interval next = iter.next();
-					if ( bigger.adjacent(next)||!bigger.disjoint(next) ) {
-						// if we bump up against or overlap next, merge
-						iter.remove();   // remove this one
-						iter.previous(); // move backwards to what we just set
-						iter.set(bigger.union(next)); // set to 3 merged ones
+					if ( !bigger.adjacent(next) && bigger.disjoint(next) ) {
+						break;
 					}
+
+					// if we bump up against or overlap next, merge
+					iter.remove();   // remove this one
+					iter.previous(); // move backwards to what we just set
+					iter.set(bigger.union(next)); // set to 3 merged ones
+					iter.next(); // first call to next after previous duplicates the result
 				}
 				return;
 			}

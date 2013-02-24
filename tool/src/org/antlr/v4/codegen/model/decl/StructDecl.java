@@ -58,7 +58,7 @@ public class StructDecl extends Decl {
 	@ModelElement public List<OutputModelObject> extensionMembers;
 
 	public StructDecl(OutputModelFactory factory, Rule r) {
-		super(factory, factory.getGenerator().target.getRuleFunctionContextStructName(r));
+		super(factory, factory.getGenerator().getTarget().getRuleFunctionContextStructName(r));
 		addDispatchMethods(r);
 		derivedFromName = r.name;
 		provideCopyFrom = r.hasAltSpecificContexts();

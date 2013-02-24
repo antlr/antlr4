@@ -160,6 +160,7 @@ public abstract class BaseTest {
 	protected ATN createATN(Grammar g, boolean useSerializer) {
 		if ( g.atn==null ) {
 			semanticProcess(g);
+			assertEquals(0, g.tool.getNumErrors());
 
 			ParserATNFactory f;
 			if ( g.isLexer() ) {
@@ -170,6 +171,7 @@ public abstract class BaseTest {
 			}
 
 			g.atn = f.createATN();
+			assertEquals(0, g.tool.getNumErrors());
 		}
 
 		ATN atn = g.atn;
@@ -737,9 +739,9 @@ public abstract class BaseTest {
             String actual = equeue.toString(g != null ? g.tool : new Tool());
 			System.err.println(actual);
 			String msg = input;
-			msg = msg.replaceAll("\n","\\\\n");
-			msg = msg.replaceAll("\r","\\\\r");
-			msg = msg.replaceAll("\t","\\\\t");
+			msg = msg.replace("\n","\\n");
+			msg = msg.replace("\r","\\r");
+			msg = msg.replace("\t","\\t");
 
             assertEquals("error in: "+msg,expect,actual);
         }

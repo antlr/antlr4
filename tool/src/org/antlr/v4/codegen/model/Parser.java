@@ -83,13 +83,13 @@ public class Parser extends OutputModelObject {
 			if ( tokenNames[i].charAt(0)=='\'' ) {
 				boolean addQuotes = false;
 				tokenNames[i] =
-					gen.target.getTargetStringLiteralFromANTLRStringLiteral(gen,
+					gen.getTarget().getTargetStringLiteralFromANTLRStringLiteral(gen,
 																			tokenNames[i],
 																			addQuotes);
 				tokenNames[i] = "\"'"+tokenNames[i]+"'\"";
 			}
 			else {
-				tokenNames[i] = gen.target.getTargetStringLiteralFromString(tokenNames[i], true);
+				tokenNames[i] = gen.getTarget().getTargetStringLiteralFromString(tokenNames[i], true);
 			}
 		}
 		ruleNames = g.rules.keySet();

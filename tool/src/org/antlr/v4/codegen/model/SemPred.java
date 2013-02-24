@@ -55,7 +55,7 @@ public class SemPred extends Action {
 		if (predicate.startsWith("{") && predicate.endsWith("}?")) {
 			predicate = predicate.substring(1, predicate.length() - 2);
 		}
-		predicate = gen.target.getTargetStringLiteralFromString(predicate);
+		predicate = gen.getTarget().getTargetStringLiteralFromString(predicate);
 
 		if ( failNode==null ) return;
 
@@ -67,7 +67,7 @@ public class SemPred extends Action {
 														  failActionNode);
 		}
 		else {
-			msg = gen.target.getTargetStringLiteralFromANTLRStringLiteral(gen,
+			msg = gen.getTarget().getTargetStringLiteralFromANTLRStringLiteral(gen,
 																		  failNode.getText(),
 																		  true);
 		}

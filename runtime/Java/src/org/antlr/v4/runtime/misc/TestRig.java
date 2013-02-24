@@ -140,7 +140,9 @@ public class TestRig {
 
 	public static void main(String[] args) throws Exception {
 		TestRig testRig = new TestRig(args);
-		testRig.process();
+ 		if(args.length >= 2) {
+			testRig.process();
+		}
 	}
 
 	public void process() throws Exception {
