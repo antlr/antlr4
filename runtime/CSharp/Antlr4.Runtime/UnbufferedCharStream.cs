@@ -288,7 +288,7 @@ namespace Antlr4.Runtime
             {
                 return IntStreamConstants.Eof;
             }
-            int c = data[index];
+            char c = data[index];
             if (c == (char)IntStreamConstants.Eof)
             {
                 return IntStreamConstants.Eof;

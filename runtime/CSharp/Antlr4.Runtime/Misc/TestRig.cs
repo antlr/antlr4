@@ -174,7 +174,10 @@ namespace Antlr4.Runtime.Misc
         public static void Main(string[] args)
         {
             Antlr4.Runtime.Misc.TestRig testRig = new Antlr4.Runtime.Misc.TestRig(args);
-            testRig.Process();
+            if (args.Length >= 2)
+            {
+                testRig.Process();
+            }
         }
 
         /// <exception cref="System.Exception"></exception>
