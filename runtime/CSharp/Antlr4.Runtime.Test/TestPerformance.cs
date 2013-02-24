@@ -12,12 +12,12 @@ namespace Antlr4.Runtime.Test
          * Parse all java files under this package within the JDK_SOURCE_ROOT
          * (environment variable or property defined on the Java command line).
          */
-        private static final String TOP_PACKAGE = "java.lang";
+        private const String TOP_PACKAGE = "java.lang";
         /**
          * {@code true} to load java files from sub-packages of
          * {@link #TOP_PACKAGE}.
          */
-        private static final boolean RECURSIVE = true;
+        private const bool RECURSIVE = true;
 
         /**
          * {@code true} to use the Java grammar with expressions in the v4
@@ -25,60 +25,60 @@ namespace Antlr4.Runtime.Test
          * grammar (Java.g4). In either case, the grammar is renamed in the
          * temporary directory to Java.g4 before compiling.
          */
-        private static final boolean USE_LR_GRAMMAR = true;
+        private const bool USE_LR_GRAMMAR = true;
         /**
          * {@code true} to specify the {@code -Xforce-atn} option when generating
          * the grammar, forcing all decisions in {@code JavaParser} to be handled by
          * {@link ParserATNSimulator#adaptivePredict}.
          */
-        private static final boolean FORCE_ATN = false;
+        private const bool FORCE_ATN = false;
         /**
          * {@code true} to specify the {@code -atn} option when generating the
          * grammar. This will cause ANTLR to export the ATN for each decision as a
          * DOT (GraphViz) file.
          */
-        private static final boolean EXPORT_ATN_GRAPHS = true;
+        private const bool EXPORT_ATN_GRAPHS = true;
         /**
          * {@code true} to specify the {@code -XdbgST} option when generating the
          * grammar.
          */
-        private static final boolean DEBUG_TEMPLATES = false;
+        private const bool DEBUG_TEMPLATES = false;
         /**
          * {@code true} to specify the {@code -XdbgSTWait} option when generating the
          * grammar.
          */
-        private static final boolean DEBUG_TEMPLATES_WAIT = DEBUG_TEMPLATES;
+        private const bool DEBUG_TEMPLATES_WAIT = DEBUG_TEMPLATES;
         /**
          * {@code true} to delete temporary (generated and compiled) files when the
          * test completes.
          */
-        private static final boolean DELETE_TEMP_FILES = true;
+        private const bool DELETE_TEMP_FILES = true;
 
         /**
          * {@code true} to call {@link System#gc} and then wait for 5 seconds at the
          * end of the test to make it easier for a profiler to grab a heap dump at
          * the end of the test run.
          */
-        private static final boolean PAUSE_FOR_HEAP_DUMP = false;
+        private const bool PAUSE_FOR_HEAP_DUMP = false;
 
         /**
          * Parse each file with {@code JavaParser.compilationUnit}.
          */
-        private static final boolean RUN_PARSER = true;
+        private const bool RUN_PARSER = true;
         /**
          * {@code true} to use {@link BailErrorStrategy}, {@code false} to use
          * {@link DefaultErrorStrategy}.
          */
-        private static final boolean BAIL_ON_ERROR = true;
+        private const bool BAIL_ON_ERROR = true;
         /**
          * {@code true} to compute a checksum for verifying consistency across
          * optimizations and multiple passes.
          */
-        private static final boolean COMPUTE_CHECKSUM = true;
+        private const bool COMPUTE_CHECKSUM = true;
         /**
          * This value is passed to {@link Parser#setBuildParseTree}.
          */
-        private static final boolean BUILD_PARSE_TREES = false;
+        private const bool BUILD_PARSE_TREES = false;
         /**
          * Use
          * {@link ParseTreeWalker#DEFAULT}{@code .}{@link ParseTreeWalker#walk walk}
@@ -87,9 +87,9 @@ namespace Antlr4.Runtime.Test
          * will instead be called during the parsing process via
          * {@link Parser#addParseListener}.
          */
-        private static final boolean BLANK_LISTENER = false;
+        private const bool BLANK_LISTENER = false;
 
-        private static final boolean EXPORT_LARGEST_CONFIG_CONTEXTS = false;
+        private const bool EXPORT_LARGEST_CONFIG_CONTEXTS = false;
 
         /**
          * Shows the number of {@link DFAState} and {@link ATNConfig} instances in
@@ -98,57 +98,57 @@ namespace Antlr4.Runtime.Test
          * will only apply to one file (the last file if {@link #NUMBER_OF_THREADS}
          * is 0, otherwise the last file which was parsed on the first thread).
          */
-        private static final boolean SHOW_DFA_STATE_STATS = true;
+        private const bool SHOW_DFA_STATE_STATS = true;
 
-        private static final boolean ENABLE_LEXER_DFA = true;
+        private const bool ENABLE_LEXER_DFA = true;
 
-        private static final boolean ENABLE_PARSER_DFA = true;
+        private const bool ENABLE_PARSER_DFA = true;
 
-        private static final PredictionMode PREDICTION_MODE = PredictionMode.LL;
-        private static final boolean FORCE_GLOBAL_CONTEXT = false;
-        private static final boolean TRY_LOCAL_CONTEXT_FIRST = true;
-        private static final boolean OPTIMIZE_LL1 = true;
-        private static final boolean OPTIMIZE_UNIQUE_CLOSURE = true;
-        private static final boolean OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS = false;
-        private static final boolean OPTIMIZE_TAIL_CALLS = true;
-        private static final boolean TAIL_CALL_PRESERVES_SLL = true;
-        private static final boolean TREAT_SLLK1_CONFLICT_AS_AMBIGUITY = false;
+        private static readonly PredictionMode PREDICTION_MODE = PredictionMode.LL;
+        private const bool FORCE_GLOBAL_CONTEXT = false;
+        private const bool TRY_LOCAL_CONTEXT_FIRST = true;
+        private const bool OPTIMIZE_LL1 = true;
+        private const bool OPTIMIZE_UNIQUE_CLOSURE = true;
+        private const bool OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS = false;
+        private const bool OPTIMIZE_TAIL_CALLS = true;
+        private const bool TAIL_CALL_PRESERVES_SLL = true;
+        private const bool TREAT_SLLK1_CONFLICT_AS_AMBIGUITY = false;
 
-        private static final boolean TWO_STAGE_PARSING = true;
+        private const bool TWO_STAGE_PARSING = true;
 
-        private static final boolean SHOW_CONFIG_STATS = false;
+        private const bool SHOW_CONFIG_STATS = false;
 
-        private static final boolean REPORT_SYNTAX_ERRORS = true;
-        private static final boolean REPORT_AMBIGUITIES = false;
-        private static final boolean REPORT_FULL_CONTEXT = false;
-        private static final boolean REPORT_CONTEXT_SENSITIVITY = REPORT_FULL_CONTEXT;
+        private const bool REPORT_SYNTAX_ERRORS = true;
+        private const bool REPORT_AMBIGUITIES = false;
+        private const bool REPORT_FULL_CONTEXT = false;
+        private const bool REPORT_CONTEXT_SENSITIVITY = REPORT_FULL_CONTEXT;
 
         /**
          * If {@code true}, a single {@code JavaLexer} will be used, and
          * {@link Lexer#setInputStream} will be called to initialize it for each
          * source file. Otherwise, a new instance will be created for each file.
          */
-        private static final boolean REUSE_LEXER = false;
+        private const bool REUSE_LEXER = false;
         /**
          * If {@code true}, a single DFA will be used for lexing which is shared
          * across all threads and files. Otherwise, each file will be lexed with its
          * own DFA which is accomplished by creating one ATN instance per thread and
          * clearing its DFA cache before lexing each file.
          */
-        private static final boolean REUSE_LEXER_DFA = true;
+        private const bool REUSE_LEXER_DFA = true;
         /**
          * If {@code true}, a single {@code JavaParser} will be used, and
          * {@link Parser#setInputStream} will be called to initialize it for each
          * source file. Otherwise, a new instance will be created for each file.
          */
-        private static final boolean REUSE_PARSER = false;
+        private const bool REUSE_PARSER = false;
         /**
          * If {@code true}, a single DFA will be used for parsing which is shared
          * across all threads and files. Otherwise, each file will be parsed with
          * its own DFA which is accomplished by creating one ATN instance per thread
          * and clearing its DFA cache before parsing each file.
          */
-        private static final boolean REUSE_PARSER_DFA = true;
+        private const bool REUSE_PARSER_DFA = true;
         /**
          * If {@code true}, the shared lexer and parser are reset after each pass.
          * If {@code false}, all passes after the first will be fully "warmed up",
@@ -156,26 +156,26 @@ namespace Antlr4.Runtime.Test
          * but it will not distinguish bytecode load/JIT time from warm-up time
          * during the first pass.
          */
-        private static final boolean CLEAR_DFA = false;
+        private const bool CLEAR_DFA = false;
         /**
          * Total number of passes to make over the source.
          */
-        private static final int PASSES = 4;
+        private const int PASSES = 4;
 
         /**
          * Number of parser threads to use.
          */
-        private static final int NUMBER_OF_THREADS = 1;
+        private const int NUMBER_OF_THREADS = 1;
 
-        private static final Lexer[] sharedLexers = new Lexer[NUMBER_OF_THREADS];
-        private static final ATN[] sharedLexerATNs = new ATN[NUMBER_OF_THREADS];
+        private static readonly Lexer[] sharedLexers = new Lexer[NUMBER_OF_THREADS];
+        private static readonly ATN[] sharedLexerATNs = new ATN[NUMBER_OF_THREADS];
 
-        private static final Parser[] sharedParsers = new Parser[NUMBER_OF_THREADS];
-        private static final ATN[] sharedParserATNs = new ATN[NUMBER_OF_THREADS];
+        private static readonly Parser[] sharedParsers = new Parser[NUMBER_OF_THREADS];
+        private static readonly ATN[] sharedParserATNs = new ATN[NUMBER_OF_THREADS];
 
-        private static final ParseTreeListener[] sharedListeners = new ParseTreeListener[NUMBER_OF_THREADS];
+        private static readonly ParseTreeListener[] sharedListeners = new ParseTreeListener[NUMBER_OF_THREADS];
 
-        private final AtomicInteger tokenCount = new AtomicInteger();
+        private readonly AtomicInteger tokenCount = new AtomicInteger();
         private int currentPass;
 
         @Test
@@ -305,17 +305,17 @@ namespace Antlr4.Runtime.Test
             parseSources(factory, sources);
         }
 
-        protected Collection<CharStream> loadSources(File directory, FilenameFilter filter, boolean recursive) {
+        protected Collection<CharStream> loadSources(File directory, FilenameFilter filter, bool recursive) {
             return loadSources(directory, filter, null, recursive);
         }
 
-        protected Collection<CharStream> loadSources(File directory, FilenameFilter filter, String encoding, boolean recursive) {
+        protected Collection<CharStream> loadSources(File directory, FilenameFilter filter, String encoding, bool recursive) {
             Collection<CharStream> result = new ArrayList<CharStream>();
             loadSources(directory, filter, encoding, recursive, result);
             return result;
         }
 
-        protected void loadSources(File directory, FilenameFilter filter, String encoding, boolean recursive, Collection<CharStream> result) {
+        protected void loadSources(File directory, FilenameFilter filter, String encoding, bool recursive, Collection<CharStream> result) {
             assert directory.isDirectory();
 
             File[] sources = directory.listFiles(filter);
@@ -467,7 +467,7 @@ namespace Antlr4.Runtime.Test
                             }
 
                             if (state.isAcceptState) {
-                                boolean hasGlobal = false;
+                                bool hasGlobal = false;
                                 for (ATNConfig config : state.configs) {
                                     if (config.getReachesIntoOuterContext()) {
                                         globalConfigCount++;
@@ -517,7 +517,7 @@ namespace Antlr4.Runtime.Test
             }
         }
 
-        protected void compileJavaParser(boolean leftRecursive) throws IOException {
+        protected void compileJavaParser(bool leftRecursive) throws IOException {
             String grammarFileName = "Java.g4";
             String sourceName = leftRecursive ? "Java-LR.g4" : "Java.g4";
             String body = load(sourceName, null);
@@ -537,7 +537,7 @@ namespace Antlr4.Runtime.Test
             }
             extraOptions.add("-visitor");
             String[] extraOptionsArray = extraOptions.toArray(new String[extraOptions.size()]);
-            boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", true, extraOptionsArray);
+            bool success = rawGenerateAndBuildRecognizer(grammarFileName, body, "JavaParser", "JavaLexer", true, extraOptionsArray);
             assertTrue(success);
         }
 
@@ -869,7 +869,7 @@ namespace Antlr4.Runtime.Test
             }
 
             @Override
-            public boolean accept(File dir, String name) {
+            public bool accept(File dir, String name) {
                 return name.toLowerCase().endsWith(extension);
             }
 
@@ -929,10 +929,10 @@ namespace Antlr4.Runtime.Test
         }
 
         protected static class ChecksumParseTreeListener implements ParseTreeListener {
-            private static final int VISIT_TERMINAL = 1;
-            private static final int VISIT_ERROR_NODE = 2;
-            private static final int ENTER_RULE = 3;
-            private static final int EXIT_RULE = 4;
+            private const int VISIT_TERMINAL = 1;
+            private const int VISIT_ERROR_NODE = 2;
+            private const int ENTER_RULE = 3;
+            private const int EXIT_RULE = 4;
 
             private final Checksum checksum;
 
