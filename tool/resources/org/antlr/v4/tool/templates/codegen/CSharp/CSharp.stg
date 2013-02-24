@@ -718,9 +718,10 @@ StructDecl(struct,attrs,getters,dispatchMethods,interfaces,extensionMembers,
 public class <struct.name> : <superClass><if(interfaces)>, <interfaces; separator=", "><endif> {
 	<attrs:{a | <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	<if(struct.ctorAttrs)>public <struct.name>(ParserRuleContext parent, int invokingState) { super(parent, invokingState); }<endif>
-	public <struct.name>(ParserRuleContext parent, int invokingState<struct.ctorAttrs:{a | , <a>}>) {
-		super(parent, invokingState);
+	<if(struct.ctorAttrs)>public <struct.name>(ParserRuleContext parent, int invokingState) : base(parent, invokingState) { }<endif>
+	public <struct.name>(ParserRuleContext parent, int invokingState<struct.ctorAttrs:{a | , <a>}>)
+		: base(parent, invokingState)
+	{
 		<struct.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
 	}
 	public override int GetRuleIndex() { return RULE_<struct.derivedFromName>; }
