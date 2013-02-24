@@ -205,7 +205,7 @@ namespace Antlr4.Runtime.Test
 
             Collection<CharStream> sources = loadSources(directory, new FileExtensionFilenameFilter(".java"), RECURSIVE);
 
-            System.out.print(getOptionsDescription(TOP_PACKAGE));
+            Console.Out.Write(getOptionsDescription(TOP_PACKAGE));
 
             currentPass = 0;
             parse1(factory, sources);
@@ -230,7 +230,7 @@ namespace Antlr4.Runtime.Test
             sources.clear();
             if (PAUSE_FOR_HEAP_DUMP) {
                 System.gc();
-                System.out.println("Pausing before application exit.");
+                Console.Out.WriteLine("Pausing before application exit.");
                 try {
                     Thread.sleep(4000);
                 } catch (InterruptedException ex) {
@@ -357,7 +357,7 @@ namespace Antlr4.Runtime.Test
                 Future<Integer> futureChecksum = executorService.submit(new Callable<Integer>() {
                     public override Integer call() {
                         // this incurred a great deal of overhead and was causing significant variations in performance results.
-                        //System.out.format("Parsing file %s\n", input.getSourceName());
+                        //Console.Out.WriteLine("Parsing file {0}", input.getSourceName());
                         try {
                             return factory.parseFile(input, ((NumberedThread)Thread.currentThread()).getThreadNumber());
                         } catch (IllegalStateException ex) {
@@ -390,7 +390,7 @@ namespace Antlr4.Runtime.Test
             executorService.shutdown();
             executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
-            System.out.format("Total parse time for %d files (%d KB, %d tokens, checksum 0x%8X): %dms%n",
+            Console.Out.WriteLine("Total parse time for {0} files ({1} KB, {2} tokens, checksum 0x{3:8X}): {4}ms",
                               sources.size(),
                               inputSize / 1024,
                               tokenCount.get(),
@@ -419,7 +419,7 @@ namespace Antlr4.Runtime.Test
                         }
                     }
 
-                    System.out.format("There are %d lexer DFAState instances, %d configs (%d unique), %d prediction contexts.%n", states, configs, uniqueConfigs.size(), lexerInterpreter.atn.getContextCacheSize());
+                    Console.Out.WriteLine("There are {0} lexer DFAState instances, {1} configs ({2} unique), {3} prediction contexts.", states, configs, uniqueConfigs.size(), lexerInterpreter.atn.getContextCacheSize());
                 }
             }
 
@@ -447,7 +447,7 @@ namespace Antlr4.Runtime.Test
                         }
                     }
 
-                    System.out.format("There are %d parser DFAState instances, %d configs (%d unique), %d prediction contexts.%n", states, configs, uniqueConfigs.size(), interpreter.atn.getContextCacheSize());
+                    Console.Out.WriteLine("There are {0} parser DFAState instances, {1} configs ({2} unique), {3} prediction contexts.", states, configs, uniqueConfigs.size(), interpreter.atn.getContextCacheSize());
                 }
 
                 int localDfaCount = 0;
@@ -506,12 +506,12 @@ namespace Antlr4.Runtime.Test
                 }
 
                 if (SHOW_CONFIG_STATS && currentPass == 0) {
-                    System.out.format("  DFA accept states: %d total, %d with only local context, %d with a global context%n", localDfaCount + globalDfaCount, localDfaCount, globalDfaCount);
-                    System.out.format("  Config stats: %d total, %d local, %d global%n", localConfigCount + globalConfigCount, localConfigCount, globalConfigCount);
+                    Console.Out.WriteLine("  DFA accept states: {0} total, {1} with only local context, {2} with a global context", localDfaCount + globalDfaCount, localDfaCount, globalDfaCount);
+                    Console.Out.WriteLine("  Config stats: {0} total, {1} local, {2} global", localConfigCount + globalConfigCount, localConfigCount, globalConfigCount);
                     if (SHOW_DFA_STATE_STATS) {
                         for (int i = 0; i < contextsInDFAState.length; i++) {
                             if (contextsInDFAState[i] != 0) {
-                                System.out.format("  %d configs = %d%n", i, contextsInDFAState[i]);
+                                Console.Out.WriteLine("  {0} configs = {1}", i, contextsInDFAState[i]);
                             }
                         }
                     }
@@ -725,7 +725,7 @@ namespace Antlr4.Runtime.Test
 
                                 String sourceName = tokens.getSourceName();
                                 sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName+": " : "";
-                                System.err.println(sourceName+"Forced to retry with full context.");
+                                Console.Error.WriteLine(sourceName+"Forced to retry with full context.");
 
                                 if (!(ex.getCause() instanceof ParseCancellationException)) {
                                     throw ex;
@@ -811,7 +811,7 @@ namespace Antlr4.Runtime.Test
                     sourceName = String.format("%s:%d:%d: ", sourceName, line, charPositionInLine);
                 }
 
-                System.err.println(sourceName+"line "+line+":"+charPositionInLine+" "+msg);
+                Console.Error.WriteLine(sourceName+"line "+line+":"+charPositionInLine+" "+msg);
             }
 
         }
