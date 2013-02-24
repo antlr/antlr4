@@ -633,7 +633,7 @@ namespace Antlr4.Runtime.Test
 
                 return new ParserFactory_1();
             } catch (Exception e) {
-                e.printStackTrace(System.out);
+                e.printStackTrace(Console.Out);
                 Assert.fail(e.getMessage());
                 throw new IllegalStateException(e);
             }
@@ -799,7 +799,7 @@ namespace Antlr4.Runtime.Test
                         return (int)checksum.getValue();
                     }
 
-                    e.printStackTrace(System.out);
+                    e.printStackTrace(Console.Out);
                     throw new IllegalStateException(e);
                 }
 
