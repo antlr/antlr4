@@ -340,7 +340,7 @@
 #endif
 
         /** Return true if all is well */
-        protected bool rawGenerateAndBuildRecognizer(string grammarFileName,
+        protected virtual bool rawGenerateAndBuildRecognizer(string grammarFileName,
                                                         string grammarStr,
                                                         [Nullable] string parserName,
                                                         string lexerName,
@@ -350,7 +350,7 @@
         }
 
         /** Return true if all is well */
-        protected bool rawGenerateAndBuildRecognizer(string grammarFileName,
+        protected virtual bool rawGenerateAndBuildRecognizer(string grammarFileName,
                                                         string grammarStr,
                                                         [Nullable] string parserName,
                                                         string lexerName,
