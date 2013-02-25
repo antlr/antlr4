@@ -47,21 +47,17 @@ namespace Antlr4.Runtime.Misc
             ).FullName);
 #endif
 
-        private static readonly ISet<Type> checkedTypes = new HashSet<Type>();
+        private static readonly ISet<string> checkedAssemblies = new HashSet<string>();
 
-        public static void CheckDependencies(Type dependentClass)
+        public static void CheckDependencies(Assembly assembly)
         {
-            if (IsChecked(dependentClass))
+            if (IsChecked(assembly))
             {
                 return;
             }
-            IList<Type> typesToCheck = GetTypesToCheck(dependentClass);
+            IList<Type> typesToCheck = GetTypesToCheck(assembly);
             foreach (Type clazz in typesToCheck)
             {
-                if (IsChecked(clazz))
-                {
-                    continue;
-                }
                 IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>> dependencies = GetDependencies(clazz
                     );
                 if (dependencies.Count == 0)
@@ -90,40 +86,28 @@ namespace Antlr4.Runtime.Misc
                 }
                 CheckDependencies(dependencies, dependencies[0].Item1.Recognizer);
             }
+
+            MarkChecked(assembly);
         }
 
-        private static IList<Type> GetTypesToCheck(Type clazz)
+        private static IList<Type> GetTypesToCheck(Assembly assembly)
         {
-            ISet<Type> result = new HashSet<Type>();
-            GetTypesToCheck(clazz, result);
-            return new List<Type>(result);
+            return assembly.GetTypes();
         }
 
-        private static void GetTypesToCheck(Type clazz, ISet<Type> result)
+        private static bool IsChecked(Assembly assembly)
         {
-            if (!result.Add(clazz))
+            lock (checkedAssemblies)
             {
-                return;
-            }
-            foreach (Type declared in clazz.GetNestedTypes())
-            {
-                GetTypesToCheck(declared, result);
+                return checkedAssemblies.Contains(assembly.FullName);
             }
         }
 
-        private static bool IsChecked(Type clazz)
+        private static void MarkChecked(Assembly assembly)
         {
-            lock (checkedTypes)
+            lock (checkedAssemblies)
             {
-                return checkedTypes.Contains(clazz);
-            }
-        }
-
-        private static void MarkChecked(Type clazz)
-        {
-            lock (checkedTypes)
-            {
-                checkedTypes.Add(clazz);
+                checkedAssemblies.Add(assembly.FullName);
             }
         }
 
@@ -234,7 +218,6 @@ namespace Antlr4.Runtime.Misc
             {
                 throw new InvalidOperationException(errors.ToString());
             }
-            MarkChecked(recognizerType);
         }
 
         private static readonly Dependents ImplementedDependents = Dependents
