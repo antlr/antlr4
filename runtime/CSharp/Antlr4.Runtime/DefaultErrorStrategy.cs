@@ -236,7 +236,6 @@ namespace Antlr4.Runtime
                 {
                     // do nothing if we can't identify the exact kind of ATN state
                     break;
-                    break;
                 }
             }
         }

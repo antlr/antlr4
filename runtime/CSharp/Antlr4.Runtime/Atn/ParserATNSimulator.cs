@@ -602,7 +602,6 @@ namespace Antlr4.Runtime.Atn
                         }
                         ReportAmbiguity(dfa, s, startIndex, stopIndex, alts, s.configs);
                         return alts.NextSetBit(0);
-                        break;
                     }
                 }
             }
@@ -783,7 +782,6 @@ namespace Antlr4.Runtime.Atn
                                 }
                                 ReportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
                                 return alts.NextSetBit(0);
-                                break;
                             }
                         }
                     }
@@ -1411,7 +1409,6 @@ namespace Antlr4.Runtime.Atn
                             default:
                             {
                                 break;
-                                break;
                             }
                         }
                         if (checkClosure && !closureBusy.Add(c))
@@ -1514,7 +1511,6 @@ namespace Antlr4.Runtime.Atn
                 default:
                 {
                     return null;
-                    break;
                 }
             }
         }

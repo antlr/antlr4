@@ -514,7 +514,6 @@ namespace Antlr4.Runtime.Atn
                 {
                     c = null;
                     break;
-                    break;
                 }
             }
             return c;
@@ -536,7 +535,7 @@ namespace Antlr4.Runtime.Atn
         ///     </see>
         /// before evaluating the predicate to ensure position
         /// sensitive values, including
-        /// <see cref="Antlr4.Runtime.Lexer.GetText()">Antlr4.Runtime.Lexer.GetText()</see>
+        /// <see cref="Antlr4.Runtime.Lexer.Text()">Antlr4.Runtime.Lexer.Text()</see>
         /// ,
         /// <see cref="Antlr4.Runtime.Lexer.Line()">Antlr4.Runtime.Lexer.Line()</see>
         /// ,
