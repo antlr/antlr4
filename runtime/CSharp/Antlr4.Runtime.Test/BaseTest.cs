@@ -8,7 +8,11 @@
     using Antlr4.Runtime.Misc;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using DirectoryInfo = System.IO.DirectoryInfo;
+    using IOException = System.IO.IOException;
     using Path = System.IO.Path;
+    using StreamReader = System.IO.StreamReader;
+    using TextReader = System.IO.TextReader;
+    using Thread = System.Threading.Thread;
 
     public abstract class BaseTest
     {
@@ -659,45 +663,48 @@
             }
         }
 
-        public class StreamVacuum : Runnable
+        public class StreamVacuum
         {
-            stringBuilder buf = new stringBuilder();
-            BufferedReader @in;
-            Thread sucker;
-            public StreamVacuum(InputStream @in)
+            private readonly StringBuilder buf = new StringBuilder();
+            private readonly TextReader @in;
+            private Thread sucker;
+
+            public StreamVacuum(StreamReader @in)
             {
-                this.@in = new BufferedReader(new InputStreamReader(@in));
+                this.@in = @in;
             }
+
             public void start()
             {
-                sucker = new Thread(this);
-                sucker.start();
+                sucker = new Thread(run);
+                sucker.Start();
             }
-            public override void run()
+
+            public void run()
             {
                 try
                 {
-                    string line = @in.readLine();
+                    string line = @in.ReadLine();
                     while (line != null)
                     {
-                        buf.append(line);
-                        buf.append('\n');
-                        line = @in.readLine();
+                        buf.AppendLine(line);
+                        line = @in.ReadLine();
                     }
                 }
-                catch (IOException ioe)
+                catch (IOException)
                 {
                     Console.Error.WriteLine("can't read output from process");
                 }
             }
+
             /** wait for the thread to finish */
-            public void join()
-            {
-                sucker.join();
+            public void join() /*throws InterruptedException*/ {
+                sucker.Join();
             }
-            public override string tostring()
+
+            public override string ToString()
             {
-                return buf.tostring();
+                return buf.ToString();
             }
         }
 
