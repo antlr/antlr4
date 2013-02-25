@@ -35,6 +35,7 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
+#pragma warning disable 0659 // 'class' overrides Object.Equals(object o) but does not override Object.GetHashCode()
     public class ArrayPredictionContext : PredictionContext
     {
         [NotNull]
