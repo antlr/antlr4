@@ -847,7 +847,7 @@ public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> : <super
 
 	public override string[] RuleNames { get { return ruleNames; } }
 
-	public override string[] GetModeNames() { return modeNames; }
+	public override string[] ModeNames { get { return modeNames; } }
 
 	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 	<atn>
