@@ -64,6 +64,10 @@
       <Name>Antlr4.Runtime</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Java-LR.g4" />
+    <EmbeddedResource Include="Java.g4" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
