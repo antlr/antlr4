@@ -27,7 +27,8 @@
     using Thread = System.Threading.Thread;
     using Volatile = System.Threading.Volatile;
 
-    public class TestPerformance
+    [TestClass]
+    public class TestPerformance : BaseTest
     {
         /**
          * Parse all java files under this package within the JDK_SOURCE_ROOT
