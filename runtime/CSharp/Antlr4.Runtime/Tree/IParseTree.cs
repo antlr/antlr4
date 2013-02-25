@@ -49,13 +49,13 @@ namespace Antlr4.Runtime.Tree
     /// </summary>
     public interface IParseTree : ISyntaxTree
     {
-        IParseTree Parent
+        new IParseTree Parent
         {
             get;
         }
 
         // the following methods narrow the return type; they are not additional methods
-        IParseTree GetChild(int i);
+        new IParseTree GetChild(int i);
 
         /// <summary>
         /// The

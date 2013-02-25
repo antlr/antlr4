@@ -40,7 +40,7 @@ namespace Antlr4.Runtime.Tree
             get;
         }
 
-        IRuleNode Parent
+        new IRuleNode Parent
         {
             get;
         }

@@ -34,32 +34,32 @@ namespace Antlr4.Runtime
 {
     public interface IWritableToken : IToken
     {
-        string Text
+        new string Text
         {
             set;
         }
 
-        int Type
+        new int Type
         {
             set;
         }
 
-        int Line
+        new int Line
         {
             set;
         }
 
-        int Column
+        new int Column
         {
             set;
         }
 
-        int Channel
+        new int Channel
         {
             set;
         }
 
-        int TokenIndex
+        new int TokenIndex
         {
             set;
         }
