@@ -693,7 +693,7 @@
                 }
             }
 
-            return new ParserFactory_1();
+            return new ParserFactory_1(listenerClass, parserClass, lexerCtor, parserCtor, entryPoint);
         }
 
         private class ParserFactory_1 : ParserFactory
@@ -705,6 +705,15 @@
             private readonly ConstructorInfo parserCtor;
 
             private readonly string entryPoint;
+
+            public ParserFactory_1(Type listenerClass, Type parserClass, ConstructorInfo lexerCtor, ConstructorInfo parserCtor, string entryPoint)
+            {
+                this.listenerClass = listenerClass;
+                this.parserClass = parserClass;
+                this.lexerCtor = lexerCtor;
+                this.parserCtor = parserCtor;
+                this.entryPoint = entryPoint;
+            }
 
             public int parseFile(ICharStream input, int thread)
             {
