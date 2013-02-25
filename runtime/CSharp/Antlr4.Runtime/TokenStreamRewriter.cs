@@ -148,8 +148,8 @@ namespace Antlr4.Runtime
 
         internal class InsertBeforeOp : TokenStreamRewriter.RewriteOperation
         {
-            protected internal InsertBeforeOp(ITokenStream tokens, int index, object text) : 
-                base(tokens, index, text)
+            public InsertBeforeOp(ITokenStream tokens, int index, object text) : base(tokens, 
+                index, text)
             {
             }
 

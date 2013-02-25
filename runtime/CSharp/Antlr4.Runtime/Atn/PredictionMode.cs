@@ -90,7 +90,7 @@ namespace Antlr4.Runtime.Atn
             public static readonly PredictionMode.AltAndContextConfigEqualityComparator Instance
                  = new PredictionMode.AltAndContextConfigEqualityComparator();
 
-            public AltAndContextConfigEqualityComparator()
+            private AltAndContextConfigEqualityComparator()
             {
             }
 

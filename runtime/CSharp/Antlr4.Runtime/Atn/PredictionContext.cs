@@ -534,7 +534,7 @@ outer_break: ;
             public static readonly PredictionContext.IdentityEqualityComparator Instance = new 
                 PredictionContext.IdentityEqualityComparator();
 
-            public IdentityEqualityComparator()
+            private IdentityEqualityComparator()
             {
             }
 

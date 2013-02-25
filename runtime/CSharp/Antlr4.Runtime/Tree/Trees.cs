@@ -172,7 +172,7 @@ namespace Antlr4.Runtime.Tree
             return ancestors;
         }
 
-        public Trees()
+        private Trees()
         {
         }
     }
