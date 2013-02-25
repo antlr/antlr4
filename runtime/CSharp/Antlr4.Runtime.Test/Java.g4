@@ -168,8 +168,14 @@
 grammar Java;
 
 @lexer::members {
-  protected boolean enumIsKeyword = true;
-  protected boolean assertIsKeyword = true;
+  protected const int EOF = Eof;
+  protected const int HIDDEN = Hidden;
+  protected bool enumIsKeyword = true;
+  protected bool assertIsKeyword = true;
+}
+
+@parser::members {
+  protected const int EOF = Eof;
 }
 
 // starting point for parsing a java file
