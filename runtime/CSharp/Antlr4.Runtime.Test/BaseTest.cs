@@ -816,8 +816,7 @@
 
         protected void mkdir(string dir)
         {
-            File f = new File(dir);
-            f.mkdirs();
+            Directory.CreateDirectory(dir);
         }
 
         protected void writeTestFile(string parserName,
