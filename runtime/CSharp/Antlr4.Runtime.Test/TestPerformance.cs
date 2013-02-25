@@ -375,7 +375,10 @@
             int sourceCount = 0;
             int inputSize = 0;
 
-            ConcurrentBag<int> threadIdentifiers = new ConcurrentBag<int>(Enumerable.Range(0, NUMBER_OF_THREADS));
+            BlockingCollection<int> threadIdentifiers = new BlockingCollection<int>();
+            for (int i = 0; i < NUMBER_OF_THREADS; i++)
+                threadIdentifiers.Add(i);
+
             ICollection<Task<int>> results = new List<Task<int>>();
             QueuedTaskScheduler executorServiceHost = new QueuedTaskScheduler(NUMBER_OF_THREADS);
             TaskScheduler executorService = executorServiceHost.ActivateNewQueue();
@@ -567,11 +570,11 @@
             private readonly ParserFactory factory;
             private readonly BlockingCollection<int> threadNumbers;
 
-            public Callable_1(ICharStream input, ParserFactory factory, IProducerConsumerCollection<int> threadNumbers)
+            public Callable_1(ICharStream input, ParserFactory factory, BlockingCollection<int> threadNumbers)
             {
                 this.input = input;
                 this.factory = factory;
-                this.threadNumbers = new BlockingCollection<int>(threadNumbers);
+                this.threadNumbers = threadNumbers;
             }
 
             public int call()
