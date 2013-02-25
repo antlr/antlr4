@@ -7,6 +7,8 @@
     using System.Threading.Tasks;
     using Antlr4.Runtime.Misc;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using DirectoryInfo = System.IO.DirectoryInfo;
+    using Path = System.IO.Path;
 
     public abstract class BaseTest
     {
@@ -31,24 +33,29 @@
          */
         protected string stderrDuringParse;
 
-        //    @org.junit.Rule
-        //    public final TestRule testWatcher = new TestWatcher() {
+        public TestContext TestContext
+        {
+            get;
+            set;
+        }
 
-        //        @Override
-        //        protected void succeeded(Description description) {
-        //            // remove tmpdir if no error.
-        //            eraseTempDir();
-        //        }
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            if (TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
+            {
+                // remove tmpdir if no error.
+                eraseTempDir();
+            }
+        }
 
-        //    };
-
-        //    @Before
-        //    public void setUp() throws Exception {
-        //        // new output dir for each test
-        //        tmpdir = new File(System.getProperty("java.io.tmpdir"),
-        //                          getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
-        ////		tmpdir = "/tmp";
-        //    }
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            // new output dir for each test
+            string tempTestFolder = GetType().Name + "-" + (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond);
+            tmpdir = Path.Combine(Path.GetTempPath(), tempTestFolder);
+        }
 
         /** Wow! much faster than compiling outside of VM. Finicky though.
          *  Had rules called r and modulo. Wouldn't compile til I changed to 'a'.
