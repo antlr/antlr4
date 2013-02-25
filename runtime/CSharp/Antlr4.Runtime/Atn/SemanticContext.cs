@@ -94,7 +94,7 @@ namespace Antlr4.Runtime.Atn
 
             public readonly bool isCtxDependent;
 
-            public Predicate()
+            protected internal Predicate()
             {
                 // e.g., $i ref in pred
                 this.ruleIndex = -1;
@@ -150,7 +150,7 @@ namespace Antlr4.Runtime.Atn
         {
             public readonly int precedence;
 
-            public PrecedencePredicate()
+            protected internal PrecedencePredicate()
             {
                 this.precedence = 0;
             }

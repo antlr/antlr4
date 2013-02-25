@@ -35,7 +35,7 @@ namespace Antlr4.Runtime.Atn
     /// <author>Sam Harwell</author>
     public abstract class AbstractPredicateTransition : Transition
     {
-        protected internal AbstractPredicateTransition(ATNState target) : base(target)
+        public AbstractPredicateTransition(ATNState target) : base(target)
         {
         }
     }

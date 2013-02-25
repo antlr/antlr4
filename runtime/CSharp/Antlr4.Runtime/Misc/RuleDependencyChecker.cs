@@ -320,7 +320,7 @@ namespace Antlr4.Runtime.Misc
             }
         }
 
-        public RuleDependencyChecker()
+        private RuleDependencyChecker()
         {
         }
     }

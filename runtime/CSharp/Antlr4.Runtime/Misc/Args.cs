@@ -50,7 +50,7 @@ namespace Antlr4.Runtime.Misc
             }
         }
 
-        public Args()
+        private Args()
         {
         }
     }
