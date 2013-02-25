@@ -170,7 +170,7 @@ namespace Antlr4.Runtime.Misc
                     EnumSet<Dependents> dependents = EnumSet.Of(Dependents.Self, dependency.Item1.Dependents
                         ());
                     ReportUnimplementedDependents(dependency, dependents);
-                    BitSet checked = new BitSet();
+                    BitSet @checked = new BitSet();
                     int highestRequiredDependency = CheckDependencyVersion(dependency, ruleNames, ruleVersions
                         , effectiveRule, null);
                     if (dependents.Contains(Dependents.Parents))
@@ -179,11 +179,11 @@ namespace Antlr4.Runtime.Misc
                         for (int parent = parents.NextSetBit(0); parent >= 0; parent = parents.NextSetBit
                             (parent + 1))
                         {
-                            if (parent < 0 || parent >= ruleVersions.Length || checked.Get(parent))
+                            if (parent < 0 || parent >= ruleVersions.Length || @checked.Get(parent))
                             {
                                 continue;
                             }
-                            checked.Set(parent);
+                            @checked.Set(parent);
                             int required = CheckDependencyVersion(dependency, ruleNames, ruleVersions, parent
                                 , "parent");
                             highestRequiredDependency = Math.Max(highestRequiredDependency, required);
@@ -195,11 +195,11 @@ namespace Antlr4.Runtime.Misc
                         for (int child = children.NextSetBit(0); child >= 0; child = children.NextSetBit(
                             child + 1))
                         {
-                            if (child < 0 || child >= ruleVersions.Length || checked.Get(child))
+                            if (child < 0 || child >= ruleVersions.Length || @checked.Get(child))
                             {
                                 continue;
                             }
-                            checked.Set(child);
+                            @checked.Set(child);
                             int required = CheckDependencyVersion(dependency, ruleNames, ruleVersions, child, 
                                 "child");
                             highestRequiredDependency = Math.Max(highestRequiredDependency, required);
@@ -211,11 +211,11 @@ namespace Antlr4.Runtime.Misc
                         for (int ancestor = ancestors.NextSetBit(0); ancestor >= 0; ancestor = ancestors.
                             NextSetBit(ancestor + 1))
                         {
-                            if (ancestor < 0 || ancestor >= ruleVersions.Length || checked.Get(ancestor))
+                            if (ancestor < 0 || ancestor >= ruleVersions.Length || @checked.Get(ancestor))
                             {
                                 continue;
                             }
-                            checked.Set(ancestor);
+                            @checked.Set(ancestor);
                             int required = CheckDependencyVersion(dependency, ruleNames, ruleVersions, ancestor
                                 , "ancestor");
                             highestRequiredDependency = Math.Max(highestRequiredDependency, required);
@@ -227,12 +227,12 @@ namespace Antlr4.Runtime.Misc
                         for (int descendant = descendants.NextSetBit(0); descendant >= 0; descendant = descendants
                             .NextSetBit(descendant + 1))
                         {
-                            if (descendant < 0 || descendant >= ruleVersions.Length || checked.Get(descendant
+                            if (descendant < 0 || descendant >= ruleVersions.Length || @checked.Get(descendant
                                 ))
                             {
                                 continue;
                             }
-                            checked.Set(descendant);
+                            @checked.Set(descendant);
                             int required = CheckDependencyVersion(dependency, ruleNames, ruleVersions, descendant
                                 , "descendant");
                             highestRequiredDependency = Math.Max(highestRequiredDependency, required);
