@@ -60,7 +60,11 @@
         {
             // new output dir for each test
             string tempTestFolder = GetType().Name + "-" + (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond);
-            tmpdir = Path.Combine(Path.GetTempPath(), tempTestFolder);
+            string dir = Path.Combine(Path.GetTempPath(), tempTestFolder);
+            if (Directory.Exists(dir))
+                throw new InvalidOperationException();
+
+            tmpdir = dir;
         }
 
         /** Wow! much faster than compiling outside of VM. Finicky though.
