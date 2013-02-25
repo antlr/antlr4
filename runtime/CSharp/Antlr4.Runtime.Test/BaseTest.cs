@@ -12,6 +12,9 @@
     using File = System.IO.File;
     using IOException = System.IO.IOException;
     using Path = System.IO.Path;
+    using RegistryHive = Microsoft.Win32.RegistryHive;
+    using RegistryKey = Microsoft.Win32.RegistryKey;
+    using RegistryView = Microsoft.Win32.RegistryView;
     using StreamReader = System.IO.StreamReader;
     using TextReader = System.IO.TextReader;
     using Thread = System.Threading.Thread;
@@ -70,108 +73,91 @@
         /** Wow! much faster than compiling outside of VM. Finicky though.
          *  Had rules called r and modulo. Wouldn't compile til I changed to 'a'.
          */
-        protected bool compile(params string[] fileNames)
+        protected virtual bool compile(params string[] fileNames)
         {
-            IList<File> files = new List<File>();
-            foreach (string fileName in fileNames)
-            {
-                File f = new File(tmpdir, fileName);
-                files.Add(f);
-            }
-
-            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-            //		DiagnosticCollector<JavaFileObject> diagnostics =
-            //			new DiagnosticCollector<JavaFileObject>();
-
-            StandardJavaFileManager fileManager =
-                compiler.getStandardFileManager(null, null, null);
-
-            Iterable<JavaFileObject> compilationUnits =
-                fileManager.getJavaFileObjectsFromFiles(files);
-
-            IList<string> compileOptions = getCompileOptions();
-            JavaCompiler.CompilationTask task =
-                compiler.getTask(null, fileManager, null, compileOptions, null,
-                                 compilationUnits);
-            bool ok = task.call();
-
+            DirectoryInfo outputDir = new DirectoryInfo(tmpdir);
             try
             {
-                fileManager.close();
-            }
-            catch (IOException ioe)
-            {
-                ioe.printStackTrace(System.err);
-            }
+                string windows = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+                string compiler = Path.Combine(windows, "Microsoft.NET", "Framework64", "v4.0.30319", "csc.exe");
 
-            //		IList<string> errors = new List<string>();
-            //		for (Diagnostic diagnostic : diagnostics.getDiagnostics()) {
-            //			errors.add(
-            //				string.valueOf(diagnostic.getLineNumber())+
-            //				": " + diagnostic.getMessage(null));
-            //		}
-            //		if ( errors.Count>0 ) {
-            //			Console.Error.WriteLine("compile stderr from: "+cmdLine);
-            //			Console.Error.WriteLine(errors);
-            //			return false;
-            //		}
-            return ok;
+                List<string> args = new List<string>();
+                args.AddRange(getCompileOptions());
 
-            /*
-            File outputDir = new File(tmpdir);
-            try {
-                Process process =
-                    Runtime.getRuntime().exec(args, null, outputDir);
-                StreamVacuum stdout = new StreamVacuum(process.getInputStream());
-                StreamVacuum stderr = new StreamVacuum(process.getErrorStream());
+                bool hasTestClass = false;
+                foreach (String fileName in fileNames)
+                {
+                    if (fileName.Equals("Test.cs"))
+                    {
+                        hasTestClass = true;
+                    }
+
+                    if (fileName.EndsWith(".dll"))
+                    {
+                        args.Add("/reference:" + fileName);
+                    }
+                    else
+                    {
+                        args.Add(fileName);
+                    }
+                }
+
+                if (hasTestClass)
+                {
+                    args.Insert(1, "/target:exe");
+                    args.Insert(1, "/reference:Parser.dll");
+                    args.Insert(1, "/out:Test.exe");
+                }
+                else
+                {
+                    args.Insert(1, "/target:library");
+                    args.Insert(1, "/out:Parser.dll");
+                }
+
+                System.Diagnostics.Process process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(compiler, '"' + string.Join("\" \"", args) + '"')
+                {
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    WorkingDirectory = tmpdir
+                });
+
+                StreamVacuum stdout = new StreamVacuum(process.StandardOutput);
+                StreamVacuum stderr = new StreamVacuum(process.StandardError);
                 stdout.start();
                 stderr.start();
-                process.waitFor();
+                process.WaitForExit();
                 stdout.join();
                 stderr.join();
-                if ( stdout.tostring().length()>0 ) {
-                    Console.Error.WriteLine("compile stdout from: "+cmdLine);
+                if (stdout.ToString().Length > 0)
+                {
+                    Console.Error.WriteLine("compile stdout from: " + string.Join(" ", args));
                     Console.Error.WriteLine(stdout);
                 }
-                if ( stderr.tostring().length()>0 ) {
-                    Console.Error.WriteLine("compile stderr from: "+cmdLine);
+                if (stderr.ToString().Length > 0)
+                {
+                    Console.Error.WriteLine("compile stderr from: " + string.Join(" ", args));
                     Console.Error.WriteLine(stderr);
                 }
-                int ret = process.exitValue();
-                return ret==0;
+                int ret = process.ExitCode;
+                return ret == 0;
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 Console.Error.WriteLine("can't exec compilation");
-                e.printStackTrace(System.err);
+                //e.printStackTrace(System.err);
                 return false;
             }
-            */
         }
 
-        public IList<string> getCompileOptions()
+        public virtual IList<string> getCompileOptions()
         {
-            List<string> compileOptions = new List<string>();
-            compileOptions.Add("-g");
-            compileOptions.Add("-source");
-            compileOptions.Add("1.6");
-            compileOptions.Add("-target");
-            compileOptions.Add("1.6");
-
-            string bootclasspath = getBootClassPath();
-            if (bootclasspath != null)
-            {
-                compileOptions.Add("-bootclasspath");
-                compileOptions.Add(bootclasspath);
-            }
-
-            if (STRICT_COMPILE_CHECKS)
-            {
-                compileOptions.Add("-Xlint");
-                compileOptions.Add("-Xlint:-serial");
-                compileOptions.Add("-Werror");
-            }
-
-            compileOptions.AddRange(new string[] { "-d", tmpdir, "-cp", tmpdir + pathSep + CLASSPATH });
+            IList<string> compileOptions = new List<string>();
+            compileOptions.Add("/debug");
+            compileOptions.Add("/warn:4");
+            compileOptions.Add("/nologo");
+            compileOptions.Add("/reference:" + typeof(Lexer).Assembly.Location);
             return compileOptions;
         }
 
@@ -197,75 +183,104 @@
             return null;
         }
 
+        protected virtual string JavaHome
+        {
+            get
+            {
+                string javaKey = "SOFTWARE\\JavaSoft\\Java Runtime Environment";
+                using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default).OpenSubKey(javaKey))
+                {
+                    string currentVersion = baseKey.GetValue("CurrentVersion").ToString();
+                    using (var homeKey = baseKey.OpenSubKey(currentVersion))
+                        return homeKey.GetValue("JavaHome").ToString();
+                }
+            }
+        }
+
+        protected virtual string MavenHome
+        {
+            get
+            {
+                string mavenHome = Environment.GetEnvironmentVariable("M2_HOME");
+                if (!Directory.Exists(mavenHome))
+                    mavenHome = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".m2");
+
+                return mavenHome;
+            }
+        }
+
+        protected virtual string GetMavenArtifact(string groupId, string artifactId, string version, string classifier = null)
+        {
+            string folder = Path.Combine(MavenHome, "repository", groupId.Replace('.', Path.DirectorySeparatorChar), artifactId, version);
+            string fileNameFormat = string.IsNullOrEmpty(classifier) ? "{0}-{1}.jar" : "{0}-{1}-{2}.jar";
+            string fileName = string.Format(fileNameFormat, artifactId, version, classifier);
+            return Path.Combine(folder, fileName);
+        }
 
         /** Return true if all is ok, no errors */
-        protected bool antlr(string fileName, string grammarFileName, string grammarStr, bool defaultListener, params string[] extraOptions)
+        protected virtual bool antlr(string fileName, string grammarFileName, string grammarStr, bool defaultListener, params string[] extraOptions)
         {
-            bool allIsWell = true;
-            Console.WriteLine("dir " + tmpdir);
             mkdir(tmpdir);
             writeFile(tmpdir, fileName, grammarStr);
-            ErrorQueue equeue = new ErrorQueue();
-            List<string> options = new List<string>();
-            options.AddRange(extraOptions);
-            options.Add("-o");
-            options.Add(tmpdir);
-            options.Add("-lib");
-            options.Add(tmpdir);
-            options.Add(new File(tmpdir, grammarFileName).tostring());
             try
             {
-                string[] optionsA = new string[options.Count];
-                options.ToArray(optionsA);
-                Tool antlr = newTool(optionsA);
-                antlr.addListener(equeue);
-                if (defaultListener)
+                string compiler = Path.Combine(JavaHome, "bin", "java.exe");
+
+                List<string> classpath = new List<string>();
+                classpath.Add(GetMavenArtifact("com.tunnelvisionlabs", "antlr4-csharp", "4.0.1-SNAPSHOT"));
+                classpath.Add(GetMavenArtifact("com.tunnelvisionlabs", "antlr4-runtime", "4.0.1-SNAPSHOT"));
+                classpath.Add(GetMavenArtifact("com.tunnelvisionlabs", "antlr4", "4.0.1-SNAPSHOT"));
+                classpath.Add(GetMavenArtifact("org.antlr", "antlr-runtime", "3.5"));
+                classpath.Add(GetMavenArtifact("org.antlr", "ST4", "4.0.7"));
+
+                List<string> options = new List<string>();
+                options.Add("-cp");
+                options.Add(string.Join(";", classpath));
+                options.Add("org.antlr.v4.Tool");
+
+                options.AddRange(extraOptions);
+                options.Add("-o");
+                options.Add(tmpdir);
+                options.Add("-lib");
+                options.Add(tmpdir);
+                options.Add("-Dlanguage=CSharp");
+                options.Add(grammarFileName);
+
+                System.Diagnostics.Process process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(compiler, '"' + string.Join("\" \"", options) + '"')
                 {
-                    antlr.addListener(new DefaultToolListener(antlr));
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    WorkingDirectory = tmpdir
+                });
+
+                StreamVacuum stdout = new StreamVacuum(process.StandardOutput);
+                StreamVacuum stderr = new StreamVacuum(process.StandardError);
+                stdout.start();
+                stderr.start();
+                process.WaitForExit();
+                stdout.join();
+                stderr.join();
+                if (stdout.ToString().Length > 0)
+                {
+                    Console.Error.WriteLine("compile stdout from: " + string.Join(" ", options));
+                    Console.Error.WriteLine(stdout);
                 }
-                antlr.processGrammarsOnCommandLine();
+                if (stderr.ToString().Length > 0)
+                {
+                    Console.Error.WriteLine("compile stderr from: " + string.Join(" ", options));
+                    Console.Error.WriteLine(stderr);
+                }
+                int ret = process.ExitCode;
+                return ret == 0;
             }
             catch (Exception e)
             {
-                allIsWell = false;
-                Console.Error.WriteLine("problems building grammar: " + e);
-                e.printStackTrace(System.err);
+                Console.Error.WriteLine("can't exec compilation");
+                //e.printStackTrace(System.err);
+                return false;
             }
-
-            allIsWell = equeue.errors.isEmpty();
-            if (!defaultListener && !equeue.errors.isEmpty())
-            {
-                Console.Error.WriteLine("antlr reports errors from " + options);
-                for (int i = 0; i < equeue.errors.Count; i++)
-                {
-                    ANTLRMessage msg = equeue.errors.get(i);
-                    Console.Error.WriteLine(msg);
-                }
-                Console.WriteLine("!!!\ngrammar:");
-                Console.WriteLine(grammarStr);
-                Console.WriteLine("###");
-            }
-            if (!defaultListener && !equeue.warnings.isEmpty())
-            {
-                Console.Error.WriteLine("antlr reports warnings from " + options);
-                for (int i = 0; i < equeue.warnings.Count; i++)
-                {
-                    ANTLRMessage msg = equeue.warnings.get(i);
-                    Console.Error.WriteLine(msg);
-                }
-            }
-
-            if (!defaultListener && !equeue.warnings.isEmpty())
-            {
-                Console.Error.WriteLine("antlr reports warnings from " + options);
-                for (int i = 0; i < equeue.warnings.Count; i++)
-                {
-                    ANTLRMessage msg = equeue.warnings.get(i);
-                    Console.Error.WriteLine(msg);
-                }
-            }
-
-            return allIsWell;
         }
 
         protected string execLexer(string grammarFileName,
@@ -343,27 +358,27 @@
                 return false;
             }
 
-            IList<string> files = new List<string>();
+            List<string> files = new List<string>();
             if (lexerName != null)
             {
-                files.add(lexerName + ".java");
+                files.Add(lexerName + ".cs");
             }
             if (parserName != null)
             {
-                files.add(parserName + ".java");
-                Set<string> optionsSet = new HashSet<string>(Arrays.asList(extraOptions));
-                if (!optionsSet.contains("-no-listener"))
+                files.Add(parserName + ".cs");
+                ISet<string> optionsSet = new HashSet<string>(extraOptions);
+                if (!optionsSet.Contains("-no-listener"))
                 {
-                    files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.')) + "BaseListener.java");
-                    files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.')) + "Listener.java");
+                    files.Add(grammarFileName.Substring(0, grammarFileName.LastIndexOf('.')) + "BaseListener.cs");
+                    files.Add(grammarFileName.Substring(0, grammarFileName.LastIndexOf('.')) + "Listener.cs");
                 }
-                if (optionsSet.contains("-visitor"))
+                if (optionsSet.Contains("-visitor"))
                 {
-                    files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.')) + "BaseVisitor.java");
-                    files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.')) + "Visitor.java");
+                    files.Add(grammarFileName.Substring(0, grammarFileName.LastIndexOf('.')) + "BaseVisitor.cs");
+                    files.Add(grammarFileName.Substring(0, grammarFileName.LastIndexOf('.')) + "Visitor.cs");
                 }
             }
-            allIsWell = compile(files.ToArray(new string[files.Count]));
+            allIsWell = compile(files.ToArray());
             return allIsWell;
         }
 
