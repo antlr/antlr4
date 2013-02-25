@@ -618,7 +618,7 @@ namespace Antlr4.Runtime.Atn
                     }
 nextTransition_continue: ;
                 }
-nextTransition_break: ;
+
                 if (optimizedTransitions != null)
                 {
                     if (state.IsOptimized)
@@ -634,7 +634,7 @@ nextTransition_break: ;
                     }
                 }
             }
-nextState_break: ;
+
             return removedEdges;
         }
 

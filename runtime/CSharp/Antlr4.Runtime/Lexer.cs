@@ -218,7 +218,6 @@ namespace Antlr4.Runtime
                     return _token;
 outer_continue: ;
                 }
-outer_break: ;
             }
             finally
             {

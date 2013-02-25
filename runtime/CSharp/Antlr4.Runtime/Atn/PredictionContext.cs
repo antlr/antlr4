@@ -515,7 +515,7 @@ namespace Antlr4.Runtime.Atn
                 }
 outer_continue: ;
             }
-outer_break: ;
+
             return result.ToArray();
         }
 
