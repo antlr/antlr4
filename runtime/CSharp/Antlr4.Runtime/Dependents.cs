@@ -27,23 +27,26 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using System;
 using Antlr4.Runtime;
 using Sharpen;
 
 namespace Antlr4.Runtime
 {
     /// <author>Sam Harwell</author>
+    [Flags]
     public enum Dependents
     {
-        Self,
-        Parents,
-        Children,
-        Ancestors,
-        Descendants,
-        Siblings,
-        PreceedingSiblings,
-        FollowingSiblings,
-        Preceeding,
-        Following
+        None = 0,
+        Self = 1 << 0,
+        Parents = 1 << 1,
+        Children = 1 << 2,
+        Ancestors = 1 << 3,
+        Descendants = 1 << 4,
+        Siblings = 1 << 5,
+        PreceedingSiblings = 1 << 6,
+        FollowingSiblings = 1 << 7,
+        Preceeding = 1 << 8,
+        Following = 1 << 9
     }
 }
