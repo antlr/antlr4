@@ -401,7 +401,7 @@
 
             executorServiceHost.Dispose();
 
-            Console.Out.WriteLine("Total parse time for {0} files ({1} KB, {2} tokens, checksum 0x{3:8X}): {4}ms",
+            Console.Out.WriteLine("Total parse time for {0} files ({1} KB, {2} tokens, checksum 0x{3:X8}): {4}ms",
                               sourceCount,
                               inputSize / 1024,
                               Volatile.Read(ref tokenCount),
