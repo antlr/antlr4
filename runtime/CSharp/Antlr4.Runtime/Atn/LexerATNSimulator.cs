@@ -514,7 +514,6 @@ namespace Antlr4.Runtime.Atn
                 {
                     c = null;
                     break;
-                    break;
                 }
             }
             return c;

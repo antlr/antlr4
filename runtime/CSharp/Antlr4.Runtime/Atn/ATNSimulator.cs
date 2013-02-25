@@ -475,13 +475,11 @@ namespace Antlr4.Runtime.Atn
                     {
                         // not implemented yet
                         continue;
-                        goto default;
                     }
 
                     default:
                     {
                         continue;
-                        break;
                     }
                 }
             }
