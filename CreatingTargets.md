@@ -30,6 +30,13 @@ The following command will add the submodule to your working repository.
 
 	git submodule add -b "master" "git://github.com/antlr/antlr4.git" "reference/antlr4"
 
+*Note:* the C# target uses a special branch of ANTLR 4 as a reference. The branch "sharpen"
+is based on the "optimized" branch, but modified to operate as an input to the Sharpen tool
+for automatically converting Java code to C#. The submodule for this target was added
+using the following command.
+
+	git submodule add -b "sharpen" "git://github.com/sharwell/antlr4.git" "reference/antlr4"
+
 ## Release structure
 
 ### Code generation support
