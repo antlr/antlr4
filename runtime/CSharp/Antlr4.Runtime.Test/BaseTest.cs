@@ -21,6 +21,7 @@
 
     public abstract class BaseTest
     {
+#if false
         // -J-Dorg.antlr.v4.test.BaseTest.level=FINE
         private static readonly Logger LOGGER = Logger.getLogger(typeof(BaseTest).getName());
 
@@ -34,6 +35,7 @@
          * Build up the full classpath we need, including the surefire path (if present)
          */
         public static readonly string CLASSPATH = System.getProperty("java.class.path");
+#endif
 
         public string tmpdir = null;
 
@@ -161,6 +163,7 @@
             return compileOptions;
         }
 
+#if false
         public string getBootClassPath()
         {
             string path = System.getProperty("bootclasspath.java6");
@@ -182,6 +185,7 @@
 
             return null;
         }
+#endif
 
         protected virtual string JavaHome
         {
@@ -283,6 +287,7 @@
             }
         }
 
+#if false
         protected string execLexer(string grammarFileName,
                                    string grammarStr,
                                    string lexerName,
@@ -332,6 +337,7 @@
                                      startRuleName,
                                      debug);
         }
+#endif
 
         /** Return true if all is well */
         protected bool rawGenerateAndBuildRecognizer(string grammarFileName,
@@ -382,6 +388,7 @@
             return allIsWell;
         }
 
+#if false
         protected string rawExecRecognizer(string parserName,
                                            string lexerName,
                                            string parserStartRuleName,
@@ -683,6 +690,7 @@
                 Console.Error.WriteLine(equeue.tostring(g.tool));
             }
         }
+#endif
 
         public class StreamVacuum
         {
@@ -729,6 +737,7 @@
             }
         }
 
+#if false
         protected void checkGrammarSemanticsError(ErrorQueue equeue,
                                                   GrammarSemanticsMessage expectedMessage)
         {
@@ -823,6 +832,7 @@
                 hide.add(ttype);
             }
         }
+#endif
 
         public static void writeFile(string dir, string fileName, string content)
         {
@@ -834,6 +844,7 @@
             Directory.CreateDirectory(dir);
         }
 
+#if false
         protected void writeTestFile(string parserName,
                                      string lexerName,
                                      string parserStartRuleName,
@@ -955,6 +966,7 @@
                 new File(tmpdir + "/" + files[i]).delete();
             }
         }
+#endif
 
         protected virtual void eraseTempDir()
         {
@@ -966,6 +978,7 @@
             Directory.Delete(tmpdir, true);
         }
 
+#if false
         public string getFirstLineOfException()
         {
             if (this.stderrDuringParse == null)
@@ -1142,5 +1155,6 @@
             }
             return dup;
         }
+#endif
     }
 }
