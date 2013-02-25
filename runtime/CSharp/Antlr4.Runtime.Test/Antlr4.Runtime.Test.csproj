@@ -50,16 +50,23 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="BaseTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TaskSchedulers\QueuedTaskScheduler.cs" />
     <Compile Include="TestBitSet.cs" />
     <Compile Include="TestGraphNodes.cs" />
     <Compile Include="TestIntervalSet.cs" />
+    <Compile Include="TestPerformance.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Antlr4.Runtime\Antlr4.Runtime.csproj">
       <Project>{e1d192de-5347-48c4-a9f4-a8cba2af3869}</Project>
       <Name>Antlr4.Runtime</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Java-LR.g4" />
+    <EmbeddedResource Include="Java.g4" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
