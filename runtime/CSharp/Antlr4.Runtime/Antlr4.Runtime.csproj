@@ -29,6 +29,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\..\..\..\..\..\keys\antlr\Key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -122,6 +128,9 @@
     <Compile Include="Lexer.cs" />
     <Compile Include="LexerNoViableAltException.cs" />
     <Compile Include="Misc\Args.cs" />
+    <None Include="..\..\..\..\..\..\keys\antlr\Key.snk">
+      <Link>Key.snk</Link>
+    </None>
     <None Include="Misc\Array2DHashSet`1.cs" />
     <Compile Include="Misc\NullableAttribute.cs" />
     <None Include="Misc\DoubleKeyMap`3.cs" />
