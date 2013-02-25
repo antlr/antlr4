@@ -589,8 +589,6 @@
                 {
                     threadNumbers.Add(threadNumber);
                 }
-
-                return -1;
             }
         }
 
