@@ -198,6 +198,7 @@ namespace Antlr4.Runtime.Atn
     /// </remarks>
     public class ParserATNSimulator : ATNSimulator
     {
+#pragma warning disable 0162 // Unreachable code detected
         public const bool debug = false;
 
         public const bool dfa_debug = false;
