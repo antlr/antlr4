@@ -141,7 +141,7 @@
     <Compile Include="Misc\NotNullAttribute.cs" />
     <None Include="Misc\OrderedHashSet`1.cs" />
     <Compile Include="Misc\ParseCanceledException.cs" />
-    <None Include="Misc\RuleDependencyChecker.cs" />
+    <Compile Include="Misc\RuleDependencyChecker.cs" />
     <None Include="Misc\RuleDependencyProcessor.cs" />
     <None Include="Misc\TestRig.cs" />
     <Compile Include="Misc\Utils.cs" />

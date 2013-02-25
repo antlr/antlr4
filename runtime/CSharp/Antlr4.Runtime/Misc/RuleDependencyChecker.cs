@@ -36,21 +36,20 @@ using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Sharpen;
-using Sharpen.Annotation;
-using Sharpen.Logging;
-using Sharpen.Reflect;
 
 namespace Antlr4.Runtime.Misc
 {
     /// <author>Sam Harwell</author>
     public class RuleDependencyChecker
     {
+#if false
         private static readonly Logger Logger = Logger.GetLogger(typeof(Antlr4.Runtime.Misc.RuleDependencyChecker
             ).FullName);
+#endif
 
         private static readonly ISet<Type> checkedTypes = new HashSet<Type>();
 
-        public static void CheckDependencies<_T0>(Type<_T0> dependentClass)
+        public static void CheckDependencies(Type dependentClass)
         {
             if (IsChecked(dependentClass))
             {
@@ -63,56 +62,56 @@ namespace Antlr4.Runtime.Misc
                 {
                     continue;
                 }
-                IList<Tuple<RuleDependency, IAnnotatedElement>> dependencies = GetDependencies(clazz
+                IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>> dependencies = GetDependencies(clazz
                     );
                 if (dependencies.Count == 0)
                 {
                     continue;
                 }
-                IDictionary<Type, IList<Tuple<RuleDependency, IAnnotatedElement>>> recognizerDependencies
-                     = new Dictionary<Type, IList<Tuple<RuleDependency, IAnnotatedElement>>>();
-                foreach (Tuple<RuleDependency, IAnnotatedElement> dependency in dependencies)
+                IDictionary<Type, IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>>> recognizerDependencies
+                     = new Dictionary<Type, IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>>>();
+                foreach (Tuple<RuleDependencyAttribute, ICustomAttributeProvider> dependency in dependencies)
                 {
-                    Type recognizerType = dependency.Item1.Recognizer();
-                    IList<Tuple<RuleDependency, IAnnotatedElement>> list = recognizerDependencies.Get
+                    Type recognizerType = dependency.Item1.Recognizer;
+                    IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>> list = recognizerDependencies.Get
                         (recognizerType);
                     if (list == null)
                     {
-                        list = new List<Tuple<RuleDependency, IAnnotatedElement>>();
+                        list = new List<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>>();
                         recognizerDependencies.Put(recognizerType, list);
                     }
-                    list.AddItem(dependency);
+                    list.Add(dependency);
                 }
-                foreach (KeyValuePair<Type, IList<Tuple<RuleDependency, IAnnotatedElement>>> entry
-                     in recognizerDependencies.EntrySet())
+                foreach (KeyValuePair<Type, IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>>> entry
+                     in recognizerDependencies)
                 {
                     //processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format("ANTLR 4: Validating %d dependencies on rules in %s.", entry.getValue().size(), entry.getKey().toString()));
                     CheckDependencies(entry.Value, entry.Key);
                 }
-                CheckDependencies(dependencies, dependencies[0].Item1.Recognizer());
+                CheckDependencies(dependencies, dependencies[0].Item1.Recognizer);
             }
         }
 
-        private static IList<Type> GetTypesToCheck<_T0>(Type<_T0> clazz)
+        private static IList<Type> GetTypesToCheck(Type clazz)
         {
             ISet<Type> result = new HashSet<Type>();
             GetTypesToCheck(clazz, result);
             return new List<Type>(result);
         }
 
-        private static void GetTypesToCheck<_T0>(Type<_T0> clazz, ISet<Type> result)
+        private static void GetTypesToCheck(Type clazz, ISet<Type> result)
         {
-            if (!result.AddItem(clazz))
+            if (!result.Add(clazz))
             {
                 return;
             }
-            foreach (Type declared in clazz.GetDeclaredClasses())
+            foreach (Type declared in clazz.GetNestedTypes())
             {
                 GetTypesToCheck(declared, result);
             }
         }
 
-        private static bool IsChecked<_T0>(Type<_T0> clazz)
+        private static bool IsChecked(Type clazz)
         {
             lock (checkedTypes)
             {
@@ -120,48 +119,46 @@ namespace Antlr4.Runtime.Misc
             }
         }
 
-        private static void MarkChecked<_T0>(Type<_T0> clazz)
+        private static void MarkChecked(Type clazz)
         {
             lock (checkedTypes)
             {
-                checkedTypes.AddItem(clazz);
+                checkedTypes.Add(clazz);
             }
         }
 
-        private static void CheckDependencies<_T0>(IList<Tuple<RuleDependency, IAnnotatedElement
-            >> dependencies, Type<_T0> recognizerType) where _T0:Recognizer<object, object
-            >
+        private static void CheckDependencies(IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider
+            >> dependencies, Type recognizerType)
         {
             string[] ruleNames = GetRuleNames(recognizerType);
             int[] ruleVersions = GetRuleVersions(recognizerType, ruleNames);
             RuleDependencyChecker.RuleRelations relations = ExtractRuleRelations(recognizerType
                 );
             StringBuilder errors = new StringBuilder();
-            foreach (Tuple<RuleDependency, IAnnotatedElement> dependency in dependencies)
+            foreach (Tuple<RuleDependencyAttribute, ICustomAttributeProvider> dependency in dependencies)
             {
-                if (!dependency.Item1.Recognizer().IsAssignableFrom(recognizerType))
+                if (!dependency.Item1.Recognizer.IsAssignableFrom(recognizerType))
                 {
                     continue;
                 }
                 // this is the rule in the dependency set with the highest version number
-                int effectiveRule = dependency.Item1.Rule();
+                int effectiveRule = dependency.Item1.Rule;
                 if (effectiveRule < 0 || effectiveRule >= ruleVersions.Length)
                 {
                     string message = string.Format("Rule dependency on unknown rule %d@%d in %s%n", dependency
-                        .Item1.Rule(), dependency.Item1.Version(), dependency.Item1.Recognizer().ToString
+                        .Item1.Rule, dependency.Item1.Version, dependency.Item1.Recognizer.ToString
                         ());
                     errors.Append(message);
                     continue;
                 }
-                EnumSet<Dependents> dependents = EnumSet.Of(Dependents.Self, dependency.Item1.Dependents
-                    ());
+                Dependents dependents = Dependents.Self | dependency.Item1.Dependents;
                 ReportUnimplementedDependents(errors, dependency, dependents);
                 BitSet @checked = new BitSet();
                 int highestRequiredDependency = CheckDependencyVersion(errors, dependency, ruleNames
                     , ruleVersions, effectiveRule, null);
-                if (dependents.Contains(Dependents.Parents))
+                if (dependents.HasFlag(Dependents.Parents))
                 {
-                    BitSet parents = relations.parents[dependency.Item1.Rule()];
+                    BitSet parents = relations.parents[dependency.Item1.Rule];
                     for (int parent = parents.NextSetBit(0); parent >= 0; parent = parents.NextSetBit
                         (parent + 1))
                     {
@@ -175,9 +172,9 @@ namespace Antlr4.Runtime.Misc
                         highestRequiredDependency = Math.Max(highestRequiredDependency, required);
                     }
                 }
-                if (dependents.Contains(Dependents.Children))
+                if (dependents.HasFlag(Dependents.Children))
                 {
-                    BitSet children = relations.children[dependency.Item1.Rule()];
+                    BitSet children = relations.children[dependency.Item1.Rule];
                     for (int child = children.NextSetBit(0); child >= 0; child = children.NextSetBit(
                         child + 1))
                     {
@@ -191,9 +188,9 @@ namespace Antlr4.Runtime.Misc
                         highestRequiredDependency = Math.Max(highestRequiredDependency, required);
                     }
                 }
-                if (dependents.Contains(Dependents.Ancestors))
+                if (dependents.HasFlag(Dependents.Ancestors))
                 {
-                    BitSet ancestors = relations.GetAncestors(dependency.Item1.Rule());
+                    BitSet ancestors = relations.GetAncestors(dependency.Item1.Rule);
                     for (int ancestor = ancestors.NextSetBit(0); ancestor >= 0; ancestor = ancestors.
                         NextSetBit(ancestor + 1))
                     {
@@ -207,9 +204,9 @@ namespace Antlr4.Runtime.Misc
                         highestRequiredDependency = Math.Max(highestRequiredDependency, required);
                     }
                 }
-                if (dependents.Contains(Dependents.Descendants))
+                if (dependents.HasFlag(Dependents.Descendants))
                 {
-                    BitSet descendants = relations.GetDescendants(dependency.Item1.Rule());
+                    BitSet descendants = relations.GetDescendants(dependency.Item1.Rule);
                     for (int descendant = descendants.NextSetBit(0); descendant >= 0; descendant = descendants
                         .NextSetBit(descendant + 1))
                     {
@@ -224,12 +221,12 @@ namespace Antlr4.Runtime.Misc
                         highestRequiredDependency = Math.Max(highestRequiredDependency, required);
                     }
                 }
-                int declaredVersion = dependency.Item1.Version();
+                int declaredVersion = dependency.Item1.Version;
                 if (declaredVersion > highestRequiredDependency)
                 {
                     string message = string.Format("Rule dependency version mismatch: %s has maximum dependency version %d (expected %d) in %s%n"
-                        , ruleNames[dependency.Item1.Rule()], highestRequiredDependency, declaredVersion
-                        , dependency.Item1.Recognizer().ToString());
+                        , ruleNames[dependency.Item1.Rule], highestRequiredDependency, declaredVersion
+                        , dependency.Item1.Recognizer.ToString());
                     errors.Append(message);
                 }
             }
@@ -240,28 +237,28 @@ namespace Antlr4.Runtime.Misc
             MarkChecked(recognizerType);
         }
 
-        private static readonly ISet<Dependents> ImplementedDependents = EnumSet.Of(Dependents
-            .Self, Dependents.Parents, Dependents.Children, Dependents.Ancestors, Dependents
-            .Descendants);
+        private static readonly Dependents ImplementedDependents = Dependents
+            .Self | Dependents.Parents | Dependents.Children | Dependents.Ancestors | Dependents
+            .Descendants;
 
-        private static void ReportUnimplementedDependents(StringBuilder errors, Tuple<RuleDependency
-            , IAnnotatedElement> dependency, EnumSet<Dependents> dependents)
+        private static void ReportUnimplementedDependents(StringBuilder errors, Tuple<RuleDependencyAttribute
+            , ICustomAttributeProvider> dependency, Dependents dependents)
         {
-            EnumSet<Dependents> unimplemented = dependents.Clone();
-            unimplemented.RemoveAll(ImplementedDependents);
-            if (!unimplemented.IsEmpty())
+            Dependents unimplemented = dependents;
+            unimplemented &= ~ImplementedDependents;
+            if (unimplemented != Dependents.None)
             {
                 string message = string.Format("Cannot validate the following dependents of rule %d: %s%n"
-                    , dependency.Item1.Rule(), unimplemented);
+                    , dependency.Item1.Rule, unimplemented);
                 errors.Append(message);
             }
         }
 
-        private static int CheckDependencyVersion(StringBuilder errors, Tuple<RuleDependency
-            , IAnnotatedElement> dependency, string[] ruleNames, int[] ruleVersions, int 
+        private static int CheckDependencyVersion(StringBuilder errors, Tuple<RuleDependencyAttribute
+            , ICustomAttributeProvider> dependency, string[] ruleNames, int[] ruleVersions, int 
             relatedRule, string relation)
         {
-            string ruleName = ruleNames[dependency.Item1.Rule()];
+            string ruleName = ruleNames[dependency.Item1.Rule];
             string path;
             if (relation == null)
             {
@@ -273,76 +270,84 @@ namespace Antlr4.Runtime.Misc
                 path = string.Format("rule %s (%s of %s)", mismatchedRuleName, relation, ruleName
                     );
             }
-            int declaredVersion = dependency.Item1.Version();
+            int declaredVersion = dependency.Item1.Version;
             int actualVersion = ruleVersions[relatedRule];
             if (actualVersion > declaredVersion)
             {
                 string message = string.Format("Rule dependency version mismatch: %s has version %d (expected <= %d) in %s%n"
-                    , path, actualVersion, declaredVersion, dependency.Item1.Recognizer().ToString
+                    , path, actualVersion, declaredVersion, dependency.Item1.Recognizer.ToString
                     ());
                 errors.Append(message);
             }
             return actualVersion;
         }
 
-        private static int[] GetRuleVersions<_T0>(Type<_T0> recognizerClass, string[] ruleNames
-            ) where _T0:Recognizer<object, object>
+        private static int[] GetRuleVersions(Type recognizerClass, string[] ruleNames
+            )
         {
             int[] versions = new int[ruleNames.Length];
             FieldInfo[] fields = recognizerClass.GetFields();
             foreach (FieldInfo field in fields)
             {
-                bool isStatic = (field.GetModifiers() & Modifier.Static) != 0;
+                bool isStatic = field.IsStatic;
                 bool isInteger = field.FieldType == typeof(int);
                 if (isStatic && isInteger && field.Name.StartsWith("RULE_"))
                 {
                     try
                     {
-                        string name = Sharpen.Runtime.Substring(field.Name, "RULE_".Length);
+                        string name = field.Name.Substring("RULE_".Length);
                         if (name.Length == 0 || !System.Char.IsLower(name[0]))
                         {
                             continue;
                         }
-                        int index = field.GetInt(null);
+                        int index = (int)field.GetValue(null);
                         if (index < 0 || index >= versions.Length)
                         {
                             object[] @params = new object[] { index, field.Name, recognizerClass.Name };
+#if false
                             Logger.Log(Level.Warning, "Rule index {0} for rule ''{1}'' out of bounds for recognizer {2}."
                                 , @params);
+#endif
                             continue;
                         }
                         MethodInfo ruleMethod = GetRuleMethod(recognizerClass, name);
                         if (ruleMethod == null)
                         {
                             object[] @params = new object[] { name, recognizerClass.Name };
+#if false
                             Logger.Log(Level.Warning, "Could not find rule method for rule ''{0}'' in recognizer {1}."
                                 , @params);
+#endif
                             continue;
                         }
-                        RuleVersion ruleVersion = ruleMethod.GetAnnotation<RuleVersion>();
-                        int version = ruleVersion != null ? ruleVersion.Value() : 0;
+                        RuleVersionAttribute ruleVersion = ruleMethod.GetCustomAttribute<RuleVersionAttribute>();
+                        int version = ruleVersion != null ? ruleVersion.Version : 0;
                         versions[index] = version;
                     }
                     catch (ArgumentException ex)
                     {
+#if false
                         Logger.Log(Level.Warning, null, ex);
+#endif
                     }
                     catch (MemberAccessException ex)
                     {
+#if false
                         Logger.Log(Level.Warning, null, ex);
+#endif
                     }
                 }
             }
             return versions;
         }
 
-        private static MethodInfo GetRuleMethod<_T0>(Type<_T0> recognizerClass, string name
-            ) where _T0:Recognizer<object, object>
+        private static MethodInfo GetRuleMethod(Type recognizerClass, string name
+            )
         {
             MethodInfo[] declaredMethods = recognizerClass.GetMethods();
             foreach (MethodInfo method in declaredMethods)
             {
-                if (method.Name.Equals(name) && method.IsAnnotationPresent(typeof(RuleVersion)))
+                if (method.Name.Equals(name) && method.GetCustomAttribute<RuleVersionAttribute>() != null)
                 {
                     return method;
                 }
@@ -350,137 +355,54 @@ namespace Antlr4.Runtime.Misc
             return null;
         }
 
-        private static string[] GetRuleNames<_T0>(Type<_T0> recognizerClass) where _T0:Recognizer
-            <object, object>
+        private static string[] GetRuleNames(Type recognizerClass)
         {
-            try
-            {
-                FieldInfo ruleNames = recognizerClass.GetField("ruleNames");
-                return (string[])ruleNames.GetValue(null);
-            }
-            catch (NoSuchFieldException ex)
-            {
-                Logger.Log(Level.Warning, null, ex);
-            }
-            catch (SecurityException ex)
-            {
-                Logger.Log(Level.Warning, null, ex);
-            }
-            catch (ArgumentException ex)
-            {
-                Logger.Log(Level.Warning, null, ex);
-            }
-            catch (MemberAccessException ex)
-            {
-                Logger.Log(Level.Warning, null, ex);
-            }
-            return new string[0];
+            FieldInfo ruleNames = recognizerClass.GetField("ruleNames");
+            return (string[])ruleNames.GetValue(null);
         }
 
-        public static IList<Tuple<RuleDependency, IAnnotatedElement>> GetDependencies<_T0
-            >(Type<_T0> clazz)
+        public static IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>> GetDependencies(Type clazz)
         {
-            IList<Tuple<RuleDependency, IAnnotatedElement>> result = new List<Tuple<RuleDependency
-                , IAnnotatedElement>>();
-            IList<ElementType> supportedTarget = Arrays.AsList(typeof(RuleDependency).GetAnnotation
-                <Target>().Value());
-            foreach (ElementType target in supportedTarget)
+            IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>> result = new List<Tuple<RuleDependencyAttribute
+                , ICustomAttributeProvider>>();
+
+            GetElementDependencies(clazz, result);
+            foreach (ConstructorInfo ctor in clazz.GetConstructors(BindingFlags.DeclaredOnly))
             {
-                switch (target)
-                {
-                    case ElementType.Type:
-                    {
-                        if (!clazz.IsAnnotation())
-                        {
-                            GetElementDependencies(clazz, result);
-                        }
-                        break;
-                    }
-
-                    case ElementType.AnnotationType:
-                    {
-                        if (!clazz.IsAnnotation())
-                        {
-                            GetElementDependencies(clazz, result);
-                        }
-                        break;
-                    }
-
-                    case ElementType.Constructor:
-                    {
-                        foreach (Constructor<object> ctor in clazz.GetDeclaredConstructors())
-                        {
-                            GetElementDependencies(ctor, result);
-                        }
-                        break;
-                    }
-
-                    case ElementType.Field:
-                    {
-                        foreach (FieldInfo field in Sharpen.Runtime.GetDeclaredFields(clazz))
-                        {
-                            GetElementDependencies(field, result);
-                        }
-                        break;
-                    }
-
-                    case ElementType.LocalVariable:
-                    {
-                        System.Console.Error.WriteLine("Runtime rule dependency checking is not supported for local variables."
-                            );
-                        break;
-                    }
-
-                    case ElementType.Method:
-                    {
-                        foreach (MethodInfo method in Sharpen.Runtime.GetDeclaredMethods(clazz))
-                        {
-                            GetElementDependencies(method, result);
-                        }
-                        break;
-                    }
-
-                    case ElementType.Package:
-                    {
-                        // package is not a subset of class, so nothing to do here
-                        break;
-                    }
-
-                    case ElementType.Parameter:
-                    {
-                        System.Console.Error.WriteLine("Runtime rule dependency checking is not supported for parameters."
-                            );
-                        break;
-                    }
-                }
+                GetElementDependencies(ctor, result);
+                foreach (ParameterInfo parameter in ctor.GetParameters())
+                    GetElementDependencies(parameter, result);
             }
+
+            foreach (FieldInfo field in clazz.GetFields(BindingFlags.DeclaredOnly))
+            {
+                GetElementDependencies(field, result);
+            }
+
+            foreach (MethodInfo method in clazz.GetMethods(BindingFlags.DeclaredOnly))
+            {
+                GetElementDependencies(method, result);
+                if (method.ReturnParameter != null)
+                    GetElementDependencies(method.ReturnParameter, result);
+
+                foreach (ParameterInfo parameter in method.GetParameters())
+                    GetElementDependencies(parameter, result);
+            }
+
             return result;
         }
 
-        private static void GetElementDependencies(IAnnotatedElement annotatedElement, IList
-            <Tuple<RuleDependency, IAnnotatedElement>> result)
+        private static void GetElementDependencies(ICustomAttributeProvider annotatedElement, IList
+            <Tuple<RuleDependencyAttribute, ICustomAttributeProvider>> result)
         {
-            RuleDependency dependency = annotatedElement.GetAnnotation<RuleDependency>();
-            if (dependency != null)
+            foreach (RuleDependencyAttribute dependency in annotatedElement.GetCustomAttributes(typeof(RuleDependencyAttribute), true))
             {
-                result.AddItem(Tuple.Create(dependency, annotatedElement));
-            }
-            RuleDependencies dependencies = annotatedElement.GetAnnotation<RuleDependencies>(
-                );
-            if (dependencies != null)
-            {
-                foreach (RuleDependency d in dependencies.Value())
-                {
-                    if (d != null)
-                    {
-                        result.AddItem(Tuple.Create(d, annotatedElement));
-                    }
-                }
+                result.Add(Tuple.Create(dependency, annotatedElement));
             }
         }
 
-        private static RuleDependencyChecker.RuleRelations ExtractRuleRelations<_T0>(Type
-            <_T0> recognizer) where _T0:Recognizer<object, object>
+        private static RuleDependencyChecker.RuleRelations ExtractRuleRelations(Type
+             recognizer)
         {
             string serializedATN = GetSerializedATN(recognizer);
             if (serializedATN == null)
@@ -509,45 +431,23 @@ namespace Antlr4.Runtime.Misc
             return relations;
         }
 
-        private static string GetSerializedATN<_T0>(Type<_T0> recognizerClass)
+        private static string GetSerializedATN(Type recognizerClass)
         {
-            try
-            {
-                FieldInfo serializedAtnField = Sharpen.Runtime.GetDeclaredField(recognizerClass, 
-                    "_serializedATN");
-                if (Modifier.IsStatic(serializedAtnField.GetModifiers()))
-                {
-                    return (string)serializedAtnField.GetValue(null);
-                }
-                return null;
-            }
-            catch (NoSuchFieldException)
-            {
-                if (recognizerClass.BaseType != null)
-                {
-                    return GetSerializedATN(recognizerClass.BaseType);
-                }
-                return null;
-            }
-            catch (SecurityException)
-            {
-                return null;
-            }
-            catch (ArgumentException)
-            {
-                return null;
-            }
-            catch (MemberAccessException)
-            {
-                return null;
-            }
+            FieldInfo serializedAtnField = recognizerClass.GetField("_serializedATN", BindingFlags.DeclaredOnly | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            if (serializedAtnField != null)
+                return (string)serializedAtnField.GetValue(null);
+
+            if (recognizerClass.BaseType != null)
+                return GetSerializedATN(recognizerClass.BaseType);
+
+            return null;
         }
 
         private sealed class RuleRelations
         {
-            private readonly BitSet[] parents;
+            public readonly BitSet[] parents;
 
-            private readonly BitSet[] children;
+            public readonly BitSet[] children;
 
             public RuleRelations(int ruleCount)
             {
