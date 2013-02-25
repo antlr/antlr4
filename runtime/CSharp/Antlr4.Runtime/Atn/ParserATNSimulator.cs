@@ -417,7 +417,7 @@ namespace Antlr4.Runtime.Atn
                     alt = ExecATN(dfa, input, index, state);
                 }
             }
-            catch (NoViableAltException nvae)
+            catch (NoViableAltException)
             {
                 throw;
             }

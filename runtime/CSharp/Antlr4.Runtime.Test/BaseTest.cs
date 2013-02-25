@@ -143,7 +143,7 @@
                 int ret = process.ExitCode;
                 return ret == 0;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Console.Error.WriteLine("can't exec compilation");
                 //e.printStackTrace(System.err);
@@ -277,7 +277,7 @@
                 int ret = process.ExitCode;
                 return ret == 0;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Console.Error.WriteLine("can't exec compilation");
                 //e.printStackTrace(System.err);
