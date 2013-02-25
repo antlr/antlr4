@@ -33,12 +33,12 @@
          * Parse all java files under this package within the JDK_SOURCE_ROOT
          * (environment variable or property defined on the Java command line).
          */
-        private const string TOP_PACKAGE = "java.lang";
+        private static readonly string TOP_PACKAGE = "java.lang";
         /**
          * {@code true} to load java files from sub-packages of
          * {@link #TOP_PACKAGE}.
          */
-        private const bool RECURSIVE = true;
+        private static readonly bool RECURSIVE = true;
 
         /**
          * {@code true} to use the Java grammar with expressions in the v4
@@ -46,60 +46,60 @@
          * grammar (Java.g4). In either case, the grammar is renamed in the
          * temporary directory to Java.g4 before compiling.
          */
-        private const bool USE_LR_GRAMMAR = true;
+        private static readonly bool USE_LR_GRAMMAR = true;
         /**
          * {@code true} to specify the {@code -Xforce-atn} option when generating
          * the grammar, forcing all decisions in {@code JavaParser} to be handled by
          * {@link ParserATNSimulator#adaptivePredict}.
          */
-        private const bool FORCE_ATN = false;
+        private static readonly bool FORCE_ATN = false;
         /**
          * {@code true} to specify the {@code -atn} option when generating the
          * grammar. This will cause ANTLR to export the ATN for each decision as a
          * DOT (GraphViz) file.
          */
-        private const bool EXPORT_ATN_GRAPHS = true;
+        private static readonly bool EXPORT_ATN_GRAPHS = true;
         /**
          * {@code true} to specify the {@code -XdbgST} option when generating the
          * grammar.
          */
-        private const bool DEBUG_TEMPLATES = false;
+        private static readonly bool DEBUG_TEMPLATES = false;
         /**
          * {@code true} to specify the {@code -XdbgSTWait} option when generating the
          * grammar.
          */
-        private const bool DEBUG_TEMPLATES_WAIT = DEBUG_TEMPLATES;
+        private static readonly bool DEBUG_TEMPLATES_WAIT = DEBUG_TEMPLATES;
         /**
          * {@code true} to delete temporary (generated and compiled) files when the
          * test completes.
          */
-        private const bool DELETE_TEMP_FILES = true;
+        private static readonly bool DELETE_TEMP_FILES = true;
 
         /**
          * {@code true} to call {@link System#gc} and then wait for 5 seconds at the
          * end of the test to make it easier for a profiler to grab a heap dump at
          * the end of the test run.
          */
-        private const bool PAUSE_FOR_HEAP_DUMP = false;
+        private static readonly bool PAUSE_FOR_HEAP_DUMP = false;
 
         /**
          * Parse each file with {@code JavaParser.compilationUnit}.
          */
-        private const bool RUN_PARSER = true;
+        private static readonly bool RUN_PARSER = true;
         /**
          * {@code true} to use {@link BailErrorStrategy}, {@code false} to use
          * {@link DefaultErrorStrategy}.
          */
-        private const bool BAIL_ON_ERROR = true;
+        private static readonly bool BAIL_ON_ERROR = true;
         /**
          * {@code true} to compute a checksum for verifying consistency across
          * optimizations and multiple passes.
          */
-        private const bool COMPUTE_CHECKSUM = true;
+        private static readonly bool COMPUTE_CHECKSUM = true;
         /**
          * This value is passed to {@link Parser#setBuildParseTree}.
          */
-        private const bool BUILD_PARSE_TREES = false;
+        private static readonly bool BUILD_PARSE_TREES = false;
         /**
          * Use
          * {@link ParseTreeWalker#DEFAULT}{@code .}{@link ParseTreeWalker#walk walk}
@@ -108,9 +108,9 @@
          * will instead be called during the parsing process via
          * {@link Parser#addParseListener}.
          */
-        private const bool BLANK_LISTENER = false;
+        private static readonly bool BLANK_LISTENER = false;
 
-        private const bool EXPORT_LARGEST_CONFIG_CONTEXTS = false;
+        private static readonly bool EXPORT_LARGEST_CONFIG_CONTEXTS = false;
 
         /**
          * Shows the number of {@link DFAState} and {@link ATNConfig} instances in
@@ -119,57 +119,57 @@
          * will only apply to one file (the last file if {@link #NUMBER_OF_THREADS}
          * is 0, otherwise the last file which was parsed on the first thread).
          */
-        private const bool SHOW_DFA_STATE_STATS = true;
+        private static readonly bool SHOW_DFA_STATE_STATS = true;
 
-        private const bool ENABLE_LEXER_DFA = true;
+        private static readonly bool ENABLE_LEXER_DFA = true;
 
-        private const bool ENABLE_PARSER_DFA = true;
+        private static readonly bool ENABLE_PARSER_DFA = true;
 
         private static readonly PredictionMode PREDICTION_MODE = PredictionMode.Ll;
-        private const bool FORCE_GLOBAL_CONTEXT = false;
-        private const bool TRY_LOCAL_CONTEXT_FIRST = true;
-        private const bool OPTIMIZE_LL1 = true;
-        private const bool OPTIMIZE_UNIQUE_CLOSURE = true;
-        private const bool OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS = false;
-        private const bool OPTIMIZE_TAIL_CALLS = true;
-        private const bool TAIL_CALL_PRESERVES_SLL = true;
-        private const bool TREAT_SLLK1_CONFLICT_AS_AMBIGUITY = false;
+        private static readonly bool FORCE_GLOBAL_CONTEXT = false;
+        private static readonly bool TRY_LOCAL_CONTEXT_FIRST = true;
+        private static readonly bool OPTIMIZE_LL1 = true;
+        private static readonly bool OPTIMIZE_UNIQUE_CLOSURE = true;
+        private static readonly bool OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS = false;
+        private static readonly bool OPTIMIZE_TAIL_CALLS = true;
+        private static readonly bool TAIL_CALL_PRESERVES_SLL = true;
+        private static readonly bool TREAT_SLLK1_CONFLICT_AS_AMBIGUITY = false;
 
-        private const bool TWO_STAGE_PARSING = true;
+        private static readonly bool TWO_STAGE_PARSING = true;
 
-        private const bool SHOW_CONFIG_STATS = false;
+        private static readonly bool SHOW_CONFIG_STATS = false;
 
-        private const bool REPORT_SYNTAX_ERRORS = true;
-        private const bool REPORT_AMBIGUITIES = false;
-        private const bool REPORT_FULL_CONTEXT = false;
-        private const bool REPORT_CONTEXT_SENSITIVITY = REPORT_FULL_CONTEXT;
+        private static readonly bool REPORT_SYNTAX_ERRORS = true;
+        private static readonly bool REPORT_AMBIGUITIES = false;
+        private static readonly bool REPORT_FULL_CONTEXT = false;
+        private static readonly bool REPORT_CONTEXT_SENSITIVITY = REPORT_FULL_CONTEXT;
 
         /**
          * If {@code true}, a single {@code JavaLexer} will be used, and
          * {@link Lexer#setInputStream} will be called to initialize it for each
          * source file. Otherwise, a new instance will be created for each file.
          */
-        private const bool REUSE_LEXER = false;
+        private static readonly bool REUSE_LEXER = false;
         /**
          * If {@code true}, a single DFA will be used for lexing which is shared
          * across all threads and files. Otherwise, each file will be lexed with its
          * own DFA which is accomplished by creating one ATN instance per thread and
          * clearing its DFA cache before lexing each file.
          */
-        private const bool REUSE_LEXER_DFA = true;
+        private static readonly bool REUSE_LEXER_DFA = true;
         /**
          * If {@code true}, a single {@code JavaParser} will be used, and
          * {@link Parser#setInputStream} will be called to initialize it for each
          * source file. Otherwise, a new instance will be created for each file.
          */
-        private const bool REUSE_PARSER = false;
+        private static readonly bool REUSE_PARSER = false;
         /**
          * If {@code true}, a single DFA will be used for parsing which is shared
          * across all threads and files. Otherwise, each file will be parsed with
          * its own DFA which is accomplished by creating one ATN instance per thread
          * and clearing its DFA cache before parsing each file.
          */
-        private const bool REUSE_PARSER_DFA = true;
+        private static readonly bool REUSE_PARSER_DFA = true;
         /**
          * If {@code true}, the shared lexer and parser are reset after each pass.
          * If {@code false}, all passes after the first will be fully "warmed up",
@@ -177,16 +177,16 @@
          * but it will not distinguish bytecode load/JIT time from warm-up time
          * during the first pass.
          */
-        private const bool CLEAR_DFA = false;
+        private static readonly bool CLEAR_DFA = false;
         /**
          * Total number of passes to make over the source.
          */
-        private const int PASSES = 4;
+        private static readonly int PASSES = 4;
 
         /**
          * Number of parser threads to use.
          */
-        private const int NUMBER_OF_THREADS = 1;
+        private static readonly int NUMBER_OF_THREADS = 1;
 
         private static readonly Lexer[] sharedLexers = new Lexer[NUMBER_OF_THREADS];
         private static readonly ATN[] sharedLexerATNs = new ATN[NUMBER_OF_THREADS];
