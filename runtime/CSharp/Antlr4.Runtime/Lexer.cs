@@ -343,7 +343,7 @@ outer_break: ;
         public virtual IToken Emit()
         {
             IToken t = _factory.Create(_tokenFactorySourcePair, _type, _text, _channel, _tokenStartCharIndex
-                , GetCharIndex() - 1, _tokenStartLine, _tokenStartCharPositionInLine);
+                , CharIndex - 1, _tokenStartLine, _tokenStartCharPositionInLine);
             Emit(t);
             return t;
         }
@@ -370,6 +370,11 @@ outer_break: ;
             {
                 return Interpreter.GetLine();
             }
+            set
+            {
+                int line = value;
+                Interpreter.SetLine(line);
+            }
         }
 
         public virtual int Column
@@ -378,89 +383,102 @@ outer_break: ;
             {
                 return Interpreter.GetCharPositionInLine();
             }
-        }
-
-        public virtual void SetLine(int line)
-        {
-            Interpreter.SetLine(line);
-        }
-
-        public virtual void SetCharPositionInLine(int charPositionInLine)
-        {
-            Interpreter.SetCharPositionInLine(charPositionInLine);
+            set
+            {
+                int charPositionInLine = value;
+                Interpreter.SetCharPositionInLine(charPositionInLine);
+            }
         }
 
         /// <summary>What is the index of the current character of lookahead?</summary>
-        public virtual int GetCharIndex()
+        public virtual int CharIndex
         {
-            return _input.Index;
-        }
-
-        /// <summary>
-        /// Return the text matched so far for the current token or any
-        /// text override.
-        /// </summary>
-        /// <remarks>
-        /// Return the text matched so far for the current token or any
-        /// text override.
-        /// </remarks>
-        public virtual string GetText()
-        {
-            if (_text != null)
+            get
             {
-                return _text;
+                return _input.Index;
             }
-            return Interpreter.GetText(_input);
         }
 
         /// <summary>
-        /// Set the complete text of this token; it wipes any previous
-        /// changes to the text.
+        /// Return the text matched so far for the current token or any text
+        /// override.
         /// </summary>
         /// <remarks>
-        /// Set the complete text of this token; it wipes any previous
-        /// changes to the text.
+        /// Return the text matched so far for the current token or any text
+        /// override.
         /// </remarks>
-        public virtual void SetText(string text)
+        /// <summary>
+        /// Set the complete text of this token; it wipes any previous changes to the
+        /// text.
+        /// </summary>
+        /// <remarks>
+        /// Set the complete text of this token; it wipes any previous changes to the
+        /// text.
+        /// </remarks>
+        public virtual string Text
         {
-            this._text = text;
+            get
+            {
+                if (_text != null)
+                {
+                    return _text;
+                }
+                return Interpreter.GetText(_input);
+            }
+            set
+            {
+                string text = value;
+                this._text = text;
+            }
         }
 
         /// <summary>Override if emitting multiple tokens.</summary>
         /// <remarks>Override if emitting multiple tokens.</remarks>
-        public virtual IToken GetToken()
+        public virtual IToken Token
         {
-            return _token;
+            get
+            {
+                return _token;
+            }
+            set
+            {
+                IToken _token = value;
+                this._token = _token;
+            }
         }
 
-        public virtual void SetToken(IToken _token)
+        public virtual int Type
         {
-            this._token = _token;
+            get
+            {
+                return _type;
+            }
+            set
+            {
+                int ttype = value;
+                _type = ttype;
+            }
         }
 
-        public virtual void SetType(int ttype)
+        public virtual int Channel
         {
-            _type = ttype;
+            get
+            {
+                return _channel;
+            }
+            set
+            {
+                int channel = value;
+                _channel = channel;
+            }
         }
 
-        public virtual int GetType()
+        public virtual string[] ModeNames
         {
-            return _type;
-        }
-
-        public virtual void SetChannel(int channel)
-        {
-            _channel = channel;
-        }
-
-        public virtual int GetChannel()
-        {
-            return _channel;
-        }
-
-        public virtual string[] GetModeNames()
-        {
-            return null;
+            get
+            {
+                return null;
+            }
         }
 
         /// <summary>
