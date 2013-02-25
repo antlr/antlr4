@@ -420,7 +420,7 @@ namespace Antlr4.Runtime.Atn
         protected internal virtual long GetKey(ATNConfig e)
         {
             long key = e.State.stateNumber;
-            key = (key << 12) | (e.Alt & unchecked((int)(0xFFF)));
+            key = (key << 12) | (e.Alt & 0xFFFL);
             return key;
         }
 
