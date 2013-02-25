@@ -7,7 +7,9 @@
     using System.Threading.Tasks;
     using Antlr4.Runtime.Misc;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Directory = System.IO.Directory;
     using DirectoryInfo = System.IO.DirectoryInfo;
+    using File = System.IO.File;
     using IOException = System.IO.IOException;
     using Path = System.IO.Path;
     using StreamReader = System.IO.StreamReader;
@@ -805,20 +807,7 @@
 
         public static void writeFile(string dir, string fileName, string content)
         {
-            try
-            {
-                File f = new File(dir, fileName);
-                FileWriter w = new FileWriter(f);
-                BufferedWriter bw = new BufferedWriter(w);
-                bw.write(content);
-                bw.close();
-                w.close();
-            }
-            catch (IOException ioe)
-            {
-                Console.Error.WriteLine("can't write file");
-                ioe.printStackTrace(System.err);
-            }
+            File.WriteAllText(Path.Combine(dir, fileName), content);
         }
 
         protected void mkdir(string dir)
@@ -948,14 +937,14 @@
             }
         }
 
-        protected void eraseTempDir()
+        protected virtual void eraseTempDir()
         {
-            File tmpdirF = new File(tmpdir);
-            if (tmpdirF.exists())
+            if (!Path.GetTempPath().Equals(Path.GetDirectoryName(tmpdir) + Path.DirectorySeparatorChar))
             {
-                eraseFiles();
-                tmpdirF.delete();
+                throw new InvalidOperationException();
             }
+
+            Directory.Delete(tmpdir, true);
         }
 
         public string getFirstLineOfException()
