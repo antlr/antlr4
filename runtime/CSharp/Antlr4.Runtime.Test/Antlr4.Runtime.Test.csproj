@@ -50,6 +50,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="BaseTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TaskSchedulers\QueuedTaskScheduler.cs" />
     <Compile Include="TestBitSet.cs" />
