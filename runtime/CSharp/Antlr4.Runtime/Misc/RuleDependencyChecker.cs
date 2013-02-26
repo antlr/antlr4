@@ -74,7 +74,7 @@ namespace Antlr4.Runtime.Misc
                     if (list == null)
                     {
                         list = new List<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>>();
-                        recognizerDependencies.Put(recognizerType, list);
+                        recognizerDependencies[recognizerType] = list;
                     }
                     list.Add(dependency);
                 }

@@ -838,7 +838,7 @@ namespace Antlr4.Runtime.Atn
                 if (alts == null)
                 {
                     alts = new BitSet();
-                    configToAlts.Put(c, alts);
+                    configToAlts[c] = alts;
                 }
                 alts.Set(c.Alt);
             }
@@ -871,7 +871,7 @@ namespace Antlr4.Runtime.Atn
                 if (alts == null)
                 {
                     alts = new BitSet();
-                    m.Put(c.State, alts);
+                    m[c.State] = alts;
                 }
                 alts.Set(c.Alt);
             }

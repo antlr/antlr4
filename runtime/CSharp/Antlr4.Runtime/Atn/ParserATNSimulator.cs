@@ -940,8 +940,8 @@ namespace Antlr4.Runtime.Atn
                     {
                         for (int i = 0; i < closureConfigs.Count; i++)
                         {
-                            closureConfigs.Set(i, closureConfigs[i].AppendContext(nextContextElement, contextCache
-                                ));
+                            closureConfigs[i] = closureConfigs[i].AppendContext(nextContextElement, contextCache
+                                );
                         }
                     }
                 }

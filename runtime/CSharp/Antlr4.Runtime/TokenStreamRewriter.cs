@@ -700,7 +700,7 @@ namespace Antlr4.Runtime
                 {
                     throw new InvalidOperationException("should only be one op per index");
                 }
-                m.Put(op.index, op);
+                m[op.index] = op;
             }
             //System.out.println("index to op: "+m);
             return m;

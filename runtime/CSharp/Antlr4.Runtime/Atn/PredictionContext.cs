@@ -355,7 +355,7 @@ namespace Antlr4.Runtime.Atn
             existing = contextCache.Get(context);
             if (existing != null)
             {
-                visited.Put(context, existing);
+                visited[context] = existing;
                 return existing;
             }
             bool changed = false;
@@ -382,7 +382,7 @@ namespace Antlr4.Runtime.Atn
             if (!changed)
             {
                 existing = contextCache.GetOrAdd(context, context);
-                visited.Put(context, existing);
+                visited[context] = existing;
                 return context;
             }
             // We know parents.length>0 because context.isEmpty() is checked at the beginning of the method.
@@ -398,8 +398,8 @@ namespace Antlr4.Runtime.Atn
                     , context.cachedHashCode);
             }
             existing = contextCache.GetOrAdd(updated, updated);
-            visited.Put(updated, existing);
-            visited.Put(context, existing);
+            visited[updated] = existing;
+            visited[context] = existing;
             return updated;
         }
 

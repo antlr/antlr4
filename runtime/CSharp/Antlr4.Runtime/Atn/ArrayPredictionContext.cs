@@ -200,7 +200,7 @@ namespace Antlr4.Runtime.Atn
                         result = PredictionContext.Join(result, suffix);
                     }
                 }
-                visited.Put(context, result);
+                visited[context] = result;
             }
             return result;
         }

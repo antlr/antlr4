@@ -789,13 +789,13 @@ namespace Antlr4.Runtime.Misc
                 // if on left edge x..b, adjust left
                 if (el == a)
                 {
-                    intervals.Set(i, Interval.Of(I.a + 1, I.b));
+                    intervals[i] = Interval.Of(I.a + 1, I.b);
                     break;
                 }
                 // if on right edge a..x, adjust right
                 if (el == b)
                 {
-                    intervals.Set(i, Interval.Of(I.a, I.b - 1));
+                    intervals[i] = Interval.Of(I.a, I.b - 1);
                     break;
                 }
                 // if in middle a..x..b, split interval
@@ -803,7 +803,7 @@ namespace Antlr4.Runtime.Misc
                 {
                     // found in this interval
                     int oldb = I.b;
-                    intervals.Set(i, Interval.Of(I.a, el - 1));
+                    intervals[i] = Interval.Of(I.a, el - 1);
                     // [a..x-1]
                     Add(el + 1, oldb);
                 }

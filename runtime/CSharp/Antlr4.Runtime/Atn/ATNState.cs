@@ -218,7 +218,7 @@ namespace Antlr4.Runtime.Atn
 
         public virtual void SetTransition(int i, Antlr4.Runtime.Atn.Transition e)
         {
-            transitions.Set(i, e);
+            transitions[i] = e;
         }
 
         public virtual void RemoveTransition(int index)
@@ -281,7 +281,7 @@ namespace Antlr4.Runtime.Atn
             {
                 throw new InvalidOperationException();
             }
-            optimizedTransitions.Set(i, e);
+            optimizedTransitions[i] = e;
         }
 
         public virtual void RemoveOptimizedTransition(int i)
