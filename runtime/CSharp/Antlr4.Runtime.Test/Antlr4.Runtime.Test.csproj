@@ -67,6 +67,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Java-LR.g4" />
     <EmbeddedResource Include="Java.g4" />
+    <Antlr4 Include="Java.g4" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
@@ -88,6 +89,13 @@
   </Choose>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <!-- Folder containing Antlr4BuildTasks.dll -->
+    <Antlr4BuildTaskPath>$(ProjectDir)..\build</Antlr4BuildTaskPath>
+    <!-- Path to the ANTLR Tool itself. -->
+    <Antlr4ToolPath>$(ProjectDir)..\build\antlr4-csharp-4.0.1-SNAPSHOT-complete.jar</Antlr4ToolPath>
+  </PropertyGroup>
+  <Import Project="$(ProjectDir)..\build\Antlr4.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
