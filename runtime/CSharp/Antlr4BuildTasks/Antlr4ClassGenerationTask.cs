@@ -304,7 +304,7 @@ namespace Antlr4.Build.Tasks
             return wrapper;
         }
 
-        private static bool IsFatalException(Exception exception)
+        internal static bool IsFatalException(Exception exception)
         {
             while (exception != null)
             {

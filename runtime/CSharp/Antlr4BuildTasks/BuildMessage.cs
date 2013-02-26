@@ -35,33 +35,45 @@ namespace Antlr4.Build.Tasks
     [Serializable]
     internal struct BuildMessage
     {
-        private static readonly Regex BuildMessageFormat = new Regex(@"^\s*(?<FILE>.*)\((?<LINE>[0-9]+),(?<COLUMN>[0-9]+)\) : (?<SEVERITY>[a-z]+)\s*(?<CODE>[0-9]+) : (?<MESSAGE>.*)$", RegexOptions.Compiled);
+        private static readonly Regex BuildMessageFormat = new Regex(@"^\s*(?<SEVERITY>[a-z]+)\((?<CODE>[0-9]+)\):\s*((?<FILE>.*):(?<LINE>[0-9]+):(?<COLUMN>[0-9]+):)?\s*(?:syntax error:\s*)?(?<MESSAGE>.*)$", RegexOptions.Compiled);
 
         public BuildMessage(string message)
             : this(TraceLevel.Error, message, null, 0, 0)
         {
-            Match match = BuildMessageFormat.Match(message);
-            if (match.Success)
+            try
             {
-                FileName = match.Groups["FILE"].Value;
-                LineNumber = int.Parse(match.Groups["LINE"].Value);
-                ColumnNumber = int.Parse(match.Groups["COLUMN"].Value);
-
-                switch (match.Groups["SEVERITY"].Value)
+                Match match = BuildMessageFormat.Match(message);
+                if (match.Success)
                 {
-                case "warning":
-                    Severity = TraceLevel.Warning;
-                    break;
-                case "error":
-                    Severity = TraceLevel.Error;
-                    break;
-                default:
-                    Severity = TraceLevel.Info;
-                    break;
-                }
+                    FileName = match.Groups["FILE"].Length > 0 ? match.Groups["FILE"].Value : "";
+                    LineNumber = match.Groups["LINE"].Length > 0 ? int.Parse(match.Groups["LINE"].Value) : 0;
+                    ColumnNumber = match.Groups["COLUMN"].Length > 0 ? int.Parse(match.Groups["COLUMN"].Value) + 1 : 0;
 
-                int code = int.Parse(match.Groups["CODE"].Value);
-                Message = string.Format("AC{0:0000}: {1}", code, match.Groups["MESSAGE"].Value);
+                    switch (match.Groups["SEVERITY"].Value)
+                    {
+                    case "warning":
+                        Severity = TraceLevel.Warning;
+                        break;
+                    case "error":
+                        Severity = TraceLevel.Error;
+                        break;
+                    default:
+                        Severity = TraceLevel.Info;
+                        break;
+                    }
+
+                    int code = int.Parse(match.Groups["CODE"].Value);
+                    Message = string.Format("AC{0:0000}: {1}", code, match.Groups["MESSAGE"].Value);
+                }
+                else
+                {
+                    Message = message;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (Antlr4ClassGenerationTask.IsFatalException(ex))
+                    throw;
             }
         }
 
