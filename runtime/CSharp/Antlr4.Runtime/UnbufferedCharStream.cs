@@ -234,7 +234,7 @@ namespace Antlr4.Runtime
         {
             for (int i = 0; i < n; i++)
             {
-                if (this.n > 0 && data[this.n - 1] == IntStreamConstants.Eof)
+                if (this.n > 0 && data[this.n - 1] == (char)IntStreamConstants.Eof)
                 {
                     return i;
                 }
@@ -284,7 +284,7 @@ namespace Antlr4.Runtime
             {
                 throw new ArgumentOutOfRangeException();
             }
-            if (index > n)
+            if (index >= n)
             {
                 return IntStreamConstants.Eof;
             }
@@ -432,7 +432,7 @@ namespace Antlr4.Runtime
             if (interval.a < bufferStartIndex || interval.b >= bufferStartIndex + n)
             {
                 throw new NotSupportedException("interval " + interval + " outside buffer: " + bufferStartIndex
-                     + ".." + (bufferStartIndex + n));
+                     + ".." + (bufferStartIndex + n - 1));
             }
             // convert from absolute to local index
             int i = interval.a - bufferStartIndex;
