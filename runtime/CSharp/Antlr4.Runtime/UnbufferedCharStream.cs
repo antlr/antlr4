@@ -234,7 +234,7 @@ namespace Antlr4.Runtime
         {
             for (int i = 0; i < n; i++)
             {
-                if (this.n > 0 && data[this.n - 1] == (char)IntStreamConstants.Eof)
+                if (this.n > 0 && data[this.n - 1] == unchecked((char)IntStreamConstants.Eof))
                 {
                     return i;
                 }
