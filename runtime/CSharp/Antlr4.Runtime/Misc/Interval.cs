@@ -88,17 +88,11 @@ namespace Antlr4.Runtime.Misc
 
         public override bool Equals(object o)
         {
-            if (o == this)
+            if (!(o is Antlr4.Runtime.Misc.Interval))
             {
-                return true;
+                return false;
             }
-            else
-            {
-                if (!(o is Antlr4.Runtime.Misc.Interval))
-                {
-                    return false;
-                }
-            }
+
             Antlr4.Runtime.Misc.Interval other = (Antlr4.Runtime.Misc.Interval)o;
             return this.a == other.a && this.b == other.b;
         }
