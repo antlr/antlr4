@@ -181,10 +181,10 @@ namespace Antlr4.Runtime.Misc
         /// , which would result in two disjoint intervals
         /// instead of the single one returned by this method.
         /// </summary>
-        public Antlr4.Runtime.Misc.Interval DifferenceNotProperlyContained(Antlr4.Runtime.Misc.Interval
+        public Antlr4.Runtime.Misc.Interval? DifferenceNotProperlyContained(Antlr4.Runtime.Misc.Interval
              other)
         {
-            Antlr4.Runtime.Misc.Interval diff = null;
+            Antlr4.Runtime.Misc.Interval? diff = null;
             // other.a to left of this.a (or same)
             if (other.StartsBeforeNonDisjoint(this))
             {
