@@ -149,7 +149,7 @@ namespace Antlr4.Build.Tasks
                 List<string> arguments = new List<string>();
                 arguments.Add("-cp");
                 arguments.Add(ToolPath);
-                arguments.Add("org.antlr.v4.Tool");
+                arguments.Add("org.antlr.v4.CSharpTool");
 
                 arguments.Add("-o");
                 arguments.Add(OutputPath);
