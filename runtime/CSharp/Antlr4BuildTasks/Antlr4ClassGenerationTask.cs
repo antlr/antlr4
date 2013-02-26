@@ -48,7 +48,7 @@ namespace Antlr4.Build.Tasks
     {
         private static AppDomain _sharedAppDomain;
 
-        private const string DefaultGeneratedSourceExtension = "g";
+        private const string DefaultGeneratedSourceExtension = "g4";
         private List<ITaskItem> _generatedCodeFiles = new List<ITaskItem>();
 
         public Antlr4ClassGenerationTask()
@@ -57,7 +57,7 @@ namespace Antlr4.Build.Tasks
         }
 
         [Required]
-        public string AntlrToolPath
+        public string ToolPath
         {
             get;
             set;
@@ -106,7 +106,7 @@ namespace Antlr4.Build.Tasks
             set;
         }
 
-        public string RootNamespace
+        public string TargetNamespace
         {
             get;
             set;
@@ -118,13 +118,25 @@ namespace Antlr4.Build.Tasks
             set;
         }
 
-        public bool DebugGrammar
+        public bool GenerateListener
         {
             get;
             set;
         }
 
-        public bool ProfileGrammar
+        public bool GenerateVisitor
+        {
+            get;
+            set;
+        }
+
+        public bool ForceAtn
+        {
+            get;
+            set;
+        }
+
+        public bool AbstractGrammar
         {
             get;
             set;
@@ -279,15 +291,16 @@ namespace Antlr4.Build.Tasks
                 }
             }
 
-            wrapper.AntlrToolPath = AntlrToolPath;
+            wrapper.ToolPath = ToolPath;
             wrapper.SourceCodeFiles = sourceCodeFiles;
             wrapper.TargetLanguage = TargetLanguage;
             wrapper.OutputPath = OutputPath;
-            wrapper.RootNamespace = RootNamespace;
-            wrapper.GeneratedSourceExtension = GeneratedSourceExtension;
             wrapper.LanguageSourceExtensions = LanguageSourceExtensions;
-            wrapper.DebugGrammar = DebugGrammar;
-            wrapper.ProfileGrammar = ProfileGrammar;
+            wrapper.TargetNamespace = TargetNamespace;
+            wrapper.GenerateListener = GenerateListener;
+            wrapper.GenerateVisitor = GenerateVisitor;
+            wrapper.ForceAtn = ForceAtn;
+            wrapper.AbstractGrammar = AbstractGrammar;
             return wrapper;
         }
 

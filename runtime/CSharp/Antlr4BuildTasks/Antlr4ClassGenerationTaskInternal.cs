@@ -32,9 +32,10 @@ namespace Antlr4.Build.Tasks
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
     using System.Reflection;
-    using System.Text;
+    using RegistryHive = Microsoft.Win32.RegistryHive;
+    using RegistryKey = Microsoft.Win32.RegistryKey;
+    using RegistryView = Microsoft.Win32.RegistryView;
 
     internal class AntlrClassGenerationTaskInternal : MarshalByRefObject
     {
@@ -50,13 +51,7 @@ namespace Antlr4.Build.Tasks
             }
         }
 
-        public string AntlrToolPath
-        {
-            get;
-            set;
-        }
-
-        public string GeneratedSourceExtension
+        public string ToolPath
         {
             get;
             set;
@@ -74,7 +69,7 @@ namespace Antlr4.Build.Tasks
             set;
         }
 
-        public string RootNamespace
+        public string TargetNamespace
         {
             get;
             set;
@@ -86,13 +81,25 @@ namespace Antlr4.Build.Tasks
             set;
         }
 
-        public bool DebugGrammar
+        public bool GenerateListener
         {
             get;
             set;
         }
 
-        public bool ProfileGrammar
+        public bool GenerateVisitor
+        {
+            get;
+            set;
+        }
+
+        public bool ForceAtn
+        {
+            get;
+            set;
+        }
+
+        public bool AbstractGrammar
         {
             get;
             set;
@@ -118,57 +125,94 @@ namespace Antlr4.Build.Tasks
             }
         }
 
+        private string JavaHome
+        {
+            get
+            {
+                string javaKey = "SOFTWARE\\JavaSoft\\Java Runtime Environment";
+                using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default).OpenSubKey(javaKey))
+                {
+                    string currentVersion = baseKey.GetValue("CurrentVersion").ToString();
+                    using (var homeKey = baseKey.OpenSubKey(currentVersion))
+                        return homeKey.GetValue("JavaHome").ToString();
+                }
+            }
+        }
+
         public bool Execute()
         {
             try
             {
-                Assembly antlrAssembly = Assembly.LoadFrom(AntlrToolPath);
-                Type antlrToolType = antlrAssembly.GetType("Antlr3.AntlrTool");
-                Type errorManagerType = antlrAssembly.GetType("Antlr3.Tool.ErrorManager");
-                object tool = Activator.CreateInstance(antlrAssembly.GetType("Antlr3.AntlrTool"), new object[] { Path.GetDirectoryName(AntlrToolPath) });
+                string javaHome = JavaHome;
+                string java = Path.Combine(javaHome, "bin", "java.exe");
 
-                Action process = (Action)Delegate.CreateDelegate(typeof(Action), tool, antlrToolType.GetMethod("Process"));
-                Action<string[]> ProcessArgs = (Action<string[]>)Delegate.CreateDelegate(typeof(Action<string[]>), tool, antlrToolType.GetMethod("ProcessArgs"));
-                Func<IList<string>> GetGeneratedFiles = (Func<IList<string>>)Delegate.CreateDelegate(typeof(Func<IList<string>>), tool, antlrToolType.GetProperty("GeneratedFiles").GetGetMethod());
+                List<string> arguments = new List<string>();
+                arguments.Add("-cp");
+                arguments.Add(ToolPath);
+                arguments.Add("org.antlr.v4.Tool");
 
-                Func<int> GetNumErrors = (Func<int>)Delegate.CreateDelegate(typeof(Func<int>), errorManagerType.GetMethod("GetNumErrors"));
-                Action<TraceListener> SetTraceListener = (Action<TraceListener>)Delegate.CreateDelegate(typeof(Action<TraceListener>), errorManagerType.GetProperty("ExternalListener").GetSetMethod());
+                arguments.Add("-o");
+                arguments.Add(OutputPath);
 
-                TimeSpan conversionTimeout = TimeSpan.FromSeconds(10);
+                if (GenerateListener)
+                    arguments.Add("-listener");
+                else
+                    arguments.Add("-no-listener");
 
-                List<string> args =
-                    new List<string>()
-                {
-                    "-Xconversiontimeout", ((int)conversionTimeout.TotalMilliseconds).ToString(),
-                    "-fo", OutputPath,
-                    "-message-format", "vs2005"
-                };
+                if (GenerateVisitor)
+                    arguments.Add("-visitor");
+                else
+                    arguments.Add("-no-visitor");
 
-                if (DebugGrammar)
-                    args.Add("-debug");
+                if (ForceAtn)
+                    arguments.Add("-force-atn");
 
-                if (ProfileGrammar)
-                    args.Add("-profile");
+                if (AbstractGrammar)
+                    arguments.Add("-Dabstract=true");
 
                 if (!string.IsNullOrEmpty(TargetLanguage))
+                    arguments.Add("-Dlanguage=" + TargetLanguage);
+
+                if (!string.IsNullOrEmpty(TargetNamespace))
                 {
-                    args.Add("-language");
-                    args.Add(TargetLanguage);
+                    arguments.Add("-package");
+                    arguments.Add(TargetNamespace);
                 }
 
-                args.AddRange(SourceCodeFiles);
+                arguments.AddRange(SourceCodeFiles);
 
-                using (LoggingTraceListener traceListener = new LoggingTraceListener(_buildMessages))
+                ProcessStartInfo startInfo = new ProcessStartInfo(java, string.Join(" ", arguments))
                 {
-                    SetTraceListener(traceListener);
-                    ProcessArgs(args.ToArray());
-                    process();
-                }
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    WorkingDirectory = OutputPath
+                };
 
-                _generatedCodeFiles.AddRange(GetGeneratedFiles().Where(file => LanguageSourceExtensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase)));
+                Process process = new Process();
+                process.StartInfo = startInfo;
+                process.ErrorDataReceived += HandleErrorDataReceived;
+                process.OutputDataReceived += HandleOutputDataReceived;
+                process.Start();
+                process.BeginErrorReadLine();
+                process.BeginOutputReadLine();
+                process.StandardInput.Close();
+                process.WaitForExit();
 
-                int errorCount = GetNumErrors();
-                return errorCount == 0;
+                return process.ExitCode == 0;
+                //using (LoggingTraceListener traceListener = new LoggingTraceListener(_buildMessages))
+                //{
+                //    SetTraceListener(traceListener);
+                //    ProcessArgs(args.ToArray());
+                //    process();
+                //}
+
+                //_generatedCodeFiles.AddRange(GetGeneratedFiles().Where(file => LanguageSourceExtensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase)));
+
+                //int errorCount = GetNumErrors();
+                //return errorCount == 0;
             }
             catch (Exception e)
             {
@@ -180,44 +224,14 @@ namespace Antlr4.Build.Tasks
             }
         }
 
-        private class LoggingTraceListener : TraceListener
+        private void HandleErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
-            private readonly ICollection<BuildMessage> _buildMessages;
-            private StringBuilder _currentLine;
+            _buildMessages.Add(new BuildMessage(e.Data));
+        }
 
-            public LoggingTraceListener(IList<BuildMessage> buildMessages)
-            {
-                _buildMessages = buildMessages;
-                _currentLine = new StringBuilder();
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                if (disposing)
-                    WriteLine(string.Empty);
-
-                base.Dispose(disposing);
-            }
-
-            public override void Write(string message)
-            {
-                _currentLine.Append(message);
-            }
-
-            public override void WriteLine(string message)
-            {
-                if (_currentLine.Length > 0)
-                {
-                    _buildMessages.Add(new BuildMessage(_currentLine.ToString()));
-                    _currentLine.Length = 0;
-                }
-
-                if (!string.IsNullOrEmpty(message))
-                {
-                    Write(message);
-                    WriteLine(null);
-                }
-            }
+        private void HandleOutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            _buildMessages.Add(new BuildMessage(e.Data));
         }
     }
 }
