@@ -226,12 +226,34 @@ namespace Antlr4.Build.Tasks
 
         private void HandleErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
-            _buildMessages.Add(new BuildMessage(e.Data));
+            if (string.IsNullOrEmpty(e.Data))
+                return;
+
+            try
+            {
+                _buildMessages.Add(new BuildMessage(e.Data));
+            }
+            catch (Exception ex)
+            {
+                if (Antlr4ClassGenerationTask.IsFatalException(ex))
+                    throw;
+            }
         }
 
         private void HandleOutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            _buildMessages.Add(new BuildMessage(e.Data));
+            if (string.IsNullOrEmpty(e.Data))
+                return;
+
+            try
+            {
+                _buildMessages.Add(new BuildMessage(e.Data));
+            }
+            catch (Exception ex)
+            {
+                if (Antlr4ClassGenerationTask.IsFatalException(ex))
+                    throw;
+            }
         }
     }
 }
