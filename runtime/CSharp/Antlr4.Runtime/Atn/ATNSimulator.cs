@@ -43,9 +43,9 @@ namespace Antlr4.Runtime.Atn
 
         public const char RuleVariantDelimiter = '$';
 
-        public static readonly string RuleLfVariantMarker = "$lf$";
+        public const string RuleLfVariantMarker = "$lf$";
 
-        public static readonly string RuleNolfVariantMarker = "$nolf$";
+        public const string RuleNolfVariantMarker = "$nolf$";
 
         /// <summary>Must distinguish between missing edge and edge we know leads nowhere</summary>
         [NotNull]
