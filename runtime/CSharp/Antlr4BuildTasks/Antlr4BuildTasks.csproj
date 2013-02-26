@@ -54,7 +54,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Antlr4.targets" />
+    <None Include="Antlr4.targets">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="..\..\..\..\..\..\keys\antlr\Key.snk">
       <Link>Key.snk</Link>
     </None>
