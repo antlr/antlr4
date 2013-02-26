@@ -190,7 +190,6 @@ namespace Antlr4.Build.Tasks
                     RedirectStandardInput = true,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-                    WorkingDirectory = OutputPath
                 };
 
                 Process process = new Process();
