@@ -36,13 +36,8 @@ namespace Antlr4.Runtime.Misc
     /// <remarks>An immutable inclusive interval a..b.</remarks>
     public struct Interval
     {
-        public const int IntervalPoolMaxValue = 1000;
-
         public static readonly Antlr4.Runtime.Misc.Interval Invalid = new Antlr4.Runtime.Misc.Interval
             (-1, -2);
-
-        private static Antlr4.Runtime.Misc.Interval[] cache = new Antlr4.Runtime.Misc.Interval
-            [IntervalPoolMaxValue + 1];
 
         /// <summary>The start of the interval.</summary>
         /// <remarks>The start of the interval.</remarks>
@@ -71,16 +66,7 @@ namespace Antlr4.Runtime.Misc
         /// </remarks>
         public static Antlr4.Runtime.Misc.Interval Of(int a, int b)
         {
-            // cache just a..a
-            if (a != b || a < 0 || a > IntervalPoolMaxValue)
-            {
-                return new Antlr4.Runtime.Misc.Interval(a, b);
-            }
-            if (cache[a] == null)
-            {
-                cache[a] = new Antlr4.Runtime.Misc.Interval(a, a);
-            }
-            return cache[a];
+            return new Antlr4.Runtime.Misc.Interval(a, b);
         }
 
         /// <summary>return number of elements between a and b inclusively.</summary>
