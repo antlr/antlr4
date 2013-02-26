@@ -424,7 +424,7 @@ namespace Antlr4.Runtime
             int bufferStartIndex = GetBufferStartIndex();
             if (n > 0 && data[n - 1] == char.MaxValue)
             {
-                if (interval.a + interval.Length() > bufferStartIndex + n)
+                if (interval.a + interval.Length > bufferStartIndex + n)
                 {
                     throw new ArgumentException("the interval extends past the end of the stream");
                 }
@@ -436,7 +436,7 @@ namespace Antlr4.Runtime
             }
             // convert from absolute to local index
             int i = interval.a - bufferStartIndex;
-            return new string(data, i, interval.Length());
+            return new string(data, i, interval.Length);
         }
 
         protected internal int GetBufferStartIndex()

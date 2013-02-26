@@ -32,8 +32,9 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Misc
 {
-    /// <summary>An immutable inclusive interval a..b</summary>
-    public class Interval
+    /// <summary>An immutable inclusive interval a..b.</summary>
+    /// <remarks>An immutable inclusive interval a..b.</remarks>
+    public struct Interval
     {
         public const int IntervalPoolMaxValue = 1000;
 
@@ -85,15 +86,18 @@ namespace Antlr4.Runtime.Misc
         /// <summary>return number of elements between a and b inclusively.</summary>
         /// <remarks>
         /// return number of elements between a and b inclusively. x..x is length 1.
-        /// if b &lt; a, then length is 0.  9..10 has length 2.
+        /// if b &lt; a, then length is 0. 9..10 has length 2.
         /// </remarks>
-        public virtual int Length()
+        public int Length
         {
-            if (b < a)
+            get
             {
-                return 0;
+                if (b < a)
+                {
+                    return 0;
+                }
+                return b - a + 1;
             }
-            return b - a + 1;
         }
 
         public override bool Equals(object o)
@@ -122,64 +126,63 @@ namespace Antlr4.Runtime.Misc
         }
 
         /// <summary>Does this start completely before other? Disjoint</summary>
-        public virtual bool StartsBeforeDisjoint(Antlr4.Runtime.Misc.Interval other)
+        public bool StartsBeforeDisjoint(Antlr4.Runtime.Misc.Interval other)
         {
             return this.a < other.a && this.b < other.a;
         }
 
         /// <summary>Does this start at or before other? Nondisjoint</summary>
-        public virtual bool StartsBeforeNonDisjoint(Antlr4.Runtime.Misc.Interval other)
+        public bool StartsBeforeNonDisjoint(Antlr4.Runtime.Misc.Interval other)
         {
             return this.a <= other.a && this.b >= other.a;
         }
 
         /// <summary>Does this.a start after other.b? May or may not be disjoint</summary>
-        public virtual bool StartsAfter(Antlr4.Runtime.Misc.Interval other)
+        public bool StartsAfter(Antlr4.Runtime.Misc.Interval other)
         {
             return this.a > other.a;
         }
 
         /// <summary>Does this start completely after other? Disjoint</summary>
-        public virtual bool StartsAfterDisjoint(Antlr4.Runtime.Misc.Interval other)
+        public bool StartsAfterDisjoint(Antlr4.Runtime.Misc.Interval other)
         {
             return this.a > other.b;
         }
 
         /// <summary>Does this start after other? NonDisjoint</summary>
-        public virtual bool StartsAfterNonDisjoint(Antlr4.Runtime.Misc.Interval other)
+        public bool StartsAfterNonDisjoint(Antlr4.Runtime.Misc.Interval other)
         {
             return this.a > other.a && this.a <= other.b;
         }
 
         // this.b>=other.b implied
         /// <summary>Are both ranges disjoint? I.e., no overlap?</summary>
-        public virtual bool Disjoint(Antlr4.Runtime.Misc.Interval other)
+        public bool Disjoint(Antlr4.Runtime.Misc.Interval other)
         {
             return StartsBeforeDisjoint(other) || StartsAfterDisjoint(other);
         }
 
         /// <summary>Are two intervals adjacent such as 0..41 and 42..42?</summary>
-        public virtual bool Adjacent(Antlr4.Runtime.Misc.Interval other)
+        public bool Adjacent(Antlr4.Runtime.Misc.Interval other)
         {
             return this.a == other.b + 1 || this.b == other.a - 1;
         }
 
-        public virtual bool ProperlyContains(Antlr4.Runtime.Misc.Interval other)
+        public bool ProperlyContains(Antlr4.Runtime.Misc.Interval other)
         {
             return other.a >= this.a && other.b <= this.b;
         }
 
         /// <summary>Return the interval computed from combining this and other</summary>
-        public virtual Antlr4.Runtime.Misc.Interval Union(Antlr4.Runtime.Misc.Interval other
-            )
+        public Antlr4.Runtime.Misc.Interval Union(Antlr4.Runtime.Misc.Interval other)
         {
             return Antlr4.Runtime.Misc.Interval.Of(Math.Min(a, other.a), Math.Max(b, other.b)
                 );
         }
 
         /// <summary>Return the interval in common between this and o</summary>
-        public virtual Antlr4.Runtime.Misc.Interval Intersection(Antlr4.Runtime.Misc.Interval
-             other)
+        public Antlr4.Runtime.Misc.Interval Intersection(Antlr4.Runtime.Misc.Interval other
+            )
         {
             return Antlr4.Runtime.Misc.Interval.Of(Math.Max(a, other.a), Math.Min(b, other.b)
                 );
@@ -198,7 +201,7 @@ namespace Antlr4.Runtime.Misc
         /// , which would result in two disjoint intervals
         /// instead of the single one returned by this method.
         /// </summary>
-        public virtual Antlr4.Runtime.Misc.Interval DifferenceNotProperlyContained(Antlr4.Runtime.Misc.Interval
+        public Antlr4.Runtime.Misc.Interval DifferenceNotProperlyContained(Antlr4.Runtime.Misc.Interval
              other)
         {
             Antlr4.Runtime.Misc.Interval diff = null;
