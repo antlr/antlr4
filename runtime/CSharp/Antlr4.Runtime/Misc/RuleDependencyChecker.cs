@@ -307,16 +307,20 @@ namespace Antlr4.Runtime.Misc
                         int version = ruleVersion != null ? ruleVersion.Version : 0;
                         versions[index] = version;
                     }
-                    catch (ArgumentException ex)
+                    catch (ArgumentException)
                     {
 #if false
                         Logger.Log(Level.Warning, null, ex);
+#else
+                        throw;
 #endif
                     }
-                    catch (MemberAccessException ex)
+                    catch (MemberAccessException)
                     {
 #if false
                         Logger.Log(Level.Warning, null, ex);
+#else
+                        throw;
 #endif
                     }
                 }
