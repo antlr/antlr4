@@ -199,11 +199,14 @@ namespace Antlr4.Runtime.Dfa
 
         public virtual DFAState GetTarget(int symbol)
         {
-            if (edges == null)
+            lock (this)
             {
-                return null;
+                if (edges == null)
+                {
+                    return null;
+                }
+                return edges[symbol];
             }
-            return edges[symbol];
         }
 
         public virtual void SetTarget(int symbol, DFAState target)
@@ -232,15 +235,18 @@ namespace Antlr4.Runtime.Dfa
 
         public virtual DFAState GetContextTarget(int invokingState)
         {
-            if (contextEdges == null)
+            lock (this)
             {
-                return null;
+                if (contextEdges == null)
+                {
+                    return null;
+                }
+                if (invokingState == PredictionContext.EmptyFullStateKey)
+                {
+                    invokingState = -1;
+                }
+                return contextEdges[invokingState];
             }
-            if (invokingState == PredictionContext.EmptyFullStateKey)
-            {
-                invokingState = -1;
-            }
-            return contextEdges[invokingState];
         }
 
         public virtual void SetContextTarget(int invokingState, DFAState target)
