@@ -49,11 +49,11 @@ namespace Antlr4.Runtime.Misc
     /// <author>Sam Harwell</author>
     public class RuleDependencyProcessor : AbstractProcessor
     {
-        public static readonly string RuleDependencyClassName = "org.antlr.v4.runtime.RuleDependency";
+        public const string RuleDependencyClassName = "org.antlr.v4.runtime.RuleDependency";
 
-        public static readonly string RuleDependenciesClassName = "org.antlr.v4.runtime.RuleDependencies";
+        public const string RuleDependenciesClassName = "org.antlr.v4.runtime.RuleDependencies";
 
-        public static readonly string RuleVersionClassName = "org.antlr.v4.runtime.RuleVersion";
+        public const string RuleVersionClassName = "org.antlr.v4.runtime.RuleVersion";
 
         public RuleDependencyProcessor()
         {

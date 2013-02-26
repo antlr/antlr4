@@ -55,7 +55,7 @@ namespace Antlr4.Runtime.Misc
     /// </remarks>
     public class TestRig
     {
-        public static readonly string LexerStartRuleName = "tokens";
+        public const string LexerStartRuleName = "tokens";
 
         protected internal string grammarName;
 

@@ -94,7 +94,7 @@ namespace Antlr4.Runtime
     /// </remarks>
     public class TokenStreamRewriter
     {
-        public static readonly string DefaultProgramName = "default";
+        public const string DefaultProgramName = "default";
 
         public const int ProgramInitSize = 100;
 
