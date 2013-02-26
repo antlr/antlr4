@@ -32,7 +32,9 @@ namespace Antlr4.Build.Tasks
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
+    using System.Text.RegularExpressions;
     using RegistryHive = Microsoft.Win32.RegistryHive;
     using RegistryKey = Microsoft.Win32.RegistryKey;
     using RegistryView = Microsoft.Win32.RegistryView;
@@ -224,6 +226,8 @@ namespace Antlr4.Build.Tasks
             }
         }
 
+        private static readonly Regex GeneratedFileMessageFormat = new Regex(@"^Generating file '(?<OUTPUT>.*?)' for grammar '(?<GRAMMAR>.*?)'$", RegexOptions.Compiled);
+
         private void HandleErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
             if (string.IsNullOrEmpty(e.Data))
@@ -247,7 +251,16 @@ namespace Antlr4.Build.Tasks
 
             try
             {
-                _buildMessages.Add(new BuildMessage(e.Data));
+                Match match = GeneratedFileMessageFormat.Match(e.Data);
+                if (!match.Success)
+                {
+                    _buildMessages.Add(new BuildMessage(e.Data));
+                    return;
+                }
+
+                string fileName = match.Groups["OUTPUT"].Value;
+                if (LanguageSourceExtensions.Contains(Path.GetExtension(fileName), StringComparer.OrdinalIgnoreCase))
+                    GeneratedCodeFiles.Add(match.Groups["OUTPUT"].Value);
             }
             catch (Exception ex)
             {
