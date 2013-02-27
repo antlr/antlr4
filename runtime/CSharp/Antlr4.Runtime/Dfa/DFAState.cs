@@ -290,7 +290,11 @@ namespace Antlr4.Runtime.Dfa
                     }
                     else
                     {
+#if NET_4_5
                         Dictionary<int, DFAState> result = map.ToDictionary(i => i.Key, i => i.Value);
+#else
+                        Dictionary<int, DFAState> result = new Dictionary<int, DFAState>(map);
+#endif
                         result.Add(PredictionContext.EmptyFullStateKey, result[-1]);
                         result.Remove(-1);
 #if NET_4_5
