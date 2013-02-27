@@ -59,9 +59,9 @@
     <Compile Include="TestPerformance.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Antlr4.Runtime\Antlr4.Runtime.csproj">
+    <ProjectReference Include="..\Antlr4.Runtime\Antlr4.Runtime.v4.5.csproj">
       <Project>{e1d192de-5347-48c4-a9f4-a8cba2af3869}</Project>
-      <Name>Antlr4.Runtime</Name>
+      <Name>Antlr4.Runtime.v4.5</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
