@@ -59,7 +59,11 @@ namespace Sharpen
         public static IDictionary<TKey, TValue> SingletonMap<TKey, TValue>(TKey key, TValue value)
 #endif
         {
+#if NET_4_5
+            return new ReadOnlyDictionary<TKey,TValue>(new Dictionary<TKey, TValue> { { key, value } });
+#else
             return new Dictionary<TKey, TValue> { { key, value } };
+#endif
         }
 
         private static class EmptyListImpl<T>
