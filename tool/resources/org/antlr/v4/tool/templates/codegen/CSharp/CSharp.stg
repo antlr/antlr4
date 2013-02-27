@@ -673,10 +673,14 @@ TokenListDecl(t) ::= "public IList\<IToken> <t.name> = new List\<IToken>();"
 RuleContextDecl(r) ::= "public <r.ctxName> <r.name>;"
 RuleContextListDecl(rdecl) ::= "public IList\<<rdecl.ctxName>> <rdecl.name> = new List\<<rdecl.ctxName>>();"
 
+contextGetterCollection(elementType) ::= <%
+<elementType>[]
+%>
+
 ContextTokenGetterDecl(t)      ::=
     "public ITerminalNode <t.name>() { return GetToken(<parser.name>.<t.name>, 0); }"
 ContextTokenListGetterDecl(t)  ::=
-    "public IReadOnlyList\<ITerminalNode> <t.name>() { return GetTokens(<parser.name>.<t.name>); }"
+    "public <contextGetterCollection("ITerminalNode")> <t.name>() { return GetTokens(<parser.name>.<t.name>); }"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
 public ITerminalNode <t.name>(int i) {
 	return GetToken(<parser.name>.<t.name>, i);
@@ -688,7 +692,7 @@ public <r.ctxName> <r.name>() {
 }
 >>
 ContextRuleListGetterDecl(r)   ::= <<
-public IReadOnlyList\<<r.ctxName>\> <r.name>() {
+public <contextGetterCollection({<r.ctxName>})> <r.name>() {
 	return GetRuleContexts\<<r.ctxName>\>();
 }
 >>
