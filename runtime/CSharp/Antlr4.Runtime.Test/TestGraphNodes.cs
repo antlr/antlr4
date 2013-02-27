@@ -1014,16 +1014,17 @@ namespace Antlr4.Runtime.Test
             where TKey : class
         {
             public IdentityHashMap()
-                : base(IdentityEqualityComparer.Default)
+                : base(IdentityEqualityComparer<TKey>.Default)
             {
             }
         }
 
-        private class IdentityEqualityComparer : IEqualityComparer<object>
+        private class IdentityEqualityComparer<T> : IEqualityComparer<T>
+            where T : class
         {
-            private static readonly IdentityEqualityComparer _default = new IdentityEqualityComparer();
+            private static readonly IdentityEqualityComparer<T> _default = new IdentityEqualityComparer<T>();
 
-            public static IdentityEqualityComparer Default
+            public static IdentityEqualityComparer<T> Default
             {
                 get
                 {
@@ -1031,12 +1032,12 @@ namespace Antlr4.Runtime.Test
                 }
             }
 
-            public new bool Equals(object x, object y)
+            public bool Equals(T x, T y)
             {
                 return x == y;
             }
 
-            public int GetHashCode(object obj)
+            public int GetHashCode(T obj)
             {
                 return RuntimeHelpers.GetHashCode(obj);
             }
