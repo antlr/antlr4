@@ -5,14 +5,12 @@
     using System.Text;
     using Antlr4.Runtime.Misc;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.Win32;
     using Directory = System.IO.Directory;
     using DirectoryInfo = System.IO.DirectoryInfo;
     using File = System.IO.File;
     using IOException = System.IO.IOException;
     using Path = System.IO.Path;
-    using RegistryHive = Microsoft.Win32.RegistryHive;
-    using RegistryKey = Microsoft.Win32.RegistryKey;
-    using RegistryView = Microsoft.Win32.RegistryView;
     using StreamReader = System.IO.StreamReader;
     using TextReader = System.IO.TextReader;
     using Thread = System.Threading.Thread;
@@ -70,6 +68,45 @@
             tmpdir = dir;
         }
 
+        protected static string WindowsFolder
+        {
+            get
+            {
+#if NET_4_0
+                return Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+#else
+                string systemFolder = Environment.GetFolderPath(Environment.SpecialFolder.System);
+                return Path.GetDirectoryName(systemFolder);
+#endif
+            }
+        }
+
+        protected static string UserProfile
+        {
+            get
+            {
+#if NET_4_0
+                return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+#else
+                string documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                return Path.GetDirectoryName(documentsFolder);
+#endif
+            }
+        }
+
+        protected static string PathCombine(params string[] paths)
+        {
+#if NET_4_0
+            return Path.Combine(paths);
+#else
+            string result = paths[0];
+            for (int i = 1; i < paths.Length; i++)
+                result = Path.Combine(result, paths[i]);
+
+            return result;
+#endif
+        }
+
         /** Wow! much faster than compiling outside of VM. Finicky though.
          *  Had rules called r and modulo. Wouldn't compile til I changed to 'a'.
          */
@@ -78,8 +115,7 @@
             DirectoryInfo outputDir = new DirectoryInfo(tmpdir);
             try
             {
-                string windows = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
-                string compiler = Path.Combine(windows, "Microsoft.NET", "Framework64", "v4.0.30319", "csc.exe");
+                string compiler = PathCombine(WindowsFolder, "Microsoft.NET", "Framework64", "v4.0.30319", "csc.exe");
 
                 List<string> args = new List<string>();
                 args.AddRange(getCompileOptions());
@@ -114,7 +150,7 @@
                     args.Insert(1, "/out:Parser.dll");
                 }
 
-                System.Diagnostics.Process process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(compiler, '"' + string.Join("\" \"", args) + '"')
+                System.Diagnostics.Process process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(compiler, '"' + Utils.Join("\" \"", args) + '"')
                 {
                     UseShellExecute = false,
                     CreateNoWindow = true,
@@ -132,12 +168,12 @@
                 stderr.join();
                 if (stdout.ToString().Length > 0)
                 {
-                    Console.Error.WriteLine("compile stdout from: " + string.Join(" ", args));
+                    Console.Error.WriteLine("compile stdout from: " + Utils.Join(" ", args));
                     Console.Error.WriteLine(stdout);
                 }
                 if (stderr.ToString().Length > 0)
                 {
-                    Console.Error.WriteLine("compile stderr from: " + string.Join(" ", args));
+                    Console.Error.WriteLine("compile stderr from: " + Utils.Join(" ", args));
                     Console.Error.WriteLine(stderr);
                 }
                 int ret = process.ExitCode;
@@ -190,7 +226,11 @@
             get
             {
                 string javaKey = "SOFTWARE\\JavaSoft\\Java Runtime Environment";
+#if NET_4_0
                 using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default).OpenSubKey(javaKey))
+#else
+                using (var baseKey = Registry.LocalMachine.OpenSubKey(javaKey))
+#endif
                 {
                     string currentVersion = baseKey.GetValue("CurrentVersion").ToString();
                     using (var homeKey = baseKey.OpenSubKey(currentVersion))
@@ -205,7 +245,7 @@
             {
                 string mavenHome = Environment.GetEnvironmentVariable("M2_HOME");
                 if (!Directory.Exists(mavenHome))
-                    mavenHome = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".m2");
+                    mavenHome = Path.Combine(UserProfile, ".m2");
 
                 return mavenHome;
             }
@@ -213,7 +253,7 @@
 
         protected virtual string GetMavenArtifact(string groupId, string artifactId, string version, string classifier = null)
         {
-            string folder = Path.Combine(MavenHome, "repository", groupId.Replace('.', Path.DirectorySeparatorChar), artifactId, version);
+            string folder = PathCombine(MavenHome, "repository", groupId.Replace('.', Path.DirectorySeparatorChar), artifactId, version);
             string fileNameFormat = string.IsNullOrEmpty(classifier) ? "{0}-{1}.jar" : "{0}-{1}-{2}.jar";
             string fileName = string.Format(fileNameFormat, artifactId, version, classifier);
             return Path.Combine(folder, fileName);
@@ -226,7 +266,7 @@
             writeFile(tmpdir, fileName, grammarStr);
             try
             {
-                string compiler = Path.Combine(JavaHome, "bin", "java.exe");
+                string compiler = PathCombine(JavaHome, "bin", "java.exe");
 
                 List<string> classpath = new List<string>();
                 classpath.Add(GetMavenArtifact("com.tunnelvisionlabs", "antlr4-csharp", "4.0.1-SNAPSHOT"));
@@ -237,7 +277,7 @@
 
                 List<string> options = new List<string>();
                 options.Add("-cp");
-                options.Add(string.Join(";", classpath));
+                options.Add(Utils.Join(";", classpath));
                 options.Add("org.antlr.v4.Tool");
 
                 options.AddRange(extraOptions);
@@ -248,7 +288,7 @@
                 options.Add("-Dlanguage=CSharp");
                 options.Add(grammarFileName);
 
-                System.Diagnostics.Process process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(compiler, '"' + string.Join("\" \"", options) + '"')
+                System.Diagnostics.Process process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(compiler, '"' + Utils.Join("\" \"", options) + '"')
                 {
                     UseShellExecute = false,
                     CreateNoWindow = true,
@@ -266,12 +306,12 @@
                 stderr.join();
                 if (stdout.ToString().Length > 0)
                 {
-                    Console.Error.WriteLine("compile stdout from: " + string.Join(" ", options));
+                    Console.Error.WriteLine("compile stdout from: " + Utils.Join(" ", options));
                     Console.Error.WriteLine(stdout);
                 }
                 if (stderr.ToString().Length > 0)
                 {
-                    Console.Error.WriteLine("compile stderr from: " + string.Join(" ", options));
+                    Console.Error.WriteLine("compile stderr from: " + Utils.Join(" ", options));
                     Console.Error.WriteLine(stderr);
                 }
                 int ret = process.ExitCode;
@@ -370,7 +410,7 @@
             if (parserName != null)
             {
                 files.Add(parserName + ".cs");
-                ISet<string> optionsSet = new HashSet<string>(extraOptions);
+                HashSet<string> optionsSet = new HashSet<string>(extraOptions);
                 if (!optionsSet.Contains("-no-listener"))
                 {
                     files.Add(grammarFileName.Substring(0, grammarFileName.LastIndexOf('.')) + "BaseListener.cs");
