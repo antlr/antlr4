@@ -69,9 +69,8 @@ namespace Antlr4.Runtime.Misc
                 foreach (Tuple<RuleDependencyAttribute, ICustomAttributeProvider> dependency in dependencies)
                 {
                     Type recognizerType = dependency.Item1.Recognizer;
-                    IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>> list = recognizerDependencies.Get
-                        (recognizerType);
-                    if (list == null)
+                    IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>> list;
+                    if (!recognizerDependencies.TryGetValue(recognizerType, out list))
                     {
                         list = new List<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>>();
                         recognizerDependencies[recognizerType] = list;

@@ -347,13 +347,12 @@ namespace Antlr4.Runtime.Atn
             {
                 return context;
             }
-            Antlr4.Runtime.Atn.PredictionContext existing = visited.Get(context);
-            if (existing != null)
+            Antlr4.Runtime.Atn.PredictionContext existing;
+            if (visited.TryGetValue(context, out existing))
             {
                 return existing;
             }
-            existing = contextCache.Get(context);
-            if (existing != null)
+            if (contextCache.TryGetValue(context, out existing))
             {
                 visited[context] = existing;
                 return existing;

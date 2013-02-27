@@ -279,8 +279,8 @@ namespace Antlr4.Runtime.Atn
             }
             ATNConfig config = (ATNConfig)o;
             long configKey = GetKey(config);
-            ATNConfig mergedConfig = mergedConfigs.Get(configKey);
-            if (mergedConfig != null && CanMerge(config, configKey, mergedConfig))
+            ATNConfig mergedConfig;
+            if (mergedConfigs.TryGetValue(configKey, out mergedConfig) && CanMerge(config, configKey, mergedConfig))
             {
                 return mergedConfig.Contains(config);
             }
@@ -326,8 +326,8 @@ namespace Antlr4.Runtime.Atn
             }
             bool addKey;
             long key = GetKey(e);
-            ATNConfig mergedConfig = mergedConfigs.Get(key);
-            addKey = (mergedConfig == null);
+            ATNConfig mergedConfig;
+            addKey = !mergedConfigs.TryGetValue(key, out mergedConfig);
             if (mergedConfig != null && CanMerge(e, key, mergedConfig))
             {
                 mergedConfig.OuterContextDepth = Math.Max(mergedConfig.OuterContextDepth, e.OuterContextDepth
@@ -639,7 +639,8 @@ namespace Antlr4.Runtime.Atn
             ATNConfig config = configs[index];
             configs.Remove(config);
             long key = GetKey(config);
-            if (mergedConfigs.Get(key) == config)
+            ATNConfig existing;
+            if (mergedConfigs.TryGetValue(key, out existing) && existing == config)
             {
                 mergedConfigs.Remove(key);
             }

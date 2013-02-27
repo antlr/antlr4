@@ -249,8 +249,8 @@ namespace Antlr4.Runtime
         /// </remarks>
         public virtual void Rollback(string programName, int instructionIndex)
         {
-            IList<TokenStreamRewriter.RewriteOperation> @is = programs.Get(programName);
-            if (@is != null)
+            IList<TokenStreamRewriter.RewriteOperation> @is;
+            if (programs.TryGetValue(programName, out @is))
             {
                 programs[programName] = new List<RewriteOperation>(@is.Skip(MinTokenIndex).Take(instructionIndex - MinTokenIndex));
             }
@@ -406,8 +406,8 @@ namespace Antlr4.Runtime
         protected internal virtual IList<TokenStreamRewriter.RewriteOperation> GetProgram
             (string name)
         {
-            IList<TokenStreamRewriter.RewriteOperation> @is = programs.Get(name);
-            if (@is == null)
+            IList<TokenStreamRewriter.RewriteOperation> @is;
+            if (!programs.TryGetValue(name, out @is))
             {
                 @is = InitializeProgram(name);
             }
@@ -457,7 +457,10 @@ namespace Antlr4.Runtime
 
         public virtual string GetText(string programName, Interval interval)
         {
-            IList<TokenStreamRewriter.RewriteOperation> rewrites = programs.Get(programName);
+            IList<TokenStreamRewriter.RewriteOperation> rewrites;
+            if (!programs.TryGetValue(programName, out rewrites))
+                rewrites = null;
+
             int start = interval.a;
             int stop = interval.b;
             // ensure start/end are in range
@@ -482,8 +485,10 @@ namespace Antlr4.Runtime
             int i = start;
             while (i <= stop && i < tokens.Size)
             {
-                TokenStreamRewriter.RewriteOperation op = indexToOp.Get(i);
-                indexToOp.Remove(i);
+                TokenStreamRewriter.RewriteOperation op;
+                if (indexToOp.TryGetValue(i, out op))
+                    indexToOp.Remove(i);
+
                 // remove so any left have index size-1
                 IToken t = tokens.Get(i);
                 if (op == null)
@@ -696,7 +701,7 @@ namespace Antlr4.Runtime
                     continue;
                 }
                 // ignore deleted ops
-                if (m.Get(op.index) != null)
+                if (m.ContainsKey(op.index))
                 {
                     throw new InvalidOperationException("should only be one op per index");
                 }

@@ -834,8 +834,8 @@ namespace Antlr4.Runtime.Atn
                 ();
             foreach (ATNConfig c in configs)
             {
-                BitSet alts = configToAlts.Get(c);
-                if (alts == null)
+                BitSet alts;
+                if (!configToAlts.TryGetValue(c, out alts))
                 {
                     alts = new BitSet();
                     configToAlts[c] = alts;
@@ -867,8 +867,8 @@ namespace Antlr4.Runtime.Atn
             IDictionary<ATNState, BitSet> m = new Dictionary<ATNState, BitSet>();
             foreach (ATNConfig c in configs)
             {
-                BitSet alts = m.Get(c.State);
-                if (alts == null)
+                BitSet alts;
+                if (!m.TryGetValue(c.State, out alts))
                 {
                     alts = new BitSet();
                     m[c.State] = alts;

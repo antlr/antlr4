@@ -160,8 +160,8 @@ namespace Antlr4.Runtime.Atn
             {
                 throw new NotSupportedException("Appending a tree suffix is not yet supported.");
             }
-            PredictionContext result = visited.Get(context);
-            if (result == null)
+            PredictionContext result;
+            if (!visited.TryGetValue(context, out result))
             {
                 if (context.IsEmpty)
                 {

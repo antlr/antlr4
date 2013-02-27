@@ -649,8 +649,8 @@ namespace Antlr4.Runtime.Atn
         {
             System.Diagnostics.Debug.Assert(!configs.HasSemanticContext);
             DFAState proposed = new DFAState(configs, 0, MaxDfaEdge);
-            DFAState existing = atn.modeToDFA[mode].states.Get(proposed);
-            if (existing != null)
+            DFAState existing;
+            if (atn.modeToDFA[mode].states.TryGetValue(proposed, out existing))
             {
                 return existing;
             }

@@ -1999,8 +1999,8 @@ namespace Antlr4.Runtime.Atn
                 configs.OptimizeConfigs(this);
             }
             DFAState proposed = CreateDFAState(configs);
-            DFAState existing = dfa.states.Get(proposed);
-            if (existing != null)
+            DFAState existing;
+            if (dfa.states.TryGetValue(proposed, out existing))
             {
                 return existing;
             }
@@ -2016,8 +2016,7 @@ namespace Antlr4.Runtime.Atn
                         if (configs.Count < size)
                         {
                             proposed = CreateDFAState(configs);
-                            existing = dfa.states.Get(proposed);
-                            if (existing != null)
+                            if (dfa.states.TryGetValue(proposed, out existing))
                             {
                                 return existing;
                             }
