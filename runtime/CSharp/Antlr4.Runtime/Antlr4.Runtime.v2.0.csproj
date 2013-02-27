@@ -40,10 +40,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -164,6 +160,16 @@
     <Compile Include="Sharpen\BitSet.cs" />
     <Compile Include="Sharpen\Checksum.cs" />
     <Compile Include="Sharpen\Collections.cs" />
+    <Compile Include="Sharpen\Compat\CollectionDebuggerView`2.cs" />
+    <Compile Include="Sharpen\Compat\ConcurrentDictionary`2.cs" />
+    <Compile Include="Sharpen\Compat\Enumerable.cs" />
+    <Compile Include="Sharpen\Compat\Funcs.cs" />
+    <Compile Include="Sharpen\Compat\HashSet`1.cs" />
+    <Compile Include="Sharpen\Compat\IStructuralComparable.cs" />
+    <Compile Include="Sharpen\Compat\IStructuralEquatable.cs" />
+    <Compile Include="Sharpen\Compat\SplitOrderedList`2.cs" />
+    <Compile Include="Sharpen\Compat\Tuple.cs" />
+    <Compile Include="Sharpen\Compat\Tuples.cs" />
     <Compile Include="Sharpen\CRC32.cs" />
     <Compile Include="Sharpen\DictionaryExtensions.cs" />
     <Compile Include="Sharpen\ListExtensions.cs" />
