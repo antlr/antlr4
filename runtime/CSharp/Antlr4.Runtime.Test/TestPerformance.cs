@@ -10,7 +10,10 @@
     using Antlr4.Runtime.Misc;
     using Antlr4.Runtime.Tree;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Sharpen;
+    using Arrays = Sharpen.Arrays;
+    using BitSet = Sharpen.BitSet;
+    using Checksum = Sharpen.Checksum;
+    using CRC32 = Sharpen.CRC32;
     using Debug = System.Diagnostics.Debug;
     using DirectoryInfo = System.IO.DirectoryInfo;
     using FileInfo = System.IO.FileInfo;
