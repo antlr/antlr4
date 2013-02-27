@@ -81,6 +81,7 @@
   <ItemDefinitionGroup>
     <Antlr4>
       <Generator>MSBuild:Compile</Generator>
+      <CustomToolNamespace>$(RootNamespace)</CustomToolNamespace>
       <TargetLanguage>CSharp</TargetLanguage>
       <Listener>true</Listener>
       <Visitor>true</Visitor>
@@ -131,6 +132,7 @@
       OutputPath="$(IntermediateOutputPath)"
       TargetLanguage="%(Antlr4.TargetLanguage)"
       TargetFrameworkVersion="$(TargetFrameworkVersion)"
+      TargetNamespace="%(Antlr4.CustomToolNamespace)"
       SourceCodeFiles="@(Antlr4)"
       ContinueOnError="$(_IntellisenseOnlyCompile)"
       TokensFiles="@(Antlr4Tokens)"
