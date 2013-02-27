@@ -164,6 +164,13 @@
     <Compile Include="Sharpen\BitSet.cs" />
     <Compile Include="Sharpen\Checksum.cs" />
     <Compile Include="Sharpen\Collections.cs" />
+    <Compile Include="Sharpen\Compat\CollectionDebuggerView`2.cs" />
+    <Compile Include="Sharpen\Compat\ConcurrentDictionary`2.cs" />
+    <Compile Include="Sharpen\Compat\IStructuralComparable.cs" />
+    <Compile Include="Sharpen\Compat\IStructuralEquatable.cs" />
+    <Compile Include="Sharpen\Compat\SplitOrderedList`2.cs" />
+    <Compile Include="Sharpen\Compat\Tuple.cs" />
+    <Compile Include="Sharpen\Compat\Tuples.cs" />
     <Compile Include="Sharpen\CRC32.cs" />
     <Compile Include="Sharpen\DictionaryExtensions.cs" />
     <Compile Include="Sharpen\ListExtensions.cs" />
