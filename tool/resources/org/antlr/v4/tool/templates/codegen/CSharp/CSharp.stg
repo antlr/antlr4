@@ -679,8 +679,9 @@ contextGetterCollection(elementType) ::= <%
 
 ContextTokenGetterDecl(t)      ::=
     "public ITerminalNode <t.name>() { return GetToken(<parser.name>.<t.name>, 0); }"
-ContextTokenListGetterDecl(t)  ::=
-    "public <contextGetterCollection("ITerminalNode")> <t.name>() { return GetTokens(<parser.name>.<t.name>); }"
+ContextTokenListGetterDecl(t)  ::= <<
+public <contextGetterCollection("ITerminalNode")> <t.name>() { return GetTokens(<parser.name>.<t.name>); }
+>>
 ContextTokenListIndexedGetterDecl(t)  ::= <<
 public ITerminalNode <t.name>(int i) {
 	return GetToken(<parser.name>.<t.name>, i);
