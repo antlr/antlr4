@@ -76,6 +76,12 @@ namespace Antlr4.Build.Tasks
             set;
         }
 
+        public string TargetFrameworkVersion
+        {
+            get;
+            set;
+        }
+
         public string BuildTaskPath
         {
             get;
@@ -294,6 +300,7 @@ namespace Antlr4.Build.Tasks
             wrapper.ToolPath = ToolPath;
             wrapper.SourceCodeFiles = sourceCodeFiles;
             wrapper.TargetLanguage = TargetLanguage;
+            wrapper.TargetFrameworkVersion = TargetFrameworkVersion;
             wrapper.OutputPath = OutputPath;
             wrapper.LanguageSourceExtensions = LanguageSourceExtensions;
             wrapper.TargetNamespace = TargetNamespace;

@@ -65,6 +65,12 @@ namespace Antlr4.Build.Tasks
             set;
         }
 
+        public string TargetFrameworkVersion
+        {
+            get;
+            set;
+        }
+
         public string OutputPath
         {
             get;
@@ -173,7 +179,19 @@ namespace Antlr4.Build.Tasks
                     arguments.Add("-Dabstract=true");
 
                 if (!string.IsNullOrEmpty(TargetLanguage))
-                    arguments.Add("-Dlanguage=" + TargetLanguage);
+                {
+                    string framework = TargetFrameworkVersion;
+                    if (string.IsNullOrEmpty(framework))
+                        framework = "v2.0";
+
+                    string language;
+                    if (TargetLanguage.Equals("CSharp"))
+                        language = TargetLanguage + '_' + framework.Replace('.', '_');
+                    else
+                        language = TargetLanguage;
+
+                    arguments.Add("-Dlanguage=" + language);
+                }
 
                 if (!string.IsNullOrEmpty(TargetNamespace))
                 {

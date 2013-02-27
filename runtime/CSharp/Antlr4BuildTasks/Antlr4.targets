@@ -130,6 +130,7 @@
       BuildTaskPath="$(Antlr4BuildTaskLocation)"
       OutputPath="$(IntermediateOutputPath)"
       TargetLanguage="%(Antlr4.TargetLanguage)"
+      TargetFrameworkVersion="$(TargetFrameworkVersion)"
       SourceCodeFiles="@(Antlr4)"
       ContinueOnError="$(_IntellisenseOnlyCompile)"
       TokensFiles="@(Antlr4Tokens)"
