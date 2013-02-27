@@ -224,9 +224,9 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        public virtual ISet<ATNState> GetStates()
+        public virtual HashSet<ATNState> GetStates()
         {
-            ISet<ATNState> states = new HashSet<ATNState>();
+            HashSet<ATNState> states = new HashSet<ATNState>();
             foreach (ATNConfig c in this.configs)
             {
                 states.Add(c.State);

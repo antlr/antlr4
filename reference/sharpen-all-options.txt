@@ -102,7 +102,7 @@
 -typeMapping java.lang.Comparable<> System.IComparable
 -typeMapping java.util.Comparator<> System.Collections.Generic.IComparer
 -typeMapping java.util.HashSet<> System.Collections.Generic.HashSet
--typeMapping java.util.Set<> System.Collections.Generic.ISet
+-typeMapping java.util.Set<> System.Collections.Generic.HashSet
 -typeMapping java.util.concurrent.ConcurrentMap<,> System.Collections.Concurrent.ConcurrentDictionary
 -typeMapping java.util.concurrent.ConcurrentHashMap<,> System.Collections.Concurrent.ConcurrentDictionary
 -typeMapping java.io.File Sharpen.FilePath

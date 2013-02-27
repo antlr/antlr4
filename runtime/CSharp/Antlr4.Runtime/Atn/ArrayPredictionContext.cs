@@ -229,7 +229,7 @@ namespace Antlr4.Runtime.Atn
                 >());
         }
 
-        private bool Equals(Antlr4.Runtime.Atn.ArrayPredictionContext other, ISet<PredictionContextCache.IdentityCommutativePredictionContextOperands
+        private bool Equals(Antlr4.Runtime.Atn.ArrayPredictionContext other, HashSet<PredictionContextCache.IdentityCommutativePredictionContextOperands
             > visited)
         {
             Stack<PredictionContext> selfWorkList = new Stack<PredictionContext>();

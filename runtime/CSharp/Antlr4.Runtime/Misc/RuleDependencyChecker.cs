@@ -47,7 +47,7 @@ namespace Antlr4.Runtime.Misc
             ).FullName);
 #endif
 
-        private static readonly ISet<string> checkedAssemblies = new HashSet<string>();
+        private static readonly HashSet<string> checkedAssemblies = new HashSet<string>();
 
         public static void CheckDependencies(Assembly assembly)
         {

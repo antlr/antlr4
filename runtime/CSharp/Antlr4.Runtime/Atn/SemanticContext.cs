@@ -277,7 +277,7 @@ namespace Antlr4.Runtime.Atn
 
             public OR(SemanticContext a, SemanticContext b)
             {
-                ISet<SemanticContext> operands = new HashSet<SemanticContext>();
+                HashSet<SemanticContext> operands = new HashSet<SemanticContext>();
                 if (a is SemanticContext.OR)
                 {
                     operands.UnionWith(((OR)a).opnds);

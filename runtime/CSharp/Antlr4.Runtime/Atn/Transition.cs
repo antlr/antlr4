@@ -56,21 +56,6 @@ namespace Antlr4.Runtime.Atn
             (Arrays.AsList("INVALID", "EPSILON", "RANGE", "RULE", "PREDICATE", "ATOM", "ACTION"
             , "SET", "NOT_SET", "WILDCARD", "PRECEDENCE"));
 
-        public static readonly IReadOnlyDictionary<Type, TransitionType> serializationTypes =
-             new Dictionary<Type, TransitionType>()
-             {
-                { typeof(EpsilonTransition), TransitionType.Epsilon },
-                { typeof(RangeTransition), TransitionType.Range },
-                { typeof(RuleTransition), TransitionType.Rule },
-                { typeof(PredicateTransition), TransitionType.Predicate },
-                { typeof(AtomTransition), TransitionType.Atom },
-                { typeof(ActionTransition), TransitionType.Action },
-                { typeof(SetTransition), TransitionType.Set },
-                { typeof(NotSetTransition), TransitionType.NotSet },
-                { typeof(WildcardTransition), TransitionType.Wildcard },
-                { typeof(PrecedencePredicateTransition), TransitionType.Precedence },
-             };
-
         /// <summary>The target of this transition.</summary>
         /// <remarks>The target of this transition.</remarks>
         [NotNull]

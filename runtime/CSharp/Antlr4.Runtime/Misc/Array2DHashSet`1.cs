@@ -39,7 +39,7 @@ namespace Antlr4.Runtime.Misc
     /// <see cref="Sharpen.ISet{E}">Sharpen.ISet&lt;E&gt;</see>
     /// implementation with closed hashing (open addressing).
     /// </summary>
-    public class Array2DHashSet<T> : ISet<T>
+    public class Array2DHashSet<T> : HashSet<T>
     {
         public const int InitalCapacity = 16;
 
