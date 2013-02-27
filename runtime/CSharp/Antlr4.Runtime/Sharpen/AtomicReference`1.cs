@@ -30,12 +30,12 @@
 namespace Sharpen
 {
     using Interlocked = System.Threading.Interlocked;
-    using Volatile = System.Threading.Volatile;
 
     public class AtomicReference<T>
         where T : class
     {
-        private T _value;
+#pragma warning disable 0420 // 'fieldname': a reference to a volatile field will not be treated as volatile
+        private volatile T _value;
 
         public AtomicReference()
         {
@@ -48,15 +48,10 @@ namespace Sharpen
 
         public T Get()
         {
-            return Volatile.Read(ref _value);
+            return _value;
         }
 
         public void Set(T value)
-        {
-            Volatile.Write(ref _value, value);
-        }
-
-        public void LazySet(T value)
         {
             _value = value;
         }

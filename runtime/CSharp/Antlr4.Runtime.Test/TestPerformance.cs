@@ -24,7 +24,6 @@
     using Stream = System.IO.Stream;
     using StreamReader = System.IO.StreamReader;
     using Thread = System.Threading.Thread;
-    using Volatile = System.Threading.Volatile;
 
     [TestClass]
     public class TestPerformance : BaseTest
@@ -370,7 +369,7 @@
         protected void parseSources(ParserFactory factory, IEnumerable<ICharStream> sources)
         {
             Stopwatch startTime = Stopwatch.StartNew();
-            Volatile.Write(ref tokenCount, 0);
+            Thread.VolatileWrite(ref tokenCount, 0);
             int sourceCount = 0;
             int inputSize = 0;
 
@@ -406,7 +405,7 @@
             Console.Out.WriteLine("Total parse time for {0} files ({1} KB, {2} tokens, checksum 0x{3:X8}): {4}ms",
                               sourceCount,
                               inputSize / 1024,
-                              Volatile.Read(ref tokenCount),
+                              Thread.VolatileRead(ref tokenCount),
                               COMPUTE_CHECKSUM ? checksum.Value : 0,
                               startTime.ElapsedMilliseconds);
 
