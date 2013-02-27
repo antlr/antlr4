@@ -52,7 +52,7 @@ namespace Antlr4.Runtime.Atn
     /// </remarks>
     public abstract class Transition
     {
-        public static readonly IReadOnlyList<string> serializationNames = new ReadOnlyCollection<string>
+        public static readonly ReadOnlyCollection<string> serializationNames = new ReadOnlyCollection<string>
             (Arrays.AsList("INVALID", "EPSILON", "RANGE", "RULE", "PREDICATE", "ATOM", "ACTION"
             , "SET", "NOT_SET", "WILDCARD", "PRECEDENCE"));
 
