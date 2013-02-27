@@ -140,7 +140,7 @@ namespace Antlr4.Runtime.Misc
                 BitSet @checked = new BitSet();
                 int highestRequiredDependency = CheckDependencyVersion(errors, dependency, ruleNames
                     , ruleVersions, effectiveRule, null);
-                if (dependents.HasFlag(Dependents.Parents))
+                if ((dependents & Dependents.Parents) != 0)
                 {
                     BitSet parents = relations.parents[dependency.Item1.Rule];
                     for (int parent = parents.NextSetBit(0); parent >= 0; parent = parents.NextSetBit
@@ -156,7 +156,7 @@ namespace Antlr4.Runtime.Misc
                         highestRequiredDependency = Math.Max(highestRequiredDependency, required);
                     }
                 }
-                if (dependents.HasFlag(Dependents.Children))
+                if ((dependents & Dependents.Children) != 0)
                 {
                     BitSet children = relations.children[dependency.Item1.Rule];
                     for (int child = children.NextSetBit(0); child >= 0; child = children.NextSetBit(
@@ -172,7 +172,7 @@ namespace Antlr4.Runtime.Misc
                         highestRequiredDependency = Math.Max(highestRequiredDependency, required);
                     }
                 }
-                if (dependents.HasFlag(Dependents.Ancestors))
+                if ((dependents & Dependents.Ancestors) != 0)
                 {
                     BitSet ancestors = relations.GetAncestors(dependency.Item1.Rule);
                     for (int ancestor = ancestors.NextSetBit(0); ancestor >= 0; ancestor = ancestors.
@@ -188,7 +188,7 @@ namespace Antlr4.Runtime.Misc
                         highestRequiredDependency = Math.Max(highestRequiredDependency, required);
                     }
                 }
-                if (dependents.HasFlag(Dependents.Descendants))
+                if ((dependents & Dependents.Descendants) != 0)
                 {
                     BitSet descendants = relations.GetDescendants(dependency.Item1.Rule);
                     for (int descendant = descendants.NextSetBit(0); descendant >= 0; descendant = descendants
