@@ -103,7 +103,11 @@ namespace Antlr4.Runtime.Dfa
             get;
         }
 
+#if NET_4_5
         public abstract IReadOnlyDictionary<int, T> ToMap();
+#else
+        public abstract IDictionary<int, T> ToMap();
+#endif
 
         public virtual IEnumerator<KeyValuePair<int, T>> GetEnumerator()
         {

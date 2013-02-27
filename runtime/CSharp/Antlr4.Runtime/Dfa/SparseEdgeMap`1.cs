@@ -201,7 +201,11 @@ namespace Antlr4.Runtime.Dfa
             return result;
         }
 
+#if NET_4_5
         public override IReadOnlyDictionary<int, T> ToMap()
+#else
+        public override IDictionary<int, T> ToMap()
+#endif
         {
             if (IsEmpty)
             {
@@ -212,7 +216,11 @@ namespace Antlr4.Runtime.Dfa
             {
                 result[keys[i]] = values[i];
             }
+#if NET_4_5
             return new ReadOnlyDictionary<int, T>(result);
+#else
+            return result;
+#endif
         }
     }
 }

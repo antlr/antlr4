@@ -149,7 +149,11 @@ namespace Antlr4.Runtime.Dfa
             return this;
         }
 
+#if NET_4_5
         public override IReadOnlyDictionary<int, T> ToMap()
+#else
+        public override IDictionary<int, T> ToMap()
+#endif
         {
             if (IsEmpty)
             {

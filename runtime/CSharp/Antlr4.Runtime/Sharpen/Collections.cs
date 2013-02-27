@@ -39,7 +39,11 @@ namespace Sharpen
             return EmptyListImpl<T>.Instance;
         }
 
+#if NET_4_5
         public static ReadOnlyDictionary<TKey, TValue> EmptyMap<TKey, TValue>()
+#else
+        public static IDictionary<TKey, TValue> EmptyMap<TKey, TValue>()
+#endif
         {
             return EmptyMapImpl<TKey, TValue>.Instance;
         }
@@ -49,9 +53,13 @@ namespace Sharpen
             return new ReadOnlyCollection<T>(new T[] { item });
         }
 
+#if NET_4_5
         public static ReadOnlyDictionary<TKey, TValue> SingletonMap<TKey, TValue>(TKey key, TValue value)
+#else
+        public static IDictionary<TKey, TValue> SingletonMap<TKey, TValue>(TKey key, TValue value)
+#endif
         {
-            return new ReadOnlyDictionary<TKey, TValue>(new Dictionary<TKey, TValue> { { key, value } });
+            return new Dictionary<TKey, TValue> { { key, value } };
         }
 
         private static class EmptyListImpl<T>
@@ -61,8 +69,18 @@ namespace Sharpen
 
         private static class EmptyMapImpl<TKey, TValue>
         {
+#if NET_4_5
             public static readonly ReadOnlyDictionary<TKey, TValue> Instance =
                 new ReadOnlyDictionary<TKey, TValue>(new Dictionary<TKey, TValue>());
+#else
+            public static IDictionary<TKey, TValue> Instance
+            {
+                get
+                {
+                    return new Dictionary<TKey, TValue>();
+                }
+            }
+#endif
         }
     }
 }

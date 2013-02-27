@@ -221,7 +221,11 @@ namespace Antlr4.Runtime.Dfa
             }
         }
 
+#if NET_4_5
         public virtual IReadOnlyDictionary<int, DFAState> EdgeMap
+#else
+        public virtual IDictionary<int, DFAState> EdgeMap
+#endif
         {
             get
             {
@@ -265,7 +269,11 @@ namespace Antlr4.Runtime.Dfa
             }
         }
 
+#if NET_4_5
         public virtual IReadOnlyDictionary<int, DFAState> ContextEdgeMap
+#else
+        public virtual IDictionary<int, DFAState> ContextEdgeMap
+#endif
         {
             get
             {
@@ -273,7 +281,7 @@ namespace Antlr4.Runtime.Dfa
                 {
                     return Sharpen.Collections.EmptyMap<int, DFAState>();
                 }
-                IReadOnlyDictionary<int, DFAState> map = contextEdges.ToMap();
+                var map = contextEdges.ToMap();
                 if (map.ContainsKey(-1))
                 {
                     if (map.Count == 1)
@@ -285,7 +293,11 @@ namespace Antlr4.Runtime.Dfa
                         Dictionary<int, DFAState> result = map.ToDictionary(i => i.Key, i => i.Value);
                         result.Add(PredictionContext.EmptyFullStateKey, result[-1]);
                         result.Remove(-1);
+#if NET_4_5
                         map = new ReadOnlyDictionary<int, DFAState>(new SortedDictionary<int, DFAState>(result));
+#else
+                        map = new SortedDictionary<int, DFAState>(result);
+#endif
                     }
                 }
                 return map;
