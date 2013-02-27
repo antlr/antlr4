@@ -203,7 +203,7 @@ namespace Antlr4.Runtime.Atn
 
             public AND(SemanticContext a, SemanticContext b)
             {
-                ISet<SemanticContext> operands = new HashSet<SemanticContext>();
+                HashSet<SemanticContext> operands = new HashSet<SemanticContext>();
                 if (a is SemanticContext.AND)
                 {
                     Sharpen.Collections.AddAll(operands, Arrays.AsList(((SemanticContext.AND)a).opnds
@@ -279,7 +279,7 @@ namespace Antlr4.Runtime.Atn
 
             public OR(SemanticContext a, SemanticContext b)
             {
-                ISet<SemanticContext> operands = new HashSet<SemanticContext>();
+                HashSet<SemanticContext> operands = new HashSet<SemanticContext>();
                 if (a is SemanticContext.OR)
                 {
                     Sharpen.Collections.AddAll(operands, Arrays.AsList(((SemanticContext.OR)a).opnds)

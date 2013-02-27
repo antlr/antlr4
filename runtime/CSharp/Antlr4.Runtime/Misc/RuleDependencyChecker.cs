@@ -48,7 +48,7 @@ namespace Antlr4.Runtime.Misc
         private static readonly Logger Logger = Logger.GetLogger(typeof(Antlr4.Runtime.Misc.RuleDependencyChecker
             ).FullName);
 
-        private static readonly ISet<Type> checkedTypes = new HashSet<Type>();
+        private static readonly HashSet<Type> checkedTypes = new HashSet<Type>();
 
         public static void CheckDependencies<_T0>(Type<_T0> dependentClass)
         {
@@ -95,12 +95,12 @@ namespace Antlr4.Runtime.Misc
 
         private static IList<Type> GetTypesToCheck<_T0>(Type<_T0> clazz)
         {
-            ISet<Type> result = new HashSet<Type>();
+            HashSet<Type> result = new HashSet<Type>();
             GetTypesToCheck(clazz, result);
             return new List<Type>(result);
         }
 
-        private static void GetTypesToCheck<_T0>(Type<_T0> clazz, ISet<Type> result)
+        private static void GetTypesToCheck<_T0>(Type<_T0> clazz, HashSet<Type> result)
         {
             if (!result.AddItem(clazz))
             {
@@ -240,7 +240,7 @@ namespace Antlr4.Runtime.Misc
             MarkChecked(recognizerType);
         }
 
-        private static readonly ISet<Dependents> ImplementedDependents = EnumSet.Of(Dependents
+        private static readonly HashSet<Dependents> ImplementedDependents = EnumSet.Of(Dependents
             .Self, Dependents.Parents, Dependents.Children, Dependents.Ancestors, Dependents
             .Descendants);
 

@@ -228,7 +228,7 @@ namespace Antlr4.Runtime.Atn
                 >());
         }
 
-        private bool Equals(Antlr4.Runtime.Atn.ArrayPredictionContext other, ISet<PredictionContextCache.IdentityCommutativePredictionContextOperands
+        private bool Equals(Antlr4.Runtime.Atn.ArrayPredictionContext other, HashSet<PredictionContextCache.IdentityCommutativePredictionContextOperands
             > visited)
         {
             IDeque<PredictionContext> selfWorkList = new ArrayDeque<PredictionContext>();

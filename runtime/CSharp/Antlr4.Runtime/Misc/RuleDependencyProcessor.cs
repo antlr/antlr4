@@ -59,7 +59,7 @@ namespace Antlr4.Runtime.Misc
         {
         }
 
-        public override bool Process<_T0>(ISet<_T0> annotations, IRoundEnvironment roundEnv
+        public override bool Process<_T0>(HashSet<_T0> annotations, IRoundEnvironment roundEnv
             )
         {
             if (!CheckClassNameConstants())
@@ -266,7 +266,7 @@ namespace Antlr4.Runtime.Misc
             }
         }
 
-        private static readonly ISet<Dependents> ImplementedDependents = EnumSet.Of(Dependents
+        private static readonly HashSet<Dependents> ImplementedDependents = EnumSet.Of(Dependents
             .Self, Dependents.Parents, Dependents.Children, Dependents.Ancestors, Dependents
             .Descendants);
 
@@ -488,7 +488,7 @@ namespace Antlr4.Runtime.Misc
         {
             IList<Tuple<RuleDependency, IElement>> result = new List<Tuple<RuleDependency, IElement
                 >>();
-            ISet<IElement> elements = roundEnv.GetElementsAnnotatedWith(typeof(RuleDependency
+            HashSet<IElement> elements = roundEnv.GetElementsAnnotatedWith(typeof(RuleDependency
                 ));
             foreach (IElement element in elements)
             {
