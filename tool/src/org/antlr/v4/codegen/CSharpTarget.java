@@ -1,7 +1,7 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
+ *  Copyright (c) 2013 Terence Parr
+ *  Copyright (c) 2013 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -29,12 +29,19 @@
  */
 package org.antlr.v4.codegen;
 
+import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.stringtemplate.v4.NumberRenderer;
+import org.stringtemplate.v4.STErrorListener;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
+import org.stringtemplate.v4.StringRenderer;
+import org.stringtemplate.v4.misc.STMessage;
 
-public class CSharpTarget extends Target {
+public abstract class CSharpTarget extends Target {
 
-	public CSharpTarget(CodeGenerator gen) {
-		super(gen, "CSharp");
+	protected CSharpTarget(CodeGenerator gen, String language) {
+		super(gen, language);
 		targetCharValueEscape[0] = "\\0";
 		targetCharValueEscape[0x0007] = "\\a";
 		targetCharValueEscape[0x000B] = "\\v";
@@ -123,6 +130,43 @@ public class CSharpTarget extends Target {
 	@Override
 	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
 		return false;
+	}
+
+	@Override
+	protected STGroup loadTemplates() {
+		// override the superclass behavior to put all C# templates in the same folder
+		STGroup result = new STGroupFile(CodeGenerator.TEMPLATE_ROOT+"/CSharp/"+getLanguage()+STGroup.GROUP_FILE_EXTENSION);
+		result.registerRenderer(Integer.class, new NumberRenderer());
+		result.registerRenderer(String.class, new StringRenderer());
+		result.setListener(new STErrorListener() {
+			@Override
+			public void compileTimeError(STMessage msg) {
+				reportError(msg);
+			}
+
+			@Override
+			public void runTimeError(STMessage msg) {
+				reportError(msg);
+			}
+
+			@Override
+			public void IOError(STMessage msg) {
+				reportError(msg);
+			}
+
+			@Override
+			public void internalError(STMessage msg) {
+				reportError(msg);
+			}
+
+			private void reportError(STMessage msg) {
+				getCodeGenerator().tool.errMgr.toolError(ErrorType.STRING_TEMPLATE_WARNING, msg.cause, msg.toString());
+			}
+		});
+
+		STGroup parentGroup = new STGroupFile(CodeGenerator.TEMPLATE_ROOT+"/CSharp/CSharp"+STGroup.GROUP_FILE_EXTENSION);
+		result.importTemplates(parentGroup);
+		return result;
 	}
 
 }
