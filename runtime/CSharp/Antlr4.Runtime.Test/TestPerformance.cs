@@ -1,12 +1,9 @@
 ﻿namespace Antlr4.Runtime.Test
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Reflection;
     using System.Text;
-    using System.Threading.Tasks;
-    using System.Threading.Tasks.Schedulers;
     using Antlr4.Runtime;
     using Antlr4.Runtime.Atn;
     using Antlr4.Runtime.Dfa;
@@ -14,7 +11,6 @@
     using Antlr4.Runtime.Tree;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Sharpen;
-    using CancellationToken = System.Threading.CancellationToken;
     using Debug = System.Diagnostics.Debug;
     using DirectoryInfo = System.IO.DirectoryInfo;
     using FileInfo = System.IO.FileInfo;
@@ -24,6 +20,13 @@
     using Stream = System.IO.Stream;
     using StreamReader = System.IO.StreamReader;
     using Thread = System.Threading.Thread;
+
+#if NET_4_0
+    using System.Collections.Concurrent;
+    using System.Threading.Tasks;
+    using System.Threading.Tasks.Schedulers;
+    using CancellationToken = System.Threading.CancellationToken;
+#endif
 
     [TestClass]
     public class TestPerformance : BaseTest
@@ -184,6 +187,10 @@
 
         /**
          * Number of parser threads to use.
+         * 
+         * <remarks>
+         * This value is ignored for .NET Framework 3.5 and earlier.
+         * </remarks>
          */
         private static readonly int NUMBER_OF_THREADS = 1;
 
@@ -373,6 +380,7 @@
             int sourceCount = 0;
             int inputSize = 0;
 
+#if NET_4_0
             BlockingCollection<int> threadIdentifiers = new BlockingCollection<int>();
             for (int i = 0; i < NUMBER_OF_THREADS; i++)
                 threadIdentifiers.Add(i);
@@ -380,27 +388,39 @@
             ICollection<Task<int>> results = new List<Task<int>>();
             QueuedTaskScheduler executorServiceHost = new QueuedTaskScheduler(NUMBER_OF_THREADS);
             TaskScheduler executorService = executorServiceHost.ActivateNewQueue();
+#else
+            ICollection<Func<int>> results = new List<Func<int>>();
+#endif
             foreach (ICharStream input in sources)
             {
                 sourceCount++;
                 input.Seek(0);
                 inputSize += input.Size;
+#if NET_4_0
                 Task<int> futureChecksum = Task.Factory.StartNew<int>(new Callable_1(input, factory, threadIdentifiers).call, CancellationToken.None, TaskCreationOptions.None, executorService);
-
+#else
+                Func<int> futureChecksum = new Callable_1(input, factory).call;
+#endif
                 results.Add(futureChecksum);
             }
 
             Checksum checksum = new CRC32();
-            foreach (Task<int> future in results)
+            foreach (var future in results)
             {
+#if NET_4_0
                 int value = future.Result;
+#else
+                int value = future();
+#endif
                 if (COMPUTE_CHECKSUM)
                 {
                     updateChecksum(checksum, value);
                 }
             }
 
+#if NET_4_0
             executorServiceHost.Dispose();
+#endif
 
             Console.Out.WriteLine("Total parse time for {0} files ({1} KB, {2} tokens, checksum 0x{3:X8}): {4}ms",
                               sourceCount,
@@ -418,7 +438,7 @@
                 {
                     int states = 0;
                     int configs = 0;
-                    ISet<ATNConfig> uniqueConfigs = new HashSet<ATNConfig>();
+                    HashSet<ATNConfig> uniqueConfigs = new HashSet<ATNConfig>();
 
                     for (int i = 0; i < modeToDFA.Length; i++)
                     {
@@ -451,7 +471,7 @@
                 {
                     int states = 0;
                     int configs = 0;
-                    ISet<ATNConfig> uniqueConfigs = new HashSet<ATNConfig>();
+                    HashSet<ATNConfig> uniqueConfigs = new HashSet<ATNConfig>();
 
                     for (int i = 0; i < decisionToDFA.Length; i++)
                     {
@@ -566,27 +586,41 @@
         {
             private readonly ICharStream input;
             private readonly ParserFactory factory;
+#if NET_4_0
             private readonly BlockingCollection<int> threadNumbers;
+#endif
 
+#if NET_4_0
             public Callable_1(ICharStream input, ParserFactory factory, BlockingCollection<int> threadNumbers)
+#else
+            public Callable_1(ICharStream input, ParserFactory factory)
+#endif
             {
                 this.input = input;
                 this.factory = factory;
+#if NET_4_0
                 this.threadNumbers = threadNumbers;
+#endif
             }
 
             public int call()
             {
                 // this incurred a great deal of overhead and was causing significant variations in performance results.
                 //Console.Out.WriteLine("Parsing file {0}", input.getSourceName());
+#if NET_4_0
                 int threadNumber = threadNumbers.Take();
+#else
+                int threadNumber = 0;
+#endif
                 try
                 {
                     return factory.parseFile(input, threadNumber);
                 }
                 finally
                 {
+#if NET_4_0
                     threadNumbers.Add(threadNumber);
+#endif
                 }
             }
         }
