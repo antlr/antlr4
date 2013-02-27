@@ -56,6 +56,7 @@
   <ItemGroup>
     <None Include="Antlr4.targets">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="..\..\..\..\..\..\keys\antlr\Key.snk">
       <Link>Key.snk</Link>
