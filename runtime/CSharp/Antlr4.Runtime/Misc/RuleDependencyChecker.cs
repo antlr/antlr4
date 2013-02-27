@@ -303,7 +303,7 @@ namespace Antlr4.Runtime.Misc
 #endif
                             continue;
                         }
-                        RuleVersionAttribute ruleVersion = ruleMethod.GetCustomAttribute<RuleVersionAttribute>();
+                        RuleVersionAttribute ruleVersion = (RuleVersionAttribute)Attribute.GetCustomAttribute(ruleMethod, typeof(RuleVersionAttribute));
                         int version = ruleVersion != null ? ruleVersion.Version : 0;
                         versions[index] = version;
                     }
@@ -334,7 +334,7 @@ namespace Antlr4.Runtime.Misc
             MethodInfo[] declaredMethods = recognizerClass.GetMethods();
             foreach (MethodInfo method in declaredMethods)
             {
-                if (method.Name.Equals(name) && method.GetCustomAttribute<RuleVersionAttribute>() != null)
+                if (method.Name.Equals(name) && Attribute.IsDefined(method, typeof(RuleVersionAttribute)))
                 {
                     return method;
                 }
