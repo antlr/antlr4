@@ -28,3 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import "CSharp.stg"
+
+// group files must contain at least 1 template
+dummy() ::= ""

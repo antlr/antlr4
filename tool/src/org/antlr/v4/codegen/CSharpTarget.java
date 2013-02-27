@@ -164,8 +164,6 @@ public abstract class CSharpTarget extends Target {
 			}
 		});
 
-		STGroup parentGroup = new STGroupFile(CodeGenerator.TEMPLATE_ROOT+"/CSharp/CSharp"+STGroup.GROUP_FILE_EXTENSION);
-		result.importTemplates(parentGroup);
 		return result;
 	}
 
