@@ -392,7 +392,11 @@ namespace Antlr4.Runtime.Atn
                 Collections.EmptyList<PrecedencePredicate>();
 
             List<PrecedencePredicate> result = collection.OfType<PrecedencePredicate>().ToList();
+#if NET_4_0
             collection.ExceptWith(result);
+#else
+            collection.ExceptWith(result.Cast<SemanticContext>());
+#endif
             return result;
         }
     }
