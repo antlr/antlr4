@@ -266,7 +266,7 @@ namespace Antlr4.Runtime.Atn
 
             public override string ToString()
             {
-                return string.Join<SemanticContext>("&&", opnds);
+                return Utils.Join("&&", opnds);
             }
         }
 
@@ -339,7 +339,7 @@ namespace Antlr4.Runtime.Atn
 
             public override string ToString()
             {
-                return string.Join<SemanticContext>("||", opnds);
+                return Utils.Join("||", opnds);
             }
         }
 

@@ -37,6 +37,24 @@ namespace Antlr4.Runtime.Misc
 {
     public class Utils
     {
+        public static string Join<T>(string separator, IEnumerable<T> items)
+        {
+#if NET_4_0
+            return string.Join(separator, items);
+#else
+            List<string> elements = new List<string>();
+            foreach (T item in items)
+            {
+                if (item == null)
+                    elements.Add("");
+                else
+                    elements.Add(item.ToString());
+            }
+
+            return string.Join(separator, elements.ToArray());
+#endif
+        }
+
         public static int NumNonnull(object[] data)
         {
             int n = 0;
