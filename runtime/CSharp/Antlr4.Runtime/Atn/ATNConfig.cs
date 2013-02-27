@@ -403,7 +403,7 @@ namespace Antlr4.Runtime.Atn
             StringBuilder builder = new StringBuilder();
             builder.Append("digraph G {\n");
             builder.Append("rankdir=LR;\n");
-            ISet<PredictionContext> visited = new HashSet<PredictionContext>();
+            HashSet<PredictionContext> visited = new HashSet<PredictionContext>();
             Stack<PredictionContext> workList = new Stack<PredictionContext>();
             workList.Push(Context);
             visited.Add(Context);

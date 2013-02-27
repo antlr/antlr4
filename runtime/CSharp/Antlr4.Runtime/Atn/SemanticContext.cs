@@ -386,7 +386,7 @@ namespace Antlr4.Runtime.Atn
         }
 
         private static IList<SemanticContext.PrecedencePredicate> FilterPrecedencePredicates
-            (ISet<SemanticContext> collection)
+            (HashSet<SemanticContext> collection)
         {
             if (!collection.OfType<PrecedencePredicate>().Any())
                 Collections.EmptyList<PrecedencePredicate>();
