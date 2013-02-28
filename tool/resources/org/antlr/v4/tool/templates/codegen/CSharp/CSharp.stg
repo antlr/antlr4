@@ -198,8 +198,8 @@ case <f.ruleIndex> : return <f.name>_sempred(<if(!recog.modes)>(<f.ctxType>)<end
 <endif>
 >>
 
-parser_ctor(p) ::= <<
-public <p.name>(ITokenStream input)
+parser_ctor(parser) ::= <<
+public <parser.name>(ITokenStream input)
 	: base(input)
 {
 	_interp = new ParserATNSimulator(this,_ATN);
