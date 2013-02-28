@@ -77,9 +77,9 @@ before attempting these steps.
 
         <PropertyGroup>
           <!-- Folder containing Antlr4BuildTasks.dll -->
-          <AntlrBuildTaskPath>$(ProjectDir)..\Reference\Antlr4</AntlrBuildTaskPath>
+          <Antlr4BuildTaskPath>$(ProjectDir)..\Reference\Antlr4</Antlr4BuildTaskPath>
           <!-- Path to the ANTLR Tool itself. -->
-          <AntlrToolPath>$(ProjectDir)..\Reference\Antlr4\antlr4-csharp-4.0.1-SNAPSHOT-complete.jar</AntlrToolPath>
+          <Antlr4ToolPath>$(ProjectDir)..\Reference\Antlr4\antlr4-csharp-4.0.1-SNAPSHOT-complete.jar</Antlr4ToolPath>
         </PropertyGroup>
         <Import Project="$(ProjectDir)..\Reference\Antlr4\Antlr4.targets" /> 
 
