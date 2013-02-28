@@ -163,6 +163,7 @@
     <Compile Include="Sharpen\Compat\CollectionDebuggerView`2.cs" />
     <Compile Include="Sharpen\Compat\ConcurrentDictionary`2.cs" />
     <Compile Include="Sharpen\Compat\Enumerable.cs" />
+    <Compile Include="Sharpen\Compat\ExtensionAttribute.cs" />
     <Compile Include="Sharpen\Compat\Funcs.cs" />
     <Compile Include="Sharpen\Compat\HashSet`1.cs" />
     <Compile Include="Sharpen\Compat\IStructuralComparable.cs" />
