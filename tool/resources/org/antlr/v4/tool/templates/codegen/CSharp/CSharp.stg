@@ -80,7 +80,7 @@ using ITerminalNode = Antlr4.Runtime.Tree.ITerminalNode;
 using IToken = Antlr4.Runtime.IToken;
 using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 
-public class <file.grammarName>BaseListener : I<file.grammarName>Listener {
+public partial class <file.grammarName>BaseListener : I<file.grammarName>Listener {
 	<file.listenerNames:{lname |
 public virtual void Enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context context) { \}
 public virtual void Exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context context) { \}}; separator="\n">
@@ -123,7 +123,7 @@ using Antlr4.Runtime.Tree;
 using IToken = Antlr4.Runtime.IToken;
 using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 
-public class <file.grammarName>BaseVisitor\<Result> : AbstractParseTreeVisitor\<Result>, I<file.grammarName>Visitor\<Result> {
+public partial class <file.grammarName>BaseVisitor\<Result> : AbstractParseTreeVisitor\<Result>, I<file.grammarName>Visitor\<Result> {
 	<file.visitorNames:{lname |
 public virtual Result Visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context context) { return VisitChildren(context); \}}; separator="\n">
 }
@@ -137,7 +137,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 >>
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
-public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> : <superClass> {
+public <if(parser.abstractRecognizer)>abstract <endif>partial class <parser.name> : <superClass> {
 	<if(parser.tokens)>
 	public const int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
@@ -720,7 +720,7 @@ CaptureNextTokenType(d) ::= "<d.varName> = _input.La(1);"
 
 StructDecl(struct,attrs,getters,dispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext}) ::= <<
-public class <struct.name> : <superClass><if(interfaces)>, <interfaces; separator=", "><endif> {
+public partial class <struct.name> : <superClass><if(interfaces)>, <interfaces; separator=", "><endif> {
 	<attrs:{a | <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
 	<if(struct.ctorAttrs)>public <struct.name>(ParserRuleContext parent, int invokingState) : base(parent, invokingState) { }<endif>
@@ -743,7 +743,7 @@ public class <struct.name> : <superClass><if(interfaces)>, <interfaces; separato
 >>
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
-public class <struct.name> : <currentRule.name; format="cap">Context {
+public partial class <struct.name> : <currentRule.name; format="cap">Context {
 	<attrs:{a | <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
 	public <struct.name>(<currentRule.name; format="cap">Context context) { CopyFrom(context); }
@@ -822,7 +822,7 @@ using DFA = Antlr4.Runtime.Dfa.DFA;
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
-public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> : <superClass> {
+public <if(lexer.abstractRecognizer)>abstract <endif>partial class <lexer.name> : <superClass> {
 	public const int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<rest(lexer.modes):{m| public const int <m> = <i>;}; separator="\n">
