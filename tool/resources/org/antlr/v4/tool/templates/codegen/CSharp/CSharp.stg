@@ -753,13 +753,15 @@ public partial class <struct.name> : <currentRule.name; format="cap">Context {
 
 ListenerDispatchMethod(method) ::= <<
 public override void <if(method.isEnter)>Enter<else>Exit<endif>Rule(IParseTreeListener listener) {
-	if ( listener is I<parser.grammarName>Listener ) ((I<parser.grammarName>Listener)listener).<if(method.isEnter)>Enter<else>Exit<endif><struct.derivedFromName; format="cap">(this);
+	I<parser.grammarName>Listener typedListener = listener as I<parser.grammarName>Listener;
+	if (typedListener != null) typedListener.<if(method.isEnter)>Enter<else>Exit<endif><struct.derivedFromName; format="cap">(this);
 }
 >>
 
 VisitorDispatchMethod(method) ::= <<
 public override TResult Accept\<TResult>(IParseTreeVisitor\<TResult> visitor) {
-	if ( visitor is I<parser.grammarName>Visitor\<TResult> ) return ((I<parser.grammarName>Visitor\<TResult>)visitor).Visit<struct.derivedFromName; format="cap">(this);
+	I<parser.grammarName>Visitor\<TResult> typedVisitor = visitor as I<parser.grammarName>Visitor\<TResult>;
+	if (typedVisitor != null) return typedVisitor.Visit<struct.derivedFromName; format="cap">(this);
 	else return visitor.VisitChildren(this);
 }
 >>
