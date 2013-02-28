@@ -199,7 +199,7 @@ case <f.ruleIndex> : return <f.name>_sempred(<if(!recog.modes)>(<f.ctxType>)<end
 >>
 
 parser_ctor(parser) ::= <<
-public <parser.name>(ITokenStream input)
+<if(parser.abstractRecognizer)>protected<else>public<endif> <parser.name>(ITokenStream input)
 	: base(input)
 {
 	_interp = new ParserATNSimulator(this,_ATN);
@@ -842,7 +842,7 @@ public <if(lexer.abstractRecognizer)>abstract <endif>partial class <lexer.name> 
 
 	<namedActions.members>
 
-	public <lexer.name>(ICharStream input)
+	<if(lexer.abstractRecognizer)>protected<else>public<endif> <lexer.name>(ICharStream input)
 		: base(input)
 	{
 		_interp = new LexerATNSimulator(this,_ATN);
