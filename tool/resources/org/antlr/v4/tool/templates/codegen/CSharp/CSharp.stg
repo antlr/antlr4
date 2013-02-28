@@ -661,9 +661,9 @@ ThisRulePropertyRef_stop(r)	 ::= "_localctx.stop"
 ThisRulePropertyRef_text(r)	 ::= "_input.GetText(_localctx.start, _input.Lt(-1))"
 ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
 
-NonLocalAttrRef(s)		 ::= "((<s.ruleName; format=\"cap\">Context)GetInvokingContext(<s.ruleIndex>)).<s.name>"
+NonLocalAttrRef(s)		 ::= <%((<s.ruleName; format="cap">Context)GetInvokingContext(<s.ruleIndex>)).<s.name>%>
 SetNonLocalAttr(s, rhsChunks)	  ::=
-	"((<s.ruleName; format=\"cap\">Context)GetInvokingContext(<s.ruleIndex>)).<s.name> = <rhsChunks>;"
+	<%((<s.ruleName; format="cap">Context)GetInvokingContext(<s.ruleIndex>)).<s.name> = <rhsChunks>;%>
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.Add(<labelref(a.label)>);"
 
