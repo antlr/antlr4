@@ -34,12 +34,24 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Antlr4.Runtime")]
+#if NET_4_5
+[assembly: AssemblyTitle("Antlr4.Runtime.v4.5")]
+#elif NET_4_0
+[assembly: AssemblyTitle("Antlr4.Runtime.v4.0")]
+#elif NET_3_5
+[assembly: AssemblyTitle("Antlr4.Runtime.v3.5")]
+#elif NET_3_0
+[assembly: AssemblyTitle("Antlr4.Runtime.v3.0")]
+#elif NET_2_0
+[assembly: AssemblyTitle("Antlr4.Runtime.v2.0")]
+#else
+#error Unknown assembly.
+#endif
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Tunnel Vision Laboratories, LLC")]
 [assembly: AssemblyProduct("Antlr4.Runtime")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
+[assembly: AssemblyCopyright("Copyright © Sam Harwell 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -61,5 +73,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.0.1.0")]
+[assembly: AssemblyFileVersion("1.0.1.0")]
