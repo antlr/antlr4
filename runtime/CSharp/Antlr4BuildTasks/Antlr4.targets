@@ -100,12 +100,12 @@
     <!-- Add grammar compilation to the CoreCompileDependsOn so that the IDE inproc compilers (particularly VB)
          can "see" the generated source files. -->
     <CoreCompileDependsOn Condition="'$(BuildingInsideVisualStudio)' == 'true' ">
-      DesignTimeGrammarCompilation;
+      Antlr4DesignTimeGrammarCompilation;
       $(CoreCompileDependsOn)
     </CoreCompileDependsOn>
   </PropertyGroup>
 
-  <Target Name="DesignTimeGrammarCompilation">
+  <Target Name="Antlr4DesignTimeGrammarCompilation">
     <!-- Only if we are not actually performing a compile i.e. we are in design mode -->
     <CallTarget Condition="'$(BuildingProject)' != 'true'"
                 Targets="Antlr4Compile" />
