@@ -46,7 +46,7 @@ public class SerializedATN extends OutputModelObject {
 		IntegerList data = ATNSerializer.getSerialized(factory.getGrammar(), atn);
 		serialized = new ArrayList<String>(data.size());
 		for (int c : data.toArray()) {
-			String encoded = factory.getGenerator().target.encodeIntAsCharEscape(c == -1 ? Character.MAX_VALUE : c);
+			String encoded = factory.getGenerator().getTarget().encodeIntAsCharEscape(c == -1 ? Character.MAX_VALUE : c);
 			serialized.add(encoded);
 		}
 //		System.out.println(ATNSerializer.getDecoded(factory.getGrammar(), atn));

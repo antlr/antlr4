@@ -110,9 +110,9 @@ public class BuildDependencyGenerator {
 		files.add(getOutputFile(generator.getVocabFileName()));
         // are we generating a .h file?
         ST headerExtST = null;
-        ST extST = generator.templates.getInstanceOf("codeFileExtension");
-        if (generator.templates.isDefined("headerFile")) {
-            headerExtST = generator.templates.getInstanceOf("headerFileExtension");
+        ST extST = generator.getTemplates().getInstanceOf("codeFileExtension");
+        if (generator.getTemplates().isDefined("headerFile")) {
+            headerExtST = generator.getTemplates().getInstanceOf("headerFileExtension");
             String suffix = Grammar.getGrammarTypeToFileNameSuffix(g.getType());
             String fileName = g.name + suffix + headerExtST.render();
             files.add(getOutputFile(fileName));

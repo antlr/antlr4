@@ -47,7 +47,7 @@ public class TestLeftRecursion extends BaseTest {
 			"  | ID" +
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "s", "x", debug);
 		String expecting = "(s (a x))\n";
@@ -72,7 +72,7 @@ public class TestLeftRecursion extends BaseTest {
 			"  | ID" +
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "s", "x y z", debug);
 		String expecting = "(s (a (a (a x) y) z))\n";
@@ -90,7 +90,7 @@ public class TestLeftRecursion extends BaseTest {
 			"  | ID" +
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 		String[] tests = {
 			"a",			"(s (e a) <EOF>)",
 			"a+b",			"(s (e (e a) + (e b)) <EOF>)",
@@ -120,7 +120,7 @@ public class TestLeftRecursion extends BaseTest {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 		String[] tests = {
 			"a",		"(s (e a) <EOF>)",
 			"1",		"(s (e 1) <EOF>)",
@@ -193,7 +193,7 @@ public class TestLeftRecursion extends BaseTest {
 			"    ;\n" +
 			"ID : ('a'..'z'|'A'..'Z'|'_'|'$')+;\n" +
 			"INT : '0'..'9'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 		String[] tests = {
 			"a|b&c",	"(s (e (e a) | (e (e b) & (e c))) <EOF>)",
 			"(a|b)&c",	"(s (e (e ( (e (e a) | (e b)) )) & (e c)) <EOF>)",
@@ -224,7 +224,7 @@ public class TestLeftRecursion extends BaseTest {
 			"e : INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 		String[] tests = {
 			"a",		"(s (declarator a) <EOF>)",
 			"*a",		"(s (declarator * (declarator a)) <EOF>)",
@@ -251,7 +251,7 @@ public class TestLeftRecursion extends BaseTest {
 			"  | '(' x=e ')' {$v = $x.v;}\n" +
 			"  ;\n" +
 			"INT : '0'..'9'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 		String[] tests = {
 			"4",			"4",
 		"1+2",			"3",
@@ -270,7 +270,7 @@ public class TestLeftRecursion extends BaseTest {
 			"  | '(' x=e ')' {}\n" +
 			"  ;\n" +
 			"INT : '0'..'9'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 		String[] tests = {
 			"4",		"(s (e 4))",
 		"1*2/3",		"(s (e (e (e 1) * (e 2)) / (e 3)))",
@@ -296,7 +296,7 @@ public class TestLeftRecursion extends BaseTest {
 			"\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 		String[] tests = {
 			"4",			"4",
 			"1+2",			"3",
@@ -318,7 +318,7 @@ public class TestLeftRecursion extends BaseTest {
 			"    ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+ ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n";
+			"WS : (' '|'\\n') -> skip ;\n";
 		String[] tests = {
 			"a",			"a",
 			"a+b",			"(a+b)",

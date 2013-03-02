@@ -56,7 +56,7 @@ public class TestLexerExec extends BaseTest {
    			"lexer grammar L;\n"+
    			"A : '-' I ;\n" +
    			"I : '0'..'9'+ ;\n"+
-   			"WS : (' '|'\\n') {skip();} ;";
+   			"WS : (' '|'\\n') -> skip ;";
    		String found = execLexer("L.g4", grammar, "L", "34 -21 3");
    		String expecting =
    			"[@0,0:1='34',<2>,1:0]\n" +
@@ -278,7 +278,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"I : ('a' | 'ab') {System.out.println(getText());} ;\n"+
-			"WS : (' '|'\\n') {skip();} ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n" +
 			"J : .;\n";
 		String found = execLexer("L.g4", grammar, "L", "ab");
 		String expecting =
@@ -292,7 +292,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"I : .*? ('a' | 'ab') {System.out.println(getText());} ;\n"+
-			"WS : (' '|'\\n') {skip();} ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n" +
 			"J : . {System.out.println(getText());};\n";
 		String found = execLexer("L.g4", grammar, "L", "ab");
 		String expecting =
@@ -308,7 +308,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
-			"WS : (' '|'\\n') {skip();} ;";
+			"WS : (' '|'\\n') -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "34 34");
 		String expecting =
 			"I\n" +
@@ -381,15 +381,15 @@ public class TestLexerExec extends BaseTest {
 	@Test public void testLexerMode() throws Exception {
 		String grammar =
 			"lexer grammar L;\n" +
-			"STRING_START : '\"' {pushMode(STRING_MODE); more();} ;\n" +
-			"WS : (' '|'\\n') {skip();} ;\n"+
+			"STRING_START : '\"' -> pushMode(STRING_MODE), more;\n" +
+			"WS : (' '|'\\n') -> skip ;\n"+
 			"mode STRING_MODE;\n"+
-			"STRING : '\"' {popMode();} ;\n"+
-			"ANY : . {more();} ;\n";
+			"STRING : '\"' -> popMode;\n"+
+			"ANY : . -> more;\n";
 		String found = execLexer("L.g4", grammar, "L", "\"abc\" \"ab\"");
 		String expecting =
-			"[@0,0:4='\"abc\"',<3>,1:0]\n" +
-			"[@1,6:9='\"ab\"',<3>,1:6]\n" +
+			"[@0,0:4='\"abc\"',<2>,1:0]\n" +
+			"[@1,6:9='\"ab\"',<2>,1:6]\n" +
 			"[@2,10:9='<EOF>',<-1>,1:10]\n";
 		assertEquals(expecting, found);
 	}

@@ -51,7 +51,7 @@ public class TestFullContextParsing extends BaseTest {
 			"@after {dumpDFA();}\n" +
 			"    : ID | ID {;} ;\n" +
 			"ID : 'a'..'z'+ ;\n"+
-			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
+			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								   "abc", true);
 		String expecting =
@@ -72,7 +72,7 @@ public class TestFullContextParsing extends BaseTest {
 			"e : INT | ;\n" +
 			"ID : 'a'..'z'+ ;\n"+
 			"INT : '0'..'9'+ ;\n"+
-			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
+			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								   "$ 34 abc", true);
 		String expecting =
@@ -106,7 +106,7 @@ public class TestFullContextParsing extends BaseTest {
 			"e : INT | ;\n" +
 			"ID : 'a'..'z'+ ;\n"+
 			"INT : '0'..'9'+ ;\n"+
-			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
+			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								   "$ 34 abc @ 34 abc", true);
 		String expecting =
@@ -132,7 +132,7 @@ public class TestFullContextParsing extends BaseTest {
 			"e : INT | ;\n" +
 			"ID : 'a'..'z'+ ;\n"+
 			"INT : '0'..'9'+ ;\n"+
-			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
+			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								   "34 abc", true);
 		String expecting =
@@ -157,7 +157,7 @@ public class TestFullContextParsing extends BaseTest {
 			"    | 'return'\n" +
 			"    ;" +
 			"ID : 'a'..'z'+ ;\n"+
-			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
+			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
 		String input = "{ if x then return }";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								   input, true);
