@@ -79,13 +79,21 @@
         <attribute name="srcpath"/>
         <element name="args" optional="true"/>
         <sequential>
+            <local name="path.antlr3.local"/>
+            <local name="sources.antlr3.local"/>
+            <path id="path.antlr3.local">
+                <fileset dir="${basedir}/tool/src/@{srcpath}" includes="*.g"/>
+            </path>
+            <pathconvert pathsep=" " property="sources.antlr3.local" refid="path.antlr3.local">
+                <map from="${basedir}/tool/src/@{srcpath}/" to=""/>
+            </pathconvert>
             <mkdir dir="${build.antlr3.dir}/@{srcpath}"/>
             <java classname="org.antlr.Tool" fork="true" failonerror="true" maxmemory="300m"
                   dir="${basedir}/tool/src/@{srcpath}">
                 <arg value="-o"/>
                 <arg value="${build.antlr3.dir}/@{srcpath}"/>
                 <args/>
-                <arg value="*.g"/>
+                <arg line="${sources.antlr3.local}"/>
                 <classpath>
                     <path refid="cp.antlr3"/>
                     <pathelement location="${java.class.path}"/>
