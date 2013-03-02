@@ -12,7 +12,7 @@
         <property name="antlr3.jar.name" value="antlr-${antlr3.version}-complete-no-st3.jar"/>
         <property name="antlr3.jar" value="${lib.dir}/${antlr3.jar.name}"/>
         <mkdir dir="${lib.dir}"/>
-        <get src="http://antlr.org/download/${antlr3.jar.name}" dest="${antlr3.jar}" skipexisting="true"/>
+        <get src="http://antlr3.org/download/${antlr3.jar.name}" dest="${antlr3.jar}" skipexisting="true"/>
         <path id="cp.antlr3" path="${antlr3.jar}"/>
 
         <property name="build.antlr3.dir" value="${build.dir}/generated-sources/antlr3" />
