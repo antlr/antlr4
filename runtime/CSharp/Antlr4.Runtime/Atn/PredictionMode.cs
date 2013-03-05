@@ -34,7 +34,9 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
+#if !PORTABLE
     [System.Serializable]
+#endif
     public sealed class PredictionMode
     {
         /// <summary>

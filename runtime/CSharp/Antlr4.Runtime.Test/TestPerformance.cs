@@ -16,6 +16,7 @@
     using CRC32 = Sharpen.CRC32;
     using Debug = System.Diagnostics.Debug;
     using DirectoryInfo = System.IO.DirectoryInfo;
+    using File = System.IO.File;
     using FileInfo = System.IO.FileInfo;
     using Interlocked = System.Threading.Interlocked;
     using Path = System.IO.Path;
@@ -360,7 +361,8 @@
             FileInfo[] sources = directory.GetFiles(filter);
             foreach (FileInfo file in sources)
             {
-                ICharStream input = new AntlrFileStream(file.FullName, encoding);
+                var stream = new StreamReader(File.OpenRead(file.FullName), encoding);
+                ICharStream input = new AntlrInputStream(stream);
                 result.Add(input);
             }
 

@@ -34,7 +34,9 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
+#if !PORTABLE
     [System.Serializable]
+#endif
     public class LexerNoViableAltException : RecognitionException
     {
         private const long serialVersionUID = -730999203913001726L;

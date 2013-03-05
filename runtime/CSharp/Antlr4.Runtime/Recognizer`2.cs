@@ -42,7 +42,12 @@ namespace Antlr4.Runtime
         public const int Eof = -1;
 
         [NotNull]
-        private IAntlrErrorListener<Symbol>[] _listeners = { ConsoleErrorListener<Symbol>.Instance };
+        private IAntlrErrorListener<Symbol>[] _listeners =
+        {
+#if !PORTABLE
+            ConsoleErrorListener<Symbol>.Instance
+#endif
+        };
 
         protected internal ATNInterpreter _interp;
 

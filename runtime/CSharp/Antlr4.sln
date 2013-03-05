@@ -34,6 +34,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.v3.0", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.v2.0", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.v2.0.csproj", "{0A4681C4-1248-4ACD-B59F-D6CC17CC2B4C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Portable", "Antlr4.Runtime\Antlr4.Runtime.Portable.csproj", "{06C182C5-095C-4D43-9C33-C87E305C6BC2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.Portable", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.Portable.csproj", "{97C32E42-51B2-4A29-B005-769B63CFEFCA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -84,6 +88,14 @@ Global
 		{0A4681C4-1248-4ACD-B59F-D6CC17CC2B4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A4681C4-1248-4ACD-B59F-D6CC17CC2B4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A4681C4-1248-4ACD-B59F-D6CC17CC2B4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06C182C5-095C-4D43-9C33-C87E305C6BC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06C182C5-095C-4D43-9C33-C87E305C6BC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06C182C5-095C-4D43-9C33-C87E305C6BC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06C182C5-095C-4D43-9C33-C87E305C6BC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97C32E42-51B2-4A29-B005-769B63CFEFCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97C32E42-51B2-4A29-B005-769B63CFEFCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97C32E42-51B2-4A29-B005-769B63CFEFCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97C32E42-51B2-4A29-B005-769B63CFEFCA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
