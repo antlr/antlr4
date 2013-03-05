@@ -41,7 +41,9 @@ namespace Antlr4.Runtime
     /// Disambiguating predicate evaluation occurs when we test a predicate during
     /// prediction.
     /// </remarks>
+#if !PORTABLE
     [System.Serializable]
+#endif
     public class FailedPredicateException : RecognitionException
     {
         private const long serialVersionUID = 5379330841495778709L;
