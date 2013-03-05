@@ -34,7 +34,9 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-#if NET_4_5
+#if PORTABLE
+[assembly: AssemblyTitle("Antlr4.Runtime.Portable")]
+#elif NET_4_5
 [assembly: AssemblyTitle("Antlr4.Runtime.v4.5")]
 #elif NET_4_0
 [assembly: AssemblyTitle("Antlr4.Runtime.v4.0")]
