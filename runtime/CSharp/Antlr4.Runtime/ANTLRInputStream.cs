@@ -158,7 +158,7 @@ namespace Antlr4.Runtime
             finally
             {
                 //System.out.println("n="+n);
-                r.Close();
+                r.Dispose();
             }
         }
 
