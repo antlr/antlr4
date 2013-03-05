@@ -27,6 +27,9 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+#if !PORTABLE
+
 using Sharpen;
 using Encoding = System.Text.Encoding;
 using File = System.IO.File;
@@ -86,3 +89,5 @@ namespace Antlr4.Runtime
         }
     }
 }
+
+#endif
