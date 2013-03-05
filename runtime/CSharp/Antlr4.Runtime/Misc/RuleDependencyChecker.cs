@@ -352,27 +352,27 @@ namespace Antlr4.Runtime.Misc
             IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>> result = new List<Tuple<RuleDependencyAttribute
                 , ICustomAttributeProvider>>();
 
-            GetElementDependencies(clazz, result);
+            GetElementDependencies(AsCustomAttributeProvider(clazz), result);
             foreach (ConstructorInfo ctor in clazz.GetConstructors(BindingFlags.DeclaredOnly))
             {
-                GetElementDependencies(ctor, result);
+                GetElementDependencies(AsCustomAttributeProvider(ctor), result);
                 foreach (ParameterInfo parameter in ctor.GetParameters())
-                    GetElementDependencies(parameter, result);
+                    GetElementDependencies(AsCustomAttributeProvider(parameter), result);
             }
 
             foreach (FieldInfo field in clazz.GetFields(BindingFlags.DeclaredOnly))
             {
-                GetElementDependencies(field, result);
+                GetElementDependencies(AsCustomAttributeProvider(field), result);
             }
 
             foreach (MethodInfo method in clazz.GetMethods(BindingFlags.DeclaredOnly))
             {
-                GetElementDependencies(method, result);
+                GetElementDependencies(AsCustomAttributeProvider(method), result);
                 if (method.ReturnParameter != null)
-                    GetElementDependencies(method.ReturnParameter, result);
+                    GetElementDependencies(AsCustomAttributeProvider(method.ReturnParameter), result);
 
                 foreach (ParameterInfo parameter in method.GetParameters())
-                    GetElementDependencies(parameter, result);
+                    GetElementDependencies(AsCustomAttributeProvider(parameter), result);
             }
 
             return result;
@@ -510,5 +510,97 @@ namespace Antlr4.Runtime.Misc
         private RuleDependencyChecker()
         {
         }
+
+#if PORTABLE
+        public interface ICustomAttributeProvider
+        {
+            object[] GetCustomAttributes(Type attributeType, bool inherit);
+        }
+
+        protected static ICustomAttributeProvider AsCustomAttributeProvider(Type type)
+        {
+            return new TypeCustomAttributeProvider(type);
+        }
+
+        protected static ICustomAttributeProvider AsCustomAttributeProvider(MethodBase method)
+        {
+            return new MethodBaseCustomAttributeProvider(method);
+        }
+
+        protected static ICustomAttributeProvider AsCustomAttributeProvider(ParameterInfo parameter)
+        {
+            return new ParameterInfoCustomAttributeProvider(parameter);
+        }
+
+        protected static ICustomAttributeProvider AsCustomAttributeProvider(FieldInfo field)
+        {
+            return new FieldInfoCustomAttributeProvider(field);
+        }
+
+        protected sealed class TypeCustomAttributeProvider : ICustomAttributeProvider
+        {
+            private readonly Type _provider;
+
+            public TypeCustomAttributeProvider(Type provider)
+            {
+                _provider = provider;
+            }
+
+            public object[] GetCustomAttributes(Type attributeType, bool inherit)
+            {
+                return Attribute.GetCustomAttributes(_provider, attributeType, inherit);
+            }
+        }
+
+        protected sealed class MethodBaseCustomAttributeProvider : ICustomAttributeProvider
+        {
+            private readonly MethodBase _provider;
+
+            public MethodBaseCustomAttributeProvider(MethodBase provider)
+            {
+                _provider = provider;
+            }
+
+            public object[] GetCustomAttributes(Type attributeType, bool inherit)
+            {
+                return Attribute.GetCustomAttributes(_provider, attributeType, inherit);
+            }
+        }
+
+        protected sealed class ParameterInfoCustomAttributeProvider : ICustomAttributeProvider
+        {
+            private readonly ParameterInfo _provider;
+
+            public ParameterInfoCustomAttributeProvider(ParameterInfo provider)
+            {
+                _provider = provider;
+            }
+
+            public object[] GetCustomAttributes(Type attributeType, bool inherit)
+            {
+                return Attribute.GetCustomAttributes(_provider, attributeType, inherit);
+            }
+        }
+
+        protected sealed class FieldInfoCustomAttributeProvider : ICustomAttributeProvider
+        {
+            private readonly FieldInfo _provider;
+
+            public FieldInfoCustomAttributeProvider(FieldInfo provider)
+            {
+                _provider = provider;
+            }
+
+            public object[] GetCustomAttributes(Type attributeType, bool inherit)
+            {
+                return Attribute.GetCustomAttributes(_provider, attributeType, inherit);
+            }
+        }
+#else
+        protected static ICustomAttributeProvider AsCustomAttributeProvider(ICustomAttributeProvider obj)
+        {
+            return obj;
+        }
+#endif
     }
 }
