@@ -1833,10 +1833,12 @@ namespace Antlr4.Runtime.Atn
                 string[] tokensNames = parser.TokenNames;
                 if (t >= tokensNames.Length)
                 {
+#if !PORTABLE
                     System.Console.Error.WriteLine(t + " ttype out of range: " + Arrays.ToString(tokensNames
                         ));
                     System.Console.Error.WriteLine(((CommonTokenStream)((ITokenStream)parser.InputStream
                         )).GetTokens());
+#endif
                 }
                 else
                 {
@@ -1851,6 +1853,7 @@ namespace Antlr4.Runtime.Atn
             return GetTokenName(input.La(1));
         }
 
+#if !PORTABLE
         public virtual void DumpDeadEndConfigs(NoViableAltException nvae)
         {
             System.Console.Error.WriteLine("dead end configs: ");
@@ -1878,6 +1881,7 @@ namespace Antlr4.Runtime.Atn
                 System.Console.Error.WriteLine(c.ToString(parser, true) + ":" + trans);
             }
         }
+#endif
 
         [return: NotNull]
         public virtual NoViableAltException NoViableAlt(ITokenStream input, ParserRuleContext

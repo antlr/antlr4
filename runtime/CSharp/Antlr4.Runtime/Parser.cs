@@ -44,6 +44,7 @@ namespace Antlr4.Runtime
     ///     </remarks>
     public abstract class Parser : Recognizer<IToken, ParserATNSimulator>
     {
+#if !PORTABLE
         public class TraceListener : IParseTreeListener
         {
             public virtual void EnterEveryRule(ParserRuleContext ctx)
@@ -77,6 +78,7 @@ namespace Antlr4.Runtime
 
             private readonly Parser _enclosing;
         }
+#endif
 
         public class TrimToSizeListener : IParseTreeListener
         {
@@ -121,7 +123,9 @@ namespace Antlr4.Runtime
 
         protected internal bool _buildParseTrees = true;
 
+#if !PORTABLE
         protected internal Parser.TraceListener _tracer;
+#endif
 
         /// <summary>
         /// If the listener is non-null, trigger enter and exit rule events
@@ -158,7 +162,9 @@ namespace Antlr4.Runtime
             _errHandler.EndErrorCondition(this);
             _ctx = null;
             _syntaxErrors = 0;
+#if !PORTABLE
             _tracer = null;
+#endif
             _precedenceStack.Clear();
             _precedenceStack.Add(0);
             ATNSimulator interpreter = Interpreter;
@@ -869,6 +875,7 @@ namespace Antlr4.Runtime
             return s;
         }
 
+#if !PORTABLE
         /// <summary>For debugging and other purposes</summary>
         public virtual void DumpDFA()
         {
@@ -888,6 +895,7 @@ namespace Antlr4.Runtime
                 }
             }
         }
+#endif
 
         public virtual string SourceName
         {
@@ -916,6 +924,7 @@ namespace Antlr4.Runtime
             return strings;
         }
 
+#if !PORTABLE
         /// <summary>
         /// During a parse is sometimes useful to listen in on the rule entry and exit
         /// events as well as token matches.
@@ -959,5 +968,6 @@ namespace Antlr4.Runtime
                 }
             }
         }
+#endif
     }
 }
