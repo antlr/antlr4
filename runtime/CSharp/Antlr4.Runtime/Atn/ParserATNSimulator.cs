@@ -199,11 +199,13 @@ namespace Antlr4.Runtime.Atn
     public class ParserATNSimulator : ATNSimulator
     {
 #pragma warning disable 0162 // Unreachable code detected
+#if !PORTABLE
         public const bool debug = false;
 
         public const bool dfa_debug = false;
 
         public const bool retry_debug = false;
+#endif
 
         private Antlr4.Runtime.Atn.PredictionMode predictionMode = Antlr4.Runtime.Atn.PredictionMode
             .Ll;
@@ -478,10 +480,12 @@ namespace Antlr4.Runtime.Atn
                 DFAState target = s.GetTarget(t);
                 if (target == null)
                 {
+#if !PORTABLE
                     if (dfa_debug && t >= 0)
                     {
                         System.Console.Out.WriteLine("no edge for " + parser.TokenNames[t]);
                     }
+#endif
                     int alt;
                     SimulatorState initialState = new SimulatorState(outerContext, s, state.useContext
                         , remainingOuterContext);
@@ -1254,16 +1258,20 @@ namespace Antlr4.Runtime.Atn
                     continue;
                 }
                 bool evaluatedResult = pair.pred.Eval(parser, outerContext);
+#if !PORTABLE
                 if (debug || dfa_debug)
                 {
                     System.Console.Out.WriteLine("eval pred " + pair + "=" + evaluatedResult);
                 }
+#endif
                 if (evaluatedResult)
                 {
+#if !PORTABLE
                     if (debug || dfa_debug)
                     {
                         System.Console.Out.WriteLine("PREDICT " + pair.alt);
                     }
+#endif
                     predictions.Set(pair.alt);
                     if (!complete)
                     {
@@ -2045,10 +2053,12 @@ namespace Antlr4.Runtime.Atn
                 PredicateDFAState(newState, configs, decisionState.NumberOfTransitions);
             }
             DFAState added = dfa.AddState(newState);
+#if !PORTABLE
             if (debug && added == newState)
             {
                 System.Console.Out.WriteLine("adding new DFA state: " + newState);
             }
+#endif
             return added;
         }
 
@@ -2071,6 +2081,7 @@ namespace Antlr4.Runtime.Atn
         public virtual void ReportAttemptingFullContext(DFA dfa, SimulatorState initialState
             , int startIndex, int stopIndex)
         {
+#if !PORTABLE
             if (debug || retry_debug)
             {
                 Interval interval = Interval.Of(startIndex, stopIndex);
@@ -2078,6 +2089,7 @@ namespace Antlr4.Runtime.Atn
                      + ":" + initialState.s0.configs + ", input=" + ((ITokenStream)parser.InputStream
                     ).GetText(interval));
             }
+#endif
             if (parser != null)
             {
                 ((IParserErrorListener)parser.GetErrorListenerDispatch()).ReportAttemptingFullContext
@@ -2088,6 +2100,7 @@ namespace Antlr4.Runtime.Atn
         public virtual void ReportContextSensitivity(DFA dfa, SimulatorState acceptState, 
             int startIndex, int stopIndex)
         {
+#if !PORTABLE
             if (debug || retry_debug)
             {
                 Interval interval = Interval.Of(startIndex, stopIndex);
@@ -2095,6 +2108,7 @@ namespace Antlr4.Runtime.Atn
                     + ":" + acceptState.s0.configs + ", input=" + ((ITokenStream)parser.InputStream
                     ).GetText(interval));
             }
+#endif
             if (parser != null)
             {
                 ((IParserErrorListener)parser.GetErrorListenerDispatch()).ReportContextSensitivity
@@ -2106,6 +2120,7 @@ namespace Antlr4.Runtime.Atn
         public virtual void ReportAmbiguity(DFA dfa, DFAState D, int startIndex, int stopIndex
             , BitSet ambigAlts, ATNConfigSet configs)
         {
+#if !PORTABLE
             if (debug || retry_debug)
             {
                 //			ParserATNPathFinder finder = new ParserATNPathFinder(parser, atn);
@@ -2128,6 +2143,7 @@ namespace Antlr4.Runtime.Atn
                 System.Console.Out.WriteLine("reportAmbiguity " + ambigAlts + ":" + configs + ", input="
                      + ((ITokenStream)parser.InputStream).GetText(interval));
             }
+#endif
             if (parser != null)
             {
                 ((IParserErrorListener)parser.GetErrorListenerDispatch()).ReportAmbiguity(parser, 

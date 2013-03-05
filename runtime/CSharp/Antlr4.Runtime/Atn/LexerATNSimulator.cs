@@ -39,9 +39,11 @@ namespace Antlr4.Runtime.Atn
     /// <summary>"dup" of ParserInterpreter</summary>
     public class LexerATNSimulator : ATNSimulator
     {
+#if !PORTABLE
         public const bool debug = false;
 
         public const bool dfa_debug = false;
+#endif
 
         public const int MinDfaEdge = 0;
 
@@ -222,11 +224,13 @@ namespace Antlr4.Runtime.Atn
                 {
                     break;
                 }
+#if !PORTABLE
                 if (debug && target != null)
                 {
                     System.Console.Out.WriteLine("reuse state " + s.stateNumber + " edge to " + target
                         .stateNumber);
                 }
+#endif
                 if (target == null)
                 {
                     ATNConfigSet reach = new OrderedATNConfigSet();
