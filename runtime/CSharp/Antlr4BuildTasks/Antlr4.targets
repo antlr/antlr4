@@ -133,7 +133,7 @@
       TargetLanguage="%(Antlr4.TargetLanguage)"
       TargetFrameworkVersion="$(TargetFrameworkVersion)"
       TargetNamespace="%(Antlr4.CustomToolNamespace)"
-      SourceCodeFiles="@(Antlr4)"
+      SourceCodeFiles="@(Antlr4 -> '%(FullPath)')"
       ContinueOnError="$(_IntellisenseOnlyCompile)"
       TokensFiles="@(Antlr4Tokens)"
       AbstractGrammarFiles="@(Antlr4AbstractGrammar)"
