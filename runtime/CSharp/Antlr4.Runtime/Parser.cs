@@ -97,9 +97,9 @@ namespace Antlr4.Runtime
 
             public virtual void ExitEveryRule(ParserRuleContext ctx)
             {
-                if (ctx.children is ArrayList)
+                if (ctx.children is List<IParseTree>)
                 {
-                    ((List<object>)ctx.children).TrimExcess();
+                    ((List<IParseTree>)ctx.children).TrimExcess();
                 }
             }
         }
