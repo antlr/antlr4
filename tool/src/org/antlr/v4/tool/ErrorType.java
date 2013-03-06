@@ -142,7 +142,7 @@ public enum ErrorType {
 	 * Whitespace : [ \t]*;  // error 146
 	 * </pre>
 	 */
-	EPSILON_TOKEN(146, "non-fragment lexer rule '<arg>' can match the empty string", ErrorSeverity.ERROR),
+	EPSILON_TOKEN(146, "non-fragment lexer rule '<arg>' can match the empty string", ErrorSeverity.WARNING),
 	/**
 	 * Left-recursive rules must contain at least one alternative which is not
 	 * left recursive.
