@@ -492,9 +492,14 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		else {
 			_ctx = _parentctx;
 		}
+
 		// hook into tree
 		retctx.parent = _parentctx;
-		if (_buildParseTrees) _parentctx.addChild(retctx); // add return ctx into invoking rule's tree
+
+		if (_buildParseTrees && _parentctx != null) {
+			// add return ctx into invoking rule's tree
+			_parentctx.addChild(retctx);
+		}
 	}
 
 	public ParserRuleContext getInvokingContext(int ruleIndex) {
