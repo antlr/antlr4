@@ -56,6 +56,10 @@ public List<Token> getActionTokens() {
     }
     return chunks;
 }
+
+private boolean isIDStartChar(int c) {
+	return c == '_' || Character.isLetter(c);
+}
 }
 
 // ignore comments right away
@@ -106,8 +110,9 @@ TEXT
 @init {StringBuilder buf = new StringBuilder();}
 @after {delegate.text(buf.toString());}
 	:	(	c=~('\\'| '$') {buf.append((char)$c);}
-		|	'\\$' {buf.append("$");}
+		|	'\\$' {buf.append('$');}
 		|	'\\' c=~('$') {buf.append('\\').append((char)$c);}
+		|	{!isIDStartChar(input.LA(2))}? => '$' {buf.append('$');}
 		)+
 	;
 
