@@ -162,8 +162,8 @@ public class TestSymbolIssues extends BaseTest {
 			"  B : C;\n" +
 			"  fragment C : A | (A C)?;",
 
-			"error(" + ErrorType.EPSILON_TOKEN.code + "): L.g4:3:0: non-fragment lexer rule 'WS' can match the empty string\n" +
-			"error(" + ErrorType.EPSILON_TOKEN.code + "): L.g4:5:2: non-fragment lexer rule 'B' can match the empty string\n"
+			"warning(" + ErrorType.EPSILON_TOKEN.code + "): L.g4:3:0: non-fragment lexer rule 'WS' can match the empty string\n" +
+			"warning(" + ErrorType.EPSILON_TOKEN.code + "): L.g4:5:2: non-fragment lexer rule 'B' can match the empty string\n"
 		};
 
 		testErrors(test, false);
