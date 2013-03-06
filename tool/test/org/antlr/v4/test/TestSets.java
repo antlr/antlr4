@@ -29,6 +29,7 @@
  */
 package org.antlr.v4.test;
 
+import org.antlr.v4.tool.ErrorType;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -237,7 +238,7 @@ public class TestSets extends BaseTest {
 			"a : A {System.out.println($A.text);} ;\n" +
 			"A : ~('a'|B) ;\n" +
 			"B : 'b' ;\n",
-			"error(134): T.g4:3:10: rule reference 'B' is not currently supported in a set\n"
+			"error(" + ErrorType.UNSUPPORTED_REFERENCE_IN_LEXER_SET.code + "): T.g4:3:10: rule reference 'B' is not currently supported in a set\n"
 		};
 		super.testErrors(pair, true);
 	}
@@ -249,7 +250,7 @@ public class TestSets extends BaseTest {
 			"a : A {System.out.println($A.text);} ;\n" +
 			"A : ~('a'|'aa') ;\n" +
 			"B : 'b' ;\n",
-			"error(144): T.g4:3:10: multi-character literals are not allowed in lexer sets: 'aa'\n"
+			"error(" + ErrorType.INVALID_LITERAL_IN_LEXER_SET.code + "): T.g4:3:10: multi-character literals are not allowed in lexer sets: 'aa'\n"
 		};
 		super.testErrors(pair, true);
 	}
