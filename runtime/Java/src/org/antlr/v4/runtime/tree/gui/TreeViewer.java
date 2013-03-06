@@ -44,7 +44,16 @@ import org.antlr.v4.runtime.tree.Trees;
 
 import javax.imageio.ImageIO;
 import javax.print.PrintException;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.BasicStroke;
@@ -288,43 +297,43 @@ public class TreeViewer extends JComponent {
 		// Make the scrollpane (containing the viewer) the center component
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 
-        JPanel wrapper = new JPanel(new FlowLayout());
+		JPanel wrapper = new JPanel(new FlowLayout());
 
-        // Add an export-to-png button left of the "OK" button
-        JButton png = new JButton("png");
-        png.addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    BufferedImage bi = new BufferedImage(viewer.getSize().width,
-                            viewer.getSize().height, BufferedImage.TYPE_INT_ARGB);
-                    Graphics g = bi.createGraphics();
-                    viewer.paint(g);
-                    g.dispose();
+		// Add an export-to-png button left of the "OK" button
+		JButton png = new JButton("png");
+		png.addActionListener(
+			new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					BufferedImage bi = new BufferedImage(viewer.getSize().width,
+							viewer.getSize().height, BufferedImage.TYPE_INT_ARGB);
+					Graphics g = bi.createGraphics();
+					viewer.paint(g);
+					g.dispose();
 
-                    try{
-                        File pngFile = new File("antlrv4_parse_tree_" +
-                                System.currentTimeMillis() +  ".png");
-                        ImageIO.write(bi, "png", pngFile);
-                        JOptionPane.showMessageDialog(dialog,
-                                "Saved PNG to: " + pngFile.getAbsolutePath());
-                    } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(dialog,
-                                "Could not export to PNG: " + ex.getMessage(),
-                                "Error",
-                                JOptionPane.ERROR_MESSAGE);
-                        ex.printStackTrace();
-                    }
-                }
-            }
-        );
-        wrapper.add(png);
+					try{
+						File pngFile = new File("antlrv4_parse_tree_" +
+								System.currentTimeMillis() +  ".png");
+						ImageIO.write(bi, "png", pngFile);
+						JOptionPane.showMessageDialog(dialog,
+								"Saved PNG to: " + pngFile.getAbsolutePath());
+					} catch (Exception ex) {
+						JOptionPane.showMessageDialog(dialog,
+								"Could not export to PNG: " + ex.getMessage(),
+								"Error",
+								JOptionPane.ERROR_MESSAGE);
+						ex.printStackTrace();
+					}
+				}
+			}
+		);
+		wrapper.add(png);
 
 	  	// Add button to bottom
 		JPanel bottomPanel = new JPanel(new BorderLayout(0,0));
 		contentPane.add(bottomPanel, BorderLayout.SOUTH);
 
-        JButton ok = new JButton("OK");
+		JButton ok = new JButton("OK");
 		ok.addActionListener(
 			new ActionListener() {
 				@Override
