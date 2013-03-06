@@ -43,7 +43,7 @@ javaTypeInitMap ::= [
 // args must be <object-model-object>, <fields-resulting-in-STs>
 
 ParserFile(file, parser, namedActions) ::= <<
-// Generated from <file.grammarFileName> by ANTLR <file.ANTLRVersion>
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 package <file.genPackage>;
 <endif>
@@ -61,7 +61,7 @@ import java.util.ArrayList;
 >>
 
 ListenerFile(file, header) ::= <<
-// Generated from <file.grammarFileName> by ANTLR <file.ANTLRVersion>
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 package <file.genPackage>;
 <endif>
@@ -77,7 +77,7 @@ void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ct
 >>
 
 BaseListenerFile(file, header) ::= <<
-// Generated from <file.grammarFileName> by ANTLR <file.ANTLRVersion>
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 package <file.genPackage>;
 <endif>
@@ -101,7 +101,7 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 >>
 
 VisitorFile(file, header) ::= <<
-// Generated from <file.grammarFileName> by ANTLR <file.ANTLRVersion>
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 package <file.genPackage>;
 <endif>
@@ -116,7 +116,7 @@ T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx)
 >>
 
 BaseVisitorFile(file, header) ::= <<
-// Generated from <file.grammarFileName> by ANTLR <file.ANTLRVersion>
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 package <file.genPackage>;
 <endif>
@@ -129,6 +129,10 @@ public class <file.grammarName>BaseVisitor\<T> extends AbstractParseTreeVisitor\
 	<file.visitorNames:{lname |
 @Override public T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
 }
+>>
+
+fileHeader(grammarFileName, ANTLRVersion) ::= <<
+// Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
@@ -155,7 +159,7 @@ public class <parser.name> extends <superClass> {
 	};
 
 	@Override
-	public String getGrammarFileName() { return "<parser.grammarFileName>"; }
+	public String getGrammarFileName() { return "<parser.grammarFileName; format="java-escape">"; }
 
 	@Override
 	public String[] getTokenNames() { return tokenNames; }
@@ -748,7 +752,7 @@ _prevctx = _localctx;
 
 
 LexerFile(lexerFile, lexer, namedActions) ::= <<
-// Generated from <lexerFile.grammarFileName> by ANTLR <lexerFile.ANTLRVersion>
+<fileHeader(lexerFile.grammarFileName, lexerFile.ANTLRVersion)>
 <if(lexerFile.genPackage)>
 package <lexerFile.genPackage>;
 <endif>
