@@ -56,6 +56,10 @@ public List<Token> getActionTokens() {
     }
     return chunks;
 }
+
+private boolean isIDStartChar(int c) {
+	return c == '_' || Character.isLetter(c);
+}
 }
 
 // ignore comments right away
@@ -106,18 +110,10 @@ TEXT
 @init {StringBuilder buf = new StringBuilder();}
 @after {delegate.text(buf.toString());}
 	:	(	c=~('\\'| '$') {buf.append((char)$c);}
-		|	'\\$' {buf.append("$");}
+		|	'\\$' {buf.append('$');}
 		|	'\\' c=~('$') {buf.append('\\').append((char)$c);}
+		|	{!isIDStartChar(input.LA(2))}? => '$' {buf.append('$');}
 		)+
-	;
-
-fragment
-ACTION
-	:	'{' ('\\}'|~'}')* '}'
-	;
-
-fragment
-ARG	:	ID '=' ACTION
 	;
 
 fragment
@@ -128,11 +124,6 @@ ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
 fragment
 ATTR_VALUE_EXPR
 	:	~'=' (~';')*
-	;
-
-fragment
-SCOPE_INDEX_EXPR
-	:	('\\]'|~']')+
 	;
 
 fragment
