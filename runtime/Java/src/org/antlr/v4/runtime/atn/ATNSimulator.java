@@ -39,6 +39,7 @@ import java.io.InvalidClassException;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Locale;
 
 public abstract class ATNSimulator {
 	public static final int SERIALIZED_VERSION;
@@ -110,7 +111,7 @@ public abstract class ATNSimulator {
 		int p = 0;
 		int version = toInt(data[p++]);
 		if (version != SERIALIZED_VERSION) {
-			String reason = String.format("Could not deserialize ATN with version %d (expected %d).", version, SERIALIZED_VERSION);
+			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with version %d (expected %d).", version, SERIALIZED_VERSION);
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
 		}
 
@@ -420,7 +421,7 @@ public abstract class ATNSimulator {
 			case ATNState.PLUS_LOOP_BACK : s = new PlusLoopbackState(); break;
 			case ATNState.LOOP_END : s = new LoopEndState(); break;
             default :
-				String message = String.format("The specified state type %d is not valid.", type);
+				String message = String.format(Locale.getDefault(), "The specified state type %d is not valid.", type);
 				throw new IllegalArgumentException(message);
 		}
 
