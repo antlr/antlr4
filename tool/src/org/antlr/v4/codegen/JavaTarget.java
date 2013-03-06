@@ -31,9 +31,12 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.StringRenderer;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -165,4 +168,24 @@ public class JavaTarget extends Target {
 		return getBadWords().contains(idNode.getText());
 	}
 
+	@Override
+	protected STGroup loadTemplates() {
+		STGroup result = super.loadTemplates();
+		result.registerRenderer(String.class, new JavaStringRenderer(), true);
+		return result;
+	}
+
+	protected static class JavaStringRenderer extends StringRenderer {
+
+		@Override
+		public String toString(Object o, String formatString, Locale locale) {
+			if ("java-escape".equals(formatString)) {
+				// 5C is the hex code for the \ itself
+				return ((String)o).replace("\\u", "\\u005Cu");
+			}
+
+			return super.toString(o, formatString, locale);
+		}
+
+	}
 }
