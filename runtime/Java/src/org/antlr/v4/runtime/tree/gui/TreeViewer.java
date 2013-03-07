@@ -54,6 +54,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
+import javax.swing.JFileChooser;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.BasicStroke;
@@ -67,6 +68,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.CubicCurve2D;
@@ -360,12 +362,45 @@ public class TreeViewer extends JComponent {
 		viewer.paint(g);
 		g.dispose();
 
-		try{
-			File pngFile = new File("antlrv4_parse_tree_" +
-									System.currentTimeMillis() + ".png");
-			ImageIO.write(bi, "png", pngFile);
-			JOptionPane.showMessageDialog(dialog,
-										  "Saved PNG to: " + pngFile.getAbsolutePath());
+		try {
+			File suggestedFile = generateNonExistingPngFile();
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setCurrentDirectory(suggestedFile.getParentFile());
+			fileChooser.setSelectedFile(suggestedFile);
+
+			int returnValue = fileChooser.showSaveDialog(dialog);
+
+			if (returnValue == JFileChooser.APPROVE_OPTION) {
+
+				File pngFile = fileChooser.getSelectedFile();
+
+				boolean writeFile = true;
+
+				if (pngFile.exists()) {
+					int answer = JOptionPane.showConfirmDialog(dialog,
+															   "Overwrite existing file?",
+															   "Overwrite?",
+															   JOptionPane.YES_NO_OPTION);
+					writeFile = (answer == JOptionPane.YES_OPTION);
+				}
+
+				if (writeFile) {
+
+					ImageIO.write(bi, "png", pngFile);
+
+					try {
+						// Try to open the parent folder using the OS' native file manager.
+						Desktop.getDesktop().open(pngFile.getParentFile());
+					}
+					catch (Exception ex) {
+						// We could not launch the file manager: just show a popup that we
+						// succeeded in saving the PNG file.
+						JOptionPane.showMessageDialog(dialog, "Saved PNG to: " +
+													  pngFile.getAbsolutePath());
+						ex.printStackTrace();
+					}
+				}
+			}
 		}
 		catch (Exception ex) {
 			JOptionPane.showMessageDialog(dialog,
@@ -374,6 +409,25 @@ public class TreeViewer extends JComponent {
 										  JOptionPane.ERROR_MESSAGE);
 			ex.printStackTrace();
 		}
+	}
+
+	private static File generateNonExistingPngFile() {
+
+		final String parent = ".";
+		final String name = "antlr4_parse_tree";
+		final String extension = ".png";
+
+		File pngFile = new File(parent, name + extension);
+
+		int counter = 1;
+
+		// Keep looping until we create a File that does not yet exist.
+		while (pngFile.exists()) {
+			pngFile = new File(parent, name + "_"+ counter + extension);
+			counter++;
+		}
+
+		return pngFile;
 	}
 
 	private Dimension getScaledTreeSize() {
