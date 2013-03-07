@@ -369,6 +369,25 @@ public class TreeViewer extends JComponent {
 			JFileChooser fileChooser = new JFileChooserConfirmOverwrite();
 			fileChooser.setCurrentDirectory(suggestedFile.getParentFile());
 			fileChooser.setSelectedFile(suggestedFile);
+			FileFilter pngFilter = new FileFilter() {
+
+				@Override
+				public boolean accept(File pathname) {
+					if (pathname.isFile()) {
+						return pathname.getName().toLowerCase().endsWith(".png");
+					}
+
+					return true;
+				}
+
+				@Override
+				public String getDescription() {
+					return "PNG Files (*.png)";
+				}
+			};
+
+			fileChooser.addChoosableFileFilter(pngFilter);
+			fileChooser.setFileFilter(pngFilter);
 
 			int returnValue = fileChooser.showSaveDialog(dialog);
 			if (returnValue == JFileChooser.APPROVE_OPTION) {
