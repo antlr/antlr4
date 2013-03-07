@@ -35,6 +35,7 @@ import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.antlr.v4.runtime.misc.GraphicsSupport;
+import org.antlr.v4.runtime.misc.JFileChooserConfirmOverwrite;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Utils;
@@ -57,6 +58,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.JFileChooser;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileFilter;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -364,41 +366,25 @@ public class TreeViewer extends JComponent {
 
 		try {
 			File suggestedFile = generateNonExistingPngFile();
-			JFileChooser fileChooser = new JFileChooser();
+			JFileChooser fileChooser = new JFileChooserConfirmOverwrite();
 			fileChooser.setCurrentDirectory(suggestedFile.getParentFile());
 			fileChooser.setSelectedFile(suggestedFile);
 
 			int returnValue = fileChooser.showSaveDialog(dialog);
-
 			if (returnValue == JFileChooser.APPROVE_OPTION) {
-
 				File pngFile = fileChooser.getSelectedFile();
+				ImageIO.write(bi, "png", pngFile);
 
-				boolean writeFile = true;
-
-				if (pngFile.exists()) {
-					int answer = JOptionPane.showConfirmDialog(dialog,
-															   "Overwrite existing file?",
-															   "Overwrite?",
-															   JOptionPane.YES_NO_OPTION);
-					writeFile = (answer == JOptionPane.YES_OPTION);
+				try {
+					// Try to open the parent folder using the OS' native file manager.
+					Desktop.getDesktop().open(pngFile.getParentFile());
 				}
-
-				if (writeFile) {
-
-					ImageIO.write(bi, "png", pngFile);
-
-					try {
-						// Try to open the parent folder using the OS' native file manager.
-						Desktop.getDesktop().open(pngFile.getParentFile());
-					}
-					catch (Exception ex) {
-						// We could not launch the file manager: just show a popup that we
-						// succeeded in saving the PNG file.
-						JOptionPane.showMessageDialog(dialog, "Saved PNG to: " +
-													  pngFile.getAbsolutePath());
-						ex.printStackTrace();
-					}
+				catch (Exception ex) {
+					// We could not launch the file manager: just show a popup that we
+					// succeeded in saving the PNG file.
+					JOptionPane.showMessageDialog(dialog, "Saved PNG to: " +
+												  pngFile.getAbsolutePath());
+					ex.printStackTrace();
 				}
 			}
 		}
