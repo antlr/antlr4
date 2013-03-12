@@ -137,12 +137,44 @@ namespace Antlr4.Build.Tasks
         {
             get
             {
-                string javaKey = "SOFTWARE\\JavaSoft\\Java Runtime Environment";
-                using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default).OpenSubKey(javaKey))
+                string javaHome;
+                if (TryGetJavaHome(RegistryView.Default, out javaHome))
+                    return javaHome;
+
+                if (TryGetJavaHome(RegistryView.Registry64, out javaHome))
+                    return javaHome;
+
+                if (TryGetJavaHome(RegistryView.Registry32, out javaHome))
+                    return javaHome;
+
+                throw new NotSupportedException("Could not locate a Java installation.");
+            }
+        }
+
+        private bool TryGetJavaHome(RegistryView registryView, out string javaHome)
+        {
+            javaHome = null;
+
+            string javaKeyName = "SOFTWARE\\JavaSoft\\Java Runtime Environment";
+            using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default))
+            {
+                using (RegistryKey javaKey = baseKey.OpenSubKey(javaKeyName))
                 {
-                    string currentVersion = baseKey.GetValue("CurrentVersion").ToString();
-                    using (var homeKey = baseKey.OpenSubKey(currentVersion))
-                        return homeKey.GetValue("JavaHome").ToString();
+                    if (javaKey == null)
+                        return false;
+
+                    object currentVersion = javaKey.GetValue("CurrentVersion");
+                    if (currentVersion == null)
+                        return false;
+
+                    using (var homeKey = javaKey.OpenSubKey(currentVersion.ToString()))
+                    {
+                        if (homeKey == null || homeKey.GetValue("JavaHome") == null)
+                            return false;
+
+                        javaHome = homeKey.GetValue("JavaHome").ToString();
+                        return !string.IsNullOrEmpty(javaHome);
+                    }
                 }
             }
         }
