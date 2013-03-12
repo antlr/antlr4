@@ -82,7 +82,7 @@ namespace Antlr4.Runtime.Misc
                 foreach (KeyValuePair<Type, IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>>> entry
                      in recognizerDependencies)
                 {
-                    //processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format("ANTLR 4: Validating %d dependencies on rules in %s.", entry.getValue().size(), entry.getKey().toString()));
+                    //processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format("ANTLR 4: Validating {0} dependencies on rules in {1}.", entry.getValue().size(), entry.getKey().toString()));
                     CheckDependencies(entry.Value, entry.Key);
                 }
                 CheckDependencies(dependencies, dependencies[0].Item1.Recognizer);
@@ -130,10 +130,10 @@ namespace Antlr4.Runtime.Misc
                 int effectiveRule = dependency.Item1.Rule;
                 if (effectiveRule < 0 || effectiveRule >= ruleVersions.Length)
                 {
-                    string message = string.Format("Rule dependency on unknown rule %d@%d in %s%n", dependency
+                    string message = string.Format("Rule dependency on unknown rule {0}@{1} in {2}", dependency
                         .Item1.Rule, dependency.Item1.Version, dependency.Item1.Recognizer.ToString
                         ());
-                    errors.Append(message);
+                    errors.AppendLine(message);
                     continue;
                 }
                 Dependents dependents = Dependents.Self | dependency.Item1.Dependents;
@@ -209,10 +209,10 @@ namespace Antlr4.Runtime.Misc
                 int declaredVersion = dependency.Item1.Version;
                 if (declaredVersion > highestRequiredDependency)
                 {
-                    string message = string.Format("Rule dependency version mismatch: %s has maximum dependency version %d (expected %d) in %s%n"
+                    string message = string.Format("Rule dependency version mismatch: {0} has maximum dependency version {1} (expected {2}) in {3}"
                         , ruleNames[dependency.Item1.Rule], highestRequiredDependency, declaredVersion
                         , dependency.Item1.Recognizer.ToString());
-                    errors.Append(message);
+                    errors.AppendLine(message);
                 }
             }
             if (errors.Length > 0)
@@ -232,9 +232,9 @@ namespace Antlr4.Runtime.Misc
             unimplemented &= ~ImplementedDependents;
             if (unimplemented != Dependents.None)
             {
-                string message = string.Format("Cannot validate the following dependents of rule %d: %s%n"
+                string message = string.Format("Cannot validate the following dependents of rule {0}: {1}"
                     , dependency.Item1.Rule, unimplemented);
-                errors.Append(message);
+                errors.AppendLine(message);
             }
         }
 
@@ -251,17 +251,17 @@ namespace Antlr4.Runtime.Misc
             else
             {
                 string mismatchedRuleName = ruleNames[relatedRule];
-                path = string.Format("rule %s (%s of %s)", mismatchedRuleName, relation, ruleName
+                path = string.Format("rule {0} ({1} of {2})", mismatchedRuleName, relation, ruleName
                     );
             }
             int declaredVersion = dependency.Item1.Version;
             int actualVersion = ruleVersions[relatedRule];
             if (actualVersion > declaredVersion)
             {
-                string message = string.Format("Rule dependency version mismatch: %s has version %d (expected <= %d) in %s%n"
+                string message = string.Format("Rule dependency version mismatch: {0} has version {1} (expected <= {2}) in {3}"
                     , path, actualVersion, declaredVersion, dependency.Item1.Recognizer.ToString
                     ());
-                errors.Append(message);
+                errors.AppendLine(message);
             }
             return actualVersion;
         }
