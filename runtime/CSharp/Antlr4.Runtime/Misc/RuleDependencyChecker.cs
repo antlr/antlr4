@@ -57,15 +57,16 @@ namespace Antlr4.Runtime.Misc
             {
                 return;
             }
+
             IList<Type> typesToCheck = GetTypesToCheck(assembly);
+            List<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>> dependencies = new List<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>>();
             foreach (Type clazz in typesToCheck)
             {
-                IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>> dependencies = GetDependencies(clazz
-                    );
-                if (dependencies.Count == 0)
-                {
-                    continue;
-                }
+                dependencies.AddRange(GetDependencies(clazz));
+            }
+
+            if (dependencies.Count > 0)
+            {
                 IDictionary<Type, IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>>> recognizerDependencies
                      = new Dictionary<Type, IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>>>();
                 foreach (Tuple<RuleDependencyAttribute, ICustomAttributeProvider> dependency in dependencies)
@@ -79,13 +80,13 @@ namespace Antlr4.Runtime.Misc
                     }
                     list.Add(dependency);
                 }
+
                 foreach (KeyValuePair<Type, IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>>> entry
                      in recognizerDependencies)
                 {
                     //processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format("ANTLR 4: Validating {0} dependencies on rules in {1}.", entry.getValue().size(), entry.getKey().toString()));
                     CheckDependencies(entry.Value, entry.Key);
                 }
-                CheckDependencies(dependencies, dependencies[0].Item1.Recognizer);
             }
 
             MarkChecked(assembly);
