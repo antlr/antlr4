@@ -134,6 +134,7 @@ namespace Antlr4.Runtime.Misc
                     string message = string.Format("Rule dependency on unknown rule {0}@{1} in {2}", dependency
                         .Item1.Rule, dependency.Item1.Version, dependency.Item1.Recognizer.ToString
                         ());
+                    errors.AppendLine(dependency.Item2.ToString());
                     errors.AppendLine(message);
                     continue;
                 }
@@ -213,6 +214,7 @@ namespace Antlr4.Runtime.Misc
                     string message = string.Format("Rule dependency version mismatch: {0} has maximum dependency version {1} (expected {2}) in {3}"
                         , ruleNames[dependency.Item1.Rule], highestRequiredDependency, declaredVersion
                         , dependency.Item1.Recognizer.ToString());
+                    errors.AppendLine(dependency.Item2.ToString());
                     errors.AppendLine(message);
                 }
             }
@@ -262,6 +264,7 @@ namespace Antlr4.Runtime.Misc
                 string message = string.Format("Rule dependency version mismatch: {0} has version {1} (expected <= {2}) in {3}"
                     , path, actualVersion, declaredVersion, dependency.Item1.Recognizer.ToString
                     ());
+                errors.AppendLine(dependency.Item2.ToString());
                 errors.AppendLine(message);
             }
             return actualVersion;
