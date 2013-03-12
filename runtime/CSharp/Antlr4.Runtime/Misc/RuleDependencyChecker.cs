@@ -47,6 +47,8 @@ namespace Antlr4.Runtime.Misc
             ).FullName);
 #endif
 
+        private const BindingFlags AllDeclaredStaticMembers = BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
+        private const BindingFlags AllDeclaredMembers = AllDeclaredStaticMembers | BindingFlags.Instance;
         private static readonly HashSet<string> checkedAssemblies = new HashSet<string>();
 
         public static void CheckDependencies(Assembly assembly)
@@ -353,19 +355,19 @@ namespace Antlr4.Runtime.Misc
                 , ICustomAttributeProvider>>();
 
             GetElementDependencies(AsCustomAttributeProvider(clazz), result);
-            foreach (ConstructorInfo ctor in clazz.GetConstructors(BindingFlags.DeclaredOnly))
+            foreach (ConstructorInfo ctor in clazz.GetConstructors(AllDeclaredMembers))
             {
                 GetElementDependencies(AsCustomAttributeProvider(ctor), result);
                 foreach (ParameterInfo parameter in ctor.GetParameters())
                     GetElementDependencies(AsCustomAttributeProvider(parameter), result);
             }
 
-            foreach (FieldInfo field in clazz.GetFields(BindingFlags.DeclaredOnly))
+            foreach (FieldInfo field in clazz.GetFields(AllDeclaredMembers))
             {
                 GetElementDependencies(AsCustomAttributeProvider(field), result);
             }
 
-            foreach (MethodInfo method in clazz.GetMethods(BindingFlags.DeclaredOnly))
+            foreach (MethodInfo method in clazz.GetMethods(AllDeclaredMembers))
             {
                 GetElementDependencies(AsCustomAttributeProvider(method), result);
                 if (method.ReturnParameter != null)
@@ -419,7 +421,7 @@ namespace Antlr4.Runtime.Misc
 
         private static string GetSerializedATN(Type recognizerClass)
         {
-            FieldInfo serializedAtnField = recognizerClass.GetField("_serializedATN", BindingFlags.DeclaredOnly | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            FieldInfo serializedAtnField = recognizerClass.GetField("_serializedATN", AllDeclaredStaticMembers);
             if (serializedAtnField != null)
                 return (string)serializedAtnField.GetValue(null);
 
