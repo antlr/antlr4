@@ -49,6 +49,9 @@
     <Antlr4BuildTaskLocation Condition="'$(Antlr4BuildTaskPath)'!=''">$(Antlr4BuildTaskPath)</Antlr4BuildTaskLocation>
     <Antlr4ToolLocation Condition="'$(Antlr4ToolPath)'==''">$(MSBuildBinPath)\Antlr4\antlr4-csharp-4.0.1-SNAPSHOT-complete.jar</Antlr4ToolLocation>
     <Antlr4ToolLocation Condition="'$(Antlr4ToolPath)'!=''">$(Antlr4ToolPath)</Antlr4ToolLocation>
+
+    <Antlr4JavaVendor Condition="'$(Antlr4JavaVendor)'==''">JavaSoft</Antlr4JavaVendor>
+    <Antlr4JavaInstallation Condition="'$(Antlr4JavaInstallation)'==''">Java Runtime Environment</Antlr4JavaInstallation>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -128,6 +131,8 @@
     </PropertyGroup>
     <Antlr4ClassGenerationTask
       ToolPath="$(Antlr4ToolLocation)"
+      JavaVendor="$(Antlr4JavaVendor)"
+      JavaInstallation="$(Antlr4JavaInstallation)"
       BuildTaskPath="$(Antlr4BuildTaskLocation)"
       OutputPath="$(IntermediateOutputPath)"
       TargetLanguage="%(Antlr4.TargetLanguage)"

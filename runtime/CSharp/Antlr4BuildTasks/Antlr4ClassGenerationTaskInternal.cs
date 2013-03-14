@@ -113,6 +113,18 @@ namespace Antlr4.Build.Tasks
             set;
         }
 
+        public string JavaVendor
+        {
+            get;
+            set;
+        }
+
+        public string JavaInstallation
+        {
+            get;
+            set;
+        }
+
         public IList<string> SourceCodeFiles
         {
             get
@@ -133,29 +145,29 @@ namespace Antlr4.Build.Tasks
             }
         }
 
-        private static string JavaHome
+        private string JavaHome
         {
             get
             {
                 string javaHome;
-                if (TryGetJavaHome(RegistryView.Default, out javaHome))
+                if (TryGetJavaHome(RegistryView.Default, JavaVendor, JavaInstallation, out javaHome))
                     return javaHome;
 
-                if (TryGetJavaHome(RegistryView.Registry64, out javaHome))
+                if (TryGetJavaHome(RegistryView.Registry64, JavaVendor, JavaInstallation, out javaHome))
                     return javaHome;
 
-                if (TryGetJavaHome(RegistryView.Registry32, out javaHome))
+                if (TryGetJavaHome(RegistryView.Registry32, JavaVendor, JavaInstallation, out javaHome))
                     return javaHome;
 
                 throw new NotSupportedException("Could not locate a Java installation.");
             }
         }
 
-        private static bool TryGetJavaHome(RegistryView registryView, out string javaHome)
+        private static bool TryGetJavaHome(RegistryView registryView, string vendor, string installation, out string javaHome)
         {
             javaHome = null;
 
-            string javaKeyName = "SOFTWARE\\JavaSoft\\Java Runtime Environment";
+            string javaKeyName = "SOFTWARE\\" + vendor + "\\" + installation;
             using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, registryView))
             {
                 using (RegistryKey javaKey = baseKey.OpenSubKey(javaKeyName))

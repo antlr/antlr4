@@ -148,6 +148,20 @@ namespace Antlr4.Build.Tasks
             set;
         }
 
+        [Required]
+        public string JavaVendor
+        {
+            get;
+            set;
+        }
+
+        [Required]
+        public string JavaInstallation
+        {
+            get;
+            set;
+        }
+
         [Output]
         public ITaskItem[] GeneratedCodeFiles
         {
@@ -308,6 +322,8 @@ namespace Antlr4.Build.Tasks
             wrapper.GenerateVisitor = GenerateVisitor;
             wrapper.ForceAtn = ForceAtn;
             wrapper.AbstractGrammar = AbstractGrammar;
+            wrapper.JavaVendor = JavaVendor;
+            wrapper.JavaInstallation = JavaInstallation;
             return wrapper;
         }
 
