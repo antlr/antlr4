@@ -156,7 +156,7 @@ namespace Antlr4.Build.Tasks
             javaHome = null;
 
             string javaKeyName = "SOFTWARE\\JavaSoft\\Java Runtime Environment";
-            using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default))
+            using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, registryView))
             {
                 using (RegistryKey javaKey = baseKey.OpenSubKey(javaKeyName))
                 {
