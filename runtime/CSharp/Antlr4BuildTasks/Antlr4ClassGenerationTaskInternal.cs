@@ -133,7 +133,7 @@ namespace Antlr4.Build.Tasks
             }
         }
 
-        private string JavaHome
+        private static string JavaHome
         {
             get
             {
@@ -151,7 +151,7 @@ namespace Antlr4.Build.Tasks
             }
         }
 
-        private bool TryGetJavaHome(RegistryView registryView, out string javaHome)
+        private static bool TryGetJavaHome(RegistryView registryView, out string javaHome)
         {
             javaHome = null;
 
