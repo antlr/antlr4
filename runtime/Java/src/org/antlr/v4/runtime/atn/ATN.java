@@ -44,9 +44,6 @@ import java.util.Map;
 public class ATN {
 	public static final int INVALID_ALT_NUMBER = 0;
 
-	public static final int PARSER = 1;
-	public static final int LEXER = 2;
-
 	@NotNull
 	public final List<ATNState> states = new ArrayList<ATNState>();
 
@@ -64,8 +61,11 @@ public class ATN {
 	public final Map<String, TokensStartState> modeNameToStartState =
 		new LinkedHashMap<String, TokensStartState>();
 
-	// runtime for parsers, lexers
-	public int grammarType; // ATN.LEXER, ...
+	/**
+	 * The type of the ATN.
+	 */
+	public ATNType grammarType;
+
 	public int maxTokenType;
 
 	// runtime for lexer only

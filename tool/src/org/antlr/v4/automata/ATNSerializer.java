@@ -35,6 +35,7 @@ import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ATNType;
 import org.antlr.v4.runtime.atn.ActionTransition;
 import org.antlr.v4.runtime.atn.AtomTransition;
 import org.antlr.v4.runtime.atn.BlockStartState;
@@ -55,6 +56,8 @@ import java.io.InvalidClassException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 public class ATNSerializer {
 	public Grammar g;
@@ -90,15 +93,17 @@ public class ATNSerializer {
 	public IntegerList serialize() {
 		IntegerList data = new IntegerList();
 		data.add(ATNSimulator.SERIALIZED_VERSION);
+		serializeUUID(data, ATNSimulator.SERIALIZED_UUID);
+
 		// convert grammar type to ATN const to avoid dependence on ANTLRParser
 		switch (g.getType()) {
 		case ANTLRParser.LEXER:
-			data.add(ATN.LEXER);
+			data.add(ATNType.LEXER.ordinal());
 			break;
 
 		case ANTLRParser.PARSER:
 		case ANTLRParser.COMBINED:
-			data.add(ATN.PARSER);
+			data.add(ATNType.PARSER.ordinal());
 			break;
 
 		default:
@@ -285,6 +290,13 @@ public class ATNSerializer {
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
 		}
 
+		UUID uuid = ATNSimulator.toUUID(data, p);
+		p += 8;
+		if (!uuid.equals(ATNSimulator.SERIALIZED_UUID)) {
+			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with UUID %s (expected %s).", uuid, ATNSimulator.SERIALIZED_UUID);
+			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
+		}
+
 		int grammarType = ATNSimulator.toInt(data[p++]);
 		int maxType = ATNSimulator.toInt(data[p++]);
 		buf.append("max type ").append(maxType).append("\n");
@@ -383,5 +395,20 @@ public class ATNSerializer {
 		IntegerList serialized = getSerialized(g, atn);
 		char[] data = Utils.toCharArray(serialized);
 		return new ATNSerializer(g, atn).decode(data);
+	}
+
+	private void serializeUUID(IntegerList data, UUID uuid) {
+		serializeLong(data, uuid.getLeastSignificantBits());
+		serializeLong(data, uuid.getMostSignificantBits());
+	}
+
+	private void serializeLong(IntegerList data, long value) {
+		serializeInt(data, (int)value);
+		serializeInt(data, (int)(value >> 32));
+	}
+
+	private void serializeInt(IntegerList data, int value) {
+		data.add((char)value);
+		data.add((char)(value >> 16));
 	}
 }
