@@ -75,9 +75,6 @@ public class ATN {
 	@NotNull
 	public final List<TokensStartState> modeToStartState = new ArrayList<TokensStartState>();
 
-	/** used during construction from grammar AST */
-	int stateNumber = 0;
-
 	/** Used for runtime deserialization of ATNs from strings */
 	public ATN() { }
 
@@ -103,10 +100,12 @@ public class ATN {
     }
 
 	public void addState(@Nullable ATNState state) {
-		if ( state==null ) { states.add(null); stateNumber++; return; }
-		state.atn = this;
+		if (state != null) {
+			state.atn = this;
+			state.stateNumber = states.size();
+		}
+
 		states.add(state);
-		state.stateNumber = stateNumber++;
 	}
 
 	public void removeState(@NotNull ATNState state) {
