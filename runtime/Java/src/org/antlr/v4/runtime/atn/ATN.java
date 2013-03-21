@@ -155,4 +155,55 @@ public class ATN {
 	public int getNumberOfDecisions() {
 		return decisionToState.size();
 	}
+
+	/**
+	 * Computes the set of input symbols which could follow ATN state number
+	 * {@code stateNumber} in the specified full {@code context}. This method
+	 * considers the complete parser context, but does not evaluate semantic
+	 * predicates (i.e. all predicates encountered during the calculation are
+	 * assumed true). If a path in the ATN exists from the starting state to the
+	 * {@link RuleStopState} of the outermost context without matching any
+	 * symbols, {@link Token#EOF} is added to the returned set.
+	 * <p/>
+	 * If {@code context} is {@code null}, it is treated as
+	 * {@link ParserRuleContext#EMPTY}.
+	 *
+	 * @param stateNumber the ATN state number
+	 * @param context the full parse context
+	 * @return The set of potentially valid input symbols which could follow the
+	 * specified state in the specified context.
+	 * @throws IllegalArgumentException if the ATN does not contain a state with
+	 * number {@code stateNumber}
+	 */
+	@NotNull
+	public IntervalSet getExpectedTokens(int stateNumber, @Nullable RuleContext context) {
+		if (stateNumber < 0 || stateNumber >= states.size()) {
+			throw new IllegalArgumentException("Invalid state number.");
+		}
+
+		RuleContext ctx = context;
+		ATNState s = states.get(stateNumber);
+		IntervalSet following = nextTokens(s);
+		if (!following.contains(Token.EPSILON)) {
+			return following;
+		}
+
+		IntervalSet expected = new IntervalSet();
+		expected.addAll(following);
+		expected.remove(Token.EPSILON);
+		while (ctx != null && ctx.invokingState >= 0 && following.contains(Token.EPSILON)) {
+			ATNState invokingState = states.get(ctx.invokingState);
+			RuleTransition rt = (RuleTransition)invokingState.transition(0);
+			following = nextTokens(rt.followState);
+			expected.addAll(following);
+			expected.remove(Token.EPSILON);
+			ctx = ctx.parent;
+		}
+
+		if (following.contains(Token.EPSILON)) {
+			expected.add(Token.EOF);
+		}
+
+		return expected;
+	}
 }
