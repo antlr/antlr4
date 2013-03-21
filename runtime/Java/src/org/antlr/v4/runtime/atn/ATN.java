@@ -31,6 +31,7 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -54,7 +55,14 @@ public class ATN {
 	@NotNull
 	public final List<DecisionState> decisionToState = new ArrayList<DecisionState>();
 
+	/**
+	 * Maps from rule index to starting state number.
+	 */
 	public RuleStartState[] ruleToStartState;
+
+	/**
+	 * Maps from rule index to stop state number.
+	 */
 	public RuleStopState[] ruleToStopState;
 
 	@NotNull
@@ -66,10 +74,24 @@ public class ATN {
 	 */
 	public final ATNType grammarType;
 
+	/**
+	 * The maximum value for any symbol recognized by a transition in the ATN.
+	 */
 	public final int maxTokenType;
 
-	// runtime for lexer only
+	/**
+	 * For lexer ATNs, this maps the rule index to the resulting token type.
+	 * <p/>
+	 * This is {@code null} for parser ATNs.
+	 */
 	public int[] ruleToTokenType;
+
+	/**
+	 * For lexer ATNs, this maps the rule index to the action which should be
+	 * executed following a match.
+	 * <p/>
+	 * This is {@code null} for parser ATNs.
+	 */
 	public int[] ruleToActionIndex;
 
 	@NotNull
@@ -81,10 +103,10 @@ public class ATN {
 		this.maxTokenType = maxTokenType;
 	}
 
-	/** Compute the set of valid tokens that can occur starting in s.
-	 *  If ctx is null, the set of tokens will not include what can follow
-	 *  the rule surrounding s. In other words, the set will be
-	 *  restricted to tokens reachable staying within s's rule.
+	/** Compute the set of valid tokens that can occur starting in state {@code s}.
+	 *  If {@code ctx} is null, the set of tokens will not include what can follow
+	 *  the rule surrounding {@code s}. In other words, the set will be
+	 *  restricted to tokens reachable staying within {@code s}'s rule.
 	 */
 	public IntervalSet nextTokens(ATNState s, RuleContext ctx) {
 		LL1Analyzer anal = new LL1Analyzer(this);
@@ -92,8 +114,10 @@ public class ATN {
 		return next;
 	}
 
-    /** Compute the set of valid tokens that can occur starting in s and staying in same rule.
-     *  EPSILON is in set if we reach end of rule.
+    /**
+	 * Compute the set of valid tokens that can occur starting in {@code s} and
+	 * staying in same rule. {@link Token#EPSILON} is in set if we reach end of
+	 * rule.
      */
     public IntervalSet nextTokens(ATNState s) {
         if ( s.nextTokenWithinRule != null ) return s.nextTokenWithinRule;
