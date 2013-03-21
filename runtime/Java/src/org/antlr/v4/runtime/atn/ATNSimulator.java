@@ -118,7 +118,6 @@ public abstract class ATNSimulator {
 			data[i] = (char)(data[i] - 2);
 		}
 
-		ATN atn = new ATN();
 		List<IntervalSet> sets = new ArrayList<IntervalSet>();
 		int p = 0;
 		int version = toInt(data[p++]);
@@ -134,8 +133,9 @@ public abstract class ATNSimulator {
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
 		}
 
-		atn.grammarType = ATNType.values()[toInt(data[p++])];
-		atn.maxTokenType = toInt(data[p++]);
+		ATNType grammarType = ATNType.values()[toInt(data[p++])];
+		int maxTokenType = toInt(data[p++]);
+		ATN atn = new ATN(grammarType, maxTokenType);
 
 		//
 		// STATES

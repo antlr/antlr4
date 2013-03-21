@@ -64,9 +64,9 @@ public class ATN {
 	/**
 	 * The type of the ATN.
 	 */
-	public ATNType grammarType;
+	public final ATNType grammarType;
 
-	public int maxTokenType;
+	public final int maxTokenType;
 
 	// runtime for lexer only
 	public int[] ruleToTokenType;
@@ -76,7 +76,10 @@ public class ATN {
 	public final List<TokensStartState> modeToStartState = new ArrayList<TokensStartState>();
 
 	/** Used for runtime deserialization of ATNs from strings */
-	public ATN() { }
+	public ATN(@NotNull ATNType grammarType, int maxTokenType) {
+		this.grammarType = grammarType;
+		this.maxTokenType = maxTokenType;
+	}
 
 	/** Compute the set of valid tokens that can occur starting in s.
 	 *  If ctx is null, the set of tokens will not include what can follow
