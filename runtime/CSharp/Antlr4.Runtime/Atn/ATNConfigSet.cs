@@ -430,15 +430,11 @@ namespace Antlr4.Runtime.Atn
             throw new NotSupportedException("Not supported yet.");
         }
 
-        public virtual bool ContainsAll<_T0>(ICollection<_T0> c)
+        public virtual bool ContainsAll(IEnumerable<ATNConfig> c)
         {
-            foreach (object o in c)
+            foreach (ATNConfig o in c)
             {
-                if (!(o is ATNConfig))
-                {
-                    return false;
-                }
-                if (!Contains((ATNConfig)o))
+                if (!Contains(o))
                 {
                     return false;
                 }

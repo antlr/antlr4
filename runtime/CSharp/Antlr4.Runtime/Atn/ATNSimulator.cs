@@ -49,16 +49,14 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>Must distinguish between missing edge and edge we know leads nowhere</summary>
         [NotNull]
-        public static readonly DFAState Error;
+        public static readonly DFAState Error =
+            new DFAState(new ATNConfigSet(), 0, 0)
+            {
+                stateNumber = int.MaxValue
+            };
 
         [NotNull]
         public readonly ATN atn;
-
-        static ATNSimulator()
-        {
-            Error = new DFAState(new ATNConfigSet(), 0, 0);
-            Error.stateNumber = int.MaxValue;
-        }
 
         public ATNSimulator(ATN atn)
         {
