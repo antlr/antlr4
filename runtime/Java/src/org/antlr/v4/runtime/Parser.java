@@ -117,8 +117,11 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
      */
     protected List<ParseTreeListener> _parseListeners;
 
-	/** Did the recognizer encounter a syntax error?  Track how many. */
-	protected int _syntaxErrors = 0;
+	/**
+	 * The number of syntax errors reported during parsing. This value is
+	 * incremented each time {@link #notifyErrorListeners} is called.
+	 */
+	protected int _syntaxErrors;
 
 	public Parser(TokenStream input) {
 		setInputStream(input);
@@ -299,12 +302,13 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		}
 	}
 
-    /** Get number of recognition errors (lexer, parser, tree parser).  Each
-	 *  recognizer tracks its own number.  So parser and lexer each have
-	 *  separate count.  Does not count the spurious errors found between
-	 *  an error and next valid token match
+	/**
+	 * Get number of recognition errors (lexer, parser). Each recognizer tracks
+	 * its own number. So parser and lexer each have separate count. Does not
+	 * count the spurious errors found between an error and next valid token
+	 * match
 	 *
-	 *  See also reportError()
+	 * @see #notifyErrorListeners
 	 */
 	public int getNumberOfSyntaxErrors() {
 		return _syntaxErrors;
@@ -351,13 +355,14 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return _input.LT(1);
 	}
 
-    public void notifyErrorListeners(String msg)	{
+	public final void notifyErrorListeners(String msg)	{
 		notifyErrorListeners(getCurrentToken(), msg, null);
 	}
 
 	public void notifyErrorListeners(Token offendingToken, String msg,
 									 @Nullable RecognitionException e)
 	{
+		_syntaxErrors++;
 		int line = -1;
 		int charPositionInLine = -1;
 		line = offendingToken.getLine();
