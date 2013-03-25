@@ -42,7 +42,7 @@ namespace Antlr4.Runtime.Dfa
 
         protected internal readonly int maxIndex;
 
-        public AbstractEdgeMap(int minIndex, int maxIndex)
+        protected AbstractEdgeMap(int minIndex, int maxIndex)
         {
             // the allowed range (with minIndex and maxIndex inclusive) should be less than 2^32
             System.Diagnostics.Debug.Assert(maxIndex - minIndex + 1 >= 0);
