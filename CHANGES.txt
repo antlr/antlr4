@@ -1,5 +1,11 @@
 ANTLR v4 Honey Badger
 
+March 26, 2013
+
+* Move primary implementation of getExpectedTokens to ATN, fixes #191
+* Updated ATN documentation
+* Use UUID instead of incremented integer for serialized ATN versioning
+
 March 7, 2013
 
 * Added export to PNG feature to the parse tree viewer

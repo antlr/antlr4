@@ -41,6 +41,7 @@ import org.antlr.v4.parse.ATNBuilder;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ATNType;
 import org.antlr.v4.runtime.atn.ActionTransition;
 import org.antlr.v4.runtime.atn.AtomTransition;
 import org.antlr.v4.runtime.atn.BasicBlockStartState;
@@ -73,6 +74,7 @@ import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LeftRecursiveRule;
+import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
@@ -112,13 +114,16 @@ public class ParserATNFactory implements ATNFactory {
 		}
 
 		this.g = g;
-		this.atn = new ATN();
+
+		ATNType atnType = g instanceof LexerGrammar ? ATNType.LEXER : ATNType.PARSER;
+		int maxTokenType = g.getMaxTokenType();
+		this.atn = new ATN(atnType, maxTokenType);
 	}
 
 	@Override
 	public ATN createATN() {
 		_createATN(g.rules.values());
-		atn.maxTokenType = g.getMaxTokenType();
+		assert atn.maxTokenType == g.getMaxTokenType();
         addRuleFollowLinks();
 		addEOFTransitionToStartRules();
 		ATNOptimizer.optimize(g, atn);

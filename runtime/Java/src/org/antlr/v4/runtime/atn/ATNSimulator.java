@@ -40,11 +40,23 @@ import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 public abstract class ATNSimulator {
 	public static final int SERIALIZED_VERSION;
 	static {
-		SERIALIZED_VERSION = 2;
+		/* This value should never change. Updates following this version are
+		 * reflected as change in the unique ID SERIALIZED_UUID.
+		 */
+		SERIALIZED_VERSION = 3;
+	}
+
+	public static final UUID SERIALIZED_UUID;
+	static {
+		/* WARNING: DO NOT MERGE THIS LINE. If UUIDs differ during a merge,
+		 * resolve the conflict by generating a new ID!
+		 */
+		SERIALIZED_UUID = UUID.fromString("065C46D6-8859-4FD7-A158-83E693BF2B52");
 	}
 
 	/** Must distinguish between missing edge and edge we know leads nowhere */
@@ -106,7 +118,6 @@ public abstract class ATNSimulator {
 			data[i] = (char)(data[i] - 2);
 		}
 
-		ATN atn = new ATN();
 		List<IntervalSet> sets = new ArrayList<IntervalSet>();
 		int p = 0;
 		int version = toInt(data[p++]);
@@ -115,8 +126,16 @@ public abstract class ATNSimulator {
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
 		}
 
-		atn.grammarType = toInt(data[p++]);
-		atn.maxTokenType = toInt(data[p++]);
+		UUID uuid = toUUID(data, p);
+		p += 8;
+		if (!uuid.equals(SERIALIZED_UUID)) {
+			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with UUID %s (expected %s).", uuid, SERIALIZED_UUID);
+			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
+		}
+
+		ATNType grammarType = ATNType.values()[toInt(data[p++])];
+		int maxTokenType = toInt(data[p++]);
+		ATN atn = new ATN(grammarType, maxTokenType);
 
 		//
 		// STATES
@@ -164,7 +183,7 @@ public abstract class ATNSimulator {
 		// RULES
 		//
 		int nrules = toInt(data[p++]);
-		if ( atn.grammarType == ATN.LEXER ) {
+		if ( atn.grammarType == ATNType.LEXER ) {
 			atn.ruleToTokenType = new int[nrules];
 			atn.ruleToActionIndex = new int[nrules];
 		}
@@ -173,7 +192,7 @@ public abstract class ATNSimulator {
 			int s = toInt(data[p++]);
 			RuleStartState startState = (RuleStartState)atn.states.get(s);
 			atn.ruleToStartState[i] = startState;
-			if ( atn.grammarType == ATN.LEXER ) {
+			if ( atn.grammarType == ATNType.LEXER ) {
 				int tokenType = toInt(data[p++]);
 				atn.ruleToTokenType[i] = tokenType;
 				int actionIndex = toInt(data[p++]);
@@ -374,6 +393,21 @@ public abstract class ATNSimulator {
 
 	public static int toInt(char c) {
 		return c==65535 ? -1 : c;
+	}
+
+	public static int toInt32(char[] data, int offset) {
+		return (int)data[offset] | ((int)data[offset + 1] << 16);
+	}
+
+	public static long toLong(char[] data, int offset) {
+		long lowOrder = toInt32(data, offset) & 0x00000000FFFFFFFFL;
+		return lowOrder | ((long)toInt32(data, offset + 2) << 32);
+	}
+
+	public static UUID toUUID(char[] data, int offset) {
+		long leastSigBits = toLong(data, offset);
+		long mostSigBits = toLong(data, offset + 4);
+		return new UUID(mostSigBits, leastSigBits);
 	}
 
 	@NotNull

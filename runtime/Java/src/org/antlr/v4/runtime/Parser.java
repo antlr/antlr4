@@ -550,32 +550,16 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
         return false;
     }
 
-	/** Compute the set of valid tokens reachable from the current
-	 *  position in the parse.
+	/**
+	 * Computes the set of input symbols which could follow the current parser
+	 * state and context, as given by {@link #getState} and {@link #getContext},
+	 * respectively.
+	 *
+	 * @see ATN#getExpectedTokens(int, RuleContext)
 	 */
-    public IntervalSet getExpectedTokens() {
-        ATN atn = getInterpreter().atn;
-		ParserRuleContext ctx = _ctx;
-        ATNState s = atn.states.get(getState());
-        IntervalSet following = atn.nextTokens(s);
-//        System.out.println("following "+s+"="+following);
-        if ( !following.contains(Token.EPSILON) ) return following;
-        IntervalSet expected = new IntervalSet();
-        expected.addAll(following);
-        expected.remove(Token.EPSILON);
-        while ( ctx!=null && ctx.invokingState>=0 && following.contains(Token.EPSILON) ) {
-            ATNState invokingState = atn.states.get(ctx.invokingState);
-            RuleTransition rt = (RuleTransition)invokingState.transition(0);
-            following = atn.nextTokens(rt.followState);
-            expected.addAll(following);
-            expected.remove(Token.EPSILON);
-            ctx = (ParserRuleContext)ctx.parent;
-        }
-        if ( following.contains(Token.EPSILON) ) {
-            expected.add(Token.EOF);
-        }
-        return expected;
-   	}
+	public IntervalSet getExpectedTokens() {
+		return getATN().getExpectedTokens(getState(), getContext());
+	}
 
     public IntervalSet getExpectedTokensWithinCurrentRule() {
         ATN atn = getInterpreter().atn;
