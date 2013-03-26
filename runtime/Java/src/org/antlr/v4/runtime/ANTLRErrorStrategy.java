@@ -31,28 +31,23 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
-/** The interface for defining strategies to deal with syntax errors
- *  encountered during a parse by ANTLR-generated parsers and tree parsers.
- *  We distinguish between three different kinds of errors:
+/**
+ * The interface for defining strategies to deal with syntax errors encountered
+ * during a parse by ANTLR-generated parsers. We distinguish between three
+ * different kinds of errors:
  *
- *  	o The parser could not figure out which path to take in the ATN
- *        (none of the available alternatives could possibly match)
- *      o The current input does not match what we were looking for.
- *      o A predicate evaluated to false.
+ * <ul>
+ * <li>The parser could not figure out which path to take in the ATN (none of
+ * the available alternatives could possibly match)</li>
+ * <li>The current input does not match what we were looking for</li>
+ * <li>A predicate evaluated to false</li>
+ * </ul>
  *
- *  The default implementation of this interface reports errors to any
- *  error listeners of the parser. It also handles single token insertion
- *  and deletion for mismatched elements.
- *
- *  We pass in the parser to each function so that the same strategy
- *  can be shared between multiple parsers running at the same time.
- *  This is just for flexibility, not that we need it for the default system.
- *
- *  TODO: To bail out upon first error, simply rethrow e?
- *
- *  TODO: what to do about lexers
+ * Implementations of this interface report syntax errors by calling
+ * {@link Parser#notifyErrorListeners}.
+ * <p/>
+ * TODO: what to do about lexers
  */
 public interface ANTLRErrorStrategy {
 	/**
@@ -61,70 +56,73 @@ public interface ANTLRErrorStrategy {
 	 */
 	void reset(@NotNull Parser recognizer);
 
-	/** When matching elements within alternative, use this method
-	 *  to recover. The default implementation uses single token
-	 *  insertion and deletion. If you want to change the way ANTLR
-	 *  response to mismatched element errors within an alternative,
-	 *  implement this method.
+	/**
+	 * This method is called when an unexpected symbol is encountered during an
+	 * inline match operation, such as {@link Parser#match}. If the error
+	 * strategy successfully recovers from the match failure, this method
+	 * returns the {@link Token} instance which should be treated as the
+	 * successful result of the match.
+	 * <p/>
+	 * Note that the calling code will not report an error if this method
+	 * returns successfully. The error strategy implementation is responsible
+	 * for calling {@link Parser#notifyErrorListeners} as appropriate.
 	 *
-	 *  From the recognizer, we can get the input stream to get
-	 *  the current input symbol and we can get the current context.
-	 *  That context gives us the current state within the ATN.
-	 *  From that state, we can look at its transition to figure out
-	 *  what was expected.
-	 *
-	 *  Because we can recover from a single token deletions by
-	 *  "inserting" tokens, we need to specify what that implicitly created
-	 *  token is. We use object, because it could be a tree node.
+	 * @param recognizer the parser instance
+	 * @throws RecognitionException if the error strategy was not able to
+	 * recover from the unexpected input symbol
 	 */
 	@NotNull
 	Token recoverInline(@NotNull Parser recognizer)
 		throws RecognitionException;
 
-	/** Resynchronize the parser by consuming tokens until we find one
-	 *  in the resynchronization set--loosely the set of tokens that can follow
-	 *  the current rule. The exception contains info you might want to
-	 *  use to recover better.
+	/**
+	 * This method is called to recover from exception {@code e}. This method is
+	 * called after {@link #reportError} by the default exception handler
+	 * generated for a rule method.
+	 *
+	 * @see #reportError
+	 *
+	 * @param recognizer the parser instance
+	 * @param e the recognition exception to recover from
+	 * @throws RecognitionException if the error strategy could not recover from
+	 * the recognition exception
 	 */
 	void recover(@NotNull Parser recognizer,
 				 @NotNull RecognitionException e)
 		throws RecognitionException;
 
-	/** Make sure that the current lookahead symbol is consistent with
-	 *  what were expecting at this point in the ATN. You can call this
-	 *  anytime but ANTLR only generates code to check before subrules/loops
-	 *  and each iteration.
+	/**
+	 * This method provides the error handler with an opportunity to handle
+	 * syntactic or semantic errors in the input stream before they result in a
+	 * {@link RecognitionException}.
+	 * <p/>
+	 * The generated code currently contains calls to {@link #sync} after
+	 * entering the decision state of a closure block ({@code (...)*} or
+	 * {@code (...)+}).
+	 * <p/>
+	 * For an implementation based on Jim Idle's "magic sync" mechanism, see
+	 * {@link DefaultErrorStrategy#sync}.
 	 *
-	 *  Implements Jim Idle's magic sync mechanism in closures and optional
-	 *  subrules. E.g.,
+	 * @see DefaultErrorStrategy#sync
 	 *
-	 * 		a : sync ( stuff sync )* ;
-	 * 		sync : {consume to what can follow sync} ;
-	 *
-	 *  Previous versions of ANTLR did a poor job of their recovery within
-	 *  loops. A single mismatch token or missing token would force the parser
-	 *  to bail out of the entire rules surrounding the loop. So, for rule
-	 *
-	 *  classDef : 'class' ID '{' member* '}'
-	 *
-	 *  input with an extra token between members would force the parser to
-	 *  consume until it found the next class definition rather than the
-	 *  next member definition of the current class.
-	 *
-	 *  This functionality cost a little bit of effort because the parser
-	 *  has to compare token set at the start of the loop and at each
-	 *  iteration. If for some reason speed is suffering for you, you can
-	 *  turn off this functionality by simply overriding this method as
-	 *  a blank { }.
+	 * @param recognizer the parser instance
+	 * @throws RecognitionException if an error is detected by the error
+	 * strategy but cannot be automatically recovered at the current state in
+	 * the parsing process
 	 */
 	void sync(@NotNull Parser recognizer)
 		throws RecognitionException;
 
-	/** Is the parser in the process of recovering from an error? Upon
-	 *  a syntax error, the parser enters recovery mode and stays there until
-	 *  the next successful match of a token. In this way, we can
-	 *  avoid sending out spurious error messages. We only want one error
-	 *  message per syntax error
+	/**
+	 * Tests whether or not {@code recognizer} is in the process of recovering
+	 * from an error. In error recovery mode, {@link Parser#consume} adds
+	 * symbols to the parse tree by calling
+	 * {@link ParserRuleContext#addErrorNode(Token)} instead of
+	 * {@link ParserRuleContext#addChild(Token)}.
+	 *
+	 * @param recognizer the parser instance
+	 * @return {@code true} if the parser is currently recovering from a parse
+	 * error, otherwise {@code false}
 	 */
 	boolean inErrorRecoveryMode(@NotNull Parser recognizer);
 
@@ -136,7 +134,13 @@ public interface ANTLRErrorStrategy {
 	 */
 	void reportMatch(@NotNull Parser recognizer);
 
-	/** Report any kind of RecognitionException. */
+	/**
+	 * Report any kind of {@link RecognitionException}. This method is called by
+	 * the default exception handler generated for a rule method.
+	 *
+	 * @param recognizer the parser instance
+	 * @param e the recognition exception to report
+	 */
 	void reportError(@NotNull Parser recognizer,
 					 @NotNull RecognitionException e);
 }
