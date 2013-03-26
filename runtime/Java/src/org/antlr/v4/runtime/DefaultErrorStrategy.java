@@ -47,9 +47,6 @@ import org.antlr.v4.runtime.misc.Pair;
  *  and tree parsers.
  */
 public class DefaultErrorStrategy implements ANTLRErrorStrategy {
-	/** How to create token objects */
-	protected TokenFactory<?> _factory = CommonTokenFactory.DEFAULT;
-
 	/** This is true after we see an error and before having successfully
 	 *  matched a token. Prevents generation of more than one error message
 	 *  per error.
@@ -65,11 +62,6 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	protected int lastErrorIndex = -1;
 
 	protected IntervalSet lastErrorStates;
-
-	@Override
-	public void setTokenFactory(TokenFactory<?> factory) {
-		this._factory = factory;
-	}
 
 	@Override
 	public void beginErrorCondition(Parser recognizer) {
@@ -389,7 +381,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 			current = lookback;
 		}
 		return
-			_factory.create(new Pair<TokenSource, CharStream>(current.getTokenSource(), current.getTokenSource().getInputStream()), expectedTokenType, tokenText,
+			recognizer.getTokenFactory().create(new Pair<TokenSource, CharStream>(current.getTokenSource(), current.getTokenSource().getInputStream()), expectedTokenType, tokenText,
 							Token.DEFAULT_CHANNEL,
 							-1, -1,
 							current.getLine(), current.getCharPositionInLine());

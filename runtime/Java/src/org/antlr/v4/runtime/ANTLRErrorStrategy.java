@@ -55,9 +55,6 @@ import org.antlr.v4.runtime.misc.Nullable;
  *  TODO: what to do about lexers
  */
 public interface ANTLRErrorStrategy {
-	/** To create missing tokens, we need a factory */
-	public void setTokenFactory(TokenFactory<?> factory);
-
 	/** When matching elements within alternative, use this method
 	 *  to recover. The default implementation uses single token
 	 *  insertion and deletion. If you want to change the way ANTLR

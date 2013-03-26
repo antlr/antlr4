@@ -317,11 +317,15 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return _syntaxErrors;
 	}
 
-	/** Tell our token source and error strategy about a new way to create tokens */
+	@Override
+	public TokenFactory<?> getTokenFactory() {
+		return _input.getTokenSource().getTokenFactory();
+	}
+
+	/** Tell our token source and error strategy about a new way to create tokens. */
 	@Override
 	public void setTokenFactory(TokenFactory<?> factory) {
 		_input.getTokenSource().setTokenFactory(factory);
-		_errHandler.setTokenFactory(factory);
 	}
 
 	@NotNull

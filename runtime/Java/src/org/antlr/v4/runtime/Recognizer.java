@@ -164,5 +164,8 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	public abstract void setInputStream(IntStream input);
 
-	public abstract void setTokenFactory(TokenFactory<?> input);
+	@NotNull
+	public abstract TokenFactory<?> getTokenFactory();
+
+	public abstract void setTokenFactory(@NotNull TokenFactory<?> input);
 }
