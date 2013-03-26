@@ -233,30 +233,32 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return t;
 	}
 
-	/** Track the RuleContext objects during the parse and hook them up
-	 *  using the children list so that it forms a parse tree.
-	 *  The RuleContext returned from the start rule represents the root
-	 *  of the parse tree.
-	 *
-	 *  To built parse trees, all we have to do is put a hook in setState()
-	 *  and enterRule(). In setState(), we add tokens to the current context
-	 *  as children. By the time we get to enterRule(), we are already
-	 *  in an invoked rule so we add this context as a child of the parent
-	 *  (invoking) context. Simple and effective.
-	 *
-	 *  Note that if we are not building parse trees, rule contexts
-	 *  only point upwards. When a rule exits, it returns the context
-	 *  but that gets garbage collected if nobody holds a reference.
-	 *  It points upwards but nobody points at it.
-	 *
-	 *  When we build parse trees, we are adding all of these contexts to
-	 *  somebody's children list. Contexts are then not candidates
-	 *  for garbage collection.
+	/**
+	 * Track the {@link ParserRuleContext} objects during the parse and hook
+	 * them up using the {@link ParserRuleContext#children} list so that it
+	 * forms a parse tree. The {@link ParserRuleContext} returned from the start
+	 * rule represents the root of the parse tree.
+	 * <p/>
+	 * Note that if we are not building parse trees, rule contexts only point
+	 * upwards. When a rule exits, it returns the context but that gets garbage
+	 * collected if nobody holds a reference. It points upwards but nobody
+	 * points at it.
+	 * <p/>
+	 * When we build parse trees, we are adding all of these contexts to
+	 * {@link ParserRuleContext#children} list. Contexts are then not candidates
+	 * for garbage collection.
 	 */
 	public void setBuildParseTree(boolean buildParseTrees) {
 		this._buildParseTrees = buildParseTrees;
 	}
 
+	/**
+	 * Gets whether or not a complete parse tree will be constructed while
+	 * parsing. This property is {@code true} for a newly constructed parser.
+	 *
+	 * @return {@code true} if a complete parse tree will be constructed while
+	 * parsing, otherwise {@code false}
+	 */
 	public boolean getBuildParseTree() {
 		return _buildParseTrees;
 	}
