@@ -74,6 +74,7 @@ public interface ANTLRErrorStrategy {
 	 *  "inserting" tokens, we need to specify what that implicitly created
 	 *  token is. We use object, because it could be a tree node.
 	 */
+	@NotNull
 	Token recoverInline(@NotNull Parser recognizer)
 		throws RecognitionException;
 
@@ -83,7 +84,7 @@ public interface ANTLRErrorStrategy {
 	 *  use to recover better.
 	 */
 	void recover(@NotNull Parser recognizer,
-                 @Nullable RecognitionException e);
+				 @NotNull RecognitionException e);
 
 	/** Make sure that the current lookahead symbol is consistent with
 	 *  what were expecting at this point in the ATN. You can call this
@@ -137,6 +138,6 @@ public interface ANTLRErrorStrategy {
 
 	/** Report any kind of RecognitionException. */
 	void reportError(@NotNull Parser recognizer,
-					 @Nullable RecognitionException e)
+					 @NotNull RecognitionException e)
 	throws RecognitionException;
 }

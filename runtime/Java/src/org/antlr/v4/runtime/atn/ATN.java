@@ -30,6 +30,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -108,6 +109,7 @@ public class ATN {
 	 *  the rule surrounding {@code s}. In other words, the set will be
 	 *  restricted to tokens reachable staying within {@code s}'s rule.
 	 */
+	@NotNull
 	public IntervalSet nextTokens(ATNState s, RuleContext ctx) {
 		LL1Analyzer anal = new LL1Analyzer(this);
 		IntervalSet next = anal.LOOK(s, ctx);
@@ -119,7 +121,8 @@ public class ATN {
 	 * staying in same rule. {@link Token#EPSILON} is in set if we reach end of
 	 * rule.
      */
-    public IntervalSet nextTokens(ATNState s) {
+	@NotNull
+    public IntervalSet nextTokens(@NotNull ATNState s) {
         if ( s.nextTokenWithinRule != null ) return s.nextTokenWithinRule;
         s.nextTokenWithinRule = nextTokens(s, null);
         s.nextTokenWithinRule.setReadonly(true);

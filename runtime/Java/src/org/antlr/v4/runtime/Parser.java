@@ -36,6 +36,7 @@ import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -92,6 +93,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		}
 	}
 
+	@NotNull
 	protected ANTLRErrorStrategy _errHandler = new DefaultErrorStrategy();
 
 	protected TokenStream _input;
@@ -161,6 +163,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return t;
 	}
 
+	@NotNull
 	public Token matchWildcard() throws RecognitionException {
 		Token t = getCurrentToken();
 		if (t.getType() > 0) {
@@ -321,11 +324,12 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		_errHandler.setTokenFactory(factory);
 	}
 
+	@NotNull
 	public ANTLRErrorStrategy getErrorHandler() {
 		return _errHandler;
 	}
 
-	public void setErrorHandler(ANTLRErrorStrategy handler) {
+	public void setErrorHandler(@NotNull ANTLRErrorStrategy handler) {
 		this._errHandler = handler;
 	}
 
@@ -427,7 +431,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 *  This is flexible because users do not have to regenerate parsers
 	 *  to get trace facilities.
 	 */
-	public void enterRule(ParserRuleContext localctx, int state, int ruleIndex) {
+	public void enterRule(@NotNull ParserRuleContext localctx, int state, int ruleIndex) {
 		setState(state);
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
@@ -562,10 +566,12 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 *
 	 * @see ATN#getExpectedTokens(int, RuleContext)
 	 */
+	@NotNull
 	public IntervalSet getExpectedTokens() {
 		return getATN().getExpectedTokens(getState(), getContext());
 	}
 
+	@NotNull
     public IntervalSet getExpectedTokensWithinCurrentRule() {
         ATN atn = getInterpreter().atn;
         ATNState s = atn.states.get(getState());
