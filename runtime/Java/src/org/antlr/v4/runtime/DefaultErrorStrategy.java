@@ -32,12 +32,7 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.BlockStartState;
-import org.antlr.v4.runtime.atn.PlusBlockStartState;
-import org.antlr.v4.runtime.atn.PlusLoopbackState;
 import org.antlr.v4.runtime.atn.RuleTransition;
-import org.antlr.v4.runtime.atn.StarLoopEntryState;
-import org.antlr.v4.runtime.atn.StarLoopbackState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -157,9 +152,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		}
 		else {
 			System.err.println("unknown recognition error type: "+e.getClass().getName());
-			if ( recognizer!=null ) {
-				recognizer.notifyErrorListeners(e.getOffendingToken(), e.getMessage(), e);
-			}
+			recognizer.notifyErrorListeners(e.getOffendingToken(), e.getMessage(), e);
 		}
 	}
 
