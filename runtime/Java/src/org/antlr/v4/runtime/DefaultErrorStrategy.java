@@ -229,8 +229,8 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		}
 	}
 
-	public void reportNoViableAlternative(@NotNull Parser recognizer,
-										  @NotNull NoViableAltException e)
+	protected void reportNoViableAlternative(@NotNull Parser recognizer,
+											 @NotNull NoViableAltException e)
 	{
 		TokenStream tokens = recognizer.getInputStream();
 		String input;
@@ -245,23 +245,23 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);
 	}
 
-	public void reportInputMismatch(@NotNull Parser recognizer,
-									@NotNull InputMismatchException e)
+	protected void reportInputMismatch(@NotNull Parser recognizer,
+									   @NotNull InputMismatchException e)
 	{
 		String msg = "mismatched input "+getTokenErrorDisplay(e.getOffendingToken())+
 		" expecting "+e.getExpectedTokens().toString(recognizer.getTokenNames());
 		recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);
 	}
 
-	public void reportFailedPredicate(@NotNull Parser recognizer,
-									  @NotNull FailedPredicateException e)
+	protected void reportFailedPredicate(@NotNull Parser recognizer,
+										 @NotNull FailedPredicateException e)
 	{
 		String ruleName = recognizer.getRuleNames()[recognizer._ctx.getRuleIndex()];
 		String msg = "rule "+ruleName+" "+e.getMessage();
 		recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);
 	}
 
-	public void reportUnwantedToken(@NotNull Parser recognizer) {
+	protected void reportUnwantedToken(@NotNull Parser recognizer) {
 		if (errorRecoveryMode) return;
 		beginErrorCondition(recognizer);
 
@@ -273,7 +273,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		recognizer.notifyErrorListeners(t, msg, null);
 	}
 
-	public void reportMissingToken(@NotNull Parser recognizer) {
+	protected void reportMissingToken(@NotNull Parser recognizer) {
 		if (errorRecoveryMode) return;
 		beginErrorCondition(recognizer);
 
@@ -337,7 +337,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	}
 
 	// if next token is what we are looking for then "delete" this token
-	public boolean singleTokenInsertion(@NotNull Parser recognizer) {
+	protected boolean singleTokenInsertion(@NotNull Parser recognizer) {
 		int currentSymbolType = recognizer.getInputStream().LA(1);
 		// if current token is consistent with what could come after current
 		// ATN state, then we know we're missing a token; error recovery
@@ -355,7 +355,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	}
 
 	@Nullable
-	public Token singleTokenDeletion(@NotNull Parser recognizer) {
+	protected Token singleTokenDeletion(@NotNull Parser recognizer) {
 		int nextTokenType = recognizer.getInputStream().LA(2);
 		IntervalSet expecting = getExpectedTokens(recognizer);
 		if ( expecting.contains(nextTokenType) ) {
@@ -415,7 +415,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	}
 
 	@NotNull
-	public IntervalSet getExpectedTokens(@NotNull Parser recognizer) {
+	protected IntervalSet getExpectedTokens(@NotNull Parser recognizer) {
 		return recognizer.getExpectedTokens();
 	}
 
@@ -427,7 +427,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	 *  your token objects because you don't have to go modify your lexer
 	 *  so that it creates a new Java type.
 	 */
-	public String getTokenErrorDisplay(Token t) {
+	protected String getTokenErrorDisplay(Token t) {
 		if ( t==null ) return "<no token>";
 		String s = getSymbolText(t);
 		if ( s==null ) {
@@ -569,7 +569,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	}
 
 	/** Consume tokens until one matches the given token set */
-	public void consumeUntil(@NotNull Parser recognizer, @NotNull IntervalSet set) {
+	protected void consumeUntil(@NotNull Parser recognizer, @NotNull IntervalSet set) {
 //		System.err.println("consumeUntil("+set.toString(recognizer.getTokenNames())+")");
 		int ttype = recognizer.getInputStream().LA(1);
 		while (ttype != Token.EOF && !set.contains(ttype) ) {
