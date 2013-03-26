@@ -87,7 +87,8 @@ public interface ANTLRErrorStrategy {
 	 *  use to recover better.
 	 */
 	void recover(@NotNull Parser recognizer,
-				 @NotNull RecognitionException e);
+				 @NotNull RecognitionException e)
+		throws RecognitionException;
 
 	/** Make sure that the current lookahead symbol is consistent with
 	 *  what were expecting at this point in the ATN. You can call this
@@ -116,7 +117,8 @@ public interface ANTLRErrorStrategy {
 	 *  turn off this functionality by simply overriding this method as
 	 *  a blank { }.
 	 */
-	void sync(@NotNull Parser recognizer);
+	void sync(@NotNull Parser recognizer)
+		throws RecognitionException;
 
 	/** Is the parser in the process of recovering from an error? Upon
 	 *  a syntax error, the parser enters recovery mode and stays there until
@@ -136,6 +138,5 @@ public interface ANTLRErrorStrategy {
 
 	/** Report any kind of RecognitionException. */
 	void reportError(@NotNull Parser recognizer,
-					 @NotNull RecognitionException e)
-	throws RecognitionException;
+					 @NotNull RecognitionException e);
 }

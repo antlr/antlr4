@@ -114,7 +114,6 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	@Override
 	public void reportError(Parser recognizer,
 							RecognitionException e)
-		throws RecognitionException
 	{
 		// if we've already reported an error and have not matched a token
 		// yet successfully, don't report any errors.
@@ -185,7 +184,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	 *  We opt to stay in the loop as long as possible.
  	 */
 	@Override
-	public void sync(Parser recognizer) {
+	public void sync(Parser recognizer) throws RecognitionException {
 		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer.getState());
 //		System.err.println("sync @ "+s.stateNumber+"="+s.getClass().getSimpleName());
 		// If already recovering, don't try to sync
@@ -232,7 +231,6 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 
 	public void reportNoViableAlternative(@NotNull Parser recognizer,
 										  @NotNull NoViableAltException e)
-	throws RecognitionException
 	{
 		TokenStream tokens = recognizer.getInputStream();
 		String input;
@@ -249,7 +247,6 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 
 	public void reportInputMismatch(@NotNull Parser recognizer,
 									@NotNull InputMismatchException e)
-		throws RecognitionException
 	{
 		String msg = "mismatched input "+getTokenErrorDisplay(e.getOffendingToken())+
 		" expecting "+e.getExpectedTokens().toString(recognizer.getTokenNames());
@@ -258,7 +255,6 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 
 	public void reportFailedPredicate(@NotNull Parser recognizer,
 									  @NotNull FailedPredicateException e)
-		throws RecognitionException
 	{
 		String ruleName = recognizer.getRuleNames()[recognizer._ctx.getRuleIndex()];
 		String msg = "rule "+ruleName+" "+e.getMessage();
