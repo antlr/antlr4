@@ -286,14 +286,6 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return _parseListeners.contains(TrimToSizeListener.INSTANCE);
 	}
 
-//	public void setTraceATNStates(boolean traceATNStates) {
-//		this.traceATNStates = traceATNStates;
-//	}
-//
-//	public boolean getTraceATNStates() {
-//		return traceATNStates;
-//	}
-
     public List<ParseTreeListener> getParseListeners() {
         return _parseListeners;
     }
