@@ -93,31 +93,49 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		}
 	}
 
+	/**
+	 * The error handling strategy for the parser. The default value is a new
+	 * instance of {@link DefaultErrorStrategy}.
+	 *
+	 * @see #getErrorHandler
+	 * @see #setErrorHandler
+	 */
 	@NotNull
 	protected ANTLRErrorStrategy _errHandler = new DefaultErrorStrategy();
 
+	/**
+	 * The input stream.
+	 *
+	 * @see #getInputStream
+	 * @see #setInputStream
+	 */
 	protected TokenStream _input;
 
-	/** The RuleContext object for the currently executing rule. This
-	 *  must be non-null during parsing, but is initially null.
-	 *  When somebody calls the start rule, this gets set to the
-	 *  root context.
+	/**
+	 * The {@link ParserRuleContext} object for the currently executing rule.
+	 * This is always non-null during the parsing process.
 	 */
 	protected ParserRuleContext _ctx;
 
+	/**
+	 * Specifies whether or not the parser should construct a parse tree during
+	 * the parsing process. The default value is {@code true}.
+	 *
+	 * @see #getBuildParseTree
+	 * @see #setBuildParseTree
+	 */
 	protected boolean _buildParseTrees = true;
 
 	protected TraceListener _tracer;
 
-	/** If the listener is non-null, trigger enter and exit rule events
-     *  *during* the parse. This is typically done only when not building
-     *  parse trees for later visiting. We either trigger events during
-     *  the parse or during tree walks later. Both could be done.
-     *  Not intended for average user!!!  Most people should use
-	 *  ParseTreeListener with ParseTreeWalker.
-	 *  @see ParseTreeWalker
-     */
-    protected List<ParseTreeListener> _parseListeners;
+	/**
+	 * The list of {@link ParseTreeListener} listeners registered to receive
+	 * events during the parse.
+	 *
+	 * @see #addParseListener
+	 */
+	@Nullable
+	protected List<ParseTreeListener> _parseListeners;
 
 	/**
 	 * The number of syntax errors reported during parsing. This value is
