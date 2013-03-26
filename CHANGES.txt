@@ -2,6 +2,7 @@ ANTLR v4 Honey Badger
 
 March 26, 2013
 
+* Updated documentation in the Parser and RecognitionException classes
 * Refactored and extensively documented the ANTLRErrorStrategy interface and
   DefaultErrorStrategy default implementation
 * Track the number of syntax errors in Parser.notifyErrorListeners instead of in
