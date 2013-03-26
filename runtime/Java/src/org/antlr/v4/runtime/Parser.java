@@ -44,6 +44,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
@@ -282,31 +283,70 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 * using the default {@link Parser.TrimToSizeListener} during the parse process.
 	 */
 	public boolean getTrimParseTree() {
-		if (_parseListeners == null) return false;
-		return _parseListeners.contains(TrimToSizeListener.INSTANCE);
+		return getParseListeners().contains(TrimToSizeListener.INSTANCE);
 	}
 
-    public List<ParseTreeListener> getParseListeners() {
-        return _parseListeners;
-    }
+	@NotNull
+	public List<ParseTreeListener> getParseListeners() {
+		List<ParseTreeListener> listeners = _parseListeners;
+		if (listeners == null) {
+			return Collections.emptyList();
+		}
 
-	/** Provide a listener that gets notified about token matches,
-	 *  and rule entry/exit events DURING the parse. It's a little bit
-	 *  weird for left recursive rule entry events but it's
-	 *  deterministic.
+		return listeners;
+	}
+
+	/**
+	 * Registers {@code listener} to receive events during the parsing process.
+	 * <p/>
+	 * To support output-preserving grammar transformations (including but not
+	 * limited to left-recursion removal, automated left-factoring, and
+	 * optimized code generation), calls to listener methods during the parse
+	 * may differ substantially from calls made by
+	 * {@link ParseTreeWalker#DEFAULT} used after the parse is complete. In
+	 * particular, rule entry and exit events may occur in a different order
+	 * during the parse than after the parser. In addition, calls to certain
+	 * rule entry methods may be omitted.
+	 * <p/>
+	 * With the following specific exceptions, calls to listener events are
+	 * <em>deterministic</em>, i.e. for identical input the calls to listener
+	 * methods will be the same.
 	 *
-	 *  THIS IS ONLY FOR ADVANCED USERS. Please give your
-	 *  ParseTreeListener to a ParseTreeWalker instead of giving it to
-	 *  the parser!!!!
+	 * <ul>
+	 * <li>Alterations to the grammar used to generate code may change the
+	 * behavior of the listener calls.</li>
+	 * <li>Alterations to the command line options passed to ANTLR 4 when
+	 * generating the parser may change the behavior of the listener calls.</li>
+	 * <li>Changing the version of the ANTLR Tool used to generate the parser
+	 * may change the behavior of the listener calls.</li>
+	 * </ul>
+	 *
+	 * @param listener the listener to add
+	 *
+	 * @throws NullPointerException if {@code} listener is {@code null}
 	 */
-    public void addParseListener(ParseTreeListener listener) {
-		if ( listener==null ) return;
-		if ( _parseListeners==null ) {
+	public void addParseListener(@NotNull ParseTreeListener listener) {
+		if (listener == null) {
+			throw new NullPointerException("listener");
+		}
+
+		if (_parseListeners == null) {
 			_parseListeners = new ArrayList<ParseTreeListener>();
 		}
-        this._parseListeners.add(listener);
-    }
 
+		this._parseListeners.add(listener);
+	}
+
+	/**
+	 * Remove {@code listener} from the list of parse listeners.
+	 * <p/>
+	 * If {@code listener} is {@code null} or has not been added as a parse
+	 * listener, this method does nothing.
+	 *
+	 * @see #addParseListener
+	 *
+	 * @param listener the listener to remove
+	 */
 	public void removeParseListener(ParseTreeListener listener) {
 		if (_parseListeners != null) {
 			if (_parseListeners.remove(listener)) {
@@ -317,28 +357,33 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		}
 	}
 
+	/**
+	 * Remove all parse listeners.
+	 *
+	 * @see #addParseListener
+	 */
 	public void removeParseListeners() {
 		_parseListeners = null;
 	}
 
-	/** Notify any parse listeners (implemented as ParseTreeListener's)
-	 *  of an enter rule event. This is not involved with
-	 *  parse tree walking in any way; it's just reusing the
-	 *  ParseTreeListener interface. This is not for the average user.
+	/**
+	 * Notify any parse listeners of an enter rule event.
+	 *
+	 * @see #addParseListener
 	 */
-	public void triggerEnterRuleEvent() {
+	protected void triggerEnterRuleEvent() {
 		for (ParseTreeListener listener : _parseListeners) {
 			listener.enterEveryRule(_ctx);
 			_ctx.enterRule(listener);
 		}
 	}
 
-	/** Notify any parse listeners (implemented as ParseTreeListener's)
-	 *  of an exit rule event. This is not involved with
-	 *  parse tree walking in any way; it's just reusing the
-	 *  ParseTreeListener interface. This is not for the average user.
+	/**
+	 * Notify any parse listeners of an exit rule event.
+	 *
+	 * @see #addParseListener
 	 */
-	public void triggerExitRuleEvent() {
+	protected void triggerExitRuleEvent() {
 		// reverse order walk of listeners
 		for (int i = _parseListeners.size()-1; i >= 0; i--) {
 			ParseTreeListener listener = _parseListeners.get(i);
