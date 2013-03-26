@@ -1,5 +1,36 @@
 ANTLR v4 Honey Badger
 
+March 7, 2013
+
+* Added export to PNG feature to the parse tree viewer
+
+March 6, 2013
+
+* Allow direct calls to left-recursive rules (fixes #161)
+* Change error type 146 (EPSILON_TOKEN) to a warning (fixes #180)
+* Specify locale for all format operations (fixes #158)
+* Fix generation of invalid Unicode escape sequences in Java code (fixes #164)
+* Do not require escape for $ in action when not followed by an ID start char
+  (fixes #176)
+
+February 23, 2013
+
+* Refactoring Target-related classes to improve support for additional language
+  targets
+
+February 22, 2013
+
+* Do not allow raw newline characters in literals
+* Pair and Triple are immutable; Triple is not a Pair
+
+February 5, 2013
+
+* Fix IntervalSet.add when multiple merges are required (fixes #153)
+
+January 29, 2013
+
+* don't call process() if args aren't specified (Dave Parfitt)
+
 January 21, 2013 -- Release 4.0
 
 * Updated PredictionContext Javadocs
