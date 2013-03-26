@@ -127,7 +127,14 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 */
 	protected boolean _buildParseTrees = true;
 
-	protected TraceListener _tracer;
+	/**
+	 * When {@link #setTrace}{@code (true)} is called, a reference to the
+	 * {@link TraceListener} is stored here so it can be easily removed in a
+	 * later call to {@link #setTrace}{@code (false)}. The listener itself is
+	 * implemented as a parser listener so this field is not directly used by
+	 * other parser methods.
+	 */
+	private TraceListener _tracer;
 
 	/**
 	 * The list of {@link ParseTreeListener} listeners registered to receive
@@ -154,7 +161,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		_errHandler.reset(this);
 		_ctx = null;
 		_syntaxErrors = 0;
-		_tracer = null;
+		setTrace(false);
 		ATNSimulator interpreter = getInterpreter();
 		if (interpreter != null) {
 			interpreter.reset();
