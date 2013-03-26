@@ -50,6 +50,8 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	/** This is true after we see an error and before having successfully
 	 *  matched a token. Prevents generation of more than one error message
 	 *  per error.
+	 *
+	 * @see #inErrorRecoveryMode
 	 */
 	protected boolean errorRecoveryMode = false;
 
@@ -117,7 +119,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	{
 		// if we've already reported an error and have not matched a token
 		// yet successfully, don't report any errors.
-		if (errorRecoveryMode) {
+		if (inErrorRecoveryMode(recognizer)) {
 //			System.err.print("[SPURIOUS] ");
 			return; // don't count spurious errors
 		}
@@ -188,7 +190,9 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		ATNState s = recognizer.getInterpreter().atn.states.get(recognizer.getState());
 //		System.err.println("sync @ "+s.stateNumber+"="+s.getClass().getSimpleName());
 		// If already recovering, don't try to sync
-        if ( errorRecoveryMode ) return;
+		if (inErrorRecoveryMode(recognizer)) {
+			return;
+		}
 
         TokenStream tokens = recognizer.getInputStream();
         int la = tokens.LA(1);
@@ -262,7 +266,10 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	}
 
 	protected void reportUnwantedToken(@NotNull Parser recognizer) {
-		if (errorRecoveryMode) return;
+		if (inErrorRecoveryMode(recognizer)) {
+			return;
+		}
+
 		beginErrorCondition(recognizer);
 
 		Token t = recognizer.getCurrentToken();
@@ -274,7 +281,10 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	}
 
 	protected void reportMissingToken(@NotNull Parser recognizer) {
-		if (errorRecoveryMode) return;
+		if (inErrorRecoveryMode(recognizer)) {
+			return;
+		}
+
 		beginErrorCondition(recognizer);
 
 		Token t = recognizer.getCurrentToken();
