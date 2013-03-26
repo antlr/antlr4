@@ -348,10 +348,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
 	/**
-	 * Get number of recognition errors (lexer, parser). Each recognizer tracks
-	 * its own number. So parser and lexer each have separate count. Does not
-	 * count the spurious errors found between an error and next valid token
-	 * match
+	 * Gets the number of syntax errors reported during parsing. This value is
+	 * incremented each time {@link #notifyErrorListeners} is called.
 	 *
 	 * @see #notifyErrorListeners
 	 */
@@ -391,7 +389,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return _input;
 	}
 
-	/** Set the token stream and reset the parser */
+	/** Set the token stream and reset the parser. */
 	public void setTokenStream(TokenStream input) {
 		this._input = null;
 		reset();
@@ -422,18 +420,26 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		listener.syntaxError(this, offendingToken, line, charPositionInLine, msg, e);
 	}
 
-	/** Consume the current symbol and return it. E.g., given the following
-	 *  input with A being the current lookahead symbol:
+	/**
+	 * Consume and return the {@linkplain #getCurrentToken current symbol}.
+	 * <p/>
+	 * E.g., given the following input with {@code A} being the current
+	 * lookahead symbol, this function moves the cursor to {@code B} and returns
+	 * {@code A}.
 	 *
-	 *  	A B
-	 *  	^
+	 * <pre>
+	 *  A B
+	 *  ^
+	 * </pre>
 	 *
-	 *  this function moves the cursor to B and returns A.
-	 *
-	 *  If the parser is creating parse trees, the current symbol
-	 *  would also be added as a child to the current context (node).
-     *
-     *  Trigger listener events if there's a listener.
+	 * If the parser is not in error recovery mode, the consumed symbol is added
+	 * to the parse tree using {@link ParserRuleContext#addChild(Token)}, and
+	 * {@link ParseTreeListener#visitTerminal} is called on any parse listeners.
+	 * If the parser <em>is</em> in error recovery mode, the consumed symbol is
+	 * added to the parse tree using
+	 * {@link ParserRuleContext#addErrorNode(Token)}, and
+	 * {@link ParseTreeListener#visitErrorNode} is called on any parse
+	 * listeners.
 	 */
 	public Token consume() {
 		Token o = getCurrentToken();
@@ -470,12 +476,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		}
 	}
 
-	/** Always called by generated parsers upon entry to a rule.
-	 *  This occurs after the new context has been pushed. Access field
-	 *  _ctx get the current context.
-	 *
-	 *  This is flexible because users do not have to regenerate parsers
-	 *  to get trace facilities.
+	/**
+	 * Always called by generated parsers upon entry to a rule. Access field
+	 * {@link #_ctx} get the current context.
 	 */
 	public void enterRule(@NotNull ParserRuleContext localctx, int state, int ruleIndex) {
 		setState(state);
@@ -515,7 +518,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		}
 	}
 
-	/* like enterRule but for recursive rules */
+	/**
+	 * Like {@link #enterRule} but for recursive rules.
+	 */
 	public void pushNewRecursionContext(ParserRuleContext localctx, int state, int ruleIndex) {
 		ParserRuleContext previous = _ctx;
 		previous.parent = localctx;
@@ -575,6 +580,20 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return false;
 	}
 
+	/**
+	 * Checks whether or not {@code symbol} can follow the current state in the
+	 * ATN. The behavior of this method is equivalent to the following, but is
+	 * implemented such that the complete context-sensitive follow set does not
+	 * need to be explicitly constructed.
+	 *
+	 * <pre>
+	 * return getExpectedTokens().contains(symbol);
+	 * </pre>
+	 *
+	 * @param symbol the symbol type to check
+	 * @return {@code true} if {@code symbol} can follow the current state in
+	 * the ATN, otherwise {@code false}.
+	 */
     public boolean isExpectedToken(int symbol) {
 //   		return getInterpreter().atn.nextTokens(_ctx);
         ATN atn = getInterpreter().atn;
@@ -636,7 +655,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 
 	public ParserRuleContext getRuleContext() { return _ctx; }
 
-	/** Return List<String> of the rule names in your parser instance
+	/** Return List&lt;String&gt; of the rule names in your parser instance
 	 *  leading up to a call to the current rule.  You could override if
 	 *  you want more details such as the file/line info of where
 	 *  in the ATN a rule is invoked.
@@ -660,7 +679,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return stack;
 	}
 
-    /** For debugging and other purposes */
+    /** For debugging and other purposes. */
 	public List<String> getDFAStrings() {
 		synchronized (_interp.decisionToDFA) {
 			List<String> s = new ArrayList<String>();
@@ -672,7 +691,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		}
     }
 
-	/** For debugging and other purposes */
+	/** For debugging and other purposes. */
 	public void dumpDFA() {
 		synchronized (_interp.decisionToDFA) {
 			boolean seenOne = false;
