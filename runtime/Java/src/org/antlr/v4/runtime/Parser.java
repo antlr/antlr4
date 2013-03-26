@@ -142,10 +142,25 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		}
 	}
 
-	/** Match current input symbol against ttype.  Attempt
-	 *  single token insertion or deletion error recovery.  If
-	 *  that fails, throw MismatchedTokenException.
+	/**
+	 * Match current input symbol against {@code ttype}. If the symbol type
+	 * matches, {@link ANTLRErrorStrategy#reportMatch} and {@link #consume} are
+	 * called to complete the match process.
+	 * <p/>
+	 * If the symbol type does not match,
+	 * {@link ANTLRErrorStrategy#recoverInline} is called on the current error
+	 * strategy to attempt recovery. If {@link #getBuildParseTree} is
+	 * {@code true} and the token index of the symbol returned by
+	 * {@link ANTLRErrorStrategy#recoverInline} is -1, the symbol is added to
+	 * the parse tree by calling {@link ParserRuleContext#addErrorNode}.
+	 *
+	 * @param ttype the token type to match
+	 * @return the matched symbol
+	 * @throws RecognitionException if the current input symbol did not match
+	 * {@code ttype} and the error strategy could not recover from the
+	 * mismatched symbol
 	 */
+	@NotNull
 	public Token match(int ttype) throws RecognitionException {
 		Token t = getCurrentToken();
 		if ( t.getType()==ttype ) {
@@ -163,6 +178,23 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return t;
 	}
 
+	/**
+	 * Match current input symbol as a wildcard. If the symbol type matches
+	 * (i.e. has a value greater than 0), {@link ANTLRErrorStrategy#reportMatch}
+	 * and {@link #consume} are called to complete the match process.
+	 * <p/>
+	 * If the symbol type does not match,
+	 * {@link ANTLRErrorStrategy#recoverInline} is called on the current error
+	 * strategy to attempt recovery. If {@link #getBuildParseTree} is
+	 * {@code true} and the token index of the symbol returned by
+	 * {@link ANTLRErrorStrategy#recoverInline} is -1, the symbol is added to
+	 * the parse tree by calling {@link ParserRuleContext#addErrorNode}.
+	 *
+	 * @return the matched symbol
+	 * @throws RecognitionException if the current input symbol did not match
+	 * a wildcard and the error strategy could not recover from the mismatched
+	 * symbol
+	 */
 	@NotNull
 	public Token matchWildcard() throws RecognitionException {
 		Token t = getCurrentToken();
