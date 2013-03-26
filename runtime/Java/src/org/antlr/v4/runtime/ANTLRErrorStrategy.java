@@ -55,6 +55,12 @@ import org.antlr.v4.runtime.misc.Nullable;
  *  TODO: what to do about lexers
  */
 public interface ANTLRErrorStrategy {
+	/**
+	 * Reset the error handler state for the specified {@code recognizer}.
+	 * @param recognizer the parser instance
+	 */
+	void reset(@NotNull Parser recognizer);
+
 	/** When matching elements within alternative, use this method
 	 *  to recover. The default implementation uses single token
 	 *  insertion and deletion. If you want to change the way ANTLR
@@ -112,13 +118,6 @@ public interface ANTLRErrorStrategy {
 	 */
 	void sync(@NotNull Parser recognizer);
 
-	/** Notify handler that parser has entered an error state.  The
-	 *  parser currently doesn't call this--the handler itself calls this
-	 *  in report error methods.  But, for symmetry with endErrorCondition,
-	 *  this method is in the interface.
-	 */
-	void beginErrorCondition(@NotNull Parser recognizer);
-
 	/** Is the parser in the process of recovering from an error? Upon
 	 *  a syntax error, the parser enters recovery mode and stays there until
 	 *  the next successful match of a token. In this way, we can
@@ -127,11 +126,13 @@ public interface ANTLRErrorStrategy {
 	 */
 	boolean inErrorRecoveryMode(@NotNull Parser recognizer);
 
-	/** Reset the error handler. Call this when the parser
-	 *  matches a valid token (indicating no longer in recovery mode)
-	 *  and from its own reset method.
+	/**
+	 * This method is called by when the parser successfully matches an input
+	 * symbol.
+	 *
+	 * @param recognizer the parser instance
 	 */
-	void endErrorCondition(@NotNull Parser recognizer);
+	void reportMatch(@NotNull Parser recognizer);
 
 	/** Report any kind of RecognitionException. */
 	void reportError(@NotNull Parser recognizer,

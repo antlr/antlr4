@@ -63,8 +63,24 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 
 	protected IntervalSet lastErrorStates;
 
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation simply calls {@link #endErrorCondition} to
+	 * ensure that the handler is not in error recovery mode.
+	 */
 	@Override
-	public void beginErrorCondition(Parser recognizer) {
+	public void reset(Parser recognizer) {
+		endErrorCondition(recognizer);
+	}
+
+	/**
+	 * This method is called to enter error recovery mode when a recognition
+	 * exception is reported.
+	 *
+	 * @param recognizer the parser instance
+	 */
+	protected void beginErrorCondition(@NotNull Parser recognizer) {
 		errorRecoveryMode = true;
 	}
 
@@ -73,11 +89,26 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		return errorRecoveryMode;
 	}
 
-	@Override
-	public void endErrorCondition(Parser recognizer) {
+	/**
+	 * This method is called to leave error recovery mode after recovering from
+	 * a recognition exception.
+	 *
+	 * @param recognizer
+	 */
+	protected void endErrorCondition(@NotNull Parser recognizer) {
 		errorRecoveryMode = false;
 		lastErrorStates = null;
 		lastErrorIndex = -1;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation simply calls {@link #endErrorCondition}.
+	 */
+	@Override
+	public void reportMatch(Parser recognizer) {
+		endErrorCondition(recognizer);
 	}
 
 	@Override
@@ -342,7 +373,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 			recognizer.consume(); // simply delete extra token
 			// we want to return the token we're actually matching
 			Token matchedSymbol = recognizer.getCurrentToken();
-			endErrorCondition(recognizer);  // we know current token is correct
+			reportMatch(recognizer);  // we know current token is correct
 			return matchedSymbol;
 		}
 		return null;

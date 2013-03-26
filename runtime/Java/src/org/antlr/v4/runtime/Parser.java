@@ -132,7 +132,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	/** reset the parser's state */
 	public void reset() {
 		if ( getInputStream()!=null ) getInputStream().seek(0);
-		_errHandler.endErrorCondition(this);
+		_errHandler.reset(this);
 		_ctx = null;
 		_syntaxErrors = 0;
 		_tracer = null;
@@ -149,7 +149,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	public Token match(int ttype) throws RecognitionException {
 		Token t = getCurrentToken();
 		if ( t.getType()==ttype ) {
-			_errHandler.endErrorCondition(this);
+			_errHandler.reportMatch(this);
 			consume();
 		}
 		else {
@@ -167,7 +167,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	public Token matchWildcard() throws RecognitionException {
 		Token t = getCurrentToken();
 		if (t.getType() > 0) {
-			_errHandler.endErrorCondition(this);
+			_errHandler.reportMatch(this);
 			consume();
 		}
 		else {
