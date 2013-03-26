@@ -307,12 +307,12 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
         this._parseListeners.add(listener);
     }
 
-	public void removeParseListener(ParseTreeListener l) {
-		if ( l==null ) return;
-		if ( _parseListeners!=null ) {
-			_parseListeners.remove(l);
-			if (_parseListeners.isEmpty()) {
-				_parseListeners = null;
+	public void removeParseListener(ParseTreeListener listener) {
+		if (_parseListeners != null) {
+			if (_parseListeners.remove(listener)) {
+				if (_parseListeners.isEmpty()) {
+					_parseListeners = null;
+				}
 			}
 		}
 	}
@@ -327,9 +327,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 *  ParseTreeListener interface. This is not for the average user.
 	 */
 	public void triggerEnterRuleEvent() {
-		for (ParseTreeListener l : _parseListeners) {
-			l.enterEveryRule(_ctx);
-			_ctx.enterRule(l);
+		for (ParseTreeListener listener : _parseListeners) {
+			listener.enterEveryRule(_ctx);
+			_ctx.enterRule(listener);
 		}
 	}
 
@@ -341,9 +341,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	public void triggerExitRuleEvent() {
 		// reverse order walk of listeners
 		for (int i = _parseListeners.size()-1; i >= 0; i--) {
-			ParseTreeListener l = _parseListeners.get(i);
-			_ctx.exitRule(l);
-			l.exitEveryRule(_ctx);
+			ParseTreeListener listener = _parseListeners.get(i);
+			_ctx.exitRule(listener);
+			listener.exitEveryRule(_ctx);
 		}
 	}
 
