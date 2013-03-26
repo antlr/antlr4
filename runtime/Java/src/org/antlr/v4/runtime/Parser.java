@@ -765,18 +765,6 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return _input.getSourceName();
 	}
 
-	/** A convenience method for use most often with template rewrites.
-	 *  Convert a List<Token> to List<String>
-	 */
-	public List<String> toStrings(List<? extends Token> tokens) {
-		if ( tokens==null ) return null;
-		List<String> strings = new ArrayList<String>(tokens.size());
-		for (int i=0; i<tokens.size(); i++) {
-			strings.add(tokens.get(i).getText());
-		}
-		return strings;
-	}
-
 	/** During a parse is sometimes useful to listen in on the rule entry and exit
 	 *  events as well as token matches. This is for quick and dirty debugging.
 	 */
