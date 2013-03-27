@@ -51,4 +51,15 @@ public class SerializedATN extends OutputModelObject {
 		}
 //		System.out.println(ATNSerializer.getDecoded(factory.getGrammar(), atn));
 	}
+
+	public String[][] getSegments() {
+		List<String[]> segments = new ArrayList<String[]>();
+		int segmentLimit = factory.getGenerator().getTarget().getSerializedATNSegmentLimit();
+		for (int i = 0; i < serialized.size(); i += segmentLimit) {
+			List<String> currentSegment = serialized.subList(i, Math.min(i + segmentLimit, serialized.size()));
+			segments.add(currentSegment.toArray(new String[currentSegment.size()]));
+		}
+
+		return segments.toArray(new String[segments.size()][]);
+	}
 }
