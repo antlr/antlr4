@@ -293,7 +293,7 @@ public class GrammarTransformPipeline {
 		// COPY OPTIONS
 		GrammarAST optionsRoot =
 			(GrammarAST)combinedAST.getFirstChildWithType(ANTLRParser.OPTIONS);
-		if ( optionsRoot!=null ) {
+		if ( optionsRoot!=null && optionsRoot.getChildCount()!=0 ) {
 			GrammarAST lexerOptionsRoot = (GrammarAST)adaptor.dupNode(optionsRoot);
 			lexerAST.addChild(lexerOptionsRoot);
 			GrammarAST[] options = optionsRoot.getChildren().toArray(new GrammarAST[0]);
