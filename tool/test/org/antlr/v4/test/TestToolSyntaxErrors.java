@@ -172,4 +172,49 @@ public class TestToolSyntaxErrors extends BaseTest {
 		super.testErrors(pair, true);
 	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#194
+	 * "NullPointerException on 'options{}' in grammar file"
+	 * https://github.com/antlr/antlr4/issues/194
+	 */
+	@Test public void testEmptyGrammarOptions() {
+		String[] pair = new String[] {
+			"grammar A;\n" +
+			"options {}\n" +
+			"a : 'x' ;\n",
+
+			""
+		};
+		super.testErrors(pair, true);
+	}
+
+	/**
+	 * This is a "related" regression test for antlr/antlr4#194
+	 * "NullPointerException on 'options{}' in grammar file"
+	 * https://github.com/antlr/antlr4/issues/194
+	 */
+	@Test public void testEmptyRuleOptions() {
+		String[] pair = new String[] {
+			"grammar A;\n" +
+			"a options{} : 'x' ;\n",
+
+			""
+		};
+		super.testErrors(pair, true);
+	}
+
+	/**
+	 * This is a "related" regression test for antlr/antlr4#194
+	 * "NullPointerException on 'options{}' in grammar file"
+	 * https://github.com/antlr/antlr4/issues/194
+	 */
+	@Test public void testEmptyBlockOptions() {
+		String[] pair = new String[] {
+			"grammar A;\n" +
+			"a : (options{} : 'x') ;\n",
+
+			""
+		};
+		super.testErrors(pair, true);
+	}
 }
