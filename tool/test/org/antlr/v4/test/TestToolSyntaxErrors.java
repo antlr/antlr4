@@ -228,4 +228,23 @@ public class TestToolSyntaxErrors extends BaseTest {
 		};
 		super.testErrors(pair, true);
 	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#190
+	 * "NullPointerException building lexer grammar using bogus 'token' action"
+	 * https://github.com/antlr/antlr4/issues/190
+	 */
+	@Test public void testInvalidLexerCommand() {
+		String[] pair = new String[] {
+			"grammar A;\n" +
+			"tokens{Foo}\n" +
+			"b : Foo ;\n" +
+			"X : 'foo' -> popmode;\n" + // "meant" to use -> popMode
+			"Y : 'foo' -> token(Foo);", // "meant" to use -> type(Foo)
+
+			"error(" + ErrorType.INVALID_LEXER_COMMAND.code + "): A.g4:4:13: lexer command 'popmode' does not exist or is not supported by the current target\n" +
+			"error(" + ErrorType.INVALID_LEXER_COMMAND.code + "): A.g4:5:13: lexer command 'token' does not exist or is not supported by the current target\n"
+		};
+		super.testErrors(pair, true);
+	}
 }

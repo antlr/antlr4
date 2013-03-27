@@ -143,6 +143,11 @@ public class LexerATNFactory extends ParserATNFactory {
 		ST cmdST = codegenTemplates.getInstanceOf("Lexer" +
 												  CharSupport.capitalize(ID.getText())+
 												  "Command");
+		if (cmdST == null) {
+			g.tool.errMgr.grammarError(ErrorType.INVALID_LEXER_COMMAND, g.fileName, ID.token, ID.getText());
+			return "";
+		}
+
 		cmdST.add("arg", arg.getText());
 		return cmdST.render();
 	}
@@ -152,6 +157,11 @@ public class LexerATNFactory extends ParserATNFactory {
 		ST cmdST = codegenTemplates.getInstanceOf("Lexer" +
 												  CharSupport.capitalize(ID.getText())+
 												  "Command");
+		if (cmdST == null) {
+			g.tool.errMgr.grammarError(ErrorType.INVALID_LEXER_COMMAND, g.fileName, ID.token, ID.getText());
+			return "";
+		}
+
 		return cmdST.render();
 	}
 
