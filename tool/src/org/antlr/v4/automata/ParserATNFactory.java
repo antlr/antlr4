@@ -92,7 +92,7 @@ import java.util.List;
 
 /** ATN construction routines triggered by ATNBuilder.g.
  *
- *  No side-effects. It builds an ATN object and returns it.
+ *  No side-effects. It builds an {@link ATN} object and returns it.
  */
 public class ParserATNFactory implements ATNFactory {
 	@NotNull
