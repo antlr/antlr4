@@ -664,4 +664,21 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("", found);
 	}
 
+	@Test public void testImportedGrammarWithEmptyOptions() throws Exception {
+		String slave =
+			"parser grammar S;\n" +
+			"options {}\n" +
+			"a : B ;\n";
+		mkdir(tmpdir);
+		writeFile(tmpdir, "S.g4", slave);
+		String master =
+			"grammar M;\n" +
+			"import S;\n" +
+			"s : a ;\n" +
+			"B : 'b' ;" +
+			"WS : (' '|'\\n') -> skip ;\n" ;
+		String found = execParser("M.g4", master, "MParser", "MLexer",
+								  "s", "b", debug);
+		assertEquals("", found);
+	}
 }

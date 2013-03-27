@@ -172,4 +172,93 @@ public class TestToolSyntaxErrors extends BaseTest {
 		super.testErrors(pair, true);
 	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#194
+	 * "NullPointerException on 'options{}' in grammar file"
+	 * https://github.com/antlr/antlr4/issues/194
+	 */
+	@Test public void testEmptyGrammarOptions() {
+		String[] pair = new String[] {
+			"grammar A;\n" +
+			"options {}\n" +
+			"a : 'x' ;\n",
+
+			""
+		};
+		super.testErrors(pair, true);
+	}
+
+	/**
+	 * This is a "related" regression test for antlr/antlr4#194
+	 * "NullPointerException on 'options{}' in grammar file"
+	 * https://github.com/antlr/antlr4/issues/194
+	 */
+	@Test public void testEmptyRuleOptions() {
+		String[] pair = new String[] {
+			"grammar A;\n" +
+			"a options{} : 'x' ;\n",
+
+			""
+		};
+		super.testErrors(pair, true);
+	}
+
+	/**
+	 * This is a "related" regression test for antlr/antlr4#194
+	 * "NullPointerException on 'options{}' in grammar file"
+	 * https://github.com/antlr/antlr4/issues/194
+	 */
+	@Test public void testEmptyBlockOptions() {
+		String[] pair = new String[] {
+			"grammar A;\n" +
+			"a : (options{} : 'x') ;\n",
+
+			""
+		};
+		super.testErrors(pair, true);
+	}
+
+	@Test public void testEmptyTokensBlock() {
+		String[] pair = new String[] {
+			"grammar A;\n" +
+			"tokens {}\n" +
+			"a : 'x' ;\n",
+
+			""
+		};
+		super.testErrors(pair, true);
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#190
+	 * "NullPointerException building lexer grammar using bogus 'token' action"
+	 * https://github.com/antlr/antlr4/issues/190
+	 */
+	@Test public void testInvalidLexerCommand() {
+		String[] pair = new String[] {
+			"grammar A;\n" +
+			"tokens{Foo}\n" +
+			"b : Foo ;\n" +
+			"X : 'foo' -> popmode;\n" + // "meant" to use -> popMode
+			"Y : 'foo' -> token(Foo);", // "meant" to use -> type(Foo)
+
+			"error(" + ErrorType.INVALID_LEXER_COMMAND.code + "): A.g4:4:13: lexer command 'popmode' does not exist or is not supported by the current target\n" +
+			"error(" + ErrorType.INVALID_LEXER_COMMAND.code + "): A.g4:5:13: lexer command 'token' does not exist or is not supported by the current target\n"
+		};
+		super.testErrors(pair, true);
+	}
+
+	@Test public void testLexerCommandArgumentValidation() {
+		String[] pair = new String[] {
+			"grammar A;\n" +
+			"tokens{Foo}\n" +
+			"b : Foo ;\n" +
+			"X : 'foo' -> popMode(Foo);\n" + // "meant" to use -> popMode
+			"Y : 'foo' -> type;", // "meant" to use -> type(Foo)
+
+			"error(" + ErrorType.UNWANTED_LEXER_COMMAND_ARGUMENT.code + "): A.g4:4:13: lexer command 'popMode' does not take any arguments\n" +
+			"error(" + ErrorType.MISSING_LEXER_COMMAND_ARGUMENT.code + "): A.g4:5:13: missing argument for lexer command 'type'\n"
+		};
+		super.testErrors(pair, true);
+	}
 }
