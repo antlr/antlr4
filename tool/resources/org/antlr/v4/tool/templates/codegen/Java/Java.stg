@@ -817,10 +817,23 @@ public class <lexer.name> extends <superClass> {
 }
 >>
 
-
 SerializedATN(model) ::= <<
+<if(rest(model.segments))>
+<! requires segmented representation !>
+private static final int _serializedATNSegments = <length(model.segments)>;
+<model.segments:{segment|private static final String _serializedATNSegment<i0> =
+	"<segment; wrap={"+<\n><\t>"}>";}; separator="\n">
+public static final String _serializedATN = Utils.join(
+	new String[] {
+		<model.segments:{segment | _serializedATNSegment<i0>}; separator=",\n">
+	},
+	""
+);
+<else>
+<! only one segment, can be inlined !>
 public static final String _serializedATN =
 	"<model.serialized; wrap={"+<\n><\t>"}>";
+<endif>
 public static final ATN _ATN =
 	ATNSimulator.deserialize(_serializedATN.toCharArray());
 static {

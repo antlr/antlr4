@@ -693,6 +693,28 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#76 "Serialized ATN strings
+	 * should be split when longer than 2^16 bytes (class file limitation)"
+	 * https://github.com/antlr/antlr4/issues/76
+	 */
+	@Test
+	public void testLargeLexer() throws Exception {
+		StringBuilder grammar = new StringBuilder();
+		grammar.append("lexer grammar L;\n");
+		grammar.append("WS : [ \\t\\r\\n]+ -> skip;\n");
+		for (int i = 0; i < 4000; i++) {
+			grammar.append("KW").append(i).append(" : '").append("KW").append(i).append("';\n");
+		}
+
+		String input = "KW400";
+		String found = execLexer("L.g4", grammar.toString(), "L", input);
+		String expecting =
+			"[@0,0:4='KW400',<402>,1:0]\n" +
+			"[@1,5:4='<EOF>',<-1>,1:5]\n";
+		assertEquals(expecting, found);
+	}
+
 	protected String load(String fileName, @Nullable String encoding)
 		throws IOException
 	{
