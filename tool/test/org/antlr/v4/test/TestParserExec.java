@@ -307,4 +307,25 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#195 "label 'label' type
+	 * mismatch with previous definition: TOKEN_LABEL!=RULE_LABEL"
+	 * https://github.com/antlr/antlr4/issues/195
+	 */
+	@Test public void testLabelAliasingAcrossLabeledAlternatives() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"start : a* EOF;\n" +
+			"a\n" +
+			"  : label=subrule {System.out.println($label.text);} #One\n" +
+			"  | label='y' {System.out.println($label.text);} #Two\n" +
+			"  ;\n" +
+			"subrule : 'x';\n" +
+			"WS : (' '|'\\n') -> skip ;\n";
+
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start",
+								  "xy", false);
+		assertEquals("x\ny\n", found);
+	}
+
 }
