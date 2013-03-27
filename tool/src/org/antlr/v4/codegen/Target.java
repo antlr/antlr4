@@ -31,6 +31,7 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.RuleFunction;
+import org.antlr.v4.codegen.model.SerializedATN;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
@@ -285,6 +286,18 @@ public abstract class Target {
 		int ttype = getCodeGenerator().g.getTokenType(name);
 		if ( ttype==Token.INVALID_TYPE ) return name;
 		return getTokenTypeAsTargetLabel(getCodeGenerator().g, ttype);
+	}
+
+	/**
+	 * Gets the maximum number of 16-bit unsigned integers that can be encoded
+	 * in a single segment of the serialized ATN.
+	 *
+	 * @see SerializedATN#getSegments
+	 *
+	 * @return the serialized ATN segment limit
+	 */
+	public int getSerializedATNSegmentLimit() {
+		return Integer.MAX_VALUE;
 	}
 
 	public boolean grammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {

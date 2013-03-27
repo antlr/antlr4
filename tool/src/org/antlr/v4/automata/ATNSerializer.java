@@ -263,7 +263,10 @@ public class ATNSerializer {
 
 		// don't adjust the first value since that's the version number
 		for (int i = 1; i < data.size(); i++) {
-			assert data.get(i) >= -1 && data.get(i) < 0xFFFF;
+			if (data.get(i) < -1 || data.get(i) > 0xFFFE) {
+				throw new UnsupportedOperationException("Serialized ATN data element out of range.");
+			}
+
 			int value = (data.get(i) + 2) & 0xFFFF;
 			if (value == 0xFFFF) {
 				value = -1;
