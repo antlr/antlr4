@@ -148,6 +148,11 @@ public class LexerATNFactory extends ParserATNFactory {
 			return "";
 		}
 
+		if (cmdST.impl.formalArguments == null || !cmdST.impl.formalArguments.containsKey("arg")) {
+			g.tool.errMgr.grammarError(ErrorType.UNWANTED_LEXER_COMMAND_ARGUMENT, g.fileName, ID.token, ID.getText());
+			return "";
+		}
+
 		cmdST.add("arg", arg.getText());
 		return cmdST.render();
 	}
@@ -159,6 +164,11 @@ public class LexerATNFactory extends ParserATNFactory {
 												  "Command");
 		if (cmdST == null) {
 			g.tool.errMgr.grammarError(ErrorType.INVALID_LEXER_COMMAND, g.fileName, ID.token, ID.getText());
+			return "";
+		}
+
+		if (cmdST.impl.formalArguments != null && cmdST.impl.formalArguments.containsKey("arg")) {
+			g.tool.errMgr.grammarError(ErrorType.MISSING_LEXER_COMMAND_ARGUMENT, g.fileName, ID.token, ID.getText());
 			return "";
 		}
 

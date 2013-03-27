@@ -247,4 +247,18 @@ public class TestToolSyntaxErrors extends BaseTest {
 		};
 		super.testErrors(pair, true);
 	}
+
+	@Test public void testLexerCommandArgumentValidation() {
+		String[] pair = new String[] {
+			"grammar A;\n" +
+			"tokens{Foo}\n" +
+			"b : Foo ;\n" +
+			"X : 'foo' -> popMode(Foo);\n" + // "meant" to use -> popMode
+			"Y : 'foo' -> type;", // "meant" to use -> type(Foo)
+
+			"error(" + ErrorType.UNWANTED_LEXER_COMMAND_ARGUMENT.code + "): A.g4:4:13: lexer command 'popMode' does not take any arguments\n" +
+			"error(" + ErrorType.MISSING_LEXER_COMMAND_ARGUMENT.code + "): A.g4:5:13: missing argument for lexer command 'type'\n"
+		};
+		super.testErrors(pair, true);
+	}
 }
