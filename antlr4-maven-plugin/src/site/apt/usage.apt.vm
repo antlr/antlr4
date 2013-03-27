@@ -5,11 +5,11 @@ Usage
 
 * Compiling Grammars into Parsers
 
- By default, the <<<{{{./antlr-mojo.html}antlr}}>>> goal will search for grammar
+ By default, the <<<{{{./antlr4-mojo.html}antlr4}}>>> goal will search for grammar
  files in the directory <<<$\{basedir\}/src/main/antlr4>>> and any additional
  <<<.tokens>>> files in the directory <<<$\{basedir\}/src/main/antlr4/imports>>>.
  This can be configured to search other directories using the plugin configuration
- parameters as described in the <<<{{{./antlr-mojo.html}antlr}}>>> goal
+ parameters as described in the <<<{{{./antlr4-mojo.html}antlr4}}>>> goal
  documentation.
 
  The following figure shows the expected layout of files for the default
