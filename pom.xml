@@ -48,6 +48,15 @@
             </roles>
         </developer>
 
+        <developer>
+            <name>Jim Idle</name>
+            <email>jimi@idle.ws</email>
+            <url>http://www.linkedin.com/in/jimidle</url>
+            <roles>
+                <role>Developer - Maven Plugin</role>
+            </roles>
+        </developer>
+
     </developers>
 
     <modules>
