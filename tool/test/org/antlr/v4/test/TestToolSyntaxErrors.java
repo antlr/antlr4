@@ -217,4 +217,15 @@ public class TestToolSyntaxErrors extends BaseTest {
 		};
 		super.testErrors(pair, true);
 	}
+
+	@Test public void testEmptyTokensBlock() {
+		String[] pair = new String[] {
+			"grammar A;\n" +
+			"tokens {}\n" +
+			"a : 'x' ;\n",
+
+			""
+		};
+		super.testErrors(pair, true);
+	}
 }
