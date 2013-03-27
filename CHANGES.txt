@@ -2,6 +2,8 @@ ANTLR v4 Honey Badger
 
 March 26, 2013
 
+* Track the number of syntax errors in Parser.notifyErrorListeners instead of in
+  the error strategy
 * Move primary implementation of getExpectedTokens to ATN, fixes #191
 * Updated ATN documentation
 * Use UUID instead of incremented integer for serialized ATN versioning

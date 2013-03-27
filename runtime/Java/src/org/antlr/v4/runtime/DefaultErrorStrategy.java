@@ -98,7 +98,6 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 //			System.err.print("[SPURIOUS] ");
 			return; // don't count spurious errors
 		}
-		recognizer._syntaxErrors++;
 		beginErrorCondition(recognizer);
 		if ( e instanceof NoViableAltException ) {
 			reportNoViableAlternative(recognizer, (NoViableAltException) e);
@@ -244,7 +243,6 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 
 	public void reportUnwantedToken(Parser recognizer) {
 		if (errorRecoveryMode) return;
-		recognizer._syntaxErrors++;
 		beginErrorCondition(recognizer);
 
 		Token t = recognizer.getCurrentToken();
@@ -257,7 +255,6 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 
 	public void reportMissingToken(Parser recognizer) {
 		if (errorRecoveryMode) return;
-		recognizer._syntaxErrors++;
 		beginErrorCondition(recognizer);
 
 		Token t = recognizer.getCurrentToken();
