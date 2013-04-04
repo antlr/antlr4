@@ -42,14 +42,14 @@ public class TestToolSyntaxErrors extends BaseTest {
         "error(" + ErrorType.NO_RULES.code + "): A.g4::: grammar 'A' has no rules\n",
 
 		"A;",
-		"error(" + ErrorType.SYNTAX_ERROR.code + "): <string>:1:0: syntax error: 'A' came as a complete surprise to me\n",
+		"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:1:0: syntax error: 'A' came as a complete surprise to me\n",
 
 		"grammar ;",
-		"error(" + ErrorType.SYNTAX_ERROR.code + "): <string>:1:8: syntax error: ';' came as a complete surprise to me while looking for an identifier\n",
+		"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:1:8: syntax error: ';' came as a complete surprise to me while looking for an identifier\n",
 
 		"grammar A\n" +
 		"a : ID ;\n",
-		"error(" + ErrorType.SYNTAX_ERROR.code + "): <string>:2:0: syntax error: missing SEMI at 'a'\n",
+		"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:2:0: syntax error: missing SEMI at 'a'\n",
 
 		"grammar A;\n" +
 		"a : ID ;;\n"+
@@ -258,6 +258,21 @@ public class TestToolSyntaxErrors extends BaseTest {
 
 			"error(" + ErrorType.UNWANTED_LEXER_COMMAND_ARGUMENT.code + "): A.g4:4:13: lexer command 'popMode' does not take any arguments\n" +
 			"error(" + ErrorType.MISSING_LEXER_COMMAND_ARGUMENT.code + "): A.g4:5:13: missing argument for lexer command 'type'\n"
+		};
+		super.testErrors(pair, true);
+	}
+
+	@Test public void testRuleRedefinition() {
+		String[] pair = new String[] {
+			"grammar Oops;\n" +
+			"\n" +
+			"ret_ty : A ;\n" +
+			"ret_ty : B ;\n" +
+			"\n" +
+			"A : 'a' ;\n" +
+			"B : 'b' ;\n",
+
+			"error(" + ErrorType.RULE_REDEFINITION.code + "): Oops.g4:4:0: rule 'ret_ty' redefinition; previous at line 3\n"
 		};
 		super.testErrors(pair, true);
 	}
