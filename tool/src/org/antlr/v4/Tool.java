@@ -423,10 +423,11 @@ public class Tool {
 		}
 	}
 
-	/** Important enough to avoid multiple defs that we do very early,
-	 *  right after AST construction.  Turn redef'd rule's AST RULE node dead
-	 *  field to true. Also check for undefined rules in parser/lexer to
-	 *  avoid exceptions later. Return true if we find an undefined rule.
+	/**
+	 * Important enough to avoid multiple definitions that we do very early,
+	 * right after AST construction. Also check for undefined rules in
+	 * parser/lexer to avoid exceptions later. Return true if we find multiple
+	 * definitions of the same rule or a reference to an undefined rule.
 	 */
 	public boolean checkForRuleIssues(final Grammar g) {
 		// check for redefined rules
@@ -436,6 +437,7 @@ public class Tool {
 			rules.addAll(mode.getAllChildrenWithType(ANTLRParser.RULE));
 		}
 
+		boolean redefinition = false;
 		final Map<String, RuleAST> ruleToAST = new HashMap<String, RuleAST>();
 		for (GrammarAST r : rules) {
 			RuleAST ruleAST = (RuleAST)r;
@@ -449,7 +451,7 @@ public class Tool {
 										   ID.getToken(),
 										   ruleName,
 										   prevChild.getToken().getLine());
-				ruleAST.dead = true;
+				redefinition = true;
 				continue;
 			}
 			ruleToAST.put(ruleName, ruleAST);
@@ -478,10 +480,11 @@ public class Tool {
 				}
 			}
 		}
+
 		UndefChecker chk = new UndefChecker();
 		chk.visitGrammar(g.ast);
 
-		return chk.undefined; // no problem
+		return redefinition || chk.undefined;
 	}
 
 	public List<GrammarRootAST> sortGrammarByTokenVocab(List<String> fileNames) {

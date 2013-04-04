@@ -36,9 +36,6 @@ import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
 
 public class RuleAST extends GrammarASTWithOptions {
-	/** Kill redef of rules */
-	public boolean dead;
-
 	public RuleAST(RuleAST node) {
 		super(node);
 	}

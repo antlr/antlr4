@@ -261,4 +261,19 @@ public class TestToolSyntaxErrors extends BaseTest {
 		};
 		super.testErrors(pair, true);
 	}
+
+	@Test public void testRuleRedefinition() {
+		String[] pair = new String[] {
+			"grammar Oops;\n" +
+			"\n" +
+			"ret_ty : A ;\n" +
+			"ret_ty : B ;\n" +
+			"\n" +
+			"A : 'a' ;\n" +
+			"B : 'b' ;\n",
+
+			"error(" + ErrorType.RULE_REDEFINITION.code + "): Oops.g4:4:0: rule 'ret_ty' redefinition; previous at line 3\n"
+		};
+		super.testErrors(pair, true);
+	}
 }
