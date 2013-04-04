@@ -641,9 +641,9 @@ public class TestCompositeGrammars extends BaseTest {
 			"s : a ;\n" +
 			"B : 'b' ;" + // defines B from inherited token space
 			"WS : (' '|'\\n') -> skip ;\n" ;
-		boolean ok = antlr("M.g4", "M.g4", master, false);
-		boolean expecting = true; // should be ok
-		assertEquals(expecting, ok);
+		ErrorQueue equeue = antlr("M.g4", "M.g4", master, false);
+		int expecting = 0; // should be ok
+		assertEquals(expecting, equeue.errors.size());
 	}
 
 	@Test public void testImportedRuleWithAction() throws Exception {

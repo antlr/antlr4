@@ -40,10 +40,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ErrorQueue implements ANTLRToolListener {
-	public List<String> infos = new ArrayList<String>();
-	public List<ANTLRMessage> errors = new ArrayList<ANTLRMessage>();
-	public List<ANTLRMessage> warnings = new ArrayList<ANTLRMessage>();
-    public List<ANTLRMessage> all = new ArrayList<ANTLRMessage>();
+	public final Tool tool;
+	public final List<String> infos = new ArrayList<String>();
+	public final List<ANTLRMessage> errors = new ArrayList<ANTLRMessage>();
+	public final List<ANTLRMessage> warnings = new ArrayList<ANTLRMessage>();
+	public final List<ANTLRMessage> all = new ArrayList<ANTLRMessage>();
+
+	public ErrorQueue() {
+		this(null);
+	}
+
+	public ErrorQueue(Tool tool) {
+		this.tool = tool;
+	}
 
 	@Override
 	public void info(String msg) {
@@ -64,7 +73,7 @@ public class ErrorQueue implements ANTLRToolListener {
 
 	public void error(ToolMessage msg) {
 		errors.add(msg);
-        all.add(msg);
+		all.add(msg);
 	}
 
 	public int size() {
@@ -72,15 +81,26 @@ public class ErrorQueue implements ANTLRToolListener {
 	}
 
 	@Override
-	public String toString() { return Utils.join(all.iterator(), "\n"); }
+	public String toString() {
+		return toString(false);
+	}
 
-	public String toString(Tool tool) {
+	public String toString(boolean rendered) {
+		if (!rendered) {
+			return Utils.join(all.iterator(), "\n");
+		}
+
+		if (tool == null) {
+			throw new IllegalStateException(String.format("No %s instance is available.", Tool.class.getName()));
+		}
+
 		StringBuilder buf = new StringBuilder();
 		for (ANTLRMessage m : all) {
 			ST st = tool.errMgr.getMessageTemplate(m);
 			buf.append(st.render());
 			buf.append("\n");
 		}
+
 		return buf.toString();
 	}
 
