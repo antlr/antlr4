@@ -1546,7 +1546,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		if ( debug ) System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
 		if ( from==null || t < -1 || to == null ) return;
 		to = addDFAState(dfa, to); // used existing if possible not incoming
-		synchronized (dfa) {
+		synchronized (from) {
 			if ( from.edges==null ) {
 				from.edges = new DFAState[atn.maxTokenType+1+1]; // TODO: make adaptive
 			}
@@ -1557,7 +1557,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	/** Add D if not there and return D. Return previous if already present. */
 	protected DFAState addDFAState(@NotNull DFA dfa, @NotNull DFAState D) {
-		synchronized (dfa) {
+		synchronized (dfa.states) {
 			DFAState existing = dfa.states.get(D);
 			if ( existing!=null ) return existing;
 
