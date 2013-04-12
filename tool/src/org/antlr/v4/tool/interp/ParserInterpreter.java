@@ -46,20 +46,25 @@ import org.antlr.v4.tool.Grammar;
 
 public class ParserInterpreter {
 	public static class DummyParser extends Parser {
+		public final ATN atn;
 		public final DFA[] decisionToDFA; // not shared for interp
 		public final PredictionContextCache sharedContextCache =
 			new PredictionContextCache();
 
 		public Grammar g;
-		public DummyParser(Grammar g, TokenStream input) {
+		public DummyParser(Grammar g, ATN atn, TokenStream input) {
 			super(input);
 			this.g = g;
-			decisionToDFA = new DFA[100];
+			this.atn = atn;
+			this.decisionToDFA = new DFA[atn.getNumberOfDecisions()];
+			for (int i = 0; i < decisionToDFA.length; i++) {
+				decisionToDFA[i] = new DFA(atn.getDecisionState(i), i);
+			}
 		}
 
 		@Override
 		public String getGrammarFileName() {
-			return null;
+			throw new UnsupportedOperationException("not implemented");
 		}
 
 		@Override
@@ -74,9 +79,7 @@ public class ParserInterpreter {
 
 		@Override
 		public ATN getATN() {
-			return null;
-		}
-		static {
+			return atn;
 		}
 	}
 
@@ -92,7 +95,7 @@ public class ParserInterpreter {
 	public ParserInterpreter(@NotNull Grammar g, @NotNull TokenStream input) {
 		Tool antlr = new Tool();
 		antlr.process(g,false);
-		parser = new DummyParser(g, input);
+		parser = new DummyParser(g, g.atn, input);
 		atnSimulator =
 			new ParserATNSimulator(parser, g.atn, parser.decisionToDFA,
 										  parser.sharedContextCache);

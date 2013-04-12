@@ -31,6 +31,7 @@
 package org.antlr.v4.test;
 
 import org.antlr.v4.automata.ParserATNFactory;
+import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
@@ -381,7 +382,7 @@ public class TestATNInterpreter extends BaseTest {
 								int expected)
 	{
 		ATN lexatn = createATN(lg, true);
-		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn,new DFA[1],null);
+		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn,new DFA[] { new DFA(lexatn.modeToStartState.get(Lexer.DEFAULT_MODE)) },null);
 		IntegerList types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
 

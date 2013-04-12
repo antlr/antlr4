@@ -119,15 +119,6 @@ public class LexerATNSimulator extends ATNSimulator {
 	{
 		super(atn,sharedContextCache);
 		this.decisionToDFA = decisionToDFA;
-		if ( decisionToDFA[Lexer.DEFAULT_MODE]==null ) { // create all mode dfa
-			synchronized (this.decisionToDFA) {
-				if ( decisionToDFA[Lexer.DEFAULT_MODE]==null ) { // create all mode dfa
-					for (int i=0; i<atn.modeToStartState.size(); i++) {
-						this.decisionToDFA[i] = new DFA(atn.modeToStartState.get(i));
-					}
-				}
-			}
-		}
 		this.recog = recog;
 	}
 
@@ -611,7 +602,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		DFA dfa = decisionToDFA[mode];
-		synchronized (dfa) {
+		synchronized (p) {
 			if ( p.edges==null ) {
 				//  make room for tokens 1..n and -1 masquerading as index 0
 				p.edges = new DFAState[MAX_DFA_EDGE-MIN_DFA_EDGE+1];
@@ -650,7 +641,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		DFA dfa = decisionToDFA[mode];
-		synchronized (dfa) {
+		synchronized (dfa.states) {
 			DFAState existing = dfa.states.get(proposed);
 			if ( existing!=null ) return existing;
 
@@ -659,7 +650,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			newState.stateNumber = dfa.states.size();
 			configs.setReadonly(true);
 			newState.configs = configs;
-			decisionToDFA[mode].states.put(newState, newState);
+			dfa.states.put(newState, newState);
 			return newState;
 		}
 	}

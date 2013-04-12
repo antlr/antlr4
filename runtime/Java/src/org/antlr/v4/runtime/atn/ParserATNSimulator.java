@@ -325,18 +325,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		_outerContext = outerContext;
 		predict_calls++;
 		DFA dfa = decisionToDFA[decision];
-		// First, synchronize on the array of DFA for this parser
-		// so that we can get the DFA for a decision or create and set one
-		if ( dfa==null ) { // only create one if not there
-			synchronized (decisionToDFA) {
-				dfa = decisionToDFA[decision];
-				if ( dfa==null ) { // the usual double-check
-					DecisionState startState = atn.decisionToState.get(decision);
-					decisionToDFA[decision] = new DFA(startState, decision);
-					dfa = decisionToDFA[decision];
-				}
-			}
-		}
+
 		// Now we are certain to have a specific decision's DFA
 		// But, do we still need an initial state?
 		if ( dfa.s0==null ) { // recheck
@@ -1557,7 +1546,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		if ( debug ) System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
 		if ( from==null || t < -1 || to == null ) return;
 		to = addDFAState(dfa, to); // used existing if possible not incoming
-		synchronized (dfa) {
+		synchronized (from) {
 			if ( from.edges==null ) {
 				from.edges = new DFAState[atn.maxTokenType+1+1]; // TODO: make adaptive
 			}
@@ -1568,14 +1557,12 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	/** Add D if not there and return D. Return previous if already present. */
 	protected DFAState addDFAState(@NotNull DFA dfa, @NotNull DFAState D) {
-		synchronized (dfa) {
+		synchronized (dfa.states) {
 			DFAState existing = dfa.states.get(D);
 			if ( existing!=null ) return existing;
 
 			D.stateNumber = dfa.states.size();
-			synchronized (sharedContextCache) {
-				D.configs.optimizeConfigs(this);
-			}
+			D.configs.optimizeConfigs(this);
 			D.configs.setReadonly(true);
 			dfa.states.put(D, D);
 			if ( debug ) System.out.println("adding new DFA state: "+D);

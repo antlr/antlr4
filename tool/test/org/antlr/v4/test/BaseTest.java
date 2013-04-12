@@ -236,7 +236,7 @@ public abstract class BaseTest {
 									  ATN atn,
 									  CharStream input)
 	{
-		LexerATNSimulator interp = new LexerATNSimulator(atn,new DFA[1],null);
+		LexerATNSimulator interp = new LexerATNSimulator(atn,new DFA[] { new DFA(atn.modeToStartState.get(Lexer.DEFAULT_MODE)) },null);
 		List<String> tokenTypes = new ArrayList<String>();
 		int ttype;
 		boolean hitEOF = false;
