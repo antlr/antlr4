@@ -987,12 +987,17 @@ public class ParserATNSimulator extends ATNSimulator {
 			 * handles both explicit EOF transitions in the grammar and implicit
 			 * EOF transitions following the end of the decision or start rule.
 			 *
+			 * When reach==intermediate, no closure operation was performed. In
+			 * this case, removeAllConfigsNotInRuleStopState needs to check for
+			 * reachable rule stop states as well as configurations already in
+			 * a rule stop state.
+			 *
 			 * This is handled before the configurations in skippedStopStates,
 			 * because any configurations potentially added from that list are
 			 * already guaranteed to meet this condition whether or not it's
 			 * required.
 			 */
-			reach = removeAllConfigsNotInRuleStopState(reach);
+			reach = removeAllConfigsNotInRuleStopState(reach, reach == intermediate);
 		}
 
 		/* If skippedStopStates is not null, then it contains at least one
@@ -1019,25 +1024,41 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * {@code configs} which are in a {@link RuleStopState}. If all
 	 * configurations in {@code configs} are already in a rule stop state, this
 	 * method simply returns {@code configs}.
+	 * <p/>
+	 * When {@code lookToEndOfRule} is true, this method uses
+	 * {@link ATN#nextTokens} for each configuration in {@code configs} which is
+	 * not already in a rule stop state to see if a rule stop state is reachable
+	 * from the configuration via epsilon-only transitions.
 	 *
 	 * @param configs the configuration set to update
+	 * @param lookToEndOfRule when true, this method checks for rule stop states
+	 * reachable by epsilon-only transitions from each configuration in
+	 * {@code configs}.
+	 *
 	 * @return {@code configs} if all configurations in {@code configs} are in a
 	 * rule stop state, otherwise return a new configuration set containing only
 	 * the configurations from {@code configs} which are in a rule stop state
 	 */
 	@NotNull
-	protected ATNConfigSet removeAllConfigsNotInRuleStopState(@NotNull ATNConfigSet configs) {
+	protected ATNConfigSet removeAllConfigsNotInRuleStopState(@NotNull ATNConfigSet configs, boolean lookToEndOfRule) {
 		if (PredictionMode.allConfigsInRuleStopStates(configs)) {
 			return configs;
 		}
 
 		ATNConfigSet result = new ATNConfigSet(configs.fullCtx);
 		for (ATNConfig config : configs) {
-			if (!(config.state instanceof RuleStopState)) {
+			if (config.state instanceof RuleStopState) {
+				result.add(config, mergeCache);
 				continue;
 			}
 
-			result.add(config, mergeCache);
+			if (lookToEndOfRule && config.state.onlyHasEpsilonTransitions()) {
+				IntervalSet nextTokens = atn.nextTokens(config.state);
+				if (nextTokens.contains(Token.EPSILON)) {
+					ATNState endOfRuleState = atn.ruleToStopState[config.state.ruleIndex];
+					result.add(new ATNConfig(config, endOfRuleState), mergeCache);
+				}
+			}
 		}
 
 		return result;

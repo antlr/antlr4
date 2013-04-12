@@ -572,4 +572,26 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertEquals("line 1:0 no viable alternative at input 'enum'\n", stderrDuringParse);
 	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#218 "ANTLR4 EOF Related Bug".
+	 * https://github.com/antlr/antlr4/issues/218
+	 */
+	@Test public void testDisabledAlternative() {
+		String grammar =
+			"grammar AnnotProcessor;\n" +
+			"\n" +
+			"cppCompilationUnit : content+ EOF;\n" +
+			"\n" +
+			"content: anything | {false}? .;\n" +
+			"\n" +
+			"anything: ANY_CHAR;\n" +
+			"\n" +
+			"ANY_CHAR: [_a-zA-Z0-9];\n";
+
+		String input = "hello";
+		String found = execParser("AnnotProcessor.g4", grammar, "AnnotProcessorParser", "AnnotProcessorLexer", "cppCompilationUnit",
+								  input, false);
+		assertEquals("", found);
+		assertNull(stderrDuringParse);
+	}
 }
