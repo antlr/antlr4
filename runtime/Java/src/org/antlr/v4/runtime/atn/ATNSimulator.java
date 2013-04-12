@@ -104,11 +104,13 @@ public abstract class ATNSimulator {
 	public PredictionContext getCachedContext(PredictionContext context) {
 		if ( sharedContextCache==null ) return context;
 
-		IdentityHashMap<PredictionContext, PredictionContext> visited =
-			new IdentityHashMap<PredictionContext, PredictionContext>();
-		return PredictionContext.getCachedContext(context,
-												  sharedContextCache,
-												  visited);
+		synchronized (sharedContextCache) {
+			IdentityHashMap<PredictionContext, PredictionContext> visited =
+				new IdentityHashMap<PredictionContext, PredictionContext>();
+			return PredictionContext.getCachedContext(context,
+													  sharedContextCache,
+													  visited);
+		}
 	}
 
 	public static ATN deserialize(@NotNull char[] data) {

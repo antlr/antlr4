@@ -562,12 +562,10 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			return existing;
 		}
 
-		synchronized (contextCache) {
-			existing = contextCache.get(context);
-			if (existing != null) {
-				visited.put(context, existing);
-				return existing;
-			}
+		existing = contextCache.get(context);
+		if (existing != null) {
+			visited.put(context, existing);
+			return existing;
 		}
 
 		boolean changed = false;
@@ -589,9 +587,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		}
 
 		if (!changed) {
-			synchronized (contextCache) {
-				contextCache.add(context);
-			}
+			contextCache.add(context);
 			visited.put(context, context);
 			return context;
 		}
@@ -608,9 +604,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			updated = new ArrayPredictionContext(parents, arrayPredictionContext.returnStates);
 		}
 
-		synchronized (contextCache) {
-			contextCache.add(updated);
-		}
+		contextCache.add(updated);
 		visited.put(updated, updated);
 		visited.put(context, updated);
 
