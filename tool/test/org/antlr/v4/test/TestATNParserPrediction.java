@@ -32,6 +32,7 @@ package org.antlr.v4.test;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ParserATNFactory;
+import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
@@ -460,7 +461,7 @@ public class TestATNParserPrediction extends BaseTest {
 		Tool.internalOption_ShowATNConfigsInDFA = true;
 		ATN lexatn = createATN(lg, true);
 		LexerATNSimulator lexInterp =
-			new LexerATNSimulator(lexatn,new DFA[1],new PredictionContextCache());
+			new LexerATNSimulator(lexatn,new DFA[] { new DFA(lexatn.modeToStartState.get(Lexer.DEFAULT_MODE)) },new PredictionContextCache());
 		IntegerList types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
 
@@ -550,7 +551,7 @@ public class TestATNParserPrediction extends BaseTest {
 //		Tool.internalOption_ShowATNConfigsInDFA = true;
 		ATN lexatn = createATN(lg, true);
 		LexerATNSimulator lexInterp =
-			new LexerATNSimulator(lexatn,new DFA[1], new PredictionContextCache());
+			new LexerATNSimulator(lexatn,new DFA[] { new DFA(lexatn.getDecisionState(Lexer.DEFAULT_MODE)) }, new PredictionContextCache());
 
 		semanticProcess(lg);
 		g.importVocab(lg);

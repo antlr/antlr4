@@ -325,18 +325,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		_outerContext = outerContext;
 		predict_calls++;
 		DFA dfa = decisionToDFA[decision];
-		// First, synchronize on the array of DFA for this parser
-		// so that we can get the DFA for a decision or create and set one
-		if ( dfa==null ) { // only create one if not there
-			synchronized (decisionToDFA) {
-				dfa = decisionToDFA[decision];
-				if ( dfa==null ) { // the usual double-check
-					DecisionState startState = atn.decisionToState.get(decision);
-					decisionToDFA[decision] = new DFA(startState, decision);
-					dfa = decisionToDFA[decision];
-				}
-			}
-		}
+
 		// Now we are certain to have a specific decision's DFA
 		// But, do we still need an initial state?
 		if ( dfa.s0==null ) { // recheck

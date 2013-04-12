@@ -838,6 +838,9 @@ public static final ATN _ATN =
 	ATNSimulator.deserialize(_serializedATN.toCharArray());
 static {
 	_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
+	for (int i = 0; i \< _ATN.getNumberOfDecisions(); i++) {
+		_decisionToDFA[i] = new DFA(_ATN.getDecisionState(i), i);
+	}
 <!	org.antlr.v4.tool.DOTGenerator dot = new org.antlr.v4.tool.DOTGenerator(null);!>
 <!	System.out.println(dot.getDOT(_ATN.decisionToState.get(0), ruleNames, false));!>
 <!	System.out.println(dot.getDOT(_ATN.ruleToStartState[2], ruleNames, false));!>

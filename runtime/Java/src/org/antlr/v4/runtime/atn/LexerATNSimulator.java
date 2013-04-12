@@ -119,15 +119,6 @@ public class LexerATNSimulator extends ATNSimulator {
 	{
 		super(atn,sharedContextCache);
 		this.decisionToDFA = decisionToDFA;
-		if ( decisionToDFA[Lexer.DEFAULT_MODE]==null ) { // create all mode dfa
-			synchronized (this.decisionToDFA) {
-				if ( decisionToDFA[Lexer.DEFAULT_MODE]==null ) { // create all mode dfa
-					for (int i=0; i<atn.modeToStartState.size(); i++) {
-						this.decisionToDFA[i] = new DFA(atn.modeToStartState.get(i));
-					}
-				}
-			}
-		}
 		this.recog = recog;
 	}
 
