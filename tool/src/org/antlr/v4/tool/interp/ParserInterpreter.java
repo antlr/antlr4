@@ -64,7 +64,7 @@ public class ParserInterpreter {
 
 		@Override
 		public String getGrammarFileName() {
-			return null;
+			throw new UnsupportedOperationException("not implemented");
 		}
 
 		@Override
