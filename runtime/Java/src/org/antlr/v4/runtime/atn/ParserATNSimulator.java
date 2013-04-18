@@ -567,161 +567,190 @@ public class ParserATNSimulator extends ATNSimulator {
         DecisionState decState = atn.getDecisionState(dfa.decision);
 
 		while (true) { // while more work
-//			System.out.println("REACH "+getLookaheadName(input));
-			ATNConfigSet reach = computeReachSet(previous, t, false);
-			if ( reach==null ) {
-				// if any configs in previous dipped into outer context, that
-				// means that input up to t actually finished entry rule
-				// at least for SLL decision. Full LL doesn't dip into outer
-				// so don't need special case.
-				// We will get an error no matter what so delay until after
-				// decision; better error message. Also, no reachable target
-				// ATN states in SLL implies LL will also get nowhere.
-				// If conflict in states that dip out, choose min since we
-				// will get error no matter what.
-				int alt = getAltThatFinishedDecisionEntryRule(previousD.configs);
-				if ( alt!=ATN.INVALID_ALT_NUMBER ) {
-					// return w/o altering DFA
-					return alt;
+			DFAState D = null;
+			if (previousD.edges != null && t + 1 >= 0 && t + 1 < previousD.edges.length) {
+				D = previousD.edges[t + 1];
+				if ( D == ERROR ) {
+					throw noViableAlt(input, outerContext, previous, startIndex);
 				}
-				throw noViableAlt(input, outerContext, previous, startIndex);
 			}
 
-			// create new target state; we'll add to DFA after it's complete
-			DFAState D = new DFAState(reach);
-
-			// It's often the case that D will already exist in the DFA
-			// and so it's a waste to compute all of the fields over the next
-			// big chunk of code. However, I tried inserting the following
-			// short circuit, but it didn't have much effect. I
-			// figured that this would be a big impact for multi threading,
-			// but it also didn't see much of an impact.
-//			synchronized (dfa) {
-//				DFAState existing = dfa.states.get(D);
-//				if ( existing!=null ) {
-//					addDFAEdge(dfa, previousD, t, existing);
-//					if ( existing.isAcceptState ) return existing.prediction;
-//					previous = D.configs;
-//					previousD = D;
-//					input.consume();
-//					t = input.LA(1);
-//					continue;
-//				}
-//			}
-
-
-			int predictedAlt = getUniqueAlt(reach);
-
-			if ( debug ) {
-				Collection<BitSet> altSubSets = PredictionMode.getConflictingAltSubsets(reach);
-				System.out.println("SLL altSubSets="+altSubSets+
-								   ", configs="+reach+
-								   ", predict="+predictedAlt+", allSubsetsConflict="+
-									   PredictionMode.allSubsetsConflict(altSubSets)+", conflictingAlts="+
-								   getConflictingAlts(reach));
-			}
-
-			if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
-				// NO CONFLICT, UNIQUELY PREDICTED ALT
-				D.isAcceptState = true;
-				D.configs.uniqueAlt = predictedAlt;
-				D.prediction = predictedAlt;
-			}
-			else if ( PredictionMode.hasSLLConflictTerminatingPrediction(mode, reach) ) {
-				// MORE THAN ONE VIABLE ALTERNATIVE
-				D.configs.conflictingAlts = getConflictingAlts(reach);
-				if ( mode == PredictionMode.SLL ) {
-					// stop w/o failover for sure
-					if ( outerContext == ParserRuleContext.EMPTY || // in grammar start rule
-						 !D.configs.dipsIntoOuterContext )          // didn't fall out of rule
-					{
-						// SPECIAL CASE WHERE SLL KNOWS CONFLICT IS AMBIGUITY
-						// report even if preds
-						reportAmbiguity(dfa, D, startIndex, input.index(),
-										D.configs.conflictingAlts, D.configs);
+			if (D == null) {
+	//			System.out.println("REACH "+getLookaheadName(input));
+				ATNConfigSet reach = computeReachSet(previous, t, false);
+				if ( reach==null ) {
+					// if any configs in previous dipped into outer context, that
+					// means that input up to t actually finished entry rule
+					// at least for SLL decision. Full LL doesn't dip into outer
+					// so don't need special case.
+					// We will get an error no matter what so delay until after
+					// decision; better error message. Also, no reachable target
+					// ATN states in SLL implies LL will also get nowhere.
+					// If conflict in states that dip out, choose min since we
+					// will get error no matter what.
+					int alt = getAltThatFinishedDecisionEntryRule(previousD.configs);
+					if ( alt!=ATN.INVALID_ALT_NUMBER ) {
+						// return w/o altering DFA
+						return alt;
 					}
-					// always stop at D
-					D.isAcceptState = true;
-					D.prediction = D.configs.conflictingAlts.nextSetBit(0);
-					if ( debug ) System.out.println("SLL RESOLVED TO "+D.prediction+" for "+D);
-					predictedAlt = D.prediction;
-					// Falls through to check predicates below
+					throw noViableAlt(input, outerContext, previous, startIndex);
 				}
-				else {
-					// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
-					if ( D.configs.hasSemanticContext ) {
-						predicateDFAState(D, decState);
-						if (D.predicates != null) {
-							int conflictIndex = input.index();
-							if (conflictIndex != startIndex) {
-								input.seek(startIndex);
-							}
 
-							BitSet alts = evalSemanticContext(D.predicates, outerContext, true);
-							if ( alts.cardinality()==1 ) {
-								if ( debug ) System.out.println("Full LL avoided");
-								return alts.nextSetBit(0);
-							}
+				// create new target state; we'll add to DFA after it's complete
+				D = new DFAState(reach);
 
-							if (conflictIndex != startIndex) {
-								// restore the index so reporting the fallback to full
-								// context occurs with the index at the correct spot
-								input.seek(conflictIndex);
+				int predictedAlt = getUniqueAlt(reach);
+
+				if ( debug ) {
+					Collection<BitSet> altSubSets = PredictionMode.getConflictingAltSubsets(reach);
+					System.out.println("SLL altSubSets="+altSubSets+
+									   ", configs="+reach+
+									   ", predict="+predictedAlt+", allSubsetsConflict="+
+										   PredictionMode.allSubsetsConflict(altSubSets)+", conflictingAlts="+
+									   getConflictingAlts(reach));
+				}
+
+				if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
+					// NO CONFLICT, UNIQUELY PREDICTED ALT
+					D.isAcceptState = true;
+					D.configs.uniqueAlt = predictedAlt;
+					D.prediction = predictedAlt;
+				}
+				else if ( PredictionMode.hasSLLConflictTerminatingPrediction(mode, reach) ) {
+					// MORE THAN ONE VIABLE ALTERNATIVE
+					D.configs.conflictingAlts = getConflictingAlts(reach);
+					if ( mode == PredictionMode.SLL ) {
+						// stop w/o failover for sure
+						if ( outerContext == ParserRuleContext.EMPTY || // in grammar start rule
+							 !D.configs.dipsIntoOuterContext )          // didn't fall out of rule
+						{
+							// SPECIAL CASE WHERE SLL KNOWS CONFLICT IS AMBIGUITY
+							// report even if preds
+							reportAmbiguity(dfa, D, startIndex, input.index(),
+											D.configs.conflictingAlts, D.configs);
+						}
+						// always stop at D
+						D.isAcceptState = true;
+						D.prediction = D.configs.conflictingAlts.nextSetBit(0);
+						if ( debug ) System.out.println("SLL RESOLVED TO "+D.prediction+" for "+D);
+						predictedAlt = D.prediction;
+						// Falls through to check predicates below
+					}
+					else {
+						// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
+						if ( D.configs.hasSemanticContext ) {
+							predicateDFAState(D, decState);
+							if (D.predicates != null) {
+								int conflictIndex = input.index();
+								if (conflictIndex != startIndex) {
+									input.seek(startIndex);
+								}
+
+								BitSet alts = evalSemanticContext(D.predicates, outerContext, true);
+								if ( alts.cardinality()==1 ) {
+									if ( debug ) System.out.println("Full LL avoided");
+									return alts.nextSetBit(0);
+								}
+
+								if (conflictIndex != startIndex) {
+									// restore the index so reporting the fallback to full
+									// context occurs with the index at the correct spot
+									input.seek(conflictIndex);
+								}
 							}
 						}
+
+						// RETRY WITH FULL LL CONTEXT
+						if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
+						ATNConfigSet s0_closure =
+							computeStartState(dfa.atnStartState,
+											  outerContext,
+											  true);
+						predictedAlt = execATNWithFullContext(dfa, D, s0_closure,
+															  input, startIndex,
+															  outerContext,
+															  D.configs.conflictingAlts.nextSetBit(0));
+						// TODO: if true conflict found and same answer as we got with SLL,
+						// then make it non ctx sensitive DFA state
+
+						// not accept state: isCtxSensitive
+						D.requiresFullContext = true; // always force DFA to ATN simulate
+						D.prediction = ATN.INVALID_ALT_NUMBER;
+						addDFAEdge(dfa, previousD, t, D);
+						return predictedAlt; // all done with preds, etc...
 					}
-
-					// RETRY WITH FULL LL CONTEXT
-					if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
-					ATNConfigSet s0_closure =
-						computeStartState(dfa.atnStartState,
-										  outerContext,
-										  true);
-					predictedAlt = execATNWithFullContext(dfa, D, s0_closure,
-														  input, startIndex,
-														  outerContext,
-														  D.configs.conflictingAlts.nextSetBit(0));
-					// TODO: if true conflict found and same answer as we got with SLL,
-					// then make it non ctx sensitive DFA state
-
-					// not accept state: isCtxSensitive
-					D.requiresFullContext = true; // always force DFA to ATN simulate
-					D.prediction = ATN.INVALID_ALT_NUMBER;
-					addDFAEdge(dfa, previousD, t, D);
-					return predictedAlt; // all done with preds, etc...
 				}
+
+				if ( D.isAcceptState && D.configs.hasSemanticContext ) {
+					predicateDFAState(D, decState);
+					if (D.predicates != null) {
+						D.prediction = ATN.INVALID_ALT_NUMBER;
+					}
+				}
+
+				// all adds to dfa are done after we've created full D state
+				D = addDFAEdge(dfa, previousD, t, D);
 			}
+			else if ( D.requiresFullContext && mode != PredictionMode.SLL ) {
+				// TODO: copied from execDFA, could be simplified
 
-			if ( D.isAcceptState && D.configs.hasSemanticContext ) {
-				predicateDFAState(D, decState);
-
+				// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
 				if ( D.predicates!=null ) {
-					int stopIndex = input.index();
-					input.seek(startIndex);
+					if ( debug ) System.out.println("DFA state has preds in DFA sim LL failover");
+					int conflictIndex = input.index();
+					if (conflictIndex != startIndex) {
+						input.seek(startIndex);
+					}
+
 					BitSet alts = evalSemanticContext(D.predicates, outerContext, true);
-					D.prediction = ATN.INVALID_ALT_NUMBER; // indicate we have preds
-					D = addDFAEdge(dfa, previousD, t, D);
-					switch (alts.cardinality()) {
-					case 0:
-						throw noViableAlt(input, outerContext, D.configs, startIndex);
-
-					case 1:
-						return alts.nextSetBit(0);
-
-					default:
-						// report ambiguity after predicate evaluation to make sure the correct
-						// set of ambig alts is reported.
-						reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
+					if ( alts.cardinality()==1 ) {
+						if ( debug ) System.out.println("Full LL avoided");
 						return alts.nextSetBit(0);
 					}
+
+					if (conflictIndex != startIndex) {
+						// restore the index so reporting the fallback to full
+						// context occurs with the index at the correct spot
+						input.seek(conflictIndex);
+					}
+				}
+
+				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+" in "+D);
+				boolean fullCtx = true;
+				ATNConfigSet s0_closure =
+					computeStartState(dfa.atnStartState, outerContext,
+									  fullCtx);
+				int alt = execATNWithFullContext(dfa, D, s0_closure,
+												 input, startIndex,
+												 outerContext,
+												 ATN.INVALID_ALT_NUMBER);
+				return alt;
+			}
+
+			if ( D.isAcceptState ) {
+				if (D.predicates == null) {
+					return D.prediction;
+				}
+
+				int stopIndex = input.index();
+				input.seek(startIndex);
+				BitSet alts = evalSemanticContext(D.predicates, outerContext, true);
+				switch (alts.cardinality()) {
+				case 0:
+					throw noViableAlt(input, outerContext, D.configs, startIndex);
+
+				case 1:
+					return alts.nextSetBit(0);
+
+				default:
+					// report ambiguity after predicate evaluation to make sure the correct
+					// set of ambig alts is reported.
+					reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
+					return alts.nextSetBit(0);
 				}
 			}
 
-			// all adds to dfa are done after we've created full D state
-			D = addDFAEdge(dfa, previousD, t, D);
-			if ( D.isAcceptState ) return predictedAlt;
-
-			previous = reach;
+			previous = D.configs;
 			previousD = D;
 
 			if (t != IntStream.EOF) {
