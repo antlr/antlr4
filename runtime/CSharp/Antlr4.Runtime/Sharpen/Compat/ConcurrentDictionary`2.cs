@@ -38,8 +38,10 @@ namespace System.Collections.Concurrent
 
 namespace Sharpen
 {
+#if !NET_CF
 	[DebuggerDisplay ("Count={Count}")]
 	[DebuggerTypeProxy (typeof (CollectionDebuggerView<,>))]
+#endif
 	public class ConcurrentDictionary<TKey, TValue> : IDictionary<TKey, TValue>,
 	  ICollection<KeyValuePair<TKey, TValue>>, IEnumerable<KeyValuePair<TKey, TValue>>,
 	  IDictionary, ICollection, IEnumerable

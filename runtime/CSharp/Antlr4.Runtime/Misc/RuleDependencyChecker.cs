@@ -374,8 +374,13 @@ namespace Antlr4.Runtime.Misc
             foreach (MethodInfo method in clazz.GetMethods(AllDeclaredMembers))
             {
                 GetElementDependencies(AsCustomAttributeProvider(method), result);
+#if NET_CF
+                if (method.ReturnTypeCustomAttributes != null)
+                    GetElementDependencies(AsCustomAttributeProvider(method.ReturnTypeCustomAttributes), result);
+#else
                 if (method.ReturnParameter != null)
                     GetElementDependencies(AsCustomAttributeProvider(method.ReturnParameter), result);
+#endif
 
                 foreach (ParameterInfo parameter in method.GetParameters())
                     GetElementDependencies(AsCustomAttributeProvider(parameter), result);

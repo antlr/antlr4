@@ -299,6 +299,8 @@ namespace Antlr4.Runtime.Dfa
                         result.Remove(-1);
 #if NET_4_5
                         map = new ReadOnlyDictionary<int, DFAState>(new SortedDictionary<int, DFAState>(result));
+#elif NET_CF
+                        map = new SortedList<int, DFAState>(result);
 #else
                         map = new SortedDictionary<int, DFAState>(result);
 #endif
