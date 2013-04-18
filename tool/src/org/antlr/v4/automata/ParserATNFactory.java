@@ -431,7 +431,7 @@ public class ParserATNFactory implements ATNFactory {
             boolean isRuleTrans = tr instanceof RuleTransition;
             if ( el.left.getStateType() == ATNState.BASIC &&
 				el.right.getStateType()== ATNState.BASIC &&
-				tr!=null && (isRuleTrans || tr.target == el.right) )
+				tr!=null && (isRuleTrans && ((RuleTransition)tr).followState == el.right || tr.target == el.right) )
 			{
 				// we can avoid epsilon edge to next el
 				if ( isRuleTrans ) ((RuleTransition)tr).followState = els.get(i+1).left;
