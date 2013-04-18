@@ -557,27 +557,24 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 		ATN_failover++;
 
-		ATNConfigSet previous = s0.configs;
 		DFAState previousD = s0;
 
 		if ( debug ) System.out.println("s0 = "+s0);
 
 		int t = input.LA(1);
 
-        DecisionState decState = atn.getDecisionState(dfa.decision);
-
 		while (true) { // while more work
 			DFAState D = null;
 			if (previousD.edges != null && t + 1 >= 0 && t + 1 < previousD.edges.length) {
 				D = previousD.edges[t + 1];
 				if ( D == ERROR ) {
-					throw noViableAlt(input, outerContext, previous, startIndex);
+					throw noViableAlt(input, outerContext, previousD.configs, startIndex);
 				}
 			}
 
 			if (D == null) {
 	//			System.out.println("REACH "+getLookaheadName(input));
-				ATNConfigSet reach = computeReachSet(previous, t, false);
+				ATNConfigSet reach = computeReachSet(previousD.configs, t, false);
 				if ( reach==null ) {
 					// if any configs in previous dipped into outer context, that
 					// means that input up to t actually finished entry rule
@@ -593,7 +590,7 @@ public class ParserATNSimulator extends ATNSimulator {
 						// return w/o altering DFA
 						return alt;
 					}
-					throw noViableAlt(input, outerContext, previous, startIndex);
+					throw noViableAlt(input, outerContext, previousD.configs, startIndex);
 				}
 
 				// create new target state; we'll add to DFA after it's complete
@@ -639,7 +636,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					else {
 						// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
 						if ( D.configs.hasSemanticContext ) {
-							predicateDFAState(D, decState);
+							predicateDFAState(D, atn.getDecisionState(dfa.decision));
 							if (D.predicates != null) {
 								int conflictIndex = input.index();
 								if (conflictIndex != startIndex) {
@@ -682,7 +679,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				}
 
 				if ( D.isAcceptState && D.configs.hasSemanticContext ) {
-					predicateDFAState(D, decState);
+					predicateDFAState(D, atn.getDecisionState(dfa.decision));
 					if (D.predicates != null) {
 						D.prediction = ATN.INVALID_ALT_NUMBER;
 					}
@@ -750,7 +747,6 @@ public class ParserATNSimulator extends ATNSimulator {
 				}
 			}
 
-			previous = D.configs;
 			previousD = D;
 
 			if (t != IntStream.EOF) {
