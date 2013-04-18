@@ -38,7 +38,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\CF2.0\Release\</OutputPath>
+    <OutputPath>bin\CF3.5\Release\</OutputPath>
     <DefineConstants>TRACE;$(PlatformFamilyName);NET_CF;NET_2_0;NET_3_0;NET_3_5</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
