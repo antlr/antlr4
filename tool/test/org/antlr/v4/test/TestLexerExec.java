@@ -84,6 +84,31 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#224: "Parentheses without
+	 * quantifier in lexer rules have unclear effect".
+	 * https://github.com/antlr/antlr4/issues/224
+	 */
+	@Test public void testParentheses() {
+		String grammar =
+			"lexer grammar Demo;\n" +
+			"\n" +
+			"START_BLOCK: '-.-.-';\n" +
+			"\n" +
+			"ID : (LETTER SEPARATOR) (LETTER SEPARATOR)+;\n" +
+			"fragment LETTER: L_A|L_K;\n" +
+			"fragment L_A: '.-';\n" +
+			"fragment L_K: '-.-';\n" +
+			"\n" +
+			"SEPARATOR: '!';\n";
+		String found = execLexer("Demo.g4", grammar, "Demo", "-.-.-!");
+		String expecting =
+			"[@0,0:4='-.-.-',<1>,1:0]\n" +
+			"[@1,5:5='!',<3>,1:5]\n" +
+			"[@2,6:5='<EOF>',<-1>,1:6]\n";
+		assertEquals(expecting, found);
+	}
+
 	@Test
 	public void testNonGreedyTermination() throws Exception {
 		String grammar =
