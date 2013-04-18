@@ -341,7 +341,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		int m = input.mark();
 		int index = input.index();
 		try {
-			return execDFA(dfa, dfa.s0, input, index, outerContext);
+			return execATN(dfa, dfa.s0, input, index, outerContext);
 		}
 		finally {
 			mergeCache = null; // wack cache after each prediction
@@ -382,138 +382,6 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 		if ( debug ) System.out.println("DFA after predictATN: "+dfa.toString(parser.getTokenNames()));
 		return alt;
-	}
-
-	public int execDFA(@NotNull DFA dfa, @NotNull DFAState s0,
-					   @NotNull TokenStream input, int startIndex,
-                       @Nullable ParserRuleContext outerContext)
-    {
-		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
-		if ( dfa_debug ) {
-			System.out.println("execDFA decision "+dfa.decision+
-							   " exec LA(1)=="+ getLookaheadName(input) +
-							   ", outerContext="+outerContext.toString(parser));
-		}
-		if ( dfa_debug ) System.out.print(dfa.toString(parser.getTokenNames()));
-		DFAState acceptState = null;
-		DFAState s = s0;
-
-		int t = input.LA(1);
-		while ( true ) {
-			if ( dfa_debug ) System.out.println("DFA state "+s.stateNumber+" LA(1)=="+getLookaheadName(input));
-			if ( s.requiresFullContext && mode != PredictionMode.SLL ) {
-				// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
-				if ( s.predicates!=null ) {
-					if ( debug ) System.out.println("DFA state has preds in DFA sim LL failover");
-					int conflictIndex = input.index();
-					if (conflictIndex != startIndex) {
-						input.seek(startIndex);
-					}
-
-					BitSet alts = evalSemanticContext(s.predicates, outerContext, true);
-					if ( alts.cardinality()==1 ) {
-						if ( debug ) System.out.println("Full LL avoided");
-						return alts.nextSetBit(0);
-					}
-
-					if (conflictIndex != startIndex) {
-						// restore the index so reporting the fallback to full
-						// context occurs with the index at the correct spot
-						input.seek(conflictIndex);
-					}
-				}
-
-				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+" in "+s);
-				boolean fullCtx = true;
-				ATNConfigSet s0_closure =
-					computeStartState(dfa.atnStartState, outerContext,
-									  fullCtx);
-				retry_with_context_from_dfa++;
-				int alt = execATNWithFullContext(dfa, s, s0_closure,
-												 input, startIndex,
-												 outerContext,
-												 ATN.INVALID_ALT_NUMBER);
-				return alt;
-			}
-			if ( s.isAcceptState ) {
-				if ( s.predicates!=null ) {
-					if ( dfa_debug ) System.out.println("accept "+s);
-				}
-				else {
-					if ( dfa_debug ) System.out.println("accept; predict "+s.prediction +" in state "+s.stateNumber);
-				}
-				acceptState = s;
-				// keep going unless we're at EOF or state only has one alt number
-				// mentioned in configs; check if something else could match
-				// TODO: don't we always stop? only lexer would keep going
-				// TODO: v3 dfa don't do this.
-				break;
-			}
-
-			// t is not updated if one of these states is reached
-			assert !s.requiresFullContext && !s.isAcceptState;
-
-			// if no edge, pop over to ATN interpreter, update DFA and return
-			if ( s.edges == null || t >= s.edges.length || t < -1 || s.edges[t+1] == null ) {
-				if ( dfa_debug && t>=0 ) System.out.println("no edge for "+parser.getTokenNames()[t]);
-				int alt;
-				if ( dfa_debug ) {
-					Interval interval = Interval.of(startIndex, parser.getTokenStream().index());
-					System.out.println("ATN exec upon "+
-										   parser.getTokenStream().getText(interval) +
-										   " at DFA state "+s.stateNumber);
-				}
-
-				alt = execATN(dfa, s, input, startIndex, outerContext);
-				// this adds edge even if next state is accept for
-				// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
-				// TODO: This next stuff kills edge, but extra states remain. :(
-				if ( s.isAcceptState && alt!=ATN.INVALID_ALT_NUMBER ) {
-					DFAState d = s.edges[input.LA(1)+1];
-					if ( d.isAcceptState && d.prediction==s.prediction ) {
-						// we can carve it out.
-						s.edges[input.LA(1)+1] = ERROR; // IGNORE really not error
-					}
-				}
-				if ( dfa_debug ) {
-					System.out.println("back from DFA update, alt="+alt+", dfa=\n"+dfa.toString(parser.getTokenNames()));
-					//dump(dfa);
-				}
-				// action already executed
-				if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
-														" predicts "+alt);
-				return alt; // we've updated DFA, exec'd action, and have our deepest answer
-			}
-			DFAState target = s.edges[t+1];
-			if ( target == ERROR ) {
-				throw noViableAlt(input, outerContext, s.configs, startIndex);
-			}
-			s = target;
-			//TODO: can't be acceptstate here; rm that part of test?
-			if (!s.requiresFullContext && !s.isAcceptState && t != IntStream.EOF) {
-				input.consume();
-				t = input.LA(1);
-			}
-		}
-
-		// Before jumping to prediction, check to see if there are
-		// disambiguating predicates to evaluate
-		if ( s.predicates!=null ) {
-			// rewind input so pred's LT(i) calls make sense
-			input.seek(startIndex);
-			// since we don't report ambiguities in execDFA, we never need to
-			// use complete predicate evaluation here
-			BitSet alts = evalSemanticContext(s.predicates, outerContext, false);
-			if (alts.isEmpty()) {
-				throw noViableAlt(input, outerContext, s.configs, startIndex);
-			}
-
-			return alts.nextSetBit(0);
-		}
-
-		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
-											" predicts "+acceptState.prediction);
-		return acceptState.prediction;
 	}
 
 	/** Performs ATN simulation to compute a predicted alternative based
@@ -689,8 +557,6 @@ public class ParserATNSimulator extends ATNSimulator {
 				D = addDFAEdge(dfa, previousD, t, D);
 			}
 			else if ( D.requiresFullContext && mode != PredictionMode.SLL ) {
-				// TODO: copied from execDFA, could be simplified
-
 				// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
 				if ( D.predicates!=null ) {
 					if ( debug ) System.out.println("DFA state has preds in DFA sim LL failover");
