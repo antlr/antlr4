@@ -257,12 +257,10 @@ public class ParserATNSimulator extends ATNSimulator {
 	public static final boolean dfa_debug = false;
 	public static final boolean retry_debug = false;
 
-	public static int ATN_failover = 0;
 	public static int predict_calls = 0;
 	public static int retry_with_context = 0;
 	public static int retry_with_context_indicates_no_conflict = 0;
 	public static int retry_with_context_predicts_same_alt = 0;
-	public static int retry_with_context_from_dfa = 0;
 
 	@Nullable
 	protected final Parser parser;
@@ -423,7 +421,6 @@ public class ParserATNSimulator extends ATNSimulator {
 							   " exec LA(1)=="+ getLookaheadName(input)+
 							   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
 		}
-		ATN_failover++;
 
 		DFAState previousD = s0;
 
