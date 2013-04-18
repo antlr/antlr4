@@ -30,7 +30,7 @@
     <BuildSystem>MSBuild</BuildSystem>
     <TaskVersion>4.0.0.0</TaskVersion>
     <TaskKeyToken>eb42632606e9261f</TaskKeyToken>
-    <Antlr4BuildTaskAssemblyName Condition="'$(Antlr4BuildTaskAssemblyName)'==''">Antlr4BuildTasks, Version=$(TaskVersion), Culture=neutral, PublicKeyToken=$(TaskKeyToken)</Antlr4BuildTaskAssemblyName>
+    <Antlr4BuildTaskAssemblyName Condition="'$(Antlr4BuildTaskAssemblyName)'==''">Antlr4BuildTasks.v3.5, Version=$(TaskVersion), Culture=neutral, PublicKeyToken=$(TaskKeyToken)</Antlr4BuildTaskAssemblyName>
   </PropertyGroup>
 
   <PropertyGroup>

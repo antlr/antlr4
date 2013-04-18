@@ -37,7 +37,11 @@ namespace Antlr4.Build.Tasks
     using System.Text.RegularExpressions;
     using RegistryHive = Microsoft.Win32.RegistryHive;
     using RegistryKey = Microsoft.Win32.RegistryKey;
+#if NET_4_0
     using RegistryView = Microsoft.Win32.RegistryView;
+#else
+    using Registry = Microsoft.Win32.Registry;
+#endif
 
     internal class AntlrClassGenerationTaskInternal : MarshalByRefObject
     {
@@ -145,6 +149,7 @@ namespace Antlr4.Build.Tasks
             }
         }
 
+#if NET_4_0
         private string JavaHome
         {
             get
@@ -190,13 +195,51 @@ namespace Antlr4.Build.Tasks
                 }
             }
         }
+#else
+        private string JavaHome
+        {
+            get
+            {
+                string javaHome;
+                if (TryGetJavaHome(Registry.LocalMachine, JavaVendor, JavaInstallation, out javaHome))
+                    return javaHome;
+
+                throw new NotSupportedException("Could not locate a Java installation.");
+            }
+        }
+
+        private static bool TryGetJavaHome(RegistryKey baseKey, string vendor, string installation, out string javaHome)
+        {
+            javaHome = null;
+
+            string javaKeyName = "SOFTWARE\\" + vendor + "\\" + installation;
+            using (RegistryKey javaKey = baseKey.OpenSubKey(javaKeyName))
+            {
+                if (javaKey == null)
+                    return false;
+
+                object currentVersion = javaKey.GetValue("CurrentVersion");
+                if (currentVersion == null)
+                    return false;
+
+                using (var homeKey = javaKey.OpenSubKey(currentVersion.ToString()))
+                {
+                    if (homeKey == null || homeKey.GetValue("JavaHome") == null)
+                        return false;
+
+                    javaHome = homeKey.GetValue("JavaHome").ToString();
+                    return !string.IsNullOrEmpty(javaHome);
+                }
+            }
+        }
+#endif
 
         public bool Execute()
         {
             try
             {
                 string javaHome = JavaHome;
-                string java = Path.Combine(javaHome, "bin", "java.exe");
+                string java = Path.Combine(Path.Combine(javaHome, "bin"), "java.exe");
 
                 List<string> arguments = new List<string>();
                 arguments.Add("-cp");
@@ -245,7 +288,7 @@ namespace Antlr4.Build.Tasks
 
                 arguments.AddRange(SourceCodeFiles);
 
-                ProcessStartInfo startInfo = new ProcessStartInfo(java, string.Join(" ", arguments))
+                ProcessStartInfo startInfo = new ProcessStartInfo(java, string.Join(" ", arguments.ToArray()))
                 {
                     UseShellExecute = false,
                     CreateNoWindow = true,

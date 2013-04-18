@@ -35,11 +35,16 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Antlr4BuildTasks")]
+#if NET_4_0
+[assembly: AssemblyTitle("Antlr4BuildTasks.v4.0")]
+[assembly: AssemblyProduct("Antlr4BuildTasks.v4.0")]
+#else
+[assembly: AssemblyTitle("Antlr4BuildTasks.v3.5")]
+[assembly: AssemblyProduct("Antlr4BuildTasks.v3.5")]
+#endif
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Tunnel Vision Laboratories, LLC")]
-[assembly: AssemblyProduct("Antlr4BuildTasks")]
 [assembly: AssemblyCopyright("Copyright © Sam Harwell 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
