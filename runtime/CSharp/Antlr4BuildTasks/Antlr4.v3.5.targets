@@ -73,6 +73,9 @@
     <Antlr4CompileDependsOn>
       Antlr4CompileReadGeneratedFileList
     </Antlr4CompileDependsOn>
+    <Antlr4CompileAddFilesGeneratedDependsOn>
+      Antlr4Compile
+    </Antlr4CompileAddFilesGeneratedDependsOn>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(BuildingInsideVisualStudio)'=='true'">
@@ -159,7 +162,7 @@
   </Target>
 
   <Target Name="Antlr4CompileAddFilesGenerated"
-          AfterTargets="Antlr4Compile"
+          DependsOnTargets="$(Antlr4CompileAddFilesGeneratedDependsOn)"
           Condition="'@(Antlr4)' != ''">
 
     <ItemGroup>
