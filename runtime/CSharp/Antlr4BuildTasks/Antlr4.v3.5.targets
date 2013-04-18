@@ -37,10 +37,12 @@
     <LoadTimeSensitiveTargets>
       $(LoadTimeSensitiveTargets);
       Antlr4Compile;
+      Antlr4CompileAddFilesGenerated;
     </LoadTimeSensitiveTargets>
     <LoadTimeSensitiveProperties>
       $(LoadTimeSensitiveProperties);
       Antlr4CompileDependsOn;
+      Antlr4CompileAddFilesGeneratedDependsOn;
     </LoadTimeSensitiveProperties>
   </PropertyGroup>
 
@@ -151,6 +153,7 @@
       ForceAtn="%(Antlr4.ForceAtn)"
       AbstractGrammar="%(Antlr4.Abstract)">
 
+      <Output ItemName="Compile" TaskParameter="GeneratedCodeFiles" Condition="'$(_IntellisenseOnlyCompile)' == 'true'" />
       <Output ItemName="Antlr4GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
     </Antlr4ClassGenerationTask>
 
