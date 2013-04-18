@@ -282,11 +282,17 @@ public class TestPerformance extends BaseTest {
             currentPass = i + 1;
             if (CLEAR_DFA) {
 				if (sharedLexers.length > 0) {
-					Arrays.fill(sharedLexers[0].getInterpreter().decisionToDFA, null);
+					ATN atn = sharedLexers[0].getATN();
+					for (int j = 0; j < sharedLexers[0].getInterpreter().decisionToDFA.length; j++) {
+						sharedLexers[0].getInterpreter().decisionToDFA[j] = new DFA(atn.getDecisionState(j), j);
+					}
 				}
 
 				if (sharedParsers.length > 0) {
-					Arrays.fill(sharedParsers[0].getInterpreter().decisionToDFA, null);
+					ATN atn = sharedParsers[0].getATN();
+					for (int j = 0; j < sharedParsers[0].getInterpreter().decisionToDFA.length; j++) {
+						sharedParsers[0].getInterpreter().decisionToDFA[j] = new DFA(atn.getDecisionState(j), j);
+					}
 				}
 
 				Arrays.fill(sharedLexers, null);
@@ -685,7 +691,10 @@ public class TestPerformance extends BaseTest {
                         }
 
 						if (!REUSE_LEXER_DFA) {
-							Arrays.fill(lexer.getInterpreter().decisionToDFA, null);
+							ATN atn = lexer.getATN();
+							for (int i = 0; i < lexer.getInterpreter().decisionToDFA.length; i++) {
+								lexer.getInterpreter().decisionToDFA[i] = new DFA(atn.getDecisionState(i), i);
+							}
 						}
 
                         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -723,7 +732,10 @@ public class TestPerformance extends BaseTest {
 						}
 
 						if (!REUSE_PARSER_DFA) {
-							Arrays.fill(parser.getInterpreter().decisionToDFA, null);
+							ATN atn = parser.getATN();
+							for (int i = 0; i < parser.getInterpreter().decisionToDFA.length; i++) {
+								parser.getInterpreter().decisionToDFA[i] = new DFA(atn.getDecisionState(i), i);
+							}
 						}
 
 						parser.getInterpreter().setPredictionMode(TWO_STAGE_PARSING ? PredictionMode.SLL : PREDICTION_MODE);
