@@ -590,6 +590,8 @@ public class ParserATNSimulator extends ATNSimulator {
 						// return w/o altering DFA
 						return alt;
 					}
+
+					addDFAEdge(dfa, previousD, t, ERROR);
 					throw noViableAlt(input, outerContext, previousD.configs, startIndex);
 				}
 
@@ -1590,6 +1592,10 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	/** Add D if not there and return D. Return previous if already present. */
 	protected DFAState addDFAState(@NotNull DFA dfa, @NotNull DFAState D) {
+		if (D == ERROR) {
+			return D;
+		}
+
 		synchronized (dfa.states) {
 			DFAState existing = dfa.states.get(D);
 			if ( existing!=null ) return existing;
