@@ -356,7 +356,6 @@ public class ParserATNSimulator extends ATNSimulator {
 	public int predictATN(@NotNull DFA dfa, @NotNull TokenStream input,
 						  @Nullable ParserRuleContext outerContext)
 	{
-		// caller must have write lock on dfa
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
 		if ( debug || debug_list_atn_decisions )  {
 			System.out.println("predictATN decision "+dfa.decision+
@@ -392,7 +391,6 @@ public class ParserATNSimulator extends ATNSimulator {
 					   @NotNull TokenStream input, int startIndex,
                        @Nullable ParserRuleContext outerContext)
     {
-		// caller must have read lock on dfa
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
 		if ( dfa_debug ) {
 			System.out.println("execDFA decision "+dfa.decision+
@@ -560,7 +558,6 @@ public class ParserATNSimulator extends ATNSimulator {
 					   @NotNull TokenStream input, int startIndex,
 					   ParserRuleContext outerContext)
 	{
-		// caller is expected to have write lock on dfa
 		if ( debug || debug_list_atn_decisions) {
 			System.out.println("execATN decision "+dfa.decision+
 							   " exec LA(1)=="+ getLookaheadName(input)+
@@ -770,7 +767,6 @@ public class ParserATNSimulator extends ATNSimulator {
 									  ParserRuleContext outerContext,
 									  int SLL_min_alt) // todo: is this in D as min ambig alts?
 	{
-		// caller must have write lock on dfa
 		retry_with_context++;
 		reportAttemptingFullContext(dfa, s0, startIndex, input.index());
 
