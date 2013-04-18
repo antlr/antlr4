@@ -36,6 +36,10 @@ using File = System.IO.File;
 
 namespace Antlr4.Runtime
 {
+#if NET_CF
+    using StreamReader = System.IO.StreamReader;
+#endif
+
     /// <summary>
     /// This is an ANTLRInputStream that is loaded from a file
     /// all at once when you construct the object.
@@ -71,10 +75,17 @@ namespace Antlr4.Runtime
             }
 
             string text;
+#if !NET_CF
             if (encoding != null)
                 text = File.ReadAllText(fileName, encoding);
             else
                 text = File.ReadAllText(fileName);
+#else
+            if (encoding != null)
+                text = ReadAllText(fileName, encoding);
+            else
+                text = ReadAllText(fileName);
+#endif
 
             data = text.ToCharArray();
             n = data.Length;
@@ -87,6 +98,24 @@ namespace Antlr4.Runtime
                 return fileName;
             }
         }
+
+#if NET_CF
+        private static string ReadAllText(string path)
+        {
+            using (var reader = new StreamReader(path))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
+        private static string ReadAllText(string path, Encoding encoding)
+        {
+            using (var reader = new StreamReader(path, encoding ?? Encoding.Default))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+#endif
     }
 }
 

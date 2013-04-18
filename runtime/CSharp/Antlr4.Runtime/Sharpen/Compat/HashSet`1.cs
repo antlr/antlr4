@@ -26,7 +26,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#if !NET_3_5
+#if !NET_3_5 || NET_CF
 
 using System;
 using System.Collections;
@@ -42,9 +42,14 @@ using System.Diagnostics;
 namespace Sharpen {
 
 	[Serializable]
+#if !NET_CF
 	[DebuggerDisplay ("Count={Count}")]
 	[DebuggerTypeProxy (typeof (CollectionDebuggerView<,>))]
-	public class HashSet<T> : ICollection<T>, ISerializable, IDeserializationCallback
+#endif
+	public class HashSet<T> : ICollection<T>
+#if !NET_CF
+		, ISerializable, IDeserializationCallback
+#endif
 	{
 		const int INITIAL_SIZE = 10;
 		const float DEFAULT_LOAD_FACTOR = (90f / 100);
@@ -81,7 +86,9 @@ namespace Sharpen {
 		int threshold;
 
 		IEqualityComparer<T> comparer;
+#if !NET_CF
 		SerializationInfo si;
+#endif
 
 		// The number of changes made to this set. Used by enumerators
 		// to detect changes and invalidate themselves.
@@ -120,10 +127,12 @@ namespace Sharpen {
 				Add (item);
 		}
 
+#if !NET_CF
 		protected HashSet (SerializationInfo info, StreamingContext context)
 		{
 			si = info;
 		}
+#endif
 
 		void Init (int capacity, IEqualityComparer<T> comparer)
 		{
@@ -570,6 +579,7 @@ namespace Sharpen {
 			return setComparer;
 		}
 
+#if !NET_CF
 		[SecurityPermission (SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
 		public virtual void GetObjectData (SerializationInfo info, StreamingContext context)
 		{
@@ -613,7 +623,7 @@ namespace Sharpen {
 				si = null;
 			}
 		}
-
+#endif
 
 		IEnumerator<T> IEnumerable<T>.GetEnumerator ()
 		{

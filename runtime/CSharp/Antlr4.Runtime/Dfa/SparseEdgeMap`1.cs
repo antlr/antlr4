@@ -211,7 +211,12 @@ namespace Antlr4.Runtime.Dfa
             {
                 return Sharpen.Collections.EmptyMap<int, T>();
             }
+
+#if NET_CF
+            IDictionary<int, T> result = new SortedList<int, T>();
+#else
             IDictionary<int, T> result = new SortedDictionary<int, T>();
+#endif
             for (int i = 0; i < Count; i++)
             {
                 result[keys[i]] = values[i];

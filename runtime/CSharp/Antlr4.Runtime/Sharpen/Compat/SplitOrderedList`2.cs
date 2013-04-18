@@ -438,16 +438,27 @@ namespace Sharpen
 					while ((rwlock & (RwWrite | RwWait)) > 0)
 						sw.SpinOnce ();
 
+#if NET_CF
+					if ((InterlockedAdd (ref rwlock, RwRead) & (RwWait | RwWait)) == 0)
+						return;
+
+					InterlockedAdd (ref rwlock, -RwRead);
+#else
 					if ((Interlocked.Add (ref rwlock, RwRead) & (RwWait | RwWait)) == 0)
 						return;
 
 					Interlocked.Add (ref rwlock, -RwRead);
+#endif
 				} while (true);
 			}
 
 			public void ExitReadLock ()
 			{
+#if NET_CF
+				InterlockedAdd (ref rwlock, -RwRead);
+#else
 				Interlocked.Add (ref rwlock, -RwRead);
+#endif
 			}
 
 			public void EnterWriteLock ()
@@ -471,8 +482,37 @@ namespace Sharpen
 
 			public void ExitWriteLock ()
 			{
+#if NET_CF
+				InterlockedAdd (ref rwlock, -RwWrite);
+#else
 				Interlocked.Add (ref rwlock, -RwWrite);
+#endif
 			}
+
+#if NET_CF
+			/// <summary>
+			/// Adds two 32-bit integers and replaces the first integer with the sum, as an atomic operation.
+			/// </summary>
+			/// <param name="location1">A variable containing the first value to be added. The sum of the two values is stored in <paramref name="location1"/>.</param>
+			/// <param name="value">The value to be added to the integer at <paramref name="location1"/>.</param>
+			/// <returns>The new value stored at <paramref name="location1"/>.</returns>
+			private static int InterlockedAdd(ref int location1, int value)
+			{
+#if false // the code calling this private method will never make use of this optimization
+				if (value == 1)
+					return Interlocked.Increment(ref location1);
+				else if (value == -1)
+					return Interlocked.Decrement(ref location1);
+#endif
+
+				while (true)
+				{
+					int previous = location1;
+					if (Interlocked.CompareExchange(ref location1, previous + value, previous) == previous)
+						return previous + value;
+				}
+			}
+#endif
 		}
 	}
 
@@ -481,14 +521,18 @@ namespace Sharpen
 		// The number of step until SpinOnce yield on multicore machine
 		const           int  step = 10;
 		const           int  maxTime = 200;
+#if !NET_CF
 		static readonly bool isSingleCpu = (Environment.ProcessorCount == 1);
+#endif
 
 		int ntime;
 
 		public void SpinOnce ()
 		{
 			ntime += 1;
-
+#if NET_CF
+			Thread.Sleep(0);
+#else
 			if (isSingleCpu) {
 				// On a single-CPU system, spinning does no good
 				Thread.Sleep (0);
@@ -499,6 +543,7 @@ namespace Sharpen
 					// Multi-CPU system might be hyper-threaded, let other thread run
 					Thread.SpinWait (Math.Min (ntime, maxTime) << 1);
 			}
+#endif
 		}
 	}
 }

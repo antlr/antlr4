@@ -46,7 +46,9 @@ namespace Sharpen
 			this.c = col;
 		}
 		
+#if !NET_CF
 		[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
+#endif
 		public T[] Items {
 			get {
 				var o = new T [c.Count];
@@ -65,7 +67,9 @@ namespace Sharpen
 			this.c = col;
 		}
 
+#if !NET_CF
 		[DebuggerBrowsable (DebuggerBrowsableState.RootHidden)]
+#endif
 		public KeyValuePair<T, U>[] Items {
 			get {
 				var o = new KeyValuePair<T, U> [c.Count];
