@@ -663,18 +663,16 @@ public class ParserATNSimulator extends ATNSimulator {
 							computeStartState(dfa.atnStartState,
 											  outerContext,
 											  true);
-						predictedAlt = execATNWithFullContext(dfa, D, s0_closure,
-															  input, startIndex,
-															  outerContext,
-															  D.configs.conflictingAlts.nextSetBit(0));
-						// TODO: if true conflict found and same answer as we got with SLL,
-						// then make it non ctx sensitive DFA state
 
 						// not accept state: isCtxSensitive
 						D.requiresFullContext = true; // always force DFA to ATN simulate
 						D.prediction = ATN.INVALID_ALT_NUMBER;
-						addDFAEdge(dfa, previousD, t, D);
-						return predictedAlt; // all done with preds, etc...
+						D = addDFAEdge(dfa, previousD, t, D);
+
+						return execATNWithFullContext(dfa, D, s0_closure,
+													  input, startIndex,
+													  outerContext,
+													  D.configs.conflictingAlts.nextSetBit(0));
 					}
 				}
 
