@@ -328,16 +328,13 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		// Now we are certain to have a specific decision's DFA
 		// But, do we still need an initial state?
-		if ( dfa.s0==null ) { // recheck
-			if ( dfa.s0==null ) { // recheck
-				try {
-					return predictATN(dfa, input, outerContext);
-				}
-				finally {
-					mergeCache = null; // wack cache after each prediction
-				}
+		if ( dfa.s0==null ) {
+			try {
+				return predictATN(dfa, input, outerContext);
 			}
-			// fall through; another thread set dfa.s0 while we waited for lock
+			finally {
+				mergeCache = null; // wack cache after each prediction
+			}
 		}
 
 		// We can start with an existing DFA
@@ -467,30 +464,25 @@ public class ParserATNSimulator extends ATNSimulator {
 										   " at DFA state "+s.stateNumber);
 				}
 
-				//TODO: recheck synchronization here. don't need if no sync
-				// recheck; another thread might have added edge
-				if ( s.edges == null || t >= s.edges.length || t < -1 || s.edges[t+1] == null ) {
-					alt = execATN(dfa, s, input, startIndex, outerContext);
-					// this adds edge even if next state is accept for
-					// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
-					// TODO: This next stuff kills edge, but extra states remain. :(
-					if ( s.isAcceptState && alt!=ATN.INVALID_ALT_NUMBER ) {
-						DFAState d = s.edges[input.LA(1)+1];
-						if ( d.isAcceptState && d.prediction==s.prediction ) {
-							// we can carve it out.
-							s.edges[input.LA(1)+1] = ERROR; // IGNORE really not error
-						}
+				alt = execATN(dfa, s, input, startIndex, outerContext);
+				// this adds edge even if next state is accept for
+				// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
+				// TODO: This next stuff kills edge, but extra states remain. :(
+				if ( s.isAcceptState && alt!=ATN.INVALID_ALT_NUMBER ) {
+					DFAState d = s.edges[input.LA(1)+1];
+					if ( d.isAcceptState && d.prediction==s.prediction ) {
+						// we can carve it out.
+						s.edges[input.LA(1)+1] = ERROR; // IGNORE really not error
 					}
-					if ( dfa_debug ) {
-						System.out.println("back from DFA update, alt="+alt+", dfa=\n"+dfa.toString(parser.getTokenNames()));
-						//dump(dfa);
-					}
-					// action already executed
-					if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
-															" predicts "+alt);
-					return alt; // we've updated DFA, exec'd action, and have our deepest answer
 				}
-				// fall through; another thread gave us the edge
+				if ( dfa_debug ) {
+					System.out.println("back from DFA update, alt="+alt+", dfa=\n"+dfa.toString(parser.getTokenNames()));
+					//dump(dfa);
+				}
+				// action already executed
+				if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
+														" predicts "+alt);
+				return alt; // we've updated DFA, exec'd action, and have our deepest answer
 			}
 			DFAState target = s.edges[t+1];
 			if ( target == ERROR ) {
