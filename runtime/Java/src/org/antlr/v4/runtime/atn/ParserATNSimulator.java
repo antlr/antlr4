@@ -700,7 +700,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					input.seek(startIndex);
 					BitSet alts = evalSemanticContext(D.predicates, outerContext, true);
 					D.prediction = ATN.INVALID_ALT_NUMBER; // indicate we have preds
-					addDFAEdge(dfa, previousD, t, D);
+					D = addDFAEdge(dfa, previousD, t, D);
 					switch (alts.cardinality()) {
 					case 0:
 						throw noViableAlt(input, outerContext, D.configs, startIndex);
@@ -718,7 +718,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 
 			// all adds to dfa are done after we've created full D state
-			addDFAEdge(dfa, previousD, t, D);
+			D = addDFAEdge(dfa, previousD, t, D);
 			if ( D.isAcceptState ) return predictedAlt;
 
 			previous = reach;
@@ -1547,13 +1547,13 @@ public class ParserATNSimulator extends ATNSimulator {
 		return alt;
 	}
 
-	protected void addDFAEdge(@NotNull DFA dfa,
-							  @Nullable DFAState from,
-							  int t,
-							  @Nullable DFAState to)
+	protected DFAState addDFAEdge(@NotNull DFA dfa,
+								  @Nullable DFAState from,
+								  int t,
+								  @Nullable DFAState to)
 	{
 		if ( debug ) System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
-		if ( from==null || t < -1 || to == null ) return;
+		if ( from==null || t < -1 || to == null ) return to;
 		to = addDFAState(dfa, to); // used existing if possible not incoming
 		synchronized (from) {
 			if ( from.edges==null ) {
@@ -1562,6 +1562,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			from.edges[t+1] = to; // connect
 		}
 		if ( debug ) System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getTokenNames():null));
+		return to;
 	}
 
 	/** Add D if not there and return D. Return previous if already present. */
