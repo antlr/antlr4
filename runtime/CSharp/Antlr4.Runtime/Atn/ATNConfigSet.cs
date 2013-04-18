@@ -55,7 +55,7 @@ namespace Antlr4.Runtime.Atn
         /// added to this map stays, and the remaining configs are placed in
         /// <see cref="unmerged">unmerged</see>
         /// .
-        /// <p>
+        /// <p/>
         /// This map is only used for optimizing the process of adding configs to the set,
         /// and is
         /// <code>null</code>
@@ -70,7 +70,7 @@ namespace Antlr4.Runtime.Atn
         /// but have a colliding key. This
         /// occurs when two configs in the set have the same state and alternative but
         /// different semantic contexts.
-        /// <p>
+        /// <p/>
         /// This list is only used for optimizing the process of adding configs to the set,
         /// and is
         /// <code>null</code>
@@ -100,7 +100,7 @@ namespace Antlr4.Runtime.Atn
         ///     </see>
         /// from pursuing the global FOLLOW when a
         /// rule stop state is reached with an empty prediction context.
-        /// <p>
+        /// <p/>
         /// Note:
         /// <code>outermostConfigSet</code>
         /// and

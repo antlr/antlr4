@@ -89,7 +89,7 @@ namespace Antlr4.Runtime
         /// if an attempt is made to consume the the
         /// end of the stream (i.e. if
         /// <code>LA(1)==</code>
-        /// <see cref="Eof">EOF</see>
+        /// <see cref="IntStreamConstants.Eof">EOF</see>
         /// before calling
         /// <code>consume</code>
         /// ).
@@ -142,7 +142,7 @@ namespace Antlr4.Runtime
         /// <code>i</code>
         /// represents a position at or beyond the end of the stream,
         /// this method returns
-        /// <see cref="Eof">Eof</see>
+        /// <see cref="IntStreamConstants.Eof">Eof</see>
         /// .
         /// <p/>
         /// The return value is unspecified if
@@ -295,7 +295,7 @@ namespace Antlr4.Runtime
         /// <li>
         /// <code>LA(1)</code>
         /// returns
-        /// <see cref="Eof">Eof</see>
+        /// <see cref="IntStreamConstants.Eof">Eof</see>
         /// </li>
         /// </ul>
         /// This operation is guaranteed to not throw an exception if
@@ -342,7 +342,7 @@ namespace Antlr4.Runtime
         /// Gets the name of the underlying symbol source. This method returns a
         /// non-null, non-empty string. If such a name is not known, this method
         /// returns
-        /// <see cref="UnknownSourceName">UnknownSourceName</see>
+        /// <see cref="IntStreamConstants.UnknownSourceName">UnknownSourceName</see>
         /// .
         /// </remarks>
         string SourceName
@@ -355,7 +355,7 @@ namespace Antlr4.Runtime
     {
         /// <summary>
         /// The value returned by
-        /// <see cref="La(int)">LA()</see>
+        /// <see cref="IIntStream.La(int)">LA()</see>
         /// when the end of the stream is
         /// reached.
         /// </summary>
@@ -363,7 +363,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// The value returned by
-        /// <see cref="SourceName()">SourceName()</see>
+        /// <see cref="IIntStream.SourceName()">SourceName()</see>
         /// when the actual name of the
         /// underlying source is not known.
         /// </summary>

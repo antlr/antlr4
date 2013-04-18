@@ -39,7 +39,7 @@ namespace Antlr4.Runtime.Tree
         /// <inheritDoc></inheritDoc>
         /// <p/>
         /// The default implementation calls
-        /// <see cref="IParseTree.Accept{T}(IParseTreeVisitor{Result})">IParseTree.Accept&lt;T&gt;(IParseTreeVisitor&lt;Result&gt;)
+        /// <see cref="IParseTree.Accept{T}(IParseTreeVisitor{T})">IParseTree.Accept&lt;T&gt;(IParseTreeVisitor&lt;Result&gt;)
         ///     </see>
         /// on the
         /// specified tree.
@@ -56,15 +56,14 @@ namespace Antlr4.Runtime.Tree
         /// <see cref="AbstractParseTreeVisitor{Result}.DefaultResult()">defaultResult()</see>
         /// . Before visiting each child, it
         /// calls
-        /// <see cref="AbstractParseTreeVisitor{Result}.ShouldVisitNextChild(IRuleNode, object)
-        ///     ">shouldVisitNextChild</see>
+        /// <see cref="AbstractParseTreeVisitor{Result}.ShouldVisitNextChild(IRuleNode, Result)">shouldVisitNextChild</see>
         /// ; if the result
         /// is
         /// <code>false</code>
         /// no more children are visited and the current aggregate
         /// result is returned. After visiting a child, the aggregate result is
         /// updated by calling
-        /// <see cref="AbstractParseTreeVisitor{Result}.AggregateResult(object, object)">aggregateResult
+        /// <see cref="AbstractParseTreeVisitor{Result}.AggregateResult(Result, Result)">aggregateResult
         ///     </see>
         /// with the
         /// previous aggregate result and the result of visiting the child.
@@ -139,7 +138,7 @@ namespace Antlr4.Runtime.Tree
         /// <remarks>
         /// Aggregates the results of visiting multiple children of a node. After
         /// either all children are visited or
-        /// <see cref="AbstractParseTreeVisitor{Result}.ShouldVisitNextChild(IRuleNode, object)
+        /// <see cref="AbstractParseTreeVisitor{Result}.ShouldVisitNextChild(IRuleNode, Result)
         ///     ">AbstractParseTreeVisitor&lt;Result&gt;.ShouldVisitNextChild(IRuleNode, object)
         ///     </see>
         /// returns

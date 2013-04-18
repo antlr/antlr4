@@ -245,7 +245,7 @@ namespace Antlr4.Runtime.Atn
         /// are suppressed. The default is
         /// <code>false</code>
         /// .
-        /// <p>
+        /// <p/>
         /// When messages about ambiguous alternatives are not required, setting this
         /// to
         /// <code>false</code>

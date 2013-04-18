@@ -827,11 +827,11 @@ namespace Antlr4.Runtime
         }
 
         /// <summary>
-        /// Return List<String> of the rule names in your parser instance
+        /// Return List&lt;String&gt; of the rule names in your parser instance
         /// leading up to a call to the current rule.
         /// </summary>
         /// <remarks>
-        /// Return List<String> of the rule names in your parser instance
+        /// Return List&lt;String&gt; of the rule names in your parser instance
         /// leading up to a call to the current rule.  You could override if
         /// you want more details such as the file/line info of where
         /// in the ATN a rule is invoked.
@@ -908,7 +908,7 @@ namespace Antlr4.Runtime
         /// <summary>A convenience method for use most often with template rewrites.</summary>
         /// <remarks>
         /// A convenience method for use most often with template rewrites.
-        /// Convert a List<Token> to List<String>
+        /// Convert a List&lt;Token&gt; to List&lt;String&gt;
         /// </remarks>
         public virtual IList<string> ToStrings<_T0>(IList<_T0> tokens) where _T0:IToken
         {

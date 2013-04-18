@@ -174,7 +174,7 @@ namespace Antlr4.Runtime
         ///     </see>
         /// , but may be
         /// optimized by the specific implementation.
-        /// </p>
+        /// <p/>
         /// If
         /// <code>ctx.getSourceInterval()</code>
         /// does not return a valid interval of

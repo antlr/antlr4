@@ -28,6 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
@@ -41,11 +42,11 @@ namespace Antlr4.Runtime.Dfa
         /// <summary>A set of all DFA states.</summary>
         /// <remarks>
         /// A set of all DFA states. Use
-        /// <see cref="System.Collections.IDictionary{K, V}">System.Collections.IDictionary&lt;K, V&gt;
+        /// <see cref="System.Collections.Generic.IDictionary{TKey, TValue}">IDictionary&lt;TKey, TValue&gt;
         ///     </see>
         /// so we can get old state back
         /// (
-        /// <see cref="Sharpen.ISet{E}">Sharpen.ISet&lt;E&gt;</see>
+        /// <see cref="HashSet{T}">HashSet&lt;T&gt;</see>
         /// only allows you to see if it's there).
         /// </remarks>
         [NotNull]

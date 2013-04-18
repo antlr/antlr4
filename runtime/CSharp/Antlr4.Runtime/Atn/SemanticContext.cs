@@ -45,7 +45,7 @@ namespace Antlr4.Runtime.Atn
     /// A tree structure used to record the semantic context in which
     /// an ATN configuration is valid.  It's either a single predicate,
     /// a conjunction
-    /// <code>p1&&p2</code>
+    /// <code>p1&amp;&amp;p2</code>
     /// , or a sum of products
     /// <code>p1||p2</code>
     /// .

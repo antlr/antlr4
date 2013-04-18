@@ -359,9 +359,9 @@ namespace Antlr4.Runtime.Atn
         /// and singleton subsets with
         /// non-conflicting configurations. Two configurations conflict if they have
         /// identical
-        /// <see cref="ATNConfig#state">ATNConfig#state</see>
+        /// <see cref="ATNConfig.state">ATNConfig#state</see>
         /// and
-        /// <see cref="ATNConfig#context">ATNConfig#context</see>
+        /// <see cref="ATNConfig.context">ATNConfig#context</see>
         /// values
         /// but different
         /// <see cref="ATNConfig.Alt()">ATNConfig.Alt()</see>
@@ -857,7 +857,7 @@ namespace Antlr4.Runtime.Atn
         /// :
         /// <pre>
         /// map[c.
-        /// <see cref="ATNConfig#state">state</see>
+        /// <see cref="ATNConfig.state">state</see>
         /// ] U= c.
         /// <see cref="ATNConfig.Alt()">getAlt()</see>
         /// </pre>

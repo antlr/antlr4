@@ -102,13 +102,13 @@ namespace Antlr4.Runtime.Atn
         /// is
         /// <code>PredictionContext#EMPTY_LOCAL</code>
         /// ,
-        /// <see cref="Antlr4.Runtime.IToken.Epsilon">EPSILON</see>
+        /// <see cref="Antlr4.Runtime.TokenConstants.Epsilon">EPSILON</see>
         /// is in set if we can reach end of rule. If
         /// <code>ctx</code>
         /// is
         /// <see cref="PredictionContext.EmptyFull">PredictionContext.EmptyFull</see>
         /// ,
-        /// <see cref="Antlr4.Runtime.IIntStream.Eof">EOF</see>
+        /// <see cref="Antlr4.Runtime.IntStreamConstants.Eof">EOF</see>
         /// is in set
         /// if we can reach end of rule.
         /// </summary>

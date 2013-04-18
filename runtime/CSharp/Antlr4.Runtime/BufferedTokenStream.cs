@@ -48,9 +48,9 @@ namespace Antlr4.Runtime
     /// inside/output templates. E.g.,
     /// <code></code>
     /// &lt;names:
-    /// hi, <it>}&gt;} has to parse names
+    /// hi, &lt;it&gt;}&gt;} has to parse names
     /// as part of an expression but
-    /// <code>"hi, <it>"</code>
+    /// <code>"hi, &lt;it&gt;"</code>
     /// as a nested template.
     /// You can't use this stream if you pass whitespace or other off-channel
     /// tokens to the parser. The stream can't ignore off-channel tokens.
