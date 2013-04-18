@@ -1572,8 +1572,10 @@ public class ParserATNSimulator extends ATNSimulator {
 			if ( existing!=null ) return existing;
 
 			D.stateNumber = dfa.states.size();
-			D.configs.optimizeConfigs(this);
-			D.configs.setReadonly(true);
+			if (!D.configs.isReadonly()) {
+				D.configs.optimizeConfigs(this);
+				D.configs.setReadonly(true);
+			}
 			dfa.states.put(D, D);
 			if ( debug ) System.out.println("adding new DFA state: "+D);
 			return D;
