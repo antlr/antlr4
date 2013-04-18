@@ -59,7 +59,7 @@
   </PropertyGroup>
 
   <UsingTask Condition="'$(Antlr4BuildTaskPath)'==''" TaskName="Antlr4.Build.Tasks.Antlr4ClassGenerationTask" AssemblyName="$(Antlr4BuildTaskAssemblyName)" />
-  <UsingTask Condition="'$(Antlr4BuildTaskPath)'!=''" TaskName="Antlr4.Build.Tasks.Antlr4ClassGenerationTask" AssemblyFile="$(Antlr4BuildTaskPath)\Antlr4BuildTasks.dll" />
+  <UsingTask Condition="'$(Antlr4BuildTaskPath)'!=''" TaskName="Antlr4.Build.Tasks.Antlr4ClassGenerationTask" AssemblyFile="$(Antlr4BuildTaskPath)\Antlr4BuildTasks.v4.0.dll" />
 
   <PropertyGroup>
     <PrepareResourcesDependsOn>
