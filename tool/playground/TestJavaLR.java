@@ -33,7 +33,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DiagnosticErrorListener;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionMode;
@@ -193,12 +192,10 @@ class TestJavaLR {
 
 		System.out.println("finished parsing OK");
 		System.out.println(LexerATNSimulator.match_calls+" lexer match calls");
-		System.out.println(ParserATNSimulator.ATN_failover+" parser failovers");
 		System.out.println(ParserATNSimulator.predict_calls +" parser predict calls");
 		System.out.println(ParserATNSimulator.retry_with_context +" retry_with_context after SLL conflict");
 		System.out.println(ParserATNSimulator.retry_with_context_indicates_no_conflict +" retry sees no conflict");
 		System.out.println(ParserATNSimulator.retry_with_context_predicts_same_alt +" retry predicts same alt as resolving conflict");
-		System.out.println(ParserATNSimulator.retry_with_context_from_dfa +" retry from DFA");
 	}
 
 	public static List<String> getFilenames(File f) throws Exception {
