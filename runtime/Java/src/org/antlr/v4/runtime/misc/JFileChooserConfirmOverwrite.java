@@ -38,6 +38,7 @@ import java.io.File;
  *
  * @author Sam Harwell
  */
+@SuppressWarnings("serial")
 public class JFileChooserConfirmOverwrite extends JFileChooser {
 
 	public JFileChooserConfirmOverwrite() {
