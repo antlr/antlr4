@@ -30,6 +30,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.misc.MutableInteger;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
@@ -651,6 +652,26 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		nodes.add(context);
 		for (int i = 0; i < context.size(); i++) {
 			getAllContextNodes_(context.getParent(i), nodes, visited);
+		}
+	}
+
+	public static int countAllContextNodes(PredictionContext context) {
+		MutableInteger count = new MutableInteger(0);
+		Map<PredictionContext, PredictionContext> visited =
+			new IdentityHashMap<PredictionContext, PredictionContext>();
+		countAllContextNodes_(context, count, visited);
+		return count.value;
+	}
+
+	public static void countAllContextNodes_(PredictionContext context,
+											 MutableInteger count,
+											 Map<PredictionContext, PredictionContext> visited)
+	{
+		if ( context==null || visited.containsKey(context) ) return;
+		visited.put(context, context);
+		count.value++;
+		for (int i = 0; i < context.size(); i++) {
+			countAllContextNodes_(context.getParent(i), count, visited);
 		}
 	}
 
