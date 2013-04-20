@@ -470,6 +470,10 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		configLookup.clear();
 	}
 
+	public boolean isReadonly() {
+		return readonly;
+	}
+
 	public void setReadonly(boolean readonly) {
 		this.readonly = readonly;
 		configLookup = null; // can't mod, no need for lookup cache
