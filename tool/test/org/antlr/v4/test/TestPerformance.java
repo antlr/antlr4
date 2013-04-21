@@ -178,7 +178,7 @@ public class TestPerformance extends BaseTest {
      * {@code true} to use {@link BailErrorStrategy}, {@code false} to use
      * {@link DefaultErrorStrategy}.
      */
-    private static final boolean BAIL_ON_ERROR = true;
+    private static final boolean BAIL_ON_ERROR = false;
 	/**
 	 * {@code true} to compute a checksum for verifying consistency across
 	 * optimizations and multiple passes.
