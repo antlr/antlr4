@@ -148,6 +148,10 @@ public class SymbolChecks {
             Map<String, LabelElementPair> labelNameSpace =
                 new HashMap<String, LabelElementPair>();
             for (int i=1; i<=r.numberOfAlts; i++) {
+				if (r.hasAltSpecificContexts()) {
+					labelNameSpace.clear();
+				}
+
                 Alternative a = r.alt[i];
                 for (List<LabelElementPair> pairs : a.labelDefs.values() ) {
                     for (LabelElementPair p : pairs) {

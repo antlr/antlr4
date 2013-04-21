@@ -509,8 +509,7 @@ rule
 @after {
 	exitRule($start);
 }
-	:   {!((RuleAST)$start).dead}?
-        ^(	RULE RULE_REF {currentRuleName=$RULE_REF.text; currentRuleAST=$RULE;}
+	:   ^(	RULE RULE_REF {currentRuleName=$RULE_REF.text; currentRuleAST=$RULE;}
 			DOC_COMMENT? (^(RULEMODIFIERS (m=ruleModifier{mods.add($m.start);})+))?
 			ARG_ACTION?
       		ret=ruleReturns?
@@ -527,20 +526,6 @@ rule
       		ruleBlock exceptionGroup
       		{finishRule((RuleAST)$RULE, $RULE_REF, $ruleBlock.start); currentRuleName=null; currentRuleAST=null;}
       	 )
-    |   // ugly repeated alt w/o actions but needed to force ANTLR to use
-    	// sem pred to avoid actions when rule dead
-    	{((RuleAST)$start).dead}?
-        ^(	RULE RULE_REF
-			DOC_COMMENT? (^(RULEMODIFIERS (m=ruleModifier)+))?
-			ARG_ACTION?
-      		ret=ruleReturns?
-      		thr=throwsSpec?
-      		loc=locals?
-      		(	opts=optionsSpec
-		    |   a=ruleAction
-		    )*
-      		ruleBlock exceptionGroup
-         )
     ;
 
 exceptionGroup

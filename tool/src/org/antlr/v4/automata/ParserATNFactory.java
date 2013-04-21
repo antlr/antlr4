@@ -42,6 +42,7 @@ import org.antlr.v4.parse.ATNBuilder;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ATNType;
 import org.antlr.v4.runtime.atn.AbstractPredicateTransition;
 import org.antlr.v4.runtime.atn.ActionTransition;
 import org.antlr.v4.runtime.atn.AtomTransition;
@@ -78,6 +79,7 @@ import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LeftRecursiveRule;
+import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
@@ -96,7 +98,7 @@ import java.util.List;
 
 /** ATN construction routines triggered by ATNBuilder.g.
  *
- *  No side-effects. It builds an ATN object and returns it.
+ *  No side-effects. It builds an {@link ATN} object and returns it.
  */
 public class ParserATNFactory implements ATNFactory {
 	@NotNull
@@ -118,13 +120,16 @@ public class ParserATNFactory implements ATNFactory {
 		}
 
 		this.g = g;
-		this.atn = new ATN();
+
+		ATNType atnType = g instanceof LexerGrammar ? ATNType.LEXER : ATNType.PARSER;
+		int maxTokenType = g.getMaxTokenType();
+		this.atn = new ATN(atnType, maxTokenType);
 	}
 
 	@Override
 	public ATN createATN() {
 		_createATN(g.rules.values());
-		atn.maxTokenType = g.getMaxTokenType();
+		assert atn.maxTokenType == g.getMaxTokenType();
         addRuleFollowLinks();
 		addEOFTransitionToStartRules();
 		ATNOptimizer.optimize(g, atn);
@@ -446,7 +451,7 @@ public class ParserATNFactory implements ATNFactory {
             boolean isRuleTrans = tr instanceof RuleTransition;
             if ( el.left.getStateType() == ATNState.BASIC &&
 				el.right.getStateType()== ATNState.BASIC &&
-				tr!=null && (isRuleTrans || tr.target == el.right) )
+				tr!=null && (isRuleTrans && ((RuleTransition)tr).followState == el.right || tr.target == el.right) )
 			{
 				// we can avoid epsilon edge to next el
 				if ( isRuleTrans ) ((RuleTransition)tr).followState = els.get(i+1).left;

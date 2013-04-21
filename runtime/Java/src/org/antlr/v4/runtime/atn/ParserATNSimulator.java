@@ -991,6 +991,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	 *
 	 * @param configs the configuration set to update
 	 * @param contextCache the {@link PredictionContext} cache
+	 *
 	 * @return {@code configs} if all configurations in {@code configs} are in a
 	 * rule stop state, otherwise return a new configuration set containing only
 	 * the configurations from {@code configs} which are in a rule stop state
@@ -1303,7 +1304,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	{
 		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
 
-		if ( !optimize_closure_busy && !closureBusy.add(config) ) {
+		if ( !optimize_closure_busy && depth != 0 && !closureBusy.add(config) ) {
 			return; // avoid infinite recursion
 		}
 
@@ -1370,7 +1371,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					}
 				}
 
-				if (optimize_closure_busy) {
+				if (optimize_closure_busy && depth != 0) {
 					boolean checkClosure = false;
 					switch (c.getState().getStateType()) {
 					case ATNState.STAR_LOOP_ENTRY:

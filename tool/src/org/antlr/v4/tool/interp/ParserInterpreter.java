@@ -46,15 +46,18 @@ import org.antlr.v4.tool.Grammar;
 
 public class ParserInterpreter {
 	public static class DummyParser extends Parser<Token> {
+		public final ATN atn;
+
 		public Grammar g;
-		public DummyParser(Grammar g, TokenStream<Token> input) {
+		public DummyParser(Grammar g, ATN atn, TokenStream<Token> input) {
 			super(input);
 			this.g = g;
+			this.atn = atn;
 		}
 
 		@Override
 		public String getGrammarFileName() {
-			return null;
+			throw new UnsupportedOperationException("not implemented");
 		}
 
 		@Override
@@ -69,7 +72,7 @@ public class ParserInterpreter {
 
 		@Override
 		public ATN getATN() {
-			return null;
+			return atn;
 		}
 	}
 
@@ -84,7 +87,7 @@ public class ParserInterpreter {
 	public ParserInterpreter(@NotNull Grammar g, @NotNull TokenStream<Token> input) {
 		Tool antlr = new Tool();
 		antlr.process(g,false);
-		atnSimulator = new ParserATNSimulator<Token>(new DummyParser(g, input), g.atn);
+		atnSimulator = new ParserATNSimulator<Token>(new DummyParser(g, g.atn, input), g.atn);
 	}
 
 	public int predictATN(@NotNull DFA dfa, @NotNull TokenStream<Token> input,

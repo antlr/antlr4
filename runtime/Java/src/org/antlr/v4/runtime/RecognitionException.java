@@ -29,6 +29,7 @@
  */
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Nullable;
 
@@ -41,34 +42,35 @@ import org.antlr.v4.runtime.misc.Nullable;
 public class RecognitionException extends RuntimeException {
 	private static final long serialVersionUID = -3861826954750022374L;
 
-	/** Who threw the exception? */
-	private Recognizer<?, ?> recognizer;
+	/** The {@link Recognizer} where this exception originated. */
+	@Nullable
+	private final Recognizer<?, ?> recognizer;
 
-	// TODO: make a dummy recognizer for the interpreter to use?
-	// Next two (ctx,input) should be what is in recognizer, but
-	// won't work when interpreting
+	@Nullable
+	private final RuleContext<?> ctx;
 
-	private RuleContext<?> ctx;
+	@Nullable
+	private final IntStream input;
 
-	private IntStream input;
-
-	/** The current Token when an error occurred.  Since not all streams
-	 *  can retrieve the ith Token, we have to track the Token object.
-	 *  For parsers.  Even when it's a tree parser, token might be set.
+	/**
+	 * The current {@link Token} when an error occurred. Since not all streams
+	 * support accessing symbols by index, we have to track the {@link Token}
+	 * instance itself.
 	 */
 	private Token offendingToken;
 
-	private int offendingState;
+	private int offendingState = -1;
 
 	public RecognitionException(@Nullable Lexer lexer,
 								CharStream input)
 	{
 		this.recognizer = lexer;
 		this.input = input;
+		this.ctx = null;
 	}
 
 	public <Symbol extends Token> RecognitionException(@Nullable Recognizer<Symbol, ?> recognizer,
-													   IntStream input,
+													   @Nullable IntStream input,
 													   @Nullable ParserRuleContext<Symbol> ctx)
 	{
 		this.recognizer = recognizer;
@@ -77,8 +79,10 @@ public class RecognitionException extends RuntimeException {
 		if ( recognizer!=null ) this.offendingState = recognizer.getState();
 	}
 
-	public <Symbol extends Token> RecognitionException(String message, @Nullable Recognizer<Symbol, ?> recognizer, IntStream input,
-								@Nullable ParserRuleContext<Symbol> ctx)
+	public <Symbol extends Token> RecognitionException(String message,
+													   @Nullable Recognizer<Symbol, ?> recognizer,
+													   @Nullable IntStream input,
+													   @Nullable ParserRuleContext<Symbol> ctx)
 	{
 		super(message);
 		this.recognizer = recognizer;
@@ -87,11 +91,14 @@ public class RecognitionException extends RuntimeException {
 		if ( recognizer!=null ) this.offendingState = recognizer.getState();
 	}
 
-	/** Where was the parser in the ATN when the error occurred?
-	 *  For No viable alternative exceptions, this is the decision state number.
-	 *  For others, it is the state whose emanating edge we couldn't match.
-	 *  This will help us tie into the grammar and syntax diagrams in
-	 *  ANTLRWorks v2.
+	/**
+	 * Get the ATN state number the parser was in at the time the error
+	 * occurred. For {@link NoViableAltException} and
+	 * {@link LexerNoViableAltException} exceptions, this is the
+	 * {@link DecisionState} number. For others, it is the state whose outgoing
+	 * edge we couldn't match.
+	 * <p/>
+	 * If the state number is not known, this method returns -1.
 	 */
 	public int getOffendingState() {
 		return offendingState;
@@ -101,32 +108,73 @@ public class RecognitionException extends RuntimeException {
 		this.offendingState = offendingState;
 	}
 
+	/**
+	 * Gets the set of input symbols which could potentially follow the
+	 * previously matched symbol at the time this exception was thrown.
+	 * <p/>
+	 * If the set of expected tokens is not known and could not be computed,
+	 * this method returns {@code null}.
+	 *
+	 * @return The set of token types that could potentially follow the current
+	 * state in the ATN, or {@code null} if the information is not available.
+	 */
+	@Nullable
 	public IntervalSet getExpectedTokens() {
-        // TODO: do we really need this type check?
-		if ( recognizer!=null && recognizer instanceof Parser) {
-			return ((Parser<?>) recognizer).getExpectedTokens();
+		if (recognizer != null) {
+			return recognizer.getATN().getExpectedTokens(offendingState, ctx);
 		}
+
 		return null;
 	}
 
+	/**
+	 * Gets the {@link RuleContext} at the time this exception was thrown.
+	 * <p/>
+	 * If the context is not available, this method returns {@code null}.
+	 *
+	 * @return The {@link RuleContext} at the time this exception was thrown.
+	 * If the context is not available, this method returns {@code null}.
+	 */
+	@Nullable
 	public RuleContext<?> getCtx() {
 		return ctx;
 	}
 
+	/**
+	 * Gets the input stream which is the symbol source for the recognizer where
+	 * this exception was thrown.
+	 * <p/>
+	 * If the input stream is not available, this method returns {@code null}.
+	 *
+	 * @return The input stream which is the symbol source for the recognizer
+	 * where this exception was thrown, or {@code null} if the stream is not
+	 * available.
+	 */
+	@Nullable
 	public IntStream getInputStream() {
 		return input;
 	}
 
+	@Nullable
 	public Token getOffendingToken() {
 		return offendingToken;
 	}
 
-	protected final <Symbol extends Token> void setOffendingToken(Recognizer<Symbol, ?> recognizer, Symbol offendingToken) {
+	protected final <Symbol extends Token> void setOffendingToken(Recognizer<Symbol, ?> recognizer, @Nullable Symbol offendingToken) {
 		if (recognizer == this.recognizer) {
 			this.offendingToken = offendingToken;
 		}
 	}
 
+	/**
+	 * Gets the {@link Recognizer} where this exception occurred.
+	 * <p/>
+	 * If the recognizer is not available, this method returns {@code null}.
+	 *
+	 * @return The recognizer where this exception occurred, or {@code null} if
+	 * the recognizer is not available.
+	 */
+	@Nullable
 	public Recognizer<?, ?> getRecognizer() {
 		return recognizer;
 	}

@@ -30,6 +30,9 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.Args;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -48,9 +51,6 @@ import java.util.concurrent.ConcurrentMap;
 public class ATN {
 	public static final int INVALID_ALT_NUMBER = 0;
 
-	public static final int PARSER = 1;
-	public static final int LEXER = 2;
-
 	@NotNull
 	public final List<ATNState> states = new ArrayList<ATNState>();
 
@@ -61,26 +61,47 @@ public class ATN {
 	@NotNull
 	public final List<DecisionState> decisionToState = new ArrayList<DecisionState>();
 
+	/**
+	 * Maps from rule index to starting state number.
+	 */
 	public RuleStartState[] ruleToStartState;
+
+	/**
+	 * Maps from rule index to stop state number.
+	 */
 	public RuleStopState[] ruleToStopState;
 
 	@NotNull
 	public final Map<String, TokensStartState> modeNameToStartState =
 		new LinkedHashMap<String, TokensStartState>();
 
-	// runtime for parsers, lexers
-	public int grammarType; // ATN.LEXER, ...
-	public int maxTokenType;
+	/**
+	 * The type of the ATN.
+	 */
+	public final ATNType grammarType;
 
-	// runtime for lexer only
+	/**
+	 * The maximum value for any symbol recognized by a transition in the ATN.
+	 */
+	public final int maxTokenType;
+
+	/**
+	 * For lexer ATNs, this maps the rule index to the resulting token type.
+	 * <p/>
+	 * This is {@code null} for parser ATNs.
+	 */
 	public int[] ruleToTokenType;
+
+	/**
+	 * For lexer ATNs, this maps the rule index to the action which should be
+	 * executed following a match.
+	 * <p/>
+	 * This is {@code null} for parser ATNs.
+	 */
 	public int[] ruleToActionIndex;
 
 	@NotNull
 	public final List<TokensStartState> modeToStartState = new ArrayList<TokensStartState>();
-
-	/** used during construction from grammar AST */
-	int stateNumber = 0;
 
 	private final ConcurrentMap<PredictionContext, PredictionContext> contextCache =
 		new ConcurrentHashMap<PredictionContext, PredictionContext>();
@@ -93,7 +114,10 @@ public class ATN {
 	protected final ConcurrentMap<Integer, Integer> LL1Table = new ConcurrentHashMap<Integer, Integer>();
 
 	/** Used for runtime deserialization of ATNs from strings */
-	public ATN() { }
+	public ATN(@NotNull ATNType grammarType, int maxTokenType) {
+		this.grammarType = grammarType;
+		this.maxTokenType = maxTokenType;
+	}
 
 	public final void clearDFA() {
 		decisionToDFA = new DFA[decisionToState.size()];
@@ -123,11 +147,12 @@ public class ATN {
 		return decisionToDFA;
 	}
 
-	/** Compute the set of valid tokens that can occur starting in s.
-	 *  If ctx is {@link PredictionContext#EMPTY_LOCAL}, the set of tokens will not include what can follow
-	 *  the rule surrounding s. In other words, the set will be
-	 *  restricted to tokens reachable staying within s's rule.
+	/** Compute the set of valid tokens that can occur starting in state {@code s}.
+	 *  If {@code ctx} is {@link PredictionContext#EMPTY_LOCAL}, the set of tokens will not include what can follow
+	 *  the rule surrounding {@code s}. In other words, the set will be
+	 *  restricted to tokens reachable staying within {@code s}'s rule.
 	 */
+	@NotNull
 	public IntervalSet nextTokens(ATNState s, @NotNull PredictionContext ctx) {
 		Args.notNull("ctx", ctx);
 		LL1Analyzer anal = new LL1Analyzer(this);
@@ -135,10 +160,13 @@ public class ATN {
 		return next;
 	}
 
-    /** Compute the set of valid tokens that can occur starting in s and staying in same rule.
-     *  EPSILON is in set if we reach end of rule.
+    /**
+	 * Compute the set of valid tokens that can occur starting in {@code s} and
+	 * staying in same rule. {@link Token#EPSILON} is in set if we reach end of
+	 * rule.
      */
-    public IntervalSet nextTokens(ATNState s) {
+	@NotNull
+    public IntervalSet nextTokens(@NotNull ATNState s) {
         if ( s.nextTokenWithinRule != null ) return s.nextTokenWithinRule;
         s.nextTokenWithinRule = nextTokens(s, PredictionContext.EMPTY_LOCAL);
         s.nextTokenWithinRule.setReadonly(true);
@@ -146,10 +174,12 @@ public class ATN {
     }
 
 	public void addState(@Nullable ATNState state) {
-		if ( state==null ) { states.add(null); stateNumber++; return; }
-		state.atn = this;
+		if (state != null) {
+			state.atn = this;
+			state.stateNumber = states.size();
+		}
+
 		states.add(state);
-		state.stateNumber = stateNumber++;
 	}
 
 	public void removeState(@NotNull ATNState state) {
@@ -181,5 +211,56 @@ public class ATN {
 
 	public int getNumberOfDecisions() {
 		return decisionToState.size();
+	}
+
+	/**
+	 * Computes the set of input symbols which could follow ATN state number
+	 * {@code stateNumber} in the specified full {@code context}. This method
+	 * considers the complete parser context, but does not evaluate semantic
+	 * predicates (i.e. all predicates encountered during the calculation are
+	 * assumed true). If a path in the ATN exists from the starting state to the
+	 * {@link RuleStopState} of the outermost context without matching any
+	 * symbols, {@link Token#EOF} is added to the returned set.
+	 * <p/>
+	 * If {@code context} is {@code null}, it is treated as
+	 * {@link ParserRuleContext#EMPTY}.
+	 *
+	 * @param stateNumber the ATN state number
+	 * @param context the full parse context
+	 * @return The set of potentially valid input symbols which could follow the
+	 * specified state in the specified context.
+	 * @throws IllegalArgumentException if the ATN does not contain a state with
+	 * number {@code stateNumber}
+	 */
+	@NotNull
+	public IntervalSet getExpectedTokens(int stateNumber, @Nullable RuleContext<?> context) {
+		if (stateNumber < 0 || stateNumber >= states.size()) {
+			throw new IllegalArgumentException("Invalid state number.");
+		}
+
+		RuleContext<?> ctx = context;
+		ATNState s = states.get(stateNumber);
+		IntervalSet following = nextTokens(s);
+		if (!following.contains(Token.EPSILON)) {
+			return following;
+		}
+
+		IntervalSet expected = new IntervalSet();
+		expected.addAll(following);
+		expected.remove(Token.EPSILON);
+		while (ctx != null && ctx.invokingState >= 0 && following.contains(Token.EPSILON)) {
+			ATNState invokingState = states.get(ctx.invokingState);
+			RuleTransition rt = (RuleTransition)invokingState.transition(0);
+			following = nextTokens(rt.followState);
+			expected.addAll(following);
+			expected.remove(Token.EPSILON);
+			ctx = ctx.parent;
+		}
+
+		if (following.contains(Token.EPSILON)) {
+			expected.add(Token.EOF);
+		}
+
+		return expected;
 	}
 }

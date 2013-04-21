@@ -643,9 +643,9 @@ public class TestCompositeGrammars extends BaseTest {
 			"s : a ;\n" +
 			"B : 'b' ;" + // defines B from inherited token space
 			"WS : (' '|'\\n') -> skip ;\n" ;
-		boolean ok = antlr("M.g4", "M.g4", master, false);
-		boolean expecting = true; // should be ok
-		assertEquals(expecting, ok);
+		ErrorQueue equeue = antlr("M.g4", "M.g4", master, false);
+		int expecting = 0; // should be ok
+		assertEquals(expecting, equeue.errors.size());
 	}
 
 	@Test public void testImportedRuleWithAction() throws Exception {
@@ -666,4 +666,21 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("", found);
 	}
 
+	@Test public void testImportedGrammarWithEmptyOptions() throws Exception {
+		String slave =
+			"parser grammar S;\n" +
+			"options {}\n" +
+			"a : B ;\n";
+		mkdir(tmpdir);
+		writeFile(tmpdir, "S.g4", slave);
+		String master =
+			"grammar M;\n" +
+			"import S;\n" +
+			"s : a ;\n" +
+			"B : 'b' ;" +
+			"WS : (' '|'\\n') -> skip ;\n" ;
+		String found = execParser("M.g4", master, "MParser", "MLexer",
+								  "s", "b", debug);
+		assertEquals("", found);
+	}
 }

@@ -1,7 +1,7 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
+ *  Copyright (c) 2013 Terence Parr
+ *  Copyright (c) 2013 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -27,48 +27,39 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.antlr.v4.runtime.misc;
 
-package org.antlr.v4.tool.ast;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
-import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.Tree;
-import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.tool.Grammar;
+import java.io.File;
 
-public class RuleAST extends GrammarASTWithOptions {
-	public RuleAST(RuleAST node) {
-		super(node);
-	}
+/**
+ *
+ * @author Sam Harwell
+ */
+public class JFileChooserConfirmOverwrite extends JFileChooser {
 
-	public RuleAST(Token t) { super(t); }
-    public RuleAST(int type) { super(type); }
-
-	public boolean isLexerRule() {
-		String name = getRuleName();
-		return name!=null && Grammar.isTokenName(name);
-	}
-
-	public String getRuleName() {
-		GrammarAST nameNode = (GrammarAST)getChild(0);
-		if ( nameNode!=null ) return nameNode.getText();
-		return null;
+	public JFileChooserConfirmOverwrite() {
+		setMultiSelectionEnabled(false);
 	}
 
 	@Override
-	public RuleAST dupNode() { return new RuleAST(this); }
+	public void approveSelection() {
+		File selectedFile = getSelectedFile();
 
-	public ActionAST getLexerAction() {
-		Tree blk = getFirstChildWithType(ANTLRParser.BLOCK);
-		if ( blk.getChildCount()==1 ) {
-			Tree onlyAlt = blk.getChild(0);
-			Tree lastChild = onlyAlt.getChild(onlyAlt.getChildCount()-1);
-			if ( lastChild.getType()==ANTLRParser.ACTION ) {
-				return (ActionAST)lastChild;
+		if (selectedFile.exists()) {
+			int answer = JOptionPane.showConfirmDialog(this,
+													   "Overwrite existing file?",
+													   "Overwrite?",
+													   JOptionPane.YES_NO_OPTION);
+			if (answer != JOptionPane.YES_OPTION) {
+				// do not call super.approveSelection
+				return;
 			}
 		}
-		return null;
+
+		super.approveSelection();
 	}
 
-	@Override
-	public Object visit(GrammarASTVisitor v) { return v.visit(this); }
 }

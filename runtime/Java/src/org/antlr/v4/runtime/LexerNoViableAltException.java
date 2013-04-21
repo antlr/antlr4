@@ -36,6 +36,8 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Utils;
 
+import java.util.Locale;
+
 public class LexerNoViableAltException extends RecognitionException {
 	private static final long serialVersionUID = -730999203913001726L;
 
@@ -77,6 +79,6 @@ public class LexerNoViableAltException extends RecognitionException {
 			symbol = Utils.escapeWhitespace(symbol, false);
 		}
 
-		return String.format("%s('%s')", LexerNoViableAltException.class.getSimpleName(), symbol);
+		return String.format(Locale.getDefault(), "%s('%s')", LexerNoViableAltException.class.getSimpleName(), symbol);
 	}
 }

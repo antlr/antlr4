@@ -84,6 +84,31 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#224: "Parentheses without
+	 * quantifier in lexer rules have unclear effect".
+	 * https://github.com/antlr/antlr4/issues/224
+	 */
+	@Test public void testParentheses() {
+		String grammar =
+			"lexer grammar Demo;\n" +
+			"\n" +
+			"START_BLOCK: '-.-.-';\n" +
+			"\n" +
+			"ID : (LETTER SEPARATOR) (LETTER SEPARATOR)+;\n" +
+			"fragment LETTER: L_A|L_K;\n" +
+			"fragment L_A: '.-';\n" +
+			"fragment L_K: '-.-';\n" +
+			"\n" +
+			"SEPARATOR: '!';\n";
+		String found = execLexer("Demo.g4", grammar, "Demo", "-.-.-!");
+		String expecting =
+			"[@0,0:4='-.-.-',<1>,1:0]\n" +
+			"[@1,5:5='!',<3>,1:5]\n" +
+			"[@2,6:5='<EOF>',<-1>,1:6]\n";
+		assertEquals(expecting, found);
+	}
+
 	@Test
 	public void testNonGreedyTermination() throws Exception {
 		String grammar =
@@ -691,6 +716,28 @@ public class TestLexerExec extends BaseTest {
 			"[@8,44:51='notLabel',<" + IDENTIFIER + ">,6:0]\n" +
 			"[@9,53:52='<EOF>',<-1>,7:0]\n";
 
+		assertEquals(expecting, found);
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#76 "Serialized ATN strings
+	 * should be split when longer than 2^16 bytes (class file limitation)"
+	 * https://github.com/antlr/antlr4/issues/76
+	 */
+	@Test
+	public void testLargeLexer() throws Exception {
+		StringBuilder grammar = new StringBuilder();
+		grammar.append("lexer grammar L;\n");
+		grammar.append("WS : [ \\t\\r\\n]+ -> skip;\n");
+		for (int i = 0; i < 4000; i++) {
+			grammar.append("KW").append(i).append(" : '").append("KW").append(i).append("';\n");
+		}
+
+		String input = "KW400";
+		String found = execLexer("L.g4", grammar.toString(), "L", input);
+		String expecting =
+			"[@0,0:4='KW400',<402>,1:0]\n" +
+			"[@1,5:4='<EOF>',<-1>,1:5]\n";
 		assertEquals(expecting, found);
 	}
 

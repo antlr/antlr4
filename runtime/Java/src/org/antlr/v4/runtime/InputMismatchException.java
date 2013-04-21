@@ -29,13 +29,15 @@
  */
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.NotNull;
+
 /** This signifies any kind of mismatched input exceptions such as
  *  when the current input does not match the expected token.
  */
 public class InputMismatchException extends RecognitionException {
 	private static final long serialVersionUID = 1532568338707443067L;
 
-	public <T extends Token> InputMismatchException(Parser<T> recognizer) {
+	public <T extends Token> InputMismatchException(@NotNull Parser<T> recognizer) {
 		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
 		this.setOffendingToken(recognizer, recognizer.getCurrentToken());
 	}

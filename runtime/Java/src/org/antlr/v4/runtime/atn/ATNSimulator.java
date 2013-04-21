@@ -45,11 +45,24 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Deque;
 import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 public abstract class ATNSimulator {
 	public static final int SERIALIZED_VERSION;
 	static {
-		SERIALIZED_VERSION = 5;
+		/* This value should never change. Updates following this version are
+		 * reflected as change in the unique ID SERIALIZED_UUID.
+		 */
+		SERIALIZED_VERSION = 3;
+	}
+
+	public static final UUID SERIALIZED_UUID;
+	static {
+		/* WARNING: DO NOT MERGE THIS LINE. If UUIDs differ during a merge,
+		 * resolve the conflict by generating a new ID!
+		 */
+		SERIALIZED_UUID = UUID.fromString("5DC25ABE-510D-4395-8F9A-62E5B79FDC49");
 	}
 
 	public static final char RULE_VARIANT_DELIMITER = '$';
@@ -84,17 +97,24 @@ public abstract class ATNSimulator {
 			data[i] = (char)(data[i] - 2);
 		}
 
-		ATN atn = new ATN();
 		List<IntervalSet> sets = new ArrayList<IntervalSet>();
 		int p = 0;
 		int version = toInt(data[p++]);
 		if (version != SERIALIZED_VERSION) {
-			String reason = String.format("Could not deserialize ATN with version %d (expected %d).", version, SERIALIZED_VERSION);
+			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with version %d (expected %d).", version, SERIALIZED_VERSION);
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
 		}
 
-		atn.grammarType = toInt(data[p++]);
-		atn.maxTokenType = toInt(data[p++]);
+		UUID uuid = toUUID(data, p);
+		p += 8;
+		if (!uuid.equals(SERIALIZED_UUID)) {
+			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with UUID %s (expected %s).", uuid, SERIALIZED_UUID);
+			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
+		}
+
+		ATNType grammarType = ATNType.values()[toInt(data[p++])];
+		int maxTokenType = toInt(data[p++]);
+		ATN atn = new ATN(grammarType, maxTokenType);
 
 		//
 		// STATES
@@ -154,7 +174,7 @@ public abstract class ATNSimulator {
 		// RULES
 		//
 		int nrules = toInt(data[p++]);
-		if ( atn.grammarType == ATN.LEXER ) {
+		if ( atn.grammarType == ATNType.LEXER ) {
 			atn.ruleToTokenType = new int[nrules];
 			atn.ruleToActionIndex = new int[nrules];
 		}
@@ -164,7 +184,7 @@ public abstract class ATNSimulator {
 			RuleStartState startState = (RuleStartState)atn.states.get(s);
 			startState.leftFactored = toInt(data[p++]) != 0;
 			atn.ruleToStartState[i] = startState;
-			if ( atn.grammarType == ATN.LEXER ) {
+			if ( atn.grammarType == ATNType.LEXER ) {
 				int tokenType = toInt(data[p++]);
 				atn.ruleToTokenType[i] = tokenType;
 				int actionIndex = toInt(data[p++]);
@@ -308,7 +328,7 @@ public abstract class ATNSimulator {
 				int optimizationCount = 0;
 				optimizationCount += inlineSetRules(atn);
 				optimizationCount += combineChainedEpsilons(atn);
-				boolean preserveOrder = atn.grammarType == ATN.LEXER;
+				boolean preserveOrder = atn.grammarType == ATNType.LEXER;
 				optimizationCount += optimizeSets(atn, preserveOrder);
 				if (optimizationCount == 0) {
 					break;
@@ -759,6 +779,21 @@ public abstract class ATNSimulator {
 		return c==65535 ? -1 : c;
 	}
 
+	public static int toInt32(char[] data, int offset) {
+		return (int)data[offset] | ((int)data[offset + 1] << 16);
+	}
+
+	public static long toLong(char[] data, int offset) {
+		long lowOrder = toInt32(data, offset) & 0x00000000FFFFFFFFL;
+		return lowOrder | ((long)toInt32(data, offset + 2) << 32);
+	}
+
+	public static UUID toUUID(char[] data, int offset) {
+		long leastSigBits = toLong(data, offset);
+		long mostSigBits = toLong(data, offset + 4);
+		return new UUID(mostSigBits, leastSigBits);
+	}
+
 	@NotNull
 	public static Transition edgeFactory(@NotNull ATN atn,
 										 int type, int src, int trg,
@@ -806,7 +841,7 @@ public abstract class ATNSimulator {
 			case ATNState.PLUS_LOOP_BACK : s = new PlusLoopbackState(); break;
 			case ATNState.LOOP_END : s = new LoopEndState(); break;
             default :
-				String message = String.format("The specified state type %d is not valid.", type);
+				String message = String.format(Locale.getDefault(), "The specified state type %d is not valid.", type);
 				throw new IllegalArgumentException(message);
 		}
 

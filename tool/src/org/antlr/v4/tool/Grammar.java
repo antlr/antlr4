@@ -778,7 +778,7 @@ public class Grammar implements AttributeResolver {
 	 */
 	public static void setNodeOptions(GrammarAST node, GrammarAST options) {
 		GrammarASTWithOptions t = (GrammarASTWithOptions)node;
-		if ( t.getChildCount()==0 ) return;
+		if ( t.getChildCount()==0 || options.getChildCount()==0 ) return;
 		for (Object o : options.getChildren()) {
 			GrammarAST c = (GrammarAST)o;
 			if ( c.getType()==ANTLRParser.ASSIGN ) {

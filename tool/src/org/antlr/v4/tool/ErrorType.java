@@ -69,7 +69,7 @@ public enum ErrorType {
 
 	// Grammar errors
 	SYNTAX_ERROR(50, "syntax error: <arg>", ErrorSeverity.ERROR),
-	RULE_REDEFINITION(51, "rule '<arg>' redefinition (ignoring); previous at line <arg2>", ErrorSeverity.ERROR),
+	RULE_REDEFINITION(51, "rule '<arg>' redefinition; previous at line <arg2>", ErrorSeverity.ERROR),
 	LEXER_RULES_NOT_ALLOWED(52, "lexer rule '<arg>' not allowed in parser", ErrorSeverity.ERROR),
 	PARSER_RULES_NOT_ALLOWED(53, "parser rule '<arg>' not allowed in lexer", ErrorSeverity.ERROR),
     REPEATED_PREQUEL(54, "repeated grammar prequel spec (option, token, or import); please merge", ErrorSeverity.ERROR),
@@ -142,7 +142,7 @@ public enum ErrorType {
 	 * Whitespace : [ \t]*;  // error 146
 	 * </pre>
 	 */
-	EPSILON_TOKEN(146, "non-fragment lexer rule '<arg>' can match the empty string", ErrorSeverity.ERROR),
+	EPSILON_TOKEN(146, "non-fragment lexer rule '<arg>' can match the empty string", ErrorSeverity.WARNING),
 	/**
 	 * Left-recursive rules must contain at least one alternative which is not
 	 * left recursive.
@@ -171,6 +171,42 @@ public enum ErrorType {
 	 * </pre>
 	 */
 	EPSILON_LR_FOLLOW(148, "left recursive rule '<arg>' contains a left recursive alternative which can be followed by the empty string", ErrorSeverity.ERROR),
+	/**
+	 * Each lexer command requires an explicit implementation in the target
+	 * templates. This error indicates that the command was incorrectly written
+	 * or is not supported by the current target.
+	 * <p/>
+	 * The following rule produces this error.
+	 * 
+	 * <pre>
+	 * X : 'foo' -> type(Foo);  // ok
+	 * Y : 'foo' -> token(Foo); // error 149 (token is not a supported lexer command)
+	 * </pre>
+	 */
+	INVALID_LEXER_COMMAND(149, "lexer command '<arg>' does not exist or is not supported by the current target", ErrorSeverity.ERROR),
+	/**
+	 * Some lexer commands require an argument.
+	 * <p/>
+	 * The following rule produces this error.
+	 * 
+	 * <pre>
+	 * X : 'foo' -> type(Foo); // ok
+	 * Y : 'foo' -> type;      // error 150 (the type command requires an argument)
+	 * </pre>
+	 */
+	MISSING_LEXER_COMMAND_ARGUMENT(150, "missing argument for lexer command '<arg>'", ErrorSeverity.ERROR),
+	/**
+	 * A lexer command which does not take parameters was invoked with an
+	 * argument.
+	 * <p/>
+	 * The following rule produces this error.
+	 *
+	 * <pre>
+	 * X : 'foo' -> popMode;    // ok
+	 * Y : 'foo' -> popMode(A); // error 151 (the popMode command does not take an argument)
+	 * </pre>
+	 */
+	UNWANTED_LEXER_COMMAND_ARGUMENT(151, "lexer command '<arg>' does not take any arguments", ErrorSeverity.ERROR),
 
 	// Backward incompatibility errors
 	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR 4", ErrorSeverity.ERROR),

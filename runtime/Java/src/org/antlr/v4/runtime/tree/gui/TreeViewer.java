@@ -35,6 +35,7 @@ import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.antlr.v4.runtime.misc.GraphicsSupport;
+import org.antlr.v4.runtime.misc.JFileChooserConfirmOverwrite;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Utils;
@@ -42,18 +43,22 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.Tree;
 import org.antlr.v4.runtime.tree.Trees;
 
+import javax.imageio.ImageIO;
 import javax.print.PrintException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
+import javax.swing.JFileChooser;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileFilter;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -65,10 +70,13 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -294,9 +302,12 @@ public class TreeViewer extends JComponent {
 		// Make the scrollpane (containing the viewer) the center component
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 
-	  	// Add button to bottom
+		JPanel wrapper = new JPanel(new FlowLayout());
+
+		// Add button to bottom
 		JPanel bottomPanel = new JPanel(new BorderLayout(0,0));
 		contentPane.add(bottomPanel, BorderLayout.SOUTH);
+
 		JButton ok = new JButton("OK");
 		ok.addActionListener(
 			new ActionListener() {
@@ -307,8 +318,20 @@ public class TreeViewer extends JComponent {
 				}
 			}
 		);
-		JPanel wrapper = new JPanel(new FlowLayout());
 		wrapper.add(ok);
+
+		// Add an export-to-png button right of the "OK" button
+		JButton png = new JButton("png");
+		png.addActionListener(
+			new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					generatePNGFile(viewer, dialog);
+				}
+			}
+		);
+		wrapper.add(png);
+
 		bottomPanel.add(wrapper, BorderLayout.SOUTH);
 
 		// Add scale slider
@@ -332,6 +355,85 @@ public class TreeViewer extends JComponent {
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
 		return dialog;
+	}
+
+	private static void generatePNGFile(TreeViewer viewer, JDialog dialog) {
+		BufferedImage bi = new BufferedImage(viewer.getSize().width,
+											 viewer.getSize().height,
+											 BufferedImage.TYPE_INT_ARGB);
+		Graphics g = bi.createGraphics();
+		viewer.paint(g);
+		g.dispose();
+
+		try {
+			File suggestedFile = generateNonExistingPngFile();
+			JFileChooser fileChooser = new JFileChooserConfirmOverwrite();
+			fileChooser.setCurrentDirectory(suggestedFile.getParentFile());
+			fileChooser.setSelectedFile(suggestedFile);
+			FileFilter pngFilter = new FileFilter() {
+
+				@Override
+				public boolean accept(File pathname) {
+					if (pathname.isFile()) {
+						return pathname.getName().toLowerCase().endsWith(".png");
+					}
+
+					return true;
+				}
+
+				@Override
+				public String getDescription() {
+					return "PNG Files (*.png)";
+				}
+			};
+
+			fileChooser.addChoosableFileFilter(pngFilter);
+			fileChooser.setFileFilter(pngFilter);
+
+			int returnValue = fileChooser.showSaveDialog(dialog);
+			if (returnValue == JFileChooser.APPROVE_OPTION) {
+				File pngFile = fileChooser.getSelectedFile();
+				ImageIO.write(bi, "png", pngFile);
+
+				try {
+					// Try to open the parent folder using the OS' native file manager.
+					Desktop.getDesktop().open(pngFile.getParentFile());
+				}
+				catch (Exception ex) {
+					// We could not launch the file manager: just show a popup that we
+					// succeeded in saving the PNG file.
+					JOptionPane.showMessageDialog(dialog, "Saved PNG to: " +
+												  pngFile.getAbsolutePath());
+					ex.printStackTrace();
+				}
+			}
+		}
+		catch (Exception ex) {
+			JOptionPane.showMessageDialog(dialog,
+										  "Could not export to PNG: " + ex.getMessage(),
+										  "Error",
+										  JOptionPane.ERROR_MESSAGE);
+			ex.printStackTrace();
+		}
+	}
+
+	private static File generateNonExistingPngFile() {
+
+		final String parent = ".";
+		final String name = "antlr4_parse_tree";
+		final String extension = ".png";
+
+		File pngFile = new File(parent, name + extension);
+
+		int counter = 1;
+
+		// Keep looping until we create a File that does not yet exist.
+		while (pngFile.exists()) {
+			pngFile = new File(parent, name + "_"+ counter + extension);
+			counter++;
+		}
+
+		return pngFile;
 	}
 
 	private Dimension getScaledTreeSize() {

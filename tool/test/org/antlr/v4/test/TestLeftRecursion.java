@@ -64,6 +64,36 @@ public class TestLeftRecursion extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	/**
+	 * This is a regression test for "Support direct calls to left-recursive
+	 * rules".
+	 * https://github.com/antlr/antlr4/issues/161
+	 */
+	@Test public void testDirectCallToLeftRecursiveRule() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"@parser::members{public AContext a() { return a(0); }}\n" +
+			"a @after {System.out.println($ctx.toStringTree(this));} : a ID\n" +
+			"  | ID" +
+			"  ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer",
+								  "a", "x", debug);
+		String expecting = "(a x)\n";
+		assertEquals(expecting, found);
+
+		found = execParser("T.g4", grammar, "TParser", "TLexer",
+						   "a", "x y", debug);
+		expecting = "(a (a x) y)\n";
+		assertEquals(expecting, found);
+
+		found = execParser("T.g4", grammar, "TParser", "TLexer",
+						   "a", "x y z", debug);
+		expecting = "(a (a (a x) y) z)\n";
+		assertEquals(expecting, found);
+	}
+
 	@Test public void testSemPred() throws Exception {
 		String grammar =
 			"grammar T;\n" +
