@@ -79,8 +79,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -109,6 +111,22 @@ public class TestPerformance extends BaseTest {
      * {@link #TOP_PACKAGE}.
      */
     private static final boolean RECURSIVE = true;
+
+	/**
+	 * {@code true} to call {@link Collections#shuffle} on the list of input
+	 * files before the first parse iteration.
+	 */
+	private static final boolean SHUFFLE_FILES_AT_START = false;
+	/**
+	 * {@code true} to call {@link Collections#shuffle} before each parse
+	 * iteration <em>after</em> the first.
+	 */
+	private static final boolean SHUFFLE_FILES_AFTER_ITERATIONS = false;
+	/**
+	 * The instance of {@link Random} passed when calling
+	 * {@link Collections#shuffle}.
+	 */
+	private static final Random RANDOM = new Random();
 
     /**
      * {@code true} to use the Java grammar with expressions in the v4
@@ -273,7 +291,10 @@ public class TestPerformance extends BaseTest {
         File directory = new File(jdkSourceRoot);
         assertTrue(directory.isDirectory());
 
-        Collection<CharStream> sources = loadSources(directory, new FileExtensionFilenameFilter(".java"), RECURSIVE);
+		List<CharStream> sources = loadSources(directory, new FileExtensionFilenameFilter(".java"), RECURSIVE);
+		if (SHUFFLE_FILES_AT_START) {
+			Collections.shuffle(sources, RANDOM);
+		}
 
 		System.out.print(getOptionsDescription(TOP_PACKAGE));
 
@@ -299,6 +320,10 @@ public class TestPerformance extends BaseTest {
 				Arrays.fill(sharedLexers, null);
 				Arrays.fill(sharedParsers, null);
             }
+
+			if (SHUFFLE_FILES_AFTER_ITERATIONS) {
+				Collections.shuffle(sources, RANDOM);
+			}
 
             parse2(factory, sources);
         }
@@ -380,12 +405,12 @@ public class TestPerformance extends BaseTest {
         parseSources(factory, sources);
     }
 
-    protected Collection<CharStream> loadSources(File directory, FilenameFilter filter, boolean recursive) {
+    protected List<CharStream> loadSources(File directory, FilenameFilter filter, boolean recursive) {
 		return loadSources(directory, filter, null, recursive);
 	}
 
-    protected Collection<CharStream> loadSources(File directory, FilenameFilter filter, String encoding, boolean recursive) {
-        Collection<CharStream> result = new ArrayList<CharStream>();
+    protected List<CharStream> loadSources(File directory, FilenameFilter filter, String encoding, boolean recursive) {
+        List<CharStream> result = new ArrayList<CharStream>();
         loadSources(directory, filter, encoding, recursive, result);
         return result;
     }
