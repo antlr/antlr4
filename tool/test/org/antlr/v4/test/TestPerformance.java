@@ -111,6 +111,10 @@ public class TestPerformance extends BaseTest {
      * {@link #TOP_PACKAGE}.
      */
     private static final boolean RECURSIVE = true;
+	/**
+	 * The maximum number of files to parse in a single iteration.
+	 */
+	private static final int MAX_FILES_PER_PARSE_ITERATION = Integer.MAX_VALUE;
 
 	/**
 	 * {@code true} to call {@link Collections#shuffle} on the list of input
@@ -445,10 +449,16 @@ public class TestPerformance extends BaseTest {
         long startTime = System.currentTimeMillis();
         tokenCount.set(0);
         int inputSize = 0;
+		int inputCount = 0;
 
 		Collection<Future<Integer>> results = new ArrayList<Future<Integer>>();
 		ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS, new NumberedThreadFactory());
         for (final CharStream input : sources) {
+			inputCount++;
+			if (inputCount > MAX_FILES_PER_PARSE_ITERATION) {
+				break;
+			}
+
             input.seek(0);
             inputSize += input.size();
 			Future<Integer> futureChecksum = executorService.submit(new Callable<Integer>() {
