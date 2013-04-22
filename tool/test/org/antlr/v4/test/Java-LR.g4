@@ -570,6 +570,7 @@ annotationTypeBody
     
 annotationTypeElementDeclaration
     :   modifiers annotationTypeElementRest
+	|	';' // this is not allowed by the grammar, but apparently allowed by the actual compiler
     ;
     
 annotationTypeElementRest
