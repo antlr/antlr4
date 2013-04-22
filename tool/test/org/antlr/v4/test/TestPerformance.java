@@ -534,7 +534,7 @@ public class TestPerformance extends BaseTest {
 
 				for (int i = 0; i < modeToDFA.length; i++) {
 					DFA dfa = modeToDFA[i];
-					if (dfa == null || dfa.states == null) {
+					if (dfa == null) {
 						continue;
 					}
 
@@ -562,7 +562,7 @@ public class TestPerformance extends BaseTest {
 
                 for (int i = 0; i < decisionToDFA.length; i++) {
                     DFA dfa = decisionToDFA[i];
-                    if (dfa == null || dfa.states == null) {
+                    if (dfa == null) {
                         continue;
                     }
 
@@ -584,7 +584,7 @@ public class TestPerformance extends BaseTest {
 
             for (int i = 0; i < decisionToDFA.length; i++) {
                 DFA dfa = decisionToDFA[i];
-                if (dfa == null || dfa.states == null) {
+                if (dfa == null) {
                     continue;
                 }
 
