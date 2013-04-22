@@ -211,6 +211,12 @@ public class TestPerformance extends BaseTest {
 	 */
     private static final boolean SHOW_DFA_STATE_STATS = true;
 
+	/**
+	 * Specify the {@link PredictionMode} used by the
+	 * {@link ParserATNSimulator}. If {@link #TWO_STAGE_PARSING} is
+	 * {@code true}, this value only applies to the second stage, as the first
+	 * stage will always use {@link PredictionMode#SLL}.
+	 */
 	private static final PredictionMode PREDICTION_MODE = PredictionMode.LL;
 
 	private static final boolean TWO_STAGE_PARSING = true;
