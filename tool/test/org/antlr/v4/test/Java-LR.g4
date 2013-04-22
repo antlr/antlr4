@@ -815,14 +815,6 @@ nonWildcardTypeArguments
     :   '<' typeList '>'
     ;
     
-selector
-    :   '.' Identifier arguments?
-    |   '.' 'this'
-    |   '.' 'super' superSuffix
-    |   '.' 'new' innerCreator
-    |   '[' expression ']'
-    ;
-    
 superSuffix
     :   arguments
     |   '.' Identifier arguments?
