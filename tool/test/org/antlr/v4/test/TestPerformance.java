@@ -112,6 +112,10 @@ public class TestPerformance extends BaseTest {
      */
     private static final boolean RECURSIVE = true;
 	/**
+	 * The encoding to use when reading source files.
+	 */
+	private static final String ENCODING = "UTF-8";
+	/**
 	 * The maximum number of files to parse in a single iteration.
 	 */
 	private static final int MAX_FILES_PER_PARSE_ITERATION = Integer.MAX_VALUE;
@@ -416,22 +420,18 @@ public class TestPerformance extends BaseTest {
     }
 
     protected List<CharStream> loadSources(File directory, FilenameFilter filter, boolean recursive) {
-		return loadSources(directory, filter, null, recursive);
-	}
-
-    protected List<CharStream> loadSources(File directory, FilenameFilter filter, String encoding, boolean recursive) {
         List<CharStream> result = new ArrayList<CharStream>();
-        loadSources(directory, filter, encoding, recursive, result);
+        loadSources(directory, filter, recursive, result);
         return result;
     }
 
-    protected void loadSources(File directory, FilenameFilter filter, String encoding, boolean recursive, Collection<CharStream> result) {
+    protected void loadSources(File directory, FilenameFilter filter, boolean recursive, Collection<CharStream> result) {
         assert directory.isDirectory();
 
         File[] sources = directory.listFiles(filter);
         for (File file : sources) {
             try {
-                CharStream input = new ANTLRFileStream(file.getAbsolutePath(), encoding);
+                CharStream input = new ANTLRFileStream(file.getAbsolutePath(), ENCODING);
                 result.add(input);
             } catch (IOException ex) {
 
@@ -442,7 +442,7 @@ public class TestPerformance extends BaseTest {
             File[] children = directory.listFiles();
             for (File child : children) {
                 if (child.isDirectory()) {
-                    loadSources(child, filter, encoding, true, result);
+                    loadSources(child, filter, true, result);
                 }
             }
         }
