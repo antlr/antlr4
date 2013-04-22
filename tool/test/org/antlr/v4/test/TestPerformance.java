@@ -322,6 +322,7 @@ public class TestPerformance extends BaseTest {
 			Collections.shuffle(sources, RANDOM);
 		}
 
+		System.out.format("Located %d source files.%n", sources.size());
 		System.out.print(getOptionsDescription(TOP_PACKAGE));
 
         currentPass = 0;
@@ -471,14 +472,14 @@ public class TestPerformance extends BaseTest {
 		Collection<Future<Integer>> results = new ArrayList<Future<Integer>>();
 		ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS, new NumberedThreadFactory());
 		for (InputDescriptor inputDescriptor : sources) {
-			inputCount++;
-			if (inputCount > MAX_FILES_PER_PARSE_ITERATION) {
+			if (inputCount >= MAX_FILES_PER_PARSE_ITERATION) {
 				break;
 			}
 
 			final CharStream input = inputDescriptor.getInputStream();
             input.seek(0);
             inputSize += input.size();
+			inputCount++;
 			Future<Integer> futureChecksum = executorService.submit(new Callable<Integer>() {
 				@Override
 				public Integer call() {
@@ -517,7 +518,7 @@ public class TestPerformance extends BaseTest {
 		executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
         System.out.format("Total parse time for %d files (%d KB, %d tokens, checksum 0x%8X): %dms%n",
-                          sources.size(),
+                          inputCount,
                           inputSize / 1024,
                           tokenCount.get(),
 						  COMPUTE_CHECKSUM ? checksum.getValue() : 0,
