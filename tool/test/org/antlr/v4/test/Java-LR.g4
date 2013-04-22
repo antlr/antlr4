@@ -495,14 +495,8 @@ methodBody
     ;
 
 constructorBody
-    :   '{' explicitConstructorInvocation? blockStatement* '}'
+    :   block
     ;
-
-explicitConstructorInvocation
-    :   nonWildcardTypeArguments? ('this' | 'super') arguments ';'
-    |   primary '.' nonWildcardTypeArguments? 'super' arguments ';'
-    ;
-
 
 qualifiedName
     :   Identifier ('.' Identifier)*
@@ -814,7 +808,7 @@ explicitGenericInvocation
 nonWildcardTypeArguments
     :   '<' typeList '>'
     ;
-    
+
 typeArgumentsOrDiamond
 	:	'<' '>'
 	|	typeArguments

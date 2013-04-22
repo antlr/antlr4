@@ -492,14 +492,8 @@ methodBody
     ;
 
 constructorBody
-    :   '{' explicitConstructorInvocation? blockStatement* '}'
+    :   block
     ;
-
-explicitConstructorInvocation
-    :   nonWildcardTypeArguments? ('this' | 'super') arguments ';'
-    |   primary '.' nonWildcardTypeArguments? 'super' arguments ';'
-    ;
-
 
 qualifiedName
     :   Identifier ('.' Identifier)*
@@ -620,7 +614,7 @@ variableModifiers
     ;
 
 statement
-    : block
+    :	block
     |   ASSERT expression (':' expression)? ';'
     |   'if' parExpression statement ('else' statement)?
     |   'for' '(' forControl ')' statement
