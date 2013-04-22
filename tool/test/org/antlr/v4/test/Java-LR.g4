@@ -628,11 +628,8 @@ statement
     |   'for' '(' forControl ')' statement
     |   'while' parExpression statement
     |   'do' statement 'while' parExpression ';'
-    |   'try' block
-        ( catches 'finally' block
-        | catches
-        |   'finally' block
-        )
+    |   'try' block (catches finallyBlock? | finallyBlock)
+	|	'try' resourceSpecification block catches? finallyBlock?
     |   'switch' parExpression '{' switchBlockStatementGroups '}'
     |   'synchronized' parExpression block
     |   'return' expression? ';'
@@ -643,14 +640,34 @@ statement
     |   statementExpression ';'
     |   Identifier ':' statement
     ;
-    
+
 catches
-    :   catchClause (catchClause)*
+    :   catchClause+
     ;
-    
+
 catchClause
-    :   'catch' '(' formalParameter ')' block
+    :   'catch' '(' variableModifiers catchType Identifier ')' block
     ;
+
+catchType
+	:	qualifiedName ('|' qualifiedName)*
+	;
+
+finallyBlock
+	:	'finally' block
+	;
+
+resourceSpecification
+	:	'(' resources ';'? ')'
+	;
+
+resources
+	:	resource (';' resource)*
+	;
+
+resource
+	:	variableModifiers classOrInterfaceType variableDeclaratorId '=' expression
+	;
 
 formalParameter
     :   variableModifiers type variableDeclaratorId
