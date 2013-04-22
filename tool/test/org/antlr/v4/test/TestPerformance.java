@@ -317,7 +317,9 @@ public class TestPerformance extends BaseTest {
         File directory = new File(jdkSourceRoot);
         assertTrue(directory.isDirectory());
 
-		List<InputDescriptor> sources = loadSources(directory, new FileExtensionFilenameFilter(".java"), RECURSIVE);
+		FilenameFilter filesFilter = FilenameFilters.extension(".java", false);
+		FilenameFilter directoriesFilter = FilenameFilters.ALL_FILES;
+		List<InputDescriptor> sources = loadSources(directory, filesFilter, directoriesFilter, RECURSIVE);
 		if (SHUFFLE_FILES_AT_START) {
 			Collections.shuffle(sources, RANDOM);
 		}
@@ -432,16 +434,16 @@ public class TestPerformance extends BaseTest {
         parseSources(factory, sources);
     }
 
-    protected List<InputDescriptor> loadSources(File directory, FilenameFilter filter, boolean recursive) {
+    protected List<InputDescriptor> loadSources(File directory, FilenameFilter filesFilter, FilenameFilter directoriesFilter, boolean recursive) {
         List<InputDescriptor> result = new ArrayList<InputDescriptor>();
-        loadSources(directory, filter, recursive, result);
+        loadSources(directory, filesFilter, directoriesFilter, recursive, result);
         return result;
     }
 
-    protected void loadSources(File directory, FilenameFilter filter, boolean recursive, Collection<InputDescriptor> result) {
+    protected void loadSources(File directory, FilenameFilter filesFilter, FilenameFilter directoriesFilter, boolean recursive, Collection<InputDescriptor> result) {
         assert directory.isDirectory();
 
-        File[] sources = directory.listFiles(filter);
+        File[] sources = directory.listFiles(filesFilter);
         for (File file : sources) {
 			if (!file.isFile()) {
 				continue;
@@ -451,10 +453,10 @@ public class TestPerformance extends BaseTest {
         }
 
         if (recursive) {
-            File[] children = directory.listFiles();
+            File[] children = directory.listFiles(directoriesFilter);
             for (File child : children) {
                 if (child.isDirectory()) {
-                    loadSources(child, filter, true, result);
+                    loadSources(child, filesFilter, directoriesFilter, true, result);
                 }
             }
         }
@@ -934,23 +936,148 @@ public class TestPerformance extends BaseTest {
 
 	}
 
-	protected static class FileExtensionFilenameFilter implements FilenameFilter {
+	protected static final class FilenameFilters {
+		public static final FilenameFilter ALL_FILES = new FilenameFilter() {
 
-		private final String extension;
-
-		public FileExtensionFilenameFilter(String extension) {
-			if (!extension.startsWith(".")) {
-				extension = '.' + extension;
+			@Override
+			public boolean accept(File dir, String name) {
+				return true;
 			}
 
-			this.extension = extension;
+		};
+
+		public static FilenameFilter extension(String extension) {
+			return extension(extension, true);
 		}
 
-		@Override
-		public boolean accept(File dir, String name) {
-			return name.toLowerCase().endsWith(extension);
+		public static FilenameFilter extension(String extension, boolean caseSensitive) {
+			return new FileExtensionFilenameFilter(extension, caseSensitive);
 		}
 
+		public static FilenameFilter name(String filename) {
+			return name(filename, true);
+		}
+
+		public static FilenameFilter name(String filename, boolean caseSensitive) {
+			return new FileNameFilenameFilter(filename, caseSensitive);
+		}
+
+		public static FilenameFilter all(FilenameFilter... filters) {
+			return new AllFilenameFilter(filters);
+		}
+
+		public static FilenameFilter any(FilenameFilter... filters) {
+			return new AnyFilenameFilter(filters);
+		}
+
+		public static FilenameFilter none(FilenameFilter... filters) {
+			return not(any(filters));
+		}
+
+		public static FilenameFilter not(FilenameFilter filter) {
+			return new NotFilenameFilter(filter);
+		}
+
+		private FilenameFilters() {
+		}
+
+		protected static class FileExtensionFilenameFilter implements FilenameFilter {
+
+			private final String extension;
+			private final boolean caseSensitive;
+
+			public FileExtensionFilenameFilter(String extension, boolean caseSensitive) {
+				if (!extension.startsWith(".")) {
+					extension = '.' + extension;
+				}
+
+				this.extension = extension;
+				this.caseSensitive = caseSensitive;
+			}
+
+			@Override
+			public boolean accept(File dir, String name) {
+				if (caseSensitive) {
+					return name.endsWith(extension);
+				} else {
+					return name.toLowerCase().endsWith(extension);
+				}
+			}
+		}
+
+		protected static class FileNameFilenameFilter implements FilenameFilter {
+
+			private final String filename;
+			private final boolean caseSensitive;
+
+			public FileNameFilenameFilter(String filename, boolean caseSensitive) {
+				this.filename = filename;
+				this.caseSensitive = caseSensitive;
+			}
+
+			@Override
+			public boolean accept(File dir, String name) {
+				if (caseSensitive) {
+					return name.equals(filename);
+				} else {
+					return name.toLowerCase().equals(filename);
+				}
+			}
+		}
+
+		protected static class AllFilenameFilter implements FilenameFilter {
+
+			private final FilenameFilter[] filters;
+
+			public AllFilenameFilter(FilenameFilter[] filters) {
+				this.filters = filters;
+			}
+
+			@Override
+			public boolean accept(File dir, String name) {
+				for (FilenameFilter filter : filters) {
+					if (!filter.accept(dir, name)) {
+						return false;
+					}
+				}
+
+				return true;
+			}
+		}
+
+		protected static class AnyFilenameFilter implements FilenameFilter {
+
+			private final FilenameFilter[] filters;
+
+			public AnyFilenameFilter(FilenameFilter[] filters) {
+				this.filters = filters;
+			}
+
+			@Override
+			public boolean accept(File dir, String name) {
+				for (FilenameFilter filter : filters) {
+					if (filter.accept(dir, name)) {
+						return true;
+					}
+				}
+
+				return false;
+			}
+		}
+
+		protected static class NotFilenameFilter implements FilenameFilter {
+
+			private final FilenameFilter filter;
+
+			public NotFilenameFilter(FilenameFilter filter) {
+				this.filter = filter;
+			}
+
+			@Override
+			public boolean accept(File dir, String name) {
+				return !filter.accept(dir, name);
+			}
+		}
 	}
 
 	protected static class NumberedThread extends Thread {
