@@ -317,7 +317,7 @@ public class ParserATNSimulator extends ATNSimulator {
 								   " exec LA(1)=="+ getLookaheadName(input)+
 								   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
 		}
-		mergeCache = new DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext>();
+
 		_input = input;
 		_startIndex = input.index();
 		_outerContext = outerContext;
@@ -775,6 +775,11 @@ public class ParserATNSimulator extends ATNSimulator {
 										   boolean fullCtx)
 	{
 		if ( debug ) System.out.println("in computeReachSet, starting closure: " + closure);
+
+		if (mergeCache == null) {
+			mergeCache = new DoubleKeyMap<PredictionContext, PredictionContext, PredictionContext>();
+		}
+
 		ATNConfigSet intermediate = new ATNConfigSet(fullCtx);
 
 		/* Configurations already in a rule stop state indicate reaching the end
