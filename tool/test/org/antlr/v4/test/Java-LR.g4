@@ -732,9 +732,8 @@ expression
 	:   primary
     |   expression '.' Identifier
     |   expression '.' 'this'
-    |   expression '.' 'super' '(' expressionList? ')'
-    |   expression '.' 'new' Identifier '(' expressionList? ')'
-    |   expression '.' 'super' '.' Identifier arguments?
+    |   expression '.' 'new' nonWildcardTypeArguments? innerCreator
+    |   expression '.' 'super' superSuffix
     |	expression '.' explicitGenericInvocation
     |   'new' creator
     |   expression '[' expression ']'
@@ -780,6 +779,7 @@ primary
     |   Identifier
     |   type '.' 'class'
     |   'void' '.' 'class'
+	|	nonWildcardTypeArguments (explicitGenericInvocationSuffix | 'this' arguments)
     ;
 
 creator
@@ -788,12 +788,12 @@ creator
     ;
 
 createdName
-    :   classOrInterfaceType
+    :   Identifier typeArgumentsOrDiamond? ('.' Identifier typeArgumentsOrDiamond?)*
     |   primitiveType
     ;
     
 innerCreator
-    :   nonWildcardTypeArguments? Identifier classCreatorRest
+    :   Identifier nonWildcardTypeArgumentsOrDiamond? classCreatorRest
     ;
 
 arrayCreatorRest
@@ -808,17 +808,32 @@ classCreatorRest
     ;
     
 explicitGenericInvocation
-    :	nonWildcardTypeArguments Identifier arguments
+    :	nonWildcardTypeArguments explicitGenericInvocationSuffix
     ;
     
 nonWildcardTypeArguments
     :   '<' typeList '>'
     ;
     
+typeArgumentsOrDiamond
+	:	'<' '>'
+	|	typeArguments
+	;
+
+nonWildcardTypeArgumentsOrDiamond
+	:	'<' '>'
+	|	nonWildcardTypeArguments
+	;
+
 superSuffix
     :   arguments
     |   '.' Identifier arguments?
     ;
+
+explicitGenericInvocationSuffix
+	:	'super' superSuffix
+	|	Identifier arguments
+	;
 
 arguments
     :   '(' expressionList? ')'

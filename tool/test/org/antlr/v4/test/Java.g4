@@ -854,10 +854,11 @@ castExpression
 
 primary
     :   parExpression
-    |   'this' ('.' Identifier)* identifierSuffix?
+    |   'this' arguments?
     |   'super' superSuffix
     |   literal
     |   'new' creator
+	|	nonWildcardTypeArguments (explicitGenericInvocationSuffix | 'this' arguments)
     |   Identifier ('.' Identifier)* identifierSuffix?
     |   primitiveType ('[' ']')* '.' 'class'
     |   'void' '.' 'class'
@@ -865,13 +866,13 @@ primary
 
 identifierSuffix
     :   ('[' ']')+ '.' 'class'
-    |   ('[' expression ']')+ // can also be matched by selector, but do here
+    |   '[' expression ']'
     |   arguments
     |   '.' 'class'
     |   '.' explicitGenericInvocation
     |   '.' 'this'
     |   '.' 'super' arguments
-    |   '.' 'new' innerCreator
+    |   '.' 'new' nonWildcardTypeArguments? innerCreator
     ;
 
 creator
@@ -880,12 +881,12 @@ creator
     ;
 
 createdName
-    :   classOrInterfaceType
-    |   primitiveType
+    :   Identifier typeArgumentsOrDiamond? ('.' Identifier typeArgumentsOrDiamond?)*
+	|	primitiveType
     ;
     
 innerCreator
-    :   nonWildcardTypeArguments? Identifier classCreatorRest
+    :   Identifier nonWildcardTypeArgumentsOrDiamond? classCreatorRest
     ;
 
 arrayCreatorRest
@@ -900,18 +901,29 @@ classCreatorRest
     ;
     
 explicitGenericInvocation
-    :   nonWildcardTypeArguments Identifier arguments
+    :   nonWildcardTypeArguments explicitGenericInvocationSuffix
     ;
     
 nonWildcardTypeArguments
     :   '<' typeList '>'
     ;
-    
+
+typeArgumentsOrDiamond
+	:	'<' '>'
+	|	typeArguments
+	;
+
+nonWildcardTypeArgumentsOrDiamond
+	:	'<' '>'
+	|	nonWildcardTypeArguments
+	;
+
 selector
     :   '.' Identifier arguments?
+	|	'.' explicitGenericInvocation
     |   '.' 'this'
     |   '.' 'super' superSuffix
-    |   '.' 'new' innerCreator
+    |   '.' 'new' nonWildcardTypeArguments? innerCreator
     |   '[' expression ']'
     ;
     
@@ -919,6 +931,11 @@ superSuffix
     :   arguments
     |   '.' Identifier arguments?
     ;
+
+explicitGenericInvocationSuffix
+	:	'super' superSuffix
+	|	Identifier arguments
+	;
 
 arguments
     :   '(' expressionList? ')'
