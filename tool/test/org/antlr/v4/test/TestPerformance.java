@@ -54,6 +54,7 @@ import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -69,6 +70,9 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -111,6 +115,14 @@ public class TestPerformance extends BaseTest {
      * {@link #TOP_PACKAGE}.
      */
     private static final boolean RECURSIVE = true;
+	/**
+	 * {@code true} to read all source files from disk into memory before
+	 * starting the parse. The default value is {@code true} to help prevent
+	 * drive speed from affecting the performance results. This value may be set
+	 * to {@code false} to support parsing large input sets which would not
+	 * otherwise fit into memory.
+	 */
+	private static final boolean PRELOAD_SOURCES = true;
 	/**
 	 * The encoding to use when reading source files.
 	 */
@@ -305,7 +317,7 @@ public class TestPerformance extends BaseTest {
         File directory = new File(jdkSourceRoot);
         assertTrue(directory.isDirectory());
 
-		List<CharStream> sources = loadSources(directory, new FileExtensionFilenameFilter(".java"), RECURSIVE);
+		List<InputDescriptor> sources = loadSources(directory, new FileExtensionFilenameFilter(".java"), RECURSIVE);
 		if (SHUFFLE_FILES_AT_START) {
 			Collections.shuffle(sources, RANDOM);
 		}
@@ -405,7 +417,7 @@ public class TestPerformance extends BaseTest {
      *  This method is separate from {@link #parse2} so the first pass can be distinguished when analyzing
      *  profiler results.
      */
-    protected void parse1(ParserFactory factory, Collection<CharStream> sources) throws InterruptedException {
+    protected void parse1(ParserFactory factory, Collection<InputDescriptor> sources) throws InterruptedException {
         System.gc();
         parseSources(factory, sources);
     }
@@ -414,28 +426,27 @@ public class TestPerformance extends BaseTest {
      *  This method is separate from {@link #parse1} so the first pass can be distinguished when analyzing
      *  profiler results.
      */
-    protected void parse2(ParserFactory factory, Collection<CharStream> sources) throws InterruptedException {
+    protected void parse2(ParserFactory factory, Collection<InputDescriptor> sources) throws InterruptedException {
         System.gc();
         parseSources(factory, sources);
     }
 
-    protected List<CharStream> loadSources(File directory, FilenameFilter filter, boolean recursive) {
-        List<CharStream> result = new ArrayList<CharStream>();
+    protected List<InputDescriptor> loadSources(File directory, FilenameFilter filter, boolean recursive) {
+        List<InputDescriptor> result = new ArrayList<InputDescriptor>();
         loadSources(directory, filter, recursive, result);
         return result;
     }
 
-    protected void loadSources(File directory, FilenameFilter filter, boolean recursive, Collection<CharStream> result) {
+    protected void loadSources(File directory, FilenameFilter filter, boolean recursive, Collection<InputDescriptor> result) {
         assert directory.isDirectory();
 
         File[] sources = directory.listFiles(filter);
         for (File file : sources) {
-            try {
-                CharStream input = new ANTLRFileStream(file.getAbsolutePath(), ENCODING);
-                result.add(input);
-            } catch (IOException ex) {
+			if (!file.isFile()) {
+				continue;
+			}
 
-            }
+			result.add(new InputDescriptor(file.getAbsolutePath()));
         }
 
         if (recursive) {
@@ -451,7 +462,7 @@ public class TestPerformance extends BaseTest {
     int configOutputSize = 0;
 
     @SuppressWarnings("unused")
-	protected void parseSources(final ParserFactory factory, Collection<CharStream> sources) throws InterruptedException {
+	protected void parseSources(final ParserFactory factory, Collection<InputDescriptor> sources) throws InterruptedException {
         long startTime = System.currentTimeMillis();
         tokenCount.set(0);
         int inputSize = 0;
@@ -459,12 +470,13 @@ public class TestPerformance extends BaseTest {
 
 		Collection<Future<Integer>> results = new ArrayList<Future<Integer>>();
 		ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS, new NumberedThreadFactory());
-        for (final CharStream input : sources) {
+		for (InputDescriptor inputDescriptor : sources) {
 			inputCount++;
 			if (inputCount > MAX_FILES_PER_PARSE_ITERATION) {
 				break;
 			}
 
+			final CharStream input = inputDescriptor.getInputStream();
             input.seek(0);
             inputSize += input.size();
 			Future<Integer> futureChecksum = executorService.submit(new Callable<Integer>() {
@@ -1006,4 +1018,50 @@ public class TestPerformance extends BaseTest {
 
 	}
 
+	protected static final class InputDescriptor {
+		private final String source;
+		private Reference<CharStream> inputStream;
+
+		public InputDescriptor(@NotNull String source) {
+			this.source = source;
+			if (PRELOAD_SOURCES) {
+				getInputStream();
+			}
+		}
+
+		@NotNull
+		public CharStream getInputStream() {
+			CharStream stream = inputStream != null ? inputStream.get() : null;
+			if (stream == null) {
+				try {
+					stream = new ANTLRFileStream(source, ENCODING);
+				} catch (IOException ex) {
+					Logger.getLogger(TestPerformance.class.getName()).log(Level.SEVERE, null, ex);
+					stream = new ANTLRInputStream("");
+				}
+
+				if (PRELOAD_SOURCES) {
+					inputStream = new StrongReference<CharStream>(stream);
+				} else {
+					inputStream = new SoftReference<CharStream>(stream);
+				}
+			}
+
+			return stream;
+		}
+	}
+
+	public static class StrongReference<T> extends WeakReference<T> {
+		public final T referent;
+
+		public StrongReference(T referent) {
+			super(referent);
+			this.referent = referent;
+		}
+
+		@Override
+		public T get() {
+			return referent;
+		}
+	}
 }
