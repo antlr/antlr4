@@ -471,7 +471,7 @@ public class TestPerformance extends BaseTest {
         int inputSize = 0;
 		int inputCount = 0;
 
-		Collection<Future<Integer>> results = new ArrayList<Future<Integer>>();
+		Collection<Future<FileParseResult>> results = new ArrayList<Future<FileParseResult>>();
 		ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS, new NumberedThreadFactory());
 		for (InputDescriptor inputDescriptor : sources) {
 			if (inputCount >= MAX_FILES_PER_PARSE_ITERATION) {
@@ -482,9 +482,9 @@ public class TestPerformance extends BaseTest {
             input.seek(0);
             inputSize += input.size();
 			inputCount++;
-			Future<Integer> futureChecksum = executorService.submit(new Callable<Integer>() {
+			Future<FileParseResult> futureChecksum = executorService.submit(new Callable<FileParseResult>() {
 				@Override
-				public Integer call() {
+				public FileParseResult call() {
 					// this incurred a great deal of overhead and was causing significant variations in performance results.
 					//System.out.format("Parsing file %s\n", input.getSourceName());
 					try {
@@ -495,7 +495,7 @@ public class TestPerformance extends BaseTest {
 						t.printStackTrace(System.err);
 					}
 
-					return -1;
+					return null;
 				}
 			});
 
@@ -503,16 +503,17 @@ public class TestPerformance extends BaseTest {
         }
 
 		Checksum checksum = new CRC32();
-		for (Future<Integer> future : results) {
-			int value = 0;
+		for (Future<FileParseResult> future : results) {
+			int fileChecksum = 0;
 			try {
-				value = future.get();
+				FileParseResult fileResult = future.get();
+				fileChecksum = fileResult.checksum;
 			} catch (ExecutionException ex) {
 				Logger.getLogger(TestPerformance.class.getName()).log(Level.SEVERE, null, ex);
 			}
 
 			if (COMPUTE_CHECKSUM) {
-				updateChecksum(checksum, value);
+				updateChecksum(checksum, fileChecksum);
 			}
 		}
 
@@ -722,9 +723,10 @@ public class TestPerformance extends BaseTest {
 
             return new ParserFactory() {
 				@Override
-                public int parseFile(CharStream input, int thread) {
+                public FileParseResult parseFile(CharStream input, int thread) {
 					final Checksum checksum = new CRC32();
 
+					final long startTime = System.nanoTime();
 					assert thread >= 0 && thread < NUMBER_OF_THREADS;
 
                     try {
@@ -765,7 +767,7 @@ public class TestPerformance extends BaseTest {
 						}
 
                         if (!RUN_PARSER) {
-                            return (int)checksum.getValue();
+                            return new FileParseResult(input.getSourceName(), (int)checksum.getValue(), null, tokens.size(), startTime, lexer, null);
                         }
 
 						Parser parser = sharedParsers[thread];
@@ -860,16 +862,16 @@ public class TestPerformance extends BaseTest {
                         if (BUILD_PARSE_TREES && BLANK_LISTENER) {
                             ParseTreeWalker.DEFAULT.walk(listener, (ParseTree)parseResult);
                         }
+
+						return new FileParseResult(input.getSourceName(), (int)checksum.getValue(), (ParseTree)parseResult, tokens.size(), startTime, lexer, parser);
                     } catch (Exception e) {
 						if (!REPORT_SYNTAX_ERRORS && e instanceof ParseCancellationException) {
-							return (int)checksum.getValue();
+							return new FileParseResult("unknown", (int)checksum.getValue(), null, 0, startTime, null, null);
 						}
 
                         e.printStackTrace(System.out);
                         throw new IllegalStateException(e);
                     }
-
-					return (int)checksum.getValue();
                 }
             };
         } catch (Exception e) {
@@ -880,8 +882,59 @@ public class TestPerformance extends BaseTest {
     }
 
     protected interface ParserFactory {
-        int parseFile(CharStream input, int thread);
+        FileParseResult parseFile(CharStream input, int thread);
     }
+
+	protected static class FileParseResult {
+		public final String sourceName;
+		public final int checksum;
+		public final ParseTree parseTree;
+		public final int tokenCount;
+		public final long startTime;
+		public final long endTime;
+
+		public final int lexerDFASize;
+		public final int parserDFASize;
+
+		public FileParseResult(String sourceName, int checksum, @Nullable ParseTree parseTree, int tokenCount, long startTime, Lexer lexer, Parser parser) {
+			this.sourceName = sourceName;
+			this.checksum = checksum;
+			this.parseTree = parseTree;
+			this.tokenCount = tokenCount;
+			this.startTime = startTime;
+			this.endTime = System.nanoTime();
+
+			if (lexer != null) {
+				LexerATNSimulator interpreter = lexer.getInterpreter();
+
+				int dfaSize = 0;
+				for (DFA dfa : interpreter.decisionToDFA) {
+					if (dfa != null && dfa.states != null) {
+						dfaSize += dfa.states.size();
+					}
+				}
+
+				lexerDFASize = dfaSize;
+			} else {
+				lexerDFASize = 0;
+			}
+
+			if (parser != null) {
+				ParserATNSimulator interpreter = parser.getInterpreter();
+
+				int dfaSize = 0;
+				for (DFA dfa : interpreter.decisionToDFA) {
+					if (dfa != null && dfa.states != null) {
+						dfaSize += dfa.states.size();
+					}
+				}
+
+				parserDFASize = dfaSize;
+			} else {
+				parserDFASize = 0;
+			}
+		}
+	}
 
 	private static class DescriptiveErrorListener extends BaseErrorListener {
 		public static DescriptiveErrorListener INSTANCE = new DescriptiveErrorListener();
