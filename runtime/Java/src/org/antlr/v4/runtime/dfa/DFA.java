@@ -38,8 +38,10 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,7 +51,7 @@ public class DFA {
 	 *  ({@link Set} only allows you to see if it's there).
      */
     @NotNull
-	public final Map<DFAState, DFAState> states = new LinkedHashMap<DFAState, DFAState>();
+	public final Map<DFAState, DFAState> states = new HashMap<DFAState, DFAState>();
 	@Nullable
 	public DFAState s0;
 
@@ -71,6 +73,22 @@ public class DFA {
 	public DFA(@NotNull DecisionState atnStartState, int decision) {
 		this.atnStartState = atnStartState;
 		this.decision = decision;
+	}
+
+	/**
+	 * Return a list of all states in this DFA, ordered by state number.
+	 */
+	@NotNull
+	public List<DFAState> getStates() {
+		List<DFAState> result = new ArrayList<DFAState>(states.keySet());
+		Collections.sort(result, new Comparator<DFAState>() {
+			@Override
+			public int compare(DFAState o1, DFAState o2) {
+				return o1.stateNumber - o2.stateNumber;
+			}
+		});
+
+		return result;
 	}
 
 	public List<Set<ATNState>> getATNStatesAlongPath(ParserATNSimulator atn,

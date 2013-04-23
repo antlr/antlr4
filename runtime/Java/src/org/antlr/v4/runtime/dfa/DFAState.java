@@ -152,10 +152,7 @@ public class DFAState {
 	public int hashCode() {
 		int h = 7;
 		if ( configs!=null ) {
-			for (ATNConfig c : configs) {
-				h = h * 31 ^ c.alt;
-				h = h * 31 ^ c.state.stateNumber;
-			}
+			h = h * 31 ^ configs.hashCode();
 		}
 		return h;
 	}

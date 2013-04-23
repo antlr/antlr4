@@ -303,6 +303,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 */
 	public final boolean fullCtx;
 
+	private int cachedHashCode = -1;
+
 	public ATNConfigSet(boolean fullCtx) {
 		configLookup = new ConfigHashSet();
 		this.fullCtx = fullCtx;
@@ -346,6 +348,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		}
 		ATNConfig existing = configLookup.getOrAdd(config);
 		if ( existing==config ) { // we added this new one
+			cachedHashCode = -1;
 			configs.add(config);  // track order here
 			return true;
 		}
@@ -428,6 +431,14 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public int hashCode() {
+		if (isReadonly()) {
+			if (cachedHashCode == -1) {
+				cachedHashCode = configs.hashCode();
+			}
+
+			return cachedHashCode;
+		}
+
 		return configs.hashCode();
 	}
 
@@ -467,6 +478,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	public void clear() {
 		if ( readonly ) throw new IllegalStateException("This set is readonly");
 		configs.clear();
+		cachedHashCode = -1;
 		configLookup.clear();
 	}
 
