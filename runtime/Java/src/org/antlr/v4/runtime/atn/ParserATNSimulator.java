@@ -1441,25 +1441,75 @@ public class ParserATNSimulator extends ATNSimulator {
 		return alt;
 	}
 
+	/**
+	 * Add an edge to the DFA, if possible. This method calls
+	 * {@link #addDFAState} to ensure the {@code to} state is present in the
+	 * DFA. If {@code from} is {@code null}, or if {@code t} is outside the
+	 * range of edges that can be represented in the DFA tables, this method
+	 * returns without adding the edge to the DFA.
+	 * <p/>
+	 * If {@code to} is {@code null}, this method returns {@code null}.
+	 * Otherwise, this method returns the {@link DFAState} returned by calling
+	 * {@link #addDFAState} for the {@code to} state.
+	 *
+	 * @param dfa The DFA
+	 * @param from The source state for the edge
+	 * @param t The input symbol
+	 * @param to The target state for the edge
+	 *
+	 * @return If {@code to} is {@code null}, this method returns {@code null};
+	 * otherwise this method returns the result of calling {@link #addDFAState}
+	 * on {@code to}
+	 */
 	protected DFAState addDFAEdge(@NotNull DFA dfa,
 								  @Nullable DFAState from,
 								  int t,
 								  @Nullable DFAState to)
 	{
-		if ( debug ) System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
-		if ( from==null || t < -1 || to == null ) return to;
+		if ( debug ) {
+			System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
+		}
+
+		if (to == null) {
+			return null;
+		}
+
 		to = addDFAState(dfa, to); // used existing if possible not incoming
+		if (from == null || t < -1 || t > atn.maxTokenType) {
+			return to;
+		}
+
 		synchronized (from) {
 			if ( from.edges==null ) {
-				from.edges = new DFAState[atn.maxTokenType+1+1]; // TODO: make adaptive
+				from.edges = new DFAState[atn.maxTokenType+1+1];
 			}
+
 			from.edges[t+1] = to; // connect
 		}
-		if ( debug ) System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getTokenNames():null));
+
+		if ( debug ) {
+			System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getTokenNames():null));
+		}
+
 		return to;
 	}
 
-	/** Add D if not there and return D. Return previous if already present. */
+	/**
+	 * Add state {@code D} to the DFA if it is not already present, and return
+	 * the actual instance stored in the DFA. If a state equivalent to {@code D}
+	 * is already in the DFA, the existing state is returned. Otherwise this
+	 * method returns {@code D} after adding it to the DFA.
+	 * <p/>
+	 * If {@code D} is {@link #ERROR}, this method returns {@link #ERROR} and
+	 * does not change the DFA.
+	 *
+	 * @param dfa The dfa
+	 * @param D The DFA state to add
+	 * @return The state stored in the DFA. This will be either the existing
+	 * state if {@code D} is already in the DFA, or {@code D} itself if the
+	 * state was not already present.
+	 */
+	@NotNull
 	protected DFAState addDFAState(@NotNull DFA dfa, @NotNull DFAState D) {
 		if (D == ERROR) {
 			return D;
