@@ -101,14 +101,6 @@ public class ParserInterpreter {
 										  parser.sharedContextCache);
 	}
 
-	public synchronized int predictATN(@NotNull DFA dfa, @NotNull TokenStream input,
-									   @Nullable ParserRuleContext outerContext,
-									   boolean useContext)
-	{
-		// sync to ensure this entry doesn't race for dfa access
-		return atnSimulator.predictATN(dfa, input, outerContext);
-	}
-
 	public int adaptivePredict(@NotNull TokenStream input, int decision,
 							   @Nullable ParserRuleContext outerContext)
 	{

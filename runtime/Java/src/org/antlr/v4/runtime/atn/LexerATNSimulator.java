@@ -41,7 +41,6 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
-import java.io.OutputStream;
 import java.util.Locale;
 
 /** "dup" of ParserInterpreter */
@@ -158,7 +157,6 @@ public class LexerATNSimulator extends ATNSimulator {
 		mode = Lexer.DEFAULT_MODE;
 	}
 
-	// only called from test code from outside
 	protected int matchATN(@NotNull CharStream input) {
 		ATNState startState = atn.modeToStartState.get(mode);
 
@@ -218,36 +216,13 @@ public class LexerATNSimulator extends ATNSimulator {
 			// This optimization makes a lot of sense for loops within DFA.
 			// A character will take us back to an existing DFA state
 			// that already has lots of edges out of it. e.g., .* in comments.
-			ATNConfigSet closure = s.configs;
-			DFAState target = null;
-			if ( s.edges != null && t >= MIN_DFA_EDGE && t <= MAX_DFA_EDGE ) {
-				target = s.edges[t - MIN_DFA_EDGE];
-				if (target == ERROR) {
-					break;
-				}
-
-				if (debug && target != null) {
-					System.out.println("reuse state "+s.stateNumber+
-									   " edge to "+target.stateNumber);
-				}
+			DFAState target = getExistingTargetState(s, t);
+			if (target == null) {
+				target = computeTargetState(input, s, t);
 			}
 
-			if (target == null) {
-				ATNConfigSet reach = new OrderedATNConfigSet();
-
-				// if we don't find an existing DFA state
-				// Fill reach starting from closure, following t transitions
-				getReachableConfigSet(input, closure, reach, t);
-
-				if ( reach.isEmpty() ) { // we got nowhere on t from s
-					// we got nowhere on t, don't throw out this knowledge; it'd
-					// cause a failover from DFA later.
-					addDFAEdge(s, t, ERROR);
-					break; // stop when we can't match any more char
-				}
-
-				// Add an edge from s to target DFA found/created for reach
-				target = addDFAEdge(s, t, reach);
+			if (target == ERROR) {
+				break;
 			}
 
 			if (target.isAcceptState) {
@@ -266,6 +241,64 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		return failOrAccept(prevAccept, input, s.configs, t);
+	}
+
+	/**
+	 * Get an existing target state for an edge in the DFA. If the target state
+	 * for the edge has not yet been computed or is otherwise not available,
+	 * this method returns {@code null}.
+	 *
+	 * @param s The current DFA state
+	 * @param t The next input symbol
+	 * @return The existing target DFA state for the given input symbol
+	 * {@code t}, or {@code null} if the target state for this edge is not
+	 * already cached
+	 */
+	@Nullable
+	protected DFAState getExistingTargetState(@NotNull DFAState s, int t) {
+		if (s.edges == null || t < MIN_DFA_EDGE || t > MAX_DFA_EDGE) {
+			return null;
+		}
+		
+		DFAState target = s.edges[t - MIN_DFA_EDGE];
+		if (debug && target != null) {
+			System.out.println("reuse state "+s.stateNumber+
+							   " edge to "+target.stateNumber);
+		}
+
+		return target;
+	}
+
+	/**
+	 * Compute a target state for an edge in the DFA, and attempt to add the
+	 * computed state and corresponding edge to the DFA.
+	 *
+	 * @param input The input stream
+	 * @param s The current DFA state
+	 * @param t The next input symbol
+	 *
+	 * @return The computed target DFA state for the given input symbol
+	 * {@code t}. If {@code t} does not lead to a valid DFA state, this method
+	 * returns {@link #ERROR}.
+	 */
+	@NotNull
+	protected DFAState computeTargetState(@NotNull CharStream input, @NotNull DFAState s, int t) {
+		ATNConfigSet reach = new OrderedATNConfigSet();
+
+		// if we don't find an existing DFA state
+		// Fill reach starting from closure, following t transitions
+		getReachableConfigSet(input, s.configs, reach, t);
+
+		if ( reach.isEmpty() ) { // we got nowhere on t from s
+			// we got nowhere on t, don't throw out this knowledge; it'd
+			// cause a failover from DFA later.
+			addDFAEdge(s, t, ERROR);
+			// stop when we can't match any more char
+			return ERROR;
+		}
+
+		// Add an edge from s to target DFA found/created for reach
+		return addDFAEdge(s, t, reach);
 	}
 
 	protected int failOrAccept(SimState prevAccept, CharStream input,
@@ -341,7 +374,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	}
 
 	@Nullable
-	public ATNState getReachableTarget(Transition trans, int t) {
+	protected ATNState getReachableTarget(Transition trans, int t) {
 		if (trans.matches(t, Lexer.MIN_CHAR_VALUE, Lexer.MAX_CHAR_VALUE)) {
 			return trans.target;
 		}
@@ -444,7 +477,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	// side-effect: can alter configs.hasSemanticContext
 	@Nullable
-	public LexerATNConfig getEpsilonTarget(@NotNull CharStream input,
+	protected LexerATNConfig getEpsilonTarget(@NotNull CharStream input,
 										   @NotNull LexerATNConfig config,
 										   @NotNull Transition t,
 										   @NotNull ATNConfigSet configs,
@@ -650,8 +683,8 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 	}
 
-	@Nullable
-	public DFA getDFA(int mode) {
+	@NotNull
+	public final DFA getDFA(int mode) {
 		return decisionToDFA[mode];
 	}
 
