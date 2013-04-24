@@ -269,7 +269,8 @@ public class ParserATNSimulator extends ATNSimulator {
 	public final DFA[] decisionToDFA;
 
 	/** SLL, LL, or LL + exact ambig detection? */
-	protected PredictionMode mode = PredictionMode.LL;
+	@NotNull
+	private PredictionMode mode = PredictionMode.LL;
 
 	/** Each prediction operation uses a cache for merge of prediction contexts.
 	 *  Don't keep around as it wastes huge amounts of memory. DoubleKeyMap
@@ -348,7 +349,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 	}
 
-	public int predictATN(@NotNull DFA dfa, @NotNull TokenStream input,
+	protected int predictATN(@NotNull DFA dfa, @NotNull TokenStream input,
 						  @Nullable ParserRuleContext outerContext)
 	{
 		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
@@ -412,7 +413,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	    conflict
 	    conflict + preds
 	 */
-	public int execATN(@NotNull DFA dfa, @NotNull DFAState s0,
+	protected int execATN(@NotNull DFA dfa, @NotNull DFAState s0,
 					   @NotNull TokenStream input, int startIndex,
 					   ParserRuleContext outerContext)
 	{
@@ -640,12 +641,12 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	// comes back with reach.uniqueAlt set to a valid alt
-	public int execATNWithFullContext(DFA dfa,
-									  DFAState D, // how far we got before failing over
-									  @NotNull ATNConfigSet s0,
-									  @NotNull TokenStream input, int startIndex,
-									  ParserRuleContext outerContext,
-									  int SLL_min_alt) // todo: is this in D as min ambig alts?
+	protected int execATNWithFullContext(DFA dfa,
+										 DFAState D, // how far we got before failing over
+										 @NotNull ATNConfigSet s0,
+										 @NotNull TokenStream input, int startIndex,
+										 ParserRuleContext outerContext,
+										 int SLL_min_alt) // todo: is this in D as min ambig alts?
 	{
 		retry_with_context++;
 		reportAttemptingFullContext(dfa, s0, startIndex, input.index());
@@ -946,7 +947,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	@NotNull
-	public ATNConfigSet computeStartState(@NotNull ATNState p,
+	protected ATNConfigSet computeStartState(@NotNull ATNState p,
 										  @Nullable RuleContext ctx,
 										  boolean fullCtx)
 	{
@@ -965,7 +966,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	@Nullable
-	public ATNState getReachableTarget(@NotNull Transition trans, int ttype) {
+	protected ATNState getReachableTarget(@NotNull Transition trans, int ttype) {
 		if (trans.matches(ttype, 0, atn.maxTokenType)) {
 			return trans.target;
 		}
@@ -973,7 +974,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return null;
 	}
 
-	public SemanticContext[] getPredsForAmbigAlts(@NotNull BitSet ambigAlts,
+	protected SemanticContext[] getPredsForAmbigAlts(@NotNull BitSet ambigAlts,
 												  @NotNull ATNConfigSet configs,
 												  int nalts)
 	{
@@ -1017,7 +1018,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return altToPred;
 	}
 
-	public DFAState.PredPrediction[] getPredicatePredictions(BitSet ambigAlts,
+	protected DFAState.PredPrediction[] getPredicatePredictions(BitSet ambigAlts,
 															 SemanticContext[] altToPred)
 	{
 		List<DFAState.PredPrediction> pairs = new ArrayList<DFAState.PredPrediction>();
@@ -1042,7 +1043,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return pairs.toArray(new DFAState.PredPrediction[pairs.size()]);
 	}
 
-	public int getAltThatFinishedDecisionEntryRule(ATNConfigSet configs) {
+	protected int getAltThatFinishedDecisionEntryRule(ATNConfigSet configs) {
 		IntervalSet alts = new IntervalSet();
 		for (ATNConfig c : configs) {
 			if ( c.reachesIntoOuterContext>0 || (c.state instanceof RuleStopState && c.context.hasEmptyPath()) ) {
@@ -1059,7 +1060,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 *  then we stop at the first predicate that evaluates to true. This
 	 *  includes pairs with null predicates.
 	 */
-	public BitSet evalSemanticContext(@NotNull DFAState.PredPrediction[] predPredictions,
+	protected BitSet evalSemanticContext(@NotNull DFAState.PredPrediction[] predPredictions,
 									  ParserRuleContext outerContext,
 									  boolean complete)
 	{
@@ -1227,7 +1228,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	@Nullable
-	public ATNConfig getEpsilonTarget(@NotNull ATNConfig config,
+	protected ATNConfig getEpsilonTarget(@NotNull ATNConfig config,
 									  @NotNull Transition t,
 									  boolean collectPredicates,
 									  boolean inContext,
@@ -1255,13 +1256,13 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	@NotNull
-	public ATNConfig actionTransition(@NotNull ATNConfig config, @NotNull ActionTransition t) {
+	protected ATNConfig actionTransition(@NotNull ATNConfig config, @NotNull ActionTransition t) {
 		if ( debug ) System.out.println("ACTION edge "+t.ruleIndex+":"+t.actionIndex);
 		return new ATNConfig(config, t.target);
 	}
 
 	@Nullable
-	public ATNConfig predTransition(@NotNull ATNConfig config,
+	protected ATNConfig predTransition(@NotNull ATNConfig config,
 									@NotNull PredicateTransition pt,
 									boolean collectPredicates,
 									boolean inContext,
@@ -1309,7 +1310,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	@NotNull
-	public ATNConfig ruleTransition(@NotNull ATNConfig config, @NotNull RuleTransition t) {
+	protected ATNConfig ruleTransition(@NotNull ATNConfig config, @NotNull RuleTransition t) {
 		if ( debug ) {
 			System.out.println("CALL rule "+getRuleName(t.target.ruleIndex)+
 							   ", ctx="+config.context);
@@ -1321,7 +1322,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return new ATNConfig(config, t.target, newContext);
 	}
 
-	public BitSet getConflictingAlts(ATNConfigSet configs) {
+	protected BitSet getConflictingAlts(ATNConfigSet configs) {
 		Collection<BitSet> altsets = PredictionMode.getConflictingAltSubsets(configs);
 		return PredictionMode.getAlts(altsets);
 	}
@@ -1416,7 +1417,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	@NotNull
-	public NoViableAltException noViableAlt(@NotNull TokenStream input,
+	protected NoViableAltException noViableAlt(@NotNull TokenStream input,
 											@NotNull ParserRuleContext outerContext,
 											@NotNull ATNConfigSet configs,
 											int startIndex)
@@ -1427,7 +1428,7 @@ public class ParserATNSimulator extends ATNSimulator {
 											configs, outerContext);
 	}
 
-	public static int getUniqueAlt(@NotNull ATNConfigSet configs) {
+	protected static int getUniqueAlt(@NotNull ATNConfigSet configs) {
 		int alt = ATN.INVALID_ALT_NUMBER;
 		for (ATNConfig c : configs) {
 			if ( alt == ATN.INVALID_ALT_NUMBER ) {
@@ -1479,7 +1480,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 	}
 
-	public void reportAttemptingFullContext(DFA dfa, ATNConfigSet configs, int startIndex, int stopIndex) {
+	protected void reportAttemptingFullContext(DFA dfa, ATNConfigSet configs, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);
 			System.out.println("reportAttemptingFullContext decision="+dfa.decision+":"+configs+
@@ -1488,7 +1489,7 @@ public class ParserATNSimulator extends ATNSimulator {
         if ( parser!=null ) parser.getErrorListenerDispatch().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, configs);
     }
 
-	public void reportContextSensitivity(DFA dfa, ATNConfigSet configs, int startIndex, int stopIndex) {
+	protected void reportContextSensitivity(DFA dfa, ATNConfigSet configs, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);
             System.out.println("reportContextSensitivity decision="+dfa.decision+":"+configs+
@@ -1498,7 +1499,7 @@ public class ParserATNSimulator extends ATNSimulator {
     }
 
     /** If context sensitive parsing, we know it's ambiguity not conflict */
-    public void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex,
+    protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex,
 								@NotNull BitSet ambigAlts,
 								@NotNull ATNConfigSet configs)
 	{
@@ -1528,9 +1529,12 @@ public class ParserATNSimulator extends ATNSimulator {
 																			  ambigAlts, configs);
     }
 
-	public void setPredictionMode(PredictionMode mode) {
+	public final void setPredictionMode(@NotNull PredictionMode mode) {
 		this.mode = mode;
 	}
 
-	public PredictionMode getPredictionMode() { return mode; }
+	@NotNull
+	public final PredictionMode getPredictionMode() {
+		return mode;
+	}
 }
