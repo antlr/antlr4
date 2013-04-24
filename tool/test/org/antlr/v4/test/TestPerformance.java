@@ -51,6 +51,7 @@ import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
@@ -238,6 +239,13 @@ public class TestPerformance extends BaseTest {
 	private static final boolean TWO_STAGE_PARSING = true;
 
     private static final boolean SHOW_CONFIG_STATS = false;
+
+	/**
+	 * If {@code true}, detailed statistics for the number of DFA edges were
+	 * taken while parsing each file, as well as the number of DFA edges which
+	 * required on-the-fly computation.
+	 */
+	private static final boolean COMPUTE_TRANSITION_STATS = false;
 
 	private static final boolean REPORT_SYNTAX_ERRORS = true;
 	private static final boolean REPORT_AMBIGUITIES = false;
@@ -741,6 +749,9 @@ public class TestPerformance extends BaseTest {
                             lexer.setInputStream(input);
                         } else {
                             lexer = lexerCtor.newInstance(input);
+							if (COMPUTE_TRANSITION_STATS) {
+								lexer.setInterpreter(new StatisticsLexerATNSimulator(lexer, lexer.getATN(), lexer.getInterpreter().decisionToDFA, lexer.getInterpreter().getSharedContextCache()));
+							}
 							sharedLexers[thread] = lexer;
 							if (!REUSE_LEXER_DFA) {
 								Field decisionToDFAField = LexerATNSimulator.class.getDeclaredField("decisionToDFA");
@@ -775,6 +786,9 @@ public class TestPerformance extends BaseTest {
                             parser.setInputStream(tokens);
                         } else {
                             parser = parserCtor.newInstance(tokens);
+							if (COMPUTE_TRANSITION_STATS) {
+								parser.setInterpreter(new StatisticsParserATNSimulator(parser, parser.getATN(), parser.getInterpreter().decisionToDFA, parser.getInterpreter().getSharedContextCache()));
+							}
 							sharedParsers[thread] = parser;
                         }
 
@@ -835,6 +849,9 @@ public class TestPerformance extends BaseTest {
 								parser.setInputStream(tokens);
 							} else {
 								parser = parserCtor.newInstance(tokens);
+								if (COMPUTE_TRANSITION_STATS) {
+									parser.setInterpreter(new StatisticsParserATNSimulator(parser, parser.getATN(), parser.getInterpreter().decisionToDFA, parser.getInterpreter().getSharedContextCache()));
+								}
 								sharedParsers[thread] = parser;
 							}
 
@@ -894,7 +911,12 @@ public class TestPerformance extends BaseTest {
 		public final long endTime;
 
 		public final int lexerDFASize;
+		public final long lexerTotalTransitions;
+		public final long lexerComputedTransitions;
+
 		public final int parserDFASize;
+		public final long parserTotalTransitions;
+		public final long parserComputedTransitions;
 
 		public FileParseResult(String sourceName, int checksum, @Nullable ParseTree parseTree, int tokenCount, long startTime, Lexer lexer, Parser parser) {
 			this.sourceName = sourceName;
@@ -906,6 +928,13 @@ public class TestPerformance extends BaseTest {
 
 			if (lexer != null) {
 				LexerATNSimulator interpreter = lexer.getInterpreter();
+				if (interpreter instanceof StatisticsLexerATNSimulator) {
+					lexerTotalTransitions = ((StatisticsLexerATNSimulator)interpreter).totalTransitions;
+					lexerComputedTransitions = ((StatisticsLexerATNSimulator)interpreter).computedTransitions;
+				} else {
+					lexerTotalTransitions = 0;
+					lexerComputedTransitions = 0;
+				}
 
 				int dfaSize = 0;
 				for (DFA dfa : interpreter.decisionToDFA) {
@@ -917,10 +946,19 @@ public class TestPerformance extends BaseTest {
 				lexerDFASize = dfaSize;
 			} else {
 				lexerDFASize = 0;
+				lexerTotalTransitions = 0;
+				lexerComputedTransitions = 0;
 			}
 
 			if (parser != null) {
 				ParserATNSimulator interpreter = parser.getInterpreter();
+				if (interpreter instanceof StatisticsParserATNSimulator) {
+					parserTotalTransitions = ((StatisticsParserATNSimulator)interpreter).totalTransitions;
+					parserComputedTransitions = ((StatisticsParserATNSimulator)interpreter).computedTransitions;
+				} else {
+					parserTotalTransitions = 0;
+					parserComputedTransitions = 0;
+				}
 
 				int dfaSize = 0;
 				for (DFA dfa : interpreter.decisionToDFA) {
@@ -932,7 +970,61 @@ public class TestPerformance extends BaseTest {
 				parserDFASize = dfaSize;
 			} else {
 				parserDFASize = 0;
+				parserTotalTransitions = 0;
+				parserComputedTransitions = 0;
 			}
+		}
+	}
+
+	private static class StatisticsLexerATNSimulator extends LexerATNSimulator {
+
+		public long totalTransitions;
+		public long computedTransitions;
+
+		public StatisticsLexerATNSimulator(ATN atn, DFA[] decisionToDFA, PredictionContextCache sharedContextCache) {
+			super(atn, decisionToDFA, sharedContextCache);
+		}
+
+		public StatisticsLexerATNSimulator(Lexer recog, ATN atn, DFA[] decisionToDFA, PredictionContextCache sharedContextCache) {
+			super(recog, atn, decisionToDFA, sharedContextCache);
+		}
+
+		@Override
+		protected DFAState getExistingTargetState(DFAState s, int t) {
+			totalTransitions++;
+			return super.getExistingTargetState(s, t);
+		}
+
+		@Override
+		protected DFAState computeTargetState(CharStream input, DFAState s, int t) {
+			computedTransitions++;
+			return super.computeTargetState(input, s, t);
+		}
+	}
+
+	private static class StatisticsParserATNSimulator extends ParserATNSimulator {
+
+		public long totalTransitions;
+		public long computedTransitions;
+
+		public StatisticsParserATNSimulator(ATN atn, DFA[] decisionToDFA, PredictionContextCache sharedContextCache) {
+			super(atn, decisionToDFA, sharedContextCache);
+		}
+
+		public StatisticsParserATNSimulator(Parser parser, ATN atn, DFA[] decisionToDFA, PredictionContextCache sharedContextCache) {
+			super(parser, atn, decisionToDFA, sharedContextCache);
+		}
+
+		@Override
+		protected DFAState getExistingTargetState(DFAState previousD, int t) {
+			totalTransitions++;
+			return super.getExistingTargetState(previousD, t);
+		}
+
+		@Override
+		protected DFAState computeTargetState(DFA dfa, DFAState previousD, int t) {
+			computedTransitions++;
+			return super.computeTargetState(dfa, previousD, t);
 		}
 	}
 

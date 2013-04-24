@@ -101,6 +101,10 @@ public abstract class ATNSimulator {
 
 	public abstract void reset();
 
+	public PredictionContextCache getSharedContextCache() {
+		return sharedContextCache;
+	}
+
 	public PredictionContext getCachedContext(PredictionContext context) {
 		if ( sharedContextCache==null ) return context;
 
