@@ -430,57 +430,9 @@ public class ParserATNSimulator extends ATNSimulator {
 		int t = input.LA(1);
 
 		while (true) { // while more work
-			DFAState D = null;
-			if (previousD.edges != null && t + 1 >= 0 && t + 1 < previousD.edges.length) {
-				D = previousD.edges[t + 1];
-			}
-
+			DFAState D = getExistingTargetState(previousD, t);
 			if (D == null) {
-	//			System.out.println("REACH "+getLookaheadName(input));
-				ATNConfigSet reach = computeReachSet(previousD.configs, t, false);
-				if ( reach==null ) {
-					D = ERROR;
-				}
-				else {
-					// create new target state; we'll add to DFA after it's complete
-					D = new DFAState(reach);
-
-					int predictedAlt = getUniqueAlt(reach);
-
-					if ( debug ) {
-						Collection<BitSet> altSubSets = PredictionMode.getConflictingAltSubsets(reach);
-						System.out.println("SLL altSubSets="+altSubSets+
-										   ", configs="+reach+
-										   ", predict="+predictedAlt+", allSubsetsConflict="+
-											   PredictionMode.allSubsetsConflict(altSubSets)+", conflictingAlts="+
-										   getConflictingAlts(reach));
-					}
-
-					if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
-						// NO CONFLICT, UNIQUELY PREDICTED ALT
-						D.isAcceptState = true;
-						D.configs.uniqueAlt = predictedAlt;
-						D.prediction = predictedAlt;
-					}
-					else if ( PredictionMode.hasSLLConflictTerminatingPrediction(mode, reach) ) {
-						// MORE THAN ONE VIABLE ALTERNATIVE
-						D.configs.conflictingAlts = getConflictingAlts(reach);
-						D.requiresFullContext = true;
-						// in SLL-only mode, we will stop at this state and return the minimum alt
-						D.isAcceptState = true;
-						D.prediction = D.configs.conflictingAlts.nextSetBit(0);
-					}
-
-					if ( D.isAcceptState && D.configs.hasSemanticContext ) {
-						predicateDFAState(D, atn.getDecisionState(dfa.decision));
-						if (D.predicates != null) {
-							D.prediction = ATN.INVALID_ALT_NUMBER;
-						}
-					}
-				}
-
-				// all adds to dfa are done after we've created full D state
-				D = addDFAEdge(dfa, previousD, t, D);
+				D = computeTargetState(dfa, previousD, t);
 			}
 
 			if (D == ERROR) {
@@ -566,6 +518,88 @@ public class ParserATNSimulator extends ATNSimulator {
 				t = input.LA(1);
 			}
 		}
+	}
+
+	/**
+	 * Get an existing target state for an edge in the DFA. If the target state
+	 * for the edge has not yet been computed or is otherwise not available,
+	 * this method returns {@code null}.
+	 *
+	 * @param previousD The current DFA state
+	 * @param t The next input symbol
+	 * @return The existing target DFA state for the given input symbol
+	 * {@code t}, or {@code null} if the target state for this edge is not
+	 * already cached
+	 */
+	@Nullable
+	protected DFAState getExistingTargetState(@NotNull DFAState previousD, int t) {
+		DFAState[] edges = previousD.edges;
+		if (edges == null || t + 1 < 0 || t + 1 >= edges.length) {
+			return null;
+		}
+
+		return edges[t + 1];
+	}
+
+	/**
+	 * Compute a target state for an edge in the DFA, and attempt to add the
+	 * computed state and corresponding edge to the DFA.
+	 *
+	 * @param dfa The DFA
+	 * @param previousD The current DFA state
+	 * @param t The next input symbol
+	 *
+	 * @return The computed target DFA state for the given input symbol
+	 * {@code t}. If {@code t} does not lead to a valid DFA state, this method
+	 * returns {@link #ERROR}.
+	 */
+	@NotNull
+	protected DFAState computeTargetState(@NotNull DFA dfa, @NotNull DFAState previousD, int t) {
+		ATNConfigSet reach = computeReachSet(previousD.configs, t, false);
+		if ( reach==null ) {
+			addDFAEdge(dfa, previousD, t, ERROR);
+			return ERROR;
+		}
+
+		// create new target state; we'll add to DFA after it's complete
+		DFAState D = new DFAState(reach);
+
+		int predictedAlt = getUniqueAlt(reach);
+
+		if ( debug ) {
+			Collection<BitSet> altSubSets = PredictionMode.getConflictingAltSubsets(reach);
+			System.out.println("SLL altSubSets="+altSubSets+
+							   ", configs="+reach+
+							   ", predict="+predictedAlt+", allSubsetsConflict="+
+								   PredictionMode.allSubsetsConflict(altSubSets)+", conflictingAlts="+
+							   getConflictingAlts(reach));
+		}
+
+		if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
+			// NO CONFLICT, UNIQUELY PREDICTED ALT
+			D.isAcceptState = true;
+			D.configs.uniqueAlt = predictedAlt;
+			D.prediction = predictedAlt;
+		}
+		else if ( PredictionMode.hasSLLConflictTerminatingPrediction(mode, reach) ) {
+			// MORE THAN ONE VIABLE ALTERNATIVE
+			D.configs.conflictingAlts = getConflictingAlts(reach);
+			D.requiresFullContext = true;
+			// in SLL-only mode, we will stop at this state and return the minimum alt
+			D.isAcceptState = true;
+			D.prediction = D.configs.conflictingAlts.nextSetBit(0);
+		}
+
+		if ( D.isAcceptState && D.configs.hasSemanticContext ) {
+			predicateDFAState(D, atn.getDecisionState(dfa.decision));
+			if (D.predicates != null) {
+				D.prediction = ATN.INVALID_ALT_NUMBER;
+			}
+		}
+
+		// all adds to dfa are done after we've created full D state
+		D = addDFAEdge(dfa, previousD, t, D);
+		return D;
 	}
 
 	protected void predicateDFAState(DFAState dfaState, DecisionState decisionState) {
