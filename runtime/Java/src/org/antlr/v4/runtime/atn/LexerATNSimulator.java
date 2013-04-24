@@ -41,7 +41,6 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
-import java.io.OutputStream;
 import java.util.Locale;
 
 /** "dup" of ParserInterpreter */
@@ -158,7 +157,6 @@ public class LexerATNSimulator extends ATNSimulator {
 		mode = Lexer.DEFAULT_MODE;
 	}
 
-	// only called from test code from outside
 	protected int matchATN(@NotNull CharStream input) {
 		ATNState startState = atn.modeToStartState.get(mode);
 
@@ -341,7 +339,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	}
 
 	@Nullable
-	public ATNState getReachableTarget(Transition trans, int t) {
+	protected ATNState getReachableTarget(Transition trans, int t) {
 		if (trans.matches(t, Lexer.MIN_CHAR_VALUE, Lexer.MAX_CHAR_VALUE)) {
 			return trans.target;
 		}
@@ -444,7 +442,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	// side-effect: can alter configs.hasSemanticContext
 	@Nullable
-	public LexerATNConfig getEpsilonTarget(@NotNull CharStream input,
+	protected LexerATNConfig getEpsilonTarget(@NotNull CharStream input,
 										   @NotNull LexerATNConfig config,
 										   @NotNull Transition t,
 										   @NotNull ATNConfigSet configs,
@@ -650,8 +648,8 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 	}
 
-	@Nullable
-	public DFA getDFA(int mode) {
+	@NotNull
+	public final DFA getDFA(int mode) {
 		return decisionToDFA[mode];
 	}
 
