@@ -56,7 +56,7 @@ public class TestFullContextParsing extends BaseTest {
 								   "abc", true);
 		String expecting =
 			"Decision 0:\n" +
-			"s0-ID->s1^\n"; // ctx sensitive
+			"s0-ID->:s1^=>1\n"; // ctx sensitive
 		assertEquals(expecting, result);
 		assertEquals("line 1:0 reportAttemptingFullContext d=0, input='abc'\n",
 					 this.stderrDuringParse);
@@ -78,7 +78,7 @@ public class TestFullContextParsing extends BaseTest {
 		String expecting =
 			"Decision 1:\n" +
 			"s0-INT->s1\n" +
-			"s1-ID->s2^\n";
+			"s1-ID->:s2^=>1\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:5 reportAttemptingFullContext d=1, input='34abc'\n" +
 					 "line 1:2 reportContextSensitivity d=1, input='34'\n",
@@ -89,7 +89,7 @@ public class TestFullContextParsing extends BaseTest {
 		expecting =
 			"Decision 1:\n" +
 			"s0-INT->s1\n" +
-			"s1-ID->s2^\n";
+			"s1-ID->:s2^=>1\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:5 reportAttemptingFullContext d=1, input='34abc'\n" +
 					 "line 1:5 reportContextSensitivity d=1, input='34abc'\n",
@@ -112,7 +112,7 @@ public class TestFullContextParsing extends BaseTest {
 		String expecting =
 			"Decision 2:\n" +
 			"s0-INT->s1\n" +
-			"s1-ID->s2^\n";
+			"s1-ID->:s2^=>1\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:5 reportAttemptingFullContext d=2, input='34abc'\n" +
 					 "line 1:2 reportContextSensitivity d=2, input='34'\n" +
@@ -138,7 +138,7 @@ public class TestFullContextParsing extends BaseTest {
 		String expecting =
 			"Decision 0:\n" +
 			"s0-INT->s1\n" +
-			"s1-ID->s2^\n"; // Must point at accept state
+			"s1-ID->:s2^=>1\n"; // Must point at accept state
 		assertEquals(expecting, result);
 		assertEquals("line 1:3 reportAttemptingFullContext d=0, input='34abc'\n" +
 					 "line 1:0 reportContextSensitivity d=0, input='34'\n",
@@ -172,7 +172,7 @@ public class TestFullContextParsing extends BaseTest {
 							input, true);
 		expecting =
 			"Decision 1:\n" +
-			"s0-'else'->s1^\n";
+			"s0-'else'->:s1^=>1\n";
 		assertEquals(expecting, result);
 		// Technically, this input sequence is not ambiguous because else
 		// uniquely predicts going into the optional subrule. else cannot
@@ -190,7 +190,7 @@ public class TestFullContextParsing extends BaseTest {
 							input, true);
 		expecting =
 			"Decision 1:\n" +
-			"s0-'else'->s1^\n" +
+			"s0-'else'->:s1^=>1\n" +
 			"s0-'}'->:s2=>2\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:29 reportAttemptingFullContext d=1, input='else'\n" +
@@ -207,7 +207,7 @@ public class TestFullContextParsing extends BaseTest {
 							input, true);
 		expecting =
 			"Decision 1:\n" +
-			"s0-'else'->s1^\n";
+			"s0-'else'->:s1^=>1\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:29 reportAttemptingFullContext d=1, input='else'\n" +
 					 "line 1:38 reportContextSensitivity d=1, input='elsefooelse'\n" +
@@ -222,7 +222,7 @@ public class TestFullContextParsing extends BaseTest {
 							input, true);
 		expecting =
 			"Decision 1:\n" +
-			"s0-'else'->s1^\n" +
+			"s0-'else'->:s1^=>1\n" +
 			"s0-'}'->:s2=>2\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:19 reportAttemptingFullContext d=1, input='else'\n" +
@@ -238,7 +238,7 @@ public class TestFullContextParsing extends BaseTest {
 							input, true);
 		expecting =
 				"Decision 1:\n" +
-				"s0-'else'->s1^\n" +
+				"s0-'else'->:s1^=>1\n" +
 				"s0-'}'->:s2=>2\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:19 reportAttemptingFullContext d=1, input='else'\n" +

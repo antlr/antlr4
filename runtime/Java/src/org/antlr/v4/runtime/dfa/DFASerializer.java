@@ -79,20 +79,20 @@ public class DFASerializer {
 		return label;
 	}
 
-	String getStateString(DFAState s) {
+	@NotNull
+	protected String getStateString(@NotNull DFAState s) {
 		int n = s.stateNumber;
-		String stateStr = "s"+n;
+		final String baseStateStr = (s.isAcceptState ? ":" : "") + "s" + n + (s.requiresFullContext ? "^" : "");
 		if ( s.isAcceptState ) {
             if ( s.predicates!=null ) {
-                stateStr = ":s"+n+"=>"+Arrays.toString(s.predicates);
+                return baseStateStr + "=>" + Arrays.toString(s.predicates);
             }
             else {
-                stateStr = ":s"+n+"=>"+s.prediction;
+                return baseStateStr + "=>" + s.prediction;
             }
 		}
-		else if ( s.requiresFullContext) {
-			stateStr = "s"+n+"^";
+		else {
+			return baseStateStr;
 		}
-		return stateStr;
 	}
 }
