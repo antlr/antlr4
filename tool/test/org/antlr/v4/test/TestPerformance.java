@@ -938,7 +938,7 @@ public class TestPerformance extends BaseTest {
 
 				int dfaSize = 0;
 				for (DFA dfa : interpreter.decisionToDFA) {
-					if (dfa != null && dfa.states != null) {
+					if (dfa != null) {
 						dfaSize += dfa.states.size();
 					}
 				}
@@ -962,7 +962,7 @@ public class TestPerformance extends BaseTest {
 
 				int dfaSize = 0;
 				for (DFA dfa : interpreter.decisionToDFA) {
-					if (dfa != null && dfa.states != null) {
+					if (dfa != null) {
 						dfaSize += dfa.states.size();
 					}
 				}
