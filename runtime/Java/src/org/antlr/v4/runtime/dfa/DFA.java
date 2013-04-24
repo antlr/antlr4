@@ -91,29 +91,6 @@ public class DFA {
 		return result;
 	}
 
-	public List<Set<ATNState>> getATNStatesAlongPath(ParserATNSimulator atn,
-													 List<DFAState> dfaStates,
-													 TokenStream input, int start, int stop)
-	{
-		List<Set<ATNState>> atnStates = new ArrayList<Set<ATNState>>();
-		int i = start;
-		for (DFAState D : dfaStates) {
-			Set<ATNState> fullSet = D.configs.getStates();
-			Set<ATNState> statesInvolved = new HashSet<ATNState>();
-			for (ATNState astate : fullSet) {
-				Transition t = astate.transition(0);
-				ATNState target = atn.getReachableTarget(t, input.get(i).getType());
-				if ( target!=null ) {
-					statesInvolved.add(astate);
-				}
-			}
-			System.out.println("statesInvolved upon "+input.get(i).getText()+"="+statesInvolved);
-			i++;
-			atnStates.add(statesInvolved);
-		}
-		return atnStates;
-	}
-
 	@Override
 	public String toString() { return toString(null); }
 
