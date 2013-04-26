@@ -325,62 +325,37 @@ public class ParserATNSimulator extends ATNSimulator {
 		predict_calls++;
 		DFA dfa = decisionToDFA[decision];
 
-		// Now we are certain to have a specific decision's DFA
-		// But, do we still need an initial state?
-		if ( dfa.s0==null ) {
-			try {
-				return predictATN(dfa, input, outerContext);
-			}
-			finally {
-				mergeCache = null; // wack cache after each prediction
-			}
-		}
-
-		// We can start with an existing DFA
 		int m = input.mark();
 		int index = input.index();
+
+		// Now we are certain to have a specific decision's DFA
+		// But, do we still need an initial state?
 		try {
-			return execATN(dfa, dfa.s0, input, index, outerContext);
+			if ( dfa.s0==null ) {
+				if ( outerContext ==null ) outerContext = ParserRuleContext.EMPTY;
+				if ( debug || debug_list_atn_decisions )  {
+					System.out.println("predictATN decision "+ dfa.decision+
+									   " exec LA(1)=="+ getLookaheadName(input) +
+									   ", outerContext="+ outerContext.toString(parser));
+				}
+				boolean fullCtx = false;
+				ATNConfigSet s0_closure =
+					computeStartState(dfa.atnStartState,
+									  ParserRuleContext.EMPTY,
+									  fullCtx);
+				dfa.s0 = addDFAState(dfa, new DFAState(s0_closure));
+			}
+
+			// We can start with an existing DFA
+			int alt = execATN(dfa, dfa.s0, input, index, outerContext);
+			if ( debug ) System.out.println("DFA after predictATN: "+ dfa.toString(parser.getTokenNames()));
+			return alt;
 		}
 		finally {
 			mergeCache = null; // wack cache after each prediction
 			input.seek(index);
 			input.release(m);
 		}
-	}
-
-	protected int predictATN(@NotNull DFA dfa, @NotNull TokenStream input,
-						  @Nullable ParserRuleContext outerContext)
-	{
-		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
-		if ( debug || debug_list_atn_decisions )  {
-			System.out.println("predictATN decision "+dfa.decision+
-							   " exec LA(1)=="+ getLookaheadName(input) +
-							   ", outerContext="+outerContext.toString(parser));
-		}
-		boolean fullCtx = false;
-		ATNConfigSet s0_closure =
-			computeStartState(dfa.atnStartState,
-							  ParserRuleContext.EMPTY,
-							  fullCtx);
-		dfa.s0 = addDFAState(dfa, new DFAState(s0_closure));
-
-		int alt = 0;
-		int m = input.mark();
-		int index = input.index();
-		try {
-			alt = execATN(dfa, dfa.s0, input, index, outerContext);
-		}
-		catch (NoViableAltException nvae) {
-			if ( debug ) dumpDeadEndConfigs(nvae);
-			throw nvae;
-		}
-		finally {
-			input.seek(index);
-			input.release(m);
-		}
-		if ( debug ) System.out.println("DFA after predictATN: "+dfa.toString(parser.getTokenNames()));
-		return alt;
 	}
 
 	/** Performs ATN simulation to compute a predicted alternative based
@@ -1378,6 +1353,10 @@ public class ParserATNSimulator extends ATNSimulator {
 		return getTokenName(input.LA(1));
 	}
 
+	/** Used for debugging in adaptivePredict around execATN but I cut
+	 *  it out for clarity now that alg. works well. We can leave this
+	 *  "dead" code for a bit.
+	 */
 	public void dumpDeadEndConfigs(@NotNull NoViableAltException nvae) {
 		System.err.println("dead end configs: ");
 		for (ATNConfig c : nvae.getDeadEndConfigs()) {
