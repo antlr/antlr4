@@ -97,6 +97,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
@@ -302,7 +303,7 @@ public class TestPerformance extends BaseTest {
 
     private static final ParseTreeListener[] sharedListeners = new ParseTreeListener[NUMBER_OF_THREADS];
 
-    private final AtomicInteger tokenCount = new AtomicInteger();
+    private final AtomicIntegerArray tokenCount = new AtomicIntegerArray(PASSES);
     private int currentPass;
 
     @Test
@@ -475,7 +476,7 @@ public class TestPerformance extends BaseTest {
     @SuppressWarnings("unused")
 	protected void parseSources(final ParserFactory factory, Collection<InputDescriptor> sources) throws InterruptedException {
         long startTime = System.currentTimeMillis();
-        tokenCount.set(0);
+        tokenCount.set(currentPass, 0);
         int inputSize = 0;
 		int inputCount = 0;
 
@@ -531,7 +532,7 @@ public class TestPerformance extends BaseTest {
         System.out.format("Total parse time for %d files (%d KB, %d tokens, checksum 0x%8X): %dms%n",
                           inputCount,
                           inputSize / 1024,
-                          tokenCount.get(),
+                          tokenCount.get(currentPass),
 						  COMPUTE_CHECKSUM ? checksum.getValue() : 0,
                           System.currentTimeMillis() - startTime);
 
@@ -769,7 +770,7 @@ public class TestPerformance extends BaseTest {
 
                         CommonTokenStream tokens = new CommonTokenStream(lexer);
                         tokens.fill();
-                        tokenCount.addAndGet(tokens.size());
+                        tokenCount.addAndGet(currentPass, tokens.size());
 
 						if (COMPUTE_CHECKSUM) {
 							for (Token token : tokens.getTokens()) {
