@@ -246,6 +246,16 @@ public class TestPerformance extends BaseTest {
 	 * required on-the-fly computation.
 	 */
 	private static final boolean COMPUTE_TRANSITION_STATS = false;
+	/**
+	 * If {@code true}, the transition statistics will be adjusted to a running
+	 * total before reporting the final results.
+	 */
+	private static final boolean TRANSITION_RUNNING_AVERAGE = false;
+	/**
+	 * If {@code true}, transition statistics will be weighted according to the
+	 * total number of transitions taken during the parsing of each file.
+	 */
+	private static final boolean TRANSITION_WEIGHTED_AVERAGE = false;
 
 	private static final boolean REPORT_SYNTAX_ERRORS = true;
 	private static final boolean REPORT_AMBIGUITIES = false;
@@ -302,6 +312,18 @@ public class TestPerformance extends BaseTest {
 
     private static final ParseTreeListener[] sharedListeners = new ParseTreeListener[NUMBER_OF_THREADS];
 
+	private static final long[][] totalTransitionsPerFile;
+	private static final long[][] computedTransitionsPerFile;
+	static {
+		if (COMPUTE_TRANSITION_STATS) {
+			totalTransitionsPerFile = new long[PASSES][];
+			computedTransitionsPerFile = new long[PASSES][];
+		} else {
+			totalTransitionsPerFile = null;
+			computedTransitionsPerFile = null;
+		}
+	}
+
     private final AtomicIntegerArray tokenCount = new AtomicIntegerArray(PASSES);
     private int currentPass;
 
@@ -330,6 +352,17 @@ public class TestPerformance extends BaseTest {
 		List<InputDescriptor> sources = loadSources(directory, filesFilter, directoriesFilter, RECURSIVE);
 		if (SHUFFLE_FILES_AT_START) {
 			Collections.shuffle(sources, RANDOM);
+		}
+		for (int i = 0; i < PASSES; i++) {
+			if (COMPUTE_TRANSITION_STATS) {
+				totalTransitionsPerFile[i] = new long[Math.min(sources.size(), MAX_FILES_PER_PARSE_ITERATION)];
+				computedTransitionsPerFile[i] = new long[Math.min(sources.size(), MAX_FILES_PER_PARSE_ITERATION)];
+			}
+
+			if (COMPUTE_TIMING_STATS) {
+				timePerFile[i] = new long[Math.min(sources.size(), MAX_FILES_PER_PARSE_ITERATION)];
+				tokensPerFile[i] = new int[Math.min(sources.size(), MAX_FILES_PER_PARSE_ITERATION)];
+			}
 		}
 
 		System.out.format("Located %d source files.%n", sources.size());
@@ -365,6 +398,10 @@ public class TestPerformance extends BaseTest {
             parse2(factory, sources);
         }
 
+		if (COMPUTE_TRANSITION_STATS) {
+			computeTransitionStatistics();
+		}
+
 		sources.clear();
 		if (PAUSE_FOR_HEAP_DUMP) {
 			System.gc();
@@ -376,6 +413,80 @@ public class TestPerformance extends BaseTest {
 			}
 		}
     }
+
+	/**
+	 * Compute and print ATN/DFA transition statistics.
+	 */
+	private void computeTransitionStatistics() {
+		if (TRANSITION_RUNNING_AVERAGE) {
+			for (int i = 0; i < PASSES; i++) {
+				long[] data = computedTransitionsPerFile[i];
+				for (int j = 0; j < data.length - 1; j++) {
+					data[j + 1] += data[j];
+				}
+
+				data = totalTransitionsPerFile[i];
+				for (int j = 0; j < data.length - 1; j++) {
+					data[j + 1] += data[j];
+				}
+			}
+		}
+
+		long[] sumNum = new long[totalTransitionsPerFile[0].length];
+		long[] sumDen = new long[totalTransitionsPerFile[0].length];
+		double[] sumNormalized = new double[totalTransitionsPerFile[0].length];
+		for (int i = 0; i < PASSES; i++) {
+			long[] num = computedTransitionsPerFile[i];
+			long[] den = totalTransitionsPerFile[i];
+			for (int j = 0; j < den.length; j++) {
+				sumNum[j] += num[j];
+				sumDen[j] += den[j];
+				sumNormalized[j] += (double)num[j] / (double)den[j];
+			}
+		}
+
+		double[] weightedAverage = new double[totalTransitionsPerFile[0].length];
+		double[] average = new double[totalTransitionsPerFile[0].length];
+		for (int i = 0; i < average.length; i++) {
+			weightedAverage[i] = (double)sumNum[i] / (double)sumDen[i];
+			average[i] = sumNormalized[i] / PASSES;
+		}
+
+		double[] low95 = new double[totalTransitionsPerFile[0].length];
+		double[] high95 = new double[totalTransitionsPerFile[0].length];
+		double[] low67 = new double[totalTransitionsPerFile[0].length];
+		double[] high67 = new double[totalTransitionsPerFile[0].length];
+		double[] stddev = new double[totalTransitionsPerFile[0].length];
+		for (int i = 0; i < stddev.length; i++) {
+			double[] points = new double[PASSES];
+			for (int j = 0; j < PASSES; j++) {
+				points[j] = ((double)computedTransitionsPerFile[j][i] / (double)totalTransitionsPerFile[j][i]);
+			}
+
+			Arrays.sort(points);
+
+			final double averageValue = TRANSITION_WEIGHTED_AVERAGE ? weightedAverage[i] : average[i];
+			double value = 0;
+			for (int j = 0; j < PASSES; j++) {
+				double diff = points[j] - averageValue;
+				value += diff * diff;
+			}
+
+			int ignoreCount95 = (int)Math.round(PASSES * (1 - 0.95) / 2.0);
+			int ignoreCount67 = (int)Math.round(PASSES * (1 - 0.667) / 2.0);
+			low95[i] = points[ignoreCount95];
+			high95[i] = points[points.length - 1 - ignoreCount95];
+			low67[i] = points[ignoreCount67];
+			high67[i] = points[points.length - 1 - ignoreCount67];
+			stddev[i] = Math.sqrt(value / PASSES);
+		}
+
+		System.out.format("File\tAverage\tStd. Dev.\t95%% Low\t95%% High\t66.7%% Low\t66.7%% High%n");
+		for (int i = 0; i < stddev.length; i++) {
+			final double averageValue = TRANSITION_WEIGHTED_AVERAGE ? weightedAverage[i] : average[i];
+			System.out.format("%d\t%e\t%e\t%e\t%e\t%e\t%e%n", i + 1, averageValue, stddev[i], averageValue - low95[i], high95[i] - averageValue, averageValue - low67[i], high67[i] - averageValue);
+		}
+	}
 
 	private String getSourceRoot(String prefix) {
 		String sourceRoot = System.getenv(prefix+"_SOURCE_ROOT");
@@ -511,10 +622,17 @@ public class TestPerformance extends BaseTest {
         }
 
 		Checksum checksum = new CRC32();
+		int currentIndex = -1;
 		for (Future<FileParseResult> future : results) {
+			currentIndex++;
 			int fileChecksum = 0;
 			try {
 				FileParseResult fileResult = future.get();
+				if (COMPUTE_TRANSITION_STATS) {
+					totalTransitionsPerFile[currentPass][currentIndex] = fileResult.parserTotalTransitions;
+					computedTransitionsPerFile[currentPass][currentIndex] = fileResult.parserComputedTransitions;
+				}
+
 				fileChecksum = fileResult.checksum;
 			} catch (ExecutionException ex) {
 				Logger.getLogger(TestPerformance.class.getName()).log(Level.SEVERE, null, ex);
