@@ -46,23 +46,34 @@ import org.antlr.v4.runtime.tree.Trees;
 import javax.imageio.ImageIO;
 import javax.print.PrintException;
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.JSplitPane;
+import javax.swing.JTree;
 import javax.swing.SwingUtilities;
-import javax.swing.JFileChooser;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -70,7 +81,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.CubicCurve2D;
@@ -290,11 +300,10 @@ public class TreeViewer extends JComponent {
 	protected static JDialog showInDialog(final TreeViewer viewer) {
 		final JDialog dialog = new JDialog();
 
-		// Make new content pane
-		final Container contentPane = new JPanel();
-		contentPane.setLayout(new BorderLayout(0,0));
+		// Make new content panes
+		final Container mainPane = new JPanel(new BorderLayout(5,5));
+		final Container contentPane = new JPanel(new BorderLayout(0,0));
 		contentPane.setBackground(Color.white);
-		dialog.setContentPane(contentPane);
 
 		// Wrap viewer in scroll pane
 		JScrollPane scrollPane = new JScrollPane(viewer);
@@ -305,7 +314,6 @@ public class TreeViewer extends JComponent {
 
 		// Add button to bottom
 		JPanel bottomPanel = new JPanel(new BorderLayout(0,0));
-		contentPane.add(bottomPanel, BorderLayout.SOUTH);
 
 		JButton ok = new JButton("OK");
 		ok.addActionListener(
@@ -348,9 +356,61 @@ public class TreeViewer extends JComponent {
 		);
 		bottomPanel.add(scaleSlider, BorderLayout.CENTER);
 
+		// Add a JTree representing the parser tree of the input.
+		JPanel treePanel = new JPanel(new BorderLayout(5, 5));
+
+		// An "empty" icon that will be used for the JTree's nodes.
+		Icon empty = new EmptyIcon();
+
+		UIManager.put("Tree.closedIcon", empty);
+		UIManager.put("Tree.openIcon", empty);
+		UIManager.put("Tree.leafIcon", empty);
+
+		Tree parseTreeRoot = viewer.getTree().getRoot();
+		TreeNodeWrapper nodeRoot = new TreeNodeWrapper(parseTreeRoot, viewer);
+		fillTree(nodeRoot, parseTreeRoot, viewer);
+		final JTree tree = new JTree(nodeRoot);
+		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+
+		tree.addTreeSelectionListener(new TreeSelectionListener() {
+			@Override
+			public void valueChanged(TreeSelectionEvent e) {
+
+				JTree selectedTree = (JTree) e.getSource();
+				TreePath path = selectedTree.getSelectionPath();
+				TreeNodeWrapper treeNode = (TreeNodeWrapper) path.getLastPathComponent();
+
+				// Set the clicked AST.
+				viewer.treeLayout = new TreeLayout<Tree>(
+						new TreeLayoutAdaptor((Tree) treeNode.getUserObject()),
+						new TreeViewer.VariableExtentProvide(viewer),
+						new DefaultConfiguration<Tree>(
+								viewer.gapBetweenLevels, viewer.gapBetweenNodes), true);
+
+				// Let the UI display this new AST.
+				viewer.updatePreferredSize();
+			}
+		});
+
+		treePanel.add(new JScrollPane(tree));
+
+		// Create the pane for both the JTree and the AST
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+				treePanel, contentPane);
+
+		mainPane.add(splitPane, BorderLayout.CENTER);
+		mainPane.add(bottomPanel, BorderLayout.SOUTH);
+
+		dialog.setContentPane(mainPane);
+
 		// make viz
 		dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		dialog.setPreferredSize(new Dimension(600, 500));
 		dialog.pack();
+
+		// After pack(): set the divider at 1/3 of the frame.
+		splitPane.setDividerLocation(0.33);
+
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
 		return dialog;
@@ -433,6 +493,23 @@ public class TreeViewer extends JComponent {
 		}
 
 		return pngFile;
+	}
+
+	private static void fillTree(TreeNodeWrapper node, Tree tree, TreeViewer viewer) {
+
+		if (tree == null) {
+			return;
+		}
+
+		for (int i = 0; i < tree.getChildCount(); i++) {
+
+			Tree childTree = tree.getChild(i);
+			TreeNodeWrapper childNode = new TreeNodeWrapper(childTree, viewer);
+
+			node.add(childNode);
+
+			fillTree(childNode, childTree, viewer);
+		}
 	}
 
 	private Dimension getScaledTreeSize() {
@@ -609,5 +686,38 @@ public class TreeViewer extends JComponent {
 		}
 		this.scale = scale;
 		updatePreferredSize();
+	}
+
+	private static class TreeNodeWrapper extends DefaultMutableTreeNode {
+
+		final TreeViewer viewer;
+
+		TreeNodeWrapper(Tree tree, TreeViewer viewer) {
+			super(tree);
+			this.viewer = viewer;
+		}
+
+		@Override
+		public String toString() {
+			return viewer.getText((Tree) this.getUserObject());
+		}
+	}
+
+	private static class EmptyIcon implements Icon {
+
+		@Override
+		public int getIconWidth() {
+			return 0;
+		}
+
+		@Override
+		public int getIconHeight() {
+			return 0;
+		}
+
+		@Override
+		public void paintIcon(Component c, Graphics g, int x, int y) {
+			/* Do nothing. */
+		}
 	}
 }
