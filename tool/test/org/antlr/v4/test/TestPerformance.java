@@ -75,7 +75,6 @@ import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -750,15 +749,18 @@ public class TestPerformance extends BaseTest {
                             lexer.setInputStream(input);
                         } else {
                             lexer = lexerCtor.newInstance(input);
-							if (COMPUTE_TRANSITION_STATS) {
-								lexer.setInterpreter(new StatisticsLexerATNSimulator(lexer, lexer.getATN(), lexer.getInterpreter().decisionToDFA, lexer.getInterpreter().getSharedContextCache()));
-							}
-							sharedLexers[thread] = lexer;
+							DFA[] decisionToDFA = lexer.getInterpreter().decisionToDFA;
 							if (!REUSE_LEXER_DFA) {
-								Field decisionToDFAField = LexerATNSimulator.class.getDeclaredField("decisionToDFA");
-								decisionToDFAField.setAccessible(true);
-								decisionToDFAField.set(lexer.getInterpreter(), lexer.getInterpreter().decisionToDFA.clone());
+								decisionToDFA = new DFA[decisionToDFA.length];
 							}
+
+							if (COMPUTE_TRANSITION_STATS) {
+								lexer.setInterpreter(new StatisticsLexerATNSimulator(lexer, lexer.getATN(), decisionToDFA, lexer.getInterpreter().getSharedContextCache()));
+							} else if (!REUSE_LEXER_DFA) {
+								lexer.setInterpreter(new LexerATNSimulator(lexer, lexer.getATN(), decisionToDFA, lexer.getInterpreter().getSharedContextCache()));
+							}
+
+							sharedLexers[thread] = lexer;
                         }
 
 						if (!REUSE_LEXER_DFA) {
@@ -787,9 +789,17 @@ public class TestPerformance extends BaseTest {
                             parser.setInputStream(tokens);
                         } else {
                             parser = parserCtor.newInstance(tokens);
-							if (COMPUTE_TRANSITION_STATS) {
-								parser.setInterpreter(new StatisticsParserATNSimulator(parser, parser.getATN(), parser.getInterpreter().decisionToDFA, parser.getInterpreter().getSharedContextCache()));
+							DFA[] decisionToDFA = parser.getInterpreter().decisionToDFA;
+							if (!REUSE_PARSER_DFA) {
+								decisionToDFA = new DFA[decisionToDFA.length];
 							}
+
+							if (COMPUTE_TRANSITION_STATS) {
+								parser.setInterpreter(new StatisticsParserATNSimulator(parser, parser.getATN(), decisionToDFA, parser.getInterpreter().getSharedContextCache()));
+							} else if (!REUSE_PARSER_DFA) {
+								parser.setInterpreter(new ParserATNSimulator(parser, parser.getATN(), decisionToDFA, parser.getInterpreter().getSharedContextCache()));
+							}
+
 							sharedParsers[thread] = parser;
                         }
 
@@ -797,12 +807,6 @@ public class TestPerformance extends BaseTest {
 						if (!TWO_STAGE_PARSING) {
 							parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
 							parser.addErrorListener(new SummarizingDiagnosticErrorListener());
-						}
-
-						if (!REUSE_PARSER_DFA) {
-							Field decisionToDFAField = ParserATNSimulator.class.getDeclaredField("decisionToDFA");
-							decisionToDFAField.setAccessible(true);
-							decisionToDFAField.set(parser.getInterpreter(), parser.getInterpreter().decisionToDFA.clone());
 						}
 
 						if (!REUSE_PARSER_DFA) {
@@ -849,10 +853,15 @@ public class TestPerformance extends BaseTest {
 							if (REUSE_PARSER && parser != null) {
 								parser.setInputStream(tokens);
 							} else {
+								Parser previousParser = parser;
 								parser = parserCtor.newInstance(tokens);
+								DFA[] decisionToDFA = previousParser.getInterpreter().decisionToDFA;
 								if (COMPUTE_TRANSITION_STATS) {
-									parser.setInterpreter(new StatisticsParserATNSimulator(parser, parser.getATN(), parser.getInterpreter().decisionToDFA, parser.getInterpreter().getSharedContextCache()));
+									parser.setInterpreter(new StatisticsParserATNSimulator(parser, parser.getATN(), decisionToDFA, parser.getInterpreter().getSharedContextCache()));
+								} else if (!REUSE_PARSER_DFA) {
+									parser.setInterpreter(new ParserATNSimulator(parser, parser.getATN(), decisionToDFA, parser.getInterpreter().getSharedContextCache()));
 								}
+
 								sharedParsers[thread] = parser;
 							}
 
