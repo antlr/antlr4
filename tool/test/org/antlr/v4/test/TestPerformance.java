@@ -268,6 +268,14 @@ public class TestPerformance extends BaseTest {
 	 * be the total time required to parse the first <em>n</em> files).
 	 */
 	private static final boolean TIMING_CUMULATIVE = false;
+	/**
+	 * If {@code true}, the timing statistics will include the parser only. This
+	 * flag allows for targeted measurements, and helps eliminate variance when
+	 * {@link #PRELOAD_SOURCES} is {@code false}.
+	 * <p/>
+	 * This flag has no impact when {@link #RUN_PARSER} is {@code false}.
+	 */
+	private static final boolean TIME_PARSE_ONLY = false;
 
 	private static final boolean REPORT_SYNTAX_ERRORS = true;
 	private static final boolean REPORT_AMBIGUITIES = false;
@@ -1061,6 +1069,7 @@ public class TestPerformance extends BaseTest {
                             return new FileParseResult(input.getSourceName(), (int)checksum.getValue(), null, tokens.size(), startTime, lexer, null);
                         }
 
+						final long parseStartTime = System.nanoTime();
 						Parser parser = sharedParsers[thread];
                         if (REUSE_PARSER && parser != null) {
                             parser.setInputStream(tokens);
@@ -1168,7 +1177,7 @@ public class TestPerformance extends BaseTest {
                             ParseTreeWalker.DEFAULT.walk(listener, (ParseTree)parseResult);
                         }
 
-						return new FileParseResult(input.getSourceName(), (int)checksum.getValue(), (ParseTree)parseResult, tokens.size(), startTime, lexer, parser);
+						return new FileParseResult(input.getSourceName(), (int)checksum.getValue(), (ParseTree)parseResult, tokens.size(), TIME_PARSE_ONLY ? parseStartTime : startTime, lexer, parser);
                     } catch (Exception e) {
 						if (!REPORT_SYNTAX_ERRORS && e instanceof ParseCancellationException) {
 							return new FileParseResult("unknown", (int)checksum.getValue(), null, 0, startTime, null, null);
