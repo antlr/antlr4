@@ -314,6 +314,13 @@ public class TestPerformance extends BaseTest {
     private static final int PASSES = 4;
 
 	/**
+	 * This option controls the granularity of multi-threaded parse operations.
+	 * If {@code true}, the parsing operation will be parallelized across files;
+	 * otherwise the parsing will be parallelized across multiple iterations.
+	 */
+	private static final boolean FILE_GRANULARITY = false;
+
+	/**
 	 * Number of parser threads to use.
 	 */
 	private static final int NUMBER_OF_THREADS = 1;
@@ -349,7 +356,6 @@ public class TestPerformance extends BaseTest {
 	}
 
     private final AtomicIntegerArray tokenCount = new AtomicIntegerArray(PASSES);
-    private int currentPass;
 
     @Test
     //@org.junit.Ignore
@@ -362,7 +368,7 @@ public class TestPerformance extends BaseTest {
 		final String parserName = "JavaParser";
 		final String listenerName = "JavaBaseListener";
 		final String entryPoint = "compilationUnit";
-        ParserFactory factory = getParserFactory(lexerName, parserName, listenerName, entryPoint);
+        final ParserFactory factory = getParserFactory(lexerName, parserName, listenerName, entryPoint);
 
 		if (!TOP_PACKAGE.isEmpty()) {
             jdkSourceRoot = jdkSourceRoot + '/' + TOP_PACKAGE.replace('.', '/');
@@ -373,10 +379,8 @@ public class TestPerformance extends BaseTest {
 
 		FilenameFilter filesFilter = FilenameFilters.extension(".java", false);
 		FilenameFilter directoriesFilter = FilenameFilters.ALL_FILES;
-		List<InputDescriptor> sources = loadSources(directory, filesFilter, directoriesFilter, RECURSIVE);
-		if (SHUFFLE_FILES_AT_START) {
-			Collections.shuffle(sources, RANDOM);
-		}
+		final List<InputDescriptor> sources = loadSources(directory, filesFilter, directoriesFilter, RECURSIVE);
+
 		for (int i = 0; i < PASSES; i++) {
 			if (COMPUTE_TRANSITION_STATS) {
 				totalTransitionsPerFile[i] = new long[Math.min(sources.size(), MAX_FILES_PER_PARSE_ITERATION)];
@@ -392,35 +396,56 @@ public class TestPerformance extends BaseTest {
 		System.out.format("Located %d source files.%n", sources.size());
 		System.out.print(getOptionsDescription(TOP_PACKAGE));
 
-        currentPass = 0;
-        parse1(factory, sources);
-        for (int i = 0; i < PASSES - 1; i++) {
-            currentPass = i + 1;
-            if (CLEAR_DFA) {
-				if (sharedLexers.length > 0) {
-					ATN atn = sharedLexers[0].getATN();
-					for (int j = 0; j < sharedLexers[0].getInterpreter().decisionToDFA.length; j++) {
-						sharedLexers[0].getInterpreter().decisionToDFA[j] = new DFA(atn.getDecisionState(j), j);
-					}
+		ExecutorService executorService = Executors.newFixedThreadPool(FILE_GRANULARITY ? 1 : NUMBER_OF_THREADS, new NumberedThreadFactory());
+
+		executorService.submit(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					parse1(0, factory, sources, SHUFFLE_FILES_AT_START);
+				} catch (InterruptedException ex) {
+					Logger.getLogger(TestPerformance.class.getName()).log(Level.SEVERE, null, ex);
 				}
-
-				if (sharedParsers.length > 0) {
-					ATN atn = sharedParsers[0].getATN();
-					for (int j = 0; j < sharedParsers[0].getInterpreter().decisionToDFA.length; j++) {
-						sharedParsers[0].getInterpreter().decisionToDFA[j] = new DFA(atn.getDecisionState(j), j);
-					}
-				}
-
-				Arrays.fill(sharedLexers, null);
-				Arrays.fill(sharedParsers, null);
-            }
-
-			if (SHUFFLE_FILES_AFTER_ITERATIONS) {
-				Collections.shuffle(sources, RANDOM);
 			}
+		});
+        for (int i = 0; i < PASSES - 1; i++) {
+            final int currentPass = i + 1;
+			executorService.submit(new Runnable() {
+				@Override
+				public void run() {
+					if (CLEAR_DFA) {
+						int index = FILE_GRANULARITY ? 0 : ((NumberedThread)Thread.currentThread()).getThreadNumber();
+						if (sharedLexers.length > 0 && sharedLexers[index] != null) {
+							ATN atn = sharedLexers[index].getATN();
+							for (int j = 0; j < sharedLexers[index].getInterpreter().decisionToDFA.length; j++) {
+								sharedLexers[index].getInterpreter().decisionToDFA[j] = new DFA(atn.getDecisionState(j), j);
+							}
+						}
 
-            parse2(factory, sources);
+						if (sharedParsers.length > 0 && sharedParsers[index] != null) {
+							ATN atn = sharedParsers[index].getATN();
+							for (int j = 0; j < sharedParsers[index].getInterpreter().decisionToDFA.length; j++) {
+								sharedParsers[index].getInterpreter().decisionToDFA[j] = new DFA(atn.getDecisionState(j), j);
+							}
+						}
+
+						if (FILE_GRANULARITY) {
+							Arrays.fill(sharedLexers, null);
+							Arrays.fill(sharedParsers, null);
+						}
+					}
+
+					try {
+						parse2(currentPass, factory, sources, SHUFFLE_FILES_AFTER_ITERATIONS);
+					} catch (InterruptedException ex) {
+						Logger.getLogger(TestPerformance.class.getName()).log(Level.SEVERE, null, ex);
+					}
+				}
+			});
         }
+
+		executorService.shutdown();
+		executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
 		if (COMPUTE_TRANSITION_STATS) {
 			computeTransitionStatistics();
@@ -636,18 +661,24 @@ public class TestPerformance extends BaseTest {
      *  This method is separate from {@link #parse2} so the first pass can be distinguished when analyzing
      *  profiler results.
      */
-    protected void parse1(ParserFactory factory, Collection<InputDescriptor> sources) throws InterruptedException {
-        System.gc();
-        parseSources(factory, sources);
+    protected void parse1(int currentPass, ParserFactory factory, Collection<InputDescriptor> sources, boolean shuffleSources) throws InterruptedException {
+		if (FILE_GRANULARITY) {
+			System.gc();
+		}
+
+        parseSources(currentPass, factory, sources, shuffleSources);
     }
 
     /**
      *  This method is separate from {@link #parse1} so the first pass can be distinguished when analyzing
      *  profiler results.
      */
-    protected void parse2(ParserFactory factory, Collection<InputDescriptor> sources) throws InterruptedException {
-        System.gc();
-        parseSources(factory, sources);
+    protected void parse2(int currentPass, ParserFactory factory, Collection<InputDescriptor> sources, boolean shuffleSources) throws InterruptedException {
+		if (FILE_GRANULARITY) {
+			System.gc();
+		}
+
+        parseSources(currentPass, factory, sources, shuffleSources);
     }
 
     protected List<InputDescriptor> loadSources(File directory, FilenameFilter filesFilter, FilenameFilter directoriesFilter, boolean recursive) {
@@ -681,14 +712,29 @@ public class TestPerformance extends BaseTest {
     int configOutputSize = 0;
 
     @SuppressWarnings("unused")
-	protected void parseSources(final ParserFactory factory, Collection<InputDescriptor> sources) throws InterruptedException {
-        long startTime = System.currentTimeMillis();
+	protected void parseSources(final int currentPass, final ParserFactory factory, Collection<InputDescriptor> sources, boolean shuffleSources) throws InterruptedException {
+		if (shuffleSources) {
+			List<InputDescriptor> sourcesList = new ArrayList<InputDescriptor>(sources);
+			synchronized (RANDOM) {
+				Collections.shuffle(sourcesList, RANDOM);
+			}
+
+			sources = sourcesList;
+		}
+
+		long startTime = System.currentTimeMillis();
         tokenCount.set(currentPass, 0);
         int inputSize = 0;
 		int inputCount = 0;
 
 		Collection<Future<FileParseResult>> results = new ArrayList<Future<FileParseResult>>();
-		ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS, new NumberedThreadFactory());
+		ExecutorService executorService;
+		if (FILE_GRANULARITY) {
+			executorService = Executors.newFixedThreadPool(FILE_GRANULARITY ? NUMBER_OF_THREADS : 1, new NumberedThreadFactory());
+		} else {
+			executorService = Executors.newSingleThreadExecutor(new FixedThreadNumberFactory(((NumberedThread)Thread.currentThread()).getThreadNumber()));
+		}
+
 		for (InputDescriptor inputDescriptor : sources) {
 			if (inputCount >= MAX_FILES_PER_PARSE_ITERATION) {
 				break;
@@ -704,7 +750,7 @@ public class TestPerformance extends BaseTest {
 					// this incurred a great deal of overhead and was causing significant variations in performance results.
 					//System.out.format("Parsing file %s\n", input.getSourceName());
 					try {
-						return factory.parseFile(input, ((NumberedThread)Thread.currentThread()).getThreadNumber());
+						return factory.parseFile(input, currentPass, ((NumberedThread)Thread.currentThread()).getThreadNumber());
 					} catch (IllegalStateException ex) {
 						ex.printStackTrace(System.err);
 					} catch (Throwable t) {
@@ -756,7 +802,8 @@ public class TestPerformance extends BaseTest {
                           System.currentTimeMillis() - startTime);
 
 		if (sharedLexers.length > 0) {
-			Lexer lexer = sharedLexers[0];
+			int index = FILE_GRANULARITY ? 0 : ((NumberedThread)Thread.currentThread()).getThreadNumber();
+			Lexer lexer = sharedLexers[index];
 			final LexerATNSimulator lexerInterpreter = lexer.getInterpreter();
 			final DFA[] modeToDFA = lexerInterpreter.decisionToDFA;
 			if (SHOW_DFA_STATE_STATS) {
@@ -782,7 +829,8 @@ public class TestPerformance extends BaseTest {
 		}
 
 		if (RUN_PARSER && sharedParsers.length > 0) {
-			Parser parser = sharedParsers[0];
+			int index = FILE_GRANULARITY ? 0 : ((NumberedThread)Thread.currentThread()).getThreadNumber();
+			Parser parser = sharedParsers[index];
             // make sure the individual DFAState objects actually have unique ATNConfig arrays
             final ParserATNSimulator interpreter = parser.getInterpreter();
             final DFA[] decisionToDFA = interpreter.decisionToDFA;
@@ -958,7 +1006,7 @@ public class TestPerformance extends BaseTest {
 
             return new ParserFactory() {
 				@Override
-                public FileParseResult parseFile(CharStream input, int thread) {
+                public FileParseResult parseFile(CharStream input, int currentPass, int thread) {
 					final Checksum checksum = new CRC32();
 
 					final long startTime = System.nanoTime();
@@ -975,9 +1023,10 @@ public class TestPerformance extends BaseTest {
                         if (REUSE_LEXER && lexer != null) {
                             lexer.setInputStream(input);
                         } else {
+							Lexer previousLexer = lexer;
                             lexer = lexerCtor.newInstance(input);
-							DFA[] decisionToDFA = lexer.getInterpreter().decisionToDFA;
-							if (!REUSE_LEXER_DFA) {
+							DFA[] decisionToDFA = (FILE_GRANULARITY || previousLexer == null ? lexer : previousLexer).getInterpreter().decisionToDFA;
+							if (!REUSE_LEXER_DFA || (!FILE_GRANULARITY && previousLexer == null)) {
 								decisionToDFA = new DFA[decisionToDFA.length];
 							}
 
@@ -990,7 +1039,7 @@ public class TestPerformance extends BaseTest {
 							sharedLexers[thread] = lexer;
                         }
 
-						if (!REUSE_LEXER_DFA) {
+						if (lexer.getInterpreter().decisionToDFA[0] == null) {
 							ATN atn = lexer.getATN();
 							for (int i = 0; i < lexer.getInterpreter().decisionToDFA.length; i++) {
 								lexer.getInterpreter().decisionToDFA[i] = new DFA(atn.getDecisionState(i), i);
@@ -1015,9 +1064,10 @@ public class TestPerformance extends BaseTest {
                         if (REUSE_PARSER && parser != null) {
                             parser.setInputStream(tokens);
                         } else {
+							Parser previousParser = parser;
                             parser = parserCtor.newInstance(tokens);
-							DFA[] decisionToDFA = parser.getInterpreter().decisionToDFA;
-							if (!REUSE_PARSER_DFA) {
+							DFA[] decisionToDFA = (FILE_GRANULARITY || previousParser == null ? parser : previousParser).getInterpreter().decisionToDFA;
+							if (!REUSE_PARSER_DFA || (!FILE_GRANULARITY && previousParser == null)) {
 								decisionToDFA = new DFA[decisionToDFA.length];
 							}
 
@@ -1036,7 +1086,7 @@ public class TestPerformance extends BaseTest {
 							parser.addErrorListener(new SummarizingDiagnosticErrorListener());
 						}
 
-						if (!REUSE_PARSER_DFA) {
+						if (parser.getInterpreter().decisionToDFA[0] == null) {
 							ATN atn = parser.getATN();
 							for (int i = 0; i < parser.getInterpreter().decisionToDFA.length; i++) {
 								parser.getInterpreter().decisionToDFA[i] = new DFA(atn.getDecisionState(i), i);
@@ -1136,7 +1186,7 @@ public class TestPerformance extends BaseTest {
     }
 
     protected interface ParserFactory {
-        FileParseResult parseFile(CharStream input, int thread);
+        FileParseResult parseFile(CharStream input, int currentPass, int thread);
     }
 
 	protected static class FileParseResult {
@@ -1488,6 +1538,20 @@ public class TestPerformance extends BaseTest {
 
 	}
 
+	protected static class FixedThreadNumberFactory implements ThreadFactory {
+		private final int threadNumber;
+
+		public FixedThreadNumberFactory(int threadNumber) {
+			this.threadNumber = threadNumber;
+		}
+
+		@Override
+		public Thread newThread(Runnable r) {
+			assert threadNumber < NUMBER_OF_THREADS;
+			return new NumberedThread(r, threadNumber);
+		}
+	}
+
 	protected static class ChecksumParseTreeListener implements ParseTreeListener {
 		private static final int VISIT_TERMINAL = 1;
 		private static final int VISIT_ERROR_NODE = 2;
@@ -1530,7 +1594,7 @@ public class TestPerformance extends BaseTest {
 
 	protected static final class InputDescriptor {
 		private final String source;
-		private Reference<CharStream> inputStream;
+		private Reference<CloneableANTLRFileStream> inputStream;
 
 		public InputDescriptor(@NotNull String source) {
 			this.source = source;
@@ -1540,23 +1604,35 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@NotNull
-		public CharStream getInputStream() {
-			CharStream stream = inputStream != null ? inputStream.get() : null;
+		public synchronized CharStream getInputStream() {
+			CloneableANTLRFileStream stream = inputStream != null ? inputStream.get() : null;
 			if (stream == null) {
 				try {
-					stream = new ANTLRFileStream(source, ENCODING);
+					stream = new CloneableANTLRFileStream(source, ENCODING);
 				} catch (IOException ex) {
-					Logger.getLogger(TestPerformance.class.getName()).log(Level.SEVERE, null, ex);
-					stream = new ANTLRInputStream("");
+					throw new RuntimeException(ex);
 				}
 
 				if (PRELOAD_SOURCES) {
-					inputStream = new StrongReference<CharStream>(stream);
+					inputStream = new StrongReference<CloneableANTLRFileStream>(stream);
 				} else {
-					inputStream = new SoftReference<CharStream>(stream);
+					inputStream = new SoftReference<CloneableANTLRFileStream>(stream);
 				}
 			}
 
+			return stream.createCopy();
+		}
+	}
+
+	protected static class CloneableANTLRFileStream extends ANTLRFileStream {
+
+		public CloneableANTLRFileStream(String fileName, String encoding) throws IOException {
+			super(fileName, encoding);
+		}
+
+		public ANTLRInputStream createCopy() {
+			ANTLRInputStream stream = new ANTLRInputStream(this.data, this.n);
+			stream.name = this.getSourceName();
 			return stream;
 		}
 	}
