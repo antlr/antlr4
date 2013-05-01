@@ -43,6 +43,15 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.Tree;
 import org.antlr.v4.runtime.tree.Trees;
 
+import javax.swing.Icon;
+import javax.swing.JTree;
+import javax.swing.JSplitPane;
+import javax.swing.UIManager;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeSelectionModel;
+import javax.swing.tree.TreePath;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.event.TreeSelectionEvent;
 import javax.imageio.ImageIO;
 import javax.print.PrintException;
 import javax.swing.BorderFactory;
@@ -59,6 +68,7 @@ import javax.swing.JFileChooser;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
+import java.awt.Component;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -87,180 +97,180 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class TreeViewer extends JComponent {
-	public static final Color LIGHT_RED = new Color(244, 213, 211);
+    public static final Color LIGHT_RED = new Color(244, 213, 211);
 
-	public static class DefaultTreeTextProvider implements TreeTextProvider {
-		private final List<String> ruleNames;
+    public static class DefaultTreeTextProvider implements TreeTextProvider {
+        private final List<String> ruleNames;
 
-		public DefaultTreeTextProvider(@Nullable List<String> ruleNames) {
-			this.ruleNames = ruleNames;
-		}
+        public DefaultTreeTextProvider(@Nullable List<String> ruleNames) {
+            this.ruleNames = ruleNames;
+        }
 
-		@Override
-		public String getText(Tree node) {
-			return String.valueOf(Trees.getNodeText(node, ruleNames));
-		}
-	}
+        @Override
+        public String getText(Tree node) {
+            return String.valueOf(Trees.getNodeText(node, ruleNames));
+        }
+    }
 
-	public static class VariableExtentProvide implements NodeExtentProvider<Tree> {
-		TreeViewer viewer;
-		public VariableExtentProvide(TreeViewer viewer) {
-			this.viewer = viewer;
-		}
-		@Override
-		public double getWidth(Tree tree) {
-			FontMetrics fontMetrics = viewer.getFontMetrics(viewer.font);
-			String s = viewer.getText(tree);
-			int w = fontMetrics.stringWidth(s) + viewer.nodeWidthPadding*2;
-			return w;
-		}
+    public static class VariableExtentProvide implements NodeExtentProvider<Tree> {
+        TreeViewer viewer;
+        public VariableExtentProvide(TreeViewer viewer) {
+            this.viewer = viewer;
+        }
+        @Override
+        public double getWidth(Tree tree) {
+            FontMetrics fontMetrics = viewer.getFontMetrics(viewer.font);
+            String s = viewer.getText(tree);
+            int w = fontMetrics.stringWidth(s) + viewer.nodeWidthPadding*2;
+            return w;
+        }
 
-		@Override
-		public double getHeight(Tree tree) {
-			FontMetrics fontMetrics = viewer.getFontMetrics(viewer.font);
-			int h = fontMetrics.getHeight() + viewer.nodeHeightPadding*2;
-			String s = viewer.getText(tree);
-			String[] lines = s.split("\n");
-			return h * lines.length;
-		}
-	}
+        @Override
+        public double getHeight(Tree tree) {
+            FontMetrics fontMetrics = viewer.getFontMetrics(viewer.font);
+            int h = fontMetrics.getHeight() + viewer.nodeHeightPadding*2;
+            String s = viewer.getText(tree);
+            String[] lines = s.split("\n");
+            return h * lines.length;
+        }
+    }
 
-	protected TreeTextProvider treeTextProvider;
-	protected TreeLayout<Tree> treeLayout;
-	protected java.util.List<Tree> highlightedNodes;
+    protected TreeTextProvider treeTextProvider;
+    protected TreeLayout<Tree> treeLayout;
+    protected java.util.List<Tree> highlightedNodes;
 
-	protected String fontName = "Helvetica"; //Font.SANS_SERIF;
-	protected int fontStyle = Font.PLAIN;
-	protected int fontSize = 11;
-	protected Font font = new Font(fontName, fontStyle, fontSize);
+    protected String fontName = "Helvetica"; //Font.SANS_SERIF;
+    protected int fontStyle = Font.PLAIN;
+    protected int fontSize = 11;
+    protected Font font = new Font(fontName, fontStyle, fontSize);
 
-	protected double gapBetweenLevels = 17;
-	protected double gapBetweenNodes = 7;
-	protected int nodeWidthPadding = 2;  // added to left/right
-	protected int nodeHeightPadding = 0; // added above/below
-	protected int arcSize = 0;           // make an arc in node outline?
+    protected double gapBetweenLevels = 17;
+    protected double gapBetweenNodes = 7;
+    protected int nodeWidthPadding = 2;  // added to left/right
+    protected int nodeHeightPadding = 0; // added above/below
+    protected int arcSize = 0;           // make an arc in node outline?
 
-	protected double scale = 1.0;
+    protected double scale = 1.0;
 
-	protected Color boxColor = null;     // set to a color to make it draw background
+    protected Color boxColor = null;     // set to a color to make it draw background
 
-	protected Color highlightedBoxColor = Color.lightGray;
-	protected Color borderColor = null;
-	protected Color textColor = Color.black;
+    protected Color highlightedBoxColor = Color.lightGray;
+    protected Color borderColor = null;
+    protected Color textColor = Color.black;
 
-	public TreeViewer(@Nullable List<String> ruleNames, Tree tree) {
-		setTreeTextProvider(new DefaultTreeTextProvider(ruleNames));
+    public TreeViewer(@Nullable List<String> ruleNames, Tree tree) {
+        setTreeTextProvider(new DefaultTreeTextProvider(ruleNames));
         boolean useIdentity = true; // compare node identity
-		this.treeLayout =
-			new TreeLayout<Tree>(new TreeLayoutAdaptor(tree),
-								 new TreeViewer.VariableExtentProvide(this),
-								 new DefaultConfiguration<Tree>(gapBetweenLevels,
-																gapBetweenNodes),
-                                 useIdentity);
-		updatePreferredSize();
-		setFont(font);
-	}
+        this.treeLayout =
+                new TreeLayout<Tree>(new TreeLayoutAdaptor(tree),
+                        new TreeViewer.VariableExtentProvide(this),
+                        new DefaultConfiguration<Tree>(gapBetweenLevels,
+                                gapBetweenNodes),
+                        useIdentity);
+        updatePreferredSize();
+        setFont(font);
+    }
 
-	private void updatePreferredSize() {
-		setPreferredSize(getScaledTreeSize());
-		invalidate();
-		if (getParent() != null) {
-			getParent().validate();
-		}
-		repaint();
-	}
+    private void updatePreferredSize() {
+        setPreferredSize(getScaledTreeSize());
+        invalidate();
+        if (getParent() != null) {
+            getParent().validate();
+        }
+        repaint();
+    }
 
-	// ---------------- PAINT -----------------------------------------------
+    // ---------------- PAINT -----------------------------------------------
 
-	private boolean useCurvedEdges = false;
+    private boolean useCurvedEdges = false;
 
-	public boolean getUseCurvedEdges() {
-		return useCurvedEdges;
-	}
+    public boolean getUseCurvedEdges() {
+        return useCurvedEdges;
+    }
 
-	public void setUseCurvedEdges(boolean useCurvedEdges) {
-		this.useCurvedEdges = useCurvedEdges;
-	}
+    public void setUseCurvedEdges(boolean useCurvedEdges) {
+        this.useCurvedEdges = useCurvedEdges;
+    }
 
-	protected void paintEdges(Graphics g, Tree parent) {
-		if (!getTree().isLeaf(parent)) {
+    protected void paintEdges(Graphics g, Tree parent) {
+        if (!getTree().isLeaf(parent)) {
             BasicStroke stroke = new BasicStroke(1.0f, BasicStroke.CAP_ROUND,
                     BasicStroke.JOIN_ROUND);
             ((Graphics2D)g).setStroke(stroke);
 
-			Rectangle2D.Double parentBounds = getBoundsOfNode(parent);
-			double x1 = parentBounds.getCenterX();
-			double y1 = parentBounds.getMaxY();
-			for (Tree child : getTree().getChildren(parent)) {
-				Rectangle2D.Double childBounds = getBoundsOfNode(child);
-				double x2 = childBounds.getCenterX();
-				double y2 = childBounds.getMinY();
-				if (getUseCurvedEdges()) {
-					CubicCurve2D c = new CubicCurve2D.Double();
-					double ctrlx1 = x1;
-					double ctrly1 = (y1+y2)/2;
-					double ctrlx2 = x2;
-					double ctrly2 = y1;
-					c.setCurve(x1, y1, ctrlx1, ctrly1, ctrlx2, ctrly2, x2, y2);
-					((Graphics2D) g).draw(c);
-				} else {
-					g.drawLine((int) x1, (int) y1,
-							   (int) x2, (int) y2);
-				}
-				paintEdges(g, child);
-			}
-		}
-	}
+            Rectangle2D.Double parentBounds = getBoundsOfNode(parent);
+            double x1 = parentBounds.getCenterX();
+            double y1 = parentBounds.getMaxY();
+            for (Tree child : getTree().getChildren(parent)) {
+                Rectangle2D.Double childBounds = getBoundsOfNode(child);
+                double x2 = childBounds.getCenterX();
+                double y2 = childBounds.getMinY();
+                if (getUseCurvedEdges()) {
+                    CubicCurve2D c = new CubicCurve2D.Double();
+                    double ctrlx1 = x1;
+                    double ctrly1 = (y1+y2)/2;
+                    double ctrlx2 = x2;
+                    double ctrly2 = y1;
+                    c.setCurve(x1, y1, ctrlx1, ctrly1, ctrlx2, ctrly2, x2, y2);
+                    ((Graphics2D) g).draw(c);
+                } else {
+                    g.drawLine((int) x1, (int) y1,
+                            (int) x2, (int) y2);
+                }
+                paintEdges(g, child);
+            }
+        }
+    }
 
-	protected void paintBox(Graphics g, Tree tree) {
-		Rectangle2D.Double box = getBoundsOfNode(tree);
-		// draw the box in the background
-		if ( isHighlighted(tree) || boxColor!=null ||
-			 tree instanceof ErrorNode )
-		{
-			if ( isHighlighted(tree) ) g.setColor(highlightedBoxColor);
-			else if ( tree instanceof ErrorNode ) g.setColor(LIGHT_RED);
-			else g.setColor(boxColor);
-			g.fillRoundRect((int) box.x, (int) box.y, (int) box.width - 1,
-							(int) box.height - 1, arcSize, arcSize);
-		}
-		if ( borderColor!=null ) {
+    protected void paintBox(Graphics g, Tree tree) {
+        Rectangle2D.Double box = getBoundsOfNode(tree);
+        // draw the box in the background
+        if ( isHighlighted(tree) || boxColor!=null ||
+                tree instanceof ErrorNode )
+        {
+            if ( isHighlighted(tree) ) g.setColor(highlightedBoxColor);
+            else if ( tree instanceof ErrorNode ) g.setColor(LIGHT_RED);
+            else g.setColor(boxColor);
+            g.fillRoundRect((int) box.x, (int) box.y, (int) box.width - 1,
+                    (int) box.height - 1, arcSize, arcSize);
+        }
+        if ( borderColor!=null ) {
             g.setColor(borderColor);
             g.drawRoundRect((int) box.x, (int) box.y, (int) box.width - 1,
                     (int) box.height - 1, arcSize, arcSize);
         }
 
-		// draw the text on top of the box (possibly multiple lines)
-		g.setColor(textColor);
-		String s = getText(tree);
-		String[] lines = s.split("\n");
-		FontMetrics m = getFontMetrics(font);
-		int x = (int) box.x + arcSize / 2 + nodeWidthPadding;
-		int y = (int) box.y + m.getAscent() + m.getLeading() + 1 + nodeHeightPadding;
-		for (int i = 0; i < lines.length; i++) {
-			text(g, lines[i], x, y);
-			y += m.getHeight();
-		}
-	}
+        // draw the text on top of the box (possibly multiple lines)
+        g.setColor(textColor);
+        String s = getText(tree);
+        String[] lines = s.split("\n");
+        FontMetrics m = getFontMetrics(font);
+        int x = (int) box.x + arcSize / 2 + nodeWidthPadding;
+        int y = (int) box.y + m.getAscent() + m.getLeading() + 1 + nodeHeightPadding;
+        for (int i = 0; i < lines.length; i++) {
+            text(g, lines[i], x, y);
+            y += m.getHeight();
+        }
+    }
 
-	public void text(Graphics g, String s, int x, int y) {
+    public void text(Graphics g, String s, int x, int y) {
 //		System.out.println("drawing '"+s+"' @ "+x+","+y);
-		s = Utils.escapeWhitespace(s, true);
-		g.drawString(s, x, y);
-	}
+        s = Utils.escapeWhitespace(s, true);
+        g.drawString(s, x, y);
+    }
 
-	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
 
-		Graphics2D g2 = (Graphics2D)g;
-		// anti-alias the lines
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-      						RenderingHints.VALUE_ANTIALIAS_ON);
+        Graphics2D g2 = (Graphics2D)g;
+        // anti-alias the lines
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
 
-		// Anti-alias the text
-		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                         	RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        // Anti-alias the text
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 //		AffineTransform at = g2.getTransform();
 //        g2.scale(
@@ -269,345 +279,445 @@ public class TreeViewer extends JComponent {
 //
 //		g2.setTransform(at);
 
-		paintEdges(g, getTree().getRoot());
+        paintEdges(g, getTree().getRoot());
 
-		// paint the boxes
-		for (Tree Tree : treeLayout.getNodeBounds().keySet()) {
-			paintBox(g, Tree);
-		}
-	}
+        // paint the boxes
+        for (Tree Tree : treeLayout.getNodeBounds().keySet()) {
+            paintBox(g, Tree);
+        }
+    }
 
-	@Override
-	protected Graphics getComponentGraphics(Graphics g) {
-		Graphics2D g2d=(Graphics2D)g;
-		g2d.scale(scale, scale);
-		return super.getComponentGraphics(g2d);
-	}
+    @Override
+    protected Graphics getComponentGraphics(Graphics g) {
+        Graphics2D g2d=(Graphics2D)g;
+        g2d.scale(scale, scale);
+        return super.getComponentGraphics(g2d);
+    }
 
-	// ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
 
-	@NotNull
-	protected static JDialog showInDialog(final TreeViewer viewer) {
-		final JDialog dialog = new JDialog();
+    @NotNull
+    protected static JDialog showInDialog(final TreeViewer viewer) {
+        final JDialog dialog = new JDialog();
 
-		// Make new content pane
-		final Container contentPane = new JPanel();
-		contentPane.setLayout(new BorderLayout(0,0));
-		contentPane.setBackground(Color.white);
-		dialog.setContentPane(contentPane);
+        // Make new content panes
+        final Container mainPane = new JPanel(new BorderLayout(5,5));
+        final Container contentPane = new JPanel(new BorderLayout(0,0));
+        contentPane.setBackground(Color.white);
 
-		// Wrap viewer in scroll pane
-		JScrollPane scrollPane = new JScrollPane(viewer);
-		// Make the scrollpane (containing the viewer) the center component
-		contentPane.add(scrollPane, BorderLayout.CENTER);
+        // Wrap viewer in scroll pane
+        JScrollPane scrollPane = new JScrollPane(viewer);
+        // Make the scrollpane (containing the viewer) the center component
+        contentPane.add(scrollPane, BorderLayout.CENTER);
 
-		JPanel wrapper = new JPanel(new FlowLayout());
+        JPanel wrapper = new JPanel(new FlowLayout());
 
-		// Add button to bottom
-		JPanel bottomPanel = new JPanel(new BorderLayout(0,0));
-		contentPane.add(bottomPanel, BorderLayout.SOUTH);
+        // Add button to bottom
+        JPanel bottomPanel = new JPanel(new BorderLayout(0,0));
 
-		JButton ok = new JButton("OK");
-		ok.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					dialog.setVisible(false);
-					dialog.dispose();
-				}
-			}
-		);
-		wrapper.add(ok);
+        JButton ok = new JButton("OK");
+        ok.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        dialog.setVisible(false);
+                        dialog.dispose();
+                    }
+                }
+        );
+        wrapper.add(ok);
 
-		// Add an export-to-png button right of the "OK" button
-		JButton png = new JButton("png");
-		png.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					generatePNGFile(viewer, dialog);
-				}
-			}
-		);
-		wrapper.add(png);
+        // Add an export-to-png button right of the "OK" button
+        JButton png = new JButton("png");
+        png.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        generatePNGFile(viewer, dialog);
+                    }
+                }
+        );
+        wrapper.add(png);
 
-		bottomPanel.add(wrapper, BorderLayout.SOUTH);
+        bottomPanel.add(wrapper, BorderLayout.SOUTH);
 
-		// Add scale slider
-		int sliderValue = (int) ((viewer.getScale()-1.0) * 1000);
-		final JSlider scaleSlider = new JSlider(JSlider.HORIZONTAL,
-										  -999,1000,sliderValue);
-		scaleSlider.addChangeListener(
-			new ChangeListener() {
-				@Override
-				public void stateChanged(ChangeEvent e) {
-					int v = scaleSlider.getValue();
-					viewer.setScale(v / 1000.0 + 1.0);
-				}
-			}
-		);
-		bottomPanel.add(scaleSlider, BorderLayout.CENTER);
+        // Add scale slider
+        int sliderValue = (int) ((viewer.getScale()-1.0) * 1000);
+        final JSlider scaleSlider = new JSlider(JSlider.HORIZONTAL,
+                -999,1000,sliderValue);
+        scaleSlider.addChangeListener(
+                new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        int v = scaleSlider.getValue();
+                        viewer.setScale(v / 1000.0 + 1.0);
+                    }
+                }
+        );
+        bottomPanel.add(scaleSlider, BorderLayout.CENTER);
 
-		// make viz
-		dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		dialog.pack();
-		dialog.setLocationRelativeTo(null);
-		dialog.setVisible(true);
-		return dialog;
-	}
+        // Add a JTree representing the parser tree of the input.
+        JPanel treePanel = new JPanel(new BorderLayout(5, 5));
 
-	private static void generatePNGFile(TreeViewer viewer, JDialog dialog) {
-		BufferedImage bi = new BufferedImage(viewer.getSize().width,
-											 viewer.getSize().height,
-											 BufferedImage.TYPE_INT_ARGB);
-		Graphics g = bi.createGraphics();
-		viewer.paint(g);
-		g.dispose();
+        // An "empty" icon that will be used for the JTree's nodes.
+        Icon empty = new EmptyIcon();
 
-		try {
-			File suggestedFile = generateNonExistingPngFile();
-			JFileChooser fileChooser = new JFileChooserConfirmOverwrite();
-			fileChooser.setCurrentDirectory(suggestedFile.getParentFile());
-			fileChooser.setSelectedFile(suggestedFile);
-			FileFilter pngFilter = new FileFilter() {
+        UIManager.put("Tree.closedIcon", empty);
+        UIManager.put("Tree.openIcon", empty);
+        UIManager.put("Tree.leafIcon", empty);
 
-				@Override
-				public boolean accept(File pathname) {
-					if (pathname.isFile()) {
-						return pathname.getName().toLowerCase().endsWith(".png");
-					}
+        Tree parseTreeRoot = viewer.getTree().getRoot();
+        TreeNodeWrapper nodeRoot = new TreeNodeWrapper(parseTreeRoot, viewer);
+        fillTree(nodeRoot, parseTreeRoot, viewer);
+        final JTree tree = new JTree(nodeRoot);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
-					return true;
-				}
+        tree.addTreeSelectionListener(new TreeSelectionListener() {
+            @Override
+            public void valueChanged(TreeSelectionEvent e) {
 
-				@Override
-				public String getDescription() {
-					return "PNG Files (*.png)";
-				}
-			};
+                JTree selectedTree = (JTree) e.getSource();
+                TreePath path = selectedTree.getSelectionPath();
+                TreeNodeWrapper treeNode = (TreeNodeWrapper) path.getLastPathComponent();
 
-			fileChooser.addChoosableFileFilter(pngFilter);
-			fileChooser.setFileFilter(pngFilter);
+                // Set the clicked AST.
+                viewer.treeLayout = new TreeLayout<Tree>(
+                        new TreeLayoutAdaptor((Tree) treeNode.getUserObject()),
+                        new TreeViewer.VariableExtentProvide(viewer),
+                        new DefaultConfiguration<Tree>(
+                                viewer.gapBetweenLevels, viewer.gapBetweenNodes), true);
 
-			int returnValue = fileChooser.showSaveDialog(dialog);
-			if (returnValue == JFileChooser.APPROVE_OPTION) {
-				File pngFile = fileChooser.getSelectedFile();
-				ImageIO.write(bi, "png", pngFile);
+                // Let the UI display this new AST.
+                viewer.updatePreferredSize();
+            }
+        });
 
-				try {
-					// Try to open the parent folder using the OS' native file manager.
-					Desktop.getDesktop().open(pngFile.getParentFile());
-				}
-				catch (Exception ex) {
-					// We could not launch the file manager: just show a popup that we
-					// succeeded in saving the PNG file.
-					JOptionPane.showMessageDialog(dialog, "Saved PNG to: " +
-												  pngFile.getAbsolutePath());
-					ex.printStackTrace();
-				}
-			}
-		}
-		catch (Exception ex) {
-			JOptionPane.showMessageDialog(dialog,
-										  "Could not export to PNG: " + ex.getMessage(),
-										  "Error",
-										  JOptionPane.ERROR_MESSAGE);
-			ex.printStackTrace();
-		}
-	}
+        treePanel.add(new JScrollPane(tree));
 
-	private static File generateNonExistingPngFile() {
+        // Create the pane for both the JTree and the AST
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+                treePanel, contentPane);
 
-		final String parent = ".";
-		final String name = "antlr4_parse_tree";
-		final String extension = ".png";
+        mainPane.add(splitPane, BorderLayout.CENTER);
+        mainPane.add(bottomPanel, BorderLayout.SOUTH);
 
-		File pngFile = new File(parent, name + extension);
+        dialog.setContentPane(mainPane);
 
-		int counter = 1;
+        // make viz
+        dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        dialog.setPreferredSize(new Dimension(600, 500));
+        dialog.pack();
 
-		// Keep looping until we create a File that does not yet exist.
-		while (pngFile.exists()) {
-			pngFile = new File(parent, name + "_"+ counter + extension);
-			counter++;
-		}
+        // After pack(): set the divider at 1/3 of the frame.
+        splitPane.setDividerLocation(0.33);
 
-		return pngFile;
-	}
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+        return dialog;
+    }
 
-	private Dimension getScaledTreeSize() {
-		Dimension scaledTreeSize =
-			treeLayout.getBounds().getBounds().getSize();
-		scaledTreeSize = new Dimension((int)(scaledTreeSize.width*scale),
-									   (int)(scaledTreeSize.height*scale));
-		return scaledTreeSize;
-	}
+    private static void generatePNGFile(TreeViewer viewer, JDialog dialog) {
+        BufferedImage bi = new BufferedImage(viewer.getSize().width,
+                viewer.getSize().height,
+                BufferedImage.TYPE_INT_ARGB);
+        Graphics g = bi.createGraphics();
+        viewer.paint(g);
+        g.dispose();
 
-	@NotNull
-	public Future<JDialog> open() {
-		final TreeViewer viewer = this;
-		viewer.setScale(1.5);
-		Callable<JDialog> callable = new Callable<JDialog>() {
-			JDialog result;
+        try {
+            File suggestedFile = generateNonExistingPngFile();
+            JFileChooser fileChooser = new JFileChooserConfirmOverwrite();
+            fileChooser.setCurrentDirectory(suggestedFile.getParentFile());
+            fileChooser.setSelectedFile(suggestedFile);
+            FileFilter pngFilter = new FileFilter() {
 
-			@Override
-			public JDialog call() throws Exception {
-				SwingUtilities.invokeAndWait(new Runnable() {
-					@Override
-					public void run() {
-						result = showInDialog(viewer);
-					}
-				});
+                @Override
+                public boolean accept(File pathname) {
+                    if (pathname.isFile()) {
+                        return pathname.getName().toLowerCase().endsWith(".png");
+                    }
 
-				return result;
-			}
-		};
+                    return true;
+                }
 
-		ExecutorService executor = Executors.newSingleThreadExecutor();
+                @Override
+                public String getDescription() {
+                    return "PNG Files (*.png)";
+                }
+            };
 
-		try {
-			return executor.submit(callable);
-		}
-		finally {
-			executor.shutdown();
-		}
-	}
+            fileChooser.addChoosableFileFilter(pngFilter);
+            fileChooser.setFileFilter(pngFilter);
 
-	public void save(String fileName) throws IOException, PrintException {
-		JDialog dialog = new JDialog();
-		Container contentPane = dialog.getContentPane();
-		((JComponent) contentPane).setBorder(BorderFactory.createEmptyBorder(
-				10, 10, 10, 10));
-		contentPane.add(this);
-		contentPane.setBackground(Color.white);
-		dialog.pack();
-		dialog.setLocationRelativeTo(null);
-		dialog.dispose();
-		GraphicsSupport.saveImage(this, fileName);
-	}
+            int returnValue = fileChooser.showSaveDialog(dialog);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                File pngFile = fileChooser.getSelectedFile();
+                ImageIO.write(bi, "png", pngFile);
 
-	// ---------------------------------------------------
+                try {
+                    // Try to open the parent folder using the OS' native file manager.
+                    Desktop.getDesktop().open(pngFile.getParentFile());
+                }
+                catch (Exception ex) {
+                    // We could not launch the file manager: just show a popup that we
+                    // succeeded in saving the PNG file.
+                    JOptionPane.showMessageDialog(dialog, "Saved PNG to: " +
+                            pngFile.getAbsolutePath());
+                    ex.printStackTrace();
+                }
+            }
+        }
+        catch (Exception ex) {
+            JOptionPane.showMessageDialog(dialog,
+                    "Could not export to PNG: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }
+    }
 
-	protected Rectangle2D.Double getBoundsOfNode(Tree node) {
-		return treeLayout.getNodeBounds().get(node);
-	}
+    private static File generateNonExistingPngFile() {
 
-	protected String getText(Tree tree) {
-		String s = treeTextProvider.getText(tree);
-		s = Utils.escapeWhitespace(s, true);
-		return s;
-	}
+        final String parent = ".";
+        final String name = "antlr4_parse_tree";
+        final String extension = ".png";
 
-	public TreeTextProvider getTreeTextProvider() {
-		return treeTextProvider;
-	}
+        File pngFile = new File(parent, name + extension);
 
-	public void setTreeTextProvider(TreeTextProvider treeTextProvider) {
-		this.treeTextProvider = treeTextProvider;
-	}
+        int counter = 1;
 
-	public void setFontSize(int sz) {
-		fontSize = sz;
-		font = new Font(fontName, fontStyle, fontSize);
-	}
+        // Keep looping until we create a File that does not yet exist.
+        while (pngFile.exists()) {
+            pngFile = new File(parent, name + "_"+ counter + extension);
+            counter++;
+        }
 
-	public void setFontName(String name) {
-		fontName = name;
-		font = new Font(fontName, fontStyle, fontSize);
-	}
+        return pngFile;
+    }
 
-	/** Slow for big lists of highlighted nodes */
-	public void addHighlightedNodes(Collection<Tree> nodes) {
-		highlightedNodes = new ArrayList<Tree>();
-		highlightedNodes.addAll(nodes);
-	}
+    private static void fillTree(TreeNodeWrapper node, Tree tree, TreeViewer viewer) {
 
-	public void removeHighlightedNodes(Collection<Tree> nodes) {
-		if ( highlightedNodes!=null ) {
-			// only remove exact objects defined by ==, not equals()
-			for (Tree t : nodes) {
-				int i = getHighlightedNodeIndex(t);
-				if ( i>=0 ) highlightedNodes.remove(i);
-			}
-		}
-	}
+        if (tree == null) {
+            return;
+        }
 
-	protected boolean isHighlighted(Tree node) {
-		return getHighlightedNodeIndex(node) >= 0;
-	}
+        for (int i = 0; i < tree.getChildCount(); i++) {
 
-	protected int getHighlightedNodeIndex(Tree node) {
-		if ( highlightedNodes==null ) return -1;
-		for (int i = 0; i < highlightedNodes.size(); i++) {
-			Tree t = highlightedNodes.get(i);
-			if ( t == node ) return i;
-		}
-		return -1;
-	}
+            Tree childTree = tree.getChild(i);
+            TreeNodeWrapper childNode = new TreeNodeWrapper(childTree, viewer);
 
-	@Override
-	public Font getFont() {
-		return font;
-	}
+            node.add(childNode);
 
-	@Override
-	public void setFont(Font font) {
-		this.font = font;
-	}
+            fillTree(childNode, childTree, viewer);
+        }
+    }
 
-	public int getArcSize() {
-		return arcSize;
-	}
+    private Dimension getScaledTreeSize() {
+        Dimension scaledTreeSize =
+                treeLayout.getBounds().getBounds().getSize();
+        scaledTreeSize = new Dimension((int)(scaledTreeSize.width*scale),
+                (int)(scaledTreeSize.height*scale));
+        return scaledTreeSize;
+    }
 
-	public void setArcSize(int arcSize) {
-		this.arcSize = arcSize;
-	}
+    @NotNull
+    public Future<JDialog> open() {
+        final TreeViewer viewer = this;
+        viewer.setScale(1.5);
+        Callable<JDialog> callable = new Callable<JDialog>() {
+            JDialog result;
 
-	public Color getBoxColor() {
-		return boxColor;
-	}
+            @Override
+            public JDialog call() throws Exception {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    @Override
+                    public void run() {
+                        result = showInDialog(viewer);
+                    }
+                });
 
-	public void setBoxColor(Color boxColor) {
-		this.boxColor = boxColor;
-	}
+                return result;
+            }
+        };
 
-	public Color getHighlightedBoxColor() {
-		return highlightedBoxColor;
-	}
+        ExecutorService executor = Executors.newSingleThreadExecutor();
 
-	public void setHighlightedBoxColor(Color highlightedBoxColor) {
-		this.highlightedBoxColor = highlightedBoxColor;
-	}
+        try {
+            return executor.submit(callable);
+        }
+        finally {
+            executor.shutdown();
+        }
+    }
 
-	public Color getBorderColor() {
-		return borderColor;
-	}
+    public void save(String fileName) throws IOException, PrintException {
+        JDialog dialog = new JDialog();
+        Container contentPane = dialog.getContentPane();
+        ((JComponent) contentPane).setBorder(BorderFactory.createEmptyBorder(
+                10, 10, 10, 10));
+        contentPane.add(this);
+        contentPane.setBackground(Color.white);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.dispose();
+        GraphicsSupport.saveImage(this, fileName);
+    }
 
-	public void setBorderColor(Color borderColor) {
-		this.borderColor = borderColor;
-	}
+    // ---------------------------------------------------
 
-	public Color getTextColor() {
-		return textColor;
-	}
+    protected Rectangle2D.Double getBoundsOfNode(Tree node) {
+        return treeLayout.getNodeBounds().get(node);
+    }
 
-	public void setTextColor(Color textColor) {
-		this.textColor = textColor;
-	}
+    protected String getText(Tree tree) {
+        String s = treeTextProvider.getText(tree);
+        s = Utils.escapeWhitespace(s, true);
+        return s;
+    }
 
-	protected TreeForTreeLayout<Tree> getTree() {
-		return treeLayout.getTree();
-	}
+    public TreeTextProvider getTreeTextProvider() {
+        return treeTextProvider;
+    }
 
-	public double getScale() {
-		return scale;
-	}
+    public void setTreeTextProvider(TreeTextProvider treeTextProvider) {
+        this.treeTextProvider = treeTextProvider;
+    }
 
-	public void setScale(double scale) {
-		if(scale <= 0) {
-			scale = 1;
-		}
-		this.scale = scale;
-		updatePreferredSize();
-	}
+    public void setFontSize(int sz) {
+        fontSize = sz;
+        font = new Font(fontName, fontStyle, fontSize);
+    }
+
+    public void setFontName(String name) {
+        fontName = name;
+        font = new Font(fontName, fontStyle, fontSize);
+    }
+
+    /** Slow for big lists of highlighted nodes */
+    public void addHighlightedNodes(Collection<Tree> nodes) {
+        highlightedNodes = new ArrayList<Tree>();
+        highlightedNodes.addAll(nodes);
+    }
+
+    public void removeHighlightedNodes(Collection<Tree> nodes) {
+        if ( highlightedNodes!=null ) {
+            // only remove exact objects defined by ==, not equals()
+            for (Tree t : nodes) {
+                int i = getHighlightedNodeIndex(t);
+                if ( i>=0 ) highlightedNodes.remove(i);
+            }
+        }
+    }
+
+    protected boolean isHighlighted(Tree node) {
+        return getHighlightedNodeIndex(node) >= 0;
+    }
+
+    protected int getHighlightedNodeIndex(Tree node) {
+        if ( highlightedNodes==null ) return -1;
+        for (int i = 0; i < highlightedNodes.size(); i++) {
+            Tree t = highlightedNodes.get(i);
+            if ( t == node ) return i;
+        }
+        return -1;
+    }
+
+    @Override
+    public Font getFont() {
+        return font;
+    }
+
+    @Override
+    public void setFont(Font font) {
+        this.font = font;
+    }
+
+    public int getArcSize() {
+        return arcSize;
+    }
+
+    public void setArcSize(int arcSize) {
+        this.arcSize = arcSize;
+    }
+
+    public Color getBoxColor() {
+        return boxColor;
+    }
+
+    public void setBoxColor(Color boxColor) {
+        this.boxColor = boxColor;
+    }
+
+    public Color getHighlightedBoxColor() {
+        return highlightedBoxColor;
+    }
+
+    public void setHighlightedBoxColor(Color highlightedBoxColor) {
+        this.highlightedBoxColor = highlightedBoxColor;
+    }
+
+    public Color getBorderColor() {
+        return borderColor;
+    }
+
+    public void setBorderColor(Color borderColor) {
+        this.borderColor = borderColor;
+    }
+
+    public Color getTextColor() {
+        return textColor;
+    }
+
+    public void setTextColor(Color textColor) {
+        this.textColor = textColor;
+    }
+
+    protected TreeForTreeLayout<Tree> getTree() {
+        return treeLayout.getTree();
+    }
+
+    public double getScale() {
+        return scale;
+    }
+
+    public void setScale(double scale) {
+        if(scale <= 0) {
+            scale = 1;
+        }
+        this.scale = scale;
+        updatePreferredSize();
+    }
+
+    private static class TreeNodeWrapper extends DefaultMutableTreeNode {
+
+        final TreeViewer viewer;
+
+        TreeNodeWrapper(Tree tree, TreeViewer viewer) {
+            super(tree);
+            this.viewer = viewer;
+        }
+
+        @Override
+        public String toString() {
+            return viewer.getText((Tree) this.getUserObject());
+        }
+    }
+
+    private static class EmptyIcon implements Icon {
+
+        @Override
+        public int getIconWidth() {
+            return 0;
+        }
+
+        @Override
+        public int getIconHeight() {
+            return 0;
+        }
+
+        @Override
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            /* Do nothing. */
+        }
+    }
 }
