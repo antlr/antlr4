@@ -794,7 +794,8 @@ public class TestPerformance extends BaseTest {
 		executorService.shutdown();
 		executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
-        System.out.format("Total parse time for %d files (%d KB, %d tokens, checksum 0x%8X): %dms%n",
+        System.out.format("%d. Total parse time for %d files (%d KB, %d tokens, checksum 0x%8X): %dms%n",
+						  currentPass + 1,
                           inputCount,
                           inputSize / 1024,
                           tokenCount.get(currentPass),
