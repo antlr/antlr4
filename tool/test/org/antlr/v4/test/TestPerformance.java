@@ -257,6 +257,18 @@ public class TestPerformance extends BaseTest {
 	 */
 	private static final boolean TRANSITION_WEIGHTED_AVERAGE = false;
 
+	/**
+	 * If {@code true}, after each pass a summary of the time required to parse
+	 * each file will be printed.
+	 */
+	private static final boolean COMPUTE_TIMING_STATS = false;
+	/**
+	 * If {@code true}, the timing statistics for {@link #COMPUTE_TIMING_STATS}
+	 * will be cumulative (i.e. the time reported for the <em>n</em>th file will
+	 * be the total time required to parse the first <em>n</em> files).
+	 */
+	private static final boolean TIMING_CUMULATIVE = false;
+
 	private static final boolean REPORT_SYNTAX_ERRORS = true;
 	private static final boolean REPORT_AMBIGUITIES = false;
 	private static final boolean REPORT_FULL_CONTEXT = false;
@@ -321,6 +333,18 @@ public class TestPerformance extends BaseTest {
 		} else {
 			totalTransitionsPerFile = null;
 			computedTransitionsPerFile = null;
+		}
+	}
+
+	private static final long[][] timePerFile;
+	private static final int[][] tokensPerFile;
+	static {
+		if (COMPUTE_TIMING_STATS) {
+			timePerFile = new long[PASSES][];
+			tokensPerFile = new int[PASSES][];
+		} else {
+			timePerFile = null;
+			tokensPerFile = null;
 		}
 	}
 
@@ -400,6 +424,10 @@ public class TestPerformance extends BaseTest {
 
 		if (COMPUTE_TRANSITION_STATS) {
 			computeTransitionStatistics();
+		}
+
+		if (COMPUTE_TIMING_STATS) {
+			computeTimingStatistics();
 		}
 
 		sources.clear();
@@ -484,6 +512,75 @@ public class TestPerformance extends BaseTest {
 		System.out.format("File\tAverage\tStd. Dev.\t95%% Low\t95%% High\t66.7%% Low\t66.7%% High%n");
 		for (int i = 0; i < stddev.length; i++) {
 			final double averageValue = TRANSITION_WEIGHTED_AVERAGE ? weightedAverage[i] : average[i];
+			System.out.format("%d\t%e\t%e\t%e\t%e\t%e\t%e%n", i + 1, averageValue, stddev[i], averageValue - low95[i], high95[i] - averageValue, averageValue - low67[i], high67[i] - averageValue);
+		}
+	}
+
+	/**
+	 * Compute and print timing statistics.
+	 */
+	private void computeTimingStatistics() {
+		if (TIMING_CUMULATIVE) {
+			for (int i = 0; i < PASSES; i++) {
+				long[] data = timePerFile[i];
+				for (int j = 0; j < data.length - 1; j++) {
+					data[j + 1] += data[j];
+				}
+
+				int[] data2 = tokensPerFile[i];
+				for (int j = 0; j < data2.length - 1; j++) {
+					data2[j + 1] += data2[j];
+				}
+			}
+		}
+
+		final int fileCount = timePerFile[0].length;
+		double[] sum = new double[fileCount];
+		for (int i = 0; i < PASSES; i++) {
+			long[] data = timePerFile[i];
+			int[] tokenData = tokensPerFile[i];
+			for (int j = 0; j < data.length; j++) {
+				sum[j] += (double)data[j] / (double)tokenData[j];
+			}
+		}
+
+		double[] average = new double[fileCount];
+		for (int i = 0; i < average.length; i++) {
+			average[i] = sum[i] / PASSES;
+		}
+
+		double[] low95 = new double[fileCount];
+		double[] high95 = new double[fileCount];
+		double[] low67 = new double[fileCount];
+		double[] high67 = new double[fileCount];
+		double[] stddev = new double[fileCount];
+		for (int i = 0; i < stddev.length; i++) {
+			double[] points = new double[PASSES];
+			for (int j = 0; j < PASSES; j++) {
+				points[j] = (double)timePerFile[j][i] / (double)tokensPerFile[j][i];
+			}
+
+			Arrays.sort(points);
+
+			final double averageValue = average[i];
+			double value = 0;
+			for (int j = 0; j < PASSES; j++) {
+				double diff = points[j] - averageValue;
+				value += diff * diff;
+			}
+
+			int ignoreCount95 = (int)Math.round(PASSES * (1 - 0.95) / 2.0);
+			int ignoreCount67 = (int)Math.round(PASSES * (1 - 0.667) / 2.0);
+			low95[i] = points[ignoreCount95];
+			high95[i] = points[points.length - 1 - ignoreCount95];
+			low67[i] = points[ignoreCount67];
+			high67[i] = points[points.length - 1 - ignoreCount67];
+			stddev[i] = Math.sqrt(value / PASSES);
+		}
+
+		System.out.format("File\tAverage\tStd. Dev.\t95%% Low\t95%% High\t66.7%% Low\t66.7%% High%n");
+		for (int i = 0; i < stddev.length; i++) {
+			final double averageValue = average[i];
 			System.out.format("%d\t%e\t%e\t%e\t%e\t%e\t%e%n", i + 1, averageValue, stddev[i], averageValue - low95[i], high95[i] - averageValue, averageValue - low67[i], high67[i] - averageValue);
 		}
 	}
@@ -633,6 +730,11 @@ public class TestPerformance extends BaseTest {
 					computedTransitionsPerFile[currentPass][currentIndex] = fileResult.parserComputedTransitions;
 				}
 
+				if (COMPUTE_TIMING_STATS) {
+					timePerFile[currentPass][currentIndex] = fileResult.endTime - fileResult.startTime;
+					tokensPerFile[currentPass][currentIndex] = fileResult.tokenCount;
+				}
+
 				fileChecksum = fileResult.checksum;
 			} catch (ExecutionException ex) {
 				Logger.getLogger(TestPerformance.class.getName()).log(Level.SEVERE, null, ex);
@@ -759,6 +861,13 @@ public class TestPerformance extends BaseTest {
                 }
             }
         }
+
+		if (COMPUTE_TIMING_STATS) {
+			System.out.format("File\tTokens\tTime%n");
+			for (int i = 0; i< timePerFile[currentPass].length; i++) {
+				System.out.format("%d\t%d\t%d%n", i + 1, tokensPerFile[currentPass][i], timePerFile[currentPass][i]);
+			}
+		}
     }
 
     protected void compileJavaParser(boolean leftRecursive) throws IOException {
