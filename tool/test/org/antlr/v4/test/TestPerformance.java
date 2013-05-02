@@ -227,6 +227,11 @@ public class TestPerformance extends BaseTest {
 	 * is 0, otherwise the last file which was parsed on the first thread).
 	 */
     private static final boolean SHOW_DFA_STATE_STATS = true;
+	/**
+	 * If {@code true}, the DFA state statistics report includes a breakdown of
+	 * the number of DFA states contained in each decision (with rule names).
+	 */
+	private static final boolean DETAILED_DFA_STATE_STATS = true;
 
 	/**
 	 * Specify the {@link PredictionMode} used by the
@@ -834,6 +839,24 @@ public class TestPerformance extends BaseTest {
 				}
 
 				System.out.format("There are %d lexer DFAState instances, %d configs (%d unique).%n", states, configs, uniqueConfigs.size());
+
+				if (DETAILED_DFA_STATE_STATS) {
+					System.out.format("\tMode\tStates\tConfigs\tMode%n");
+					for (int i = 0; i < modeToDFA.length; i++) {
+						DFA dfa = modeToDFA[i];
+						if (dfa == null) {
+							continue;
+						}
+
+						int modeConfigs = 0;
+						for (DFAState state : dfa.states.values()) {
+							modeConfigs += state.configs.size();
+						}
+
+						String modeName = lexer.getModeNames()[i];
+						System.out.format("\t%d\t%d\t%d\t%s%n", dfa.decision, dfa.states.size(), modeConfigs, modeName);
+					}
+				}
 			}
 		}
 
@@ -863,6 +886,24 @@ public class TestPerformance extends BaseTest {
                 }
 
                 System.out.format("There are %d parser DFAState instances, %d configs (%d unique).%n", states, configs, uniqueConfigs.size());
+
+				if (DETAILED_DFA_STATE_STATS) {
+					System.out.format("\tDecision\tStates\tConfigs\tRule%n");
+					for (int i = 0; i < decisionToDFA.length; i++) {
+						DFA dfa = decisionToDFA[i];
+						if (dfa == null || dfa.states.isEmpty()) {
+							continue;
+						}
+
+						int decisionConfigs = 0;
+						for (DFAState state : dfa.states.values()) {
+							decisionConfigs += state.configs.size();
+						}
+
+						String ruleName = parser.getRuleNames()[parser.getATN().decisionToState.get(dfa.decision).ruleIndex];
+						System.out.format("\t%d\t%d\t%d\t%s%n", dfa.decision, dfa.states.size(), decisionConfigs, ruleName);
+					}
+				}
             }
 
             int localDfaCount = 0;
