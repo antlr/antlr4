@@ -299,6 +299,7 @@ public class TreeViewer extends JComponent {
 	@NotNull
 	protected static JDialog showInDialog(final TreeViewer viewer) {
 		final JDialog dialog = new JDialog();
+		dialog.setTitle("Parse Tree Inspector");
 
 		// Make new content panes
 		final Container mainPane = new JPanel(new BorderLayout(5,5));
