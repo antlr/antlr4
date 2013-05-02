@@ -314,6 +314,7 @@ public class TreeViewer extends JComponent {
 
 		// Add button to bottom
 		JPanel bottomPanel = new JPanel(new BorderLayout(0,0));
+		contentPane.add(bottomPanel, BorderLayout.SOUTH);
 
 		JButton ok = new JButton("OK");
 		ok.addActionListener(
@@ -399,7 +400,6 @@ public class TreeViewer extends JComponent {
 				treePanel, contentPane);
 
 		mainPane.add(splitPane, BorderLayout.CENTER);
-		mainPane.add(bottomPanel, BorderLayout.SOUTH);
 
 		dialog.setContentPane(mainPane);
 
