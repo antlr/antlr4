@@ -36,6 +36,7 @@ import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.SemanticContext;
+import org.antlr.v4.runtime.misc.MurmurHash;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
@@ -150,11 +151,10 @@ public class DFAState {
 
 	@Override
 	public int hashCode() {
-		int h = 7;
-		if ( configs!=null ) {
-			h = h * 31 ^ configs.hashCode();
-		}
-		return h;
+		int hash = MurmurHash.initialize(7);
+		hash = MurmurHash.update(hash, configs.hashCode());
+		hash = MurmurHash.finish(hash, 1);
+		return hash;
 	}
 
 	/**

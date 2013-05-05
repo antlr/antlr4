@@ -136,15 +136,17 @@ public class Array2DHashSet<T> implements Set<T> {
 
 	@Override
 	public int hashCode() {
-		int h = 0;
+		int hash = MurmurHash.initialize();
 		for (T[] bucket : buckets) {
 			if ( bucket==null ) continue;
 			for (T o : bucket) {
 				if ( o==null ) break;
-				h += comparator.hashCode(o);
+				hash = MurmurHash.update(hash, comparator.hashCode(o));
 			}
 		}
-		return h;
+
+		hash = MurmurHash.finish(hash, size());
+		return hash;
 	}
 
 	@Override

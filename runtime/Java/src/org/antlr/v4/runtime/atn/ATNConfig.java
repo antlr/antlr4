@@ -31,6 +31,7 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.misc.MurmurHash;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
@@ -159,13 +160,14 @@ public class ATNConfig {
 
 	@Override
 	public int hashCode() {
-		int hashCode = 7;
-		hashCode = 5 * hashCode + state.stateNumber;
-		hashCode = 5 * hashCode + alt;
-		hashCode = 5 * hashCode + (context != null ? context.hashCode() : 0);
-		hashCode = 5 * hashCode + semanticContext.hashCode();
-        return hashCode;
-    }
+		int hashCode = MurmurHash.initialize(7);
+		hashCode = MurmurHash.update(hashCode, state.stateNumber);
+		hashCode = MurmurHash.update(hashCode, alt);
+		hashCode = MurmurHash.update(hashCode, context);
+		hashCode = MurmurHash.update(hashCode, semanticContext);
+		hashCode = MurmurHash.finish(hashCode, 4);
+		return hashCode;
+	}
 
 	@Override
 	public String toString() {

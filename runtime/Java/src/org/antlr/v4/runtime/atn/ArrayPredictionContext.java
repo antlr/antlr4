@@ -58,49 +58,6 @@ public class ArrayPredictionContext extends PredictionContext {
 		this.returnStates = returnStates;
 	}
 
-//ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] returnStates, int parentHashCode, int returnStateHashCode) {
-//		super(calculateHashCode(parentHashCode, returnStateHashCode));
-//		assert parents.length == returnStates.length;
-//		assert returnStates.length > 1 || returnStates[0] != EMPTY_FULL_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
-//
-//		this.parents = parents;
-//		this.returnStates = returnStates;
-//	}
-//
-//ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] returnStates, int hashCode) {
-//		super(hashCode);
-//		assert parents.length == returnStates.length;
-//		assert returnStates.length > 1 || returnStates[0] != EMPTY_FULL_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
-//
-//		this.parents = parents;
-//		this.returnStates = returnStates;
-//	}
-
-	protected static int calculateHashCode(PredictionContext[] parents, int[] returnStates) {
-		return calculateHashCode(calculateParentHashCode(parents),
-								 calculateReturnStatesHashCode(returnStates));
-	}
-
-	protected static int calculateParentHashCode(PredictionContext[] parents) {
-		int hashCode = 1;
-		for (PredictionContext p : parents) {
-			if ( p!=null ) { // can be null for full ctx stack in ArrayPredictionContext
-				hashCode = hashCode * 31 ^ p.hashCode();
-			}
-		}
-
-		return hashCode;
-	}
-
-	protected static int calculateReturnStatesHashCode(int[] returnStates) {
-		int hashCode = 1;
-		for (int state : returnStates) {
-			hashCode = hashCode * 31 ^ state;
-		}
-
-		return hashCode;
-	}
-
 	@Override
 	public Iterator<SingletonPredictionContext> iterator() {
 		return new Iterator<SingletonPredictionContext>() {
