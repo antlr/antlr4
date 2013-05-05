@@ -113,7 +113,25 @@ public final class MurmurHash {
 		return hash;
 	}
 
-	private MurmurHash() {
+	/**
+	 * Utility function to compute the hash code of an array using the
+	 * MurmurHash algorithm.
+	 *
+	 * @param <T> the array element type
+	 * @param data the array data
+	 * @param seed the seed for the MurmurHash algorithm
+	 * @return the hash code of the data
+	 */
+	public static <T> int hashCode(T[] data, int seed) {
+		int hash = initialize(seed);
+		for (T value : data) {
+			hash = update(hash, value);
+		}
+
+		hash = finish(hash, data.length);
+		return hash;
 	}
 
+	private MurmurHash() {
+	}
 }
