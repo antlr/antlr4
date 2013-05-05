@@ -944,13 +944,13 @@ JavaIDDigit
        '\u1040'..'\u1049'
    ;
 
-WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ -> channel(HIDDEN)
+WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ -> skip
     ;
 
 COMMENT
-    :   '/*' .*? '*/' -> channel(HIDDEN)
+    :   '/*' .*? '*/' -> skip
     ;
 
 LINE_COMMENT
-    : '//' ~('\n'|'\r')* '\r'? '\n' -> channel(HIDDEN)
+    : '//' ~('\n'|'\r')* '\r'? '\n' -> skip
     ;
