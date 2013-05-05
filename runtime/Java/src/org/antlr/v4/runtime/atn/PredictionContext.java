@@ -33,6 +33,7 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
+import org.antlr.v4.runtime.misc.MurmurHash;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
@@ -61,9 +62,32 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	 */
 	public static final int EMPTY_RETURN_STATE = Integer.MAX_VALUE;
 
+	private static final int INITIAL_HASH = 1;
+
 	public static int globalNodeCount = 0;
 	public final int id = globalNodeCount++;
 
+	/**
+	 * Stores the computed hash code of this {@link PredictionContext}. The hash
+	 * code is computed in parts to match the following reference algorithm.
+	 *
+	 * <pre>
+	 *  private int referenceHashCode() {
+	 *      int hash = {@link MurmurHash#initialize}({@link #INITIAL_HASH});
+	 *
+	 *      for (int i = 0; i < {@link #size()}; i++) {
+	 *          hash = {@link MurmurHash#update}(hash, {@link #getParent}(i));
+	 *      }
+	 *
+	 *      for (int i = 0; i < {@link #size()}; i++) {
+	 *          hash = {@link MurmurHash#update}(hash, {@link #getReturnState}(i));
+	 *      }
+	 *
+	 *      hash = {@link MurmurHash#finish}(hash, 2 * {@link #size()});
+	 *      return hash;
+	 *  }
+	 * </pre>
+	 */
 	public final int cachedHashCode;
 
 	protected PredictionContext(int cachedHashCode) {
@@ -117,12 +141,40 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	}
 
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return cachedHashCode;
 	}
 
-	protected static int calculateHashCode(int parentHashCode, int returnStateHashCode) {
-		return 5 * 5 * 7 + 5 * parentHashCode + returnStateHashCode;
+	@Override
+	public abstract boolean equals(Object obj);
+
+	protected static int calculateEmptyHashCode() {
+		int hash = MurmurHash.initialize(INITIAL_HASH);
+		hash = MurmurHash.finish(hash, 0);
+		return hash;
+	}
+
+	protected static int calculateHashCode(PredictionContext parent, int returnState) {
+		int hash = MurmurHash.initialize(INITIAL_HASH);
+		hash = MurmurHash.update(hash, parent);
+		hash = MurmurHash.update(hash, returnState);
+		hash = MurmurHash.finish(hash, 2);
+		return hash;
+	}
+
+	protected static int calculateHashCode(PredictionContext[] parents, int[] returnStates) {
+		int hash = MurmurHash.initialize(INITIAL_HASH);
+
+		for (PredictionContext parent : parents) {
+			hash = MurmurHash.update(hash, parent);
+		}
+
+		for (int returnState : returnStates) {
+			hash = MurmurHash.update(hash, returnState);
+		}
+
+		hash = MurmurHash.finish(hash, 2 * parents.length);
+		return hash;
 	}
 
 	// dispatch

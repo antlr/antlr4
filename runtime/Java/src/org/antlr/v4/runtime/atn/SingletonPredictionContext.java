@@ -37,8 +37,7 @@ public class SingletonPredictionContext extends PredictionContext {
 	public final int returnState;
 
 	SingletonPredictionContext(PredictionContext parent, int returnState) {
-		super(calculateHashCode(parent!=null ? 31 ^ parent.hashCode() : 1,
-								31 ^ returnState));
+		super(parent != null ? calculateHashCode(parent, returnState) : calculateEmptyHashCode());
 		assert returnState!=ATNState.INVALID_STATE_NUMBER;
 		this.parent = parent;
 		this.returnState = returnState;
