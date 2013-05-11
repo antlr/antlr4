@@ -97,6 +97,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 */
 	private boolean outermostConfigSet;
 
+	private int cachedHashCode = -1;
+
 	public ATNConfigSet() {
 		this.mergedConfigs = new HashMap<Long, ATNConfig>();
 		this.unmerged = new ArrayList<ATNConfig>();
@@ -450,9 +452,18 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	@Override
 	public int hashCode() {
+		if (isReadOnly() && cachedHashCode != -1) {
+			return cachedHashCode;
+		}
+
 		int hashCode = 1;
 		hashCode = 5 * hashCode ^ (outermostConfigSet ? 1 : 0);
 		hashCode = 5 * hashCode ^ configs.hashCode();
+
+		if (isReadOnly()) {
+			cachedHashCode = hashCode;
+		}
+
 		return hashCode;
 	}
 

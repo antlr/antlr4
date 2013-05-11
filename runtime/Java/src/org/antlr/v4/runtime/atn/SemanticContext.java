@@ -32,6 +32,7 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.misc.MurmurHash;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Utils;
 
@@ -96,10 +97,11 @@ public abstract class SemanticContext {
 
 		@Override
 		public int hashCode() {
-			int hashCode = 1;
-			hashCode = 31 * hashCode + ruleIndex;
-			hashCode = 31 * hashCode + predIndex;
-			hashCode = 31 * hashCode + (isCtxDependent ? 1 : 0);
+			int hashCode = MurmurHash.initialize();
+			hashCode = MurmurHash.update(hashCode, ruleIndex);
+			hashCode = MurmurHash.update(hashCode, predIndex);
+			hashCode = MurmurHash.update(hashCode, isCtxDependent ? 1 : 0);
+			hashCode = MurmurHash.finish(hashCode, 3);
 			return hashCode;
 		}
 
@@ -197,7 +199,7 @@ public abstract class SemanticContext {
 
 		@Override
 		public int hashCode() {
-			return Arrays.hashCode(opnds);
+			return MurmurHash.hashCode(opnds, AND.class.hashCode());
 		}
 
 		@Override
@@ -244,7 +246,7 @@ public abstract class SemanticContext {
 
 		@Override
 		public int hashCode() {
-			return Arrays.hashCode(opnds) + 1; // differ from AND slightly
+			return MurmurHash.hashCode(opnds, OR.class.hashCode());
 		}
 
 		@Override

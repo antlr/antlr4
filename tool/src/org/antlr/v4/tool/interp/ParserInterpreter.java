@@ -90,13 +90,6 @@ public class ParserInterpreter {
 		atnSimulator = new ParserATNSimulator<Token>(new DummyParser(g, g.atn, input), g.atn);
 	}
 
-	public int predictATN(@NotNull DFA dfa, @NotNull TokenStream<Token> input,
-						  @Nullable ParserRuleContext<Token> outerContext,
-						  boolean useContext)
-	{
-		return atnSimulator.predictATN(dfa, input, outerContext, useContext);
-	}
-
 	public int adaptivePredict(@NotNull TokenStream<Token> input, int decision,
 							   @Nullable ParserRuleContext<Token> outerContext)
 	{

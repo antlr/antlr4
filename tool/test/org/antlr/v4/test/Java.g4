@@ -492,14 +492,8 @@ methodBody
     ;
 
 constructorBody
-    :   '{' explicitConstructorInvocation? blockStatement* '}'
+    :   block
     ;
-
-explicitConstructorInvocation
-    :   nonWildcardTypeArguments? ('this' | 'super') arguments ';'
-    |   primary '.' nonWildcardTypeArguments? 'super' arguments ';'
-    ;
-
 
 qualifiedName
     :   Identifier ('.' Identifier)*
@@ -567,6 +561,7 @@ annotationTypeBody
     
 annotationTypeElementDeclaration
     :   modifiers annotationTypeElementRest
+	|	';' // this is not allowed by the grammar, but apparently allowed by the actual compiler
     ;
     
 annotationTypeElementRest
@@ -619,18 +614,14 @@ variableModifiers
     ;
 
 statement
-@leftfactor{catches}
-    : block
+    :	block
     |   ASSERT expression (':' expression)? ';'
     |   'if' parExpression statement ('else' statement)?
     |   'for' '(' forControl ')' statement
     |   'while' parExpression statement
     |   'do' statement 'while' parExpression ';'
-    |   'try' block
-        ( catches 'finally' block
-        | catches
-        |   'finally' block
-        )
+    |   'try' block (catches finallyBlock? | finallyBlock)
+	|	'try' resourceSpecification block catches? finallyBlock?
     |   'switch' parExpression '{' switchBlockStatementGroups '}'
     |   'synchronized' parExpression block
     |   'return' expression? ';'
@@ -641,14 +632,34 @@ statement
     |   statementExpression ';'
     |   Identifier ':' statement
     ;
-    
+
 catches
-    :   catchClause (catchClause)*
+    :   catchClause+
     ;
     
 catchClause
-    :   'catch' '(' formalParameter ')' block
+    :   'catch' '(' variableModifiers catchType Identifier ')' block
     ;
+
+catchType
+	:	qualifiedName ('|' qualifiedName)*
+	;
+
+finallyBlock
+	:	'finally' block
+	;
+
+resourceSpecification
+	:	'(' resources ';'? ')'
+	;
+
+resources
+	:	resource (';' resource)*
+	;
+
+resource
+	:	variableModifiers classOrInterfaceType variableDeclaratorId '=' expression
+	;
 
 formalParameter
     :   variableModifiers type variableDeclaratorId
@@ -742,7 +753,7 @@ assignmentOperator
     ;
 
 conditionalExpression
-    :   conditionalOrExpression ( '?' conditionalExpression ':' conditionalExpression )?
+    :   conditionalOrExpression ( '?' expression ':' conditionalExpression )?
     ;
 
 conditionalOrExpression
@@ -837,10 +848,11 @@ castExpression
 
 primary
     :   parExpression
-    |   'this' ('.' Identifier)* identifierSuffix?
+    |   'this' arguments?
     |   'super' superSuffix
     |   literal
     |   'new' creator
+	|	nonWildcardTypeArguments (explicitGenericInvocationSuffix | 'this' arguments)
     |   Identifier ('.' Identifier)* identifierSuffix?
     |   primitiveType ('[' ']')* '.' 'class'
     |   'void' '.' 'class'
@@ -848,13 +860,13 @@ primary
 
 identifierSuffix
     :   ('[' ']')+ '.' 'class'
-    |   ('[' expression ']')+ // can also be matched by selector, but do here
+    |   '[' expression ']'
     |   arguments
     |   '.' 'class'
     |   '.' explicitGenericInvocation
     |   '.' 'this'
     |   '.' 'super' arguments
-    |   '.' 'new' innerCreator
+    |   '.' 'new' nonWildcardTypeArguments? innerCreator
     ;
 
 creator
@@ -863,12 +875,12 @@ creator
     ;
 
 createdName
-    :   classOrInterfaceType
-    |   primitiveType
+    :   Identifier typeArgumentsOrDiamond? ('.' Identifier typeArgumentsOrDiamond?)*
+	|	primitiveType
     ;
     
 innerCreator
-    :   nonWildcardTypeArguments? Identifier classCreatorRest
+    :   Identifier nonWildcardTypeArgumentsOrDiamond? classCreatorRest
     ;
 
 arrayCreatorRest
@@ -883,18 +895,29 @@ classCreatorRest
     ;
     
 explicitGenericInvocation
-    :   nonWildcardTypeArguments Identifier arguments
+    :   nonWildcardTypeArguments explicitGenericInvocationSuffix
     ;
     
 nonWildcardTypeArguments
     :   '<' typeList '>'
     ;
-    
+
+typeArgumentsOrDiamond
+	:	'<' '>'
+	|	typeArguments
+	;
+
+nonWildcardTypeArgumentsOrDiamond
+	:	'<' '>'
+	|	nonWildcardTypeArguments
+	;
+
 selector
     :   '.' Identifier arguments?
+	|	'.' explicitGenericInvocation
     |   '.' 'this'
     |   '.' 'super' superSuffix
-    |   '.' 'new' innerCreator
+    |   '.' 'new' nonWildcardTypeArguments? innerCreator
     |   '[' expression ']'
     ;
     
@@ -902,6 +925,11 @@ superSuffix
     :   arguments
     |   '.' Identifier arguments?
     ;
+
+explicitGenericInvocationSuffix
+	:	'super' superSuffix
+	|	Identifier arguments
+	;
 
 arguments
     :   '(' expressionList? ')'
@@ -1018,13 +1046,13 @@ JavaIDDigit
        '\u1040'..'\u1049'
    ;
 
-WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ -> channel(HIDDEN)
+WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ -> skip
     ;
 
 COMMENT
-    :   '/*' .*? '*/' -> channel(HIDDEN)
+    :   '/*' .*? '*/' -> skip
     ;
 
 LINE_COMMENT
-    : '//' ~('\n'|'\r')* '\r'? '\n' -> channel(HIDDEN)
+    : '//' ~('\n'|'\r')* '\r'? '\n' -> skip
     ;

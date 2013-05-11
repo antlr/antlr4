@@ -183,15 +183,17 @@ public class FlexibleHashMap<K,V> implements Map<K, V> {
 
 	@Override
 	public int hashCode() {
-		int h = 0;
+		int hash = MurmurHash.initialize();
 		for (LinkedList<Entry<K, V>> bucket : buckets) {
 			if ( bucket==null ) continue;
 			for (Entry<K, V> e : bucket) {
 				if ( e==null ) break;
-				h += comparator.hashCode(e.key);
+				hash = MurmurHash.update(hash, comparator.hashCode(e.key));
 			}
 		}
-		return h;
+
+		hash = MurmurHash.finish(hash, size());
+		return hash;
 	}
 
 	@Override

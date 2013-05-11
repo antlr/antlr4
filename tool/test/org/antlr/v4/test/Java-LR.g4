@@ -495,14 +495,8 @@ methodBody
     ;
 
 constructorBody
-    :   '{' explicitConstructorInvocation? blockStatement* '}'
+    :   block
     ;
-
-explicitConstructorInvocation
-    :   nonWildcardTypeArguments? ('this' | 'super') arguments ';'
-    |   primary '.' nonWildcardTypeArguments? 'super' arguments ';'
-    ;
-
 
 qualifiedName
     :   Identifier ('.' Identifier)*
@@ -570,6 +564,7 @@ annotationTypeBody
     
 annotationTypeElementDeclaration
     :   modifiers annotationTypeElementRest
+	|	';' // this is not allowed by the grammar, but apparently allowed by the actual compiler
     ;
     
 annotationTypeElementRest
@@ -622,18 +617,14 @@ variableModifiers
     ;
 
 statement
-@leftfactor{catches}
     : block
     |   ASSERT expression (':' expression)? ';'
     |   'if' parExpression statement ('else' statement)?
     |   'for' '(' forControl ')' statement
     |   'while' parExpression statement
     |   'do' statement 'while' parExpression ';'
-    |   'try' block
-        ( catches 'finally' block
-        | catches
-        |   'finally' block
-        )
+    |   'try' block (catches finallyBlock? | finallyBlock)
+	|	'try' resourceSpecification block catches? finallyBlock?
     |   'switch' parExpression '{' switchBlockStatementGroups '}'
     |   'synchronized' parExpression block
     |   'return' expression? ';'
@@ -644,14 +635,34 @@ statement
     |   statementExpression ';'
     |   Identifier ':' statement
     ;
-    
+
 catches
-    :   catchClause (catchClause)*
+    :   catchClause+
     ;
-    
+
 catchClause
-    :   'catch' '(' formalParameter ')' block
+    :   'catch' '(' variableModifiers catchType Identifier ')' block
     ;
+
+catchType
+	:	qualifiedName ('|' qualifiedName)*
+	;
+
+finallyBlock
+	:	'finally' block
+	;
+
+resourceSpecification
+	:	'(' resources ';'? ')'
+	;
+
+resources
+	:	resource (';' resource)*
+	;
+
+resource
+	:	variableModifiers classOrInterfaceType variableDeclaratorId '=' expression
+	;
 
 formalParameter
     :   variableModifiers type variableDeclaratorId
@@ -715,9 +726,8 @@ expression
 	:   primary
     |   expression '.' Identifier
     |   expression '.' 'this'
-    |   expression '.' 'super' '(' expressionList? ')'
-    |   expression '.' 'new' Identifier '(' expressionList? ')'
-    |   expression '.' 'super' '.' Identifier arguments?
+    |   expression '.' 'new' nonWildcardTypeArguments? innerCreator
+    |   expression '.' 'super' superSuffix
     |	expression '.' explicitGenericInvocation
     |   'new' creator
     |   expression '[' expression ']'
@@ -763,6 +773,7 @@ primary
     |   Identifier
     |   type '.' 'class'
     |   'void' '.' 'class'
+	|	nonWildcardTypeArguments (explicitGenericInvocationSuffix | 'this' arguments)
     ;
 
 creator
@@ -771,12 +782,12 @@ creator
     ;
 
 createdName
-    :   classOrInterfaceType
+    :   Identifier typeArgumentsOrDiamond? ('.' Identifier typeArgumentsOrDiamond?)*
     |   primitiveType
     ;
     
 innerCreator
-    :   nonWildcardTypeArguments? Identifier classCreatorRest
+    :   Identifier nonWildcardTypeArgumentsOrDiamond? classCreatorRest
     ;
 
 arrayCreatorRest
@@ -791,25 +802,32 @@ classCreatorRest
     ;
     
 explicitGenericInvocation
-    :	nonWildcardTypeArguments Identifier arguments
+    :	nonWildcardTypeArguments explicitGenericInvocationSuffix
     ;
     
 nonWildcardTypeArguments
     :   '<' typeList '>'
     ;
-    
-selector
-    :   '.' Identifier arguments?
-    |   '.' 'this'
-    |   '.' 'super' superSuffix
-    |   '.' 'new' innerCreator
-    |   '[' expression ']'
-    ;
-    
+
+typeArgumentsOrDiamond
+	:	'<' '>'
+	|	typeArguments
+	;
+
+nonWildcardTypeArgumentsOrDiamond
+	:	'<' '>'
+	|	nonWildcardTypeArguments
+	;
+
 superSuffix
     :   arguments
     |   '.' Identifier arguments?
     ;
+
+explicitGenericInvocationSuffix
+	:	'super' superSuffix
+	|	Identifier arguments
+	;
 
 arguments
     :   '(' expressionList? ')'
@@ -926,13 +944,13 @@ JavaIDDigit
        '\u1040'..'\u1049'
    ;
 
-WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ -> channel(HIDDEN)
+WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ -> skip
     ;
 
 COMMENT
-    :   '/*' .*? '*/' -> channel(HIDDEN)
+    :   '/*' .*? '*/' -> skip
     ;
 
 LINE_COMMENT
-    : '//' ~('\n'|'\r')* '\r'? '\n' -> channel(HIDDEN)
+    : '//' ~('\n'|'\r')* '\r'? '\n' -> skip
     ;

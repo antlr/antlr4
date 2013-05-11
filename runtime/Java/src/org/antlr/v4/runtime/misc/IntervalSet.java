@@ -424,11 +424,14 @@ public class IntervalSet implements IntSet {
 
 	@Override
 	public int hashCode() {
-		if ( isNil() ) return 0;
-		int n = 0;
-		// just add left edge of intervals
-		for (Interval I : intervals) n += I.a;
-		return n;
+		int hash = MurmurHash.initialize();
+		for (Interval I : intervals) {
+			hash = MurmurHash.update(hash, I.a);
+			hash = MurmurHash.update(hash, I.b);
+		}
+
+		hash = MurmurHash.finish(hash, intervals.size() * 2);
+		return hash;
 	}
 
 	/** Are two IntervalSets equal?  Because all intervals are sorted

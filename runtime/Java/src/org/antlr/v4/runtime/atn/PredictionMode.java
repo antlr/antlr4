@@ -32,6 +32,7 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.misc.AbstractEqualityComparator;
 import org.antlr.v4.runtime.misc.FlexibleHashMap;
+import org.antlr.v4.runtime.misc.MurmurHash;
 import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.BitSet;
@@ -79,9 +80,10 @@ public enum PredictionMode {
 		/** Code is function of (s, _, ctx, _) */
 		@Override
 		public int hashCode(ATNConfig o) {
-			int hashCode = 7;
-			hashCode = 31 * hashCode + o.getState().stateNumber;
-			hashCode = 31 * hashCode + o.getContext().hashCode();
+			int hashCode = MurmurHash.initialize(7);
+			hashCode = MurmurHash.update(hashCode, o.getState().stateNumber);
+			hashCode = MurmurHash.update(hashCode, o.getContext());
+			hashCode = MurmurHash.finish(hashCode, 2);
 	        return hashCode;
 		}
 
@@ -89,7 +91,6 @@ public enum PredictionMode {
 		public boolean equals(ATNConfig a, ATNConfig b) {
 			if ( a==b ) return true;
 			if ( a==null || b==null ) return false;
-			if ( hashCode(a) != hashCode(b) ) return false;
 			return a.getState().stateNumber==b.getState().stateNumber
 				&& a.getContext().equals(b.getContext());
 		}

@@ -39,7 +39,7 @@ public class SingletonPredictionContext extends PredictionContext {
 	public final int returnState;
 
 	/*package*/ SingletonPredictionContext(@NotNull PredictionContext parent, int returnState) {
-		super(calculateHashCode(calculateParentHashCode(parent), calculateReturnStateHashCode(returnState)));
+		super(calculateHashCode(parent, returnState));
 		assert returnState != EMPTY_FULL_STATE_KEY && returnState != EMPTY_LOCAL_STATE_KEY;
 		this.parent = parent;
 		this.returnState = returnState;

@@ -34,6 +34,7 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.AbstractEqualityComparator;
 import org.antlr.v4.runtime.misc.FlexibleHashMap;
+import org.antlr.v4.runtime.misc.MurmurHash;
 import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.ArrayList;
@@ -51,28 +52,25 @@ public abstract class PredictionContext {
 	public static final int EMPTY_FULL_STATE_KEY = Integer.MAX_VALUE;
 
 	private static final int INITIAL_HASH = 1;
-	private static final int HASH_MULTIPLIER = 31;
 
 	/**
-	 * Stores the computed hash code of this PredictionContext. The hash code is
-	 * computed in parts to match the following reference algorithm.
+	 * Stores the computed hash code of this {@link PredictionContext}. The hash
+	 * code is computed in parts to match the following reference algorithm.
 	 *
 	 * <pre>
 	 *  private int referenceHashCode() {
-	 *  	int returnStateHashCode = {@link #INITIAL_HASH INITIAL_HASH};
-	 *  	for (int i = 0; i &lt; size(); i++) {
-	 *  		returnStateHashCode = returnStateHashCode * {@link #HASH_MULTIPLIER HASH_MULTIPLIER} ^ getReturnState(i);
-	 *  	}
+	 *      int hash = {@link MurmurHash#initialize}({@link #INITIAL_HASH});
 	 *
-	 *  	int parentHashCode = INITIAL_HASH;
-	 *  	for (int i = 0; i &lt; size(); i++) {
-	 *  		parentHashCode = parentHashCode * HASH_MULTIPLIER ^ getParent(i).hashCode();
-	 *  	}
+	 *      for (int i = 0; i < {@link #size()}; i++) {
+	 *          hash = {@link MurmurHash#update}(hash, {@link #getParent}(i));
+	 *      }
 	 *
-	 *  	int hashCode = INITIAL_HASH;
-	 *  	hashCode = hashCode * HASH_MULTIPLIER ^ parentHashCode;
-	 *  	hashCode = hashCode * HASH_MULTIPLIER ^ returnStateHashCode;
-	 *  	return hashCode;
+	 *      for (int i = 0; i < {@link #size()}; i++) {
+	 *          hash = {@link MurmurHash#update}(hash, {@link #getReturnState}(i));
+	 *      }
+	 *
+	 *      hash = {@link MurmurHash#finish}(hash, 2 * {@link #size()});
+	 *      return hash;
 	 *  }
 	 * </pre>
 	 */
@@ -82,42 +80,33 @@ public abstract class PredictionContext {
 		this.cachedHashCode = cachedHashCode;
 	}
 
-	protected static int calculateEmptyParentHashCode() {
-		return INITIAL_HASH;
+	protected static int calculateEmptyHashCode() {
+		int hash = MurmurHash.initialize(INITIAL_HASH);
+		hash = MurmurHash.finish(hash, 0);
+		return hash;
 	}
 
-	protected static int calculateParentHashCode(PredictionContext parent) {
-		return INITIAL_HASH * HASH_MULTIPLIER ^ parent.hashCode();
+	protected static int calculateHashCode(PredictionContext parent, int returnState) {
+		int hash = MurmurHash.initialize(INITIAL_HASH);
+		hash = MurmurHash.update(hash, parent);
+		hash = MurmurHash.update(hash, returnState);
+		hash = MurmurHash.finish(hash, 2);
+		return hash;
 	}
 
-	protected static int calculateParentHashCode(PredictionContext[] parents) {
-		int hashCode = INITIAL_HASH;
-		for (PredictionContext context : parents) {
-			hashCode = hashCode * HASH_MULTIPLIER ^ context.hashCode();
+	protected static int calculateHashCode(PredictionContext[] parents, int[] returnStates) {
+		int hash = MurmurHash.initialize(INITIAL_HASH);
+
+		for (PredictionContext parent : parents) {
+			hash = MurmurHash.update(hash, parent);
 		}
 
-		return hashCode;
-	}
-
-	protected static int calculateEmptyReturnStateHashCode() {
-		return INITIAL_HASH;
-	}
-
-	protected static int calculateReturnStateHashCode(int returnState) {
-		return INITIAL_HASH * HASH_MULTIPLIER ^ returnState;
-	}
-
-	protected static int calculateReturnStatesHashCode(int[] returnStates) {
-		int hashCode = INITIAL_HASH;
-		for (int state : returnStates) {
-			hashCode = hashCode * HASH_MULTIPLIER ^ state;
+		for (int returnState : returnStates) {
+			hash = MurmurHash.update(hash, returnState);
 		}
 
-		return hashCode;
-	}
-
-	protected static int calculateHashCode(int parentHashCode, int returnStateHashCode) {
-		return (INITIAL_HASH * HASH_MULTIPLIER ^ parentHashCode) * HASH_MULTIPLIER ^ returnStateHashCode;
+		hash = MurmurHash.finish(hash, 2 * parents.length);
+		return hash;
 	}
 
 	public abstract int size();

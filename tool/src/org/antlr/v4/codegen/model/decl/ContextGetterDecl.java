@@ -31,6 +31,7 @@
 package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.runtime.misc.MurmurHash;
 
 public abstract class ContextGetterDecl extends Decl {
 	public ContextGetterDecl(OutputModelFactory factory, String name) {
@@ -44,7 +45,11 @@ public abstract class ContextGetterDecl extends Decl {
 
 	@Override
 	public int hashCode() {
-		return name.hashCode() + getArgType().hashCode();
+		int hash = MurmurHash.initialize();
+		hash = MurmurHash.update(hash, name);
+		hash = MurmurHash.update(hash, getArgType());
+		hash = MurmurHash.finish(hash, 2);
+		return hash;
 	}
 
 	/** Make sure that a getter does not equal a label. X() and X are ok.

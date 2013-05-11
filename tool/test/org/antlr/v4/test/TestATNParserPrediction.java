@@ -489,7 +489,7 @@ public class TestATNParserPrediction extends BaseTest {
 		ParserInterpreter interp = new ParserInterpreter(g, input);
 		DecisionState startState = atn.decisionToState.get(decision);
 		DFA dfa = new DFA(startState, decision);
-		int alt = interp.predictATN(dfa, input, ParserRuleContext.emptyContext(), false);
+		int alt = interp.adaptivePredict(input, decision, ParserRuleContext.emptyContext());
 
 		System.out.println(dot.getDOT(dfa, false));
 
@@ -503,42 +503,6 @@ public class TestATNParserPrediction extends BaseTest {
 		input.seek(0);
 		alt = interp.adaptivePredict(input, decision, null);
 		assertEquals(expectedAlt, alt);
-	}
-
-	public DFA getDFA(LexerGrammar lg, Grammar g, String ruleName,
-					  String inputString, ParserRuleContext<Token> ctx)
-	{
-		Tool.internalOption_ShowATNConfigsInDFA = true;
-		ATN lexatn = createATN(lg, true);
-		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn);
-
-		semanticProcess(lg);
-		g.importVocab(lg);
-		semanticProcess(g);
-
-		ParserATNFactory f = new ParserATNFactory(g);
-		ATN atn = f.createATN();
-
-//		DOTGenerator dot = new DOTGenerator(g);
-//		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("a"))));
-//		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("b"))));
-//		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("e"))));
-
-		ParserATNSimulator<Token> interp = new ParserATNSimulator<Token>(atn);
-		IntegerList types = getTokenTypesViaATN(inputString, lexInterp);
-		System.out.println(types);
-		TokenStream<Token> input = new IntTokenStream(types);
-		try {
-			DecisionState startState = atn.decisionToState.get(0);
-			DFA dfa = new DFA(startState);
-//			Rule r = g.getRule(ruleName);
-			//ATNState startState = atn.ruleToStartState.get(r);
-			interp.predictATN(dfa, input, ctx, false);
-		}
-		catch (NoViableAltException nvae) {
-			nvae.printStackTrace(System.err);
-		}
-		return null;
 	}
 
 	public void checkDFAConstruction(LexerGrammar lg, Grammar g, int decision,

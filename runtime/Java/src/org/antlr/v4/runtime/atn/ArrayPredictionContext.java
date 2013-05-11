@@ -47,7 +47,7 @@ public class ArrayPredictionContext extends PredictionContext {
 	public final int[] returnStates;
 
 	/*package*/ ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] returnStates) {
-		super(calculateHashCode(calculateParentHashCode(parents), calculateReturnStatesHashCode(returnStates)));
+		super(calculateHashCode(parents, returnStates));
 		assert parents.length == returnStates.length;
 		assert returnStates.length > 1 || returnStates[0] != EMPTY_FULL_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
 
