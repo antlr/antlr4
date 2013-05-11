@@ -519,7 +519,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				return alt; // we've updated DFA, exec'd action, and have our deepest answer
 			}
 			else if ( target == ERROR ) {
-				throw noViableAlt(input, outerContext, s.configs, startIndex);
+				SimulatorState<Symbol> errorState = new SimulatorState<Symbol>(outerContext, s, state.useContext, remainingOuterContext);
+				return handleNoViableAlt(input, startIndex, errorState);
 			}
 			s = target;
 			if (!s.isAcceptState && t != IntStream.EOF) {
@@ -665,26 +666,25 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 
 		int t = input.LA(1);
 
-        DecisionState decState = atn.getDecisionState(dfa.decision);
 		SimulatorState<Symbol> previous = initialState;
 
 		PredictionContextCache contextCache = new PredictionContextCache();
 		while (true) { // while more work
 			SimulatorState<Symbol> nextState = computeReachSet(dfa, previous, t, contextCache);
 			if (nextState == null) {
+				addDFAEdge(previous.s0, input.LA(1), ERROR);
 				return handleNoViableAlt(input, startIndex, previous);
 			}
 
 			DFAState D = nextState.s0;
-			ATNConfigSet reach = D.configs;
 
 			// predicted alt => accept state
-			assert D.isAcceptState || getUniqueAlt(reach) == ATN.INVALID_ALT_NUMBER;
+			assert D.isAcceptState || getUniqueAlt(D.configs) == ATN.INVALID_ALT_NUMBER;
 			// conflicted => accept state
 			assert D.isAcceptState || D.configs.getConflictingAlts() == null;
 
 			if (D.isAcceptState) {
-				int predictedAlt = reach.getConflictingAlts() == null ? getUniqueAlt(reach) : ATN.INVALID_ALT_NUMBER;
+				int predictedAlt = D.configs.getConflictingAlts() == null ? getUniqueAlt(D.configs) : ATN.INVALID_ALT_NUMBER;
 				if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
 					if (optimize_ll1
 						&& input.index() == startIndex
@@ -719,7 +719,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 							assert D.isAcceptState;
 
 							if ( D.configs.hasSemanticContext() ) {
-								int nalts = decState.getNumberOfTransitions();
+								int nalts = atn.getDecisionState(dfa.decision).getNumberOfTransitions();
 								DFAState.PredPrediction[] predPredictions = D.predicates;
 								if (predPredictions != null) {
 									int conflictIndex = input.index();
@@ -971,6 +971,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		} while (useContext && stepIntoGlobal);
 
 		if (reach.isEmpty()) {
+			addDFAEdge(s0, t, ERROR);
 			return null;
 		}
 

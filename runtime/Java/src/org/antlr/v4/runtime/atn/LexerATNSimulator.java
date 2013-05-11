@@ -237,14 +237,9 @@ public class LexerATNSimulator extends ATNSimulator {
 				getReachableConfigSet(input, closure, reach, t);
 
 				if ( reach.isEmpty() ) { // we got nowhere on t from s
-					// we reached state associated with closure for sure, so
-					// make sure it's defined. worst case, we define s0 from
-					// start state configs.
-					@NotNull
-					DFAState from = s != null ? s : addDFAState(closure);
 					// we got nowhere on t, don't throw out this knowledge; it'd
 					// cause a failover from DFA later.
-					addDFAEdge(from, t, ERROR);
+					addDFAEdge(s, t, ERROR);
 					break; // stop when we can't match any more char
 				}
 
