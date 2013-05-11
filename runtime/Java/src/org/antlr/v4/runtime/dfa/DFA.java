@@ -48,10 +48,10 @@ public class DFA {
     @NotNull
 	public final ConcurrentMap<DFAState, DFAState> states = new ConcurrentHashMap<DFAState, DFAState>();
 
-	@Nullable
+	@NotNull
 	public final AtomicReference<DFAState> s0 = new AtomicReference<DFAState>();
 
-	@Nullable
+	@NotNull
 	public final AtomicReference<DFAState> s0full = new AtomicReference<DFAState>();
 
 	public final int decision;
