@@ -740,7 +740,7 @@ public class TestPerformance extends BaseTest {
 			sources = sourcesList;
 		}
 
-		long startTime = System.currentTimeMillis();
+		long startTime = System.nanoTime();
         tokenCount.set(currentPass, 0);
         int inputSize = 0;
 		int inputCount = 0;
@@ -812,13 +812,13 @@ public class TestPerformance extends BaseTest {
 		executorService.shutdown();
 		executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
-        System.out.format("%d. Total parse time for %d files (%d KB, %d tokens, checksum 0x%8X): %dms%n",
+        System.out.format("%d. Total parse time for %d files (%d KB, %d tokens, checksum 0x%8X): %.0fms%n",
 						  currentPass + 1,
                           inputCount,
                           inputSize / 1024,
                           tokenCount.get(currentPass),
 						  COMPUTE_CHECKSUM ? checksum.getValue() : 0,
-                          System.currentTimeMillis() - startTime);
+                          (double)(System.nanoTime() - startTime) / 1000000.0);
 
 		if (sharedLexers.length > 0) {
 			int index = FILE_GRANULARITY ? 0 : ((NumberedThread)Thread.currentThread()).getThreadNumber();
