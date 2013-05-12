@@ -331,7 +331,7 @@ public class TestPerformance extends BaseTest {
 	 * If {@code true}, the parsing operation will be parallelized across files;
 	 * otherwise the parsing will be parallelized across multiple iterations.
 	 */
-	private static final boolean FILE_GRANULARITY = false;
+	private static final boolean FILE_GRANULARITY = true;
 
 	/**
 	 * Number of parser threads to use.
