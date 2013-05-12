@@ -849,7 +849,7 @@ public class TestPerformance extends BaseTest {
 					System.out.format("\tMode\tStates\tConfigs\tMode%n");
 					for (int i = 0; i < modeToDFA.length; i++) {
 						DFA dfa = modeToDFA[i];
-						if (dfa == null) {
+						if (dfa == null || dfa.states.isEmpty()) {
 							continue;
 						}
 
