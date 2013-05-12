@@ -372,7 +372,7 @@ public class TestPerformance extends BaseTest {
 
     @Test
     //@org.junit.Ignore
-    public void compileJdk() throws IOException, InterruptedException {
+    public void compileJdk() throws IOException, InterruptedException, ExecutionException {
         String jdkSourceRoot = getSourceRoot("JDK");
 		assertTrue("The JDK_SOURCE_ROOT environment variable must be set for performance testing.", jdkSourceRoot != null && !jdkSourceRoot.isEmpty());
 
@@ -411,7 +411,8 @@ public class TestPerformance extends BaseTest {
 
 		ExecutorService executorService = Executors.newFixedThreadPool(FILE_GRANULARITY ? 1 : NUMBER_OF_THREADS, new NumberedThreadFactory());
 
-		executorService.submit(new Runnable() {
+		List<Future<?>> passResults = new ArrayList<Future<?>>();
+		passResults.add(executorService.submit(new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -420,10 +421,10 @@ public class TestPerformance extends BaseTest {
 					Logger.getLogger(TestPerformance.class.getName()).log(Level.SEVERE, null, ex);
 				}
 			}
-		});
+		}));
         for (int i = 0; i < PASSES - 1; i++) {
             final int currentPass = i + 1;
-			executorService.submit(new Runnable() {
+			passResults.add(executorService.submit(new Runnable() {
 				@Override
 				public void run() {
 					if (CLEAR_DFA) {
@@ -454,8 +455,12 @@ public class TestPerformance extends BaseTest {
 						Logger.getLogger(TestPerformance.class.getName()).log(Level.SEVERE, null, ex);
 					}
 				}
-			});
+			}));
         }
+
+		for (Future<?> passResult : passResults) {
+			passResult.get();
+		}
 
 		executorService.shutdown();
 		executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
