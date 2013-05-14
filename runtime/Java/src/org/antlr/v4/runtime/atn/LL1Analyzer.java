@@ -37,6 +37,7 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
+import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -66,7 +67,7 @@ public class LL1Analyzer {
 			boolean seeThruPreds = false; // fail to get lookahead upon pred
 			_LOOK(s.transition(alt - 1).target,
 				  PredictionContext.EMPTY,
-				  look[alt], lookBusy, seeThruPreds, false);
+				  look[alt], lookBusy, new BitSet(), seeThruPreds, false);
 			// Wipe out lookahead for this alternative if we found nothing
 			// or we had a predicate when we !seeThruPreds
 			if ( look[alt].size()==0 || look[alt].contains(HIT_PRED) ) {
@@ -90,7 +91,7 @@ public class LL1Analyzer {
 		boolean seeThruPreds = true; // ignore preds; get all lookahead
 		PredictionContext lookContext = ctx != null ? PredictionContext.fromRuleContext(s.atn, ctx) : null;
    		_LOOK(s, lookContext,
-			  r, new HashSet<ATNConfig>(), seeThruPreds, true);
+			  r, new HashSet<ATNConfig>(), new BitSet(), seeThruPreds, true);
    		return r;
    	}
 
@@ -104,6 +105,7 @@ public class LL1Analyzer {
     protected void _LOOK(@NotNull ATNState s, @Nullable PredictionContext ctx,
 						 @NotNull IntervalSet look,
                          @NotNull Set<ATNConfig> lookBusy,
+						 @NotNull BitSet calledRuleStack,
 						 boolean seeThruPreds, boolean addEOF)
 	{
 //		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);
@@ -124,7 +126,17 @@ public class LL1Analyzer {
 				for (SingletonPredictionContext p : ctx) {
 					ATNState returnState = atn.states.get(p.returnState);
 //					System.out.println("popping back to "+retState);
-					_LOOK(returnState, p.parent, look, lookBusy, seeThruPreds, addEOF);
+
+					boolean removed = calledRuleStack.get(returnState.ruleIndex);
+					try {
+						calledRuleStack.clear(returnState.ruleIndex);
+						_LOOK(returnState, p.parent, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+					}
+					finally {
+						if (removed) {
+							calledRuleStack.set(returnState.ruleIndex);
+						}
+					}
 				}
 				return;
 			}
@@ -134,20 +146,31 @@ public class LL1Analyzer {
         for (int i=0; i<n; i++) {
 			Transition t = s.transition(i);
 			if ( t.getClass() == RuleTransition.class ) {
+				if (calledRuleStack.get(((RuleTransition)t).target.ruleIndex)) {
+					continue;
+				}
+
 				PredictionContext newContext =
 					SingletonPredictionContext.create(ctx, ((RuleTransition)t).followState.stateNumber);
-				_LOOK(t.target, newContext, look, lookBusy, seeThruPreds, addEOF);
+
+				try {
+					calledRuleStack.set(((RuleTransition)t).target.ruleIndex);
+					_LOOK(t.target, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+				}
+				finally {
+					calledRuleStack.clear(((RuleTransition)t).target.ruleIndex);
+				}
 			}
 			else if ( t instanceof PredicateTransition ) {
 				if ( seeThruPreds ) {
-					_LOOK(t.target, ctx, look, lookBusy, seeThruPreds, addEOF);
+					_LOOK(t.target, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
 				}
 				else {
 					look.add(HIT_PRED);
 				}
 			}
 			else if ( t.isEpsilon() ) {
-				_LOOK(t.target, ctx, look, lookBusy, seeThruPreds, addEOF);
+				_LOOK(t.target, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
 			}
 			else if ( t.getClass() == WildcardTransition.class ) {
 				look.addAll( IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType) );
