@@ -64,8 +64,7 @@ public class LL1PlusBlock extends LL1Loop {
 		/** Lookahead for each alt 1..n */
 		IntervalSet[] altLookSets = g.decisionLOOK.get(decision);
 		altLook = getAltLookaheadAsStringLists(altLookSets);
-		IntervalSet all = new IntervalSet();
-		for (IntervalSet s : altLookSets) all.addAll(s);
+		IntervalSet all = IntervalSet.or(altLookSets);
 
 		this.error = getThrowNoViableAlt(factory, plusRoot, all);
 
