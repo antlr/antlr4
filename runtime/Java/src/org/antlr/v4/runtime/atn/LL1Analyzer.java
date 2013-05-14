@@ -59,13 +59,16 @@ public class LL1Analyzer {
 	@Nullable
 	public IntervalSet[] getDecisionLookahead(@Nullable ATNState s) {
 //		System.out.println("LOOK("+s.stateNumber+")");
-		if ( s==null ) return null;
-		IntervalSet[] look = new IntervalSet[s.getNumberOfTransitions()+1];
-		for (int alt=1; alt<=s.getNumberOfTransitions(); alt++) {
+		if ( s==null ) {
+			return null;
+		}
+
+		IntervalSet[] look = new IntervalSet[s.getNumberOfTransitions()];
+		for (int alt = 0; alt < s.getNumberOfTransitions(); alt++) {
 			look[alt] = new IntervalSet();
 			Set<ATNConfig> lookBusy = new HashSet<ATNConfig>();
 			boolean seeThruPreds = false; // fail to get lookahead upon pred
-			_LOOK(s.transition(alt - 1).target,
+			_LOOK(s.transition(alt).target,
 				  PredictionContext.EMPTY,
 				  look[alt], lookBusy, new BitSet(), seeThruPreds, false);
 			// Wipe out lookahead for this alternative if we found nothing

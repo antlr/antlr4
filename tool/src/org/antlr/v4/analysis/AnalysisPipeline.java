@@ -103,8 +103,7 @@ public class AnalysisPipeline {
 		boolean collision = false;
 		IntervalSet combined = new IntervalSet();
 		if ( altLook==null ) return false;
-		for (int a=1; a<altLook.length; a++) {
-			IntervalSet look = altLook[a];
+		for (IntervalSet look : altLook) {
 			if ( look==null ) return false; // lookahead must've computation failed
 			if ( !look.and(combined).isNil() ) {
 				collision = true;
