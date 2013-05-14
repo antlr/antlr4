@@ -1260,6 +1260,7 @@ public class TestPerformance extends BaseTest {
 		public final int parserDFASize;
 		public final long parserTotalTransitions;
 		public final long parserComputedTransitions;
+		public final long parserFullContextTransitions;
 
 		public FileParseResult(String sourceName, int checksum, @Nullable ParseTree parseTree, int tokenCount, long startTime, Lexer lexer, Parser parser) {
 			this.sourceName = sourceName;
@@ -1298,9 +1299,11 @@ public class TestPerformance extends BaseTest {
 				if (interpreter instanceof StatisticsParserATNSimulator) {
 					parserTotalTransitions = ((StatisticsParserATNSimulator)interpreter).totalTransitions;
 					parserComputedTransitions = ((StatisticsParserATNSimulator)interpreter).computedTransitions;
+					parserFullContextTransitions = ((StatisticsParserATNSimulator)interpreter).fullContextTransitions;
 				} else {
 					parserTotalTransitions = 0;
 					parserComputedTransitions = 0;
+					parserFullContextTransitions = 0;
 				}
 
 				int dfaSize = 0;
@@ -1315,6 +1318,7 @@ public class TestPerformance extends BaseTest {
 				parserDFASize = 0;
 				parserTotalTransitions = 0;
 				parserComputedTransitions = 0;
+				parserFullContextTransitions = 0;
 			}
 		}
 	}
@@ -1349,6 +1353,7 @@ public class TestPerformance extends BaseTest {
 
 		public long totalTransitions;
 		public long computedTransitions;
+		public long fullContextTransitions;
 
 		public StatisticsParserATNSimulator(ATN atn, DFA[] decisionToDFA, PredictionContextCache sharedContextCache) {
 			super(atn, decisionToDFA, sharedContextCache);
@@ -1368,6 +1373,17 @@ public class TestPerformance extends BaseTest {
 		protected DFAState computeTargetState(DFA dfa, DFAState previousD, int t) {
 			computedTransitions++;
 			return super.computeTargetState(dfa, previousD, t);
+		}
+
+		@Override
+		protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t, boolean fullCtx) {
+			if (fullCtx) {
+				totalTransitions++;
+				computedTransitions++;
+				fullContextTransitions++;
+			}
+
+			return super.computeReachSet(closure, t, fullCtx);
 		}
 	}
 
