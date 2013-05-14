@@ -607,22 +607,31 @@ public abstract class BaseTest {
 				return output;
 			} catch (MalformedURLException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
 			} catch (IOException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
 			} catch (InterruptedException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
 			} catch (IllegalAccessException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
 			} catch (IllegalArgumentException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
 			} catch (InvocationTargetException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
 			} catch (NoSuchMethodException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
 			} catch (SecurityException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
 			} catch (ClassNotFoundException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
 			}
 		}
 
