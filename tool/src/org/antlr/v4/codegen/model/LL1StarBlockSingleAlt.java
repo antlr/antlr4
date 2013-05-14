@@ -46,6 +46,7 @@ public class LL1StarBlockSingleAlt extends LL1Loop {
 		loopBackStateNumber = star.loopBackState.stateNumber;
 		this.decision = star.decision;
 		IntervalSet[] altLookSets = factory.getGrammar().decisionLOOK.get(decision);
+		assert altLookSets.length == 2;
 		IntervalSet enterLook = altLookSets[0];
 		IntervalSet exitLook = altLookSets[1];
 		loopExpr = addCodeForLoopLookaheadTempVar(enterLook);
