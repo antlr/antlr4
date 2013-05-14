@@ -331,7 +331,7 @@ public class TestPerformance extends BaseTest {
 	 * If {@code true}, the parsing operation will be parallelized across files;
 	 * otherwise the parsing will be parallelized across multiple iterations.
 	 */
-	private static final boolean FILE_GRANULARITY = false;
+	private static final boolean FILE_GRANULARITY = true;
 
 	/**
 	 * Number of parser threads to use.
@@ -372,7 +372,7 @@ public class TestPerformance extends BaseTest {
 
     @Test
     //@org.junit.Ignore
-    public void compileJdk() throws IOException, InterruptedException {
+    public void compileJdk() throws IOException, InterruptedException, ExecutionException {
         String jdkSourceRoot = getSourceRoot("JDK");
 		assertTrue("The JDK_SOURCE_ROOT environment variable must be set for performance testing.", jdkSourceRoot != null && !jdkSourceRoot.isEmpty());
 
@@ -411,7 +411,8 @@ public class TestPerformance extends BaseTest {
 
 		ExecutorService executorService = Executors.newFixedThreadPool(FILE_GRANULARITY ? 1 : NUMBER_OF_THREADS, new NumberedThreadFactory());
 
-		executorService.submit(new Runnable() {
+		List<Future<?>> passResults = new ArrayList<Future<?>>();
+		passResults.add(executorService.submit(new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -420,10 +421,10 @@ public class TestPerformance extends BaseTest {
 					Logger.getLogger(TestPerformance.class.getName()).log(Level.SEVERE, null, ex);
 				}
 			}
-		});
+		}));
         for (int i = 0; i < PASSES - 1; i++) {
             final int currentPass = i + 1;
-			executorService.submit(new Runnable() {
+			passResults.add(executorService.submit(new Runnable() {
 				@Override
 				public void run() {
 					if (CLEAR_DFA) {
@@ -454,8 +455,12 @@ public class TestPerformance extends BaseTest {
 						Logger.getLogger(TestPerformance.class.getName()).log(Level.SEVERE, null, ex);
 					}
 				}
-			});
+			}));
         }
+
+		for (Future<?> passResult : passResults) {
+			passResult.get();
+		}
 
 		executorService.shutdown();
 		executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
@@ -735,7 +740,7 @@ public class TestPerformance extends BaseTest {
 			sources = sourcesList;
 		}
 
-		long startTime = System.currentTimeMillis();
+		long startTime = System.nanoTime();
         tokenCount.set(currentPass, 0);
         int inputSize = 0;
 		int inputCount = 0;
@@ -807,13 +812,13 @@ public class TestPerformance extends BaseTest {
 		executorService.shutdown();
 		executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
-        System.out.format("%d. Total parse time for %d files (%d KB, %d tokens, checksum 0x%8X): %dms%n",
+        System.out.format("%d. Total parse time for %d files (%d KB, %d tokens, checksum 0x%8X): %.0fms%n",
 						  currentPass + 1,
                           inputCount,
                           inputSize / 1024,
                           tokenCount.get(currentPass),
 						  COMPUTE_CHECKSUM ? checksum.getValue() : 0,
-                          System.currentTimeMillis() - startTime);
+                          (double)(System.nanoTime() - startTime) / 1000000.0);
 
 		if (sharedLexers.length > 0) {
 			int index = FILE_GRANULARITY ? 0 : ((NumberedThread)Thread.currentThread()).getThreadNumber();
@@ -844,7 +849,7 @@ public class TestPerformance extends BaseTest {
 					System.out.format("\tMode\tStates\tConfigs\tMode%n");
 					for (int i = 0; i < modeToDFA.length; i++) {
 						DFA dfa = modeToDFA[i];
-						if (dfa == null) {
+						if (dfa == null || dfa.states.isEmpty()) {
 							continue;
 						}
 
@@ -1255,6 +1260,7 @@ public class TestPerformance extends BaseTest {
 		public final int parserDFASize;
 		public final long parserTotalTransitions;
 		public final long parserComputedTransitions;
+		public final long parserFullContextTransitions;
 
 		public FileParseResult(String sourceName, int checksum, @Nullable ParseTree parseTree, int tokenCount, long startTime, Lexer lexer, Parser parser) {
 			this.sourceName = sourceName;
@@ -1293,9 +1299,11 @@ public class TestPerformance extends BaseTest {
 				if (interpreter instanceof StatisticsParserATNSimulator) {
 					parserTotalTransitions = ((StatisticsParserATNSimulator)interpreter).totalTransitions;
 					parserComputedTransitions = ((StatisticsParserATNSimulator)interpreter).computedTransitions;
+					parserFullContextTransitions = ((StatisticsParserATNSimulator)interpreter).fullContextTransitions;
 				} else {
 					parserTotalTransitions = 0;
 					parserComputedTransitions = 0;
+					parserFullContextTransitions = 0;
 				}
 
 				int dfaSize = 0;
@@ -1310,6 +1318,7 @@ public class TestPerformance extends BaseTest {
 				parserDFASize = 0;
 				parserTotalTransitions = 0;
 				parserComputedTransitions = 0;
+				parserFullContextTransitions = 0;
 			}
 		}
 	}
@@ -1344,6 +1353,7 @@ public class TestPerformance extends BaseTest {
 
 		public long totalTransitions;
 		public long computedTransitions;
+		public long fullContextTransitions;
 
 		public StatisticsParserATNSimulator(ATN atn, DFA[] decisionToDFA, PredictionContextCache sharedContextCache) {
 			super(atn, decisionToDFA, sharedContextCache);
@@ -1363,6 +1373,17 @@ public class TestPerformance extends BaseTest {
 		protected DFAState computeTargetState(DFA dfa, DFAState previousD, int t) {
 			computedTransitions++;
 			return super.computeTargetState(dfa, previousD, t);
+		}
+
+		@Override
+		protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t, boolean fullCtx) {
+			if (fullCtx) {
+				totalTransitions++;
+				computedTransitions++;
+				fullContextTransitions++;
+			}
+
+			return super.computeReachSet(closure, t, fullCtx);
 		}
 	}
 
