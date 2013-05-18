@@ -210,14 +210,15 @@ classOrInterfaceModifiers
     ;
 
 classOrInterfaceModifier
-    :   annotation   // class or interface
-    |   'public'     // class or interface
-    |   'protected'  // class or interface
-    |   'private'    // class or interface
-    |   'abstract'   // class or interface
-    |   'static'     // class or interface
-    |   'final'      // class only -- does not apply to interfaces
-    |   'strictfp'   // class or interface
+    :   annotation       // class or interface
+    |   (   'public'     // class or interface
+        |   'protected'  // class or interface
+        |   'private'    // class or interface
+        |   'abstract'   // class or interface
+        |   'static'     // class or interface
+        |   'final'      // class only -- does not apply to interfaces
+        |   'strictfp'   // class or interface
+        )
     ;
 
 modifiers
@@ -414,17 +415,18 @@ arrayInitializer
 
 modifier
     :   annotation
-    |   'public'
-    |   'protected'
-    |   'private'
-    |   'static'
-    |   'abstract'
-    |   'final'
-    |   'native'
-    |   'synchronized'
-    |   'transient'
-    |   'volatile'
-    |   'strictfp'
+    |   (   'public'
+        |   'protected'
+        |   'private'
+        |   'static'
+        |   'abstract'
+        |   'final'
+        |   'native'
+        |   'synchronized'
+        |   'transient'
+        |   'volatile'
+        |   'strictfp'
+        )
     ;
 
 packageOrTypeName
