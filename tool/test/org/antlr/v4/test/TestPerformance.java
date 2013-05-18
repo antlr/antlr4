@@ -1692,7 +1692,7 @@ public class TestPerformance extends BaseTest {
 				}
 			}
 
-			return stream.createCopy();
+			return new JavaUnicodeInputStream(stream.createCopy());
 		}
 	}
 

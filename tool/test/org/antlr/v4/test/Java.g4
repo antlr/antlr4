@@ -980,7 +980,6 @@ StringLiteral
 fragment
 EscapeSequence
     :   '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\')
-    |   UnicodeEscape
     |   OctalEscape
     ;
 
@@ -989,11 +988,6 @@ OctalEscape
     :   '\\' ('0'..'3') ('0'..'7') ('0'..'7')
     |   '\\' ('0'..'7') ('0'..'7')
     |   '\\' ('0'..'7')
-    ;
-
-fragment
-UnicodeEscape
-    :   '\\' 'u' HexDigit HexDigit HexDigit HexDigit
     ;
 
 ENUM:   'enum' {enumIsKeyword}?
