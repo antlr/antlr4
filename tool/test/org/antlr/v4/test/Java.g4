@@ -1221,6 +1221,51 @@ NullLiteral
 	:	'null'
 	;
 
+// §3.11 Separators
+
+LPAREN : '(';
+RPAREN : ')';
+LBRACE : '{';
+RBRACE : '}';
+LBRACK : '[';
+RBRACK : ']';
+SEMI : ';';
+COMMA : ',';
+DOT : '.';
+
+// §3.12 Operators
+
+ASSIGN : '=';
+GT : '>';
+LT : '<';
+BANG : '!';
+TILDE : '~';
+QUESTION : '?';
+COLON : ':';
+EQUAL : '==';
+NOTEQUAL : '!=';
+AND : '&&';
+OR : '||';
+INC : '++';
+DEC : '--';
+ADD : '+';
+SUB : '-';
+MUL : '*';
+DIV : '/';
+BITAND : '&';
+BITOR : '|';
+CARET : '^';
+MOD : '%';
+
+ADD_ASSIGN : '+=';
+SUB_ASSIGN : '-=';
+MUL_ASSIGN : '*=';
+DIV_ASSIGN : '/=';
+AND_ASSIGN : '&=';
+OR_ASSIGN : '|=';
+XOR_ASSIGN : '^=';
+MOD_ASSIGN : '%=';
+
 Identifier
 	:	JavaLetter JavaLetterOrDigit*
 	;
