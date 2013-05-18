@@ -512,14 +512,22 @@ public class TestPerformance extends BaseTest {
 			for (int j = 0; j < den.length; j++) {
 				sumNum[j] += num[j];
 				sumDen[j] += den[j];
-				sumNormalized[j] += (double)num[j] / (double)den[j];
+				if (den[j] > 0) {
+					sumNormalized[j] += (double)num[j] / (double)den[j];
+				}
 			}
 		}
 
 		double[] weightedAverage = new double[totalTransitionsPerFile[0].length];
 		double[] average = new double[totalTransitionsPerFile[0].length];
 		for (int i = 0; i < average.length; i++) {
-			weightedAverage[i] = (double)sumNum[i] / (double)sumDen[i];
+			if (sumDen[i] > 0) {
+				weightedAverage[i] = (double)sumNum[i] / (double)sumDen[i];
+			}
+			else {
+				weightedAverage[i] = 0;
+			}
+
 			average[i] = sumNormalized[i] / PASSES;
 		}
 
@@ -531,7 +539,13 @@ public class TestPerformance extends BaseTest {
 		for (int i = 0; i < stddev.length; i++) {
 			double[] points = new double[PASSES];
 			for (int j = 0; j < PASSES; j++) {
-				points[j] = ((double)computedTransitionsPerFile[j][i] / (double)totalTransitionsPerFile[j][i]);
+				long totalTransitions = totalTransitionsPerFile[j][i];
+				if (totalTransitions > 0) {
+					points[j] = ((double)computedTransitionsPerFile[j][i] / (double)totalTransitionsPerFile[j][i]);
+				}
+				else {
+					points[j] = 0;
+				}
 			}
 
 			Arrays.sort(points);
