@@ -257,11 +257,6 @@ public class ParserATNSimulator extends ATNSimulator {
 	public static final boolean dfa_debug = false;
 	public static final boolean retry_debug = false;
 
-	public static int predict_calls = 0;
-	public static int retry_with_context = 0;
-	public static int retry_with_context_indicates_no_conflict = 0;
-	public static int retry_with_context_predicts_same_alt = 0;
-
 	@Nullable
 	protected final Parser parser;
 
@@ -322,7 +317,6 @@ public class ParserATNSimulator extends ATNSimulator {
 		_input = input;
 		_startIndex = input.index();
 		_outerContext = outerContext;
-		predict_calls++;
 		DFA dfa = decisionToDFA[decision];
 
 		int m = input.mark();
@@ -460,8 +454,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				reportAttemptingFullContext(dfa, conflictingAlts, D.configs, startIndex, input.index());
 				int alt = execATNWithFullContext(dfa, D, s0_closure,
 												 input, startIndex,
-												 outerContext,
-												 ATN.INVALID_ALT_NUMBER);
+												 outerContext);
 				return alt;
 			}
 
@@ -604,11 +597,8 @@ public class ParserATNSimulator extends ATNSimulator {
 										 DFAState D, // how far we got before failing over
 										 @NotNull ATNConfigSet s0,
 										 @NotNull TokenStream input, int startIndex,
-										 ParserRuleContext outerContext,
-										 int SLL_min_alt) // todo: is this in D as min ambig alts?
+										 ParserRuleContext outerContext)
 	{
-		retry_with_context++;
-
 		if ( debug || debug_list_atn_decisions ) {
 			System.out.println("execATNWithFullContext "+s0);
 		}
@@ -688,11 +678,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		// without conflict, then we know that it's a full LL decision
 		// not SLL.
 		if ( reach.uniqueAlt != ATN.INVALID_ALT_NUMBER ) {
-			retry_with_context_indicates_no_conflict++;
 			reportContextSensitivity(dfa, predictedAlt, reach, startIndex, input.index());
-			if ( predictedAlt == SLL_min_alt ) {
-				retry_with_context_predicts_same_alt++;
-			}
 			return predictedAlt;
 		}
 
