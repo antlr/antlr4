@@ -1176,26 +1176,54 @@ BooleanLiteral
 	|	'false'
 	;
 
+// §3.10.4 Character Literals
+
 CharacterLiteral
-    :   '\'' ( EscapeSequence | ~('\''|'\\') ) '\''
-    ;
+	:	'\'' SingleCharacter '\''
+	|	'\'' EscapeSequence '\''
+	;
+
+fragment
+SingleCharacter
+	:	~['\\]
+	;
+
+// §3.10.5 String Literals
 
 StringLiteral
-    :  '"' ( EscapeSequence | ~('\\'|'"') )* '"'
-    ;
+	:	'"' StringCharacters? '"'
+	;
+
+fragment
+StringCharacters
+	:	StringCharacter+
+	;
+
+fragment
+StringCharacter
+	:	~["\\]
+	|	EscapeSequence
+	;
+
+// §3.10.6 Escape Sequences for Character and String Literals
 
 fragment
 EscapeSequence
-    :   '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\')
-    |   OctalEscape
-    ;
+	:	'\\' [btnfr"'\\]
+	|	OctalEscape
+	;
 
 fragment
 OctalEscape
-    :   '\\' ('0'..'3') ('0'..'7') ('0'..'7')
-    |   '\\' ('0'..'7') ('0'..'7')
-    |   '\\' ('0'..'7')
-    ;
+	:	'\\' OctalDigit
+	|	'\\' OctalDigit OctalDigit
+	|	'\\' ZeroToThree OctalDigit OctalDigit
+	;
+
+fragment
+ZeroToThree
+	:	[0-3]
+	;
 
 // §3.10.7 The Null Literal
 
