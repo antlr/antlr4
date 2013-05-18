@@ -63,11 +63,12 @@ public class ProxyErrorListener implements ANTLRErrorListener {
 								DFA dfa,
 								int startIndex,
 								int stopIndex,
+								boolean exact,
 								BitSet ambigAlts,
 								ATNConfigSet configs)
 	{
 		for (ANTLRErrorListener listener : delegates) {
-			listener.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, ambigAlts, configs);
+			listener.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
 		}
 	}
 
@@ -76,10 +77,11 @@ public class ProxyErrorListener implements ANTLRErrorListener {
 											DFA dfa,
 											int startIndex,
 											int stopIndex,
+											BitSet conflictingAlts,
 											ATNConfigSet configs)
 	{
 		for (ANTLRErrorListener listener : delegates) {
-			listener.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, configs);
+			listener.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs);
 		}
 	}
 
@@ -88,10 +90,11 @@ public class ProxyErrorListener implements ANTLRErrorListener {
 										 DFA dfa,
 										 int startIndex,
 										 int stopIndex,
+										 int prediction,
 										 ATNConfigSet configs)
 	{
 		for (ANTLRErrorListener listener : delegates) {
-			listener.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, configs);
+			listener.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs);
 		}
 	}
 }
