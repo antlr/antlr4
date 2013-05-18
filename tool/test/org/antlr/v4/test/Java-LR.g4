@@ -504,7 +504,7 @@ literal
     |   FloatingPointLiteral
     |   CharacterLiteral
     |   StringLiteral
-    |   booleanLiteral
+    |   BooleanLiteral
     |   'null'
     ;
 
@@ -512,11 +512,6 @@ integerLiteral
     :   HexLiteral
     |   OctalLiteral
     |   DecimalLiteral
-    ;
-
-booleanLiteral
-    :   'true'
-    |   'false'
     ;
 
 // ANNOTATIONS
@@ -916,6 +911,13 @@ HexExponent : ('p'|'P') ('+'|'-')? ('0'..'9')+ ;
 
 fragment
 FloatTypeSuffix : ('f'|'F'|'d'|'D') ;
+
+// §3.10.3 Boolean Literals
+
+BooleanLiteral
+	:	'true'
+	|	'false'
+	;
 
 CharacterLiteral
     :   '\'' ( EscapeSequence | ~('\''|'\\') ) '\''
