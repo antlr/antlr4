@@ -1094,6 +1094,9 @@ public class TestPerformance extends BaseTest {
 							sharedLexers[thread] = lexer;
                         }
 
+						lexer.removeErrorListeners();
+						lexer.addErrorListener(DescriptiveErrorListener.INSTANCE);
+
 						if (lexer.getInterpreter().decisionToDFA[0] == null) {
 							ATN atn = lexer.getATN();
 							for (int i = 0; i < lexer.getInterpreter().decisionToDFA.length; i++) {
@@ -1692,7 +1695,7 @@ public class TestPerformance extends BaseTest {
 				}
 			}
 
-			return stream.createCopy();
+			return new JavaUnicodeInputStream(stream.createCopy());
 		}
 	}
 
