@@ -1197,6 +1197,8 @@ LSHIFT_ASSIGN : '<<=';
 RSHIFT_ASSIGN : '>>=';
 URSHIFT_ASSIGN : '>>>=';
 
+// §3.8 Identifiers (must appear after all keywords in the grammar)
+
 Identifier
 	:	JavaLetter JavaLetterOrDigit*
 	;
@@ -1223,7 +1225,18 @@ JavaLetterOrDigit
 		{Character.isJavaIdentifierPart(Character.toCodePoint((char)_input.LA(-2), (char)_input.LA(-1)))}?
 	;
 
-WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ -> skip
+//
+// Additional symbols not defined in the lexical specification
+//
+
+AT : '@';
+ELLIPSIS : '...';
+
+//
+// Whitespace and comments
+//
+
+WS  :  [ \t\r\n\u000C]+ -> skip
     ;
 
 COMMENT
@@ -1231,5 +1244,5 @@ COMMENT
     ;
 
 LINE_COMMENT
-    : '//' ~('\n'|'\r')* '\r'? '\n' -> skip
+    :   '//' ~[\r\n]* -> skip
     ;
