@@ -725,7 +725,7 @@ expression
     |   expression ('*'|'/'|'%') expression
     |   expression ('+'|'-') expression
     |   expression ('<' '<' | '>' '>' '>' | '>' '>') expression
-    |   expression ('<' '=' | '>' '=' | '>' | '<') expression
+    |   expression ('<=' | '>=' | '>' | '<') expression
 	|   expression 'instanceof' type
 	|   expression ('==' | '!=') expression
 	|   expression '&' expression
@@ -735,7 +735,7 @@ expression
 	|   expression '||' expression
 	|   expression '?' expression ':' expression
 	|   expression
-        ('='<assoc=right>
+        (	'='<assoc=right>
         |	'+='<assoc=right>
         |	'-='<assoc=right>
         |	'*='<assoc=right>
@@ -743,9 +743,9 @@ expression
         |	'&='<assoc=right>
         |	'|='<assoc=right>
         |	'^='<assoc=right>
-        |	'>' '>' '='<assoc=right>
-        |	'>' '>' '>' '='<assoc=right>
-        |	'<' '<' '='<assoc=right>
+        |	'>>='<assoc=right>
+        |	'>>>='<assoc=right>
+        |	'<<='<assoc=right>
         |	'%='<assoc=right>
         )
         expression
@@ -1141,6 +1141,8 @@ TILDE : '~';
 QUESTION : '?';
 COLON : ':';
 EQUAL : '==';
+LE : '<=';
+GE : '>=';
 NOTEQUAL : '!=';
 AND : '&&';
 OR : '||';
@@ -1163,6 +1165,9 @@ AND_ASSIGN : '&=';
 OR_ASSIGN : '|=';
 XOR_ASSIGN : '^=';
 MOD_ASSIGN : '%=';
+LSHIFT_ASSIGN : '<<=';
+RSHIFT_ASSIGN : '>>=';
+URSHIFT_ASSIGN : '>>>=';
 
 Identifier
 	:	JavaLetter JavaLetterOrDigit*

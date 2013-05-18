@@ -719,23 +719,9 @@ assignmentOperator
     |   '|='
     |   '^='
     |   '%='
-    |   t1='<' t2='<' t3='='
-//        { $t1.getLine() == $t2.getLine() &&
-//          $t1.getCharPositionInLine() + 1 == $t2.getCharPositionInLine() &&
-//          $t2.getLine() == $t3.getLine() &&
-//          $t2.getCharPositionInLine() + 1 == $t3.getCharPositionInLine() }?
-    |   t1='>' t2='>' t3='>' t4='='
-//        { $t1.getLine() == $t2.getLine() &&
-//          $t1.getCharPositionInLine() + 1 == $t2.getCharPositionInLine() &&
-//          $t2.getLine() == $t3.getLine() &&
-//          $t2.getCharPositionInLine() + 1 == $t3.getCharPositionInLine() &&
-//          $t3.getLine() == $t4.getLine() &&
-//          $t3.getCharPositionInLine() + 1 == $t4.getCharPositionInLine() }?
-    |   t1='>' t2='>' t3='='
-//        { $t1.getLine() == $t2.getLine() &&
-//          $t1.getCharPositionInLine() + 1 == $t2.getCharPositionInLine() &&
-//          $t2.getLine() == $t3.getLine() &&
-//          $t2.getCharPositionInLine() + 1 == $t3.getCharPositionInLine() }?
+    |   '<<='
+    |   '>>='
+    |   '>>>='
     ;
 
 conditionalExpression
@@ -775,14 +761,10 @@ relationalExpression
     ;
     
 relationalOp
-    :   t1='<' t2='='
-//        { $t1.getLine() == $t2.getLine() &&
-//          $t1.getCharPositionInLine() + 1 == $t2.getCharPositionInLine() }?
-    |   t1='>' t2='='
-//        { $t1.getLine() == $t2.getLine() &&
-//          $t1.getCharPositionInLine() + 1 == $t2.getCharPositionInLine() }?
-    |   '<' 
-    |   '>' 
+    :   '<='
+    |   '>='
+    |   '<'
+    |   '>'
     ;
 
 shiftExpression
@@ -1243,6 +1225,8 @@ TILDE : '~';
 QUESTION : '?';
 COLON : ':';
 EQUAL : '==';
+LE : '<=';
+GE : '>=';
 NOTEQUAL : '!=';
 AND : '&&';
 OR : '||';
@@ -1265,6 +1249,9 @@ AND_ASSIGN : '&=';
 OR_ASSIGN : '|=';
 XOR_ASSIGN : '^=';
 MOD_ASSIGN : '%=';
+LSHIFT_ASSIGN : '<<=';
+RSHIFT_ASSIGN : '>>=';
+URSHIFT_ASSIGN : '>>>=';
 
 Identifier
 	:	JavaLetter JavaLetterOrDigit*
