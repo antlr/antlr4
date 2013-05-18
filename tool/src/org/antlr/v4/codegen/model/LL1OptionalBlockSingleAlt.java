@@ -53,8 +53,8 @@ public class LL1OptionalBlockSingleAlt extends LL1Choice {
 //		IntervalSet[] altLookSets = LinearApproximator.getLL1LookaheadSets(dfa);
 		IntervalSet[] altLookSets = factory.getGrammar().decisionLOOK.get(decision);
 		altLook = getAltLookaheadAsStringLists(altLookSets);
-		IntervalSet look = altLookSets[1];
-		IntervalSet followLook = altLookSets[2];
+		IntervalSet look = altLookSets[0];
+		IntervalSet followLook = altLookSets[1];
 
 		IntervalSet expecting = look.or(followLook);
 		this.error = getThrowNoViableAlt(factory, blkAST, expecting);
