@@ -91,12 +91,14 @@ public interface ANTLRErrorListener {
      */
     void reportAmbiguity(@NotNull Parser recognizer,
 						 DFA dfa, int startIndex, int stopIndex,
+						 boolean exact,
 						 @NotNull BitSet ambigAlts,
 						 @NotNull ATNConfigSet configs);
 
 	void reportAttemptingFullContext(@NotNull Parser recognizer,
 									 @NotNull DFA dfa,
 									 int startIndex, int stopIndex,
+									 @Nullable BitSet conflictingAlts,
 									 @NotNull ATNConfigSet configs);
 
 	/** Called by the parser when it find a conflict that is resolved
@@ -108,5 +110,6 @@ public interface ANTLRErrorListener {
     void reportContextSensitivity(@NotNull Parser recognizer,
                                   @NotNull DFA dfa,
                                   int startIndex, int stopIndex,
+								  int prediction,
                                   @NotNull ATNConfigSet configs);
 }

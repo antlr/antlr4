@@ -34,6 +34,7 @@ import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.BitSet;
 
@@ -41,10 +42,15 @@ public class DiagnosticErrorListener extends BaseErrorListener {
     @Override
     public void reportAmbiguity(@NotNull Parser recognizer,
 								DFA dfa, int startIndex, int stopIndex,
-								@NotNull BitSet ambigAlts,
+								boolean exact,
+								@Nullable BitSet ambigAlts,
 								@NotNull ATNConfigSet configs)
     {
-        recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision +
+		if (!exact) {
+			return;
+		}
+
+		recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision +
 			": ambigAlts=" + ambigAlts + ", input='" +
 			recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
     }
@@ -53,6 +59,7 @@ public class DiagnosticErrorListener extends BaseErrorListener {
 	public void reportAttemptingFullContext(@NotNull Parser recognizer,
 											@NotNull DFA dfa,
 											int startIndex, int stopIndex,
+											@Nullable BitSet conflictingAlts,
 											@NotNull ATNConfigSet configs)
 	{
 		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" +
@@ -64,6 +71,7 @@ public class DiagnosticErrorListener extends BaseErrorListener {
 	public void reportContextSensitivity(@NotNull Parser recognizer,
 										 @NotNull DFA dfa,
                                          int startIndex, int stopIndex,
+										 int prediction,
 										 @NotNull ATNConfigSet configs)
     {
         recognizer.notifyErrorListeners("reportContextSensitivity d=" +
