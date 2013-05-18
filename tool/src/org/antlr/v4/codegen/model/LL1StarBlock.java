@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.ast.GrammarAST;
 
+import java.util.Arrays;
 import java.util.List;
 
 /** */
@@ -58,9 +59,8 @@ public class LL1StarBlock extends LL1Loop {
 		/** Lookahead for each alt 1..n */
 		IntervalSet[] altLookSets = factory.getGrammar().decisionLOOK.get(decision);
 		IntervalSet lastLook = altLookSets[altLookSets.length-1];
-		IntervalSet[] copy = new IntervalSet[altLookSets.length-1];
-		System.arraycopy(altLookSets, 0, copy, 0, altLookSets.length-1); // remove last (exit) alt
-		altLookSets = copy;
+		// remove last (exit) alt
+		altLookSets = Arrays.copyOf(altLookSets, altLookSets.length - 1);
 		altLook = getAltLookaheadAsStringLists(altLookSets);
 		loopLabel = factory.getGenerator().getTarget().getLoopLabel(starRootAST);
 

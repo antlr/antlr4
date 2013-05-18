@@ -30,19 +30,19 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
+import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Set;
 
 public class LL1Analyzer {
 	/** Special value added to the lookahead sets to indicate that we hit
-	 *  a predicate during analysis if seeThruPreds==false.
+	 *  a predicate during analysis if {@code seeThruPreds==false}.
 	 */
 	public static final int HIT_PRED = Token.INVALID_TYPE;
 
@@ -52,21 +52,30 @@ public class LL1Analyzer {
 	public LL1Analyzer(@NotNull ATN atn) { this.atn = atn; }
 
 	/**
-	 * From an ATN state, {@code s}, find the set of all labels reachable from
-	 * {@code s} at depth k. Only for DecisionStates.
+	 * Calculates the SLL(1) expected lookahead set for each outgoing transition
+	 * of an {@link ATNState}. The returned array has one element for each
+	 * outgoing transition in {@code s}. If the closure from transition
+	 * <em>i</em> leads to a semantic predicate before matching a symbol, the
+	 * element at index <em>i</em> of the result will be {@code null}.
+	 *
+	 * @param s the ATN state
+	 * @return the expected symbols for each outgoing transition of {@code s}.
 	 */
 	@Nullable
 	public IntervalSet[] getDecisionLookahead(@Nullable ATNState s) {
 //		System.out.println("LOOK("+s.stateNumber+")");
-		if ( s==null ) return null;
-		IntervalSet[] look = new IntervalSet[s.getNumberOfTransitions()+1];
-		for (int alt=1; alt<=s.getNumberOfTransitions(); alt++) {
+		if ( s==null ) {
+			return null;
+		}
+
+		IntervalSet[] look = new IntervalSet[s.getNumberOfTransitions()];
+		for (int alt = 0; alt < s.getNumberOfTransitions(); alt++) {
 			look[alt] = new IntervalSet();
 			Set<ATNConfig> lookBusy = new HashSet<ATNConfig>();
 			boolean seeThruPreds = false; // fail to get lookahead upon pred
-			_LOOK(s.transition(alt - 1).target,
+			_LOOK(s.transition(alt).target,
 				  PredictionContext.EMPTY,
-				  look[alt], lookBusy, seeThruPreds, false);
+				  look[alt], lookBusy, new BitSet(), seeThruPreds, false);
 			// Wipe out lookahead for this alternative if we found nothing
 			// or we had a predicate when we !seeThruPreds
 			if ( look[alt].size()==0 || look[alt].contains(HIT_PRED) ) {
@@ -77,12 +86,20 @@ public class LL1Analyzer {
 	}
 
 	/**
-	 * Get lookahead, using {@code ctx} if we reach end of rule. If {@code ctx}
-	 * is {@code null} or {@link RuleContext#EMPTY EMPTY}, don't chase FOLLOW.
-	 * If {@code ctx} is {@code null}, {@link Token#EPSILON EPSILON} is in set
-	 * if we can reach end of rule. If {@code ctx} is
-	 * {@link RuleContext#EMPTY EMPTY}, {@link IntStream#EOF EOF} is in set if
-	 * we can reach end of rule.
+	 * Compute set of tokens that can follow {@code s} in the ATN in the
+	 * specified {@code ctx}.
+	 * <p/>
+	 * If {@code ctx} is {@code null} and the end of the rule containing
+	 * {@code s} is reached, {@link Token#EPSILON} is added to the result set.
+	 * If {@code ctx} is not {@code null} and the end of the outermost rule is
+	 * reached, {@link Token#EOF} is added to the result set.
+	 *
+	 * @param s the ATN state
+	 * @param ctx the complete parser context, or {@code null} if the context
+	 * should be ignored
+	 *
+	 * @return The set of tokens that can follow {@code s} in the ATN in the
+	 * specified {@code ctx}.
 	 */
     @NotNull
    	public IntervalSet LOOK(@NotNull ATNState s, @Nullable RuleContext ctx) {
@@ -90,20 +107,42 @@ public class LL1Analyzer {
 		boolean seeThruPreds = true; // ignore preds; get all lookahead
 		PredictionContext lookContext = ctx != null ? PredictionContext.fromRuleContext(s.atn, ctx) : null;
    		_LOOK(s, lookContext,
-			  r, new HashSet<ATNConfig>(), seeThruPreds, true);
+			  r, new HashSet<ATNConfig>(), new BitSet(), seeThruPreds, true);
    		return r;
    	}
 
-    /** Compute set of tokens that can come next. If the {@code ctx} is {@link PredictionContext#EMPTY},
-     *  then we don't go anywhere when we hit the end of the rule. We have
-     *  the correct set.  If {@code ctx} is null, that means that we did not want
-     *  any tokens following this rule--just the tokens that could be found within this
-     *  rule. Add {@link Token#EPSILON} to the set indicating we reached the end of the ruled out having
-     *  to match a token.
-     */
+	/**
+	 * Compute set of tokens that can follow {@code s} in the ATN in the
+	 * specified {@code ctx}.
+	 * <p/>
+	 * If {@code ctx} is {@code null} and the end of the rule containing
+	 * {@code s} is reached, {@link Token#EPSILON} is added to the result set.
+	 * If {@code ctx} is not {@code null} and {@code addEOF} is {@code true} and
+	 * the end of the outermost rule is reached, {@link Token#EOF} is added to
+	 * the result set.
+	 *
+	 * @param s the ATN state.
+	 * @param ctx The outer context, or {@code null} if the outer context should
+	 * not be used.
+	 * @param look The result lookahead set.
+	 * @param lookBusy A set used for preventing epsilon closures in the ATN
+	 * from causing a stack overflow. Outside code should pass
+	 * {@code new HashSet<ATNConfig>} for this argument.
+	 * @param calledRuleStack A set used for preventing left recursion in the
+	 * ATN from causing a stack overflow. Outside code should pass
+	 * {@code new BitSet()} for this argument.
+	 * @param seeThruPreds {@code true} to true semantic predicates as
+	 * implicitly {@code true} and "see through them", otherwise {@code false}
+	 * to treat semantic predicates as opaque and add {@link #HIT_PRED} to the
+	 * result if one is encountered.
+	 * @param addEOF Add {@link Token#EOF} to the result if the end of the
+	 * outermost context is reached. This parameter has no effect if {@code ctx}
+	 * is {@code null}.
+	 */
     protected void _LOOK(@NotNull ATNState s, @Nullable PredictionContext ctx,
 						 @NotNull IntervalSet look,
                          @NotNull Set<ATNConfig> lookBusy,
+						 @NotNull BitSet calledRuleStack,
 						 boolean seeThruPreds, boolean addEOF)
 	{
 //		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);
@@ -124,7 +163,17 @@ public class LL1Analyzer {
 				for (SingletonPredictionContext p : ctx) {
 					ATNState returnState = atn.states.get(p.returnState);
 //					System.out.println("popping back to "+retState);
-					_LOOK(returnState, p.parent, look, lookBusy, seeThruPreds, addEOF);
+
+					boolean removed = calledRuleStack.get(returnState.ruleIndex);
+					try {
+						calledRuleStack.clear(returnState.ruleIndex);
+						_LOOK(returnState, p.parent, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+					}
+					finally {
+						if (removed) {
+							calledRuleStack.set(returnState.ruleIndex);
+						}
+					}
 				}
 				return;
 			}
@@ -134,20 +183,31 @@ public class LL1Analyzer {
         for (int i=0; i<n; i++) {
 			Transition t = s.transition(i);
 			if ( t.getClass() == RuleTransition.class ) {
+				if (calledRuleStack.get(((RuleTransition)t).target.ruleIndex)) {
+					continue;
+				}
+
 				PredictionContext newContext =
 					SingletonPredictionContext.create(ctx, ((RuleTransition)t).followState.stateNumber);
-				_LOOK(t.target, newContext, look, lookBusy, seeThruPreds, addEOF);
+
+				try {
+					calledRuleStack.set(((RuleTransition)t).target.ruleIndex);
+					_LOOK(t.target, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+				}
+				finally {
+					calledRuleStack.clear(((RuleTransition)t).target.ruleIndex);
+				}
 			}
 			else if ( t instanceof PredicateTransition ) {
 				if ( seeThruPreds ) {
-					_LOOK(t.target, ctx, look, lookBusy, seeThruPreds, addEOF);
+					_LOOK(t.target, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
 				}
 				else {
 					look.add(HIT_PRED);
 				}
 			}
 			else if ( t.isEpsilon() ) {
-				_LOOK(t.target, ctx, look, lookBusy, seeThruPreds, addEOF);
+				_LOOK(t.target, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
 			}
 			else if ( t.getClass() == WildcardTransition.class ) {
 				look.addAll( IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType) );
