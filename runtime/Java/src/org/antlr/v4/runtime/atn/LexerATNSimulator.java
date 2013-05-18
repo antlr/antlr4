@@ -375,7 +375,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	@Nullable
 	protected ATNState getReachableTarget(Transition trans, int t) {
-		if (trans.matches(t, Lexer.MIN_CHAR_VALUE, Lexer.MAX_CHAR_VALUE)) {
+		if (trans.matches(t, Character.MIN_VALUE, Character.MAX_VALUE)) {
 			return trans.target;
 		}
 
