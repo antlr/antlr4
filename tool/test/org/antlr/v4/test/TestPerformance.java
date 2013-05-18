@@ -1426,6 +1426,15 @@ public class TestPerformance extends BaseTest {
 
 	}
 
+	private static BitSet getRepresentedAlts(ATNConfigSet configs) {
+		BitSet alts = new BitSet();
+		for (ATNConfig config : configs) {
+			alts.set(config.alt);
+		}
+
+		return alts;
+	}
+
 	private static class SummarizingDiagnosticErrorListener extends DiagnosticErrorListener {
 
 		@Override
@@ -1434,7 +1443,12 @@ public class TestPerformance extends BaseTest {
 				return;
 			}
 
-			super.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, ambigAlts, configs);
+			// show the rule name along with the decision
+			String format = "reportAmbiguity d=%d (%s): ambigAlts=%s, input='%s'";
+			int decision = dfa.decision;
+			String rule = recognizer.getRuleNames()[dfa.atnStartState.ruleIndex];
+			String input = recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex));
+			recognizer.notifyErrorListeners(String.format(format, decision, rule, ambigAlts, input));
 		}
 
 		@Override
@@ -1443,7 +1457,13 @@ public class TestPerformance extends BaseTest {
 				return;
 			}
 
-			super.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, configs);
+			// show the rule name and viable configs along with the base info
+			String format = "reportAttemptingFullContext d=%d (%s), input='%s', viable=%s";
+			int decision = dfa.decision;
+			String rule = recognizer.getRuleNames()[dfa.atnStartState.ruleIndex];
+			String input = recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex));
+			BitSet representedAlts = getRepresentedAlts(configs);
+			recognizer.notifyErrorListeners(String.format(format, decision, rule, input, representedAlts));
 		}
 
 		@Override
@@ -1452,7 +1472,13 @@ public class TestPerformance extends BaseTest {
 				return;
 			}
 
-			super.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, configs);
+			// show the rule name and viable configs along with the base info
+			String format = "reportContextSensitivity d=%d (%s), input='%s', viable=%s";
+			int decision = dfa.decision;
+			String rule = recognizer.getRuleNames()[dfa.atnStartState.ruleIndex];
+			String input = recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex));
+			BitSet representedAlts = getRepresentedAlts(configs);
+			recognizer.notifyErrorListeners(String.format(format, decision, rule, input, representedAlts));
 		}
 
 	}
