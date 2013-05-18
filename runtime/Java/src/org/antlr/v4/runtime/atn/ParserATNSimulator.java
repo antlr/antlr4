@@ -431,6 +431,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 			if ( D.requiresFullContext && mode != PredictionMode.SLL ) {
 				// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
+				BitSet conflictingAlts = null;
 				if ( D.predicates!=null ) {
 					if ( debug ) System.out.println("DFA state has preds in DFA sim LL failover");
 					int conflictIndex = input.index();
@@ -438,10 +439,10 @@ public class ParserATNSimulator extends ATNSimulator {
 						input.seek(startIndex);
 					}
 
-					BitSet alts = evalSemanticContext(D.predicates, outerContext, true);
-					if ( alts.cardinality()==1 ) {
+					conflictingAlts = evalSemanticContext(D.predicates, outerContext, true);
+					if ( conflictingAlts.cardinality()==1 ) {
 						if ( debug ) System.out.println("Full LL avoided");
-						return alts.nextSetBit(0);
+						return conflictingAlts.nextSetBit(0);
 					}
 
 					if (conflictIndex != startIndex) {
@@ -456,6 +457,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				ATNConfigSet s0_closure =
 					computeStartState(dfa.atnStartState, outerContext,
 									  fullCtx);
+				reportAttemptingFullContext(dfa, conflictingAlts, D.configs, startIndex, input.index());
 				int alt = execATNWithFullContext(dfa, D, s0_closure,
 												 input, startIndex,
 												 outerContext,
@@ -481,7 +483,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				default:
 					// report ambiguity after predicate evaluation to make sure the correct
 					// set of ambig alts is reported.
-					reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
+					reportAmbiguity(dfa, D, startIndex, stopIndex, false, alts, D.configs);
 					return alts.nextSetBit(0);
 				}
 			}
@@ -606,7 +608,6 @@ public class ParserATNSimulator extends ATNSimulator {
 										 int SLL_min_alt) // todo: is this in D as min ambig alts?
 	{
 		retry_with_context++;
-		reportAttemptingFullContext(dfa, s0, startIndex, input.index());
 
 		if ( debug || debug_list_atn_decisions ) {
 			System.out.println("execATNWithFullContext "+s0);
@@ -688,7 +689,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		// not SLL.
 		if ( reach.uniqueAlt != ATN.INVALID_ALT_NUMBER ) {
 			retry_with_context_indicates_no_conflict++;
-			reportContextSensitivity(dfa, reach, startIndex, input.index());
+			reportContextSensitivity(dfa, predictedAlt, reach, startIndex, input.index());
 			if ( predictedAlt == SLL_min_alt ) {
 				retry_with_context_predicts_same_alt++;
 			}
@@ -722,9 +723,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		the fact that we should predict alternative 1.  We just can't say for
 		sure that there is an ambiguity without looking further.
 		*/
-		if ( foundExactAmbig ) {
-			reportAmbiguity(dfa, D, startIndex, input.index(), getConflictingAlts(reach), reach);
-		}
+		reportAmbiguity(dfa, D, startIndex, input.index(), foundExactAmbig, null, reach);
 
 		return predictedAlt;
 	}
@@ -1491,28 +1490,29 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 	}
 
-	protected void reportAttemptingFullContext(DFA dfa, ATNConfigSet configs, int startIndex, int stopIndex) {
+	protected void reportAttemptingFullContext(DFA dfa, @Nullable BitSet conflictingAlts, @NotNull ATNConfigSet configs, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);
 			System.out.println("reportAttemptingFullContext decision="+dfa.decision+":"+configs+
                                ", input="+parser.getTokenStream().getText(interval));
         }
-        if ( parser!=null ) parser.getErrorListenerDispatch().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, configs);
+        if ( parser!=null ) parser.getErrorListenerDispatch().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, conflictingAlts, configs);
     }
 
-	protected void reportContextSensitivity(DFA dfa, ATNConfigSet configs, int startIndex, int stopIndex) {
+	protected void reportContextSensitivity(DFA dfa, int prediction, @NotNull ATNConfigSet configs, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);
             System.out.println("reportContextSensitivity decision="+dfa.decision+":"+configs+
                                ", input="+parser.getTokenStream().getText(interval));
         }
-        if ( parser!=null ) parser.getErrorListenerDispatch().reportContextSensitivity(parser, dfa, startIndex, stopIndex, configs);
+        if ( parser!=null ) parser.getErrorListenerDispatch().reportContextSensitivity(parser, dfa, startIndex, stopIndex, prediction, configs);
     }
 
     /** If context sensitive parsing, we know it's ambiguity not conflict */
     protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex,
-								@NotNull BitSet ambigAlts,
-								@NotNull ATNConfigSet configs)
+								   boolean exact,
+								   @Nullable BitSet ambigAlts,
+								   @NotNull ATNConfigSet configs)
 	{
 		if ( debug || retry_debug ) {
 //			ParserATNPathFinder finder = new ParserATNPathFinder(parser, atn);
@@ -1537,7 +1537,7 @@ public class ParserATNSimulator extends ATNSimulator {
                                ", input="+parser.getTokenStream().getText(interval));
         }
         if ( parser!=null ) parser.getErrorListenerDispatch().reportAmbiguity(parser, dfa, startIndex, stopIndex,
-																			  ambigAlts, configs);
+																			  exact, ambigAlts, configs);
     }
 
 	public final void setPredictionMode(@NotNull PredictionMode mode) {

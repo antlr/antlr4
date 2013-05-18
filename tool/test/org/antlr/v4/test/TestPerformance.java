@@ -1438,7 +1438,7 @@ public class TestPerformance extends BaseTest {
 	private static class SummarizingDiagnosticErrorListener extends DiagnosticErrorListener {
 
 		@Override
-		public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet ambigAlts, ATNConfigSet configs) {
+		public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) {
 			if (!REPORT_AMBIGUITIES) {
 				return;
 			}
@@ -1452,7 +1452,7 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, ATNConfigSet configs) {
+		public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, ATNConfigSet configs) {
 			if (!REPORT_FULL_CONTEXT) {
 				return;
 			}
@@ -1467,7 +1467,7 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, ATNConfigSet configs) {
+		public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, ATNConfigSet configs) {
 			if (!REPORT_CONTEXT_SENSITIVITY) {
 				return;
 			}
