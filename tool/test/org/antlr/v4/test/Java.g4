@@ -1215,6 +1215,11 @@ OctalEscape
     |   '\\' ('0'..'7')
     ;
 
+// §3.10.7 The Null Literal
+
+NullLiteral
+	:	'null'
+	;
 
 Identifier
 	:	JavaLetter JavaLetterOrDigit*
