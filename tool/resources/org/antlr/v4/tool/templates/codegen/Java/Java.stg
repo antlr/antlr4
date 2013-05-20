@@ -66,12 +66,23 @@ ListenerFile(file, header) ::= <<
 package <file.genPackage>;
 <endif>
 <header>
-import org.antlr.v4.runtime.tree.*;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
 
+/**
+ * This interface defines a complete listener for a parse tree produced by
+ * {@link <file.parserName>}.
+ */
 public interface <file.grammarName>Listener extends ParseTreeListener {
 	<file.listenerNames:{lname |
+/**
+ * Enter a parse tree produced by {@link <file.parserName>#<lname>\}.
+ * @param ctx the parse tree
+ */
 void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);
+/**
+ * Exit a parse tree produced by {@link <file.parserName>#<lname>\}.
+ * @param ctx the parse tree
+ */
 void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
 }
 >>
@@ -84,18 +95,52 @@ package <file.genPackage>;
 <header>
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.ErrorNode;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
+/**
+ * This class provides an empty implementation of {@link <file.grammarName>Listener},
+ * which can be extended to create a listener which only needs to handle a subset
+ * of the available methods.
+ */
 public class <file.grammarName>BaseListener implements <file.grammarName>Listener {
 	<file.listenerNames:{lname |
+/**
+ * {@inheritDoc\}
+ * \<p/>
+ * The default implementation does nothing.
+ */
 @Override public void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
+/**
+ * {@inheritDoc\}
+ * \<p/>
+ * The default implementation does nothing.
+ */
 @Override public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
+	/**
+	 * {@inheritDoc\}
+	 * \<p/>
+	 * The default implementation does nothing.
+	 */
 	@Override public void enterEveryRule(ParserRuleContext ctx) { }
+	/**
+	 * {@inheritDoc\}
+	 * \<p/>
+	 * The default implementation does nothing.
+	 */
 	@Override public void exitEveryRule(ParserRuleContext ctx) { }
+	/**
+	 * {@inheritDoc\}
+	 * \<p/>
+	 * The default implementation does nothing.
+	 */
 	@Override public void visitTerminal(TerminalNode node) { }
+	/**
+	 * {@inheritDoc\}
+	 * \<p/>
+	 * The default implementation does nothing.
+	 */
 	@Override public void visitErrorNode(ErrorNode node) { }
 }
 >>
@@ -106,11 +151,22 @@ VisitorFile(file, header) ::= <<
 package <file.genPackage>;
 <endif>
 <header>
-import org.antlr.v4.runtime.tree.*;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
+/**
+ * This interface defines a complete generic visitor for a parse tree produced
+ * by {@link <file.parserName>}.
+ *
+ * @param \<T> The return type of the visit operation. Use {@link Void} for
+ * operations with no return type.
+ */
 public interface <file.grammarName>Visitor\<T> extends ParseTreeVisitor\<T> {
 	<file.visitorNames:{lname |
+/**
+ * Visit a parse tree produced by {@link <file.parserName>#<lname>\}.
+ * @param ctx the parse tree
+ * @return the visitor result
+ */
 T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
 }
 >>
@@ -121,12 +177,24 @@ BaseVisitorFile(file, header) ::= <<
 package <file.genPackage>;
 <endif>
 <header>
-import org.antlr.v4.runtime.tree.*;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
+/**
+ * This class provides an empty implementation of {@link <file.grammarName>Visitor},
+ * which can be extended to create a visitor which only needs to handle a subset
+ * of the available methods.
+ *
+ * @param \<T> The return type of the visit operation. Use {@link Void} for
+ * operations with no return type.
+ */
 public class <file.grammarName>BaseVisitor\<T> extends AbstractParseTreeVisitor\<T> implements <file.grammarName>Visitor\<T> {
 	<file.visitorNames:{lname |
+/**
+ * {@inheritDoc\}
+ * \<p/>
+ * The default implementation returns the result of calling
+ * {@link #visitChildren\} on {@code ctx\}.
+ */
 @Override public T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
 }
 >>
