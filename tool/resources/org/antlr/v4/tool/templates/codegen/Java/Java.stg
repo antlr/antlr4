@@ -66,6 +66,7 @@ ListenerFile(file, header) ::= <<
 package <file.genPackage>;
 <endif>
 <header>
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -78,12 +79,12 @@ public interface <file.grammarName>Listener extends ParseTreeListener {
  * Enter a parse tree produced by {@link <file.parserName>#<lname>\}.
  * @param ctx the parse tree
  */
-void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);
+void enter<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx);
 /**
  * Exit a parse tree produced by {@link <file.parserName>#<lname>\}.
  * @param ctx the parse tree
  */
-void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+void exit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
 }
 >>
 
@@ -95,6 +96,7 @@ package <file.genPackage>;
 <header>
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -110,38 +112,38 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
  * \<p/>
  * The default implementation does nothing.
  */
-@Override public void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
+@Override public void enter<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx) { \}
 /**
  * {@inheritDoc\}
  * \<p/>
  * The default implementation does nothing.
  */
-@Override public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
+@Override public void exit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
 	/**
 	 * {@inheritDoc\}
 	 * \<p/>
 	 * The default implementation does nothing.
 	 */
-	@Override public void enterEveryRule(ParserRuleContext ctx) { }
+	@Override public void enterEveryRule(@NotNull ParserRuleContext ctx) { }
 	/**
 	 * {@inheritDoc\}
 	 * \<p/>
 	 * The default implementation does nothing.
 	 */
-	@Override public void exitEveryRule(ParserRuleContext ctx) { }
+	@Override public void exitEveryRule(@NotNull ParserRuleContext ctx) { }
 	/**
 	 * {@inheritDoc\}
 	 * \<p/>
 	 * The default implementation does nothing.
 	 */
-	@Override public void visitTerminal(TerminalNode node) { }
+	@Override public void visitTerminal(@NotNull TerminalNode node) { }
 	/**
 	 * {@inheritDoc\}
 	 * \<p/>
 	 * The default implementation does nothing.
 	 */
-	@Override public void visitErrorNode(ErrorNode node) { }
+	@Override public void visitErrorNode(@NotNull ErrorNode node) { }
 }
 >>
 
@@ -151,6 +153,7 @@ VisitorFile(file, header) ::= <<
 package <file.genPackage>;
 <endif>
 <header>
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -167,7 +170,7 @@ public interface <file.grammarName>Visitor\<T> extends ParseTreeVisitor\<T> {
  * @param ctx the parse tree
  * @return the visitor result
  */
-T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+T visit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
 }
 >>
 
@@ -177,6 +180,7 @@ BaseVisitorFile(file, header) ::= <<
 package <file.genPackage>;
 <endif>
 <header>
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 /**
@@ -195,7 +199,7 @@ public class <file.grammarName>BaseVisitor\<T> extends AbstractParseTreeVisitor\
  * The default implementation returns the result of calling
  * {@link #visitChildren\} on {@code ctx\}.
  */
-@Override public T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
+@Override public T visit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
 }
 >>
 
