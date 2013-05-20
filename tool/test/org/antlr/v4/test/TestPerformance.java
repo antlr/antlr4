@@ -1582,15 +1582,6 @@ public class TestPerformance extends BaseTest {
 
 	}
 
-	private static BitSet getRepresentedAlts(ATNConfigSet configs) {
-		BitSet alts = new BitSet();
-		for (ATNConfig config : configs) {
-			alts.set(config.alt);
-		}
-
-		return alts;
-	}
-
 	private static class SummarizingDiagnosticErrorListener extends DiagnosticErrorListener {
 		private BitSet _sllConflict;
 		private ATNConfigSet _sllConfigs;
@@ -1598,9 +1589,9 @@ public class TestPerformance extends BaseTest {
 		@Override
 		public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) {
 			if (COMPUTE_TRANSITION_STATS && DETAILED_DFA_STATE_STATS) {
-				BitSet sllPredictions = _sllConflict != null ? _sllConflict : getRepresentedAlts(_sllConfigs);
+				BitSet sllPredictions = getConflictingAlts(_sllConflict, _sllConfigs);
 				int sllPrediction = sllPredictions.nextSetBit(0);
-				BitSet llPredictions = ambigAlts != null ? ambigAlts : getRepresentedAlts(configs);
+				BitSet llPredictions = getConflictingAlts(ambigAlts, configs);
 				int llPrediction = llPredictions.cardinality() == 0 ? ATN.INVALID_ALT_NUMBER : llPredictions.nextSetBit(0);
 				if (sllPrediction != llPrediction) {
 					((StatisticsParserATNSimulator)recognizer.getInterpreter()).nonSll[dfa.decision]++;
@@ -1632,14 +1623,14 @@ public class TestPerformance extends BaseTest {
 			int decision = dfa.decision;
 			String rule = recognizer.getRuleNames()[dfa.atnStartState.ruleIndex];
 			String input = recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex));
-			BitSet representedAlts = getRepresentedAlts(configs);
+			BitSet representedAlts = getConflictingAlts(conflictingAlts, configs);
 			recognizer.notifyErrorListeners(String.format(format, decision, rule, input, representedAlts));
 		}
 
 		@Override
 		public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, ATNConfigSet configs) {
 			if (COMPUTE_TRANSITION_STATS && DETAILED_DFA_STATE_STATS) {
-				BitSet sllPredictions = _sllConflict != null ? _sllConflict : getRepresentedAlts(_sllConfigs);
+				BitSet sllPredictions = getConflictingAlts(_sllConflict, _sllConfigs);
 				int sllPrediction = sllPredictions.nextSetBit(0);
 				if (sllPrediction != prediction) {
 					((StatisticsParserATNSimulator)recognizer.getInterpreter()).nonSll[dfa.decision]++;
@@ -1651,12 +1642,11 @@ public class TestPerformance extends BaseTest {
 			}
 
 			// show the rule name and viable configs along with the base info
-			String format = "reportContextSensitivity d=%d (%s), input='%s', viable=%s";
+			String format = "reportContextSensitivity d=%d (%s), input='%s', viable={%d}";
 			int decision = dfa.decision;
 			String rule = recognizer.getRuleNames()[dfa.atnStartState.ruleIndex];
 			String input = recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex));
-			BitSet representedAlts = getRepresentedAlts(configs);
-			recognizer.notifyErrorListeners(String.format(format, decision, rule, input, representedAlts));
+			recognizer.notifyErrorListeners(String.format(format, decision, rule, input, prediction));
 		}
 
 	}

@@ -30,6 +30,7 @@
 
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.Interval;
@@ -51,7 +52,7 @@ public class DiagnosticErrorListener extends BaseErrorListener {
 		}
 
 		recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision +
-			": ambigAlts=" + ambigAlts + ", input='" +
+			": ambigAlts=" + getConflictingAlts(ambigAlts, configs) + ", input='" +
 			recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
     }
 
@@ -78,4 +79,29 @@ public class DiagnosticErrorListener extends BaseErrorListener {
 			dfa.decision + ", input='" +
 			recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
     }
+
+	/**
+	 * Computes the set of conflicting or ambiguous alternatives from a
+	 * configuration set, if that information was not already provided by the
+	 * parser.
+	 *
+	 * @param reportedAlts The set of conflicting or ambiguous alternatives, as
+	 * reported by the parser.
+	 * @param configs The conflicting or ambiguous configuration set.
+	 * @return Returns {@code reportedAlts} if it is not {@code null}, otherwise
+	 * returns the set of alternatives represented in {@code configs}.
+	 */
+	@NotNull
+	protected BitSet getConflictingAlts(@Nullable BitSet reportedAlts, @NotNull ATNConfigSet configs) {
+		if (reportedAlts != null) {
+			return reportedAlts;
+		}
+
+		BitSet result = new BitSet();
+		for (ATNConfig config : configs) {
+			result.set(config.alt);
+		}
+
+		return result;
+	}
 }
