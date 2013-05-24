@@ -49,12 +49,15 @@ public class JavaUnicodeInputStream implements CharStream {
 	private int range;
 	private int slashCount;
 
+	private int la1;
+
 	public JavaUnicodeInputStream(@NotNull CharStream source) {
 		if (source == null) {
 			throw new NullPointerException("source");
 		}
 
 		this.source = source;
+		this.la1 = source.LA(1);
 	}
 
 	@Override
@@ -79,8 +82,9 @@ public class JavaUnicodeInputStream implements CharStream {
 
 	@Override
 	public void consume() {
-		if (source.LA(1) != '\\') {
+		if (la1 != '\\') {
 			source.consume();
+			la1 = source.LA(1);
 			range = Math.max(range, source.index());
 			slashCount = 0;
 			return;
@@ -102,11 +106,16 @@ public class JavaUnicodeInputStream implements CharStream {
 			slashCount = 0;
 		}
 
+		la1 = source.LA(1);
 		assert range >= index();
 	}
 
 	@Override
 	public int LA(int i) {
+		if (i == 1 && la1 != '\\') {
+			return la1;
+		}
+
 		if (i <= 0) {
 			int desiredIndex = index() + i;
 			for (int j = escapeListIndex - 1; j >= 0; j--) {
@@ -135,7 +144,6 @@ public class JavaUnicodeInputStream implements CharStream {
 				}
 			}
 
-			desiredIndex = index() + i - 1;
 			int[] currentIndex = { index() };
 			int[] slashCountPtr = { slashCount };
 			for (int j = 0; j < i; j++) {
@@ -176,6 +184,7 @@ public class JavaUnicodeInputStream implements CharStream {
 		}
 
 		source.seek(index);
+		la1 = source.LA(1);
 
 		slashCount = 0;
 		while (source.LA(-slashCount - 1) == '\\') {
