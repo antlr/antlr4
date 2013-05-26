@@ -173,6 +173,21 @@ public class TestToolSyntaxErrors extends BaseTest {
 	}
 
 	/**
+	 * This is a regression test for antlr/antlr4#262
+	 * "Parser Rule Name Starting With an Underscore"
+	 * https://github.com/antlr/antlr4/issues/262
+	 */
+	@Test public void testParserRuleNameStartingWithUnderscore() {
+		String[] pair = new String[] {
+			"grammar A;\n" +
+			"_a : 'x' ;\n",
+
+			"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:2:0: syntax error: '_' came as a complete surprise to me\n"
+		};
+		super.testErrors(pair, true);
+	}
+
+	/**
 	 * This is a regression test for antlr/antlr4#194
 	 * "NullPointerException on 'options{}' in grammar file"
 	 * https://github.com/antlr/antlr4/issues/194

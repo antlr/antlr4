@@ -764,8 +764,12 @@ WSNLCHARS
 ERRCHAR
     : .
       {
-         // TODO: Issue error message
-         //
+         Token t = new CommonToken(input, state.type, state.channel, state.tokenStartCharIndex, getCharIndex()-1);
+         t.setLine(state.tokenStartLine);
+         t.setText(state.text);
+         t.setCharPositionInLine(state.tokenStartCharPositionInLine);
+         String msg = getTokenErrorDisplay(t) + " came as a complete surprise to me";
+         grammarError(ErrorType.SYNTAX_ERROR, t, msg);
          skip();
       }
     ;
