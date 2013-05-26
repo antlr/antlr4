@@ -207,6 +207,17 @@ public enum ErrorType {
 	 * </pre>
 	 */
 	UNWANTED_LEXER_COMMAND_ARGUMENT(151, "lexer command '<arg>' does not take any arguments", ErrorSeverity.ERROR),
+	/**
+	 * The parser contains an unterminated string literal.
+	 * <p/>
+	 * The following rule produces this error.
+	 *
+	 * <pre>
+	 * x : 'x'; // ok
+	 * y : 'y;  // error 152
+	 * </pre>
+	 */
+	UNTERMINATED_STRING_LITERAL(152, "unterminated string literal", ErrorSeverity.ERROR),
 
 	// Backward incompatibility errors
 	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR 4", ErrorSeverity.ERROR),

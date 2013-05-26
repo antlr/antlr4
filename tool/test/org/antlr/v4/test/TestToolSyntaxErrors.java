@@ -173,6 +173,22 @@ public class TestToolSyntaxErrors extends BaseTest {
 	}
 
 	/**
+	 * This is a regression test for antlr/antlr4#243
+	 * "Generate a good message for unterminated strings"
+	 * https://github.com/antlr/antlr4/issues/243
+	 */
+	@Test public void testUnterminatedStringLiteral() {
+		String[] pair = new String[] {
+			"grammar A;\n" +
+			"a : 'x\n" +
+			"  ;\n",
+
+			"error(" + ErrorType.UNTERMINATED_STRING_LITERAL.code + "): A.g4:2:4: unterminated string literal\n"
+		};
+		super.testErrors(pair, true);
+	}
+
+	/**
 	 * This is a regression test for antlr/antlr4#262
 	 * "Parser Rule Name Starting With an Underscore"
 	 * https://github.com/antlr/antlr4/issues/262
