@@ -357,7 +357,7 @@ public class ATNSerializer {
 		int maxType = ATNSimulator.toInt(data[p++]);
 		buf.append("max type ").append(maxType).append("\n");
 		int nstates = ATNSimulator.toInt(data[p++]);
-		for (int i=1; i<=nstates; i++) {
+		for (int i=0; i<nstates; i++) {
 			int stype = ATNSimulator.toInt(data[p++]);
             if ( stype==ATNState.INVALID_TYPE ) continue; // ignore bad type of states
 			int ruleIndex = ATNSimulator.toInt(data[p++]);
@@ -374,7 +374,7 @@ public class ATNSerializer {
 				int endStateNumber = ATNSimulator.toInt(data[p++]);
 				arg = " "+endStateNumber;
 			}
-			buf.append(i - 1).append(":")
+			buf.append(i).append(":")
 				.append(ATNState.serializationNames.get(stype)).append(" ")
 				.append(ruleIndex).append(arg).append("\n");
 		}
@@ -403,9 +403,9 @@ public class ATNSerializer {
 			buf.append("mode ").append(i).append(":").append(s).append('\n');
 		}
 		int nsets = ATNSimulator.toInt(data[p++]);
-		for (int i=1; i<=nsets; i++) {
+		for (int i=0; i<nsets; i++) {
 			int nintervals = ATNSimulator.toInt(data[p++]);
-			buf.append(i-1).append(":");
+			buf.append(i).append(":");
 			boolean containsEof = data[p++] != 0;
 			if (containsEof) {
 				buf.append(getTokenName(Token.EOF));
@@ -422,7 +422,7 @@ public class ATNSerializer {
 			buf.append("\n");
 		}
 		int nedges = ATNSimulator.toInt(data[p++]);
-		for (int i=1; i<=nedges; i++) {
+		for (int i=0; i<nedges; i++) {
 			int src = ATNSimulator.toInt(data[p]);
 			int trg = ATNSimulator.toInt(data[p + 1]);
 			int ttype = ATNSimulator.toInt(data[p + 2]);
@@ -436,9 +436,9 @@ public class ATNSerializer {
 			p += 6;
 		}
 		int ndecisions = ATNSimulator.toInt(data[p++]);
-		for (int i=1; i<=ndecisions; i++) {
+		for (int i=0; i<ndecisions; i++) {
 			int s = ATNSimulator.toInt(data[p++]);
-			buf.append(i-1).append(":").append(s).append("\n");
+			buf.append(i).append(":").append(s).append("\n");
 		}
 		return buf.toString();
 	}

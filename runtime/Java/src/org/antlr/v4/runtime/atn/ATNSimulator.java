@@ -149,7 +149,7 @@ public abstract class ATNSimulator {
 		List<Pair<LoopEndState, Integer>> loopBackStateNumbers = new ArrayList<Pair<LoopEndState, Integer>>();
 		List<Pair<BlockStartState, Integer>> endStateNumbers = new ArrayList<Pair<BlockStartState, Integer>>();
 		int nstates = toInt(data[p++]);
-		for (int i=1; i<=nstates; i++) {
+		for (int i=0; i<nstates; i++) {
 			int stype = toInt(data[p++]);
 			// ignore bad type of states
 			if ( stype==ATNState.INVALID_TYPE ) {
@@ -243,7 +243,7 @@ public abstract class ATNSimulator {
 		//
 		List<IntervalSet> sets = new ArrayList<IntervalSet>();
 		int nsets = toInt(data[p++]);
-		for (int i=1; i<=nsets; i++) {
+		for (int i=0; i<nsets; i++) {
 			int nintervals = toInt(data[p]);
 			p++;
 			IntervalSet set = new IntervalSet();
@@ -254,7 +254,7 @@ public abstract class ATNSimulator {
 				set.add(-1);
 			}
 
-			for (int j=1; j<=nintervals; j++) {
+			for (int j=0; j<nintervals; j++) {
 				set.add(toInt(data[p]), toInt(data[p + 1]));
 				p += 2;
 			}
@@ -264,7 +264,7 @@ public abstract class ATNSimulator {
 		// EDGES
 		//
 		int nedges = toInt(data[p++]);
-		for (int i=1; i<=nedges; i++) {
+		for (int i=0; i<nedges; i++) {
 			int src = toInt(data[p]);
 			int trg = toInt(data[p+1]);
 			int ttype = toInt(data[p+2]);
