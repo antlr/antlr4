@@ -285,6 +285,9 @@ public class Grammar implements AttributeResolver {
 
 	protected void initTokenSymbolTables() {
 		tokenNameToTypeMap.put("EOF", Token.EOF);
+
+		// reserve a spot for the INVALID token
+		typeToTokenList.add(null);
 	}
 
     public void loadImportedGrammars() {
