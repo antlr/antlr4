@@ -55,14 +55,15 @@ import org.antlr.v4.tool.Rule;
 
 import java.io.InvalidClassException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 public class ATNSerializer {
 	public Grammar g;
 	public ATN atn;
-	public List<IntervalSet> sets = new ArrayList<IntervalSet>();
 
 	public ATNSerializer(Grammar g, ATN atn) {
 		this.g = g;
@@ -113,6 +114,9 @@ public class ATNSerializer {
 		data.add(g.getMaxTokenType());
 		int nedges = 0;
 
+		Map<IntervalSet, Integer> setIndices = new HashMap<IntervalSet, Integer>();
+		List<IntervalSet> sets = new ArrayList<IntervalSet>();
+
 		// dump states, count edges and collect sets while doing so
 		IntegerList nonGreedyStates = new IntegerList();
 		data.add(atn.states.size());
@@ -153,7 +157,10 @@ public class ATNSerializer {
 				int edgeType = Transition.serializationTypes.get(t.getClass());
 				if ( edgeType == Transition.SET || edgeType == Transition.NOT_SET ) {
 					SetTransition st = (SetTransition)t;
-					sets.add(st.set);
+					if (!setIndices.containsKey(st.set)) {
+						sets.add(st.set);
+						setIndices.put(st.set, sets.size() - 1);
+					}
 				}
 			}
 		}
@@ -225,7 +232,6 @@ public class ATNSerializer {
 		}
 
 		data.add(nedges);
-		int setIndex = 0;
 		for (ATNState s : atn.states) {
 			if ( s==null ) {
 				// might be optimized away
@@ -289,10 +295,10 @@ public class ATNSerializer {
 						arg3 = at.isCtxDependent ? 1 : 0 ;
 						break;
 					case Transition.SET :
-						arg1 = setIndex++;
+						arg1 = setIndices.get(((SetTransition)t).set);
 						break;
 					case Transition.NOT_SET :
-						arg1 = setIndex++;
+						arg1 = setIndices.get(((SetTransition)t).set);
 						break;
 					case Transition.WILDCARD :
 						break;
