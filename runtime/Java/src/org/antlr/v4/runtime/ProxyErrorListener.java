@@ -36,12 +36,20 @@ import java.util.BitSet;
 import java.util.Collection;
 
 /**
+ * This implementation of {@link ANTLRErrorListener} dispatches all calls to a
+ * collection of delegate listeners. This reduces the effort required to support multiple
+ * listeners.
+ *
  * @author Sam Harwell
  */
 public class ProxyErrorListener implements ANTLRErrorListener {
 	private final Collection<? extends ANTLRErrorListener> delegates;
 
 	public ProxyErrorListener(Collection<? extends ANTLRErrorListener> delegates) {
+		if (delegates == null) {
+			throw new NullPointerException("delegates");
+		}
+
 		this.delegates = delegates;
 	}
 
