@@ -51,10 +51,13 @@ public class DiagnosticErrorListener extends BaseErrorListener {
 			return;
 		}
 
-		recognizer.notifyErrorListeners("reportAmbiguity d=" + dfa.decision +
-			": ambigAlts=" + getConflictingAlts(ambigAlts, configs) + ", input='" +
-			recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
-    }
+		String format = "reportAmbiguity d=%s: ambigAlts=%s, input='%s'";
+		String decision = getDecisionDescription(recognizer, dfa);
+		BitSet conflictingAlts = getConflictingAlts(ambigAlts, configs);
+		String text = recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex));
+		String message = String.format(format, decision, conflictingAlts, text);
+		recognizer.notifyErrorListeners(message);
+	}
 
 	@Override
 	public void reportAttemptingFullContext(@NotNull Parser recognizer,
@@ -63,9 +66,11 @@ public class DiagnosticErrorListener extends BaseErrorListener {
 											@Nullable BitSet conflictingAlts,
 											@NotNull ATNConfigSet configs)
 	{
-		recognizer.notifyErrorListeners("reportAttemptingFullContext d=" +
-			dfa.decision + ", input='" +
-			recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
+		String format = "reportAttemptingFullContext d=%s, input='%s'";
+		String decision = getDecisionDescription(recognizer, dfa);
+		String text = recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex));
+		String message = String.format(format, decision, text);
+		recognizer.notifyErrorListeners(message);
 	}
 
 	@Override
@@ -74,11 +79,30 @@ public class DiagnosticErrorListener extends BaseErrorListener {
                                          int startIndex, int stopIndex,
 										 int prediction,
 										 @NotNull ATNConfigSet configs)
-    {
-        recognizer.notifyErrorListeners("reportContextSensitivity d=" +
-			dfa.decision + ", input='" +
-			recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex)) + "'");
-    }
+	{
+		String format = "reportContextSensitivity d=%s, input='%s'";
+		String decision = getDecisionDescription(recognizer, dfa);
+		String text = recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex));
+		String message = String.format(format, decision, text);
+		recognizer.notifyErrorListeners(message);
+	}
+
+	protected String getDecisionDescription(@NotNull Parser recognizer, @NotNull DFA dfa) {
+		int decision = dfa.decision;
+		int ruleIndex = dfa.atnStartState.ruleIndex;
+
+		String[] ruleNames = recognizer.getRuleNames();
+		if (ruleIndex < 0 || ruleIndex >= ruleNames.length) {
+			return String.valueOf(decision);
+		}
+
+		String ruleName = ruleNames[ruleIndex];
+		if (ruleName == null || ruleName.isEmpty()) {
+			return String.valueOf(decision);
+		}
+
+		return String.format("%d (%s)", decision, ruleName);
+	}
 
 	/**
 	 * Computes the set of conflicting or ambiguous alternatives from a
