@@ -77,7 +77,7 @@ public class TestATNSerialization extends BaseTest {
 				"rule 0:0\n" +
 				"0->2 EPSILON 0,0,0\n" +
 				"2->3 ATOM 1,0,0\n" +
-				"3->4 ATOM -1,0,0\n" +
+				"3->4 ATOM 0,0,1\n" +
 				"4->1 EPSILON 0,0,0\n";
 		ATN atn = createATN(g, true);
 		String result = ATNSerializer.getDecoded(g, atn);
@@ -96,7 +96,7 @@ public class TestATNSerialization extends BaseTest {
 				"3:BASIC 0\n" +
 				"4:BASIC 0\n" +
 				"rule 0:0\n" +
-				"0:EOF..EOF, A..A\n" +
+				"0:EOF, A..A\n" +
 				"0->2 EPSILON 0,0,0\n" +
 				"2->3 SET 0,0,0\n" +
 				"3->1 EPSILON 0,0,0\n";
@@ -347,7 +347,7 @@ public class TestATNSerialization extends BaseTest {
 				"0->1 EPSILON 0,0,0\n" +
 				"1->3 EPSILON 0,0,0\n" +
 				"3->4 ATOM 97,0,0\n" +
-				"4->5 ATOM -1,0,0\n" +
+				"4->5 ATOM 0,0,1\n" +
 				"5->2 EPSILON 0,0,0\n" +
 				"0:0\n";
 		ATN atn = createATN(lg, true);
@@ -370,7 +370,7 @@ public class TestATNSerialization extends BaseTest {
 				"6:BLOCK_END 0\n" +
 				"rule 0:1 1,-1\n" +
 				"mode 0:0\n" +
-				"0:EOF..EOF, '\\n'..'\\n'\n" +
+				"0:EOF, '\\n'..'\\n'\n" +
 				"0->1 EPSILON 0,0,0\n" +
 				"1->3 EPSILON 0,0,0\n" +
 				"3->5 ATOM 97,0,0\n" +
