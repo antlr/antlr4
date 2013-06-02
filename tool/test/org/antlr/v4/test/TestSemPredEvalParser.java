@@ -196,10 +196,10 @@ public class TestSemPredEvalParser extends BaseTest {
 			"alt 1\n" +
 			"alt 1\n";
 		assertEquals(expecting, found);
-		assertEquals("line 1:0 reportAttemptingFullContext d=0, input='x'\n" +
-					 "line 1:0 reportAmbiguity d=0: ambigAlts={1, 2}, input='x'\n" +
-					 "line 1:3 reportAttemptingFullContext d=0, input='y'\n" +
-					 "line 1:3 reportAmbiguity d=0: ambigAlts={1, 2}, input='y'\n",
+		assertEquals("line 1:0 reportAttemptingFullContext d=0 (a), input='x'\n" +
+					 "line 1:0 reportAmbiguity d=0 (a): ambigAlts={1, 2}, input='x'\n" +
+					 "line 1:3 reportAttemptingFullContext d=0 (a), input='y'\n" +
+					 "line 1:3 reportAmbiguity d=0 (a): ambigAlts={1, 2}, input='y'\n",
                      this.stderrDuringParse);
 	}
 
@@ -227,10 +227,10 @@ public class TestSemPredEvalParser extends BaseTest {
 			"alt 2\n" +
 			"alt 2\n";
 		assertEquals(expecting, found);
-		assertEquals("line 1:4 reportAttemptingFullContext d=0, input='x'\n" +
-					 "line 1:4 reportAmbiguity d=0: ambigAlts={2, 3}, input='x'\n" +
-					 "line 1:7 reportAttemptingFullContext d=0, input='y'\n" +
-					 "line 1:7 reportAmbiguity d=0: ambigAlts={2, 3}, input='y'\n",
+		assertEquals("line 1:4 reportAttemptingFullContext d=0 (a), input='x'\n" +
+					 "line 1:4 reportAmbiguity d=0 (a): ambigAlts={2, 3}, input='x'\n" +
+					 "line 1:7 reportAttemptingFullContext d=0 (a), input='y'\n" +
+					 "line 1:7 reportAmbiguity d=0 (a): ambigAlts={2, 3}, input='y'\n",
 					 this.stderrDuringParse);
 	}
 
