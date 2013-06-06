@@ -42,12 +42,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public abstract class PredictionContext implements Iterable<SingletonPredictionContext>,
-													   Comparable<PredictionContext> // to sort node lists by id
+public abstract class PredictionContext implements Comparable<PredictionContext> // to sort node lists by id
 {
 	/**
 	 * Represents {@code $} in local context prediction, which means wildcard.
@@ -116,9 +114,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		RuleTransition transition = (RuleTransition)state.transition(0);
 		return SingletonPredictionContext.create(parent, transition.followState.stateNumber);
 	}
-
-	@Override
-	public abstract Iterator<SingletonPredictionContext> iterator();
 
 	public abstract int size();
 
