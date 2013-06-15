@@ -307,4 +307,44 @@ public class TestToolSyntaxErrors extends BaseTest {
 		};
 		super.testErrors(pair, true);
 	}
+
+	@Test public void testEpsilonClosureAnalysis() {
+		String grammar =
+			"grammar A;\n"
+			+ "x : ;\n"
+			+ "y1 : x+;\n"
+			+ "y2 : x*;\n"
+			+ "z1 : ('foo' | 'bar'? 'bar2'?)*;\n"
+			+ "z2 : ('foo' | 'bar' 'bar2'? | 'bar2')*;\n";
+		String expected =
+			"error(" + ErrorType.EPSILON_CLOSURE.code + "): A.g4:3:0: rule 'y1' contains a closure with at least one alternative that can match an empty string\n" +
+			"error(" + ErrorType.EPSILON_CLOSURE.code + "): A.g4:4:0: rule 'y2' contains a closure with at least one alternative that can match an empty string\n" +
+			"error(" + ErrorType.EPSILON_CLOSURE.code + "): A.g4:5:0: rule 'z1' contains a closure with at least one alternative that can match an empty string\n";
+
+		String[] pair = new String[] {
+			grammar,
+			expected
+		};
+			
+		super.testErrors(pair, true);
+	}
+
+	@Test public void testEpsilonOptionalAnalysis() {
+		String grammar =
+			"grammar A;\n"
+			+ "x : ;\n"
+			+ "y  : x?;\n"
+			+ "z1 : ('foo' | 'bar'? 'bar2'?)?;\n"
+			+ "z2 : ('foo' | 'bar' 'bar2'? | 'bar2')?;\n";
+		String expected =
+			"warning(" + ErrorType.EPSILON_OPTIONAL.code + "): A.g4:3:0: rule 'y' contains an optional block with at least one alternative that can match an empty string\n" +
+			"warning(" + ErrorType.EPSILON_OPTIONAL.code + "): A.g4:4:0: rule 'z1' contains an optional block with at least one alternative that can match an empty string\n";
+
+		String[] pair = new String[] {
+			grammar,
+			expected
+		};
+
+		super.testErrors(pair, true);
+	}
 }

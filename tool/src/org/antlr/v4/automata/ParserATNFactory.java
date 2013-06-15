@@ -48,7 +48,6 @@ import org.antlr.v4.runtime.atn.BasicBlockStartState;
 import org.antlr.v4.runtime.atn.BasicState;
 import org.antlr.v4.runtime.atn.BlockEndState;
 import org.antlr.v4.runtime.atn.BlockStartState;
-import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.EpsilonTransition;
 import org.antlr.v4.runtime.atn.LL1Analyzer;
 import org.antlr.v4.runtime.atn.LoopEndState;
@@ -68,7 +67,7 @@ import org.antlr.v4.runtime.atn.WildcardTransition;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.misc.Triple;
 import org.antlr.v4.semantics.UseDefAnalyzer;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
@@ -105,8 +104,11 @@ public class ParserATNFactory implements ATNFactory {
 
 	public int currentOuterAlt;
 
-	protected final List<Pair<Rule, DecisionState>> preventEpsilonDecisions =
-		new ArrayList<Pair<Rule, DecisionState>>();
+	protected final List<Triple<Rule, ATNState, ATNState>> preventEpsilonClosureBlocks =
+		new ArrayList<Triple<Rule, ATNState, ATNState>>();
+
+	protected final List<Triple<Rule, ATNState, ATNState>> preventEpsilonOptionalBlocks =
+		new ArrayList<Triple<Rule, ATNState, ATNState>>();
 
 	public ParserATNFactory(@NotNull Grammar g) {
 		if (g == null) {
@@ -128,11 +130,33 @@ public class ParserATNFactory implements ATNFactory {
 		addEOFTransitionToStartRules();
 		ATNOptimizer.optimize(g, atn);
 
-		for (Pair<Rule, DecisionState> pair : preventEpsilonDecisions) {
+		for (Triple<Rule, ATNState, ATNState> pair : preventEpsilonClosureBlocks) {
 			LL1Analyzer analyzer = new LL1Analyzer(atn);
-			if (analyzer.LOOK(pair.b, null).contains(org.antlr.v4.runtime.Token.EPSILON)) {
-				LeftRecursiveRule r;
-				g.tool.errMgr.grammarError(ErrorType.EPSILON_LR_FOLLOW, g.fileName, ((GrammarAST)pair.a.ast.getChild(0)).getToken(), pair.a.name);
+			if (analyzer.LOOK(pair.b, pair.c, null).contains(org.antlr.v4.runtime.Token.EPSILON)) {
+				ErrorType errorType = pair.a instanceof LeftRecursiveRule ? ErrorType.EPSILON_LR_FOLLOW : ErrorType.EPSILON_CLOSURE;
+				g.tool.errMgr.grammarError(errorType, g.fileName, ((GrammarAST)pair.a.ast.getChild(0)).getToken(), pair.a.name);
+			}
+		}
+
+		optionalCheck:
+		for (Triple<Rule, ATNState, ATNState> pair : preventEpsilonOptionalBlocks) {
+			int bypassCount = 0;
+			for (int i = 0; i < pair.b.getNumberOfTransitions(); i++) {
+				ATNState startState = pair.b.transition(i).target;
+				if (startState == pair.c) {
+					bypassCount++;
+					continue;
+				}
+
+				LL1Analyzer analyzer = new LL1Analyzer(atn);
+				if (analyzer.LOOK(startState, pair.c, null).contains(org.antlr.v4.runtime.Token.EPSILON)) {
+					g.tool.errMgr.grammarError(ErrorType.EPSILON_OPTIONAL, g.fileName, ((GrammarAST)pair.a.ast.getChild(0)).getToken(), pair.a.name);
+					continue optionalCheck;
+				}
+			}
+
+			if (bypassCount != 1) {
+				throw new UnsupportedOperationException("Expected optional block with exactly 1 bypass alternative.");
 			}
 		}
 
@@ -406,10 +430,6 @@ public class ParserATNFactory implements ATNFactory {
 //		System.out.println(blkAST.toStringTree()+":\n"+ser);
 		blkAST.atnState = start;
 
-		if (Boolean.valueOf(blkAST.getOptionString("preventepsilon"))) {
-			preventEpsilonDecisions.add(new Pair<Rule, DecisionState>(currentRule, start));
-		}
-
 		return h;
 	}
 
@@ -466,6 +486,8 @@ public class ParserATNFactory implements ATNFactory {
 	@Override
 	public Handle optional(@NotNull GrammarAST optAST, @NotNull Handle blk) {
 		BlockStartState blkStart = (BlockStartState)blk.left;
+		ATNState blkEnd = blk.right;
+		preventEpsilonOptionalBlocks.add(new Triple<Rule, ATNState, ATNState>(currentRule, blkStart, blkEnd));
 
 		blkStart.nonGreedy = !((QuantifierAST)optAST).isGreedy();
 		if (((QuantifierAST)optAST).isGreedy()) {
@@ -497,6 +519,7 @@ public class ParserATNFactory implements ATNFactory {
 	public Handle plus(@NotNull GrammarAST plusAST, @NotNull Handle blk) {
 		PlusBlockStartState blkStart = (PlusBlockStartState)blk.left;
 		BlockEndState blkEnd = (BlockEndState)blk.right;
+		preventEpsilonClosureBlocks.add(new Triple<Rule, ATNState, ATNState>(currentRule, blkStart, blkEnd));
 
 		PlusLoopbackState loop = newState(PlusLoopbackState.class, plusAST);
 		loop.nonGreedy = !((QuantifierAST)plusAST).isGreedy();
@@ -546,6 +569,7 @@ public class ParserATNFactory implements ATNFactory {
 	public Handle star(@NotNull GrammarAST starAST, @NotNull Handle elem) {
 		StarBlockStartState blkStart = (StarBlockStartState)elem.left;
 		BlockEndState blkEnd = (BlockEndState)elem.right;
+		preventEpsilonClosureBlocks.add(new Triple<Rule, ATNState, ATNState>(currentRule, blkStart, blkEnd));
 
 		StarLoopEntryState entry = newState(StarLoopEntryState.class, starAST);
 		entry.nonGreedy = !((QuantifierAST)starAST).isGreedy();
