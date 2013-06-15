@@ -467,14 +467,9 @@ public class ParserATNFactory implements ATNFactory {
 	public Handle optional(@NotNull GrammarAST optAST, @NotNull Handle blk) {
 		BlockStartState blkStart = (BlockStartState)blk.left;
 
-		blkStart.nonGreedy = !((QuantifierAST)optAST).isGreedy();
-		if (((QuantifierAST)optAST).isGreedy()) {
-			epsilon(blkStart, blk.right);
-		} else {
-			Transition existing = blkStart.removeTransition(0);
-			epsilon(blkStart, blk.right);
-			blkStart.addTransition(existing);
-		}
+		boolean greedy = ((QuantifierAST)optAST).isGreedy();
+		blkStart.nonGreedy = !greedy;
+		epsilon(blkStart, blk.right, !greedy);
 
 		optAST.atnState = blk.left;
 		return blk;
@@ -587,8 +582,15 @@ public class ParserATNFactory implements ATNFactory {
 		return new Handle(left, right);
 	}
 
-	void epsilon(ATNState a, @NotNull ATNState b) {
-		if ( a!=null ) a.addTransition(new EpsilonTransition(b));
+	protected void epsilon(ATNState a, @NotNull ATNState b) {
+		epsilon(a, b, false);
+	}
+
+	protected void epsilon(ATNState a, @NotNull ATNState b, boolean prepend) {
+		if ( a!=null ) {
+			int index = prepend ? 0 : a.getNumberOfTransitions();
+			a.addTransition(index, new EpsilonTransition(b));
+		}
 	}
 
 	/** Define all the rule begin/end ATNStates to solve forward reference
