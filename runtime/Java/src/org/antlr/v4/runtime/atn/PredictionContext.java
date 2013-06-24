@@ -40,15 +40,13 @@ import org.antlr.v4.runtime.misc.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public abstract class PredictionContext implements Iterable<SingletonPredictionContext>,
-													   Comparable<PredictionContext> // to sort node lists by id
-{
+public abstract class PredictionContext {
 	/**
 	 * Represents {@code $} in local context prediction, which means wildcard.
 	 * {@code *+x = *}.
@@ -117,9 +115,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		return SingletonPredictionContext.create(parent, transition.followState.stateNumber);
 	}
 
-	@Override
-	public abstract Iterator<SingletonPredictionContext> iterator();
-
 	public abstract int size();
 
 	public abstract PredictionContext getParent(int index);
@@ -133,11 +128,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 
 	public boolean hasEmptyPath() {
 		return getReturnState(size() - 1) == EMPTY_RETURN_STATE;
-	}
-
-	@Override
-	public int compareTo(PredictionContext o) { // used for toDotString to print nodes in order
-		return id - o.id;
 	}
 
 	@Override
@@ -555,7 +545,12 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		buf.append("rankdir=LR;\n");
 
 		List<PredictionContext> nodes = getAllContextNodes(context);
-		Collections.sort(nodes);
+		Collections.sort(nodes, new Comparator<PredictionContext>() {
+			@Override
+			public int compare(PredictionContext o1, PredictionContext o2) {
+				return o1.id - o2.id;
+			}
+		});
 
 		for (PredictionContext current : nodes) {
 			if ( current instanceof SingletonPredictionContext ) {

@@ -433,20 +433,10 @@ public class LexerATNSimulator extends ATNSimulator {
 			}
 
 			if ( config.context!=null && !config.context.isEmpty() ) {
-				for (SingletonPredictionContext ctx : config.context) {
-					if ( !ctx.isEmpty() ) {
-						PredictionContext newContext = ctx.parent; // "pop" return state
-						if ( ctx.returnState==PredictionContext.EMPTY_RETURN_STATE ) {
-							// we have no context info. Don't pursue but
-							// record a config that indicates how we hit end
-							LexerATNConfig c = new LexerATNConfig(config, config.state, ctx);
-							if ( debug ) System.out.println("FALLING off token "+
-														    recog.getRuleNames()[config.state.ruleIndex]+
-														    " record "+c);
-							configs.add(c);
-							continue;
-						}
-						ATNState returnState = atn.states.get(ctx.returnState);
+				for (int i = 0; i < config.context.size(); i++) {
+					if (config.context.getReturnState(i) != PredictionContext.EMPTY_RETURN_STATE) {
+						PredictionContext newContext = config.context.getParent(i); // "pop" return state
+						ATNState returnState = atn.states.get(config.context.getReturnState(i));
 						LexerATNConfig c = new LexerATNConfig(returnState, config.alt, newContext);
 						currentAltReachedAcceptState = closure(input, c, configs, currentAltReachedAcceptState, speculative);
 					}

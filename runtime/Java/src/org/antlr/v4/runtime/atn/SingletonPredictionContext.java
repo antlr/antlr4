@@ -30,8 +30,6 @@
 
 package org.antlr.v4.runtime.atn;
 
-import java.util.Iterator;
-
 public class SingletonPredictionContext extends PredictionContext {
 	public final PredictionContext parent;
 	public final int returnState;
@@ -49,22 +47,6 @@ public class SingletonPredictionContext extends PredictionContext {
 			return EMPTY;
 		}
 		return new SingletonPredictionContext(parent, returnState);
-	}
-
-	@Override
-	public Iterator<SingletonPredictionContext> iterator() {
-		final SingletonPredictionContext self = this;
-		return new Iterator<SingletonPredictionContext>() {
-			int i = 0;
-			@Override
-			public boolean hasNext() { return i==0; }
-
-			@Override
-			public SingletonPredictionContext next() { i++; return self; }
-
-			@Override
-			public void remove() { throw new UnsupportedOperationException(); }
-		};
 	}
 
 	@Override

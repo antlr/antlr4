@@ -31,7 +31,6 @@
 package org.antlr.v4.runtime.atn;
 
 import java.util.Arrays;
-import java.util.Iterator;
 
 public class ArrayPredictionContext extends PredictionContext {
 	/** Parent can be null only if full ctx mode and we make an array
@@ -56,26 +55,6 @@ public class ArrayPredictionContext extends PredictionContext {
 //		System.err.println("CREATE ARRAY: "+Arrays.toString(parents)+", "+Arrays.toString(returnStates));
 		this.parents = parents;
 		this.returnStates = returnStates;
-	}
-
-	@Override
-	public Iterator<SingletonPredictionContext> iterator() {
-		return new Iterator<SingletonPredictionContext>() {
-			int i = 0;
-			@Override
-			public boolean hasNext() { return i < parents.length; }
-
-			@Override
-			public SingletonPredictionContext next() {
-				SingletonPredictionContext ctx =
-					SingletonPredictionContext.create(parents[i], returnStates[i]);
-				i++;
-				return ctx;
-			}
-
-			@Override
-			public void remove() { throw new UnsupportedOperationException(); }
-		};
 	}
 
 	@Override
