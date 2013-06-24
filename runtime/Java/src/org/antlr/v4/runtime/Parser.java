@@ -59,8 +59,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		@Override
 		public void visitTerminal(TerminalNode node) {
 			System.out.println("consume "+node.getSymbol()+" rule "+
-							   getRuleNames()[_ctx.getRuleIndex()]+
-							   " alt="+_ctx.altNum);
+							   getRuleNames()[_ctx.getRuleIndex()]);
 		}
 
 		@Override
@@ -561,7 +560,6 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 			}
 		}
 		_ctx = localctx;
-		_ctx.altNum = altNum;
 	}
 
 	public void enterRecursionRule(ParserRuleContext localctx, int ruleIndex) {
