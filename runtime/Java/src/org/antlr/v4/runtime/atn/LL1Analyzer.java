@@ -160,14 +160,14 @@ public class LL1Analyzer {
 
 			if ( ctx != PredictionContext.EMPTY ) {
 				// run thru all possible stack tops in ctx
-				for (SingletonPredictionContext p : ctx) {
-					ATNState returnState = atn.states.get(p.returnState);
+				for (int i = 0; i < ctx.size(); i++) {
+					ATNState returnState = atn.states.get(ctx.getReturnState(i));
 //					System.out.println("popping back to "+retState);
 
 					boolean removed = calledRuleStack.get(returnState.ruleIndex);
 					try {
 						calledRuleStack.clear(returnState.ruleIndex);
-						_LOOK(returnState, p.parent, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+						_LOOK(returnState, ctx.getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
 					}
 					finally {
 						if (removed) {

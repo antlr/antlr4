@@ -1069,8 +1069,8 @@ public class ParserATNSimulator extends ATNSimulator {
 			// We hit rule end. If we have context info, use it
 			// run thru all possible stack tops in ctx
 			if ( !config.context.isEmpty() ) {
-				for (SingletonPredictionContext ctx : config.context) {
-					if ( ctx.returnState==PredictionContext.EMPTY_RETURN_STATE ) {
+				for (int i = 0; i < config.context.size(); i++) {
+					if ( config.context.getReturnState(i)==PredictionContext.EMPTY_RETURN_STATE ) {
 						if (fullCtx) {
 							configs.add(new ATNConfig(config, config.state, PredictionContext.EMPTY), mergeCache);
 							continue;
@@ -1084,8 +1084,8 @@ public class ParserATNSimulator extends ATNSimulator {
 						}
 						continue;
 					}
-					ATNState returnState = atn.states.get(ctx.returnState);
-					PredictionContext newContext = ctx.parent; // "pop" return state
+					ATNState returnState = atn.states.get(config.context.getReturnState(i));
+					PredictionContext newContext = config.context.getParent(i); // "pop" return state
 					ATNConfig c = new ATNConfig(returnState, config.alt, newContext,
 												config.semanticContext);
 					// While we have context to pop back from, we may have
