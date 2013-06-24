@@ -179,6 +179,10 @@ public abstract class ATNState {
 	}
 
 	public void addTransition(Transition e) {
+		addTransition(transitions.size(), e);
+	}
+
+	public void addTransition(int index, Transition e) {
 		if (transitions.isEmpty()) {
 			epsilonOnlyTransitions = e.isEpsilon();
 		}
@@ -187,7 +191,7 @@ public abstract class ATNState {
 			epsilonOnlyTransitions = false;
 		}
 
-		transitions.add(e);
+		transitions.add(index, e);
 	}
 
 	public Transition transition(int i) { return transitions.get(i); }
