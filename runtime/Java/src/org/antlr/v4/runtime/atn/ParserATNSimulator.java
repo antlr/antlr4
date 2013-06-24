@@ -1063,8 +1063,6 @@ public class ParserATNSimulator extends ATNSimulator {
 	{
 		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
 
-		if ( depth != 0 && !closureBusy.add(config) ) return; // avoid infinite recursion
-
 		if ( config.state instanceof RuleStopState ) {
 			// We hit rule end. If we have context info, use it
 			// run thru all possible stack tops in ctx
@@ -1144,6 +1142,12 @@ public class ParserATNSimulator extends ATNSimulator {
 					// track how far we dip into outer context.  Might
 					// come in handy and we avoid evaluating context dependent
 					// preds if this is > 0.
+
+					if (!closureBusy.add(c)) {
+						// avoid infinite recursion for right-recursive rules
+						continue;
+					}
+
 					c.reachesIntoOuterContext++;
 					configs.dipsIntoOuterContext = true; // TODO: can remove? only care when we add to set per middle of this method
 					assert newDepth > Integer.MIN_VALUE;
