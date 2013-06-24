@@ -218,6 +218,34 @@ public enum ErrorType {
 	 * </pre>
 	 */
 	UNTERMINATED_STRING_LITERAL(152, "unterminated string literal", ErrorSeverity.ERROR),
+	/**
+	 * A rule contains a closure ({@code (...)*}) or positive closure
+	 * ({@code (...)+}) around an empty alternative.
+	 * <p/>
+	 * The following rule produces this error.
+	 *
+	 * <pre>
+	 * x  : ;
+	 * y  : x+;                                // error 153
+	 * z1 : ('foo' | 'bar'? 'bar2'?)*;         // error 153
+	 * z2 : ('foo' | 'bar' 'bar2'? | 'bar2')*; // ok
+	 * </pre>
+	 */
+	EPSILON_CLOSURE(153, "rule '<arg>' contains a closure with at least one alternative that can match an empty string", ErrorSeverity.ERROR),
+	/**
+	 * A rule contains an optional block ({@code (...)?}) around an empty
+	 * alternative.
+	 * <p/>
+	 * The following rule produces this warning.
+	 *
+	 * <pre>
+	 * x  : ;
+	 * y  : x?;                                // warning 154
+	 * z1 : ('foo' | 'bar'? 'bar2'?)?;         // warning 154
+	 * z2 : ('foo' | 'bar' 'bar2'? | 'bar2')?; // ok
+	 * </pre>
+	 */
+	EPSILON_OPTIONAL(154, "rule '<arg>' contains an optional block with at least one alternative that can match an empty string", ErrorSeverity.WARNING),
 
 	// Backward incompatibility errors
 	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR 4", ErrorSeverity.ERROR),
