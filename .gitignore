@@ -25,3 +25,6 @@ nbactions*.xml
 
 # Profiler results
 *.hprof
+
+# Playground
+/tool/playground/
