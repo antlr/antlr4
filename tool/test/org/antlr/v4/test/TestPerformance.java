@@ -58,6 +58,7 @@ import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.atn.SimulatorState;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -271,6 +272,7 @@ public class TestPerformance extends BaseTest {
 	 * required on-the-fly computation.
 	 */
 	private static final boolean COMPUTE_TRANSITION_STATS = false;
+	private static final boolean SHOW_TRANSITION_STATS_PER_FILE = false;
 	/**
 	 * If {@code true}, the transition statistics will be adjusted to a running
 	 * total before reporting the final results.
@@ -380,6 +382,30 @@ public class TestPerformance extends BaseTest {
 		}
 	}
 
+	private static final long[][][] decisionInvocationsPerFile;
+	private static final long[][][] fullContextFallbackPerFile;
+	private static final long[][][] nonSllPerFile;
+	private static final long[][][] totalTransitionsPerDecisionPerFile;
+	private static final long[][][] computedTransitionsPerDecisionPerFile;
+	private static final long[][][] fullContextTransitionsPerDecisionPerFile;
+	static {
+		if (COMPUTE_TRANSITION_STATS && DETAILED_DFA_STATE_STATS) {
+			decisionInvocationsPerFile = new long[PASSES][][];
+			fullContextFallbackPerFile = new long[PASSES][][];
+			nonSllPerFile = new long[PASSES][][];
+			totalTransitionsPerDecisionPerFile = new long[PASSES][][];
+			computedTransitionsPerDecisionPerFile = new long[PASSES][][];
+			fullContextTransitionsPerDecisionPerFile = new long[PASSES][][];
+		} else {
+			decisionInvocationsPerFile = null;
+			fullContextFallbackPerFile = null;
+			nonSllPerFile = null;
+			totalTransitionsPerDecisionPerFile = null;
+			computedTransitionsPerDecisionPerFile = null;
+			fullContextTransitionsPerDecisionPerFile = null;
+		}
+	}
+
 	private static final long[][] timePerFile;
 	private static final int[][] tokensPerFile;
 	static {
@@ -422,6 +448,15 @@ public class TestPerformance extends BaseTest {
 			if (COMPUTE_TRANSITION_STATS) {
 				totalTransitionsPerFile[i] = new long[Math.min(sources.size(), MAX_FILES_PER_PARSE_ITERATION)];
 				computedTransitionsPerFile[i] = new long[Math.min(sources.size(), MAX_FILES_PER_PARSE_ITERATION)];
+
+				if (DETAILED_DFA_STATE_STATS) {
+					decisionInvocationsPerFile[i] = new long[Math.min(sources.size(), MAX_FILES_PER_PARSE_ITERATION)][];
+					fullContextFallbackPerFile[i] = new long[Math.min(sources.size(), MAX_FILES_PER_PARSE_ITERATION)][];
+					nonSllPerFile[i] = new long[Math.min(sources.size(), MAX_FILES_PER_PARSE_ITERATION)][];
+					totalTransitionsPerDecisionPerFile[i] = new long[Math.min(sources.size(), MAX_FILES_PER_PARSE_ITERATION)][];
+					computedTransitionsPerDecisionPerFile[i] = new long[Math.min(sources.size(), MAX_FILES_PER_PARSE_ITERATION)][];
+					fullContextTransitionsPerDecisionPerFile[i] = new long[Math.min(sources.size(), MAX_FILES_PER_PARSE_ITERATION)][];
+				}
 			}
 
 			if (COMPUTE_TIMING_STATS) {
@@ -483,7 +518,7 @@ public class TestPerformance extends BaseTest {
 		executorService.shutdown();
 		executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
-		if (COMPUTE_TRANSITION_STATS) {
+		if (COMPUTE_TRANSITION_STATS && SHOW_TRANSITION_STATS_PER_FILE) {
 			computeTransitionStatistics();
 		}
 
@@ -530,14 +565,22 @@ public class TestPerformance extends BaseTest {
 			for (int j = 0; j < den.length; j++) {
 				sumNum[j] += num[j];
 				sumDen[j] += den[j];
-				sumNormalized[j] += (double)num[j] / (double)den[j];
+				if (den[j] > 0) {
+					sumNormalized[j] += (double)num[j] / (double)den[j];
+				}
 			}
 		}
 
 		double[] weightedAverage = new double[totalTransitionsPerFile[0].length];
 		double[] average = new double[totalTransitionsPerFile[0].length];
 		for (int i = 0; i < average.length; i++) {
-			weightedAverage[i] = (double)sumNum[i] / (double)sumDen[i];
+			if (sumDen[i] > 0) {
+				weightedAverage[i] = (double)sumNum[i] / (double)sumDen[i];
+			}
+			else {
+				weightedAverage[i] = 0;
+			}
+
 			average[i] = sumNormalized[i] / PASSES;
 		}
 
@@ -549,7 +592,13 @@ public class TestPerformance extends BaseTest {
 		for (int i = 0; i < stddev.length; i++) {
 			double[] points = new double[PASSES];
 			for (int j = 0; j < PASSES; j++) {
-				points[j] = ((double)computedTransitionsPerFile[j][i] / (double)totalTransitionsPerFile[j][i]);
+				long totalTransitions = totalTransitionsPerFile[j][i];
+				if (totalTransitions > 0) {
+					points[j] = ((double)computedTransitionsPerFile[j][i] / (double)totalTransitionsPerFile[j][i]);
+				}
+				else {
+					points[j] = 0;
+				}
 			}
 
 			Arrays.sort(points);
@@ -814,8 +863,17 @@ public class TestPerformance extends BaseTest {
 			try {
 				FileParseResult fileResult = future.get();
 				if (COMPUTE_TRANSITION_STATS) {
-					totalTransitionsPerFile[currentPass][currentIndex] = fileResult.parserTotalTransitions;
-					computedTransitionsPerFile[currentPass][currentIndex] = fileResult.parserComputedTransitions;
+					totalTransitionsPerFile[currentPass][currentIndex] = sum(fileResult.parserTotalTransitions);
+					computedTransitionsPerFile[currentPass][currentIndex] = sum(fileResult.parserComputedTransitions);
+
+					if (DETAILED_DFA_STATE_STATS) {
+						decisionInvocationsPerFile[currentPass][currentIndex] = fileResult.decisionInvocations;
+						fullContextFallbackPerFile[currentPass][currentIndex] = fileResult.fullContextFallback;
+						nonSllPerFile[currentPass][currentIndex] = fileResult.nonSll;
+						totalTransitionsPerDecisionPerFile[currentPass][currentIndex] = fileResult.parserTotalTransitions;
+						computedTransitionsPerDecisionPerFile[currentPass][currentIndex] = fileResult.parserComputedTransitions;
+						fullContextTransitionsPerDecisionPerFile[currentPass][currentIndex] = fileResult.parserFullContextTransitions;
+					}
 				}
 
 				if (COMPUTE_TIMING_STATS) {
@@ -917,7 +975,13 @@ public class TestPerformance extends BaseTest {
                 System.out.format("There are %d parser DFAState instances, %d configs (%d unique), %d prediction contexts.%n", states, configs, uniqueConfigs.size(), interpreter.atn.getContextCacheSize());
 
 				if (DETAILED_DFA_STATE_STATS) {
-					System.out.format("\tDecision\tStates\tConfigs\tRule%n");
+					if (COMPUTE_TRANSITION_STATS) {
+						System.out.format("\tDecision\tStates\tConfigs\tPredict (ALL)\tPredict (LL)\tNon-SLL\tTransitions\tTransitions (ATN)\tTransitions (LL)\tLA (SLL)\tLA (LL)\tRule%n");
+					}
+					else {
+						System.out.format("\tDecision\tStates\tConfigs\tRule%n");
+					}
+
 					for (int i = 0; i < decisionToDFA.length; i++) {
 						DFA dfa = decisionToDFA[i];
 						if (dfa == null || dfa.states.isEmpty()) {
@@ -930,7 +994,57 @@ public class TestPerformance extends BaseTest {
 						}
 
 						String ruleName = parser.getRuleNames()[parser.getATN().decisionToState.get(dfa.decision).ruleIndex];
-						System.out.format("\t%d\t%d\t%d\t%s%n", dfa.decision, dfa.states.size(), decisionConfigs, ruleName);
+
+						long calls = 0;
+						long fullContextCalls = 0;
+						long nonSllCalls = 0;
+						long transitions = 0;
+						long computedTransitions = 0;
+						long fullContextTransitions = 0;
+						double lookahead = 0;
+						double fullContextLookahead = 0;
+						String formatString;
+						if (COMPUTE_TRANSITION_STATS) {
+							for (long[] data : decisionInvocationsPerFile[currentPass]) {
+								calls += data[i];
+							}
+
+							for (long[] data : fullContextFallbackPerFile[currentPass]) {
+								fullContextCalls += data[i];
+							}
+
+							for (long[] data : nonSllPerFile[currentPass]) {
+								nonSllCalls += data[i];
+							}
+
+							for (long[] data : totalTransitionsPerDecisionPerFile[currentPass]) {
+								transitions += data[i];
+							}
+
+							for (long[] data : computedTransitionsPerDecisionPerFile[currentPass]) {
+								computedTransitions += data[i];
+							}
+
+							for (long[] data : fullContextTransitionsPerDecisionPerFile[currentPass]) {
+								fullContextTransitions += data[i];
+							}
+
+							if (calls > 0) {
+								lookahead = (double)(transitions - fullContextTransitions) / (double)calls;
+							}
+
+							if (fullContextCalls > 0) {
+								fullContextLookahead = (double)fullContextTransitions / (double)fullContextCalls;
+							}
+
+							formatString = "\t%1$d\t%2$d\t%3$d\t%4$d\t%5$d\t%6$d\t%7$d\t%8$d\t%9$d\t%10$f\t%11$f\t%12$s%n";
+						}
+						else {
+							calls = 0;
+							formatString = "\t%1$d\t%2$d\t%3$d\t%12$s%n";
+						}
+
+						System.out.format(formatString, dfa.decision, dfa.states.size(), decisionConfigs, calls, fullContextCalls, nonSllCalls, transitions, computedTransitions, fullContextTransitions, lookahead, fullContextLookahead, ruleName);
 					}
 				}
             }
@@ -1010,6 +1124,15 @@ public class TestPerformance extends BaseTest {
 			}
 		}
     }
+
+	private static long sum(long[] array) {
+		long result = 0;
+		for (int i = 0; i < array.length; i++) {
+			result += array[i];
+		}
+
+		return result;
+	}
 
     protected void compileJavaParser(boolean leftRecursive) throws IOException {
         String grammarFileName = "Java.g4";
@@ -1332,9 +1455,12 @@ public class TestPerformance extends BaseTest {
 		public final long lexerComputedTransitions;
 
 		public final int parserDFASize;
-		public final long parserTotalTransitions;
-		public final long parserComputedTransitions;
-		public final long parserFullContextTransitions;
+		public final long[] decisionInvocations;
+		public final long[] fullContextFallback;
+		public final long[] nonSll;
+		public final long[] parserTotalTransitions;
+		public final long[] parserComputedTransitions;
+		public final long[] parserFullContextTransitions;
 
 		public FileParseResult(String sourceName, int checksum, @Nullable ParseTree<?> parseTree, int tokenCount, long startTime, Lexer lexer, Parser<? extends Token> parser) {
 			this.sourceName = sourceName;
@@ -1371,13 +1497,19 @@ public class TestPerformance extends BaseTest {
 			if (parser != null) {
 				ParserATNSimulator<? extends Token> interpreter = parser.getInterpreter();
 				if (interpreter instanceof StatisticsParserATNSimulator) {
+					decisionInvocations = ((StatisticsParserATNSimulator)interpreter).decisionInvocations;
+					fullContextFallback = ((StatisticsParserATNSimulator)interpreter).fullContextFallback;
+					nonSll = ((StatisticsParserATNSimulator)interpreter).nonSll;
 					parserTotalTransitions = ((StatisticsParserATNSimulator)interpreter).totalTransitions;
 					parserComputedTransitions = ((StatisticsParserATNSimulator)interpreter).computedTransitions;
 					parserFullContextTransitions = ((StatisticsParserATNSimulator)interpreter).fullContextTransitions;
 				} else {
-					parserTotalTransitions = 0;
-					parserComputedTransitions = 0;
-					parserFullContextTransitions = 0;
+					decisionInvocations = new long[0];
+					fullContextFallback = new long[0];
+					nonSll = new long[0];
+					parserTotalTransitions = new long[0];
+					parserComputedTransitions = new long[0];
+					parserFullContextTransitions = new long[0];
 				}
 
 				int dfaSize = 0;
@@ -1390,9 +1522,12 @@ public class TestPerformance extends BaseTest {
 				parserDFASize = dfaSize;
 			} else {
 				parserDFASize = 0;
-				parserTotalTransitions = 0;
-				parserComputedTransitions = 0;
-				parserFullContextTransitions = 0;
+				decisionInvocations = new long[0];
+				fullContextFallback = new long[0];
+				nonSll = new long[0];
+				parserTotalTransitions = new long[0];
+				parserComputedTransitions = new long[0];
+				parserFullContextTransitions = new long[0];
 			}
 		}
 	}
@@ -1425,36 +1560,74 @@ public class TestPerformance extends BaseTest {
 
 	private static class StatisticsParserATNSimulator<Symbol extends Token> extends ParserATNSimulator<Symbol> {
 
-		public long totalTransitions;
-		public long computedTransitions;
-		public long fullContextTransitions;
+		public final long[] decisionInvocations;
+		public final long[] fullContextFallback;
+		public final long[] nonSll;
+		public final long[] totalTransitions;
+		public final long[] computedTransitions;
+		public final long[] fullContextTransitions;
+
+		private int decision;
 
 		public StatisticsParserATNSimulator(ATN atn) {
 			super(atn);
+			decisionInvocations = new long[atn.decisionToState.size()];
+			fullContextFallback = new long[atn.decisionToState.size()];
+			nonSll = new long[atn.decisionToState.size()];
+			totalTransitions = new long[atn.decisionToState.size()];
+			computedTransitions = new long[atn.decisionToState.size()];
+			fullContextTransitions = new long[atn.decisionToState.size()];
 		}
 
 		public StatisticsParserATNSimulator(Parser<Symbol> parser, ATN atn) {
 			super(parser, atn);
+			decisionInvocations = new long[atn.decisionToState.size()];
+			fullContextFallback = new long[atn.decisionToState.size()];
+			nonSll = new long[atn.decisionToState.size()];
+			totalTransitions = new long[atn.decisionToState.size()];
+			computedTransitions = new long[atn.decisionToState.size()];
+			fullContextTransitions = new long[atn.decisionToState.size()];
+		}
+
+		@Override
+		public int adaptivePredict(TokenStream<? extends Symbol> input, int decision, ParserRuleContext<Symbol> outerContext) {
+			try {
+				this.decision = decision;
+				decisionInvocations[decision]++;
+				return super.adaptivePredict(input, decision, outerContext);
+			}
+			finally {
+				this.decision = -1;
+			}
+		}
+
+		@Override
+		public int adaptivePredict(TokenStream<? extends Symbol> input, int decision, ParserRuleContext<Symbol> outerContext, boolean useContext) {
+			if (useContext) {
+				fullContextFallback[decision]++;
+			}
+
+			return super.adaptivePredict(input, decision, outerContext, useContext);
 		}
 
 		@Override
 		protected DFAState getExistingTargetState(DFAState previousD, int t) {
-			totalTransitions++;
+			totalTransitions[decision]++;
 			return super.getExistingTargetState(previousD, t);
 		}
 
 		@Override
 		protected Tuple2<DFAState, ParserRuleContext<Symbol>> computeTargetState(DFA dfa, DFAState s, ParserRuleContext<Symbol> remainingGlobalContext, int t, boolean useContext, PredictionContextCache contextCache) {
-			computedTransitions++;
+			computedTransitions[decision]++;
 			return super.computeTargetState(dfa, s, remainingGlobalContext, t, useContext, contextCache);
 		}
 
 		@Override
 		protected SimulatorState<Symbol> computeReachSet(DFA dfa, SimulatorState<Symbol> previous, int t, PredictionContextCache contextCache) {
 			if (previous.useContext) {
-				totalTransitions++;
-				computedTransitions++;
-				fullContextTransitions++;
+				totalTransitions[decision]++;
+				computedTransitions[decision]++;
+				fullContextTransitions[decision]++;
 			}
 
 			return super.computeReachSet(dfa, previous, t, contextCache);
@@ -1500,41 +1673,71 @@ public class TestPerformance extends BaseTest {
 	}
 
 	private static class SummarizingDiagnosticErrorListener extends DiagnosticErrorListener<Token> {
+		private BitSet _sllConflict;
+		private ATNConfigSet _sllConfigs;
 
 		@Override
-		public void reportAmbiguity(Parser<? extends Token> recognizer, DFA dfa, int startIndex, int stopIndex, BitSet ambigAlts, ATNConfigSet configs) {
+		public void reportAmbiguity(Parser<? extends Token> recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) {
+			if (COMPUTE_TRANSITION_STATS && DETAILED_DFA_STATE_STATS) {
+				BitSet sllPredictions = getConflictingAlts(_sllConflict, _sllConfigs);
+				int sllPrediction = sllPredictions.nextSetBit(0);
+				BitSet llPredictions = getConflictingAlts(ambigAlts, configs);
+				int llPrediction = llPredictions.cardinality() == 0 ? ATN.INVALID_ALT_NUMBER : llPredictions.nextSetBit(0);
+				if (sllPrediction != llPrediction) {
+					((StatisticsParserATNSimulator)recognizer.getInterpreter()).nonSll[dfa.decision]++;
+				}
+			}
+
 			if (!REPORT_AMBIGUITIES) {
 				return;
 			}
 
-			super.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, ambigAlts, configs);
+			// show the rule name along with the decision
+			String format = "reportAmbiguity d=%d (%s): ambigAlts=%s, input='%s'";
+			int decision = dfa.decision;
+			String rule = recognizer.getRuleNames()[dfa.atnStartState.ruleIndex];
+			String input = recognizer.getInputStream().getText(Interval.of(startIndex, stopIndex));
+			recognizer.notifyErrorListeners(String.format(format, decision, rule, ambigAlts, input));
 		}
 
 		@Override
-		public <T extends Token> void reportAttemptingFullContext(Parser<T> recognizer, DFA dfa, int startIndex, int stopIndex, SimulatorState<T> initialState) {
+		public <T extends Token> void reportAttemptingFullContext(Parser<T> recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, SimulatorState<T> conflictState) {
+			_sllConflict = conflictingAlts;
+			_sllConfigs = conflictState.s0.configs;
 			if (!REPORT_FULL_CONTEXT) {
 				return;
 			}
 
-			super.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, initialState);
+			// show the rule name and viable configs along with the base info
+			String format = "reportAttemptingFullContext d=%d (%s), input='%s', viable=%s";
+			int decision = dfa.decision;
+			String rule = recognizer.getRuleNames()[dfa.atnStartState.ruleIndex];
+			String input = recognizer.getInputStream().getText(Interval.of(startIndex, stopIndex));
+			BitSet representedAlts = getConflictingAlts(conflictingAlts, conflictState.s0.configs);
+			recognizer.notifyErrorListeners(String.format(format, decision, rule, input, representedAlts));
 		}
 
 		@Override
-		public <T extends Token> void reportContextSensitivity(Parser<T> recognizer, DFA dfa, int startIndex, int stopIndex, SimulatorState<T> acceptState) {
+		public <T extends Token> void reportContextSensitivity(Parser<T> recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, SimulatorState<T> acceptState) {
+			if (COMPUTE_TRANSITION_STATS && DETAILED_DFA_STATE_STATS) {
+				BitSet sllPredictions = getConflictingAlts(_sllConflict, _sllConfigs);
+				int sllPrediction = sllPredictions.nextSetBit(0);
+				if (sllPrediction != prediction) {
+					((StatisticsParserATNSimulator)recognizer.getInterpreter()).nonSll[dfa.decision]++;
+				}
+			}
+
 			if (!REPORT_CONTEXT_SENSITIVITY) {
 				return;
 			}
 
-			super.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, acceptState);
+			// show the rule name and viable configs along with the base info
+			String format = "reportContextSensitivity d=%d (%s), input='%s', viable={%d}";
+			int decision = dfa.decision;
+			String rule = recognizer.getRuleNames()[dfa.atnStartState.ruleIndex];
+			String input = recognizer.getInputStream().getText(Interval.of(startIndex, stopIndex));
+			recognizer.notifyErrorListeners(String.format(format, decision, rule, input, prediction));
 		}
-
-		@Override
-		protected <T extends Token> String getDecisionDescription(Parser<T> recognizer, int decision) {
-			String format = "%d(%s)";
-			String ruleName = recognizer.getRuleNames()[recognizer.getATN().decisionToState.get(decision).ruleIndex];
-			return String.format(format, decision, ruleName);
-		}
-
 	}
 
 	protected static final class FilenameFilters {

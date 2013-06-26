@@ -38,7 +38,7 @@ public class TestBasicSemanticErrors extends BaseTest {
     static String[] U = {
         // INPUT
         "parser grammar U;\n" +
-        "options { foo=bar; k=\"3\";}\n" +
+        "options { foo=bar; k=3;}\n" +
         "tokens {\n" +
 		"        ID,\n" +
         "        f,\n" +

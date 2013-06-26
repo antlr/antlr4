@@ -190,12 +190,16 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		else matchOp = new MatchSet(this, setAST);
 		if ( labelAST!=null ) {
 			String label = labelAST.getText();
-			Decl d = getTokenLabelDecl(label);
-			matchOp.labels.add(d);
-			getCurrentRuleFunction().addContextDecl(setAST.getAltLabel(), d);
+			RuleFunction rf = getCurrentRuleFunction();
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN ) {
+				defineImplicitLabel(setAST, matchOp);
 				TokenListDecl l = getTokenListLabelDecl(label);
-				getCurrentRuleFunction().addContextDecl(setAST.getAltLabel(), l);
+				rf.addContextDecl(setAST.getAltLabel(), l);
+			}
+			else {
+				Decl d = getTokenLabelDecl(label);
+				matchOp.labels.add(d);
+				rf.addContextDecl(setAST.getAltLabel(), d);
 			}
 		}
 		if ( controller.needsImplicitLabel(setAST, matchOp) ) defineImplicitLabel(setAST, matchOp);

@@ -62,7 +62,7 @@ public abstract class ATNSimulator {
 		/* WARNING: DO NOT MERGE THIS LINE. If UUIDs differ during a merge,
 		 * resolve the conflict by generating a new ID!
 		 */
-		SERIALIZED_UUID = UUID.fromString("5DC25ABE-510D-4395-8F9A-62E5B79FDC49");
+		SERIALIZED_UUID = UUID.fromString("E4178468-DF95-44D0-AD87-F22A5D5FB6D3");
 	}
 
 	public static final char RULE_VARIANT_DELIMITER = '$';
@@ -97,7 +97,6 @@ public abstract class ATNSimulator {
 			data[i] = (char)(data[i] - 2);
 		}
 
-		List<IntervalSet> sets = new ArrayList<IntervalSet>();
 		int p = 0;
 		int version = toInt(data[p++]);
 		if (version != SERIALIZED_VERSION) {
@@ -122,7 +121,7 @@ public abstract class ATNSimulator {
 		List<Tuple2<LoopEndState, Integer>> loopBackStateNumbers = new ArrayList<Tuple2<LoopEndState, Integer>>();
 		List<Tuple2<BlockStartState, Integer>> endStateNumbers = new ArrayList<Tuple2<BlockStartState, Integer>>();
 		int nstates = toInt(data[p++]);
-		for (int i=1; i<=nstates; i++) {
+		for (int i=0; i<nstates; i++) {
 			int stype = toInt(data[p++]);
 			// ignore bad type of states
 			if ( stype==ATNState.INVALID_TYPE ) {
@@ -131,6 +130,10 @@ public abstract class ATNSimulator {
 			}
 
 			int ruleIndex = toInt(data[p++]);
+			if (ruleIndex == Character.MAX_VALUE) {
+				ruleIndex = -1;
+			}
+
 			ATNState s = stateFactory(stype, ruleIndex);
 			if ( stype == ATNState.LOOP_END ) { // special case
 				int loopBackStateNumber = toInt(data[p++]);
@@ -186,8 +189,16 @@ public abstract class ATNSimulator {
 			atn.ruleToStartState[i] = startState;
 			if ( atn.grammarType == ATNType.LEXER ) {
 				int tokenType = toInt(data[p++]);
+				if (tokenType == 0xFFFF) {
+					tokenType = Token.EOF;
+				}
+
 				atn.ruleToTokenType[i] = tokenType;
 				int actionIndex = toInt(data[p++]);
+				if (actionIndex == 0xFFFF) {
+					actionIndex = -1;
+				}
+
 				atn.ruleToActionIndex[i] = actionIndex;
 			}
 		}
@@ -220,13 +231,20 @@ public abstract class ATNSimulator {
 		//
 		// SETS
 		//
+		List<IntervalSet> sets = new ArrayList<IntervalSet>();
 		int nsets = toInt(data[p++]);
-		for (int i=1; i<=nsets; i++) {
+		for (int i=0; i<nsets; i++) {
 			int nintervals = toInt(data[p]);
 			p++;
 			IntervalSet set = new IntervalSet();
 			sets.add(set);
-			for (int j=1; j<=nintervals; j++) {
+
+			boolean containsEof = toInt(data[p++]) != 0;
+			if (containsEof) {
+				set.add(-1);
+			}
+
+			for (int j=0; j<nintervals; j++) {
 				set.add(toInt(data[p]), toInt(data[p + 1]));
 				p += 2;
 			}
@@ -236,7 +254,7 @@ public abstract class ATNSimulator {
 		// EDGES
 		//
 		int nedges = toInt(data[p++]);
-		for (int i=1; i<=nedges; i++) {
+		for (int i=0; i<nedges; i++) {
 			int src = toInt(data[p]);
 			int trg = toInt(data[p+1]);
 			int ttype = toInt(data[p+2]);
@@ -776,7 +794,7 @@ public abstract class ATNSimulator {
 	}
 
 	public static int toInt(char c) {
-		return c==65535 ? -1 : c;
+		return c;
 	}
 
 	public static int toInt32(char[] data, int offset) {
@@ -803,7 +821,13 @@ public abstract class ATNSimulator {
 		ATNState target = atn.states.get(trg);
 		switch (type) {
 			case Transition.EPSILON : return new EpsilonTransition(target);
-			case Transition.RANGE : return new RangeTransition(target, arg1, arg2);
+			case Transition.RANGE :
+				if (arg3 != 0) {
+					return new RangeTransition(target, Token.EOF, arg2);
+				}
+				else {
+					return new RangeTransition(target, arg1, arg2);
+				}
 			case Transition.RULE :
 				RuleTransition rt = new RuleTransition((RuleStartState)atn.states.get(arg1), arg2, arg3, target);
 				return rt;
@@ -812,7 +836,13 @@ public abstract class ATNSimulator {
 				return pt;
 			case Transition.PRECEDENCE:
 				return new PrecedencePredicateTransition(target, arg1);
-			case Transition.ATOM : return new AtomTransition(target, arg1);
+			case Transition.ATOM :
+				if (arg3 != 0) {
+					return new AtomTransition(target, Token.EOF);
+				}
+				else {
+					return new AtomTransition(target, arg1);
+				}
 			case Transition.ACTION :
 				ActionTransition a = new ActionTransition(target, arg1, arg2, arg3 != 0);
 				return a;

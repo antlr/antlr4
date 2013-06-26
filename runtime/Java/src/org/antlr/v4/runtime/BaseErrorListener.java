@@ -54,6 +54,7 @@ public class BaseErrorListener<Symbol extends Token> implements ParserErrorListe
 								DFA dfa,
 								int startIndex,
 								int stopIndex,
+								boolean exact,
 								BitSet ambigAlts,
 								ATNConfigSet configs)
 	{
@@ -64,7 +65,8 @@ public class BaseErrorListener<Symbol extends Token> implements ParserErrorListe
 															   DFA dfa,
 															   int startIndex,
 															   int stopIndex,
-															   SimulatorState<T> initialState)
+															   BitSet conflictingAlts,
+															   SimulatorState<T> conflictState)
 	{
 	}
 
@@ -73,6 +75,7 @@ public class BaseErrorListener<Symbol extends Token> implements ParserErrorListe
 															DFA dfa,
 															int startIndex,
 															int stopIndex,
+															int prediction,
 															SimulatorState<T> acceptState)
 	{
 	}

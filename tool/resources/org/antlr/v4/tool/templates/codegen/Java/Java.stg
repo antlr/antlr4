@@ -66,13 +66,26 @@ ListenerFile(file, header) ::= <<
 package <file.genPackage>;
 <endif>
 <header>
-import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
 
+/**
+ * This interface defines a complete listener for a parse tree produced by
+ * {@link <file.parserName>}.
+ */
 public interface <file.grammarName>Listener extends ParseTreeListener\<<InputSymbolType()>\> {
 	<file.listenerNames:{lname |
-void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);
-void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+/**
+ * Enter a parse tree produced by {@link <file.parserName>#<lname>\}.
+ * @param ctx the parse tree
+ */
+void enter<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx);
+/**
+ * Exit a parse tree produced by {@link <file.parserName>#<lname>\}.
+ * @param ctx the parse tree
+ */
+void exit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
 }
 >>
 
@@ -85,18 +98,54 @@ package <file.genPackage>;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ErrorNode;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
+/**
+ * This class provides an empty implementation of {@link <file.grammarName>Listener},
+ * which can be extended to create a listener which only needs to handle a subset
+ * of the available methods.
+ */
 public class <file.grammarName>BaseListener implements <file.grammarName>Listener {
 	<file.listenerNames:{lname |
-@Override public void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
-@Override public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
+/**
+ * {@inheritDoc\}
+ * \<p/>
+ * The default implementation does nothing.
+ */
+@Override public void enter<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx) { \}
+/**
+ * {@inheritDoc\}
+ * \<p/>
+ * The default implementation does nothing.
+ */
+@Override public void exit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
-	@Override public void enterEveryRule(ParserRuleContext\<? extends <InputSymbolType()>\> ctx) { }
-	@Override public void exitEveryRule(ParserRuleContext\<? extends <InputSymbolType()>\> ctx) { }
-	@Override public void visitTerminal(TerminalNode\<? extends <InputSymbolType()>\> node) { }
-	@Override public void visitErrorNode(ErrorNode\<? extends <InputSymbolType()>\> node) { }
+	/**
+	 * {@inheritDoc\}
+	 * \<p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void enterEveryRule(@NotNull ParserRuleContext\<? extends <InputSymbolType()>\> ctx) { }
+	/**
+	 * {@inheritDoc\}
+	 * \<p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void exitEveryRule(@NotNull ParserRuleContext\<? extends <InputSymbolType()>\> ctx) { }
+	/**
+	 * {@inheritDoc\}
+	 * \<p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void visitTerminal(@NotNull TerminalNode\<? extends <InputSymbolType()>\> node) { }
+	/**
+	 * {@inheritDoc\}
+	 * \<p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void visitErrorNode(@NotNull ErrorNode\<? extends <InputSymbolType()>\> node) { }
 }
 >>
 
@@ -106,12 +155,25 @@ VisitorFile(file, header) ::= <<
 package <file.genPackage>;
 <endif>
 <header>
-import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
+/**
+ * This interface defines a complete generic visitor for a parse tree produced
+ * by {@link <file.parserName>}.
+ *
+ * @param \<T> The return type of the visit operation. Use {@link Void} for
+ * operations with no return type.
+ */
 public interface <file.grammarName>Visitor\<Symbol extends <InputSymbolType()>, Result> extends ParseTreeVisitor\<Symbol, Result> {
 	<file.visitorNames:{lname |
-Result visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+/**
+ * Visit a parse tree produced by {@link <file.parserName>#<lname>\}.
+ * @param ctx the parse tree
+ * @return the visitor result
+ */
+Result visit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
 }
 >>
 
@@ -121,13 +183,27 @@ BaseVisitorFile(file, header) ::= <<
 package <file.genPackage>;
 <endif>
 <header>
-import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
+/**
+ * This class provides an empty implementation of {@link <file.grammarName>Visitor},
+ * which can be extended to create a visitor which only needs to handle a subset
+ * of the available methods.
+ *
+ * @param \<T> The return type of the visit operation. Use {@link Void} for
+ * operations with no return type.
+ */
 public class <file.grammarName>BaseVisitor\<Result> extends AbstractParseTreeVisitor\<<InputSymbolType()>, Result> implements <file.grammarName>Visitor\<<InputSymbolType()>, Result> {
 	<file.visitorNames:{lname |
-@Override public Result visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
+/**
+ * {@inheritDoc\}
+ * \<p/>
+ * The default implementation returns the result of calling
+ * {@link #visitChildren\} on {@code ctx\}.
+ */
+@Override public Result visit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
 }
 >>
 

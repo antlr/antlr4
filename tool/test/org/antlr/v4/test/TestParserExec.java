@@ -82,6 +82,27 @@ public class TestParserExec extends BaseTest {
 		assertEquals(null, stderrDuringParse);
 	}
 
+	/**
+	 * This is a regression test for #270 "Fix operator += applied to a set of
+	 * tokens".
+	 * https://github.com/antlr/antlr4/issues/270
+	 */
+	@Test public void testListLabelOnSet() {
+		String grammar =
+			"grammar T;\n" +
+			"a : b b* ';' ;\n" +
+			"b : ID val+=(INT | FLOAT)*;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"FLOAT : [0-9]+ '.' [0-9]+;\n" +
+			"WS : (' '|'\\n') -> skip ;\n";
+
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
+								  "abc 34;", false);
+		assertEquals("", found);
+		assertEquals(null, stderrDuringParse);
+	}
+
 	@Test public void testBasic() throws Exception {
 		String grammar =
 			"grammar T;\n" +

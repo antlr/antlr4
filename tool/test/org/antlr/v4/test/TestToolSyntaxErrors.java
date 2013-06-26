@@ -173,6 +173,37 @@ public class TestToolSyntaxErrors extends BaseTest {
 	}
 
 	/**
+	 * This is a regression test for antlr/antlr4#243
+	 * "Generate a good message for unterminated strings"
+	 * https://github.com/antlr/antlr4/issues/243
+	 */
+	@Test public void testUnterminatedStringLiteral() {
+		String[] pair = new String[] {
+			"grammar A;\n" +
+			"a : 'x\n" +
+			"  ;\n",
+
+			"error(" + ErrorType.UNTERMINATED_STRING_LITERAL.code + "): A.g4:2:4: unterminated string literal\n"
+		};
+		super.testErrors(pair, true);
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#262
+	 * "Parser Rule Name Starting With an Underscore"
+	 * https://github.com/antlr/antlr4/issues/262
+	 */
+	@Test public void testParserRuleNameStartingWithUnderscore() {
+		String[] pair = new String[] {
+			"grammar A;\n" +
+			"_a : 'x' ;\n",
+
+			"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:2:0: syntax error: '_' came as a complete surprise to me\n"
+		};
+		super.testErrors(pair, true);
+	}
+
+	/**
 	 * This is a regression test for antlr/antlr4#194
 	 * "NullPointerException on 'options{}' in grammar file"
 	 * https://github.com/antlr/antlr4/issues/194
@@ -274,6 +305,46 @@ public class TestToolSyntaxErrors extends BaseTest {
 
 			"error(" + ErrorType.RULE_REDEFINITION.code + "): Oops.g4:4:0: rule 'ret_ty' redefinition; previous at line 3\n"
 		};
+		super.testErrors(pair, true);
+	}
+
+	@Test public void testEpsilonClosureAnalysis() {
+		String grammar =
+			"grammar A;\n"
+			+ "x : ;\n"
+			+ "y1 : x+;\n"
+			+ "y2 : x*;\n"
+			+ "z1 : ('foo' | 'bar'? 'bar2'?)*;\n"
+			+ "z2 : ('foo' | 'bar' 'bar2'? | 'bar2')*;\n";
+		String expected =
+			"error(" + ErrorType.EPSILON_CLOSURE.code + "): A.g4:3:0: rule 'y1' contains a closure with at least one alternative that can match an empty string\n" +
+			"error(" + ErrorType.EPSILON_CLOSURE.code + "): A.g4:4:0: rule 'y2' contains a closure with at least one alternative that can match an empty string\n" +
+			"error(" + ErrorType.EPSILON_CLOSURE.code + "): A.g4:5:0: rule 'z1' contains a closure with at least one alternative that can match an empty string\n";
+
+		String[] pair = new String[] {
+			grammar,
+			expected
+		};
+			
+		super.testErrors(pair, true);
+	}
+
+	@Test public void testEpsilonOptionalAnalysis() {
+		String grammar =
+			"grammar A;\n"
+			+ "x : ;\n"
+			+ "y  : x?;\n"
+			+ "z1 : ('foo' | 'bar'? 'bar2'?)?;\n"
+			+ "z2 : ('foo' | 'bar' 'bar2'? | 'bar2')?;\n";
+		String expected =
+			"warning(" + ErrorType.EPSILON_OPTIONAL.code + "): A.g4:3:0: rule 'y' contains an optional block with at least one alternative that can match an empty string\n" +
+			"warning(" + ErrorType.EPSILON_OPTIONAL.code + "): A.g4:4:0: rule 'z1' contains an optional block with at least one alternative that can match an empty string\n";
+
+		String[] pair = new String[] {
+			grammar,
+			expected
+		};
+
 		super.testErrors(pair, true);
 	}
 }

@@ -30,38 +30,108 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.atn.SimulatorState;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.BitSet;
 
-/** How to emit recognition errors */
+/** How to emit recognition errors for parsers.
+ */
 public interface ParserErrorListener<Symbol extends Token> extends ANTLRErrorListener<Symbol> {
-	/** Called when the parser detects a true ambiguity: an input sequence can be matched
-	 * literally by two or more pass through the grammar. ANTLR resolves the ambiguity in
-	 * favor of the alternative appearing first in the grammar. The start and stop index are
-     * zero-based absolute indices into the token stream. ambigAlts is a set of alternative numbers
-     * that can match the input sequence. This method is only called when we are parsing with
-     * full context.
-     */
-    void reportAmbiguity(@NotNull Parser<? extends Symbol> recognizer,
-						 DFA dfa, int startIndex, int stopIndex, @NotNull BitSet ambigAlts,
+	/**
+	 * This method is called by the parser when a full-context prediction
+	 * results in an ambiguity.
+	 * <p/>
+	 * When {@code exact} is {@code true}, <em>all</em> of the alternatives in
+	 * {@code ambigAlts} are viable, i.e. this is reporting an exact ambiguity.
+	 * When {@code exact} is {@code false}, <em>at least two</em> of the
+	 * alternatives in {@code ambigAlts} are viable for the current input, but
+	 * the prediction algorithm terminated as soon as it determined that at
+	 * least the <em>minimum</em> alternative in {@code ambigAlts} is viable.
+	 * <p/>
+	 * When the {@link PredictionMode#LL_EXACT_AMBIG_DETECTION} prediction mode
+	 * is used, the parser is required to identify exact ambiguities so
+	 * {@code exact} will always be {@code true}.
+	 *
+	 * @param recognizer the parser instance
+	 * @param dfa the DFA for the current decision
+	 * @param startIndex the input index where the decision started
+	 * @param stopIndex the input input where the ambiguity is reported
+	 * @param exact {@code true} if the ambiguity is exactly known, otherwise
+	 * {@code false}. This is always {@code true} when
+	 * {@link PredictionMode#LL_EXACT_AMBIG_DETECTION} is used.
+	 * @param ambigAlts the potentially ambiguous alternatives
+	 * @param configs the ATN configuration set where the ambiguity was
+	 * determined
+	 */
+	void reportAmbiguity(@NotNull Parser<? extends Symbol> recognizer,
+						 @NotNull DFA dfa,
+						 int startIndex,
+						 int stopIndex,
+						 boolean exact,
+						 @NotNull BitSet ambigAlts,
 						 @NotNull ATNConfigSet configs);
 
+	/**
+	 * This method is called when an SLL conflict occurs and the parser is about
+	 * to use the full context information to make an LL decision.
+	 * <p/>
+	 * If one or more configurations in {@code configs} contains a semantic
+	 * predicate, the predicates are evaluated before this method is called. The
+	 * subset of alternatives which are still viable after predicates are
+	 * evaluated is reported in {@code conflictingAlts}.
+	 *
+	 * @param recognizer the parser instance
+	 * @param dfa the DFA for the current decision
+	 * @param startIndex the input index where the decision started
+	 * @param stopIndex the input index where the SLL conflict occurred
+	 * @param conflictingAlts The specific conflicting alternatives. If this is
+	 * {@code null}, the conflicting alternatives are all alternatives
+	 * represented in {@code configs}.
+	 * @param conflictState the simulator state when the SLL conflict was
+	 * detected
+	 */
 	<T extends Symbol> void reportAttemptingFullContext(@NotNull Parser<T> recognizer,
 									 @NotNull DFA dfa,
-									 int startIndex, int stopIndex,
-									 @NotNull SimulatorState<T> initialState);
+									 int startIndex,
+									 int stopIndex,
+									 @Nullable BitSet conflictingAlts,
+									 @NotNull SimulatorState<T> conflictState);
 
-	/** Called by the parser when it find a conflict that is resolved by retrying the parse
-     *  with full context. This is not a warning; it simply notifies you that your grammar
-     *  is more complicated than Strong LL can handle. The parser moved up to full context
-     *  parsing for that input sequence.
-     */
-    <T extends Symbol> void reportContextSensitivity(@NotNull Parser<T> recognizer,
-                                  @NotNull DFA dfa,
-                                  int startIndex, int stopIndex,
-                                  @NotNull SimulatorState<T> acceptState);
+	/**
+	 * This method is called by the parser when a full-context prediction has a
+	 * unique result.
+	 * <p/>
+	 * For prediction implementations that only evaluate full-context
+	 * predictions when an SLL conflict is found (including the default
+	 * {@link ParserATNSimulator} implementation), this method reports cases
+	 * where SLL conflicts were resolved to unique full-context predictions,
+	 * i.e. the decision was context-sensitive. This report does not necessarily
+	 * indicate a problem, and it may appear even in completely unambiguous
+	 * grammars.
+	 * <p/>
+	 * {@code configs} may have more than one represented alternative if the
+	 * full-context prediction algorithm does not evaluate predicates before
+	 * beginning the full-context prediction. In all cases, the final prediction
+	 * is passed as the {@code prediction} argument.
+	 *
+	 * @param recognizer the parser instance
+	 * @param dfa the DFA for the current decision
+	 * @param startIndex the input index where the decision started
+	 * @param stopIndex the input index where the context sensitivity was
+	 * finally determined
+	 * @param prediction the unambiguous result of the full-context prediction
+	 * @param acceptState the simulator state when the unambiguous prediction
+	 * was determined
+	 */
+	<T extends Symbol> void reportContextSensitivity(@NotNull Parser<T> recognizer,
+								  @NotNull DFA dfa,
+								  int startIndex,
+								  int stopIndex,
+								  int prediction,
+								  @NotNull SimulatorState<T> acceptState);
 }

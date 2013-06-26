@@ -322,25 +322,25 @@ public class TestParseErrors extends BaseTest {
 		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xx", true);
 		assertEquals("", result);
 		assertEquals(
-			"line 1:1 reportAttemptingFullContext d=0, input='x'\n" +
-			"line 1:1 reportContextSensitivity d=0, input='x'\n",
+			"line 1:1 reportAttemptingFullContext d=0 (expr), input='x'\n" +
+			"line 1:1 reportContextSensitivity d=0 (expr), input='x'\n",
 			this.stderrDuringParse);
 
 		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xxx", true);
 		assertEquals("", result);
 		assertEquals(
-			"line 1:1 reportAttemptingFullContext d=0, input='x'\n" +
-			"line 1:1 reportContextSensitivity d=0, input='x'\n" +
-			"line 1:2 reportAttemptingFullContext d=0, input='x'\n",
+			"line 1:1 reportAttemptingFullContext d=0 (expr), input='x'\n" +
+			"line 1:1 reportContextSensitivity d=0 (expr), input='x'\n" +
+			"line 1:2 reportAttemptingFullContext d=0 (expr), input='x'\n",
 			this.stderrDuringParse);
 
 		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xxxx", true);
 		assertEquals("", result);
 		assertEquals(
-			"line 1:1 reportAttemptingFullContext d=0, input='x'\n" +
-			"line 1:1 reportContextSensitivity d=0, input='x'\n" +
-			"line 1:2 reportAttemptingFullContext d=0, input='x'\n" +
-			"line 1:3 reportAttemptingFullContext d=0, input='x'\n",
+			"line 1:1 reportAttemptingFullContext d=0 (expr), input='x'\n" +
+			"line 1:1 reportContextSensitivity d=0 (expr), input='x'\n" +
+			"line 1:2 reportAttemptingFullContext d=0 (expr), input='x'\n" +
+			"line 1:3 reportAttemptingFullContext d=0 (expr), input='x'\n",
 			this.stderrDuringParse);
 	}
 
@@ -360,8 +360,8 @@ public class TestParseErrors extends BaseTest {
 		String expecting = "";
 		assertEquals(expecting, result);
 		assertEquals(
-			"line 1:4 reportAttemptingFullContext d=0, input='ab'\n" +
-			"line 1:2 reportContextSensitivity d=0, input='a'\n",
+			"line 1:4 reportAttemptingFullContext d=0 (s), input='ab'\n" +
+			"line 1:2 reportContextSensitivity d=0 (s), input='a'\n",
 			this.stderrDuringParse);
 	}
 

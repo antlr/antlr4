@@ -72,8 +72,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 			ParserRuleContext<?> parent = (ParserRuleContext<?>)node.getParent().getRuleContext();
 			Token token = node.getSymbol();
 			System.out.println("consume "+token+" rule "+
-							   getRuleNames()[parent.getRuleIndex()]+
-							   " alt="+parent.altNum);
+							   getRuleNames()[parent.getRuleIndex()]);
 		}
 	}
 
@@ -585,7 +584,6 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 			}
 		}
 		_ctx = localctx;
-		_ctx.altNum = altNum;
 	}
 
 	public void enterRecursionRule(ParserRuleContext<Symbol> localctx, int ruleIndex, int precedence) {

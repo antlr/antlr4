@@ -73,8 +73,7 @@ public class LL1Analyzer {
 			look[alt] = new IntervalSet();
 			Set<ATNConfig> lookBusy = new HashSet<ATNConfig>();
 			boolean seeThruPreds = false; // fail to get lookahead upon pred
-			_LOOK(s.transition(alt).target,
-				  PredictionContext.EMPTY_FULL,
+			_LOOK(s.transition(alt).target, null, PredictionContext.EMPTY_FULL,
 				  look[alt], lookBusy, new BitSet(), seeThruPreds, false);
 			// Wipe out lookahead for this alternative if we found nothing
 			// or we had a predicate when we !seeThruPreds
@@ -103,11 +102,7 @@ public class LL1Analyzer {
 	 */
     @NotNull
    	public IntervalSet LOOK(@NotNull ATNState s, @NotNull PredictionContext ctx) {
-		Args.notNull("ctx", ctx);
-   		IntervalSet r = new IntervalSet();
-		boolean seeThruPreds = true; // ignore preds; get all lookahead
-   		_LOOK(s, ctx, r, new HashSet<ATNConfig>(), new BitSet(), seeThruPreds, true);
-   		return r;
+		return LOOK(s, null, ctx);
    	}
 
 	/**
@@ -116,13 +111,42 @@ public class LL1Analyzer {
 	 * <p/>
 	 * If {@code ctx} is {@code null} and the end of the rule containing
 	 * {@code s} is reached, {@link Token#EPSILON} is added to the result set.
-	 * If {@code ctx} is not {@code null} and {@code addEOF} is {@code true} and
-	 * the end of the outermost rule is reached, {@link Token#EOF} is added to
-	 * the result set.
+	 * If {@code ctx} is not {@code null} and the end of the outermost rule is
+	 * reached, {@link Token#EOF} is added to the result set.
+	 *
+	 * @param s the ATN state
+	 * @param stopState the ATN state to stop at. This can be a
+	 * {@link BlockEndState} to detect epsilon paths through a closure.
+	 * @param ctx the complete parser context, or {@code null} if the context
+	 * should be ignored
+	 *
+	 * @return The set of tokens that can follow {@code s} in the ATN in the
+	 * specified {@code ctx}.
+	 */
+    @NotNull
+   	public IntervalSet LOOK(@NotNull ATNState s, @Nullable ATNState stopState, @NotNull PredictionContext ctx) {
+   		IntervalSet r = new IntervalSet();
+		boolean seeThruPreds = true; // ignore preds; get all lookahead
+   		_LOOK(s, stopState, ctx, r, new HashSet<ATNConfig>(), new BitSet(), seeThruPreds, true);
+   		return r;
+   	}
+
+	/**
+	 * Compute set of tokens that can follow {@code s} in the ATN in the
+	 * specified {@code ctx}.
+	 * <p/>
+	 * If {@code ctx} is {@link PredictionContext#EMPTY_LOCAL} and
+	 * {@code stopState} or the end of the rule containing {@code s} is reached,
+	 * {@link Token#EPSILON} is added to the result set. If {@code ctx} is not
+	 * {@link PredictionContext#EMPTY_LOCAL} and {@code addEOF} is {@code true}
+	 * and {@code stopState} or the end of the outermost rule is reached,
+	 * {@link Token#EOF} is added to the result set.
 	 *
 	 * @param s the ATN state.
-	 * @param ctx The outer context, or {@code null} if the outer context should
-	 * not be used.
+	 * @param stopState the ATN state to stop at. This can be a
+	 * {@link BlockEndState} to detect epsilon paths through a closure.
+	 * @param ctx The outer context, or {@link PredictionContext#EMPTY_LOCAL} if
+	 * the outer context should not be used.
 	 * @param look The result lookahead set.
 	 * @param lookBusy A set used for preventing epsilon closures in the ATN
 	 * from causing a stack overflow. Outside code should pass
@@ -136,9 +160,11 @@ public class LL1Analyzer {
 	 * result if one is encountered.
 	 * @param addEOF Add {@link Token#EOF} to the result if the end of the
 	 * outermost context is reached. This parameter has no effect if {@code ctx}
-	 * is {@code null}.
+	 * is {@link PredictionContext#EMPTY_LOCAL}.
 	 */
-    protected void _LOOK(@NotNull ATNState s, @Nullable PredictionContext ctx,
+    protected void _LOOK(@NotNull ATNState s,
+						 @Nullable ATNState stopState,
+						 @NotNull PredictionContext ctx,
 						 @NotNull IntervalSet look,
                          @NotNull Set<ATNConfig> lookBusy,
 						 @NotNull BitSet calledRuleStack,
@@ -147,6 +173,16 @@ public class LL1Analyzer {
 //		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);
         ATNConfig c = ATNConfig.create(s, 0, ctx);
         if ( !lookBusy.add(c) ) return;
+
+		if (s == stopState) {
+			if (PredictionContext.isEmptyLocal(ctx)) {
+				look.add(Token.EPSILON);
+				return;
+			} else if (ctx.isEmpty() && addEOF) {
+				look.add(Token.EOF);
+				return;
+			}
+		}
 
         if ( s instanceof RuleStopState ) {
             if ( PredictionContext.isEmptyLocal(ctx) ) {
@@ -165,7 +201,7 @@ public class LL1Analyzer {
 						boolean removed = calledRuleStack.get(returnState.ruleIndex);
 						try {
 							calledRuleStack.clear(returnState.ruleIndex);
-							_LOOK(returnState, ctx.getParent(j), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+							_LOOK(returnState, stopState, ctx.getParent(j), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
 						}
 						finally {
 							if (removed) {
@@ -190,7 +226,7 @@ public class LL1Analyzer {
 
 				try {
 					calledRuleStack.set(((RuleTransition)t).target.ruleIndex);
-					_LOOK(t.target, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+					_LOOK(t.target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
 				}
 				finally {
 					calledRuleStack.clear(((RuleTransition)t).target.ruleIndex);
@@ -198,14 +234,14 @@ public class LL1Analyzer {
 			}
 			else if ( t instanceof AbstractPredicateTransition ) {
 				if ( seeThruPreds ) {
-					_LOOK(t.target, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+					_LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
 				}
 				else {
 					look.add(HIT_PRED);
 				}
 			}
 			else if ( t.isEpsilon() ) {
-				_LOOK(t.target, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+				_LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
 			}
 			else if ( t.getClass() == WildcardTransition.class ) {
 				look.addAll( IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType) );

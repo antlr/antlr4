@@ -523,15 +523,16 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					// Before attempting full context prediction, check to see if there are
 					// disambiguating or validating predicates to evaluate which allow an
 					// immediate decision
+					BitSet conflictingAlts = null;
 					if ( acceptState.predicates!=null ) {
 						int conflictIndex = input.index();
 						if (conflictIndex != startIndex) {
 							input.seek(startIndex);
 						}
 
-						BitSet predictions = evalSemanticContext(s.predicates, outerContext, true);
-						if ( predictions.cardinality() == 1 ) {
-							return predictions.nextSetBit(0);
+						conflictingAlts = evalSemanticContext(s.predicates, outerContext, true);
+						if ( conflictingAlts.cardinality() == 1 ) {
+							return conflictingAlts.nextSetBit(0);
 						}
 
 						if (conflictIndex != startIndex) {
@@ -542,8 +543,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					}
 
 					if (reportAmbiguities) {
-						SimulatorState<Symbol> fullContextState = computeStartState(dfa, outerContext, true);
-						reportAttemptingFullContext(dfa, fullContextState, startIndex, input.index());
+						SimulatorState<Symbol> conflictState = new SimulatorState<Symbol>(outerContext, acceptState, state.useContext, remainingOuterContext);
+						reportAttemptingFullContext(dfa, conflictingAlts, conflictState, startIndex, input.index());
 					}
 
 					input.seek(startIndex);
@@ -575,7 +576,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					input.seek(stopIndex);
 				}
 
-				reportAmbiguity(dfa, s, startIndex, stopIndex, alts, s.configs);
+				reportAmbiguity(dfa, s, startIndex, stopIndex, predictionMode == PredictionMode.LL_EXACT_AMBIG_DETECTION, alts, s.configs);
 				return alts.nextSetBit(0);
 			}
 		}
@@ -657,7 +658,8 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 			assert D.isAcceptState || D.configs.getConflictingAlts() == null;
 
 			if (D.isAcceptState) {
-				int predictedAlt = D.configs.getConflictingAlts() == null ? getUniqueAlt(D.configs) : ATN.INVALID_ALT_NUMBER;
+				BitSet conflictingAlts = D.configs.getConflictingAlts();
+				int predictedAlt = conflictingAlts == null ? getUniqueAlt(D.configs) : ATN.INVALID_ALT_NUMBER;
 				if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
 					if (optimize_ll1
 						&& input.index() == startIndex
@@ -672,87 +674,79 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					}
 
 					if (useContext && always_try_local_context) {
-						reportContextSensitivity(dfa, nextState, startIndex, input.index());
+						reportContextSensitivity(dfa, predictedAlt, nextState, startIndex, input.index());
 					}
 				}
-				else if ( D.configs.getConflictingAlts()!=null ) {
-					predictedAlt = D.prediction;
-//						int k = input.index() - startIndex + 1; // how much input we used
-//						System.out.println("used k="+k);
-						if ( !userWantsCtxSensitive ||
-							 !D.configs.getDipsIntoOuterContext() ||
-							 (treat_sllk1_conflict_as_ambiguity && input.index() == startIndex))
-						{
-							if ( reportAmbiguities && !D.configs.hasSemanticContext() ) {
-								reportAmbiguity(dfa, D, startIndex, input.index(), D.configs.getConflictingAlts(), D.configs);
-							}
-						}
-						else {
-							assert !useContext;
-							assert D.isAcceptState;
 
-							if ( D.configs.hasSemanticContext() ) {
-								int nalts = atn.getDecisionState(dfa.decision).getNumberOfTransitions();
-								DFAState.PredPrediction[] predPredictions = D.predicates;
-								if (predPredictions != null) {
-									int conflictIndex = input.index();
-									if (conflictIndex != startIndex) {
-										input.seek(startIndex);
-									}
+				predictedAlt = D.prediction;
+//				int k = input.index() - startIndex + 1; // how much input we used
+//				System.out.println("used k="+k);
+				boolean attemptFullContext = conflictingAlts != null && userWantsCtxSensitive;
+				if (attemptFullContext) {
+					if (predictionMode == PredictionMode.LL_EXACT_AMBIG_DETECTION) {
+						attemptFullContext = !useContext
+							&& (D.configs.getDipsIntoOuterContext() || D.configs.getConflictingAlts().cardinality() > 2)
+							&& (!treat_sllk1_conflict_as_ambiguity || input.index() != startIndex);
+					}
+					else {
+						attemptFullContext = D.configs.getDipsIntoOuterContext()
+							&& (!treat_sllk1_conflict_as_ambiguity || input.index() != startIndex);
+					}
+				}
 
-									// always use complete evaluation here since we'll want to retry with full context if still ambiguous
-									BitSet alts = evalSemanticContext(predPredictions, outerContext, true);
-									if (alts.cardinality() == 1) {
-										return alts.nextSetBit(0);
-									}
-
-									if (conflictIndex != startIndex) {
-										// restore the index so reporting the fallback to full
-										// context occurs with the index at the correct spot
-										input.seek(conflictIndex);
-									}
-								}
-							}
-
-							if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
-							SimulatorState<Symbol> fullContextState = computeStartState(dfa, outerContext, true);
-							if (reportAmbiguities) {
-								reportAttemptingFullContext(dfa, fullContextState, startIndex, input.index());
-							}
-
+				if ( D.configs.hasSemanticContext() ) {
+					DFAState.PredPrediction[] predPredictions = D.predicates;
+					if (predPredictions != null) {
+						int conflictIndex = input.index();
+						if (conflictIndex != startIndex) {
 							input.seek(startIndex);
-							return execATN(dfa, input, startIndex, fullContextState);
-						}
-				}
-
-				if ( D.predicates != null ) {
-					int stopIndex = input.index();
-					if (startIndex != stopIndex) {
-						input.seek(startIndex);
-					}
-
-					BitSet alts = evalSemanticContext(D.predicates, outerContext, reportAmbiguities && predictionMode == PredictionMode.LL_EXACT_AMBIG_DETECTION);
-					D.prediction = ATN.INVALID_ALT_NUMBER;
-					switch (alts.cardinality()) {
-					case 0:
-						throw noViableAlt(input, outerContext, D.configs, startIndex);
-
-					case 1:
-						return alts.nextSetBit(0);
-
-					default:
-						// report ambiguity after predicate evaluation to make sure the correct
-						// set of ambig alts is reported.
-						if (startIndex != stopIndex) {
-							input.seek(stopIndex);
 						}
 
-						reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
-						return alts.nextSetBit(0);
+						// use complete evaluation here if we'll want to retry with full context if still ambiguous
+						conflictingAlts = evalSemanticContext(predPredictions, outerContext, attemptFullContext || reportAmbiguities);
+						switch (conflictingAlts.cardinality()) {
+						case 0:
+							throw noViableAlt(input, outerContext, D.configs, startIndex);
+
+						case 1:
+							return conflictingAlts.nextSetBit(0);
+
+						default:
+							break;
+						}
+
+						if (conflictIndex != startIndex) {
+							// restore the index so reporting the fallback to full
+							// context occurs with the index at the correct spot
+							input.seek(conflictIndex);
+						}
 					}
 				}
 
-				return predictedAlt;
+				if (!attemptFullContext) {
+					if (conflictingAlts != null) {
+						if (reportAmbiguities && conflictingAlts.cardinality() > 1) {
+							reportAmbiguity(dfa, D, startIndex, input.index(), predictionMode == PredictionMode.LL_EXACT_AMBIG_DETECTION, conflictingAlts, D.configs);
+						}
+
+						predictedAlt = conflictingAlts.nextSetBit(0);
+					}
+
+					return predictedAlt;
+				}
+				else {
+					assert !useContext;
+					assert D.isAcceptState;
+
+					if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
+					SimulatorState<Symbol> fullContextState = computeStartState(dfa, outerContext, true);
+					if (reportAmbiguities) {
+						reportAttemptingFullContext(dfa, conflictingAlts, nextState, startIndex, input.index());
+					}
+
+					input.seek(startIndex);
+					return execATN(dfa, input, startIndex, fullContextState);
+				}
 			}
 
 			previous = nextState;
@@ -1316,10 +1310,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	{
 		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
 
-		if ( !optimize_closure_busy && depth != 0 && !closureBusy.add(config) ) {
-			return; // avoid infinite recursion
-		}
-
 		if ( config.getState() instanceof RuleStopState ) {
 			// We hit rule end. If we have context info, use it
 			if ( !config.getContext().isEmpty() ) {
@@ -1416,6 +1406,12 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					// track how far we dip into outer context.  Might
 					// come in handy and we avoid evaluating context dependent
 					// preds if this is > 0.
+
+					if (!closureBusy.add(c)) {
+						// avoid infinite recursion for right-recursive rules
+						continue;
+					}
+
 					c.setOuterContextDepth(c.getOuterContextDepth() + 1);
 
 					assert newDepth > Integer.MIN_VALUE;
@@ -1980,39 +1976,29 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		return new DFAState(configs, -1, atn.maxTokenType);
 	}
 
-//	public void reportConflict(int startIndex, int stopIndex,
-//							   @NotNull IntervalSet alts,
-//							   @NotNull ATNConfigSet configs)
-//	{
-//		if ( debug || retry_debug ) {
-//			System.out.println("reportConflict "+alts+":"+configs+
-//							   ", input="+parser.getInputString(startIndex, stopIndex));
-//		}
-//		if ( parser!=null ) parser.getErrorHandler().reportConflict(parser, startIndex, stopIndex, alts, configs);
-//	}
-
-	protected void reportAttemptingFullContext(DFA dfa, SimulatorState<Symbol> initialState, int startIndex, int stopIndex) {
+	protected void reportAttemptingFullContext(DFA dfa, @Nullable BitSet conflictingAlts, SimulatorState<Symbol> conflictState, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);
-            System.out.println("reportAttemptingFullContext decision="+dfa.decision+":"+initialState.s0.configs+
+            System.out.println("reportAttemptingFullContext decision="+dfa.decision+":"+conflictState.s0.configs+
                                ", input="+parser.getInputStream().getText(interval));
         }
-        if ( parser!=null ) parser.getErrorListenerDispatch().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, initialState);
+        if ( parser!=null ) parser.getErrorListenerDispatch().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, conflictingAlts, conflictState);
     }
 
-	protected void reportContextSensitivity(DFA dfa, SimulatorState<Symbol> acceptState, int startIndex, int stopIndex) {
+	protected void reportContextSensitivity(DFA dfa, int prediction, SimulatorState<Symbol> acceptState, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);
             System.out.println("reportContextSensitivity decision="+dfa.decision+":"+acceptState.s0.configs+
                                ", input="+parser.getInputStream().getText(interval));
         }
-        if ( parser!=null ) parser.getErrorListenerDispatch().reportContextSensitivity(parser, dfa, startIndex, stopIndex, acceptState);
+        if ( parser!=null ) parser.getErrorListenerDispatch().reportContextSensitivity(parser, dfa, startIndex, stopIndex, prediction, acceptState);
     }
 
     /** If context sensitive parsing, we know it's ambiguity not conflict */
     protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex,
-								@NotNull BitSet ambigAlts,
-								@NotNull ATNConfigSet configs)
+								   boolean exact,
+								   @Nullable BitSet ambigAlts,
+								   @NotNull ATNConfigSet configs)
 	{
 		if ( debug || retry_debug ) {
 //			ParserATNPathFinder finder = new ParserATNPathFinder(parser, atn);
@@ -2037,7 +2023,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
                                ", input="+parser.getInputStream().getText(interval));
         }
         if ( parser!=null ) parser.getErrorListenerDispatch().reportAmbiguity(parser, dfa, startIndex, stopIndex,
-                                                                     ambigAlts, configs);
+																			  exact, ambigAlts, configs);
     }
 
 	protected final int getReturnState(RuleContext<?> context) {

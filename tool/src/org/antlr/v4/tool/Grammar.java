@@ -91,8 +91,6 @@ public class Grammar implements AttributeResolver {
 
 	public static final Set<String> ParserBlockOptions = new HashSet<String>();
 	static {
-		// LR rule transformation sets this to help with reporting EPSILON_LR_FOLLOW
-		ParserBlockOptions.add("preventepsilon");
 		ParserBlockOptions.add("sll");
 	}
 
@@ -297,6 +295,9 @@ public class Grammar implements AttributeResolver {
 
 	protected void initTokenSymbolTables() {
 		tokenNameToTypeMap.put("EOF", Token.EOF);
+
+		// reserve a spot for the INVALID token
+		typeToTokenList.add(null);
 	}
 
     public void loadImportedGrammars() {

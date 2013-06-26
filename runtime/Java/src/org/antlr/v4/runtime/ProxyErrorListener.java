@@ -32,12 +32,20 @@ package org.antlr.v4.runtime;
 import java.util.Collection;
 
 /**
+ * This implementation of {@link ANTLRErrorListener} dispatches all calls to a
+ * collection of delegate listeners. This reduces the effort required to support multiple
+ * listeners.
+ *
  * @author Sam Harwell
  */
 public class ProxyErrorListener<Symbol> implements ANTLRErrorListener<Symbol> {
 	private final Collection<? extends ANTLRErrorListener<? super Symbol>> delegates;
 
 	public ProxyErrorListener(Collection<? extends ANTLRErrorListener<? super Symbol>> delegates) {
+		if (delegates == null) {
+			throw new NullPointerException("delegates");
+		}
+
 		this.delegates = delegates;
 	}
 

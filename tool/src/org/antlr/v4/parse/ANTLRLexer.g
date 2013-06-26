@@ -618,10 +618,17 @@ SRC : 'src' WSCHARS+ file=ACTION_STRING_LITERAL WSCHARS+ line=INT
 // may contain unicode escape sequences of the form \uxxxx, where x
 // is a valid hexadecimal number (as per Java basically).
 STRING_LITERAL
-@init {
-   int len = 0;
-}
-    :  '\'' ( ( ESC_SEQ | ~('\\'|'\''|'\r'|'\n') ) {len++;} )* '\''
+    :  '\'' ( ( ESC_SEQ | ~('\\'|'\''|'\r'|'\n') ) )*
+       (    '\''
+       |    // Unterminated string literal
+            {
+            Token t = new CommonToken(input, state.type, state.channel, state.tokenStartCharIndex, getCharIndex()-1);
+            t.setLine(state.tokenStartLine);
+            t.setText(state.text);
+            t.setCharPositionInLine(state.tokenStartCharPositionInLine);
+            grammarError(ErrorType.UNTERMINATED_STRING_LITERAL, t);
+            }
+       )
     ;
 
 // A valid hex digit specification
@@ -764,8 +771,12 @@ WSNLCHARS
 ERRCHAR
     : .
       {
-         // TODO: Issue error message
-         //
+         Token t = new CommonToken(input, state.type, state.channel, state.tokenStartCharIndex, getCharIndex()-1);
+         t.setLine(state.tokenStartLine);
+         t.setText(state.text);
+         t.setCharPositionInLine(state.tokenStartCharPositionInLine);
+         String msg = getTokenErrorDisplay(t) + " came as a complete surprise to me";
+         grammarError(ErrorType.SYNTAX_ERROR, t, msg);
          skip();
       }
     ;

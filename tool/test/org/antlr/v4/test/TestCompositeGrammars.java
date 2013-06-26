@@ -683,4 +683,33 @@ public class TestCompositeGrammars extends BaseTest {
 								  "s", "b", debug);
 		assertEquals("", found);
 	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#248 "Including grammar with
+	 * only fragments breaks generated lexer".
+	 * https://github.com/antlr/antlr4/issues/248
+	 */
+	@Test public void testImportLexerWithOnlyFragmentRules() {
+		String slave =
+			"lexer grammar Unicode;\n" +
+			"\n" +
+			"fragment\n" +
+			"UNICODE_CLASS_Zs    : '\\u0020' | '\\u00A0' | '\\u1680' | '\\u180E'\n" +
+			"                    | '\\u2000'..'\\u200A'\n" +
+			"                    | '\\u202F' | '\\u205F' | '\\u3000'\n" +
+			"                    ;\n";
+		String master =
+			"grammar Test;\n" +
+			"import Unicode;\n" +
+			"\n" +
+			"program : 'test' 'test' ;\n" +
+			"\n" +
+			"WS : (UNICODE_CLASS_Zs)+ -> skip;\n";
+
+		mkdir(tmpdir);
+		writeFile(tmpdir, "Unicode.g4", slave);
+		String found = execParser("Test.g4", master, "TestParser", "TestLexer", "program", "test test", debug);
+		assertEquals("", found);
+		assertNull(stderrDuringParse);
+	}
 }
