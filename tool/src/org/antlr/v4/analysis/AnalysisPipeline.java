@@ -93,6 +93,8 @@ public class AnalysisPipeline {
 				look = anal.getDecisionLookahead(s);
 				g.tool.log("LL1", "look=" + Arrays.toString(look));
 			}
+
+			assert s.decision + 1 >= g.decisionLOOK.size();
 			Utils.setSize(g.decisionLOOK, s.decision+1);
 			g.decisionLOOK.set(s.decision, look);
 			g.tool.log("LL1", "LL(1)? " + disjoint(look));
@@ -104,8 +106,7 @@ public class AnalysisPipeline {
 		boolean collision = false;
 		IntervalSet combined = new IntervalSet();
 		if ( altLook==null ) return false;
-		for (int a=1; a<altLook.length; a++) {
-			IntervalSet look = altLook[a];
+		for (IntervalSet look : altLook) {
 			if ( look==null ) return false; // lookahead must've computation failed
 			if ( !look.and(combined).isNil() ) {
 				collision = true;

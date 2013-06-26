@@ -71,8 +71,7 @@ public abstract class Choice extends RuleElement {
 
 	public List<String[]> getAltLookaheadAsStringLists(IntervalSet[] altLookSets) {
 		List<String[]> altLook = new ArrayList<String[]>();
-		for (int a=1; a<altLookSets.length; a++) {
-			IntervalSet s = altLookSets[a];
+		for (IntervalSet s : altLookSets) {
 			altLook.add(factory.getGenerator().getTarget().getTokenTypesAsTargetLabels(factory.getGrammar(), s.toArray()));
 		}
 		return altLook;
