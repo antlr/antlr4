@@ -147,6 +147,10 @@ public abstract class BaseTest {
 //		tmpdir = "/tmp";
     }
 
+	protected boolean testInSameProcess() {
+		return TEST_IN_SAME_PROCESS;
+	}
+
     protected org.antlr.v4.Tool newTool(String[] args) {
 		Tool tool = new Tool(args);
 		return tool;
@@ -616,7 +620,7 @@ public abstract class BaseTest {
 	}
 
 	public String execClass(String className) {
-		if (TEST_IN_SAME_PROCESS) {
+		if (testInSameProcess()) {
 			try {
 				ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
                 final Class<?> mainClass = (Class<?>)loader.loadClass(className);

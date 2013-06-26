@@ -167,6 +167,11 @@ public class TestRuleVersioning extends BaseTest {
 		assertEquals(expected, firstLine);
 	}
 
+	@Override
+	protected boolean testInSameProcess() {
+		return false;
+	}
+
 	private void testBasicGrammar(String name, String elementName, boolean expectSuccess) throws Exception {
 		testGrammar(name);
 		if (expectSuccess) {
