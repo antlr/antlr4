@@ -1004,16 +1004,16 @@ public abstract class BaseTest {
 			"        ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
 			"    }\n" +
 			"\n" +
-			"	static class TreeShapeListener implements ParseTreeListener\\<Token> {\n" +
-			"		@Override public void visitTerminal(TerminalNode\\<? extends Token> node) { }\n" +
-			"		@Override public void visitErrorNode(ErrorNode\\<? extends Token> node) { }\n" +
+			"	static class TreeShapeListener implements ParseTreeListener {\n" +
+			"		@Override public void visitTerminal(TerminalNode node) { }\n" +
+			"		@Override public void visitErrorNode(ErrorNode node) { }\n" +
 			"		@Override public void exitEveryRule(ParserRuleContext ctx) { }\n" +
 			"\n" +
 			"		@Override\n" +
 			"		public void enterEveryRule(ParserRuleContext ctx) {\n" +
 			"			for (int i = 0; i \\< ctx.getChildCount(); i++) {\n" +
-			"				ParseTree\\<? extends Token> parent = ctx.getChild(i).getParent();\n" +
-			"				if (!(parent instanceof RuleNode) || ((RuleNode\\<? extends Token>)parent).getRuleContext() != ctx) {\n" +
+			"				ParseTree parent = ctx.getChild(i).getParent();\n" +
+			"				if (!(parent instanceof RuleNode) || ((RuleNode)parent).getRuleContext() != ctx) {\n" +
 			"					throw new IllegalStateException(\"Invalid parse tree shape detected.\");\n" +
 			"				}\n" +
 			"			}\n" +

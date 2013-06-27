@@ -50,7 +50,7 @@ import java.util.List;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
 public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
-	public class TraceListener implements ParseTreeListener<Token> {
+	public class TraceListener implements ParseTreeListener {
 		@Override
 		public void enterEveryRule(ParserRuleContext ctx) {
 			System.out.println("enter   " + getRuleNames()[ctx.getRuleIndex()] +
@@ -64,11 +64,11 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		}
 
 		@Override
-		public void visitErrorNode(ErrorNode<? extends Token> node) {
+		public void visitErrorNode(ErrorNode node) {
 		}
 
 		@Override
-		public void visitTerminal(TerminalNode<? extends Token> node) {
+		public void visitTerminal(TerminalNode node) {
 			ParserRuleContext parent = (ParserRuleContext)node.getParent().getRuleContext();
 			Token token = node.getSymbol();
 			System.out.println("consume "+token+" rule "+
@@ -76,15 +76,15 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		}
 	}
 
-	public static class TrimToSizeListener implements ParseTreeListener<Token> {
+	public static class TrimToSizeListener implements ParseTreeListener {
 		public static final TrimToSizeListener INSTANCE = new TrimToSizeListener();
 
 		@Override
-		public void visitTerminal(TerminalNode<? extends Token> node) {
+		public void visitTerminal(TerminalNode node) {
 		}
 
 		@Override
-		public void visitErrorNode(ErrorNode<? extends Token> node) {
+		public void visitErrorNode(ErrorNode node) {
 		}
 
 		@Override
@@ -153,7 +153,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 * @see #addParseListener
 	 */
 	@Nullable
-	protected List<ParseTreeListener<? super Token>> _parseListeners;
+	protected List<ParseTreeListener> _parseListeners;
 
 	/**
 	 * The number of syntax errors reported during parsing. This value is
@@ -311,8 +311,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
 	@NotNull
-    public List<ParseTreeListener<? super Token>> getParseListeners() {
-		List<ParseTreeListener<? super Token>> listeners = _parseListeners;
+    public List<ParseTreeListener> getParseListeners() {
+		List<ParseTreeListener> listeners = _parseListeners;
 		if (listeners == null) {
 			return Collections.emptyList();
 		}
@@ -349,13 +349,13 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 *
 	 * @throws NullPointerException if {@code} listener is {@code null}
 	 */
-	public void addParseListener(@NotNull ParseTreeListener<? super Token> listener) {
+	public void addParseListener(@NotNull ParseTreeListener listener) {
 		if (listener == null) {
 			throw new NullPointerException("listener");
 		}
 
 		if (_parseListeners == null) {
-			_parseListeners = new ArrayList<ParseTreeListener<? super Token>>();
+			_parseListeners = new ArrayList<ParseTreeListener>();
 		}
 
 		this._parseListeners.add(listener);
@@ -371,7 +371,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 *
 	 * @param listener the listener to remove
 	 */
-	public void removeParseListener(ParseTreeListener<? super Token> listener) {
+	public void removeParseListener(ParseTreeListener listener) {
 		if (_parseListeners != null) {
 			if (_parseListeners.remove(listener)) {
 				if (_parseListeners.isEmpty()) {
@@ -396,7 +396,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 * @see #addParseListener
 	 */
 	protected void triggerEnterRuleEvent() {
-		for (ParseTreeListener<? super Token> listener : _parseListeners) {
+		for (ParseTreeListener listener : _parseListeners) {
 			listener.enterEveryRule(_ctx);
 			_ctx.enterRule(listener);
 		}
@@ -410,7 +410,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	protected void triggerExitRuleEvent() {
 		// reverse order walk of listeners
 		for (int i = _parseListeners.size()-1; i >= 0; i--) {
-			ParseTreeListener<? super Token> listener = _parseListeners.get(i);
+			ParseTreeListener listener = _parseListeners.get(i);
 			_ctx.exitRule(listener);
 			listener.exitEveryRule(_ctx);
 		}
@@ -506,17 +506,17 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		boolean hasListener = _parseListeners != null && !_parseListeners.isEmpty();
 		if (_buildParseTrees || hasListener) {
 			if ( _errHandler.inErrorRecoveryMode(this) ) {
-				ErrorNode<Token> node = _ctx.addErrorNode(o);
+				ErrorNode node = _ctx.addErrorNode(o);
 				if (_parseListeners != null) {
-					for (ParseTreeListener<? super Token> listener : _parseListeners) {
+					for (ParseTreeListener listener : _parseListeners) {
 						listener.visitErrorNode(node);
 					}
 				}
 			}
 			else {
-				TerminalNode<Token> node = _ctx.addChild(o);
+				TerminalNode node = _ctx.addChild(o);
 				if (_parseListeners != null) {
-					for (ParseTreeListener<? super Token> listener : _parseListeners) {
+					for (ParseTreeListener listener : _parseListeners) {
 						listener.visitTerminal(node);
 					}
 				}

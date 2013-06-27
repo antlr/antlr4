@@ -38,11 +38,10 @@ import org.antlr.v4.runtime.misc.NotNull;
  * grammar {@code X}.
  *
  * @author Sam Harwell
- * @param <Symbol> A superclass of the parse tree's symbol type.
  * @param <Result> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
-public interface ParseTreeVisitor<Symbol, Result> {
+public interface ParseTreeVisitor<Result> {
 
 	/**
 	 * Visit a parse tree, and return a user-defined result of the operation.
@@ -50,7 +49,7 @@ public interface ParseTreeVisitor<Symbol, Result> {
 	 * @param tree The {@link ParseTree} to visit.
 	 * @return The result of visiting the parse tree.
 	 */
-	Result visit(@NotNull ParseTree<? extends Symbol> tree);
+	Result visit(@NotNull ParseTree tree);
 
 	/**
 	 * Visit the children of a node, and return a user-defined result
@@ -59,7 +58,7 @@ public interface ParseTreeVisitor<Symbol, Result> {
 	 * @param node The {@link RuleNode} whose children should be visited.
 	 * @return The result of visiting the children of the node.
 	 */
-	Result visitChildren(@NotNull RuleNode<? extends Symbol> node);
+	Result visitChildren(@NotNull RuleNode node);
 
 	/**
 	 * Visit a terminal node, and return a user-defined result of the operation.
@@ -67,7 +66,7 @@ public interface ParseTreeVisitor<Symbol, Result> {
 	 * @param node The {@link TerminalNode} to visit.
 	 * @return The result of visiting the node.
 	 */
-	Result visitTerminal(@NotNull TerminalNode<? extends Symbol> node);
+	Result visitTerminal(@NotNull TerminalNode node);
 
 	/**
 	 * Visit an error node, and return a user-defined result of the operation.
@@ -75,6 +74,6 @@ public interface ParseTreeVisitor<Symbol, Result> {
 	 * @param node The {@link ErrorNode} to visit.
 	 * @return The result of visiting the node.
 	 */
-	Result visitErrorNode(@NotNull ErrorNode<? extends Symbol> node);
+	Result visitErrorNode(@NotNull ErrorNode node);
 
 }

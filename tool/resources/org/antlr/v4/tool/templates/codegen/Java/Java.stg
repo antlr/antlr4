@@ -74,7 +74,7 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  * This interface defines a complete listener for a parse tree produced by
  * {@link <file.parserName>}.
  */
-public interface <file.grammarName>Listener extends ParseTreeListener\<<InputSymbolType()>\> {
+public interface <file.grammarName>Listener extends ParseTreeListener {
 	<file.listenerNames:{lname |
 /**
  * Enter a parse tree produced by {@link <file.parserName>#<lname>\}.
@@ -139,13 +139,13 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 	 * \<p/>
 	 * The default implementation does nothing.
 	 */
-	@Override public void visitTerminal(@NotNull TerminalNode\<? extends <InputSymbolType()>\> node) { }
+	@Override public void visitTerminal(@NotNull TerminalNode node) { }
 	/**
 	 * {@inheritDoc\}
 	 * \<p/>
 	 * The default implementation does nothing.
 	 */
-	@Override public void visitErrorNode(@NotNull ErrorNode\<? extends <InputSymbolType()>\> node) { }
+	@Override public void visitErrorNode(@NotNull ErrorNode node) { }
 }
 >>
 
@@ -163,10 +163,10 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  * This interface defines a complete generic visitor for a parse tree produced
  * by {@link <file.parserName>}.
  *
- * @param \<T> The return type of the visit operation. Use {@link Void} for
+ * @param \<Result> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
-public interface <file.grammarName>Visitor\<Symbol extends <InputSymbolType()>, Result> extends ParseTreeVisitor\<Symbol, Result> {
+public interface <file.grammarName>Visitor\<Result> extends ParseTreeVisitor\<Result> {
 	<file.visitorNames:{lname |
 /**
  * Visit a parse tree produced by {@link <file.parserName>#<lname>\}.
@@ -192,10 +192,10 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
  * which can be extended to create a visitor which only needs to handle a subset
  * of the available methods.
  *
- * @param \<T> The return type of the visit operation. Use {@link Void} for
+ * @param \<Result> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
-public class <file.grammarName>BaseVisitor\<Result> extends AbstractParseTreeVisitor\<<InputSymbolType()>, Result> implements <file.grammarName>Visitor\<<InputSymbolType()>, Result> {
+public class <file.grammarName>BaseVisitor\<Result> extends AbstractParseTreeVisitor\<Result> implements <file.grammarName>Visitor\<Result> {
 	<file.visitorNames:{lname |
 /**
  * {@inheritDoc\}
@@ -757,11 +757,11 @@ RuleContextDecl(r) ::= "public <r.ctxName> <r.name>;"
 RuleContextListDecl(rdecl) ::= "public List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>();"
 
 ContextTokenGetterDecl(t)      ::=
-    "public TerminalNode\<<TokenLabelType()>> <t.name>() { return getToken(<parser.name>.<t.name>, 0); }"
+    "public TerminalNode <t.name>() { return getToken(<parser.name>.<t.name>, 0); }"
 ContextTokenListGetterDecl(t)  ::=
-    "public List\<? extends TerminalNode\<<TokenLabelType()>>> <t.name>() { return getTokens(<parser.name>.<t.name>); }"
+    "public List\<? extends TerminalNode> <t.name>() { return getTokens(<parser.name>.<t.name>); }"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-public TerminalNode\<<TokenLabelType()>\> <t.name>(int i) {
+public TerminalNode <t.name>(int i) {
 	return getToken(<parser.name>.<t.name>, i);
 }
 >>
@@ -830,15 +830,15 @@ public static class <struct.name> extends <currentRule.name; format="cap">Contex
 
 ListenerDispatchMethod(method) ::= <<
 @Override
-public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<? super <InputSymbolType()>\> listener) {
+public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener listener) {
 	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
 }
 >>
 
 VisitorDispatchMethod(method) ::= <<
 @Override
-public \<Result> Result accept(ParseTreeVisitor\<? super <InputSymbolType()>, ? extends Result> visitor) {
-	if ( visitor instanceof <parser.grammarName>Visitor\<?, ?> ) return ((<parser.grammarName>Visitor\<? super <InputSymbolType()>, ? extends Result>)visitor).visit<struct.derivedFromName; format="cap">(this);
+public \<Result> Result accept(ParseTreeVisitor\<? extends Result> visitor) {
+	if ( visitor instanceof <parser.grammarName>Visitor\<?> ) return ((<parser.grammarName>Visitor\<? extends Result>)visitor).visit<struct.derivedFromName; format="cap">(this);
 	else return visitor.visitChildren(this);
 }
 >>

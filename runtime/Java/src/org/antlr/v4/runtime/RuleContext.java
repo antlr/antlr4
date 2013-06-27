@@ -64,7 +64,7 @@ import java.util.concurrent.Future;
  *
  *  @see ParserRuleContext
  */
-public class RuleContext implements RuleNode<Token> {
+public class RuleContext implements RuleNode {
 	/** What context invoked this rule? */
 	public RuleContext parent;
 
@@ -143,7 +143,7 @@ public class RuleContext implements RuleNode<Token> {
 	public int getRuleIndex() { return -1; }
 
 	@Override
-	public ParseTree<Token> getChild(int i) {
+	public ParseTree getChild(int i) {
 		return null;
 	}
 
@@ -153,7 +153,7 @@ public class RuleContext implements RuleNode<Token> {
 	}
 
 	@Override
-	public <T> T accept(ParseTreeVisitor<? super Token, ? extends T> visitor) {
+	public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 		return visitor.visitChildren(this);
 	}
 

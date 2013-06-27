@@ -38,10 +38,10 @@ public class TestListeners extends BaseTest {
 	@Test public void testBasic() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"@header {import org.antlr.v4.runtime.tree.*;}\n"+
+			"@header {import org.antlr.v4.runtime.tree.TerminalNode;}\n"+
 			"@members {\n" +
 			"public static class LeafListener extends TBaseListener {\n" +
-			"    public void visitTerminal(TerminalNode<? extends Token> node) {\n" +
+			"    public void visitTerminal(TerminalNode node) {\n" +
 			"      System.out.println(node.getSymbol().getText());\n" +
 			"    }\n" +
 			"  }}\n" +
