@@ -40,6 +40,7 @@ import org.antlr.v4.runtime.misc.Nullable;
 import java.util.BitSet;
 
 /** How to emit recognition errors for parsers.
+ * @param <Symbol> The base parser symbol type supported by this listener.
  */
 public interface ParserErrorListener<Symbol extends Token> extends ANTLRErrorListener<Symbol> {
 	/**
@@ -85,6 +86,7 @@ public interface ParserErrorListener<Symbol extends Token> extends ANTLRErrorLis
 	 * subset of alternatives which are still viable after predicates are
 	 * evaluated is reported in {@code conflictingAlts}.
 	 *
+	 * @param <T> The parser symbol type.
 	 * @param recognizer the parser instance
 	 * @param dfa the DFA for the current decision
 	 * @param startIndex the input index where the decision started
@@ -119,6 +121,7 @@ public interface ParserErrorListener<Symbol extends Token> extends ANTLRErrorLis
 	 * beginning the full-context prediction. In all cases, the final prediction
 	 * is passed as the {@code prediction} argument.
 	 *
+	 * @param <T> The parser symbol type.
 	 * @param recognizer the parser instance
 	 * @param dfa the DFA for the current decision
 	 * @param startIndex the input index where the decision started
