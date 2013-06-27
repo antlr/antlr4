@@ -363,8 +363,7 @@ public class TestPerformance extends BaseTest {
     private static final Lexer[] sharedLexers = new Lexer[NUMBER_OF_THREADS];
 	private static final ATN[] sharedLexerATNs = new ATN[NUMBER_OF_THREADS];
 
-	@SuppressWarnings("unchecked")
-    private static final Parser<Token>[] sharedParsers = (Parser<Token>[])new Parser<?>[NUMBER_OF_THREADS];
+    private static final Parser[] sharedParsers = new Parser[NUMBER_OF_THREADS];
 	private static final ATN[] sharedParserATNs = new ATN[NUMBER_OF_THREADS];
 
 	@SuppressWarnings("unchecked")
@@ -949,7 +948,7 @@ public class TestPerformance extends BaseTest {
 
 		if (RUN_PARSER && sharedParsers.length > 0) {
 			int index = FILE_GRANULARITY ? 0 : ((NumberedThread)Thread.currentThread()).getThreadNumber();
-			Parser<?> parser = sharedParsers[index];
+			Parser parser = sharedParsers[index];
             // make sure the individual DFAState objects actually have unique ATNConfig arrays
 			final ParserATNSimulator<?> interpreter = parser.getInterpreter();
             final DFA[] decisionToDFA = interpreter.atn.decisionToDFA;
@@ -1297,12 +1296,11 @@ public class TestPerformance extends BaseTest {
                         }
 
 						final long parseStartTime = System.nanoTime();
-						Parser<Token> parser = sharedParsers[thread];
+						Parser parser = sharedParsers[thread];
                         if (REUSE_PARSER && parser != null) {
                             parser.setInputStream(tokens);
                         } else {
-							@SuppressWarnings("unchecked")
-							Parser<Token> newParser = parserCtor.newInstance(tokens);
+							Parser newParser = parserCtor.newInstance(tokens);
 
 							ATN atn = (FILE_GRANULARITY || parser == null ? newParser : parser).getATN();
 							if (!REUSE_PARSER_DFA || (!FILE_GRANULARITY && parser == null)) {
@@ -1374,9 +1372,7 @@ public class TestPerformance extends BaseTest {
 							if (REUSE_PARSER && sharedParsers[thread] != null) {
 								parser.setInputStream(tokens);
 							} else {
-								@SuppressWarnings("unchecked")
-								Parser<Token> newParser = parserCtor.newInstance(tokens);
-								parser = newParser;
+								parser = parserCtor.newInstance(tokens);
 								sharedParsers[thread] = parser;
 							}
 
@@ -1462,7 +1458,7 @@ public class TestPerformance extends BaseTest {
 		public final long[] parserComputedTransitions;
 		public final long[] parserFullContextTransitions;
 
-		public FileParseResult(String sourceName, int checksum, @Nullable ParseTree<?> parseTree, int tokenCount, long startTime, Lexer lexer, Parser<? extends Token> parser) {
+		public FileParseResult(String sourceName, int checksum, @Nullable ParseTree<?> parseTree, int tokenCount, long startTime, Lexer lexer, Parser parser) {
 			this.sourceName = sourceName;
 			this.checksum = checksum;
 			this.parseTree = parseTree;
@@ -1579,7 +1575,7 @@ public class TestPerformance extends BaseTest {
 			fullContextTransitions = new long[atn.decisionToState.size()];
 		}
 
-		public StatisticsParserATNSimulator(Parser<Symbol> parser, ATN atn) {
+		public StatisticsParserATNSimulator(Parser parser, ATN atn) {
 			super(parser, atn);
 			decisionInvocations = new long[atn.decisionToState.size()];
 			fullContextFallback = new long[atn.decisionToState.size()];
@@ -1677,7 +1673,7 @@ public class TestPerformance extends BaseTest {
 		private ATNConfigSet _sllConfigs;
 
 		@Override
-		public void reportAmbiguity(Parser<? extends Token> recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) {
+		public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) {
 			if (COMPUTE_TRANSITION_STATS && DETAILED_DFA_STATE_STATS) {
 				BitSet sllPredictions = getConflictingAlts(_sllConflict, _sllConfigs);
 				int sllPrediction = sllPredictions.nextSetBit(0);
@@ -1701,7 +1697,7 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public <T extends Token> void reportAttemptingFullContext(Parser<T> recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, SimulatorState<T> conflictState) {
+		public <T extends Token> void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, SimulatorState<T> conflictState) {
 			_sllConflict = conflictingAlts;
 			_sllConfigs = conflictState.s0.configs;
 			if (!REPORT_FULL_CONTEXT) {
@@ -1718,7 +1714,7 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public <T extends Token> void reportContextSensitivity(Parser<T> recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, SimulatorState<T> acceptState) {
+		public <T extends Token> void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, SimulatorState<T> acceptState) {
 			if (COMPUTE_TRANSITION_STATS && DETAILED_DFA_STATE_STATS) {
 				BitSet sllPredictions = getConflictingAlts(_sllConflict, _sllConfigs);
 				int sllPrediction = sllPredictions.nextSetBit(0);
@@ -1899,7 +1895,7 @@ public class TestPerformance extends BaseTest {
 
 	protected static class NonCachingParserATNSimulator<Symbol extends Token> extends StatisticsParserATNSimulator<Symbol> {
 
-		public NonCachingParserATNSimulator(Parser<Symbol> parser, ATN atn) {
+		public NonCachingParserATNSimulator(Parser parser, ATN atn) {
 			super(parser, atn);
 		}
 

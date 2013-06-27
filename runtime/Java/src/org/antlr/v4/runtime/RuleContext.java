@@ -158,7 +158,7 @@ public class RuleContext<Symbol> implements RuleNode<Symbol> {
 	}
 
 	/** Call this method to view a parse tree in a dialog box visually. */
-	public Future<JDialog> inspect(@Nullable Parser<?> parser) {
+	public Future<JDialog> inspect(@Nullable Parser parser) {
 		List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
 		return inspect(ruleNames);
 	}
@@ -169,7 +169,7 @@ public class RuleContext<Symbol> implements RuleNode<Symbol> {
 	}
 
 	/** Save this tree in a postscript file */
-	public void save(@Nullable Parser<?> parser, String fileName)
+	public void save(@Nullable Parser parser, String fileName)
 		throws IOException, PrintException
 	{
 		List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
@@ -177,7 +177,7 @@ public class RuleContext<Symbol> implements RuleNode<Symbol> {
 	}
 
 	/** Save this tree in a postscript file using a particular font name and size */
-	public void save(@Nullable Parser<?> parser, String fileName,
+	public void save(@Nullable Parser parser, String fileName,
 					 String fontName, int fontSize)
 		throws IOException
 	{
@@ -205,7 +205,7 @@ public class RuleContext<Symbol> implements RuleNode<Symbol> {
 	 *  We have to know the recognizer so we can get rule names.
 	 */
 	@Override
-	public String toStringTree(@Nullable Parser<?> recog) {
+	public String toStringTree(@Nullable Parser recog) {
 		return Trees.toStringTree(this, recog);
 	}
 

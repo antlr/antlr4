@@ -87,7 +87,7 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 	}
 
 	@Override
-	public void reportAmbiguity(@NotNull Parser<? extends Symbol> recognizer,
+	public void reportAmbiguity(@NotNull Parser recognizer,
 								DFA dfa,
 								int startIndex,
 								int stopIndex,
@@ -108,7 +108,7 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 	}
 
 	@Override
-	public <T extends Symbol> void reportAttemptingFullContext(@NotNull Parser<T> recognizer,
+	public <T extends Symbol> void reportAttemptingFullContext(@NotNull Parser recognizer,
 											@NotNull DFA dfa,
 											int startIndex,
 											int stopIndex,
@@ -123,7 +123,7 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 	}
 
 	@Override
-	public <T extends Symbol> void reportContextSensitivity(@NotNull Parser<T> recognizer,
+	public <T extends Symbol> void reportContextSensitivity(@NotNull Parser recognizer,
 										 @NotNull DFA dfa,
 										 int startIndex,
 										 int stopIndex,
@@ -137,7 +137,7 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 		recognizer.notifyErrorListeners(message);
 	}
 
-	protected <T extends Symbol> String getDecisionDescription(@NotNull Parser<T> recognizer, @NotNull DFA dfa) {
+	protected <T extends Symbol> String getDecisionDescription(@NotNull Parser recognizer, @NotNull DFA dfa) {
 		int decision = dfa.decision;
 		int ruleIndex = dfa.atnStartState.ruleIndex;
 

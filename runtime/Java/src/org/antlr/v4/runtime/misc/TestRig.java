@@ -168,19 +168,16 @@ public class TestRig {
 		Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
 		Lexer lexer = lexerCtor.newInstance((CharStream)null);
 
-		Class<? extends Parser<Token>> parserClass = null;
-		Parser<Token> parser = null;
+		Class<? extends Parser> parserClass = null;
+		Parser parser = null;
 		if ( !startRuleName.equals(LEXER_START_RULE_NAME) ) {
 			String parserName = grammarName+"Parser";
 
-			@SuppressWarnings("unchecked")
-			Class<? extends Parser<Token>> uncheckedParserClass = (Class<? extends Parser<Token>>)cl.loadClass(parserName);
-
-			parserClass = uncheckedParserClass;
+			parserClass = (Class<? extends Parser>)cl.loadClass(parserName);
 			if ( parserClass==null ) {
 				System.err.println("Can't load "+parserName);
 			}
-			Constructor<? extends Parser<Token>> parserCtor = parserClass.getConstructor(TokenStream.class);
+			Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
 			parser = parserCtor.newInstance((TokenStream)null);
 		}
 
@@ -217,7 +214,7 @@ public class TestRig {
 		}
 	}
 
-	protected void process(Lexer lexer, Class<? extends Parser<Token>> parserClass, Parser<Token> parser, InputStream is, Reader r) throws IOException, IllegalAccessException, InvocationTargetException, PrintException {
+	protected void process(Lexer lexer, Class<? extends Parser> parserClass, Parser parser, InputStream is, Reader r) throws IOException, IllegalAccessException, InvocationTargetException, PrintException {
 		try {
 			ANTLRInputStream input = new ANTLRInputStream(r);
 			lexer.setInputStream(input);

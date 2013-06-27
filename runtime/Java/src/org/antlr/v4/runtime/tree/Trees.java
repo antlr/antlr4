@@ -90,7 +90,7 @@ public class Trees {
 	 *  node payloads to get the text for the nodes.  Detect
 	 *  parse trees and extract data appropriately.
 	 */
-	public static String toStringTree(@NotNull Tree t, @Nullable Parser<?> recog) {
+	public static String toStringTree(@NotNull Tree t, @Nullable Parser recog) {
 		String[] ruleNames = recog != null ? recog.getRuleNames() : null;
 		List<String> ruleNamesList = ruleNames != null ? Arrays.asList(ruleNames) : null;
 		return toStringTree(t, ruleNamesList);
@@ -116,7 +116,7 @@ public class Trees {
 		return buf.toString();
 	}
 
-	public static String getNodeText(@NotNull Tree t, @Nullable Parser<?> recog) {
+	public static String getNodeText(@NotNull Tree t, @Nullable Parser recog) {
 		String[] ruleNames = recog != null ? recog.getRuleNames() : null;
 		List<String> ruleNamesList = ruleNames != null ? Arrays.asList(ruleNames) : null;
 		return getNodeText(t, ruleNamesList);

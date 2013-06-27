@@ -31,7 +31,6 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.SimulatorState;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.BitSet;
 import java.util.Collection;
@@ -46,7 +45,7 @@ public class ProxyParserErrorListener<Symbol extends Token> extends ProxyErrorLi
 	}
 
 	@Override
-	public void reportAmbiguity(Parser<? extends Symbol> recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) {
+	public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) {
 		for (ANTLRErrorListener<? super Symbol> listener : getDelegates()) {
 			if (!(listener instanceof ParserErrorListener<?>)) {
 				continue;
@@ -58,7 +57,7 @@ public class ProxyParserErrorListener<Symbol extends Token> extends ProxyErrorLi
 	}
 
 	@Override
-	public <T extends Symbol> void reportAttemptingFullContext(Parser<T> recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, SimulatorState<T> conflictState) {
+	public <T extends Symbol> void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, SimulatorState<T> conflictState) {
 		for (ANTLRErrorListener<? super Symbol> listener : getDelegates()) {
 			if (!(listener instanceof ParserErrorListener<?>)) {
 				continue;
@@ -70,7 +69,7 @@ public class ProxyParserErrorListener<Symbol extends Token> extends ProxyErrorLi
 	}
 
 	@Override
-	public <T extends Symbol> void reportContextSensitivity(Parser<T> recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, SimulatorState<T> acceptState) {
+	public <T extends Symbol> void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, SimulatorState<T> acceptState) {
 		for (ANTLRErrorListener<? super Symbol> listener : getDelegates()) {
 			if (!(listener instanceof ParserErrorListener<?>)) {
 				continue;

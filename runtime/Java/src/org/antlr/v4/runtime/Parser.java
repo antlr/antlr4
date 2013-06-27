@@ -49,7 +49,7 @@ import java.util.Collections;
 import java.util.List;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
-public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, ParserATNSimulator<Symbol>> {
+public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>> {
 	public class TraceListener implements ParseTreeListener<Token> {
 		@Override
 		public void enterEveryRule(ParserRuleContext<? extends Token> ctx) {
@@ -107,7 +107,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	 * @see #setErrorHandler
 	 */
 	@NotNull
-	protected ANTLRErrorStrategy<? super Symbol> _errHandler = new DefaultErrorStrategy<Symbol>();
+	protected ANTLRErrorStrategy<? super Token> _errHandler = new DefaultErrorStrategy<Token>();
 
 	/**
 	 * The input stream.
@@ -115,7 +115,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	 * @see #getInputStream
 	 * @see #setInputStream
 	 */
-	protected TokenStream<? extends Symbol> _input;
+	protected TokenStream<? extends Token> _input;
 
 	protected final IntegerStack _precedenceStack;
 	{
@@ -126,7 +126,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	 * The {@link ParserRuleContext} object for the currently executing rule.
 	 * This is always non-null during the parsing process.
 	 */
-	protected ParserRuleContext<Symbol> _ctx;
+	protected ParserRuleContext<Token> _ctx;
 
 	/**
 	 * Specifies whether or not the parser should construct a parse tree during
@@ -153,7 +153,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	 * @see #addParseListener
 	 */
 	@Nullable
-	protected List<ParseTreeListener<? super Symbol>> _parseListeners;
+	protected List<ParseTreeListener<? super Token>> _parseListeners;
 
 	/**
 	 * The number of syntax errors reported during parsing. This value is
@@ -161,7 +161,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	 */
 	protected int _syntaxErrors;
 
-	public Parser(TokenStream<? extends Symbol> input) {
+	public Parser(TokenStream<? extends Token> input) {
 		setInputStream(input);
 	}
 
@@ -199,8 +199,8 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	 * mismatched symbol
 	 */
 	@NotNull
-	public Symbol match(int ttype) throws RecognitionException {
-		Symbol t = getCurrentToken();
+	public Token match(int ttype) throws RecognitionException {
+		Token t = getCurrentToken();
 		if ( t.getType()==ttype ) {
 			_errHandler.reportMatch(this);
 			consume();
@@ -234,8 +234,8 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	 * symbol
 	 */
 	@NotNull
-	public Symbol matchWildcard() throws RecognitionException {
-		Symbol t = getCurrentToken();
+	public Token matchWildcard() throws RecognitionException {
+		Token t = getCurrentToken();
 		if (t.getType() > 0) {
 			_errHandler.reportMatch(this);
 			consume();
@@ -311,8 +311,8 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	}
 
 	@NotNull
-    public List<ParseTreeListener<? super Symbol>> getParseListeners() {
-		List<ParseTreeListener<? super Symbol>> listeners = _parseListeners;
+    public List<ParseTreeListener<? super Token>> getParseListeners() {
+		List<ParseTreeListener<? super Token>> listeners = _parseListeners;
 		if (listeners == null) {
 			return Collections.emptyList();
 		}
@@ -349,13 +349,13 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	 *
 	 * @throws NullPointerException if {@code} listener is {@code null}
 	 */
-	public void addParseListener(@NotNull ParseTreeListener<? super Symbol> listener) {
+	public void addParseListener(@NotNull ParseTreeListener<? super Token> listener) {
 		if (listener == null) {
 			throw new NullPointerException("listener");
 		}
 
 		if (_parseListeners == null) {
-			_parseListeners = new ArrayList<ParseTreeListener<? super Symbol>>();
+			_parseListeners = new ArrayList<ParseTreeListener<? super Token>>();
 		}
 
 		this._parseListeners.add(listener);
@@ -371,7 +371,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	 *
 	 * @param listener the listener to remove
 	 */
-	public void removeParseListener(ParseTreeListener<? super Symbol> listener) {
+	public void removeParseListener(ParseTreeListener<? super Token> listener) {
 		if (_parseListeners != null) {
 			if (_parseListeners.remove(listener)) {
 				if (_parseListeners.isEmpty()) {
@@ -396,7 +396,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	 * @see #addParseListener
 	 */
 	protected void triggerEnterRuleEvent() {
-		for (ParseTreeListener<? super Symbol> listener : _parseListeners) {
+		for (ParseTreeListener<? super Token> listener : _parseListeners) {
 			listener.enterEveryRule(_ctx);
 			_ctx.enterRule(listener);
 		}
@@ -410,7 +410,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	protected void triggerExitRuleEvent() {
 		// reverse order walk of listeners
 		for (int i = _parseListeners.size()-1; i >= 0; i--) {
-			ParseTreeListener<? super Symbol> listener = _parseListeners.get(i);
+			ParseTreeListener<? super Token> listener = _parseListeners.get(i);
 			_ctx.exitRule(listener);
 			listener.exitEveryRule(_ctx);
 		}
@@ -426,26 +426,26 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		return _syntaxErrors;
 	}
 
-	public TokenFactory<? extends Symbol> getTokenFactory() {
+	public TokenFactory<? extends Token> getTokenFactory() {
 		return _input.getTokenSource().getTokenFactory();
 	}
 
 	@NotNull
-	public ANTLRErrorStrategy<? super Symbol> getErrorHandler() {
+	public ANTLRErrorStrategy<? super Token> getErrorHandler() {
 		return _errHandler;
 	}
 
-	public void setErrorHandler(@NotNull ANTLRErrorStrategy<? super Symbol> handler) {
+	public void setErrorHandler(@NotNull ANTLRErrorStrategy<? super Token> handler) {
 		this._errHandler = handler;
 	}
 
 	@Override
-	public TokenStream<? extends Symbol> getInputStream() {
+	public TokenStream<? extends Token> getInputStream() {
 		return _input;
 	}
 
 	/** Set the token stream and reset the parser. */
-	public void setInputStream(TokenStream<? extends Symbol> input) {
+	public void setInputStream(TokenStream<? extends Token> input) {
 		this._input = null;
 		reset();
 		this._input = input;
@@ -454,7 +454,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
     /** Match needs to return the current input symbol, which gets put
      *  into the label for the associated token ref; e.g., x=ID.
      */
-    public Symbol getCurrentToken() {
+    public Token getCurrentToken() {
 		return _input.LT(1);
 	}
 
@@ -462,7 +462,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		notifyErrorListeners(getCurrentToken(), msg, null);
 	}
 
-	public void notifyErrorListeners(Symbol offendingToken, String msg,
+	public void notifyErrorListeners(Token offendingToken, String msg,
 									 @Nullable RecognitionException e)
 	{
 		_syntaxErrors++;
@@ -473,7 +473,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 			charPositionInLine = offendingToken.getCharPositionInLine();
 		}
 
-		ANTLRErrorListener<? super Symbol> listener = getErrorListenerDispatch();
+		ANTLRErrorListener<? super Token> listener = getErrorListenerDispatch();
 		listener.syntaxError(this, offendingToken, line, charPositionInLine, msg, e);
 	}
 
@@ -498,25 +498,25 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	 * {@link ParseTreeListener#visitErrorNode} is called on any parse
 	 * listeners.
 	 */
-	public Symbol consume() {
-		Symbol o = getCurrentToken();
+	public Token consume() {
+		Token o = getCurrentToken();
 		if (o.getType() != EOF) {
 			getInputStream().consume();
 		}
 		boolean hasListener = _parseListeners != null && !_parseListeners.isEmpty();
 		if (_buildParseTrees || hasListener) {
 			if ( _errHandler.inErrorRecoveryMode(this) ) {
-				ErrorNode<Symbol> node = _ctx.addErrorNode(o);
+				ErrorNode<Token> node = _ctx.addErrorNode(o);
 				if (_parseListeners != null) {
-					for (ParseTreeListener<? super Symbol> listener : _parseListeners) {
+					for (ParseTreeListener<? super Token> listener : _parseListeners) {
 						listener.visitErrorNode(node);
 					}
 				}
 			}
 			else {
-				TerminalNode<Symbol> node = _ctx.addChild(o);
+				TerminalNode<Token> node = _ctx.addChild(o);
 				if (_parseListeners != null) {
-					for (ParseTreeListener<? super Symbol> listener : _parseListeners) {
+					for (ParseTreeListener<? super Token> listener : _parseListeners) {
 						listener.visitTerminal(node);
 					}
 				}
@@ -526,7 +526,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	}
 
 	protected void addContextToParseTree() {
-		ParserRuleContext<Symbol> parent = (ParserRuleContext<Symbol>)_ctx.parent;
+		ParserRuleContext<Token> parent = (ParserRuleContext<Token>)_ctx.parent;
 		// add current context to parent if we have a parent
 		if ( parent!=null )	{
 			parent.addChild(_ctx);
@@ -537,7 +537,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	 * Always called by generated parsers upon entry to a rule. Access field
 	 * {@link #_ctx} get the current context.
 	 */
-	public void enterRule(@NotNull ParserRuleContext<Symbol> localctx, int state, int ruleIndex) {
+	public void enterRule(@NotNull ParserRuleContext<Token> localctx, int state, int ruleIndex) {
 		setState(state);
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
@@ -545,10 +545,10 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
         if ( _parseListeners != null) triggerEnterRuleEvent();
 	}
 
-	public void enterLeftFactoredRule(ParserRuleContext<Symbol> localctx, int state, int ruleIndex) {
+	public void enterLeftFactoredRule(ParserRuleContext<Token> localctx, int state, int ruleIndex) {
 		setState(state);
 		if (_buildParseTrees) {
-			ParserRuleContext<Symbol> factoredContext = (ParserRuleContext<Symbol>)_ctx.getChild(_ctx.getChildCount() - 1);
+			ParserRuleContext<Token> factoredContext = (ParserRuleContext<Token>)_ctx.getChild(_ctx.getChildCount() - 1);
 			_ctx.removeLastChild();
 			factoredContext.parent = localctx;
 			localctx.addChild(factoredContext);
@@ -570,14 +570,14 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
         // trigger event on _ctx, before it reverts to parent
         if ( _parseListeners != null) triggerExitRuleEvent();
 		setState(_ctx.invokingState);
-		_ctx = (ParserRuleContext<Symbol>)_ctx.parent;
+		_ctx = (ParserRuleContext<Token>)_ctx.parent;
     }
 
-	public void enterOuterAlt(ParserRuleContext<Symbol> localctx, int altNum) {
+	public void enterOuterAlt(ParserRuleContext<Token> localctx, int altNum) {
 		// if we have new localctx, make sure we replace existing ctx
 		// that is previous child of parse tree
 		if ( _buildParseTrees && _ctx != localctx ) {
-			ParserRuleContext<Symbol> parent = (ParserRuleContext<Symbol>)_ctx.parent;
+			ParserRuleContext<Token> parent = (ParserRuleContext<Token>)_ctx.parent;
 			if ( parent!=null )	{
 				parent.removeLastChild();
 				parent.addChild(localctx);
@@ -586,7 +586,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		_ctx = localctx;
 	}
 
-	public void enterRecursionRule(ParserRuleContext<Symbol> localctx, int ruleIndex, int precedence) {
+	public void enterRecursionRule(ParserRuleContext<Token> localctx, int ruleIndex, int precedence) {
 		_precedenceStack.push(precedence);
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
@@ -598,8 +598,8 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 	/**
 	 * Like {@link #enterRule} but for recursive rules.
 	 */
-	public void pushNewRecursionContext(ParserRuleContext<Symbol> localctx, int state, int ruleIndex) {
-		ParserRuleContext<Symbol> previous = _ctx;
+	public void pushNewRecursionContext(ParserRuleContext<Token> localctx, int state, int ruleIndex) {
+		ParserRuleContext<Token> previous = _ctx;
 		previous.parent = localctx;
 		previous.invokingState = state;
 		previous.stop = _input.LT(-1);
@@ -615,16 +615,16 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		}
 	}
 
-	public void unrollRecursionContexts(ParserRuleContext<Symbol> _parentctx) {
+	public void unrollRecursionContexts(ParserRuleContext<Token> _parentctx) {
 		_precedenceStack.pop();
 		_ctx.stop = _input.LT(-1);
-		ParserRuleContext<Symbol> retctx = _ctx; // save current ctx (return value)
+		ParserRuleContext<Token> retctx = _ctx; // save current ctx (return value)
 
 		// unroll so _ctx is as it was before call to recursive method
 		if ( _parseListeners != null ) {
 			while ( _ctx != _parentctx ) {
 				triggerExitRuleEvent();
-				_ctx = (ParserRuleContext<Symbol>)_ctx.parent;
+				_ctx = (ParserRuleContext<Token>)_ctx.parent;
 			}
 		}
 		else {
@@ -640,27 +640,27 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 		}
 	}
 
-	public ParserRuleContext<Symbol> getInvokingContext(int ruleIndex) {
-		ParserRuleContext<Symbol> p = _ctx;
+	public ParserRuleContext<Token> getInvokingContext(int ruleIndex) {
+		ParserRuleContext<Token> p = _ctx;
 		while ( p!=null ) {
 			if ( p.getRuleIndex() == ruleIndex ) return p;
-			p = (ParserRuleContext<Symbol>)p.parent;
+			p = (ParserRuleContext<Token>)p.parent;
 		}
 		return null;
 	}
 
-	public ParserRuleContext<Symbol> getContext() {
+	public ParserRuleContext<Token> getContext() {
 		return _ctx;
 	}
 
 	@Override
-	public boolean precpred(RuleContext<Symbol> localctx, int precedence) {
+	public boolean precpred(RuleContext<Token> localctx, int precedence) {
 		return precedence >= _precedenceStack.peek();
 	}
 
 	@Override
-	public ParserErrorListener<? super Symbol> getErrorListenerDispatch() {
-		return new ProxyParserErrorListener<Symbol>(getErrorListeners());
+	public ParserErrorListener<? super Token> getErrorListenerDispatch() {
+		return new ProxyParserErrorListener<Token>(getErrorListeners());
 	}
 
 	public boolean inContext(String context) {
@@ -741,7 +741,7 @@ public abstract class Parser<Symbol extends Token> extends Recognizer<Symbol, Pa
 //		return atn.nextTokens(s, ctx);
 //	}
 
-	public ParserRuleContext<Symbol> getRuleContext() { return _ctx; }
+	public ParserRuleContext<Token> getRuleContext() { return _ctx; }
 
 	/** Return List&lt;String&gt; of the rule names in your parser instance
 	 *  leading up to a call to the current rule.  You could override if

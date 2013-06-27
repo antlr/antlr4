@@ -45,7 +45,7 @@ import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.Grammar;
 
 public class ParserInterpreter {
-	public static class DummyParser extends Parser<Token> {
+	public static class DummyParser extends Parser {
 		public final ATN atn;
 
 		public Grammar g;

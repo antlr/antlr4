@@ -79,7 +79,7 @@ public class TerminalNodeImpl<Symbol> implements TerminalNode<Symbol> {
 	}
 
 	@Override
-	public String toStringTree(Parser<?> parser) {
+	public String toStringTree(Parser parser) {
 		return toString();
 	}
 

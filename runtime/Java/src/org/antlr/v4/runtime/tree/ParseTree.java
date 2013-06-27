@@ -60,5 +60,5 @@ public interface ParseTree<Symbol> extends SyntaxTree {
 	/** Specialize toStringTree so that it can print out more information
 	 * 	based upon the parser.
 	 */
-	public String toStringTree(Parser<?> parser);
+	public String toStringTree(Parser parser);
 }

@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
@@ -45,8 +46,8 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Tuple;
-
 import org.antlr.v4.runtime.misc.Tuple2;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -262,7 +263,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public boolean treat_sllk1_conflict_as_ambiguity = false;
 
 	@Nullable
-	protected final Parser<Symbol> parser;
+	protected final Parser parser;
 
 	/**
 	 * When {@code true}, ambiguous alternatives are reported when they are
@@ -288,7 +289,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		this(null, atn);
 	}
 
-	public ParserATNSimulator(@Nullable Parser<Symbol> parser, @NotNull ATN atn) {
+	public ParserATNSimulator(@Nullable Parser parser, @NotNull ATN atn) {
 		super(atn);
 		this.parser = parser;
 	}
@@ -1246,7 +1247,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				continue;
 			}
 
-			boolean evaluatedResult = pair.pred.eval(parser, outerContext);
+			boolean evaluatedResult = pair.pred.eval((Recognizer<Symbol, ParserATNSimulator<Symbol>>)(Recognizer)parser, outerContext);
 			if ( debug || dfa_debug ) {
 				System.out.println("eval pred "+pair+"="+evaluatedResult);
 			}
@@ -1792,7 +1793,7 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 											@NotNull ATNConfigSet configs,
 											int startIndex)
 	{
-		return new NoViableAltException(parser, input,
+		return new NoViableAltException((Recognizer<Symbol, ParserATNSimulator<Symbol>>)(Recognizer)parser, input,
 											input.get(startIndex),
 											input.LT(1),
 											configs, outerContext);

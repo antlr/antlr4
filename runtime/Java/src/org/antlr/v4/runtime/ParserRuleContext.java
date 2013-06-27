@@ -287,7 +287,7 @@ public class ParserRuleContext<Symbol extends Token> extends RuleContext<Symbol>
 	public Symbol getStop() { return stop; }
 
     /** Used for rule context info debugging during parse-time, not so much for ATN debugging */
-    public String toInfoString(Parser<?> recognizer) {
+    public String toInfoString(Parser recognizer) {
         List<String> rules = recognizer.getRuleInvocationStack(this);
         Collections.reverse(rules);
         return "ParserRuleContext"+rules+"{" +

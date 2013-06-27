@@ -54,7 +54,7 @@ public interface ANTLRErrorStrategy<Symbol extends Token> {
 	 * Reset the error handler state for the specified {@code recognizer}.
 	 * @param recognizer the parser instance
 	 */
-	void reset(@NotNull Parser<? extends Symbol> recognizer);
+	void reset(@NotNull Parser recognizer);
 
 	/**
 	 * This method is called when an unexpected symbol is encountered during an
@@ -72,7 +72,7 @@ public interface ANTLRErrorStrategy<Symbol extends Token> {
 	 * recover from the unexpected input symbol
 	 */
 	@NotNull
-	<T extends Symbol> T recoverInline(@NotNull Parser<T> recognizer)
+	<T extends Symbol> T recoverInline(@NotNull Parser recognizer)
 		throws RecognitionException;
 
 	/**
@@ -87,7 +87,7 @@ public interface ANTLRErrorStrategy<Symbol extends Token> {
 	 * @throws RecognitionException if the error strategy could not recover from
 	 * the recognition exception
 	 */
-	void recover(@NotNull Parser<? extends Symbol> recognizer,
+	void recover(@NotNull Parser recognizer,
 				 @NotNull RecognitionException e)
 		throws RecognitionException;
 
@@ -110,7 +110,7 @@ public interface ANTLRErrorStrategy<Symbol extends Token> {
 	 * strategy but cannot be automatically recovered at the current state in
 	 * the parsing process
 	 */
-	void sync(@NotNull Parser<? extends Symbol> recognizer)
+	void sync(@NotNull Parser recognizer)
 		throws RecognitionException;
 
 	/**
@@ -124,7 +124,7 @@ public interface ANTLRErrorStrategy<Symbol extends Token> {
 	 * @return {@code true} if the parser is currently recovering from a parse
 	 * error, otherwise {@code false}
 	 */
-	boolean inErrorRecoveryMode(@NotNull Parser<? extends Symbol> recognizer);
+	boolean inErrorRecoveryMode(@NotNull Parser recognizer);
 
 	/**
 	 * This method is called by when the parser successfully matches an input
@@ -132,7 +132,7 @@ public interface ANTLRErrorStrategy<Symbol extends Token> {
 	 *
 	 * @param recognizer the parser instance
 	 */
-	void reportMatch(@NotNull Parser<? extends Symbol> recognizer);
+	void reportMatch(@NotNull Parser recognizer);
 
 	/**
 	 * Report any kind of {@link RecognitionException}. This method is called by
@@ -141,6 +141,6 @@ public interface ANTLRErrorStrategy<Symbol extends Token> {
 	 * @param recognizer the parser instance
 	 * @param e the recognition exception to report
 	 */
-	void reportError(@NotNull Parser<? extends Symbol> recognizer,
+	void reportError(@NotNull Parser recognizer,
 					 @NotNull RecognitionException e);
 }

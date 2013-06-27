@@ -50,7 +50,7 @@ public class BaseErrorListener<Symbol extends Token> implements ParserErrorListe
 	}
 
 	@Override
-	public void reportAmbiguity(Parser<? extends Symbol> recognizer,
+	public void reportAmbiguity(Parser recognizer,
 								DFA dfa,
 								int startIndex,
 								int stopIndex,
@@ -61,7 +61,7 @@ public class BaseErrorListener<Symbol extends Token> implements ParserErrorListe
 	}
 
 	@Override
-	public <T extends Symbol> void reportAttemptingFullContext(Parser<T> recognizer,
+	public <T extends Symbol> void reportAttemptingFullContext(Parser recognizer,
 															   DFA dfa,
 															   int startIndex,
 															   int stopIndex,
@@ -71,7 +71,7 @@ public class BaseErrorListener<Symbol extends Token> implements ParserErrorListe
 	}
 
 	@Override
-	public <T extends Symbol> void reportContextSensitivity(Parser<T> recognizer,
+	public <T extends Symbol> void reportContextSensitivity(Parser recognizer,
 															DFA dfa,
 															int startIndex,
 															int stopIndex,

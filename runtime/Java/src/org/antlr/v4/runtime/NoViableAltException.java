@@ -53,7 +53,7 @@ public class NoViableAltException extends RecognitionException {
 	@NotNull
 	private final Token startToken;
 
-	public <Symbol extends Token> NoViableAltException(@NotNull Parser<Symbol> recognizer) { // LL(1) error
+	public NoViableAltException(@NotNull Parser recognizer) { // LL(1) error
 		this(recognizer,
 			 recognizer.getInputStream(),
 			 recognizer.getCurrentToken(),

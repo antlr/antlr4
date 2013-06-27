@@ -708,7 +708,7 @@ LexerChannelCommand(arg)   ::= "_channel = <arg>;"
 LexerModeCommand(arg)      ::= "_mode = <arg>;"
 LexerPushModeCommand(arg)  ::= "pushMode(<arg>);"
 
-DefaultParserSuperClass(s) ::= "Parser\<<InputSymbolType()>>"
+DefaultParserSuperClass(s) ::= "Parser"
 DefaultLexerSuperClass(s)  ::= "Lexer"
 
 ActionText(t) ::= "<t.text>"

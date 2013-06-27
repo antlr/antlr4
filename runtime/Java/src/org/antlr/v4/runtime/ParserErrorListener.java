@@ -69,7 +69,7 @@ public interface ParserErrorListener<Symbol extends Token> extends ANTLRErrorLis
 	 * @param configs the ATN configuration set where the ambiguity was
 	 * determined
 	 */
-	void reportAmbiguity(@NotNull Parser<? extends Symbol> recognizer,
+	void reportAmbiguity(@NotNull Parser recognizer,
 						 @NotNull DFA dfa,
 						 int startIndex,
 						 int stopIndex,
@@ -97,7 +97,7 @@ public interface ParserErrorListener<Symbol extends Token> extends ANTLRErrorLis
 	 * @param conflictState the simulator state when the SLL conflict was
 	 * detected
 	 */
-	<T extends Symbol> void reportAttemptingFullContext(@NotNull Parser<T> recognizer,
+	<T extends Symbol> void reportAttemptingFullContext(@NotNull Parser recognizer,
 									 @NotNull DFA dfa,
 									 int startIndex,
 									 int stopIndex,
@@ -131,7 +131,7 @@ public interface ParserErrorListener<Symbol extends Token> extends ANTLRErrorLis
 	 * @param acceptState the simulator state when the unambiguous prediction
 	 * was determined
 	 */
-	<T extends Symbol> void reportContextSensitivity(@NotNull Parser<T> recognizer,
+	<T extends Symbol> void reportContextSensitivity(@NotNull Parser recognizer,
 								  @NotNull DFA dfa,
 								  int startIndex,
 								  int stopIndex,
