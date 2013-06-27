@@ -48,6 +48,7 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar =
 			"grammar T;\n"+
 			"s" +
+			"@init {_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);}\n" +
 			"@after {dumpDFA();}\n" +
 			"    : ID | ID {;} ;\n" +
 			"ID : 'a'..'z'+ ;\n"+
