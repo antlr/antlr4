@@ -98,7 +98,7 @@ import java.util.Map;
  *  If you don't use named rewrite streams, a "default" stream is used as
  *  the first example shows.
  */
-public class TokenStreamRewriter<Symbol extends Token> {
+public class TokenStreamRewriter {
 	public static final String DEFAULT_PROGRAM_NAME = "default";
     public static final int PROGRAM_INIT_SIZE = 100;
 	public static final int MIN_TOKEN_INDEX = 0;
@@ -183,7 +183,7 @@ public class TokenStreamRewriter<Symbol extends Token> {
 	}
 
 	/** Our source stream */
-	protected final TokenStream<? extends Symbol> tokens;
+	protected final TokenStream<? extends Token> tokens;
 
 	/** You may have multiple, named streams of rewrite operations.
 	 *  I'm calling these things "programs."
@@ -194,7 +194,7 @@ public class TokenStreamRewriter<Symbol extends Token> {
 	/** Map String (program name) -> Integer index */
 	protected final Map<String, Integer> lastRewriteTokenIndexes;
 
-	public TokenStreamRewriter(TokenStream<? extends Symbol> tokens) {
+	public TokenStreamRewriter(TokenStream<? extends Token> tokens) {
 		this.tokens = tokens;
 		programs = new HashMap<String, List<RewriteOperation>>();
 		programs.put(DEFAULT_PROGRAM_NAME,
@@ -202,7 +202,7 @@ public class TokenStreamRewriter<Symbol extends Token> {
 		lastRewriteTokenIndexes = new HashMap<String, Integer>();
 	}
 
-	public final TokenStream<? extends Symbol> getTokenStream() {
+	public final TokenStream<? extends Token> getTokenStream() {
 		return tokens;
 	}
 
