@@ -40,9 +40,8 @@ import org.antlr.v4.runtime.misc.Nullable;
 import java.util.BitSet;
 
 /** How to emit recognition errors for parsers.
- * @param <Symbol> The base parser symbol type supported by this listener.
  */
-public interface ParserErrorListener<Symbol extends Token> extends ANTLRErrorListener<Symbol> {
+public interface ParserErrorListener extends ANTLRErrorListener<Token> {
 	/**
 	 * This method is called by the parser when a full-context prediction
 	 * results in an ambiguity.

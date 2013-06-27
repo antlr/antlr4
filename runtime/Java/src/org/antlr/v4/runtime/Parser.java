@@ -659,8 +659,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
 	@Override
-	public ParserErrorListener<? super Token> getErrorListenerDispatch() {
-		return new ProxyParserErrorListener<Token>(getErrorListeners());
+	public ParserErrorListener getErrorListenerDispatch() {
+		return new ProxyParserErrorListener(getErrorListeners());
 	}
 
 	public boolean inContext(String context) {

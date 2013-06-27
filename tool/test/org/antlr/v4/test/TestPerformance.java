@@ -1626,7 +1626,7 @@ public class TestPerformance extends BaseTest {
 		}
 	}
 
-	private static class DescriptiveErrorListener extends BaseErrorListener<Token> {
+	private static class DescriptiveErrorListener extends BaseErrorListener {
 		public static DescriptiveErrorListener INSTANCE = new DescriptiveErrorListener();
 
 		@Override
@@ -1664,7 +1664,7 @@ public class TestPerformance extends BaseTest {
 
 	}
 
-	private static class SummarizingDiagnosticErrorListener extends DiagnosticErrorListener<Token> {
+	private static class SummarizingDiagnosticErrorListener extends DiagnosticErrorListener {
 		private BitSet _sllConflict;
 		private ATNConfigSet _sllConfigs;
 

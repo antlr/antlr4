@@ -232,7 +232,7 @@ public class TestRig {
 			if ( startRuleName.equals(LEXER_START_RULE_NAME) ) return;
 
 			if ( diagnostics ) {
-				parser.addErrorListener(new DiagnosticErrorListener<Token>());
+				parser.addErrorListener(new DiagnosticErrorListener());
 				parser.getInterpreter().setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);
 			}
 

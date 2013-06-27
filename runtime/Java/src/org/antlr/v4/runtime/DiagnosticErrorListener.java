@@ -61,7 +61,7 @@ import java.util.BitSet;
  *
  * @author Sam Harwell
  */
-public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorListener<Symbol> {
+public class DiagnosticErrorListener extends BaseErrorListener {
 	/**
 	 * When {@code true}, only exactly known ambiguities are reported.
 	 */
@@ -137,7 +137,7 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 		recognizer.notifyErrorListeners(message);
 	}
 
-	protected <T extends Symbol> String getDecisionDescription(@NotNull Parser recognizer, @NotNull DFA dfa) {
+	protected <T extends Token> String getDecisionDescription(@NotNull Parser recognizer, @NotNull DFA dfa) {
 		int decision = dfa.decision;
 		int ruleIndex = dfa.atnStartState.ruleIndex;
 

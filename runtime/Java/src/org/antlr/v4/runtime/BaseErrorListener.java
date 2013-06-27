@@ -38,14 +38,14 @@ import java.util.BitSet;
 /**
  * @author Sam Harwell
  */
-public class BaseErrorListener<Symbol extends Token> implements ParserErrorListener<Symbol> {
+public class BaseErrorListener implements ParserErrorListener {
 	@Override
-	public <T extends Symbol> void syntaxError(Recognizer<T, ?> recognizer,
-											   T offendingSymbol,
-											   int line,
-											   int charPositionInLine,
-											   String msg,
-											   RecognitionException e)
+	public <T extends Token> void syntaxError(Recognizer<T, ?> recognizer,
+											  T offendingSymbol,
+											  int line,
+											  int charPositionInLine,
+											  String msg,
+											  RecognitionException e)
 	{
 	}
 

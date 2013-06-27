@@ -39,43 +39,43 @@ import java.util.Collection;
  *
  * @author Sam Harwell
  */
-public class ProxyParserErrorListener<Symbol extends Token> extends ProxyErrorListener<Symbol> implements ParserErrorListener<Symbol> {
-	public ProxyParserErrorListener(Collection<? extends ANTLRErrorListener<? super Symbol>> delegates) {
+public class ProxyParserErrorListener extends ProxyErrorListener<Token> implements ParserErrorListener {
+	public ProxyParserErrorListener(Collection<? extends ANTLRErrorListener<? super Token>> delegates) {
 		super(delegates);
 	}
 
 	@Override
 	public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) {
-		for (ANTLRErrorListener<? super Symbol> listener : getDelegates()) {
-			if (!(listener instanceof ParserErrorListener<?>)) {
+		for (ANTLRErrorListener<? super Token> listener : getDelegates()) {
+			if (!(listener instanceof ParserErrorListener)) {
 				continue;
 			}
 
-			ParserErrorListener<? super Symbol> parserErrorListener = (ParserErrorListener<? super Symbol>)listener;
+			ParserErrorListener parserErrorListener = (ParserErrorListener)listener;
 			parserErrorListener.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
 		}
 	}
 
 	@Override
 	public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, SimulatorState conflictState) {
-		for (ANTLRErrorListener<? super Symbol> listener : getDelegates()) {
-			if (!(listener instanceof ParserErrorListener<?>)) {
+		for (ANTLRErrorListener<? super Token> listener : getDelegates()) {
+			if (!(listener instanceof ParserErrorListener)) {
 				continue;
 			}
 
-			ParserErrorListener<? super Symbol> parserErrorListener = (ParserErrorListener<? super Symbol>)listener;
+			ParserErrorListener parserErrorListener = (ParserErrorListener)listener;
 			parserErrorListener.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, conflictState);
 		}
 	}
 
 	@Override
 	public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, SimulatorState acceptState) {
-		for (ANTLRErrorListener<? super Symbol> listener : getDelegates()) {
-			if (!(listener instanceof ParserErrorListener<?>)) {
+		for (ANTLRErrorListener<? super Token> listener : getDelegates()) {
+			if (!(listener instanceof ParserErrorListener)) {
 				continue;
 			}
 
-			ParserErrorListener<? super Symbol> parserErrorListener = (ParserErrorListener<? super Symbol>)listener;
+			ParserErrorListener parserErrorListener = (ParserErrorListener)listener;
 			parserErrorListener.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, acceptState);
 		}
 	}
