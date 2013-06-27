@@ -136,7 +136,7 @@ public interface TokenStream<Symbol> extends IntStream {
 	 * @return The text of all tokens within the source interval of {@code ctx}.
 	 */
 	@NotNull
-	public String getText(@NotNull RuleContext<?> ctx);
+	public String getText(@NotNull RuleContext ctx);
 
 	/**
 	 * Return the text of all tokens in this stream between {@code start} and

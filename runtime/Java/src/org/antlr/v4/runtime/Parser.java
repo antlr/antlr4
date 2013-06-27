@@ -654,7 +654,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
 	@Override
-	public boolean precpred(RuleContext<Token> localctx, int precedence) {
+	public boolean precpred(RuleContext localctx, int precedence) {
 		return precedence >= _precedenceStack.peek();
 	}
 
@@ -754,7 +754,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return getRuleInvocationStack(_ctx);
 	}
 
-	public List<String> getRuleInvocationStack(RuleContext<?> p) {
+	public List<String> getRuleInvocationStack(RuleContext p) {
 		String[] ruleNames = getRuleNames();
 		List<String> stack = new ArrayList<String>();
 		while ( p!=null ) {

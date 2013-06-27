@@ -122,11 +122,11 @@ public abstract class PredictionContext {
 
 	protected abstract PredictionContext removeEmptyContext();
 
-	public static PredictionContext fromRuleContext(@NotNull ATN atn, @NotNull RuleContext<?> outerContext) {
+	public static PredictionContext fromRuleContext(@NotNull ATN atn, @NotNull RuleContext outerContext) {
 		return fromRuleContext(atn, outerContext, true);
 	}
 
-	public static PredictionContext fromRuleContext(@NotNull ATN atn, @NotNull RuleContext<?> outerContext, boolean fullContext) {
+	public static PredictionContext fromRuleContext(@NotNull ATN atn, @NotNull RuleContext outerContext, boolean fullContext) {
 		if (outerContext.isEmpty()) {
 			return fullContext ? EMPTY_FULL : EMPTY_LOCAL;
 		}

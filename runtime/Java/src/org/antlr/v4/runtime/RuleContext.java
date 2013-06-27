@@ -64,9 +64,9 @@ import java.util.concurrent.Future;
  *
  *  @see ParserRuleContext
  */
-public class RuleContext<Symbol> implements RuleNode<Symbol> {
+public class RuleContext implements RuleNode<Token> {
 	/** What context invoked this rule? */
-	public RuleContext<Symbol> parent;
+	public RuleContext parent;
 
 	/** What state invoked the rule associated with this context?
 	 *  The "return address" is the followState of invokingState
@@ -76,19 +76,19 @@ public class RuleContext<Symbol> implements RuleNode<Symbol> {
 
 	public RuleContext() {}
 
-	public RuleContext(RuleContext<Symbol> parent, int invokingState) {
+	public RuleContext(RuleContext parent, int invokingState) {
 		this.parent = parent;
 		//if ( parent!=null ) System.out.println("invoke "+stateNumber+" from "+parent);
 		this.invokingState = invokingState;
 	}
 
-	public static <T> RuleContext<T> getChildContext(RuleContext<T> parent, int invokingState) {
-		return new RuleContext<T>(parent, invokingState);
+	public static RuleContext getChildContext(RuleContext parent, int invokingState) {
+		return new RuleContext(parent, invokingState);
 	}
 
 	public int depth() {
 		int n = 0;
-		RuleContext<?> p = this;
+		RuleContext p = this;
 		while ( p!=null ) {
 			p = p.parent;
 			n++;
@@ -111,13 +111,13 @@ public class RuleContext<Symbol> implements RuleNode<Symbol> {
 	}
 
 	@Override
-	public RuleContext<Symbol> getRuleContext() { return this; }
+	public RuleContext getRuleContext() { return this; }
 
 	@Override
-	public RuleContext<Symbol> getParent() { return parent; }
+	public RuleContext getParent() { return parent; }
 
 	@Override
-	public RuleContext<Symbol> getPayload() { return this; }
+	public RuleContext getPayload() { return this; }
 
 	/** Return the combined text of all child nodes. This method only considers
 	 *  tokens which have been added to the parse tree.
@@ -143,7 +143,7 @@ public class RuleContext<Symbol> implements RuleNode<Symbol> {
 	public int getRuleIndex() { return -1; }
 
 	@Override
-	public ParseTree<Symbol> getChild(int i) {
+	public ParseTree<Token> getChild(int i) {
 		return null;
 	}
 
@@ -153,7 +153,7 @@ public class RuleContext<Symbol> implements RuleNode<Symbol> {
 	}
 
 	@Override
-	public <T> T accept(ParseTreeVisitor<? super Symbol, ? extends T> visitor) {
+	public <T> T accept(ParseTreeVisitor<? super Token, ? extends T> visitor) {
 		return visitor.visitChildren(this);
 	}
 
@@ -223,7 +223,7 @@ public class RuleContext<Symbol> implements RuleNode<Symbol> {
 
 	@Override
 	public String toString() {
-		return toString((List<String>)null, (RuleContext<?>)null);
+		return toString((List<String>)null, (RuleContext)null);
 	}
 
 	public final String toString(@Nullable Recognizer<?, ?> recog) {
@@ -235,15 +235,15 @@ public class RuleContext<Symbol> implements RuleNode<Symbol> {
 	}
 
 	// recog null unless ParserRuleContext, in which case we use subclass toString(...)
-	public String toString(@Nullable Recognizer<?,?> recog, @Nullable RuleContext<?> stop) {
+	public String toString(@Nullable Recognizer<?,?> recog, @Nullable RuleContext stop) {
 		String[] ruleNames = recog != null ? recog.getRuleNames() : null;
 		List<String> ruleNamesList = ruleNames != null ? Arrays.asList(ruleNames) : null;
 		return toString(ruleNamesList, stop);
 	}
 
-	public String toString(@Nullable List<String> ruleNames, @Nullable RuleContext<?> stop) {
+	public String toString(@Nullable List<String> ruleNames, @Nullable RuleContext stop) {
 		StringBuilder buf = new StringBuilder();
-		RuleContext<?> p = this;
+		RuleContext p = this;
 		buf.append("[");
 		while (p != null && p != stop) {
 			if (ruleNames == null) {

@@ -1226,7 +1226,7 @@ public abstract class BaseTest {
 
 		@NotNull
 		@Override
-		public String getText(RuleContext<?> ctx) {
+		public String getText(RuleContext ctx) {
 			throw new UnsupportedOperationException("can't give strings");
 		}
 

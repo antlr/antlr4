@@ -136,15 +136,15 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	// subclass needs to override these if there are sempreds or actions
 	// that the ATN interp needs to execute
-	public boolean sempred(@Nullable RuleContext<Symbol> _localctx, int ruleIndex, int actionIndex) {
+	public boolean sempred(@Nullable RuleContext _localctx, int ruleIndex, int actionIndex) {
 		return true;
 	}
 
-	public boolean precpred(@Nullable RuleContext<Symbol> localctx, int precedence) {
+	public boolean precpred(@Nullable RuleContext localctx, int precedence) {
 		return true;
 	}
 
-	public void action(@Nullable RuleContext<Symbol> _localctx, int ruleIndex, int actionIndex) {
+	public void action(@Nullable RuleContext _localctx, int ruleIndex, int actionIndex) {
 	}
 
 	public final int getState() {

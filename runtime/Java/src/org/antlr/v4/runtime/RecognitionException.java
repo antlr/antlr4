@@ -47,7 +47,7 @@ public class RecognitionException extends RuntimeException {
 	private final Recognizer<?, ?> recognizer;
 
 	@Nullable
-	private final RuleContext<?> ctx;
+	private final RuleContext ctx;
 
 	@Nullable
 	private final IntStream input;
@@ -136,7 +136,7 @@ public class RecognitionException extends RuntimeException {
 	 * If the context is not available, this method returns {@code null}.
 	 */
 	@Nullable
-	public RuleContext<?> getCtx() {
+	public RuleContext getContext() {
 		return ctx;
 	}
 
@@ -177,11 +177,6 @@ public class RecognitionException extends RuntimeException {
 	@Nullable
 	public Recognizer<?, ?> getRecognizer() {
 		return recognizer;
-	}
-
-	@SuppressWarnings("unchecked") // safe
-	public <T> RuleContext<T> getContext(Recognizer<T, ?> recognizer) {
-		return this.recognizer == recognizer ? (RuleContext<T>)ctx : null;
 	}
 
 	@SuppressWarnings("unchecked") // safe

@@ -420,7 +420,7 @@ public class BufferedTokenStream<T extends Token> implements TokenStream<T> {
 
 	@NotNull
 	@Override
-	public String getText(RuleContext<?> ctx) {
+	public String getText(RuleContext ctx) {
 		return getText(ctx.getSourceInterval());
 	}
 

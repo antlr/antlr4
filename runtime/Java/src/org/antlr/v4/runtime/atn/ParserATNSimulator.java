@@ -1991,7 +1991,7 @@ public class ParserATNSimulator extends ATNSimulator {
 																			  exact, ambigAlts, configs);
     }
 
-	protected final int getReturnState(RuleContext<?> context) {
+	protected final int getReturnState(RuleContext context) {
 		if (context.isEmpty()) {
 			return PredictionContext.EMPTY_FULL_STATE_KEY;
 		}

@@ -33,7 +33,7 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.RuleContext;
 
 public interface RuleNode<Symbol> extends ParseTree<Symbol> {
-	RuleContext<Symbol> getRuleContext();
+	RuleContext getRuleContext();
 
 	@Override
 	RuleNode<Symbol> getParent();

@@ -65,7 +65,7 @@ import java.util.List;
  *  group values such as this aggregate.  The getters/setters are there to
  *  satisfy the superclass interface.
  */
-public class ParserRuleContext extends RuleContext<Token> {
+public class ParserRuleContext extends RuleContext {
 	private static final ParserRuleContext EMPTY = new ParserRuleContext();
 
 	/** If we are debugging or building a parse tree for a visitor,
@@ -135,7 +135,7 @@ public class ParserRuleContext extends RuleContext<Token> {
 		children.add(t);
 	}
 
-	public void addChild(RuleContext<Token> ruleInvocation) {
+	public void addChild(RuleContext ruleInvocation) {
 		if ( children==null ) children = new ArrayList<ParseTree<Token>>();
 		children.add(ruleInvocation);
 	}
