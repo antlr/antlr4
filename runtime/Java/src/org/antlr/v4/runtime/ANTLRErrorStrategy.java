@@ -49,7 +49,7 @@ import org.antlr.v4.runtime.misc.NotNull;
  * <p/>
  * TODO: what to do about lexers
  */
-public interface ANTLRErrorStrategy<Symbol extends Token> {
+public interface ANTLRErrorStrategy {
 	/**
 	 * Reset the error handler state for the specified {@code recognizer}.
 	 * @param recognizer the parser instance
@@ -72,7 +72,7 @@ public interface ANTLRErrorStrategy<Symbol extends Token> {
 	 * recover from the unexpected input symbol
 	 */
 	@NotNull
-	<T extends Symbol> T recoverInline(@NotNull Parser recognizer)
+	Token recoverInline(@NotNull Parser recognizer)
 		throws RecognitionException;
 
 	/**

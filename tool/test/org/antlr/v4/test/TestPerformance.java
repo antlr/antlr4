@@ -1337,7 +1337,7 @@ public class TestPerformance extends BaseTest {
 							parser.addParseListener(listener);
 						}
 						if (BAIL_ON_ERROR || TWO_STAGE_PARSING) {
-							parser.setErrorHandler(new BailErrorStrategy<Token>());
+							parser.setErrorHandler(new BailErrorStrategy());
 						}
 
                         Method parseMethod = parserClass.getMethod(entryPoint);
@@ -1396,7 +1396,7 @@ public class TestPerformance extends BaseTest {
 								parser.addParseListener(listener);
 							}
 							if (BAIL_ON_ERROR) {
-								parser.setErrorHandler(new BailErrorStrategy<Token>());
+								parser.setErrorHandler(new BailErrorStrategy());
 							}
 
 							parseResult = parseMethod.invoke(parser);

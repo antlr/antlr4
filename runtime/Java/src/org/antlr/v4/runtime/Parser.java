@@ -107,7 +107,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 * @see #setErrorHandler
 	 */
 	@NotNull
-	protected ANTLRErrorStrategy<? super Token> _errHandler = new DefaultErrorStrategy<Token>();
+	protected ANTLRErrorStrategy _errHandler = new DefaultErrorStrategy();
 
 	/**
 	 * The input stream.
@@ -431,11 +431,11 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
 	@NotNull
-	public ANTLRErrorStrategy<? super Token> getErrorHandler() {
+	public ANTLRErrorStrategy getErrorHandler() {
 		return _errHandler;
 	}
 
-	public void setErrorHandler(@NotNull ANTLRErrorStrategy<? super Token> handler) {
+	public void setErrorHandler(@NotNull ANTLRErrorStrategy handler) {
 		this._errHandler = handler;
 	}
 

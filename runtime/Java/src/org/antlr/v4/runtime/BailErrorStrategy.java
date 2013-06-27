@@ -34,9 +34,9 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 /** Bail out of parser at first syntax error. Do this to use it:
  *  <p/>
- *  {@code myparser.setErrorHandler(new BailErrorStrategy<Token>());}
+ *  {@code myparser.setErrorHandler(new BailErrorStrategy());}
  */
-public class BailErrorStrategy<Symbol extends Token> extends DefaultErrorStrategy<Symbol> {
+public class BailErrorStrategy extends DefaultErrorStrategy {
     /** Instead of recovering from exception {@code e}, re-throw it wrapped
      *  in a {@link ParseCancellationException} so it is not caught by the
      *  rule function catches.  Use {@link Exception#getCause()} to get the
@@ -55,7 +55,7 @@ public class BailErrorStrategy<Symbol extends Token> extends DefaultErrorStrateg
      *  successfully recovers, it won't throw an exception.
      */
     @Override
-    public <T extends Symbol> T recoverInline(Parser recognizer)
+    public Token recoverInline(Parser recognizer)
         throws RecognitionException
     {
 		InputMismatchException e = new InputMismatchException(recognizer);

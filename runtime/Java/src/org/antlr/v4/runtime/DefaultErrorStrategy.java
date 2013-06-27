@@ -42,7 +42,7 @@ import org.antlr.v4.runtime.misc.Tuple;
 /** This is the default error handling mechanism for ANTLR parsers
  *  and tree parsers.
  */
-public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStrategy<Symbol> {
+public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	/** This is true after we see an error and before having successfully
 	 *  matched a token. Prevents generation of more than one error message
 	 *  per error.
@@ -157,7 +157,7 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 		}
 	}
 
-	protected <T extends Symbol> void notifyErrorListeners(@NotNull Parser recognizer, String message, RecognitionException e) {
+	protected void notifyErrorListeners(@NotNull Parser recognizer, String message, RecognitionException e) {
 		recognizer.notifyErrorListeners(e.getOffendingToken(recognizer), message, e);
 	}
 
@@ -249,7 +249,7 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 			return;
 		}
 
-        TokenStream<? extends Symbol> tokens = (TokenStream<? extends Symbol>)(TokenStream)recognizer.getInputStream();
+        TokenStream<? extends Token> tokens = recognizer.getInputStream();
         int la = tokens.LA(1);
 
         // try cheaper subset first; might get lucky. seems to shave a wee bit off
@@ -300,7 +300,7 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 	protected void reportNoViableAlternative(@NotNull Parser recognizer,
 											 @NotNull NoViableAltException e)
 	{
-		TokenStream<? extends Symbol> tokens = (TokenStream<? extends Symbol>)(TokenStream)recognizer.getInputStream();
+		TokenStream<? extends Token> tokens = recognizer.getInputStream();
 		String input;
 		if (tokens instanceof TokenStream<?>) {
 			if ( e.getStartToken().getType()==Token.EOF ) input = "<EOF>";
@@ -325,7 +325,7 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 	protected void reportInputMismatch(@NotNull Parser recognizer,
 									   @NotNull InputMismatchException e)
 	{
-		String msg = "mismatched input "+getTokenErrorDisplay((Symbol)e.getOffendingToken(recognizer))+
+		String msg = "mismatched input "+getTokenErrorDisplay(e.getOffendingToken(recognizer))+
 		" expecting "+e.getExpectedTokens().toString(recognizer.getTokenNames());
 		notifyErrorListeners(recognizer, msg, e);
 	}
@@ -365,14 +365,14 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 	 *
 	 * @param recognizer the parser instance
 	 */
-	protected <T extends Symbol> void reportUnwantedToken(@NotNull Parser recognizer) {
+	protected void reportUnwantedToken(@NotNull Parser recognizer) {
 		if (inErrorRecoveryMode(recognizer)) {
 			return;
 		}
 
 		beginErrorCondition(recognizer);
 
-		T t = (T)recognizer.getCurrentToken();
+		Token t = recognizer.getCurrentToken();
 		String tokenName = getTokenErrorDisplay(t);
 		IntervalSet expecting = getExpectedTokens(recognizer);
 		String msg = "extraneous input "+tokenName+" expecting "+
@@ -397,14 +397,14 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 	 *
 	 * @param recognizer the parser instance
 	 */
-	protected <T extends Symbol> void reportMissingToken(@NotNull Parser recognizer) {
+	protected void reportMissingToken(@NotNull Parser recognizer) {
 		if (inErrorRecoveryMode(recognizer)) {
 			return;
 		}
 
 		beginErrorCondition(recognizer);
 
-		T t = (T)recognizer.getCurrentToken();
+		Token t = recognizer.getCurrentToken();
 		IntervalSet expecting = getExpectedTokens(recognizer);
 		String msg = "missing "+expecting.toString(recognizer.getTokenNames())+
 			" at "+getTokenErrorDisplay(t);
@@ -463,11 +463,11 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 	 * in rule {@code atom}. It can assume that you forgot the {@code ')'}.
 	 */
 	@Override
-	public <T extends Symbol> T recoverInline(Parser recognizer)
+	public Token recoverInline(Parser recognizer)
 		throws RecognitionException
 	{
 		// SINGLE TOKEN DELETION
-		T matchedSymbol = singleTokenDeletion(recognizer);
+		Token matchedSymbol = singleTokenDeletion(recognizer);
 		if ( matchedSymbol!=null ) {
 			// we have deleted the extra token.
 			// now, move past ttype token as if all were ok
@@ -538,7 +538,7 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 	 * {@code null}
 	 */
 	@Nullable
-	protected <T extends Symbol> T singleTokenDeletion(@NotNull Parser recognizer) {
+	protected Token singleTokenDeletion(@NotNull Parser recognizer) {
 		int nextTokenType = recognizer.getInputStream().LA(2);
 		IntervalSet expecting = getExpectedTokens(recognizer);
 		if ( expecting.contains(nextTokenType) ) {
@@ -551,7 +551,7 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 			*/
 			recognizer.consume(); // simply delete extra token
 			// we want to return the token we're actually matching
-			T matchedSymbol = (T)recognizer.getCurrentToken();
+			Token matchedSymbol = recognizer.getCurrentToken();
 			reportMatch(recognizer);  // we know current token is correct
 			return matchedSymbol;
 		}
@@ -578,27 +578,27 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 	 *  override this method to create the appropriate tokens.
 	 */
 	@NotNull
-	protected <T extends Symbol> T getMissingSymbol(@NotNull Parser recognizer) {
-		Symbol currentSymbol = (Symbol)recognizer.getCurrentToken();
+	protected Token getMissingSymbol(@NotNull Parser recognizer) {
+		Token currentSymbol = recognizer.getCurrentToken();
 		IntervalSet expecting = getExpectedTokens(recognizer);
 		int expectedTokenType = expecting.getMinElement(); // get any element
 		String tokenText;
 		if ( expectedTokenType== Token.EOF ) tokenText = "<missing EOF>";
 		else tokenText = "<missing "+recognizer.getTokenNames()[expectedTokenType]+">";
-		Symbol current = currentSymbol;
-		Symbol lookback = (Symbol)recognizer.getInputStream().LT(-1);
+		Token current = currentSymbol;
+		Token lookback = (Token)recognizer.getInputStream().LT(-1);
 		if ( current.getType() == Token.EOF && lookback!=null ) {
 			current = lookback;
 		}
 
-		return constructToken((TokenSource<T>)recognizer.getInputStream().getTokenSource(), expectedTokenType, tokenText, current);
+		return constructToken((TokenSource<Token>)recognizer.getInputStream().getTokenSource(), expectedTokenType, tokenText, current);
 	}
 
-	protected <T extends Symbol> T constructToken(TokenSource<T> tokenSource, int expectedTokenType, String tokenText, Symbol current) {
-		TokenFactory<? extends T> factory = tokenSource.getTokenFactory();
+	protected Token constructToken(TokenSource<Token> tokenSource, int expectedTokenType, String tokenText, Token current) {
+		TokenFactory<? extends Token> factory = tokenSource.getTokenFactory();
 		return
 			factory.create(Tuple.create(tokenSource, current.getTokenSource().getInputStream()), expectedTokenType, tokenText,
-							Symbol.DEFAULT_CHANNEL,
+							Token.DEFAULT_CHANNEL,
 							-1, -1,
 							current.getLine(), current.getCharPositionInLine());
 	}
@@ -616,7 +616,7 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 	 *  your token objects because you don't have to go modify your lexer
 	 *  so that it creates a new Java type.
 	 */
-	protected String getTokenErrorDisplay(Symbol t) {
+	protected String getTokenErrorDisplay(Token t) {
 		if ( t==null ) return "<no token>";
 		String s = getSymbolText(t);
 		if ( s==null ) {
@@ -630,11 +630,11 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 		return escapeWSAndQuote(s);
 	}
 
-	protected String getSymbolText(@NotNull Symbol symbol) {
+	protected String getSymbolText(@NotNull Token symbol) {
 		return symbol.getText();
 	}
 
-	protected int getSymbolType(@NotNull Symbol symbol) {
+	protected int getSymbolType(@NotNull Token symbol) {
 		return symbol.getType();
 	}
 
@@ -752,7 +752,7 @@ public class DefaultErrorStrategy<Symbol extends Token> implements ANTLRErrorStr
 			recoverSet.addAll(follow);
 			ctx = ctx.parent;
 		}
-        recoverSet.remove(Symbol.EPSILON);
+        recoverSet.remove(Token.EPSILON);
 //		System.out.println("recover set "+recoverSet.toString(recognizer.getTokenNames()));
 		return recoverSet;
 	}
