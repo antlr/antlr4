@@ -91,7 +91,7 @@ public class ParserInterpreter {
 	}
 
 	public int adaptivePredict(@NotNull TokenStream<Token> input, int decision,
-							   @Nullable ParserRuleContext<Token> outerContext)
+							   @Nullable ParserRuleContext outerContext)
 	{
 		return atnSimulator.adaptivePredict(input, decision, outerContext);
 	}

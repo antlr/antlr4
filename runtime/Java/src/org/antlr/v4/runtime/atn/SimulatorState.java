@@ -37,15 +37,15 @@ import org.antlr.v4.runtime.misc.NotNull;
  * @author Sam Harwell
  */
 public class SimulatorState<Symbol extends Token> {
-	public final ParserRuleContext<Symbol> outerContext;
+	public final ParserRuleContext outerContext;
 
 	public final DFAState s0;
 
 	public final boolean useContext;
-	public final ParserRuleContext<Symbol> remainingOuterContext;
+	public final ParserRuleContext remainingOuterContext;
 
-	public SimulatorState(ParserRuleContext<Symbol> outerContext, @NotNull DFAState s0, boolean useContext, ParserRuleContext<Symbol> remainingOuterContext) {
-		this.outerContext = outerContext != null ? outerContext : ParserRuleContext.<Symbol>emptyContext();
+	public SimulatorState(ParserRuleContext outerContext, @NotNull DFAState s0, boolean useContext, ParserRuleContext remainingOuterContext) {
+		this.outerContext = outerContext != null ? outerContext : ParserRuleContext.emptyContext();
 		this.s0 = s0;
 		this.useContext = useContext;
 		this.remainingOuterContext = remainingOuterContext;

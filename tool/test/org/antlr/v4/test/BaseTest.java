@@ -1000,17 +1000,17 @@ public abstract class BaseTest {
 			"        <createParser>\n"+
 			"		 parser.setBuildParseTree(true);\n" +
 			"		 parser.getInterpreter().reportAmbiguities = true;\n" +
-			"        ParserRuleContext\\<Token> tree = parser.<parserStartRuleName>();\n" +
+			"        ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
 			"        ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
 			"    }\n" +
 			"\n" +
 			"	static class TreeShapeListener implements ParseTreeListener\\<Token> {\n" +
 			"		@Override public void visitTerminal(TerminalNode\\<? extends Token> node) { }\n" +
 			"		@Override public void visitErrorNode(ErrorNode\\<? extends Token> node) { }\n" +
-			"		@Override public void exitEveryRule(ParserRuleContext\\<? extends Token> ctx) { }\n" +
+			"		@Override public void exitEveryRule(ParserRuleContext ctx) { }\n" +
 			"\n" +
 			"		@Override\n" +
-			"		public void enterEveryRule(ParserRuleContext\\<? extends Token> ctx) {\n" +
+			"		public void enterEveryRule(ParserRuleContext ctx) {\n" +
 			"			for (int i = 0; i \\< ctx.getChildCount(); i++) {\n" +
 			"				ParseTree\\<? extends Token> parent = ctx.getChild(i).getParent();\n" +
 			"				if (!(parent instanceof RuleNode) || ((RuleNode\\<? extends Token>)parent).getRuleContext() != ctx) {\n" +

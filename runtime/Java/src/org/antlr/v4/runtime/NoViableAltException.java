@@ -62,12 +62,12 @@ public class NoViableAltException extends RecognitionException {
 			 recognizer._ctx);
 	}
 
-	public <Symbol extends Token> NoViableAltException(@NotNull Recognizer<Symbol, ?> recognizer,
-													   @NotNull TokenStream<? extends Symbol> input,
-													   @NotNull Symbol startToken,
-													   @NotNull Symbol offendingToken,
-													   @Nullable ATNConfigSet deadEndConfigs,
-													   @NotNull ParserRuleContext<Symbol> ctx)
+	public NoViableAltException(@NotNull Recognizer<Token, ?> recognizer,
+								@NotNull TokenStream<? extends Token> input,
+								@NotNull Token startToken,
+								@NotNull Token offendingToken,
+								@Nullable ATNConfigSet deadEndConfigs,
+								@NotNull ParserRuleContext ctx)
 	{
 		super(recognizer, input, ctx);
 		this.deadEndConfigs = deadEndConfigs;

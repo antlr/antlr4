@@ -62,14 +62,14 @@ public class ParseTreeWalker {
 	 * the rule specific. We to them in reverse order upon finishing the node.
 	 */
     protected <Symbol extends Token> void enterRule(ParseTreeListener<? super Symbol> listener, RuleNode<Symbol> r) {
-		ParserRuleContext<Symbol> ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
+		ParserRuleContext ctx = (ParserRuleContext)r.getRuleContext();
 		listener.enterEveryRule(ctx);
-		ctx.enterRule(listener);
+		ctx.enterRule((ParseTreeListener<? super Token>)listener);
     }
 
     protected <Symbol extends Token> void exitRule(ParseTreeListener<? super Symbol> listener, RuleNode<Symbol> r) {
-		ParserRuleContext<Symbol> ctx = (ParserRuleContext<Symbol>)r.getRuleContext();
-		ctx.exitRule(listener);
+		ParserRuleContext ctx = (ParserRuleContext)r.getRuleContext();
+		ctx.exitRule((ParseTreeListener<? super Token>)listener);
 		listener.exitEveryRule(ctx);
     }
 }

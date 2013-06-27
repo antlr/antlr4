@@ -1413,7 +1413,7 @@ public class TestPerformance extends BaseTest {
 
 						assertThat(parseResult, instanceOf(ParseTree.class));
                         if (BUILD_PARSE_TREES && BLANK_LISTENER) {
-                            ParseTreeWalker.DEFAULT.walk(listener, (ParserRuleContext<?>)parseResult);
+                            ParseTreeWalker.DEFAULT.walk(listener, (ParserRuleContext)parseResult);
                         }
 
 						return new FileParseResult(input.getSourceName(), (int)checksum.getValue(), (ParseTree<?>)parseResult, tokens.size(), TIME_PARSE_ONLY ? parseStartTime : startTime, lexer, parser);
@@ -1586,7 +1586,7 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public int adaptivePredict(TokenStream<? extends Token> input, int decision, ParserRuleContext<Token> outerContext) {
+		public int adaptivePredict(TokenStream<? extends Token> input, int decision, ParserRuleContext outerContext) {
 			try {
 				this.decision = decision;
 				decisionInvocations[decision]++;
@@ -1598,7 +1598,7 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public int adaptivePredict(TokenStream<? extends Token> input, int decision, ParserRuleContext<Token> outerContext, boolean useContext) {
+		public int adaptivePredict(TokenStream<? extends Token> input, int decision, ParserRuleContext outerContext, boolean useContext) {
 			if (useContext) {
 				fullContextFallback[decision]++;
 			}
@@ -1613,7 +1613,7 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		protected Tuple2<DFAState, ParserRuleContext<Token>> computeTargetState(DFA dfa, DFAState s, ParserRuleContext<Token> remainingGlobalContext, int t, boolean useContext, PredictionContextCache contextCache) {
+		protected Tuple2<DFAState, ParserRuleContext> computeTargetState(DFA dfa, DFAState s, ParserRuleContext remainingGlobalContext, int t, boolean useContext, PredictionContextCache contextCache) {
 			computedTransitions[decision]++;
 			return super.computeTargetState(dfa, s, remainingGlobalContext, t, useContext, contextCache);
 		}
@@ -1972,14 +1972,14 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public void enterEveryRule(ParserRuleContext<? extends Token> ctx) {
+		public void enterEveryRule(ParserRuleContext ctx) {
 			checksum.update(ENTER_RULE);
 			updateChecksum(checksum, ctx.getRuleIndex());
 			updateChecksum(checksum, ctx.getStart());
 		}
 
 		@Override
-		public void exitEveryRule(ParserRuleContext<? extends Token> ctx) {
+		public void exitEveryRule(ParserRuleContext ctx) {
 			checksum.update(EXIT_RULE);
 			updateChecksum(checksum, ctx.getRuleIndex());
 			updateChecksum(checksum, ctx.getStop());

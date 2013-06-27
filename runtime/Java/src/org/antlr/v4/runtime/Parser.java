@@ -52,13 +52,13 @@ import java.util.List;
 public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	public class TraceListener implements ParseTreeListener<Token> {
 		@Override
-		public void enterEveryRule(ParserRuleContext<? extends Token> ctx) {
+		public void enterEveryRule(ParserRuleContext ctx) {
 			System.out.println("enter   " + getRuleNames()[ctx.getRuleIndex()] +
 							   ", LT(1)=" + _input.LT(1).getText());
 		}
 
 		@Override
-		public void exitEveryRule(ParserRuleContext<? extends Token> ctx) {
+		public void exitEveryRule(ParserRuleContext ctx) {
 			System.out.println("exit    "+getRuleNames()[ctx.getRuleIndex()]+
 							   ", LT(1)="+_input.LT(1).getText());
 		}
@@ -69,7 +69,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 
 		@Override
 		public void visitTerminal(TerminalNode<? extends Token> node) {
-			ParserRuleContext<?> parent = (ParserRuleContext<?>)node.getParent().getRuleContext();
+			ParserRuleContext parent = (ParserRuleContext)node.getParent().getRuleContext();
 			Token token = node.getSymbol();
 			System.out.println("consume "+token+" rule "+
 							   getRuleNames()[parent.getRuleIndex()]);
@@ -88,11 +88,11 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		}
 
 		@Override
-		public void enterEveryRule(ParserRuleContext<? extends Token> ctx) {
+		public void enterEveryRule(ParserRuleContext ctx) {
 		}
 
 		@Override
-		public void exitEveryRule(ParserRuleContext<? extends Token> ctx) {
+		public void exitEveryRule(ParserRuleContext ctx) {
 			if (ctx.children instanceof ArrayList) {
 				((ArrayList<?>)ctx.children).trimToSize();
 			}
@@ -126,7 +126,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 * The {@link ParserRuleContext} object for the currently executing rule.
 	 * This is always non-null during the parsing process.
 	 */
-	protected ParserRuleContext<Token> _ctx;
+	protected ParserRuleContext _ctx;
 
 	/**
 	 * Specifies whether or not the parser should construct a parse tree during
@@ -526,7 +526,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
 	protected void addContextToParseTree() {
-		ParserRuleContext<Token> parent = (ParserRuleContext<Token>)_ctx.parent;
+		ParserRuleContext parent = (ParserRuleContext)_ctx.parent;
 		// add current context to parent if we have a parent
 		if ( parent!=null )	{
 			parent.addChild(_ctx);
@@ -537,7 +537,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 * Always called by generated parsers upon entry to a rule. Access field
 	 * {@link #_ctx} get the current context.
 	 */
-	public void enterRule(@NotNull ParserRuleContext<Token> localctx, int state, int ruleIndex) {
+	public void enterRule(@NotNull ParserRuleContext localctx, int state, int ruleIndex) {
 		setState(state);
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
@@ -545,10 +545,10 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
         if ( _parseListeners != null) triggerEnterRuleEvent();
 	}
 
-	public void enterLeftFactoredRule(ParserRuleContext<Token> localctx, int state, int ruleIndex) {
+	public void enterLeftFactoredRule(ParserRuleContext localctx, int state, int ruleIndex) {
 		setState(state);
 		if (_buildParseTrees) {
-			ParserRuleContext<Token> factoredContext = (ParserRuleContext<Token>)_ctx.getChild(_ctx.getChildCount() - 1);
+			ParserRuleContext factoredContext = (ParserRuleContext)_ctx.getChild(_ctx.getChildCount() - 1);
 			_ctx.removeLastChild();
 			factoredContext.parent = localctx;
 			localctx.addChild(factoredContext);
@@ -570,14 +570,14 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
         // trigger event on _ctx, before it reverts to parent
         if ( _parseListeners != null) triggerExitRuleEvent();
 		setState(_ctx.invokingState);
-		_ctx = (ParserRuleContext<Token>)_ctx.parent;
+		_ctx = (ParserRuleContext)_ctx.parent;
     }
 
-	public void enterOuterAlt(ParserRuleContext<Token> localctx, int altNum) {
+	public void enterOuterAlt(ParserRuleContext localctx, int altNum) {
 		// if we have new localctx, make sure we replace existing ctx
 		// that is previous child of parse tree
 		if ( _buildParseTrees && _ctx != localctx ) {
-			ParserRuleContext<Token> parent = (ParserRuleContext<Token>)_ctx.parent;
+			ParserRuleContext parent = (ParserRuleContext)_ctx.parent;
 			if ( parent!=null )	{
 				parent.removeLastChild();
 				parent.addChild(localctx);
@@ -586,7 +586,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		_ctx = localctx;
 	}
 
-	public void enterRecursionRule(ParserRuleContext<Token> localctx, int ruleIndex, int precedence) {
+	public void enterRecursionRule(ParserRuleContext localctx, int ruleIndex, int precedence) {
 		_precedenceStack.push(precedence);
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
@@ -598,8 +598,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	/**
 	 * Like {@link #enterRule} but for recursive rules.
 	 */
-	public void pushNewRecursionContext(ParserRuleContext<Token> localctx, int state, int ruleIndex) {
-		ParserRuleContext<Token> previous = _ctx;
+	public void pushNewRecursionContext(ParserRuleContext localctx, int state, int ruleIndex) {
+		ParserRuleContext previous = _ctx;
 		previous.parent = localctx;
 		previous.invokingState = state;
 		previous.stop = _input.LT(-1);
@@ -615,16 +615,16 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		}
 	}
 
-	public void unrollRecursionContexts(ParserRuleContext<Token> _parentctx) {
+	public void unrollRecursionContexts(ParserRuleContext _parentctx) {
 		_precedenceStack.pop();
 		_ctx.stop = _input.LT(-1);
-		ParserRuleContext<Token> retctx = _ctx; // save current ctx (return value)
+		ParserRuleContext retctx = _ctx; // save current ctx (return value)
 
 		// unroll so _ctx is as it was before call to recursive method
 		if ( _parseListeners != null ) {
 			while ( _ctx != _parentctx ) {
 				triggerExitRuleEvent();
-				_ctx = (ParserRuleContext<Token>)_ctx.parent;
+				_ctx = (ParserRuleContext)_ctx.parent;
 			}
 		}
 		else {
@@ -640,16 +640,16 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		}
 	}
 
-	public ParserRuleContext<Token> getInvokingContext(int ruleIndex) {
-		ParserRuleContext<Token> p = _ctx;
+	public ParserRuleContext getInvokingContext(int ruleIndex) {
+		ParserRuleContext p = _ctx;
 		while ( p!=null ) {
 			if ( p.getRuleIndex() == ruleIndex ) return p;
-			p = (ParserRuleContext<Token>)p.parent;
+			p = (ParserRuleContext)p.parent;
 		}
 		return null;
 	}
 
-	public ParserRuleContext<Token> getContext() {
+	public ParserRuleContext getContext() {
 		return _ctx;
 	}
 
@@ -685,7 +685,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
     public boolean isExpectedToken(int symbol) {
 //   		return getInterpreter().atn.nextTokens(_ctx);
         ATN atn = getInterpreter().atn;
-		ParserRuleContext<?> ctx = _ctx;
+		ParserRuleContext ctx = _ctx;
         ATNState s = atn.states.get(getState());
         IntervalSet following = atn.nextTokens(s);
         if (following.contains(symbol)) {
@@ -702,7 +702,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
                 return true;
             }
 
-            ctx = (ParserRuleContext<?>)ctx.parent;
+            ctx = (ParserRuleContext)ctx.parent;
         }
 
         if ( following.contains(Token.EPSILON) && symbol == Token.EOF ) {
@@ -741,7 +741,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 //		return atn.nextTokens(s, ctx);
 //	}
 
-	public ParserRuleContext<Token> getRuleContext() { return _ctx; }
+	public ParserRuleContext getRuleContext() { return _ctx; }
 
 	/** Return List&lt;String&gt; of the rule names in your parser instance
 	 *  leading up to a call to the current rule.  You could override if

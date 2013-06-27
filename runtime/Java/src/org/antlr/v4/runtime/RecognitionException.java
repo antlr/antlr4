@@ -69,9 +69,9 @@ public class RecognitionException extends RuntimeException {
 		this.ctx = null;
 	}
 
-	public <Symbol extends Token> RecognitionException(@Nullable Recognizer<Symbol, ?> recognizer,
-													   @Nullable IntStream input,
-													   @Nullable ParserRuleContext<Symbol> ctx)
+	public RecognitionException(@Nullable Recognizer<Token, ?> recognizer,
+								@Nullable IntStream input,
+								@Nullable ParserRuleContext ctx)
 	{
 		this.recognizer = recognizer;
 		this.input = input;
@@ -79,10 +79,10 @@ public class RecognitionException extends RuntimeException {
 		if ( recognizer!=null ) this.offendingState = recognizer.getState();
 	}
 
-	public <Symbol extends Token> RecognitionException(String message,
-													   @Nullable Recognizer<Symbol, ?> recognizer,
-													   @Nullable IntStream input,
-													   @Nullable ParserRuleContext<Symbol> ctx)
+	public RecognitionException(String message,
+								@Nullable Recognizer<Token, ?> recognizer,
+								@Nullable IntStream input,
+								@Nullable ParserRuleContext ctx)
 	{
 		super(message);
 		this.recognizer = recognizer;

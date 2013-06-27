@@ -308,14 +308,14 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	public int adaptivePredict(@NotNull TokenStream<? extends Token> input, int decision,
-							   @Nullable ParserRuleContext<Token> outerContext)
+							   @Nullable ParserRuleContext outerContext)
 	{
 		return adaptivePredict(input, decision, outerContext, false);
 	}
 
 	public int adaptivePredict(@NotNull TokenStream<? extends Token> input,
 							   int decision,
-							   @Nullable ParserRuleContext<Token> outerContext,
+							   @Nullable ParserRuleContext outerContext,
 							   boolean useContext)
 	{
 		DFA dfa = atn.decisionToDFA[decision];
@@ -372,7 +372,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	protected SimulatorState<Token> getStartState(@NotNull DFA dfa,
 										@NotNull TokenStream<? extends Token> input,
-										@NotNull ParserRuleContext<Token> outerContext,
+										@NotNull ParserRuleContext outerContext,
 										boolean useContext) {
 
 		if (!useContext) {
@@ -383,7 +383,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			return new SimulatorState<Token>(outerContext, dfa.s0.get(), false, outerContext);
 		}
 
-		ParserRuleContext<Token> remainingContext = outerContext;
+		ParserRuleContext remainingContext = outerContext;
 		assert outerContext != null;
 		DFAState s0 = dfa.s0full.get();
 		while (remainingContext != null && s0 != null && s0.isContextSensitive()) {
@@ -408,7 +408,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					   @NotNull TokenStream<? extends Token> input, int startIndex,
 					   @NotNull SimulatorState<Token> state)
     {
-		ParserRuleContext<Token> outerContext = state.outerContext;
+		ParserRuleContext outerContext = state.outerContext;
 		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
 											" exec LA(1)=="+ getLookaheadName(input) +
 											", outerContext="+outerContext.toString(parser));
@@ -417,7 +417,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		DFAState s = state.s0;
 
 		int t = input.LA(1);
-		ParserRuleContext<Token> remainingOuterContext = state.remainingOuterContext;
+		ParserRuleContext remainingOuterContext = state.remainingOuterContext;
 
 		while ( true ) {
 			if ( dfa_debug ) System.out.println("DFA state "+s.stateNumber+" LA(1)=="+getLookaheadName(input));
@@ -634,7 +634,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	{
 		if ( debug ) System.out.println("execATN decision "+dfa.decision+" exec LA(1)=="+ getLookaheadName(input));
 
-		final ParserRuleContext<Token> outerContext = initialState.outerContext;
+		final ParserRuleContext outerContext = initialState.outerContext;
 		final boolean useContext = initialState.useContext;
 
 		int t = input.LA(1);
@@ -776,7 +776,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	protected SimulatorState<Token> computeReachSet(DFA dfa, SimulatorState<Token> previous, int t, PredictionContextCache contextCache) {
 		final boolean useContext = previous.useContext;
-		ParserRuleContext<Token> remainingGlobalContext = previous.remainingOuterContext;
+		ParserRuleContext remainingGlobalContext = previous.remainingOuterContext;
 
 		DFAState s = previous.s0;
 		if ( useContext ) {
@@ -805,7 +805,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		DFAState target = getExistingTargetState(s0, t);
 		if (target == null) {
-			Tuple2<DFAState, ParserRuleContext<Token>> result = computeTargetState(dfa, s0, remainingGlobalContext, t, useContext, contextCache);
+			Tuple2<DFAState, ParserRuleContext> result = computeTargetState(dfa, s0, remainingGlobalContext, t, useContext, contextCache);
 			target = result.getItem1();
 			remainingGlobalContext = result.getItem2();
 		}
@@ -850,7 +850,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * returns {@link #ERROR}.
 	 */
 	@NotNull
-	protected Tuple2<DFAState, ParserRuleContext<Token>> computeTargetState(@NotNull DFA dfa, @NotNull DFAState s, ParserRuleContext<Token> remainingGlobalContext, int t, boolean useContext, PredictionContextCache contextCache) {
+	protected Tuple2<DFAState, ParserRuleContext> computeTargetState(@NotNull DFA dfa, @NotNull DFAState s, ParserRuleContext remainingGlobalContext, int t, boolean useContext, PredictionContextCache contextCache) {
 		List<ATNConfig> closureConfigs = new ArrayList<ATNConfig>(s.configs);
 		IntegerList contextElements = null;
 		ATNConfigSet reach = new ATNConfigSet();
@@ -1021,7 +1021,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	@NotNull
 	protected SimulatorState<Token> computeStartState(DFA dfa,
-											ParserRuleContext<Token> globalContext,
+											ParserRuleContext globalContext,
 											boolean useContext)
 	{
 		DFAState s0 = useContext ? dfa.s0full.get() : dfa.s0.get();
@@ -1038,7 +1038,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		final ATNState p = dfa.atnStartState;
 
 		int previousContext = 0;
-		ParserRuleContext<Token> remainingGlobalContext = globalContext;
+		ParserRuleContext remainingGlobalContext = globalContext;
 		PredictionContext initialContext = useContext ? PredictionContext.EMPTY_FULL : PredictionContext.EMPTY_LOCAL; // always at least the implicit call to start rule
 		PredictionContextCache contextCache = new PredictionContextCache();
 		if (useContext) {
@@ -1233,7 +1233,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 *  unpredicated config which behaves as "always true."
 	 */
 	protected BitSet evalSemanticContext(@NotNull DFAState.PredPrediction[] predPredictions,
-										   ParserRuleContext<Token> outerContext,
+										   ParserRuleContext outerContext,
 										   boolean complete)
 	{
 		BitSet predictions = new BitSet();
@@ -1789,7 +1789,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	@NotNull
 	protected NoViableAltException noViableAlt(@NotNull TokenStream<? extends Token> input,
-											@NotNull ParserRuleContext<Token> outerContext,
+											@NotNull ParserRuleContext outerContext,
 											@NotNull ATNConfigSet configs,
 											int startIndex)
 	{
@@ -2001,7 +2001,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return transition.followState.stateNumber;
 	}
 
-	protected final <T extends Token> ParserRuleContext<T> skipTailCalls(ParserRuleContext<T> context) {
+	protected final ParserRuleContext skipTailCalls(ParserRuleContext context) {
 		if (!optimize_tail_calls) {
 			return context;
 		}
