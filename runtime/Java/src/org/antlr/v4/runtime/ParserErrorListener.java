@@ -86,7 +86,6 @@ public interface ParserErrorListener<Symbol extends Token> extends ANTLRErrorLis
 	 * subset of alternatives which are still viable after predicates are
 	 * evaluated is reported in {@code conflictingAlts}.
 	 *
-	 * @param <T> The parser symbol type.
 	 * @param recognizer the parser instance
 	 * @param dfa the DFA for the current decision
 	 * @param startIndex the input index where the decision started
@@ -97,12 +96,12 @@ public interface ParserErrorListener<Symbol extends Token> extends ANTLRErrorLis
 	 * @param conflictState the simulator state when the SLL conflict was
 	 * detected
 	 */
-	<T extends Symbol> void reportAttemptingFullContext(@NotNull Parser recognizer,
+	void reportAttemptingFullContext(@NotNull Parser recognizer,
 									 @NotNull DFA dfa,
 									 int startIndex,
 									 int stopIndex,
 									 @Nullable BitSet conflictingAlts,
-									 @NotNull SimulatorState<T> conflictState);
+									 @NotNull SimulatorState conflictState);
 
 	/**
 	 * This method is called by the parser when a full-context prediction has a
@@ -121,7 +120,6 @@ public interface ParserErrorListener<Symbol extends Token> extends ANTLRErrorLis
 	 * beginning the full-context prediction. In all cases, the final prediction
 	 * is passed as the {@code prediction} argument.
 	 *
-	 * @param <T> The parser symbol type.
 	 * @param recognizer the parser instance
 	 * @param dfa the DFA for the current decision
 	 * @param startIndex the input index where the decision started
@@ -131,10 +129,10 @@ public interface ParserErrorListener<Symbol extends Token> extends ANTLRErrorLis
 	 * @param acceptState the simulator state when the unambiguous prediction
 	 * was determined
 	 */
-	<T extends Symbol> void reportContextSensitivity(@NotNull Parser recognizer,
+	void reportContextSensitivity(@NotNull Parser recognizer,
 								  @NotNull DFA dfa,
 								  int startIndex,
 								  int stopIndex,
 								  int prediction,
-								  @NotNull SimulatorState<T> acceptState);
+								  @NotNull SimulatorState acceptState);
 }

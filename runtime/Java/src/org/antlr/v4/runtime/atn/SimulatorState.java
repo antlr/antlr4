@@ -28,7 +28,6 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.NotNull;
 
@@ -36,7 +35,7 @@ import org.antlr.v4.runtime.misc.NotNull;
  *
  * @author Sam Harwell
  */
-public class SimulatorState<Symbol extends Token> {
+public class SimulatorState {
 	public final ParserRuleContext outerContext;
 
 	public final DFAState s0;

@@ -108,12 +108,12 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 	}
 
 	@Override
-	public <T extends Symbol> void reportAttemptingFullContext(@NotNull Parser recognizer,
+	public void reportAttemptingFullContext(@NotNull Parser recognizer,
 											@NotNull DFA dfa,
 											int startIndex,
 											int stopIndex,
 											@Nullable BitSet conflictingAlts,
-											@NotNull SimulatorState<T> conflictState)
+											@NotNull SimulatorState conflictState)
 	{
 		String format = "reportAttemptingFullContext d=%s, input='%s'";
 		String decision = getDecisionDescription(recognizer, dfa);
@@ -123,12 +123,12 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 	}
 
 	@Override
-	public <T extends Symbol> void reportContextSensitivity(@NotNull Parser recognizer,
+	public void reportContextSensitivity(@NotNull Parser recognizer,
 										 @NotNull DFA dfa,
 										 int startIndex,
 										 int stopIndex,
 										 int prediction,
-										 @NotNull SimulatorState<T> acceptState)
+										 @NotNull SimulatorState acceptState)
 	{
 		String format = "reportContextSensitivity d=%s, input='%s'";
 		String decision = getDecisionDescription(recognizer, dfa);

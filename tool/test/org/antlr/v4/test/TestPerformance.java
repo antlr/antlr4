@@ -1615,7 +1615,7 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		protected SimulatorState<Token> computeReachSet(DFA dfa, SimulatorState<Token> previous, int t, PredictionContextCache contextCache) {
+		protected SimulatorState computeReachSet(DFA dfa, SimulatorState previous, int t, PredictionContextCache contextCache) {
 			if (previous.useContext) {
 				totalTransitions[decision]++;
 				computedTransitions[decision]++;
@@ -1693,7 +1693,7 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public <T extends Token> void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, SimulatorState<T> conflictState) {
+		public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, SimulatorState conflictState) {
 			_sllConflict = conflictingAlts;
 			_sllConfigs = conflictState.s0.configs;
 			if (!REPORT_FULL_CONTEXT) {
@@ -1710,7 +1710,7 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public <T extends Token> void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, SimulatorState<T> acceptState) {
+		public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, SimulatorState acceptState) {
 			if (COMPUTE_TRANSITION_STATS && DETAILED_DFA_STATE_STATS) {
 				BitSet sllPredictions = getConflictingAlts(_sllConflict, _sllConfigs);
 				int sllPrediction = sllPredictions.nextSetBit(0);

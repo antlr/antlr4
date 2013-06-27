@@ -61,22 +61,22 @@ public class BaseErrorListener<Symbol extends Token> implements ParserErrorListe
 	}
 
 	@Override
-	public <T extends Symbol> void reportAttemptingFullContext(Parser recognizer,
-															   DFA dfa,
-															   int startIndex,
-															   int stopIndex,
-															   BitSet conflictingAlts,
-															   SimulatorState<T> conflictState)
+	public void reportAttemptingFullContext(Parser recognizer,
+											DFA dfa,
+											int startIndex,
+											int stopIndex,
+											BitSet conflictingAlts,
+											SimulatorState conflictState)
 	{
 	}
 
 	@Override
-	public <T extends Symbol> void reportContextSensitivity(Parser recognizer,
-															DFA dfa,
-															int startIndex,
-															int stopIndex,
-															int prediction,
-															SimulatorState<T> acceptState)
+	public void reportContextSensitivity(Parser recognizer,
+										 DFA dfa,
+										 int startIndex,
+										 int stopIndex,
+										 int prediction,
+										 SimulatorState acceptState)
 	{
 	}
 }
