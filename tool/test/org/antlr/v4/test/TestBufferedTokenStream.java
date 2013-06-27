@@ -45,7 +45,7 @@ import static org.junit.Assert.*;
 public class TestBufferedTokenStream extends BaseTest {
 
 	protected TokenStream<Token> createTokenStream(TokenSource<? extends Token> src) {
-		return new BufferedTokenStream<Token>(src);
+		return new BufferedTokenStream(src);
 	}
 
 	@Test public void testFirstToken() throws Exception {

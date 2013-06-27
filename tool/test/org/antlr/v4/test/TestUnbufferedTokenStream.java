@@ -65,7 +65,7 @@ public class TestUnbufferedTokenStream extends BaseTest {
 		);
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 			lexEngine.setInput(input);
-        TokenStream<Token> tokens = new UnbufferedTokenStream<Token>(lexEngine);
+        TokenStream<Token> tokens = new UnbufferedTokenStream(lexEngine);
 
 		assertEquals("x", tokens.LT(1).getText());
 		assertEquals(" ", tokens.LT(2).getText());
@@ -92,7 +92,7 @@ public class TestUnbufferedTokenStream extends BaseTest {
 		);
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 			lexEngine.setInput(input);
-		TestingUnbufferedTokenStream<Token> tokens = new TestingUnbufferedTokenStream<Token>(lexEngine);
+		TestingUnbufferedTokenStream tokens = new TestingUnbufferedTokenStream(lexEngine);
 
 		assertEquals("[[@0,0:0='x',<1>,1:0]]", tokens.getBuffer().toString());
 		assertEquals("x", tokens.LT(1).getText());
@@ -130,7 +130,7 @@ public class TestUnbufferedTokenStream extends BaseTest {
 		);
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 			lexEngine.setInput(input);
-		TestingUnbufferedTokenStream<Token> tokens = new TestingUnbufferedTokenStream<Token>(lexEngine);
+		TestingUnbufferedTokenStream tokens = new TestingUnbufferedTokenStream(lexEngine);
 
 		int m = tokens.mark();
 		assertEquals("[[@0,0:0='x',<1>,1:0]]", tokens.getBuffer().toString());
@@ -166,7 +166,7 @@ public class TestUnbufferedTokenStream extends BaseTest {
 		);
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 		lexEngine.setInput(input);
-		TestingUnbufferedTokenStream<Token> tokens = new TestingUnbufferedTokenStream<Token>(lexEngine);
+		TestingUnbufferedTokenStream tokens = new TestingUnbufferedTokenStream(lexEngine);
 
 		int m = tokens.mark();
 		assertEquals("[[@0,0:0='x',<1>,1:0]]", tokens.getBuffer().toString());
@@ -195,9 +195,9 @@ public class TestUnbufferedTokenStream extends BaseTest {
 		tokens.release(m);
     }
 
-	protected static class TestingUnbufferedTokenStream<T extends Token> extends UnbufferedTokenStream<T> {
+	protected static class TestingUnbufferedTokenStream extends UnbufferedTokenStream {
 
-		public TestingUnbufferedTokenStream(TokenSource<T> tokenSource) {
+		public TestingUnbufferedTokenStream(TokenSource<Token> tokenSource) {
 			super(tokenSource);
 		}
 

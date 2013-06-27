@@ -35,15 +35,15 @@ import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.Arrays;
 
-public class UnbufferedTokenStream<T extends Token> implements TokenStream<T> {
-	protected TokenSource<T> tokenSource;
+public class UnbufferedTokenStream implements TokenStream<Token> {
+	protected TokenSource<Token> tokenSource;
 
 	/**
 	 * A moving window buffer of the data being scanned. While there's a marker,
 	 * we keep adding to buffer. Otherwise, {@link #consume consume()} resets so
 	 * we start filling at index 0 again.
 	 */
-	protected T[] tokens;
+	protected Token[] tokens;
 
 	/**
 	 * The number of tokens currently in {@link #tokens tokens}.
@@ -71,13 +71,13 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream<T> {
 	/**
 	 * This is the {@code LT(-1)} token for the current position.
 	 */
-	protected T lastToken;
+	protected Token lastToken;
 
 	/**
 	 * When {@code numMarkers > 0}, this is the {@code LT(-1)} token for the
 	 * first token in {@link #tokens}. Otherwise, this is {@code null}.
 	 */
-	protected T lastTokenBufferStart;
+	protected Token lastTokenBufferStart;
 
 	/**
 	 * Absolute token index. It's the index of the token about to be read via
@@ -89,21 +89,19 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream<T> {
 	 */
 	protected int currentTokenIndex = 0;
 
-	public UnbufferedTokenStream(TokenSource<T> tokenSource) {
+	public UnbufferedTokenStream(TokenSource<Token> tokenSource) {
 		this(tokenSource, 256);
 	}
 
-	public UnbufferedTokenStream(TokenSource<T> tokenSource, int bufferSize) {
+	public UnbufferedTokenStream(TokenSource<Token> tokenSource, int bufferSize) {
 		this.tokenSource = tokenSource;
-		@SuppressWarnings("unchecked")
-		T[] tokens = (T[])new Token[bufferSize];
-		this.tokens = tokens;
+		this.tokens = new Token[bufferSize];
 		n = 0;
 		fill(1); // prime the pump
 	}
 
 	@Override
-	public T get(int i) {
+	public Token get(int i) {
 		int bufferStartIndex = getBufferStartIndex();
 		if (i < bufferStartIndex || i >= bufferStartIndex + n) {
 			throw new IndexOutOfBoundsException("get("+i+") outside buffer: "+
@@ -113,7 +111,7 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream<T> {
 	}
 
 	@Override
-	public T LT(int i) {
+	public Token LT(int i) {
 		if ( i==-1 ) {
 			return lastToken;
 		}
@@ -138,7 +136,7 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream<T> {
 	}
 
 	@Override
-	public TokenSource<T> getTokenSource() {
+	public TokenSource<Token> getTokenSource() {
 		return tokenSource;
 	}
 
@@ -207,14 +205,14 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream<T> {
 				return i;
 			}
 
-			T t = tokenSource.nextToken();
+			Token t = tokenSource.nextToken();
 			add(t);
 		}
 
 		return n;
 	}
 
-	protected void add(@NotNull T t) {
+	protected void add(@NotNull Token t) {
 		if ( n>=tokens.length ) {
 			tokens = Arrays.copyOf(tokens, tokens.length * 2);
 		}
