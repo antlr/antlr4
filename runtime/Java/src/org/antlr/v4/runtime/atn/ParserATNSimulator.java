@@ -261,8 +261,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 	public boolean tail_call_preserves_sll = true;
 	public boolean treat_sllk1_conflict_as_ambiguity = false;
 
-	public static boolean optimize_closure_busy = true;
-
 	@Nullable
 	protected final Parser<Symbol> parser;
 
@@ -1288,10 +1286,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 		while (currentConfigs.size() > 0) {
 			ATNConfigSet intermediate = new ATNConfigSet();
 			for (ATNConfig config : currentConfigs) {
-				if (optimize_closure_busy && !closureBusy.add(config)) {
-					continue;
-				}
-
 				closure(config, configs, intermediate, closureBusy, collectPredicates, hasMoreContext, contextCache, 0);
 			}
 
@@ -1324,10 +1318,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 					// Make sure we track that we are now out of context.
 					c.setOuterContextDepth(config.getOuterContextDepth());
 					assert depth > Integer.MIN_VALUE;
-					if (optimize_closure_busy && c.getContext().isEmpty() && !closureBusy.add(c)) {
-						continue;
-					}
-
 					closure(c, configs, intermediate, closureBusy, collectPredicates, hasMoreContexts, contextCache, depth - 1);
 				}
 
@@ -1369,32 +1359,6 @@ public class ParserATNSimulator<Symbol extends Token> extends ATNSimulator {
 				if (t instanceof RuleTransition) {
 					if (intermediate != null && !collectPredicates) {
 						intermediate.add(c, contextCache);
-						continue;
-					}
-				}
-
-				if (optimize_closure_busy && depth != 0) {
-					boolean checkClosure = false;
-					switch (c.getState().getStateType()) {
-					case ATNState.STAR_LOOP_ENTRY:
-					case ATNState.BLOCK_END:
-					case ATNState.LOOP_END:
-						checkClosure = true;
-						break;
-
-					case ATNState.PLUS_BLOCK_START:
-						checkClosure = true;
-						break;
-
-					case ATNState.RULE_STOP:
-						checkClosure = c.getContext().isEmpty();
-						break;
-
-					default:
-						break;
-					}
-
-					if (checkClosure && !closureBusy.add(c)) {
 						continue;
 					}
 				}
