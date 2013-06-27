@@ -49,7 +49,7 @@ import java.util.Collections;
 import java.util.List;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
-public abstract class Parser extends Recognizer<Token, ParserATNSimulator<Token>> {
+public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	public class TraceListener implements ParseTreeListener<Token> {
 		@Override
 		public void enterEveryRule(ParserRuleContext<? extends Token> ctx) {

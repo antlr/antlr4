@@ -77,7 +77,7 @@ public class ParserInterpreter {
 	}
 
 	protected Grammar g;
-	protected ParserATNSimulator<Token> atnSimulator;
+	protected ParserATNSimulator atnSimulator;
 	protected TokenStream<?> input;
 
 	public ParserInterpreter(@NotNull Grammar g) {
@@ -87,7 +87,7 @@ public class ParserInterpreter {
 	public ParserInterpreter(@NotNull Grammar g, @NotNull TokenStream<Token> input) {
 		Tool antlr = new Tool();
 		antlr.process(g,false);
-		atnSimulator = new ParserATNSimulator<Token>(new DummyParser(g, g.atn, input), g.atn);
+		atnSimulator = new ParserATNSimulator(new DummyParser(g, g.atn, input), g.atn);
 	}
 
 	public int adaptivePredict(@NotNull TokenStream<Token> input, int decision,
@@ -113,7 +113,7 @@ public class ParserInterpreter {
 		}
 	}
 
-	public ParserATNSimulator<Token> getATNSimulator() {
+	public ParserATNSimulator getATNSimulator() {
 		return atnSimulator;
 	}
 

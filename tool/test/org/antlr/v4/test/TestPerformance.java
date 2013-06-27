@@ -950,7 +950,7 @@ public class TestPerformance extends BaseTest {
 			int index = FILE_GRANULARITY ? 0 : ((NumberedThread)Thread.currentThread()).getThreadNumber();
 			Parser parser = sharedParsers[index];
             // make sure the individual DFAState objects actually have unique ATNConfig arrays
-			final ParserATNSimulator<?> interpreter = parser.getInterpreter();
+			final ParserATNSimulator interpreter = parser.getInterpreter();
             final DFA[] decisionToDFA = interpreter.atn.decisionToDFA;
 
             if (SHOW_DFA_STATE_STATS) {
@@ -1491,7 +1491,7 @@ public class TestPerformance extends BaseTest {
 			}
 
 			if (parser != null) {
-				ParserATNSimulator<? extends Token> interpreter = parser.getInterpreter();
+				ParserATNSimulator interpreter = parser.getInterpreter();
 				if (interpreter instanceof StatisticsParserATNSimulator) {
 					decisionInvocations = ((StatisticsParserATNSimulator)interpreter).decisionInvocations;
 					fullContextFallback = ((StatisticsParserATNSimulator)interpreter).fullContextFallback;
@@ -1554,7 +1554,7 @@ public class TestPerformance extends BaseTest {
 		}
 	}
 
-	private static class StatisticsParserATNSimulator<Symbol extends Token> extends ParserATNSimulator<Symbol> {
+	private static class StatisticsParserATNSimulator<Symbol extends Token> extends ParserATNSimulator {
 
 		public final long[] decisionInvocations;
 		public final long[] fullContextFallback;
@@ -1586,7 +1586,7 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public int adaptivePredict(TokenStream<? extends Symbol> input, int decision, ParserRuleContext<Symbol> outerContext) {
+		public int adaptivePredict(TokenStream<? extends Token> input, int decision, ParserRuleContext<Token> outerContext) {
 			try {
 				this.decision = decision;
 				decisionInvocations[decision]++;
@@ -1598,7 +1598,7 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public int adaptivePredict(TokenStream<? extends Symbol> input, int decision, ParserRuleContext<Symbol> outerContext, boolean useContext) {
+		public int adaptivePredict(TokenStream<? extends Token> input, int decision, ParserRuleContext<Token> outerContext, boolean useContext) {
 			if (useContext) {
 				fullContextFallback[decision]++;
 			}
@@ -1613,13 +1613,13 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		protected Tuple2<DFAState, ParserRuleContext<Symbol>> computeTargetState(DFA dfa, DFAState s, ParserRuleContext<Symbol> remainingGlobalContext, int t, boolean useContext, PredictionContextCache contextCache) {
+		protected Tuple2<DFAState, ParserRuleContext<Token>> computeTargetState(DFA dfa, DFAState s, ParserRuleContext<Token> remainingGlobalContext, int t, boolean useContext, PredictionContextCache contextCache) {
 			computedTransitions[decision]++;
 			return super.computeTargetState(dfa, s, remainingGlobalContext, t, useContext, contextCache);
 		}
 
 		@Override
-		protected SimulatorState<Symbol> computeReachSet(DFA dfa, SimulatorState<Symbol> previous, int t, PredictionContextCache contextCache) {
+		protected SimulatorState<Token> computeReachSet(DFA dfa, SimulatorState<Token> previous, int t, PredictionContextCache contextCache) {
 			if (previous.useContext) {
 				totalTransitions[decision]++;
 				computedTransitions[decision]++;
