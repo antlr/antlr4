@@ -943,7 +943,7 @@ public abstract class BaseTest {
 	}
 
     public static class FilteringTokenStream extends CommonTokenStream {
-        public FilteringTokenStream(TokenSource<? extends Token> src) { super(src); }
+        public FilteringTokenStream(TokenSource src) { super(src); }
         Set<Integer> hide = new HashSet<Integer>();
         @Override
         protected boolean sync(int i) {
@@ -1153,7 +1153,7 @@ public abstract class BaseTest {
 		assertFalse(text.isEmpty());
 	}
 
-	public static class IntTokenStream implements TokenStream<Token> {
+	public static class IntTokenStream implements TokenStream {
 		IntegerList types;
 		int p=0;
 		public IntTokenStream(IntegerList types) { this.types = types; }
@@ -1208,7 +1208,7 @@ public abstract class BaseTest {
 		}
 
 		@Override
-		public TokenSource<? extends Token> getTokenSource() {
+		public TokenSource getTokenSource() {
 			return null;
 		}
 

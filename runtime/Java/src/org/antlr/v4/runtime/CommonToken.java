@@ -39,14 +39,14 @@ import java.io.Serializable;
 public class CommonToken implements WritableToken, Serializable {
 	private static final long serialVersionUID = -6708843461296520577L;
 
-	protected static final Tuple2<TokenSource<?>, CharStream> EMPTY_SOURCE =
-		Tuple.<TokenSource<?>, CharStream>create(null, null);
+	protected static final Tuple2<TokenSource, CharStream> EMPTY_SOURCE =
+		Tuple.<TokenSource, CharStream>create(null, null);
 
 	protected int type;
 	protected int line;
 	protected int charPositionInLine = -1; // set to invalid position
 	protected int channel=DEFAULT_CHANNEL;
-	protected Tuple2<? extends TokenSource<?>, CharStream> source;
+	protected Tuple2<? extends TokenSource, CharStream> source;
 
 	/** We need to be able to change the text once in a while.  If
 	 *  this is non-null, then getText should return this.  Note that
@@ -68,7 +68,7 @@ public class CommonToken implements WritableToken, Serializable {
 		this.type = type;
 	}
 
-	public CommonToken(@NotNull Tuple2<? extends TokenSource<?>, CharStream> source, int type, int channel, int start, int stop) {
+	public CommonToken(@NotNull Tuple2<? extends TokenSource, CharStream> source, int type, int channel, int start, int stop) {
 		this.source = source;
 		this.type = type;
 		this.channel = channel;
@@ -201,7 +201,7 @@ public class CommonToken implements WritableToken, Serializable {
 	}
 
 	@Override
-	public TokenSource<?> getTokenSource() {
+	public TokenSource getTokenSource() {
 		return source.getItem1();
 	}
 

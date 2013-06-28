@@ -51,9 +51,9 @@ import java.util.List;
  *  This is not a subclass of {@code UnbufferedTokenStream} because I don't want
  *  to confuse small moving window of tokens it uses for the full buffer.
  */
-public class BufferedTokenStream implements TokenStream<Token> {
+public class BufferedTokenStream implements TokenStream {
 	@NotNull
-    protected TokenSource<? extends Token> tokenSource;
+    protected TokenSource tokenSource;
 
     /** Record every single token pulled from the source so we can reproduce
      *  chunks of it later. This list captures everything so we can access
@@ -77,7 +77,7 @@ public class BufferedTokenStream implements TokenStream<Token> {
 	 */
 	protected boolean fetchedEOF;
 
-    public BufferedTokenStream(TokenSource<? extends Token> tokenSource) {
+    public BufferedTokenStream(TokenSource tokenSource) {
 		if (tokenSource == null) {
 			throw new NullPointerException("tokenSource cannot be null");
 		}
@@ -85,7 +85,7 @@ public class BufferedTokenStream implements TokenStream<Token> {
     }
 
     @Override
-    public TokenSource<? extends Token> getTokenSource() { return tokenSource; }
+    public TokenSource getTokenSource() { return tokenSource; }
 
 	@Override
 	public int index() { return p; }
@@ -243,7 +243,7 @@ public class BufferedTokenStream implements TokenStream<Token> {
 	}
 
     /** Reset this token stream by setting its token source. */
-    public void setTokenSource(TokenSource<? extends Token> tokenSource) {
+    public void setTokenSource(TokenSource tokenSource) {
         this.tokenSource = tokenSource;
         tokens.clear();
         p = -1;

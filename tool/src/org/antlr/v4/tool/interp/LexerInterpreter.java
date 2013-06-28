@@ -43,14 +43,14 @@ import org.antlr.v4.runtime.misc.Tuple;
 import org.antlr.v4.runtime.misc.Tuple2;
 import org.antlr.v4.tool.LexerGrammar;
 
-public class LexerInterpreter implements TokenSource<Token> {
+public class LexerInterpreter implements TokenSource {
 	protected LexerGrammar g;
 	protected LexerATNSimulator interp;
 	protected CharStream input;
-	protected Tuple2<? extends TokenSource<? super Token>, CharStream> tokenFactorySourcePair;
+	protected Tuple2<? extends TokenSource, CharStream> tokenFactorySourcePair;
 
 	/** How to create token objects */
-	protected TokenFactory<? extends Token> _factory = CommonTokenFactory.DEFAULT;
+	protected TokenFactory _factory = CommonTokenFactory.DEFAULT;
 
 	public LexerInterpreter(LexerGrammar g, String inputString) {
 		this(g);
@@ -76,12 +76,12 @@ public class LexerInterpreter implements TokenSource<Token> {
 	public String getSourceName() {	return g.name; }
 
 	@Override
-	public TokenFactory<? extends Token> getTokenFactory() {
+	public TokenFactory getTokenFactory() {
 		return _factory;
 	}
 
 	@Override
-	public void setTokenFactory(TokenFactory<? extends Token> factory) {
+	public void setTokenFactory(TokenFactory factory) {
 		_factory = factory != null ? factory : CommonTokenFactory.DEFAULT;
 	}
 

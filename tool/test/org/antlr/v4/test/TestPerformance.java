@@ -1215,7 +1215,7 @@ public class TestPerformance extends BaseTest {
             final Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
 
             // construct initial instances of the lexer and parser to deserialize their ATNs
-            TokenSource<Token> tokenSource = lexerCtor.newInstance(new ANTLRInputStream(""));
+            TokenSource tokenSource = lexerCtor.newInstance(new ANTLRInputStream(""));
             parserCtor.newInstance(new CommonTokenStream(tokenSource));
 
 			if (!REUSE_LEXER_DFA) {
@@ -1582,7 +1582,7 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public int adaptivePredict(TokenStream<? extends Token> input, int decision, ParserRuleContext outerContext) {
+		public int adaptivePredict(TokenStream input, int decision, ParserRuleContext outerContext) {
 			try {
 				this.decision = decision;
 				decisionInvocations[decision]++;
@@ -1594,7 +1594,7 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public int adaptivePredict(TokenStream<? extends Token> input, int decision, ParserRuleContext outerContext, boolean useContext) {
+		public int adaptivePredict(TokenStream input, int decision, ParserRuleContext outerContext, boolean useContext) {
 			if (useContext) {
 				fullContextFallback[decision]++;
 			}

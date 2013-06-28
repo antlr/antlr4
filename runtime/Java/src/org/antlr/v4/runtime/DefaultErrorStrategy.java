@@ -249,7 +249,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 			return;
 		}
 
-        TokenStream<? extends Token> tokens = recognizer.getInputStream();
+        TokenStream tokens = recognizer.getInputStream();
         int la = tokens.LA(1);
 
         // try cheaper subset first; might get lucky. seems to shave a wee bit off
@@ -300,9 +300,9 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	protected void reportNoViableAlternative(@NotNull Parser recognizer,
 											 @NotNull NoViableAltException e)
 	{
-		TokenStream<? extends Token> tokens = recognizer.getInputStream();
+		TokenStream tokens = recognizer.getInputStream();
 		String input;
-		if (tokens instanceof TokenStream<?>) {
+		if (tokens instanceof TokenStream) {
 			if ( e.getStartToken().getType()==Token.EOF ) input = "<EOF>";
 			else input = tokens.getText(e.getStartToken(), e.getOffendingToken());
 		}
@@ -586,16 +586,16 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		if ( expectedTokenType== Token.EOF ) tokenText = "<missing EOF>";
 		else tokenText = "<missing "+recognizer.getTokenNames()[expectedTokenType]+">";
 		Token current = currentSymbol;
-		Token lookback = (Token)recognizer.getInputStream().LT(-1);
+		Token lookback = recognizer.getInputStream().LT(-1);
 		if ( current.getType() == Token.EOF && lookback!=null ) {
 			current = lookback;
 		}
 
-		return constructToken((TokenSource<Token>)recognizer.getInputStream().getTokenSource(), expectedTokenType, tokenText, current);
+		return constructToken(recognizer.getInputStream().getTokenSource(), expectedTokenType, tokenText, current);
 	}
 
-	protected Token constructToken(TokenSource<Token> tokenSource, int expectedTokenType, String tokenText, Token current) {
-		TokenFactory<? extends Token> factory = tokenSource.getTokenFactory();
+	protected Token constructToken(TokenSource tokenSource, int expectedTokenType, String tokenText, Token current) {
+		TokenFactory factory = tokenSource.getTokenFactory();
 		return
 			factory.create(Tuple.create(tokenSource, current.getTokenSource().getInputStream()), expectedTokenType, tokenText,
 							Token.DEFAULT_CHANNEL,

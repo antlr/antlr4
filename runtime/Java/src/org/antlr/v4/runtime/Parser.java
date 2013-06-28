@@ -115,7 +115,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 * @see #getInputStream
 	 * @see #setInputStream
 	 */
-	protected TokenStream<? extends Token> _input;
+	protected TokenStream _input;
 
 	protected final IntegerStack _precedenceStack;
 	{
@@ -161,7 +161,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 */
 	protected int _syntaxErrors;
 
-	public Parser(TokenStream<? extends Token> input) {
+	public Parser(TokenStream input) {
 		setInputStream(input);
 	}
 
@@ -426,7 +426,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return _syntaxErrors;
 	}
 
-	public TokenFactory<? extends Token> getTokenFactory() {
+	public TokenFactory getTokenFactory() {
 		return _input.getTokenSource().getTokenFactory();
 	}
 
@@ -440,12 +440,12 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
 	@Override
-	public TokenStream<? extends Token> getInputStream() {
+	public TokenStream getInputStream() {
 		return _input;
 	}
 
 	/** Set the token stream and reset the parser. */
-	public void setInputStream(TokenStream<? extends Token> input) {
+	public void setInputStream(TokenStream input) {
 		this._input = null;
 		reset();
 		this._input = input;

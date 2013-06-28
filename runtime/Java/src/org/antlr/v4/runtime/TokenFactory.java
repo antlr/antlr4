@@ -37,17 +37,17 @@ import org.antlr.v4.runtime.misc.Tuple2;
  *  the error handling strategy (to create missing tokens).  Notifying the parser
  *  of a new factory means that it notifies it's token source and error strategy.
  */
-public interface TokenFactory<Symbol extends Token> {
+public interface TokenFactory {
 	/** This is the method used to create tokens in the lexer and in the
 	 *  error handling strategy. If text!=null, than the start and stop positions
 	 *  are wiped to -1 in the text override is set in the CommonToken.
 	 */
 	@NotNull
-	Symbol create(@NotNull Tuple2<? extends TokenSource<? super Symbol>, CharStream> source, int type, String text,
+	Token create(@NotNull Tuple2<? extends TokenSource, CharStream> source, int type, String text,
 				  int channel, int start, int stop,
 				  int line, int charPositionInLine);
 
 	/** Generically useful */
 	@NotNull
-	Symbol create(int type, String text);
+	Token create(int type, String text);
 }

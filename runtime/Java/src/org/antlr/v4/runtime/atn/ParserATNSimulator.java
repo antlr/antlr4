@@ -35,7 +35,6 @@ import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
@@ -307,13 +306,13 @@ public class ParserATNSimulator extends ATNSimulator {
 	public void reset() {
 	}
 
-	public int adaptivePredict(@NotNull TokenStream<? extends Token> input, int decision,
+	public int adaptivePredict(@NotNull TokenStream input, int decision,
 							   @Nullable ParserRuleContext outerContext)
 	{
 		return adaptivePredict(input, decision, outerContext, false);
 	}
 
-	public int adaptivePredict(@NotNull TokenStream<? extends Token> input,
+	public int adaptivePredict(@NotNull TokenStream input,
 							   int decision,
 							   @Nullable ParserRuleContext outerContext,
 							   boolean useContext)
@@ -371,7 +370,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	protected SimulatorState getStartState(@NotNull DFA dfa,
-										@NotNull TokenStream<? extends Token> input,
+										@NotNull TokenStream input,
 										@NotNull ParserRuleContext outerContext,
 										boolean useContext) {
 
@@ -405,7 +404,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	protected int execDFA(@NotNull DFA dfa,
-					   @NotNull TokenStream<? extends Token> input, int startIndex,
+					   @NotNull TokenStream input, int startIndex,
 					   @NotNull SimulatorState state)
     {
 		ParserRuleContext outerContext = state.outerContext;
@@ -629,7 +628,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	 */
 	protected int execATN(@NotNull DFA dfa,
-					   @NotNull TokenStream<? extends Token> input, int startIndex,
+					   @NotNull TokenStream input, int startIndex,
 					   @NotNull SimulatorState initialState)
 	{
 		if ( debug ) System.out.println("execATN decision "+dfa.decision+" exec LA(1)=="+ getLookaheadName(input));
@@ -757,7 +756,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 	}
 
-	protected int handleNoViableAlt(@NotNull TokenStream<? extends Token> input, int startIndex, @NotNull SimulatorState previous) {
+	protected int handleNoViableAlt(@NotNull TokenStream input, int startIndex, @NotNull SimulatorState previous) {
 		if (previous.s0 != null) {
 			BitSet alts = new BitSet();
 			for (ATNConfig config : previous.s0.configs) {
@@ -1763,7 +1762,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return String.valueOf(t);
 	}
 
-	public String getLookaheadName(TokenStream<?> input) {
+	public String getLookaheadName(TokenStream input) {
 		return getTokenName(input.LA(1));
 	}
 
@@ -1788,7 +1787,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	@NotNull
-	protected NoViableAltException noViableAlt(@NotNull TokenStream<? extends Token> input,
+	protected NoViableAltException noViableAlt(@NotNull TokenStream input,
 											@NotNull ParserRuleContext outerContext,
 											@NotNull ATNConfigSet configs,
 											int startIndex)

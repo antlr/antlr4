@@ -65,7 +65,7 @@ public class TestUnbufferedTokenStream extends BaseTest {
 		);
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 			lexEngine.setInput(input);
-        TokenStream<Token> tokens = new UnbufferedTokenStream(lexEngine);
+        TokenStream tokens = new UnbufferedTokenStream(lexEngine);
 
 		assertEquals("x", tokens.LT(1).getText());
 		assertEquals(" ", tokens.LT(2).getText());
@@ -197,7 +197,7 @@ public class TestUnbufferedTokenStream extends BaseTest {
 
 	protected static class TestingUnbufferedTokenStream extends UnbufferedTokenStream {
 
-		public TestingUnbufferedTokenStream(TokenSource<Token> tokenSource) {
+		public TestingUnbufferedTokenStream(TokenSource tokenSource) {
 			super(tokenSource);
 		}
 

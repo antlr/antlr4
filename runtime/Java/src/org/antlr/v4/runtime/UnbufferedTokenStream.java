@@ -35,8 +35,8 @@ import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.Arrays;
 
-public class UnbufferedTokenStream implements TokenStream<Token> {
-	protected TokenSource<Token> tokenSource;
+public class UnbufferedTokenStream implements TokenStream {
+	protected TokenSource tokenSource;
 
 	/**
 	 * A moving window buffer of the data being scanned. While there's a marker,
@@ -89,11 +89,11 @@ public class UnbufferedTokenStream implements TokenStream<Token> {
 	 */
 	protected int currentTokenIndex = 0;
 
-	public UnbufferedTokenStream(TokenSource<Token> tokenSource) {
+	public UnbufferedTokenStream(TokenSource tokenSource) {
 		this(tokenSource, 256);
 	}
 
-	public UnbufferedTokenStream(TokenSource<Token> tokenSource, int bufferSize) {
+	public UnbufferedTokenStream(TokenSource tokenSource, int bufferSize) {
 		this.tokenSource = tokenSource;
 		this.tokens = new Token[bufferSize];
 		n = 0;
@@ -136,7 +136,7 @@ public class UnbufferedTokenStream implements TokenStream<Token> {
 	}
 
 	@Override
-	public TokenSource<Token> getTokenSource() {
+	public TokenSource getTokenSource() {
 		return tokenSource;
 	}
 

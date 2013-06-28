@@ -63,7 +63,7 @@ public class NoViableAltException extends RecognitionException {
 	}
 
 	public NoViableAltException(@NotNull Recognizer<Token, ?> recognizer,
-								@NotNull TokenStream<? extends Token> input,
+								@NotNull TokenStream input,
 								@NotNull Token startToken,
 								@NotNull Token offendingToken,
 								@Nullable ATNConfigSet deadEndConfigs,
@@ -77,11 +77,6 @@ public class NoViableAltException extends RecognitionException {
 
 	public Token getStartToken() {
 		return startToken;
-	}
-
-	@SuppressWarnings("unchecked") // safe
-	public <T> T getStartToken(Recognizer<T, ?> recognizer) {
-		return this.getRecognizer() == recognizer ? (T)startToken : null;
 	}
 
 	@Nullable
