@@ -143,8 +143,8 @@ public class TestActionTranslation extends BaseTest {
 	}
 
 	@Test public void testReturnValues() throws Exception {
-		String action = "$lab.e; $b.e;";
-		String expected = "((AContext)_localctx).lab.e; ((AContext)_localctx).b.e;";
+		String action = "$lab.e; $b.e; $y.e = \"\";";
+		String expected = "((AContext)_localctx).lab.e; ((AContext)_localctx).b.e; _localctx.y.e = \"\";";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
 

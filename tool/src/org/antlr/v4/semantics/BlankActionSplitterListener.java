@@ -35,10 +35,6 @@ import org.antlr.v4.parse.ActionSplitterListener;
 
 public class BlankActionSplitterListener implements ActionSplitterListener {
 	@Override
-	public void setQualifiedAttr(String expr, Token x, Token y, Token rhs) {
-	}
-
-	@Override
 	public void qualifiedAttr(String expr, Token x, Token y) {
 	}
 
