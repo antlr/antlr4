@@ -195,15 +195,6 @@ public class ActionTranslator implements ActionSplitterListener {
 		}
 	}
 
-	/** $x.y = expr; */
-	@Override
-	public void setQualifiedAttr(String expr, Token x, Token y, Token rhs) {
-		gen.g.tool.log("action-translator", "setQAttr "+x+"."+y+"="+rhs);
-		// x has to be current rule; just set y attr
-		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
-		chunks.add(new SetAttr(nodeContext,y.getText(), rhsChunks));
-	}
-
 	@Override
 	public void qualifiedAttr(String expr, Token x, Token y) {
 		gen.g.tool.log("action-translator", "qattr "+x+"."+y);

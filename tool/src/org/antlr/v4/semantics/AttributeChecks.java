@@ -110,12 +110,6 @@ public class AttributeChecks implements ActionSplitterListener {
 
     // LISTENER METHODS
 
-    @Override
-    public void setQualifiedAttr(String expr, Token x, Token y, Token rhs) {
-		qualifiedAttr(expr, x, y);
-        new AttributeChecks(g, r, alt, node, rhs).examineAction();
-    }
-
 	// $x.y
 	@Override
 	public void qualifiedAttr(String expr, Token x, Token y) {

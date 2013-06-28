@@ -81,8 +81,6 @@ public class UseDefAnalyzer {
 			@Override
 			public void setNonLocalAttr(String expr, Token x, Token y, Token rhs) { dependent[0] = true; }
 			@Override
-			public void setQualifiedAttr(String expr, Token x, Token y, Token rhs) { dependent[0] = true; }
-			@Override
 			public void attr(String expr, Token x) {  dependent[0] = true; }
 		};
 		ActionSplitter splitter = new ActionSplitter(in, listener);
