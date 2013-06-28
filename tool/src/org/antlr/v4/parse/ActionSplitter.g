@@ -83,13 +83,6 @@ NONLOCAL_ATTR
 	:	'$' x=ID '::' y=ID {delegate.nonLocalAttr($text, $x, $y);}
 	;
 
-SET_QUALIFIED_ATTR
-	:	'$' x=ID '.' y=ID WS? '=' expr=ATTR_VALUE_EXPR ';'
-		{
-		delegate.setQualifiedAttr($text, $x, $y, $expr);
-		}
-	;
-
 QUALIFIED_ATTR
 	:	'$' x=ID '.' y=ID {input.LA(1)!='('}? {delegate.qualifiedAttr($text, $x, $y);}
 	;

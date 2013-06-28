@@ -77,6 +77,7 @@ public class TestAttributeChecks extends BaseTest {
 		"$start",		"",
 		"$x = $y",		"",
 		"$y = $x",		"",
+		"$y.b = 3;",	"",
 		"$a.x = $a.y",	"",
 		"$lab.e",		"",
 		"$lab.text",	"",
@@ -96,11 +97,11 @@ public class TestAttributeChecks extends BaseTest {
 		"$q.y",         "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'q' in '$q.y'\n",
 		"$q = 3",       "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'q' in '$q'\n",
 		"$q = 3;",      "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'q' in '$q = 3;'\n",
-		"$q.y = 3;",    "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'q' in '$q.y = 3;'\n",
+		"$q.y = 3;",    "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'q' in '$q.y'\n",
 		"$q = $blort;", "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'q' in '$q = $blort;'\n" +
 						"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:9: unknown attribute reference 'blort' in '$blort'\n",
 		"$a.ick",       "error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:7:6: unknown attribute 'ick' for rule 'a' in '$a.ick'\n",
-		"$a.ick = 3;",  "error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:7:6: unknown attribute 'ick' for rule 'a' in '$a.ick = 3;'\n",
+		"$a.ick = 3;",  "error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:7:6: unknown attribute 'ick' for rule 'a' in '$a.ick'\n",
 		"$b.d",         "error(" + ErrorType.INVALID_RULE_PARAMETER_REF.code + "): A.g4:7:6: parameter 'd' of rule 'b' is not accessible in this scope: $b.d\n",  // can't see rule ref's arg
 		"$d.text",      "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'd' in '$d.text'\n", // valid rule, but no ref
 		"$lab.d",		"error(" + ErrorType.INVALID_RULE_PARAMETER_REF.code + "): A.g4:7:8: parameter 'd' of rule 'b' is not accessible in this scope: $lab.d\n",
@@ -125,11 +126,11 @@ public class TestAttributeChecks extends BaseTest {
 		"$q.y",         "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'q' in '$q.y'\n",
 		"$q = 3",       "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'q' in '$q'\n",
 		"$q = 3;",      "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'q' in '$q = 3;'\n",
-		"$q.y = 3;",    "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'q' in '$q.y = 3;'\n",
+		"$q.y = 3;",    "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'q' in '$q.y'\n",
 		"$q = $blort;", "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'q' in '$q = $blort;'\n" +
 						"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:19: unknown attribute reference 'blort' in '$blort'\n",
 		"$a.ick",       "error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:10:16: unknown attribute 'ick' for rule 'a' in '$a.ick'\n",
-		"$a.ick = 3;",  "error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:10:16: unknown attribute 'ick' for rule 'a' in '$a.ick = 3;'\n",
+		"$a.ick = 3;",  "error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:10:16: unknown attribute 'ick' for rule 'a' in '$a.ick'\n",
 		"$b.e",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'b' in '$b.e'\n", // can't see rule refs outside alts
 		"$b.d",         "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'b' in '$b.d'\n",
 		"$c.text",      "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'c' in '$c.text'\n",
