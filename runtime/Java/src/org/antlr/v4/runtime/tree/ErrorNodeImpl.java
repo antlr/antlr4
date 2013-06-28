@@ -30,22 +30,22 @@
 
 package org.antlr.v4.runtime.tree;
 
+import org.antlr.v4.runtime.Token;
+
 /** Represents a token that was consumed during resynchronization
  *  rather than during a valid match operation. For example,
  *  we will create this kind of a node during single token insertion
  *  and deletion as well as during "consume until error recovery set"
  *  upon no viable alternative exceptions.
  */
-public class ErrorNodeImpl<Symbol> extends
-	TerminalNodeImpl<Symbol>
-	implements ErrorNode<Symbol>
+public class ErrorNodeImpl extends TerminalNodeImpl implements ErrorNode
 {
-	public ErrorNodeImpl(Symbol token) {
+	public ErrorNodeImpl(Token token) {
 		super(token);
 	}
 
 	@Override
-	public <T> T accept(ParseTreeVisitor<? super Symbol, ? extends T> visitor) {
+	public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 		return visitor.visitErrorNode(this);
 	}
 }

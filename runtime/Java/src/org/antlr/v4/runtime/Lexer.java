@@ -45,7 +45,7 @@ import java.util.List;
  *  of speed.
  */
 public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
-	implements TokenSource<Token>
+	implements TokenSource
 {
 	public static final int DEFAULT_MODE = 0;
 	public static final int MORE = -2;
@@ -57,10 +57,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	public static final int MAX_CHAR_VALUE = '\uFFFE';
 
 	public CharStream _input;
-	protected Tuple2<? extends TokenSource<Token>, CharStream> _tokenFactorySourcePair;
+	protected Tuple2<? extends TokenSource, CharStream> _tokenFactorySourcePair;
 
 	/** How to create token objects */
-	protected TokenFactory<?> _factory = CommonTokenFactory.DEFAULT;
+	protected TokenFactory _factory = CommonTokenFactory.DEFAULT;
 
 	/** The goal of all lexer rules/methods is to create a token object.
 	 *  This is an instance variable as multiple rules may collaborate to
@@ -219,12 +219,12 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	}
 
 	@Override
-	public TokenFactory<?> getTokenFactory() {
+	public TokenFactory getTokenFactory() {
 		return _factory;
 	}
 
 	@Override
-	public void setTokenFactory(TokenFactory<? extends Token> factory) {
+	public void setTokenFactory(TokenFactory factory) {
 		this._factory = factory;
 	}
 

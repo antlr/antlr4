@@ -47,15 +47,15 @@ package org.antlr.v4.runtime;
  *  @see UnbufferedTokenStream
  *  @see BufferedTokenStream
  */
-public class CommonTokenStream extends BufferedTokenStream<Token> {
+public class CommonTokenStream extends BufferedTokenStream {
     /** Skip tokens on any channel but this one; this is how we skip whitespace... */
     protected int channel = Token.DEFAULT_CHANNEL;
 
-    public CommonTokenStream(TokenSource<? extends Token> tokenSource) {
+    public CommonTokenStream(TokenSource tokenSource) {
         super(tokenSource);
     }
 
-    public CommonTokenStream(TokenSource<? extends Token> tokenSource, int channel) {
+    public CommonTokenStream(TokenSource tokenSource, int channel) {
         this(tokenSource);
         this.channel = channel;
     }

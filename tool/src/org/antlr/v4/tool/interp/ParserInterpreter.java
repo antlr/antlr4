@@ -39,17 +39,16 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
-import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.Grammar;
 
 public class ParserInterpreter {
-	public static class DummyParser extends Parser<Token> {
+	public static class DummyParser extends Parser {
 		public final ATN atn;
 
 		public Grammar g;
-		public DummyParser(Grammar g, ATN atn, TokenStream<Token> input) {
+		public DummyParser(Grammar g, ATN atn, TokenStream input) {
 			super(input);
 			this.g = g;
 			this.atn = atn;
@@ -77,26 +76,26 @@ public class ParserInterpreter {
 	}
 
 	protected Grammar g;
-	protected ParserATNSimulator<Token> atnSimulator;
-	protected TokenStream<?> input;
+	protected ParserATNSimulator atnSimulator;
+	protected TokenStream input;
 
 	public ParserInterpreter(@NotNull Grammar g) {
 		this.g = g;
 	}
 
-	public ParserInterpreter(@NotNull Grammar g, @NotNull TokenStream<Token> input) {
+	public ParserInterpreter(@NotNull Grammar g, @NotNull TokenStream input) {
 		Tool antlr = new Tool();
 		antlr.process(g,false);
-		atnSimulator = new ParserATNSimulator<Token>(new DummyParser(g, g.atn, input), g.atn);
+		atnSimulator = new ParserATNSimulator(new DummyParser(g, g.atn, input), g.atn);
 	}
 
-	public int adaptivePredict(@NotNull TokenStream<Token> input, int decision,
-							   @Nullable ParserRuleContext<Token> outerContext)
+	public int adaptivePredict(@NotNull TokenStream input, int decision,
+							   @Nullable ParserRuleContext outerContext)
 	{
 		return atnSimulator.adaptivePredict(input, decision, outerContext);
 	}
 
-	public int matchATN(@NotNull TokenStream<Token> input,
+	public int matchATN(@NotNull TokenStream input,
 						@NotNull ATNState startState)
 	{
 		if (startState.getNumberOfTransitions() == 1) {
@@ -113,7 +112,7 @@ public class ParserInterpreter {
 		}
 	}
 
-	public ParserATNSimulator<Token> getATNSimulator() {
+	public ParserATNSimulator getATNSimulator() {
 		return atnSimulator;
 	}
 

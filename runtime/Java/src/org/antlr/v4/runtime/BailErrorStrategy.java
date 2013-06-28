@@ -34,17 +34,17 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 /** Bail out of parser at first syntax error. Do this to use it:
  *  <p/>
- *  {@code myparser.setErrorHandler(new BailErrorStrategy<Token>());}
+ *  {@code myparser.setErrorHandler(new BailErrorStrategy());}
  */
-public class BailErrorStrategy<Symbol extends Token> extends DefaultErrorStrategy<Symbol> {
+public class BailErrorStrategy extends DefaultErrorStrategy {
     /** Instead of recovering from exception {@code e}, re-throw it wrapped
      *  in a {@link ParseCancellationException} so it is not caught by the
      *  rule function catches.  Use {@link Exception#getCause()} to get the
 	 *  original {@link RecognitionException}.
      */
     @Override
-    public void recover(Parser<? extends Symbol> recognizer, RecognitionException e) {
-		for (ParserRuleContext<?> context = recognizer.getContext(); context != null; context = context.getParent()) {
+    public void recover(Parser recognizer, RecognitionException e) {
+		for (ParserRuleContext context = recognizer.getContext(); context != null; context = context.getParent()) {
 			context.exception = e;
 		}
 
@@ -55,11 +55,11 @@ public class BailErrorStrategy<Symbol extends Token> extends DefaultErrorStrateg
      *  successfully recovers, it won't throw an exception.
      */
     @Override
-    public <T extends Symbol> T recoverInline(Parser<T> recognizer)
+    public Token recoverInline(Parser recognizer)
         throws RecognitionException
     {
 		InputMismatchException e = new InputMismatchException(recognizer);
-		for (ParserRuleContext<?> context = recognizer.getContext(); context != null; context = context.getParent()) {
+		for (ParserRuleContext context = recognizer.getContext(); context != null; context = context.getParent()) {
 			context.exception = e;
 		}
 
@@ -68,5 +68,5 @@ public class BailErrorStrategy<Symbol extends Token> extends DefaultErrorStrateg
 
     /** Make sure we don't attempt to recover from problems in subrules. */
     @Override
-    public void sync(Parser<? extends Symbol> recognizer) { }
+    public void sync(Parser recognizer) { }
 }

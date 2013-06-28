@@ -34,28 +34,28 @@ import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 
-public class TerminalNodeImpl<Symbol> implements TerminalNode<Symbol> {
-	public Symbol symbol;
-	public RuleNode<Symbol> parent;
+public class TerminalNodeImpl implements TerminalNode {
+	public Token symbol;
+	public RuleNode parent;
 
-	public TerminalNodeImpl(Symbol symbol) {	this.symbol = symbol;	}
-
-	@Override
-	public ParseTree<Symbol> getChild(int i) {return null;}
+	public TerminalNodeImpl(Token symbol) {	this.symbol = symbol;	}
 
 	@Override
-	public Symbol getSymbol() {return symbol;}
+	public ParseTree getChild(int i) {return null;}
 
 	@Override
-	public RuleNode<Symbol> getParent() { return parent; }
+	public Token getSymbol() {return symbol;}
 
 	@Override
-	public Symbol getPayload() { return symbol; }
+	public RuleNode getParent() { return parent; }
+
+	@Override
+	public Token getPayload() { return symbol; }
 
 	@Override
 	public Interval getSourceInterval() {
-		if (symbol instanceof Token) {
-			int tokenIndex = ((Token)symbol).getTokenIndex();
+		if (symbol != null) {
+			int tokenIndex = symbol.getTokenIndex();
 			return new Interval(tokenIndex, tokenIndex);
 		}
 
@@ -66,31 +66,35 @@ public class TerminalNodeImpl<Symbol> implements TerminalNode<Symbol> {
 	public int getChildCount() { return 0; }
 
 	@Override
-	public <T> T accept(ParseTreeVisitor<? super Symbol, ? extends T> visitor) {
+	public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 		return visitor.visitTerminal(this);
 	}
 
 	@Override
 	public String getText() {
-		if (symbol instanceof Token) {
-			return ((Token)symbol).getText();
+		if (symbol != null) {
+			return symbol.getText();
 		}
+
 		return null;
 	}
 
 	@Override
-	public String toStringTree(Parser<?> parser) {
+	public String toStringTree(Parser parser) {
 		return toString();
 	}
 
 	@Override
 	public String toString() {
-		if (symbol instanceof Token) {
-			if ( ((Token)symbol).getType() == Token.EOF ) return "<EOF>";
-			return ((Token)symbol).getText();
+		if (symbol != null) {
+			if ( symbol.getType() == Token.EOF ) {
+				return "<EOF>";
+			}
+
+			return symbol.getText();
 		}
 		else {
-			return symbol != null ? symbol.toString() : "<null>";
+			return "<null>";
 		}
 	}
 

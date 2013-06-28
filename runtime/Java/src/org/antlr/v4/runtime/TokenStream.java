@@ -36,7 +36,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 /**
  * An {@link IntStream} whose symbols are {@link Token} instances.
  */
-public interface TokenStream<Symbol> extends IntStream {
+public interface TokenStream extends IntStream {
 	/**
 	 * Get the {@link Token} instance associated with the value returned by
 	 * {@link #LA LA(k)}. This method has the same pre- and post-conditions as
@@ -47,7 +47,7 @@ public interface TokenStream<Symbol> extends IntStream {
 	 * @see IntStream#LA
 	 */
 	@NotNull
-    public Symbol LT(int k);
+    public Token LT(int k);
 
 	/**
 	 * Gets the {@link Token} at the specified {@code index} in the stream. When
@@ -68,14 +68,14 @@ public interface TokenStream<Symbol> extends IntStream {
 	 * retrieving the token at the specified index
 	 */
 	@NotNull
-	public Symbol get(int i);
+	public Token get(int i);
 
 	/**
 	 * Gets the underlying {@link TokenSource} which provides tokens for this
 	 * stream.
 	 */
 	@NotNull
-	public TokenSource<? extends Symbol> getTokenSource();
+	public TokenSource getTokenSource();
 
 	/**
 	 * Return the text of all tokens within the specified {@code interval}. This
@@ -136,7 +136,7 @@ public interface TokenStream<Symbol> extends IntStream {
 	 * @return The text of all tokens within the source interval of {@code ctx}.
 	 */
 	@NotNull
-	public String getText(@NotNull RuleContext<?> ctx);
+	public String getText(@NotNull RuleContext ctx);
 
 	/**
 	 * Return the text of all tokens in this stream between {@code start} and

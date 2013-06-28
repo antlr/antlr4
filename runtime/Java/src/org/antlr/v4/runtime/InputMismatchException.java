@@ -37,7 +37,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 public class InputMismatchException extends RecognitionException {
 	private static final long serialVersionUID = 1532568338707443067L;
 
-	public <T extends Token> InputMismatchException(@NotNull Parser<T> recognizer) {
+	public InputMismatchException(@NotNull Parser recognizer) {
 		super(recognizer, recognizer.getInputStream(), recognizer._ctx);
 		this.setOffendingToken(recognizer, recognizer.getCurrentToken());
 	}

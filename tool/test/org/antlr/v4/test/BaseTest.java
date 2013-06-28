@@ -943,7 +943,7 @@ public abstract class BaseTest {
 	}
 
     public static class FilteringTokenStream extends CommonTokenStream {
-        public FilteringTokenStream(TokenSource<? extends Token> src) { super(src); }
+        public FilteringTokenStream(TokenSource src) { super(src); }
         Set<Integer> hide = new HashSet<Integer>();
         @Override
         protected boolean sync(int i) {
@@ -1000,20 +1000,20 @@ public abstract class BaseTest {
 			"        <createParser>\n"+
 			"		 parser.setBuildParseTree(true);\n" +
 			"		 parser.getInterpreter().reportAmbiguities = true;\n" +
-			"        ParserRuleContext\\<Token> tree = parser.<parserStartRuleName>();\n" +
+			"        ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
 			"        ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
 			"    }\n" +
 			"\n" +
-			"	static class TreeShapeListener implements ParseTreeListener\\<Token> {\n" +
-			"		@Override public void visitTerminal(TerminalNode\\<? extends Token> node) { }\n" +
-			"		@Override public void visitErrorNode(ErrorNode\\<? extends Token> node) { }\n" +
-			"		@Override public void exitEveryRule(ParserRuleContext\\<? extends Token> ctx) { }\n" +
+			"	static class TreeShapeListener implements ParseTreeListener {\n" +
+			"		@Override public void visitTerminal(TerminalNode node) { }\n" +
+			"		@Override public void visitErrorNode(ErrorNode node) { }\n" +
+			"		@Override public void exitEveryRule(ParserRuleContext ctx) { }\n" +
 			"\n" +
 			"		@Override\n" +
-			"		public void enterEveryRule(ParserRuleContext\\<? extends Token> ctx) {\n" +
+			"		public void enterEveryRule(ParserRuleContext ctx) {\n" +
 			"			for (int i = 0; i \\< ctx.getChildCount(); i++) {\n" +
-			"				ParseTree\\<? extends Token> parent = ctx.getChild(i).getParent();\n" +
-			"				if (!(parent instanceof RuleNode) || ((RuleNode\\<? extends Token>)parent).getRuleContext() != ctx) {\n" +
+			"				ParseTree parent = ctx.getChild(i).getParent();\n" +
+			"				if (!(parent instanceof RuleNode) || ((RuleNode)parent).getRuleContext() != ctx) {\n" +
 			"					throw new IllegalStateException(\"Invalid parse tree shape detected.\");\n" +
 			"				}\n" +
 			"			}\n" +
@@ -1026,7 +1026,7 @@ public abstract class BaseTest {
 			createParserST =
 				new ST(
 				"        <parserName> parser = new <parserName>(tokens);\n" +
-                "        parser.addErrorListener(new DiagnosticErrorListener\\<Token>());\n");
+                "        parser.addErrorListener(new DiagnosticErrorListener());\n");
 		}
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);
@@ -1153,7 +1153,7 @@ public abstract class BaseTest {
 		assertFalse(text.isEmpty());
 	}
 
-	public static class IntTokenStream implements TokenStream<Token> {
+	public static class IntTokenStream implements TokenStream {
 		IntegerList types;
 		int p=0;
 		public IntTokenStream(IntegerList types) { this.types = types; }
@@ -1208,7 +1208,7 @@ public abstract class BaseTest {
 		}
 
 		@Override
-		public TokenSource<? extends Token> getTokenSource() {
+		public TokenSource getTokenSource() {
 			return null;
 		}
 
@@ -1226,7 +1226,7 @@ public abstract class BaseTest {
 
 		@NotNull
 		@Override
-		public String getText(RuleContext<?> ctx) {
+		public String getText(RuleContext ctx) {
 			throw new UnsupportedOperationException("can't give strings");
 		}
 

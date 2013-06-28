@@ -61,7 +61,7 @@ import java.util.BitSet;
  *
  * @author Sam Harwell
  */
-public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorListener<Symbol> {
+public class DiagnosticErrorListener extends BaseErrorListener {
 	/**
 	 * When {@code true}, only exactly known ambiguities are reported.
 	 */
@@ -87,7 +87,7 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 	}
 
 	@Override
-	public void reportAmbiguity(@NotNull Parser<? extends Symbol> recognizer,
+	public void reportAmbiguity(@NotNull Parser recognizer,
 								DFA dfa,
 								int startIndex,
 								int stopIndex,
@@ -108,12 +108,12 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 	}
 
 	@Override
-	public <T extends Symbol> void reportAttemptingFullContext(@NotNull Parser<T> recognizer,
+	public void reportAttemptingFullContext(@NotNull Parser recognizer,
 											@NotNull DFA dfa,
 											int startIndex,
 											int stopIndex,
 											@Nullable BitSet conflictingAlts,
-											@NotNull SimulatorState<T> conflictState)
+											@NotNull SimulatorState conflictState)
 	{
 		String format = "reportAttemptingFullContext d=%s, input='%s'";
 		String decision = getDecisionDescription(recognizer, dfa);
@@ -123,12 +123,12 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 	}
 
 	@Override
-	public <T extends Symbol> void reportContextSensitivity(@NotNull Parser<T> recognizer,
+	public void reportContextSensitivity(@NotNull Parser recognizer,
 										 @NotNull DFA dfa,
 										 int startIndex,
 										 int stopIndex,
 										 int prediction,
-										 @NotNull SimulatorState<T> acceptState)
+										 @NotNull SimulatorState acceptState)
 	{
 		String format = "reportContextSensitivity d=%s, input='%s'";
 		String decision = getDecisionDescription(recognizer, dfa);
@@ -137,7 +137,7 @@ public class DiagnosticErrorListener<Symbol extends Token> extends BaseErrorList
 		recognizer.notifyErrorListeners(message);
 	}
 
-	protected <T extends Symbol> String getDecisionDescription(@NotNull Parser<T> recognizer, @NotNull DFA dfa) {
+	protected <T extends Token> String getDecisionDescription(@NotNull Parser recognizer, @NotNull DFA dfa) {
 		int decision = dfa.decision;
 		int ruleIndex = dfa.atnStartState.ruleIndex;
 

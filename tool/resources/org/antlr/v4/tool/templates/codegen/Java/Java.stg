@@ -74,7 +74,7 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  * This interface defines a complete listener for a parse tree produced by
  * {@link <file.parserName>}.
  */
-public interface <file.grammarName>Listener extends ParseTreeListener\<<InputSymbolType()>\> {
+public interface <file.grammarName>Listener extends ParseTreeListener {
 	<file.listenerNames:{lname |
 /**
  * Enter a parse tree produced by {@link <file.parserName>#<lname>\}.
@@ -127,25 +127,25 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 	 * \<p/>
 	 * The default implementation does nothing.
 	 */
-	@Override public void enterEveryRule(@NotNull ParserRuleContext\<? extends <InputSymbolType()>\> ctx) { }
+	@Override public void enterEveryRule(@NotNull ParserRuleContext ctx) { }
 	/**
 	 * {@inheritDoc\}
 	 * \<p/>
 	 * The default implementation does nothing.
 	 */
-	@Override public void exitEveryRule(@NotNull ParserRuleContext\<? extends <InputSymbolType()>\> ctx) { }
+	@Override public void exitEveryRule(@NotNull ParserRuleContext ctx) { }
 	/**
 	 * {@inheritDoc\}
 	 * \<p/>
 	 * The default implementation does nothing.
 	 */
-	@Override public void visitTerminal(@NotNull TerminalNode\<? extends <InputSymbolType()>\> node) { }
+	@Override public void visitTerminal(@NotNull TerminalNode node) { }
 	/**
 	 * {@inheritDoc\}
 	 * \<p/>
 	 * The default implementation does nothing.
 	 */
-	@Override public void visitErrorNode(@NotNull ErrorNode\<? extends <InputSymbolType()>\> node) { }
+	@Override public void visitErrorNode(@NotNull ErrorNode node) { }
 }
 >>
 
@@ -163,10 +163,10 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  * This interface defines a complete generic visitor for a parse tree produced
  * by {@link <file.parserName>}.
  *
- * @param \<T> The return type of the visit operation. Use {@link Void} for
+ * @param \<Result> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
-public interface <file.grammarName>Visitor\<Symbol extends <InputSymbolType()>, Result> extends ParseTreeVisitor\<Symbol, Result> {
+public interface <file.grammarName>Visitor\<Result> extends ParseTreeVisitor\<Result> {
 	<file.visitorNames:{lname |
 /**
  * Visit a parse tree produced by {@link <file.parserName>#<lname>\}.
@@ -192,10 +192,10 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
  * which can be extended to create a visitor which only needs to handle a subset
  * of the available methods.
  *
- * @param \<T> The return type of the visit operation. Use {@link Void} for
+ * @param \<Result> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
-public class <file.grammarName>BaseVisitor\<Result> extends AbstractParseTreeVisitor\<<InputSymbolType()>, Result> implements <file.grammarName>Visitor\<<InputSymbolType()>, Result> {
+public class <file.grammarName>BaseVisitor\<Result> extends AbstractParseTreeVisitor\<Result> implements <file.grammarName>Visitor\<Result> {
 	<file.visitorNames:{lname |
 /**
  * {@inheritDoc\}
@@ -244,7 +244,7 @@ public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extend
 	<funcs; separator="\n">
 
 <if(sempredFuncs)>
-	public boolean sempred(RuleContext\<<InputSymbolType()>\> _localctx, int ruleIndex, int predIndex) {
+	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
 		<parser.sempredFuncs.values:{f|
 case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
@@ -261,7 +261,7 @@ case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
 @Override
-public void action(RuleContext\<<if(recog.modes)>Integer<else><InputSymbolType()><endif>\> _localctx, int ruleIndex, int actionIndex) {
+public void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
 	switch (ruleIndex) {
 	<recog.actionFuncs.values:{f|
 case <f.ruleIndex> : <f.name>_action(<if(!recog.modes)>(<f.ctxType>)<endif>_localctx, actionIndex); break;}; separator="\n">
@@ -271,7 +271,7 @@ case <f.ruleIndex> : <f.name>_action(<if(!recog.modes)>(<f.ctxType>)<endif>_loca
 <endif>
 <if(sempredFuncs)>
 @Override
-public boolean sempred(RuleContext\<<if(recog.modes)>Integer<else><InputSymbolType()><endif>\> _localctx, int ruleIndex, int predIndex) {
+public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 	switch (ruleIndex) {
 	<recog.sempredFuncs.values:{f|
 case <f.ruleIndex> : return <f.name>_sempred(<if(!recog.modes)>(<f.ctxType>)<endif>_localctx, predIndex);}; separator="\n">
@@ -283,9 +283,9 @@ case <f.ruleIndex> : return <f.name>_sempred(<if(!recog.modes)>(<f.ctxType>)<end
 >>
 
 parser_ctor(p) ::= <<
-public <p.name>(TokenStream\<? extends <InputSymbolType()>\> input) {
+public <p.name>(TokenStream input) {
 	super(input);
-	_interp = new ParserATNSimulator\<<InputSymbolType()>\>(this,_ATN);
+	_interp = new ParserATNSimulator(this,_ATN);
 }
 >>
 
@@ -420,7 +420,7 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 
 @RuleVersion(<namedActions.version; null="0">)
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(int _p<currentRule.args:{a | , <a>}>) throws RecognitionException {
-	ParserRuleContext\<Token> _parentctx = _ctx;
+	ParserRuleContext _parentctx = _ctx;
 	int _parentState = getState();
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>);
 	<currentRule.ctxType> _prevctx = _localctx;
@@ -708,7 +708,7 @@ LexerChannelCommand(arg)   ::= "_channel = <arg>;"
 LexerModeCommand(arg)      ::= "_mode = <arg>;"
 LexerPushModeCommand(arg)  ::= "pushMode(<arg>);"
 
-DefaultParserSuperClass(s) ::= "Parser\<<InputSymbolType()>>"
+DefaultParserSuperClass(s) ::= "Parser"
 DefaultLexerSuperClass(s)  ::= "Lexer"
 
 ActionText(t) ::= "<t.text>"
@@ -757,11 +757,11 @@ RuleContextDecl(r) ::= "public <r.ctxName> <r.name>;"
 RuleContextListDecl(rdecl) ::= "public List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>();"
 
 ContextTokenGetterDecl(t)      ::=
-    "public TerminalNode\<<TokenLabelType()>> <t.name>() { return getToken(<parser.name>.<t.name>, 0); }"
+    "public TerminalNode <t.name>() { return getToken(<parser.name>.<t.name>, 0); }"
 ContextTokenListGetterDecl(t)  ::=
-    "public List\<? extends TerminalNode\<<TokenLabelType()>>> <t.name>() { return getTokens(<parser.name>.<t.name>); }"
+    "public List\<? extends TerminalNode> <t.name>() { return getTokens(<parser.name>.<t.name>); }"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-public TerminalNode\<<TokenLabelType()>\> <t.name>(int i) {
+public TerminalNode <t.name>(int i) {
 	return getToken(<parser.name>.<t.name>, i);
 }
 >>
@@ -781,7 +781,7 @@ public <r.ctxName> <r.name>(int i) {
 }
 >>
 
-LexerRuleContext() ::= "RuleContext\<Integer>"
+LexerRuleContext() ::= "RuleContext"
 
 /** The rule context name is the rule followed by a suffix; e.g.,
  *	r becomes rContext.
@@ -797,12 +797,12 @@ CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 
 StructDecl(struct,attrs,getters,dispatchMethods,interfaces,extensionMembers,
-           superClass={ParserRuleContext\<<InputSymbolType()>>}) ::= <<
+           superClass={ParserRuleContext}) ::= <<
 public static class <struct.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	<if(struct.ctorAttrs)>public <struct.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int invokingState) { super(parent, invokingState); }<endif>
-	public <struct.name>(ParserRuleContext\<<InputSymbolType()>\> parent, int invokingState<struct.ctorAttrs:{a | , <a>}>) {
+	<if(struct.ctorAttrs)>public <struct.name>(ParserRuleContext parent, int invokingState) { super(parent, invokingState); }<endif>
+	public <struct.name>(ParserRuleContext parent, int invokingState<struct.ctorAttrs:{a | , <a>}>) {
 		super(parent, invokingState);
 		<struct.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
 	}
@@ -830,15 +830,15 @@ public static class <struct.name> extends <currentRule.name; format="cap">Contex
 
 ListenerDispatchMethod(method) ::= <<
 @Override
-public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener\<? super <InputSymbolType()>\> listener) {
+public void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener listener) {
 	if ( listener instanceof <parser.grammarName>Listener ) ((<parser.grammarName>Listener)listener).<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
 }
 >>
 
 VisitorDispatchMethod(method) ::= <<
 @Override
-public \<Result> Result accept(ParseTreeVisitor\<? super <InputSymbolType()>, ? extends Result> visitor) {
-	if ( visitor instanceof <parser.grammarName>Visitor\<?, ?> ) return ((<parser.grammarName>Visitor\<? super <InputSymbolType()>, ? extends Result>)visitor).visit<struct.derivedFromName; format="cap">(this);
+public \<Result> Result accept(ParseTreeVisitor\<? extends Result> visitor) {
+	if ( visitor instanceof <parser.grammarName>Visitor\<?> ) return ((<parser.grammarName>Visitor\<? extends Result>)visitor).visit<struct.derivedFromName; format="cap">(this);
 	else return visitor.visitChildren(this);
 }
 >>

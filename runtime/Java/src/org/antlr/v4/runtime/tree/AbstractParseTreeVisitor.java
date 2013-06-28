@@ -32,7 +32,7 @@ package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.misc.NotNull;
 
-public abstract class AbstractParseTreeVisitor<Symbol, Result> implements ParseTreeVisitor<Symbol, Result> {
+public abstract class AbstractParseTreeVisitor<Result> implements ParseTreeVisitor<Result> {
 	/**
 	 * {@inheritDoc}
 	 * <p/>
@@ -40,7 +40,7 @@ public abstract class AbstractParseTreeVisitor<Symbol, Result> implements ParseT
 	 * specified tree.
 	 */
 	@Override
-	public Result visit(@NotNull ParseTree<? extends Symbol> tree) {
+	public Result visit(@NotNull ParseTree tree) {
 		return tree.accept(this);
 	}
 
@@ -56,7 +56,7 @@ public abstract class AbstractParseTreeVisitor<Symbol, Result> implements ParseT
 	 * previous aggregate result and the result of visiting the child.
 	 */
 	@Override
-	public Result visitChildren(@NotNull RuleNode<? extends Symbol> node) {
+	public Result visitChildren(@NotNull RuleNode node) {
 		Result result = defaultResult();
 		int n = node.getChildCount();
 		for (int i=0; i<n; i++) {
@@ -64,7 +64,7 @@ public abstract class AbstractParseTreeVisitor<Symbol, Result> implements ParseT
 				break;
 			}
 
-			ParseTree<? extends Symbol> c = node.getChild(i);
+			ParseTree c = node.getChild(i);
 			Result childResult = c.accept(this);
 			result = aggregateResult(result, childResult);
 		}
@@ -79,7 +79,7 @@ public abstract class AbstractParseTreeVisitor<Symbol, Result> implements ParseT
 	 * {@link #defaultResult defaultResult}.
 	 */
 	@Override
-	public Result visitTerminal(@NotNull TerminalNode<? extends Symbol> node) {
+	public Result visitTerminal(@NotNull TerminalNode node) {
 		return defaultResult();
 	}
 
@@ -90,7 +90,7 @@ public abstract class AbstractParseTreeVisitor<Symbol, Result> implements ParseT
 	 * {@link #defaultResult defaultResult}.
 	 */
 	@Override
-	public Result visitErrorNode(@NotNull ErrorNode<? extends Symbol> node) {
+	public Result visitErrorNode(@NotNull ErrorNode node) {
 		return defaultResult();
 	}
 
@@ -156,7 +156,7 @@ public abstract class AbstractParseTreeVisitor<Symbol, Result> implements ParseT
 	 * {@code false} to stop visiting children and immediately return the
 	 * current aggregate result from {@link #visitChildren}.
 	 */
-	protected boolean shouldVisitNextChild(@NotNull RuleNode<? extends Symbol> node, Result currentResult) {
+	protected boolean shouldVisitNextChild(@NotNull RuleNode node, Result currentResult) {
 		return true;
 	}
 

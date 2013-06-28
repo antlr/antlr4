@@ -90,7 +90,7 @@ public class Trees {
 	 *  node payloads to get the text for the nodes.  Detect
 	 *  parse trees and extract data appropriately.
 	 */
-	public static String toStringTree(@NotNull Tree t, @Nullable Parser<?> recog) {
+	public static String toStringTree(@NotNull Tree t, @Nullable Parser recog) {
 		String[] ruleNames = recog != null ? recog.getRuleNames() : null;
 		List<String> ruleNamesList = ruleNames != null ? Arrays.asList(ruleNames) : null;
 		return toStringTree(t, ruleNamesList);
@@ -116,7 +116,7 @@ public class Trees {
 		return buf.toString();
 	}
 
-	public static String getNodeText(@NotNull Tree t, @Nullable Parser<?> recog) {
+	public static String getNodeText(@NotNull Tree t, @Nullable Parser recog) {
 		String[] ruleNames = recog != null ? recog.getRuleNames() : null;
 		List<String> ruleNamesList = ruleNames != null ? Arrays.asList(ruleNames) : null;
 		return getNodeText(t, ruleNamesList);
@@ -125,7 +125,7 @@ public class Trees {
 	public static String getNodeText(@NotNull Tree t, @Nullable List<String> ruleNames) {
 		if ( ruleNames!=null ) {
 			if ( t instanceof RuleNode ) {
-				int ruleIndex = ((RuleNode<?>)t).getRuleContext().getRuleIndex();
+				int ruleIndex = ((RuleNode)t).getRuleContext().getRuleIndex();
 				String ruleName = ruleNames.get(ruleIndex);
 				return ruleName;
 			}
@@ -133,9 +133,9 @@ public class Trees {
 				return t.toString();
 			}
 			else if ( t instanceof TerminalNode) {
-				Object symbol = ((TerminalNode<?>)t).getSymbol();
-				if (symbol instanceof Token) {
-					String s = ((Token)symbol).getText();
+				Token symbol = ((TerminalNode)t).getSymbol();
+				if (symbol != null) {
+					String s = symbol.getText();
 					return s;
 				}
 			}

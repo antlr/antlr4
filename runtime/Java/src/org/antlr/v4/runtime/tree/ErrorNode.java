@@ -30,5 +30,5 @@
 
 package org.antlr.v4.runtime.tree;
 
-public interface ErrorNode<Symbol> extends TerminalNode<Symbol> {
+public interface ErrorNode extends TerminalNode {
 }

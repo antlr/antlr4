@@ -39,7 +39,6 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.tool.DOTGenerator;
@@ -485,7 +484,7 @@ public class TestATNParserPrediction extends BaseTest {
 
 		// Check ATN prediction
 //		ParserATNSimulator<Token> interp = new ParserATNSimulator<Token>(atn);
-		TokenStream<Token> input = new IntTokenStream(types);
+		TokenStream input = new IntTokenStream(types);
 		ParserInterpreter interp = new ParserInterpreter(g, input);
 		DecisionState startState = atn.decisionToState.get(decision);
 		DFA dfa = new DFA(startState, decision);
@@ -521,7 +520,7 @@ public class TestATNParserPrediction extends BaseTest {
 			// Check DFA
 			IntegerList types = getTokenTypesViaATN(inputString[i], lexInterp);
 			System.out.println(types);
-			TokenStream<Token> input = new IntTokenStream(types);
+			TokenStream input = new IntTokenStream(types);
 			try {
 				interp.adaptivePredict(input, decision, ParserRuleContext.emptyContext());
 			}

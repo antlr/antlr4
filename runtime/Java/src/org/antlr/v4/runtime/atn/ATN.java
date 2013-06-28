@@ -233,12 +233,12 @@ public class ATN {
 	 * number {@code stateNumber}
 	 */
 	@NotNull
-	public IntervalSet getExpectedTokens(int stateNumber, @Nullable RuleContext<?> context) {
+	public IntervalSet getExpectedTokens(int stateNumber, @Nullable RuleContext context) {
 		if (stateNumber < 0 || stateNumber >= states.size()) {
 			throw new IllegalArgumentException("Invalid state number.");
 		}
 
-		RuleContext<?> ctx = context;
+		RuleContext ctx = context;
 		ATNState s = states.get(stateNumber);
 		IntervalSet following = nextTokens(s);
 		if (!following.contains(Token.EPSILON)) {

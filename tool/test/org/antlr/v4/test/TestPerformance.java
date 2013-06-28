@@ -363,12 +363,10 @@ public class TestPerformance extends BaseTest {
     private static final Lexer[] sharedLexers = new Lexer[NUMBER_OF_THREADS];
 	private static final ATN[] sharedLexerATNs = new ATN[NUMBER_OF_THREADS];
 
-	@SuppressWarnings("unchecked")
-    private static final Parser<Token>[] sharedParsers = (Parser<Token>[])new Parser<?>[NUMBER_OF_THREADS];
+    private static final Parser[] sharedParsers = new Parser[NUMBER_OF_THREADS];
 	private static final ATN[] sharedParserATNs = new ATN[NUMBER_OF_THREADS];
 
-	@SuppressWarnings("unchecked")
-    private static final ParseTreeListener<Token>[] sharedListeners = (ParseTreeListener<Token>[])new ParseTreeListener<?>[NUMBER_OF_THREADS];
+    private static final ParseTreeListener[] sharedListeners = new ParseTreeListener[NUMBER_OF_THREADS];
 
 	private static final long[][] totalTransitionsPerFile;
 	private static final long[][] computedTransitionsPerFile;
@@ -949,9 +947,9 @@ public class TestPerformance extends BaseTest {
 
 		if (RUN_PARSER && sharedParsers.length > 0) {
 			int index = FILE_GRANULARITY ? 0 : ((NumberedThread)Thread.currentThread()).getThreadNumber();
-			Parser<?> parser = sharedParsers[index];
+			Parser parser = sharedParsers[index];
             // make sure the individual DFAState objects actually have unique ATNConfig arrays
-			final ParserATNSimulator<?> interpreter = parser.getInterpreter();
+			final ParserATNSimulator interpreter = parser.getInterpreter();
             final DFA[] decisionToDFA = interpreter.atn.decisionToDFA;
 
             if (SHOW_DFA_STATE_STATS) {
@@ -1210,17 +1208,14 @@ public class TestPerformance extends BaseTest {
         try {
             ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
             final Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
-			@SuppressWarnings("rawtypes")
             final Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
-            @SuppressWarnings("unchecked")
-            final Class<? extends ParseTreeListener<Token>> listenerClass = (Class<? extends ParseTreeListener<Token>>)loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
+            final Class<? extends ParseTreeListener> listenerClass = (Class<? extends ParseTreeListener>)loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
 
             final Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
-			@SuppressWarnings("rawtypes")
             final Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
 
             // construct initial instances of the lexer and parser to deserialize their ATNs
-            TokenSource<Token> tokenSource = lexerCtor.newInstance(new ANTLRInputStream(""));
+            TokenSource tokenSource = lexerCtor.newInstance(new ANTLRInputStream(""));
             parserCtor.newInstance(new CommonTokenStream(tokenSource));
 
 			if (!REUSE_LEXER_DFA) {
@@ -1249,7 +1244,7 @@ public class TestPerformance extends BaseTest {
 					assert thread >= 0 && thread < NUMBER_OF_THREADS;
 
                     try {
-						ParseTreeListener<Token> listener = sharedListeners[thread];
+						ParseTreeListener listener = sharedListeners[thread];
 						if (listener == null) {
 							listener = listenerClass.newInstance();
 							sharedListeners[thread] = listener;
@@ -1297,12 +1292,11 @@ public class TestPerformance extends BaseTest {
                         }
 
 						final long parseStartTime = System.nanoTime();
-						Parser<Token> parser = sharedParsers[thread];
+						Parser parser = sharedParsers[thread];
                         if (REUSE_PARSER && parser != null) {
                             parser.setInputStream(tokens);
                         } else {
-							@SuppressWarnings("unchecked")
-							Parser<Token> newParser = parserCtor.newInstance(tokens);
+							Parser newParser = parserCtor.newInstance(tokens);
 
 							ATN atn = (FILE_GRANULARITY || parser == null ? newParser : parser).getATN();
 							if (!REUSE_PARSER_DFA || (!FILE_GRANULARITY && parser == null)) {
@@ -1343,13 +1337,13 @@ public class TestPerformance extends BaseTest {
 							parser.addParseListener(listener);
 						}
 						if (BAIL_ON_ERROR || TWO_STAGE_PARSING) {
-							parser.setErrorHandler(new BailErrorStrategy<Token>());
+							parser.setErrorHandler(new BailErrorStrategy());
 						}
 
                         Method parseMethod = parserClass.getMethod(entryPoint);
                         Object parseResult;
 
-						ParseTreeListener<Token> checksumParserListener = null;
+						ParseTreeListener checksumParserListener = null;
 
 						try {
 							if (COMPUTE_CHECKSUM) {
@@ -1374,9 +1368,7 @@ public class TestPerformance extends BaseTest {
 							if (REUSE_PARSER && sharedParsers[thread] != null) {
 								parser.setInputStream(tokens);
 							} else {
-								@SuppressWarnings("unchecked")
-								Parser<Token> newParser = parserCtor.newInstance(tokens);
-								parser = newParser;
+								parser = parserCtor.newInstance(tokens);
 								sharedParsers[thread] = parser;
 							}
 
@@ -1404,7 +1396,7 @@ public class TestPerformance extends BaseTest {
 								parser.addParseListener(listener);
 							}
 							if (BAIL_ON_ERROR) {
-								parser.setErrorHandler(new BailErrorStrategy<Token>());
+								parser.setErrorHandler(new BailErrorStrategy());
 							}
 
 							parseResult = parseMethod.invoke(parser);
@@ -1417,10 +1409,10 @@ public class TestPerformance extends BaseTest {
 
 						assertThat(parseResult, instanceOf(ParseTree.class));
                         if (BUILD_PARSE_TREES && BLANK_LISTENER) {
-                            ParseTreeWalker.DEFAULT.walk(listener, (ParserRuleContext<?>)parseResult);
+                            ParseTreeWalker.DEFAULT.walk(listener, (ParserRuleContext)parseResult);
                         }
 
-						return new FileParseResult(input.getSourceName(), (int)checksum.getValue(), (ParseTree<?>)parseResult, tokens.size(), TIME_PARSE_ONLY ? parseStartTime : startTime, lexer, parser);
+						return new FileParseResult(input.getSourceName(), (int)checksum.getValue(), (ParseTree)parseResult, tokens.size(), TIME_PARSE_ONLY ? parseStartTime : startTime, lexer, parser);
                     } catch (Exception e) {
 						if (!REPORT_SYNTAX_ERRORS && e instanceof ParseCancellationException) {
 							return new FileParseResult("unknown", (int)checksum.getValue(), null, 0, startTime, null, null);
@@ -1445,7 +1437,7 @@ public class TestPerformance extends BaseTest {
 	protected static class FileParseResult {
 		public final String sourceName;
 		public final int checksum;
-		public final ParseTree<?> parseTree;
+		public final ParseTree parseTree;
 		public final int tokenCount;
 		public final long startTime;
 		public final long endTime;
@@ -1462,7 +1454,7 @@ public class TestPerformance extends BaseTest {
 		public final long[] parserComputedTransitions;
 		public final long[] parserFullContextTransitions;
 
-		public FileParseResult(String sourceName, int checksum, @Nullable ParseTree<?> parseTree, int tokenCount, long startTime, Lexer lexer, Parser<? extends Token> parser) {
+		public FileParseResult(String sourceName, int checksum, @Nullable ParseTree parseTree, int tokenCount, long startTime, Lexer lexer, Parser parser) {
 			this.sourceName = sourceName;
 			this.checksum = checksum;
 			this.parseTree = parseTree;
@@ -1495,7 +1487,7 @@ public class TestPerformance extends BaseTest {
 			}
 
 			if (parser != null) {
-				ParserATNSimulator<? extends Token> interpreter = parser.getInterpreter();
+				ParserATNSimulator interpreter = parser.getInterpreter();
 				if (interpreter instanceof StatisticsParserATNSimulator) {
 					decisionInvocations = ((StatisticsParserATNSimulator)interpreter).decisionInvocations;
 					fullContextFallback = ((StatisticsParserATNSimulator)interpreter).fullContextFallback;
@@ -1558,7 +1550,7 @@ public class TestPerformance extends BaseTest {
 		}
 	}
 
-	private static class StatisticsParserATNSimulator<Symbol extends Token> extends ParserATNSimulator<Symbol> {
+	private static class StatisticsParserATNSimulator<Symbol extends Token> extends ParserATNSimulator {
 
 		public final long[] decisionInvocations;
 		public final long[] fullContextFallback;
@@ -1579,7 +1571,7 @@ public class TestPerformance extends BaseTest {
 			fullContextTransitions = new long[atn.decisionToState.size()];
 		}
 
-		public StatisticsParserATNSimulator(Parser<Symbol> parser, ATN atn) {
+		public StatisticsParserATNSimulator(Parser parser, ATN atn) {
 			super(parser, atn);
 			decisionInvocations = new long[atn.decisionToState.size()];
 			fullContextFallback = new long[atn.decisionToState.size()];
@@ -1590,7 +1582,7 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public int adaptivePredict(TokenStream<? extends Symbol> input, int decision, ParserRuleContext<Symbol> outerContext) {
+		public int adaptivePredict(TokenStream input, int decision, ParserRuleContext outerContext) {
 			try {
 				this.decision = decision;
 				decisionInvocations[decision]++;
@@ -1602,7 +1594,7 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public int adaptivePredict(TokenStream<? extends Symbol> input, int decision, ParserRuleContext<Symbol> outerContext, boolean useContext) {
+		public int adaptivePredict(TokenStream input, int decision, ParserRuleContext outerContext, boolean useContext) {
 			if (useContext) {
 				fullContextFallback[decision]++;
 			}
@@ -1617,13 +1609,13 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		protected Tuple2<DFAState, ParserRuleContext<Symbol>> computeTargetState(DFA dfa, DFAState s, ParserRuleContext<Symbol> remainingGlobalContext, int t, boolean useContext, PredictionContextCache contextCache) {
+		protected Tuple2<DFAState, ParserRuleContext> computeTargetState(DFA dfa, DFAState s, ParserRuleContext remainingGlobalContext, int t, boolean useContext, PredictionContextCache contextCache) {
 			computedTransitions[decision]++;
 			return super.computeTargetState(dfa, s, remainingGlobalContext, t, useContext, contextCache);
 		}
 
 		@Override
-		protected SimulatorState<Symbol> computeReachSet(DFA dfa, SimulatorState<Symbol> previous, int t, PredictionContextCache contextCache) {
+		protected SimulatorState computeReachSet(DFA dfa, SimulatorState previous, int t, PredictionContextCache contextCache) {
 			if (previous.useContext) {
 				totalTransitions[decision]++;
 				computedTransitions[decision]++;
@@ -1634,7 +1626,7 @@ public class TestPerformance extends BaseTest {
 		}
 	}
 
-	private static class DescriptiveErrorListener extends BaseErrorListener<Token> {
+	private static class DescriptiveErrorListener extends BaseErrorListener {
 		public static DescriptiveErrorListener INSTANCE = new DescriptiveErrorListener();
 
 		@Override
@@ -1672,12 +1664,12 @@ public class TestPerformance extends BaseTest {
 
 	}
 
-	private static class SummarizingDiagnosticErrorListener extends DiagnosticErrorListener<Token> {
+	private static class SummarizingDiagnosticErrorListener extends DiagnosticErrorListener {
 		private BitSet _sllConflict;
 		private ATNConfigSet _sllConfigs;
 
 		@Override
-		public void reportAmbiguity(Parser<? extends Token> recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) {
+		public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) {
 			if (COMPUTE_TRANSITION_STATS && DETAILED_DFA_STATE_STATS) {
 				BitSet sllPredictions = getConflictingAlts(_sllConflict, _sllConfigs);
 				int sllPrediction = sllPredictions.nextSetBit(0);
@@ -1701,7 +1693,7 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public <T extends Token> void reportAttemptingFullContext(Parser<T> recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, SimulatorState<T> conflictState) {
+		public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, SimulatorState conflictState) {
 			_sllConflict = conflictingAlts;
 			_sllConfigs = conflictState.s0.configs;
 			if (!REPORT_FULL_CONTEXT) {
@@ -1718,7 +1710,7 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public <T extends Token> void reportContextSensitivity(Parser<T> recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, SimulatorState<T> acceptState) {
+		public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, SimulatorState acceptState) {
 			if (COMPUTE_TRANSITION_STATS && DETAILED_DFA_STATE_STATS) {
 				BitSet sllPredictions = getConflictingAlts(_sllConflict, _sllConfigs);
 				int sllPrediction = sllPredictions.nextSetBit(0);
@@ -1899,7 +1891,7 @@ public class TestPerformance extends BaseTest {
 
 	protected static class NonCachingParserATNSimulator<Symbol extends Token> extends StatisticsParserATNSimulator<Symbol> {
 
-		public NonCachingParserATNSimulator(Parser<Symbol> parser, ATN atn) {
+		public NonCachingParserATNSimulator(Parser parser, ATN atn) {
 			super(parser, atn);
 		}
 
@@ -1951,7 +1943,7 @@ public class TestPerformance extends BaseTest {
 		}
 	}
 
-	protected static class ChecksumParseTreeListener implements ParseTreeListener<Token> {
+	protected static class ChecksumParseTreeListener implements ParseTreeListener {
 		private static final int VISIT_TERMINAL = 1;
 		private static final int VISIT_ERROR_NODE = 2;
 		private static final int ENTER_RULE = 3;
@@ -1964,26 +1956,26 @@ public class TestPerformance extends BaseTest {
 		}
 
 		@Override
-		public void visitTerminal(TerminalNode<? extends Token> node) {
+		public void visitTerminal(TerminalNode node) {
 			checksum.update(VISIT_TERMINAL);
 			updateChecksum(checksum, node.getSymbol());
 		}
 
 		@Override
-		public void visitErrorNode(ErrorNode<? extends Token> node) {
+		public void visitErrorNode(ErrorNode node) {
 			checksum.update(VISIT_ERROR_NODE);
 			updateChecksum(checksum, node.getSymbol());
 		}
 
 		@Override
-		public void enterEveryRule(ParserRuleContext<? extends Token> ctx) {
+		public void enterEveryRule(ParserRuleContext ctx) {
 			checksum.update(ENTER_RULE);
 			updateChecksum(checksum, ctx.getRuleIndex());
 			updateChecksum(checksum, ctx.getStart());
 		}
 
 		@Override
-		public void exitEveryRule(ParserRuleContext<? extends Token> ctx) {
+		public void exitEveryRule(ParserRuleContext ctx) {
 			checksum.update(EXIT_RULE);
 			updateChecksum(checksum, ctx.getRuleIndex());
 			updateChecksum(checksum, ctx.getStop());

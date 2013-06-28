@@ -44,8 +44,8 @@ import static org.junit.Assert.*;
 
 public class TestBufferedTokenStream extends BaseTest {
 
-	protected TokenStream<Token> createTokenStream(TokenSource<? extends Token> src) {
-		return new BufferedTokenStream<Token>(src);
+	protected TokenStream createTokenStream(TokenSource src) {
+		return new BufferedTokenStream(src);
 	}
 
 	@Test public void testFirstToken() throws Exception {
@@ -63,7 +63,7 @@ public class TestBufferedTokenStream extends BaseTest {
         CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 			lexEngine.setInput(input);
-        TokenStream<Token> tokens = createTokenStream(lexEngine);
+        TokenStream tokens = createTokenStream(lexEngine);
 
         String result = tokens.LT(1).getText();
         String expecting = "x";
@@ -85,7 +85,7 @@ public class TestBufferedTokenStream extends BaseTest {
         CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 		lexEngine.setInput(input);
-        TokenStream<Token> tokens = createTokenStream(lexEngine);
+        TokenStream tokens = createTokenStream(lexEngine);
 
         String result = tokens.LT(2).getText();
         String expecting = " ";
@@ -107,7 +107,7 @@ public class TestBufferedTokenStream extends BaseTest {
         CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 		lexEngine.setInput(input);
-        TokenStream<Token> tokens = createTokenStream(lexEngine);
+        TokenStream tokens = createTokenStream(lexEngine);
 
         int i = 1;
         Token t = tokens.LT(i);
@@ -138,7 +138,7 @@ public class TestBufferedTokenStream extends BaseTest {
         CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 		lexEngine.setInput(input);
-        TokenStream<Token> tokens = createTokenStream(lexEngine);
+        TokenStream tokens = createTokenStream(lexEngine);
 
         Token t = tokens.LT(1);
         while ( t.getType()!=Token.EOF ) {
@@ -166,7 +166,7 @@ public class TestBufferedTokenStream extends BaseTest {
         CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
         LexerInterpreter lexEngine = new LexerInterpreter(g);
 		lexEngine.setInput(input);
-        TokenStream<Token> tokens = createTokenStream(lexEngine);
+        TokenStream tokens = createTokenStream(lexEngine);
 
         tokens.consume(); // get x into buffer
         Token t = tokens.LT(-1);

@@ -47,13 +47,13 @@ import static org.junit.Assert.*;
 public class TestCommonTokenStream extends TestBufferedTokenStream {
 
 	@Override
-	protected TokenStream<Token> createTokenStream(TokenSource<? extends Token> src) {
+	protected TokenStream createTokenStream(TokenSource src) {
 		return new CommonTokenStream(src);
 	}
 
 	@Test public void testOffChannel() throws Exception {
-        TokenSource<Token> lexer = // simulate input " x =34  ;\n"
-            new TokenSource<Token>() {
+        TokenSource lexer = // simulate input " x =34  ;\n"
+            new TokenSource() {
                 int i = 0;
                 @SuppressWarnings("serial")
                 WritableToken[] tokens = {
@@ -88,12 +88,12 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
 				}
 
 				@Override
-				public TokenFactory<? extends Token> getTokenFactory() {
+				public TokenFactory getTokenFactory() {
 					return CommonTokenFactory.DEFAULT;
 				}
 
 				@Override
-				public void setTokenFactory(TokenFactory<?> factory) {
+				public void setTokenFactory(TokenFactory factory) {
 				}
 			};
 
@@ -122,9 +122,9 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
     }
 
 	@Test public void testFetchOffChannel() throws Exception {
-		TokenSource<Token> lexer = // simulate input " x =34  ; \n"
+		TokenSource lexer = // simulate input " x =34  ; \n"
 		                    // token indexes   01234 56789
-			new TokenSource<Token>() {
+			new TokenSource() {
 				int i = 0;
 				@SuppressWarnings("serial")
 				WritableToken[] tokens = {
@@ -160,12 +160,12 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
 				}
 
 				@Override
-				public TokenFactory<? extends Token> getTokenFactory() {
+				public TokenFactory getTokenFactory() {
 					return CommonTokenFactory.DEFAULT;
 				}
 
 				@Override
-				public void setTokenFactory(TokenFactory<?> factory) {
+				public void setTokenFactory(TokenFactory factory) {
 				}
 			};
 
@@ -214,7 +214,7 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
 
 	@Test
 	public void testSingleEOF() throws Exception {
-		TokenSource<Token> lexer = new TokenSource<Token>() {
+		TokenSource lexer = new TokenSource() {
 
 			@Override
 			public Token nextToken() {
@@ -242,12 +242,12 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
 			}
 
 			@Override
-			public TokenFactory<? extends Token> getTokenFactory() {
+			public TokenFactory getTokenFactory() {
 				throw new UnsupportedOperationException("Not supported yet.");
 			}
 
 			@Override
-			public void setTokenFactory(TokenFactory<? extends Token> factory) {
+			public void setTokenFactory(TokenFactory factory) {
 				throw new UnsupportedOperationException("Not supported yet.");
 			}
 		};
@@ -262,7 +262,7 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
 
 	@Test(expected = IllegalStateException.class)
 	public void testCannotConsumeEOF() throws Exception {
-		TokenSource<Token> lexer = new TokenSource<Token>() {
+		TokenSource lexer = new TokenSource() {
 
 			@Override
 			public Token nextToken() {
@@ -290,12 +290,12 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
 			}
 
 			@Override
-			public TokenFactory<? extends Token> getTokenFactory() {
+			public TokenFactory getTokenFactory() {
 				throw new UnsupportedOperationException("Not supported yet.");
 			}
 
 			@Override
-			public void setTokenFactory(TokenFactory<? extends Token> factory) {
+			public void setTokenFactory(TokenFactory factory) {
 				throw new UnsupportedOperationException("Not supported yet.");
 			}
 		};

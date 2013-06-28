@@ -98,7 +98,7 @@ import java.util.Map;
  *  If you don't use named rewrite streams, a "default" stream is used as
  *  the first example shows.
  */
-public class TokenStreamRewriter<Symbol extends Token> {
+public class TokenStreamRewriter {
 	public static final String DEFAULT_PROGRAM_NAME = "default";
     public static final int PROGRAM_INIT_SIZE = 100;
 	public static final int MIN_TOKEN_INDEX = 0;
@@ -106,19 +106,19 @@ public class TokenStreamRewriter<Symbol extends Token> {
 	// Define the rewrite operation hierarchy
 
 	public static class RewriteOperation {
-		protected final TokenStream<? extends Token> tokens;
+		protected final TokenStream tokens;
         /** What index into rewrites List are we? */
         protected int instructionIndex;
         /** Token buffer index. */
         protected int index;
 		protected Object text;
 
-		protected RewriteOperation(TokenStream<? extends Token> tokens, int index) {
+		protected RewriteOperation(TokenStream tokens, int index) {
 			this.tokens = tokens;
 			this.index = index;
 		}
 
-		protected RewriteOperation(TokenStream<? extends Token> tokens, int index, Object text) {
+		protected RewriteOperation(TokenStream tokens, int index, Object text) {
 			this.tokens = tokens;
 			this.index = index;
 			this.text = text;
@@ -141,7 +141,7 @@ public class TokenStreamRewriter<Symbol extends Token> {
 	}
 
 	static class InsertBeforeOp extends RewriteOperation {
-		public InsertBeforeOp(TokenStream<? extends Token> tokens, int index, Object text) {
+		public InsertBeforeOp(TokenStream tokens, int index, Object text) {
 			super(tokens,index,text);
 		}
 
@@ -160,7 +160,7 @@ public class TokenStreamRewriter<Symbol extends Token> {
 	 */
 	static class ReplaceOp extends RewriteOperation {
 		protected int lastIndex;
-		public ReplaceOp(TokenStream<? extends Token> tokens, int from, int to, Object text) {
+		public ReplaceOp(TokenStream tokens, int from, int to, Object text) {
 			super(tokens, from,text);
 			lastIndex = to;
 		}
@@ -183,7 +183,7 @@ public class TokenStreamRewriter<Symbol extends Token> {
 	}
 
 	/** Our source stream */
-	protected final TokenStream<? extends Symbol> tokens;
+	protected final TokenStream tokens;
 
 	/** You may have multiple, named streams of rewrite operations.
 	 *  I'm calling these things "programs."
@@ -194,7 +194,7 @@ public class TokenStreamRewriter<Symbol extends Token> {
 	/** Map String (program name) -> Integer index */
 	protected final Map<String, Integer> lastRewriteTokenIndexes;
 
-	public TokenStreamRewriter(TokenStream<? extends Symbol> tokens) {
+	public TokenStreamRewriter(TokenStream tokens) {
 		this.tokens = tokens;
 		programs = new HashMap<String, List<RewriteOperation>>();
 		programs.put(DEFAULT_PROGRAM_NAME,
@@ -202,7 +202,7 @@ public class TokenStreamRewriter<Symbol extends Token> {
 		lastRewriteTokenIndexes = new HashMap<String, Integer>();
 	}
 
-	public final TokenStream<? extends Symbol> getTokenStream() {
+	public final TokenStream getTokenStream() {
 		return tokens;
 	}
 

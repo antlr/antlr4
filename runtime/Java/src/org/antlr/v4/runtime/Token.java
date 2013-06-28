@@ -100,7 +100,7 @@ public interface Token {
 
 	/** Gets the {@link TokenSource} which created this token.
 	 */
-	TokenSource<?> getTokenSource();
+	TokenSource getTokenSource();
 
 	/**
 	 * Gets the {@link CharStream} from which this token was derived.

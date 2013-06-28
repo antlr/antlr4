@@ -53,7 +53,7 @@ public class NoViableAltException extends RecognitionException {
 	@NotNull
 	private final Token startToken;
 
-	public <Symbol extends Token> NoViableAltException(@NotNull Parser<Symbol> recognizer) { // LL(1) error
+	public NoViableAltException(@NotNull Parser recognizer) { // LL(1) error
 		this(recognizer,
 			 recognizer.getInputStream(),
 			 recognizer.getCurrentToken(),
@@ -62,12 +62,12 @@ public class NoViableAltException extends RecognitionException {
 			 recognizer._ctx);
 	}
 
-	public <Symbol extends Token> NoViableAltException(@NotNull Recognizer<Symbol, ?> recognizer,
-													   @NotNull TokenStream<? extends Symbol> input,
-													   @NotNull Symbol startToken,
-													   @NotNull Symbol offendingToken,
-													   @Nullable ATNConfigSet deadEndConfigs,
-													   @NotNull ParserRuleContext<Symbol> ctx)
+	public NoViableAltException(@NotNull Recognizer<Token, ?> recognizer,
+								@NotNull TokenStream input,
+								@NotNull Token startToken,
+								@NotNull Token offendingToken,
+								@Nullable ATNConfigSet deadEndConfigs,
+								@NotNull ParserRuleContext ctx)
 	{
 		super(recognizer, input, ctx);
 		this.deadEndConfigs = deadEndConfigs;
@@ -77,11 +77,6 @@ public class NoViableAltException extends RecognitionException {
 
 	public Token getStartToken() {
 		return startToken;
-	}
-
-	@SuppressWarnings("unchecked") // safe
-	public <T> T getStartToken(Recognizer<T, ?> recognizer) {
-		return this.getRecognizer() == recognizer ? (T)startToken : null;
 	}
 
 	@Nullable

@@ -30,9 +30,11 @@
 
 package org.antlr.v4.runtime.tree;
 
-public interface TerminalNode<Symbol> extends ParseTree<Symbol> {
-	Symbol getSymbol();
+import org.antlr.v4.runtime.Token;
+
+public interface TerminalNode extends ParseTree {
+	Token getSymbol();
 
 	@Override
-	RuleNode<Symbol> getParent();
+	RuleNode getParent();
 }

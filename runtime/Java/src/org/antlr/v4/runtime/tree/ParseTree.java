@@ -41,15 +41,15 @@ import org.antlr.v4.runtime.Token;
  * <p/>
  *  The payload is either a {@link Token} or a {@link RuleContext} object.
  */
-public interface ParseTree<Symbol> extends SyntaxTree {
+public interface ParseTree extends SyntaxTree {
 	// the following methods narrow the return type; they are not additional methods
 	@Override
-	ParseTree<Symbol> getParent();
+	ParseTree getParent();
 	@Override
-	ParseTree<Symbol> getChild(int i);
+	ParseTree getChild(int i);
 
 	/** The {@link ParseTreeVisitor} needs a double dispatch method. */
-	public <T> T accept(ParseTreeVisitor<? super Symbol, ? extends T> visitor);
+	public <T> T accept(ParseTreeVisitor<? extends T> visitor);
 
 	/** Return the combined text of all leaf nodes. Does not get any
 	 *  off-channel tokens (if any) so won't return whitespace and
@@ -60,5 +60,5 @@ public interface ParseTree<Symbol> extends SyntaxTree {
 	/** Specialize toStringTree so that it can print out more information
 	 * 	based upon the parser.
 	 */
-	public String toStringTree(Parser<?> parser);
+	public String toStringTree(Parser parser);
 }
