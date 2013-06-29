@@ -1,5 +1,7 @@
 ANTLR v4 Honey Badger
 
+June 30, 2013 -- 4.1 release
+
 June 24, 2013
 
 * Resize ANTLRInputStream.data after reading a file with fewer characters than
