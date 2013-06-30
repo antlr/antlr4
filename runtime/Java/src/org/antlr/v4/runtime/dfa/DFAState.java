@@ -94,7 +94,7 @@ public class DFAState {
 	/**
 	 * Indicates that this state was created during SLL prediction that
 	 * discovered a conflict between the configurations in the state. Future
-	 * {@link ParserATNSimulator#execDFA} invocations immediately jumped doing
+	 * {@link ParserATNSimulator#execATN} invocations immediately jumped doing
 	 * full context prediction if this field is true.
 	 */
 	public boolean requiresFullContext;
