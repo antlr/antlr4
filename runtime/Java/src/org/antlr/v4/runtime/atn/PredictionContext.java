@@ -234,7 +234,6 @@ public abstract class PredictionContext {
 	 * @param rootIsWildcard {@code true} if this is a local-context merge,
 	 * otherwise false to indicate a full-context merge
 	 * @param mergeCache
-	 * @return
 	 */
 	public static PredictionContext mergeSingletons(
 		SingletonPredictionContext a,

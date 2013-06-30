@@ -44,201 +44,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-/** Specialized OrderedHashSet that can track info about the set.
- *  Might be able to optimize later w/o affecting code that uses this set.
-
- histogram of lexer DFA configset size:
-
- 206 30  <- 206 sets with size 30
-  47 1
-  17 31
-  12 2
-  10 3
-   7 32
-   4 4
-   3 35
-   2 9
-   2 6
-   2 5
-   2 34
-   1 7
-   1 33
-   1 29
-   1 12
-   1 119 <- max size
-
- 322 set size for SLL parser java.* in DFA states:
-
- 888 1
- 411 54
- 365 88
- 304 56
- 206 80
- 182 16
- 167 86
- 166 78
- 158 84
- 131 2
- 121 20
- 120 8
- 119 112
-  82 10
-  73 6
-  53 174
-  47 90
-  45 4
-  39 12
-  38 122
- 37 89
- 37 62
- 34 3
- 34 18
- 32 81
- 31 87
- 28 45
- 27 144
- 25 41
- 24 132
- 22 91
- 22 7
- 21 82
- 21 28
- 21 27
- 17 9
- 16 29
- 16 155
- 15 51
- 15 118
- 14 146
- 14 114
- 13 5
- 13 38
- 12 48
- 11 64
- 11 50
- 11 22
- 11 134
- 11 131
- 10 79
- 10 76
- 10 59
- 10 58
- 10 55
- 10 39
- 10 116
-  9 74
-  9 47
-  9 310
-   ...
-
- javalr, java.* configs with # preds histogram:
-
- 4569 0
-   57 1
-   27 27
-    5 76
-    4 28
-    3 72
-    3 38
-    3 30
-    2 6
-    2 32
-    1 9
-    1 2
-
- javalr, java.* all atnconfigsets; max size = 322, num sets = 269088
-
- 114186 1    <-- optimize
- 35712 6
- 28081 78
- 15252 54
- 14171 56
- 13159 12
- 11810 88
- 6873 86
- 6158 80
- 5169 4
- 3773 118
- 2350 16
- 1002 112
-  915 28
-  898 44
-  734 2
-  632 62
-  575 8
-  566 59
-  474 20
-  388 84
-  343 48
-  333 55
-  328 47
-  311 41
-  306 38
-  277 81
-  263 79
-  255 66
-  245 90
-  245 87
-  234 50
-  224 10
-  220 60
-  194 64
-  186 32
-  184 82
-  150 18
-  125 7
-  121 132
-  116 30
-  103 51
-   95 114
-   84 36
-   82 40
-   78 22
-   77 89
-   55 9
-   53 174
-   48 152
-   44 67
-   44 5
-   42 115
-   41 58
-   38 122
-   37 134
-   34 13
-   34 116
-   29 45
-   29 3
-   29 24
-   27 144
-   26 146
-   25 91
-   24 113
-   20 27
-   ...
-
- number with 1-9 elements:
-
- 114186 1
- 35712 6
- 5169 4
-  734 2
-  575 8
-  125 7
-   55 9
-   44 5
-   29 3
-
- Can cover 60% of sizes with size up to 6
- Can cover 44% of sizes with size up to 4
- Can cover 42% of sizes with size up to 1
+/**
+ * Specialized {@link Set}{@code <}{@link ATNConfig}{@code >} that can track
+ * info about the set, with support for combining similar configurations using a
+ * graph-structured stack.
  */
 public class ATNConfigSet implements Set<ATNConfig> {
-	/*
-	The reason that we need this is because we don't want the hash map to use
-	the standard hash code and equals. We need all configurations with the same
-	(s,i,_,semctx) to be equal. Unfortunately, this key effectively doubles
-	the number of objects associated with ATNConfigs. The other solution is to
-	use a hash table that lets us specify the equals/hashcode operation.
+	/**
+	 * The reason that we need this is because we don't want the hash map to use
+	 * the standard hash code and equals. We need all configurations with the same
+	 * {@code (s,i,_,semctx)} to be equal. Unfortunately, this key effectively doubles
+	 * the number of objects associated with ATNConfigs. The other solution is to
+	 * use a hash table that lets us specify the equals/hashcode operation.
 	 */
 	public static class ConfigHashSet extends AbstractConfigHashSet {
 		public ConfigHashSet() {
@@ -279,8 +96,9 @@ public class ATNConfigSet implements Set<ATNConfig> {
  	 */
 	protected boolean readonly = false;
 
-	/** All configs but hashed by (s, i, _, pi) not incl context.  Wiped out
-	 *  when we go readonly as this set becomes a DFA state.
+	/**
+	 * All configs but hashed by (s, i, _, pi) not including context. Wiped out
+	 * when we go readonly as this set becomes a DFA state.
 	 */
 	public AbstractConfigHashSet configLookup;
 

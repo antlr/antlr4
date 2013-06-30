@@ -35,10 +35,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 
-/** This is an ANTLRInputStream that is loaded from a file
- *  all at once when you construct the object.  This is a special case
- *  since we know the exact size of the object to load.  We can avoid lots
- *  of data copying.
+/**
+ * This is an {@link ANTLRInputStream} that is loaded from a file all at once
+ * when you construct the object.
  */
 public class ANTLRFileStream extends ANTLRInputStream {
 	protected String fileName;
