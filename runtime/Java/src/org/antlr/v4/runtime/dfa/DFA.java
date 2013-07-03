@@ -30,7 +30,6 @@
 package org.antlr.v4.runtime.dfa;
 
 import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
@@ -61,11 +60,6 @@ public class DFA {
 	public final ATNState atnStartState;
 
 	private final AtomicInteger nextStateNumber = new AtomicInteger();
-
-	/** Set of configs for a DFA state with at least one conflict? Mainly used as "return value"
-	 *  from {@link ParserATNSimulator#predictATN} for retry.
-	 */
-//	public OrderedHashSet<ATNConfig> conflictSet;
 
 	public DFA(@NotNull ATNState atnStartState) {
 		this(atnStartState, 0);
