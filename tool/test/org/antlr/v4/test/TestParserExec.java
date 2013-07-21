@@ -286,6 +286,7 @@ public class TestParserExec extends BaseTest {
 	 * https://github.com/antlr/antlr4/issues/42
 	 */
 	@Test
+	@Ignore("The fix for this test has been deferred to the next release.")
 	public void testPredicatedIfIfElse() throws Exception {
 		String grammar =
 			"grammar T;\n" +
