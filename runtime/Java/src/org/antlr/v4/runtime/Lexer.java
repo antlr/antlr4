@@ -37,6 +37,7 @@ import org.antlr.v4.runtime.misc.Pair;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.List;
+import java.util.Stack;
 
 /** A lexer is recognizer that draws input symbols from a character stream.
  *  lexer grammars result in a subclass of this object. A Lexer object
@@ -97,6 +98,65 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	public final IntegerStack _modeStack = new IntegerStack();
 	public int _mode = Lexer.DEFAULT_MODE;
 
+	/** 
+	 * Keep track of lexer states.
+	 * Needed to handling grammars that allow to include 
+	 * content into the current scanning. 
+	 */
+	public final Stack<StackableLexerState> _includeStack = new Stack<StackableLexerState>(); 
+	
+	/** 
+	 * Once a request to process an include file, next token need to store 
+	 * current lexer state and read from the requested file.
+	 */
+	public boolean _hitInclude = false;
+	public Integer _includeIdx;
+	public CharStream _includeStream;
+	public IncludeStrategy _includeStrategy;
+	
+	public class StackableLexerState
+	{   private CharStream input;
+	    private Pair<TokenSource, CharStream> tokenFactorySourcePair;
+	
+		public StackableLexerState(CharStream cs, Pair<TokenSource, CharStream> tfsp)
+		{ input=cs;
+		  tokenFactorySourcePair=tfsp;
+		}
+
+		public CharStream getInput() {return input;	};
+		public  Pair<TokenSource, CharStream> getTokenFactorySourcePair(){ return tokenFactorySourcePair; };
+	}
+	
+	public void pushLexerState(CharStream newStream)
+	{
+		/* store old state on stack */
+		_includeStack.push(new StackableLexerState(this._input
+				                               , this._tokenFactorySourcePair));
+		if ( LexerATNSimulator.debug ) System.out.println(">> push stream:"+ _includeStack.size());
+		
+		/* Insert new stream into current lexer */
+		this._input = newStream;
+        this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, _input);
+	};
+	public void popLexerState()
+	{
+		if ( LexerATNSimulator.debug ) System.out.println("<< pop stream:"+ _includeStack.size());
+		StackableLexerState old=_includeStack.pop();
+		this._input = old.getInput();
+        this._tokenFactorySourcePair = old.tokenFactorySourcePair;
+	};
+	
+	protected void setIncludeStream(CharStream ch)
+	{
+		_includeStream=ch;
+		_hitInclude=true;
+	}
+
+	public void setIncludeStream(String fileName)
+	{
+		setIncludeStream(this._includeStrategy.file2Stream(fileName, this._includeIdx));
+	}
+	
 	/** You can set the text for the current token to override what is in
 	 *  the input char buffer.  Use setText() or can set this instance var.
 	 */
@@ -108,6 +168,13 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		this._input = input;
 		this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, input);
 	}
+
+	public Lexer(CharStream input, IncludeStrategy includeStrategy) {
+		this._input = input;
+		this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, input);
+		this._includeStrategy = includeStrategy;
+	}
+	
 
 	public void reset() {
 		// wack Lexer state variables
@@ -145,10 +212,21 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 			outer:
 			while (true) {
 				if (_hitEOF) {
-					emitEOF();
-					return _token;
+					if (!_includeStack.empty()) {
+						/* restore Lexer state */
+						popLexerState();
+						_hitEOF = false;
+					} else {
+						emitEOF();
+						return _token;
+					}
 				}
-
+				/* Lexer encountered an INCLUDE/COPY request */
+				if (_hitInclude) { 
+					pushLexerState(_includeStream); 
+					_hitInclude=false;
+				}
+				
 				_token = null;
 				_channel = Token.DEFAULT_CHANNEL;
 				_tokenStartCharIndex = _input.index();

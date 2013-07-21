@@ -786,7 +786,7 @@ public class Tool {
 	}
 
 	public void help() {
-		info("ANTLR Parser Generator  Version " + Tool.VERSION);
+		info("ANTLR Parser Generator (HS Styled) Version " + Tool.VERSION);
 		for (Option o : optionDefs) {
 			String name = o.name + (o.argType!=OptionArgType.NONE? " ___" : "");
 			String s = String.format(" %-19s %s", name, o.description);
