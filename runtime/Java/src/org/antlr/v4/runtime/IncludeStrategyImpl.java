@@ -18,10 +18,10 @@ public class IncludeStrategyImpl implements IncludeStrategy
 		 */
 		ArrayList<ANTLRInputStream> filenameContentList = new ArrayList<ANTLRInputStream>();
 
-		public Pair<CharStream, Integer> file2Stream(String inFileName) {
-			Integer outFileIdx=filenameIndexMap.get(inFileName); 
-			Pair<CharStream, Integer> outPair=new Pair<CharStream, Integer>(filenameContentList.get(outFileIdx),outFileIdx);
-			return outPair;
+		public Pair<CharStream, Integer> file2StreamPair(String inFileName) {
+			Integer streamRef=filenameIndexMap.get(inFileName); 
+			Pair<CharStream, Integer> streamPair=new Pair<CharStream, Integer>(filenameContentList.get(streamRef),streamRef);
+			return streamPair;
 		}
 		
 		public Integer addInclude(String fileName) {
@@ -31,17 +31,17 @@ public class IncludeStrategyImpl implements IncludeStrategy
 		
 		public Integer addInclude(String fileName,String content) {
 
-			Integer ix=filenameIndexMap.get(fileName);
-			if(ix==null){
+			Integer streamRef=filenameIndexMap.get(fileName);
+			if(streamRef==null){
 				ANTLRInputStream istrm=new ANTLRInputStream(content);
 				filenameContentList.add(istrm);
-				ix=filenameContentList.indexOf(istrm);
-				filenameIndexMap.put(fileName, ix);
+				streamRef=filenameContentList.indexOf(istrm);
+				filenameIndexMap.put(fileName, streamRef);
 			}
 			else {
 				// replace content
-				filenameContentList.set(ix,new ANTLRInputStream(content));
+				filenameContentList.set(streamRef,new ANTLRInputStream(content));
 			}
-			return ix;
+			return streamRef;
 		};
 	}

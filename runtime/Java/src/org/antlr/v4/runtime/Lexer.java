@@ -155,7 +155,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	
 	public void setIncludeStream(String fileName)
 	{
-		this._includePair = this._includeStrategy.file2Stream(fileName);
+		this._includePair = this._includeStrategy.file2StreamPair(fileName);
 		_hitInclude=true;
 	}
 	
