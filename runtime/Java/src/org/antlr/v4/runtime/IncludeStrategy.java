@@ -1,5 +1,7 @@
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.Pair;
+
 public interface IncludeStrategy {
-   public CharStream file2Stream(String inFileName, Integer outFileIdx);
+   public  Pair<CharStream,Integer> file2Stream(String inFileName);
 }

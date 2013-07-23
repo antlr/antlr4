@@ -106,4 +106,6 @@ public interface Token {
 	 * Gets the {@link CharStream} from which this token was derived.
 	 */
 	CharStream getInputStream();
+	
+	Integer getStreamRef();
 }

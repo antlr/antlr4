@@ -44,7 +44,7 @@ public class CommonToken implements WritableToken, Serializable {
 	protected int charPositionInLine = -1; // set to invalid position
 	protected int channel=DEFAULT_CHANNEL;
 	protected Pair<TokenSource, CharStream> source;
-
+	protected Integer streamRef = -1;
 	/** We need to be able to change the text once in a while.  If
 	 *  this is non-null, then getText should return this.  Note that
 	 *  start/stop are not affected by changing this.
@@ -65,12 +65,13 @@ public class CommonToken implements WritableToken, Serializable {
 		this.type = type;
 	}
 
-	public CommonToken(@NotNull Pair<TokenSource, CharStream> source, int type, int channel, int start, int stop) {
+	public CommonToken(@NotNull Pair<TokenSource, CharStream> source, int type, int channel, int start, int stop, Integer streamRef) {
 		this.source = source;
 		this.type = type;
 		this.channel = channel;
 		this.start = start;
 		this.stop = stop;
+		this.streamRef=streamRef;
 		if (source.a != null) {
 			this.line = source.a.getLine();
 			this.charPositionInLine = source.a.getCharPositionInLine();
@@ -93,6 +94,7 @@ public class CommonToken implements WritableToken, Serializable {
 		channel = oldToken.getChannel();
 		start = oldToken.getStartIndex();
 		stop = oldToken.getStopIndex();
+		streamRef=oldToken.getStreamRef();
 
 		if (oldToken instanceof CommonToken) {
 			source = ((CommonToken)oldToken).source;
@@ -139,6 +141,11 @@ public class CommonToken implements WritableToken, Serializable {
 		this.text = text;
 	}
 
+	@Override
+	public void setStreamRef(Integer streamRef) {
+		this.streamRef=streamRef;
+	}
+	
 	@Override
 	public int getLine() {
 		return line;
@@ -208,10 +215,19 @@ public class CommonToken implements WritableToken, Serializable {
 	}
 
 	@Override
+	public Integer getStreamRef() {
+		return this.streamRef;
+	}
+	
+	@Override
 	public String toString() {
 		String channelStr = "";
+		String streamrefStr = "";
 		if ( channel>0 ) {
 			channelStr=",channel="+channel;
+		}
+		if (streamRef!=null&&streamRef>=0 ) {
+			streamrefStr=",streamref="+streamRef;
 		}
 		String txt = getText();
 		if ( txt!=null ) {
@@ -222,6 +238,10 @@ public class CommonToken implements WritableToken, Serializable {
 		else {
 			txt = "<no text>";
 		}
-		return "[@"+getTokenIndex()+","+start+":"+stop+"='"+txt+"',<"+type+">"+channelStr+","+line+":"+getCharPositionInLine()+"]";
+		return "[@"+getTokenIndex()+","+start+":"+stop+"='"+txt+"',<"+type+">"+channelStr+streamrefStr+","+line+":"+getCharPositionInLine()+"]";
 	}
+
+
+
+
 }

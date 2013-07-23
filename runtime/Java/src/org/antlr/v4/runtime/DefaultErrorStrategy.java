@@ -589,7 +589,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 			recognizer.getTokenFactory().create(new Pair<TokenSource, CharStream>(current.getTokenSource(), current.getTokenSource().getInputStream()), expectedTokenType, tokenText,
 							Token.DEFAULT_CHANNEL,
 							-1, -1,
-							current.getLine(), current.getCharPositionInLine());
+							current.getLine(), current.getCharPositionInLine(),-1);
 	}
 
 	@NotNull

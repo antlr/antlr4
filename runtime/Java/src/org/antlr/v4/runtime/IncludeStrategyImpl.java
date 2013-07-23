@@ -3,6 +3,8 @@ package org.antlr.v4.runtime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.antlr.v4.runtime.misc.Pair;
+
 public class IncludeStrategyImpl implements IncludeStrategy
 	{
 		/**
@@ -16,9 +18,10 @@ public class IncludeStrategyImpl implements IncludeStrategy
 		 */
 		ArrayList<ANTLRInputStream> filenameContentList = new ArrayList<ANTLRInputStream>();
 
-		public CharStream file2Stream(String inFileName, Integer outFileIdx) {
-			outFileIdx=filenameIndexMap.get(inFileName);
-			return filenameContentList.get(outFileIdx);
+		public Pair<CharStream, Integer> file2Stream(String inFileName) {
+			Integer outFileIdx=filenameIndexMap.get(inFileName); 
+			Pair<CharStream, Integer> outPair=new Pair<CharStream, Integer>(filenameContentList.get(outFileIdx),outFileIdx);
+			return outPair;
 		}
 		
 		public Integer addInclude(String fileName) {
