@@ -128,6 +128,14 @@ public class LexerATNSimulator extends ATNSimulator {
 		this.startIndex = simulator.startIndex;
 	}
 
+	public void setState(@NotNull LexerATNSimulatorState simulatorState) {
+		this.charPositionInLine = simulatorState.getCharPositionInLine();
+		this.line = simulatorState.getLine();
+		this.mode = simulatorState.getMode();
+		this.startIndex = simulatorState.getStartIndex();
+	}
+
+	
 	public int match(@NotNull CharStream input, int mode) {
 		match_calls++;
 		this.mode = mode;

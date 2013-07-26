@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.atn.LexerATNSimulatorState;
 import org.antlr.v4.runtime.misc.IntegerStack;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Pair;
@@ -119,16 +120,22 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	{   private CharStream input;
 	    private Pair<TokenSource, CharStream> tokenFactorySourcePair;
 	    private Integer streamRef;
-	
-		public StackableLexerState(CharStream cs, Pair<TokenSource, CharStream> tfsp, Integer sr)
+	    private LexerATNSimulatorState lexerATNSimulatorState;
+
+		public StackableLexerState(CharStream cs, Pair<TokenSource, CharStream> tfsp, Integer sr
+				, LexerATNSimulatorState lass
+				)
 		{ input=cs;
 		  tokenFactorySourcePair=tfsp;
 		  streamRef=sr;
+		  lexerATNSimulatorState=lass;
 		}
 
 		public CharStream getInput() {return input;	};
 		public  Pair<TokenSource, CharStream> getTokenFactorySourcePair(){ return tokenFactorySourcePair; }
-		public Integer getIncludeIdx() {return streamRef;};
+		public Integer getstremRef() {return streamRef;};
+		public LexerATNSimulatorState getLexerATNSimulatorState() {return lexerATNSimulatorState;}
+		
 	}
 	
 	public void pushLexerState(Pair<CharStream,Integer> includePair)
@@ -136,13 +143,15 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		/* store old state on stack */
 		_includeStack.push(new StackableLexerState(this._input
 				                               , this._tokenFactorySourcePair
-				                               , this._streamRef));
+				                               , this._streamRef
+				                               , new LexerATNSimulatorState(getInterpreter())));
 		if ( LexerATNSimulator.debug ) System.out.println(">> push stream:"+ _includeStack.size());
 		
 		/* Insert new stream into current lexer */
 		this._input = includePair.a;
 		this._streamRef = includePair.b;
         this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, _input);
+        this._input.seek(0); // ensure position is set
 	};
 	public void popLexerState()
 	{
@@ -150,7 +159,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		StackableLexerState old=_includeStack.pop();
 		this._input = old.getInput();
         this._tokenFactorySourcePair = old.getTokenFactorySourcePair();
-        this._streamRef=old.getIncludeIdx();
+        this._streamRef=old.getstremRef();
+        LexerATNSimulatorState lass=old.getLexerATNSimulatorState();
+        getInterpreter().reset();
+        getInterpreter().setState(lass);
 	};
 	
 	public void setIncludeStream(String fileName)

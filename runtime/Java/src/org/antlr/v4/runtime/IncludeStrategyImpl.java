@@ -1,8 +1,11 @@
 package org.antlr.v4.runtime;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import org.antlr.v4.runtime.misc.Pair;
 
 public class IncludeStrategyImpl implements IncludeStrategy
@@ -10,38 +13,78 @@ public class IncludeStrategyImpl implements IncludeStrategy
 		/**
 		 * Maps a filename to an index in the ArrayList
 		 */
-		HashMap<String,Integer>     filenameIndexMap   = new HashMap<String, Integer>();
+		private HashMap<String,Integer>     filenameIndexMap   = new HashMap<String, Integer>();
 		
 		/**
 		 * List of ANTLRInputStream.
 		 * Filenames are mapped to the ANTLRInputStream using filenameIndexMap. 
 		 */
-		ArrayList<ANTLRInputStream> filenameContentList = new ArrayList<ANTLRInputStream>();
+		private ArrayList<ANTLRInputStream> filenameContentList = new ArrayList<ANTLRInputStream>();
 
+		/**
+		 * Returns Pair<CharStream,Integer> for the inFileName
+		 */
 		public Pair<CharStream, Integer> file2StreamPair(String inFileName) {
-			Integer streamRef=filenameIndexMap.get(inFileName); 
+			Integer streamRef=addInclude(inFileName);
 			Pair<CharStream, Integer> streamPair=new Pair<CharStream, Integer>(filenameContentList.get(streamRef),streamRef);
 			return streamPair;
 		}
 		
-		public Integer addInclude(String fileName) {
-			// TODO: should create a ANTLRStream( Reader(fileName) )
-			return null;
-		};
+		/**
+		 * Maintain internal data-structure mapping fileName with ANTLRInputStream
+		 * @param fileName
+		 * @param ais
+		 * @return reference number to input stream
+		 */
+		protected Integer buildStreamMap(String fileName, ANTLRInputStream ais)
+		{
+			filenameContentList.add(ais);
+			Integer streamRef = filenameContentList.indexOf(ais);
+			filenameIndexMap.put(fileName, streamRef);
+			return streamRef;
+		}
 		
-		public Integer addInclude(String fileName,String content) {
+		/**
+		 * If the fileName has not been added, reads the fileName from the filesystem
+		 * @param fileName
+		 * @return
+		 */
+		public Integer addInclude(String fileName) {
+			Integer streamRef=filenameIndexMap.get(fileName);
+			if (streamRef == null) {
+				try {
+					InputStream is = new FileInputStream(fileName);
+					ANTLRInputStream istrm = new ANTLRInputStream(is);
+					
+					return buildStreamMap(fileName,istrm);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			return streamRef;
+		}
 
+		/**
+		 * Adding fileName as string content.  If filename is re-added then the content will be replaced. 
+		 * @param fileName
+		 * @param content
+		 * @return
+		 */
+		public Integer addInclude(String fileName, String content) {
 			Integer streamRef=filenameIndexMap.get(fileName);
 			if(streamRef==null){
 				ANTLRInputStream istrm=new ANTLRInputStream(content);
-				filenameContentList.add(istrm);
-				streamRef=filenameContentList.indexOf(istrm);
-				filenameIndexMap.put(fileName, streamRef);
+				return buildStreamMap(fileName,istrm);
 			}
 			else {
 				// replace content
 				filenameContentList.set(streamRef,new ANTLRInputStream(content));
 			}
 			return streamRef;
-		};
+		}
 	}
