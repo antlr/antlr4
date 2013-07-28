@@ -238,7 +238,7 @@ public class CommonToken implements WritableToken, Serializable {
 		else {
 			txt = "<no text>";
 		}
-		return "[@"+getTokenIndex()+","+start+":"+stop+"='"+txt+"',<"+type+">"+channelStr+streamrefStr+","+line+":"+getCharPositionInLine()+"]";
+		return "[@"+getTokenIndex()+","+start+":"+stop+"='"+txt+"',<"+type+">"+channelStr+streamrefStr+","+line+":"+charPositionInLine+"]";
 	}
 
 

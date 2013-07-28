@@ -152,6 +152,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		this._streamRef = includePair.b;
         this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, _input);
         this._input.seek(0); // ensure position is set
+        getInterpreter().reset();
 	};
 	public void popLexerState()
 	{

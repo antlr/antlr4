@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+
 import org.antlr.v4.runtime.misc.Pair;
 
 public class IncludeStrategyImpl implements IncludeStrategy
@@ -41,6 +43,7 @@ public class IncludeStrategyImpl implements IncludeStrategy
 			filenameContentList.add(ais);
 			Integer streamRef = filenameContentList.indexOf(ais);
 			filenameIndexMap.put(fileName, streamRef);
+			//System.out.println("+++Adding include ("+streamRef+") "+fileName);
 			return streamRef;
 		}
 		
@@ -86,5 +89,20 @@ public class IncludeStrategyImpl implements IncludeStrategy
 				filenameContentList.set(streamRef,new ANTLRInputStream(content));
 			}
 			return streamRef;
+		}
+		
+		public String getFileName(Integer ref)
+		{
+			String s="";
+			int i=0;
+			Iterator<String> ix=filenameIndexMap.keySet().iterator();
+			while(ix.hasNext()) 
+			{s=ix.next();
+			//System.out.println("+++("+i+") "+s);
+			 if(filenameIndexMap.get(s).equals(ref)) break;
+			 i++;
+			}
+			
+			return s;
 		}
 	}
