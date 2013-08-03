@@ -65,13 +65,13 @@ public class CommonToken implements WritableToken, Serializable {
 		this.type = type;
 	}
 
-	public CommonToken(@NotNull Pair<TokenSource, CharStream> source, int type, int channel, int start, int stop, Integer streamRef) {
+	public CommonToken(@NotNull Pair<TokenSource, CharStream> source, int type, int channel, int start, int stop) {
 		this.source = source;
 		this.type = type;
 		this.channel = channel;
 		this.start = start;
 		this.stop = stop;
-		this.streamRef=streamRef;
+		this.streamRef=-1;
 		if (source.a != null) {
 			this.line = source.a.getLine();
 			this.charPositionInLine = source.a.getCharPositionInLine();

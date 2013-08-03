@@ -45,7 +45,11 @@ public interface TokenFactory<Symbol extends Token> {
 	@NotNull
 	Symbol create(@NotNull Pair<TokenSource, CharStream> source, int type, String text,
 				  int channel, int start, int stop,
-				  int line, int charPositionInLine, Integer streamRef);
+				  int line, int charPositionInLine);
+
+	Symbol create(@NotNull Pair<TokenSource, CharStream> source, int type, String text,
+			  int channel, int start, int stop,
+			  int line, int charPositionInLine, Integer streamRef);
 
 	/** Generically useful */
 	@NotNull

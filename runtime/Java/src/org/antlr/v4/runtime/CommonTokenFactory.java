@@ -52,12 +52,11 @@ public class CommonTokenFactory implements TokenFactory<CommonToken> {
 	@Override
 	public CommonToken create(Pair<TokenSource, CharStream> source, int type, String text,
 							  int channel, int start, int stop,
-							  int line, int charPositionInLine,Integer streamRef)
+							  int line, int charPositionInLine)
 	{
-		CommonToken t = new CommonToken(source, type, channel, start, stop, streamRef);
+		CommonToken t = new CommonToken(source, type, channel, start, stop);
 		t.setLine(line);
 		t.setCharPositionInLine(charPositionInLine);
-		t.setStreamRef(streamRef);
 		if ( text!=null ) {
 			t.setText(text);
 		}
@@ -65,6 +64,16 @@ public class CommonTokenFactory implements TokenFactory<CommonToken> {
 			t.setText(source.b.getText(Interval.of(start,stop)));
 		}
 
+		return t;
+	}
+
+	@Override
+	public CommonToken create(Pair<TokenSource, CharStream> source, int type, String text,
+							  int channel, int start, int stop,
+							  int line, int charPositionInLine ,Integer streamRef)
+	{
+		CommonToken t = this.create(source, type, text, channel, start, stop, line, charPositionInLine);
+		t.setStreamRef(streamRef);
 		return t;
 	}
 

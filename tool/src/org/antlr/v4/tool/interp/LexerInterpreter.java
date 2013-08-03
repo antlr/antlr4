@@ -121,7 +121,7 @@ public class LexerInterpreter implements TokenSource {
 			int stop = input.index()-1;
 
 			return _factory.create(tokenFactorySourcePair, ttype, null, Token.DEFAULT_CHANNEL, start, stop,
-								   tokenStartLine, tokenStartCharPositionInLine,-1);
+								   tokenStartLine, tokenStartCharPositionInLine);
 		}
 		finally {
 			input.release(mark);
