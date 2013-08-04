@@ -76,13 +76,13 @@
         <dependency>
             <groupId>com.tunnelvisionlabs</groupId>
             <artifactId>antlr4</artifactId>
-            <version>4.0.1-SNAPSHOT</version>
+            <version>4.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.tunnelvisionlabs</groupId>
             <artifactId>antlr4-runtime</artifactId>
-            <version>4.0.1-SNAPSHOT</version>
+            <version>4.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -142,7 +142,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-shade-plugin</artifactId>
-                        <version>2.0</version>
+                        <version>2.1</version>
                         <inherited>false</inherited>
                         <executions>
                             <execution>
@@ -198,7 +198,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.0</version>
+                <version>3.1</version>
                 <configuration>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
@@ -246,7 +246,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.12.4</version>
+                <version>2.15</version>
             </plugin>
 
             <plugin>
@@ -260,7 +260,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <!-- override the version inherited from the parent -->
-                <version>2.9</version>
+                <version>2.9.1</version>
                 <configuration>
                     <quiet>true</quiet>
                 </configuration>
