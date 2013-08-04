@@ -199,6 +199,12 @@ namespace Antlr4.Build.Tasks
             AppDomain domain = null;
             bool success;
 
+            if (!Path.IsPathRooted(ToolPath))
+                ToolPath = Path.Combine(Path.GetDirectoryName(BuildEngine.ProjectFileOfTaskNode), ToolPath);
+
+            if (!Path.IsPathRooted(BuildTaskPath))
+                BuildTaskPath = Path.Combine(Path.GetDirectoryName(BuildEngine.ProjectFileOfTaskNode), BuildTaskPath);
+
             try
             {
                 domain = GetAntlrTaskAppDomain();
