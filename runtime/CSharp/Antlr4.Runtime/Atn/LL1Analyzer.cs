@@ -139,7 +139,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>ctx</code>
         /// .
         /// </returns>
-        [NotNull]
+        [return: NotNull]
         public virtual IntervalSet Look(ATNState s, PredictionContext ctx)
         {
             return Look(s, null, ctx);

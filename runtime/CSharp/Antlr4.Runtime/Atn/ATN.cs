@@ -174,7 +174,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>s</code>
         /// 's rule.
         /// </summary>
-        [NotNull]
+        [return: NotNull]
         public virtual IntervalSet NextTokens(ATNState s, PredictionContext ctx)
         {
             Args.NotNull("ctx", ctx);
@@ -192,7 +192,7 @@ namespace Antlr4.Runtime.Atn
         /// is in set if we reach end of
         /// rule.
         /// </summary>
-        [NotNull]
+        [return: NotNull]
         public virtual IntervalSet NextTokens(ATNState s)
         {
             if (s.nextTokenWithinRule != null)
@@ -286,7 +286,7 @@ namespace Antlr4.Runtime.Atn
         /// number
         /// <code>stateNumber</code>
         /// </exception>
-        [NotNull]
+        [return: NotNull]
         public virtual IntervalSet GetExpectedTokens(int stateNumber, RuleContext context
             )
         {

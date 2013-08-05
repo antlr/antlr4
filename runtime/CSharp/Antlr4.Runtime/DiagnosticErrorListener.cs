@@ -135,8 +135,8 @@ namespace Antlr4.Runtime
             recognizer.NotifyErrorListeners(message);
         }
 
-        protected internal virtual string GetDecisionDescription<T>(Parser recognizer, DFA
-             dfa) where T:IToken
+        protected internal virtual string GetDecisionDescription(Parser recognizer, DFA
+             dfa)
         {
             int decision = dfa.decision;
             int ruleIndex = dfa.atnStartState.ruleIndex;
@@ -146,7 +146,7 @@ namespace Antlr4.Runtime
                 return decision.ToString();
             }
             string ruleName = ruleNames[ruleIndex];
-            if (ruleName == null || ruleName.IsEmpty())
+            if (string.IsNullOrEmpty(ruleName))
             {
                 return decision.ToString();
             }
@@ -178,7 +178,7 @@ namespace Antlr4.Runtime
         /// <code>configs</code>
         /// .
         /// </returns>
-        [NotNull]
+        [return: NotNull]
         protected internal virtual BitSet GetConflictingAlts(BitSet reportedAlts, ATNConfigSet
              configs)
         {

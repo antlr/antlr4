@@ -210,7 +210,7 @@ namespace Antlr4.Runtime.Atn
                 if (epsilonOnlyTransitions != e.IsEpsilon)
                 {
 #if !PORTABLE
-                    System.Console.Error.Format(CultureInfo.CurrentCulture, "ATN state {0} has both epsilon and non-epsilon transitions."
+                    System.Console.Error.WriteLine("ATN state {0} has both epsilon and non-epsilon transitions."
                         , stateNumber);
 #endif
                     epsilonOnlyTransitions = false;

@@ -156,7 +156,7 @@ namespace Antlr4.Runtime
         /// <code>null</code>
         /// if the information is not available.
         /// </returns>
-        [Nullable]
+        [return: Nullable]
         public virtual IntervalSet GetExpectedTokens()
         {
             if (recognizer != null)

@@ -42,7 +42,7 @@ namespace Antlr4.Runtime.Atn
     {
         public static readonly int SerializedVersion = 3;
 
-        public static readonly UUID SerializedUuid = UUID.FromString("E4178468-DF95-44D0-AD87-F22A5D5FB6D3");
+        public static readonly Guid SerializedUuid = new Guid("E4178468-DF95-44D0-AD87-F22A5D5FB6D3");
 
         public const char RuleVariantDelimiter = '$';
 
@@ -89,16 +89,15 @@ namespace Antlr4.Runtime.Atn
                     , version, SerializedVersion);
                 throw new NotSupportedException(reason);
             }
-            UUID uuid = ToUUID(data, p);
+            Guid uuid = ToUUID(data, p);
             p += 8;
             if (!uuid.Equals(SerializedUuid))
             {
-                string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with UUID %s (expected %s)."
+                string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with UUID {0} (expected {1})."
                     , uuid, SerializedUuid);
-                throw new NotSupportedException(new InvalidClassException(typeof(ATN).FullName, reason
-                    ));
+                throw new NotSupportedException(reason);
             }
-            ATNType grammarType = ATNType.Values()[ToInt(data[p++])];
+            ATNType grammarType = (ATNType)ToInt(data[p++]);
             int maxTokenType = ToInt(data[p++]);
             ATN atn = new ATN(grammarType, maxTokenType);
             //
@@ -863,11 +862,16 @@ nextTransition_continue: ;
             return lowOrder | ((long)ToInt32(data, offset + 2) << 32);
         }
 
-        public static UUID ToUUID(char[] data, int offset)
+        public static Guid ToUUID(char[] data, int offset)
         {
-            long leastSigBits = ToLong(data, offset);
-            long mostSigBits = ToLong(data, offset + 4);
-            return new UUID(mostSigBits, leastSigBits);
+            byte[] leastSigBits = BitConverter.GetBytes(ToLong(data, offset));
+            byte[] mostSigBits = BitConverter.GetBytes(ToLong(data, offset + 4));
+
+            byte[] bits = leastSigBits;
+            Array.Resize(ref bits, leastSigBits.Length + mostSigBits.Length);
+            Buffer.BlockCopy(mostSigBits, 0, bits, leastSigBits.Length, mostSigBits.Length);
+
+            return new Guid(bits);
         }
 
         [return: NotNull]

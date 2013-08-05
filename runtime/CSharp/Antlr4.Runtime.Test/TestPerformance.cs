@@ -988,41 +988,41 @@
 
         private class SummarizingDiagnosticErrorListener : DiagnosticErrorListener
         {
-            public override void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet ambigAlts, ATNConfigSet configs)
+            public override void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, bool exact, BitSet ambigAlts, ATNConfigSet configs)
             {
                 if (!REPORT_AMBIGUITIES)
                 {
                     return;
                 }
 
-                base.ReportAmbiguity(recognizer, dfa, startIndex, stopIndex, ambigAlts, configs);
+                base.ReportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
             }
 
-            public override void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, SimulatorState initialState)
+            public override void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, SimulatorState initialState)
             {
                 if (!REPORT_FULL_CONTEXT)
                 {
                     return;
                 }
 
-                base.ReportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, initialState);
+                base.ReportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, initialState);
             }
 
-            public override void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, SimulatorState acceptState)
+            public override void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, SimulatorState acceptState)
             {
                 if (!REPORT_CONTEXT_SENSITIVITY)
                 {
                     return;
                 }
 
-                base.ReportContextSensitivity(recognizer, dfa, startIndex, stopIndex, acceptState);
+                base.ReportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, acceptState);
             }
 
-            protected override string GetDecisionDescription(Parser recognizer, int decision)
+            protected override string GetDecisionDescription(Parser recognizer, DFA dfa)
             {
                 string format = "{0}({1})";
-                string ruleName = recognizer.RuleNames[recognizer.Atn.decisionToState[decision].ruleIndex];
-                return string.Format(format, decision, ruleName);
+                string ruleName = recognizer.RuleNames[recognizer.Atn.decisionToState[dfa.decision].ruleIndex];
+                return string.Format(format, dfa.decision, ruleName);
             }
         }
 

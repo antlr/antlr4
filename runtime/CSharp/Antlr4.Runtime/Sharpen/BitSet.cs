@@ -140,6 +140,18 @@ namespace Sharpen
             return result;
         }
 
+        public void Clear(int index)
+        {
+            if (index < 0)
+                throw new ArgumentOutOfRangeException("index");
+
+            int element = index / BitsPerElement;
+            if (element >= _data.Length)
+                return;
+
+            _data[element] &= ~(1UL << (index % BitsPerElement));
+        }
+
         public bool Get(int index)
         {
             if (index < 0)

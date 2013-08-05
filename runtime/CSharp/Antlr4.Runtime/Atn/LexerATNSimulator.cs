@@ -262,15 +262,17 @@ namespace Antlr4.Runtime.Atn
         /// if the target state for this edge is not
         /// already cached
         /// </returns>
-        [Nullable]
+        [return: Nullable]
         protected internal virtual DFAState GetExistingTargetState(DFAState s, int t)
         {
             DFAState target = s.GetTarget(t);
+#if !PORTABLE
             if (debug && target != null)
             {
                 System.Console.Out.WriteLine("reuse state " + s.stateNumber + " edge to " + target
                     .stateNumber);
             }
+#endif
             return target;
         }
 
@@ -295,7 +297,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="ATNSimulator.Error">ATNSimulator.Error</see>
         /// .
         /// </returns>
-        [NotNull]
+        [return: NotNull]
         protected internal virtual DFAState ComputeTargetState(ICharStream input, DFAState
              s, int t)
         {

@@ -850,7 +850,7 @@ namespace Antlr4.Runtime.Atn
         /// if the target state for this edge is not
         /// already cached
         /// </returns>
-        [Nullable]
+        [return: Nullable]
         protected internal virtual DFAState GetExistingTargetState(DFAState s, int t)
         {
             return s.GetTarget(t);
@@ -880,7 +880,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="ATNSimulator.Error">ATNSimulator.Error</see>
         /// .
         /// </returns>
-        [NotNull]
+        [return: NotNull]
         protected internal virtual Tuple<DFAState, ParserRuleContext> ComputeTargetState(
             DFA dfa, DFAState s, ParserRuleContext remainingGlobalContext, int t, bool useContext
             , PredictionContextCache contextCache)
@@ -1405,7 +1405,7 @@ namespace Antlr4.Runtime.Atn
                         // track how far we dip into outer context.  Might
                         // come in handy and we avoid evaluating context dependent
                         // preds if this is > 0.
-                        if (!closureBusy.AddItem(c))
+                        if (!closureBusy.Add(c))
                         {
                             // avoid infinite recursion for right-recursive rules
                             continue;

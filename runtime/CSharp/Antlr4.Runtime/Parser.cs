@@ -254,7 +254,7 @@ namespace Antlr4.Runtime
         /// mismatched symbol
         /// </exception>
         /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
-        [NotNull]
+        [return: NotNull]
         public virtual IToken Match(int ttype)
         {
             IToken t = CurrentToken;
@@ -310,7 +310,7 @@ namespace Antlr4.Runtime
         /// symbol
         /// </exception>
         /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
-        [NotNull]
+        [return: NotNull]
         public virtual IToken MatchWildcard()
         {
             IToken t = CurrentToken;
@@ -440,7 +440,7 @@ namespace Antlr4.Runtime
                 IList<IParseTreeListener> listeners = _parseListeners;
                 if (listeners == null)
                 {
-                    return Sharpen.Collections.EmptyList();
+                    return Sharpen.Collections.EmptyList<IParseTreeListener>();
                 }
                 return listeners;
             }
@@ -982,13 +982,13 @@ namespace Antlr4.Runtime
         /// </summary>
         /// <seealso cref="Antlr4.Runtime.Atn.ATN.GetExpectedTokens(int, RuleContext)">Antlr4.Runtime.Atn.ATN.GetExpectedTokens(int, RuleContext)
         ///     </seealso>
-        [NotNull]
+        [return: NotNull]
         public virtual IntervalSet GetExpectedTokens()
         {
             return Atn.GetExpectedTokens(State, Context);
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual IntervalSet GetExpectedTokensWithinCurrentRule()
         {
             ATN atn = Interpreter.atn;

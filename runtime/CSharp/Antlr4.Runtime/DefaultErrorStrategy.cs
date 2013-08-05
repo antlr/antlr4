@@ -711,7 +711,7 @@ namespace Antlr4.Runtime
         /// deletion successfully recovers from the mismatched input, otherwise
         /// <code>null</code>
         /// </returns>
-        [Nullable]
+        [return: Nullable]
         protected internal virtual IToken SingleTokenDeletion(Parser recognizer)
         {
             int nextTokenType = ((ITokenStream)recognizer.InputStream).La(2);
@@ -750,7 +750,7 @@ namespace Antlr4.Runtime
         /// If you change what tokens must be created by the lexer,
         /// override this method to create the appropriate tokens.
         /// </remarks>
-        [NotNull]
+        [return: NotNull]
         protected internal virtual IToken GetMissingSymbol(Parser recognizer)
         {
             IToken currentSymbol = recognizer.CurrentToken;
@@ -785,7 +785,7 @@ namespace Antlr4.Runtime
                 Line, current.Column);
         }
 
-        [NotNull]
+        [return: NotNull]
         protected internal virtual IntervalSet GetExpectedTokens(Parser recognizer)
         {
             return recognizer.GetExpectedTokens();
@@ -836,7 +836,7 @@ namespace Antlr4.Runtime
             return symbol.Type;
         }
 
-        [NotNull]
+        [return: NotNull]
         protected internal virtual string EscapeWSAndQuote(string s)
         {
             //		if ( s==null ) return s;
@@ -846,7 +846,7 @@ namespace Antlr4.Runtime
             return "'" + s + "'";
         }
 
-        [NotNull]
+        [return: NotNull]
         protected internal virtual IntervalSet GetErrorRecoverySet(Parser recognizer)
         {
             ATN atn = recognizer.Interpreter.atn;

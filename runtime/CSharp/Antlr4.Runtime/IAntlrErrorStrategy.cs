@@ -88,7 +88,7 @@ namespace Antlr4.Runtime
         /// recover from the unexpected input symbol
         /// </exception>
         /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
-        [NotNull]
+        [return: NotNull]
         IToken RecoverInline(Parser recognizer);
 
         /// <summary>

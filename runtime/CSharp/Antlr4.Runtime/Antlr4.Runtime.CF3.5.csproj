@@ -75,6 +75,7 @@
     <Compile Include="Atn\ATNConfigSet.cs" />
     <Compile Include="Atn\ATNSimulator.cs" />
     <Compile Include="Atn\ATNState.cs" />
+    <Compile Include="Atn\ATNType.cs" />
     <Compile Include="Atn\AtomTransition.cs" />
     <Compile Include="Atn\BasicBlockStartState.cs" />
     <Compile Include="Atn\BasicState.cs" />
@@ -88,7 +89,6 @@
     <Compile Include="Atn\LoopEndState.cs" />
     <Compile Include="Atn\NotSetTransition.cs" />
     <Compile Include="Atn\OrderedATNConfigSet.cs" />
-    <Compile Include="Atn\ParserATNPathFinder.cs" />
     <Compile Include="Atn\ParserATNSimulator.cs" />
     <Compile Include="Atn\PlusBlockStartState.cs" />
     <Compile Include="Atn\PlusLoopbackState.cs" />
@@ -152,6 +152,7 @@
       <Link>Key.snk</Link>
     </None>
     <None Include="Misc\Array2DHashSet`1.cs" />
+    <Compile Include="Misc\MurmurHash.cs" />
     <Compile Include="Misc\NullableAttribute.cs" />
     <None Include="Misc\DoubleKeyMap`3.cs" />
     <Compile Include="Misc\IIntSet.cs" />
