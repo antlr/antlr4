@@ -114,9 +114,7 @@ namespace Antlr4.Runtime
         /// <see cref="DefaultErrorStrategy">DefaultErrorStrategy</see>
         /// .
         /// </remarks>
-        /// <seealso cref="ErrorHandler()">ErrorHandler()</seealso>
-        /// <seealso cref="ErrorHandler(IAntlrErrorStrategy)">ErrorHandler(IAntlrErrorStrategy)
-        ///     </seealso>
+        /// <seealso cref="ErrorHandler"/>
         [NotNull]
         protected internal IAntlrErrorStrategy _errHandler = new DefaultErrorStrategy();
 
@@ -146,25 +144,24 @@ namespace Antlr4.Runtime
         /// <code>true</code>
         /// .
         /// </remarks>
-        /// <seealso cref="BuildParseTree()">BuildParseTree()</seealso>
-        /// <seealso cref="BuildParseTree(bool)">BuildParseTree(bool)</seealso>
+        /// <seealso cref="BuildParseTree"/>
         protected internal bool _buildParseTrees = true;
 
+#if !PORTABLE
         /// <summary>
         /// When
-        /// <see cref="Trace(bool)">Trace(bool)</see>
+        /// <see cref="Trace"/>
         /// <code>(true)</code>
         /// is called, a reference to the
         /// <see cref="TraceListener">TraceListener</see>
         /// is stored here so it can be easily removed in a
         /// later call to
-        /// <see cref="Trace(bool)">Trace(bool)</see>
+        /// <see cref="Trace"/>
         /// <code>(false)</code>
         /// . The listener itself is
         /// implemented as a parser listener so this field is not directly used by
         /// other parser methods.
         /// </summary>
-#if !PORTABLE
         private Parser.TraceListener _tracer;
 #endif
 

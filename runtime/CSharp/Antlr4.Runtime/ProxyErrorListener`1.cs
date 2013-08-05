@@ -36,7 +36,7 @@ namespace Antlr4.Runtime
 {
     /// <summary>
     /// This implementation of
-    /// <see cref="IANTLRErrorListener{Symbol}">IANTLRErrorListener&lt;Symbol&gt;</see>
+    /// <see cref="IAntlrErrorListener{Symbol}"/>
     /// dispatches all calls to a
     /// collection of delegate listeners. This reduces the effort required to support multiple
     /// listeners.

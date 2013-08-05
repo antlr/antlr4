@@ -37,7 +37,7 @@ namespace Antlr4.Runtime
 {
     /// <summary>
     /// This implementation of
-    /// <see cref="IANTLRErrorListener{Symbol}">IANTLRErrorListener&lt;Symbol&gt;</see>
+    /// <see cref="IAntlrErrorListener{Symbol}"/>
     /// can be used to identify
     /// certain potential correctness and performance problems in grammars. "Reports"
     /// are made by calling

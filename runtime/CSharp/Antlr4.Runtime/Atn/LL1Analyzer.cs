@@ -113,7 +113,7 @@ namespace Antlr4.Runtime.Atn
         /// and the end of the rule containing
         /// <code>s</code>
         /// is reached,
-        /// <see cref="Antlr4.Runtime.IToken.Epsilon">Antlr4.Runtime.IToken.Epsilon</see>
+        /// <see cref="TokenConstants.Epsilon"/>
         /// is added to the result set.
         /// If
         /// <code>ctx</code>
@@ -160,15 +160,15 @@ namespace Antlr4.Runtime.Atn
         /// and the end of the rule containing
         /// <code>s</code>
         /// is reached,
-        /// <see cref="Antlr4.Runtime.IToken.Epsilon">Antlr4.Runtime.IToken.Epsilon</see>
+        /// <see cref="TokenConstants.Epsilon"/>
         /// is added to the result set.
         /// If
-        /// <see cref="Antlr4.Runtime.IIntStream.Eof">EOF</see>
+        /// <see cref="IntStreamConstants.Eof"/>
         /// is not
         /// <code>null</code>
         /// and the end of the outermost rule is
         /// reached,
-        /// <see cref="Antlr4.Runtime.IToken.Eof">Antlr4.Runtime.IToken.Eof</see>
+        /// <see cref="TokenConstants.Eof"/>
         /// is added to the result set.
         /// </summary>
         /// <param name="s">the ATN state</param>
@@ -220,7 +220,7 @@ namespace Antlr4.Runtime.Atn
         /// or the end of the rule containing
         /// <code>s</code>
         /// is reached,
-        /// <see cref="Antlr4.Runtime.IToken.Epsilon">Antlr4.Runtime.IToken.Epsilon</see>
+        /// <see cref="TokenConstants.Epsilon"/>
         /// is added to the result set. If
         /// <code>ctx</code>
         /// is not
@@ -232,7 +232,7 @@ namespace Antlr4.Runtime.Atn
         /// and
         /// <code>stopState</code>
         /// or the end of the outermost rule is reached,
-        /// <see cref="Antlr4.Runtime.IToken.Eof">Antlr4.Runtime.IToken.Eof</see>
+        /// <see cref="TokenConstants.Eof"/>
         /// is added to the result set.
         /// </summary>
         /// <param name="s">the ATN state.</param>
@@ -251,7 +251,7 @@ namespace Antlr4.Runtime.Atn
         /// <param name="lookBusy">
         /// A set used for preventing epsilon closures in the ATN
         /// from causing a stack overflow. Outside code should pass
-        /// <code>new HashSet<ATNConfig></code>
+        /// <code>new HashSet&lt;ATNConfig&gt;</code>
         /// for this argument.
         /// </param>
         /// <param name="calledRuleStack">
@@ -275,7 +275,7 @@ namespace Antlr4.Runtime.Atn
         /// </param>
         /// <param name="addEOF">
         /// Add
-        /// <see cref="Antlr4.Runtime.IToken.Eof">Antlr4.Runtime.IToken.Eof</see>
+        /// <see cref="TokenConstants.Eof"/>
         /// to the result if the end of the
         /// outermost context is reached. This parameter has no effect if
         /// <code>ctx</code>

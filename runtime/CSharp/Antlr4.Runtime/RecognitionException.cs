@@ -52,8 +52,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// The
-        /// <see cref="Recognizer{Symbol, ATNInterpreter}">Recognizer&lt;Symbol, ATNInterpreter&gt;
-        ///     </see>
+        /// <see cref="IRecognizer"/>
         /// where this exception originated.
         /// </summary>
         [Nullable]
@@ -233,8 +232,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Gets the
-        /// <see cref="Recognizer{Symbol, ATNInterpreter}">Recognizer&lt;Symbol, ATNInterpreter&gt;
-        ///     </see>
+        /// <see cref="IRecognizer"/>
         /// where this exception occurred.
         /// <p/>
         /// If the recognizer is not available, this method returns

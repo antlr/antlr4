@@ -896,7 +896,6 @@ nextTransition_continue: ;
                     {
                         return new RangeTransition(target, arg1, arg2);
                     }
-                    goto case TransitionType.Rule;
                 }
 
                 case TransitionType.Rule:
@@ -927,7 +926,6 @@ nextTransition_continue: ;
                     {
                         return new AtomTransition(target, arg1);
                     }
-                    goto case TransitionType.Action;
                 }
 
                 case TransitionType.Action:

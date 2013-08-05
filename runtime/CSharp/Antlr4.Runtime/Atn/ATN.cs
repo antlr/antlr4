@@ -188,7 +188,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>s</code>
         /// and
         /// staying in same rule.
-        /// <see cref="Antlr4.Runtime.IToken.Epsilon">Antlr4.Runtime.IToken.Epsilon</see>
+        /// <see cref="TokenConstants.Epsilon"/>
         /// is in set if we reach end of
         /// rule.
         /// </summary>
@@ -264,7 +264,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="RuleStopState">RuleStopState</see>
         /// of the outermost context without matching any
         /// symbols,
-        /// <see cref="Antlr4.Runtime.IToken.Eof">Antlr4.Runtime.IToken.Eof</see>
+        /// <see cref="TokenConstants.Eof"/>
         /// is added to the returned set.
         /// <p/>
         /// If
@@ -272,7 +272,7 @@ namespace Antlr4.Runtime.Atn
         /// is
         /// <code>null</code>
         /// , it is treated as
-        /// <see cref="ParserRuleContext#EMPTY">ParserRuleContext#EMPTY</see>
+        /// <see cref="ParserRuleContext.EmptyContext"/>
         /// .
         /// </summary>
         /// <param name="stateNumber">the ATN state number</param>

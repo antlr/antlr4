@@ -122,7 +122,6 @@ namespace Antlr4.Runtime.Misc
         /// Utility function to compute the hash code of an array using the
         /// MurmurHash algorithm.
         /// </remarks>
-        /// <?></?>
         /// <param name="data">the array data</param>
         /// <param name="seed">the seed for the MurmurHash algorithm</param>
         /// <returns>the hash code of the data</returns>
