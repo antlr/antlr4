@@ -532,17 +532,14 @@ namespace Antlr4.Runtime.Misc
 
         public override int GetHashCode()
         {
-            if (IsNil())
-            {
-                return 0;
-            }
-            int n = 0;
-            // just add left edge of intervals
+            int hash = MurmurHash.Initialize();
             foreach (Interval I in intervals)
             {
-                n += I.a;
+                hash = MurmurHash.Update(hash, I.a);
+                hash = MurmurHash.Update(hash, I.b);
             }
-            return n;
+            hash = MurmurHash.Finish(hash, intervals.Count * 2);
+            return hash;
         }
 
         /// <summary>

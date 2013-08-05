@@ -389,12 +389,13 @@ namespace Antlr4.Runtime.Atn
 
         public override int GetHashCode()
         {
-            int hashCode = 7;
-            hashCode = 5 * hashCode + State.stateNumber;
-            hashCode = 5 * hashCode + Alt;
-            hashCode = 5 * hashCode + (ReachesIntoOuterContext ? 1 : 0);
-            hashCode = 5 * hashCode + (Context != null ? Context.GetHashCode() : 0);
-            hashCode = 5 * hashCode + SemanticContext.GetHashCode();
+            int hashCode = MurmurHash.Initialize(7);
+            hashCode = MurmurHash.Update(hashCode, State.stateNumber);
+            hashCode = MurmurHash.Update(hashCode, Alt);
+            hashCode = MurmurHash.Update(hashCode, ReachesIntoOuterContext ? 1 : 0);
+            hashCode = MurmurHash.Update(hashCode, Context);
+            hashCode = MurmurHash.Update(hashCode, SemanticContext);
+            hashCode = MurmurHash.Finish(hashCode, 5);
             return hashCode;
         }
 

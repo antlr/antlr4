@@ -110,6 +110,8 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         private bool outermostConfigSet;
 
+        private int cachedHashCode = -1;
+
         public ATNConfigSet()
         {
             // Used in parser and lexer. In lexer, it indicates we hit a pred
@@ -499,9 +501,17 @@ namespace Antlr4.Runtime.Atn
 
         public override int GetHashCode()
         {
+            if (IsReadOnly && cachedHashCode != -1)
+            {
+                return cachedHashCode;
+            }
             int hashCode = 1;
             hashCode = 5 * hashCode ^ (outermostConfigSet ? 1 : 0);
             hashCode = 5 * hashCode ^ SequenceEqualityComparer<ATNConfig>.Default.GetHashCode(configs);
+            if (IsReadOnly)
+            {
+                cachedHashCode = hashCode;
+            }
             return hashCode;
         }
 
@@ -514,7 +524,7 @@ namespace Antlr4.Runtime.Atn
         {
             StringBuilder buf = new StringBuilder();
             List<ATNConfig> sortedConfigs = new List<ATNConfig>(configs);
-            sortedConfigs.Sort(new _IComparer_479());
+            sortedConfigs.Sort(new _IComparer_490());
             buf.Append("[");
             for (int i = 0; i < sortedConfigs.Count; i++)
             {
@@ -544,9 +554,9 @@ namespace Antlr4.Runtime.Atn
             return buf.ToString();
         }
 
-        private sealed class _IComparer_479 : IComparer<ATNConfig>
+        private sealed class _IComparer_490 : IComparer<ATNConfig>
         {
-            public _IComparer_479()
+            public _IComparer_490()
             {
             }
 

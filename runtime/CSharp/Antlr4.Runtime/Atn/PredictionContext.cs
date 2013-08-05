@@ -53,33 +53,49 @@ namespace Antlr4.Runtime.Atn
 
         private const int InitialHash = 1;
 
-        private const int HashMultiplier = 31;
-
-        /// <summary>Stores the computed hash code of this PredictionContext.</summary>
-        /// <remarks>
-        /// Stores the computed hash code of this PredictionContext. The hash code is
-        /// computed in parts to match the following reference algorithm.
+        /// <summary>
+        /// Stores the computed hash code of this
+        /// <see cref="PredictionContext">PredictionContext</see>
+        /// . The hash
+        /// code is computed in parts to match the following reference algorithm.
         /// <pre>
         /// private int referenceHashCode() {
-        /// int returnStateHashCode =
-        /// <see cref="InitialHash">INITIAL_HASH</see>
-        /// ;
-        /// for (int i = 0; i &lt; size(); i++) {
-        /// returnStateHashCode = returnStateHashCode *
-        /// <see cref="HashMultiplier">HASH_MULTIPLIER</see>
-        /// ^ getReturnState(i);
+        /// int hash =
+        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Initialize()">Antlr4.Runtime.Misc.MurmurHash.Initialize()
+        ///     </see>
+        /// (
+        /// <see cref="InitialHash">InitialHash</see>
+        /// );
+        /// for (int i = 0; i &lt;
+        /// <see cref="Size()">Size()</see>
+        /// ; i++) {
+        /// hash =
+        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Update(int, int)">Antlr4.Runtime.Misc.MurmurHash.Update(int, int)
+        ///     </see>
+        /// (hash,
+        /// <see cref="GetParent(int)">GetParent(int)</see>
+        /// (i));
         /// }
-        /// int parentHashCode = INITIAL_HASH;
-        /// for (int i = 0; i &lt; size(); i++) {
-        /// parentHashCode = parentHashCode * HASH_MULTIPLIER ^ getParent(i).hashCode();
+        /// for (int i = 0; i &lt;
+        /// <see cref="Size()">Size()</see>
+        /// ; i++) {
+        /// hash =
+        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Update(int, int)">Antlr4.Runtime.Misc.MurmurHash.Update(int, int)
+        ///     </see>
+        /// (hash,
+        /// <see cref="GetReturnState(int)">GetReturnState(int)</see>
+        /// (i));
         /// }
-        /// int hashCode = INITIAL_HASH;
-        /// hashCode = hashCode * HASH_MULTIPLIER ^ parentHashCode;
-        /// hashCode = hashCode * HASH_MULTIPLIER ^ returnStateHashCode;
-        /// return hashCode;
+        /// hash =
+        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Finish(int, int)">Antlr4.Runtime.Misc.MurmurHash.Finish(int, int)
+        ///     </see>
+        /// (hash, 2 *
+        /// <see cref="Size()">Size()</see>
+        /// );
+        /// return hash;
         /// }
         /// </pre>
-        /// </remarks>
+        /// </summary>
         private readonly int cachedHashCode;
 
         protected internal PredictionContext(int cachedHashCode)
@@ -87,52 +103,37 @@ namespace Antlr4.Runtime.Atn
             this.cachedHashCode = cachedHashCode;
         }
 
-        protected internal static int CalculateEmptyParentHashCode()
+        protected internal static int CalculateEmptyHashCode()
         {
-            return InitialHash;
+            int hash = MurmurHash.Initialize(InitialHash);
+            hash = MurmurHash.Finish(hash, 0);
+            return hash;
         }
 
-        protected internal static int CalculateParentHashCode(Antlr4.Runtime.Atn.PredictionContext
-             parent)
+        protected internal static int CalculateHashCode(Antlr4.Runtime.Atn.PredictionContext
+             parent, int returnState)
         {
-            return InitialHash * HashMultiplier ^ parent.GetHashCode();
+            int hash = MurmurHash.Initialize(InitialHash);
+            hash = MurmurHash.Update(hash, parent);
+            hash = MurmurHash.Update(hash, returnState);
+            hash = MurmurHash.Finish(hash, 2);
+            return hash;
         }
 
-        protected internal static int CalculateParentHashCode(Antlr4.Runtime.Atn.PredictionContext
-            [] parents)
+        protected internal static int CalculateHashCode(Antlr4.Runtime.Atn.PredictionContext
+            [] parents, int[] returnStates)
         {
-            int hashCode = InitialHash;
-            foreach (Antlr4.Runtime.Atn.PredictionContext context in parents)
+            int hash = MurmurHash.Initialize(InitialHash);
+            foreach (Antlr4.Runtime.Atn.PredictionContext parent in parents)
             {
-                hashCode = hashCode * HashMultiplier ^ context.GetHashCode();
+                hash = MurmurHash.Update(hash, parent);
             }
-            return hashCode;
-        }
-
-        protected internal static int CalculateEmptyReturnStateHashCode()
-        {
-            return InitialHash;
-        }
-
-        protected internal static int CalculateReturnStateHashCode(int returnState)
-        {
-            return InitialHash * HashMultiplier ^ returnState;
-        }
-
-        protected internal static int CalculateReturnStatesHashCode(int[] returnStates)
-        {
-            int hashCode = InitialHash;
-            foreach (int state in returnStates)
+            foreach (int returnState in returnStates)
             {
-                hashCode = hashCode * HashMultiplier ^ state;
+                hash = MurmurHash.Update(hash, returnState);
             }
-            return hashCode;
-        }
-
-        protected internal static int CalculateHashCode(int parentHashCode, int returnStateHashCode
-            )
-        {
-            return (InitialHash * HashMultiplier ^ parentHashCode) * HashMultiplier ^ returnStateHashCode;
+            hash = MurmurHash.Finish(hash, 2 * parents.Length);
+            return hash;
         }
 
         public abstract int Size

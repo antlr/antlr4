@@ -99,9 +99,10 @@ namespace Antlr4.Runtime.Atn
             /// <summary>Code is function of (s, _, ctx, _)</summary>
             public override int GetHashCode(ATNConfig o)
             {
-                int hashCode = 7;
-                hashCode = 31 * hashCode + o.State.stateNumber;
-                hashCode = 31 * hashCode + o.Context.GetHashCode();
+                int hashCode = MurmurHash.Initialize(7);
+                hashCode = MurmurHash.Update(hashCode, o.State.stateNumber);
+                hashCode = MurmurHash.Update(hashCode, o.Context);
+                hashCode = MurmurHash.Finish(hashCode, 2);
                 return hashCode;
             }
 
@@ -112,10 +113,6 @@ namespace Antlr4.Runtime.Atn
                     return true;
                 }
                 if (a == null || b == null)
-                {
-                    return false;
-                }
-                if (GetHashCode(a) != GetHashCode(b))
                 {
                     return false;
                 }

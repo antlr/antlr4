@@ -120,10 +120,6 @@ namespace Antlr4.Runtime
         /// </remarks>
         public IToken stop;
 
-        /// <summary>Set during parsing to identify which alt of rule parser is in.</summary>
-        /// <remarks>Set during parsing to identify which alt of rule parser is in.</remarks>
-        public int altNum;
-
         /// <summary>The exception which forced this rule to return.</summary>
         /// <remarks>
         /// The exception which forced this rule to return. If the rule successfully
@@ -406,8 +402,8 @@ namespace Antlr4.Runtime
         {
             List<string> rules = new List<string>(recognizer.GetRuleInvocationStack(this));
             rules.Reverse();
-            return "ParserRuleContext" + rules + "{" + "altNum=" + altNum + ", start=" + start
-                 + ", stop=" + stop + '}';
+            return "ParserRuleContext" + rules + "{" + "start=" + start + ", stop=" + stop + 
+                '}';
         }
     }
 }

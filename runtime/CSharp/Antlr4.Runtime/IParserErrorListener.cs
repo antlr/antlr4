@@ -34,38 +34,147 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-    /// <summary>How to emit recognition errors</summary>
+    /// <summary>How to emit recognition errors for parsers.</summary>
+    /// <remarks>How to emit recognition errors for parsers.</remarks>
     public interface IParserErrorListener : IAntlrErrorListener<IToken>
     {
         /// <summary>
-        /// Called when the parser detects a true ambiguity: an input sequence can be matched
-        /// literally by two or more pass through the grammar.
+        /// This method is called by the parser when a full-context prediction
+        /// results in an ambiguity.
         /// </summary>
         /// <remarks>
-        /// Called when the parser detects a true ambiguity: an input sequence can be matched
-        /// literally by two or more pass through the grammar. ANTLR resolves the ambiguity in
-        /// favor of the alternative appearing first in the grammar. The start and stop index are
-        /// zero-based absolute indices into the token stream. ambigAlts is a set of alternative numbers
-        /// that can match the input sequence. This method is only called when we are parsing with
-        /// full context.
+        /// This method is called by the parser when a full-context prediction
+        /// results in an ambiguity.
+        /// <p/>
+        /// When
+        /// <code>exact</code>
+        /// is
+        /// <code>true</code>
+        /// , <em>all</em> of the alternatives in
+        /// <code>ambigAlts</code>
+        /// are viable, i.e. this is reporting an exact ambiguity.
+        /// When
+        /// <code>exact</code>
+        /// is
+        /// <code>false</code>
+        /// , <em>at least two</em> of the
+        /// alternatives in
+        /// <code>ambigAlts</code>
+        /// are viable for the current input, but
+        /// the prediction algorithm terminated as soon as it determined that at
+        /// least the <em>minimum</em> alternative in
+        /// <code>ambigAlts</code>
+        /// is viable.
+        /// <p/>
+        /// When the
+        /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection">Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection
+        ///     </see>
+        /// prediction mode
+        /// is used, the parser is required to identify exact ambiguities so
+        /// <code>exact</code>
+        /// will always be
+        /// <code>true</code>
+        /// .
         /// </remarks>
-        void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet
-             ambigAlts, ATNConfigSet configs);
-
-        void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int 
-            stopIndex, SimulatorState initialState);
+        /// <param name="recognizer">the parser instance</param>
+        /// <param name="dfa">the DFA for the current decision</param>
+        /// <param name="startIndex">the input index where the decision started</param>
+        /// <param name="stopIndex">the input input where the ambiguity is reported</param>
+        /// <param name="exact">
+        /// 
+        /// <code>true</code>
+        /// if the ambiguity is exactly known, otherwise
+        /// <code>false</code>
+        /// . This is always
+        /// <code>true</code>
+        /// when
+        /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection">Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection
+        ///     </see>
+        /// is used.
+        /// </param>
+        /// <param name="ambigAlts">the potentially ambiguous alternatives</param>
+        /// <param name="configs">
+        /// the ATN configuration set where the ambiguity was
+        /// determined
+        /// </param>
+        void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, bool
+             exact, BitSet ambigAlts, ATNConfigSet configs);
 
         /// <summary>
-        /// Called by the parser when it find a conflict that is resolved by retrying the parse
-        /// with full context.
+        /// This method is called when an SLL conflict occurs and the parser is about
+        /// to use the full context information to make an LL decision.
         /// </summary>
         /// <remarks>
-        /// Called by the parser when it find a conflict that is resolved by retrying the parse
-        /// with full context. This is not a warning; it simply notifies you that your grammar
-        /// is more complicated than Strong LL can handle. The parser moved up to full context
-        /// parsing for that input sequence.
+        /// This method is called when an SLL conflict occurs and the parser is about
+        /// to use the full context information to make an LL decision.
+        /// <p/>
+        /// If one or more configurations in
+        /// <code>configs</code>
+        /// contains a semantic
+        /// predicate, the predicates are evaluated before this method is called. The
+        /// subset of alternatives which are still viable after predicates are
+        /// evaluated is reported in
+        /// <code>conflictingAlts</code>
+        /// .
         /// </remarks>
+        /// <param name="recognizer">the parser instance</param>
+        /// <param name="dfa">the DFA for the current decision</param>
+        /// <param name="startIndex">the input index where the decision started</param>
+        /// <param name="stopIndex">the input index where the SLL conflict occurred</param>
+        /// <param name="conflictingAlts">
+        /// The specific conflicting alternatives. If this is
+        /// <code>null</code>
+        /// , the conflicting alternatives are all alternatives
+        /// represented in
+        /// <code>configs</code>
+        /// .
+        /// </param>
+        /// <param name="conflictState">
+        /// the simulator state when the SLL conflict was
+        /// detected
+        /// </param>
+        void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int 
+            stopIndex, BitSet conflictingAlts, SimulatorState conflictState);
+
+        /// <summary>
+        /// This method is called by the parser when a full-context prediction has a
+        /// unique result.
+        /// </summary>
+        /// <remarks>
+        /// This method is called by the parser when a full-context prediction has a
+        /// unique result.
+        /// <p/>
+        /// For prediction implementations that only evaluate full-context
+        /// predictions when an SLL conflict is found (including the default
+        /// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator">Antlr4.Runtime.Atn.ParserATNSimulator
+        ///     </see>
+        /// implementation), this method reports cases
+        /// where SLL conflicts were resolved to unique full-context predictions,
+        /// i.e. the decision was context-sensitive. This report does not necessarily
+        /// indicate a problem, and it may appear even in completely unambiguous
+        /// grammars.
+        /// <p/>
+        /// <code>configs</code>
+        /// may have more than one represented alternative if the
+        /// full-context prediction algorithm does not evaluate predicates before
+        /// beginning the full-context prediction. In all cases, the final prediction
+        /// is passed as the
+        /// <code>prediction</code>
+        /// argument.
+        /// </remarks>
+        /// <param name="recognizer">the parser instance</param>
+        /// <param name="dfa">the DFA for the current decision</param>
+        /// <param name="startIndex">the input index where the decision started</param>
+        /// <param name="stopIndex">
+        /// the input index where the context sensitivity was
+        /// finally determined
+        /// </param>
+        /// <param name="prediction">the unambiguous result of the full-context prediction</param>
+        /// <param name="acceptState">
+        /// the simulator state when the unambiguous prediction
+        /// was determined
+        /// </param>
         void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex
-            , SimulatorState acceptState);
+            , int prediction, SimulatorState acceptState);
     }
 }

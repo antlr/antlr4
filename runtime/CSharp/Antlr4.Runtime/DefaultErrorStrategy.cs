@@ -54,6 +54,7 @@ namespace Antlr4.Runtime
         /// matched a token. Prevents generation of more than one error message
         /// per error.
         /// </remarks>
+        /// <seealso cref="InErrorRecoveryMode(Parser)">InErrorRecoveryMode(Parser)</seealso>
         protected internal bool errorRecoveryMode = false;
 
         /// <summary>The index into the input stream where the last error occurred.</summary>
@@ -68,35 +69,112 @@ namespace Antlr4.Runtime
 
         protected internal IntervalSet lastErrorStates;
 
-        public virtual void BeginErrorCondition(Parser recognizer)
+        /// <summary>
+        /// <inheritDoc></inheritDoc>
+        /// <p/>
+        /// The default implementation simply calls
+        /// <see cref="EndErrorCondition(Parser)">EndErrorCondition(Parser)</see>
+        /// to
+        /// ensure that the handler is not in error recovery mode.
+        /// </summary>
+        public virtual void Reset(Parser recognizer)
+        {
+            EndErrorCondition(recognizer);
+        }
+
+        /// <summary>
+        /// This method is called to enter error recovery mode when a recognition
+        /// exception is reported.
+        /// </summary>
+        /// <remarks>
+        /// This method is called to enter error recovery mode when a recognition
+        /// exception is reported.
+        /// </remarks>
+        /// <param name="recognizer">the parser instance</param>
+        protected internal virtual void BeginErrorCondition(Parser recognizer)
         {
             errorRecoveryMode = true;
         }
 
+        /// <summary><inheritDoc></inheritDoc></summary>
         public virtual bool InErrorRecoveryMode(Parser recognizer)
         {
             return errorRecoveryMode;
         }
 
-        public virtual void EndErrorCondition(Parser recognizer)
+        /// <summary>
+        /// This method is called to leave error recovery mode after recovering from
+        /// a recognition exception.
+        /// </summary>
+        /// <remarks>
+        /// This method is called to leave error recovery mode after recovering from
+        /// a recognition exception.
+        /// </remarks>
+        /// <param name="recognizer"></param>
+        protected internal virtual void EndErrorCondition(Parser recognizer)
         {
             errorRecoveryMode = false;
             lastErrorStates = null;
             lastErrorIndex = -1;
         }
 
-        /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
+        /// <summary>
+        /// <inheritDoc></inheritDoc>
+        /// <p/>
+        /// The default implementation simply calls
+        /// <see cref="EndErrorCondition(Parser)">EndErrorCondition(Parser)</see>
+        /// .
+        /// </summary>
+        public virtual void ReportMatch(Parser recognizer)
+        {
+            EndErrorCondition(recognizer);
+        }
+
+        /// <summary>
+        /// <inheritDoc></inheritDoc>
+        /// <p/>
+        /// The default implementation returns immediately if the handler is already
+        /// in error recovery mode. Otherwise, it calls
+        /// <see cref="BeginErrorCondition(Parser)">BeginErrorCondition(Parser)</see>
+        /// and dispatches the reporting task based on the runtime type of
+        /// <code>e</code>
+        /// according to the following table.
+        /// <ul>
+        /// <li>
+        /// <see cref="NoViableAltException">NoViableAltException</see>
+        /// : Dispatches the call to
+        /// <see cref="ReportNoViableAlternative(Parser, NoViableAltException)">ReportNoViableAlternative(Parser, NoViableAltException)
+        ///     </see>
+        /// </li>
+        /// <li>
+        /// <see cref="InputMismatchException">InputMismatchException</see>
+        /// : Dispatches the call to
+        /// <see cref="ReportInputMismatch(Parser, InputMismatchException)">ReportInputMismatch(Parser, InputMismatchException)
+        ///     </see>
+        /// </li>
+        /// <li>
+        /// <see cref="FailedPredicateException">FailedPredicateException</see>
+        /// : Dispatches the call to
+        /// <see cref="ReportFailedPredicate(Parser, FailedPredicateException)">ReportFailedPredicate(Parser, FailedPredicateException)
+        ///     </see>
+        /// </li>
+        /// <li>All other types: calls
+        /// <see cref="Parser.NotifyErrorListeners(string)">Parser.NotifyErrorListeners(string)
+        ///     </see>
+        /// to report
+        /// the exception</li>
+        /// </ul>
+        /// </summary>
         public virtual void ReportError(Parser recognizer, RecognitionException e)
         {
             // if we've already reported an error and have not matched a token
             // yet successfully, don't report any errors.
-            if (errorRecoveryMode)
+            if (InErrorRecoveryMode(recognizer))
             {
                 //			System.err.print("[SPURIOUS] ");
                 return;
             }
-            // don't count spurious errors
-            recognizer._syntaxErrors++;
+            // don't report spurious errors
             BeginErrorCondition(recognizer);
             if (e is NoViableAltException)
             {
@@ -129,17 +207,16 @@ namespace Antlr4.Runtime
         protected internal virtual void NotifyErrorListeners(Parser recognizer, string message
             , RecognitionException e)
         {
-            if (recognizer != null)
-            {
-                recognizer.NotifyErrorListeners(e.OffendingToken, message, e);
-            }
+            recognizer.NotifyErrorListeners(e.OffendingToken, message, e);
         }
 
-        /// <summary>Recover from NoViableAlt errors.</summary>
-        /// <remarks>
-        /// Recover from NoViableAlt errors. Also there could be a mismatched
-        /// token that the match() routine could not recover from.
-        /// </remarks>
+        /// <summary>
+        /// <inheritDoc></inheritDoc>
+        /// <p/>
+        /// The default implementation resynchronizes the parser by consuming tokens
+        /// until we find one in the resynchronization set--loosely the set of tokens
+        /// that can follow the current rule.
+        /// </summary>
         public virtual void Recover(Parser recognizer, RecognitionException e)
         {
             //		System.out.println("recover in "+recognizer.getRuleInvocationStack()+
@@ -170,28 +247,62 @@ namespace Antlr4.Runtime
         }
 
         /// <summary>
-        /// Make sure that the current lookahead symbol is consistent with
-        /// what were expecting at this point in the ATN.
+        /// The default implementation of
+        /// <see cref="IAntlrErrorStrategy.Sync(Parser)">IAntlrErrorStrategy.Sync(Parser)</see>
+        /// makes sure
+        /// that the current lookahead symbol is consistent with what were expecting
+        /// at this point in the ATN. You can call this anytime but ANTLR only
+        /// generates code to check before subrules/loops and each iteration.
+        /// <p/>
+        /// Implements Jim Idle's magic sync mechanism in closures and optional
+        /// subrules. E.g.,
+        /// <pre>
+        /// a : sync ( stuff sync )* ;
+        /// sync : {consume to what can follow sync} ;
+        /// </pre>
+        /// At the start of a sub rule upon error,
+        /// <see cref="Sync(Parser)">Sync(Parser)</see>
+        /// performs single
+        /// token deletion, if possible. If it can't do that, it bails on the current
+        /// rule and uses the default error recovery, which consumes until the
+        /// resynchronization set of the current rule.
+        /// <p/>
+        /// If the sub rule is optional (
+        /// <code>(...)?</code>
+        /// ,
+        /// <code>(...)*</code>
+        /// , or block
+        /// with an empty alternative), then the expected set includes what follows
+        /// the subrule.
+        /// <p/>
+        /// During loop iteration, it consumes until it sees a token that can start a
+        /// sub rule or what follows loop. Yes, that is pretty aggressive. We opt to
+        /// stay in the loop as long as possible.
+        /// <p/>
+        /// <strong>ORIGINS</strong>
+        /// <p/>
+        /// Previous versions of ANTLR did a poor job of their recovery within loops.
+        /// A single mismatch token or missing token would force the parser to bail
+        /// out of the entire rules surrounding the loop. So, for rule
+        /// <pre>
+        /// classDef : 'class' ID '{' member* '}'
+        /// </pre>
+        /// input with an extra token between members would force the parser to
+        /// consume until it found the next class definition rather than the next
+        /// member definition of the current class.
+        /// <p/>
+        /// This functionality cost a little bit of effort because the parser has to
+        /// compare token set at the start of the loop and at each iteration. If for
+        /// some reason speed is suffering for you, you can turn off this
+        /// functionality by simply overriding this method as a blank { }.
         /// </summary>
-        /// <remarks>
-        /// Make sure that the current lookahead symbol is consistent with
-        /// what were expecting at this point in the ATN.
-        /// At the start of a sub rule upon error, sync() performs single
-        /// token deletion, if possible. If it can't do that, it bails
-        /// on the current rule and uses the default error recovery,
-        /// which consumes until the resynchronization set of the current rule.
-        /// If the sub rule is optional, ()? or ()* or optional alternative,
-        /// then the expected set includes what follows the subrule.
-        /// During loop iteration, it consumes until it sees a token that can
-        /// start a sub rule or what follows loop. Yes, that is pretty aggressive.
-        /// We opt to stay in the loop as long as possible.
-        /// </remarks>
+        /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
         public virtual void Sync(Parser recognizer)
         {
             ATNState s = recognizer.Interpreter.atn.states[recognizer.State];
             //		System.err.println("sync @ "+s.stateNumber+"="+s.getClass().getSimpleName());
             // If already recovering, don't try to sync
-            if (errorRecoveryMode)
+            if (InErrorRecoveryMode(recognizer))
             {
                 return;
             }
@@ -242,13 +353,24 @@ namespace Antlr4.Runtime
             }
         }
 
-        /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
-        public virtual void ReportNoViableAlternative(Parser recognizer, NoViableAltException
+        /// <summary>
+        /// This is called by
+        /// <see cref="ReportError(Parser, RecognitionException)">ReportError(Parser, RecognitionException)
+        ///     </see>
+        /// when the exception is a
+        /// <see cref="NoViableAltException">NoViableAltException</see>
+        /// .
+        /// </summary>
+        /// <seealso cref="ReportError(Parser, RecognitionException)">ReportError(Parser, RecognitionException)
+        ///     </seealso>
+        /// <param name="recognizer">the parser instance</param>
+        /// <param name="e">the recognition exception</param>
+        protected internal virtual void ReportNoViableAlternative(Parser recognizer, NoViableAltException
              e)
         {
             ITokenStream tokens = ((ITokenStream)recognizer.InputStream);
             string input;
-            if (tokens != null)
+            if (tokens is ITokenStream)
             {
                 if (e.GetStartToken().Type == TokenConstants.Eof)
                 {
@@ -267,8 +389,19 @@ namespace Antlr4.Runtime
             NotifyErrorListeners(recognizer, msg, e);
         }
 
-        /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
-        public virtual void ReportInputMismatch(Parser recognizer, InputMismatchException
+        /// <summary>
+        /// This is called by
+        /// <see cref="ReportError(Parser, RecognitionException)">ReportError(Parser, RecognitionException)
+        ///     </see>
+        /// when the exception is an
+        /// <see cref="InputMismatchException">InputMismatchException</see>
+        /// .
+        /// </summary>
+        /// <seealso cref="ReportError(Parser, RecognitionException)">ReportError(Parser, RecognitionException)
+        ///     </seealso>
+        /// <param name="recognizer">the parser instance</param>
+        /// <param name="e">the recognition exception</param>
+        protected internal virtual void ReportInputMismatch(Parser recognizer, InputMismatchException
              e)
         {
             string msg = "mismatched input " + GetTokenErrorDisplay(e.OffendingToken) + " expecting "
@@ -276,8 +409,19 @@ namespace Antlr4.Runtime
             NotifyErrorListeners(recognizer, msg, e);
         }
 
-        /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
-        public virtual void ReportFailedPredicate(Parser recognizer, FailedPredicateException
+        /// <summary>
+        /// This is called by
+        /// <see cref="ReportError(Parser, RecognitionException)">ReportError(Parser, RecognitionException)
+        ///     </see>
+        /// when the exception is a
+        /// <see cref="FailedPredicateException">FailedPredicateException</see>
+        /// .
+        /// </summary>
+        /// <seealso cref="ReportError(Parser, RecognitionException)">ReportError(Parser, RecognitionException)
+        ///     </seealso>
+        /// <param name="recognizer">the parser instance</param>
+        /// <param name="e">the recognition exception</param>
+        protected internal virtual void ReportFailedPredicate(Parser recognizer, FailedPredicateException
              e)
         {
             string ruleName = recognizer.RuleNames[recognizer._ctx.GetRuleIndex()];
@@ -285,13 +429,42 @@ namespace Antlr4.Runtime
             NotifyErrorListeners(recognizer, msg, e);
         }
 
-        public virtual void ReportUnwantedToken(Parser recognizer)
+        /// <summary>
+        /// This method is called to report a syntax error which requires the removal
+        /// of a token from the input stream.
+        /// </summary>
+        /// <remarks>
+        /// This method is called to report a syntax error which requires the removal
+        /// of a token from the input stream. At the time this method is called, the
+        /// erroneous symbol is current
+        /// <code>LT(1)</code>
+        /// symbol and has not yet been
+        /// removed from the input stream. When this method returns,
+        /// <code>recognizer</code>
+        /// is in error recovery mode.
+        /// <p/>
+        /// This method is called when
+        /// <see cref="SingleTokenDeletion(Parser)">SingleTokenDeletion(Parser)</see>
+        /// identifies
+        /// single-token deletion as a viable recovery strategy for a mismatched
+        /// input error.
+        /// <p/>
+        /// The default implementation simply returns if the handler is already in
+        /// error recovery mode. Otherwise, it calls
+        /// <see cref="BeginErrorCondition(Parser)">BeginErrorCondition(Parser)</see>
+        /// to
+        /// enter error recovery mode, followed by calling
+        /// <see cref="Parser.NotifyErrorListeners(string)">Parser.NotifyErrorListeners(string)
+        ///     </see>
+        /// .
+        /// </remarks>
+        /// <param name="recognizer">the parser instance</param>
+        protected internal virtual void ReportUnwantedToken(Parser recognizer)
         {
-            if (errorRecoveryMode)
+            if (InErrorRecoveryMode(recognizer))
             {
                 return;
             }
-            recognizer._syntaxErrors++;
             BeginErrorCondition(recognizer);
             IToken t = recognizer.CurrentToken;
             string tokenName = GetTokenErrorDisplay(t);
@@ -301,13 +474,40 @@ namespace Antlr4.Runtime
             recognizer.NotifyErrorListeners(t, msg, null);
         }
 
-        public virtual void ReportMissingToken(Parser recognizer)
+        /// <summary>
+        /// This method is called to report a syntax error which requires the
+        /// insertion of a missing token into the input stream.
+        /// </summary>
+        /// <remarks>
+        /// This method is called to report a syntax error which requires the
+        /// insertion of a missing token into the input stream. At the time this
+        /// method is called, the missing token has not yet been inserted. When this
+        /// method returns,
+        /// <code>recognizer</code>
+        /// is in error recovery mode.
+        /// <p/>
+        /// This method is called when
+        /// <see cref="SingleTokenInsertion(Parser)">SingleTokenInsertion(Parser)</see>
+        /// identifies
+        /// single-token insertion as a viable recovery strategy for a mismatched
+        /// input error.
+        /// <p/>
+        /// The default implementation simply returns if the handler is already in
+        /// error recovery mode. Otherwise, it calls
+        /// <see cref="BeginErrorCondition(Parser)">BeginErrorCondition(Parser)</see>
+        /// to
+        /// enter error recovery mode, followed by calling
+        /// <see cref="Parser.NotifyErrorListeners(string)">Parser.NotifyErrorListeners(string)
+        ///     </see>
+        /// .
+        /// </remarks>
+        /// <param name="recognizer">the parser instance</param>
+        protected internal virtual void ReportMissingToken(Parser recognizer)
         {
-            if (errorRecoveryMode)
+            if (InErrorRecoveryMode(recognizer))
             {
                 return;
             }
-            recognizer._syntaxErrors++;
             BeginErrorCondition(recognizer);
             IToken t = recognizer.CurrentToken;
             IntervalSet expecting = GetExpectedTokens(recognizer);
@@ -316,30 +516,91 @@ namespace Antlr4.Runtime
             recognizer.NotifyErrorListeners(t, msg, null);
         }
 
-        /// <summary>Attempt to recover from a single missing or extra token.</summary>
-        /// <remarks>
-        /// Attempt to recover from a single missing or extra token.
-        /// EXTRA TOKEN
-        /// LA(1) is not what we are looking for.  If LA(2) has the right token,
-        /// however, then assume LA(1) is some extra spurious token.  Delete it
-        /// and LA(2) as if we were doing a normal match(), which advances the
-        /// input.
-        /// MISSING TOKEN
-        /// If current token is consistent with what could come after
-        /// ttype then it is ok to "insert" the missing token, else throw
-        /// exception For example, Input "i=(3;" is clearly missing the
-        /// ')'.  When the parser returns from the nested call to expr, it
-        /// will have call chain:
+        /// <summary>
+        /// <inheritDoc></inheritDoc>
+        /// <p/>
+        /// The default implementation attempts to recover from the mismatched input
+        /// by using single token insertion and deletion as described below. If the
+        /// recovery attempt fails, this method throws an
+        /// <see cref="InputMismatchException">InputMismatchException</see>
+        /// .
+        /// <p/>
+        /// <strong>EXTRA TOKEN</strong> (single token deletion)
+        /// <p/>
+        /// <code>LA(1)</code>
+        /// is not what we are looking for. If
+        /// <code>LA(2)</code>
+        /// has the
+        /// right token, however, then assume
+        /// <code>LA(1)</code>
+        /// is some extra spurious
+        /// token and delete it. Then consume and return the next token (which was
+        /// the
+        /// <code>LA(2)</code>
+        /// token) as the successful result of the match operation.
+        /// <p/>
+        /// This recovery strategy is implemented by
+        /// <see cref="SingleTokenDeletion(Parser)">SingleTokenDeletion(Parser)</see>
+        /// .
+        /// <p/>
+        /// <strong>MISSING TOKEN</strong> (single token insertion)
+        /// <p/>
+        /// If current token (at
+        /// <code>LA(1)</code>
+        /// ) is consistent with what could come
+        /// after the expected
+        /// <code>LA(1)</code>
+        /// token, then assume the token is missing
+        /// and use the parser's
+        /// <see cref="ITokenFactory">ITokenFactory</see>
+        /// to create it on the fly. The
+        /// "insertion" is performed by returning the created token as the successful
+        /// result of the match operation.
+        /// <p/>
+        /// This recovery strategy is implemented by
+        /// <see cref="SingleTokenInsertion(Parser)">SingleTokenInsertion(Parser)</see>
+        /// .
+        /// <p/>
+        /// <strong>EXAMPLE</strong>
+        /// <p/>
+        /// For example, Input
+        /// <code>i=(3;</code>
+        /// is clearly missing the
+        /// <code>')'</code>
+        /// . When
+        /// the parser returns from the nested call to
+        /// <code>expr</code>
+        /// , it will have
+        /// call chain:
+        /// <pre>
         /// stat -&gt; expr -&gt; atom
-        /// and it will be trying to match the ')' at this point in the
+        /// </pre>
+        /// and it will be trying to match the
+        /// <code>')'</code>
+        /// at this point in the
         /// derivation:
+        /// <pre>
         /// =&gt; ID '=' '(' INT ')' ('+' atom)* ';'
         /// ^
-        /// match() will see that ';' doesn't match ')' and report a
-        /// mismatched token error.  To recover, it sees that LA(1)==';'
-        /// is in the set of tokens that can follow the ')' token
-        /// reference in rule atom.  It can assume that you forgot the ')'.
-        /// </remarks>
+        /// </pre>
+        /// The attempt to match
+        /// <code>')'</code>
+        /// will fail when it sees
+        /// <code>';'</code>
+        /// and
+        /// call
+        /// <see cref="RecoverInline(Parser)">RecoverInline(Parser)</see>
+        /// . To recover, it sees that
+        /// <code>LA(1)==';'</code>
+        /// is in the set of tokens that can follow the
+        /// <code>')'</code>
+        /// token reference
+        /// in rule
+        /// <code>atom</code>
+        /// . It can assume that you forgot the
+        /// <code>')'</code>
+        /// .
+        /// </summary>
         /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
         public virtual IToken RecoverInline(Parser recognizer)
         {
@@ -361,8 +622,43 @@ namespace Antlr4.Runtime
             throw new InputMismatchException(recognizer);
         }
 
-        // if next token is what we are looking for then "delete" this token
-        public virtual bool SingleTokenInsertion(Parser recognizer)
+        /// <summary>
+        /// This method implements the single-token insertion inline error recovery
+        /// strategy.
+        /// </summary>
+        /// <remarks>
+        /// This method implements the single-token insertion inline error recovery
+        /// strategy. It is called by
+        /// <see cref="RecoverInline(Parser)">RecoverInline(Parser)</see>
+        /// if the single-token
+        /// deletion strategy fails to recover from the mismatched input. If this
+        /// method returns
+        /// <code>true</code>
+        /// ,
+        /// <code>recognizer</code>
+        /// will be in error recovery
+        /// mode.
+        /// <p/>
+        /// This method determines whether or not single-token insertion is viable by
+        /// checking if the
+        /// <code>LA(1)</code>
+        /// input symbol could be successfully matched
+        /// if it were instead the
+        /// <code>LA(2)</code>
+        /// symbol. If this method returns
+        /// <code>true</code>
+        /// , the caller is responsible for creating and inserting a
+        /// token with the correct type to produce this behavior.
+        /// </remarks>
+        /// <param name="recognizer">the parser instance</param>
+        /// <returns>
+        /// 
+        /// <code>true</code>
+        /// if single-token insertion is a viable recovery
+        /// strategy for the current mismatched input, otherwise
+        /// <code>false</code>
+        /// </returns>
+        protected internal virtual bool SingleTokenInsertion(Parser recognizer)
         {
             int currentSymbolType = ((ITokenStream)recognizer.InputStream).La(1);
             // if current token is consistent with what could come after current
@@ -382,7 +678,41 @@ namespace Antlr4.Runtime
             return false;
         }
 
-        public virtual IToken SingleTokenDeletion(Parser recognizer)
+        /// <summary>
+        /// This method implements the single-token deletion inline error recovery
+        /// strategy.
+        /// </summary>
+        /// <remarks>
+        /// This method implements the single-token deletion inline error recovery
+        /// strategy. It is called by
+        /// <see cref="RecoverInline(Parser)">RecoverInline(Parser)</see>
+        /// to attempt to recover
+        /// from mismatched input. If this method returns null, the parser and error
+        /// handler state will not have changed. If this method returns non-null,
+        /// <code>recognizer</code>
+        /// will <em>not</em> be in error recovery mode since the
+        /// returned token was a successful match.
+        /// <p/>
+        /// If the single-token deletion is successful, this method calls
+        /// <see cref="ReportUnwantedToken(Parser)">ReportUnwantedToken(Parser)</see>
+        /// to report the error, followed by
+        /// <see cref="Parser.Consume()">Parser.Consume()</see>
+        /// to actually "delete" the extraneous token. Then,
+        /// before returning
+        /// <see cref="ReportMatch(Parser)">ReportMatch(Parser)</see>
+        /// is called to signal a successful
+        /// match.
+        /// </remarks>
+        /// <param name="recognizer">the parser instance</param>
+        /// <returns>
+        /// the successfully matched
+        /// <see cref="IToken">IToken</see>
+        /// instance if single-token
+        /// deletion successfully recovers from the mismatched input, otherwise
+        /// <code>null</code>
+        /// </returns>
+        [Nullable]
+        protected internal virtual IToken SingleTokenDeletion(Parser recognizer)
         {
             int nextTokenType = ((ITokenStream)recognizer.InputStream).La(2);
             IntervalSet expecting = GetExpectedTokens(recognizer);
@@ -393,7 +723,7 @@ namespace Antlr4.Runtime
                 // simply delete extra token
                 // we want to return the token we're actually matching
                 IToken matchedSymbol = recognizer.CurrentToken;
-                EndErrorCondition(recognizer);
+                ReportMatch(recognizer);
                 // we know current token is correct
                 return matchedSymbol;
             }
@@ -420,6 +750,7 @@ namespace Antlr4.Runtime
         /// If you change what tokens must be created by the lexer,
         /// override this method to create the appropriate tokens.
         /// </remarks>
+        [NotNull]
         protected internal virtual IToken GetMissingSymbol(Parser recognizer)
         {
             IToken currentSymbol = recognizer.CurrentToken;
@@ -454,7 +785,8 @@ namespace Antlr4.Runtime
                 Line, current.Column);
         }
 
-        public virtual IntervalSet GetExpectedTokens(Parser recognizer)
+        [NotNull]
+        protected internal virtual IntervalSet GetExpectedTokens(Parser recognizer)
         {
             return recognizer.GetExpectedTokens();
         }
@@ -473,7 +805,7 @@ namespace Antlr4.Runtime
         /// your token objects because you don't have to go modify your lexer
         /// so that it creates a new Java type.
         /// </remarks>
-        public virtual string GetTokenErrorDisplay(IToken t)
+        protected internal virtual string GetTokenErrorDisplay(IToken t)
         {
             if (t == null)
             {
@@ -504,6 +836,7 @@ namespace Antlr4.Runtime
             return symbol.Type;
         }
 
+        [NotNull]
         protected internal virtual string EscapeWSAndQuote(string s)
         {
             //		if ( s==null ) return s;
@@ -513,6 +846,7 @@ namespace Antlr4.Runtime
             return "'" + s + "'";
         }
 
+        [NotNull]
         protected internal virtual IntervalSet GetErrorRecoverySet(Parser recognizer)
         {
             ATN atn = recognizer.Interpreter.atn;
@@ -532,8 +866,9 @@ namespace Antlr4.Runtime
             return recoverSet;
         }
 
-        /// <summary>Consume tokens until one matches the given token set</summary>
-        public virtual void ConsumeUntil(Parser recognizer, IntervalSet set)
+        /// <summary>Consume tokens until one matches the given token set.</summary>
+        /// <remarks>Consume tokens until one matches the given token set.</remarks>
+        protected internal virtual void ConsumeUntil(Parser recognizer, IntervalSet set)
         {
             //		System.err.println("consumeUntil("+set.toString(recognizer.getTokenNames())+")");
             int ttype = ((ITokenStream)recognizer.InputStream).La(1);

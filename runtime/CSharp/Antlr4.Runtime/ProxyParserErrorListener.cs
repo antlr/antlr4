@@ -44,7 +44,7 @@ namespace Antlr4.Runtime
         }
 
         public virtual void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int
-             stopIndex, BitSet ambigAlts, ATNConfigSet configs)
+             stopIndex, bool exact, BitSet ambigAlts, ATNConfigSet configs)
         {
             foreach (IAntlrErrorListener<IToken> listener in Delegates)
             {
@@ -53,13 +53,13 @@ namespace Antlr4.Runtime
                     continue;
                 }
                 IParserErrorListener parserErrorListener = (IParserErrorListener)listener;
-                parserErrorListener.ReportAmbiguity(recognizer, dfa, startIndex, stopIndex, ambigAlts
-                    , configs);
+                parserErrorListener.ReportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact
+                    , ambigAlts, configs);
             }
         }
 
         public virtual void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex
-            , int stopIndex, SimulatorState initialState)
+            , int stopIndex, BitSet conflictingAlts, SimulatorState conflictState)
         {
             foreach (IAntlrErrorListener<IToken> listener in Delegates)
             {
@@ -69,12 +69,12 @@ namespace Antlr4.Runtime
                 }
                 IParserErrorListener parserErrorListener = (IParserErrorListener)listener;
                 parserErrorListener.ReportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex
-                    , initialState);
+                    , conflictingAlts, conflictState);
             }
         }
 
         public virtual void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex
-            , int stopIndex, SimulatorState acceptState)
+            , int stopIndex, int prediction, SimulatorState acceptState)
         {
             foreach (IAntlrErrorListener<IToken> listener in Delegates)
             {
@@ -84,7 +84,7 @@ namespace Antlr4.Runtime
                 }
                 IParserErrorListener parserErrorListener = (IParserErrorListener)listener;
                 parserErrorListener.ReportContextSensitivity(recognizer, dfa, startIndex, stopIndex
-                    , acceptState);
+                    , prediction, acceptState);
             }
         }
     }

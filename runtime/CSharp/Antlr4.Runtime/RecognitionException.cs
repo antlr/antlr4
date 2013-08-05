@@ -50,30 +50,38 @@ namespace Antlr4.Runtime
     {
         private const long serialVersionUID = -3861826954750022374L;
 
-        /// <summary>Who threw the exception?</summary>
-        private IRecognizer recognizer;
+        /// <summary>
+        /// The
+        /// <see cref="Recognizer{Symbol, ATNInterpreter}">Recognizer&lt;Symbol, ATNInterpreter&gt;
+        ///     </see>
+        /// where this exception originated.
+        /// </summary>
+        [Nullable]
+        private readonly IRecognizer recognizer;
 
-        private RuleContext ctx;
+        [Nullable]
+        private readonly RuleContext ctx;
 
-        private IIntStream input;
+        [Nullable]
+        private readonly IIntStream input;
 
-        /// <summary>The current Token when an error occurred.</summary>
-        /// <remarks>
-        /// The current Token when an error occurred.  Since not all streams
-        /// can retrieve the ith Token, we have to track the Token object.
-        /// For parsers.  Even when it's a tree parser, token might be set.
-        /// </remarks>
+        /// <summary>
+        /// The current
+        /// <see cref="IToken">IToken</see>
+        /// when an error occurred. Since not all streams
+        /// support accessing symbols by index, we have to track the
+        /// <see cref="IToken">IToken</see>
+        /// instance itself.
+        /// </summary>
         private IToken offendingToken;
 
-        private int offendingState;
+        private int offendingState = -1;
 
         public RecognitionException(Lexer lexer, ICharStream input)
         {
-            // TODO: make a dummy recognizer for the interpreter to use?
-            // Next two (ctx,input) should be what is in recognizer, but
-            // won't work when interpreting
             this.recognizer = lexer;
             this.input = input;
+            this.ctx = null;
         }
 
         public RecognitionException(IRecognizer recognizer, 
@@ -100,15 +108,21 @@ namespace Antlr4.Runtime
         }
 
         /// <summary>
-        /// Where was the parser in the ATN when the error occurred?
-        /// For No viable alternative exceptions, this is the decision state number.
+        /// Get the ATN state number the parser was in at the time the error
+        /// occurred.
         /// </summary>
         /// <remarks>
-        /// Where was the parser in the ATN when the error occurred?
-        /// For No viable alternative exceptions, this is the decision state number.
-        /// For others, it is the state whose emanating edge we couldn't match.
-        /// This will help us tie into the grammar and syntax diagrams in
-        /// ANTLRWorks v2.
+        /// Get the ATN state number the parser was in at the time the error
+        /// occurred. For
+        /// <see cref="NoViableAltException">NoViableAltException</see>
+        /// and
+        /// <see cref="LexerNoViableAltException">LexerNoViableAltException</see>
+        /// exceptions, this is the
+        /// <see cref="Antlr4.Runtime.Atn.DecisionState">Antlr4.Runtime.Atn.DecisionState</see>
+        /// number. For others, it is the state whose outgoing
+        /// edge we couldn't match.
+        /// <p/>
+        /// If the state number is not known, this method returns -1.
         /// </remarks>
         public int OffendingState
         {
@@ -123,16 +137,52 @@ namespace Antlr4.Runtime
             }
         }
 
+        /// <summary>
+        /// Gets the set of input symbols which could potentially follow the
+        /// previously matched symbol at the time this exception was thrown.
+        /// </summary>
+        /// <remarks>
+        /// Gets the set of input symbols which could potentially follow the
+        /// previously matched symbol at the time this exception was thrown.
+        /// <p/>
+        /// If the set of expected tokens is not known and could not be computed,
+        /// this method returns
+        /// <code>null</code>
+        /// .
+        /// </remarks>
+        /// <returns>
+        /// The set of token types that could potentially follow the current
+        /// state in the ATN, or
+        /// <code>null</code>
+        /// if the information is not available.
+        /// </returns>
+        [Nullable]
         public virtual IntervalSet GetExpectedTokens()
         {
-            // TODO: do we really need this type check?
-            if (recognizer is Parser)
+            if (recognizer != null)
             {
-                return ((Parser)recognizer).GetExpectedTokens();
+                return recognizer.Atn.GetExpectedTokens(offendingState, ctx);
             }
             return null;
         }
 
+        /// <summary>
+        /// Gets the
+        /// <see cref="RuleContext">RuleContext</see>
+        /// at the time this exception was thrown.
+        /// <p/>
+        /// If the context is not available, this method returns
+        /// <code>null</code>
+        /// .
+        /// </summary>
+        /// <returns>
+        /// The
+        /// <see cref="RuleContext">RuleContext</see>
+        /// at the time this exception was thrown.
+        /// If the context is not available, this method returns
+        /// <code>null</code>
+        /// .
+        /// </returns>
         public virtual RuleContext Context
         {
             get
@@ -141,6 +191,25 @@ namespace Antlr4.Runtime
             }
         }
 
+        /// <summary>
+        /// Gets the input stream which is the symbol source for the recognizer where
+        /// this exception was thrown.
+        /// </summary>
+        /// <remarks>
+        /// Gets the input stream which is the symbol source for the recognizer where
+        /// this exception was thrown.
+        /// <p/>
+        /// If the input stream is not available, this method returns
+        /// <code>null</code>
+        /// .
+        /// </remarks>
+        /// <returns>
+        /// The input stream which is the symbol source for the recognizer
+        /// where this exception was thrown, or
+        /// <code>null</code>
+        /// if the stream is not
+        /// available.
+        /// </returns>
         public virtual IIntStream InputStream
         {
             get
@@ -162,6 +231,22 @@ namespace Antlr4.Runtime
             }
         }
 
+        /// <summary>
+        /// Gets the
+        /// <see cref="Recognizer{Symbol, ATNInterpreter}">Recognizer&lt;Symbol, ATNInterpreter&gt;
+        ///     </see>
+        /// where this exception occurred.
+        /// <p/>
+        /// If the recognizer is not available, this method returns
+        /// <code>null</code>
+        /// .
+        /// </summary>
+        /// <returns>
+        /// The recognizer where this exception occurred, or
+        /// <code>null</code>
+        /// if
+        /// the recognizer is not available.
+        /// </returns>
         public virtual IRecognizer Recognizer
         {
             get

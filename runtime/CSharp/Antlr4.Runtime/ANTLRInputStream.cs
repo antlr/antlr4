@@ -35,13 +35,22 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-    /// <summary>Vacuum all input from a Reader/InputStream and then treat it like a char[] buffer.
-    ///     </summary>
-    /// <remarks>
-    /// Vacuum all input from a Reader/InputStream and then treat it like a char[] buffer.
-    /// Can also pass in a string or char[] to use.
+    /// <summary>
+    /// Vacuum all input from a
+    /// <see cref="System.IO.StreamReader">System.IO.StreamReader</see>
+    /// /
+    /// <see cref="System.IO.Stream">System.IO.Stream</see>
+    /// and then treat it
+    /// like a
+    /// <code>char[]</code>
+    /// buffer. Can also pass in a
+    /// <see cref="string">string</see>
+    /// or
+    /// <code>char[]</code>
+    /// to use.
+    /// <p/>
     /// If you need encoding, pass in stream/reader with correct encoding.
-    /// </remarks>
+    /// </summary>
     public class AntlrInputStream : ICharStream
     {
         public const int ReadBufferSize = 1024;

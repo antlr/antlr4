@@ -37,7 +37,7 @@ namespace Antlr4.Runtime
     /// <remarks>
     /// Bail out of parser at first syntax error. Do this to use it:
     /// <p/>
-    /// <code>myparser.setErrorHandler(new BailErrorStrategy&lt;Token&gt;());</code>
+    /// <code>myparser.setErrorHandler(new BailErrorStrategy());</code>
     /// </remarks>
     public class BailErrorStrategy : DefaultErrorStrategy
     {

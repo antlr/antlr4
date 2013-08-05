@@ -29,6 +29,7 @@
  */
 using System;
 using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
 using Sharpen;
 
 namespace Antlr4.Runtime
@@ -50,10 +51,12 @@ namespace Antlr4.Runtime
         /// error handling strategy. If text!=null, than the start and stop positions
         /// are wiped to -1 in the text override is set in the CommonToken.
         /// </remarks>
+        [NotNull]
         IToken Create(Tuple<ITokenSource, ICharStream> source, int type, string text, int channel, int start
             , int stop, int line, int charPositionInLine);
 
         /// <summary>Generically useful</summary>
+        [NotNull]
         IToken Create(int type, string text);
     }
 }

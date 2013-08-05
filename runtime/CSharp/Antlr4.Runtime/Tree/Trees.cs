@@ -130,10 +130,10 @@ namespace Antlr4.Runtime.Tree
                     {
                         if (t is ITerminalNode)
                         {
-                            object symbol = ((ITerminalNode)t).Symbol;
-                            if (symbol is IToken)
+                            IToken symbol = ((ITerminalNode)t).Symbol;
+                            if (symbol != null)
                             {
-                                string s = ((IToken)symbol).Text;
+                                string s = symbol.Text;
                                 return s;
                             }
                         }

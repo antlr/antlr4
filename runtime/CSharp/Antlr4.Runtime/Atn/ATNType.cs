@@ -27,34 +27,17 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
-using Antlr4.Runtime.Dfa;
 using Sharpen;
 
-namespace Antlr4.Runtime
+namespace Antlr4.Runtime.Atn
 {
+    /// <summary>Represents the type of recognizer an ATN applies to.</summary>
+    /// <remarks>Represents the type of recognizer an ATN applies to.</remarks>
     /// <author>Sam Harwell</author>
-    public class BaseErrorListener : IParserErrorListener
+    public enum ATNType
     {
-        public virtual void SyntaxError(IRecognizer recognizer, IToken offendingSymbol
-            , int line, int charPositionInLine, string msg, RecognitionException e)
-        {
-        }
-
-        public virtual void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int
-             stopIndex, bool exact, BitSet ambigAlts, ATNConfigSet configs)
-        {
-        }
-
-        public virtual void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex
-            , int stopIndex, BitSet conflictingAlts, SimulatorState conflictState)
-        {
-        }
-
-        public virtual void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex
-            , int stopIndex, int prediction, SimulatorState acceptState)
-        {
-        }
+        Lexer,
+        Parser
     }
 }

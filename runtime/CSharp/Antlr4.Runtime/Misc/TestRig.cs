@@ -212,10 +212,11 @@ namespace Antlr4.Runtime.Misc
             if (!startRuleName.Equals(LexerStartRuleName))
             {
                 string parserName = grammarName + "Parser";
-                parserClass = (Type)cl.LoadClass(parserName).AsSubclass<Parser>();
+                parserClass = cl.LoadClass(parserName).AsSubclass<Parser>();
                 if (parserClass == null)
                 {
                     System.Console.Error.WriteLine("Can't load " + parserName);
+                    return;
                 }
                 Constructor<Parser> parserCtor = parserClass.GetConstructor(typeof(ITokenStream));
                 parser = parserCtor.NewInstance((ITokenStream)null);
