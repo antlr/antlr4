@@ -29,6 +29,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
@@ -43,7 +44,14 @@ namespace Antlr4.Runtime.Atn
 
         static ATNSimulator()
         {
-            SerializedVersion = 5;
+            SerializedVersion = 3;
+        }
+
+        public static readonly UUID SerializedUuid;
+
+        static ATNSimulator()
+        {
+            SerializedUuid = UUID.FromString("E4178468-DF95-44D0-AD87-F22A5D5FB6D3");
         }
 
         public const char RuleVariantDelimiter = '$';
@@ -85,19 +93,27 @@ namespace Antlr4.Runtime.Atn
             {
                 data[i] = (char)(data[i] - 2);
             }
-            ATN atn = new ATN();
-            IList<IntervalSet> sets = new List<IntervalSet>();
             int p = 0;
             int version = ToInt(data[p++]);
             if (version != SerializedVersion)
             {
-                string reason = string.Format("Could not deserialize ATN with version %d (expected %d)."
+                string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with version %d (expected %d)."
                     , version, SerializedVersion);
                 throw new NotSupportedException(new InvalidClassException(typeof(ATN).FullName, reason
                     ));
             }
-            atn.grammarType = ToInt(data[p++]);
-            atn.maxTokenType = ToInt(data[p++]);
+            UUID uuid = ToUUID(data, p);
+            p += 8;
+            if (!uuid.Equals(SerializedUuid))
+            {
+                string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with UUID %s (expected %s)."
+                    , uuid, SerializedUuid);
+                throw new NotSupportedException(new InvalidClassException(typeof(ATN).FullName, reason
+                    ));
+            }
+            ATNType grammarType = ATNType.Values()[ToInt(data[p++])];
+            int maxTokenType = ToInt(data[p++]);
+            ATN atn = new ATN(grammarType, maxTokenType);
             //
             // STATES
             //
@@ -106,7 +122,7 @@ namespace Antlr4.Runtime.Atn
             IList<Tuple<BlockStartState, int>> endStateNumbers = new List<Tuple<BlockStartState
                 , int>>();
             int nstates = ToInt(data[p++]);
-            for (int i_1 = 1; i_1 <= nstates; i_1++)
+            for (int i_1 = 0; i_1 < nstates; i_1++)
             {
                 StateType stype = StateType.Values()[ToInt(data[p++])];
                 // ignore bad type of states
@@ -116,6 +132,10 @@ namespace Antlr4.Runtime.Atn
                     continue;
                 }
                 int ruleIndex = ToInt(data[p++]);
+                if (ruleIndex == char.MaxValue)
+                {
+                    ruleIndex = -1;
+                }
                 ATNState s = StateFactory(stype, ruleIndex);
                 if (stype == StateType.LoopEnd)
                 {
@@ -164,7 +184,7 @@ namespace Antlr4.Runtime.Atn
             // RULES
             //
             int nrules = ToInt(data[p++]);
-            if (atn.grammarType == ATN.Lexer)
+            if (atn.grammarType == ATNType.Lexer)
             {
                 atn.ruleToTokenType = new int[nrules];
                 atn.ruleToActionIndex = new int[nrules];
@@ -176,11 +196,19 @@ namespace Antlr4.Runtime.Atn
                 RuleStartState startState = (RuleStartState)atn.states[s];
                 startState.leftFactored = ToInt(data[p++]) != 0;
                 atn.ruleToStartState[i_5] = startState;
-                if (atn.grammarType == ATN.Lexer)
+                if (atn.grammarType == ATNType.Lexer)
                 {
                     int tokenType = ToInt(data[p++]);
+                    if (tokenType == unchecked((int)(0xFFFF)))
+                    {
+                        tokenType = TokenConstants.Eof;
+                    }
                     atn.ruleToTokenType[i_5] = tokenType;
                     int actionIndex = ToInt(data[p++]);
+                    if (actionIndex == unchecked((int)(0xFFFF)))
+                    {
+                        actionIndex = -1;
+                    }
                     atn.ruleToActionIndex[i_5] = actionIndex;
                 }
             }
@@ -212,14 +240,20 @@ namespace Antlr4.Runtime.Atn
             //
             // SETS
             //
+            IList<IntervalSet> sets = new List<IntervalSet>();
             int nsets = ToInt(data[p++]);
-            for (int i_8 = 1; i_8 <= nsets; i_8++)
+            for (int i_8 = 0; i_8 < nsets; i_8++)
             {
                 int nintervals = ToInt(data[p]);
                 p++;
                 IntervalSet set = new IntervalSet();
                 sets.AddItem(set);
-                for (int j = 1; j <= nintervals; j++)
+                bool containsEof = ToInt(data[p++]) != 0;
+                if (containsEof)
+                {
+                    set.Add(-1);
+                }
+                for (int j = 0; j < nintervals; j++)
                 {
                     set.Add(ToInt(data[p]), ToInt(data[p + 1]));
                     p += 2;
@@ -229,7 +263,7 @@ namespace Antlr4.Runtime.Atn
             // EDGES
             //
             int nedges = ToInt(data[p++]);
-            for (int i_9 = 1; i_9 <= nedges; i_9++)
+            for (int i_9 = 0; i_9 < nedges; i_9++)
             {
                 int src = ToInt(data[p]);
                 int trg = ToInt(data[p + 1]);
@@ -336,7 +370,7 @@ namespace Antlr4.Runtime.Atn
                     int optimizationCount = 0;
                     optimizationCount += InlineSetRules(atn);
                     optimizationCount += CombineChainedEpsilons(atn);
-                    bool preserveOrder = atn.grammarType == ATN.Lexer;
+                    bool preserveOrder = atn.grammarType == ATNType.Lexer;
                     optimizationCount += OptimizeSets(atn, preserveOrder);
                     if (optimizationCount == 0)
                     {
@@ -828,7 +862,25 @@ nextState_break: ;
 
         public static int ToInt(char c)
         {
-            return c == 65535 ? -1 : c;
+            return c;
+        }
+
+        public static int ToInt32(char[] data, int offset)
+        {
+            return (int)data[offset] | ((int)data[offset + 1] << 16);
+        }
+
+        public static long ToLong(char[] data, int offset)
+        {
+            long lowOrder = ToInt32(data, offset) & unchecked((long)(0x00000000FFFFFFFFL));
+            return lowOrder | ((long)ToInt32(data, offset + 2) << 32);
+        }
+
+        public static UUID ToUUID(char[] data, int offset)
+        {
+            long leastSigBits = ToLong(data, offset);
+            long mostSigBits = ToLong(data, offset + 4);
+            return new UUID(mostSigBits, leastSigBits);
         }
 
         [NotNull]
@@ -845,7 +897,15 @@ nextState_break: ;
 
                 case TransitionType.Range:
                 {
-                    return new RangeTransition(target, arg1, arg2);
+                    if (arg3 != 0)
+                    {
+                        return new RangeTransition(target, TokenConstants.Eof, arg2);
+                    }
+                    else
+                    {
+                        return new RangeTransition(target, arg1, arg2);
+                    }
+                    goto case TransitionType.Rule;
                 }
 
                 case TransitionType.Rule:
@@ -868,7 +928,15 @@ nextState_break: ;
 
                 case TransitionType.Atom:
                 {
-                    return new AtomTransition(target, arg1);
+                    if (arg3 != 0)
+                    {
+                        return new AtomTransition(target, TokenConstants.Eof);
+                    }
+                    else
+                    {
+                        return new AtomTransition(target, arg1);
+                    }
+                    goto case TransitionType.Action;
                 }
 
                 case TransitionType.Action:
@@ -979,7 +1047,8 @@ nextState_break: ;
 
                 default:
                 {
-                    string message = string.Format("The specified state type %d is not valid.", type);
+                    string message = string.Format(CultureInfo.CurrentCulture, "The specified state type %d is not valid."
+                        , type);
                     throw new ArgumentException(message);
                 }
             }

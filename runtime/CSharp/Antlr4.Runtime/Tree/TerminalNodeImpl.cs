@@ -126,7 +126,7 @@ namespace Antlr4.Runtime.Tree
             }
             else
             {
-                return symbol != null ? symbol.ToString() : "<null>";
+                return "<null>";
             }
         }
 

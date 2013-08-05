@@ -299,11 +299,10 @@ namespace Antlr4.Runtime.Dfa
 
         public override int GetHashCode()
         {
-            if (configs == null)
-            {
-                return 1;
-            }
-            return configs.GetHashCode();
+            int hash = MurmurHash.Initialize(7);
+            hash = MurmurHash.Update(hash, configs.GetHashCode());
+            hash = MurmurHash.Finish(hash, 1);
+            return hash;
         }
 
         /// <summary>

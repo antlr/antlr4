@@ -166,7 +166,6 @@ namespace Antlr4.Runtime.Atn
             mode = Lexer.DefaultMode;
         }
 
-        // only called from test code from outside
         protected internal virtual int MatchATN(ICharStream input)
         {
             ATNState startState = atn.modeToStartState[mode];
@@ -215,39 +214,14 @@ namespace Antlr4.Runtime.Atn
                 // This optimization makes a lot of sense for loops within DFA.
                 // A character will take us back to an existing DFA state
                 // that already has lots of edges out of it. e.g., .* in comments.
-                ATNConfigSet closure = s.configs;
-                DFAState target = null;
-                target = s.GetTarget(t);
+                DFAState target = GetExistingTargetState(s, t);
+                if (target == null)
+                {
+                    target = ComputeTargetState(input, s, t);
+                }
                 if (target == Error)
                 {
                     break;
-                }
-                if (debug && target != null)
-                {
-                    System.Console.Out.WriteLine("reuse state " + s.stateNumber + " edge to " + target
-                        .stateNumber);
-                }
-                if (target == null)
-                {
-                    ATNConfigSet reach = new OrderedATNConfigSet();
-                    // if we don't find an existing DFA state
-                    // Fill reach starting from closure, following t transitions
-                    GetReachableConfigSet(input, closure, reach, t);
-                    if (reach.IsEmpty())
-                    {
-                        // we got nowhere on t from s
-                        // we reached state associated with closure for sure, so
-                        // make sure it's defined. worst case, we define s0 from
-                        // start state configs.
-                        DFAState from = s != null ? s : AddDFAState(closure);
-                        // we got nowhere on t, don't throw out this knowledge; it'd
-                        // cause a failover from DFA later.
-                        AddDFAEdge(from, t, Error);
-                        break;
-                    }
-                    // stop when we can't match any more char
-                    // Add an edge from s to target DFA found/created for reach
-                    target = AddDFAEdge(s, t, reach);
                 }
                 if (target.isAcceptState)
                 {
@@ -266,6 +240,78 @@ namespace Antlr4.Runtime.Atn
             }
             // flip; current DFA target becomes new src/from state
             return FailOrAccept(prevAccept, input, s.configs, t);
+        }
+
+        /// <summary>Get an existing target state for an edge in the DFA.</summary>
+        /// <remarks>
+        /// Get an existing target state for an edge in the DFA. If the target state
+        /// for the edge has not yet been computed or is otherwise not available,
+        /// this method returns
+        /// <code>null</code>
+        /// .
+        /// </remarks>
+        /// <param name="s">The current DFA state</param>
+        /// <param name="t">The next input symbol</param>
+        /// <returns>
+        /// The existing target DFA state for the given input symbol
+        /// <code>t</code>
+        /// , or
+        /// <code>null</code>
+        /// if the target state for this edge is not
+        /// already cached
+        /// </returns>
+        [Nullable]
+        protected internal virtual DFAState GetExistingTargetState(DFAState s, int t)
+        {
+            DFAState target = s.GetTarget(t);
+            if (debug && target != null)
+            {
+                System.Console.Out.WriteLine("reuse state " + s.stateNumber + " edge to " + target
+                    .stateNumber);
+            }
+            return target;
+        }
+
+        /// <summary>
+        /// Compute a target state for an edge in the DFA, and attempt to add the
+        /// computed state and corresponding edge to the DFA.
+        /// </summary>
+        /// <remarks>
+        /// Compute a target state for an edge in the DFA, and attempt to add the
+        /// computed state and corresponding edge to the DFA.
+        /// </remarks>
+        /// <param name="input">The input stream</param>
+        /// <param name="s">The current DFA state</param>
+        /// <param name="t">The next input symbol</param>
+        /// <returns>
+        /// The computed target DFA state for the given input symbol
+        /// <code>t</code>
+        /// . If
+        /// <code>t</code>
+        /// does not lead to a valid DFA state, this method
+        /// returns
+        /// <see cref="ATNSimulator.Error">ATNSimulator.Error</see>
+        /// .
+        /// </returns>
+        [NotNull]
+        protected internal virtual DFAState ComputeTargetState(ICharStream input, DFAState
+             s, int t)
+        {
+            ATNConfigSet reach = new OrderedATNConfigSet();
+            // if we don't find an existing DFA state
+            // Fill reach starting from closure, following t transitions
+            GetReachableConfigSet(input, s.configs, reach, t);
+            if (reach.IsEmpty())
+            {
+                // we got nowhere on t from s
+                // we got nowhere on t, don't throw out this knowledge; it'd
+                // cause a failover from DFA later.
+                AddDFAEdge(s, t, Error);
+                // stop when we can't match any more char
+                return Error;
+            }
+            // Add an edge from s to target DFA found/created for reach
+            return AddDFAEdge(s, t, reach);
         }
 
         protected internal virtual int FailOrAccept(LexerATNSimulator.SimState prevAccept
@@ -349,9 +395,9 @@ namespace Antlr4.Runtime.Atn
         }
 
         [Nullable]
-        public virtual ATNState GetReachableTarget(Transition trans, int t)
+        protected internal virtual ATNState GetReachableTarget(Transition trans, int t)
         {
-            if (trans.Matches(t, Lexer.MinCharValue, Lexer.MaxCharValue))
+            if (trans.Matches(t, char.MinValue, char.MaxValue))
             {
                 return trans.target;
             }
@@ -454,8 +500,8 @@ namespace Antlr4.Runtime.Atn
 
         // side-effect: can alter configs.hasSemanticContext
         [Nullable]
-        public virtual ATNConfig GetEpsilonTarget(ICharStream input, ATNConfig config, Transition
-             t, ATNConfigSet configs, bool speculative)
+        protected internal virtual ATNConfig GetEpsilonTarget(ICharStream input, ATNConfig
+             config, Transition t, ATNConfigSet configs, bool speculative)
         {
             ATNConfig c;
             switch (t.TransitionType)

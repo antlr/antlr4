@@ -38,12 +38,10 @@ namespace Antlr4.Runtime.Atn
     {
         /// <summary>
         /// Special value added to the lookahead sets to indicate that we hit
-        /// a predicate during analysis if seeThruPreds==false.
+        /// a predicate during analysis if
+        /// <code>seeThruPreds==false</code>
+        /// .
         /// </summary>
-        /// <remarks>
-        /// Special value added to the lookahead sets to indicate that we hit
-        /// a predicate during analysis if seeThruPreds==false.
-        /// </remarks>
         public const int HitPred = TokenConstants.InvalidType;
 
         [NotNull]
@@ -55,12 +53,24 @@ namespace Antlr4.Runtime.Atn
         }
 
         /// <summary>
-        /// From an ATN state,
+        /// Calculates the SLL(1) expected lookahead set for each outgoing transition
+        /// of an
+        /// <see cref="ATNState">ATNState</see>
+        /// . The returned array has one element for each
+        /// outgoing transition in
         /// <code>s</code>
-        /// , find the set of all labels reachable from
-        /// <code>s</code>
-        /// at depth k. Only for DecisionStates.
+        /// . If the closure from transition
+        /// <em>i</em> leads to a semantic predicate before matching a symbol, the
+        /// element at index <em>i</em> of the result will be
+        /// <code>null</code>
+        /// .
         /// </summary>
+        /// <param name="s">the ATN state</param>
+        /// <returns>
+        /// the expected symbols for each outgoing transition of
+        /// <code>s</code>
+        /// .
+        /// </returns>
         [Nullable]
         public virtual IntervalSet[] GetDecisionLookahead(ATNState s)
         {
@@ -69,15 +79,15 @@ namespace Antlr4.Runtime.Atn
             {
                 return null;
             }
-            IntervalSet[] look = new IntervalSet[s.NumberOfTransitions + 1];
-            for (int alt = 1; alt <= s.NumberOfTransitions; alt++)
+            IntervalSet[] look = new IntervalSet[s.NumberOfTransitions];
+            for (int alt = 0; alt < s.NumberOfTransitions; alt++)
             {
                 look[alt] = new IntervalSet();
                 HashSet<ATNConfig> lookBusy = new HashSet<ATNConfig>();
                 bool seeThruPreds = false;
                 // fail to get lookahead upon pred
-                Look(s.Transition(alt - 1).target, PredictionContext.EmptyFull, look[alt], lookBusy
-                    , seeThruPreds, false);
+                Look(s.Transition(alt).target, null, PredictionContext.EmptyFull, look[alt], lookBusy
+                    , new BitSet(), seeThruPreds, false);
                 // Wipe out lookahead for this alternative if we found nothing
                 // or we had a predicate when we !seeThruPreds
                 if (look[alt].Size() == 0 || look[alt].Contains(HitPred))
@@ -89,61 +99,215 @@ namespace Antlr4.Runtime.Atn
         }
 
         /// <summary>
-        /// Get lookahead, using
+        /// Compute set of tokens that can follow
+        /// <code>s</code>
+        /// in the ATN in the
+        /// specified
         /// <code>ctx</code>
-        /// if we reach end of rule. If
-        /// <code>ctx</code>
-        /// is
-        /// <code>PredictionContext#EMPTY_LOCAL</code>
-        /// or
-        /// <see cref="PredictionContext.EmptyFull">PredictionContext.EmptyFull</see>
-        /// , don't chase FOLLOW. If
-        /// <code>ctx</code>
-        /// is
-        /// <code>PredictionContext#EMPTY_LOCAL</code>
-        /// ,
-        /// <see cref="Antlr4.Runtime.IToken.Epsilon">EPSILON</see>
-        /// is in set if we can reach end of rule. If
+        /// .
+        /// <p/>
+        /// If
         /// <code>ctx</code>
         /// is
-        /// <see cref="PredictionContext.EmptyFull">PredictionContext.EmptyFull</see>
-        /// ,
-        /// <see cref="Antlr4.Runtime.IIntStream.Eof">EOF</see>
-        /// is in set
-        /// if we can reach end of rule.
+        /// <code>null</code>
+        /// and the end of the rule containing
+        /// <code>s</code>
+        /// is reached,
+        /// <see cref="Antlr4.Runtime.IToken.Epsilon">Antlr4.Runtime.IToken.Epsilon</see>
+        /// is added to the result set.
+        /// If
+        /// <code>ctx</code>
+        /// is not
+        /// <code>null</code>
+        /// and the end of the outermost rule is
+        /// reached,
+        /// <see cref="Antlr4.Runtime.IToken.Eof">Antlr4.Runtime.IToken.Eof</see>
+        /// is added to the result set.
         /// </summary>
+        /// <param name="s">the ATN state</param>
+        /// <param name="ctx">
+        /// the complete parser context, or
+        /// <code>null</code>
+        /// if the context
+        /// should be ignored
+        /// </param>
+        /// <returns>
+        /// The set of tokens that can follow
+        /// <code>s</code>
+        /// in the ATN in the
+        /// specified
+        /// <code>ctx</code>
+        /// .
+        /// </returns>
         [NotNull]
         public virtual IntervalSet Look(ATNState s, PredictionContext ctx)
         {
-            Args.NotNull("ctx", ctx);
+            return Look(s, null, ctx);
+        }
+
+        /// <summary>
+        /// Compute set of tokens that can follow
+        /// <code>s</code>
+        /// in the ATN in the
+        /// specified
+        /// <code>ctx</code>
+        /// .
+        /// <p/>
+        /// If
+        /// <code>ctx</code>
+        /// is
+        /// <code>null</code>
+        /// and the end of the rule containing
+        /// <code>s</code>
+        /// is reached,
+        /// <see cref="Antlr4.Runtime.IToken.Epsilon">Antlr4.Runtime.IToken.Epsilon</see>
+        /// is added to the result set.
+        /// If
+        /// <code>ctx</code>
+        /// is not
+        /// <code>null</code>
+        /// and the end of the outermost rule is
+        /// reached,
+        /// <see cref="Antlr4.Runtime.IToken.Eof">Antlr4.Runtime.IToken.Eof</see>
+        /// is added to the result set.
+        /// </summary>
+        /// <param name="s">the ATN state</param>
+        /// <param name="stopState">
+        /// the ATN state to stop at. This can be a
+        /// <see cref="BlockEndState">BlockEndState</see>
+        /// to detect epsilon paths through a closure.
+        /// </param>
+        /// <param name="ctx">
+        /// the complete parser context, or
+        /// <code>null</code>
+        /// if the context
+        /// should be ignored
+        /// </param>
+        /// <returns>
+        /// The set of tokens that can follow
+        /// <code>s</code>
+        /// in the ATN in the
+        /// specified
+        /// <code>ctx</code>
+        /// .
+        /// </returns>
+        [NotNull]
+        public virtual IntervalSet Look(ATNState s, ATNState stopState, PredictionContext
+             ctx)
+        {
             IntervalSet r = new IntervalSet();
             bool seeThruPreds = true;
             // ignore preds; get all lookahead
-            Look(s, ctx, r, new HashSet<ATNConfig>(), seeThruPreds, true);
+            Look(s, stopState, ctx, r, new HashSet<ATNConfig>(), new BitSet(), seeThruPreds, 
+                true);
             return r;
         }
 
-        /// <summary>Compute set of tokens that can come next.</summary>
-        /// <remarks>
-        /// Compute set of tokens that can come next. If the context is
-        /// <see cref="PredictionContext.EmptyFull">PredictionContext.EmptyFull</see>
-        /// ,
-        /// then we don't go anywhere when we hit the end of the rule. We have
-        /// the correct set.  If the context is
+        /// <summary>
+        /// Compute set of tokens that can follow
+        /// <code>s</code>
+        /// in the ATN in the
+        /// specified
+        /// <code>ctx</code>
+        /// .
+        /// <p/>
+        /// If
+        /// <code>ctx</code>
+        /// is
         /// <see cref="PredictionContext.EmptyLocal">PredictionContext.EmptyLocal</see>
-        /// ,
-        /// that means that we did not want any tokens following this rule--just the
-        /// tokens that could be found within this rule. Add EPSILON to the set
-        /// indicating we reached the end of the ruled out having to match a token.
-        /// </remarks>
-        protected internal virtual void Look(ATNState s, PredictionContext ctx, IntervalSet
-             look, HashSet<ATNConfig> lookBusy, bool seeThruPreds, bool addEOF)
+        /// and
+        /// <code>stopState</code>
+        /// or the end of the rule containing
+        /// <code>s</code>
+        /// is reached,
+        /// <see cref="Antlr4.Runtime.IToken.Epsilon">Antlr4.Runtime.IToken.Epsilon</see>
+        /// is added to the result set. If
+        /// <code>ctx</code>
+        /// is not
+        /// <see cref="PredictionContext.EmptyLocal">PredictionContext.EmptyLocal</see>
+        /// and
+        /// <code>addEOF</code>
+        /// is
+        /// <code>true</code>
+        /// and
+        /// <code>stopState</code>
+        /// or the end of the outermost rule is reached,
+        /// <see cref="Antlr4.Runtime.IToken.Eof">Antlr4.Runtime.IToken.Eof</see>
+        /// is added to the result set.
+        /// </summary>
+        /// <param name="s">the ATN state.</param>
+        /// <param name="stopState">
+        /// the ATN state to stop at. This can be a
+        /// <see cref="BlockEndState">BlockEndState</see>
+        /// to detect epsilon paths through a closure.
+        /// </param>
+        /// <param name="ctx">
+        /// The outer context, or
+        /// <see cref="PredictionContext.EmptyLocal">PredictionContext.EmptyLocal</see>
+        /// if
+        /// the outer context should not be used.
+        /// </param>
+        /// <param name="look">The result lookahead set.</param>
+        /// <param name="lookBusy">
+        /// A set used for preventing epsilon closures in the ATN
+        /// from causing a stack overflow. Outside code should pass
+        /// <code>new HashSet<ATNConfig></code>
+        /// for this argument.
+        /// </param>
+        /// <param name="calledRuleStack">
+        /// A set used for preventing left recursion in the
+        /// ATN from causing a stack overflow. Outside code should pass
+        /// <code>new BitSet()</code>
+        /// for this argument.
+        /// </param>
+        /// <param name="seeThruPreds">
+        /// 
+        /// <code>true</code>
+        /// to true semantic predicates as
+        /// implicitly
+        /// <code>true</code>
+        /// and "see through them", otherwise
+        /// <code>false</code>
+        /// to treat semantic predicates as opaque and add
+        /// <see cref="HitPred">HitPred</see>
+        /// to the
+        /// result if one is encountered.
+        /// </param>
+        /// <param name="addEOF">
+        /// Add
+        /// <see cref="Antlr4.Runtime.IToken.Eof">Antlr4.Runtime.IToken.Eof</see>
+        /// to the result if the end of the
+        /// outermost context is reached. This parameter has no effect if
+        /// <code>ctx</code>
+        /// is
+        /// <see cref="PredictionContext.EmptyLocal">PredictionContext.EmptyLocal</see>
+        /// .
+        /// </param>
+        protected internal virtual void Look(ATNState s, ATNState stopState, PredictionContext
+             ctx, IntervalSet look, HashSet<ATNConfig> lookBusy, BitSet calledRuleStack, 
+            bool seeThruPreds, bool addEOF)
         {
             //		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);
             ATNConfig c = ATNConfig.Create(s, 0, ctx);
             if (!lookBusy.AddItem(c))
             {
                 return;
+            }
+            if (s == stopState)
+            {
+                if (PredictionContext.IsEmptyLocal(ctx))
+                {
+                    look.Add(TokenConstants.Epsilon);
+                    return;
+                }
+                else
+                {
+                    if (ctx.IsEmpty && addEOF)
+                    {
+                        look.Add(TokenConstants.Eof);
+                        return;
+                    }
+                }
             }
             if (s is RuleStopState)
             {
@@ -165,10 +329,23 @@ namespace Antlr4.Runtime.Atn
                     if (ctx.GetReturnState(i) != PredictionContext.EmptyFullStateKey)
                     {
                         ATNState returnState = atn.states[ctx.GetReturnState(i)];
-                        //			System.out.println("popping back to "+retState);
+                        //					System.out.println("popping back to "+retState);
                         for (int j = 0; j < ctx.Size; j++)
                         {
-                            Look(returnState, ctx.GetParent(j), look, lookBusy, seeThruPreds, addEOF);
+                            bool removed = calledRuleStack.Get(returnState.ruleIndex);
+                            try
+                            {
+                                calledRuleStack.Clear(returnState.ruleIndex);
+                                Look(returnState, stopState, ctx.GetParent(j), look, lookBusy, calledRuleStack, seeThruPreds
+                                    , addEOF);
+                            }
+                            finally
+                            {
+                                if (removed)
+                                {
+                                    calledRuleStack.Set(returnState.ruleIndex);
+                                }
+                            }
                         }
                         return;
                     }
@@ -180,9 +357,22 @@ namespace Antlr4.Runtime.Atn
                 Transition t = s.Transition(i_1);
                 if (t.GetType() == typeof(RuleTransition))
                 {
+                    if (calledRuleStack.Get(((RuleTransition)t).target.ruleIndex))
+                    {
+                        continue;
+                    }
                     PredictionContext newContext = ctx.GetChild(((RuleTransition)t).followState.stateNumber
                         );
-                    Look(t.target, newContext, look, lookBusy, seeThruPreds, addEOF);
+                    try
+                    {
+                        calledRuleStack.Set(((RuleTransition)t).target.ruleIndex);
+                        Look(t.target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds
+                            , addEOF);
+                    }
+                    finally
+                    {
+                        calledRuleStack.Clear(((RuleTransition)t).target.ruleIndex);
+                    }
                 }
                 else
                 {
@@ -190,7 +380,8 @@ namespace Antlr4.Runtime.Atn
                     {
                         if (seeThruPreds)
                         {
-                            Look(t.target, ctx, look, lookBusy, seeThruPreds, addEOF);
+                            Look(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF
+                                );
                         }
                         else
                         {
@@ -201,7 +392,8 @@ namespace Antlr4.Runtime.Atn
                     {
                         if (t.IsEpsilon)
                         {
-                            Look(t.target, ctx, look, lookBusy, seeThruPreds, addEOF);
+                            Look(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF
+                                );
                         }
                         else
                         {

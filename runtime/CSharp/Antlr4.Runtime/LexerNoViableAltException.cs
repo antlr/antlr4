@@ -27,6 +27,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using System.Globalization;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
@@ -81,8 +82,8 @@ namespace Antlr4.Runtime
                 symbol = ((ICharStream)InputStream).GetText(Interval.Of(startIndex, startIndex));
                 symbol = Utils.EscapeWhitespace(symbol, false);
             }
-            return string.Format("%s('%s')", typeof(Antlr4.Runtime.LexerNoViableAltException)
-                .Name, symbol);
+            return string.Format(CultureInfo.CurrentCulture, "%s('%s')", typeof(Antlr4.Runtime.LexerNoViableAltException
+                ).Name, symbol);
         }
     }
 }

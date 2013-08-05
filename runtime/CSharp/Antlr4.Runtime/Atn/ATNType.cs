@@ -27,36 +27,17 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
-using Antlr4.Runtime;
-using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Atn;
 using Sharpen;
 
-namespace Antlr4.Runtime
+namespace Antlr4.Runtime.Atn
 {
-    /// <summary>The default mechanism for creating tokens.</summary>
-    /// <remarks>
-    /// The default mechanism for creating tokens. It's used by default in Lexer and
-    /// the error handling strategy (to create missing tokens).  Notifying the parser
-    /// of a new factory means that it notifies it's token source and error strategy.
-    /// </remarks>
-    public interface ITokenFactory
+    /// <summary>Represents the type of recognizer an ATN applies to.</summary>
+    /// <remarks>Represents the type of recognizer an ATN applies to.</remarks>
+    /// <author>Sam Harwell</author>
+    public enum ATNType
     {
-        /// <summary>
-        /// This is the method used to create tokens in the lexer and in the
-        /// error handling strategy.
-        /// </summary>
-        /// <remarks>
-        /// This is the method used to create tokens in the lexer and in the
-        /// error handling strategy. If text!=null, than the start and stop positions
-        /// are wiped to -1 in the text override is set in the CommonToken.
-        /// </remarks>
-        [NotNull]
-        IToken Create<_T0>(Tuple<_T0> source, int type, string text, int channel, int start
-            , int stop, int line, int charPositionInLine) where _T0:ITokenSource;
-
-        /// <summary>Generically useful</summary>
-        [NotNull]
-        IToken Create(int type, string text);
+        Lexer,
+        Parser
     }
 }

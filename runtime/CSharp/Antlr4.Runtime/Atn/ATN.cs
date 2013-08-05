@@ -27,8 +27,10 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
@@ -39,10 +41,6 @@ namespace Antlr4.Runtime.Atn
     public class ATN
     {
         public const int InvalidAltNumber = 0;
-
-        public const int Parser = 1;
-
-        public const int Lexer = 2;
 
         [NotNull]
         public readonly IList<ATNState> states = new List<ATNState>();
@@ -59,28 +57,53 @@ namespace Antlr4.Runtime.Atn
         [NotNull]
         public readonly IList<DecisionState> decisionToState = new List<DecisionState>();
 
+        /// <summary>Maps from rule index to starting state number.</summary>
+        /// <remarks>Maps from rule index to starting state number.</remarks>
         public RuleStartState[] ruleToStartState;
 
+        /// <summary>Maps from rule index to stop state number.</summary>
+        /// <remarks>Maps from rule index to stop state number.</remarks>
         public RuleStopState[] ruleToStopState;
 
         [NotNull]
         public readonly IDictionary<string, TokensStartState> modeNameToStartState = new 
             LinkedHashMap<string, TokensStartState>();
 
-        public int grammarType;
+        /// <summary>The type of the ATN.</summary>
+        /// <remarks>The type of the ATN.</remarks>
+        public readonly ATNType grammarType;
 
-        public int maxTokenType;
+        /// <summary>The maximum value for any symbol recognized by a transition in the ATN.</summary>
+        /// <remarks>The maximum value for any symbol recognized by a transition in the ATN.</remarks>
+        public readonly int maxTokenType;
 
+        /// <summary>For lexer ATNs, this maps the rule index to the resulting token type.</summary>
+        /// <remarks>
+        /// For lexer ATNs, this maps the rule index to the resulting token type.
+        /// <p/>
+        /// This is
+        /// <code>null</code>
+        /// for parser ATNs.
+        /// </remarks>
         public int[] ruleToTokenType;
 
+        /// <summary>
+        /// For lexer ATNs, this maps the rule index to the action which should be
+        /// executed following a match.
+        /// </summary>
+        /// <remarks>
+        /// For lexer ATNs, this maps the rule index to the action which should be
+        /// executed following a match.
+        /// <p/>
+        /// This is
+        /// <code>null</code>
+        /// for parser ATNs.
+        /// </remarks>
         public int[] ruleToActionIndex;
 
         [NotNull]
         public readonly IList<TokensStartState> modeToStartState = new List<TokensStartState
             >();
-
-        /// <summary>used during construction from grammar AST</summary>
-        internal int stateNumber = 0;
 
         private readonly ConcurrentDictionary<PredictionContext, PredictionContext> contextCache
              = new ConcurrentDictionary<PredictionContext, PredictionContext>();
@@ -95,13 +118,12 @@ namespace Antlr4.Runtime.Atn
             <int, int>();
 
         /// <summary>Used for runtime deserialization of ATNs from strings</summary>
-        public ATN()
+        public ATN(ATNType grammarType, int maxTokenType)
         {
+            this.grammarType = grammarType;
+            this.maxTokenType = maxTokenType;
         }
 
-        // runtime for parsers, lexers
-        // ATN.LEXER, ...
-        // runtime for lexer only
         public void ClearDFA()
         {
             decisionToDFA = new DFA[decisionToState.Count];
@@ -136,15 +158,23 @@ namespace Antlr4.Runtime.Atn
             return decisionToDFA;
         }
 
-        /// <summary>Compute the set of valid tokens that can occur starting in s.</summary>
-        /// <remarks>
-        /// Compute the set of valid tokens that can occur starting in s.
-        /// If ctx is
+        /// <summary>
+        /// Compute the set of valid tokens that can occur starting in state
+        /// <code>s</code>
+        /// .
+        /// If
+        /// <code>ctx</code>
+        /// is
         /// <see cref="PredictionContext.EmptyLocal">PredictionContext.EmptyLocal</see>
         /// , the set of tokens will not include what can follow
-        /// the rule surrounding s. In other words, the set will be
-        /// restricted to tokens reachable staying within s's rule.
-        /// </remarks>
+        /// the rule surrounding
+        /// <code>s</code>
+        /// . In other words, the set will be
+        /// restricted to tokens reachable staying within
+        /// <code>s</code>
+        /// 's rule.
+        /// </summary>
+        [NotNull]
         public virtual IntervalSet NextTokens(ATNState s, PredictionContext ctx)
         {
             Args.NotNull("ctx", ctx);
@@ -153,12 +183,16 @@ namespace Antlr4.Runtime.Atn
             return next;
         }
 
-        /// <summary>Compute the set of valid tokens that can occur starting in s and staying in same rule.
-        ///     </summary>
-        /// <remarks>
-        /// Compute the set of valid tokens that can occur starting in s and staying in same rule.
-        /// EPSILON is in set if we reach end of rule.
-        /// </remarks>
+        /// <summary>
+        /// Compute the set of valid tokens that can occur starting in
+        /// <code>s</code>
+        /// and
+        /// staying in same rule.
+        /// <see cref="Antlr4.Runtime.IToken.Epsilon">Antlr4.Runtime.IToken.Epsilon</see>
+        /// is in set if we reach end of
+        /// rule.
+        /// </summary>
+        [NotNull]
         public virtual IntervalSet NextTokens(ATNState s)
         {
             if (s.nextTokenWithinRule != null)
@@ -172,15 +206,12 @@ namespace Antlr4.Runtime.Atn
 
         public virtual void AddState(ATNState state)
         {
-            if (state == null)
+            if (state != null)
             {
-                states.AddItem(null);
-                stateNumber++;
-                return;
+                state.atn = this;
+                state.stateNumber = states.Count;
             }
-            state.atn = this;
             states.AddItem(state);
-            state.stateNumber = stateNumber++;
         }
 
         public virtual void RemoveState(ATNState state)
@@ -219,6 +250,75 @@ namespace Antlr4.Runtime.Atn
         public virtual int GetNumberOfDecisions()
         {
             return decisionToState.Count;
+        }
+
+        /// <summary>
+        /// Computes the set of input symbols which could follow ATN state number
+        /// <code>stateNumber</code>
+        /// in the specified full
+        /// <code>context</code>
+        /// . This method
+        /// considers the complete parser context, but does not evaluate semantic
+        /// predicates (i.e. all predicates encountered during the calculation are
+        /// assumed true). If a path in the ATN exists from the starting state to the
+        /// <see cref="RuleStopState">RuleStopState</see>
+        /// of the outermost context without matching any
+        /// symbols,
+        /// <see cref="Antlr4.Runtime.IToken.Eof">Antlr4.Runtime.IToken.Eof</see>
+        /// is added to the returned set.
+        /// <p/>
+        /// If
+        /// <code>context</code>
+        /// is
+        /// <code>null</code>
+        /// , it is treated as
+        /// <see cref="ParserRuleContext#EMPTY">ParserRuleContext#EMPTY</see>
+        /// .
+        /// </summary>
+        /// <param name="stateNumber">the ATN state number</param>
+        /// <param name="context">the full parse context</param>
+        /// <returns>
+        /// The set of potentially valid input symbols which could follow the
+        /// specified state in the specified context.
+        /// </returns>
+        /// <exception cref="System.ArgumentException">
+        /// if the ATN does not contain a state with
+        /// number
+        /// <code>stateNumber</code>
+        /// </exception>
+        [NotNull]
+        public virtual IntervalSet GetExpectedTokens(int stateNumber, RuleContext context
+            )
+        {
+            if (stateNumber < 0 || stateNumber >= states.Count)
+            {
+                throw new ArgumentException("Invalid state number.");
+            }
+            RuleContext ctx = context;
+            ATNState s = states[stateNumber];
+            IntervalSet following = NextTokens(s);
+            if (!following.Contains(TokenConstants.Epsilon))
+            {
+                return following;
+            }
+            IntervalSet expected = new IntervalSet();
+            expected.AddAll(following);
+            expected.Remove(TokenConstants.Epsilon);
+            while (ctx != null && ctx.invokingState >= 0 && following.Contains(TokenConstants
+                .Epsilon))
+            {
+                ATNState invokingState = states[ctx.invokingState];
+                RuleTransition rt = (RuleTransition)invokingState.Transition(0);
+                following = NextTokens(rt.followState);
+                expected.AddAll(following);
+                expected.Remove(TokenConstants.Epsilon);
+                ctx = ctx.parent;
+            }
+            if (following.Contains(TokenConstants.Epsilon))
+            {
+                expected.Add(TokenConstants.Eof);
+            }
+            return expected;
         }
     }
 }

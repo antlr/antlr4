@@ -36,33 +36,28 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-    /// <summary>
-    /// Buffer all input tokens but do on-demand fetching of new tokens from
-    /// lexer.
-    /// </summary>
+    /// <summary>Buffer all input tokens but do on-demand fetching of new tokens from lexer.
+    ///     </summary>
     /// <remarks>
-    /// Buffer all input tokens but do on-demand fetching of new tokens from
-    /// lexer. Useful when the parser or lexer has to set context/mode info before
-    /// proper lexing of future tokens. The ST template parser needs this,
-    /// for example, because it has to constantly flip back and forth between
-    /// inside/output templates. E.g.,
+    /// Buffer all input tokens but do on-demand fetching of new tokens from lexer.
+    /// Useful when the parser or lexer has to set context/mode info before proper
+    /// lexing of future tokens. The ST template parser needs this, for example,
+    /// because it has to constantly flip back and forth between inside/output
+    /// templates. E.g.,
     /// <code></code>
     /// &lt;names:
-    /// hi, <it>}&gt;} has to parse names
-    /// as part of an expression but
+    /// hi, <it>}&gt;} has to parse names as part of an
+    /// expression but
     /// <code>"hi, <it>"</code>
     /// as a nested template.
-    /// You can't use this stream if you pass whitespace or other off-channel
-    /// tokens to the parser. The stream can't ignore off-channel tokens.
+    /// <p/>
+    /// You can't use this stream if you pass whitespace or other off-channel tokens
+    /// to the parser. The stream can't ignore off-channel tokens.
     /// (
     /// <see cref="UnbufferedTokenStream">UnbufferedTokenStream</see>
-    /// is the same way.)  Use
+    /// is the same way.) Use
     /// <see cref="CommonTokenStream">CommonTokenStream</see>
     /// .
-    /// This is not a subclass of
-    /// <code>UnbufferedTokenStream</code>
-    /// because I don't want
-    /// to confuse small moving window of tokens it uses for the full buffer.
     /// </remarks>
     public class BufferedTokenStream : ITokenStream
     {
@@ -81,25 +76,27 @@ namespace Antlr4.Runtime
         protected internal IList<IToken> tokens = new List<IToken>(100);
 
         /// <summary>
-        /// The index into the tokens list of the current token (next token
-        /// to consume).
-        /// </summary>
-        /// <remarks>
-        /// The index into the tokens list of the current token (next token
-        /// to consume).
-        /// <code>tokens[p]</code>
+        /// The index into
+        /// <see cref="tokens">tokens</see>
+        /// of the current token (next token to
+        /// consume).
+        /// <see cref="tokens">tokens</see>
+        /// <code>[</code>
+        /// <see cref="p">p</see>
+        /// <code>]</code>
         /// should be
-        /// <code>LT(1)</code>
+        /// <see cref="Lt(int)">LT(1)</see>
         /// .
-        /// <code>p==-1</code>
-        /// indicates need
-        /// to initialize with first token.  The ctor doesn't get a token.
-        /// First call to
-        /// <code>LT(1)</code>
+        /// <see cref="p">p</see>
+        /// <code>=-1</code>
+        /// indicates need to initialize
+        /// with first token. The constructor doesn't get a token. First call to
+        /// <see cref="Lt(int)">LT(1)</see>
         /// or whatever gets the first token and sets
-        /// <code>p=0;</code>
+        /// <see cref="p">p</see>
+        /// <code>=0;</code>
         /// .
-        /// </remarks>
+        /// </summary>
         protected internal int p = -1;
 
         /// <summary>
@@ -138,7 +135,6 @@ namespace Antlr4.Runtime
             }
         }
 
-        //	public int range() { return range; }
         public virtual int Mark()
         {
             return 0;

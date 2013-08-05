@@ -33,15 +33,11 @@ using Sharpen;
 namespace Antlr4.Runtime
 {
     /// <summary>
-    /// This is an ANTLRInputStream that is loaded from a file
-    /// all at once when you construct the object.
+    /// This is an
+    /// <see cref="AntlrInputStream">AntlrInputStream</see>
+    /// that is loaded from a file all at once
+    /// when you construct the object.
     /// </summary>
-    /// <remarks>
-    /// This is an ANTLRInputStream that is loaded from a file
-    /// all at once when you construct the object.  This is a special case
-    /// since we know the exact size of the object to load.  We can avoid lots
-    /// of data copying.
-    /// </remarks>
     public class AntlrFileStream : AntlrInputStream
     {
         protected internal string fileName;
@@ -80,7 +76,11 @@ namespace Antlr4.Runtime
             try
             {
                 data = new char[size];
-                base.n = isr.Read(data);
+                n = isr.Read(data);
+                if (n < data.Length)
+                {
+                    data = Arrays.CopyOf(data, n);
+                }
             }
             finally
             {

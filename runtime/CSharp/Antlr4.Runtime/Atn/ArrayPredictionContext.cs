@@ -44,8 +44,7 @@ namespace Antlr4.Runtime.Atn
         public readonly int[] returnStates;
 
         internal ArrayPredictionContext(PredictionContext[] parents, int[] returnStates) : 
-            base(CalculateHashCode(CalculateParentHashCode(parents), CalculateReturnStatesHashCode
-            (returnStates)))
+            base(CalculateHashCode(parents, returnStates))
         {
             System.Diagnostics.Debug.Assert(parents.Length == returnStates.Length);
             System.Diagnostics.Debug.Assert(returnStates.Length > 1 || returnStates[0] != EmptyFullStateKey

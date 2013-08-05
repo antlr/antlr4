@@ -28,130 +28,164 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
 using Sharpen;
 
 namespace Antlr4.Runtime
 {
     /// <summary>
-    /// The interface for defining strategies to deal with syntax errors
-    /// encountered during a parse by ANTLR-generated parsers and tree parsers.
+    /// The interface for defining strategies to deal with syntax errors encountered
+    /// during a parse by ANTLR-generated parsers.
     /// </summary>
     /// <remarks>
-    /// The interface for defining strategies to deal with syntax errors
-    /// encountered during a parse by ANTLR-generated parsers and tree parsers.
-    /// We distinguish between three different kinds of errors:
-    /// o The parser could not figure out which path to take in the ATN
-    /// (none of the available alternatives could possibly match)
-    /// o The current input does not match what we were looking for.
-    /// o A predicate evaluated to false.
-    /// The default implementation of this interface reports errors to any
-    /// error listeners of the parser. It also handles single token insertion
-    /// and deletion for mismatched elements.
-    /// We pass in the parser to each function so that the same strategy
-    /// can be shared between multiple parsers running at the same time.
-    /// This is just for flexibility, not that we need it for the default system.
-    /// TODO: To bail out upon first error, simply rethrow e?
+    /// The interface for defining strategies to deal with syntax errors encountered
+    /// during a parse by ANTLR-generated parsers. We distinguish between three
+    /// different kinds of errors:
+    /// <ul>
+    /// <li>The parser could not figure out which path to take in the ATN (none of
+    /// the available alternatives could possibly match)</li>
+    /// <li>The current input does not match what we were looking for</li>
+    /// <li>A predicate evaluated to false</li>
+    /// </ul>
+    /// Implementations of this interface report syntax errors by calling
+    /// <see cref="Parser.NotifyErrorListeners(string)">Parser.NotifyErrorListeners(string)
+    ///     </see>
+    /// .
+    /// <p/>
     /// TODO: what to do about lexers
     /// </remarks>
     public interface IAntlrErrorStrategy
     {
         /// <summary>
-        /// When matching elements within alternative, use this method
-        /// to recover.
+        /// Reset the error handler state for the specified
+        /// <code>recognizer</code>
+        /// .
         /// </summary>
-        /// <remarks>
-        /// When matching elements within alternative, use this method
-        /// to recover. The default implementation uses single token
-        /// insertion and deletion. If you want to change the way ANTLR
-        /// response to mismatched element errors within an alternative,
-        /// implement this method.
-        /// From the recognizer, we can get the input stream to get
-        /// the current input symbol and we can get the current context.
-        /// That context gives us the current state within the ATN.
-        /// From that state, we can look at its transition to figure out
-        /// what was expected.
-        /// Because we can recover from a single token deletions by
-        /// "inserting" tokens, we need to specify what that implicitly created
-        /// token is. We use object, because it could be a tree node.
-        /// </remarks>
+        /// <param name="recognizer">the parser instance</param>
+        void Reset(Parser recognizer);
+
+        /// <summary>
+        /// This method is called when an unexpected symbol is encountered during an
+        /// inline match operation, such as
+        /// <see cref="Parser.Match(int)">Parser.Match(int)</see>
+        /// . If the error
+        /// strategy successfully recovers from the match failure, this method
+        /// returns the
+        /// <see cref="IToken">IToken</see>
+        /// instance which should be treated as the
+        /// successful result of the match.
+        /// <p/>
+        /// Note that the calling code will not report an error if this method
+        /// returns successfully. The error strategy implementation is responsible
+        /// for calling
+        /// <see cref="Parser.NotifyErrorListeners(string)">Parser.NotifyErrorListeners(string)
+        ///     </see>
+        /// as appropriate.
+        /// </summary>
+        /// <param name="recognizer">the parser instance</param>
+        /// <exception cref="RecognitionException">
+        /// if the error strategy was not able to
+        /// recover from the unexpected input symbol
+        /// </exception>
         /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
+        [NotNull]
         IToken RecoverInline(Parser recognizer);
 
         /// <summary>
-        /// Resynchronize the parser by consuming tokens until we find one
-        /// in the resynchronization set--loosely the set of tokens that can follow
-        /// the current rule.
+        /// This method is called to recover from exception
+        /// <code>e</code>
+        /// . This method is
+        /// called after
+        /// <see cref="ReportError(Parser, RecognitionException)">ReportError(Parser, RecognitionException)
+        ///     </see>
+        /// by the default exception handler
+        /// generated for a rule method.
         /// </summary>
-        /// <remarks>
-        /// Resynchronize the parser by consuming tokens until we find one
-        /// in the resynchronization set--loosely the set of tokens that can follow
-        /// the current rule. The exception contains info you might want to
-        /// use to recover better.
-        /// </remarks>
+        /// <seealso cref="ReportError(Parser, RecognitionException)">ReportError(Parser, RecognitionException)
+        ///     </seealso>
+        /// <param name="recognizer">the parser instance</param>
+        /// <param name="e">the recognition exception to recover from</param>
+        /// <exception cref="RecognitionException">
+        /// if the error strategy could not recover from
+        /// the recognition exception
+        /// </exception>
+        /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
         void Recover(Parser recognizer, RecognitionException e);
 
         /// <summary>
-        /// Make sure that the current lookahead symbol is consistent with
-        /// what were expecting at this point in the ATN.
+        /// This method provides the error handler with an opportunity to handle
+        /// syntactic or semantic errors in the input stream before they result in a
+        /// <see cref="RecognitionException">RecognitionException</see>
+        /// .
+        /// <p/>
+        /// The generated code currently contains calls to
+        /// <see cref="Sync(Parser)">Sync(Parser)</see>
+        /// after
+        /// entering the decision state of a closure block (
+        /// <code>(...)*</code>
+        /// or
+        /// <code>(...)+</code>
+        /// ).
+        /// <p/>
+        /// For an implementation based on Jim Idle's "magic sync" mechanism, see
+        /// <see cref="DefaultErrorStrategy.Sync(Parser)">DefaultErrorStrategy.Sync(Parser)</see>
+        /// .
         /// </summary>
-        /// <remarks>
-        /// Make sure that the current lookahead symbol is consistent with
-        /// what were expecting at this point in the ATN. You can call this
-        /// anytime but ANTLR only generates code to check before subrules/loops
-        /// and each iteration.
-        /// Implements Jim Idle's magic sync mechanism in closures and optional
-        /// subrules. E.g.,
-        /// a : sync ( stuff sync )* ;
-        /// sync : {consume to what can follow sync} ;
-        /// Previous versions of ANTLR did a poor job of their recovery within
-        /// loops. A single mismatch token or missing token would force the parser
-        /// to bail out of the entire rules surrounding the loop. So, for rule
-        /// classDef : 'class' ID '{' member* '}'
-        /// input with an extra token between members would force the parser to
-        /// consume until it found the next class definition rather than the
-        /// next member definition of the current class.
-        /// This functionality cost a little bit of effort because the parser
-        /// has to compare token set at the start of the loop and at each
-        /// iteration. If for some reason speed is suffering for you, you can
-        /// turn off this functionality by simply overriding this method as
-        /// a blank { }.
-        /// </remarks>
+        /// <seealso cref="DefaultErrorStrategy.Sync(Parser)">DefaultErrorStrategy.Sync(Parser)
+        ///     </seealso>
+        /// <param name="recognizer">the parser instance</param>
+        /// <exception cref="RecognitionException">
+        /// if an error is detected by the error
+        /// strategy but cannot be automatically recovered at the current state in
+        /// the parsing process
+        /// </exception>
+        /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
         void Sync(Parser recognizer);
 
-        /// <summary>Notify handler that parser has entered an error state.</summary>
-        /// <remarks>
-        /// Notify handler that parser has entered an error state.  The
-        /// parser currently doesn't call this--the handler itself calls this
-        /// in report error methods.  But, for symmetry with endErrorCondition,
-        /// this method is in the interface.
-        /// </remarks>
-        void BeginErrorCondition(Parser recognizer);
-
         /// <summary>
-        /// Is the parser in the process of recovering from an error? Upon
-        /// a syntax error, the parser enters recovery mode and stays there until
-        /// the next successful match of a token.
+        /// Tests whether or not
+        /// <code>recognizer</code>
+        /// is in the process of recovering
+        /// from an error. In error recovery mode,
+        /// <see cref="Parser.Consume()">Parser.Consume()</see>
+        /// adds
+        /// symbols to the parse tree by calling
+        /// <see cref="ParserRuleContext.AddErrorNode(IToken)">ParserRuleContext.AddErrorNode(IToken)
+        ///     </see>
+        /// instead of
+        /// <see cref="ParserRuleContext.AddChild(IToken)">ParserRuleContext.AddChild(IToken)
+        ///     </see>
+        /// .
         /// </summary>
-        /// <remarks>
-        /// Is the parser in the process of recovering from an error? Upon
-        /// a syntax error, the parser enters recovery mode and stays there until
-        /// the next successful match of a token. In this way, we can
-        /// avoid sending out spurious error messages. We only want one error
-        /// message per syntax error
-        /// </remarks>
+        /// <param name="recognizer">the parser instance</param>
+        /// <returns>
+        /// 
+        /// <code>true</code>
+        /// if the parser is currently recovering from a parse
+        /// error, otherwise
+        /// <code>false</code>
+        /// </returns>
         bool InErrorRecoveryMode(Parser recognizer);
 
-        /// <summary>Reset the error handler.</summary>
+        /// <summary>
+        /// This method is called by when the parser successfully matches an input
+        /// symbol.
+        /// </summary>
         /// <remarks>
-        /// Reset the error handler. Call this when the parser
-        /// matches a valid token (indicating no longer in recovery mode)
-        /// and from its own reset method.
+        /// This method is called by when the parser successfully matches an input
+        /// symbol.
         /// </remarks>
-        void EndErrorCondition(Parser recognizer);
+        /// <param name="recognizer">the parser instance</param>
+        void ReportMatch(Parser recognizer);
 
-        /// <summary>Report any kind of RecognitionException.</summary>
-        /// <remarks>Report any kind of RecognitionException.</remarks>
-        /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
+        /// <summary>
+        /// Report any kind of
+        /// <see cref="RecognitionException">RecognitionException</see>
+        /// . This method is called by
+        /// the default exception handler generated for a rule method.
+        /// </summary>
+        /// <param name="recognizer">the parser instance</param>
+        /// <param name="e">the recognition exception to report</param>
         void ReportError(Parser recognizer, RecognitionException e);
     }
 }

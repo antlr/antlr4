@@ -29,6 +29,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Sharpen;
@@ -195,6 +196,11 @@ namespace Antlr4.Runtime.Atn
 
         public virtual void AddTransition(Antlr4.Runtime.Atn.Transition e)
         {
+            AddTransition(transitions.Count, e);
+        }
+
+        public virtual void AddTransition(int index, Antlr4.Runtime.Atn.Transition e)
+        {
             if (transitions.IsEmpty())
             {
                 epsilonOnlyTransitions = e.IsEpsilon;
@@ -203,12 +209,12 @@ namespace Antlr4.Runtime.Atn
             {
                 if (epsilonOnlyTransitions != e.IsEpsilon)
                 {
-                    System.Console.Error.Format("ATN state %d has both epsilon and non-epsilon transitions.\n"
+                    System.Console.Error.Format(CultureInfo.CurrentCulture, "ATN state %d has both epsilon and non-epsilon transitions.\n"
                         , stateNumber);
                     epsilonOnlyTransitions = false;
                 }
             }
-            transitions.AddItem(e);
+            transitions.Add(index, e);
         }
 
         public virtual Antlr4.Runtime.Atn.Transition Transition(int i)

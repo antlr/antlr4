@@ -51,10 +51,10 @@ namespace Antlr4.Runtime.Dfa
         public readonly ConcurrentDictionary<DFAState, DFAState> states = new ConcurrentDictionary
             <DFAState, DFAState>();
 
-        [Nullable]
+        [NotNull]
         public readonly AtomicReference<DFAState> s0 = new AtomicReference<DFAState>();
 
-        [Nullable]
+        [NotNull]
         public readonly AtomicReference<DFAState> s0full = new AtomicReference<DFAState>(
             );
 
@@ -66,21 +66,12 @@ namespace Antlr4.Runtime.Dfa
 
         private readonly AtomicInteger nextStateNumber = new AtomicInteger();
 
-        /// <summary>
-        /// Set of configs for a DFA state with at least one conflict? Mainly used as "return value"
-        /// from
-        /// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.PredictATN(DFA, Antlr4.Runtime.ITokenStream, Antlr4.Runtime.ParserRuleContext, bool)
-        ///     ">Antlr4.Runtime.Atn.ParserATNSimulator.PredictATN(DFA, Antlr4.Runtime.ITokenStream, Antlr4.Runtime.ParserRuleContext, bool)
-        ///     </see>
-        /// for retry.
-        /// </summary>
         public DFA(ATNState atnStartState) : this(atnStartState, 0)
         {
         }
 
         public DFA(ATNState atnStartState, int decision)
         {
-            //	public OrderedHashSet<ATNConfig> conflictSet;
             this.atnStartState = atnStartState;
             this.decision = decision;
         }

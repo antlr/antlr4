@@ -44,17 +44,17 @@ namespace Antlr4.Runtime
         }
 
         public virtual void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int
-             stopIndex, BitSet ambigAlts, ATNConfigSet configs)
+             stopIndex, bool exact, BitSet ambigAlts, ATNConfigSet configs)
         {
         }
 
         public virtual void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex
-            , int stopIndex, SimulatorState initialState)
+            , int stopIndex, BitSet conflictingAlts, SimulatorState conflictState)
         {
         }
 
         public virtual void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex
-            , int stopIndex, SimulatorState acceptState)
+            , int stopIndex, int prediction, SimulatorState acceptState)
         {
         }
     }

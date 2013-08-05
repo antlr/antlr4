@@ -182,7 +182,7 @@ namespace Antlr4.Runtime.Misc
 
         public override int GetHashCode()
         {
-            int h = 0;
+            int hash = MurmurHash.Initialize();
             foreach (T[] bucket in buckets)
             {
                 if (bucket == null)
@@ -195,10 +195,11 @@ namespace Antlr4.Runtime.Misc
                     {
                         break;
                     }
-                    h += comparator.GetHashCode(o);
+                    hash = MurmurHash.Update(hash, comparator.GetHashCode(o));
                 }
             }
-            return h;
+            hash = MurmurHash.Finish(hash, Count);
+            return hash;
         }
 
         public override bool Equals(object o)

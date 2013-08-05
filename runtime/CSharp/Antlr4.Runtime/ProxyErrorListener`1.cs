@@ -27,12 +27,20 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using System;
 using System.Collections.Generic;
 using Antlr4.Runtime;
 using Sharpen;
 
 namespace Antlr4.Runtime
 {
+    /// <summary>
+    /// This implementation of
+    /// <see cref="IANTLRErrorListener{Symbol}">IANTLRErrorListener&lt;Symbol&gt;</see>
+    /// dispatches all calls to a
+    /// collection of delegate listeners. This reduces the effort required to support multiple
+    /// listeners.
+    /// </summary>
     /// <author>Sam Harwell</author>
     public class ProxyErrorListener<Symbol> : IAntlrErrorListener<Symbol>
     {
@@ -40,6 +48,10 @@ namespace Antlr4.Runtime
 
         public ProxyErrorListener(IEnumerable<IAntlrErrorListener<Symbol>> delegates)
         {
+            if (delegates == null)
+            {
+                throw new ArgumentNullException("delegates");
+            }
             this.delegates = delegates;
         }
 

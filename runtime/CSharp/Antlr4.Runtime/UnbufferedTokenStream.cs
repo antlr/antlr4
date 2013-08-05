@@ -135,8 +135,7 @@ namespace Antlr4.Runtime
         public UnbufferedTokenStream(ITokenSource tokenSource, int bufferSize)
         {
             this.tokenSource = tokenSource;
-            IToken[] tokens = new IToken[bufferSize];
-            this.tokens = tokens;
+            this.tokens = new IToken[bufferSize];
             n = 0;
             Fill(1);
         }

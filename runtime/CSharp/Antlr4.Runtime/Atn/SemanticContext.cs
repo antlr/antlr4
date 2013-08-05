@@ -115,10 +115,11 @@ namespace Antlr4.Runtime.Atn
 
             public override int GetHashCode()
             {
-                int hashCode = 1;
-                hashCode = 31 * hashCode + ruleIndex;
-                hashCode = 31 * hashCode + predIndex;
-                hashCode = 31 * hashCode + (isCtxDependent ? 1 : 0);
+                int hashCode = MurmurHash.Initialize();
+                hashCode = MurmurHash.Update(hashCode, ruleIndex);
+                hashCode = MurmurHash.Update(hashCode, predIndex);
+                hashCode = MurmurHash.Update(hashCode, isCtxDependent ? 1 : 0);
+                hashCode = MurmurHash.Finish(hashCode, 3);
                 return hashCode;
             }
 
@@ -251,7 +252,7 @@ namespace Antlr4.Runtime.Atn
 
             public override int GetHashCode()
             {
-                return Arrays.HashCode(opnds);
+                return MurmurHash.HashCode(opnds, typeof(SemanticContext.AND).GetHashCode());
             }
 
             public override bool Eval<_T0>(Recognizer<_T0> parser, RuleContext outerContext)
@@ -327,10 +328,9 @@ namespace Antlr4.Runtime.Atn
 
             public override int GetHashCode()
             {
-                return Arrays.HashCode(opnds) + 1;
+                return MurmurHash.HashCode(opnds, typeof(SemanticContext.OR).GetHashCode());
             }
 
-            // differ from AND slightly
             public override bool Eval<_T0>(Recognizer<_T0> parser, RuleContext outerContext)
             {
                 foreach (SemanticContext opnd in opnds)
