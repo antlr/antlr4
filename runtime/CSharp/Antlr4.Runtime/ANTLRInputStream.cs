@@ -130,45 +130,9 @@ namespace Antlr4.Runtime
             {
                 return;
             }
-            if (size <= 0)
-            {
-                size = InitialBufferSize;
-            }
-            if (readChunkSize <= 0)
-            {
-                readChunkSize = ReadBufferSize;
-            }
-            // System.out.println("load "+size+" in chunks of "+readChunkSize);
-            try
-            {
-                // alloc initial buffer size.
-                data = new char[size];
-                // read all the data in chunks of readChunkSize
-                int numRead = 0;
-                int p = 0;
-                do
-                {
-                    if (p + readChunkSize > data.Length)
-                    {
-                        // overflow?
-                        // System.out.println("### overflow p="+p+", data.length="+data.length);
-                        data = Arrays.CopyOf(data, data.Length * 2);
-                    }
-                    numRead = r.Read(data, p, readChunkSize);
-                    // System.out.println("read "+numRead+" chars; p was "+p+" is now "+(p+numRead));
-                    p += numRead;
-                }
-                while (numRead != -1);
-                // while not EOF
-                // set the actual size of the data available;
-                // EOF subtracted one above in p+=numRead; add one back
-                n = p + 1;
-            }
-            finally
-            {
-                //System.out.println("n="+n);
-                r.Dispose();
-            }
+
+            data = r.ReadToEnd().ToCharArray();
+            n = data.Length;
         }
 
         /// <summary>
