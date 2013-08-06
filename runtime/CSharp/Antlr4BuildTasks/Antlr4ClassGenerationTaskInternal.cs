@@ -42,6 +42,7 @@ namespace Antlr4.Build.Tasks
 #else
     using Registry = Microsoft.Win32.Registry;
 #endif
+    using StringBuilder = System.Text.StringBuilder;
 
     internal class AntlrClassGenerationTaskInternal : MarshalByRefObject
     {
@@ -243,11 +244,11 @@ namespace Antlr4.Build.Tasks
 
                 List<string> arguments = new List<string>();
                 arguments.Add("-cp");
-                arguments.Add('"' + ToolPath + '"');
+                arguments.Add(ToolPath);
                 arguments.Add("org.antlr.v4.CSharpTool");
 
                 arguments.Add("-o");
-                arguments.Add('"' + OutputPath + '"');
+                arguments.Add(OutputPath);
 
                 if (GenerateListener)
                     arguments.Add("-listener");
@@ -288,7 +289,7 @@ namespace Antlr4.Build.Tasks
 
                 arguments.AddRange(SourceCodeFiles);
 
-                ProcessStartInfo startInfo = new ProcessStartInfo(java, string.Join(" ", arguments.ToArray()))
+                ProcessStartInfo startInfo = new ProcessStartInfo(java, JoinArguments(arguments))
                 {
                     UseShellExecute = false,
                     CreateNoWindow = true,
@@ -328,6 +329,35 @@ namespace Antlr4.Build.Tasks
                 _buildMessages.Add(new BuildMessage(e.Message));
                 throw;
             }
+        }
+
+        private static string JoinArguments(IEnumerable<string> arguments)
+        {
+            if (arguments == null)
+                throw new ArgumentNullException("arguments");
+
+            StringBuilder builder = new StringBuilder();
+            foreach (string argument in arguments)
+            {
+                if (builder.Length > 0)
+                    builder.Append(' ');
+
+                if (argument.IndexOfAny(new[] { '"', ' ' }) < 0)
+                {
+                    builder.Append(argument);
+                    continue;
+                }
+
+                // escape a backslash appearing before a quote
+                string arg = argument.Replace("\\\"", "\\\\\"");
+                // escape double quotes
+                arg = arg.Replace("\"", "\\\"");
+
+                // wrap the argument in outer quotes
+                builder.Append('"').Append(arg).Append('"');
+            }
+
+            return builder.ToString();
         }
 
         private static readonly Regex GeneratedFileMessageFormat = new Regex(@"^Generating file '(?<OUTPUT>.*?)' for grammar '(?<GRAMMAR>.*?)'$", RegexOptions.Compiled);
