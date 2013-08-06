@@ -298,6 +298,8 @@ namespace Antlr4.Build.Tasks
                     RedirectStandardError = true,
                 };
 
+                this.BuildMessages.Add(new BuildMessage(TraceLevel.Info, "Executing command: \"" + startInfo.FileName + "\" " + startInfo.Arguments, "", 0, 0));
+
                 Process process = new Process();
                 process.StartInfo = startInfo;
                 process.ErrorDataReceived += HandleErrorDataReceived;
@@ -375,6 +377,8 @@ namespace Antlr4.Build.Tasks
             {
                 if (Antlr4ClassGenerationTask.IsFatalException(ex))
                     throw;
+
+                _buildMessages.Add(new BuildMessage(ex.Message));
             }
         }
 
@@ -400,6 +404,8 @@ namespace Antlr4.Build.Tasks
             {
                 if (Antlr4ClassGenerationTask.IsFatalException(ex))
                     throw;
+
+                _buildMessages.Add(new BuildMessage(ex.Message));
             }
         }
     }
