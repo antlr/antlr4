@@ -31,7 +31,7 @@
 // args must be <object-model-object>, <fields-resulting-in-STs>
 
 ParserFile(file, parser, namedActions) ::= <<
-// Generated from <file.grammarFileName> by ANTLR <file.ANTLRVersion>
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 namespace <file.genPackage> {
 <endif>
@@ -50,18 +50,31 @@ using DFA = Antlr4.Runtime.Dfa.DFA;
 >>
 
 ListenerFile(file, header) ::= <<
-// Generated from <file.grammarFileName> by ANTLR <file.ANTLRVersion>
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 namespace <file.genPackage> {
 <endif>
 <header>
-using Antlr4.Runtime.Tree;
+using Antlr4.Runtime.Misc;
+using IParseTreeListener = Antlr4.Runtime.Tree.IParseTreeListener;
 using IToken = Antlr4.Runtime.IToken;
 
+/// \<summary>
+/// This interface defines a complete listener for a parse tree produced by
+/// \<see cref="<file.parserName>"/>.
+/// \</summary>
 public interface I<file.grammarName>Listener : IParseTreeListener {
 	<file.listenerNames:{lname |
-void Enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context context);
-void Exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context context);}; separator="\n">
+/// \<summary>
+/// Enter a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+/// \</summary>
+/// \<param name="context">The parse tree.\</param>
+void Enter<lname; format="cap">([NotNull] <file.parserName>.<lname; format="cap">Context context);
+/// \<summary>
+/// Exit a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+/// \</summary>
+/// \<param name="context">The parse tree.\</param>
+void Exit<lname; format="cap">([NotNull] <file.parserName>.<lname; format="cap">Context context);}; separator="\n">
 }
 <if(file.genPackage)>
 } // namespace <file.genPackage>
@@ -69,26 +82,50 @@ void Exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context co
 >>
 
 BaseListenerFile(file, header) ::= <<
-// Generated from <file.grammarFileName> by ANTLR <file.ANTLRVersion>
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 namespace <file.genPackage> {
 <endif>
 <header>
 
+using Antlr4.Runtime.Misc;
 using IErrorNode = Antlr4.Runtime.Tree.IErrorNode;
 using ITerminalNode = Antlr4.Runtime.Tree.ITerminalNode;
 using IToken = Antlr4.Runtime.IToken;
 using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 
+/// \<summary>
+/// This class provides an empty implementation of \<see cref="I<file.grammarName>Listener"/>,
+/// which can be extended to create a listener which only needs to handle a subset
+/// of the available methods.
+/// \</summary>
 public partial class <file.grammarName>BaseListener : I<file.grammarName>Listener {
 	<file.listenerNames:{lname |
-public virtual void Enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context context) { \}
-public virtual void Exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context context) { \}}; separator="\n">
+/// \<summary>
+/// Enter a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+/// \<para>The default implementation does nothing.\</para>
+/// \</summary>
+/// \<param name="context">The parse tree.\</param>
+public virtual void Enter<lname; format="cap">([NotNull] <file.parserName>.<lname; format="cap">Context context) { \}
+/// \<summary>
+/// Exit a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+/// \<para>The default implementation does nothing.\</para>
+/// \</summary>
+/// \<param name="context">The parse tree.\</param>
+public virtual void Exit<lname; format="cap">([NotNull] <file.parserName>.<lname; format="cap">Context context) { \}}; separator="\n">
 
-	public virtual void EnterEveryRule(ParserRuleContext context) { }
-	public virtual void ExitEveryRule(ParserRuleContext context) { }
-	public virtual void VisitTerminal(ITerminalNode node) { }
-	public virtual void VisitErrorNode(IErrorNode node) { }
+	/// \<inheritdoc/>
+	/// \<remarks>The default implementation does nothing.\</remarks>
+	public virtual void EnterEveryRule([NotNull] ParserRuleContext context) { }
+	/// \<inheritdoc/>
+	/// \<remarks>The default implementation does nothing.\</remarks>
+	public virtual void ExitEveryRule([NotNull] ParserRuleContext context) { }
+	/// \<inheritdoc/>
+	/// \<remarks>The default implementation does nothing.\</remarks>
+	public virtual void VisitTerminal([NotNull] ITerminalNode node) { }
+	/// \<inheritdoc/>
+	/// \<remarks>The default implementation does nothing.\</remarks>
+	public virtual void VisitErrorNode([NotNull] IErrorNode node) { }
 }
 <if(file.genPackage)>
 } // namespace <file.genPackage>
@@ -96,17 +133,28 @@ public virtual void Exit<lname; format="cap">(<file.parserName>.<lname; format="
 >>
 
 VisitorFile(file, header) ::= <<
-// Generated from <file.grammarFileName> by ANTLR <file.ANTLRVersion>
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 namespace <file.genPackage> {
 <endif>
 <header>
+using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using IToken = Antlr4.Runtime.IToken;
 
+/// \<summary>
+/// This interface defines a complete generic visitor for a parse tree produced
+/// by \<see cref="<file.parserName>"/>.
+/// \</summary>
+/// \<typeparam name="Result">The return type of the visit operation.\</typeparam>
 public interface I<file.grammarName>Visitor\<Result> : IParseTreeVisitor\<Result> {
 	<file.visitorNames:{lname |
-Result Visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context context);}; separator="\n">
+/// \<summary>
+/// Visit a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+/// \</summary>
+/// \<param name="context">The parse tree.\</param>
+/// \<return>The visitor result.\</return>
+Result Visit<lname; format="cap">([NotNull] <file.parserName>.<lname; format="cap">Context context);}; separator="\n">
 }
 <if(file.genPackage)>
 } // namespace <file.genPackage>
@@ -114,22 +162,42 @@ Result Visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context
 >>
 
 BaseVisitorFile(file, header) ::= <<
-// Generated from <file.grammarFileName> by ANTLR <file.ANTLRVersion>
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 namespace <file.genPackage> {
 <endif>
 <header>
+using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using IToken = Antlr4.Runtime.IToken;
 using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 
+/// \<summary>
+/// This class provides an empty implementation of \<see cref="I<file.grammarName>Visitor{Result}"/>,
+/// which can be extended to create a visitor which only needs to handle a subset
+/// of the available methods.
+/// \</summary>
+/// \<typeparam name="Result">The return type of the visit operation.\</typeparam>
 public partial class <file.grammarName>BaseVisitor\<Result> : AbstractParseTreeVisitor\<Result>, I<file.grammarName>Visitor\<Result> {
 	<file.visitorNames:{lname |
-public virtual Result Visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context context) { return VisitChildren(context); \}}; separator="\n">
+/// \<summary>
+/// Visit a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+/// \<para>
+/// The default implementation returns the result of calling \<see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+/// on \<paramref name="context"/>.
+/// \</para>
+/// \</summary>
+/// \<param name="context">The parse tree.\</param>
+/// \<return>The visitor result.\</return>
+public virtual Result Visit<lname; format="cap">([NotNull] <file.parserName>.<lname; format="cap">Context context) { return VisitChildren(context); \}}; separator="\n">
 }
 <if(file.genPackage)>
 } // namespace <file.genPackage>
 <endif>
+>>
+
+fileHeader(grammarFileName, ANTLRVersion) ::= <<
+// Generated from <grammarFileName> by ANTLR <ANTLRVersion>
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
@@ -807,7 +875,7 @@ _prevctx = _localctx;
 
 
 LexerFile(file, lexer, namedActions) ::= <<
-// Generated from <file.grammarFileName> by ANTLR <file.ANTLRVersion>
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 namespace <file.genPackage> {
 <endif>
