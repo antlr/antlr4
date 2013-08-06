@@ -61,21 +61,21 @@ using IToken = Antlr4.Runtime.IToken;
 
 /// \<summary>
 /// This interface defines a complete listener for a parse tree produced by
-/// \<see cref="<file.parserName>"/>.
+/// \<see cref="<csIdentifier.(file.parserName)>"/>.
 /// \</summary>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
 public interface I<file.grammarName>Listener : IParseTreeListener {
 	<file.listenerNames:{lname |
 /// \<summary>
-/// Enter a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+/// Enter a parse tree produced by \<see cref="<csIdentifier.(file.parserName)>.<csIdentifier.(lname)>"/>.
 /// \</summary>
 /// \<param name="context">The parse tree.\</param>
-void Enter<lname; format="cap">([NotNull] <file.parserName>.<lname; format="cap">Context context);
+void Enter<lname; format="cap">([NotNull] <csIdentifier.(file.parserName)>.<lname; format="cap">Context context);
 /// \<summary>
-/// Exit a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+/// Exit a parse tree produced by \<see cref="<csIdentifier.(file.parserName)>.<csIdentifier.(lname)>"/>.
 /// \</summary>
 /// \<param name="context">The parse tree.\</param>
-void Exit<lname; format="cap">([NotNull] <file.parserName>.<lname; format="cap">Context context);}; separator="\n">
+void Exit<lname; format="cap">([NotNull] <csIdentifier.(file.parserName)>.<lname; format="cap">Context context);}; separator="\n">
 }
 <if(file.genPackage)>
 } // namespace <file.genPackage>
@@ -104,17 +104,17 @@ using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 public partial class <file.grammarName>BaseListener : I<file.grammarName>Listener {
 	<file.listenerNames:{lname |
 /// \<summary>
-/// Enter a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+/// Enter a parse tree produced by \<see cref="<csIdentifier.(file.parserName)>.<csIdentifier.(lname)>"/>.
 /// \<para>The default implementation does nothing.\</para>
 /// \</summary>
 /// \<param name="context">The parse tree.\</param>
-public virtual void Enter<lname; format="cap">([NotNull] <file.parserName>.<lname; format="cap">Context context) { \}
+public virtual void Enter<lname; format="cap">([NotNull] <csIdentifier.(file.parserName)>.<lname; format="cap">Context context) { \}
 /// \<summary>
-/// Exit a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+/// Exit a parse tree produced by \<see cref="<csIdentifier.(file.parserName)>.<csIdentifier.(lname)>"/>.
 /// \<para>The default implementation does nothing.\</para>
 /// \</summary>
 /// \<param name="context">The parse tree.\</param>
-public virtual void Exit<lname; format="cap">([NotNull] <file.parserName>.<lname; format="cap">Context context) { \}}; separator="\n">
+public virtual void Exit<lname; format="cap">([NotNull] <csIdentifier.(file.parserName)>.<lname; format="cap">Context context) { \}}; separator="\n">
 
 	/// \<inheritdoc/>
 	/// \<remarks>The default implementation does nothing.\</remarks>
@@ -146,18 +146,18 @@ using IToken = Antlr4.Runtime.IToken;
 
 /// \<summary>
 /// This interface defines a complete generic visitor for a parse tree produced
-/// by \<see cref="<file.parserName>"/>.
+/// by \<see cref="<csIdentifier.(file.parserName)>"/>.
 /// \</summary>
 /// \<typeparam name="Result">The return type of the visit operation.\</typeparam>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
 public interface I<file.grammarName>Visitor\<Result> : IParseTreeVisitor\<Result> {
 	<file.visitorNames:{lname |
 /// \<summary>
-/// Visit a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+/// Visit a parse tree produced by \<see cref="<csIdentifier.(file.parserName)>.<csIdentifier.(lname)>"/>.
 /// \</summary>
 /// \<param name="context">The parse tree.\</param>
 /// \<return>The visitor result.\</return>
-Result Visit<lname; format="cap">([NotNull] <file.parserName>.<lname; format="cap">Context context);}; separator="\n">
+Result Visit<lname; format="cap">([NotNull] <csIdentifier.(file.parserName)>.<lname; format="cap">Context context);}; separator="\n">
 }
 <if(file.genPackage)>
 } // namespace <file.genPackage>
@@ -185,7 +185,7 @@ using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 public partial class <file.grammarName>BaseVisitor\<Result> : AbstractParseTreeVisitor\<Result>, I<file.grammarName>Visitor\<Result> {
 	<file.visitorNames:{lname |
 /// \<summary>
-/// Visit a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+/// Visit a parse tree produced by \<see cref="<csIdentifier.(file.parserName)>.<csIdentifier.(lname)>"/>.
 /// \<para>
 /// The default implementation returns the result of calling \<see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 /// on \<paramref name="context"/>.
@@ -193,7 +193,7 @@ public partial class <file.grammarName>BaseVisitor\<Result> : AbstractParseTreeV
 /// \</summary>
 /// \<param name="context">The parse tree.\</param>
 /// \<return>The visitor result.\</return>
-public virtual Result Visit<lname; format="cap">([NotNull] <file.parserName>.<lname; format="cap">Context context) { return VisitChildren(context); \}}; separator="\n">
+public virtual Result Visit<lname; format="cap">([NotNull] <csIdentifier.(file.parserName)>.<lname; format="cap">Context context) { return VisitChildren(context); \}}; separator="\n">
 }
 <if(file.genPackage)>
 } // namespace <file.genPackage>
@@ -220,7 +220,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
-public <if(parser.abstractRecognizer)>abstract <endif>partial class <parser.name> : <superClass> {
+public <if(parser.abstractRecognizer)>abstract <endif>partial class <csIdentifier.(parser.name)> : <superClass> {
 	<if(parser.tokens)>
 	public const int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
@@ -282,7 +282,7 @@ case <f.ruleIndex> : return <f.name>_sempred(<if(!recog.modes)>(<f.ctxType>)<end
 >>
 
 parser_ctor(parser) ::= <<
-<if(parser.abstractRecognizer)>protected<else>public<endif> <parser.name>(ITokenStream input)
+<if(parser.abstractRecognizer)>protected<else>public<endif> <csIdentifier.(parser.name)>(ITokenStream input)
 	: base(input)
 {
 	_interp = new ParserATNSimulator(this,_ATN);
@@ -320,7 +320,7 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 [RuleVersion(<namedActions.version; null="0">)]
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<currentRule.args; separator=",">) {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <a.name>}>);
 	EnterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
 	<namedActions.init>
@@ -353,7 +353,7 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 LeftFactoredRuleFunction(currentRule,code,locals,namedActions,finallyAction,postamble) ::=
 <<
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<currentRule.args; separator=",">) {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <a.name>}>);
 	EnterLeftFactoredRule(_localctx, <currentRule.startState>, RULE_<currentRule.variantOf>);
 	<namedActions.init>
@@ -385,7 +385,7 @@ LeftFactoredRuleFunction(currentRule,code,locals,namedActions,finallyAction,post
 LeftUnfactoredRuleFunction(currentRule,code,locals,namedActions,finallyAction,postamble) ::=
 <<
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<currentRule.args; separator=",">) {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <a.name>}>);
 	EnterRule(_localctx, <currentRule.startState>, RULE_<currentRule.variantOf>);
 	<namedActions.init>
@@ -419,7 +419,7 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 [RuleVersion(<namedActions.version; null="0">)]
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <currentRule.name>(int _p<currentRule.args:{a | , <a>}>) {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(int _p<currentRule.args:{a | , <a>}>) {
 	ParserRuleContext _parentctx = _ctx;
 	int _parentState = State;
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>);
@@ -761,27 +761,27 @@ contextGetterCollection(elementType) ::= <%
 %>
 
 ContextTokenGetterDecl(t)      ::=
-    "public ITerminalNode <t.name>() { return GetToken(<parser.name>.<t.name>, 0); }"
+    "public ITerminalNode <t.name>() { return GetToken(<csIdentifier.(parser.name)>.<t.name>, 0); }"
 ContextTokenListGetterDecl(t)  ::= <<
-public <contextGetterCollection("ITerminalNode")> <t.name>() { return GetTokens(<parser.name>.<t.name>); }
+public <contextGetterCollection("ITerminalNode")> <t.name>() { return GetTokens(<csIdentifier.(parser.name)>.<t.name>); }
 >>
 ContextTokenListIndexedGetterDecl(t)  ::= <<
 public ITerminalNode <t.name>(int i) {
-	return GetToken(<parser.name>.<t.name>, i);
+	return GetToken(<csIdentifier.(parser.name)>.<t.name>, i);
 }
 >>
 ContextRuleGetterDecl(r)       ::= <<
-public <r.ctxName> <r.name>() {
+public <r.ctxName> <csIdentifier.(r.name)>() {
 	return GetRuleContext\<<r.ctxName>\>(0);
 }
 >>
 ContextRuleListGetterDecl(r)   ::= <<
-public <contextGetterCollection({<r.ctxName>})> <r.name>() {
+public <contextGetterCollection({<r.ctxName>})> <csIdentifier.(r.name)>() {
 	return GetRuleContexts\<<r.ctxName>\>();
 }
 >>
 ContextRuleListIndexedGetterDecl(r)   ::= <<
-public <r.ctxName> <r.name>(int i) {
+public <r.ctxName> <csIdentifier.(r.name)>(int i) {
 	return GetRuleContext\<<r.ctxName>\>(i);
 }
 >>
@@ -908,7 +908,7 @@ using DFA = Antlr4.Runtime.Dfa.DFA;
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
-public <if(lexer.abstractRecognizer)>abstract <endif>partial class <lexer.name> : <superClass> {
+public <if(lexer.abstractRecognizer)>abstract <endif>partial class <csIdentifier.(lexer.name)> : <superClass> {
 	public const int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<rest(lexer.modes):{m| public const int <m> = <i>;}; separator="\n">
@@ -926,7 +926,7 @@ public <if(lexer.abstractRecognizer)>abstract <endif>partial class <lexer.name> 
 
 	<namedActions.members>
 
-	<if(lexer.abstractRecognizer)>protected<else>public<endif> <lexer.name>(ICharStream input)
+	<if(lexer.abstractRecognizer)>protected<else>public<endif> <csIdentifier.(lexer.name)>(ICharStream input)
 		: base(input)
 	{
 		_interp = new LexerATNSimulator(this,_ATN);
@@ -958,3 +958,84 @@ default(<typeName>)
 >>
 
 codeFileExtension() ::= ".cs"
+
+csIdentifier ::= [
+	"abstract" : "@abstract",
+	"as" : "@as",
+	"base" : "@base",
+	"bool" : "@bool",
+	"break" : "@break",
+	"byte" : "@byte",
+	"case" : "@case",
+	"catch" : "@catch",
+	"char" : "@char",
+	"checked" : "@checked",
+	"class" : "@class",
+	"const" : "@const",
+	"continue" : "@continue",
+	"decimal" : "@decimal",
+	"default" : "@default",
+	"delegate" : "@delegate",
+	"do" : "@do",
+	"double" : "@double",
+	"else" : "@else",
+	"enum" : "@enum",
+	"event" : "@event",
+	"explicit" : "@explicit",
+	"extern" : "@extern",
+	"false" : "@false",
+	"finally" : "@finally",
+	"fixed" : "@fixed",
+	"float" : "@float",
+	"for" : "@for",
+	"foreach" : "@foreach",
+	"goto" : "@goto",
+	"if" : "@if",
+	"implicit" : "@implicit",
+	"in" : "@in",
+	"int" : "@int",
+	"interface" : "@interface",
+	"internal" : "@internal",
+	"is" : "@is",
+	"lock" : "@lock",
+	"long" : "@long",
+	"namespace" : "@namespace",
+	"new" : "@new",
+	"null" : "@null",
+	"object" : "@object",
+	"operator" : "@operator",
+	"out" : "@out",
+	"override" : "@override",
+	"params" : "@params",
+	"private" : "@private",
+	"protected" : "@protected",
+	"public" : "@public",
+	"readonly" : "@readonly",
+	"ref" : "@ref",
+	"return" : "@return",
+	"sbyte" : "@sbyte",
+	"sealed" : "@sealed",
+	"short" : "@short",
+	"sizeof" : "@sizeof",
+	"stackalloc" : "@stackalloc",
+	"static" : "@static",
+	"string" : "@string",
+	"struct" : "@struct",
+	"switch" : "@switch",
+	"this" : "@this",
+	"throw" : "@throw",
+	"true" : "@true",
+	"try" : "@try",
+	"typeof" : "@typeof",
+	"uint" : "@uint",
+	"ulong" : "@ulong",
+	"unchecked" : "@unchecked",
+	"unsafe" : "@unsafe",
+	"ushort" : "@ushort",
+	"using" : "@using",
+	"virtual" : "@virtual",
+	"void" : "@void",
+	"volatile" : "@volatile",
+	"while" : "@while",
+	default : key
+]
