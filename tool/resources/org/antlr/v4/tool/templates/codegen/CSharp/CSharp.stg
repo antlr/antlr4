@@ -187,7 +187,7 @@ public partial class <file.grammarName>BaseVisitor\<Result> : AbstractParseTreeV
 /// \<summary>
 /// Visit a parse tree produced by \<see cref="<csIdentifier.(file.parserName)>.<csIdentifier.(lname)>"/>.
 /// \<para>
-/// The default implementation returns the result of calling \<see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+/// The default implementation returns the result of calling \<see cref="AbstractParseTreeVisitor{Result\}.VisitChildren(IRuleNode)"/>
 /// on \<paramref name="context"/>.
 /// \</para>
 /// \</summary>
