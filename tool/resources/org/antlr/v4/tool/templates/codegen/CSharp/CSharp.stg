@@ -320,8 +320,8 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 [RuleVersion(<namedActions.version; null="0">)]
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<currentRule.args; separator=",">) {
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <a.name>}>);
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<currentRule.args:{a | <a.type> <csIdentifier.(a.name)><if(a.initValue)> = <a.initValue><endif>}; separator=", ">) {
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
 	EnterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
 	<namedActions.init>
 	<locals; separator="\n">
@@ -353,8 +353,8 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 LeftFactoredRuleFunction(currentRule,code,locals,namedActions,finallyAction,postamble) ::=
 <<
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<currentRule.args; separator=",">) {
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <a.name>}>);
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<currentRule.args:{a | <a.type> <csIdentifier.(a.name)><if(a.initValue)> = <a.initValue><endif>}; separator=", ">) {
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
 	EnterLeftFactoredRule(_localctx, <currentRule.startState>, RULE_<currentRule.variantOf>);
 	<namedActions.init>
 	<locals; separator="\n">
@@ -385,8 +385,8 @@ LeftFactoredRuleFunction(currentRule,code,locals,namedActions,finallyAction,post
 LeftUnfactoredRuleFunction(currentRule,code,locals,namedActions,finallyAction,postamble) ::=
 <<
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<currentRule.args; separator=",">) {
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <a.name>}>);
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<currentRule.args:{a | <a.type> <csIdentifier.(a.name)><if(a.initValue)> = <a.initValue><endif>}; separator=", ">) {
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
 	EnterRule(_localctx, <currentRule.startState>, RULE_<currentRule.variantOf>);
 	<namedActions.init>
 	<locals; separator="\n">
@@ -419,10 +419,10 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 [RuleVersion(<namedActions.version; null="0">)]
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(int _p<currentRule.args:{a | , <a>}>) {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(int _p<currentRule.args:{a | , <a.type> <csIdentifier.(a.name)><if(a.initValue)> = <a.initValue><endif>}>) {
 	ParserRuleContext _parentctx = _ctx;
 	int _parentState = State;
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>);
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
 	<currentRule.ctxType> _prevctx = _localctx;
 	int _startState = <currentRule.startState>;
 	EnterRecursionRule(_localctx, RULE_<currentRule.name>, _p);
@@ -654,7 +654,7 @@ cases(ttypes) ::= <<
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
-State = <r.stateNumber>; <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
+State = <r.stateNumber>; <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><csIdentifier.(r.name)>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
 >>
 
 MatchToken(m) ::= <<
@@ -713,15 +713,15 @@ DefaultLexerSuperClass(s)  ::= "Lexer"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
-ArgRef(a) ::= "_localctx.<a.name>"
-LocalRef(a) ::= "_localctx.<a.name>"
-RetValueRef(a) ::= "_localctx.<a.name>"
-QRetValueRef(a) ::= "<ctx(a)>.<a.dict>.<a.name>"
+ArgRef(a) ::= "_localctx.<csIdentifier.(a.name)>"
+LocalRef(a) ::= "_localctx.<csIdentifier.(a.name)>"
+RetValueRef(a) ::= "_localctx.<csIdentifier.(a.name)>"
+QRetValueRef(a) ::= "<ctx(a)>.<a.dict>.<csIdentifier.(a.name)>"
 /** How to translate $tokenLabel */
-TokenRef(t) ::= "<ctx(t)>.<t.name>"
-LabelRef(t) ::= "<ctx(t)>.<t.name>"
-ListLabelRef(t) ::= "<ctx(t)>.<ListLabelName(t.name)>"
-SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.name> = <rhsChunks>;"
+TokenRef(t) ::= "<ctx(t)>.<csIdentifier.(t.name)>"
+LabelRef(t) ::= "<ctx(t)>.<csIdentifier.(t.name)>"
+ListLabelRef(t) ::= "<ctx(t)>.<ListLabelName(csIdentifier.(t.name))>"
+SetAttr(s,rhsChunks) ::= "<ctx(s)>.<csIdentifier.(s.name)> = <rhsChunks>;"
 
 TokenLabelType() ::= "<file.TokenLabelType; null={IToken}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={IToken}>"
@@ -744,30 +744,30 @@ ThisRulePropertyRef_stop(r)	 ::= "_localctx.stop"
 ThisRulePropertyRef_text(r)	 ::= "_input.GetText(_localctx.start, _input.Lt(-1))"
 ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
 
-NonLocalAttrRef(s)		 ::= <%((<s.ruleName; format="cap">Context)GetInvokingContext(<s.ruleIndex>)).<s.name>%>
+NonLocalAttrRef(s)		 ::= <%((<s.ruleName; format="cap">Context)GetInvokingContext(<s.ruleIndex>)).<csIdentifier.(s.name)>%>
 SetNonLocalAttr(s, rhsChunks)	  ::=
-	<%((<s.ruleName; format="cap">Context)GetInvokingContext(<s.ruleIndex>)).<s.name> = <rhsChunks>;%>
+	<%((<s.ruleName; format="cap">Context)GetInvokingContext(<s.ruleIndex>)).<csIdentifier.(s.name)> = <rhsChunks>;%>
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.Add(<labelref(a.label)>);"
 
-TokenDecl(t) ::= "public <TokenLabelType()> <t.name>;"
-TokenTypeDecl(t) ::= "int <t.name>;"
-TokenListDecl(t) ::= "public IList\<IToken> <t.name> = new List\<IToken>();"
-RuleContextDecl(r) ::= "public <r.ctxName> <r.name>;"
-RuleContextListDecl(rdecl) ::= "public IList\<<rdecl.ctxName>> <rdecl.name> = new List\<<rdecl.ctxName>>();"
+TokenDecl(t) ::= "public <TokenLabelType()> <csIdentifier.(t.name)>;"
+TokenTypeDecl(t) ::= "int <csIdentifier.(t.name)>;"
+TokenListDecl(t) ::= "public IList\<IToken> <csIdentifier.(t.name)> = new List\<IToken>();"
+RuleContextDecl(r) ::= "public <r.ctxName> <csIdentifier.(r.name)>;"
+RuleContextListDecl(rdecl) ::= "public IList\<<rdecl.ctxName>> <csIdentifier.(rdecl.name)> = new List\<<rdecl.ctxName>>();"
 
 contextGetterCollection(elementType) ::= <%
 <elementType>[]
 %>
 
 ContextTokenGetterDecl(t)      ::=
-    "public ITerminalNode <t.name>() { return GetToken(<csIdentifier.(parser.name)>.<t.name>, 0); }"
+    "public ITerminalNode <csIdentifier.(t.name)>() { return GetToken(<csIdentifier.(parser.name)>.<csIdentifier.(t.name)>, 0); }"
 ContextTokenListGetterDecl(t)  ::= <<
-public <contextGetterCollection("ITerminalNode")> <t.name>() { return GetTokens(<csIdentifier.(parser.name)>.<t.name>); }
+public <contextGetterCollection("ITerminalNode")> <csIdentifier.(t.name)>() { return GetTokens(<csIdentifier.(parser.name)>.<csIdentifier.(t.name)>); }
 >>
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-public ITerminalNode <t.name>(int i) {
-	return GetToken(<csIdentifier.(parser.name)>.<t.name>, i);
+public ITerminalNode <csIdentifier.(t.name)>(int i) {
+	return GetToken(<csIdentifier.(parser.name)>.<csIdentifier.(t.name)>, i);
 }
 >>
 ContextRuleGetterDecl(r)       ::= <<
@@ -807,17 +807,17 @@ public partial class <struct.name> : <superClass><if(interfaces)>, <interfaces; 
 	<attrs:{a | <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
 	<if(struct.ctorAttrs)>public <struct.name>(ParserRuleContext parent, int invokingState) : base(parent, invokingState) { }<endif>
-	public <struct.name>(ParserRuleContext parent, int invokingState<struct.ctorAttrs:{a | , <a>}>)
+	public <struct.name>(ParserRuleContext parent, int invokingState<struct.ctorAttrs:{a | , <a.type> <csIdentifier.(a.name)>}>)
 		: base(parent, invokingState)
 	{
-		<struct.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
+		<struct.ctorAttrs:{a | this.<csIdentifier.(a.name)> = <csIdentifier.(a.name)>;}; separator="\n">
 	}
 	public override int GetRuleIndex() { return RULE_<struct.derivedFromName>; }
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
 	public <struct.name>() { }
 	public virtual void CopyFrom(<struct.name> context) {
 		base.CopyFrom(context);
-		<struct.attrs:{a | this.<a.name> = context.<a.name>;}; separator="\n">
+		<struct.attrs:{a | this.<csIdentifier.(a.name)> = context.<csIdentifier.(a.name)>;}; separator="\n">
 	}
 <endif>
 	<dispatchMethods; separator="\n">
@@ -852,7 +852,7 @@ public override TResult Accept\<TResult>(IParseTreeVisitor\<TResult> visitor) {
 AttributeDecl(d) ::= "public <d.decl>;"
 
 /** If we don't know location of label def x, use this template */
-labelref(x) ::= "<if(!x.isLocal)><typedContext(x.ctx)>.<endif><x.name>"
+labelref(x) ::= "<if(!x.isLocal)><typedContext(x.ctx)>.<endif><csIdentifier.(x.name)>"
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
 ctx(actionChunk) ::= "<typedContext(actionChunk.ctx)>"
