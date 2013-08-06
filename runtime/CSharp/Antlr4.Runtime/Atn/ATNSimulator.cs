@@ -864,14 +864,13 @@ nextTransition_continue: ;
 
         public static Guid ToUUID(char[] data, int offset)
         {
-            byte[] leastSigBits = BitConverter.GetBytes(ToLong(data, offset));
-            byte[] mostSigBits = BitConverter.GetBytes(ToLong(data, offset + 4));
+            int a = ToInt32(data, offset + 4 + 2);
+            short b = (short)data[offset + 4 + 1];
+            short c = (short)data[offset + 4];
+            byte[] d = BitConverter.GetBytes(ToLong(data, offset));
+            Array.Reverse(d);
 
-            byte[] bits = leastSigBits;
-            Array.Resize(ref bits, leastSigBits.Length + mostSigBits.Length);
-            Buffer.BlockCopy(mostSigBits, 0, bits, leastSigBits.Length, mostSigBits.Length);
-
-            return new Guid(bits);
+            return new Guid(a, b, c, d);
         }
 
         [return: NotNull]
