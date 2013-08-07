@@ -26,7 +26,8 @@ public class IncludeStrategyImpl implements IncludeStrategy
 		/**
 		 * Returns Pair<CharStream,Integer> for the inFileName
 		 */
-		public Pair<CharStream, Integer> file2StreamPair(String inFileName) {
+		@Override
+		public Pair<CharStream, Integer> fileName2StreamPair(String inFileName) {
 			Integer streamRef=addInclude(inFileName);
 			Pair<CharStream, Integer> streamPair=new Pair<CharStream, Integer>(filenameContentList.get(streamRef),streamRef);
 			return streamPair;
@@ -91,7 +92,8 @@ public class IncludeStrategyImpl implements IncludeStrategy
 			return streamRef;
 		}
 		
-		public String getFileName(Integer ref)
+		@Override
+		public String getFileName(Integer streamRef)
 		{
 			String s="";
 			int i=0;
@@ -99,7 +101,7 @@ public class IncludeStrategyImpl implements IncludeStrategy
 			while(ix.hasNext()) 
 			{s=ix.next();
 			//System.out.println("+++("+i+") "+s);
-			 if(filenameIndexMap.get(s).equals(ref)) break;
+			 if(filenameIndexMap.get(s).equals(streamRef)) break;
 			 i++;
 			}
 			
