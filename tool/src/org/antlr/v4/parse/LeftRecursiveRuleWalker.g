@@ -49,9 +49,8 @@ private String ruleName;
 private int currentOuterAltNumber; // which outer alt of rule?
 public int numAlts;  // how many alts for this rule total?
 
-public void setTokenAssoc(GrammarAST t, int alt) {}
+public void setAltAssoc(AltAST altTree, int alt) {}
 public void binaryAlt(AltAST altTree, int alt) {}
-public void ternaryAlt(AltAST altTree, int alt) {}
 public void prefixAlt(AltAST altTree, int alt) {}
 public void suffixAlt(AltAST altTree, int alt) {}
 public void otherAlt(AltAST altTree, int alt) {}
@@ -112,47 +111,37 @@ ruleBlock returns [boolean isLeftRec]
 
 /** An alt is either prefix, suffix, binary, or ternary operation or "other" */
 outerAlternative returns [boolean isLeftRec]
-    :   (binaryMultipleOp)=> binaryMultipleOp
+    :   (binary)=>           binary
                              {binaryAlt((AltAST)$start, currentOuterAltNumber); $isLeftRec=true;}
-    |   (binary)=>           binary
-                             {binaryAlt((AltAST)$start, currentOuterAltNumber); $isLeftRec=true;}
-    |   (ternary)=>          ternary
-                             {ternaryAlt((AltAST)$start, currentOuterAltNumber); $isLeftRec=true;}
     |   (prefix)=>           prefix
                              {prefixAlt((AltAST)$start, currentOuterAltNumber);}
     |   (suffix)=>           suffix
                              {suffixAlt((AltAST)$start, currentOuterAltNumber); $isLeftRec=true;}
-    |   ^(ALT element+) // "other" case
-                             {otherAlt((AltAST)$start, currentOuterAltNumber);}
-    ;
-
-// (ALT (= a e) (= op (SET '*' '/')) (= b e) {}) (ALT INT {}) (ALT '(' (= x e) ')' {})
-binaryMultipleOp
-	:	^( ALT recurse bops recurse ACTION? )
-	;
-
-bops:   ^(ASSIGN ID bops)
-	|	^( BLOCK ( ^( ALT (op=token)+ {setTokenAssoc($op.t, currentOuterAltNumber);} ) )+ )
-    |   ^(SET (op=token)+ {setTokenAssoc($op.t, currentOuterAltNumber);})
+    |   nonLeftRecur         {otherAlt((AltAST)$start,  currentOuterAltNumber);}
     ;
 
 binary
-	:	^( ALT recurse (op=token)+ {setTokenAssoc($op.t, currentOuterAltNumber);} recurse ACTION? )
-	;
-
-ternary
-	:	^( ALT recurse op=token recurse token recurse ACTION? ) {setTokenAssoc($op.t, currentOuterAltNumber);}
+	:	^( ALT ruleElementOptions? recurse element+ recurse ACTION? )
+        {setAltAssoc((AltAST)$ALT,currentOuterAltNumber);}
 	;
 
 prefix
-	:	^(	ALT {setTokenAssoc((GrammarAST)input.LT(1), currentOuterAltNumber);}
+	:	^(	ALT ruleElementOptions?
 			({!((CommonTree)input.LT(1)).getText().equals(ruleName)}? element)+
 			recurse ACTION?
 		 )
+         {setAltAssoc((AltAST)$ALT,currentOuterAltNumber);}
 	;
 
-suffix : ^( ALT recurse {setTokenAssoc((GrammarAST)input.LT(1), currentOuterAltNumber);} element+  ) ;
+suffix
+    :   ^( ALT ruleElementOptions? recurse element+ )
+         {setAltAssoc((AltAST)$ALT,currentOuterAltNumber);}
+    ;
 
+nonLeftRecur
+    :   ^(ALT element+)  // no assoc for these; ignore if <assoc=...> present
+    ;
+    
 recurse
 	:	^(ASSIGN ID recurseNoLabel)
 	|	recurseNoLabel
@@ -164,16 +153,16 @@ token returns [GrammarAST t=null]
 	:	^(ASSIGN ID s=token {$t = $s.t;})
 	|	^(PLUS_ASSIGN ID s=token {$t = $s.t;})
 	|	b=STRING_LITERAL    					{$t = $b;}
-    |	^(b=STRING_LITERAL elementOptions)		{$t = $b;}
-    |	^(c=TOKEN_REF elementOptions)			{$t = $c;}
+    |	^(b=STRING_LITERAL ruleElementOptions)		{$t = $b;}
+    |	^(c=TOKEN_REF ruleElementOptions)			{$t = $c;}
 	|	c=TOKEN_REF        						{$t = $c;}
 	;
 
-elementOptions
-    :	^(ELEMENT_OPTIONS elementOption*)
+ruleElementOptions
+    :	^(ELEMENT_OPTIONS ruleElementOption*)
     ;
 
-elementOption
+ruleElementOption
     :	ID
     |   ^(ASSIGN ID ID)
     |   ^(ASSIGN ID STRING_LITERAL)
@@ -211,16 +200,16 @@ block
     ;
 
 alternative
-	:	^(ALT elementOptions? element+)
+	:	^(ALT ruleElementOptions? element+)
     ;
 
 atom
 	:	^(RULE_REF ARG_ACTION?)
-    |  ^(STRING_LITERAL elementOptions)
+    |  ^(STRING_LITERAL ruleElementOptions)
 	|	STRING_LITERAL
-    |	^(TOKEN_REF elementOptions)
+    |	^(TOKEN_REF ruleElementOptions)
 	|	TOKEN_REF
-    |	^(WILDCARD elementOptions)
+    |	^(WILDCARD ruleElementOptions)
 	|	WILDCARD
 	|	^(DOT ID element)
 	;

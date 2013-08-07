@@ -1,5 +1,44 @@
 ANTLR v4 Honey Badger
 
+August 7, 2013
+
+* [BREAKING CHANGE] Altered left-recursion elimination to be simpler. Now,
+  we use the following patterns:
+
+  * Binary expressions are expressions which contain a recursive invocation of
+    the rule as the first and last element of the alternative.
+
+  * Suffix expressions contain a recursive invocation of the rule as the first
+    element of the alternative, but not as the last element.
+
+  * Prefix expressions contain a recursive invocation of the rule as the last
+    element of the alternative, but not as the first element.
+
+There is no such thing as a "ternary" expression--they are just binary
+expressions in disguise.
+
+The right associativity specifiers no longer on the individual tokens because
+it's done on alternative basis anyway. The option is now on the individual
+alternative; e.g.,
+
+  e : e '*' e
+    | e '+' e
+    |<assoc=right> e '?' e ':' e
+    |<assoc=right> e '=' e
+    | INT
+    ;
+
+If your language uses a right-associative ternary operator, you will need
+to update your grammar to include <assoc=right> on the alternative operator.
+
+This also fixes #245 and fixes #268:
+
+https://github.com/antlr/antlr4/issues/245
+https://github.com/antlr/antlr4/issues/268
+
+To smooth the transition, <assoc=right> is still allowed on token references
+but it is ignored.
+
 June 30, 2013 -- 4.1 release
 
 June 24, 2013

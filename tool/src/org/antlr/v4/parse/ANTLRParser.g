@@ -654,8 +654,12 @@ altList
 // An individual alt with an optional alt option like <assoc=right>
 alternative
 @init { paraphrases.push("matching alternative"); }
-@after { paraphrases.pop(); }
-    :	ruleElementOptions? e+=element+ -> ^(ALT<AltAST> ruleElementOptions? $e+)
+@after {
+    paraphrases.pop();
+    Grammar.setNodeOptions($tree, $o.tree);
+}
+    :	o=ruleElementOptions?
+        e+=element+                     -> ^(ALT<AltAST> ruleElementOptions? $e+)
     |                                   -> ^(ALT<AltAST> EPSILON) // empty alt
     ;
 
@@ -879,7 +883,8 @@ if ( options!=null ) {
 // Terminals may be adorned with certain options when
 // reference in the grammar: TOK<,,,>
 ruleElementOptions
-    : LT (elementOption (COMMA elementOption)*)? GT -> ^(ELEMENT_OPTIONS[$LT,"ELEMENT_OPTIONS"] elementOption*)
+    :   LT (elementOption (COMMA elementOption)*)? GT
+            -> ^(ELEMENT_OPTIONS[$LT,"ELEMENT_OPTIONS"] elementOption*)
     ;
 
 // When used with elements we can specify what the tree node type can
