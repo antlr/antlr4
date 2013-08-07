@@ -651,17 +651,12 @@ altList
     :	alternative (OR alternative)* -> alternative+
     ;
 
-// An individual alt with an optional rewrite clause for the
-// elements of the alt.
+// An individual alt with an optional alt option like <assoc=right>
 alternative
 @init { paraphrases.push("matching alternative"); }
 @after { paraphrases.pop(); }
-    :	elements	-> elements
-    |				-> ^(ALT<AltAST> EPSILON) // empty alt
-    ;
-
-elements
-    : e+=element+ -> ^(ALT<AltAST> $e+)
+    :	ruleElementOptions? e+=element+ -> ^(ALT<AltAST> ruleElementOptions? $e+)
+    |                                   -> ^(ALT<AltAST> EPSILON) // empty alt
     ;
 
 element
@@ -716,9 +711,9 @@ actionElement
 	}
 }
 	:	ACTION<ActionAST>
-	|   ACTION elementOptions	-> ^(ACTION<ActionAST> elementOptions)
+	|   ACTION ruleElementOptions	-> ^(ACTION<ActionAST> ruleElementOptions)
 	|   SEMPRED<PredAST>
-	|   SEMPRED elementOptions	-> ^(SEMPRED<PredAST> elementOptions)
+	|   SEMPRED ruleElementOptions	-> ^(SEMPRED<PredAST> ruleElementOptions)
 	;
 
 labeledElement
@@ -795,8 +790,8 @@ wildcard
 		// Because the terminal rule is allowed to be the node
 		// specification for the start of a tree rule, we must
 		// later check that wildcard was not used for that.
-	    DOT elementOptions?
-	    -> ^(WILDCARD<TerminalAST>[$DOT] elementOptions?)
+	    DOT ruleElementOptions?
+	    -> ^(WILDCARD<TerminalAST>[$DOT] ruleElementOptions?)
 	;
 
 // --------------------
@@ -877,13 +872,13 @@ if ( options!=null ) {
 	Grammar.setNodeOptions($tree, options);
 }
 }
-	:   TOKEN_REF elementOptions?		-> ^(TOKEN_REF<TerminalAST> elementOptions?)
-	|   STRING_LITERAL elementOptions?	-> ^(STRING_LITERAL<TerminalAST> elementOptions?)
+	:   TOKEN_REF ruleElementOptions?		-> ^(TOKEN_REF<TerminalAST> ruleElementOptions?)
+	|   STRING_LITERAL ruleElementOptions?	-> ^(STRING_LITERAL<TerminalAST> ruleElementOptions?)
 	;
 
 // Terminals may be adorned with certain options when
 // reference in the grammar: TOK<,,,>
-elementOptions
+ruleElementOptions
     : LT (elementOption (COMMA elementOption)*)? GT -> ^(ELEMENT_OPTIONS[$LT,"ELEMENT_OPTIONS"] elementOption*)
     ;
 

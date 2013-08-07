@@ -232,7 +232,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void elementOption(GrammarASTWithOptions elem, GrammarAST ID, GrammarAST valueAST) {
+	public void ruleElementOption(GrammarASTWithOptions elem, GrammarAST ID, GrammarAST valueAST) {
 		String v = null;
 		boolean ok = checkElementOptions(elem, ID, valueAST);
 //		if ( ok ) {

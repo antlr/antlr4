@@ -211,7 +211,7 @@ block
     ;
 
 alternative
-	:	^(ALT element+)
+	:	^(ALT elementOptions? element+)
     ;
 
 atom
