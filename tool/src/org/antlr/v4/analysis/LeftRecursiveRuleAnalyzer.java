@@ -115,7 +115,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 	}
 
 	@Override
-	public void setTokenPrec(GrammarAST t, int alt) {
+	public void setTokenAssoc(GrammarAST t, int alt) {
 		ASSOC assoc = ASSOC.left;
 		if ( t instanceof GrammarASTWithOptions ) {
 			if ( ((GrammarASTWithOptions)t).getOptions()!=null ) {

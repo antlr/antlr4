@@ -49,7 +49,7 @@ private String ruleName;
 private int currentOuterAltNumber; // which outer alt of rule?
 public int numAlts;  // how many alts for this rule total?
 
-public void setTokenPrec(GrammarAST t, int alt) {}
+public void setTokenAssoc(GrammarAST t, int alt) {}
 public void binaryAlt(AltAST altTree, int alt) {}
 public void ternaryAlt(AltAST altTree, int alt) {}
 public void prefixAlt(AltAST altTree, int alt) {}
@@ -132,26 +132,26 @@ binaryMultipleOp
 	;
 
 bops:   ^(ASSIGN ID bops)
-	|	^( BLOCK ( ^( ALT (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);} ) )+ )
-    |   ^(SET (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);})
+	|	^( BLOCK ( ^( ALT (op=token)+ {setTokenAssoc($op.t, currentOuterAltNumber);} ) )+ )
+    |   ^(SET (op=token)+ {setTokenAssoc($op.t, currentOuterAltNumber);})
     ;
 
 binary
-	:	^( ALT recurse (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);} recurse ACTION? )
+	:	^( ALT recurse (op=token)+ {setTokenAssoc($op.t, currentOuterAltNumber);} recurse ACTION? )
 	;
 
 ternary
-	:	^( ALT recurse op=token recurse token recurse ACTION? ) {setTokenPrec($op.t, currentOuterAltNumber);}
+	:	^( ALT recurse op=token recurse token recurse ACTION? ) {setTokenAssoc($op.t, currentOuterAltNumber);}
 	;
 
 prefix
-	:	^(	ALT {setTokenPrec((GrammarAST)input.LT(1), currentOuterAltNumber);}
+	:	^(	ALT {setTokenAssoc((GrammarAST)input.LT(1), currentOuterAltNumber);}
 			({!((CommonTree)input.LT(1)).getText().equals(ruleName)}? element)+
 			recurse ACTION?
 		 )
 	;
 
-suffix : ^( ALT recurse {setTokenPrec((GrammarAST)input.LT(1), currentOuterAltNumber);} element+  ) ;
+suffix : ^( ALT recurse {setTokenAssoc((GrammarAST)input.LT(1), currentOuterAltNumber);} element+  ) ;
 
 recurse
 	:	^(ASSIGN ID recurseNoLabel)
