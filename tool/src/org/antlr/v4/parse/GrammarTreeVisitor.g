@@ -148,7 +148,7 @@ public void finishAlt(AltAST alt) { }
 
 public void ruleRef(GrammarAST ref, ActionAST arg) { }
 public void tokenRef(TerminalAST ref) { }
-public void ruleElementOption(GrammarASTWithOptions t, GrammarAST ID, GrammarAST valueAST) { }
+public void elementOption(GrammarASTWithOptions t, GrammarAST ID, GrammarAST valueAST) { }
 public void stringRef(TerminalAST ref) { }
 public void wildcardRef(GrammarAST ref) { }
 public void actionInAlt(ActionAST action) { }
@@ -703,8 +703,8 @@ lexerElement
 	|	lexerSubrule
 	|   ACTION						{actionInAlt((ActionAST)$ACTION);}
 	|   SEMPRED						{sempredInAlt((PredAST)$SEMPRED);}
-	|   ^(ACTION ruleElementOptions)	{actionInAlt((ActionAST)$ACTION);}
-	|   ^(SEMPRED ruleElementOptions)	{sempredInAlt((PredAST)$SEMPRED);}
+	|   ^(ACTION elementOptions)	{actionInAlt((ActionAST)$ACTION);}
+	|   ^(SEMPRED elementOptions)	{sempredInAlt((PredAST)$SEMPRED);}
 	|	EPSILON
 	;
 
@@ -738,7 +738,7 @@ lexerAtom
     :   terminal
     |   ^(NOT blockSet)
     |   blockSet
-    |   ^(WILDCARD ruleElementOptions)
+    |   ^(WILDCARD elementOptions)
     |   WILDCARD
     |	LEXER_CHAR_SET
     |   range
@@ -752,9 +752,9 @@ actionElement
 	exitActionElement($start);
 }
 	:	ACTION
-	|   ^(ACTION ruleElementOptions)
+	|   ^(ACTION elementOptions)
 	|   SEMPRED
-	|   ^(SEMPRED ruleElementOptions)
+	|   ^(SEMPRED elementOptions)
 	;
 
 alternative
@@ -766,7 +766,7 @@ alternative
 	finishAlt((AltAST)$start);
 	exitAlternative((AltAST)$start);
 }
-	:	^(ALT ruleElementOptions? element+)
+	:	^(ALT elementOptions? element+)
 	|	^(ALT EPSILON)
     ;
 
@@ -806,8 +806,8 @@ element
 	|	subrule
 	|   ACTION						{actionInAlt((ActionAST)$ACTION);}
 	|   SEMPRED						{sempredInAlt((PredAST)$SEMPRED);}
-	|   ^(ACTION ruleElementOptions)	{actionInAlt((ActionAST)$ACTION);}
-	|   ^(SEMPRED ruleElementOptions)	{sempredInAlt((PredAST)$SEMPRED);}
+	|   ^(ACTION elementOptions)	{actionInAlt((ActionAST)$ACTION);}
+	|   ^(SEMPRED elementOptions)	{sempredInAlt((PredAST)$SEMPRED);}
 
 	|	^(NOT blockSet)
 	|	^(NOT block)
@@ -888,7 +888,7 @@ atom
 }
 	:	^(DOT ID terminal)
 	|	^(DOT ID ruleref)
-    |	^(WILDCARD ruleElementOptions)	{wildcardRef($WILDCARD);}
+    |	^(WILDCARD elementOptions)	{wildcardRef($WILDCARD);}
     |	WILDCARD					{wildcardRef($WILDCARD);}
     |   terminal
     |	blockSet
@@ -963,33 +963,33 @@ terminal
 @after {
 	exitTerminal($start);
 }
-    :  ^(STRING_LITERAL ruleElementOptions)
+    :  ^(STRING_LITERAL elementOptions)
     								{stringRef((TerminalAST)$STRING_LITERAL);}
     |	STRING_LITERAL				{stringRef((TerminalAST)$STRING_LITERAL);}
-    |	^(TOKEN_REF ruleElementOptions)	{tokenRef((TerminalAST)$TOKEN_REF);}
+    |	^(TOKEN_REF elementOptions)	{tokenRef((TerminalAST)$TOKEN_REF);}
     |	TOKEN_REF	    			{tokenRef((TerminalAST)$TOKEN_REF);}
     ;
 
-ruleElementOptions
+elementOptions
 @init {
 	enterElementOptions($start);
 }
 @after {
 	exitElementOptions($start);
 }
-    :	^(ELEMENT_OPTIONS ruleElementOption[(GrammarASTWithOptions)$start.getParent()]*)
+    :	^(ELEMENT_OPTIONS elementOption[(GrammarASTWithOptions)$start.getParent()]*)
     ;
 
-ruleElementOption[GrammarASTWithOptions t]
+elementOption[GrammarASTWithOptions t]
 @init {
 	enterElementOption($start);
 }
 @after {
 	exitElementOption($start);
 }
-    :	ID								{ruleElementOption(t, $ID, null);}
-    |   ^(ASSIGN id=ID v=ID)			{ruleElementOption(t, $id, $v);}
-    |   ^(ASSIGN ID v=STRING_LITERAL)	{ruleElementOption(t, $ID, $v);}
-    |   ^(ASSIGN ID v=ACTION)			{ruleElementOption(t, $ID, $v);}
-    |   ^(ASSIGN ID v=INT)				{ruleElementOption(t, $ID, $v);}
+    :	ID								{elementOption(t, $ID, null);}
+    |   ^(ASSIGN id=ID v=ID)			{elementOption(t, $id, $v);}
+    |   ^(ASSIGN ID v=STRING_LITERAL)	{elementOption(t, $ID, $v);}
+    |   ^(ASSIGN ID v=ACTION)			{elementOption(t, $ID, $v);}
+    |   ^(ASSIGN ID v=INT)				{elementOption(t, $ID, $v);}
     ;

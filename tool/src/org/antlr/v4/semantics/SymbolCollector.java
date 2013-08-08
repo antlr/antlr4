@@ -185,7 +185,7 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void ruleElementOption(GrammarASTWithOptions t, GrammarAST ID, GrammarAST valueAST) {
+	public void elementOption(GrammarASTWithOptions t, GrammarAST ID, GrammarAST valueAST) {
 		setActionResolver(valueAST);
 	}
 

@@ -121,12 +121,12 @@ outerAlternative returns [boolean isLeftRec]
     ;
 
 binary
-	:	^( ALT ruleElementOptions? recurse element+ recurse ACTION? )
+	:	^( ALT elementOptions? recurse element+ recurse ACTION? )
         {setAltAssoc((AltAST)$ALT,currentOuterAltNumber);}
 	;
 
 prefix
-	:	^(	ALT ruleElementOptions?
+	:	^(	ALT elementOptions?
 			({!((CommonTree)input.LT(1)).getText().equals(ruleName)}? element)+
 			recurse ACTION?
 		 )
@@ -134,14 +134,14 @@ prefix
 	;
 
 suffix
-    :   ^( ALT ruleElementOptions? recurse element+ )
+    :   ^( ALT elementOptions? recurse element+ )
          {setAltAssoc((AltAST)$ALT,currentOuterAltNumber);}
     ;
 
 nonLeftRecur
     :   ^(ALT element+)  // no assoc for these; ignore if <assoc=...> present
     ;
-    
+
 recurse
 	:	^(ASSIGN ID recurseNoLabel)
 	|	recurseNoLabel
@@ -153,16 +153,16 @@ token returns [GrammarAST t=null]
 	:	^(ASSIGN ID s=token {$t = $s.t;})
 	|	^(PLUS_ASSIGN ID s=token {$t = $s.t;})
 	|	b=STRING_LITERAL    					{$t = $b;}
-    |	^(b=STRING_LITERAL ruleElementOptions)		{$t = $b;}
-    |	^(c=TOKEN_REF ruleElementOptions)			{$t = $c;}
+    |	^(b=STRING_LITERAL elementOptions)		{$t = $b;}
+    |	^(c=TOKEN_REF elementOptions)			{$t = $c;}
 	|	c=TOKEN_REF        						{$t = $c;}
 	;
 
-ruleElementOptions
-    :	^(ELEMENT_OPTIONS ruleElementOption*)
+elementOptions
+    :	^(ELEMENT_OPTIONS elementOption*)
     ;
 
-ruleElementOption
+elementOption
     :	ID
     |   ^(ASSIGN ID ID)
     |   ^(ASSIGN ID STRING_LITERAL)
@@ -200,16 +200,16 @@ block
     ;
 
 alternative
-	:	^(ALT ruleElementOptions? element+)
+	:	^(ALT elementOptions? element+)
     ;
 
 atom
 	:	^(RULE_REF ARG_ACTION?)
-    |  ^(STRING_LITERAL ruleElementOptions)
+    |  ^(STRING_LITERAL elementOptions)
 	|	STRING_LITERAL
-    |	^(TOKEN_REF ruleElementOptions)
+    |	^(TOKEN_REF elementOptions)
 	|	TOKEN_REF
-    |	^(WILDCARD ruleElementOptions)
+    |	^(WILDCARD elementOptions)
 	|	WILDCARD
 	|	^(DOT ID element)
 	;

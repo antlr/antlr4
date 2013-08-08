@@ -658,8 +658,8 @@ alternative
     paraphrases.pop();
     Grammar.setNodeOptions($tree, $o.tree);
 }
-    :	o=ruleElementOptions?
-        e+=element+                     -> ^(ALT<AltAST> ruleElementOptions? $e+)
+    :	o=elementOptions?
+        e+=element+                     -> ^(ALT<AltAST> elementOptions? $e+)
     |                                   -> ^(ALT<AltAST> EPSILON) // empty alt
     ;
 
@@ -715,9 +715,9 @@ actionElement
 	}
 }
 	:	ACTION<ActionAST>
-	|   ACTION ruleElementOptions	-> ^(ACTION<ActionAST> ruleElementOptions)
+	|   ACTION elementOptions	-> ^(ACTION<ActionAST> elementOptions)
 	|   SEMPRED<PredAST>
-	|   SEMPRED ruleElementOptions	-> ^(SEMPRED<PredAST> ruleElementOptions)
+	|   SEMPRED elementOptions	-> ^(SEMPRED<PredAST> elementOptions)
 	;
 
 labeledElement
@@ -794,8 +794,8 @@ wildcard
 		// Because the terminal rule is allowed to be the node
 		// specification for the start of a tree rule, we must
 		// later check that wildcard was not used for that.
-	    DOT ruleElementOptions?
-	    -> ^(WILDCARD<TerminalAST>[$DOT] ruleElementOptions?)
+	    DOT elementOptions?
+	    -> ^(WILDCARD<TerminalAST>[$DOT] elementOptions?)
 	;
 
 // --------------------
@@ -876,13 +876,13 @@ if ( options!=null ) {
 	Grammar.setNodeOptions($tree, options);
 }
 }
-	:   TOKEN_REF ruleElementOptions?		-> ^(TOKEN_REF<TerminalAST> ruleElementOptions?)
-	|   STRING_LITERAL ruleElementOptions?	-> ^(STRING_LITERAL<TerminalAST> ruleElementOptions?)
+	:   TOKEN_REF elementOptions?		-> ^(TOKEN_REF<TerminalAST> elementOptions?)
+	|   STRING_LITERAL elementOptions?	-> ^(STRING_LITERAL<TerminalAST> elementOptions?)
 	;
 
 // Terminals may be adorned with certain options when
 // reference in the grammar: TOK<,,,>
-ruleElementOptions
+elementOptions
     :   LT (elementOption (COMMA elementOption)*)? GT
             -> ^(ELEMENT_OPTIONS[$LT,"ELEMENT_OPTIONS"] elementOption*)
     ;
