@@ -754,6 +754,7 @@ public class Grammar implements AttributeResolver {
 	 *  set option assoc=right in TOKEN_REF.
 	 */
 	public static void setNodeOptions(GrammarAST node, GrammarAST options) {
+		if ( options==null ) return;
 		GrammarASTWithOptions t = (GrammarASTWithOptions)node;
 		if ( t.getChildCount()==0 || options.getChildCount()==0 ) return;
 		for (Object o : options.getChildren()) {

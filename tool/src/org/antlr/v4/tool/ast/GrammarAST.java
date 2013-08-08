@@ -115,6 +115,21 @@ public class GrammarAST extends CommonTree {
 		return nodes;
 	}
 
+	public List<GrammarAST> getNodesWithTypePreorderDFS(IntervalSet types) {
+		ArrayList<GrammarAST> nodes = new ArrayList<GrammarAST>();
+		getNodesWithTypePreorderDFS_(nodes, types);
+		return nodes;
+	}
+
+	public void getNodesWithTypePreorderDFS_(List<GrammarAST> nodes, IntervalSet types) {
+		if ( types.contains(this.getType()) ) nodes.add(this);
+		// walk all children of root.
+		for (int i= 0; i < getChildCount(); i++) {
+			GrammarAST child = (GrammarAST)getChild(i);
+			child.getNodesWithTypePreorderDFS_(nodes, types);
+		}
+	}
+
 	public AltAST getOutermostAltNode() {
 		if ( this instanceof AltAST && parent.parent instanceof RuleAST ) {
 			return (AltAST)this;
