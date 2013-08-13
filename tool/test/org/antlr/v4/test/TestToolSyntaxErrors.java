@@ -347,4 +347,34 @@ public class TestToolSyntaxErrors extends BaseTest {
 
 		super.testErrors(pair, true);
 	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#315
+	 * "Inconsistent lexer error msg for actions"
+	 * https://github.com/antlr/antlr4/issues/315
+	 */
+	@Test public void testActionAtEndOfOneLexerAlternative() {
+		String grammar =
+			"grammar A;\n" +
+			"stat : 'start' CharacterLiteral 'end' EOF;\n" +
+			"\n" +
+			"// Lexer\n" +
+			"\n" +
+			"CharacterLiteral\n" +
+			"    :   '\\'' SingleCharacter '\\''\n" +
+			"    |   '\\'' ~[\\r\\n] {notifyErrorListeners(\"unclosed character literal\");}\n" +
+			"    ;\n" +
+			"\n" +
+			"fragment\n" +
+			"SingleCharacter\n" +
+			"    :   ~['\\\\\\r\\n]\n" +
+			"    ;\n" +
+			"\n" +
+			"WS   : [ \\r\\t\\n]+ -> skip ;\n";
+		String expected =
+			"error(" + ErrorType.LEXER_ACTION_PLACEMENT_ISSUE.code + "): A.g4:8:21: action in lexer rule 'CharacterLiteral' must be last element of single outermost alt\n";
+		
+		String[] pair = new String[] { grammar, expected };
+		super.testErrors(pair, true);
+	}
 }
