@@ -42,6 +42,7 @@ import java.util.Set;
 
 public class VisitorFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
+	public boolean gen_public; // from -public cmd-line
 	public String grammarName;
 	public String parserName;
 	public Set<String> visitorNames = new HashSet<String>();
@@ -68,5 +69,6 @@ public class VisitorFile extends OutputFile {
 		ActionAST ast = g.namedActions.get("header");
 		if ( ast!=null ) header = new Action(factory, ast);
 		genPackage = factory.getGrammar().tool.genPackage;
+		gen_public = factory.getGrammar().tool.gen_public;
 	}
 }
