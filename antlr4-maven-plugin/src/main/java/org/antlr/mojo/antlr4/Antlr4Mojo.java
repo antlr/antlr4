@@ -106,6 +106,9 @@ public class Antlr4Mojo extends AbstractMojo {
 	 */
 	@Parameter(property = "antlr4.visitor", defaultValue = "false")
 	protected boolean visitor;
+	
+	@Parameter(property = "antlr4.public", defaultValue = "true")
+	protected boolean publicClasses;
 
 	/**
 	 * Treat warnings as errors.
@@ -321,6 +324,13 @@ public class Antlr4Mojo extends AbstractMojo {
 		}
 		else {
 			args.add("-no-visitor");
+		}
+		
+		if (publicClasses) {
+			args.add("-public");
+		}
+		else {
+			args.add("-no-public");
 		}
 
 		if (treatWarningsAsErrors) {
