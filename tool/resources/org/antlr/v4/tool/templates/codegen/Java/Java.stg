@@ -869,6 +869,11 @@ public class <lexer.name> extends <superClass> {
 		_interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 
+	public <lexer.name>(CharStream input, IncludeStrategy includeStrategy) {
+		super(input,includeStrategy);
+		_interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
+	}
+ 
 	@Override
 	public String getGrammarFileName() { return "<lexer.grammarFileName>"; }
 

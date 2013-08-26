@@ -126,6 +126,10 @@ public abstract class BaseTest {
      *  stdout and stderr.  This doesn't trap errors from running antlr.
      */
 	protected String stderrDuringParse;
+	
+	
+	protected String _includeStrategy;
+	
 
 	@org.junit.Rule
 	public final TestRule testWatcher = new TestWatcher() {
@@ -449,6 +453,13 @@ public abstract class BaseTest {
 		return equeue;
 	}
 
+	protected String execLexer(String grammarFileName, String grammarStr,
+			String lexerName, String input, String includeStrategy) {
+		
+		this._includeStrategy=includeStrategy;
+		return execLexer(grammarFileName, grammarStr, lexerName, input, false);
+	}
+	
 	protected String execLexer(String grammarFileName,
 							   String grammarStr,
 							   String lexerName,
@@ -986,7 +997,11 @@ public abstract class BaseTest {
 			"public class Test {\n" +
 			"    public static void main(String[] args) throws Exception {\n" +
 			"        CharStream input = new ANTLRFileStream(args[0]);\n" +
-			"        <lexerName> lex = new <lexerName>(input);\n" +
+			(this._includeStrategy==null?
+			 "        <lexerName> lex = new <lexerName>(input);\n"
+			:" <includeStrategy>\n"+
+			 "        <lexerName> lex = new <lexerName>(input,includeStrategy);\n"
+			)+
 			"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
 			"        tokens.fill();\n" +
 			"        for (Object t : tokens.getTokens()) System.out.println(t);\n" +
@@ -996,6 +1011,10 @@ public abstract class BaseTest {
 			);
 
 		outputFileST.add("lexerName", lexerName);
+
+		if (this._includeStrategy!=null)
+		outputFileST.add("includeStrategy", this._includeStrategy);
+		
 		writeFile(tmpdir, "Test.java", outputFileST.render());
 	}
 

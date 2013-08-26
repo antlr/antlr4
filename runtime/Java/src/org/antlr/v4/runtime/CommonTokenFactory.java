@@ -68,6 +68,16 @@ public class CommonTokenFactory implements TokenFactory<CommonToken> {
 	}
 
 	@Override
+	public CommonToken create(Pair<TokenSource, CharStream> source, int type, String text,
+							  int channel, int start, int stop,
+							  int line, int charPositionInLine ,Integer streamRef)
+	{
+		CommonToken t = this.create(source, type, text, channel, start, stop, line, charPositionInLine);
+		t.setStreamRef(streamRef);
+		return t;
+	}
+
+	@Override
 	public CommonToken create(int type, String text) {
 		return new CommonToken(type, text);
 	}

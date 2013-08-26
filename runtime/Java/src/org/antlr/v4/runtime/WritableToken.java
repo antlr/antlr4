@@ -42,4 +42,6 @@ public interface WritableToken extends Token {
 	public void setChannel(int channel);
 
 	public void setTokenIndex(int index);
+	
+	public void setStreamRef(Integer index);
 }
