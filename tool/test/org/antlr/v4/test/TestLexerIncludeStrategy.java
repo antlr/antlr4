@@ -52,7 +52,8 @@ public class TestLexerIncludeStrategy extends BaseTest {
 		
    		String grammar =
 				"lexer grammar L;"+
-				"COPY: 'COPY' ' '+ ID '.' {setIncludeStream(getText());} ;"+
+//				"COPY: 'COPY' ' '+ ID '.' {setIncludeStream(getText());} ;"+
+				"COPY: [Cc][Oo][Pp][Yy] ' '+ ID '.' {setIncludeStream(getText());} ;"+
 				"ID: [A-Z0-9]+;"+
 				"EQ:  '=';"+
 				"DOT: '.';"+
