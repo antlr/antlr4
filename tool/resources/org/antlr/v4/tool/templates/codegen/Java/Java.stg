@@ -73,7 +73,7 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  * This interface defines a complete listener for a parse tree produced by
  * {@link <file.parserName>}.
  */
-public interface <file.grammarName>Listener extends ParseTreeListener {
+<file.factory.grammar.ast.cmdLineOptions.classModifier; null="public"> interface <file.grammarName>Listener extends ParseTreeListener {
 	<file.listenerNames:{lname |
 /**
  * Enter a parse tree produced by {@link <file.parserName>#<lname>\}.
@@ -105,7 +105,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  * which can be extended to create a listener which only needs to handle a subset
  * of the available methods.
  */
-public class <file.grammarName>BaseListener implements <file.grammarName>Listener {
+<file.factory.grammar.ast.cmdLineOptions.classModifier; null="public"> class <file.grammarName>BaseListener implements <file.grammarName>Listener {
 	<file.listenerNames:{lname |
 /**
  * {@inheritDoc\}
@@ -163,7 +163,7 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  * @param \<T> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
-public interface <file.grammarName>Visitor\<T> extends ParseTreeVisitor\<T> {
+<file.factory.grammar.ast.cmdLineOptions.classModifier; null="public"> interface <file.grammarName>Visitor\<T> extends ParseTreeVisitor\<T> {
 	<file.visitorNames:{lname |
 /**
  * Visit a parse tree produced by {@link <file.parserName>#<lname>\}.
@@ -191,7 +191,7 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
  * @param \<T> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
-public class <file.grammarName>BaseVisitor\<T> extends AbstractParseTreeVisitor\<T> implements <file.grammarName>Visitor\<T> {
+<file.factory.grammar.ast.cmdLineOptions.classModifier; null="public"> class <file.grammarName>BaseVisitor\<T> extends AbstractParseTreeVisitor\<T> implements <file.grammarName>Visitor\<T> {
 	<file.visitorNames:{lname |
 /**
  * {@inheritDoc\}
@@ -213,7 +213,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public class <parser.name> extends <superClass> {
+<file.factory.grammar.ast.cmdLineOptions.classModifier; null="public"> class <parser.name> extends <superClass> {
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
@@ -843,7 +843,7 @@ import org.antlr.v4.runtime.misc.*;
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public class <lexer.name> extends <superClass> {
+<lexerFile.factory.grammar.ast.cmdLineOptions.classModifier; null="public"> class <lexer.name> extends <superClass> {
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
