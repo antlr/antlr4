@@ -299,10 +299,6 @@ public class Tool {
 		if ( eq>0 && arg.length()>3 ) {
 			String option = arg.substring("-D".length(), eq);
 			String value = arg.substring(eq+1);
-			if ( value.length()==0 ) {
-				errMgr.toolError(ErrorType.BAD_OPTION_SET_SYNTAX, arg);
-				return;
-			}
 			if ( Grammar.parserOptions.contains(option) ||
 				 Grammar.lexerOptions.contains(option) )
 			{
