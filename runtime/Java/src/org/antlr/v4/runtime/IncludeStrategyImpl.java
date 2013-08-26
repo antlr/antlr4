@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -29,6 +30,12 @@ public class IncludeStrategyImpl implements IncludeStrategy
 		@Override
 		public Pair<CharStream, Integer> fileName2StreamPair(String inFileName) {
 			Integer streamRef=addInclude(inFileName);
+			Pair<CharStream, Integer> streamPair=new Pair<CharStream, Integer>(filenameContentList.get(streamRef),streamRef);
+			return streamPair;
+		}
+
+		public Pair<CharStream, Integer> fileName2StreamPair(String inFileName, String substFrom, String substTo) {
+			Integer streamRef=addInclude(inFileName,substFrom,substTo);
 			Pair<CharStream, Integer> streamPair=new Pair<CharStream, Integer>(filenameContentList.get(streamRef),streamRef);
 			return streamPair;
 		}
@@ -59,8 +66,29 @@ public class IncludeStrategyImpl implements IncludeStrategy
 				try {
 					InputStream is = new FileInputStream(fileName);
 					ANTLRInputStream istrm = new ANTLRInputStream(is);
-					
 					return buildStreamMap(fileName,istrm);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			return streamRef;
+		}
+
+		public Integer addInclude(String fileName, String substFrom, String substTo) {
+			Integer streamRef=filenameIndexMap.get(fileName);
+			if (streamRef == null) {
+				try {
+					InputStream is = new FileInputStream(fileName);
+					ANTLRInputStream istrm = new ANTLRInputStream(is);
+					String beforeStream = String.copyValueOf(istrm.data, 0, istrm.size());
+					String replacedStream = beforeStream.replaceAll(substFrom, substTo);
+					ANTLRInputStream istrmSubstituted = new ANTLRInputStream(replacedStream);
+					return buildStreamMap(fileName,istrmSubstituted);
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -96,15 +124,29 @@ public class IncludeStrategyImpl implements IncludeStrategy
 		public String getFileName(Integer streamRef)
 		{
 			String s="";
-			int i=0;
+			//int i=0;
 			Iterator<String> ix=filenameIndexMap.keySet().iterator();
 			while(ix.hasNext()) 
 			{s=ix.next();
 			//System.out.println("+++("+i+") "+s);
 			 if(filenameIndexMap.get(s).equals(streamRef)) break;
-			 i++;
+			 //i++;
 			}
-			
 			return s;
 		}
+		
+		public String includePrefix="";
+		public String includeSuffix="";
+		
+		public String getIncludePrefix() { return includePrefix;}
+		public String getIncludeSuffix() { return includeSuffix;}
+		public void setIncludePrefix(String prefix) { includePrefix=prefix;}
+		public void setIncludeSuffix(String suffix) { includeSuffix=suffix;}
+		public String getQualifiedFileName(String lexerIncludeName)
+		{
+			return getIncludePrefix()+lexerIncludeName+getIncludeSuffix();
+		}
+		
+		
+		
 	}

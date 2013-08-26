@@ -167,8 +167,17 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	};
 	
 	public void setIncludeStream(String fileName)
-	{
+	{ System.out.println("lexer: including fileName "+fileName);
+	  System.out.println("lexer: including fileName "+fileName);
 		this._includePair = this._includeStrategy.fileName2StreamPair(fileName);
+		_hitInclude=true;
+	}
+	
+	public void setIncludeStream(String fileName, String substituteFrom, String substituteTo)
+	{ System.out.println("lexer: including fileName "+fileName
+			            +" substitute "+substituteFrom
+			            +" with "+substituteTo);
+		this._includePair = this._includeStrategy.fileName2StreamPair(fileName,substituteFrom,substituteTo);
 		_hitInclude=true;
 	}
 	
@@ -342,6 +351,9 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		return _input;
 	}
 
+	public IncludeStrategy getIncludeStrategy()
+	{ return this._includeStrategy; }
+	
 	/** By default does not support multiple emits per nextToken invocation
 	 *  for efficiency reasons.  Subclass and override this method, nextToken,
 	 *  and getToken (to push tokens into a list and pull from that list
