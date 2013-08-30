@@ -978,7 +978,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 
 		if ( !containsPredicate ) {
-			pairs = null;
+			return null;
 		}
 
 //		System.out.println(Arrays.toString(altToPred)+"->"+pairs);
