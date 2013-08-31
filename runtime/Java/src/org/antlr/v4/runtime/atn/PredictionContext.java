@@ -173,8 +173,10 @@ public abstract class PredictionContext {
 		boolean rootIsWildcard,
 		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
 	{
+		assert a!=null && b!=null; // must be empty context, never null
+
 		// share same graph if both same
-		if ( (a==null&&b==null) || a==b || (a!=null&&a.equals(b)) ) return a;
+		if ( a==b || a.equals(b) ) return a;
 
 		if ( a instanceof SingletonPredictionContext && b instanceof SingletonPredictionContext) {
 			return mergeSingletons((SingletonPredictionContext)a,
