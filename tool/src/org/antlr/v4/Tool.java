@@ -385,10 +385,8 @@ public class Tool {
 	}
 
 	public void processNonCombinedGrammar(Grammar g, boolean gencode) {
-		if ( g.ast!=null && internalOption_PrintGrammarTree ) System.out.println(g.ast.toStringTree());
-		//g.ast.inspect();
-
-		if ( g.ast.hasErrors ) return;
+		if ( g.ast==null || g.ast.hasErrors ) return;
+		if ( internalOption_PrintGrammarTree ) System.out.println(g.ast.toStringTree());
 
 		boolean ruleFail = checkForRuleIssues(g);
 		if ( ruleFail ) return;
