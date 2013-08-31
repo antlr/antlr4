@@ -137,7 +137,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		}
 		altAssociativity.put(alt, assoc);
 
-		System.out.println("setAltAssoc: op " + alt + ": " + t.getText()+", assoc="+assoc);
+//		System.out.println("setAltAssoc: op " + alt + ": " + t.getText()+", assoc="+assoc);
 	}
 
 	@Override
