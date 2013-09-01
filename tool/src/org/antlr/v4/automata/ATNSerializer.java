@@ -353,6 +353,7 @@ public class ATNSerializer {
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
 		}
 
+		p++; // skip grammarType
 		int maxType = ATNSimulator.toInt(data[p++]);
 		buf.append("max type ").append(maxType).append("\n");
 		int nstates = ATNSimulator.toInt(data[p++]);
