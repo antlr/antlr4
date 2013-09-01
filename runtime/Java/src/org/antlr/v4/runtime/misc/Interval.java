@@ -74,11 +74,19 @@ public class Interval {
 
 	@Override
 	public boolean equals(Object o) {
-		if ( o==null ) {
+		if ( o==null || !(o instanceof Interval) ) {
 			return false;
 		}
 		Interval other = (Interval)o;
 		return this.a==other.a && this.b==other.b;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 23;
+		hash = hash * 31 + a;
+		hash = hash * 31 + b;
+		return hash;
 	}
 
 	/** Does this start completely before other? Disjoint */
