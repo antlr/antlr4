@@ -30,7 +30,7 @@
 
 package org.antlr.v4.runtime.misc;
 
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
@@ -94,8 +94,12 @@ public class Utils {
 	public static void writeFile(String fileName, String content) throws IOException {
 		FileWriter fw = new FileWriter(fileName);
 		Writer w = new BufferedWriter(fw);
-		w.write(content);
-		w.close();
+		try {
+			w.write(content);
+		}
+		finally {
+			w.close();
+		}
 	}
 
 	public static void waitForClose(final Window window) throws InterruptedException {
