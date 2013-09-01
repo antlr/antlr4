@@ -30,6 +30,7 @@
 
 package org.antlr.v4.parse;
 
+import org.antlr.runtime.Token;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.tool.ErrorType;
@@ -59,10 +60,12 @@ public class TokenVocabParser {
 		Map<String,Integer> tokens = new LinkedHashMap<String,Integer>();
 		int maxTokenType = -1;
 		File fullFile = getImportedVocabFile();
+		FileReader fr = null;
+		BufferedReader br = null;
 		try {
 			Pattern tokenDefPattern = Pattern.compile("([^\n]+?)[ \\t]*?=[ \\t]*?([0-9]+)");
-			FileReader fr = new FileReader(fullFile);
-			BufferedReader br = new BufferedReader(fr);
+			fr = new FileReader(fullFile);
+			br = new BufferedReader(fr);
 			String tokenDef = br.readLine();
 			int lineNum = 1;
 			while ( tokenDef!=null ) {
@@ -70,7 +73,17 @@ public class TokenVocabParser {
 				if ( matcher.find() ) {
 					String tokenID = matcher.group(1);
 					String tokenTypeS = matcher.group(2);
-					int tokenType = Integer.valueOf(tokenTypeS);
+					int tokenType;
+					try {
+						tokenType = Integer.valueOf(tokenTypeS);
+					}
+					catch (NumberFormatException nfe) {
+						tool.errMgr.toolError(ErrorType.TOKENS_FILE_SYNTAX_ERROR,
+											  vocabName + CodeGenerator.VOCAB_FILE_EXTENSION,
+											  " bad token type: "+tokenTypeS,
+											  lineNum);
+						tokenType = Token.INVALID_TOKEN_TYPE;
+					}
 					tool.log("grammar", "import "+tokenID+"="+tokenType);
 					tokens.put(tokenID, tokenType);
 					maxTokenType = Math.max(maxTokenType,tokenType);
@@ -86,21 +99,25 @@ public class TokenVocabParser {
 				}
 				tokenDef = br.readLine();
 			}
-			br.close();
 		}
 		catch (FileNotFoundException fnfe) {
 			tool.errMgr.toolError(ErrorType.CANNOT_FIND_TOKENS_FILE,
 								  fullFile);
 		}
-		catch (IOException ioe) {
-			tool.errMgr.toolError(ErrorType.ERROR_READING_TOKENS_FILE,
-								  fullFile,
-								  ioe);
-		}
 		catch (Exception e) {
 			tool.errMgr.toolError(ErrorType.ERROR_READING_TOKENS_FILE,
 								  fullFile,
 								  e);
+		}
+		finally {
+			try {
+				if ( br!=null ) br.close();
+			}
+			catch (IOException ioe) {
+				tool.errMgr.toolError(ErrorType.ERROR_READING_TOKENS_FILE,
+									  fullFile,
+									  ioe);
+			}
 		}
 		return tokens;
 	}
