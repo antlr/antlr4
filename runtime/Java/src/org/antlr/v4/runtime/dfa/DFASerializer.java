@@ -67,6 +67,7 @@ public class DFASerializer {
 		}
 
 		String output = buf.toString();
+		if ( output.length()==0 ) return null;
 		//return Utils.sortLinesInString(output);
 		return output;
 	}

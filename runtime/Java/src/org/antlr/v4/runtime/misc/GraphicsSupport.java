@@ -81,14 +81,14 @@ public class GraphicsSupport {
 	public static void saveImage(final JComponent comp, String fileName)
 		throws IOException, PrintException
 	{
-		if (fileName.endsWith(".ps") || fileName.endsWith(".eps") ) {
+		if ( fileName.endsWith(".ps") || fileName.endsWith(".eps") ) {
 			DocFlavor flavor = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
 			String mimeType = "application/postscript";
 			StreamPrintServiceFactory[] factories =
 				StreamPrintServiceFactory.lookupStreamPrintServiceFactories(flavor, mimeType);
 			System.out.println(Arrays.toString(factories));
-			FileOutputStream out = new FileOutputStream(fileName);
 			if (factories.length > 0) {
+				FileOutputStream out = new FileOutputStream(fileName);
 				PrintService service = factories[0].getPrintService(out);
 				SimpleDoc doc = new SimpleDoc(new Printable() {
 					@Override
@@ -115,6 +115,7 @@ public class GraphicsSupport {
 				DocPrintJob job = service.createPrintJob();
 				PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
 				job.print(doc, attributes);
+				out.close();
 			}
 		} else {
 			// parrt: works with [image/jpeg, image/png, image/x-png, image/vnd.wap.wbmp, image/bmp, image/gif]

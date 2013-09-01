@@ -97,7 +97,9 @@ public class Graph<T> {
 				n = tNode;
 				if ( !visited.contains(n) ) break;
 			}
-			DFS(n, visited, sorted);
+			if (n!=null) { // if at least one unvisited
+				DFS(n, visited, sorted);
+			}
 		}
 		return sorted;
 	}

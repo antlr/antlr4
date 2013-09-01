@@ -111,8 +111,7 @@ public class ATNPrinter {
 				}
 				else if ( t instanceof AtomTransition ) {
 					AtomTransition a = (AtomTransition)t;
-					String label = a.toString();
-					if ( g!=null ) label = g.getTokenDisplayName(a.label);
+					String label = g.getTokenDisplayName(a.label);
 					buf.append("-").append(label).append("->").append(getStateString(t.target)).append('\n');
 				}
 				else {
