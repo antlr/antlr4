@@ -173,8 +173,10 @@ public abstract class PredictionContext {
 		boolean rootIsWildcard,
 		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
 	{
+		assert a!=null && b!=null; // must be empty context, never null
+
 		// share same graph if both same
-		if ( (a==null&&b==null) || a==b || (a!=null&&a.equals(b)) ) return a;
+		if ( a==b || a.equals(b) ) return a;
 
 		if ( a instanceof SingletonPredictionContext && b instanceof SingletonPredictionContext) {
 			return mergeSingletons((SingletonPredictionContext)a,
@@ -703,20 +705,6 @@ public abstract class PredictionContext {
 	public String toString(@Nullable Recognizer<?,?> recog) {
 		return toString();
 //		return toString(recog, ParserRuleContext.EMPTY);
-	}
-
-	// recog null unless ParserRuleContext, in which case we use subclass toString(...)
-	public String toString(@Nullable Recognizer<?,?> recog, RuleContext stop) {
-		StringBuilder buf = new StringBuilder();
-		PredictionContext p = this;
-		buf.append("[");
-//		while ( p != null && p != stop ) {
-//			if ( !p.isEmpty() ) buf.append(p.returnState);
-//			if ( p.parent != null && !p.parent.isEmpty() ) buf.append(" ");
-//			p = p.parent;
-//		}
-		buf.append("]");
-		return buf.toString();
 	}
 
 	public String[] toStrings(Recognizer<?, ?> recognizer, int currentState) {

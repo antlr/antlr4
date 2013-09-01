@@ -96,7 +96,7 @@ public class RuleCollector extends GrammarTreeVisitor {
 		if ( locals!=null ) {
 			r.locals = ScopeParser.parseTypedArgList(locals, locals.getText(), g.tool.errMgr);
 			r.locals.type = AttributeDict.DictType.LOCAL;
-			r.locals.ast = returns;
+			r.locals.ast = locals;
 		}
 
 		for (GrammarAST a : actions) {
