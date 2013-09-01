@@ -1,5 +1,9 @@
 ANTLR v4 Honey Badger
 
+August 31, 2013
+
+* Lots of little fixes thanks to Coverity Scan
+
 August 7, 2013
 
 * [BREAKING CHANGE] Altered left-recursion elimination to be simpler. Now,
