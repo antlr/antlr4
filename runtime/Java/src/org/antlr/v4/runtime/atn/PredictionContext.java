@@ -707,20 +707,6 @@ public abstract class PredictionContext {
 //		return toString(recog, ParserRuleContext.EMPTY);
 	}
 
-	// recog null unless ParserRuleContext, in which case we use subclass toString(...)
-	public String toString(@Nullable Recognizer<?,?> recog, RuleContext stop) {
-		StringBuilder buf = new StringBuilder();
-		PredictionContext p = this;
-		buf.append("[");
-//		while ( p != null && p != stop ) {
-//			if ( !p.isEmpty() ) buf.append(p.returnState);
-//			if ( p.parent != null && !p.parent.isEmpty() ) buf.append(" ");
-//			p = p.parent;
-//		}
-		buf.append("]");
-		return buf.toString();
-	}
-
 	public String[] toStrings(Recognizer<?, ?> recognizer, int currentState) {
 		return toStrings(recognizer, EMPTY, currentState);
 	}

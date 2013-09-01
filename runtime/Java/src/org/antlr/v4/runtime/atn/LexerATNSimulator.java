@@ -259,7 +259,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		if (s.edges == null || t < MIN_DFA_EDGE || t > MAX_DFA_EDGE) {
 			return null;
 		}
-		
+
 		DFAState target = s.edges[t - MIN_DFA_EDGE];
 		if (debug && target != null) {
 			System.out.println("reuse state "+s.stateNumber+
@@ -619,7 +619,6 @@ public class LexerATNSimulator extends ATNSimulator {
 			System.out.println("EDGE "+p+" -> "+q+" upon "+((char)t));
 		}
 
-		DFA dfa = decisionToDFA[mode];
 		synchronized (p) {
 			if ( p.edges==null ) {
 				//  make room for tokens 1..n and -1 masquerading as index 0
