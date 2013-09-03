@@ -30,14 +30,43 @@
 
 package org.antlr.v4.runtime.tree;
 
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.misc.Pair;
 
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class ParseTreePatternMatcher {
-	protected Parser parser;
+	protected Class<? extends Lexer> lexerClass;
+	protected Class<? extends Parser> parserClass;
+
+	protected String start = "<", stop=">";
+	protected String escapeLeft = "\\<";
+
+	public static class Pattern {
+		protected String pattern;
+
+		public Pattern(String pattern) {
+			this.pattern = pattern;
+		}
+
+		public boolean matches(ParseTree t) {
+			return false;
+		}
+	}
+
+	public static final Pattern WildcardPattern =
+		new Pattern("...") {
+			public boolean matches(ParseTree t) {
+				return true;
+			}
+		};
 
 	public static class Match {
 		protected ParseTree subtree;
@@ -60,11 +89,168 @@ public class ParseTreePatternMatcher {
 		}
 	}
 
-	public ParseTreePatternMatcher(Parser parser) {
-		this.parser = parser;
+	public ParseTreePatternMatcher() { }
+
+	public ParseTreePatternMatcher(Class<? extends Lexer> lexerClass,
+								   Class<? extends Parser> parserClass)
+	{
+		this.lexerClass = lexerClass;
+		this.parserClass = parserClass;
 	}
 
-	public MatchIterator findAll(int ruleIndex, String pattern) {
+	public void setDelimiters(String start, String stop, String escapeLeft) {
+		this.start = start;
+		this.stop = stop;
+		this.escapeLeft = escapeLeft;
+	}
+
+	public ParseTree compilePattern(String pattern) {
+		Parser parser = null;
+		Lexer lexer = null;
+		try {
+			Class<? extends Lexer> c = lexerClass.asSubclass(Lexer.class);
+			Constructor<? extends Lexer> ctor = c.getConstructor(CharStream.class);
+			lexer = ctor.newInstance((CharStream)null);
+		}
+		catch (Exception cnfe) {
+			System.err.println("what?---------------");
+		}
+
+		try {
+			Class<? extends Parser> c = parserClass.asSubclass(Parser.class);
+			Constructor<? extends Parser> ctor = c.getConstructor(TokenStream.class);
+			TokenStream tokens = new CommonTokenStream(lexer);
+			parser = ctor.newInstance(tokens);
+		}
+		catch (Exception cnfe) {
+			System.err.println("what?---------------");
+		}
+		// split pattern into chunks: sea (raw input) and islands (<ID>, <expr>)
+//		ANTLRInputStream in = new ANTLRInputStream(new StringReader("foo"));
 		return null;
+	}
+
+	/** Split "<ID> = <e:expr> ;" into 4 chunks */
+	protected List<String> split(String pattern) {
+		int p = 0;
+		int n = pattern.length();
+		List<String> chunks = new ArrayList<String>();
+		StringBuffer buf = new StringBuffer();
+		// find all start and stop indexes first, then collect
+		List<Integer> starts = new ArrayList<Integer>();
+		List<Integer> stops = new ArrayList<Integer>();
+		while ( p<n ) {
+			if ( p == pattern.indexOf(escapeLeft,p) ) {
+				p += escapeLeft.length();
+			}
+			else if ( p == pattern.indexOf(start,p) ) {
+				starts.add(p);
+				p += start.length();
+			}
+			else if ( p == pattern.indexOf(stop,p) ) {
+				stops.add(p);
+				p += stop.length();
+			}
+			else {
+				p++;
+			}
+		}
+
+		if ( starts.size() != stops.size() ) {
+			System.err.println("what?---------------");
+		}
+
+		// collect into chunks now
+		int ntags = starts.size();
+		if ( starts.get(0)>0 ) { // copy text up to first tag into chunks
+			chunks.add(pattern.substring(0, starts.get(0)));
+		}
+		for (int i=0; i<ntags; i++) {
+			// copy inside of <tag>
+			String tag = pattern.substring(starts.get(i) + start.length(), stops.get(i));
+			chunks.add(tag);
+			if ( i+1 < ntags ) {
+				// copy from end of <tag> to start of next
+				String text = pattern.substring(stops.get(i) + 1, starts.get(i + 1));
+				chunks.add(text);
+			}
+		}
+		int endOfLastTag = stops.get(ntags - 1) + stop.length();
+		if ( endOfLastTag < n-1 ) { // copy text from end of last tag to end
+			String text = pattern.substring(endOfLastTag+1, n);
+			chunks.add(text);
+		}
+
+		return chunks;
+	}
+
+	public static void main(String[] args) {
+		ParseTreePatternMatcher p = new ParseTreePatternMatcher();
+		List<String> chunks = p.split("<ID> = <expr> ;");
+		System.out.println(chunks);
+	}
+
+	protected List<String> split____(String pattern) {
+		int p = 0;
+		int n = pattern.length();
+		List<String> chunks = new ArrayList<String>();
+		StringBuffer buf = new StringBuffer();
+		while ( p<n ) {
+			int nextEsc = pattern.indexOf(escapeLeft, p);
+			int nextStart = pattern.indexOf(start, p);
+			if ( p == nextEsc ) { // found escape right now
+			}
+			else if ( nextEsc > p ) { // an esc exists ahead
+				chunks.add(pattern.substring(p,nextStart));
+				p = nextStart; // jump to next tag
+			}
+			else {
+
+			}
+			if ( p == nextStart ) { // found start of tag
+				// consume <tag>, scan for stop sequence
+				int nextStop = pattern.indexOf(stop, p);
+				if ( nextStop == -1 ) {
+					System.err.println("what?---------------");
+				}
+				chunks.add(pattern.substring(p+start.length(),nextStop));
+				p = nextStop + stop.length();
+			}
+			else if ( nextStart > p ) { // another tag exists
+				chunks.add(pattern.substring(p,nextStart));
+				p = nextStart; // jump to next tag
+			}
+			else {
+				// no next tag, return rest of string as chunk
+				chunks.add(pattern.substring(p,n));
+				break;
+			}
+		}
+		return chunks;
+	}
+
+	public MatchIterator findAll(ParseTree t, int ruleIndex, String pattern) {
+		ParseTreeWalker walker = new ParseTreeWalker();
+		return null;
+	}
+
+	// preorder
+	protected List<ParseTree> findAll(ParseTree t, Pattern pattern) {
+		List<ParseTree> subtrees = new ArrayList<ParseTree>();
+		findAll_(t, pattern, subtrees);
+		return subtrees;
+	}
+
+	protected void findAll_(ParseTree t, Pattern pattern, List<ParseTree> subtrees) {
+		if ( pattern.matches(t) ) {
+			subtrees.add(t);
+		}
+		if ( t instanceof RuleNode ) {
+			RuleNode r = (RuleNode)t;
+			int n = r.getChildCount();
+			for (int i = 0; i<n; i++) {
+				findAll(r.getChild(i), pattern);
+			}
+		}
 	}
 }
