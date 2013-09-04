@@ -47,7 +47,7 @@ public class ParseTreePatternMatcher {
 	protected Class<? extends Parser> parserClass;
 
 	protected String start = "<", stop=">";
-	protected String escapeLeft = "\\<";
+	protected String escape = "\\"; // e.g., \< and \> must escape BOTH!
 
 	public static class Pattern {
 		protected String pattern;
@@ -101,7 +101,7 @@ public class ParseTreePatternMatcher {
 	public void setDelimiters(String start, String stop, String escapeLeft) {
 		this.start = start;
 		this.stop = stop;
-		this.escapeLeft = escapeLeft;
+		this.escape = escapeLeft;
 	}
 
 	public ParseTree compilePattern(String pattern) {
@@ -140,8 +140,11 @@ public class ParseTreePatternMatcher {
 		List<Integer> starts = new ArrayList<Integer>();
 		List<Integer> stops = new ArrayList<Integer>();
 		while ( p<n ) {
-			if ( p == pattern.indexOf(escapeLeft,p) ) {
-				p += escapeLeft.length();
+			if ( p == pattern.indexOf(escape+start,p) ) {
+				p += escape.length() + start.length();
+			}
+			else if ( p == pattern.indexOf(escape+stop,p) ) {
+				p += escape.length() + stop.length();
 			}
 			else if ( p == pattern.indexOf(start,p) ) {
 				starts.add(p);
@@ -156,13 +159,30 @@ public class ParseTreePatternMatcher {
 			}
 		}
 
-		if ( starts.size() != stops.size() ) {
-			System.err.println("what?---------------");
+//		System.out.println("");
+//		System.out.println(starts);
+//		System.out.println(stops);
+		if ( starts.size() > stops.size() ) {
+			throw new IllegalArgumentException("unterminated tag in pattern: "+pattern);
+		}
+
+		if ( starts.size() < stops.size() ) {
+			throw new IllegalArgumentException("missing start tag in pattern: "+pattern);
+		}
+
+		int ntags = starts.size();
+		for (int i=0; i<ntags; i++) {
+			if ( starts.get(i)>=stops.get(i) ) {
+				throw new IllegalArgumentException("tag delimiters out of order in pattern: "+pattern);
+			}
 		}
 
 		// collect into chunks now
-		int ntags = starts.size();
-		if ( starts.get(0)>0 ) { // copy text up to first tag into chunks
+		if ( ntags==0 ) {
+			chunks.add(pattern.substring(0, n));
+		}
+
+		if ( ntags>0 && starts.get(0)>0 ) { // copy text up to first tag into chunks
 			chunks.add(pattern.substring(0, starts.get(0)));
 		}
 		for (int i=0; i<ntags; i++) {
@@ -171,63 +191,86 @@ public class ParseTreePatternMatcher {
 			chunks.add(tag);
 			if ( i+1 < ntags ) {
 				// copy from end of <tag> to start of next
-				String text = pattern.substring(stops.get(i) + 1, starts.get(i + 1));
+				String text = pattern.substring(stops.get(i) + stop.length(), starts.get(i + 1));
 				chunks.add(text);
 			}
 		}
-		int endOfLastTag = stops.get(ntags - 1) + stop.length();
-		if ( endOfLastTag < n-1 ) { // copy text from end of last tag to end
-			String text = pattern.substring(endOfLastTag+1, n);
-			chunks.add(text);
+		if ( ntags>0 ) {
+			int endOfLastTag = stops.get(ntags - 1) + stop.length();
+			if ( endOfLastTag < n-1 ) { // copy text from end of last tag to end
+				String text = pattern.substring(endOfLastTag+stop.length(), n);
+				chunks.add(text);
+			}
+		}
+
+		// strip out the escape sequences
+		for (int i=0; i<chunks.size(); i++) {
+			String chunk = chunks.get(i).replace(escape, "");
+			chunks.set(i, chunk);
 		}
 
 		return chunks;
 	}
 
 	public static void main(String[] args) {
+		// tests
 		ParseTreePatternMatcher p = new ParseTreePatternMatcher();
-		List<String> chunks = p.split("<ID> = <expr> ;");
-		System.out.println(chunks);
+		System.out.println( p.split("<ID> = <expr> ;") );
+		System.out.println( p.split(" <ID> = <expr>") );
+		System.out.println( p.split("<ID> = <expr>") );
+		System.out.println( p.split("<expr>") );
+		System.out.println(p.split("\\<x\\> foo"));
+		System.out.println(p.split("foo \\<x\\> bar <tag>"));
+//		System.out.println( p.split(">expr<") );
+
+		p.setDelimiters("<<", ">>", "$");
+		System.out.println(p.split("<<ID>> = <<expr>> ;$<< ick $>>"));
+
 	}
 
-	protected List<String> split____(String pattern) {
-		int p = 0;
-		int n = pattern.length();
-		List<String> chunks = new ArrayList<String>();
-		StringBuffer buf = new StringBuffer();
-		while ( p<n ) {
-			int nextEsc = pattern.indexOf(escapeLeft, p);
-			int nextStart = pattern.indexOf(start, p);
-			if ( p == nextEsc ) { // found escape right now
-			}
-			else if ( nextEsc > p ) { // an esc exists ahead
-				chunks.add(pattern.substring(p,nextStart));
-				p = nextStart; // jump to next tag
-			}
-			else {
-
-			}
-			if ( p == nextStart ) { // found start of tag
-				// consume <tag>, scan for stop sequence
-				int nextStop = pattern.indexOf(stop, p);
-				if ( nextStop == -1 ) {
-					System.err.println("what?---------------");
-				}
-				chunks.add(pattern.substring(p+start.length(),nextStop));
-				p = nextStop + stop.length();
-			}
-			else if ( nextStart > p ) { // another tag exists
-				chunks.add(pattern.substring(p,nextStart));
-				p = nextStart; // jump to next tag
-			}
-			else {
-				// no next tag, return rest of string as chunk
-				chunks.add(pattern.substring(p,n));
-				break;
-			}
-		}
-		return chunks;
-	}
+//	protected List<String> split____(String pattern) {
+//		int p = 0;
+//		int n = pattern.length();
+//		List<String> chunks = new ArrayList<String>();
+//		StringBuffer buf = new StringBuffer();
+//		while ( p<n ) {
+//			int nextEsc = pattern.indexOf(escape, p);
+//			if ( p == nextEsc ) { // found escape right now
+//			}
+//			else if ( nextEsc > p ) { // an esc exists ahead
+//				chunks.add(pattern.substring(p,nextStart));
+//				p = nextStart; // jump to next tag
+//			}
+//			else {
+//
+//			}
+//			int nextStart = pattern.indexOf(start, p);
+//			int esclen = escape.length();
+//			if ( pattern.substring(p-esclen,p).equals(escape) ) {
+//				// it's escape+start, skip
+//
+//			}
+//			if ( p == nextStart ) { // found start of tag
+//				// consume <tag>, scan for stop sequence
+//				int nextStop = pattern.indexOf(stop, p);
+//				if ( nextStop == -1 ) {
+//					System.err.println("what?---------------");
+//				}
+//				chunks.add(pattern.substring(p+start.length(),nextStop));
+//				p = nextStop + stop.length();
+//			}
+//			else if ( nextStart > p ) { // another tag exists
+//				chunks.add(pattern.substring(p,nextStart));
+//				p = nextStart; // jump to next tag
+//			}
+//			else {
+//				// no next tag, return rest of string as chunk
+//				chunks.add(pattern.substring(p,n));
+//				break;
+//			}
+//		}
+//		return chunks;
+//	}
 
 	public MatchIterator findAll(ParseTree t, int ruleIndex, String pattern) {
 		ParseTreeWalker walker = new ParseTreeWalker();
