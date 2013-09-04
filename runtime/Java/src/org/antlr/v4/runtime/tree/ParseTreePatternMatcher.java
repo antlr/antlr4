@@ -30,14 +30,19 @@
 
 package org.antlr.v4.runtime.tree;
 
+import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.misc.Pair;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -48,6 +53,38 @@ public class ParseTreePatternMatcher {
 
 	protected String start = "<", stop=">";
 	protected String escape = "\\"; // e.g., \< and \> must escape BOTH!
+
+	protected class Chunk {
+	}
+	protected class TextChunk extends Chunk {
+		public String text;
+		public TextChunk(String text) {
+			this.text = text;
+		}
+
+		@Override
+		public String toString() {
+			return "'"+text+"'";
+		}
+	}
+	protected class TagChunk extends Chunk { // <e:expr> or <ID>
+		public String tag;
+		public String label;
+
+		public TagChunk(String tag) {
+			this.tag = tag;
+		}
+
+		public TagChunk(String label, String tag) {
+			this.label = label;
+			this.tag = tag;
+		}
+		@Override
+		public String toString() {
+			if ( label!=null ) return label+":"+tag;
+			return tag;
+		}
+	}
 
 	public static class Pattern {
 		protected String pattern;
@@ -104,37 +141,58 @@ public class ParseTreePatternMatcher {
 		this.escape = escapeLeft;
 	}
 
-	public ParseTree compilePattern(String pattern) {
+	public ParseTree compilePattern(String pattern)
+		throws InstantiationException, IllegalAccessException, NoSuchMethodException,
+			   InvocationTargetException
+	{
 		Parser parser = null;
 		Lexer lexer = null;
-		try {
-			Class<? extends Lexer> c = lexerClass.asSubclass(Lexer.class);
-			Constructor<? extends Lexer> ctor = c.getConstructor(CharStream.class);
-			lexer = ctor.newInstance((CharStream)null);
-		}
-		catch (Exception cnfe) {
-			System.err.println("what?---------------");
-		}
+		Class<? extends Lexer> c = lexerClass.asSubclass(Lexer.class);
+		Constructor<? extends Lexer> ctor = c.getConstructor(CharStream.class);
+		lexer = ctor.newInstance((CharStream)null);
 
-		try {
-			Class<? extends Parser> c = parserClass.asSubclass(Parser.class);
-			Constructor<? extends Parser> ctor = c.getConstructor(TokenStream.class);
-			TokenStream tokens = new CommonTokenStream(lexer);
-			parser = ctor.newInstance(tokens);
-		}
-		catch (Exception cnfe) {
-			System.err.println("what?---------------");
-		}
+		Class<? extends Parser> pc = parserClass.asSubclass(Parser.class);
+		Constructor<? extends Parser> pctor = pc.getConstructor(TokenStream.class);
+//		TokenStream tokens = new CommonTokenStream(lexer);
+		parser = pctor.newInstance((TokenStream)null);
+
+		String[] tokenNames = parser.getTokenNames();
+		String[] ruleNames = parser.getRuleNames();
+		// make maps for quick look up
+		
 		// split pattern into chunks: sea (raw input) and islands (<ID>, <expr>)
-//		ANTLRInputStream in = new ANTLRInputStream(new StringReader("foo"));
+		List<Chunk> chunks = split(pattern);
+
+		// create token stream from text and tags
+		List<Token> tokens = new ArrayList<Token>();
+		for (Chunk chunk : chunks) {
+			if ( chunk instanceof TagChunk ) {
+				TagChunk tagChunk = (TagChunk)chunk;
+				// add special rule token or conjure up new token from name
+				if ( Character.isUpperCase(tagChunk.tag.charAt(0)) ) {
+
+				}
+				else {
+
+				}
+			}
+			else {
+				try {
+					ANTLRInputStream in = new ANTLRInputStream(new StringReader("foo"));
+				}
+				catch (IOException ioe) {
+					// -----------------
+				}
+			}
+		}
 		return null;
 	}
 
 	/** Split "<ID> = <e:expr> ;" into 4 chunks */
-	protected List<String> split(String pattern) {
+	protected List<Chunk> split(String pattern) {
 		int p = 0;
 		int n = pattern.length();
-		List<String> chunks = new ArrayList<String>();
+		List<Chunk> chunks = new ArrayList<Chunk>();
 		StringBuffer buf = new StringBuffer();
 		// find all start and stop indexes first, then collect
 		List<Integer> starts = new ArrayList<Integer>();
@@ -179,34 +237,38 @@ public class ParseTreePatternMatcher {
 
 		// collect into chunks now
 		if ( ntags==0 ) {
-			chunks.add(pattern.substring(0, n));
+			String text = pattern.substring(0, n);
+			chunks.add(new TextChunk(text));
 		}
 
 		if ( ntags>0 && starts.get(0)>0 ) { // copy text up to first tag into chunks
-			chunks.add(pattern.substring(0, starts.get(0)));
+			String text = pattern.substring(0, starts.get(0));
+			chunks.add(new TextChunk(text));
 		}
 		for (int i=0; i<ntags; i++) {
 			// copy inside of <tag>
 			String tag = pattern.substring(starts.get(i) + start.length(), stops.get(i));
-			chunks.add(tag);
+			chunks.add(new TagChunk(tag));
 			if ( i+1 < ntags ) {
 				// copy from end of <tag> to start of next
 				String text = pattern.substring(stops.get(i) + stop.length(), starts.get(i + 1));
-				chunks.add(text);
+				chunks.add(new TextChunk(text));
 			}
 		}
 		if ( ntags>0 ) {
 			int endOfLastTag = stops.get(ntags - 1) + stop.length();
 			if ( endOfLastTag < n-1 ) { // copy text from end of last tag to end
 				String text = pattern.substring(endOfLastTag+stop.length(), n);
-				chunks.add(text);
+				chunks.add(new TextChunk(text));
 			}
 		}
 
 		// strip out the escape sequences
-		for (int i=0; i<chunks.size(); i++) {
-			String chunk = chunks.get(i).replace(escape, "");
-			chunks.set(i, chunk);
+		for (Chunk c : chunks) {
+			if ( c instanceof TextChunk ) {
+				TextChunk tc = (TextChunk)c;
+				tc.text = tc.text.replace(escape, "");
+			}
 		}
 
 		return chunks;
@@ -227,50 +289,6 @@ public class ParseTreePatternMatcher {
 		System.out.println(p.split("<<ID>> = <<expr>> ;$<< ick $>>"));
 
 	}
-
-//	protected List<String> split____(String pattern) {
-//		int p = 0;
-//		int n = pattern.length();
-//		List<String> chunks = new ArrayList<String>();
-//		StringBuffer buf = new StringBuffer();
-//		while ( p<n ) {
-//			int nextEsc = pattern.indexOf(escape, p);
-//			if ( p == nextEsc ) { // found escape right now
-//			}
-//			else if ( nextEsc > p ) { // an esc exists ahead
-//				chunks.add(pattern.substring(p,nextStart));
-//				p = nextStart; // jump to next tag
-//			}
-//			else {
-//
-//			}
-//			int nextStart = pattern.indexOf(start, p);
-//			int esclen = escape.length();
-//			if ( pattern.substring(p-esclen,p).equals(escape) ) {
-//				// it's escape+start, skip
-//
-//			}
-//			if ( p == nextStart ) { // found start of tag
-//				// consume <tag>, scan for stop sequence
-//				int nextStop = pattern.indexOf(stop, p);
-//				if ( nextStop == -1 ) {
-//					System.err.println("what?---------------");
-//				}
-//				chunks.add(pattern.substring(p+start.length(),nextStop));
-//				p = nextStop + stop.length();
-//			}
-//			else if ( nextStart > p ) { // another tag exists
-//				chunks.add(pattern.substring(p,nextStart));
-//				p = nextStart; // jump to next tag
-//			}
-//			else {
-//				// no next tag, return rest of string as chunk
-//				chunks.add(pattern.substring(p,n));
-//				break;
-//			}
-//		}
-//		return chunks;
-//	}
 
 	public MatchIterator findAll(ParseTree t, int ruleIndex, String pattern) {
 		ParseTreeWalker walker = new ParseTreeWalker();
