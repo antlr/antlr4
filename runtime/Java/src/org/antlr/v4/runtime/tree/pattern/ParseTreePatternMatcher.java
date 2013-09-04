@@ -28,23 +28,23 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.runtime.tree;
+package org.antlr.v4.runtime.tree.pattern;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.tree.RuleNode;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class ParseTreePatternMatcher {
@@ -53,78 +53,6 @@ public class ParseTreePatternMatcher {
 
 	protected String start = "<", stop=">";
 	protected String escape = "\\"; // e.g., \< and \> must escape BOTH!
-
-	protected class Chunk {
-	}
-	protected class TextChunk extends Chunk {
-		public String text;
-		public TextChunk(String text) {
-			this.text = text;
-		}
-
-		@Override
-		public String toString() {
-			return "'"+text+"'";
-		}
-	}
-	protected class TagChunk extends Chunk { // <e:expr> or <ID>
-		public String tag;
-		public String label;
-
-		public TagChunk(String tag) {
-			this.tag = tag;
-		}
-
-		public TagChunk(String label, String tag) {
-			this.label = label;
-			this.tag = tag;
-		}
-		@Override
-		public String toString() {
-			if ( label!=null ) return label+":"+tag;
-			return tag;
-		}
-	}
-
-	public static class Pattern {
-		protected String pattern;
-
-		public Pattern(String pattern) {
-			this.pattern = pattern;
-		}
-
-		public boolean matches(ParseTree t) {
-			return false;
-		}
-	}
-
-	public static final Pattern WildcardPattern =
-		new Pattern("...") {
-			public boolean matches(ParseTree t) {
-				return true;
-			}
-		};
-
-	public static class Match {
-		protected ParseTree subtree;
-		protected List<Pair<String,? extends ParseTree>> labels;
-	}
-
-	public static class MatchIterator implements Iterator<Match> {
-		@Override
-		public boolean hasNext() {
-			return false;
-		}
-
-		@Override
-		public Match next() {
-			return null;
-		}
-
-		@Override
-		public void remove() {
-		}
-	}
 
 	public ParseTreePatternMatcher() { }
 
@@ -159,7 +87,7 @@ public class ParseTreePatternMatcher {
 		String[] tokenNames = parser.getTokenNames();
 		String[] ruleNames = parser.getRuleNames();
 		// make maps for quick look up
-		
+
 		// split pattern into chunks: sea (raw input) and islands (<ID>, <expr>)
 		List<Chunk> chunks = split(pattern);
 
@@ -306,7 +234,7 @@ public class ParseTreePatternMatcher {
 		if ( pattern.matches(t) ) {
 			subtrees.add(t);
 		}
-		if ( t instanceof RuleNode ) {
+		if ( t instanceof RuleNode) {
 			RuleNode r = (RuleNode)t;
 			int n = r.getChildCount();
 			for (int i = 0; i<n; i++) {

@@ -28,30 +28,48 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.runtime.tree;
+package org.antlr.v4.runtime.tree.pattern;
 
-import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.atn.ATN;
 
-public class ParseTreePatternLexer extends Lexer {
-	@Override
-	public ATN getATN() {
-		return null;
+/** Alter response to errors in rules so it checks for special RULE tokens
+ *  representing patterns like <expr>.
+
+ catch (RecognitionException re) {
+         _localctx.exception = re;
+ 		 // DO NOTHING IF RULE TOKEN
+         _errHandler.reportError(this, re);
+         _errHandler.recover(this, re);
+ }
+
+ if it's a rule token, it'll cause a mismatch or no viable alt error
+ immediately at start token of rule attempt.
+
+ When parsing "x = <expr>;" pattern, we use nextTokenOrRuleToken() not
+ nextToken() so <expr> is converted to RULE token instead of tokenizing.
+ */
+
+public class ParseTreePatternErrorStrategy extends DefaultErrorStrategy {
+
+	public boolean isRuleToken(Token t) {
+		return t.getType() == 33;
 	}
 
 	@Override
-	public String[] getRuleNames() {
-		return new String[0];
+	public void reportError(Parser recognizer, RecognitionException e) {
+		if ( isRuleToken(e.getOffendingToken()) ) {
+			super.reportError(recognizer, e);
+		}
 	}
 
 	@Override
-	public String getGrammarFileName() {
-		return null;
-	}
-
-	@Override
-	public Token nextToken() {
-		return super.nextToken();
+	public void recover(Parser recognizer, RecognitionException e) {
+		if ( isRuleToken(e.getOffendingToken()) ) {
+			super.recover(recognizer, e);
+		}
 	}
 }
+
