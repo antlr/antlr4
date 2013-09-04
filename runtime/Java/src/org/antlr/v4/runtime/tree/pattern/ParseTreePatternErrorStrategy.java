@@ -31,7 +31,9 @@
 package org.antlr.v4.runtime.tree.pattern;
 
 import org.antlr.v4.runtime.DefaultErrorStrategy;
+import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
 
@@ -46,21 +48,26 @@ import org.antlr.v4.runtime.Token;
  }
 
  if it's a rule token, it'll cause a mismatch or no viable alt error
- immediately at start token of rule attempt.
-
- When parsing "x = <expr>;" pattern, we use nextTokenOrRuleToken() not
- nextToken() so <expr> is converted to RULE token instead of tokenizing.
+ immediately at start token of rule attempt. Trap and make it "match"
+ <expr> to rule any expr.
  */
-
 public class ParseTreePatternErrorStrategy extends DefaultErrorStrategy {
 
 	public boolean isRuleToken(Token t) {
-		return t.getType() == 33;
+		return t instanceof RuleTagToken;
+	}
+
+	@Override
+	public Token recoverInline(Parser recognizer) throws RecognitionException {
+		throw new InputMismatchException(recognizer);
 	}
 
 	@Override
 	public void reportError(Parser recognizer, RecognitionException e) {
 		if ( isRuleToken(e.getOffendingToken()) ) {
+			System.out.println("match <ruletag>");
+		}
+		else {
 			super.reportError(recognizer, e);
 		}
 	}
@@ -68,8 +75,15 @@ public class ParseTreePatternErrorStrategy extends DefaultErrorStrategy {
 	@Override
 	public void recover(Parser recognizer, RecognitionException e) {
 		if ( isRuleToken(e.getOffendingToken()) ) {
+			ParserRuleContext ctx = recognizer.getContext();
+			RuleSubtreeNode sub = new RuleSubtreeNode(ctx);
+			ParserRuleContext parent = ctx.getParent();
+			int i = parent.children.indexOf(ctx);
+			parent.children.set(i, sub); // replace
+			recognizer.consume(); // skip over the <tag>
+		}
+		else {
 			super.recover(recognizer, e);
 		}
 	}
 }
-

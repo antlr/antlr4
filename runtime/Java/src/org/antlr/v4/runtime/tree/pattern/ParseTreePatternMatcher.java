@@ -32,8 +32,10 @@ package org.antlr.v4.runtime.tree.pattern;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -44,12 +46,18 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ParseTreePatternMatcher {
 	protected Class<? extends Lexer> lexerClass;
 	protected Class<? extends Parser> parserClass;
+
+	protected Lexer lexer;
+	protected Parser parser;
 
 	protected String start = "<", stop=">";
 	protected String escape = "\\"; // e.g., \< and \> must escape BOTH!
@@ -69,24 +77,46 @@ public class ParseTreePatternMatcher {
 		this.escape = escapeLeft;
 	}
 
-	public ParseTree compilePattern(String pattern)
+	public void lazyInit()
+		throws IllegalAccessException, InvocationTargetException,
+			   InstantiationException, NoSuchMethodException
+	{
+		if ( lexer==null ) {
+			Class<? extends Lexer> c = lexerClass.asSubclass(Lexer.class);
+			Constructor<? extends Lexer> ctor = c.getConstructor(CharStream.class);
+			lexer = ctor.newInstance((CharStream)null);
+		}
+
+		if ( parser==null ) {
+			Class<? extends Parser> pc = parserClass.asSubclass(Parser.class);
+			Constructor<? extends Parser> pctor = pc.getConstructor(TokenStream.class);
+			parser = pctor.newInstance((TokenStream)null);
+		}
+	}
+
+	public ParseTree compilePattern(String patternRuleName, String pattern)
 		throws InstantiationException, IllegalAccessException, NoSuchMethodException,
 			   InvocationTargetException
 	{
-		Parser parser = null;
-		Lexer lexer = null;
-		Class<? extends Lexer> c = lexerClass.asSubclass(Lexer.class);
-		Constructor<? extends Lexer> ctor = c.getConstructor(CharStream.class);
-		lexer = ctor.newInstance((CharStream)null);
+		List<? extends Token> tokenList = tokenizePattern(pattern);
+		ListTokenSource tokenSrc = new ListTokenSource(tokenList);
+		CommonTokenStream tokens = new CommonTokenStream(tokenSrc);
+		parser.setTokenStream(tokens);
+		parser.setErrorHandler(new ParseTreePatternErrorStrategy());
+		Method startRule = parserClass.getMethod(patternRuleName);
+		ParserRuleContext tree = (ParserRuleContext)startRule.invoke(parser, (Object[])null);
+		System.out.println(tree.toStringTree(parser));
+		return tree;
+	}
 
-		Class<? extends Parser> pc = parserClass.asSubclass(Parser.class);
-		Constructor<? extends Parser> pctor = pc.getConstructor(TokenStream.class);
-//		TokenStream tokens = new CommonTokenStream(lexer);
-		parser = pctor.newInstance((TokenStream)null);
-
-		String[] tokenNames = parser.getTokenNames();
-		String[] ruleNames = parser.getRuleNames();
+	public List<? extends Token> tokenizePattern(String pattern)
+		throws InstantiationException, IllegalAccessException, NoSuchMethodException,
+			   InvocationTargetException
+	{
+		lazyInit();
 		// make maps for quick look up
+		Map<String, Integer> tokenNameToType = toMap(parser.getTokenNames(), 0);
+		Map<String, Integer> ruleNameToIndex = toMap(parser.getRuleNames(), 0);
 
 		// split pattern into chunks: sea (raw input) and islands (<ID>, <expr>)
 		List<Chunk> chunks = split(pattern);
@@ -98,26 +128,43 @@ public class ParseTreePatternMatcher {
 				TagChunk tagChunk = (TagChunk)chunk;
 				// add special rule token or conjure up new token from name
 				if ( Character.isUpperCase(tagChunk.tag.charAt(0)) ) {
-
+					tokens.add(new TokenTagToken(tagChunk.tag, tokenNameToType.get(tagChunk.tag)));
 				}
 				else {
-
+					tokens.add(new RuleTagToken(tagChunk.tag, ruleNameToIndex.get(tagChunk.tag)));
 				}
 			}
 			else {
+				TextChunk textChunk = (TextChunk)chunk;
 				try {
-					ANTLRInputStream in = new ANTLRInputStream(new StringReader("foo"));
+					ANTLRInputStream in = new ANTLRInputStream(new StringReader(textChunk.text));
+					lexer.setInputStream(in);
+					Token t = lexer.nextToken();
+					while ( t.getType()!=Token.EOF ) {
+						tokens.add(t);
+						t = lexer.nextToken();
+					}
 				}
 				catch (IOException ioe) {
 					// -----------------
 				}
 			}
 		}
-		return null;
+
+		System.out.println(tokens);
+		return tokens;
+	}
+
+	public static Map<String, Integer> toMap(String[] keys, int offset) {
+		Map<String, Integer> m = new HashMap<String, Integer>();
+		for (int i=0; i<keys.length; i++) {
+			m.put(keys[i], i+offset);
+		}
+		return m;
 	}
 
 	/** Split "<ID> = <e:expr> ;" into 4 chunks */
-	protected List<Chunk> split(String pattern) {
+	public List<Chunk> split(String pattern) {
 		int p = 0;
 		int n = pattern.length();
 		List<Chunk> chunks = new ArrayList<Chunk>();
@@ -202,22 +249,6 @@ public class ParseTreePatternMatcher {
 		return chunks;
 	}
 
-	public static void main(String[] args) {
-		// tests
-		ParseTreePatternMatcher p = new ParseTreePatternMatcher();
-		System.out.println( p.split("<ID> = <expr> ;") );
-		System.out.println( p.split(" <ID> = <expr>") );
-		System.out.println( p.split("<ID> = <expr>") );
-		System.out.println( p.split("<expr>") );
-		System.out.println(p.split("\\<x\\> foo"));
-		System.out.println(p.split("foo \\<x\\> bar <tag>"));
-//		System.out.println( p.split(">expr<") );
-
-		p.setDelimiters("<<", ">>", "$");
-		System.out.println(p.split("<<ID>> = <<expr>> ;$<< ick $>>"));
-
-	}
-
 	public MatchIterator findAll(ParseTree t, int ruleIndex, String pattern) {
 		ParseTreeWalker walker = new ParseTreeWalker();
 		return null;
@@ -241,5 +272,13 @@ public class ParseTreePatternMatcher {
 				findAll(r.getChild(i), pattern);
 			}
 		}
+	}
+
+	public Lexer getLexer() {
+		return lexer;
+	}
+
+	public Parser getParser() {
+		return parser;
 	}
 }
