@@ -69,19 +69,19 @@ public class TestParseTreeMatcher extends BaseTest {
 
 	@Test public void testTokenizingPattern() throws Exception {
 		String grammar =
-			"grammar T;\n" +
+			"grammar X;\n" +
 			"s : ID '=' expr ';' ;\n" +
 			"expr : ID | INT ;\n" +
 			"ID : [a-z]+ ;\n" +
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\r\\n\\t]+ -> skip ;\n";
 		boolean ok =
-			rawGenerateAndBuildRecognizer("T.g4", grammar, "TParser", "TLexer", false);
+			rawGenerateAndBuildRecognizer("X.g4", grammar, "XParser", "XLexer", false);
 		assertTrue(ok);
 
 		ParseTreePatternMatcher p =
-			new ParseTreePatternMatcher(loadLexerClassFromTempDir("TLexer"),
-										loadParserClassFromTempDir("TParser"));
+			new ParseTreePatternMatcher(loadLexerClassFromTempDir("XLexer"),
+										loadParserClassFromTempDir("XParser"));
 
 		List<? extends Token> tokens = p.tokenizePattern("<ID> = <expr> ;");
 		String results = tokens.toString();
@@ -92,19 +92,19 @@ public class TestParseTreeMatcher extends BaseTest {
 	@Test
 	public void testCompilingPattern() throws Exception {
 		String grammar =
-			"grammar T;\n" +
+			"grammar X;\n" +
 			"s : ID '=' expr ';' ;\n" +
 			"expr : ID | INT ;\n" +
 			"ID : [a-z]+ ;\n" +
 			"INT : [0-9]+ ;\n" +
 			"WS : [ \\r\\n\\t]+ -> skip ;\n";
 		boolean ok =
-			rawGenerateAndBuildRecognizer("T.g4", grammar, "TParser", "TLexer", false);
+			rawGenerateAndBuildRecognizer("X.g4", grammar, "XParser", "XLexer", false);
 		assertTrue(ok);
 
 		ParseTreePatternMatcher p =
-			new ParseTreePatternMatcher(loadLexerClassFromTempDir("TLexer"),
-										loadParserClassFromTempDir("TParser"));
+			new ParseTreePatternMatcher(loadLexerClassFromTempDir("XLexer"),
+										loadParserClassFromTempDir("XParser"));
 
 		ParseTree t = p.compilePattern("s", "<ID> = <expr> ;");
 		String results = t.toStringTree(p.getParser());
@@ -114,19 +114,19 @@ public class TestParseTreeMatcher extends BaseTest {
 
 	@Test public void testIDNodeMatches() throws Exception {
 		String grammar =
-			"grammar T;\n" +
+			"grammar X;\n" +
 			"s : ID ';' ;\n" +
 			"ID : [a-z]+ ;\n" +
 			"WS : [ \\r\\n\\t]+ -> skip ;\n";
 
 		String input = "x ;";
 		String pattern = "<ID>;";
-		checkPatternMatch("T.g4", grammar, "s", input, pattern, "TParser", "TLexer");
+		checkPatternMatch("X.g4", grammar, "s", input, pattern, "XParser", "XLexer");
 	}
 
 	@Test public void testTokenAndRuleMatch() throws Exception {
 		String grammar =
-			"grammar T;\n" +
+			"grammar X;\n" +
 			"s : ID '=' expr ';' ;\n" +
 			"expr : ID | INT ;\n" +
 			"ID : [a-z]+ ;\n" +
@@ -135,7 +135,7 @@ public class TestParseTreeMatcher extends BaseTest {
 
 		String input = "x = 99;";
 		String pattern = "<ID> = <expr> ;";
-		checkPatternMatch("T.g4", grammar, "s", input, pattern, "TParser", "TLexer");
+		checkPatternMatch("X.g4", grammar, "s", input, pattern, "XParser", "XLexer");
 	}
 
 	public void checkPatternMatch(String grammarName, String grammar, String startRule,
