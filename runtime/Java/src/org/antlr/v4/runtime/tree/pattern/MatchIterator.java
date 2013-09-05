@@ -2,14 +2,14 @@ package org.antlr.v4.runtime.tree.pattern;
 
 import java.util.Iterator;
 
-public class MatchIterator implements Iterator<Match> {
+public class MatchIterator implements Iterator<ParseTreeMatch> {
 	@Override
 	public boolean hasNext() {
 		return false;
 	}
 
 	@Override
-	public Match next() {
+	public ParseTreeMatch next() {
 		return null;
 	}
 

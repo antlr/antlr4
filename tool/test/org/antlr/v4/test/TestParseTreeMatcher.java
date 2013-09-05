@@ -2,6 +2,7 @@ package org.antlr.v4.test;
 
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.pattern.ParseTreePattern;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
 import org.junit.Test;
 
@@ -83,7 +84,7 @@ public class TestParseTreeMatcher extends BaseTest {
 			new ParseTreePatternMatcher(loadLexerClassFromTempDir("XLexer"),
 										loadParserClassFromTempDir("XParser"));
 
-		List<? extends Token> tokens = p.tokenizePattern("<ID> = <expr> ;");
+		List<? extends Token> tokens = p.tokenize("<ID> = <expr> ;");
 		String results = tokens.toString();
 		String expected = "[ID:3, [@-1,1:1='=',<1>,1:1], expr:1, [@-1,1:1=';',<2>,1:1]]";
 		assertEquals(expected, results);
@@ -106,8 +107,8 @@ public class TestParseTreeMatcher extends BaseTest {
 			new ParseTreePatternMatcher(loadLexerClassFromTempDir("XLexer"),
 										loadParserClassFromTempDir("XParser"));
 
-		ParseTree t = p.compilePattern("s", "<ID> = <expr> ;");
-		String results = t.toStringTree(p.getParser());
+		ParseTreePattern t = p.compile("s", "<ID> = <expr> ;");
+		String results = t.patternTree.toStringTree(p.getParser());
 		String expected = "(s <ID> = expr ;)";
 		assertEquals(expected, results);
 	}
