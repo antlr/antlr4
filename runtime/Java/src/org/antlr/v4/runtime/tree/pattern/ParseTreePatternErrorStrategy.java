@@ -53,10 +53,6 @@ import org.antlr.v4.runtime.Token;
  */
 public class ParseTreePatternErrorStrategy extends DefaultErrorStrategy {
 
-	public boolean isRuleToken(Token t) {
-		return t instanceof RuleTagToken;
-	}
-
 	@Override
 	public Token recoverInline(Parser recognizer) throws RecognitionException {
 		throw new InputMismatchException(recognizer);
@@ -64,7 +60,7 @@ public class ParseTreePatternErrorStrategy extends DefaultErrorStrategy {
 
 	@Override
 	public void reportError(Parser recognizer, RecognitionException e) {
-		if ( isRuleToken(e.getOffendingToken()) ) {
+		if (e.getOffendingToken() instanceof RuleTagToken) {
 			System.out.println("match <ruletag>");
 		}
 		else {
@@ -74,7 +70,7 @@ public class ParseTreePatternErrorStrategy extends DefaultErrorStrategy {
 
 	@Override
 	public void recover(Parser recognizer, RecognitionException e) {
-		if ( isRuleToken(e.getOffendingToken()) ) {
+		if (e.getOffendingToken() instanceof RuleTagToken) {
 			ParserRuleContext ctx = recognizer.getContext();
 			RuleSubtreeNode sub = new RuleSubtreeNode(ctx);
 			ParserRuleContext parent = ctx.getParent();

@@ -41,11 +41,11 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.RuleNode;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,6 +53,17 @@ import java.util.List;
 import java.util.Map;
 
 public class ParseTreePatternMatcher {
+	public static class CannotCreateLexerOrParser extends RuntimeException {
+		public CannotCreateLexerOrParser(Throwable e) {
+			super(e);
+		}
+	}
+	public static class CannotInvokeStartRule extends RuntimeException {
+		public CannotInvokeStartRule(Throwable e) {
+			super(e);
+		}
+	}
+
 	protected Class<? extends Lexer> lexerClass;
 	protected Class<? extends Parser> parserClass;
 
@@ -71,48 +82,89 @@ public class ParseTreePatternMatcher {
 		this.parserClass = parserClass;
 	}
 
+//	public ParseTreePatternMatcher(String lexerName, String parseName) {
+//		final Class<? extends Lexer> lexerClass = (Class<? extends Lexer>)loader.loadClass("TLexer");
+//		final Class<? extends Parser> parserClass = (Class<? extends Parser>)loader.loadClass("TParser");
+//
+//	}
+
 	public void setDelimiters(String start, String stop, String escapeLeft) {
 		this.start = start;
 		this.stop = stop;
 		this.escape = escapeLeft;
 	}
 
-	public void lazyInit()
-		throws IllegalAccessException, InvocationTargetException,
-			   InstantiationException, NoSuchMethodException
-	{
-		if ( lexer==null ) {
-			Class<? extends Lexer> c = lexerClass.asSubclass(Lexer.class);
-			Constructor<? extends Lexer> ctor = c.getConstructor(CharStream.class);
-			lexer = ctor.newInstance((CharStream)null);
-		}
+	public void lazyInit() {
+		try {
+			if ( lexer==null ) {
+				Class<? extends Lexer> c = lexerClass.asSubclass(Lexer.class);
+				Constructor<? extends Lexer> ctor = c.getConstructor(CharStream.class);
+				lexer = ctor.newInstance((CharStream)null);
+			}
 
-		if ( parser==null ) {
-			Class<? extends Parser> pc = parserClass.asSubclass(Parser.class);
-			Constructor<? extends Parser> pctor = pc.getConstructor(TokenStream.class);
-			parser = pctor.newInstance((TokenStream)null);
+			if ( parser==null ) {
+				Class<? extends Parser> pc = parserClass.asSubclass(Parser.class);
+				Constructor<? extends Parser> pctor = pc.getConstructor(TokenStream.class);
+				parser = pctor.newInstance((TokenStream)null);
+			}
+		}
+		catch (Exception e) {
+			throw new CannotCreateLexerOrParser(e);
 		}
 	}
 
-	public ParseTree compilePattern(String patternRuleName, String pattern)
-		throws InstantiationException, IllegalAccessException, NoSuchMethodException,
-			   InvocationTargetException
-	{
+	public boolean matches(ParseTree tree, String patternRuleName, String pattern) {
+		ParseTree patternTree = compilePattern(patternRuleName, pattern);
+		return matches_(tree, patternTree);
+	}
+
+	protected boolean matches_(ParseTree tree, ParseTree patternTree) {
+		if ( tree==null || patternTree==null ) return false;
+		// x and <ID>
+		if ( tree instanceof TerminalNode && patternTree instanceof TerminalNode ) {
+			TerminalNode t1 = (TerminalNode)tree;
+			TerminalNode t2 = (TerminalNode)patternTree;
+			return t1.getSymbol().getType() == t2.getSymbol().getType();
+		}
+		if ( tree instanceof RuleNode && patternTree instanceof RuleNode ) {
+			RuleNode r1 = (RuleNode)tree;
+			RuleNode r2 = (RuleNode)patternTree;
+			// (expr ...) and <expr>
+			if ( r2 instanceof RuleSubtreeNode ) {
+				return r1.getRuleContext().getRuleIndex() == r2.getRuleContext().getRuleIndex();
+			}
+			// (expr ...) and (expr ...)
+			if ( r1.getChildCount()!=r2.getChildCount() ) return false;
+			int n = r1.getChildCount();
+			for (int i = 0; i<n; i++) {
+				boolean childrenMatch = matches_(r1.getChild(i), patternTree.getChild(i));
+				if ( !childrenMatch ) return false;
+			}
+			return true;
+		}
+		// if nodes aren't both tokens or both rule nodes, can't match
+		return false;
+	}
+
+	public ParseTree compilePattern(String patternRuleName, String pattern) {
 		List<? extends Token> tokenList = tokenizePattern(pattern);
 		ListTokenSource tokenSrc = new ListTokenSource(tokenList);
 		CommonTokenStream tokens = new CommonTokenStream(tokenSrc);
 		parser.setTokenStream(tokens);
 		parser.setErrorHandler(new ParseTreePatternErrorStrategy());
-		Method startRule = parserClass.getMethod(patternRuleName);
-		ParserRuleContext tree = (ParserRuleContext)startRule.invoke(parser, (Object[])null);
-		System.out.println(tree.toStringTree(parser));
+		ParserRuleContext tree = null;
+		try {
+			Method startRule = parserClass.getMethod(patternRuleName);
+			tree = (ParserRuleContext)startRule.invoke(parser, (Object[])null);
+			System.out.println("pattern tree = "+tree.toStringTree(parser));
+		}
+		catch (Exception e) {
+			throw new CannotInvokeStartRule(e);
+		}
 		return tree;
 	}
 
-	public List<? extends Token> tokenizePattern(String pattern)
-		throws InstantiationException, IllegalAccessException, NoSuchMethodException,
-			   InvocationTargetException
-	{
+	public List<? extends Token> tokenizePattern(String pattern) {
 		lazyInit();
 		// make maps for quick look up
 		Map<String, Integer> tokenNameToType = toMap(parser.getTokenNames(), 0);
@@ -147,11 +199,12 @@ public class ParseTreePatternMatcher {
 				}
 				catch (IOException ioe) {
 					// -----------------
+					System.err.println("what?-----------------");
 				}
 			}
 		}
 
-		System.out.println(tokens);
+		System.out.println("tokens="+tokens);
 		return tokens;
 	}
 
@@ -231,9 +284,9 @@ public class ParseTreePatternMatcher {
 			}
 		}
 		if ( ntags>0 ) {
-			int endOfLastTag = stops.get(ntags - 1) + stop.length();
-			if ( endOfLastTag < n-1 ) { // copy text from end of last tag to end
-				String text = pattern.substring(endOfLastTag+stop.length(), n);
+			int afterLastTag = stops.get(ntags - 1) + stop.length();
+			if ( afterLastTag < n ) { // copy text from end of last tag to end
+				String text = pattern.substring(afterLastTag, n);
 				chunks.add(new TextChunk(text));
 			}
 		}
