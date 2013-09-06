@@ -82,12 +82,6 @@ public class ParseTreePatternMatcher {
 		this.parserClass = parserClass;
 	}
 
-//	public ParseTreePatternMatcher(String lexerName, String parseName) {
-//		final Class<? extends Lexer> lexerClass = (Class<? extends Lexer>)loader.loadClass("TLexer");
-//		final Class<? extends Parser> parserClass = (Class<? extends Parser>)loader.loadClass("TParser");
-//
-//	}
-
 	public void setDelimiters(String start, String stop, String escapeLeft) {
 		this.start = start;
 		this.stop = stop;
@@ -127,6 +121,10 @@ public class ParseTreePatternMatcher {
 	public ParseTreeMatch match(ParseTree tree, String patternRuleName, String pattern) {
 		ParseTreePattern p = compile(patternRuleName, pattern);
 		return matches_(tree, p.patternTree, p);
+	}
+
+	public ParseTreeMatch match(ParseTree tree, ParseTreePattern pattern) {
+		return matches_(tree, pattern.patternTree, pattern);
 	}
 
 	protected ParseTreeMatch matches_(ParseTree tree, ParseTree patternTree, ParseTreePattern pattern) {
