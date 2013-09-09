@@ -33,6 +33,7 @@ package org.antlr.v4.runtime.tree.pattern;
 import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
 
@@ -70,9 +71,15 @@ public class ParseTreePatternErrorStrategy extends DefaultErrorStrategy {
 	@Override
 	public void recover(Parser recognizer, RecognitionException e) {
 		if (e.getOffendingToken() instanceof RuleTagToken) {
-			recognizer.consume(); // match <tag> as if it matches rule, continue
-			// leaves <expr> as (expr <expr>) tree; can shrink later. this
-			// is simplest mechanism to get <expr> into tree.
+			ParserRuleContext ctx = recognizer.getContext();
+			// found a <expr> tag in pattern. Just consume it and store in
+			// rule node to indicate it matches entire subtree. A bit ugly
+			// but better than replacing rule node with diff kind of object
+			Token o = recognizer.getCurrentToken();
+			ctx.patternRuleTag = (RuleTagToken)o;
+			if (o.getType() != Token.EOF) {
+				recognizer.getInputStream().consume();
+			}
 		}
 		else {
 			super.recover(recognizer, e);

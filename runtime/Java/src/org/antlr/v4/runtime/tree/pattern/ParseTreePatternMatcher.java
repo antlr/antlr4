@@ -144,11 +144,11 @@ public class ParseTreePatternMatcher {
 			}
 			return m;
 		}
-		if ( tree instanceof RuleNode && patternTree instanceof RuleNode ) {
-			RuleNode r1 = (RuleNode)tree;
-			RuleNode r2 = (RuleNode)patternTree;
+		if ( tree instanceof ParserRuleContext && patternTree instanceof ParserRuleContext ) {
+			ParserRuleContext r1 = (ParserRuleContext)tree;
+			ParserRuleContext r2 = (ParserRuleContext)patternTree;
 			// (expr ...) and <expr>
-			if ( r2 instanceof RuleSubtreeNode ) {
+			if ( r2.patternRuleTag!=null ) {
 				ParseTreeMatch m = null;
 				if ( r1.getRuleContext().getRuleIndex() == r2.getRuleContext().getRuleIndex() ) {
 					m = new ParseTreeMatch(tree, pattern);
@@ -184,46 +184,26 @@ public class ParseTreePatternMatcher {
 		parser.setErrorHandler(new ParseTreePatternErrorStrategy());
 		ParseTree tree = null;
 		try {
-			Method startRule = parserClass.getMethod(patternRuleName);
-			tree = (ParserRuleContext)startRule.invoke(parser, (Object[])null);
+			Method startRule = null;
+			Object[] args = null;
+			try {
+				startRule = parserClass.getMethod(patternRuleName);
+			}
+			catch (NoSuchMethodException nsme) {
+				// try with int _p arg for recursive func
+				startRule = parserClass.getMethod(patternRuleName, int.class);
+				args = new Integer[] {0};
+			}
+			tree = (ParseTree)startRule.invoke(parser, args);
 			System.out.println("pattern tree = "+tree.toStringTree(parser));
 		}
 		catch (Exception e) {
 			throw new CannotInvokeStartRule(e);
 		}
 
-		shrinkRuleTagSubtreesToSingleNode(tree);
 		System.out.println("after optimize pattern tree = " + tree.toStringTree(parser));
 
 		return new ParseTreePattern(patternRuleName, pattern, tree);
-	}
-
-	// replace (expr <expr>) where <expr> is a TerminalNode with RuleTagToken
-	// symbol to a single RuleSubtreeNode for <expr>
-	protected void shrinkRuleTagSubtreesToSingleNode(ParseTree t) {
-		if ( t instanceof RuleNode ) {
-			RuleNode r = (RuleNode)t;
-			if ( r.getChildCount()==1 && r.getChild(0) instanceof TerminalNode ) {
-				TerminalNode c = (TerminalNode)r.getChild(0);
-				if ( c.getSymbol() instanceof RuleTagToken ) {
-					System.out.println("rule tag subtree "+t.toStringTree(parser));
-					ParserRuleContext parent = (ParserRuleContext)r.getParent();
-					int i = parent.children.indexOf(r);
-					if ( i==-1 ) {
-						System.out.printf("eh?-------------------");
-					}
-					RuleSubtreeNode sub = new RuleSubtreeNode((ParserRuleContext)r.getRuleContext());
-					parent.children.set(i, sub);
-				}
-			}
-		}
-		if ( t instanceof RuleNode) {
-			RuleNode r = (RuleNode)t;
-			int n = r.getChildCount();
-			for (int i = 0; i<n; i++) {
-				shrinkRuleTagSubtreesToSingleNode(r.getChild(i));
-			}
-		}
 	}
 
 	public List<? extends Token> tokenize(String pattern) {

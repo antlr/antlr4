@@ -524,8 +524,17 @@ public abstract class BaseTest {
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		Parser parser = pctor.newInstance(tokens);
 
-		Method startRule = parserClass.getMethod(startRuleName);
-		ParseTree result = (ParseTree)startRule.invoke(parser, (Object[])null);
+		Method startRule = null;
+		Object[] args = null;
+		try {
+			startRule = parserClass.getMethod(startRuleName);
+		}
+		catch (NoSuchMethodException nsme) {
+			// try with int _p arg for recursive func
+			startRule = parserClass.getMethod(startRuleName, int.class);
+			args = new Integer[] {0};
+		}
+		ParseTree result = (ParseTree)startRule.invoke(parser, args);
 		System.out.println("parse tree = "+result.toStringTree(parser));
 		return result;
 	}

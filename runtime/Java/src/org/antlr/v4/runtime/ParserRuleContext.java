@@ -37,6 +37,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
+import org.antlr.v4.runtime.tree.pattern.RuleTagToken;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,8 +97,17 @@ public class ParserRuleContext extends RuleContext {
 
 	public Token start, stop;
 
+	/** Used when parsing <expr> tags in patterns. If non-null, then this
+	 *  node is not just expr but <expr> to match any expr rule subtree.
+	 *
+	 *  			// found a <expr> tag in pattern. Just consume it and store in
+	 			// rule node to indicate it matches entire subtree. A bit ugly
+	 			// but better than replacing rule node with diff kind of object
+	 */
+	public RuleTagToken patternRuleTag;
+
 	/**
-	 * The exception which forced this rule to return. If the rule successfully
+	 * The exception that forced this rule to return. If the rule successfully
 	 * completed, this is {@code null}.
 	 */
 	public RecognitionException exception;

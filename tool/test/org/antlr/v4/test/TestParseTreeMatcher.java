@@ -160,6 +160,27 @@ public class TestParseTreeMatcher extends BaseTest {
 		checkPatternMatch("X5.g4", grammar, "s", input, pattern, "X5Parser", "X5Lexer");
 	}
 
+	@Test public void testLRecursiveExpr() throws Exception {
+		String grammar =
+			"grammar X6;\n" +
+			"s   : expr ';'\n" +
+			//"    | 'return' expr ';'\n" +
+			"    ;\n" +
+			"expr: expr '.' ID\n" +
+			"    | expr '*' expr\n" +
+			"    | expr '=' expr\n" +
+			"    | ID\n" +
+			"    | INT\n" +
+			"    ;\n" +
+			"ID : [a-z]+ ;\n" +
+			"INT : [0-9]+ ;\n" +
+			"WS : [ \\r\\n\\t]+ -> skip ;\n";
+
+		String input = "3*4*5";
+		String pattern = "<expr> * <expr> * <expr>";
+		checkPatternMatch("X6.g4", grammar, "expr", input, pattern, "X6Parser", "X6Lexer");
+	}
+
 	public void checkPatternMatch(String grammarName, String grammar, String startRule,
 								  String input, String pattern,
 								  String parserName, String lexerName)
