@@ -158,6 +158,16 @@ public class TestParseTreeMatcher extends BaseTest {
 		pattern = "<ID> = 0;";
 		invertMatch = false;
 		checkPatternMatch("X4.g4", grammar, "s", input, pattern, "X4Parser", "X4Lexer", invertMatch);
+
+		input = "x = 0;";
+		pattern = "x = 0;";
+		invertMatch = false;
+		checkPatternMatch("X4.g4", grammar, "s", input, pattern, "X4Parser", "X4Lexer", invertMatch);
+
+		input = "x = 0;";
+		pattern = "y = 0;";
+		invertMatch = true;
+		checkPatternMatch("X4.g4", grammar, "s", input, pattern, "X4Parser", "X4Lexer", invertMatch);
 	}
 
 	@Test public void testAssign() throws Exception {
