@@ -148,7 +148,7 @@ public class ParseTreePatternMatcher {
 			ParserRuleContext r1 = (ParserRuleContext)tree;
 			ParserRuleContext r2 = (ParserRuleContext)patternTree;
 			// (expr ...) and <expr>
-			if ( r2.patternRuleTag!=null ) {
+			if ( isRuleTag(r2) ) {
 				ParseTreeMatch m = null;
 				if ( r1.getRuleContext().getRuleIndex() == r2.getRuleContext().getRuleIndex() ) {
 					m = new ParseTreeMatch(tree, pattern);
@@ -174,6 +174,20 @@ public class ParseTreePatternMatcher {
 		}
 		// if nodes aren't both tokens or both rule nodes, can't match
 		return new ParseTreeMatchFailed(tree, tree, pattern);
+	}
+
+	public boolean isRuleTag(ParseTree t) {
+		if ( t instanceof RuleNode ) {
+			RuleNode r = (RuleNode)t;
+			if ( r.getChildCount()==1 && r.getChild(0) instanceof TerminalNode ) {
+				TerminalNode c = (TerminalNode)r.getChild(0);
+				if ( c.getSymbol() instanceof RuleTagToken ) {
+					System.out.println("rule tag subtree "+t.toStringTree(parser));
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public ParseTreePattern compile(String patternRuleName, String pattern) {
