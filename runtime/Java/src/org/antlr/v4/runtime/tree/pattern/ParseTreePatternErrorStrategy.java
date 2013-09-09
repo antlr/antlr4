@@ -33,7 +33,6 @@ package org.antlr.v4.runtime.tree.pattern;
 import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
 
@@ -71,12 +70,7 @@ public class ParseTreePatternErrorStrategy extends DefaultErrorStrategy {
 	@Override
 	public void recover(Parser recognizer, RecognitionException e) {
 		if (e.getOffendingToken() instanceof RuleTagToken) {
-			ParserRuleContext ctx = recognizer.getContext();
-			RuleSubtreeNode sub = new RuleSubtreeNode(ctx);
-			ParserRuleContext parent = ctx.getParent();
-			int i = parent.children.indexOf(ctx);
-			parent.children.set(i, sub); // replace
-			recognizer.consume(); // skip over the <tag>
+			recognizer.consume(); // match <tag> as if it matches rule, continue
 		}
 		else {
 			super.recover(recognizer, e);
