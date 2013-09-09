@@ -627,6 +627,10 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return _ctx;
 	}
 
+	public void setContext(ParserRuleContext ctx) {
+		_ctx = ctx;
+	}
+
 	public boolean inContext(String context) {
 		// TODO: useful in parser?
 		return false;
