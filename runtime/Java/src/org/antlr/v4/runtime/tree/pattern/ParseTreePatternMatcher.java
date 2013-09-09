@@ -131,13 +131,22 @@ public class ParseTreePatternMatcher {
 		if ( tree==null || patternTree==null ) {
 			return new ParseTreeMatchFailed(tree, null, pattern);
 		}
-		// x and <ID>
+		// x and <ID>, x and y, or x and x; or could be mismatched types
 		if ( tree instanceof TerminalNode && patternTree instanceof TerminalNode ) {
 			TerminalNode t1 = (TerminalNode)tree;
 			TerminalNode t2 = (TerminalNode)patternTree;
 			ParseTreeMatch m = null;
+			// both are
 			if ( t1.getSymbol().getType() == t2.getSymbol().getType() ) {
-				m = new ParseTreeMatch(tree, pattern);
+				if ( t2.getSymbol() instanceof TokenTagToken ) { // x and <ID>
+					m = new ParseTreeMatch(tree, pattern);
+				}
+				else if ( t1.getText().equals(t2.getText()) ) { // x and x
+					m = new ParseTreeMatch(tree, pattern);
+				}
+				else { // x and y
+					m = new ParseTreeMatchFailed(tree, t1, pattern);
+				}
 			}
 			else {
 				m = new ParseTreeMatchFailed(tree, t1, pattern);
@@ -176,6 +185,7 @@ public class ParseTreePatternMatcher {
 		return new ParseTreeMatchFailed(tree, tree, pattern);
 	}
 
+	/** Is t (expr <expr>) subtree? */
 	public boolean isRuleTag(ParseTree t) {
 		if ( t instanceof RuleNode ) {
 			RuleNode r = (RuleNode)t;

@@ -9,6 +9,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class TestParseTreeMatcher extends BaseTest {
@@ -139,6 +140,26 @@ public class TestParseTreeMatcher extends BaseTest {
 		checkPatternMatch("X4.g4", grammar, "s", input, pattern, "X4Parser", "X4Lexer");
 	}
 
+	@Test public void testTokenTextMatch() throws Exception {
+		String grammar =
+			"grammar X4;\n" +
+			"s : ID '=' expr ';' ;\n" +
+			"expr : ID | INT ;\n" +
+			"ID : [a-z]+ ;\n" +
+			"INT : [0-9]+ ;\n" +
+			"WS : [ \\r\\n\\t]+ -> skip ;\n";
+
+		String input = "x = 0;";
+		String pattern = "<ID> = 1;";
+		boolean invertMatch = true; // 0!=1
+		checkPatternMatch("X4.g4", grammar, "s", input, pattern, "X4Parser", "X4Lexer", invertMatch);
+
+		input = "x = 0;";
+		pattern = "<ID> = 0;";
+		invertMatch = false;
+		checkPatternMatch("X4.g4", grammar, "s", input, pattern, "X4Parser", "X4Lexer", invertMatch);
+	}
+
 	@Test public void testAssign() throws Exception {
 		String grammar =
 			"grammar X5;\n" +
@@ -186,6 +207,15 @@ public class TestParseTreeMatcher extends BaseTest {
 								  String parserName, String lexerName)
 		throws Exception
 	{
+		checkPatternMatch(grammarName, grammar, startRule, input, pattern, parserName, lexerName, false);
+	}
+
+	public void checkPatternMatch(String grammarName, String grammar, String startRule,
+								  String input, String pattern,
+								  String parserName, String lexerName,
+								  boolean invertMatch)
+		throws Exception
+	{
 		boolean ok =
 			rawGenerateAndBuildRecognizer(grammarName, grammar, parserName, lexerName, false);
 		assertTrue(ok);
@@ -196,6 +226,7 @@ public class TestParseTreeMatcher extends BaseTest {
 			new ParseTreePatternMatcher(loadLexerClassFromTempDir(lexerName),
 										loadParserClassFromTempDir(parserName));
 		boolean matches = p.matches(result, startRule, pattern);
-		assertTrue(matches);
+		if ( invertMatch ) assertFalse(matches);
+		else assertTrue(matches);
 	}
 }
