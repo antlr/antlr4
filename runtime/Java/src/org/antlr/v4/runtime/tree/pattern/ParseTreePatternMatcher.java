@@ -191,7 +191,39 @@ public class ParseTreePatternMatcher {
 		catch (Exception e) {
 			throw new CannotInvokeStartRule(e);
 		}
+
+		shrinkRuleTagSubtreesToSingleNode(tree);
+		System.out.println("after optimize pattern tree = " + tree.toStringTree(parser));
+
 		return new ParseTreePattern(patternRuleName, pattern, tree);
+	}
+
+	// replace (expr <expr>) where <expr> is a TerminalNode with RuleTagToken
+	// symbol to a single RuleSubtreeNode for <expr>
+	protected void shrinkRuleTagSubtreesToSingleNode(ParseTree t) {
+		if ( t instanceof RuleNode ) {
+			RuleNode r = (RuleNode)t;
+			if ( r.getChildCount()==1 && r.getChild(0) instanceof TerminalNode ) {
+				TerminalNode c = (TerminalNode)r.getChild(0);
+				if ( c.getSymbol() instanceof RuleTagToken ) {
+					System.out.println("rule tag subtree "+t.toStringTree(parser));
+					ParserRuleContext parent = (ParserRuleContext)r.getParent();
+					int i = parent.children.indexOf(r);
+					if ( i==-1 ) {
+						System.out.printf("eh?-------------------");
+					}
+					RuleSubtreeNode sub = new RuleSubtreeNode((ParserRuleContext)r.getRuleContext());
+					parent.children.set(i, sub);
+				}
+			}
+		}
+		if ( t instanceof RuleNode) {
+			RuleNode r = (RuleNode)t;
+			int n = r.getChildCount();
+			for (int i = 0; i<n; i++) {
+				shrinkRuleTagSubtreesToSingleNode(r.getChild(i));
+			}
+		}
 	}
 
 	public List<? extends Token> tokenize(String pattern) {

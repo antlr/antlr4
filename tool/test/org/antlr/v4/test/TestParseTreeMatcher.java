@@ -109,7 +109,7 @@ public class TestParseTreeMatcher extends BaseTest {
 
 		ParseTreePattern t = p.compile("s", "<ID> = <expr> ;");
 		String results = t.patternTree.toStringTree(p.getParser());
-		String expected = "(s <ID> = (expr <expr>) ;)";
+		String expected = "(s <ID> = expr ;)";
 		assertEquals(expected, results);
 	}
 

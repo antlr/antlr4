@@ -71,6 +71,8 @@ public class ParseTreePatternErrorStrategy extends DefaultErrorStrategy {
 	public void recover(Parser recognizer, RecognitionException e) {
 		if (e.getOffendingToken() instanceof RuleTagToken) {
 			recognizer.consume(); // match <tag> as if it matches rule, continue
+			// leaves <expr> as (expr <expr>) tree; can shrink later. this
+			// is simplest mechanism to get <expr> into tree.
 		}
 		else {
 			super.recover(recognizer, e);
