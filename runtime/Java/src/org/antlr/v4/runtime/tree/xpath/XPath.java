@@ -22,6 +22,8 @@ import java.util.regex.Pattern;
  *  //ID				INVALID (same as ID)
  *  classdef//funcdef	all funcs under classdef somewhere
  *  classdef/*			all children of classdefs anywhere in tree
+ *  *					INVALID
+ *  * slash *			INVALID
  *
  *  The "root" is relative to the node passed to evaluate().
  */
@@ -34,30 +36,53 @@ public class XPath {
 	public XPath(String path) {
 		this.path = path;
 		elements = split(path);
+		System.out.println(Arrays.toString(elements));
 	}
 
 	public XPathElement[] split(String path) {
 		Pattern pattern = Pattern.compile("//|/|\\w+|\\*");
 		Matcher matcher = pattern.matcher(path);
-		System.out.println("path="+path);
 		List<String> pathStrings = new ArrayList<String>();
 		while (matcher.find()) {
 			pathStrings.add(matcher.group());
 		}
+		System.out.println("path="+path+"=>"+pathStrings);
 		List<XPathElement> elements = new ArrayList<XPathElement>();
-		for (String el : pathStrings) {
-		System.out.println("\t"+ el);
+		int n = pathStrings.size();
+		int i=0;
+		while ( i<n ) {
+			String el = pathStrings.get(i);
 			if ( el.equals("/") ) {
-
+				i++;
+				if ( i>=n ) {
+					System.out.println("missing element name after operator");
+				}
+				String next = pathStrings.get(i);
+				if ( i==1 ) { // "/ID" is rooted element if '/' is first el
+					elements.add(new XPathRootedElement(el));
+				}
+				else {
+					elements.add(new XPathNodeElement(next));
+				}
+				i++;
 			}
 			else if ( el.equals("//") ) {
-
-			}
-			else if ( el.equals("*") ) {
-
+				i++;
+				if ( i>=n ) {
+					System.out.println("missing element name after operator");
+				}
+				String next = pathStrings.get(i);
+				elements.add(new XPathAnywhereElement(next));
+				i++;
 			}
 			else {
-				elements.add(new XPathNodeElement(el));
+				if ( i==0 ) { // "ID" is first element w/o a "//" or "/"
+					elements.add(new XPathAnywhereElement(el));
+				}
+				else {
+					elements.add(new XPathNodeElement(el));
+				}
+				i++;
 			}
 		}
 		return elements.toArray(new XPathElement[0]);

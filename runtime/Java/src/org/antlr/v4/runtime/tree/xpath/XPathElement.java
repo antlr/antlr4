@@ -9,4 +9,9 @@ public abstract class XPathElement {
 	public XPathElement(String nodeName) {
 		this.nodeName = nodeName;
 	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+"["+nodeName+"]";
+	}
 }
