@@ -53,6 +53,10 @@ import java.util.List;
 import java.util.Map;
 
 public class ParseTreePatternMatcher {
+
+	public static final String ANYTHING = "...";
+	public static final String WILDCARD = ".";
+
 	public static class CannotCreateLexerOrParser extends RuntimeException {
 		public CannotCreateLexerOrParser(Throwable e) {
 			super(e);
@@ -131,12 +135,15 @@ public class ParseTreePatternMatcher {
 		if ( tree==null || patternTree==null ) {
 			return new ParseTreeMatchFailed(tree, null, pattern);
 		}
+		if ( patternTree instanceof WildcardTagToken ) {
+			return new ParseTreeMatch(tree, pattern); // <.> matches any single node/subtree
+		}
 		// x and <ID>, x and y, or x and x; or could be mismatched types
 		if ( tree instanceof TerminalNode && patternTree instanceof TerminalNode ) {
 			TerminalNode t1 = (TerminalNode)tree;
 			TerminalNode t2 = (TerminalNode)patternTree;
 			ParseTreeMatch m = null;
-			// both are
+			// both are tokens and they have same type
 			if ( t1.getSymbol().getType() == t2.getSymbol().getType() ) {
 				if ( t2.getSymbol() instanceof TokenTagToken ) { // x and <ID>
 					m = new ParseTreeMatch(tree, pattern);
@@ -225,8 +232,6 @@ public class ParseTreePatternMatcher {
 			throw new CannotInvokeStartRule(e);
 		}
 
-		System.out.println("after optimize pattern tree = " + tree.toStringTree(parser));
-
 		return new ParseTreePattern(patternRuleName, pattern, tree);
 	}
 
@@ -245,7 +250,13 @@ public class ParseTreePatternMatcher {
 			if ( chunk instanceof TagChunk ) {
 				TagChunk tagChunk = (TagChunk)chunk;
 				// add special rule token or conjure up new token from name
-				if ( Character.isUpperCase(tagChunk.tag.charAt(0)) ) {
+//				if ( tagChunk.tag.equals(ANYTHING) ) {
+//					tokens.add(new AnythingTagToken());
+//				}
+				if ( tagChunk.tag.equals(WILDCARD) ) {
+					tokens.add(new WildcardTagToken());
+				}
+				else if ( Character.isUpperCase(tagChunk.tag.charAt(0)) ) {
 					tokens.add(new TokenTagToken(tagChunk.tag, tokenNameToType.get(tagChunk.tag)));
 				}
 				else {

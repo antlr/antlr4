@@ -36,6 +36,7 @@ import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.NotNull;
 
 /** Alter response to errors in rules so it checks for special RULE tokens
  *  representing patterns like <expr>.
@@ -60,17 +61,14 @@ public class ParseTreePatternErrorStrategy extends DefaultErrorStrategy {
 
 	@Override
 	public void reportError(Parser recognizer, RecognitionException e) {
-		if (e.getOffendingToken() instanceof RuleTagToken) {
-			System.out.println("match <ruletag>");
-		}
-		else {
+		if (!isPatternTag(e.getOffendingToken())) {
 			super.reportError(recognizer, e);
 		}
 	}
 
 	@Override
 	public void recover(Parser recognizer, RecognitionException e) {
-		if (e.getOffendingToken() instanceof RuleTagToken) {
+		if (isPatternTag(e.getOffendingToken())) {
 			recognizer.consume(); // match <tag> as if it matches rule, continue
 			// leaves <expr> as (expr <expr>) tree; could shrink later but why
 			// bother. Matcher can look for this pattern. This
@@ -79,5 +77,10 @@ public class ParseTreePatternErrorStrategy extends DefaultErrorStrategy {
 		else {
 			super.recover(recognizer, e);
 		}
+	}
+
+	protected boolean isPatternTag(Token t) {
+		return t instanceof RuleTagToken ||
+			   t instanceof WildcardTagToken;
 	}
 }
