@@ -259,6 +259,10 @@ public class TestParseTreeMatcher extends BaseTest {
 		assertEquals(expected, results);
 	}
 
+	/*
+	crap. pattern "<expr>.<ID>" won't work for recursive rules as <expr> won't
+	match the primaries at start of recursive expr rule. damn!
+	 */
 	@Test public void testLRWildcard() throws Exception {
 		String grammar =
 			"grammar X6;\n" +
