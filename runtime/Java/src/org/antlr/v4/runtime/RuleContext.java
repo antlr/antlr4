@@ -34,12 +34,11 @@ import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.antlr.v4.runtime.tree.RuleNode;
-import org.antlr.v4.runtime.tree.Tree;
 import org.antlr.v4.runtime.tree.Trees;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
 import javax.print.PrintException;
-import javax.swing.JDialog;
+import javax.swing.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -152,7 +151,7 @@ public class RuleContext implements RuleNode {
 	}
 
 	@Override
-	public List<? extends Tree> getChildren() {
+	public List<? extends ParseTree> getChildren() {
 		return null;
 	}
 

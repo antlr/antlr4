@@ -66,7 +66,7 @@ public class TerminalNodeImpl implements TerminalNode {
 	public int getChildCount() { return 0; }
 
 	@Override
-	public List<? extends Tree> getChildren() {
+	public List<? extends ParseTree> getChildren() {
 		return null;
 	}
 
