@@ -34,6 +34,8 @@ import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 
+import java.util.List;
+
 public class TerminalNodeImpl implements TerminalNode {
 	public Token symbol;
 	public ParseTree parent;
@@ -62,6 +64,11 @@ public class TerminalNodeImpl implements TerminalNode {
 
 	@Override
 	public int getChildCount() { return 0; }
+
+	@Override
+	public List<? extends Tree> getChildren() {
+		return null;
+	}
 
 	@Override
 	public <T> T accept(ParseTreeVisitor<? extends T> visitor) {

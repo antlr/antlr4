@@ -33,6 +33,9 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 
+import java.util.Collection;
+import java.util.List;
+
 /** The basic notion of a tree has a parent, a payload, and a list of children.
  *  It is the most abstract interface for all the trees used by ANTLR.
  */
@@ -58,6 +61,9 @@ public interface Tree {
 	 *  node represents a leaf node.
 	 */
 	int getChildCount();
+
+	/** Return ordered list of all children of this node */
+	List<? extends Tree> getChildren();
 
 	/** Print out a whole tree, not just a node, in LISP format
 	 *  {@code (root child1 .. childN)}. Print just a node if this is a leaf.

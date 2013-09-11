@@ -34,6 +34,7 @@ import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.antlr.v4.runtime.tree.RuleNode;
+import org.antlr.v4.runtime.tree.Tree;
 import org.antlr.v4.runtime.tree.Trees;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
@@ -59,7 +60,7 @@ import java.util.concurrent.Future;
  *  getting error information.
  *
  *  These objects are used during parsing and prediction.
- *  For the special case of parsers and tree parsers, we use the subclass
+ *  For the special case of parsers, we use the subclass
  *  ParserRuleContext.
  *
  *  @see ParserRuleContext
@@ -148,6 +149,11 @@ public class RuleContext implements RuleNode {
 	@Override
 	public int getChildCount() {
 		return 0;
+	}
+
+	@Override
+	public List<? extends Tree> getChildren() {
+		return null;
 	}
 
 	@Override
