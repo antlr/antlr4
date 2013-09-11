@@ -4,10 +4,9 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.Collection;
 
-/** Either ID at start of path or ...//ID in middle of path */
-public class XPathAnywhereElement extends XPathElement {
-	public XPathAnywhereElement(String nodeName) {
-		super(nodeName);
+public class XPathRuleElement extends XPathElement {
+	public XPathRuleElement(String ruleName) {
+		super(ruleName);
 	}
 
 	@Override

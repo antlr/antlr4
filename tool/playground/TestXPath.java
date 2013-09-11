@@ -17,15 +17,22 @@ public class TestXPath {
 		ParserRuleContext tree = parser.compilationUnit();
 		System.out.println(tree.toStringTree(parser));
 
-		XPath p = new XPath("ID");
-		p.evaluate(tree);
-		new XPath("A/B");
-		new XPath("/A/B");
-		new XPath("A//B");
-		new XPath("A/*");
-		new XPath("*");
-		new XPath("*/A");
-		new XPath("A/*/B");
+		XPath p = new XPath(parser, "/compilationUnit");
+		System.out.println( p.evaluate(tree) );
+
+//		new XPath("//A/B");
+//		new XPath("/A/B");
+//		new XPath("//A//B");
+//		new XPath("/A/*");
+//		new XPath("/*/*");
+//		new XPath("//*");
+//		new XPath("/*/A");
+//		new XPath("/A/*/B");
+//		new XPath("//A/*/B");
+//		// these are all the same:
+//		new XPath("A");
+//		new XPath("/A");
+//		new XPath("/*");
 	}
 }
 

@@ -1,5 +1,6 @@
 package org.antlr.v4.runtime.tree.xpath;
 
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.ArrayList;
@@ -16,14 +17,22 @@ import java.util.regex.Pattern;
  *  At each separator-word pair, find set of nodes. Next stage uses those as
  *  work list.
  *
- *  ID					all IDs anywhere
+ *  //ID					all IDs anywhere
  *  /ID					an ID node if at root
  *  /classdef/field		all field children of classdef at root.
- *  //ID				INVALID (same as ID)
- *  classdef//funcdef	all funcs under classdef somewhere
- *  classdef/*			all children of classdefs anywhere in tree
+ *  ID					INVALID (must have // in front or /)
+ *  //classdef//funcdef	all funcs under classdef somewhere
+ *  //classdef/*			all children of classdefs anywhere in tree
  *  *					INVALID
- *  * slash *			INVALID
+ *  /*					root node
+ *  //*					every node
+ *  /*slash*			All children of root
+ *  /* slash *			INVALID
+ *
+ * these are all the same: returns t if t is classdef root node
+ *  [9/10/13 6:35:13 PM] Terence Parr: eval(t, "classdef")
+ [9/10/13 6:35:45 PM] Terence Parr: eval(t, "/classdef")
+ [9/10/13 6:36:44 PM] Terence Parr: eval(t, "/*")
  *
  *  The "root" is relative to the node passed to evaluate().
  */
@@ -32,8 +41,10 @@ public class XPath {
 
 	protected String path;
 	protected XPathElement[] elements;
+	protected Parser parser;
 
-	public XPath(String path) {
+	public XPath(Parser parser, String path) {
+		this.parser = parser;
 		this.path = path;
 		elements = split(path);
 		System.out.println(Arrays.toString(elements));
@@ -59,10 +70,10 @@ public class XPath {
 				}
 				String next = pathStrings.get(i);
 				if ( i==1 ) { // "/ID" is rooted element if '/' is first el
-					elements.add(new XPathRootedElement(el));
+					elements.add(new XPathRootRuleElement(next));
 				}
 				else {
-					elements.add(new XPathNodeElement(next));
+					elements.add(new XPathTokenElement(next));
 				}
 				i++;
 			}
@@ -76,12 +87,7 @@ public class XPath {
 				i++;
 			}
 			else {
-				if ( i==0 ) { // "ID" is first element w/o a "//" or "/"
-					elements.add(new XPathAnywhereElement(el));
-				}
-				else {
-					elements.add(new XPathNodeElement(el));
-				}
+				elements.add(new XPathTokenElement(el));
 				i++;
 			}
 		}
@@ -92,6 +98,7 @@ public class XPath {
 	/** Return a list of all nodes starting at t as root that satisfy the path.
 	 */
 	public Collection<? extends ParseTree> evaluate(ParseTree t) {
-		return null;
+		// do just first for now
+		return elements[0].evaluate(t);
 	}
 }
