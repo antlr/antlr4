@@ -16,15 +16,9 @@ public class XPathRootRuleElement extends XPathElement {
 
 	@Override
 	public Collection<? extends ParseTree> evaluate(final ParseTree t) {
-		// /* means whatever the root is
-		if ( isWildcard() ) {
+		ParserRuleContext ctx = (ParserRuleContext)t.getPayload();
+		if ( ctx.getRuleIndex() == ruleIndex ) {
 			return new ArrayList<ParseTree>() {{add(t);}};
-		}
-		else { // /x means x must be root
-			ParserRuleContext ctx = (ParserRuleContext)t.getPayload();
-			if ( ctx.getRuleIndex() == ruleIndex ) {
-				return new ArrayList<ParseTree>() {{add(t);}};
-			}
 		}
 		return new ArrayList<ParseTree>();
 	}

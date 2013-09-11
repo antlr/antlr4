@@ -13,18 +13,13 @@ public class XPathTokenElement extends XPathElement {
 
 	@Override
 	public Collection<? extends ParseTree> evaluate(ParseTree t) {
-		if ( isWildcard() ) {
-			return t.getChildren();
-		}
-		else {
-			// return all children of t that match nodeName
-			List<ParseTree> nodes = new ArrayList<ParseTree>();
-			for (ParseTree c : t.getChildren()) {
-				if ( c.getText().equals(nodeName) ) {
-					nodes.add(c);
-				}
+		// return all children of t that match nodeName
+		List<ParseTree> nodes = new ArrayList<ParseTree>();
+		for (ParseTree c : t.getChildren()) {
+			if ( c.getText().equals(nodeName) ) {
+				nodes.add(c);
 			}
-			return nodes;
 		}
+		return nodes;
 	}
 }
