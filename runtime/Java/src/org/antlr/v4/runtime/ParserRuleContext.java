@@ -194,7 +194,7 @@ public class ParserRuleContext extends RuleContext {
 	}
 
 	@Override
-	public List<? extends ParseTree> getChildren() {
+	public List<ParseTree> getChildren() {
 		return children;
 	}
 

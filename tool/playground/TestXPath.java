@@ -24,15 +24,17 @@ public class TestXPath {
 //		XPath p = new XPath(parser, "//blockStatement");
 //		XPath p = new XPath(parser, "//StringLiteral");
 //		XPath p = new XPath(parser, "//Identifier");
-		XPath p = new XPath(parser, "//expression/primary/Identifier");
-		for (ParseTree t : p.evaluate(tree) ) {
+//		XPath p = new XPath(parser, "//expression/primary/Identifier");
+//		XPath p = new XPath(parser, "//primary/*");
+		XPath p = new XPath(parser, "//expression//Identifier");
+		for (ParseTree t : tree.findAll(parser, "//expression//Identifier") ) {
 			if ( t instanceof RuleContext ) {
 				RuleContext r = (RuleContext)t;
-				System.out.println("  "+parser.ruleNames[r.getRuleIndex()]);
+				System.out.println("  "+parser.getRuleNames()[r.getRuleIndex()]);
 			}
 			else {
 				TerminalNode token = (TerminalNode)t;
-				System.out.println(token.getText());
+				System.out.println("  "+token.getText());
 			}
 		}
 

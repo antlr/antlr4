@@ -34,6 +34,7 @@ import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 
+import java.util.Collection;
 import java.util.List;
 
 /** An interface to access the tree of {@link RuleContext} objects created
@@ -53,19 +54,21 @@ public interface ParseTree extends SyntaxTree {
 	/** Return ordered list of all children of this node; redefine to
 	 *  refine type.
 	 */
-	List<? extends ParseTree> getChildren();
+	List<ParseTree> getChildren();
 
 	/** The {@link ParseTreeVisitor} needs a double dispatch method. */
-	public <T> T accept(ParseTreeVisitor<? extends T> visitor);
+	<T> T accept(ParseTreeVisitor<? extends T> visitor);
+
+	Collection<ParseTree> findAll(Parser parser, String xpath);
 
 	/** Return the combined text of all leaf nodes. Does not get any
 	 *  off-channel tokens (if any) so won't return whitespace and
 	 *  comments if they are sent to parser on hidden channel.
 	 */
-	public String getText();
+	String getText();
 
 	/** Specialize toStringTree so that it can print out more information
 	 * 	based upon the parser.
 	 */
-	public String toStringTree(Parser parser);
+	String toStringTree(Parser parser);
 }

@@ -42,6 +42,7 @@ import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenSource;
@@ -57,6 +58,8 @@ import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DOTGenerator;
@@ -64,7 +67,11 @@ import org.antlr.v4.tool.DefaultToolListener;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.tool.Rule;
 import org.junit.Before;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
@@ -73,10 +80,6 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
-import org.antlr.v4.tool.Rule;
-import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -87,6 +90,8 @@ import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
+import java.io.StringReader;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -104,7 +109,11 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public abstract class BaseTest {
 	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
@@ -476,6 +485,69 @@ public abstract class BaseTest {
 			System.err.println(stderrDuringParse);
 		}
 		return output;
+	}
+
+	public ParseTree execParser(String startRuleName, String input,
+								String parserName, String lexerName)
+		throws Exception
+	{
+		Pair<Parser, Lexer> pl = getParserAndLexer(input, parserName, lexerName);
+		Parser parser = pl.a;
+		return execStartRule(startRuleName, parser);
+	}
+
+	public ParseTree execStartRule(String startRuleName, Parser parser)
+		throws IllegalAccessException, InvocationTargetException,
+			   NoSuchMethodException
+	{
+		Method startRule = null;
+		Object[] args = null;
+		try {
+			startRule = parser.getClass().getMethod(startRuleName);
+		}
+		catch (NoSuchMethodException nsme) {
+			// try with int _p arg for recursive func
+			startRule = parser.getClass().getMethod(startRuleName, int.class);
+			args = new Integer[] {0};
+		}
+		ParseTree result = (ParseTree)startRule.invoke(parser, args);
+		System.out.println("parse tree = "+result.toStringTree(parser));
+		return result;
+	}
+
+	public Pair<Parser, Lexer> getParserAndLexer(String input,
+												 String parserName, String lexerName)
+		throws Exception
+	{
+		final Class<? extends Lexer> lexerClass = loadLexerClassFromTempDir(lexerName);
+		final Class<? extends Parser> parserClass = loadParserClassFromTempDir(parserName);
+
+		ANTLRInputStream in = new ANTLRInputStream(new StringReader(input));
+
+		Class<? extends Lexer> c = lexerClass.asSubclass(Lexer.class);
+		Constructor<? extends Lexer> ctor = c.getConstructor(CharStream.class);
+		Lexer lexer = ctor.newInstance(in);
+
+		Class<? extends Parser> pc = parserClass.asSubclass(Parser.class);
+		Constructor<? extends Parser> pctor = pc.getConstructor(TokenStream.class);
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		Parser parser = pctor.newInstance(tokens);
+		return new Pair<Parser, Lexer>(parser, lexer);
+	}
+
+	public Class<?> loadClassFromTempDir(String name) throws Exception {
+		ClassLoader loader =
+			new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() },
+							   ClassLoader.getSystemClassLoader());
+		return loader.loadClass(name);
+	}
+
+	public Class<? extends Lexer> loadLexerClassFromTempDir(String name) throws Exception {
+		return (Class<? extends Lexer>)loadClassFromTempDir(name);
+	}
+
+	public Class<? extends Parser> loadParserClassFromTempDir(String name) throws Exception {
+		return (Class<? extends Parser>)loadClassFromTempDir(name);
 	}
 
 	protected String execParser(String grammarFileName,

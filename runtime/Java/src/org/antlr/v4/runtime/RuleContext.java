@@ -36,11 +36,13 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.Trees;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
+import org.antlr.v4.runtime.tree.xpath.XPath;
 
 import javax.print.PrintException;
 import javax.swing.*;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -151,8 +153,14 @@ public class RuleContext implements RuleNode {
 	}
 
 	@Override
-	public List<? extends ParseTree> getChildren() {
+	public List<ParseTree> getChildren() {
 		return null;
+	}
+
+	@Override
+	public Collection<ParseTree> findAll(Parser parser, String xpath) {
+		XPath p = new XPath(parser, xpath);
+		return p.evaluate(this);
 	}
 
 	@Override
