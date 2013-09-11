@@ -6,7 +6,9 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,6 +53,8 @@ public class XPath {
 	}
 
 	public XPathElement[] split(String path) {
+		Map<String, Integer> ruleIndexes = toMap(parser.getRuleNames());
+		Map<String, Integer> tokenTypes = toMap(parser.getTokenNames());
 		Pattern pattern = Pattern.compile("//|/|\\w+|\\*");
 		Matcher matcher = pattern.matcher(path);
 		List<String> pathStrings = new ArrayList<String>();
@@ -70,10 +74,26 @@ public class XPath {
 				}
 				String next = pathStrings.get(i);
 				if ( i==1 ) { // "/ID" is rooted element if '/' is first el
-					elements.add(new XPathRootRuleElement(next));
+					if ( next.equals(WILDCARD) ) {
+						elements.add(new XPathRootWildcardElement());
+					}
+					else if ( Character.isUpperCase(next.charAt(0)) ) {
+						elements.add(new XPathRootTokenElement(next, tokenTypes.get(next)));
+					}
+					else {
+						elements.add(new XPathRootRuleElement(next, ruleIndexes.get(next)));
+					}
 				}
 				else {
-					elements.add(new XPathTokenElement(next));
+					if ( next.equals(WILDCARD) ) {
+						elements.add(new XPathWildcardElement());
+					}
+					else if ( Character.isUpperCase(next.charAt(0)) ) {
+						elements.add(new XPathTokenElement(next, tokenTypes.get(next)));
+					}
+					else {
+						elements.add(new XPathRuleElement(next, ruleIndexes.get(next)));
+					}
 				}
 				i++;
 			}
@@ -87,7 +107,12 @@ public class XPath {
 				i++;
 			}
 			else {
-				elements.add(new XPathTokenElement(el));
+				if ( Character.isUpperCase(el.charAt(0)) ) {
+					elements.add(new XPathTokenElement(el, tokenTypes.get(el)));
+				}
+				else {
+					elements.add(new XPathRuleElement(el, ruleIndexes.get(el)));
+				}
 				i++;
 			}
 		}
@@ -99,6 +124,19 @@ public class XPath {
 	 */
 	public Collection<? extends ParseTree> evaluate(ParseTree t) {
 		// do just first for now
-		return elements[0].evaluate(t);
+		Collection<? extends ParseTree> work = elements[0].evaluate(t);
+		int i = 1;
+		for (ParseTree node : work) {
+			Collection<? extends ParseTree> work2 = elements[i].evaluate(node);
+		}
 	}
+
+	public static Map<String, Integer> toMap(String[] keys) {
+		Map<String, Integer> m = new HashMap<String, Integer>();
+		for (int i=0; i<keys.length; i++) {
+			m.put(keys[i], i);
+		}
+		return m;
+	}
+
 }

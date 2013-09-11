@@ -5,8 +5,10 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import java.util.Collection;
 
 public class XPathRuleElement extends XPathElement {
-	public XPathRuleElement(String ruleName) {
+	protected int ruleIndex;
+	public XPathRuleElement(String ruleName, int ruleIndex) {
 		super(ruleName);
+		this.ruleIndex = ruleIndex;
 	}
 
 	@Override

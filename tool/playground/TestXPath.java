@@ -2,6 +2,9 @@ import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.xpath.XPath;
 
 import java.io.IOException;
@@ -17,8 +20,17 @@ public class TestXPath {
 		ParserRuleContext tree = parser.compilationUnit();
 		System.out.println(tree.toStringTree(parser));
 
-		XPath p = new XPath(parser, "/compilationUnit");
-		System.out.println( p.evaluate(tree) );
+		XPath p = new XPath(parser, "/compilationUnit/*");
+		for (ParseTree t : p.evaluate(tree) ) {
+			if ( t instanceof RuleContext ) {
+				RuleContext r = (RuleContext)t;
+				System.out.println(parser.ruleNames[r.getRuleIndex()]);
+			}
+			else {
+				TerminalNode token = (TerminalNode)t;
+				System.out.println(token.getText());
+			}
+		}
 
 //		new XPath("//A/B");
 //		new XPath("/A/B");
