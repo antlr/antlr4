@@ -31,6 +31,8 @@
 package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -42,6 +44,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -165,6 +168,49 @@ public class Trees {
 			t = t.getParent();
 		}
 		return ancestors;
+	}
+
+	public static Collection<ParseTree> findAllTokenNodes(ParseTree t, int ttype) {
+		return findAllNodes(t, ttype, true);
+	}
+
+	public static Collection<ParseTree> findAllRuleNodes(ParseTree t, int ruleIndex) {
+		return findAllNodes(t, ruleIndex, false);
+	}
+
+	public static List<ParseTree> findAllNodes(ParseTree t, int index, boolean findTokens) {
+		List<? super ParseTree> nodes = new ArrayList<ParseTree>();
+		_findAllNodes(t, index, findTokens, nodes);
+		return (List<ParseTree>)nodes;
+	}
+
+	public static void _findAllNodes(ParseTree t, int index, boolean findTokens,
+									 List<? super ParseTree> nodes)
+	{
+		// check this node (the root) first
+		if ( t instanceof TerminalNode ) {
+			TerminalNode tnode = (TerminalNode)t;
+			if ( tnode.getSymbol().getType()==index ) nodes.add(t);
+		}
+		else {
+			ParserRuleContext ctx = (ParserRuleContext)t;
+			if ( ctx.getRuleIndex() == index ) nodes.add(t);
+		}
+		// check children
+		for (int i = 0; i < t.getChildCount(); i++){
+			_findAllNodes(t.getChild(i), index, findTokens, nodes);
+		}
+	}
+
+	public static List<Tree> descendants(ParseTree t){
+		List<Tree> nodes = new ArrayList<Tree>();
+		nodes.add(t);
+
+		int n = t.getChildCount();
+		for (int i = 0 ; i < n ; i++){
+			nodes.addAll(descendants(t.getChild(i)));
+		}
+		return nodes;
 	}
 
 	private Trees() {

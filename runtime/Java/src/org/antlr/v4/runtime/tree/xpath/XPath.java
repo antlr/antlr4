@@ -1,6 +1,7 @@
 package org.antlr.v4.runtime.tree.xpath;
 
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.ArrayList;
@@ -52,6 +53,8 @@ public class XPath {
 		System.out.println(Arrays.toString(elements));
 	}
 
+	// TODO: check for invalid token/rule names, bad syntax
+
 	public XPathElement[] split(String path) {
 		Map<String, Integer> ruleIndexes = toMap(parser.getRuleNames());
 		Map<String, Integer> tokenTypes = toMap(parser.getTokenNames());
@@ -73,27 +76,14 @@ public class XPath {
 					System.out.println("missing element name after operator");
 				}
 				String next = pathStrings.get(i);
-				if ( i==1 ) { // "/ID" is rooted element if '/' is first el
-					if ( next.equals(WILDCARD) ) {
-						elements.add(new XPathRootWildcardElement());
-					}
-					else if ( Character.isUpperCase(next.charAt(0)) ) {
-						elements.add(new XPathRootTokenElement(next, tokenTypes.get(next)));
-					}
-					else {
-						elements.add(new XPathRootRuleElement(next, ruleIndexes.get(next)));
-					}
+				if ( next.equals(WILDCARD) ) {
+					elements.add(new XPathWildcardElement());
+				}
+				else if ( Character.isUpperCase(next.charAt(0)) ) {
+					elements.add(new XPathTokenElement(next, tokenTypes.get(next)));
 				}
 				else {
-					if ( next.equals(WILDCARD) ) {
-						elements.add(new XPathWildcardElement());
-					}
-					else if ( Character.isUpperCase(next.charAt(0)) ) {
-						elements.add(new XPathTokenElement(next, tokenTypes.get(next)));
-					}
-					else {
-						elements.add(new XPathRuleElement(next, ruleIndexes.get(next)));
-					}
+					elements.add(new XPathRuleElement(next, ruleIndexes.get(next)));
 				}
 				i++;
 			}
@@ -103,7 +93,12 @@ public class XPath {
 					System.out.println("missing element name after operator");
 				}
 				String next = pathStrings.get(i);
-				elements.add(new XPathAnywhereElement(next));
+				if ( Character.isUpperCase(next.charAt(0)) ) {
+					elements.add(new XPathTokenAnywhereElement(next, tokenTypes.get(next)));
+				}
+				else {
+					elements.add(new XPathRuleAnywhereElement(next, ruleIndexes.get(next)));
+				}
 				i++;
 			}
 			else {
@@ -122,13 +117,25 @@ public class XPath {
 	// following java xpath like methods; not sure it's best way
 	/** Return a list of all nodes starting at t as root that satisfy the path.
 	 */
-	public Collection<? extends ParseTree> evaluate(ParseTree t) {
-		// do just first for now
-		Collection<? extends ParseTree> work = elements[0].evaluate(t);
-		int i = 1;
-		for (ParseTree node : work) {
-			Collection<? extends ParseTree> work2 = elements[i].evaluate(node);
+	public Collection<ParseTree> evaluate(final ParseTree t) {
+		ParserRuleContext dummyRoot = new ParserRuleContext();
+		dummyRoot.children = new ArrayList<ParseTree>() {{add(t);}}; // don't set t's parent.
+
+		Collection<ParseTree> work = new ArrayList<ParseTree>();
+		work.add(dummyRoot);
+
+		int i = 0;
+		while ( i < elements.length ) {
+			Collection<ParseTree> next = new ArrayList<ParseTree>();
+			for (ParseTree node : work) {
+				Collection<? extends ParseTree> matching = elements[i].evaluate(node);
+				next.addAll(matching);
+			}
+			i++;
+			work = next;
 		}
+
+		return work;
 	}
 
 	public static Map<String, Integer> toMap(String[] keys) {

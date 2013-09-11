@@ -1,5 +1,14 @@
 ANTLR v4 Honey Badger
 
+September 11, 2013
+
+* Copy lots of find node stuff from v3 GrammarAST to Trees class in runtime.
+
+September 10, 2013
+
+* Add getChildren to ParseTree [BREAKING CHANGE]
+* Adding in XPath stuff.
+
 August 31, 2013
 
 * Lots of little fixes thanks to Coverity Scan

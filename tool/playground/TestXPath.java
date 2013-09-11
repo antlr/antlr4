@@ -20,11 +20,15 @@ public class TestXPath {
 		ParserRuleContext tree = parser.compilationUnit();
 		System.out.println(tree.toStringTree(parser));
 
-		XPath p = new XPath(parser, "/compilationUnit/*");
+//		XPath p = new XPath(parser, "/compilationUnit/*");
+//		XPath p = new XPath(parser, "//blockStatement");
+//		XPath p = new XPath(parser, "//StringLiteral");
+//		XPath p = new XPath(parser, "//Identifier");
+		XPath p = new XPath(parser, "//expression/primary/Identifier");
 		for (ParseTree t : p.evaluate(tree) ) {
 			if ( t instanceof RuleContext ) {
 				RuleContext r = (RuleContext)t;
-				System.out.println(parser.ruleNames[r.getRuleIndex()]);
+				System.out.println("  "+parser.ruleNames[r.getRuleIndex()]);
 			}
 			else {
 				TerminalNode token = (TerminalNode)t;

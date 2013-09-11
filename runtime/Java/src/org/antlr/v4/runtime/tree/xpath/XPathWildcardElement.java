@@ -11,7 +11,7 @@ public class XPathWildcardElement extends XPathElement {
 	}
 
 	@Override
-	public Collection<? extends ParseTree> evaluate(final ParseTree t) {
-		return new ArrayList<ParseTree>() {{add(t);}};
+	public Collection<ParseTree> evaluate(final ParseTree t) {
+		return new ArrayList<ParseTree>() {{addAll(t.getChildren());}};
 	}
 }

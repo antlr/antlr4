@@ -15,7 +15,7 @@ public abstract class XPathElement {
 	}
 
 	/** Given tree rooted at t return all nodes matched by this path element */
-	public abstract Collection<? extends ParseTree> evaluate(ParseTree t);
+	public abstract Collection<ParseTree> evaluate(ParseTree t);
 
 	@Override
 	public String toString() {

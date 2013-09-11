@@ -1,6 +1,7 @@
 package org.antlr.v4.runtime.tree.xpath;
 
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,12 +15,15 @@ public class XPathTokenElement extends XPathElement {
 	}
 
 	@Override
-	public Collection<? extends ParseTree> evaluate(ParseTree t) {
+	public Collection<ParseTree> evaluate(ParseTree t) {
 		// return all children of t that match nodeName
 		List<ParseTree> nodes = new ArrayList<ParseTree>();
 		for (ParseTree c : t.getChildren()) {
-			if ( c.getText().equals(nodeName) ) {
-				nodes.add(c);
+			if ( c instanceof TerminalNode ) {
+				TerminalNode tnode = (TerminalNode)c;
+				if ( tnode.getSymbol().getType() == tokenType ) {
+					nodes.add(c);
+				}
 			}
 		}
 		return nodes;
