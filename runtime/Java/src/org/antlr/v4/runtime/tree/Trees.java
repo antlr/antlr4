@@ -32,7 +32,6 @@ package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -188,11 +187,11 @@ public class Trees {
 									 List<? super ParseTree> nodes)
 	{
 		// check this node (the root) first
-		if ( t instanceof TerminalNode ) {
+		if ( findTokens && t instanceof TerminalNode ) {
 			TerminalNode tnode = (TerminalNode)t;
 			if ( tnode.getSymbol().getType()==index ) nodes.add(t);
 		}
-		else {
+		else if ( !findTokens && t instanceof ParserRuleContext ) {
 			ParserRuleContext ctx = (ParserRuleContext)t;
 			if ( ctx.getRuleIndex() == index ) nodes.add(t);
 		}
@@ -202,8 +201,8 @@ public class Trees {
 		}
 	}
 
-	public static List<Tree> descendants(ParseTree t){
-		List<Tree> nodes = new ArrayList<Tree>();
+	public static List<ParseTree> descendants(ParseTree t){
+		List<ParseTree> nodes = new ArrayList<ParseTree>();
 		nodes.add(t);
 
 		int n = t.getChildCount();

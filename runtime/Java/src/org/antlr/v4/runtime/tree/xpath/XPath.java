@@ -20,22 +20,7 @@ import java.util.regex.Pattern;
  *  At each separator-word pair, find set of nodes. Next stage uses those as
  *  work list.
  *
- *  //ID					all IDs anywhere
- *  /ID					an ID node if at root
- *  /classdef/field		all field children of classdef at root.
- *  ID					INVALID (must have // in front or /)
- *  //classdef//funcdef	all funcs under classdef somewhere
- *  //classdef/*			all children of classdefs anywhere in tree
- *  *					INVALID
- *  /*					root node
- *  //*					every node
- *  /*slash*			All children of root
- *  /* slash *			INVALID
- *
- * these are all the same: returns t if t is classdef root node
- *  [9/10/13 6:35:13 PM] Terence Parr: eval(t, "classdef")
- [9/10/13 6:35:45 PM] Terence Parr: eval(t, "/classdef")
- [9/10/13 6:36:44 PM] Terence Parr: eval(t, "/*")
+ * See TestXPath
  *
  *  The "root" is relative to the node passed to evaluate().
  */
@@ -58,7 +43,7 @@ public class XPath {
 	public XPathElement[] split(String path) {
 		Map<String, Integer> ruleIndexes = toMap(parser.getRuleNames());
 		Map<String, Integer> tokenTypes = toMap(parser.getTokenNames());
-		Pattern pattern = Pattern.compile("//|/|\\w+|\\*");
+		Pattern pattern = Pattern.compile("//|/|\\w+|'.+?'|\\*"); // TODO: handle escapes in strings?
 		Matcher matcher = pattern.matcher(path);
 		List<String> pathStrings = new ArrayList<String>();
 		while (matcher.find()) {
@@ -79,7 +64,7 @@ public class XPath {
 				if ( next.equals(WILDCARD) ) {
 					elements.add(new XPathWildcardElement());
 				}
-				else if ( Character.isUpperCase(next.charAt(0)) ) {
+				else if ( next.charAt(0)=='\'' || Character.isUpperCase(next.charAt(0)) ) {
 					elements.add(new XPathTokenElement(next, tokenTypes.get(next)));
 				}
 				else {
@@ -93,7 +78,10 @@ public class XPath {
 					System.out.println("missing element name after operator");
 				}
 				String next = pathStrings.get(i);
-				if ( Character.isUpperCase(next.charAt(0)) ) {
+				if ( next.equals(WILDCARD) ) {
+					elements.add(new XPathWildcardAnywhereElement());
+				}
+				else if ( next.charAt(0)=='\'' || Character.isUpperCase(next.charAt(0)) ) {
 					elements.add(new XPathTokenAnywhereElement(next, tokenTypes.get(next)));
 				}
 				else {
@@ -102,7 +90,10 @@ public class XPath {
 				i++;
 			}
 			else {
-				if ( Character.isUpperCase(el.charAt(0)) ) {
+				if ( el.equals(WILDCARD) ) {
+					elements.add(new XPathWildcardElement());
+				}
+				else if ( el.charAt(0)=='\'' || Character.isUpperCase(el.charAt(0)) ) {
 					elements.add(new XPathTokenElement(el, tokenTypes.get(el)));
 				}
 				else {
@@ -128,8 +119,13 @@ public class XPath {
 		while ( i < elements.length ) {
 			Collection<ParseTree> next = new ArrayList<ParseTree>();
 			for (ParseTree node : work) {
-				Collection<? extends ParseTree> matching = elements[i].evaluate(node);
-				next.addAll(matching);
+				if ( node.getChildCount()>0 ) {
+					// only try to match next element if it has children
+					// e.g., //func/*/stat might have a token node for which
+					// we can't go looking for stat nodes.
+					Collection<? extends ParseTree> matching = elements[i].evaluate(node);
+					next.addAll(matching);
+				}
 			}
 			i++;
 			work = next;

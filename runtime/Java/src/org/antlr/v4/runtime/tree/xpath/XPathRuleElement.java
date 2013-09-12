@@ -18,6 +18,9 @@ public class XPathRuleElement extends XPathElement {
 	public Collection<ParseTree> evaluate(ParseTree t) {
 				// return all children of t that match nodeName
 		List<ParseTree> nodes = new ArrayList<ParseTree>();
+		if ( t.getChildren()==null) {
+			System.out.println();
+		}
 		for (ParseTree c : t.getChildren()) {
 			if ( c instanceof ParserRuleContext ) {
 				ParserRuleContext ctx = (ParserRuleContext)c;
