@@ -5,7 +5,8 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import java.util.Collection;
 
 public abstract class XPathElement {
-	public String nodeName;
+	protected String nodeName;
+	protected boolean invert;
 
 	/** Construct element like /ID or or ID or "/*" etc...
 	 *  op is null if just node
@@ -19,6 +20,7 @@ public abstract class XPathElement {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+"["+nodeName+"]";
+		String inv = invert ? "!" : "";
+		return getClass().getSimpleName()+"["+inv+nodeName+"]";
 	}
 }

@@ -12,6 +12,7 @@ public class XPathWildcardElement extends XPathElement {
 
 	@Override
 	public Collection<ParseTree> evaluate(final ParseTree t) {
+		if ( invert ) return new ArrayList<ParseTree>(); // !* is weird but valid (empty)
 		return new ArrayList<ParseTree>() {{addAll(t.getChildren());}};
 	}
 }

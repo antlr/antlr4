@@ -2,6 +2,11 @@ ANTLR v4 Honey Badger
 
 September 11, 2013
 
+* Add ! operator to XPath
+* Use ANTLR v4 XPathLexer.g4 not regex
+
+September 11, 2013
+
 * Copy lots of find node stuff from v3 GrammarAST to Trees class in runtime.
 * Add to ParseTree [BREAKING CHANGE]:
 	Collection<ParseTree> findAll(String xpath);

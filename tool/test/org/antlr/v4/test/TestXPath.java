@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class TestXPath extends BaseTest {
@@ -45,9 +46,10 @@ public class TestXPath extends BaseTest {
 		"NEWLINE:'\\r'? '\\n' -> skip;     // return newlines to parser (is end-statement signal)\n" +
 		"WS  :   [ \\t]+ -> skip ; // toss out whitespace\n";
 
-	@Test public void test() throws Exception {
+	@Test public void testValidPaths() throws Exception {
 		boolean ok =
-			rawGenerateAndBuildRecognizer("Expr.g4", grammar, "ExprParser", "ExprLexer", false);
+			rawGenerateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
+										  "ExprLexer", false);
 		assertTrue(ok);
 
 		String input =
@@ -68,7 +70,11 @@ public class TestXPath extends BaseTest {
 			"//primary/*",		// all kids of any primary
 			"//func/*/stat",	// all stat nodes grandkids of any func node
 			"/prog/func/'def'",	// all def literal kids of func kid of prog
-			"//stat/';'"		// all ';' under any stat node
+			"//stat/';'",		// all ';' under any stat node
+			"//expr/primary/!ID",	// anything but ID under primary under any expr node
+			"//expr/!primary",	// anything but primary under any expr node
+			"//!*",				// nothing anywhere
+			"/!*",				// nothing at root
 		};
 		String expected[] = {
 			"[func, func]",
@@ -85,7 +91,11 @@ public class TestXPath extends BaseTest {
 			"[3, 4, y, 1, 2, x]",
 			"[stat, stat, stat, stat]",
 			"[def, def]",
-			"[;, ;, ;, ;]"
+			"[;, ;, ;, ;]",
+			"[3, 4, 1, 2]",
+			"[expr, expr, expr, expr, expr, expr]",
+			"[]",
+			"[]",
 		};
 
 		for (int i=0; i<xpath.length; i++) {
@@ -93,6 +103,116 @@ public class TestXPath extends BaseTest {
 			String result = nodes.toString();
 			assertEquals("path "+xpath[i]+" failed", expected[i], result);
 		}
+	}
+
+	@Test public void testWeirdChar() throws Exception {
+		boolean ok =
+			rawGenerateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
+										  "ExprLexer", false);
+		assertTrue(ok);
+
+		String input =
+			"def f(x,y) { x = 3+4; y; ; }\n" +
+			"def g(x) { return 1+2*x; }\n";
+		String path = "&";
+		String expected = "Invalid tokens or characters at index 0 in path '&'";
+
+		testError(input, path, expected, "prog", "ExprParser", "ExprLexer");
+	}
+
+	@Test public void testWeirdChar2() throws Exception {
+		boolean ok =
+			rawGenerateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
+										  "ExprLexer", false);
+		assertTrue(ok);
+
+		String input =
+			"def f(x,y) { x = 3+4; y; ; }\n" +
+			"def g(x) { return 1+2*x; }\n";
+		String path = "//w&e/";
+		String expected = "Invalid tokens or characters at index 3 in path '//w&e/'";
+
+		testError(input, path, expected, "prog", "ExprParser", "ExprLexer");
+	}
+
+	@Test public void testBadSyntax() throws Exception {
+		boolean ok =
+			rawGenerateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
+										  "ExprLexer", false);
+		assertTrue(ok);
+
+		String input =
+			"def f(x,y) { x = 3+4; y; ; }\n" +
+			"def g(x) { return 1+2*x; }\n";
+		String path = "///";
+		String expected = "/ at index 2 isn't a valid rule name";
+
+		testError(input, path, expected, "prog", "ExprParser", "ExprLexer");
+	}
+
+	@Test public void testMissingWordAtEnd() throws Exception {
+		boolean ok =
+			rawGenerateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
+										  "ExprLexer", false);
+		assertTrue(ok);
+
+		String input =
+			"def f(x,y) { x = 3+4; y; ; }\n" +
+			"def g(x) { return 1+2*x; }\n";
+		String path = "//";
+		String expected = "Missing path element at end of path";
+
+		testError(input, path, expected, "prog", "ExprParser", "ExprLexer");
+	}
+
+	@Test public void testBadTokenName() throws Exception {
+		boolean ok =
+			rawGenerateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
+										  "ExprLexer", false);
+		assertTrue(ok);
+
+		String input =
+			"def f(x,y) { x = 3+4; y; ; }\n" +
+			"def g(x) { return 1+2*x; }\n";
+		String path = "//Ick";
+		String expected = "Ick at index 2 isn't a valid token name";
+
+		testError(input, path, expected, "prog", "ExprParser", "ExprLexer");
+	}
+
+	@Test public void testBadRuleName() throws Exception {
+		boolean ok =
+			rawGenerateAndBuildRecognizer("Expr.g4", grammar, "ExprParser",
+										  "ExprLexer", false);
+		assertTrue(ok);
+
+		String input =
+			"def f(x,y) { x = 3+4; y; ; }\n" +
+			"def g(x) { return 1+2*x; }\n";
+		String path = "/prog/ick";
+		String expected = "ick at index 6 isn't a valid rule name";
+
+		testError(input, path, expected, "prog", "ExprParser", "ExprLexer");
+	}
+
+	protected void testError(String input, String path, String expected,
+							 String startRuleName,
+							 String parserName, String lexerName)
+		throws Exception
+	{
+		Pair<Parser, Lexer> pl = getParserAndLexer(input, parserName, lexerName);
+		Parser parser = pl.a;
+		ParseTree tree = execStartRule(startRuleName, parser);
+
+		IllegalArgumentException e = null;
+		try {
+			tree.findAll(parser, path);
+		}
+		catch (IllegalArgumentException iae) {
+			e = iae;
+		}
+		assertNotNull(e);
+		assertEquals(expected, e.getMessage());
 	}
 
 	public List<String> getNodeStrings(String input, String xpath,

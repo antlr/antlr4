@@ -511,7 +511,7 @@ public abstract class BaseTest {
 			args = new Integer[] {0};
 		}
 		ParseTree result = (ParseTree)startRule.invoke(parser, args);
-		System.out.println("parse tree = "+result.toStringTree(parser));
+//		System.out.println("parse tree = "+result.toStringTree(parser));
 		return result;
 	}
 

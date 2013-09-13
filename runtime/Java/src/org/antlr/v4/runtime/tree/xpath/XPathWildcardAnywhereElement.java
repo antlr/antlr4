@@ -3,6 +3,7 @@ package org.antlr.v4.runtime.tree.xpath;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.Trees;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class XPathWildcardAnywhereElement extends XPathElement {
@@ -12,6 +13,7 @@ public class XPathWildcardAnywhereElement extends XPathElement {
 
 	@Override
 	public Collection<ParseTree> evaluate(ParseTree t) {
+		if ( invert ) return new ArrayList<ParseTree>(); // !* is weird but valid (empty)
 		return Trees.descendants(t);
 	}
 }
