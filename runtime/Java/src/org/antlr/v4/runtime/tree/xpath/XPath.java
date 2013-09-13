@@ -110,7 +110,6 @@ loop:
 					pathElement.invert = invert;
 					elements.add(pathElement);
 					i++;
-				//case XPathLexer.BANG :
 					break;
 
 				case XPathLexer.TOKEN_REF :
