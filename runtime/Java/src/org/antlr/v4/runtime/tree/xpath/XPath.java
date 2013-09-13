@@ -41,8 +41,6 @@ public class XPath {
 	// TODO: check for invalid token/rule names, bad syntax
 
 	public XPathElement[] split(String path) {
-		Map<String, Integer> ruleIndexes = toMap(parser.getRuleNames());
-		Map<String, Integer> tokenTypes = toMap(parser.getTokenNames());
 		Pattern pattern = Pattern.compile("//|/|\\w+|'.+?'|\\*"); // TODO: handle escapes in strings?
 		Matcher matcher = pattern.matcher(path);
 		List<String> pathStrings = new ArrayList<String>();
@@ -55,54 +53,42 @@ public class XPath {
 		int i=0;
 		while ( i<n ) {
 			String el = pathStrings.get(i);
-			if ( el.equals("/") ) {
+			if ( el.startsWith("/") ) {
 				i++;
 				if ( i>=n ) {
 					System.out.println("missing element name after operator");
 				}
 				String next = pathStrings.get(i);
-				if ( next.equals(WILDCARD) ) {
-					elements.add(new XPathWildcardElement());
-				}
-				else if ( next.charAt(0)=='\'' || Character.isUpperCase(next.charAt(0)) ) {
-					elements.add(new XPathTokenElement(next, tokenTypes.get(next)));
-				}
-				else {
-					elements.add(new XPathRuleElement(next, ruleIndexes.get(next)));
-				}
-				i++;
-			}
-			else if ( el.equals("//") ) {
-				i++;
-				if ( i>=n ) {
-					System.out.println("missing element name after operator");
-				}
-				String next = pathStrings.get(i);
-				if ( next.equals(WILDCARD) ) {
-					elements.add(new XPathWildcardAnywhereElement());
-				}
-				else if ( next.charAt(0)=='\'' || Character.isUpperCase(next.charAt(0)) ) {
-					elements.add(new XPathTokenAnywhereElement(next, tokenTypes.get(next)));
-				}
-				else {
-					elements.add(new XPathRuleAnywhereElement(next, ruleIndexes.get(next)));
-				}
+				boolean anywhere = el.equals("//");
+				elements.add( getXPathElement(next, anywhere) );
 				i++;
 			}
 			else {
-				if ( el.equals(WILDCARD) ) {
-					elements.add(new XPathWildcardElement());
-				}
-				else if ( el.charAt(0)=='\'' || Character.isUpperCase(el.charAt(0)) ) {
-					elements.add(new XPathTokenElement(el, tokenTypes.get(el)));
-				}
-				else {
-					elements.add(new XPathRuleElement(el, ruleIndexes.get(el)));
-				}
+				elements.add( getXPathElement(el, false) );
 				i++;
 			}
 		}
 		return elements.toArray(new XPathElement[0]);
+	}
+
+	public XPathElement getXPathElement(String word, boolean anywhere) {
+		Map<String, Integer> ruleIndexes = toMap(parser.getRuleNames());
+		Map<String, Integer> tokenTypes = toMap(parser.getTokenNames());
+		if ( word.equals(WILDCARD) ) {
+			return anywhere ?
+				new XPathWildcardAnywhereElement() :
+				new XPathWildcardElement();
+		}
+		else if ( word.charAt(0)=='\'' || Character.isUpperCase(word.charAt(0)) ) {
+			return anywhere ?
+				new XPathTokenAnywhereElement(word, tokenTypes.get(word)) :
+				new XPathTokenElement(word, tokenTypes.get(word));
+		}
+		else {
+			return anywhere ?
+				new XPathRuleAnywhereElement(word, ruleIndexes.get(word)) :
+				new XPathRuleElement(word, ruleIndexes.get(word));
+		}
 	}
 
 	// following java xpath like methods; not sure it's best way
