@@ -645,7 +645,7 @@ testShiftInRange(shiftAmount) ::= <<
 
 // produces smaller bytecode only when bits.ttypes contains more than two items
 bitsetBitfieldComparison(s, bits) ::= <%
-(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((1L \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (1L \<\< <offsetShift(ttype, bits.shift)>)}; separator=" | ">)) != 0)
+(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((1L \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (1L \<\< <offsetShift(tokenType.(ttype), bits.shift)>)}; separator=" | ">)) != 0)
 %>
 
 isZero ::= [
@@ -659,11 +659,11 @@ offsetShift(shiftAmount, offset) ::= <%
 
 // produces more efficient bytecode when bits.ttypes contains at most two items
 bitsetInlineComparison(s, bits) ::= <%
-<bits.ttypes:{ttype | <s.varName>==<ttype>}; separator=" || ">
+<bits.ttypes:{ttype | <s.varName>==<tokenType.(ttype)>}; separator=" || ">
 %>
 
 cases(ttypes) ::= <<
-<ttypes:{t | case <t>:}; separator="\n">
+<ttypes:{t | case <tokenType.(t)>:}; separator="\n">
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
@@ -671,7 +671,7 @@ State = <r.stateNumber>; <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><
 >>
 
 MatchToken(m) ::= <<
-State = <m.stateNumber>; <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>Match(<m.name>);
+State = <m.stateNumber>; <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>Match(<tokenType.(m.name)>);
 >>
 
 MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
@@ -716,7 +716,7 @@ LexerSkipCommand()  ::= "Skip();"
 LexerMoreCommand()  ::= "More();"
 LexerPopModeCommand() ::= "PopMode();"
 
-LexerTypeCommand(arg)      ::= "_type = <arg>;"
+LexerTypeCommand(arg)      ::= "_type = <tokenType.(arg)>;"
 LexerChannelCommand(arg)   ::= "_channel = <channelName.(arg)>;"
 LexerModeCommand(arg)      ::= "_mode = <modeName.(arg)>;"
 LexerPushModeCommand(arg)  ::= "PushMode(<modeName.(arg)>);"
@@ -731,7 +731,7 @@ LocalRef(a) ::= "_localctx.<csIdentifier.(a.name)>"
 RetValueRef(a) ::= "_localctx.<csIdentifier.(a.name)>"
 QRetValueRef(a) ::= "<ctx(a)>.<a.dict>.<csIdentifier.(a.name)>"
 /** How to translate $tokenLabel */
-TokenRef(t) ::= "<ctx(t)>.<csIdentifier.(t.name)>"
+TokenRef(t) ::= "<ctx(t)>.<csIdentifier.(tokenType.(t.name))>"
 LabelRef(t) ::= "<ctx(t)>.<csIdentifier.(t.name)>"
 ListLabelRef(t) ::= "<ctx(t)>.<ListLabelName(csIdentifier.(t.name))>"
 SetAttr(s,rhsChunks) ::= "<ctx(s)>.<csIdentifier.(s.name)> = <rhsChunks>;"
@@ -739,13 +739,13 @@ SetAttr(s,rhsChunks) ::= "<ctx(s)>.<csIdentifier.(s.name)> = <rhsChunks>;"
 TokenLabelType() ::= "<file.TokenLabelType; null={IToken}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={IToken}>"
 
-TokenPropertyRef_text(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.Text:null)"
-TokenPropertyRef_type(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.Type:0)"
-TokenPropertyRef_line(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.Line:0)"
-TokenPropertyRef_pos(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.CharPositionInLine:0)"
-TokenPropertyRef_channel(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.Channel:0)"
-TokenPropertyRef_index(t) ::= "(<ctx(t)>.<t.label>!=null?<ctx(t)>.<t.label>.TokenIndex:0)"
-TokenPropertyRef_int(t) ::= "(<ctx(t)>.<t.label>!=null?int.Parse(<ctx(t)>.<t.label>.Text):0)"
+TokenPropertyRef_text(t) ::= "(<ctx(t)>.<tokenType.(t.label)>!=null?<ctx(t)>.<tokenType.(t.label)>.Text:null)"
+TokenPropertyRef_type(t) ::= "(<ctx(t)>.<tokenType.(t.label)>!=null?<ctx(t)>.<tokenType.(t.label)>.Type:0)"
+TokenPropertyRef_line(t) ::= "(<ctx(t)>.<tokenType.(t.label)>!=null?<ctx(t)>.<tokenType.(t.label)>.Line:0)"
+TokenPropertyRef_pos(t) ::= "(<ctx(t)>.<tokenType.(t.label)>!=null?<ctx(t)>.<tokenType.(t.label)>.CharPositionInLine:0)"
+TokenPropertyRef_channel(t) ::= "(<ctx(t)>.<tokenType.(t.label)>!=null?<ctx(t)>.<tokenType.(t.label)>.Channel:0)"
+TokenPropertyRef_index(t) ::= "(<ctx(t)>.<tokenType.(t.label)>!=null?<ctx(t)>.<tokenType.(t.label)>.TokenIndex:0)"
+TokenPropertyRef_int(t) ::= "(<ctx(t)>.<tokenType.(t.label)>!=null?int.Parse(<ctx(t)>.<tokenType.(t.label)>.Text):0)"
 
 RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label>!=null?(<ctx(r)>.<r.label>.start):null)"
 RulePropertyRef_stop(r)	 ::= "(<ctx(r)>.<r.label>!=null?(<ctx(r)>.<r.label>.stop):null)"
@@ -763,9 +763,9 @@ SetNonLocalAttr(s, rhsChunks)	  ::=
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.Add(<labelref(a.label)>);"
 
-TokenDecl(t) ::= "public <TokenLabelType()> <csIdentifier.(t.name)>;"
-TokenTypeDecl(t) ::= "int <csIdentifier.(t.name)>;"
-TokenListDecl(t) ::= "public IList\<IToken> <csIdentifier.(t.name)> = new List\<IToken>();"
+TokenDecl(t) ::= "public <TokenLabelType()> <csIdentifier.(tokenType.(t.name))>;"
+TokenTypeDecl(t) ::= "int <csIdentifier.(tokenType.(t.name))>;"
+TokenListDecl(t) ::= "public IList\<IToken> <csIdentifier.(tokenType.(t.name))> = new List\<IToken>();"
 RuleContextDecl(r) ::= "public <r.ctxName> <csIdentifier.(r.name)>;"
 RuleContextListDecl(rdecl) ::= "public IList\<<rdecl.ctxName>> <csIdentifier.(rdecl.name)> = new List\<<rdecl.ctxName>>();"
 
@@ -774,13 +774,13 @@ contextGetterCollection(elementType) ::= <%
 %>
 
 ContextTokenGetterDecl(t)      ::=
-    "public ITerminalNode <csIdentifier.(t.name)>() { return GetToken(<csIdentifier.(parser.name)>.<csIdentifier.(t.name)>, 0); }"
+    "public ITerminalNode <csIdentifier.(tokenType.(t.name))>() { return GetToken(<csIdentifier.(parser.name)>.<csIdentifier.(tokenType.(t.name))>, 0); }"
 ContextTokenListGetterDecl(t)  ::= <<
-public <contextGetterCollection("ITerminalNode")> <csIdentifier.(t.name)>() { return GetTokens(<csIdentifier.(parser.name)>.<csIdentifier.(t.name)>); }
+public <contextGetterCollection("ITerminalNode")> <csIdentifier.(tokenType.(t.name))>() { return GetTokens(<csIdentifier.(parser.name)>.<csIdentifier.(tokenType.(t.name))>); }
 >>
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-public ITerminalNode <csIdentifier.(t.name)>(int i) {
-	return GetToken(<csIdentifier.(parser.name)>.<csIdentifier.(t.name)>, i);
+public ITerminalNode <csIdentifier.(tokenType.(t.name))>(int i) {
+	return GetToken(<csIdentifier.(parser.name)>.<csIdentifier.(tokenType.(t.name))>, i);
 }
 >>
 ContextRuleGetterDecl(r)       ::= <<
@@ -806,7 +806,7 @@ LexerRuleContext() ::= "RuleContext"
  */
 RuleContextNameSuffix() ::= "Context"
 
-ImplicitTokenLabel(tokenName) ::= "_<tokenName>"
+ImplicitTokenLabel(tokenName) ::= "_<tokenType.(tokenName)>"
 ImplicitRuleLabel(ruleName)	  ::= "_<ruleName>"
 ImplicitSetLabel(id)		  ::= "_tset<id>"
 ListLabelName(label)		  ::= "_<label>"
@@ -924,7 +924,7 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 [System.CLSCompliant(false)]
 public <if(lexer.abstractRecognizer)>abstract <endif>partial class <csIdentifier.(lexer.name)> : <superClass> {
 	public const int
-		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
+		<lexer.tokens:{k | <tokenType.(k)>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<rest(lexer.modes):{m| public const int <modeName.(m)> = <i>;}; separator="\n">
 	public static string[] modeNames = {
 		<lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor>
@@ -981,6 +981,11 @@ modeName ::= [
 channelName ::= [
 	"HIDDEN" : "Hidden",
 	"DEFAULT_TOKEN_CHANNEL" : "DefaultTokenChannel",
+	default : key
+]
+
+tokenType ::= [
+	"EOF" : "Eof",
 	default : key
 ]
 
