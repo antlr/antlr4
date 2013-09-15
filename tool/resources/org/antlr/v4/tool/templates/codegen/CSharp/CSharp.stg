@@ -718,8 +718,8 @@ LexerPopModeCommand() ::= "PopMode();"
 
 LexerTypeCommand(arg)      ::= "_type = <arg>;"
 LexerChannelCommand(arg)   ::= "_channel = <arg>;"
-LexerModeCommand(arg)      ::= "_mode = <arg>;"
-LexerPushModeCommand(arg)  ::= "PushMode(<arg>);"
+LexerModeCommand(arg)      ::= "_mode = <modeName.(arg)>;"
+LexerPushModeCommand(arg)  ::= "PushMode(<modeName.(arg)>);"
 
 DefaultParserSuperClass(s) ::= "Parser"
 DefaultLexerSuperClass(s)  ::= "Lexer"
@@ -925,7 +925,7 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 public <if(lexer.abstractRecognizer)>abstract <endif>partial class <csIdentifier.(lexer.name)> : <superClass> {
 	public const int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
-	<rest(lexer.modes):{m| public const int <m> = <i>;}; separator="\n">
+	<rest(lexer.modes):{m| public const int <modeName.(m)> = <i>;}; separator="\n">
 	public static string[] modeNames = {
 		<lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor>
 	};
@@ -972,6 +972,11 @@ default(<typeName>)
 >>
 
 codeFileExtension() ::= ".cs"
+
+modeName ::= [
+	"DEFAULT_MODE" : "DefaultMode",
+	default : key
+]
 
 csIdentifier ::= [
 	"abstract" : "@abstract",
