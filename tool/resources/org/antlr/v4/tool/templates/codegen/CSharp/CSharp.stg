@@ -717,7 +717,7 @@ LexerMoreCommand()  ::= "More();"
 LexerPopModeCommand() ::= "PopMode();"
 
 LexerTypeCommand(arg)      ::= "_type = <arg>;"
-LexerChannelCommand(arg)   ::= "_channel = <arg>;"
+LexerChannelCommand(arg)   ::= "_channel = <channelName.(arg)>;"
 LexerModeCommand(arg)      ::= "_mode = <modeName.(arg)>;"
 LexerPushModeCommand(arg)  ::= "PushMode(<modeName.(arg)>);"
 
@@ -975,6 +975,12 @@ codeFileExtension() ::= ".cs"
 
 modeName ::= [
 	"DEFAULT_MODE" : "DefaultMode",
+	default : key
+]
+
+channelName ::= [
+	"HIDDEN" : "Hidden",
+	"DEFAULT_TOKEN_CHANNEL" : "DefaultTokenChannel",
 	default : key
 ]
 
