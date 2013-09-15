@@ -128,7 +128,7 @@ namespace Antlr4.Runtime
         /// </remarks>
         protected internal int currentCharIndex = 0;
 
-        protected internal StreamReader input;
+        protected internal TextReader input;
 
         /// <summary>The name or source of this char stream.</summary>
         /// <remarks>The name or source of this char stream.</remarks>
@@ -152,7 +152,7 @@ namespace Antlr4.Runtime
         {
         }
 
-        public UnbufferedCharStream(StreamReader input) : this(input, 256)
+        public UnbufferedCharStream(TextReader input) : this(input, 256)
         {
         }
 
@@ -162,7 +162,7 @@ namespace Antlr4.Runtime
             Fill(1);
         }
 
-        public UnbufferedCharStream(StreamReader input, int bufferSize) : this(bufferSize
+        public UnbufferedCharStream(TextReader input, int bufferSize) : this(bufferSize
             )
         {
             // prime

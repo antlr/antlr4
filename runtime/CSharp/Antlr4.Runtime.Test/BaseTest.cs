@@ -11,7 +11,6 @@
     using File = System.IO.File;
     using IOException = System.IO.IOException;
     using Path = System.IO.Path;
-    using StreamReader = System.IO.StreamReader;
     using TextReader = System.IO.TextReader;
     using Thread = System.Threading.Thread;
 
@@ -736,7 +735,7 @@
             private readonly TextReader @in;
             private Thread sucker;
 
-            public StreamVacuum(StreamReader @in)
+            public StreamVacuum(TextReader @in)
             {
                 this.@in = @in;
             }
