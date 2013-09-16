@@ -5,7 +5,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.antlr.v4.runtime.tree.xpath.XPath;
 
 import java.io.IOException;
 
@@ -20,13 +19,13 @@ public class TestXPath {
 		ParserRuleContext tree = parser.compilationUnit();
 		System.out.println(tree.toStringTree(parser));
 
-//		XPath p = new XPath(parser, "/compilationUnit/*");
-//		XPath p = new XPath(parser, "//blockStatement");
-//		XPath p = new XPath(parser, "//StringLiteral");
-//		XPath p = new XPath(parser, "//Identifier");
-//		XPath p = new XPath(parser, "//expression/primary/Identifier");
-//		XPath p = new XPath(parser, "//primary/*");
-		XPath p = new XPath(parser, "//expression//Identifier");
+//		"/compilationUnit/*"
+//		"//blockStatement"
+//		"//StringLiteral"
+//		"//Identifier"
+//		"//expression/primary/Identifier"
+//		"//primary/*"
+//		"//expression//Identifier"
 		for (ParseTree t : tree.findAll(parser, "//expression//Identifier") ) {
 			if ( t instanceof RuleContext ) {
 				RuleContext r = (RuleContext)t;
@@ -37,20 +36,6 @@ public class TestXPath {
 				System.out.println("  "+token.getText());
 			}
 		}
-
-//		new XPath("//A/B");
-//		new XPath("/A/B");
-//		new XPath("//A//B");
-//		new XPath("/A/*");
-//		new XPath("/*/*");
-//		new XPath("//*");
-//		new XPath("/*/A");
-//		new XPath("/A/*/B");
-//		new XPath("//A/*/B");
-//		// these are all the same:
-//		new XPath("A");
-//		new XPath("/A");
-//		new XPath("/*");
 	}
 }
 
