@@ -35,7 +35,6 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 
 import java.util.Collection;
-import java.util.List;
 
 /** An interface to access the tree of {@link RuleContext} objects created
  *  during a parse that makes the data structure look like a simple parse tree.
@@ -50,11 +49,6 @@ public interface ParseTree extends SyntaxTree {
 	ParseTree getParent();
 	@Override
 	ParseTree getChild(int i);
-
-	/** Return ordered list of all children of this node; redefine to
-	 *  refine type.
-	 */
-	List<ParseTree> getChildren();
 
 	/** The {@link ParseTreeVisitor} needs a double dispatch method. */
 	<T> T accept(ParseTreeVisitor<? extends T> visitor);
