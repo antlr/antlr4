@@ -204,7 +204,7 @@
                 <path refid="cp.antlr3"/>
                 <pathelement location="${basedir}/runtime/Java/lib/org.abego.treelayout.core.jar"/>
             </classpath>
-            <src path="${basedir}/tool/src:${basedir}/runtime/Java/src:${build.antlr3.dir}"/>
+            <src path="${basedir}/tool/src:${basedir}/runtime/Java/src:${build.antlr3.dir}:${build.antlr4.dir}"/>
         </javac>
     </target>
 
