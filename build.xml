@@ -185,7 +185,12 @@
            </pathconvert>
            <echo message="Generating ANTLR 4 grammars:${line.separator}  ${echo.sources.antlr4}"/>
 
-           <antlr4 srcpath="org/antlr/v4/runtime/tree/xpath"/>
+           <antlr4 srcpath="org/antlr/v4/runtime/tree/xpath">
+                <args>
+                    <arg value="-package"/>
+                    <arg value="org.antlr.v4.runtime.tree.xpath"/>
+                </args>
+           </antlr4>
 
            <touch file="${antlr4.touch}" mkdirs="true"/>
    	</target>
