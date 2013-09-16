@@ -12,7 +12,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -168,6 +167,12 @@ loop:
 					new XPathRuleAnywhereElement(word, ruleIndex) :
 					new XPathRuleElement(word, ruleIndex);
 		}
+	}
+
+
+	public static Collection<ParseTree> findAll(ParseTree tree, String xpath, Parser parser) {
+		XPath p = new XPath(parser, xpath);
+		return p.evaluate(tree);
 	}
 
 	/** Return a list of all nodes starting at t as root that satisfy the path.

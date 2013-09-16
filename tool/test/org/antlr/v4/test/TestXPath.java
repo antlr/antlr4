@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.tree.xpath.XPath;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -206,7 +207,7 @@ public class TestXPath extends BaseTest {
 
 		IllegalArgumentException e = null;
 		try {
-			tree.findAll(parser, path);
+			XPath.findAll(tree, path, parser);
 		}
 		catch (IllegalArgumentException iae) {
 			e = iae;
@@ -225,7 +226,7 @@ public class TestXPath extends BaseTest {
 		ParseTree tree = execStartRule(startRuleName, parser);
 
 		List<String> nodes = new ArrayList<String>();
-		for (ParseTree t : tree.findAll(parser, xpath) ) {
+		for (ParseTree t : XPath.findAll(tree, xpath, parser) ) {
 			if ( t instanceof RuleContext) {
 				RuleContext r = (RuleContext)t;
 				nodes.add(parser.getRuleNames()[r.getRuleIndex()]);

@@ -34,8 +34,6 @@ import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 
-import java.util.Collection;
-
 /** An interface to access the tree of {@link RuleContext} objects created
  *  during a parse that makes the data structure look like a simple parse tree.
  *  This node represents both internal nodes, rule invocations,
@@ -52,8 +50,6 @@ public interface ParseTree extends SyntaxTree {
 
 	/** The {@link ParseTreeVisitor} needs a double dispatch method. */
 	<T> T accept(ParseTreeVisitor<? extends T> visitor);
-
-	Collection<ParseTree> findAll(Parser parser, String xpath);
 
 	/** Return the combined text of all leaf nodes. Does not get any
 	 *  off-channel tokens (if any) so won't return whitespace and

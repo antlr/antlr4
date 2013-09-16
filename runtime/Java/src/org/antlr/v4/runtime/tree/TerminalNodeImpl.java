@@ -33,9 +33,7 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.tree.xpath.XPath;
 
-import java.util.Collection;
 import java.util.List;
 
 public class TerminalNodeImpl implements TerminalNode {
@@ -70,12 +68,6 @@ public class TerminalNodeImpl implements TerminalNode {
 	@Override
 	public List<ParseTree> getChildren() {
 		return null;
-	}
-
-	@Override
-	public Collection<ParseTree> findAll(Parser parser, String xpath) {
-		XPath p = new XPath(parser, xpath);
-		return p.evaluate(this);
 	}
 
 	@Override
