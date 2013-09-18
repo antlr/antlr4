@@ -1,11 +1,6 @@
 lexer grammar XPathLexer;
 
-@header {package org.antlr.v4.runtime.tree.xpath;}
-
 tokens { TOKEN_REF, RULE_REF }
-
-// "//|/|//[!]|/\\[!]|\\w+|'.+?'|[*]"
-// TODO: handle escapes in strings?
 
 /*
 path : separator? word (separator word)* EOF ;
