@@ -223,7 +223,7 @@ public class Tool {
 			String arg = args[i];
 			i++;
 			if ( arg.startsWith("-D") ) { // -Dlanguage=Java syntax
-				handleOptionSetArg(arg);
+				handleOptionSetArg(arg.substring("-D".length()));
 				continue;
 			}
 			if ( arg.charAt(0)!='-' ) { // file name
@@ -295,18 +295,14 @@ public class Tool {
 	}
 
 	protected void handleOptionSetArg(String arg) {
-		int eq = arg.indexOf('=');
-		if ( eq>0 && arg.length()>3 ) {
-			String option = arg.substring("-D".length(), eq);
-			String value = arg.substring(eq+1);
-			if ( value.length()==0 ) {
-				errMgr.toolError(ErrorType.BAD_OPTION_SET_SYNTAX, arg);
-				return;
-			}
+		final String[] pieces = arg.split("=", 2);
+		final boolean hasEqualSign = arg.indexOf('=') > 0;
 
-			commandLineOptions.put(option, value);
-		}
-		else {
+		if (pieces.length == 2) {
+			commandLineOptions.put(pieces[0], pieces[1]);
+		} else if (hasEqualSign) {
+			commandLineOptions.put(pieces[0], "");
+		} else {
 			errMgr.toolError(ErrorType.BAD_OPTION_SET_SYNTAX, arg);
 		}
 	}
