@@ -365,7 +365,7 @@ public class Tool {
 			lexerAST = transform.extractImplicitLexer(g); // alters g.ast
 			if ( lexerAST!=null ) {
 				if (grammarOptions != null) {
-					lexerAST.cmdLineOptions = grammarOptions;
+					lexerAST.applyCommandLineOptions(grammarOptions);
 				}
 
 				lexerg = new LexerGrammar(this, lexerAST);
@@ -621,7 +621,7 @@ public class Tool {
 					((GrammarRootAST)root).hasErrors = p.getNumberOfSyntaxErrors()>0;
 					assert ((GrammarRootAST)root).tokenStream == tokens;
 					if ( grammarOptions!=null ) {
-						((GrammarRootAST)root).cmdLineOptions = grammarOptions;
+						((GrammarRootAST)root).applyCommandLineOptions(grammarOptions);
 					}
 					return ((GrammarRootAST)root);
 				}
