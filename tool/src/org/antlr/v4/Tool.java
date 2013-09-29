@@ -303,17 +303,8 @@ public class Tool {
 				errMgr.toolError(ErrorType.BAD_OPTION_SET_SYNTAX, arg);
 				return;
 			}
-			if ( Grammar.parserOptions.contains(option) ||
-				 Grammar.lexerOptions.contains(option) )
-			{
-				commandLineOptions.put(option, value);
-			}
-			else {
-				errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
-									null,
-									null,
-									option);
-			}
+
+			commandLineOptions.put(option, value);
 		}
 		else {
 			errMgr.toolError(ErrorType.BAD_OPTION_SET_SYNTAX, arg);
