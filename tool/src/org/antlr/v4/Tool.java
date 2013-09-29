@@ -134,7 +134,7 @@ public class Tool {
 	public boolean gen_visitor = false;
 	public boolean gen_dependencies = false;
 	public String genPackage = null;
-	public Map<String, String> grammarOptions = null;
+	public Map<String, String> commandLineOptions = new HashMap<String, String>();
 	public boolean warnings_are_errors = false;
 	public boolean longMessages = false;
 
@@ -306,8 +306,7 @@ public class Tool {
 			if ( Grammar.parserOptions.contains(option) ||
 				 Grammar.lexerOptions.contains(option) )
 			{
-				if ( grammarOptions==null ) grammarOptions = new HashMap<String, String>();
-				grammarOptions.put(option, value);
+				commandLineOptions.put(option, value);
 			}
 			else {
 				errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
@@ -364,9 +363,7 @@ public class Tool {
 		{
 			lexerAST = transform.extractImplicitLexer(g); // alters g.ast
 			if ( lexerAST!=null ) {
-				if (grammarOptions != null) {
-					lexerAST.applyCommandLineOptions(grammarOptions);
-				}
+				lexerAST.applyCommandLineOptions(commandLineOptions);
 
 				lexerg = new LexerGrammar(this, lexerAST);
 				lexerg.fileName = g.fileName;
@@ -620,9 +617,7 @@ public class Tool {
 				if ( root instanceof GrammarRootAST) {
 					((GrammarRootAST)root).hasErrors = p.getNumberOfSyntaxErrors()>0;
 					assert ((GrammarRootAST)root).tokenStream == tokens;
-					if ( grammarOptions!=null ) {
-						((GrammarRootAST)root).applyCommandLineOptions(grammarOptions);
-					}
+					((GrammarRootAST)root).applyCommandLineOptions(commandLineOptions);
 					return ((GrammarRootAST)root);
 				}
 			}
