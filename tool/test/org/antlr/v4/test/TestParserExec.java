@@ -349,4 +349,32 @@ public class TestParserExec extends BaseTest {
 		assertEquals("x\ny\n", found);
 	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#334 "BailErrorStrategy: bails
+	 * out on proper input".
+	 * https://github.com/antlr/antlr4/issues/334
+	 */
+	@Test public void testPredictionIssue334() {
+		String grammar =
+			"grammar T;\n" +
+			"\n" +
+			"file @init{setErrorHandler(new BailErrorStrategy());} \n" +
+			"@after {System.out.println($ctx.toStringTree(this));}\n" +
+			"  :   item (SEMICOLON item)* SEMICOLON? EOF ;\n" +
+			"item : A B?;\n" +
+			"\n" +
+			"\n" +
+			"\n" +
+			"SEMICOLON: ';';\n" +
+			"\n" +
+			"A : 'a'|'A';\n" +
+			"B : 'b'|'B';\n" +
+			"\n" +
+			"WS      : [ \\r\\t\\n]+ -> skip;\n";
+
+		String input = "a";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "file", input, false);
+		assertEquals("(file (item a) <EOF>)\n", found);
+		assertNull(stderrDuringParse);
+	}
 }
