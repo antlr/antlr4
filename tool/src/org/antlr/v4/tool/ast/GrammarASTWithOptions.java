@@ -34,7 +34,6 @@ import org.antlr.runtime.Token;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.runtime.misc.NotNull;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
