@@ -27,8 +27,7 @@ public class TestGrammarOptions extends BaseTest {
 		BaseTest.writeFile(this.tmpdir, GRAMMAR_FILE_NAME, GRAMMAR_WITHOUT_OPTIONS);
 		
 		final File grammarFile = new File(this.tmpdir, GRAMMAR_FILE_NAME);
-		
-		GrammarRootAST root = this.newTool().loadGrammar(grammarFile.getAbsolutePath());
+		final GrammarRootAST root = this.newTool().loadGrammar(grammarFile.getAbsolutePath());
 		
 		assertEquals("Java", root.getOptionString("language"));
 	}
@@ -39,8 +38,7 @@ public class TestGrammarOptions extends BaseTest {
 		BaseTest.writeFile(this.tmpdir, GRAMMAR_FILE_NAME, GRAMMAR_WITH_OPTIONS);
 		
 		final File grammarFile = new File(this.tmpdir, GRAMMAR_FILE_NAME);
-		
-		GrammarRootAST root = this.newTool().loadGrammar(grammarFile.getAbsolutePath());
+		final GrammarRootAST root = this.newTool().loadGrammar(grammarFile.getAbsolutePath());
 		
 		assertEquals("Python", root.getOptionString("language"));
 	}
@@ -57,8 +55,7 @@ public class TestGrammarOptions extends BaseTest {
 			BaseTest.writeFile(this.tmpdir, GRAMMAR_FILE_NAME, GRAMMAR_WITHOUT_OPTIONS);
 			
 			final File grammarFile = new File(this.tmpdir, GRAMMAR_FILE_NAME);
-			
-			GrammarRootAST root = this.newTool().loadGrammar(grammarFile.getAbsolutePath());
+			final GrammarRootAST root = this.newTool().loadGrammar(grammarFile.getAbsolutePath());
 			root.applyCommandLineOptions(commandLineOptions);
 			assertEquals("C", root.getOptionString("language"));
 		}
@@ -67,10 +64,31 @@ public class TestGrammarOptions extends BaseTest {
 			BaseTest.writeFile(this.tmpdir, GRAMMAR_FILE_NAME, GRAMMAR_WITH_OPTIONS);
 			
 			final File grammarFile = new File(this.tmpdir, GRAMMAR_FILE_NAME);
-			
-			GrammarRootAST root = this.newTool().loadGrammar(grammarFile.getAbsolutePath());
+			final GrammarRootAST root = this.newTool().loadGrammar(grammarFile.getAbsolutePath());
 			root.applyCommandLineOptions(commandLineOptions);
 			assertEquals("C", root.getOptionString("language"));
 		}
 	}
+	
+	@Test
+	public void testArbitraryGrammarOption() {
+		final String grammar =
+				"grammar T;\n" +
+				"options {color=purple;}" +
+				"a: 'x';";
+
+		this.mkdir(this.tmpdir);
+		BaseTest.writeFile(this.tmpdir, GRAMMAR_FILE_NAME, grammar);
+		
+		final File grammarFile = new File(this.tmpdir, GRAMMAR_FILE_NAME);
+		final GrammarRootAST root = this.newTool().loadGrammar(grammarFile.getAbsolutePath());
+		assertEquals("purple", root.getOptionString("color"));
+		
+		final HashMap<String, String> commandLineOptions = new HashMap<String, String>();
+		commandLineOptions.put("size", "large");
+		
+		root.applyCommandLineOptions(commandLineOptions);
+		assertEquals("large", root.getOptionString("size"));
+	}
+	
 }
