@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
@@ -44,8 +45,12 @@ import java.util.Arrays;
  * <p/>
  * If you need encoding, pass in stream/reader with correct encoding.
  */
-public class ANTLRInputStream implements CharStream {
-    public static final int READ_BUFFER_SIZE = 1024;
+public class ANTLRInputStream implements CharStream, Serializable {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public static final int READ_BUFFER_SIZE = 1024;
    	public static final int INITIAL_BUFFER_SIZE = 1024;
 
 	/** The data being scanned */

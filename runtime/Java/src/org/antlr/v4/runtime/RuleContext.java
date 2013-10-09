@@ -40,6 +40,7 @@ import org.antlr.v4.runtime.tree.gui.TreeViewer;
 import javax.print.PrintException;
 import javax.swing.JDialog;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -64,7 +65,12 @@ import java.util.concurrent.Future;
  *
  *  @see ParserRuleContext
  */
-public class RuleContext implements RuleNode {
+public class RuleContext implements RuleNode,Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public static final ParserRuleContext EMPTY = new ParserRuleContext();
 
 	/** What context invoked this rule? */

@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.misc.IntegerStack;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Pair;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.List;
@@ -46,8 +47,12 @@ import java.util.Stack;
  *  of speed.
  */
 public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
-	implements TokenSource
+	implements TokenSource, Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final int DEFAULT_MODE = 0;
 	public static final int MORE = -2;
 	public static final int SKIP = -3;

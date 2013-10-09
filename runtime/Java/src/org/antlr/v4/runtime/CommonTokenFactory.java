@@ -30,10 +30,17 @@
 
 package org.antlr.v4.runtime;
 
+import java.io.Serializable;
+
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Pair;
 
-public class CommonTokenFactory implements TokenFactory<CommonToken> {
+public class CommonTokenFactory implements TokenFactory<CommonToken>,Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public static final TokenFactory<CommonToken> DEFAULT = new CommonTokenFactory();
 
 	/** Copy text for token out of input char stream. Useful when input

@@ -30,11 +30,17 @@
 
 package org.antlr.v4.runtime.tree;
 
+import java.io.Serializable;
+
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 
-public class TerminalNodeImpl implements TerminalNode {
+public class TerminalNodeImpl implements TerminalNode,Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public Token symbol;
 	public ParseTree parent;
 

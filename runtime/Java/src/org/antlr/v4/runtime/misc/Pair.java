@@ -30,7 +30,13 @@
 
 package org.antlr.v4.runtime.misc;
 
-public class Pair<A,B> {
+import java.io.Serializable;
+
+public class Pair<A,B> implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public final A a;
 	public final B b;
 

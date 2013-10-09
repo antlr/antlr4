@@ -29,11 +29,18 @@
  */
 package org.antlr.v4.runtime.misc;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Sam Harwell
  */
-public class IntegerStack extends IntegerList {
+public class IntegerStack extends IntegerList implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	public IntegerStack() {
 	}

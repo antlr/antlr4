@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,8 +12,13 @@ import java.util.Iterator;
 
 import org.antlr.v4.runtime.misc.Pair;
 
-public class IncludeStrategyImpl implements IncludeStrategy
+public class IncludeStrategyImpl implements IncludeStrategy, Serializable
 	{
+		/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 		/**
 		 * Maps a filename to an index in the ArrayList
 		 */
