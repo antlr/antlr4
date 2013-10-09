@@ -43,10 +43,9 @@ import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.interp.ParserInterpreter;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
@@ -393,7 +392,7 @@ public class TestATNInterpreter extends BaseTest {
 
 		IntTokenStream input = new IntTokenStream(types);
 		System.out.println("input="+input.types);
-		ParserInterpreter interp = new ParserInterpreter(g, input);
+		ParserInterpreterForTesting interp = new ParserInterpreterForTesting(g, input);
 		ATNState startState = atn.ruleToStartState[g.getRule("a").index];
 		if ( startState.transition(0).target instanceof BlockStartState ) {
 			startState = startState.transition(0).target;

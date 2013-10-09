@@ -28,7 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.tool.interp;
+package org.antlr.v4.test;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.runtime.Parser;
@@ -44,7 +44,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.Grammar;
 
-public class ParserInterpreter {
+public class ParserInterpreterForTesting {
 	public static class DummyParser extends Parser {
 		public final ATN atn;
 		public final DFA[] decisionToDFA; // not shared for interp
@@ -88,11 +88,11 @@ public class ParserInterpreter {
 	protected ParserATNSimulator atnSimulator;
 	protected TokenStream input;
 
-	public ParserInterpreter(@NotNull Grammar g) {
+	public ParserInterpreterForTesting(@NotNull Grammar g) {
 		this.g = g;
 	}
 
-	public ParserInterpreter(@NotNull Grammar g, @NotNull TokenStream input) {
+	public ParserInterpreterForTesting(@NotNull Grammar g, @NotNull TokenStream input) {
 		Tool antlr = new Tool();
 		antlr.process(g,false);
 		parser = new DummyParser(g, g.atn, input);
