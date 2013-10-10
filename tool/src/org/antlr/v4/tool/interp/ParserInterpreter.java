@@ -14,6 +14,7 @@ import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.atn.RuleStartState;
 import org.antlr.v4.runtime.atn.RuleStopState;
+import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -79,14 +80,12 @@ public class ParserInterpreter extends Parser {
 
 		InterpreterRuleContext rootContext =
 			new InterpreterRuleContext(null, startState.stateNumber, r.index);
-		ParserRuleContext ctx = rootContext;
+		_ctx = rootContext;
 
 loop:
 		while ( true ) {
 			System.out.println("p is "+p.getClass().getCanonicalName());
 			switch ( p.getStateType() ) {
-				case ATNState.RULE_START :
-					break;
 				case ATNState.RULE_STOP :
 					if ( p == stopState ) {
 						// done; don't look for EOF unless they mentioned
@@ -94,7 +93,13 @@ loop:
 						break loop;
 					}
 					else { // pop
-						ctx = ctx.getParent();
+						ATNState returnState = g.atn.states.get(_ctx.invokingState);
+						System.out.println("pop from "+g.getRule(p.ruleIndex)+" to "+
+										   g.getRule(returnState.ruleIndex));
+						RuleTransition retStateCallEdge =
+							(RuleTransition)returnState.transition(0);
+						p = retStateCallEdge.followState;
+						_ctx = _ctx.getParent();
 					}
 					break;
 
@@ -117,7 +122,9 @@ loop:
 			Transition t = p.getTransitions()[0];
 			switch ( t.getSerializationType() ) {
 				case Transition.RULE: // push
-					ctx = new ParserRuleContext(ctx, p.stateNumber);
+					_ctx = new ParserRuleContext(_ctx, p.stateNumber);
+					p = t.target;
+					System.out.println("push "+g.getRule(p.ruleIndex));
 					break;
 
 				case Transition.ATOM:
@@ -125,6 +132,7 @@ loop:
 					if ( at.matches(_input.LA(1), 0, g.atn.maxTokenType) ) {
 						p = at.target;
 						System.out.println("matched "+g.getTokenDisplayName(_input.LA(1)));
+						_input.consume();
 					}
 					else {
 						throw new InputMismatchException(this);

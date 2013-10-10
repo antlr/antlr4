@@ -56,4 +56,32 @@ public class TestParserInterpreter extends BaseTest {
 		t = parser.parse("s");
 		assertEquals("s", t.toStringTree(parser));
 	}
+
+	@Test public void testCall() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : 'a' ;\n" +
+			"B : 'b' ;\n" +
+			"C : 'c' ;\n");
+		Grammar g = new Grammar(
+			"parser grammar T;\n"+
+			"s : t C ;\n" +
+			"t : A{;} | B ;\n",
+			lg);
+		String input = "ac";
+		LexerInterpreter lexEngine = new LexerInterpreter(lg, input);
+		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
+
+		ParserInterpreter parser = new ParserInterpreter(g, tokens);
+		ParseTree t = parser.parse("s");
+		assertEquals("s", t.toStringTree(parser));
+
+		input = "bc";
+		lexEngine = new LexerInterpreter(lg, input);
+		tokens = new CommonTokenStream(lexEngine);
+
+		parser = new ParserInterpreter(g, tokens);
+		t = parser.parse("s");
+		assertEquals("s", t.toStringTree(parser));
+	}
 }
