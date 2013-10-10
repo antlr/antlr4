@@ -15,6 +15,7 @@ import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.atn.RuleStartState;
 import org.antlr.v4.runtime.atn.RuleStopState;
 import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.StarLoopbackState;
 import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -104,21 +105,33 @@ loop:
 					break;
 
 				// start a decision
-				// loop backs refer to decision at start of loop
-				case ATNState.PLUS_LOOP_BACK:
 				case ATNState.STAR_LOOP_BACK:
-
+				case ATNState.PLUS_LOOP_BACK:
 				case ATNState.BLOCK_START:
 				case ATNState.STAR_BLOCK_START:
 				case ATNState.PLUS_BLOCK_START:
 				case ATNState.STAR_LOOP_ENTRY:
-					DecisionState d = (DecisionState)p;
-					System.out.println("decision "+d.decision);
-					int alt = atnSimulator.adaptivePredict(_input,
-														   d.decision,
-														   null);
-					System.out.println("predict "+alt);
-					p = d.transition(alt-1).target;
+					DecisionState d;
+					// A (...)* loop has an entry decision and then the block decision
+					// The loop back state should simply jump back to the entry point.
+					if ( p.getStateType()==ATNState.STAR_LOOP_BACK ) {
+						d = ((StarLoopbackState)p).getLoopEntryState();
+					}
+					else {
+						d = (DecisionState)p;
+					}
+					if ( d.getNumberOfTransitions()>1 ) {
+						System.out.println("decision "+d.decision);
+						int alt = atnSimulator.adaptivePredict(_input,
+															   d.decision,
+															   null);
+						System.out.println("predict "+alt);
+						p = d.transition(alt-1).target;
+					}
+					else {
+						p = d.transition(0).target;
+
+					}
 					continue loop;
 			}
 

@@ -426,8 +426,6 @@ public class ParserATNFactory implements ATNFactory {
 			opt.visit(alt.left);
 		}
 		Handle h = new Handle(start, end);
-//		FASerializer ser = new FASerializer(g, h.left);
-//		System.out.println(blkAST.toStringTree()+":\n"+ser);
 		blkAST.atnState = start;
 
 		return h;

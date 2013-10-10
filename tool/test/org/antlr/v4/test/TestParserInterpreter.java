@@ -109,7 +109,7 @@ public class TestParserInterpreter extends BaseTest {
 			"C : 'c' ;\n");
 		Grammar g = new Grammar(
 			"parser grammar T;\n" +
-			"s : (A{;}|B)? C ;\n",
+			"s : (A{;}|B)* C ;\n",
 			lg);
 
 		testInterp(lg, g, "s", "c", "s");
