@@ -638,6 +638,10 @@ public class Tool {
 		return null;
 	}
 
+	public List<String> getGrammarFiles() {
+		return grammarFiles;
+	}
+
 	public void generateATNs(Grammar g) {
 		DOTGenerator dotGenerator = new DOTGenerator(g);
 		List<Grammar> grammars = new ArrayList<Grammar>();

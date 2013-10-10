@@ -103,13 +103,17 @@ loop:
 					}
 					break;
 
-				case ATNState.BLOCK_START: // start a decision
+				// start a decision
+				// loop backs refer to decision at start of loop
+				case ATNState.PLUS_LOOP_BACK:
+				case ATNState.STAR_LOOP_BACK:
+
+				case ATNState.BLOCK_START:
 				case ATNState.STAR_BLOCK_START:
 				case ATNState.PLUS_BLOCK_START:
 				case ATNState.STAR_LOOP_ENTRY:
-				case ATNState.PLUS_LOOP_BACK:
-				case ATNState.STAR_LOOP_BACK:
 					DecisionState d = (DecisionState)p;
+					System.out.println("decision "+d.decision);
 					int alt = atnSimulator.adaptivePredict(_input,
 														   d.decision,
 														   null);
