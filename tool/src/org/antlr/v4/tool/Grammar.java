@@ -123,7 +123,7 @@ public class Grammar implements AttributeResolver {
     public GrammarRootAST ast;
 	/** Track stream used to create this grammar */
 	@NotNull
-	public final TokenStream tokenStream;
+	public TokenStream tokenStream;
     public String text; // testing only
     public String fileName;
 
@@ -224,37 +224,50 @@ public class Grammar implements AttributeResolver {
 		initTokenSymbolTables();
     }
 
-	/** For testing */
+	/** Remaining ctors for testing */
+	public Grammar() {
+		this.tool = new Tool();
+	}
+
 	public Grammar(String grammarText) throws RecognitionException {
 		this(GRAMMAR_FROM_STRING_NAME, grammarText, null);
 	}
 
-	/** For testing */
+	public Grammar(String grammarText, Grammar tokenVocabSource) throws RecognitionException {
+		this();
+		this.fileName = GRAMMAR_FROM_STRING_NAME;
+		this.text = grammarText;
+		prepToBuildFromText(this, grammarText);
+		importVocab(tokenVocabSource);
+		tool.process(this, false);
+	}
+
 	public Grammar(String grammarText, ANTLRToolListener listener)
 		throws RecognitionException
 	{
 		this(GRAMMAR_FROM_STRING_NAME, grammarText, listener);
 	}
 
-	/** For testing; builds trees, does sem anal */
 	public Grammar(String fileName, String grammarText)
 		throws RecognitionException
 	{
 		this(fileName, grammarText, null);
 	}
 
-	/** For testing; builds trees, does sem anal */
 	public Grammar(String fileName, String grammarText, @Nullable ANTLRToolListener listener)
 		throws RecognitionException
 	{
-        this.text = grammarText;
 		this.fileName = fileName;
 		this.tool = new Tool();
 		this.tool.addListener(listener);
+		this.text = grammarText;
+		prepToBuildFromText(this, grammarText);
+
+		/*
 		ANTLRStringStream in = new ANTLRStringStream(grammarText);
 		in.name = fileName;
 
-		this.ast = tool.load(fileName, in);
+		ast = tool.load(fileName, in);
 		if ( ast==null ) {
 			throw new UnsupportedOperationException();
 		}
@@ -263,7 +276,7 @@ public class Grammar implements AttributeResolver {
 			throw new IllegalStateException("expected ast to have a token stream");
 		}
 
-		this.tokenStream = ast.tokenStream;
+		tokenStream = ast.tokenStream;
 
 		// ensure each node has pointer to surrounding grammar
 		final Grammar thiz = this;
@@ -275,13 +288,39 @@ public class Grammar implements AttributeResolver {
 			public Object post(Object t) { return t; }
 		});
 		initTokenSymbolTables();
-
+*/
 		tool.process(this, false);
+	}
+
+	protected void prepToBuildFromText(Grammar g, String grammarText) {
+		ANTLRStringStream in = new ANTLRStringStream(grammarText);
+		in.name = g.fileName;
+
+		g.ast = g.tool.load(g.fileName, in);
+		if ( g.ast==null ) {
+			throw new UnsupportedOperationException();
+		}
+
+		if (g.ast.tokenStream == null) {
+			throw new IllegalStateException("expected ast to have a token stream");
+		}
+
+		g.tokenStream = g.ast.tokenStream;
+
+		// ensure each node has pointer to surrounding grammar
+		final Grammar thiz = g;
+		TreeVisitor v = new TreeVisitor(new GrammarASTAdaptor());
+		v.visit(g.ast, new TreeVisitorAction() {
+			@Override
+			public Object pre(Object t) { ((GrammarAST)t).g = thiz; return t; }
+			@Override
+			public Object post(Object t) { return t; }
+		});
+		g.initTokenSymbolTables();
     }
 
 	protected void initTokenSymbolTables() {
 		tokenNameToTypeMap.put("EOF", Token.EOF);
-
 		// reserve a spot for the INVALID token
 		typeToTokenList.add(null);
 	}
@@ -453,6 +492,8 @@ public class Grammar implements AttributeResolver {
         }
         return qualifiedName+suffix;
     }
+
+	public String getName() { return name; }
 
 	public String getStringLiteralLexerRuleName(String lit) {
 		return AUTO_GENERATED_TOKEN_NAME_PREFIX + stringLiteralRuleNumber++;
