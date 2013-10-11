@@ -30,7 +30,7 @@ public class RuleFunctionCall {
 	public RuleFunctionCall(RuleFunctionCall parent) { this.parent = parent; }
 
 	// needed for both kinds of rule functions
-	ParserRuleContext _localctx;
+	InterpreterRuleContext _localctx;
 
 	// needed for recursive rule functions
 	ParserRuleContext _parentctx;

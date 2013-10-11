@@ -31,13 +31,13 @@
 package org.antlr.v4.tool;
 
 
+import org.antlr.v4.misc.UniqueList;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.TerminalAST;
 import org.stringtemplate.v4.misc.MultiMap;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /** An outermost alternative for a rule.  We don't track inner alternatives. */
@@ -74,7 +74,7 @@ public class Alternative implements AttributeResolver {
 	 *
 	 *  This tracks per alt
      */
-    public List<ActionAST> actions = new ArrayList<ActionAST>();
+    public List<ActionAST> actions = new UniqueList<ActionAST>();
 
     public Alternative(Rule r, int altNum) { this.rule = r; this.altNum = altNum; }
 

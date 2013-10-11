@@ -304,6 +304,7 @@ public class ParserATNFactory implements ATNFactory {
 			ActionAST arg = (ActionAST)node.getChild(0);
 			String precText = arg.getText();
 			int prec = Integer.parseInt(precText);
+//			System.out.println("create recursive call "+text+"["+prec+"]");
 			call = new LeftRecursiveRuleTransition(start, r.index, right, prec);
 		}
 		else {
@@ -349,12 +350,12 @@ public class ParserATNFactory implements ATNFactory {
 			String digits = elems[0].substring(1);
 			int precedence = Integer.parseInt(digits);
 			p = new PrecedencePredicateTransition(right, currentRule.index,
-												  g.sempreds.get(pred),
+												  g.predToIndexMap.get(pred),
 												  isCtxDependent,
 												  precedence);
 		}
 		else {
-			p = new PredicateTransition(right, currentRule.index, g.sempreds.get(pred), isCtxDependent);
+			p = new PredicateTransition(right, currentRule.index, g.predToIndexMap.get(pred), isCtxDependent);
 		}
 		left.addTransition(p);
 		pred.atnState = left;

@@ -30,6 +30,7 @@
 
 package org.antlr.v4.tool;
 
+import org.antlr.v4.misc.UniqueList;
 import org.antlr.v4.runtime.misc.Triple;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
@@ -104,16 +105,17 @@ public class Rule implements AttributeResolver {
     /** Track exception handlers; points at "catch" node of (catch exception action)
 	 *  don't track finally action
 	 */
-    public List<GrammarAST> exceptions = new ArrayList<GrammarAST>();
+    public List<GrammarAST> exceptions = new UniqueList<GrammarAST>();
 
 	/** Track all executable actions other than named actions like @init
 	 *  and catch/finally (not in an alt). Also tracks predicates, rewrite actions.
 	 *  We need to examine these actions before code generation so
-	 *  that we can detect refs to $rule.attr etc...
+	 *  that we can detect refs to $rule.attr etc...  list is unique by
+	 *  AST node.
 	 *
 	 *  This tracks per rule; Alternative objs also track per alt.
 	 */
-	public List<ActionAST> actions = new ArrayList<ActionAST>();
+	public List<ActionAST> actions = new UniqueList<ActionAST>();
 
 	public ActionAST finallyAction;
 
@@ -157,8 +159,9 @@ public class Rule implements AttributeResolver {
 	public void definePredicateInAlt(int currentAlt, PredAST predAST) {
 		actions.add(predAST);
 		alt[currentAlt].actions.add(predAST);
-		if ( g.sempreds.get(predAST)==null ) {
-			g.sempreds.put(predAST, g.sempreds.size());
+		g.sempreds.add(predAST);
+		if ( g.predToIndexMap.get(predAST)==null ) {
+			g.predToIndexMap.put(predAST, g.predToIndexMap.size());
 		}
 	}
 

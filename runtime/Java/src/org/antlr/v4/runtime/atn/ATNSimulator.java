@@ -451,6 +451,12 @@ public abstract class ATNSimulator {
 				else {
 					return new RangeTransition(target, arg1, arg2);
 				}
+			case Transition.LEFT_RECUR_RULE :
+				// NOT serialized for now
+//				int prec = 999999; // TODO FIX!
+//				LeftRecursiveRuleTransition lrrt =
+//					new LeftRecursiveRuleTransition((RuleStartState)atn.states.get(arg1), arg2, target, prec);
+//				return lrrt;
 			case Transition.RULE :
 				RuleTransition rt = new RuleTransition((RuleStartState)atn.states.get(arg1), arg2, target);
 				return rt;

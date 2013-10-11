@@ -153,9 +153,12 @@ public class TestParserInterpreter extends BaseTest {
 			"  ;\n",
 			lg);
 
-//		testInterp(lg, g, "s", "a", "(s (e a))");
-		testInterp(lg, g, "s", "a+a", "(s (e a) + (e a))");
-//		testInterp(lg, g, "s", "a+a*b", "s");
+		testInterp(lg, g, "s", "a", 	"(s (e a))");
+		testInterp(lg, g, "s", "a+a", 	"(s (e (e a) + (e a)))");
+		testInterp(lg, g, "s", "a*a", 	"(s (e (e a) * (e a)))");
+		testInterp(lg, g, "s", "a+a+a", "(s (e (e (e a) + (e a)) + (e a)))");
+		testInterp(lg, g, "s", "a*a+a", "(s (e (e (e a) * (e a)) + (e a)))");
+		testInterp(lg, g, "s", "a+a*a", "(s (e (e a) + (e (e a) * (e a))))");
 	}
 
 	void testInterp(LexerGrammar lg, Grammar g,

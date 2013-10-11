@@ -11,4 +11,9 @@ public class PrecedencePredicateTransition extends PredicateTransition {
 		super(target, ruleIndex, predIndex, isCtxDependent);
 		this.precedence = precedence;
 	}
+
+	@Override
+	public int getSerializationType() {
+		return Transition.PREC_PREDICATE;
+	}
 }

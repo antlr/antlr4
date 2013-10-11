@@ -4,6 +4,7 @@ package org.antlr.v4.tool.interp;
 import org.antlr.v4.Tool;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
@@ -18,9 +19,11 @@ import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.atn.StarLoopbackState;
 import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.PredAST;
 
 import java.util.NoSuchElementException;
 
@@ -36,6 +39,7 @@ public class ParserInterpreter extends Parser {
 	public final DFA[] decisionToDFA; // not shared like it is for generated parsers
 	public final PredictionContextCache sharedContextCache =
 		new PredictionContextCache();
+	public RuleFunctionCall locals;
 
 	public ParserInterpreter(Grammar g, TokenStream input) {
 		super(input);
@@ -69,7 +73,7 @@ public class ParserInterpreter extends Parser {
 		_ctx = rootContext;
 
 		// Create space for rule function locals needed per rule invocation
-		RuleFunctionCall locals = new RuleFunctionCall(null);
+		locals = new RuleFunctionCall(null);
 
 		loop:
 		while ( true ) {
@@ -118,7 +122,7 @@ public class ParserInterpreter extends Parser {
 
 					int alt = 1;
 					if ( d.getNumberOfTransitions()>1 ) {
-						System.out.println("decision "+d.decision);
+						System.out.println("decision "+d.decision+", input="+_input.LT(1));
 						alt = getInterpreter().adaptivePredict(_input,
 															   d.decision,
 															   null);
@@ -128,20 +132,26 @@ public class ParserInterpreter extends Parser {
 					// handle case where we need to push new recursive context
 					// is this the STAR_LOOP_ENTRY built during left-recur
 					// elimination?  Check left-recur rule and it's
-					// getOperatorLoopBlockStartState().
+					// getOperatorLoopBlockStartState(). Also only do it
+					// if we're not skipping loop.
 					Rule curRule = g.getRule(p.ruleIndex);
-					if ( p.getStateType()==ATNState.STAR_LOOP_ENTRY &&
+					if ( d.getStateType()==ATNState.STAR_LOOP_ENTRY &&
 						curRule.isLeftRecursive() &&
-						p == ((LeftRecursiveRule)curRule).getOperatorLoopBlockStartState() )
+						d == ((LeftRecursiveRule)curRule).getOperatorLoopBlockEntryState()) // always 2 alts in op loop star entry decision
 					{
-						// if we get past STAR_LOOP_ENTRY, one of (...)* blk
-						// will match. This new recur ctx is pushed for any kind
-						locals._localctx =
-							new InterpreterRuleContext(locals._parentctx, locals._parentState,
-													   locals._prec);
-						pushNewRecursionContext(locals._localctx,
-												locals._startState,
-												curRule.index);
+						System.out.println("left recur start of suffix block");
+						if ( alt != 2 ) {
+							System.out.println("not exit branch");
+							// if we get past STAR_LOOP_ENTRY, one of (...)* blk
+							// will match. This new recur ctx is pushed for any kind
+							locals._localctx =
+								new InterpreterRuleContext(locals._parentctx,
+														   locals._parentState,
+														   p.ruleIndex);
+							pushNewRecursionContext(locals._localctx,
+													locals._startState,
+													curRule.index);
+						}
 					}
 
 					p = d.transition(alt-1).target;
@@ -156,36 +166,34 @@ public class ParserInterpreter extends Parser {
 				case Transition.RULE: // push
 				case Transition.LEFT_RECUR_RULE:
 					locals = new RuleFunctionCall(locals); // new local var space
-					int returnState = p.stateNumber;
+					locals._parentctx = _ctx;
+					int returnState = p.stateNumber; // invoker is current state until we jump
+					locals._parentState = returnState;
 					ATNState targetStartState = t.target;
+					locals._startState = targetStartState.stateNumber;
+
 					InterpreterRuleContext callctx =
 						new InterpreterRuleContext(_ctx, returnState,
 												   targetStartState.ruleIndex);
 					locals._localctx = callctx;
-					if ( t.getSerializationType()==Transition.LEFT_RECUR_RULE ) {
-						locals._prec = ((LeftRecursiveRuleTransition)t).precedence;
-						System.out.println("arg "+locals._prec);
-					}
-					p = targetStartState; // jump to rule
-					setState(p.stateNumber);
 					Rule targetRule = g.getRule(targetStartState.ruleIndex);
 					System.out.println("push " + targetRule);
 					if ( targetRule.isLeftRecursive() ) {
-						locals._parentctx = _ctx;
-						locals._parentState = returnState;
-						locals._startState = p.stateNumber;
+						locals._prec = ((LeftRecursiveRuleTransition)t).precedence;
+//						System.out.println("arg "+locals._prec);
 						enterRecursionRule(callctx, targetRule.index);
 					}
 					else {
 						enterRule(callctx, targetStartState.stateNumber, targetRule.index);
 					}
-					locals._localctx = callctx;
+					p = targetStartState; // jump to rule
+					setState(p.stateNumber);
 					break;
 
 				case Transition.ATOM:
 					AtomTransition at = (AtomTransition)t;
 					match(at.label);
-					System.out.println("match " + g.getTokenDisplayName(at.label));
+					System.out.println("MATCH " + g.getTokenDisplayName(at.label));
 					p = at.target;
 					setState(p.stateNumber);
 					break;
@@ -197,8 +205,8 @@ public class ParserInterpreter extends Parser {
 
 				case Transition.EPSILON:
 				case Transition.PREDICATE:
-				case Transition.ACTION:
 				case Transition.PREC_PREDICATE:
+				case Transition.ACTION:
 					p = t.target;
 					setState(p.stateNumber);
 					break;
@@ -209,6 +217,32 @@ public class ParserInterpreter extends Parser {
 			}
 		}
 		return rootContext;
+	}
+
+	/** Predicates are evaluated during prediction and not by this interpreter.
+	 *  However, the ATN simulator asks the recognizer to evaluate predicates
+	 *  and so we override this method to interpret the special, generated
+	 *  predicates created during left recursion elimination.
+	 *
+	 *  e.g., "{3 >= $_p}?";
+	 */
+	@Override
+	public boolean sempred(@Nullable RuleContext localctx, int ruleIndex, int predIndex) {
+		System.out.print("EVAL pred rule:action=" + ruleIndex + ":" + predIndex);
+		PredAST predAST = g.sempreds.get(predIndex);
+		Rule r = g.getRule(ruleIndex);
+		System.out.print(", sempred " + predAST.getText());
+		String[] elems = predAST.getText().split(" ");
+		if ( elems.length==3 && elems[1].equals(">=") && elems[2].equals("$_p}?") ) {
+			String digits = elems[0].substring(1);
+			int precedence = Integer.parseInt(digits);
+			System.out.println(", prec = " + precedence + ", rule arg is " + locals._prec);
+			return precedence >= locals._prec;
+		}
+		System.out.println();
+
+//		System.out.println(g.sempreds.get(ac));
+		return true;
 	}
 
 	@Override
