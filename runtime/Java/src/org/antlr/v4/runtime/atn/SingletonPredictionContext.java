@@ -30,15 +30,12 @@
 
 package org.antlr.v4.runtime.atn;
 
-import java.util.Iterator;
-
 public class SingletonPredictionContext extends PredictionContext {
 	public final PredictionContext parent;
 	public final int returnState;
 
 	SingletonPredictionContext(PredictionContext parent, int returnState) {
-		super(calculateHashCode(parent!=null ? 31 ^ parent.hashCode() : 1,
-								31 ^ returnState));
+		super(parent != null ? calculateHashCode(parent, returnState) : calculateEmptyHashCode());
 		assert returnState!=ATNState.INVALID_STATE_NUMBER;
 		this.parent = parent;
 		this.returnState = returnState;
@@ -50,22 +47,6 @@ public class SingletonPredictionContext extends PredictionContext {
 			return EMPTY;
 		}
 		return new SingletonPredictionContext(parent, returnState);
-	}
-
-	@Override
-	public Iterator<SingletonPredictionContext> iterator() {
-		final SingletonPredictionContext self = this;
-		return new Iterator<SingletonPredictionContext>() {
-			int i = 0;
-			@Override
-			public boolean hasNext() { return i==0; }
-
-			@Override
-			public SingletonPredictionContext next() { i++; return self; }
-
-			@Override
-			public void remove() { throw new UnsupportedOperationException(); }
-		};
 	}
 
 	@Override

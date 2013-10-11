@@ -87,7 +87,11 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Tool {
-	public static final String getVersion() { return "4.0b4"; }
+	public static final String VERSION;
+	static {
+		String version = Tool.class.getPackage().getImplementationVersion();
+		VERSION = version != null ? version : "4.x";
+	}
 
 	public static final String GRAMMAR_EXTENSION = ".g4";
 	public static final String LEGACY_GRAMMAR_EXTENSION = ".g";
@@ -123,6 +127,7 @@ public class Tool {
 	public String grammarEncoding = null; // use default locale's encoding
 	public String msgFormat = "antlr";
 	public boolean launch_ST_inspector = false;
+	public boolean ST_inspector_wait_for_close = false;
     public boolean force_atn = false;
     public boolean log = false;
 	public boolean gen_listener = true;
@@ -149,6 +154,7 @@ public class Tool {
 		new Option("",					"-D<option>=value", "set/override a grammar-level option"),
 		new Option("warnings_are_errors", "-Werror", "treat warnings as errors"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
+		new Option("ST_inspector_wait_for_close", "-XdbgSTWait", "wait for STViz to close before continuing"),
         new Option("force_atn",			"-Xforce-atn", "use the ATN simulator for all predictions"),
 		new Option("log",   			"-Xlog", "dump lots of logging info to antlr-timestamp.log"),
 	};
@@ -358,6 +364,10 @@ public class Tool {
 		{
 			lexerAST = transform.extractImplicitLexer(g); // alters g.ast
 			if ( lexerAST!=null ) {
+				if (grammarOptions != null) {
+					lexerAST.cmdLineOptions = grammarOptions;
+				}
+
 				lexerg = new LexerGrammar(this, lexerAST);
 				lexerg.fileName = g.fileName;
 				lexerg.originalGrammar = g;
@@ -375,10 +385,8 @@ public class Tool {
 	}
 
 	public void processNonCombinedGrammar(Grammar g, boolean gencode) {
-		if ( g.ast!=null && internalOption_PrintGrammarTree ) System.out.println(g.ast.toStringTree());
-		//g.ast.inspect();
-
-		if ( g.ast.hasErrors ) return;
+		if ( g.ast==null || g.ast.hasErrors ) return;
+		if ( internalOption_PrintGrammarTree ) System.out.println(g.ast.toStringTree());
 
 		boolean ruleFail = checkForRuleIssues(g);
 		if ( ruleFail ) return;
@@ -413,10 +421,11 @@ public class Tool {
 		}
 	}
 
-	/** Important enough to avoid multiple defs that we do very early,
-	 *  right after AST construction.  Turn redef'd rule's AST RULE node dead
-	 *  field to true. Also check for undefined rules in parser/lexer to
-	 *  avoid exceptions later. Return true if we find an undefined rule.
+	/**
+	 * Important enough to avoid multiple definitions that we do very early,
+	 * right after AST construction. Also check for undefined rules in
+	 * parser/lexer to avoid exceptions later. Return true if we find multiple
+	 * definitions of the same rule or a reference to an undefined rule.
 	 */
 	public boolean checkForRuleIssues(final Grammar g) {
 		// check for redefined rules
@@ -426,6 +435,7 @@ public class Tool {
 			rules.addAll(mode.getAllChildrenWithType(ANTLRParser.RULE));
 		}
 
+		boolean redefinition = false;
 		final Map<String, RuleAST> ruleToAST = new HashMap<String, RuleAST>();
 		for (GrammarAST r : rules) {
 			RuleAST ruleAST = (RuleAST)r;
@@ -439,7 +449,7 @@ public class Tool {
 										   ID.getToken(),
 										   ruleName,
 										   prevChild.getToken().getLine());
-				ruleAST.dead = true;
+				redefinition = true;
 				continue;
 			}
 			ruleToAST.put(ruleName, ruleAST);
@@ -468,10 +478,11 @@ public class Tool {
 				}
 			}
 		}
+
 		UndefChecker chk = new UndefChecker();
 		chk.visitGrammar(g.ast);
 
-		return chk.undefined; // no problem
+		return redefinition || chk.undefined;
 	}
 
 	public List<GrammarRootAST> sortGrammarByTokenVocab(List<String> fileNames) {
@@ -517,7 +528,7 @@ public class Tool {
 	/** Manually get option node from tree; return null if no defined. */
 	public static GrammarAST findOptionValueAST(GrammarRootAST root, String option) {
 		GrammarAST options = (GrammarAST)root.getFirstChildWithType(ANTLRParser.OPTIONS);
-		if ( options!=null ) {
+		if ( options!=null && options.getChildCount() > 0 ) {
 			for (Object o : options.getChildren()) {
 				GrammarAST c = (GrammarAST)o;
 				if ( c.getType() == ANTLRParser.ASSIGN &&
@@ -541,7 +552,6 @@ public class Tool {
 		final Grammar g;
 		if ( ast.grammarType==ANTLRParser.LEXER ) g = new LexerGrammar(this, ast);
 		else g = new Grammar(this, ast);
-		g.tokenStream = ast.tokenStream;
 
 		// ensure each node has pointer to surrounding grammar
 		GrammarTransformPipeline.setGrammarPtr(g, ast);
@@ -609,7 +619,7 @@ public class Tool {
 				GrammarAST root = (GrammarAST)r.getTree();
 				if ( root instanceof GrammarRootAST) {
 					((GrammarRootAST)root).hasErrors = p.getNumberOfSyntaxErrors()>0;
-					((GrammarRootAST)root).tokenStream = tokens;
+					assert ((GrammarRootAST)root).tokenStream == tokens;
 					if ( grammarOptions!=null ) {
 						((GrammarRootAST)root).cmdLineOptions = grammarOptions;
 					}
@@ -769,12 +779,16 @@ public class Tool {
 
 	protected void writeDOTFile(Grammar g, String name, String dot) throws IOException {
 		Writer fw = getOutputFileWriter(g, name + ".dot");
-		fw.write(dot);
-		fw.close();
+		try {
+			fw.write(dot);
+		}
+		finally {
+			fw.close();
+		}
 	}
 
 	public void help() {
-		info("ANTLR Parser Generator  Version " + Tool.getVersion());
+		info("ANTLR Parser Generator  Version " + Tool.VERSION);
 		for (Option o : optionDefs) {
 			String name = o.name + (o.argType!=OptionArgType.NONE? " ___" : "");
 			String s = String.format(" %-19s %s", name, o.description);
@@ -822,7 +836,7 @@ public class Tool {
 	}
 
 	public void version() {
-		info("ANTLR Parser Generator  Version " + getVersion());
+		info("ANTLR Parser Generator  Version " + VERSION);
 	}
 
 	public void exit(int e) { System.exit(e); }

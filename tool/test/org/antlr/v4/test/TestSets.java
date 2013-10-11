@@ -29,7 +29,10 @@
  */
 package org.antlr.v4.test;
 
+import org.antlr.v4.tool.ErrorType;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /** Test the set stuff in lexer and parser */
 public class TestSets extends BaseTest {
@@ -235,7 +238,19 @@ public class TestSets extends BaseTest {
 			"a : A {System.out.println($A.text);} ;\n" +
 			"A : ~('a'|B) ;\n" +
 			"B : 'b' ;\n",
-			"error(134): T.g4:3:10: lexer set element B is invalid (either lexer rule ref or literal with > 1 char)\n"
+			"error(" + ErrorType.UNSUPPORTED_REFERENCE_IN_LEXER_SET.code + "): T.g4:3:10: rule reference 'B' is not currently supported in a set\n"
+		};
+		super.testErrors(pair, true);
+	}
+
+	@Test public void testNotCharSetWithString() throws Exception {
+		// might be a useful feature to add someday
+		String[] pair = new String[] {
+			"grammar T;\n" +
+			"a : A {System.out.println($A.text);} ;\n" +
+			"A : ~('a'|'aa') ;\n" +
+			"B : 'b' ;\n",
+			"error(" + ErrorType.INVALID_LITERAL_IN_LEXER_SET.code + "): T.g4:3:10: multi-character literals are not allowed in lexer sets: 'aa'\n"
 		};
 		super.testErrors(pair, true);
 	}
@@ -257,7 +272,7 @@ public class TestSets extends BaseTest {
 			"grammar T;\n" +
 			"a : (A {System.out.println($A.text);})+ ;\n" +
 			"A : [AaBb] ;\n" +
-			"WS : (' '|'\\n')+ {skip();} ;\n";
+			"WS : (' '|'\\n')+ -> skip ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 								  "a", "A a B b", debug);
 		assertEquals("A\n" +

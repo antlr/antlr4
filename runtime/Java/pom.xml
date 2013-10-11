@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-master</artifactId>
-        <version>4.0-SNAPSHOT</version>
+        <version>4.1.1-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
 
@@ -23,6 +23,32 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>sonatype-oss-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>us.bryon</groupId>
+                        <artifactId>graphviz-maven-plugin</artifactId>
+                        <version>1.0</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>dot</goal>
+                                </goals>
+                                <configuration>
+                                    <destdir>${project.build.directory}/apidocs</destdir>
+                                    <output>svg</output>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <build>
 

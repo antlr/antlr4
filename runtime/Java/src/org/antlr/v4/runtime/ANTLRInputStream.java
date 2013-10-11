@@ -35,11 +35,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Arrays;
 
-/** Vacuum all input from a Reader/InputStream and then treat it like a char[] buffer.
- *  Can also pass in a string or char[] to use.
- *
- *  If you need encoding, pass in stream/reader with correct encoding.
+/**
+ * Vacuum all input from a {@link Reader}/{@link InputStream} and then treat it
+ * like a {@code char[]} buffer. Can also pass in a {@link String} or
+ * {@code char[]} to use.
+ * <p/>
+ * If you need encoding, pass in stream/reader with correct encoding.
  */
 public class ANTLRInputStream implements CharStream {
     public static final int READ_BUFFER_SIZE = 1024;
@@ -117,9 +120,7 @@ public class ANTLRInputStream implements CharStream {
    			do {
    				if ( p+readChunkSize > data.length ) { // overflow?
    					// System.out.println("### overflow p="+p+", data.length="+data.length);
-   					char[] newdata = new char[data.length*2]; // resize
-   					System.arraycopy(data, 0, newdata, 0, data.length);
-   					data = newdata;
+   					data = Arrays.copyOf(data, data.length * 2);
    				}
    				numRead = r.read(data, p, readChunkSize);
    				// System.out.println("read "+numRead+" chars; p was "+p+" is now "+(p+numRead));
@@ -146,7 +147,7 @@ public class ANTLRInputStream implements CharStream {
     @Override
     public void consume() {
 		if (p >= n) {
-			assert LA(1) == CharStream.EOF;
+			assert LA(1) == IntStream.EOF;
 			throw new IllegalStateException("cannot consume EOF");
 		}
 

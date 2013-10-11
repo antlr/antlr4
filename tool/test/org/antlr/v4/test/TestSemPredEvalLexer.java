@@ -32,6 +32,8 @@ package org.antlr.v4.test;
 
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 public class TestSemPredEvalLexer extends BaseTest {
 
 	@Test public void testDisableRule() throws Exception {
@@ -40,7 +42,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"E1 : 'enum' {false}? ;\n" +
 			"E2 : 'enum' {true}? ;\n" +  // winner not E1 or ID
 			"ID : 'a'..'z'+ ;\n"+
-			"WS : (' '|'\\n') {skip();} ;";
+			"WS : (' '|'\\n') -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "enum abc", true);
 		String expecting =
 			"[@0,0:3='enum',<2>,1:0]\n" +
@@ -61,7 +63,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"lexer grammar L;\n"+
 			"ENUM : 'enum' {false}? ;\n" +
 			"ID : 'a'..'z'+ ;\n"+
-			"WS : (' '|'\\n') {skip();} ;";
+			"WS : (' '|'\\n') -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "enum abc enum", true);
 		String expecting =
 			"[@0,0:3='enum',<2>,1:0]\n" +
@@ -83,7 +85,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"lexer grammar L;\n"+
 			"ENUM : [a-z]+ {false}? ;\n" +
 			"ID   : [a-z]+ ;\n"+
-			"WS : (' '|'\\n') {skip();} ;";
+			"WS : (' '|'\\n') -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "enum abc enum", true);
 		String expecting =
 			"[@0,0:3='enum',<2>,1:0]\n" +
@@ -99,7 +101,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"lexer grammar L;\n"+
 			"ENUM : [a-z]+ {getText().equals(\"enum\")}? ;\n" +
 			"ID   : [a-z]+ ;\n"+
-			"WS : (' '|'\\n') {skip();} ;";
+			"WS : (' '|'\\n') -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "enum abc enum", true);
 		String expecting =
 			"[@0,0:3='enum',<1>,1:0]\n" +
@@ -166,7 +168,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 			"lexer grammar A;" +
 			"ENUM : [a-z]+ {getText().equals(\"enum\")}? {System.out.println(\"enum!\");} ;\n" +
 			"ID   : [a-z]+ {System.out.println(\"ID \"+getText());} ;\n" +
-			"WS   : [ \n] -> skip ;";
+			"WS   : [ \\n] -> skip ;";
 		String found = execLexer("A.g4", grammar, "A", "enum enu a");
 		String expecting =
 			"enum!\n" +

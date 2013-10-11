@@ -31,17 +31,16 @@
 package org.antlr.v4.runtime.atn;
 
 import java.util.Arrays;
-import java.util.Iterator;
 
 public class ArrayPredictionContext extends PredictionContext {
 	/** Parent can be null only if full ctx mode and we make an array
-	 *  from EMPTY and non-empty. We merge EMPTY by using null parent and
-	 *  returnState == EMPTY_FULL_RETURN_STATE
+	 *  from {@link #EMPTY} and non-empty. We merge {@link #EMPTY} by using null parent and
+	 *  returnState == {@link #EMPTY_RETURN_STATE}.
 	 */
 	public final PredictionContext[] parents;
 
 	/** Sorted for merge, no duplicates; if present,
-	 *  EMPTY_FULL_RETURN_STATE is always first
+	 *  {@link #EMPTY_RETURN_STATE} is always last.
  	 */
 	public final int[] returnStates;
 
@@ -58,73 +57,11 @@ public class ArrayPredictionContext extends PredictionContext {
 		this.returnStates = returnStates;
 	}
 
-//ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] returnStates, int parentHashCode, int returnStateHashCode) {
-//		super(calculateHashCode(parentHashCode, returnStateHashCode));
-//		assert parents.length == returnStates.length;
-//		assert returnStates.length > 1 || returnStates[0] != EMPTY_FULL_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
-//
-//		this.parents = parents;
-//		this.returnStates = returnStates;
-//	}
-//
-//ArrayPredictionContext(@NotNull PredictionContext[] parents, int[] returnStates, int hashCode) {
-//		super(hashCode);
-//		assert parents.length == returnStates.length;
-//		assert returnStates.length > 1 || returnStates[0] != EMPTY_FULL_STATE_KEY : "Should be using PredictionContext.EMPTY instead.";
-//
-//		this.parents = parents;
-//		this.returnStates = returnStates;
-//	}
-
-	protected static int calculateHashCode(PredictionContext[] parents, int[] returnStates) {
-		return calculateHashCode(calculateParentHashCode(parents),
-								 calculateReturnStatesHashCode(returnStates));
-	}
-
-	protected static int calculateParentHashCode(PredictionContext[] parents) {
-		int hashCode = 1;
-		for (PredictionContext p : parents) {
-			if ( p!=null ) { // can be null for full ctx stack in ArrayPredictionContext
-				hashCode = hashCode * 31 ^ p.hashCode();
-			}
-		}
-
-		return hashCode;
-	}
-
-	protected static int calculateReturnStatesHashCode(int[] returnStates) {
-		int hashCode = 1;
-		for (int state : returnStates) {
-			hashCode = hashCode * 31 ^ state;
-		}
-
-		return hashCode;
-	}
-
-	@Override
-	public Iterator<SingletonPredictionContext> iterator() {
-		return new Iterator<SingletonPredictionContext>() {
-			int i = 0;
-			@Override
-			public boolean hasNext() { return i < parents.length; }
-
-			@Override
-			public SingletonPredictionContext next() {
-				SingletonPredictionContext ctx =
-					SingletonPredictionContext.create(parents[i], returnStates[i]);
-				i++;
-				return ctx;
-			}
-
-			@Override
-			public void remove() { throw new UnsupportedOperationException(); }
-		};
-	}
-
 	@Override
 	public boolean isEmpty() {
-		return size()==1 &&
-			   returnStates[0]==EMPTY_RETURN_STATE;
+		// since EMPTY_RETURN_STATE can only appear in the last position, we
+		// don't need to verify that size==1
+		return returnStates[0]==EMPTY_RETURN_STATE;
 	}
 
 	@Override

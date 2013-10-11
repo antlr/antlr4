@@ -64,22 +64,21 @@ import java.util.List;
  *        [input-filename(s)]
  */
 public class TestRig {
-	static String grammarName;
-	static String startRuleName;
-	static List<String> inputFiles = new ArrayList<String>();
-	static boolean printTree = false;
-	static boolean gui = false;
-	static String psFile = null;
-	static boolean showTokens = false;
-	static boolean trace = false;
-	static boolean diagnostics = false;
-	static String encoding = null;
-	static boolean SLL = false;
-
 	public static final String LEXER_START_RULE_NAME = "tokens";
 
-	public static void main(String[] args) throws Exception {
+	protected String grammarName;
+	protected String startRuleName;
+	protected final List<String> inputFiles = new ArrayList<String>();
+	protected boolean printTree = false;
+	protected boolean gui = false;
+	protected String psFile = null;
+	protected boolean showTokens = false;
+	protected boolean trace = false;
+	protected boolean diagnostics = false;
+	protected String encoding = null;
+	protected boolean SLL = false;
 
+	public TestRig(String[] args) throws Exception {
 		if ( args.length < 2 ) {
 			System.err.println("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName\n" +
 							   "  [-tokens] [-tree] [-gui] [-ps file.ps] [-encoding encodingname]\n" +
@@ -136,6 +135,16 @@ public class TestRig {
 				i++;
 			}
 		}
+	}
+
+	public static void main(String[] args) throws Exception {
+		TestRig testRig = new TestRig(args);
+ 		if(args.length >= 2) {
+			testRig.process();
+		}
+	}
+
+	public void process() throws Exception {
 //		System.out.println("exec "+grammarName+"."+startRuleName);
 		String lexerName = grammarName+"Lexer";
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -203,7 +212,7 @@ public class TestRig {
 		}
 	}
 
-	static void process(Lexer lexer, Class<? extends Parser> parserClass, Parser parser, InputStream is, Reader r) throws IOException, IllegalAccessException, InvocationTargetException, PrintException {
+	protected void process(Lexer lexer, Class<? extends Parser> parserClass, Parser parser, InputStream is, Reader r) throws IOException, IllegalAccessException, InvocationTargetException, PrintException {
 		try {
 			ANTLRInputStream input = new ANTLRInputStream(r);
 			lexer.setInputStream(input);
@@ -218,7 +227,6 @@ public class TestRig {
 			}
 
 			if ( startRuleName.equals(LEXER_START_RULE_NAME) ) return;
-
 
 			if ( diagnostics ) {
 				parser.addErrorListener(new DiagnosticErrorListener());

@@ -31,51 +31,42 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.RuleFunction;
+import org.antlr.v4.codegen.model.SerializedATN;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.stringtemplate.v4.NumberRenderer;
 import org.stringtemplate.v4.ST;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import org.stringtemplate.v4.STErrorListener;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
+import org.stringtemplate.v4.StringRenderer;
+import org.stringtemplate.v4.misc.STMessage;
 
 /** */
-public class Target {
-	/** For pure strings of Java 16-bit unicode char, how can we display
+public abstract class Target {
+	/** For pure strings of Java 16-bit Unicode char, how can we display
 	 *  it in the target language as a literal.  Useful for dumping
 	 *  predicates and such that may refer to chars that need to be escaped
 	 *  when represented as strings.  Also, templates need to be escaped so
 	 *  that the target language can hold them as a string.
-	 *
+	 *  <p/>
 	 *  I have defined (via the constructor) the set of typical escapes,
-	 *  but your Target subclass is free to alter the translated chars or
-	 *  add more definitions.  This is nonstatic so each target can have
+	 *  but your {@link Target} subclass is free to alter the translated chars
+	 *  or add more definitions.  This is non-static so each target can have
 	 *  a different set in memory at same time.
 	 */
 	protected String[] targetCharValueEscape = new String[255];
 
-	public CodeGenerator gen;
+	private final CodeGenerator gen;
+	private final String language;
+	private STGroup templates;
 
-	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
-	public Set<String> badWords = new HashSet<String>();
-
-	public static String[] javaKeywords = {
-		"abstract", "assert", "boolean", "break", "byte", "case", "catch",
-		"char", "class", "const", "continue", "default", "do", "double", "else",
-		"enum", "extends", "false", "final", "finally", "float", "for",
-		"if", "implements", "import", "instanceof", "int", "interface",
-		"long", "native", "new", "null", "package", "private", "protected",
-		"public", "return", "short", "static", "strictfp", "super", "switch",
-		"synchronized", "this", "throw", "throws", "transient", "true", "try",
-		"void", "volatile", "while"
-	};
-
-	public Target(CodeGenerator gen) {
+	protected Target(CodeGenerator gen, String language) {
 		targetCharValueEscape['\n'] = "\\n";
 		targetCharValueEscape['\r'] = "\\r";
 		targetCharValueEscape['\t'] = "\\t";
@@ -85,27 +76,37 @@ public class Target {
 		targetCharValueEscape['\''] = "\\'";
 		targetCharValueEscape['"'] = "\\\"";
 		this.gen = gen;
-		addBadWords();
+		this.language = language;
 	}
 
-	public void addBadWords() {
-		badWords.addAll(Arrays.asList(javaKeywords));
-		badWords.add("rule");
-		badWords.add("parserRule");
+	public CodeGenerator getCodeGenerator() {
+		return gen;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public STGroup getTemplates() {
+		if (templates == null) {
+			templates = loadTemplates();
+		}
+
+		return templates;
 	}
 
 	protected void genFile(Grammar g,
 						   ST outputFileST,
 						   String fileName)
 	{
-		gen.write(outputFileST, fileName);
+		getCodeGenerator().write(outputFileST, fileName);
 	}
 
 	protected void genListenerFile(Grammar g,
 								   ST outputFileST)
 	{
-		String fileName = gen.getListenerFileName();
-		gen.write(outputFileST, fileName);
+		String fileName = getCodeGenerator().getListenerFileName();
+		getCodeGenerator().write(outputFileST, fileName);
 	}
 
 	protected void genRecognizerHeaderFile(Grammar g,
@@ -136,63 +137,6 @@ public class Target {
 			labels[i] = getTokenTypeAsTargetLabel(g, ttypes[i]);
 		}
 		return labels;
-	}
-
-	/** Convert from an ANTLR char literal found in a grammar file to
-	 *  an equivalent char literal in the target language.  For most
-	 *  languages, this means leaving 'x' as 'x'.  Actually, we need
-	 *  to escape '\u000A' so that it doesn't get converted to \n by
-	 *  the compiler.  Convert the literal to the char value and then
-	 *  to an appropriate target char literal.
-	 *
-	 *  Expect single quotes around the incoming literal.
-	 *  TODO: unused and should call CharSupport.getANTLRCharLiteralForChar anyway
-	 */
-	public String getTargetCharLiteralCharValue(int c) {
-		StringBuilder buf = new StringBuilder();
-		buf.append('\'');
-		if ( c< Lexer.MIN_CHAR_VALUE ) return "'\u0000'";
-		if ( c<targetCharValueEscape.length &&
-			 targetCharValueEscape[c]!=null )
-		{
-			buf.append(targetCharValueEscape[c]);
-		}
-		else if ( Character.UnicodeBlock.of((char)c)==
-				  Character.UnicodeBlock.BASIC_LATIN &&
-				  !Character.isISOControl((char)c) )
-		{
-			// normal char
-			buf.append((char)c);
-		}
-		else {
-			// must be something unprintable...use \\uXXXX
-			// turn on the bit above max "\\uFFFF" value so that we pad with zeros
-			// then only take last 4 digits
-			String hex = Integer.toHexString(c|0x10000).toUpperCase().substring(1,5);
-			buf.append("\\u");
-			buf.append(hex);
-		}
-
-		buf.append('\'');
-		return buf.toString();
-	}
-
-	/** Convert long to 0xNNNNNNNNNNNNNNNN by default for spitting out
-	 *  with bitsets.  I.e., convert bytes to hex string.
-	 */
-	public String getTarget64BitStringFromValue(long word) {
-		int numHexDigits = 8*2;
-		StringBuilder buf = new StringBuilder(numHexDigits+2);
-		buf.append("0x");
-		String digits = Long.toHexString(word);
-		digits = digits.toUpperCase();
-		int padding = numHexDigits - digits.length();
-		// pad left with zeros
-		for (int i=1; i<=padding; i++) {
-			buf.append('0');
-		}
-		buf.append(digits);
-		return buf.toString();
 	}
 
 	/** Given a random string of Java unicode chars, return a new string with
@@ -245,93 +189,16 @@ public class Target {
 		return getTargetStringLiteralFromString(s, true);
 	}
 
-	/** Convert from an ANTLR string literal found in a grammar file to
-	 *  an equivalent string literal in the target language.  For Java, this
-	 *  is the translation 'a\n"' -> "a\n\"".  Expect single quotes
-	 *  around the incoming literal.  Just flip the quotes and replace
-	 *  double quotes with \"
-     *
-     *  Note that we have decided to allow people to use '\"' without
-	 *  penalty, so we must build the target string in a loop as Utils.replae
-	 *  cannot handle both \" and " without a lot of messing around.
-	 *
+	/**
+	 * Convert from an ANTLR string literal found in a grammar file to an
+	 * equivalent string literal in the target language.
 	 */
-	public String getTargetStringLiteralFromANTLRStringLiteral(
+	public abstract String getTargetStringLiteralFromANTLRStringLiteral(
 		CodeGenerator generator,
-		String literal, boolean addQuotes)
-	{
-		StringBuilder sb = new StringBuilder();
-		String is = literal;
-
-        if ( addQuotes ) sb.append('"');
-
-        for (int i = 1; i < is.length() -1; i++) {
-            if  (is.charAt(i) == '\\') {
-                // Anything escaped is what it is! We assume that
-                // people know how to escape characters correctly. However
-                // we catch anything that does not need an escape in Java (which
-                // is what the default implementation is dealing with and remove
-                // the escape. The C target does this for instance.
-                //
-                switch (is.charAt(i+1)) {
-                    // Pass through any escapes that Java also needs
-                    //
-                    case    '"':
-                    case    'n':
-                    case    'r':
-                    case    't':
-                    case    'b':
-                    case    'f':
-                    case    '\\':
-                    case    'u':    // Assume unnnn
-                        sb.append('\\');    // Pass the escape through
-                        break;
-                    default:
-                        // Remove the escape by virtue of not adding it here
-                        // Thus \' becomes ' and so on
-                        break;
-                }
-
-                // Go past the \ character
-                i++;
-            } else {
-                // Characters that don't need \ in ANTLR 'strings' but do in Java
-                if (is.charAt(i) == '"') {
-                    // We need to escape " in Java
-                    sb.append('\\');
-                }
-            }
-            // Add in the next character, which may have been escaped
-            sb.append(is.charAt(i));
-        }
-
-		if ( addQuotes ) sb.append('"');
-
-		return sb.toString();
-	}
+		String literal, boolean addQuotes);
 
 	/** Assume 16-bit char */
-	public String encodeIntAsCharEscape(int v) {
-		if (v < Character.MIN_VALUE || v > Character.MAX_VALUE) {
-			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));
-		}
-
-		if (v >= 0 && v < targetCharValueEscape.length && targetCharValueEscape[v] != null) {
-			return targetCharValueEscape[v];
-		}
-
-		if (v >= 0x20 && v < 127 && (!Character.isDigit(v) || v == '8' || v == '9')) {
-			return String.valueOf((char)v);
-		}
-
-		if ( v>=0 && v<=127 ) {
-			String oct = Integer.toOctalString(v);
-			return "\\"+ oct;
-		}
-
-		String hex = Integer.toHexString(v|0x10000).substring(1,5);
-		return "\\u"+hex;
-	}
+	public abstract String encodeIntAsCharEscape(int v);
 
 	public String getLoopLabel(GrammarAST ast) {
 		return "loop"+ ast.token.getTokenIndex();
@@ -342,20 +209,20 @@ public class Target {
 	}
 
 	public String getListLabel(String label) {
-		ST st = gen.templates.getInstanceOf("ListLabelName");
+		ST st = getTemplates().getInstanceOf("ListLabelName");
 		st.add("label", label);
 		return st.render();
 	}
 
 	public String getRuleFunctionContextStructName(Rule r) {
 		if ( r.g.isLexer() ) {
-			return gen.templates.getInstanceOf("LexerRuleContext").render();
+			return getTemplates().getInstanceOf("LexerRuleContext").render();
 		}
-		return Utils.capitalize(r.name)+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
+		return Utils.capitalize(r.name)+getTemplates().getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	public String getAltLabelContextStructName(String label) {
-		return Utils.capitalize(label)+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
+		return Utils.capitalize(label)+getTemplates().getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	/** If we know which actual function, we can provide the actual ctx type.
@@ -366,39 +233,39 @@ public class Target {
 	public String getRuleFunctionContextStructName(RuleFunction function) {
 		Rule r = function.rule;
 		if ( r.g.isLexer() ) {
-			return gen.templates.getInstanceOf("LexerRuleContext").render();
+			return getTemplates().getInstanceOf("LexerRuleContext").render();
 		}
-		return Utils.capitalize(r.name)+gen.templates.getInstanceOf("RuleContextNameSuffix").render();
+		return Utils.capitalize(r.name)+getTemplates().getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	// should be same for all refs to same token like ctx.ID within single rule function
 	// for literals like 'while', we gen _s<ttype>
 	public String getImplicitTokenLabel(String tokenName) {
-		ST st = gen.templates.getInstanceOf("ImplicitTokenLabel");
-		int ttype = gen.g.getTokenType(tokenName);
+		ST st = getTemplates().getInstanceOf("ImplicitTokenLabel");
+		int ttype = getCodeGenerator().g.getTokenType(tokenName);
 		if ( tokenName.startsWith("'") ) {
 			return "s"+ttype;
 		}
-		String text = getTokenTypeAsTargetLabel(gen.g, ttype);
+		String text = getTokenTypeAsTargetLabel(getCodeGenerator().g, ttype);
 		st.add("tokenName", text);
 		return st.render();
 	}
 
 	// x=(A|B)
 	public String getImplicitSetLabel(String id) {
-		ST st = gen.templates.getInstanceOf("ImplicitSetLabel");
+		ST st = getTemplates().getInstanceOf("ImplicitSetLabel");
 		st.add("id", id);
 		return st.render();
 	}
 
 	public String getImplicitRuleLabel(String ruleName) {
-		ST st = gen.templates.getInstanceOf("ImplicitRuleLabel");
+		ST st = getTemplates().getInstanceOf("ImplicitRuleLabel");
 		st.add("ruleName", ruleName);
 		return st.render();
 	}
 
 	public String getElementListName(String name) {
-		ST st = gen.templates.getInstanceOf("ElementListName");
+		ST st = getTemplates().getInstanceOf("ElementListName");
 		st.add("elemName", getElementName(name));
 		return st.render();
 	}
@@ -408,10 +275,22 @@ public class Target {
 			return "_wild";
 		}
 
-		if ( gen.g.getRule(name)!=null ) return name;
-		int ttype = gen.g.getTokenType(name);
+		if ( getCodeGenerator().g.getRule(name)!=null ) return name;
+		int ttype = getCodeGenerator().g.getTokenType(name);
 		if ( ttype==Token.INVALID_TYPE ) return name;
-		return getTokenTypeAsTargetLabel(gen.g, ttype);
+		return getTokenTypeAsTargetLabel(getCodeGenerator().g, ttype);
+	}
+
+	/**
+	 * Gets the maximum number of 16-bit unsigned integers that can be encoded
+	 * in a single segment of the serialized ATN.
+	 *
+	 * @see SerializedATN#getSegments
+	 *
+	 * @return the serialized ATN segment limit
+	 */
+	public int getSerializedATNSegmentLimit() {
+		return Integer.MAX_VALUE;
 	}
 
 	public boolean grammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
@@ -445,7 +324,41 @@ public class Target {
 			break;
 		}
 
-		return badWords.contains(idNode.getText());
+		return visibleGrammarSymbolCausesIssueInGeneratedCode(idNode);
 	}
 
+	protected abstract boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode);
+
+	protected STGroup loadTemplates() {
+		STGroup result = new STGroupFile(CodeGenerator.TEMPLATE_ROOT+"/"+getLanguage()+"/"+getLanguage()+STGroup.GROUP_FILE_EXTENSION);
+		result.registerRenderer(Integer.class, new NumberRenderer());
+		result.registerRenderer(String.class, new StringRenderer());
+		result.setListener(new STErrorListener() {
+			@Override
+			public void compileTimeError(STMessage msg) {
+				reportError(msg);
+			}
+
+			@Override
+			public void runTimeError(STMessage msg) {
+				reportError(msg);
+			}
+
+			@Override
+			public void IOError(STMessage msg) {
+				reportError(msg);
+			}
+
+			@Override
+			public void internalError(STMessage msg) {
+				reportError(msg);
+			}
+
+			private void reportError(STMessage msg) {
+				getCodeGenerator().tool.errMgr.toolError(ErrorType.STRING_TEMPLATE_WARNING, msg.cause, msg.toString());
+			}
+		});
+
+		return result;
+	}
 }

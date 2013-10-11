@@ -33,9 +33,9 @@ package org.antlr.v4.tool;
 import java.util.Collection;
 
 public class LeftRecursionCyclesMessage extends ANTLRMessage {
-	public Collection cycles;
+	public Collection<? extends Collection<Rule>> cycles;
 
-	public LeftRecursionCyclesMessage(String fileName, Collection cycles) {
+	public LeftRecursionCyclesMessage(String fileName, Collection<? extends Collection<Rule>> cycles) {
 		super(ErrorType.LEFT_RECURSION_CYCLES, cycles);
 		this.cycles = cycles;
 		this.fileName = fileName;

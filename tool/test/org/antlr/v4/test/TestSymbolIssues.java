@@ -30,8 +30,11 @@
 
 package org.antlr.v4.test;
 
+import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /** */
 public class TestSymbolIssues extends BaseTest {
@@ -51,16 +54,16 @@ public class TestSymbolIssues extends BaseTest {
         "\n" +
         "ID : 'a'..'z'+ ID ;",
         // YIELDS
-			"error(94): A.g4:5:1: redefinition of members action\n" +
-			"error(94): A.g4:7:1: redefinition of header action\n" +
-			"warning(83): A.g4:2:10: illegal option opt\n" +
-			"warning(83): A.g4:2:21: illegal option k\n" +
-			"error(94): A.g4:5:1: redefinition of members action\n" +
-			"warning(125): A.g4:9:27: implicit definition of token X in parser\n" +
-			"warning(125): A.g4:10:20: implicit definition of token Y in parser\n" +
-			"warning(125): A.g4:11:4: implicit definition of token FJKD in parser\n" +
-			"error(80): A.g4:9:37: rule b has no defined parameters\n" +
-			"error(79): A.g4:10:31: missing parameter(s) on rule reference: a\n"
+			"error(" + ErrorType.ACTION_REDEFINITION.code + "): A.g4:5:1: redefinition of 'members' action\n" +
+			"error(" + ErrorType.ACTION_REDEFINITION.code + "): A.g4:7:1: redefinition of 'header' action\n" +
+			"warning(" + ErrorType.ILLEGAL_OPTION.code + "): A.g4:2:10: unsupported option 'opt'\n" +
+			"warning(" + ErrorType.ILLEGAL_OPTION.code + "): A.g4:2:21: unsupported option 'k'\n" +
+			"error(" + ErrorType.ACTION_REDEFINITION.code + "): A.g4:5:1: redefinition of 'members' action\n" +
+			"warning(" + ErrorType.IMPLICIT_TOKEN_DEFINITION.code + "): A.g4:9:27: implicit definition of token 'X' in parser\n" +
+			"warning(" + ErrorType.IMPLICIT_TOKEN_DEFINITION.code + "): A.g4:10:20: implicit definition of token 'Y' in parser\n" +
+			"warning(" + ErrorType.IMPLICIT_TOKEN_DEFINITION.code + "): A.g4:11:4: implicit definition of token 'FJKD' in parser\n" +
+			"error(" + ErrorType.RULE_HAS_NO_ARGS.code + "): A.g4:9:37: rule 'b' has no defined parameters\n" +
+			"error(" + ErrorType.MISSING_RULE_ARGS.code + "): A.g4:10:31: missing arguments(s) on rule reference: a\n"
     };
 
     static String[] B = {
@@ -74,11 +77,11 @@ public class TestSymbolIssues extends BaseTest {
         "\n" +
         "s : FOO ;",
         // YIELDS
-		"error(69): B.g4:4:4: label s conflicts with rule with same name\n" +
-		"error(69): B.g4:4:9: label b conflicts with rule with same name\n" +
-		"error(70): B.g4:4:15: label X conflicts with token with same name\n" +
-		"error(75): B.g4:6:9: label x type mismatch with previous definition: TOKEN_LIST_LABEL!=TOKEN_LABEL\n" +
-		"error(126): B.g4:4:20: cannot create implicit token for string literal '.' in non-combined grammar\n"
+		"error(" + ErrorType.LABEL_CONFLICTS_WITH_RULE.code + "): B.g4:4:4: label 's' conflicts with rule with same name\n" +
+		"error(" + ErrorType.LABEL_CONFLICTS_WITH_RULE.code + "): B.g4:4:9: label 'b' conflicts with rule with same name\n" +
+		"error(" + ErrorType.LABEL_CONFLICTS_WITH_TOKEN.code + "): B.g4:4:15: label 'X' conflicts with token with same name\n" +
+		"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): B.g4:6:9: label 'x' type mismatch with previous definition: TOKEN_LIST_LABEL!=TOKEN_LABEL\n" +
+		"error(" + ErrorType.IMPLICIT_STRING_DEFINITION.code + "): B.g4:4:20: cannot create implicit token for string literal in non-combined grammar: '.'\n"
     };
 
     static String[] D = {
@@ -94,8 +97,8 @@ public class TestSymbolIssues extends BaseTest {
         "        :       ID ;",
 
         // YIELDS
-        "error(72): D.g4:4:21: label j conflicts with rule a's return value or parameter with same name\n" +
-		"error(76): D.g4:6:0: rule b's argument i conflicts a return value with same name\n"
+        "error(" + ErrorType.LABEL_CONFLICTS_WITH_ARG.code + "): D.g4:4:21: label 'j' conflicts with parameter with same name\n" +
+		"error(" + ErrorType.RETVAL_CONFLICTS_WITH_ARG.code + "): D.g4:6:22: return value 'i' conflicts with parameter with same name\n"
     };
 
 	static String[] E = {
@@ -109,7 +112,7 @@ public class TestSymbolIssues extends BaseTest {
 		"a : A ;\n",
 
 		// YIELDS
-		"warning(108): E.g4:3:4: token name A is already defined\n"
+		"warning(" + ErrorType.TOKEN_NAME_REASSIGNMENT.code + "): E.g4:3:4: token name 'A' is already defined\n"
 	};
 
     @Test public void testA() { super.testErrors(A, false); }
@@ -135,5 +138,34 @@ public class TestSymbolIssues extends BaseTest {
 		assertEquals(expectedTokenIDToTypeMap, g.tokenNameToTypeMap.toString());
 		assertEquals(expectedStringLiteralToTypeMap, g.stringLiteralToTypeMap.toString());
 		assertEquals(expectedTypeToTokenList, realElements(g.typeToTokenList).toString());
+	}
+
+	@Test public void testEmptyLexerModeDetection() throws Exception {
+		String[] test = {
+			"lexer grammar L;\n" +
+			"A : 'a';\n" +
+			"mode X;\n" +
+			"fragment B : 'b';",
+
+			"error(" + ErrorType.MODE_WITHOUT_RULES.code + "): L.g4:3:5: lexer mode 'X' must contain at least one non-fragment rule\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	@Test public void testEmptyLexerRuleDetection() throws Exception {
+		String[] test = {
+			"lexer grammar L;\n" +
+			"A : 'a';\n" +
+			"WS : [ \t]* -> skip;\n" +
+			"mode X;\n" +
+			"  B : C;\n" +
+			"  fragment C : A | (A C)?;",
+
+			"warning(" + ErrorType.EPSILON_TOKEN.code + "): L.g4:3:0: non-fragment lexer rule 'WS' can match the empty string\n" +
+			"warning(" + ErrorType.EPSILON_TOKEN.code + "): L.g4:5:2: non-fragment lexer rule 'B' can match the empty string\n"
+		};
+
+		testErrors(test, false);
 	}
 }

@@ -100,9 +100,9 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 				s = "<"+t.getType()+">";
 			}
 		}
-		s = s.replaceAll("\n","\\\\n");
-		s = s.replaceAll("\r","\\\\r");
-		s = s.replaceAll("\t","\\\\t");
+		s = s.replace("\n","\\n");
+		s = s.replace("\r","\\r");
+		s = s.replace("\t","\\t");
 		return "'"+s+"'";
 	}
 
@@ -168,5 +168,8 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	public abstract void setInputStream(IntStream input);
 
-	public abstract void setTokenFactory(TokenFactory<?> input);
+	@NotNull
+	public abstract TokenFactory<?> getTokenFactory();
+
+	public abstract void setTokenFactory(@NotNull TokenFactory<?> input);
 }

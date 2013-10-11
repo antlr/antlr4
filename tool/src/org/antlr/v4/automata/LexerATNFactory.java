@@ -66,7 +66,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		// use codegen to get correct language templates for lexer commands
 		String language = g.getOptionString("language");
 		CodeGenerator gen = new CodeGenerator(g.tool, null, language);
-		codegenTemplates = gen.templates;
+		codegenTemplates = gen.getTemplates();
 	}
 
 	@Override
@@ -143,6 +143,16 @@ public class LexerATNFactory extends ParserATNFactory {
 		ST cmdST = codegenTemplates.getInstanceOf("Lexer" +
 												  CharSupport.capitalize(ID.getText())+
 												  "Command");
+		if (cmdST == null) {
+			g.tool.errMgr.grammarError(ErrorType.INVALID_LEXER_COMMAND, g.fileName, ID.token, ID.getText());
+			return "";
+		}
+
+		if (cmdST.impl.formalArguments == null || !cmdST.impl.formalArguments.containsKey("arg")) {
+			g.tool.errMgr.grammarError(ErrorType.UNWANTED_LEXER_COMMAND_ARGUMENT, g.fileName, ID.token, ID.getText());
+			return "";
+		}
+
 		cmdST.add("arg", arg.getText());
 		return cmdST.render();
 	}
@@ -152,6 +162,16 @@ public class LexerATNFactory extends ParserATNFactory {
 		ST cmdST = codegenTemplates.getInstanceOf("Lexer" +
 												  CharSupport.capitalize(ID.getText())+
 												  "Command");
+		if (cmdST == null) {
+			g.tool.errMgr.grammarError(ErrorType.INVALID_LEXER_COMMAND, g.fileName, ID.token, ID.getText());
+			return "";
+		}
+
+		if (cmdST.impl.formalArguments != null && cmdST.impl.formalArguments.containsKey("arg")) {
+			g.tool.errMgr.grammarError(ErrorType.MISSING_LEXER_COMMAND_ARGUMENT, g.fileName, ID.token, ID.getText());
+			return "";
+		}
+
 		return cmdST.render();
 	}
 
@@ -187,13 +207,13 @@ public class LexerATNFactory extends ParserATNFactory {
 					set.add(c);
 				}
 				else {
-					g.tool.errMgr.grammarError(ErrorType.INVALID_LEXER_SET_ELEMENT,
+					g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
 											   g.fileName, t.getToken(), t.getText());
 
 				}
 			}
 			else if ( t.getType()==ANTLRParser.TOKEN_REF ) {
-				g.tool.errMgr.grammarError(ErrorType.INVALID_LEXER_SET_ELEMENT,
+				g.tool.errMgr.grammarError(ErrorType.UNSUPPORTED_REFERENCE_IN_LEXER_SET,
 										   g.fileName, t.getToken(), t.getText());
 			}
 		}

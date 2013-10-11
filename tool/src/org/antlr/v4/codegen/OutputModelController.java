@@ -213,7 +213,7 @@ public class OutputModelController {
 
 		// now inject code to start alts
 		CodeGenerator gen = delegate.getGenerator();
-		STGroup codegenTemplates = gen.templates;
+		STGroup codegenTemplates = gen.getTemplates();
 
 		// pick out alt(s) for primaries
 		CodeBlockForOuterMostAlt outerAlt = (CodeBlockForOuterMostAlt)function.code.get(0);
@@ -300,7 +300,7 @@ public class OutputModelController {
 			e.printStackTrace(System.err);
 		}
 
-		function.ctxType = gen.target.getRuleFunctionContextStructName(function);
+		function.ctxType = gen.getTarget().getRuleFunctionContextStructName(function);
 
 		function.postamble = rulePostamble(function, r);
 	}
@@ -312,12 +312,12 @@ public class OutputModelController {
 
 		CodeGenerator gen = delegate.getGenerator();
 		Grammar g = delegate.getGrammar();
-		String ctxType = gen.target.getRuleFunctionContextStructName(r);
+		String ctxType = gen.getTarget().getRuleFunctionContextStructName(r);
 		RuleActionFunction raf = lexer.actionFuncs.get(r);
 		if ( raf==null ) {
 			raf = new RuleActionFunction(delegate, r, ctxType);
-			lexer.actionFuncs.put(r, raf);
 		}
+
 		for (ActionAST a : r.actions) {
 			if ( a instanceof PredAST ) {
 				PredAST p = (PredAST)a;
@@ -331,6 +331,11 @@ public class OutputModelController {
 			else if ( a.getType()== ANTLRParser.ACTION ) {
 				raf.actions.put(g.lexerActions.get(a), new Action(delegate, a));
 			}
+		}
+
+		if (!raf.actions.isEmpty() && !lexer.actionFuncs.containsKey(r)) {
+			// only add to lexer if the function actually contains actions
+			lexer.actionFuncs.put(r, raf);
 		}
 	}
 

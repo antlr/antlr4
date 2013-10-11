@@ -136,6 +136,9 @@ public class LeftRecursiveRuleTransformer {
 //		System.out.println("created: "+newRuleText);
 		RuleAST t = parseArtificialRule(g, newRuleText);
 
+		// reuse the name token from the original AST since it refers to the proper source location in the original grammar
+		((GrammarAST)t.getChild(0)).token = ((GrammarAST)prevRuleAST.getChild(0)).getToken();
+
 		// update grammar AST and set rule's AST.
 		RULES.setChild(prevRuleAST.getChildIndex(), t);
 		r.ast = t;
@@ -155,6 +158,10 @@ public class LeftRecursiveRuleTransformer {
 		r.recPrimaryAlts = new ArrayList<LeftRecursiveRuleAltInfo>();
 		r.recPrimaryAlts.addAll(leftRecursiveRuleWalker.prefixAlts);
 		r.recPrimaryAlts.addAll(leftRecursiveRuleWalker.otherAlts);
+		if (r.recPrimaryAlts.isEmpty()) {
+			tool.errMgr.grammarError(ErrorType.NO_NON_LR_ALTS, g.fileName, ((GrammarAST)r.ast.getChild(0)).getToken(), r.name);
+		}
+
 		r.recOpAlts = new OrderedHashMap<Integer, LeftRecursiveRuleAltInfo>();
 		r.recOpAlts.putAll(leftRecursiveRuleWalker.binaryAlts);
 		r.recOpAlts.putAll(leftRecursiveRuleWalker.ternaryAlts);
@@ -167,7 +174,7 @@ public class LeftRecursiveRuleTransformer {
 		// update Rule to just one alt and add prec alt
 		ActionAST arg = (ActionAST)r.ast.getFirstChildWithType(ANTLRParser.ARG_ACTION);
 		if ( arg!=null ) {
-			r.args = ScopeParser.parseTypedArgList(arg.getText(), g.tool.errMgr);
+			r.args = ScopeParser.parseTypedArgList(arg, arg.getText(), g.tool.errMgr);
 			r.args.type = AttributeDict.DictType.ARG;
 			r.args.ast = arg;
 			arg.resolver = r.alt[1]; // todo: isn't this Rule or something?
@@ -211,18 +218,20 @@ public class LeftRecursiveRuleTransformer {
 	}
 
 	/**
-	 (RULE e int _p (returns int v)
-	 	(BLOCK
-	 	  (ALT
-	 		(BLOCK
-	 			(ALT INT {$v = $INT.int;})
-	 			(ALT '(' (= x e) ')' {$v = $x.v;})
-	 			(ALT ID))
-	 		(* (BLOCK
-	 			(ALT {7 >= $_p}? '*' (= b e) {$v = $a.v * $b.v;})
-	 			(ALT {6 >= $_p}? '+' (= b e) {$v = $a.v + $b.v;})
-	 			(ALT {3 >= $_p}? '++') (ALT {2 >= $_p}? '--'))))))
-
+	 * <pre>
+	 * (RULE e int _p (returns int v)
+	 * 	(BLOCK
+	 * 	  (ALT
+	 * 		(BLOCK
+	 * 			(ALT INT {$v = $INT.int;})
+	 * 			(ALT '(' (= x e) ')' {$v = $x.v;})
+	 * 			(ALT ID))
+	 * 		(* (BLOCK
+	 *			(OPTIONS ...)
+	 * 			(ALT {7 >= $_p}? '*' (= b e) {$v = $a.v * $b.v;})
+	 * 			(ALT {6 >= $_p}? '+' (= b e) {$v = $a.v + $b.v;})
+	 * 			(ALT {3 >= $_p}? '++') (ALT {2 >= $_p}? '--'))))))
+	 * </pre>
 	 */
 	public void setAltASTPointers(LeftRecursiveRule r, RuleAST t) {
 //		System.out.println("RULE: "+t.toStringTree());

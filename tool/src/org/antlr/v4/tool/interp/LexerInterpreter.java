@@ -53,7 +53,7 @@ public class LexerInterpreter implements TokenSource {
 	/** How to create token objects */
 	protected TokenFactory<?> _factory = CommonTokenFactory.DEFAULT;
 
-	protected final DFA[] _decisionToDFA = new DFA[1];
+	protected final DFA[] _decisionToDFA;
 	protected final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 
@@ -65,6 +65,10 @@ public class LexerInterpreter implements TokenSource {
 	public LexerInterpreter(LexerGrammar g) {
 		Tool antlr = new Tool();
 		antlr.process(g,false);
+		_decisionToDFA = new DFA[g.atn.getNumberOfDecisions()];
+		for (int i = 0; i < _decisionToDFA.length; i++) {
+			_decisionToDFA[i] = new DFA(g.atn.getDecisionState(i), i);
+		}
 		interp = new LexerATNSimulator(g.atn,_decisionToDFA,_sharedContextCache);
 	}
 

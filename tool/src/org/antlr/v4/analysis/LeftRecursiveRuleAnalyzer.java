@@ -39,11 +39,11 @@ import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.LeftRecursiveRuleWalker;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.GrammarASTWithOptions;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
@@ -73,7 +73,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		new ArrayList<Pair<GrammarAST,String>>();
 
 	/** Tokens from which rule AST comes from */
-	public TokenStream tokenStream;
+	public final TokenStream tokenStream;
 
 	public GrammarAST retvals;
 
@@ -90,7 +90,11 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		this.tool = tool;
 		this.ruleName = ruleName;
 		this.language = language;
-		tokenStream = ruleAST.g.tokenStream;
+		this.tokenStream = ruleAST.g.tokenStream;
+		if (this.tokenStream == null) {
+			throw new NullPointerException("grammar must have a token stream");
+		}
+
 		loadPrecRuleTemplates();
 	}
 
@@ -103,7 +107,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 		// use codegen to get correct language templates; that's it though
 		CodeGenerator gen = new CodeGenerator(tool, null, language);
-		codegenTemplates = gen.templates;
+		codegenTemplates = gen.getTemplates();
 	}
 
 	@Override
@@ -112,21 +116,19 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 	}
 
 	@Override
-	public void setTokenPrec(GrammarAST t, int alt) {
+	public void setAltAssoc(AltAST t, int alt) {
 		ASSOC assoc = ASSOC.left;
-		if ( t instanceof GrammarASTWithOptions ) {
-			if ( ((GrammarASTWithOptions)t).getOptions()!=null ) {
-				String a = ((GrammarASTWithOptions)t).getOptionString("assoc");
-				if ( a!=null ) {
-					if ( a.equals(ASSOC.right.toString()) ) {
-						assoc = ASSOC.right;
-					}
-					else if ( a.equals(ASSOC.left.toString()) ) {
-						assoc = ASSOC.left;
-					}
-					else {
-						tool.errMgr.toolError(ErrorType.ILLEGAL_OPTION_VALUE, "assoc", assoc);
-					}
+		if ( t.getOptions()!=null ) {
+			String a = t.getOptionString("assoc");
+			if ( a!=null ) {
+				if ( a.equals(ASSOC.right.toString()) ) {
+					assoc = ASSOC.right;
+				}
+				else if ( a.equals(ASSOC.left.toString()) ) {
+					assoc = ASSOC.left;
+				}
+				else {
+					tool.errMgr.toolError(ErrorType.ILLEGAL_OPTION_VALUE, "assoc", assoc);
 				}
 			}
 		}
@@ -136,7 +138,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		}
 		altAssociativity.put(alt, assoc);
 
-		//System.out.println("op " + alt + ": " + t.getText()+", assoc="+assoc);
+//		System.out.println("setAltAssoc: op " + alt + ": " + t.getText()+", assoc="+assoc);
 	}
 
 	@Override
@@ -164,32 +166,6 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		a.nextPrec = nextPrec;
 		binaryAlts.put(alt, a);
 		//System.out.println("binaryAlt " + alt + ": " + altText + ", rewrite=" + rewriteText);
-	}
-
-	/** Convert e ? e : e  ->  ? e : e_[nextPrec] */
-	@Override
-	public void ternaryAlt(AltAST originalAltTree, int alt) {
-		AltAST altTree = (AltAST)originalAltTree.dupTree();
-		String altLabel = altTree.altLabel!=null ? altTree.altLabel.getText() : null;
-
-		GrammarAST lrlabel = stripLeftRecursion(altTree);
-		String label = lrlabel != null ? lrlabel.getText() : null;
-		if ( lrlabel!=null ) {
-			leftRecursiveRuleRefLabels.add(new Pair<GrammarAST,String>(lrlabel,altLabel));
-		}
-		stripAssocOptions(altTree);
-		stripAltLabel(altTree);
-
-		int nextPrec = nextPrecedence(alt);
-		altTree = addPrecedenceArgToLastRule(altTree, nextPrec);
-
-		String altText = text(altTree);
-		altText = altText.trim();
-		LeftRecursiveRuleAltInfo a =
-			new LeftRecursiveRuleAltInfo(alt, altText, label, altLabel, originalAltTree);
-		a.nextPrec = nextPrec;
-		ternaryAlts.put(alt, a);
-		//System.out.println("ternaryAlt " + alt + ": " + altText + ", rewrite=" + rewriteText);
 	}
 
 	@Override
@@ -279,20 +255,14 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 	public AltAST addPrecedenceArgToRules(AltAST t, int prec) {
 		if ( t==null ) return null;
-		for (GrammarAST rref : t.getNodesWithType(RULE_REF)) {
-			if ( rref.getText().equals(ruleName) ) {
+		// get all top-level rule refs from ALT
+		List<GrammarAST> outerAltRuleRefs = t.getNodesWithTypePreorderDFS(IntervalSet.of(RULE_REF));
+		for (GrammarAST rref : outerAltRuleRefs) {
+			boolean recursive = rref.getText().equals(ruleName);
+			boolean rightmost = rref == outerAltRuleRefs.get(outerAltRuleRefs.size()-1);
+			if ( recursive && rightmost ) {
 				rref.setText(ruleName+"<"+LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME+"="+prec+">");
 			}
-		}
-		return t;
-	}
-
-	public AltAST addPrecedenceArgToLastRule(AltAST t, int prec) {
-		if ( t==null ) return null;
-		GrammarAST last = null;
-		for (GrammarAST rref : t.getNodesWithType(RULE_REF)) { last = rref; }
-		if ( last !=null && last.getText().equals(ruleName) ) {
-			last.setText(ruleName+"<"+LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME+"="+prec+">");
 		}
 		return t;
 	}
@@ -344,15 +314,21 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 	public GrammarAST stripLeftRecursion(GrammarAST altAST) {
 		GrammarAST lrlabel=null;
 		GrammarAST first = (GrammarAST)altAST.getChild(0);
+		int leftRecurRuleIndex = 0;
+		if ( first.getType() == ELEMENT_OPTIONS ) {
+			first = (GrammarAST)altAST.getChild(1);
+			leftRecurRuleIndex = 1;
+		}
 		Tree rref = first.getChild(1); // if label=rule
 		if ( (first.getType()==RULE_REF && first.getText().equals(ruleName)) ||
 			 (rref!=null && rref.getType()==RULE_REF && rref.getText().equals(ruleName)) )
 		{
 			if ( first.getType()==ASSIGN ) lrlabel = (GrammarAST)first.getChild(0);
-			// remove rule ref (first child)
-			altAST.deleteChild(0);
-			// reset index so it prints properly
-			GrammarAST newFirstChild = (GrammarAST)altAST.getChild(0);
+			// remove rule ref (first child unless options present)
+			altAST.deleteChild(leftRecurRuleIndex);
+			// reset index so it prints properly (sets token range of
+			// ALT to start to right of left recur rule we deleted)
+			GrammarAST newFirstChild = (GrammarAST)altAST.getChild(leftRecurRuleIndex);
 			altAST.setTokenStartIndex(newFirstChild.getTokenStartIndex());
 		}
 		return lrlabel;
@@ -382,10 +358,11 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		return numAlts-alt+1;
 	}
 
+	// Assumes left assoc
 	public int nextPrecedence(int alt) {
 		int p = precedence(alt);
-		if ( altAssociativity.get(alt)==ASSOC.left ) p++;
-		return p;
+		if ( altAssociativity.get(alt)==ASSOC.right ) return p;
+		return p+1;
 	}
 
 	@Override

@@ -43,6 +43,8 @@ import org.junit.Test;
 import java.io.Reader;
 import java.io.StringReader;
 
+import static org.junit.Assert.*;
+
 public class TestUnbufferedCharStream extends BaseTest {
 	@Test public void testNoChar() throws Exception {
 		CharStream input = createStream("");

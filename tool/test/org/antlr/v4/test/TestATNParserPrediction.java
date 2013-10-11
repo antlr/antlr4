@@ -32,6 +32,7 @@ package org.antlr.v4.test;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ParserATNFactory;
+import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
@@ -48,6 +49,8 @@ import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.interp.ParserInterpreter;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
@@ -240,14 +243,14 @@ public class TestATNParserPrediction extends BaseTest {
 		};
 		String[] dfa = {
 			"s0-'a'->s1\n" +
-			"s1-EOF->s2^\n",
+			"s1-EOF->:s2^=>1\n",
 
 			"s0-'a'->s1\n" +
-			"s1-EOF->s2^\n" +
+			"s1-EOF->:s2^=>1\n" +
 			"s1-'b'->:s3=>3\n",
 
 			"s0-'a'->s1\n" +
-			"s1-EOF->s2^\n" +
+			"s1-EOF->:s2^=>1\n" +
 			"s1-'b'->:s3=>3\n",
 		};
 		checkDFAConstruction(lg, g, decision, inputs, dfa);
@@ -275,16 +278,16 @@ public class TestATNParserPrediction extends BaseTest {
 		String[] dfa = {
 			"s0-'a'->s1\n" +
 			"s1-'b'->s2\n" +
-			"s2-EOF->s3^\n",
+			"s2-EOF->:s3^=>1\n",
 
 			"s0-'a'->s1\n" +
 			"s1-'b'->s2\n" +
-			"s2-EOF->s3^\n" +
+			"s2-EOF->:s3^=>1\n" +
 			"s2-'c'->:s4=>3\n",
 
 			"s0-'a'->s1\n" +
 			"s1-'b'->s2\n" +
-			"s2-EOF->s3^\n" +
+			"s2-EOF->:s3^=>1\n" +
 			"s2-'c'->:s4=>3\n",
 		};
 		checkDFAConstruction(lg, g, decision, inputs, dfa);
@@ -458,7 +461,7 @@ public class TestATNParserPrediction extends BaseTest {
 		Tool.internalOption_ShowATNConfigsInDFA = true;
 		ATN lexatn = createATN(lg, true);
 		LexerATNSimulator lexInterp =
-			new LexerATNSimulator(lexatn,new DFA[1],new PredictionContextCache());
+			new LexerATNSimulator(lexatn,new DFA[] { new DFA(lexatn.modeToStartState.get(Lexer.DEFAULT_MODE)) },new PredictionContextCache());
 		IntegerList types = getTokenTypesViaATN(inputString, lexInterp);
 		System.out.println(types);
 
@@ -486,11 +489,7 @@ public class TestATNParserPrediction extends BaseTest {
 //		ParserATNSimulator interp = new ParserATNSimulator(atn);
 		TokenStream input = new IntTokenStream(types);
 		ParserInterpreter interp = new ParserInterpreter(g, input);
-		DecisionState startState = atn.decisionToState.get(decision);
-		DFA dfa = new DFA(startState, decision);
-		int alt = interp.predictATN(dfa, input, ParserRuleContext.EMPTY, false);
-
-		System.out.println(dot.getDOT(dfa, false));
+		int alt = interp.adaptivePredict(input, decision, ParserRuleContext.EMPTY);
 
 		assertEquals(expectedAlt, alt);
 
@@ -504,51 +503,13 @@ public class TestATNParserPrediction extends BaseTest {
 		assertEquals(expectedAlt, alt);
 	}
 
-	public synchronized DFA getDFA(LexerGrammar lg, Grammar g, String ruleName,
-								   String inputString, ParserRuleContext ctx)
-	{
-		// sync to ensure multiple tests don't race on dfa access
-		Tool.internalOption_ShowATNConfigsInDFA = true;
-		ATN lexatn = createATN(lg, true);
-		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn,null,null);
-
-		semanticProcess(lg);
-		g.importVocab(lg);
-		semanticProcess(g);
-
-		ParserATNFactory f = new ParserATNFactory(g);
-		ATN atn = f.createATN();
-
-//		DOTGenerator dot = new DOTGenerator(g);
-//		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("a"))));
-//		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("b"))));
-//		System.out.println(dot.getDOT(atn.ruleToStartState.get(g.getRule("e"))));
-
-		ParserATNSimulator interp =
-			new ParserATNSimulator(atn, new DFA[atn.getNumberOfDecisions()],null);
-		IntegerList types = getTokenTypesViaATN(inputString, lexInterp);
-		System.out.println(types);
-		TokenStream input = new IntTokenStream(types);
-		try {
-			DecisionState startState = atn.decisionToState.get(0);
-			DFA dfa = new DFA(startState);
-//			Rule r = g.getRule(ruleName);
-			//ATNState startState = atn.ruleToStartState.get(r);
-			interp.predictATN(dfa, input, ctx);
-		}
-		catch (NoViableAltException nvae) {
-			nvae.printStackTrace(System.err);
-		}
-		return null;
-	}
-
 	public void checkDFAConstruction(LexerGrammar lg, Grammar g, int decision,
 									 String[] inputString, String[] dfaString)
 	{
 //		Tool.internalOption_ShowATNConfigsInDFA = true;
 		ATN lexatn = createATN(lg, true);
 		LexerATNSimulator lexInterp =
-			new LexerATNSimulator(lexatn,new DFA[1], new PredictionContextCache());
+			new LexerATNSimulator(lexatn,new DFA[] { new DFA(lexatn.getDecisionState(Lexer.DEFAULT_MODE)) }, new PredictionContextCache());
 
 		semanticProcess(lg);
 		g.importVocab(lg);

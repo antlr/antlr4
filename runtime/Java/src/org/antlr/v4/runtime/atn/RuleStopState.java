@@ -35,5 +35,11 @@ package org.antlr.v4.runtime.atn;
  *  references to all calls to this rule to compute FOLLOW sets for
  *  error handling.
  */
-public class RuleStopState extends ATNState {
+public final class RuleStopState extends ATNState {
+
+	@Override
+	public int getStateType() {
+		return RULE_STOP;
+	}
+
 }

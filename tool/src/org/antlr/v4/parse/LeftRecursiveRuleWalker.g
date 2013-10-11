@@ -49,9 +49,8 @@ private String ruleName;
 private int currentOuterAltNumber; // which outer alt of rule?
 public int numAlts;  // how many alts for this rule total?
 
-public void setTokenPrec(GrammarAST t, int alt) {}
+public void setAltAssoc(AltAST altTree, int alt) {}
 public void binaryAlt(AltAST altTree, int alt) {}
-public void ternaryAlt(AltAST altTree, int alt) {}
 public void prefixAlt(AltAST altTree, int alt) {}
 public void suffixAlt(AltAST altTree, int alt) {}
 public void otherAlt(AltAST altTree, int alt) {}
@@ -112,46 +111,36 @@ ruleBlock returns [boolean isLeftRec]
 
 /** An alt is either prefix, suffix, binary, or ternary operation or "other" */
 outerAlternative returns [boolean isLeftRec]
-    :   (binaryMultipleOp)=> binaryMultipleOp
+    :   (binary)=>           binary
                              {binaryAlt((AltAST)$start, currentOuterAltNumber); $isLeftRec=true;}
-    |   (binary)=>           binary
-                             {binaryAlt((AltAST)$start, currentOuterAltNumber); $isLeftRec=true;}
-    |   (ternary)=>          ternary
-                             {ternaryAlt((AltAST)$start, currentOuterAltNumber); $isLeftRec=true;}
     |   (prefix)=>           prefix
                              {prefixAlt((AltAST)$start, currentOuterAltNumber);}
     |   (suffix)=>           suffix
                              {suffixAlt((AltAST)$start, currentOuterAltNumber); $isLeftRec=true;}
-    |   ^(ALT element+) // "other" case
-                             {otherAlt((AltAST)$start, currentOuterAltNumber);}
-    ;
-
-// (ALT (= a e) (= op (SET '*' '/')) (= b e) {}) (ALT INT {}) (ALT '(' (= x e) ')' {})
-binaryMultipleOp
-	:	^( ALT recurse bops recurse ACTION? )
-	;
-
-bops:   ^(ASSIGN ID bops)
-	|	^( BLOCK ( ^( ALT (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);} ) )+ )
-    |   ^(SET (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);})
+    |   nonLeftRecur         {otherAlt((AltAST)$start,  currentOuterAltNumber);}
     ;
 
 binary
-	:	^( ALT recurse (op=token)+ {setTokenPrec($op.t, currentOuterAltNumber);} recurse ACTION? )
-	;
-
-ternary
-	:	^( ALT recurse op=token recurse token recurse ACTION? ) {setTokenPrec($op.t, currentOuterAltNumber);}
+	:	^( ALT elementOptions? recurse element+ recurse ACTION? )
+        {setAltAssoc((AltAST)$ALT,currentOuterAltNumber);}
 	;
 
 prefix
-	:	^(	ALT {setTokenPrec((GrammarAST)input.LT(1), currentOuterAltNumber);}
+	:	^(	ALT elementOptions?
 			({!((CommonTree)input.LT(1)).getText().equals(ruleName)}? element)+
 			recurse ACTION?
 		 )
+         {setAltAssoc((AltAST)$ALT,currentOuterAltNumber);}
 	;
 
-suffix : ^( ALT recurse {setTokenPrec((GrammarAST)input.LT(1), currentOuterAltNumber);} element+  ) ;
+suffix
+    :   ^( ALT elementOptions? recurse element+ )
+         {setAltAssoc((AltAST)$ALT,currentOuterAltNumber);}
+    ;
+
+nonLeftRecur
+    :   ^(ALT element+)  // no assoc for these; ignore if <assoc=...> present
+    ;
 
 recurse
 	:	^(ASSIGN ID recurseNoLabel)
@@ -170,7 +159,7 @@ token returns [GrammarAST t=null]
 	;
 
 elementOptions
-    :	^(ELEMENT_OPTIONS elementOption+)
+    :	^(ELEMENT_OPTIONS elementOption*)
     ;
 
 elementOption
@@ -211,7 +200,7 @@ block
     ;
 
 alternative
-	:	^(ALT element+)
+	:	^(ALT elementOptions? element+)
     ;
 
 atom

@@ -31,10 +31,14 @@
 package org.antlr.v4.analysis;
 
 import org.antlr.v4.misc.Utils;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LL1Analyzer;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,11 +56,30 @@ public class AnalysisPipeline {
 		lr.check();
 		if ( !lr.listOfRecursiveCycles.isEmpty() ) return; // bail out
 
-		// BUILD DFA FOR EACH DECISION
-		if ( !g.isLexer() ) processParser();
+		if (g.isLexer()) {
+			processLexer();
+		} else {
+			// BUILD DFA FOR EACH DECISION
+			processParser();
+		}
 	}
 
-	void processParser() {
+	protected void processLexer() {
+		// make sure all non-fragment lexer rules must match at least one symbol
+		for (Rule rule : g.rules.values()) {
+			if (rule.isFragment()) {
+				continue;
+			}
+
+			LL1Analyzer analyzer = new LL1Analyzer(g.atn);
+			IntervalSet look = analyzer.LOOK(g.atn.ruleToStartState[rule.index], null);
+			if (look.contains(Token.EPSILON)) {
+				g.tool.errMgr.grammarError(ErrorType.EPSILON_TOKEN, g.fileName, ((GrammarAST)rule.ast.getChild(0)).getToken(), rule.name);
+			}
+		}
+	}
+
+	protected void processParser() {
 		g.decisionLOOK = new ArrayList<IntervalSet[]>(g.atn.getNumberOfDecisions()+1);
 		for (DecisionState s : g.atn.decisionToState) {
             g.tool.log("LL1", "\nDECISION "+s.decision+" in rule "+g.getRule(s.ruleIndex).name);
@@ -69,6 +92,8 @@ public class AnalysisPipeline {
 				look = anal.getDecisionLookahead(s);
 				g.tool.log("LL1", "look=" + Arrays.toString(look));
 			}
+
+			assert s.decision + 1 >= g.decisionLOOK.size();
 			Utils.setSize(g.decisionLOOK, s.decision+1);
 			g.decisionLOOK.set(s.decision, look);
 			g.tool.log("LL1", "LL(1)? " + disjoint(look));
@@ -80,8 +105,7 @@ public class AnalysisPipeline {
 		boolean collision = false;
 		IntervalSet combined = new IntervalSet();
 		if ( altLook==null ) return false;
-		for (int a=1; a<altLook.length; a++) {
-			IntervalSet look = altLook[a];
+		for (IntervalSet look : altLook) {
 			if ( look==null ) return false; // lookahead must've computation failed
 			if ( !look.and(combined).isNil() ) {
 				collision = true;

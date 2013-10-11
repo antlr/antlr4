@@ -133,21 +133,21 @@ public class OutputModelWalker {
 					if ( o instanceof OutputModelObject[] ) {
 						o = Arrays.asList((OutputModelObject[])o);
 					}
-					Collection<? extends OutputModelObject> nestedOmos = (Collection)o;
-					for (OutputModelObject nestedOmo : nestedOmos) {
+					Collection<?> nestedOmos = (Collection<?>)o;
+					for (Object nestedOmo : nestedOmos) {
 						if ( nestedOmo==null ) continue;
-						ST nestedST = walk(nestedOmo);
+						ST nestedST = walk((OutputModelObject)nestedOmo);
 //						System.out.println("set ModelElement "+fieldName+"="+nestedST+" in "+templateName);
 						st.add(fieldName, nestedST);
 					}
 				}
 				else if ( o instanceof Map ) {
-					Map<Object, OutputModelObject> nestedOmoMap = (Map<Object, OutputModelObject>)o;
+					Map<?, ?> nestedOmoMap = (Map<?, ?>)o;
 					Map<Object, ST> m = new HashMap<Object, ST>();
-					for (Object key : nestedOmoMap.keySet()) {
-						ST nestedST = walk(nestedOmoMap.get(key));
+					for (Map.Entry<?, ?> entry : nestedOmoMap.entrySet()) {
+						ST nestedST = walk((OutputModelObject)entry.getValue());
 //						System.out.println("set ModelElement "+fieldName+"="+nestedST+" in "+templateName);
-						m.put(key, nestedST);
+						m.put(entry.getKey(), nestedST);
 					}
 					st.add(fieldName, m);
 				}

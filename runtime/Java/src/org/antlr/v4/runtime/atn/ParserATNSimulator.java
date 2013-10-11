@@ -166,8 +166,7 @@ import java.util.Set;
 
  When we start in the DFA and reach an accept state that's predicated,
  we test those and return the minimum semantically viable
- alternative. If no alternatives are viable, we throw an exception.  We
- don't report ambiguities in the DFA, but I'm not sure why anymore.
+ alternative. If no alternatives are viable, we throw an exception.
 
  During full LL ATN simulation, closure always evaluates predicates and
  on-the-fly. This is crucial to reducing the configuration set size
@@ -258,13 +257,6 @@ public class ParserATNSimulator extends ATNSimulator {
 	public static final boolean dfa_debug = false;
 	public static final boolean retry_debug = false;
 
-	public static int ATN_failover = 0;
-	public static int predict_calls = 0;
-	public static int retry_with_context = 0;
-	public static int retry_with_context_indicates_no_conflict = 0;
-	public static int retry_with_context_predicts_same_alt = 0;
-	public static int retry_with_context_from_dfa = 0;
-
 	@Nullable
 	protected final Parser parser;
 
@@ -272,7 +264,8 @@ public class ParserATNSimulator extends ATNSimulator {
 	public final DFA[] decisionToDFA;
 
 	/** SLL, LL, or LL + exact ambig detection? */
-	protected PredictionMode mode = PredictionMode.LL;
+	@NotNull
+	private PredictionMode mode = PredictionMode.LL;
 
 	/** Each prediction operation uses a cache for merge of prediction contexts.
 	 *  Don't keep around as it wastes huge amounts of memory. DoubleKeyMap
@@ -320,210 +313,43 @@ public class ParserATNSimulator extends ATNSimulator {
 								   " exec LA(1)=="+ getLookaheadName(input)+
 								   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
 		}
-		mergeCache = new DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext>();
+
 		_input = input;
 		_startIndex = input.index();
 		_outerContext = outerContext;
-		predict_calls++;
 		DFA dfa = decisionToDFA[decision];
-		// First, synchronize on the array of DFA for this parser
-		// so that we can get the DFA for a decision or create and set one
-		if ( dfa==null ) { // only create one if not there
-			synchronized (decisionToDFA) {
-				dfa = decisionToDFA[decision];
-				if ( dfa==null ) { // the usual double-check
-					DecisionState startState = atn.decisionToState.get(decision);
-					decisionToDFA[decision] = new DFA(startState, decision);
-					dfa = decisionToDFA[decision];
-				}
-			}
-		}
-		// Now we are certain to have a specific decision's DFA
-		// But, do we still need an initial state?
-		if ( dfa.s0==null ) { // recheck
-			if ( dfa.s0==null ) { // recheck
-				try {
-					return predictATN(dfa, input, outerContext);
-				}
-				finally {
-					mergeCache = null; // wack cache after each prediction
-				}
-			}
-			// fall through; another thread set dfa.s0 while we waited for lock
-		}
 
-		// We can start with an existing DFA
 		int m = input.mark();
 		int index = input.index();
+
+		// Now we are certain to have a specific decision's DFA
+		// But, do we still need an initial state?
 		try {
-			return execDFA(dfa, dfa.s0, input, index, outerContext);
+			if ( dfa.s0==null ) {
+				if ( outerContext ==null ) outerContext = ParserRuleContext.EMPTY;
+				if ( debug || debug_list_atn_decisions )  {
+					System.out.println("predictATN decision "+ dfa.decision+
+									   " exec LA(1)=="+ getLookaheadName(input) +
+									   ", outerContext="+ outerContext.toString(parser));
+				}
+				boolean fullCtx = false;
+				ATNConfigSet s0_closure =
+					computeStartState(dfa.atnStartState,
+									  ParserRuleContext.EMPTY,
+									  fullCtx);
+				dfa.s0 = addDFAState(dfa, new DFAState(s0_closure));
+			}
+
+			// We can start with an existing DFA
+			int alt = execATN(dfa, dfa.s0, input, index, outerContext);
+			if ( debug ) System.out.println("DFA after predictATN: "+ dfa.toString(parser.getTokenNames()));
+			return alt;
 		}
 		finally {
 			mergeCache = null; // wack cache after each prediction
 			input.seek(index);
 			input.release(m);
 		}
-	}
-
-	public int predictATN(@NotNull DFA dfa, @NotNull TokenStream input,
-						  @Nullable ParserRuleContext outerContext)
-	{
-		// caller must have write lock on dfa
-		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
-		if ( debug || debug_list_atn_decisions )  {
-			System.out.println("predictATN decision "+dfa.decision+
-							   " exec LA(1)=="+ getLookaheadName(input) +
-							   ", outerContext="+outerContext.toString(parser));
-		}
-		boolean fullCtx = false;
-		ATNConfigSet s0_closure =
-			computeStartState(dfa.atnStartState,
-							  ParserRuleContext.EMPTY,
-							  fullCtx);
-		dfa.s0 = addDFAState(dfa, new DFAState(s0_closure));
-
-		int alt = 0;
-		int m = input.mark();
-		int index = input.index();
-		try {
-			alt = execATN(dfa, dfa.s0, input, index, outerContext);
-		}
-		catch (NoViableAltException nvae) {
-			if ( debug ) dumpDeadEndConfigs(nvae);
-			throw nvae;
-		}
-		finally {
-			input.seek(index);
-			input.release(m);
-		}
-		if ( debug ) System.out.println("DFA after predictATN: "+dfa.toString(parser.getTokenNames()));
-		return alt;
-	}
-
-	public int execDFA(@NotNull DFA dfa, @NotNull DFAState s0,
-					   @NotNull TokenStream input, int startIndex,
-                       @Nullable ParserRuleContext outerContext)
-    {
-		// caller must have read lock on dfa
-		if ( outerContext==null ) outerContext = ParserRuleContext.EMPTY;
-		if ( dfa_debug ) {
-			System.out.println("execDFA decision "+dfa.decision+
-							   " exec LA(1)=="+ getLookaheadName(input) +
-							   ", outerContext="+outerContext.toString(parser));
-		}
-		if ( dfa_debug ) System.out.print(dfa.toString(parser.getTokenNames()));
-		DFAState acceptState = null;
-		DFAState s = s0;
-
-		int t = input.LA(1);
-		while ( true ) {
-			if ( dfa_debug ) System.out.println("DFA state "+s.stateNumber+" LA(1)=="+getLookaheadName(input));
-			if ( s.requiresFullContext && mode != PredictionMode.SLL ) {
-				// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
-				if ( s.predicates!=null ) {
-					if ( debug ) System.out.println("DFA state has preds in DFA sim LL failover");
-					input.seek(startIndex);
-					BitSet alts = evalSemanticContext(s.predicates, outerContext, true);
-					if ( alts.cardinality()==1 ) {
-						if ( debug ) System.out.println("Full LL avoided");
-						return alts.nextSetBit(0);
-					}
-				}
-
-				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+" in "+s);
-				boolean fullCtx = true;
-				ATNConfigSet s0_closure =
-					computeStartState(dfa.atnStartState, outerContext,
-									  fullCtx);
-				retry_with_context_from_dfa++;
-				int alt = execATNWithFullContext(dfa, s, s0_closure,
-												 input, startIndex,
-												 outerContext,
-												 ATN.INVALID_ALT_NUMBER);
-				return alt;
-			}
-			if ( s.isAcceptState ) {
-				if ( s.predicates!=null ) {
-					if ( dfa_debug ) System.out.println("accept "+s);
-				}
-				else {
-					if ( dfa_debug ) System.out.println("accept; predict "+s.prediction +" in state "+s.stateNumber);
-				}
-				acceptState = s;
-				// keep going unless we're at EOF or state only has one alt number
-				// mentioned in configs; check if something else could match
-				// TODO: don't we always stop? only lexer would keep going
-				// TODO: v3 dfa don't do this.
-				break;
-			}
-
-			// t is not updated if one of these states is reached
-			assert !s.requiresFullContext && !s.isAcceptState;
-
-			// if no edge, pop over to ATN interpreter, update DFA and return
-			if ( s.edges == null || t >= s.edges.length || t < -1 || s.edges[t+1] == null ) {
-				if ( dfa_debug && t>=0 ) System.out.println("no edge for "+parser.getTokenNames()[t]);
-				int alt;
-				if ( dfa_debug ) {
-					Interval interval = Interval.of(startIndex, parser.getTokenStream().index());
-					System.out.println("ATN exec upon "+
-										   parser.getTokenStream().getText(interval) +
-										   " at DFA state "+s.stateNumber);
-				}
-
-				// recheck; another thread might have added edge
-				if ( s.edges == null || t >= s.edges.length || t < -1 || s.edges[t+1] == null ) {
-					alt = execATN(dfa, s, input, startIndex, outerContext);
-					// this adds edge even if next state is accept for
-					// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
-					// TODO: This next stuff kills edge, but extra states remain. :(
-					if ( s.isAcceptState && alt!=-1 ) {
-						DFAState d = s.edges[input.LA(1)+1];
-						if ( d.isAcceptState && d.prediction==s.prediction ) {
-							// we can carve it out.
-							s.edges[input.LA(1)+1] = ERROR; // IGNORE really not error
-						}
-					}
-					if ( dfa_debug ) {
-						System.out.println("back from DFA update, alt="+alt+", dfa=\n"+dfa.toString(parser.getTokenNames()));
-						//dump(dfa);
-					}
-					// action already executed
-					if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
-															" predicts "+alt);
-					return alt; // we've updated DFA, exec'd action, and have our deepest answer
-				}
-				// fall through; another thread gave us the edge
-			}
-			DFAState target = s.edges[t+1];
-			if ( target == ERROR ) {
-				throw noViableAlt(input, outerContext, s.configs, startIndex);
-			}
-			s = target;
-			if (!s.requiresFullContext && !s.isAcceptState) {
-				input.consume();
-				t = input.LA(1);
-			}
-		}
-
-		// Before jumping to prediction, check to see if there are
-		// disambiguating predicates to evaluate
-		if ( s.predicates!=null ) {
-			// rewind input so pred's LT(i) calls make sense
-			input.seek(startIndex);
-			// since we don't report ambiguities in execDFA, we never need to
-			// use complete predicate evaluation here
-			BitSet alts = evalSemanticContext(s.predicates, outerContext, false);
-			if (alts.isEmpty()) {
-				throw noViableAlt(input, outerContext, s.configs, startIndex);
-			}
-
-			return alts.nextSetBit(0);
-		}
-
-		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
-											" predicts "+acceptState.prediction);
-		return acceptState.prediction;
 	}
 
 	/** Performs ATN simulation to compute a predicted alternative based
@@ -556,31 +382,29 @@ public class ParserATNSimulator extends ATNSimulator {
 	    conflict
 	    conflict + preds
 	 */
-	public int execATN(@NotNull DFA dfa, @NotNull DFAState s0,
+	protected int execATN(@NotNull DFA dfa, @NotNull DFAState s0,
 					   @NotNull TokenStream input, int startIndex,
 					   ParserRuleContext outerContext)
 	{
-		// caller is expected to have write lock on dfa
 		if ( debug || debug_list_atn_decisions) {
 			System.out.println("execATN decision "+dfa.decision+
 							   " exec LA(1)=="+ getLookaheadName(input)+
 							   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
 		}
-		ATN_failover++;
 
-		ATNConfigSet previous = s0.configs;
 		DFAState previousD = s0;
 
 		if ( debug ) System.out.println("s0 = "+s0);
 
 		int t = input.LA(1);
 
-        DecisionState decState = atn.getDecisionState(dfa.decision);
-
 		while (true) { // while more work
-//			System.out.println("REACH "+getLookaheadName(input));
-			ATNConfigSet reach = computeReachSet(previous, t, false);
-			if ( reach==null ) {
+			DFAState D = getExistingTargetState(previousD, t);
+			if (D == null) {
+				D = computeTargetState(dfa, previousD, t);
+			}
+
+			if (D == ERROR) {
 				// if any configs in previous dipped into outer context, that
 				// means that input up to t actually finished entry rule
 				// at least for SLL decision. Full LL doesn't dip into outer
@@ -595,136 +419,157 @@ public class ParserATNSimulator extends ATNSimulator {
 					// return w/o altering DFA
 					return alt;
 				}
-				throw noViableAlt(input, outerContext, previous, startIndex);
+
+				throw noViableAlt(input, outerContext, previousD.configs, startIndex);
 			}
 
-			// create new target state; we'll add to DFA after it's complete
-			DFAState D = new DFAState(reach);
-
-			// It's often the case that D will already exist in the DFA
-			// and so it's a waste to compute all of the fields over the next
-			// big chunk of code. However, I tried inserting the following
-			// short circuit, but it didn't have much effect. I
-			// figured that this would be a big impact for multi threading,
-			// but it also didn't see much of an impact.
-//			synchronized (dfa) {
-//				DFAState existing = dfa.states.get(D);
-//				if ( existing!=null ) {
-//					addDFAEdge(dfa, previousD, t, existing);
-//					if ( existing.isAcceptState ) return existing.prediction;
-//					previous = D.configs;
-//					previousD = D;
-//					input.consume();
-//					t = input.LA(1);
-//					continue;
-//				}
-//			}
-
-
-			int predictedAlt = getUniqueAlt(reach);
-
-			if ( debug ) {
-				Collection<BitSet> altSubSets = PredictionMode.getConflictingAltSubsets(reach);
-				System.out.println("SLL altSubSets="+altSubSets+
-								   ", configs="+reach+
-								   ", predict="+predictedAlt+", allSubsetsConflict="+
-									   PredictionMode.allSubsetsConflict(altSubSets)+", conflictingAlts="+
-								   getConflictingAlts(reach));
-			}
-
-			if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
-				// NO CONFLICT, UNIQUELY PREDICTED ALT
-				D.isAcceptState = true;
-				D.configs.uniqueAlt = predictedAlt;
-				D.prediction = predictedAlt;
-			}
-			else if ( PredictionMode.hasSLLConflictTerminatingPrediction(mode, reach) ) {
-				// MORE THAN ONE VIABLE ALTERNATIVE
-				D.configs.conflictingAlts = getConflictingAlts(reach);
-				if ( mode == PredictionMode.SLL ) {
-					// stop w/o failover for sure
-					if ( outerContext == ParserRuleContext.EMPTY || // in grammar start rule
-						 !D.configs.dipsIntoOuterContext )          // didn't fall out of rule
-					{
-						// SPECIAL CASE WHERE SLL KNOWS CONFLICT IS AMBIGUITY
-						// report even if preds
-						reportAmbiguity(dfa, D, startIndex, input.index(),
-										D.configs.conflictingAlts, D.configs);
-					}
-					// always stop at D
-					D.isAcceptState = true;
-					D.prediction = D.configs.conflictingAlts.nextSetBit(0);
-					if ( debug ) System.out.println("SLL RESOLVED TO "+D.prediction+" for "+D);
-					predictedAlt = D.prediction;
-					// Falls through to check predicates below
-				}
-				else {
-					// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
-					if ( D.configs.hasSemanticContext ) {
-						predicateDFAState(D, decState);
-						input.seek(startIndex);
-						BitSet alts = evalSemanticContext(D.predicates, outerContext, true);
-						if ( alts.cardinality()==1 ) {
-							if ( debug ) System.out.println("Full LL avoided");
-							return alts.nextSetBit(0);
-						}
-					}
-
-					// RETRY WITH FULL LL CONTEXT
-					if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
-					ATNConfigSet s0_closure =
-						computeStartState(dfa.atnStartState,
-										  outerContext,
-										  true);
-					predictedAlt = execATNWithFullContext(dfa, D, s0_closure,
-														  input, startIndex,
-														  outerContext,
-														  D.configs.conflictingAlts.nextSetBit(0));
-					// TODO: if true conflict found and same answer as we got with SLL,
-					// then make it non ctx sensitive DFA state
-
-					// not accept state: isCtxSensitive
-					D.requiresFullContext = true; // always force DFA to ATN simulate
-					D.prediction = ATN.INVALID_ALT_NUMBER;
-					addDFAEdge(dfa, previousD, t, D);
-					return predictedAlt; // all done with preds, etc...
-				}
-			}
-
-			if ( D.isAcceptState && D.configs.hasSemanticContext ) {
-				predicateDFAState(D, decState);
-
+			if ( D.requiresFullContext && mode != PredictionMode.SLL ) {
+				// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
+				BitSet conflictingAlts = null;
 				if ( D.predicates!=null ) {
-					int stopIndex = input.index();
-					input.seek(startIndex);
-					BitSet alts = evalSemanticContext(D.predicates, outerContext, true);
-					D.prediction = ATN.INVALID_ALT_NUMBER; // indicate we have preds
-					addDFAEdge(dfa, previousD, t, D);
-					switch (alts.cardinality()) {
-					case 0:
-						throw noViableAlt(input, outerContext, D.configs, startIndex);
-
-					case 1:
-						return alts.nextSetBit(0);
-
-					default:
-						// report ambiguity after predicate evaluation to make sure the correct
-						// set of ambig alts is reported.
-						reportAmbiguity(dfa, D, startIndex, stopIndex, alts, D.configs);
-						return alts.nextSetBit(0);
+					if ( debug ) System.out.println("DFA state has preds in DFA sim LL failover");
+					int conflictIndex = input.index();
+					if (conflictIndex != startIndex) {
+						input.seek(startIndex);
 					}
+
+					conflictingAlts = evalSemanticContext(D.predicates, outerContext, true);
+					if ( conflictingAlts.cardinality()==1 ) {
+						if ( debug ) System.out.println("Full LL avoided");
+						return conflictingAlts.nextSetBit(0);
+					}
+
+					if (conflictIndex != startIndex) {
+						// restore the index so reporting the fallback to full
+						// context occurs with the index at the correct spot
+						input.seek(conflictIndex);
+					}
+				}
+
+				if ( dfa_debug ) System.out.println("ctx sensitive state "+outerContext+" in "+D);
+				boolean fullCtx = true;
+				ATNConfigSet s0_closure =
+					computeStartState(dfa.atnStartState, outerContext,
+									  fullCtx);
+				reportAttemptingFullContext(dfa, conflictingAlts, D.configs, startIndex, input.index());
+				int alt = execATNWithFullContext(dfa, D, s0_closure,
+												 input, startIndex,
+												 outerContext);
+				return alt;
+			}
+
+			if ( D.isAcceptState ) {
+				if (D.predicates == null) {
+					return D.prediction;
+				}
+
+				int stopIndex = input.index();
+				input.seek(startIndex);
+				BitSet alts = evalSemanticContext(D.predicates, outerContext, true);
+				switch (alts.cardinality()) {
+				case 0:
+					throw noViableAlt(input, outerContext, D.configs, startIndex);
+
+				case 1:
+					return alts.nextSetBit(0);
+
+				default:
+					// report ambiguity after predicate evaluation to make sure the correct
+					// set of ambig alts is reported.
+					reportAmbiguity(dfa, D, startIndex, stopIndex, false, alts, D.configs);
+					return alts.nextSetBit(0);
 				}
 			}
 
-			// all adds to dfa are done after we've created full D state
-			addDFAEdge(dfa, previousD, t, D);
-			if ( D.isAcceptState ) return predictedAlt;
-
-			previous = reach;
 			previousD = D;
-			input.consume();
-			t = input.LA(1);
+
+			if (t != IntStream.EOF) {
+				input.consume();
+				t = input.LA(1);
+			}
 		}
+	}
+
+	/**
+	 * Get an existing target state for an edge in the DFA. If the target state
+	 * for the edge has not yet been computed or is otherwise not available,
+	 * this method returns {@code null}.
+	 *
+	 * @param previousD The current DFA state
+	 * @param t The next input symbol
+	 * @return The existing target DFA state for the given input symbol
+	 * {@code t}, or {@code null} if the target state for this edge is not
+	 * already cached
+	 */
+	@Nullable
+	protected DFAState getExistingTargetState(@NotNull DFAState previousD, int t) {
+		DFAState[] edges = previousD.edges;
+		if (edges == null || t + 1 < 0 || t + 1 >= edges.length) {
+			return null;
+		}
+
+		return edges[t + 1];
+	}
+
+	/**
+	 * Compute a target state for an edge in the DFA, and attempt to add the
+	 * computed state and corresponding edge to the DFA.
+	 *
+	 * @param dfa The DFA
+	 * @param previousD The current DFA state
+	 * @param t The next input symbol
+	 *
+	 * @return The computed target DFA state for the given input symbol
+	 * {@code t}. If {@code t} does not lead to a valid DFA state, this method
+	 * returns {@link #ERROR}.
+	 */
+	@NotNull
+	protected DFAState computeTargetState(@NotNull DFA dfa, @NotNull DFAState previousD, int t) {
+		ATNConfigSet reach = computeReachSet(previousD.configs, t, false);
+		if ( reach==null ) {
+			addDFAEdge(dfa, previousD, t, ERROR);
+			return ERROR;
+		}
+
+		// create new target state; we'll add to DFA after it's complete
+		DFAState D = new DFAState(reach);
+
+		int predictedAlt = getUniqueAlt(reach);
+
+		if ( debug ) {
+			Collection<BitSet> altSubSets = PredictionMode.getConflictingAltSubsets(reach);
+			System.out.println("SLL altSubSets="+altSubSets+
+							   ", configs="+reach+
+							   ", predict="+predictedAlt+", allSubsetsConflict="+
+								   PredictionMode.allSubsetsConflict(altSubSets)+", conflictingAlts="+
+							   getConflictingAlts(reach));
+		}
+
+		if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
+			// NO CONFLICT, UNIQUELY PREDICTED ALT
+			D.isAcceptState = true;
+			D.configs.uniqueAlt = predictedAlt;
+			D.prediction = predictedAlt;
+		}
+		else if ( PredictionMode.hasSLLConflictTerminatingPrediction(mode, reach) ) {
+			// MORE THAN ONE VIABLE ALTERNATIVE
+			D.configs.conflictingAlts = getConflictingAlts(reach);
+			D.requiresFullContext = true;
+			// in SLL-only mode, we will stop at this state and return the minimum alt
+			D.isAcceptState = true;
+			D.prediction = D.configs.conflictingAlts.nextSetBit(0);
+		}
+
+		if ( D.isAcceptState && D.configs.hasSemanticContext ) {
+			predicateDFAState(D, atn.getDecisionState(dfa.decision));
+			if (D.predicates != null) {
+				D.prediction = ATN.INVALID_ALT_NUMBER;
+			}
+		}
+
+		// all adds to dfa are done after we've created full D state
+		D = addDFAEdge(dfa, previousD, t, D);
+		return D;
 	}
 
 	protected void predicateDFAState(DFAState dfaState, DecisionState decisionState) {
@@ -748,17 +593,12 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	// comes back with reach.uniqueAlt set to a valid alt
-	public int execATNWithFullContext(DFA dfa,
-									  DFAState D, // how far we got before failing over
-									  @NotNull ATNConfigSet s0,
-									  @NotNull TokenStream input, int startIndex,
-									  ParserRuleContext outerContext,
-									  int SLL_min_alt) // todo: is this in D as min ambig alts?
+	protected int execATNWithFullContext(DFA dfa,
+										 DFAState D, // how far we got before failing over
+										 @NotNull ATNConfigSet s0,
+										 @NotNull TokenStream input, int startIndex,
+										 ParserRuleContext outerContext)
 	{
-		// caller must have write lock on dfa
-		retry_with_context++;
-		reportAttemptingFullContext(dfa, s0, startIndex, input.index());
-
 		if ( debug || debug_list_atn_decisions ) {
 			System.out.println("execATNWithFullContext "+s0);
 		}
@@ -826,20 +666,19 @@ public class ParserATNSimulator extends ATNSimulator {
 				// we're not sure what the ambiguity is yet.
 				// So, keep going.
 			}
+
 			previous = reach;
-			input.consume();
-			t = input.LA(1);
+			if (t != IntStream.EOF) {
+				input.consume();
+				t = input.LA(1);
+			}
 		}
 
 		// If the configuration set uniquely predicts an alternative,
 		// without conflict, then we know that it's a full LL decision
 		// not SLL.
 		if ( reach.uniqueAlt != ATN.INVALID_ALT_NUMBER ) {
-			retry_with_context_indicates_no_conflict++;
-			reportContextSensitivity(dfa, reach, startIndex, input.index());
-			if ( predictedAlt == SLL_min_alt ) {
-				retry_with_context_predicts_same_alt++;
-			}
+			reportContextSensitivity(dfa, predictedAlt, reach, startIndex, input.index());
 			return predictedAlt;
 		}
 
@@ -870,9 +709,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		the fact that we should predict alternative 1.  We just can't say for
 		sure that there is an ambiguity without looking further.
 		*/
-		if ( foundExactAmbig ) {
-			reportAmbiguity(dfa, D, startIndex, input.index(), getConflictingAlts(reach), reach);
-		}
+		reportAmbiguity(dfa, D, startIndex, input.index(), foundExactAmbig, null, reach);
 
 		return predictedAlt;
 	}
@@ -881,12 +718,42 @@ public class ParserATNSimulator extends ATNSimulator {
 										   boolean fullCtx)
 	{
 		if ( debug ) System.out.println("in computeReachSet, starting closure: " + closure);
-		ATNConfigSet reach = new ATNConfigSet(fullCtx);
-		Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
+
+		if (mergeCache == null) {
+			mergeCache = new DoubleKeyMap<PredictionContext, PredictionContext, PredictionContext>();
+		}
+
 		ATNConfigSet intermediate = new ATNConfigSet(fullCtx);
+
+		/* Configurations already in a rule stop state indicate reaching the end
+		 * of the decision rule (local context) or end of the start rule (full
+		 * context). Once reached, these configurations are never updated by a
+		 * closure operation, so they are handled separately for the performance
+		 * advantage of having a smaller intermediate set when calling closure.
+		 *
+		 * For full-context reach operations, separate handling is required to
+		 * ensure that the alternative matching the longest overall sequence is
+		 * chosen when multiple such configurations can match the input.
+		 */
+		List<ATNConfig> skippedStopStates = null;
+
 		// First figure out where we can reach on input t
 		for (ATNConfig c : closure) {
 			if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString());
+
+			if (c.state instanceof RuleStopState) {
+				assert c.context.isEmpty();
+				if (fullCtx || t == IntStream.EOF) {
+					if (skippedStopStates == null) {
+						skippedStopStates = new ArrayList<ATNConfig>();
+					}
+
+					skippedStopStates.add(c);
+				}
+
+				continue;
+			}
+
 			int n = c.state.getNumberOfTransitions();
 			for (int ti=0; ti<n; ti++) {               // for each transition
 				Transition trans = c.state.transition(ti);
@@ -895,38 +762,134 @@ public class ParserATNSimulator extends ATNSimulator {
 					intermediate.add(new ATNConfig(c, target), mergeCache);
 				}
 			}
+		}
 
-			if (t == IntStream.EOF && c.state instanceof RuleStopState) {
-				assert c.context.isEmpty();
-				intermediate.add(c, mergeCache);
+		// Now figure out where the reach operation can take us...
+
+		ATNConfigSet reach = null;
+
+		/* This block optimizes the reach operation for intermediate sets which
+		 * trivially indicate a termination state for the overall
+		 * adaptivePredict operation.
+		 *
+		 * The conditions assume that intermediate
+		 * contains all configurations relevant to the reach set, but this
+		 * condition is not true when one or more configurations have been
+		 * withheld in skippedStopStates.
+		 */
+		if (skippedStopStates == null) {
+			if ( intermediate.size()==1 ) {
+				// Don't pursue the closure if there is just one state.
+				// It can only have one alternative; just add to result
+				// Also don't pursue the closure if there is unique alternative
+				// among the configurations.
+				reach = intermediate;
+			}
+			else if ( getUniqueAlt(intermediate)!=ATN.INVALID_ALT_NUMBER ) {
+				// Also don't pursue the closure if there is unique alternative
+				// among the configurations.
+				reach = intermediate;
 			}
 		}
-		// Now figure out where the closure can take us, but only if we'll
-		// need to continue looking for more input.
-		if ( intermediate.size()==1 ) {
-			// Don't pursue the closure if there is just one state.
-			// It can only have one alternative; just add to result
-			// Also don't pursue the closure if there is unique alternative
-			// among the configurations.
-			reach = new ATNConfigSet(intermediate);
-		}
-		else if ( getUniqueAlt(intermediate)==1 ) {
-			// Also don't pursue the closure if there is unique alternative
-			// among the configurations.
-			reach = new ATNConfigSet(intermediate);
-		}
-		else {
+
+		/* If the reach set could not be trivially determined, perform a closure
+		 * operation on the intermediate set to compute its initial value.
+		 */
+		if (reach == null) {
+			reach = new ATNConfigSet(fullCtx);
+			Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
 			for (ATNConfig c : intermediate) {
 				closure(c, reach, closureBusy, false, fullCtx);
 			}
 		}
 
-		if ( reach.size()==0 ) return null;
+		if (t == IntStream.EOF) {
+			/* After consuming EOF no additional input is possible, so we are
+			 * only interested in configurations which reached the end of the
+			 * decision rule (local context) or end of the start rule (full
+			 * context). Update reach to contain only these configurations. This
+			 * handles both explicit EOF transitions in the grammar and implicit
+			 * EOF transitions following the end of the decision or start rule.
+			 *
+			 * When reach==intermediate, no closure operation was performed. In
+			 * this case, removeAllConfigsNotInRuleStopState needs to check for
+			 * reachable rule stop states as well as configurations already in
+			 * a rule stop state.
+			 *
+			 * This is handled before the configurations in skippedStopStates,
+			 * because any configurations potentially added from that list are
+			 * already guaranteed to meet this condition whether or not it's
+			 * required.
+			 */
+			reach = removeAllConfigsNotInRuleStopState(reach, reach == intermediate);
+		}
+
+		/* If skippedStopStates is not null, then it contains at least one
+		 * configuration. For full-context reach operations, these
+		 * configurations reached the end of the start rule, in which case we
+		 * only add them back to reach if no configuration during the current
+		 * closure operation reached such a state. This ensures adaptivePredict
+		 * chooses an alternative matching the longest overall sequence when
+		 * multiple alternatives are viable.
+		 */
+		if (skippedStopStates != null && (!fullCtx || !PredictionMode.hasConfigInRuleStopState(reach))) {
+			assert !skippedStopStates.isEmpty();
+			for (ATNConfig c : skippedStopStates) {
+				reach.add(c, mergeCache);
+			}
+		}
+
+		if ( reach.isEmpty() ) return null;
 		return reach;
 	}
 
+	/**
+	 * Return a configuration set containing only the configurations from
+	 * {@code configs} which are in a {@link RuleStopState}. If all
+	 * configurations in {@code configs} are already in a rule stop state, this
+	 * method simply returns {@code configs}.
+	 * <p/>
+	 * When {@code lookToEndOfRule} is true, this method uses
+	 * {@link ATN#nextTokens} for each configuration in {@code configs} which is
+	 * not already in a rule stop state to see if a rule stop state is reachable
+	 * from the configuration via epsilon-only transitions.
+	 *
+	 * @param configs the configuration set to update
+	 * @param lookToEndOfRule when true, this method checks for rule stop states
+	 * reachable by epsilon-only transitions from each configuration in
+	 * {@code configs}.
+	 *
+	 * @return {@code configs} if all configurations in {@code configs} are in a
+	 * rule stop state, otherwise return a new configuration set containing only
+	 * the configurations from {@code configs} which are in a rule stop state
+	 */
 	@NotNull
-	public ATNConfigSet computeStartState(@NotNull ATNState p,
+	protected ATNConfigSet removeAllConfigsNotInRuleStopState(@NotNull ATNConfigSet configs, boolean lookToEndOfRule) {
+		if (PredictionMode.allConfigsInRuleStopStates(configs)) {
+			return configs;
+		}
+
+		ATNConfigSet result = new ATNConfigSet(configs.fullCtx);
+		for (ATNConfig config : configs) {
+			if (config.state instanceof RuleStopState) {
+				result.add(config, mergeCache);
+				continue;
+			}
+
+			if (lookToEndOfRule && config.state.onlyHasEpsilonTransitions()) {
+				IntervalSet nextTokens = atn.nextTokens(config.state);
+				if (nextTokens.contains(Token.EPSILON)) {
+					ATNState endOfRuleState = atn.ruleToStopState[config.state.ruleIndex];
+					result.add(new ATNConfig(config, endOfRuleState), mergeCache);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	@NotNull
+	protected ATNConfigSet computeStartState(@NotNull ATNState p,
 										  @Nullable RuleContext ctx,
 										  boolean fullCtx)
 	{
@@ -945,7 +908,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	@Nullable
-	public ATNState getReachableTarget(@NotNull Transition trans, int ttype) {
+	protected ATNState getReachableTarget(@NotNull Transition trans, int ttype) {
 		if (trans.matches(ttype, 0, atn.maxTokenType)) {
 			return trans.target;
 		}
@@ -953,7 +916,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return null;
 	}
 
-	public SemanticContext[] getPredsForAmbigAlts(@NotNull BitSet ambigAlts,
+	protected SemanticContext[] getPredsForAmbigAlts(@NotNull BitSet ambigAlts,
 												  @NotNull ATNConfigSet configs,
 												  int nalts)
 	{
@@ -997,7 +960,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return altToPred;
 	}
 
-	public DFAState.PredPrediction[] getPredicatePredictions(BitSet ambigAlts,
+	protected DFAState.PredPrediction[] getPredicatePredictions(BitSet ambigAlts,
 															 SemanticContext[] altToPred)
 	{
 		List<DFAState.PredPrediction> pairs = new ArrayList<DFAState.PredPrediction>();
@@ -1015,14 +978,14 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 
 		if ( !containsPredicate ) {
-			pairs = null;
+			return null;
 		}
 
 //		System.out.println(Arrays.toString(altToPred)+"->"+pairs);
 		return pairs.toArray(new DFAState.PredPrediction[pairs.size()]);
 	}
 
-	public int getAltThatFinishedDecisionEntryRule(ATNConfigSet configs) {
+	protected int getAltThatFinishedDecisionEntryRule(ATNConfigSet configs) {
 		IntervalSet alts = new IntervalSet();
 		for (ATNConfig c : configs) {
 			if ( c.reachesIntoOuterContext>0 || (c.state instanceof RuleStopState && c.context.hasEmptyPath()) ) {
@@ -1039,7 +1002,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 *  then we stop at the first predicate that evaluates to true. This
 	 *  includes pairs with null predicates.
 	 */
-	public BitSet evalSemanticContext(@NotNull DFAState.PredPrediction[] predPredictions,
+	protected BitSet evalSemanticContext(@NotNull DFAState.PredPrediction[] predPredictions,
 									  ParserRuleContext outerContext,
 									  boolean complete)
 	{
@@ -1088,6 +1051,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		closureCheckingStopState(config, configs, closureBusy, collectPredicates,
 								 fullCtx,
 								 initialDepth);
+		assert !fullCtx || !configs.dipsIntoOuterContext;
 	}
 
 	protected void closureCheckingStopState(@NotNull ATNConfig config,
@@ -1099,23 +1063,27 @@ public class ParserATNSimulator extends ATNSimulator {
 	{
 		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
 
-		if ( !closureBusy.add(config) ) return; // avoid infinite recursion
-
 		if ( config.state instanceof RuleStopState ) {
 			// We hit rule end. If we have context info, use it
 			// run thru all possible stack tops in ctx
-			if ( config.context!=null && !config.context.isEmpty() ) {
-				for (SingletonPredictionContext ctx : config.context) {
-					if ( ctx.returnState==PredictionContext.EMPTY_RETURN_STATE ) {
-						// we have no context info, just chase follow links (if greedy)
-						if ( debug ) System.out.println("FALLING off rule "+
-														getRuleName(config.state.ruleIndex));
-						closure_(config, configs, closureBusy, collectPredicates,
-								 fullCtx, depth);
+			if ( !config.context.isEmpty() ) {
+				for (int i = 0; i < config.context.size(); i++) {
+					if ( config.context.getReturnState(i)==PredictionContext.EMPTY_RETURN_STATE ) {
+						if (fullCtx) {
+							configs.add(new ATNConfig(config, config.state, PredictionContext.EMPTY), mergeCache);
+							continue;
+						}
+						else {
+							// we have no context info, just chase follow links (if greedy)
+							if ( debug ) System.out.println("FALLING off rule "+
+															getRuleName(config.state.ruleIndex));
+							closure_(config, configs, closureBusy, collectPredicates,
+									 fullCtx, depth);
+						}
 						continue;
 					}
-					ATNState returnState = atn.states.get(ctx.returnState);
-					PredictionContext newContext = ctx.parent; // "pop" return state
+					ATNState returnState = atn.states.get(config.context.getReturnState(i));
+					PredictionContext newContext = config.context.getParent(i); // "pop" return state
 					ATNConfig c = new ATNConfig(returnState, config.alt, newContext,
 												config.semanticContext);
 					// While we have context to pop back from, we may have
@@ -1126,6 +1094,11 @@ public class ParserATNSimulator extends ATNSimulator {
 					closureCheckingStopState(c, configs, closureBusy, collectPredicates,
 											 fullCtx, depth - 1);
 				}
+				return;
+			}
+			else if (fullCtx) {
+				// reached end of start rule
+				configs.add(config, mergeCache);
 				return;
 			}
 			else {
@@ -1151,12 +1124,6 @@ public class ParserATNSimulator extends ATNSimulator {
 		// optimization
 		if ( !p.onlyHasEpsilonTransitions() ) {
             configs.add(config, mergeCache);
-			if ( config.semanticContext!=null && config.semanticContext!= SemanticContext.NONE ) {
-				configs.hasSemanticContext = true;
-			}
-			if ( config.reachesIntoOuterContext>0 ) {
-				configs.dipsIntoOuterContext = true;
-			}
 //            if ( debug ) System.out.println("added config "+configs);
         }
 
@@ -1169,11 +1136,18 @@ public class ParserATNSimulator extends ATNSimulator {
 			if ( c!=null ) {
 				int newDepth = depth;
 				if ( config.state instanceof RuleStopState) {
+					assert !fullCtx;
 					// target fell off end of rule; mark resulting c as having dipped into outer context
 					// We can't get here if incoming config was rule stop and we had context
 					// track how far we dip into outer context.  Might
 					// come in handy and we avoid evaluating context dependent
 					// preds if this is > 0.
+
+					if (!closureBusy.add(c)) {
+						// avoid infinite recursion for right-recursive rules
+						continue;
+					}
+
 					c.reachesIntoOuterContext++;
 					configs.dipsIntoOuterContext = true; // TODO: can remove? only care when we add to set per middle of this method
 					assert newDepth > Integer.MIN_VALUE;
@@ -1200,7 +1174,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	@Nullable
-	public ATNConfig getEpsilonTarget(@NotNull ATNConfig config,
+	protected ATNConfig getEpsilonTarget(@NotNull ATNConfig config,
 									  @NotNull Transition t,
 									  boolean collectPredicates,
 									  boolean inContext,
@@ -1231,7 +1205,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	@NotNull
-	public ATNConfig actionTransition(@NotNull ATNConfig config, @NotNull ActionTransition t) {
+	protected ATNConfig actionTransition(@NotNull ATNConfig config, @NotNull ActionTransition t) {
 		if ( debug ) System.out.println("ACTION edge "+t.ruleIndex+":"+t.actionIndex);
 		return new ATNConfig(config, t.target);
 	}
@@ -1283,7 +1257,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	@Nullable
-	public ATNConfig predTransition(@NotNull ATNConfig config,
+	protected ATNConfig predTransition(@NotNull ATNConfig config,
 									@NotNull PredicateTransition pt,
 									boolean collectPredicates,
 									boolean inContext,
@@ -1331,7 +1305,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	@NotNull
-	public ATNConfig ruleTransition(@NotNull ATNConfig config, @NotNull RuleTransition t) {
+	protected ATNConfig ruleTransition(@NotNull ATNConfig config, @NotNull RuleTransition t) {
 		if ( debug ) {
 			System.out.println("CALL rule "+getRuleName(t.target.ruleIndex)+
 							   ", ctx="+config.context);
@@ -1343,7 +1317,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return new ATNConfig(config, t.target, newContext);
 	}
 
-	public BitSet getConflictingAlts(ATNConfigSet configs) {
+	protected BitSet getConflictingAlts(ATNConfigSet configs) {
 		Collection<BitSet> altsets = PredictionMode.getConflictingAltSubsets(configs);
 		return PredictionMode.getAlts(altsets);
 	}
@@ -1417,6 +1391,10 @@ public class ParserATNSimulator extends ATNSimulator {
 		return getTokenName(input.LA(1));
 	}
 
+	/** Used for debugging in adaptivePredict around execATN but I cut
+	 *  it out for clarity now that alg. works well. We can leave this
+	 *  "dead" code for a bit.
+	 */
 	public void dumpDeadEndConfigs(@NotNull NoViableAltException nvae) {
 		System.err.println("dead end configs: ");
 		for (ATNConfig c : nvae.getDeadEndConfigs()) {
@@ -1438,7 +1416,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	@NotNull
-	public NoViableAltException noViableAlt(@NotNull TokenStream input,
+	protected NoViableAltException noViableAlt(@NotNull TokenStream input,
 											@NotNull ParserRuleContext outerContext,
 											@NotNull ATNConfigSet configs,
 											int startIndex)
@@ -1449,7 +1427,7 @@ public class ParserATNSimulator extends ATNSimulator {
 											configs, outerContext);
 	}
 
-	public static int getUniqueAlt(@NotNull ATNConfigSet configs) {
+	protected static int getUniqueAlt(@NotNull ATNConfigSet configs) {
 		int alt = ATN.INVALID_ALT_NUMBER;
 		for (ATNConfig c : configs) {
 			if ( alt == ATN.INVALID_ALT_NUMBER ) {
@@ -1462,62 +1440,118 @@ public class ParserATNSimulator extends ATNSimulator {
 		return alt;
 	}
 
-	protected void addDFAEdge(@NotNull DFA dfa,
-							  @Nullable DFAState from,
-							  int t,
-							  @Nullable DFAState to)
+	/**
+	 * Add an edge to the DFA, if possible. This method calls
+	 * {@link #addDFAState} to ensure the {@code to} state is present in the
+	 * DFA. If {@code from} is {@code null}, or if {@code t} is outside the
+	 * range of edges that can be represented in the DFA tables, this method
+	 * returns without adding the edge to the DFA.
+	 * <p/>
+	 * If {@code to} is {@code null}, this method returns {@code null}.
+	 * Otherwise, this method returns the {@link DFAState} returned by calling
+	 * {@link #addDFAState} for the {@code to} state.
+	 *
+	 * @param dfa The DFA
+	 * @param from The source state for the edge
+	 * @param t The input symbol
+	 * @param to The target state for the edge
+	 *
+	 * @return If {@code to} is {@code null}, this method returns {@code null};
+	 * otherwise this method returns the result of calling {@link #addDFAState}
+	 * on {@code to}
+	 */
+	protected DFAState addDFAEdge(@NotNull DFA dfa,
+								  @Nullable DFAState from,
+								  int t,
+								  @Nullable DFAState to)
 	{
-		if ( debug ) System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
-		if ( from==null || t < -1 || to == null ) return;
+		if ( debug ) {
+			System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
+		}
+
+		if (to == null) {
+			return null;
+		}
+
 		to = addDFAState(dfa, to); // used existing if possible not incoming
-		synchronized (dfa) {
+		if (from == null || t < -1 || t > atn.maxTokenType) {
+			return to;
+		}
+
+		synchronized (from) {
 			if ( from.edges==null ) {
-				from.edges = new DFAState[atn.maxTokenType+1+1]; // TODO: make adaptive
+				from.edges = new DFAState[atn.maxTokenType+1+1];
 			}
+
 			from.edges[t+1] = to; // connect
 		}
-		if ( debug ) System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getTokenNames():null));
+
+		if ( debug ) {
+			System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getTokenNames():null));
+		}
+
+		return to;
 	}
 
-	/** Add D if not there and return D. Return previous if already present. */
+	/**
+	 * Add state {@code D} to the DFA if it is not already present, and return
+	 * the actual instance stored in the DFA. If a state equivalent to {@code D}
+	 * is already in the DFA, the existing state is returned. Otherwise this
+	 * method returns {@code D} after adding it to the DFA.
+	 * <p/>
+	 * If {@code D} is {@link #ERROR}, this method returns {@link #ERROR} and
+	 * does not change the DFA.
+	 *
+	 * @param dfa The dfa
+	 * @param D The DFA state to add
+	 * @return The state stored in the DFA. This will be either the existing
+	 * state if {@code D} is already in the DFA, or {@code D} itself if the
+	 * state was not already present.
+	 */
+	@NotNull
 	protected DFAState addDFAState(@NotNull DFA dfa, @NotNull DFAState D) {
-		synchronized (dfa) {
+		if (D == ERROR) {
+			return D;
+		}
+
+		synchronized (dfa.states) {
 			DFAState existing = dfa.states.get(D);
 			if ( existing!=null ) return existing;
 
 			D.stateNumber = dfa.states.size();
-			synchronized (sharedContextCache) {
+			if (!D.configs.isReadonly()) {
 				D.configs.optimizeConfigs(this);
+				D.configs.setReadonly(true);
 			}
-			D.configs.setReadonly(true);
 			dfa.states.put(D, D);
 			if ( debug ) System.out.println("adding new DFA state: "+D);
 			return D;
 		}
 	}
 
-	public void reportAttemptingFullContext(DFA dfa, ATNConfigSet configs, int startIndex, int stopIndex) {
+	protected void reportAttemptingFullContext(DFA dfa, @Nullable BitSet conflictingAlts, @NotNull ATNConfigSet configs, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);
 			System.out.println("reportAttemptingFullContext decision="+dfa.decision+":"+configs+
                                ", input="+parser.getTokenStream().getText(interval));
         }
-        if ( parser!=null ) parser.getErrorListenerDispatch().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, configs);
+        if ( parser!=null ) parser.getErrorListenerDispatch().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, conflictingAlts, configs);
     }
 
-	public void reportContextSensitivity(DFA dfa, ATNConfigSet configs, int startIndex, int stopIndex) {
+	protected void reportContextSensitivity(DFA dfa, int prediction, @NotNull ATNConfigSet configs, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);
             System.out.println("reportContextSensitivity decision="+dfa.decision+":"+configs+
                                ", input="+parser.getTokenStream().getText(interval));
         }
-        if ( parser!=null ) parser.getErrorListenerDispatch().reportContextSensitivity(parser, dfa, startIndex, stopIndex, configs);
+        if ( parser!=null ) parser.getErrorListenerDispatch().reportContextSensitivity(parser, dfa, startIndex, stopIndex, prediction, configs);
     }
 
     /** If context sensitive parsing, we know it's ambiguity not conflict */
-    public void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex,
-								@NotNull BitSet ambigAlts,
-								@NotNull ATNConfigSet configs)
+    protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex,
+								   boolean exact,
+								   @Nullable BitSet ambigAlts,
+								   @NotNull ATNConfigSet configs)
 	{
 		if ( debug || retry_debug ) {
 //			ParserATNPathFinder finder = new ParserATNPathFinder(parser, atn);
@@ -1542,12 +1576,15 @@ public class ParserATNSimulator extends ATNSimulator {
                                ", input="+parser.getTokenStream().getText(interval));
         }
         if ( parser!=null ) parser.getErrorListenerDispatch().reportAmbiguity(parser, dfa, startIndex, stopIndex,
-																			  ambigAlts, configs);
+																			  exact, ambigAlts, configs);
     }
 
-	public void setPredictionMode(PredictionMode mode) {
+	public final void setPredictionMode(@NotNull PredictionMode mode) {
 		this.mode = mode;
 	}
 
-	public PredictionMode getPredictionMode() { return mode; }
+	@NotNull
+	public final PredictionMode getPredictionMode() {
+		return mode;
+	}
 }

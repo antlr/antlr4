@@ -34,11 +34,13 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.junit.Assert.*;
+
 /** Test topo sort in GraphNode. */
 public class TestTopologicalSort extends BaseTest {
     @Test
     public void testFairlyLargeGraph() throws Exception {
-        Graph g = new Graph();
+        Graph<String> g = new Graph<String>();
         g.addEdge("C", "F");
         g.addEdge("C", "G");
         g.addEdge("C", "A");
@@ -52,63 +54,63 @@ public class TestTopologicalSort extends BaseTest {
         g.addEdge("E", "F");
 
         String expecting = "[H, F, E, D, G, A, B, C]";
-        List nodes = g.sort();
+        List<String> nodes = g.sort();
         String result = nodes.toString();
         assertEquals(expecting, result);
     }
 
     @Test
     public void testCyclicGraph() throws Exception {
-        Graph g = new Graph();
+        Graph<String> g = new Graph<String>();
         g.addEdge("A", "B");
         g.addEdge("B", "C");
         g.addEdge("C", "A");
         g.addEdge("C", "D");
 
         String expecting = "[D, C, B, A]";
-        List nodes = g.sort();
+        List<String> nodes = g.sort();
         String result = nodes.toString();
         assertEquals(expecting, result);
     }
 
     @Test
     public void testRepeatedEdges() throws Exception {
-        Graph g = new Graph();
+        Graph<String> g = new Graph<String>();
         g.addEdge("A", "B");
         g.addEdge("B", "C");
         g.addEdge("A", "B"); // dup
         g.addEdge("C", "D");
 
         String expecting = "[D, C, B, A]";
-        List nodes = g.sort();
+        List<String> nodes = g.sort();
         String result = nodes.toString();
         assertEquals(expecting, result);
     }
 
     @Test
     public void testSimpleTokenDependence() throws Exception {
-        Graph g = new Graph();
+        Graph<String> g = new Graph<String>();
         g.addEdge("Java.g4", "MyJava.tokens"); // Java feeds off manual token file
         g.addEdge("Java.tokens", "Java.g4");
         g.addEdge("Def.g4", "Java.tokens");    // walkers feed off generated tokens
         g.addEdge("Ref.g4", "Java.tokens");
 
         String expecting = "[MyJava.tokens, Java.g4, Java.tokens, Ref.g4, Def.g4]";
-        List nodes = g.sort();
+        List<String> nodes = g.sort();
         String result = nodes.toString();
         assertEquals(expecting, result);
     }
 
     @Test
     public void testParserLexerCombo() throws Exception {
-        Graph g = new Graph();
+        Graph<String> g = new Graph<String>();
         g.addEdge("JavaLexer.tokens", "JavaLexer.g4");
         g.addEdge("JavaParser.g4", "JavaLexer.tokens");
         g.addEdge("Def.g4", "JavaLexer.tokens");
         g.addEdge("Ref.g4", "JavaLexer.tokens");
 
         String expecting = "[JavaLexer.g4, JavaLexer.tokens, JavaParser.g4, Ref.g4, Def.g4]";
-        List nodes = g.sort();
+        List<String> nodes = g.sort();
         String result = nodes.toString();
         assertEquals(expecting, result);
     }

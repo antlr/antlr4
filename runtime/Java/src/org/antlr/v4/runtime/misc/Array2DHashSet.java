@@ -30,12 +30,13 @@
 
 package org.antlr.v4.runtime.misc;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-/** Set impl with closed hashing (open addressing). */
+/** {@link Set} implementation with closed hashing (open addressing). */
 public class Array2DHashSet<T> implements Set<T> {
 	public static final int INITAL_CAPACITY = 16; // must be power of 2
 	public static final int INITAL_BUCKET_CAPACITY = 8;
@@ -68,28 +69,33 @@ public class Array2DHashSet<T> implements Set<T> {
 		}
 
 		this.comparator = comparator;
-		this.buckets = (T[][])new Object[initialCapacity][];
+		this.buckets = createBuckets(initialCapacity);
 		this.initialBucketCapacity = initialBucketCapacity;
 	}
 
-	/** Add o to set if not there; return existing value if already there.
-	 *  Absorb is used as synonym for add.
+	/**
+	 * Add {@code o} to set if not there; return existing value if already
+	 * there. This method performs the same operation as {@link #add} aside from
+	 * the return value.
 	 */
-	public T absorb(T o) {
+	public final T getOrAdd(T o) {
 		if ( n > threshold ) expand();
-		return absorb_(o);
+		return getOrAddImpl(o);
 	}
 
-	protected T absorb_(T o) {
+	protected T getOrAddImpl(T o) {
 		int b = getBucket(o);
 		T[] bucket = buckets[b];
+
 		// NEW BUCKET
 		if ( bucket==null ) {
-			buckets[b] = (T[])new Object[initialBucketCapacity];
-			buckets[b][0] = o;
+			bucket = createBucket(initialBucketCapacity);
+			bucket[0] = o;
+			buckets[b] = bucket;
 			n++;
 			return o;
 		}
+
 		// LOOK FOR IT IN BUCKET
 		for (int i=0; i<bucket.length; i++) {
 			T existing = bucket[i];
@@ -100,12 +106,12 @@ public class Array2DHashSet<T> implements Set<T> {
 			}
 			if ( comparator.equals(existing, o) ) return existing; // found existing, quit
 		}
+
 		// FULL BUCKET, expand and add to end
-		T[] old = bucket;
-		bucket = (T[])new Object[old.length * 2];
+		int oldLength = bucket.length;
+		bucket = Arrays.copyOf(bucket, bucket.length * 2);
 		buckets[b] = bucket;
-		System.arraycopy(old, 0, bucket, 0, old.length);
-		bucket[old.length] = o; // add to end
+		bucket[oldLength] = o; // add to end
 		n++;
 		return o;
 	}
@@ -122,7 +128,7 @@ public class Array2DHashSet<T> implements Set<T> {
 		return null;
 	}
 
-	protected int getBucket(T o) {
+	protected final int getBucket(T o) {
 		int hash = comparator.hashCode(o);
 		int b = hash & (buckets.length-1); // assumes len is power of 2
 		return b;
@@ -130,22 +136,24 @@ public class Array2DHashSet<T> implements Set<T> {
 
 	@Override
 	public int hashCode() {
-		int h = 0;
+		int hash = MurmurHash.initialize();
 		for (T[] bucket : buckets) {
 			if ( bucket==null ) continue;
 			for (T o : bucket) {
 				if ( o==null ) break;
-				h += comparator.hashCode(o);
+				hash = MurmurHash.update(hash, comparator.hashCode(o));
 			}
 		}
-		return h;
+
+		hash = MurmurHash.finish(hash, size());
+		return hash;
 	}
 
 	@Override
 	public boolean equals(Object o) {
 		if (o == this) return true;
-		if ( !(o instanceof Array2DHashSet) || o==null ) return false;
-		Array2DHashSet<T> other = (Array2DHashSet<T>)o;
+		if ( !(o instanceof Array2DHashSet) ) return false;
+		Array2DHashSet<?> other = (Array2DHashSet<?>)o;
 		if ( other.size() != size() ) return false;
 		boolean same = this.containsAll(other);
 		return same;
@@ -155,140 +163,179 @@ public class Array2DHashSet<T> implements Set<T> {
 		T[][] old = buckets;
 		currentPrime += 4;
 		int newCapacity = buckets.length * 2;
-		T[][] newTable = (T[][])new Object[newCapacity][];
+		T[][] newTable = createBuckets(newCapacity);
+		int[] newBucketLengths = new int[newTable.length];
 		buckets = newTable;
 		threshold = (int)(newCapacity * LOAD_FACTOR);
 //		System.out.println("new size="+newCapacity+", thres="+threshold);
 		// rehash all existing entries
 		int oldSize = size();
 		for (T[] bucket : old) {
-			if ( bucket==null ) continue;
+			if ( bucket==null ) {
+				continue;
+			}
+
 			for (T o : bucket) {
-				if ( o==null ) break;
-				absorb_(o);
+				if ( o==null ) {
+					break;
+				}
+
+				int b = getBucket(o);
+				int bucketLength = newBucketLengths[b];
+				T[] newBucket;
+				if (bucketLength == 0) {
+					// new bucket
+					newBucket = createBucket(initialBucketCapacity);
+					newTable[b] = newBucket;
+				}
+				else {
+					newBucket = newTable[b];
+					if (bucketLength == newBucket.length) {
+						// expand
+						newBucket = Arrays.copyOf(newBucket, newBucket.length * 2);
+						newTable[b] = newBucket;
+					}
+				}
+
+				newBucket[bucketLength] = o;
+				newBucketLengths[b]++;
 			}
 		}
-		n = oldSize;
+
+		assert n == oldSize;
 	}
 
 	@Override
-	public boolean add(T t) {
-		T existing = absorb(t);
+	public final boolean add(T t) {
+		T existing = getOrAdd(t);
 		return existing==t;
 	}
 
 	@Override
-	public int size() {
+	public final int size() {
 		return n;
 	}
 
 	@Override
-	public boolean isEmpty() {
+	public final boolean isEmpty() {
 		return n==0;
 	}
 
 	@Override
-	public boolean contains(Object o) {
-		return get((T)o) != null;
+	public final boolean contains(Object o) {
+		return containsFast(asElementType(o));
+	}
+
+	public boolean containsFast(@Nullable T obj) {
+		if (obj == null) {
+			return false;
+		}
+
+		return get(obj) != null;
 	}
 
 	@Override
 	public Iterator<T> iterator() {
-		final Object[] data = toArray();
-		return new Iterator<T>() {
-			int nextIndex = 0;
-			boolean removed = true;
-
-			@Override
-			public boolean hasNext() {
-				return nextIndex < data.length;
-			}
-
-			@Override
-			public T next() {
-				if (!hasNext()) {
-					throw new NoSuchElementException();
-				}
-
-				removed = false;
-				return (T)data[nextIndex++];
-			}
-
-			@Override
-			public void remove() {
-				if (removed) {
-					throw new IllegalStateException();
-				}
-
-				Array2DHashSet.this.remove(data[nextIndex - 1]);
-				removed = true;
-			}
-
-		};
+		return new SetIterator(toArray());
 	}
 
 	@Override
-	public Object[] toArray() {
-		Object[] a = new Object[size()];
+	public T[] toArray() {
+		T[] a = createBucket(size());
 		int i = 0;
 		for (T[] bucket : buckets) {
-			if ( bucket==null ) continue;
+			if ( bucket==null ) {
+				continue;
+			}
+
 			for (T o : bucket) {
-				if ( o==null ) break;
+				if ( o==null ) {
+					break;
+				}
+
 				a[i++] = o;
 			}
 		}
+
 		return a;
 	}
 
 	@Override
 	public <U> U[] toArray(U[] a) {
+		if (a.length < size()) {
+			a = Arrays.copyOf(a, size());
+		}
+
 		int i = 0;
 		for (T[] bucket : buckets) {
-			if ( bucket==null ) continue;
+			if ( bucket==null ) {
+				continue;
+			}
+
 			for (T o : bucket) {
-				if ( o==null ) break;
-				a[i++] = (U)o;
+				if ( o==null ) {
+					break;
+				}
+
+				@SuppressWarnings("unchecked") // array store will check this
+				U targetElement = (U)o;
+				a[i++] = targetElement;
 			}
 		}
 		return a;
 	}
 
 	@Override
-	public boolean remove(Object o) {
-		if ( o==null ) return false;
-		int b = getBucket((T)o);
+	public final boolean remove(Object o) {
+		return removeFast(asElementType(o));
+	}
+
+	public boolean removeFast(@Nullable T obj) {
+		if (obj == null) {
+			return false;
+		}
+
+		int b = getBucket(obj);
 		T[] bucket = buckets[b];
-		if ( bucket==null ) return false; // no bucket
+		if ( bucket==null ) {
+			// no bucket
+			return false;
+		}
+
 		for (int i=0; i<bucket.length; i++) {
 			T e = bucket[i];
-			if ( e==null ) return false;  // empty slot; not there
-			if ( comparator.equals(e, (T) o) ) {          // found it
+			if ( e==null ) {
+				// empty slot; not there
+				return false;
+			}
+
+			if ( comparator.equals(e, obj) ) {          // found it
 				// shift all elements to the right down one
-//				for (int j=i; j<bucket.length-1; j++) bucket[j] = bucket[j+1];
 				System.arraycopy(bucket, i+1, bucket, i, bucket.length-i-1);
+				bucket[bucket.length - 1] = null;
 				n--;
 				return true;
 			}
 		}
+
 		return false;
 	}
 
 	@Override
 	public boolean containsAll(Collection<?> collection) {
 		if ( collection instanceof Array2DHashSet ) {
-			Array2DHashSet<T> s = (Array2DHashSet<T>)collection;
-			for (T[] bucket : s.buckets) {
+			Array2DHashSet<?> s = (Array2DHashSet<?>)collection;
+			for (Object[] bucket : s.buckets) {
 				if ( bucket==null ) continue;
-				for (T o : bucket) {
+				for (Object o : bucket) {
 					if ( o==null ) break;
-					if ( !this.contains(o) ) return false;
+					if ( !this.containsFast(asElementType(o)) ) return false;
 				}
 			}
 		}
 		else {
 			for (Object o : collection) {
-				if ( !this.contains(o) ) return false;
+				if ( !this.containsFast(asElementType(o)) ) return false;
 			}
 		}
 		return true;
@@ -298,7 +345,7 @@ public class Array2DHashSet<T> implements Set<T> {
 	public boolean addAll(Collection<? extends T> c) {
 		boolean changed = false;
 		for (T o : c) {
-			T existing = absorb(o);
+			T existing = getOrAdd(o);
 			if ( existing!=o ) changed=true;
 		}
 		return changed;
@@ -306,20 +353,63 @@ public class Array2DHashSet<T> implements Set<T> {
 
 	@Override
 	public boolean retainAll(Collection<?> c) {
-		throw new UnsupportedOperationException();
+		int newsize = 0;
+		for (T[] bucket : buckets) {
+			if (bucket == null) {
+				continue;
+			}
+
+			int i;
+			int j;
+			for (i = 0, j = 0; i < bucket.length; i++) {
+				if (bucket[i] == null) {
+					break;
+				}
+
+				if (!c.contains(bucket[i])) {
+					// removed
+					continue;
+				}
+
+				// keep
+				if (i != j) {
+					bucket[j] = bucket[i];
+				}
+
+				j++;
+				newsize++;
+			}
+
+			newsize += j;
+
+			while (j < i) {
+				bucket[j] = null;
+				j++;
+			}
+		}
+
+		boolean changed = newsize != n;
+		n = newsize;
+		return changed;
 	}
 
 	@Override
 	public boolean removeAll(Collection<?> c) {
-		throw new UnsupportedOperationException();
+		boolean changed = false;
+		for (Object o : c) {
+			changed |= removeFast(asElementType(o));
+		}
+
+		return changed;
 	}
 
 	@Override
 	public void clear() {
-		buckets = (T[][])new Object[INITAL_CAPACITY][];
+		buckets = createBuckets(INITAL_CAPACITY);
 		n = 0;
 	}
 
+	@Override
 	public String toString() {
 		if ( size()==0 ) return "{}";
 
@@ -359,20 +449,78 @@ public class Array2DHashSet<T> implements Set<T> {
 		return buf.toString();
 	}
 
-	public static void main(String[] args) {
-		Array2DHashSet<String> clset = new Array2DHashSet<String>();
-		Set<String> set = clset;
-		set.add("hi");
-		set.add("mom");
-		set.add("foo");
-		set.add("ach");
-		set.add("cbba");
-		set.add("d");
-		set.add("edf");
-		set.add("f");
-		set.add("gab");
-		set.remove("ach");
-		System.out.println(set);
-		System.out.println(clset.toTableString());
+	/**
+	 * Return {@code o} as an instance of the element type {@code T}. If
+	 * {@code o} is non-null but known to not be an instance of {@code T}, this
+	 * method returns {@code null}. The base implementation does not perform any
+	 * type checks; override this method to provide strong type checks for the
+	 * {@link #contains} and {@link #remove} methods to ensure the arguments to
+	 * the {@link EqualityComparator} for the set always have the expected
+	 * types.
+	 *
+	 * @param o the object to try and cast to the element type of the set
+	 * @return {@code o} if it could be an instance of {@code T}, otherwise
+	 * {@code null}.
+	 */
+	@SuppressWarnings("unchecked")
+	protected T asElementType(Object o) {
+		return (T)o;
+	}
+
+	/**
+	 * Return an array of {@code T[]} with length {@code capacity}.
+	 *
+	 * @param capacity the length of the array to return
+	 * @return the newly constructed array
+	 */
+	@SuppressWarnings("unchecked")
+	protected T[][] createBuckets(int capacity) {
+		return (T[][])new Object[capacity][];
+	}
+
+	/**
+	 * Return an array of {@code T} with length {@code capacity}.
+	 *
+	 * @param capacity the length of the array to return
+	 * @return the newly constructed array
+	 */
+	@SuppressWarnings("unchecked")
+	protected T[] createBucket(int capacity) {
+		return (T[])new Object[capacity];
+	}
+
+	protected class SetIterator implements Iterator<T> {
+		final T[] data;
+		int nextIndex = 0;
+		boolean removed = true;
+
+		public SetIterator(T[] data) {
+			this.data = data;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return nextIndex < data.length;
+		}
+
+		@Override
+		public T next() {
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+
+			removed = false;
+			return data[nextIndex++];
+		}
+
+		@Override
+		public void remove() {
+			if (removed) {
+				throw new IllegalStateException();
+			}
+
+			Array2DHashSet.this.remove(data[nextIndex - 1]);
+			removed = true;
+		}
 	}
 }

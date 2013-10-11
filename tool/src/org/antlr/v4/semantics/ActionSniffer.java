@@ -96,12 +96,6 @@ public class ActionSniffer extends BlankActionSplitterListener {
 	}
 
 	@Override
-	public void setQualifiedAttr(String expr, Token x, Token y, Token rhs) {
-		trackRef(x);
-		processNested(rhs);
-	}
-
-	@Override
 	public void setNonLocalAttr(String expr, Token x, Token y, Token rhs) {
 		processNested(rhs);
 	}

@@ -30,6 +30,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.misc.MurmurHash;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
@@ -84,8 +85,13 @@ public class LexerATNConfig extends ATNConfig {
 
 	@Override
 	public int hashCode() {
-		int hashCode = super.hashCode();
-		hashCode = 35 * hashCode ^ (passedThroughNonGreedyDecision ? 1 : 0);
+		int hashCode = MurmurHash.initialize(7);
+		hashCode = MurmurHash.update(hashCode, state.stateNumber);
+		hashCode = MurmurHash.update(hashCode, alt);
+		hashCode = MurmurHash.update(hashCode, context);
+		hashCode = MurmurHash.update(hashCode, semanticContext);
+		hashCode = MurmurHash.update(hashCode, passedThroughNonGreedyDecision ? 1 : 0);
+		hashCode = MurmurHash.finish(hashCode, 5);
 		return hashCode;
 	}
 

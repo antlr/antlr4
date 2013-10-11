@@ -30,8 +30,13 @@
 
 package org.antlr.v4.runtime.atn;
 
-/** Decision state for A+ and (A|B)+.  It has two transitions:
+/** Decision state for {@code A+} and {@code (A|B)+}.  It has two transitions:
  *  one to the loop back to start of the block and one to exit.
  */
-public class PlusLoopbackState extends DecisionState {
+public final class PlusLoopbackState extends DecisionState {
+
+	@Override
+	public int getStateType() {
+		return PLUS_LOOP_BACK;
+	}
 }

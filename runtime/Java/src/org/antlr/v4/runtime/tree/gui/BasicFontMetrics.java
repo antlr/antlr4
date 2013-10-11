@@ -38,34 +38,38 @@ package org.antlr.v4.runtime.tree.gui;
  *  then converted that to a Java class for use in a PostScript generator
  *  for trees. Commands:
  *
- * 		$ ttf2tfm /Library/Fonts/Arial\ Black.ttf > metrics
+ * <pre>
+ *	 $ ttf2tfm /Library/Fonts/Arial\ Black.ttf > metrics
+ * </pre>
  *
  * 	Then run metrics into python code after stripping header/footer:
  *
- 	 #
-	 # Process lines from ttf2tfm that look like this:
- 	 # Glyph  Code   Glyph Name                Width  llx    lly      urx    ury
- 	 # ------------------------------------------------------------------------
-	 #     3  00020  space                       333  0,     0 --     0,     0
-     #
-	 lines = open("metrics").read().split('\n')
-	 print "public class FontName {"
-	 print "    {"
-	 maxh = 0;
-	 for line in lines[4:]: # skip header 0..3
-			 all = line.split(' ')
-			 words = [x for x in all if len(x)>0]
-			 ascii = int(words[1], 16)
-			 height = int(words[8])
-			 if height>maxh: maxh = height
-			 if ascii>=128: break
-			 print "        widths[%d] = %s; // %s" % (ascii, words[3], words[2])
-
-	 print "        maxCharHeight = "+str(maxh)+";"
-	 print "    }"
-	 print "}"
-
- 	Units are 1000th of an 'em'.
+ * <pre>
+ *	 #
+ *	 # Process lines from ttf2tfm that look like this:
+ *	 # Glyph  Code   Glyph Name                Width  llx    lly      urx    ury
+ *	 # ------------------------------------------------------------------------
+ *	 #     3  00020  space                       333  0,     0 --     0,     0
+ *	 #
+ *	 lines = open("metrics").read().split('\n')
+ *	 print "public class FontName {"
+ *	 print "    {"
+ *	 maxh = 0;
+ *	 for line in lines[4:]: # skip header 0..3
+ *			 all = line.split(' ')
+ *			 words = [x for x in all if len(x)>0]
+ *			 ascii = int(words[1], 16)
+ *			 height = int(words[8])
+ *			 if height>maxh: maxh = height
+ *			 if ascii>=128: break
+ *			 print "        widths[%d] = %s; // %s" % (ascii, words[3], words[2])
+ *
+ *	 print "        maxCharHeight = "+str(maxh)+";"
+ *	 print "    }"
+ *	 print "}"
+ * </pre>
+ *
+ *	Units are 1000th of an 'em'.
  */
 public abstract class BasicFontMetrics {
 	public static final int MAX_CHAR = '\u00FF';

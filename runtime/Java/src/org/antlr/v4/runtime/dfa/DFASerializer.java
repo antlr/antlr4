@@ -34,7 +34,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.Arrays;
-import java.util.Map;
+import java.util.List;
 
 /** A DFA walker that knows how to dump them to serialized strings. */
 public class DFASerializer {
@@ -52,22 +52,22 @@ public class DFASerializer {
 	public String toString() {
 		if ( dfa.s0==null ) return null;
 		StringBuilder buf = new StringBuilder();
-		Map<DFAState,DFAState> states = dfa.states;
-		if ( states!=null ) {
-			for (DFAState s : states.values()) {
-				int n = 0;
-				if ( s.edges!=null ) n = s.edges.length;
-				for (int i=0; i<n; i++) {
-					DFAState t = s.edges[i];
-					if ( t!=null && t.stateNumber != Integer.MAX_VALUE ) {
-						buf.append(getStateString(s));
-						String label = getEdgeLabel(i);
-						buf.append("-").append(label).append("->").append(getStateString(t)).append('\n');
-					}
+		List<DFAState> states = dfa.getStates();
+		for (DFAState s : states) {
+			int n = 0;
+			if ( s.edges!=null ) n = s.edges.length;
+			for (int i=0; i<n; i++) {
+				DFAState t = s.edges[i];
+				if ( t!=null && t.stateNumber != Integer.MAX_VALUE ) {
+					buf.append(getStateString(s));
+					String label = getEdgeLabel(i);
+					buf.append("-").append(label).append("->").append(getStateString(t)).append('\n');
 				}
 			}
 		}
+
 		String output = buf.toString();
+		if ( output.length()==0 ) return null;
 		//return Utils.sortLinesInString(output);
 		return output;
 	}
@@ -80,20 +80,20 @@ public class DFASerializer {
 		return label;
 	}
 
-	String getStateString(DFAState s) {
+	@NotNull
+	protected String getStateString(@NotNull DFAState s) {
 		int n = s.stateNumber;
-		String stateStr = "s"+n;
+		final String baseStateStr = (s.isAcceptState ? ":" : "") + "s" + n + (s.requiresFullContext ? "^" : "");
 		if ( s.isAcceptState ) {
             if ( s.predicates!=null ) {
-                stateStr = ":s"+n+"=>"+Arrays.toString(s.predicates);
+                return baseStateStr + "=>" + Arrays.toString(s.predicates);
             }
             else {
-                stateStr = ":s"+n+"=>"+s.prediction;
+                return baseStateStr + "=>" + s.prediction;
             }
 		}
-		else if ( s.requiresFullContext) {
-			stateStr = "s"+n+"^";
+		else {
+			return baseStateStr;
 		}
-		return stateStr;
 	}
 }

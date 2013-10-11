@@ -35,6 +35,7 @@ public class EmptyPredictionContext extends SingletonPredictionContext {
 		super(null, EMPTY_RETURN_STATE);
 	}
 
+	@Override
 	public boolean isEmpty() { return true; }
 
 	@Override

@@ -38,6 +38,8 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 public class TestATNDeserialization extends BaseTest {
 	@Test public void testSimpleNoBlock() throws Exception {
 		Grammar g = new Grammar(
@@ -123,7 +125,7 @@ public class TestATNDeserialization extends BaseTest {
 	@Test public void testLexerEOFInSet() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
-			"A : 'a' (EOF|'\n') ;\n");
+			"A : 'a' (EOF|'\\n') ;\n");
 		checkDeserializationIsStable(lg);
 	}
 

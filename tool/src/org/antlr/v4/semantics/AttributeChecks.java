@@ -110,12 +110,6 @@ public class AttributeChecks implements ActionSplitterListener {
 
     // LISTENER METHODS
 
-    @Override
-    public void setQualifiedAttr(String expr, Token x, Token y, Token rhs) {
-		qualifiedAttr(expr, x, y);
-        new AttributeChecks(g, r, alt, node, rhs).examineAction();
-    }
-
 	// $x.y
 	@Override
 	public void qualifiedAttr(String expr, Token x, Token y) {
@@ -135,7 +129,7 @@ public class AttributeChecks implements ActionSplitterListener {
 			if ( rref!=null ) {
 				if ( rref.args!=null && rref.args.get(y.getText())!=null ) {
 					g.tool.errMgr.grammarError(ErrorType.INVALID_RULE_PARAMETER_REF,
-											  g.fileName, y, y.getText(), expr);
+											  g.fileName, y, y.getText(), rref.name, expr);
 				}
 				else {
 					errMgr.grammarError(ErrorType.UNKNOWN_RULE_ATTRIBUTE,
@@ -161,7 +155,13 @@ public class AttributeChecks implements ActionSplitterListener {
 			return;
 		}
 		if ( node.resolver.resolveToAttribute(x.getText(), node)==null ) {
-			errMgr.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
+			ErrorType errorType = ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE;
+			if ( node.resolver.resolvesToListLabel(x.getText(), node) ) {
+				// $ids for ids+=ID etc...
+				errorType = ErrorType.ASSIGNMENT_TO_LIST_LABEL;
+			}
+
+			errMgr.grammarError(errorType,
 								g.fileName, x, x.getText(), expr);
 		}
 		new AttributeChecks(g, r, alt, node, rhs).examineAction();
@@ -195,8 +195,8 @@ public class AttributeChecks implements ActionSplitterListener {
 	public void nonLocalAttr(String expr, Token x, Token y) {
 		Rule r = g.getRule(x.getText());
 		if ( r==null ) {
-			errMgr.toolError(ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF,
-							 x.getText(), y.getText());
+			errMgr.grammarError(ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF,
+								g.fileName, x, x.getText(), y.getText(), expr);
 		}
 		else if ( r.resolveToAttribute(y.getText(), null)==null ) {
 			errMgr.grammarError(ErrorType.UNKNOWN_RULE_ATTRIBUTE,
@@ -209,8 +209,8 @@ public class AttributeChecks implements ActionSplitterListener {
 	public void setNonLocalAttr(String expr, Token x, Token y, Token rhs) {
 		Rule r = g.getRule(x.getText());
 		if ( r==null ) {
-			errMgr.toolError(ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF,
-							 x.getText(), y.getText());
+			errMgr.grammarError(ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF,
+								g.fileName, x, x.getText(), y.getText(), expr);
 		}
 		else if ( r.resolveToAttribute(y.getText(), null)==null ) {
 			errMgr.grammarError(ErrorType.UNKNOWN_RULE_ATTRIBUTE,

@@ -38,36 +38,38 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/** Buffer all input tokens but do on-demand fetching of new tokens from
- *  lexer. Useful when the parser or lexer has to set context/mode info before
- *  proper lexing of future tokens. The ST template parser needs this,
- *  for example, because it has to constantly flip back and forth between
- *  inside/output templates. E.g., <names:{hi, <it>}> has to parse names
- *  as part of an expression but "hi, <it>" as a nested template.
- *
- *  You can't use this stream if you pass whitespace or other off-channel
- *  tokens to the parser. The stream can't ignore off-channel tokens.
- *  (UnbufferedTokenStream is the same way.)  Use CommonTokenStream.
- *
- *  This is not a subclass of UnbufferedTokenStream because I don't want
- *  to confuse small moving window of tokens it uses for the full buffer.
+/**
+ * Buffer all input tokens but do on-demand fetching of new tokens from lexer.
+ * Useful when the parser or lexer has to set context/mode info before proper
+ * lexing of future tokens. The ST template parser needs this, for example,
+ * because it has to constantly flip back and forth between inside/output
+ * templates. E.g., {@code <names:{hi, <it>}>} has to parse names as part of an
+ * expression but {@code "hi, <it>"} as a nested template.
+ * <p/>
+ * You can't use this stream if you pass whitespace or other off-channel tokens
+ * to the parser. The stream can't ignore off-channel tokens.
+ * ({@link UnbufferedTokenStream} is the same way.) Use
+ * {@link CommonTokenStream}.
  */
 public class BufferedTokenStream implements TokenStream {
 	@NotNull
     protected TokenSource tokenSource;
 
-    /** Record every single token pulled from the source so we can reproduce
-     *  chunks of it later.  The buffer in LookaheadStream overlaps sometimes
-     *  as its moving window moves through the input.  This list captures
-     *  everything so we can access complete input text.
-     */
+	/**
+	 * Record every single token pulled from the source so we can reproduce
+	 * chunks of it later. This list captures everything so we can access
+	 * complete input text.
+	 */
     protected List<Token> tokens = new ArrayList<Token>(100);
 
-    /** The index into the tokens list of the current token (next token
-     *  to consume).  tokens[p] should be LT(1).  p=-1 indicates need
-     *  to initialize with first token.  The ctor doesn't get a token.
-     *  First call to LT(1) or whatever gets the first token and sets p=0;
-     */
+	/**
+	 * The index into {@link #tokens} of the current token (next token to
+	 * consume). {@link #tokens}{@code [}{@link #p}{@code ]} should be
+	 * {@link #LT LT(1)}. {@link #p}{@code =-1} indicates need to initialize
+	 * with first token. The constructor doesn't get a token. First call to
+	 * {@link #LT LT(1)} or whatever gets the first token and sets
+	 * {@link #p}{@code =0;}.
+	 */
     protected int p = -1;
 
 	/**
@@ -92,8 +94,6 @@ public class BufferedTokenStream implements TokenStream {
 	@Override
 	public int index() { return p; }
 
-//	public int range() { return range; }
-
     @Override
     public int mark() {
 		return 0;
@@ -117,14 +117,12 @@ public class BufferedTokenStream implements TokenStream {
     @Override
     public int size() { return tokens.size(); }
 
-    /** Move the input pointer to the next incoming token.  The stream
-     *  must become active with LT(1) available.  consume() simply
-     *  moves the input pointer so that LT(1) points at the next
-     *  input symbol. Consume at least one token, unless EOF has been reached.
-     */
     @Override
     public void consume() {
-        lazyInit();
+		if (LA(1) == EOF) {
+			throw new IllegalStateException("cannot consume EOF");
+		}
+
 		if (sync(p + 1)) {
 			p = adjustSeekIndex(p + 1);
 		}
@@ -224,7 +222,7 @@ public class BufferedTokenStream implements TokenStream {
 	 * operation. The default implementation simply returns {@code i}. If an
 	 * exception is thrown in this method, the current stream index should not be
 	 * changed.
-	 * <p>
+	 * <p/>
 	 * For example, {@link CommonTokenStream} overrides this method to ensure that
 	 * the seek target is always an on-channel token.
 	 *

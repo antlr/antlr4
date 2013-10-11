@@ -42,6 +42,8 @@ import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Grammar;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /** Create output objects for elements *within* rule functions except
@@ -106,15 +108,13 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 	// MISC
 
 	@NotNull
-	public static List<SrcOp> list(Object... values) {
-		List<SrcOp> x = new ArrayList<SrcOp>(values.length);
-		for (Object v : values) {
-			if ( v!=null ) {
-				if ( v instanceof List<?> ) x.addAll((List) v);
-				else x.add((SrcOp)v);
-			}
-		}
-		return x;
+	public static List<SrcOp> list(SrcOp... values) {
+		return new ArrayList<SrcOp>(Arrays.asList(values));
+	}
+
+	@NotNull
+	public static List<SrcOp> list(Collection<? extends SrcOp> values) {
+		return new ArrayList<SrcOp>(values);
 	}
 
 	@Nullable

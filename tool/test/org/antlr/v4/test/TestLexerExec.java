@@ -37,6 +37,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import static org.junit.Assert.*;
+
 public class TestLexerExec extends BaseTest {
     @Test public void testQuoteTranslation() throws Exception {
    		String grammar =
@@ -54,7 +56,7 @@ public class TestLexerExec extends BaseTest {
    			"lexer grammar L;\n"+
    			"A : '-' I ;\n" +
    			"I : '0'..'9'+ ;\n"+
-   			"WS : (' '|'\\n') {skip();} ;";
+   			"WS : (' '|'\\n') -> skip ;";
    		String found = execLexer("L.g4", grammar, "L", "34 -21 3");
    		String expecting =
    			"[@0,0:1='34',<2>,1:0]\n" +
@@ -63,6 +65,49 @@ public class TestLexerExec extends BaseTest {
    			"[@3,8:7='<EOF>',<-1>,1:8]\n"; // EOF has no length so range is 8:7 not 8:8
    		assertEquals(expecting, found);
    	}
+
+	@Test public void testSlashes() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"Backslash : '\\\\';\n" +
+			"Slash : '/';\n" +
+			"Vee : '\\\\/';\n" +
+			"Wedge : '/\\\\';\n"+
+			"WS : [ \\t] -> skip;";
+		String found = execLexer("L.g4", grammar, "L", "\\ / \\/ /\\");
+		String expecting =
+			"[@0,0:0='\\',<1>,1:0]\n" +
+			"[@1,2:2='/',<2>,1:2]\n" +
+			"[@2,4:5='\\/',<3>,1:4]\n" +
+			"[@3,7:8='/\\',<4>,1:7]\n" +
+			"[@4,9:8='<EOF>',<-1>,1:9]\n";
+		assertEquals(expecting, found);
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#224: "Parentheses without
+	 * quantifier in lexer rules have unclear effect".
+	 * https://github.com/antlr/antlr4/issues/224
+	 */
+	@Test public void testParentheses() {
+		String grammar =
+			"lexer grammar Demo;\n" +
+			"\n" +
+			"START_BLOCK: '-.-.-';\n" +
+			"\n" +
+			"ID : (LETTER SEPARATOR) (LETTER SEPARATOR)+;\n" +
+			"fragment LETTER: L_A|L_K;\n" +
+			"fragment L_A: '.-';\n" +
+			"fragment L_K: '-.-';\n" +
+			"\n" +
+			"SEPARATOR: '!';\n";
+		String found = execLexer("Demo.g4", grammar, "Demo", "-.-.-!");
+		String expecting =
+			"[@0,0:4='-.-.-',<1>,1:0]\n" +
+			"[@1,5:5='!',<3>,1:5]\n" +
+			"[@2,6:5='<EOF>',<-1>,1:6]\n";
+		assertEquals(expecting, found);
+	}
 
 	@Test
 	public void testNonGreedyTermination() throws Exception {
@@ -182,7 +227,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"CMT : '/*' (CMT | .)*? '*/' ;\n" +
-			"WS : (' '|'\n')+ ;\n"
+			"WS : (' '|'\\n')+ ;\n"
 			/*+ "ANY : .;"*/;
 
 		String expecting =
@@ -220,7 +265,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"CMT : '/*' (CMT | .)+? '*/' ;\n" +
-			"WS : (' '|'\n')+ ;\n"
+			"WS : (' '|'\\n')+ ;\n"
 			/*+ "ANY : .;"*/;
 
 		String expecting =
@@ -258,7 +303,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"I : ('a' | 'ab') {System.out.println(getText());} ;\n"+
-			"WS : (' '|'\\n') {skip();} ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n" +
 			"J : .;\n";
 		String found = execLexer("L.g4", grammar, "L", "ab");
 		String expecting =
@@ -272,7 +317,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"I : .*? ('a' | 'ab') {System.out.println(getText());} ;\n"+
-			"WS : (' '|'\\n') {skip();} ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n" +
 			"J : . {System.out.println(getText());};\n";
 		String found = execLexer("L.g4", grammar, "L", "ab");
 		String expecting =
@@ -288,7 +333,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
-			"WS : (' '|'\\n') {skip();} ;";
+			"WS : (' '|'\\n') -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "34 34");
 		String expecting =
 			"I\n" +
@@ -361,15 +406,15 @@ public class TestLexerExec extends BaseTest {
 	@Test public void testLexerMode() throws Exception {
 		String grammar =
 			"lexer grammar L;\n" +
-			"STRING_START : '\"' {pushMode(STRING_MODE); more();} ;\n" +
-			"WS : (' '|'\n') {skip();} ;\n"+
+			"STRING_START : '\"' -> pushMode(STRING_MODE), more;\n" +
+			"WS : (' '|'\\n') -> skip ;\n"+
 			"mode STRING_MODE;\n"+
-			"STRING : '\"' {popMode();} ;\n"+
-			"ANY : . {more();} ;\n";
+			"STRING : '\"' -> popMode;\n"+
+			"ANY : . -> more;\n";
 		String found = execLexer("L.g4", grammar, "L", "\"abc\" \"ab\"");
 		String expecting =
-			"[@0,0:4='\"abc\"',<3>,1:0]\n" +
-			"[@1,6:9='\"ab\"',<3>,1:6]\n" +
+			"[@0,0:4='\"abc\"',<2>,1:0]\n" +
+			"[@1,6:9='\"ab\"',<2>,1:6]\n" +
 			"[@2,10:9='<EOF>',<-1>,1:10]\n";
 		assertEquals(expecting, found);
 	}
@@ -378,7 +423,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n" +
 			"STRING_START : '\"' -> pushMode(STRING_MODE), more ;\n" +
-			"WS : (' '|'\n') -> skip ;\n"+
+			"WS : (' '|'\\n') -> skip ;\n"+
 			"mode STRING_MODE;\n"+
 			"STRING : '\"' -> popMode ;\n"+  // token type 2
 			"ANY : . -> more ;\n";
@@ -394,7 +439,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n" +
 			"STRING_START : '\"' -> mode(STRING_MODE), more ;\n" +
-			"WS : (' '|'\n') -> skip ;\n"+
+			"WS : (' '|'\\n') -> skip ;\n"+
 			"mode STRING_MODE;\n"+
 			"STRING : '\"' -> mode(DEFAULT_MODE) ;\n"+ // ttype 2 since '"' ambiguity
 			"ANY : . -> more ;\n";
@@ -411,7 +456,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"KEND : 'end' ;\n" + // has priority
 			"ID : 'a'..'z'+ ;\n" +
-			"WS : (' '|'\n')+ ;";
+			"WS : (' '|'\\n')+ ;";
 		String found = execLexer("L.g4", grammar, "L", "end eend ending a");
 		String expecting =
 			"[@0,0:2='end',<1>,1:0]\n" +
@@ -434,7 +479,7 @@ public class TestLexerExec extends BaseTest {
 			"DOT : '.' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"fragment HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;\n" +
-			"WS : (' '|'\n')+ ;";
+			"WS : (' '|'\\n')+ ;";
 		String found = execLexer("L.g4", grammar, "L", "x 0 1 a.b a.l");
 		String expecting =
 			"[@0,0:0='x',<5>,1:0]\n" +
@@ -518,7 +563,7 @@ public class TestLexerExec extends BaseTest {
 	@Test public void testCharSetNot() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"I : ~[ab \n] ~[ \ncd]* {System.out.println(\"I\");} ;\n"+
+			"I : ~[ab \\n] ~[ \\ncd]* {System.out.println(\"I\");} ;\n"+
 			"WS : [ \\n\\u000D]+ -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "xaf");
 		String expecting =
@@ -531,7 +576,7 @@ public class TestLexerExec extends BaseTest {
 	@Test public void testCharSetInSet() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"I : (~[ab \n]|'a') {System.out.println(\"I\");} ;\n"+
+			"I : (~[ab \\n]|'a') {System.out.println(\"I\");} ;\n"+
 			"WS : [ \\n\\u000D]+ -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "a x");
 		String expecting =
@@ -548,7 +593,7 @@ public class TestLexerExec extends BaseTest {
 			"lexer grammar L;\n"+
 			"I : [0-9]+ {System.out.println(\"I\");} ;\n"+
 			"ID : [a-zA-Z] [a-zA-Z0-9]* {System.out.println(\"ID\");} ;\n"+
-			"WS : [ \\n\\u0009\r]+ -> skip ;";
+			"WS : [ \\n\\u0009\\r]+ -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "34\r 34 a2 abc \n   ");
 		String expecting =
 			"I\n" +
@@ -621,7 +666,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"A : [\"a-z]+ {System.out.println(\"A\");} ;\n"+
-			"WS : [ \n\t]+ -> skip ;";
+			"WS : [ \\n\\t]+ -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "b\"a");
 		String expecting =
 			"A\n" +
@@ -634,7 +679,7 @@ public class TestLexerExec extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"A : [\"\\\\ab]+ {System.out.println(\"A\");} ;\n"+
-			"WS : [ \n\t]+ -> skip ;";
+			"WS : [ \\n\\t]+ -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "b\"\\a");
 		String expecting =
 			"A\n" +
@@ -670,6 +715,28 @@ public class TestLexerExec extends BaseTest {
 			"[@8,44:51='notLabel',<" + IDENTIFIER + ">,6:0]\n" +
 			"[@9,53:52='<EOF>',<-1>,7:0]\n";
 
+		assertEquals(expecting, found);
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#76 "Serialized ATN strings
+	 * should be split when longer than 2^16 bytes (class file limitation)"
+	 * https://github.com/antlr/antlr4/issues/76
+	 */
+	@Test
+	public void testLargeLexer() throws Exception {
+		StringBuilder grammar = new StringBuilder();
+		grammar.append("lexer grammar L;\n");
+		grammar.append("WS : [ \\t\\r\\n]+ -> skip;\n");
+		for (int i = 0; i < 4000; i++) {
+			grammar.append("KW").append(i).append(" : '").append("KW").append(i).append("';\n");
+		}
+
+		String input = "KW400";
+		String found = execLexer("L.g4", grammar.toString(), "L", input);
+		String expecting =
+			"[@0,0:4='KW400',<402>,1:0]\n" +
+			"[@1,5:4='<EOF>',<-1>,1:5]\n";
 		assertEquals(expecting, found);
 	}
 

@@ -36,6 +36,9 @@ import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
+
 public class TestATNConstruction extends BaseTest {
 	@Test
 	public void testA() throws Exception {
@@ -893,7 +896,7 @@ public class TestATNConstruction extends BaseTest {
 			System.err.println("no such mode "+modeName);
 			return;
 		}
-		ParserATNFactory f = new LexerATNFactory((LexerGrammar)g);
+		ParserATNFactory f = new LexerATNFactory(g);
 		ATN nfa = f.createATN();
 		ATNState startState = nfa.modeNameToStartState.get(modeName);
 		ATNPrinter serializer = new ATNPrinter(g, startState);

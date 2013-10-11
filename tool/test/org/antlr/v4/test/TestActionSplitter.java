@@ -39,6 +39,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.*;
+
 public class TestActionSplitter extends BaseTest {
     static String[] exprs = {
         "foo",		"['foo'<" + ActionSplitter.TEXT + ">]",
@@ -48,7 +50,7 @@ public class TestActionSplitter extends BaseTest {
         "$ID.text",		"['$ID.text'<" + ActionSplitter.QUALIFIED_ATTR + ">]",
         "$ID",		"['$ID'<" + ActionSplitter.ATTR + ">]",
         "$ID.getText()",		"['$ID'<" + ActionSplitter.ATTR + ">, '.getText()'<" + ActionSplitter.TEXT + ">]",
-        "$ID.text = \"test\";",		"['$ID.text = \"test\";'<" + ActionSplitter.SET_QUALIFIED_ATTR + ">]",
+        "$ID.text = \"test\";",		"['$ID.text'<" + ActionSplitter.QUALIFIED_ATTR + ">, ' = \"test\";'<" + ActionSplitter.TEXT + ">]",
         "$a.line == $b.line",		"['$a.line'<" + ActionSplitter.QUALIFIED_ATTR + ">, ' == '<" + ActionSplitter.TEXT + ">, '$b.line'<" + ActionSplitter.QUALIFIED_ATTR + ">]",
         "$r.tree",		"['$r.tree'<" + ActionSplitter.QUALIFIED_ATTR + ">]",
         "foo $a::n bar",		"['foo '<" + ActionSplitter.TEXT + ">, '$a::n'<" + ActionSplitter.NONLOCAL_ATTR + ">, ' bar'<" + ActionSplitter.TEXT + ">]",

@@ -53,6 +53,7 @@ public class BaseErrorListener implements ANTLRErrorListener {
 								DFA dfa,
 								int startIndex,
 								int stopIndex,
+								boolean exact,
 								BitSet ambigAlts,
 								ATNConfigSet configs)
 	{
@@ -63,6 +64,7 @@ public class BaseErrorListener implements ANTLRErrorListener {
 											DFA dfa,
 											int startIndex,
 											int stopIndex,
+											BitSet conflictingAlts,
 											ATNConfigSet configs)
 	{
 	}
@@ -72,6 +74,7 @@ public class BaseErrorListener implements ANTLRErrorListener {
 										 DFA dfa,
 										 int startIndex,
 										 int stopIndex,
+										 int prediction,
 										 ATNConfigSet configs)
 	{
 	}

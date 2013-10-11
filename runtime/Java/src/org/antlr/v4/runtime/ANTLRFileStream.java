@@ -33,11 +33,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 
-/** This is an ANTLRInputStream that is loaded from a file
- *  all at once when you construct the object.  This is a special case
- *  since we know the exact size of the object to load.  We can avoid lots
- *  of data copying.
+/**
+ * This is an {@link ANTLRInputStream} that is loaded from a file all at once
+ * when you construct the object.
  */
 public class ANTLRFileStream extends ANTLRInputStream {
 	protected String fileName;
@@ -69,7 +69,10 @@ public class ANTLRFileStream extends ANTLRInputStream {
 		}
 		try {
 			data = new char[size];
-			super.n = isr.read(data);
+			n = isr.read(data);
+			if (n < data.length) {
+				data = Arrays.copyOf(data, n);
+			}
 		}
 		finally {
 			isr.close();

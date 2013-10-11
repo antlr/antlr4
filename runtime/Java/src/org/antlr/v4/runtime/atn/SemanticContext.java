@@ -32,6 +32,7 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.misc.MurmurHash;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Utils;
 
@@ -46,29 +47,29 @@ import java.util.Set;
 
 /** A tree structure used to record the semantic context in which
  *  an ATN configuration is valid.  It's either a single predicate,
- *  a conjunction p1&&p2, or a sum of products p1||p2.
- *
- *  I have scoped the AND, OR, and Predicate subclasses of
- *  SemanticContext within the scope of this outer class.
+ *  a conjunction {@code p1&&p2}, or a sum of products {@code p1||p2}.
+ * <p/>
+ *  I have scoped the {@link AND}, {@link OR}, and {@link Predicate} subclasses of
+ *  {@link SemanticContext} within the scope of this outer class.
  */
 public abstract class SemanticContext {
     public static final SemanticContext NONE = new Predicate();
 
 	public SemanticContext parent;
 
-    /**
-     For context independent predicates, we evaluate them without a local
-     context (i.e., null context). That way, we can evaluate them without having to create
-     proper rule-specific context during prediction (as opposed to the parser,
-     which creates them naturally). In a practical sense, this avoids a cast exception
-     from RuleContext to myruleContext.
-
-     For context dependent predicates, we must pass in a local context so that
-     references such as $arg evaluate properly as _localctx.arg. We only capture
-     context dependent predicates in the context in which we begin prediction,
-     so we passed in the outer context here in case of context dependent predicate
-     evaluation.
-    */
+	/**
+	 * For context independent predicates, we evaluate them without a local
+	 * context (i.e., null context). That way, we can evaluate them without
+	 * having to create proper rule-specific context during prediction (as
+	 * opposed to the parser, which creates them naturally). In a practical
+	 * sense, this avoids a cast exception from RuleContext to myruleContext.
+	 * <p/>
+	 * For context dependent predicates, we must pass in a local context so that
+	 * references such as $arg evaluate properly as _localctx.arg. We only
+	 * capture context dependent predicates in the context in which we begin
+	 * prediction, so we passed in the outer context here in case of context
+	 * dependent predicate evaluation.
+	 */
     public abstract boolean eval(Recognizer<?,?> parser, RuleContext outerContext);
 
     public static class Predicate extends SemanticContext {
@@ -96,10 +97,11 @@ public abstract class SemanticContext {
 
 		@Override
 		public int hashCode() {
-			int hashCode = 1;
-			hashCode = 31 * hashCode + ruleIndex;
-			hashCode = 31 * hashCode + predIndex;
-			hashCode = 31 * hashCode + (isCtxDependent ? 1 : 0);
+			int hashCode = MurmurHash.initialize();
+			hashCode = MurmurHash.update(hashCode, ruleIndex);
+			hashCode = MurmurHash.update(hashCode, predIndex);
+			hashCode = MurmurHash.update(hashCode, isCtxDependent ? 1 : 0);
+			hashCode = MurmurHash.finish(hashCode, 3);
 			return hashCode;
 		}
 
@@ -197,7 +199,7 @@ public abstract class SemanticContext {
 
 		@Override
 		public int hashCode() {
-			return Arrays.hashCode(opnds);
+			return MurmurHash.hashCode(opnds, AND.class.hashCode());
 		}
 
 		@Override
@@ -244,7 +246,7 @@ public abstract class SemanticContext {
 
 		@Override
 		public int hashCode() {
-			return Arrays.hashCode(opnds) + 1; // differ from AND slightly
+			return MurmurHash.hashCode(opnds, OR.class.hashCode());
 		}
 
 		@Override

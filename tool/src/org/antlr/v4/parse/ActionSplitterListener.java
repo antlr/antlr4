@@ -34,7 +34,6 @@ import org.antlr.runtime.Token;
 
 /** */
 public interface ActionSplitterListener {
-    void setQualifiedAttr(String expr, Token x, Token y, Token rhs);
     void qualifiedAttr(String expr, Token x, Token y);
 	void setAttr(String expr, Token x, Token rhs);
 	void attr(String expr, Token x);

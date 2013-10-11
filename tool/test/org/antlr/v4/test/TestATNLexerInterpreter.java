@@ -41,6 +41,8 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.junit.Assert.*;
+
 /**
  * Lexer rules are little quirky when it comes to wildcards. Problem
  * stems from the fact that we want the longest match to win among
@@ -141,7 +143,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 			"lexer grammar L;\n"+
 			"KEND : 'end' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
-			"WS : (' '|'\n')+ ;");
+			"WS : (' '|'\\n')+ ;");
 		String expecting = "ID, EOF";
 		//checkLexerMatches(lg, "e", expecting);
 		expecting = "KEND, EOF";
@@ -157,7 +159,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 			"lexer grammar L;\n"+
 			"INT : DIGIT+ ;\n" +
 			"fragment DIGIT : '0'..'9' ;\n" +
-			"WS : (' '|'\n')+ ;");
+			"WS : (' '|'\\n')+ ;");
 		String expecting = "INT, WS, INT, EOF";
 		checkLexerMatches(lg, "32 99", expecting);
 	}
@@ -166,7 +168,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
 			"CMT : '/*' (CMT | ~'*')+ '*/' ;\n" +
-			"WS : (' '|'\n')+ ;");
+			"WS : (' '|'\\n')+ ;");
 		String expecting = "CMT, WS, CMT, EOF";
 		checkLexerMatches(lg, "/* ick */\n/* /*nested*/ */", expecting);
 	}
@@ -175,7 +177,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
 			"CMT : '/*' (CMT | .)*? '*/' ;\n" +
-			"WS : (' '|'\n')+ ;");
+			"WS : (' '|'\\n')+ ;");
 
 		String expecting = "CMT, WS, CMT, WS, EOF";
 		checkLexerMatches(lg,
@@ -255,7 +257,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 	@Test public void testEOFAtEndOfLineComment() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
-			"CMT : '//' ~('\n')* ;\n");
+			"CMT : '//' ~('\\n')* ;\n");
 		String expecting = "CMT, EOF";
 		checkLexerMatches(lg, "//x", expecting);
 	}
@@ -263,7 +265,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 	@Test public void testEOFAtEndOfLineComment2() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
-			"CMT : '//' ~('\n'|'\r')* ;\n");
+			"CMT : '//' ~('\\n'|'\\r')* ;\n");
 		String expecting = "CMT, EOF";
 		checkLexerMatches(lg, "//x", expecting);
 	}
@@ -274,7 +276,7 @@ public class TestATNLexerInterpreter extends BaseTest {
 	@Test public void testEOFInSetAtEndOfLineComment() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
-			"CMT : '//' .* (EOF|'\n') ;\n");
+			"CMT : '//' .* (EOF|'\\n') ;\n");
 		String expecting = "CMT, EOF";
 		checkLexerMatches(lg, "//", expecting);
 	}

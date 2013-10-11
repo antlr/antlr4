@@ -130,10 +130,13 @@ package org.antlr.v4.parse;
 
 import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.*;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
 }
 
 @members {
-Stack paraphrases = new Stack();
+Deque<String> paraphrases = new ArrayDeque<String>();
 public void grammarError(ErrorType etype, org.antlr.runtime.Token token, Object... args) { }
 }
 
@@ -205,12 +208,12 @@ grammarType
 	if ( $t!=null ) ((GrammarRootAST)$tree).grammarType = $t.type;
 	else ((GrammarRootAST)$tree).grammarType=COMBINED;
 }
-    :	(	t=LEXER g=GRAMMAR  -> GRAMMAR<GrammarRootAST>[$g, "LEXER_GRAMMAR"]
+    :	(	t=LEXER g=GRAMMAR  -> GRAMMAR<GrammarRootAST>[$g, "LEXER_GRAMMAR", getTokenStream()]
 		| // A standalone parser specification
-		  	t=PARSER g=GRAMMAR -> GRAMMAR<GrammarRootAST>[$g, "PARSER_GRAMMAR"]
+		  	t=PARSER g=GRAMMAR -> GRAMMAR<GrammarRootAST>[$g, "PARSER_GRAMMAR", getTokenStream()]
 
 		// A combined lexer and parser specification
-		| 	g=GRAMMAR          -> GRAMMAR<GrammarRootAST>[$g, "COMBINED_GRAMMAR"]
+		| 	g=GRAMMAR          -> GRAMMAR<GrammarRootAST>[$g, "COMBINED_GRAMMAR", getTokenStream()]
 		|   tg=TREE_GRAMMAR
 
 		)
@@ -243,7 +246,7 @@ prequelConstruct
 
 // A list of options that affect analysis and/or code generation
 optionsSpec
-	:	OPTIONS (option SEMI)* RBRACE -> ^(OPTIONS[$OPTIONS, "OPTIONS"] option+)
+	:	OPTIONS (option SEMI)* RBRACE -> ^(OPTIONS[$OPTIONS, "OPTIONS"] option*)
     ;
 
 option
@@ -316,7 +319,7 @@ actionScopeName
 	;
 
 modeSpec
-    :	MODE id SEMI sync (lexerRule sync)+  -> ^(MODE id lexerRule+)
+    :	MODE id SEMI sync (lexerRule sync)*  -> ^(MODE id lexerRule*)
     ;
 
 rules
@@ -544,6 +547,7 @@ lexerAlt
 		(	lexerCommands	-> ^(LEXER_ALT_ACTION<AltAST> lexerElements lexerCommands)
 		|					-> lexerElements
 		)
+	|						-> ^(ALT<AltAST> EPSILON) // empty alt
 	;
 
 lexerElements
@@ -647,17 +651,16 @@ altList
     :	alternative (OR alternative)* -> alternative+
     ;
 
-// An individual alt with an optional rewrite clause for the
-// elements of the alt.
+// An individual alt with an optional alt option like <assoc=right>
 alternative
 @init { paraphrases.push("matching alternative"); }
-@after { paraphrases.pop(); }
-    :	elements	-> elements
-    |				-> ^(ALT<AltAST> EPSILON) // empty alt
-    ;
-
-elements
-    : e+=element+ -> ^(ALT<AltAST> $e+)
+@after {
+    paraphrases.pop();
+    Grammar.setNodeOptions($tree, $o.tree);
+}
+    :	o=elementOptions?
+        e+=element+                     -> ^(ALT<AltAST> elementOptions? $e+)
+    |                                   -> ^(ALT<AltAST> EPSILON) // empty alt
     ;
 
 element
@@ -886,7 +889,8 @@ if ( options!=null ) {
 // Terminals may be adorned with certain options when
 // reference in the grammar: TOK<,,,>
 elementOptions
-    : LT elementOption (COMMA elementOption)* GT -> ^(ELEMENT_OPTIONS[$LT,"ELEMENT_OPTIONS"] elementOption+)
+    :   LT (elementOption (COMMA elementOption)*)? GT
+            -> ^(ELEMENT_OPTIONS[$LT,"ELEMENT_OPTIONS"] elementOption*)
     ;
 
 // When used with elements we can specify what the tree node type can

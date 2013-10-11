@@ -30,6 +30,7 @@
 
 package org.antlr.v4.runtime.tree;
 
+import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
 
@@ -38,11 +39,13 @@ import org.antlr.v4.runtime.misc.NotNull;
  *  between parse trees and other kinds of syntax trees we might want to create.
  */
 public interface SyntaxTree extends Tree {
-	/** Return an interval indicating the index in the TokenStream of
-	 *  the first and last token associated with this subtree. If this
-	 *  node is a leaf, then the interval represents a single token.
+	/**
+	 * Return an {@link Interval} indicating the index in the
+	 * {@link TokenStream} of the first and last token associated with this
+	 * subtree. If this node is a leaf, then the interval represents a single
+	 * token.
 	 * <p/>
-	 *  If source interval is unknown, this returns {@link Interval#INVALID}.
+	 * If source interval is unknown, this returns {@link Interval#INVALID}.
 	 */
 	@NotNull
 	Interval getSourceInterval();

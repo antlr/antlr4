@@ -54,7 +54,7 @@ public class ToolANTLRParser extends ANTLRParser {
 	{
 		String msg = getParserErrorMessage(this, e);
 		if ( !paraphrases.isEmpty() ) {
-			String paraphrase = (String)paraphrases.peek();
+			String paraphrase = paraphrases.peek();
 			msg = msg+" while "+paraphrase;
 		}
 	//	List stack = getRuleInvocationStack(e, this.getClass().getName());

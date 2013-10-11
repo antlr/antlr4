@@ -30,6 +30,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -39,11 +40,24 @@ import java.io.InvalidClassException;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 public abstract class ATNSimulator {
 	public static final int SERIALIZED_VERSION;
 	static {
+		/* This value should never change. Updates following this version are
+		 * reflected as change in the unique ID SERIALIZED_UUID.
+		 */
 		SERIALIZED_VERSION = 3;
+	}
+
+	public static final UUID SERIALIZED_UUID;
+	static {
+		/* WARNING: DO NOT MERGE THIS LINE. If UUIDs differ during a merge,
+		 * resolve the conflict by generating a new ID!
+		 */
+		SERIALIZED_UUID = UUID.fromString("33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3");
 	}
 
 	/** Must distinguish between missing edge and edge we know leads nowhere */
@@ -58,7 +72,7 @@ public abstract class ATNSimulator {
 	 *  to use only cached nodes/graphs in addDFAState(). We don't want to
 	 *  fill this during closure() since there are lots of contexts that
 	 *  pop up but are not used ever again. It also greatly slows down closure().
-	 *
+	 *  <p/>
 	 *  This cache makes a huge difference in memory and a little bit in speed.
 	 *  For the Java grammar on java.*, it dropped the memory requirements
 	 *  at the end from 25M to 16M. We don't store any of the full context
@@ -66,7 +80,7 @@ public abstract class ATNSimulator {
 	 *  but apparently there's a lot of repetition there as well. We optimize
 	 *  the config contexts before storing the config set in the DFA states
 	 *  by literally rebuilding them with cached subgraphs only.
-	 *
+	 *  <p/>
 	 *  I tried a cache for use during closure operations, that was
 	 *  whacked after each adaptivePredict(). It cost a little bit
 	 *  more time I think and doesn't save on the overall footprint
@@ -88,28 +102,46 @@ public abstract class ATNSimulator {
 
 	public abstract void reset();
 
+	public PredictionContextCache getSharedContextCache() {
+		return sharedContextCache;
+	}
+
 	public PredictionContext getCachedContext(PredictionContext context) {
 		if ( sharedContextCache==null ) return context;
 
-		IdentityHashMap<PredictionContext, PredictionContext> visited =
-			new IdentityHashMap<PredictionContext, PredictionContext>();
-		return PredictionContext.getCachedContext(context,
-												  sharedContextCache,
-												  visited);
+		synchronized (sharedContextCache) {
+			IdentityHashMap<PredictionContext, PredictionContext> visited =
+				new IdentityHashMap<PredictionContext, PredictionContext>();
+			return PredictionContext.getCachedContext(context,
+													  sharedContextCache,
+													  visited);
+		}
 	}
 
 	public static ATN deserialize(@NotNull char[] data) {
-		ATN atn = new ATN();
-		List<IntervalSet> sets = new ArrayList<IntervalSet>();
+		data = data.clone();
+		// don't adjust the first value since that's the version number
+		for (int i = 1; i < data.length; i++) {
+			data[i] = (char)(data[i] - 2);
+		}
+
 		int p = 0;
 		int version = toInt(data[p++]);
 		if (version != SERIALIZED_VERSION) {
-			String reason = String.format("Could not deserialize ATN with version %d (expected %d).", version, SERIALIZED_VERSION);
+			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with version %d (expected %d).", version, SERIALIZED_VERSION);
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
 		}
 
-		atn.grammarType = toInt(data[p++]);
-		atn.maxTokenType = toInt(data[p++]);
+		UUID uuid = toUUID(data, p);
+		p += 8;
+		if (!uuid.equals(SERIALIZED_UUID)) {
+			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with UUID %s (expected %s).", uuid, SERIALIZED_UUID);
+			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
+		}
+
+		ATNType grammarType = ATNType.values()[toInt(data[p++])];
+		int maxTokenType = toInt(data[p++]);
+		ATN atn = new ATN(grammarType, maxTokenType);
 
 		//
 		// STATES
@@ -117,7 +149,7 @@ public abstract class ATNSimulator {
 		List<Pair<LoopEndState, Integer>> loopBackStateNumbers = new ArrayList<Pair<LoopEndState, Integer>>();
 		List<Pair<BlockStartState, Integer>> endStateNumbers = new ArrayList<Pair<BlockStartState, Integer>>();
 		int nstates = toInt(data[p++]);
-		for (int i=1; i<=nstates; i++) {
+		for (int i=0; i<nstates; i++) {
 			int stype = toInt(data[p++]);
 			// ignore bad type of states
 			if ( stype==ATNState.INVALID_TYPE ) {
@@ -125,8 +157,12 @@ public abstract class ATNSimulator {
 				continue;
 			}
 
-			ATNState s = stateFactory(stype, i);
-			s.ruleIndex = toInt(data[p++]);
+			int ruleIndex = toInt(data[p++]);
+			if (ruleIndex == Character.MAX_VALUE) {
+				ruleIndex = -1;
+			}
+
+			ATNState s = stateFactory(stype, ruleIndex);
 			if ( stype == ATNState.LOOP_END ) { // special case
 				int loopBackStateNumber = toInt(data[p++]);
 				loopBackStateNumbers.add(new Pair<LoopEndState, Integer>((LoopEndState)s, loopBackStateNumber));
@@ -163,7 +199,7 @@ public abstract class ATNSimulator {
 		// RULES
 		//
 		int nrules = toInt(data[p++]);
-		if ( atn.grammarType == ATN.LEXER ) {
+		if ( atn.grammarType == ATNType.LEXER ) {
 			atn.ruleToTokenType = new int[nrules];
 			atn.ruleToActionIndex = new int[nrules];
 		}
@@ -172,10 +208,18 @@ public abstract class ATNSimulator {
 			int s = toInt(data[p++]);
 			RuleStartState startState = (RuleStartState)atn.states.get(s);
 			atn.ruleToStartState[i] = startState;
-			if ( atn.grammarType == ATN.LEXER ) {
+			if ( atn.grammarType == ATNType.LEXER ) {
 				int tokenType = toInt(data[p++]);
+				if (tokenType == 0xFFFF) {
+					tokenType = Token.EOF;
+				}
+
 				atn.ruleToTokenType[i] = tokenType;
 				int actionIndex = toInt(data[p++]);
+				if (actionIndex == 0xFFFF) {
+					actionIndex = -1;
+				}
+
 				atn.ruleToActionIndex[i] = actionIndex;
 			}
 		}
@@ -203,13 +247,20 @@ public abstract class ATNSimulator {
 		//
 		// SETS
 		//
+		List<IntervalSet> sets = new ArrayList<IntervalSet>();
 		int nsets = toInt(data[p++]);
-		for (int i=1; i<=nsets; i++) {
+		for (int i=0; i<nsets; i++) {
 			int nintervals = toInt(data[p]);
 			p++;
 			IntervalSet set = new IntervalSet();
 			sets.add(set);
-			for (int j=1; j<=nintervals; j++) {
+
+			boolean containsEof = toInt(data[p++]) != 0;
+			if (containsEof) {
+				set.add(-1);
+			}
+
+			for (int j=0; j<nintervals; j++) {
 				set.add(toInt(data[p]), toInt(data[p + 1]));
 				p += 2;
 			}
@@ -219,7 +270,7 @@ public abstract class ATNSimulator {
 		// EDGES
 		//
 		int nedges = toInt(data[p++]);
-		for (int i=1; i<=nedges; i++) {
+		for (int i=0; i<nedges; i++) {
 			int src = toInt(data[p]);
 			int trg = toInt(data[p+1]);
 			int ttype = toInt(data[p+2]);
@@ -306,53 +357,88 @@ public abstract class ATNSimulator {
 				continue;
 			}
 
+			checkCondition(state.onlyHasEpsilonTransitions() || state.getNumberOfTransitions() <= 1);
+
 			if (state instanceof PlusBlockStartState) {
-				if (((PlusBlockStartState)state).loopBackState == null) {
-					throw new IllegalStateException();
-				}
+				checkCondition(((PlusBlockStartState)state).loopBackState != null);
 			}
 
 			if (state instanceof StarLoopEntryState) {
-				if (((StarLoopEntryState)state).loopBackState == null) {
+				StarLoopEntryState starLoopEntryState = (StarLoopEntryState)state;
+				checkCondition(starLoopEntryState.loopBackState != null);
+				checkCondition(starLoopEntryState.getNumberOfTransitions() == 2);
+
+				if (starLoopEntryState.transition(0).target instanceof StarBlockStartState) {
+					checkCondition(starLoopEntryState.transition(1).target instanceof LoopEndState);
+					checkCondition(!starLoopEntryState.nonGreedy);
+				}
+				else if (starLoopEntryState.transition(0).target instanceof LoopEndState) {
+					checkCondition(starLoopEntryState.transition(1).target instanceof StarBlockStartState);
+					checkCondition(starLoopEntryState.nonGreedy);
+				}
+				else {
 					throw new IllegalStateException();
 				}
+			}
+
+			if (state instanceof StarLoopbackState) {
+				checkCondition(state.getNumberOfTransitions() == 1);
+				checkCondition(state.transition(0).target instanceof StarLoopEntryState);
 			}
 
 			if (state instanceof LoopEndState) {
-				if (((LoopEndState)state).loopBackState == null) {
-					throw new IllegalStateException();
-				}
+				checkCondition(((LoopEndState)state).loopBackState != null);
 			}
 
 			if (state instanceof RuleStartState) {
-				if (((RuleStartState)state).stopState == null) {
-					throw new IllegalStateException();
-				}
+				checkCondition(((RuleStartState)state).stopState != null);
 			}
 
 			if (state instanceof BlockStartState) {
-				if (((BlockStartState)state).endState == null) {
-					throw new IllegalStateException();
-				}
+				checkCondition(((BlockStartState)state).endState != null);
 			}
 
 			if (state instanceof BlockEndState) {
-				if (((BlockEndState)state).startState == null) {
-					throw new IllegalStateException();
-				}
+				checkCondition(((BlockEndState)state).startState != null);
 			}
 
 			if (state instanceof DecisionState) {
 				DecisionState decisionState = (DecisionState)state;
-				if (decisionState.getNumberOfTransitions() > 1 && decisionState.decision < 0) {
-					throw new IllegalStateException();
-				}
+				checkCondition(decisionState.getNumberOfTransitions() <= 1 || decisionState.decision >= 0);
+			}
+			else {
+				checkCondition(state.getNumberOfTransitions() <= 1 || state instanceof RuleStopState);
 			}
 		}
 	}
 
+	public static void checkCondition(boolean condition) {
+		checkCondition(condition, null);
+	}
+
+	public static void checkCondition(boolean condition, String message) {
+		if (!condition) {
+			throw new IllegalStateException(message);
+		}
+	}
+
 	public static int toInt(char c) {
-		return c==65535 ? -1 : c;
+		return c;
+	}
+
+	public static int toInt32(char[] data, int offset) {
+		return (int)data[offset] | ((int)data[offset + 1] << 16);
+	}
+
+	public static long toLong(char[] data, int offset) {
+		long lowOrder = toInt32(data, offset) & 0x00000000FFFFFFFFL;
+		return lowOrder | ((long)toInt32(data, offset + 2) << 32);
+	}
+
+	public static UUID toUUID(char[] data, int offset) {
+		long leastSigBits = toLong(data, offset);
+		long mostSigBits = toLong(data, offset + 4);
+		return new UUID(mostSigBits, leastSigBits);
 	}
 
 	@NotNull
@@ -364,7 +450,13 @@ public abstract class ATNSimulator {
 		ATNState target = atn.states.get(trg);
 		switch (type) {
 			case Transition.EPSILON : return new EpsilonTransition(target);
-			case Transition.RANGE : return new RangeTransition(target, arg1, arg2);
+			case Transition.RANGE :
+				if (arg3 != 0) {
+					return new RangeTransition(target, Token.EOF, arg2);
+				}
+				else {
+					return new RangeTransition(target, arg1, arg2);
+				}
 			case Transition.RULE :
 				RuleTransition rt = new RuleTransition((RuleStartState)atn.states.get(arg1), arg2, arg3, target);
 				return rt;
@@ -373,7 +465,13 @@ public abstract class ATNSimulator {
 				return pt;
 			case Transition.PRECEDENCE:
 				return new PrecedencePredicateTransition(target, arg1);
-			case Transition.ATOM : return new AtomTransition(target, arg1);
+			case Transition.ATOM :
+				if (arg3 != 0) {
+					return new AtomTransition(target, Token.EOF);
+				}
+				else {
+					return new AtomTransition(target, arg1);
+				}
 			case Transition.ACTION :
 				ActionTransition a = new ActionTransition(target, arg1, arg2, arg3 != 0);
 				return a;
@@ -385,13 +483,13 @@ public abstract class ATNSimulator {
 		throw new IllegalArgumentException("The specified transition type is not valid.");
 	}
 
-	public static ATNState stateFactory(int type, int stateNumber) {
+	public static ATNState stateFactory(int type, int ruleIndex) {
 		ATNState s;
 		switch (type) {
 			case ATNState.INVALID_TYPE: return null;
-			case ATNState.BASIC : s = new ATNState(); break;
+			case ATNState.BASIC : s = new BasicState(); break;
 			case ATNState.RULE_START : s = new RuleStartState(); break;
-			case ATNState.BLOCK_START : s = new BlockStartState(); break;
+			case ATNState.BLOCK_START : s = new BasicBlockStartState(); break;
 			case ATNState.PLUS_BLOCK_START : s = new PlusBlockStartState(); break;
 			case ATNState.STAR_BLOCK_START : s = new StarBlockStartState(); break;
 			case ATNState.TOKEN_START : s = new TokensStartState(); break;
@@ -402,11 +500,11 @@ public abstract class ATNSimulator {
 			case ATNState.PLUS_LOOP_BACK : s = new PlusLoopbackState(); break;
 			case ATNState.LOOP_END : s = new LoopEndState(); break;
             default :
-				String message = String.format("The specified state type %d for state %d is not valid.", type, stateNumber);
+				String message = String.format(Locale.getDefault(), "The specified state type %d is not valid.", type);
 				throw new IllegalArgumentException(message);
 		}
 
-		s.stateNumber = stateNumber;
+		s.ruleIndex = ruleIndex;
 		return s;
 	}
 

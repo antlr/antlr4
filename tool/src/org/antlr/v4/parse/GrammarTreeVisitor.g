@@ -132,7 +132,7 @@ public void discoverRules(GrammarAST rules) { }
 public void finishRules(GrammarAST rule) { }
 public void discoverRule(RuleAST rule, GrammarAST ID, List<GrammarAST> modifiers,
 						 ActionAST arg, ActionAST returns, GrammarAST thrws,
-						 GrammarAST options, GrammarAST locals,
+						 GrammarAST options, ActionAST locals,
 						 List<GrammarAST> actions,
 						 GrammarAST block) { }
 public void finishRule(RuleAST rule, GrammarAST ID, GrammarAST block) { }
@@ -316,10 +316,12 @@ protected void exitElementOptions(GrammarAST tree) { }
 protected void enterElementOption(GrammarAST tree) { }
 protected void exitElementOption(GrammarAST tree) { }
 
+	@Override
 	public void traceIn(String ruleName, int ruleIndex)  {
 		System.err.println("enter "+ruleName+": "+input.LT(1));
 	}
 
+	@Override
 	public void traceOut(String ruleName, int ruleIndex)  {
 		System.err.println("exit "+ruleName+": "+input.LT(1));
 	}
@@ -466,7 +468,15 @@ rules
     : ^(RULES {discoverRules($RULES);} (rule|lexerRule)* {finishRules($RULES);})
     ;
 
-mode : ^( MODE ID {currentModeName=$ID.text; modeDef($MODE, $ID);} lexerRule+ ) ;
+mode
+@init {
+	enterMode($start);
+}
+@after {
+	exitMode($start);
+}
+	:	^( MODE ID {currentModeName=$ID.text; modeDef($MODE, $ID);} lexerRule* )
+	;
 
 lexerRule
 @init {
@@ -499,8 +509,7 @@ rule
 @after {
 	exitRule($start);
 }
-	:   {!((RuleAST)$start).dead}?
-        ^(	RULE RULE_REF {currentRuleName=$RULE_REF.text; currentRuleAST=$RULE;}
+	:   ^(	RULE RULE_REF {currentRuleName=$RULE_REF.text; currentRuleAST=$RULE;}
 			DOC_COMMENT? (^(RULEMODIFIERS (m=ruleModifier{mods.add($m.start);})+))?
 			ARG_ACTION?
       		ret=ruleReturns?
@@ -517,20 +526,6 @@ rule
       		ruleBlock exceptionGroup
       		{finishRule((RuleAST)$RULE, $RULE_REF, $ruleBlock.start); currentRuleName=null; currentRuleAST=null;}
       	 )
-    |   // ugly repeated alt w/o actions but needed to force ANTLR to use
-    	// sem pred to avoid actions when rule dead
-    	{((RuleAST)$start).dead}?
-        ^(	RULE RULE_REF
-			DOC_COMMENT? (^(RULEMODIFIERS (m=ruleModifier)+))?
-			ARG_ACTION?
-      		ret=ruleReturns?
-      		thr=throwsSpec?
-      		loc=locals?
-      		(	opts=optionsSpec
-		    |   a=ruleAction
-		    )*
-      		ruleBlock exceptionGroup
-         )
     ;
 
 exceptionGroup
@@ -710,6 +705,7 @@ lexerElement
 	|   SEMPRED						{sempredInAlt((PredAST)$SEMPRED);}
 	|   ^(ACTION elementOptions)	{actionInAlt((ActionAST)$ACTION);}
 	|   ^(SEMPRED elementOptions)	{sempredInAlt((PredAST)$SEMPRED);}
+	|	EPSILON
 	;
 
 labeledLexerElement
@@ -770,7 +766,7 @@ alternative
 	finishAlt((AltAST)$start);
 	exitAlternative((AltAST)$start);
 }
-	:	^(ALT element+)
+	:	^(ALT elementOptions? element+)
 	|	^(ALT EPSILON)
     ;
 
@@ -961,6 +957,12 @@ range
     ;
 
 terminal
+@init {
+	enterTerminal($start);
+}
+@after {
+	exitTerminal($start);
+}
     :  ^(STRING_LITERAL elementOptions)
     								{stringRef((TerminalAST)$STRING_LITERAL);}
     |	STRING_LITERAL				{stringRef((TerminalAST)$STRING_LITERAL);}
@@ -975,7 +977,7 @@ elementOptions
 @after {
 	exitElementOptions($start);
 }
-    :	^(ELEMENT_OPTIONS elementOption[(GrammarASTWithOptions)$start.getParent()]+)
+    :	^(ELEMENT_OPTIONS elementOption[(GrammarASTWithOptions)$start.getParent()]*)
     ;
 
 elementOption[GrammarASTWithOptions t]

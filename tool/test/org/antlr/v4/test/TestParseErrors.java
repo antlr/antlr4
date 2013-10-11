@@ -33,6 +33,8 @@ package org.antlr.v4.test;
 import org.antlr.v4.automata.ATNSerializer;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 /** test runtime parse errors */
 public class TestParseErrors extends BaseTest {
 	@Test public void testTokenMismatch() throws Exception {
@@ -246,7 +248,7 @@ public class TestParseErrors extends BaseTest {
 			"CAT : 'cat';\n" +
 			"HARDWARE: 'hardware';\n" +
 			"SOFTWARE: 'software';\n" +
-			"WS : ' ' {skip();} ;" +
+			"WS : ' ' -> skip ;" +
 			"acClass\n" +
 			"@init\n" +
 			"{ System.out.println(getExpectedTokens().toString(tokenNames)); }\n" +
@@ -319,25 +321,25 @@ public class TestParseErrors extends BaseTest {
 		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xx", true);
 		assertEquals("", result);
 		assertEquals(
-			"line 1:1 reportAttemptingFullContext d=0, input='x'\n" +
-			"line 1:1 reportContextSensitivity d=0, input='x'\n",
+			"line 1:1 reportAttemptingFullContext d=0 (expr), input='x'\n" +
+			"line 1:1 reportContextSensitivity d=0 (expr), input='x'\n",
 			this.stderrDuringParse);
 
 		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xxx", true);
 		assertEquals("", result);
 		assertEquals(
-			"line 1:1 reportAttemptingFullContext d=0, input='x'\n" +
-			"line 1:1 reportContextSensitivity d=0, input='x'\n" +
-			"line 1:2 reportAttemptingFullContext d=0, input='x'\n",
+			"line 1:1 reportAttemptingFullContext d=0 (expr), input='x'\n" +
+			"line 1:1 reportContextSensitivity d=0 (expr), input='x'\n" +
+			"line 1:2 reportAttemptingFullContext d=0 (expr), input='x'\n",
 			this.stderrDuringParse);
 
 		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xxxx", true);
 		assertEquals("", result);
 		assertEquals(
-			"line 1:1 reportAttemptingFullContext d=0, input='x'\n" +
-			"line 1:1 reportContextSensitivity d=0, input='x'\n" +
-			"line 1:2 reportAttemptingFullContext d=0, input='x'\n" +
-			"line 1:3 reportAttemptingFullContext d=0, input='x'\n",
+			"line 1:1 reportAttemptingFullContext d=0 (expr), input='x'\n" +
+			"line 1:1 reportContextSensitivity d=0 (expr), input='x'\n" +
+			"line 1:2 reportAttemptingFullContext d=0 (expr), input='x'\n" +
+			"line 1:3 reportAttemptingFullContext d=0 (expr), input='x'\n",
 			this.stderrDuringParse);
 	}
 

@@ -43,7 +43,7 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Grammar;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -81,6 +81,10 @@ public class GrammarAST extends CommonTree {
 		token.setTokenIndex(t.getTokenIndex());
     }
 
+	public GrammarAST[] getChildrenAsArray() {
+		return children.toArray(new GrammarAST[children.size()]);
+	}
+
 	public List<GrammarAST> getNodesWithType(int ttype) {
 		return getNodesWithType(IntervalSet.of(ttype));
 	}
@@ -104,9 +108,26 @@ public class GrammarAST extends CommonTree {
 		while ( !work.isEmpty() ) {
 			t = work.remove(0);
 			if ( types.contains(t.getType()) ) nodes.add(t);
-			if ( t.children!=null ) work.addAll((Collection)t.children);
+			if ( t.children!=null ) {
+				work.addAll(Arrays.asList(t.getChildrenAsArray()));
+			}
 		}
 		return nodes;
+	}
+
+	public List<GrammarAST> getNodesWithTypePreorderDFS(IntervalSet types) {
+		ArrayList<GrammarAST> nodes = new ArrayList<GrammarAST>();
+		getNodesWithTypePreorderDFS_(nodes, types);
+		return nodes;
+	}
+
+	public void getNodesWithTypePreorderDFS_(List<GrammarAST> nodes, IntervalSet types) {
+		if ( types.contains(this.getType()) ) nodes.add(this);
+		// walk all children of root.
+		for (int i= 0; i < getChildCount(); i++) {
+			GrammarAST child = (GrammarAST)getChild(i);
+			child.getNodesWithTypePreorderDFS_(nodes, types);
+		}
 	}
 
 	public AltAST getOutermostAltNode() {
@@ -146,19 +167,6 @@ public class GrammarAST extends CommonTree {
 			}
 		}
 		return false;
-	}
-
-	/** Fix bug */
-	@Override
-	public void insertChild(int i, Object t) {
-		if (i < 0 || i > getChildCount()) {
-			throw new IndexOutOfBoundsException(i+" out or range");
-		}
-		if ( children==null ) children = createChildrenList();
-		children.add(i, t);
-		// walk others to increment their child indexes
-		// set index, parent of this one too
-		this.freshenParentAndChildIndexes(i);
 	}
 
     // TODO: move to basetree when i settle on how runtime works

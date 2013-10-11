@@ -33,40 +33,67 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
+import org.antlr.v4.runtime.misc.MurmurHash;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public abstract class PredictionContext implements Iterable<SingletonPredictionContext>,
-													   Comparable<PredictionContext> // to sort node lists by id
-{
-	/** Represents $ in local ctx prediction, which means wildcard. *+x = *. */
+public abstract class PredictionContext {
+	/**
+	 * Represents {@code $} in local context prediction, which means wildcard.
+	 * {@code *+x = *}.
+	 */
 	public static final EmptyPredictionContext EMPTY = new EmptyPredictionContext();
 
-	/** Represents $ in an array in full ctx mode, when $ doesn't mean wildcard:
-	 *  $ + x = [$,x]. Here, $ = EMPTY_RETURN_STATE.
+	/**
+	 * Represents {@code $} in an array in full context mode, when {@code $}
+	 * doesn't mean wildcard: {@code $ + x = [$,x]}. Here,
+	 * {@code $} = {@link #EMPTY_RETURN_STATE}.
 	 */
 	public static final int EMPTY_RETURN_STATE = Integer.MAX_VALUE;
+
+	private static final int INITIAL_HASH = 1;
 
 	public static int globalNodeCount = 0;
 	public final int id = globalNodeCount++;
 
+	/**
+	 * Stores the computed hash code of this {@link PredictionContext}. The hash
+	 * code is computed in parts to match the following reference algorithm.
+	 *
+	 * <pre>
+	 *  private int referenceHashCode() {
+	 *      int hash = {@link MurmurHash#initialize}({@link #INITIAL_HASH});
+	 *
+	 *      for (int i = 0; i < {@link #size()}; i++) {
+	 *          hash = {@link MurmurHash#update}(hash, {@link #getParent}(i));
+	 *      }
+	 *
+	 *      for (int i = 0; i < {@link #size()}; i++) {
+	 *          hash = {@link MurmurHash#update}(hash, {@link #getReturnState}(i));
+	 *      }
+	 *
+	 *      hash = {@link MurmurHash#finish}(hash, 2 * {@link #size()});
+	 *      return hash;
+	 *  }
+	 * </pre>
+	 */
 	public final int cachedHashCode;
 
 	protected PredictionContext(int cachedHashCode) {
 		this.cachedHashCode = cachedHashCode;
 	}
 
-	/** Convert a RuleContext tree to a PredictionContext graph.
-	 *  Return EMPTY if outerContext is empty or null.
+	/** Convert a {@link RuleContext} tree to a {@link PredictionContext} graph.
+	 *  Return {@link #EMPTY} if {@code outerContext} is empty or null.
 	 */
 	public static PredictionContext fromRuleContext(@NotNull ATN atn, RuleContext outerContext) {
 		if ( outerContext==null ) outerContext = RuleContext.EMPTY;
@@ -88,16 +115,13 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		return SingletonPredictionContext.create(parent, transition.followState.stateNumber);
 	}
 
-	@Override
-	public abstract Iterator<SingletonPredictionContext> iterator();
-
 	public abstract int size();
 
 	public abstract PredictionContext getParent(int index);
 
 	public abstract int getReturnState(int index);
 
-	/** This means only the EMPTY context is in set */
+	/** This means only the {@link #EMPTY} context is in set. */
 	public boolean isEmpty() {
 		return this == EMPTY;
 	}
@@ -107,46 +131,41 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	}
 
 	@Override
-	public int compareTo(PredictionContext o) { // used for toDotString to print nodes in order
-		return id - o.id;
-	}
-
-	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return cachedHashCode;
 	}
 
-	protected static int calculateHashCode(int parentHashCode, int returnStateHashCode) {
-		return 5 * 5 * 7 + 5 * parentHashCode + returnStateHashCode;
+	@Override
+	public abstract boolean equals(Object obj);
+
+	protected static int calculateEmptyHashCode() {
+		int hash = MurmurHash.initialize(INITIAL_HASH);
+		hash = MurmurHash.finish(hash, 0);
+		return hash;
 	}
 
-	/** Two contexts conflict() if they are equals() or one is a stack suffix
-	 *  of the other.  For example, contexts [21 12 $] and [21 9 $] do not
-	 *  conflict, but [21 $] and [21 12 $] do conflict.  Note that I should
-	 *  probably not show the $ in this case.  There is a dummy node for each
-	 *  stack that just means empty; $ is a marker that's all.
-	 *
-	 *  This is used in relation to checking conflicts associated with a
-	 *  single NFA state's configurations within a single DFA state.
-	 *  If there are configurations s and t within a DFA state such that
-	 *  s.state=t.state && s.alt != t.alt && s.ctx conflicts t.ctx then
-	 *  the DFA state predicts more than a single alt--it's nondeterministic.
-	 *  Two contexts conflict if they are the same or if one is a suffix
-	 *  of the other.
-	 *
-	 *  When comparing contexts, if one context has a stack and the other
-	 *  does not then they should be considered the same context.  The only
-	 *  way for an NFA state p to have an empty context and a nonempty context
-	 *  is the case when closure falls off end of rule without a call stack
-	 *  and re-enters the rule with a context.  This resolves the issue I
-	 *  discussed with Sriram Srinivasan Feb 28, 2005 about not terminating
-	 *  fast enough upon nondeterminism.
-	 *
-	 *  UPDATE FOR GRAPH STACK; no suffix
-	 */
-//	public boolean conflictsWith(PredictionContext other) {
-//		return this.equals(other);
-//	}
+	protected static int calculateHashCode(PredictionContext parent, int returnState) {
+		int hash = MurmurHash.initialize(INITIAL_HASH);
+		hash = MurmurHash.update(hash, parent);
+		hash = MurmurHash.update(hash, returnState);
+		hash = MurmurHash.finish(hash, 2);
+		return hash;
+	}
+
+	protected static int calculateHashCode(PredictionContext[] parents, int[] returnStates) {
+		int hash = MurmurHash.initialize(INITIAL_HASH);
+
+		for (PredictionContext parent : parents) {
+			hash = MurmurHash.update(hash, parent);
+		}
+
+		for (int returnState : returnStates) {
+			hash = MurmurHash.update(hash, returnState);
+		}
+
+		hash = MurmurHash.finish(hash, 2 * parents.length);
+		return hash;
+	}
 
 	// dispatch
 	public static PredictionContext merge(
@@ -154,8 +173,10 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		boolean rootIsWildcard,
 		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
 	{
+		assert a!=null && b!=null; // must be empty context, never null
+
 		// share same graph if both same
-		if ( (a==null&&b==null) || a==b || (a!=null&&a.equals(b)) ) return a;
+		if ( a==b || a.equals(b) ) return a;
 
 		if ( a instanceof SingletonPredictionContext && b instanceof SingletonPredictionContext) {
 			return mergeSingletons((SingletonPredictionContext)a,
@@ -181,7 +202,41 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 						   rootIsWildcard, mergeCache);
 	}
 
-	// http://www.antlr.org/wiki/download/attachments/32014352/singleton-merge.png
+	/**
+	 * Merge two {@link SingletonPredictionContext} instances.
+	 *
+	 * <p/>
+	 *
+	 * Stack tops equal, parents merge is same; return left graph.<br/>
+	 * <embed src="images/SingletonMerge_SameRootSamePar.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * Same stack top, parents differ; merge parents giving array node, then
+	 * remainders of those graphs. A new root node is created to point to the
+	 * merged parents.<br/>
+	 * <embed src="images/SingletonMerge_SameRootDiffPar.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * Different stack tops pointing to same parent. Make array node for the
+	 * root where both element in the root point to the same (original)
+	 * parent.<br/>
+	 * <embed src="images/SingletonMerge_DiffRootSamePar.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * Different stack tops pointing to different parents. Make array node for
+	 * the root where each element points to the corresponding original
+	 * parent.<br/>
+	 * <embed src="images/SingletonMerge_DiffRootDiffPar.svg" type="image/svg+xml"/>
+	 *
+	 * @param a the first {@link SingletonPredictionContext}
+	 * @param b the second {@link SingletonPredictionContext}
+	 * @param rootIsWildcard {@code true} if this is a local-context merge,
+	 * otherwise false to indicate a full-context merge
+	 * @param mergeCache
+	 */
 	public static PredictionContext mergeSingletons(
 		SingletonPredictionContext a,
 		SingletonPredictionContext b,
@@ -248,9 +303,56 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		}
 	}
 
-	// http://www.antlr.org/wiki/download/attachments/32014352/local-ctx-root-merge.png
-	// http://www.antlr.org/wiki/download/attachments/32014352/full-ctx-root-merge.png
-	/** Handle case where at least one of a or b is $ (EMPTY) */
+	/**
+	 * Handle case where at least one of {@code a} or {@code b} is
+	 * {@link #EMPTY}. In the following diagrams, the symbol {@code $} is used
+	 * to represent {@link #EMPTY}.
+	 *
+	 * <h2>Local-Context Merges</h2>
+	 *
+	 * These local-context merge operations are used when {@code rootIsWildcard}
+	 * is true.
+	 *
+	 * <p/>
+	 *
+	 * {@link #EMPTY} is superset of any graph; return {@link #EMPTY}.<br/>
+	 * <embed src="images/LocalMerge_EmptyRoot.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * {@link #EMPTY} and anything is {@code #EMPTY}, so merged parent is
+	 * {@code #EMPTY}; return left graph.<br/>
+	 * <embed src="images/LocalMerge_EmptyParent.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * Special case of last merge if local context.<br/>
+	 * <embed src="images/LocalMerge_DiffRoots.svg" type="image/svg+xml"/>
+	 *
+	 * <h2>Full-Context Merges</h2>
+	 *
+	 * These full-context merge operations are used when {@code rootIsWildcard}
+	 * is false.
+	 *
+	 * <p/>
+	 *
+	 * <embed src="images/FullMerge_EmptyRoots.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * Must keep all contexts; {@link #EMPTY} in array is a special value (and
+	 * null parent).<br/>
+	 * <embed src="images/FullMerge_EmptyRoot.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * <embed src="images/FullMerge_SameRoot.svg" type="image/svg+xml"/>
+	 *
+	 * @param a the first {@link SingletonPredictionContext}
+	 * @param b the second {@link SingletonPredictionContext}
+	 * @param rootIsWildcard {@code true} if this is a local-context merge,
+	 * otherwise false to indicate a full-context merge
+	 */
 	public static PredictionContext mergeRoot(SingletonPredictionContext a,
 											  SingletonPredictionContext b,
 											  boolean rootIsWildcard)
@@ -279,7 +381,35 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		return null;
 	}
 
-	// http://www.antlr.org/wiki/download/attachments/32014352/array-merge.png
+	/**
+	 * Merge two {@link ArrayPredictionContext} instances.
+	 *
+	 * <p/>
+	 *
+	 * Different tops, different parents.<br/>
+	 * <embed src="images/ArrayMerge_DiffTopDiffPar.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * Shared top, same parents.<br/>
+	 * <embed src="images/ArrayMerge_ShareTopSamePar.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * Shared top, different parents.<br/>
+	 * <embed src="images/ArrayMerge_ShareTopDiffPar.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * Shared top, all shared parents.<br/>
+	 * <embed src="images/ArrayMerge_ShareTopSharePar.svg" type="image/svg+xml"/>
+	 *
+	 * <p/>
+	 *
+	 * Equal tops, merge parents and reduce top to
+	 * {@link SingletonPredictionContext}.<br/>
+	 * <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/>
+	 */
 	public static PredictionContext mergeArrays(
 		ArrayPredictionContext a,
 		ArrayPredictionContext b,
@@ -389,7 +519,10 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		return M;
 	}
 
-	/** make pass over all M parents; merge any equals() ones */
+	/**
+	 * Make pass over all <em>M</em> {@code parents}; merge any {@code equals()}
+	 * ones.
+	 */
 	protected static void combineCommonParents(PredictionContext[] parents) {
 		Map<PredictionContext, PredictionContext> uniqueParents =
 			new HashMap<PredictionContext, PredictionContext>();
@@ -413,7 +546,12 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		buf.append("rankdir=LR;\n");
 
 		List<PredictionContext> nodes = getAllContextNodes(context);
-		Collections.sort(nodes);
+		Collections.sort(nodes, new Comparator<PredictionContext>() {
+			@Override
+			public int compare(PredictionContext o1, PredictionContext o2) {
+				return o1.id - o2.id;
+			}
+		});
 
 		for (PredictionContext current : nodes) {
 			if ( current instanceof SingletonPredictionContext ) {
@@ -472,12 +610,10 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			return existing;
 		}
 
-		synchronized (contextCache) {
-			existing = contextCache.get(context);
-			if (existing != null) {
-				visited.put(context, existing);
-				return existing;
-			}
+		existing = contextCache.get(context);
+		if (existing != null) {
+			visited.put(context, existing);
+			return existing;
 		}
 
 		boolean changed = false;
@@ -499,9 +635,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 		}
 
 		if (!changed) {
-			synchronized (contextCache) {
-				contextCache.add(context);
-			}
+			contextCache.add(context);
 			visited.put(context, context);
 			return context;
 		}
@@ -518,9 +652,7 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 			updated = new ArrayPredictionContext(parents, arrayPredictionContext.returnStates);
 		}
 
-		synchronized (contextCache) {
-			contextCache.add(updated);
-		}
+		contextCache.add(updated);
 		visited.put(updated, updated);
 		visited.put(context, updated);
 
@@ -573,20 +705,6 @@ public abstract class PredictionContext implements Iterable<SingletonPredictionC
 	public String toString(@Nullable Recognizer<?,?> recog) {
 		return toString();
 //		return toString(recog, ParserRuleContext.EMPTY);
-	}
-
-	// recog null unless ParserRuleContext, in which case we use subclass toString(...)
-	public String toString(@Nullable Recognizer<?,?> recog, RuleContext stop) {
-		StringBuilder buf = new StringBuilder();
-		PredictionContext p = this;
-		buf.append("[");
-//		while ( p != null && p != stop ) {
-//			if ( !p.isEmpty() ) buf.append(p.returnState);
-//			if ( p.parent != null && !p.parent.isEmpty() ) buf.append(" ");
-//			p = p.parent;
-//		}
-		buf.append("]");
-		return buf.toString();
 	}
 
 	public String[] toStrings(Recognizer<?, ?> recognizer, int currentState) {

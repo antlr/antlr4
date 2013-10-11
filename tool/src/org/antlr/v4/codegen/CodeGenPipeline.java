@@ -36,6 +36,7 @@ import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.gui.STViz;
 
 import java.util.List;
 
@@ -55,24 +56,22 @@ public class CodeGenPipeline {
 		idTypes.add(ANTLRParser.TOKEN_REF);
 		List<GrammarAST> idNodes = g.ast.getNodesWithType(idTypes);
 		for (GrammarAST idNode : idNodes) {
-			if ( gen.target.grammarSymbolCausesIssueInGeneratedCode(idNode) ) {
+			if ( gen.getTarget().grammarSymbolCausesIssueInGeneratedCode(idNode) ) {
 				g.tool.errMgr.grammarError(ErrorType.USE_OF_BAD_WORD,
 										   g.fileName, idNode.getToken(),
 										   idNode.getText());
 			}
 		}
 
-		if ( gen.templates==null ) return;
+		if ( gen.getTemplates()==null ) return;
 
 		if ( g.isLexer() ) {
 			ST lexer = gen.generateLexer();
-			if ( g.tool.launch_ST_inspector ) lexer.inspect();
-			gen.writeRecognizer(lexer);
+			writeRecognizer(lexer, gen);
 		}
 		else {
 			ST parser = gen.generateParser();
-			if ( g.tool.launch_ST_inspector ) parser.inspect();
-			gen.writeRecognizer(parser);
+			writeRecognizer(parser, gen);
 			if ( g.tool.gen_listener ) {
 				gen.writeListener(gen.generateListener());
 				gen.writeBaseListener(gen.generateBaseListener());
@@ -84,5 +83,19 @@ public class CodeGenPipeline {
 			gen.writeHeaderFile();
 		}
 		gen.writeVocabFile();
+	}
+
+	protected void writeRecognizer(ST template, CodeGenerator gen) {
+		if ( g.tool.launch_ST_inspector ) {
+			STViz viz = template.inspect();
+			if (g.tool.ST_inspector_wait_for_close) {
+				try {
+					viz.waitForClose();
+				} catch (InterruptedException ex) {
+				}
+			}
+		}
+
+		gen.writeRecognizer(template);
 	}
 }

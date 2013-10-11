@@ -29,7 +29,6 @@
  */
 package org.antlr.v4.test;
 
-
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.ATNPrinter;
@@ -65,9 +64,6 @@ import org.antlr.v4.tool.DefaultToolListener;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.antlr.v4.tool.LexerGrammar;
-import org.antlr.v4.tool.Rule;
-import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -77,6 +73,10 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
+import org.antlr.v4.tool.Rule;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -104,6 +104,7 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.junit.Assert.*;
 
 public abstract class BaseTest {
 	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
@@ -121,28 +122,28 @@ public abstract class BaseTest {
 
 	public String tmpdir = null;
 
-    /** reset during setUp and set to true if we find a problem */
-    protected boolean lastTestFailed = false;
-
 	/** If error during parser execution, store stderr here; can't return
      *  stdout and stderr.  This doesn't trap errors from running antlr.
      */
 	protected String stderrDuringParse;
 
+	@org.junit.Rule
+	public final TestRule testWatcher = new TestWatcher() {
+
+		@Override
+		protected void succeeded(Description description) {
+			// remove tmpdir if no error.
+			eraseTempDir();
+		}
+
+	};
+
     @Before
 	public void setUp() throws Exception {
-        lastTestFailed = false; // hope for the best, but set to true in asserts that fail
         // new output dir for each test
         tmpdir = new File(System.getProperty("java.io.tmpdir"),
 						  getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
 //		tmpdir = "/tmp";
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        // remove tmpdir if no error.
-        if ( !lastTestFailed ) eraseTempDir();
-
     }
 
     protected org.antlr.v4.Tool newTool(String[] args) {
@@ -158,6 +159,7 @@ public abstract class BaseTest {
 	protected ATN createATN(Grammar g, boolean useSerializer) {
 		if ( g.atn==null ) {
 			semanticProcess(g);
+			assertEquals(0, g.tool.getNumErrors());
 
 			ParserATNFactory f;
 			if ( g.isLexer() ) {
@@ -168,6 +170,7 @@ public abstract class BaseTest {
 			}
 
 			g.atn = f.createATN();
+			assertEquals(0, g.tool.getNumErrors());
 		}
 
 		ATN atn = g.atn;
@@ -233,7 +236,7 @@ public abstract class BaseTest {
 									  ATN atn,
 									  CharStream input)
 	{
-		LexerATNSimulator interp = new LexerATNSimulator(atn,new DFA[1],null);
+		LexerATNSimulator interp = new LexerATNSimulator(atn,new DFA[] { new DFA(atn.modeToStartState.get(Lexer.DEFAULT_MODE)) },null);
 		List<String> tokenTypes = new ArrayList<String>();
 		int ttype;
 		boolean hitEOF = false;
@@ -402,15 +405,11 @@ public abstract class BaseTest {
 		*/
 	}
 
-
-
 	/** Return true if all is ok, no errors */
-	protected boolean antlr(String fileName, String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
-		boolean allIsWell = true;
+	protected ErrorQueue antlr(String fileName, String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
 		System.out.println("dir "+tmpdir);
 		mkdir(tmpdir);
 		writeFile(tmpdir, fileName, grammarStr);
-		ErrorQueue equeue = new ErrorQueue();
 		final List<String> options = new ArrayList<String>();
 		Collections.addAll(options, extraOptions);
 		options.add("-o");
@@ -418,23 +417,17 @@ public abstract class BaseTest {
 		options.add("-lib");
 		options.add(tmpdir);
 		options.add(new File(tmpdir,grammarFileName).toString());
-		try {
-			final String[] optionsA = new String[options.size()];
-			options.toArray(optionsA);
-			Tool antlr = newTool(optionsA);
-			antlr.addListener(equeue);
-			if (defaultListener) {
-				antlr.addListener(new DefaultToolListener(antlr));
-			}
-			antlr.processGrammarsOnCommandLine();
-		}
-		catch (Exception e) {
-			allIsWell = false;
-			System.err.println("problems building grammar: "+e);
-			e.printStackTrace(System.err);
-		}
 
-		allIsWell = equeue.errors.isEmpty();
+		final String[] optionsA = new String[options.size()];
+		options.toArray(optionsA);
+		Tool antlr = newTool(optionsA);
+		ErrorQueue equeue = new ErrorQueue(antlr);
+		antlr.addListener(equeue);
+		if (defaultListener) {
+			antlr.addListener(new DefaultToolListener(antlr));
+		}
+		antlr.processGrammarsOnCommandLine();
+
 		if ( !defaultListener && !equeue.errors.isEmpty() ) {
 			System.err.println("antlr reports errors from "+options);
 			for (int i = 0; i < equeue.errors.size(); i++) {
@@ -453,7 +446,7 @@ public abstract class BaseTest {
 			}
 		}
 
-		return allIsWell;
+		return equeue;
 	}
 
 	protected String execLexer(String grammarFileName,
@@ -523,9 +516,9 @@ public abstract class BaseTest {
 													boolean defaultListener,
 													String... extraOptions)
 	{
-		boolean allIsWell =
+		ErrorQueue equeue =
 			antlr(grammarFileName, grammarFileName, grammarStr, defaultListener, extraOptions);
-		if (!allIsWell) {
+		if (!equeue.errors.isEmpty()) {
 			return false;
 		}
 
@@ -543,7 +536,7 @@ public abstract class BaseTest {
 				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseVisitor.java");
 			}
 		}
-		allIsWell = compile(files.toArray(new String[files.size()]));
+		boolean allIsWell = compile(files.toArray(new String[files.size()]));
 		return allIsWell;
 	}
 
@@ -614,22 +607,31 @@ public abstract class BaseTest {
 				return output;
 			} catch (MalformedURLException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
 			} catch (IOException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
 			} catch (InterruptedException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
 			} catch (IllegalAccessException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
 			} catch (IllegalArgumentException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
 			} catch (InvocationTargetException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
 			} catch (NoSuchMethodException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
 			} catch (SecurityException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
 			} catch (ClassNotFoundException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
 			}
 		}
 
@@ -667,36 +669,32 @@ public abstract class BaseTest {
         for (int i = 0; i < pairs.length; i+=2) {
             String input = pairs[i];
             String expect = pairs[i+1];
-            ErrorQueue equeue = new ErrorQueue();
-			Grammar g=null;
-            try {
-                String[] lines = input.split("\n");
-				String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
-                g = new Grammar(fileName, input, equeue);
-            }
-            catch (org.antlr.runtime.RecognitionException re) {
-                re.printStackTrace(System.err);
-            }
-            String actual = equeue.toString(g.tool);
+
+			String[] lines = input.split("\n");
+			String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
+			ErrorQueue equeue = antlr(fileName, fileName, input, false);
+
+			String actual = equeue.toString(true);
+			actual = actual.replace(tmpdir + File.separator, "");
 			System.err.println(actual);
 			String msg = input;
-			msg = msg.replaceAll("\n","\\\\n");
-			msg = msg.replaceAll("\r","\\\\r");
-			msg = msg.replaceAll("\t","\\\\t");
+			msg = msg.replace("\n","\\n");
+			msg = msg.replace("\r","\\r");
+			msg = msg.replace("\t","\\t");
 
             assertEquals("error in: "+msg,expect,actual);
         }
     }
 
 	public String getFilenameFromFirstLineOfGrammar(String line) {
-		String fileName = "<string>";
+		String fileName = "A" + Tool.GRAMMAR_EXTENSION;
 		int grIndex = line.lastIndexOf("grammar");
 		int semi = line.lastIndexOf(';');
 		if ( grIndex>=0 && semi>=0 ) {
 			int space = line.indexOf(' ', grIndex);
 			fileName = line.substring(space+1, semi)+Tool.GRAMMAR_EXTENSION;
 		}
-		if ( fileName.length()==Tool.GRAMMAR_EXTENSION.length() ) fileName = "<string>";
+		if ( fileName.length()==Tool.GRAMMAR_EXTENSION.length() ) fileName = "A" + Tool.GRAMMAR_EXTENSION;
 		return fileName;
 	}
 
@@ -767,7 +765,7 @@ public abstract class BaseTest {
 		st.add(actionName, action);
 		String grammar = st.render();
 		ErrorQueue equeue = new ErrorQueue();
-		Grammar g = new Grammar(grammar);
+		Grammar g = new Grammar(grammar, equeue);
 		if ( g.ast!=null && !g.ast.hasErrors ) {
 			SemanticPipeline sem = new SemanticPipeline(g);
 			sem.process();
@@ -788,7 +786,7 @@ public abstract class BaseTest {
 			assertEquals(expected, snippet);
 		}
 		if ( equeue.size()>0 ) {
-			System.err.println(equeue.toString(g.tool));
+			System.err.println(equeue.toString());
 		}
 	}
 
@@ -834,14 +832,14 @@ public abstract class BaseTest {
 		ANTLRMessage foundMsg = null;
 		for (int i = 0; i < equeue.errors.size(); i++) {
 			ANTLRMessage m = equeue.errors.get(i);
-			if (m.errorType==expectedMessage.errorType ) {
+			if (m.getErrorType()==expectedMessage.getErrorType() ) {
 				foundMsg = m;
 			}
 		}
-		assertNotNull("no error; "+expectedMessage.errorType+" expected", foundMsg);
+		assertNotNull("no error; "+expectedMessage.getErrorType()+" expected", foundMsg);
 		assertTrue("error is not a GrammarSemanticsMessage",
 				   foundMsg instanceof GrammarSemanticsMessage);
-		assertEquals(Arrays.toString(expectedMessage.args), Arrays.toString(foundMsg.args));
+		assertEquals(Arrays.toString(expectedMessage.getArgs()), Arrays.toString(foundMsg.getArgs()));
 		if ( equeue.size()!=1 ) {
 			System.err.println(equeue);
 		}
@@ -854,14 +852,14 @@ public abstract class BaseTest {
 		ANTLRMessage foundMsg = null;
 		for (int i = 0; i < equeue.warnings.size(); i++) {
 			ANTLRMessage m = equeue.warnings.get(i);
-			if (m.errorType==expectedMessage.errorType ) {
+			if (m.getErrorType()==expectedMessage.getErrorType() ) {
 				foundMsg = m;
 			}
 		}
-		assertNotNull("no error; "+expectedMessage.errorType+" expected", foundMsg);
+		assertNotNull("no error; "+expectedMessage.getErrorType()+" expected", foundMsg);
 		assertTrue("error is not a GrammarSemanticsMessage",
 				   foundMsg instanceof GrammarSemanticsMessage);
-		assertEquals(Arrays.toString(expectedMessage.args), Arrays.toString(foundMsg.args));
+		assertEquals(Arrays.toString(expectedMessage.getArgs()), Arrays.toString(foundMsg.getArgs()));
 		if ( equeue.size()!=1 ) {
 			System.err.println(equeue);
 		}
@@ -875,18 +873,18 @@ public abstract class BaseTest {
 		ANTLRMessage foundMsg = null;
 		for (int i = 0; i < equeue.errors.size(); i++) {
 			ANTLRMessage m = equeue.errors.get(i);
-			if (m.errorType==expectedMessage.errorType ) {
+			if (m.getErrorType()==expectedMessage.getErrorType() ) {
 				foundMsg = m;
 			}
 		}
-		assertTrue("no error; "+expectedMessage.errorType+" expected", !equeue.errors.isEmpty());
+		assertTrue("no error; "+expectedMessage.getErrorType()+" expected", !equeue.errors.isEmpty());
 		assertTrue("too many errors; "+equeue.errors, equeue.errors.size()<=1);
-		assertNotNull("couldn't find expected error: "+expectedMessage.errorType, foundMsg);
+		assertNotNull("couldn't find expected error: "+expectedMessage.getErrorType(), foundMsg);
 		/*
 		assertTrue("error is not a GrammarSemanticsMessage",
 				   foundMsg instanceof GrammarSemanticsMessage);
 		 */
-		assertTrue(Arrays.equals(expectedMessage.args, foundMsg.args));
+		assertArrayEquals(expectedMessage.getArgs(), foundMsg.getArgs());
 	}
 
     public static class FilteringTokenStream extends CommonTokenStream {
@@ -1089,24 +1087,15 @@ public abstract class BaseTest {
 		return elements.subList(Token.MIN_USER_TOKEN_TYPE, elements.size());
 	}
 
-    // override to track errors
+	public void assertNotNullOrEmpty(String message, String text) {
+		assertNotNull(message, text);
+		assertFalse(message, text.isEmpty());
+	}
 
-    public void assertEquals(String msg, Object expected, Object actual) { try {Assert.assertEquals(msg,expected,actual);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertEquals(Object expected, Object actual) { try {Assert.assertEquals(expected,actual);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertEquals(String msg, long expected, long actual) { try {Assert.assertEquals(msg,expected,actual);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertEquals(long expected, long actual) { try {Assert.assertEquals(expected,actual);} catch (Error e) {lastTestFailed=true; throw e;} }
-
-    public void assertTrue(String message, boolean condition) { try {Assert.assertTrue(message,condition);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertTrue(boolean condition) { try {Assert.assertTrue(condition);} catch (Error e) {lastTestFailed=true; throw e;} }
-
-    public void assertFalse(String message, boolean condition) { try {Assert.assertFalse(message,condition);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertFalse(boolean condition) { try {Assert.assertFalse(condition);} catch (Error e) {lastTestFailed=true; throw e;} }
-
-    public void assertNotNull(String message, Object object) { try {Assert.assertNotNull(message, object);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertNotNull(Object object) { try {Assert.assertNotNull(object);} catch (Error e) {lastTestFailed=true; throw e;} }
-
-    public void assertNull(String message, Object object) { try {Assert.assertNull(message, object);} catch (Error e) {lastTestFailed=true; throw e;} }
-    public void assertNull(Object object) { try {Assert.assertNull(object);} catch (Error e) {lastTestFailed=true; throw e;} }
+	public void assertNotNullOrEmpty(String text) {
+		assertNotNull(text);
+		assertFalse(text.isEmpty());
+	}
 
 	public static class IntTokenStream implements TokenStream {
 		IntegerList types;

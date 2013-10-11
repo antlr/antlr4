@@ -42,10 +42,10 @@ import java.util.Map;
 
 /** An ATN transition between any two ATN states.  Subclasses define
  *  atom, set, epsilon, action, predicate, rule transitions.
- *
+ * <p/>
  *  This is a one way link.  It emanates from a state (usually via a list of
  *  transitions) and has a target state.
- *
+ * <p/>
  *  Since we never have to change the ATN transitions once we construct it,
  *  we can fix these transitions as specific classes. The DFA transitions
  *  on the other hand need to update the labels as it adds transitions to
@@ -95,7 +95,7 @@ public abstract class Transition {
 			put(PrecedencePredicateTransition.class, PRECEDENCE);
 		}});
 
-	/** The target of this transition */
+	/** The target of this transition. */
 	@NotNull
 	public ATNState target;
 

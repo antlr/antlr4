@@ -141,14 +141,17 @@ public class IntervalSet implements IntSet {
 				iter.set(bigger);
 				// make sure we didn't just create an interval that
 				// should be merged with next interval in list
-				if ( iter.hasNext() ) {
+				while ( iter.hasNext() ) {
 					Interval next = iter.next();
-					if ( bigger.adjacent(next)||!bigger.disjoint(next) ) {
-						// if we bump up against or overlap next, merge
-						iter.remove();   // remove this one
-						iter.previous(); // move backwards to what we just set
-						iter.set(bigger.union(next)); // set to 3 merged ones
+					if ( !bigger.adjacent(next) && bigger.disjoint(next) ) {
+						break;
 					}
+
+					// if we bump up against or overlap next, merge
+					iter.remove();   // remove this one
+					iter.previous(); // move backwards to what we just set
+					iter.set(bigger.union(next)); // set to 3 merged ones
+					iter.next(); // first call to next after previous duplicates the result
 				}
 				return;
 			}
@@ -421,11 +424,14 @@ public class IntervalSet implements IntSet {
 
 	@Override
 	public int hashCode() {
-		if ( isNil() ) return 0;
-		int n = 0;
-		// just add left edge of intervals
-		for (Interval I : intervals) n += I.a;
-		return n;
+		int hash = MurmurHash.initialize();
+		for (Interval I : intervals) {
+			hash = MurmurHash.update(hash, I.a);
+			hash = MurmurHash.update(hash, I.b);
+		}
+
+		hash = MurmurHash.finish(hash, intervals.size() * 2);
+		return hash;
 	}
 
 	/** Are two IntervalSets equal?  Because all intervals are sorted

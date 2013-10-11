@@ -66,15 +66,14 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Goal that picks up all the ANTLR grammars in a project and moves those that
- * are required for generation of the compilable sources into the location
- * that we use to compile them, such as {@code target/generated-sources/antlr4}.
- * 
+ * Parses ANTLR 4 grammar files {@code *.g4} and transforms them into Java
+ * source files.
+ *
  * @author Sam Harwell
  */
 @Mojo(
-	name = "antlr",
-	defaultPhase = LifecyclePhase.PROCESS_SOURCES,
+	name = "antlr4",
+	defaultPhase = LifecyclePhase.GENERATE_SOURCES,
 	requiresDependencyResolution = ResolutionScope.COMPILE,
 	requiresProject = true)
 public class Antlr4Mojo extends AbstractMojo {
@@ -84,8 +83,8 @@ public class Antlr4Mojo extends AbstractMojo {
     //
 
     /**
-     * If set to true then the ANTLR tool will generate a description of the atn
-     * for each rule in <a href="http://www.graphviz.org">Dot format</a>
+     * If set to true then the ANTLR tool will generate a description of the ATN
+     * for each rule in <a href="http://www.graphviz.org">Dot format</a>.
      */
     @Parameter(property = "antlr4.atn", defaultValue = "false")
     protected boolean atn;
@@ -93,29 +92,29 @@ public class Antlr4Mojo extends AbstractMojo {
 	/**
 	 * specify grammar file encoding; e.g., euc-jp
 	 */
-	@Parameter
+	@Parameter(property = "project.build.sourceEncoding")
 	protected String encoding;
 
 	/**
-	 * generate parse tree listener (default)
+	 * Generate parse tree listener interface and base class.
 	 */
 	@Parameter(property = "antlr4.listener", defaultValue = "true")
 	protected boolean listener;
 
 	/**
-	 * generate parse tree visitor
+	 * Generate parse tree visitor interface and base class.
 	 */
 	@Parameter(property = "antlr4.visitor", defaultValue = "false")
 	protected boolean visitor;
 
 	/**
-	 * treat warnings as errors
+	 * Treat warnings as errors.
 	 */
 	@Parameter(property = "antlr4.treatWarningsAsErrors", defaultValue = "false")
 	protected boolean treatWarningsAsErrors;
 
 	/**
-	 * use the ATN simulator for all predictions
+	 * Use the ATN simulator for all predictions.
 	 */
 	@Parameter(property = "antlr4.forceATN", defaultValue = "false")
 	protected boolean forceATN;
@@ -135,50 +134,49 @@ public class Antlr4Mojo extends AbstractMojo {
 	protected List<String> arguments;
 
     /* --------------------------------------------------------------------
-     * The following are Maven specific parameters, rather than specificlly
+     * The following are Maven specific parameters, rather than specific
      * options that the ANTLR tool can use.
      */
 
-    /**
-     * Provides an explicit list of all the grammars that should
-     * be included in the generate phase of the plugin. Note that the plugin
-     * is smart enough to realize that imported grammars should be included but
-     * not acted upon directly by the ANTLR Tool.
-     *
-     * Unless otherwise specified, the include list scans for and includes all
-     * files that end in ".g" in any directory beneath src/main/antlr4. Note that
-     * this version of the plugin looks for the directory antlr4 and not the directory
-     * antlr, so as to avoid clashes and confusion for projects that use both v3 and v4 grammars
-     * such as ANTLR itself.
-     */
+	/**
+	 * Provides an explicit list of all the grammars that should be included in
+	 * the generate phase of the plugin. Note that the plugin is smart enough to
+	 * realize that imported grammars should be included but not acted upon
+	 * directly by the ANTLR Tool.
+	 * <p/>
+	 * A set of Ant-like inclusion patterns used to select files from the source
+	 * directory for processing. By default, the pattern
+	 * <code>**&#47;*.g4</code> is used to select grammar files.
+	 */
     @Parameter
     protected Set<String> includes = new HashSet<String>();
     /**
-     * Provides an explicit list of any grammars that should be excluded from
-     * the generate phase of the plugin. Files listed here will not be sent for
-     * processing by the ANTLR tool.
+     * A set of Ant-like exclusion patterns used to prevent certain files from
+     * being processed. By default, this set is empty such that no files are
+     * excluded.
      */
     @Parameter
     protected Set<String> excludes = new HashSet<String>();
     /**
+     * The current Maven project.
      */
     @Parameter(property = "project", required = true, readonly = true)
     protected MavenProject project;
 
     /**
-     * Specifies the ANTLR directory containing grammar files.
+     * The directory where the ANTLR grammar files ({@code *.g4}) are located.
      */
-	@Parameter(defaultValue = "${basedir}/src/main/antlr4", required = true)
+	@Parameter(defaultValue = "${basedir}/src/main/antlr4")
     private File sourceDirectory;
 
     /**
      * Specify output directory where the Java files are generated.
      */
-	@Parameter(defaultValue = "${project.build.directory}/generated-sources/antlr4", required = true)
+	@Parameter(defaultValue = "${project.build.directory}/generated-sources/antlr4")
     private File outputDirectory;
 
     /**
-     * Specify location of grammars and tokens files.
+     * Specify location of imported grammars and tokens files.
      */
 	@Parameter(defaultValue = "${basedir}/src/main/antlr4/imports")
     private File libDirectory;
@@ -207,42 +205,28 @@ public class Antlr4Mojo extends AbstractMojo {
     /**
      * The main entry point for this Mojo, it is responsible for converting
      * ANTLR 4.x grammars into the target language specified by the grammar.
-     * 
-     * @throws MojoExecutionException When something is discovered such as a missing source
-     * @throws MojoFailureException When something really bad happens such as not being able to create the ANTLR Tool
+     *
+     * @throws MojoExecutionException if a configuration or grammar error causes
+     * the code generation process to fail
+     * @throws MojoFailureException if an instance of the ANTLR 4 {@link Tool}
+     * cannot be created
      */
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         Log log = getLog();
 
-        // Check to see if the user asked for debug information, then dump all the
-        // parameters we have picked up if they did.
-        //
         if (log.isDebugEnabled()) {
-
-            // Excludes
-            //
             for (String e : excludes) {
                 log.debug("ANTLR: Exclude: " + e);
             }
 
-            // Includes
-            //
             for (String e : includes) {
                 log.debug("ANTLR: Include: " + e);
             }
 
-            // Output location
-            //
             log.debug("ANTLR: Output: " + outputDirectory);
-
-            // Library directory
-            //
             log.debug("ANTLR: Library: " + libDirectory);
-
-            // Flags
-            //
         }
 
 		if (!sourceDirectory.isDirectory()) {
@@ -363,7 +347,7 @@ public class Antlr4Mojo extends AbstractMojo {
     /**
      *
      * @param sourceDirectory
-     * @throws org.codehaus.plexus.compiler.util.scan.InclusionScanException
+     * @throws InclusionScanException
      */
     @NotNull
     private List<List<String>> processGrammarFiles(List<String> args, File sourceDirectory) throws InclusionScanException {
@@ -445,7 +429,7 @@ public class Antlr4Mojo extends AbstractMojo {
      * relative to the base of the output directory and reflect the input
      * organization of the grammar files.
      *
-     * @param sourceDirectory The source directory File object
+     * @param sourceDirectory The source directory {@link File} object
      * @param grammarFileName The full path to the input grammar file
      * @return The path to the grammar file relative to the source directory
      */

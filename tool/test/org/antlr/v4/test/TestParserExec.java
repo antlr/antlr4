@@ -30,7 +30,10 @@
 
 package org.antlr.v4.test;
 
+import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /** Test parser execution.
  *
@@ -71,6 +74,27 @@ public class TestParserExec extends BaseTest {
 			"b : id=ID val+=INT*;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') -> skip ;\n";
+
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
+								  "abc 34;", false);
+		assertEquals("", found);
+		assertEquals(null, stderrDuringParse);
+	}
+
+	/**
+	 * This is a regression test for #270 "Fix operator += applied to a set of
+	 * tokens".
+	 * https://github.com/antlr/antlr4/issues/270
+	 */
+	@Test public void testListLabelOnSet() {
+		String grammar =
+			"grammar T;\n" +
+			"a : b b* ';' ;\n" +
+			"b : ID val+=(INT | FLOAT)*;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"FLOAT : [0-9]+ '.' [0-9]+;\n" +
 			"WS : (' '|'\\n') -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
@@ -280,4 +304,77 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#118.
+	 * https://github.com/antlr/antlr4/issues/118
+	 */
+	@Ignore("Performance impact of passing this test may not be worthwhile")
+	@Test public void testStartRuleWithoutEOF() {
+		String grammar =
+			"grammar T;\n"+
+			"s @after {dumpDFA();}\n" +
+			"  : ID | ID INT ID ;\n" +
+			"ID : 'a'..'z'+ ;\n"+
+			"INT : '0'..'9'+ ;\n"+
+			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
+								   "abc 34", true);
+		String expecting =
+			"Decision 0:\n" +
+			"s0-ID->s1\n" +
+			"s1-INT->s2\n" +
+			"s2-EOF->:s3=>1\n"; // Must point at accept state
+		assertEquals(expecting, result);
+		assertNull(this.stderrDuringParse);
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#195 "label 'label' type
+	 * mismatch with previous definition: TOKEN_LABEL!=RULE_LABEL"
+	 * https://github.com/antlr/antlr4/issues/195
+	 */
+	@Test public void testLabelAliasingAcrossLabeledAlternatives() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"start : a* EOF;\n" +
+			"a\n" +
+			"  : label=subrule {System.out.println($label.text);} #One\n" +
+			"  | label='y' {System.out.println($label.text);} #Two\n" +
+			"  ;\n" +
+			"subrule : 'x';\n" +
+			"WS : (' '|'\\n') -> skip ;\n";
+
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start",
+								  "xy", false);
+		assertEquals("x\ny\n", found);
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#334 "BailErrorStrategy: bails
+	 * out on proper input".
+	 * https://github.com/antlr/antlr4/issues/334
+	 */
+	@Test public void testPredictionIssue334() {
+		String grammar =
+			"grammar T;\n" +
+			"\n" +
+			"file @init{setErrorHandler(new BailErrorStrategy());} \n" +
+			"@after {System.out.println($ctx.toStringTree(this));}\n" +
+			"  :   item (SEMICOLON item)* SEMICOLON? EOF ;\n" +
+			"item : A B?;\n" +
+			"\n" +
+			"\n" +
+			"\n" +
+			"SEMICOLON: ';';\n" +
+			"\n" +
+			"A : 'a'|'A';\n" +
+			"B : 'b'|'B';\n" +
+			"\n" +
+			"WS      : [ \\r\\t\\n]+ -> skip;\n";
+
+		String input = "a";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "file", input, false);
+		assertEquals("(file (item a) <EOF>)\n", found);
+		assertNull(stderrDuringParse);
+	}
 }

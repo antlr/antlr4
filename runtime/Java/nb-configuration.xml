@@ -6,6 +6,10 @@ The configuration is intended to be shared among all the users of project and
 therefore it is assumed to be part of version control checkout.
 Without this configuration present, some functionality in the IDE may be limited or fail altogether.
 -->
+    <spellchecker-wordlist xmlns="http://www.netbeans.org/ns/spellchecker-wordlist/1">
+        <word>rule's</word>
+        <word>validator</word>
+    </spellchecker-wordlist>
     <properties xmlns="http://www.netbeans.org/ns/maven-properties-data/1">
         <!--
 Properties that influence various parts of the IDE, especially code formatting and the like. 
@@ -28,9 +32,8 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.text-limit-width>80</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.text-limit-width>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.text-line-wrap>none</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.text-line-wrap>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.continuationIndentSize>4</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.continuationIndentSize>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.allowConvertToStarImport>false</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.allowConvertToStarImport>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.allowConvertToStaticStarImport>false</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.allowConvertToStaticStarImport>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.importGroupsOrder>*;java</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.importGroupsOrder>
+        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.importGroupsOrder>*;javax;java</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.importGroupsOrder>
         <netbeans.compile.on.save>test</netbeans.compile.on.save>
+        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.spaceAfterTypeCast>false</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.spaceAfterTypeCast>
     </properties>
 </project-shared-configuration>

@@ -79,29 +79,35 @@ import java.util.Map;
 
 /** */
 public class ActionTranslator implements ActionSplitterListener {
-	public static final Map<String, Class<? extends RulePropertyRef>> thisRulePropToModelMap = new HashMap<String, Class<? extends RulePropertyRef>>() {{
-		put("start", ThisRulePropertyRef_start.class);
-		put("stop",  ThisRulePropertyRef_stop.class);
-		put("text",  ThisRulePropertyRef_text.class);
-        put("ctx",   ThisRulePropertyRef_ctx.class);
-	}};
+	public static final Map<String, Class<? extends RulePropertyRef>> thisRulePropToModelMap =
+		new HashMap<String, Class<? extends RulePropertyRef>>();
+	static {
+		thisRulePropToModelMap.put("start", ThisRulePropertyRef_start.class);
+		thisRulePropToModelMap.put("stop",  ThisRulePropertyRef_stop.class);
+		thisRulePropToModelMap.put("text",  ThisRulePropertyRef_text.class);
+		thisRulePropToModelMap.put("ctx",   ThisRulePropertyRef_ctx.class);
+	}
 
-	public static final Map<String, Class<? extends RulePropertyRef>> rulePropToModelMap = new HashMap<String, Class<? extends RulePropertyRef>>() {{
-		put("start", RulePropertyRef_start.class);
-		put("stop",  RulePropertyRef_stop.class);
-		put("text",  RulePropertyRef_text.class);
-        put("ctx",   RulePropertyRef_ctx.class);
-	}};
+	public static final Map<String, Class<? extends RulePropertyRef>> rulePropToModelMap =
+		new HashMap<String, Class<? extends RulePropertyRef>>();
+	static {
+		rulePropToModelMap.put("start", RulePropertyRef_start.class);
+		rulePropToModelMap.put("stop",  RulePropertyRef_stop.class);
+		rulePropToModelMap.put("text",  RulePropertyRef_text.class);
+		rulePropToModelMap.put("ctx",   RulePropertyRef_ctx.class);
+	}
 
-	public static final Map<String, Class<? extends TokenPropertyRef>> tokenPropToModelMap = new HashMap<String, Class<? extends TokenPropertyRef>>() {{
-		put("text",  TokenPropertyRef_text.class);
-		put("type",  TokenPropertyRef_type.class);
-		put("line",  TokenPropertyRef_line.class);
-		put("index", TokenPropertyRef_index.class);
-		put("pos",   TokenPropertyRef_pos.class);
-		put("channel", TokenPropertyRef_channel.class);
-		put("int",   TokenPropertyRef_int.class);
-	}};
+	public static final Map<String, Class<? extends TokenPropertyRef>> tokenPropToModelMap =
+		new HashMap<String, Class<? extends TokenPropertyRef>>();
+	static {
+		tokenPropToModelMap.put("text",  TokenPropertyRef_text.class);
+		tokenPropToModelMap.put("type",  TokenPropertyRef_type.class);
+		tokenPropToModelMap.put("line",  TokenPropertyRef_line.class);
+		tokenPropToModelMap.put("index", TokenPropertyRef_index.class);
+		tokenPropToModelMap.put("pos",   TokenPropertyRef_pos.class);
+		tokenPropToModelMap.put("channel", TokenPropertyRef_channel.class);
+		tokenPropToModelMap.put("int",   TokenPropertyRef_int.class);
+	}
 
 	CodeGenerator gen;
 	ActionAST node;
@@ -187,15 +193,6 @@ public class ActionTranslator implements ActionSplitterListener {
 		if ( r!=null ) {
 			chunks.add(new LabelRef(nodeContext,getRuleLabel(x.getText()))); // $r for r rule ref
 		}
-	}
-
-	/** $x.y = expr; */
-	@Override
-	public void setQualifiedAttr(String expr, Token x, Token y, Token rhs) {
-		gen.g.tool.log("action-translator", "setQAttr "+x+"."+y+"="+rhs);
-		// x has to be current rule; just set y attr
-		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
-		chunks.add(new SetAttr(nodeContext,y.getText(), rhsChunks));
 	}
 
 	@Override
@@ -310,12 +307,12 @@ public class ActionTranslator implements ActionSplitterListener {
 
 	public String getTokenLabel(String x) {
 		if ( node.resolver.resolvesToLabel(x, node) ) return x;
-		return factory.getGenerator().target.getImplicitTokenLabel(x);
+		return factory.getGenerator().getTarget().getImplicitTokenLabel(x);
 	}
 
 	public String getRuleLabel(String x) {
 		if ( node.resolver.resolvesToLabel(x, node) ) return x;
-		return factory.getGenerator().target.getImplicitRuleLabel(x);
+		return factory.getGenerator().getTarget().getImplicitRuleLabel(x);
 	}
 
 }

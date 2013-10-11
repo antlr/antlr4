@@ -30,6 +30,9 @@
 
 package org.antlr.v4.runtime.misc;
 
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -49,6 +52,18 @@ public class Utils {
         }
         return buf.toString();
     }
+
+	public static <T> String join(T[] array, String separator) {
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < array.length; i++) {
+			builder.append(array[i]);
+			if (i < array.length - 1) {
+				builder.append(separator);
+			}
+		}
+
+		return builder.toString();
+	}
 
 	public static int numNonnull(Object[] data) {
 		int n = 0;
@@ -79,7 +94,43 @@ public class Utils {
 	public static void writeFile(String fileName, String content) throws IOException {
 		FileWriter fw = new FileWriter(fileName);
 		Writer w = new BufferedWriter(fw);
-		w.write(content);
-		w.close();
+		try {
+			w.write(content);
+		}
+		finally {
+			w.close();
+		}
+	}
+
+	public static void waitForClose(final Window window) throws InterruptedException {
+		final Object lock = new Object();
+
+		Thread t = new Thread() {
+			@Override
+			public void run() {
+				synchronized (lock) {
+					while (window.isVisible()) {
+						try {
+							lock.wait(500);
+						} catch (InterruptedException e) {
+						}
+					}
+				}
+			}
+		};
+
+		t.start();
+
+		window.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				synchronized (lock) {
+					window.setVisible(false);
+					lock.notify();
+				}
+			}
+		});
+
+		t.join();
 	}
 }

@@ -32,6 +32,8 @@ package org.antlr.v4.test;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /*
 	 cover these cases:
 	    dead end
@@ -49,14 +51,14 @@ public class TestFullContextParsing extends BaseTest {
 			"@after {dumpDFA();}\n" +
 			"    : ID | ID {;} ;\n" +
 			"ID : 'a'..'z'+ ;\n"+
-			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
+			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								   "abc", true);
 		String expecting =
 			"Decision 0:\n" +
-			"s0-ID->s1^\n"; // ctx sensitive
+			"s0-ID->:s1^=>1\n"; // ctx sensitive
 		assertEquals(expecting, result);
-		assertEquals("line 1:0 reportAttemptingFullContext d=0, input='abc'\n",
+		assertEquals("line 1:0 reportAttemptingFullContext d=0 (s), input='abc'\n",
 					 this.stderrDuringParse);
 	}
 
@@ -70,16 +72,16 @@ public class TestFullContextParsing extends BaseTest {
 			"e : INT | ;\n" +
 			"ID : 'a'..'z'+ ;\n"+
 			"INT : '0'..'9'+ ;\n"+
-			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
+			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								   "$ 34 abc", true);
 		String expecting =
 			"Decision 1:\n" +
 			"s0-INT->s1\n" +
-			"s1-ID->s2^\n";
+			"s1-ID->:s2^=>1\n";
 		assertEquals(expecting, result);
-		assertEquals("line 1:5 reportAttemptingFullContext d=1, input='34abc'\n" +
-					 "line 1:2 reportContextSensitivity d=1, input='34'\n",
+		assertEquals("line 1:5 reportAttemptingFullContext d=1 (e), input='34abc'\n" +
+					 "line 1:2 reportContextSensitivity d=1 (e), input='34'\n",
 					 this.stderrDuringParse);
 
 		result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
@@ -87,10 +89,10 @@ public class TestFullContextParsing extends BaseTest {
 		expecting =
 			"Decision 1:\n" +
 			"s0-INT->s1\n" +
-			"s1-ID->s2^\n";
+			"s1-ID->:s2^=>1\n";
 		assertEquals(expecting, result);
-		assertEquals("line 1:5 reportAttemptingFullContext d=1, input='34abc'\n" +
-					 "line 1:5 reportContextSensitivity d=1, input='34abc'\n",
+		assertEquals("line 1:5 reportAttemptingFullContext d=1 (e), input='34abc'\n" +
+					 "line 1:5 reportContextSensitivity d=1 (e), input='34abc'\n",
 					 this.stderrDuringParse);
 	}
 
@@ -104,18 +106,42 @@ public class TestFullContextParsing extends BaseTest {
 			"e : INT | ;\n" +
 			"ID : 'a'..'z'+ ;\n"+
 			"INT : '0'..'9'+ ;\n"+
-			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
+			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								   "$ 34 abc @ 34 abc", true);
 		String expecting =
 			"Decision 2:\n" +
 			"s0-INT->s1\n" +
-			"s1-ID->s2^\n";
+			"s1-ID->:s2^=>1\n";
 		assertEquals(expecting, result);
-		assertEquals("line 1:5 reportAttemptingFullContext d=2, input='34abc'\n" +
-					 "line 1:2 reportContextSensitivity d=2, input='34'\n" +
-					 "line 1:14 reportAttemptingFullContext d=2, input='34abc'\n" +
-					 "line 1:14 reportContextSensitivity d=2, input='34abc'\n",
+		assertEquals("line 1:5 reportAttemptingFullContext d=2 (e), input='34abc'\n" +
+					 "line 1:2 reportContextSensitivity d=2 (e), input='34'\n" +
+					 "line 1:14 reportAttemptingFullContext d=2 (e), input='34abc'\n" +
+					 "line 1:14 reportContextSensitivity d=2 (e), input='34abc'\n",
+					 this.stderrDuringParse);
+	}
+
+	@Test
+	public void testSLLSeesEOFInLLGrammar() {
+		String grammar =
+			"grammar T;\n"+
+			"s @after {dumpDFA();}\n" +
+			"  : a ;\n" +
+			"a : e ID ;\n" +
+			"b : e INT ID ;\n" +
+			"e : INT | ;\n" +
+			"ID : 'a'..'z'+ ;\n"+
+			"INT : '0'..'9'+ ;\n"+
+			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
+								   "34 abc", true);
+		String expecting =
+			"Decision 0:\n" +
+			"s0-INT->s1\n" +
+			"s1-ID->:s2^=>1\n"; // Must point at accept state
+		assertEquals(expecting, result);
+		assertEquals("line 1:3 reportAttemptingFullContext d=0 (e), input='34abc'\n" +
+					 "line 1:0 reportContextSensitivity d=0 (e), input='34'\n",
 					 this.stderrDuringParse);
 	}
 
@@ -131,7 +157,7 @@ public class TestFullContextParsing extends BaseTest {
 			"    | 'return'\n" +
 			"    ;" +
 			"ID : 'a'..'z'+ ;\n"+
-			"WS : (' '|'\\t'|'\\n')+ {skip();} ;\n";
+			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
 		String input = "{ if x then return }";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								   input, true);
@@ -146,7 +172,7 @@ public class TestFullContextParsing extends BaseTest {
 							input, true);
 		expecting =
 			"Decision 1:\n" +
-			"s0-'else'->s1^\n";
+			"s0-'else'->:s1^=>1\n";
 		assertEquals(expecting, result);
 		// Technically, this input sequence is not ambiguous because else
 		// uniquely predicts going into the optional subrule. else cannot
@@ -154,8 +180,8 @@ public class TestFullContextParsing extends BaseTest {
 		// the start of a stat. But, we are using the theory that
 		// SLL(1)=LL(1) and so we are avoiding full context parsing
 		// by declaring all else clause parsing to be ambiguous.
-		assertEquals("line 1:19 reportAttemptingFullContext d=1, input='else'\n" +
-					 "line 1:19 reportContextSensitivity d=1, input='else'\n",
+		assertEquals("line 1:19 reportAttemptingFullContext d=1 (stat), input='else'\n" +
+					 "line 1:19 reportContextSensitivity d=1 (stat), input='else'\n",
 					 this.stderrDuringParse);
 
 		input =
@@ -164,11 +190,11 @@ public class TestFullContextParsing extends BaseTest {
 							input, true);
 		expecting =
 			"Decision 1:\n" +
-			"s0-'else'->s1^\n" +
+			"s0-'else'->:s1^=>1\n" +
 			"s0-'}'->:s2=>2\n";
 		assertEquals(expecting, result);
-		assertEquals("line 1:29 reportAttemptingFullContext d=1, input='else'\n" +
-					 "line 1:38 reportAmbiguity d=1: ambigAlts={1, 2}, input='elsefoo}'\n",
+		assertEquals("line 1:29 reportAttemptingFullContext d=1 (stat), input='else'\n" +
+					 "line 1:38 reportAmbiguity d=1 (stat): ambigAlts={1, 2}, input='elsefoo}'\n",
 					 this.stderrDuringParse);
 
 		// should not be ambiguous because the second 'else bar' clearly
@@ -181,12 +207,12 @@ public class TestFullContextParsing extends BaseTest {
 							input, true);
 		expecting =
 			"Decision 1:\n" +
-			"s0-'else'->s1^\n";
+			"s0-'else'->:s1^=>1\n";
 		assertEquals(expecting, result);
-		assertEquals("line 1:29 reportAttemptingFullContext d=1, input='else'\n" +
-					 "line 1:38 reportContextSensitivity d=1, input='elsefooelse'\n" +
-					 "line 1:38 reportAttemptingFullContext d=1, input='else'\n" +
-					 "line 1:38 reportContextSensitivity d=1, input='else'\n",
+		assertEquals("line 1:29 reportAttemptingFullContext d=1 (stat), input='else'\n" +
+					 "line 1:38 reportContextSensitivity d=1 (stat), input='elsefooelse'\n" +
+					 "line 1:38 reportAttemptingFullContext d=1 (stat), input='else'\n" +
+					 "line 1:38 reportContextSensitivity d=1 (stat), input='else'\n",
 					 this.stderrDuringParse);
 
 		input =
@@ -196,13 +222,13 @@ public class TestFullContextParsing extends BaseTest {
 							input, true);
 		expecting =
 			"Decision 1:\n" +
-			"s0-'else'->s1^\n" +
+			"s0-'else'->:s1^=>1\n" +
 			"s0-'}'->:s2=>2\n";
 		assertEquals(expecting, result);
-		assertEquals("line 1:19 reportAttemptingFullContext d=1, input='else'\n" +
-					 "line 1:19 reportContextSensitivity d=1, input='else'\n" +
-					 "line 2:27 reportAttemptingFullContext d=1, input='else'\n" +
-					 "line 2:36 reportAmbiguity d=1: ambigAlts={1, 2}, input='elsefoo}'\n",
+		assertEquals("line 1:19 reportAttemptingFullContext d=1 (stat), input='else'\n" +
+					 "line 1:19 reportContextSensitivity d=1 (stat), input='else'\n" +
+					 "line 2:27 reportAttemptingFullContext d=1 (stat), input='else'\n" +
+					 "line 2:36 reportAmbiguity d=1 (stat): ambigAlts={1, 2}, input='elsefoo}'\n",
 					 this.stderrDuringParse);
 
 		input =
@@ -212,13 +238,13 @@ public class TestFullContextParsing extends BaseTest {
 							input, true);
 		expecting =
 				"Decision 1:\n" +
-				"s0-'else'->s1^\n" +
+				"s0-'else'->:s1^=>1\n" +
 				"s0-'}'->:s2=>2\n";
 		assertEquals(expecting, result);
-		assertEquals("line 1:19 reportAttemptingFullContext d=1, input='else'\n" +
-					 "line 1:19 reportContextSensitivity d=1, input='else'\n" +
-					 "line 2:27 reportAttemptingFullContext d=1, input='else'\n" +
-					 "line 2:36 reportAmbiguity d=1: ambigAlts={1, 2}, input='elsefoo}'\n",
+		assertEquals("line 1:19 reportAttemptingFullContext d=1 (stat), input='else'\n" +
+					 "line 1:19 reportContextSensitivity d=1 (stat), input='else'\n" +
+					 "line 2:27 reportAttemptingFullContext d=1 (stat), input='else'\n" +
+					 "line 2:36 reportAmbiguity d=1 (stat): ambigAlts={1, 2}, input='elsefoo}'\n",
 					 this.stderrDuringParse);
 	}
 
@@ -250,8 +276,8 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("pass: a(i)<-x\n", found);
 
 		String expecting =
-			"line 1:3 reportAttemptingFullContext d=3, input='a(i)'\n" +
-			"line 1:7 reportAmbiguity d=3: ambigAlts={2, 3}, input='a(i)<-x'\n";
+			"line 1:3 reportAttemptingFullContext d=3 (expr_primary), input='a(i)'\n" +
+			"line 1:7 reportAmbiguity d=3 (expr_primary): ambigAlts={2, 3}, input='a(i)<-x'\n";
 		assertEquals(expecting, this.stderrDuringParse);
 	}
 
@@ -270,16 +296,16 @@ public class TestFullContextParsing extends BaseTest {
 			"    | ID\n" +
 			"    ;\n" +
 			"ID  : [a-z]+ ;\n" +
-			"WS  : [ \r\n\t]+ -> skip ;\n";
+			"WS  : [ \\r\\n\\t]+ -> skip ;\n";
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "prog", "a@", true);
 		assertEquals("alt 1\n", found);
 
 		String expecting =
-			"line 1:2 reportAttemptingFullContext d=0, input='a@'\n" +
-			"line 1:2 reportAmbiguity d=0: ambigAlts={1, 2}, input='a@'\n" +
-			"line 1:2 reportAttemptingFullContext d=1, input='a@'\n" +
-			"line 1:2 reportContextSensitivity d=1, input='a@'\n";
+			"line 1:2 reportAttemptingFullContext d=0 (prog), input='a@'\n" +
+			"line 1:2 reportAmbiguity d=0 (prog): ambigAlts={1, 2}, input='a@'\n" +
+			"line 1:2 reportAttemptingFullContext d=1 (expr), input='a@'\n" +
+			"line 1:2 reportContextSensitivity d=1 (expr), input='a@'\n";
 		assertEquals(expecting, this.stderrDuringParse);
 	}
 
@@ -306,18 +332,18 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("(expr a + (expr b))\n", found);
 
 		String expecting =
-			"line 1:1 reportAttemptingFullContext d=1, input='+'\n" +
-			"line 1:1 reportContextSensitivity d=1, input='+'\n";
+			"line 1:1 reportAttemptingFullContext d=1 (expr), input='+'\n" +
+			"line 1:2 reportContextSensitivity d=1 (expr), input='+b'\n";
 		assertEquals(expecting, this.stderrDuringParse);
 
 		found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "a+b*c", true);
 		assertEquals("(expr a + (expr b * (expr c)))\n", found);
 
 		expecting =
-			"line 1:1 reportAttemptingFullContext d=1, input='+'\n" +
-			"line 1:1 reportContextSensitivity d=1, input='+'\n" +
-			"line 1:3 reportAttemptingFullContext d=1, input='*'\n" +
-			"line 1:5 reportAmbiguity d=1: ambigAlts={1, 2}, input='*c'\n";
+			"line 1:1 reportAttemptingFullContext d=1 (expr), input='+'\n" +
+			"line 1:2 reportContextSensitivity d=1 (expr), input='+b'\n" +
+			"line 1:3 reportAttemptingFullContext d=1 (expr), input='*'\n" +
+			"line 1:5 reportAmbiguity d=1 (expr): ambigAlts={1, 2}, input='*c'\n";
 		assertEquals(expecting, this.stderrDuringParse);
 	}
 

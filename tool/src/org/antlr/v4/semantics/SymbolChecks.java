@@ -31,7 +31,11 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.Alternative;
+import org.antlr.v4.tool.Attribute;
+import org.antlr.v4.tool.AttributeDict;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
@@ -140,10 +144,14 @@ public class SymbolChecks {
      */
     public void checkForLabelConflicts(Collection<Rule> rules) {
         for (Rule r : rules) {
-            checkForRuleArgumentAndReturnValueConflicts(r);
+            checkForAttributeConflicts(r);
             Map<String, LabelElementPair> labelNameSpace =
                 new HashMap<String, LabelElementPair>();
             for (int i=1; i<=r.numberOfAlts; i++) {
+				if (r.hasAltSpecificContexts()) {
+					labelNameSpace.clear();
+				}
+
                 Alternative a = r.alt[i];
                 for (List<LabelElementPair> pairs : a.labelDefs.values() ) {
                     for (LabelElementPair p : pairs) {
@@ -173,42 +181,81 @@ public class SymbolChecks {
         }
     }
 
-    public void checkForLabelConflict(Rule r, GrammarAST labelID) {
-        ErrorType etype = ErrorType.INVALID;
-        Object arg2 = null;
-        String name = labelID.getText();
-        if ( nameToRuleMap.containsKey(name) ) {
-            etype = ErrorType.LABEL_CONFLICTS_WITH_RULE;
-        }
-        else if ( tokenIDs.contains(name) ) {
-            etype = ErrorType.LABEL_CONFLICTS_WITH_TOKEN;
-        }
-        else if ( (r.retvals!=null&&r.retvals.get(name)!=null) ||
-                  (r.args!=null&&r.args.get(name)!=null) )
-        {
-            etype = ErrorType.LABEL_CONFLICTS_WITH_RULE_ARG_RETVAL;
-            arg2 = r.name;
-        }
-        if ( etype!=ErrorType.INVALID ) {
-            errMgr.grammarError(etype,g.fileName,labelID.token,name,arg2);
-        }
-    }
+	public void checkForLabelConflict(Rule r, GrammarAST labelID) {
+		String name = labelID.getText();
+		if (nameToRuleMap.containsKey(name)) {
+			ErrorType etype = ErrorType.LABEL_CONFLICTS_WITH_RULE;
+			errMgr.grammarError(etype, g.fileName, labelID.token, name, r.name);
+		}
 
-    public void checkForRuleArgumentAndReturnValueConflicts(Rule r) {
-        if ( r.retvals!=null ) {
-            Set<String> conflictingKeys = r.retvals.intersection(r.args);
-            if (conflictingKeys!=null) {
-				for (String key : conflictingKeys) {
-					errMgr.grammarError(
-						ErrorType.ARG_RETVAL_CONFLICT,
-						g.fileName,
-						((GrammarAST) r.ast.getChild(0)).token,
-						key,
-						r.name);
-				}
-            }
-        }
-    }
+		if (tokenIDs.contains(name)) {
+			ErrorType etype = ErrorType.LABEL_CONFLICTS_WITH_TOKEN;
+			errMgr.grammarError(etype, g.fileName, labelID.token, name, r.name);
+		}
+
+		if (r.args != null && r.args.get(name) != null) {
+			ErrorType etype = ErrorType.LABEL_CONFLICTS_WITH_ARG;
+			errMgr.grammarError(etype, g.fileName, labelID.token, name, r.name);
+		}
+
+		if (r.retvals != null && r.retvals.get(name) != null) {
+			ErrorType etype = ErrorType.LABEL_CONFLICTS_WITH_RETVAL;
+			errMgr.grammarError(etype, g.fileName, labelID.token, name, r.name);
+		}
+
+		if (r.locals != null && r.locals.get(name) != null) {
+			ErrorType etype = ErrorType.LABEL_CONFLICTS_WITH_LOCAL;
+			errMgr.grammarError(etype, g.fileName, labelID.token, name, r.name);
+		}
+	}
+
+	public void checkForAttributeConflicts(Rule r) {
+		checkDeclarationRuleConflicts(r, r.args, nameToRuleMap.keySet(), ErrorType.ARG_CONFLICTS_WITH_RULE);
+		checkDeclarationRuleConflicts(r, r.args, tokenIDs, ErrorType.ARG_CONFLICTS_WITH_TOKEN);
+
+		checkDeclarationRuleConflicts(r, r.retvals, nameToRuleMap.keySet(), ErrorType.RETVAL_CONFLICTS_WITH_RULE);
+		checkDeclarationRuleConflicts(r, r.retvals, tokenIDs, ErrorType.RETVAL_CONFLICTS_WITH_TOKEN);
+
+		checkDeclarationRuleConflicts(r, r.locals, nameToRuleMap.keySet(), ErrorType.LOCAL_CONFLICTS_WITH_RULE);
+		checkDeclarationRuleConflicts(r, r.locals, tokenIDs, ErrorType.LOCAL_CONFLICTS_WITH_TOKEN);
+
+		checkLocalConflictingDeclarations(r, r.retvals, r.args, ErrorType.RETVAL_CONFLICTS_WITH_ARG);
+		checkLocalConflictingDeclarations(r, r.locals, r.args, ErrorType.LOCAL_CONFLICTS_WITH_ARG);
+		checkLocalConflictingDeclarations(r, r.locals, r.retvals, ErrorType.LOCAL_CONFLICTS_WITH_RETVAL);
+	}
+
+	protected void checkDeclarationRuleConflicts(@NotNull Rule r, @Nullable AttributeDict attributes, @NotNull Set<String> ruleNames, @NotNull ErrorType errorType) {
+		if (attributes == null) {
+			return;
+		}
+
+		for (Attribute attribute : attributes.attributes.values()) {
+			if (ruleNames.contains(attribute.name)) {
+				errMgr.grammarError(
+					errorType,
+					g.fileName,
+					attribute.token != null ? attribute.token : ((GrammarAST)r.ast.getChild(0)).token,
+					attribute.name,
+					r.name);
+			}
+		}
+	}
+
+	protected void checkLocalConflictingDeclarations(@NotNull Rule r, @Nullable AttributeDict attributes, @Nullable AttributeDict referenceAttributes, @NotNull ErrorType errorType) {
+		if (attributes == null || referenceAttributes == null) {
+			return;
+		}
+
+		Set<String> conflictingKeys = attributes.intersection(referenceAttributes);
+		for (String key : conflictingKeys) {
+			errMgr.grammarError(
+				errorType,
+				g.fileName,
+				attributes.get(key).token != null ? attributes.get(key).token : ((GrammarAST) r.ast.getChild(0)).token,
+				key,
+				r.name);
+		}
+	}
 
 	// CAN ONLY CALL THE TWO NEXT METHODS AFTER GRAMMAR HAS RULE DEFS (see semanticpipeline)
 

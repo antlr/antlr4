@@ -30,11 +30,35 @@
 
 package org.antlr.v4.runtime.tree.gui;
 
+import java.awt.Font;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 public class PostScriptDocument {
+	public static final String DEFAULT_FONT = "Courier New";
+
+	public static final Map<String, String> POSTSCRIPT_FONT_NAMES;
+	static {
+		POSTSCRIPT_FONT_NAMES = new HashMap<String, String>();
+		POSTSCRIPT_FONT_NAMES.put(Font.SANS_SERIF + ".plain", "ArialMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.SANS_SERIF + ".bold", "Arial-BoldMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.SANS_SERIF + ".italic", "Arial-ItalicMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.SANS_SERIF + ".bolditalic", "Arial-BoldItalicMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.SERIF + ".plain", "TimesNewRomanPSMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.SERIF + ".bold", "TimesNewRomanPS-BoldMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.SERIF + ".italic", "TimesNewRomanPS-ItalicMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.SERIF + ".bolditalic", "TimesNewRomanPS-BoldItalicMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.MONOSPACED + ".plain", "CourierNewPSMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.MONOSPACED + ".bold", "CourierNewPS-BoldMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.MONOSPACED + ".italic", "CourierNewPS-ItalicMT");
+		POSTSCRIPT_FONT_NAMES.put(Font.MONOSPACED + ".bolditalic", "CourierNewPS-BoldItalicMT");
+	}
+
 	protected int boundingBoxWidth;
 	protected int boundingBoxHeight;
 
-	protected BasicFontMetrics fontMetrics;
+	protected SystemFontMetrics fontMetrics;
 	protected String fontName;
 	protected int fontSize = 12;
 	protected double lineWidth = 0.3;
@@ -44,7 +68,7 @@ public class PostScriptDocument {
 	protected boolean closed = false;
 
 	public PostScriptDocument() {
-		this("CourierNew", 12);
+		this(DEFAULT_FONT, 12);
 	}
 
 	public PostScriptDocument(String fontName, int fontSize) {
@@ -60,7 +84,7 @@ public class PostScriptDocument {
 	public void boundingBox(int w, int h) {
 		boundingBoxWidth = w;
 		boundingBoxHeight = h;
-		boundingBox = String.format("%%%%BoundingBox: %d %d %d %d\n", 0,0,
+		boundingBox = String.format(Locale.US, "%%%%BoundingBox: %d %d %d %d\n", 0,0,
 									boundingBoxWidth,boundingBoxHeight);
 	}
 
@@ -96,23 +120,22 @@ public class PostScriptDocument {
 				 "        fill\n" +
 				 "        grestore\n" +
 				 "        end\n" +
-				 "} def");
+				 "} def\n");
 
 		return b;
 	}
 
-	// Courier, Helvetica, Times, ... should be available
 	public void setFont(String fontName, int fontSize) {
-		this.fontName = fontName;
+		this.fontMetrics = new SystemFontMetrics(fontName);
+		this.fontName = fontMetrics.getFont().getPSName();
 		this.fontSize = fontSize;
-		try {
-			Class<?> c = Class.forName("org.antlr.v4.runtime.tree.gui." + fontName);
-			this.fontMetrics = (BasicFontMetrics)c.newInstance();
+
+		String psname = POSTSCRIPT_FONT_NAMES.get(this.fontName);
+		if (psname == null) {
+			psname = this.fontName;
 		}
-		catch (Exception e) {
-			throw new UnsupportedOperationException("No font metrics for "+fontName);
-		}
-		ps.append(String.format("/%s findfont\n%d scalefont setfont\n", fontName, fontSize));
+
+		ps.append(String.format(Locale.US, "/%s findfont %d scalefont setfont\n", psname, fontSize));
 	}
 
 	public void lineWidth(double w) {
@@ -121,11 +144,11 @@ public class PostScriptDocument {
 	}
 
 	public void move(double x, double y) {
-		ps.append(String.format("%1.3f %1.3f moveto\n", x, y));
+		ps.append(String.format(Locale.US, "%1.3f %1.3f moveto\n", x, y));
 	}
 
 	public void lineto(double x, double y) {
-		ps.append(String.format("%1.3f %1.3f lineto\n", x, y));
+		ps.append(String.format(Locale.US, "%1.3f %1.3f lineto\n", x, y));
 	}
 
 	public void line(double x1, double y1, double x2, double y2) {
@@ -142,7 +165,7 @@ public class PostScriptDocument {
 
 	/** Make red box */
 	public void highlight(double x, double y, double width, double height) {
-		ps.append(String.format("%1.3f %1.3f %1.3f %1.3f highlight\n", x, y, width, height));
+		ps.append(String.format(Locale.US, "%1.3f %1.3f %1.3f %1.3f highlight\n", x, y, width, height));
 	}
 
 	public void stroke() {
@@ -150,11 +173,11 @@ public class PostScriptDocument {
 	}
 
 //	public void rarrow(double x, double y) {
-//		ps.append(String.format("%1.3f %1.3f rarrow\n", x,y));
+//		ps.append(String.format(Locale.US, "%1.3f %1.3f rarrow\n", x,y));
 //	}
 //
 //	public void darrow(double x, double y) {
-//		ps.append(String.format("%1.3f %1.3f darrow\n", x,y));
+//		ps.append(String.format(Locale.US, "%1.3f %1.3f darrow\n", x,y));
 //	}
 
 	public void text(String s, double x, double y) {
@@ -175,7 +198,7 @@ public class PostScriptDocument {
 		}
 		s = buf.toString();
 		move(x,y);
-		ps.append(String.format("(%s) show\n", s));
+		ps.append(String.format(Locale.US, "(%s) show\n", s));
 		stroke();
 	}
 
