@@ -55,6 +55,7 @@ import org.antlr.v4.runtime.atn.LoopEndState;
 import org.antlr.v4.runtime.atn.NotSetTransition;
 import org.antlr.v4.runtime.atn.PlusBlockStartState;
 import org.antlr.v4.runtime.atn.PlusLoopbackState;
+import org.antlr.v4.runtime.atn.PrecedencePredicateTransition;
 import org.antlr.v4.runtime.atn.PredicateTransition;
 import org.antlr.v4.runtime.atn.RuleStartState;
 import org.antlr.v4.runtime.atn.RuleStopState;
@@ -347,7 +348,18 @@ public class ParserATNFactory implements ATNFactory {
 		ATNState left = newState(pred);
 		ATNState right = newState(pred);
 		boolean isCtxDependent = UseDefAnalyzer.actionIsContextDependent(pred);
-		PredicateTransition p = new PredicateTransition(right, currentRule.index, g.sempreds.get(pred), isCtxDependent);
+		PredicateTransition p;
+		String precedencePred = "{3 >= $_p}?";
+		if ( true ) {
+			int prec = 0;
+			p = new PrecedencePredicateTransition(right, currentRule.index,
+												  g.sempreds.get(pred),
+												  isCtxDependent,
+												  prec);
+		}
+		else {
+			p = new PredicateTransition(right, currentRule.index, g.sempreds.get(pred), isCtxDependent);
+		}
 		left.addTransition(p);
 		pred.atnState = left;
 		return new Handle(left, right);

@@ -63,6 +63,8 @@ public abstract class Transition {
 	public static final int SET				= 7; // ~(A|B) or ~atom, wildcard, which convert to next 2
 	public static final int NOT_SET			= 8;
 	public static final int WILDCARD		= 9;
+	public static final int LEFT_RECUR_RULE	= 10;
+	public static final int PREC_PREDICATE	= 11; // e.g., {3 >= $_p}?
 
 
 	public static final List<String> serializationNames =
@@ -76,7 +78,9 @@ public abstract class Transition {
 			"ACTION",
 			"SET",
 			"NOT_SET",
-			"WILDCARD"
+			"WILDCARD",
+			"LEFT_RECUR_RULE",
+			"PREC_PREDICATE"
 		));
 
 	public static final Map<Class<? extends Transition>, Integer> serializationTypes =
@@ -84,7 +88,9 @@ public abstract class Transition {
 			put(EpsilonTransition.class, EPSILON);
 			put(RangeTransition.class, RANGE);
 			put(RuleTransition.class, RULE);
+			put(LeftRecursiveRuleTransition.class, RULE);
 			put(PredicateTransition.class, PREDICATE);
+			put(PrecedencePredicateTransition.class, PREDICATE);
 			put(AtomTransition.class, ATOM);
 			put(ActionTransition.class, ACTION);
 			put(SetTransition.class, SET);
