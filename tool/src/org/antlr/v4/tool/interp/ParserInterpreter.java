@@ -9,6 +9,7 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.AtomTransition;
 import org.antlr.v4.runtime.atn.DecisionState;
+import org.antlr.v4.runtime.atn.LeftRecursiveRuleTransition;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.atn.RuleStartState;
@@ -161,7 +162,10 @@ public class ParserInterpreter extends Parser {
 						new InterpreterRuleContext(_ctx, returnState,
 												   targetStartState.ruleIndex);
 					locals._localctx = callctx;
-					locals._prec = 99999999;
+					if ( t.getSerializationType()==Transition.LEFT_RECUR_RULE ) {
+						locals._prec = ((LeftRecursiveRuleTransition)t).precedence;
+						System.out.println("arg "+locals._prec);
+					}
 					p = targetStartState; // jump to rule
 					setState(p.stateNumber);
 					Rule targetRule = g.getRule(targetStartState.ruleIndex);
@@ -194,6 +198,7 @@ public class ParserInterpreter extends Parser {
 				case Transition.EPSILON:
 				case Transition.PREDICATE:
 				case Transition.ACTION:
+				case Transition.PREC_PREDICATE:
 					p = t.target;
 					setState(p.stateNumber);
 					break;

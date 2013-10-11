@@ -147,8 +147,8 @@ public class TestParserInterpreter extends BaseTest {
 		Grammar g = new Grammar(
 			"parser grammar T;\n" +
 			"s : e ;\n" +
-			"e : e '*' e\n" +
-			"  | e '+' e\n" +
+			"e : e MULT e\n" +
+			"  | e PLUS e\n" +
 			"  | A\n" +
 			"  ;\n",
 			lg);

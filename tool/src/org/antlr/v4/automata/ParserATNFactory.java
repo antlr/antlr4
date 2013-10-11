@@ -303,13 +303,7 @@ public class ParserATNFactory implements ATNFactory {
 		if ( r.isLeftRecursive() ) {
 			ActionAST arg = (ActionAST)node.getChild(0);
 			String precText = arg.getText();
-			int prec = 0;
-			try {
-				prec = Integer.valueOf(precText);
-			}
-			catch (NumberFormatException nfe) {
-				ErrorManager.fatalInternalError("bad precedence arg in transformed call", nfe);
-			}
+			int prec = Integer.parseInt(precText);
 			call = new LeftRecursiveRuleTransition(start, r.index, right, prec);
 		}
 		else {
@@ -349,13 +343,15 @@ public class ParserATNFactory implements ATNFactory {
 		ATNState right = newState(pred);
 		boolean isCtxDependent = UseDefAnalyzer.actionIsContextDependent(pred);
 		PredicateTransition p;
-		String precedencePred = "{3 >= $_p}?";
-		if ( true ) {
-			int prec = 0;
+		// e.g., "{3 >= $_p}?";
+		String[] elems = pred.getText().split(" ");
+		if ( elems.length==3 && elems[1].equals(">=") && elems[2].equals("$_p}?") ) {
+			String digits = elems[0].substring(1);
+			int precedence = Integer.parseInt(digits);
 			p = new PrecedencePredicateTransition(right, currentRule.index,
 												  g.sempreds.get(pred),
 												  isCtxDependent,
-												  prec);
+												  precedence);
 		}
 		else {
 			p = new PredicateTransition(right, currentRule.index, g.sempreds.get(pred), isCtxDependent);
