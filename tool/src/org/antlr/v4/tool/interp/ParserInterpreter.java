@@ -2,7 +2,6 @@ package org.antlr.v4.tool.interp;
 
 
 import org.antlr.v4.Tool;
-import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
@@ -18,8 +17,8 @@ import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.atn.StarLoopbackState;
 import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.Rule;
 
 import java.util.NoSuchElementException;
@@ -32,7 +31,6 @@ import java.util.NoSuchElementException;
  */
 public class ParserInterpreter extends Parser {
 	protected Grammar g;
-	protected ParserATNSimulator atnSimulator;
 
 	public final DFA[] decisionToDFA; // not shared like it is for generated parsers
 	public final PredictionContextCache sharedContextCache =
@@ -48,24 +46,9 @@ public class ParserInterpreter extends Parser {
 			decisionToDFA[i] = new DFA(g.atn.getDecisionState(i), i);
 		}
 		// get atn simulator that knows how to do predictions
-		atnSimulator = new ParserATNSimulator(this, g.atn,
+		setInterpreter(new ParserATNSimulator(this, g.atn,
 											  decisionToDFA,
-											  sharedContextCache);
-	}
-
-	public static class InterpreterRuleContext extends ParserRuleContext {
-		protected int ruleIndex;
-
-		public InterpreterRuleContext(@Nullable ParserRuleContext parent,
-									  int invokingStateNumber,
-									  int ruleIndex)
-		{
-			super(parent, invokingStateNumber);
-			this.ruleIndex = ruleIndex;
-		}
-
-		@Override
-		public int getRuleIndex() {	return ruleIndex; }
+											  sharedContextCache));
 	}
 
 	/** Begin parsing at startRuleName */
@@ -74,34 +57,45 @@ public class ParserInterpreter extends Parser {
 		if ( r==null ) {
 			throw new NoSuchElementException(startRuleName+" is not a valid rule name in "+g.getName());
 		}
-		RuleStartState startState = g.atn.ruleToStartState[r.index];
-		RuleStopState stopState = g.atn.ruleToStopState[r.index];
+		RuleStartState startRuleStartState = g.atn.ruleToStartState[r.index];
+		RuleStopState startRuleStopState = g.atn.ruleToStopState[r.index];
 		// Where are we in the grammar's ATN during the parse.
-		ATNState p = startState;
+		ATNState p = startRuleStartState;
+		setState(startRuleStartState.stateNumber);
 
 		InterpreterRuleContext rootContext =
-			new InterpreterRuleContext(null, startState.stateNumber, r.index);
+			new InterpreterRuleContext(null, startRuleStartState.stateNumber, r.index);
 		_ctx = rootContext;
 
-loop:
+		// Create space for rule function locals needed per rule invocation
+		RuleFunctionCall locals = new RuleFunctionCall(null);
+
+		loop:
 		while ( true ) {
-			System.out.println("p is "+p.getClass().getCanonicalName());
+			System.out.println("p is "+p.getClass().getCanonicalName()+": s"+getState());
 			switch ( p.getStateType() ) {
-				case ATNState.RULE_STOP :
-					if ( p == stopState ) {
+				case ATNState.RULE_STOP : // pop; return from rule
+					if ( p == startRuleStopState ) {
 						// done; don't look for EOF unless they mentioned
-						// which means it'll be inside the rule submachine
+						// which means it'll be inside the rule submachine proper
+						System.out.println("pop from start rule");
+						locals = locals.parent; // pop local var context
 						break loop;
 					}
-					else { // pop
-						ATNState returnState = g.atn.states.get(_ctx.invokingState);
-						System.out.println("pop from "+g.getRule(p.ruleIndex)+" to "+
+					ATNState returnState = g.atn.states.get(_ctx.invokingState);
+					System.out.println("pop from " + g.getRule(p.ruleIndex) + " to " +
 										   g.getRule(returnState.ruleIndex));
-						RuleTransition retStateCallEdge =
-							(RuleTransition)returnState.transition(0);
-						p = retStateCallEdge.followState;
-						_ctx = _ctx.getParent();
+					RuleTransition retStateCallEdge =
+						(RuleTransition)returnState.transition(0);
+					if ( g.getRule(p.ruleIndex).isLeftRecursive() ) {
+						System.out.println("unrolling");
+						unrollRecursionContexts(locals._parentctx);
 					}
+					else {
+						exitRule();
+					}
+					p = retStateCallEdge.followState;
+					locals = locals.parent; // pop local var context
 					break;
 
 				// start a decision
@@ -120,18 +114,38 @@ loop:
 					else {
 						d = (DecisionState)p;
 					}
+
+					int alt = 1;
 					if ( d.getNumberOfTransitions()>1 ) {
 						System.out.println("decision "+d.decision);
-						int alt = atnSimulator.adaptivePredict(_input,
+						alt = getInterpreter().adaptivePredict(_input,
 															   d.decision,
 															   null);
 						System.out.println("predict "+alt);
-						p = d.transition(alt-1).target;
 					}
-					else {
-						p = d.transition(0).target;
 
+					// handle case where we need to push new recursive context
+					// is this the STAR_LOOP_ENTRY built during left-recur
+					// elimination?  Check left-recur rule and it's
+					// getOperatorLoopBlockStartState().
+					Rule curRule = g.getRule(p.ruleIndex);
+					if ( p.getStateType()==ATNState.STAR_LOOP_ENTRY &&
+						curRule.isLeftRecursive() &&
+						p == ((LeftRecursiveRule)curRule).getOperatorLoopBlockStartState() )
+					{
+						// if we get past STAR_LOOP_ENTRY, one of (...)* blk
+						// will match. This new recur ctx is pushed for any kind
+						locals._localctx =
+							new InterpreterRuleContext(locals._parentctx, locals._parentState,
+													   locals._prec);
+						pushNewRecursionContext(locals._localctx,
+												locals._startState,
+												curRule.index);
 					}
+
+					p = d.transition(alt-1).target;
+					// TODO: enterOuterAlt()
+					setState(p.stateNumber);
 					continue loop;
 			}
 
@@ -139,21 +153,38 @@ loop:
 			Transition t = p.getTransitions()[0];
 			switch ( t.getSerializationType() ) {
 				case Transition.RULE: // push
-					_ctx = new ParserRuleContext(_ctx, p.stateNumber);
-					p = t.target;
-					System.out.println("push "+g.getRule(p.ruleIndex));
+				case Transition.LEFT_RECUR_RULE:
+					locals = new RuleFunctionCall(locals); // new local var space
+					int returnState = p.stateNumber;
+					ATNState targetStartState = t.target;
+					InterpreterRuleContext callctx =
+						new InterpreterRuleContext(_ctx, returnState,
+												   targetStartState.ruleIndex);
+					locals._localctx = callctx;
+					locals._prec = 99999999;
+					p = targetStartState; // jump to rule
+					setState(p.stateNumber);
+					Rule targetRule = g.getRule(targetStartState.ruleIndex);
+					System.out.println("push " + targetRule);
+					if ( targetRule.isLeftRecursive() ) {
+						locals._parentctx = _ctx;
+						locals._parentState = returnState;
+						locals._startState = p.stateNumber;
+						enterRecursionRule(callctx, targetRule.index);
+					}
+					else {
+						enterRule(callctx, targetStartState.stateNumber, targetRule.index);
+					}
+					locals._localctx = callctx;
 					break;
 
 				case Transition.ATOM:
 					AtomTransition at = (AtomTransition)t;
-					if ( at.matches(_input.LA(1), 0, g.atn.maxTokenType) ) {
-						p = at.target;
-						System.out.println("matched "+g.getTokenDisplayName(_input.LA(1)));
-						_input.consume();
-					}
-					else {
-						throw new InputMismatchException(this);
-					}
+					match(at.label);
+					System.out.println("match " + g.getTokenDisplayName(at.label));
+					p = at.target;
+					setState(p.stateNumber);
+					break;
 				case Transition.SET:
 					break;
 
@@ -164,6 +195,7 @@ loop:
 				case Transition.PREDICATE:
 				case Transition.ACTION:
 					p = t.target;
+					setState(p.stateNumber);
 					break;
 
 				default:

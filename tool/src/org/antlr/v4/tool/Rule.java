@@ -78,6 +78,11 @@ public class Rule implements AttributeResolver {
 	public List<GrammarAST> modifiers;
 
 	public RuleAST ast;
+
+	/** If we performed a left recursion removal, this points at the original
+	 *  rule tree before we transformed it.
+ 	 */
+	public RuleAST originalRuleAST;
 	public AttributeDict args;
 	public AttributeDict retvals;
 	public AttributeDict locals;
@@ -127,7 +132,7 @@ public class Rule implements AttributeResolver {
 	public Rule(Grammar g, String name, RuleAST ast, int numberOfAlts) {
 		this.g = g;
 		this.name = name;
-		this.ast = ast;
+		this.ast = this.originalRuleAST = ast;
 		this.numberOfAlts = numberOfAlts;
 		alt = new Alternative[numberOfAlts+1]; // 1..n
 		for (int i=1; i<=numberOfAlts; i++) alt[i] = new Alternative(this, i);
@@ -325,6 +330,10 @@ public class Rule implements AttributeResolver {
 			if ( a.getText().equals("fragment") ) return true;
 		}
 		return false;
+	}
+
+	public boolean isLeftRecursive() {
+		return this instanceof LeftRecursiveRule;
 	}
 
 	@Override

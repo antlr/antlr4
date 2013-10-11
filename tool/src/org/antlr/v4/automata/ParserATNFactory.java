@@ -50,6 +50,7 @@ import org.antlr.v4.runtime.atn.BlockEndState;
 import org.antlr.v4.runtime.atn.BlockStartState;
 import org.antlr.v4.runtime.atn.EpsilonTransition;
 import org.antlr.v4.runtime.atn.LL1Analyzer;
+import org.antlr.v4.runtime.atn.LeftRecursiveRuleTransition;
 import org.antlr.v4.runtime.atn.LoopEndState;
 import org.antlr.v4.runtime.atn.NotSetTransition;
 import org.antlr.v4.runtime.atn.PlusBlockStartState;
@@ -72,7 +73,6 @@ import org.antlr.v4.semantics.UseDefAnalyzer;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
@@ -133,7 +133,7 @@ public class ParserATNFactory implements ATNFactory {
 		for (Triple<Rule, ATNState, ATNState> pair : preventEpsilonClosureBlocks) {
 			LL1Analyzer analyzer = new LL1Analyzer(atn);
 			if (analyzer.LOOK(pair.b, pair.c, null).contains(org.antlr.v4.runtime.Token.EPSILON)) {
-				ErrorType errorType = pair.a instanceof LeftRecursiveRule ? ErrorType.EPSILON_LR_FOLLOW : ErrorType.EPSILON_CLOSURE;
+				ErrorType errorType = pair.a.isLeftRecursive() ? ErrorType.EPSILON_LR_FOLLOW : ErrorType.EPSILON_CLOSURE;
 				g.tool.errMgr.grammarError(errorType, g.fileName, ((GrammarAST)pair.a.ast.getChild(0)).getToken(), pair.a.name);
 			}
 		}
@@ -289,15 +289,31 @@ public class ParserATNFactory implements ATNFactory {
 	}
 
 	public Handle _ruleRef(GrammarAST node) {
-		Rule r = g.getRule(node.getText());
+		String text = node.getText();
+		Rule r = g.getRule(text);
 		if ( r==null ) {
-			g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, "Rule "+node.getText()+" undefined");
+			g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, "Rule "+ text +" undefined");
 			return null;
 		}
 		RuleStartState start = atn.ruleToStartState[r.index];
 		ATNState left = newState(node);
 		ATNState right = newState(node);
-		RuleTransition call = new RuleTransition(start, r.index, right);
+		RuleTransition call;
+		if ( r.isLeftRecursive() ) {
+			ActionAST arg = (ActionAST)node.getChild(0);
+			String precText = arg.getText();
+			int prec = 0;
+			try {
+				prec = Integer.valueOf(precText);
+			}
+			catch (NumberFormatException nfe) {
+				ErrorManager.fatalInternalError("bad precedence arg in transformed call", nfe);
+			}
+			call = new LeftRecursiveRuleTransition(start, r.index, right, prec);
+		}
+		else {
+			call = new RuleTransition(start, r.index, right);
+		}
 		left.addTransition(call);
 
 		node.atnState = left;

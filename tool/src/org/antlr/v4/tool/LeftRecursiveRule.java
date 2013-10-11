@@ -32,9 +32,11 @@ package org.antlr.v4.tool;
 
 import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
 import org.antlr.v4.misc.OrderedHashMap;
+import org.antlr.v4.runtime.atn.StarBlockStartState;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.misc.Triple;
 import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.RuleAST;
 
@@ -105,5 +107,14 @@ public class LeftRecursiveRule extends Rule {
 		}
 		if ( labels.isEmpty() ) return null;
 		return labels;
+	}
+
+	/** Given e : e '+' e | ID, return loop start state for
+	 *  ( '+' e )*.
+	 */
+	public StarBlockStartState getOperatorLoopBlockStartState() {
+		LeftRecursiveRuleAltInfo altInfo = recOpAlts.get(1);
+		BlockAST blk = (BlockAST)altInfo.altAST.parent;
+		return (StarBlockStartState)blk.atnState;
 	}
 }

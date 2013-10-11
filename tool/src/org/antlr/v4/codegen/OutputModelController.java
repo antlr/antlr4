@@ -184,7 +184,7 @@ public class OutputModelController {
 		pushCurrentRule(function);
 		function.fillNamedActions(delegate, r);
 
-		if ( r instanceof LeftRecursiveRule ) {
+		if ( r.isLeftRecursive() ) {
 			buildLeftRecursiveRuleFunction((LeftRecursiveRule)r,
 										   (LeftRecursiveRuleFunction)function);
 		}
