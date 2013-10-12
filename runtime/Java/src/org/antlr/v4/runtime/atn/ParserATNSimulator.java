@@ -1033,7 +1033,6 @@ public class ParserATNSimulator extends ATNSimulator {
 		return predictions;
 	}
 
-
 	/* TODO: If we are doing predicates, there is no point in pursuing
 		 closure operations if we reach a DFA state that uniquely predicts
 		 alternative. We will not be caching that DFA state and it is a

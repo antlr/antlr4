@@ -1,3 +1,33 @@
+/*
+ * [The "BSD license"]
+ * Copyright (c) 2013 Terence Parr
+ * Copyright (c) 2013 Sam Harwell
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.antlr.v4.tool.interp;
 
 
@@ -12,6 +42,7 @@ import org.antlr.v4.runtime.atn.AtomTransition;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LeftRecursiveRuleTransition;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PrecedencePredicateTransition;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.atn.RuleStartState;
 import org.antlr.v4.runtime.atn.RuleStopState;
@@ -23,7 +54,6 @@ import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.PredAST;
 
 import java.util.NoSuchElementException;
 
@@ -34,6 +64,7 @@ import java.util.NoSuchElementException;
  *  makes us efficient rather than, say, backtracking.
  */
 public class ParserInterpreter extends Parser {
+	public static final boolean debug = false;
 	protected Grammar g;
 
 	public final DFA[] decisionToDFA; // not shared like it is for generated parsers
@@ -77,23 +108,22 @@ public class ParserInterpreter extends Parser {
 
 		loop:
 		while ( true ) {
-			System.out.println("p is "+p.getClass().getCanonicalName()+": s"+getState());
+			if ( debug ) System.out.println("p is "+p.getClass().getCanonicalName()+": s"+getState());
 			switch ( p.getStateType() ) {
 				case ATNState.RULE_STOP : // pop; return from rule
 					if ( p == startRuleStopState ) {
 						// done; don't look for EOF unless they mentioned
 						// which means it'll be inside the rule submachine proper
-						System.out.println("pop from start rule");
+						if ( debug ) System.out.println("pop from start rule");
 						locals = locals.parent; // pop local var context
 						break loop;
 					}
 					ATNState returnState = g.atn.states.get(_ctx.invokingState);
-					System.out.println("pop from " + g.getRule(p.ruleIndex) + " to " +
+					if ( debug ) System.out.println("pop from " + g.getRule(p.ruleIndex) + " to " +
 										   g.getRule(returnState.ruleIndex));
 					RuleTransition retStateCallEdge =
 						(RuleTransition)returnState.transition(0);
 					if ( g.getRule(p.ruleIndex).isLeftRecursive() ) {
-						System.out.println("unrolling");
 						unrollRecursionContexts(locals._parentctx);
 					}
 					else {
@@ -122,11 +152,11 @@ public class ParserInterpreter extends Parser {
 
 					int alt = 1;
 					if ( d.getNumberOfTransitions()>1 ) {
-						System.out.println("decision "+d.decision+", input="+_input.LT(1));
+						if ( debug ) System.out.println("decision "+d.decision+", input="+_input.LT(1));
 						alt = getInterpreter().adaptivePredict(_input,
 															   d.decision,
 															   null);
-						System.out.println("predict "+alt);
+						if ( debug ) System.out.println("predict "+alt);
 					}
 
 					// handle case where we need to push new recursive context
@@ -139,9 +169,9 @@ public class ParserInterpreter extends Parser {
 						curRule.isLeftRecursive() &&
 						d == ((LeftRecursiveRule)curRule).getOperatorLoopBlockEntryState()) // always 2 alts in op loop star entry decision
 					{
-						System.out.println("left recur start of suffix block");
+						if ( debug ) System.out.println("left recur start of suffix block");
 						if ( alt != 2 ) {
-							System.out.println("not exit branch");
+							if ( debug ) System.out.println("not exit branch");
 							// if we get past STAR_LOOP_ENTRY, one of (...)* blk
 							// will match. This new recur ctx is pushed for any kind
 							locals._localctx =
@@ -177,7 +207,7 @@ public class ParserInterpreter extends Parser {
 												   targetStartState.ruleIndex);
 					locals._localctx = callctx;
 					Rule targetRule = g.getRule(targetStartState.ruleIndex);
-					System.out.println("push " + targetRule);
+					if ( debug ) System.out.println("push " + targetRule);
 					if ( targetRule.isLeftRecursive() ) {
 						locals._prec = ((LeftRecursiveRuleTransition)t).precedence;
 //						System.out.println("arg "+locals._prec);
@@ -193,7 +223,7 @@ public class ParserInterpreter extends Parser {
 				case Transition.ATOM:
 					AtomTransition at = (AtomTransition)t;
 					match(at.label);
-					System.out.println("MATCH " + g.getTokenDisplayName(at.label));
+					if ( debug ) System.out.println("MATCH " + g.getTokenDisplayName(at.label));
 					p = at.target;
 					setState(p.stateNumber);
 					break;
@@ -227,21 +257,15 @@ public class ParserInterpreter extends Parser {
 	 *  e.g., "{3 >= $_p}?";
 	 */
 	@Override
-	public boolean sempred(@Nullable RuleContext localctx, int ruleIndex, int predIndex) {
-		System.out.print("EVAL pred rule:action=" + ruleIndex + ":" + predIndex);
-		PredAST predAST = g.sempreds.get(predIndex);
-		Rule r = g.getRule(ruleIndex);
-		System.out.print(", sempred " + predAST.getText());
-		String[] elems = predAST.getText().split(" ");
-		if ( elems.length==3 && elems[1].equals(">=") && elems[2].equals("$_p}?") ) {
-			String digits = elems[0].substring(1);
-			int precedence = Integer.parseInt(digits);
-			System.out.println(", prec = " + precedence + ", rule arg is " + locals._prec);
-			return precedence >= locals._prec;
+	public boolean sempred(ATNState state, @Nullable RuleContext localctx, int ruleIndex, int predIndex) {
+		if ( state.transition(0) instanceof PrecedencePredicateTransition ) {
+			PrecedencePredicateTransition pt = (PrecedencePredicateTransition)state.transition(0);
+			if ( debug ) {
+				System.out.print("EVAL pred rule:action=" + ruleIndex + ":" + predIndex);
+				System.out.println(", prec = " + pt.precedence + ", rule arg is " + locals._prec);
+			}
+			return pt.precedence >= locals._prec;
 		}
-		System.out.println();
-
-//		System.out.println(g.sempreds.get(ac));
 		return true;
 	}
 

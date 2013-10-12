@@ -113,7 +113,9 @@ public class LeftRecursiveRule extends Rule {
 	}
 
 	/** Given e : e '+' e | ID, return loop entry start state for
-	 *  ( '+' e )*.
+	 *  ( '+' e )*. This is needed by the parser interpreter
+	 *  so that it knows when to pushNewRecursionContext(). It needs to
+	 *  do so at the start of loop entries for the suffix loop.
 	 */
 	public StarLoopEntryState getOperatorLoopBlockEntryState() {
 		LeftRecursiveRuleAltInfo altInfo = recOpAlts.get(1);

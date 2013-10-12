@@ -68,17 +68,20 @@ public abstract class SemanticContext {
     public abstract boolean eval(Recognizer<?,?> parser, RuleContext outerContext);
 
     public static class Predicate extends SemanticContext {
+		public final ATNState source;
         public final int ruleIndex;
        	public final int predIndex;
        	public final boolean isCtxDependent;  // e.g., $i ref in pred
 
         protected Predicate() {
+			this.source = null;
             this.ruleIndex = -1;
             this.predIndex = -1;
             this.isCtxDependent = false;
         }
 
-        public Predicate(int ruleIndex, int predIndex, boolean isCtxDependent) {
+        public Predicate(ATNState source, int ruleIndex, int predIndex, boolean isCtxDependent) {
+			this.source = source;
             this.ruleIndex = ruleIndex;
             this.predIndex = predIndex;
             this.isCtxDependent = isCtxDependent;
@@ -87,7 +90,7 @@ public abstract class SemanticContext {
         @Override
         public boolean eval(Recognizer<?,?> parser, RuleContext outerContext) {
             RuleContext localctx = isCtxDependent ? outerContext : null;
-            return parser.sempred(localctx, ruleIndex, predIndex);
+            return parser.sempred(source, localctx, ruleIndex, predIndex);
         }
 
 		@Override

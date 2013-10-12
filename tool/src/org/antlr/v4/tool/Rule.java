@@ -159,7 +159,6 @@ public class Rule implements AttributeResolver {
 	public void definePredicateInAlt(int currentAlt, PredAST predAST) {
 		actions.add(predAST);
 		alt[currentAlt].actions.add(predAST);
-		g.sempreds.add(predAST);
 		if ( g.predToIndexMap.get(predAST)==null ) {
 			g.predToIndexMap.put(predAST, g.predToIndexMap.size());
 		}

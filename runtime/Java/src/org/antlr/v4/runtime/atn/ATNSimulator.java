@@ -442,6 +442,7 @@ public abstract class ATNSimulator {
 										 List<IntervalSet> sets)
 	{
 		ATNState target = atn.states.get(trg);
+		ATNState source = atn.states.get(src);
 		switch (type) {
 			case Transition.EPSILON : return new EpsilonTransition(target);
 			case Transition.RANGE :
@@ -451,17 +452,13 @@ public abstract class ATNSimulator {
 				else {
 					return new RangeTransition(target, arg1, arg2);
 				}
-			case Transition.LEFT_RECUR_RULE :
-				// NOT serialized for now
-//				int prec = 999999; // TODO FIX!
-//				LeftRecursiveRuleTransition lrrt =
-//					new LeftRecursiveRuleTransition((RuleStartState)atn.states.get(arg1), arg2, target, prec);
-//				return lrrt;
+			case Transition.LEFT_RECUR_RULE : // NOT serialized differently
 			case Transition.RULE :
 				RuleTransition rt = new RuleTransition((RuleStartState)atn.states.get(arg1), arg2, target);
 				return rt;
+			case Transition.PREC_PREDICATE: // NOT serialized differently
 			case Transition.PREDICATE :
-				PredicateTransition pt = new PredicateTransition(target, arg1, arg2, arg3 != 0);
+				PredicateTransition pt = new PredicateTransition(source, target, arg1, arg2, arg3 != 0);
 				return pt;
 			case Transition.ATOM :
 				if (arg3 != 0) {

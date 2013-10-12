@@ -301,10 +301,11 @@ public class ParserATNFactory implements ATNFactory {
 		ATNState right = newState(node);
 		RuleTransition call;
 		if ( r.isLeftRecursive() ) {
+			// Create a special rule transition at tool time that records
+			// the integer precedence argument. used by parser interpreter.
 			ActionAST arg = (ActionAST)node.getChild(0);
 			String precText = arg.getText();
 			int prec = Integer.parseInt(precText);
-//			System.out.println("create recursive call "+text+"["+prec+"]");
 			call = new LeftRecursiveRuleTransition(start, r.index, right, prec);
 		}
 		else {
@@ -344,18 +345,22 @@ public class ParserATNFactory implements ATNFactory {
 		ATNState right = newState(pred);
 		boolean isCtxDependent = UseDefAnalyzer.actionIsContextDependent(pred);
 		PredicateTransition p;
-		// e.g., "{3 >= $_p}?";
+		// Create a special transition for precedence predicates at tool time
+		// for use by the interpreter. We look for the text of predicates
+		// e.g., "{3 >= $_p}?"; This is fragile but the fastest least intrusive
+		// implementation.
 		String[] elems = pred.getText().split(" ");
 		if ( elems.length==3 && elems[1].equals(">=") && elems[2].equals("$_p}?") ) {
 			String digits = elems[0].substring(1);
 			int precedence = Integer.parseInt(digits);
-			p = new PrecedencePredicateTransition(right, currentRule.index,
+			p = new PrecedencePredicateTransition(left, right, currentRule.index,
 												  g.predToIndexMap.get(pred),
 												  isCtxDependent,
 												  precedence);
 		}
 		else {
-			p = new PredicateTransition(right, currentRule.index, g.predToIndexMap.get(pred), isCtxDependent);
+			p = new PredicateTransition(left, right, currentRule.index,
+										g.predToIndexMap.get(pred), isCtxDependent);
 		}
 		left.addTransition(p);
 		pred.atnState = left;

@@ -40,7 +40,6 @@ import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.v4.Tool;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.OrderedHashMap;
-import org.antlr.v4.misc.UniqueList;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -206,8 +205,6 @@ public class Grammar implements AttributeResolver {
 	 */
 	public LinkedHashMap<PredAST, Integer> predToIndexMap =
 		new LinkedHashMap<PredAST, Integer>();
-	/** Map sempred index to AST node */
-	public List<PredAST> sempreds = new UniqueList<PredAST>();
 
 	public static final String AUTO_GENERATED_TOKEN_NAME_PREFIX = "T__";
 

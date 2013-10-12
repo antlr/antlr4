@@ -63,8 +63,8 @@ public abstract class Transition {
 	public static final int SET				= 7; // ~(A|B) or ~atom, wildcard, which convert to next 2
 	public static final int NOT_SET			= 8;
 	public static final int WILDCARD		= 9;
-	public static final int LEFT_RECUR_RULE	= 10; // not realized differently than RULE
-	public static final int PREC_PREDICATE	= 11; // e.g., {3 >= $_p}? // not realized differently than PREDICATE
+	public static final int LEFT_RECUR_RULE	= 10; // not serialized differently than RULE
+	public static final int PREC_PREDICATE	= 11; // e.g., {3 >= $_p}? // not serialized differently than PREDICATE
 
 	public static final List<String> serializationNames =
 		Collections.unmodifiableList(Arrays.asList(
@@ -87,9 +87,9 @@ public abstract class Transition {
 			put(EpsilonTransition.class, EPSILON);
 			put(RangeTransition.class, RANGE);
 			put(RuleTransition.class, RULE);
-			put(LeftRecursiveRuleTransition.class, LEFT_RECUR_RULE);
+			put(LeftRecursiveRuleTransition.class, RULE);
 			put(PredicateTransition.class, PREDICATE);
-			put(PrecedencePredicateTransition.class, PREC_PREDICATE);
+			put(PrecedencePredicateTransition.class, PREDICATE);
 			put(AtomTransition.class, ATOM);
 			put(ActionTransition.class, ACTION);
 			put(SetTransition.class, SET);
