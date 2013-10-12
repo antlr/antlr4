@@ -59,9 +59,19 @@ import java.util.NoSuchElementException;
 
 /** A parser simulator that mimics what ANTLR's generated
  *  parser code does. A ParserATNSimulator is used to make
- *  predictions but this class moves a pointer through the
+ *  predictions via adaptivePredict but this class moves a pointer through the
  *  ATN to simulate parsing. ParserATNSimulator just
- *  makes us efficient rather than, say, backtracking.
+ *  makes us efficient rather than having to backtrack, for example.
+ *
+ *  This properly creates parse trees even for left recursive rules.
+ *
+ *  We rely on the left recursive rule invocation and special predicate
+ *  transitions to make left recursive rules work. The ATN factory creates
+ *  the special objects but, at least for now, we do not serialize and
+ *  deserialize those specialties. That implies that this interpreter only
+ *  works at tool time and cannot be used on an ATN built from deserialization.
+ *
+ *  See TestParserInterpreter for examples.
  */
 public class ParserInterpreter extends Parser {
 	public static final boolean debug = false;
@@ -106,147 +116,176 @@ public class ParserInterpreter extends Parser {
 		// Create space for rule function locals needed per rule invocation
 		locals = new RuleFunctionCall(null);
 
-		loop:
 		while ( true ) {
 			if ( debug ) System.out.println("p is "+p.getClass().getCanonicalName()+": s"+getState());
 			switch ( p.getStateType() ) {
 				case ATNState.RULE_STOP : // pop; return from rule
-					if ( p == startRuleStopState ) {
+					if ( p == startRuleStopState ) { // are we done parsing?
 						// done; don't look for EOF unless they mentioned
 						// which means it'll be inside the rule submachine proper
 						if ( debug ) System.out.println("pop from start rule");
 						locals = locals.parent; // pop local var context
-						break loop;
+						return rootContext;
 					}
-					ATNState returnState = g.atn.states.get(_ctx.invokingState);
-					if ( debug ) System.out.println("pop from " + g.getRule(p.ruleIndex) + " to " +
-										   g.getRule(returnState.ruleIndex));
-					RuleTransition retStateCallEdge =
-						(RuleTransition)returnState.transition(0);
-					if ( g.getRule(p.ruleIndex).isLeftRecursive() ) {
-						unrollRecursionContexts(locals._parentctx);
-					}
-					else {
-						exitRule();
-					}
-					p = retStateCallEdge.followState;
-					locals = locals.parent; // pop local var context
+					p = visitRuleStopState(p);
 					break;
 
-				// start a decision
 				case ATNState.STAR_LOOP_BACK:
 				case ATNState.PLUS_LOOP_BACK:
 				case ATNState.BLOCK_START:
 				case ATNState.STAR_BLOCK_START:
 				case ATNState.PLUS_BLOCK_START:
 				case ATNState.STAR_LOOP_ENTRY:
-					DecisionState d;
-					// A (...)* loop has an entry decision and then the block decision
-					// The loop back state should simply jump back to the entry point.
-					if ( p.getStateType()==ATNState.STAR_LOOP_BACK ) {
-						d = ((StarLoopbackState)p).getLoopEntryState();
-					}
-					else {
-						d = (DecisionState)p;
-					}
-
-					int alt = 1;
-					if ( d.getNumberOfTransitions()>1 ) {
-						if ( debug ) System.out.println("decision "+d.decision+", input="+_input.LT(1));
-						alt = getInterpreter().adaptivePredict(_input,
-															   d.decision,
-															   null);
-						if ( debug ) System.out.println("predict "+alt);
-					}
-
-					// handle case where we need to push new recursive context
-					// is this the STAR_LOOP_ENTRY built during left-recur
-					// elimination?  Check left-recur rule and it's
-					// getOperatorLoopBlockStartState(). Also only do it
-					// if we're not skipping loop.
-					Rule curRule = g.getRule(p.ruleIndex);
-					if ( d.getStateType()==ATNState.STAR_LOOP_ENTRY &&
-						curRule.isLeftRecursive() &&
-						d == ((LeftRecursiveRule)curRule).getOperatorLoopBlockEntryState()) // always 2 alts in op loop star entry decision
-					{
-						if ( debug ) System.out.println("left recur start of suffix block");
-						if ( alt != 2 ) {
-							if ( debug ) System.out.println("not exit branch");
-							// if we get past STAR_LOOP_ENTRY, one of (...)* blk
-							// will match. This new recur ctx is pushed for any kind
-							locals._localctx =
-								new InterpreterRuleContext(locals._parentctx,
-														   locals._parentState,
-														   p.ruleIndex);
-							pushNewRecursionContext(locals._localctx,
-													locals._startState,
-													curRule.index);
-						}
-					}
-
-					p = d.transition(alt-1).target;
-					// TODO: enterOuterAlt()
-					setState(p.stateNumber);
-					continue loop;
-			}
-
-			// must be just 1 transition here as it's not a decision
-			Transition t = p.getTransitions()[0];
-			switch ( t.getSerializationType() ) {
-				case Transition.RULE: // push
-				case Transition.LEFT_RECUR_RULE:
-					locals = new RuleFunctionCall(locals); // new local var space
-					locals._parentctx = _ctx;
-					int returnState = p.stateNumber; // invoker is current state until we jump
-					locals._parentState = returnState;
-					ATNState targetStartState = t.target;
-					locals._startState = targetStartState.stateNumber;
-
-					InterpreterRuleContext callctx =
-						new InterpreterRuleContext(_ctx, returnState,
-												   targetStartState.ruleIndex);
-					locals._localctx = callctx;
-					Rule targetRule = g.getRule(targetStartState.ruleIndex);
-					if ( debug ) System.out.println("push " + targetRule);
-					if ( targetRule.isLeftRecursive() ) {
-						locals._prec = ((LeftRecursiveRuleTransition)t).precedence;
-//						System.out.println("arg "+locals._prec);
-						enterRecursionRule(callctx, targetRule.index);
-					}
-					else {
-						enterRule(callctx, targetStartState.stateNumber, targetRule.index);
-					}
-					p = targetStartState; // jump to rule
-					setState(p.stateNumber);
+					p = visitDecisionState(p);
 					break;
 
-				case Transition.ATOM:
-					AtomTransition at = (AtomTransition)t;
-					match(at.label);
-					if ( debug ) System.out.println("MATCH " + g.getTokenDisplayName(at.label));
-					p = at.target;
-					setState(p.stateNumber);
+				default :
+					// must be just 1 transition here as it's not a decision
+					p = visitBasicState(p);
 					break;
-				case Transition.SET:
-					break;
-
-				case Transition.NOT_SET:
-					break;
-
-				case Transition.EPSILON:
-				case Transition.PREDICATE:
-				case Transition.PREC_PREDICATE:
-				case Transition.ACTION:
-					p = t.target;
-					setState(p.stateNumber);
-					break;
-
-				default:
-					// error
-					break loop;
 			}
 		}
-		return rootContext;
+	}
+
+	protected ATNState visitDecisionState(ATNState p) {
+		DecisionState d;
+		// A (...)* loop has an entry decision and then the block decision
+		// The loop back state should simply jump back to the entry point.
+		if ( p.getStateType()==ATNState.STAR_LOOP_BACK ) {
+			d = ((StarLoopbackState)p).getLoopEntryState();
+		}
+		else {
+			d = (DecisionState)p;
+		}
+
+		int alt = 1;
+		if ( d.getNumberOfTransitions()>1 ) {
+			if ( debug ) System.out.println("decision "+d.decision+", input="+_input.LT(1));
+			alt = getInterpreter().adaptivePredict(_input,
+												   d.decision,
+												   null);
+			if ( debug ) System.out.println("predict "+alt);
+		}
+		handleParseTreeForOperatorLoop(p, d, alt);
+
+
+		p = d.transition(alt-1).target;
+		// TODO: enterOuterAlt()
+		setState(p.stateNumber);
+		return p;
+	}
+
+	protected ATNState visitBasicState(ATNState p) {
+		Transition t = p.getTransitions()[0];
+		switch ( t.getSerializationType() ) {
+			case Transition.RULE: // push
+			case Transition.LEFT_RECUR_RULE:
+				p = visitRuleInvocation(p, t);
+				break;
+			case Transition.ATOM:
+				p = visitAtom((AtomTransition) t);
+				break;
+			case Transition.SET:
+				break;
+			case Transition.NOT_SET:
+				break;
+			case Transition.EPSILON:
+			case Transition.PREDICATE:
+			case Transition.PREC_PREDICATE:
+			case Transition.ACTION:
+				p = visitEpsilonOrAction(t);
+				break;
+		}
+		return p;
+	}
+
+	protected ATNState visitRuleInvocation(ATNState p, Transition t) {
+		locals = new RuleFunctionCall(locals); // new local var space
+		locals._parentctx = _ctx;
+		int returnState = p.stateNumber; // invoker is current state until we jump
+		locals._parentState = returnState;
+		ATNState targetStartState = t.target;
+		locals._startState = targetStartState.stateNumber;
+
+		InterpreterRuleContext callctx =
+			new InterpreterRuleContext(_ctx, returnState,
+									   targetStartState.ruleIndex);
+		locals._localctx = callctx;
+		Rule targetRule = g.getRule(targetStartState.ruleIndex);
+		if ( debug ) System.out.println("push " + targetRule);
+		if ( targetRule.isLeftRecursive() ) {
+			locals._prec = ((LeftRecursiveRuleTransition)t).precedence;
+//						System.out.println("arg "+locals._prec);
+			enterRecursionRule(callctx, targetRule.index);
+		}
+		else {
+			enterRule(callctx, targetStartState.stateNumber, targetRule.index);
+		}
+		p = targetStartState; // jump to rule
+		setState(p.stateNumber);
+		return p;
+	}
+
+	protected ATNState visitEpsilonOrAction(Transition t) {
+		ATNState p;
+		p = t.target;
+		setState(p.stateNumber);
+		return p;
+	}
+
+	protected ATNState visitAtom(AtomTransition t) {
+		ATNState p;
+		match(t.label);
+		if ( debug ) System.out.println("MATCH " + g.getTokenDisplayName(t.label));
+		p = t.target;
+		setState(p.stateNumber);
+		return p;
+	}
+
+	/** Handle case where we need to push new recursive context
+	 	is this the STAR_LOOP_ENTRY built during left-recur
+	 	elimination?  Check left-recur rule and it's
+	 	getOperatorLoopBlockStartState(). Also only do it
+	 	if we're not skipping loop.
+	 */
+	protected void handleParseTreeForOperatorLoop(ATNState p, DecisionState d, int alt) {
+		Rule curRule = g.getRule(p.ruleIndex);
+		boolean isOpLoopEntry =
+			curRule.isLeftRecursive() &&
+			d.getStateType()==ATNState.STAR_LOOP_ENTRY &&
+			d == ((LeftRecursiveRule)curRule).getOperatorLoopBlockEntryState();
+		boolean exitBranch = alt == 2; // always 2 alts in op loop star entry decision
+		if ( isOpLoopEntry && !exitBranch ) {
+			if ( debug ) System.out.println("left recur start of suffix block");
+			if ( debug ) System.out.println("not exit branch");
+			// if we get past STAR_LOOP_ENTRY, one of (...)* blk
+			// will match. This new recur ctx is pushed for any kind
+			locals._localctx =
+				new InterpreterRuleContext(locals._parentctx,
+										   locals._parentState,
+										   p.ruleIndex);
+			pushNewRecursionContext(locals._localctx,
+									locals._startState,
+									curRule.index);
+		}
+	}
+
+	protected ATNState visitRuleStopState(ATNState p) {
+		ATNState returnState = g.atn.states.get(_ctx.invokingState);
+		if ( debug ) System.out.println("pop from " + g.getRule(p.ruleIndex) + " to " +
+											g.getRule(returnState.ruleIndex));
+		RuleTransition retStateCallEdge =
+			(RuleTransition)returnState.transition(0);
+		//
+		if ( g.getRule(p.ruleIndex).isLeftRecursive() ) {
+			unrollRecursionContexts(locals._parentctx);
+		}
+		else {
+			exitRule();
+		}
+		p = retStateCallEdge.followState;
+		locals = locals.parent; // pop local var context
+		return p;
 	}
 
 	/** Predicates are evaluated during prediction and not by this interpreter.
