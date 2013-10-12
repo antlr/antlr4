@@ -1181,23 +1181,25 @@ public class ParserATNSimulator extends ATNSimulator {
 									  boolean fullCtx)
 	{
 		switch (t.getSerializationType()) {
-		case Transition.RULE:
-			return ruleTransition(config, (RuleTransition)t);
+			case Transition.RULE:
+			case Transition.LEFT_RECUR_RULE:
+				return ruleTransition(config, (RuleTransition)t);
 
-		case Transition.PREDICATE:
-			return predTransition(config, (PredicateTransition)t,
-								  collectPredicates,
-								  inContext,
-								  fullCtx);
+			case Transition.PREC_PREDICATE:
+			case Transition.PREDICATE:
+				return predTransition(config, (PredicateTransition)t,
+									  collectPredicates,
+									  inContext,
+									  fullCtx);
 
-		case Transition.ACTION:
-			return actionTransition(config, (ActionTransition)t);
+			case Transition.ACTION:
+				return actionTransition(config, (ActionTransition)t);
 
-		case Transition.EPSILON:
-			return new ATNConfig(config, t.target);
+			case Transition.EPSILON:
+				return new ATNConfig(config, t.target);
 
-		default:
-			return null;
+			default:
+				return null;
 		}
 	}
 
