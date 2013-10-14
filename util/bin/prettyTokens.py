@@ -55,7 +55,7 @@
 #      type:         the token type, a numeric string
 #      channel:      the channel number where the token was sent, '' for parser
 #      line:         the line number where the token begins
-#      position:     the column where the token begins, expected same as start
+#      position:     the column where the token begins
 #    and the derived values:
 #      length:       the length of the token text, derived from start and stop
 #      token_name:   the name of the token, derived from type
@@ -72,16 +72,15 @@ import glob, os, re, sys;
 try:
     # get format string from environment. bash example:
     #   export ANTLR_TOKEN_FORMAT_STRING=\
-    #     "[@{index:>4}, line {line:>3}[{start:>3}::{stop:>3}::{length:>3}],\
-    #      {token_name:>15}({type:>3}), {text:>23} --> {channel_name}"
+    #     "[@{index:>4}, line {line:>3}[{position:>3}:{length:>+4}],\
+    #      {token_name:>30}({type:>3}), {text:>23} -> {channel_name}"
     token_format_string = os.environ['ANTLR_TOKEN_FORMAT_STRING']
 except KeyError:
     # default format string
     token_format_string = ("[@{index:>4}, "
-                           "line {line:>3}[{start:>3}::{stop:>3}::{length:>3}],"
-                           "{token_name:>15}({type:>3}), "
-                           "{text:>23} "
-                           "-> {channel_name}")
+                           "line {line:>3}[{position:>3}:{length:>+4}],"
+                           "{token_name:>30}({type:>3}), "
+                           "{text:>23} -> {channel_name}")
 
 # regular expression for tokens output. example targets for default:
 #    [@1,8:16='intensive',<165>,1:8]
@@ -185,7 +184,7 @@ if lexer_path:
             matched = re.match(re_channel_value.format(name=channel_name), line)
             if matched:
                 fields = matched.groupdict()
-                channels_by_value[fields['value']] = channel_name
+                channels_by_value[eval(fields['value'])] = channel_name
     lexer_source.close()
 
 # get the local filename for the tokens file, latest if multiple glob hits
@@ -207,23 +206,30 @@ if tokens_path:
         if matched:
             fields = matched.groupdict()
             if not tokens_by_value.has_key(fields['value']):
-                tokens_by_value[fields['value']] = fields['name']
+                tokens_by_value[eval(fields['value'])] = fields['name']
     token_enums.close()
 
 # substitute formatted token line for each matching token string
 for line in sys.stdin:
     matched = rec_token_string.match(line)
     if matched:
-        # when the line matches our token string re, form the derived fields
+        # when the line matches our token string re, get the fields
         fields = matched.groupdict()
+        # convert the number strings to numbers
+        for key in fields.keys():
+            if (key != 'text') and fields[key]:
+                fields[key] = eval(fields[key])
+        # derive token length
         try:
-            length = str(eval(fields['stop']) - eval(fields['start']) + 1)
+            length = fields['stop'] - fields['start'] + 1
         except:
             length = ''
+        # derive token name
         try:
             token_name = tokens_by_value[fields['type']]
         except:
             token_name = ''
+        # derive channel name
         try:
             channel_name = channels_by_value[fields['channel']]
         except:
