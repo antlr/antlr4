@@ -21,6 +21,7 @@ nbactions*.xml
 # Eclipse projects
 .classpath
 .project
+.pydevproject
 .settings/
 
 # Profiler results
