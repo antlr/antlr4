@@ -113,6 +113,8 @@ public class ParserInterpreter extends Parser {
 			new InterpreterRuleContext(null, startRuleStartState.stateNumber, r.index);
 		_ctx = rootContext;
 
+		_input.LA(1); // init lookahead
+
 		// Create space for rule function locals needed per rule invocation
 		locals = new RuleFunctionCall(null);
 
