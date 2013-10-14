@@ -38,13 +38,17 @@ import org.antlr.v4.runtime.misc.NotNull;
  *  may have to combine a bunch of them as it collects predicates from
  *  multiple ATN configurations into a single DFA state.
  */
-public final class PredicateTransition extends Transition {
+public class PredicateTransition extends Transition {
+	public ATNState source;
 	public final int ruleIndex;
 	public final int predIndex;
 	public final boolean isCtxDependent;  // e.g., $i ref in pred
 
-	public PredicateTransition(@NotNull ATNState target, int ruleIndex, int predIndex, boolean isCtxDependent) {
+	public PredicateTransition(@NotNull ATNState source, @NotNull ATNState target,
+							   int ruleIndex, int predIndex, boolean isCtxDependent)
+	{
 		super(target);
+		this.source = source;
 		this.ruleIndex = ruleIndex;
 		this.predIndex = predIndex;
 		this.isCtxDependent = isCtxDependent;
@@ -64,7 +68,7 @@ public final class PredicateTransition extends Transition {
 	}
 
     public SemanticContext.Predicate getPredicate() {
-   		return new SemanticContext.Predicate(ruleIndex, predIndex, isCtxDependent);
+   		return new SemanticContext.Predicate(source, ruleIndex, predIndex, isCtxDependent);
    	}
 
 	@Override

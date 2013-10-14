@@ -32,9 +32,14 @@ package org.antlr.v4.tool;
 
 import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
 import org.antlr.v4.misc.OrderedHashMap;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.BlockEndState;
+import org.antlr.v4.runtime.atn.StarBlockStartState;
+import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.misc.Triple;
 import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.RuleAST;
 
@@ -105,5 +110,18 @@ public class LeftRecursiveRule extends Rule {
 		}
 		if ( labels.isEmpty() ) return null;
 		return labels;
+	}
+
+	/** Given e : e '+' e | ID, return loop entry start state for
+	 *  ( '+' e )*. This is needed by the parser interpreter
+	 *  so that it knows when to pushNewRecursionContext(). It needs to
+	 *  do so at the start of loop entries for the suffix loop.
+	 */
+	public StarLoopEntryState getOperatorLoopBlockEntryState() {
+		LeftRecursiveRuleAltInfo altInfo = recOpAlts.get(1);
+		BlockAST blk = (BlockAST)altInfo.altAST.parent;
+		BlockEndState endState = ((StarBlockStartState) blk.atnState).endState;
+		ATNState loopBack = endState.transition(0).target;
+		return (StarLoopEntryState)loopBack.transition(0).target;
 	}
 }

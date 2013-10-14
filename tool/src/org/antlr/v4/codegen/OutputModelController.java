@@ -184,7 +184,7 @@ public class OutputModelController {
 		pushCurrentRule(function);
 		function.fillNamedActions(delegate, r);
 
-		if ( r instanceof LeftRecursiveRule ) {
+		if ( r.isLeftRecursive() ) {
 			buildLeftRecursiveRuleFunction((LeftRecursiveRule)r,
 										   (LeftRecursiveRuleFunction)function);
 		}
@@ -201,7 +201,7 @@ public class OutputModelController {
 					rsf = new RuleSempredFunction(delegate, r, function.ctxType);
 					parser.sempredFuncs.put(r, rsf);
 				}
-				rsf.actions.put(g.sempreds.get(p), new Action(delegate, p));
+				rsf.actions.put(g.predToIndexMap.get(p), new Action(delegate, p));
 			}
 		}
 
@@ -326,7 +326,7 @@ public class OutputModelController {
 					rsf = new RuleSempredFunction(delegate, r, ctxType);
 					lexer.sempredFuncs.put(r, rsf);
 				}
-				rsf.actions.put(g.sempreds.get(p), new Action(delegate, p));
+				rsf.actions.put(g.predToIndexMap.get(p), new Action(delegate, p));
 			}
 			else if ( a.getType()== ANTLRParser.ACTION ) {
 				raf.actions.put(g.lexerActions.get(a), new Action(delegate, a));

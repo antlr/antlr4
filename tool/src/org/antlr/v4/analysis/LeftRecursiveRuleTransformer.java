@@ -43,6 +43,8 @@ import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.ScopeParser;
 import org.antlr.v4.parse.ToolANTLRParser;
 import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.semantics.BasicSemanticChecks;
+import org.antlr.v4.semantics.RuleCollector;
 import org.antlr.v4.tool.AttributeDict;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
@@ -111,10 +113,9 @@ public class LeftRecursiveRuleTransformer {
 	{
 		//tool.log("grammar", ruleAST.toStringTree());
 		Grammar g = r.ast.g;
-		GrammarAST prevRuleAST = r.ast;
-		String ruleName = prevRuleAST.getChild(0).getText();
+		String ruleName = r.originalRuleAST.getChild(0).getText();
 		LeftRecursiveRuleAnalyzer leftRecursiveRuleWalker =
-			new LeftRecursiveRuleAnalyzer(prevRuleAST, tool, ruleName, language);
+			new LeftRecursiveRuleAnalyzer(r.originalRuleAST, tool, ruleName, language);
 		boolean isLeftRec;
 		try {
 //			System.out.println("TESTING ---------------\n"+
@@ -133,16 +134,22 @@ public class LeftRecursiveRuleTransformer {
 		RuleAST t = parseArtificialRule(g, newRuleText);
 
 		// reuse the name token from the original AST since it refers to the proper source location in the original grammar
-		((GrammarAST)t.getChild(0)).token = ((GrammarAST)prevRuleAST.getChild(0)).getToken();
+		((GrammarAST)t.getChild(0)).token = ((GrammarAST)r.originalRuleAST.getChild(0)).getToken();
 
 		// update grammar AST and set rule's AST.
-		RULES.setChild(prevRuleAST.getChildIndex(), t);
-		r.ast = t;
+		RULES.setChild(r.originalRuleAST.getChildIndex(), t);
+		r.ast = t; // reset tree for this rule to transformed tree
 
 		// Reduce sets in newly created rule tree
 		GrammarTransformPipeline transform = new GrammarTransformPipeline(g, g.tool);
 		transform.reduceBlocksToSets(r.ast);
 		transform.expandParameterizedLoops(r.ast);
+
+		// Rerun semantic checks on the new rule
+		RuleCollector ruleCollector = new RuleCollector(g);
+		ruleCollector.visit(t, "rule");
+		BasicSemanticChecks basics = new BasicSemanticChecks(g, ruleCollector);
+		basics.visit(t, "rule");
 
 		// track recursive alt info for codegen
 		r.recPrimaryAlts = new ArrayList<LeftRecursiveRuleAltInfo>();

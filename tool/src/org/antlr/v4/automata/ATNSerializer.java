@@ -256,11 +256,13 @@ public class ATNSerializer {
 				int arg2 = 0;
 				int arg3 = 0;
 				switch ( edgeType ) {
+					case Transition.LEFT_RECUR_RULE :
 					case Transition.RULE :
 						trg = ((RuleTransition)t).followState.stateNumber;
 						arg1 = ((RuleTransition)t).target.stateNumber;
 						arg2 = ((RuleTransition)t).ruleIndex;
 						break;
+					case Transition.PREC_PREDICATE : // NOT serialized differently at moment
 					case Transition.PREDICATE :
 						PredicateTransition pt = (PredicateTransition)t;
 						arg1 = pt.ruleIndex;

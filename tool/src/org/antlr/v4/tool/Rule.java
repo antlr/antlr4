@@ -30,6 +30,7 @@
 
 package org.antlr.v4.tool;
 
+import org.antlr.v4.misc.UniqueList;
 import org.antlr.v4.runtime.misc.Triple;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
@@ -78,6 +79,11 @@ public class Rule implements AttributeResolver {
 	public List<GrammarAST> modifiers;
 
 	public RuleAST ast;
+
+	/** If we performed a left recursion removal, this points at the original
+	 *  rule tree before we transformed it.
+ 	 */
+	public RuleAST originalRuleAST;
 	public AttributeDict args;
 	public AttributeDict retvals;
 	public AttributeDict locals;
@@ -99,16 +105,17 @@ public class Rule implements AttributeResolver {
     /** Track exception handlers; points at "catch" node of (catch exception action)
 	 *  don't track finally action
 	 */
-    public List<GrammarAST> exceptions = new ArrayList<GrammarAST>();
+    public List<GrammarAST> exceptions = new UniqueList<GrammarAST>();
 
 	/** Track all executable actions other than named actions like @init
 	 *  and catch/finally (not in an alt). Also tracks predicates, rewrite actions.
 	 *  We need to examine these actions before code generation so
-	 *  that we can detect refs to $rule.attr etc...
+	 *  that we can detect refs to $rule.attr etc...  list is unique by
+	 *  AST node.
 	 *
 	 *  This tracks per rule; Alternative objs also track per alt.
 	 */
-	public List<ActionAST> actions = new ArrayList<ActionAST>();
+	public List<ActionAST> actions = new UniqueList<ActionAST>();
 
 	public ActionAST finallyAction;
 
@@ -127,7 +134,7 @@ public class Rule implements AttributeResolver {
 	public Rule(Grammar g, String name, RuleAST ast, int numberOfAlts) {
 		this.g = g;
 		this.name = name;
-		this.ast = ast;
+		this.ast = this.originalRuleAST = ast;
 		this.numberOfAlts = numberOfAlts;
 		alt = new Alternative[numberOfAlts+1]; // 1..n
 		for (int i=1; i<=numberOfAlts; i++) alt[i] = new Alternative(this, i);
@@ -152,8 +159,8 @@ public class Rule implements AttributeResolver {
 	public void definePredicateInAlt(int currentAlt, PredAST predAST) {
 		actions.add(predAST);
 		alt[currentAlt].actions.add(predAST);
-		if ( g.sempreds.get(predAST)==null ) {
-			g.sempreds.put(predAST, g.sempreds.size());
+		if ( g.predToIndexMap.get(predAST)==null ) {
+			g.predToIndexMap.put(predAST, g.predToIndexMap.size());
 		}
 	}
 
@@ -325,6 +332,10 @@ public class Rule implements AttributeResolver {
 			if ( a.getText().equals("fragment") ) return true;
 		}
 		return false;
+	}
+
+	public boolean isLeftRecursive() {
+		return this instanceof LeftRecursiveRule;
 	}
 
 	@Override

@@ -1033,7 +1033,6 @@ public class ParserATNSimulator extends ATNSimulator {
 		return predictions;
 	}
 
-
 	/* TODO: If we are doing predicates, there is no point in pursuing
 		 closure operations if we reach a DFA state that uniquely predicts
 		 alternative. We will not be caching that DFA state and it is a
@@ -1181,23 +1180,25 @@ public class ParserATNSimulator extends ATNSimulator {
 									  boolean fullCtx)
 	{
 		switch (t.getSerializationType()) {
-		case Transition.RULE:
-			return ruleTransition(config, (RuleTransition)t);
+			case Transition.RULE:
+			case Transition.LEFT_RECUR_RULE:
+				return ruleTransition(config, (RuleTransition)t);
 
-		case Transition.PREDICATE:
-			return predTransition(config, (PredicateTransition)t,
-								  collectPredicates,
-								  inContext,
-								  fullCtx);
+			case Transition.PREC_PREDICATE:
+			case Transition.PREDICATE:
+				return predTransition(config, (PredicateTransition)t,
+									  collectPredicates,
+									  inContext,
+									  fullCtx);
 
-		case Transition.ACTION:
-			return actionTransition(config, (ActionTransition)t);
+			case Transition.ACTION:
+				return actionTransition(config, (ActionTransition)t);
 
-		case Transition.EPSILON:
-			return new ATNConfig(config, t.target);
+			case Transition.EPSILON:
+				return new ATNConfig(config, t.target);
 
-		default:
-			return null;
+			default:
+				return null;
 		}
 	}
 

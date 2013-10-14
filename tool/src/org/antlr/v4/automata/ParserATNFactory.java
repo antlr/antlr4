@@ -50,10 +50,12 @@ import org.antlr.v4.runtime.atn.BlockEndState;
 import org.antlr.v4.runtime.atn.BlockStartState;
 import org.antlr.v4.runtime.atn.EpsilonTransition;
 import org.antlr.v4.runtime.atn.LL1Analyzer;
+import org.antlr.v4.runtime.atn.LeftRecursiveRuleTransition;
 import org.antlr.v4.runtime.atn.LoopEndState;
 import org.antlr.v4.runtime.atn.NotSetTransition;
 import org.antlr.v4.runtime.atn.PlusBlockStartState;
 import org.antlr.v4.runtime.atn.PlusLoopbackState;
+import org.antlr.v4.runtime.atn.PrecedencePredicateTransition;
 import org.antlr.v4.runtime.atn.PredicateTransition;
 import org.antlr.v4.runtime.atn.RuleStartState;
 import org.antlr.v4.runtime.atn.RuleStopState;
@@ -72,7 +74,6 @@ import org.antlr.v4.semantics.UseDefAnalyzer;
 import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
@@ -133,7 +134,7 @@ public class ParserATNFactory implements ATNFactory {
 		for (Triple<Rule, ATNState, ATNState> pair : preventEpsilonClosureBlocks) {
 			LL1Analyzer analyzer = new LL1Analyzer(atn);
 			if (analyzer.LOOK(pair.b, pair.c, null).contains(org.antlr.v4.runtime.Token.EPSILON)) {
-				ErrorType errorType = pair.a instanceof LeftRecursiveRule ? ErrorType.EPSILON_LR_FOLLOW : ErrorType.EPSILON_CLOSURE;
+				ErrorType errorType = pair.a.isLeftRecursive() ? ErrorType.EPSILON_LR_FOLLOW : ErrorType.EPSILON_CLOSURE;
 				g.tool.errMgr.grammarError(errorType, g.fileName, ((GrammarAST)pair.a.ast.getChild(0)).getToken(), pair.a.name);
 			}
 		}
@@ -289,15 +290,27 @@ public class ParserATNFactory implements ATNFactory {
 	}
 
 	public Handle _ruleRef(GrammarAST node) {
-		Rule r = g.getRule(node.getText());
+		String text = node.getText();
+		Rule r = g.getRule(text);
 		if ( r==null ) {
-			g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, "Rule "+node.getText()+" undefined");
+			g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, "Rule "+ text +" undefined");
 			return null;
 		}
 		RuleStartState start = atn.ruleToStartState[r.index];
 		ATNState left = newState(node);
 		ATNState right = newState(node);
-		RuleTransition call = new RuleTransition(start, r.index, right);
+		RuleTransition call;
+		if ( r.isLeftRecursive() ) {
+			// Create a special rule transition at tool time that records
+			// the integer precedence argument. used by parser interpreter.
+			ActionAST arg = (ActionAST)node.getChild(0);
+			String precText = arg.getText();
+			int prec = Integer.parseInt(precText);
+			call = new LeftRecursiveRuleTransition(start, r.index, right, prec);
+		}
+		else {
+			call = new RuleTransition(start, r.index, right);
+		}
 		left.addTransition(call);
 
 		node.atnState = left;
@@ -331,7 +344,24 @@ public class ParserATNFactory implements ATNFactory {
 		ATNState left = newState(pred);
 		ATNState right = newState(pred);
 		boolean isCtxDependent = UseDefAnalyzer.actionIsContextDependent(pred);
-		PredicateTransition p = new PredicateTransition(right, currentRule.index, g.sempreds.get(pred), isCtxDependent);
+		PredicateTransition p;
+		// Create a special transition for precedence predicates at tool time
+		// for use by the interpreter. We look for the text of predicates
+		// e.g., "{3 >= $_p}?"; This is fragile but the fastest least intrusive
+		// implementation.
+		String[] elems = pred.getText().split(" ");
+		if ( elems.length==3 && elems[1].equals(">=") && elems[2].equals("$_p}?") ) {
+			String digits = elems[0].substring(1);
+			int precedence = Integer.parseInt(digits);
+			p = new PrecedencePredicateTransition(left, right, currentRule.index,
+												  g.predToIndexMap.get(pred),
+												  isCtxDependent,
+												  precedence);
+		}
+		else {
+			p = new PredicateTransition(left, right, currentRule.index,
+										g.predToIndexMap.get(pred), isCtxDependent);
+		}
 		left.addTransition(p);
 		pred.atnState = left;
 		return new Handle(left, right);
@@ -426,8 +456,6 @@ public class ParserATNFactory implements ATNFactory {
 			opt.visit(alt.left);
 		}
 		Handle h = new Handle(start, end);
-//		FASerializer ser = new FASerializer(g, h.left);
-//		System.out.println(blkAST.toStringTree()+":\n"+ser);
 		blkAST.atnState = start;
 
 		return h;

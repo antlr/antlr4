@@ -1,5 +1,19 @@
 ANTLR v4 Honey Badger
 
+October 12, 2013
+
+* index() in BufferedTokenStream was not forcing initialization of the
+  stream and giving bad results if you called it before anything else.
+
+* Recognizer.sempred() changed; added source ATNState for PredicateTransition
+
+* Added ParserInterpreter and shuffled the classes around a little bit.
+  The interpreter works even with left recursive rules, producing the
+  correct parse trees. See TestParserInterpreter for unit tests.
+
+* Actions were not tracked uniquely in alt info and Rule.  Made UniqueList
+  so we track same ActionAST just once.
+
 August 31, 2013
 
 * Lots of little fixes thanks to Coverity Scan

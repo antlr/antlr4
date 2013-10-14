@@ -94,7 +94,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 
 	@Override
 	public RuleFunction rule(Rule r) {
-		if ( r instanceof LeftRecursiveRule ) {
+		if ( r.isLeftRecursive() ) {
 			return new LeftRecursiveRuleFunction(this, (LeftRecursiveRule)r);
 		}
 		else {

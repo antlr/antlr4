@@ -456,7 +456,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		ATNState p = config.state;
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			Transition t = p.transition(i);
-			LexerATNConfig c = getEpsilonTarget(input, config, t, configs, speculative);
+			LexerATNConfig c = getEpsilonTarget(p, input, config, t, configs, speculative);
 			if ( c!=null ) {
 				currentAltReachedAcceptState = closure(input, c, configs, currentAltReachedAcceptState, speculative);
 			}
@@ -467,11 +467,12 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	// side-effect: can alter configs.hasSemanticContext
 	@Nullable
-	protected LexerATNConfig getEpsilonTarget(@NotNull CharStream input,
-										   @NotNull LexerATNConfig config,
-										   @NotNull Transition t,
-										   @NotNull ATNConfigSet configs,
-										   boolean speculative)
+	protected LexerATNConfig getEpsilonTarget(@NotNull ATNState p,
+											  @NotNull CharStream input,
+											  @NotNull LexerATNConfig config,
+											  @NotNull Transition t,
+											  @NotNull ATNConfigSet configs,
+											  boolean speculative)
 	{
 		LexerATNConfig c = null;
 		switch (t.getSerializationType()) {
@@ -506,7 +507,7 @@ public class LexerATNSimulator extends ATNSimulator {
 					System.out.println("EVAL rule "+pt.ruleIndex+":"+pt.predIndex);
 				}
 				configs.hasSemanticContext = true;
-				if (evaluatePredicate(input, pt.ruleIndex, pt.predIndex, speculative)) {
+				if (evaluatePredicate(p, input, pt.ruleIndex, pt.predIndex, speculative)) {
 					c = new LexerATNConfig(config, t.target);
 				}
 				break;
@@ -543,14 +544,16 @@ public class LexerATNSimulator extends ATNSimulator {
 	 * @return {@code true} if the specified predicate evaluates to
 	 * {@code true}.
 	 */
-	protected boolean evaluatePredicate(@NotNull CharStream input, int ruleIndex, int predIndex, boolean speculative) {
+	protected boolean evaluatePredicate(@NotNull ATNState p, @NotNull CharStream input,
+										int ruleIndex, int predIndex, boolean speculative)
+	{
 		// assume true if no recognizer was provided
 		if (recog == null) {
 			return true;
 		}
 
 		if (!speculative) {
-			return recog.sempred(null, ruleIndex, predIndex);
+			return recog.sempred(p, null, ruleIndex, predIndex);
 		}
 
 		int savedCharPositionInLine = charPositionInLine;
@@ -559,7 +562,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		int marker = input.mark();
 		try {
 			consume(input);
-			return recog.sempred(null, ruleIndex, predIndex);
+			return recog.sempred(p, null, ruleIndex, predIndex);
 		}
 		finally {
 			charPositionInLine = savedCharPositionInLine;
