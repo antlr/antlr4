@@ -92,7 +92,7 @@ public class BufferedTokenStream implements TokenStream {
     public TokenSource getTokenSource() { return tokenSource; }
 
 	@Override
-	public int index() { lazyInit(); return p; }
+	public int index() { return p; }
 
     @Override
     public int mark() {
