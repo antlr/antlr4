@@ -237,6 +237,10 @@ public class Grammar implements AttributeResolver {
 		this(GRAMMAR_FROM_STRING_NAME, grammarText, null);
 	}
 
+	public Grammar(String grammarText, LexerGrammar tokenVocabSource) throws RecognitionException {
+		this(GRAMMAR_FROM_STRING_NAME, grammarText, tokenVocabSource, null);
+	}
+
 	/** For testing */
 	public Grammar(String grammarText, ANTLRToolListener listener)
 		throws RecognitionException
@@ -253,6 +257,13 @@ public class Grammar implements AttributeResolver {
 
 	/** For testing; builds trees, does sem anal */
 	public Grammar(String fileName, String grammarText, @Nullable ANTLRToolListener listener)
+		throws RecognitionException
+	{
+		this(fileName, grammarText, null, listener);
+	}
+
+	/** For testing; builds trees, does sem anal */
+	public Grammar(String fileName, String grammarText, Grammar tokenVocabSource, @Nullable ANTLRToolListener listener)
 		throws RecognitionException
 	{
         this.text = grammarText;
@@ -283,6 +294,10 @@ public class Grammar implements AttributeResolver {
 			public Object post(Object t) { return t; }
 		});
 		initTokenSymbolTables();
+
+		if (tokenVocabSource != null) {
+			importVocab(tokenVocabSource);
+		}
 
 		tool.process(this, false);
     }
@@ -519,6 +534,15 @@ public class Grammar implements AttributeResolver {
 		}
 //		tool.log("grammar", "getTokenDisplayName ttype="+ttype+", name="+tokenName);
 		return tokenName;
+	}
+
+	public String[] getRuleNames() {
+		String[] result = new String[rules.size()];
+		for (Rule rule : rules.values()) {
+			result[rule.index] = rule.name;
+		}
+
+		return result;
 	}
 
 	public List<String> getTokenDisplayNames(IntegerList types) {
