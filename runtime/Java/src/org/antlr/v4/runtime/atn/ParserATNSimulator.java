@@ -361,7 +361,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		DFA dfa = decisionToDFA[decision];
 
 		int m = input.mark();
-		int index = input.index();
+		int index = _startIndex;
 
 		// Now we are certain to have a specific decision's DFA
 		// But, do we still need an initial state?
