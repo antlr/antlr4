@@ -556,7 +556,8 @@ public class TestLeftRecursion extends BaseTest {
 		writeRecognizerAndCompile("TParser",
 								  "TLexer",
 								  startRule,
-								  debug);
+								  debug,
+								  false);
 
 		for (int i=0; i<tests.length; i+=2) {
 			String test = tests[i];
