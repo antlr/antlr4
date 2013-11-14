@@ -487,7 +487,6 @@ public abstract class BaseTest {
 		return output;
 	}
 
-/*
 	public ParseTree execParser(String startRuleName, String input,
 								String parserName, String lexerName)
 		throws Exception
@@ -496,7 +495,6 @@ public abstract class BaseTest {
 		Parser parser = pl.a;
 		return execStartRule(startRuleName, parser);
 	}
-	 */
 
 	public ParseTree execStartRule(String startRuleName, Parser parser)
 		throws IllegalAccessException, InvocationTargetException,
@@ -537,6 +535,21 @@ public abstract class BaseTest {
 		return new Pair<Parser, Lexer>(parser, lexer);
 	}
 
+	public Class<?> loadClassFromTempDir(String name) throws Exception {
+		ClassLoader loader =
+			new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() },
+							   ClassLoader.getSystemClassLoader());
+		return loader.loadClass(name);
+	}
+
+	public Class<? extends Lexer> loadLexerClassFromTempDir(String name) throws Exception {
+		return loadClassFromTempDir(name).asSubclass(Lexer.class);
+	}
+
+	public Class<? extends Parser> loadParserClassFromTempDir(String name) throws Exception {
+		return loadClassFromTempDir(name).asSubclass(Parser.class);
+	}
+
 	protected String execParser(String grammarFileName,
 								String grammarStr,
 								String parserName,
@@ -555,54 +568,6 @@ public abstract class BaseTest {
 								 lexerName,
 								 startRuleName,
 								 debug);
-	}
-
-	public ParseTree execParser(String startRuleName, String input,
-								String parserName, String lexerName)
-		throws Exception
-	{
-		final Class<? extends Lexer> lexerClass = loadLexerClassFromTempDir(lexerName);
-		final Class<? extends Parser> parserClass = loadParserClassFromTempDir(parserName);
-
-		ANTLRInputStream in = new ANTLRInputStream(new StringReader(input));
-
-		Class<? extends Lexer> c = lexerClass.asSubclass(Lexer.class);
-		Constructor<? extends Lexer> ctor = c.getConstructor(CharStream.class);
-		Lexer lexer = ctor.newInstance(in);
-
-		Class<? extends Parser> pc = parserClass.asSubclass(Parser.class);
-		Constructor<? extends Parser> pctor = pc.getConstructor(TokenStream.class);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		Parser parser = pctor.newInstance(tokens);
-
-		Method startRule = null;
-		Object[] args = null;
-		try {
-			startRule = parserClass.getMethod(startRuleName);
-		}
-		catch (NoSuchMethodException nsme) {
-			// try with int _p arg for recursive func
-			startRule = parserClass.getMethod(startRuleName, int.class);
-			args = new Integer[] {0};
-		}
-		ParseTree result = (ParseTree)startRule.invoke(parser, args);
-		System.out.println("parse tree = "+result.toStringTree(parser));
-		return result;
-	}
-
-	public Class<?> loadClassFromTempDir(String name) throws Exception {
-		ClassLoader loader =
-			new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() },
-							   ClassLoader.getSystemClassLoader());
-		return loader.loadClass(name);
-	}
-
-	public Class<? extends Lexer> loadLexerClassFromTempDir(String name) throws Exception {
-		return (Class<? extends Lexer>)loadClassFromTempDir(name);
-	}
-
-	public Class<? extends Parser> loadParserClassFromTempDir(String name) throws Exception {
-		return (Class<? extends Parser>)loadClassFromTempDir(name);
 	}
 
 	/** Return true if all is well */
