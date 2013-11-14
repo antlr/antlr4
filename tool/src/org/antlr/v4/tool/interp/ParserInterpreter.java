@@ -214,6 +214,7 @@ public class ParserInterpreter extends Parser {
 			if (!transition.matches(_input.LA(1), Token.MIN_TOKEN_TYPE, 65535)) {
 				_errHandler.recoverInline(this);
 			}
+			matchWildcard();
 			break;
 
 		case Transition.WILDCARD:
