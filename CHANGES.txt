@@ -1,5 +1,9 @@
 ANTLR v4 Honey Badger
 
+November 13, 2013
+
+* move getChildren() from Tree into Trees (to avoid breaking change)
+
 September 16, 2013
 
 * Updated build.xml to support v4 grammars in v4 itself; compiles XPathLexer.g4
