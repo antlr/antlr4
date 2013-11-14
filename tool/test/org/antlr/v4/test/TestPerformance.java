@@ -1303,7 +1303,7 @@ public class TestPerformance extends BaseTest {
                         Object parseResult;
 
 						try {
-							if (COMPUTE_CHECKSUM) {
+							if (COMPUTE_CHECKSUM && !BUILD_PARSE_TREES) {
 								parser.addParseListener(new ChecksumParseTreeListener(checksum));
 							}
 
@@ -1357,7 +1357,7 @@ public class TestPerformance extends BaseTest {
 							parser.addErrorListener(new SummarizingDiagnosticErrorListener());
 							parser.getInterpreter().setPredictionMode(PredictionMode.LL);
 							parser.setBuildParseTree(BUILD_PARSE_TREES);
-							if (COMPUTE_CHECKSUM) {
+							if (COMPUTE_CHECKSUM && !BUILD_PARSE_TREES) {
 								parser.addParseListener(new ChecksumParseTreeListener(checksum));
 							}
 							if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
@@ -1371,6 +1371,9 @@ public class TestPerformance extends BaseTest {
 						}
 
 						assertThat(parseResult, instanceOf(ParseTree.class));
+						if (COMPUTE_CHECKSUM && BUILD_PARSE_TREES) {
+							ParseTreeWalker.DEFAULT.walk(new ChecksumParseTreeListener(checksum), (ParseTree)parseResult);
+						}
                         if (BUILD_PARSE_TREES && BLANK_LISTENER) {
                             ParseTreeWalker.DEFAULT.walk(listener, (ParseTree)parseResult);
                         }
