@@ -1276,6 +1276,7 @@ public class TestPerformance extends BaseTest {
 							sharedParsers[thread] = parser;
                         }
 
+						parser.removeParseListeners();
 						parser.removeErrorListeners();
 						if (!TWO_STAGE_PARSING) {
 							parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
@@ -1301,12 +1302,9 @@ public class TestPerformance extends BaseTest {
                         Method parseMethod = parserClass.getMethod(entryPoint);
                         Object parseResult;
 
-						ParseTreeListener checksumParserListener = null;
-
 						try {
 							if (COMPUTE_CHECKSUM) {
-								checksumParserListener = new ChecksumParseTreeListener(checksum);
-								parser.addParseListener(checksumParserListener);
+								parser.addParseListener(new ChecksumParseTreeListener(checksum));
 							}
 
 							if (USE_PARSER_INTERPRETER) {
@@ -1353,11 +1351,15 @@ public class TestPerformance extends BaseTest {
 								sharedParsers[thread] = parser;
 							}
 
+							parser.removeParseListeners();
 							parser.removeErrorListeners();
 							parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
 							parser.addErrorListener(new SummarizingDiagnosticErrorListener());
 							parser.getInterpreter().setPredictionMode(PredictionMode.LL);
 							parser.setBuildParseTree(BUILD_PARSE_TREES);
+							if (COMPUTE_CHECKSUM) {
+								parser.addParseListener(new ChecksumParseTreeListener(checksum));
+							}
 							if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
 								parser.addParseListener(listener);
 							}
@@ -1366,11 +1368,6 @@ public class TestPerformance extends BaseTest {
 							}
 
 							parseResult = parseMethod.invoke(parser);
-						}
-						finally {
-							if (checksumParserListener != null) {
-								parser.removeParseListener(checksumParserListener);
-							}
 						}
 
 						assertThat(parseResult, instanceOf(ParseTree.class));
