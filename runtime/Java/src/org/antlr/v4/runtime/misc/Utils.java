@@ -38,7 +38,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 public class Utils {
     // Seriously: why isn't this built in to java? ugh!
@@ -132,5 +134,16 @@ public class Utils {
 		});
 
 		t.join();
+	}
+
+	/** Convert array of strings to string->index map. Useful for
+	 *  converting rulenames to name->ruleindex map.
+	 */
+	public static Map<String, Integer> toMap(String[] keys) {
+		Map<String, Integer> m = new HashMap<String, Integer>();
+		for (int i=0; i<keys.length; i++) {
+			m.put(keys[i], i);
+		}
+		return m;
 	}
 }
