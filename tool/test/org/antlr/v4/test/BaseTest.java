@@ -543,11 +543,11 @@ public abstract class BaseTest {
 	}
 
 	public Class<? extends Lexer> loadLexerClassFromTempDir(String name) throws Exception {
-		return (Class<? extends Lexer>)loadClassFromTempDir(name);
+		return loadClassFromTempDir(name).asSubclass(Lexer.class);
 	}
 
 	public Class<? extends Parser> loadParserClassFromTempDir(String name) throws Exception {
-		return (Class<? extends Parser>)loadClassFromTempDir(name);
+		return loadClassFromTempDir(name).asSubclass(Parser.class);
 	}
 
 	protected String execParser(String grammarFileName,
