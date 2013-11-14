@@ -310,10 +310,9 @@ public class TestUnbufferedCharStream extends BaseTest {
         // Tokens: 012345678901234567
         // Input:  x = 3 * 0 + 2 * 0;
 		TestingUnbufferedCharStream input = createStream("x = 302 * 91 + 20234234 * 0;");
-        LexerInterpreter lexEngine = new LexerInterpreter(g);
+        LexerInterpreter lexEngine = g.createLexerInterpreter(input);
 		// copy text into tokens from char stream
 		lexEngine.setTokenFactory(new CommonTokenFactory(true));
-        lexEngine.setInput(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
         String result = tokens.LT(1).getText();
         String expecting = "x";

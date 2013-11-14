@@ -29,6 +29,7 @@
  */
 package org.antlr.v4.test;
 
+import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.misc.Interval;
@@ -50,7 +51,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "A : 'a';\n" +
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
-		LexerInterpreter lexEngine = new LexerInterpreter(g, "abc");
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream("abc"));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -67,7 +68,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -84,7 +85,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -102,7 +103,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -119,7 +120,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -136,7 +137,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -158,7 +159,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 		// Tokens: 0123456789
 		// Input:  x = 3 * 0;
 		String input = "x = 3 * 0;";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -196,7 +197,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 		// Tokens: 012345678901234567
 		// Input:  x = 3 * 0 + 2 * 0;
 		String input = "x = 3 * 0 + 2 * 0;";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -248,7 +249,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -266,7 +267,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -285,7 +286,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -303,7 +304,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -328,7 +329,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -348,7 +349,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -366,7 +367,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -385,7 +386,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -403,7 +404,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -421,7 +422,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -439,7 +440,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abcccba";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -457,7 +458,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abcccba";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -483,7 +484,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abcccba";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -501,7 +502,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abcccba";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -518,7 +519,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abcccba";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -535,7 +536,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abcccba";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -562,7 +563,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abcccba";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -589,7 +590,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abcba";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -607,7 +608,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -625,7 +626,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -644,7 +645,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -664,7 +665,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -686,7 +687,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -705,7 +706,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abcc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -725,7 +726,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abcc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -752,7 +753,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abcc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -772,7 +773,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abcc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -792,7 +793,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abcc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -812,7 +813,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -832,7 +833,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abcc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -850,7 +851,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abcc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
@@ -868,7 +869,7 @@ public class TestTokenStreamRewriter extends BaseTest {
 											 "B : 'b';\n" +
 											 "C : 'c';\n");
 		String input = "abc";
-		LexerInterpreter lexEngine = new LexerInterpreter(g, input);
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream stream = new CommonTokenStream(lexEngine);
 		stream.fill();
 		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
