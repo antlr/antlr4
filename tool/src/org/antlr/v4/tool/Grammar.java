@@ -30,13 +30,6 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.TokenStream;
-import org.antlr.runtime.tree.Tree;
-import org.antlr.runtime.tree.TreeVisitor;
-import org.antlr.runtime.tree.TreeVisitorAction;
-import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.v4.Tool;
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.misc.CharSupport;
@@ -131,7 +124,7 @@ public class Grammar implements AttributeResolver {
     public GrammarRootAST ast;
 	/** Track stream used to create this grammar */
 	@NotNull
-	public final TokenStream tokenStream;
+	public final org.antlr.runtime.TokenStream tokenStream;
     public String text; // testing only
     public String fileName;
 
@@ -233,44 +226,44 @@ public class Grammar implements AttributeResolver {
     }
 
 	/** For testing */
-	public Grammar(String grammarText) throws RecognitionException {
+	public Grammar(String grammarText) throws org.antlr.runtime.RecognitionException {
 		this(GRAMMAR_FROM_STRING_NAME, grammarText, null);
 	}
 
-	public Grammar(String grammarText, LexerGrammar tokenVocabSource) throws RecognitionException {
+	public Grammar(String grammarText, LexerGrammar tokenVocabSource) throws org.antlr.runtime.RecognitionException {
 		this(GRAMMAR_FROM_STRING_NAME, grammarText, tokenVocabSource, null);
 	}
 
 	/** For testing */
 	public Grammar(String grammarText, ANTLRToolListener listener)
-		throws RecognitionException
+		throws org.antlr.runtime.RecognitionException
 	{
 		this(GRAMMAR_FROM_STRING_NAME, grammarText, listener);
 	}
 
 	/** For testing; builds trees, does sem anal */
 	public Grammar(String fileName, String grammarText)
-		throws RecognitionException
+		throws org.antlr.runtime.RecognitionException
 	{
 		this(fileName, grammarText, null);
 	}
 
 	/** For testing; builds trees, does sem anal */
 	public Grammar(String fileName, String grammarText, @Nullable ANTLRToolListener listener)
-		throws RecognitionException
+		throws org.antlr.runtime.RecognitionException
 	{
 		this(fileName, grammarText, null, listener);
 	}
 
 	/** For testing; builds trees, does sem anal */
 	public Grammar(String fileName, String grammarText, Grammar tokenVocabSource, @Nullable ANTLRToolListener listener)
-		throws RecognitionException
+		throws org.antlr.runtime.RecognitionException
 	{
         this.text = grammarText;
 		this.fileName = fileName;
 		this.tool = new Tool();
 		this.tool.addListener(listener);
-		ANTLRStringStream in = new ANTLRStringStream(grammarText);
+		org.antlr.runtime.ANTLRStringStream in = new org.antlr.runtime.ANTLRStringStream(grammarText);
 		in.name = fileName;
 
 		this.ast = tool.load(fileName, in);
@@ -286,8 +279,8 @@ public class Grammar implements AttributeResolver {
 
 		// ensure each node has pointer to surrounding grammar
 		final Grammar thiz = this;
-		TreeVisitor v = new TreeVisitor(new GrammarASTAdaptor());
-		v.visit(ast, new TreeVisitorAction() {
+		org.antlr.runtime.tree.TreeVisitor v = new org.antlr.runtime.tree.TreeVisitor(new GrammarASTAdaptor());
+		v.visit(ast, new org.antlr.runtime.tree.TreeVisitorAction() {
 			@Override
 			public Object pre(Object t) { ((GrammarAST)t).g = thiz; return t; }
 			@Override
@@ -749,7 +742,7 @@ public class Grammar implements AttributeResolver {
         return 0;
     }
 
-	public TokenStream getTokenStream() {
+	public org.antlr.runtime.TokenStream getTokenStream() {
 		if ( ast!=null ) return ast.tokenStream;
 		return null;
 	}
@@ -814,7 +807,7 @@ public class Grammar implements AttributeResolver {
 			// TODO: allow doc comment in there
 		};
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor(ast.token.getInputStream());
-		TreeWizard wiz = new TreeWizard(adaptor,ANTLRParser.tokenNames);
+		org.antlr.runtime.tree.TreeWizard wiz = new org.antlr.runtime.tree.TreeWizard(adaptor,ANTLRParser.tokenNames);
 		List<Pair<GrammarAST,GrammarAST>> lexerRuleToStringLiteral =
 			new ArrayList<Pair<GrammarAST,GrammarAST>>();
 
@@ -824,7 +817,7 @@ public class Grammar implements AttributeResolver {
 		for (GrammarAST r : ruleNodes) {
 			//tool.log("grammar", r.toStringTree());
 //			System.out.println("chk: "+r.toStringTree());
-			Tree name = r.getChild(0);
+			org.antlr.runtime.tree.Tree name = r.getChild(0);
 			if ( name.getType()==ANTLRParser.TOKEN_REF ) {
 				// check rule against patterns
 				boolean isLitRule;
@@ -840,7 +833,7 @@ public class Grammar implements AttributeResolver {
 	}
 
 	protected static boolean defAlias(GrammarAST r, String pattern,
-									  TreeWizard wiz,
+									  org.antlr.runtime.tree.TreeWizard wiz,
 									  List<Pair<GrammarAST,GrammarAST>> lexerRuleToStringLiteral)
 	{
 		HashMap<String, Object> nodes = new HashMap<String, Object>();
@@ -866,7 +859,6 @@ public class Grammar implements AttributeResolver {
 		collector.visitGrammar(ast);
 		return strings;
 	}
-
 
 	public void setLookaheadDFA(int decision, DFA lookaheadDFA) {
 		decisionDFAs.put(decision, lookaheadDFA);
