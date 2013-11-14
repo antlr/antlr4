@@ -52,12 +52,59 @@ public abstract class ATNSimulator {
 		SERIALIZED_VERSION = 3;
 	}
 
+	/**
+	 * This is the earliest supported serialized UUID.
+	 */
+	private static final UUID BASE_SERIALIZED_UUID;
+	/**
+	 * This UUID indicates an extension of {@link BASE_SERIALIZED_UUID} for the
+	 * addition of precedence predicates.
+	 */
+	private static final UUID ADDED_PRECEDENCE_TRANSITIONS;
+	/**
+	 * This list contains all of the currently supported UUIDs, ordered by when
+	 * the feature first appeared in this branch.
+	 */
+	private static final List<UUID> SUPPORTED_UUIDS;
+
+	/**
+	 * This is the current serialized UUID.
+	 */
 	public static final UUID SERIALIZED_UUID;
 	static {
 		/* WARNING: DO NOT MERGE THIS LINE. If UUIDs differ during a merge,
 		 * resolve the conflict by generating a new ID!
 		 */
-		SERIALIZED_UUID = UUID.fromString("33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3");
+		BASE_SERIALIZED_UUID = UUID.fromString("33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3");
+		ADDED_PRECEDENCE_TRANSITIONS = UUID.fromString("1DA0C57D-6C06-438A-9B27-10BCB3CE0F61");
+
+		SUPPORTED_UUIDS = new ArrayList<UUID>();
+		SUPPORTED_UUIDS.add(BASE_SERIALIZED_UUID);
+		SUPPORTED_UUIDS.add(ADDED_PRECEDENCE_TRANSITIONS);
+
+		SERIALIZED_UUID = ADDED_PRECEDENCE_TRANSITIONS;
+	}
+
+	/**
+	 * Determines if a particular serialized representation of an ATN supports
+	 * a particular feature, identified by the {@link UUID} used for serializing
+	 * the ATN at the time the feature was first introduced.
+	 *
+	 * @param feature The {@link UUID} marking the first time the feature was
+	 * supported in the serialized ATN.
+	 * @param actualUuid The {@link UUID} of the actual serialized ATN which is
+	 * currently being deserialized.
+	 * @return {@code true} if the {@code actualUuid} value represents a
+	 * serialized ATN at or after the feature identified by {@code feature} was
+	 * introduced; otherwise, {@code false}.
+	 */
+	private static boolean isFeatureSupported(UUID feature, UUID actualUuid) {
+		int featureIndex = SUPPORTED_UUIDS.indexOf(feature);
+		if (featureIndex < 0) {
+			return false;
+		}
+
+		return SUPPORTED_UUIDS.indexOf(actualUuid) >= featureIndex;
 	}
 
 	/** Must distinguish between missing edge and edge we know leads nowhere */
@@ -134,10 +181,13 @@ public abstract class ATNSimulator {
 
 		UUID uuid = toUUID(data, p);
 		p += 8;
-		if (!uuid.equals(SERIALIZED_UUID)) {
-			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with UUID %s (expected %s).", uuid, SERIALIZED_UUID);
+		if (!uuid.equals(SERIALIZED_UUID)
+			&& !uuid.equals(BASE_SERIALIZED_UUID)) {
+			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with UUID %s (expected %s or a legacy UUID).", uuid, SERIALIZED_UUID);
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
 		}
+
+		boolean supportsPrecedencePredicates = isFeatureSupported(ADDED_PRECEDENCE_TRANSITIONS, uuid);
 
 		ATNType grammarType = ATNType.values()[toInt(data[p++])];
 		int maxTokenType = toInt(data[p++]);
@@ -187,6 +237,14 @@ public abstract class ATNSimulator {
 		for (int i = 0; i < numNonGreedyStates; i++) {
 			int stateNumber = toInt(data[p++]);
 			((DecisionState)atn.states.get(stateNumber)).nonGreedy = true;
+		}
+
+		if (supportsPrecedencePredicates) {
+			int numPrecedenceStates = toInt(data[p++]);
+			for (int i = 0; i < numPrecedenceStates; i++) {
+				int stateNumber = toInt(data[p++]);
+				((RuleStartState)atn.states.get(stateNumber)).isPrecedenceRule = true;
+			}
 		}
 
 		//
@@ -452,11 +510,13 @@ public abstract class ATNSimulator {
 					return new RangeTransition(target, arg1, arg2);
 				}
 			case Transition.RULE :
-				RuleTransition rt = new RuleTransition((RuleStartState)atn.states.get(arg1), arg2, target);
+				RuleTransition rt = new RuleTransition((RuleStartState)atn.states.get(arg1), arg2, arg3, target);
 				return rt;
 			case Transition.PREDICATE :
 				PredicateTransition pt = new PredicateTransition(target, arg1, arg2, arg3 != 0);
 				return pt;
+			case Transition.PRECEDENCE:
+				return new PrecedencePredicateTransition(target, arg1);
 			case Transition.ATOM :
 				if (arg3 != 0) {
 					return new AtomTransition(target, Token.EOF);

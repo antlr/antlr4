@@ -234,7 +234,7 @@ public class LL1Analyzer {
 					calledRuleStack.clear(((RuleTransition)t).target.ruleIndex);
 				}
 			}
-			else if ( t instanceof PredicateTransition ) {
+			else if ( t instanceof AbstractPredicateTransition ) {
 				if ( seeThruPreds ) {
 					_LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
 				}

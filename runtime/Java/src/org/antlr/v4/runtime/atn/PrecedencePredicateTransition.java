@@ -30,12 +30,42 @@
 
 package org.antlr.v4.runtime.atn;
 
-public final class RuleStartState extends ATNState {
-	public RuleStopState stopState;
-	public boolean isPrecedenceRule;
+import org.antlr.v4.runtime.misc.NotNull;
+
+/**
+ *
+ * @author Sam Harwell
+ */
+public final class PrecedencePredicateTransition extends AbstractPredicateTransition {
+	public final int precedence;
+
+	public PrecedencePredicateTransition(@NotNull ATNState target, int precedence) {
+		super(target);
+		this.precedence = precedence;
+	}
 
 	@Override
-	public int getStateType() {
-		return RULE_START;
+	public int getSerializationType() {
+		return PRECEDENCE;
 	}
+
+	@Override
+	public boolean isEpsilon() {
+		return true;
+	}
+
+	@Override
+	public boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
+		return false;
+	}
+
+	public SemanticContext.PrecedencePredicate getPredicate() {
+		return new SemanticContext.PrecedencePredicate(precedence);
+	}
+
+	@Override
+	public String toString() {
+		return precedence + " >= _p";
+	}
+
 }

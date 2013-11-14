@@ -61,8 +61,7 @@ public class TestBufferedTokenStream extends BaseTest {
         // Tokens: 012345678901234567
         // Input:  x = 3 * 0 + 2 * 0;
         CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
-        LexerInterpreter lexEngine = new LexerInterpreter(g);
-			lexEngine.setInput(input);
+        LexerInterpreter lexEngine = g.createLexerInterpreter(input);
         TokenStream tokens = createTokenStream(lexEngine);
 
         String result = tokens.LT(1).getText();
@@ -83,8 +82,7 @@ public class TestBufferedTokenStream extends BaseTest {
         // Tokens: 012345678901234567
         // Input:  x = 3 * 0 + 2 * 0;
         CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
-        LexerInterpreter lexEngine = new LexerInterpreter(g);
-		lexEngine.setInput(input);
+        LexerInterpreter lexEngine = g.createLexerInterpreter(input);
         TokenStream tokens = createTokenStream(lexEngine);
 
         String result = tokens.LT(2).getText();
@@ -105,8 +103,7 @@ public class TestBufferedTokenStream extends BaseTest {
         // Tokens: 012345678901234567
         // Input:  x = 3 * 0 + 2 * 0;
         CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
-        LexerInterpreter lexEngine = new LexerInterpreter(g);
-		lexEngine.setInput(input);
+        LexerInterpreter lexEngine = g.createLexerInterpreter(input);
         TokenStream tokens = createTokenStream(lexEngine);
 
         int i = 1;
@@ -136,8 +133,7 @@ public class TestBufferedTokenStream extends BaseTest {
         // Tokens: 012345678901234567
         // Input:  x = 3 * 0 + 2 * 0;
         CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
-        LexerInterpreter lexEngine = new LexerInterpreter(g);
-		lexEngine.setInput(input);
+        LexerInterpreter lexEngine = g.createLexerInterpreter(input);
         TokenStream tokens = createTokenStream(lexEngine);
 
         Token t = tokens.LT(1);
@@ -164,8 +160,7 @@ public class TestBufferedTokenStream extends BaseTest {
         // Tokens: 012345678901234567
         // Input:  x = 3 * 0 + 2 * 0;
         CharStream input = new ANTLRInputStream("x = 3 * 0 + 2 * 0;");
-        LexerInterpreter lexEngine = new LexerInterpreter(g);
-		lexEngine.setInput(input);
+        LexerInterpreter lexEngine = g.createLexerInterpreter(input);
         TokenStream tokens = createTokenStream(lexEngine);
 
         tokens.consume(); // get x into buffer

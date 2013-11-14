@@ -63,6 +63,7 @@ public abstract class Transition {
 	public static final int SET				= 7; // ~(A|B) or ~atom, wildcard, which convert to next 2
 	public static final int NOT_SET			= 8;
 	public static final int WILDCARD		= 9;
+	public static final int PRECEDENCE		= 10;
 
 
 	public static final List<String> serializationNames =
@@ -76,7 +77,8 @@ public abstract class Transition {
 			"ACTION",
 			"SET",
 			"NOT_SET",
-			"WILDCARD"
+			"WILDCARD",
+			"PRECEDENCE"
 		));
 
 	public static final Map<Class<? extends Transition>, Integer> serializationTypes =
@@ -90,6 +92,7 @@ public abstract class Transition {
 			put(SetTransition.class, SET);
 			put(NotSetTransition.class, NOT_SET);
 			put(WildcardTransition.class, WILDCARD);
+			put(PrecedencePredicateTransition.class, PRECEDENCE);
 		}});
 
 	/** The target of this transition. */

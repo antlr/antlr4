@@ -58,6 +58,7 @@ import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRMessage;
@@ -484,6 +485,56 @@ public abstract class BaseTest {
 			System.err.println(stderrDuringParse);
 		}
 		return output;
+	}
+
+/*
+	public ParseTree execParser(String startRuleName, String input,
+								String parserName, String lexerName)
+		throws Exception
+	{
+		Pair<Parser, Lexer> pl = getParserAndLexer(input, parserName, lexerName);
+		Parser parser = pl.a;
+		return execStartRule(startRuleName, parser);
+	}
+	 */
+
+	public ParseTree execStartRule(String startRuleName, Parser parser)
+		throws IllegalAccessException, InvocationTargetException,
+			   NoSuchMethodException
+	{
+		Method startRule = null;
+		Object[] args = null;
+		try {
+			startRule = parser.getClass().getMethod(startRuleName);
+		}
+		catch (NoSuchMethodException nsme) {
+			// try with int _p arg for recursive func
+			startRule = parser.getClass().getMethod(startRuleName, int.class);
+			args = new Integer[] {0};
+		}
+		ParseTree result = (ParseTree)startRule.invoke(parser, args);
+//		System.out.println("parse tree = "+result.toStringTree(parser));
+		return result;
+	}
+
+	public Pair<Parser, Lexer> getParserAndLexer(String input,
+												 String parserName, String lexerName)
+		throws Exception
+	{
+		final Class<? extends Lexer> lexerClass = loadLexerClassFromTempDir(lexerName);
+		final Class<? extends Parser> parserClass = loadParserClassFromTempDir(parserName);
+
+		ANTLRInputStream in = new ANTLRInputStream(new StringReader(input));
+
+		Class<? extends Lexer> c = lexerClass.asSubclass(Lexer.class);
+		Constructor<? extends Lexer> ctor = c.getConstructor(CharStream.class);
+		Lexer lexer = ctor.newInstance(in);
+
+		Class<? extends Parser> pc = parserClass.asSubclass(Parser.class);
+		Constructor<? extends Parser> pctor = pc.getConstructor(TokenStream.class);
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		Parser parser = pctor.newInstance(tokens);
+		return new Pair<Parser, Lexer>(parser, lexer);
 	}
 
 	protected String execParser(String grammarFileName,

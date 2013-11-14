@@ -19,6 +19,18 @@
         <property name="antlr3.touch" value="${build.dir}/antlr3-${antlr3.version}.touch"/>
     </target>
 
+    <target name="antlr4-init" depends="basic-init">
+        <property name="antlr4.version" value="4.1"/>
+        <property name="antlr4.jar.name" value="antlr-${antlr4.version}-complete.jar"/>
+        <property name="antlr4.jar" value="${lib.dir}/${antlr4.jar.name}"/>
+        <mkdir dir="${lib.dir}"/>
+        <get src="http://antlr.org/download/${antlr4.jar.name}" dest="${antlr4.jar}" skipexisting="true"/>
+        <path id="cp.antlr4" path="${antlr4.jar}"/>
+
+        <property name="build.antlr4.dir" value="${build.dir}/generated-sources/antlr4" />
+        <property name="antlr4.touch" value="${build.dir}/antlr4-${antlr4.version}.touch"/>
+    </target>
+
     <target name="build-init" depends="basic-init">
         <property name="version" value="4.1.1-dev"/>
         <property name="build.sysclasspath" value="ignore"/>
@@ -45,7 +57,17 @@
         </uptodate>
     </target>
 
-    <target name="up-to-date" depends="antlr3-up-to-date,build-init">
+    <target name="antlr4-up-to-date" depends="basic-init,antlr4-init">
+        <uptodate targetfile="${antlr4.touch}" property="is.antlr4.uptodate">
+            <srcfiles dir="${basedir}/tool/src">
+                <include name="**/*.g4"/>
+                <include name="**/*.tokens"/>
+            </srcfiles>
+            <srcfiles file="${antlr4.jar}"/>
+        </uptodate>
+    </target>
+
+    <target name="up-to-date" depends="antlr3-up-to-date,antlr4-up-to-date,build-init">
         <uptodate targetfile="${jar.file}" property="is.source.uptodate">
             <srcfiles dir="${basedir}/tool/src">
                 <include name="**/*.java"/>
@@ -102,6 +124,33 @@
         </sequential>
     </macrodef>
 
+    <macrodef name="antlr4">
+        <attribute name="srcpath"/>
+        <element name="args" optional="true"/>
+        <sequential>
+            <local name="path.antlr4.local"/>
+            <local name="sources.antlr4.local"/>
+            <path id="path.antlr4.local">
+                <fileset dir="${basedir}/runtime/Java/src/@{srcpath}" includes="*.g4"/>
+            </path>
+            <pathconvert pathsep=" " property="sources.antlr4.local" refid="path.antlr4.local">
+                <map from="${basedir}/runtime/Java/src/@{srcpath}/" to=""/>
+            </pathconvert>
+            <mkdir dir="${build.antlr4.dir}/@{srcpath}"/>
+            <java classname="org.antlr.v4.Tool" fork="true" failonerror="true" maxmemory="300m"
+                  dir="${basedir}/runtime/Java/src/@{srcpath}">
+                <arg value="-o"/>
+                <arg value="${build.antlr4.dir}/@{srcpath}"/>
+                <args/>
+                <arg line="${sources.antlr4.local}"/>
+                <classpath>
+                    <path refid="cp.antlr4"/>
+                    <pathelement location="${java.class.path}"/>
+                </classpath>
+            </java>
+        </sequential>
+    </macrodef>
+
 	<target name="antlr3" depends="build-init,antlr3-init,antlr3-up-to-date" unless="is.antlr3.uptodate">
         <mkdir dir="${build.antlr3.dir}" />
 
@@ -125,7 +174,28 @@
         <touch file="${antlr3.touch}" mkdirs="true"/>
 	</target>
 
-    <target name="compile" depends="build-init,antlr3,up-to-date" description="Compile for generic OS" unless="is.jar.uptodate">
+    <target name="antlr4" depends="build-init,antlr4-init,antlr4-up-to-date" unless="is.antlr4.uptodate">
+           <mkdir dir="${build.antlr4.dir}" />
+
+           <path id="sources.antlr4">
+               <fileset dir="${basedir}/runtime/Java/src" includes="**/*.g4"/>
+           </path>
+           <pathconvert pathsep="${line.separator}  " property="echo.sources.antlr4" refid="sources.antlr4">
+               <map from="${basedir}/runtime/Java/src/" to=""/>
+           </pathconvert>
+           <echo message="Generating ANTLR 4 grammars:${line.separator}  ${echo.sources.antlr4}"/>
+
+           <antlr4 srcpath="org/antlr/v4/runtime/tree/xpath">
+                <args>
+                    <arg value="-package"/>
+                    <arg value="org.antlr.v4.runtime.tree.xpath"/>
+                </args>
+           </antlr4>
+
+           <touch file="${antlr4.touch}" mkdirs="true"/>
+   	</target>
+
+    <target name="compile" depends="build-init,antlr3,antlr4,up-to-date" description="Compile for generic OS" unless="is.jar.uptodate">
         <mkdir dir="${build.dir}/classes"/>
         <javac
                 destdir="${build.dir}/classes"
@@ -139,7 +209,7 @@
                 <path refid="cp.antlr3"/>
                 <pathelement location="${basedir}/runtime/Java/lib/org.abego.treelayout.core.jar"/>
             </classpath>
-            <src path="${basedir}/tool/src:${basedir}/runtime/Java/src:${build.antlr3.dir}"/>
+            <src path="${basedir}/tool/src:${basedir}/runtime/Java/src:${build.antlr3.dir}:${build.antlr4.dir}"/>
         </javac>
     </target>
 

@@ -204,7 +204,7 @@ alternative
     ;
 
 atom
-	:	^(RULE_REF ARG_ACTION?)
+	:	^(RULE_REF ARG_ACTION? elementOptions?)
     |  ^(STRING_LITERAL elementOptions)
 	|	STRING_LITERAL
     |	^(TOKEN_REF elementOptions)

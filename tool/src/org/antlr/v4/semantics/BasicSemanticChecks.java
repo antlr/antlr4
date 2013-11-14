@@ -501,6 +501,20 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		return false;
 	}
 
+	boolean checkRuleRefOptions(TerminalAST elem, GrammarAST ID, GrammarAST valueAST) {
+		Token optionID = ID.token;
+		String fileName = optionID.getInputStream().getSourceName();
+		// don't care about id<SimpleValue> options
+		if ( valueAST!=null && !Grammar.ruleRefOptions.contains(optionID.getText()) ) {
+			g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
+									   fileName,
+									   optionID,
+									   optionID.getText());
+			return false;
+		}
+		// TODO: extra checks depending on rule kind?
+		return true;
+	}
 
 	boolean checkTokenOptions(TerminalAST elem, GrammarAST ID, GrammarAST valueAST) {
 		Token optionID = ID.token;

@@ -939,7 +939,7 @@ ruleref
 @after {
 	exitRuleref($start);
 }
-    :	^(RULE_REF arg=ARG_ACTION?)
+    :	^(RULE_REF arg=ARG_ACTION? elementOptions?)
     	{
     	ruleRef($RULE_REF, (ActionAST)$ARG_ACTION);
     	if ( $arg!=null ) actionInAlt((ActionAST)$arg);

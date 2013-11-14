@@ -140,6 +140,10 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 		return true;
 	}
 
+	public boolean precpred(@Nullable RuleContext localctx, int precedence) {
+		return true;
+	}
+
 	public void action(@Nullable RuleContext _localctx, int ruleIndex, int actionIndex) {
 	}
 

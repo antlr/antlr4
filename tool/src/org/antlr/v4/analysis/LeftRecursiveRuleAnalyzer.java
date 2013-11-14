@@ -36,6 +36,7 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.LeftRecursiveRuleWalker;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -221,8 +222,6 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 	public String getArtificialOpPrecRule() {
 		ST ruleST = recRuleTemplates.getInstanceOf("recRule");
 		ruleST.add("ruleName", ruleName);
-		ST argDefST = codegenTemplates.getInstanceOf("recRuleDefArg");
-		ruleST.add("precArgDef", argDefST);
 		ST ruleArgST = codegenTemplates.getInstanceOf("recRuleArg");
 		ruleST.add("argName", ruleArgST);
 		ST setResultST = codegenTemplates.getInstanceOf("recRuleSetResultAction");
@@ -241,6 +240,8 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 			predST.add("ruleName", ruleName);
 			altST.add("pred", predST);
 			altST.add("alt", altInfo);
+			altST.add("precOption", LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME);
+			altST.add("opPrec", precedence(alt));
 			ruleST.add("opAlts", altST);
 		}
 
@@ -260,7 +261,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 			boolean recursive = rref.getText().equals(ruleName);
 			boolean rightmost = rref == outerAltRuleRefs.get(outerAltRuleRefs.size()-1);
 			if ( recursive && rightmost ) {
-				rref.setText(ruleName+"["+prec+"]");
+				rref.setText(ruleName+"<"+LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME+"="+prec+">");
 			}
 		}
 		return t;

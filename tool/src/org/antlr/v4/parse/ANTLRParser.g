@@ -852,7 +852,13 @@ if ( options!=null ) {
 // directive to become the root node or ignore the tree produced
 //
 ruleref
-    :	RULE_REF ARG_ACTION? -> ^(RULE_REF<RuleRefAST> ARG_ACTION<ActionAST>?)
+@after {
+GrammarAST options = (GrammarAST)$tree.getFirstChildWithType(ANTLRParser.ELEMENT_OPTIONS);
+if ( options!=null ) {
+	Grammar.setNodeOptions($tree, options);
+}
+}
+    :	RULE_REF ARG_ACTION? elementOptions? -> ^(RULE_REF<RuleRefAST> ARG_ACTION<ActionAST>? elementOptions?)
     ;
     catch [RecognitionException re] { throw re; } // pass upwards to element
 

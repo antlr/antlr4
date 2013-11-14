@@ -37,9 +37,7 @@ import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
@@ -47,10 +45,9 @@ import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.interp.ParserInterpreter;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
@@ -488,7 +485,7 @@ public class TestATNParserPrediction extends BaseTest {
 		// Check ATN prediction
 //		ParserATNSimulator interp = new ParserATNSimulator(atn);
 		TokenStream input = new IntTokenStream(types);
-		ParserInterpreter interp = new ParserInterpreter(g, input);
+		ParserInterpreterForTesting interp = new ParserInterpreterForTesting(g, input);
 		int alt = interp.adaptivePredict(input, decision, ParserRuleContext.EMPTY);
 
 		assertEquals(expectedAlt, alt);
@@ -515,7 +512,7 @@ public class TestATNParserPrediction extends BaseTest {
 		g.importVocab(lg);
 		semanticProcess(g);
 
-		ParserInterpreter interp = new ParserInterpreter(g, null);
+		ParserInterpreterForTesting interp = new ParserInterpreterForTesting(g, null);
 		for (int i=0; i<inputString.length; i++) {
 			// Check DFA
 			IntegerList types = getTokenTypesViaATN(inputString[i], lexInterp);
