@@ -163,6 +163,7 @@ public class ParserInterpreter extends Parser {
 			case ATNState.RULE_STOP :
 				// pop; return from rule
 				if ( _ctx.isEmpty() ) {
+					exitRule();
 					return rootContext;
 				}
 
