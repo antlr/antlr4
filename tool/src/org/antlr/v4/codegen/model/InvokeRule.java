@@ -83,8 +83,9 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 				rf.addContextDecl(ast.getAltLabel(), d);
 			}
 		}
-		if ( ast.getChildCount()>0 ) {
-			ActionAST arg = (ActionAST)ast.getChild(0);
+
+		ActionAST arg = (ActionAST)ast.getFirstChildWithType(ANTLRParser.ARG_ACTION);
+		if ( arg != null ) {
 			argExprsChunks = ActionTranslator.translateAction(factory, rf, arg.token, arg);
 		}
 

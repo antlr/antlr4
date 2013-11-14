@@ -182,7 +182,9 @@ atom returns [ATNFactory.Handle p]
     ;
 
 ruleref returns [ATNFactory.Handle p]
-    :	^(RULE_REF ARG_ACTION?)			{$p = factory.ruleRef($RULE_REF);}
+    :	^(RULE_REF ARG_ACTION? ^(ELEMENT_OPTIONS .*))		{$p = factory.ruleRef($RULE_REF);}
+    |	^(RULE_REF ARG_ACTION?)								{$p = factory.ruleRef($RULE_REF);}
+    |	RULE_REF											{$p = factory.ruleRef($RULE_REF);}
     ;
 
 range returns [ATNFactory.Handle p]

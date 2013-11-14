@@ -30,6 +30,7 @@
 
 package org.antlr.v4.semantics;
 
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.Alternative;
@@ -263,7 +264,7 @@ public class SymbolChecks {
 		for (GrammarAST ref : rulerefs) {
 			String ruleName = ref.getText();
 			Rule r = g.getRule(ruleName);
-			GrammarAST arg = (GrammarAST)ref.getChild(0);
+			GrammarAST arg = (GrammarAST)ref.getFirstChildWithType(ANTLRParser.ARG_ACTION);
 			if ( arg!=null && (r==null || r.args==null) ) {
 				errMgr.grammarError(ErrorType.RULE_HAS_NO_ARGS,
 										  g.fileName, ref.token, ruleName);

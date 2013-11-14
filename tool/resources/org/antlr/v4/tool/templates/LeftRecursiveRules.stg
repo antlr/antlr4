@@ -29,16 +29,16 @@
  */
 
 /** How to generate rules derived from left-recursive rules.
- *  These rely on recRuleDefArg(), recRuleAltPredicate(),
+ *  These rely on recRuleAltPredicate(),
  *  recRuleArg(), recRuleSetResultAction(), recRuleSetReturnAction()
  *  templates in main language.stg
  */
 group LeftRecursiveRules;
 
-recRule(ruleName, precArgDef, argName, primaryAlts, opAlts, setResultAction,
+recRule(ruleName, argName, primaryAlts, opAlts, setResultAction,
         userRetvals, leftRecursiveRuleRefLabels) ::=
 <<
-<ruleName>[<precArgDef>]<if(userRetvals)> returns [<userRetvals>]<endif>
+<ruleName><if(userRetvals)> returns [<userRetvals>]<endif>
     :   ( {} <primaryAlts:{alt | <alt.altText> }; separator="\n        | ">
         )
         (
@@ -47,6 +47,6 @@ recRule(ruleName, precArgDef, argName, primaryAlts, opAlts, setResultAction,
     ;
 >>
 
-recRuleAlt(alt, pred) ::= <<
-{<pred>}? <alt.altText>
+recRuleAlt(alt, precOption, opPrec, pred) ::= <<
+{<pred>}?\<<precOption>=<opPrec>\> <alt.altText>
 >>

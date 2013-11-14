@@ -37,16 +37,32 @@ public final class RuleTransition extends Transition {
 	/** Ptr to the rule definition object for this rule ref */
 	public final int ruleIndex;     // no Rule object at runtime
 
+	public final int precedence;
+
 	/** What node to begin computations following ref to rule */
 	@NotNull
 	public ATNState followState;
 
+	/**
+	 * @deprecated Use
+	 * {@link #RuleTransition(RuleStartState, int, int, ATNState)} instead.
+	 */
+	@Deprecated
 	public RuleTransition(@NotNull RuleStartState ruleStart,
 						  int ruleIndex,
 						  @NotNull ATNState followState)
 	{
+		this(ruleStart, ruleIndex, 0, followState);
+	}
+
+	public RuleTransition(@NotNull RuleStartState ruleStart,
+						  int ruleIndex,
+						  int precedence,
+						  @NotNull ATNState followState)
+	{
 		super(ruleStart);
 		this.ruleIndex = ruleIndex;
+		this.precedence = precedence;
 		this.followState = followState;
 	}
 

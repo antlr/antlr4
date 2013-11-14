@@ -30,12 +30,14 @@
 
 package org.antlr.v4.runtime.atn;
 
-public final class RuleStartState extends ATNState {
-	public RuleStopState stopState;
-	public boolean isPrecedenceRule;
+/**
+ *
+ * @author Sam Harwell
+ */
+public abstract class AbstractPredicateTransition extends Transition {
 
-	@Override
-	public int getStateType() {
-		return RULE_START;
+	public AbstractPredicateTransition(ATNState target) {
+		super(target);
 	}
+
 }
