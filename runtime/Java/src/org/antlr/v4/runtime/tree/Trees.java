@@ -188,9 +188,9 @@ public class Trees {
 	}
 
 	public static List<ParseTree> findAllNodes(ParseTree t, int index, boolean findTokens) {
-		List<? super ParseTree> nodes = new ArrayList<ParseTree>();
+		List<ParseTree> nodes = new ArrayList<ParseTree>();
 		_findAllNodes(t, index, findTokens, nodes);
-		return (List<ParseTree>)nodes;
+		return nodes;
 	}
 
 	public static void _findAllNodes(ParseTree t, int index, boolean findTokens,
