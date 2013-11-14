@@ -30,9 +30,9 @@
 
 package org.antlr.v4.test;
 
+import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
@@ -41,7 +41,6 @@ import org.antlr.v4.tool.interp.ParserInterpreter;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import org.junit.Ignore;
 
 import java.util.Arrays;
 
@@ -200,7 +199,7 @@ public class TestParserInterpreter extends BaseTest {
 					String startRule, String input,
 					String parseTree)
 	{
-		LexerInterpreter lexEngine = new LexerInterpreter(lg, input);
+		LexerInterpreter lexEngine = lg.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
 
 		ATN atn = createATN(g, true);

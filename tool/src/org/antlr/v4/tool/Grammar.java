@@ -39,8 +39,10 @@ import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.GrammarTreeVisitor;
 import org.antlr.v4.parse.TokenVocabParser;
+import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntSet;
@@ -55,9 +57,12 @@ import org.antlr.v4.tool.ast.GrammarASTWithOptions;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.antlr.v4.tool.ast.PredAST;
 import org.antlr.v4.tool.ast.TerminalAST;
+import org.antlr.v4.tool.interp.LexerInterpreter;
+import org.antlr.v4.tool.interp.ParserInterpreter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -862,5 +867,25 @@ public class Grammar implements AttributeResolver {
 
 	public void setLookaheadDFA(int decision, DFA lookaheadDFA) {
 		decisionDFAs.put(decision, lookaheadDFA);
+	}
+
+	public LexerInterpreter createLexerInterpreter(CharStream input) {
+		if (this.isParser()) {
+			throw new IllegalStateException("A lexer interpreter can only be created for a lexer or combined grammar.");
+		}
+
+		if (this.isCombined()) {
+			return implicitLexer.createLexerInterpreter(input);
+		}
+
+		return new LexerInterpreter(fileName, Arrays.asList(getTokenNames()), Arrays.asList(getRuleNames()), ((LexerGrammar)this).modes.keySet(), atn, input);
+	}
+
+	public ParserInterpreter createParserInterpreter(TokenStream tokenStream) {
+		if (this.isLexer()) {
+			throw new IllegalStateException("A parser interpreter can only be created for a parser or combined grammar.");
+		}
+
+		return new ParserInterpreter(fileName, Arrays.asList(getTokenNames()), Arrays.asList(getRuleNames()), atn, tokenStream);
 	}
 }

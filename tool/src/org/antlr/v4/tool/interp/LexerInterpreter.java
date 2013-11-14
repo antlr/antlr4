@@ -30,101 +30,70 @@
 
 package org.antlr.v4.tool.interp;
 
-import org.antlr.v4.Tool;
-import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenFactory;
 import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenFactory;
-import org.antlr.v4.runtime.TokenSource;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNType;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.Pair;
-import org.antlr.v4.tool.LexerGrammar;
 
-public class LexerInterpreter implements TokenSource {
-	protected LexerGrammar g;
-	protected LexerATNSimulator interp;
-	protected CharStream input;
-	protected Pair<TokenSource, CharStream> tokenFactorySourcePair;
+import java.util.Collection;
 
-	/** How to create token objects */
-	protected TokenFactory<?> _factory = CommonTokenFactory.DEFAULT;
+public class LexerInterpreter extends Lexer {
+	protected final String grammarFileName;
+	protected final ATN atn;
+
+	protected final String[] tokenNames;
+	protected final String[] ruleNames;
+	protected final String[] modeNames;
 
 	protected final DFA[] _decisionToDFA;
 	protected final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 
-	public LexerInterpreter(LexerGrammar g, String inputString) {
-		this(g);
-		setInput(inputString);
-	}
+	public LexerInterpreter(String grammarFileName, Collection<String> tokenNames, Collection<String> ruleNames, Collection<String> modeNames, ATN atn, CharStream input) {
+		super(input);
 
-	public LexerInterpreter(LexerGrammar g) {
-		Tool antlr = new Tool();
-		antlr.process(g,false);
-		_decisionToDFA = new DFA[g.atn.getNumberOfDecisions()];
+		if (atn.grammarType != ATNType.LEXER) {
+			throw new IllegalArgumentException("The ATN must be a lexer ATN.");
+		}
+
+		this.grammarFileName = grammarFileName;
+		this.atn = atn;
+		this.tokenNames = tokenNames.toArray(new String[tokenNames.size()]);
+		this.ruleNames = ruleNames.toArray(new String[ruleNames.size()]);
+		this.modeNames = modeNames.toArray(new String[modeNames.size()]);
+
+		this._decisionToDFA = new DFA[atn.getNumberOfDecisions()];
 		for (int i = 0; i < _decisionToDFA.length; i++) {
-			_decisionToDFA[i] = new DFA(g.atn.getDecisionState(i), i);
+			_decisionToDFA[i] = new DFA(atn.getDecisionState(i), i);
 		}
-		interp = new LexerATNSimulator(g.atn,_decisionToDFA,_sharedContextCache);
-	}
-
-	public void setInput(String inputString) {
-		setInput(new ANTLRInputStream(inputString));
-	}
-
-	public void setInput(CharStream input) {
-		this.input = input;
-		this.tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, input);
+		this._interp = new LexerATNSimulator(atn,_decisionToDFA,_sharedContextCache);
 	}
 
 	@Override
-	public String getSourceName() {	return g.name; }
-
-	@Override
-	public void setTokenFactory(TokenFactory<?> factory) {
-		this._factory = factory;
+	public ATN getATN() {
+		return atn;
 	}
 
 	@Override
-	public TokenFactory<?> getTokenFactory() {
-		return _factory;
+	public String getGrammarFileName() {
+		return grammarFileName;
 	}
 
 	@Override
-	public int getCharPositionInLine() {
-		return 0;
+	public String[] getTokenNames() {
+		return tokenNames;
 	}
 
 	@Override
-	public int getLine() {
-		return 0;
+	public String[] getRuleNames() {
+		return ruleNames;
 	}
 
 	@Override
-	public CharStream getInputStream() {
-		return input;
-	}
-
-	@Override
-	public Token nextToken() {
-		// TODO: Deal with off channel tokens
-		int start = input.index();
-		int tokenStartCharPositionInLine = interp.getCharPositionInLine();
-		int tokenStartLine = interp.getLine();
-		int mark = input.mark(); // make sure unuffered stream holds chars long enough to get text
-		try {
-			int ttype = interp.match(input, Lexer.DEFAULT_MODE);
-			int stop = input.index()-1;
-
-			return _factory.create(tokenFactorySourcePair, ttype, null, Token.DEFAULT_CHANNEL, start, stop,
-								   tokenStartLine, tokenStartCharPositionInLine);
-		}
-		finally {
-			input.release(mark);
-		}
+	public String[] getModeNames() {
+		return modeNames;
 	}
 }
