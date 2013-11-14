@@ -64,6 +64,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.tool.interp.ParserInterpreter;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -184,6 +185,11 @@ public class TestPerformance extends BaseTest {
      * test completes.
      */
     private static final boolean DELETE_TEMP_FILES = true;
+	/**
+	 * {@code true} to use a {@link ParserInterpreter} for parsing instead of
+	 * generated parser.
+	 */
+	private static final boolean USE_PARSER_INTERPRETER = false;
 
 	/**
 	 * {@code true} to call {@link System#gc} and then wait for 5 seconds at the
@@ -1247,7 +1253,15 @@ public class TestPerformance extends BaseTest {
                             parser.setInputStream(tokens);
                         } else {
 							Parser previousParser = parser;
-                            parser = parserCtor.newInstance(tokens);
+
+							if (USE_PARSER_INTERPRETER) {
+								Parser referenceParser = parserCtor.newInstance(tokens);
+								parser = new ParserInterpreter(referenceParser.getGrammarFileName(), Arrays.asList(referenceParser.getTokenNames()), Arrays.asList(referenceParser.getRuleNames()), referenceParser.getATN(), tokens);
+							}
+							else {
+								parser = parserCtor.newInstance(tokens);
+							}
+
 							DFA[] decisionToDFA = (FILE_GRANULARITY || previousParser == null ? parser : previousParser).getInterpreter().decisionToDFA;
 							if (!REUSE_PARSER_DFA || (!FILE_GRANULARITY && previousParser == null)) {
 								decisionToDFA = new DFA[decisionToDFA.length];
@@ -1294,7 +1308,14 @@ public class TestPerformance extends BaseTest {
 								checksumParserListener = new ChecksumParseTreeListener(checksum);
 								parser.addParseListener(checksumParserListener);
 							}
-							parseResult = parseMethod.invoke(parser);
+
+							if (USE_PARSER_INTERPRETER) {
+								ParserInterpreter parserInterpreter = (ParserInterpreter)parser;
+								parseResult = parserInterpreter.parse(Collections.lastIndexOfSubList(Arrays.asList(parser.getRuleNames()), Collections.singletonList(entryPoint)));
+							}
+							else {
+								parseResult = parseMethod.invoke(parser);
+							}
 						} catch (InvocationTargetException ex) {
 							if (!TWO_STAGE_PARSING) {
 								throw ex;
@@ -1313,7 +1334,15 @@ public class TestPerformance extends BaseTest {
 								parser.setInputStream(tokens);
 							} else {
 								Parser previousParser = parser;
-								parser = parserCtor.newInstance(tokens);
+
+								if (USE_PARSER_INTERPRETER) {
+									Parser referenceParser = parserCtor.newInstance(tokens);
+									parser = new ParserInterpreter(referenceParser.getGrammarFileName(), Arrays.asList(referenceParser.getTokenNames()), Arrays.asList(referenceParser.getRuleNames()), referenceParser.getATN(), tokens);
+								}
+								else {
+									parser = parserCtor.newInstance(tokens);
+								}
+
 								DFA[] decisionToDFA = previousParser.getInterpreter().decisionToDFA;
 								if (COMPUTE_TRANSITION_STATS) {
 									parser.setInterpreter(new StatisticsParserATNSimulator(parser, parser.getATN(), decisionToDFA, parser.getInterpreter().getSharedContextCache()));
