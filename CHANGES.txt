@@ -6,7 +6,7 @@ November 13, 2013
 * Notation:
 	/prog/func,         -> all funcs under prog at root
 	/prog/*,            -> all children of prog at root
-	 /*/func,            -> all func kids of any root node
+	/*/func,            -> all func kids of any root node
 	prog,               -> prog must be root node
 	/prog,              -> prog must be root node
 	/*,                 -> any root
