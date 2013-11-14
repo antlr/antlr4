@@ -154,6 +154,16 @@ public class Trees {
 		return t.getPayload().toString();
 	}
 
+
+	/** Return ordered list of all children of this node */
+	public static List<Tree> getChildren(Tree t) {
+		List<Tree> kids = new ArrayList<Tree>();
+		for (int i=0; i<t.getChildCount(); i++) {
+			kids.add(t.getChild(i));
+		}
+		return kids;
+	}
+
 	/** Return a list of all ancestors of this node.  The first node of
 	 *  list is the root and the last is the parent of this node.
 	 */

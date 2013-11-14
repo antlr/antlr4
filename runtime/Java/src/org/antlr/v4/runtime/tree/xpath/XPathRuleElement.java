@@ -3,6 +3,7 @@ package org.antlr.v4.runtime.tree.xpath;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.Tree;
+import org.antlr.v4.runtime.tree.Trees;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,7 +20,7 @@ public class XPathRuleElement extends XPathElement {
 	public Collection<ParseTree> evaluate(ParseTree t) {
 				// return all children of t that match nodeName
 		List<ParseTree> nodes = new ArrayList<ParseTree>();
-		for (Tree c : t.getChildren()) {
+		for (Tree c : Trees.getChildren(t)) {
 			if ( c instanceof ParserRuleContext ) {
 				ParserRuleContext ctx = (ParserRuleContext)c;
 				if ( (ctx.getRuleIndex() == ruleIndex && !invert) ||

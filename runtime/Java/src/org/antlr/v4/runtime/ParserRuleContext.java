@@ -193,11 +193,6 @@ public class ParserRuleContext extends RuleContext {
 		return null;
 	}
 
-	@Override
-	public List<ParseTree> getChildren() {
-		return children;
-	}
-
 	public TerminalNode getToken(int ttype, int i) {
 		if ( children==null || i < 0 || i >= children.size() ) {
 			return null;

@@ -62,9 +62,6 @@ public interface Tree {
 	 */
 	int getChildCount();
 
-	/** Return ordered list of all children of this node */
-	List<? extends Tree> getChildren();
-
 	/** Print out a whole tree, not just a node, in LISP format
 	 *  {@code (root child1 .. childN)}. Print just a node if this is a leaf.
 	 */

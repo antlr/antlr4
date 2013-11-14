@@ -151,11 +151,6 @@ public class RuleContext implements RuleNode {
 	}
 
 	@Override
-	public List<ParseTree> getChildren() {
-		return null;
-	}
-
-	@Override
 	public <T> T accept(ParseTreeVisitor<? extends T> visitor) { return visitor.visitChildren(this); }
 
 	/** Call this method to view a parse tree in a dialog box visually. */
