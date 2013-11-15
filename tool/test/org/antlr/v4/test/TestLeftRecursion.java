@@ -73,7 +73,6 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testDirectCallToLeftRecursiveRule() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"@parser::members{public AContext a() { return a(0); }}\n" +
 			"a @after {System.out.println($ctx.toStringTree(this));} : a ID\n" +
 			"  | ID" +
 			"  ;\n" +
