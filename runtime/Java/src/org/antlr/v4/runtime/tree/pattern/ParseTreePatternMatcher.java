@@ -34,6 +34,7 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.ListTokenSource;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -53,10 +54,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ParseTreePatternMatcher {
-
-	public static final String ANYTHING = "...";
-	public static final String WILDCARD = ".";
-
 	public static class CannotCreateLexerOrParser extends RuntimeException {
 		public CannotCreateLexerOrParser(Throwable e) {
 			super(e);
@@ -134,9 +131,6 @@ public class ParseTreePatternMatcher {
 	protected ParseTreeMatch matches_(ParseTree tree, ParseTree patternTree, ParseTreePattern pattern) {
 		if ( tree==null || patternTree==null ) {
 			return new ParseTreeMatchFailed(tree, null, pattern);
-		}
-		if ( patternTree instanceof WildcardTagToken ) {
-			return new ParseTreeMatch(tree, pattern); // <.> matches any single node/subtree
 		}
 		// x and <ID>, x and y, or x and x; or could be mismatched types
 		if ( tree instanceof TerminalNode && patternTree instanceof TerminalNode ) {
@@ -250,13 +244,7 @@ public class ParseTreePatternMatcher {
 			if ( chunk instanceof TagChunk ) {
 				TagChunk tagChunk = (TagChunk)chunk;
 				// add special rule token or conjure up new token from name
-//				if ( tagChunk.tag.equals(ANYTHING) ) {
-//					tokens.add(new AnythingTagToken());
-//				}
-				if ( tagChunk.tag.equals(WILDCARD) ) {
-					tokens.add(new WildcardTagToken());
-				}
-				else if ( Character.isUpperCase(tagChunk.tag.charAt(0)) ) {
+				if ( Character.isUpperCase(tagChunk.tag.charAt(0)) ) {
 					tokens.add(new TokenTagToken(tagChunk.tag, tokenNameToType.get(tagChunk.tag)));
 				}
 				else {
@@ -293,7 +281,7 @@ public class ParseTreePatternMatcher {
 		return m;
 	}
 
-	/** Split "<ID> = <e:expr> ;" into 4 chunks */
+	/** Split "<ID> = <e:expr> ;" into 4 chunks for tokenizing by tokenize() */
 	public List<Chunk> split(String pattern) {
 		int p = 0;
 		int n = pattern.length();
@@ -368,7 +356,7 @@ public class ParseTreePatternMatcher {
 			}
 		}
 
-		// strip out the escape sequences
+		// strip out the escape sequences from text chunks but not tags
 		for (Chunk c : chunks) {
 			if ( c instanceof TextChunk ) {
 				TextChunk tc = (TextChunk)c;

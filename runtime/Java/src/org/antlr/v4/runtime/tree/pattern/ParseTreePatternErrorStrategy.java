@@ -80,7 +80,6 @@ public class ParseTreePatternErrorStrategy extends DefaultErrorStrategy {
 	}
 
 	protected boolean isPatternTag(Token t) {
-		return t instanceof RuleTagToken ||
-			   t instanceof WildcardTagToken;
+		return t instanceof RuleTagToken;
 	}
 }
