@@ -88,6 +88,21 @@ public class ATNDeserializer {
 		SERIALIZED_UUID = ADDED_PRECEDENCE_TRANSITIONS;
 	}
 
+	@NotNull
+	private final ATNDeserializationOptions deserializationOptions;
+
+	public ATNDeserializer() {
+		this(ATNDeserializationOptions.getDefaultOptions());
+	}
+
+	public ATNDeserializer(@Nullable ATNDeserializationOptions deserializationOptions) {
+		if (deserializationOptions == null) {
+			deserializationOptions = ATNDeserializationOptions.getDefaultOptions();
+		}
+
+		this.deserializationOptions = deserializationOptions;
+	}
+
 	/**
 	 * Determines if a particular serialized representation of an ATN supports
 	 * a particular feature, identified by the {@link UUID} used for serializing
