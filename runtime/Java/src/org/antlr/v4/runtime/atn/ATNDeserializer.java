@@ -362,6 +362,96 @@ public class ATNDeserializer {
 			verifyATN(atn);
 		}
 
+		if (deserializationOptions.isGenerateRuleBypassTransitions() && atn.grammarType == ATNType.PARSER) {
+			atn.ruleToTokenType = new int[atn.ruleToStartState.length];
+			for (int i = 0; i < atn.ruleToStartState.length; i++) {
+				atn.ruleToTokenType[i] = atn.maxTokenType + i + 1;
+			}
+
+			for (int i = 0; i < atn.ruleToStartState.length; i++) {
+				BasicBlockStartState bypassStart = new BasicBlockStartState();
+				bypassStart.ruleIndex = i;
+				atn.addState(bypassStart);
+
+				BlockEndState bypassStop = new BlockEndState();
+				bypassStop.ruleIndex = i;
+				atn.addState(bypassStop);
+
+				bypassStart.endState = bypassStop;
+				atn.defineDecisionState(bypassStart);
+
+				bypassStop.startState = bypassStart;
+
+				ATNState endState;
+				Transition excludeTransition = null;
+				if (atn.ruleToStartState[i].isPrecedenceRule) {
+					// wrap from the beginning of the rule to the StarLoopEntryState
+					endState = null;
+					for (ATNState state : atn.states) {
+						if (state.ruleIndex != i) {
+							continue;
+						}
+
+						if (!(state instanceof StarLoopEntryState)) {
+							continue;
+						}
+
+						ATNState maybeLoopEndState = state.transition(state.getNumberOfTransitions() - 1).target;
+						if (!(maybeLoopEndState instanceof LoopEndState)) {
+							continue;
+						}
+
+						if (maybeLoopEndState.epsilonOnlyTransitions && maybeLoopEndState.transition(0).target instanceof RuleStopState) {
+							endState = state;
+							break;
+						}
+					}
+
+					if (endState == null) {
+						throw new UnsupportedOperationException("Couldn't identify final state of the precedence rule prefix section.");
+					}
+
+					excludeTransition = ((StarLoopEntryState)endState).loopBackState.transition(0);
+				}
+				else {
+					endState = atn.ruleToStopState[i];
+				}
+
+				// all non-excluded transitions that currently target end state need to target blockEnd instead
+				for (ATNState state : atn.states) {
+					for (Transition transition : state.transitions) {
+						if (transition == excludeTransition) {
+							continue;
+						}
+
+						if (transition.target == endState) {
+							transition.target = bypassStop;
+						}
+					}
+				}
+
+				// all transitions leaving the rule start state need to leave blockStart instead
+				while (atn.ruleToStartState[i].getNumberOfTransitions() > 0) {
+					Transition transition = atn.ruleToStartState[i].removeTransition(atn.ruleToStartState[i].getNumberOfTransitions() - 1);
+					bypassStart.addTransition(transition);
+				}
+
+				// link the new states
+				atn.ruleToStartState[i].addTransition(new EpsilonTransition(bypassStart));
+				bypassStop.addTransition(new EpsilonTransition(endState));
+
+				ATNState matchState = new BasicState();
+				atn.addState(matchState);
+				matchState.addTransition(new AtomTransition(bypassStop, atn.ruleToTokenType[i]));
+				bypassStart.addTransition(new EpsilonTransition(matchState));
+			}
+
+			if (deserializationOptions.isVerifyATN()) {
+				// reverify after modification
+				verifyATN(atn);
+			}
+		}
+
 		return atn;
 	}
 
