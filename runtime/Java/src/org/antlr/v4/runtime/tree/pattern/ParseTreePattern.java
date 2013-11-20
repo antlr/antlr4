@@ -4,14 +4,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 /** A pattern like "<ID> = <expr>;" converted to a ParseTree */
 public class ParseTreePattern {
-	/** Matches a single node or subtree */
-	public static final ParseTreePattern WildcardPattern =
-		new ParseTreePattern(null, ".", null) {
-			public boolean matches(ParseTree t) {
-				return true;
-			}
-		};
-
 	public String patternRuleName;
 	public String pattern;
 	public ParseTree patternTree;
