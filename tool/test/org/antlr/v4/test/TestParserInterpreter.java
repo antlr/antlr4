@@ -201,9 +201,7 @@ public class TestParserInterpreter extends BaseTest {
 	{
 		LexerInterpreter lexEngine = lg.createLexerInterpreter(new ANTLRInputStream(input));
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
-
-		ATN atn = createATN(g, true);
-		ParserInterpreter parser = new ParserInterpreter(g.fileName, Arrays.asList(g.getTokenNames()), Arrays.asList(g.getRuleNames()), atn, tokens);
+		ParserInterpreter parser = g.createParserInterpreter(tokens);
 		ParseTree t = parser.parse(g.rules.get(startRule).index);
 		System.out.println("parse tree: "+t.toStringTree(parser));
 		assertEquals(parseTree, t.toStringTree(parser));
