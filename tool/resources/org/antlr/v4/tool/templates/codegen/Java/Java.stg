@@ -359,7 +359,11 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(int _p<currentRule.args:{a | , <a>}>) throws RecognitionException {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=", ">) throws RecognitionException {
+	return <currentRule.name>(0<currentRule.args:{a | , <a.name>}>);
+}
+
+private <currentRule.ctxType> <currentRule.name>(int _p<currentRule.args:{a | , <a>}>) throws RecognitionException {
 	ParserRuleContext _parentctx = _ctx;
 	int _parentState = getState();
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>);
