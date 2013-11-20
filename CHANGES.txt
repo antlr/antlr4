@@ -1,5 +1,30 @@
 ANTLR v4 Honey Badger
 
+November 20, 2013
+
+* Sam added method stuff like expr() that calls expr(0). Makes it possible
+  to call expr rule from TestRig (grun).
+
+November 14, 2013
+
+* Added Sam's ParserInterpreter implementation that uses ATN after
+  deserialization.
+
+	LexerGrammar lg = new LexerGrammar(
+		"lexer grammar L;\n" +
+  		"A : 'a' ;\n" +
+  		"B : 'b' ;\n" +
+  		"C : 'c' ;\n");
+  	Grammar g = new Grammar(
+  		"parser grammar T;\n" +
+  		"s : (A{;}|B)* C ;\n",
+  		lg);
+
+	LexerInterpreter lexEngine = lg.createLexerInterpreter(new ANTLRInputStream(input));
+	CommonTokenStream tokens = new CommonTokenStream(lexEngine);
+	ParserInterpreter parser = g.createParserInterpreter(tokens);
+	ParseTree t = parser.parse(g.rules.get(startRule).index);
+
 November 13, 2013
 
 * move getChildren() from Tree into Trees (to avoid breaking change)
