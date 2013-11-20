@@ -44,11 +44,14 @@ public class ATNDeserializationOptions {
 	}
 
 	private boolean readOnly;
+	private boolean verifyATN;
 
 	public ATNDeserializationOptions() {
+		this.verifyATN = true;
 	}
 
 	public ATNDeserializationOptions(ATNDeserializationOptions options) {
+		this.verifyATN = options.verifyATN;
 	}
 
 	@NotNull
@@ -62,6 +65,15 @@ public class ATNDeserializationOptions {
 
 	public final void makeReadOnly() {
 		readOnly = true;
+	}
+
+	public final boolean isVerifyATN() {
+		return verifyATN;
+	}
+
+	public final void setVerifyATN(boolean verifyATN) {
+		throwIfReadOnly();
+		this.verifyATN = verifyATN;
 	}
 
 	protected void throwIfReadOnly() {

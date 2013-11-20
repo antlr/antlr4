@@ -358,7 +358,10 @@ public class ATNDeserializer {
 			decState.decision = i-1;
 		}
 
-		verifyATN(atn);
+		if (deserializationOptions.isVerifyATN()) {
+			verifyATN(atn);
+		}
+
 		return atn;
 	}
 
