@@ -908,7 +908,7 @@ public static final String _serializedATN =
 	"<model.serialized; wrap={"+<\n><\t>"}>";
 <endif>
 public static final ATN _ATN =
-	ATNSimulator.deserialize(_serializedATN.toCharArray());
+	new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 static {
 	_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
 	for (int i = 0; i \< _ATN.getNumberOfDecisions(); i++) {
