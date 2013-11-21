@@ -41,6 +41,8 @@ import org.antlr.v4.parse.GrammarTreeVisitor;
 import org.antlr.v4.parse.TokenVocabParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.LexerInterpreter;
+import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
@@ -57,8 +59,6 @@ import org.antlr.v4.tool.ast.GrammarASTWithOptions;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.antlr.v4.tool.ast.PredAST;
 import org.antlr.v4.tool.ast.TerminalAST;
-import org.antlr.v4.tool.interp.LexerInterpreter;
-import org.antlr.v4.tool.interp.ParserInterpreter;
 
 import java.io.IOException;
 import java.util.ArrayList;
