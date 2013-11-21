@@ -27,9 +27,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.antlr.v4.tool.interp;
+package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Nullable;
 
 /** This object is used by the ParserInterpreter and is the same as a regular
