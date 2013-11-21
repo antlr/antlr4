@@ -30,7 +30,7 @@
 
 package org.antlr.v4.test;
 
-import org.antlr.v4.automata.ATNSerializer;
+import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

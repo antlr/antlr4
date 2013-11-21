@@ -124,15 +124,6 @@ public class Utils {
 		return Character.toLowerCase(s.charAt(0)) + s.substring(1);
 	}
 
-	public static char[] toCharArray(IntegerList data) {
-		if ( data==null ) return null;
-		char[] cdata = new char[data.size()];
-		for (int i=0; i<data.size(); i++) {
-			cdata[i] = (char)data.get(i);
-		}
-		return cdata;
-	}
-
 	/** apply methodName to list and return list of results. method has
 	 *  no args.  This pulls data out of a list essentially.
 	 */

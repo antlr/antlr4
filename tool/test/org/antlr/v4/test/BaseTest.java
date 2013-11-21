@@ -32,7 +32,6 @@ package org.antlr.v4.test;
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.ATNPrinter;
-import org.antlr.v4.automata.ATNSerializer;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenerator;
@@ -50,6 +49,7 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.WritableToken;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
+import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
@@ -184,7 +184,7 @@ public abstract class BaseTest {
 
 		ATN atn = g.atn;
 		if (useSerializer) {
-			char[] serialized = ATNSerializer.getSerializedAsChars(g, atn);
+			char[] serialized = ATNSerializer.getSerializedAsChars(atn);
 			return new ATNDeserializer().deserialize(serialized);
 		}
 

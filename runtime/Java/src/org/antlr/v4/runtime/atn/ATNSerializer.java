@@ -28,32 +28,13 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.automata;
+package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.misc.Utils;
-import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNSimulator;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.ATNType;
-import org.antlr.v4.runtime.atn.ActionTransition;
-import org.antlr.v4.runtime.atn.AtomTransition;
-import org.antlr.v4.runtime.atn.BlockStartState;
-import org.antlr.v4.runtime.atn.DecisionState;
-import org.antlr.v4.runtime.atn.LoopEndState;
-import org.antlr.v4.runtime.atn.PrecedencePredicateTransition;
-import org.antlr.v4.runtime.atn.PredicateTransition;
-import org.antlr.v4.runtime.atn.RangeTransition;
-import org.antlr.v4.runtime.atn.RuleStartState;
-import org.antlr.v4.runtime.atn.RuleTransition;
-import org.antlr.v4.runtime.atn.SetTransition;
-import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.runtime.misc.Utils;
 
 import java.io.InvalidClassException;
 import java.util.ArrayList;
@@ -64,12 +45,18 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ATNSerializer {
-	public Grammar g;
 	public ATN atn;
+	private List<String> tokenNames;
 
-	public ATNSerializer(Grammar g, ATN atn) {
-		this.g = g;
+	public ATNSerializer(ATN atn) {
+		assert atn.grammarType != null;
 		this.atn = atn;
+	}
+
+	public ATNSerializer(ATN atn, List<String> tokenNames) {
+		assert atn.grammarType != null;
+		this.atn = atn;
+		this.tokenNames = tokenNames;
 	}
 
 	/** Serialize state descriptors, edge descriptors, and decision->state map
@@ -99,21 +86,8 @@ public class ATNSerializer {
 		serializeUUID(data, ATNSimulator.SERIALIZED_UUID);
 
 		// convert grammar type to ATN const to avoid dependence on ANTLRParser
-		switch (g.getType()) {
-		case ANTLRParser.LEXER:
-			data.add(ATNType.LEXER.ordinal());
-			break;
-
-		case ANTLRParser.PARSER:
-		case ANTLRParser.COMBINED:
-			data.add(ATNType.PARSER.ordinal());
-			break;
-
-		default:
-			throw new UnsupportedOperationException("Invalid grammar type.");
-		}
-
-		data.add(g.getMaxTokenType());
+		data.add(atn.grammarType.ordinal());
+		data.add(atn.maxTokenType);
 		int nedges = 0;
 
 		Map<IntervalSet, Integer> setIndices = new HashMap<IntervalSet, Integer>();
@@ -189,20 +163,19 @@ public class ATNSerializer {
 		for (int r=0; r<nrules; r++) {
 			ATNState ruleStartState = atn.ruleToStartState[r];
 			data.add(ruleStartState.stateNumber);
-			if ( g.isLexer() ) {
+			if (atn.grammarType == ATNType.LEXER) {
 				if (atn.ruleToTokenType[r] == Token.EOF) {
 					data.add(Character.MAX_VALUE);
 				}
 				else {
 					data.add(atn.ruleToTokenType[r]);
 				}
-				String ruleName = g.rules.getKey(r);
-				Rule rule = g.getRule(ruleName);
-				if (rule.actionIndex == -1) {
+
+				if (atn.ruleToActionIndex[r] == -1) {
 					data.add(Character.MAX_VALUE);
 				}
 				else {
-					data.add(rule.actionIndex);
+					data.add(atn.ruleToActionIndex[r]);
 				}
 			}
 		}
@@ -407,7 +380,7 @@ public class ATNSerializer {
 		int nrules = ATNSimulator.toInt(data[p++]);
 		for (int i=0; i<nrules; i++) {
 			int s = ATNSimulator.toInt(data[p++]);
-            if ( g.isLexer() ) {
+            if (atn.grammarType == ATNType.LEXER) {
                 int arg1 = ATNSimulator.toInt(data[p++]);
                 int arg2 = ATNSimulator.toInt(data[p++]);
 				if (arg2 == Character.MAX_VALUE) {
@@ -467,27 +440,62 @@ public class ATNSerializer {
 
 	public String getTokenName(int t) {
 		if ( t==-1 ) return "EOF";
-		if ( g!=null ) return g.getTokenDisplayName(t);
+
+		if ( atn.grammarType == ATNType.LEXER &&
+			 t >= Character.MIN_VALUE && t <= Character.MAX_VALUE )
+		{
+			switch (t) {
+			case '\n':
+				return "'\\n'";
+			case '\r':
+				return "'\\r'";
+			case '\t':
+				return "'\\t'";
+			case '\b':
+				return "'\\b'";
+			case '\f':
+				return "'\\f'";
+			case '\\':
+				return "'\\\\'";
+			case '\'':
+				return "'\\''";
+			default:
+				if ( Character.UnicodeBlock.of((char)t)==Character.UnicodeBlock.BASIC_LATIN &&
+					 !Character.isISOControl((char)t) ) {
+					return '\''+Character.toString((char)t)+'\'';
+				}
+				// turn on the bit above max "\uFFFF" value so that we pad with zeros
+				// then only take last 4 digits
+				String hex = Integer.toHexString(t|0x10000).toUpperCase().substring(1,5);
+				String unicodeStr = "'\\u"+hex+"'";
+				return unicodeStr;
+			}
+		}
+
+		if (tokenNames != null && t >= 0 && t < tokenNames.size()) {
+			return tokenNames.get(t);
+		}
+
 		return String.valueOf(t);
 	}
 
 	/** Used by Java target to encode short/int array as chars in string. */
-	public static String getSerializedAsString(Grammar g, ATN atn) {
-		return new String(getSerializedAsChars(g, atn));
+	public static String getSerializedAsString(ATN atn) {
+		return new String(getSerializedAsChars(atn));
 	}
 
-	public static IntegerList getSerialized(Grammar g, ATN atn) {
-		return new ATNSerializer(g, atn).serialize();
+	public static IntegerList getSerialized(ATN atn) {
+		return new ATNSerializer(atn).serialize();
 	}
 
-	public static char[] getSerializedAsChars(Grammar g, ATN atn) {
-		return Utils.toCharArray(getSerialized(g, atn));
+	public static char[] getSerializedAsChars(ATN atn) {
+		return Utils.toCharArray(getSerialized(atn));
 	}
 
-	public static String getDecoded(Grammar g, ATN atn) {
-		IntegerList serialized = getSerialized(g, atn);
+	public static String getDecoded(ATN atn, List<String> tokenNames) {
+		IntegerList serialized = getSerialized(atn);
 		char[] data = Utils.toCharArray(serialized);
-		return new ATNSerializer(g, atn).decode(data);
+		return new ATNSerializer(atn, tokenNames).decode(data);
 	}
 
 	private void serializeUUID(IntegerList data, UUID uuid) {
