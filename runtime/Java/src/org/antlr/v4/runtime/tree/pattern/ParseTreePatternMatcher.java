@@ -267,6 +267,7 @@ public class ParseTreePatternMatcher {
 				}
 				else {
 					System.err.println("invalid tag: "+tagChunk.tag);
+					throw new IllegalArgumentException("invalid tag: "+tagChunk.tag+" in "+pattern);
 				}
 			}
 			else {

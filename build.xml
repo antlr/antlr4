@@ -114,6 +114,8 @@
                   dir="${basedir}/tool/src/@{srcpath}">
                 <arg value="-o"/>
                 <arg value="${build.antlr3.dir}/@{srcpath}"/>
+                <arg value="-lib"/>
+                <arg value="${build.antlr3.dir}/org/antlr/v4/parse"/>
                 <args/>
                 <arg line="${sources.antlr3.local}"/>
                 <classpath>
@@ -164,12 +166,7 @@
 
         <antlr3 srcpath="org/antlr/v4/parse"/>
 
-        <antlr3 srcpath="org/antlr/v4/codegen">
-            <args>
-                <arg value="-lib"/>
-                <arg value="${build.antlr3.dir}/org/antlr/v4/parse"/>
-            </args>
-        </antlr3>
+        <antlr3 srcpath="org/antlr/v4/codegen"/>
 
         <touch file="${antlr3.touch}" mkdirs="true"/>
 	</target>
