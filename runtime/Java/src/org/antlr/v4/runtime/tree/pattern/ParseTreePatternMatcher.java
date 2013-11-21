@@ -209,11 +209,12 @@ public class ParseTreePatternMatcher {
 		ListTokenSource tokenSrc = new ListTokenSource(tokenList);
 		CommonTokenStream tokens = new CommonTokenStream(tokenSrc);
 
-//		parser.getATN()
-//
-//		ATNDeserializationOptions deserializationOptions = new ATNDeserializationOptions();
-//		deserializationOptions.setGenerateRuleBypassTransitions(true);
-//		ATN atn = new ATNDeserializer(deserializationOptions).deserialize(parser.);
+		String sATN = parser.getSerializedATN();
+		ATNDeserializationOptions deserializationOptions = new ATNDeserializationOptions();
+		deserializationOptions.setGenerateRuleBypassTransitions(true);
+		ATN atn = new ATNDeserializer(deserializationOptions).deserialize(sATN.toCharArray());
+
+//		ParserInterpreter parserInterp;
 
 		parser.setTokenStream(tokens);
 		parser.setErrorHandler(new ParseTreePatternErrorStrategy());
