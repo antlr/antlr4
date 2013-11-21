@@ -6,11 +6,11 @@ import org.antlr.v4.runtime.TokenSource;
 
 public class RuleTagToken implements Token {
 	protected String ruleName;
-	protected int ruleIndex;
+	protected int ruleImaginaryTokenType;
 
-	public RuleTagToken(String ruleName, int ruleIndex) {
+	public RuleTagToken(String ruleName, int ruleImaginaryTokenType) {
 		this.ruleName = ruleName;
-		this.ruleIndex = ruleIndex;
+		this.ruleImaginaryTokenType = ruleImaginaryTokenType;
 	}
 
 	@Override
@@ -25,7 +25,7 @@ public class RuleTagToken implements Token {
 
 	@Override
 	public int getType() {
-		return 0;
+		return ruleImaginaryTokenType;
 	}
 
 	@Override
@@ -65,6 +65,6 @@ public class RuleTagToken implements Token {
 
 	@Override
 	public String toString() {
-		return ruleName+":"+ruleIndex;
+		return ruleName+":"+ ruleImaginaryTokenType;
 	}
 }

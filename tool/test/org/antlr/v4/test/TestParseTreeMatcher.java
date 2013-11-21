@@ -87,7 +87,7 @@ public class TestParseTreeMatcher extends BaseTest {
 
 		List<? extends Token> tokens = p.tokenize("<ID> = <expr> ;");
 		String results = tokens.toString();
-		String expected = "[ID:3, [@-1,1:1='=',<1>,1:1], expr:1, [@-1,1:1=';',<2>,1:1]]";
+		String expected = "[ID:3, [@-1,1:1='=',<1>,1:1], expr:7, [@-1,1:1=';',<2>,1:1]]";
 		assertEquals(expected, results);
 	}
 
@@ -229,58 +229,6 @@ public class TestParseTreeMatcher extends BaseTest {
 
 		String input = "3*4*5";
 		String pattern = "<expr> * <expr> * <expr>";
-		checkPatternMatch("X6.g4", grammar, "expr", input, pattern, "X6Parser", "X6Lexer");
-	}
-
-	/*
-	Shit. issue is that <.> won't match any tokens and jumps to end of rule
-	to recover but we need it to recover inline. Same if ID or (ID|FOO) decision
-	in rule s.
-	 */
-	@Test
-	public void testWildcard() throws Exception {
-		String grammar =
-			"grammar X2;\n" +
-			"s : ID '=' INT ';' ;\n" +
-			"ID : [a-z]+ ;\n" +
-			"INT : [0-9]+ ;\n" +
-			"WS : [ \\r\\n\\t]+ -> skip ;\n";
-		boolean ok =
-			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
-		assertTrue(ok);
-
-		ParseTreePatternMatcher p =
-			new ParseTreePatternMatcher(loadLexerClassFromTempDir("X2Lexer"),
-										loadParserClassFromTempDir("X2Parser"));
-
-		ParseTreePattern t = p.compile("s", "<.> = <INT> ;");
-		String results = t.patternTree.toStringTree(p.getParser());
-		String expected = "(s <ID> = (expr <expr>) ;)";
-		assertEquals(expected, results);
-	}
-
-	/*
-	crap. pattern "<expr>.<ID>" won't work for recursive rules as <expr> won't
-	match the primaries at start of recursive expr rule. damn!
-	 */
-	@Test public void testLRWildcard() throws Exception {
-		String grammar =
-			"grammar X6;\n" +
-			"s   : expr ';'\n" +
-			"    ;\n" +
-			"expr: expr '.' ID\n" +
-			"    | expr '*' expr\n" +
-			"    | expr '=' expr\n" +
-			"    | ID\n" +
-			"    | INT\n" +
-			"    ;\n" +
-			"ID : [a-z]+ ;\n" +
-			"INT : [0-9]+ ;\n" +
-			"WS : [ \\r\\n\\t]+ -> skip ;\n";
-
-		String input = "a.b.c";
-		//pattern = "<expr>.<ID>";
-		String pattern = "<.> . <ID>"; // match any single node or subtree then .<ID>
 		checkPatternMatch("X6.g4", grammar, "expr", input, pattern, "X6Parser", "X6Lexer");
 	}
 

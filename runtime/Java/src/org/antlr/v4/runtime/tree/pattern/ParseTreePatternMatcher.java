@@ -36,12 +36,14 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.ListTokenSource;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializationOptions;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
+import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.RuleNode;
@@ -50,8 +52,8 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,6 +79,11 @@ public class ParseTreePatternMatcher {
 	protected String start = "<", stop=">";
 	protected String escape = "\\"; // e.g., \< and \> must escape BOTH!
 
+	/** This ATN has alternatives to match special imaginary tokens for rules like <expr> */
+	protected ATN atnWithBypassAlts;
+
+	protected Map<String, Integer> ruleToIndex;
+
 	public ParseTreePatternMatcher() { }
 
 	public ParseTreePatternMatcher(Class<? extends Lexer> lexerClass,
@@ -84,6 +91,13 @@ public class ParseTreePatternMatcher {
 	{
 		this.lexerClass = lexerClass;
 		this.parserClass = parserClass;
+
+		lazyInit();
+		String sATN = parser.getSerializedATN();
+		ATNDeserializationOptions deserializationOptions = new ATNDeserializationOptions();
+		deserializationOptions.setGenerateRuleBypassTransitions(true);
+		atnWithBypassAlts = new ATNDeserializer(deserializationOptions).deserialize(sATN.toCharArray());
+		ruleToIndex = Utils.toMap(parser.getRuleNames());
 	}
 
 	public void setDelimiters(String start, String stop, String escapeLeft) {
@@ -209,29 +223,17 @@ public class ParseTreePatternMatcher {
 		ListTokenSource tokenSrc = new ListTokenSource(tokenList);
 		CommonTokenStream tokens = new CommonTokenStream(tokenSrc);
 
-		String sATN = parser.getSerializedATN();
-		ATNDeserializationOptions deserializationOptions = new ATNDeserializationOptions();
-		deserializationOptions.setGenerateRuleBypassTransitions(true);
-		ATN atn = new ATNDeserializer(deserializationOptions).deserialize(sATN.toCharArray());
+		ParserInterpreter parserInterp = new ParserInterpreter(parser.getGrammarFileName(),
+															   Arrays.asList(parser.getTokenNames()),
+															   Arrays.asList(parser.getRuleNames()),
+															   atnWithBypassAlts,
+															   tokens);
 
-//		ParserInterpreter parserInterp;
-
-		parser.setTokenStream(tokens);
-		parser.setErrorHandler(new ParseTreePatternErrorStrategy());
 		ParseTree tree = null;
 		try {
-			Method startRule = null;
-			Object[] args = null;
-			try {
-				startRule = parserClass.getMethod(patternRuleName);
-			}
-			catch (NoSuchMethodException nsme) {
-				// try with int _p arg for recursive func
-				startRule = parserClass.getMethod(patternRuleName, int.class);
-				args = new Integer[] {0};
-			}
-			tree = (ParseTree)startRule.invoke(parser, args);
-			System.out.println("pattern tree = "+tree.toStringTree(parser));
+			Integer ruleIndex = ruleToIndex.get(patternRuleName);
+			tree = parserInterp.parse(ruleIndex);
+			System.out.println("pattern tree = "+tree.toStringTree(parserInterp));
 		}
 		catch (Exception e) {
 			throw new CannotInvokeStartRule(e);
@@ -258,8 +260,13 @@ public class ParseTreePatternMatcher {
 				if ( Character.isUpperCase(tagChunk.tag.charAt(0)) ) {
 					tokens.add(new TokenTagToken(tagChunk.tag, tokenNameToType.get(tagChunk.tag)));
 				}
+				else if ( Character.isLowerCase(tagChunk.tag.charAt(0)) ) {
+					int ruleIndex = ruleNameToIndex.get(tagChunk.tag);
+					int ruleImaginaryTokenType = atnWithBypassAlts.ruleToTokenType[ruleIndex];
+					tokens.add(new RuleTagToken(tagChunk.tag, ruleImaginaryTokenType));
+				}
 				else {
-					tokens.add(new RuleTagToken(tagChunk.tag, ruleNameToIndex.get(tagChunk.tag)));
+					System.err.println("invalid tag: "+tagChunk.tag);
 				}
 			}
 			else {
