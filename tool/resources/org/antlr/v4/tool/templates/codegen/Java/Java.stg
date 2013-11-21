@@ -240,6 +240,9 @@ public class <parser.name> extends <superClass> {
 	public String[] getRuleNames() { return ruleNames; }
 
 	@Override
+	public String getSerializedATN() { return _serializedATN; }
+
+	@Override
 	public ATN getATN() { return _ATN; }
 
 	<namedActions.members>
@@ -878,6 +881,9 @@ public class <lexer.name> extends <superClass> {
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
+
+	@Override
+	public String getSerializedATN() { return _serializedATN; }
 
 	@Override
 	public String[] getModeNames() { return modeNames; }

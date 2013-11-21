@@ -40,6 +40,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNDeserializationOptions;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.RuleNode;
@@ -207,9 +209,11 @@ public class ParseTreePatternMatcher {
 		ListTokenSource tokenSrc = new ListTokenSource(tokenList);
 		CommonTokenStream tokens = new CommonTokenStream(tokenSrc);
 
+//		parser.getATN()
+//
 //		ATNDeserializationOptions deserializationOptions = new ATNDeserializationOptions();
 //		deserializationOptions.setGenerateRuleBypassTransitions(true);
-//		ATN atn = new ATNDeserializer(deserializationOptions).deserialize(serializedATN);
+//		ATN atn = new ATNDeserializer(deserializationOptions).deserialize(parser.);
 
 		parser.setTokenStream(tokens);
 		parser.setErrorHandler(new ParseTreePatternErrorStrategy());

@@ -59,6 +59,16 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	public abstract String[] getRuleNames();
 
+	/** If this recognizer was generated, it will have a serialized ATN
+	 *  representation of the grammar.
+	 *
+	 *  Provide a dummy return value here to support backward compatibility.
+	 *
+	 * For interpreters, we don't know their serialized ATN despite having
+	 * created the interpreter from it.
+	 */
+	public String getSerializedATN() { return null; }
+
 	/** For debugging and other purposes, might want the grammar name.
 	 *  Have ANTLR generate an implementation for this method.
 	 */
