@@ -82,8 +82,8 @@ public class ATNSerializer {
 	 */
 	public IntegerList serialize() {
 		IntegerList data = new IntegerList();
-		data.add(ATNSimulator.SERIALIZED_VERSION);
-		serializeUUID(data, ATNSimulator.SERIALIZED_UUID);
+		data.add(ATNDeserializer.SERIALIZED_VERSION);
+		serializeUUID(data, ATNDeserializer.SERIALIZED_UUID);
 
 		// convert grammar type to ATN const to avoid dependence on ANTLRParser
 		data.add(atn.grammarType.ordinal());
@@ -331,58 +331,58 @@ public class ATNSerializer {
 
 		StringBuilder buf = new StringBuilder();
 		int p = 0;
-		int version = ATNSimulator.toInt(data[p++]);
-		if (version != ATNSimulator.SERIALIZED_VERSION) {
-			String reason = String.format("Could not deserialize ATN with version %d (expected %d).", version, ATNSimulator.SERIALIZED_VERSION);
+		int version = ATNDeserializer.toInt(data[p++]);
+		if (version != ATNDeserializer.SERIALIZED_VERSION) {
+			String reason = String.format("Could not deserialize ATN with version %d (expected %d).", version, ATNDeserializer.SERIALIZED_VERSION);
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
 		}
 
-		UUID uuid = ATNSimulator.toUUID(data, p);
+		UUID uuid = ATNDeserializer.toUUID(data, p);
 		p += 8;
-		if (!uuid.equals(ATNSimulator.SERIALIZED_UUID)) {
-			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with UUID %s (expected %s).", uuid, ATNSimulator.SERIALIZED_UUID);
+		if (!uuid.equals(ATNDeserializer.SERIALIZED_UUID)) {
+			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with UUID %s (expected %s).", uuid, ATNDeserializer.SERIALIZED_UUID);
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
 		}
 
 		p++; // skip grammarType
-		int maxType = ATNSimulator.toInt(data[p++]);
+		int maxType = ATNDeserializer.toInt(data[p++]);
 		buf.append("max type ").append(maxType).append("\n");
-		int nstates = ATNSimulator.toInt(data[p++]);
+		int nstates = ATNDeserializer.toInt(data[p++]);
 		for (int i=0; i<nstates; i++) {
-			int stype = ATNSimulator.toInt(data[p++]);
+			int stype = ATNDeserializer.toInt(data[p++]);
             if ( stype==ATNState.INVALID_TYPE ) continue; // ignore bad type of states
-			int ruleIndex = ATNSimulator.toInt(data[p++]);
+			int ruleIndex = ATNDeserializer.toInt(data[p++]);
 			if (ruleIndex == Character.MAX_VALUE) {
 				ruleIndex = -1;
 			}
 
 			String arg = "";
 			if ( stype == ATNState.LOOP_END ) {
-				int loopBackStateNumber = ATNSimulator.toInt(data[p++]);
+				int loopBackStateNumber = ATNDeserializer.toInt(data[p++]);
 				arg = " "+loopBackStateNumber;
 			}
 			else if ( stype == ATNState.PLUS_BLOCK_START || stype == ATNState.STAR_BLOCK_START || stype == ATNState.BLOCK_START ) {
-				int endStateNumber = ATNSimulator.toInt(data[p++]);
+				int endStateNumber = ATNDeserializer.toInt(data[p++]);
 				arg = " "+endStateNumber;
 			}
 			buf.append(i).append(":")
 				.append(ATNState.serializationNames.get(stype)).append(" ")
 				.append(ruleIndex).append(arg).append("\n");
 		}
-		int numNonGreedyStates = ATNSimulator.toInt(data[p++]);
+		int numNonGreedyStates = ATNDeserializer.toInt(data[p++]);
 		for (int i = 0; i < numNonGreedyStates; i++) {
-			int stateNumber = ATNSimulator.toInt(data[p++]);
+			int stateNumber = ATNDeserializer.toInt(data[p++]);
 		}
-		int numPrecedenceStates = ATNSimulator.toInt(data[p++]);
+		int numPrecedenceStates = ATNDeserializer.toInt(data[p++]);
 		for (int i = 0; i < numPrecedenceStates; i++) {
-			int stateNumber = ATNSimulator.toInt(data[p++]);
+			int stateNumber = ATNDeserializer.toInt(data[p++]);
 		}
-		int nrules = ATNSimulator.toInt(data[p++]);
+		int nrules = ATNDeserializer.toInt(data[p++]);
 		for (int i=0; i<nrules; i++) {
-			int s = ATNSimulator.toInt(data[p++]);
+			int s = ATNDeserializer.toInt(data[p++]);
             if (atn.grammarType == ATNType.LEXER) {
-                int arg1 = ATNSimulator.toInt(data[p++]);
-                int arg2 = ATNSimulator.toInt(data[p++]);
+                int arg1 = ATNDeserializer.toInt(data[p++]);
+                int arg2 = ATNDeserializer.toInt(data[p++]);
 				if (arg2 == Character.MAX_VALUE) {
 					arg2 = -1;
 				}
@@ -392,14 +392,14 @@ public class ATNSerializer {
                 buf.append("rule ").append(i).append(":").append(s).append('\n');
             }
 		}
-		int nmodes = ATNSimulator.toInt(data[p++]);
+		int nmodes = ATNDeserializer.toInt(data[p++]);
 		for (int i=0; i<nmodes; i++) {
-			int s = ATNSimulator.toInt(data[p++]);
+			int s = ATNDeserializer.toInt(data[p++]);
 			buf.append("mode ").append(i).append(":").append(s).append('\n');
 		}
-		int nsets = ATNSimulator.toInt(data[p++]);
+		int nsets = ATNDeserializer.toInt(data[p++]);
 		for (int i=0; i<nsets; i++) {
-			int nintervals = ATNSimulator.toInt(data[p++]);
+			int nintervals = ATNDeserializer.toInt(data[p++]);
 			buf.append(i).append(":");
 			boolean containsEof = data[p++] != 0;
 			if (containsEof) {
@@ -411,28 +411,28 @@ public class ATNSerializer {
 					buf.append(", ");
 				}
 
-				buf.append(getTokenName(ATNSimulator.toInt(data[p]))).append("..").append(getTokenName(ATNSimulator.toInt(data[p + 1])));
+				buf.append(getTokenName(ATNDeserializer.toInt(data[p]))).append("..").append(getTokenName(ATNDeserializer.toInt(data[p + 1])));
 				p += 2;
 			}
 			buf.append("\n");
 		}
-		int nedges = ATNSimulator.toInt(data[p++]);
+		int nedges = ATNDeserializer.toInt(data[p++]);
 		for (int i=0; i<nedges; i++) {
-			int src = ATNSimulator.toInt(data[p]);
-			int trg = ATNSimulator.toInt(data[p + 1]);
-			int ttype = ATNSimulator.toInt(data[p + 2]);
-			int arg1 = ATNSimulator.toInt(data[p + 3]);
-			int arg2 = ATNSimulator.toInt(data[p + 4]);
-			int arg3 = ATNSimulator.toInt(data[p + 5]);
+			int src = ATNDeserializer.toInt(data[p]);
+			int trg = ATNDeserializer.toInt(data[p + 1]);
+			int ttype = ATNDeserializer.toInt(data[p + 2]);
+			int arg1 = ATNDeserializer.toInt(data[p + 3]);
+			int arg2 = ATNDeserializer.toInt(data[p + 4]);
+			int arg3 = ATNDeserializer.toInt(data[p + 5]);
 			buf.append(src).append("->").append(trg)
 				.append(" ").append(Transition.serializationNames.get(ttype))
 				.append(" ").append(arg1).append(",").append(arg2).append(",").append(arg3)
 				.append("\n");
 			p += 6;
 		}
-		int ndecisions = ATNSimulator.toInt(data[p++]);
+		int ndecisions = ATNDeserializer.toInt(data[p++]);
 		for (int i=0; i<ndecisions; i++) {
-			int s = ATNSimulator.toInt(data[p++]);
+			int s = ATNDeserializer.toInt(data[p++]);
 			buf.append(i).append(":").append(s).append("\n");
 		}
 		return buf.toString();
