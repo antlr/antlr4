@@ -31,7 +31,6 @@
 package org.antlr.v4.runtime.tree.pattern;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.ListTokenSource;
@@ -39,7 +38,6 @@ import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializationOptions;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
@@ -51,7 +49,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -86,13 +83,9 @@ public class ParseTreePatternMatcher {
 
 	public ParseTreePatternMatcher() { }
 
-	public ParseTreePatternMatcher(Class<? extends Lexer> lexerClass,
-								   Class<? extends Parser> parserClass)
-	{
-		this.lexerClass = lexerClass;
-		this.parserClass = parserClass;
-
-		lazyInit();
+	public ParseTreePatternMatcher(Lexer lexer, Parser parser) {
+		this.lexer = lexer;
+		this.parser = parser;
 		String sATN = parser.getSerializedATN();
 		ATNDeserializationOptions deserializationOptions = new ATNDeserializationOptions();
 		deserializationOptions.setGenerateRuleBypassTransitions(true);
@@ -104,25 +97,6 @@ public class ParseTreePatternMatcher {
 		this.start = start;
 		this.stop = stop;
 		this.escape = escapeLeft;
-	}
-
-	public void lazyInit() {
-		try {
-			if ( lexer==null ) {
-				Class<? extends Lexer> c = lexerClass.asSubclass(Lexer.class);
-				Constructor<? extends Lexer> ctor = c.getConstructor(CharStream.class);
-				lexer = ctor.newInstance((CharStream)null);
-			}
-
-			if ( parser==null ) {
-				Class<? extends Parser> pc = parserClass.asSubclass(Parser.class);
-				Constructor<? extends Parser> pctor = pc.getConstructor(TokenStream.class);
-				parser = pctor.newInstance((TokenStream)null);
-			}
-		}
-		catch (Exception e) {
-			throw new CannotCreateLexerOrParser(e);
-		}
 	}
 
 	public boolean matches(ParseTree tree, String patternRuleName, String pattern) {
@@ -243,7 +217,6 @@ public class ParseTreePatternMatcher {
 	}
 
 	public List<? extends Token> tokenize(String pattern) {
-		lazyInit();
 		// make maps for quick look up
 		Map<String, Integer> tokenNameToType = toMap(parser.getTokenNames(), 0);
 		Map<String, Integer> ruleNameToIndex = toMap(parser.getRuleNames(), 0);

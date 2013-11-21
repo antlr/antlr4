@@ -62,8 +62,6 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	/** If this recognizer was generated, it will have a serialized ATN
 	 *  representation of the grammar.
 	 *
-	 *  Provide a dummy return value here to support backward compatibility.
-	 *
 	 *  For interpreters, we don't know their serialized ATN despite having
 	 *  created the interpreter from it.
 	 */
