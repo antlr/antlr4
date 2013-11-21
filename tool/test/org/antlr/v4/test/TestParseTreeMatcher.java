@@ -116,6 +116,27 @@ public class TestParseTreeMatcher extends BaseTest {
 	}
 
 	@Test
+	public void testHiddenTokensNotSeenByTreePatternParser() throws Exception {
+		String grammar =
+			"grammar X2;\n" +
+			"s : ID '=' expr ';' ;\n" +
+			"expr : ID | INT ;\n" +
+			"ID : [a-z]+ ;\n" +
+			"INT : [0-9]+ ;\n" +
+			"WS : [ \\r\\n\\t]+ -> channel(HIDDEN) ;\n";
+		boolean ok =
+			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
+		assertTrue(ok);
+
+		ParseTreePatternMatcher p = getMatcher("X2");
+
+		ParseTreePattern t = p.compile("s", "<ID> = <expr> ;");
+		String results = t.patternTree.toStringTree(p.getParser());
+		String expected = "(s <ID> = (expr <expr>) ;)";
+		assertEquals(expected, results);
+	}
+
+	@Test
 	public void testCompilingMultipleTokens() throws Exception {
 		String grammar =
 			"grammar X2;\n" +
