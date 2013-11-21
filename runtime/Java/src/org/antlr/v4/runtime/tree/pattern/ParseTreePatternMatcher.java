@@ -31,6 +31,7 @@
 package org.antlr.v4.runtime.tree.pattern;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.ListTokenSource;
@@ -49,6 +50,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -56,6 +58,11 @@ import java.util.List;
 import java.util.Map;
 
 public class ParseTreePatternMatcher {
+	public static class CannotCreateLexerOrParser extends RuntimeException {
+		public CannotCreateLexerOrParser(Throwable e) {
+			super(e);
+		}
+	}
 	public static class CannotInvokeStartRule extends RuntimeException {
 		public CannotInvokeStartRule(Throwable e) {
 			super(e);
@@ -238,11 +245,30 @@ public class ParseTreePatternMatcher {
 				TextChunk textChunk = (TextChunk)chunk;
 				try {
 					ANTLRInputStream in = new ANTLRInputStream(new StringReader(textChunk.text));
-					lexer.setInputStream(in);
-					Token t = lexer.nextToken();
+					/* We want this:
+					LexerInterpreter lexerInterpreter
+						= new LexerInterpreter(lexer.getGrammarFileName(),
+											   Arrays.asList(lexer.getTokenNames()),
+											   Arrays.asList(lexer.getRuleNames()),
+											   Arrays.asList(lexer.getModeNames()),
+											   lexer.getATN(),
+											   in);
+											   */
+
+					Lexer mylexer = null;
+					try {
+						Class<? extends Lexer> lexerClass = lexer.getClass();
+						Constructor<? extends Lexer> ctor = lexerClass.getConstructor(CharStream.class);
+						mylexer = ctor.newInstance(in);
+					}
+					catch (Exception e) {
+						throw new CannotCreateLexerOrParser(e);
+					}
+
+					Token t = mylexer.nextToken();
 					while ( t.getType()!=Token.EOF ) {
 						tokens.add(t);
-						t = lexer.nextToken();
+						t = mylexer.nextToken();
 					}
 				}
 				catch (IOException ioe) {
