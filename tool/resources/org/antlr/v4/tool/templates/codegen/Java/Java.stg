@@ -372,7 +372,7 @@ private <currentRule.ctxType> <currentRule.name>(int _p<currentRule.args:{a | , 
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>);
 	<currentRule.ctxType> _prevctx = _localctx;
 	int _startState = <currentRule.startState>;
-	enterRecursionRule(_localctx, RULE_<currentRule.name>, _p);
+	enterRecursionRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>, _p);
 	<namedActions.init>
 	<locals; separator="\n">
 	try {

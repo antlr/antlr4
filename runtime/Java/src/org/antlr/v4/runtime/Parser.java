@@ -577,10 +577,11 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 */
 	@Deprecated
 	public void enterRecursionRule(ParserRuleContext localctx, int ruleIndex) {
-		enterRecursionRule(localctx, ruleIndex, 0);
+		enterRecursionRule(localctx, getATN().ruleToStartState[ruleIndex].stateNumber, ruleIndex, 0);
 	}
 
-	public void enterRecursionRule(ParserRuleContext localctx, int ruleIndex, int precedence) {
+	public void enterRecursionRule(ParserRuleContext localctx, int state, int ruleIndex, int precedence) {
+		setState(state);
 		_precedenceStack.push(precedence);
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
