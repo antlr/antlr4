@@ -33,7 +33,7 @@ package org.antlr.v4.test;
 import org.antlr.v4.automata.ATNSerializer;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
@@ -179,7 +179,7 @@ public class TestATNDeserialization extends BaseTest {
 		ATN atn = createATN(g, false);
 		char[] data = Utils.toCharArray(ATNSerializer.getSerialized(g, atn));
 		String atnData = ATNSerializer.getDecoded(g, atn);
-		ATN atn2 = ParserATNSimulator.deserialize(data);
+		ATN atn2 = new ATNDeserializer().deserialize(data);
 		String atn2Data = ATNSerializer.getDecoded(g, atn2);
 
 		assertEquals(atnData, atn2Data);

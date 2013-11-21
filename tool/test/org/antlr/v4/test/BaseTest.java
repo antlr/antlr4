@@ -49,7 +49,7 @@ import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.WritableToken;
 import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
@@ -185,7 +185,7 @@ public abstract class BaseTest {
 		ATN atn = g.atn;
 		if (useSerializer) {
 			char[] serialized = ATNSerializer.getSerializedAsChars(g, atn);
-			return ATNSimulator.deserialize(serialized);
+			return new ATNDeserializer().deserialize(serialized);
 		}
 
 		return atn;
