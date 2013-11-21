@@ -53,7 +53,6 @@ import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -217,8 +216,8 @@ public class ParseTreePatternMatcher {
 
 	public List<? extends Token> tokenize(String pattern) {
 		// make maps for quick look up
-		Map<String, Integer> tokenNameToType = toMap(parser.getTokenNames(), 0);
-		Map<String, Integer> ruleNameToIndex = toMap(parser.getRuleNames(), 0);
+		Map<String, Integer> tokenNameToType = Utils.toMap(parser.getTokenNames());
+		Map<String, Integer> ruleNameToIndex = Utils.toMap(parser.getRuleNames());
 
 		// split pattern into chunks: sea (raw input) and islands (<ID>, <expr>)
 		List<Chunk> chunks = split(pattern);
@@ -280,14 +279,6 @@ public class ParseTreePatternMatcher {
 
 		System.out.println("tokens="+tokens);
 		return tokens;
-	}
-
-	public static Map<String, Integer> toMap(String[] keys, int offset) {
-		Map<String, Integer> m = new HashMap<String, Integer>();
-		for (int i=0; i<keys.length; i++) {
-			m.put(keys[i], i+offset);
-		}
-		return m;
 	}
 
 	/** Split "<ID> = <e:expr> ;" into 4 chunks for tokenizing by tokenize() */
