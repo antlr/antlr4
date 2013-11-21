@@ -32,17 +32,14 @@ package org.antlr.v4.test;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.LexerInterpreter;
+import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
-import org.antlr.v4.tool.interp.LexerInterpreter;
-import org.antlr.v4.tool.interp.ParserInterpreter;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
 
 
 public class TestParserInterpreter extends BaseTest {

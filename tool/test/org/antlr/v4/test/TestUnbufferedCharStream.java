@@ -34,16 +34,16 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenFactory;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.IntStream;
+import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.UnbufferedCharStream;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.tool.LexerGrammar;
-import org.antlr.v4.tool.interp.LexerInterpreter;
 import org.junit.Test;
 
 import java.io.Reader;
 import java.io.StringReader;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class TestUnbufferedCharStream extends BaseTest {
 	@Test public void testNoChar() throws Exception {
