@@ -84,7 +84,6 @@ public class ParserInterpreter extends Parser {
 	protected final String[] ruleNames;
 
 	protected final Deque<Pair<ParserRuleContext, Integer>> _parentContextStack = new ArrayDeque<Pair<ParserRuleContext, Integer>>();
-	protected final Deque<InterpreterRuleContext> _contextStack = new ArrayDeque<InterpreterRuleContext>();
 
 	public ParserInterpreter(String grammarFileName, Collection<String> tokenNames, Collection<String> ruleNames, ATN atn, TokenStream input) {
 		super(input);
