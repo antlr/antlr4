@@ -56,19 +56,11 @@ import java.util.List;
 import java.util.Map;
 
 public class ParseTreePatternMatcher {
-	public static class CannotCreateLexerOrParser extends RuntimeException {
-		public CannotCreateLexerOrParser(Throwable e) {
-			super(e);
-		}
-	}
 	public static class CannotInvokeStartRule extends RuntimeException {
 		public CannotInvokeStartRule(Throwable e) {
 			super(e);
 		}
 	}
-
-	protected Class<? extends Lexer> lexerClass;
-	protected Class<? extends Parser> parserClass;
 
 	protected Lexer lexer;
 	protected Parser parser;
