@@ -30,10 +30,11 @@
 
 package org.antlr.v4.tool.interp;
 
-import org.antlr.runtime.Token;
 import org.antlr.v4.runtime.FailedPredicateException;
+import org.antlr.v4.runtime.InterpreterRuleContext;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
@@ -212,7 +213,7 @@ public class ParserInterpreter extends Parser {
 		case Transition.RANGE:
 		case Transition.SET:
 		case Transition.NOT_SET:
-			if (!transition.matches(_input.LA(1), Token.MIN_TOKEN_TYPE, 65535)) {
+			if (!transition.matches(_input.LA(1), Token.MIN_USER_TOKEN_TYPE, 65535)) {
 				_errHandler.recoverInline(this);
 			}
 			matchWildcard();
