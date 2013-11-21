@@ -14,6 +14,9 @@ public class ParseTreeMatch {
 
 	protected List<Pair<String,? extends ParseTree>> labels;
 
+	/** Where in actual parse tree we failed if we can't match pattern */
+	ParseTree mismatchedNode;
+
 	public ParseTreeMatch(ParseTree tree, ParseTreePattern pattern) {
 		this.tree = tree;
 		this.pattern = pattern;

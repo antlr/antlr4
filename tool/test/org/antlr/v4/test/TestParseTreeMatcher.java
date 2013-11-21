@@ -181,6 +181,18 @@ public class TestParseTreeMatcher extends BaseTest {
 		checkPatternMatch("X3.g4", grammar, "s", input, pattern, "X3");
 	}
 
+	@Test public void testIDNodeWithLabelMatches() throws Exception {
+		String grammar =
+			"grammar X3;\n" +
+			"s : ID ';' ;\n" +
+			"ID : [a-z]+ ;\n" +
+			"WS : [ \\r\\n\\t]+ -> skip ;\n";
+
+		String input = "x ;";
+		String pattern = "<id:ID>;";
+		checkPatternMatch("X3.g4", grammar, "s", input, pattern, "X3");
+	}
+
 	@Test public void testTokenAndRuleMatch() throws Exception {
 		String grammar =
 			"grammar X4;\n" +

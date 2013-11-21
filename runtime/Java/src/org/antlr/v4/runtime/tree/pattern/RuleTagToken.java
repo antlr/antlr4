@@ -7,10 +7,16 @@ import org.antlr.v4.runtime.TokenSource;
 public class RuleTagToken implements Token {
 	protected String ruleName;
 	protected int ruleImaginaryTokenType;
+	protected String label;
 
 	public RuleTagToken(String ruleName, int ruleImaginaryTokenType) {
 		this.ruleName = ruleName;
 		this.ruleImaginaryTokenType = ruleImaginaryTokenType;
+	}
+
+	public RuleTagToken(String ruleName, int ruleImaginaryTokenType, String label) {
+		this(ruleName, ruleImaginaryTokenType);
+		this.label = label;
 	}
 
 	@Override

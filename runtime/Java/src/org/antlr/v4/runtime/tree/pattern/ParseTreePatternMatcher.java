@@ -99,27 +99,39 @@ public class ParseTreePatternMatcher {
 
 	public boolean matches(ParseTree tree, String patternRuleName, String pattern) {
 		ParseTreePattern p = compile(patternRuleName, pattern);
-		ParseTreeMatch m = matches_(tree, p.patternTree, p);
-		return !(m instanceof ParseTreeMatchFailed);
+		ParseTreeMatch match = new ParseTreeMatch(tree, p);
+		matches_(tree, p.patternTree, p, match);
+		return match.mismatchedNode==null;
 	}
 
 	public boolean matches(ParseTree tree, ParseTreePattern pattern) {
-		ParseTreeMatch m = matches_(tree, pattern.patternTree, pattern);
-		return !(m instanceof ParseTreeMatchFailed);
+		ParseTreeMatch match = new ParseTreeMatch(tree, pattern);
+		matches_(tree, pattern.patternTree, pattern, match);
+		return match.mismatchedNode==null;
 	}
 
 	public ParseTreeMatch match(ParseTree tree, String patternRuleName, String pattern) {
 		ParseTreePattern p = compile(patternRuleName, pattern);
-		return matches_(tree, p.patternTree, p);
+		ParseTreeMatch match = new ParseTreeMatch(tree, p);
+		if ( matches_(tree, p.patternTree, p, match) ) {
+			return match;
+		}
+		return match;
 	}
 
 	public ParseTreeMatch match(ParseTree tree, ParseTreePattern pattern) {
-		return matches_(tree, pattern.patternTree, pattern);
+		ParseTreeMatch match = new ParseTreeMatch(tree, pattern);
+		matches_(tree, pattern.patternTree, pattern, match);
+		return match;
 	}
 
-	protected ParseTreeMatch matches_(ParseTree tree, ParseTree patternTree, ParseTreePattern pattern) {
+	protected boolean matches_(ParseTree tree,
+							   ParseTree patternTree,
+							   ParseTreePattern pattern,
+							   ParseTreeMatch match)
+	{
 		if ( tree==null || patternTree==null ) {
-			return new ParseTreeMatchFailed(tree, null, pattern);
+			return false;
 		}
 		// x and <ID>, x and y, or x and x; or could be mismatched types
 		if ( tree instanceof TerminalNode && patternTree instanceof TerminalNode ) {
@@ -129,19 +141,17 @@ public class ParseTreePatternMatcher {
 			// both are tokens and they have same type
 			if ( t1.getSymbol().getType() == t2.getSymbol().getType() ) {
 				if ( t2.getSymbol() instanceof TokenTagToken ) { // x and <ID>
-					m = new ParseTreeMatch(tree, pattern);
 				}
 				else if ( t1.getText().equals(t2.getText()) ) { // x and x
-					m = new ParseTreeMatch(tree, pattern);
 				}
 				else { // x and y
-					m = new ParseTreeMatchFailed(tree, t1, pattern);
+					match.mismatchedNode = t1;
 				}
 			}
 			else {
-				m = new ParseTreeMatchFailed(tree, t1, pattern);
+				match.mismatchedNode = t1;
 			}
-			return m;
+			return match.mismatchedNode==null;
 		}
 		if ( tree instanceof ParserRuleContext && patternTree instanceof ParserRuleContext ) {
 			ParserRuleContext r1 = (ParserRuleContext)tree;
@@ -150,29 +160,28 @@ public class ParseTreePatternMatcher {
 			if ( isRuleTag(r2) ) {
 				ParseTreeMatch m = null;
 				if ( r1.getRuleContext().getRuleIndex() == r2.getRuleContext().getRuleIndex() ) {
-					m = new ParseTreeMatch(tree, pattern);
 				}
 				else {
-					m = new ParseTreeMatchFailed(tree, r1, pattern);
+					match.mismatchedNode = r1;
 				}
-				return m;
+				return match.mismatchedNode==null;
 			}
 			// (expr ...) and (expr ...)
 			if ( r1.getChildCount()!=r2.getChildCount() ) {
-				return new ParseTreeMatchFailed(tree, r1, pattern);
+				match.mismatchedNode = r1;
+				return false;
 			}
 			int n = r1.getChildCount();
 			for (int i = 0; i<n; i++) {
-				ParseTreeMatch childMatch =
-					matches_(r1.getChild(i), patternTree.getChild(i), pattern);
-				if ( childMatch instanceof ParseTreeMatchFailed ) {
-					return childMatch;
-				}
+				boolean childMatch =
+					matches_(r1.getChild(i), patternTree.getChild(i), pattern, match);
+				if ( !childMatch ) return false;
 			}
-			return new ParseTreeMatch(tree, pattern);
+			return true;
 		}
 		// if nodes aren't both tokens or both rule nodes, can't match
-		return new ParseTreeMatchFailed(tree, tree, pattern);
+		match.mismatchedNode = tree;
+		return false;
 	}
 
 	/** Is t (expr <expr>) subtree? */
@@ -229,12 +238,14 @@ public class ParseTreePatternMatcher {
 				TagChunk tagChunk = (TagChunk)chunk;
 				// add special rule token or conjure up new token from name
 				if ( Character.isUpperCase(tagChunk.tag.charAt(0)) ) {
-					tokens.add(new TokenTagToken(tagChunk.tag, tokenNameToType.get(tagChunk.tag)));
+					Integer ttype = tokenNameToType.get(tagChunk.tag);
+					TokenTagToken t = new TokenTagToken(tagChunk.tag, ttype, tagChunk.label);
+					tokens.add(t);
 				}
 				else if ( Character.isLowerCase(tagChunk.tag.charAt(0)) ) {
 					int ruleIndex = ruleNameToIndex.get(tagChunk.tag);
 					int ruleImaginaryTokenType = atnWithBypassAlts.ruleToTokenType[ruleIndex];
-					tokens.add(new RuleTagToken(tagChunk.tag, ruleImaginaryTokenType));
+					tokens.add(new RuleTagToken(tagChunk.tag, ruleImaginaryTokenType, tagChunk.label));
 				}
 				else {
 					System.err.println("invalid tag: "+tagChunk.tag);
@@ -341,7 +352,14 @@ public class ParseTreePatternMatcher {
 		for (int i=0; i<ntags; i++) {
 			// copy inside of <tag>
 			String tag = pattern.substring(starts.get(i) + start.length(), stops.get(i));
-			chunks.add(new TagChunk(tag));
+			String ruleOrToken = tag;
+			String label = null;
+			int colon = tag.indexOf(':');
+			if ( colon >= 0 ) {
+				label = tag.substring(0,colon);
+				ruleOrToken = tag.substring(colon+1, tag.length());
+			}
+			chunks.add(new TagChunk(label, ruleOrToken));
 			if ( i+1 < ntags ) {
 				// copy from end of <tag> to start of next
 				String text = pattern.substring(stops.get(i) + stop.length(), starts.get(i + 1));
