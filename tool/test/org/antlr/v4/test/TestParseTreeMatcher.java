@@ -158,20 +158,6 @@ public class TestParseTreeMatcher extends BaseTest {
 		assertEquals(expected, results);
 	}
 
-	public ParseTreePatternMatcher getMatcher(String name) throws Exception {
-		Class<? extends Lexer> lexerClass = loadLexerClassFromTempDir(name+"Lexer");
-		Class<? extends Parser> parserClass = loadParserClassFromTempDir(name + "Parser");
-		Class<? extends Lexer> c = lexerClass.asSubclass(Lexer.class);
-		Constructor<? extends Lexer> ctor = c.getConstructor(CharStream.class);
-		Lexer lexer = ctor.newInstance((CharStream) null);
-
-		Class<? extends Parser> pc = parserClass.asSubclass(Parser.class);
-		Constructor<? extends Parser> pctor = pc.getConstructor(TokenStream.class);
-		Parser parser = pctor.newInstance((TokenStream)null);
-
-		return new ParseTreePatternMatcher(lexer, parser);
-	}
-
 	@Test public void testIDNodeMatches() throws Exception {
 		String grammar =
 			"grammar X3;\n" +
@@ -226,6 +212,8 @@ public class TestParseTreeMatcher extends BaseTest {
 		assertEquals("[x, z]", m.getAll("a").toString());
 		assertEquals("[y]", m.getAll("b").toString());
 		assertEquals("[x, y, z]", m.getAll("ID").toString()); // ordered
+
+		assertEquals("xyz;", m.getText()); // whitespace stripped by lexer
 
 		assertNull(m.get("undefined"));
 		assertEquals("[]", m.getAll("undefined").toString());
@@ -340,9 +328,23 @@ public class TestParseTreeMatcher extends BaseTest {
 
 		ParseTreePatternMatcher p = getMatcher(grammarName);
 		ParseTreeMatch match = p.match(result, pattern, startRule);
-		boolean matched = match.getMismatchedNode() == null;
+		boolean matched = match.succeeded();
 		if ( invertMatch ) assertFalse(matched);
 		else assertTrue(matched);
 		return match;
+	}
+
+	public ParseTreePatternMatcher getMatcher(String name) throws Exception {
+		Class<? extends Lexer> lexerClass = loadLexerClassFromTempDir(name+"Lexer");
+		Class<? extends Parser> parserClass = loadParserClassFromTempDir(name + "Parser");
+		Class<? extends Lexer> c = lexerClass.asSubclass(Lexer.class);
+		Constructor<? extends Lexer> ctor = c.getConstructor(CharStream.class);
+		Lexer lexer = ctor.newInstance((CharStream) null);
+
+		Class<? extends Parser> pc = parserClass.asSubclass(Parser.class);
+		Constructor<? extends Parser> pctor = pc.getConstructor(TokenStream.class);
+		Parser parser = pctor.newInstance((TokenStream)null);
+
+		return new ParseTreePatternMatcher(lexer, parser);
 	}
 }

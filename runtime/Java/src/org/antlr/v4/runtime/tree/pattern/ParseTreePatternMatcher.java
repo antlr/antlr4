@@ -1,37 +1,36 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
+ * Copyright (c) 2013 Terence Parr
+ * Copyright (c) 2013 Sam Harwell
+ * All rights reserved.
  *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
  *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
  *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.antlr.v4.runtime.tree.pattern;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.ListTokenSource;
@@ -44,31 +43,87 @@ import org.antlr.v4.runtime.atn.ATNDeserializationOptions;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+/** A tree pattern matching mechanism for ANTLR ParseTrees.
+ *
+ *  Patterns are strings of source input text with special tags
+ *  representing token or rule references such as:
+ *
+ *  "<ID> = <expr>;"
+ *
+ *  Given a pattern start rule such as statement, this object
+ *  construct a parse tree with placeholders for the identifier and
+ *  expression subtree. Then the match() routines can compare an
+ *  actual parse tree from a parse with this pattern. Tag <ID> matches
+ *  any ID token and tag <expr> references any expression subtree.
+ *
+ *  Pattern "x = 0;" is a similar pattern that matches the same
+ *  pattern except that it requires the identifier to be x and the
+ *  expression to be 0.
+ *
+ *  The matches() routines return true or false based upon a match for
+ *  the tree rooted at the parameter sent in. The match() routines
+ *  return a ParseTreeMatch object that contains the parse tree, the
+ *  parse tree pattern, and a map from tag name to matched nodes (more
+ *  below). A subtree that fails to match, returns with
+ *  ParseTreeMatch.mismatchedNode set to the first tree node that did
+ *  not match.
+ *
+ *  For efficiency, you can compile a tree pattern in string form to a
+ *  ParseTreePattern object. It is also expensive to create a
+ *  ParseTreePatternMatcher object, so create one of those and reuse
+ *  it.
+ *
+ *  See TestParseTreeMatcher for lots of examples. ParseTreePattern
+ *  has two static helper methods: findAll() and match() that are easy
+ *  to use but not superefficient because they create new
+ *  ParseTreePatternMatcher objects each time and have to compile the
+ *  pattern in string form before using it.
+ *
+ *  The lexer and parser that you pass into the
+ *  ParseTreePatternMatcher constructor are used to parse the pattern
+ *  in string form. The lexer converts the "<ID> = <expr>;" into a
+ *  sequence of four tokens (assuming lexer throws out whitespace or
+ *  puts it on a hidden channel). Be aware that the input stream is
+ *  reset for the lexer (but not the parser; a ParserInterpreter is
+ *  created to parse the input.). Any user-defined fields you have put
+ *  into the lexer might get changed when this mechanism asks it to
+ *  scan the pattern string.
+ *
+ *  Normally a parser does not accept token "<expr>" as a valid expr
+ *  but, from the parser passed in, we create a special version of the
+ *  underlying grammar representation (an ATN) that allows imaginary
+ *  tokens representing rules (<expr>) to match entire rules.
+ *  We call these bypass alternatives.
+ *
+ *  Delimiters are < and > with \ as the escape string by default, but
+ *  you can set them to whatever you want using setDelimiters(). You
+ *  must escape both start and stop strings \< and \>.
+ */
 public class ParseTreePatternMatcher {
-	public static class CannotCreateLexerOrParser extends RuntimeException {
-		public CannotCreateLexerOrParser(Throwable e) {
-			super(e);
-		}
-	}
 	public static class CannotInvokeStartRule extends RuntimeException {
 		public CannotInvokeStartRule(Throwable e) {
 			super(e);
 		}
 	}
 
+	/** Used to convert the tree pattern string into a series of tokens.
+	 *  The input stream is reset.
+	 */
 	protected Lexer lexer;
+
+	/** Used to collect to the grammar file name, token names, rule names
+	 *  for used to parse the pattern into a parse tree.
+	 */
 	protected Parser parser;
 
 	protected String start = "<", stop=">";
@@ -77,11 +132,18 @@ public class ParseTreePatternMatcher {
 	/** This ATN has alternatives to match special imaginary tokens for rules like <expr> */
 	protected ATN atnWithBypassAlts;
 
+	/** Maps the rule name to rule index; computed during the constructor
+	 *  for efficient use later.
+	 */
 	protected Map<String, Integer> ruleToIndex;
 
-	public ParseTreePatternMatcher() { }
+	public ParseTreePatternMatcher() { } // used for testing only
 
-	// alters stream of lexer, any users fields
+	/** Constructs a pattern match or from a lecture and parser object.
+	 *  The lexer input stream is altered for tokenizing the tree patterns.
+	 *  The parser is used as a convenient mechanism to get the grammar name,
+	 *  plus token, rule names.
+	 */
 	public ParseTreePatternMatcher(Lexer lexer, Parser parser) {
 		this.lexer = lexer;
 		this.parser = parser;
@@ -98,28 +160,53 @@ public class ParseTreePatternMatcher {
 		this.escape = escapeLeft;
 	}
 
+	/** Does pattern matched as a patternRuleName match tree? */
 	public boolean matches(ParseTree tree, String pattern, String patternRuleName) {
 		ParseTreePattern p = compile(patternRuleName, pattern);
 		return matches(tree, p);
 	}
 
+	/** Does pattern matched as a patternRuleName match tree? Pass in a
+	 *  compiled pattern instead of a string representation of a tree pattern.
+	 */
 	public boolean matches(ParseTree tree, ParseTreePattern pattern) {
 		ParseTreeMatch match = new ParseTreeMatch(tree, pattern);
 		matches_(tree, pattern.patternTree, match);
-		return match.mismatchedNode==null;
+		return match.succeeded();
 	}
 
+	/** Compare pattern matched as a patternRuleName against tree and
+	 *  return a ParseTreeMatch object that contains the matched elements,
+	 *  or the node at which the match failed.
+	 */
 	public ParseTreeMatch match(ParseTree tree, String pattern, String patternRuleName) {
 		ParseTreePattern p = compile(patternRuleName, pattern);
 		return match(tree, p);
 	}
 
+	/** Compare pattern matched as a patternRuleName against tree and
+	 *  return a ParseTreeMatch object that contains the matched elements,
+	 *  or the node at which the match failed. Pass in a compiled pattern
+	 *  instead of a string representation of a tree pattern.
+	 */
 	public ParseTreeMatch match(ParseTree tree, ParseTreePattern pattern) {
 		ParseTreeMatch match = new ParseTreeMatch(tree, pattern);
 		matches_(tree, pattern.patternTree, match);
 		return match;
 	}
 
+
+	public Lexer getLexer() {
+		return lexer;
+	}
+
+	public Parser getParser() {
+		return parser;
+	}
+
+	// ---- SUPPORT CODE ----
+
+	/** Recursively walk tree against patternTree, filling match.labels */
 	protected boolean matches_(ParseTree tree,
 							   ParseTree patternTree,
 							   ParseTreeMatch match)
@@ -151,7 +238,7 @@ public class ParseTreePatternMatcher {
 			else {
 				match.mismatchedNode = t1;
 			}
-			return match.mismatchedNode==null;
+			return match.succeeded();
 		}
 		if ( tree instanceof ParserRuleContext && patternTree instanceof ParserRuleContext ) {
 			ParserRuleContext r1 = (ParserRuleContext)tree;
@@ -170,7 +257,7 @@ public class ParseTreePatternMatcher {
 				else {
 					match.mismatchedNode = r1;
 				}
-				return match.mismatchedNode==null;
+				return match.succeeded();
 			}
 			// (expr ...) and (expr ...)
 			if ( r1.getChildCount()!=r2.getChildCount() ) {
@@ -205,7 +292,7 @@ public class ParseTreePatternMatcher {
 		return null;
 	}
 
-	protected ParseTreePattern compile(String patternRuleName, String pattern) {
+	public ParseTreePattern compile(String patternRuleName, String pattern) {
 		List<? extends Token> tokenList = tokenize(pattern);
 		ListTokenSource tokenSrc = new ListTokenSource(tokenList);
 		CommonTokenStream tokens = new CommonTokenStream(tokenSrc);
@@ -229,7 +316,7 @@ public class ParseTreePatternMatcher {
 		return new ParseTreePattern(patternRuleName, pattern, tree);
 	}
 
-	protected List<? extends Token> tokenize(String pattern) {
+	public List<? extends Token> tokenize(String pattern) {
 		// make maps for quick look up
 		Map<String, Integer> tokenNameToType = Utils.toMap(parser.getTokenNames());
 		Map<String, Integer> ruleNameToIndex = Utils.toMap(parser.getRuleNames());
@@ -272,39 +359,6 @@ public class ParseTreePatternMatcher {
 					// -----------------
 					System.err.println("what?-----------------");
 				}
-
-//				try {
-//					ANTLRInputStream in = new ANTLRInputStream(new StringReader(textChunk.text));
-//					/* We want this:
-//					LexerInterpreter lexerInterpreter
-//						= new LexerInterpreter(lexer.getGrammarFileName(),
-//											   Arrays.asList(lexer.getTokenNames()),
-//											   Arrays.asList(lexer.getRuleNames()),
-//											   Arrays.asList(lexer.getModeNames()),
-//											   lexer.getATN(),
-//											   in);
-//											   */
-//
-//					Lexer mylexer = null;
-//					try {
-//						Class<? extends Lexer> lexerClass = lexer.getClass();
-//						Constructor<? extends Lexer> ctor = lexerClass.getConstructor(CharStream.class);
-//						mylexer = ctor.newInstance(in);
-//					}
-//					catch (Exception e) {
-//						throw new CannotCreateLexerOrParser(e);
-//					}
-//
-//					Token t = mylexer.nextToken();
-//					while ( t.getType()!=Token.EOF ) {
-//						tokens.add(t);
-//						t = mylexer.nextToken();
-//					}
-//				}
-//				catch (IOException ioe) {
-//					// -----------------
-//					System.err.println("what?-----------------");
-//				}
 			}
 		}
 
@@ -313,7 +367,7 @@ public class ParseTreePatternMatcher {
 	}
 
 	/** Split "<ID> = <e:expr> ;" into 4 chunks for tokenizing by tokenize() */
-	protected List<Chunk> split(String pattern) {
+	public List<Chunk> split(String pattern) {
 		int p = 0;
 		int n = pattern.length();
 		List<Chunk> chunks = new ArrayList<Chunk>();
@@ -403,38 +457,5 @@ public class ParseTreePatternMatcher {
 		}
 
 		return chunks;
-	}
-
-	public MatchIterator findAll(ParseTree t, int ruleIndex, String pattern) {
-		ParseTreeWalker walker = new ParseTreeWalker();
-		return null;
-	}
-
-	// preorder
-	protected List<ParseTree> findAll(ParseTree t, ParseTreePattern pattern) {
-		List<ParseTree> subtrees = new ArrayList<ParseTree>();
-		findAll_(t, pattern, subtrees);
-		return subtrees;
-	}
-
-	protected void findAll_(ParseTree t, ParseTreePattern pattern, List<ParseTree> subtrees) {
-		if ( pattern.matches(t) ) {
-			subtrees.add(t);
-		}
-		if ( t instanceof RuleNode) {
-			RuleNode r = (RuleNode)t;
-			int n = r.getChildCount();
-			for (int i = 0; i<n; i++) {
-				findAll(r.getChild(i), pattern);
-			}
-		}
-	}
-
-	public Lexer getLexer() {
-		return lexer;
-	}
-
-	public Parser getParser() {
-		return parser;
 	}
 }
