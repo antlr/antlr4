@@ -1,5 +1,9 @@
 ANTLR v4 Honey Badger
 
+November 22, 2013
+
+* Ter adds tree pattern matching.
+
 November 20, 2013
 
 * Sam added method stuff like expr() that calls expr(0). Makes it possible
