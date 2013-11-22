@@ -100,20 +100,20 @@ public class ParseTreePatternMatcher {
 	public boolean matches(ParseTree tree, String patternRuleName, String pattern) {
 		ParseTreePattern p = compile(patternRuleName, pattern);
 		ParseTreeMatch match = new ParseTreeMatch(tree, p);
-		matches_(tree, p.patternTree, p, match);
+		matches_(tree, p.patternTree, match);
 		return match.mismatchedNode==null;
 	}
 
 	public boolean matches(ParseTree tree, ParseTreePattern pattern) {
 		ParseTreeMatch match = new ParseTreeMatch(tree, pattern);
-		matches_(tree, pattern.patternTree, pattern, match);
+		matches_(tree, pattern.patternTree, match);
 		return match.mismatchedNode==null;
 	}
 
 	public ParseTreeMatch match(ParseTree tree, String patternRuleName, String pattern) {
 		ParseTreePattern p = compile(patternRuleName, pattern);
 		ParseTreeMatch match = new ParseTreeMatch(tree, p);
-		if ( matches_(tree, p.patternTree, p, match) ) {
+		if ( matches_(tree, p.patternTree, match) ) {
 			return match;
 		}
 		return match;
@@ -121,13 +121,12 @@ public class ParseTreePatternMatcher {
 
 	public ParseTreeMatch match(ParseTree tree, ParseTreePattern pattern) {
 		ParseTreeMatch match = new ParseTreeMatch(tree, pattern);
-		matches_(tree, pattern.patternTree, pattern, match);
+		matches_(tree, pattern.patternTree, match);
 		return match;
 	}
 
 	protected boolean matches_(ParseTree tree,
 							   ParseTree patternTree,
-							   ParseTreePattern pattern,
 							   ParseTreeMatch match)
 	{
 		if ( tree==null || patternTree==null ) {
@@ -141,6 +140,12 @@ public class ParseTreePatternMatcher {
 			// both are tokens and they have same type
 			if ( t1.getSymbol().getType() == t2.getSymbol().getType() ) {
 				if ( t2.getSymbol() instanceof TokenTagToken ) { // x and <ID>
+					TokenTagToken tokenTagToken = (TokenTagToken)t2.getSymbol();
+					// track label->list-of-nodes for both token name and label (if any)
+					match.labels.map(tokenTagToken.tokenName, tree);
+					if ( tokenTagToken.label!=null ) {
+						match.labels.map(tokenTagToken.label, tree);
+					}
 				}
 				else if ( t1.getText().equals(t2.getText()) ) { // x and x
 				}
@@ -157,9 +162,15 @@ public class ParseTreePatternMatcher {
 			ParserRuleContext r1 = (ParserRuleContext)tree;
 			ParserRuleContext r2 = (ParserRuleContext)patternTree;
 			// (expr ...) and <expr>
-			if ( isRuleTag(r2) ) {
+			RuleTagToken ruleTagToken = getRuleTagToken(r2);
+			if ( ruleTagToken!=null ) {
 				ParseTreeMatch m = null;
 				if ( r1.getRuleContext().getRuleIndex() == r2.getRuleContext().getRuleIndex() ) {
+					// track label->list-of-nodes for both rule name and label (if any)
+					match.labels.map(ruleTagToken.ruleName, tree);
+					if ( ruleTagToken.label!=null ) {
+						match.labels.map(ruleTagToken.label, tree);
+					}
 				}
 				else {
 					match.mismatchedNode = r1;
@@ -174,7 +185,7 @@ public class ParseTreePatternMatcher {
 			int n = r1.getChildCount();
 			for (int i = 0; i<n; i++) {
 				boolean childMatch =
-					matches_(r1.getChild(i), patternTree.getChild(i), pattern, match);
+					matches_(r1.getChild(i), patternTree.getChild(i), match);
 				if ( !childMatch ) return false;
 			}
 			return true;
@@ -185,18 +196,18 @@ public class ParseTreePatternMatcher {
 	}
 
 	/** Is t (expr <expr>) subtree? */
-	public boolean isRuleTag(ParseTree t) {
+	public RuleTagToken getRuleTagToken(ParseTree t) {
 		if ( t instanceof RuleNode ) {
 			RuleNode r = (RuleNode)t;
 			if ( r.getChildCount()==1 && r.getChild(0) instanceof TerminalNode ) {
 				TerminalNode c = (TerminalNode)r.getChild(0);
 				if ( c.getSymbol() instanceof RuleTagToken ) {
 					System.out.println("rule tag subtree "+t.toStringTree(parser));
-					return true;
+					return (RuleTagToken)c.getSymbol();
 				}
 			}
 		}
-		return false;
+		return null;
 	}
 
 	public ParseTreePattern compile(String patternRuleName, String pattern) {
