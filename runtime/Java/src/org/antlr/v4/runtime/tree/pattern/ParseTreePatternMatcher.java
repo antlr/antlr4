@@ -81,6 +81,7 @@ public class ParseTreePatternMatcher {
 
 	public ParseTreePatternMatcher() { }
 
+	// alters stream of lexer, any users fields
 	public ParseTreePatternMatcher(Lexer lexer, Parser parser) {
 		this.lexer = lexer;
 		this.parser = parser;
@@ -97,11 +98,9 @@ public class ParseTreePatternMatcher {
 		this.escape = escapeLeft;
 	}
 
-	public boolean matches(ParseTree tree, String patternRuleName, String pattern) {
+	public boolean matches(ParseTree tree, String pattern, String patternRuleName) {
 		ParseTreePattern p = compile(patternRuleName, pattern);
-		ParseTreeMatch match = new ParseTreeMatch(tree, p);
-		matches_(tree, p.patternTree, match);
-		return match.mismatchedNode==null;
+		return matches(tree, p);
 	}
 
 	public boolean matches(ParseTree tree, ParseTreePattern pattern) {
@@ -110,13 +109,9 @@ public class ParseTreePatternMatcher {
 		return match.mismatchedNode==null;
 	}
 
-	public ParseTreeMatch match(ParseTree tree, String patternRuleName, String pattern) {
+	public ParseTreeMatch match(ParseTree tree, String pattern, String patternRuleName) {
 		ParseTreePattern p = compile(patternRuleName, pattern);
-		ParseTreeMatch match = new ParseTreeMatch(tree, p);
-		if ( matches_(tree, p.patternTree, match) ) {
-			return match;
-		}
-		return match;
+		return match(tree, p);
 	}
 
 	public ParseTreeMatch match(ParseTree tree, ParseTreePattern pattern) {
@@ -196,7 +191,7 @@ public class ParseTreePatternMatcher {
 	}
 
 	/** Is t (expr <expr>) subtree? */
-	public RuleTagToken getRuleTagToken(ParseTree t) {
+	protected RuleTagToken getRuleTagToken(ParseTree t) {
 		if ( t instanceof RuleNode ) {
 			RuleNode r = (RuleNode)t;
 			if ( r.getChildCount()==1 && r.getChild(0) instanceof TerminalNode ) {
@@ -210,7 +205,7 @@ public class ParseTreePatternMatcher {
 		return null;
 	}
 
-	public ParseTreePattern compile(String patternRuleName, String pattern) {
+	protected ParseTreePattern compile(String patternRuleName, String pattern) {
 		List<? extends Token> tokenList = tokenize(pattern);
 		ListTokenSource tokenSrc = new ListTokenSource(tokenList);
 		CommonTokenStream tokens = new CommonTokenStream(tokenSrc);
@@ -234,7 +229,7 @@ public class ParseTreePatternMatcher {
 		return new ParseTreePattern(patternRuleName, pattern, tree);
 	}
 
-	public List<? extends Token> tokenize(String pattern) {
+	protected List<? extends Token> tokenize(String pattern) {
 		// make maps for quick look up
 		Map<String, Integer> tokenNameToType = Utils.toMap(parser.getTokenNames());
 		Map<String, Integer> ruleNameToIndex = Utils.toMap(parser.getRuleNames());
@@ -266,36 +261,50 @@ public class ParseTreePatternMatcher {
 				TextChunk textChunk = (TextChunk)chunk;
 				try {
 					ANTLRInputStream in = new ANTLRInputStream(new StringReader(textChunk.text));
-					/* We want this:
-					LexerInterpreter lexerInterpreter
-						= new LexerInterpreter(lexer.getGrammarFileName(),
-											   Arrays.asList(lexer.getTokenNames()),
-											   Arrays.asList(lexer.getRuleNames()),
-											   Arrays.asList(lexer.getModeNames()),
-											   lexer.getATN(),
-											   in);
-											   */
-
-					Lexer mylexer = null;
-					try {
-						Class<? extends Lexer> lexerClass = lexer.getClass();
-						Constructor<? extends Lexer> ctor = lexerClass.getConstructor(CharStream.class);
-						mylexer = ctor.newInstance(in);
-					}
-					catch (Exception e) {
-						throw new CannotCreateLexerOrParser(e);
-					}
-
-					Token t = mylexer.nextToken();
+					lexer.setInputStream(in);
+					Token t = lexer.nextToken();
 					while ( t.getType()!=Token.EOF ) {
 						tokens.add(t);
-						t = mylexer.nextToken();
+						t = lexer.nextToken();
 					}
 				}
 				catch (IOException ioe) {
 					// -----------------
 					System.err.println("what?-----------------");
 				}
+
+//				try {
+//					ANTLRInputStream in = new ANTLRInputStream(new StringReader(textChunk.text));
+//					/* We want this:
+//					LexerInterpreter lexerInterpreter
+//						= new LexerInterpreter(lexer.getGrammarFileName(),
+//											   Arrays.asList(lexer.getTokenNames()),
+//											   Arrays.asList(lexer.getRuleNames()),
+//											   Arrays.asList(lexer.getModeNames()),
+//											   lexer.getATN(),
+//											   in);
+//											   */
+//
+//					Lexer mylexer = null;
+//					try {
+//						Class<? extends Lexer> lexerClass = lexer.getClass();
+//						Constructor<? extends Lexer> ctor = lexerClass.getConstructor(CharStream.class);
+//						mylexer = ctor.newInstance(in);
+//					}
+//					catch (Exception e) {
+//						throw new CannotCreateLexerOrParser(e);
+//					}
+//
+//					Token t = mylexer.nextToken();
+//					while ( t.getType()!=Token.EOF ) {
+//						tokens.add(t);
+//						t = mylexer.nextToken();
+//					}
+//				}
+//				catch (IOException ioe) {
+//					// -----------------
+//					System.err.println("what?-----------------");
+//				}
 			}
 		}
 
@@ -304,7 +313,7 @@ public class ParseTreePatternMatcher {
 	}
 
 	/** Split "<ID> = <e:expr> ;" into 4 chunks for tokenizing by tokenize() */
-	public List<Chunk> split(String pattern) {
+	protected List<Chunk> split(String pattern) {
 		int p = 0;
 		int n = pattern.length();
 		List<Chunk> chunks = new ArrayList<Chunk>();

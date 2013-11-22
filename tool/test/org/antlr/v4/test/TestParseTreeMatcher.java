@@ -339,7 +339,7 @@ public class TestParseTreeMatcher extends BaseTest {
 		ParseTree result = execParser(startRule, input, parserName, lexerName);
 
 		ParseTreePatternMatcher p = getMatcher(grammarName);
-		ParseTreeMatch match = p.match(result, startRule, pattern);
+		ParseTreeMatch match = p.match(result, pattern, startRule);
 		boolean matched = match.getMismatchedNode() == null;
 		if ( invertMatch ) assertFalse(matched);
 		else assertTrue(matched);
