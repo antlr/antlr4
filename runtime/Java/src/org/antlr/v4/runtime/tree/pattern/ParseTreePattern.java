@@ -65,7 +65,7 @@ public class ParseTreePattern {
 		ParseTreePatternMatcher p = new ParseTreePatternMatcher(lexer, parser);
 		for (ParseTree t : subtrees) {
 			ParseTreeMatch match = p.match(t, pattern, patternRuleName);
-			if ( !match.succeeded() ) {
+			if ( match.succeeded() ) {
 				matches.add(match);
 			}
 		}

@@ -126,4 +126,8 @@ public class ParseTreeMatch {
 	public ParseTree getTree() {
 		return tree;
 	}
+
+	public String toString() {
+		return tree.getText();
+	}
 }

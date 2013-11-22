@@ -112,7 +112,7 @@ public class TestParseTreeMatcher extends BaseTest {
 
 		ParseTreePatternMatcher p = getMatcher("X2");
 
-		ParseTreePattern t = p.compile("s", "<ID> = <expr> ;");
+		ParseTreePattern t = p.compile("<ID> = <expr> ;", "s");
 		String results = t.patternTree.toStringTree(p.getParser());
 		String expected = "(s <ID> = (expr <expr>) ;)";
 		assertEquals(expected, results);
@@ -133,7 +133,7 @@ public class TestParseTreeMatcher extends BaseTest {
 
 		ParseTreePatternMatcher p = getMatcher("X2");
 
-		ParseTreePattern t = p.compile("s", "<ID> = <expr> ;");
+		ParseTreePattern t = p.compile("<ID> = <expr> ;", "s");
 		String results = t.patternTree.toStringTree(p.getParser());
 		String expected = "(s <ID> = (expr <expr>) ;)";
 		assertEquals(expected, results);
@@ -152,7 +152,7 @@ public class TestParseTreeMatcher extends BaseTest {
 
 		ParseTreePatternMatcher p =	getMatcher("X2");
 
-		ParseTreePattern t = p.compile("s", "<ID> = <ID> ;");
+		ParseTreePattern t = p.compile("<ID> = <ID> ;", "s");
 		String results = t.patternTree.toStringTree(p.getParser());
 		String expected = "(s <ID> = <ID> ;)";
 		assertEquals(expected, results);

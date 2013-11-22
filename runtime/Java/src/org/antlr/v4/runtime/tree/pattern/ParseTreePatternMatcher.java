@@ -162,7 +162,7 @@ public class ParseTreePatternMatcher {
 
 	/** Does pattern matched as a patternRuleName match tree? */
 	public boolean matches(ParseTree tree, String pattern, String patternRuleName) {
-		ParseTreePattern p = compile(patternRuleName, pattern);
+		ParseTreePattern p = compile(pattern, patternRuleName);
 		return matches(tree, p);
 	}
 
@@ -180,7 +180,7 @@ public class ParseTreePatternMatcher {
 	 *  or the node at which the match failed.
 	 */
 	public ParseTreeMatch match(ParseTree tree, String pattern, String patternRuleName) {
-		ParseTreePattern p = compile(patternRuleName, pattern);
+		ParseTreePattern p = compile(pattern, patternRuleName);
 		return match(tree, p);
 	}
 
@@ -195,6 +195,32 @@ public class ParseTreePatternMatcher {
 		return match;
 	}
 
+	/** For repeated use of a tree pattern, compile it to a ParseTreePattern
+	 *  using this method.
+	 */
+	public ParseTreePattern compile(String pattern, String patternRuleName) {
+		List<? extends Token> tokenList = tokenize(pattern);
+		ListTokenSource tokenSrc = new ListTokenSource(tokenList);
+		CommonTokenStream tokens = new CommonTokenStream(tokenSrc);
+
+		ParserInterpreter parserInterp = new ParserInterpreter(parser.getGrammarFileName(),
+															   Arrays.asList(parser.getTokenNames()),
+															   Arrays.asList(parser.getRuleNames()),
+															   atnWithBypassAlts,
+															   tokens);
+
+		ParseTree tree = null;
+		try {
+			Integer ruleIndex = ruleToIndex.get(patternRuleName);
+			tree = parserInterp.parse(ruleIndex);
+//			System.out.println("pattern tree = "+tree.toStringTree(parserInterp));
+		}
+		catch (Exception e) {
+			throw new CannotInvokeStartRule(e);
+		}
+
+		return new ParseTreePattern(patternRuleName, pattern, tree);
+	}
 
 	public Lexer getLexer() {
 		return lexer;
@@ -284,36 +310,12 @@ public class ParseTreePatternMatcher {
 			if ( r.getChildCount()==1 && r.getChild(0) instanceof TerminalNode ) {
 				TerminalNode c = (TerminalNode)r.getChild(0);
 				if ( c.getSymbol() instanceof RuleTagToken ) {
-					System.out.println("rule tag subtree "+t.toStringTree(parser));
+//					System.out.println("rule tag subtree "+t.toStringTree(parser));
 					return (RuleTagToken)c.getSymbol();
 				}
 			}
 		}
 		return null;
-	}
-
-	public ParseTreePattern compile(String patternRuleName, String pattern) {
-		List<? extends Token> tokenList = tokenize(pattern);
-		ListTokenSource tokenSrc = new ListTokenSource(tokenList);
-		CommonTokenStream tokens = new CommonTokenStream(tokenSrc);
-
-		ParserInterpreter parserInterp = new ParserInterpreter(parser.getGrammarFileName(),
-															   Arrays.asList(parser.getTokenNames()),
-															   Arrays.asList(parser.getRuleNames()),
-															   atnWithBypassAlts,
-															   tokens);
-
-		ParseTree tree = null;
-		try {
-			Integer ruleIndex = ruleToIndex.get(patternRuleName);
-			tree = parserInterp.parse(ruleIndex);
-			System.out.println("pattern tree = "+tree.toStringTree(parserInterp));
-		}
-		catch (Exception e) {
-			throw new CannotInvokeStartRule(e);
-		}
-
-		return new ParseTreePattern(patternRuleName, pattern, tree);
 	}
 
 	public List<? extends Token> tokenize(String pattern) {
@@ -332,16 +334,22 @@ public class ParseTreePatternMatcher {
 				// add special rule token or conjure up new token from name
 				if ( Character.isUpperCase(tagChunk.tag.charAt(0)) ) {
 					Integer ttype = tokenNameToType.get(tagChunk.tag);
+					if ( ttype==null ) {
+						throw new IllegalArgumentException("Unknown token "+tagChunk.tag+" in pattern: "+pattern);
+					}
 					TokenTagToken t = new TokenTagToken(tagChunk.tag, ttype, tagChunk.label);
 					tokens.add(t);
 				}
 				else if ( Character.isLowerCase(tagChunk.tag.charAt(0)) ) {
-					int ruleIndex = ruleNameToIndex.get(tagChunk.tag);
+					Integer ruleIndex = ruleNameToIndex.get(tagChunk.tag);
+					if ( ruleIndex==null ) {
+						throw new IllegalArgumentException("Unknown rule "+tagChunk.tag+" in pattern: "+pattern);
+					}
 					int ruleImaginaryTokenType = atnWithBypassAlts.ruleToTokenType[ruleIndex];
 					tokens.add(new RuleTagToken(tagChunk.tag, ruleImaginaryTokenType, tagChunk.label));
 				}
 				else {
-					System.err.println("invalid tag: "+tagChunk.tag);
+					throw new IllegalArgumentException("invalid tag: "+tagChunk.tag+" in pattern: "+pattern);
 				}
 			}
 			else {
@@ -357,12 +365,12 @@ public class ParseTreePatternMatcher {
 				}
 				catch (IOException ioe) {
 					// -----------------
-					System.err.println("what?-----------------");
+					throw new IllegalArgumentException("IOException lexing pattern: "+pattern, ioe);
 				}
 			}
 		}
 
-		System.out.println("tokens="+tokens);
+//		System.out.println("tokens="+tokens);
 		return tokens;
 	}
 
