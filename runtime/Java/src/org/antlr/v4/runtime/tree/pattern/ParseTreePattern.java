@@ -30,8 +30,6 @@
 
 package org.antlr.v4.runtime.tree.pattern;
 
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.xpath.XPath;
 
@@ -43,28 +41,36 @@ import java.util.List;
  *  ParseTreePatternMatcher.compile().
  */
 public class ParseTreePattern {
-	public String patternRuleName;
-	public String pattern;
-	public ParseTree patternTree;
+	protected int patternRuleIndex;
+	protected String pattern;
+	protected ParseTree patternTree;
+	public ParseTreePatternMatcher matcher;
 
-	public ParseTreePattern(String patternRuleName, String pattern, ParseTree patternTree) {
-		this.patternRuleName = patternRuleName;
+	public ParseTreePattern(ParseTreePatternMatcher matcher,
+							String pattern, int patternRuleIndex, ParseTree patternTree)
+	{
+		this.matcher = matcher;
+		this.patternRuleIndex = patternRuleIndex;
 		this.pattern = pattern;
 		this.patternTree = patternTree;
 	}
 
-	/** Find all nodes in the tree that match xpath and also the tree
-	 *  pattern. Return the list of ParseTreeMatch objects for all matches.
+	public ParseTreeMatch match(ParseTree tree) {
+		return matcher.match(tree, this);
+	}
+
+	public boolean matches(ParseTree tree) {
+		return matcher.match(tree, this).succeeded();
+	}
+
+	/** Find all nodes using xpath and then try to match those subtrees
+	 *  against this tree pattern
 	 */
-	public static List<ParseTreeMatch> findAll(ParseTree tree, String xpath,
-											   String pattern, String patternRuleName,
-											   Lexer lexer, Parser parser)
-	{
-		Collection<ParseTree> subtrees = XPath.findAll(tree, xpath, parser);
+	public List<ParseTreeMatch> findAll(ParseTree tree, String xpath) {
+		Collection<ParseTree> subtrees = XPath.findAll(tree, xpath, matcher.getParser());
 		List<ParseTreeMatch> matches = new ArrayList<ParseTreeMatch>();
-		ParseTreePatternMatcher p = new ParseTreePatternMatcher(lexer, parser);
 		for (ParseTree t : subtrees) {
-			ParseTreeMatch match = p.match(t, pattern, patternRuleName);
+			ParseTreeMatch match = match(t);
 			if ( match.succeeded() ) {
 				matches.add(match);
 			}
@@ -72,10 +78,19 @@ public class ParseTreePattern {
 		return matches;
 	}
 
-	/** Does the tree match the pattern matched as a patternRuleName? */
-	public static ParseTreeMatch match(ParseTree tree, String pattern, String patternRuleName,
-									   Lexer lexer, Parser parser) {
-		ParseTreePatternMatcher p = new ParseTreePatternMatcher(lexer, parser);
-		return p.match(tree, pattern, patternRuleName);
+	public ParseTreePatternMatcher getParseTreePattern() {
+		return matcher;
+	}
+
+	public String getPattern() {
+		return pattern;
+	}
+
+	public int getPatternRuleIndex() {
+		return patternRuleIndex;
+	}
+
+	public ParseTree getPatternTree() {
+		return patternTree;
 	}
 }

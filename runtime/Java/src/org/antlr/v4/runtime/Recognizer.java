@@ -36,6 +36,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
@@ -58,6 +59,22 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	public abstract String[] getTokenNames();
 
 	public abstract String[] getRuleNames();
+
+	/** Used for xpath, tree pattern compilation */
+	public Map<String, Integer> getTokenTypeMap() {
+		throw new UnsupportedOperationException("recognizer implementation must implement this");
+	}
+
+	/** Used for xpath, tree pattern compilation */
+	public Map<String, Integer> getRuleIndexMap() {
+		throw new UnsupportedOperationException("recognizer implementation must implement this");
+	}
+
+	public int getTokenType(String tokenName) {
+		Integer ttype = getTokenTypeMap().get(tokenName);
+		if ( ttype!=null ) return ttype;
+		return Token.INVALID_TYPE;
+	}
 
 	/** If this recognizer was generated, it will have a serialized ATN
 	 *  representation of the grammar.

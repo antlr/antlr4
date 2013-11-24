@@ -1,6 +1,7 @@
 package org.antlr.v4.test;
 
 import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
@@ -22,27 +23,27 @@ import static org.junit.Assert.assertTrue;
 
 public class TestParseTreeMatcher extends BaseTest {
 	@Test public void testChunking() throws Exception {
-		ParseTreePatternMatcher p = new ParseTreePatternMatcher();
-		assertEquals("[ID, ' = ', expr, ' ;']", p.split("<ID> = <expr> ;").toString());
-		assertEquals("[' ', ID, ' = ', expr]", p.split(" <ID> = <expr>").toString());
-		assertEquals("[ID, ' = ', expr]", p.split("<ID> = <expr>").toString());
-		assertEquals("[expr]", p.split("<expr>").toString());
-		assertEquals("['<x> foo']", p.split("\\<x\\> foo").toString());
-		assertEquals("['foo <x> bar ', tag]", p.split("foo \\<x\\> bar <tag>").toString());
+		ParseTreePatternMatcher m = new ParseTreePatternMatcher();
+		assertEquals("[ID, ' = ', expr, ' ;']", m.split("<ID> = <expr> ;").toString());
+		assertEquals("[' ', ID, ' = ', expr]", m.split(" <ID> = <expr>").toString());
+		assertEquals("[ID, ' = ', expr]", m.split("<ID> = <expr>").toString());
+		assertEquals("[expr]", m.split("<expr>").toString());
+		assertEquals("['<x> foo']", m.split("\\<x\\> foo").toString());
+		assertEquals("['foo <x> bar ', tag]", m.split("foo \\<x\\> bar <tag>").toString());
 	}
 
 	@Test public void testDelimiters() throws Exception {
-		ParseTreePatternMatcher p = new ParseTreePatternMatcher();
-		p.setDelimiters("<<", ">>", "$");
-		String result = p.split("<<ID>> = <<expr>> ;$<< ick $>>").toString();
+		ParseTreePatternMatcher m = new ParseTreePatternMatcher();
+		m.setDelimiters("<<", ">>", "$");
+		String result = m.split("<<ID>> = <<expr>> ;$<< ick $>>").toString();
 		assertEquals("[ID, ' = ', expr, ' ;<< ick >>']", result);
 	}
 
 	@Test public void testInvertedTags() throws Exception {
-		ParseTreePatternMatcher p = new ParseTreePatternMatcher();
+		ParseTreePatternMatcher m= new ParseTreePatternMatcher();
 		String result = null;
 		try {
-			p.split(">expr<");
+			m.split(">expr<");
 		}
 		catch (IllegalArgumentException iae) {
 			result = iae.getMessage();
@@ -52,10 +53,10 @@ public class TestParseTreeMatcher extends BaseTest {
 	}
 
 	@Test public void testUnclosedTag() throws Exception {
-		ParseTreePatternMatcher p = new ParseTreePatternMatcher();
+		ParseTreePatternMatcher m = new ParseTreePatternMatcher();
 		String result = null;
 		try {
-			p.split("<expr hi mom");
+			m.split("<expr hi mom");
 		}
 		catch (IllegalArgumentException iae) {
 			result = iae.getMessage();
@@ -65,10 +66,10 @@ public class TestParseTreeMatcher extends BaseTest {
 	}
 
 	@Test public void testExtraClose() throws Exception {
-		ParseTreePatternMatcher p = new ParseTreePatternMatcher();
+		ParseTreePatternMatcher m = new ParseTreePatternMatcher();
 		String result = null;
 		try {
-			p.split("<expr> >");
+			m.split("<expr> >");
 		}
 		catch (IllegalArgumentException iae) {
 			result = iae.getMessage();
@@ -89,9 +90,9 @@ public class TestParseTreeMatcher extends BaseTest {
 			rawGenerateAndBuildRecognizer("X1.g4", grammar, "X1Parser", "X1Lexer", false);
 		assertTrue(ok);
 
-		ParseTreePatternMatcher p = getMatcher("X1");
+		ParseTreePatternMatcher m = getPatternMatcher("X1");
 
-		List<? extends Token> tokens = p.tokenize("<ID> = <expr> ;");
+		List<? extends Token> tokens = m.tokenize("<ID> = <expr> ;");
 		String results = tokens.toString();
 		String expected = "[ID:3, [@-1,1:1='=',<1>,1:1], expr:7, [@-1,1:1=';',<2>,1:1]]";
 		assertEquals(expected, results);
@@ -110,10 +111,10 @@ public class TestParseTreeMatcher extends BaseTest {
 			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
 		assertTrue(ok);
 
-		ParseTreePatternMatcher p = getMatcher("X2");
+		ParseTreePatternMatcher m = getPatternMatcher("X2");
 
-		ParseTreePattern t = p.compile("<ID> = <expr> ;", "s");
-		String results = t.patternTree.toStringTree(p.getParser());
+		ParseTreePattern t = m.compile("<ID> = <expr> ;", m.getParser().getRuleIndex("s"));
+		String results = t.getPatternTree().toStringTree(m.getParser());
 		String expected = "(s <ID> = (expr <expr>) ;)";
 		assertEquals(expected, results);
 	}
@@ -131,10 +132,10 @@ public class TestParseTreeMatcher extends BaseTest {
 			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
 		assertTrue(ok);
 
-		ParseTreePatternMatcher p = getMatcher("X2");
+		ParseTreePatternMatcher m = getPatternMatcher("X2");
 
-		ParseTreePattern t = p.compile("<ID> = <expr> ;", "s");
-		String results = t.patternTree.toStringTree(p.getParser());
+		ParseTreePattern t = m.compile("<ID> = <expr> ;", m.getParser().getRuleIndex("s"));
+		String results = t.getPatternTree().toStringTree(m.getParser());
 		String expected = "(s <ID> = (expr <expr>) ;)";
 		assertEquals(expected, results);
 	}
@@ -150,10 +151,10 @@ public class TestParseTreeMatcher extends BaseTest {
 			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
 		assertTrue(ok);
 
-		ParseTreePatternMatcher p =	getMatcher("X2");
+		ParseTreePatternMatcher m =	getPatternMatcher("X2");
 
-		ParseTreePattern t = p.compile("<ID> = <ID> ;", "s");
-		String results = t.patternTree.toStringTree(p.getParser());
+		ParseTreePattern t = m.compile("<ID> = <ID> ;", m.getParser().getRuleIndex("s"));
+		String results = t.getPatternTree().toStringTree(m.getParser());
 		String expected = "(s <ID> = <ID> ;)";
 		assertEquals(expected, results);
 	}
@@ -326,24 +327,38 @@ public class TestParseTreeMatcher extends BaseTest {
 
 		ParseTree result = execParser(startRule, input, parserName, lexerName);
 
-		ParseTreePatternMatcher p = getMatcher(grammarName);
-		ParseTreeMatch match = p.match(result, pattern, startRule);
+		ParseTreePattern p = getPattern(grammarName, pattern, startRule);
+		ParseTreeMatch match = p.match(result);
 		boolean matched = match.succeeded();
 		if ( invertMatch ) assertFalse(matched);
 		else assertTrue(matched);
 		return match;
 	}
 
-	public ParseTreePatternMatcher getMatcher(String name) throws Exception {
-		Class<? extends Lexer> lexerClass = loadLexerClassFromTempDir(name+"Lexer");
-		Class<? extends Parser> parserClass = loadParserClassFromTempDir(name + "Parser");
-		Class<? extends Lexer> c = lexerClass.asSubclass(Lexer.class);
-		Constructor<? extends Lexer> ctor = c.getConstructor(CharStream.class);
+	public ParseTreePattern getPattern(String grammarName, String pattern, String ruleName)
+		throws Exception
+	{
+		Class<? extends Lexer> lexerClass = loadLexerClassFromTempDir(grammarName + "Lexer");
+		Constructor<? extends Lexer> ctor = lexerClass.getConstructor(CharStream.class);
 		Lexer lexer = ctor.newInstance((CharStream) null);
 
-		Class<? extends Parser> pc = parserClass.asSubclass(Parser.class);
-		Constructor<? extends Parser> pctor = pc.getConstructor(TokenStream.class);
-		Parser parser = pctor.newInstance((TokenStream)null);
+		Class<? extends Parser> parserClass = loadParserClassFromTempDir(grammarName + "Parser");
+		Constructor<? extends Parser> pctor = parserClass.getConstructor(TokenStream.class);
+		Parser parser = pctor.newInstance(new CommonTokenStream(lexer));
+
+		return parser.compileParseTreePattern(pattern, parser.getRuleIndex(ruleName));
+	}
+
+	public ParseTreePatternMatcher getPatternMatcher(String grammarName)
+		throws Exception
+	{
+		Class<? extends Lexer> lexerClass = loadLexerClassFromTempDir(grammarName + "Lexer");
+		Constructor<? extends Lexer> ctor = lexerClass.getConstructor(CharStream.class);
+		Lexer lexer = ctor.newInstance((CharStream) null);
+
+		Class<? extends Parser> parserClass = loadParserClassFromTempDir(grammarName + "Parser");
+		Constructor<? extends Parser> pctor = parserClass.getConstructor(TokenStream.class);
+		Parser parser = pctor.newInstance(new CommonTokenStream(lexer));
 
 		return new ParseTreePatternMatcher(lexer, parser);
 	}

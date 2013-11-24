@@ -38,10 +38,6 @@ import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializationOptions;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -51,7 +47,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /** A tree pattern matching mechanism for ANTLR ParseTrees.
  *
@@ -79,9 +74,7 @@ import java.util.Map;
  *  not match.
  *
  *  For efficiency, you can compile a tree pattern in string form to a
- *  ParseTreePattern object. It is also expensive to create a
- *  ParseTreePatternMatcher object, so create one of those and reuse
- *  it.
+ *  ParseTreePattern object.
  *
  *  See TestParseTreeMatcher for lots of examples. ParseTreePattern
  *  has two static helper methods: findAll() and match() that are easy
@@ -129,14 +122,6 @@ public class ParseTreePatternMatcher {
 	protected String start = "<", stop=">";
 	protected String escape = "\\"; // e.g., \< and \> must escape BOTH!
 
-	/** This ATN has alternatives to match special imaginary tokens for rules like <expr> */
-	protected ATN atnWithBypassAlts;
-
-	/** Maps the rule name to rule index; computed during the constructor
-	 *  for efficient use later.
-	 */
-	protected Map<String, Integer> ruleToIndex;
-
 	public ParseTreePatternMatcher() { } // used for testing only
 
 	/** Constructs a pattern match or from a lecture and parser object.
@@ -147,11 +132,9 @@ public class ParseTreePatternMatcher {
 	public ParseTreePatternMatcher(Lexer lexer, Parser parser) {
 		this.lexer = lexer;
 		this.parser = parser;
-		String sATN = parser.getSerializedATN();
-		ATNDeserializationOptions deserializationOptions = new ATNDeserializationOptions();
-		deserializationOptions.setGenerateRuleBypassTransitions(true);
-		atnWithBypassAlts = new ATNDeserializer(deserializationOptions).deserialize(sATN.toCharArray());
-		ruleToIndex = Utils.toMap(parser.getRuleNames());
+		if ( parser!=null ) {
+			parser.createATNWithBypassAlts();
+		}
 	}
 
 	public void setDelimiters(String start, String stop, String escapeLeft) {
@@ -160,13 +143,13 @@ public class ParseTreePatternMatcher {
 		this.escape = escapeLeft;
 	}
 
-	/** Does pattern matched as a patternRuleName match tree? */
-	public boolean matches(ParseTree tree, String pattern, String patternRuleName) {
-		ParseTreePattern p = compile(pattern, patternRuleName);
+	/** Does pattern matched as rule patternRuleIndex match tree? */
+	public boolean matches(ParseTree tree, String pattern, int patternRuleIndex) {
+		ParseTreePattern p = compile(pattern, patternRuleIndex);
 		return matches(tree, p);
 	}
 
-	/** Does pattern matched as a patternRuleName match tree? Pass in a
+	/** Does pattern matched as rule patternRuleIndex match tree? Pass in a
 	 *  compiled pattern instead of a string representation of a tree pattern.
 	 */
 	public boolean matches(ParseTree tree, ParseTreePattern pattern) {
@@ -175,16 +158,16 @@ public class ParseTreePatternMatcher {
 		return match.succeeded();
 	}
 
-	/** Compare pattern matched as a patternRuleName against tree and
+	/** Compare pattern matched as rule patternRuleIndex against tree and
 	 *  return a ParseTreeMatch object that contains the matched elements,
 	 *  or the node at which the match failed.
 	 */
-	public ParseTreeMatch match(ParseTree tree, String pattern, String patternRuleName) {
-		ParseTreePattern p = compile(pattern, patternRuleName);
+	public ParseTreeMatch match(ParseTree tree, String pattern, int patternRuleIndex) {
+		ParseTreePattern p = compile(pattern, patternRuleIndex);
 		return match(tree, p);
 	}
 
-	/** Compare pattern matched as a patternRuleName against tree and
+	/** Compare pattern matched against tree and
 	 *  return a ParseTreeMatch object that contains the matched elements,
 	 *  or the node at which the match failed. Pass in a compiled pattern
 	 *  instead of a string representation of a tree pattern.
@@ -198,7 +181,7 @@ public class ParseTreePatternMatcher {
 	/** For repeated use of a tree pattern, compile it to a ParseTreePattern
 	 *  using this method.
 	 */
-	public ParseTreePattern compile(String pattern, String patternRuleName) {
+	public ParseTreePattern compile(String pattern, int patternRuleIndex) {
 		List<? extends Token> tokenList = tokenize(pattern);
 		ListTokenSource tokenSrc = new ListTokenSource(tokenList);
 		CommonTokenStream tokens = new CommonTokenStream(tokenSrc);
@@ -206,20 +189,19 @@ public class ParseTreePatternMatcher {
 		ParserInterpreter parserInterp = new ParserInterpreter(parser.getGrammarFileName(),
 															   Arrays.asList(parser.getTokenNames()),
 															   Arrays.asList(parser.getRuleNames()),
-															   atnWithBypassAlts,
+															   parser.getATNWithBypassAlts(),
 															   tokens);
 
 		ParseTree tree = null;
 		try {
-			Integer ruleIndex = ruleToIndex.get(patternRuleName);
-			tree = parserInterp.parse(ruleIndex);
+			tree = parserInterp.parse(patternRuleIndex);
 //			System.out.println("pattern tree = "+tree.toStringTree(parserInterp));
 		}
 		catch (Exception e) {
 			throw new CannotInvokeStartRule(e);
 		}
 
-		return new ParseTreePattern(patternRuleName, pattern, tree);
+		return new ParseTreePattern(this, pattern, patternRuleIndex, tree);
 	}
 
 	public Lexer getLexer() {
@@ -319,10 +301,6 @@ public class ParseTreePatternMatcher {
 	}
 
 	public List<? extends Token> tokenize(String pattern) {
-		// make maps for quick look up
-		Map<String, Integer> tokenNameToType = Utils.toMap(parser.getTokenNames());
-		Map<String, Integer> ruleNameToIndex = Utils.toMap(parser.getRuleNames());
-
 		// split pattern into chunks: sea (raw input) and islands (<ID>, <expr>)
 		List<Chunk> chunks = split(pattern);
 
@@ -333,19 +311,19 @@ public class ParseTreePatternMatcher {
 				TagChunk tagChunk = (TagChunk)chunk;
 				// add special rule token or conjure up new token from name
 				if ( Character.isUpperCase(tagChunk.tag.charAt(0)) ) {
-					Integer ttype = tokenNameToType.get(tagChunk.tag);
-					if ( ttype==null ) {
+					Integer ttype = parser.getTokenType(tagChunk.tag);
+					if ( ttype==Token.INVALID_TYPE ) {
 						throw new IllegalArgumentException("Unknown token "+tagChunk.tag+" in pattern: "+pattern);
 					}
 					TokenTagToken t = new TokenTagToken(tagChunk.tag, ttype, tagChunk.label);
 					tokens.add(t);
 				}
 				else if ( Character.isLowerCase(tagChunk.tag.charAt(0)) ) {
-					Integer ruleIndex = ruleNameToIndex.get(tagChunk.tag);
-					if ( ruleIndex==null ) {
+					int ruleIndex = parser.getRuleIndex(tagChunk.tag);
+					if ( ruleIndex==-1 ) {
 						throw new IllegalArgumentException("Unknown rule "+tagChunk.tag+" in pattern: "+pattern);
 					}
-					int ruleImaginaryTokenType = atnWithBypassAlts.ruleToTokenType[ruleIndex];
+					int ruleImaginaryTokenType = parser.getATNWithBypassAlts().ruleToTokenType[ruleIndex];
 					tokens.add(new RuleTagToken(tagChunk.tag, ruleImaginaryTokenType, tagChunk.label));
 				}
 				else {
