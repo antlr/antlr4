@@ -136,10 +136,8 @@ loop:
 			throw new IllegalArgumentException("Missing path element at end of path");
 		}
 		String word = wordToken.getText();
-		Map<String, Integer> ruleIndexes = Utils.toMap(parser.getRuleNames());
-		Map<String, Integer> tokenTypes = Utils.toMap(parser.getTokenNames());
-		Integer ttype = tokenTypes.get(word);
-		Integer ruleIndex = ruleIndexes.get(word);
+		int ttype = parser.getTokenType(word);
+		int ruleIndex = parser.getRuleIndex(word);
 		switch ( wordToken.getType() ) {
 			case XPathLexer.WILDCARD :
 				return anywhere ?
@@ -147,7 +145,7 @@ loop:
 					new XPathWildcardElement();
 			case XPathLexer.TOKEN_REF :
 			case XPathLexer.STRING :
-				if ( ttype==null ) {
+				if ( ttype==Token.INVALID_TYPE ) {
 					throw new IllegalArgumentException(word+
 													   " at index "+
 													   wordToken.getStartIndex()+
@@ -157,7 +155,7 @@ loop:
 					new XPathTokenAnywhereElement(word, ttype) :
 					new XPathTokenElement(word, ttype);
 			default :
-				if ( ruleIndex==null ) {
+				if ( ruleIndex==-1 ) {
 					throw new IllegalArgumentException(word+
 													   " at index "+
 													   wordToken.getStartIndex()+
