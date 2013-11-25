@@ -30,12 +30,6 @@
 
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.FailedPredicateException;
-import org.antlr.v4.runtime.InterpreterRuleContext;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.ActionTransition;
@@ -85,9 +79,10 @@ public class ParserInterpreter extends Parser {
 	protected final String[] ruleNames;
 
 	protected final Deque<Pair<ParserRuleContext, Integer>> _parentContextStack = new ArrayDeque<Pair<ParserRuleContext, Integer>>();
-	protected final Deque<InterpreterRuleContext> _contextStack = new ArrayDeque<InterpreterRuleContext>();
 
-	public ParserInterpreter(String grammarFileName, Collection<String> tokenNames, Collection<String> ruleNames, ATN atn, TokenStream input) {
+	public ParserInterpreter(String grammarFileName, Collection<String> tokenNames,
+							 Collection<String> ruleNames, ATN atn, TokenStream input)
+	{
 		super(input);
 		this.grammarFileName = grammarFileName;
 		this.atn = atn;
@@ -152,7 +147,7 @@ public class ParserInterpreter extends Parser {
 
 		InterpreterRuleContext rootContext = new InterpreterRuleContext(null, ATNState.INVALID_STATE_NUMBER, startRuleIndex);
 		if (startRuleStartState.isPrecedenceRule) {
-			enterRecursionRule(rootContext, startRuleIndex, 0);
+			enterRecursionRule(rootContext, startRuleStartState.stateNumber, startRuleIndex, 0);
 		}
 		else {
 			enterRule(rootContext, startRuleStartState.stateNumber, startRuleIndex);
@@ -179,9 +174,9 @@ public class ParserInterpreter extends Parser {
 	}
 
 	@Override
-	public void enterRecursionRule(ParserRuleContext localctx, int ruleIndex, int precedence) {
+	public void enterRecursionRule(ParserRuleContext localctx, int state, int ruleIndex, int precedence) {
 		_parentContextStack.push(new Pair<ParserRuleContext, Integer>(_ctx, localctx.invokingState));
-		super.enterRecursionRule(localctx, ruleIndex, precedence);
+		super.enterRecursionRule(localctx, state, ruleIndex, precedence);
 	}
 
 	protected ATNState getATNState() {
@@ -228,7 +223,7 @@ public class ParserInterpreter extends Parser {
 			int ruleIndex = ruleStartState.ruleIndex;
 			InterpreterRuleContext ctx = new InterpreterRuleContext(_ctx, p.stateNumber, ruleIndex);
 			if (ruleStartState.isPrecedenceRule) {
-				enterRecursionRule(ctx, ruleIndex, ((RuleTransition)transition).precedence);
+				enterRecursionRule(ctx, ruleStartState.stateNumber, ruleIndex, ((RuleTransition)transition).precedence);
 			}
 			else {
 				enterRule(ctx, transition.target.stateNumber, ruleIndex);

@@ -56,6 +56,7 @@ import org.antlr.v4.runtime.tree.*;
 import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Map;
 
 <parser>
 >>
@@ -224,11 +225,13 @@ public class <parser.name> extends <superClass> {
 	public static final String[] tokenNames = {
 		<parser.tokenNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor>
 	};
+	public static final Map\<String, Integer> tokenNameToType = Utils.toMap(tokenNames);
 	public static final int
 		<parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
 	public static final String[] ruleNames = {
 		<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	};
+	public static final Map\<String, Integer> ruleNameToIndex = Utils.toMap(ruleNames);
 
 	@Override
 	public String getGrammarFileName() { return "<parser.grammarFileName; format="java-escape">"; }
@@ -240,7 +243,19 @@ public class <parser.name> extends <superClass> {
 	public String[] getRuleNames() { return ruleNames; }
 
 	@Override
+	public String getSerializedATN() { return _serializedATN; }
+
+	@Override
 	public ATN getATN() { return _ATN; }
+	@Override
+	public ATN getATNWithBypassAlts() { return _ATNWithBypassAlts; }
+	@Override
+	public void setATNWithBypassAlts(ATN atn) { _ATNWithBypassAlts = atn; }
+
+	@Override
+	public Map\<String, Integer> getTokenTypeMap() { return tokenNameToType; }
+	@Override
+	public Map\<String, Integer> getRuleIndexMap() { return ruleNameToIndex; }
 
 	<namedActions.members>
 	<parser:(ctor)()>
@@ -369,7 +384,7 @@ private <currentRule.ctxType> <currentRule.name>(int _p<currentRule.args:{a | , 
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>);
 	<currentRule.ctxType> _prevctx = _localctx;
 	int _startState = <currentRule.startState>;
-	enterRecursionRule(_localctx, RULE_<currentRule.name>, _p);
+	enterRecursionRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>, _p);
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
@@ -838,6 +853,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
+import java.util.Map;
 
 <lexer>
 >>
@@ -859,9 +875,16 @@ public class <lexer.name> extends <superClass> {
 		"\<INVALID>",
 		<lexer.tokenNames:{t | <t>}; separator=", ", wrap, anchor>
 	};
+	public static final Map\<String, Integer> tokenNameToType = Utils.toMap(tokenNames);
 	public static final String[] ruleNames = {
 		<lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	};
+	public static final Map\<String, Integer> ruleNameToIndex = Utils.toMap(ruleNames);
+
+	@Override
+	public Map\<String, Integer> getTokenTypeMap() { return tokenNameToType; }
+	@Override
+	public Map\<String, Integer> getRuleIndexMap() { return ruleNameToIndex; }
 
 	<namedActions.members>
 
@@ -878,6 +901,9 @@ public class <lexer.name> extends <superClass> {
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
+
+	@Override
+	public String getSerializedATN() { return _serializedATN; }
 
 	@Override
 	public String[] getModeNames() { return modeNames; }
@@ -909,6 +935,7 @@ public static final String _serializedATN =
 <endif>
 public static final ATN _ATN =
 	new ATNDeserializer().deserialize(_serializedATN.toCharArray());
+public static ATN _ATNWithBypassAlts;
 static {
 	_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
 	for (int i = 0; i \< _ATN.getNumberOfDecisions(); i++) {

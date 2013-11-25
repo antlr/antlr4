@@ -106,9 +106,7 @@ public abstract class PredictionContext {
 
 		// If we have a parent, convert it to a PredictionContext graph
 		PredictionContext parent = EMPTY;
-		if ( outerContext.parent != null ) {
-			parent = PredictionContext.fromRuleContext(atn, outerContext.parent);
-		}
+		parent = PredictionContext.fromRuleContext(atn, outerContext.parent);
 
 		ATNState state = atn.states.get(outerContext.invokingState);
 		RuleTransition transition = (RuleTransition)state.transition(0);
