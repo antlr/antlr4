@@ -188,14 +188,6 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		}
 	}
 
-	/** When parsing "x = <expr>;" pattern, we use nextTokenOrRuleToken() not
-	 *  nextToken() so <expr> is converted to RULE token instead of tokenizing.
-	 */
-	public Token nextTokenOrRuleToken() {
-		//if ( '<' id '>' or special pattern ) return RULE token for id
-		return nextToken();
-	}
-
 	/** Instruct the lexer to skip creating a token for current lexer rule
 	 *  and look for another token.  nextToken() knows to keep looking when
 	 *  a lexer rule finishes with token set to SKIP_TOKEN.  Recall that
