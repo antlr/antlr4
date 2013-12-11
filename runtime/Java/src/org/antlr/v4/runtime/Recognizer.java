@@ -34,13 +34,21 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.Utils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	public static final int EOF=-1;
+
+	private static final Map<String[], Map<String, Integer>> tokenTypeMapCache =
+		new WeakHashMap<String[], Map<String, Integer>>();
+	private static final Map<String[], Map<String, Integer>> ruleIndexMapCache =
+		new WeakHashMap<String[], Map<String, Integer>>();
 
 	@NotNull
 	private List<ANTLRErrorListener> _listeners =
@@ -61,13 +69,43 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	public abstract String[] getRuleNames();
 
 	/** Used for xpath, tree pattern compilation */
+	@NotNull
 	public Map<String, Integer> getTokenTypeMap() {
-		throw new UnsupportedOperationException("recognizer implementation must implement this");
+		String[] tokenNames = getTokenNames();
+		if (tokenNames == null) {
+			throw new UnsupportedOperationException("The current recognizer does not provide a list of token names.");
+		}
+
+		synchronized (tokenTypeMapCache) {
+			Map<String, Integer> result = tokenTypeMapCache.get(tokenNames);
+			if (result == null) {
+				result = Utils.toMap(tokenNames);
+				result.put("EOF", Token.EOF);
+				result = Collections.unmodifiableMap(result);
+				tokenTypeMapCache.put(tokenNames, result);
+			}
+
+			return result;
+		}
 	}
 
 	/** Used for xpath, tree pattern compilation */
+	@NotNull
 	public Map<String, Integer> getRuleIndexMap() {
-		throw new UnsupportedOperationException("recognizer implementation must implement this");
+		String[] ruleNames = getRuleNames();
+		if (ruleNames == null) {
+			throw new UnsupportedOperationException("The current recognizer does not provide a list of rule names.");
+		}
+
+		synchronized (ruleIndexMapCache) {
+			Map<String, Integer> result = ruleIndexMapCache.get(ruleNames);
+			if (result == null) {
+				result = Collections.unmodifiableMap(Utils.toMap(ruleNames));
+				ruleIndexMapCache.put(ruleNames, result);
+			}
+
+			return result;
+		}
 	}
 
 	public int getTokenType(String tokenName) {
