@@ -247,10 +247,6 @@ public class <parser.name> extends <superClass> {
 
 	@Override
 	public ATN getATN() { return _ATN; }
-	@Override
-	public ATN getATNWithBypassAlts() { return _ATNWithBypassAlts; }
-	@Override
-	public void setATNWithBypassAlts(ATN atn) { _ATNWithBypassAlts = atn; }
 
 	@Override
 	public Map\<String, Integer> getTokenTypeMap() { return tokenNameToType; }
@@ -935,7 +931,6 @@ public static final String _serializedATN =
 <endif>
 public static final ATN _ATN =
 	new ATNDeserializer().deserialize(_serializedATN.toCharArray());
-public static ATN _ATNWithBypassAlts;
 static {
 	_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
 	for (int i = 0; i \< _ATN.getNumberOfDecisions(); i++) {

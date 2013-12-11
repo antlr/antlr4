@@ -132,9 +132,6 @@ public class ParseTreePatternMatcher {
 	public ParseTreePatternMatcher(Lexer lexer, Parser parser) {
 		this.lexer = lexer;
 		this.parser = parser;
-		if ( parser!=null ) {
-			parser.createATNWithBypassAlts();
-		}
 	}
 
 	public void setDelimiters(String start, String stop, String escapeLeft) {
