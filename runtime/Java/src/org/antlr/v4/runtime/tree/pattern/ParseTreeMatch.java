@@ -97,11 +97,11 @@ public class ParseTreeMatch {
 	}
 
 	/**
-	 * Get the first node associated with a specific {@code label}.
+	 * Get the last node associated with a specific {@code label}.
 	 * <p/>
 	 * For example, for pattern {@code <id:ID>}, {@code get("id")} returns the
 	 * node matched for that {@code ID}. If more than one node
-	 * matched the specified label, only the first is returned. If there is
+	 * matched the specified label, only the last is returned. If there is
 	 * no node associated with the label, this returns {@code null}.
 	 * <p/>
 	 * Pattern tags like {@code <ID>} and {@code <expr>} without labels are
@@ -109,7 +109,7 @@ public class ParseTreeMatch {
 	 *
 	 * @param label The label to check.
 	 *
-	 * @return The first {@link ParseTree} to match a tag with the specified
+	 * @return The last {@link ParseTree} to match a tag with the specified
 	 * label, or {@code null} if no parse tree matched a tag with the label.
 	 */
 	@Nullable
@@ -119,7 +119,7 @@ public class ParseTreeMatch {
 			return null;
 		}
 
-		return parseTrees.get(0); // return first if multiple
+		return parseTrees.get( parseTrees.size()-1 ); // return last if multiple
 	}
 
 	/**
