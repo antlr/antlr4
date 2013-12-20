@@ -193,6 +193,28 @@ public class TestParseTreeMatcher extends BaseTest {
 		assertEquals("[]", m.getAll("undefined").toString());
 	}
 
+	@Test public void testLabelGetsLastIDNode() throws Exception {
+		String grammar =
+			"grammar X9;\n" +
+			"s : ID ID ';' ;\n" +
+			"ID : [a-z]+ ;\n" +
+			"WS : [ \\r\\n\\t]+ -> skip ;\n";
+
+		String input = "x y;";
+		String pattern = "<id:ID> <id:ID>;";
+		ParseTreeMatch m = checkPatternMatch(grammar, "s", input, pattern, "X9");
+		assertEquals("{ID=[x, y], id=[x, y]}", m.getLabels().toString());
+		assertNotNull(m.get("id"));
+		assertNotNull(m.get("ID"));
+		assertEquals("y", m.get("id").getText());
+		assertEquals("y", m.get("ID").getText());
+		assertEquals("[x, y]", m.getAll("id").toString());
+		assertEquals("[x, y]", m.getAll("ID").toString());
+
+		assertNull(m.get("undefined"));
+		assertEquals("[]", m.getAll("undefined").toString());
+	}
+
 	@Test public void testIDNodeWithMultipleLabelMatches() throws Exception {
 		String grammar =
 			"grammar X7;\n" +
@@ -207,9 +229,9 @@ public class TestParseTreeMatcher extends BaseTest {
 		assertNotNull(m.get("a")); // get first
 		assertNotNull(m.get("b"));
 		assertNotNull(m.get("ID"));
-		assertEquals("x", m.get("a").getText());
+		assertEquals("z", m.get("a").getText());
 		assertEquals("y", m.get("b").getText());
-		assertEquals("x", m.get("ID").getText()); // get first
+		assertEquals("z", m.get("ID").getText()); // get last
 		assertEquals("[x, z]", m.getAll("a").toString());
 		assertEquals("[y]", m.getAll("b").toString());
 		assertEquals("[x, y, z]", m.getAll("ID").toString()); // ordered
