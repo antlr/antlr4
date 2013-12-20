@@ -1,5 +1,15 @@
 ANTLR v4 Honey Badger
 
+December 19, 2013
+
+* Sam:
+	Improved documentation for tree patterns classes
+    Refactored parts of the tree patterns API to simplify classes and improve encapsulation
+    Move ATN serializer to runtime
+    Use ATNDeserializer methods instead of ATNSimulator methods which are now deprecated
+
+* parrt: fix null pointer bug with rule "a : a;"
+
 November 24, 2013
 
 * Ter adds tree pattern matching.  Preferred interface:
