@@ -122,8 +122,6 @@ public class ParseTreePatternMatcher {
 	protected String start = "<", stop=">";
 	protected String escape = "\\"; // e.g., \< and \> must escape BOTH!
 
-	public ParseTreePatternMatcher() { } // used for testing only
-
 	/** Constructs a pattern match or from a lecture and parser object.
 	 *  The lexer input stream is altered for tokenizing the tree patterns.
 	 *  The parser is used as a convenient mechanism to get the grammar name,
