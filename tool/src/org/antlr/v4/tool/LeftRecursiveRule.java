@@ -88,19 +88,23 @@ public class LeftRecursiveRule extends Rule {
 		List<Triple<Integer,AltAST,String>> labels = new ArrayList<Triple<Integer,AltAST,String>>();
 		List<Triple<Integer,AltAST,String>> normalAltLabels = super.getAltLabels();
 		if ( normalAltLabels!=null ) labels.addAll(normalAltLabels);
-		for (LeftRecursiveRuleAltInfo altInfo : recPrimaryAlts) {
-			if (altInfo.altLabel != null) {
-				labels.add(new Triple<Integer, AltAST, String>(altInfo.altNum,
-															   altInfo.originalAltAST,
-															   altInfo.altLabel));
+		if ( recPrimaryAlts!=null ) {
+			for (LeftRecursiveRuleAltInfo altInfo : recPrimaryAlts) {
+				if (altInfo.altLabel != null) {
+					labels.add(new Triple<Integer, AltAST, String>(altInfo.altNum,
+																   altInfo.originalAltAST,
+																   altInfo.altLabel));
+				}
 			}
 		}
-		for (int i = 0; i < recOpAlts.size(); i++) {
-			LeftRecursiveRuleAltInfo altInfo = recOpAlts.getElement(i);
-			if ( altInfo.altLabel!=null ) {
-				labels.add(new Triple<Integer,AltAST,String>(altInfo.altNum,
-															 altInfo.originalAltAST,
-															 altInfo.altLabel));
+		if ( recOpAlts!=null ) {
+			for (int i = 0; i < recOpAlts.size(); i++) {
+				LeftRecursiveRuleAltInfo altInfo = recOpAlts.getElement(i);
+				if ( altInfo.altLabel!=null ) {
+					labels.add(new Triple<Integer,AltAST,String>(altInfo.altNum,
+																 altInfo.originalAltAST,
+																 altInfo.altLabel));
+				}
 			}
 		}
 		if ( labels.isEmpty() ) return null;
