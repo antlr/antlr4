@@ -145,7 +145,7 @@ public abstract class ATNSimulator {
 	 */
 	@Deprecated
 	public static int toInt(char c) {
-		return new ATNDeserializer().toInt(c);
+		return ATNDeserializer.toInt(c);
 	}
 
 	/**
@@ -153,7 +153,7 @@ public abstract class ATNSimulator {
 	 */
 	@Deprecated
 	public static int toInt32(char[] data, int offset) {
-		return new ATNDeserializer().toInt32(data, offset);
+		return ATNDeserializer.toInt32(data, offset);
 	}
 
 	/**
@@ -161,7 +161,7 @@ public abstract class ATNSimulator {
 	 */
 	@Deprecated
 	public static long toLong(char[] data, int offset) {
-		return new ATNDeserializer().toLong(data, offset);
+		return ATNDeserializer.toLong(data, offset);
 	}
 
 	/**
@@ -169,7 +169,7 @@ public abstract class ATNSimulator {
 	 */
 	@Deprecated
 	public static UUID toUUID(char[] data, int offset) {
-		return new ATNDeserializer().toUUID(data, offset);
+		return ATNDeserializer.toUUID(data, offset);
 	}
 
 	/**

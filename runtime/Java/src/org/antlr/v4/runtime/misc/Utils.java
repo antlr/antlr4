@@ -146,4 +146,13 @@ public class Utils {
 		}
 		return m;
 	}
+
+	public static char[] toCharArray(IntegerList data) {
+		if ( data==null ) return null;
+		char[] cdata = new char[data.size()];
+		for (int i=0; i<data.size(); i++) {
+			cdata[i] = (char)data.get(i);
+		}
+		return cdata;
+	}
 }

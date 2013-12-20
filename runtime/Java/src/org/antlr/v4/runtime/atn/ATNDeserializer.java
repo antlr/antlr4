@@ -527,20 +527,20 @@ public class ATNDeserializer {
 		}
 	}
 
-	protected int toInt(char c) {
+	protected static int toInt(char c) {
 		return c;
 	}
 
-	protected int toInt32(char[] data, int offset) {
+	protected static int toInt32(char[] data, int offset) {
 		return (int)data[offset] | ((int)data[offset + 1] << 16);
 	}
 
-	protected long toLong(char[] data, int offset) {
+	protected static long toLong(char[] data, int offset) {
 		long lowOrder = toInt32(data, offset) & 0x00000000FFFFFFFFL;
 		return lowOrder | ((long)toInt32(data, offset + 2) << 32);
 	}
 
-	protected UUID toUUID(char[] data, int offset) {
+	protected static UUID toUUID(char[] data, int offset) {
 		long leastSigBits = toLong(data, offset);
 		long mostSigBits = toLong(data, offset + 4);
 		return new UUID(mostSigBits, leastSigBits);
