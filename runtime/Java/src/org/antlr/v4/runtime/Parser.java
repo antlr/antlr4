@@ -473,13 +473,16 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		}
 	}
 
-	/** The preferred method of getting a tree pattern. For example,
-	 *  here's a sample use:
+	/**
+	 * The preferred method of getting a tree pattern. For example, here's a
+	 * sample use:
 	 *
-	 *  ParseTree t = parser.expr();
-	 *  ParseTreePattern p = parser.compileParseTreePattern("<ID>+0", MyParser.RULE_expr);
-	 *  ParseTreeMatch m = p.match(t);
-	 *  String id = m.get("ID");
+	 * <pre>
+	 * ParseTree t = parser.expr();
+	 * ParseTreePattern p = parser.compileParseTreePattern("<ID>+0", MyParser.RULE_expr);
+	 * ParseTreeMatch m = p.match(t);
+	 * String id = m.get("ID");
+	 * </pre>
 	 */
 	public ParseTreePattern compileParseTreePattern(String pattern, int patternRuleIndex) {
 		if ( getTokenStream()!=null ) {
@@ -492,8 +495,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		throw new UnsupportedOperationException("Parser can't discover a lexer to use");
 	}
 
-	/** The same as compileParseTreePattern(pattern,patternRuleName) but
-	 *  specify a lexer rather than trying to deduce it from this parser.
+	/**
+	 * The same as {@link #compileParseTreePattern(String, int)} but specify a
+	 * {@link Lexer} rather than trying to deduce it from this parser.
 	 */
 	public ParseTreePattern compileParseTreePattern(String pattern, int patternRuleIndex,
 													Lexer lexer)
@@ -644,8 +648,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
 	/**
-	 * @deprecated Use {@link #enterRecursionRule(ParserRuleContext, int, int)}
-	 * instead.
+	 * @deprecated Use
+	 * {@link #enterRecursionRule(ParserRuleContext, int, int, int)} instead.
 	 */
 	@Deprecated
 	public void enterRecursionRule(ParserRuleContext localctx, int ruleIndex) {
@@ -797,7 +801,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
    		return atn.nextTokens(s);
    	}
 
-	/** Get a rule's index (i.e., RULE_ruleName field) or -1 if not found. */
+	/** Get a rule's index (i.e., {@code RULE_ruleName} field) or -1 if not found. */
 	public int getRuleIndex(String ruleName) {
 		Integer ruleIndex = getRuleIndexMap().get(ruleName);
 		if ( ruleIndex!=null ) return ruleIndex;

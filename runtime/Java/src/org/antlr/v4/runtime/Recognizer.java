@@ -68,7 +68,11 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	public abstract String[] getRuleNames();
 
-	/** Used for xpath, tree pattern compilation */
+	/**
+	 * Get a map from token names to token types.
+	 * <p/>
+	 * Used for XPath and tree pattern compilation.
+	 */
 	@NotNull
 	public Map<String, Integer> getTokenTypeMap() {
 		String[] tokenNames = getTokenNames();
@@ -89,7 +93,11 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 		}
 	}
 
-	/** Used for xpath, tree pattern compilation */
+	/**
+	 * Get a map from rule names to rule indexes.
+	 * <p/>
+	 * Used for XPath and tree pattern compilation.
+	 */
 	@NotNull
 	public Map<String, Integer> getRuleIndexMap() {
 		String[] ruleNames = getRuleNames();
@@ -114,12 +122,14 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 		return Token.INVALID_TYPE;
 	}
 
-	/** If this recognizer was generated, it will have a serialized ATN
-	 *  representation of the grammar.
-	 *
-	 *  For interpreters, we don't know their serialized ATN despite having
-	 *  created the interpreter from it.
+	/**
+	 * If this recognizer was generated, it will have a serialized ATN
+	 * representation of the grammar.
+	 * <p/>
+	 * For interpreters, we don't know their serialized ATN despite having
+	 * created the interpreter from it.
 	 */
+	@NotNull
 	public String getSerializedATN() {
 		throw new UnsupportedOperationException("there is no serialized ATN");
 	}
@@ -129,18 +139,37 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	 */
 	public abstract String getGrammarFileName();
 
+	/**
+	 * Get the {@link ATN} used by the recognizer for prediction.
+	 *
+	 * @return The {@link ATN} used by the recognizer for prediction.
+	 */
+	@NotNull
 	public abstract ATN getATN();
 
+	/**
+	 * Get the ATN interpreter used by the recognizer for prediction.
+	 *
+	 * @return The ATN interpreter used by the recognizer for prediction.
+	 */
+	@NotNull
 	public ATNInterpreter getInterpreter() {
 		return _interp;
 	}
 
-	public void setInterpreter(ATNInterpreter interpreter) {
+	/**
+	 * Set the ATN interpreter used by the recognizer for prediction.
+	 *
+	 * @param interpreter The ATN interpreter used by the recognizer for
+	 * prediction.
+	 */
+	public void setInterpreter(@NotNull ATNInterpreter interpreter) {
 		_interp = interpreter;
 	}
 
 	/** What is the error header, normally line/character position information? */
-	public String getErrorHeader(RecognitionException e) {
+	@NotNull
+	public String getErrorHeader(@NotNull RecognitionException e) {
 		int line = e.getOffendingToken().getLine();
 		int charPositionInLine = e.getOffendingToken().getCharPositionInLine();
 		return "line "+line+":"+charPositionInLine;
@@ -172,7 +201,7 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	}
 
 	/**
-	 * @throws NullPointerException if {@code listener} is {@code null}.
+	 * @exception NullPointerException if {@code listener} is {@code null}.
 	 */
 	public void addErrorListener(@NotNull ANTLRErrorListener listener) {
 		if (listener == null) {
