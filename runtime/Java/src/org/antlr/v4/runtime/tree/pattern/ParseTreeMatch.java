@@ -100,18 +100,6 @@ public class ParseTreeMatch {
 		return mismatchedNode;
 	}
 
-	/** Return the text of the entire subtree matched. It does not include
-	 *  whitespace stripped by the lexer.
-	 */
-	public String getText() {
-		return tree.getText();
-	}
-
-	/** Did the tree vs pattern fail to match? */
-	public boolean failed() {
-		return mismatchedNode!=null;
-	}
-
 	/** Did the tree vs pattern match? */
 	public boolean succeeded() {
 		return mismatchedNode==null;

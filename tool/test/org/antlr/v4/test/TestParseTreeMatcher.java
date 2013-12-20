@@ -214,7 +214,7 @@ public class TestParseTreeMatcher extends BaseTest {
 		assertEquals("[y]", m.getAll("b").toString());
 		assertEquals("[x, y, z]", m.getAll("ID").toString()); // ordered
 
-		assertEquals("xyz;", m.getText()); // whitespace stripped by lexer
+		assertEquals("xyz;", m.getTree().getText()); // whitespace stripped by lexer
 
 		assertNull(m.get("undefined"));
 		assertEquals("[]", m.getAll("undefined").toString());
