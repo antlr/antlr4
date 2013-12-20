@@ -6,7 +6,6 @@ import org.antlr.v4.runtime.LexerNoViableAltException;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.IOException;
@@ -14,7 +13,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /** Represent a subset of XPath XML path syntax for use in identifying nodes in
  *  parse trees.
@@ -29,7 +27,7 @@ import java.util.Map;
  *  XPath p = new XPath(parser, xpath);
  *  return p.evaluate(this);
  *
- *  See {@link org.antlr.v4.test.TestXPath} for descriptions. In short, this allows
+ *  See {@code org.antlr.v4.test.TestXPath} for descriptions. In short, this allows
  *  operators:
  *
  *      /         root

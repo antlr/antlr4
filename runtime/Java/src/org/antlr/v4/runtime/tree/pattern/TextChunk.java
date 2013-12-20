@@ -30,13 +30,49 @@
 
 package org.antlr.v4.runtime.tree.pattern;
 
-/** The "sea" of text surrounding tags in a tree pattern string */
+import org.antlr.v4.runtime.misc.NotNull;
+
+/**
+ * Represents a span of raw text (concrete syntax) between tags in a tree
+ * pattern string.
+ */
 class TextChunk extends Chunk {
-	public String text;
-	public TextChunk(String text) {
+	/**
+	 * This is the backing field for {@link #getText}.
+	 */
+	@NotNull
+	private final String text;
+
+	/**
+	 * Constructs a new instance of {@link TextChunk} with the specified text.
+	 *
+	 * @param text The text of this chunk.
+	 * @exception IllegalArgumentException if {@code text} is {@code null}.
+	 */
+	public TextChunk(@NotNull String text) {
+		if (text == null) {
+			throw new IllegalArgumentException("text cannot be null");
+		}
+
 		this.text = text;
 	}
 
+	/**
+	 * Gets the raw text of this chunk.
+	 *
+	 * @return The text of the chunk.
+	 */
+	@NotNull
+	public final String getText() {
+		return text;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The implementation for {@link TextChunk} returns the result of
+	 * {@link #getText()} in single quotes.
+	 */
 	@Override
 	public String toString() {
 		return "'"+text+"'";

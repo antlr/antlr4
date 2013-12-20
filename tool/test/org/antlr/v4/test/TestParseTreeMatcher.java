@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 public class TestParseTreeMatcher extends BaseTest {
 	@Test public void testChunking() throws Exception {
-		ParseTreePatternMatcher m = new ParseTreePatternMatcher();
+		ParseTreePatternMatcher m = new ParseTreePatternMatcher(null, null);
 		assertEquals("[ID, ' = ', expr, ' ;']", m.split("<ID> = <expr> ;").toString());
 		assertEquals("[' ', ID, ' = ', expr]", m.split(" <ID> = <expr>").toString());
 		assertEquals("[ID, ' = ', expr]", m.split("<ID> = <expr>").toString());
@@ -33,14 +33,14 @@ public class TestParseTreeMatcher extends BaseTest {
 	}
 
 	@Test public void testDelimiters() throws Exception {
-		ParseTreePatternMatcher m = new ParseTreePatternMatcher();
+		ParseTreePatternMatcher m = new ParseTreePatternMatcher(null, null);
 		m.setDelimiters("<<", ">>", "$");
 		String result = m.split("<<ID>> = <<expr>> ;$<< ick $>>").toString();
 		assertEquals("[ID, ' = ', expr, ' ;<< ick >>']", result);
 	}
 
 	@Test public void testInvertedTags() throws Exception {
-		ParseTreePatternMatcher m= new ParseTreePatternMatcher();
+		ParseTreePatternMatcher m= new ParseTreePatternMatcher(null, null);
 		String result = null;
 		try {
 			m.split(">expr<");
@@ -53,7 +53,7 @@ public class TestParseTreeMatcher extends BaseTest {
 	}
 
 	@Test public void testUnclosedTag() throws Exception {
-		ParseTreePatternMatcher m = new ParseTreePatternMatcher();
+		ParseTreePatternMatcher m = new ParseTreePatternMatcher(null, null);
 		String result = null;
 		try {
 			m.split("<expr hi mom");
@@ -66,7 +66,7 @@ public class TestParseTreeMatcher extends BaseTest {
 	}
 
 	@Test public void testExtraClose() throws Exception {
-		ParseTreePatternMatcher m = new ParseTreePatternMatcher();
+		ParseTreePatternMatcher m = new ParseTreePatternMatcher(null, null);
 		String result = null;
 		try {
 			m.split("<expr> >");
@@ -214,7 +214,7 @@ public class TestParseTreeMatcher extends BaseTest {
 		assertEquals("[y]", m.getAll("b").toString());
 		assertEquals("[x, y, z]", m.getAll("ID").toString()); // ordered
 
-		assertEquals("xyz;", m.getText()); // whitespace stripped by lexer
+		assertEquals("xyz;", m.getTree().getText()); // whitespace stripped by lexer
 
 		assertNull(m.get("undefined"));
 		assertEquals("[]", m.getAll("undefined").toString());

@@ -57,7 +57,9 @@ public interface Token {
 	 */
 	public static final int HIDDEN_CHANNEL = 1;
 
-	/** Get the text of the token */
+	/**
+	 * Get the text of the token.
+	 */
 	String getText();
 
 	/** Get the token type of the token */

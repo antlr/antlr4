@@ -51,6 +51,8 @@ import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
 public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
@@ -97,6 +99,15 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 			}
 		}
 	}
+
+	/**
+	 * This field maps from the serialized ATN string to the deserialized {@link ATN} with
+	 * bypass alternatives.
+	 *
+	 * @see ATNDeserializationOptions#isGenerateRuleBypassTransitions()
+	 */
+	private static final Map<String, ATN> bypassAltsAtnCache =
+		new WeakHashMap<String, ATN>();
 
 	/**
 	 * The error handling strategy for the parser. The default value is a new
@@ -435,36 +446,43 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		_input.getTokenSource().setTokenFactory(factory);
 	}
 
-	/** The ATN with bypass alternatives is expensive to create so we create it lazily.
-	 *  The actual generated parsers override this method. These are just
-	 *  setters/getters. createATNWithBypassAlts() does the creation.
+	/**
+	 * The ATN with bypass alternatives is expensive to create so we create it
+	 * lazily.
+	 *
+	 * @throws UnsupportedOperationException if the current parser does not
+	 * implement the {@link #getSerializedATN()} method.
 	 */
-	public void setATNWithBypassAlts(ATN atn) { }
-	public ATN getATNWithBypassAlts() { return null; }
+	@NotNull
+	public ATN getATNWithBypassAlts() {
+		String serializedAtn = getSerializedATN();
+		if (serializedAtn == null) {
+			throw new UnsupportedOperationException("The current parser does not support an ATN with bypass alternatives.");
+		}
 
-	/** Create and cache the ATN with bypass alternatives. This is not
-	 *  part of the typical API--use compileParseTreePattern().
-	 */
-	public void createATNWithBypassAlts() {
-		if ( getATNWithBypassAlts()==null ) {
-			synchronized (Parser.class) { // create just one pattern matcher
-				if ( getATNWithBypassAlts()==null ) { // double-check
-					String sATN = getSerializedATN();
-					ATNDeserializationOptions deserializationOptions = new ATNDeserializationOptions();
-					deserializationOptions.setGenerateRuleBypassTransitions(true);
-					setATNWithBypassAlts( new ATNDeserializer(deserializationOptions).deserialize(sATN.toCharArray()) );
-				}
+		synchronized (bypassAltsAtnCache) {
+			ATN result = bypassAltsAtnCache.get(serializedAtn);
+			if (result == null) {
+				ATNDeserializationOptions deserializationOptions = new ATNDeserializationOptions();
+				deserializationOptions.setGenerateRuleBypassTransitions(true);
+				result = new ATNDeserializer(deserializationOptions).deserialize(serializedAtn.toCharArray());
+				bypassAltsAtnCache.put(serializedAtn, result);
 			}
+
+			return result;
 		}
 	}
 
-	/** The preferred method of getting a tree pattern. For example,
-	 *  here's a sample use:
+	/**
+	 * The preferred method of getting a tree pattern. For example, here's a
+	 * sample use:
 	 *
-	 *  ParseTree t = parser.expr();
-	 *  ParseTreePattern p = parser.compileParseTreePattern("<ID>+0", MyParser.RULE_expr);
-	 *  ParseTreeMatch m = p.match(t);
-	 *  String id = m.get("ID");
+	 * <pre>
+	 * ParseTree t = parser.expr();
+	 * ParseTreePattern p = parser.compileParseTreePattern("<ID>+0", MyParser.RULE_expr);
+	 * ParseTreeMatch m = p.match(t);
+	 * String id = m.get("ID");
+	 * </pre>
 	 */
 	public ParseTreePattern compileParseTreePattern(String pattern, int patternRuleIndex) {
 		if ( getTokenStream()!=null ) {
@@ -477,13 +495,13 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		throw new UnsupportedOperationException("Parser can't discover a lexer to use");
 	}
 
-	/** The same as compileParseTreePattern(pattern,patternRuleName) but
-	 *  specify a lexer rather than trying to deduce it from this parser.
+	/**
+	 * The same as {@link #compileParseTreePattern(String, int)} but specify a
+	 * {@link Lexer} rather than trying to deduce it from this parser.
 	 */
 	public ParseTreePattern compileParseTreePattern(String pattern, int patternRuleIndex,
 													Lexer lexer)
 	{
-		createATNWithBypassAlts();
 		ParseTreePatternMatcher m = new ParseTreePatternMatcher(lexer, this);
 		return m.compile(pattern, patternRuleIndex);
 	}
@@ -630,8 +648,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
 	/**
-	 * @deprecated Use {@link #enterRecursionRule(ParserRuleContext, int, int)}
-	 * instead.
+	 * @deprecated Use
+	 * {@link #enterRecursionRule(ParserRuleContext, int, int, int)} instead.
 	 */
 	@Deprecated
 	public void enterRecursionRule(ParserRuleContext localctx, int ruleIndex) {
@@ -783,7 +801,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
    		return atn.nextTokens(s);
    	}
 
-	/** Get a rule's index (i.e., RULE_ruleName field) or -1 if not found. */
+	/** Get a rule's index (i.e., {@code RULE_ruleName} field) or -1 if not found. */
 	public int getRuleIndex(String ruleName) {
 		Integer ruleIndex = getRuleIndexMap().get(ruleName);
 		if ( ruleIndex!=null ) return ruleIndex;
