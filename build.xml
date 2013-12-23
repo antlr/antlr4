@@ -260,7 +260,7 @@
                 <include name="build.properties"/>
                 <include name="build.xml"/>
                 <include name="LICENSE.txt"/>
-                <include name="README.txt"/>
+                <include name="README.md"/>
                 <include name="doxyfile"/>
             </fileset>
         </copy>
