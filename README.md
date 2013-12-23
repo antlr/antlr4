@@ -2,9 +2,9 @@
 
 ANTLR (ANother Tool for Language Recognition) is a powerful parser generator for reading, processing, executing, or translating structured text or binary files. It's widely used to build languages, tools, and frameworks. From a grammar, ANTLR generates a parser that can build and walk parse trees.
 
-[Wikipedia](https://en.wikipedia.org/wiki/ANTLR)
-[Official site](http://www.antlr3.org/)
-[ANTLR v3](http://www.antlr3.org/)?
+* [Wikipedia](https://en.wikipedia.org/wiki/ANTLR)
+* [Official site](http://www.antlr3.org/)
+* [ANTLR v3](http://www.antlr3.org/)
 
 ## INTRODUCTION
 
@@ -127,7 +127,7 @@ by the grammar. For example, java, cpp, csharp, c, etc...
 
 ## Author
 
-[Terence Parr](http://www.cs.usfca.edu/~parrt/), parrt@cs.usfca.edu <br/>
+[Terence Parr](http://www.cs.usfca.edu/~parrt/), parrt@cs.usfca.edu
 ANTLR project lead and supreme dictator for life<br/>
 [University of San Francisco](http://www.usfca.edu/)
 
