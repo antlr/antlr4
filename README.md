@@ -1,6 +1,6 @@
 # ANTLR v4
 
-ANTLR (ANother Tool for Language Recognition) is a powerful parser generator for reading, processing, executing, or translating structured text or binary files. It's widely used to build languages, tools, and frameworks. From a grammar, ANTLR generates a parser that can build and walk parse trees.
+**ANTLR** (ANother Tool for Language Recognition) is a powerful parser generator for reading, processing, executing, or translating structured text or binary files. It's widely used to build languages, tools, and frameworks. From a grammar, ANTLR generates a parser that can build and walk parse trees.
 
 * [Wikipedia](https://en.wikipedia.org/wiki/ANTLR)
 * [Official site](http://www.antlr3.org/)
@@ -114,9 +114,8 @@ hello parrt
 
 ## The Definitive ANTLR 4 Reference
 You can by a book [The Definitive ANTLR 4 Reference](http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference)
-[bquote]
+
 Programmers run into parsing problems all the time. Whether it’s a data format like JSON, a network protocol like SMTP, a server configuration file for Apache, a PostScript/PDF file, or a simple spreadsheet macro language—ANTLR v4 and this book will demystify the process. ANTLR v4 has been rewritten from scratch to make it easier than ever to build parsers and the language applications built on top. This completely rewritten new edition of the bestselling Definitive ANTLR Reference shows you how to take advantage of these new features.
-[/bquote]
 
 [Book source code](http://pragprog.com/titles/tpantlr2/source_code)
 
@@ -130,5 +129,3 @@ by the grammar. For example, java, cpp, csharp, c, etc...
 [Terence Parr](http://www.cs.usfca.edu/~parrt/), parrt@cs.usfca.edu
 ANTLR project lead and supreme dictator for life<br/>
 [University of San Francisco](http://www.usfca.edu/)
-
-
