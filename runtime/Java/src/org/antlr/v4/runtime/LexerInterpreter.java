@@ -35,7 +35,6 @@ import org.antlr.v4.runtime.atn.ATNType;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.Collection;
 
@@ -69,11 +68,6 @@ public class LexerInterpreter extends Lexer {
 			_decisionToDFA[i] = new DFA(atn.getDecisionState(i), i);
 		}
 		this._interp = new LexerATNSimulator(this,atn,_decisionToDFA,_sharedContextCache);
-	}
-
-	@Override
-	public void action(@Nullable RuleContext _localctx, int ruleIndex, int actionIndex) {
-		super.action(_localctx, ruleIndex, actionIndex);
 	}
 
 	@Override
