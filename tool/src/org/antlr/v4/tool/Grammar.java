@@ -273,7 +273,7 @@ public class Grammar implements AttributeResolver {
 		org.antlr.runtime.ANTLRStringStream in = new org.antlr.runtime.ANTLRStringStream(grammarText);
 		in.name = fileName;
 
-		this.ast = tool.load(fileName, in);
+		this.ast = tool.parse(fileName, in);
 		if ( ast==null ) {
 			throw new UnsupportedOperationException();
 		}
@@ -427,7 +427,17 @@ public class Grammar implements AttributeResolver {
     }
 */
 
-    /** Return list of imported grammars from root down to our parent.
+	public LexerGrammar getImplicitLexer() {
+		return implicitLexer;
+	}
+
+	/** convenience method for Tool.loadGrammar() */
+	public static Grammar load(String fileName) {
+		Tool antlr = new Tool();
+		return antlr.loadGrammar(fileName);
+	}
+
+	/** Return list of imported grammars from root down to our parent.
      *  Order is [root, ..., this.parent].  (us not included).
      */
     public List<Grammar> getGrammarAncestors() {
