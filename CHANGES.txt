@@ -1,5 +1,19 @@
 ANTLR v4 Honey Badger
 
+December 29, 2013
+
+* Internal change: Tool.loadGrammar() -> parseGrammar(). Tool.load()->parse()
+
+* Added Tool.loadGrammar(fileName) that completely parses, extracts implicit lexer,
+  and processes into Grammar object. Does not geneate code.  Use
+  Grammar.getImplicitLexer() to get the lexer created during processing of
+  combined grammar.
+
+* Added Grammar.load(fileName) that creates Tool object for you. loadGrammar()
+  lets you create your own Tool for setting error handlers etc...
+
+	final Grammar g = Grammar.load("/tmp/MyGrammar.g4");
+
 December 19, 2013
 
 * Sam:

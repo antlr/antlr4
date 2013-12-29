@@ -494,7 +494,7 @@ public class Tool {
 		Graph<String> g = new Graph<String>();
 		List<GrammarRootAST> roots = new ArrayList<GrammarRootAST>();
 		for (String fileName : fileNames) {
-			GrammarAST t = loadGrammar(fileName);
+			GrammarAST t = parseGrammar(fileName);
 			if ( t==null || t instanceof GrammarASTErrorNode) continue; // came back as error node
 			if ( ((GrammarRootAST)t).hasErrors ) continue;
 			GrammarRootAST root = (GrammarRootAST)t;
@@ -562,7 +562,7 @@ public class Tool {
 		return g;
 	}
 
-	public GrammarRootAST loadGrammar(String fileName) {
+	public GrammarRootAST parseGrammar(String fileName) {
 		try {
 			File file = new File(fileName);
 			if (!file.isAbsolute()) {
@@ -570,13 +570,26 @@ public class Tool {
 			}
 
 			ANTLRFileStream in = new ANTLRFileStream(file.getAbsolutePath(), grammarEncoding);
-			GrammarRootAST t = load(fileName, in);
+			GrammarRootAST t = parse(fileName, in);
 			return t;
 		}
 		catch (IOException ioe) {
 			errMgr.toolError(ErrorType.CANNOT_OPEN_FILE, ioe, fileName);
 		}
 		return null;
+	}
+
+	/** Convenience method to load and process an ANTLR grammar. Useful
+	 *  when creating interpreters.  If you need to access to the lexer
+	 *  grammar created while processing a combined grammar, use
+	 *  getImplicitLexer() on returned grammar.
+	 */
+	public Grammar loadGrammar(String fileName) {
+		Tool antlr = new Tool();
+		GrammarRootAST grammarRootAST = antlr.parseGrammar(fileName);
+		final Grammar g = antlr.createGrammar(grammarRootAST);
+		antlr.process(g, false);
+		return g;
 	}
 
 	/**
@@ -600,17 +613,17 @@ public class Tool {
 		}
 
 		ANTLRFileStream in = new ANTLRFileStream(importedFile.getAbsolutePath());
-		GrammarRootAST root = load(g.fileName, in);
+		GrammarRootAST root = parse(g.fileName, in);
 		Grammar imported = createGrammar(root);
 		imported.fileName = importedFile.getAbsolutePath();
 		return imported;
 	}
 
-	public GrammarRootAST loadFromString(String grammar) {
-		return load("<string>", new ANTLRStringStream(grammar));
+	public GrammarRootAST parseGrammarFromString(String grammar) {
+		return parse("<string>", new ANTLRStringStream(grammar));
 	}
 
-	public GrammarRootAST load(String fileName, CharStream in) {
+	public GrammarRootAST parse(String fileName, CharStream in) {
 		try {
 			GrammarASTAdaptor adaptor = new GrammarASTAdaptor(in);
 			ToolANTLRLexer lexer = new ToolANTLRLexer(in, this);
