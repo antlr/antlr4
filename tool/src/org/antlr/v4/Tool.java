@@ -350,14 +350,16 @@ public class Tool {
 		into the root grammar. If a root grammar is a combined grammar,
 		we have to extract the implicit lexer. Once all this is done, we
 		process the lexer first, if present, and then the parser grammar
+
+	    If g is combined, return the created lexer grammar else null.
 	 */
-	public void process(Grammar g, boolean gencode) {
+	public LexerGrammar process(Grammar g, boolean gencode) {
+		LexerGrammar lexerg = null;
 		g.loadImportedGrammars();
 
 		GrammarTransformPipeline transform = new GrammarTransformPipeline(g, this);
 		transform.process();
 
-		LexerGrammar lexerg;
 		GrammarRootAST lexerAST;
 		if ( g.ast!=null && g.ast.grammarType== ANTLRParser.COMBINED &&
 			 !g.ast.hasErrors )
@@ -382,6 +384,8 @@ public class Tool {
 //		System.out.println("tokens="+g.tokenNameToTypeMap);
 //		System.out.println("strings="+g.stringLiteralToTypeMap);
 		processNonCombinedGrammar(g, gencode);
+
+		return lexerg;
 	}
 
 	public void processNonCombinedGrammar(Grammar g, boolean gencode) {
