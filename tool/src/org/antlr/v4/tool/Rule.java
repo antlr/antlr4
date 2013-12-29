@@ -110,6 +110,12 @@ public class Rule implements AttributeResolver {
 	 */
 	public List<ActionAST> actions = new ArrayList<ActionAST>();
 
+	/** Root of ->skip(), ->pushMode(...) type action, if any; will
+	 *  also appear in actions field but those will be the translated
+	 *  versions of this subtree (or a regular action).
+	 */
+	public GrammarAST lexerCommandTree;
+
 	public ActionAST finallyAction;
 
 	public int numberOfAlts;

@@ -878,7 +878,13 @@ public class Grammar implements AttributeResolver {
 			return implicitLexer.createLexerInterpreter(input);
 		}
 
-		return new LexerInterpreter(fileName, Arrays.asList(getTokenNames()), Arrays.asList(getRuleNames()), ((LexerGrammar)this).modes.keySet(), atn, input);
+		return new LexerGrammarInterpreter((LexerGrammar)this,
+												fileName,
+												Arrays.asList(getTokenNames()),
+												Arrays.asList(getRuleNames()),
+												((LexerGrammar)this).modes.keySet(),
+												atn,
+												input);
 	}
 
 	public ParserInterpreter createParserInterpreter(TokenStream tokenStream) {
@@ -886,6 +892,10 @@ public class Grammar implements AttributeResolver {
 			throw new IllegalStateException("A parser interpreter can only be created for a parser or combined grammar.");
 		}
 
-		return new ParserInterpreter(fileName, Arrays.asList(getTokenNames()), Arrays.asList(getRuleNames()), atn, tokenStream);
+		return new ParserInterpreter(fileName,
+									 Arrays.asList(getTokenNames()),
+									 Arrays.asList(getRuleNames()),
+									 atn,
+									 tokenStream);
 	}
 }
