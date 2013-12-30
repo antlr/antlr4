@@ -585,10 +585,9 @@ public class Tool {
 	 *  getImplicitLexer() on returned grammar.
 	 */
 	public Grammar loadGrammar(String fileName) {
-		Tool antlr = new Tool();
-		GrammarRootAST grammarRootAST = antlr.parseGrammar(fileName);
-		final Grammar g = antlr.createGrammar(grammarRootAST);
-		antlr.process(g, false);
+		GrammarRootAST grammarRootAST = parseGrammar(fileName);
+		final Grammar g = createGrammar(grammarRootAST);
+		process(g, false);
 		return g;
 	}
 

@@ -28,19 +28,19 @@ November 24, 2013
 
 * Ter adds tree pattern matching.  Preferred interface:
 
-	   ParseTree t = parser.expr();
-	   ParseTreePattern p = parser.compileParseTreePattern("<ID>+0", MyParser.RULE_expr);
-	   ParseTreeMatch m = p.match(t);
-	   String id = m.get("ID");
+	ParseTree t = parser.expr();
+	ParseTreePattern p = parser.compileParseTreePattern("<ID>+0", MyParser.RULE_expr);
+	ParseTreeMatch m = p.match(t);
+	String id = m.get("ID");
 
   or
 
-		String xpath = "//blockStatement/*";
-		String treePattern = "int <Identifier> = <expression>;";
-		ParseTreePattern p =
-			parser.compileParseTreePattern(treePattern,
-										   JavaParser.RULE_localVariableDeclarationStatement);
-		List<ParseTreeMatch> matches = p.findAll(tree, xpath);
+	String xpath = "//blockStatement/*";
+	String treePattern = "int <Identifier> = <expression>;";
+	ParseTreePattern p =
+		parser.compileParseTreePattern(treePattern,
+									   JavaParser.RULE_localVariableDeclarationStatement);
+	List<ParseTreeMatch> matches = p.findAll(tree, xpath);
 
 November 20, 2013
 
