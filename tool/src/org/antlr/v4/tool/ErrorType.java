@@ -45,7 +45,7 @@ public enum ErrorType {
 	// Tool errors
 	CANNOT_WRITE_FILE(1, "cannot write file '<arg>': <arg2>", ErrorSeverity.ERROR),
 	INVALID_CMDLINE_ARG(2, "unknown command-line option '<arg>'", ErrorSeverity.ERROR),
-	CANNOT_FIND_TOKENS_FILE(3, "cannot find tokens file '<arg>'", ErrorSeverity.ERROR),
+	CANNOT_FIND_TOKENS_FILE(3, "cannot find tokens file '<arg>'", ErrorSeverity.WARNING),
 	ERROR_READING_TOKENS_FILE(4, "cannot find tokens file '<arg>': <arg2>", ErrorSeverity.ERROR),
 	DIR_NOT_FOUND(5, "directory not found: <arg>", ErrorSeverity.ERROR),
 	OUTPUT_DIR_IS_FILE(6, "output directory is a file: <arg>", ErrorSeverity.ERROR),
@@ -177,7 +177,7 @@ public enum ErrorType {
 	 * or is not supported by the current target.
 	 * <p/>
 	 * The following rule produces this error.
-	 * 
+	 *
 	 * <pre>
 	 * X : 'foo' -> type(Foo);  // ok
 	 * Y : 'foo' -> token(Foo); // error 149 (token is not a supported lexer command)
@@ -188,7 +188,7 @@ public enum ErrorType {
 	 * Some lexer commands require an argument.
 	 * <p/>
 	 * The following rule produces this error.
-	 * 
+	 *
 	 * <pre>
 	 * X : 'foo' -> type(Foo); // ok
 	 * Y : 'foo' -> type;      // error 150 (the type command requires an argument)

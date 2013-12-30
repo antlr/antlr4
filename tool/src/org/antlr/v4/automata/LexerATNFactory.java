@@ -155,7 +155,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 
 		// track actual subtree in rule
-		currentRule.lexerCommandTree = (GrammarAST)ID.getParent();
+		currentRule.lexerCommandTrees.add( (GrammarAST)ID.getParent() );
 
 		cmdST.add("arg", arg.getText());
 		return cmdST.render();
@@ -178,7 +178,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 
 		// track actual subtree in rule
-		currentRule.lexerCommandTree = ID;
+		currentRule.lexerCommandTrees.add(ID);
 
 		return cmdST.render();
 	}

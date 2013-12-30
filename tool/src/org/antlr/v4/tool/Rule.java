@@ -112,9 +112,10 @@ public class Rule implements AttributeResolver {
 
 	/** Root of ->skip(), ->pushMode(...) type action, if any; will
 	 *  also appear in actions field but those will be the translated
-	 *  versions of this subtree (or a regular action).
+	 *  versions of this subtree (or a regular action). There could
+	 *  be multiple like "->more, mode(foo)"
 	 */
-	public GrammarAST lexerCommandTree;
+	public List<GrammarAST> lexerCommandTrees = new ArrayList<GrammarAST>();
 
 	public ActionAST finallyAction;
 
