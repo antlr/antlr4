@@ -570,7 +570,10 @@ public class Grammar implements AttributeResolver {
 		String[] tokenNames = new String[numTokens+1];
 		for (String tokenName : tokenNameToTypeMap.keySet()) {
 			Integer ttype = tokenNameToTypeMap.get(tokenName);
-			if ( tokenName!=null && tokenName.startsWith(AUTO_GENERATED_TOKEN_NAME_PREFIX) ) {
+			if ( tokenName!=null &&
+                 tokenName.startsWith(AUTO_GENERATED_TOKEN_NAME_PREFIX) &&
+                 ttype < typeToStringLiteralList.size() )
+            {
 				tokenName = typeToStringLiteralList.get(ttype);
 			}
 			if ( ttype>0 ) tokenNames[ttype] = tokenName;
