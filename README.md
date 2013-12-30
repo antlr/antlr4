@@ -3,12 +3,12 @@
 **ANTLR** (ANother Tool for Language Recognition) is a powerful parser generator for reading, processing, executing, or translating structured text or binary files. It's widely used to build languages, tools, and frameworks. From a grammar, ANTLR generates a parser that can build and walk parse trees.
 
 * [Wikipedia](https://en.wikipedia.org/wiki/ANTLR)
-* [Official site](http://www.antlr3.org/)
+* [Official site](http://www.antlr.org/)
 * [ANTLR v3](http://www.antlr3.org/)
 
 ## INTRODUCTION
 
-Hi and welcome to the Honey Badger 4.1 release of ANTLR!
+Hi and welcome to the Honey Badger 4.1 release (June 30, 2013) of ANTLR!
 
 ## INSTALLATION
 
@@ -124,8 +124,10 @@ Programmers run into parsing problems all the time. Whether it’s a data format
 root directory name is the all-lowercase name of the language parsed
 by the grammar. For example, java, cpp, csharp, c, etc...
 
-## Author
+## Authors
 
 [Terence Parr](http://www.cs.usfca.edu/~parrt/), parrt@cs.usfca.edu
 ANTLR project lead and supreme dictator for life<br/>
 [University of San Francisco](http://www.usfca.edu/)
+
+[Sam Harwell](http://tunnelvisionlabs.com/)
