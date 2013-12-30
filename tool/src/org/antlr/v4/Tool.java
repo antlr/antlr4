@@ -591,6 +591,15 @@ public class Tool {
 		return g;
 	}
 
+	/** Same as loadGrammar(fileName) except import vocab from existing lexer */
+	public Grammar loadGrammar(String fileName, LexerGrammar lexerGrammar) {
+		GrammarRootAST grammarRootAST = parseGrammar(fileName);
+		final Grammar g = createGrammar(grammarRootAST);
+		g.importVocab(lexerGrammar);
+		process(g, false);
+		return g;
+	}
+
 	/**
 	 * Try current dir then dir of g then lib dir
 	 * @param g

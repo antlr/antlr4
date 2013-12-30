@@ -435,6 +435,12 @@ public class Grammar implements AttributeResolver {
 		return antlr.loadGrammar(fileName);
 	}
 
+	/** convenience method for Tool.loadGrammar() */
+	public static Grammar load(String fileName, LexerGrammar lexerGrammar) {
+		Tool antlr = new Tool();
+		return antlr.loadGrammar(fileName, lexerGrammar);
+	}
+
 	/** Return list of imported grammars from root down to our parent.
      *  Order is [root, ..., this.parent].  (us not included).
      */

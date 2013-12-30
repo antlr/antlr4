@@ -14,6 +14,13 @@ December 29, 2013
 
 	final Grammar g = Grammar.load("/tmp/MyGrammar.g4");
 
+  There is a variant to import vocab.
+
+	final LexerGrammar lg = (LexerGrammar)Grammar.load(XMLLexerGrammar);
+	final Grammar pg = Grammar.load(XMLParserGrammar, lg);
+
+* missing .tokens file is now warning not error.
+
 December 19, 2013
 
 * Sam:
