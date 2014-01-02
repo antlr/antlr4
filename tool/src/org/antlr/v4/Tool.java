@@ -595,6 +595,7 @@ public class Tool {
 	public Grammar loadGrammar(String fileName, LexerGrammar lexerGrammar) {
 		GrammarRootAST grammarRootAST = parseGrammar(fileName);
 		final Grammar g = createGrammar(grammarRootAST);
+		g.fileName = fileName;
 		g.importVocab(lexerGrammar);
 		process(g, false);
 		return g;
