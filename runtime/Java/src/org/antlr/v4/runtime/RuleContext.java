@@ -131,7 +131,8 @@ public class RuleContext implements RuleNode,Serializable {
 	 *  method.
 	 */
 	@Override
-	public String getText() {
+	public String getText() { return this.getText(""); }
+	public String getText(String sep) {
 		if (getChildCount() == 0) {
 			return "";
 		}
@@ -139,6 +140,7 @@ public class RuleContext implements RuleNode,Serializable {
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < getChildCount(); i++) {
 			builder.append(getChild(i).getText());
+			if (sep.length()>0) builder.append(sep);
 		}
 
 		return builder.toString();
