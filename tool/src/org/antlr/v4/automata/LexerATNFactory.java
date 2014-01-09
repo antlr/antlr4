@@ -61,6 +61,14 @@ import java.util.Set;
 
 public class LexerATNFactory extends ParserATNFactory {
 	public STGroup codegenTemplates;
+/*
+	public boolean lexerIgnoreCase=false;
+	
+	@Override
+	public void setLexerIgnoreCase(boolean ignoreCase) {
+		lexerIgnoreCase=ignoreCase;
+	}
+*/	
 	public LexerATNFactory(LexerGrammar g) {
 		super(g);
 		// use codegen to get correct language templates for lexer commands
@@ -243,6 +251,12 @@ public class LexerATNFactory extends ParserATNFactory {
 	@Override
 	public Handle stringLiteral(TerminalAST stringLiteralAST) {
 		String chars = stringLiteralAST.getText();
+		// TODO:ignorecase
+		//   To implement case insensitive scanning, capture the 'STRING' 
+		//   and convert to [Ss][Tt][Rr][Ii][Nn][Gg] 
+		//   and use the charSetLiteral to construct the Handle
+		// System.out.println("LexerATNFactor.java stringLiteral>"+chars+"<");
+
 		chars = CharSupport.getStringFromGrammarStringLiteral(chars);
 		int n = chars.length();
 		ATNState left = newState(stringLiteralAST);
@@ -260,6 +274,8 @@ public class LexerATNFactory extends ParserATNFactory {
 	/** [Aa\t \u1234a-z\]\-] char sets */
 	@Override
 	public Handle charSetLiteral(GrammarAST charSetAST) {
+		// TODO:ignorecase
+		// System.out.println("LexerATNFactor.java charSetLiteral>"+charSetAST.getText()+"<");
 		ATNState left = newState(charSetAST);
 		ATNState right = newState(charSetAST);
 		IntervalSet set = getSetFromCharSetLiteral(charSetAST);

@@ -64,6 +64,8 @@ public interface ATNFactory {
 	void setCurrentRuleName(String name);
 
 	void setCurrentOuterAlt(int alt);
+	
+	//void setLexerIgnoreCase(boolean ignoreCase);
 
 	Handle rule(GrammarAST ruleAST, String name, Handle blk);
 

@@ -137,6 +137,7 @@ public class Tool {
 	public Map<String, String> grammarOptions = null;
 	public boolean warnings_are_errors = false;
 	public boolean longMessages = false;
+	public boolean ignoreCase = false;
 
     public static Option[] optionDefs = {
         new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
@@ -157,6 +158,8 @@ public class Tool {
 		new Option("ST_inspector_wait_for_close", "-XdbgSTWait", "wait for STViz to close before continuing"),
         new Option("force_atn",			"-Xforce-atn", "use the ATN simulator for all predictions"),
 		new Option("log",   			"-Xlog", "dump lots of logging info to antlr-timestamp.log"),
+		new Option("ignoreCase",		"-ignorecase", "the generated lexer will be case insensitive"),
+		new Option("",					"-help", "show tool help"),
 	};
 
 	// helper vars for option management
@@ -224,6 +227,10 @@ public class Tool {
 			i++;
 			if ( arg.startsWith("-D") ) { // -Dlanguage=Java syntax
 				handleOptionSetArg(arg);
+				continue;
+			}
+			if ( arg.startsWith("-help") ) {
+				help();
 				continue;
 			}
 			if ( arg.charAt(0)!='-' ) { // file name
@@ -404,6 +411,12 @@ public class Tool {
 		ATNFactory factory;
 		if ( g.isLexer() ) factory = new LexerATNFactory((LexerGrammar)g);
 		else factory = new ParserATNFactory(g);
+		
+		if (ignoreCase)
+			if (g.isLexer()) {//TODO: factory.setLexerIgnoreCase(true);
+			}
+			else errMgr.toolError(ErrorType.LEXER_OPTION_IGNORECASE);
+		
 		g.atn = factory.createATN();
 
 		if ( generate_ATN_dot ) generateATNs(g);
@@ -786,7 +799,7 @@ public class Tool {
 	}
 
 	public void help() {
-		info("ANTLR Parser Generator (HS Styled) Version " + Tool.VERSION);
+		version();
 		for (Option o : optionDefs) {
 			String name = o.name + (o.argType!=OptionArgType.NONE? " ___" : "");
 			String s = String.format(" %-19s %s", name, o.description);

@@ -20,9 +20,9 @@ import org.junit.runners.Suite.SuiteClasses;
 		TestPerformance.class, TestScopeParsing.class,
 		TestSemPredEvalLexer.class, TestSemPredEvalParser.class,
 		TestSets.class, TestSymbolIssues.class, TestTokenStreamRewriter.class,
-		TestTokenTypeAssignment.class, TestToolSyntaxErrors.class,
-		TestTopologicalSort.class, TestUnbufferedCharStream.class,
-		TestUnbufferedTokenStream.class })
+		TestTokenTypeAssignment.class, TestToolOptions.class,
+		TestToolSyntaxErrors.class, TestTopologicalSort.class,
+		TestUnbufferedCharStream.class, TestUnbufferedTokenStream.class })
 public class AllTests {
 
 }

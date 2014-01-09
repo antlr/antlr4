@@ -193,6 +193,12 @@ public class ParserATNFactory implements ATNFactory {
 		currentOuterAlt = alt;
 	}
 
+/*	
+	@Override
+	public void setLexerIgnoreCase(boolean ignoreCase) {
+	}
+*/
+	
 	/* start->ruleblock->end */
 	@Override
 	public Handle rule(GrammarAST ruleAST, String name, Handle blk) {

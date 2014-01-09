@@ -246,6 +246,7 @@ public enum ErrorType {
 	 * </pre>
 	 */
 	EPSILON_OPTIONAL(154, "rule '<arg>' contains an optional block with at least one alternative that can match an empty string", ErrorSeverity.WARNING),
+	LEXER_OPTION_IGNORECASE(155, "option -ignorecase is only valid for Lexer grammars", ErrorSeverity.ERROR),
 
 	// Backward incompatibility errors
 	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR 4", ErrorSeverity.ERROR),

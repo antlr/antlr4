@@ -697,6 +697,29 @@ public abstract class BaseTest {
         }
     }
 
+
+	public void testErrors(String[] pairs, String... extraOptions ) {
+        for (int i = 0; i < pairs.length; i+=2) {
+            String input = pairs[i];
+            String expect = pairs[i+1];
+
+			String[] lines = input.split("\n");
+			String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
+			ErrorQueue equeue = antlr(fileName, fileName, input, false,extraOptions);
+
+			String actual = equeue.toString(true);
+			actual = actual.replace(tmpdir + File.separator, "");
+			System.err.println(actual);
+			String msg = input;
+			msg = msg.replace("\n","\\n");
+			msg = msg.replace("\r","\\r");
+			msg = msg.replace("\t","\\t");
+
+            assertEquals("error in: "+msg,expect,actual);
+        }
+    }
+
+	
 	public String getFilenameFromFirstLineOfGrammar(String line) {
 		String fileName = "A" + Tool.GRAMMAR_EXTENSION;
 		int grIndex = line.lastIndexOf("grammar");
