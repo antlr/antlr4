@@ -1,5 +1,7 @@
 package org.antlr.v4.runtime;
 
+import java.util.List;
+
 import org.antlr.v4.runtime.misc.Pair;
 
 public interface IncludeStrategy {
@@ -28,6 +30,11 @@ public interface IncludeStrategy {
     */
    public String getQualifiedFileName(String lexerIncludeRequest);
 
+   /**
+    * Return the list of qualified file names that have been used for the scanning.
+    * @return List<String>
+    */
+   public List<String>  getAllFiles();
    
    
 }

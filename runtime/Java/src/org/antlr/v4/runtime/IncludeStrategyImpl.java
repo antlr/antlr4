@@ -6,10 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-
+import java.util.List;
 import org.antlr.v4.runtime.misc.Pair;
 
 public class IncludeStrategyImpl implements IncludeStrategy, Serializable
@@ -153,6 +152,12 @@ public class IncludeStrategyImpl implements IncludeStrategy, Serializable
 			return getIncludePrefix()+lexerIncludeName+getIncludeSuffix();
 		}
 		
-		
+		/**
+		 * Returns all qualified files names
+		 */
+		public List<String>  getAllFiles()
+		{
+			return new ArrayList<String>(this.filenameIndexMap.keySet());
+		}
 		
 	}
