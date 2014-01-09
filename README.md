@@ -113,13 +113,13 @@ hello parrt
 (That `^D` means `EOF` on unix; it's `^Z` in Windows.) The `-tree` option prints the parse tree in LISP notation.
 
 ## The Definitive ANTLR 4 Reference
-You can by a book [The Definitive ANTLR 4 Reference](http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference)
+You can buy a book [The Definitive ANTLR 4 Reference](http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference)
 
 Programmers run into parsing problems all the time. Whether it’s a data format like JSON, a network protocol like SMTP, a server configuration file for Apache, a PostScript/PDF file, or a simple spreadsheet macro language—ANTLR v4 and this book will demystify the process. ANTLR v4 has been rewritten from scratch to make it easier than ever to build parsers and the language applications built on top. This completely rewritten new edition of the bestselling Definitive ANTLR Reference shows you how to take advantage of these new features.
 
 [Book source code](http://pragprog.com/titles/tpantlr2/source_code)
 
-## Addinitional grammars
+## Additional grammars
 [This repository](https://github.com/antlr/grammars-v4) is a collection of grammars without actions where the
 root directory name is the all-lowercase name of the language parsed
 by the grammar. For example, java, cpp, csharp, c, etc...
