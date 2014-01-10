@@ -327,9 +327,12 @@ public class ParserATNSimulator extends ATNSimulator {
 		try {
 			DFAState s0;
 			if (dfa.isPrecedenceDfa()) {
+				// the start state for a precedence DFA depends on the current
+				// parser precedence, and is provided by a DFA method.
 				s0 = dfa.getPrecedenceStartState(parser.getPrecedence());
 			}
 			else {
+				// the start state for a "regular" DFA is just s0
 				s0 = dfa.s0;
 			}
 
@@ -341,6 +344,14 @@ public class ParserATNSimulator extends ATNSimulator {
 									   ", outerContext="+ outerContext.toString(parser));
 				}
 
+				/* If this is not a precedence DFA, we analyze the ATN to
+				 * determine if this ATN start state is the decision for the
+				 * closure block that determines whether a precedence rule
+				 * should continue or complete.
+				 *
+				 * This analysis is also in ParserInterpreter to initialize the
+				 * pushRecursionContextStates field.
+				 */
 				if (!dfa.isPrecedenceDfa() && dfa.atnStartState instanceof StarLoopEntryState) {
 					if (atn.ruleToStartState[dfa.atnStartState.ruleIndex].isPrecedenceRule) {
 						ATNState maybeLoopEndState = dfa.atnStartState.transition(dfa.atnStartState.getNumberOfTransitions() - 1).target;
@@ -359,6 +370,12 @@ public class ParserATNSimulator extends ATNSimulator {
 									  fullCtx);
 
 				if (dfa.isPrecedenceDfa()) {
+					/* If this is a precedence DFA, we use applyPrecedenceFilter
+					 * to convert the computed start state to a precedence start
+					 * state. We then use DFA.setPrecedenceStartState to set the
+					 * appropriate start state for the precedence level rather
+					 * than simply setting DFA.s0.
+					 */
 					s0_closure = applyPrecedenceFilter(s0_closure);
 					s0 = addDFAState(dfa, new DFAState(s0_closure));
 					dfa.setPrecedenceStartState(parser.getPrecedence(), s0);
@@ -935,6 +952,39 @@ public class ParserATNSimulator extends ATNSimulator {
 		return configs;
 	}
 
+	/**
+	 * This method transforms the start state computed by
+	 * {@link #computeStartState} to the special start state used by a
+	 * precedence DFA for a particular precedence value. The transformation
+	 * process applies the following changes to the start state's configuration
+	 * set.
+	 *
+	 * <ol>
+	 * <li>Evaluate the precedence predicates for each configuration using
+	 * {@link SemanticContext.evalPrecedence}.</li>
+	 * <li>Remove all configurations which predict an alternative greater than
+	 * 1, for which another configuration that predicts alternative 1 is in the
+	 * same ATN state. This transformation is valid for the following reasons:
+	 * <ul>
+	 * <li>The closure block cannot contain any epsilon transitions which bypass
+	 * the body of the closure, so all states reachable via alternative 1 are
+	 * part of the precedence alternatives of the transformed left-recursive
+	 * rule.</li>
+	 * <li>The "primary" portion of a left recursive rule cannot contain an
+	 * epsilon transition, so the only way an alternative other than 1 can exist
+	 * in a state that is also reachable via alternative 1 is by nesting calls
+	 * to the left-recursive rule, with the outer calls not being at the
+	 * preferred precedence level.</li>
+	 * </ul>
+	 * </li>
+	 * </ol>
+	 *
+	 * @param configs The configuration set computed by
+	 * {@link #computeStartState} as the start state for the DFA.
+	 * @return The transformed configuration set representing the start state
+	 * for a precedence DFA at a particular precedence level (determined by
+	 * calling {@link Parser#getPrecedence}).
+	 */
 	@NotNull
 	protected ATNConfigSet applyPrecedenceFilter(@NotNull ATNConfigSet configs) {
 		Set<Integer> statesFromAlt1 = new HashSet<Integer>();
