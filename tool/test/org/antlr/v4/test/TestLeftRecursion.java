@@ -394,17 +394,10 @@ public class TestLeftRecursion extends BaseTest {
 		assertNull(stderrDuringParse);
 
 		result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "a+b*2\n", true);
-		assertEquals("line 1:1 reportAttemptingFullContext d=3 (expr), input='+'\n" +
-					 "line 1:1 reportContextSensitivity d=3 (expr), input='+'\n" +
-					 "line 1:3 reportAttemptingFullContext d=3 (expr), input='*'\n",
-					 stderrDuringParse);
+		assertNull(stderrDuringParse);
 
 		result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "(1+2)*3\n", true);
-		assertEquals("line 1:2 reportAttemptingFullContext d=3 (expr), input='+'\n" +
-					 "line 1:2 reportContextSensitivity d=3 (expr), input='+'\n" +
-					 "line 1:5 reportAttemptingFullContext d=3 (expr), input='*'\n" +
-					 "line 1:5 reportContextSensitivity d=3 (expr), input='*'\n",
-					 stderrDuringParse);
+		assertNull(stderrDuringParse);
 	}
 
 	@Test public void testCheckForNonLeftRecursiveRule() throws Exception {
