@@ -344,22 +344,14 @@ public class ParserATNSimulator extends ATNSimulator {
 									   ", outerContext="+ outerContext.toString(parser));
 				}
 
-				/* If this is not a precedence DFA, we analyze the ATN to
-				 * determine if this ATN start state is the decision for the
+				/* If this is not a precedence DFA, we check the ATN start state
+				 * to determine if this ATN start state is the decision for the
 				 * closure block that determines whether a precedence rule
 				 * should continue or complete.
-				 *
-				 * This analysis is also in ParserInterpreter to initialize the
-				 * pushRecursionContextStates field.
 				 */
 				if (!dfa.isPrecedenceDfa() && dfa.atnStartState instanceof StarLoopEntryState) {
-					if (atn.ruleToStartState[dfa.atnStartState.ruleIndex].isPrecedenceRule) {
-						ATNState maybeLoopEndState = dfa.atnStartState.transition(dfa.atnStartState.getNumberOfTransitions() - 1).target;
-						if (maybeLoopEndState instanceof LoopEndState) {
-							if (maybeLoopEndState.epsilonOnlyTransitions && maybeLoopEndState.transition(0).target instanceof RuleStopState) {
-								dfa.setPrecedenceDfa(true);
-							}
-						}
+					if (((StarLoopEntryState)dfa.atnStartState).precedenceRuleDecision) {
+						dfa.setPrecedenceDfa(true);
 					}
 				}
 
