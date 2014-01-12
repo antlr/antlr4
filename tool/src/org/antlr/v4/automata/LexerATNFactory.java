@@ -140,6 +140,7 @@ public class LexerATNFactory extends ParserATNFactory {
 
 	@Override
 	public String lexerCallCommand(GrammarAST ID, GrammarAST arg) {
+		// translate to target code
 		ST cmdST = codegenTemplates.getInstanceOf("Lexer" +
 												  CharSupport.capitalize(ID.getText())+
 												  "Command");
@@ -153,12 +154,16 @@ public class LexerATNFactory extends ParserATNFactory {
 			return "";
 		}
 
+		// track actual subtree in rule
+		currentRule.lexerCommandTrees.add( (GrammarAST)ID.getParent() );
+
 		cmdST.add("arg", arg.getText());
 		return cmdST.render();
 	}
 
 	@Override
 	public String lexerCommand(GrammarAST ID) {
+		// translate to target code
 		ST cmdST = codegenTemplates.getInstanceOf("Lexer" +
 												  CharSupport.capitalize(ID.getText())+
 												  "Command");
@@ -171,6 +176,9 @@ public class LexerATNFactory extends ParserATNFactory {
 			g.tool.errMgr.grammarError(ErrorType.MISSING_LEXER_COMMAND_ARGUMENT, g.fileName, ID.token, ID.getText());
 			return "";
 		}
+
+		// track actual subtree in rule
+		currentRule.lexerCommandTrees.add(ID);
 
 		return cmdST.render();
 	}

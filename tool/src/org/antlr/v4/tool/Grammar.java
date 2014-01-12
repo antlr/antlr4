@@ -271,7 +271,7 @@ public class Grammar implements AttributeResolver {
 		org.antlr.runtime.ANTLRStringStream in = new org.antlr.runtime.ANTLRStringStream(grammarText);
 		in.name = fileName;
 
-		this.ast = tool.load(fileName, in);
+		this.ast = tool.parse(fileName, in);
 		if ( ast==null ) {
 			throw new UnsupportedOperationException();
 		}
@@ -425,7 +425,23 @@ public class Grammar implements AttributeResolver {
     }
 */
 
-    /** Return list of imported grammars from root down to our parent.
+	public LexerGrammar getImplicitLexer() {
+		return implicitLexer;
+	}
+
+	/** convenience method for Tool.loadGrammar() */
+	public static Grammar load(String fileName) {
+		Tool antlr = new Tool();
+		return antlr.loadGrammar(fileName);
+	}
+
+	/** convenience method for Tool.loadGrammar() */
+	public static Grammar load(String fileName, LexerGrammar lexerGrammar) {
+		Tool antlr = new Tool();
+		return antlr.loadGrammar(fileName, lexerGrammar);
+	}
+
+	/** Return list of imported grammars from root down to our parent.
      *  Order is [root, ..., this.parent].  (us not included).
      */
     public List<Grammar> getGrammarAncestors() {
@@ -554,7 +570,10 @@ public class Grammar implements AttributeResolver {
 		String[] tokenNames = new String[numTokens+1];
 		for (String tokenName : tokenNameToTypeMap.keySet()) {
 			Integer ttype = tokenNameToTypeMap.get(tokenName);
-			if ( tokenName!=null && tokenName.startsWith(AUTO_GENERATED_TOKEN_NAME_PREFIX) ) {
+			if ( tokenName!=null &&
+                 tokenName.startsWith(AUTO_GENERATED_TOKEN_NAME_PREFIX) &&
+                 ttype < typeToStringLiteralList.size() )
+            {
 				tokenName = typeToStringLiteralList.get(ttype);
 			}
 			if ( ttype>0 ) tokenNames[ttype] = tokenName;
@@ -878,7 +897,13 @@ public class Grammar implements AttributeResolver {
 			return implicitLexer.createLexerInterpreter(input);
 		}
 
-		return new LexerInterpreter(fileName, Arrays.asList(getTokenNames()), Arrays.asList(getRuleNames()), ((LexerGrammar)this).modes.keySet(), atn, input);
+		return new LexerGrammarInterpreter((LexerGrammar)this,
+												fileName,
+												Arrays.asList(getTokenNames()),
+												Arrays.asList(getRuleNames()),
+												((LexerGrammar)this).modes.keySet(),
+												atn,
+												input);
 	}
 
 	public ParserInterpreter createParserInterpreter(TokenStream tokenStream) {
@@ -886,6 +911,10 @@ public class Grammar implements AttributeResolver {
 			throw new IllegalStateException("A parser interpreter can only be created for a parser or combined grammar.");
 		}
 
-		return new ParserInterpreter(fileName, Arrays.asList(getTokenNames()), Arrays.asList(getRuleNames()), atn, tokenStream);
+		return new ParserInterpreter(fileName,
+									 Arrays.asList(getTokenNames()),
+									 Arrays.asList(getRuleNames()),
+									 atn,
+									 tokenStream);
 	}
 }

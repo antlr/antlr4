@@ -350,14 +350,16 @@ public class Tool {
 		into the root grammar. If a root grammar is a combined grammar,
 		we have to extract the implicit lexer. Once all this is done, we
 		process the lexer first, if present, and then the parser grammar
+
+	    If g is combined, return the created lexer grammar else null.
 	 */
-	public void process(Grammar g, boolean gencode) {
+	public LexerGrammar process(Grammar g, boolean gencode) {
+		LexerGrammar lexerg = null;
 		g.loadImportedGrammars();
 
 		GrammarTransformPipeline transform = new GrammarTransformPipeline(g, this);
 		transform.process();
 
-		LexerGrammar lexerg;
 		GrammarRootAST lexerAST;
 		if ( g.ast!=null && g.ast.grammarType== ANTLRParser.COMBINED &&
 			 !g.ast.hasErrors )
@@ -382,6 +384,8 @@ public class Tool {
 //		System.out.println("tokens="+g.tokenNameToTypeMap);
 //		System.out.println("strings="+g.stringLiteralToTypeMap);
 		processNonCombinedGrammar(g, gencode);
+
+		return lexerg;
 	}
 
 	public void processNonCombinedGrammar(Grammar g, boolean gencode) {
@@ -490,7 +494,7 @@ public class Tool {
 		Graph<String> g = new Graph<String>();
 		List<GrammarRootAST> roots = new ArrayList<GrammarRootAST>();
 		for (String fileName : fileNames) {
-			GrammarAST t = loadGrammar(fileName);
+			GrammarAST t = parseGrammar(fileName);
 			if ( t==null || t instanceof GrammarASTErrorNode) continue; // came back as error node
 			if ( ((GrammarRootAST)t).hasErrors ) continue;
 			GrammarRootAST root = (GrammarRootAST)t;
@@ -558,7 +562,7 @@ public class Tool {
 		return g;
 	}
 
-	public GrammarRootAST loadGrammar(String fileName) {
+	public GrammarRootAST parseGrammar(String fileName) {
 		try {
 			File file = new File(fileName);
 			if (!file.isAbsolute()) {
@@ -566,13 +570,35 @@ public class Tool {
 			}
 
 			ANTLRFileStream in = new ANTLRFileStream(file.getAbsolutePath(), grammarEncoding);
-			GrammarRootAST t = load(fileName, in);
+			GrammarRootAST t = parse(fileName, in);
 			return t;
 		}
 		catch (IOException ioe) {
 			errMgr.toolError(ErrorType.CANNOT_OPEN_FILE, ioe, fileName);
 		}
 		return null;
+	}
+
+	/** Convenience method to load and process an ANTLR grammar. Useful
+	 *  when creating interpreters.  If you need to access to the lexer
+	 *  grammar created while processing a combined grammar, use
+	 *  getImplicitLexer() on returned grammar.
+	 */
+	public Grammar loadGrammar(String fileName) {
+		GrammarRootAST grammarRootAST = parseGrammar(fileName);
+		final Grammar g = createGrammar(grammarRootAST);
+		process(g, false);
+		return g;
+	}
+
+	/** Same as loadGrammar(fileName) except import vocab from existing lexer */
+	public Grammar loadGrammar(String fileName, LexerGrammar lexerGrammar) {
+		GrammarRootAST grammarRootAST = parseGrammar(fileName);
+		final Grammar g = createGrammar(grammarRootAST);
+		g.fileName = fileName;
+		g.importVocab(lexerGrammar);
+		process(g, false);
+		return g;
 	}
 
 	/**
@@ -596,17 +622,17 @@ public class Tool {
 		}
 
 		ANTLRFileStream in = new ANTLRFileStream(importedFile.getAbsolutePath());
-		GrammarRootAST root = load(g.fileName, in);
+		GrammarRootAST root = parse(g.fileName, in);
 		Grammar imported = createGrammar(root);
 		imported.fileName = importedFile.getAbsolutePath();
 		return imported;
 	}
 
-	public GrammarRootAST loadFromString(String grammar) {
-		return load("<string>", new ANTLRStringStream(grammar));
+	public GrammarRootAST parseGrammarFromString(String grammar) {
+		return parse("<string>", new ANTLRStringStream(grammar));
 	}
 
-	public GrammarRootAST load(String fileName, CharStream in) {
+	public GrammarRootAST parse(String fileName, CharStream in) {
 		try {
 			GrammarASTAdaptor adaptor = new GrammarASTAdaptor(in);
 			ToolANTLRLexer lexer = new ToolANTLRLexer(in, this);
