@@ -41,7 +41,6 @@ import org.antlr.v4.runtime.atn.PrecedencePredicateTransition;
 import org.antlr.v4.runtime.atn.PredicateTransition;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.atn.RuleStartState;
-import org.antlr.v4.runtime.atn.RuleStopState;
 import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.atn.Transition;
@@ -100,17 +99,7 @@ public class ParserInterpreter extends Parser {
 				continue;
 			}
 
-			RuleStartState ruleStartState = atn.ruleToStartState[state.ruleIndex];
-			if (!ruleStartState.isPrecedenceRule) {
-				continue;
-			}
-
-			ATNState maybeLoopEndState = state.transition(state.getNumberOfTransitions() - 1).target;
-			if (!(maybeLoopEndState instanceof LoopEndState)) {
-				continue;
-			}
-
-			if (maybeLoopEndState.epsilonOnlyTransitions && maybeLoopEndState.transition(0).target instanceof RuleStopState) {
+			if (((StarLoopEntryState)state).precedenceRuleDecision) {
 				this.pushRecursionContextStates.set(state.stateNumber);
 			}
 		}

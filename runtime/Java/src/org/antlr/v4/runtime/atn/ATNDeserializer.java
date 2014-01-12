@@ -358,6 +358,8 @@ public class ATNDeserializer {
 			decState.decision = i-1;
 		}
 
+		markPrecedenceDecisions(atn);
+
 		if (deserializationOptions.isVerifyATN()) {
 			verifyATN(atn);
 		}
@@ -453,6 +455,34 @@ public class ATNDeserializer {
 		}
 
 		return atn;
+	}
+
+	/**
+	 * Analyze the {@link StarLoopEntryState} states in the specified ATN to set
+	 * the {@link StarLoopEntryState#precedenceRuleDecision} field to the
+	 * correct value.
+	 *
+	 * @param atn The ATN.
+	 */
+	protected void markPrecedenceDecisions(@NotNull ATN atn) {
+		for (ATNState state : atn.states) {
+			if (!(state instanceof StarLoopEntryState)) {
+				continue;
+			}
+
+			/* We analyze the ATN to determine if this ATN decision state is the
+			 * decision for the closure block that determines whether a
+			 * precedence rule should continue or complete.
+			 */
+			if (atn.ruleToStartState[state.ruleIndex].isPrecedenceRule) {
+				ATNState maybeLoopEndState = state.transition(state.getNumberOfTransitions() - 1).target;
+				if (maybeLoopEndState instanceof LoopEndState) {
+					if (maybeLoopEndState.epsilonOnlyTransitions && maybeLoopEndState.transition(0).target instanceof RuleStopState) {
+						((StarLoopEntryState)state).precedenceRuleDecision = true;
+					}
+				}
+			}
+		}
 	}
 
 	protected void verifyATN(ATN atn) {

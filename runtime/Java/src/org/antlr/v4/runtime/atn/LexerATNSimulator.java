@@ -290,9 +290,12 @@ public class LexerATNSimulator extends ATNSimulator {
 		getReachableConfigSet(input, s.configs, reach, t);
 
 		if ( reach.isEmpty() ) { // we got nowhere on t from s
-			// we got nowhere on t, don't throw out this knowledge; it'd
-			// cause a failover from DFA later.
-			addDFAEdge(s, t, ERROR);
+			if (!reach.hasSemanticContext) {
+				// we got nowhere on t, don't throw out this knowledge; it'd
+				// cause a failover from DFA later.
+				addDFAEdge(s, t, ERROR);
+			}
+
 			// stop when we can't match any more char
 			return ERROR;
 		}

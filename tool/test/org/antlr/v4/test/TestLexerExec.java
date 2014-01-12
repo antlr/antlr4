@@ -740,6 +740,43 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#398 "Lexer: literal matches
+	 * while negated char set fail to match"
+	 * https://github.com/antlr/antlr4/issues/398
+	 */
+	@Test
+	public void testFailingPredicateEvalIsNotCached() {
+		String grammar =
+			"lexer grammar TestLexer;\n" +
+			"\n" +
+			"fragment WS: [ \\t]+;\n" +
+			"fragment EOL: '\\r'? '\\n';\n" +
+			"\n" +
+			"LINE: WS? ~[\\r\\n]* EOL { !getText().trim().startsWith(\"Item:\") }?;\n" +
+			"ITEM: WS? 'Item:' -> pushMode(ITEM_HEADING_MODE);\n" +
+			"\n" +
+			"mode ITEM_HEADING_MODE;\n" +
+			"\n" +
+			"NAME: ~[\\r\\n]+;\n" +
+			"SECTION_HEADING_END: EOL -> popMode;\n";
+		String input =
+			"A line here.\n" +
+			"Item: name of item\n" +
+			"Another line.\n" +
+			"More line.\n";
+		String found = execLexer("TestLexer.g4", grammar, "TestLexer", input);
+		String expecting =
+			"[@0,0:12='A line here.\\n',<1>,1:0]\n" +
+			"[@1,13:17='Item:',<2>,2:0]\n" +
+			"[@2,18:30=' name of item',<3>,2:5]\n" +
+			"[@3,31:31='\\n',<4>,2:18]\n" +
+			"[@4,32:45='Another line.\\n',<1>,3:0]\n" +
+			"[@5,46:56='More line.\\n',<1>,4:0]\n" +
+			"[@6,57:56='<EOF>',<-1>,5:11]\n";
+		assertEquals(expecting, found);
+	}
+
 	protected String load(String fileName, @Nullable String encoding)
 		throws IOException
 	{
