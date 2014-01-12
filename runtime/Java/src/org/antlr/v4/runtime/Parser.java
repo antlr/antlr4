@@ -648,6 +648,20 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
 	/**
+	 * Get the precedence level for the top-most precedence rule.
+	 *
+	 * @return The precedence level for the top-most precedence rule, or -1 if
+	 * the parser context is not nested within a precedence rule.
+	 */
+	public final int getPrecedence() {
+		if (_precedenceStack.isEmpty()) {
+			return -1;
+		}
+
+		return _precedenceStack.peek();
+	}
+
+	/**
 	 * @deprecated Use
 	 * {@link #enterRecursionRule(ParserRuleContext, int, int, int)} instead.
 	 */
