@@ -216,8 +216,9 @@ public class ANTLRInputStream implements CharStream {
 			p = index; // just jump; don't update stream state (line, ...)
 			return;
 		}
-		// seek forward, consume until p hits index
-		while ( p<index && index<n ) {
+		// seek forward, consume until p hits index or n (whichever comes first)
+		index = Math.min(index, n);
+		while ( p<index ) {
 			consume();
 		}
 	}
