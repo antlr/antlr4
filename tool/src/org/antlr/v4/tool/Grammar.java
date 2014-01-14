@@ -46,6 +46,8 @@ import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
+import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntSet;
 import org.antlr.v4.runtime.misc.IntegerList;
@@ -878,7 +880,9 @@ public class Grammar implements AttributeResolver {
 			return implicitLexer.createLexerInterpreter(input);
 		}
 
-		return new LexerInterpreter(fileName, Arrays.asList(getTokenNames()), Arrays.asList(getRuleNames()), ((LexerGrammar)this).modes.keySet(), atn, input);
+		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
+		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
+		return new LexerInterpreter(fileName, Arrays.asList(getTokenNames()), Arrays.asList(getRuleNames()), ((LexerGrammar)this).modes.keySet(), deserialized, input);
 	}
 
 	public ParserInterpreter createParserInterpreter(TokenStream tokenStream) {
@@ -886,6 +890,8 @@ public class Grammar implements AttributeResolver {
 			throw new IllegalStateException("A parser interpreter can only be created for a parser or combined grammar.");
 		}
 
-		return new ParserInterpreter(fileName, Arrays.asList(getTokenNames()), Arrays.asList(getRuleNames()), atn, tokenStream);
+		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
+		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
+		return new ParserInterpreter(fileName, Arrays.asList(getTokenNames()), Arrays.asList(getRuleNames()), deserialized, tokenStream);
 	}
 }
