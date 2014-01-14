@@ -953,7 +953,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 *
 	 * <ol>
 	 * <li>Evaluate the precedence predicates for each configuration using
-	 * {@link SemanticContext.evalPrecedence}.</li>
+	 * {@link SemanticContext#evalPrecedence}.</li>
 	 * <li>Remove all configurations which predict an alternative greater than
 	 * 1, for which another configuration that predicts alternative 1 is in the
 	 * same ATN state. This transformation is valid for the following reasons:
