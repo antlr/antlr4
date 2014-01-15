@@ -214,7 +214,7 @@ public interface ATNFactory {
 
 	Handle lexerAltCommands(ATNFactory.Handle alt, ATNFactory.Handle cmds);
 
-	String lexerCallCommand(GrammarAST ID, GrammarAST arg);
+	Handle lexerCallCommand(GrammarAST ID, GrammarAST arg);
 
-	String lexerCommand(GrammarAST ID);
+	Handle lexerCommand(GrammarAST ID);
 }

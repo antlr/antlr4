@@ -34,6 +34,7 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.atn.LexerActionExecutor;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.misc.MurmurHash;
@@ -88,8 +89,7 @@ public class DFAState {
 	 */
 	public int prediction;
 
-	public int lexerRuleIndex = -1;		// if accept, exec action in what rule?
-	public int lexerActionIndex = -1;	// if accept, exec what action?
+	public LexerActionExecutor lexerActionExecutor;
 
 	/**
 	 * Indicates that this state was created during SLL prediction that

@@ -372,7 +372,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"\n" +
 			"WS   : [ \\r\\t\\n]+ -> skip ;\n";
 		String expected =
-			"error(" + ErrorType.LEXER_ACTION_PLACEMENT_ISSUE.code + "): A.g4:8:21: action in lexer rule 'CharacterLiteral' must be last element of single outermost alt\n";
+			"";
 		
 		String[] pair = new String[] { grammar, expected };
 		super.testErrors(pair, true);
