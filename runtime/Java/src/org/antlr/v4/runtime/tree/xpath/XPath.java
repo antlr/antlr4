@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /** Represent a subset of XPath XML path syntax for use in identifying nodes in
@@ -176,14 +178,14 @@ loop:
 	 */
 	public Collection<ParseTree> evaluate(final ParseTree t) {
 		ParserRuleContext dummyRoot = new ParserRuleContext();
-		dummyRoot.children = new ArrayList<ParseTree>() {{add(t);}}; // don't set t's parent.
+		dummyRoot.children = Collections.singletonList(t); // don't set t's parent.
 
-		Collection<ParseTree> work = new ArrayList<ParseTree>();
+		Collection<ParseTree> work = Collections.<ParseTree>singleton(dummyRoot);
 		work.add(dummyRoot);
 
 		int i = 0;
 		while ( i < elements.length ) {
-			Collection<ParseTree> next = new ArrayList<ParseTree>();
+			Collection<ParseTree> next = new LinkedHashSet<ParseTree>();
 			for (ParseTree node : work) {
 				if ( node.getChildCount()>0 ) {
 					// only try to match next element if it has children

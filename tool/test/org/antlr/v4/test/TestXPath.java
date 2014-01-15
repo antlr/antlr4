@@ -76,6 +76,7 @@ public class TestXPath extends BaseTest {
 			"//expr/!primary",	// anything but primary under any expr node
 			"//!*",				// nothing anywhere
 			"/!*",				// nothing at root
+			"//expr//ID",		// any ID under any expression (tests antlr/antlr4#370)
 		};
 		String expected[] = {
 			"[func, func]",
@@ -97,6 +98,7 @@ public class TestXPath extends BaseTest {
 			"[expr, expr, expr, expr, expr, expr]",
 			"[]",
 			"[]",
+			"[y, x]",
 		};
 
 		for (int i=0; i<xpath.length; i++) {
