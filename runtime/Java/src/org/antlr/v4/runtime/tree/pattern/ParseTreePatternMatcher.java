@@ -37,6 +37,7 @@ import org.antlr.v4.runtime.ListTokenSource;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.misc.MultiMap;
@@ -112,6 +113,11 @@ public class ParseTreePatternMatcher {
 		public CannotInvokeStartRule(Throwable e) {
 			super(e);
 		}
+	}
+
+	// Fixes https://github.com/antlr/antlr4/issues/413
+	// "Tree pattern compilation doesn't check for a complete parse"
+	public static class StartRuleDoesNotConsumeFullPattern extends RuntimeException {
 	}
 
 	/**
@@ -222,8 +228,16 @@ public class ParseTreePatternMatcher {
 			tree = parserInterp.parse(patternRuleIndex);
 //			System.out.println("pattern tree = "+tree.toStringTree(parserInterp));
 		}
+		catch (RecognitionException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new CannotInvokeStartRule(e);
+		}
+
+		// Make sure tree pattern compilation checks for a complete parse
+		if ( tokens.LA(1)!=Token.EOF ) {
+			throw new StartRuleDoesNotConsumeFullPattern();
 		}
 
 		return new ParseTreePattern(this, pattern, patternRuleIndex, tree);
