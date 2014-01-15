@@ -1,5 +1,11 @@
 ANTLR v4 Honey Badger
 
+January 15, 2014
+
+* Unit tests for lexer actions from yesterday.
+* Refactored TreeView so we can refresh tree externally w/o creating new one.
+  Needed for intellij plugin.
+
 January 14, 2014
 
 * Updated serialized ATN representation of lexer actions, allowing the lexer
