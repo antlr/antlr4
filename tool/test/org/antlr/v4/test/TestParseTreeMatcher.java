@@ -2,7 +2,9 @@ package org.antlr.v4.test;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
@@ -117,6 +119,81 @@ public class TestParseTreeMatcher extends BaseTest {
 		String results = t.getPatternTree().toStringTree(m.getParser());
 		String expected = "(s <ID> = (expr <expr>) ;)";
 		assertEquals(expected, results);
+	}
+
+	@Test
+	public void testCompilingPatternConsumesAllTokens() throws Exception {
+		String grammar =
+			"grammar X2;\n" +
+			"s : ID '=' expr ';' ;\n" +
+			"expr : ID | INT ;\n" +
+			"ID : [a-z]+ ;\n" +
+			"INT : [0-9]+ ;\n" +
+			"WS : [ \\r\\n\\t]+ -> skip ;\n";
+		boolean ok =
+			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
+		assertTrue(ok);
+
+		ParseTreePatternMatcher m = getPatternMatcher("X2");
+
+		boolean failed = false;
+		try {
+			m.compile("<ID> = <expr> ; extra", m.getParser().getRuleIndex("s"));
+		}
+		catch (ParseTreePatternMatcher.StartRuleDoesNotConsumeFullPattern e) {
+			failed = true;
+		}
+		assertTrue(failed);
+	}
+
+	@Test
+	public void testPatternMatchesStartRule() throws Exception {
+		String grammar =
+			"grammar X2;\n" +
+			"s : ID '=' expr ';' ;\n" +
+			"expr : ID | INT ;\n" +
+			"ID : [a-z]+ ;\n" +
+			"INT : [0-9]+ ;\n" +
+			"WS : [ \\r\\n\\t]+ -> skip ;\n";
+		boolean ok =
+			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
+		assertTrue(ok);
+
+		ParseTreePatternMatcher m = getPatternMatcher("X2");
+
+		boolean failed = false;
+		try {
+			m.compile("<ID> ;", m.getParser().getRuleIndex("s"));
+		}
+		catch (InputMismatchException e) {
+			failed = true;
+		}
+		assertTrue(failed);
+	}
+
+	@Test
+	public void testPatternMatchesStartRule2() throws Exception {
+		String grammar =
+			"grammar X2;\n" +
+			"s : ID '=' expr ';' | expr ';' ;\n" +
+			"expr : ID | INT ;\n" +
+			"ID : [a-z]+ ;\n" +
+			"INT : [0-9]+ ;\n" +
+			"WS : [ \\r\\n\\t]+ -> skip ;\n";
+		boolean ok =
+			rawGenerateAndBuildRecognizer("X2.g4", grammar, "X2Parser", "X2Lexer", false);
+		assertTrue(ok);
+
+		ParseTreePatternMatcher m = getPatternMatcher("X2");
+
+		boolean failed = false;
+		try {
+			m.compile("<ID> <ID> ;", m.getParser().getRuleIndex("s"));
+		}
+		catch (NoViableAltException e) {
+			failed = true;
+		}
+		assertTrue(failed);
 	}
 
 	@Test
