@@ -766,12 +766,12 @@ public class ParserATNFactory implements ATNFactory {
 	}
 
 	@Override
-	public String lexerCallCommand(GrammarAST ID, GrammarAST arg) {
+	public Handle lexerCallCommand(GrammarAST ID, GrammarAST arg) {
 		return null;
 	}
 
 	@Override
-	public String lexerCommand(GrammarAST ID) {
+	public Handle lexerCommand(GrammarAST ID) {
 		return null;
 	}
 }

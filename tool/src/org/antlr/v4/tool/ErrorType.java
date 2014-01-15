@@ -113,6 +113,7 @@ public enum ErrorType {
 	ATTRIBUTE_IN_LEXER_ACTION(128, "attribute references not allowed in lexer actions: $<arg>", ErrorSeverity.ERROR),
 	LABEL_BLOCK_NOT_A_SET(130, "label '<arg>' assigned to a block which is not a set", ErrorSeverity.ERROR),
 	EXPECTED_NON_GREEDY_WILDCARD_BLOCK(131, "greedy block ()<arg> contains wildcard; the non-greedy syntax ()<arg>? may be preferred", ErrorSeverity.WARNING),
+	@Deprecated
 	LEXER_ACTION_PLACEMENT_ISSUE(132, "action in lexer rule '<arg>' must be last element of single outermost alt", ErrorSeverity.ERROR),
 	LEXER_COMMAND_PLACEMENT_ISSUE(133, "->command in lexer rule '<arg>' must be last element of single outermost alt", ErrorSeverity.ERROR),
 	USE_OF_BAD_WORD(134, "symbol '<arg>' conflicts with generated code in target language or runtime", ErrorSeverity.ERROR),
@@ -246,6 +247,25 @@ public enum ErrorType {
 	 * </pre>
 	 */
 	EPSILON_OPTIONAL(154, "rule '<arg>' contains an optional block with at least one alternative that can match an empty string", ErrorSeverity.WARNING),
+	/**
+	 * A lexer rule contains a standard lexer command, but the constant value
+	 * argument for the command is an unrecognized string. As a result, the
+	 * lexer command will be translated as a custom lexer action, preventing the
+	 * command from executing in some interpreted modes. The output of the lexer
+	 * interpreter may not match the output of the generated lexer.
+	 * <p/>
+	 * The following rule produces this warning.
+	 *
+	 * <pre>
+	 * &#064;members {
+	 * public static final int CUSTOM = HIDDEN + 1;
+	 * }
+	 *
+	 * X : 'foo' -> channel(HIDDEN);           // ok
+	 * Y : 'bar' -> channel(CUSTOM);           // warning 155
+	 * </pre>
+	 */
+	UNKNOWN_LEXER_CONSTANT(155, "rule '<arg>' contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output", ErrorSeverity.WARNING),
 
 	// Backward incompatibility errors
 	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR 4", ErrorSeverity.ERROR),

@@ -170,13 +170,6 @@ public class ATNSerializer {
 				else {
 					data.add(atn.ruleToTokenType[r]);
 				}
-
-				if (atn.ruleToActionIndex[r] == -1) {
-					data.add(Character.MAX_VALUE);
-				}
-				else {
-					data.add(atn.ruleToActionIndex[r]);
-				}
 			}
 		}
 
@@ -303,10 +296,66 @@ public class ATNSerializer {
 				data.add(arg3);
 			}
 		}
+
 		int ndecisions = atn.decisionToState.size();
 		data.add(ndecisions);
 		for (DecisionState decStartState : atn.decisionToState) {
 			data.add(decStartState.stateNumber);
+		}
+
+		//
+		// LEXER ACTIONS
+		//
+		if (atn.grammarType == ATNType.LEXER) {
+			data.add(atn.lexerActions.length);
+			for (LexerAction action : atn.lexerActions) {
+				data.add(action.getActionType().ordinal());
+				switch (action.getActionType()) {
+				case CHANNEL:
+					data.add(((LexerChannelAction)action).getChannel());
+					data.add(0);
+					break;
+
+				case CUSTOM:
+					data.add(((LexerCustomAction)action).getRuleIndex());
+					data.add(((LexerCustomAction)action).getActionIndex());
+					break;
+
+				case MODE:
+					data.add(((LexerModeAction)action).getMode());
+					data.add(0);
+					break;
+
+				case MORE:
+					data.add(0);
+					data.add(0);
+					break;
+
+				case POP_MODE:
+					data.add(0);
+					data.add(0);
+					break;
+
+				case PUSH_MODE:
+					data.add(((LexerPushModeAction)action).getMode());
+					data.add(0);
+					break;
+
+				case SKIP:
+					data.add(0);
+					data.add(0);
+					break;
+
+				case TYPE:
+					data.add(((LexerTypeAction)action).getType());
+					data.add(0);
+					break;
+
+				default:
+					String message = String.format(Locale.getDefault(), "The specified lexer action type %s is not valid.", action.getActionType());
+					throw new IllegalArgumentException(message);
+				}
+			}
 		}
 
 		// don't adjust the first value since that's the version number
@@ -382,11 +431,7 @@ public class ATNSerializer {
 			int s = ATNDeserializer.toInt(data[p++]);
             if (atn.grammarType == ATNType.LEXER) {
                 int arg1 = ATNDeserializer.toInt(data[p++]);
-                int arg2 = ATNDeserializer.toInt(data[p++]);
-				if (arg2 == Character.MAX_VALUE) {
-					arg2 = -1;
-				}
-                buf.append("rule ").append(i).append(":").append(s).append(" ").append(arg1).append(",").append(arg2).append('\n');
+                buf.append("rule ").append(i).append(":").append(s).append(" ").append(arg1).append('\n');
             }
             else {
                 buf.append("rule ").append(i).append(":").append(s).append('\n');
@@ -434,6 +479,14 @@ public class ATNSerializer {
 		for (int i=0; i<ndecisions; i++) {
 			int s = ATNDeserializer.toInt(data[p++]);
 			buf.append(i).append(":").append(s).append("\n");
+		}
+		if (atn.grammarType == ATNType.LEXER) {
+				int lexerActionCount = ATNDeserializer.toInt(data[p++]);
+				for (int i = 0; i < lexerActionCount; i++) {
+					LexerActionType actionType = LexerActionType.values()[ATNDeserializer.toInt(data[p++])];
+					int data1 = ATNDeserializer.toInt(data[p++]);
+					int data2 = ATNDeserializer.toInt(data[p++]);
+				}
 		}
 		return buf.toString();
 	}

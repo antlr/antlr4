@@ -308,9 +308,8 @@ public class LexerATNSimulator extends ATNSimulator {
 							   ATNConfigSet reach, int t)
 	{
 		if (prevAccept.dfaState != null) {
-			int ruleIndex = prevAccept.dfaState.lexerRuleIndex;
-			int actionIndex = prevAccept.dfaState.lexerActionIndex;
-			accept(input, ruleIndex, actionIndex,
+			LexerActionExecutor lexerActionExecutor = prevAccept.dfaState.lexerActionExecutor;
+			accept(input, lexerActionExecutor, startIndex,
 				prevAccept.index, prevAccept.line, prevAccept.charPos);
 			return prevAccept.dfaState.prediction;
 		}
@@ -347,7 +346,12 @@ public class LexerATNSimulator extends ATNSimulator {
 				Transition trans = c.state.transition(ti);
 				ATNState target = getReachableTarget(trans, t);
 				if ( target!=null ) {
-					if (closure(input, new LexerATNConfig((LexerATNConfig)c, target), reach, currentAltReachedAcceptState, true)) {
+					LexerActionExecutor lexerActionExecutor = ((LexerATNConfig)c).lexerActionExecutor;
+					if (lexerActionExecutor != null) {
+						lexerActionExecutor = lexerActionExecutor.fixOffsetBeforeMatch(input.index() - startIndex);
+					}
+
+					if (closure(input, new LexerATNConfig((LexerATNConfig)c, target, lexerActionExecutor), reach, currentAltReachedAcceptState, true)) {
 						// any remaining configs for this alt have a lower priority than
 						// the one that just reached an accept state.
 						skipAlt = c.alt;
@@ -358,14 +362,12 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 	}
 
-	protected void accept(@NotNull CharStream input, int ruleIndex, int actionIndex,
-						  int index, int line, int charPos)
+	protected void accept(@NotNull CharStream input, LexerActionExecutor lexerActionExecutor,
+						  int startIndex, int index, int line, int charPos)
 	{
 		if ( debug ) {
-			System.out.format(Locale.getDefault(), "ACTION %s:%d\n", recog != null ? recog.getRuleNames()[ruleIndex] : ruleIndex, actionIndex);
+			System.out.format(Locale.getDefault(), "ACTION %s\n", lexerActionExecutor);
 		}
-
-		if ( actionIndex>=0 && recog!=null ) recog.action(null, ruleIndex, actionIndex);
 
 		// seek to after last char in token
 		input.seek(index);
@@ -373,6 +375,10 @@ public class LexerATNSimulator extends ATNSimulator {
 		this.charPositionInLine = charPos;
 		if (input.LA(1) != IntStream.EOF) {
 			consume(input);
+		}
+
+		if (lexerActionExecutor != null && recog != null) {
+			lexerActionExecutor.execute(recog, input, startIndex);
 		}
 	}
 
@@ -516,10 +522,12 @@ public class LexerATNSimulator extends ATNSimulator {
 					c = new LexerATNConfig(config, t.target);
 				}
 				break;
-			// ignore actions; just exec one per rule upon accept
+
 			case Transition.ACTION:
-				c = new LexerATNConfig(config, t.target, ((ActionTransition)t).actionIndex);
+				LexerActionExecutor lexerActionExecutor = LexerActionExecutor.append(config.lexerActionExecutor, atn.lexerActions[((ActionTransition)t).actionIndex]);
+				c = new LexerATNConfig(config, t.target, lexerActionExecutor);
 				break;
+
 			case Transition.EPSILON:
 				c = new LexerATNConfig(config, t.target);
 				break;
@@ -657,10 +665,8 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		if ( firstConfigWithRuleStopState!=null ) {
 			proposed.isAcceptState = true;
-			proposed.lexerRuleIndex = firstConfigWithRuleStopState.state.ruleIndex;
-			proposed.lexerActionIndex =
-				((LexerATNConfig)firstConfigWithRuleStopState).lexerActionIndex;
-			proposed.prediction = atn.ruleToTokenType[proposed.lexerRuleIndex];
+			proposed.lexerActionExecutor = ((LexerATNConfig)firstConfigWithRuleStopState).lexerActionExecutor;
+			proposed.prediction = atn.ruleToTokenType[firstConfigWithRuleStopState.state.ruleIndex];
 		}
 
 		DFA dfa = decisionToDFA[mode];
