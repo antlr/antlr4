@@ -583,6 +583,7 @@ public class Tool {
 	public Grammar loadGrammar(String fileName) {
 		GrammarRootAST grammarRootAST = parseGrammar(fileName);
 		final Grammar g = createGrammar(grammarRootAST);
+		g.fileName = fileName;
 		process(g, false);
 		return g;
 	}
