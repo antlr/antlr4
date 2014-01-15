@@ -30,8 +30,6 @@
 
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNType;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
@@ -69,7 +67,7 @@ public class LexerInterpreter extends Lexer {
 		for (int i = 0; i < _decisionToDFA.length; i++) {
 			_decisionToDFA[i] = new DFA(atn.getDecisionState(i), i);
 		}
-		this._interp = new LexerATNSimulator(atn,_decisionToDFA,_sharedContextCache);
+		this._interp = new LexerATNSimulator(this,atn,_decisionToDFA,_sharedContextCache);
 	}
 
 	@Override
