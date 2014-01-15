@@ -1,5 +1,17 @@
 ANTLR v4 Honey Badger
 
+January 14, 2014
+
+* Updated serialized ATN representation of lexer actions, allowing the lexer
+  interpreter to execute the majority of lexer commands (#408)
+
+January 12, 2014
+
+* Support executing precedence predicates during the SLL phase of
+  adaptivePredict (#401). The result is a massive performance boost for grammars
+  containing direct left-recursion (improvements of 5% to 1000+% have been
+  observed, depending on the grammar and input).
+
 December 29, 2013
 
 * Internal change: Tool.loadGrammar() -> parseGrammar(). Tool.load()->parse()
