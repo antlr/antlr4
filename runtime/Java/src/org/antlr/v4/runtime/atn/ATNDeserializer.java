@@ -38,10 +38,8 @@ import org.antlr.v4.runtime.misc.Pair;
 
 import java.io.InvalidClassException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -152,8 +150,7 @@ public class ATNDeserializer {
 
 		UUID uuid = toUUID(data, p);
 		p += 8;
-		if (!uuid.equals(SERIALIZED_UUID)
-			&& !uuid.equals(BASE_SERIALIZED_UUID)) {
+		if (!SUPPORTED_UUIDS.contains(uuid)) {
 			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with UUID %s (expected %s or a legacy UUID).", uuid, SERIALIZED_UUID);
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
 		}
