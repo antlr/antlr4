@@ -159,15 +159,10 @@ public class TreeViewer extends JComponent {
 	protected Color textColor = Color.black;
 
 	public TreeViewer(@Nullable List<String> ruleNames, Tree tree) {
-		setTreeTextProvider(new DefaultTreeTextProvider(ruleNames));
-        boolean useIdentity = true; // compare node identity
-		this.treeLayout =
-			new TreeLayout<Tree>(new TreeLayoutAdaptor(tree),
-								 new TreeViewer.VariableExtentProvide(this),
-								 new DefaultConfiguration<Tree>(gapBetweenLevels,
-																gapBetweenNodes),
-                                 useIdentity);
-		updatePreferredSize();
+		setRuleNames(ruleNames);
+		if ( tree!=null ) {
+			setTree(tree);
+		}
 		setFont(font);
 	}
 
@@ -262,6 +257,10 @@ public class TreeViewer extends JComponent {
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
+
+		if ( treeLayout==null ) {
+			return;
+		}
 
 		Graphics2D g2 = (Graphics2D)g;
 		// anti-alias the lines
@@ -383,14 +382,7 @@ public class TreeViewer extends JComponent {
 				TreeNodeWrapper treeNode = (TreeNodeWrapper) path.getLastPathComponent();
 
 				// Set the clicked AST.
-				viewer.treeLayout = new TreeLayout<Tree>(
-						new TreeLayoutAdaptor((Tree) treeNode.getUserObject()),
-						new TreeViewer.VariableExtentProvide(viewer),
-						new DefaultConfiguration<Tree>(
-								viewer.gapBetweenLevels, viewer.gapBetweenNodes), true);
-
-				// Let the UI display this new AST.
-				viewer.updatePreferredSize();
+				viewer.setTree((Tree) treeNode.getUserObject());
 			}
 		});
 
@@ -677,6 +669,24 @@ public class TreeViewer extends JComponent {
 		return treeLayout.getTree();
 	}
 
+	public void setTree(Tree root) {
+		if ( root!=null ) {
+			boolean useIdentity = true; // compare node identity
+			this.treeLayout =
+				new TreeLayout<Tree>(new TreeLayoutAdaptor(root),
+									 new TreeViewer.VariableExtentProvide(this),
+									 new DefaultConfiguration<Tree>(gapBetweenLevels,
+																	gapBetweenNodes),
+									 useIdentity);
+			// Let the UI display this new AST.
+			updatePreferredSize();
+		}
+		else {
+			this.treeLayout = null;
+			repaint();
+		}
+	}
+
 	public double getScale() {
 		return scale;
 	}
@@ -687,6 +697,10 @@ public class TreeViewer extends JComponent {
 		}
 		this.scale = scale;
 		updatePreferredSize();
+	}
+
+	public void setRuleNames(List<String> ruleNames) {
+		setTreeTextProvider(new DefaultTreeTextProvider(ruleNames));
 	}
 
 	private static class TreeNodeWrapper extends DefaultMutableTreeNode {
