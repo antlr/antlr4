@@ -311,11 +311,18 @@ public class Grammar implements AttributeResolver {
 
     public void loadImportedGrammars() {
 		if ( ast==null ) return;
-        GrammarAST i = (GrammarAST)ast.getFirstChildWithType(ANTLRParser.IMPORT);
-        if ( i==null ) return;
+        List<GrammarAST> i = ast.getAllChildrenWithType(ANTLRParser.IMPORT);
+        if ( i==null || i.isEmpty() ) {
+			return;
+		}
+
+		List<GrammarAST> imports = new ArrayList<GrammarAST>();
+		for (GrammarAST importStatement : i) {
+			imports.addAll(Arrays.asList(importStatement.getChildrenAsArray()));
+		}
+
         importedGrammars = new ArrayList<Grammar>();
-        for (Object c : i.getChildren()) {
-            GrammarAST t = (GrammarAST)c;
+        for (GrammarAST t : imports) {
             String importedGrammarName = null;
             if ( t.getType()==ANTLRParser.ASSIGN ) {
                 importedGrammarName = t.getChild(1).getText();
