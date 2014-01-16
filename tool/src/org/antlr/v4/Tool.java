@@ -631,7 +631,7 @@ public class Tool {
 				ParserRuleReturnScope r = p.grammarSpec();
 				GrammarAST root = (GrammarAST)r.getTree();
 				if ( root instanceof GrammarRootAST) {
-					((GrammarRootAST)root).hasErrors = p.getNumberOfSyntaxErrors()>0;
+					((GrammarRootAST)root).hasErrors = lexer.getNumberOfSyntaxErrors()>0 || p.getNumberOfSyntaxErrors()>0;
 					assert ((GrammarRootAST)root).tokenStream == tokens;
 					if ( grammarOptions!=null ) {
 						((GrammarRootAST)root).cmdLineOptions = grammarOptions;
