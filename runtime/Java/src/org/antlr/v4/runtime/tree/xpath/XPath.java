@@ -181,7 +181,6 @@ loop:
 		dummyRoot.children = Collections.singletonList(t); // don't set t's parent.
 
 		Collection<ParseTree> work = Collections.<ParseTree>singleton(dummyRoot);
-		work.add(dummyRoot);
 
 		int i = 0;
 		while ( i < elements.length ) {
