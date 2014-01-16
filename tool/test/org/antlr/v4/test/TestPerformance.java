@@ -877,12 +877,12 @@ public class TestPerformance extends BaseTest {
 		executorService.shutdown();
 		executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
-        System.out.format("%d. Total parse time for %d files (%d KB, %d tokens, checksum 0x%8X): %.0fms%n",
+        System.out.format("%d. Total parse time for %d files (%d KB, %d tokens%s): %.0fms%n",
 						  currentPass + 1,
                           inputCount,
                           inputSize / 1024,
                           tokenCount.get(currentPass),
-						  COMPUTE_CHECKSUM ? checksum.getValue() : 0,
+						  COMPUTE_CHECKSUM ? String.format(", checksum 0x%8X", checksum.getValue()) : "",
                           (double)(System.nanoTime() - startTime) / 1000000.0);
 
 		if (sharedLexers.length > 0) {
