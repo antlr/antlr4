@@ -32,6 +32,7 @@ package org.antlr.v4.tool;
 
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
+import org.stringtemplate.v4.ST;
 import java.util.Arrays;
 
 public class ANTLRMessage {
@@ -76,6 +77,31 @@ public class ANTLRMessage {
 
 		return args;
     }
+
+	public ST getMessageTemplate(boolean verbose) {
+		ST messageST = new ST(getErrorType().msg);
+
+		messageST.add("verbose", verbose);
+		Object[] args = getArgs();
+		for (int i=0; i<args.length; i++) {
+			String attr = "arg";
+			if ( i>0 ) attr += i + 1;
+			messageST.add(attr, args[i]);
+		}
+		if ( args.length<2 ) messageST.add("arg2", null); // some messages ref arg2
+
+		Throwable cause = getCause();
+		if ( cause!=null ) {
+			messageST.add("exception", cause);
+			messageST.add("stackTrace", cause.getStackTrace());
+		}
+		else {
+			messageST.add("exception", null); // avoid ST error msg
+			messageST.add("stackTrace", null);
+		}
+
+		return messageST;
+	}
 
 	@Nullable
     public Throwable getCause() {

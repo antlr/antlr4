@@ -39,6 +39,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -49,11 +50,13 @@ import org.codehaus.plexus.compiler.util.scan.SimpleSourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.SourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
 import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URI;
@@ -180,6 +183,9 @@ public class Antlr4Mojo extends AbstractMojo {
      */
 	@Parameter(defaultValue = "${basedir}/src/main/antlr4/imports")
     private File libDirectory;
+
+	@Component
+	private BuildContext buildContext;
 
     public File getSourceDirectory() {
         return sourceDirectory;
@@ -375,6 +381,12 @@ public class Antlr4Mojo extends AbstractMojo {
 		// Iterate each grammar file we were given and add it into the tool's list of
 		// grammars to process.
 		for (File grammarFile : grammarFiles) {
+			if (!buildContext.hasDelta(grammarFile)) {
+				continue;
+			}
+
+			buildContext.removeMessages(grammarFile);
+
 			getLog().debug("Grammar file '" + grammarFile.getPath() + "' detected.");
 
 			String relPathBase = findSourceSubdir(sourceDirectory, grammarFile.getPath());
@@ -452,7 +464,7 @@ public class Antlr4Mojo extends AbstractMojo {
 
 		public CustomTool(String[] args) {
 			super(args);
-			addListener(new Antlr4ErrorLog(this, getLog()));
+			addListener(new Antlr4ErrorLog(this, buildContext, getLog()));
 		}
 
 		@Override
@@ -486,8 +498,8 @@ public class Antlr4Mojo extends AbstractMojo {
 
 			URI relativePath = project.getBasedir().toURI().relativize(outputFile.toURI());
 			getLog().debug("  Writing file: " + relativePath);
-			FileWriter fw = new FileWriter(outputFile);
-			return new BufferedWriter(fw);
+			OutputStream outputStream = buildContext.newFileOutputStream(outputFile);
+			return new BufferedWriter(new OutputStreamWriter(outputStream));
 		}
 	}
 }

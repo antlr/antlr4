@@ -33,7 +33,10 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.ANTLRToolListener;
 import org.apache.maven.plugin.logging.Log;
+import org.sonatype.plexus.build.incremental.BuildContext;
 import org.stringtemplate.v4.ST;
+
+import java.io.File;
 
 /**
  * This implementation of {@link ANTLRToolListener} reports messages to the
@@ -44,6 +47,7 @@ import org.stringtemplate.v4.ST;
 public class Antlr4ErrorLog implements ANTLRToolListener {
 
     private final Tool tool;
+    private final BuildContext buildContext;
     private final Log log;
 
     /**
@@ -51,8 +55,9 @@ public class Antlr4ErrorLog implements ANTLRToolListener {
      *
      * @param log The Maven log
      */
-    public Antlr4ErrorLog(@NotNull Tool tool, @NotNull Log log) {
+    public Antlr4ErrorLog(@NotNull Tool tool, @NotNull BuildContext buildContext, @NotNull Log log) {
         this.tool = tool;
+        this.buildContext = buildContext;
         this.log = log;
     }
 
@@ -87,6 +92,11 @@ public class Antlr4ErrorLog implements ANTLRToolListener {
         }
 
         log.error(outputMsg);
+
+        if (message.fileName != null) {
+            String text = message.getMessageTemplate(false).render();
+            buildContext.addMessage(new File(message.fileName), message.line, message.charPosition, text, BuildContext.SEVERITY_ERROR, message.getCause());
+        }
     }
 
     /**
@@ -105,5 +115,10 @@ public class Antlr4ErrorLog implements ANTLRToolListener {
         }
 
         log.warn(outputMsg);
+
+        if (message.fileName != null) {
+            String text = message.getMessageTemplate(false).render();
+            buildContext.addMessage(new File(message.fileName), message.line, message.charPosition, text, BuildContext.SEVERITY_WARNING, message.getCause());
+        }
     }
 }

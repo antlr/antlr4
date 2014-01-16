@@ -92,6 +92,12 @@
             <version>2.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.sonatype.plexus</groupId>
+            <artifactId>plexus-build-api</artifactId>
+            <version>0.0.7</version>
+        </dependency>
+
         <!--
          The version of ANTLR tool that this version of the plugin controls.
          We have decided that this should be in lockstep with ANTLR itself, other
@@ -134,6 +140,11 @@
     <build>
 
         <defaultGoal>install</defaultGoal>
+        <resources>
+            <resource>
+                <directory>resources</directory>
+            </resource>
+        </resources>
 
         <plugins>
 
