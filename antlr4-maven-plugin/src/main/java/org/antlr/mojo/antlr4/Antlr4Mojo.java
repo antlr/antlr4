@@ -452,7 +452,7 @@ public class Antlr4Mojo extends AbstractMojo {
 
 		public CustomTool(String[] args) {
 			super(args);
-			addListener(new Antlr4ErrorLog(getLog()));
+			addListener(new Antlr4ErrorLog(this, getLog()));
 		}
 
 		@Override

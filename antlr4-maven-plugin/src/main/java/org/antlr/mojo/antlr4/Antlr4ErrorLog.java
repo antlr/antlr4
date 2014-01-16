@@ -28,10 +28,12 @@
 */
 package org.antlr.mojo.antlr4;
 
+import org.antlr.v4.Tool;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.ANTLRToolListener;
 import org.apache.maven.plugin.logging.Log;
+import org.stringtemplate.v4.ST;
 
 /**
  * This implementation of {@link ANTLRToolListener} reports messages to the
@@ -41,6 +43,7 @@ import org.apache.maven.plugin.logging.Log;
  */
 public class Antlr4ErrorLog implements ANTLRToolListener {
 
+    private final Tool tool;
     private final Log log;
 
     /**
@@ -48,7 +51,8 @@ public class Antlr4ErrorLog implements ANTLRToolListener {
      *
      * @param log The Maven log
      */
-    public Antlr4ErrorLog(@NotNull Log log) {
+    public Antlr4ErrorLog(@NotNull Tool tool, @NotNull Log log) {
+        this.tool = tool;
         this.log = log;
     }
 
@@ -61,6 +65,9 @@ public class Antlr4ErrorLog implements ANTLRToolListener {
      */
     @Override
     public void info(String message) {
+        if (tool.errMgr.formatWantsSingleLineMessage()) {
+            message = message.replace('\n', ' ');
+        }
         log.info(message);
     }
 
@@ -73,7 +80,13 @@ public class Antlr4ErrorLog implements ANTLRToolListener {
      */
     @Override
     public void error(ANTLRMessage message) {
-        log.error(message.toString());
+        ST msgST = tool.errMgr.getMessageTemplate(message);
+        String outputMsg = msgST.render();
+        if (tool.errMgr.formatWantsSingleLineMessage()) {
+            outputMsg = outputMsg.replace('\n', ' ');
+        }
+
+        log.error(outputMsg);
     }
 
     /**
@@ -85,6 +98,12 @@ public class Antlr4ErrorLog implements ANTLRToolListener {
      */
     @Override
     public void warning(ANTLRMessage message) {
-        log.warn(message.toString());
+        ST msgST = tool.errMgr.getMessageTemplate(message);
+        String outputMsg = msgST.render();
+        if (tool.errMgr.formatWantsSingleLineMessage()) {
+            outputMsg = outputMsg.replace('\n', ' ');
+        }
+
+        log.warn(outputMsg);
     }
 }
