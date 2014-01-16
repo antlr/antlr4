@@ -302,7 +302,9 @@ public class GrammarTransformPipeline {
 				if ( Grammar.lexerOptions.contains(optionName) &&
 					 !Grammar.doNotCopyOptionsToLexer.contains(optionName) )
 				{
-					lexerOptionsRoot.addChild((Tree)adaptor.dupTree(o));
+					GrammarAST optionTree = (GrammarAST)adaptor.dupTree(o);
+					lexerOptionsRoot.addChild(optionTree);
+					lexerAST.setOption(optionName, (GrammarAST)optionTree.getChild(1));
 				}
 			}
 		}
