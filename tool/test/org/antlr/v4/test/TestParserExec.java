@@ -348,4 +348,63 @@ public class TestParserExec extends BaseTest {
 		assertEquals("x\ny\n", found);
 	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#334 "BailErrorStrategy: bails
+	 * out on proper input".
+	 * https://github.com/antlr/antlr4/issues/334
+	 */
+	@Test public void testPredictionIssue334() {
+		String grammar =
+			"grammar T;\n" +
+			"\n" +
+			"file @init{setErrorHandler(new BailErrorStrategy());} \n" +
+			"@after {System.out.println($ctx.toStringTree(this));}\n" +
+			"  :   item (SEMICOLON item)* SEMICOLON? EOF ;\n" +
+			"item : A B?;\n" +
+			"\n" +
+			"\n" +
+			"\n" +
+			"SEMICOLON: ';';\n" +
+			"\n" +
+			"A : 'a'|'A';\n" +
+			"B : 'b'|'B';\n" +
+			"\n" +
+			"WS      : [ \\r\\t\\n]+ -> skip;\n";
+
+		String input = "a";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "file", input, false);
+		assertEquals("(file (item a) <EOF>)\n", found);
+		assertNull(stderrDuringParse);
+	}
+
+	/**
+	 * This is a regressino test for antlr/antlr4#299 "Repeating subtree not
+	 * accessible in visitor".
+	 * https://github.com/antlr/antlr4/issues/299
+	 */
+	@Test public void testListLabelForClosureContext() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"ifStatement\n" +
+			"@after { List<? extends ElseIfStatementContext> items = $ctx.elseIfStatement(); }\n" +
+			"    : 'if' expression\n" +
+			"      ( ( 'then'\n" +
+			"          executableStatement*\n" +
+			"          elseIfStatement*  // <--- problem is here\n" +
+			"          elseStatement?\n" +
+			"          'end' 'if'\n" +
+			"        ) | executableStatement )\n" +
+			"    ;\n" +
+			"\n" +
+			"elseIfStatement\n" +
+			"    : 'else' 'if' expression 'then' executableStatement*\n" +
+			"    ;\n"
+			+ "expression : 'a' ;\n"
+			+ "executableStatement : 'a' ;\n"
+			+ "elseStatement : 'a' ;\n";
+		String input = "a";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "expression", input, false);
+		assertEquals("", found);
+		assertNull(stderrDuringParse);
+	}
 }

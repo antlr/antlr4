@@ -29,9 +29,11 @@
  */
 package org.antlr.v4.runtime.dfa;
 
+import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.Parser;
 
 import java.util.Map;
 import java.util.Set;
@@ -61,6 +63,13 @@ public class DFA {
 
 	private final AtomicInteger nextStateNumber = new AtomicInteger();
 
+	/**
+	 * {@code true} if this DFA is for a precedence decision; otherwise,
+	 * {@code false}. This is the backing field for {@link #isPrecedenceDfa},
+	 * {@link #setPrecedenceDfa}, {@link #hasPrecedenceEdge}.
+	 */
+	private volatile boolean precedenceDfa;
+
 	public DFA(@NotNull ATNState atnStartState) {
 		this(atnStartState, 0);
 	}
@@ -70,11 +79,131 @@ public class DFA {
 		this.decision = decision;
 	}
 
+	/**
+	 * Gets whether this DFA is a precedence DFA. Precedence DFAs use a special
+	 * start state {@link #s0} which is not stored in {@link #states}. The
+	 * {@link DFAState#edges} array for this start state contains outgoing edges
+	 * supplying individual start states corresponding to specific precedence
+	 * values.
+	 *
+	 * @return {@code true} if this is a precedence DFA; otherwise,
+	 * {@code false}.
+	 * @see Parser#getPrecedence()
+	 */
+	public final boolean isPrecedenceDfa() {
+		return precedenceDfa;
+	}
+
+	/**
+	 * Get the start state for a specific precedence value.
+	 *
+	 * @param precedence The current precedence.
+	 * @return The start state corresponding to the specified precedence, or
+	 * {@code null} if no start state exists for the specified precedence.
+	 *
+	 * @throws IllegalStateException if this is not a precedence DFA.
+	 * @see #isPrecedenceDfa()
+	 */
+	@SuppressWarnings("null")
+	public final DFAState getPrecedenceStartState(int precedence, boolean fullContext) {
+		if (!isPrecedenceDfa()) {
+			throw new IllegalStateException("Only precedence DFAs may contain a precedence start state.");
+		}
+
+		// s0.get() and s0full.get() are never null for a precedence DFA
+		if (fullContext) {
+			return s0full.get().getTarget(precedence);
+		}
+		else {
+			return s0.get().getTarget(precedence);
+		}
+	}
+
+	/**
+	 * Set the start state for a specific precedence value.
+	 *
+	 * @param precedence The current precedence.
+	 * @param startState The start state corresponding to the specified
+	 * precedence.
+	 *
+	 * @throws IllegalStateException if this is not a precedence DFA.
+	 * @see #isPrecedenceDfa()
+	 */
+	@SuppressWarnings({"SynchronizeOnNonFinalField", "null"})
+	public final void setPrecedenceStartState(int precedence, boolean fullContext, DFAState startState) {
+		if (!isPrecedenceDfa()) {
+			throw new IllegalStateException("Only precedence DFAs may contain a precedence start state.");
+		}
+
+		if (precedence < 0) {
+			return;
+		}
+
+		if (fullContext) {
+			synchronized (s0full) {
+				// s0full.get() is never null for a precedence DFA
+				s0full.get().setTarget(precedence, startState);
+			}
+		}
+		else {
+			synchronized (s0) {
+				// s0.get() is never null for a precedence DFA
+				s0.get().setTarget(precedence, startState);
+			}
+		}
+	}
+
+	/**
+	 * Sets whether this is a precedence DFA. If the specified value differs
+	 * from the current DFA configuration, the following actions are taken;
+	 * otherwise no changes are made to the current DFA.
+	 *
+	 * <ul>
+	 * <li>The {@link #states} map is cleared</li>
+	 * <li>If {@code precedenceDfa} is {@code false}, the initial state
+	 * {@link #s0} is set to {@code null}; otherwise, it is initialized to a new
+	 * {@link DFAState} with an empty outgoing {@link DFAState#edges} array to
+	 * store the start states for individual precedence values.</li>
+	 * <li>The {@link #precedenceDfa} field is updated</li>
+	 * </ul>
+	 *
+	 * @param precedenceDfa {@code true} if this is a precedence DFA; otherwise,
+	 * {@code false}
+	 */
+	public final synchronized void setPrecedenceDfa(boolean precedenceDfa) {
+		if (this.precedenceDfa != precedenceDfa) {
+			this.states.clear();
+			if (precedenceDfa) {
+				DFAState precedenceState = new DFAState(new ATNConfigSet(), 0, 200);
+				precedenceState.isAcceptState = false;
+				this.s0.set(precedenceState);
+
+				DFAState fullContextPrecedenceState = new DFAState(new ATNConfigSet(), 0, 200);
+				fullContextPrecedenceState.isAcceptState = false;
+				this.s0full.set(fullContextPrecedenceState);
+			}
+			else {
+				this.s0.set(null);
+				this.s0full.set(null);
+			}
+
+			this.precedenceDfa = precedenceDfa;
+		}
+	}
+
 	public boolean isEmpty() {
+		if (isPrecedenceDfa()) {
+			return s0.get().getEdgeMap().isEmpty() && s0full.get().getEdgeMap().isEmpty();
+		}
+
 		return s0.get() == null && s0full.get() == null;
 	}
 
 	public boolean isContextSensitive() {
+		if (isPrecedenceDfa()) {
+			return s0full.get().getEdgeMap().isEmpty();
+		}
+
 		return s0full.get() != null;
 	}
 

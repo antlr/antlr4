@@ -34,6 +34,7 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.misc.MurmurHash;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.ObjectEqualityComparator;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -79,24 +80,24 @@ public class ATNConfig {
 	}
 
 	public static ATNConfig create(@NotNull ATNState state, int alt, @Nullable PredictionContext context) {
-		return create(state, alt, context, SemanticContext.NONE, -1);
+		return create(state, alt, context, SemanticContext.NONE, null);
 	}
 
 	public static ATNConfig create(@NotNull ATNState state, int alt, @Nullable PredictionContext context, @NotNull SemanticContext semanticContext) {
-		return create(state, alt, context, semanticContext, -1);
+		return create(state, alt, context, semanticContext, null);
 	}
 
-	public static ATNConfig create(@NotNull ATNState state, int alt, @Nullable PredictionContext context, @NotNull SemanticContext semanticContext, int actionIndex) {
+	public static ATNConfig create(@NotNull ATNState state, int alt, @Nullable PredictionContext context, @NotNull SemanticContext semanticContext, LexerActionExecutor lexerActionExecutor) {
 		if (semanticContext != SemanticContext.NONE) {
-			if (actionIndex != -1) {
-				return new ActionSemanticContextATNConfig(actionIndex, semanticContext, state, alt, context);
+			if (lexerActionExecutor != null) {
+				return new ActionSemanticContextATNConfig(lexerActionExecutor, semanticContext, state, alt, context);
 			}
 			else {
 				return new SemanticContextATNConfig(semanticContext, state, alt, context);
 			}
 		}
-		else if (actionIndex != -1) {
-			return new ActionATNConfig(actionIndex, state, alt, context);
+		else if (lexerActionExecutor != null) {
+			return new ActionATNConfig(lexerActionExecutor, state, alt, context);
 		}
 		else {
 			return new ATNConfig(state, alt, context);
@@ -160,8 +161,9 @@ public class ATNConfig {
 		this.altAndOuterContextDepth = (outerContextDepth << 24) | (altAndOuterContextDepth & ~0x7F000000);
 	}
 
-	public int getActionIndex() {
-		return -1;
+	@Nullable
+	public LexerActionExecutor getLexerActionExecutor() {
+		return null;
 	}
 
 	@NotNull
@@ -175,32 +177,32 @@ public class ATNConfig {
 	}
 
 	public final ATNConfig transform(@NotNull ATNState state) {
-		return transform(state, this.context, this.getSemanticContext(), this.getActionIndex());
+		return transform(state, this.context, this.getSemanticContext(), this.getLexerActionExecutor());
 	}
 
 	public final ATNConfig transform(@NotNull ATNState state, @NotNull SemanticContext semanticContext) {
-		return transform(state, this.context, semanticContext, this.getActionIndex());
+		return transform(state, this.context, semanticContext, this.getLexerActionExecutor());
 	}
 
 	public final ATNConfig transform(@NotNull ATNState state, @Nullable PredictionContext context) {
-		return transform(state, context, this.getSemanticContext(), this.getActionIndex());
+		return transform(state, context, this.getSemanticContext(), this.getLexerActionExecutor());
 	}
 
-	public final ATNConfig transform(@NotNull ATNState state, int actionIndex) {
-		return transform(state, context, this.getSemanticContext(), actionIndex);
+	public final ATNConfig transform(@NotNull ATNState state, LexerActionExecutor lexerActionExecutor) {
+		return transform(state, context, this.getSemanticContext(), lexerActionExecutor);
 	}
 
-	private ATNConfig transform(@NotNull ATNState state, @Nullable PredictionContext context, @NotNull SemanticContext semanticContext, int actionIndex) {
+	private ATNConfig transform(@NotNull ATNState state, @Nullable PredictionContext context, @NotNull SemanticContext semanticContext, LexerActionExecutor lexerActionExecutor) {
 		if (semanticContext != SemanticContext.NONE) {
-			if (actionIndex != -1) {
-				return new ActionSemanticContextATNConfig(actionIndex, semanticContext, this, state, context);
+			if (lexerActionExecutor != null) {
+				return new ActionSemanticContextATNConfig(lexerActionExecutor, semanticContext, this, state, context);
 			}
 			else {
 				return new SemanticContextATNConfig(semanticContext, this, state, context);
 			}
 		}
-		else if (actionIndex != -1) {
-			return new ActionATNConfig(actionIndex, this, state, context);
+		else if (lexerActionExecutor != null) {
+			return new ActionATNConfig(lexerActionExecutor, this, state, context);
 		}
 		else {
 			return new ATNConfig(this, state, context);
@@ -286,7 +288,7 @@ public class ATNConfig {
 			&& this.getReachesIntoOuterContext() == other.getReachesIntoOuterContext()
 			&& this.getContext().equals(other.getContext())
 			&& this.getSemanticContext().equals(other.getSemanticContext())
-			&& this.getActionIndex() == other.getActionIndex();
+			&& ObjectEqualityComparator.INSTANCE.equals(this.getLexerActionExecutor(), other.getLexerActionExecutor());
 	}
 
 	@Override
@@ -297,7 +299,8 @@ public class ATNConfig {
 		hashCode = MurmurHash.update(hashCode, getReachesIntoOuterContext() ? 1 : 0);
 		hashCode = MurmurHash.update(hashCode, getContext());
 		hashCode = MurmurHash.update(hashCode, getSemanticContext());
-		hashCode = MurmurHash.finish(hashCode, 5);
+		hashCode = MurmurHash.update(hashCode, getLexerActionExecutor());
+		hashCode = MurmurHash.finish(hashCode, 6);
         return hashCode;
     }
 
@@ -404,46 +407,46 @@ public class ATNConfig {
 
 	private static class ActionATNConfig extends ATNConfig {
 
-		private final int actionIndex;
+		private final LexerActionExecutor lexerActionExecutor;
 
-		public ActionATNConfig(int actionIndex, @NotNull ATNState state, int alt, @Nullable PredictionContext context) {
+		public ActionATNConfig(LexerActionExecutor lexerActionExecutor, @NotNull ATNState state, int alt, @Nullable PredictionContext context) {
 			super(state, alt, context);
-			this.actionIndex = actionIndex;
+			this.lexerActionExecutor = lexerActionExecutor;
 		}
 
-		protected ActionATNConfig(int actionIndex, @NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context) {
+		protected ActionATNConfig(LexerActionExecutor lexerActionExecutor, @NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context) {
 			super(c, state, context);
 			if (c.getSemanticContext() != SemanticContext.NONE) {
 				throw new UnsupportedOperationException();
 			}
 
-			this.actionIndex = actionIndex;
+			this.lexerActionExecutor = lexerActionExecutor;
 		}
 
 		@Override
-		public int getActionIndex() {
-			return actionIndex;
+		public LexerActionExecutor getLexerActionExecutor() {
+			return lexerActionExecutor;
 		}
 
 	}
 
 	private static class ActionSemanticContextATNConfig extends SemanticContextATNConfig {
 
-		private final int actionIndex;
+		private final LexerActionExecutor lexerActionExecutor;
 
-		public ActionSemanticContextATNConfig(int actionIndex, @NotNull SemanticContext semanticContext, @NotNull ATNState state, int alt, @Nullable PredictionContext context) {
+		public ActionSemanticContextATNConfig(LexerActionExecutor lexerActionExecutor, @NotNull SemanticContext semanticContext, @NotNull ATNState state, int alt, @Nullable PredictionContext context) {
 			super(semanticContext, state, alt, context);
-			this.actionIndex = actionIndex;
+			this.lexerActionExecutor = lexerActionExecutor;
 		}
 
-		public ActionSemanticContextATNConfig(int actionIndex, @NotNull SemanticContext semanticContext, @NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context) {
+		public ActionSemanticContextATNConfig(LexerActionExecutor lexerActionExecutor, @NotNull SemanticContext semanticContext, @NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context) {
 			super(semanticContext, c, state, context);
-			this.actionIndex = actionIndex;
+			this.lexerActionExecutor = lexerActionExecutor;
 		}
 
 		@Override
-		public int getActionIndex() {
-			return actionIndex;
+		public LexerActionExecutor getLexerActionExecutor() {
+			return lexerActionExecutor;
 		}
 
 	}

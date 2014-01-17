@@ -38,7 +38,7 @@ import org.antlr.v4.runtime.tree.Trees;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
 import javax.print.PrintException;
-import javax.swing.JDialog;
+import javax.swing.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -59,7 +59,7 @@ import java.util.concurrent.Future;
  *  getting error information.
  *
  *  These objects are used during parsing and prediction.
- *  For the special case of parsers and tree parsers, we use the subclass
+ *  For the special case of parsers, we use the subclass
  *  ParserRuleContext.
  *
  *  @see ParserRuleContext

@@ -40,6 +40,7 @@ import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -70,7 +71,7 @@ public class Lexer extends OutputModelObject {
 		name = g.getRecognizerName();
 		tokens = new LinkedHashMap<String,Integer>();
 		LexerGrammar lg = (LexerGrammar)g;
-		atn = new SerializedATN(factory, lg.atn);
+		atn = new SerializedATN(factory, lg.atn, Arrays.asList(g.getRuleNames()));
 		modes = lg.modes.keySet();
 
 		for (String t : g.tokenNameToTypeMap.keySet()) {

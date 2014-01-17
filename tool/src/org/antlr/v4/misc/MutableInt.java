@@ -35,6 +35,15 @@ public class MutableInt extends Number implements Comparable<Number> {
 	public int v;
 
 	public MutableInt(int v) { this.v = v; }
+
+	@Override
+	public boolean equals(Object o) {
+		if ( o instanceof Number ) return v == ((Number)o).intValue();
+		return false;
+	}
+
+	@Override public int hashCode() { return v; }
+
 	@Override public int compareTo(Number o) { return v-o.intValue(); }
 	@Override public int intValue() { return v; }
 	@Override public long longValue() { return v; }

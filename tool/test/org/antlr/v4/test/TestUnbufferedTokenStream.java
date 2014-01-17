@@ -32,12 +32,12 @@ package org.antlr.v4.test;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.UnbufferedTokenStream;
 import org.antlr.v4.tool.LexerGrammar;
-import org.antlr.v4.tool.interp.LexerInterpreter;
 import org.junit.Test;
 
 import java.io.StringReader;
@@ -45,7 +45,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class TestUnbufferedTokenStream extends BaseTest {
 	@Test public void testLookahead() throws Exception {
@@ -63,8 +63,7 @@ public class TestUnbufferedTokenStream extends BaseTest {
         CharStream input = new ANTLRInputStream(
 			new StringReader("x = 302;")
 		);
-        LexerInterpreter lexEngine = new LexerInterpreter(g);
-			lexEngine.setInput(input);
+        LexerInterpreter lexEngine = g.createLexerInterpreter(input);
         TokenStream tokens = new UnbufferedTokenStream(lexEngine);
 
 		assertEquals("x", tokens.LT(1).getText());
@@ -90,8 +89,7 @@ public class TestUnbufferedTokenStream extends BaseTest {
         CharStream input = new ANTLRInputStream(
 			new StringReader("x = 302;")
 		);
-        LexerInterpreter lexEngine = new LexerInterpreter(g);
-			lexEngine.setInput(input);
+        LexerInterpreter lexEngine = g.createLexerInterpreter(input);
 		TestingUnbufferedTokenStream tokens = new TestingUnbufferedTokenStream(lexEngine);
 
 		assertEquals("[[@0,0:0='x',<1>,1:0]]", tokens.getBuffer().toString());
@@ -128,8 +126,7 @@ public class TestUnbufferedTokenStream extends BaseTest {
         CharStream input = new ANTLRInputStream(
 			new StringReader("x = 302;")
 		);
-        LexerInterpreter lexEngine = new LexerInterpreter(g);
-			lexEngine.setInput(input);
+        LexerInterpreter lexEngine = g.createLexerInterpreter(input);
 		TestingUnbufferedTokenStream tokens = new TestingUnbufferedTokenStream(lexEngine);
 
 		int m = tokens.mark();
@@ -164,8 +161,7 @@ public class TestUnbufferedTokenStream extends BaseTest {
         CharStream input = new ANTLRInputStream(
 			new StringReader("x = 302 + 1;")
 		);
-        LexerInterpreter lexEngine = new LexerInterpreter(g);
-		lexEngine.setInput(input);
+        LexerInterpreter lexEngine = g.createLexerInterpreter(input);
 		TestingUnbufferedTokenStream tokens = new TestingUnbufferedTokenStream(lexEngine);
 
 		int m = tokens.mark();

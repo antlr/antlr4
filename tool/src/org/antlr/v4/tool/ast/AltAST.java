@@ -35,7 +35,7 @@ import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
 import org.antlr.v4.tool.Alternative;
 
 /** Any ALT (which can be child of ALT_REWRITE node) */
-public class AltAST extends GrammarAST {
+public class AltAST extends GrammarASTWithOptions {
 	public Alternative alt;
 
 	/** If we transformed this alt from a left-recursive one, need info on it */

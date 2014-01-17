@@ -777,6 +777,7 @@ ERRCHAR
          t.setCharPositionInLine(state.tokenStartCharPositionInLine);
          String msg = getTokenErrorDisplay(t) + " came as a complete surprise to me";
          grammarError(ErrorType.SYNTAX_ERROR, t, msg);
+         state.syntaxErrors++;
          skip();
       }
     ;

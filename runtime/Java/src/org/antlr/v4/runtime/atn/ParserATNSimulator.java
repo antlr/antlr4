@@ -319,7 +319,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	{
 		DFA dfa = atn.decisionToDFA[decision];
 		assert dfa != null;
-		if (optimize_ll1 && !dfa.isEmpty()) {
+		if (optimize_ll1 && !dfa.isPrecedenceDfa() && !dfa.isEmpty()) {
 			int ll_1 = input.LA(1);
 			if (ll_1 >= 0 && ll_1 <= Short.MAX_VALUE) {
 				int key = (decision << 16) + ll_1;
@@ -375,16 +375,35 @@ public class ParserATNSimulator extends ATNSimulator {
 										boolean useContext) {
 
 		if (!useContext) {
-			if (dfa.s0.get() == null) {
-				return null;
-			}
+			if (dfa.isPrecedenceDfa()) {
+				// the start state for a precedence DFA depends on the current
+				// parser precedence, and is provided by a DFA method.
+				DFAState state = dfa.getPrecedenceStartState(parser.getPrecedence(), false);
+				if (state == null) {
+					return null;
+				}
 
-			return new SimulatorState(outerContext, dfa.s0.get(), false, outerContext);
+				return new SimulatorState(outerContext, state, false, outerContext);
+			}
+			else {
+				if (dfa.s0.get() == null) {
+					return null;
+				}
+
+				return new SimulatorState(outerContext, dfa.s0.get(), false, outerContext);
+			}
 		}
 
 		ParserRuleContext remainingContext = outerContext;
 		assert outerContext != null;
-		DFAState s0 = dfa.s0full.get();
+		DFAState s0;
+		if (dfa.isPrecedenceDfa()) {
+			s0 = dfa.getPrecedenceStartState(parser.getPrecedence(), true);
+		}
+		else {
+			s0 = dfa.s0full.get();
+		}
+
 		while (remainingContext != null && s0 != null && s0.isContextSensitive()) {
 			remainingContext = skipTailCalls(remainingContext);
 			s0 = s0.getContextTarget(getReturnState(remainingContext));
@@ -661,6 +680,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
 					if (optimize_ll1
 						&& input.index() == startIndex
+						&& !dfa.isPrecedenceDfa()
 						&& nextState.outerContext == nextState.remainingOuterContext
 						&& dfa.decision >= 0
 						&& !D.configs.hasSemanticContext())
@@ -1023,7 +1043,11 @@ public class ParserATNSimulator extends ATNSimulator {
 											ParserRuleContext globalContext,
 											boolean useContext)
 	{
-		DFAState s0 = useContext ? dfa.s0full.get() : dfa.s0.get();
+		DFAState s0 =
+			dfa.isPrecedenceDfa() ? dfa.getPrecedenceStartState(parser.getPrecedence(), useContext) :
+			useContext ? dfa.s0full.get() :
+			dfa.s0.get();
+
 		if (s0 != null) {
 			if (!useContext) {
 				return new SimulatorState(globalContext, s0, useContext, globalContext);
@@ -1087,16 +1111,42 @@ public class ParserATNSimulator extends ATNSimulator {
 			closure(reachIntermediate, configs, collectPredicates, hasMoreContext, contextCache);
 			boolean stepIntoGlobal = configs.getDipsIntoOuterContext();
 
-			DFAState next = addDFAState(dfa, configs, contextCache);
+			DFAState next;
 			if (s0 == null) {
-				AtomicReference<DFAState> reference = useContext ? dfa.s0full : dfa.s0;
-				if (!reference.compareAndSet(null, next)) {
-					next = reference.get();
+				if (!dfa.isPrecedenceDfa() && dfa.atnStartState instanceof StarLoopEntryState) {
+					if (((StarLoopEntryState)dfa.atnStartState).precedenceRuleDecision) {
+						dfa.setPrecedenceDfa(true);
+					}
+				}
+
+				if (!dfa.isPrecedenceDfa()) {
+					AtomicReference<DFAState> reference = useContext ? dfa.s0full : dfa.s0;
+					next = addDFAState(dfa, configs, contextCache);
+					if (!reference.compareAndSet(null, next)) {
+						next = reference.get();
+					}
+				}
+				else {
+					/* If this is a precedence DFA, we use applyPrecedenceFilter
+					 * to convert the computed start state to a precedence start
+					 * state. We then use DFA.setPrecedenceStartState to set the
+					 * appropriate start state for the precedence level rather
+					 * than simply setting DFA.s0.
+					 */
+					configs = applyPrecedenceFilter(configs, globalContext, contextCache);
+					next = addDFAState(dfa, configs, contextCache);
+					dfa.setPrecedenceStartState(parser.getPrecedence(), useContext, next);
 				}
 			}
 			else {
+				if (dfa.isPrecedenceDfa()) {
+					configs = applyPrecedenceFilter(configs, globalContext, contextCache);
+				}
+
+				next = addDFAState(dfa, configs, contextCache);
 				s0.setContextTarget(previousContext, next);
 			}
+
 			s0 = next;
 
 			if (!useContext || !stepIntoGlobal) {
@@ -1124,6 +1174,81 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 
 		return new SimulatorState(globalContext, s0, useContext, remainingGlobalContext);
+	}
+
+	/**
+	 * This method transforms the start state computed by
+	 * {@link #computeStartState} to the special start state used by a
+	 * precedence DFA for a particular precedence value. The transformation
+	 * process applies the following changes to the start state's configuration
+	 * set.
+	 *
+	 * <ol>
+	 * <li>Evaluate the precedence predicates for each configuration using
+	 * {@link SemanticContext#evalPrecedence}.</li>
+	 * <li>Remove all configurations which predict an alternative greater than
+	 * 1, for which another configuration that predicts alternative 1 is in the
+	 * same ATN state. This transformation is valid for the following reasons:
+	 * <ul>
+	 * <li>The closure block cannot contain any epsilon transitions which bypass
+	 * the body of the closure, so all states reachable via alternative 1 are
+	 * part of the precedence alternatives of the transformed left-recursive
+	 * rule.</li>
+	 * <li>The "primary" portion of a left recursive rule cannot contain an
+	 * epsilon transition, so the only way an alternative other than 1 can exist
+	 * in a state that is also reachable via alternative 1 is by nesting calls
+	 * to the left-recursive rule, with the outer calls not being at the
+	 * preferred precedence level.</li>
+	 * </ul>
+	 * </li>
+	 * </ol>
+	 *
+	 * @param configs The configuration set computed by
+	 * {@link #computeStartState} as the start state for the DFA.
+	 * @return The transformed configuration set representing the start state
+	 * for a precedence DFA at a particular precedence level (determined by
+	 * calling {@link Parser#getPrecedence}).
+	 */
+	@NotNull
+	protected ATNConfigSet applyPrecedenceFilter(@NotNull ATNConfigSet configs, ParserRuleContext globalContext, PredictionContextCache contextCache) {
+		Set<Integer> statesFromAlt1 = new HashSet<Integer>();
+		ATNConfigSet configSet = new ATNConfigSet();
+		for (ATNConfig config : configs) {
+			// handle alt 1 first
+			if (config.getAlt() != 1) {
+				continue;
+			}
+
+			SemanticContext updatedContext = config.getSemanticContext().evalPrecedence(parser, globalContext);
+			if (updatedContext == null) {
+				// the configuration was eliminated
+				continue;
+			}
+
+			statesFromAlt1.add(config.getState().stateNumber);
+			if (updatedContext != config.getSemanticContext()) {
+				configSet.add(config.transform(config.getState(), updatedContext), contextCache);
+			}
+			else {
+				configSet.add(config, contextCache);
+			}
+		}
+
+		for (ATNConfig config : configs) {
+			if (config.getAlt() == 1) {
+				// already handled
+				continue;
+			}
+
+			if (statesFromAlt1.contains(config.getState().stateNumber)) {
+				// eliminated
+				continue;
+			}
+
+			configSet.add(config, contextCache);
+		}
+
+		return configSet;
 	}
 
 	@Nullable
@@ -1220,7 +1345,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 
 		if ( !containsPredicate ) {
-			pairs = null;
+			return null;
 		}
 
 //		System.out.println(Arrays.toString(altToPred)+"->"+pairs);
@@ -1830,7 +1955,7 @@ public class ParserATNSimulator extends ATNSimulator {
 								  @NotNull ATNConfigSet toConfigs,
 								  PredictionContextCache contextCache)
 	{
-		assert dfa.isContextSensitive() || contextTransitions == null || contextTransitions.isEmpty();
+		assert contextTransitions == null || contextTransitions.isEmpty() || dfa.isContextSensitive();
 
 		DFAState from = fromState;
 		DFAState to = addDFAState(dfa, toConfigs, contextCache);

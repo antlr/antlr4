@@ -33,7 +33,8 @@ package org.antlr.v4.test;
 import org.antlr.v4.tool.ErrorType;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /** */
 public class TestLeftRecursion extends BaseTest {
@@ -72,7 +73,6 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testDirectCallToLeftRecursiveRule() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"@parser::members{public AContext a() { return a(0); }}\n" +
 			"a @after {System.out.println($ctx.toStringTree(this));} : a ID\n" +
 			"  | ID" +
 			"  ;\n" +
@@ -115,8 +115,8 @@ public class TestLeftRecursion extends BaseTest {
 			"s @after {System.out.println($ctx.toStringTree(this));} : e EOF ;\n" + // must indicate EOF can follow or 'a<EOF>' won't match
 			"e : e '*' e" +
 			"  | e '+' e" +
-			"  | e '?'<assoc=right> e ':' e" +
-			"  | e '='<assoc=right> e" +
+			"  |<assoc=right> e '?' e ':' e" +
+			"  |<assoc=right> e '=' e" +
 			"  | ID" +
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
@@ -198,23 +198,24 @@ public class TestLeftRecursion extends BaseTest {
 			"    |   e 'instanceof' e\n" +
 			"    |   e ('==' | '!=') e\n" +
 			"    |   e '&' e\n" +
-			"    |   e '^'<assoc=right> e\n" +
+			"    |<assoc=right> e '^' e\n" +
 			"    |   e '|' e\n" +
 			"    |   e '&&' e\n" +
 			"    |   e '||' e\n" +
 			"    |   e '?' e ':' e\n" +
-			"    |   e ('='<assoc=right>\n" +
-			"          |'+='<assoc=right>\n" +
-			"          |'-='<assoc=right>\n" +
-			"          |'*='<assoc=right>\n" +
-			"          |'/='<assoc=right>\n" +
-			"          |'&='<assoc=right>\n" +
-			"          |'|='<assoc=right>\n" +
-			"          |'^='<assoc=right>\n" +
-			"          |'>>='<assoc=right>\n" +
-			"          |'>>>='<assoc=right>\n" +
-			"          |'<<='<assoc=right>\n" +
-			"          |'%='<assoc=right>) e\n" +
+			"    |<assoc=right>" +
+			"        e ('='\n" +
+			"          |'+='\n" +
+			"          |'-='\n" +
+			"          |'*='\n" +
+			"          |'/='\n" +
+			"          |'&='\n" +
+			"          |'|='\n" +
+			"          |'^='\n" +
+			"          |'>>='\n" +
+			"          |'>>>='\n" +
+			"          |'<<='\n" +
+			"          |'%=') e\n" +
 			"    ;\n" +
 			"type: ID \n" +
 			"    | ID '[' ']'\n" +
@@ -229,6 +230,8 @@ public class TestLeftRecursion extends BaseTest {
 			"(a|b)&c",	"(s (e (e ( (e (e a) | (e b)) )) & (e c)) <EOF>)",
             "a > b",	"(s (e (e a) > (e b)) <EOF>)",
 			"a >> b",	"(s (e (e a) >> (e b)) <EOF>)",
+			"a=b=c",	"(s (e (e a) = (e (e b) = (e c))) <EOF>)",
+			"a^b^c",	"(s (e (e a) ^ (e (e b) ^ (e c))) <EOF>)",
 			"(T)x",							"(s (e ( (type T) ) (e x)) <EOF>)",
 			"new A().b",					"(s (e (e new (type A) ( )) . b) <EOF>)",
 			"(T)t.f()",						"(s (e (e ( (type T) ) (e (e t) . f)) ( )) <EOF>)",
@@ -391,17 +394,10 @@ public class TestLeftRecursion extends BaseTest {
 		assertNull(stderrDuringParse);
 
 		result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "a+b*2\n", true);
-		assertEquals("line 1:1 reportAttemptingFullContext d=3 (expr), input='+'\n" +
-					 "line 1:1 reportContextSensitivity d=3 (expr), input='+'\n" +
-					 "line 1:3 reportAttemptingFullContext d=3 (expr), input='*'\n",
-					 stderrDuringParse);
+		assertNull(stderrDuringParse);
 
 		result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "(1+2)*3\n", true);
-		assertEquals("line 1:2 reportAttemptingFullContext d=3 (expr), input='+'\n" +
-					 "line 1:2 reportContextSensitivity d=3 (expr), input='+'\n" +
-					 "line 1:5 reportAttemptingFullContext d=3 (expr), input='*'\n" +
-					 "line 1:5 reportContextSensitivity d=3 (expr), input='*'\n",
-					 stderrDuringParse);
+		assertNull(stderrDuringParse);
 	}
 
 	@Test public void testCheckForNonLeftRecursiveRule() throws Exception {

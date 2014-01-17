@@ -89,19 +89,23 @@ public class LeftRecursiveRule extends Rule {
 		List<Tuple3<Integer,AltAST,String>> labels = new ArrayList<Tuple3<Integer,AltAST,String>>();
 		List<Tuple3<Integer,AltAST,String>> normalAltLabels = super.getAltLabels();
 		if ( normalAltLabels!=null ) labels.addAll(normalAltLabels);
-		for (LeftRecursiveRuleAltInfo altInfo : recPrimaryAlts) {
-			if (altInfo.altLabel != null) {
-				labels.add(Tuple.create(altInfo.altNum,
-															   altInfo.originalAltAST,
-															   altInfo.altLabel));
+		if ( recPrimaryAlts!=null ) {
+			for (LeftRecursiveRuleAltInfo altInfo : recPrimaryAlts) {
+				if (altInfo.altLabel != null) {
+					labels.add(Tuple.create(altInfo.altNum,
+																   altInfo.originalAltAST,
+																   altInfo.altLabel));
+				}
 			}
 		}
-		for (int i = 0; i < recOpAlts.size(); i++) {
-			LeftRecursiveRuleAltInfo altInfo = recOpAlts.getElement(i);
-			if ( altInfo.altLabel!=null ) {
-				labels.add(Tuple.create(altInfo.altNum,
-															 altInfo.originalAltAST,
-															 altInfo.altLabel));
+		if ( recOpAlts!=null ) {
+			for (int i = 0; i < recOpAlts.size(); i++) {
+				LeftRecursiveRuleAltInfo altInfo = recOpAlts.getElement(i);
+				if ( altInfo.altLabel!=null ) {
+					labels.add(Tuple.create(altInfo.altNum,
+																 altInfo.originalAltAST,
+																 altInfo.altLabel));
+				}
 			}
 		}
 		if ( labels.isEmpty() ) return null;

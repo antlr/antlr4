@@ -302,7 +302,9 @@ public class GrammarTransformPipeline {
 				if ( Grammar.lexerOptions.contains(optionName) &&
 					 !Grammar.doNotCopyOptionsToLexer.contains(optionName) )
 				{
-					lexerOptionsRoot.addChild((Tree)adaptor.dupTree(o));
+					GrammarAST optionTree = (GrammarAST)adaptor.dupTree(o);
+					lexerOptionsRoot.addChild(optionTree);
+					lexerAST.setOption(optionName, (GrammarAST)optionTree.getChild(1));
 				}
 			}
 		}
@@ -333,19 +335,17 @@ public class GrammarTransformPipeline {
 		List<GrammarAST> rulesWeMoved = new ArrayList<GrammarAST>();
 		GrammarASTWithOptions[] rules;
 		if (combinedRulesRoot.getChildCount() > 0) {
-			rules = ((List<?>)combinedRulesRoot.getChildren()).toArray(new GrammarASTWithOptions[0]);
+			rules = combinedRulesRoot.getChildren().toArray(new GrammarASTWithOptions[0]);
 		}
 		else {
 			rules = new GrammarASTWithOptions[0];
 		}
 
-		if ( rules!=null ) {
-			for (GrammarASTWithOptions r : rules) {
-				String ruleName = r.getChild(0).getText();
-				if (Grammar.isTokenName(ruleName)) {
-					lexerRulesRoot.addChild((Tree)adaptor.dupTree(r));
-					rulesWeMoved.add(r);
-				}
+		for (GrammarASTWithOptions r : rules) {
+			String ruleName = r.getChild(0).getText();
+			if (Grammar.isTokenName(ruleName)) {
+				lexerRulesRoot.addChild((Tree)adaptor.dupTree(r));
+				rulesWeMoved.add(r);
 			}
 		}
 

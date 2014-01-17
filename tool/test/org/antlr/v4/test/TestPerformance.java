@@ -41,6 +41,7 @@ import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.DiagnosticErrorListener;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
@@ -50,7 +51,7 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
@@ -63,6 +64,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.misc.Tuple2;
+import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -104,8 +106,9 @@ import java.util.logging.Logger;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -190,6 +193,11 @@ public class TestPerformance extends BaseTest {
      * test completes.
      */
     private static final boolean DELETE_TEMP_FILES = true;
+	/**
+	 * {@code true} to use a {@link ParserInterpreter} for parsing instead of
+	 * generated parser.
+	 */
+	private static final boolean USE_PARSER_INTERPRETER = false;
 
 	/**
 	 * {@code true} to call {@link System#gc} and then wait for 5 seconds at the
@@ -892,12 +900,12 @@ public class TestPerformance extends BaseTest {
 		executorService.shutdown();
 		executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
-        System.out.format("%d. Total parse time for %d files (%d KB, %d tokens, checksum 0x%8X): %.0fms%n",
+        System.out.format("%d. Total parse time for %d files (%d KB, %d tokens%s): %.0fms%n",
 						  currentPass + 1,
                           inputCount,
                           inputSize / 1024,
                           tokenCount.get(currentPass),
-						  COMPUTE_CHECKSUM ? checksum.getValue() : 0,
+						  COMPUTE_CHECKSUM ? String.format(", checksum 0x%8X", checksum.getValue()) : "",
                           (double)(System.nanoTime() - startTime) / 1000000.0);
 
 		if (sharedLexers.length > 0) {
@@ -1222,7 +1230,7 @@ public class TestPerformance extends BaseTest {
 				Field lexerSerializedATNField = lexerClass.getField("_serializedATN");
 				String lexerSerializedATN = (String)lexerSerializedATNField.get(null);
 				for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-					sharedLexerATNs[i] = ATNSimulator.deserialize(lexerSerializedATN.toCharArray());
+					sharedLexerATNs[i] = new ATNDeserializer().deserialize(lexerSerializedATN.toCharArray());
 				}
 			}
 
@@ -1230,7 +1238,7 @@ public class TestPerformance extends BaseTest {
 				Field parserSerializedATNField = parserClass.getField("_serializedATN");
 				String parserSerializedATN = (String)parserSerializedATNField.get(null);
 				for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-					sharedParserATNs[i] = ATNSimulator.deserialize(parserSerializedATN.toCharArray());
+					sharedParserATNs[i] = new ATNDeserializer().deserialize(parserSerializedATN.toCharArray());
 				}
 			}
 
@@ -1296,14 +1304,21 @@ public class TestPerformance extends BaseTest {
                         if (REUSE_PARSER && parser != null) {
                             parser.setInputStream(tokens);
                         } else {
-							Parser newParser = parserCtor.newInstance(tokens);
+							Parser previousParser = parser;
 
-							ATN atn = (FILE_GRANULARITY || parser == null ? newParser : parser).getATN();
-							if (!REUSE_PARSER_DFA || (!FILE_GRANULARITY && parser == null)) {
+							if (USE_PARSER_INTERPRETER) {
+								Parser referenceParser = parserCtor.newInstance(tokens);
+								parser = new ParserInterpreter(referenceParser.getGrammarFileName(), Arrays.asList(referenceParser.getTokenNames()), Arrays.asList(referenceParser.getRuleNames()), referenceParser.getATN(), tokens);
+							}
+							else {
+								parser = parserCtor.newInstance(tokens);
+							}
+
+							ATN atn = (FILE_GRANULARITY || previousParser == null ? parser : previousParser).getATN();
+							if (!REUSE_PARSER_DFA || (!FILE_GRANULARITY && previousParser == null)) {
 								atn = sharedLexerATNs[thread];
 							}
 
-							parser = newParser;
 							if (!ENABLE_PARSER_DFA) {
 								parser.setInterpreter(new NonCachingParserATNSimulator<Token>(parser, atn));
 							} else if (!REUSE_PARSER_DFA || COMPUTE_TRANSITION_STATS) {
@@ -1313,6 +1328,7 @@ public class TestPerformance extends BaseTest {
                             sharedParsers[thread] = parser;
                         }
 
+						parser.removeParseListeners();
 						parser.removeErrorListeners();
 						if (!TWO_STAGE_PARSING) {
 							parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
@@ -1343,14 +1359,18 @@ public class TestPerformance extends BaseTest {
                         Method parseMethod = parserClass.getMethod(entryPoint);
                         Object parseResult;
 
-						ParseTreeListener checksumParserListener = null;
-
 						try {
-							if (COMPUTE_CHECKSUM) {
-								checksumParserListener = new ChecksumParseTreeListener(checksum);
-								parser.addParseListener(checksumParserListener);
+							if (COMPUTE_CHECKSUM && !BUILD_PARSE_TREES) {
+								parser.addParseListener(new ChecksumParseTreeListener(checksum));
 							}
-							parseResult = parseMethod.invoke(parser);
+
+							if (USE_PARSER_INTERPRETER) {
+								ParserInterpreter parserInterpreter = (ParserInterpreter)parser;
+								parseResult = parserInterpreter.parse(Collections.lastIndexOfSubList(Arrays.asList(parser.getRuleNames()), Collections.singletonList(entryPoint)));
+							}
+							else {
+								parseResult = parseMethod.invoke(parser);
+							}
 						} catch (InvocationTargetException ex) {
 							if (!TWO_STAGE_PARSING) {
 								throw ex;
@@ -1368,10 +1388,18 @@ public class TestPerformance extends BaseTest {
 							if (REUSE_PARSER && sharedParsers[thread] != null) {
 								parser.setInputStream(tokens);
 							} else {
-								parser = parserCtor.newInstance(tokens);
+								if (USE_PARSER_INTERPRETER) {
+									Parser referenceParser = parserCtor.newInstance(tokens);
+									parser = new ParserInterpreter(referenceParser.getGrammarFileName(), Arrays.asList(referenceParser.getTokenNames()), Arrays.asList(referenceParser.getRuleNames()), referenceParser.getATN(), tokens);
+								}
+								else {
+									parser = parserCtor.newInstance(tokens);
+								}
+
 								sharedParsers[thread] = parser;
 							}
 
+							parser.removeParseListeners();
 							parser.removeErrorListeners();
 							parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
 							parser.addErrorListener(new SummarizingDiagnosticErrorListener());
@@ -1392,6 +1420,9 @@ public class TestPerformance extends BaseTest {
 							parser.getInterpreter().tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
 							parser.getInterpreter().treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
 							parser.setBuildParseTree(BUILD_PARSE_TREES);
+							if (COMPUTE_CHECKSUM && !BUILD_PARSE_TREES) {
+								parser.addParseListener(new ChecksumParseTreeListener(checksum));
+							}
 							if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
 								parser.addParseListener(listener);
 							}
@@ -1401,13 +1432,11 @@ public class TestPerformance extends BaseTest {
 
 							parseResult = parseMethod.invoke(parser);
 						}
-						finally {
-							if (checksumParserListener != null) {
-								parser.removeParseListener(checksumParserListener);
-							}
-						}
 
 						assertThat(parseResult, instanceOf(ParseTree.class));
+						if (COMPUTE_CHECKSUM && BUILD_PARSE_TREES) {
+							ParseTreeWalker.DEFAULT.walk(new ChecksumParseTreeListener(checksum), (ParseTree)parseResult);
+						}
                         if (BUILD_PARSE_TREES && BLANK_LISTENER) {
                             ParseTreeWalker.DEFAULT.walk(listener, (ParserRuleContext)parseResult);
                         }
@@ -2041,5 +2070,58 @@ public class TestPerformance extends BaseTest {
 		public T get() {
 			return referent;
 		}
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#192 "Poor performance of
+	 * expression parsing".
+	 * https://github.com/antlr/antlr4/issues/192
+	 */
+	@Test(timeout = 60000)
+	public void testExpressionGrammar() {
+		String grammar =
+			"grammar Expr;\n" +
+			"\n" +
+			"program: expr EOF;\n" +
+			"\n" +
+			"expr: ID\n" +
+			"    | 'not' expr\n" +
+			"    | expr 'and' expr\n" +
+			"    | expr 'or' expr\n" +
+			"    ;\n" +
+			"\n" +
+			"ID: [a-zA-Z_][a-zA-Z_0-9]*;\n" +
+			"WS: [ \\t\\n\\r\\f]+ -> skip;\n" +
+			"ERROR: .;\n";
+		String input =
+			"not X1 and not X2 and not X3 and not X4 and not X5 and not X6 and not X7 and not X8 and not X9 and not X10 and not X11 and not X12 or\n" +
+			"    X1 and not X2 and not X3 and not X4 and not X5 and not X6 and not X7 and not X8 and not X9 and not X10 and not X11 and not X12 or\n" +
+			"not X1 and     X2 and not X3 and not X4 and not X5 and not X6 and not X7 and not X8 and not X9 and not X10 and not X11 and not X12 or\n" +
+			"not X1 and not X2 and     X3 and not X4 and not X5 and not X6 and not X7 and not X8 and not X9 and not X10 and not X11 and not X12 or\n" +
+			"not X1 and not X2 and not X3 and     X4 and not X5 and not X6 and not X7 and not X8 and not X9 and not X10 and not X11 and not X12 or\n" +
+			"not X1 and not X2 and not X3 and not X4 and     X5 and not X6 and not X7 and not X8 and not X9 and not X10 and not X11 and not X12 or\n" +
+			"not X1 and not X2 and not X3 and not X4 and not X5 and     X6 and not X7 and not X8 and not X9 and not X10 and not X11 and not X12 or\n" +
+			"not X1 and not X2 and not X3 and not X4 and not X5 and not X6 and     X7 and not X8 and not X9 and not X10 and not X11 and not X12 or\n" +
+			"not X1 and not X2 and not X3 and not X4 and not X5 and not X6 and not X7 and     X8 and not X9 and not X10 and not X11 and not X12 or\n" +
+			"not X1 and not X2 and not X3 and not X4 and not X5 and not X6 and not X7 and not X8 and     X9 and not X10 and not X11 and not X12 or\n" +
+			"not X1 and not X2 and not X3 and not X4 and not X5 and not X6 and not X7 and not X8 and not X9 and     X10 and not X11 and not X12 or\n" +
+			"not X1 and not X2 and not X3 and not X4 and not X5 and not X6 and not X7 and not X8 and not X9 and not X10 and     X11 and not X12 or\n" +
+			"not X1 and not X2 and not X3 and not X4 and not X5 and not X6 and not X7 and not X8 and not X9 and not X10 and not X11 and     X12\n";
+
+		String found = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "program",
+								  input, false);
+		Assert.assertEquals("", found);
+		Assert.assertEquals(null, stderrDuringParse);
+
+		List<String> inputs = new ArrayList<String>();
+		for (int i = 0; i < 10; i++) {
+			inputs.add(input);
+		}
+
+		input = Utils.join(inputs.iterator(), " or\n");
+		found = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "program",
+								  input, false);
+		Assert.assertEquals("", found);
+		Assert.assertEquals(null, stderrDuringParse);
 	}
 }

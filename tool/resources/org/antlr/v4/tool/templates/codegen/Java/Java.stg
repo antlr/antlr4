@@ -239,6 +239,9 @@ public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extend
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
 
+	@Override
+	public String getSerializedATN() { return _serializedATN; }
+
 	<namedActions.members>
 	<parser:(ctor)()>
 	<funcs; separator="\n">
@@ -419,13 +422,17 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 @RuleVersion(<namedActions.version; null="0">)
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(int _p<currentRule.args:{a | , <a>}>) throws RecognitionException {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=", ">) throws RecognitionException {
+	return <currentRule.name>(0<currentRule.args:{a | , <a.name>}>);
+}
+
+private <currentRule.ctxType> <currentRule.name>(int _p<currentRule.args:{a | , <a>}>) throws RecognitionException {
 	ParserRuleContext _parentctx = _ctx;
 	int _parentState = getState();
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>);
 	<currentRule.ctxType> _prevctx = _localctx;
 	int _startState = <currentRule.startState>;
-	enterRecursionRule(_localctx, RULE_<currentRule.name>, _p);
+	enterRecursionRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>, _p);
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
@@ -935,6 +942,9 @@ public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends 
 	public String[] getRuleNames() { return ruleNames; }
 
 	@Override
+	public String getSerializedATN() { return _serializedATN; }
+
+	@Override
 	public String[] getModeNames() { return modeNames; }
 
 	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
@@ -960,7 +970,7 @@ public static final String _serializedATN =
 	"<model.serialized; wrap={"+<\n><\t>"}>";
 <endif>
 public static final ATN _ATN =
-	ATNSimulator.deserialize(_serializedATN.toCharArray());
+	new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 static {
 <!	org.antlr.v4.tool.DOTGenerator dot = new org.antlr.v4.tool.DOTGenerator(null);!>
 <!	System.out.println(dot.getDOT(_ATN.decisionToState.get(0), ruleNames, false));!>

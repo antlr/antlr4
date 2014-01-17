@@ -1,5 +1,173 @@
 ANTLR v4 Honey Badger
 
+January 15, 2014
+
+* Unit tests for lexer actions from yesterday.
+* Refactored TreeView so we can refresh tree externally w/o creating new one.
+  Needed for intellij plugin.
+
+January 14, 2014
+
+* Updated serialized ATN representation of lexer actions, allowing the lexer
+  interpreter to execute the majority of lexer commands (#408)
+
+January 12, 2014
+
+* Support executing precedence predicates during the SLL phase of
+  adaptivePredict (#401). The result is a massive performance boost for grammars
+  containing direct left-recursion (improvements of 5% to 1000+% have been
+  observed, depending on the grammar and input).
+
+December 29, 2013
+
+* Internal change: Tool.loadGrammar() -> parseGrammar(). Tool.load()->parse()
+
+* Added Tool.loadGrammar(fileName) that completely parses, extracts implicit lexer,
+  and processes into Grammar object. Does not geneate code.  Use
+  Grammar.getImplicitLexer() to get the lexer created during processing of
+  combined grammar.
+
+* Added Grammar.load(fileName) that creates Tool object for you. loadGrammar()
+  lets you create your own Tool for setting error handlers etc...
+
+	final Grammar g = Grammar.load("/tmp/MyGrammar.g4");
+
+December 19, 2013
+
+* Sam:
+	Improved documentation for tree patterns classes
+    Refactored parts of the tree patterns API to simplify classes and improve encapsulation
+    Move ATN serializer to runtime
+    Use ATNDeserializer methods instead of ATNSimulator methods which are now deprecated
+
+* parrt: fix null pointer bug with rule "a : a;"
+
+November 24, 2013
+
+* Ter adds tree pattern matching.  Preferred interface:
+
+	ParseTree t = parser.expr();
+	ParseTreePattern p = parser.compileParseTreePattern("<ID>+0", MyParser.RULE_expr);
+	ParseTreeMatch m = p.match(t);
+	String id = m.get("ID");
+
+  or
+
+	String xpath = "//blockStatement/*";
+	String treePattern = "int <Identifier> = <expression>;";
+	ParseTreePattern p =
+		parser.compileParseTreePattern(treePattern,
+									   JavaParser.RULE_localVariableDeclarationStatement);
+	List<ParseTreeMatch> matches = p.findAll(tree, xpath);
+
+November 20, 2013
+
+* Sam added method stuff like expr() that calls expr(0). Makes it possible
+  to call expr rule from TestRig (grun).
+
+November 14, 2013
+
+* Added Sam's ParserInterpreter implementation that uses ATN after
+  deserialization.
+
+	LexerGrammar lg = new LexerGrammar(
+		"lexer grammar L;\n" +
+  		"A : 'a' ;\n" +
+  		"B : 'b' ;\n" +
+  		"C : 'c' ;\n");
+  	Grammar g = new Grammar(
+  		"parser grammar T;\n" +
+  		"s : (A{;}|B)* C ;\n",
+  		lg);
+
+	LexerInterpreter lexEngine = lg.createLexerInterpreter(new ANTLRInputStream(input));
+	CommonTokenStream tokens = new CommonTokenStream(lexEngine);
+	ParserInterpreter parser = g.createParserInterpreter(tokens);
+	ParseTree t = parser.parse(g.rules.get(startRule).index);
+
+November 13, 2013
+
+* move getChildren() from Tree into Trees (to avoid breaking change)
+* Notation:
+	/prog/func,         -> all funcs under prog at root
+	/prog/*,            -> all children of prog at root
+	/*/func,            -> all func kids of any root node
+	prog,               -> prog must be root node
+	/prog,              -> prog must be root node
+	/*,                 -> any root
+	*,                  -> any root
+	//ID,               -> any ID in tree
+	//expr/primary/ID,  -> any ID child of a primary under any expr
+	//body//ID,         -> any ID under a body
+	//'return',         -> any 'return' literal in tree
+	//primary/*,        -> all kids of any primary
+	//func/*/stat,      -> all stat nodes grandkids of any func node
+	/prog/func/'def',   -> all def literal kids of func kid of prog
+	//stat/';',         -> all ';' under any stat node
+	//expr/primary/!ID, -> anything but ID under primary under any expr node
+	//expr/!primary,    -> anything but primary under any expr node
+	//!*,               -> nothing anywhere
+	/!*,                -> nothing at root
+
+September 16, 2013
+
+* Updated build.xml to support v4 grammars in v4 itself; compiles XPathLexer.g4
+* Add to XPath:
+	Collection<ParseTree> findAll(String xpath);
+
+September 11, 2013
+
+* Add ! operator to XPath
+* Use ANTLR v4 XPathLexer.g4 not regex
+* Copy lots of find node stuff from v3 GrammarAST to Trees class in runtime.
+
+September 10, 2013
+
+* Adding in XPath stuff.
+
+August 31, 2013
+
+* Lots of little fixes thanks to Coverity Scan
+
+August 7, 2013
+
+* [BREAKING CHANGE] Altered left-recursion elimination to be simpler. Now,
+  we use the following patterns:
+
+  * Binary expressions are expressions which contain a recursive invocation of
+    the rule as the first and last element of the alternative.
+
+  * Suffix expressions contain a recursive invocation of the rule as the first
+    element of the alternative, but not as the last element.
+
+  * Prefix expressions contain a recursive invocation of the rule as the last
+    element of the alternative, but not as the first element.
+
+There is no such thing as a "ternary" expression--they are just binary
+expressions in disguise.
+
+The right associativity specifiers no longer on the individual tokens because
+it's done on alternative basis anyway. The option is now on the individual
+alternative; e.g.,
+
+  e : e '*' e
+    | e '+' e
+    |<assoc=right> e '?' e ':' e
+    |<assoc=right> e '=' e
+    | INT
+    ;
+
+If your language uses a right-associative ternary operator, you will need
+to update your grammar to include <assoc=right> on the alternative operator.
+
+This also fixes #245 and fixes #268:
+
+https://github.com/antlr/antlr4/issues/245
+https://github.com/antlr/antlr4/issues/268
+
+To smooth the transition, <assoc=right> is still allowed on token references
+but it is ignored.
+
 June 30, 2013 -- 4.1 release
 
 June 24, 2013

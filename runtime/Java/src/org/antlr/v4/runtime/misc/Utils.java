@@ -39,8 +39,10 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class Utils {
 	public static String join(Iterable<?> iter, String separator) {
@@ -104,8 +106,12 @@ public class Utils {
 	public static void writeFile(String fileName, String content) throws IOException {
 		FileWriter fw = new FileWriter(fileName);
 		Writer w = new BufferedWriter(fw);
-		w.write(content);
-		w.close();
+		try {
+			w.write(content);
+		}
+		finally {
+			w.close();
+		}
 	}
 
 	public static <T> void removeAll(@NotNull List<T> list, @NotNull Predicate<? super T> predicate) {
@@ -170,5 +176,25 @@ public class Utils {
 		});
 
 		t.join();
+	}
+
+	/** Convert array of strings to string->index map. Useful for
+	 *  converting rulenames to name->ruleindex map.
+	 */
+	public static Map<String, Integer> toMap(String[] keys) {
+		Map<String, Integer> m = new HashMap<String, Integer>();
+		for (int i=0; i<keys.length; i++) {
+			m.put(keys[i], i);
+		}
+		return m;
+	}
+
+	public static char[] toCharArray(IntegerList data) {
+		if ( data==null ) return null;
+		char[] cdata = new char[data.size()];
+		for (int i=0; i<data.size(); i++) {
+			cdata[i] = (char)data.get(i);
+		}
+		return cdata;
 	}
 }

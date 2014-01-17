@@ -29,11 +29,17 @@
  */
 package org.antlr.v4.runtime.misc;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import org.antlr.v4.runtime.Dependents;
+import org.antlr.v4.runtime.RuleDependencies;
+import org.antlr.v4.runtime.RuleDependency;
+import org.antlr.v4.runtime.RuleVersion;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
+import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.Transition;
+
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -50,19 +56,14 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
-import org.antlr.v4.runtime.Dependents;
-import org.antlr.v4.runtime.RuleDependencies;
-import org.antlr.v4.runtime.RuleDependency;
-import org.antlr.v4.runtime.RuleVersion;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNSimulator;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.RuleTransition;
-import org.antlr.v4.runtime.atn.Transition;
-
 import java.lang.annotation.AnnotationTypeMismatchException;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A compile-time validator for rule dependencies.
@@ -615,7 +616,7 @@ public class RuleDependencyProcessor extends AbstractProcessor {
 			return null;
 		}
 
-		ATN atn = ATNSimulator.deserialize(serializedATN.toCharArray());
+		ATN atn = new ATNDeserializer().deserialize(serializedATN.toCharArray());
 		RuleRelations relations = new RuleRelations(atn.ruleToStartState.length);
 		for (ATNState state : atn.states) {
 			if (!state.epsilonOnlyTransitions) {

@@ -766,7 +766,7 @@ alternative
 	finishAlt((AltAST)$start);
 	exitAlternative((AltAST)$start);
 }
-	:	^(ALT element+)
+	:	^(ALT elementOptions? element+)
 	|	^(ALT EPSILON)
     ;
 

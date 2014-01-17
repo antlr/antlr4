@@ -32,7 +32,6 @@ package org.antlr.v4.test;
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.ATNPrinter;
-import org.antlr.v4.automata.ATNSerializer;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenerator;
@@ -42,13 +41,15 @@ import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.WritableToken;
 import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
+import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
@@ -57,6 +58,7 @@ import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DOTGenerator;
@@ -64,7 +66,11 @@ import org.antlr.v4.tool.DefaultToolListener;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.tool.Rule;
 import org.junit.Before;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
@@ -73,10 +79,8 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
-import org.antlr.v4.tool.Rule;
-import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
+import org.antlr.v4.runtime.misc.Tuple;
+import org.antlr.v4.runtime.misc.Tuple2;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -87,6 +91,8 @@ import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
+import java.io.StringReader;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -104,7 +110,11 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public abstract class BaseTest {
 	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
@@ -180,8 +190,8 @@ public abstract class BaseTest {
 
 		ATN atn = g.atn;
 		if (useSerializer) {
-			char[] serialized = ATNSerializer.getSerializedAsChars(g, atn);
-			return ATNSimulator.deserialize(serialized);
+			char[] serialized = ATNSerializer.getSerializedAsChars(atn, Arrays.asList(g.getRuleNames()));
+			return new ATNDeserializer().deserialize(serialized);
 		}
 
 		return atn;
@@ -529,6 +539,69 @@ public abstract class BaseTest {
 			System.err.println(stderrDuringParse);
 		}
 		return output;
+	}
+
+	public ParseTree execParser(String startRuleName, String input,
+								String parserName, String lexerName)
+		throws Exception
+	{
+		Tuple2<Parser, Lexer> pl = getParserAndLexer(input, parserName, lexerName);
+		Parser parser = pl.getItem1();
+		return execStartRule(startRuleName, parser);
+	}
+
+	public ParseTree execStartRule(String startRuleName, Parser parser)
+		throws IllegalAccessException, InvocationTargetException,
+			   NoSuchMethodException
+	{
+		Method startRule = null;
+		Object[] args = null;
+		try {
+			startRule = parser.getClass().getMethod(startRuleName);
+		}
+		catch (NoSuchMethodException nsme) {
+			// try with int _p arg for recursive func
+			startRule = parser.getClass().getMethod(startRuleName, int.class);
+			args = new Integer[] {0};
+		}
+		ParseTree result = (ParseTree)startRule.invoke(parser, args);
+//		System.out.println("parse tree = "+result.toStringTree(parser));
+		return result;
+	}
+
+	public Tuple2<Parser, Lexer> getParserAndLexer(String input,
+												 String parserName, String lexerName)
+		throws Exception
+	{
+		final Class<? extends Lexer> lexerClass = loadLexerClassFromTempDir(lexerName);
+		final Class<? extends Parser> parserClass = loadParserClassFromTempDir(parserName);
+
+		ANTLRInputStream in = new ANTLRInputStream(new StringReader(input));
+
+		Class<? extends Lexer> c = lexerClass.asSubclass(Lexer.class);
+		Constructor<? extends Lexer> ctor = c.getConstructor(CharStream.class);
+		Lexer lexer = ctor.newInstance(in);
+
+		Class<? extends Parser> pc = parserClass.asSubclass(Parser.class);
+		Constructor<? extends Parser> pctor = pc.getConstructor(TokenStream.class);
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		Parser parser = pctor.newInstance(tokens);
+		return Tuple.create(parser, lexer);
+	}
+
+	public Class<?> loadClassFromTempDir(String name) throws Exception {
+		ClassLoader loader =
+			new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() },
+							   ClassLoader.getSystemClassLoader());
+		return loader.loadClass(name);
+	}
+
+	public Class<? extends Lexer> loadLexerClassFromTempDir(String name) throws Exception {
+		return loadClassFromTempDir(name).asSubclass(Lexer.class);
+	}
+
+	public Class<? extends Parser> loadParserClassFromTempDir(String name) throws Exception {
+		return loadClassFromTempDir(name).asSubclass(Parser.class);
 	}
 
 	protected String execParser(String grammarFileName,

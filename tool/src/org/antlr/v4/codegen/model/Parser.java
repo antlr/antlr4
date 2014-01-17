@@ -40,6 +40,7 @@ import org.antlr.v4.tool.Rule;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -94,7 +95,7 @@ public class Parser extends OutputModelObject {
 		}
 		ruleNames = g.rules.keySet();
 		rules = g.rules.values();
-		atn = new SerializedATN(factory, g.atn);
+		atn = new SerializedATN(factory, g.atn, Arrays.asList(g.getRuleNames()));
 		if (g.getOptionString("superClass") != null) {
 			superClass = new ActionText(null, g.getOptionString("superClass"));
 		}

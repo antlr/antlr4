@@ -109,14 +109,14 @@ alternative returns [ATNFactory.Handle p]
     ;
 
 lexerCommands returns [ATNFactory.Handle p]
-@init {StringBuilder cmds = new StringBuilder();}
-    :   (c=lexerCommand {cmds.append($c.cmd).append(' ');})+
+@init {List<ATNFactory.Handle> cmds = new ArrayList<ATNFactory.Handle>();}
+    :   (c=lexerCommand {if ($c.cmd != null) cmds.add($c.cmd);})+
         {
-        $p = factory.action(cmds.toString());
+        $p = factory.alt(cmds);
         }
     ;
 
-lexerCommand returns [String cmd]
+lexerCommand returns [ATNFactory.Handle cmd]
 	:	^(LEXER_ACTION_CALL ID lexerCommandExpr)
         {$cmd = factory.lexerCallCommand($ID, $lexerCommandExpr.start);}
 	|	ID

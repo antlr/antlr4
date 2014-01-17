@@ -285,9 +285,12 @@ public class LexerATNSimulator extends ATNSimulator {
 		getReachableConfigSet(input, s.configs, reach, t);
 
 		if ( reach.isEmpty() ) { // we got nowhere on t from s
-			// we got nowhere on t, don't throw out this knowledge; it'd
-			// cause a failover from DFA later.
-			addDFAEdge(s, t, ERROR);
+			if (!reach.hasSemanticContext()) {
+				// we got nowhere on t, don't throw out this knowledge; it'd
+				// cause a failover from DFA later.
+				addDFAEdge(s, t, ERROR);
+			}
+
 			// stop when we can't match any more char
 			return ERROR;
 		}
@@ -300,9 +303,8 @@ public class LexerATNSimulator extends ATNSimulator {
 							   ATNConfigSet reach, int t)
 	{
 		if (prevAccept.dfaState != null) {
-			int ruleIndex = prevAccept.dfaState.lexerRuleIndex;
-			int actionIndex = prevAccept.dfaState.lexerActionIndex;
-			accept(input, ruleIndex, actionIndex,
+			LexerActionExecutor lexerActionExecutor = prevAccept.dfaState.lexerActionExecutor;
+			accept(input, lexerActionExecutor, startIndex,
 				prevAccept.index, prevAccept.line, prevAccept.charPos);
 			return prevAccept.dfaState.prediction;
 		}
@@ -338,7 +340,12 @@ public class LexerATNSimulator extends ATNSimulator {
 				Transition trans = c.getState().getOptimizedTransition(ti);
 				ATNState target = getReachableTarget(trans, t);
 				if ( target!=null ) {
-					if (closure(input, c.transform(target), reach, true)) {
+					LexerActionExecutor lexerActionExecutor = c.getLexerActionExecutor();
+					if (lexerActionExecutor != null) {
+						lexerActionExecutor = lexerActionExecutor.fixOffsetBeforeMatch(input.index() - startIndex);
+					}
+
+					if (closure(input, c.transform(target, lexerActionExecutor), reach, true)) {
 						// any remaining configs for this alt have a lower priority than
 						// the one that just reached an accept state.
 						skipAlt = c.getAlt();
@@ -349,14 +356,12 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 	}
 
-	protected void accept(@NotNull CharStream input, int ruleIndex, int actionIndex,
-						  int index, int line, int charPos)
+	protected void accept(@NotNull CharStream input, LexerActionExecutor lexerActionExecutor,
+						  int startIndex, int index, int line, int charPos)
 	{
 		if ( debug ) {
-			System.out.format(Locale.getDefault(), "ACTION %s:%d\n", recog != null ? recog.getRuleNames()[ruleIndex] : ruleIndex, actionIndex);
+			System.out.format(Locale.getDefault(), "ACTION %s\n", lexerActionExecutor);
 		}
-
-		if ( actionIndex>=0 && recog!=null ) recog.action(null, ruleIndex, actionIndex);
 
 		// seek to after last char in token
 		input.seek(index);
@@ -364,6 +369,10 @@ public class LexerATNSimulator extends ATNSimulator {
 		this.charPositionInLine = charPos;
 		if (input.LA(1) != IntStream.EOF) {
 			consume(input);
+		}
+
+		if (lexerActionExecutor != null && recog != null) {
+			lexerActionExecutor.execute(recog, input, startIndex);
 		}
 	}
 
@@ -521,10 +530,10 @@ public class LexerATNSimulator extends ATNSimulator {
 			break;
 			
 		case Transition.ACTION:
-			// ignore actions; just exec one per rule upon accept
-			c = config.transform(t.target, ((ActionTransition)t).actionIndex);
+			LexerActionExecutor lexerActionExecutor = LexerActionExecutor.append(config.getLexerActionExecutor(), atn.lexerActions[((ActionTransition)t).actionIndex]);
+			c = config.transform(t.target, lexerActionExecutor);
 			break;
-			
+
 		case Transition.EPSILON:
 			c = config.transform(t.target);
 			break;
@@ -665,9 +674,8 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		if ( firstConfigWithRuleStopState!=null ) {
 			newState.isAcceptState = true;
-			newState.lexerRuleIndex = firstConfigWithRuleStopState.getState().ruleIndex;
-			newState.lexerActionIndex = firstConfigWithRuleStopState.getActionIndex();
-			newState.prediction = atn.ruleToTokenType[newState.lexerRuleIndex];
+			newState.lexerActionExecutor = firstConfigWithRuleStopState.getLexerActionExecutor();
+			newState.prediction = atn.ruleToTokenType[firstConfigWithRuleStopState.getState().ruleIndex];
 		}
 
 		return atn.modeToDFA[mode].addState(newState);

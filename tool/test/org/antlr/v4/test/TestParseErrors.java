@@ -30,7 +30,7 @@
 
 package org.antlr.v4.test;
 
-import org.antlr.v4.automata.ATNSerializer;
+import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -321,27 +321,15 @@ public class TestParseErrors extends BaseTest {
 
 		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xx", true);
 		assertEquals("", result);
-		assertEquals(
-			"line 1:1 reportAttemptingFullContext d=0 (expr), input='x'\n" +
-			"line 1:1 reportContextSensitivity d=0 (expr), input='x'\n",
-			this.stderrDuringParse);
+		assertNull(this.stderrDuringParse);
 
 		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xxx", true);
 		assertEquals("", result);
-		assertEquals(
-			"line 1:1 reportAttemptingFullContext d=0 (expr), input='x'\n" +
-			"line 1:1 reportContextSensitivity d=0 (expr), input='x'\n" +
-			"line 1:2 reportAttemptingFullContext d=0 (expr), input='x'\n",
-			this.stderrDuringParse);
+		assertNull(this.stderrDuringParse);
 
 		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xxxx", true);
 		assertEquals("", result);
-		assertEquals(
-			"line 1:1 reportAttemptingFullContext d=0 (expr), input='x'\n" +
-			"line 1:1 reportContextSensitivity d=0 (expr), input='x'\n" +
-			"line 1:2 reportAttemptingFullContext d=0 (expr), input='x'\n" +
-			"line 1:3 reportAttemptingFullContext d=0 (expr), input='x'\n",
-			this.stderrDuringParse);
+		assertNull(this.stderrDuringParse);
 	}
 
 	/**

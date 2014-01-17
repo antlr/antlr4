@@ -30,12 +30,14 @@
 
 package org.antlr.v4.test;
 
-import org.antlr.v4.automata.ATNSerializer;
 import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -58,7 +60,7 @@ public class TestATNSerialization extends BaseTest {
 				"3->4 ATOM 2,0,0\n" +
 				"4->1 EPSILON 0,0,0\n";
 		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(g, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getRuleNames()), Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -80,7 +82,7 @@ public class TestATNSerialization extends BaseTest {
 				"3->4 ATOM 0,0,1\n" +
 				"4->1 EPSILON 0,0,0\n";
 		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(g, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getRuleNames()), Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -101,7 +103,7 @@ public class TestATNSerialization extends BaseTest {
 				"2->3 SET 0,0,0\n" +
 				"3->1 EPSILON 0,0,0\n";
 		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(g, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getRuleNames()), Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -125,7 +127,7 @@ public class TestATNSerialization extends BaseTest {
 		ATN atn = createATN(g, true);
 		DOTGenerator gen = new DOTGenerator(g);
 		System.out.println(gen.getDOT(atn.ruleToStartState[0]));
-		String result = ATNSerializer.getDecoded(g, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getRuleNames()), Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -146,7 +148,7 @@ public class TestATNSerialization extends BaseTest {
 			"2->3 WILDCARD 0,0,0\n" +
 			"3->1 EPSILON 0,0,0\n";
 		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(g, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getRuleNames()), Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -174,7 +176,7 @@ public class TestATNSerialization extends BaseTest {
 				"6->1 EPSILON 0,0,0\n" +
 				"0:5\n";
 		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(g, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getRuleNames()), Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -209,7 +211,7 @@ public class TestATNSerialization extends BaseTest {
 				"9->1 EPSILON 0,0,0\n" +
 				"0:8\n";
 		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(g, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getRuleNames()), Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -241,7 +243,7 @@ public class TestATNSerialization extends BaseTest {
 				"8->1 EPSILON 0,0,0\n" +
 				"0:5\n";
 		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(g, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getRuleNames()), Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -270,7 +272,7 @@ public class TestATNSerialization extends BaseTest {
 				"6->7 ATOM 1,0,0\n" +
 				"7->3 EPSILON 0,0,0\n";
 		ATN atn = createATN(g, false);
-		String result = ATNSerializer.getDecoded(g, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getRuleNames()), Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -290,8 +292,8 @@ public class TestATNSerialization extends BaseTest {
 			"6:BASIC 0\n" +
 			"7:BASIC 1\n" +
 			"8:BASIC 1\n" +
-			"rule 0:1 1,-1\n" +
-			"rule 1:3 2,-1\n" +
+			"rule 0:1 1\n" +
+			"rule 1:3 2\n" +
 			"mode 0:0\n" +
 			"0->1 EPSILON 0,0,0\n" +
 			"0->3 EPSILON 0,0,0\n" +
@@ -303,7 +305,7 @@ public class TestATNSerialization extends BaseTest {
 			"8->4 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(lg, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getRuleNames()), Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -318,7 +320,7 @@ public class TestATNSerialization extends BaseTest {
 			"2:RULE_STOP 0\n" +
 			"3:BASIC 0\n" +
 			"4:BASIC 0\n" +
-			"rule 0:1 1,-1\n" +
+			"rule 0:1 1\n" +
 			"mode 0:0\n" +
 			"0->1 EPSILON 0,0,0\n" +
 			"1->3 EPSILON 0,0,0\n" +
@@ -326,7 +328,7 @@ public class TestATNSerialization extends BaseTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(lg, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getRuleNames()), Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -342,7 +344,7 @@ public class TestATNSerialization extends BaseTest {
 				"3:BASIC 0\n" +
 				"4:BASIC 0\n" +
 				"5:BASIC 0\n" +
-				"rule 0:1 1,-1\n" +
+				"rule 0:1 1\n" +
 				"mode 0:0\n" +
 				"0->1 EPSILON 0,0,0\n" +
 				"1->3 EPSILON 0,0,0\n" +
@@ -351,7 +353,7 @@ public class TestATNSerialization extends BaseTest {
 				"5->2 EPSILON 0,0,0\n" +
 				"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(lg, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getRuleNames()), Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -368,7 +370,7 @@ public class TestATNSerialization extends BaseTest {
 				"4:BASIC 0\n" +
 				"5:BLOCK_START 0 6\n" +
 				"6:BLOCK_END 0\n" +
-				"rule 0:1 1,-1\n" +
+				"rule 0:1 1\n" +
 				"mode 0:0\n" +
 				"0:EOF, '\\n'..'\\n'\n" +
 				"0->1 EPSILON 0,0,0\n" +
@@ -380,7 +382,7 @@ public class TestATNSerialization extends BaseTest {
 				"0:0\n" +
 				"1:5\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(lg, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getRuleNames()), Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -398,7 +400,7 @@ public class TestATNSerialization extends BaseTest {
 				"5:BLOCK_END 0\n" +
 				"6:PLUS_LOOP_BACK 0\n" +
 				"7:LOOP_END 0 6\n" +
-				"rule 0:1 1,-1\n" +
+				"rule 0:1 1\n" +
 				"mode 0:0\n" +
 				"0->1 EPSILON 0,0,0\n" +
 				"1->4 EPSILON 0,0,0\n" +
@@ -411,7 +413,7 @@ public class TestATNSerialization extends BaseTest {
 				"0:0\n" +
 				"1:6\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(lg, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getRuleNames()), Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -438,9 +440,9 @@ public class TestATNSerialization extends BaseTest {
 				"12:BASIC 2\n" +
 				"13:BASIC 2\n" +
 				"14:BASIC 2\n" +
-				"rule 0:1 1,0\n" +
-				"rule 1:3 2,-1\n" +
-				"rule 2:5 3,1\n" +
+				"rule 0:1 1\n" +
+				"rule 1:3 2\n" +
+				"rule 2:5 3\n" +
 				"mode 0:0\n" +
 				"0->1 EPSILON 0,0,0\n" +
 				"0->3 EPSILON 0,0,0\n" +
@@ -458,7 +460,7 @@ public class TestATNSerialization extends BaseTest {
 				"14->6 EPSILON 0,0,0\n" +
 				"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(lg, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getRuleNames()), Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -473,7 +475,7 @@ public class TestATNSerialization extends BaseTest {
 			"2:RULE_STOP 0\n" +
 			"3:BASIC 0\n" +
 			"4:BASIC 0\n" +
-			"rule 0:1 1,-1\n" +
+			"rule 0:1 1\n" +
 			"mode 0:0\n" +
 			"0:'a'..'b'\n" +
 			"0->1 EPSILON 0,0,0\n" +
@@ -482,7 +484,7 @@ public class TestATNSerialization extends BaseTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(lg, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getRuleNames()), Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -497,7 +499,7 @@ public class TestATNSerialization extends BaseTest {
 			"2:RULE_STOP 0\n" +
 			"3:BASIC 0\n" +
 			"4:BASIC 0\n" +
-			"rule 0:1 1,-1\n" +
+			"rule 0:1 1\n" +
 			"mode 0:0\n" +
 			"0:'a'..'b', 'e'..'e', 'p'..'t'\n" +
 			"0->1 EPSILON 0,0,0\n" +
@@ -506,7 +508,7 @@ public class TestATNSerialization extends BaseTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(lg, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getRuleNames()), Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -521,7 +523,7 @@ public class TestATNSerialization extends BaseTest {
 			"2:RULE_STOP 0\n" +
 			"3:BASIC 0\n" +
 			"4:BASIC 0\n" +
-			"rule 0:1 1,-1\n" +
+			"rule 0:1 1\n" +
 			"mode 0:0\n" +
 			"0:'a'..'b', 'e'..'e', 'p'..'t'\n" +
 			"0->1 EPSILON 0,0,0\n" +
@@ -530,7 +532,7 @@ public class TestATNSerialization extends BaseTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(lg, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getRuleNames()), Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -564,9 +566,9 @@ public class TestATNSerialization extends BaseTest {
 				"18:BASIC 2\n" +
 				"19:BASIC 2\n" +
 				"20:BASIC 2\n" +
-				"rule 0:2 1,-1\n" +
-				"rule 1:4 2,0\n" +
-				"rule 2:6 3,1\n" +
+				"rule 0:2 1\n" +
+				"rule 1:4 2\n" +
+				"rule 2:6 3\n" +
 				"mode 0:0\n" +
 				"mode 1:1\n" +
 				"0->2 EPSILON 0,0,0\n" +
@@ -593,7 +595,7 @@ public class TestATNSerialization extends BaseTest {
 				"1:1\n" +
 				"2:11\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(lg, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getRuleNames()), Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -609,7 +611,7 @@ public class TestATNSerialization extends BaseTest {
 				"3:BASIC 0\n" +
 				"4:BASIC 0\n" +
 				"5:BASIC 0\n" +
-				"rule 0:1 1,-1\n" +
+				"rule 0:1 1\n" +
 				"mode 0:0\n" +
 				"0:'a'..'b'\n" +
 				"1:'e'..'e', 'p'..'t'\n" +
@@ -620,7 +622,7 @@ public class TestATNSerialization extends BaseTest {
 				"5->2 EPSILON 0,0,0\n" +
 				"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(lg, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getRuleNames()), Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -652,10 +654,10 @@ public class TestATNSerialization extends BaseTest {
 			"15:BASIC 2\n" +
 			"16:BASIC 3\n" +
 			"17:BASIC 3\n" +
-			"rule 0:2 1,-1\n" +
-			"rule 1:4 2,-1\n" +
-			"rule 2:6 3,-1\n" +
-			"rule 3:8 4,-1\n" +
+			"rule 0:2 1\n" +
+			"rule 1:4 2\n" +
+			"rule 2:6 3\n" +
+			"rule 3:8 4\n" +
 			"mode 0:0\n" +
 			"mode 1:1\n" +
 			"0->2 EPSILON 0,0,0\n" +
@@ -677,7 +679,7 @@ public class TestATNSerialization extends BaseTest {
 			"0:0\n" +
 			"1:1\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(lg, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getRuleNames()), Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -706,9 +708,9 @@ public class TestATNSerialization extends BaseTest {
 			"12:BASIC 1\n" +
 			"13:BASIC 2\n" +
 			"14:BASIC 2\n" +
-			"rule 0:3 1,-1\n" +
-			"rule 1:5 2,-1\n" +
-			"rule 2:7 3,-1\n" +
+			"rule 0:3 1\n" +
+			"rule 1:5 2\n" +
+			"rule 2:7 3\n" +
 			"mode 0:0\n" +
 			"mode 1:1\n" +
 			"mode 2:2\n" +
@@ -728,7 +730,7 @@ public class TestATNSerialization extends BaseTest {
 			"1:1\n" +
 			"2:2\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(lg, atn);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getRuleNames()), Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 

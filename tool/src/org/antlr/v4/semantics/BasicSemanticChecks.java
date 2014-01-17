@@ -370,9 +370,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 
 	@Override
 	protected void enterLexerElement(GrammarAST tree) {
-		if ( tree.getType() == ACTION ) {
-			checkElementIsOuterMostInSingleAlt(tree);
-		}
 	}
 
 	@Override
@@ -396,7 +393,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		if ( !outerMostAlt || blk.getChildCount()>1 )
 		{
 			ErrorType e = ErrorType.LEXER_COMMAND_PLACEMENT_ISSUE;
-			if ( tree.getType() == ACTION ) e = ErrorType.LEXER_ACTION_PLACEMENT_ISSUE;
 			g.tool.errMgr.grammarError(e,
 									   fileName,
 									   tree.getToken(),

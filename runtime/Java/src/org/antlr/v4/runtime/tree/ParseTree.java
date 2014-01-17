@@ -49,16 +49,16 @@ public interface ParseTree extends SyntaxTree {
 	ParseTree getChild(int i);
 
 	/** The {@link ParseTreeVisitor} needs a double dispatch method. */
-	public <T> T accept(ParseTreeVisitor<? extends T> visitor);
+	<T> T accept(ParseTreeVisitor<? extends T> visitor);
 
 	/** Return the combined text of all leaf nodes. Does not get any
 	 *  off-channel tokens (if any) so won't return whitespace and
 	 *  comments if they are sent to parser on hidden channel.
 	 */
-	public String getText();
+	String getText();
 
 	/** Specialize toStringTree so that it can print out more information
 	 * 	based upon the parser.
 	 */
-	public String toStringTree(Parser parser);
+	String toStringTree(Parser parser);
 }

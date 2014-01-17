@@ -34,16 +34,16 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenFactory;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.IntStream;
+import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.UnbufferedCharStream;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.tool.LexerGrammar;
-import org.antlr.v4.tool.interp.LexerInterpreter;
 import org.junit.Test;
 
 import java.io.Reader;
 import java.io.StringReader;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class TestUnbufferedCharStream extends BaseTest {
 	@Test public void testNoChar() throws Exception {
@@ -310,10 +310,9 @@ public class TestUnbufferedCharStream extends BaseTest {
         // Tokens: 012345678901234567
         // Input:  x = 3 * 0 + 2 * 0;
 		TestingUnbufferedCharStream input = createStream("x = 302 * 91 + 20234234 * 0;");
-        LexerInterpreter lexEngine = new LexerInterpreter(g);
+        LexerInterpreter lexEngine = g.createLexerInterpreter(input);
 		// copy text into tokens from char stream
 		lexEngine.setTokenFactory(new CommonTokenFactory(true));
-        lexEngine.setInput(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
         String result = tokens.LT(1).getText();
         String expecting = "x";

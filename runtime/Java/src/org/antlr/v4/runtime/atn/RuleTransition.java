@@ -46,6 +46,18 @@ public final class RuleTransition extends Transition {
 	public boolean tailCall;
 	public boolean optimizedTailCall;
 
+	/**
+	 * @deprecated Use
+	 * {@link #RuleTransition(RuleStartState, int, int, ATNState)} instead.
+	 */
+	@Deprecated
+	public RuleTransition(@NotNull RuleStartState ruleStart,
+						  int ruleIndex,
+						  @NotNull ATNState followState)
+	{
+		this(ruleStart, ruleIndex, 0, followState);
+	}
+
 	public RuleTransition(@NotNull RuleStartState ruleStart,
 						  int ruleIndex,
 						  int precedence,

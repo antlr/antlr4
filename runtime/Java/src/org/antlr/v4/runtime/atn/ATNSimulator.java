@@ -1,7 +1,7 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
+ *  Copyright (c) 2013 Terence Parr
+ *  Copyright (c) 2013 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -49,20 +49,23 @@ import java.util.Locale;
 import java.util.UUID;
 
 public abstract class ATNSimulator {
+	/**
+	 * @deprecated Use {@link ATNDeserializer#SERIALIZED_VERSION} instead.
+	 */
+	@Deprecated
 	public static final int SERIALIZED_VERSION;
 	static {
-		/* This value should never change. Updates following this version are
-		 * reflected as change in the unique ID SERIALIZED_UUID.
-		 */
-		SERIALIZED_VERSION = 3;
+		SERIALIZED_VERSION = ATNDeserializer.SERIALIZED_VERSION;
 	}
 
+	/**
+	 * This is the current serialized UUID.
+	 * @deprecated Use {@link ATNDeserializer#checkCondition(boolean)} instead.
+	 */
+	@Deprecated
 	public static final UUID SERIALIZED_UUID;
 	static {
-		/* WARNING: DO NOT MERGE THIS LINE. If UUIDs differ during a merge,
-		 * resolve the conflict by generating a new ID!
-		 */
-		SERIALIZED_UUID = UUID.fromString("E4178468-DF95-44D0-AD87-F22A5D5FB6D3");
+		SERIALIZED_UUID = ATNDeserializer.SERIALIZED_UUID;
 	}
 
 	public static final char RULE_VARIANT_DELIMITER = '$';
@@ -86,797 +89,81 @@ public abstract class ATNSimulator {
 
 	public abstract void reset();
 
+	/**
+	 * @deprecated Use {@link ATNDeserializer#deserialize} instead.
+	 */
+	@Deprecated
 	public static ATN deserialize(@NotNull char[] data) {
-		return deserialize(data, true);
+		return new ATNDeserializer().deserialize(data);
 	}
 
-	public static ATN deserialize(@NotNull char[] data, boolean optimize) {
-		data = data.clone();
-		// don't adjust the first value since that's the version number
-		for (int i = 1; i < data.length; i++) {
-			data[i] = (char)(data[i] - 2);
-		}
-
-		int p = 0;
-		int version = toInt(data[p++]);
-		if (version != SERIALIZED_VERSION) {
-			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with version %d (expected %d).", version, SERIALIZED_VERSION);
-			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
-		}
-
-		UUID uuid = toUUID(data, p);
-		p += 8;
-		if (!uuid.equals(SERIALIZED_UUID)) {
-			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with UUID %s (expected %s).", uuid, SERIALIZED_UUID);
-			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
-		}
-
-		ATNType grammarType = ATNType.values()[toInt(data[p++])];
-		int maxTokenType = toInt(data[p++]);
-		ATN atn = new ATN(grammarType, maxTokenType);
-
-		//
-		// STATES
-		//
-		List<Tuple2<LoopEndState, Integer>> loopBackStateNumbers = new ArrayList<Tuple2<LoopEndState, Integer>>();
-		List<Tuple2<BlockStartState, Integer>> endStateNumbers = new ArrayList<Tuple2<BlockStartState, Integer>>();
-		int nstates = toInt(data[p++]);
-		for (int i=0; i<nstates; i++) {
-			int stype = toInt(data[p++]);
-			// ignore bad type of states
-			if ( stype==ATNState.INVALID_TYPE ) {
-				atn.addState(null);
-				continue;
-			}
-
-			int ruleIndex = toInt(data[p++]);
-			if (ruleIndex == Character.MAX_VALUE) {
-				ruleIndex = -1;
-			}
-
-			ATNState s = stateFactory(stype, ruleIndex);
-			if ( stype == ATNState.LOOP_END ) { // special case
-				int loopBackStateNumber = toInt(data[p++]);
-				loopBackStateNumbers.add(Tuple.create((LoopEndState)s, loopBackStateNumber));
-			}
-			else if (s instanceof BlockStartState) {
-				int endStateNumber = toInt(data[p++]);
-				endStateNumbers.add(Tuple.create((BlockStartState)s, endStateNumber));
-			}
-			atn.addState(s);
-		}
-
-		// delay the assignment of loop back and end states until we know all the state instances have been initialized
-		for (Tuple2<LoopEndState, Integer> pair : loopBackStateNumbers) {
-			pair.getItem1().loopBackState = atn.states.get(pair.getItem2());
-		}
-
-		for (Tuple2<BlockStartState, Integer> pair : endStateNumbers) {
-			pair.getItem1().endState = (BlockEndState)atn.states.get(pair.getItem2());
-		}
-
-		int numNonGreedyStates = toInt(data[p++]);
-		for (int i = 0; i < numNonGreedyStates; i++) {
-			int stateNumber = toInt(data[p++]);
-			((DecisionState)atn.states.get(stateNumber)).nonGreedy = true;
-		}
-
-		int numSllDecisions = toInt(data[p++]);
-		for (int i = 0; i < numSllDecisions; i++) {
-			int stateNumber = toInt(data[p++]);
-			((DecisionState)atn.states.get(stateNumber)).sll = true;
-		}
-
-		int numPrecedenceStates = toInt(data[p++]);
-		for (int i = 0; i < numPrecedenceStates; i++) {
-			int stateNumber = toInt(data[p++]);
-			((RuleStartState)atn.states.get(stateNumber)).isPrecedenceRule = true;
-		}
-
-		//
-		// RULES
-		//
-		int nrules = toInt(data[p++]);
-		if ( atn.grammarType == ATNType.LEXER ) {
-			atn.ruleToTokenType = new int[nrules];
-			atn.ruleToActionIndex = new int[nrules];
-		}
-		atn.ruleToStartState = new RuleStartState[nrules];
-		for (int i=0; i<nrules; i++) {
-			int s = toInt(data[p++]);
-			RuleStartState startState = (RuleStartState)atn.states.get(s);
-			startState.leftFactored = toInt(data[p++]) != 0;
-			atn.ruleToStartState[i] = startState;
-			if ( atn.grammarType == ATNType.LEXER ) {
-				int tokenType = toInt(data[p++]);
-				if (tokenType == 0xFFFF) {
-					tokenType = Token.EOF;
-				}
-
-				atn.ruleToTokenType[i] = tokenType;
-				int actionIndex = toInt(data[p++]);
-				if (actionIndex == 0xFFFF) {
-					actionIndex = -1;
-				}
-
-				atn.ruleToActionIndex[i] = actionIndex;
-			}
-		}
-
-		atn.ruleToStopState = new RuleStopState[nrules];
-		for (ATNState state : atn.states) {
-			if (!(state instanceof RuleStopState)) {
-				continue;
-			}
-
-			RuleStopState stopState = (RuleStopState)state;
-			atn.ruleToStopState[state.ruleIndex] = stopState;
-			atn.ruleToStartState[state.ruleIndex].stopState = stopState;
-		}
-
-		//
-		// MODES
-		//
-		int nmodes = toInt(data[p++]);
-		for (int i=0; i<nmodes; i++) {
-			int s = toInt(data[p++]);
-			atn.modeToStartState.add((TokensStartState)atn.states.get(s));
-		}
-
-		atn.modeToDFA = new DFA[nmodes];
-		for (int i = 0; i < nmodes; i++) {
-			atn.modeToDFA[i] = new DFA(atn.modeToStartState.get(i));
-		}
-
-		//
-		// SETS
-		//
-		List<IntervalSet> sets = new ArrayList<IntervalSet>();
-		int nsets = toInt(data[p++]);
-		for (int i=0; i<nsets; i++) {
-			int nintervals = toInt(data[p]);
-			p++;
-			IntervalSet set = new IntervalSet();
-			sets.add(set);
-
-			boolean containsEof = toInt(data[p++]) != 0;
-			if (containsEof) {
-				set.add(-1);
-			}
-
-			for (int j=0; j<nintervals; j++) {
-				set.add(toInt(data[p]), toInt(data[p + 1]));
-				p += 2;
-			}
-		}
-
-		//
-		// EDGES
-		//
-		int nedges = toInt(data[p++]);
-		for (int i=0; i<nedges; i++) {
-			int src = toInt(data[p]);
-			int trg = toInt(data[p+1]);
-			int ttype = toInt(data[p+2]);
-			int arg1 = toInt(data[p+3]);
-			int arg2 = toInt(data[p+4]);
-			int arg3 = toInt(data[p+5]);
-			Transition trans = edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets);
-//			System.out.println("EDGE "+trans.getClass().getSimpleName()+" "+
-//							   src+"->"+trg+
-//					   " "+Transition.serializationNames[ttype]+
-//					   " "+arg1+","+arg2+","+arg3);
-			ATNState srcState = atn.states.get(src);
-			srcState.addTransition(trans);
-			p += 6;
-		}
-
-		// edges for rule stop states can be derived, so they aren't serialized
-		for (ATNState state : atn.states) {
-			boolean returningToLeftFactored = state.ruleIndex >= 0 && atn.ruleToStartState[state.ruleIndex].leftFactored;
-			for (int i = 0; i < state.getNumberOfTransitions(); i++) {
-				Transition t = state.transition(i);
-				if (!(t instanceof RuleTransition)) {
-					continue;
-				}
-
-				RuleTransition ruleTransition = (RuleTransition)t;
-				boolean returningFromLeftFactored = atn.ruleToStartState[ruleTransition.target.ruleIndex].leftFactored;
-				if (!returningFromLeftFactored && returningToLeftFactored) {
-					continue;
-				}
-
-				atn.ruleToStopState[ruleTransition.target.ruleIndex].addTransition(new EpsilonTransition(ruleTransition.followState));
-			}
-		}
-
-		for (ATNState state : atn.states) {
-			if (state instanceof BlockStartState) {
-				// we need to know the end state to set its start state
-				if (((BlockStartState)state).endState == null) {
-					throw new IllegalStateException();
-				}
-
-				// block end states can only be associated to a single block start state
-				if (((BlockStartState)state).endState.startState != null) {
-					throw new IllegalStateException();
-				}
-
-				((BlockStartState)state).endState.startState = (BlockStartState)state;
-			}
-
-			if (state instanceof PlusLoopbackState) {
-				PlusLoopbackState loopbackState = (PlusLoopbackState)state;
-				for (int i = 0; i < loopbackState.getNumberOfTransitions(); i++) {
-					ATNState target = loopbackState.transition(i).target;
-					if (target instanceof PlusBlockStartState) {
-						((PlusBlockStartState)target).loopBackState = loopbackState;
-					}
-				}
-			}
-			else if (state instanceof StarLoopbackState) {
-				StarLoopbackState loopbackState = (StarLoopbackState)state;
-				for (int i = 0; i < loopbackState.getNumberOfTransitions(); i++) {
-					ATNState target = loopbackState.transition(i).target;
-					if (target instanceof StarLoopEntryState) {
-						((StarLoopEntryState)target).loopBackState = loopbackState;
-					}
-				}
-			}
-		}
-
-		//
-		// DECISIONS
-		//
-		int ndecisions = toInt(data[p++]);
-		for (int i=1; i<=ndecisions; i++) {
-			int s = toInt(data[p++]);
-			DecisionState decState = (DecisionState)atn.states.get(s);
-			atn.decisionToState.add(decState);
-			decState.decision = i-1;
-		}
-
-		atn.decisionToDFA = new DFA[ndecisions];
-		for (int i = 0; i < ndecisions; i++) {
-			atn.decisionToDFA[i] = new DFA(atn.decisionToState.get(i), i);
-		}
-
-		if (optimize) {
-			while (true) {
-				int optimizationCount = 0;
-				optimizationCount += inlineSetRules(atn);
-				optimizationCount += combineChainedEpsilons(atn);
-				boolean preserveOrder = atn.grammarType == ATNType.LEXER;
-				optimizationCount += optimizeSets(atn, preserveOrder);
-				if (optimizationCount == 0) {
-					break;
-				}
-			}
-		}
-
-		identifyTailCalls(atn);
-
-		verifyATN(atn);
-		return atn;
-	}
-
-	private static void verifyATN(ATN atn) {
-		// verify assumptions
-		for (ATNState state : atn.states) {
-			if (state == null) {
-				continue;
-			}
-
-			checkCondition(state.onlyHasEpsilonTransitions() || state.getNumberOfTransitions() <= 1);
-
-			if (state instanceof PlusBlockStartState) {
-				checkCondition(((PlusBlockStartState)state).loopBackState != null);
-			}
-
-			if (state instanceof StarLoopEntryState) {
-				StarLoopEntryState starLoopEntryState = (StarLoopEntryState)state;
-				checkCondition(starLoopEntryState.loopBackState != null);
-				checkCondition(starLoopEntryState.getNumberOfTransitions() == 2);
-
-				if (starLoopEntryState.transition(0).target instanceof StarBlockStartState) {
-					checkCondition(starLoopEntryState.transition(1).target instanceof LoopEndState);
-					checkCondition(!starLoopEntryState.nonGreedy);
-				}
-				else if (starLoopEntryState.transition(0).target instanceof LoopEndState) {
-					checkCondition(starLoopEntryState.transition(1).target instanceof StarBlockStartState);
-					checkCondition(starLoopEntryState.nonGreedy);
-				}
-				else {
-					throw new IllegalStateException();
-				}
-			}
-
-			if (state instanceof StarLoopbackState) {
-				checkCondition(state.getNumberOfTransitions() == 1);
-				checkCondition(state.transition(0).target instanceof StarLoopEntryState);
-			}
-
-			if (state instanceof LoopEndState) {
-				checkCondition(((LoopEndState)state).loopBackState != null);
-			}
-
-			if (state instanceof RuleStartState) {
-				checkCondition(((RuleStartState)state).stopState != null);
-			}
-
-			if (state instanceof BlockStartState) {
-				checkCondition(((BlockStartState)state).endState != null);
-			}
-
-			if (state instanceof BlockEndState) {
-				checkCondition(((BlockEndState)state).startState != null);
-			}
-
-			if (state instanceof DecisionState) {
-				DecisionState decisionState = (DecisionState)state;
-				checkCondition(decisionState.getNumberOfTransitions() <= 1 || decisionState.decision >= 0);
-			}
-			else {
-				checkCondition(state.getNumberOfTransitions() <= 1 || state instanceof RuleStopState);
-			}
-		}
-	}
-
+	/**
+	 * @deprecated Use {@link ATNDeserializer#checkCondition(boolean)} instead.
+	 */
+	@Deprecated
 	public static void checkCondition(boolean condition) {
-		checkCondition(condition, null);
+		new ATNDeserializer().checkCondition(condition);
 	}
 
+	/**
+	 * @deprecated Use {@link ATNDeserializer#checkCondition(boolean, String)} instead.
+	 */
+	@Deprecated
 	public static void checkCondition(boolean condition, String message) {
-		if (!condition) {
-			throw new IllegalStateException(message);
-		}
+		new ATNDeserializer().checkCondition(condition, message);
 	}
 
-	private static int inlineSetRules(ATN atn) {
-		int inlinedCalls = 0;
-
-		Transition[] ruleToInlineTransition = new Transition[atn.ruleToStartState.length];
-		for (int i = 0; i < atn.ruleToStartState.length; i++) {
-			RuleStartState startState = atn.ruleToStartState[i];
-			ATNState middleState = startState;
-			while (middleState.onlyHasEpsilonTransitions()
-				&& middleState.getNumberOfOptimizedTransitions() == 1
-				&& middleState.getOptimizedTransition(0).getSerializationType() == Transition.EPSILON)
-			{
-				middleState = middleState.getOptimizedTransition(0).target;
-			}
-
-			if (middleState.getNumberOfOptimizedTransitions() != 1) {
-				continue;
-			}
-
-			Transition matchTransition = middleState.getOptimizedTransition(0);
-			ATNState matchTarget = matchTransition.target;
-			if (matchTransition.isEpsilon()
-				|| !matchTarget.onlyHasEpsilonTransitions()
-				|| matchTarget.getNumberOfOptimizedTransitions() != 1
-				|| !(matchTarget.getOptimizedTransition(0).target instanceof RuleStopState))
-			{
-				continue;
-			}
-
-			switch (matchTransition.getSerializationType()) {
-			case Transition.ATOM:
-			case Transition.RANGE:
-			case Transition.SET:
-				ruleToInlineTransition[i] = matchTransition;
-				break;
-
-			case Transition.NOT_SET:
-			case Transition.WILDCARD:
-				// not implemented yet
-				continue;
-
-			default:
-				continue;
-			}
-		}
-
-		for (int stateNumber = 0; stateNumber < atn.states.size(); stateNumber++) {
-			ATNState state = atn.states.get(stateNumber);
-			if (state.ruleIndex < 0) {
-				continue;
-			}
-
-			List<Transition> optimizedTransitions = null;
-			for (int i = 0; i < state.getNumberOfOptimizedTransitions(); i++) {
-				Transition transition = state.getOptimizedTransition(i);
-				if (!(transition instanceof RuleTransition)) {
-					if (optimizedTransitions != null) {
-						optimizedTransitions.add(transition);
-					}
-
-					continue;
-				}
-
-				RuleTransition ruleTransition = (RuleTransition)transition;
-				Transition effective = ruleToInlineTransition[ruleTransition.target.ruleIndex];
-				if (effective == null) {
-					if (optimizedTransitions != null) {
-						optimizedTransitions.add(transition);
-					}
-
-					continue;
-				}
-
-				if (optimizedTransitions == null) {
-					optimizedTransitions = new ArrayList<Transition>();
-					for (int j = 0; j < i; j++) {
-						optimizedTransitions.add(state.getOptimizedTransition(i));
-					}
-				}
-
-				inlinedCalls++;
-				ATNState target = ruleTransition.followState;
-				ATNState intermediateState = new BasicState();
-				intermediateState.setRuleIndex(target.ruleIndex);
-				atn.addState(intermediateState);
-				optimizedTransitions.add(new EpsilonTransition(intermediateState));
-
-				switch (effective.getSerializationType()) {
-				case Transition.ATOM:
-					intermediateState.addTransition(new AtomTransition(target, ((AtomTransition)effective).label));
-					break;
-
-				case Transition.RANGE:
-					intermediateState.addTransition(new RangeTransition(target, ((RangeTransition)effective).from, ((RangeTransition)effective).to));
-					break;
-
-				case Transition.SET:
-					intermediateState.addTransition(new SetTransition(target, effective.label()));
-					break;
-
-				default:
-					throw new UnsupportedOperationException();
-				}
-			}
-
-			if (optimizedTransitions != null) {
-				if (state.isOptimized()) {
-					while (state.getNumberOfOptimizedTransitions() > 0) {
-						state.removeOptimizedTransition(state.getNumberOfOptimizedTransitions() - 1);
-					}
-				}
-
-				for (Transition transition : optimizedTransitions) {
-					state.addOptimizedTransition(transition);
-				}
-			}
-		}
-
-		if (ParserATNSimulator.debug) {
-			System.out.println("ATN runtime optimizer removed " + inlinedCalls + " rule invocations by inlining sets.");
-		}
-
-		return inlinedCalls;
-	}
-
-	private static int combineChainedEpsilons(ATN atn) {
-		int removedEdges = 0;
-
-		nextState:
-		for (ATNState state : atn.states) {
-			if (!state.onlyHasEpsilonTransitions() || state instanceof RuleStopState) {
-				continue;
-			}
-
-			List<Transition> optimizedTransitions = null;
-			nextTransition:
-			for (int i = 0; i < state.getNumberOfOptimizedTransitions(); i++) {
-				Transition transition = state.getOptimizedTransition(i);
-				ATNState intermediate = transition.target;
-				if (transition.getSerializationType() != Transition.EPSILON
-					|| intermediate.getStateType() != ATNState.BASIC
-					|| !intermediate.onlyHasEpsilonTransitions())
-				{
-					if (optimizedTransitions != null) {
-						optimizedTransitions.add(transition);
-					}
-
-					continue nextTransition;
-				}
-
-				for (int j = 0; j < intermediate.getNumberOfOptimizedTransitions(); j++) {
-					if (intermediate.getOptimizedTransition(j).getSerializationType() != Transition.EPSILON) {
-						if (optimizedTransitions != null) {
-							optimizedTransitions.add(transition);
-						}
-
-						continue nextTransition;
-					}
-				}
-
-				removedEdges++;
-				if (optimizedTransitions == null) {
-					optimizedTransitions = new ArrayList<Transition>();
-					for (int j = 0; j < i; j++) {
-						optimizedTransitions.add(state.getOptimizedTransition(j));
-					}
-				}
-
-				for (int j = 0; j < intermediate.getNumberOfOptimizedTransitions(); j++) {
-					ATNState target = intermediate.getOptimizedTransition(j).target;
-					optimizedTransitions.add(new EpsilonTransition(target));
-				}
-			}
-
-			if (optimizedTransitions != null) {
-				if (state.isOptimized()) {
-					while (state.getNumberOfOptimizedTransitions() > 0) {
-						state.removeOptimizedTransition(state.getNumberOfOptimizedTransitions() - 1);
-					}
-				}
-
-				for (Transition transition : optimizedTransitions) {
-					state.addOptimizedTransition(transition);
-				}
-			}
-		}
-
-		if (ParserATNSimulator.debug) {
-			System.out.println("ATN runtime optimizer removed " + removedEdges + " transitions by combining chained epsilon transitions.");
-		}
-
-		return removedEdges;
-	}
-
-	private static int optimizeSets(ATN atn, boolean preserveOrder) {
-		if (preserveOrder) {
-			// this optimization currently doesn't preserve edge order.
-			return 0;
-		}
-
-		int removedPaths = 0;
-		List<DecisionState> decisions = atn.decisionToState;
-		for (DecisionState decision : decisions) {
-			IntervalSet setTransitions = new IntervalSet();
-			for (int i = 0; i < decision.getNumberOfOptimizedTransitions(); i++) {
-				Transition epsTransition = decision.getOptimizedTransition(i);
-				if (!(epsTransition instanceof EpsilonTransition)) {
-					continue;
-				}
-
-				if (epsTransition.target.getNumberOfOptimizedTransitions() != 1) {
-					continue;
-				}
-
-				Transition transition = epsTransition.target.getOptimizedTransition(0);
-				if (!(transition.target instanceof BlockEndState)) {
-					continue;
-				}
-
-				if (transition instanceof NotSetTransition) {
-					// TODO: not yet implemented
-					continue;
-				}
-
-				if (transition instanceof AtomTransition
-					|| transition instanceof RangeTransition
-					|| transition instanceof SetTransition)
-				{
-					setTransitions.add(i);
-				}
-			}
-
-			if (setTransitions.size() <= 1) {
-				continue;
-			}
-
-			List<Transition> optimizedTransitions = new ArrayList<Transition>();
-			for (int i = 0; i < decision.getNumberOfOptimizedTransitions(); i++) {
-				if (!setTransitions.contains(i)) {
-					optimizedTransitions.add(decision.getOptimizedTransition(i));
-				}
-			}
-
-			ATNState blockEndState = decision.getOptimizedTransition(setTransitions.getMinElement()).target.getOptimizedTransition(0).target;
-			IntervalSet matchSet = new IntervalSet();
-			for (int i = 0; i < setTransitions.getIntervals().size(); i++) {
-				Interval interval = setTransitions.getIntervals().get(i);
-				for (int j = interval.a; j <= interval.b; j++) {
-					Transition matchTransition = decision.getOptimizedTransition(j).target.getOptimizedTransition(0);
-					if (matchTransition instanceof NotSetTransition) {
-						throw new UnsupportedOperationException("Not yet implemented.");
-					} else {
-						matchSet.addAll(matchTransition.label());
-					}
-				}
-			}
-
-			Transition newTransition;
-			if (matchSet.getIntervals().size() == 1) {
-				if (matchSet.size() == 1) {
-					newTransition = new AtomTransition(blockEndState, matchSet.getMinElement());
-				} else {
-					Interval matchInterval = matchSet.getIntervals().get(0);
-					newTransition = new RangeTransition(blockEndState, matchInterval.a, matchInterval.b);
-				}
-			} else {
-				newTransition = new SetTransition(blockEndState, matchSet);
-			}
-
-			ATNState setOptimizedState = new BasicState();
-			setOptimizedState.setRuleIndex(decision.ruleIndex);
-			atn.addState(setOptimizedState);
-
-			setOptimizedState.addTransition(newTransition);
-			optimizedTransitions.add(new EpsilonTransition(setOptimizedState));
-
-			removedPaths += decision.getNumberOfOptimizedTransitions() - optimizedTransitions.size();
-
-			if (decision.isOptimized()) {
-				while (decision.getNumberOfOptimizedTransitions() > 0) {
-					decision.removeOptimizedTransition(decision.getNumberOfOptimizedTransitions() - 1);
-				}
-			}
-
-			for (Transition transition : optimizedTransitions) {
-				decision.addOptimizedTransition(transition);
-			}
-		}
-
-		if (ParserATNSimulator.debug) {
-			System.out.println("ATN runtime optimizer removed " + removedPaths + " paths by collapsing sets.");
-		}
-
-		return removedPaths;
-	}
-
-	private static void identifyTailCalls(ATN atn) {
-		for (ATNState state : atn.states) {
-			for (Transition transition : state.transitions) {
-				if (!(transition instanceof RuleTransition)) {
-					continue;
-				}
-
-				RuleTransition ruleTransition = (RuleTransition)transition;
-				ruleTransition.tailCall = testTailCall(atn, ruleTransition, false);
-				ruleTransition.optimizedTailCall = testTailCall(atn, ruleTransition, true);
-			}
-
-			if (!state.isOptimized()) {
-				continue;
-			}
-
-			for (Transition transition : state.optimizedTransitions) {
-				if (!(transition instanceof RuleTransition)) {
-					continue;
-				}
-
-				RuleTransition ruleTransition = (RuleTransition)transition;
-				ruleTransition.tailCall = testTailCall(atn, ruleTransition, false);
-				ruleTransition.optimizedTailCall = testTailCall(atn, ruleTransition, true);
-			}
-		}
-	}
-
-	private static boolean testTailCall(ATN atn, RuleTransition transition, boolean optimizedPath) {
-		if (!optimizedPath && transition.tailCall) {
-			return true;
-		}
-		if (optimizedPath && transition.optimizedTailCall) {
-			return true;
-		}
-
-		BitSet reachable = new BitSet(atn.states.size());
-		Deque<ATNState> worklist = new ArrayDeque<ATNState>();
-		worklist.add(transition.followState);
-		while (!worklist.isEmpty()) {
-			ATNState state = worklist.pop();
-			if (reachable.get(state.stateNumber)) {
-				continue;
-			}
-
-			if (state instanceof RuleStopState) {
-				continue;
-			}
-
-			if (!state.onlyHasEpsilonTransitions()) {
-				return false;
-			}
-
-			List<Transition> transitions = optimizedPath ? state.optimizedTransitions : state.transitions;
-			for (Transition t : transitions) {
-				if (t.getSerializationType() != Transition.EPSILON) {
-					return false;
-				}
-
-				worklist.add(t.target);
-			}
-		}
-
-		return true;
-	}
-
+	/**
+	 * @deprecated Use {@link ATNDeserializer#toInt} instead.
+	 */
+	@Deprecated
 	public static int toInt(char c) {
-		return c;
+		return ATNDeserializer.toInt(c);
 	}
 
+	/**
+	 * @deprecated Use {@link ATNDeserializer#toInt32} instead.
+	 */
+	@Deprecated
 	public static int toInt32(char[] data, int offset) {
-		return (int)data[offset] | ((int)data[offset + 1] << 16);
+		return ATNDeserializer.toInt32(data, offset);
 	}
 
+	/**
+	 * @deprecated Use {@link ATNDeserializer#toLong} instead.
+	 */
+	@Deprecated
 	public static long toLong(char[] data, int offset) {
-		long lowOrder = toInt32(data, offset) & 0x00000000FFFFFFFFL;
-		return lowOrder | ((long)toInt32(data, offset + 2) << 32);
+		return ATNDeserializer.toLong(data, offset);
 	}
 
+	/**
+	 * @deprecated Use {@link ATNDeserializer#toUUID} instead.
+	 */
+	@Deprecated
 	public static UUID toUUID(char[] data, int offset) {
-		long leastSigBits = toLong(data, offset);
-		long mostSigBits = toLong(data, offset + 4);
-		return new UUID(mostSigBits, leastSigBits);
+		return ATNDeserializer.toUUID(data, offset);
 	}
 
+	/**
+	 * @deprecated Use {@link ATNDeserializer#edgeFactory} instead.
+	 */
+	@Deprecated
 	@NotNull
 	public static Transition edgeFactory(@NotNull ATN atn,
 										 int type, int src, int trg,
 										 int arg1, int arg2, int arg3,
 										 List<IntervalSet> sets)
 	{
-		ATNState target = atn.states.get(trg);
-		switch (type) {
-			case Transition.EPSILON : return new EpsilonTransition(target);
-			case Transition.RANGE :
-				if (arg3 != 0) {
-					return new RangeTransition(target, Token.EOF, arg2);
-				}
-				else {
-					return new RangeTransition(target, arg1, arg2);
-				}
-			case Transition.RULE :
-				RuleTransition rt = new RuleTransition((RuleStartState)atn.states.get(arg1), arg2, arg3, target);
-				return rt;
-			case Transition.PREDICATE :
-				PredicateTransition pt = new PredicateTransition(target, arg1, arg2, arg3 != 0);
-				return pt;
-			case Transition.PRECEDENCE:
-				return new PrecedencePredicateTransition(target, arg1);
-			case Transition.ATOM :
-				if (arg3 != 0) {
-					return new AtomTransition(target, Token.EOF);
-				}
-				else {
-					return new AtomTransition(target, arg1);
-				}
-			case Transition.ACTION :
-				ActionTransition a = new ActionTransition(target, arg1, arg2, arg3 != 0);
-				return a;
-			case Transition.SET : return new SetTransition(target, sets.get(arg1));
-			case Transition.NOT_SET : return new NotSetTransition(target, sets.get(arg1));
-			case Transition.WILDCARD : return new WildcardTransition(target);
-		}
-
-		throw new IllegalArgumentException("The specified transition type is not valid.");
+		return new ATNDeserializer().edgeFactory(atn, type, src, trg, arg1, arg2, arg3, sets);
 	}
 
+	/**
+	 * @deprecated Use {@link ATNDeserializer#stateFactory} instead.
+	 */
+	@Deprecated
 	public static ATNState stateFactory(int type, int ruleIndex) {
-		ATNState s;
-		switch (type) {
-			case ATNState.INVALID_TYPE: return null;
-			case ATNState.BASIC : s = new BasicState(); break;
-			case ATNState.RULE_START : s = new RuleStartState(); break;
-			case ATNState.BLOCK_START : s = new BasicBlockStartState(); break;
-			case ATNState.PLUS_BLOCK_START : s = new PlusBlockStartState(); break;
-			case ATNState.STAR_BLOCK_START : s = new StarBlockStartState(); break;
-			case ATNState.TOKEN_START : s = new TokensStartState(); break;
-			case ATNState.RULE_STOP : s = new RuleStopState(); break;
-			case ATNState.BLOCK_END : s = new BlockEndState(); break;
-			case ATNState.STAR_LOOP_BACK : s = new StarLoopbackState(); break;
-			case ATNState.STAR_LOOP_ENTRY : s = new StarLoopEntryState(); break;
-			case ATNState.PLUS_LOOP_BACK : s = new PlusLoopbackState(); break;
-			case ATNState.LOOP_END : s = new LoopEndState(); break;
-            default :
-				String message = String.format(Locale.getDefault(), "The specified state type %d is not valid.", type);
-				throw new IllegalArgumentException(message);
-		}
-
-		s.ruleIndex = ruleIndex;
-		return s;
+		return new ATNDeserializer().stateFactory(type, ruleIndex);
 	}
 
 /*

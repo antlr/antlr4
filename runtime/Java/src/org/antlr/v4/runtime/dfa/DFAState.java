@@ -32,6 +32,7 @@ package org.antlr.v4.runtime.dfa;
 
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.atn.LexerActionExecutor;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionContext;
 import org.antlr.v4.runtime.atn.SemanticContext;
@@ -89,8 +90,7 @@ public class DFAState {
 	 */
 	public int prediction;
 
-	public int lexerRuleIndex = -1;		// if accept, exec action in what rule?
-	public int lexerActionIndex = -1;	// if accept, exec what action?
+	public LexerActionExecutor lexerActionExecutor;
 
 	/** These keys for these edges are the top level element of the global context. */
 	@Nullable

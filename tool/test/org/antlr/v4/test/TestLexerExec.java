@@ -37,7 +37,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class TestLexerExec extends BaseTest {
     @Test public void testQuoteTranslation() throws Exception {
@@ -299,6 +300,23 @@ public class TestLexerExec extends BaseTest {
 			"line 3:16 token recognition error at: 'x'\n", stderrDuringParse);
 	}
 
+	@Test public void testActionPlacement() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : ({System.out.println(\"stuff0: \" + getText());} 'a' {System.out.println(\"stuff1: \" + getText());} | {System.out.println(\"stuff fail: \" + getText());} 'a' {System.out.println(\"stuff1: \" + getText());} 'b' {System.out.println(\"stuff2: \" + getText());}) {System.out.println(getText());} ;\n"+
+			"WS : (' '|'\\n') -> skip ;\n" +
+			"J : .;\n";
+		String found = execLexer("L.g4", grammar, "L", "ab");
+		String expecting =
+			"stuff0: \n" +
+			"stuff1: a\n" +
+			"a\n" +
+			"[@0,0:0='a',<1>,1:0]\n" +
+			"[@1,1:1='b',<3>,1:1]\n" +
+			"[@2,2:1='<EOF>',<-1>,1:2]\n";
+		assertEquals(expecting, found);
+	}
+
 	@Test public void testGreedyConfigs() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
@@ -327,128 +345,6 @@ public class TestLexerExec extends BaseTest {
 			"[@0,0:0='a',<1>,1:0]\n" +
 			"[@1,1:1='b',<3>,1:1]\n" +
 			"[@2,2:1='<EOF>',<-1>,1:2]\n";
-		assertEquals(expecting, found);
-	}
-
-	@Test public void testActionExecutedInDFA() throws Exception {
-		String grammar =
-			"lexer grammar L;\n"+
-			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
-			"WS : (' '|'\\n') -> skip ;";
-		String found = execLexer("L.g4", grammar, "L", "34 34");
-		String expecting =
-			"I\n" +
-			"I\n" +
-			"[@0,0:1='34',<1>,1:0]\n" +
-			"[@1,3:4='34',<1>,1:3]\n" +
-			"[@2,5:4='<EOF>',<-1>,1:5]\n";
-		assertEquals(expecting, found);
-	}
-
-	@Test public void testSkipCommand() throws Exception {
-		String grammar =
-			"lexer grammar L;\n"+
-			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
-			"WS : (' '|'\\n') -> skip ;";
-		String found = execLexer("L.g4", grammar, "L", "34 34");
-		String expecting =
-			"I\n" +
-			"I\n" +
-			"[@0,0:1='34',<1>,1:0]\n" +
-			"[@1,3:4='34',<1>,1:3]\n" +
-			"[@2,5:4='<EOF>',<-1>,1:5]\n";
-		assertEquals(expecting, found);
-	}
-
-	@Test public void testMoreCommand() throws Exception {
-		String grammar =
-			"lexer grammar L;\n"+
-			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
-			"WS : '#' -> more ;";
-		String found = execLexer("L.g4", grammar, "L", "34#10");
-		String expecting =
-			"I\n" +
-			"I\n" +
-			"[@0,0:1='34',<1>,1:0]\n" +
-			"[@1,2:4='#10',<1>,1:2]\n" +
-			"[@2,5:4='<EOF>',<-1>,1:5]\n";
-		assertEquals(expecting, found);
-	}
-
-	@Test public void testTypeCommand() throws Exception {
-		String grammar =
-			"lexer grammar L;\n"+
-			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
-			"HASH : '#' -> type(HASH) ;";
-		String found = execLexer("L.g4", grammar, "L", "34#");
-		String expecting =
-			"I\n" +
-			"[@0,0:1='34',<1>,1:0]\n" +
-			"[@1,2:2='#',<2>,1:2]\n" +
-			"[@2,3:2='<EOF>',<-1>,1:3]\n";
-		assertEquals(expecting, found);
-	}
-
-	@Test public void testCombinedCommand() throws Exception {
-		String grammar =
-			"lexer grammar L;\n"+
-			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
-			"HASH : '#' -> type(100), skip, more  ;";
-		String found = execLexer("L.g4", grammar, "L", "34#11");
-		String expecting =
-			"I\n" +
-			"I\n" +
-			"[@0,0:1='34',<1>,1:0]\n" +
-			"[@1,2:4='#11',<1>,1:2]\n" +
-			"[@2,5:4='<EOF>',<-1>,1:5]\n";
-		assertEquals(expecting, found);
-	}
-
-	@Test public void testLexerMode() throws Exception {
-		String grammar =
-			"lexer grammar L;\n" +
-			"STRING_START : '\"' -> pushMode(STRING_MODE), more;\n" +
-			"WS : (' '|'\\n') -> skip ;\n"+
-			"mode STRING_MODE;\n"+
-			"STRING : '\"' -> popMode;\n"+
-			"ANY : . -> more;\n";
-		String found = execLexer("L.g4", grammar, "L", "\"abc\" \"ab\"");
-		String expecting =
-			"[@0,0:4='\"abc\"',<2>,1:0]\n" +
-			"[@1,6:9='\"ab\"',<2>,1:6]\n" +
-			"[@2,10:9='<EOF>',<-1>,1:10]\n";
-		assertEquals(expecting, found);
-	}
-
-	@Test public void testLexerPushPopModeAction() throws Exception {
-		String grammar =
-			"lexer grammar L;\n" +
-			"STRING_START : '\"' -> pushMode(STRING_MODE), more ;\n" +
-			"WS : (' '|'\\n') -> skip ;\n"+
-			"mode STRING_MODE;\n"+
-			"STRING : '\"' -> popMode ;\n"+  // token type 2
-			"ANY : . -> more ;\n";
-		String found = execLexer("L.g4", grammar, "L", "\"abc\" \"ab\"");
-		String expecting =
-			"[@0,0:4='\"abc\"',<2>,1:0]\n" +
-			"[@1,6:9='\"ab\"',<2>,1:6]\n" +
-			"[@2,10:9='<EOF>',<-1>,1:10]\n";
-		assertEquals(expecting, found);
-	}
-
-	@Test public void testLexerModeAction() throws Exception {
-		String grammar =
-			"lexer grammar L;\n" +
-			"STRING_START : '\"' -> mode(STRING_MODE), more ;\n" +
-			"WS : (' '|'\\n') -> skip ;\n"+
-			"mode STRING_MODE;\n"+
-			"STRING : '\"' -> mode(DEFAULT_MODE) ;\n"+ // ttype 2 since '"' ambiguity
-			"ANY : . -> more ;\n";
-		String found = execLexer("L.g4", grammar, "L", "\"abc\" \"ab\"");
-		String expecting =
-			"[@0,0:4='\"abc\"',<2>,1:0]\n" +
-			"[@1,6:9='\"ab\"',<2>,1:6]\n" +
-			"[@2,10:9='<EOF>',<-1>,1:10]\n";
 		assertEquals(expecting, found);
 	}
 

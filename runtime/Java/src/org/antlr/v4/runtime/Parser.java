@@ -30,6 +30,8 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNDeserializationOptions;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
@@ -43,10 +45,14 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.tree.pattern.ParseTreePattern;
+import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
 public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
@@ -100,6 +106,15 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
 	/**
+	 * This field maps from the serialized ATN string to the deserialized {@link ATN} with
+	 * bypass alternatives.
+	 *
+	 * @see ATNDeserializationOptions#isGenerateRuleBypassTransitions()
+	 */
+	private static final Map<String, ATN> bypassAltsAtnCache =
+		new WeakHashMap<String, ATN>();
+
+	/**
 	 * The error handling strategy for the parser. The default value is a new
 	 * instance of {@link DefaultErrorStrategy}.
 	 *
@@ -136,6 +151,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 * @see #setBuildParseTree
 	 */
 	protected boolean _buildParseTrees = true;
+
 
 	/**
 	 * When {@link #setTrace}{@code (true)} is called, a reference to the
@@ -430,6 +446,66 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return _input.getTokenSource().getTokenFactory();
 	}
 
+	/**
+	 * The ATN with bypass alternatives is expensive to create so we create it
+	 * lazily.
+	 *
+	 * @throws UnsupportedOperationException if the current parser does not
+	 * implement the {@link #getSerializedATN()} method.
+	 */
+	@NotNull
+	public ATN getATNWithBypassAlts() {
+		String serializedAtn = getSerializedATN();
+		if (serializedAtn == null) {
+			throw new UnsupportedOperationException("The current parser does not support an ATN with bypass alternatives.");
+		}
+
+		synchronized (bypassAltsAtnCache) {
+			ATN result = bypassAltsAtnCache.get(serializedAtn);
+			if (result == null) {
+				ATNDeserializationOptions deserializationOptions = new ATNDeserializationOptions();
+				deserializationOptions.setGenerateRuleBypassTransitions(true);
+				result = new ATNDeserializer(deserializationOptions).deserialize(serializedAtn.toCharArray());
+				bypassAltsAtnCache.put(serializedAtn, result);
+			}
+
+			return result;
+		}
+	}
+
+	/**
+	 * The preferred method of getting a tree pattern. For example, here's a
+	 * sample use:
+	 *
+	 * <pre>
+	 * ParseTree t = parser.expr();
+	 * ParseTreePattern p = parser.compileParseTreePattern("<ID>+0", MyParser.RULE_expr);
+	 * ParseTreeMatch m = p.match(t);
+	 * String id = m.get("ID");
+	 * </pre>
+	 */
+	public ParseTreePattern compileParseTreePattern(String pattern, int patternRuleIndex) {
+		if ( getInputStream()!=null ) {
+			TokenSource tokenSource = getInputStream().getTokenSource();
+			if ( tokenSource instanceof Lexer ) {
+				Lexer lexer = (Lexer)tokenSource;
+				return compileParseTreePattern(pattern, patternRuleIndex, lexer);
+			}
+		}
+		throw new UnsupportedOperationException("Parser can't discover a lexer to use");
+	}
+
+	/**
+	 * The same as {@link #compileParseTreePattern(String, int)} but specify a
+	 * {@link Lexer} rather than trying to deduce it from this parser.
+	 */
+	public ParseTreePattern compileParseTreePattern(String pattern, int patternRuleIndex,
+													Lexer lexer)
+	{
+		ParseTreePatternMatcher m = new ParseTreePatternMatcher(lexer, this);
+		return m.compile(pattern, patternRuleIndex);
+	}
+
 	@NotNull
 	public ANTLRErrorStrategy getErrorHandler() {
 		return _errHandler;
@@ -586,7 +662,31 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		_ctx = localctx;
 	}
 
-	public void enterRecursionRule(ParserRuleContext localctx, int ruleIndex, int precedence) {
+	/**
+	 * Get the precedence level for the top-most precedence rule.
+	 *
+	 * @return The precedence level for the top-most precedence rule, or -1 if
+	 * the parser context is not nested within a precedence rule.
+	 */
+	public final int getPrecedence() {
+		if (_precedenceStack.isEmpty()) {
+			return -1;
+		}
+
+		return _precedenceStack.peek();
+	}
+
+	/**
+	 * @deprecated Use
+	 * {@link #enterRecursionRule(ParserRuleContext, int, int, int)} instead.
+	 */
+	@Deprecated
+	public void enterRecursionRule(ParserRuleContext localctx, int ruleIndex) {
+		enterRecursionRule(localctx, getATN().ruleToStartState[ruleIndex].stateNumber, ruleIndex, 0);
+	}
+
+	public void enterRecursionRule(ParserRuleContext localctx, int state, int ruleIndex, int precedence) {
+		setState(state);
 		_precedenceStack.push(precedence);
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
@@ -651,6 +751,10 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 
 	public ParserRuleContext getContext() {
 		return _ctx;
+	}
+
+	public void setContext(ParserRuleContext ctx) {
+		_ctx = ctx;
 	}
 
 	@Override
@@ -731,15 +835,12 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
    		return atn.nextTokens(s);
    	}
 
-//	/** Compute the set of valid tokens reachable from the current
-//	 *  position in the parse.
-//	 */
-//	public IntervalSet nextTokens(@NotNull RuleContext ctx) {
-//		ATN atn = getInterpreter().atn;
-//		ATNState s = atn.states.get(ctx.s);
-//		if ( s == null ) return null;
-//		return atn.nextTokens(s, ctx);
-//	}
+	/** Get a rule's index (i.e., {@code RULE_ruleName} field) or -1 if not found. */
+	public int getRuleIndex(String ruleName) {
+		Integer ruleIndex = getRuleIndexMap().get(ruleName);
+		if ( ruleIndex!=null ) return ruleIndex;
+		return -1;
+	}
 
 	public ParserRuleContext getRuleContext() { return _ctx; }
 

@@ -72,6 +72,28 @@ public abstract class SemanticContext {
 	 */
     public abstract <T> boolean eval(Recognizer<T, ?> parser, RuleContext outerContext);
 
+	/**
+	 * Evaluate the precedence predicates for the context and reduce the result.
+	 *
+	 * @param parser The parser instance.
+	 * @param outerContext The current parser context object.
+	 * @return The simplified semantic context after precedence predicates are
+	 * evaluated, which will be one of the following values.
+	 * <ul>
+	 * <li>{@link #NONE}: if the predicate simplifies to {@code true} after
+	 * precedence predicates are evaluated.</li>
+	 * <li>{@code null}: if the predicate simplifies to {@code false} after
+	 * precedence predicates are evaluated.</li>
+	 * <li>{@code this}: if the semantic context is not changed as a result of
+	 * precedence predicate evaluation.</li>
+	 * <li>A non-{@code null} {@link SemanticContext}: the new simplified
+	 * semantic context after precedence predicates are evaluated.</li>
+	 * </ul>
+	 */
+	public SemanticContext evalPrecedence(Recognizer<?,?> parser, RuleContext outerContext) {
+		return this;
+	}
+
     public static class Predicate extends SemanticContext {
         public final int ruleIndex;
        	public final int predIndex;
@@ -135,6 +157,16 @@ public abstract class SemanticContext {
 		@Override
 		public <T> boolean eval(Recognizer<T, ?> parser, RuleContext outerContext) {
 			return parser.precpred(outerContext, precedence);
+		}
+
+		@Override
+		public SemanticContext evalPrecedence(Recognizer<?, ?> parser, RuleContext outerContext) {
+			if (parser.precpred(outerContext, precedence)) {
+				return SemanticContext.NONE;
+			}
+			else {
+				return null;
+			}
 		}
 
 		@Override
@@ -211,6 +243,40 @@ public abstract class SemanticContext {
         }
 
 		@Override
+		public SemanticContext evalPrecedence(Recognizer<?, ?> parser, RuleContext outerContext) {
+			boolean differs = false;
+			List<SemanticContext> operands = new ArrayList<SemanticContext>();
+			for (SemanticContext context : opnds) {
+				SemanticContext evaluated = context.evalPrecedence(parser, outerContext);
+				differs |= (evaluated != context);
+				if (evaluated == null) {
+					// The AND context is false if any element is false
+					return null;
+				}
+				else if (evaluated != NONE) {
+					// Reduce the result by skipping true elements
+					operands.add(evaluated);
+				}
+			}
+
+			if (!differs) {
+				return this;
+			}
+
+			if (operands.isEmpty()) {
+				// all elements were true, so the AND context is true
+				return NONE;
+			}
+
+			SemanticContext result = operands.get(0);
+			for (int i = 1; i < operands.size(); i++) {
+				result = SemanticContext.and(result, operands.get(i));
+			}
+
+			return result;
+		}
+
+		@Override
 		public String toString() {
 			return Utils.join(opnds, "&&");
         }
@@ -256,6 +322,40 @@ public abstract class SemanticContext {
 			}
 			return false;
         }
+
+		@Override
+		public SemanticContext evalPrecedence(Recognizer<?, ?> parser, RuleContext outerContext) {
+			boolean differs = false;
+			List<SemanticContext> operands = new ArrayList<SemanticContext>();
+			for (SemanticContext context : opnds) {
+				SemanticContext evaluated = context.evalPrecedence(parser, outerContext);
+				differs |= (evaluated != context);
+				if (evaluated == NONE) {
+					// The OR context is true if any element is true
+					return NONE;
+				}
+				else if (evaluated != null) {
+					// Reduce the result by skipping false elements
+					operands.add(evaluated);
+				}
+			}
+
+			if (!differs) {
+				return this;
+			}
+
+			if (operands.isEmpty()) {
+				// all elements were false, so the OR context is false
+				return null;
+			}
+
+			SemanticContext result = operands.get(0);
+			for (int i = 1; i < operands.size(); i++) {
+				result = SemanticContext.or(result, operands.get(i));
+			}
+
+			return result;
+		}
 
         @Override
         public String toString() {
