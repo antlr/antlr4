@@ -377,4 +377,35 @@ public class TestParserExec extends BaseTest {
 		assertEquals("(file (item a) <EOF>)\n", found);
 		assertNull(stderrDuringParse);
 	}
+
+	/**
+	 * This is a regressino test for antlr/antlr4#299 "Repeating subtree not
+	 * accessible in visitor".
+	 * https://github.com/antlr/antlr4/issues/299
+	 */
+	@Test public void testListLabelForClosureContext() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"ifStatement\n" +
+			"@after { List<? extends ElseIfStatementContext> items = $ctx.elseIfStatement(); }\n" +
+			"    : 'if' expression\n" +
+			"      ( ( 'then'\n" +
+			"          executableStatement*\n" +
+			"          elseIfStatement*  // <--- problem is here\n" +
+			"          elseStatement?\n" +
+			"          'end' 'if'\n" +
+			"        ) | executableStatement )\n" +
+			"    ;\n" +
+			"\n" +
+			"elseIfStatement\n" +
+			"    : 'else' 'if' expression 'then' executableStatement*\n" +
+			"    ;\n"
+			+ "expression : 'a' ;\n"
+			+ "executableStatement : 'a' ;\n"
+			+ "elseStatement : 'a' ;\n";
+		String input = "a";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "expression", input, false);
+		assertEquals("", found);
+		assertNull(stderrDuringParse);
+	}
 }
