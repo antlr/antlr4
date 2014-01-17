@@ -33,6 +33,7 @@ package org.antlr.v4.misc;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /** I need the get-element-i functionality so I'm subclassing
  *  LinkedHashMap.
@@ -49,6 +50,13 @@ public class OrderedHashMap<K,V> extends LinkedHashMap<K,V> {
 	public V put(K key, V value) {
 		elements.add(key);
 		return super.put(key, value);
+	}
+
+	@Override
+	public void putAll(Map<? extends K, ? extends V> m) {
+		for (Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {
+			put(entry.getKey(), entry.getValue());
+		}
 	}
 
 	@Override
