@@ -154,6 +154,29 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("S.a\n", found);
 	}
 
+	@Test public void testDelegatorInvokesFirstVersionOfDelegateRuleMultipleImports() throws Exception {
+		String slave =
+			"parser grammar S;\n" +
+			"a : b {System.out.println(\"S.a\");} ;\n" +
+			"b : B ;\n" ;
+		mkdir(tmpdir);
+		writeFile(tmpdir, "S.g4", slave);
+		String slave2 =
+			"parser grammar T;\n" +
+			"a : B {System.out.println(\"T.a\");} ;\n"; // hidden by S.a
+		writeFile(tmpdir, "T.g4", slave2);
+		String master =
+			"grammar M;\n" +
+			"import S;\n" +
+			"import T;\n" +
+			"s : a ;\n" +
+			"B : 'b' ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n" ;
+		String found = execParser("M.g4", master, "MParser", "MLexer",
+								  "s", "b", debug);
+		assertEquals("S.a\n", found);
+	}
+
 	@Test public void testDelegatesSeeSameTokenType() throws Exception {
 		String slave =
 			"parser grammar S;\n" + // A, B, C token type order
@@ -210,6 +233,49 @@ public class TestCompositeGrammars extends BaseTest {
 		String master =
 			"grammar M;\n" +
 			"import S,T;\n" +
+			"s : x y ;\n" + // matches AA, which should be "aa"
+			"B : 'b' ;\n" + // another order: B, A, C
+			"A : 'a' ;\n" +
+			"C : 'c' ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n" ;
+		writeFile(tmpdir, "M.g4", master);
+		Grammar g = new Grammar(tmpdir+"/M.g4", master, equeue);
+
+		String expectedTokenIDToTypeMap = "{EOF=-1, B=1, A=2, C=3, WS=4}";
+		String expectedStringLiteralToTypeMap = "{'a'=2, 'b'=1, 'c'=3}";
+		String expectedTypeToTokenList = "[B, A, C, WS]";
+
+		assertEquals(expectedTokenIDToTypeMap, g.tokenNameToTypeMap.toString());
+		assertEquals(expectedStringLiteralToTypeMap, sort(g.stringLiteralToTypeMap).toString());
+		assertEquals(expectedTypeToTokenList, realElements(g.typeToTokenList).toString());
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+
+		String found = execParser("M.g4", master, "MParser", "MLexer",
+								  "s", "aa", debug);
+		assertEquals("S.x\n" +
+					 "T.y\n", found);
+	}
+
+	@Test public void testDelegatesSeeSameTokenType2MultipleImports() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		String slave =
+			"parser grammar S;\n" + // A, B, C token type order
+			"tokens { A, B, C }\n" +
+			"x : A {System.out.println(\"S.x\");} ;\n";
+		mkdir(tmpdir);
+		writeFile(tmpdir, "S.g4", slave);
+		String slave2 =
+			"parser grammar T;\n" +
+			"tokens { C, B, A }\n" + // reverse order
+			"y : A {System.out.println(\"T.y\");} ;\n";
+		mkdir(tmpdir);
+		writeFile(tmpdir, "T.g4", slave2);
+
+		String master =
+			"grammar M;\n" +
+			"import S;\n" +
+			"import T;\n" +
 			"s : x y ;\n" + // matches AA, which should be "aa"
 			"B : 'b' ;\n" + // another order: B, A, C
 			"A : 'a' ;\n" +
