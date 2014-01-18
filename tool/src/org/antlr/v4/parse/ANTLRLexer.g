@@ -541,7 +541,8 @@ NameStartChar
             |   '\u2C00'..'\u2FEF'
             |   '\u3001'..'\uD7FF'
             |   '\uF900'..'\uFDCF'
-            |   '\uFDF0'..'\uFFFD'
+            |   '\uFDF0'..'\uFEFE'
+            |   '\uFF00'..'\uFFFD'
             ; // ignores | ['\u10000-'\uEFFFF] ;
 
 // ----------------------------
@@ -755,6 +756,15 @@ WSCHARS
 fragment
 WSNLCHARS
     : ' ' | '\t' | '\f' | '\n' | '\r'
+    ;
+
+// This rule allows ANTLR 4 to parse grammars using the UTF-8 encoding with a
+// byte order mark. Since this Unicode character doesn't appear as a token
+// anywhere else in the grammar, we can simply skip all instances of it without
+// problem. This rule will not break usage of \uFEFF inside a LEXER_CHAR_SET or
+// STRING_LITERAL.
+UnicodeBOM
+    :   '\uFEFF' {skip();}
     ;
 
 // -----------------
