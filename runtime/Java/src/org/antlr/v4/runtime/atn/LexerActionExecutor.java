@@ -82,8 +82,8 @@ public class LexerActionExecutor {
 	 *
 	 * @param lexerActionExecutor The executor for actions already traversed by
 	 * the lexer while matching a token within a particular
-	 * {@link LexerATNConfig}. If this is {@code null}, the method behaves as
-	 * though it were an empty executor.
+	 * {@link ATNConfig}. If this is {@code null}, the method behaves as though
+	 * it were an empty executor.
 	 * @param lexerAction The lexer action to execute after the actions
 	 * specified in {@code lexerActionExecutor}.
 	 *

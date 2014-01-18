@@ -59,7 +59,7 @@ public interface LexerAction {
 	 * Many lexer commands, including {@code type}, {@code skip}, and
 	 * {@code more}, do not check the input index during their execution.
 	 * Actions like this are position-independent, and may be stored more
-	 * efficiently as part of the {@link LexerATNConfig#lexerActionExecutor}.
+	 * efficiently as part of the {@link ATNConfig#getLexerActionExecutor()}.
 	 *
 	 * @return {@code true} if the lexer action semantics can be affected by the
 	 * position of the input {@link CharStream} at the time it is executed;
