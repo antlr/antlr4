@@ -524,9 +524,28 @@ public class LexerATNSimulator extends ATNSimulator {
 				break;
 
 			case Transition.ACTION:
-				LexerActionExecutor lexerActionExecutor = LexerActionExecutor.append(config.lexerActionExecutor, atn.lexerActions[((ActionTransition)t).actionIndex]);
-				c = new LexerATNConfig(config, t.target, lexerActionExecutor);
-				break;
+				if (config.context == null || config.context.hasEmptyPath()) {
+					// execute actions anywhere in the start rule for a token.
+					//
+					// TODO: if the entry rule is invoked recursively, some
+					// actions may be executed during the recursive call. The
+					// problem can appear when hasEmptyPath() is true but
+					// isEmpty() is false. In this case, the config needs to be
+					// split into two contexts - one with just the empty path
+					// and another with everything but the empty path.
+					// Unfortunately, the current algorithm does not allow
+					// getEpsilonTarget to return two configurations, so
+					// additional modifications are needed before we can support
+					// the split operation.
+					LexerActionExecutor lexerActionExecutor = LexerActionExecutor.append(config.lexerActionExecutor, atn.lexerActions[((ActionTransition)t).actionIndex]);
+					c = new LexerATNConfig(config, t.target, lexerActionExecutor);
+					break;
+				}
+				else {
+					// ignore actions in referenced rules
+					c = new LexerATNConfig(config, t.target);
+					break;
+				}
 
 			case Transition.EPSILON:
 				c = new LexerATNConfig(config, t.target);
