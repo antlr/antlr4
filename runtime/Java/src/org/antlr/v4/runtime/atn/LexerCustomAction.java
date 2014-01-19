@@ -41,10 +41,10 @@ import org.antlr.v4.runtime.misc.NotNull;
  * rule and action indexes assigned to the custom action. The implementation of
  * a custom action is added to the generated code for the lexer in an override
  * of {@link Recognizer#action} when the grammar is compiled.
- * <p/>
- * This class may represent embedded actions created with the <code>{...}</code>
+ *
+ * <p>This class may represent embedded actions created with the <code>{...}</code>
  * syntax in ANTLR 4, as well as actions created for lexer commands where the
- * command argument could not be evaluated when the grammar was compiled.
+ * command argument could not be evaluated when the grammar was compiled.</p>
  *
  * @author Sam Harwell
  * @since 4.2
@@ -99,10 +99,10 @@ public final class LexerCustomAction implements LexerAction {
 	 * Gets whether the lexer action is position-dependent. Position-dependent
 	 * actions may have different semantics depending on the {@link CharStream}
 	 * index at the time the action is executed.
-	 * <p/>
-	 * Custom actions are position-dependent since they may represent a
+	 *
+	 * <p>Custom actions are position-dependent since they may represent a
 	 * user-defined embedded action which makes calls to methods like
-	 * {@link Lexer#getText}.
+	 * {@link Lexer#getText}.</p>
 	 *
 	 * @return This method returns {@code true}.
 	 */
@@ -113,9 +113,9 @@ public final class LexerCustomAction implements LexerAction {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * Custom actions are implemented by calling {@link Lexer#action} with the
-	 * appropriate rule and action indexes.
+	 *
+	 * <p>Custom actions are implemented by calling {@link Lexer#action} with the
+	 * appropriate rule and action indexes.</p>
 	 */
 	@Override
 	public void execute(@NotNull Lexer lexer) {

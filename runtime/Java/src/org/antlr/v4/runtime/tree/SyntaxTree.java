@@ -44,8 +44,8 @@ public interface SyntaxTree extends Tree {
 	 * {@link TokenStream} of the first and last token associated with this
 	 * subtree. If this node is a leaf, then the interval represents a single
 	 * token.
-	 * <p/>
-	 * If source interval is unknown, this returns {@link Interval#INVALID}.
+	 *
+	 * <p>If source interval is unknown, this returns {@link Interval#INVALID}.</p>
 	 */
 	@NotNull
 	Interval getSourceInterval();

@@ -228,7 +228,7 @@ import java.util.Set;
  must yield a set of ambiguous alternatives that is no larger
  than the SLL set. If the LL set is a singleton, then the grammar
  is LL but not SLL. If the LL set is the same size as the SLL
- set, the decision is SLL. If the LL set has size > 1, then that
+ set, the decision is SLL. If the LL set has size &gt; 1, then that
  decision is truly ambiguous on the current input. If the LL set
  is smaller, then the SLL conflict resolution might choose an
  alternative that the full LL would rule out as a possibility
@@ -271,8 +271,8 @@ public class ParserATNSimulator extends ATNSimulator {
 	 *  Don't keep around as it wastes huge amounts of memory. DoubleKeyMap
 	 *  isn't synchronized but we're ok since two threads shouldn't reuse same
 	 *  parser/atnsim object because it can only handle one input at a time.
-	 *  This maps graphs a and b to merged result c. (a,b)->c. We can avoid
-	 *  the merge if we ever see a and b again.  Note that (b,a)->c should
+	 *  This maps graphs a and b to merged result c. (a,b)&rarr;c. We can avoid
+	 *  the merge if we ever see a and b again.  Note that (b,a)&rarr;c should
 	 *  also be examined during cache lookup.
 	 */
 	protected DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache;
@@ -885,11 +885,11 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * {@code configs} which are in a {@link RuleStopState}. If all
 	 * configurations in {@code configs} are already in a rule stop state, this
 	 * method simply returns {@code configs}.
-	 * <p/>
-	 * When {@code lookToEndOfRule} is true, this method uses
+	 *
+	 * <p>When {@code lookToEndOfRule} is true, this method uses
 	 * {@link ATN#nextTokens} for each configuration in {@code configs} which is
 	 * not already in a rule stop state to see if a rule stop state is reachable
-	 * from the configuration via epsilon-only transitions.
+	 * from the configuration via epsilon-only transitions.</p>
 	 *
 	 * @param configs the configuration set to update
 	 * @param lookToEndOfRule when true, this method checks for rule stop states
@@ -1451,7 +1451,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 we don't consider any conflicts that include alternative 2. So, we
 	 ignore the conflict between alts 1 and 2. We ignore a set of
 	 conflicting alts when there is an intersection with an alternative
-	 associated with a single alt state in the state->config-list map.
+	 associated with a single alt state in the state&rarr;config-list map.
 
 	 It's also the case that we might have two conflicting configurations but
 	 also a 3rd nonconflicting configuration for a different alternative:
@@ -1558,10 +1558,10 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * DFA. If {@code from} is {@code null}, or if {@code t} is outside the
 	 * range of edges that can be represented in the DFA tables, this method
 	 * returns without adding the edge to the DFA.
-	 * <p/>
-	 * If {@code to} is {@code null}, this method returns {@code null}.
+	 *
+	 * <p>If {@code to} is {@code null}, this method returns {@code null}.
 	 * Otherwise, this method returns the {@link DFAState} returned by calling
-	 * {@link #addDFAState} for the {@code to} state.
+	 * {@link #addDFAState} for the {@code to} state.</p>
 	 *
 	 * @param dfa The DFA
 	 * @param from The source state for the edge
@@ -1610,9 +1610,9 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * the actual instance stored in the DFA. If a state equivalent to {@code D}
 	 * is already in the DFA, the existing state is returned. Otherwise this
 	 * method returns {@code D} after adding it to the DFA.
-	 * <p/>
-	 * If {@code D} is {@link #ERROR}, this method returns {@link #ERROR} and
-	 * does not change the DFA.
+	 *
+	 * <p>If {@code D} is {@link #ERROR}, this method returns {@link #ERROR} and
+	 * does not change the DFA.</p>
 	 *
 	 * @param dfa The dfa
 	 * @param D The DFA state to add

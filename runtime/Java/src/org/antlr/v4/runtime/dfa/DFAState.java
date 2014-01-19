@@ -52,7 +52,7 @@ import java.util.Set;
  *  input a1a2..an, the DFA is in a state that represents the
  *  subset T of the states of the ATN that are reachable from the
  *  ATN's start state along some path labeled a1a2..an."
- *  In conventional NFA->DFA conversion, therefore, the subset T
+ *  In conventional NFA&rarr;DFA conversion, therefore, the subset T
  *  would be a bitset representing the set of states the
  *  ATN could be in.  We need to track the alt predicted by each
  *  state as well, however.  More importantly, we need to maintain
@@ -60,14 +60,14 @@ import java.util.Set;
  *  jump from rule to rule, emulating rule invocations (method calls).
  *  I have to add a stack to simulate the proper lookahead sequences for
  *  the underlying LL grammar from which the ATN was derived.
- * <p/>
- *  I use a set of ATNConfig objects not simple states.  An ATNConfig
+ *
+ *  <p>I use a set of ATNConfig objects not simple states.  An ATNConfig
  *  is both a state (ala normal conversion) and a RuleContext describing
- *  the chain of rules (if any) followed to arrive at that state.
- * <p/>
- *  A DFA state may have multiple references to a particular state,
+ *  the chain of rules (if any) followed to arrive at that state.</p>
+ *
+ *  <p>A DFA state may have multiple references to a particular state,
  *  but with different ATN contexts (with same or different alts)
- *  meaning that state was reached via a different set of rule invocations.
+ *  meaning that state was reached via a different set of rule invocations.</p>
  */
 public class DFAState {
 	public int stateNumber = -1;
@@ -104,12 +104,12 @@ public class DFAState {
 	 *  {@link #requiresFullContext} is {@code false} since full context prediction evaluates predicates
 	 *  on-the-fly. If this is not null, then {@link #prediction} is
 	 *  {@link ATN#INVALID_ALT_NUMBER}.
-	 * <p/>
-	 *  We only use these for non-{@link #requiresFullContext} but conflicting states. That
+	 *
+	 *  <p>We only use these for non-{@link #requiresFullContext} but conflicting states. That
 	 *  means we know from the context (it's $ or we don't dip into outer
-	 *  context) that it's an ambiguity not a conflict.
-	 * <p/>
-	 *  This list is computed by {@link ParserATNSimulator#predicateDFAState}.
+	 *  context) that it's an ambiguity not a conflict.</p>
+	 *
+	 *  <p>This list is computed by {@link ParserATNSimulator#predicateDFAState}.</p>
 	 */
 	@Nullable
 	public PredPrediction[] predicates;
@@ -160,15 +160,15 @@ public class DFAState {
 	/**
 	 * Two {@link DFAState} instances are equal if their ATN configuration sets
 	 * are the same. This method is used to see if a state already exists.
-	 * <p/>
-	 * Because the number of alternatives and number of ATN configurations are
+	 *
+	 * <p>Because the number of alternatives and number of ATN configurations are
 	 * finite, there is a finite number of DFA states that can be processed.
-	 * This is necessary to show that the algorithm terminates.
-	 * <p/>
-	 * Cannot test the DFA state numbers here because in
+	 * This is necessary to show that the algorithm terminates.</p>
+	 *
+	 * <p>Cannot test the DFA state numbers here because in
 	 * {@link ParserATNSimulator#addDFAState} we need to know if any other state
 	 * exists that has this exact set of ATN configurations. The
-	 * {@link #stateNumber} is irrelevant.
+	 * {@link #stateNumber} is irrelevant.</p>
 	 */
 	@Override
 	public boolean equals(Object o) {

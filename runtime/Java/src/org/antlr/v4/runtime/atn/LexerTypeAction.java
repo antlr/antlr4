@@ -80,9 +80,9 @@ public class LexerTypeAction implements LexerAction {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * This action is implemented by calling {@link Lexer#setType} with the
-	 * value provided by {@link #getType}.
+	 *
+	 * <p>This action is implemented by calling {@link Lexer#setType} with the
+	 * value provided by {@link #getType}.</p>
 	 */
 	@Override
 	public void execute(@NotNull Lexer lexer) {

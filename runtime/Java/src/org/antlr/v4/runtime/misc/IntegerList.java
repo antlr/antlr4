@@ -234,10 +234,10 @@ public class IntegerList {
 
 	/**
 	 * Returns the hash code value for this list.
-	 * <p/>
-	 * This implementation uses exactly the code that is used to define the
+	 *
+	 * <p>This implementation uses exactly the code that is used to define the
 	 * list hash function in the documentation for the {@link List#hashCode}
-	 * method.
+	 * method.</p>
 	 *
 	 * @return the hash code value for this list
 	 */

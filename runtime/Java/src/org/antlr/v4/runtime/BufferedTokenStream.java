@@ -45,11 +45,11 @@ import java.util.Set;
  * because it has to constantly flip back and forth between inside/output
  * templates. E.g., {@code <names:{hi, <it>}>} has to parse names as part of an
  * expression but {@code "hi, <it>"} as a nested template.
- * <p/>
- * You can't use this stream if you pass whitespace or other off-channel tokens
+ *
+ * <p>You can't use this stream if you pass whitespace or other off-channel tokens
  * to the parser. The stream can't ignore off-channel tokens.
  * ({@link UnbufferedTokenStream} is the same way.) Use
- * {@link CommonTokenStream}.
+ * {@link CommonTokenStream}.</p>
  */
 public class BufferedTokenStream implements TokenStream {
 	@NotNull
@@ -222,9 +222,9 @@ public class BufferedTokenStream implements TokenStream {
 	 * operation. The default implementation simply returns {@code i}. If an
 	 * exception is thrown in this method, the current stream index should not be
 	 * changed.
-	 * <p/>
-	 * For example, {@link CommonTokenStream} overrides this method to ensure that
-	 * the seek target is always an on-channel token.
+	 *
+	 * <p>For example, {@link CommonTokenStream} overrides this method to ensure that
+	 * the seek target is always an on-channel token.</p>
 	 *
 	 * @param i The target token index.
 	 * @return The adjusted target token index.

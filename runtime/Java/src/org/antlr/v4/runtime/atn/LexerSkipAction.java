@@ -36,9 +36,9 @@ import org.antlr.v4.runtime.misc.NotNull;
 
 /**
  * Implements the {@code skip} lexer action by calling {@link Lexer#skip}.
- * <p/>
- * The {@code skip} command does not have any parameters, so this action is
- * implemented as a singleton instance exposed by {@link #INSTANCE}.
+ *
+ * <p>The {@code skip} command does not have any parameters, so this action is
+ * implemented as a singleton instance exposed by {@link #INSTANCE}.</p>
  *
  * @author Sam Harwell
  * @since 4.2
@@ -75,8 +75,8 @@ public final class LexerSkipAction implements LexerAction {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * This action is implemented by calling {@link Lexer#skip}.
+	 *
+	 * <p>This action is implemented by calling {@link Lexer#skip}.</p>
 	 */
 	@Override
 	public void execute(@NotNull Lexer lexer) {
