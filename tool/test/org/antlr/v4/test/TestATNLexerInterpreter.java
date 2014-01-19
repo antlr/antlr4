@@ -70,12 +70,12 @@ public class TestATNLexerInterpreter extends BaseTest {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
 			"A : 'xy'\n" +
-			"  | 'xyz'\n" +  // this alt shouldn't be reachable since the alts are ordered
+			"  | 'xyz'\n" + // this alt is preferred since there are no non-greedy configs
 			"  ;\n" +
 			"Z : 'z'\n" +
 			"  ;\n");
 		checkLexerMatches(lg, "xy", "A, EOF");
-		checkLexerMatches(lg, "xyz", "A, Z, EOF");
+		checkLexerMatches(lg, "xyz", "A, EOF");
 	}
 
 	@Test public void testShortLongRule2() throws Exception {
@@ -104,12 +104,12 @@ public class TestATNLexerInterpreter extends BaseTest {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
 			"A : 'xy'\n" +
-			"  | 'xy' .\n" +  // should not pursue '.' since alts are ordered
+			"  | 'xy' .\n" +  // this alt is preferred since there are no non-greedy configs
 			"  ;\n" +
 			"Z : 'z'\n" +
 			"  ;\n");
 		checkLexerMatches(lg, "xy", "A, EOF");
-		checkLexerMatches(lg, "xyz", "A, Z, EOF");
+		checkLexerMatches(lg, "xyz", "A, EOF");
 	}
 
 	@Test public void testWildcardNonQuirkWhenSplitBetweenTwoRules() throws Exception {

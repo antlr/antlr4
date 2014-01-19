@@ -248,7 +248,7 @@ public enum PredictionMode {
 				// dup configs, tossing out semantic predicates
 				ATNConfigSet dup = new ATNConfigSet();
 				for (ATNConfig c : configs) {
-					c = c.transform(c.getState(), SemanticContext.NONE);
+					c = c.transform(c.getState(), SemanticContext.NONE, false);
 					dup.add(c);
 				}
 				configs = dup;

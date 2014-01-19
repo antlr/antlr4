@@ -90,14 +90,14 @@ public class ATNConfig {
 	public static ATNConfig create(@NotNull ATNState state, int alt, @Nullable PredictionContext context, @NotNull SemanticContext semanticContext, LexerActionExecutor lexerActionExecutor) {
 		if (semanticContext != SemanticContext.NONE) {
 			if (lexerActionExecutor != null) {
-				return new ActionSemanticContextATNConfig(lexerActionExecutor, semanticContext, state, alt, context);
+				return new ActionSemanticContextATNConfig(lexerActionExecutor, semanticContext, state, alt, context, false);
 			}
 			else {
 				return new SemanticContextATNConfig(semanticContext, state, alt, context);
 			}
 		}
 		else if (lexerActionExecutor != null) {
-			return new ActionATNConfig(lexerActionExecutor, state, alt, context);
+			return new ActionATNConfig(lexerActionExecutor, state, alt, context, false);
 		}
 		else {
 			return new ATNConfig(state, alt, context);
@@ -171,53 +171,63 @@ public class ATNConfig {
 		return SemanticContext.NONE;
 	}
 
+	public boolean hasPassedThroughNonGreedyDecision() {
+		return false;
+	}
+
 	@Override
 	public final ATNConfig clone() {
-		return transform(this.getState());
+		return transform(this.getState(), false);
 	}
 
-	public final ATNConfig transform(@NotNull ATNState state) {
-		return transform(state, this.context, this.getSemanticContext(), this.getLexerActionExecutor());
+	public final ATNConfig transform(@NotNull ATNState state, boolean checkNonGreedy) {
+		return transform(state, this.context, this.getSemanticContext(), checkNonGreedy, this.getLexerActionExecutor());
 	}
 
-	public final ATNConfig transform(@NotNull ATNState state, @NotNull SemanticContext semanticContext) {
-		return transform(state, this.context, semanticContext, this.getLexerActionExecutor());
+	public final ATNConfig transform(@NotNull ATNState state, @NotNull SemanticContext semanticContext, boolean checkNonGreedy) {
+		return transform(state, this.context, semanticContext, checkNonGreedy, this.getLexerActionExecutor());
 	}
 
-	public final ATNConfig transform(@NotNull ATNState state, @Nullable PredictionContext context) {
-		return transform(state, context, this.getSemanticContext(), this.getLexerActionExecutor());
+	public final ATNConfig transform(@NotNull ATNState state, @Nullable PredictionContext context, boolean checkNonGreedy) {
+		return transform(state, context, this.getSemanticContext(), checkNonGreedy, this.getLexerActionExecutor());
 	}
 
-	public final ATNConfig transform(@NotNull ATNState state, LexerActionExecutor lexerActionExecutor) {
-		return transform(state, context, this.getSemanticContext(), lexerActionExecutor);
+	public final ATNConfig transform(@NotNull ATNState state, LexerActionExecutor lexerActionExecutor, boolean checkNonGreedy) {
+		return transform(state, context, this.getSemanticContext(), checkNonGreedy, lexerActionExecutor);
 	}
 
-	private ATNConfig transform(@NotNull ATNState state, @Nullable PredictionContext context, @NotNull SemanticContext semanticContext, LexerActionExecutor lexerActionExecutor) {
+	private ATNConfig transform(@NotNull ATNState state, @Nullable PredictionContext context, @NotNull SemanticContext semanticContext, boolean checkNonGreedy, LexerActionExecutor lexerActionExecutor) {
+		boolean passedThroughNonGreedy = checkNonGreedy && checkNonGreedyDecision(this, state);
 		if (semanticContext != SemanticContext.NONE) {
-			if (lexerActionExecutor != null) {
-				return new ActionSemanticContextATNConfig(lexerActionExecutor, semanticContext, this, state, context);
+			if (lexerActionExecutor != null || passedThroughNonGreedy) {
+				return new ActionSemanticContextATNConfig(lexerActionExecutor, semanticContext, this, state, context, passedThroughNonGreedy);
 			}
 			else {
 				return new SemanticContextATNConfig(semanticContext, this, state, context);
 			}
 		}
-		else if (lexerActionExecutor != null) {
-			return new ActionATNConfig(lexerActionExecutor, this, state, context);
+		else if (lexerActionExecutor != null || passedThroughNonGreedy) {
+			return new ActionATNConfig(lexerActionExecutor, this, state, context, passedThroughNonGreedy);
 		}
 		else {
 			return new ATNConfig(this, state, context);
 		}
 	}
 
+	private static boolean checkNonGreedyDecision(ATNConfig source, ATNState target) {
+		return source.hasPassedThroughNonGreedyDecision()
+			|| target instanceof DecisionState && ((DecisionState)target).nonGreedy;
+	}
+
 	public ATNConfig appendContext(int context, PredictionContextCache contextCache) {
 		PredictionContext appendedContext = getContext().appendContext(context, contextCache);
-		ATNConfig result = transform(getState(), appendedContext);
+		ATNConfig result = transform(getState(), appendedContext, false);
 		return result;
 	}
 
 	public ATNConfig appendContext(PredictionContext context, PredictionContextCache contextCache) {
 		PredictionContext appendedContext = getContext().appendContext(context, contextCache);
-		ATNConfig result = transform(getState(), appendedContext);
+		ATNConfig result = transform(getState(), appendedContext, false);
 		return result;
 	}
 
@@ -288,6 +298,7 @@ public class ATNConfig {
 			&& this.getReachesIntoOuterContext() == other.getReachesIntoOuterContext()
 			&& this.getContext().equals(other.getContext())
 			&& this.getSemanticContext().equals(other.getSemanticContext())
+			&& this.hasPassedThroughNonGreedyDecision() == other.hasPassedThroughNonGreedyDecision()
 			&& ObjectEqualityComparator.INSTANCE.equals(this.getLexerActionExecutor(), other.getLexerActionExecutor());
 	}
 
@@ -299,8 +310,9 @@ public class ATNConfig {
 		hashCode = MurmurHash.update(hashCode, getReachesIntoOuterContext() ? 1 : 0);
 		hashCode = MurmurHash.update(hashCode, getContext());
 		hashCode = MurmurHash.update(hashCode, getSemanticContext());
+		hashCode = MurmurHash.update(hashCode, hasPassedThroughNonGreedyDecision() ? 1 : 0);
 		hashCode = MurmurHash.update(hashCode, getLexerActionExecutor());
-		hashCode = MurmurHash.finish(hashCode, 6);
+		hashCode = MurmurHash.finish(hashCode, 7);
         return hashCode;
     }
 
@@ -408,19 +420,22 @@ public class ATNConfig {
 	private static class ActionATNConfig extends ATNConfig {
 
 		private final LexerActionExecutor lexerActionExecutor;
+		private final boolean passedThroughNonGreedyDecision;
 
-		public ActionATNConfig(LexerActionExecutor lexerActionExecutor, @NotNull ATNState state, int alt, @Nullable PredictionContext context) {
+		public ActionATNConfig(LexerActionExecutor lexerActionExecutor, @NotNull ATNState state, int alt, @Nullable PredictionContext context, boolean passedThroughNonGreedyDecision) {
 			super(state, alt, context);
 			this.lexerActionExecutor = lexerActionExecutor;
+			this.passedThroughNonGreedyDecision = passedThroughNonGreedyDecision;
 		}
 
-		protected ActionATNConfig(LexerActionExecutor lexerActionExecutor, @NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context) {
+		protected ActionATNConfig(LexerActionExecutor lexerActionExecutor, @NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context, boolean passedThroughNonGreedyDecision) {
 			super(c, state, context);
 			if (c.getSemanticContext() != SemanticContext.NONE) {
 				throw new UnsupportedOperationException();
 			}
 
 			this.lexerActionExecutor = lexerActionExecutor;
+			this.passedThroughNonGreedyDecision = passedThroughNonGreedyDecision;
 		}
 
 		@Override
@@ -428,20 +443,27 @@ public class ATNConfig {
 			return lexerActionExecutor;
 		}
 
+		@Override
+		public boolean hasPassedThroughNonGreedyDecision() {
+			return passedThroughNonGreedyDecision;
+		}
 	}
 
 	private static class ActionSemanticContextATNConfig extends SemanticContextATNConfig {
 
 		private final LexerActionExecutor lexerActionExecutor;
+		private final boolean passedThroughNonGreedyDecision;
 
-		public ActionSemanticContextATNConfig(LexerActionExecutor lexerActionExecutor, @NotNull SemanticContext semanticContext, @NotNull ATNState state, int alt, @Nullable PredictionContext context) {
+		public ActionSemanticContextATNConfig(LexerActionExecutor lexerActionExecutor, @NotNull SemanticContext semanticContext, @NotNull ATNState state, int alt, @Nullable PredictionContext context, boolean passedThroughNonGreedyDecision) {
 			super(semanticContext, state, alt, context);
 			this.lexerActionExecutor = lexerActionExecutor;
+			this.passedThroughNonGreedyDecision = passedThroughNonGreedyDecision;
 		}
 
-		public ActionSemanticContextATNConfig(LexerActionExecutor lexerActionExecutor, @NotNull SemanticContext semanticContext, @NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context) {
+		public ActionSemanticContextATNConfig(LexerActionExecutor lexerActionExecutor, @NotNull SemanticContext semanticContext, @NotNull ATNConfig c, @NotNull ATNState state, @Nullable PredictionContext context, boolean passedThroughNonGreedyDecision) {
 			super(semanticContext, c, state, context);
 			this.lexerActionExecutor = lexerActionExecutor;
+			this.passedThroughNonGreedyDecision = passedThroughNonGreedyDecision;
 		}
 
 		@Override
@@ -449,6 +471,10 @@ public class ATNConfig {
 			return lexerActionExecutor;
 		}
 
+		@Override
+		public boolean hasPassedThroughNonGreedyDecision() {
+			return passedThroughNonGreedyDecision;
+		}
 	}
 
 }

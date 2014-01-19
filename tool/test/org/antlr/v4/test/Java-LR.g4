@@ -877,10 +877,10 @@ WHILE : 'while';
 // §3.10.1 Integer Literals
 
 IntegerLiteral
-	:	HexIntegerLiteral
+	:	DecimalIntegerLiteral
+	|	HexIntegerLiteral
 	|	OctalIntegerLiteral
 	|	BinaryIntegerLiteral
-	|	DecimalIntegerLiteral
 	;
 
 fragment

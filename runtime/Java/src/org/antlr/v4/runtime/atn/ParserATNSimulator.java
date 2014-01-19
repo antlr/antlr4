@@ -915,7 +915,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					Transition trans = c.getState().getOptimizedTransition(ti);
 					ATNState target = getReachableTarget(c, trans, t);
 					if ( target!=null ) {
-						reachIntermediate.add(c.transform(target), contextCache);
+						reachIntermediate.add(c.transform(target, false), contextCache);
 					}
 				}
 			}
@@ -1227,7 +1227,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 			statesFromAlt1.add(config.getState().stateNumber);
 			if (updatedContext != config.getSemanticContext()) {
-				configSet.add(config.transform(config.getState(), updatedContext), contextCache);
+				configSet.add(config.transform(config.getState(), updatedContext, false), contextCache);
 			}
 			else {
 				configSet.add(config, contextCache);
@@ -1450,7 +1450,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					return;
 				}
 
-				config = config.transform(config.getState(), PredictionContext.EMPTY_LOCAL);
+				config = config.transform(config.getState(), PredictionContext.EMPTY_LOCAL, false);
 			}
 			else if (!hasMoreContexts) {
 				configs.add(config, contextCache);
@@ -1463,7 +1463,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 				if (config.getContext() == PredictionContext.EMPTY_FULL) {
 					// no need to keep full context overhead when we step out
-					config = config.transform(config.getState(), PredictionContext.EMPTY_LOCAL);
+					config = config.transform(config.getState(), PredictionContext.EMPTY_LOCAL, false);
 				}
 			}
 		}
@@ -1555,7 +1555,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			return actionTransition(config, (ActionTransition)t);
 
 		case Transition.EPSILON:
-			return config.transform(t.target);
+			return config.transform(t.target, false);
 
 		default:
 			return null;
@@ -1565,7 +1565,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	@NotNull
 	protected ATNConfig actionTransition(@NotNull ATNConfig config, @NotNull ActionTransition t) {
 		if ( debug ) System.out.println("ACTION edge "+t.ruleIndex+":"+t.actionIndex);
-		return config.transform(t.target);
+		return config.transform(t.target, false);
 	}
 
 	@Nullable
@@ -1587,10 +1587,10 @@ public class ParserATNSimulator extends ATNSimulator {
         ATNConfig c = null;
         if (collectPredicates && inContext) {
             SemanticContext newSemCtx = SemanticContext.and(config.getSemanticContext(), pt.getPredicate());
-            c = config.transform(pt.target, newSemCtx);
+            c = config.transform(pt.target, newSemCtx, false);
         }
 		else {
-			c = config.transform(pt.target);
+			c = config.transform(pt.target, false);
 		}
 
 		if ( debug ) System.out.println("config from pred transition="+c);
@@ -1618,10 +1618,10 @@ public class ParserATNSimulator extends ATNSimulator {
 			 (!pt.isCtxDependent || (pt.isCtxDependent&&inContext)) )
 		{
             SemanticContext newSemCtx = SemanticContext.and(config.getSemanticContext(), pt.getPredicate());
-            c = config.transform(pt.target, newSemCtx);
+            c = config.transform(pt.target, newSemCtx, false);
         }
 		else {
-			c = config.transform(pt.target);
+			c = config.transform(pt.target, false);
 		}
 
 		if ( debug ) System.out.println("config from pred transition="+c);
@@ -1648,7 +1648,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			newContext = config.getContext().getChild(returnState.stateNumber);
 		}
 
-		return config.transform(t.target, newContext);
+		return config.transform(t.target, newContext, false);
 	}
 
 	private static final Comparator<ATNConfig> STATE_ALT_SORT_COMPARATOR =

@@ -303,17 +303,17 @@ public class TestLexerExec extends BaseTest {
 	@Test public void testActionPlacement() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"I : ({System.out.println(\"stuff0: \" + getText());} 'a' {System.out.println(\"stuff1: \" + getText());} | {System.out.println(\"stuff fail: \" + getText());} 'a' {System.out.println(\"stuff1: \" + getText());} 'b' {System.out.println(\"stuff2: \" + getText());}) {System.out.println(getText());} ;\n"+
+			"I : ({System.out.println(\"stuff fail: \" + getText());} 'a' | {System.out.println(\"stuff0: \" + getText());} 'a' {System.out.println(\"stuff1: \" + getText());} 'b' {System.out.println(\"stuff2: \" + getText());}) {System.out.println(getText());} ;\n"+
 			"WS : (' '|'\\n') -> skip ;\n" +
 			"J : .;\n";
 		String found = execLexer("L.g4", grammar, "L", "ab");
 		String expecting =
 			"stuff0: \n" +
 			"stuff1: a\n" +
-			"a\n" +
-			"[@0,0:0='a',<1>,1:0]\n" +
-			"[@1,1:1='b',<3>,1:1]\n" +
-			"[@2,2:1='<EOF>',<-1>,1:2]\n";
+			"stuff2: ab\n" +
+			"ab\n" +
+			"[@0,0:1='ab',<1>,1:0]\n" +
+			"[@1,2:1='<EOF>',<-1>,1:2]\n";
 		assertEquals(expecting, found);
 	}
 
@@ -325,10 +325,9 @@ public class TestLexerExec extends BaseTest {
 			"J : .;\n";
 		String found = execLexer("L.g4", grammar, "L", "ab");
 		String expecting =
-			"a\n" +
-			"[@0,0:0='a',<1>,1:0]\n" +
-			"[@1,1:1='b',<3>,1:1]\n" +
-			"[@2,2:1='<EOF>',<-1>,1:2]\n";
+			"ab\n" +
+			"[@0,0:1='ab',<1>,1:0]\n" +
+			"[@1,2:1='<EOF>',<-1>,1:2]\n";
 		assertEquals(expecting, found);
 	}
 
