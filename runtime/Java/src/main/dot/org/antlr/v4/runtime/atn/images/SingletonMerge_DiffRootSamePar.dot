@@ -25,7 +25,7 @@ digraph "" {
         temp2b;
         temp2c;
 
-        temp2b -> temp2c[constraint="false";label="wwwwwww"];
+        temp2b -> temp2c[constraint="false";label="wwwwwww";fontcolor="invis"];
     }
 
     subgraph clusterRes {
