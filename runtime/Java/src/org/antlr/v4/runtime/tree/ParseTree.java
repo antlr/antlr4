@@ -38,8 +38,8 @@ import org.antlr.v4.runtime.Token;
  *  during a parse that makes the data structure look like a simple parse tree.
  *  This node represents both internal nodes, rule invocations,
  *  and leaf nodes, token matches.
- * <p/>
- *  The payload is either a {@link Token} or a {@link RuleContext} object.
+ *
+ *  <p>The payload is either a {@link Token} or a {@link RuleContext} object.</p>
  */
 public interface ParseTree extends SyntaxTree {
 	// the following methods narrow the return type; they are not additional methods

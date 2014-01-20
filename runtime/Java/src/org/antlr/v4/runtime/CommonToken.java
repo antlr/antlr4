@@ -52,7 +52,7 @@ public class CommonToken implements WritableToken, Serializable {
 	// TODO: can store these in map in token stream rather than as field here
 	protected String text;
 
-	/** What token number is this from 0..n-1 tokens; < 0 implies invalid index */
+	/** What token number is this from 0..n-1 tokens; &lt; 0 implies invalid index */
 	protected int index = -1;
 
 	/** The char position into the input buffer where this token starts */

@@ -52,16 +52,16 @@ public interface TokenStream extends IntStream {
 	/**
 	 * Gets the {@link Token} at the specified {@code index} in the stream. When
 	 * the preconditions of this method are met, the return value is non-null.
-	 * <p/>
-	 * The preconditions for this method are the same as the preconditions of
+	 *
+	 * <p>The preconditions for this method are the same as the preconditions of
 	 * {@link IntStream#seek}. If the behavior of {@code seek(index)} is
 	 * unspecified for the current state and given {@code index}, then the
-	 * behavior of this method is also unspecified.
-	 * <p/>
-	 * The symbol referred to by {@code index} differs from {@code seek()} only
+	 * behavior of this method is also unspecified.</p>
+	 *
+	 * <p>The symbol referred to by {@code index} differs from {@code seek()} only
 	 * in the case of filtering streams where {@code index} lies before the end
 	 * of the stream. Unlike {@code seek()}, this method does not adjust
-	 * {@code index} to point to a non-ignored symbol.
+	 * {@code index} to point to a non-ignored symbol.</p>
 	 *
 	 * @throws IllegalArgumentException if {code index} is less than 0
 	 * @throws UnsupportedOperationException if the stream does not support
@@ -86,7 +86,7 @@ public interface TokenStream extends IntStream {
 	 * <pre>
 	 * TokenStream stream = ...;
 	 * String text = "";
-	 * for (int i = interval.a; i <= interval.b; i++) {
+	 * for (int i = interval.a; i &lt;= interval.b; i++) {
 	 *   text += stream.get(i).getText();
 	 * }
 	 * </pre>
@@ -122,9 +122,9 @@ public interface TokenStream extends IntStream {
 	 * context. This method behaves like the following code, including potential
 	 * exceptions from the call to {@link #getText(Interval)}, but may be
 	 * optimized by the specific implementation.
-	 * </p>
-	 * If {@code ctx.getSourceInterval()} does not return a valid interval of
-	 * tokens provided by this stream, the behavior is unspecified.
+	 *
+	 * <p>If {@code ctx.getSourceInterval()} does not return a valid interval of
+	 * tokens provided by this stream, the behavior is unspecified.</p>
 	 *
 	 * <pre>
 	 * TokenStream stream = ...;
@@ -141,20 +141,20 @@ public interface TokenStream extends IntStream {
 	/**
 	 * Return the text of all tokens in this stream between {@code start} and
 	 * {@code stop} (inclusive).
-	 * <p/>
-	 * If the specified {@code start} or {@code stop} token was not provided by
+	 *
+	 * <p>If the specified {@code start} or {@code stop} token was not provided by
 	 * this stream, or if the {@code stop} occurred before the {@code start}
-	 * token, the behavior is unspecified.
-	 * <p/>
-	 * For streams which ensure that the {@link Token#getTokenIndex} method is
+	 * token, the behavior is unspecified.</p>
+	 *
+	 * <p>For streams which ensure that the {@link Token#getTokenIndex} method is
 	 * accurate for all of its provided tokens, this method behaves like the
 	 * following code. Other streams may implement this method in other ways
-	 * provided the behavior is consistent with this at a high level.
+	 * provided the behavior is consistent with this at a high level.</p>
 	 *
 	 * <pre>
 	 * TokenStream stream = ...;
 	 * String text = "";
-	 * for (int i = start.getTokenIndex(); i <= stop.getTokenIndex(); i++) {
+	 * for (int i = start.getTokenIndex(); i &lt;= stop.getTokenIndex(); i++) {
 	 *   text += stream.get(i).getText();
 	 * }
 	 * </pre>

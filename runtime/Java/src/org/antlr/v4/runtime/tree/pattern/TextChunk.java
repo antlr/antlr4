@@ -69,9 +69,9 @@ class TextChunk extends Chunk {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * The implementation for {@link TextChunk} returns the result of
-	 * {@link #getText()} in single quotes.
+	 *
+	 * <p>The implementation for {@link TextChunk} returns the result of
+	 * {@link #getText()} in single quotes.</p>
 	 */
 	@Override
 	public String toString() {

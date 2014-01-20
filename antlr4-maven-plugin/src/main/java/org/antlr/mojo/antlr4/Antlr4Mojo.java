@@ -212,9 +212,9 @@ public class Antlr4Mojo extends AbstractMojo {
      * The main entry point for this Mojo, it is responsible for converting
      * ANTLR 4.x grammars into the target language specified by the grammar.
      *
-     * @throws MojoExecutionException if a configuration or grammar error causes
+     * @exception MojoExecutionException if a configuration or grammar error causes
      * the code generation process to fail
-     * @throws MojoFailureException if an instance of the ANTLR 4 {@link Tool}
+     * @exception MojoFailureException if an instance of the ANTLR 4 {@link Tool}
      * cannot be created
      */
     @Override
@@ -353,7 +353,7 @@ public class Antlr4Mojo extends AbstractMojo {
     /**
      *
      * @param sourceDirectory
-     * @throws InclusionScanException
+     * @exception InclusionScanException
      */
     @NotNull
     private List<List<String>> processGrammarFiles(List<String> args, File sourceDirectory) throws InclusionScanException {

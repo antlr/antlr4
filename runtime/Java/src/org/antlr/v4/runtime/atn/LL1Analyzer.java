@@ -87,11 +87,11 @@ public class LL1Analyzer {
 	/**
 	 * Compute set of tokens that can follow {@code s} in the ATN in the
 	 * specified {@code ctx}.
-	 * <p/>
-	 * If {@code ctx} is {@code null} and the end of the rule containing
+	 *
+	 * <p>If {@code ctx} is {@code null} and the end of the rule containing
 	 * {@code s} is reached, {@link Token#EPSILON} is added to the result set.
 	 * If {@code ctx} is not {@code null} and the end of the outermost rule is
-	 * reached, {@link Token#EOF} is added to the result set.
+	 * reached, {@link Token#EOF} is added to the result set.</p>
 	 *
 	 * @param s the ATN state
 	 * @param ctx the complete parser context, or {@code null} if the context
@@ -108,11 +108,11 @@ public class LL1Analyzer {
 	/**
 	 * Compute set of tokens that can follow {@code s} in the ATN in the
 	 * specified {@code ctx}.
-	 * <p/>
-	 * If {@code ctx} is {@code null} and the end of the rule containing
+	 *
+	 * <p>If {@code ctx} is {@code null} and the end of the rule containing
 	 * {@code s} is reached, {@link Token#EPSILON} is added to the result set.
 	 * If {@code ctx} is not {@code null} and the end of the outermost rule is
-	 * reached, {@link Token#EOF} is added to the result set.
+	 * reached, {@link Token#EOF} is added to the result set.</p>
 	 *
 	 * @param s the ATN state
 	 * @param stopState the ATN state to stop at. This can be a
@@ -136,12 +136,12 @@ public class LL1Analyzer {
 	/**
 	 * Compute set of tokens that can follow {@code s} in the ATN in the
 	 * specified {@code ctx}.
-	 * <p/>
-	 * If {@code ctx} is {@code null} and {@code stopState} or the end of the
+	 *
+	 * <p>If {@code ctx} is {@code null} and {@code stopState} or the end of the
 	 * rule containing {@code s} is reached, {@link Token#EPSILON} is added to
 	 * the result set. If {@code ctx} is not {@code null} and {@code addEOF} is
 	 * {@code true} and {@code stopState} or the end of the outermost rule is
-	 * reached, {@link Token#EOF} is added to the result set.
+	 * reached, {@link Token#EOF} is added to the result set.</p>
 	 *
 	 * @param s the ATN state.
 	 * @param stopState the ATN state to stop at. This can be a

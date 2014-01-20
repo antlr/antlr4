@@ -59,7 +59,7 @@ public class ATNSerializer {
 		this.tokenNames = tokenNames;
 	}
 
-	/** Serialize state descriptors, edge descriptors, and decision->state map
+	/** Serialize state descriptors, edge descriptors, and decision&rarr;state map
 	 *  into list of ints:
 	 *
 	 * 		grammar-type, (ANTLRParser.LEXER, ...)

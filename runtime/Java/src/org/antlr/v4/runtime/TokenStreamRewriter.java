@@ -184,11 +184,11 @@ public class TokenStreamRewriter {
 
 	/** You may have multiple, named streams of rewrite operations.
 	 *  I'm calling these things "programs."
-	 *  Maps String (name) -> rewrite (List)
+	 *  Maps String (name) &rarr; rewrite (List)
 	 */
 	protected final Map<String, List<RewriteOperation>> programs;
 
-	/** Map String (program name) -> Integer index */
+	/** Map String (program name) &rarr; Integer index */
 	protected final Map<String, Integer> lastRewriteTokenIndexes;
 
 	public TokenStreamRewriter(TokenStream tokens) {
@@ -456,7 +456,7 @@ public class TokenStreamRewriter {
 	 * 		3. throw exception if index in same range as previous replace
 	 *
 	 *  Don't actually delete; make op null in list. Easier to walk list.
-	 *  Later we can throw as we add to index -> op map.
+	 *  Later we can throw as we add to index &rarr; op map.
 	 *
 	 *  Note that I.2 R.2-2 will wipe out I.2 even though, technically, the
 	 *  inserted stuff would be before the replace range.  But, if you

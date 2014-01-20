@@ -82,9 +82,9 @@ public final class LexerChannelAction implements LexerAction {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * This action is implemented by calling {@link Lexer#setChannel} with the
-	 * value provided by {@link #getChannel}.
+	 *
+	 * <p>This action is implemented by calling {@link Lexer#setChannel} with the
+	 * value provided by {@link #getChannel}.</p>
 	 */
 	@Override
 	public void execute(@NotNull Lexer lexer) {

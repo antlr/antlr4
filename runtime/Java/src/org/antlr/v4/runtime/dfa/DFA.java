@@ -62,7 +62,7 @@ public class DFA {
 	/**
 	 * {@code true} if this DFA is for a precedence decision; otherwise,
 	 * {@code false}. This is the backing field for {@link #isPrecedenceDfa},
-	 * {@link #setPrecedenceDfa}, {@link #hasPrecedenceEdge}.
+	 * {@link #setPrecedenceDfa}.
 	 */
 	private volatile boolean precedenceDfa;
 

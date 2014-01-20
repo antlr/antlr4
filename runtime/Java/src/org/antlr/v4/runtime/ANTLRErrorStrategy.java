@@ -46,8 +46,8 @@ import org.antlr.v4.runtime.misc.NotNull;
  *
  * Implementations of this interface report syntax errors by calling
  * {@link Parser#notifyErrorListeners}.
- * <p/>
- * TODO: what to do about lexers
+ *
+ * <p>TODO: what to do about lexers</p>
  */
 public interface ANTLRErrorStrategy {
 	/**
@@ -62,10 +62,10 @@ public interface ANTLRErrorStrategy {
 	 * strategy successfully recovers from the match failure, this method
 	 * returns the {@link Token} instance which should be treated as the
 	 * successful result of the match.
-	 * <p/>
-	 * Note that the calling code will not report an error if this method
+	 *
+	 * <p>Note that the calling code will not report an error if this method
 	 * returns successfully. The error strategy implementation is responsible
-	 * for calling {@link Parser#notifyErrorListeners} as appropriate.
+	 * for calling {@link Parser#notifyErrorListeners} as appropriate.</p>
 	 *
 	 * @param recognizer the parser instance
 	 * @throws RecognitionException if the error strategy was not able to
@@ -95,13 +95,13 @@ public interface ANTLRErrorStrategy {
 	 * This method provides the error handler with an opportunity to handle
 	 * syntactic or semantic errors in the input stream before they result in a
 	 * {@link RecognitionException}.
-	 * <p/>
-	 * The generated code currently contains calls to {@link #sync} after
+	 *
+	 * <p>The generated code currently contains calls to {@link #sync} after
 	 * entering the decision state of a closure block ({@code (...)*} or
-	 * {@code (...)+}).
-	 * <p/>
-	 * For an implementation based on Jim Idle's "magic sync" mechanism, see
-	 * {@link DefaultErrorStrategy#sync}.
+	 * {@code (...)+}).</p>
+	 *
+	 * <p>For an implementation based on Jim Idle's "magic sync" mechanism, see
+	 * {@link DefaultErrorStrategy#sync}.</p>
 	 *
 	 * @see DefaultErrorStrategy#sync
 	 *
