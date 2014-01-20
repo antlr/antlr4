@@ -71,17 +71,17 @@ public abstract class PredictionContext {
 	 *
 	 * <pre>
 	 *  private int referenceHashCode() {
-	 *      int hash = {@link MurmurHash#initialize}({@link #INITIAL_HASH});
+	 *      int hash = {@link MurmurHash#initialize MurmurHash.initialize}({@link #INITIAL_HASH});
 	 *
 	 *      for (int i = 0; i &lt; {@link #size()}; i++) {
-	 *          hash = {@link MurmurHash#update}(hash, {@link #getParent}(i));
+	 *          hash = {@link MurmurHash#update MurmurHash.update}(hash, {@link #getParent getParent}(i));
 	 *      }
 	 *
 	 *      for (int i = 0; i &lt; {@link #size()}; i++) {
-	 *          hash = {@link MurmurHash#update}(hash, {@link #getReturnState}(i));
+	 *          hash = {@link MurmurHash#update MurmurHash.update}(hash, {@link #getReturnState getReturnState}(i));
 	 *      }
 	 *
-	 *      hash = {@link MurmurHash#finish}(hash, 2 * {@link #size()});
+	 *      hash = {@link MurmurHash#finish MurmurHash.finish}(hash, 2 * {@link #size()});
 	 *      return hash;
 	 *  }
 	 * </pre>
