@@ -15,6 +15,11 @@
     <name>ANTLR 4 Runtime</name>
     <description>The ANTLR 4 Runtime</description>
 
+    <properties>
+        <!-- Assumes dot is in the system path, or specified for the build. -->
+        <dot.path>dot</dot.path>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.abego.treelayout</groupId>
@@ -39,6 +44,7 @@
                                     <goal>dot</goal>
                                 </goals>
                                 <configuration>
+                                    <dot>${dot.path}</dot>
                                     <destdir>${project.build.directory}/apidocs</destdir>
                                     <output>svg</output>
                                 </configuration>
