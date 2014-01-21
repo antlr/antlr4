@@ -236,12 +236,14 @@ public class NullUsageProcessor extends AbstractProcessor {
 
 	private void checkOverriddenMethods(ExecutableElement method) {
 		TypeElement declaringType = (TypeElement)method.getEnclosingElement();
+		Set<Element> errorElements = new HashSet<Element>();
+		Set<Element> warnedElements = new HashSet<Element>();
 		typeLoop:
 		for (TypeMirror supertypeMirror : getAllSupertypes(processingEnv.getTypeUtils().getDeclaredType(declaringType))) {
 			for (Element element : ((TypeElement)processingEnv.getTypeUtils().asElement(supertypeMirror)).getEnclosedElements()) {
 				if (element instanceof ExecutableElement) {
 					if (processingEnv.getElementUtils().overrides(method, (ExecutableElement)element, declaringType)) {
-						checkOverriddenMethod(method, (ExecutableElement)element);
+						checkOverriddenMethod(method, (ExecutableElement)element, errorElements, warnedElements);
 						continue typeLoop;
 					}
 				}
@@ -263,13 +265,13 @@ public class NullUsageProcessor extends AbstractProcessor {
 		return new ArrayList<TypeMirror>(supertypes);
 	}
 
-	private void checkOverriddenMethod(ExecutableElement overrider, ExecutableElement overridden) {
+	private void checkOverriddenMethod(ExecutableElement overrider, ExecutableElement overridden, Set<Element> errorElements, Set<Element> warnedElements) {
 		// check method annotation
-		if (isNullable(overrider) && isNotNull(overridden)) {
+		if (isNullable(overrider) && isNotNull(overridden) && errorElements.add(overrider)) {
 			String error = String.format("method annotated with %s cannot override or implement a method annotated with %s", nullableType.getSimpleName(), notNullType.getSimpleName());
 			processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error, overrider, getNullableAnnotationMirror(overrider));
 		}
-		else if (isNullable(overrider) && !(isNullable(overridden) || isNotNull(overridden))) {
+		else if (isNullable(overrider) && !(isNullable(overridden) || isNotNull(overridden)) && !errorElements.contains(overrider) && warnedElements.add(overrider)) {
 			String error = String.format("method annotated with %s overrides a method that is not annotated", nullableType.getSimpleName());
 			processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, error, overrider, getNullableAnnotationMirror(overrider));
 		}
@@ -277,11 +279,11 @@ public class NullUsageProcessor extends AbstractProcessor {
 		List<? extends VariableElement> overriderParameters = overrider.getParameters();
 		List<? extends VariableElement> overriddenParameters = overridden.getParameters();
 		for (int i = 0; i < overriderParameters.size(); i++) {
-			if (isNotNull(overriderParameters.get(i)) && isNullable(overriddenParameters.get(i))) {
+			if (isNotNull(overriderParameters.get(i)) && isNullable(overriddenParameters.get(i)) && errorElements.add(overriderParameters.get(i))) {
 				String error = String.format("parameter %s annotated with %s cannot override or implement a parameter annotated with %s", overriderParameters.get(i).getSimpleName(), notNullType.getSimpleName(), nullableType.getSimpleName());
 				processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error, overriderParameters.get(i), getNotNullAnnotationMirror(overriderParameters.get(i)));
 			}
-			else if (isNotNull(overriderParameters.get(i)) && !(isNullable(overriddenParameters.get(i)) || isNotNull(overriddenParameters.get(i)))) {
+			else if (isNotNull(overriderParameters.get(i)) && !(isNullable(overriddenParameters.get(i)) || isNotNull(overriddenParameters.get(i))) /*&& !errorElements.contains(overriderParameters.get(i)) && warnedElements.add(overriderParameters.get(i))*/) {
 				String error = String.format("parameter %s annotated with %s overrides a parameter that is not annotated", overriderParameters.get(i).getSimpleName(), notNullType.getSimpleName());
 				processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, error, overriderParameters.get(i), getNotNullAnnotationMirror(overriderParameters.get(i)));
 			}
