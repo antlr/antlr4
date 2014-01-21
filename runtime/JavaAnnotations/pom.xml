@@ -10,31 +10,10 @@
         <relativePath>../..</relativePath>
     </parent>
 
-    <artifactId>antlr4-runtime</artifactId>
+    <artifactId>antlr4-annotations</artifactId>
 
-    <name>ANTLR 4 Runtime</name>
-    <description>The ANTLR 4 Runtime</description>
-
-    <properties>
-        <!-- Assumes dot is in the system path, or specified for the build. -->
-        <dot.path>dot</dot.path>
-    </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.abego.treelayout</groupId>
-            <artifactId>org.abego.treelayout.core</artifactId>
-            <version>1.0.1</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr4-annotations</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
+    <name>ANTLR 4 Runtime Annotations</name>
+    <description>A set of annotations used within the ANTLR 4 Runtime</description>
 
     <profiles>
         <profile>
@@ -64,27 +43,12 @@
     </profiles>
 
     <build>
-
         <sourceDirectory>src</sourceDirectory>
-        <resources/>
-
-        <plugins>
-            <plugin>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.1</version>
-                <configuration>
-                    <sourceDirectory>src</sourceDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>antlr4</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
+        <resources>
+            <resource>
+                <directory>resources</directory>
+            </resource>
+        </resources>
     </build>
 
 </project>
