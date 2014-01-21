@@ -35,6 +35,7 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -46,7 +47,13 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -59,6 +66,8 @@ import java.util.Set;
  * <li><strong>Error</strong>: an element is annotated with both {@link NotNull} and {@link Nullable}.</li>
  * <li><strong>Error</strong>: an method which returns {@code void} is annotated with {@link NotNull} or {@link Nullable}.</li>
  * <li><strong>Error</strong>: an element with a primitive type is annotated with {@link Nullable}.</li>
+ * <li><strong>Error</strong>: a parameter is annotated with {@link NotNull}, but the method overrides or implements a method where the parameter is annotated {@link Nullable}.</li>
+ * <li><strong>Error</strong>: a method is annotated with {@link Nullable}, but the method overrides or implements a method that is annotated with {@link NotNull}.</li>
  * <li><strong>Warning</strong>: an element with a primitive type is annotated with {@link NotNull}.</li>
  * </ul>
  *
@@ -70,6 +79,9 @@ public class NullUsageProcessor extends AbstractProcessor {
 	public static final String NotNullClassName = "org.antlr.v4.runtime.misc.NotNull";
 	public static final String NullableClassName = "org.antlr.v4.runtime.misc.Nullable";
 
+	private TypeElement notNullType;
+	private TypeElement nullableType;
+
 	public NullUsageProcessor() {
 	}
 
@@ -79,8 +91,8 @@ public class NullUsageProcessor extends AbstractProcessor {
 			return true;
 		}
 
-		TypeElement notNullType = processingEnv.getElementUtils().getTypeElement(NotNullClassName);
-		TypeElement nullableType = processingEnv.getElementUtils().getTypeElement(NullableClassName);
+		notNullType = processingEnv.getElementUtils().getTypeElement(NotNullClassName);
+		nullableType = processingEnv.getElementUtils().getTypeElement(NullableClassName);
 		Set<? extends Element> notNullElements = roundEnv.getElementsAnnotatedWith(notNullType);
 		Set<? extends Element> nullableElements = roundEnv.getElementsAnnotatedWith(nullableType);
 
@@ -96,6 +108,18 @@ public class NullUsageProcessor extends AbstractProcessor {
 
 		checkPrimitiveTypeAnnotations(nullableElements, Diagnostic.Kind.ERROR, nullableType);
 		checkPrimitiveTypeAnnotations(notNullElements, Diagnostic.Kind.WARNING, notNullType);
+
+		// method name -> method -> annotated elements of method
+		Map<String, Map<ExecutableElement, List<Element>>> namedMethodMap =
+			new HashMap<String, Map<ExecutableElement, List<Element>>>();
+		addElementsToNamedMethodMap(notNullElements, namedMethodMap);
+		addElementsToNamedMethodMap(nullableElements, namedMethodMap);
+
+		for (Map.Entry<String, Map<ExecutableElement, List<Element>>> entry : namedMethodMap.entrySet()) {
+			for (Map.Entry<ExecutableElement, List<Element>> subentry : entry.getValue().entrySet()) {
+				checkOverriddenMethods(subentry.getKey());
+			}
+		}
 
 		return true;
 	}
@@ -166,5 +190,105 @@ public class NullUsageProcessor extends AbstractProcessor {
 				processingEnv.getMessager().printMessage(kind, error, element);
 			}
 		}
+	}
+
+	private void addElementsToNamedMethodMap(Set<? extends Element> elements, Map<String, Map<ExecutableElement, List<Element>>> namedMethodMap) {
+		for (Element element : elements) {
+			ExecutableElement method;
+			switch (element.getKind()) {
+			case PARAMETER:
+				method = (ExecutableElement)element.getEnclosingElement();
+				assert method.getKind() == ElementKind.METHOD;
+				break;
+
+			case METHOD:
+				method = (ExecutableElement)element;
+				break;
+
+			default:
+				continue;
+			}
+
+			Map<ExecutableElement, List<Element>> annotatedMethodWithName =
+				namedMethodMap.get(method.getSimpleName().toString());
+			if (annotatedMethodWithName == null) {
+				annotatedMethodWithName = new HashMap<ExecutableElement, List<Element>>();
+				namedMethodMap.put(method.getSimpleName().toString(), annotatedMethodWithName);
+			}
+
+			List<Element> annotatedElementsOfMethod = annotatedMethodWithName.get(method);
+			if (annotatedElementsOfMethod == null) {
+				annotatedElementsOfMethod = new ArrayList<Element>();
+				annotatedMethodWithName.put(method, annotatedElementsOfMethod);
+			}
+
+			annotatedElementsOfMethod.add(element);
+		}
+	}
+
+	private void checkOverriddenMethods(ExecutableElement method) {
+		TypeElement declaringType = (TypeElement)method.getEnclosingElement();
+		typeLoop:
+		for (TypeMirror supertypeMirror : getAllSupertypes(processingEnv.getTypeUtils().getDeclaredType(declaringType))) {
+			for (Element element : ((TypeElement)processingEnv.getTypeUtils().asElement(supertypeMirror)).getEnclosedElements()) {
+				if (element instanceof ExecutableElement) {
+					if (processingEnv.getElementUtils().overrides(method, (ExecutableElement)element, declaringType)) {
+						checkOverriddenMethod(method, (ExecutableElement)element);
+						continue typeLoop;
+					}
+				}
+			}
+		}
+	}
+
+	private List<? extends TypeMirror> getAllSupertypes(TypeMirror type) {
+		Set<TypeMirror> supertypes = new HashSet<TypeMirror>();
+		Deque<TypeMirror> worklist = new ArrayDeque<TypeMirror>();
+		worklist.add(type);
+		while (!worklist.isEmpty()) {
+			List<? extends TypeMirror> next = processingEnv.getTypeUtils().directSupertypes(worklist.poll());
+			if (supertypes.addAll(next)) {
+				worklist.addAll(next);
+			}
+		}
+
+		return new ArrayList<TypeMirror>(supertypes);
+	}
+
+	private void checkOverriddenMethod(ExecutableElement overrider, ExecutableElement overridden) {
+		// check method annotation
+		if (isNullable(overrider) && isNotNull(overridden)) {
+			String error = String.format("method annotated with %s cannot override or implement a method annotated with %s", nullableType.getSimpleName(), notNullType.getSimpleName());
+			processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error, overrider);
+		}
+
+		List<? extends VariableElement> overriderParameters = overrider.getParameters();
+		List<? extends VariableElement> overriddenParameters = overridden.getParameters();
+		for (int i = 0; i < overriderParameters.size(); i++) {
+			if (isNotNull(overriderParameters.get(i)) && isNullable(overriddenParameters.get(i))) {
+				String error = String.format("parameter annotated with %s cannot override or implement a parameter annotated with %s", notNullType.getSimpleName(), nullableType.getSimpleName());
+				processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error, overrider);
+			}
+		}
+	}
+
+	private boolean isNotNull(Element element) {
+		for (AnnotationMirror annotationMirror : element.getAnnotationMirrors()) {
+			if (annotationMirror.getAnnotationType().asElement() == notNullType) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private boolean isNullable(Element element) {
+		for (AnnotationMirror annotationMirror : element.getAnnotationMirrors()) {
+			if (annotationMirror.getAnnotationType().asElement() == nullableType) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
