@@ -39,7 +39,9 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.NoType;
+import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
@@ -56,6 +58,8 @@ import java.util.Set;
  * <ul>
  * <li><strong>Error</strong>: an element is annotated with both {@link NotNull} and {@link Nullable}.</li>
  * <li><strong>Error</strong>: an method which returns {@code void} is annotated with {@link NotNull} or {@link Nullable}.</li>
+ * <li><strong>Error</strong>: an element with a primitive type is annotated with {@link Nullable}.</li>
+ * <li><strong>Warning</strong>: an element with a primitive type is annotated with {@link NotNull}.</li>
  * </ul>
  *
  * @author Sam Harwell
@@ -89,6 +93,9 @@ public class NullUsageProcessor extends AbstractProcessor {
 
 		checkVoidMethodAnnotations(notNullElements, notNullType);
 		checkVoidMethodAnnotations(nullableElements, nullableType);
+
+		checkPrimitiveTypeAnnotations(nullableElements, Diagnostic.Kind.ERROR, nullableType);
+		checkPrimitiveTypeAnnotations(notNullElements, Diagnostic.Kind.WARNING, notNullType);
 
 		return true;
 	}
@@ -128,6 +135,35 @@ public class NullUsageProcessor extends AbstractProcessor {
 				// TODO: report the error on the annotation usage instead of the method
 				String error = String.format("void method cannot be annotated with %s", annotationType.getSimpleName());
 				processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error, element);
+			}
+		}
+	}
+
+	private void checkPrimitiveTypeAnnotations(Set<? extends Element> elements, Diagnostic.Kind kind, TypeElement annotationType) {
+		for (Element element : elements) {
+			TypeMirror typeToCheck;
+			switch (element.getKind()) {
+			case FIELD:
+			case PARAMETER:
+			case LOCAL_VARIABLE:
+				// checking variable type
+				VariableElement variableElement = (VariableElement)element;
+				typeToCheck = variableElement.asType();
+				break;
+
+			case METHOD:
+				// checking return type
+				ExecutableElement executableElement = (ExecutableElement)element;
+				typeToCheck = executableElement.getReturnType();
+				break;
+
+			default:
+				continue;
+			}
+
+			if (typeToCheck instanceof PrimitiveType && typeToCheck.getKind().isPrimitive()) {
+				String error = String.format("%s with a primitive type %s be annotated with %s", element.getKind().toString().replace('_', ' ').toLowerCase(), kind == Diagnostic.Kind.ERROR ? "cannot" : "should not", annotationType.getSimpleName());
+				processingEnv.getMessager().printMessage(kind, error, element);
 			}
 		}
 	}
