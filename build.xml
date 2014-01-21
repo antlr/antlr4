@@ -246,6 +246,9 @@
 				<include name="**/*.st"/>
 				<include name="**/*.stg"/>
 			</fileset>
+			<fileset dir="${basedir}/runtime/JavaAnnotations/resources/">
+				<include name="**/*.Processor"/>
+			</fileset>
 			<fileset dir="${basedir}/runtime/JavaAnnotations/src/">
 				<include name="**/*.java"/>
 			</fileset>
