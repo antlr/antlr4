@@ -36,7 +36,12 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.NoType;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 
 import java.util.HashSet;
@@ -50,6 +55,7 @@ import java.util.Set;
  *
  * <ul>
  * <li><strong>Error</strong>: an element is annotated with both {@link NotNull} and {@link Nullable}.</li>
+ * <li><strong>Error</strong>: an method which returns {@code void} is annotated with {@link NotNull} or {@link Nullable}.</li>
  * </ul>
  *
  * @author Sam Harwell
@@ -69,8 +75,10 @@ public class NullUsageProcessor extends AbstractProcessor {
 			return true;
 		}
 
-		Set<? extends Element> notNullElements = roundEnv.getElementsAnnotatedWith(processingEnv.getElementUtils().getTypeElement(NotNullClassName));
-		Set<? extends Element> nullableElements = roundEnv.getElementsAnnotatedWith(processingEnv.getElementUtils().getTypeElement(NullableClassName));
+		TypeElement notNullType = processingEnv.getElementUtils().getTypeElement(NotNullClassName);
+		TypeElement nullableType = processingEnv.getElementUtils().getTypeElement(NullableClassName);
+		Set<? extends Element> notNullElements = roundEnv.getElementsAnnotatedWith(notNullType);
+		Set<? extends Element> nullableElements = roundEnv.getElementsAnnotatedWith(nullableType);
 
 		Set<Element> intersection = new HashSet<Element>(notNullElements);
 		intersection.retainAll(nullableElements);
@@ -78,6 +86,9 @@ public class NullUsageProcessor extends AbstractProcessor {
 			String error = String.format("%s cannot be annotated with both NotNull and Nullable", element.getKind().toString().toLowerCase());
 			processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error, element);
 		}
+
+		checkVoidMethodAnnotations(notNullElements, notNullType);
+		checkVoidMethodAnnotations(nullableElements, nullableType);
 
 		return true;
 	}
@@ -103,5 +114,21 @@ public class NullUsageProcessor extends AbstractProcessor {
 		}
 
 		return true;
+	}
+
+	private void checkVoidMethodAnnotations(Set<? extends Element> elements, TypeElement annotationType) {
+		for (Element element : elements) {
+			if (element.getKind() != ElementKind.METHOD) {
+				continue;
+			}
+
+			ExecutableElement executableElement = (ExecutableElement)element;
+			TypeMirror returnType = executableElement.getReturnType();
+			if (returnType instanceof NoType && returnType.getKind() == TypeKind.VOID) {
+				// TODO: report the error on the annotation usage instead of the method
+				String error = String.format("void method cannot be annotated with %s", annotationType.getSimpleName());
+				processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error, element);
+			}
+		}
 	}
 }
