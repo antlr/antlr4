@@ -101,7 +101,7 @@ public class NullUsageProcessor extends AbstractProcessor {
 		Set<Element> intersection = new HashSet<Element>(notNullElements);
 		intersection.retainAll(nullableElements);
 		for (Element element : intersection) {
-			String error = String.format("%s cannot be annotated with both NotNull and Nullable", element.getKind().toString().toLowerCase());
+			String error = String.format("%s cannot be annotated with both %s and %s", element.getKind().toString().replace('_', ' ').toLowerCase(), notNullType.getSimpleName(), nullableType.getSimpleName());
 			processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error, element);
 		}
 
@@ -158,9 +158,8 @@ public class NullUsageProcessor extends AbstractProcessor {
 			ExecutableElement executableElement = (ExecutableElement)element;
 			TypeMirror returnType = executableElement.getReturnType();
 			if (returnType instanceof NoType && returnType.getKind() == TypeKind.VOID) {
-				// TODO: report the error on the annotation usage instead of the method
 				String error = String.format("void method cannot be annotated with %s", annotationType.getSimpleName());
-				processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error, element);
+				processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error, element, getAnnotationMirror(element, annotationType));
 			}
 		}
 	}
@@ -189,7 +188,7 @@ public class NullUsageProcessor extends AbstractProcessor {
 
 			if (typeToCheck instanceof PrimitiveType && typeToCheck.getKind().isPrimitive()) {
 				String error = String.format("%s with a primitive type %s be annotated with %s", element.getKind().toString().replace('_', ' ').toLowerCase(), kind == Diagnostic.Kind.ERROR ? "cannot" : "should not", annotationType.getSimpleName());
-				processingEnv.getMessager().printMessage(kind, error, element);
+				processingEnv.getMessager().printMessage(kind, error, element, getAnnotationMirror(element, annotationType));
 			}
 		}
 	}
@@ -261,7 +260,7 @@ public class NullUsageProcessor extends AbstractProcessor {
 		// check method annotation
 		if (isNullable(overrider) && isNotNull(overridden)) {
 			String error = String.format("method annotated with %s cannot override or implement a method annotated with %s", nullableType.getSimpleName(), notNullType.getSimpleName());
-			processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error, overrider);
+			processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error, overrider, getNullableAnnotationMirror(overrider));
 		}
 		else if (isNullable(overrider) && !(isNullable(overridden) || isNotNull(overridden))) {
 			String error = String.format("method annotated with %s overrides a method that is not annotated", nullableType.getSimpleName());
@@ -272,8 +271,8 @@ public class NullUsageProcessor extends AbstractProcessor {
 		List<? extends VariableElement> overriddenParameters = overridden.getParameters();
 		for (int i = 0; i < overriderParameters.size(); i++) {
 			if (isNotNull(overriderParameters.get(i)) && isNullable(overriddenParameters.get(i))) {
-				String error = String.format("parameter annotated with %s cannot override or implement a parameter annotated with %s", notNullType.getSimpleName(), nullableType.getSimpleName());
-				processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error, overrider);
+				String error = String.format("parameter %s annotated with %s cannot override or implement a parameter annotated with %s", overriderParameters.get(i).getSimpleName(), notNullType.getSimpleName(), nullableType.getSimpleName());
+				processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error, overriderParameters.get(i), getNotNullAnnotationMirror(overriderParameters.get(i)));
 			}
 			else if (isNotNull(overriderParameters.get(i)) && !(isNullable(overriddenParameters.get(i)) || isNotNull(overriddenParameters.get(i)))) {
 				String error = String.format("parameter %s annotated with %s overrides a parameter that is not annotated", overriderParameters.get(i).getSimpleName(), notNullType.getSimpleName());
@@ -291,18 +290,16 @@ public class NullUsageProcessor extends AbstractProcessor {
 	}
 
 	private AnnotationMirror getNotNullAnnotationMirror(Element element) {
-		for (AnnotationMirror annotationMirror : element.getAnnotationMirrors()) {
-			if (annotationMirror.getAnnotationType().asElement() == notNullType) {
-				return annotationMirror;
-			}
-		}
-
-		return null;
+		return getAnnotationMirror(element, notNullType);
 	}
 
 	private AnnotationMirror getNullableAnnotationMirror(Element element) {
+		return getAnnotationMirror(element, nullableType);
+	}
+
+	private AnnotationMirror getAnnotationMirror(Element element, TypeElement annotationType) {
 		for (AnnotationMirror annotationMirror : element.getAnnotationMirrors()) {
-			if (annotationMirror.getAnnotationType().asElement() == nullableType) {
+			if (annotationMirror.getAnnotationType().asElement() == annotationType) {
 				return annotationMirror;
 			}
 		}
