@@ -73,6 +73,13 @@ import java.util.Set;
  * <li><strong>Warning</strong>: a method is annotated with {@link Nullable}, but the method overrides or implements a method that is not annotated.</li>
  * </ul>
  *
+ * <p>In the future, the validation process may be updated to check the following additional items.</p>
+ *
+ * <ul>
+ * <li><strong>Warning</strong>: a parameter is not annotated, but the method overrides or implements a method where the parameter is annotated with {@link NotNull} or {@link Nullable}.</li>
+ * <li><strong>Warning</strong>: a method is not annotated, but the method overrides or implements a method that is annotated with with {@link NotNull} or {@link Nullable}.</li>
+ * </ul>
+ *
  * @author Sam Harwell
  */
 @SupportedAnnotationTypes({NullUsageProcessor.NotNullClassName, NullUsageProcessor.NullableClassName})
