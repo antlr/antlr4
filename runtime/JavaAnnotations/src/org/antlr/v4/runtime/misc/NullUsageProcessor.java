@@ -35,9 +35,11 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -45,6 +47,10 @@ import java.util.Set;
  * {@link Nullable} annotations.
  *
  * <p>The validation process checks the following items.</p>
+ *
+ * <ul>
+ * <li><strong>Error</strong>: an element is annotated with both {@link NotNull} and {@link Nullable}.</li>
+ * </ul>
  *
  * @author Sam Harwell
  */
@@ -61,6 +67,16 @@ public class NullUsageProcessor extends AbstractProcessor {
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 		if (!checkClassNameConstants()) {
 			return true;
+		}
+
+		Set<? extends Element> notNullElements = roundEnv.getElementsAnnotatedWith(processingEnv.getElementUtils().getTypeElement(NotNullClassName));
+		Set<? extends Element> nullableElements = roundEnv.getElementsAnnotatedWith(processingEnv.getElementUtils().getTypeElement(NullableClassName));
+
+		Set<Element> intersection = new HashSet<Element>(notNullElements);
+		intersection.retainAll(nullableElements);
+		for (Element element : intersection) {
+			String error = String.format("%s cannot be annotated with both NotNull and Nullable", element.getKind().toString().toLowerCase());
+			processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error, element);
 		}
 
 		return true;
