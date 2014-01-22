@@ -74,11 +74,11 @@ public interface ANTLRErrorListener {
 	 *        the parser was able to recover in line without exiting the
 	 *        surrounding rule.
 	 */
-	public void syntaxError(Recognizer<?, ?> recognizer,
+	public void syntaxError(@NotNull Recognizer<?, ?> recognizer,
 							@Nullable Object offendingSymbol,
 							int line,
 							int charPositionInLine,
-							String msg,
+							@NotNull String msg,
 							@Nullable RecognitionException e);
 
 	/**
@@ -114,7 +114,7 @@ public interface ANTLRErrorListener {
 						 int startIndex,
 						 int stopIndex,
 						 boolean exact,
-						 @NotNull BitSet ambigAlts,
+						 @Nullable BitSet ambigAlts,
 						 @NotNull ATNConfigSet configs);
 
 	/**

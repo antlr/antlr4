@@ -139,7 +139,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	}
 
 	@Override
-	public boolean add(@NotNull ATNConfig config) {
+	public boolean add(ATNConfig config) {
 		return add(config, null);
 	}
 
