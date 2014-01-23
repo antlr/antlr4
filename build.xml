@@ -199,8 +199,8 @@
         <mkdir dir="${build.dir}/classes"/>
         <javac
                 destdir="${build.dir}/classes"
-                source="1.5"
-                target="1.5"
+                source="1.6"
+                target="1.6"
                 debug="true"
                 excludes="org/antlr/v4/test/**">
             <compilerarg value="-Xlint"/>
