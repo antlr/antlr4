@@ -92,10 +92,19 @@ public class DFAState {
 	public LexerActionExecutor lexerActionExecutor;
 
 	/**
-	 * Indicates that this state was created during SLL prediction that
-	 * discovered a conflict between the configurations in the state. Future
-	 * {@link ParserATNSimulator#execATN} invocations immediately jumped doing
-	 * full context prediction if this field is true.
+	 * This first has completely different meaning for parser DFA states and
+	 * lexer DFA states.
+	 *
+	 * <ul>
+	 * <li><strong>Parsers:</strong> Indicates that this state was created
+	 * during SLL prediction that discovered a conflict between the
+	 * configurations in the state. Future {@link ParserATNSimulator#execATN}
+	 * invocations immediately jumped doing full context prediction if this
+	 * field is true.</li>
+	 * <li><strong>Lexers:</strong> This is the backing field for
+	 * {@link #isLexerTerminationState} and {@link #setLexerTerminationState},
+	 * and should not be accessed directly.</li>
+	 * </ul>
 	 */
 	public boolean requiresFullContext;
 
@@ -147,6 +156,36 @@ public class DFAState {
 		}
 		if ( alts.isEmpty() ) return null;
 		return alts;
+	}
+
+	/**
+	 * Indicates whether this is a termination state for the lexer prediction
+	 * process. Termination states are {@link #isAcceptState accept states} that
+	 * also indicate that no remaining configuration is able to match additional
+	 * input characters.
+	 *
+	 * <p>This method is meaningless for parser DFAs.</p>
+	 *
+	 * @return {@code true} if this is a lexer termination state; otherwise,
+	 * {@code false}.
+	 */
+	public final boolean isLexerTerminationState() {
+		return requiresFullContext;
+	}
+
+	/**
+	 * Sets whether this is a termination state for the lexer prediction
+	 * process.
+	 *
+	 * <p>This method is meaningless for parser DFAs.</p>
+	 *
+	 * @param value {@code true} if this is a lexer termination state;
+	 * otherwise, {@code false}.
+	 *
+	 * @see #isLexerTerminationState()
+	 */
+	public final void setLexerTerminationState(boolean value) {
+		requiresFullContext = value;
 	}
 
 	@Override
