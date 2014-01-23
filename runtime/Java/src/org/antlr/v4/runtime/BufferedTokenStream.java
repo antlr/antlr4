@@ -83,6 +83,9 @@ public class BufferedTokenStream implements TokenStream {
 	 * performance for the following cases:
 	 *
 	 * <ul>
+	 * <li>{@link #consume}: The lookahead check in {@link #consume} to prevent
+	 * consuming the EOF symbol is optimized by checking the values of
+	 * {@link #fetchedEOF} and {@link #p} instead of calling {@link #LA}.</li>
 	 * <li>{@link #fetch}: The check to prevent adding multiple EOF symbols into
 	 * {@link #tokens} is trivial with this field.</li>
 	 * <ul>
@@ -127,7 +130,24 @@ public class BufferedTokenStream implements TokenStream {
 
     @Override
     public void consume() {
-		if (LA(1) == EOF) {
+		boolean skipEofCheck;
+		if (p >= 0) {
+			if (fetchedEOF) {
+				// the last token in tokens is EOF. skip check if p indexes any
+				// fetched token except the last.
+				skipEofCheck = p < tokens.size() - 1;
+			}
+			else {
+				// no EOF token in tokens. skip check if p indexes a fetched token.
+				skipEofCheck = p < tokens.size();
+			}
+		}
+		else {
+			// not yet initialized
+			skipEofCheck = false;
+		}
+
+		if (!skipEofCheck && LA(1) == EOF) {
 			throw new IllegalStateException("cannot consume EOF");
 		}
 
