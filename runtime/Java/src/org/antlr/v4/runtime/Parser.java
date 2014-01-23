@@ -537,15 +537,16 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
     /** Match needs to return the current input symbol, which gets put
      *  into the label for the associated token ref; e.g., x=ID.
      */
+	@NotNull
     public Token getCurrentToken() {
 		return _input.LT(1);
 	}
 
-	public final void notifyErrorListeners(String msg)	{
+	public final void notifyErrorListeners(@NotNull String msg)	{
 		notifyErrorListeners(getCurrentToken(), msg, null);
 	}
 
-	public void notifyErrorListeners(Token offendingToken, String msg,
+	public void notifyErrorListeners(@NotNull Token offendingToken, @NotNull String msg,
 									 @Nullable RecognitionException e)
 	{
 		_syntaxErrors++;
@@ -743,7 +744,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
 	@Override
-	public boolean precpred(RuleContext localctx, int precedence) {
+	public boolean precpred(@Nullable RuleContext localctx, int precedence) {
 		return precedence >= _precedenceStack.peek();
 	}
 
