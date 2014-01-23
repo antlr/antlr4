@@ -233,22 +233,17 @@ import java.util.Set;
  * way it will work because it's not doing a test and set operation.</p>
  *
  * <p>
- * <strong>Starting with SLL then failing to combined SLL/LL</strong></p>
+ * <strong>Starting with SLL then failing to combined SLL/LL (Two-Stage
+ * Parsing)</strong></p>
  *
  * <p>
  * Sam pointed out that if SLL does not give a syntax error, then there is no
  * point in doing full LL, which is slower. We only have to try LL if we get a
- * syntax error. For maximum speed, Sam starts the parser with pure SLL
- * mode:</p>
+ * syntax error. For maximum speed, Sam starts the parser set to pure SLL
+ * mode with the {@link BailErrorStrategy}:</p>
  *
  * <pre>
  * parser.{@link Parser#getInterpreter() getInterpreter()}.{@link #setSLL setSLL(true)};
- * </pre>
- *
- * <p>
- * and with the bail error strategy:</p>
- *
- * <pre>
  * parser.{@link Parser#setErrorHandler setErrorHandler}(new {@link BailErrorStrategy}());
  * </pre>
  *
@@ -257,16 +252,16 @@ import java.util.Set;
  * error, we need to retry with the combined SLL/LL strategy.</p>
  *
  * <p>
- * The reason this works is as follows. If there are no SLL conflicts then the
- * grammar is SLL for sure, at least for that input set. If there is an SLL
- * conflict, the full LL analysis must yield a set of ambiguous alternatives
- * that is no larger than the SLL set. If the LL set is a singleton, then the
- * grammar is LL but not SLL. If the LL set is the same size as the SLL set, the
- * decision is SLL. If the LL set has size &gt; 1, then that decision is truly
- * ambiguous on the current input. If the LL set is smaller, then the SLL
- * conflict resolution might choose an alternative that the full LL would rule
- * out as a possibility based upon better context information. If that's the
- * case, then the SLL parse will definitely get an error because the full LL
+ * The reason this works is as follows. If there are no SLL conflicts, then the
+ * grammar is SLL (at least for that input set). If there is an SLL conflict,
+ * the full LL analysis must yield a set of viable alternatives which is a
+ * subset of the alternatives reported by SLL. If the LL set is a singleton,
+ * then the grammar is LL but not SLL. If the LL set is the same size as the SLL
+ * set, the decision is SLL. If the LL set has size &gt; 1, then that decision
+ * is truly ambiguous on the current input. If the LL set is smaller, then the
+ * SLL conflict resolution might choose an alternative that the full LL would
+ * rule out as a possibility based upon better context information. If that's
+ * the case, then the SLL parse will definitely get an error because the full LL
  * analysis says it's not viable. If SLL conflict resolution chooses an
  * alternative within the LL set, them both SLL and LL would choose the same
  * alternative because they both choose the minimum of multiple conflicting
