@@ -36,31 +36,74 @@ import org.antlr.v4.runtime.misc.Pair;
 import java.io.Serializable;
 
 public class CommonToken implements WritableToken, Serializable {
+	/**
+	 * An empty {@link Pair} which is used as the default value of
+	 * {@link #source} for tokens that do not have a source.
+	 */
 	protected static final Pair<TokenSource, CharStream> EMPTY_SOURCE =
 		new Pair<TokenSource, CharStream>(null, null);
 
+	/**
+	 * This is the backing field for {@link #getType} and {@link #setType}.
+	 */
 	protected int type;
+	/**
+	 * This is the backing field for {@link #getLine} and {@link #setLine}.
+	 */
 	protected int line;
+	/**
+	 * This is the backing field for {@link #getCharPositionInLine} and
+	 * {@link #setCharPositionInLine}.
+	 */
 	protected int charPositionInLine = -1; // set to invalid position
+	/**
+	 * This is the backing field for {@link #getChannel} and
+	 * {@link #setChannel}.
+	 */
 	protected int channel=DEFAULT_CHANNEL;
+	/**
+	 * This is the backing field for {@link #getTokenSource} and
+	 * {@link #getInputStream}.
+	 *
+	 * <p>
+	 * These properties share a field to reduce the memory footprint of
+	 * {@link CommonToken}. Tokens created by a {@link CommonTokenFactory} from
+	 * the same source and input stream share a reference to the same
+	 * {@link Pair} containing these values.</p>
+	 */
 	protected Pair<TokenSource, CharStream> source;
 
-	/** We need to be able to change the text once in a while.  If
-	 *  this is non-null, then getText should return this.  Note that
-	 *  start/stop are not affected by changing this.
-	  */
-	// TODO: can store these in map in token stream rather than as field here
+	/**
+	 * This is the backing field for {@link #getText} when the token text is
+	 * explicitly set in the constructor or via {@link #setText}.
+	 *
+	 * @see #getText()
+	 */
 	protected String text;
 
-	/** What token number is this from 0..n-1 tokens; &lt; 0 implies invalid index */
+	/**
+	 * This is the backing field for {@link #getTokenIndex} and
+	 * {@link #setTokenIndex}.
+	 */
 	protected int index = -1;
 
-	/** The char position into the input buffer where this token starts */
+	/**
+	 * This is the backing field for {@link #getStartIndex} and
+	 * {@link #setStartIndex}.
+	 */
 	protected int start;
 
-	/** The char position into the input buffer where this token stops */
+	/**
+	 * This is the backing field for {@link #getStopIndex} and
+	 * {@link #setStopIndex}.
+	 */
 	protected int stop;
 
+	/**
+	 * Constructs a new {@link CommonToken} with the specified token type.
+	 *
+	 * @param type The token type.
+	 */
 	public CommonToken(int type) {
 		this.type = type;
 	}
@@ -77,6 +120,13 @@ public class CommonToken implements WritableToken, Serializable {
 		}
 	}
 
+	/**
+	 * Constructs a new {@link CommonToken} with the specified token type and
+	 * text.
+	 *
+	 * @param type The token type.
+	 * @param text The text of the token.
+	 */
 	public CommonToken(int type, String text) {
 		this.type = type;
 		this.channel = DEFAULT_CHANNEL;
@@ -129,10 +179,14 @@ public class CommonToken implements WritableToken, Serializable {
 		}
 	}
 
-	/** Override the text for this token.  getText() will return this text
-	 *  rather than pulling from the buffer.  Note that this does not mean
-	 *  that start/stop indexes are not valid.  It means that that input
-	 *  was converted to a new string in the token object.
+	/**
+	 * Explicitly set the text for this token. If {code text} is not
+	 * {@code null}, then {@link #getText} will return this value rather than
+	 * extracting the text from the input.
+	 *
+	 * @param text The explicit text of the token, or {@code null} if the text
+	 * should be obtained from the input along with the start and stop indexes
+	 * of the token.
 	 */
 	@Override
 	public void setText(String text) {
