@@ -89,7 +89,7 @@ public class BufferedTokenStream implements TokenStream {
 	 */
 	protected boolean fetchedEOF;
 
-    public BufferedTokenStream(TokenSource tokenSource) {
+    public BufferedTokenStream(@NotNull TokenSource tokenSource) {
 		if (tokenSource == null) {
 			throw new NullPointerException("tokenSource cannot be null");
 		}
@@ -208,6 +208,7 @@ public class BufferedTokenStream implements TokenStream {
         return tokens.get(p-k);
     }
 
+	@NotNull
     @Override
     public Token LT(int k) {
         lazyInit();

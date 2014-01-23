@@ -71,6 +71,7 @@ public class CommonToken implements WritableToken, Serializable {
 	 * the same source and input stream share a reference to the same
 	 * {@link Pair} containing these values.</p>
 	 */
+	@NotNull
 	protected Pair<TokenSource, CharStream> source;
 
 	/**
@@ -106,6 +107,7 @@ public class CommonToken implements WritableToken, Serializable {
 	 */
 	public CommonToken(int type) {
 		this.type = type;
+		this.source = EMPTY_SOURCE;
 	}
 
 	public CommonToken(@NotNull Pair<TokenSource, CharStream> source, int type, int channel, int start, int stop) {
@@ -139,7 +141,7 @@ public class CommonToken implements WritableToken, Serializable {
 	 *
 	 * @param oldToken The token to copy.
 	 */
-	public CommonToken(Token oldToken) {
+	public CommonToken(@NotNull Token oldToken) {
 		text = oldToken.getText();
 		type = oldToken.getType();
 		line = oldToken.getLine();
