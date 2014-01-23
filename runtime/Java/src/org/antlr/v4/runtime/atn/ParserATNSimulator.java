@@ -199,33 +199,38 @@ import java.util.Set;
  * <p>
  * All instances of the same parser share the same decision DFAs through a
  * static field. Each instance gets its own ATN simulator but they share the
- * same decisionToDFA field. They also share a PredictionContextCache object
- * that makes sure that all PredictionContext objects are shared among the DFA
- * states. This makes a big size difference.</p>
+ * same {@link #decisionToDFA} field. They also share a
+ * {@link PredictionContextCache} object that makes sure that all
+ * {@link PredictionContext} objects are shared among the DFA states. This makes
+ * a big size difference.</p>
  *
  * <p>
  * <strong>THREAD SAFETY</strong></p>
  *
  * <p>
- * The parser ATN simulator locks on the decisionDFA field when it adds a new
- * DFA object to that array. addDFAEdge locks on the DFA for the current
- * decision when setting the edges[] field. addDFAState locks on the DFA for the
- * current decision when looking up a DFA state to see if it already exists. We
- * must make sure that all requests to add DFA states that are equivalent result
- * in the same shared DFA object. This is because lots of threads will be trying
- * to update the DFA at once. The addDFAState method also locks inside the DFA
- * lock but this time on the shared context cache when it rebuilds the
- * configurations' PredictionContext objects using cached subgraphs/nodes. No
- * other locking occurs, even during DFA simulation. This is safe as long as we
- * can guarantee that all threads referencing s.edge[t] get the same physical
- * target DFA state, or none. Once into the DFA, the DFA simulation does not
- * reference the dfa.state map. It follows the edges[] field to new targets. The
- * DFA simulator will either find dfa.edges to be null, to be non-null and
- * dfa.edges[t] null, or dfa.edges[t] to be non-null. The addDFAEdge method
- * could be racing to set the field but in either case the DFA simulator works;
- * if null, and requests ATN simulation. It could also race trying to get
- * dfa.edges[t], but either way it will work because it's not doing a test and
- * set operation.</p>
+ * The {@link ParserATNSimulator} locks on the {@link #decisionToDFA} field when
+ * it adds a new DFA object to that array. {@link #addDFAEdge}
+ * locks on the DFA for the current decision when setting the
+ * {@link DFAState#edges} field. {@link #addDFAState} locks on
+ * the DFA for the current decision when looking up a DFA state to see if it
+ * already exists. We must make sure that all requests to add DFA states that
+ * are equivalent result in the same shared DFA object. This is because lots of
+ * threads will be trying to update the DFA at once. The
+ * {@link #addDFAState} method also locks inside the DFA lock
+ * but this time on the shared context cache when it rebuilds the
+ * configurations' {@link PredictionContext} objects using cached
+ * subgraphs/nodes. No other locking occurs, even during DFA simulation. This is
+ * safe as long as we can guarantee that all threads referencing
+ * {@code s.edge[t]} get the same physical target {@link DFAState}, or
+ * {@code null}. Once into the DFA, the DFA simulation does not reference the
+ * {@link DFA#states} map. It follows the {@link DFAState#edges} field to new
+ * targets. The DFA simulator will either find {@link DFAState#edges} to be
+ * {@code null}, to be non-{@code null} and {@code dfa.edges[t]} null, or
+ * {@code dfa.edges[t]} to be non-null. The
+ * {@link #addDFAEdge} method could be racing to set the field
+ * but in either case the DFA simulator works; if {@code null}, and requests ATN
+ * simulation. It could also race trying to get {@code dfa.edges[t]}, but either
+ * way it will work because it's not doing a test and set operation.</p>
  *
  * <p>
  * <strong>Starting with SLL then failing to combined SLL/LL</strong></p>
@@ -237,14 +242,14 @@ import java.util.Set;
  * mode:</p>
  *
  * <pre>
- * parser.getInterpreter().setSLL(true);
+ * parser.{@link Parser#getInterpreter() getInterpreter()}.{@link #setSLL setSLL(true)};
  * </pre>
  *
  * <p>
  * and with the bail error strategy:</p>
  *
  * <pre>
- * parser.setErrorHandler(new BailErrorStrategy());
+ * parser.{@link Parser#setErrorHandler setErrorHandler}(new {@link BailErrorStrategy}());
  * </pre>
  *
  * <p>
