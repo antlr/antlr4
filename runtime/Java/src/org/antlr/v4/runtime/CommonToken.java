@@ -134,6 +134,11 @@ public class CommonToken implements WritableToken, Serializable {
 		this.source = EMPTY_SOURCE;
 	}
 
+	/**
+	 * Constructs a new {@link CommonToken} as a copy of another {@link Token}.
+	 *
+	 * @param oldToken The token to copy.
+	 */
 	public CommonToken(Token oldToken) {
 		text = oldToken.getText();
 		type = oldToken.getType();
