@@ -38,13 +38,15 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Pair;
 
-/** This is the default error handling mechanism for ANTLR parsers
- *  and tree parsers.
+/**
+ * This is the default implementation of {@link ANTLRErrorStrategy} used for
+ * error reporting and recovery in ANTLR parsers.
  */
 public class DefaultErrorStrategy implements ANTLRErrorStrategy {
-	/** This is true after we see an error and before having successfully
-	 *  matched a token. Prevents generation of more than one error message
-	 *  per error.
+	/**
+	 * Indicates whether the error strategy is currently "recovering from an
+	 * error". This is used to suppress reporting multiple error messages while
+	 * attempting to recover from a detected syntax error.
 	 *
 	 * @see #inErrorRecoveryMode
 	 */

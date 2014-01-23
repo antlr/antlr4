@@ -34,8 +34,23 @@ package org.antlr.v4.runtime;
  * @author Sam Harwell
  */
 public class ConsoleErrorListener extends BaseErrorListener {
+	/**
+	 * Provides a default instance of {@link ConsoleErrorListener}.
+	 */
 	public static final ConsoleErrorListener INSTANCE = new ConsoleErrorListener();
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * This implementation prints messages to {@link System#err} containing the
+	 * values of {@code line}, {@code charPositionInLine}, and {@code msg} using
+	 * the following format.</p>
+	 *
+	 * <pre>
+	 * line <em>line</em>:<em>charPositionInLine</em> <em>msg</em>
+	 * </pre>
+	 */
 	@Override
 	public void syntaxError(Recognizer<?, ?> recognizer,
 							Object offendingSymbol,

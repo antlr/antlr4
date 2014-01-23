@@ -53,6 +53,10 @@ import java.util.Set;
  *  {@link SemanticContext} within the scope of this outer class.</p>
  */
 public abstract class SemanticContext {
+	/**
+	 * The default {@link SemanticContext}, which is semantically equivalent to
+	 * a predicate of the form {@code {true}?}.
+	 */
     public static final SemanticContext NONE = new Predicate();
 
 	public SemanticContext parent;
@@ -201,6 +205,10 @@ public abstract class SemanticContext {
 		}
 	}
 
+	/**
+	 * A semantic context which is true whenever none of the contained contexts
+	 * is false.
+	 */
     public static class AND extends SemanticContext {
 		@NotNull public final SemanticContext[] opnds;
 
@@ -234,6 +242,13 @@ public abstract class SemanticContext {
 			return MurmurHash.hashCode(opnds, AND.class.hashCode());
 		}
 
+		/**
+		 * {@inheritDoc}
+		 *
+		 * <p>
+		 * The evaluation of predicates by this context is short-circuiting, but
+		 * unordered.</p>
+		 */
 		@Override
 		public boolean eval(Recognizer<?,?> parser, RuleContext outerContext) {
 			for (SemanticContext opnd : opnds) {
@@ -282,6 +297,10 @@ public abstract class SemanticContext {
         }
     }
 
+	/**
+	 * A semantic context which is true whenever at least one of the contained
+	 * contexts is true.
+	 */
     public static class OR extends SemanticContext {
 		@NotNull public final SemanticContext[] opnds;
 
@@ -315,6 +334,13 @@ public abstract class SemanticContext {
 			return MurmurHash.hashCode(opnds, OR.class.hashCode());
 		}
 
+		/**
+		 * {@inheritDoc}
+		 *
+		 * <p>
+		 * The evaluation of predicates by this context is short-circuiting, but
+		 * unordered.</p>
+		 */
 		@Override
         public boolean eval(Recognizer<?,?> parser, RuleContext outerContext) {
 			for (SemanticContext opnd : opnds) {
