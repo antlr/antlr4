@@ -40,7 +40,7 @@ public class CommonToken implements WritableToken, Serializable {
 	private static final long serialVersionUID = -6708843461296520577L;
 
 	/**
-	 * An empty {@link Pair} which is used as the default value of
+	 * An empty {@link Tuple2} which is used as the default value of
 	 * {@link #source} for tokens that do not have a source.
 	 */
 	protected static final Tuple2<TokenSource, CharStream> EMPTY_SOURCE =
@@ -72,7 +72,7 @@ public class CommonToken implements WritableToken, Serializable {
 	 * These properties share a field to reduce the memory footprint of
 	 * {@link CommonToken}. Tokens created by a {@link CommonTokenFactory} from
 	 * the same source and input stream share a reference to the same
-	 * {@link Pair} containing these values.</p>
+	 * {@link Tuple2} containing these values.</p>
 	 */
 	@NotNull
 	protected Tuple2<? extends TokenSource, CharStream> source;
@@ -145,7 +145,7 @@ public class CommonToken implements WritableToken, Serializable {
 	 * <p>
 	 * If {@code oldToken} is also a {@link CommonToken} instance, the newly
 	 * constructed token will share a reference to the {@link #text} field and
-	 * the {@link Pair} stored in {@link #source}. Otherwise, {@link #text} will
+	 * the {@link Tuple2} stored in {@link #source}. Otherwise, {@link #text} will
 	 * be assigned the result of calling {@link #getText}, and {@link #source}
 	 * will be constructed from the result of {@link Token#getTokenSource} and
 	 * {@link Token#getInputStream}.</p>

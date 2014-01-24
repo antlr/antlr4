@@ -30,6 +30,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.NoViableAltException;
@@ -203,7 +204,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * <p>
  * All instances of the same parser share the same decision DFAs through a
  * static field. Each instance gets its own ATN simulator but they share the
- * same {@link #decisionToDFA} field. They also share a
+ * same {@link ATN#decisionToDFA} field. They also share a
  * {@link PredictionContextCache} object that makes sure that all
  * {@link PredictionContext} objects are shared among the DFA states. This makes
  * a big size difference.</p>
@@ -212,7 +213,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * <strong>THREAD SAFETY</strong></p>
  *
  * <p>
- * The {@link ParserATNSimulator} locks on the {@link #decisionToDFA} field when
+ * The {@link ParserATNSimulator} locks on the {@link ATN#decisionToDFA} field when
  * it adds a new DFA object to that array. {@link #addDFAEdge}
  * locks on the DFA for the current decision when setting the
  * {@link DFAState#edges} field. {@link #addDFAState} locks on
@@ -247,7 +248,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * mode with the {@link BailErrorStrategy}:</p>
  *
  * <pre>
- * parser.{@link Parser#getInterpreter() getInterpreter()}.{@link #setSLL setSLL(true)};
+ * parser.{@link Parser#getInterpreter() getInterpreter()}.{@link #setPredictionMode setPredictionMode(}{@link PredictionMode#SLL}{@code )};
  * parser.{@link Parser#setErrorHandler setErrorHandler}(new {@link BailErrorStrategy}());
  * </pre>
  *
