@@ -312,17 +312,21 @@ public class ATNSerializer {
 				data.add(action.getActionType().ordinal());
 				switch (action.getActionType()) {
 				case CHANNEL:
-					data.add(((LexerChannelAction)action).getChannel());
+					int channel = ((LexerChannelAction)action).getChannel();
+					data.add(channel != -1 ? channel : 0xFFFF);
 					data.add(0);
 					break;
 
 				case CUSTOM:
-					data.add(((LexerCustomAction)action).getRuleIndex());
-					data.add(((LexerCustomAction)action).getActionIndex());
+					int ruleIndex = ((LexerCustomAction)action).getRuleIndex();
+					int actionIndex = ((LexerCustomAction)action).getActionIndex();
+					data.add(ruleIndex != -1 ? ruleIndex : 0xFFFF);
+					data.add(actionIndex != -1 ? actionIndex : 0xFFFF);
 					break;
 
 				case MODE:
-					data.add(((LexerModeAction)action).getMode());
+					int mode = ((LexerModeAction)action).getMode();
+					data.add(mode != -1 ? mode : 0xFFFF);
 					data.add(0);
 					break;
 
@@ -337,7 +341,8 @@ public class ATNSerializer {
 					break;
 
 				case PUSH_MODE:
-					data.add(((LexerPushModeAction)action).getMode());
+					mode = ((LexerPushModeAction)action).getMode();
+					data.add(mode != -1 ? mode : 0xFFFF);
 					data.add(0);
 					break;
 
@@ -347,7 +352,8 @@ public class ATNSerializer {
 					break;
 
 				case TYPE:
-					data.add(((LexerTypeAction)action).getType());
+					int type = ((LexerTypeAction)action).getType();
+					data.add(type != -1 ? type : 0xFFFF);
 					data.add(0);
 					break;
 
