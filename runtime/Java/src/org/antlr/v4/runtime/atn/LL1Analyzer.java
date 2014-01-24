@@ -73,7 +73,7 @@ public class LL1Analyzer {
 			look[alt] = new IntervalSet();
 			Set<ATNConfig> lookBusy = new HashSet<ATNConfig>();
 			boolean seeThruPreds = false; // fail to get lookahead upon pred
-			_LOOK(s.transition(alt).target, null, PredictionContext.EMPTY_FULL,
+			_LOOK(s.transition(alt).target, null, PredictionContext.EMPTY_LOCAL,
 				  look[alt], lookBusy, new BitSet(), seeThruPreds, false);
 			// Wipe out lookahead for this alternative if we found nothing
 			// or we had a predicate when we !seeThruPreds
@@ -102,7 +102,7 @@ public class LL1Analyzer {
 	 */
     @NotNull
    	public IntervalSet LOOK(@NotNull ATNState s, @NotNull PredictionContext ctx) {
-		return LOOK(s, null, ctx);
+		return LOOK(s, s.atn.ruleToStopState[s.ruleIndex], ctx);
    	}
 
 	/**
@@ -111,7 +111,7 @@ public class LL1Analyzer {
 	 *
 	 * <p>If {@code ctx} is {@code null} and the end of the rule containing
 	 * {@code s} is reached, {@link Token#EPSILON} is added to the result set.
-	 * If {@code ctx} is not {@code null} and the end of the outermost rule is
+	 * If {@code ctx} is not {@code PredictionContext#EMPTY_LOCAL} and the end of the outermost rule is
 	 * reached, {@link Token#EOF} is added to the result set.</p>
 	 *
 	 * @param s the ATN state
@@ -126,8 +126,9 @@ public class LL1Analyzer {
     @NotNull
    	public IntervalSet LOOK(@NotNull ATNState s, @Nullable ATNState stopState, @NotNull PredictionContext ctx) {
    		IntervalSet r = new IntervalSet();
-		boolean seeThruPreds = true; // ignore preds; get all lookahead
-   		_LOOK(s, stopState, ctx, r, new HashSet<ATNConfig>(), new BitSet(), seeThruPreds, true);
+		final boolean seeThruPreds = true; // ignore preds; get all lookahead
+		final boolean addEOF = true;
+   		_LOOK(s, stopState, ctx, r, new HashSet<ATNConfig>(), new BitSet(), seeThruPreds, addEOF);
    		return r;
    	}
 
@@ -178,38 +179,40 @@ public class LL1Analyzer {
 			if (PredictionContext.isEmptyLocal(ctx)) {
 				look.add(Token.EPSILON);
 				return;
-			} else if (ctx.isEmpty() && addEOF) {
-				look.add(Token.EOF);
+			} else if (ctx.isEmpty()) {
+				if (addEOF) {
+					look.add(Token.EOF);
+				}
+
 				return;
 			}
 		}
 
         if ( s instanceof RuleStopState ) {
-            if ( PredictionContext.isEmptyLocal(ctx) ) {
-                look.add(Token.EPSILON);
-                return;
-            } else if (ctx.isEmpty() && addEOF) {
-				look.add(Token.EOF);
+            if (ctx.isEmpty() && !PredictionContext.isEmptyLocal(ctx)) {
+				if (addEOF) {
+					look.add(Token.EOF);
+				}
+
 				return;
 			}
 
-			for (int i = 0; i < ctx.size(); i++) {
-				if ( ctx.getReturnState(i)!=PredictionContext.EMPTY_FULL_STATE_KEY ) {
+			boolean removed = calledRuleStack.get(s.ruleIndex);
+			try {
+				calledRuleStack.clear(s.ruleIndex);
+				for (int i = 0; i < ctx.size(); i++) {
+					if (ctx.getReturnState(i) == PredictionContext.EMPTY_FULL_STATE_KEY) {
+						continue;
+					}
+
 					ATNState returnState = atn.states.get(ctx.getReturnState(i));
 //					System.out.println("popping back to "+retState);
-					for (int j = 0; j < ctx.size(); j++) {
-						boolean removed = calledRuleStack.get(returnState.ruleIndex);
-						try {
-							calledRuleStack.clear(returnState.ruleIndex);
-							_LOOK(returnState, stopState, ctx.getParent(j), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
-						}
-						finally {
-							if (removed) {
-								calledRuleStack.set(returnState.ruleIndex);
-							}
-						}
-					}
-					return;
+					_LOOK(returnState, stopState, ctx.getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+				}
+			}
+			finally {
+				if (removed) {
+					calledRuleStack.set(s.ruleIndex);
 				}
 			}
         }
@@ -217,19 +220,20 @@ public class LL1Analyzer {
         int n = s.getNumberOfTransitions();
         for (int i=0; i<n; i++) {
 			Transition t = s.transition(i);
-			if ( t.getClass() == RuleTransition.class ) {
-				if (calledRuleStack.get(((RuleTransition)t).target.ruleIndex)) {
+			if ( t instanceof RuleTransition ) {
+				RuleTransition ruleTransition = (RuleTransition)t;
+				if (calledRuleStack.get(ruleTransition.ruleIndex)) {
 					continue;
 				}
 
-				PredictionContext newContext = ctx.getChild(((RuleTransition)t).followState.stateNumber);
+				PredictionContext newContext = ctx.getChild(ruleTransition.followState.stateNumber);
 
 				try {
-					calledRuleStack.set(((RuleTransition)t).target.ruleIndex);
+					calledRuleStack.set(ruleTransition.ruleIndex);
 					_LOOK(t.target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
 				}
 				finally {
-					calledRuleStack.clear(((RuleTransition)t).target.ruleIndex);
+					calledRuleStack.clear(ruleTransition.ruleIndex);
 				}
 			}
 			else if ( t instanceof AbstractPredicateTransition ) {
