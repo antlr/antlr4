@@ -546,18 +546,23 @@ while ( _alt!=<choice.exitAlt> && _alt!=-1 ) {
 >>
 
 PlusBlock(choice, alts, error) ::= <<
-setState(<choice.blockStartStateNumber>); <! alt block decision !>
-_errHandler.sync(this);
-_alt = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
 do {
+	setState(<choice.blockStartStateNumber>); <! alt block decision !>
+<if(rest(alts))>
+	_errHandler.sync(this);
+	_alt = getInterpreter().adaptivePredict(_input,<choice.startState.decision>,_ctx);
 	switch (_alt) {
 	<alts:{alt|
-case <i><if(!choice.ast.greedy)>+1<endif>:
+case <i>:
 	<alt>
 	break;}; separator="\n">
 	default:
 		<error>
 	}
+<else>
+	<! only one alt, no need for a decision beforehand !>
+	<alts>
+<endif>
 	setState(<choice.loopBackStateNumber>); <! loopback/exit decision !>
 	_errHandler.sync(this);
 	_alt = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
