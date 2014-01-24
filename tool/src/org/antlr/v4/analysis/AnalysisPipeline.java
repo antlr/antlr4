@@ -83,15 +83,10 @@ public class AnalysisPipeline {
 		g.decisionLOOK = new ArrayList<IntervalSet[]>(g.atn.getNumberOfDecisions()+1);
 		for (DecisionState s : g.atn.decisionToState) {
             g.tool.log("LL1", "\nDECISION "+s.decision+" in rule "+g.getRule(s.ruleIndex).name);
-			IntervalSet[] look;
-			if ( s.nonGreedy ) { // nongreedy decisions can't be LL(1)
-				look = new IntervalSet[s.getNumberOfTransitions()+1];
-			}
-			else {
-				LL1Analyzer anal = new LL1Analyzer(g.atn);
-				look = anal.getDecisionLookahead(s);
-				g.tool.log("LL1", "look=" + Arrays.toString(look));
-			}
+
+			LL1Analyzer anal = new LL1Analyzer(g.atn);
+			IntervalSet[] look = anal.getDecisionLookahead(s);
+			g.tool.log("LL1", "look=" + Arrays.toString(look));
 
 			assert s.decision + 1 >= g.decisionLOOK.size();
 			Utils.setSize(g.decisionLOOK, s.decision+1);
