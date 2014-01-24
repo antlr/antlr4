@@ -30,6 +30,7 @@
 
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
 /** How to emit recognition errors. */
@@ -40,11 +41,11 @@ public interface ANTLRErrorListener<Symbol> {
 	 * specifies how to recover from syntax errors and how to compute error
 	 * messages. This listener's job is simply to emit a computed message,
 	 * though it has enough information to create its own message in many cases.
-	 * <p/>
-	 * The {@link RecognitionException} is non-null for all syntax errors except
+	 *
+	 * <p>The {@link RecognitionException} is non-null for all syntax errors except
 	 * when we discover mismatched token errors that we can recover from
 	 * in-line, without returning from the surrounding rule (via the single
-	 * token insertion and deletion mechanism).
+	 * token insertion and deletion mechanism).</p>
 	 *
 	 * @param recognizer
      *        What parser got the error. From this
@@ -67,10 +68,10 @@ public interface ANTLRErrorListener<Symbol> {
 	 *        the parser was able to recover in line without exiting the
 	 *        surrounding rule.
 	 */
-	public <T extends Symbol> void syntaxError(Recognizer<T, ?> recognizer,
+	public <T extends Symbol> void syntaxError(@NotNull Recognizer<T, ?> recognizer,
 											   @Nullable T offendingSymbol,
 											   int line,
 											   int charPositionInLine,
-											   String msg,
+											   @NotNull String msg,
 											   @Nullable RecognitionException e);
 }

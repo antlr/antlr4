@@ -48,14 +48,16 @@ import java.util.Set;
 /** A tree structure used to record the semantic context in which
  *  an ATN configuration is valid.  It's either a single predicate,
  *  a conjunction {@code p1&&p2}, or a sum of products {@code p1||p2}.
- * <p/>
- *  I have scoped the {@link AND}, {@link OR}, and {@link Predicate} subclasses of
- *  {@link SemanticContext} within the scope of this outer class.
+ *
+ *  <p>I have scoped the {@link AND}, {@link OR}, and {@link Predicate} subclasses of
+ *  {@link SemanticContext} within the scope of this outer class.</p>
  */
 public abstract class SemanticContext {
+	/**
+	 * The default {@link SemanticContext}, which is semantically equivalent to
+	 * a predicate of the form {@code {true}?}.
+	 */
     public static final SemanticContext NONE = new Predicate();
-
-	public SemanticContext parent;
 
 	/**
 	 * For context independent predicates, we evaluate them without a local
@@ -63,12 +65,12 @@ public abstract class SemanticContext {
 	 * having to create proper rule-specific context during prediction (as
 	 * opposed to the parser, which creates them naturally). In a practical
 	 * sense, this avoids a cast exception from RuleContext to myruleContext.
-	 * <p/>
-	 * For context dependent predicates, we must pass in a local context so that
+	 *
+	 * <p>For context dependent predicates, we must pass in a local context so that
 	 * references such as $arg evaluate properly as _localctx.arg. We only
 	 * capture context dependent predicates in the context in which we begin
 	 * prediction, so we passed in the outer context here in case of context
-	 * dependent predicate evaluation.
+	 * dependent predicate evaluation.</p>
 	 */
     public abstract <T> boolean eval(Recognizer<T, ?> parser, RuleContext outerContext);
 
@@ -201,6 +203,10 @@ public abstract class SemanticContext {
 		}
 	}
 
+	/**
+	 * A semantic context which is true whenever none of the contained contexts
+	 * is false.
+	 */
     public static class AND extends SemanticContext {
 		@NotNull public final SemanticContext[] opnds;
 
@@ -234,6 +240,13 @@ public abstract class SemanticContext {
 			return MurmurHash.hashCode(opnds, AND.class.hashCode());
 		}
 
+		/**
+		 * {@inheritDoc}
+		 *
+		 * <p>
+		 * The evaluation of predicates by this context is short-circuiting, but
+		 * unordered.</p>
+		 */
 		@Override
 		public <T> boolean eval(Recognizer<T, ?> parser, RuleContext outerContext) {
 			for (SemanticContext opnd : opnds) {
@@ -282,6 +295,10 @@ public abstract class SemanticContext {
         }
     }
 
+	/**
+	 * A semantic context which is true whenever at least one of the contained
+	 * contexts is true.
+	 */
     public static class OR extends SemanticContext {
 		@NotNull public final SemanticContext[] opnds;
 
@@ -315,6 +332,13 @@ public abstract class SemanticContext {
 			return MurmurHash.hashCode(opnds, OR.class.hashCode());
 		}
 
+		/**
+		 * {@inheritDoc}
+		 *
+		 * <p>
+		 * The evaluation of predicates by this context is short-circuiting, but
+		 * unordered.</p>
+		 */
 		@Override
         public <T> boolean eval(Recognizer<T, ?> parser, RuleContext outerContext) {
 			for (SemanticContext opnd : opnds) {

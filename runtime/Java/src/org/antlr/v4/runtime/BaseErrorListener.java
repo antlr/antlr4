@@ -32,51 +32,57 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.SimulatorState;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.BitSet;
 
 /**
+ * Provides an empty default implementation of {@link ANTLRErrorListener}. The
+ * default implementation of each method does nothing, but can be overridden as
+ * necessary.
+ *
  * @author Sam Harwell
  */
 public class BaseErrorListener implements ParserErrorListener {
 	@Override
-	public <T extends Token> void syntaxError(Recognizer<T, ?> recognizer,
-											  T offendingSymbol,
+	public <T extends Token> void syntaxError(@NotNull Recognizer<T, ?> recognizer,
+											  @Nullable T offendingSymbol,
 											  int line,
 											  int charPositionInLine,
-											  String msg,
-											  RecognitionException e)
+											  @NotNull String msg,
+											  @Nullable RecognitionException e)
 	{
 	}
 
 	@Override
-	public void reportAmbiguity(Parser recognizer,
-								DFA dfa,
+	public void reportAmbiguity(@NotNull Parser recognizer,
+								@NotNull DFA dfa,
 								int startIndex,
 								int stopIndex,
 								boolean exact,
-								BitSet ambigAlts,
-								ATNConfigSet configs)
+								@Nullable BitSet ambigAlts,
+								@NotNull ATNConfigSet configs)
 	{
 	}
 
 	@Override
-	public void reportAttemptingFullContext(Parser recognizer,
-											DFA dfa,
+	public void reportAttemptingFullContext(@NotNull Parser recognizer,
+											@NotNull DFA dfa,
 											int startIndex,
 											int stopIndex,
-											BitSet conflictingAlts,
-											SimulatorState conflictState)
+											@Nullable BitSet conflictingAlts,
+											@NotNull SimulatorState conflictState)
 	{
 	}
 
 	@Override
-	public void reportContextSensitivity(Parser recognizer,
-										 DFA dfa,
+	public void reportContextSensitivity(@NotNull Parser recognizer,
+										 @NotNull DFA dfa,
 										 int startIndex,
 										 int stopIndex,
 										 int prediction,
-										 SimulatorState acceptState)
+										 @NotNull SimulatorState acceptState)
 	{
 	}
 }

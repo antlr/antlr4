@@ -98,14 +98,14 @@ public class ParseTreeMatch {
 
 	/**
 	 * Get the last node associated with a specific {@code label}.
-	 * <p/>
-	 * For example, for pattern {@code <id:ID>}, {@code get("id")} returns the
+	 *
+	 * <p>For example, for pattern {@code <id:ID>}, {@code get("id")} returns the
 	 * node matched for that {@code ID}. If more than one node
 	 * matched the specified label, only the last is returned. If there is
-	 * no node associated with the label, this returns {@code null}.
-	 * <p/>
-	 * Pattern tags like {@code <ID>} and {@code <expr>} without labels are
-	 * considered to be labeled with {@code ID} and {@code expr}, respectively.
+	 * no node associated with the label, this returns {@code null}.</p>
+	 *
+	 * <p>Pattern tags like {@code <ID>} and {@code <expr>} without labels are
+	 * considered to be labeled with {@code ID} and {@code expr}, respectively.</p>
 	 *
 	 * @param label The label to check.
 	 *
@@ -124,13 +124,13 @@ public class ParseTreeMatch {
 
 	/**
 	 * Return all nodes matching a rule or token tag with the specified label.
-	 * <p/>
-	 * If the {@code label} is the name of a parser rule or token in the
+	 *
+	 * <p>If the {@code label} is the name of a parser rule or token in the
 	 * grammar, the resulting list will contain both the parse trees matching
 	 * rule or tags explicitly labeled with the label and the complete set of
 	 * parse trees matching the labeled and unlabeled tags in the pattern for
 	 * the parser rule or token. For example, if {@code label} is {@code "foo"},
-	 * the result will contain <em>all</em> of the following.
+	 * the result will contain <em>all</em> of the following.</p>
 	 *
 	 * <ul>
 	 * <li>Parse tree nodes matching tags of the form {@code <foo:anyRuleName>} and
@@ -157,10 +157,10 @@ public class ParseTreeMatch {
 
 	/**
 	 * Return a mapping from label &rarr; [list of nodes].
-	 * <p/>
-	 * The map includes special entries corresponding to the names of rules and
+	 *
+	 * <p>The map includes special entries corresponding to the names of rules and
 	 * tokens referenced in tags in the original pattern. For additional
-	 * information, see the description of {@link #getAll(String)}.
+	 * information, see the description of {@link #getAll(String)}.</p>
 	 *
 	 * @return A mapping from labels to parse tree nodes. If the parse tree
 	 * pattern did not contain any rule or token tags, this map will be empty.

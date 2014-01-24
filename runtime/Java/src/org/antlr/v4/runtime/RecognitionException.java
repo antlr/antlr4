@@ -97,8 +97,8 @@ public class RecognitionException extends RuntimeException {
 	 * {@link LexerNoViableAltException} exceptions, this is the
 	 * {@link DecisionState} number. For others, it is the state whose outgoing
 	 * edge we couldn't match.
-	 * <p/>
-	 * If the state number is not known, this method returns -1.
+	 *
+	 * <p>If the state number is not known, this method returns -1.</p>
 	 */
 	public int getOffendingState() {
 		return offendingState;
@@ -111,9 +111,9 @@ public class RecognitionException extends RuntimeException {
 	/**
 	 * Gets the set of input symbols which could potentially follow the
 	 * previously matched symbol at the time this exception was thrown.
-	 * <p/>
-	 * If the set of expected tokens is not known and could not be computed,
-	 * this method returns {@code null}.
+	 *
+	 * <p>If the set of expected tokens is not known and could not be computed,
+	 * this method returns {@code null}.</p>
 	 *
 	 * @return The set of token types that could potentially follow the current
 	 * state in the ATN, or {@code null} if the information is not available.
@@ -129,8 +129,8 @@ public class RecognitionException extends RuntimeException {
 
 	/**
 	 * Gets the {@link RuleContext} at the time this exception was thrown.
-	 * <p/>
-	 * If the context is not available, this method returns {@code null}.
+	 *
+	 * <p>If the context is not available, this method returns {@code null}.</p>
 	 *
 	 * @return The {@link RuleContext} at the time this exception was thrown.
 	 * If the context is not available, this method returns {@code null}.
@@ -143,8 +143,8 @@ public class RecognitionException extends RuntimeException {
 	/**
 	 * Gets the input stream which is the symbol source for the recognizer where
 	 * this exception was thrown.
-	 * <p/>
-	 * If the input stream is not available, this method returns {@code null}.
+	 *
+	 * <p>If the input stream is not available, this method returns {@code null}.</p>
 	 *
 	 * @return The input stream which is the symbol source for the recognizer
 	 * where this exception was thrown, or {@code null} if the stream is not
@@ -168,8 +168,8 @@ public class RecognitionException extends RuntimeException {
 
 	/**
 	 * Gets the {@link Recognizer} where this exception occurred.
-	 * <p/>
-	 * If the recognizer is not available, this method returns {@code null}.
+	 *
+	 * <p>If the recognizer is not available, this method returns {@code null}.</p>
 	 *
 	 * @return The recognizer where this exception occurred, or {@code null} if
 	 * the recognizer is not available.

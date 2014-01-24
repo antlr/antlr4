@@ -178,8 +178,8 @@ public class Utils {
 		t.join();
 	}
 
-	/** Convert array of strings to string->index map. Useful for
-	 *  converting rulenames to name->ruleindex map.
+	/** Convert array of strings to string&rarr;index map. Useful for
+	 *  converting rulenames to name&rarr;ruleindex map.
 	 */
 	public static Map<String, Integer> toMap(String[] keys) {
 		Map<String, Integer> m = new HashMap<String, Integer>();

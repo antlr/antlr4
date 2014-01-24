@@ -88,7 +88,7 @@ public class DiagnosticErrorListener extends BaseErrorListener {
 
 	@Override
 	public void reportAmbiguity(@NotNull Parser recognizer,
-								DFA dfa,
+								@NotNull DFA dfa,
 								int startIndex,
 								int stopIndex,
 								boolean exact,

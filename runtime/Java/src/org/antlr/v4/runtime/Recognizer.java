@@ -71,8 +71,8 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	/**
 	 * Get a map from token names to token types.
-	 * <p/>
-	 * Used for XPath and tree pattern compilation.
+	 *
+	 * <p>Used for XPath and tree pattern compilation.</p>
 	 */
 	@NotNull
 	public Map<String, Integer> getTokenTypeMap() {
@@ -96,8 +96,8 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	/**
 	 * Get a map from rule names to rule indexes.
-	 * <p/>
-	 * Used for XPath and tree pattern compilation.
+	 *
+	 * <p>Used for XPath and tree pattern compilation.</p>
 	 */
 	@NotNull
 	public Map<String, Integer> getRuleIndexMap() {
@@ -126,9 +126,9 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	/**
 	 * If this recognizer was generated, it will have a serialized ATN
 	 * representation of the grammar.
-	 * <p/>
-	 * For interpreters, we don't know their serialized ATN despite having
-	 * created the interpreter from it.
+	 *
+	 * <p>For interpreters, we don't know their serialized ATN despite having
+	 * created the interpreter from it.</p>
 	 */
 	@NotNull
 	public String getSerializedATN() {

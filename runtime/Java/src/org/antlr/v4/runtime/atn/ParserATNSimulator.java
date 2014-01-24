@@ -59,191 +59,232 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- The embodiment of the adaptive LL(*) parsing strategy.
-
- The basic complexity of the adaptive strategy makes it harder to
- understand. We begin with ATN simulation to build paths in a
- DFA. Subsequent prediction requests go through the DFA first. If
- they reach a state without an edge for the current symbol, the
- algorithm fails over to the ATN simulation to complete the DFA
- path for the current input (until it finds a conflict state or
- uniquely predicting state).
-
- All of that is done without using the outer context because we
- want to create a DFA that is not dependent upon the rule
- invocation stack when we do a prediction.  One DFA works in all
- contexts. We avoid using context not necessarily because it
- slower, although it can be, but because of the DFA caching
- problem.  The closure routine only considers the rule invocation
- stack created during prediction beginning in the entry rule.  For
- example, if prediction occurs without invoking another rule's
- ATN, there are no context stacks in the configurations. When this
- leads to a conflict, we don't know if it's an ambiguity or a
- weakness in the strong LL(*) parsing strategy (versus full
- LL(*)).
-
- So, we simply retry the ATN simulation again, this time
- using full outer context and filling a dummy DFA (to avoid
- polluting the context insensitive DFA). Configuration context
- stacks will be the full invocation stack from the start rule. If
- we get a conflict using full context, then we can definitively
- say we have a true ambiguity for that input sequence. If we don't
- get a conflict, it implies that the decision is sensitive to the
- outer context. (It is not context-sensitive in the sense of
- context sensitive grammars.) We create a special DFA accept state
- that maps rule context to a predicted alternative. That is the
- only modification needed to handle full LL(*) prediction. In
- general, full context prediction will use more lookahead than
- necessary, but it pays to share the same DFA. For a schedule
- proof that full context prediction uses that most the same amount
- of lookahead as a context insensitive prediction, see the comment
- on method retryWithContext().
-
- So, the strategy is complex because we bounce back and forth from
- the ATN to the DFA, simultaneously performing predictions and
- extending the DFA according to previously unseen input
- sequences. The retry with full context is a recursive call to the
- same function naturally because it does the same thing, just with
- a different initial context. The problem is, that we need to pass
- in a "full context mode" parameter so that it knows to report
- conflicts differently. It also knows not to do a retry, to avoid
- infinite recursion, if it is already using full context.
-
- Retry a simulation using full outer context.
-	 *
-	 *  One of the key assumptions here is that using full context
-	 *  can use at most the same amount of input as a simulation
-	 *  that is not useful context (i.e., it uses all possible contexts
-	 *  that could invoke our entry rule. I believe that this is true
-	 *  and the proof might go like this.
-	 *
-	 *  THEOREM:  The amount of input consumed during a full context
-	 *  simulation is at most the amount of input consumed during a
-	 *  non full context simulation.
-	 *
-	 *  PROOF: Let D be the DFA state at which non-context simulation
-	 *  terminated. That means that D does not have a configuration for
-	 *  which we can legally pursue more input. (It is legal to work only
-	 *  on configurations for which there is no conflict with another
-	 *  configuration.) Now we restrict ourselves to following ATN edges
-	 *  associated with a single context. Choose any DFA state D' along
-	 *  the path (same input) to D. That state has either the same number
-	 *  of configurations or fewer. (If the number of configurations is
-	 *  the same, then we have degenerated to the non-context case.) Now
-	 *  imagine that we restrict to following edges associated with
-	 *  another single context and that we reach DFA state D'' for the
-	 *  same amount of input as D'. The non-context simulation merges D'
-	 *  and D''. The union of the configuration sets either has the same
-	 *  number of configurations as both D' and D'' or it has more. If it
-	 *  has the same number, we are no worse off and the merge does not
-	 *  force us to look for more input than we would otherwise have to
-	 *  do. If the union has more configurations, it can introduce
-	 *  conflicts but not new alternatives--we cannot conjure up alternatives
-	 *  by computing closure on the DFA state.  Here are the cases for
-	 *  D' union D'':
-	 *
-	 *  1. No increase in configurations, D' = D''
-	 *  2. Add configuration that introduces a new alternative number.
-	 *     This cannot happen because no new alternatives are introduced
-	 *     while computing closure, even during start state computation.
-	 *  3. D'' adds a configuration that does not conflict with any
-	 *     configuration in D'.  Simulating without context would then have
-	 *     forced us to use more lookahead than D' (full context) alone.
-	 *  3. D'' adds a configuration that introduces a conflict with a
-	 *     configuration in D'. There are 2 cases:
-	 *     a. The conflict does not cause termination (D' union D''
-	 *        is added to the work list). Again no context simulation requires
-	 *        more input.
-	 *     b. The conflict does cause termination, but this cannot happen.
-	 *        By definition, we know that with ALL contexts merged we
-	 *        don't terminate until D and D' uses less input than D. Therefore
-	 *        no context simulation requires more input than full context
-	 *        simulation.
-	 *
-	 *  We have covered all the cases and there is never a situation where
-	 *  a single, full context simulation requires more input than a
-	 *  no context simulation.
-
-	 I spent a bunch of time thinking about this problem after finding
-	 a case where context-sensitive ATN simulation looks beyond what they
-	 no context simulation uses. the no context simulation for if then else
-	 stops at the else whereas full context scans through to the end of the
-	 statement to decide that the "else statement" clause is ambiguous. And
-	 sometimes it is not ambiguous! Ok, I made an untrue assumption in my
-	 proof which I won't bother going to. the important thing is what I'm
-	 going to do about it. I thought I had a simple answer, but nope. It
-	 turns out that the if then else case is perfect example of something
-	 that has the following characteristics:
-
-	 * no context conflicts at k=1
-	 * full context at k=(1 + length of statement) can be both ambiguous and not
-	   ambiguous depending on the input, though I think from different contexts.
-
-	 But, the good news is that the k=1 case is a special case in that
-	 SLL(1) and LL(1) have exactly the same power so we can conclude that
-	 conflicts at k=1 are true ambiguities and we do not need to pursue
-	 context-sensitive parsing. That covers a huge number of cases
-	 including the if then else clause and the predicated precedence
-	 parsing mechanism. whew! because that could be extremely expensive if
-	 we had to do context.
-
-	 Further, there is no point in doing full context if none of the
-	 configurations dip into the outer context. This nicely handles cases
-	 such as super constructor calls versus function calls. One grammar
-	 might look like this:
-
-	 ctorBody : '{' superCall? stat* '}' ;
-
-	 Or, you might see something like
-
-	 stat : superCall ';' | expression ';' | ... ;
-
-	 In both cases I believe that no closure operations will dip into the
-	 outer context. In the first case ctorBody in the worst case will stop
-	 at the '}'. In the 2nd case it should stop at the ';'. Both cases
-	 should stay within the entry rule and not dip into the outer context.
-
-	 So, we now cover what I hope is the vast majority of the cases (in
-	 particular the very important precedence parsing case). Anything that
-	 needs k>1 and dips into the outer context requires a full context
-	 retry. In this case, I'm going to start out with a brain-dead solution
-	 which is to mark the DFA state as context-sensitive when I get a
-	 conflict. Any further DFA simulation that reaches that state will
-	 launch an ATN simulation to get the prediction, without updating the
-	 DFA or storing any context information. Later, I can make this more
-	 efficient, but at least in this case I can guarantee that it will
-	 always do the right thing. We are not making any assumptions about
-	 lookahead depth.
-
-	 Ok, writing this up so I can put in a comment.
-
-	 Upon conflict in the no context simulation:
-
-	 * if k=1, report ambiguity and resolve to the minimum conflicting alternative
-
-	 * if k=1 and predicates, no report and include the predicate to
-	   predicted alternative map in the DFA state
-
-	 * if k=* and we did not dip into the outer context, report ambiguity
-	   and resolve to minimum conflicting alternative
-
-	 * if k>1 and we dip into outer context, retry with full context
-		 * if conflict, report ambiguity and resolve to minimum conflicting
-		   alternative, mark DFA as context-sensitive
-		 * If no conflict, report ctx sensitivity and mark DFA as context-sensitive
-		 * Technically, if full context k is less than no context k, we can
-			 reuse the conflicting DFA state so we don't have to create special
-			 DFA paths branching from context, but we can leave that for
-			 optimization later if necessary.
-
-	 * if non-greedy, no report and resolve to the exit alternative
+ * The embodiment of the adaptive LL(*), ALL(*), parsing strategy.
  *
- * 	By default we do full context-sensitive LL(*) parsing not
- 	 *  Strong LL(*) parsing. If we fail with Strong LL(*) we
- 	 *  try full LL(*). That means we rewind and use context information
- 	 *  when closure operations fall off the end of the rule that
- 	 *  holds the decision were evaluating
-*/
+ * <p>
+ * The basic complexity of the adaptive strategy makes it harder to understand.
+ * We begin with ATN simulation to build paths in a DFA. Subsequent prediction
+ * requests go through the DFA first. If they reach a state without an edge for
+ * the current symbol, the algorithm fails over to the ATN simulation to
+ * complete the DFA path for the current input (until it finds a conflict state
+ * or uniquely predicting state).</p>
+ *
+ * <p>
+ * All of that is done without using the outer context because we want to create
+ * a DFA that is not dependent upon the rule invocation stack when we do a
+ * prediction. One DFA works in all contexts. We avoid using context not
+ * necessarily because it's slower, although it can be, but because of the DFA
+ * caching problem. The closure routine only considers the rule invocation stack
+ * created during prediction beginning in the decision rule. For example, if
+ * prediction occurs without invoking another rule's ATN, there are no context
+ * stacks in the configurations. When lack of context leads to a conflict, we
+ * don't know if it's an ambiguity or a weakness in the strong LL(*) parsing
+ * strategy (versus full LL(*)).</p>
+ *
+ * <p>
+ * When SLL yields a configuration set with conflict, we rewind the input and
+ * retry the ATN simulation, this time using full outer context without adding
+ * to the DFA. Configuration context stacks will be the full invocation stacks
+ * from the start rule. If we get a conflict using full context, then we can
+ * definitively say we have a true ambiguity for that input sequence. If we
+ * don't get a conflict, it implies that the decision is sensitive to the outer
+ * context. (It is not context-sensitive in the sense of context-sensitive
+ * grammars.)</p>
+ *
+ * <p>
+ * The next time we reach this DFA state with an SLL conflict, through DFA
+ * simulation, we will again retry the ATN simulation using full context mode.
+ * This is slow because we can't save the results and have to "interpret" the
+ * ATN each time we get that input.</p>
+ *
+ * <p>
+ * <strong>CACHING FULL CONTEXT PREDICTIONS</strong></p>
+ *
+ * <p>
+ * We could cache results from full context to predicted alternative easily and
+ * that saves a lot of time but doesn't work in presence of predicates. The set
+ * of visible predicates from the ATN start state changes depending on the
+ * context, because closure can fall off the end of a rule. I tried to cache
+ * tuples (stack context, semantic context, predicted alt) but it was slower
+ * than interpreting and much more complicated. Also required a huge amount of
+ * memory. The goal is not to create the world's fastest parser anyway. I'd like
+ * to keep this algorithm simple. By launching multiple threads, we can improve
+ * the speed of parsing across a large number of files.</p>
+ *
+ * <p>
+ * There is no strict ordering between the amount of input used by SLL vs LL,
+ * which makes it really hard to build a cache for full context. Let's say that
+ * we have input A B C that leads to an SLL conflict with full context X. That
+ * implies that using X we might only use A B but we could also use A B C D to
+ * resolve conflict. Input A B C D could predict alternative 1 in one position
+ * in the input and A B C E could predict alternative 2 in another position in
+ * input. The conflicting SLL configurations could still be non-unique in the
+ * full context prediction, which would lead us to requiring more input than the
+ * original A B C.	To make a	prediction cache work, we have to track	the exact
+ * input	used during the previous prediction. That amounts to a cache that maps
+ * X to a specific DFA for that context.</p>
+ *
+ * <p>
+ * Something should be done for left-recursive expression predictions. They are
+ * likely LL(1) + pred eval. Easier to do the whole SLL unless error and retry
+ * with full LL thing Sam does.</p>
+ *
+ * <p>
+ * <strong>AVOIDING FULL CONTEXT PREDICTION</strong></p>
+ *
+ * <p>
+ * We avoid doing full context retry when the outer context is empty, we did not
+ * dip into the outer context by falling off the end of the decision state rule,
+ * or when we force SLL mode.</p>
+ *
+ * <p>
+ * As an example of the not dip into outer context case, consider as super
+ * constructor calls versus function calls. One grammar might look like
+ * this:</p>
+ *
+ * <pre>
+ * ctorBody
+ *   : '{' superCall? stat* '}'
+ *   ;
+ * </pre>
+ *
+ * <p>
+ * Or, you might see something like</p>
+ *
+ * <pre>
+ * stat
+ *   : superCall ';'
+ *   | expression ';'
+ *   | ...
+ *   ;
+ * </pre>
+ *
+ * <p>
+ * In both cases I believe that no closure operations will dip into the outer
+ * context. In the first case ctorBody in the worst case will stop at the '}'.
+ * In the 2nd case it should stop at the ';'. Both cases should stay within the
+ * entry rule and not dip into the outer context.</p>
+ *
+ * <p>
+ * <strong>PREDICATES</strong></p>
+ *
+ * <p>
+ * Predicates are always evaluated if present in either SLL or LL both. SLL and
+ * LL simulation deals with predicates differently. SLL collects predicates as
+ * it performs closure operations like ANTLR v3 did. It delays predicate
+ * evaluation until it reaches and accept state. This allows us to cache the SLL
+ * ATN simulation whereas, if we had evaluated predicates on-the-fly during
+ * closure, the DFA state configuration sets would be different and we couldn't
+ * build up a suitable DFA.</p>
+ *
+ * <p>
+ * When building a DFA accept state during ATN simulation, we evaluate any
+ * predicates and return the sole semantically valid alternative. If there is
+ * more than 1 alternative, we report an ambiguity. If there are 0 alternatives,
+ * we throw an exception. Alternatives without predicates act like they have
+ * true predicates. The simple way to think about it is to strip away all
+ * alternatives with false predicates and choose the minimum alternative that
+ * remains.</p>
+ *
+ * <p>
+ * When we start in the DFA and reach an accept state that's predicated, we test
+ * those and return the minimum semantically viable alternative. If no
+ * alternatives are viable, we throw an exception.</p>
+ *
+ * <p>
+ * During full LL ATN simulation, closure always evaluates predicates and
+ * on-the-fly. This is crucial to reducing the configuration set size during
+ * closure. It hits a landmine when parsing with the Java grammar, for example,
+ * without this on-the-fly evaluation.</p>
+ *
+ * <p>
+ * <strong>SHARING DFA</strong></p>
+ *
+ * <p>
+ * All instances of the same parser share the same decision DFAs through a
+ * static field. Each instance gets its own ATN simulator but they share the
+ * same {@link #decisionToDFA} field. They also share a
+ * {@link PredictionContextCache} object that makes sure that all
+ * {@link PredictionContext} objects are shared among the DFA states. This makes
+ * a big size difference.</p>
+ *
+ * <p>
+ * <strong>THREAD SAFETY</strong></p>
+ *
+ * <p>
+ * The {@link ParserATNSimulator} locks on the {@link #decisionToDFA} field when
+ * it adds a new DFA object to that array. {@link #addDFAEdge}
+ * locks on the DFA for the current decision when setting the
+ * {@link DFAState#edges} field. {@link #addDFAState} locks on
+ * the DFA for the current decision when looking up a DFA state to see if it
+ * already exists. We must make sure that all requests to add DFA states that
+ * are equivalent result in the same shared DFA object. This is because lots of
+ * threads will be trying to update the DFA at once. The
+ * {@link #addDFAState} method also locks inside the DFA lock
+ * but this time on the shared context cache when it rebuilds the
+ * configurations' {@link PredictionContext} objects using cached
+ * subgraphs/nodes. No other locking occurs, even during DFA simulation. This is
+ * safe as long as we can guarantee that all threads referencing
+ * {@code s.edge[t]} get the same physical target {@link DFAState}, or
+ * {@code null}. Once into the DFA, the DFA simulation does not reference the
+ * {@link DFA#states} map. It follows the {@link DFAState#edges} field to new
+ * targets. The DFA simulator will either find {@link DFAState#edges} to be
+ * {@code null}, to be non-{@code null} and {@code dfa.edges[t]} null, or
+ * {@code dfa.edges[t]} to be non-null. The
+ * {@link #addDFAEdge} method could be racing to set the field
+ * but in either case the DFA simulator works; if {@code null}, and requests ATN
+ * simulation. It could also race trying to get {@code dfa.edges[t]}, but either
+ * way it will work because it's not doing a test and set operation.</p>
+ *
+ * <p>
+ * <strong>Starting with SLL then failing to combined SLL/LL (Two-Stage
+ * Parsing)</strong></p>
+ *
+ * <p>
+ * Sam pointed out that if SLL does not give a syntax error, then there is no
+ * point in doing full LL, which is slower. We only have to try LL if we get a
+ * syntax error. For maximum speed, Sam starts the parser set to pure SLL
+ * mode with the {@link BailErrorStrategy}:</p>
+ *
+ * <pre>
+ * parser.{@link Parser#getInterpreter() getInterpreter()}.{@link #setSLL setSLL(true)};
+ * parser.{@link Parser#setErrorHandler setErrorHandler}(new {@link BailErrorStrategy}());
+ * </pre>
+ *
+ * <p>
+ * If it does not get a syntax error, then we're done. If it does get a syntax
+ * error, we need to retry with the combined SLL/LL strategy.</p>
+ *
+ * <p>
+ * The reason this works is as follows. If there are no SLL conflicts, then the
+ * grammar is SLL (at least for that input set). If there is an SLL conflict,
+ * the full LL analysis must yield a set of viable alternatives which is a
+ * subset of the alternatives reported by SLL. If the LL set is a singleton,
+ * then the grammar is LL but not SLL. If the LL set is the same size as the SLL
+ * set, the decision is SLL. If the LL set has size &gt; 1, then that decision
+ * is truly ambiguous on the current input. If the LL set is smaller, then the
+ * SLL conflict resolution might choose an alternative that the full LL would
+ * rule out as a possibility based upon better context information. If that's
+ * the case, then the SLL parse will definitely get an error because the full LL
+ * analysis says it's not viable. If SLL conflict resolution chooses an
+ * alternative within the LL set, them both SLL and LL would choose the same
+ * alternative because they both choose the minimum of multiple conflicting
+ * alternatives.</p>
+ *
+ * <p>
+ * Let's say we have a set of SLL conflicting alternatives {@code {1, 2, 3}} and
+ * a smaller LL set called <em>s</em>. If <em>s</em> is {@code {2, 3}}, then SLL
+ * parsing will get an error because SLL will pursue alternative 1. If
+ * <em>s</em> is {@code {1, 2}} or {@code {1, 3}} then both SLL and LL will
+ * choose the same alternative because alternative one is the minimum of either
+ * set. If <em>s</em> is {@code {2}} or {@code {3}} then SLL will get a syntax
+ * error. If <em>s</em> is {@code {1}} then SLL will succeed.</p>
+ *
+ * <p>
+ * Of course, if the input is invalid, then we will get an error for sure in
+ * both SLL and LL parsing. Erroneous input will therefore require 2 passes over
+ * the input.</p>
+ */
 public class ParserATNSimulator extends ATNSimulator {
 	public static final boolean debug = false;
 	public static final boolean dfa_debug = false;
@@ -2065,7 +2106,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return new DFAState(configs, -1, atn.maxTokenType);
 	}
 
-	protected void reportAttemptingFullContext(DFA dfa, @Nullable BitSet conflictingAlts, SimulatorState conflictState, int startIndex, int stopIndex) {
+	protected void reportAttemptingFullContext(@NotNull DFA dfa, @Nullable BitSet conflictingAlts, @NotNull SimulatorState conflictState, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);
             System.out.println("reportAttemptingFullContext decision="+dfa.decision+":"+conflictState.s0.configs+
@@ -2074,7 +2115,7 @@ public class ParserATNSimulator extends ATNSimulator {
         if ( parser!=null ) parser.getErrorListenerDispatch().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, conflictingAlts, conflictState);
     }
 
-	protected void reportContextSensitivity(DFA dfa, int prediction, SimulatorState acceptState, int startIndex, int stopIndex) {
+	protected void reportContextSensitivity(@NotNull DFA dfa, int prediction, @NotNull SimulatorState acceptState, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);
             System.out.println("reportContextSensitivity decision="+dfa.decision+":"+acceptState.s0.configs+

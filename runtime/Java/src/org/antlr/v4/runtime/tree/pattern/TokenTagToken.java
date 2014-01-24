@@ -100,9 +100,9 @@ public class TokenTagToken extends CommonToken {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * The implementation for {@link TokenTagToken} returns the token tag
-	 * formatted with {@code <} and {@code >} delimiters.
+	 *
+	 * <p>The implementation for {@link TokenTagToken} returns the token tag
+	 * formatted with {@code <} and {@code >} delimiters.</p>
 	 */
 	@Override
 	public String getText() {
@@ -115,9 +115,9 @@ public class TokenTagToken extends CommonToken {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * The implementation for {@link TokenTagToken} returns a string of the form
-	 * {@code tokenName:type}.
+	 *
+	 * <p>The implementation for {@link TokenTagToken} returns a string of the form
+	 * {@code tokenName:type}.</p>
 	 */
 	@Override
 	public String toString() {

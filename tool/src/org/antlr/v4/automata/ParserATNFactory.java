@@ -110,9 +110,11 @@ public class ParserATNFactory implements ATNFactory {
 
 	public int currentOuterAlt;
 
+	@NotNull
 	protected final List<Tuple3<? extends Rule, ? extends ATNState, ? extends ATNState>> preventEpsilonClosureBlocks =
 		new ArrayList<Tuple3<? extends Rule, ? extends ATNState, ? extends ATNState>>();
 
+	@NotNull
 	protected final List<Tuple3<? extends Rule, ? extends ATNState, ? extends ATNState>> preventEpsilonOptionalBlocks =
 		new ArrayList<Tuple3<? extends Rule, ? extends ATNState, ? extends ATNState>>();
 
@@ -128,6 +130,7 @@ public class ParserATNFactory implements ATNFactory {
 		this.atn = new ATN(atnType, maxTokenType);
 	}
 
+	@NotNull
 	@Override
 	public ATN createATN() {
 		_createATN(g.rules.values());
@@ -169,7 +172,7 @@ public class ParserATNFactory implements ATNFactory {
 		return atn;
 	}
 
-	protected void _createATN(Collection<Rule> rules) {
+	protected void _createATN(@NotNull Collection<Rule> rules) {
 		createRuleStartAndStopATNStates();
 
 		GrammarASTAdaptor adaptor = new GrammarASTAdaptor();
@@ -190,7 +193,7 @@ public class ParserATNFactory implements ATNFactory {
 	}
 
 	@Override
-	public void setCurrentRuleName(String name) {
+	public void setCurrentRuleName(@NotNull String name) {
 		this.currentRule = g.getRule(name);
 	}
 
@@ -200,8 +203,9 @@ public class ParserATNFactory implements ATNFactory {
 	}
 
 	/* start->ruleblock->end */
+	@NotNull
 	@Override
-	public Handle rule(GrammarAST ruleAST, String name, Handle blk) {
+	public Handle rule(@NotNull GrammarAST ruleAST, @NotNull String name, @NotNull Handle blk) {
 		Rule r = g.getRule(name);
 		RuleStartState start = atn.ruleToStartState[r.index];
 		epsilon(start, blk.left);
@@ -215,8 +219,9 @@ public class ParserATNFactory implements ATNFactory {
 	}
 
 	/** From label {@code A} build graph {@code o-A->o}. */
+	@NotNull
 	@Override
-	public Handle tokenRef(TerminalAST node) {
+	public Handle tokenRef(@NotNull TerminalAST node) {
 		ATNState left = newState(node);
 		ATNState right = newState(node);
 		int ttype = g.getTokenType(node.getText());
@@ -229,8 +234,9 @@ public class ParserATNFactory implements ATNFactory {
      *  what an alt block looks like, must have extra state on left.
 	 *  This also handles {@code ~A}, converted to {@code ~{A}} set.
      */
+	@NotNull
 	@Override
-	public Handle set(GrammarAST associatedAST, List<GrammarAST> terminals, boolean invert) {
+	public Handle set(@NotNull GrammarAST associatedAST, @NotNull List<GrammarAST> terminals, boolean invert) {
 		ATNState left = newState(associatedAST);
 		ATNState right = newState(associatedAST);
 		IntervalSet set = new IntervalSet();
@@ -249,12 +255,13 @@ public class ParserATNFactory implements ATNFactory {
 	}
 
 	/** Not valid for non-lexers. */
+	@NotNull
 	@Override
-	public Handle range(GrammarAST a, GrammarAST b) {
-		throw new UnsupportedOperationException();
+	public Handle range(@NotNull GrammarAST a, @NotNull GrammarAST b) {
+		throw new UnsupportedOperationException("This construct is not valid in parsers.");
 	}
 
-	protected int getTokenType(GrammarAST atom) {
+	protected int getTokenType(@NotNull GrammarAST atom) {
 		int ttype;
 		if ( g.isLexer() ) {
 			ttype = CharSupport.getCharValueFromGrammarCharLiteral(atom.getText());
@@ -266,14 +273,16 @@ public class ParserATNFactory implements ATNFactory {
 	}
 
 	/** For a non-lexer, just build a simple token reference atom. */
+	@NotNull
 	@Override
-	public Handle stringLiteral(TerminalAST stringLiteralAST) {
+	public Handle stringLiteral(@NotNull TerminalAST stringLiteralAST) {
 		return tokenRef(stringLiteralAST);
 	}
 
 	/** {@code [Aa]} char sets not allowed in parser */
+	@NotNull
 	@Override
-	public Handle charSetLiteral(GrammarAST charSetAST) {
+	public Handle charSetLiteral(@NotNull GrammarAST charSetAST) {
 		return null;
 	}
 
@@ -288,13 +297,15 @@ public class ParserATNFactory implements ATNFactory {
 	 * {@code o} is not linked to from rule ref state directly (uses
 	 * {@link RuleTransition#followState}).
 	 */
+	@NotNull
 	@Override
-	public Handle ruleRef(GrammarAST node) {
+	public Handle ruleRef(@NotNull GrammarAST node) {
 		Handle h = _ruleRef(node);
 		return h;
 	}
 
-	public Handle _ruleRef(GrammarAST node) {
+	@NotNull
+	public Handle _ruleRef(@NotNull GrammarAST node) {
 		Rule r = g.getRule(node.getText());
 		if ( r==null ) {
 			g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, "Rule "+node.getText()+" undefined");
@@ -322,8 +333,9 @@ public class ParserATNFactory implements ATNFactory {
 	}
 
 	/** From an empty alternative build {@code o-e->o}. */
+	@NotNull
 	@Override
-	public Handle epsilon(GrammarAST node) {
+	public Handle epsilon(@NotNull GrammarAST node) {
 		ATNState left = newState(node);
 		ATNState right = newState(node);
 		epsilon(left, right);
@@ -335,8 +347,9 @@ public class ParserATNFactory implements ATNFactory {
 	 *  predicate action.  The {@code pred} is a pointer into the AST of
 	 *  the {@link ANTLRParser#SEMPRED} token.
 	 */
+	@NotNull
 	@Override
-	public Handle sempred(PredAST pred) {
+	public Handle sempred(@NotNull PredAST pred) {
 		//System.out.println("sempred: "+ pred);
 		ATNState left = newState(pred);
 		ATNState right = newState(pred);
@@ -360,8 +373,9 @@ public class ParserATNFactory implements ATNFactory {
 	 *  The action goes into ATN though it is ignored during prediction
 	 *  if {@link ActionTransition#actionIndex actionIndex}{@code <0}.
 	 */
+	@NotNull
 	@Override
-	public Handle action(ActionAST action) {
+	public Handle action(@NotNull ActionAST action) {
 		//System.out.println("action: "+action);
 		ATNState left = newState(action);
 		ATNState right = newState(action);
@@ -371,9 +385,10 @@ public class ParserATNFactory implements ATNFactory {
 		return new Handle(left, right);
 	}
 
+	@NotNull
 	@Override
-	public Handle action(String action) {
-		return null;
+	public Handle action(@NotNull String action) {
+		throw new UnsupportedOperationException("This element is not valid in parsers.");
 	}
 
 	/**
@@ -400,8 +415,9 @@ public class ParserATNFactory implements ATNFactory {
 	 * <p/>
 	 * TODO: Set alt number (1..n) in the states?
 	 */
+	@NotNull
 	@Override
-	public Handle block(BlockAST blkAST, GrammarAST ebnfRoot, List<Handle> alts) {
+	public Handle block(@NotNull BlockAST blkAST, @NotNull GrammarAST ebnfRoot, @NotNull List<Handle> alts) {
 		if ( ebnfRoot==null ) {
 			if ( alts.size()==1 ) {
 				Handle h = alts.get(0);
@@ -432,7 +448,8 @@ public class ParserATNFactory implements ATNFactory {
 		return null;
 	}
 
-	protected Handle makeBlock(BlockStartState start, BlockAST blkAST, List<Handle> alts) {
+	@NotNull
+	protected Handle makeBlock(@NotNull BlockStartState start, @NotNull BlockAST blkAST, @NotNull List<Handle> alts) {
 		start.sll = isSLLDecision(blkAST);
 
 		BlockEndState end = newState(BlockEndState.class, blkAST);
@@ -622,7 +639,7 @@ public class ParserATNFactory implements ATNFactory {
 	/** Build an atom with all possible values in its label. */
 	@NotNull
 	@Override
-	public Handle wildcard(GrammarAST node) {
+	public Handle wildcard(@NotNull GrammarAST node) {
 		ATNState left = newState(node);
 		ATNState right = newState(node);
 		left.addTransition(new WildcardTransition(right));
@@ -692,13 +709,15 @@ public class ParserATNFactory implements ATNFactory {
 		return n;
 	}
 
+	@NotNull
 	@Override
-	public Handle label(Handle t) {
+	public Handle label(@NotNull Handle t) {
 		return t;
 	}
 
+	@NotNull
 	@Override
-	public Handle listLabel(Handle t) {
+	public Handle listLabel(@NotNull Handle t) {
 		return t;
 	}
 
@@ -771,18 +790,21 @@ public class ParserATNFactory implements ATNFactory {
 		return false;
 	}
 
+	@NotNull
 	@Override
-	public Handle lexerAltCommands(Handle alt, Handle cmds) {
-		return null;
+	public Handle lexerAltCommands(@NotNull Handle alt, @NotNull Handle cmds) {
+		throw new UnsupportedOperationException("This element is not allowed in parsers.");
 	}
 
+	@NotNull
 	@Override
-	public Handle lexerCallCommand(GrammarAST ID, GrammarAST arg) {
-		return null;
+	public Handle lexerCallCommand(@NotNull GrammarAST ID, @NotNull GrammarAST arg) {
+		throw new UnsupportedOperationException("This element is not allowed in parsers.");
 	}
 
+	@NotNull
 	@Override
-	public Handle lexerCommand(GrammarAST ID) {
-		return null;
+	public Handle lexerCommand(@NotNull GrammarAST ID) {
+		throw new UnsupportedOperationException("This element is not allowed in parsers.");
 	}
 }

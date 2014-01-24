@@ -33,7 +33,7 @@ digraph "" {
 
         temp2a -> temp2b[style="invisible";dir="none"];
         temp2a -> temp2c[style="invisible";dir="none"];
-        temp2b -> temp2c[constraint="false";label="wwwwwww"];
+        temp2b -> temp2c[constraint="false";label="wwwwwww";fontcolor="invis"];
     }
 
     subgraph Res {

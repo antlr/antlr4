@@ -425,6 +425,8 @@ public abstract class BaseTest {
 		compileOptions.add("1.6");
 		compileOptions.add("-target");
 		compileOptions.add("1.6");
+		compileOptions.add("-implicit:class");
+		compileOptions.add("-Xlint:-options");
 
 		String bootclasspath = getBootClassPath();
 		if (bootclasspath != null) {

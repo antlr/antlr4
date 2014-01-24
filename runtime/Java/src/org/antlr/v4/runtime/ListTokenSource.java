@@ -8,10 +8,10 @@ import java.util.List;
 /**
  * Provides an implementation of {@link TokenSource} as a wrapper around a list
  * of {@link Token} objects.
- * <p/>
- * If the final token in the list is an {@link Token#EOF} token, it will be used
+ *
+ * <p>If the final token in the list is an {@link Token#EOF} token, it will be used
  * as the EOF token for every call to {@link #nextToken} after the end of the
- * list is reached. Otherwise, an EOF token will be created.
+ * list is reached. Otherwise, an EOF token will be created.</p>
  */
 public class ListTokenSource implements TokenSource {
 	/**
@@ -80,7 +80,7 @@ public class ListTokenSource implements TokenSource {
 	}
 
 	/**
-	 * @inheritDoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getCharPositionInLine() {
@@ -111,7 +111,7 @@ public class ListTokenSource implements TokenSource {
 	}
 
 	/**
-	 * @inheritDoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public Token nextToken() {
@@ -142,7 +142,7 @@ public class ListTokenSource implements TokenSource {
 	}
 
 	/**
-	 * @inheritDoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public int getLine() {
@@ -177,7 +177,7 @@ public class ListTokenSource implements TokenSource {
 	}
 
 	/**
-	 * @inheritDoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public CharStream getInputStream() {
@@ -196,7 +196,7 @@ public class ListTokenSource implements TokenSource {
 	}
 
 	/**
-	 * @inheritDoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public String getSourceName() {
@@ -213,7 +213,7 @@ public class ListTokenSource implements TokenSource {
 	}
 
 	/**
-	 * @inheritDoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void setTokenFactory(@NotNull TokenFactory factory) {
@@ -221,7 +221,7 @@ public class ListTokenSource implements TokenSource {
 	}
 
 	/**
-	 * @inheritDoc
+	 * {@inheritDoc}
 	 */
 	@Override
 	@NotNull

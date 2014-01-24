@@ -81,9 +81,9 @@ public final class LexerModeAction implements LexerAction {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * This action is implemented by calling {@link Lexer#mode} with the
-	 * value provided by {@link #getMode}.
+	 *
+	 * <p>This action is implemented by calling {@link Lexer#mode} with the
+	 * value provided by {@link #getMode}.</p>
 	 */
 	@Override
 	public void execute(@NotNull Lexer lexer) {

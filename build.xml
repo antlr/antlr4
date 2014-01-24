@@ -199,8 +199,8 @@
         <mkdir dir="${build.dir}/classes"/>
         <javac
                 destdir="${build.dir}/classes"
-                source="1.5"
-                target="1.5"
+                source="1.6"
+                target="1.6"
                 debug="true"
                 excludes="org/antlr/v4/test/**">
             <compilerarg value="-Xlint"/>
@@ -209,7 +209,7 @@
                 <path refid="cp.antlr3"/>
                 <pathelement location="${basedir}/runtime/Java/lib/org.abego.treelayout.core.jar"/>
             </classpath>
-            <src path="${basedir}/tool/src:${basedir}/runtime/Java/src:${build.antlr3.dir}:${build.antlr4.dir}"/>
+            <src path="${basedir}/tool/src:${basedir}/runtime/JavaAnnotations/src:${basedir}/runtime/Java/src:${build.antlr3.dir}:${build.antlr4.dir}"/>
         </javac>
     </target>
 
@@ -245,6 +245,12 @@
 			<fileset dir="${basedir}/tool/resources/">
 				<include name="**/*.st"/>
 				<include name="**/*.stg"/>
+			</fileset>
+			<fileset dir="${basedir}/runtime/JavaAnnotations/resources/">
+				<include name="**/*.Processor"/>
+			</fileset>
+			<fileset dir="${basedir}/runtime/JavaAnnotations/src/">
+				<include name="**/*.java"/>
 			</fileset>
 			<fileset dir="${basedir}/runtime/Java/src/">
 				<include name="**/*.java"/>

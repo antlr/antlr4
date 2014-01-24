@@ -221,9 +221,9 @@ public class ATN {
 	 * assumed true). If a path in the ATN exists from the starting state to the
 	 * {@link RuleStopState} of the outermost context without matching any
 	 * symbols, {@link Token#EOF} is added to the returned set.
-	 * <p/>
-	 * If {@code context} is {@code null}, it is treated as
-	 * {@link ParserRuleContext#EMPTY}.
+	 *
+	 * <p>If {@code context} is {@code null}, it is treated as
+	 * {@link ParserRuleContext#EMPTY}.</p>
 	 *
 	 * @param stateNumber the ATN state number
 	 * @param context the full parse context

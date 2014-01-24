@@ -38,49 +38,60 @@ import java.util.BitSet;
 import java.util.List;
 
 /**
- * Buffer all input tokens but do on-demand fetching of new tokens from lexer.
- * Useful when the parser or lexer has to set context/mode info before proper
- * lexing of future tokens. The ST template parser needs this, for example,
- * because it has to constantly flip back and forth between inside/output
- * templates. E.g., {@code <names:{hi, <it>}>} has to parse names as part of an
- * expression but {@code "hi, <it>"} as a nested template.
- * <p/>
- * You can't use this stream if you pass whitespace or other off-channel tokens
- * to the parser. The stream can't ignore off-channel tokens.
- * ({@link UnbufferedTokenStream} is the same way.) Use
- * {@link CommonTokenStream}.
+ * This implementation of {@link TokenStream} loads tokens from a
+ * {@link TokenSource} on-demand, and places the tokens in a buffer to provide
+ * access to any previous token by index.
+ *
+ * <p>
+ * This token stream ignores the value of {@link Token#getChannel}. If your
+ * parser requires the token stream filter tokens to only those on a particular
+ * channel, such as {@link Token#DEFAULT_CHANNEL} or
+ * {@link Token#HIDDEN_CHANNEL}, use a filtering token stream such a
+ * {@link CommonTokenStream}.</p>
  */
 public class BufferedTokenStream implements TokenStream {
+	/**
+	 * The {@link TokenSource} from which tokens for this stream are fetched.
+	 */
 	@NotNull
     protected TokenSource tokenSource;
 
 	/**
-	 * Record every single token pulled from the source so we can reproduce
-	 * chunks of it later. This list captures everything so we can access
-	 * complete input text.
+	 * A collection of all tokens fetched from the token source. The list is
+	 * considered a complete view of the input once {@link #fetchedEOF} is set
+	 * to {@code true}.
 	 */
     protected List<Token> tokens = new ArrayList<Token>(100);
 
 	/**
 	 * The index into {@link #tokens} of the current token (next token to
-	 * consume). {@link #tokens}{@code [}{@link #p}{@code ]} should be
-	 * {@link #LT LT(1)}. {@link #p}{@code =-1} indicates need to initialize
-	 * with first token. The constructor doesn't get a token. First call to
-	 * {@link #LT LT(1)} or whatever gets the first token and sets
-	 * {@link #p}{@code =0;}.
+	 * {@link #consume}). {@link #tokens}{@code [}{@link #p}{@code ]} should be
+	 * {@link #LT LT(1)}.
+	 *
+	 * <p>This field is set to -1 when the stream is first constructed or when
+	 * {@link #setTokenSource} is called, indicating that the first token has
+	 * not yet been fetched from the token source. For additional information,
+	 * see the documentation of {@link IntStream} for a description of
+	 * Initializing Methods.</p>
 	 */
     protected int p = -1;
 
 	/**
-	 * Set to {@code true} when the EOF token is fetched. Do not continue fetching
-	 * tokens after that point, or multiple EOF tokens could end up in the
-	 * {@link #tokens} array.
+	 * Indicates whether the {@link Token#EOF} token has been fetched from
+	 * {@link #tokenSource} and added to {@link #tokens}. This field improves
+	 * performance for the following cases:
 	 *
-	 * @see #fetch
+	 * <ul>
+	 * <li>{@link #consume}: The lookahead check in {@link #consume} to prevent
+	 * consuming the EOF symbol is optimized by checking the values of
+	 * {@link #fetchedEOF} and {@link #p} instead of calling {@link #LA}.</li>
+	 * <li>{@link #fetch}: The check to prevent adding multiple EOF symbols into
+	 * {@link #tokens} is trivial with this field.</li>
+	 * <ul>
 	 */
 	protected boolean fetchedEOF;
 
-    public BufferedTokenStream(TokenSource tokenSource) {
+    public BufferedTokenStream(@NotNull TokenSource tokenSource) {
 		if (tokenSource == null) {
 			throw new NullPointerException("tokenSource cannot be null");
 		}
@@ -118,7 +129,24 @@ public class BufferedTokenStream implements TokenStream {
 
     @Override
     public void consume() {
-		if (LA(1) == EOF) {
+		boolean skipEofCheck;
+		if (p >= 0) {
+			if (fetchedEOF) {
+				// the last token in tokens is EOF. skip check if p indexes any
+				// fetched token except the last.
+				skipEofCheck = p < tokens.size() - 1;
+			}
+			else {
+				// no EOF token in tokens. skip check if p indexes a fetched token.
+				skipEofCheck = p < tokens.size();
+			}
+		}
+		else {
+			// not yet initialized
+			skipEofCheck = false;
+		}
+
+		if (!skipEofCheck && LA(1) == EOF) {
 			throw new IllegalStateException("cannot consume EOF");
 		}
 
@@ -199,6 +227,7 @@ public class BufferedTokenStream implements TokenStream {
         return tokens.get(p-k);
     }
 
+	@NotNull
     @Override
     public Token LT(int k) {
         lazyInit();
@@ -221,9 +250,9 @@ public class BufferedTokenStream implements TokenStream {
 	 * operation. The default implementation simply returns {@code i}. If an
 	 * exception is thrown in this method, the current stream index should not be
 	 * changed.
-	 * <p/>
-	 * For example, {@link CommonTokenStream} overrides this method to ensure that
-	 * the seek target is always an on-channel token.
+	 *
+	 * <p>For example, {@link CommonTokenStream} overrides this method to ensure that
+	 * the seek target is always an on-channel token.</p>
 	 *
 	 * @param i The target token index.
 	 * @return The adjusted target token index.

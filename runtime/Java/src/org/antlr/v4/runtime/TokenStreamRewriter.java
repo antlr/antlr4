@@ -37,66 +37,81 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Useful for rewriting out a buffered input token stream after doing some
- *  augmentation or other manipulations on it.
+/**
+ * Useful for rewriting out a buffered input token stream after doing some
+ * augmentation or other manipulations on it.
  *
- *  You can insert stuff, replace, and delete chunks.  Note that the
- *  operations are done lazily--only if you convert the buffer to a
- *  String with getText(). This is very efficient because you are not moving
- *  data around all the time.  As the buffer of tokens is converted to strings,
- *  the getText() method(s) scan the input token stream and check
- *  to see if there is an operation at the current index.
- *  If so, the operation is done and then normal String
- *  rendering continues on the buffer.  This is like having multiple Turing
- *  machine instruction streams (programs) operating on a single input tape. :)
+ * <p>
+ * You can insert stuff, replace, and delete chunks. Note that the operations
+ * are done lazily--only if you convert the buffer to a {@link String} with
+ * {@link TokenStream#getText()}. This is very efficient because you are not
+ * moving data around all the time. As the buffer of tokens is converted to
+ * strings, the {@link #getText()} method(s) scan the input token stream and
+ * check to see if there is an operation at the current index. If so, the
+ * operation is done and then normal {@link String} rendering continues on the
+ * buffer. This is like having multiple Turing machine instruction streams
+ * (programs) operating on a single input tape. :)</p>
  *
- *  This rewriter makes no modifications to the token stream. It does not
- *  ask the stream to fill itself up nor does it advance the input cursor.
- *  The token stream index() will return the same value before and after
- *  any getText() call.
+ * <p>
+ * This rewriter makes no modifications to the token stream. It does not ask the
+ * stream to fill itself up nor does it advance the input cursor. The token
+ * stream {@link TokenStream#index()} will return the same value before and
+ * after any {@link #getText()} call.</p>
  *
- *  The rewriter only works on tokens that you have in the buffer and
- *  ignores the current input cursor. If you are buffering tokens on-demand,
- *  calling getText() halfway through the input will only do rewrites
- *  for those tokens in the first half of the file.
+ * <p>
+ * The rewriter only works on tokens that you have in the buffer and ignores the
+ * current input cursor. If you are buffering tokens on-demand, calling
+ * {@link #getText()} halfway through the input will only do rewrites for those
+ * tokens in the first half of the file.</p>
  *
- *  Since the operations are done lazily at getText-time, operations do not
- *  screw up the token index values.  That is, an insert operation at token
- *  index i does not change the index values for tokens i+1..n-1.
+ * <p>
+ * Since the operations are done lazily at {@link #getText}-time, operations do
+ * not screw up the token index values. That is, an insert operation at token
+ * index {@code i} does not change the index values for tokens
+ * {@code i}+1..n-1.</p>
  *
- *  Because operations never actually alter the buffer, you may always get
- *  the original token stream back without undoing anything.  Since
- *  the instructions are queued up, you can easily simulate transactions and
- *  roll back any changes if there is an error just by removing instructions.
- *  For example,
+ * <p>
+ * Because operations never actually alter the buffer, you may always get the
+ * original token stream back without undoing anything. Since the instructions
+ * are queued up, you can easily simulate transactions and roll back any changes
+ * if there is an error just by removing instructions. For example,</p>
  *
- *   CharStream input = new ANTLRFileStream("input");
- *   TLexer lex = new TLexer(input);
- *   CommonTokenStream tokens = new CommonTokenStream(lex);
- *   T parser = new T(tokens);
- *   TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
- *   parser.startRule();
+ * <pre>
+ * CharStream input = new ANTLRFileStream("input");
+ * TLexer lex = new TLexer(input);
+ * CommonTokenStream tokens = new CommonTokenStream(lex);
+ * T parser = new T(tokens);
+ * TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
+ * parser.startRule();
+ * </pre>
  *
- * 	 Then in the rules, you can execute (assuming rewriter is visible):
- *      Token t,u;
- *      ...
- *      rewriter.insertAfter(t, "text to put after t");}
- * 		rewriter.insertAfter(u, "text after u");}
- * 		System.out.println(tokens.toString());
+ * <p>
+ * Then in the rules, you can execute (assuming rewriter is visible):</p>
  *
- *  You can also have multiple "instruction streams" and get multiple
- *  rewrites from a single pass over the input.  Just name the instruction
- *  streams and use that name again when printing the buffer.  This could be
- *  useful for generating a C file and also its header file--all from the
- *  same buffer:
+ * <pre>
+ * Token t,u;
+ * ...
+ * rewriter.insertAfter(t, "text to put after t");}
+ * rewriter.insertAfter(u, "text after u");}
+ * System.out.println(tokens.toString());
+ * </pre>
  *
- *      tokens.insertAfter("pass1", t, "text to put after t");}
- * 		tokens.insertAfter("pass2", u, "text after u");}
- * 		System.out.println(tokens.toString("pass1"));
- * 		System.out.println(tokens.toString("pass2"));
+ * <p>
+ * You can also have multiple "instruction streams" and get multiple rewrites
+ * from a single pass over the input. Just name the instruction streams and use
+ * that name again when printing the buffer. This could be useful for generating
+ * a C file and also its header file--all from the same buffer:</p>
  *
- *  If you don't use named rewrite streams, a "default" stream is used as
- *  the first example shows.
+ * <pre>
+ * tokens.insertAfter("pass1", t, "text to put after t");}
+ * tokens.insertAfter("pass2", u, "text after u");}
+ * System.out.println(tokens.toString("pass1"));
+ * System.out.println(tokens.toString("pass2"));
+ * </pre>
+ *
+ * <p>
+ * If you don't use named rewrite streams, a "default" stream is used as the
+ * first example shows.</p>
  */
 public class TokenStreamRewriter {
 	public static final String DEFAULT_PROGRAM_NAME = "default";
@@ -187,11 +202,11 @@ public class TokenStreamRewriter {
 
 	/** You may have multiple, named streams of rewrite operations.
 	 *  I'm calling these things "programs."
-	 *  Maps String (name) -> rewrite (List)
+	 *  Maps String (name) &rarr; rewrite (List)
 	 */
 	protected final Map<String, List<RewriteOperation>> programs;
 
-	/** Map String (program name) -> Integer index */
+	/** Map String (program name) &rarr; Integer index */
 	protected final Map<String, Integer> lastRewriteTokenIndexes;
 
 	public TokenStreamRewriter(TokenStream tokens) {
@@ -459,7 +474,7 @@ public class TokenStreamRewriter {
 	 * 		3. throw exception if index in same range as previous replace
 	 *
 	 *  Don't actually delete; make op null in list. Easier to walk list.
-	 *  Later we can throw as we add to index -> op map.
+	 *  Later we can throw as we add to index &rarr; op map.
 	 *
 	 *  Note that I.2 R.2-2 will wipe out I.2 even though, technically, the
 	 *  inserted stuff would be before the replace range.  But, if you

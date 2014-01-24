@@ -39,10 +39,10 @@ public final class StarLoopEntryState extends DecisionState {
 	/**
 	 * Indicates whether this state can benefit from a precedence DFA during SLL
 	 * decision making.
-	 * <p/>
-	 * This is a computed property that is calculated during ATN deserialization
+	 *
+	 * <p>This is a computed property that is calculated during ATN deserialization
 	 * and stored for use in {@link ParserATNSimulator} and
-	 * {@link ParserInterpreter}.
+	 * {@link ParserInterpreter}.</p>
 	 *
 	 * @see DFA#isPrecedenceDfa()
 	 */

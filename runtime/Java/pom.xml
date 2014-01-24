@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.tunnelvisionlabs</groupId>
         <artifactId>antlr4-master</artifactId>
-        <version>4.1.1-SNAPSHOT</version>
+        <version>4.2-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
 
@@ -15,11 +15,23 @@
     <name>ANTLR 4 Runtime</name>
     <description>The ANTLR 4 Runtime</description>
 
+    <properties>
+        <!-- Assumes dot is in the system path, or specified for the build. -->
+        <dot.path>dot</dot.path>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.abego.treelayout</groupId>
             <artifactId>org.abego.treelayout.core</artifactId>
             <version>1.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.tunnelvisionlabs</groupId>
+            <artifactId>antlr4-annotations</artifactId>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -39,11 +51,23 @@
                                     <goal>dot</goal>
                                 </goals>
                                 <configuration>
+                                    <dot>${dot.path}</dot>
                                     <destdir>${project.build.directory}/apidocs</destdir>
                                     <output>svg</output>
                                 </configuration>
                             </execution>
                         </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <includeDependencySources>true</includeDependencySources>
+                            <dependencySourceIncludes>
+                                <dependencySourceInclude>org.antlr:*</dependencySourceInclude>
+                            </dependencySourceIncludes>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
@@ -64,9 +88,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <compilerArguments>
-                        <proc:none/>
-                    </compilerArguments>
+                    <compilerArgs>
+                        <compilerArg>-processor</compilerArg>
+                        <compilerArg>org.antlr.v4.runtime.misc.NullUsageProcessor</compilerArg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
 

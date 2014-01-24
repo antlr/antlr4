@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tunnelvisionlabs</groupId>
     <artifactId>antlr4-master</artifactId>
-    <version>4.1.1-SNAPSHOT</version>
+    <version>4.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>ANTLR 4</name>
@@ -61,6 +61,7 @@
 
     <modules>
         <module>runtime/Java</module>
+        <module>runtime/JavaAnnotations</module>
         <module>tool</module>
         <module>antlr4-maven-plugin</module>
     </modules>

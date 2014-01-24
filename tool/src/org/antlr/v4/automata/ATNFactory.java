@@ -32,6 +32,7 @@ package org.antlr.v4.automata;
 
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -59,27 +60,36 @@ public interface ATNFactory {
 		}
 	}
 
+	@NotNull
 	ATN createATN();
 
-	void setCurrentRuleName(String name);
+	void setCurrentRuleName(@NotNull String name);
 
 	void setCurrentOuterAlt(int alt);
 
-	Handle rule(GrammarAST ruleAST, String name, Handle blk);
+	@NotNull
+	Handle rule(@NotNull GrammarAST ruleAST, @NotNull String name, @NotNull Handle blk);
 
+	@NotNull
 	ATNState newState();
 
-	Handle label(Handle t);
+	@NotNull
+	Handle label(@NotNull Handle t);
 
-	Handle listLabel(Handle t);
+	@NotNull
+	Handle listLabel(@NotNull Handle t);
 
-	Handle tokenRef(TerminalAST node);
+	@NotNull
+	Handle tokenRef(@NotNull TerminalAST node);
 
-	Handle set(GrammarAST associatedAST, List<GrammarAST> alts, boolean invert);
+	@NotNull
+	Handle set(@NotNull GrammarAST associatedAST, @NotNull List<GrammarAST> alts, boolean invert);
 
-	Handle charSetLiteral(GrammarAST charSetAST);
+	@NotNull
+	Handle charSetLiteral(@NotNull GrammarAST charSetAST);
 
-	Handle range(GrammarAST a, GrammarAST b);
+	@NotNull
+	Handle range(@NotNull GrammarAST a, @NotNull GrammarAST b);
 
 	/** For a non-lexer, just build a simple token reference atom.
 	 *  For a lexer, a string is a sequence of char to match.  That is,
@@ -87,7 +97,8 @@ public interface ATNFactory {
 	 *  the DFA.  Machine== o-'f'->o-'o'->o-'g'->o and has n+1 states
 	 *  for n characters.
 	 */
-	Handle stringLiteral(TerminalAST stringLiteralAST);
+	@NotNull
+	Handle stringLiteral(@NotNull TerminalAST stringLiteralAST);
 
 	/** For reference to rule r, build
 	 *
@@ -105,25 +116,31 @@ public interface ATNFactory {
 	 *  TODO add to codegen: collapse alt blks that are sets into single matchSet
 	 * @param node
 	 */
-	Handle ruleRef(GrammarAST node);
+	@NotNull
+	Handle ruleRef(@NotNull GrammarAST node);
 
 	/** From an empty alternative build Grip o-e->o */
-	Handle epsilon(GrammarAST node);
+	@NotNull
+	Handle epsilon(@NotNull GrammarAST node);
 
 	/** Build what amounts to an epsilon transition with a semantic
 	 *  predicate action.  The pred is a pointer into the AST of
 	 *  the SEMPRED token.
 	 */
-	Handle sempred(PredAST pred);
+	@NotNull
+	Handle sempred(@NotNull PredAST pred);
 
 	/** Build what amounts to an epsilon transition with an action.
 	 *  The action goes into ATN though it is ignored during analysis.
 	 */
-	Handle action(ActionAST action);
+	@NotNull
+	Handle action(@NotNull ActionAST action);
 
-	Handle action(String action);
+	@NotNull
+	Handle action(@NotNull String action);
 
-	Handle alt(List<Handle> els);
+	@NotNull
+	Handle alt(@NotNull List<Handle> els);
 
 	/** From A|B|..|Z alternative block build
      *
@@ -148,7 +165,8 @@ public interface ATNFactory {
      *
      *  Set alt number (1..n) in the left-Transition ATNState.
      */
-	Handle block(BlockAST blockAST, GrammarAST ebnfRoot, List<Handle> alternativeGrips);
+	@NotNull
+	Handle block(@NotNull BlockAST blockAST, @NotNull GrammarAST ebnfRoot, @NotNull List<Handle> alternativeGrips);
 
 //	Handle notBlock(GrammarAST blockAST, Handle set);
 
@@ -160,7 +178,8 @@ public interface ATNFactory {
 	 *
 	 *  or, if A is a block, just add an empty alt to the end of the block
 	 */
-	Handle optional(GrammarAST optAST, Handle blk);
+	@NotNull
+	Handle optional(@NotNull GrammarAST optAST, @NotNull Handle blk);
 
 	/** From (A)+ build
 	 *
@@ -175,7 +194,8 @@ public interface ATNFactory {
 	 *  During analysis we'll call the follow link (transition 1) alt n+1 for
 	 *  an n-alt A block.
 	 */
-	Handle plus(GrammarAST plusAST, Handle blk);
+	@NotNull
+	Handle plus(@NotNull GrammarAST plusAST, @NotNull Handle blk);
 
 	/** From (A)* build
 	 *
@@ -207,14 +227,19 @@ public interface ATNFactory {
 	 *  is sufficient to let me make an appropriate enter, exit, loop
 	 *  determination.  See codegen.g
 	 */
-	Handle star(GrammarAST starAST, Handle blk);
+	@NotNull
+	Handle star(@NotNull GrammarAST starAST, @NotNull Handle blk);
 
 	/** Build an atom with all possible values in its label */
-	Handle wildcard(GrammarAST associatedAST);
+	@NotNull
+	Handle wildcard(@NotNull GrammarAST associatedAST);
 
-	Handle lexerAltCommands(ATNFactory.Handle alt, ATNFactory.Handle cmds);
+	@NotNull
+	Handle lexerAltCommands(@NotNull Handle alt, @NotNull Handle cmds);
 
-	Handle lexerCallCommand(GrammarAST ID, GrammarAST arg);
+	@NotNull
+	Handle lexerCallCommand(@NotNull GrammarAST ID, @NotNull GrammarAST arg);
 
-	Handle lexerCommand(GrammarAST ID);
+	@NotNull
+	Handle lexerCommand(@NotNull GrammarAST ID);
 }

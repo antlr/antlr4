@@ -39,7 +39,7 @@ package org.antlr.v4.runtime.tree.gui;
  *  for trees. Commands:
  *
  * <pre>
- *	 $ ttf2tfm /Library/Fonts/Arial\ Black.ttf > metrics
+ *	 $ ttf2tfm /Library/Fonts/Arial\ Black.ttf &gt; metrics
  * </pre>
  *
  * 	Then run metrics into python code after stripping header/footer:
@@ -57,11 +57,11 @@ package org.antlr.v4.runtime.tree.gui;
  *	 maxh = 0;
  *	 for line in lines[4:]: # skip header 0..3
  *			 all = line.split(' ')
- *			 words = [x for x in all if len(x)>0]
+ *			 words = [x for x in all if len(x)&gt;0]
  *			 ascii = int(words[1], 16)
  *			 height = int(words[8])
- *			 if height>maxh: maxh = height
- *			 if ascii>=128: break
+ *			 if height&gt;maxh: maxh = height
+ *			 if ascii&gt;=128: break
  *			 print "        widths[%d] = %s; // %s" % (ascii, words[3], words[2])
  *
  *	 print "        maxCharHeight = "+str(maxh)+";"

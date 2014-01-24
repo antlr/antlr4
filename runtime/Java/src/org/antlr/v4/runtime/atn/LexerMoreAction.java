@@ -36,9 +36,9 @@ import org.antlr.v4.runtime.misc.NotNull;
 
 /**
  * Implements the {@code more} lexer action by calling {@link Lexer#more}.
- * <p/>
- * The {@code more} command does not have any parameters, so this action is
- * implemented as a singleton instance exposed by {@link #INSTANCE}.
+ *
+ * <p>The {@code more} command does not have any parameters, so this action is
+ * implemented as a singleton instance exposed by {@link #INSTANCE}.</p>
  *
  * @author Sam Harwell
  * @since 4.2
@@ -75,8 +75,8 @@ public final class LexerMoreAction implements LexerAction {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
-	 * This action is implemented by calling {@link Lexer#more}.
+	 *
+	 * <p>This action is implemented by calling {@link Lexer#more}.</p>
 	 */
 	@Override
 	public void execute(@NotNull Lexer lexer) {
