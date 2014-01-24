@@ -97,11 +97,16 @@ public class AnalysisPipeline {
 
 	/** Return whether lookahead sets are disjoint; no lookahead => not disjoint */
 	public static boolean disjoint(IntervalSet[] altLook) {
+		if ( altLook==null ) return false;
 		boolean collision = false;
 		IntervalSet combined = new IntervalSet();
-		if ( altLook==null ) return false;
 		for (IntervalSet look : altLook) {
-			if ( look==null ) return false; // lookahead must've computation failed
+			if ( look==null || look.contains(Token.EPSILON) ) {
+				// lookahead calculation hit a predicate or failed to follow
+				// global context transitions
+				return false;
+			}
+
 			if ( !look.and(combined).isNil() ) {
 				collision = true;
 				break;
