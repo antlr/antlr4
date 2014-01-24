@@ -494,7 +494,6 @@ do {
 
 LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
 setState(<choice.blockStartStateNumber>); <! alt block decision !>
-_errHandler.sync(this);
 <preamble; separator="\n">
 do {
 	<alts; separator="\n">
