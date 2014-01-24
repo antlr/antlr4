@@ -49,6 +49,6 @@ public class LL1StarBlockSingleAlt extends LL1Loop {
 		assert altLookSets.length == 2;
 		IntervalSet enterLook = altLookSets[0];
 		IntervalSet exitLook = altLookSets[1];
-		loopExpr = addCodeForLoopLookaheadTempVar(enterLook);
+		loopExpr = addCodeForLoopLookaheadTempVar(enterLook, true);
 	}
 }

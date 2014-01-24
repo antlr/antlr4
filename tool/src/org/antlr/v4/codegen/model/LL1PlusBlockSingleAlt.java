@@ -50,6 +50,6 @@ public class LL1PlusBlockSingleAlt extends LL1Loop {
 		IntervalSet[] altLookSets = factory.getGrammar().decisionLOOK.get(decision);
 
 		IntervalSet loopBackLook = altLookSets[0];
-		loopExpr = addCodeForLoopLookaheadTempVar(loopBackLook);
+		loopExpr = addCodeForLoopLookaheadTempVar(loopBackLook, false);
 	}
 }
