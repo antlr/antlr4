@@ -175,6 +175,7 @@ public class ParserInterpreter extends Parser {
 	protected void visitState(ATNState p) {
 		int edge;
 		if (p.getNumberOfTransitions() > 1) {
+			getErrorHandler().sync(this);
 			edge = getInterpreter().adaptivePredict(_input, ((DecisionState)p).decision, _ctx);
 		}
 		else {
