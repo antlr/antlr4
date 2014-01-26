@@ -156,7 +156,16 @@ public class ParserInterpreter extends Parser {
 				break;
 
 			default :
-				visitState(p);
+				try {
+					visitState(p);
+				}
+				catch (RecognitionException e) {
+					setState(atn.ruleToStopState[p.ruleIndex].stateNumber);
+					getContext().exception = e;
+					getErrorHandler().reportError(this, e);
+					getErrorHandler().recover(this, e);
+				}
+
 				break;
 			}
 		}
