@@ -156,7 +156,16 @@ public class ParserInterpreter extends Parser {
 				break;
 
 			default :
-				visitState(p);
+				try {
+					visitState(p);
+				}
+				catch (RecognitionException e) {
+					setState(atn.ruleToStopState[p.ruleIndex].stateNumber);
+					getContext().exception = e;
+					getErrorHandler().reportError(this, e);
+					getErrorHandler().recover(this, e);
+				}
+
 				break;
 			}
 		}
@@ -175,6 +184,7 @@ public class ParserInterpreter extends Parser {
 	protected void visitState(ATNState p) {
 		int edge;
 		if (p.getNumberOfTransitions() > 1) {
+			getErrorHandler().sync(this);
 			edge = getInterpreter().adaptivePredict(_input, ((DecisionState)p).decision, _ctx);
 		}
 		else {
