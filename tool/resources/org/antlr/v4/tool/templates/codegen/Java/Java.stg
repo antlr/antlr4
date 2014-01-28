@@ -111,39 +111,39 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 	<file.listenerNames:{lname |
 /**
  * {@inheritDoc\}
- * \<p/>
- * The default implementation does nothing.
+ *
+ * \<p>The default implementation does nothing.\</p>
  */
 @Override public void enter<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx) { \}
 /**
  * {@inheritDoc\}
- * \<p/>
- * The default implementation does nothing.
+ *
+ * \<p>The default implementation does nothing.\</p>
  */
 @Override public void exit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
 	/**
 	 * {@inheritDoc\}
-	 * \<p/>
-	 * The default implementation does nothing.
+	 *
+	 * \<p>The default implementation does nothing.\</p>
 	 */
 	@Override public void enterEveryRule(@NotNull ParserRuleContext ctx) { }
 	/**
 	 * {@inheritDoc\}
-	 * \<p/>
-	 * The default implementation does nothing.
+	 *
+	 * \<p>The default implementation does nothing.\</p>
 	 */
 	@Override public void exitEveryRule(@NotNull ParserRuleContext ctx) { }
 	/**
 	 * {@inheritDoc\}
-	 * \<p/>
-	 * The default implementation does nothing.
+	 *
+	 * \<p>The default implementation does nothing.\</p>
 	 */
 	@Override public void visitTerminal(@NotNull TerminalNode node) { }
 	/**
 	 * {@inheritDoc\}
-	 * \<p/>
-	 * The default implementation does nothing.
+	 *
+	 * \<p>The default implementation does nothing.\</p>
 	 */
 	@Override public void visitErrorNode(@NotNull ErrorNode node) { }
 }
@@ -199,9 +199,9 @@ public class <file.grammarName>BaseVisitor\<Result> extends AbstractParseTreeVis
 	<file.visitorNames:{lname |
 /**
  * {@inheritDoc\}
- * \<p/>
- * The default implementation returns the result of calling
- * {@link #visitChildren\} on {@code ctx\}.
+ *
+ * \<p>The default implementation returns the result of calling
+ * {@link #visitChildren\} on {@code ctx\}.\</p>
  */
 @Override public Result visit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
 }

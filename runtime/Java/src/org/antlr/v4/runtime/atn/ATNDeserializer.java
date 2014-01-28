@@ -393,7 +393,15 @@ public class ATNDeserializer {
 				for (int i = 0; i < atn.lexerActions.length; i++) {
 					LexerActionType actionType = LexerActionType.values()[toInt(data[p++])];
 					int data1 = toInt(data[p++]);
+					if (data1 == 0xFFFF) {
+						data1 = -1;
+					}
+
 					int data2 = toInt(data[p++]);
+					if (data2 == 0xFFFF) {
+						data2 = -1;
+					}
+
 					LexerAction lexerAction = lexerActionFactory(actionType, data1, data2);
 
 					atn.lexerActions[i] = lexerAction;
