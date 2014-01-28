@@ -1320,9 +1320,9 @@ public class TestPerformance extends BaseTest {
 							}
 
 							if (!ENABLE_PARSER_DFA) {
-								parser.setInterpreter(new NonCachingParserATNSimulator<Token>(parser, atn));
+								parser.setInterpreter(new NonCachingParserATNSimulator(parser, atn));
 							} else if (!REUSE_PARSER_DFA || COMPUTE_TRANSITION_STATS) {
-								parser.setInterpreter(new StatisticsParserATNSimulator<Token>(parser, atn));
+								parser.setInterpreter(new StatisticsParserATNSimulator(parser, atn));
 							}
 
                             sharedParsers[thread] = parser;
@@ -1404,11 +1404,11 @@ public class TestPerformance extends BaseTest {
 							parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
 							parser.addErrorListener(new SummarizingDiagnosticErrorListener());
 							if (!ENABLE_PARSER_DFA) {
-								parser.setInterpreter(new NonCachingParserATNSimulator<Token>(parser, parser.getATN()));
+								parser.setInterpreter(new NonCachingParserATNSimulator(parser, parser.getATN()));
 							} else if (!REUSE_PARSER_DFA) {
-								parser.setInterpreter(new StatisticsParserATNSimulator<Token>(parser, sharedParserATNs[thread]));
+								parser.setInterpreter(new StatisticsParserATNSimulator(parser, sharedParserATNs[thread]));
 							} else if (COMPUTE_TRANSITION_STATS) {
-								parser.setInterpreter(new StatisticsParserATNSimulator<Token>(parser, parser.getATN()));
+								parser.setInterpreter(new StatisticsParserATNSimulator(parser, parser.getATN()));
 							}
 							parser.getInterpreter().setPredictionMode(PREDICTION_MODE);
 							parser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT;
@@ -1579,7 +1579,7 @@ public class TestPerformance extends BaseTest {
 		}
 	}
 
-	private static class StatisticsParserATNSimulator<Symbol extends Token> extends ParserATNSimulator {
+	private static class StatisticsParserATNSimulator extends ParserATNSimulator {
 
 		public final long[] decisionInvocations;
 		public final long[] fullContextFallback;
@@ -1918,7 +1918,7 @@ public class TestPerformance extends BaseTest {
 
 	}
 
-	protected static class NonCachingParserATNSimulator<Symbol extends Token> extends StatisticsParserATNSimulator<Symbol> {
+	protected static class NonCachingParserATNSimulator extends StatisticsParserATNSimulator {
 
 		public NonCachingParserATNSimulator(Parser parser, ATN atn) {
 			super(parser, atn);
