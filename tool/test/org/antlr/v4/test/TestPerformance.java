@@ -253,6 +253,11 @@ public class TestPerformance extends BaseTest {
 	private static final boolean ENABLE_LEXER_DFA = true;
 
 	private static final boolean ENABLE_PARSER_DFA = true;
+	/**
+	 * If {@code true}, the DFA will be used for full context parsing as well as
+	 * SLL parsing.
+	 */
+	private static final boolean ENABLE_PARSER_FULL_CONTEXT_DFA = false;
 
 	/**
 	 * Specify the {@link PredictionMode} used by the
@@ -1342,6 +1347,7 @@ public class TestPerformance extends BaseTest {
 						parser.getInterpreter().setPredictionMode(TWO_STAGE_PARSING ? PredictionMode.SLL : PREDICTION_MODE);
 						parser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT && !TWO_STAGE_PARSING;
 						parser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST || TWO_STAGE_PARSING;
+						parser.getInterpreter().enable_global_context_dfa = ENABLE_PARSER_FULL_CONTEXT_DFA;
 						parser.getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
 						parser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
 						parser.getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
@@ -1413,6 +1419,7 @@ public class TestPerformance extends BaseTest {
 							parser.getInterpreter().setPredictionMode(PREDICTION_MODE);
 							parser.getInterpreter().force_global_context = FORCE_GLOBAL_CONTEXT;
 							parser.getInterpreter().always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
+							parser.getInterpreter().enable_global_context_dfa = ENABLE_PARSER_FULL_CONTEXT_DFA;
 							parser.getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
 							parser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
 							parser.getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;

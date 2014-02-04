@@ -296,6 +296,22 @@ public class ParserATNSimulator extends ATNSimulator {
 	public boolean force_global_context = false;
 	public boolean always_try_local_context = true;
 
+	/**
+	 * Determines whether the DFA is used for full-context predictions. When
+	 * {@code true}, the DFA stores transition information for both full-context
+	 * and SLL parsing; otherwise, the DFA only stores SLL transition
+	 * information.
+	 *
+	 * <p>
+	 * For some grammars, enabling the full-context DFA can result in a
+	 * substantial performance improvement. However, this improvement typically
+	 * comes at the expense of memory used for storing the cached DFA states,
+	 * configuration sets, and prediction contexts.</p>
+	 *
+	 * <p>
+	 * The default value is {@code false}.</p>
+	 */
+	public boolean enable_global_context_dfa = false;
 	public boolean optimize_unique_closure = true;
 	public boolean optimize_ll1 = true;
 	public boolean optimize_hidden_conflicted_configs = false;
@@ -434,6 +450,10 @@ public class ParserATNSimulator extends ATNSimulator {
 
 				return new SimulatorState(outerContext, dfa.s0.get(), false, outerContext);
 			}
+		}
+
+		if (!enable_global_context_dfa) {
+			return null;
 		}
 
 		ParserRuleContext remainingContext = outerContext;
@@ -1107,6 +1127,20 @@ public class ParserATNSimulator extends ATNSimulator {
 		PredictionContext initialContext = useContext ? PredictionContext.EMPTY_FULL : PredictionContext.EMPTY_LOCAL; // always at least the implicit call to start rule
 		PredictionContextCache contextCache = new PredictionContextCache();
 		if (useContext) {
+			if (!enable_global_context_dfa) {
+				while (remainingGlobalContext != null) {
+					if (remainingGlobalContext.isEmpty()) {
+						previousContext = PredictionContext.EMPTY_FULL_STATE_KEY;
+						remainingGlobalContext = null;
+					}
+					else {
+						previousContext = getReturnState(remainingGlobalContext);
+						initialContext = initialContext.appendContext(previousContext, contextCache);
+						remainingGlobalContext = remainingGlobalContext.getParent();
+					}
+				}
+			}
+
 			while (s0 != null && s0.isContextSensitive() && remainingGlobalContext != null) {
 				DFAState next;
 				remainingGlobalContext = skipTailCalls(remainingGlobalContext);
@@ -1154,7 +1188,11 @@ public class ParserATNSimulator extends ATNSimulator {
 			boolean stepIntoGlobal = configs.getDipsIntoOuterContext();
 
 			DFAState next;
-			if (s0 == null) {
+			if (useContext && !enable_global_context_dfa) {
+				s0 = addDFAState(dfa, configs, contextCache);
+				break;
+			}
+			else if (s0 == null) {
 				if (!dfa.isPrecedenceDfa() && dfa.atnStartState instanceof StarLoopEntryState) {
 					if (((StarLoopEntryState)dfa.atnStartState).precedenceRuleDecision) {
 						dfa.setPrecedenceDfa(true);
@@ -2059,13 +2097,16 @@ public class ParserATNSimulator extends ATNSimulator {
 	/** See comment on LexerInterpreter.addDFAState. */
 	@NotNull
 	protected DFAState addDFAState(@NotNull DFA dfa, @NotNull ATNConfigSet configs, PredictionContextCache contextCache) {
-		if (!configs.isReadOnly()) {
-			configs.optimizeConfigs(this);
-		}
+		final boolean enableDfa = enable_global_context_dfa || !configs.isOutermostConfigSet();
+		if (enableDfa) {
+			if (!configs.isReadOnly()) {
+				configs.optimizeConfigs(this);
+			}
 
-		DFAState proposed = createDFAState(configs);
-		DFAState existing = dfa.states.get(proposed);
-		if ( existing!=null ) return existing;
+			DFAState proposed = createDFAState(configs);
+			DFAState existing = dfa.states.get(proposed);
+			if ( existing!=null ) return existing;
+		}
 
 		if (!configs.isReadOnly()) {
 			if (configs.getConflictingAlts() == null) {
@@ -2073,9 +2114,9 @@ public class ParserATNSimulator extends ATNSimulator {
 				if (optimize_hidden_conflicted_configs && configs.getConflictingAlts() != null) {
 					int size = configs.size();
 					configs.stripHiddenConfigs();
-					if (configs.size() < size) {
-						proposed = createDFAState(configs);
-						existing = dfa.states.get(proposed);
+					if (enableDfa && configs.size() < size) {
+						DFAState proposed = createDFAState(configs);
+						DFAState existing = dfa.states.get(proposed);
 						if ( existing!=null ) return existing;
 					}
 				}
@@ -2095,6 +2136,10 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		if (newState.isAcceptState && configs.hasSemanticContext()) {
 			predicateDFAState(newState, configs, decisionState.getNumberOfTransitions());
+		}
+
+		if (!enableDfa) {
+			return newState;
 		}
 
 		DFAState added = dfa.addState(newState);
