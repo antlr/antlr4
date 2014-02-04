@@ -29,6 +29,12 @@
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>
+            <artifactId>antlr4-annotations</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
             <artifactId>antlr-runtime</artifactId>
             <version>3.5</version>
             <scope>compile</scope>
@@ -68,6 +74,13 @@
                                             <artifact>org.antlr:antlr4-runtime</artifact>
                                             <includes>
                                                 <include>org/antlr/v4/runtime/**</include>
+                                            </includes>
+                                        </filter>
+                                        <filter>
+                                            <artifact>org.antlr:antlr4-annotations</artifact>
+                                            <includes>
+                                                <include>org/antlr/v4/runtime/**</include>
+                                                <include>META-INF/services/**</include>
                                             </includes>
                                         </filter>
                                     </filters>
