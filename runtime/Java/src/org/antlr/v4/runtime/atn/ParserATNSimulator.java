@@ -248,7 +248,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * mode with the {@link BailErrorStrategy}:</p>
  *
  * <pre>
- * parser.{@link Parser#getInterpreter() getInterpreter()}.{@link #setPredictionMode setPredictionMode(}{@link PredictionMode#SLL}{@code )};
+ * parser.{@link Parser#getInterpreter() getInterpreter()}.{@link #setPredictionMode setPredictionMode}{@code (}{@link PredictionMode#SLL}{@code )};
  * parser.{@link Parser#setErrorHandler setErrorHandler}(new {@link BailErrorStrategy}());
  * </pre>
  *

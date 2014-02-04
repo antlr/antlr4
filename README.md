@@ -8,7 +8,7 @@
 
 ## INTRODUCTION
 
-Hi and welcome to the Honey Badger 4.1 release (June 30, 2013) of ANTLR!
+Hi and welcome to the Honey Badger 4.2 release (February 3, 2014) of ANTLR!
 
 ## INSTALLATION
 
@@ -19,20 +19,20 @@ Hi and welcome to the Honey Badger 4.1 release (June 30, 2013) of ANTLR!
 1. Download
    ```sh
    $ cd /usr/local/lib
-   $ curl -O http://www.antlr4.org/download/antlr-4.1-complete.jar
+   $ curl -O http://www.antlr4.org/download/antlr-4.2-complete.jar
    ```
-   Or just [download in browser](http://www.antlr4.org/download/antlr-4.1-complete.jar) and put it somewhere rational like `/usr/local/lib`.
+   Or just [download in browser](http://www.antlr4.org/download/antlr-4.2-complete.jar) and put it somewhere rational like `/usr/local/lib`.
 
-2. Add `antlr-4.1-complete.jar` to your `CLASSPATH`:
+2. Add `antlr-4.2-complete.jar` to your `CLASSPATH`:
    ```sh
-   $ export CLASSPATH=".:/usr/local/lib/antlr-4.1-complete.jar:$CLASSPATH"
+   $ export CLASSPATH=".:/usr/local/lib/antlr-4.2-complete.jar:$CLASSPATH"
    ```
    Is also a good idea to put this in your .bash_profile or whatever your
    startup script is.
 
 3. Create aliases for the ANTLR Tool, and TestRig.
    ```sh
-   $ alias antlr4='java -jar /usr/local/lib/antlr-4.1-complete.jar'
+   $ alias antlr4='java -jar /usr/local/lib/antlr-4.2-complete.jar'
    $ alias grun='java org.antlr.v4.runtime.misc.TestRig'
    ```
 
@@ -40,16 +40,16 @@ Hi and welcome to the Honey Badger 4.1 release (June 30, 2013) of ANTLR!
 
 0. [Install Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) (version 1.6 or higher)
 
-1. Download [antlr-4.1-complete.jar](http://antlr.org/download/antlr-4.1-complete.jar)
+1. Download [antlr-4.2-complete.jar](http://antlr.org/download/antlr-4.2-complete.jar)
    Save to your directory for 3rd party Java libraries, say `C:\Javalib`
 
-2. Add `antlr-4.1-complete.jar` to `CLASSPATH`, either:
+2. Add `antlr-4.2-complete.jar` to `CLASSPATH`, either:
 
  * Permanently: Using System Properties dialog > Environment variables >
    Create or append to `CLASSPATH` variable
 
  * Temporarily, at command line:
-   `SET CLASSPATH=C:\Javalib\antlr-4.1-complete.jar;%CLASSPATH%`
+   `SET CLASSPATH=C:\Javalib\antlr-4.2-complete.jar;%CLASSPATH%`
 
 3. Create short convenient commands for the ANTLR Tool, and TestRig,
    using batch files or doskey commands:
@@ -71,15 +71,15 @@ Hi and welcome to the Honey Badger 4.1 release (June 30, 2013) of ANTLR!
 Either launch `org.antlr.v4.Tool` directly:
 ```sh
 $ java org.antlr.v4.Tool
-ANTLR Parser Generator Version 4.1
+ANTLR Parser Generator Version 4.2
     -o ___              specify output directory where all output is generated
     -lib ___            specify location of .tokens files
 ...
 ```
 or use `-jar` option on java:
 ```sh
-$ java -jar /usr/local/lib/antlr-4.1-complete.jar
-ANTLR Parser Generator Version 4.1
+$ java -jar /usr/local/lib/antlr-4.2-complete.jar
+ANTLR Parser Generator Version 4.2
     -o ___              specify output directory where all output is generated
     -lib ___            specify location of .tokens files
 ...
