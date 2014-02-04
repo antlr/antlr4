@@ -30,6 +30,7 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.NoViableAltException;
@@ -243,7 +244,7 @@ import java.util.Set;
  * mode with the {@link BailErrorStrategy}:</p>
  *
  * <pre>
- * parser.{@link Parser#getInterpreter() getInterpreter()}.{@link #setSLL setSLL(true)};
+ * parser.{@link Parser#getInterpreter() getInterpreter()}.{@link #setPredictionMode setPredictionMode}{@code (}{@link PredictionMode#SLL}{@code )};
  * parser.{@link Parser#setErrorHandler setErrorHandler}(new {@link BailErrorStrategy}());
  * </pre>
  *

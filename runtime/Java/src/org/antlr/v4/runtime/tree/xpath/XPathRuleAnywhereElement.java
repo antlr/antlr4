@@ -5,7 +5,9 @@ import org.antlr.v4.runtime.tree.Trees;
 
 import java.util.Collection;
 
-/** Either ID at start of path or ...//ID in middle of path */
+/**
+ * Either {@code ID} at start of path or {@code ...//ID} in middle of path.
+ */
 public class XPathRuleAnywhereElement extends XPathElement {
 	protected int ruleIndex;
 	public XPathRuleAnywhereElement(String ruleName, int ruleIndex) {

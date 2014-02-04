@@ -31,6 +31,7 @@
 package org.antlr.v4.runtime.tree.pattern;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.ListTokenSource;
@@ -43,6 +44,7 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.misc.MultiMap;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -225,8 +227,12 @@ public class ParseTreePatternMatcher {
 
 		ParseTree tree = null;
 		try {
+			parserInterp.setErrorHandler(new BailErrorStrategy());
 			tree = parserInterp.parse(patternRuleIndex);
 //			System.out.println("pattern tree = "+tree.toStringTree(parserInterp));
+		}
+		catch (ParseCancellationException e) {
+			throw (RecognitionException)e.getCause();
 		}
 		catch (RecognitionException re) {
 			throw re;
