@@ -108,17 +108,23 @@
                             <execution>
                                 <id>default-compile</id>
                                 <configuration>
-                                    <compilerArguments>
-                                        <bootclasspath>${bootclasspath.compile}</bootclasspath>
-                                    </compilerArguments>
+                                    <compilerArgs>
+                                        <compilerArg>-Xlint</compilerArg>
+                                        <compilerArg>-Xlint:-serial</compilerArg>
+                                        <compilerArg>-bootclasspath</compilerArg>
+                                        <compilerArg>${bootclasspath.compile}</compilerArg>
+                                    </compilerArgs>
                                 </configuration>
                             </execution>
                             <execution>
                                 <id>default-testCompile</id>
                                 <configuration>
-                                    <compilerArguments>
-                                        <bootclasspath>${bootclasspath.testCompile}</bootclasspath>
-                                    </compilerArguments>
+                                    <compilerArgs>
+                                        <compilerArg>-Xlint</compilerArg>
+                                        <compilerArg>-Xlint:-serial</compilerArg>
+                                        <compilerArg>-bootclasspath</compilerArg>
+                                        <compilerArg>${bootclasspath.testCompile}</compilerArg>
+                                    </compilerArgs>
                                 </configuration>
                             </execution>
                         </executions>
@@ -138,32 +144,13 @@
                     <sourceDirectory>src</sourceDirectory>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <compilerArgs>
+                        <compilerArg>-Xlint</compilerArg>
+                        <compilerArg>-Xlint:-serial</compilerArg>
+                    </compilerArgs>
                 </configuration>
-
-                <executions>
-                    <execution>
-                        <id>default-compile</id>
-                        <configuration>
-                            <source>1.6</source>
-                            <target>1.6</target>
-                            <compilerArgument>-Xlint:-serial</compilerArgument>
-                            <compilerArguments>
-                                <Xlint/>
-                            </compilerArguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>default-testCompile</id>
-                        <configuration>
-                            <source>1.6</source>
-                            <target>1.6</target>
-                            <compilerArgument>-Xlint:-serial</compilerArgument>
-                            <compilerArguments>
-                                <Xlint/>
-                            </compilerArguments>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>
@@ -182,7 +169,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.15</version>
+                <version>2.16</version>
             </plugin>
 
             <plugin>
@@ -196,7 +183,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <!-- override the version inherited from the parent -->
-                <version>2.9</version>
+                <version>2.9.1</version>
                 <configuration>
                     <quiet>true</quiet>
                 </configuration>
@@ -207,6 +194,16 @@
                 <artifactId>maven-gpg-plugin</artifactId>
                 <!-- override the version inherited from the parent -->
                 <version>1.4</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <!-- override the version inherited from the parent -->
+                <version>2.4.2</version>
+                <configuration>
+                    <arguments>-Psonatype-oss-release ${release.arguments}</arguments>
+                </configuration>
             </plugin>
         </plugins>
     </build>
