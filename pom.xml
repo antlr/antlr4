@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.sonatype.oss</groupId>
@@ -10,7 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.antlr</groupId>
     <artifactId>antlr4-master</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.2.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>ANTLR 4</name>
@@ -94,7 +93,8 @@
         <url>https://github.com/antlr/antlr4/tree/master</url>
         <connection>scm:git:git://github.com/antlr/antlr4.git</connection>
         <developerConnection>scm:git:git@github.com:antlr/antlr4.git</developerConnection>
-    </scm>
+      <tag>HEAD</tag>
+  </scm>
 
     <profiles>
         <profile>
