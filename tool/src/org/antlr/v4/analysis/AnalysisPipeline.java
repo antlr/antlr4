@@ -83,15 +83,10 @@ public class AnalysisPipeline {
 		g.decisionLOOK = new ArrayList<IntervalSet[]>(g.atn.getNumberOfDecisions()+1);
 		for (DecisionState s : g.atn.decisionToState) {
             g.tool.log("LL1", "\nDECISION "+s.decision+" in rule "+g.getRule(s.ruleIndex).name);
-			IntervalSet[] look;
-			if ( s.nonGreedy ) { // nongreedy decisions can't be LL(1)
-				look = new IntervalSet[s.getNumberOfTransitions()+1];
-			}
-			else {
-				LL1Analyzer anal = new LL1Analyzer(g.atn);
-				look = anal.getDecisionLookahead(s);
-				g.tool.log("LL1", "look=" + Arrays.toString(look));
-			}
+
+			LL1Analyzer anal = new LL1Analyzer(g.atn);
+			IntervalSet[] look = anal.getDecisionLookahead(s);
+			g.tool.log("LL1", "look=" + Arrays.toString(look));
 
 			assert s.decision + 1 >= g.decisionLOOK.size();
 			Utils.setSize(g.decisionLOOK, s.decision+1);
@@ -102,11 +97,16 @@ public class AnalysisPipeline {
 
 	/** Return whether lookahead sets are disjoint; no lookahead => not disjoint */
 	public static boolean disjoint(IntervalSet[] altLook) {
+		if ( altLook==null ) return false;
 		boolean collision = false;
 		IntervalSet combined = new IntervalSet();
-		if ( altLook==null ) return false;
 		for (IntervalSet look : altLook) {
-			if ( look==null ) return false; // lookahead must've computation failed
+			if ( look==null || look.contains(Token.EPSILON) ) {
+				// lookahead calculation hit a predicate or failed to follow
+				// global context transitions
+				return false;
+			}
+
 			if ( !look.and(combined).isNil() ) {
 				collision = true;
 				break;

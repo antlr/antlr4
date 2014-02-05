@@ -68,7 +68,7 @@ public class LL1PlusBlock extends LL1Loop {
 
 		this.error = getThrowNoViableAlt(factory, plusRoot, all);
 
-		loopExpr = addCodeForLoopLookaheadTempVar(all);
+		loopExpr = addCodeForLoopLookaheadTempVar(all, true);
 
 		loopLabel = gen.getTarget().getLoopLabel(plusRoot);
 		loopCounterVar = gen.getTarget().getLoopCounter(plusRoot);

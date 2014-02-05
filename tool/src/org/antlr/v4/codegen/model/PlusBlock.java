@@ -38,6 +38,8 @@ import org.antlr.v4.tool.ast.GrammarAST;
 import java.util.List;
 
 public class PlusBlock extends Loop {
+	public PlusBlockStartState startState;
+	public PlusLoopbackState loopbackState;
 	@ModelElement public ThrowNoViableAlt error;
 
 	public PlusBlock(OutputModelFactory factory,
@@ -46,12 +48,12 @@ public class PlusBlock extends Loop {
 	{
 		super(factory, plusRoot, alts);
 
-		PlusBlockStartState blkStart = (PlusBlockStartState)plusRoot.atnState;
-		PlusLoopbackState loop = ((PlusBlockStartState)plusRoot.atnState).loopBackState;
-		stateNumber = blkStart.loopBackState.stateNumber;
-		blockStartStateNumber = blkStart.stateNumber;
-		loopBackStateNumber = loop.stateNumber;
+		startState = (PlusBlockStartState)plusRoot.atnState;
+		loopbackState = ((PlusBlockStartState)plusRoot.atnState).loopBackState;
+		stateNumber = startState.loopBackState.stateNumber;
+		blockStartStateNumber = startState.stateNumber;
+		loopBackStateNumber = loopbackState.stateNumber;
 		this.error = getThrowNoViableAlt(factory, plusRoot, null);
-		decision = loop.decision;
+		decision = loopbackState.decision;
 	}
 }

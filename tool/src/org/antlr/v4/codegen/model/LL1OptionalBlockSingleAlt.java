@@ -59,7 +59,7 @@ public class LL1OptionalBlockSingleAlt extends LL1Choice {
 		IntervalSet expecting = look.or(followLook);
 		this.error = getThrowNoViableAlt(factory, blkAST, expecting);
 
-		expr = addCodeForLookaheadTempVar(look);
+		expr = addCodeForLookaheadTempVar(look, true);
 		followExpr = factory.getLL1Test(followLook, blkAST);
 	}
 }
