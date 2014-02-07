@@ -192,6 +192,35 @@ public class TestParserInterpreter extends BaseTest {
 		testInterp(lg, g, "s", "a+a*a", "(s (e (e a) + (e (e a) * (e a))))");
 	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#461.
+	 * https://github.com/antlr/antlr4/issues/461
+	 */
+	@Test public void testLeftRecursiveStartRule() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"A : 'a' ;\n" +
+			"B : 'b' ;\n" +
+			"C : 'c' ;\n" +
+			"PLUS : '+' ;\n" +
+			"MULT : '*' ;\n");
+		Grammar g = new Grammar(
+			"parser grammar T;\n" +
+			"s : e ;\n" +
+			"e : e MULT e\n" +
+			"  | e PLUS e\n" +
+			"  | A\n" +
+			"  ;\n",
+			lg);
+
+		testInterp(lg, g, "e", "a", 	"(e a)");
+		testInterp(lg, g, "e", "a+a", 	"(e (e a) + (e a))");
+		testInterp(lg, g, "e", "a*a", 	"(e (e a) * (e a))");
+		testInterp(lg, g, "e", "a+a+a", "(e (e (e a) + (e a)) + (e a))");
+		testInterp(lg, g, "e", "a*a+a", "(e (e (e a) * (e a)) + (e a))");
+		testInterp(lg, g, "e", "a+a*a", "(e (e a) + (e (e a) * (e a)))");
+	}
+
 	void testInterp(LexerGrammar lg, Grammar g,
 					String startRule, String input,
 					String parseTree)
