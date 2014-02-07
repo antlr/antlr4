@@ -148,8 +148,16 @@ public class ParserInterpreter extends Parser {
 			case ATNState.RULE_STOP :
 				// pop; return from rule
 				if ( _ctx.isEmpty() ) {
-					exitRule();
-					return rootContext;
+					if (startRuleStartState.isPrecedenceRule) {
+						ParserRuleContext result = _ctx;
+						Pair<ParserRuleContext, Integer> parentContext = _parentContextStack.pop();
+						unrollRecursionContexts(parentContext.a);
+						return result;
+					}
+					else {
+						exitRule();
+						return rootContext;
+					}
 				}
 
 				visitRuleStopState(p);
