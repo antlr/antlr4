@@ -63,13 +63,11 @@ namespace Antlr4.Runtime
             }
         }
 
-        public virtual void SyntaxError(IRecognizer recognizer, Symbol offendingSymbol
-            , int line, int charPositionInLine, string msg, RecognitionException e)
+        public virtual void SyntaxError(IRecognizer recognizer, Symbol offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
         {
             foreach (IAntlrErrorListener<Symbol> listener in delegates)
             {
-                listener.SyntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, 
-                    e);
+                listener.SyntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
             }
         }
     }

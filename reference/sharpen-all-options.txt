@@ -5,6 +5,7 @@
 -indentWithSpaces
 -paramCountFileNames
 -separateInterfaceConstants
+-maxColumns 1000
 
 -methodMapping System.out.println System.Console.WriteLine
 

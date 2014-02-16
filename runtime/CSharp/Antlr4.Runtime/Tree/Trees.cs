@@ -43,8 +43,7 @@ namespace Antlr4.Runtime.Tree
         /// <summary>Print out a whole tree in LISP form.</summary>
         /// <remarks>
         /// Print out a whole tree in LISP form.
-        /// <see cref="GetNodeText(ITree, Antlr4.Runtime.Parser)">GetNodeText(ITree, Antlr4.Runtime.Parser)
-        ///     </see>
+        /// <see cref="GetNodeText(ITree, Antlr4.Runtime.Parser)">GetNodeText(ITree, Antlr4.Runtime.Parser)</see>
         /// is used on the
         /// node payloads to get the text for the nodes.  Detect
         /// parse trees and extract data appropriately.
@@ -57,8 +56,7 @@ namespace Antlr4.Runtime.Tree
         /// <summary>Print out a whole tree in LISP form.</summary>
         /// <remarks>
         /// Print out a whole tree in LISP form.
-        /// <see cref="GetNodeText(ITree, Antlr4.Runtime.Parser)">GetNodeText(ITree, Antlr4.Runtime.Parser)
-        ///     </see>
+        /// <see cref="GetNodeText(ITree, Antlr4.Runtime.Parser)">GetNodeText(ITree, Antlr4.Runtime.Parser)</see>
         /// is used on the
         /// node payloads to get the text for the nodes.  Detect
         /// parse trees and extract data appropriately.
@@ -73,8 +71,7 @@ namespace Antlr4.Runtime.Tree
         /// <summary>Print out a whole tree in LISP form.</summary>
         /// <remarks>
         /// Print out a whole tree in LISP form.
-        /// <see cref="GetNodeText(ITree, Antlr4.Runtime.Parser)">GetNodeText(ITree, Antlr4.Runtime.Parser)
-        ///     </see>
+        /// <see cref="GetNodeText(ITree, Antlr4.Runtime.Parser)">GetNodeText(ITree, Antlr4.Runtime.Parser)</see>
         /// is used on the
         /// node payloads to get the text for the nodes.  Detect
         /// parse trees and extract data appropriately.

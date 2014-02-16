@@ -42,23 +42,20 @@ namespace Antlr4.Runtime.Dfa
         /// <summary>A set of all DFA states.</summary>
         /// <remarks>
         /// A set of all DFA states. Use
-        /// <see cref="System.Collections.Generic.IDictionary{TKey, TValue}">IDictionary&lt;TKey, TValue&gt;
-        ///     </see>
+        /// <see cref="System.Collections.Generic.IDictionary{TKey, TValue}">IDictionary&lt;TKey, TValue&gt;</see>
         /// so we can get old state back
         /// (
         /// <see cref="HashSet{T}">HashSet&lt;T&gt;</see>
         /// only allows you to see if it's there).
         /// </remarks>
         [NotNull]
-        public readonly ConcurrentDictionary<DFAState, DFAState> states = new ConcurrentDictionary
-            <DFAState, DFAState>();
+        public readonly ConcurrentDictionary<DFAState, DFAState> states = new ConcurrentDictionary<DFAState, DFAState>();
 
         [NotNull]
         public readonly AtomicReference<DFAState> s0 = new AtomicReference<DFAState>();
 
         [NotNull]
-        public readonly AtomicReference<DFAState> s0full = new AtomicReference<DFAState>(
-            );
+        public readonly AtomicReference<DFAState> s0full = new AtomicReference<DFAState>();
 
         public readonly int decision;
 
@@ -116,8 +113,7 @@ namespace Antlr4.Runtime.Dfa
             {
                 return string.Empty;
             }
-            DFASerializer serializer = new DFASerializer(this, tokenNames, ruleNames, atnStartState
-                .atn);
+            DFASerializer serializer = new DFASerializer(this, tokenNames, ruleNames, atnStartState.atn);
             return serializer.ToString();
         }
 

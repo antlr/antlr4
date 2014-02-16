@@ -83,8 +83,7 @@ namespace Antlr4.Runtime
             this.ctx = null;
         }
 
-        public RecognitionException(IRecognizer recognizer, 
-            IIntStream input, ParserRuleContext ctx)
+        public RecognitionException(IRecognizer recognizer, IIntStream input, ParserRuleContext ctx)
         {
             this.recognizer = recognizer;
             this.input = input;

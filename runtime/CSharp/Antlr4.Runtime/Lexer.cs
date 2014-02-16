@@ -158,8 +158,7 @@ namespace Antlr4.Runtime
         {
             if (_input == null)
             {
-                throw new InvalidOperationException("nextToken requires a non-null input stream."
-                    );
+                throw new InvalidOperationException("nextToken requires a non-null input stream.");
             }
             // Mark start location in char stream so unbuffered streams are
             // guaranteed at least have text of current token
@@ -348,8 +347,7 @@ outer_continue: ;
         /// </remarks>
         public virtual IToken Emit()
         {
-            IToken t = _factory.Create(_tokenFactorySourcePair, _type, _text, _channel, _tokenStartCharIndex
-                , CharIndex - 1, _tokenStartLine, _tokenStartCharPositionInLine);
+            IToken t = _factory.Create(_tokenFactorySourcePair, _type, _text, _channel, _tokenStartCharIndex, CharIndex - 1, _tokenStartLine, _tokenStartCharPositionInLine);
             Emit(t);
             return t;
         }
@@ -364,8 +362,7 @@ outer_continue: ;
                 int n = _token.StopIndex - _token.StartIndex + 1;
                 cpos = _token.Column + n;
             }
-            IToken eof = _factory.Create(_tokenFactorySourcePair, TokenConstants.Eof, null, TokenConstants
-                .DefaultChannel, _input.Index, _input.Index - 1, Line, cpos);
+            IToken eof = _factory.Create(_tokenFactorySourcePair, TokenConstants.Eof, null, TokenConstants.DefaultChannel, _input.Index, _input.Index - 1, Line, cpos);
             Emit(eof);
             return eof;
         }
@@ -535,8 +532,7 @@ outer_continue: ;
             string text = _input.GetText(Interval.Of(_tokenStartCharIndex, _input.Index));
             string msg = "token recognition error at: '" + GetErrorDisplay(text) + "'";
             IAntlrErrorListener<int> listener = GetErrorListenerDispatch();
-            listener.SyntaxError(this, 0, _tokenStartLine, _tokenStartCharPositionInLine, 
-                msg, e);
+            listener.SyntaxError(this, 0, _tokenStartLine, _tokenStartCharPositionInLine, msg, e);
         }
 
         public virtual string GetErrorDisplay(string s)

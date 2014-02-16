@@ -40,11 +40,9 @@ namespace Antlr4.Runtime
     {
         public static readonly ConsoleErrorListener<Symbol> Instance = new ConsoleErrorListener<Symbol>();
 
-        public virtual void SyntaxError(IRecognizer recognizer, Symbol offendingSymbol
-            , int line, int charPositionInLine, string msg, RecognitionException e)
+        public virtual void SyntaxError(IRecognizer recognizer, Symbol offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
         {
-            System.Console.Error.WriteLine("line " + line + ":" + charPositionInLine + " " + 
-                msg);
+            System.Console.Error.WriteLine("line " + line + ":" + charPositionInLine + " " + msg);
         }
     }
 }

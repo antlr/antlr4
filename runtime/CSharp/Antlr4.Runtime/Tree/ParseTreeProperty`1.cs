@@ -51,8 +51,7 @@ namespace Antlr4.Runtime.Tree
     /// </remarks>
     public class ParseTreeProperty<V>
     {
-        protected internal ConcurrentDictionary<IParseTree, V> annotations = new ConcurrentDictionary<IParseTree
-            , V>();
+        protected internal ConcurrentDictionary<IParseTree, V> annotations = new ConcurrentDictionary<IParseTree, V>();
 
         public virtual V Get(IParseTree node)
         {

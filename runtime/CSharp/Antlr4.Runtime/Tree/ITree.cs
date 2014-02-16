@@ -32,8 +32,7 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
-    /// <summary>The basic notion of a tree has a parent, a payload, and a list of children.
-    ///     </summary>
+    /// <summary>The basic notion of a tree has a parent, a payload, and a list of children.</summary>
     /// <remarks>
     /// The basic notion of a tree has a parent, a payload, and a list of children.
     /// It is the most abstract interface for all the trees used by ANTLR.

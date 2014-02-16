@@ -41,8 +41,7 @@ namespace Antlr4.Runtime
     {
         private const long serialVersionUID = -6708843461296520577L;
 
-        protected internal static readonly Tuple<ITokenSource, ICharStream> EmptySource = 
-            Tuple.Create<ITokenSource, ICharStream>(null, null);
+        protected internal static readonly Tuple<ITokenSource, ICharStream> EmptySource = Tuple.Create<ITokenSource, ICharStream>(null, null);
 
         protected internal int type;
 
@@ -62,8 +61,7 @@ namespace Antlr4.Runtime
         /// </remarks>
         protected internal string text;
 
-        /// <summary>What token number is this from 0..n-1 tokens; &lt; 0 implies invalid index
-        ///     </summary>
+        /// <summary>What token number is this from 0..n-1 tokens; &lt; 0 implies invalid index</summary>
         protected internal int index = -1;
 
         /// <summary>The char position into the input buffer where this token starts</summary>
@@ -79,8 +77,7 @@ namespace Antlr4.Runtime
             this.type = type;
         }
 
-        public CommonToken(Tuple<ITokenSource, ICharStream> source, int type, int channel
-            , int start, int stop)
+        public CommonToken(Tuple<ITokenSource, ICharStream> source, int type, int channel, int start, int stop)
         {
             this.source = source;
             this.type = type;
@@ -284,8 +281,7 @@ namespace Antlr4.Runtime
             {
                 txt = "<no text>";
             }
-            return "[@" + TokenIndex + "," + start + ":" + stop + "='" + txt + "',<" + type +
-                 ">" + channelStr + "," + line + ":" + Column + "]";
+            return "[@" + TokenIndex + "," + start + ":" + stop + "='" + txt + "',<" + type + ">" + channelStr + "," + line + ":" + Column + "]";
         }
     }
 }

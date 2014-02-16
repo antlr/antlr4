@@ -54,8 +54,7 @@ namespace Antlr4.Runtime.Tree
         /// token.
         /// <p/>
         /// If source interval is unknown, this returns
-        /// <see cref="Antlr4.Runtime.Misc.Interval.Invalid">Antlr4.Runtime.Misc.Interval.Invalid
-        ///     </see>
+        /// <see cref="Antlr4.Runtime.Misc.Interval.Invalid">Antlr4.Runtime.Misc.Interval.Invalid</see>
         /// .
         /// </summary>
         Interval SourceInterval

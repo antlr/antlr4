@@ -40,12 +40,10 @@ namespace Antlr4.Runtime.Atn
     public abstract class PredictionContext
     {
         [NotNull]
-        public static readonly Antlr4.Runtime.Atn.PredictionContext EmptyLocal = EmptyPredictionContext
-            .LocalContext;
+        public static readonly Antlr4.Runtime.Atn.PredictionContext EmptyLocal = EmptyPredictionContext.LocalContext;
 
         [NotNull]
-        public static readonly Antlr4.Runtime.Atn.PredictionContext EmptyFull = EmptyPredictionContext
-            .FullContext;
+        public static readonly Antlr4.Runtime.Atn.PredictionContext EmptyFull = EmptyPredictionContext.FullContext;
 
         public const int EmptyLocalStateKey = int.MinValue;
 
@@ -61,8 +59,7 @@ namespace Antlr4.Runtime.Atn
         /// <pre>
         /// private int referenceHashCode() {
         /// int hash =
-        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Initialize()">Antlr4.Runtime.Misc.MurmurHash.Initialize()
-        ///     </see>
+        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Initialize()">Antlr4.Runtime.Misc.MurmurHash.Initialize()</see>
         /// (
         /// <see cref="InitialHash">InitialHash</see>
         /// );
@@ -70,8 +67,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="Size()">Size()</see>
         /// ; i++) {
         /// hash =
-        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Update(int, int)">Antlr4.Runtime.Misc.MurmurHash.Update(int, int)
-        ///     </see>
+        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Update(int, int)">Antlr4.Runtime.Misc.MurmurHash.Update(int, int)</see>
         /// (hash,
         /// <see cref="GetParent(int)">GetParent(int)</see>
         /// (i));
@@ -80,15 +76,13 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="Size()">Size()</see>
         /// ; i++) {
         /// hash =
-        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Update(int, int)">Antlr4.Runtime.Misc.MurmurHash.Update(int, int)
-        ///     </see>
+        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Update(int, int)">Antlr4.Runtime.Misc.MurmurHash.Update(int, int)</see>
         /// (hash,
         /// <see cref="GetReturnState(int)">GetReturnState(int)</see>
         /// (i));
         /// }
         /// hash =
-        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Finish(int, int)">Antlr4.Runtime.Misc.MurmurHash.Finish(int, int)
-        ///     </see>
+        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Finish(int, int)">Antlr4.Runtime.Misc.MurmurHash.Finish(int, int)</see>
         /// (hash, 2 *
         /// <see cref="Size()">Size()</see>
         /// );
@@ -110,8 +104,7 @@ namespace Antlr4.Runtime.Atn
             return hash;
         }
 
-        protected internal static int CalculateHashCode(Antlr4.Runtime.Atn.PredictionContext
-             parent, int returnState)
+        protected internal static int CalculateHashCode(Antlr4.Runtime.Atn.PredictionContext parent, int returnState)
         {
             int hash = MurmurHash.Initialize(InitialHash);
             hash = MurmurHash.Update(hash, parent);
@@ -120,8 +113,7 @@ namespace Antlr4.Runtime.Atn
             return hash;
         }
 
-        protected internal static int CalculateHashCode(Antlr4.Runtime.Atn.PredictionContext
-            [] parents, int[] returnStates)
+        protected internal static int CalculateHashCode(Antlr4.Runtime.Atn.PredictionContext[] parents, int[] returnStates)
         {
             int hash = MurmurHash.Initialize(InitialHash);
             foreach (Antlr4.Runtime.Atn.PredictionContext parent in parents)
@@ -148,20 +140,16 @@ namespace Antlr4.Runtime.Atn
         [return: NotNull]
         public abstract Antlr4.Runtime.Atn.PredictionContext GetParent(int index);
 
-        protected internal abstract Antlr4.Runtime.Atn.PredictionContext AddEmptyContext(
-            );
+        protected internal abstract Antlr4.Runtime.Atn.PredictionContext AddEmptyContext();
 
-        protected internal abstract Antlr4.Runtime.Atn.PredictionContext RemoveEmptyContext
-            ();
+        protected internal abstract Antlr4.Runtime.Atn.PredictionContext RemoveEmptyContext();
 
-        public static Antlr4.Runtime.Atn.PredictionContext FromRuleContext(ATN atn, RuleContext
-             outerContext)
+        public static Antlr4.Runtime.Atn.PredictionContext FromRuleContext(ATN atn, RuleContext outerContext)
         {
             return FromRuleContext(atn, outerContext, true);
         }
 
-        public static Antlr4.Runtime.Atn.PredictionContext FromRuleContext(ATN atn, RuleContext
-             outerContext, bool fullContext)
+        public static Antlr4.Runtime.Atn.PredictionContext FromRuleContext(ATN atn, RuleContext outerContext, bool fullContext)
         {
             if (outerContext.IsEmpty())
             {
@@ -170,8 +158,7 @@ namespace Antlr4.Runtime.Atn
             Antlr4.Runtime.Atn.PredictionContext parent;
             if (outerContext.parent != null)
             {
-                parent = Antlr4.Runtime.Atn.PredictionContext.FromRuleContext(atn, outerContext.parent
-                    , fullContext);
+                parent = Antlr4.Runtime.Atn.PredictionContext.FromRuleContext(atn, outerContext.parent, fullContext);
             }
             else
             {
@@ -182,27 +169,22 @@ namespace Antlr4.Runtime.Atn
             return parent.GetChild(transition.followState.stateNumber);
         }
 
-        private static Antlr4.Runtime.Atn.PredictionContext AddEmptyContext(Antlr4.Runtime.Atn.PredictionContext
-             context)
+        private static Antlr4.Runtime.Atn.PredictionContext AddEmptyContext(Antlr4.Runtime.Atn.PredictionContext context)
         {
             return context.AddEmptyContext();
         }
 
-        private static Antlr4.Runtime.Atn.PredictionContext RemoveEmptyContext(Antlr4.Runtime.Atn.PredictionContext
-             context)
+        private static Antlr4.Runtime.Atn.PredictionContext RemoveEmptyContext(Antlr4.Runtime.Atn.PredictionContext context)
         {
             return context.RemoveEmptyContext();
         }
 
-        public static Antlr4.Runtime.Atn.PredictionContext Join(Antlr4.Runtime.Atn.PredictionContext
-             context0, Antlr4.Runtime.Atn.PredictionContext context1)
+        public static Antlr4.Runtime.Atn.PredictionContext Join(Antlr4.Runtime.Atn.PredictionContext context0, Antlr4.Runtime.Atn.PredictionContext context1)
         {
             return Join(context0, context1, PredictionContextCache.Uncached);
         }
 
-        internal static Antlr4.Runtime.Atn.PredictionContext Join(Antlr4.Runtime.Atn.PredictionContext
-             context0, Antlr4.Runtime.Atn.PredictionContext context1, PredictionContextCache
-             contextCache)
+        internal static Antlr4.Runtime.Atn.PredictionContext Join(Antlr4.Runtime.Atn.PredictionContext context0, Antlr4.Runtime.Atn.PredictionContext context1, PredictionContextCache contextCache)
         {
             if (context0 == context1)
             {
@@ -221,11 +203,9 @@ namespace Antlr4.Runtime.Atn
             }
             int context0size = context0.Size;
             int context1size = context1.Size;
-            if (context0size == 1 && context1size == 1 && context0.GetReturnState(0) == context1
-                .GetReturnState(0))
+            if (context0size == 1 && context1size == 1 && context0.GetReturnState(0) == context1.GetReturnState(0))
             {
-                Antlr4.Runtime.Atn.PredictionContext merged = contextCache.Join(context0.GetParent
-                    (0), context1.GetParent(0));
+                Antlr4.Runtime.Atn.PredictionContext merged = contextCache.Join(context0.GetParent(0), context1.GetParent(0));
                 if (merged == context0.GetParent(0))
                 {
                     return context0;
@@ -243,8 +223,7 @@ namespace Antlr4.Runtime.Atn
                 }
             }
             int count = 0;
-            Antlr4.Runtime.Atn.PredictionContext[] parentsList = new Antlr4.Runtime.Atn.PredictionContext
-                [context0size + context1size];
+            Antlr4.Runtime.Atn.PredictionContext[] parentsList = new Antlr4.Runtime.Atn.PredictionContext[context0size + context1size];
             int[] returnStatesList = new int[parentsList.Length];
             int leftIndex = 0;
             int rightIndex = 0;
@@ -254,13 +233,10 @@ namespace Antlr4.Runtime.Atn
             {
                 if (context0.GetReturnState(leftIndex) == context1.GetReturnState(rightIndex))
                 {
-                    parentsList[count] = contextCache.Join(context0.GetParent(leftIndex), context1.GetParent
-                        (rightIndex));
+                    parentsList[count] = contextCache.Join(context0.GetParent(leftIndex), context1.GetParent(rightIndex));
                     returnStatesList[count] = context0.GetReturnState(leftIndex);
-                    canReturnLeft = canReturnLeft && parentsList[count] == context0.GetParent(leftIndex
-                        );
-                    canReturnRight = canReturnRight && parentsList[count] == context1.GetParent(rightIndex
-                        );
+                    canReturnLeft = canReturnLeft && parentsList[count] == context0.GetParent(leftIndex);
+                    canReturnRight = canReturnRight && parentsList[count] == context1.GetParent(rightIndex);
                     leftIndex++;
                     rightIndex++;
                 }
@@ -275,8 +251,7 @@ namespace Antlr4.Runtime.Atn
                     }
                     else
                     {
-                        System.Diagnostics.Debug.Assert(context1.GetReturnState(rightIndex) < context0.GetReturnState
-                            (leftIndex));
+                        System.Diagnostics.Debug.Assert(context1.GetReturnState(rightIndex) < context0.GetReturnState(leftIndex));
                         parentsList[count] = context1.GetParent(rightIndex);
                         returnStatesList[count] = context1.GetReturnState(rightIndex);
                         canReturnLeft = false;
@@ -340,9 +315,7 @@ namespace Antlr4.Runtime.Atn
             return context == EmptyLocal;
         }
 
-        public static Antlr4.Runtime.Atn.PredictionContext GetCachedContext(Antlr4.Runtime.Atn.PredictionContext
-             context, ConcurrentDictionary<Antlr4.Runtime.Atn.PredictionContext, Antlr4.Runtime.Atn.PredictionContext
-            > contextCache, PredictionContext.IdentityHashMap visited)
+        public static Antlr4.Runtime.Atn.PredictionContext GetCachedContext(Antlr4.Runtime.Atn.PredictionContext context, ConcurrentDictionary<Antlr4.Runtime.Atn.PredictionContext, Antlr4.Runtime.Atn.PredictionContext> contextCache, PredictionContext.IdentityHashMap visited)
         {
             if (context.IsEmpty)
             {
@@ -359,12 +332,10 @@ namespace Antlr4.Runtime.Atn
                 return existing;
             }
             bool changed = false;
-            Antlr4.Runtime.Atn.PredictionContext[] parents = new Antlr4.Runtime.Atn.PredictionContext
-                [context.Size];
+            Antlr4.Runtime.Atn.PredictionContext[] parents = new Antlr4.Runtime.Atn.PredictionContext[context.Size];
             for (int i = 0; i < parents.Length; i++)
             {
-                Antlr4.Runtime.Atn.PredictionContext parent = GetCachedContext(context.GetParent(
-                    i), contextCache, visited);
+                Antlr4.Runtime.Atn.PredictionContext parent = GetCachedContext(context.GetParent(i), contextCache, visited);
                 if (changed || parent != context.GetParent(i))
                 {
                     if (!changed)
@@ -394,8 +365,7 @@ namespace Antlr4.Runtime.Atn
             else
             {
                 ArrayPredictionContext arrayPredictionContext = (ArrayPredictionContext)context;
-                updated = new ArrayPredictionContext(parents, arrayPredictionContext.returnStates
-                    , context.cachedHashCode);
+                updated = new ArrayPredictionContext(parents, arrayPredictionContext.returnStates, context.cachedHashCode);
             }
             existing = contextCache.GetOrAdd(updated, updated);
             visited[updated] = existing;
@@ -403,15 +373,12 @@ namespace Antlr4.Runtime.Atn
             return updated;
         }
 
-        public virtual Antlr4.Runtime.Atn.PredictionContext AppendContext(int returnContext
-            , PredictionContextCache contextCache)
+        public virtual Antlr4.Runtime.Atn.PredictionContext AppendContext(int returnContext, PredictionContextCache contextCache)
         {
-            return AppendContext(Antlr4.Runtime.Atn.PredictionContext.EmptyFull.GetChild(returnContext
-                ), contextCache);
+            return AppendContext(Antlr4.Runtime.Atn.PredictionContext.EmptyFull.GetChild(returnContext), contextCache);
         }
 
-        public abstract Antlr4.Runtime.Atn.PredictionContext AppendContext(Antlr4.Runtime.Atn.PredictionContext
-             suffix, PredictionContextCache contextCache);
+        public abstract Antlr4.Runtime.Atn.PredictionContext AppendContext(Antlr4.Runtime.Atn.PredictionContext suffix, PredictionContextCache contextCache);
 
         public virtual Antlr4.Runtime.Atn.PredictionContext GetChild(int returnState)
         {
@@ -439,15 +406,12 @@ namespace Antlr4.Runtime.Atn
         //public String toString() {
         //	return toString(null, Integer.MAX_VALUE);
         //}
-        public virtual string[] ToStrings(IRecognizer recognizer, int currentState
-            )
+        public virtual string[] ToStrings(IRecognizer recognizer, int currentState)
         {
-            return ToStrings(recognizer, Antlr4.Runtime.Atn.PredictionContext.EmptyFull, currentState
-                );
+            return ToStrings(recognizer, Antlr4.Runtime.Atn.PredictionContext.EmptyFull, currentState);
         }
 
-        public virtual string[] ToStrings(IRecognizer recognizer, Antlr4.Runtime.Atn.PredictionContext
-             stop, int currentState)
+        public virtual string[] ToStrings(IRecognizer recognizer, Antlr4.Runtime.Atn.PredictionContext stop, int currentState)
         {
             List<string> result = new List<string>();
             for (int perm = 0; ; perm++)
@@ -519,8 +483,7 @@ outer_continue: ;
             return result.ToArray();
         }
 
-        public sealed class IdentityHashMap : Dictionary<PredictionContext, PredictionContext
-            >
+        public sealed class IdentityHashMap : Dictionary<PredictionContext, PredictionContext>
         {
             public IdentityHashMap()
                 : base(PredictionContext.IdentityEqualityComparator.Instance)
@@ -528,11 +491,9 @@ outer_continue: ;
             }
         }
 
-        public sealed class IdentityEqualityComparator : EqualityComparer<PredictionContext
-            >
+        public sealed class IdentityEqualityComparator : EqualityComparer<PredictionContext>
         {
-            public static readonly PredictionContext.IdentityEqualityComparator Instance = new 
-                PredictionContext.IdentityEqualityComparator();
+            public static readonly PredictionContext.IdentityEqualityComparator Instance = new PredictionContext.IdentityEqualityComparator();
 
             private IdentityEqualityComparator()
             {

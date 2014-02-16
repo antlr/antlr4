@@ -136,8 +136,7 @@ namespace Antlr4.Runtime.Atn
                     return true;
                 }
                 SemanticContext.Predicate p = (SemanticContext.Predicate)obj;
-                return this.ruleIndex == p.ruleIndex && this.predIndex == p.predIndex && this.isCtxDependent
-                     == p.isCtxDependent;
+                return this.ruleIndex == p.ruleIndex && this.predIndex == p.predIndex && this.isCtxDependent == p.isCtxDependent;
             }
 
             public override string ToString()
@@ -146,8 +145,7 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        public class PrecedencePredicate : SemanticContext, IComparable<SemanticContext.PrecedencePredicate
-            >
+        public class PrecedencePredicate : SemanticContext, IComparable<SemanticContext.PrecedencePredicate>
         {
             public readonly int precedence;
 
@@ -188,8 +186,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     return true;
                 }
-                SemanticContext.PrecedencePredicate other = (SemanticContext.PrecedencePredicate)
-                    obj;
+                SemanticContext.PrecedencePredicate other = (SemanticContext.PrecedencePredicate)obj;
                 return this.precedence == other.precedence;
             }
 
@@ -223,8 +220,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     operands.Add(b);
                 }
-                IList<SemanticContext.PrecedencePredicate> precedencePredicates = FilterPrecedencePredicates
-                    (operands);
+                IList<SemanticContext.PrecedencePredicate> precedencePredicates = FilterPrecedencePredicates(operands);
                 if (precedencePredicates.Count > 0)
                 {
                     // interested in the transition with the lowest precedence
@@ -295,8 +291,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     operands.Add(b);
                 }
-                IList<SemanticContext.PrecedencePredicate> precedencePredicates = FilterPrecedencePredicates
-                    (operands);
+                IList<SemanticContext.PrecedencePredicate> precedencePredicates = FilterPrecedencePredicates(operands);
                 if (precedencePredicates.Count > 0)
                 {
                     // interested in the transition with the highest precedence
@@ -361,8 +356,7 @@ namespace Antlr4.Runtime.Atn
             return result;
         }
 
-        /// <seealso cref="ParserATNSimulator.GetPredsForAmbigAlts(Sharpen.BitSet, ATNConfigSet, int)
-        ///     ">ParserATNSimulator.GetPredsForAmbigAlts(Sharpen.BitSet, ATNConfigSet, int)</seealso>
+        /// <seealso cref="ParserATNSimulator.GetPredsForAmbigAlts(Sharpen.BitSet, ATNConfigSet, int)">ParserATNSimulator.GetPredsForAmbigAlts(Sharpen.BitSet, ATNConfigSet, int)</seealso>
         public static SemanticContext Or(SemanticContext a, SemanticContext b)
         {
             if (a == null)
@@ -385,8 +379,7 @@ namespace Antlr4.Runtime.Atn
             return result;
         }
 
-        private static IList<SemanticContext.PrecedencePredicate> FilterPrecedencePredicates
-            (HashSet<SemanticContext> collection)
+        private static IList<SemanticContext.PrecedencePredicate> FilterPrecedencePredicates(HashSet<SemanticContext> collection)
         {
             if (!collection.OfType<PrecedencePredicate>().Any())
                 Collections.EmptyList<PrecedencePredicate>();

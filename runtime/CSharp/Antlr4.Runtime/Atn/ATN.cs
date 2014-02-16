@@ -66,8 +66,7 @@ namespace Antlr4.Runtime.Atn
         public RuleStopState[] ruleToStopState;
 
         [NotNull]
-        public readonly IDictionary<string, TokensStartState> modeNameToStartState = new 
-            Dictionary<string, TokensStartState>();
+        public readonly IDictionary<string, TokensStartState> modeNameToStartState = new Dictionary<string, TokensStartState>();
 
         /// <summary>The type of the ATN.</summary>
         /// <remarks>The type of the ATN.</remarks>
@@ -102,11 +101,9 @@ namespace Antlr4.Runtime.Atn
         public int[] ruleToActionIndex;
 
         [NotNull]
-        public readonly IList<TokensStartState> modeToStartState = new List<TokensStartState
-            >();
+        public readonly IList<TokensStartState> modeToStartState = new List<TokensStartState>();
 
-        private readonly ConcurrentDictionary<PredictionContext, PredictionContext> contextCache
-             = new ConcurrentDictionary<PredictionContext, PredictionContext>();
+        private readonly ConcurrentDictionary<PredictionContext, PredictionContext> contextCache = new ConcurrentDictionary<PredictionContext, PredictionContext>();
 
         [NotNull]
         public DFA[] decisionToDFA = new DFA[0];
@@ -114,8 +111,7 @@ namespace Antlr4.Runtime.Atn
         [NotNull]
         public DFA[] modeToDFA = new DFA[0];
 
-        protected internal readonly ConcurrentDictionary<int, int> LL1Table = new ConcurrentDictionary
-            <int, int>();
+        protected internal readonly ConcurrentDictionary<int, int> LL1Table = new ConcurrentDictionary<int, int>();
 
         /// <summary>Used for runtime deserialization of ATNs from strings</summary>
         public ATN(ATNType grammarType, int maxTokenType)
@@ -147,14 +143,12 @@ namespace Antlr4.Runtime.Atn
 
         public virtual PredictionContext GetCachedContext(PredictionContext context)
         {
-            return PredictionContext.GetCachedContext(context, contextCache, new PredictionContext.IdentityHashMap
-                ());
+            return PredictionContext.GetCachedContext(context, contextCache, new PredictionContext.IdentityHashMap());
         }
 
         public DFA[] GetDecisionToDFA()
         {
-            System.Diagnostics.Debug.Assert(decisionToDFA != null && decisionToDFA.Length == 
-                decisionToState.Count);
+            System.Diagnostics.Debug.Assert(decisionToDFA != null && decisionToDFA.Length == decisionToState.Count);
             return decisionToDFA;
         }
 
@@ -287,8 +281,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>stateNumber</code>
         /// </exception>
         [return: NotNull]
-        public virtual IntervalSet GetExpectedTokens(int stateNumber, RuleContext context
-            )
+        public virtual IntervalSet GetExpectedTokens(int stateNumber, RuleContext context)
         {
             if (stateNumber < 0 || stateNumber >= states.Count)
             {
@@ -304,8 +297,7 @@ namespace Antlr4.Runtime.Atn
             IntervalSet expected = new IntervalSet();
             expected.AddAll(following);
             expected.Remove(TokenConstants.Epsilon);
-            while (ctx != null && ctx.invokingState >= 0 && following.Contains(TokenConstants
-                .Epsilon))
+            while (ctx != null && ctx.invokingState >= 0 && following.Contains(TokenConstants.Epsilon))
             {
                 ATNState invokingState = states[ctx.invokingState];
                 RuleTransition rt = (RuleTransition)invokingState.Transition(0);

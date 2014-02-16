@@ -196,8 +196,7 @@ namespace Antlr4.Runtime
 
         // subclass needs to override these if there are sempreds or actions
         // that the ATN interp needs to execute
-        public virtual bool Sempred(RuleContext _localctx, int ruleIndex, int actionIndex
-            )
+        public virtual bool Sempred(RuleContext _localctx, int ruleIndex, int actionIndex)
         {
             return true;
         }

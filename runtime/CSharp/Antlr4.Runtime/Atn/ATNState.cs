@@ -96,10 +96,7 @@ namespace Antlr4.Runtime.Atn
     {
         public const int InitialNumTransitions = 4;
 
-        public static readonly ReadOnlyCollection<string> serializationNames = new ReadOnlyCollection<string>
-            (Arrays.AsList("INVALID", "BASIC", "RULE_START", "BLOCK_START", "PLUS_BLOCK_START"
-            , "STAR_BLOCK_START", "TOKEN_START", "RULE_STOP", "BLOCK_END", "STAR_LOOP_BACK"
-            , "STAR_LOOP_ENTRY", "PLUS_LOOP_BACK", "LOOP_END"));
+        public static readonly ReadOnlyCollection<string> serializationNames = new ReadOnlyCollection<string>(Arrays.AsList("INVALID", "BASIC", "RULE_START", "BLOCK_START", "PLUS_BLOCK_START", "STAR_BLOCK_START", "TOKEN_START", "RULE_STOP", "BLOCK_END", "STAR_LOOP_BACK", "STAR_LOOP_ENTRY", "PLUS_LOOP_BACK", "LOOP_END"));
 
         public const int InvalidStateNumber = -1;
 
@@ -114,8 +111,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>Track the transitions emanating from this ATN state.</summary>
         /// <remarks>Track the transitions emanating from this ATN state.</remarks>
-        protected internal readonly List<Antlr4.Runtime.Atn.Transition> transitions = new 
-            List<Antlr4.Runtime.Atn.Transition>(InitialNumTransitions);
+        protected internal readonly List<Antlr4.Runtime.Atn.Transition> transitions = new List<Antlr4.Runtime.Atn.Transition>(InitialNumTransitions);
 
         protected internal List<Antlr4.Runtime.Atn.Transition> optimizedTransitions;
 
@@ -210,8 +206,7 @@ namespace Antlr4.Runtime.Atn
                 if (epsilonOnlyTransitions != e.IsEpsilon)
                 {
 #if !PORTABLE
-                    System.Console.Error.WriteLine("ATN state {0} has both epsilon and non-epsilon transitions."
-                        , stateNumber);
+                    System.Console.Error.WriteLine("ATN state {0} has both epsilon and non-epsilon transitions.", stateNumber);
 #endif
                     epsilonOnlyTransitions = false;
                 }
@@ -282,8 +277,7 @@ namespace Antlr4.Runtime.Atn
             optimizedTransitions.Add(e);
         }
 
-        public virtual void SetOptimizedTransition(int i, Antlr4.Runtime.Atn.Transition e
-            )
+        public virtual void SetOptimizedTransition(int i, Antlr4.Runtime.Atn.Transition e)
         {
             if (!IsOptimized)
             {

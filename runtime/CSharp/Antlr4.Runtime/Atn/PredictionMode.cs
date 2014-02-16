@@ -73,8 +73,7 @@ namespace Antlr4.Runtime.Atn
         /// continue looking for the exact ambiguous sequence even if
         /// it has already figured out which alternative to predict.
         /// </remarks>
-        public static readonly PredictionMode LlExactAmbigDetection = new PredictionMode(
-            );
+        public static readonly PredictionMode LlExactAmbigDetection = new PredictionMode();
 
         /// <summary>A Map that uses just the state and the stack context as the key.</summary>
         /// <remarks>A Map that uses just the state and the stack context as the key.</remarks>
@@ -86,11 +85,9 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        private sealed class AltAndContextConfigEqualityComparator : EqualityComparer<ATNConfig
-            >
+        private sealed class AltAndContextConfigEqualityComparator : EqualityComparer<ATNConfig>
         {
-            public static readonly PredictionMode.AltAndContextConfigEqualityComparator Instance
-                 = new PredictionMode.AltAndContextConfigEqualityComparator();
+            public static readonly PredictionMode.AltAndContextConfigEqualityComparator Instance = new PredictionMode.AltAndContextConfigEqualityComparator();
 
             private AltAndContextConfigEqualityComparator()
             {
@@ -238,8 +235,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="ATNConfigSet">ATNConfigSet</see>
         /// will merge everything ignoring predicates.
         /// </remarks>
-        public static bool HasSLLConflictTerminatingPrediction(PredictionMode mode, ATNConfigSet
-             configs)
+        public static bool HasSLLConflictTerminatingPrediction(PredictionMode mode, ATNConfigSet configs)
         {
             if (AllConfigsInRuleStopStates(configs))
             {
@@ -266,8 +262,7 @@ namespace Antlr4.Runtime.Atn
             // now we have combined contexts for configs with dissimilar preds
             // pure SLL or combined SLL+LL mode parsing
             ICollection<BitSet> altsets = GetConflictingAltSubsets(configs);
-            bool heuristic = HasConflictingAltSet(altsets) && !HasStateAssociatedWithOneAlt(configs
-                );
+            bool heuristic = HasConflictingAltSet(altsets) && !HasStateAssociatedWithOneAlt(configs);
             return heuristic;
         }
 
@@ -809,8 +804,7 @@ namespace Antlr4.Runtime.Atn
             return all;
         }
 
-        /// <summary>This function gets the conflicting alt subsets from a configuration set.
-        ///     </summary>
+        /// <summary>This function gets the conflicting alt subsets from a configuration set.</summary>
         /// <remarks>
         /// This function gets the conflicting alt subsets from a configuration set.
         /// For each configuration
@@ -826,11 +820,9 @@ namespace Antlr4.Runtime.Atn
         /// </pre>
         /// </remarks>
         [return: NotNull]
-        public static ICollection<BitSet> GetConflictingAltSubsets(IEnumerable<ATNConfig>
-             configs)
+        public static ICollection<BitSet> GetConflictingAltSubsets(IEnumerable<ATNConfig> configs)
         {
-            PredictionMode.AltAndContextMap configToAlts = new PredictionMode.AltAndContextMap
-                ();
+            PredictionMode.AltAndContextMap configToAlts = new PredictionMode.AltAndContextMap();
             foreach (ATNConfig c in configs)
             {
                 BitSet alts;
@@ -860,8 +852,7 @@ namespace Antlr4.Runtime.Atn
         /// </pre>
         /// </remarks>
         [return: NotNull]
-        public static IDictionary<ATNState, BitSet> GetStateToAltMap(IEnumerable<ATNConfig
-            > configs)
+        public static IDictionary<ATNState, BitSet> GetStateToAltMap(IEnumerable<ATNConfig> configs)
         {
             IDictionary<ATNState, BitSet> m = new Dictionary<ATNState, BitSet>();
             foreach (ATNConfig c in configs)

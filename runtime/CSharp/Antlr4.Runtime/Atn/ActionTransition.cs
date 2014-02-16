@@ -45,8 +45,7 @@ namespace Antlr4.Runtime.Atn
         {
         }
 
-        public ActionTransition(ATNState target, int ruleIndex, int actionIndex, bool isCtxDependent
-            )
+        public ActionTransition(ATNState target, int ruleIndex, int actionIndex, bool isCtxDependent)
             : base(target)
         {
             // e.g., $i ref in action

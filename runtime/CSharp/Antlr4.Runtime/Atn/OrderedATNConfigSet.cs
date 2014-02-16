@@ -46,8 +46,7 @@ namespace Antlr4.Runtime.Atn
 
         public override ATNConfigSet Clone(bool @readonly)
         {
-            Antlr4.Runtime.Atn.OrderedATNConfigSet copy = new Antlr4.Runtime.Atn.OrderedATNConfigSet
-                (this, @readonly);
+            Antlr4.Runtime.Atn.OrderedATNConfigSet copy = new Antlr4.Runtime.Atn.OrderedATNConfigSet(this, @readonly);
             if (!@readonly && this.IsReadOnly)
             {
                 copy.AddAll(this);
@@ -60,8 +59,7 @@ namespace Antlr4.Runtime.Atn
             return e.GetHashCode();
         }
 
-        protected internal override bool CanMerge(ATNConfig left, long leftKey, ATNConfig
-             right)
+        protected internal override bool CanMerge(ATNConfig left, long leftKey, ATNConfig right)
         {
             return left.Equals(right);
         }

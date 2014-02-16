@@ -48,19 +48,16 @@ namespace Antlr4.Runtime.Atn
             : base(CalculateHashCode(parents, returnStates))
         {
             System.Diagnostics.Debug.Assert(parents.Length == returnStates.Length);
-            System.Diagnostics.Debug.Assert(returnStates.Length > 1 || returnStates[0] != EmptyFullStateKey
-                , "Should be using PredictionContext.EMPTY instead.");
+            System.Diagnostics.Debug.Assert(returnStates.Length > 1 || returnStates[0] != EmptyFullStateKey, "Should be using PredictionContext.EMPTY instead.");
             this.parents = parents;
             this.returnStates = returnStates;
         }
 
-        internal ArrayPredictionContext(PredictionContext[] parents, int[] returnStates, 
-            int hashCode)
+        internal ArrayPredictionContext(PredictionContext[] parents, int[] returnStates, int hashCode)
             : base(hashCode)
         {
             System.Diagnostics.Debug.Assert(parents.Length == returnStates.Length);
-            System.Diagnostics.Debug.Assert(returnStates.Length > 1 || returnStates[0] != EmptyFullStateKey
-                , "Should be using PredictionContext.EMPTY instead.");
+            System.Diagnostics.Debug.Assert(returnStates.Length > 1 || returnStates[0] != EmptyFullStateKey, "Should be using PredictionContext.EMPTY instead.");
             this.parents = parents;
             this.returnStates = returnStates;
         }
@@ -135,14 +132,12 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        public override PredictionContext AppendContext(PredictionContext suffix, PredictionContextCache
-             contextCache)
+        public override PredictionContext AppendContext(PredictionContext suffix, PredictionContextCache contextCache)
         {
             return AppendContext(this, suffix, new PredictionContext.IdentityHashMap());
         }
 
-        private static PredictionContext AppendContext(PredictionContext context, PredictionContext
-             suffix, PredictionContext.IdentityHashMap visited)
+        private static PredictionContext AppendContext(PredictionContext context, PredictionContext suffix, PredictionContext.IdentityHashMap visited)
         {
             if (suffix.IsEmpty)
             {
@@ -186,14 +181,12 @@ namespace Antlr4.Runtime.Atn
                     }
                     if (updatedParents.Length == 1)
                     {
-                        result = new SingletonPredictionContext(updatedParents[0], updatedReturnStates[0]
-                            );
+                        result = new SingletonPredictionContext(updatedParents[0], updatedReturnStates[0]);
                     }
                     else
                     {
                         System.Diagnostics.Debug.Assert(updatedParents.Length > 1);
-                        result = new Antlr4.Runtime.Atn.ArrayPredictionContext(updatedParents, updatedReturnStates
-                            );
+                        result = new Antlr4.Runtime.Atn.ArrayPredictionContext(updatedParents, updatedReturnStates);
                     }
                     if (context.HasEmpty)
                     {
@@ -223,14 +216,11 @@ namespace Antlr4.Runtime.Atn
                 return false;
             }
             // can't be same if hash is different
-            Antlr4.Runtime.Atn.ArrayPredictionContext other = (Antlr4.Runtime.Atn.ArrayPredictionContext
-                )o;
-            return Equals(other, new HashSet<PredictionContextCache.IdentityCommutativePredictionContextOperands
-                >());
+            Antlr4.Runtime.Atn.ArrayPredictionContext other = (Antlr4.Runtime.Atn.ArrayPredictionContext)o;
+            return Equals(other, new HashSet<PredictionContextCache.IdentityCommutativePredictionContextOperands>());
         }
 
-        private bool Equals(Antlr4.Runtime.Atn.ArrayPredictionContext other, HashSet<PredictionContextCache.IdentityCommutativePredictionContextOperands
-            > visited)
+        private bool Equals(Antlr4.Runtime.Atn.ArrayPredictionContext other, HashSet<PredictionContextCache.IdentityCommutativePredictionContextOperands> visited)
         {
             Stack<PredictionContext> selfWorkList = new Stack<PredictionContext>();
             Stack<PredictionContext> otherWorkList = new Stack<PredictionContext>();
@@ -238,9 +228,7 @@ namespace Antlr4.Runtime.Atn
             otherWorkList.Push(other);
             while (selfWorkList.Count > 0)
             {
-                PredictionContextCache.IdentityCommutativePredictionContextOperands operands = new 
-                    PredictionContextCache.IdentityCommutativePredictionContextOperands(selfWorkList
-                    .Pop(), otherWorkList.Pop());
+                PredictionContextCache.IdentityCommutativePredictionContextOperands operands = new PredictionContextCache.IdentityCommutativePredictionContextOperands(selfWorkList.Pop(), otherWorkList.Pop());
                 if (!visited.Add(operands))
                 {
                     continue;

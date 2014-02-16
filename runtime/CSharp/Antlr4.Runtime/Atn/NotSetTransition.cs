@@ -50,8 +50,7 @@ namespace Antlr4.Runtime.Atn
 
         public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
         {
-            return symbol >= minVocabSymbol && symbol <= maxVocabSymbol && !base.Matches(symbol
-                , minVocabSymbol, maxVocabSymbol);
+            return symbol >= minVocabSymbol && symbol <= maxVocabSymbol && !base.Matches(symbol, minVocabSymbol, maxVocabSymbol);
         }
 
         public override string ToString()

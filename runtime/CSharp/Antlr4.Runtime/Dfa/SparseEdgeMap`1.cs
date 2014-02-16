@@ -146,8 +146,7 @@ namespace Antlr4.Runtime.Dfa
                     values.Add(value);
                     return this;
                 }
-                int desiredSize = Count >= GetMaxSparseSize() ? GetMaxSparseSize() * 2 : GetMaxSparseSize
-                    ();
+                int desiredSize = Count >= GetMaxSparseSize() ? GetMaxSparseSize() * 2 : GetMaxSparseSize();
                 int space = maxIndex - minIndex + 1;
                 // SparseEdgeMap only uses less memory than ArrayEdgeMap up to half the size of the symbol space
                 if (desiredSize >= space / 2)
@@ -159,10 +158,8 @@ namespace Antlr4.Runtime.Dfa
                 }
                 else
                 {
-                    Antlr4.Runtime.Dfa.SparseEdgeMap<T> resized = new Antlr4.Runtime.Dfa.SparseEdgeMap
-                        <T>(this, desiredSize);
-                    System.Array.Copy(resized.keys, insertIndex, resized.keys, insertIndex + 1, resized
-                        .keys.Length - insertIndex - 1);
+                    Antlr4.Runtime.Dfa.SparseEdgeMap<T> resized = new Antlr4.Runtime.Dfa.SparseEdgeMap<T>(this, desiredSize);
+                    System.Array.Copy(resized.keys, insertIndex, resized.keys, insertIndex + 1, resized.keys.Length - insertIndex - 1);
                     resized.keys[insertIndex] = key;
                     resized.values.Insert(insertIndex, value);
                     return resized;
@@ -182,8 +179,7 @@ namespace Antlr4.Runtime.Dfa
                 values.RemoveAt(index);
                 return this;
             }
-            Antlr4.Runtime.Dfa.SparseEdgeMap<T> result = new Antlr4.Runtime.Dfa.SparseEdgeMap
-                <T>(this, GetMaxSparseSize());
+            Antlr4.Runtime.Dfa.SparseEdgeMap<T> result = new Antlr4.Runtime.Dfa.SparseEdgeMap<T>(this, GetMaxSparseSize());
             System.Array.Copy(result.keys, index + 1, result.keys, index, Count - index - 1);
             result.values.RemoveAt(index);
             return result;
@@ -195,8 +191,7 @@ namespace Antlr4.Runtime.Dfa
             {
                 return this;
             }
-            Antlr4.Runtime.Dfa.SparseEdgeMap<T> result = new Antlr4.Runtime.Dfa.SparseEdgeMap
-                <T>(this, GetMaxSparseSize());
+            Antlr4.Runtime.Dfa.SparseEdgeMap<T> result = new Antlr4.Runtime.Dfa.SparseEdgeMap<T>(this, GetMaxSparseSize());
             result.values.Clear();
             return result;
         }

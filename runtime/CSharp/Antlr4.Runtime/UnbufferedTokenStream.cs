@@ -147,8 +147,7 @@ namespace Antlr4.Runtime
             int bufferStartIndex = GetBufferStartIndex();
             if (i < bufferStartIndex || i >= bufferStartIndex + n)
             {
-                throw new ArgumentOutOfRangeException("get(" + i + ") outside buffer: " + bufferStartIndex
-                     + ".." + (bufferStartIndex + n));
+                throw new ArgumentOutOfRangeException("get(" + i + ") outside buffer: " + bufferStartIndex + ".." + (bufferStartIndex + n));
             }
             return tokens[i - bufferStartIndex];
         }
@@ -167,8 +166,7 @@ namespace Antlr4.Runtime
             }
             if (index >= n)
             {
-                System.Diagnostics.Debug.Assert(n > 0 && tokens[n - 1].Type == TokenConstants.Eof
-                    );
+                System.Diagnostics.Debug.Assert(n > 0 && tokens[n - 1].Type == TokenConstants.Eof);
                 return tokens[n - 1];
             }
             return tokens[index];
@@ -206,8 +204,7 @@ namespace Antlr4.Runtime
             {
                 return GetText(Interval.Of(start.TokenIndex, stop.TokenIndex));
             }
-            throw new NotSupportedException("The specified start and stop symbols are not supported."
-                );
+            throw new NotSupportedException("The specified start and stop symbols are not supported.");
         }
 
         public virtual void Consume()
@@ -372,8 +369,7 @@ namespace Antlr4.Runtime
             {
                 if (i >= n)
                 {
-                    throw new NotSupportedException("seek to index outside buffer: " + index + " not in "
-                         + bufferStartIndex + ".." + (bufferStartIndex + n));
+                    throw new NotSupportedException("seek to index outside buffer: " + index + " not in " + bufferStartIndex + ".." + (bufferStartIndex + n));
                 }
             }
             p = i;
@@ -413,8 +409,7 @@ namespace Antlr4.Runtime
             int stop = interval.b;
             if (start < bufferStartIndex || stop > bufferStopIndex)
             {
-                throw new NotSupportedException("interval " + interval + " not in token buffer window: "
-                     + bufferStartIndex + ".." + bufferStopIndex);
+                throw new NotSupportedException("interval " + interval + " not in token buffer window: " + bufferStartIndex + ".." + bufferStopIndex);
             }
             int a = start - bufferStartIndex;
             int b = stop - bufferStartIndex;

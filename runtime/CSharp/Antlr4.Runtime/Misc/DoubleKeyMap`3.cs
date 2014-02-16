@@ -33,8 +33,7 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Misc
 {
-    /// <summary>Sometimes we need to map a key to a value but key is two pieces of data.
-    ///     </summary>
+    /// <summary>Sometimes we need to map a key to a value but key is two pieces of data.</summary>
     /// <remarks>
     /// Sometimes we need to map a key to a value but key is two pieces of data.
     /// This nested hash table saves creating a single key each time we access
@@ -42,8 +41,7 @@ namespace Antlr4.Runtime.Misc
     /// </remarks>
     public class DoubleKeyMap<Key1, Key2, Value>
     {
-        internal IDictionary<Key1, IDictionary<Key2, Value>> data = new LinkedHashMap<Key1
-            , IDictionary<Key2, Value>>();
+        internal IDictionary<Key1, IDictionary<Key2, Value>> data = new LinkedHashMap<Key1, IDictionary<Key2, Value>>();
 
         public virtual Value Put(Key1 k1, Key2 k2, Value v)
         {

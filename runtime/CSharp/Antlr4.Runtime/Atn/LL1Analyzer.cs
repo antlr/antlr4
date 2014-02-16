@@ -86,8 +86,7 @@ namespace Antlr4.Runtime.Atn
                 HashSet<ATNConfig> lookBusy = new HashSet<ATNConfig>();
                 bool seeThruPreds = false;
                 // fail to get lookahead upon pred
-                Look(s.Transition(alt).target, null, PredictionContext.EmptyFull, look[alt], lookBusy
-                    , new BitSet(), seeThruPreds, false);
+                Look(s.Transition(alt).target, null, PredictionContext.EmptyFull, look[alt], lookBusy, new BitSet(), seeThruPreds, false);
                 // Wipe out lookahead for this alternative if we found nothing
                 // or we had a predicate when we !seeThruPreds
                 if (look[alt].Size() == 0 || look[alt].Contains(HitPred))
@@ -192,14 +191,12 @@ namespace Antlr4.Runtime.Atn
         /// .
         /// </returns>
         [return: NotNull]
-        public virtual IntervalSet Look(ATNState s, ATNState stopState, PredictionContext
-             ctx)
+        public virtual IntervalSet Look(ATNState s, ATNState stopState, PredictionContext ctx)
         {
             IntervalSet r = new IntervalSet();
             bool seeThruPreds = true;
             // ignore preds; get all lookahead
-            Look(s, stopState, ctx, r, new HashSet<ATNConfig>(), new BitSet(), seeThruPreds, 
-                true);
+            Look(s, stopState, ctx, r, new HashSet<ATNConfig>(), new BitSet(), seeThruPreds, true);
             return r;
         }
 
@@ -283,9 +280,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="PredictionContext.EmptyLocal">PredictionContext.EmptyLocal</see>
         /// .
         /// </param>
-        protected internal virtual void Look(ATNState s, ATNState stopState, PredictionContext
-             ctx, IntervalSet look, HashSet<ATNConfig> lookBusy, BitSet calledRuleStack, 
-            bool seeThruPreds, bool addEOF)
+        protected internal virtual void Look(ATNState s, ATNState stopState, PredictionContext ctx, IntervalSet look, HashSet<ATNConfig> lookBusy, BitSet calledRuleStack, bool seeThruPreds, bool addEOF)
         {
             //		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);
             ATNConfig c = ATNConfig.Create(s, 0, ctx);
@@ -336,8 +331,7 @@ namespace Antlr4.Runtime.Atn
                             try
                             {
                                 calledRuleStack.Clear(returnState.ruleIndex);
-                                Look(returnState, stopState, ctx.GetParent(j), look, lookBusy, calledRuleStack, seeThruPreds
-                                    , addEOF);
+                                Look(returnState, stopState, ctx.GetParent(j), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
                             }
                             finally
                             {
@@ -361,13 +355,11 @@ namespace Antlr4.Runtime.Atn
                     {
                         continue;
                     }
-                    PredictionContext newContext = ctx.GetChild(((RuleTransition)t).followState.stateNumber
-                        );
+                    PredictionContext newContext = ctx.GetChild(((RuleTransition)t).followState.stateNumber);
                     try
                     {
                         calledRuleStack.Set(((RuleTransition)t).target.ruleIndex);
-                        Look(t.target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds
-                            , addEOF);
+                        Look(t.target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
                     }
                     finally
                     {
@@ -380,8 +372,7 @@ namespace Antlr4.Runtime.Atn
                     {
                         if (seeThruPreds)
                         {
-                            Look(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF
-                                );
+                            Look(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
                         }
                         else
                         {
@@ -392,8 +383,7 @@ namespace Antlr4.Runtime.Atn
                     {
                         if (t.IsEpsilon)
                         {
-                            Look(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF
-                                );
+                            Look(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
                         }
                         else
                         {
@@ -409,8 +399,7 @@ namespace Antlr4.Runtime.Atn
                                 {
                                     if (t is NotSetTransition)
                                     {
-                                        set = set.Complement(IntervalSet.Of(TokenConstants.MinUserTokenType, atn.maxTokenType
-                                            ));
+                                        set = set.Complement(IntervalSet.Of(TokenConstants.MinUserTokenType, atn.maxTokenType));
                                     }
                                     look.AddAll(set);
                                 }

@@ -41,8 +41,7 @@ namespace Antlr4.Runtime
     /// can be used to identify
     /// certain potential correctness and performance problems in grammars. "Reports"
     /// are made by calling
-    /// <see cref="Parser.NotifyErrorListeners(string)">Parser.NotifyErrorListeners(string)
-    ///     </see>
+    /// <see cref="Parser.NotifyErrorListeners(string)">Parser.NotifyErrorListeners(string)</see>
     /// with the appropriate
     /// message.
     /// <ul>
@@ -97,8 +96,7 @@ namespace Antlr4.Runtime
             this.exactOnly = exactOnly;
         }
 
-        public override void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, 
-            int stopIndex, bool exact, BitSet ambigAlts, ATNConfigSet configs)
+        public override void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, bool exact, BitSet ambigAlts, ATNConfigSet configs)
         {
             if (exactOnly && !exact)
             {
@@ -107,37 +105,30 @@ namespace Antlr4.Runtime
             string format = "reportAmbiguity d={0}: ambigAlts={1}, input='{2}'";
             string decision = GetDecisionDescription(recognizer, dfa);
             BitSet conflictingAlts = GetConflictingAlts(ambigAlts, configs);
-            string text = ((ITokenStream)recognizer.InputStream).GetText(Interval.Of(startIndex
-                , stopIndex));
+            string text = ((ITokenStream)recognizer.InputStream).GetText(Interval.Of(startIndex, stopIndex));
             string message = string.Format(format, decision, conflictingAlts, text);
             recognizer.NotifyErrorListeners(message);
         }
 
-        public override void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int 
-            startIndex, int stopIndex, BitSet conflictingAlts, SimulatorState conflictState
-            )
+        public override void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, SimulatorState conflictState)
         {
             string format = "reportAttemptingFullContext d={0}, input='{1}'";
             string decision = GetDecisionDescription(recognizer, dfa);
-            string text = ((ITokenStream)recognizer.InputStream).GetText(Interval.Of(startIndex
-                , stopIndex));
+            string text = ((ITokenStream)recognizer.InputStream).GetText(Interval.Of(startIndex, stopIndex));
             string message = string.Format(format, decision, text);
             recognizer.NotifyErrorListeners(message);
         }
 
-        public override void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex
-            , int stopIndex, int prediction, SimulatorState acceptState)
+        public override void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, SimulatorState acceptState)
         {
             string format = "reportContextSensitivity d={0}, input='{1}'";
             string decision = GetDecisionDescription(recognizer, dfa);
-            string text = ((ITokenStream)recognizer.InputStream).GetText(Interval.Of(startIndex
-                , stopIndex));
+            string text = ((ITokenStream)recognizer.InputStream).GetText(Interval.Of(startIndex, stopIndex));
             string message = string.Format(format, decision, text);
             recognizer.NotifyErrorListeners(message);
         }
 
-        protected internal virtual string GetDecisionDescription(Parser recognizer, DFA
-             dfa)
+        protected internal virtual string GetDecisionDescription(Parser recognizer, DFA dfa)
         {
             int decision = dfa.decision;
             int ruleIndex = dfa.atnStartState.ruleIndex;
@@ -180,8 +171,7 @@ namespace Antlr4.Runtime
         /// .
         /// </returns>
         [return: NotNull]
-        protected internal virtual BitSet GetConflictingAlts(BitSet reportedAlts, ATNConfigSet
-             configs)
+        protected internal virtual BitSet GetConflictingAlts(BitSet reportedAlts, ATNConfigSet configs)
         {
             if (reportedAlts != null)
             {

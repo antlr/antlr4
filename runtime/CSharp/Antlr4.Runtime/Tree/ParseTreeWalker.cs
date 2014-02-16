@@ -64,23 +64,20 @@ namespace Antlr4.Runtime.Tree
 
         /// <summary>
         /// The discovery of a rule node, involves sending two events: the generic
-        /// <see cref="IParseTreeListener.EnterEveryRule(Antlr4.Runtime.ParserRuleContext)">IParseTreeListener.EnterEveryRule(Antlr4.Runtime.ParserRuleContext)
-        ///     </see>
+        /// <see cref="IParseTreeListener.EnterEveryRule(Antlr4.Runtime.ParserRuleContext)">IParseTreeListener.EnterEveryRule(Antlr4.Runtime.ParserRuleContext)</see>
         /// and a
         /// <see cref="Antlr4.Runtime.RuleContext">Antlr4.Runtime.RuleContext</see>
         /// -specific event. First we trigger the generic and then
         /// the rule specific. We to them in reverse order upon finishing the node.
         /// </summary>
-        protected internal virtual void EnterRule(IParseTreeListener listener, IRuleNode 
-            r)
+        protected internal virtual void EnterRule(IParseTreeListener listener, IRuleNode r)
         {
             ParserRuleContext ctx = (ParserRuleContext)r.RuleContext;
             listener.EnterEveryRule(ctx);
             ctx.EnterRule(listener);
         }
 
-        protected internal virtual void ExitRule(IParseTreeListener listener, IRuleNode r
-            )
+        protected internal virtual void ExitRule(IParseTreeListener listener, IRuleNode r)
         {
             ParserRuleContext ctx = (ParserRuleContext)r.RuleContext;
             ctx.ExitRule(listener);

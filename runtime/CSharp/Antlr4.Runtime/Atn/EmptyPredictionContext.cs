@@ -37,11 +37,9 @@ namespace Antlr4.Runtime.Atn
 #pragma warning disable 0659 // 'class' overrides Object.Equals(object o) but does not override Object.GetHashCode()
     public sealed class EmptyPredictionContext : PredictionContext
     {
-        public static readonly Antlr4.Runtime.Atn.EmptyPredictionContext LocalContext = new 
-            Antlr4.Runtime.Atn.EmptyPredictionContext(false);
+        public static readonly Antlr4.Runtime.Atn.EmptyPredictionContext LocalContext = new Antlr4.Runtime.Atn.EmptyPredictionContext(false);
 
-        public static readonly Antlr4.Runtime.Atn.EmptyPredictionContext FullContext = new 
-            Antlr4.Runtime.Atn.EmptyPredictionContext(true);
+        public static readonly Antlr4.Runtime.Atn.EmptyPredictionContext FullContext = new Antlr4.Runtime.Atn.EmptyPredictionContext(true);
 
         private readonly bool fullContext;
 
@@ -89,14 +87,12 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        public override PredictionContext AppendContext(int returnContext, PredictionContextCache
-             contextCache)
+        public override PredictionContext AppendContext(int returnContext, PredictionContextCache contextCache)
         {
             return contextCache.GetChild(this, returnContext);
         }
 
-        public override PredictionContext AppendContext(PredictionContext suffix, PredictionContextCache
-             contextCache)
+        public override PredictionContext AppendContext(PredictionContext suffix, PredictionContextCache contextCache)
         {
             return suffix;
         }
@@ -122,14 +118,12 @@ namespace Antlr4.Runtime.Atn
             return this == o;
         }
 
-        public override string[] ToStrings(IRecognizer recognizer, int currentState
-            )
+        public override string[] ToStrings(IRecognizer recognizer, int currentState)
         {
             return new string[] { "[]" };
         }
 
-        public override string[] ToStrings(IRecognizer recognizer, PredictionContext
-             stop, int currentState)
+        public override string[] ToStrings(IRecognizer recognizer, PredictionContext stop, int currentState)
         {
             return new string[] { "[]" };
         }

@@ -381,8 +381,7 @@ namespace Antlr4.Runtime
             {
                 if (i >= n)
                 {
-                    throw new NotSupportedException("seek to index outside buffer: " + index + " not in "
-                         + GetBufferStartIndex() + ".." + (GetBufferStartIndex() + n));
+                    throw new NotSupportedException("seek to index outside buffer: " + index + " not in " + GetBufferStartIndex() + ".." + (GetBufferStartIndex() + n));
                 }
             }
             p = i;
@@ -429,8 +428,7 @@ namespace Antlr4.Runtime
             }
             if (interval.a < bufferStartIndex || interval.b >= bufferStartIndex + n)
             {
-                throw new NotSupportedException("interval " + interval + " outside buffer: " + bufferStartIndex
-                     + ".." + (bufferStartIndex + n - 1));
+                throw new NotSupportedException("interval " + interval + " outside buffer: " + bufferStartIndex + ".." + (bufferStartIndex + n - 1));
             }
             // convert from absolute to local index
             int i = interval.a - bufferStartIndex;

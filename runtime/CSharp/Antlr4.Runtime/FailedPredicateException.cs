@@ -65,10 +65,8 @@ namespace Antlr4.Runtime
         {
         }
 
-        public FailedPredicateException(Parser recognizer, string predicate, string message
-            )
-            : base(FormatMessage(predicate, message), recognizer, ((ITokenStream)recognizer.InputStream
-                ), recognizer._ctx)
+        public FailedPredicateException(Parser recognizer, string predicate, string message)
+            : base(FormatMessage(predicate, message), recognizer, ((ITokenStream)recognizer.InputStream), recognizer._ctx)
         {
             ATNState s = recognizer.Interpreter.atn.states[recognizer.State];
             AbstractPredicateTransition trans = (AbstractPredicateTransition)s.Transition(0);
@@ -109,8 +107,7 @@ namespace Antlr4.Runtime
             {
                 return message;
             }
-            return string.Format(CultureInfo.CurrentCulture, "failed predicate: {{{0}}}?", predicate
-                );
+            return string.Format(CultureInfo.CurrentCulture, "failed predicate: {{{0}}}?", predicate);
         }
     }
 }

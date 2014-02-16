@@ -75,10 +75,8 @@ namespace Antlr4.Runtime.Tree
         /// <returns>The result of visiting the children of the node.</returns>
         Result VisitChildren(IRuleNode node);
 
-        /// <summary>Visit a terminal node, and return a user-defined result of the operation.
-        ///     </summary>
-        /// <remarks>Visit a terminal node, and return a user-defined result of the operation.
-        ///     </remarks>
+        /// <summary>Visit a terminal node, and return a user-defined result of the operation.</summary>
+        /// <remarks>Visit a terminal node, and return a user-defined result of the operation.</remarks>
         /// <param name="node">
         /// The
         /// <see cref="ITerminalNode">ITerminalNode</see>

@@ -83,8 +83,7 @@ namespace Antlr4.Runtime
             this.invokingState = invokingState;
         }
 
-        public static Antlr4.Runtime.RuleContext GetChildContext(Antlr4.Runtime.RuleContext
-             parent, int invokingState)
+        public static Antlr4.Runtime.RuleContext GetChildContext(Antlr4.Runtime.RuleContext parent, int invokingState)
         {
             return new Antlr4.Runtime.RuleContext(parent, invokingState);
         }
@@ -278,16 +277,14 @@ namespace Antlr4.Runtime
         }
 
         // recog null unless ParserRuleContext, in which case we use subclass toString(...)
-        public virtual string ToString(IRecognizer recog, Antlr4.Runtime.RuleContext
-             stop)
+        public virtual string ToString(IRecognizer recog, Antlr4.Runtime.RuleContext stop)
         {
             string[] ruleNames = recog != null ? recog.RuleNames : null;
             IList<string> ruleNamesList = ruleNames != null ? Arrays.AsList(ruleNames) : null;
             return ToString(ruleNamesList, stop);
         }
 
-        public virtual string ToString(IList<string> ruleNames, Antlr4.Runtime.RuleContext
-             stop)
+        public virtual string ToString(IList<string> ruleNames, Antlr4.Runtime.RuleContext stop)
         {
             StringBuilder buf = new StringBuilder();
             Antlr4.Runtime.RuleContext p = this;
@@ -304,8 +301,7 @@ namespace Antlr4.Runtime
                 else
                 {
                     int ruleIndex = p.GetRuleIndex();
-                    string ruleName = ruleIndex >= 0 && ruleIndex < ruleNames.Count ? ruleNames[ruleIndex
-                        ] : ruleIndex.ToString();
+                    string ruleName = ruleIndex >= 0 && ruleIndex < ruleNames.Count ? ruleNames[ruleIndex] : ruleIndex.ToString();
                     buf.Append(ruleName);
                 }
                 if (p.parent != null && (ruleNames != null || !p.parent.IsEmpty()))

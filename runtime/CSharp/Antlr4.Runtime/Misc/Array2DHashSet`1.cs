@@ -71,8 +71,7 @@ namespace Antlr4.Runtime.Misc
         {
         }
 
-        public Array2DHashSet(EqualityComparer<T> comparator, int initialCapacity, int initialBucketCapacity
-            )
+        public Array2DHashSet(EqualityComparer<T> comparator, int initialCapacity, int initialBucketCapacity)
         {
             // must be power of 2
             // when to expand
@@ -91,8 +90,7 @@ namespace Antlr4.Runtime.Misc
         /// <code>o</code>
         /// to set if not there; return existing value if already
         /// there. This method performs the same operation as
-        /// <see cref="Array2DHashSet{T}.AddItem(object)">Array2DHashSet&lt;T&gt;.AddItem(object)
-        ///     </see>
+        /// <see cref="Array2DHashSet{T}.AddItem(object)">Array2DHashSet&lt;T&gt;.AddItem(object)</see>
         /// aside from
         /// the return value.
         /// </summary>
@@ -213,8 +211,7 @@ namespace Antlr4.Runtime.Misc
             {
                 return false;
             }
-            Antlr4.Runtime.Misc.Array2DHashSet<object> other = (Antlr4.Runtime.Misc.Array2DHashSet
-                <object>)o;
+            Antlr4.Runtime.Misc.Array2DHashSet<object> other = (Antlr4.Runtime.Misc.Array2DHashSet<object>)o;
             if (other.Count != Count)
             {
                 return false;
@@ -403,8 +400,7 @@ namespace Antlr4.Runtime.Misc
         {
             if (collection is Antlr4.Runtime.Misc.Array2DHashSet)
             {
-                Antlr4.Runtime.Misc.Array2DHashSet<object> s = (Antlr4.Runtime.Misc.Array2DHashSet
-                    <object>)collection;
+                Antlr4.Runtime.Misc.Array2DHashSet<object> s = (Antlr4.Runtime.Misc.Array2DHashSet<object>)collection;
                 foreach (object[] bucket in s.buckets)
                 {
                     if (bucket == null)
@@ -596,11 +592,9 @@ namespace Antlr4.Runtime.Misc
         /// <code>null</code>
         /// . The base implementation does not perform any
         /// type checks; override this method to provide strong type checks for the
-        /// <see cref="Array2DHashSet{T}.Contains(object)">Array2DHashSet&lt;T&gt;.Contains(object)
-        ///     </see>
+        /// <see cref="Array2DHashSet{T}.Contains(object)">Array2DHashSet&lt;T&gt;.Contains(object)</see>
         /// and
-        /// <see cref="Array2DHashSet{T}.Remove(object)">Array2DHashSet&lt;T&gt;.Remove(object)
-        ///     </see>
+        /// <see cref="Array2DHashSet{T}.Remove(object)">Array2DHashSet&lt;T&gt;.Remove(object)</see>
         /// methods to ensure the arguments to
         /// the
         /// <see cref="IEqualityComparator{T}">IEqualityComparator&lt;T&gt;</see>

@@ -52,8 +52,7 @@ namespace Antlr4.Runtime
         /// are wiped to -1 in the text override is set in the CommonToken.
         /// </remarks>
         [return: NotNull]
-        IToken Create(Tuple<ITokenSource, ICharStream> source, int type, string text, int channel, int start
-            , int stop, int line, int charPositionInLine);
+        IToken Create(Tuple<ITokenSource, ICharStream> source, int type, string text, int channel, int start, int stop, int line, int charPositionInLine);
 
         /// <summary>Generically useful</summary>
         [return: NotNull]

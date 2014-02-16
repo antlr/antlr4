@@ -36,8 +36,7 @@ namespace Antlr4.Runtime.Misc
     /// <remarks>An immutable inclusive interval a..b.</remarks>
     public struct Interval
     {
-        public static readonly Antlr4.Runtime.Misc.Interval Invalid = new Antlr4.Runtime.Misc.Interval
-            (-1, -2);
+        public static readonly Antlr4.Runtime.Misc.Interval Invalid = new Antlr4.Runtime.Misc.Interval(-1, -2);
 
         /// <summary>The start of the interval.</summary>
         /// <remarks>The start of the interval.</remarks>
@@ -156,16 +155,13 @@ namespace Antlr4.Runtime.Misc
         /// <summary>Return the interval computed from combining this and other</summary>
         public Antlr4.Runtime.Misc.Interval Union(Antlr4.Runtime.Misc.Interval other)
         {
-            return Antlr4.Runtime.Misc.Interval.Of(Math.Min(a, other.a), Math.Max(b, other.b)
-                );
+            return Antlr4.Runtime.Misc.Interval.Of(Math.Min(a, other.a), Math.Max(b, other.b));
         }
 
         /// <summary>Return the interval in common between this and o</summary>
-        public Antlr4.Runtime.Misc.Interval Intersection(Antlr4.Runtime.Misc.Interval other
-            )
+        public Antlr4.Runtime.Misc.Interval Intersection(Antlr4.Runtime.Misc.Interval other)
         {
-            return Antlr4.Runtime.Misc.Interval.Of(Math.Max(a, other.a), Math.Min(b, other.b)
-                );
+            return Antlr4.Runtime.Misc.Interval.Of(Math.Max(a, other.a), Math.Min(b, other.b));
         }
 
         /// <summary>
@@ -181,8 +177,7 @@ namespace Antlr4.Runtime.Misc
         /// , which would result in two disjoint intervals
         /// instead of the single one returned by this method.
         /// </summary>
-        public Antlr4.Runtime.Misc.Interval? DifferenceNotProperlyContained(Antlr4.Runtime.Misc.Interval
-             other)
+        public Antlr4.Runtime.Misc.Interval? DifferenceNotProperlyContained(Antlr4.Runtime.Misc.Interval other)
         {
             Antlr4.Runtime.Misc.Interval? diff = null;
             // other.a to left of this.a (or same)

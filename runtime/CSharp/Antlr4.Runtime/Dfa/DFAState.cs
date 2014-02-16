@@ -88,8 +88,7 @@ namespace Antlr4.Runtime.Dfa
         /// <summary>
         /// if accept state, what ttype do we match or alt do we predict?
         /// This is set to
-        /// <see cref="Antlr4.Runtime.Atn.ATN.InvalidAltNumber">Antlr4.Runtime.Atn.ATN.InvalidAltNumber
-        ///     </see>
+        /// <see cref="Antlr4.Runtime.Atn.ATN.InvalidAltNumber">Antlr4.Runtime.Atn.ATN.InvalidAltNumber</see>
         /// when
         /// <see cref="predicates">predicates</see>
         /// <code>!=null</code>
@@ -101,25 +100,19 @@ namespace Antlr4.Runtime.Dfa
 
         public int lexerActionIndex = -1;
 
-        /// <summary>These keys for these edges are the top level element of the global context.
-        ///     </summary>
-        /// <remarks>These keys for these edges are the top level element of the global context.
-        ///     </remarks>
+        /// <summary>These keys for these edges are the top level element of the global context.</summary>
+        /// <remarks>These keys for these edges are the top level element of the global context.</remarks>
         [Nullable]
         private AbstractEdgeMap<Antlr4.Runtime.Dfa.DFAState> contextEdges;
 
-        /// <summary>Symbols in this set require a global context transition before matching an input symbol.
-        ///     </summary>
-        /// <remarks>Symbols in this set require a global context transition before matching an input symbol.
-        ///     </remarks>
+        /// <summary>Symbols in this set require a global context transition before matching an input symbol.</summary>
+        /// <remarks>Symbols in this set require a global context transition before matching an input symbol.</remarks>
         [Nullable]
         private BitSet contextSymbols;
 
         /// <summary>
         /// This list is computed by
-        /// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.PredicateDFAState(DFAState, Antlr4.Runtime.Atn.ATNConfigSet, int)
-        ///     ">Antlr4.Runtime.Atn.ParserATNSimulator.PredicateDFAState(DFAState, Antlr4.Runtime.Atn.ATNConfigSet, int)
-        ///     </see>
+        /// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.PredicateDFAState(DFAState, Antlr4.Runtime.Atn.ATNConfigSet, int)">Antlr4.Runtime.Atn.ParserATNSimulator.PredicateDFAState(DFAState, Antlr4.Runtime.Atn.ATNConfigSet, int)</see>
         /// .
         /// </summary>
         [Nullable]
@@ -329,9 +322,7 @@ namespace Antlr4.Runtime.Dfa
         /// This is necessary to show that the algorithm terminates.
         /// <p/>
         /// Cannot test the DFA state numbers here because in
-        /// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.AddDFAState(DFA, Antlr4.Runtime.Atn.ATNConfigSet, Antlr4.Runtime.Atn.PredictionContextCache)
-        ///     ">Antlr4.Runtime.Atn.ParserATNSimulator.AddDFAState(DFA, Antlr4.Runtime.Atn.ATNConfigSet, Antlr4.Runtime.Atn.PredictionContextCache)
-        ///     </see>
+        /// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.AddDFAState(DFA, Antlr4.Runtime.Atn.ATNConfigSet, Antlr4.Runtime.Atn.PredictionContextCache)">Antlr4.Runtime.Atn.ParserATNSimulator.AddDFAState(DFA, Antlr4.Runtime.Atn.ATNConfigSet, Antlr4.Runtime.Atn.PredictionContextCache)</see>
         /// we need to know if any other state
         /// exists that has this exact set of ATN configurations. The
         /// <see cref="stateNumber">stateNumber</see>
