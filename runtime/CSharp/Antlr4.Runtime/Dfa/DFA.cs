@@ -68,7 +68,8 @@ namespace Antlr4.Runtime.Dfa
 
         private int nextStateNumber;
 
-        public DFA(ATNState atnStartState) : this(atnStartState, 0)
+        public DFA(ATNState atnStartState)
+            : this(atnStartState, 0)
         {
         }
 

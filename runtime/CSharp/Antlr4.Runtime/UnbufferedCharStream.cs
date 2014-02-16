@@ -136,7 +136,8 @@ namespace Antlr4.Runtime
 
         /// <summary>Useful for subclasses that pull char from other than this.input.</summary>
         /// <remarks>Useful for subclasses that pull char from other than this.input.</remarks>
-        public UnbufferedCharStream() : this(256)
+        public UnbufferedCharStream()
+            : this(256)
         {
         }
 
@@ -148,22 +149,25 @@ namespace Antlr4.Runtime
             data = new char[bufferSize];
         }
 
-        public UnbufferedCharStream(Stream input) : this(input, 256)
+        public UnbufferedCharStream(Stream input)
+            : this(input, 256)
         {
         }
 
-        public UnbufferedCharStream(TextReader input) : this(input, 256)
+        public UnbufferedCharStream(TextReader input)
+            : this(input, 256)
         {
         }
 
-        public UnbufferedCharStream(Stream input, int bufferSize) : this(bufferSize)
+        public UnbufferedCharStream(Stream input, int bufferSize)
+            : this(bufferSize)
         {
             this.input = new StreamReader(input);
             Fill(1);
         }
 
-        public UnbufferedCharStream(TextReader input, int bufferSize) : this(bufferSize
-            )
+        public UnbufferedCharStream(TextReader input, int bufferSize)
+            : this(bufferSize)
         {
             // prime
             this.input = input;

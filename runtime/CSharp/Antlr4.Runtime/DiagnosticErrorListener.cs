@@ -74,7 +74,8 @@ namespace Antlr4.Runtime
         /// which only
         /// reports exact ambiguities.
         /// </summary>
-        public DiagnosticErrorListener() : this(true)
+        public DiagnosticErrorListener()
+            : this(true)
         {
         }
 

@@ -51,7 +51,8 @@ namespace Antlr4.Runtime
         protected internal string fileName;
 
         /// <exception cref="System.IO.IOException"></exception>
-        public AntlrFileStream(string fileName) : this(fileName, null)
+        public AntlrFileStream(string fileName)
+            : this(fileName, null)
         {
         }
 

@@ -522,8 +522,8 @@ outer_continue: ;
         public sealed class IdentityHashMap : Dictionary<PredictionContext, PredictionContext
             >
         {
-            public IdentityHashMap() : base(PredictionContext.IdentityEqualityComparator.Instance
-                )
+            public IdentityHashMap()
+                : base(PredictionContext.IdentityEqualityComparator.Instance)
             {
             }
         }

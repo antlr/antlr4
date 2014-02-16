@@ -128,7 +128,8 @@ namespace Antlr4.Runtime
         /// </remarks>
         protected internal int currentTokenIndex = 0;
 
-        public UnbufferedTokenStream(ITokenSource tokenSource) : this(tokenSource, 256)
+        public UnbufferedTokenStream(ITokenSource tokenSource)
+            : this(tokenSource, 256)
         {
         }
 

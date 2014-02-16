@@ -45,7 +45,8 @@ namespace Antlr4.Runtime.Atn
 
         private readonly bool fullContext;
 
-        private EmptyPredictionContext(bool fullContext) : base(CalculateEmptyHashCode())
+        private EmptyPredictionContext(bool fullContext)
+            : base(CalculateEmptyHashCode())
         {
             this.fullContext = fullContext;
         }

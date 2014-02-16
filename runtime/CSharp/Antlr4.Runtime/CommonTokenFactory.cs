@@ -60,7 +60,8 @@ namespace Antlr4.Runtime
             this.copyText = copyText;
         }
 
-        public CommonTokenFactory() : this(false)
+        public CommonTokenFactory()
+            : this(false)
         {
         }
 

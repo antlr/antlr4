@@ -95,7 +95,8 @@ namespace Antlr4.Runtime
             }
         }
 
-        public RecognitionException(string message, IRecognizer recognizer, IIntStream input, ParserRuleContext ctx) : base(message)
+        public RecognitionException(string message, IRecognizer recognizer, IIntStream input, ParserRuleContext ctx)
+            : base(message)
         {
             this.recognizer = recognizer;
             this.input = input;

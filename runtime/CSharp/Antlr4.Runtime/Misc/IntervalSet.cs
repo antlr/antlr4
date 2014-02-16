@@ -73,7 +73,8 @@ namespace Antlr4.Runtime.Misc
             this.intervals = intervals;
         }
 
-        public IntervalSet(Antlr4.Runtime.Misc.IntervalSet set) : this()
+        public IntervalSet(Antlr4.Runtime.Misc.IntervalSet set)
+            : this()
         {
             AddAll(set);
         }

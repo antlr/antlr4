@@ -44,8 +44,8 @@ namespace Antlr4.Runtime.Atn
         [NotNull]
         public readonly int[] returnStates;
 
-        internal ArrayPredictionContext(PredictionContext[] parents, int[] returnStates) : 
-            base(CalculateHashCode(parents, returnStates))
+        internal ArrayPredictionContext(PredictionContext[] parents, int[] returnStates)
+            : base(CalculateHashCode(parents, returnStates))
         {
             System.Diagnostics.Debug.Assert(parents.Length == returnStates.Length);
             System.Diagnostics.Debug.Assert(returnStates.Length > 1 || returnStates[0] != EmptyFullStateKey
@@ -55,7 +55,8 @@ namespace Antlr4.Runtime.Atn
         }
 
         internal ArrayPredictionContext(PredictionContext[] parents, int[] returnStates, 
-            int hashCode) : base(hashCode)
+            int hashCode)
+            : base(hashCode)
         {
             System.Diagnostics.Debug.Assert(parents.Length == returnStates.Length);
             System.Diagnostics.Debug.Assert(returnStates.Length > 1 || returnStates[0] != EmptyFullStateKey

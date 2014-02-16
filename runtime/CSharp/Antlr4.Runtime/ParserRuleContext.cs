@@ -153,7 +153,8 @@ namespace Antlr4.Runtime
         }
 
         public ParserRuleContext(Antlr4.Runtime.ParserRuleContext parent, int invokingStateNumber
-            ) : base(parent, invokingStateNumber)
+            )
+            : base(parent, invokingStateNumber)
         {
         }
 
@@ -235,7 +236,8 @@ namespace Antlr4.Runtime
             return children != null && i >= 0 && i < children.Count ? children[i] : null;
         }
 
-        public virtual T GetChild<T>(int i) where T:IParseTree
+        public virtual T GetChild<T>(int i)
+            where T : IParseTree
         {
             if (children == null || i < 0 || i >= children.Count)
             {
@@ -322,15 +324,18 @@ namespace Antlr4.Runtime
 #endif
         }
 
-        public virtual T GetRuleContext<T>(int i) where T:Antlr4.Runtime.ParserRuleContext
+        public virtual T GetRuleContext<T>(int i)
+            where T : Antlr4.Runtime.ParserRuleContext
         {
             return GetChild<T>(i);
         }
 
 #if NET_4_5
-        public virtual IReadOnlyList<T> GetRuleContexts<T>() where T:Antlr4.Runtime.ParserRuleContext
+        public virtual IReadOnlyList<T> GetRuleContexts<T>()
+            where T : Antlr4.Runtime.ParserRuleContext
 #else
-        public virtual T[] GetRuleContexts<T>() where T:Antlr4.Runtime.ParserRuleContext
+        public virtual T[] GetRuleContexts<T>()
+            where T : Antlr4.Runtime.ParserRuleContext
 #endif
         {
             if (children == null)

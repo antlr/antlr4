@@ -35,7 +35,8 @@ namespace Antlr4.Runtime.Atn
 {
     public sealed class WildcardTransition : Transition
     {
-        public WildcardTransition(ATNState target) : base(target)
+        public WildcardTransition(ATNState target)
+            : base(target)
         {
         }
 

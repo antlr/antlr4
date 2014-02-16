@@ -59,7 +59,8 @@ namespace Antlr4.Runtime.Misc
         {
         }
 
-        public ParseCanceledException(string message) : base(message)
+        public ParseCanceledException(string message)
+            : base(message)
         {
         }
 

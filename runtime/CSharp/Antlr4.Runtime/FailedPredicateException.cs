@@ -55,18 +55,20 @@ namespace Antlr4.Runtime
 
         private readonly string predicate;
 
-        public FailedPredicateException(Parser recognizer) : this(recognizer, null)
+        public FailedPredicateException(Parser recognizer)
+            : this(recognizer, null)
         {
         }
 
-        public FailedPredicateException(Parser recognizer, string predicate) : this(recognizer
-            , predicate, null)
+        public FailedPredicateException(Parser recognizer, string predicate)
+            : this(recognizer, predicate, null)
         {
         }
 
         public FailedPredicateException(Parser recognizer, string predicate, string message
-            ) : base(FormatMessage(predicate, message), recognizer, ((ITokenStream)recognizer
-            .InputStream), recognizer._ctx)
+            )
+            : base(FormatMessage(predicate, message), recognizer, ((ITokenStream)recognizer.InputStream
+                ), recognizer._ctx)
         {
             ATNState s = recognizer.Interpreter.atn.states[recognizer.State];
             AbstractPredicateTransition trans = (AbstractPredicateTransition)s.Transition(0);

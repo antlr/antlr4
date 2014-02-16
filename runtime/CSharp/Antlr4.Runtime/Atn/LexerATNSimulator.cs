@@ -117,11 +117,13 @@ namespace Antlr4.Runtime.Atn
 
         public static int match_calls = 0;
 
-        public LexerATNSimulator(ATN atn) : this(null, atn)
+        public LexerATNSimulator(ATN atn)
+            : this(null, atn)
         {
         }
 
-        public LexerATNSimulator(Lexer recog, ATN atn) : base(atn)
+        public LexerATNSimulator(Lexer recog, ATN atn)
+            : base(atn)
         {
             this.recog = recog;
         }

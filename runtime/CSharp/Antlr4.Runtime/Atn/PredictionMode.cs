@@ -80,8 +80,8 @@ namespace Antlr4.Runtime.Atn
         /// <remarks>A Map that uses just the state and the stack context as the key.</remarks>
         internal class AltAndContextMap : Dictionary<ATNConfig, BitSet>
         {
-            public AltAndContextMap() : base(PredictionMode.AltAndContextConfigEqualityComparator
-                .Instance)
+            public AltAndContextMap()
+                : base(PredictionMode.AltAndContextConfigEqualityComparator.Instance)
             {
             }
         }

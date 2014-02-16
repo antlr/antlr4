@@ -88,14 +88,14 @@ namespace Antlr4.Runtime
         }
 
         /// <exception cref="System.IO.IOException"></exception>
-        public AntlrInputStream(TextReader r) : this(r, InitialBufferSize, ReadBufferSize
-            )
+        public AntlrInputStream(TextReader r)
+            : this(r, InitialBufferSize, ReadBufferSize)
         {
         }
 
         /// <exception cref="System.IO.IOException"></exception>
-        public AntlrInputStream(TextReader r, int initialSize) : this(r, initialSize, ReadBufferSize
-            )
+        public AntlrInputStream(TextReader r, int initialSize)
+            : this(r, initialSize, ReadBufferSize)
         {
         }
 
@@ -106,20 +106,20 @@ namespace Antlr4.Runtime
         }
 
         /// <exception cref="System.IO.IOException"></exception>
-        public AntlrInputStream(Stream input) : this(new StreamReader(input), InitialBufferSize
-            )
+        public AntlrInputStream(Stream input)
+            : this(new StreamReader(input), InitialBufferSize)
         {
         }
 
         /// <exception cref="System.IO.IOException"></exception>
-        public AntlrInputStream(Stream input, int initialSize) : this(new StreamReader(input
-            ), initialSize)
+        public AntlrInputStream(Stream input, int initialSize)
+            : this(new StreamReader(input), initialSize)
         {
         }
 
         /// <exception cref="System.IO.IOException"></exception>
-        public AntlrInputStream(Stream input, int initialSize, int readChunkSize) : this(
-            new StreamReader(input), initialSize, readChunkSize)
+        public AntlrInputStream(Stream input, int initialSize, int readChunkSize)
+            : this(new StreamReader(input), initialSize, readChunkSize)
         {
         }
 

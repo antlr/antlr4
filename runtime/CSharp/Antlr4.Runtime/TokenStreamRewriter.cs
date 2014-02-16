@@ -149,8 +149,8 @@ namespace Antlr4.Runtime
 
         internal class InsertBeforeOp : TokenStreamRewriter.RewriteOperation
         {
-            public InsertBeforeOp(ITokenStream tokens, int index, object text) : base(tokens, 
-                index, text)
+            public InsertBeforeOp(ITokenStream tokens, int index, object text)
+                : base(tokens, index, text)
             {
             }
 
@@ -177,8 +177,8 @@ namespace Antlr4.Runtime
         {
             protected internal int lastIndex;
 
-            public ReplaceOp(ITokenStream tokens, int from, int to, object text) : base(tokens
-                , from, text)
+            public ReplaceOp(ITokenStream tokens, int from, int to, object text)
+                : base(tokens, from, text)
             {
                 lastIndex = to;
             }

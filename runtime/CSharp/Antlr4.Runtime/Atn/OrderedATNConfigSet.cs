@@ -39,8 +39,8 @@ namespace Antlr4.Runtime.Atn
         {
         }
 
-        public OrderedATNConfigSet(ATNConfigSet set, bool @readonly) : base(set, @readonly
-            )
+        public OrderedATNConfigSet(ATNConfigSet set, bool @readonly)
+            : base(set, @readonly)
         {
         }
 

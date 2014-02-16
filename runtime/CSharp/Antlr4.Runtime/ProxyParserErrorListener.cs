@@ -39,7 +39,8 @@ namespace Antlr4.Runtime
     public class ProxyParserErrorListener : ProxyErrorListener<IToken>, IParserErrorListener
     {
         public ProxyParserErrorListener(ICollection<IAntlrErrorListener<IToken>> delegates
-            ) : base(delegates)
+            )
+            : base(delegates)
         {
         }
 

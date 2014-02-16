@@ -35,7 +35,8 @@ namespace Antlr4.Runtime.Atn
 {
     public sealed class EpsilonTransition : Transition
     {
-        public EpsilonTransition(ATNState target) : base(target)
+        public EpsilonTransition(ATNState target)
+            : base(target)
         {
         }
 

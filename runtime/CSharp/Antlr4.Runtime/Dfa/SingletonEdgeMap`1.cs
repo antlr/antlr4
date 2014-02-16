@@ -41,14 +41,15 @@ namespace Antlr4.Runtime.Dfa
 
         private readonly T value;
 
-        public SingletonEdgeMap(int minIndex, int maxIndex) : base(minIndex, maxIndex)
+        public SingletonEdgeMap(int minIndex, int maxIndex)
+            : base(minIndex, maxIndex)
         {
             this.key = 0;
             this.value = null;
         }
 
-        public SingletonEdgeMap(int minIndex, int maxIndex, int key, T value) : base(minIndex
-            , maxIndex)
+        public SingletonEdgeMap(int minIndex, int maxIndex, int key, T value)
+            : base(minIndex, maxIndex)
         {
             if (key >= minIndex && key <= maxIndex)
             {

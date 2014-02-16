@@ -504,15 +504,15 @@ namespace Antlr4.Runtime.Atn
             private readonly Antlr4.Runtime.Atn.SemanticContext semanticContext;
 
             public SemanticContextATNConfig(Antlr4.Runtime.Atn.SemanticContext semanticContext
-                , ATNState state, int alt, PredictionContext context) : base(state, alt, context
-                )
+                , ATNState state, int alt, PredictionContext context)
+                : base(state, alt, context)
             {
                 this.semanticContext = semanticContext;
             }
 
             public SemanticContextATNConfig(Antlr4.Runtime.Atn.SemanticContext semanticContext
-                , ATNConfig c, ATNState state, PredictionContext context) : base(c, state, context
-                )
+                , ATNConfig c, ATNState state, PredictionContext context)
+                : base(c, state, context)
             {
                 this.semanticContext = semanticContext;
             }
@@ -531,13 +531,15 @@ namespace Antlr4.Runtime.Atn
             private readonly int actionIndex;
 
             public ActionATNConfig(int actionIndex, ATNState state, int alt, PredictionContext
-                 context) : base(state, alt, context)
+                 context)
+                : base(state, alt, context)
             {
                 this.actionIndex = actionIndex;
             }
 
             protected internal ActionATNConfig(int actionIndex, ATNConfig c, ATNState state, 
-                PredictionContext context) : base(c, state, context)
+                PredictionContext context)
+                : base(c, state, context)
             {
                 if (c.SemanticContext != SemanticContext.None)
                 {
@@ -560,15 +562,15 @@ namespace Antlr4.Runtime.Atn
             private readonly int actionIndex;
 
             public ActionSemanticContextATNConfig(int actionIndex, SemanticContext semanticContext
-                , ATNState state, int alt, PredictionContext context) : base(semanticContext, 
-                state, alt, context)
+                , ATNState state, int alt, PredictionContext context)
+                : base(semanticContext, state, alt, context)
             {
                 this.actionIndex = actionIndex;
             }
 
             public ActionSemanticContextATNConfig(int actionIndex, SemanticContext semanticContext
-                , ATNConfig c, ATNState state, PredictionContext context) : base(semanticContext
-                , c, state, context)
+                , ATNConfig c, ATNState state, PredictionContext context)
+                : base(semanticContext, c, state, context)
             {
                 this.actionIndex = actionIndex;
             }
