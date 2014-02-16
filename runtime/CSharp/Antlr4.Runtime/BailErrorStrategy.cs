@@ -33,12 +33,39 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-    /// <summary>Bail out of parser at first syntax error.</summary>
-    /// <remarks>
-    /// Bail out of parser at first syntax error. Do this to use it:
-    /// <p/>
+    /// <summary>
+    /// This implementation of
+    /// <see cref="IAntlrErrorStrategy">IAntlrErrorStrategy</see>
+    /// responds to syntax errors
+    /// by immediately canceling the parse operation with a
+    /// <see cref="ParseCanceledException">ParseCanceledException</see>
+    /// . The implementation ensures that the
+    /// <see cref="ParserRuleContext.exception">ParserRuleContext.exception</see>
+    /// field is set for all parse tree nodes
+    /// that were not completed prior to encountering the error.
+    /// <p>
+    /// This error strategy is useful in the following scenarios.</p>
+    /// <ul>
+    /// <li><strong>Two-stage parsing:</strong> This error strategy allows the first
+    /// stage of two-stage parsing to immediately terminate if an error is
+    /// encountered, and immediately fall back to the second stage. In addition to
+    /// avoiding wasted work by attempting to recover from errors here, the empty
+    /// implementation of
+    /// <see cref="Sync(Parser)">Sync(Parser)</see>
+    /// improves the performance of
+    /// the first stage.</li>
+    /// <li><strong>Silent validation:</strong> When syntax errors are not being
+    /// reported or logged, and the parse result is simply ignored if errors occur,
+    /// the
+    /// <see cref="BailErrorStrategy">BailErrorStrategy</see>
+    /// avoids wasting work on recovering from errors
+    /// when the result will be ignored either way.</li>
+    /// </ul>
+    /// <p>
     /// <code>myparser.setErrorHandler(new BailErrorStrategy());</code>
-    /// </remarks>
+    /// </p>
+    /// </summary>
+    /// <seealso cref="Parser.ErrorHandler(IAntlrErrorStrategy)">Parser.ErrorHandler(IAntlrErrorStrategy)</seealso>
     public class BailErrorStrategy : DefaultErrorStrategy
     {
         /// <summary>

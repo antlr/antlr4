@@ -40,10 +40,9 @@ namespace Antlr4.Runtime
     /// For more information on marked ranges, see
     /// <see cref="Mark()">Mark()</see>
     /// .
-    /// <p/>
-    /// <strong>Initializing Methods:</strong> Some methods in this interface have
+    /// <p><strong>Initializing Methods:</strong> Some methods in this interface have
     /// unspecified behavior if no call to an initializing method has occurred after
-    /// the stream was constructed. The following is a list of initializing methods:
+    /// the stream was constructed. The following is a list of initializing methods:</p>
     /// <ul>
     /// <li>
     /// <see cref="La(int)">La(int)</see>
@@ -110,8 +109,7 @@ namespace Antlr4.Runtime
         /// <code>i==0</code>
         /// , but the specific behavior is unspecified because this
         /// method is frequently called from performance-critical code.
-        /// <p/>
-        /// This method is guaranteed to succeed if any of the following are true:
+        /// <p>This method is guaranteed to succeed if any of the following are true:</p>
         /// <ul>
         /// <li>
         /// <code>i&gt;0</code>
@@ -138,21 +136,20 @@ namespace Antlr4.Runtime
         /// refers to a symbol consumed within a marked region
         /// that has not yet been released.</li>
         /// </ul>
-        /// If
+        /// <p>If
         /// <code>i</code>
         /// represents a position at or beyond the end of the stream,
         /// this method returns
         /// <see cref="IntStreamConstants.Eof">Eof</see>
-        /// .
-        /// <p/>
-        /// The return value is unspecified if
+        /// .</p>
+        /// <p>The return value is unspecified if
         /// <code>i&lt;0</code>
         /// and fewer than
         /// <code>-i</code>
         /// calls to
         /// <see cref="Consume()">consume()</see>
         /// have occurred from the beginning of
-        /// the stream before calling this method.
+        /// the stream before calling this method.</p>
         /// </summary>
         /// <exception cref="System.NotSupportedException">
         /// if the stream does not support
@@ -171,8 +168,7 @@ namespace Antlr4.Runtime
         /// . This allows the use of
         /// streaming input sources by specifying the minimum buffering requirements
         /// to support arbitrary lookahead during prediction.
-        /// <p/>
-        /// The returned mark is an opaque handle (type
+        /// <p>The returned mark is an opaque handle (type
         /// <code>int</code>
         /// ) which is passed
         /// to
@@ -187,16 +183,13 @@ namespace Antlr4.Runtime
         /// used during performance-critical sections of prediction, the specific
         /// behavior of invalid usage is unspecified (i.e. a mark is not released, or
         /// a mark is released twice, or marks are not released in reverse order from
-        /// which they were created).
-        /// <p/>
-        /// The behavior of this method is unspecified if no call to an
+        /// which they were created).</p>
+        /// <p>The behavior of this method is unspecified if no call to an
         /// <see cref="IIntStream">initializing method</see>
         /// has occurred after this stream was
-        /// constructed.
-        /// <p/>
-        /// This method does not change the current position in the input stream.
-        /// <p/>
-        /// The following example shows the use of
+        /// constructed.</p>
+        /// <p>This method does not change the current position in the input stream.</p>
+        /// <p>The following example shows the use of
         /// <see cref="Mark()">mark()</see>
         /// ,
         /// <see cref="Release(int)">release(mark)</see>
@@ -206,7 +199,7 @@ namespace Antlr4.Runtime
         /// <see cref="Seek(int)">seek(index)</see>
         /// as part of an operation to safely work within a
         /// marked region, then restore the stream position to its original value and
-        /// release the mark.
+        /// release the mark.</p>
         /// <pre>
         /// IntStream stream = ...;
         /// int index = -1;
@@ -242,10 +235,9 @@ namespace Antlr4.Runtime
         /// corresponding calls to
         /// <code>mark()</code>
         /// , the behavior is unspecified.
-        /// <p/>
-        /// For more information and an example, see
+        /// <p>For more information and an example, see
         /// <see cref="Mark()">Mark()</see>
-        /// .
+        /// .</p>
         /// </summary>
         /// <param name="marker">
         /// A marker returned by a call to
@@ -259,11 +251,10 @@ namespace Antlr4.Runtime
         /// Return the index into the stream of the input symbol referred to by
         /// <code>LA(1)</code>
         /// .
-        /// <p/>
-        /// The behavior of this method is unspecified if no call to an
+        /// <p>The behavior of this method is unspecified if no call to an
         /// <see cref="IIntStream">initializing method</see>
         /// has occurred after this stream was
-        /// constructed.
+        /// constructed.</p>
         /// </summary>
         int Index
         {

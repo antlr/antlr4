@@ -83,21 +83,21 @@ namespace Antlr4.Runtime.Atn
 
         public static Antlr4.Runtime.Atn.ATNConfig Create(ATNState state, int alt, PredictionContext context)
         {
-            return Create(state, alt, context, Antlr4.Runtime.Atn.SemanticContext.None, -1);
+            return Create(state, alt, context, Antlr4.Runtime.Atn.SemanticContext.None, null);
         }
 
         public static Antlr4.Runtime.Atn.ATNConfig Create(ATNState state, int alt, PredictionContext context, Antlr4.Runtime.Atn.SemanticContext semanticContext)
         {
-            return Create(state, alt, context, semanticContext, -1);
+            return Create(state, alt, context, semanticContext, null);
         }
 
-        public static Antlr4.Runtime.Atn.ATNConfig Create(ATNState state, int alt, PredictionContext context, Antlr4.Runtime.Atn.SemanticContext semanticContext, int actionIndex)
+        public static Antlr4.Runtime.Atn.ATNConfig Create(ATNState state, int alt, PredictionContext context, Antlr4.Runtime.Atn.SemanticContext semanticContext, LexerActionExecutor lexerActionExecutor)
         {
             if (semanticContext != Antlr4.Runtime.Atn.SemanticContext.None)
             {
-                if (actionIndex != -1)
+                if (lexerActionExecutor != null)
                 {
-                    return new ATNConfig.ActionSemanticContextATNConfig(actionIndex, semanticContext, state, alt, context);
+                    return new ATNConfig.ActionSemanticContextATNConfig(lexerActionExecutor, semanticContext, state, alt, context, false);
                 }
                 else
                 {
@@ -106,9 +106,9 @@ namespace Antlr4.Runtime.Atn
             }
             else
             {
-                if (actionIndex != -1)
+                if (lexerActionExecutor != null)
                 {
-                    return new ATNConfig.ActionATNConfig(actionIndex, state, alt, context);
+                    return new ATNConfig.ActionATNConfig(lexerActionExecutor, state, alt, context, false);
                 }
                 else
                 {
@@ -207,11 +207,11 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        public virtual int ActionIndex
+        public virtual LexerActionExecutor ActionExecutor
         {
             get
             {
-                return -1;
+                return null;
             }
         }
 
@@ -223,38 +223,44 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
+        public virtual bool HasPassedThroughNonGreedyDecision()
+        {
+            return false;
+        }
+
         public Antlr4.Runtime.Atn.ATNConfig Clone()
         {
-            return Transform(this.State);
+            return Transform(this.State, false);
         }
 
-        public Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state)
+        public Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, bool checkNonGreedy)
         {
-            return Transform(state, this.context, this.SemanticContext, this.ActionIndex);
+            return Transform(state, this.context, this.SemanticContext, checkNonGreedy, this.ActionExecutor);
         }
 
-        public Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, Antlr4.Runtime.Atn.SemanticContext semanticContext)
+        public Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, Antlr4.Runtime.Atn.SemanticContext semanticContext, bool checkNonGreedy)
         {
-            return Transform(state, this.context, semanticContext, this.ActionIndex);
+            return Transform(state, this.context, semanticContext, checkNonGreedy, this.ActionExecutor);
         }
 
-        public Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, PredictionContext context)
+        public Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, PredictionContext context, bool checkNonGreedy)
         {
-            return Transform(state, context, this.SemanticContext, this.ActionIndex);
+            return Transform(state, context, this.SemanticContext, checkNonGreedy, this.ActionExecutor);
         }
 
-        public Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, int actionIndex)
+        public Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, LexerActionExecutor lexerActionExecutor, bool checkNonGreedy)
         {
-            return Transform(state, context, this.SemanticContext, actionIndex);
+            return Transform(state, context, this.SemanticContext, checkNonGreedy, lexerActionExecutor);
         }
 
-        private Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, PredictionContext context, Antlr4.Runtime.Atn.SemanticContext semanticContext, int actionIndex)
+        private Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, PredictionContext context, Antlr4.Runtime.Atn.SemanticContext semanticContext, bool checkNonGreedy, LexerActionExecutor lexerActionExecutor)
         {
+            bool passedThroughNonGreedy = checkNonGreedy && CheckNonGreedyDecision(this, state);
             if (semanticContext != Antlr4.Runtime.Atn.SemanticContext.None)
             {
-                if (actionIndex != -1)
+                if (lexerActionExecutor != null || passedThroughNonGreedy)
                 {
-                    return new ATNConfig.ActionSemanticContextATNConfig(actionIndex, semanticContext, this, state, context);
+                    return new ATNConfig.ActionSemanticContextATNConfig(lexerActionExecutor, semanticContext, this, state, context, passedThroughNonGreedy);
                 }
                 else
                 {
@@ -263,9 +269,9 @@ namespace Antlr4.Runtime.Atn
             }
             else
             {
-                if (actionIndex != -1)
+                if (lexerActionExecutor != null || passedThroughNonGreedy)
                 {
-                    return new ATNConfig.ActionATNConfig(actionIndex, this, state, context);
+                    return new ATNConfig.ActionATNConfig(lexerActionExecutor, this, state, context, passedThroughNonGreedy);
                 }
                 else
                 {
@@ -274,17 +280,22 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
+        private static bool CheckNonGreedyDecision(Antlr4.Runtime.Atn.ATNConfig source, ATNState target)
+        {
+            return source.HasPassedThroughNonGreedyDecision() || target is DecisionState && ((DecisionState)target).nonGreedy;
+        }
+
         public virtual Antlr4.Runtime.Atn.ATNConfig AppendContext(int context, PredictionContextCache contextCache)
         {
             PredictionContext appendedContext = Context.AppendContext(context, contextCache);
-            Antlr4.Runtime.Atn.ATNConfig result = Transform(State, appendedContext);
+            Antlr4.Runtime.Atn.ATNConfig result = Transform(State, appendedContext, false);
             return result;
         }
 
         public virtual Antlr4.Runtime.Atn.ATNConfig AppendContext(PredictionContext context, PredictionContextCache contextCache)
         {
             PredictionContext appendedContext = Context.AppendContext(context, contextCache);
-            Antlr4.Runtime.Atn.ATNConfig result = Transform(State, appendedContext);
+            Antlr4.Runtime.Atn.ATNConfig result = Transform(State, appendedContext, false);
             return result;
         }
 
@@ -364,7 +375,7 @@ namespace Antlr4.Runtime.Atn
                     return false;
                 }
             }
-            return this.State.stateNumber == other.State.stateNumber && this.Alt == other.Alt && this.ReachesIntoOuterContext == other.ReachesIntoOuterContext && this.Context.Equals(other.Context) && this.SemanticContext.Equals(other.SemanticContext) && this.ActionIndex == other.ActionIndex;
+            return this.State.stateNumber == other.State.stateNumber && this.Alt == other.Alt && this.ReachesIntoOuterContext == other.ReachesIntoOuterContext && this.Context.Equals(other.Context) && this.SemanticContext.Equals(other.SemanticContext) && this.HasPassedThroughNonGreedyDecision() == other.HasPassedThroughNonGreedyDecision() && ObjectEqualityComparator.Instance.Equals(this.ActionExecutor, other.ActionExecutor);
         }
 
         public override int GetHashCode()
@@ -375,7 +386,9 @@ namespace Antlr4.Runtime.Atn
             hashCode = MurmurHash.Update(hashCode, ReachesIntoOuterContext ? 1 : 0);
             hashCode = MurmurHash.Update(hashCode, Context);
             hashCode = MurmurHash.Update(hashCode, SemanticContext);
-            hashCode = MurmurHash.Finish(hashCode, 5);
+            hashCode = MurmurHash.Update(hashCode, HasPassedThroughNonGreedyDecision() ? 1 : 0);
+            hashCode = MurmurHash.Update(hashCode, ActionExecutor);
+            hashCode = MurmurHash.Finish(hashCode, 7);
             return hashCode;
         }
 
@@ -502,55 +515,73 @@ namespace Antlr4.Runtime.Atn
 
         private class ActionATNConfig : ATNConfig
         {
-            private readonly int actionIndex;
+            private readonly LexerActionExecutor lexerActionExecutor;
 
-            public ActionATNConfig(int actionIndex, ATNState state, int alt, PredictionContext context)
+            private readonly bool passedThroughNonGreedyDecision;
+
+            public ActionATNConfig(LexerActionExecutor lexerActionExecutor, ATNState state, int alt, PredictionContext context, bool passedThroughNonGreedyDecision)
                 : base(state, alt, context)
             {
-                this.actionIndex = actionIndex;
+                this.lexerActionExecutor = lexerActionExecutor;
+                this.passedThroughNonGreedyDecision = passedThroughNonGreedyDecision;
             }
 
-            protected internal ActionATNConfig(int actionIndex, ATNConfig c, ATNState state, PredictionContext context)
+            protected internal ActionATNConfig(LexerActionExecutor lexerActionExecutor, ATNConfig c, ATNState state, PredictionContext context, bool passedThroughNonGreedyDecision)
                 : base(c, state, context)
             {
                 if (c.SemanticContext != SemanticContext.None)
                 {
                     throw new NotSupportedException();
                 }
-                this.actionIndex = actionIndex;
+                this.lexerActionExecutor = lexerActionExecutor;
+                this.passedThroughNonGreedyDecision = passedThroughNonGreedyDecision;
             }
 
-            public override int ActionIndex
+            public override LexerActionExecutor ActionExecutor
             {
                 get
                 {
-                    return actionIndex;
+                    return lexerActionExecutor;
                 }
+            }
+
+            public override bool HasPassedThroughNonGreedyDecision()
+            {
+                return passedThroughNonGreedyDecision;
             }
         }
 
         private class ActionSemanticContextATNConfig : ATNConfig.SemanticContextATNConfig
         {
-            private readonly int actionIndex;
+            private readonly LexerActionExecutor lexerActionExecutor;
 
-            public ActionSemanticContextATNConfig(int actionIndex, SemanticContext semanticContext, ATNState state, int alt, PredictionContext context)
+            private readonly bool passedThroughNonGreedyDecision;
+
+            public ActionSemanticContextATNConfig(LexerActionExecutor lexerActionExecutor, SemanticContext semanticContext, ATNState state, int alt, PredictionContext context, bool passedThroughNonGreedyDecision)
                 : base(semanticContext, state, alt, context)
             {
-                this.actionIndex = actionIndex;
+                this.lexerActionExecutor = lexerActionExecutor;
+                this.passedThroughNonGreedyDecision = passedThroughNonGreedyDecision;
             }
 
-            public ActionSemanticContextATNConfig(int actionIndex, SemanticContext semanticContext, ATNConfig c, ATNState state, PredictionContext context)
+            public ActionSemanticContextATNConfig(LexerActionExecutor lexerActionExecutor, SemanticContext semanticContext, ATNConfig c, ATNState state, PredictionContext context, bool passedThroughNonGreedyDecision)
                 : base(semanticContext, c, state, context)
             {
-                this.actionIndex = actionIndex;
+                this.lexerActionExecutor = lexerActionExecutor;
+                this.passedThroughNonGreedyDecision = passedThroughNonGreedyDecision;
             }
 
-            public override int ActionIndex
+            public override LexerActionExecutor ActionExecutor
             {
                 get
                 {
-                    return actionIndex;
+                    return lexerActionExecutor;
                 }
+            }
+
+            public override bool HasPassedThroughNonGreedyDecision()
+            {
+                return passedThroughNonGreedyDecision;
             }
         }
     }

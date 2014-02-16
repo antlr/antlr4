@@ -49,8 +49,7 @@ namespace Antlr4.Runtime.Atn
     /// , or a sum of products
     /// <code>p1||p2</code>
     /// .
-    /// <p/>
-    /// I have scoped the
+    /// <p>I have scoped the
     /// <see cref="AND">AND</see>
     /// ,
     /// <see cref="OR">OR</see>
@@ -58,13 +57,20 @@ namespace Antlr4.Runtime.Atn
     /// <see cref="Predicate">Predicate</see>
     /// subclasses of
     /// <see cref="SemanticContext">SemanticContext</see>
-    /// within the scope of this outer class.
+    /// within the scope of this outer class.</p>
     /// </remarks>
     public abstract class SemanticContext
     {
+        /// <summary>
+        /// The default
+        /// <see cref="SemanticContext">SemanticContext</see>
+        /// , which is semantically equivalent to
+        /// a predicate of the form
+        /// <code></code>
+        /// 
+        /// true}?}.
+        /// </summary>
         public static readonly SemanticContext None = new SemanticContext.Predicate();
-
-        public SemanticContext parent;
 
         /// <summary>
         /// For context independent predicates, we evaluate them without a local
@@ -76,15 +82,50 @@ namespace Antlr4.Runtime.Atn
         /// having to create proper rule-specific context during prediction (as
         /// opposed to the parser, which creates them naturally). In a practical
         /// sense, this avoids a cast exception from RuleContext to myruleContext.
-        /// <p/>
-        /// For context dependent predicates, we must pass in a local context so that
+        /// <p>For context dependent predicates, we must pass in a local context so that
         /// references such as $arg evaluate properly as _localctx.arg. We only
         /// capture context dependent predicates in the context in which we begin
         /// prediction, so we passed in the outer context here in case of context
-        /// dependent predicate evaluation.
+        /// dependent predicate evaluation.</p>
         /// </remarks>
         public abstract bool Eval<Symbol, ATNInterpreter>(Recognizer<Symbol, ATNInterpreter> parser, RuleContext outerContext)
             where ATNInterpreter : ATNSimulator;
+        /// <summary>Evaluate the precedence predicates for the context and reduce the result.</summary>
+        /// <remarks>Evaluate the precedence predicates for the context and reduce the result.</remarks>
+        /// <param name="parser">The parser instance.</param>
+        /// <param name="outerContext">The current parser context object.</param>
+        /// <returns>
+        /// The simplified semantic context after precedence predicates are
+        /// evaluated, which will be one of the following values.
+        /// <ul>
+        /// <li>
+        /// <see cref="None">None</see>
+        /// : if the predicate simplifies to
+        /// <code>true</code>
+        /// after
+        /// precedence predicates are evaluated.</li>
+        /// <li>
+        /// <code>null</code>
+        /// : if the predicate simplifies to
+        /// <code>false</code>
+        /// after
+        /// precedence predicates are evaluated.</li>
+        /// <li>
+        /// <code>this</code>
+        /// : if the semantic context is not changed as a result of
+        /// precedence predicate evaluation.</li>
+        /// <li>A non-
+        /// <code>null</code>
+        /// 
+        /// <see cref="SemanticContext">SemanticContext</see>
+        /// : the new simplified
+        /// semantic context after precedence predicates are evaluated.</li>
+        /// </ul>
+        /// </returns>
+        public virtual SemanticContext EvalPrecedence<_T0>(Recognizer<_T0> parser, RuleContext outerContext)
+        {
+            return this;
+        }
 
         public class Predicate : SemanticContext
         {
@@ -164,6 +205,18 @@ namespace Antlr4.Runtime.Atn
                 return parser.Precpred(outerContext, precedence);
             }
 
+            public override SemanticContext EvalPrecedence<_T0>(Recognizer<_T0> parser, RuleContext outerContext)
+            {
+                if (parser.Precpred(outerContext, precedence))
+                {
+                    return SemanticContext.None;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
             public virtual int CompareTo(SemanticContext.PrecedencePredicate o)
             {
                 return precedence - o.precedence;
@@ -196,6 +249,14 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
+        /// <summary>
+        /// A semantic context which is true whenever none of the contained contexts
+        /// is false.
+        /// </summary>
+        /// <remarks>
+        /// A semantic context which is true whenever none of the contained contexts
+        /// is false.
+        /// </remarks>
         public class AND : SemanticContext
         {
             [NotNull]
@@ -249,6 +310,12 @@ namespace Antlr4.Runtime.Atn
                 return MurmurHash.HashCode(opnds, typeof(SemanticContext.AND).GetHashCode());
             }
 
+            /// <summary>
+            /// <inheritDoc></inheritDoc>
+            /// <p>
+            /// The evaluation of predicates by this context is short-circuiting, but
+            /// unordered.</p>
+            /// </summary>
             public override bool Eval<Symbol, ATNInterpreter>(Recognizer<Symbol, ATNInterpreter> parser, RuleContext outerContext)
             {
                 foreach (SemanticContext opnd in opnds)
@@ -261,12 +328,59 @@ namespace Antlr4.Runtime.Atn
                 return true;
             }
 
+            public override SemanticContext EvalPrecedence<_T0>(Recognizer<_T0> parser, RuleContext outerContext)
+            {
+                bool differs = false;
+                IList<SemanticContext> operands = new List<SemanticContext>();
+                foreach (SemanticContext context in opnds)
+                {
+                    SemanticContext evaluated = context.EvalPrecedence(parser, outerContext);
+                    differs |= (evaluated != context);
+                    if (evaluated == null)
+                    {
+                        // The AND context is false if any element is false
+                        return null;
+                    }
+                    else
+                    {
+                        if (evaluated != None)
+                        {
+                            // Reduce the result by skipping true elements
+                            operands.AddItem(evaluated);
+                        }
+                    }
+                }
+                if (!differs)
+                {
+                    return this;
+                }
+                if (operands.IsEmpty())
+                {
+                    // all elements were true, so the AND context is true
+                    return None;
+                }
+                SemanticContext result = operands[0];
+                for (int i = 1; i < operands.Count; i++)
+                {
+                    result = SemanticContext.And(result, operands[i]);
+                }
+                return result;
+            }
+
             public override string ToString()
             {
                 return Utils.Join("&&", opnds);
             }
         }
 
+        /// <summary>
+        /// A semantic context which is true whenever at least one of the contained
+        /// contexts is true.
+        /// </summary>
+        /// <remarks>
+        /// A semantic context which is true whenever at least one of the contained
+        /// contexts is true.
+        /// </remarks>
         public class OR : SemanticContext
         {
             [NotNull]
@@ -320,6 +434,12 @@ namespace Antlr4.Runtime.Atn
                 return MurmurHash.HashCode(opnds, typeof(SemanticContext.OR).GetHashCode());
             }
 
+            /// <summary>
+            /// <inheritDoc></inheritDoc>
+            /// <p>
+            /// The evaluation of predicates by this context is short-circuiting, but
+            /// unordered.</p>
+            /// </summary>
             public override bool Eval<Symbol, ATNInterpreter>(Recognizer<Symbol, ATNInterpreter> parser, RuleContext outerContext)
             {
                 foreach (SemanticContext opnd in opnds)
@@ -330,6 +450,45 @@ namespace Antlr4.Runtime.Atn
                     }
                 }
                 return false;
+            }
+
+            public override SemanticContext EvalPrecedence<_T0>(Recognizer<_T0> parser, RuleContext outerContext)
+            {
+                bool differs = false;
+                IList<SemanticContext> operands = new List<SemanticContext>();
+                foreach (SemanticContext context in opnds)
+                {
+                    SemanticContext evaluated = context.EvalPrecedence(parser, outerContext);
+                    differs |= (evaluated != context);
+                    if (evaluated == None)
+                    {
+                        // The OR context is true if any element is true
+                        return None;
+                    }
+                    else
+                    {
+                        if (evaluated != null)
+                        {
+                            // Reduce the result by skipping false elements
+                            operands.AddItem(evaluated);
+                        }
+                    }
+                }
+                if (!differs)
+                {
+                    return this;
+                }
+                if (operands.IsEmpty())
+                {
+                    // all elements were false, so the OR context is false
+                    return null;
+                }
+                SemanticContext result = operands[0];
+                for (int i = 1; i < operands.Count; i++)
+                {
+                    result = SemanticContext.Or(result, operands[i]);
+                }
+                return result;
             }
 
             public override string ToString()

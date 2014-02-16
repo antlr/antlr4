@@ -51,7 +51,7 @@ namespace Antlr4.Runtime
     /// The parent contexts are useful for computing lookahead sets and
     /// getting error information.
     /// These objects are used during parsing and prediction.
-    /// For the special case of parsers and tree parsers, we use the subclass
+    /// For the special case of parsers, we use the subclass
     /// ParserRuleContext.
     /// </remarks>
     /// <seealso cref="ParserRuleContext">ParserRuleContext</seealso>

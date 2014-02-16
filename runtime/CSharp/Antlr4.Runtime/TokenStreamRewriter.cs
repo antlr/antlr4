@@ -44,54 +44,84 @@ namespace Antlr4.Runtime
     /// <remarks>
     /// Useful for rewriting out a buffered input token stream after doing some
     /// augmentation or other manipulations on it.
-    /// You can insert stuff, replace, and delete chunks.  Note that the
-    /// operations are done lazily--only if you convert the buffer to a
-    /// String with getText(). This is very efficient because you are not moving
-    /// data around all the time.  As the buffer of tokens is converted to strings,
-    /// the getText() method(s) scan the input token stream and check
-    /// to see if there is an operation at the current index.
-    /// If so, the operation is done and then normal String
-    /// rendering continues on the buffer.  This is like having multiple Turing
-    /// machine instruction streams (programs) operating on a single input tape. :)
-    /// This rewriter makes no modifications to the token stream. It does not
-    /// ask the stream to fill itself up nor does it advance the input cursor.
-    /// The token stream index() will return the same value before and after
-    /// any getText() call.
-    /// The rewriter only works on tokens that you have in the buffer and
-    /// ignores the current input cursor. If you are buffering tokens on-demand,
-    /// calling getText() halfway through the input will only do rewrites
-    /// for those tokens in the first half of the file.
-    /// Since the operations are done lazily at getText-time, operations do not
-    /// screw up the token index values.  That is, an insert operation at token
-    /// index i does not change the index values for tokens i+1..n-1.
-    /// Because operations never actually alter the buffer, you may always get
-    /// the original token stream back without undoing anything.  Since
-    /// the instructions are queued up, you can easily simulate transactions and
-    /// roll back any changes if there is an error just by removing instructions.
-    /// For example,
+    /// <p>
+    /// You can insert stuff, replace, and delete chunks. Note that the operations
+    /// are done lazily--only if you convert the buffer to a
+    /// <see cref="string">string</see>
+    /// with
+    /// <see cref="ITokenStream.GetText()">ITokenStream.GetText()</see>
+    /// . This is very efficient because you are not
+    /// moving data around all the time. As the buffer of tokens is converted to
+    /// strings, the
+    /// <see cref="GetText()">GetText()</see>
+    /// method(s) scan the input token stream and
+    /// check to see if there is an operation at the current index. If so, the
+    /// operation is done and then normal
+    /// <see cref="string">string</see>
+    /// rendering continues on the
+    /// buffer. This is like having multiple Turing machine instruction streams
+    /// (programs) operating on a single input tape. :)</p>
+    /// <p>
+    /// This rewriter makes no modifications to the token stream. It does not ask the
+    /// stream to fill itself up nor does it advance the input cursor. The token
+    /// stream
+    /// <see cref="IIntStream.Index()">IIntStream.Index()</see>
+    /// will return the same value before and
+    /// after any
+    /// <see cref="GetText()">GetText()</see>
+    /// call.</p>
+    /// <p>
+    /// The rewriter only works on tokens that you have in the buffer and ignores the
+    /// current input cursor. If you are buffering tokens on-demand, calling
+    /// <see cref="GetText()">GetText()</see>
+    /// halfway through the input will only do rewrites for those
+    /// tokens in the first half of the file.</p>
+    /// <p>
+    /// Since the operations are done lazily at
+    /// <see cref="GetText()">GetText()</see>
+    /// -time, operations do
+    /// not screw up the token index values. That is, an insert operation at token
+    /// index
+    /// <code>i</code>
+    /// does not change the index values for tokens
+    /// <code>i</code>
+    /// +1..n-1.</p>
+    /// <p>
+    /// Because operations never actually alter the buffer, you may always get the
+    /// original token stream back without undoing anything. Since the instructions
+    /// are queued up, you can easily simulate transactions and roll back any changes
+    /// if there is an error just by removing instructions. For example,</p>
+    /// <pre>
     /// CharStream input = new ANTLRFileStream("input");
     /// TLexer lex = new TLexer(input);
     /// CommonTokenStream tokens = new CommonTokenStream(lex);
     /// T parser = new T(tokens);
     /// TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
     /// parser.startRule();
-    /// Then in the rules, you can execute (assuming rewriter is visible):
+    /// </pre>
+    /// <p>
+    /// Then in the rules, you can execute (assuming rewriter is visible):</p>
+    /// <pre>
     /// Token t,u;
     /// ...
     /// rewriter.insertAfter(t, "text to put after t");}
     /// rewriter.insertAfter(u, "text after u");}
     /// System.out.println(tokens.toString());
-    /// You can also have multiple "instruction streams" and get multiple
-    /// rewrites from a single pass over the input.  Just name the instruction
-    /// streams and use that name again when printing the buffer.  This could be
-    /// useful for generating a C file and also its header file--all from the
-    /// same buffer:
+    /// </pre>
+    /// <p>
+    /// You can also have multiple "instruction streams" and get multiple rewrites
+    /// from a single pass over the input. Just name the instruction streams and use
+    /// that name again when printing the buffer. This could be useful for generating
+    /// a C file and also its header file--all from the same buffer:</p>
+    /// <pre>
     /// tokens.insertAfter("pass1", t, "text to put after t");}
     /// tokens.insertAfter("pass2", u, "text after u");}
     /// System.out.println(tokens.toString("pass1"));
     /// System.out.println(tokens.toString("pass2"));
-    /// If you don't use named rewrite streams, a "default" stream is used as
-    /// the first example shows.
+    /// </pre>
+    /// <p>
+    /// If you don't use named rewrite streams, a "default" stream is used as the
+    /// first example shows.</p>
     /// </remarks>
     public class TokenStreamRewriter
     {
@@ -209,11 +239,11 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// You may have multiple, named streams of rewrite operations.
         /// I'm calling these things "programs."
-        /// Maps String (name) -&gt; rewrite (List)
+        /// Maps String (name) &rarr; rewrite (List)
         /// </remarks>
         protected internal readonly IDictionary<string, IList<TokenStreamRewriter.RewriteOperation>> programs;
 
-        /// <summary>Map String (program name) -&gt; Integer index</summary>
+        /// <summary>Map String (program name) &rarr; Integer index</summary>
         protected internal readonly IDictionary<string, int> lastRewriteTokenIndexes;
 
         public TokenStreamRewriter(ITokenStream tokens)
@@ -548,7 +578,7 @@ namespace Antlr4.Runtime
         /// insert with replace and delete this replace.
         /// 3. throw exception if index in same range as previous replace
         /// Don't actually delete; make op null in list. Easier to walk list.
-        /// Later we can throw as we add to index -&gt; op map.
+        /// Later we can throw as we add to index &rarr; op map.
         /// Note that I.2 R.2-2 will wipe out I.2 even though, technically, the
         /// inserted stuff would be before the replace range.  But, if you
         /// add tokens in front of a method body '{' and then delete the method

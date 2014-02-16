@@ -27,6 +27,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using System;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Sharpen;
@@ -47,6 +48,13 @@ namespace Antlr4.Runtime.Atn
         public bool tailCall;
 
         public bool optimizedTailCall;
+
+        [Obsolete]
+        [System.ObsoleteAttribute(@"UseRuleTransition(RuleStartState, int, int, ATNState) instead.")]
+        public RuleTransition(RuleStartState ruleStart, int ruleIndex, ATNState followState)
+            : this(ruleStart, ruleIndex, 0, followState)
+        {
+        }
 
         public RuleTransition(RuleStartState ruleStart, int ruleIndex, int precedence, ATNState followState)
             : base(ruleStart)

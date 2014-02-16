@@ -120,8 +120,7 @@ namespace Antlr4.Runtime
         /// <see cref="Antlr4.Runtime.Atn.DecisionState">Antlr4.Runtime.Atn.DecisionState</see>
         /// number. For others, it is the state whose outgoing
         /// edge we couldn't match.
-        /// <p/>
-        /// If the state number is not known, this method returns -1.
+        /// <p>If the state number is not known, this method returns -1.</p>
         /// </remarks>
         public int OffendingState
         {
@@ -143,11 +142,10 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// Gets the set of input symbols which could potentially follow the
         /// previously matched symbol at the time this exception was thrown.
-        /// <p/>
-        /// If the set of expected tokens is not known and could not be computed,
+        /// <p>If the set of expected tokens is not known and could not be computed,
         /// this method returns
         /// <code>null</code>
-        /// .
+        /// .</p>
         /// </remarks>
         /// <returns>
         /// The set of token types that could potentially follow the current
@@ -169,10 +167,9 @@ namespace Antlr4.Runtime
         /// Gets the
         /// <see cref="RuleContext">RuleContext</see>
         /// at the time this exception was thrown.
-        /// <p/>
-        /// If the context is not available, this method returns
+        /// <p>If the context is not available, this method returns
         /// <code>null</code>
-        /// .
+        /// .</p>
         /// </summary>
         /// <returns>
         /// The
@@ -197,10 +194,9 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// Gets the input stream which is the symbol source for the recognizer where
         /// this exception was thrown.
-        /// <p/>
-        /// If the input stream is not available, this method returns
+        /// <p>If the input stream is not available, this method returns
         /// <code>null</code>
-        /// .
+        /// .</p>
         /// </remarks>
         /// <returns>
         /// The input stream which is the symbol source for the recognizer
@@ -234,10 +230,9 @@ namespace Antlr4.Runtime
         /// Gets the
         /// <see cref="IRecognizer"/>
         /// where this exception occurred.
-        /// <p/>
-        /// If the recognizer is not available, this method returns
+        /// <p>If the recognizer is not available, this method returns
         /// <code>null</code>
-        /// .
+        /// .</p>
         /// </summary>
         /// <returns>
         /// The recognizer where this exception occurred, or

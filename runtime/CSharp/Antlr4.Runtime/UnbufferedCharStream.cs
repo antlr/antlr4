@@ -58,10 +58,9 @@ namespace Antlr4.Runtime
         /// The number of characters currently in
         /// <see cref="data">data</see>
         /// .
-        /// <p/>
-        /// This is not the buffer capacity, that's
+        /// <p>This is not the buffer capacity, that's
         /// <code>data.length</code>
-        /// .
+        /// .</p>
         /// </summary>
         protected internal int n;
 
@@ -69,15 +68,14 @@ namespace Antlr4.Runtime
         /// 0..n-1 index into
         /// <see cref="data">data</see>
         /// of next character.
-        /// <p/>
-        /// The
+        /// <p>The
         /// <code>LA(1)</code>
         /// character is
         /// <code>data[p]</code>
         /// . If
         /// <code>p == n</code>
         /// , we are
-        /// out of buffered characters.
+        /// out of buffered characters.</p>
         /// </summary>
         protected internal int p = 0;
 
@@ -297,13 +295,12 @@ namespace Antlr4.Runtime
         /// <summary>Return a marker that we can release later.</summary>
         /// <remarks>
         /// Return a marker that we can release later.
-        /// <p/>
-        /// The specific marker value used for this class allows for some level of
+        /// <p>The specific marker value used for this class allows for some level of
         /// protection against misuse where
         /// <code>seek()</code>
         /// is called on a mark or
         /// <code>release()</code>
-        /// is called in the wrong order.
+        /// is called in the wrong order.</p>
         /// </remarks>
         public virtual int Mark()
         {

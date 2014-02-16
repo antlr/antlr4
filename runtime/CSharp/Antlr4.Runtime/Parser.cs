@@ -35,6 +35,7 @@ using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
+using Antlr4.Runtime.Tree.Pattern;
 using Sharpen;
 
 namespace Antlr4.Runtime
@@ -100,6 +101,15 @@ namespace Antlr4.Runtime
                 }
             }
         }
+
+        /// <summary>
+        /// This field maps from the serialized ATN string to the deserialized
+        /// <see cref="Antlr4.Runtime.Atn.ATN">Antlr4.Runtime.Atn.ATN</see>
+        /// with
+        /// bypass alternatives.
+        /// </summary>
+        /// <seealso cref="Antlr4.Runtime.Atn.ATNDeserializationOptions.IsGenerateRuleBypassTransitions()">Antlr4.Runtime.Atn.ATNDeserializationOptions.IsGenerateRuleBypassTransitions()</seealso>
+        private static readonly IDictionary<string, ATN> bypassAltsAtnCache = new WeakHashMap<string, ATN>();
 
         /// <summary>The error handling strategy for the parser.</summary>
         /// <remarks>
@@ -215,8 +225,7 @@ namespace Antlr4.Runtime
         /// <see cref="Consume()">Consume()</see>
         /// are
         /// called to complete the match process.
-        /// <p/>
-        /// If the symbol type does not match,
+        /// <p>If the symbol type does not match,
         /// <see cref="IAntlrErrorStrategy.RecoverInline(Parser)">IAntlrErrorStrategy.RecoverInline(Parser)</see>
         /// is called on the current error
         /// strategy to attempt recovery. If
@@ -228,7 +237,7 @@ namespace Antlr4.Runtime
         /// is -1, the symbol is added to
         /// the parse tree by calling
         /// <see cref="ParserRuleContext.AddErrorNode(IToken)">ParserRuleContext.AddErrorNode(IToken)</see>
-        /// .
+        /// .</p>
         /// </summary>
         /// <param name="ttype">the token type to match</param>
         /// <returns>the matched symbol</returns>
@@ -269,8 +278,7 @@ namespace Antlr4.Runtime
         /// and
         /// <see cref="Consume()">Consume()</see>
         /// are called to complete the match process.
-        /// <p/>
-        /// If the symbol type does not match,
+        /// <p>If the symbol type does not match,
         /// <see cref="IAntlrErrorStrategy.RecoverInline(Parser)">IAntlrErrorStrategy.RecoverInline(Parser)</see>
         /// is called on the current error
         /// strategy to attempt recovery. If
@@ -282,7 +290,7 @@ namespace Antlr4.Runtime
         /// is -1, the symbol is added to
         /// the parse tree by calling
         /// <see cref="ParserRuleContext.AddErrorNode(IToken)">ParserRuleContext.AddErrorNode(IToken)</see>
-        /// .
+        /// .</p>
         /// </remarks>
         /// <returns>the matched symbol</returns>
         /// <exception cref="RecognitionException">
@@ -324,16 +332,14 @@ namespace Antlr4.Runtime
         /// <see cref="ParserRuleContext">ParserRuleContext</see>
         /// returned from the start
         /// rule represents the root of the parse tree.
-        /// <p/>
-        /// Note that if we are not building parse trees, rule contexts only point
+        /// <p>Note that if we are not building parse trees, rule contexts only point
         /// upwards. When a rule exits, it returns the context but that gets garbage
         /// collected if nobody holds a reference. It points upwards but nobody
-        /// points at it.
-        /// <p/>
-        /// When we build parse trees, we are adding all of these contexts to
+        /// points at it.</p>
+        /// <p>When we build parse trees, we are adding all of these contexts to
         /// <see cref="ParserRuleContext.children">ParserRuleContext.children</see>
         /// list. Contexts are then not candidates
-        /// for garbage collection.
+        /// for garbage collection.</p>
         /// </summary>
         /// <summary>
         /// Gets whether or not a complete parse tree will be constructed while
@@ -430,8 +436,7 @@ namespace Antlr4.Runtime
         /// Registers
         /// <code>listener</code>
         /// to receive events during the parsing process.
-        /// <p/>
-        /// To support output-preserving grammar transformations (including but not
+        /// <p>To support output-preserving grammar transformations (including but not
         /// limited to left-recursion removal, automated left-factoring, and
         /// optimized code generation), calls to listener methods during the parse
         /// may differ substantially from calls made by
@@ -439,11 +444,10 @@ namespace Antlr4.Runtime
         /// used after the parse is complete. In
         /// particular, rule entry and exit events may occur in a different order
         /// during the parse than after the parser. In addition, calls to certain
-        /// rule entry methods may be omitted.
-        /// <p/>
-        /// With the following specific exceptions, calls to listener events are
+        /// rule entry methods may be omitted.</p>
+        /// <p>With the following specific exceptions, calls to listener events are
         /// <em>deterministic</em>, i.e. for identical input the calls to listener
-        /// methods will be the same.
+        /// methods will be the same.</p>
         /// <ul>
         /// <li>Alterations to the grammar used to generate code may change the
         /// behavior of the listener calls.</li>
@@ -477,13 +481,12 @@ namespace Antlr4.Runtime
         /// Remove
         /// <code>listener</code>
         /// from the list of parse listeners.
-        /// <p/>
-        /// If
+        /// <p>If
         /// <code>listener</code>
         /// is
         /// <code>null</code>
         /// or has not been added as a parse
-        /// listener, this method does nothing.
+        /// listener, this method does nothing.</p>
         /// </summary>
         /// <seealso cref="AddParseListener(Antlr4.Runtime.Tree.IParseTreeListener)">AddParseListener(Antlr4.Runtime.Tree.IParseTreeListener)</seealso>
         /// <param name="listener">the listener to remove</param>
@@ -554,6 +557,80 @@ namespace Antlr4.Runtime
         public virtual ITokenFactory GetTokenFactory()
         {
             return _input.TokenSource.TokenFactory;
+        }
+
+        /// <summary>
+        /// The ATN with bypass alternatives is expensive to create so we create it
+        /// lazily.
+        /// </summary>
+        /// <remarks>
+        /// The ATN with bypass alternatives is expensive to create so we create it
+        /// lazily.
+        /// </remarks>
+        /// <exception cref="System.NotSupportedException">
+        /// if the current parser does not
+        /// implement the
+        /// <see cref="Recognizer{Symbol, ATNInterpreter}.GetSerializedATN()">Recognizer&lt;Symbol, ATNInterpreter&gt;.GetSerializedATN()</see>
+        /// method.
+        /// </exception>
+        [NotNull]
+        public virtual ATN GetATNWithBypassAlts()
+        {
+            string serializedAtn = GetSerializedATN();
+            if (serializedAtn == null)
+            {
+                throw new NotSupportedException("The current parser does not support an ATN with bypass alternatives.");
+            }
+            lock (bypassAltsAtnCache)
+            {
+                ATN result = bypassAltsAtnCache.Get(serializedAtn);
+                if (result == null)
+                {
+                    ATNDeserializationOptions deserializationOptions = new ATNDeserializationOptions();
+                    deserializationOptions.SetGenerateRuleBypassTransitions(true);
+                    result = new ATNDeserializer(deserializationOptions).Deserialize(serializedAtn.ToCharArray());
+                    bypassAltsAtnCache.Put(serializedAtn, result);
+                }
+                return result;
+            }
+        }
+
+        /// <summary>The preferred method of getting a tree pattern.</summary>
+        /// <remarks>
+        /// The preferred method of getting a tree pattern. For example, here's a
+        /// sample use:
+        /// <pre>
+        /// ParseTree t = parser.expr();
+        /// ParseTreePattern p = parser.compileParseTreePattern("&lt;ID&gt;+0", MyParser.RULE_expr);
+        /// ParseTreeMatch m = p.match(t);
+        /// String id = m.get("ID");
+        /// </pre>
+        /// </remarks>
+        public virtual ParseTreePattern CompileParseTreePattern(string pattern, int patternRuleIndex)
+        {
+            if (((ITokenStream)InputStream) != null)
+            {
+                ITokenSource tokenSource = ((ITokenStream)InputStream).TokenSource;
+                if (tokenSource is Lexer)
+                {
+                    Lexer lexer = (Lexer)tokenSource;
+                    return CompileParseTreePattern(pattern, patternRuleIndex, lexer);
+                }
+            }
+            throw new NotSupportedException("Parser can't discover a lexer to use");
+        }
+
+        /// <summary>
+        /// The same as
+        /// <see cref="CompileParseTreePattern(string, int)">CompileParseTreePattern(string, int)</see>
+        /// but specify a
+        /// <see cref="Lexer">Lexer</see>
+        /// rather than trying to deduce it from this parser.
+        /// </summary>
+        public virtual ParseTreePattern CompileParseTreePattern(string pattern, int patternRuleIndex, Lexer lexer)
+        {
+            ParseTreePatternMatcher m = new ParseTreePatternMatcher(lexer, this);
+            return m.Compile(pattern, patternRuleIndex);
         }
 
         public virtual IAntlrErrorStrategy ErrorHandler
@@ -628,15 +705,14 @@ namespace Antlr4.Runtime
         /// current symbol
         /// </linkplain>
         /// .
-        /// <p/>
-        /// E.g., given the following input with
+        /// <p>E.g., given the following input with
         /// <code>A</code>
         /// being the current
         /// lookahead symbol, this function moves the cursor to
         /// <code>B</code>
         /// and returns
         /// <code>A</code>
-        /// .
+        /// .</p>
         /// <pre>
         /// A B
         /// ^
@@ -772,8 +848,31 @@ namespace Antlr4.Runtime
             _ctx = localctx;
         }
 
-        public virtual void EnterRecursionRule(ParserRuleContext localctx, int ruleIndex, int precedence)
+        /// <summary>Get the precedence level for the top-most precedence rule.</summary>
+        /// <remarks>Get the precedence level for the top-most precedence rule.</remarks>
+        /// <returns>
+        /// The precedence level for the top-most precedence rule, or -1 if
+        /// the parser context is not nested within a precedence rule.
+        /// </returns>
+        public int GetPrecedence()
         {
+            if (_precedenceStack.IsEmpty())
+            {
+                return -1;
+            }
+            return _precedenceStack.Peek();
+        }
+
+        [Obsolete]
+        [System.ObsoleteAttribute(@"UseEnterRecursionRule(ParserRuleContext, int, int, int) instead.")]
+        public virtual void EnterRecursionRule(ParserRuleContext localctx, int ruleIndex)
+        {
+            EnterRecursionRule(localctx, Atn.ruleToStartState[ruleIndex].stateNumber, ruleIndex, 0);
+        }
+
+        public virtual void EnterRecursionRule(ParserRuleContext localctx, int state, int ruleIndex, int precedence)
+        {
+            State = state;
             _precedenceStack.Add(precedence);
             _ctx = localctx;
             _ctx.start = _input.Lt(1);
@@ -856,6 +955,11 @@ namespace Antlr4.Runtime
             {
                 return _ctx;
             }
+        }
+
+        public virtual void SetContext(ParserRuleContext ctx)
+        {
+            _ctx = ctx;
         }
 
         public override bool Precpred(RuleContext localctx, int precedence)
@@ -954,19 +1058,25 @@ namespace Antlr4.Runtime
             return atn.NextTokens(s);
         }
 
+        /// <summary>
+        /// Get a rule's index (i.e.,
+        /// <code>RULE_ruleName</code>
+        /// field) or -1 if not found.
+        /// </summary>
+        public virtual int GetRuleIndex(string ruleName)
+        {
+            int ruleIndex = GetRuleIndexMap().Get(ruleName);
+            if (ruleIndex != null)
+            {
+                return ruleIndex;
+            }
+            return -1;
+        }
+
         public virtual ParserRuleContext RuleContext
         {
             get
             {
-                //	/** Compute the set of valid tokens reachable from the current
-                //	 *  position in the parse.
-                //	 */
-                //	public IntervalSet nextTokens(@NotNull RuleContext ctx) {
-                //		ATN atn = getInterpreter().atn;
-                //		ATNState s = atn.states.get(ctx.s);
-                //		if ( s == null ) return null;
-                //		return atn.nextTokens(s, ctx);
-                //	}
                 return _ctx;
             }
         }

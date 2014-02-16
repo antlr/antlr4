@@ -48,13 +48,12 @@ namespace Antlr4.Runtime
         /// specifies how to recover from syntax errors and how to compute error
         /// messages. This listener's job is simply to emit a computed message,
         /// though it has enough information to create its own message in many cases.
-        /// <p/>
-        /// The
+        /// <p>The
         /// <see cref="RecognitionException">RecognitionException</see>
         /// is non-null for all syntax errors except
         /// when we discover mismatched token errors that we can recover from
         /// in-line, without returning from the surrounding rule (via the single
-        /// token insertion and deletion mechanism).
+        /// token insertion and deletion mechanism).</p>
         /// </remarks>
         /// <param name="recognizer">
         /// What parser got the error. From this

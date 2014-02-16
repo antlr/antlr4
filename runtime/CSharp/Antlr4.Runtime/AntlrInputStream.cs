@@ -48,8 +48,7 @@ namespace Antlr4.Runtime
     /// or
     /// <code>char[]</code>
     /// to use.
-    /// <p/>
-    /// If you need encoding, pass in stream/reader with correct encoding.
+    /// <p>If you need encoding, pass in stream/reader with correct encoding.</p>
     /// </summary>
     public class AntlrInputStream : ICharStream
     {
@@ -248,8 +247,9 @@ namespace Antlr4.Runtime
                 // just jump; don't update stream state (line, ...)
                 return;
             }
-            // seek forward, consume until p hits index
-            while (p < index && index < n)
+            // seek forward, consume until p hits index or n (whichever comes first)
+            index = Math.Min(index, n);
+            while (p < index)
             {
                 Consume();
             }

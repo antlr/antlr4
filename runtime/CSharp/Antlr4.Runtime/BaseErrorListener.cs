@@ -34,6 +34,13 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
+    /// <summary>
+    /// Provides an empty default implementation of
+    /// <see cref="IANTLRErrorListener{Symbol}">IANTLRErrorListener&lt;Symbol&gt;</see>
+    /// . The
+    /// default implementation of each method does nothing, but can be overridden as
+    /// necessary.
+    /// </summary>
     /// <author>Sam Harwell</author>
     public class BaseErrorListener : IParserErrorListener
     {

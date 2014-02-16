@@ -142,5 +142,34 @@ namespace Antlr4.Runtime.Misc
                 list.RemoveAt(list.Count - 1);
             }
         }
+
+        /// <summary>Convert array of strings to string&rarr;index map.</summary>
+        /// <remarks>
+        /// Convert array of strings to string&rarr;index map. Useful for
+        /// converting rulenames to name&rarr;ruleindex map.
+        /// </remarks>
+        public static IDictionary<string, int> ToMap(string[] keys)
+        {
+            IDictionary<string, int> m = new Dictionary<string, int>();
+            for (int i = 0; i < keys.Length; i++)
+            {
+                m.Put(keys[i], i);
+            }
+            return m;
+        }
+
+        public static char[] ToCharArray(List<int> data)
+        {
+            if (data == null)
+            {
+                return null;
+            }
+            char[] cdata = new char[data.Size()];
+            for (int i = 0; i < data.Size(); i++)
+            {
+                cdata[i] = (char)data.Get(i);
+            }
+            return cdata;
+        }
     }
 }

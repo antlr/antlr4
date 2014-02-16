@@ -33,42 +33,88 @@ using Sharpen;
 namespace Antlr4.Runtime
 {
     /// <summary>
-    /// The most common stream of tokens where every token is buffered up
-    /// and tokens are filtered for a certain channel (the parser will only
-    /// see these tokens).
-    /// </summary>
-    /// <remarks>
-    /// The most common stream of tokens where every token is buffered up
-    /// and tokens are filtered for a certain channel (the parser will only
-    /// see these tokens).
-    /// Even though it buffers all of the tokens, this token stream pulls tokens
-    /// from the tokens source on demand. In other words, until you ask for a
-    /// token using consume(), LT(), etc. the stream does not pull from the lexer.
-    /// The only difference between this stream and
+    /// This class extends
     /// <see cref="BufferedTokenStream">BufferedTokenStream</see>
-    /// superclass
-    /// is that this stream knows how to ignore off channel tokens. There may be
-    /// a performance advantage to using the superclass if you don't pass
-    /// whitespace and comments etc. to the parser on a hidden channel (i.e.,
-    /// you set
-    /// <code>$channel</code>
-    /// instead of calling
-    /// <code>skip()</code>
-    /// in lexer rules.)
-    /// </remarks>
-    /// <seealso cref="UnbufferedTokenStream">UnbufferedTokenStream</seealso>
-    /// <seealso cref="BufferedTokenStream">BufferedTokenStream</seealso>
+    /// with functionality to filter
+    /// token streams to tokens on a particular channel (tokens where
+    /// <see cref="IToken.Channel()">IToken.Channel()</see>
+    /// returns a particular value).
+    /// <p>
+    /// This token stream provides access to all tokens by index or when calling
+    /// methods like
+    /// <see cref="BufferedTokenStream.GetText()">BufferedTokenStream.GetText()</see>
+    /// . The channel filtering is only used for code
+    /// accessing tokens via the lookahead methods
+    /// <see cref="BufferedTokenStream.La(int)">BufferedTokenStream.La(int)</see>
+    /// ,
+    /// <see cref="Lt(int)">Lt(int)</see>
+    /// , and
+    /// <see cref="Lb(int)">Lb(int)</see>
+    /// .</p>
+    /// <p>
+    /// By default, tokens are placed on the default channel
+    /// (
+    /// <see cref="IToken.DefaultChannel">IToken.DefaultChannel</see>
+    /// ), but may be reassigned by using the
+    /// <code>-&gt;channel(HIDDEN)</code>
+    /// lexer command, or by using an embedded action to
+    /// call
+    /// <see cref="Lexer.Channel(int)">Lexer.Channel(int)</see>
+    /// .
+    /// </p>
+    /// <p>
+    /// Note: lexer rules which use the
+    /// <code>-&gt;skip</code>
+    /// lexer command or call
+    /// <see cref="Lexer.Skip()">Lexer.Skip()</see>
+    /// do not produce tokens at all, so input text matched by
+    /// such a rule will not be available as part of the token stream, regardless of
+    /// channel.</p>
+    /// </summary>
     public class CommonTokenStream : BufferedTokenStream
     {
-        /// <summary>Skip tokens on any channel but this one; this is how we skip whitespace...</summary>
-        /// <remarks>Skip tokens on any channel but this one; this is how we skip whitespace...</remarks>
+        /// <summary>Specifies the channel to use for filtering tokens.</summary>
+        /// <remarks>
+        /// Specifies the channel to use for filtering tokens.
+        /// <p>
+        /// The default value is
+        /// <see cref="IToken.DefaultChannel">IToken.DefaultChannel</see>
+        /// , which matches the
+        /// default channel assigned to tokens created by the lexer.</p>
+        /// </remarks>
         protected internal int channel = TokenConstants.DefaultChannel;
 
+        /// <summary>
+        /// Constructs a new
+        /// <see cref="CommonTokenStream">CommonTokenStream</see>
+        /// using the specified token
+        /// source and the default token channel (
+        /// <see cref="IToken.DefaultChannel">IToken.DefaultChannel</see>
+        /// ).
+        /// </summary>
+        /// <param name="tokenSource">The token source.</param>
         public CommonTokenStream(ITokenSource tokenSource)
             : base(tokenSource)
         {
         }
 
+        /// <summary>
+        /// Constructs a new
+        /// <see cref="CommonTokenStream">CommonTokenStream</see>
+        /// using the specified token
+        /// source and filtering tokens to the specified channel. Only tokens whose
+        /// <see cref="IToken.Channel()">IToken.Channel()</see>
+        /// matches
+        /// <code>channel</code>
+        /// or have the
+        /// <see cref="IToken.Type()">IToken.Type()</see>
+        /// equal to
+        /// <see cref="IToken.Eof">IToken.Eof</see>
+        /// will be returned by the
+        /// token stream lookahead methods.
+        /// </summary>
+        /// <param name="tokenSource">The token source.</param>
+        /// <param name="channel">The channel to use for filtering tokens.</param>
         public CommonTokenStream(ITokenSource tokenSource, int channel)
             : this(tokenSource)
         {
