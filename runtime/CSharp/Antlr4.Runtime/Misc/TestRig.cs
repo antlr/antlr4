@@ -84,13 +84,9 @@ namespace Antlr4.Runtime.Misc
         {
             if (args.Length < 2)
             {
-                System.Console.Error.WriteLine("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName\n"
-                     + "  [-tokens] [-tree] [-gui] [-ps file.ps] [-encoding encodingname]\n" + "  [-trace] [-diagnostics] [-SLL]\n"
-                     + "  [input-filename(s)]");
-                System.Console.Error.WriteLine("Use startRuleName='tokens' if GrammarName is a lexer grammar."
-                    );
-                System.Console.Error.WriteLine("Omitting input-filename makes rig read from stdin."
-                    );
+                System.Console.Error.WriteLine("java org.antlr.v4.runtime.misc.TestRig GrammarName startRuleName\n" + "  [-tokens] [-tree] [-gui] [-ps file.ps] [-encoding encodingname]\n" + "  [-trace] [-diagnostics] [-SLL]\n" + "  [input-filename(s)]");
+                System.Console.Error.WriteLine("Use startRuleName='tokens' if GrammarName is a lexer grammar.");
+                System.Console.Error.WriteLine("Omitting input-filename makes rig read from stdin.");
                 return;
             }
             int i = 0;
@@ -264,8 +260,7 @@ namespace Antlr4.Runtime.Misc
         /// <exception cref="System.MemberAccessException"></exception>
         /// <exception cref="System.Reflection.TargetInvocationException"></exception>
         /// <exception cref="Javax.Print.PrintException"></exception>
-        protected internal virtual void Process<_T0>(Lexer lexer, Type<_T0> parserClass, 
-            Parser parser, Stream @is, StreamReader r)
+        protected internal virtual void Process<_T0>(Lexer lexer, Type<_T0> parserClass, Parser parser, Stream @is, StreamReader r)
             where _T0 : Parser
         {
             try
@@ -304,8 +299,7 @@ namespace Antlr4.Runtime.Misc
                 try
                 {
                     MethodInfo startRule = parserClass.GetMethod(startRuleName, (Type[])null);
-                    ParserRuleContext tree = (ParserRuleContext)startRule.Invoke(parser, (object[])null
-                        );
+                    ParserRuleContext tree = (ParserRuleContext)startRule.Invoke(parser, (object[])null);
                     if (printTree)
                     {
                         System.Console.Out.WriteLine(tree.ToStringTree(parser));
@@ -322,8 +316,7 @@ namespace Antlr4.Runtime.Misc
                 catch (NoSuchMethodException)
                 {
                     // Generate postscript
-                    System.Console.Error.WriteLine("No method for rule " + startRuleName + " or it has arguments"
-                        );
+                    System.Console.Error.WriteLine("No method for rule " + startRuleName + " or it has arguments");
                 }
             }
             finally

@@ -67,8 +67,7 @@ namespace Antlr4.Runtime
         /// is viable.
         /// <p/>
         /// When the
-        /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection">Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection
-        ///     </see>
+        /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection">Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection</see>
         /// prediction mode
         /// is used, the parser is required to identify exact ambiguities so
         /// <code>exact</code>
@@ -88,8 +87,7 @@ namespace Antlr4.Runtime
         /// . This is always
         /// <code>true</code>
         /// when
-        /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection">Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection
-        ///     </see>
+        /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection">Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection</see>
         /// is used.
         /// </param>
         /// <param name="ambigAlts">the potentially ambiguous alternatives</param>
@@ -97,8 +95,7 @@ namespace Antlr4.Runtime
         /// the ATN configuration set where the ambiguity was
         /// determined
         /// </param>
-        void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, bool
-             exact, BitSet ambigAlts, ATNConfigSet configs);
+        void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, bool exact, BitSet ambigAlts, ATNConfigSet configs);
 
         /// <summary>
         /// This method is called when an SLL conflict occurs and the parser is about
@@ -133,8 +130,7 @@ namespace Antlr4.Runtime
         /// the simulator state when the SLL conflict was
         /// detected
         /// </param>
-        void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int 
-            stopIndex, BitSet conflictingAlts, SimulatorState conflictState);
+        void ReportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, SimulatorState conflictState);
 
         /// <summary>
         /// This method is called by the parser when a full-context prediction has a
@@ -146,8 +142,7 @@ namespace Antlr4.Runtime
         /// <p/>
         /// For prediction implementations that only evaluate full-context
         /// predictions when an SLL conflict is found (including the default
-        /// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator">Antlr4.Runtime.Atn.ParserATNSimulator
-        ///     </see>
+        /// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator">Antlr4.Runtime.Atn.ParserATNSimulator</see>
         /// implementation), this method reports cases
         /// where SLL conflicts were resolved to unique full-context predictions,
         /// i.e. the decision was context-sensitive. This report does not necessarily
@@ -174,7 +169,6 @@ namespace Antlr4.Runtime
         /// the simulator state when the unambiguous prediction
         /// was determined
         /// </param>
-        void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex
-            , int prediction, SimulatorState acceptState);
+        void ReportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, SimulatorState acceptState);
     }
 }

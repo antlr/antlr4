@@ -59,8 +59,7 @@ namespace Antlr4.Runtime.Dfa
         }
 
         public DFASerializer(DFA dfa, Recognizer<object, object> parser)
-            : this(dfa, parser != null ? parser.TokenNames : null, parser != null ? parser.RuleNames
-                 : null, parser != null ? parser.Atn : null)
+            : this(dfa, parser != null ? parser.TokenNames : null, parser != null ? parser.RuleNames : null, parser != null ? parser.Atn : null)
         {
         }
 
@@ -89,14 +88,12 @@ namespace Antlr4.Runtime.Dfa
                     IDictionary<int, DFAState> contextEdges = s.ContextEdgeMap;
                     foreach (KeyValuePair<int, DFAState> entry in edges.EntrySet())
                     {
-                        if ((entry.Value == null || entry.Value == ATNSimulator.Error) && !s.IsContextSymbol
-                            (entry.Key))
+                        if ((entry.Value == null || entry.Value == ATNSimulator.Error) && !s.IsContextSymbol(entry.Key))
                         {
                             continue;
                         }
                         bool contextSymbol = false;
-                        buf.Append(GetStateString(s)).Append("-").Append(GetEdgeLabel(entry.Key)).Append(
-                            "->");
+                        buf.Append(GetStateString(s)).Append("-").Append(GetEdgeLabel(entry.Key)).Append("->");
                         if (s.IsContextSymbol(entry.Key))
                         {
                             buf.Append("!");
@@ -119,8 +116,7 @@ namespace Antlr4.Runtime.Dfa
                     {
                         foreach (KeyValuePair<int, DFAState> entry_1 in contextEdges.EntrySet())
                         {
-                            buf.Append(GetStateString(s)).Append("-").Append(GetContextLabel(entry_1.Key)).Append
-                                ("->").Append(GetStateString(entry_1.Value)).Append("\n");
+                            buf.Append(GetStateString(s)).Append("-").Append(GetContextLabel(entry_1.Key)).Append("->").Append(GetStateString(entry_1.Value)).Append("\n");
                         }
                     }
                 }

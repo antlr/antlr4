@@ -122,8 +122,7 @@ namespace Antlr4.Runtime.Misc
                 return false;
             }
             //		System.out.print("equals " + this + ", " + o+" = ");
-            bool same = elements != null && elements.Equals(((OrderedHashSet<object>)o).elements
-                );
+            bool same = elements != null && elements.Equals(((OrderedHashSet<object>)o).elements);
             //		System.out.println(same);
             return same;
         }

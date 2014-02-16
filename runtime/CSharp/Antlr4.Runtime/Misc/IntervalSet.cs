@@ -55,11 +55,9 @@ namespace Antlr4.Runtime.Misc
     /// </remarks>
     public class IntervalSet : IIntSet
     {
-        public static readonly Antlr4.Runtime.Misc.IntervalSet CompleteCharSet = Antlr4.Runtime.Misc.IntervalSet
-            .Of(0, Lexer.MaxCharValue);
+        public static readonly Antlr4.Runtime.Misc.IntervalSet CompleteCharSet = Antlr4.Runtime.Misc.IntervalSet.Of(0, Lexer.MaxCharValue);
 
-        public static readonly Antlr4.Runtime.Misc.IntervalSet EmptySet = new Antlr4.Runtime.Misc.IntervalSet
-            ();
+        public static readonly Antlr4.Runtime.Misc.IntervalSet EmptySet = new Antlr4.Runtime.Misc.IntervalSet();
 
         /// <summary>The list of sorted, disjoint intervals.</summary>
         /// <remarks>The list of sorted, disjoint intervals.</remarks>
@@ -212,8 +210,7 @@ namespace Antlr4.Runtime.Misc
         }
 
         /// <summary>combine all sets in the array returned the or'd value</summary>
-        public static Antlr4.Runtime.Misc.IntervalSet Or(Antlr4.Runtime.Misc.IntervalSet[]
-             sets)
+        public static Antlr4.Runtime.Misc.IntervalSet Or(Antlr4.Runtime.Misc.IntervalSet[] sets)
         {
             Antlr4.Runtime.Misc.IntervalSet r = new Antlr4.Runtime.Misc.IntervalSet();
             foreach (Antlr4.Runtime.Misc.IntervalSet s in sets)
@@ -231,8 +228,7 @@ namespace Antlr4.Runtime.Misc
             }
             if (!(set is Antlr4.Runtime.Misc.IntervalSet))
             {
-                throw new ArgumentException("can't add non IntSet (" + set.GetType().FullName + ") to IntervalSet"
-                    );
+                throw new ArgumentException("can't add non IntSet (" + set.GetType().FullName + ") to IntervalSet");
             }
             Antlr4.Runtime.Misc.IntervalSet other = (Antlr4.Runtime.Misc.IntervalSet)set;
             // walk set and add each interval
@@ -245,11 +241,9 @@ namespace Antlr4.Runtime.Misc
             return this;
         }
 
-        public virtual Antlr4.Runtime.Misc.IntervalSet Complement(int minElement, int maxElement
-            )
+        public virtual Antlr4.Runtime.Misc.IntervalSet Complement(int minElement, int maxElement)
         {
-            return this.Complement(Antlr4.Runtime.Misc.IntervalSet.Of(minElement, maxElement)
-                );
+            return this.Complement(Antlr4.Runtime.Misc.IntervalSet.Of(minElement, maxElement));
         }
 
         /// <summary>
@@ -272,11 +266,9 @@ namespace Antlr4.Runtime.Misc
             // nothing in common with null set
             if (!(vocabulary is Antlr4.Runtime.Misc.IntervalSet))
             {
-                throw new ArgumentException("can't complement with non IntervalSet (" + vocabulary
-                    .GetType().FullName + ")");
+                throw new ArgumentException("can't complement with non IntervalSet (" + vocabulary.GetType().FullName + ")");
             }
-            Antlr4.Runtime.Misc.IntervalSet vocabularyIS = ((Antlr4.Runtime.Misc.IntervalSet)
-                vocabulary);
+            Antlr4.Runtime.Misc.IntervalSet vocabularyIS = ((Antlr4.Runtime.Misc.IntervalSet)vocabulary);
             int maxElement = vocabularyIS.GetMaxElement();
             Antlr4.Runtime.Misc.IntervalSet compl = new Antlr4.Runtime.Misc.IntervalSet();
             int n = intervals.Count;
@@ -288,8 +280,7 @@ namespace Antlr4.Runtime.Misc
             // add a range from 0 to first.a constrained to vocab
             if (first.a > 0)
             {
-                Antlr4.Runtime.Misc.IntervalSet s = Antlr4.Runtime.Misc.IntervalSet.Of(0, first.a
-                     - 1);
+                Antlr4.Runtime.Misc.IntervalSet s = Antlr4.Runtime.Misc.IntervalSet.Of(0, first.a - 1);
                 Antlr4.Runtime.Misc.IntervalSet a = s.And(vocabularyIS);
                 compl.AddAll(a);
             }
@@ -298,8 +289,7 @@ namespace Antlr4.Runtime.Misc
                 // from 2nd interval .. nth
                 Interval previous = intervals[i - 1];
                 Interval current = intervals[i];
-                Antlr4.Runtime.Misc.IntervalSet s = Antlr4.Runtime.Misc.IntervalSet.Of(previous.b
-                     + 1, current.a - 1);
+                Antlr4.Runtime.Misc.IntervalSet s = Antlr4.Runtime.Misc.IntervalSet.Of(previous.b + 1, current.a - 1);
                 Antlr4.Runtime.Misc.IntervalSet a = s.And(vocabularyIS);
                 compl.AddAll(a);
             }
@@ -307,8 +297,7 @@ namespace Antlr4.Runtime.Misc
             // add a range from last.b to maxElement constrained to vocab
             if (last.b < maxElement)
             {
-                Antlr4.Runtime.Misc.IntervalSet s = Antlr4.Runtime.Misc.IntervalSet.Of(last.b + 1
-                    , maxElement);
+                Antlr4.Runtime.Misc.IntervalSet s = Antlr4.Runtime.Misc.IntervalSet.Of(last.b + 1, maxElement);
                 Antlr4.Runtime.Misc.IntervalSet a = s.And(vocabularyIS);
                 compl.AddAll(a);
             }
@@ -330,8 +319,7 @@ namespace Antlr4.Runtime.Misc
             // will be empty.  The only problem would be when this' set max value
             // goes beyond MAX_CHAR_VALUE, but hopefully the constant MAX_CHAR_VALUE
             // will prevent this.
-            return this.And(((Antlr4.Runtime.Misc.IntervalSet)other).Complement(CompleteCharSet
-                ));
+            return this.And(((Antlr4.Runtime.Misc.IntervalSet)other).Complement(CompleteCharSet));
         }
 
         public virtual Antlr4.Runtime.Misc.IntervalSet Or(IIntSet a)

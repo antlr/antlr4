@@ -59,21 +59,18 @@ namespace Antlr4.Runtime.Misc
         {
         }
 
-        public override bool Process<_T0>(HashSet<_T0> annotations, IRoundEnvironment roundEnv
-            )
+        public override bool Process<_T0>(HashSet<_T0> annotations, IRoundEnvironment roundEnv)
         {
             if (!CheckClassNameConstants())
             {
                 return true;
             }
             IList<Tuple<RuleDependency, IElement>> dependencies = GetDependencies(roundEnv);
-            IDictionary<ITypeMirror, IList<Tuple<RuleDependency, IElement>>> recognizerDependencies
-                 = new Dictionary<ITypeMirror, IList<Tuple<RuleDependency, IElement>>>();
+            IDictionary<ITypeMirror, IList<Tuple<RuleDependency, IElement>>> recognizerDependencies = new Dictionary<ITypeMirror, IList<Tuple<RuleDependency, IElement>>>();
             foreach (Tuple<RuleDependency, IElement> dependency in dependencies)
             {
                 ITypeMirror recognizerType = GetRecognizerType(dependency.Item1);
-                IList<Tuple<RuleDependency, IElement>> list = recognizerDependencies.Get(recognizerType
-                    );
+                IList<Tuple<RuleDependency, IElement>> list = recognizerDependencies.Get(recognizerType);
                 if (list == null)
                 {
                     list = new List<Tuple<RuleDependency, IElement>>();
@@ -81,11 +78,9 @@ namespace Antlr4.Runtime.Misc
                 }
                 list.AddItem(dependency);
             }
-            foreach (KeyValuePair<ITypeMirror, IList<Tuple<RuleDependency, IElement>>> entry in 
-                recognizerDependencies.EntrySet())
+            foreach (KeyValuePair<ITypeMirror, IList<Tuple<RuleDependency, IElement>>> entry in recognizerDependencies.EntrySet())
             {
-                processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Note, string.Format("ANTLR 4: Validating %d dependencies on rules in %s."
-                    , entry.Value.Count, entry.Key.ToString()));
+                processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Note, string.Format("ANTLR 4: Validating %d dependencies on rules in %s.", entry.Value.Count, entry.Key.ToString()));
                 CheckDependencies(entry.Value, entry.Key);
             }
             return true;
@@ -93,23 +88,19 @@ namespace Antlr4.Runtime.Misc
 
         private bool CheckClassNameConstants()
         {
-            bool success = CheckClassNameConstant(RuleDependencyClassName, typeof(RuleDependency
-                ));
-            success &= CheckClassNameConstant(RuleDependenciesClassName, typeof(RuleDependencies
-                ));
+            bool success = CheckClassNameConstant(RuleDependencyClassName, typeof(RuleDependency));
+            success &= CheckClassNameConstant(RuleDependenciesClassName, typeof(RuleDependencies));
             success &= CheckClassNameConstant(RuleVersionClassName, typeof(RuleVersion));
             return success;
         }
 
-        private bool CheckClassNameConstant<_T0>(string className, System.Type<_T0> clazz
-            )
+        private bool CheckClassNameConstant<_T0>(string className, System.Type<_T0> clazz)
         {
             Args.NotNull("className", className);
             Args.NotNull("clazz", clazz);
             if (!className.Equals(clazz.GetCanonicalName()))
             {
-                processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, string.Format("Unable to process rule dependencies due to class name mismatch: %s != %s"
-                    , className, clazz.GetCanonicalName()));
+                processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, string.Format("Unable to process rule dependencies due to class name mismatch: %s != %s", className, clazz.GetCanonicalName()));
                 return false;
             }
             return true;
@@ -120,8 +111,7 @@ namespace Antlr4.Runtime.Misc
             try
             {
                 dependency.Recognizer();
-                string message = string.Format("Expected %s to get the %s.", typeof(MirroredTypeException
-                    ).Name, typeof(ITypeMirror).Name);
+                string message = string.Format("Expected %s to get the %s.", typeof(MirroredTypeException).Name, typeof(ITypeMirror).Name);
                 throw new NotSupportedException(message);
             }
             catch (MirroredTypeException ex)
@@ -130,19 +120,16 @@ namespace Antlr4.Runtime.Misc
             }
         }
 
-        private void CheckDependencies(IList<Tuple<RuleDependency, IElement>> dependencies
-            , ITypeMirror recognizerType)
+        private void CheckDependencies(IList<Tuple<RuleDependency, IElement>> dependencies, ITypeMirror recognizerType)
         {
             string[] ruleNames = GetRuleNames(recognizerType);
             int[] ruleVersions = GetRuleVersions(recognizerType, ruleNames);
-            RuleDependencyProcessor.RuleRelations relations = ExtractRuleRelations(recognizerType
-                );
+            RuleDependencyProcessor.RuleRelations relations = ExtractRuleRelations(recognizerType);
             foreach (Tuple<RuleDependency, IElement> dependency in dependencies)
             {
                 try
                 {
-                    if (!processingEnv.GetTypeUtils().IsAssignable(GetRecognizerType(dependency.Item1
-                        ), recognizerType))
+                    if (!processingEnv.GetTypeUtils().IsAssignable(GetRecognizerType(dependency.Item1), recognizerType))
                     {
                         continue;
                     }
@@ -150,157 +137,126 @@ namespace Antlr4.Runtime.Misc
                     int effectiveRule = dependency.Item1.Rule();
                     if (effectiveRule < 0 || effectiveRule >= ruleVersions.Length)
                     {
-                        Tuple<IAnnotationMirror, IAnnotationValue> ruleReferenceElement = FindRuleDependencyProperty
-                            (dependency, RuleDependencyProcessor.RuleDependencyProperty.Rule);
-                        string message = string.Format("Rule dependency on unknown rule %d@%d in %s", dependency
-                            .Item1.Rule(), dependency.Item1.Version(), GetRecognizerType(dependency.Item1
-                            ).ToString());
+                        Tuple<IAnnotationMirror, IAnnotationValue> ruleReferenceElement = FindRuleDependencyProperty(dependency, RuleDependencyProcessor.RuleDependencyProperty.Rule);
+                        string message = string.Format("Rule dependency on unknown rule %d@%d in %s", dependency.Item1.Rule(), dependency.Item1.Version(), GetRecognizerType(dependency.Item1).ToString());
                         if (ruleReferenceElement != null)
                         {
-                            processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, message, dependency
-                                .Item2, ruleReferenceElement.Item1, ruleReferenceElement.Item2);
+                            processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, message, dependency.Item2, ruleReferenceElement.Item1, ruleReferenceElement.Item2);
                         }
                         else
                         {
-                            processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, message, dependency
-                                .Item2);
+                            processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, message, dependency.Item2);
                         }
                         continue;
                     }
-                    EnumSet<Dependents> dependents = EnumSet.Of(Dependents.Self, dependency.Item1.Dependents
-                        ());
+                    EnumSet<Dependents> dependents = EnumSet.Of(Dependents.Self, dependency.Item1.Dependents());
                     ReportUnimplementedDependents(dependency, dependents);
                     BitSet @checked = new BitSet();
-                    int highestRequiredDependency = CheckDependencyVersion(dependency, ruleNames, ruleVersions
-                        , effectiveRule, null);
+                    int highestRequiredDependency = CheckDependencyVersion(dependency, ruleNames, ruleVersions, effectiveRule, null);
                     if (dependents.Contains(Dependents.Parents))
                     {
                         BitSet parents = relations.parents[dependency.Item1.Rule()];
-                        for (int parent = parents.NextSetBit(0); parent >= 0; parent = parents.NextSetBit
-                            (parent + 1))
+                        for (int parent = parents.NextSetBit(0); parent >= 0; parent = parents.NextSetBit(parent + 1))
                         {
                             if (parent < 0 || parent >= ruleVersions.Length || @checked.Get(parent))
                             {
                                 continue;
                             }
                             @checked.Set(parent);
-                            int required = CheckDependencyVersion(dependency, ruleNames, ruleVersions, parent
-                                , "parent");
+                            int required = CheckDependencyVersion(dependency, ruleNames, ruleVersions, parent, "parent");
                             highestRequiredDependency = Math.Max(highestRequiredDependency, required);
                         }
                     }
                     if (dependents.Contains(Dependents.Children))
                     {
                         BitSet children = relations.children[dependency.Item1.Rule()];
-                        for (int child = children.NextSetBit(0); child >= 0; child = children.NextSetBit(
-                            child + 1))
+                        for (int child = children.NextSetBit(0); child >= 0; child = children.NextSetBit(child + 1))
                         {
                             if (child < 0 || child >= ruleVersions.Length || @checked.Get(child))
                             {
                                 continue;
                             }
                             @checked.Set(child);
-                            int required = CheckDependencyVersion(dependency, ruleNames, ruleVersions, child, 
-                                "child");
+                            int required = CheckDependencyVersion(dependency, ruleNames, ruleVersions, child, "child");
                             highestRequiredDependency = Math.Max(highestRequiredDependency, required);
                         }
                     }
                     if (dependents.Contains(Dependents.Ancestors))
                     {
                         BitSet ancestors = relations.GetAncestors(dependency.Item1.Rule());
-                        for (int ancestor = ancestors.NextSetBit(0); ancestor >= 0; ancestor = ancestors.
-                            NextSetBit(ancestor + 1))
+                        for (int ancestor = ancestors.NextSetBit(0); ancestor >= 0; ancestor = ancestors.NextSetBit(ancestor + 1))
                         {
                             if (ancestor < 0 || ancestor >= ruleVersions.Length || @checked.Get(ancestor))
                             {
                                 continue;
                             }
                             @checked.Set(ancestor);
-                            int required = CheckDependencyVersion(dependency, ruleNames, ruleVersions, ancestor
-                                , "ancestor");
+                            int required = CheckDependencyVersion(dependency, ruleNames, ruleVersions, ancestor, "ancestor");
                             highestRequiredDependency = Math.Max(highestRequiredDependency, required);
                         }
                     }
                     if (dependents.Contains(Dependents.Descendants))
                     {
                         BitSet descendants = relations.GetDescendants(dependency.Item1.Rule());
-                        for (int descendant = descendants.NextSetBit(0); descendant >= 0; descendant = descendants
-                            .NextSetBit(descendant + 1))
+                        for (int descendant = descendants.NextSetBit(0); descendant >= 0; descendant = descendants.NextSetBit(descendant + 1))
                         {
-                            if (descendant < 0 || descendant >= ruleVersions.Length || @checked.Get(descendant
-                                ))
+                            if (descendant < 0 || descendant >= ruleVersions.Length || @checked.Get(descendant))
                             {
                                 continue;
                             }
                             @checked.Set(descendant);
-                            int required = CheckDependencyVersion(dependency, ruleNames, ruleVersions, descendant
-                                , "descendant");
+                            int required = CheckDependencyVersion(dependency, ruleNames, ruleVersions, descendant, "descendant");
                             highestRequiredDependency = Math.Max(highestRequiredDependency, required);
                         }
                     }
                     int declaredVersion = dependency.Item1.Version();
                     if (declaredVersion > highestRequiredDependency)
                     {
-                        Tuple<IAnnotationMirror, IAnnotationValue> versionElement = FindRuleDependencyProperty
-                            (dependency, RuleDependencyProcessor.RuleDependencyProperty.Version);
-                        string message = string.Format("Rule dependency version mismatch: %s has maximum dependency version %d (expected %d) in %s"
-                            , ruleNames[dependency.Item1.Rule()], highestRequiredDependency, declaredVersion
-                            , GetRecognizerType(dependency.Item1).ToString());
+                        Tuple<IAnnotationMirror, IAnnotationValue> versionElement = FindRuleDependencyProperty(dependency, RuleDependencyProcessor.RuleDependencyProperty.Version);
+                        string message = string.Format("Rule dependency version mismatch: %s has maximum dependency version %d (expected %d) in %s", ruleNames[dependency.Item1.Rule()], highestRequiredDependency, declaredVersion, GetRecognizerType(dependency.Item1).ToString());
                         if (versionElement != null)
                         {
-                            processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, message, dependency
-                                .Item2, versionElement.Item1, versionElement.Item2);
+                            processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, message, dependency.Item2, versionElement.Item1, versionElement.Item2);
                         }
                         else
                         {
-                            processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, message, dependency
-                                .Item2);
+                            processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, message, dependency.Item2);
                         }
                     }
                 }
                 catch (AnnotationTypeMismatchException)
                 {
-                    processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, string.Format("Could not validate rule dependencies for element %s"
-                        , dependency.Item2.ToString()), dependency.Item2);
+                    processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, string.Format("Could not validate rule dependencies for element %s", dependency.Item2.ToString()), dependency.Item2);
                 }
             }
         }
 
-        private static readonly HashSet<Dependents> ImplementedDependents = EnumSet.Of(Dependents
-            .Self, Dependents.Parents, Dependents.Children, Dependents.Ancestors, Dependents
-            .Descendants);
+        private static readonly HashSet<Dependents> ImplementedDependents = EnumSet.Of(Dependents.Self, Dependents.Parents, Dependents.Children, Dependents.Ancestors, Dependents.Descendants);
 
-        private void ReportUnimplementedDependents(Tuple<RuleDependency, IElement> dependency
-            , EnumSet<Dependents> dependents)
+        private void ReportUnimplementedDependents(Tuple<RuleDependency, IElement> dependency, EnumSet<Dependents> dependents)
         {
             EnumSet<Dependents> unimplemented = dependents.Clone();
             unimplemented.RemoveAll(ImplementedDependents);
             if (!unimplemented.IsEmpty())
             {
-                Tuple<IAnnotationMirror, IAnnotationValue> dependentsElement = FindRuleDependencyProperty
-                    (dependency, RuleDependencyProcessor.RuleDependencyProperty.Dependents);
+                Tuple<IAnnotationMirror, IAnnotationValue> dependentsElement = FindRuleDependencyProperty(dependency, RuleDependencyProcessor.RuleDependencyProperty.Dependents);
                 if (dependentsElement == null)
                 {
-                    dependentsElement = FindRuleDependencyProperty(dependency, RuleDependencyProcessor.RuleDependencyProperty
-                        .Rule);
+                    dependentsElement = FindRuleDependencyProperty(dependency, RuleDependencyProcessor.RuleDependencyProperty.Rule);
                 }
-                string message = string.Format("Cannot validate the following dependents of rule %d: %s"
-                    , dependency.Item1.Rule(), unimplemented);
+                string message = string.Format("Cannot validate the following dependents of rule %d: %s", dependency.Item1.Rule(), unimplemented);
                 if (dependentsElement != null)
                 {
-                    processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, message, dependency
-                        .Item2, dependentsElement.Item1, dependentsElement.Item2);
+                    processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, message, dependency.Item2, dependentsElement.Item1, dependentsElement.Item2);
                 }
                 else
                 {
-                    processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, message, dependency
-                        .Item2);
+                    processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, message, dependency.Item2);
                 }
             }
         }
 
-        private int CheckDependencyVersion(Tuple<RuleDependency, IElement> dependency, string
-            [] ruleNames, int[] ruleVersions, int relatedRule, string relation)
+        private int CheckDependencyVersion(Tuple<RuleDependency, IElement> dependency, string[] ruleNames, int[] ruleVersions, int relatedRule, string relation)
         {
             string ruleName = ruleNames[dependency.Item1.Rule()];
             string path;
@@ -311,27 +267,21 @@ namespace Antlr4.Runtime.Misc
             else
             {
                 string mismatchedRuleName = ruleNames[relatedRule];
-                path = string.Format("rule %s (%s of %s)", mismatchedRuleName, relation, ruleName
-                    );
+                path = string.Format("rule %s (%s of %s)", mismatchedRuleName, relation, ruleName);
             }
             int declaredVersion = dependency.Item1.Version();
             int actualVersion = ruleVersions[relatedRule];
             if (actualVersion > declaredVersion)
             {
-                Tuple<IAnnotationMirror, IAnnotationValue> versionElement = FindRuleDependencyProperty
-                    (dependency, RuleDependencyProcessor.RuleDependencyProperty.Version);
-                string message = string.Format("Rule dependency version mismatch: %s has version %d (expected <= %d) in %s"
-                    , path, actualVersion, declaredVersion, GetRecognizerType(dependency.Item1).ToString
-                    ());
+                Tuple<IAnnotationMirror, IAnnotationValue> versionElement = FindRuleDependencyProperty(dependency, RuleDependencyProcessor.RuleDependencyProperty.Version);
+                string message = string.Format("Rule dependency version mismatch: %s has version %d (expected <= %d) in %s", path, actualVersion, declaredVersion, GetRecognizerType(dependency.Item1).ToString());
                 if (versionElement != null)
                 {
-                    processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, message, dependency
-                        .Item2, versionElement.Item1, versionElement.Item2);
+                    processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, message, dependency.Item2, versionElement.Item1, versionElement.Item2);
                 }
                 else
                 {
-                    processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, message, dependency
-                        .Item2);
+                    processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, message, dependency.Item2);
                 }
             }
             return actualVersion;
@@ -340,8 +290,7 @@ namespace Antlr4.Runtime.Misc
         private int[] GetRuleVersions(ITypeMirror recognizerClass, string[] ruleNames)
         {
             int[] versions = new int[ruleNames.Length];
-            IList<IElement> elements = processingEnv.GetElementUtils().GetAllMembers((ITypeElement
-                )processingEnv.GetTypeUtils().AsElement(recognizerClass));
+            IList<IElement> elements = processingEnv.GetElementUtils().GetAllMembers((ITypeElement)processingEnv.GetTypeUtils().AsElement(recognizerClass));
             foreach (IElement element in elements)
             {
                 if (element.GetKind() != ElementKind.Field)
@@ -365,8 +314,7 @@ namespace Antlr4.Runtime.Misc
                         int index = (int)constantValue;
                         if (index < 0 || index >= versions.Length)
                         {
-                            string message = string.Format("Rule index %d for rule '%s' out of bounds for recognizer %s."
-                                , index, name, recognizerClass.ToString());
+                            string message = string.Format("Rule index %d for rule '%s' out of bounds for recognizer %s.", index, name, recognizerClass.ToString());
                             processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, message, element);
                             continue;
                         }
@@ -378,8 +326,7 @@ namespace Antlr4.Runtime.Misc
                         IExecutableElement ruleMethod = GetRuleMethod(recognizerClass, name);
                         if (ruleMethod == null)
                         {
-                            string message = string.Format("Could not find rule method for rule '%s' in recognizer %s."
-                                , name, recognizerClass.ToString());
+                            string message = string.Format("Could not find rule method for rule '%s' in recognizer %s.", name, recognizerClass.ToString());
                             processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, message, element);
                             continue;
                         }
@@ -389,19 +336,16 @@ namespace Antlr4.Runtime.Misc
                     }
                     catch (ArgumentException)
                     {
-                        processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, "Exception occurred while validating rule dependencies."
-                            , element);
+                        processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, "Exception occurred while validating rule dependencies.", element);
                     }
                 }
             }
             return versions;
         }
 
-        private IExecutableElement GetRuleMethod(ITypeMirror recognizerClass, string name
-            )
+        private IExecutableElement GetRuleMethod(ITypeMirror recognizerClass, string name)
         {
-            IList<IElement> elements = processingEnv.GetElementUtils().GetAllMembers((ITypeElement
-                )processingEnv.GetTypeUtils().AsElement(recognizerClass));
+            IList<IElement> elements = processingEnv.GetElementUtils().GetAllMembers((ITypeElement)processingEnv.GetTypeUtils().AsElement(recognizerClass));
             foreach (IElement element in elements)
             {
                 if (element.GetKind() != ElementKind.Method)
@@ -409,8 +353,7 @@ namespace Antlr4.Runtime.Misc
                     continue;
                 }
                 IExecutableElement method = (IExecutableElement)element;
-                if (method.GetSimpleName().ContentEquals(name) && HasRuleVersionAnnotation(method
-                    ))
+                if (method.GetSimpleName().ContentEquals(name) && HasRuleVersionAnnotation(method))
                 {
                     return method;
                 }
@@ -420,16 +363,14 @@ namespace Antlr4.Runtime.Misc
 
         private bool HasRuleVersionAnnotation(IExecutableElement method)
         {
-            ITypeElement ruleVersionAnnotationElement = processingEnv.GetElementUtils().GetTypeElement
-                (RuleVersionClassName);
+            ITypeElement ruleVersionAnnotationElement = processingEnv.GetElementUtils().GetTypeElement(RuleVersionClassName);
             if (ruleVersionAnnotationElement == null)
             {
                 return false;
             }
             foreach (IAnnotationMirror annotation in method.GetAnnotationMirrors())
             {
-                if (processingEnv.GetTypeUtils().IsSameType(annotation.GetAnnotationType(), ruleVersionAnnotationElement
-                    .AsType()))
+                if (processingEnv.GetTypeUtils().IsSameType(annotation.GetAnnotationType(), ruleVersionAnnotationElement.AsType()))
                 {
                     return true;
                 }
@@ -440,8 +381,7 @@ namespace Antlr4.Runtime.Misc
         private string[] GetRuleNames(ITypeMirror recognizerClass)
         {
             IList<string> result = new List<string>();
-            IList<IElement> elements = processingEnv.GetElementUtils().GetAllMembers((ITypeElement
-                )processingEnv.GetTypeUtils().AsElement(recognizerClass));
+            IList<IElement> elements = processingEnv.GetElementUtils().GetAllMembers((ITypeElement)processingEnv.GetTypeUtils().AsElement(recognizerClass));
             foreach (IElement element in elements)
             {
                 if (element.GetKind() != ElementKind.Field)
@@ -475,21 +415,17 @@ namespace Antlr4.Runtime.Misc
                     }
                     catch (ArgumentException)
                     {
-                        processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, "Exception occurred while validating rule dependencies."
-                            , element);
+                        processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, "Exception occurred while validating rule dependencies.", element);
                     }
                 }
             }
             return Sharpen.Collections.ToArray(result, new string[result.Count]);
         }
 
-        public static IList<Tuple<RuleDependency, IElement>> GetDependencies(IRoundEnvironment
-             roundEnv)
+        public static IList<Tuple<RuleDependency, IElement>> GetDependencies(IRoundEnvironment roundEnv)
         {
-            IList<Tuple<RuleDependency, IElement>> result = new List<Tuple<RuleDependency, IElement
-                >>();
-            HashSet<IElement> elements = roundEnv.GetElementsAnnotatedWith(typeof(RuleDependency
-                ));
+            IList<Tuple<RuleDependency, IElement>> result = new List<Tuple<RuleDependency, IElement>>();
+            HashSet<IElement> elements = roundEnv.GetElementsAnnotatedWith(typeof(RuleDependency));
             foreach (IElement element in elements)
             {
                 RuleDependency dependency = element.GetAnnotation<RuleDependency>();
@@ -524,22 +460,16 @@ namespace Antlr4.Runtime.Misc
         }
 
         [Nullable]
-        private Tuple<IAnnotationMirror, IAnnotationValue> FindRuleDependencyProperty(Tuple
-            <RuleDependency, IElement> dependency, RuleDependencyProcessor.RuleDependencyProperty
-             property)
+        private Tuple<IAnnotationMirror, IAnnotationValue> FindRuleDependencyProperty(Tuple<RuleDependency, IElement> dependency, RuleDependencyProcessor.RuleDependencyProperty property)
         {
-            ITypeElement ruleDependencyTypeElement = processingEnv.GetElementUtils().GetTypeElement
-                (RuleDependencyClassName);
-            ITypeElement ruleDependenciesTypeElement = processingEnv.GetElementUtils().GetTypeElement
-                (RuleDependenciesClassName);
+            ITypeElement ruleDependencyTypeElement = processingEnv.GetElementUtils().GetTypeElement(RuleDependencyClassName);
+            ITypeElement ruleDependenciesTypeElement = processingEnv.GetElementUtils().GetTypeElement(RuleDependenciesClassName);
             IList<IAnnotationMirror> mirrors = dependency.Item2.GetAnnotationMirrors();
             foreach (IAnnotationMirror annotationMirror in mirrors)
             {
-                if (processingEnv.GetTypeUtils().IsSameType(ruleDependencyTypeElement.AsType(), annotationMirror
-                    .GetAnnotationType()))
+                if (processingEnv.GetTypeUtils().IsSameType(ruleDependencyTypeElement.AsType(), annotationMirror.GetAnnotationType()))
                 {
-                    IAnnotationValue element = FindRuleDependencyProperty(dependency, annotationMirror
-                        , property);
+                    IAnnotationValue element = FindRuleDependencyProperty(dependency, annotationMirror, property);
                     if (element != null)
                     {
                         return Tuple.Create(annotationMirror, element);
@@ -547,21 +477,17 @@ namespace Antlr4.Runtime.Misc
                 }
                 else
                 {
-                    if (processingEnv.GetTypeUtils().IsSameType(ruleDependenciesTypeElement.AsType(), 
-                        annotationMirror.GetAnnotationType()))
+                    if (processingEnv.GetTypeUtils().IsSameType(ruleDependenciesTypeElement.AsType(), annotationMirror.GetAnnotationType()))
                     {
-                        IDictionary<IExecutableElement, IAnnotationValue> values = annotationMirror.GetElementValues
-                            ();
-                        foreach (KeyValuePair<IExecutableElement, IAnnotationValue> value in values.EntrySet
-                            ())
+                        IDictionary<IExecutableElement, IAnnotationValue> values = annotationMirror.GetElementValues();
+                        foreach (KeyValuePair<IExecutableElement, IAnnotationValue> value in values.EntrySet())
                         {
                             if ("value()".Equals(value.Key.ToString()))
                             {
                                 IAnnotationValue annotationValue = value.Value;
                                 if (!(annotationValue.GetValue() is IList))
                                 {
-                                    processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Expected array of RuleDependency annotations for annotation property 'value()'."
-                                        , dependency.Item2, annotationMirror, annotationValue);
+                                    processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Expected array of RuleDependency annotations for annotation property 'value()'.", dependency.Item2, annotationMirror, annotationValue);
                                     break;
                                 }
                                 IList<object> annotationValueList = (IList<object>)annotationValue.GetValue();
@@ -569,12 +495,10 @@ namespace Antlr4.Runtime.Misc
                                 {
                                     if (!(obj is IAnnotationMirror))
                                     {
-                                        processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Expected RuleDependency annotation mirror for element of property 'value()'."
-                                            , dependency.Item2, annotationMirror, annotationValue);
+                                        processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Expected RuleDependency annotation mirror for element of property 'value()'.", dependency.Item2, annotationMirror, annotationValue);
                                         break;
                                     }
-                                    IAnnotationValue element = FindRuleDependencyProperty(dependency, (IAnnotationMirror
-                                        )obj, property);
+                                    IAnnotationValue element = FindRuleDependencyProperty(dependency, (IAnnotationMirror)obj, property);
                                     if (element != null)
                                     {
                                         return Tuple.Create((IAnnotationMirror)obj, element);
@@ -583,8 +507,7 @@ namespace Antlr4.Runtime.Misc
                             }
                             else
                             {
-                                processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, string.Format("Unexpected annotation property %s."
-                                    , value.Key.ToString()), dependency.Item2, annotationMirror, value.Value);
+                                processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, string.Format("Unexpected annotation property %s.", value.Key.ToString()), dependency.Item2, annotationMirror, value.Value);
                             }
                         }
                     }
@@ -594,18 +517,14 @@ namespace Antlr4.Runtime.Misc
         }
 
         [Nullable]
-        private IAnnotationValue FindRuleDependencyProperty(Tuple<RuleDependency, IElement
-            > dependency, IAnnotationMirror annotationMirror, RuleDependencyProcessor.RuleDependencyProperty
-             property)
+        private IAnnotationValue FindRuleDependencyProperty(Tuple<RuleDependency, IElement> dependency, IAnnotationMirror annotationMirror, RuleDependencyProcessor.RuleDependencyProperty property)
         {
             IAnnotationValue recognizerValue = null;
             IAnnotationValue ruleValue = null;
             IAnnotationValue versionValue = null;
             IAnnotationValue dependentsValue = null;
-            IDictionary<IExecutableElement, IAnnotationValue> values = annotationMirror.GetElementValues
-                ();
-            foreach (KeyValuePair<IExecutableElement, IAnnotationValue> value in values.EntrySet
-                ())
+            IDictionary<IExecutableElement, IAnnotationValue> values = annotationMirror.GetElementValues();
+            foreach (KeyValuePair<IExecutableElement, IAnnotationValue> value in values.EntrySet())
             {
                 IAnnotationValue annotationValue = value.Value;
                 if ("rule()".Equals(value.Key.ToString()))
@@ -613,8 +532,7 @@ namespace Antlr4.Runtime.Misc
                     ruleValue = annotationValue;
                     if (!(annotationValue.GetValue() is int))
                     {
-                        processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Expected int constant for annotation property 'rule()'."
-                            , dependency.Item2, annotationMirror, annotationValue);
+                        processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Expected int constant for annotation property 'rule()'.", dependency.Item2, annotationMirror, annotationValue);
                         return null;
                     }
                     if ((int)annotationValue.GetValue() != dependency.Item1.Rule())
@@ -630,14 +548,12 @@ namespace Antlr4.Runtime.Misc
                         recognizerValue = annotationValue;
                         if (!(annotationValue.GetValue() is ITypeMirror))
                         {
-                            processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Expected Class constant for annotation property 'recognizer()'."
-                                , dependency.Item2, annotationMirror, annotationValue);
+                            processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Expected Class constant for annotation property 'recognizer()'.", dependency.Item2, annotationMirror, annotationValue);
                             return null;
                         }
                         ITypeMirror annotationRecognizer = (ITypeMirror)annotationValue.GetValue();
                         ITypeMirror expectedRecognizer = GetRecognizerType(dependency.Item1);
-                        if (!processingEnv.GetTypeUtils().IsSameType(expectedRecognizer, annotationRecognizer
-                            ))
+                        if (!processingEnv.GetTypeUtils().IsSameType(expectedRecognizer, annotationRecognizer))
                         {
                             // this is a valid dependency annotation, but not the one we're looking for
                             return null;
@@ -650,8 +566,7 @@ namespace Antlr4.Runtime.Misc
                             versionValue = annotationValue;
                             if (!(annotationValue.GetValue() is int))
                             {
-                                processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Expected int constant for annotation property 'version()'."
-                                    , dependency.Item2, annotationMirror, annotationValue);
+                                processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Expected int constant for annotation property 'version()'.", dependency.Item2, annotationMirror, annotationValue);
                                 return null;
                             }
                             if ((int)annotationValue.GetValue() != dependency.Item1.Version())
@@ -699,8 +614,7 @@ namespace Antlr4.Runtime.Misc
             }
             if (recognizerValue == null)
             {
-                processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Could not find 'recognizer()' element in annotation."
-                    , dependency.Item2, annotationMirror);
+                processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Could not find 'recognizer()' element in annotation.", dependency.Item2, annotationMirror);
             }
             if (property == RuleDependencyProcessor.RuleDependencyProperty.Recognizer)
             {
@@ -708,8 +622,7 @@ namespace Antlr4.Runtime.Misc
             }
             if (ruleValue == null)
             {
-                processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Could not find 'rule()' element in annotation."
-                    , dependency.Item2, annotationMirror);
+                processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Could not find 'rule()' element in annotation.", dependency.Item2, annotationMirror);
             }
             if (property == RuleDependencyProcessor.RuleDependencyProperty.Rule)
             {
@@ -717,14 +630,12 @@ namespace Antlr4.Runtime.Misc
             }
             if (versionValue == null)
             {
-                processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Could not find 'version()' element in annotation."
-                    , dependency.Item2, annotationMirror);
+                processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Warning, "Could not find 'version()' element in annotation.", dependency.Item2, annotationMirror);
             }
             return null;
         }
 
-        private RuleDependencyProcessor.RuleRelations ExtractRuleRelations(ITypeMirror recognizer
-            )
+        private RuleDependencyProcessor.RuleRelations ExtractRuleRelations(ITypeMirror recognizer)
         {
             string serializedATN = GetSerializedATN(recognizer);
             if (serializedATN == null)
@@ -732,8 +643,7 @@ namespace Antlr4.Runtime.Misc
                 return null;
             }
             ATN atn = ATNSimulator.Deserialize(serializedATN.ToCharArray());
-            RuleDependencyProcessor.RuleRelations relations = new RuleDependencyProcessor.RuleRelations
-                (atn.ruleToStartState.Length);
+            RuleDependencyProcessor.RuleRelations relations = new RuleDependencyProcessor.RuleRelations(atn.ruleToStartState.Length);
             foreach (ATNState state in atn.states)
             {
                 if (!state.epsilonOnlyTransitions)
@@ -755,8 +665,7 @@ namespace Antlr4.Runtime.Misc
 
         private string GetSerializedATN(ITypeMirror recognizerClass)
         {
-            IList<IElement> elements = processingEnv.GetElementUtils().GetAllMembers((ITypeElement
-                )processingEnv.GetTypeUtils().AsElement(recognizerClass));
+            IList<IElement> elements = processingEnv.GetElementUtils().GetAllMembers((ITypeElement)processingEnv.GetTypeUtils().AsElement(recognizerClass));
             foreach (IElement element in elements)
             {
                 if (element.GetKind() != ElementKind.Field)
@@ -773,8 +682,7 @@ namespace Antlr4.Runtime.Misc
                     return (string)constantValue;
                 }
             }
-            processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, "Could not retrieve serialized ATN from grammar."
-                );
+            processingEnv.GetMessager().PrintMessage(Diagnostic.Kind.Error, "Could not retrieve serialized ATN from grammar.");
             return null;
         }
 

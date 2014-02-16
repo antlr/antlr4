@@ -32,8 +32,7 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-    /// <summary>The last node in the ATN for a rule, unless that rule is the start symbol.
-    ///     </summary>
+    /// <summary>The last node in the ATN for a rule, unless that rule is the start symbol.</summary>
     /// <remarks>
     /// The last node in the ATN for a rule, unless that rule is the start symbol.
     /// In that case, there is one transition to EOF. Later, we might encode

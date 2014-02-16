@@ -50,8 +50,7 @@ namespace Antlr4.Runtime.Tree
     /// </remarks>
     public class ParseTreeProperty<V>
     {
-        protected internal IDictionary<IParseTree, V> annotations = new IdentityHashMap<IParseTree
-            , V>();
+        protected internal IDictionary<IParseTree, V> annotations = new IdentityHashMap<IParseTree, V>();
 
         public virtual V Get(IParseTree node)
         {

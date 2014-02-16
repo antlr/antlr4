@@ -92,9 +92,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>true</code>
         /// , this config set represents configurations where the entire
         /// outer context has been consumed by the ATN interpreter. This prevents the
-        /// <see cref="ParserATNSimulator.Closure(ATNConfigSet, ATNConfigSet, bool, bool, PredictionContextCache)
-        ///     ">ParserATNSimulator.Closure(ATNConfigSet, ATNConfigSet, bool, bool, PredictionContextCache)
-        ///     </see>
+        /// <see cref="ParserATNSimulator.Closure(ATNConfigSet, ATNConfigSet, bool, bool, PredictionContextCache)">ParserATNSimulator.Closure(ATNConfigSet, ATNConfigSet, bool, bool, PredictionContextCache)</see>
         /// from pursuing the global FOLLOW when a
         /// rule stop state is reached with an empty prediction context.
         /// <p>
@@ -119,8 +117,7 @@ namespace Antlr4.Runtime.Atn
             this.uniqueAlt = ATN.InvalidAltNumber;
         }
 
-        protected internal ATNConfigSet(Antlr4.Runtime.Atn.ATNConfigSet set, bool @readonly
-            )
+        protected internal ATNConfigSet(Antlr4.Runtime.Atn.ATNConfigSet set, bool @readonly)
         {
             if (@readonly)
             {
@@ -186,8 +183,7 @@ namespace Antlr4.Runtime.Atn
         public void StripHiddenConfigs()
         {
             EnsureWritable();
-            IEnumerator<KeyValuePair<long, ATNConfig>> iterator = mergedConfigs.EntrySet().GetEnumerator
-                ();
+            IEnumerator<KeyValuePair<long, ATNConfig>> iterator = mergedConfigs.EntrySet().GetEnumerator();
             while (iterator.HasNext())
             {
                 if (iterator.Next().Value.IsHidden)
@@ -256,8 +252,7 @@ namespace Antlr4.Runtime.Atn
 
         public virtual Antlr4.Runtime.Atn.ATNConfigSet Clone(bool @readonly)
         {
-            Antlr4.Runtime.Atn.ATNConfigSet copy = new Antlr4.Runtime.Atn.ATNConfigSet(this, 
-                @readonly);
+            Antlr4.Runtime.Atn.ATNConfigSet copy = new Antlr4.Runtime.Atn.ATNConfigSet(this, @readonly);
             if (!@readonly && this.IsReadOnly)
             {
                 Sharpen.Collections.AddAll(copy, this.configs);
@@ -319,8 +314,7 @@ namespace Antlr4.Runtime.Atn
         public virtual bool Add(ATNConfig e, PredictionContextCache contextCache)
         {
             EnsureWritable();
-            System.Diagnostics.Debug.Assert(!outermostConfigSet || !e.ReachesIntoOuterContext
-                );
+            System.Diagnostics.Debug.Assert(!outermostConfigSet || !e.ReachesIntoOuterContext);
             System.Diagnostics.Debug.Assert(!e.IsHidden);
             if (contextCache == null)
             {
@@ -332,10 +326,8 @@ namespace Antlr4.Runtime.Atn
             addKey = (mergedConfig == null);
             if (mergedConfig != null && CanMerge(e, key, mergedConfig))
             {
-                mergedConfig.OuterContextDepth = Math.Max(mergedConfig.OuterContextDepth, e.OuterContextDepth
-                    );
-                PredictionContext joined = PredictionContext.Join(mergedConfig.Context, e.Context
-                    , contextCache);
+                mergedConfig.OuterContextDepth = Math.Max(mergedConfig.OuterContextDepth, e.OuterContextDepth);
+                PredictionContext joined = PredictionContext.Join(mergedConfig.Context, e.Context, contextCache);
                 UpdatePropertiesForMergedConfig(e);
                 if (mergedConfig.Context == joined)
                 {
@@ -349,10 +341,8 @@ namespace Antlr4.Runtime.Atn
                 ATNConfig unmergedConfig = unmerged[i];
                 if (CanMerge(e, key, unmergedConfig))
                 {
-                    unmergedConfig.OuterContextDepth = Math.Max(unmergedConfig.OuterContextDepth, e.OuterContextDepth
-                        );
-                    PredictionContext joined = PredictionContext.Join(unmergedConfig.Context, e.Context
-                        , contextCache);
+                    unmergedConfig.OuterContextDepth = Math.Max(unmergedConfig.OuterContextDepth, e.OuterContextDepth);
+                    PredictionContext joined = PredictionContext.Join(unmergedConfig.Context, e.Context, contextCache);
                     UpdatePropertiesForMergedConfig(e);
                     if (unmergedConfig.Context == joined)
                     {
@@ -405,8 +395,7 @@ namespace Antlr4.Runtime.Atn
             System.Diagnostics.Debug.Assert(!outermostConfigSet || !dipsIntoOuterContext);
         }
 
-        protected internal virtual bool CanMerge(ATNConfig left, long leftKey, ATNConfig 
-            right)
+        protected internal virtual bool CanMerge(ATNConfig left, long leftKey, ATNConfig right)
         {
             if (left.State.stateNumber != right.State.stateNumber)
             {
@@ -454,8 +443,7 @@ namespace Antlr4.Runtime.Atn
             return AddAll(c, null);
         }
 
-        public virtual bool AddAll<_T0>(ICollection<_T0> c, PredictionContextCache contextCache
-            )
+        public virtual bool AddAll<_T0>(ICollection<_T0> c, PredictionContextCache contextCache)
             where _T0 : ATNConfig
         {
             EnsureWritable();
@@ -502,8 +490,7 @@ namespace Antlr4.Runtime.Atn
                 return false;
             }
             Antlr4.Runtime.Atn.ATNConfigSet other = (Antlr4.Runtime.Atn.ATNConfigSet)obj;
-            return this.outermostConfigSet == other.outermostConfigSet && Utils.Equals(conflictingAlts
-                , other.conflictingAlts) && configs.Equals(other.configs);
+            return this.outermostConfigSet == other.outermostConfigSet && Utils.Equals(conflictingAlts, other.conflictingAlts) && configs.Equals(other.configs);
         }
 
         public override int GetHashCode()
@@ -581,8 +568,7 @@ namespace Antlr4.Runtime.Atn
                     }
                     else
                     {
-                        return string.CompareOrdinal(o1.SemanticContext.ToString(), o2.SemanticContext.ToString
-                            ());
+                        return string.CompareOrdinal(o1.SemanticContext.ToString(), o2.SemanticContext.ToString());
                     }
                 }
             }

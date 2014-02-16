@@ -59,8 +59,7 @@ namespace Antlr4.Runtime
     /// </remarks>
     public class ParserRuleContext : RuleContext
     {
-        private static readonly Antlr4.Runtime.ParserRuleContext Empty = new Antlr4.Runtime.ParserRuleContext
-            ();
+        private static readonly Antlr4.Runtime.ParserRuleContext Empty = new Antlr4.Runtime.ParserRuleContext();
 
         /// <summary>
         /// If we are debugging or building a parse tree for a visitor,
@@ -152,8 +151,7 @@ namespace Antlr4.Runtime
             this.stop = ctx.stop;
         }
 
-        public ParserRuleContext(Antlr4.Runtime.ParserRuleContext parent, int invokingStateNumber
-            )
+        public ParserRuleContext(Antlr4.Runtime.ParserRuleContext parent, int invokingStateNumber)
             : base(parent, invokingStateNumber)
         {
         }
@@ -387,14 +385,12 @@ namespace Antlr4.Runtime
             }
         }
 
-        /// <summary>Used for rule context info debugging during parse-time, not so much for ATN debugging
-        ///     </summary>
+        /// <summary>Used for rule context info debugging during parse-time, not so much for ATN debugging</summary>
         public virtual string ToInfoString(Parser recognizer)
         {
             IList<string> rules = recognizer.GetRuleInvocationStack(this);
             Sharpen.Collections.Reverse(rules);
-            return "ParserRuleContext" + rules + "{" + "start=" + start + ", stop=" + stop + 
-                '}';
+            return "ParserRuleContext" + rules + "{" + "start=" + start + ", stop=" + stop + '}';
         }
     }
 }

@@ -36,8 +36,7 @@ namespace Antlr4.Runtime
 {
     public class CommonTokenFactory : ITokenFactory
     {
-        public static readonly ITokenFactory Default = new Antlr4.Runtime.CommonTokenFactory
-            ();
+        public static readonly ITokenFactory Default = new Antlr4.Runtime.CommonTokenFactory();
 
         /// <summary>Copy text for token out of input char stream.</summary>
         /// <remarks>
@@ -65,8 +64,7 @@ namespace Antlr4.Runtime
         {
         }
 
-        public virtual CommonToken Create<_T0>(Tuple<_T0> source, int type, string text, 
-            int channel, int start, int stop, int line, int charPositionInLine)
+        public virtual CommonToken Create<_T0>(Tuple<_T0> source, int type, string text, int channel, int start, int stop, int line, int charPositionInLine)
             where _T0 : ITokenSource
         {
             CommonToken t = new CommonToken(source, type, channel, start, stop);

@@ -43,13 +43,11 @@ namespace Antlr4.Runtime
         /// <summary>Matching attempted at what input index?</summary>
         private readonly int startIndex;
 
-        /// <summary>Which configurations did we try at input.index() that couldn't match input.LA(1)?
-        ///     </summary>
+        /// <summary>Which configurations did we try at input.index() that couldn't match input.LA(1)?</summary>
         [Nullable]
         private readonly ATNConfigSet deadEndConfigs;
 
-        public LexerNoViableAltException(Lexer lexer, ICharStream input, int startIndex, 
-            ATNConfigSet deadEndConfigs)
+        public LexerNoViableAltException(Lexer lexer, ICharStream input, int startIndex, ATNConfigSet deadEndConfigs)
             : base(lexer, input)
         {
             this.startIndex = startIndex;
@@ -83,8 +81,7 @@ namespace Antlr4.Runtime
                 symbol = ((ICharStream)InputStream).GetText(Interval.Of(startIndex, startIndex));
                 symbol = Utils.EscapeWhitespace(symbol, false);
             }
-            return string.Format(CultureInfo.CurrentCulture, "%s('%s')", typeof(Antlr4.Runtime.LexerNoViableAltException
-                ).Name, symbol);
+            return string.Format(CultureInfo.CurrentCulture, "%s('%s')", typeof(Antlr4.Runtime.LexerNoViableAltException).Name, symbol);
         }
     }
 }

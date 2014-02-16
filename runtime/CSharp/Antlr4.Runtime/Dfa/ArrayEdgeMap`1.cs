@@ -135,8 +135,7 @@ namespace Antlr4.Runtime.Dfa
                 {
                     SingletonEdgeMap<T> other = (SingletonEdgeMap<T>)m;
                     System.Diagnostics.Debug.Assert(!other.IsEmpty);
-                    return ((Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)Put(other.GetKey(), other.GetValue())
-                        );
+                    return ((Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)Put(other.GetKey(), other.GetValue()));
                 }
                 else
                 {
@@ -154,8 +153,7 @@ namespace Antlr4.Runtime.Dfa
                     }
                     else
                     {
-                        throw new NotSupportedException(string.Format("EdgeMap of type %s is supported yet."
-                            , m.GetType().FullName));
+                        throw new NotSupportedException(string.Format("EdgeMap of type %s is supported yet.", m.GetType().FullName));
                     }
                 }
             }

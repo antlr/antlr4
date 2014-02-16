@@ -149,8 +149,7 @@ namespace Antlr4.Runtime
         /// following code, including potential exceptions from the calls to
         /// <see cref="IIntStream.Size()">IIntStream.Size()</see>
         /// and
-        /// <see cref="GetText(Antlr4.Runtime.Misc.Interval)">GetText(Antlr4.Runtime.Misc.Interval)
-        ///     </see>
+        /// <see cref="GetText(Antlr4.Runtime.Misc.Interval)">GetText(Antlr4.Runtime.Misc.Interval)</see>
         /// , but may be
         /// optimized by the specific implementation.
         /// <pre>
@@ -170,8 +169,7 @@ namespace Antlr4.Runtime
         /// Return the text of all tokens in the source interval of the specified
         /// context. This method behaves like the following code, including potential
         /// exceptions from the call to
-        /// <see cref="GetText(Antlr4.Runtime.Misc.Interval)">GetText(Antlr4.Runtime.Misc.Interval)
-        ///     </see>
+        /// <see cref="GetText(Antlr4.Runtime.Misc.Interval)">GetText(Antlr4.Runtime.Misc.Interval)</see>
         /// , but may be
         /// optimized by the specific implementation.
         /// </p>

@@ -60,10 +60,8 @@ namespace Antlr4.Runtime
     /// <seealso cref="BufferedTokenStream">BufferedTokenStream</seealso>
     public class CommonTokenStream : BufferedTokenStream
     {
-        /// <summary>Skip tokens on any channel but this one; this is how we skip whitespace...
-        ///     </summary>
-        /// <remarks>Skip tokens on any channel but this one; this is how we skip whitespace...
-        ///     </remarks>
+        /// <summary>Skip tokens on any channel but this one; this is how we skip whitespace...</summary>
+        /// <remarks>Skip tokens on any channel but this one; this is how we skip whitespace...</remarks>
         protected internal int channel = TokenConstants.DefaultChannel;
 
         public CommonTokenStream(ITokenSource tokenSource)

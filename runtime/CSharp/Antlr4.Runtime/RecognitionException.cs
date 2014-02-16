@@ -48,8 +48,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// The
-        /// <see cref="Recognizer{Symbol, ATNInterpreter}">Recognizer&lt;Symbol, ATNInterpreter&gt;
-        ///     </see>
+        /// <see cref="Recognizer{Symbol, ATNInterpreter}">Recognizer&lt;Symbol, ATNInterpreter&gt;</see>
         /// where this exception originated.
         /// </summary>
         [Nullable]
@@ -80,8 +79,7 @@ namespace Antlr4.Runtime
             this.ctx = null;
         }
 
-        public RecognitionException(Antlr4.Runtime.Recognizer<IToken, object> recognizer, 
-            IIntStream input, ParserRuleContext ctx)
+        public RecognitionException(Antlr4.Runtime.Recognizer<IToken, object> recognizer, IIntStream input, ParserRuleContext ctx)
         {
             this.recognizer = recognizer;
             this.input = input;
@@ -92,8 +90,7 @@ namespace Antlr4.Runtime
             }
         }
 
-        public RecognitionException(string message, Antlr4.Runtime.Recognizer<IToken, object
-            > recognizer, IIntStream input, ParserRuleContext ctx)
+        public RecognitionException(string message, Antlr4.Runtime.Recognizer<IToken, object> recognizer, IIntStream input, ParserRuleContext ctx)
             : base(message)
         {
             this.recognizer = recognizer;
@@ -231,8 +228,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Gets the
-        /// <see cref="Recognizer{Symbol, ATNInterpreter}">Recognizer&lt;Symbol, ATNInterpreter&gt;
-        ///     </see>
+        /// <see cref="Recognizer{Symbol, ATNInterpreter}">Recognizer&lt;Symbol, ATNInterpreter&gt;</see>
         /// where this exception occurred.
         /// <p/>
         /// If the recognizer is not available, this method returns

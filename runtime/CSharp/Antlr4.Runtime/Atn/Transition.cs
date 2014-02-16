@@ -51,9 +51,7 @@ namespace Antlr4.Runtime.Atn
     /// </remarks>
     public abstract class Transition
     {
-        public static readonly IList<string> serializationNames = Sharpen.Collections.UnmodifiableList
-            (Arrays.AsList("INVALID", "EPSILON", "RANGE", "RULE", "PREDICATE", "ATOM", "ACTION"
-            , "SET", "NOT_SET", "WILDCARD", "PRECEDENCE"));
+        public static readonly IList<string> serializationNames = Sharpen.Collections.UnmodifiableList(Arrays.AsList("INVALID", "EPSILON", "RANGE", "RULE", "PREDICATE", "ATOM", "ACTION", "SET", "NOT_SET", "WILDCARD", "PRECEDENCE"));
 
         /// <summary>The target of this transition.</summary>
         /// <remarks>The target of this transition.</remarks>

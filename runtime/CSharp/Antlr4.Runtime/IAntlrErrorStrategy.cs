@@ -48,8 +48,7 @@ namespace Antlr4.Runtime
     /// <li>A predicate evaluated to false</li>
     /// </ul>
     /// Implementations of this interface report syntax errors by calling
-    /// <see cref="Parser.NotifyErrorListeners(string)">Parser.NotifyErrorListeners(string)
-    ///     </see>
+    /// <see cref="Parser.NotifyErrorListeners(string)">Parser.NotifyErrorListeners(string)</see>
     /// .
     /// <p/>
     /// TODO: what to do about lexers
@@ -78,8 +77,7 @@ namespace Antlr4.Runtime
         /// Note that the calling code will not report an error if this method
         /// returns successfully. The error strategy implementation is responsible
         /// for calling
-        /// <see cref="Parser.NotifyErrorListeners(string)">Parser.NotifyErrorListeners(string)
-        ///     </see>
+        /// <see cref="Parser.NotifyErrorListeners(string)">Parser.NotifyErrorListeners(string)</see>
         /// as appropriate.
         /// </summary>
         /// <param name="recognizer">the parser instance</param>
@@ -96,13 +94,11 @@ namespace Antlr4.Runtime
         /// <code>e</code>
         /// . This method is
         /// called after
-        /// <see cref="ReportError(Parser, RecognitionException)">ReportError(Parser, RecognitionException)
-        ///     </see>
+        /// <see cref="ReportError(Parser, RecognitionException)">ReportError(Parser, RecognitionException)</see>
         /// by the default exception handler
         /// generated for a rule method.
         /// </summary>
-        /// <seealso cref="ReportError(Parser, RecognitionException)">ReportError(Parser, RecognitionException)
-        ///     </seealso>
+        /// <seealso cref="ReportError(Parser, RecognitionException)">ReportError(Parser, RecognitionException)</seealso>
         /// <param name="recognizer">the parser instance</param>
         /// <param name="e">the recognition exception to recover from</param>
         /// <exception cref="RecognitionException">
@@ -131,8 +127,7 @@ namespace Antlr4.Runtime
         /// <see cref="DefaultErrorStrategy.Sync(Parser)">DefaultErrorStrategy.Sync(Parser)</see>
         /// .
         /// </summary>
-        /// <seealso cref="DefaultErrorStrategy.Sync(Parser)">DefaultErrorStrategy.Sync(Parser)
-        ///     </seealso>
+        /// <seealso cref="DefaultErrorStrategy.Sync(Parser)">DefaultErrorStrategy.Sync(Parser)</seealso>
         /// <param name="recognizer">the parser instance</param>
         /// <exception cref="RecognitionException">
         /// if an error is detected by the error
@@ -150,11 +145,9 @@ namespace Antlr4.Runtime
         /// <see cref="Parser.Consume()">Parser.Consume()</see>
         /// adds
         /// symbols to the parse tree by calling
-        /// <see cref="ParserRuleContext.AddErrorNode(IToken)">ParserRuleContext.AddErrorNode(IToken)
-        ///     </see>
+        /// <see cref="ParserRuleContext.AddErrorNode(IToken)">ParserRuleContext.AddErrorNode(IToken)</see>
         /// instead of
-        /// <see cref="ParserRuleContext.AddChild(IToken)">ParserRuleContext.AddChild(IToken)
-        ///     </see>
+        /// <see cref="ParserRuleContext.AddChild(IToken)">ParserRuleContext.AddChild(IToken)</see>
         /// .
         /// </summary>
         /// <param name="recognizer">the parser instance</param>

@@ -36,8 +36,7 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-    /// <summary>Buffer all input tokens but do on-demand fetching of new tokens from lexer.
-    ///     </summary>
+    /// <summary>Buffer all input tokens but do on-demand fetching of new tokens from lexer.</summary>
     /// <remarks>
     /// Buffer all input tokens but do on-demand fetching of new tokens from lexer.
     /// Useful when the parser or lexer has to set context/mode info before proper
@@ -238,8 +237,7 @@ namespace Antlr4.Runtime
         {
             if (i < 0 || i >= tokens.Count)
             {
-                throw new ArgumentOutOfRangeException("token index " + i + " out of range 0.." + 
-                    (tokens.Count - 1));
+                throw new ArgumentOutOfRangeException("token index " + i + " out of range 0.." + (tokens.Count - 1));
             }
             return tokens[i];
         }
@@ -382,8 +380,7 @@ namespace Antlr4.Runtime
             LazyInit();
             if (start < 0 || stop >= tokens.Count || stop < 0 || start >= tokens.Count)
             {
-                throw new ArgumentOutOfRangeException("start " + start + " or stop " + stop + " not in 0.."
-                     + (tokens.Count - 1));
+                throw new ArgumentOutOfRangeException("start " + start + " or stop " + stop + " not in 0.." + (tokens.Count - 1));
             }
             if (start > stop)
             {
@@ -448,8 +445,7 @@ namespace Antlr4.Runtime
             return i;
         }
 
-        /// <summary>Given a starting index, return the index of the previous token on channel.
-        ///     </summary>
+        /// <summary>Given a starting index, return the index of the previous token on channel.</summary>
         /// <remarks>
         /// Given a starting index, return the index of the previous token on channel.
         /// Return
@@ -490,8 +486,7 @@ namespace Antlr4.Runtime
             LazyInit();
             if (tokenIndex < 0 || tokenIndex >= tokens.Count)
             {
-                throw new ArgumentOutOfRangeException(tokenIndex + " not in 0.." + (tokens.Count 
-                    - 1));
+                throw new ArgumentOutOfRangeException(tokenIndex + " not in 0.." + (tokens.Count - 1));
             }
             int nextOnChannel = NextTokenOnChannel(tokenIndex + 1, Lexer.DefaultTokenChannel);
             int to;
@@ -535,11 +530,9 @@ namespace Antlr4.Runtime
             LazyInit();
             if (tokenIndex < 0 || tokenIndex >= tokens.Count)
             {
-                throw new ArgumentOutOfRangeException(tokenIndex + " not in 0.." + (tokens.Count 
-                    - 1));
+                throw new ArgumentOutOfRangeException(tokenIndex + " not in 0.." + (tokens.Count - 1));
             }
-            int prevOnChannel = PreviousTokenOnChannel(tokenIndex - 1, Lexer.DefaultTokenChannel
-                );
+            int prevOnChannel = PreviousTokenOnChannel(tokenIndex - 1, Lexer.DefaultTokenChannel);
             if (prevOnChannel == tokenIndex - 1)
             {
                 return null;
@@ -561,8 +554,7 @@ namespace Antlr4.Runtime
             return GetHiddenTokensToLeft(tokenIndex, -1);
         }
 
-        protected internal virtual IList<IToken> FilterForChannel(int from, int to, int channel
-            )
+        protected internal virtual IList<IToken> FilterForChannel(int from, int to, int channel)
         {
             IList<IToken> hidden = new List<IToken>();
             for (int i = from; i <= to; i++)

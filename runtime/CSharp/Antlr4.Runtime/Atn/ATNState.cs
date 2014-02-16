@@ -95,10 +95,7 @@ namespace Antlr4.Runtime.Atn
     {
         public const int InitialNumTransitions = 4;
 
-        public static readonly IList<string> serializationNames = Sharpen.Collections.UnmodifiableList
-            (Arrays.AsList("INVALID", "BASIC", "RULE_START", "BLOCK_START", "PLUS_BLOCK_START"
-            , "STAR_BLOCK_START", "TOKEN_START", "RULE_STOP", "BLOCK_END", "STAR_LOOP_BACK"
-            , "STAR_LOOP_ENTRY", "PLUS_LOOP_BACK", "LOOP_END"));
+        public static readonly IList<string> serializationNames = Sharpen.Collections.UnmodifiableList(Arrays.AsList("INVALID", "BASIC", "RULE_START", "BLOCK_START", "PLUS_BLOCK_START", "STAR_BLOCK_START", "TOKEN_START", "RULE_STOP", "BLOCK_END", "STAR_LOOP_BACK", "STAR_LOOP_ENTRY", "PLUS_LOOP_BACK", "LOOP_END"));
 
         public const int InvalidStateNumber = -1;
 
@@ -113,8 +110,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>Track the transitions emanating from this ATN state.</summary>
         /// <remarks>Track the transitions emanating from this ATN state.</remarks>
-        protected internal readonly IList<Antlr4.Runtime.Atn.Transition> transitions = new 
-            List<Antlr4.Runtime.Atn.Transition>(InitialNumTransitions);
+        protected internal readonly IList<Antlr4.Runtime.Atn.Transition> transitions = new List<Antlr4.Runtime.Atn.Transition>(InitialNumTransitions);
 
         protected internal IList<Antlr4.Runtime.Atn.Transition> optimizedTransitions;
 
@@ -182,8 +178,7 @@ namespace Antlr4.Runtime.Atn
 
         public virtual Antlr4.Runtime.Atn.Transition[] GetTransitions()
         {
-            return Sharpen.Collections.ToArray(transitions, new Antlr4.Runtime.Atn.Transition
-                [transitions.Count]);
+            return Sharpen.Collections.ToArray(transitions, new Antlr4.Runtime.Atn.Transition[transitions.Count]);
         }
 
         public virtual int NumberOfTransitions
@@ -209,8 +204,7 @@ namespace Antlr4.Runtime.Atn
             {
                 if (epsilonOnlyTransitions != e.IsEpsilon)
                 {
-                    System.Console.Error.Format(CultureInfo.CurrentCulture, "ATN state %d has both epsilon and non-epsilon transitions.\n"
-                        , stateNumber);
+                    System.Console.Error.Format(CultureInfo.CurrentCulture, "ATN state %d has both epsilon and non-epsilon transitions.\n", stateNumber);
                     epsilonOnlyTransitions = false;
                 }
             }
@@ -280,8 +274,7 @@ namespace Antlr4.Runtime.Atn
             optimizedTransitions.AddItem(e);
         }
 
-        public virtual void SetOptimizedTransition(int i, Antlr4.Runtime.Atn.Transition e
-            )
+        public virtual void SetOptimizedTransition(int i, Antlr4.Runtime.Atn.Transition e)
         {
             if (!IsOptimized)
             {

@@ -43,8 +43,7 @@ namespace Antlr4.Runtime.Atn
         internal SingletonPredictionContext(PredictionContext parent, int returnState)
             : base(CalculateHashCode(parent, returnState))
         {
-            System.Diagnostics.Debug.Assert(returnState != EmptyFullStateKey && returnState !=
-                 EmptyLocalStateKey);
+            System.Diagnostics.Debug.Assert(returnState != EmptyFullStateKey && returnState != EmptyLocalStateKey);
             this.parent = parent;
             this.returnState = returnState;
         }
@@ -90,11 +89,9 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        public override PredictionContext AppendContext(PredictionContext suffix, PredictionContextCache
-             contextCache)
+        public override PredictionContext AppendContext(PredictionContext suffix, PredictionContextCache contextCache)
         {
-            return contextCache.GetChild(parent.AppendContext(suffix, contextCache), returnState
-                );
+            return contextCache.GetChild(parent.AppendContext(suffix, contextCache), returnState);
         }
 
         protected internal override PredictionContext AddEmptyContext()
@@ -122,8 +119,7 @@ namespace Antlr4.Runtime.Atn
                     return false;
                 }
             }
-            Antlr4.Runtime.Atn.SingletonPredictionContext other = (Antlr4.Runtime.Atn.SingletonPredictionContext
-                )o;
+            Antlr4.Runtime.Atn.SingletonPredictionContext other = (Antlr4.Runtime.Atn.SingletonPredictionContext)o;
             if (this.GetHashCode() != other.GetHashCode())
             {
                 return false;

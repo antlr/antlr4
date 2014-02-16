@@ -134,8 +134,7 @@ namespace Antlr4.Runtime.Atn
                     return true;
                 }
                 SemanticContext.Predicate p = (SemanticContext.Predicate)obj;
-                return this.ruleIndex == p.ruleIndex && this.predIndex == p.predIndex && this.isCtxDependent
-                     == p.isCtxDependent;
+                return this.ruleIndex == p.ruleIndex && this.predIndex == p.predIndex && this.isCtxDependent == p.isCtxDependent;
             }
 
             public override string ToString()
@@ -144,8 +143,7 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        public class PrecedencePredicate : SemanticContext, IComparable<SemanticContext.PrecedencePredicate
-            >
+        public class PrecedencePredicate : SemanticContext, IComparable<SemanticContext.PrecedencePredicate>
         {
             public readonly int precedence;
 
@@ -186,8 +184,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     return true;
                 }
-                SemanticContext.PrecedencePredicate other = (SemanticContext.PrecedencePredicate)
-                    obj;
+                SemanticContext.PrecedencePredicate other = (SemanticContext.PrecedencePredicate)obj;
                 return this.precedence == other.precedence;
             }
 
@@ -207,8 +204,7 @@ namespace Antlr4.Runtime.Atn
                 HashSet<SemanticContext> operands = new HashSet<SemanticContext>();
                 if (a is SemanticContext.AND)
                 {
-                    Sharpen.Collections.AddAll(operands, Arrays.AsList(((SemanticContext.AND)a).opnds
-                        ));
+                    Sharpen.Collections.AddAll(operands, Arrays.AsList(((SemanticContext.AND)a).opnds));
                 }
                 else
                 {
@@ -216,24 +212,20 @@ namespace Antlr4.Runtime.Atn
                 }
                 if (b is SemanticContext.AND)
                 {
-                    Sharpen.Collections.AddAll(operands, Arrays.AsList(((SemanticContext.AND)b).opnds
-                        ));
+                    Sharpen.Collections.AddAll(operands, Arrays.AsList(((SemanticContext.AND)b).opnds));
                 }
                 else
                 {
                     operands.AddItem(b);
                 }
-                IList<SemanticContext.PrecedencePredicate> precedencePredicates = FilterPrecedencePredicates
-                    (operands);
+                IList<SemanticContext.PrecedencePredicate> precedencePredicates = FilterPrecedencePredicates(operands);
                 if (!precedencePredicates.IsEmpty())
                 {
                     // interested in the transition with the lowest precedence
-                    SemanticContext.PrecedencePredicate reduced = Sharpen.Collections.Min(precedencePredicates
-                        );
+                    SemanticContext.PrecedencePredicate reduced = Sharpen.Collections.Min(precedencePredicates);
                     operands.AddItem(reduced);
                 }
-                opnds = Sharpen.Collections.ToArray(operands, new SemanticContext[operands.Count]
-                    );
+                opnds = Sharpen.Collections.ToArray(operands, new SemanticContext[operands.Count]);
             }
 
             public override bool Equals(object obj)
@@ -283,8 +275,7 @@ namespace Antlr4.Runtime.Atn
                 HashSet<SemanticContext> operands = new HashSet<SemanticContext>();
                 if (a is SemanticContext.OR)
                 {
-                    Sharpen.Collections.AddAll(operands, Arrays.AsList(((SemanticContext.OR)a).opnds)
-                        );
+                    Sharpen.Collections.AddAll(operands, Arrays.AsList(((SemanticContext.OR)a).opnds));
                 }
                 else
                 {
@@ -292,24 +283,20 @@ namespace Antlr4.Runtime.Atn
                 }
                 if (b is SemanticContext.OR)
                 {
-                    Sharpen.Collections.AddAll(operands, Arrays.AsList(((SemanticContext.OR)b).opnds)
-                        );
+                    Sharpen.Collections.AddAll(operands, Arrays.AsList(((SemanticContext.OR)b).opnds));
                 }
                 else
                 {
                     operands.AddItem(b);
                 }
-                IList<SemanticContext.PrecedencePredicate> precedencePredicates = FilterPrecedencePredicates
-                    (operands);
+                IList<SemanticContext.PrecedencePredicate> precedencePredicates = FilterPrecedencePredicates(operands);
                 if (!precedencePredicates.IsEmpty())
                 {
                     // interested in the transition with the highest precedence
-                    SemanticContext.PrecedencePredicate reduced = Sharpen.Collections.Max(precedencePredicates
-                        );
+                    SemanticContext.PrecedencePredicate reduced = Sharpen.Collections.Max(precedencePredicates);
                     operands.AddItem(reduced);
                 }
-                this.opnds = Sharpen.Collections.ToArray(operands, new SemanticContext[operands.Count
-                    ]);
+                this.opnds = Sharpen.Collections.ToArray(operands, new SemanticContext[operands.Count]);
             }
 
             public override bool Equals(object obj)
@@ -367,8 +354,7 @@ namespace Antlr4.Runtime.Atn
             return result;
         }
 
-        /// <seealso cref="ParserATNSimulator.GetPredsForAmbigAlts(Sharpen.BitSet, ATNConfigSet, int)
-        ///     ">ParserATNSimulator.GetPredsForAmbigAlts(Sharpen.BitSet, ATNConfigSet, int)</seealso>
+        /// <seealso cref="ParserATNSimulator.GetPredsForAmbigAlts(Sharpen.BitSet, ATNConfigSet, int)">ParserATNSimulator.GetPredsForAmbigAlts(Sharpen.BitSet, ATNConfigSet, int)</seealso>
         public static SemanticContext Or(SemanticContext a, SemanticContext b)
         {
             if (a == null)
@@ -391,13 +377,11 @@ namespace Antlr4.Runtime.Atn
             return result;
         }
 
-        private static IList<SemanticContext.PrecedencePredicate> FilterPrecedencePredicates
-            <_T0>(ICollection<_T0> collection)
+        private static IList<SemanticContext.PrecedencePredicate> FilterPrecedencePredicates<_T0>(ICollection<_T0> collection)
             where _T0 : SemanticContext
         {
             List<SemanticContext.PrecedencePredicate> result = null;
-            for (IEnumerator<SemanticContext> iterator = collection.GetEnumerator(); iterator
-                .HasNext(); )
+            for (IEnumerator<SemanticContext> iterator = collection.GetEnumerator(); iterator.HasNext(); )
             {
                 SemanticContext context = iterator.Next();
                 if (context is SemanticContext.PrecedencePredicate)

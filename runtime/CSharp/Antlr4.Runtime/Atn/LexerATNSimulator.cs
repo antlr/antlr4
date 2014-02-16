@@ -107,11 +107,9 @@ namespace Antlr4.Runtime.Atn
 
         protected internal int mode = Lexer.DefaultMode;
 
-        /// <summary>Used during DFA/ATN exec to record the most recent accept configuration info
-        ///     </summary>
+        /// <summary>Used during DFA/ATN exec to record the most recent accept configuration info</summary>
         [NotNull]
-        protected internal readonly LexerATNSimulator.SimState prevAccept = new LexerATNSimulator.SimState
-            ();
+        protected internal readonly LexerATNSimulator.SimState prevAccept = new LexerATNSimulator.SimState();
 
         public static int match_calls = 0;
 
@@ -268,8 +266,7 @@ namespace Antlr4.Runtime.Atn
             DFAState target = s.GetTarget(t);
             if (debug && target != null)
             {
-                System.Console.Out.WriteLine("reuse state " + s.stateNumber + " edge to " + target
-                    .stateNumber);
+                System.Console.Out.WriteLine("reuse state " + s.stateNumber + " edge to " + target.stateNumber);
             }
             return target;
         }
@@ -296,8 +293,7 @@ namespace Antlr4.Runtime.Atn
         /// .
         /// </returns>
         [NotNull]
-        protected internal virtual DFAState ComputeTargetState(ICharStream input, DFAState
-             s, int t)
+        protected internal virtual DFAState ComputeTargetState(ICharStream input, DFAState s, int t)
         {
             ATNConfigSet reach = new OrderedATNConfigSet();
             // if we don't find an existing DFA state
@@ -316,15 +312,13 @@ namespace Antlr4.Runtime.Atn
             return AddDFAEdge(s, t, reach);
         }
 
-        protected internal virtual int FailOrAccept(LexerATNSimulator.SimState prevAccept
-            , ICharStream input, ATNConfigSet reach, int t)
+        protected internal virtual int FailOrAccept(LexerATNSimulator.SimState prevAccept, ICharStream input, ATNConfigSet reach, int t)
         {
             if (prevAccept.dfaState != null)
             {
                 int ruleIndex = prevAccept.dfaState.lexerRuleIndex;
                 int actionIndex = prevAccept.dfaState.lexerActionIndex;
-                Accept(input, ruleIndex, actionIndex, prevAccept.index, prevAccept.line, prevAccept
-                    .charPos);
+                Accept(input, ruleIndex, actionIndex, prevAccept.index, prevAccept.line, prevAccept.charPos);
                 return prevAccept.dfaState.prediction;
             }
             else
@@ -347,8 +341,7 @@ namespace Antlr4.Runtime.Atn
         /// is a return
         /// parameter.
         /// </summary>
-        protected internal virtual void GetReachableConfigSet(ICharStream input, ATNConfigSet
-             closure, ATNConfigSet reach, int t)
+        protected internal virtual void GetReachableConfigSet(ICharStream input, ATNConfigSet closure, ATNConfigSet reach, int t)
         {
             // this is used to skip processing for configs which have a lower priority
             // than a config that already reached an accept state for the same rule
@@ -379,8 +372,7 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        protected internal virtual void Accept(ICharStream input, int ruleIndex, int actionIndex
-            , int index, int line, int charPos)
+        protected internal virtual void Accept(ICharStream input, int ruleIndex, int actionIndex, int index, int line, int charPos)
         {
             if (actionIndex >= 0 && recog != null)
             {
@@ -407,8 +399,7 @@ namespace Antlr4.Runtime.Atn
         }
 
         [NotNull]
-        protected internal virtual ATNConfigSet ComputeStartState(ICharStream input, ATNState
-             p)
+        protected internal virtual ATNConfigSet ComputeStartState(ICharStream input, ATNState p)
         {
             PredictionContext initialContext = PredictionContext.EmptyFull;
             ATNConfigSet configs = new OrderedATNConfigSet();
@@ -442,8 +433,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>false</code>
         /// .
         /// </returns>
-        protected internal virtual bool Closure(ICharStream input, ATNConfig config, ATNConfigSet
-             configs, bool speculative)
+        protected internal virtual bool Closure(ICharStream input, ATNConfig config, ATNConfigSet configs, bool speculative)
         {
             if (config.State is RuleStopState)
             {
@@ -502,8 +492,7 @@ namespace Antlr4.Runtime.Atn
 
         // side-effect: can alter configs.hasSemanticContext
         [Nullable]
-        protected internal virtual ATNConfig GetEpsilonTarget(ICharStream input, ATNConfig
-             config, Transition t, ATNConfigSet configs, bool speculative)
+        protected internal virtual ATNConfig GetEpsilonTarget(ICharStream input, ATNConfig config, Transition t, ATNConfigSet configs, bool speculative)
         {
             ATNConfig c;
             switch (t.TransitionType)
@@ -517,8 +506,7 @@ namespace Antlr4.Runtime.Atn
                     }
                     else
                     {
-                        PredictionContext newContext = config.Context.GetChild(ruleTransition.followState
-                            .stateNumber);
+                        PredictionContext newContext = config.Context.GetChild(ruleTransition.followState.stateNumber);
                         c = config.Transform(t.target, newContext);
                     }
                     break;
@@ -526,8 +514,7 @@ namespace Antlr4.Runtime.Atn
 
                 case TransitionType.Precedence:
                 {
-                    throw new NotSupportedException("Precedence predicates are not supported in lexers."
-                        );
+                    throw new NotSupportedException("Precedence predicates are not supported in lexers.");
                 }
 
                 case TransitionType.Predicate:
@@ -576,11 +563,9 @@ namespace Antlr4.Runtime.Atn
         /// is
         /// <code>true</code>
         /// , this method was called before
-        /// <see cref="Consume(Antlr4.Runtime.ICharStream)">Consume(Antlr4.Runtime.ICharStream)
-        ///     </see>
+        /// <see cref="Consume(Antlr4.Runtime.ICharStream)">Consume(Antlr4.Runtime.ICharStream)</see>
         /// for the matched character. This method should call
-        /// <see cref="Consume(Antlr4.Runtime.ICharStream)">Consume(Antlr4.Runtime.ICharStream)
-        ///     </see>
+        /// <see cref="Consume(Antlr4.Runtime.ICharStream)">Consume(Antlr4.Runtime.ICharStream)</see>
         /// before evaluating the predicate to ensure position
         /// sensitive values, including
         /// <see cref="Antlr4.Runtime.Lexer.Text()">Antlr4.Runtime.Lexer.Text()</see>
@@ -595,8 +580,7 @@ namespace Antlr4.Runtime.Atn
         /// and the simulator
         /// to the original state before returning (i.e. undo the actions made by the
         /// call to
-        /// <see cref="Consume(Antlr4.Runtime.ICharStream)">Consume(Antlr4.Runtime.ICharStream)
-        ///     </see>
+        /// <see cref="Consume(Antlr4.Runtime.ICharStream)">Consume(Antlr4.Runtime.ICharStream)</see>
         /// .
         /// </remarks>
         /// <param name="input">The input stream.</param>
@@ -617,8 +601,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>true</code>
         /// .
         /// </returns>
-        protected internal virtual bool EvaluatePredicate(ICharStream input, int ruleIndex
-            , int predIndex, bool speculative)
+        protected internal virtual bool EvaluatePredicate(ICharStream input, int ruleIndex, int predIndex, bool speculative)
         {
             // assume true if no recognizer was provided
             if (recog == null)
@@ -647,8 +630,7 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        protected internal virtual void CaptureSimState(LexerATNSimulator.SimState settings
-            , ICharStream input, DFAState dfaState)
+        protected internal virtual void CaptureSimState(LexerATNSimulator.SimState settings, ICharStream input, DFAState dfaState)
         {
             settings.index = input.Index;
             settings.line = line;
@@ -657,8 +639,7 @@ namespace Antlr4.Runtime.Atn
         }
 
         [NotNull]
-        protected internal virtual DFAState AddDFAEdge(DFAState from, int t, ATNConfigSet
-             q)
+        protected internal virtual DFAState AddDFAEdge(DFAState from, int t, ATNConfigSet q)
         {
             bool suppressEdge = q.HasSemanticContext;
             if (suppressEdge)

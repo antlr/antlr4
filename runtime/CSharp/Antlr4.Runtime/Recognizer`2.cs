@@ -40,8 +40,7 @@ namespace Antlr4.Runtime
     {
         public const int Eof = -1;
 
-        private sealed class _CopyOnWriteArrayList_49 : CopyOnWriteArrayList<IAntlrErrorListener
-            <Symbol>>
+        private sealed class _CopyOnWriteArrayList_49 : CopyOnWriteArrayList<IAntlrErrorListener<Symbol>>
         {
             public _CopyOnWriteArrayList_49()
             {
@@ -52,8 +51,7 @@ namespace Antlr4.Runtime
         }
 
         [NotNull]
-        private IList<IAntlrErrorListener<Symbol>> _listeners = new _CopyOnWriteArrayList_49
-            ();
+        private IList<IAntlrErrorListener<Symbol>> _listeners = new _CopyOnWriteArrayList_49();
 
         protected internal ATNInterpreter _interp;
 
@@ -191,8 +189,7 @@ namespace Antlr4.Runtime
 
         // subclass needs to override these if there are sempreds or actions
         // that the ATN interp needs to execute
-        public virtual bool Sempred(RuleContext _localctx, int ruleIndex, int actionIndex
-            )
+        public virtual bool Sempred(RuleContext _localctx, int ruleIndex, int actionIndex)
         {
             return true;
         }

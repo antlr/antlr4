@@ -97,19 +97,15 @@ namespace Antlr4.Runtime.Atn
             int version = ToInt(data[p++]);
             if (version != SerializedVersion)
             {
-                string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with version %d (expected %d)."
-                    , version, SerializedVersion);
-                throw new NotSupportedException(new InvalidClassException(typeof(ATN).FullName, reason
-                    ));
+                string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with version %d (expected %d).", version, SerializedVersion);
+                throw new NotSupportedException(new InvalidClassException(typeof(ATN).FullName, reason));
             }
             UUID uuid = ToUUID(data, p);
             p += 8;
             if (!uuid.Equals(SerializedUuid))
             {
-                string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with UUID %s (expected %s)."
-                    , uuid, SerializedUuid);
-                throw new NotSupportedException(new InvalidClassException(typeof(ATN).FullName, reason
-                    ));
+                string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with UUID %s (expected %s).", uuid, SerializedUuid);
+                throw new NotSupportedException(new InvalidClassException(typeof(ATN).FullName, reason));
             }
             ATNType grammarType = ATNType.Values()[ToInt(data[p++])];
             int maxTokenType = ToInt(data[p++]);
@@ -117,10 +113,8 @@ namespace Antlr4.Runtime.Atn
             //
             // STATES
             //
-            IList<Tuple<LoopEndState, int>> loopBackStateNumbers = new List<Tuple<LoopEndState
-                , int>>();
-            IList<Tuple<BlockStartState, int>> endStateNumbers = new List<Tuple<BlockStartState
-                , int>>();
+            IList<Tuple<LoopEndState, int>> loopBackStateNumbers = new List<Tuple<LoopEndState, int>>();
+            IList<Tuple<BlockStartState, int>> endStateNumbers = new List<Tuple<BlockStartState, int>>();
             int nstates = ToInt(data[p++]);
             for (int i_1 = 0; i_1 < nstates; i_1++)
             {
@@ -283,8 +277,7 @@ namespace Antlr4.Runtime.Atn
             // edges for rule stop states can be derived, so they aren't serialized
             foreach (ATNState state_1 in atn.states)
             {
-                bool returningToLeftFactored = state_1.ruleIndex >= 0 && atn.ruleToStartState[state_1
-                    .ruleIndex].leftFactored;
+                bool returningToLeftFactored = state_1.ruleIndex >= 0 && atn.ruleToStartState[state_1.ruleIndex].leftFactored;
                 for (int i_10 = 0; i_10 < state_1.NumberOfTransitions; i_10++)
                 {
                     Transition t = state_1.Transition(i_10);
@@ -293,14 +286,12 @@ namespace Antlr4.Runtime.Atn
                         continue;
                     }
                     RuleTransition ruleTransition = (RuleTransition)t;
-                    bool returningFromLeftFactored = atn.ruleToStartState[ruleTransition.target.ruleIndex
-                        ].leftFactored;
+                    bool returningFromLeftFactored = atn.ruleToStartState[ruleTransition.target.ruleIndex].leftFactored;
                     if (!returningFromLeftFactored && returningToLeftFactored)
                     {
                         continue;
                     }
-                    atn.ruleToStopState[ruleTransition.target.ruleIndex].AddTransition(new EpsilonTransition
-                        (ruleTransition.followState));
+                    atn.ruleToStopState[ruleTransition.target.ruleIndex].AddTransition(new EpsilonTransition(ruleTransition.followState));
                 }
             }
             foreach (ATNState state_2 in atn.states)
@@ -444,8 +435,7 @@ namespace Antlr4.Runtime.Atn
                 if (state is DecisionState)
                 {
                     DecisionState decisionState = (DecisionState)state;
-                    CheckCondition(decisionState.NumberOfTransitions <= 1 || decisionState.decision >=
-                         0);
+                    CheckCondition(decisionState.NumberOfTransitions <= 1 || decisionState.decision >= 0);
                 }
                 else
                 {
@@ -470,15 +460,12 @@ namespace Antlr4.Runtime.Atn
         private static int InlineSetRules(ATN atn)
         {
             int inlinedCalls = 0;
-            Transition[] ruleToInlineTransition = new Transition[atn.ruleToStartState.Length]
-                ;
+            Transition[] ruleToInlineTransition = new Transition[atn.ruleToStartState.Length];
             for (int i = 0; i < atn.ruleToStartState.Length; i++)
             {
                 RuleStartState startState = atn.ruleToStartState[i];
                 ATNState middleState = startState;
-                while (middleState.OnlyHasEpsilonTransitions && middleState.NumberOfOptimizedTransitions
-                     == 1 && middleState.GetOptimizedTransition(0).TransitionType == TransitionType
-                    .Epsilon)
+                while (middleState.OnlyHasEpsilonTransitions && middleState.NumberOfOptimizedTransitions == 1 && middleState.GetOptimizedTransition(0).TransitionType == TransitionType.Epsilon)
                 {
                     middleState = middleState.GetOptimizedTransition(0).target;
                 }
@@ -488,9 +475,7 @@ namespace Antlr4.Runtime.Atn
                 }
                 Transition matchTransition = middleState.GetOptimizedTransition(0);
                 ATNState matchTarget = matchTransition.target;
-                if (matchTransition.IsEpsilon || !matchTarget.OnlyHasEpsilonTransitions || matchTarget
-                    .NumberOfOptimizedTransitions != 1 || !(matchTarget.GetOptimizedTransition(0)
-                    .target is RuleStopState))
+                if (matchTransition.IsEpsilon || !matchTarget.OnlyHasEpsilonTransitions || matchTarget.NumberOfOptimizedTransitions != 1 || !(matchTarget.GetOptimizedTransition(0).target is RuleStopState))
                 {
                     continue;
                 }
@@ -564,15 +549,13 @@ namespace Antlr4.Runtime.Atn
                     {
                         case TransitionType.Atom:
                         {
-                            intermediateState.AddTransition(new AtomTransition(target, ((AtomTransition)effective
-                                ).label));
+                            intermediateState.AddTransition(new AtomTransition(target, ((AtomTransition)effective).label));
                             break;
                         }
 
                         case TransitionType.Range:
                         {
-                            intermediateState.AddTransition(new RangeTransition(target, ((RangeTransition)effective
-                                ).from, ((RangeTransition)effective).to));
+                            intermediateState.AddTransition(new RangeTransition(target, ((RangeTransition)effective).from, ((RangeTransition)effective).to));
                             break;
                         }
 
@@ -620,8 +603,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     Transition transition = state.GetOptimizedTransition(i);
                     ATNState intermediate = transition.target;
-                    if (transition.TransitionType != TransitionType.Epsilon || intermediate.StateType
-                         != StateType.Basic || !intermediate.OnlyHasEpsilonTransitions)
+                    if (transition.TransitionType != TransitionType.Epsilon || intermediate.StateType != StateType.Basic || !intermediate.OnlyHasEpsilonTransitions)
                     {
                         if (optimizedTransitions != null)
                         {
@@ -709,8 +691,7 @@ nextState_break: ;
                         // TODO: not yet implemented
                         continue;
                     }
-                    if (transition is AtomTransition || transition is RangeTransition || transition is
-                         SetTransition)
+                    if (transition is AtomTransition || transition is RangeTransition || transition is SetTransition)
                     {
                         setTransitions.Add(i);
                     }
@@ -727,16 +708,14 @@ nextState_break: ;
                         optimizedTransitions.AddItem(decision.GetOptimizedTransition(i_1));
                     }
                 }
-                ATNState blockEndState = decision.GetOptimizedTransition(setTransitions.GetMinElement
-                    ()).target.GetOptimizedTransition(0).target;
+                ATNState blockEndState = decision.GetOptimizedTransition(setTransitions.GetMinElement()).target.GetOptimizedTransition(0).target;
                 IntervalSet matchSet = new IntervalSet();
                 for (int i_2 = 0; i_2 < setTransitions.GetIntervals().Count; i_2++)
                 {
                     Interval interval = setTransitions.GetIntervals()[i_2];
                     for (int j = interval.a; j <= interval.b; j++)
                     {
-                        Transition matchTransition = decision.GetOptimizedTransition(j).target.GetOptimizedTransition
-                            (0);
+                        Transition matchTransition = decision.GetOptimizedTransition(j).target.GetOptimizedTransition(0);
                         if (matchTransition is NotSetTransition)
                         {
                             throw new NotSupportedException("Not yet implemented.");
@@ -757,8 +736,7 @@ nextState_break: ;
                     else
                     {
                         Interval matchInterval = matchSet.GetIntervals()[0];
-                        newTransition = new RangeTransition(blockEndState, matchInterval.a, matchInterval
-                            .b);
+                        newTransition = new RangeTransition(blockEndState, matchInterval.a, matchInterval.b);
                     }
                 }
                 else
@@ -817,8 +795,7 @@ nextState_break: ;
             }
         }
 
-        private static bool TestTailCall(ATN atn, RuleTransition transition, bool optimizedPath
-            )
+        private static bool TestTailCall(ATN atn, RuleTransition transition, bool optimizedPath)
         {
             if (!optimizedPath && transition.tailCall)
             {
@@ -846,8 +823,7 @@ nextState_break: ;
                 {
                     return false;
                 }
-                IList<Transition> transitions = optimizedPath ? state.optimizedTransitions : state
-                    .transitions;
+                IList<Transition> transitions = optimizedPath ? state.optimizedTransitions : state.transitions;
                 foreach (Transition t in transitions)
                 {
                     if (t.TransitionType != TransitionType.Epsilon)
@@ -884,8 +860,7 @@ nextState_break: ;
         }
 
         [NotNull]
-        public static Transition EdgeFactory(ATN atn, TransitionType type, int src, int trg
-            , int arg1, int arg2, int arg3, IList<IntervalSet> sets)
+        public static Transition EdgeFactory(ATN atn, TransitionType type, int src, int trg, int arg1, int arg2, int arg3, IList<IntervalSet> sets)
         {
             ATNState target = atn.states[trg];
             switch (type)
@@ -910,8 +885,7 @@ nextState_break: ;
 
                 case TransitionType.Rule:
                 {
-                    RuleTransition rt = new RuleTransition((RuleStartState)atn.states[arg1], arg2, arg3
-                        , target);
+                    RuleTransition rt = new RuleTransition((RuleStartState)atn.states[arg1], arg2, arg3, target);
                     return rt;
                 }
 
@@ -1047,8 +1021,7 @@ nextState_break: ;
 
                 default:
                 {
-                    string message = string.Format(CultureInfo.CurrentCulture, "The specified state type %d is not valid."
-                        , type);
+                    string message = string.Format(CultureInfo.CurrentCulture, "The specified state type %d is not valid.", type);
                     throw new ArgumentException(message);
                 }
             }

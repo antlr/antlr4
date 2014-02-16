@@ -36,8 +36,7 @@ namespace Antlr4.Runtime.Misc
     /// <remarks>
     /// This exception is thrown to cancel a parsing operation. This exception does
     /// not extend
-    /// <see cref="Antlr4.Runtime.RecognitionException">Antlr4.Runtime.RecognitionException
-    ///     </see>
+    /// <see cref="Antlr4.Runtime.RecognitionException">Antlr4.Runtime.RecognitionException</see>
     /// , allowing it to bypass the standard
     /// error recovery mechanisms.
     /// <see cref="Antlr4.Runtime.BailErrorStrategy">Antlr4.Runtime.BailErrorStrategy</see>
