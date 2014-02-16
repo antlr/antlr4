@@ -36,41 +36,45 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
-    /// <summary>Buffer all input tokens but do on-demand fetching of new tokens from lexer.</summary>
-    /// <remarks>
-    /// Buffer all input tokens but do on-demand fetching of new tokens from lexer.
-    /// Useful when the parser or lexer has to set context/mode info before proper
-    /// lexing of future tokens. The ST template parser needs this, for example,
-    /// because it has to constantly flip back and forth between inside/output
-    /// templates. E.g.,
-    /// <code></code>
-    /// &lt;names:
-    /// hi, <it>}&gt;} has to parse names as part of an
-    /// expression but
-    /// <code>"hi, <it>"</code>
-    /// as a nested template.
-    /// <p/>
-    /// You can't use this stream if you pass whitespace or other off-channel tokens
-    /// to the parser. The stream can't ignore off-channel tokens.
-    /// (
-    /// <see cref="UnbufferedTokenStream">UnbufferedTokenStream</see>
-    /// is the same way.) Use
+    /// <summary>
+    /// This implementation of
+    /// <see cref="ITokenStream">ITokenStream</see>
+    /// loads tokens from a
+    /// <see cref="ITokenSource">ITokenSource</see>
+    /// on-demand, and places the tokens in a buffer to provide
+    /// access to any previous token by index.
+    /// <p>
+    /// This token stream ignores the value of
+    /// <see cref="IToken.Channel()">IToken.Channel()</see>
+    /// . If your
+    /// parser requires the token stream filter tokens to only those on a particular
+    /// channel, such as
+    /// <see cref="IToken.DefaultChannel">IToken.DefaultChannel</see>
+    /// or
+    /// <see cref="IToken.HiddenChannel">IToken.HiddenChannel</see>
+    /// , use a filtering token stream such a
     /// <see cref="CommonTokenStream">CommonTokenStream</see>
-    /// .
-    /// </remarks>
+    /// .</p>
+    /// </summary>
     public class BufferedTokenStream : ITokenStream
     {
+        /// <summary>
+        /// The
+        /// <see cref="ITokenSource">ITokenSource</see>
+        /// from which tokens for this stream are fetched.
+        /// </summary>
         [NotNull]
         protected internal ITokenSource tokenSource;
 
-        /// <summary>
-        /// Record every single token pulled from the source so we can reproduce
-        /// chunks of it later.
-        /// </summary>
+        /// <summary>A collection of all tokens fetched from the token source.</summary>
         /// <remarks>
-        /// Record every single token pulled from the source so we can reproduce
-        /// chunks of it later. This list captures everything so we can access
-        /// complete input text.
+        /// A collection of all tokens fetched from the token source. The list is
+        /// considered a complete view of the input once
+        /// <see cref="fetchedEOF">fetchedEOF</see>
+        /// is set
+        /// to
+        /// <code>true</code>
+        /// .
         /// </remarks>
         protected internal IList<IToken> tokens = new List<IToken>(100);
 
@@ -78,7 +82,8 @@ namespace Antlr4.Runtime
         /// The index into
         /// <see cref="tokens">tokens</see>
         /// of the current token (next token to
-        /// consume).
+        /// <see cref="Consume()">Consume()</see>
+        /// ).
         /// <see cref="tokens">tokens</see>
         /// <code>[</code>
         /// <see cref="p">p</see>
@@ -86,27 +91,46 @@ namespace Antlr4.Runtime
         /// should be
         /// <see cref="Lt(int)">LT(1)</see>
         /// .
-        /// <see cref="p">p</see>
-        /// <code>=-1</code>
-        /// indicates need to initialize
-        /// with first token. The constructor doesn't get a token. First call to
-        /// <see cref="Lt(int)">LT(1)</see>
-        /// or whatever gets the first token and sets
-        /// <see cref="p">p</see>
-        /// <code>=0;</code>
-        /// .
+        /// <p>This field is set to -1 when the stream is first constructed or when
+        /// <see cref="SetTokenSource(ITokenSource)">SetTokenSource(ITokenSource)</see>
+        /// is called, indicating that the first token has
+        /// not yet been fetched from the token source. For additional information,
+        /// see the documentation of
+        /// <see cref="IIntStream">IIntStream</see>
+        /// for a description of
+        /// Initializing Methods.</p>
         /// </summary>
         protected internal int p = -1;
 
         /// <summary>
-        /// Set to
-        /// <code>true</code>
-        /// when the EOF token is fetched. Do not continue fetching
-        /// tokens after that point, or multiple EOF tokens could end up in the
+        /// Indicates whether the
+        /// <see cref="IToken.Eof">IToken.Eof</see>
+        /// token has been fetched from
+        /// <see cref="tokenSource">tokenSource</see>
+        /// and added to
         /// <see cref="tokens">tokens</see>
-        /// array.
+        /// . This field improves
+        /// performance for the following cases:
+        /// <ul>
+        /// <li>
+        /// <see cref="Consume()">Consume()</see>
+        /// : The lookahead check in
+        /// <see cref="Consume()">Consume()</see>
+        /// to prevent
+        /// consuming the EOF symbol is optimized by checking the values of
+        /// <see cref="fetchedEOF">fetchedEOF</see>
+        /// and
+        /// <see cref="p">p</see>
+        /// instead of calling
+        /// <see cref="La(int)">La(int)</see>
+        /// .</li>
+        /// <li>
+        /// <see cref="Fetch(int)">Fetch(int)</see>
+        /// : The check to prevent adding multiple EOF symbols into
+        /// <see cref="tokens">tokens</see>
+        /// is trivial with this field.</li>
+        /// <ul>
         /// </summary>
-        /// <seealso cref="Fetch(int)">Fetch(int)</seealso>
         protected internal bool fetchedEOF;
 
         public BufferedTokenStream(ITokenSource tokenSource)
@@ -165,7 +189,27 @@ namespace Antlr4.Runtime
 
         public virtual void Consume()
         {
-            if (La(1) == IntStreamConstants.Eof)
+            bool skipEofCheck;
+            if (p >= 0)
+            {
+                if (fetchedEOF)
+                {
+                    // the last token in tokens is EOF. skip check if p indexes any
+                    // fetched token except the last.
+                    skipEofCheck = p < tokens.Count - 1;
+                }
+                else
+                {
+                    // no EOF token in tokens. skip check if p indexes a fetched token.
+                    skipEofCheck = p < tokens.Count;
+                }
+            }
+            else
+            {
+                // not yet initialized
+                skipEofCheck = false;
+            }
+            if (!skipEofCheck && La(1) == IntStreamConstants.Eof)
             {
                 throw new InvalidOperationException("cannot consume EOF");
             }
@@ -282,6 +326,7 @@ namespace Antlr4.Runtime
             return tokens[p - k];
         }
 
+        [NotNull]
         public virtual IToken Lt(int k)
         {
             LazyInit();
@@ -318,11 +363,10 @@ namespace Antlr4.Runtime
         /// . If an
         /// exception is thrown in this method, the current stream index should not be
         /// changed.
-        /// <p/>
-        /// For example,
+        /// <p>For example,
         /// <see cref="CommonTokenStream">CommonTokenStream</see>
         /// overrides this method to ensure that
-        /// the seek target is always an on-channel token.
+        /// the seek target is always an on-channel token.</p>
         /// </remarks>
         /// <param name="i">The target token index.</param>
         /// <returns>The adjusted target token index.</returns>

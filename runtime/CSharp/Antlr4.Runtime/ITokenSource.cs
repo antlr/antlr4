@@ -28,79 +28,135 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
 using Sharpen;
 
 namespace Antlr4.Runtime
 {
     /// <summary>
-    /// A source of tokens must provide a sequence of tokens via nextToken()
-    /// and also must reveal it's source of characters; CommonToken's text is
-    /// computed from a CharStream; it only store indices into the char stream.
+    /// A source of tokens must provide a sequence of tokens via
+    /// <see cref="NextToken()">NextToken()</see>
+    /// and also must reveal it's source of characters;
+    /// <see cref="CommonToken">CommonToken</see>
+    /// 's text is
+    /// computed from a
+    /// <see cref="ICharStream">ICharStream</see>
+    /// ; it only store indices into the char
+    /// stream.
+    /// <p>Errors from the lexer are never passed to the parser. Either you want to keep
+    /// going or you do not upon token recognition error. If you do not want to
+    /// continue lexing then you do not want to continue parsing. Just throw an
+    /// exception not under
+    /// <see cref="RecognitionException">RecognitionException</see>
+    /// and Java will naturally toss
+    /// you all the way out of the recognizers. If you want to continue lexing then
+    /// you should not throw an exception to the parser--it has already requested a
+    /// token. Keep lexing until you get a valid one. Just report errors and keep
+    /// going, looking for a valid token.</p>
     /// </summary>
-    /// <remarks>
-    /// A source of tokens must provide a sequence of tokens via nextToken()
-    /// and also must reveal it's source of characters; CommonToken's text is
-    /// computed from a CharStream; it only store indices into the char stream.
-    /// Errors from the lexer are never passed to the parser.  Either you want
-    /// to keep going or you do not upon token recognition error.  If you do not
-    /// want to continue lexing then you do not want to continue parsing.  Just
-    /// throw an exception not under RecognitionException and Java will naturally
-    /// toss you all the way out of the recognizers.  If you want to continue
-    /// lexing then you should not throw an exception to the parser--it has already
-    /// requested a token.  Keep lexing until you get a valid one.  Just report
-    /// errors and keep going, looking for a valid token.
-    /// </remarks>
     public interface ITokenSource
     {
-        /// <summary>Return a Token object from your input stream (usually a CharStream).</summary>
-        /// <remarks>
-        /// Return a Token object from your input stream (usually a CharStream).
-        /// Do not fail/return upon lexing error; keep chewing on the characters
-        /// until you get a good one; errors are not passed through to the parser.
-        /// </remarks>
+        /// <summary>
+        /// Return a
+        /// <see cref="IToken">IToken</see>
+        /// object from your input stream (usually a
+        /// <see cref="ICharStream">ICharStream</see>
+        /// ). Do not fail/return upon lexing error; keep chewing
+        /// on the characters until you get a good one; errors are not passed through
+        /// to the parser.
+        /// </summary>
+        [NotNull]
         IToken NextToken();
 
+        /// <summary>Get the line number for the current position in the input stream.</summary>
+        /// <remarks>
+        /// Get the line number for the current position in the input stream. The
+        /// first line in the input is line 1.
+        /// </remarks>
+        /// <returns>
+        /// The line number for the current position in the input stream, or
+        /// 0 if the current token source does not track line numbers.
+        /// </returns>
         int Line
         {
             get;
         }
 
+        /// <summary>
+        /// Get the index into the current line for the current position in the input
+        /// stream.
+        /// </summary>
+        /// <remarks>
+        /// Get the index into the current line for the current position in the input
+        /// stream. The first character on a line has position 0.
+        /// </remarks>
+        /// <returns>
+        /// The line number for the current position in the input stream, or
+        /// -1 if the current token source does not track character positions.
+        /// </returns>
         int Column
         {
             get;
         }
 
         /// <summary>
-        /// From what character stream was this token created?  You don't have to
-        /// implement but it's nice to know where a Token comes from if you have
-        /// include files etc...
+        /// Get the
+        /// <see cref="ICharStream">ICharStream</see>
+        /// from which this token source is currently
+        /// providing tokens.
         /// </summary>
-        /// <remarks>
-        /// From what character stream was this token created?  You don't have to
-        /// implement but it's nice to know where a Token comes from if you have
-        /// include files etc... on the input.
-        /// </remarks>
+        /// <returns>
+        /// The
+        /// <see cref="ICharStream">ICharStream</see>
+        /// associated with the current position in
+        /// the input, or
+        /// <code>null</code>
+        /// if no input stream is available for the token
+        /// source.
+        /// </returns>
         ICharStream InputStream
         {
             get;
         }
 
-        /// <summary>
-        /// Where are you getting tokens from? normally the implication will simply
-        /// ask lexers input stream.
-        /// </summary>
+        /// <summary>Gets the name of the underlying input source.</summary>
         /// <remarks>
-        /// Where are you getting tokens from? normally the implication will simply
-        /// ask lexers input stream.
+        /// Gets the name of the underlying input source. This method returns a
+        /// non-null, non-empty string. If such a name is not known, this method
+        /// returns
+        /// <see cref="IIntStream.UnknownSourceName">IIntStream.UnknownSourceName</see>
+        /// .
         /// </remarks>
         string SourceName
         {
             get;
         }
 
-        /// <summary>Gets the factory used for constructing tokens.</summary>
-        /// <remarks>Gets the factory used for constructing tokens.</remarks>
-        /// <summary>Optional method that lets users set factory in lexer or other source</summary>
+        /// <summary>
+        /// Set the
+        /// <see cref="ITokenFactory">ITokenFactory</see>
+        /// this token source should use for creating
+        /// <see cref="IToken">IToken</see>
+        /// objects from the input.
+        /// </summary>
+        /// <value>
+        /// The
+        /// <see cref="ITokenFactory">ITokenFactory</see>
+        /// to use for creating tokens.
+        /// </value>
+        /// <summary>
+        /// Gets the
+        /// <see cref="ITokenFactory">ITokenFactory</see>
+        /// this token source is currently using for
+        /// creating
+        /// <see cref="IToken">IToken</see>
+        /// objects from the input.
+        /// </summary>
+        /// <returns>
+        /// The
+        /// <see cref="ITokenFactory">ITokenFactory</see>
+        /// currently used by this token source.
+        /// </returns>
         ITokenFactory TokenFactory
         {
             get;

@@ -146,6 +146,17 @@ namespace Antlr4.Runtime.Tree
             return t.Payload.ToString();
         }
 
+        /// <summary>Return ordered list of all children of this node</summary>
+        public static IList<ITree> GetChildren(ITree t)
+        {
+            IList<ITree> kids = new List<ITree>();
+            for (int i = 0; i < t.ChildCount; i++)
+            {
+                kids.AddItem(t.GetChild(i));
+            }
+            return kids;
+        }
+
         /// <summary>Return a list of all ancestors of this node.</summary>
         /// <remarks>
         /// Return a list of all ancestors of this node.  The first node of
@@ -167,6 +178,64 @@ namespace Antlr4.Runtime.Tree
                 t = t.Parent;
             }
             return ancestors;
+        }
+
+        public static ICollection<IParseTree> FindAllTokenNodes(IParseTree t, int ttype)
+        {
+            return FindAllNodes(t, ttype, true);
+        }
+
+        public static ICollection<IParseTree> FindAllRuleNodes(IParseTree t, int ruleIndex)
+        {
+            return FindAllNodes(t, ruleIndex, false);
+        }
+
+        public static IList<IParseTree> FindAllNodes(IParseTree t, int index, bool findTokens)
+        {
+            IList<IParseTree> nodes = new List<IParseTree>();
+            _findAllNodes(t, index, findTokens, nodes);
+            return nodes;
+        }
+
+        public static void _findAllNodes<_T0>(IParseTree t, int index, bool findTokens, IList<_T0> nodes)
+        {
+            // check this node (the root) first
+            if (findTokens && t is ITerminalNode)
+            {
+                ITerminalNode tnode = (ITerminalNode)t;
+                if (tnode.Symbol.Type == index)
+                {
+                    nodes.AddItem(t);
+                }
+            }
+            else
+            {
+                if (!findTokens && t is ParserRuleContext)
+                {
+                    ParserRuleContext ctx = (ParserRuleContext)t;
+                    if (ctx.GetRuleIndex() == index)
+                    {
+                        nodes.AddItem(t);
+                    }
+                }
+            }
+            // check children
+            for (int i = 0; i < t.ChildCount; i++)
+            {
+                _findAllNodes(t.GetChild(i), index, findTokens, nodes);
+            }
+        }
+
+        public static IList<IParseTree> Descendants(IParseTree t)
+        {
+            IList<IParseTree> nodes = new List<IParseTree>();
+            nodes.AddItem(t);
+            int n = t.ChildCount;
+            for (int i = 0; i < n; i++)
+            {
+                Sharpen.Collections.AddAll(nodes, Descendants(t.GetChild(i)));
+            }
+            return nodes;
         }
 
         private Trees()

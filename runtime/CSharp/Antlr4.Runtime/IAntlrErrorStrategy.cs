@@ -50,8 +50,7 @@ namespace Antlr4.Runtime
     /// Implementations of this interface report syntax errors by calling
     /// <see cref="Parser.NotifyErrorListeners(string)">Parser.NotifyErrorListeners(string)</see>
     /// .
-    /// <p/>
-    /// TODO: what to do about lexers
+    /// <p>TODO: what to do about lexers</p>
     /// </remarks>
     public interface IAntlrErrorStrategy
     {
@@ -73,12 +72,11 @@ namespace Antlr4.Runtime
         /// <see cref="IToken">IToken</see>
         /// instance which should be treated as the
         /// successful result of the match.
-        /// <p/>
-        /// Note that the calling code will not report an error if this method
+        /// <p>Note that the calling code will not report an error if this method
         /// returns successfully. The error strategy implementation is responsible
         /// for calling
         /// <see cref="Parser.NotifyErrorListeners(string)">Parser.NotifyErrorListeners(string)</see>
-        /// as appropriate.
+        /// as appropriate.</p>
         /// </summary>
         /// <param name="recognizer">the parser instance</param>
         /// <exception cref="RecognitionException">
@@ -113,19 +111,17 @@ namespace Antlr4.Runtime
         /// syntactic or semantic errors in the input stream before they result in a
         /// <see cref="RecognitionException">RecognitionException</see>
         /// .
-        /// <p/>
-        /// The generated code currently contains calls to
+        /// <p>The generated code currently contains calls to
         /// <see cref="Sync(Parser)">Sync(Parser)</see>
         /// after
         /// entering the decision state of a closure block (
         /// <code>(...)*</code>
         /// or
         /// <code>(...)+</code>
-        /// ).
-        /// <p/>
-        /// For an implementation based on Jim Idle's "magic sync" mechanism, see
+        /// ).</p>
+        /// <p>For an implementation based on Jim Idle's "magic sync" mechanism, see
         /// <see cref="DefaultErrorStrategy.Sync(Parser)">DefaultErrorStrategy.Sync(Parser)</see>
-        /// .
+        /// .</p>
         /// </summary>
         /// <seealso cref="DefaultErrorStrategy.Sync(Parser)">DefaultErrorStrategy.Sync(Parser)</seealso>
         /// <param name="recognizer">the parser instance</param>

@@ -117,9 +117,9 @@ namespace Antlr4.Runtime.Misc
 
         public override int GetHashCode()
         {
-            int hash = 5;
-            hash = 37 * hash ^ this.a;
-            hash = 37 * hash ^ this.b;
+            int hash = 23;
+            hash = hash * 31 + a;
+            hash = hash * 31 + b;
             return hash;
         }
 

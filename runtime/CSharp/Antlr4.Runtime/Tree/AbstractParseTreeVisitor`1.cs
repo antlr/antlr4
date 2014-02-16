@@ -36,11 +36,10 @@ namespace Antlr4.Runtime.Tree
     {
         /// <summary>
         /// <inheritDoc></inheritDoc>
-        /// <p/>
-        /// The default implementation calls
+        /// <p>The default implementation calls
         /// <see cref="IParseTree.Accept{T}(IParseTreeVisitor{Result})">IParseTree.Accept&lt;T&gt;(IParseTreeVisitor&lt;Result&gt;)</see>
         /// on the
-        /// specified tree.
+        /// specified tree.</p>
         /// </summary>
         public virtual Result Visit(IParseTree tree)
         {
@@ -49,8 +48,7 @@ namespace Antlr4.Runtime.Tree
 
         /// <summary>
         /// <inheritDoc></inheritDoc>
-        /// <p/>
-        /// The default implementation initializes the aggregate result to
+        /// <p>The default implementation initializes the aggregate result to
         /// <see cref="AbstractParseTreeVisitor{Result}.DefaultResult()">defaultResult()</see>
         /// . Before visiting each child, it
         /// calls
@@ -63,7 +61,10 @@ namespace Antlr4.Runtime.Tree
         /// updated by calling
         /// <see cref="AbstractParseTreeVisitor{Result}.AggregateResult(object, object)">aggregateResult</see>
         /// with the
-        /// previous aggregate result and the result of visiting the child.
+        /// previous aggregate result and the result of visiting the child.</p>
+        /// <p>The default implementation is not safe for use in visitors that modify
+        /// the tree structure. Visitors that modify the tree should override this
+        /// method to behave properly in respect to the specific algorithm in use.</p>
         /// </summary>
         public virtual Result VisitChildren(IRuleNode node)
         {
@@ -84,10 +85,9 @@ namespace Antlr4.Runtime.Tree
 
         /// <summary>
         /// <inheritDoc></inheritDoc>
-        /// <p/>
-        /// The default implementation returns the result of
+        /// <p>The default implementation returns the result of
         /// <see cref="AbstractParseTreeVisitor{Result}.DefaultResult()">defaultResult</see>
-        /// .
+        /// .</p>
         /// </summary>
         public virtual Result VisitTerminal(ITerminalNode node)
         {
@@ -96,10 +96,9 @@ namespace Antlr4.Runtime.Tree
 
         /// <summary>
         /// <inheritDoc></inheritDoc>
-        /// <p/>
-        /// The default implementation returns the result of
+        /// <p>The default implementation returns the result of
         /// <see cref="AbstractParseTreeVisitor{Result}.DefaultResult()">defaultResult</see>
-        /// .
+        /// .</p>
         /// </summary>
         public virtual Result VisitErrorNode(IErrorNode node)
         {
@@ -117,10 +116,9 @@ namespace Antlr4.Runtime.Tree
         /// The default implementation of
         /// <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)">visitChildren</see>
         /// initializes its aggregate result to this value.
-        /// <p/>
-        /// The base implementation returns
+        /// <p>The base implementation returns
         /// <code>null</code>
-        /// .
+        /// .</p>
         /// </remarks>
         /// <returns>The default value returned by visitor methods.</returns>
         protected internal virtual Result DefaultResult()
@@ -138,13 +136,12 @@ namespace Antlr4.Runtime.Tree
         /// , the aggregate value is returned as the result of
         /// <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)">AbstractParseTreeVisitor&lt;Result&gt;.VisitChildren(IRuleNode)</see>
         /// .
-        /// <p/>
-        /// The default implementation returns
+        /// <p>The default implementation returns
         /// <code>nextResult</code>
         /// , meaning
         /// <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)">AbstractParseTreeVisitor&lt;Result&gt;.VisitChildren(IRuleNode)</see>
         /// will return the result of the last child visited
-        /// (or return the initial value if the node has no children).
+        /// (or return the initial value if the node has no children).</p>
         /// </remarks>
         /// <param name="aggregate">
         /// The previous aggregate value. In the default
@@ -177,8 +174,7 @@ namespace Antlr4.Runtime.Tree
         /// <see cref="AbstractParseTreeVisitor{Result}.DefaultResult()">AbstractParseTreeVisitor&lt;Result&gt;.DefaultResult()</see>
         /// . This method is not called after the last
         /// child is visited.
-        /// <p/>
-        /// The default implementation always returns
+        /// <p>The default implementation always returns
         /// <code>true</code>
         /// , indicating that
         /// <code>visitChildren</code>
@@ -186,7 +182,7 @@ namespace Antlr4.Runtime.Tree
         /// One reason to override this method is to provide a "short circuit"
         /// evaluation option for situations where the result of visiting a single
         /// child has the potential to determine the result of the visit operation as
-        /// a whole.
+        /// a whole.</p>
         /// </summary>
         /// <param name="node">
         /// The

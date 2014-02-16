@@ -40,12 +40,11 @@ namespace Antlr4.Runtime.Tree
     /// during a parse that makes the data structure look like a simple parse tree.
     /// This node represents both internal nodes, rule invocations,
     /// and leaf nodes, token matches.
-    /// <p/>
-    /// The payload is either a
+    /// <p>The payload is either a
     /// <see cref="Antlr4.Runtime.IToken">Antlr4.Runtime.IToken</see>
     /// or a
     /// <see cref="Antlr4.Runtime.RuleContext">Antlr4.Runtime.RuleContext</see>
-    /// object.
+    /// object.</p>
     /// </summary>
     public interface IParseTree : ISyntaxTree
     {

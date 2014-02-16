@@ -52,10 +52,9 @@ namespace Antlr4.Runtime.Tree
         /// of the first and last token associated with this
         /// subtree. If this node is a leaf, then the interval represents a single
         /// token.
-        /// <p/>
-        /// If source interval is unknown, this returns
+        /// <p>If source interval is unknown, this returns
         /// <see cref="Antlr4.Runtime.Misc.Interval.Invalid">Antlr4.Runtime.Misc.Interval.Invalid</see>
-        /// .
+        /// .</p>
         /// </summary>
         Interval SourceInterval
         {

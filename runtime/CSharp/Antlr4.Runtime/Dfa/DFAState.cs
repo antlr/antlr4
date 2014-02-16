@@ -46,7 +46,7 @@ namespace Antlr4.Runtime.Dfa
     /// input a1a2..an, the DFA is in a state that represents the
     /// subset T of the states of the ATN that are reachable from the
     /// ATN's start state along some path labeled a1a2..an."
-    /// In conventional NFA-&gt;DFA conversion, therefore, the subset T
+    /// In conventional NFA&rarr;DFA conversion, therefore, the subset T
     /// would be a bitset representing the set of states the
     /// ATN could be in.  We need to track the alt predicted by each
     /// state as well, however.  More importantly, we need to maintain
@@ -54,14 +54,12 @@ namespace Antlr4.Runtime.Dfa
     /// jump from rule to rule, emulating rule invocations (method calls).
     /// I have to add a stack to simulate the proper lookahead sequences for
     /// the underlying LL grammar from which the ATN was derived.
-    /// <p/>
-    /// I use a set of ATNConfig objects not simple states.  An ATNConfig
+    /// <p>I use a set of ATNConfig objects not simple states.  An ATNConfig
     /// is both a state (ala normal conversion) and a RuleContext describing
-    /// the chain of rules (if any) followed to arrive at that state.
-    /// <p/>
-    /// A DFA state may have multiple references to a particular state,
+    /// the chain of rules (if any) followed to arrive at that state.</p>
+    /// <p>A DFA state may have multiple references to a particular state,
     /// but with different ATN contexts (with same or different alts)
-    /// meaning that state was reached via a different set of rule invocations.
+    /// meaning that state was reached via a different set of rule invocations.</p>
     /// </remarks>
     public class DFAState
     {
@@ -94,9 +92,7 @@ namespace Antlr4.Runtime.Dfa
         /// </summary>
         public int prediction;
 
-        public int lexerRuleIndex = -1;
-
-        public int lexerActionIndex = -1;
+        public LexerActionExecutor lexerActionExecutor;
 
         /// <summary>These keys for these edges are the top level element of the global context.</summary>
         /// <remarks>These keys for these edges are the top level element of the global context.</remarks>
@@ -127,8 +123,6 @@ namespace Antlr4.Runtime.Dfa
 
             public PredPrediction(SemanticContext pred, int alt)
             {
-                // if accept, exec action in what rule?
-                // if accept, exec what action?
                 // never null; at least SemanticContext.NONE
                 this.alt = alt;
                 this.pred = pred;
@@ -302,17 +296,15 @@ namespace Antlr4.Runtime.Dfa
         /// <see cref="DFAState">DFAState</see>
         /// instances are equal if their ATN configuration sets
         /// are the same. This method is used to see if a state already exists.
-        /// <p/>
-        /// Because the number of alternatives and number of ATN configurations are
+        /// <p>Because the number of alternatives and number of ATN configurations are
         /// finite, there is a finite number of DFA states that can be processed.
-        /// This is necessary to show that the algorithm terminates.
-        /// <p/>
-        /// Cannot test the DFA state numbers here because in
+        /// This is necessary to show that the algorithm terminates.</p>
+        /// <p>Cannot test the DFA state numbers here because in
         /// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.AddDFAState(DFA, Antlr4.Runtime.Atn.ATNConfigSet, Antlr4.Runtime.Atn.PredictionContextCache)">Antlr4.Runtime.Atn.ParserATNSimulator.AddDFAState(DFA, Antlr4.Runtime.Atn.ATNConfigSet, Antlr4.Runtime.Atn.PredictionContextCache)</see>
         /// we need to know if any other state
         /// exists that has this exact set of ATN configurations. The
         /// <see cref="stateNumber">stateNumber</see>
-        /// is irrelevant.
+        /// is irrelevant.</p>
         /// </summary>
         public override bool Equals(object o)
         {

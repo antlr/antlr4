@@ -59,7 +59,7 @@ namespace Antlr4.Runtime.Atn
         /// <pre>
         /// private int referenceHashCode() {
         /// int hash =
-        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Initialize()">Antlr4.Runtime.Misc.MurmurHash.Initialize()</see>
+        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Initialize()">MurmurHash.initialize</see>
         /// (
         /// <see cref="InitialHash">InitialHash</see>
         /// );
@@ -67,22 +67,22 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="Size()">Size()</see>
         /// ; i++) {
         /// hash =
-        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Update(int, int)">Antlr4.Runtime.Misc.MurmurHash.Update(int, int)</see>
+        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Update(int, int)">MurmurHash.update</see>
         /// (hash,
-        /// <see cref="GetParent(int)">GetParent(int)</see>
+        /// <see cref="GetParent(int)">getParent</see>
         /// (i));
         /// }
         /// for (int i = 0; i &lt;
         /// <see cref="Size()">Size()</see>
         /// ; i++) {
         /// hash =
-        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Update(int, int)">Antlr4.Runtime.Misc.MurmurHash.Update(int, int)</see>
+        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Update(int, int)">MurmurHash.update</see>
         /// (hash,
-        /// <see cref="GetReturnState(int)">GetReturnState(int)</see>
+        /// <see cref="GetReturnState(int)">getReturnState</see>
         /// (i));
         /// }
         /// hash =
-        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Finish(int, int)">Antlr4.Runtime.Misc.MurmurHash.Finish(int, int)</see>
+        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Finish(int, int)">MurmurHash.finish</see>
         /// (hash, 2 *
         /// <see cref="Size()">Size()</see>
         /// );

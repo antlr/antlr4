@@ -27,6 +27,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using System;
 using System.Collections.Generic;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
@@ -40,9 +41,13 @@ namespace Antlr4.Runtime
     {
         public const int Eof = -1;
 
-        private sealed class _CopyOnWriteArrayList_49 : CopyOnWriteArrayList<IAntlrErrorListener<Symbol>>
+        private static readonly IDictionary<string[], IDictionary<string, int>> tokenTypeMapCache = new WeakHashMap<string[], IDictionary<string, int>>();
+
+        private static readonly IDictionary<string[], IDictionary<string, int>> ruleIndexMapCache = new WeakHashMap<string[], IDictionary<string, int>>();
+
+        private sealed class _CopyOnWriteArrayList_58 : CopyOnWriteArrayList<IAntlrErrorListener<Symbol>>
         {
-            public _CopyOnWriteArrayList_49()
+            public _CopyOnWriteArrayList_58()
             {
                 {
                     this.AddItem(ConsoleErrorListener.Instance);
@@ -51,7 +56,7 @@ namespace Antlr4.Runtime
         }
 
         [NotNull]
-        private IList<IAntlrErrorListener<Symbol>> _listeners = new _CopyOnWriteArrayList_49();
+        private IList<IAntlrErrorListener<Symbol>> _listeners = new _CopyOnWriteArrayList_58();
 
         protected internal ATNInterpreter _interp;
 
@@ -76,6 +81,84 @@ namespace Antlr4.Runtime
             get;
         }
 
+        /// <summary>Get a map from token names to token types.</summary>
+        /// <remarks>
+        /// Get a map from token names to token types.
+        /// <p>Used for XPath and tree pattern compilation.</p>
+        /// </remarks>
+        [NotNull]
+        public virtual IDictionary<string, int> GetTokenTypeMap()
+        {
+            string[] tokenNames = TokenNames;
+            if (tokenNames == null)
+            {
+                throw new NotSupportedException("The current recognizer does not provide a list of token names.");
+            }
+            lock (tokenTypeMapCache)
+            {
+                IDictionary<string, int> result = tokenTypeMapCache.Get(tokenNames);
+                if (result == null)
+                {
+                    result = Utils.ToMap(tokenNames);
+                    result.Put("EOF", TokenConstants.Eof);
+                    result = Sharpen.Collections.UnmodifiableMap(result);
+                    tokenTypeMapCache.Put(tokenNames, result);
+                }
+                return result;
+            }
+        }
+
+        /// <summary>Get a map from rule names to rule indexes.</summary>
+        /// <remarks>
+        /// Get a map from rule names to rule indexes.
+        /// <p>Used for XPath and tree pattern compilation.</p>
+        /// </remarks>
+        [NotNull]
+        public virtual IDictionary<string, int> GetRuleIndexMap()
+        {
+            string[] ruleNames = RuleNames;
+            if (ruleNames == null)
+            {
+                throw new NotSupportedException("The current recognizer does not provide a list of rule names.");
+            }
+            lock (ruleIndexMapCache)
+            {
+                IDictionary<string, int> result = ruleIndexMapCache.Get(ruleNames);
+                if (result == null)
+                {
+                    result = Sharpen.Collections.UnmodifiableMap(Utils.ToMap(ruleNames));
+                    ruleIndexMapCache.Put(ruleNames, result);
+                }
+                return result;
+            }
+        }
+
+        public virtual int GetTokenType(string tokenName)
+        {
+            int ttype = GetTokenTypeMap().Get(tokenName);
+            if (ttype != null)
+            {
+                return ttype;
+            }
+            return TokenConstants.InvalidType;
+        }
+
+        /// <summary>
+        /// If this recognizer was generated, it will have a serialized ATN
+        /// representation of the grammar.
+        /// </summary>
+        /// <remarks>
+        /// If this recognizer was generated, it will have a serialized ATN
+        /// representation of the grammar.
+        /// <p>For interpreters, we don't know their serialized ATN despite having
+        /// created the interpreter from it.</p>
+        /// </remarks>
+        [NotNull]
+        public virtual string GetSerializedATN()
+        {
+            throw new NotSupportedException("there is no serialized ATN");
+        }
+
         /// <summary>For debugging and other purposes, might want the grammar name.</summary>
         /// <remarks>
         /// For debugging and other purposes, might want the grammar name.
@@ -86,6 +169,16 @@ namespace Antlr4.Runtime
             get;
         }
 
+        /// <summary>
+        /// Get the
+        /// <see cref="Antlr4.Runtime.Atn.ATN">Antlr4.Runtime.Atn.ATN</see>
+        /// used by the recognizer for prediction.
+        /// </summary>
+        /// <returns>
+        /// The
+        /// <see cref="Antlr4.Runtime.Atn.ATN">Antlr4.Runtime.Atn.ATN</see>
+        /// used by the recognizer for prediction.
+        /// </returns>
         public virtual ATN Atn
         {
             get
@@ -94,6 +187,15 @@ namespace Antlr4.Runtime
             }
         }
 
+        /// <summary>Get the ATN interpreter used by the recognizer for prediction.</summary>
+        /// <remarks>Get the ATN interpreter used by the recognizer for prediction.</remarks>
+        /// <returns>The ATN interpreter used by the recognizer for prediction.</returns>
+        /// <summary>Set the ATN interpreter used by the recognizer for prediction.</summary>
+        /// <remarks>Set the ATN interpreter used by the recognizer for prediction.</remarks>
+        /// <value>
+        /// The ATN interpreter used by the recognizer for
+        /// prediction.
+        /// </value>
         public virtual ATNInterpreter Interpreter
         {
             get
@@ -108,6 +210,7 @@ namespace Antlr4.Runtime
         }
 
         /// <summary>What is the error header, normally line/character position information?</summary>
+        [NotNull]
         public virtual string GetErrorHeader(RecognitionException e)
         {
             int line = e.OffendingToken.Line;
@@ -153,7 +256,8 @@ namespace Antlr4.Runtime
             return "'" + s + "'";
         }
 
-        /// <exception cref="System.ArgumentNullException">
+        /// <exception>
+        /// NullPointerException
         /// if
         /// <code>listener</code>
         /// is

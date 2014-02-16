@@ -39,40 +39,119 @@ namespace Antlr4.Runtime
     {
         private const long serialVersionUID = -6708843461296520577L;
 
+        /// <summary>
+        /// An empty
+        /// <see cref="Antlr4.Runtime.Misc.Tuple2{T1, T2}">Antlr4.Runtime.Misc.Tuple2&lt;T1, T2&gt;</see>
+        /// which is used as the default value of
+        /// <see cref="source">source</see>
+        /// for tokens that do not have a source.
+        /// </summary>
         protected internal static readonly Tuple<ITokenSource, ICharStream> EmptySource = Tuple.Create<ITokenSource, ICharStream>(null, null);
 
+        /// <summary>
+        /// This is the backing field for
+        /// <see cref="Type()">Type()</see>
+        /// and
+        /// <see cref="Type(int)">Type(int)</see>
+        /// .
+        /// </summary>
         protected internal int type;
 
+        /// <summary>
+        /// This is the backing field for
+        /// <see cref="Line()">Line()</see>
+        /// and
+        /// <see cref="Line(int)">Line(int)</see>
+        /// .
+        /// </summary>
         protected internal int line;
 
+        /// <summary>
+        /// This is the backing field for
+        /// <see cref="Column()">Column()</see>
+        /// and
+        /// <see cref="Column(int)">Column(int)</see>
+        /// .
+        /// </summary>
         protected internal int charPositionInLine = -1;
 
+        /// <summary>
+        /// This is the backing field for
+        /// <see cref="Channel()">Channel()</see>
+        /// and
+        /// <see cref="Channel(int)">Channel(int)</see>
+        /// .
+        /// </summary>
         protected internal int channel = TokenConstants.DefaultChannel;
 
+        /// <summary>
+        /// This is the backing field for
+        /// <see cref="TokenSource()">TokenSource()</see>
+        /// and
+        /// <see cref="InputStream()">InputStream()</see>
+        /// .
+        /// <p>
+        /// These properties share a field to reduce the memory footprint of
+        /// <see cref="CommonToken">CommonToken</see>
+        /// . Tokens created by a
+        /// <see cref="CommonTokenFactory">CommonTokenFactory</see>
+        /// from
+        /// the same source and input stream share a reference to the same
+        /// <see cref="Antlr4.Runtime.Misc.Tuple2{T1, T2}">Antlr4.Runtime.Misc.Tuple2&lt;T1, T2&gt;</see>
+        /// containing these values.</p>
+        /// </summary>
+        [NotNull]
         protected internal Tuple<ITokenSource, ICharStream> source;
 
-        /// <summary>We need to be able to change the text once in a while.</summary>
-        /// <remarks>
-        /// We need to be able to change the text once in a while.  If
-        /// this is non-null, then getText should return this.  Note that
-        /// start/stop are not affected by changing this.
-        /// </remarks>
+        /// <summary>
+        /// This is the backing field for
+        /// <see cref="Text()">Text()</see>
+        /// when the token text is
+        /// explicitly set in the constructor or via
+        /// <see cref="Text(string)">Text(string)</see>
+        /// .
+        /// </summary>
+        /// <seealso cref="Text()">Text()</seealso>
         protected internal string text;
 
-        /// <summary>What token number is this from 0..n-1 tokens; &lt; 0 implies invalid index</summary>
+        /// <summary>
+        /// This is the backing field for
+        /// <see cref="TokenIndex()">TokenIndex()</see>
+        /// and
+        /// <see cref="TokenIndex(int)">TokenIndex(int)</see>
+        /// .
+        /// </summary>
         protected internal int index = -1;
 
-        /// <summary>The char position into the input buffer where this token starts</summary>
+        /// <summary>
+        /// This is the backing field for
+        /// <see cref="StartIndex()">StartIndex()</see>
+        /// and
+        /// <see cref="SetStartIndex(int)">SetStartIndex(int)</see>
+        /// .
+        /// </summary>
         protected internal int start;
 
-        /// <summary>The char position into the input buffer where this token stops</summary>
+        /// <summary>
+        /// This is the backing field for
+        /// <see cref="StopIndex()">StopIndex()</see>
+        /// and
+        /// <see cref="SetStopIndex(int)">SetStopIndex(int)</see>
+        /// .
+        /// </summary>
         protected internal int stop;
 
+        /// <summary>
+        /// Constructs a new
+        /// <see cref="CommonToken">CommonToken</see>
+        /// with the specified token type.
+        /// </summary>
+        /// <param name="type">The token type.</param>
         public CommonToken(int type)
         {
             // set to invalid position
-            // TODO: can store these in map in token stream rather than as field here
             this.type = type;
+            this.source = EmptySource;
         }
 
         public CommonToken(Tuple<ITokenSource, ICharStream> source, int type, int channel, int start, int stop)
@@ -89,6 +168,14 @@ namespace Antlr4.Runtime
             }
         }
 
+        /// <summary>
+        /// Constructs a new
+        /// <see cref="CommonToken">CommonToken</see>
+        /// with the specified token type and
+        /// text.
+        /// </summary>
+        /// <param name="type">The token type.</param>
+        /// <param name="text">The text of the token.</param>
         public CommonToken(int type, string text)
         {
             this.type = type;
@@ -97,9 +184,41 @@ namespace Antlr4.Runtime
             this.source = EmptySource;
         }
 
+        /// <summary>
+        /// Constructs a new
+        /// <see cref="CommonToken">CommonToken</see>
+        /// as a copy of another
+        /// <see cref="IToken">IToken</see>
+        /// .
+        /// <p>
+        /// If
+        /// <code>oldToken</code>
+        /// is also a
+        /// <see cref="CommonToken">CommonToken</see>
+        /// instance, the newly
+        /// constructed token will share a reference to the
+        /// <see cref="text">text</see>
+        /// field and
+        /// the
+        /// <see cref="Antlr4.Runtime.Misc.Tuple2{T1, T2}">Antlr4.Runtime.Misc.Tuple2&lt;T1, T2&gt;</see>
+        /// stored in
+        /// <see cref="source">source</see>
+        /// . Otherwise,
+        /// <see cref="text">text</see>
+        /// will
+        /// be assigned the result of calling
+        /// <see cref="Text()">Text()</see>
+        /// , and
+        /// <see cref="source">source</see>
+        /// will be constructed from the result of
+        /// <see cref="IToken.TokenSource()">IToken.TokenSource()</see>
+        /// and
+        /// <see cref="IToken.InputStream()">IToken.InputStream()</see>
+        /// .</p>
+        /// </summary>
+        /// <param name="oldToken">The token to copy.</param>
         public CommonToken(IToken oldToken)
         {
-            text = oldToken.Text;
             type = oldToken.Type;
             line = oldToken.Line;
             index = oldToken.TokenIndex;
@@ -109,10 +228,12 @@ namespace Antlr4.Runtime
             stop = oldToken.StopIndex;
             if (oldToken is Antlr4.Runtime.CommonToken)
             {
+                text = ((Antlr4.Runtime.CommonToken)oldToken).text;
                 source = ((Antlr4.Runtime.CommonToken)oldToken).source;
             }
             else
             {
+                text = oldToken.Text;
                 source = Tuple.Create(oldToken.TokenSource, oldToken.InputStream);
             }
         }
@@ -143,13 +264,22 @@ namespace Antlr4.Runtime
             }
         }
 
-        /// <summary>Override the text for this token.</summary>
+        /// <summary>Explicitly set the text for this token.</summary>
         /// <remarks>
-        /// Override the text for this token.  getText() will return this text
-        /// rather than pulling from the buffer.  Note that this does not mean
-        /// that start/stop indexes are not valid.  It means that that input
-        /// was converted to a new string in the token object.
+        /// Explicitly set the text for this token. If {code text} is not
+        /// <code>null</code>
+        /// , then
+        /// <see cref="Text()">Text()</see>
+        /// will return this value rather than
+        /// extracting the text from the input.
         /// </remarks>
+        /// <value>
+        /// The explicit text of the token, or
+        /// <code>null</code>
+        /// if the text
+        /// should be obtained from the input along with the start and stop indexes
+        /// of the token.
+        /// </value>
         public virtual string Text
         {
             get

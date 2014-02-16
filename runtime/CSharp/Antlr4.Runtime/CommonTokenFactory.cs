@@ -34,31 +34,91 @@ using Sharpen;
 
 namespace Antlr4.Runtime
 {
+    /// <summary>
+    /// This default implementation of
+    /// <see cref="ITokenFactory">ITokenFactory</see>
+    /// creates
+    /// <see cref="CommonToken">CommonToken</see>
+    /// objects.
+    /// </summary>
     public class CommonTokenFactory : ITokenFactory
     {
+        /// <summary>
+        /// The default
+        /// <see cref="CommonTokenFactory">CommonTokenFactory</see>
+        /// instance.
+        /// <p>
+        /// This token factory does not explicitly copy token text when constructing
+        /// tokens.</p>
+        /// </summary>
         public static readonly ITokenFactory Default = new Antlr4.Runtime.CommonTokenFactory();
 
-        /// <summary>Copy text for token out of input char stream.</summary>
-        /// <remarks>
-        /// Copy text for token out of input char stream. Useful when input
-        /// stream is unbuffered.
-        /// </remarks>
-        /// <seealso cref="UnbufferedCharStream">UnbufferedCharStream</seealso>
+        /// <summary>
+        /// Indicates whether
+        /// <see cref="CommonToken.Text(string)">CommonToken.Text(string)</see>
+        /// should be called after
+        /// constructing tokens to explicitly set the text. This is useful for cases
+        /// where the input stream might not be able to provide arbitrary substrings
+        /// of text from the input after the lexer creates a token (e.g. the
+        /// implementation of
+        /// <see cref="ICharStream.GetText(Antlr4.Runtime.Misc.Interval)">ICharStream.GetText(Antlr4.Runtime.Misc.Interval)</see>
+        /// in
+        /// <see cref="UnbufferedCharStream">UnbufferedCharStream</see>
+        /// throws an
+        /// <see cref="System.NotSupportedException">System.NotSupportedException</see>
+        /// ). Explicitly setting the token text
+        /// allows
+        /// <see cref="IToken.Text()">IToken.Text()</see>
+        /// to be called at any time regardless of the
+        /// input stream implementation.
+        /// <p>
+        /// The default value is
+        /// <code>false</code>
+        /// to avoid the performance and memory
+        /// overhead of copying text for every token unless explicitly requested.</p>
+        /// </summary>
         protected internal readonly bool copyText;
 
         /// <summary>
-        /// Create factory and indicate whether or not the factory copy
-        /// text out of the char stream.
+        /// Constructs a
+        /// <see cref="CommonTokenFactory">CommonTokenFactory</see>
+        /// with the specified value for
+        /// <see cref="copyText">copyText</see>
+        /// .
+        /// <p>
+        /// When
+        /// <code>copyText</code>
+        /// is
+        /// <code>false</code>
+        /// , the
+        /// <see cref="Default">Default</see>
+        /// instance
+        /// should be used instead of constructing a new instance.</p>
         /// </summary>
-        /// <remarks>
-        /// Create factory and indicate whether or not the factory copy
-        /// text out of the char stream.
-        /// </remarks>
+        /// <param name="copyText">
+        /// The value for
+        /// <see cref="copyText">copyText</see>
+        /// .
+        /// </param>
         public CommonTokenFactory(bool copyText)
         {
             this.copyText = copyText;
         }
 
+        /// <summary>
+        /// Constructs a
+        /// <see cref="CommonTokenFactory">CommonTokenFactory</see>
+        /// with
+        /// <see cref="copyText">copyText</see>
+        /// set to
+        /// <code>false</code>
+        /// .
+        /// <p>
+        /// The
+        /// <see cref="Default">Default</see>
+        /// instance should be used instead of calling this
+        /// directly.</p>
+        /// </summary>
         public CommonTokenFactory()
             : this(false)
         {

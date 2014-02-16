@@ -86,7 +86,7 @@ namespace Antlr4.Runtime.Atn
                 HashSet<ATNConfig> lookBusy = new HashSet<ATNConfig>();
                 bool seeThruPreds = false;
                 // fail to get lookahead upon pred
-                Look(s.Transition(alt).target, null, PredictionContext.EmptyFull, look[alt], lookBusy, new BitSet(), seeThruPreds, false);
+                Look(s.Transition(alt).target, null, PredictionContext.EmptyLocal, look[alt], lookBusy, new BitSet(), seeThruPreds, false);
                 // Wipe out lookahead for this alternative if we found nothing
                 // or we had a predicate when we !seeThruPreds
                 if (look[alt].Size() == 0 || look[alt].Contains(HitPred))
@@ -104,8 +104,7 @@ namespace Antlr4.Runtime.Atn
         /// specified
         /// <code>ctx</code>
         /// .
-        /// <p/>
-        /// If
+        /// <p>If
         /// <code>ctx</code>
         /// is
         /// <code>null</code>
@@ -121,7 +120,7 @@ namespace Antlr4.Runtime.Atn
         /// and the end of the outermost rule is
         /// reached,
         /// <see cref="Antlr4.Runtime.IToken.Eof">Antlr4.Runtime.IToken.Eof</see>
-        /// is added to the result set.
+        /// is added to the result set.</p>
         /// </summary>
         /// <param name="s">the ATN state</param>
         /// <param name="ctx">
@@ -141,7 +140,7 @@ namespace Antlr4.Runtime.Atn
         [NotNull]
         public virtual IntervalSet Look(ATNState s, PredictionContext ctx)
         {
-            return Look(s, null, ctx);
+            return Look(s, s.atn.ruleToStopState[s.ruleIndex], ctx);
         }
 
         /// <summary>
@@ -151,8 +150,7 @@ namespace Antlr4.Runtime.Atn
         /// specified
         /// <code>ctx</code>
         /// .
-        /// <p/>
-        /// If
+        /// <p>If
         /// <code>ctx</code>
         /// is
         /// <code>null</code>
@@ -164,11 +162,11 @@ namespace Antlr4.Runtime.Atn
         /// If
         /// <code>ctx</code>
         /// is not
-        /// <code>null</code>
+        /// <code>PredictionContext#EMPTY_LOCAL</code>
         /// and the end of the outermost rule is
         /// reached,
         /// <see cref="Antlr4.Runtime.IToken.Eof">Antlr4.Runtime.IToken.Eof</see>
-        /// is added to the result set.
+        /// is added to the result set.</p>
         /// </summary>
         /// <param name="s">the ATN state</param>
         /// <param name="stopState">
@@ -196,7 +194,8 @@ namespace Antlr4.Runtime.Atn
             IntervalSet r = new IntervalSet();
             bool seeThruPreds = true;
             // ignore preds; get all lookahead
-            Look(s, stopState, ctx, r, new HashSet<ATNConfig>(), new BitSet(), seeThruPreds, true);
+            bool addEOF = true;
+            Look(s, stopState, ctx, r, new HashSet<ATNConfig>(), new BitSet(), seeThruPreds, addEOF);
             return r;
         }
 
@@ -297,51 +296,46 @@ namespace Antlr4.Runtime.Atn
                 }
                 else
                 {
-                    if (ctx.IsEmpty && addEOF)
+                    if (ctx.IsEmpty)
                     {
-                        look.Add(TokenConstants.Eof);
+                        if (addEOF)
+                        {
+                            look.Add(TokenConstants.Eof);
+                        }
                         return;
                     }
                 }
             }
             if (s is RuleStopState)
             {
-                if (PredictionContext.IsEmptyLocal(ctx))
+                if (ctx.IsEmpty && !PredictionContext.IsEmptyLocal(ctx))
                 {
-                    look.Add(TokenConstants.Epsilon);
-                    return;
-                }
-                else
-                {
-                    if (ctx.IsEmpty && addEOF)
+                    if (addEOF)
                     {
                         look.Add(TokenConstants.Eof);
-                        return;
                     }
+                    return;
                 }
-                for (int i = 0; i < ctx.Size; i++)
+                bool removed = calledRuleStack.Get(s.ruleIndex);
+                try
                 {
-                    if (ctx.GetReturnState(i) != PredictionContext.EmptyFullStateKey)
+                    calledRuleStack.Clear(s.ruleIndex);
+                    for (int i = 0; i < ctx.Size; i++)
                     {
+                        if (ctx.GetReturnState(i) == PredictionContext.EmptyFullStateKey)
+                        {
+                            continue;
+                        }
                         ATNState returnState = atn.states[ctx.GetReturnState(i)];
                         //					System.out.println("popping back to "+retState);
-                        for (int j = 0; j < ctx.Size; j++)
-                        {
-                            bool removed = calledRuleStack.Get(returnState.ruleIndex);
-                            try
-                            {
-                                calledRuleStack.Clear(returnState.ruleIndex);
-                                Look(returnState, stopState, ctx.GetParent(j), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
-                            }
-                            finally
-                            {
-                                if (removed)
-                                {
-                                    calledRuleStack.Set(returnState.ruleIndex);
-                                }
-                            }
-                        }
-                        return;
+                        Look(returnState, stopState, ctx.GetParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+                    }
+                }
+                finally
+                {
+                    if (removed)
+                    {
+                        calledRuleStack.Set(s.ruleIndex);
                     }
                 }
             }
@@ -349,21 +343,22 @@ namespace Antlr4.Runtime.Atn
             for (int i_1 = 0; i_1 < n; i_1++)
             {
                 Transition t = s.Transition(i_1);
-                if (t.GetType() == typeof(RuleTransition))
+                if (t is RuleTransition)
                 {
-                    if (calledRuleStack.Get(((RuleTransition)t).target.ruleIndex))
+                    RuleTransition ruleTransition = (RuleTransition)t;
+                    if (calledRuleStack.Get(ruleTransition.ruleIndex))
                     {
                         continue;
                     }
-                    PredictionContext newContext = ctx.GetChild(((RuleTransition)t).followState.stateNumber);
+                    PredictionContext newContext = ctx.GetChild(ruleTransition.followState.stateNumber);
                     try
                     {
-                        calledRuleStack.Set(((RuleTransition)t).target.ruleIndex);
+                        calledRuleStack.Set(ruleTransition.ruleIndex);
                         Look(t.target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
                     }
                     finally
                     {
-                        calledRuleStack.Clear(((RuleTransition)t).target.ruleIndex);
+                        calledRuleStack.Clear(ruleTransition.ruleIndex);
                     }
                 }
                 else

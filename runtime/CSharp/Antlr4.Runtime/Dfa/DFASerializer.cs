@@ -122,6 +122,10 @@ namespace Antlr4.Runtime.Dfa
                 }
             }
             string output = buf.ToString();
+            if (output.Length == 0)
+            {
+                return null;
+            }
             //return Utils.sortLinesInString(output);
             return output;
         }

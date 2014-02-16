@@ -35,8 +35,31 @@ namespace Antlr4.Runtime
     /// <author>Sam Harwell</author>
     public class ConsoleErrorListener : IAntlrErrorListener<object>
     {
+        /// <summary>
+        /// Provides a default instance of
+        /// <see cref="ConsoleErrorListener">ConsoleErrorListener</see>
+        /// .
+        /// </summary>
         public static readonly ConsoleErrorListener Instance = new ConsoleErrorListener();
 
+        /// <summary>
+        /// <inheritDoc></inheritDoc>
+        /// <p>
+        /// This implementation prints messages to
+        /// <see cref="System.Console.Error">System.Console.Error</see>
+        /// containing the
+        /// values of
+        /// <code>line</code>
+        /// ,
+        /// <code>charPositionInLine</code>
+        /// , and
+        /// <code>msg</code>
+        /// using
+        /// the following format.</p>
+        /// <pre>
+        /// line <em>line</em>:<em>charPositionInLine</em> <em>msg</em>
+        /// </pre>
+        /// </summary>
         public virtual void SyntaxError<T>(Recognizer<T, object> recognizer, T offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
         {
             System.Console.Error.WriteLine("line " + line + ":" + charPositionInLine + " " + msg);

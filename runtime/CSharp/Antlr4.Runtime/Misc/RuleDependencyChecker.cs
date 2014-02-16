@@ -447,7 +447,7 @@ namespace Antlr4.Runtime.Misc
             {
                 return null;
             }
-            ATN atn = ATNSimulator.Deserialize(serializedATN.ToCharArray());
+            ATN atn = new ATNDeserializer().Deserialize(serializedATN.ToCharArray());
             RuleDependencyChecker.RuleRelations relations = new RuleDependencyChecker.RuleRelations(atn.ruleToStartState.Length);
             foreach (ATNState state in atn.states)
             {

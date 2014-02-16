@@ -65,8 +65,7 @@ namespace Antlr4.Runtime
         /// <code>index</code>
         /// in the stream. When
         /// the preconditions of this method are met, the return value is non-null.
-        /// <p/>
-        /// The preconditions for this method are the same as the preconditions of
+        /// <p>The preconditions for this method are the same as the preconditions of
         /// <see cref="IIntStream.Seek(int)">IIntStream.Seek(int)</see>
         /// . If the behavior of
         /// <code>seek(index)</code>
@@ -74,9 +73,8 @@ namespace Antlr4.Runtime
         /// unspecified for the current state and given
         /// <code>index</code>
         /// , then the
-        /// behavior of this method is also unspecified.
-        /// <p/>
-        /// The symbol referred to by
+        /// behavior of this method is also unspecified.</p>
+        /// <p>The symbol referred to by
         /// <code>index</code>
         /// differs from
         /// <code>seek()</code>
@@ -88,7 +86,7 @@ namespace Antlr4.Runtime
         /// <code>seek()</code>
         /// , this method does not adjust
         /// <code>index</code>
-        /// to point to a non-ignored symbol.
+        /// to point to a non-ignored symbol.</p>
         /// </summary>
         /// <exception cref="System.ArgumentException">if {code index} is less than 0</exception>
         /// <exception cref="System.NotSupportedException">
@@ -172,11 +170,10 @@ namespace Antlr4.Runtime
         /// <see cref="GetText(Antlr4.Runtime.Misc.Interval)">GetText(Antlr4.Runtime.Misc.Interval)</see>
         /// , but may be
         /// optimized by the specific implementation.
-        /// </p>
-        /// If
+        /// <p>If
         /// <code>ctx.getSourceInterval()</code>
         /// does not return a valid interval of
-        /// tokens provided by this stream, the behavior is unspecified.
+        /// tokens provided by this stream, the behavior is unspecified.</p>
         /// <pre>
         /// TokenStream stream = ...;
         /// String text = stream.getText(ctx.getSourceInterval());
@@ -200,8 +197,7 @@ namespace Antlr4.Runtime
         /// and
         /// <code>stop</code>
         /// (inclusive).
-        /// <p/>
-        /// If the specified
+        /// <p>If the specified
         /// <code>start</code>
         /// or
         /// <code>stop</code>
@@ -210,14 +206,13 @@ namespace Antlr4.Runtime
         /// <code>stop</code>
         /// occurred before the
         /// <code>start</code>
-        /// token, the behavior is unspecified.
-        /// <p/>
-        /// For streams which ensure that the
+        /// token, the behavior is unspecified.</p>
+        /// <p>For streams which ensure that the
         /// <see cref="IToken.TokenIndex()">IToken.TokenIndex()</see>
         /// method is
         /// accurate for all of its provided tokens, this method behaves like the
         /// following code. Other streams may implement this method in other ways
-        /// provided the behavior is consistent with this at a high level.
+        /// provided the behavior is consistent with this at a high level.</p>
         /// <pre>
         /// TokenStream stream = ...;
         /// String text = "";

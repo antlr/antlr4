@@ -59,13 +59,12 @@ namespace Antlr4.Runtime.Atn
         /// and current character position in that line. Note that the Lexer is
         /// tracking the starting line and characterization of the token. These
         /// variables track the "state" of the simulator when it hits an accept state.
-        /// <p/>
-        /// We track these variables separately for the DFA and ATN simulation
+        /// <p>We track these variables separately for the DFA and ATN simulation
         /// because the DFA simulation often has to fail over to the ATN
         /// simulation. If the ATN simulation fails, we need the DFA to fall
         /// back to its previously accepted state, if any. If the ATN succeeds,
         /// then the ATN does the accept and the DFA simulator that invoked it
-        /// can simply return the predicted token type.
+        /// can simply return the predicted token type.</p>
         /// </summary>
         protected internal class SimState
         {
@@ -302,9 +301,12 @@ namespace Antlr4.Runtime.Atn
             if (reach.IsEmpty())
             {
                 // we got nowhere on t from s
-                // we got nowhere on t, don't throw out this knowledge; it'd
-                // cause a failover from DFA later.
-                AddDFAEdge(s, t, Error);
+                if (!reach.HasSemanticContext)
+                {
+                    // we got nowhere on t, don't throw out this knowledge; it'd
+                    // cause a failover from DFA later.
+                    AddDFAEdge(s, t, Error);
+                }
                 // stop when we can't match any more char
                 return Error;
             }
@@ -316,9 +318,8 @@ namespace Antlr4.Runtime.Atn
         {
             if (prevAccept.dfaState != null)
             {
-                int ruleIndex = prevAccept.dfaState.lexerRuleIndex;
-                int actionIndex = prevAccept.dfaState.lexerActionIndex;
-                Accept(input, ruleIndex, actionIndex, prevAccept.index, prevAccept.line, prevAccept.charPos);
+                LexerActionExecutor lexerActionExecutor = prevAccept.dfaState.lexerActionExecutor;
+                Accept(input, lexerActionExecutor, startIndex, prevAccept.index, prevAccept.line, prevAccept.charPos);
                 return prevAccept.dfaState.prediction;
             }
             else
@@ -348,7 +349,8 @@ namespace Antlr4.Runtime.Atn
             int skipAlt = ATN.InvalidAltNumber;
             foreach (ATNConfig c in closure)
             {
-                if (c.Alt == skipAlt)
+                bool currentAltReachedAcceptState = c.Alt == skipAlt;
+                if (currentAltReachedAcceptState && c.HasPassedThroughNonGreedyDecision())
                 {
                     continue;
                 }
@@ -360,7 +362,12 @@ namespace Antlr4.Runtime.Atn
                     ATNState target = GetReachableTarget(trans, t);
                     if (target != null)
                     {
-                        if (Closure(input, c.Transform(target), reach, true))
+                        LexerActionExecutor lexerActionExecutor = c.ActionExecutor;
+                        if (lexerActionExecutor != null)
+                        {
+                            lexerActionExecutor = lexerActionExecutor.FixOffsetBeforeMatch(input.Index - startIndex);
+                        }
+                        if (Closure(input, c.Transform(target, lexerActionExecutor, true), reach, currentAltReachedAcceptState, true))
                         {
                             // any remaining configs for this alt have a lower priority than
                             // the one that just reached an accept state.
@@ -372,12 +379,8 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        protected internal virtual void Accept(ICharStream input, int ruleIndex, int actionIndex, int index, int line, int charPos)
+        protected internal virtual void Accept(ICharStream input, LexerActionExecutor lexerActionExecutor, int startIndex, int index, int line, int charPos)
         {
-            if (actionIndex >= 0 && recog != null)
-            {
-                recog.Action(null, ruleIndex, actionIndex);
-            }
             // seek to after last char in token
             input.Seek(index);
             this.line = line;
@@ -385,6 +388,10 @@ namespace Antlr4.Runtime.Atn
             if (input.La(1) != IntStreamConstants.Eof)
             {
                 Consume(input);
+            }
+            if (lexerActionExecutor != null && recog != null)
+            {
+                lexerActionExecutor.Execute(recog, input, startIndex);
             }
         }
 
@@ -407,7 +414,7 @@ namespace Antlr4.Runtime.Atn
             {
                 ATNState target = p.Transition(i).target;
                 ATNConfig c = ATNConfig.Create(target, i + 1, initialContext);
-                Closure(input, c, configs, false);
+                Closure(input, c, configs, false, false);
             }
             return configs;
         }
@@ -433,7 +440,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>false</code>
         /// .
         /// </returns>
-        protected internal virtual bool Closure(ICharStream input, ATNConfig config, ATNConfigSet configs, bool speculative)
+        protected internal virtual bool Closure(ICharStream input, ATNConfig config, ATNConfigSet configs, bool currentAltReachedAcceptState, bool speculative)
         {
             if (config.State is RuleStopState)
             {
@@ -447,8 +454,8 @@ namespace Antlr4.Runtime.Atn
                 {
                     if (context.HasEmpty)
                     {
-                        configs.AddItem(config.Transform(config.State, PredictionContext.EmptyFull));
-                        return true;
+                        configs.AddItem(config.Transform(config.State, PredictionContext.EmptyFull, true));
+                        currentAltReachedAcceptState = true;
                     }
                 }
                 for (int i = 0; i < context.Size; i++)
@@ -462,17 +469,17 @@ namespace Antlr4.Runtime.Atn
                     // "pop" return state
                     ATNState returnState = atn.states[returnStateNumber];
                     ATNConfig c = ATNConfig.Create(returnState, config.Alt, newContext);
-                    if (Closure(input, c, configs, speculative))
-                    {
-                        return true;
-                    }
+                    currentAltReachedAcceptState = Closure(input, c, configs, currentAltReachedAcceptState, speculative);
                 }
-                return false;
+                return currentAltReachedAcceptState;
             }
             // optimization
             if (!config.State.OnlyHasEpsilonTransitions)
             {
-                configs.AddItem(config);
+                if (!currentAltReachedAcceptState || !config.HasPassedThroughNonGreedyDecision())
+                {
+                    configs.AddItem(config);
+                }
             }
             ATNState p = config.State;
             for (int i_1 = 0; i_1 < p.NumberOfOptimizedTransitions; i_1++)
@@ -481,13 +488,10 @@ namespace Antlr4.Runtime.Atn
                 ATNConfig c = GetEpsilonTarget(input, config, t, configs, speculative);
                 if (c != null)
                 {
-                    if (Closure(input, c, configs, speculative))
-                    {
-                        return true;
-                    }
+                    currentAltReachedAcceptState = Closure(input, c, configs, currentAltReachedAcceptState, speculative);
                 }
             }
-            return false;
+            return currentAltReachedAcceptState;
         }
 
         // side-effect: can alter configs.hasSemanticContext
@@ -502,12 +506,12 @@ namespace Antlr4.Runtime.Atn
                     RuleTransition ruleTransition = (RuleTransition)t;
                     if (optimize_tail_calls && ruleTransition.optimizedTailCall && !config.Context.HasEmpty)
                     {
-                        c = config.Transform(t.target);
+                        c = config.Transform(t.target, true);
                     }
                     else
                     {
                         PredictionContext newContext = config.Context.GetChild(ruleTransition.followState.stateNumber);
-                        c = config.Transform(t.target, newContext);
+                        c = config.Transform(t.target, newContext, true);
                     }
                     break;
                 }
@@ -523,7 +527,7 @@ namespace Antlr4.Runtime.Atn
                     configs.MarkExplicitSemanticContext();
                     if (EvaluatePredicate(input, pt.ruleIndex, pt.predIndex, speculative))
                     {
-                        c = config.Transform(t.target);
+                        c = config.Transform(t.target, true);
                     }
                     else
                     {
@@ -534,14 +538,36 @@ namespace Antlr4.Runtime.Atn
 
                 case TransitionType.Action:
                 {
-                    // ignore actions; just exec one per rule upon accept
-                    c = config.Transform(t.target, ((ActionTransition)t).actionIndex);
-                    break;
+                    if (config.Context.HasEmpty)
+                    {
+                        // execute actions anywhere in the start rule for a token.
+                        //
+                        // TODO: if the entry rule is invoked recursively, some
+                        // actions may be executed during the recursive call. The
+                        // problem can appear when hasEmpty() is true but
+                        // isEmpty() is false. In this case, the config needs to be
+                        // split into two contexts - one with just the empty path
+                        // and another with everything but the empty path.
+                        // Unfortunately, the current algorithm does not allow
+                        // getEpsilonTarget to return two configurations, so
+                        // additional modifications are needed before we can support
+                        // the split operation.
+                        LexerActionExecutor lexerActionExecutor = LexerActionExecutor.Append(config.ActionExecutor, atn.lexerActions[((ActionTransition)t).actionIndex]);
+                        c = config.Transform(t.target, lexerActionExecutor, true);
+                        break;
+                    }
+                    else
+                    {
+                        // ignore actions in referenced rules
+                        c = config.Transform(t.target, true);
+                        break;
+                    }
+                    goto case TransitionType.Epsilon;
                 }
 
                 case TransitionType.Epsilon:
                 {
-                    c = config.Transform(t.target);
+                    c = config.Transform(t.target, true);
                     break;
                 }
 
@@ -557,8 +583,7 @@ namespace Antlr4.Runtime.Atn
         /// <summary>Evaluate a predicate specified in the lexer.</summary>
         /// <remarks>
         /// Evaluate a predicate specified in the lexer.
-        /// <p/>
-        /// If
+        /// <p>If
         /// <code>speculative</code>
         /// is
         /// <code>true</code>
@@ -581,7 +606,7 @@ namespace Antlr4.Runtime.Atn
         /// to the original state before returning (i.e. undo the actions made by the
         /// call to
         /// <see cref="Consume(Antlr4.Runtime.ICharStream)">Consume(Antlr4.Runtime.ICharStream)</see>
-        /// .
+        /// .</p>
         /// </remarks>
         /// <param name="input">The input stream.</param>
         /// <param name="ruleIndex">The rule containing the predicate.</param>
@@ -697,9 +722,8 @@ namespace Antlr4.Runtime.Atn
             if (firstConfigWithRuleStopState != null)
             {
                 newState.isAcceptState = true;
-                newState.lexerRuleIndex = firstConfigWithRuleStopState.State.ruleIndex;
-                newState.lexerActionIndex = firstConfigWithRuleStopState.ActionIndex;
-                newState.prediction = atn.ruleToTokenType[newState.lexerRuleIndex];
+                newState.lexerActionExecutor = firstConfigWithRuleStopState.ActionExecutor;
+                newState.prediction = atn.ruleToTokenType[firstConfigWithRuleStopState.State.ruleIndex];
             }
             return atn.modeToDFA[mode].AddState(newState);
         }

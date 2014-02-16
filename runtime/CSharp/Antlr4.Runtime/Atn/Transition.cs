@@ -39,15 +39,13 @@ namespace Antlr4.Runtime.Atn
     /// <remarks>
     /// An ATN transition between any two ATN states.  Subclasses define
     /// atom, set, epsilon, action, predicate, rule transitions.
-    /// <p/>
-    /// This is a one way link.  It emanates from a state (usually via a list of
-    /// transitions) and has a target state.
-    /// <p/>
-    /// Since we never have to change the ATN transitions once we construct it,
+    /// <p>This is a one way link.  It emanates from a state (usually via a list of
+    /// transitions) and has a target state.</p>
+    /// <p>Since we never have to change the ATN transitions once we construct it,
     /// we can fix these transitions as specific classes. The DFA transitions
     /// on the other hand need to update the labels as it adds transitions to
     /// the states. We'll use the term Edge for the DFA to distinguish them from
-    /// ATN transitions.
+    /// ATN transitions.</p>
     /// </remarks>
     public abstract class Transition
     {

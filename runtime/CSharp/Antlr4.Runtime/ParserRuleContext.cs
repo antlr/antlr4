@@ -119,9 +119,9 @@ namespace Antlr4.Runtime
         /// </remarks>
         public IToken stop;
 
-        /// <summary>The exception which forced this rule to return.</summary>
+        /// <summary>The exception that forced this rule to return.</summary>
         /// <remarks>
-        /// The exception which forced this rule to return. If the rule successfully
+        /// The exception that forced this rule to return. If the rule successfully
         /// completed, this is
         /// <code>null</code>
         /// .
