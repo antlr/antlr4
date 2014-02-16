@@ -49,7 +49,8 @@ namespace Antlr4.Runtime.Atn
         public bool optimizedTailCall;
 
         public RuleTransition(RuleStartState ruleStart, int ruleIndex, int precedence, ATNState
-             followState) : base(ruleStart)
+             followState)
+            : base(ruleStart)
         {
             // no Rule object at runtime
             this.ruleIndex = ruleIndex;

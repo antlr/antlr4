@@ -76,6 +76,7 @@ namespace Antlr4.Runtime
         /// surrounding rule.
         /// </param>
         void SyntaxError<T>(Recognizer<T, object> recognizer, T offendingSymbol, int line
-            , int charPositionInLine, string msg, RecognitionException e) where T:Symbol;
+            , int charPositionInLine, string msg, RecognitionException e)
+            where T : Symbol;
     }
 }

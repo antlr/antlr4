@@ -40,13 +40,14 @@ namespace Antlr4.Runtime.Atn
 
         public readonly bool isCtxDependent;
 
-        public ActionTransition(ATNState target, int ruleIndex) : this(target, ruleIndex, 
-            -1, false)
+        public ActionTransition(ATNState target, int ruleIndex)
+            : this(target, ruleIndex, -1, false)
         {
         }
 
         public ActionTransition(ATNState target, int ruleIndex, int actionIndex, bool isCtxDependent
-            ) : base(target)
+            )
+            : base(target)
         {
             // e.g., $i ref in action
             this.ruleIndex = ruleIndex;

@@ -93,7 +93,8 @@ namespace Antlr4.Runtime
         }
 
         public RecognitionException(string message, Antlr4.Runtime.Recognizer<IToken, object
-            > recognizer, IIntStream input, ParserRuleContext ctx) : base(message)
+            > recognizer, IIntStream input, ParserRuleContext ctx)
+            : base(message)
         {
             this.recognizer = recognizer;
             this.input = input;

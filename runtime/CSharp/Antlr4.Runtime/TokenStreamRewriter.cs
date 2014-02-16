@@ -148,8 +148,8 @@ namespace Antlr4.Runtime
 
         internal class InsertBeforeOp : TokenStreamRewriter.RewriteOperation
         {
-            public InsertBeforeOp(ITokenStream tokens, int index, object text) : base(tokens, 
-                index, text)
+            public InsertBeforeOp(ITokenStream tokens, int index, object text)
+                : base(tokens, index, text)
             {
             }
 
@@ -176,8 +176,8 @@ namespace Antlr4.Runtime
         {
             protected internal int lastIndex;
 
-            public ReplaceOp(ITokenStream tokens, int from, int to, object text) : base(tokens
-                , from, text)
+            public ReplaceOp(ITokenStream tokens, int from, int to, object text)
+                : base(tokens, from, text)
             {
                 lastIndex = to;
             }
@@ -722,7 +722,9 @@ namespace Antlr4.Runtime
 
         /// <summary>Get all operations before an index of a particular kind</summary>
         protected internal virtual IList<T> GetKindOfOps<T, _T1>(IList<_T1> rewrites, int
-             before) where T:TokenStreamRewriter.RewriteOperation where _T1:TokenStreamRewriter.RewriteOperation
+             before)
+            where T : TokenStreamRewriter.RewriteOperation
+            where _T1 : TokenStreamRewriter.RewriteOperation
         {
             System.Type kind = typeof(T);
             IList<T> ops = new List<T>();

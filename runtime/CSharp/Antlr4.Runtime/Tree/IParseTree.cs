@@ -62,7 +62,8 @@ namespace Antlr4.Runtime.Tree
         /// <see cref="IParseTreeVisitor{Result}">IParseTreeVisitor&lt;Result&gt;</see>
         /// needs a double dispatch method.
         /// </summary>
-        T Accept<T, _T1>(IParseTreeVisitor<_T1> visitor) where _T1:T;
+        T Accept<T, _T1>(IParseTreeVisitor<_T1> visitor)
+            where _T1 : T;
 
         /// <summary>Return the combined text of all leaf nodes.</summary>
         /// <remarks>

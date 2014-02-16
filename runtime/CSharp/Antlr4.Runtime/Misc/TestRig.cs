@@ -265,7 +265,8 @@ namespace Antlr4.Runtime.Misc
         /// <exception cref="System.Reflection.TargetInvocationException"></exception>
         /// <exception cref="Javax.Print.PrintException"></exception>
         protected internal virtual void Process<_T0>(Lexer lexer, Type<_T0> parserClass, 
-            Parser parser, Stream @is, StreamReader r) where _T0:Parser
+            Parser parser, Stream @is, StreamReader r)
+            where _T0 : Parser
         {
             try
             {

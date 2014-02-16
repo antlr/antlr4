@@ -38,8 +38,8 @@ namespace Antlr4.Runtime
     public class BaseErrorListener : IParserErrorListener
     {
         public virtual void SyntaxError<T>(Recognizer<T, object> recognizer, T offendingSymbol
-            , int line, int charPositionInLine, string msg, RecognitionException e) where 
-            T:IToken
+            , int line, int charPositionInLine, string msg, RecognitionException e)
+            where T : IToken
         {
         }
 

@@ -74,7 +74,8 @@ namespace Antlr4.Runtime
         /// which only
         /// reports exact ambiguities.
         /// </summary>
-        public DiagnosticErrorListener() : this(true)
+        public DiagnosticErrorListener()
+            : this(true)
         {
         }
 
@@ -136,7 +137,8 @@ namespace Antlr4.Runtime
         }
 
         protected internal virtual string GetDecisionDescription<T>(Parser recognizer, DFA
-             dfa) where T:IToken
+             dfa)
+            where T : IToken
         {
             int decision = dfa.decision;
             int ruleIndex = dfa.atnStartState.ruleIndex;

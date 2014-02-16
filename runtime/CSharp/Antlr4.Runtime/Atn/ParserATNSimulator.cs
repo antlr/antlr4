@@ -265,11 +265,13 @@ namespace Antlr4.Runtime.Atn
         protected internal bool userWantsCtxSensitive = true;
 
         /// <summary>Testing only!</summary>
-        public ParserATNSimulator(ATN atn) : this(null, atn)
+        public ParserATNSimulator(ATN atn)
+            : this(null, atn)
         {
         }
 
-        public ParserATNSimulator(Parser parser, ATN atn) : base(atn)
+        public ParserATNSimulator(Parser parser, ATN atn)
+            : base(atn)
         {
             this.parser = parser;
         }

@@ -41,7 +41,8 @@ namespace Antlr4.Runtime.Dfa
 
         private int size;
 
-        public ArrayEdgeMap(int minIndex, int maxIndex) : base(minIndex, maxIndex)
+        public ArrayEdgeMap(int minIndex, int maxIndex)
+            : base(minIndex, maxIndex)
         {
             arrayData = (T[])new object[maxIndex - minIndex + 1];
         }

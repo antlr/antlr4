@@ -60,13 +60,14 @@ namespace Antlr4.Runtime
             this.copyText = copyText;
         }
 
-        public CommonTokenFactory() : this(false)
+        public CommonTokenFactory()
+            : this(false)
         {
         }
 
         public virtual CommonToken Create<_T0>(Tuple<_T0> source, int type, string text, 
-            int channel, int start, int stop, int line, int charPositionInLine) where _T0:
-            ITokenSource
+            int channel, int start, int stop, int line, int charPositionInLine)
+            where _T0 : ITokenSource
         {
             CommonToken t = new CommonToken(source, type, channel, start, stop);
             t.Line = line;

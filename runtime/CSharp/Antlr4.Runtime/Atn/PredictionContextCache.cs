@@ -59,7 +59,8 @@ namespace Antlr4.Runtime.Atn
 
         private readonly bool enableCache;
 
-        public PredictionContextCache() : this(true)
+        public PredictionContextCache()
+            : this(true)
         {
         }
 

@@ -37,8 +37,8 @@ namespace Antlr4.Runtime.Atn
     {
         public readonly int precedence;
 
-        public PrecedencePredicateTransition(ATNState target, int precedence) : base(target
-            )
+        public PrecedencePredicateTransition(ATNState target, int precedence)
+            : base(target)
         {
             this.precedence = precedence;
         }

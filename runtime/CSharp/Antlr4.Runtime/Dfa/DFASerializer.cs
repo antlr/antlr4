@@ -53,14 +53,14 @@ namespace Antlr4.Runtime.Dfa
         [Nullable]
         internal readonly ATN atn;
 
-        public DFASerializer(DFA dfa, string[] tokenNames) : this(dfa, tokenNames, null, 
-            null)
+        public DFASerializer(DFA dfa, string[] tokenNames)
+            : this(dfa, tokenNames, null, null)
         {
         }
 
-        public DFASerializer(DFA dfa, Recognizer<object, object> parser) : this(dfa, parser
-             != null ? parser.TokenNames : null, parser != null ? parser.RuleNames : null
-            , parser != null ? parser.Atn : null)
+        public DFASerializer(DFA dfa, Recognizer<object, object> parser)
+            : this(dfa, parser != null ? parser.TokenNames : null, parser != null ? parser.RuleNames
+                 : null, parser != null ? parser.Atn : null)
         {
         }
 

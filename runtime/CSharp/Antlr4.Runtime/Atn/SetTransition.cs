@@ -40,7 +40,8 @@ namespace Antlr4.Runtime.Atn
         [NotNull]
         public readonly IntervalSet set;
 
-        public SetTransition(ATNState target, IntervalSet set) : base(target)
+        public SetTransition(ATNState target, IntervalSet set)
+            : base(target)
         {
             // TODO (sam): should we really allow null here?
             if (set == null)

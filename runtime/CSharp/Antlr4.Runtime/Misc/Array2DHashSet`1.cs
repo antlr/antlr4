@@ -61,12 +61,13 @@ namespace Antlr4.Runtime.Misc
 
         protected internal int initialBucketCapacity = InitalBucketCapacity;
 
-        public Array2DHashSet() : this(null, InitalCapacity, InitalBucketCapacity)
+        public Array2DHashSet()
+            : this(null, InitalCapacity, InitalBucketCapacity)
         {
         }
 
-        public Array2DHashSet(EqualityComparer<T> comparator) : this(comparator, InitalCapacity
-            , InitalBucketCapacity)
+        public Array2DHashSet(EqualityComparer<T> comparator)
+            : this(comparator, InitalCapacity, InitalBucketCapacity)
         {
         }
 
@@ -436,7 +437,8 @@ namespace Antlr4.Runtime.Misc
             return true;
         }
 
-        public virtual bool AddAll<_T0>(ICollection<_T0> c) where _T0:T
+        public virtual bool AddAll<_T0>(ICollection<_T0> c)
+            where _T0 : T
         {
             bool changed = false;
             foreach (T o in c)

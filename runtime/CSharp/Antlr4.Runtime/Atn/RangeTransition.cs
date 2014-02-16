@@ -39,7 +39,8 @@ namespace Antlr4.Runtime.Atn
 
         public readonly int to;
 
-        public RangeTransition(ATNState target, int from, int to) : base(target)
+        public RangeTransition(ATNState target, int from, int to)
+            : base(target)
         {
             this.from = from;
             this.to = to;

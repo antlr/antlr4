@@ -61,7 +61,8 @@ namespace Antlr4.Runtime.Dfa
         IEdgeMap<T> Remove(int key);
 
         [NotNull]
-        IEdgeMap<T> PutAll<_T0>(IEdgeMap<_T0> m) where _T0:T;
+        IEdgeMap<T> PutAll<_T0>(IEdgeMap<_T0> m)
+            where _T0 : T;
 
         [NotNull]
         IEdgeMap<T> Clear();

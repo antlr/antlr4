@@ -35,7 +35,8 @@ namespace Antlr4.Runtime.Dfa
 {
     public class LexerDFASerializer : DFASerializer
     {
-        public LexerDFASerializer(DFA dfa) : base(dfa, (string[])null)
+        public LexerDFASerializer(DFA dfa)
+            : base(dfa, (string[])null)
         {
         }
 

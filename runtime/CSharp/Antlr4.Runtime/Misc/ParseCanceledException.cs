@@ -54,7 +54,8 @@ namespace Antlr4.Runtime.Misc
         {
         }
 
-        public ParseCanceledException(string message) : base(message)
+        public ParseCanceledException(string message)
+            : base(message)
         {
         }
 
@@ -63,7 +64,8 @@ namespace Antlr4.Runtime.Misc
             Sharpen.Extensions.InitCause(this, cause);
         }
 
-        public ParseCanceledException(string message, Exception cause) : base(message)
+        public ParseCanceledException(string message, Exception cause)
+            : base(message)
         {
             Sharpen.Extensions.InitCause(this, cause);
         }

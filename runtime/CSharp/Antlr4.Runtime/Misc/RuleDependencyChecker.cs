@@ -129,8 +129,8 @@ namespace Antlr4.Runtime.Misc
         }
 
         private static void CheckDependencies<_T0>(IList<Tuple<RuleDependency, IAnnotatedElement
-            >> dependencies, Type<_T0> recognizerType) where _T0:Recognizer<object, object
-            >
+            >> dependencies, Type<_T0> recognizerType)
+            where _T0 : Recognizer<object, object>
         {
             string[] ruleNames = GetRuleNames(recognizerType);
             int[] ruleVersions = GetRuleVersions(recognizerType, ruleNames);
@@ -286,7 +286,8 @@ namespace Antlr4.Runtime.Misc
         }
 
         private static int[] GetRuleVersions<_T0>(Type<_T0> recognizerClass, string[] ruleNames
-            ) where _T0:Recognizer<object, object>
+            )
+            where _T0 : Recognizer<object, object>
         {
             int[] versions = new int[ruleNames.Length];
             FieldInfo[] fields = recognizerClass.GetFields();
@@ -337,7 +338,8 @@ namespace Antlr4.Runtime.Misc
         }
 
         private static MethodInfo GetRuleMethod<_T0>(Type<_T0> recognizerClass, string name
-            ) where _T0:Recognizer<object, object>
+            )
+            where _T0 : Recognizer<object, object>
         {
             MethodInfo[] declaredMethods = recognizerClass.GetMethods();
             foreach (MethodInfo method in declaredMethods)
@@ -350,8 +352,8 @@ namespace Antlr4.Runtime.Misc
             return null;
         }
 
-        private static string[] GetRuleNames<_T0>(Type<_T0> recognizerClass) where _T0:Recognizer
-            <object, object>
+        private static string[] GetRuleNames<_T0>(Type<_T0> recognizerClass)
+            where _T0 : Recognizer<object, object>
         {
             try
             {
@@ -480,7 +482,8 @@ namespace Antlr4.Runtime.Misc
         }
 
         private static RuleDependencyChecker.RuleRelations ExtractRuleRelations<_T0>(Type
-            <_T0> recognizer) where _T0:Recognizer<object, object>
+            <_T0> recognizer)
+            where _T0 : Recognizer<object, object>
         {
             string serializedATN = GetSerializedATN(recognizer);
             if (serializedATN == null)

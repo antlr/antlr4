@@ -43,20 +43,20 @@ namespace Antlr4.Runtime.Dfa
 
         private readonly IList<T> values;
 
-        public SparseEdgeMap(int minIndex, int maxIndex) : this(minIndex, maxIndex, DefaultMaxSize
-            )
+        public SparseEdgeMap(int minIndex, int maxIndex)
+            : this(minIndex, maxIndex, DefaultMaxSize)
         {
         }
 
-        public SparseEdgeMap(int minIndex, int maxIndex, int maxSparseSize) : base(minIndex
-            , maxIndex)
+        public SparseEdgeMap(int minIndex, int maxIndex, int maxSparseSize)
+            : base(minIndex, maxIndex)
         {
             this.keys = new int[maxSparseSize];
             this.values = new List<T>(maxSparseSize);
         }
 
         private SparseEdgeMap(Antlr4.Runtime.Dfa.SparseEdgeMap<T> map, int maxSparseSize)
-             : base(map.minIndex, map.maxIndex)
+            : base(map.minIndex, map.maxIndex)
         {
             if (maxSparseSize < map.values.Count)
             {

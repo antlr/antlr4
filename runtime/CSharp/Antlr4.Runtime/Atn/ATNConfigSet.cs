@@ -448,13 +448,15 @@ namespace Antlr4.Runtime.Atn
             return true;
         }
 
-        public virtual bool AddAll<_T0>(ICollection<_T0> c) where _T0:ATNConfig
+        public virtual bool AddAll<_T0>(ICollection<_T0> c)
+            where _T0 : ATNConfig
         {
             return AddAll(c, null);
         }
 
         public virtual bool AddAll<_T0>(ICollection<_T0> c, PredictionContextCache contextCache
-            ) where _T0:ATNConfig
+            )
+            where _T0 : ATNConfig
         {
             EnsureWritable();
             bool changed = false;

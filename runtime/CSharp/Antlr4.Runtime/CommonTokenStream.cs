@@ -66,12 +66,13 @@ namespace Antlr4.Runtime
         ///     </remarks>
         protected internal int channel = TokenConstants.DefaultChannel;
 
-        public CommonTokenStream(ITokenSource tokenSource) : base(tokenSource)
+        public CommonTokenStream(ITokenSource tokenSource)
+            : base(tokenSource)
         {
         }
 
-        public CommonTokenStream(ITokenSource tokenSource, int channel) : this(tokenSource
-            )
+        public CommonTokenStream(ITokenSource tokenSource, int channel)
+            : this(tokenSource)
         {
             this.channel = channel;
         }

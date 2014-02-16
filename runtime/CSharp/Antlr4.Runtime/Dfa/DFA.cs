@@ -66,7 +66,8 @@ namespace Antlr4.Runtime.Dfa
 
         private readonly AtomicInteger nextStateNumber = new AtomicInteger();
 
-        public DFA(ATNState atnStartState) : this(atnStartState, 0)
+        public DFA(ATNState atnStartState)
+            : this(atnStartState, 0)
         {
         }
 
