@@ -114,6 +114,11 @@ namespace System.Linq
             }
         }
 
+        public static T[] ToArray<T>(this IEnumerable<T> sequence)
+        {
+            return new List<T>(sequence).ToArray();
+        }
+
         public static List<T> ToList<T>(this IEnumerable<T> sequence)
         {
             return new List<T>(sequence);

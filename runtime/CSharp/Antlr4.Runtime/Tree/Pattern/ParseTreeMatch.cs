@@ -165,7 +165,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <code>null</code>
         /// if no parse tree matched a tag with the label.
         /// </returns>
-        [Nullable]
+        [return: Nullable]
         public virtual IParseTree Get(string label)
         {
             IList<IParseTree> parseTrees = labels.Get(label);
@@ -216,13 +216,13 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// . If no nodes matched the label, an empty list
         /// is returned.
         /// </returns>
-        [NotNull]
+        [return: NotNull]
         public virtual IList<IParseTree> GetAll(string label)
         {
             IList<IParseTree> nodes = labels.Get(label);
             if (nodes == null)
             {
-                return Sharpen.Collections.EmptyList();
+                return Sharpen.Collections.EmptyList<IParseTree>();
             }
             return nodes;
         }
@@ -240,7 +240,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// A mapping from labels to parse tree nodes. If the parse tree
         /// pattern did not contain any rule or token tags, this map will be empty.
         /// </returns>
-        [NotNull]
+        [return: NotNull]
         public virtual MultiMap<string, IParseTree> GetLabels()
         {
             return labels;
@@ -253,7 +253,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <code>null</code>
         /// if the match was successful.
         /// </returns>
-        [Nullable]
+        [return: Nullable]
         public virtual IParseTree GetMismatchedNode()
         {
             return mismatchedNode;
@@ -276,7 +276,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <summary>Get the tree pattern we are matching against.</summary>
         /// <remarks>Get the tree pattern we are matching against.</remarks>
         /// <returns>The tree pattern we are matching against.</returns>
-        [NotNull]
+        [return: NotNull]
         public virtual ParseTreePattern GetPattern()
         {
             return pattern;
@@ -289,7 +289,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
         /// we are trying to match to a pattern.
         /// </returns>
-        [NotNull]
+        [return: NotNull]
         public virtual IParseTree GetTree()
         {
             return tree;

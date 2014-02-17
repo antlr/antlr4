@@ -41,9 +41,9 @@ namespace Antlr4.Runtime
     {
         public const int Eof = -1;
 
-        private static readonly IDictionary<string[], IDictionary<string, int>> tokenTypeMapCache = new WeakHashMap<string[], IDictionary<string, int>>();
+        private static readonly IDictionary<string[], IDictionary<string, int>> tokenTypeMapCache = new Dictionary<string[], IDictionary<string, int>>();
 
-        private static readonly IDictionary<string[], IDictionary<string, int>> ruleIndexMapCache = new WeakHashMap<string[], IDictionary<string, int>>();
+        private static readonly IDictionary<string[], IDictionary<string, int>> ruleIndexMapCache = new Dictionary<string[], IDictionary<string, int>>();
 
         [NotNull]
         private IAntlrErrorListener<Symbol>[] _listeners =
@@ -81,7 +81,7 @@ namespace Antlr4.Runtime
         /// Get a map from token names to token types.
         /// <p>Used for XPath and tree pattern compilation.</p>
         /// </remarks>
-        [NotNull]
+        [return: NotNull]
         public virtual IDictionary<string, int> GetTokenTypeMap()
         {
             string[] tokenNames = TokenNames;
@@ -95,8 +95,7 @@ namespace Antlr4.Runtime
                 if (result == null)
                 {
                     result = Utils.ToMap(tokenNames);
-                    result.Put("EOF", TokenConstants.Eof);
-                    result = Sharpen.Collections.UnmodifiableMap(result);
+                    result["EOF"] = TokenConstants.Eof;
                     tokenTypeMapCache.Put(tokenNames, result);
                 }
                 return result;
@@ -108,7 +107,7 @@ namespace Antlr4.Runtime
         /// Get a map from rule names to rule indexes.
         /// <p>Used for XPath and tree pattern compilation.</p>
         /// </remarks>
-        [NotNull]
+        [return: NotNull]
         public virtual IDictionary<string, int> GetRuleIndexMap()
         {
             string[] ruleNames = RuleNames;
@@ -121,7 +120,7 @@ namespace Antlr4.Runtime
                 IDictionary<string, int> result = ruleIndexMapCache.Get(ruleNames);
                 if (result == null)
                 {
-                    result = Sharpen.Collections.UnmodifiableMap(Utils.ToMap(ruleNames));
+                    result = Utils.ToMap(ruleNames);
                     ruleIndexMapCache.Put(ruleNames, result);
                 }
                 return result;
@@ -130,8 +129,8 @@ namespace Antlr4.Runtime
 
         public virtual int GetTokenType(string tokenName)
         {
-            int ttype = GetTokenTypeMap().Get(tokenName);
-            if (ttype != null)
+            int ttype;
+            if (GetTokenTypeMap().TryGetValue(tokenName, out ttype))
             {
                 return ttype;
             }
@@ -148,7 +147,7 @@ namespace Antlr4.Runtime
         /// <p>For interpreters, we don't know their serialized ATN despite having
         /// created the interpreter from it.</p>
         /// </remarks>
-        [NotNull]
+        [return: NotNull]
         public virtual string GetSerializedATN()
         {
             throw new NotSupportedException("there is no serialized ATN");
@@ -205,7 +204,7 @@ namespace Antlr4.Runtime
         }
 
         /// <summary>What is the error header, normally line/character position information?</summary>
-        [NotNull]
+        [return: NotNull]
         public virtual string GetErrorHeader(RecognitionException e)
         {
             int line = e.OffendingToken.Line;

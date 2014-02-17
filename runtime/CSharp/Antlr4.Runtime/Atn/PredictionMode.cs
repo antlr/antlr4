@@ -34,7 +34,7 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-#if !PORTABLE
+    /// <summary>
     /// This enumeration defines the prediction modes available in ANTLR 4 along with
     /// utility methods for analyzing configuration sets for conflicts and/or
     /// ambiguities.
@@ -44,6 +44,7 @@ namespace Antlr4.Runtime.Atn
     /// utility methods for analyzing configuration sets for conflicts and/or
     /// ambiguities.
     /// </remarks>
+#if !PORTABLE
     [System.Serializable]
 #endif
     public sealed class PredictionMode

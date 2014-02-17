@@ -38,7 +38,7 @@ namespace Antlr4.Runtime.Atn
     /// Implements the
     /// <code>type</code>
     /// lexer action by calling
-    /// <see cref="Antlr4.Runtime.Lexer.Type(int)">Antlr4.Runtime.Lexer.Type(int)</see>
+    /// <see cref="Antlr4.Runtime.Lexer.Type">Antlr4.Runtime.Lexer.Type</see>
     /// with the assigned type.
     /// </summary>
     /// <author>Sam Harwell</author>
@@ -54,7 +54,7 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="type">
         /// The type to assign to the token using
-        /// <see cref="Antlr4.Runtime.Lexer.Type(int)">Antlr4.Runtime.Lexer.Type(int)</see>
+        /// <see cref="Antlr4.Runtime.Lexer.Type">Antlr4.Runtime.Lexer.Type</see>
         /// .
         /// </param>
         public LexerTypeAction(int type)

@@ -78,7 +78,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <summary>Gets the raw text of this chunk.</summary>
         /// <remarks>Gets the raw text of this chunk.</remarks>
         /// <returns>The text of the chunk.</returns>
-        [NotNull]
+        [return: NotNull]
         public string GetText()
         {
             return text;

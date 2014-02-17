@@ -119,7 +119,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// method can be
         /// used to determine whether or not the match was successful.
         /// </returns>
-        [NotNull]
+        [return: NotNull]
         public virtual ParseTreeMatch Match(IParseTree tree)
         {
             return matcher.Match(tree, this);
@@ -164,7 +164,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// successful matches. Unsuccessful matches are omitted from the result,
         /// regardless of the reason for the failure.
         /// </returns>
-        [NotNull]
+        [return: NotNull]
         public virtual IList<ParseTreeMatch> FindAll(IParseTree tree, string xpath)
         {
             ICollection<IParseTree> subtrees = XPath.FindAll(tree, xpath, matcher.GetParser());
@@ -174,7 +174,7 @@ namespace Antlr4.Runtime.Tree.Pattern
                 ParseTreeMatch match = Match(t);
                 if (match.Succeeded())
                 {
-                    matches.AddItem(match);
+                    matches.Add(match);
                 }
             }
             return matches;
@@ -191,7 +191,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// which created this tree
         /// pattern.
         /// </returns>
-        [NotNull]
+        [return: NotNull]
         public virtual ParseTreePatternMatcher GetMatcher()
         {
             return matcher;
@@ -200,7 +200,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <summary>Get the tree pattern in concrete syntax form.</summary>
         /// <remarks>Get the tree pattern in concrete syntax form.</remarks>
         /// <returns>The tree pattern in concrete syntax form.</returns>
-        [NotNull]
+        [return: NotNull]
         public virtual string GetPattern()
         {
             return pattern;
@@ -239,7 +239,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
         /// .
         /// </returns>
-        [NotNull]
+        [return: NotNull]
         public virtual IParseTree GetPatternTree()
         {
             return patternTree;

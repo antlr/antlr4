@@ -38,14 +38,12 @@ namespace Antlr4.Runtime.Atn
 {
     public abstract class ATNSimulator
     {
-        [System.ObsoleteAttribute(@"Use ATNDeserializer.SerializedVersion instead.")]
-        [Obsolete]
+        [Obsolete(@"Use ATNDeserializer.SerializedVersion instead.")]
         public static readonly int SerializedVersion = ATNDeserializer.SerializedVersion;
 
         /// <summary>This is the current serialized UUID.</summary>
         /// <remarks>This is the current serialized UUID.</remarks>
-        [System.ObsoleteAttribute(@"Use ATNDeserializer.CheckCondition(bool) instead.")]
-        [Obsolete]
+        [Obsolete(@"Use ATNDeserializer.CheckCondition(bool) instead.")]
         public static readonly Guid SerializedUuid = ATNDeserializer.SerializedUuid;
 
         public const char RuleVariantDelimiter = '$';
@@ -72,65 +70,56 @@ namespace Antlr4.Runtime.Atn
 
         public abstract void Reset();
 
-        [Obsolete]
-        [System.ObsoleteAttribute(@"Use ATNDeserializer.Deserialize(char[]) instead.")]
+        [Obsolete(@"Use ATNDeserializer.Deserialize(char[]) instead.")]
         public static ATN Deserialize(char[] data)
         {
             return new ATNDeserializer().Deserialize(data);
         }
 
-        [Obsolete]
-        [System.ObsoleteAttribute(@"Use ATNDeserializer.CheckCondition(bool) instead.")]
+        [Obsolete(@"Use ATNDeserializer.CheckCondition(bool) instead.")]
         public static void CheckCondition(bool condition)
         {
             new ATNDeserializer().CheckCondition(condition);
         }
 
-        [Obsolete]
-        [System.ObsoleteAttribute(@"Use ATNDeserializer.CheckCondition(bool, string) instead.")]
+        [Obsolete(@"Use ATNDeserializer.CheckCondition(bool, string) instead.")]
         public static void CheckCondition(bool condition, string message)
         {
             new ATNDeserializer().CheckCondition(condition, message);
         }
 
-        [Obsolete]
-        [System.ObsoleteAttribute(@"Use ATNDeserializer.ToInt(char) instead.")]
+        [Obsolete(@"Use ATNDeserializer.ToInt(char) instead.")]
         public static int ToInt(char c)
         {
             return ATNDeserializer.ToInt(c);
         }
 
-        [Obsolete]
-        [System.ObsoleteAttribute(@"Use ATNDeserializer.ToInt32(char[], int) instead.")]
+        [Obsolete(@"Use ATNDeserializer.ToInt32(char[], int) instead.")]
         public static int ToInt32(char[] data, int offset)
         {
             return ATNDeserializer.ToInt32(data, offset);
         }
 
-        [Obsolete]
-        [System.ObsoleteAttribute(@"Use ATNDeserializer.ToLong(char[], int) instead.")]
+        [Obsolete(@"Use ATNDeserializer.ToLong(char[], int) instead.")]
         public static long ToLong(char[] data, int offset)
         {
             return ATNDeserializer.ToLong(data, offset);
         }
 
-        [Obsolete]
-        [System.ObsoleteAttribute(@"Use ATNDeserializer.ToUUID(char[], int) instead.")]
-        public static UUID ToUUID(char[] data, int offset)
+        [Obsolete(@"Use ATNDeserializer.ToUUID(char[], int) instead.")]
+        public static Guid ToUUID(char[] data, int offset)
         {
             return ATNDeserializer.ToUUID(data, offset);
         }
 
-        [Obsolete]
         [return: NotNull]
-        [System.ObsoleteAttribute(@"Use ATNDeserializer.EdgeFactory(ATN, TransitionType, int, int, int, int, int, System.Collections.Generic.IList{E}) instead.")]
+        [Obsolete(@"Use ATNDeserializer.EdgeFactory(ATN, TransitionType, int, int, int, int, int, System.Collections.Generic.IList{E}) instead.")]
         public static Transition EdgeFactory(ATN atn, TransitionType type, int src, int trg, int arg1, int arg2, int arg3, IList<IntervalSet> sets)
         {
             return new ATNDeserializer().EdgeFactory(atn, type, src, trg, arg1, arg2, arg3, sets);
         }
 
-        [Obsolete]
-        [System.ObsoleteAttribute(@"Use ATNDeserializer.StateFactory(StateType, int) instead.")]
+        [Obsolete(@"Use ATNDeserializer.StateFactory(StateType, int) instead.")]
         public static ATNState StateFactory(StateType type, int ruleIndex)
         {
             return new ATNDeserializer().StateFactory(type, ruleIndex);

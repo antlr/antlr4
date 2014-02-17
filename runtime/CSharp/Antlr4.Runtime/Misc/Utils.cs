@@ -153,7 +153,7 @@ namespace Antlr4.Runtime.Misc
             IDictionary<string, int> m = new Dictionary<string, int>();
             for (int i = 0; i < keys.Length; i++)
             {
-                m.Put(keys[i], i);
+                m[keys[i]] = i;
             }
             return m;
         }
@@ -164,10 +164,10 @@ namespace Antlr4.Runtime.Misc
             {
                 return null;
             }
-            char[] cdata = new char[data.Size()];
-            for (int i = 0; i < data.Size(); i++)
+            char[] cdata = new char[data.Count];
+            for (int i = 0; i < data.Count; i++)
             {
-                cdata[i] = (char)data.Get(i);
+                cdata[i] = (char)data[i];
             }
             return cdata;
         }

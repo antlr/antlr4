@@ -112,7 +112,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// </exception>
         public RuleTagToken(string ruleName, int bypassTokenType, string label)
         {
-            if (ruleName == null || ruleName.IsEmpty())
+            if (string.IsNullOrEmpty(ruleName))
             {
                 throw new ArgumentException("ruleName cannot be null or empty.");
             }
@@ -124,7 +124,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <summary>Gets the name of the rule associated with this rule tag.</summary>
         /// <remarks>Gets the name of the rule associated with this rule tag.</remarks>
         /// <returns>The name of the parser rule associated with this rule tag.</returns>
-        [NotNull]
+        [return: NotNull]
         public string GetRuleName()
         {
             return ruleName;
@@ -137,7 +137,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <code>null</code>
         /// if this is an unlabeled rule tag.
         /// </returns>
-        [Nullable]
+        [return: Nullable]
         public string GetLabel()
         {
             return label;

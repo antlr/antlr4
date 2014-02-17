@@ -65,7 +65,7 @@ namespace Antlr4.Runtime
         /// on the characters until you get a good one; errors are not passed through
         /// to the parser.
         /// </summary>
-        [NotNull]
+        [return: NotNull]
         IToken NextToken();
 
         /// <summary>Get the line number for the current position in the input stream.</summary>

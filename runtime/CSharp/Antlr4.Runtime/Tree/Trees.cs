@@ -152,7 +152,7 @@ namespace Antlr4.Runtime.Tree
             IList<ITree> kids = new List<ITree>();
             for (int i = 0; i < t.ChildCount; i++)
             {
-                kids.AddItem(t.GetChild(i));
+                kids.Add(t.GetChild(i));
             }
             return kids;
         }
@@ -197,7 +197,7 @@ namespace Antlr4.Runtime.Tree
             return nodes;
         }
 
-        public static void _findAllNodes<_T0>(IParseTree t, int index, bool findTokens, IList<_T0> nodes)
+        public static void _findAllNodes(IParseTree t, int index, bool findTokens, IList<IParseTree> nodes)
         {
             // check this node (the root) first
             if (findTokens && t is ITerminalNode)
@@ -205,7 +205,7 @@ namespace Antlr4.Runtime.Tree
                 ITerminalNode tnode = (ITerminalNode)t;
                 if (tnode.Symbol.Type == index)
                 {
-                    nodes.AddItem(t);
+                    nodes.Add(t);
                 }
             }
             else
@@ -215,7 +215,7 @@ namespace Antlr4.Runtime.Tree
                     ParserRuleContext ctx = (ParserRuleContext)t;
                     if (ctx.GetRuleIndex() == index)
                     {
-                        nodes.AddItem(t);
+                        nodes.Add(t);
                     }
                 }
             }
@@ -228,12 +228,12 @@ namespace Antlr4.Runtime.Tree
 
         public static IList<IParseTree> Descendants(IParseTree t)
         {
-            IList<IParseTree> nodes = new List<IParseTree>();
-            nodes.AddItem(t);
+            List<IParseTree> nodes = new List<IParseTree>();
+            nodes.Add(t);
             int n = t.ChildCount;
             for (int i = 0; i < n; i++)
             {
-                Sharpen.Collections.AddAll(nodes, Descendants(t.GetChild(i)));
+                nodes.AddRange(Descendants(t.GetChild(i)));
             }
             return nodes;
         }

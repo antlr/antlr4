@@ -243,7 +243,7 @@ namespace Antlr4.Runtime.Dfa
         {
             if (IsPrecedenceDfa())
             {
-                return s0.Get().EdgeMap.IsEmpty() && s0full.Get().EdgeMap.IsEmpty();
+                return s0.Get().EdgeMap.Count == 0 && s0full.Get().EdgeMap.Count == 0;
             }
             return s0.Get() == null && s0full.Get() == null;
         }
@@ -252,7 +252,7 @@ namespace Antlr4.Runtime.Dfa
         {
             if (IsPrecedenceDfa())
             {
-                return s0full.Get().EdgeMap.IsEmpty();
+                return s0full.Get().EdgeMap.Count == 0;
             }
             return s0full.Get() != null;
         }

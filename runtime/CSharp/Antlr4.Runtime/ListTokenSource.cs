@@ -227,7 +227,7 @@ namespace Antlr4.Runtime
                         }
                     }
                     int stop = Math.Max(-1, start - 1);
-                    eofToken = _factory.Create(Tuple.Create(this, InputStream), TokenConstants.Eof, "EOF", TokenConstants.DefaultChannel, start, stop, Line, Column);
+                    eofToken = _factory.Create(Tuple.Create((ITokenSource)this, InputStream), TokenConstants.Eof, "EOF", TokenConstants.DefaultChannel, start, stop, Line, Column);
                 }
                 return eofToken;
             }
@@ -266,9 +266,9 @@ namespace Antlr4.Runtime
                             string tokenText = lastToken.Text;
                             if (tokenText != null)
                             {
-                                for (int i = 0; i < tokenText.Length; i++)
+                                for (int j = 0; j < tokenText.Length; j++)
                                 {
-                                    if (tokenText[i] == '\n')
+                                    if (tokenText[j] == '\n')
                                     {
                                         line++;
                                     }

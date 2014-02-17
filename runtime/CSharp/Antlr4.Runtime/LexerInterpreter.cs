@@ -29,6 +29,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Sharpen;
@@ -47,7 +48,7 @@ namespace Antlr4.Runtime
 
         protected internal readonly string[] modeNames;
 
-        public LexerInterpreter(string grammarFileName, ICollection<string> tokenNames, ICollection<string> ruleNames, ICollection<string> modeNames, ATN atn, ICharStream input)
+        public LexerInterpreter(string grammarFileName, IEnumerable<string> tokenNames, IEnumerable<string> ruleNames, IEnumerable<string> modeNames, ATN atn, ICharStream input)
             : base(input)
         {
             if (atn.grammarType != ATNType.Lexer)
@@ -56,9 +57,9 @@ namespace Antlr4.Runtime
             }
             this.grammarFileName = grammarFileName;
             this.atn = atn;
-            this.tokenNames = Sharpen.Collections.ToArray(tokenNames, new string[tokenNames.Count]);
-            this.ruleNames = Sharpen.Collections.ToArray(ruleNames, new string[ruleNames.Count]);
-            this.modeNames = Sharpen.Collections.ToArray(modeNames, new string[modeNames.Count]);
+            this.tokenNames = tokenNames.ToArray();
+            this.ruleNames = ruleNames.ToArray();
+            this.modeNames = modeNames.ToArray();
             this._interp = new LexerATNSimulator(this, atn);
         }
 

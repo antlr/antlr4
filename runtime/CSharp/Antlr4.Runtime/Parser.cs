@@ -109,7 +109,7 @@ namespace Antlr4.Runtime
         /// bypass alternatives.
         /// </summary>
         /// <seealso cref="Antlr4.Runtime.Atn.ATNDeserializationOptions.IsGenerateRuleBypassTransitions()">Antlr4.Runtime.Atn.ATNDeserializationOptions.IsGenerateRuleBypassTransitions()</seealso>
-        private static readonly IDictionary<string, ATN> bypassAltsAtnCache = new WeakHashMap<string, ATN>();
+        private static readonly IDictionary<string, ATN> bypassAltsAtnCache = new Dictionary<string, ATN>();
 
         /// <summary>The error handling strategy for the parser.</summary>
         /// <remarks>
@@ -573,7 +573,7 @@ namespace Antlr4.Runtime
         /// <see cref="Recognizer{Symbol, ATNInterpreter}.GetSerializedATN()">Recognizer&lt;Symbol, ATNInterpreter&gt;.GetSerializedATN()</see>
         /// method.
         /// </exception>
-        [NotNull]
+        [return: NotNull]
         public virtual ATN GetATNWithBypassAlts()
         {
             string serializedAtn = GetSerializedATN();
@@ -856,15 +856,14 @@ namespace Antlr4.Runtime
         /// </returns>
         public int GetPrecedence()
         {
-            if (_precedenceStack.IsEmpty())
+            if (_precedenceStack.Count == 0)
             {
                 return -1;
             }
-            return _precedenceStack.Peek();
+            return _precedenceStack[_precedenceStack.Count - 1];
         }
 
-        [Obsolete]
-        [System.ObsoleteAttribute(@"UseEnterRecursionRule(ParserRuleContext, int, int, int) instead.")]
+        [Obsolete(@"UseEnterRecursionRule(ParserRuleContext, int, int, int) instead.")]
         public virtual void EnterRecursionRule(ParserRuleContext localctx, int ruleIndex)
         {
             EnterRecursionRule(localctx, Atn.ruleToStartState[ruleIndex].stateNumber, ruleIndex, 0);
@@ -1065,8 +1064,8 @@ namespace Antlr4.Runtime
         /// </summary>
         public virtual int GetRuleIndex(string ruleName)
         {
-            int ruleIndex = GetRuleIndexMap().Get(ruleName);
-            if (ruleIndex != null)
+            int ruleIndex;
+            if (GetRuleIndexMap().TryGetValue(ruleName, out ruleIndex))
             {
                 return ruleIndex;
             }

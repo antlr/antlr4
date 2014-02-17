@@ -55,7 +55,7 @@ namespace Antlr4.Runtime.Tree.Xpath
                     ITerminalNode tnode = (ITerminalNode)c;
                     if ((tnode.Symbol.Type == tokenType && !invert) || (tnode.Symbol.Type != tokenType && invert))
                     {
-                        nodes.AddItem(tnode);
+                        nodes.Add(tnode);
                     }
                 }
             }

@@ -37,13 +37,15 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// A
     /// <see cref="Antlr4.Runtime.IToken">Antlr4.Runtime.IToken</see>
     /// object representing a token of a particular type; e.g.,
-    /// <code><ID></code>
+    /// <code>&lt;ID&gt;</code>
     /// . These tokens are created for
     /// <see cref="TagChunk">TagChunk</see>
     /// chunks where the
     /// tag corresponds to a lexer rule or token type.
     /// </summary>
+#if !PORTABLE
     [System.Serializable]
+#endif
     public class TokenTagToken : CommonToken
     {
         /// <summary>
@@ -99,7 +101,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <summary>Gets the token name.</summary>
         /// <remarks>Gets the token name.</remarks>
         /// <returns>The token name.</returns>
-        [NotNull]
+        [return: NotNull]
         public string GetTokenName()
         {
             return tokenName;
@@ -112,7 +114,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <code>null</code>
         /// if this is an unlabeled rule tag.
         /// </returns>
-        [Nullable]
+        [return: Nullable]
         public string GetLabel()
         {
             return label;

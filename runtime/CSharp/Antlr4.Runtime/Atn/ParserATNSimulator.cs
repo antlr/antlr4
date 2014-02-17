@@ -1346,7 +1346,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="Antlr4.Runtime.Parser.GetPrecedence()">Antlr4.Runtime.Parser.GetPrecedence()</see>
         /// ).
         /// </returns>
-        [NotNull]
+        [return: NotNull]
         protected internal virtual ATNConfigSet ApplyPrecedenceFilter(ATNConfigSet configs, ParserRuleContext globalContext, PredictionContextCache contextCache)
         {
             HashSet<int> statesFromAlt1 = new HashSet<int>();
@@ -1364,7 +1364,7 @@ namespace Antlr4.Runtime.Atn
                     // the configuration was eliminated
                     continue;
                 }
-                statesFromAlt1.AddItem(config.State.stateNumber);
+                statesFromAlt1.Add(config.State.stateNumber);
                 if (updatedContext != config.SemanticContext)
                 {
                     configSet.Add(config.Transform(config.State, updatedContext, false), contextCache);
@@ -2207,7 +2207,7 @@ namespace Antlr4.Runtime.Atn
                         if (enableDfa && configs.Count < size)
                         {
                             DFAState proposed = CreateDFAState(configs);
-                            DfaState existing;
+                            DFAState existing;
                             if (dfa.states.TryGetValue(proposed, out existing))
                             {
                                 return existing;

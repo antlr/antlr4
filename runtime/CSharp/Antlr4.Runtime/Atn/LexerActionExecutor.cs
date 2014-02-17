@@ -59,7 +59,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="hashCode">hashCode</see>
         /// since the hash code is an element
         /// of the performance-critical
-        /// <see cref="LexerATNConfig#hashCode">LexerATNConfig#hashCode</see>
+        /// <see cref="LexerATNConfig.hashCode">LexerATNConfig#hashCode</see>
         /// operation.
         /// </summary>
         private readonly int hashCode;
@@ -116,7 +116,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>lexerAction</code>
         /// .
         /// </returns>
-        [NotNull]
+        [return: NotNull]
         public static Antlr4.Runtime.Atn.LexerActionExecutor Append(Antlr4.Runtime.Atn.LexerActionExecutor lexerActionExecutor, ILexerAction lexerAction)
         {
             if (lexerActionExecutor == null)
@@ -177,7 +177,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     if (updatedLexerActions == null)
                     {
-                        updatedLexerActions = lexerActions.Clone();
+                        updatedLexerActions = (ILexerAction[])lexerActions.Clone();
                     }
                     updatedLexerActions[i] = new LexerIndexedCustomAction(offset, lexerActions[i]);
                 }
@@ -192,7 +192,7 @@ namespace Antlr4.Runtime.Atn
         /// <summary>Gets the lexer actions to be executed by this executor.</summary>
         /// <remarks>Gets the lexer actions to be executed by this executor.</remarks>
         /// <returns>The lexer actions to be executed by this executor.</returns>
-        [NotNull]
+        [return: NotNull]
         public virtual ILexerAction[] GetLexerActions()
         {
             return lexerActions;
@@ -241,22 +241,23 @@ namespace Antlr4.Runtime.Atn
             {
                 foreach (ILexerAction lexerAction in lexerActions)
                 {
-                    if (lexerAction is LexerIndexedCustomAction)
+                    ILexerAction action = lexerAction;
+                    if (action is LexerIndexedCustomAction)
                     {
-                        int offset = ((LexerIndexedCustomAction)lexerAction).GetOffset();
+                        int offset = ((LexerIndexedCustomAction)action).GetOffset();
                         input.Seek(startIndex + offset);
-                        lexerAction = ((LexerIndexedCustomAction)lexerAction).GetAction();
+                        action = ((LexerIndexedCustomAction)action).GetAction();
                         requiresSeek = (startIndex + offset) != stopIndex;
                     }
                     else
                     {
-                        if (lexerAction.IsPositionDependent())
+                        if (action.IsPositionDependent())
                         {
                             input.Seek(stopIndex);
                             requiresSeek = false;
                         }
                     }
-                    lexerAction.Execute(lexer);
+                    action.Execute(lexer);
                 }
             }
             finally

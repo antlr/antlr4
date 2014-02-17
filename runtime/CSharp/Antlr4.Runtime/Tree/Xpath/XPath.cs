@@ -30,6 +30,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using Antlr4.Runtime.Tree.Xpath;
@@ -162,7 +163,7 @@ namespace Antlr4.Runtime.Tree.Xpath
                         }
                         XPathElement pathElement = GetXPathElement(next, anywhere);
                         pathElement.invert = invert;
-                        elements.AddItem(pathElement);
+                        elements.Add(pathElement);
                         i++;
                         break;
                     }
@@ -171,7 +172,7 @@ namespace Antlr4.Runtime.Tree.Xpath
                     case XPathLexer.RuleRef:
                     case XPathLexer.Wildcard:
                     {
-                        elements.AddItem(GetXPathElement(el, false));
+                        elements.Add(GetXPathElement(el, false));
                         i++;
                         break;
                     }
@@ -189,7 +190,7 @@ namespace Antlr4.Runtime.Tree.Xpath
 loop_continue: ;
             }
 loop_break: ;
-            return Sharpen.Collections.ToArray(elements, new XPathElement[0]);
+            return elements.ToArray();
         }
 
         private sealed class _XPathLexer_87 : XPathLexer
@@ -235,7 +236,7 @@ loop_break: ;
             {
                 case XPathLexer.Wildcard:
                 {
-                    return anywhere ? new XPathWildcardAnywhereElement() : new XPathWildcardElement();
+                    return anywhere ? new XPathWildcardAnywhereElement() : (XPathElement)new XPathWildcardElement();
                 }
 
                 case XPathLexer.TokenRef:
@@ -245,7 +246,7 @@ loop_break: ;
                     {
                         throw new ArgumentException(word + " at index " + wordToken.StartIndex + " isn't a valid token name");
                     }
-                    return anywhere ? new XPathTokenAnywhereElement(word, ttype) : new XPathTokenElement(word, ttype);
+                    return anywhere ? new XPathTokenAnywhereElement(word, ttype) : (XPathElement)new XPathTokenElement(word, ttype);
                 }
 
                 default:
@@ -254,7 +255,7 @@ loop_break: ;
                     {
                         throw new ArgumentException(word + " at index " + wordToken.StartIndex + " isn't a valid rule name");
                     }
-                    return anywhere ? new XPathRuleAnywhereElement(word, ruleIndex) : new XPathRuleElement(word, ruleIndex);
+                    return anywhere ? new XPathRuleAnywhereElement(word, ruleIndex) : (XPathElement)new XPathRuleElement(word, ruleIndex);
                 }
             }
         }
@@ -280,11 +281,12 @@ loop_break: ;
             ParserRuleContext dummyRoot = new ParserRuleContext();
             dummyRoot.children = Sharpen.Collections.SingletonList(t);
             // don't set t's parent.
-            ICollection<IParseTree> work = Sharpen.Collections.Singleton<IParseTree>(dummyRoot);
+            ICollection<IParseTree> work = new[] { dummyRoot };
             int i = 0;
             while (i < elements.Length)
             {
-                ICollection<IParseTree> next = new LinkedHashSet<IParseTree>();
+                HashSet<IParseTree> visited = new HashSet<IParseTree>();
+                ICollection<IParseTree> next = new List<IParseTree>();
                 foreach (IParseTree node in work)
                 {
                     if (node.ChildCount > 0)
@@ -293,7 +295,11 @@ loop_break: ;
                         // e.g., //func/*/stat might have a token node for which
                         // we can't go looking for stat nodes.
                         ICollection<IParseTree> matching = elements[i].Evaluate(node);
-                        Sharpen.Collections.AddAll(next, matching);
+                        foreach (IParseTree parseTree in matching)
+                        {
+                            if (visited.Add(parseTree))
+                                next.Add(parseTree);
+                        }
                     }
                 }
                 i++;

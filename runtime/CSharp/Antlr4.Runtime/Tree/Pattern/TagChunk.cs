@@ -131,7 +131,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// </exception>
         public TagChunk(string label, string tag)
         {
-            if (tag == null || tag.IsEmpty())
+            if (string.IsNullOrEmpty(tag))
             {
                 throw new ArgumentException("tag cannot be null or empty");
             }
@@ -142,7 +142,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <summary>Get the tag for this chunk.</summary>
         /// <remarks>Get the tag for this chunk.</remarks>
         /// <returns>The tag for the chunk.</returns>
-        [NotNull]
+        [return: NotNull]
         public string GetTag()
         {
             return tag;
@@ -156,7 +156,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// if no label is
         /// assigned to the chunk.
         /// </returns>
-        [Nullable]
+        [return: Nullable]
         public string GetLabel()
         {
             return label;

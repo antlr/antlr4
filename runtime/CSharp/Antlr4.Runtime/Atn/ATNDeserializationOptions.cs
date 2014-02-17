@@ -66,7 +66,7 @@ namespace Antlr4.Runtime.Atn
             this.optimize = options.optimize;
         }
 
-        [NotNull]
+        [return: NotNull]
         public static Antlr4.Runtime.Atn.ATNDeserializationOptions GetDefaultOptions()
         {
             return defaultOptions;

@@ -699,7 +699,7 @@ namespace Antlr4.Runtime.Atn
             return new Antlr4.Runtime.Atn.ATNSerializer(atn, ruleNames, tokenNames).Decode(data);
         }
 
-        private void SerializeUUID(List<int> data, UUID uuid)
+        private void SerializeUUID(List<int> data, Guid uuid)
         {
             SerializeLong(data, uuid.GetLeastSignificantBits());
             SerializeLong(data, uuid.GetMostSignificantBits());

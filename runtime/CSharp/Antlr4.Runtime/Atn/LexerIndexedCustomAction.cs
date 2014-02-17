@@ -113,7 +113,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="ILexerAction">ILexerAction</see>
         /// object which executes the lexer action.
         /// </returns>
-        [NotNull]
+        [return: NotNull]
         public ILexerAction GetAction()
         {
             return action;

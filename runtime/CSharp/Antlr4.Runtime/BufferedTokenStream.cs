@@ -326,7 +326,7 @@ namespace Antlr4.Runtime
             return tokens[p - k];
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual IToken Lt(int k)
         {
             LazyInit();

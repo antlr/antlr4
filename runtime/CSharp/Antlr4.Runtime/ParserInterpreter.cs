@@ -29,6 +29,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Sharpen;
@@ -62,15 +63,15 @@ namespace Antlr4.Runtime
 
         protected internal readonly string[] ruleNames;
 
-        protected internal readonly IDeque<Tuple<ParserRuleContext, int>> _parentContextStack = new ArrayDeque<Tuple<ParserRuleContext, int>>();
+        protected internal readonly Stack<Tuple<ParserRuleContext, int>> _parentContextStack = new Stack<Tuple<ParserRuleContext, int>>();
 
-        public ParserInterpreter(string grammarFileName, ICollection<string> tokenNames, ICollection<string> ruleNames, ATN atn, ITokenStream input)
+        public ParserInterpreter(string grammarFileName, IEnumerable<string> tokenNames, IEnumerable<string> ruleNames, ATN atn, ITokenStream input)
             : base(input)
         {
             this.grammarFileName = grammarFileName;
             this.atn = atn;
-            this.tokenNames = Sharpen.Collections.ToArray(tokenNames, new string[tokenNames.Count]);
-            this.ruleNames = Sharpen.Collections.ToArray(ruleNames, new string[ruleNames.Count]);
+            this.tokenNames = tokenNames.ToArray();
+            this.ruleNames = ruleNames.ToArray();
             // identify the ATN states where pushNewRecursionContext must be called
             this.pushRecursionContextStates = new BitSet(atn.states.Count);
             foreach (ATNState state in atn.states)

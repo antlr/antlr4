@@ -375,7 +375,7 @@ namespace Antlr4.Runtime.Atn
                     return false;
                 }
             }
-            return this.State.stateNumber == other.State.stateNumber && this.Alt == other.Alt && this.ReachesIntoOuterContext == other.ReachesIntoOuterContext && this.Context.Equals(other.Context) && this.SemanticContext.Equals(other.SemanticContext) && this.HasPassedThroughNonGreedyDecision() == other.HasPassedThroughNonGreedyDecision() && ObjectEqualityComparator.Instance.Equals(this.ActionExecutor, other.ActionExecutor);
+            return this.State.stateNumber == other.State.stateNumber && this.Alt == other.Alt && this.ReachesIntoOuterContext == other.ReachesIntoOuterContext && this.Context.Equals(other.Context) && this.SemanticContext.Equals(other.SemanticContext) && this.HasPassedThroughNonGreedyDecision() == other.HasPassedThroughNonGreedyDecision() && EqualityComparer<LexerActionExecutor>.Default.Equals(this.ActionExecutor, other.ActionExecutor);
         }
 
         public override int GetHashCode()

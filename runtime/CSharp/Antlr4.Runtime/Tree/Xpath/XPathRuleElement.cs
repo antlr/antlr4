@@ -56,7 +56,7 @@ namespace Antlr4.Runtime.Tree.Xpath
                     ParserRuleContext ctx = (ParserRuleContext)c;
                     if ((ctx.GetRuleIndex() == ruleIndex && !invert) || (ctx.GetRuleIndex() != ruleIndex && invert))
                     {
-                        nodes.AddItem(ctx);
+                        nodes.Add(ctx);
                     }
                 }
             }

@@ -34,32 +34,35 @@ using Sharpen;
 
 namespace Antlr4.Runtime.Misc
 {
+#if !PORTABLE
     [System.Serializable]
-    public class MultiMap<K, V> : LinkedHashMap<K, IList<V>>
+#endif
+    public class MultiMap<K, V> : Dictionary<K, IList<V>>
     {
         private const long serialVersionUID = -4956746660057462312L;
 
         public virtual void Map(K key, V value)
         {
-            IList<V> elementsForKey = Get(key);
-            if (elementsForKey == null)
+            IList<V> elementsForKey;
+            if (!TryGetValue(key, out elementsForKey))
             {
                 elementsForKey = new List<V>();
-                base.Put(key, elementsForKey);
+                this[key] = elementsForKey;
             }
-            elementsForKey.AddItem(value);
+            elementsForKey.Add(value);
         }
 
         public virtual IList<Tuple<K, V>> GetPairs()
         {
             IList<Tuple<K, V>> pairs = new List<Tuple<K, V>>();
-            foreach (K key in Keys)
+            foreach (KeyValuePair<K, IList<V>> pair in this)
             {
-                foreach (V value in Get(key))
+                foreach (V value in pair.Value)
                 {
-                    pairs.AddItem(Tuple.Create(key, value));
+                    pairs.Add(Tuple.Create(pair.Key, value));
                 }
             }
+
             return pairs;
         }
     }
