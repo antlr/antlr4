@@ -23,7 +23,7 @@
   <files>
     <!-- Tools -->
 
-    <file src="$M2_REPO$\com\tunnelvisionlabs\antlr4-csharp\4.1-SNAPSHOT\antlr4-csharp-4.1-SNAPSHOT-complete.jar" target="tools"/>
+    <file src="$M2_REPO$\com\tunnelvisionlabs\antlr4-csharp\4.2-SNAPSHOT\antlr4-csharp-4.2-SNAPSHOT-complete.jar" target="tools"/>
 
     <!-- Build Configuration -->
 
