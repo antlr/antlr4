@@ -570,13 +570,13 @@ namespace Antlr4.Runtime
         /// <exception cref="System.NotSupportedException">
         /// if the current parser does not
         /// implement the
-        /// <see cref="Recognizer{Symbol, ATNInterpreter}.GetSerializedATN()">Recognizer&lt;Symbol, ATNInterpreter&gt;.GetSerializedATN()</see>
+        /// <see cref="Recognizer{Symbol, ATNInterpreter}.SerializedAtn()">Recognizer&lt;Symbol, ATNInterpreter&gt;.SerializedAtn()</see>
         /// method.
         /// </exception>
         [NotNull]
         public virtual ATN GetATNWithBypassAlts()
         {
-            string serializedAtn = GetSerializedATN();
+            string serializedAtn = SerializedAtn;
             if (serializedAtn == null)
             {
                 throw new NotSupportedException("The current parser does not support an ATN with bypass alternatives.");
