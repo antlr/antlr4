@@ -41,7 +41,7 @@ Hi and welcome to the Honey Badger 4.2 release (February 3, 2014) of ANTLR!
 
 0. [Install Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) (version 1.6 or higher)
 
-1. Download [antlr-4.2-complete.jar](http://antlr.org/download/antlr-4.2-complete.jar)
+1. Download [antlr-4.2-complete.jar](http://www.antlr.org/download/antlr-4.2-complete.jar)
    Save to your directory for 3rd party Java libraries, say `C:\Javalib`
 
 2. Add `antlr-4.2-complete.jar` to `CLASSPATH`, either:
