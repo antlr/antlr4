@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/sharwell/antlr4cs</projectUrl>
     <licenseUrl>https://raw.github.com/sharwell/antlr4cs/master/LICENSE.txt</licenseUrl>
     <iconUrl>https://raw.github.com/antlr/website-antlr4/master/images/icons/antlr.png</iconUrl>
-    <copyright>Copyright © Sam Harwell 2013</copyright>
+    <copyright>Copyright © Sam Harwell 2014</copyright>
     <releaseNotes>https://github.com/sharwell/antlr4cs/releases/v$version$</releaseNotes>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <tags>antlr antlr4 parsing</tags>
@@ -51,5 +51,6 @@
     <!-- Source Code -->
 
     <file exclude="..\runtime\CSharp\Antlr4.Runtime\obj\**\*.cs" src="..\runtime\CSharp\Antlr4.Runtime\**\*.cs" target="src"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\**\$Configuration$\*Lexer.cs" target="src"/>
   </files>
 </package>

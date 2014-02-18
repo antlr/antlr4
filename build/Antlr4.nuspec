@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/sharwell/antlr4cs</projectUrl>
     <licenseUrl>https://raw.github.com/sharwell/antlr4cs/master/LICENSE.txt</licenseUrl>
     <iconUrl>https://raw.github.com/antlr/website-antlr4/master/images/icons/antlr.png</iconUrl>
-    <copyright>Copyright © Sam Harwell 2013</copyright>
+    <copyright>Copyright © Sam Harwell 2014</copyright>
     <releaseNotes>https://github.com/sharwell/antlr4cs/releases/v$version$</releaseNotes>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <tags>antlr antlr4 parsing</tags>
@@ -23,7 +23,7 @@
   <files>
     <!-- Tools -->
 
-    <file src="$M2_REPO$\com\tunnelvisionlabs\antlr4-csharp\4.2-SNAPSHOT\antlr4-csharp-4.2-SNAPSHOT-complete.jar" target="tools"/>
+    <file src="..\tool\target\antlr4-csharp-$CSharpToolVersion$-complete.jar" target="tools"/>
 
     <!-- Build Configuration -->
 
