@@ -5,6 +5,7 @@
 * [Wikipedia](https://en.wikipedia.org/wiki/ANTLR)
 * [Official site](http://www.antlr.org/)
 * [ANTLR v3](http://www.antlr3.org/)
+* [v3 to v4 Migration guide, differences](https://theantlrguy.atlassian.net/wiki/pages/viewpage.action?pageId=1900596)
 
 ## INTRODUCTION
 
