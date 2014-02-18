@@ -147,10 +147,13 @@ namespace Antlr4.Runtime
         /// <p>For interpreters, we don't know their serialized ATN despite having
         /// created the interpreter from it.</p>
         /// </remarks>
-        [return: NotNull]
-        public virtual string GetSerializedATN()
+        public virtual string SerializedAtn
         {
-            throw new NotSupportedException("there is no serialized ATN");
+            [return: NotNull]
+            get
+            {
+                throw new NotSupportedException("there is no serialized ATN");
+            }
         }
 
         /// <summary>For debugging and other purposes, might want the grammar name.</summary>
