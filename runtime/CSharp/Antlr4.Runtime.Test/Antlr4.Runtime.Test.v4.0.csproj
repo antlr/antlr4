@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Antlr4.4.1.0-alpha003\build\Antlr4.props" Condition="Exists('..\packages\Antlr4.4.1.0-alpha003\build\Antlr4.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -17,6 +18,8 @@
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
     <BaseIntermediateOutputPath>obj\v4.0\</BaseIntermediateOutputPath>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -70,6 +73,9 @@
     <EmbeddedResource Include="Java.g4" />
     <Antlr4 Include="Java.g4" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.Antlr4.Runtime.Test.v4.0.config" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
@@ -90,13 +96,16 @@
   </Choose>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <!-- Folder containing Antlr4BuildTasks.dll -->
-    <Antlr4BuildTaskPath>$(ProjectDir)..\build</Antlr4BuildTaskPath>
-    <!-- Path to the ANTLR Tool itself. -->
-    <Antlr4ToolPath>$(ProjectDir)..\build\antlr4-csharp-4.0.1-SNAPSHOT-complete.jar</Antlr4ToolPath>
-  </PropertyGroup>
-  <Import Project="$(ProjectDir)..\build\Antlr4.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+    <Error Condition="!Exists('..\packages\Antlr4.4.1.0-alpha003\build\Antlr4.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Antlr4.4.1.0-alpha003\build\Antlr4.props'))" />
+    <Error Condition="!Exists('..\packages\Antlr4.4.1.0-alpha003\build\Antlr4.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Antlr4.4.1.0-alpha003\build\Antlr4.targets'))" />
+  </Target>
+  <Import Project="..\packages\Antlr4.4.1.0-alpha003\build\Antlr4.targets" Condition="Exists('..\packages\Antlr4.4.1.0-alpha003\build\Antlr4.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
