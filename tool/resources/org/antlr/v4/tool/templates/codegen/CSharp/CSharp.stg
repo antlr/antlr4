@@ -253,6 +253,8 @@ public <if(parser.abstractRecognizer)>abstract <endif>partial class <csIdentifie
 
 	public override string[] RuleNames { get { return ruleNames; } }
 
+	public override string SerializedAtn { get { return _serializedATN; } }
+
 	<namedActions.members>
 	<parser:(ctor)()>
 	<funcs; separator="\n">
@@ -432,13 +434,17 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 [RuleVersion(<namedActions.version; null="0">)]
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(int _p<currentRule.args:{a | , <a.type> <csIdentifier.(a.name)><if(a.initValue)> = <a.initValue><endif>}>) {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<currentRule.args:{a | <a.type> <csIdentifier.(a.name)><if(a.initValue)> = <a.initValue><endif>}; separator=", ">) {
+	return <csIdentifier.(currentRule.name)>(0<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
+}
+
+private <currentRule.ctxType> <csIdentifier.(currentRule.name)>(int _p<currentRule.args:{a | , <a.type> <csIdentifier.(a.name)><if(a.initValue)> = <a.initValue><endif>}>) {
 	ParserRuleContext _parentctx = _ctx;
 	int _parentState = State;
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
 	<currentRule.ctxType> _prevctx = _localctx;
 	int _startState = <currentRule.startState>;
-	EnterRecursionRule(_localctx, RULE_<currentRule.name>, _p);
+	EnterRecursionRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>, _p);
 	<namedActions.init>
 	<locals; separator="\n">
 	try {
@@ -954,6 +960,8 @@ public <if(lexer.abstractRecognizer)>abstract <endif>partial class <csIdentifier
 
 	public override string[] ModeNames { get { return modeNames; } }
 
+	public override string SerializedAtn { get { return _serializedATN; } }
+
 	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 	<atn>
 }
@@ -964,7 +972,7 @@ SerializedATN(model) ::= <<
 public static readonly string _serializedATN =
 	"<model.serialized; wrap={"+<\n><\t>"}>";
 public static readonly ATN _ATN =
-	ATNSimulator.Deserialize(_serializedATN.ToCharArray());
+	new ATNDeserializer().Deserialize(_serializedATN.ToCharArray());
 >>
 
 initValue(typeName) ::= <<
