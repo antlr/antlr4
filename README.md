@@ -96,7 +96,7 @@ In a temporary directory, put the following grammar inside file `Hello.g4`:
 grammar Hello;
 r : 'hello' ID ;
 ID : [a-z]+ ;
-WS : [ \t\n]+ -> skip ; // skip spaces, tabs, newlines
+WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
 ```
 Then run ANTLR the tool on it:
 ```sh
