@@ -22,7 +22,7 @@ Hi and welcome to the Honey Badger 4.2 release (February 3, 2014) of ANTLR!
    $ cd /usr/local/lib
    $ curl -O http://www.antlr4.org/download/antlr-4.2-complete.jar
    ```
-   Or just [download in browser](http://www.antlr4.org/download/antlr-4.2-complete.jar) and put it somewhere rational like `/usr/local/lib`.
+   Or just [download in browser](http://www.antlr.org/download/antlr-4.2-complete.jar) and put it somewhere rational like `/usr/local/lib`.
 
 2. Add `antlr-4.2-complete.jar` to your `CLASSPATH`:
    ```sh
