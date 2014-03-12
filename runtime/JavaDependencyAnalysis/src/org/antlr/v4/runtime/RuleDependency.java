@@ -30,6 +30,8 @@
 
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.RuleDependencyProcessor;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -48,10 +50,26 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.FIELD})
 public @interface RuleDependency {
 
+	/**
+	 * Gets the recognizer class where the dependent parser rules are defined.
+	 * This may reference the generated parser class directly, or for simplicity
+	 * in certain cases, any class derived from it.
+	 */
 	Class<? extends Recognizer<?, ?>> recognizer();
 
+	/**
+	 * Gets the rule index for this dependency. This value should be specified
+	 * as a reference to one of the {@code RULE_} constants defined in the
+	 * generated parser code.
+	 */
 	int rule();
 
+	/**
+	 * Gets the version number for this dependency. The value must equal the
+	 * maximum version specified for any single rule in the set of computed
+	 * dependent rules, or a validation error will occur in
+	 * {@link RuleDependencyProcessor} at compile time.
+	 */
 	int version();
 
 	/**
@@ -59,11 +77,11 @@ public @interface RuleDependency {
 	 * annotated element depends on. Even when absent from this set, the
 	 * annotated element is implicitly dependent upon the explicitly specified
 	 * {@link #rule}, which corresponds to the {@link Dependents#SELF} element.
-	 * <p/>
+	 * <p>
 	 * By default, the annotated element is dependent upon the specified
 	 * {@link #rule} and its {@link Dependents#PARENTS}, i.e. the rule within
 	 * one level of context information. The parents are included since the most
-	 * frequent assumption about a rule is where it's used in the grammar.
+	 * frequent assumption about a rule is where it's used in the grammar.</p>
 	 */
 	Dependents[] dependents() default {Dependents.SELF, Dependents.PARENTS};
 }
