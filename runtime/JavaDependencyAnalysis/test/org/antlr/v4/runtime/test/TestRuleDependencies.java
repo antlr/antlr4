@@ -41,6 +41,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -110,6 +111,30 @@ public class TestRuleDependencies extends BaseTest {
 
 			Assert.assertNull(method.getAnnotation(RuleVersion.class));
 		}
+	}
+
+	/**
+	 * This test verifies that the {@link RuleDependencyProcessor} annotation
+	 * processor is enabled by default while compiling Java code. It functions
+	 * by watching for the build to write a standard message indicating the
+	 * number of rule dependencies which are being validated.
+	 */
+	@Test
+	public void testProcessorEnabled() throws IOException {
+		String grammarFileName = "Simple.g4";
+		String body = load(grammarFileName, null);
+		String[] extraOptionsArray = { "-Werror", "-rule-versioning" };
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "SimpleParser", "SimpleLexer", true, extraOptionsArray);
+		Assert.assertTrue(success);
+
+		String sourceFile = load("TestProcessorEnabled.java.test", null);
+		assertNotNullOrEmpty(sourceFile);
+
+		writeFile(tmpdir, "TestProcessorEnabled.java", sourceFile);
+		StringWriter writer = new StringWriter();
+		success = compile(writer, "TestProcessorEnabled.java");
+		Assert.assertTrue(success);
+		Assert.assertEquals("Note: ANTLR 4: Validating 1 dependencies on rules in SimpleParser." + newline, writer.getBuffer().toString());
 	}
 
 	protected String load(String fileName, @Nullable String encoding)
