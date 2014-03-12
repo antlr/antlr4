@@ -325,6 +325,9 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
+<if(currentRule.ruleVersioning)>
+@RuleVersion(<namedActions.version; null="0">)
+<endif>
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>);
 	enterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
@@ -362,6 +365,9 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
+<if(currentRule.ruleVersioning)>
+@RuleVersion(<namedActions.version; null="0">)
+<endif>
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=", ">) throws RecognitionException {
 	return <currentRule.name>(0<currentRule.args:{a | , <a.name>}>);
 }

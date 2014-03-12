@@ -133,6 +133,7 @@ public class Tool {
 	public boolean gen_listener = true;
 	public boolean gen_visitor = false;
 	public boolean gen_dependencies = false;
+	public boolean rule_versioning = false;
 	public String genPackage = null;
 	public Map<String, String> grammarOptions = null;
 	public boolean warnings_are_errors = false;
@@ -151,6 +152,7 @@ public class Tool {
 		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
 		new Option("genPackage",		"-package", OptionArgType.STRING, "specify a package/namespace for the generated code"),
 		new Option("gen_dependencies",	"-depend", "generate file dependencies"),
+		new Option("rule_versioning",	"-rule-versioning", "enable rule versioning annotations"),
 		new Option("",					"-D<option>=value", "set/override a grammar-level option"),
 		new Option("warnings_are_errors", "-Werror", "treat warnings as errors"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),

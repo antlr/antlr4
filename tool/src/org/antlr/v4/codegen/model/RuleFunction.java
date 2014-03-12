@@ -86,6 +86,7 @@ public class RuleFunction extends OutputModelObject {
 	public Rule rule;
 	public AltLabelStructDecl[] altToContext;
 	public boolean hasLookaheadBlock;
+	public boolean ruleVersioning;
 
 	@ModelElement public List<SrcOp> code;
 	@ModelElement public OrderedHashSet<Decl> locals; // TODO: move into ctx?
@@ -136,6 +137,8 @@ public class RuleFunction extends OutputModelObject {
 		}
 
 		startState = factory.getGrammar().atn.ruleToStartState[r.index];
+
+		ruleVersioning = r.g != null && r.g.tool.rule_versioning;
 	}
 
 	public void addContextGetters(OutputModelFactory factory, Rule r) {
