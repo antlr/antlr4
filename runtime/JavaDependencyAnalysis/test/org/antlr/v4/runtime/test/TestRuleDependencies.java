@@ -193,6 +193,62 @@ public class TestRuleDependencies extends BaseTest {
 			writer.getBuffer().toString());
 	}
 
+	/**
+	 * This test verifies that a rule dependency that references an invalid rule
+	 * number results in a compile-time validation error.
+	 */
+	@Test
+	public void testInvalidRule() throws IOException {
+		String grammarFileName = "Simple.g4";
+		String body = load(grammarFileName, null);
+		String[] extraOptionsArray = { "-Werror", "-rule-versioning" };
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "SimpleParser", "SimpleLexer", true, extraOptionsArray);
+		Assert.assertTrue(success);
+
+		String sourceFile = load("TestInvalidRule.java.test", null);
+		assertNotNullOrEmpty(sourceFile);
+
+		writeFile(tmpdir, "TestInvalidRule.java", sourceFile);
+		StringWriter writer = new StringWriter();
+		success = compile(writer, "TestInvalidRule.java");
+		Assert.assertFalse(success);
+		Assert.assertEquals(
+			"Note: ANTLR 4: Validating 1 dependencies on rules in SimpleParser." + newline +
+			tmpdir + File.separator + "TestInvalidRule.java:4: error: Rule dependency on unknown rule 3@0 in SimpleParser" + newline +
+			"    @RuleDependency(recognizer = SimpleParser.class, rule = 3, version = 0)" + newline +
+			"    ^" + newline +
+			"1 error" + newline,
+			writer.getBuffer().toString());
+	}
+
+	/**
+	 * This test verifies that a rule dependency that references an invalid rule
+	 * number (negative) results in a compile-time validation error.
+	 */
+	@Test
+	public void testInvalidRuleNegative() throws IOException {
+		String grammarFileName = "Simple.g4";
+		String body = load(grammarFileName, null);
+		String[] extraOptionsArray = { "-Werror", "-rule-versioning" };
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "SimpleParser", "SimpleLexer", true, extraOptionsArray);
+		Assert.assertTrue(success);
+
+		String sourceFile = load("TestInvalidRuleNegative.java.test", null);
+		assertNotNullOrEmpty(sourceFile);
+
+		writeFile(tmpdir, "TestInvalidRuleNegative.java", sourceFile);
+		StringWriter writer = new StringWriter();
+		success = compile(writer, "TestInvalidRuleNegative.java");
+		Assert.assertFalse(success);
+		Assert.assertEquals(
+			"Note: ANTLR 4: Validating 1 dependencies on rules in SimpleParser." + newline +
+			tmpdir + File.separator + "TestInvalidRuleNegative.java:4: error: Rule dependency on unknown rule -1@0 in SimpleParser" + newline +
+			"    @RuleDependency(recognizer = SimpleParser.class, rule = -1, version = 0)" + newline +
+			"    ^" + newline +
+			"1 error" + newline,
+			writer.getBuffer().toString());
+	}
+
 	protected String load(String fileName, @Nullable String encoding)
 		throws IOException
 	{
