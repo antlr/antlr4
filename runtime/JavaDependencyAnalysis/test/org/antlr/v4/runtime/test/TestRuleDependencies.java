@@ -137,6 +137,62 @@ public class TestRuleDependencies extends BaseTest {
 		Assert.assertEquals("Note: ANTLR 4: Validating 1 dependencies on rules in SimpleParser." + newline, writer.getBuffer().toString());
 	}
 
+	/**
+	 * This test verifies that a rule dependency version number which is too low
+	 * results in a compile-time validation error.
+	 */
+	@Test
+	public void testVersionTooLow() throws IOException {
+		String grammarFileName = "Simple.g4";
+		String body = load(grammarFileName, null);
+		String[] extraOptionsArray = { "-Werror", "-rule-versioning" };
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "SimpleParser", "SimpleLexer", true, extraOptionsArray);
+		Assert.assertTrue(success);
+
+		String sourceFile = load("TestVersionTooLow.java.test", null);
+		assertNotNullOrEmpty(sourceFile);
+
+		writeFile(tmpdir, "TestVersionTooLow.java", sourceFile);
+		StringWriter writer = new StringWriter();
+		success = compile(writer, "TestVersionTooLow.java");
+		Assert.assertFalse(success);
+		Assert.assertEquals(
+			"Note: ANTLR 4: Validating 1 dependencies on rules in SimpleParser." + newline +
+			tmpdir + File.separator + "TestVersionTooLow.java:4: error: Rule dependency version mismatch: sourceFile has version 0 (expected <= -1) in SimpleParser" + newline +
+			"    @RuleDependency(recognizer = SimpleParser.class, rule = SimpleParser.RULE_sourceFile, version = -1)" + newline +
+			"    ^" + newline +
+			"1 error" + newline,
+			writer.getBuffer().toString());
+	}
+
+	/**
+	 * This test verifies that a rule dependency version number which is too
+	 * high results in a compile-time validation error.
+	 */
+	@Test
+	public void testVersionTooHigh() throws IOException {
+		String grammarFileName = "Simple.g4";
+		String body = load(grammarFileName, null);
+		String[] extraOptionsArray = { "-Werror", "-rule-versioning" };
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, "SimpleParser", "SimpleLexer", true, extraOptionsArray);
+		Assert.assertTrue(success);
+
+		String sourceFile = load("TestVersionTooHigh.java.test", null);
+		assertNotNullOrEmpty(sourceFile);
+
+		writeFile(tmpdir, "TestVersionTooHigh.java", sourceFile);
+		StringWriter writer = new StringWriter();
+		success = compile(writer, "TestVersionTooHigh.java");
+		Assert.assertFalse(success);
+		Assert.assertEquals(
+			"Note: ANTLR 4: Validating 1 dependencies on rules in SimpleParser." + newline +
+			tmpdir + File.separator + "TestVersionTooHigh.java:4: error: Rule dependency version mismatch: sourceFile has maximum dependency version 0 (expected 1) in SimpleParser" + newline +
+			"    @RuleDependency(recognizer = SimpleParser.class, rule = SimpleParser.RULE_sourceFile, version = 1)" + newline +
+			"    ^" + newline +
+			"1 error" + newline,
+			writer.getBuffer().toString());
+	}
+
 	protected String load(String fileName, @Nullable String encoding)
 		throws IOException
 	{
@@ -148,6 +204,7 @@ public class TestRuleDependencies extends BaseTest {
 		int size = 65000;
 		InputStreamReader isr;
 		InputStream fis = getClass().getClassLoader().getResourceAsStream(fullFileName);
+		Assert.assertNotNull(fis);
 		if ( encoding!=null ) {
 			isr = new InputStreamReader(fis, encoding);
 		}

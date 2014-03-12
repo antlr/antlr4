@@ -1,0 +1,6 @@
+import org.antlr.v4.runtime.RuleDependency;
+
+public class TestVersionTooHigh {
+    @RuleDependency(recognizer = SimpleParser.class, rule = SimpleParser.RULE_sourceFile, version = 1)
+    private int foo;
+}
