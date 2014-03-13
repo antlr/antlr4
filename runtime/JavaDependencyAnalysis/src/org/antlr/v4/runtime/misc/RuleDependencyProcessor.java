@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime.misc;
 
 import org.antlr.v4.runtime.Dependents;
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RuleDependencies;
 import org.antlr.v4.runtime.RuleDependency;
 import org.antlr.v4.runtime.RuleVersion;
@@ -67,6 +68,65 @@ import java.util.Set;
 
 /**
  * A compile-time validator for rule dependencies.
+ *
+ * <p>
+ * This annotation processor produces the following messages during validation.
+ * </p>
+ *
+ * <ul>
+ * <li>
+ * {@link javax.tools.Diagnostic.Kind#NOTE}: <quote>"ANTLR 4: Validating
+ * <em>count</em> dependencies on rules in <em>parser</em>."</quote>
+ * <p>
+ * This message is printed to indicate the total number of declared dependencies
+ * found in the project which link to a specific type of {@link Parser}.
+ * </p>
+ * </li>
+ * <li>
+ * {@link javax.tools.Diagnostic.Kind#ERROR}: <quote>"Rule dependency on unknown
+ * rule <em>ruleIndex</em>@<em>version</em> in <em>parser</em>"</quote>
+ * <p>This message is printed when the {@link RuleDependency#rule()} property of
+ * a dependency is set to a rule {@code ruleIndex} which could not be found in
+ * the specified recognizer.</p>
+ * </li>
+ * <li>
+ * {@link javax.tools.Diagnostic.Kind#ERROR}: <quote>"Rule dependency version
+ * mismatch: <em>rule</em> has maximum dependency version <em>version</em>
+ * (expected <em>expected</em>) in <em>parser</em>"</quote>
+ * <p>This message is printed when a {@link RuleDependency} annotation's
+ * {@link RuleDependency#version} property ({@code expected}) is greater than
+ * the maximum rule {@code version} found in the generated parser within the
+ * scope defined by the {@link RuleDependency#rule} and
+ * {@link RuleDependency#dependents} properties.</p>
+ * </li>
+ * <li>
+ * {@link javax.tools.Diagnostic.Kind#ERROR}: <quote>"Rule dependency version
+ * mismatch: <em>rule</em> has version <em>version</em> (expected &lt;=
+ * <em>expected</em>) in <em>parser</em>"</quote>
+ * <p>This message is printed when the actual version of a rule in the generated
+ * parser is greater than the {@code expected} version specified in the
+ * {@link RuleDependency#version} property. The specified {@code rule} may not
+ * match the {@link RuleDependency#rule} property, but was considered according
+ * to the scope defined in the {@link RuleDependency#dependents} property.</p>
+ * </li>
+ * <li>
+ * {@link javax.tools.Diagnostic.Kind#WARNING}: <quote>"Cannot validate the
+ * following dependents of rule <em>rule</em>: <em>dependents</em>"</quote>
+ * <p>This message is printed when the {@link RuleDependency#dependents}
+ * property includes one of the following values, which are not yet implemented
+ * by this annotation processor: {@link Dependents#SIBLINGS},
+ * {@link Dependents#PRECEEDING_SIBLINGS},
+ * {@link Dependents#FOLLOWING_SIBLINGS}, {@link Dependents#PRECEEDING},
+ * {@link Dependents#FOLLOWING}.</p>
+ * </li>
+ * </ul>
+ *
+ * <p>
+ * In addition to the above, the annotation processor may produce
+ * {@link javax.tools.Diagnostic.Kind#ERROR} or
+ * {@link javax.tools.Diagnostic.Kind#WARNING} messages to aid in diagnosing
+ * cases where validation could not be performed.
+ * </p>
  *
  * @see RuleDependency
  * @see RuleDependencies
