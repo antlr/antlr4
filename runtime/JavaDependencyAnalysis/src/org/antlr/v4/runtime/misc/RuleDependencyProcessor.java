@@ -115,8 +115,8 @@ import java.util.Set;
  * <p>This message is printed when the {@link RuleDependency#dependents}
  * property includes one of the following values, which are not yet implemented
  * by this annotation processor: {@link Dependents#SIBLINGS},
- * {@link Dependents#PRECEEDING_SIBLINGS},
- * {@link Dependents#FOLLOWING_SIBLINGS}, {@link Dependents#PRECEEDING},
+ * {@link Dependents#PRECEDING_SIBLINGS},
+ * {@link Dependents#FOLLOWING_SIBLINGS}, {@link Dependents#PRECEDING},
  * {@link Dependents#FOLLOWING}.</p>
  * </li>
  * </ul>

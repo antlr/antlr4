@@ -70,7 +70,7 @@ public enum Dependents {
 	 * siblings (the union of {@link #CHILDREN} of its {@link #PARENTS} which
 	 * appear before a reference to the rule).
 	 */
-	PRECEEDING_SIBLINGS,
+	PRECEDING_SIBLINGS,
 	/**
 	 * The element is dependent upon the set of the specified rule's following
 	 * siblings (the union of {@link #CHILDREN} of its {@link #PARENTS} which
@@ -81,11 +81,11 @@ public enum Dependents {
 	 * The element is dependent upon the set of the specified rule's preceeding
 	 * elements (rules which might end before the start of the specified rule
 	 * while parsing). This is calculated by taking the
-	 * {@link #PRECEEDING_SIBLINGS} of the rule and each of its
+	 * {@link #PRECEDING_SIBLINGS} of the rule and each of its
 	 * {@link #ANCESTORS}, along with the {@link #DESCENDANTS} of those
 	 * elements.
 	 */
-	PRECEEDING,
+	PRECEDING,
 	/**
 	 * The element is dependent upon the set of the specified rule's following
 	 * elements (rules which might start after the end of the specified rule
