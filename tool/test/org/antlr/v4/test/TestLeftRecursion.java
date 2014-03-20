@@ -339,6 +339,41 @@ public class TestLeftRecursion extends BaseTest {
 		runTests(grammar, tests, "s");
 	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#433 "Not all context accessor
+	 * methods are generated when an alternative rule label is used for multiple
+	 * alternatives".
+	 * https://github.com/antlr/antlr4/issues/433
+	 */
+	@Test public void testMultipleAlternativesWithCommonLabel() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"s : e {System.out.println($e.v);} ;\n" +
+			"\n" +
+			"e returns [int v]\n" +
+			"  : e '*' e     {$v = ((BinaryContext)$ctx).e(0).v * ((BinaryContext)$ctx).e(1).v;}  # binary\n" +
+			"  | e '+' e     {$v = ((BinaryContext)$ctx).e(0).v + ((BinaryContext)$ctx).e(1).v;}  # binary\n" +
+			"  | INT         {$v = $INT.int;}                                                     # anInt\n" +
+			"  | '(' e ')'   {$v = $e.v;}                                                         # parens\n" +
+			"  | left=e INC  {assert(((UnaryContext)$ctx).INC() != null); $v = $left.v + 1;}      # unary\n" +
+			"  | left=e DEC  {assert(((UnaryContext)$ctx).DEC() != null); $v = $left.v - 1;}      # unary\n" +
+			"  | ID          {$v = 3;}                                                            # anID\n" +
+			"  ; \n" +
+			"\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+ ;\n" +
+			"INC : '++' ;\n" +
+			"DEC : '--' ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n";
+		String[] tests = {
+			"4",			"4",
+			"1+2",			"3",
+			"1+2*3",		"7",
+			"i++*3",		"12",
+		};
+		runTests(grammar, tests, "s");
+	}
+
 	@Test public void testPrefixOpWithActionAndLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
