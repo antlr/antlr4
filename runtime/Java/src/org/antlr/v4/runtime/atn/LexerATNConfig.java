@@ -39,6 +39,7 @@ public class LexerATNConfig extends ATNConfig {
 	/**
 	 * This is the backing field for {@link #getLexerActionExecutor}.
 	 */
+	@Nullable
 	private final LexerActionExecutor lexerActionExecutor;
 
 	private final boolean passedThroughNonGreedyDecision;
@@ -55,7 +56,7 @@ public class LexerATNConfig extends ATNConfig {
 	public LexerATNConfig(@NotNull ATNState state,
 						  int alt,
 						  @Nullable PredictionContext context,
-						  LexerActionExecutor lexerActionExecutor)
+						  @Nullable LexerActionExecutor lexerActionExecutor)
 	{
 		super(state, alt, context, SemanticContext.NONE);
 		this.lexerActionExecutor = lexerActionExecutor;
@@ -69,7 +70,7 @@ public class LexerATNConfig extends ATNConfig {
 	}
 
 	public LexerATNConfig(@NotNull LexerATNConfig c, @NotNull ATNState state,
-						  LexerActionExecutor lexerActionExecutor)
+						  @Nullable LexerActionExecutor lexerActionExecutor)
 	{
 		super(c, state, c.context, c.semanticContext);
 		this.lexerActionExecutor = lexerActionExecutor;
@@ -87,6 +88,7 @@ public class LexerATNConfig extends ATNConfig {
 	 * Gets the {@link LexerActionExecutor} capable of executing the embedded
 	 * action(s) for the current configuration.
 	 */
+	@Nullable
 	public final LexerActionExecutor getLexerActionExecutor() {
 		return lexerActionExecutor;
 	}
