@@ -20,7 +20,7 @@
     </target>
 
     <target name="antlr4-init" depends="basic-init">
-        <property name="antlr4.version" value="4.1"/>
+        <property name="antlr4.version" value="4.2"/>
         <property name="antlr4.jar.name" value="antlr-${antlr4.version}-complete.jar"/>
         <property name="antlr4.jar" value="${lib.dir}/${antlr4.jar.name}"/>
         <mkdir dir="${lib.dir}"/>
