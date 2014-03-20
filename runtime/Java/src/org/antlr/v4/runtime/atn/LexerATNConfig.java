@@ -36,8 +36,10 @@ import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.ObjectEqualityComparator;
 
 public class LexerATNConfig extends ATNConfig {
-	/** Capture lexer actions we traverse. */
-	public LexerActionExecutor lexerActionExecutor;
+	/**
+	 * This is the backing field for {@link #getLexerActionExecutor}.
+	 */
+	private final LexerActionExecutor lexerActionExecutor;
 
 	private final boolean passedThroughNonGreedyDecision;
 
@@ -47,6 +49,7 @@ public class LexerATNConfig extends ATNConfig {
 	{
 		super(state, alt, context, SemanticContext.NONE);
 		this.passedThroughNonGreedyDecision = false;
+		this.lexerActionExecutor = null;
 	}
 
 	public LexerATNConfig(@NotNull ATNState state,
@@ -78,6 +81,14 @@ public class LexerATNConfig extends ATNConfig {
 		super(c, state, context, c.semanticContext);
 		this.lexerActionExecutor = c.lexerActionExecutor;
 		this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
+	}
+
+	/**
+	 * Gets the {@link LexerActionExecutor} capable of executing the embedded
+	 * action(s) for the current configuration.
+	 */
+	public final LexerActionExecutor getLexerActionExecutor() {
+		return lexerActionExecutor;
 	}
 
 	public final boolean hasPassedThroughNonGreedyDecision() {
