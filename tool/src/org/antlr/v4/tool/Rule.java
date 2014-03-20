@@ -30,7 +30,7 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.v4.runtime.misc.Triple;
+import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -205,13 +205,24 @@ public class Rule implements AttributeResolver {
 		return numberOfAlts;
 	}
 
-	/** Get -> labels. */
-	public List<Triple<Integer,AltAST,String>> getAltLabels() {
-		List<Triple<Integer,AltAST,String>> labels = new ArrayList<Triple<Integer,AltAST,String>>();
+	/**
+	 * Get {@code #} labels. The keys of the map are the labels applied to outer
+	 * alternatives of a lexer rule, and the values are collections of pairs
+	 * (alternative number and {@link AltAST}) identifying the alternatives with
+	 * this label. Unlabeled alternatives are not included in the result.
+	 */
+	public Map<String, List<Pair<Integer, AltAST>>> getAltLabels() {
+		Map<String, List<Pair<Integer, AltAST>>> labels = new HashMap<String, List<Pair<Integer, AltAST>>>();
 		for (int i=1; i<=numberOfAlts; i++) {
 			GrammarAST altLabel = alt[i].ast.altLabel;
 			if ( altLabel!=null ) {
-				labels.add(new Triple<Integer,AltAST,String>(i,alt[i].ast,altLabel.getText()));
+				List<Pair<Integer, AltAST>> list = labels.get(altLabel.getText());
+				if (list == null) {
+					list = new ArrayList<Pair<Integer, AltAST>>();
+					labels.put(altLabel.getText(), list);
+				}
+
+				list.add(new Pair<Integer, AltAST>(i, alt[i].ast));
 			}
 		}
 		if ( labels.isEmpty() ) return null;
