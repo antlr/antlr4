@@ -446,7 +446,7 @@ public class LexerATNSimulator extends ATNSimulator {
 					if (config.context.getReturnState(i) != PredictionContext.EMPTY_RETURN_STATE) {
 						PredictionContext newContext = config.context.getParent(i); // "pop" return state
 						ATNState returnState = atn.states.get(config.context.getReturnState(i));
-						LexerATNConfig c = new LexerATNConfig(returnState, config.alt, newContext);
+						LexerATNConfig c = new LexerATNConfig(config, returnState, newContext);
 						currentAltReachedAcceptState = closure(input, c, configs, currentAltReachedAcceptState, speculative);
 					}
 				}
