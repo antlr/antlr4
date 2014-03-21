@@ -146,38 +146,50 @@ public class TestRig {
 
 	public void process() throws Exception {
 //		System.out.println("exec "+grammarName+"."+startRuleName);
-		String lexerName = grammarName+"Lexer";
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		Class<? extends Lexer> lexerClass = null;
-		try {
-			lexerClass = cl.loadClass(lexerName).asSubclass(Lexer.class);
-		}
-		catch (java.lang.ClassNotFoundException cnfe) {
-			// might be pure lexer grammar; no Lexer suffix then
-			lexerName = grammarName;
-			try {
-				lexerClass = cl.loadClass(lexerName).asSubclass(Lexer.class);
-			}
-			catch (ClassNotFoundException cnfe2) {
-				System.err.println("Can't load "+lexerName+" as lexer or parser");
-				return;
-			}
-		}
-
-		Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
-		Lexer lexer = lexerCtor.newInstance((CharStream)null);
-
 		Class<? extends Parser> parserClass = null;
 		Parser parser = null;
 		if ( !startRuleName.equals(LEXER_START_RULE_NAME) ) {
 			String parserName = grammarName+"Parser";
 			parserClass = cl.loadClass(parserName).asSubclass(Parser.class);
 			if ( parserClass==null ) {
-				System.err.println("Can't load "+parserName);
+				System.err.println("Can't load parser "+parserName);
 			}
 			Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
 			parser = parserCtor.newInstance((TokenStream)null);
 		}
+
+		String lexerName = grammarName+"Lexer";
+		Class<? extends Lexer> lexerClass = null;
+		try {
+			lexerClass = cl.loadClass(lexerName).asSubclass(Lexer.class);
+		}
+		catch (java.lang.ClassNotFoundException cnfe) {}
+		if ( lexerClass==null ) {
+			// might be pure lexer grammar; no Lexer suffix then
+			lexerName = grammarName;
+			try {
+				lexerClass = cl.loadClass(lexerName).asSubclass(Lexer.class);
+			}
+			catch (ClassNotFoundException cnfe) {}
+		}
+		if ( lexerClass==null && parser!=null ) {
+			// try to get lexer from parser options
+			lexerName = parser.getOptions().get("tokenVocab");
+			if ( lexerName!=null ) {
+				try {
+					lexerClass = cl.loadClass(lexerName).asSubclass(Lexer.class);
+				}
+				catch (ClassNotFoundException cnfe) {}
+			}
+		}
+		if ( lexerClass==null ) {
+			System.err.println("Can't load lexer for "+grammarName);
+			return;
+		}
+
+		Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
+		Lexer lexer = lexerCtor.newInstance((CharStream)null);
 
 		if ( inputFiles.size()==0 ) {
 			InputStream is = System.in;

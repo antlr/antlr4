@@ -53,7 +53,9 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.runtime.tree.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Iterator;
 import java.util.ArrayList;
 
@@ -229,6 +231,11 @@ public class <parser.name> extends <superClass> {
 	public static final String[] ruleNames = {
 		<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	};
+	public static final Map\<String,String> options;
+	static {
+		options = new HashMap\<String,String>();
+		<parser.options.keys:{k | options.put("<k>", "<parser.options.(k)>"); }; separator="\n">
+	}
 
 	@Override
 	public String getGrammarFileName() { return "<parser.grammarFileName; format="java-escape">"; }
@@ -238,6 +245,9 @@ public class <parser.name> extends <superClass> {
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
+
+	@Override
+	public Map\<String,String> getOptions() { return options; }
 
 	@Override
 	public String getSerializedATN() { return _serializedATN; }
@@ -841,6 +851,8 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
+import java.util.HashMap;
+import java.util.Map;
 
 <lexer>
 >>
@@ -865,6 +877,11 @@ public class <lexer.name> extends <superClass> {
 	public static final String[] ruleNames = {
 		<lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	};
+	public static final Map\<String,String> options;
+	static {
+		options = new HashMap\<String,String>();
+		<lexer.options.keys:{k | options.put("<k>", "<lexer.options.(k)>"); }; separator="\n">
+	}
 
 	<namedActions.members>
 
@@ -881,6 +898,9 @@ public class <lexer.name> extends <superClass> {
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
+
+	@Override
+	public Map\<String,String> getOptions() { return options; }
 
 	@Override
 	public String getSerializedATN() { return _serializedATN; }

@@ -69,6 +69,14 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	public abstract String[] getRuleNames();
 
 	/**
+	 * Get a map of the grammar options.
+	 */
+	@NotNull
+	public Map<String,String> getOptions() {
+		throw new UnsupportedOperationException("The current recognizer does not provide an option map");
+	}
+
+	/**
 	 * Get a map from token names to token types.
 	 *
 	 * <p>Used for XPath and tree pattern compilation.</p>
