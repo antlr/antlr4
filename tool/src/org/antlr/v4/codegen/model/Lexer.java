@@ -105,7 +105,10 @@ public class Lexer extends OutputModelObject {
 		}
 		options = new HashMap<String,String>();
 		for (String name : Grammar.lexerOptions) {
-			options.put(name, g.getOptionString(name));
+			String value = g.getOptionString(name);
+			if ( value!=null ) {
+				options.put(name, g.getOptionString(name));
+			}
 		}
 	}
 

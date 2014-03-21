@@ -104,7 +104,10 @@ public class Parser extends OutputModelObject {
 		}
 		options = new HashMap<String,String>();
 		for (String name : Grammar.parserOptions) {
-			options.put(name, g.getOptionString(name));
+			String value = g.getOptionString(name);
+			if ( value!=null ) {
+				options.put(name, g.getOptionString(name));
+			}
 		}
 	}
 }
