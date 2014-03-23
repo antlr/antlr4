@@ -33,13 +33,14 @@ package org.antlr.v4.tool;
 import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
 import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.runtime.misc.Pair;
-import org.antlr.v4.runtime.misc.Triple;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.RuleAST;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LeftRecursiveRule extends Rule {
 	public List<LeftRecursiveRuleAltInfo> recPrimaryAlts;
@@ -84,16 +85,20 @@ public class LeftRecursiveRule extends Rule {
 
 	/** Get -> labels from those alts we deleted for left-recursive rules. */
 	@Override
-	public List<Triple<Integer,AltAST,String>> getAltLabels() {
-		List<Triple<Integer,AltAST,String>> labels = new ArrayList<Triple<Integer,AltAST,String>>();
-		List<Triple<Integer,AltAST,String>> normalAltLabels = super.getAltLabels();
-		if ( normalAltLabels!=null ) labels.addAll(normalAltLabels);
+	public Map<String, List<Pair<Integer, AltAST>>> getAltLabels() {
+		Map<String, List<Pair<Integer, AltAST>>> labels = new HashMap<String, List<Pair<Integer, AltAST>>>();
+		Map<String, List<Pair<Integer, AltAST>>> normalAltLabels = super.getAltLabels();
+		if ( normalAltLabels!=null ) labels.putAll(normalAltLabels);
 		if ( recPrimaryAlts!=null ) {
 			for (LeftRecursiveRuleAltInfo altInfo : recPrimaryAlts) {
 				if (altInfo.altLabel != null) {
-					labels.add(new Triple<Integer, AltAST, String>(altInfo.altNum,
-																   altInfo.originalAltAST,
-																   altInfo.altLabel));
+					List<Pair<Integer, AltAST>> pairs = labels.get(altInfo.altLabel);
+					if (pairs == null) {
+						pairs = new ArrayList<Pair<Integer, AltAST>>();
+						labels.put(altInfo.altLabel, pairs);
+					}
+
+					pairs.add(new Pair<Integer, AltAST>(altInfo.altNum, altInfo.originalAltAST));
 				}
 			}
 		}
@@ -101,9 +106,13 @@ public class LeftRecursiveRule extends Rule {
 			for (int i = 0; i < recOpAlts.size(); i++) {
 				LeftRecursiveRuleAltInfo altInfo = recOpAlts.getElement(i);
 				if ( altInfo.altLabel!=null ) {
-					labels.add(new Triple<Integer,AltAST,String>(altInfo.altNum,
-																 altInfo.originalAltAST,
-																 altInfo.altLabel));
+					List<Pair<Integer, AltAST>> pairs = labels.get(altInfo.altLabel);
+					if (pairs == null) {
+						pairs = new ArrayList<Pair<Integer, AltAST>>();
+						labels.put(altInfo.altLabel, pairs);
+					}
+
+					pairs.add(new Pair<Integer, AltAST>(altInfo.altNum, altInfo.originalAltAST));
 				}
 			}
 		}
