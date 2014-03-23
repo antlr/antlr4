@@ -497,6 +497,25 @@ public class TestLeftRecursion extends BaseTest {
 		assertNull(stderrDuringParse);
 	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#509 "Incorrect rule chosen in
+	 * unambiguous grammar".
+	 * https://github.com/antlr/antlr4/issues/509
+	 */
+	@Test public void testPrecedenceFilterConsidersContext() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"prog\n" +
+			"@after {System.out.println($ctx.toStringTree(this));}\n" +
+			": statement* EOF {};\n" +
+			"statement: letterA | statement letterA 'b' ;\n" +
+			"letterA: 'a';\n";
+
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "prog",
+								  "aa", false);
+		assertEquals("(prog (statement (letterA a)) (statement (letterA a)) <EOF>)\n", found);
+	}
+
 	public void runTests(String grammar, String[] tests, String startRule) {
 		rawGenerateAndBuildRecognizer("T.g4", grammar, "TParser", "TLexer");
 		writeRecognizerAndCompile("TParser",
