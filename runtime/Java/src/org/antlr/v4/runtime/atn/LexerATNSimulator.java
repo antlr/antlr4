@@ -346,7 +346,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				Transition trans = c.state.transition(ti);
 				ATNState target = getReachableTarget(trans, t);
 				if ( target!=null ) {
-					LexerActionExecutor lexerActionExecutor = ((LexerATNConfig)c).lexerActionExecutor;
+					LexerActionExecutor lexerActionExecutor = ((LexerATNConfig)c).getLexerActionExecutor();
 					if (lexerActionExecutor != null) {
 						lexerActionExecutor = lexerActionExecutor.fixOffsetBeforeMatch(input.index() - startIndex);
 					}
@@ -446,7 +446,7 @@ public class LexerATNSimulator extends ATNSimulator {
 					if (config.context.getReturnState(i) != PredictionContext.EMPTY_RETURN_STATE) {
 						PredictionContext newContext = config.context.getParent(i); // "pop" return state
 						ATNState returnState = atn.states.get(config.context.getReturnState(i));
-						LexerATNConfig c = new LexerATNConfig(returnState, config.alt, newContext);
+						LexerATNConfig c = new LexerATNConfig(config, returnState, newContext);
 						currentAltReachedAcceptState = closure(input, c, configs, currentAltReachedAcceptState, speculative);
 					}
 				}
@@ -537,7 +537,7 @@ public class LexerATNSimulator extends ATNSimulator {
 					// getEpsilonTarget to return two configurations, so
 					// additional modifications are needed before we can support
 					// the split operation.
-					LexerActionExecutor lexerActionExecutor = LexerActionExecutor.append(config.lexerActionExecutor, atn.lexerActions[((ActionTransition)t).actionIndex]);
+					LexerActionExecutor lexerActionExecutor = LexerActionExecutor.append(config.getLexerActionExecutor(), atn.lexerActions[((ActionTransition)t).actionIndex]);
 					c = new LexerATNConfig(config, t.target, lexerActionExecutor);
 					break;
 				}
@@ -684,7 +684,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		if ( firstConfigWithRuleStopState!=null ) {
 			proposed.isAcceptState = true;
-			proposed.lexerActionExecutor = ((LexerATNConfig)firstConfigWithRuleStopState).lexerActionExecutor;
+			proposed.lexerActionExecutor = ((LexerATNConfig)firstConfigWithRuleStopState).getLexerActionExecutor();
 			proposed.prediction = atn.ruleToTokenType[firstConfigWithRuleStopState.state.ruleIndex];
 		}
 
