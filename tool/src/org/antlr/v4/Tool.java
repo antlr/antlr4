@@ -339,7 +339,7 @@ public class Tool {
 				System.out.println(dep.getDependencies().render());
 
 			}
-			else {
+			else if (errMgr.getNumErrors() == 0) {
 				process(g, true);
 			}
 		}
