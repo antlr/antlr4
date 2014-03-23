@@ -116,6 +116,13 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	 */
 	protected int nonFragmentRuleCount;
 
+	/**
+	 * This is {@code true} from the time {@link #discoverLexerRule} is called
+	 * for a lexer rule with the {@code fragment} modifier until
+	 * {@link #exitLexerRule} is called.
+	 */
+	private boolean inFragmentRule;
+
 	public BasicSemanticChecks(Grammar g, RuleCollector ruleCollector) {
 		this.g = g;
 		this.ruleCollector = ruleCollector;
@@ -200,18 +207,22 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	{
 		checkInvalidRuleDef(ID.token);
 
-		boolean fragmentRule = false;
 		if (modifiers != null) {
 			for (GrammarAST tree : modifiers) {
 				if (tree.getType() == ANTLRParser.FRAGMENT) {
-					fragmentRule = true;
+					inFragmentRule = true;
 				}
 			}
 		}
 
-		if (!fragmentRule) {
+		if (!inFragmentRule) {
 			nonFragmentRuleCount++;
 		}
+	}
+
+	@Override
+	protected void exitLexerRule(GrammarAST tree) {
+		inFragmentRule = false;
 	}
 
 	@Override
@@ -381,6 +392,21 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	@Override
 	protected void enterLexerCommand(GrammarAST tree) {
 		checkElementIsOuterMostInSingleAlt(tree);
+
+		if (inFragmentRule) {
+			String fileName = tree.token.getInputStream().getSourceName();
+			String ruleName = currentRuleName;
+			g.tool.errMgr.grammarError(ErrorType.FRAGMENT_ACTION_IGNORED, fileName, tree.token, ruleName);
+		}
+	}
+
+	@Override
+	public void actionInAlt(ActionAST action) {
+		if (inFragmentRule) {
+			String fileName = action.token.getInputStream().getSourceName();
+			String ruleName = currentRuleName;
+			g.tool.errMgr.grammarError(ErrorType.FRAGMENT_ACTION_IGNORED, fileName, action.token, ruleName);
+		}
 	}
 
 	/**

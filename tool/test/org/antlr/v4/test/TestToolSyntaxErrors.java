@@ -473,4 +473,33 @@ public class TestToolSyntaxErrors extends BaseTest {
 
 		super.testErrors(pair, true);
 	}
+
+	/**
+	 * This test ensures the {@link ErrorType#FRAGMENT_ACTION_IGNORED} warning
+	 * is produced as described in the documentation.
+	 */
+	@Test public void testFragmentActionIgnored() {
+		String grammar =
+			"lexer grammar A;\n" +
+			"X1 : 'x' -> more    // ok\n" +
+			"   ;\n" +
+			"Y1 : 'x' {more();}  // ok\n" +
+			"   ;\n" +
+			"fragment\n" +
+			"X2 : 'x' -> more    // warning 158\n" +
+			"   ;\n" +
+			"fragment\n" +
+			"Y2 : 'x' {more();}  // warning 158\n" +
+			"   ;\n";
+		String expected =
+			"warning(" + ErrorType.FRAGMENT_ACTION_IGNORED.code + "): A.g4:7:12: fragment rule 'X2' contains an action or command which can never be executed\n" +
+			"warning(" + ErrorType.FRAGMENT_ACTION_IGNORED.code + "): A.g4:10:9: fragment rule 'Y2' contains an action or command which can never be executed\n";
+
+		String[] pair = new String[] {
+			grammar,
+			expected
+		};
+
+		super.testErrors(pair, true);
+	}
 }
