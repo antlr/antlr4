@@ -726,7 +726,7 @@ public enum ErrorType {
 	 *
 	 * <p>unterminated string literal</p>
 	 *
-	 * <p>The parser contains an unterminated string literal.</p>
+	 * <p>The grammar contains an unterminated string literal.</p>
 	 *
 	 * <p>The following rule produces this error.</p>
 	 *
@@ -809,6 +809,23 @@ public enum ErrorType {
 	 * @since 4.2
 	 */
 	UNKNOWN_LEXER_CONSTANT(155, "rule '<arg>' contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output", ErrorSeverity.WARNING),
+	/**
+	 * Compiler Error 156.
+	 *
+	 * <p>invalid escape sequence</p>
+	 *
+	 * <p>The grammar contains a string literal with an invalid escape sequence.</p>
+	 *
+	 * <p>The following rule produces this error.</p>
+	 *
+	 * <pre>
+	 * x : 'x';  // ok
+	 * y : '\u005Cu'; // error 156
+	 * </pre>
+	 *
+	 * @since 4.2.1
+	 */
+	INVALID_ESCAPE_SEQUENCE(156, "invalid escape sequence", ErrorSeverity.ERROR),
 
 	/*
 	 * Backward incompatibility errors
