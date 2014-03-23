@@ -826,6 +826,32 @@ public enum ErrorType {
 	 * @since 4.2.1
 	 */
 	INVALID_ESCAPE_SEQUENCE(156, "invalid escape sequence", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Warning 157.
+	 *
+	 * <p>rule '<em>rule</em>' contains an 'assoc' element option in an
+	 * unrecognized location</p>
+	 *
+	 * <p>
+	 * In ANTLR 4.2, the position of the {@code assoc} element option was moved
+	 * from the operator terminal(s) to the alternative itself. This warning is
+	 * reported when an {@code assoc} element option is specified on a grammar
+	 * element that is not recognized by the current version of ANTLR, and as a
+	 * result will simply be ignored.
+	 * </p>
+	 *
+	 * <p>The following rule produces this warning.</p>
+	 *
+	 * <pre>
+	 * x : 'x'
+	 *   | x '+'&lt;assoc=right&gt; x   // warning 157
+	 *   |&lt;assoc=right&gt; x '*' x   // ok
+	 *   ;
+	 * </pre>
+	 *
+	 * @since 4.2.1
+	 */
+	UNRECOGNIZED_ASSOC_OPTION(157, "rule '<arg>' contains an 'assoc' terminal option in an unrecognized location", ErrorSeverity.WARNING),
 
 	/*
 	 * Backward incompatibility errors

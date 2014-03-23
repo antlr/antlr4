@@ -451,4 +451,26 @@ public class TestToolSyntaxErrors extends BaseTest {
 
 		super.testErrors(pair, true);
 	}
+
+	/**
+	 * This test ensures the {@link ErrorType#UNRECOGNIZED_ASSOC_OPTION} warning
+	 * is produced as described in the documentation.
+	 */
+	@Test public void testUnrecognizedAssocOption() {
+		String grammar =
+			"grammar A;\n" +
+			"x : 'x'\n" +
+			"  | x '+'<assoc=right> x   // warning 157\n" +
+			"  |<assoc=right> x '*' x   // ok\n" +
+			"  ;\n";
+		String expected =
+			"warning(" + ErrorType.UNRECOGNIZED_ASSOC_OPTION.code + "): A.g4:3:10: rule 'x' contains an 'assoc' terminal option in an unrecognized location\n";
+
+		String[] pair = new String[] {
+			grammar,
+			expected
+		};
+
+		super.testErrors(pair, true);
+	}
 }

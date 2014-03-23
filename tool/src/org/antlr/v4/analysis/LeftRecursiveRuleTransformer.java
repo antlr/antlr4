@@ -152,6 +152,9 @@ public class LeftRecursiveRuleTransformer {
 		RuleCollector ruleCollector = new RuleCollector(g);
 		ruleCollector.visit(t, "rule");
 		BasicSemanticChecks basics = new BasicSemanticChecks(g, ruleCollector);
+		// disable the assoc element option checks because they are already
+		// handled for the pre-transformed rule.
+		basics.checkAssocElementOption = false;
 		basics.visit(t, "rule");
 
 		// track recursive alt info for codegen
