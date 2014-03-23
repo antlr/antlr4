@@ -102,6 +102,15 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	public ErrorManager errMgr;
 
 	/**
+	 * When this is {@code true}, the semantic checks will report
+	 * {@link ErrorType#UNRECOGNIZED_ASSOC_OPTION} where appropriate. This may
+	 * be set to {@code false} to disable this specific check.
+	 *
+	 * <p>The default value is {@code true}.</p>
+	 */
+	public boolean checkAssocElementOption = true;
+
+	/**
 	 * This field is used for reporting the {@link ErrorType#MODE_WITHOUT_RULES}
 	 * error when necessary.
 	 */
@@ -477,6 +486,17 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 								GrammarAST ID,
 								GrammarAST valueAST)
 	{
+		if (checkAssocElementOption && ID != null && "assoc".equals(ID.getText())) {
+			if (elem.getType() != ANTLRParser.ALT) {
+				Token optionID = ID.token;
+				String fileName = optionID.getInputStream().getSourceName();
+				g.tool.errMgr.grammarError(ErrorType.UNRECOGNIZED_ASSOC_OPTION,
+										   fileName,
+										   optionID,
+										   currentRuleName);
+			}
+		}
+
 		if ( elem instanceof TerminalAST ) {
 			return checkTokenOptions((TerminalAST)elem, ID, valueAST);
 		}
