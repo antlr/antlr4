@@ -726,7 +726,7 @@ public enum ErrorType {
 	 *
 	 * <p>unterminated string literal</p>
 	 *
-	 * <p>The parser contains an unterminated string literal.</p>
+	 * <p>The grammar contains an unterminated string literal.</p>
 	 *
 	 * <p>The following rule produces this error.</p>
 	 *
