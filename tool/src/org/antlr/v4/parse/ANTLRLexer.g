@@ -656,8 +656,11 @@ ESC_SEQ
     	    | // An illegal escape seqeunce
     	      //
     	      {
-    	      	// TODO: Issue error message
-    	      	//
+                Token t = new CommonToken(input, state.type, state.channel, getCharIndex()-1, getCharIndex());
+                t.setText(t.getText());
+                t.setLine(input.getLine());
+                t.setCharPositionInLine(input.getCharPositionInLine()-1);
+                grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE, t);
     	      }
         )
     ;
@@ -708,9 +711,12 @@ UNICODE_ESC
     	// Now check the digit count and issue an error if we need to
     	//
     	{
-    		if	(hCount != 4) {
-
-    			// TODO: Issue error message
+    		if (hCount != 4) {
+                Token t = new CommonToken(input, state.type, state.channel, getCharIndex()-3-hCount, getCharIndex()-1);
+                t.setText(t.getText());
+                t.setLine(input.getLine());
+                t.setCharPositionInLine(input.getCharPositionInLine()-hCount-2);
+                grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE, t);
     		}
     	}
     ;

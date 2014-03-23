@@ -409,4 +409,46 @@ public class TestToolSyntaxErrors extends BaseTest {
 
 		super.testErrors(pair, true);
 	}
+
+	/**
+	 * This test ensures that the {@link ErrorType#INVALID_ESCAPE_SEQUENCE}
+	 * error is not reported for escape sequences that are known to be valid.
+	 */
+	@Test public void testValidEscapeSequences() {
+		String grammar =
+			"lexer grammar A;\n" +
+			"NORMAL_ESCAPE : '\\b \\t \\n \\f \\r \\\" \\' \\\\';\n" +
+			"UNICODE_ESCAPE : '\\u0001 \\u00A1 \\u00a1 \\uaaaa \\uAAAA';\n";
+		String expected =
+			"";
+
+		String[] pair = new String[] {
+			grammar,
+			expected
+		};
+
+		super.testErrors(pair, true);
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#507 "NullPointerException When
+	 * Generating Code from Grammar".
+	 * https://github.com/antlr/antlr4/issues/507
+	 */
+	@Test public void testInvalidEscapeSequences() {
+		String grammar =
+			"lexer grammar A;\n" +
+			"RULE : 'Foo \\uAABG \\x \\u';\n";
+		String expected =
+			"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:12: invalid escape sequence\n" +
+			"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:19: invalid escape sequence\n" +
+			"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:22: invalid escape sequence\n";
+
+		String[] pair = new String[] {
+			grammar,
+			expected
+		};
+
+		super.testErrors(pair, true);
+	}
 }
