@@ -310,6 +310,11 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 
 	void checkGrammarName(Token nameToken) {
 		String fullyQualifiedName = nameToken.getInputStream().getSourceName();
+		if (fullyQualifiedName == null) {
+			// This wasn't read from a file.
+			return;
+		}
+
 		File f = new File(fullyQualifiedName);
 		String fileName = f.getName();
 		if ( g.originalGrammar!=null ) return; // don't warn about diff if this is implicit lexer
