@@ -883,6 +883,23 @@ public enum ErrorType {
 	 * @since 4.2.1
 	 */
 	FRAGMENT_ACTION_IGNORED(158, "fragment rule '<arg>' contains an action or command which can never be executed", ErrorSeverity.WARNING),
+	/**
+	 * Compiler Error 159.
+	 *
+	 * <p>cannot declare a rule with reserved name '<em>rule</em>'</p>
+	 *
+	 * <p>A rule was declared with a reserved name.</p>
+	 *
+	 * <p>The following rule produces this error.</p>
+	 *
+	 * <pre>
+	 * EOF : ' '   // error 159 (EOF is a reserved name)
+	 *     ;
+	 * </pre>
+	 *
+	 * @since 4.2.1
+	 */
+	RESERVED_RULE_NAME(159, "cannot declare a rule with reserved name '<arg>'", ErrorSeverity.ERROR),
 
 	/*
 	 * Backward incompatibility errors

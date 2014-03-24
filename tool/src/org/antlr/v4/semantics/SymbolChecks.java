@@ -67,6 +67,11 @@ public class SymbolChecks {
 
 	public ErrorManager errMgr;
 
+	protected final Set<String> reservedNames = new HashSet<String>();
+	{
+		reservedNames.add("EOF");
+	}
+
     public SymbolChecks(Grammar g, SymbolCollector collector) {
         this.g = g;
         this.collector = collector;
@@ -94,6 +99,7 @@ public class SymbolChecks {
 		if ( g.rules!=null ) {
 			for (Rule r : g.rules.values()) nameToRuleMap.put(r.name, r);
 		}
+		checkReservedNames(g.rules.values());
 		checkActionRedefinitions(collector.namedActions);
 		checkForTokenConflicts(collector.tokenIDRefs);  // sets tokenIDs
 		checkForLabelConflicts(g.rules.values());
@@ -254,6 +260,14 @@ public class SymbolChecks {
 				attributes.get(key).token != null ? attributes.get(key).token : ((GrammarAST) r.ast.getChild(0)).token,
 				key,
 				r.name);
+		}
+	}
+
+	protected void checkReservedNames(@NotNull Collection<Rule> rules) {
+		for (Rule rule : rules) {
+			if (reservedNames.contains(rule.name)) {
+				errMgr.grammarError(ErrorType.RESERVED_RULE_NAME, g.fileName, ((GrammarAST)rule.ast.getChild(0)).getToken(), rule.name);
+			}
 		}
 	}
 
