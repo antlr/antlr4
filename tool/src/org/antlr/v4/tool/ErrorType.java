@@ -852,6 +852,37 @@ public enum ErrorType {
 	 * @since 4.2.1
 	 */
 	UNRECOGNIZED_ASSOC_OPTION(157, "rule '<arg>' contains an 'assoc' terminal option in an unrecognized location", ErrorSeverity.WARNING),
+	/**
+	 * Compiler Warning 158.
+	 *
+	 * <p>fragment rule '<em>rule</em>' contains an action or command which can
+	 * never be executed</p>
+	 *
+	 * <p>A lexer rule which is marked with the {@code fragment} modifier
+	 * contains an embedded action or lexer command. ANTLR lexers only execute
+	 * commands and embedded actions located in the top-level matched rule.
+	 * Since fragment rules can never be the top-level rule matched by a lexer,
+	 * actions or commands placed in these rules can never be executed during
+	 * the lexing process.</p>
+	 *
+	 * <p>The following rule produces this warning.</p>
+	 *
+	 * <pre>
+	 * X1 : 'x' -> more    // ok
+	 *    ;
+	 * Y1 : 'x' {more();}  // ok
+	 *    ;
+	 * fragment
+	 * X2 : 'x' -> more    // warning 158
+	 *    ;
+	 * fragment
+	 * Y2 : 'x' {more();}  // warning 158
+	 *    ;
+	 * </pre>
+	 *
+	 * @since 4.2.1
+	 */
+	FRAGMENT_ACTION_IGNORED(158, "fragment rule '<arg>' contains an action or command which can never be executed", ErrorSeverity.WARNING),
 
 	/*
 	 * Backward incompatibility errors
