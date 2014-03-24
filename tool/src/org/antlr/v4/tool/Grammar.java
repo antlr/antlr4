@@ -706,6 +706,11 @@ public class Grammar implements AttributeResolver {
 	}
 
 	public void setTokenForType(int ttype, String text) {
+		if (ttype == Token.EOF) {
+			// ignore EOF, it will be reported as an error separately
+			return;
+		}
+
 		if ( ttype>=typeToTokenList.size() ) {
 			Utils.setSize(typeToTokenList, ttype+1);
 		}

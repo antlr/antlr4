@@ -502,4 +502,25 @@ public class TestToolSyntaxErrors extends BaseTest {
 
 		super.testErrors(pair, true);
 	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#500 "Array Index Out Of
+	 * Bounds".
+	 * https://github.com/antlr/antlr4/issues/500
+	 */
+	@Test public void testTokenNamedEOF() {
+		String grammar =
+			"lexer grammar A;\n" +
+			"WS : ' ';\n" +
+			" EOF : 'a';\n";
+		String expected =
+			"error(" + ErrorType.RESERVED_RULE_NAME.code + "): A.g4:3:1: cannot declare a rule with reserved name 'EOF'\n";
+
+		String[] pair = new String[] {
+			grammar,
+			expected
+		};
+
+		super.testErrors(pair, true);
+	}
 }
