@@ -8,7 +8,7 @@
     </target>
 
     <target name="antlr3-init" depends="basic-init">
-        <property name="antlr3.version" value="3.5"/>
+        <property name="antlr3.version" value="3.5.2"/>
         <property name="antlr3.jar.name" value="antlr-${antlr3.version}-complete-no-st3.jar"/>
         <property name="antlr3.jar" value="${lib.dir}/${antlr3.jar.name}"/>
         <mkdir dir="${lib.dir}"/>
