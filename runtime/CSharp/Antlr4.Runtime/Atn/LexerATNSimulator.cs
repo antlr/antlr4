@@ -468,7 +468,7 @@ namespace Antlr4.Runtime.Atn
                     PredictionContext newContext = context.GetParent(i);
                     // "pop" return state
                     ATNState returnState = atn.states[returnStateNumber];
-                    ATNConfig c = ATNConfig.Create(returnState, config.Alt, newContext);
+                    ATNConfig c = config.Transform(returnState, newContext, false);
                     currentAltReachedAcceptState = Closure(input, c, configs, currentAltReachedAcceptState, speculative);
                 }
                 return currentAltReachedAcceptState;

@@ -143,8 +143,18 @@ namespace Antlr4.Runtime
                         // pop; return from rule
                         if (_ctx.IsEmpty())
                         {
-                            ExitRule();
-                            return rootContext;
+                            if (startRuleStartState.isPrecedenceRule)
+                            {
+                                ParserRuleContext result = _ctx;
+                                Tuple<ParserRuleContext, int> parentContext = _parentContextStack.Pop();
+                                UnrollRecursionContexts(parentContext.Item1);
+                                return result;
+                            }
+                            else
+                            {
+                                ExitRule();
+                                return rootContext;
+                            }
                         }
                         VisitRuleStopState(p);
                         break;

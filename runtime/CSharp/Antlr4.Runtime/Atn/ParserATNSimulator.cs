@@ -1314,7 +1314,8 @@ namespace Antlr4.Runtime.Atn
         /// .</li>
         /// <li>Remove all configurations which predict an alternative greater than
         /// 1, for which another configuration that predicts alternative 1 is in the
-        /// same ATN state. This transformation is valid for the following reasons:
+        /// same ATN state with the same prediction context. This transformation is
+        /// valid for the following reasons:
         /// <ul>
         /// <li>The closure block cannot contain any epsilon transitions which bypass
         /// the body of the closure, so all states reachable via alternative 1 are
@@ -1328,6 +1329,35 @@ namespace Antlr4.Runtime.Atn
         /// </ul>
         /// </li>
         /// </ol>
+        /// <p>
+        /// The prediction context must be considered by this filter to address
+        /// situations like the following.
+        /// </p>
+        /// <code>
+        /// <pre>
+        /// grammar TA;
+        /// prog: statement* EOF;
+        /// statement: letterA | statement letterA 'b' ;
+        /// letterA: 'a';
+        /// </pre>
+        /// </code>
+        /// <p>
+        /// If the above grammar, the ATN state immediately before the token
+        /// reference
+        /// <code>'a'</code>
+        /// in
+        /// <code>letterA</code>
+        /// is reachable from the left edge
+        /// of both the primary and closure blocks of the left-recursive rule
+        /// <code>statement</code>
+        /// . The prediction context associated with each of these
+        /// configurations distinguishes between them, and prevents the alternative
+        /// which stepped out to
+        /// <code>prog</code>
+        /// (and then back in to
+        /// <code>statement</code>
+        /// from being eliminated by the filter.
+        /// </p>
         /// </summary>
         /// <param name="configs">
         /// The configuration set computed by
@@ -1344,7 +1374,7 @@ namespace Antlr4.Runtime.Atn
         [NotNull]
         protected internal virtual ATNConfigSet ApplyPrecedenceFilter(ATNConfigSet configs, ParserRuleContext globalContext, PredictionContextCache contextCache)
         {
-            HashSet<int> statesFromAlt1 = new HashSet<int>();
+            IDictionary<int, PredictionContext> statesFromAlt1 = new Dictionary<int, PredictionContext>();
             ATNConfigSet configSet = new ATNConfigSet();
             foreach (ATNConfig config in configs)
             {
@@ -1359,7 +1389,7 @@ namespace Antlr4.Runtime.Atn
                     // the configuration was eliminated
                     continue;
                 }
-                statesFromAlt1.AddItem(config.State.stateNumber);
+                statesFromAlt1.Put(config.State.stateNumber, config.Context);
                 if (updatedContext != config.SemanticContext)
                 {
                     configSet.Add(config.Transform(config.State, updatedContext, false), contextCache);
@@ -1376,7 +1406,8 @@ namespace Antlr4.Runtime.Atn
                     // already handled
                     continue;
                 }
-                if (statesFromAlt1.Contains(config_1.State.stateNumber))
+                PredictionContext context = statesFromAlt1.Get(config_1.State.stateNumber);
+                if (context != null && context.Equals(config_1.Context))
                 {
                     // eliminated
                     continue;
@@ -1776,9 +1807,9 @@ namespace Antlr4.Runtime.Atn
             return config.Transform(t.target, newContext, false);
         }
 
-        private sealed class _IComparer_1741 : IComparer<ATNConfig>
+        private sealed class _IComparer_1771 : IComparer<ATNConfig>
         {
-            public _IComparer_1741()
+            public _IComparer_1771()
             {
             }
 
@@ -1798,7 +1829,7 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        private static readonly IComparer<ATNConfig> StateAltSortComparator = new _IComparer_1741();
+        private static readonly IComparer<ATNConfig> StateAltSortComparator = new _IComparer_1771();
 
         private BitSet IsConflicted(ATNConfigSet configset, PredictionContextCache contextCache)
         {
