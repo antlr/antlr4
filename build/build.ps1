@@ -1,3 +1,7 @@
+param (
+	[switch]$Debug
+)
+
 # build the solutions
 $SolutionPath = "..\Runtime\CSharp\Antlr4.sln"
 $CF35SolutionPath = "..\Runtime\CSharp\Antlr4.VS2008.sln"
@@ -8,33 +12,38 @@ if (!(Test-Path $SolutionPath)) {
 	exit 1
 }
 
-$BuildConfig = "Release"
-$DebugBuild = false
-$AntlrVersion = "4.2.0-alpha001"
+. .\version.ps1
+
+If ($Debug) {
+	$BuildConfig = 'Debug'
+} Else {
+	$BuildConfig = 'Release'
+}
+
 # this is configured here for path checking, but also in the .props and .targets files
 [xml]$pom = Get-Content "..\tool\pom.xml"
 $CSharpToolVersionNodeInfo = Select-Xml "/mvn:project/mvn:version" -Namespace @{mvn='http://maven.apache.org/POM/4.0.0'} $pom
 $CSharpToolVersion = $CSharpToolVersionNodeInfo.Node.InnerText.trim()
 
 # build the main project
-$msbuild = "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\msbuild.exe"
+$msbuild = "$env:windir\Microsoft.NET\Framework64\v4.0.30319\msbuild.exe"
 
-&$msbuild /nologo /m /nr:false /t:rebuild /p:Configuration=$BuildConfig $SolutionPath
+&$msbuild '/nologo' '/m' '/nr:false' '/t:rebuild' "/p:Configuration=$BuildConfig" $SolutionPath
 if ($LASTEXITCODE -ne 0) {
 	echo "Build failed, aborting!"
 	exit $p.ExitCode
 }
 
 # build the compact framework project
-$msbuild = "C:\Windows\Microsoft.NET\Framework\v4.0.30319\msbuild.exe"
+$msbuild = "$env:windir\Microsoft.NET\Framework\v4.0.30319\msbuild.exe"
 
-&$msbuild /nologo /m /nr:false /t:rebuild /p:Configuration=$BuildConfig $CF35SolutionPath
+&$msbuild '/nologo' '/m' '/nr:false' '/t:rebuild' "/p:Configuration=$BuildConfig" $CF35SolutionPath
 if ($LASTEXITCODE -ne 0) {
 	echo ".NET 3.5 Compact Framework Build failed, aborting!"
 	exit $p.ExitCode
 }
 
-if (-not (Test-Path nuget)) {
+if (-not (Test-Path 'nuget')) {
 	mkdir "nuget"
 }
 

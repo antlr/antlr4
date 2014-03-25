@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.v4.5", "Antlr4.Runtime\Antlr4.Runtime.v4.5.csproj", "{E1D192DE-5347-48C4-A9F4-A8CBA2AF3869}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{47C0086D-577C-43DA-ADC7-544F27656E45}"
@@ -39,6 +41,16 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.Portable", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.Portable.csproj", "{97C32E42-51B2-4A29-B005-769B63CFEFCA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4BuildTasks.v3.5", "Antlr4BuildTasks\Antlr4BuildTasks.v3.5.csproj", "{0D3D20E9-3341-4449-80E7-76A4534F0E55}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{4CE79A54-058D-4940-875E-7F6AA9922A7D}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\build\Antlr4.nuspec = ..\..\build\Antlr4.nuspec
+		..\..\build\Antlr4.Runtime.nuspec = ..\..\build\Antlr4.Runtime.nuspec
+		..\..\build\Antlr4.VS2008.nuspec = ..\..\build\Antlr4.VS2008.nuspec
+		..\..\build\build.ps1 = ..\..\build\build.ps1
+		..\..\build\push.ps1 = ..\..\build\push.ps1
+		..\..\build\version.ps1 = ..\..\build\version.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,5 +117,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4CE79A54-058D-4940-875E-7F6AA9922A7D} = {47C0086D-577C-43DA-ADC7-544F27656E45}
 	EndGlobalSection
 EndGlobal
