@@ -27,7 +27,7 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.antlr</groupId>
+            <groupId>com.tunnelvisionlabs</groupId>
             <artifactId>antlr4-annotations</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
