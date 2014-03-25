@@ -1,15 +1,18 @@
 # ANTLR v4
 
-**ANTLR** (ANother Tool for Language Recognition) is a powerful parser generator for reading, processing, executing, or translating structured text or binary files. It's widely used to build languages, tools, and frameworks. From a grammar, ANTLR generates a parser that can build and walk parse trees.
+**ANTLR** (ANother Tool for Language Recognition) is a powerful parser generator for reading, processing, executing, or translating structured text or binary files. It's widely used to build languages, tools, and frameworks. From a grammar, ANTLR generates a parser that can build parse trees and also generates a listener interface (or visitor) that makes it easy to respond to the recognition of phrases of interest.
 
 * [Wikipedia](https://en.wikipedia.org/wiki/ANTLR)
 * [Official site](http://www.antlr.org/)
+* [Documentation](https://theantlrguy.atlassian.net/wiki/display/ANTLR4/ANTLR+4+Documentation)
+* [FAQ](https://theantlrguy.atlassian.net/wiki/display/ANTLR4/ANTLR+v4+FAQ)
+* [API](http://www.antlr.org/api/Java/index.html)
 * [ANTLR v3](http://www.antlr3.org/)
 * [v3 to v4 Migration guide, differences](https://theantlrguy.atlassian.net/wiki/pages/viewpage.action?pageId=1900596)
 
 ## INTRODUCTION
 
-Hi and welcome to the Honey Badger 4.2 release (February 3, 2014) of ANTLR!
+Hi and welcome to the Honey Badger 4.2.1 release (March 25, 2014) of ANTLR!
 
 ## INSTALLATION
 
@@ -20,20 +23,20 @@ Hi and welcome to the Honey Badger 4.2 release (February 3, 2014) of ANTLR!
 1. Download
    ```sh
    $ cd /usr/local/lib
-   $ curl -O http://www.antlr4.org/download/antlr-4.2-complete.jar
+   $ curl -O http://www.antlr4.org/download/antlr-4.2.1-complete.jar
    ```
-   Or just [download in browser](http://www.antlr.org/download/antlr-4.2-complete.jar) and put it somewhere rational like `/usr/local/lib`.
+   Or just [download in browser](http://www.antlr.org/download/antlr-4.2.1-complete.jar) and put it somewhere rational like `/usr/local/lib`.
 
-2. Add `antlr-4.2-complete.jar` to your `CLASSPATH`:
+2. Add `antlr-4.2.1-complete.jar` to your `CLASSPATH`:
    ```sh
-   $ export CLASSPATH=".:/usr/local/lib/antlr-4.2-complete.jar:$CLASSPATH"
+   $ export CLASSPATH=".:/usr/local/lib/antlr-4.2.1-complete.jar:$CLASSPATH"
    ```
    Is also a good idea to put this in your .bash_profile or whatever your
    startup script is.
 
 3. Create aliases for the ANTLR Tool, and TestRig.
    ```sh
-   $ alias antlr4='java -jar /usr/local/lib/antlr-4.2-complete.jar'
+   $ alias antlr4='java -jar /usr/local/lib/antlr-4.2.1-complete.jar'
    $ alias grun='java org.antlr.v4.runtime.misc.TestRig'
    ```
 
@@ -41,16 +44,16 @@ Hi and welcome to the Honey Badger 4.2 release (February 3, 2014) of ANTLR!
 
 0. [Install Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) (version 1.6 or higher)
 
-1. Download [antlr-4.2-complete.jar](http://www.antlr.org/download/antlr-4.2-complete.jar)
+1. Download [antlr-4.2.1-complete.jar](http://www.antlr.org/download/antlr-4.2.1-complete.jar)
    Save to your directory for 3rd party Java libraries, say `C:\Javalib`
 
-2. Add `antlr-4.2-complete.jar` to `CLASSPATH`, either:
+2. Add `antlr-4.2.1-complete.jar` to `CLASSPATH`, either:
 
  * Permanently: Using System Properties dialog > Environment variables >
    Create or append to `CLASSPATH` variable
 
  * Temporarily, at command line:
-   `SET CLASSPATH=C:\Javalib\antlr-4.2-complete.jar;%CLASSPATH%`
+   `SET CLASSPATH=C:\Javalib\antlr-4.2.1-complete.jar;%CLASSPATH%`
 
 3. Create short convenient commands for the ANTLR Tool, and TestRig,
    using batch files or doskey commands:
@@ -72,15 +75,15 @@ Hi and welcome to the Honey Badger 4.2 release (February 3, 2014) of ANTLR!
 Either launch `org.antlr.v4.Tool` directly:
 ```sh
 $ java org.antlr.v4.Tool
-ANTLR Parser Generator Version 4.2
+ANTLR Parser Generator Version 4.2.1
     -o ___              specify output directory where all output is generated
     -lib ___            specify location of .tokens files
 ...
 ```
 or use `-jar` option on java:
 ```sh
-$ java -jar /usr/local/lib/antlr-4.2-complete.jar
-ANTLR Parser Generator Version 4.2
+$ java -jar /usr/local/lib/antlr-4.2-complete.jar.1
+ANTLR Parser Generator Version 4.2.1
     -o ___              specify output directory where all output is generated
     -lib ___            specify location of .tokens files
 ...
@@ -127,8 +130,8 @@ by the grammar. For example, java, cpp, csharp, c, etc...
 
 ## Authors
 
-[Terence Parr](http://www.cs.usfca.edu/~parrt/), parrt@cs.usfca.edu
-ANTLR project lead and supreme dictator for life<br/>
+[Terence Parr](http://www.cs.usfca.edu/~parrt/), parrt@cs.usfca.edu  
+ANTLR project lead and supreme dictator for life
 [University of San Francisco](http://www.usfca.edu/)
 
 [Sam Harwell](http://tunnelvisionlabs.com/)
