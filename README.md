@@ -10,6 +10,8 @@
 * [ANTLR v3](http://www.antlr3.org/)
 * [v3 to v4 Migration guide, differences](https://theantlrguy.atlassian.net/wiki/pages/viewpage.action?pageId=1900596)
 
+[Release notes](https://github.com/antlr/antlr4/releases)
+
 ## INTRODUCTION
 
 Hi and welcome to the Honey Badger 4.2.1 release (March 25, 2014) of ANTLR!
