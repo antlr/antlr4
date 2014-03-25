@@ -1379,7 +1379,7 @@ namespace Antlr4.Runtime.Atn
         [return: NotNull]
         protected internal virtual ATNConfigSet ApplyPrecedenceFilter(ATNConfigSet configs, ParserRuleContext globalContext, PredictionContextCache contextCache)
         {
-            IDictionary<int, PredictionContext> statesFromAlt1 = new Dictionary<int, PredictionContext>();
+            Dictionary<int, PredictionContext> statesFromAlt1 = new Dictionary<int, PredictionContext>();
             ATNConfigSet configSet = new ATNConfigSet();
             foreach (ATNConfig config in configs)
             {
@@ -1394,7 +1394,7 @@ namespace Antlr4.Runtime.Atn
                     // the configuration was eliminated
                     continue;
                 }
-                statesFromAlt1.Put(config.State.stateNumber, config.Context);
+                statesFromAlt1[config.State.stateNumber] = config.Context;
                 if (updatedContext != config.SemanticContext)
                 {
                     configSet.Add(config.Transform(config.State, updatedContext, false), contextCache);
@@ -1411,8 +1411,8 @@ namespace Antlr4.Runtime.Atn
                     // already handled
                     continue;
                 }
-                PredictionContext context = statesFromAlt1.Get(config_1.State.stateNumber);
-                if (context != null && context.Equals(config_1.Context))
+                PredictionContext context;
+                if (statesFromAlt1.TryGetValue(config_1.State.stateNumber, out context) && context.Equals(config_1.Context))
                 {
                     // eliminated
                     continue;
