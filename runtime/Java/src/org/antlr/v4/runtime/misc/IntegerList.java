@@ -103,6 +103,7 @@ public class IntegerList {
 		int current = 0;
 		for (int x : list) {
 			_data[_size + current] = x;
+			current++;
 		}
 
 		_size += list.size();

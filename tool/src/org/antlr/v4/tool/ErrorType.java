@@ -726,7 +726,7 @@ public enum ErrorType {
 	 *
 	 * <p>unterminated string literal</p>
 	 *
-	 * <p>The parser contains an unterminated string literal.</p>
+	 * <p>The grammar contains an unterminated string literal.</p>
 	 *
 	 * <p>The following rule produces this error.</p>
 	 *
@@ -809,6 +809,97 @@ public enum ErrorType {
 	 * @since 4.2
 	 */
 	UNKNOWN_LEXER_CONSTANT(155, "rule '<arg>' contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output", ErrorSeverity.WARNING),
+	/**
+	 * Compiler Error 156.
+	 *
+	 * <p>invalid escape sequence</p>
+	 *
+	 * <p>The grammar contains a string literal with an invalid escape sequence.</p>
+	 *
+	 * <p>The following rule produces this error.</p>
+	 *
+	 * <pre>
+	 * x : 'x';  // ok
+	 * y : '\u005Cu'; // error 156
+	 * </pre>
+	 *
+	 * @since 4.2.1
+	 */
+	INVALID_ESCAPE_SEQUENCE(156, "invalid escape sequence", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Warning 157.
+	 *
+	 * <p>rule '<em>rule</em>' contains an 'assoc' element option in an
+	 * unrecognized location</p>
+	 *
+	 * <p>
+	 * In ANTLR 4.2, the position of the {@code assoc} element option was moved
+	 * from the operator terminal(s) to the alternative itself. This warning is
+	 * reported when an {@code assoc} element option is specified on a grammar
+	 * element that is not recognized by the current version of ANTLR, and as a
+	 * result will simply be ignored.
+	 * </p>
+	 *
+	 * <p>The following rule produces this warning.</p>
+	 *
+	 * <pre>
+	 * x : 'x'
+	 *   | x '+'&lt;assoc=right&gt; x   // warning 157
+	 *   |&lt;assoc=right&gt; x '*' x   // ok
+	 *   ;
+	 * </pre>
+	 *
+	 * @since 4.2.1
+	 */
+	UNRECOGNIZED_ASSOC_OPTION(157, "rule '<arg>' contains an 'assoc' terminal option in an unrecognized location", ErrorSeverity.WARNING),
+	/**
+	 * Compiler Warning 158.
+	 *
+	 * <p>fragment rule '<em>rule</em>' contains an action or command which can
+	 * never be executed</p>
+	 *
+	 * <p>A lexer rule which is marked with the {@code fragment} modifier
+	 * contains an embedded action or lexer command. ANTLR lexers only execute
+	 * commands and embedded actions located in the top-level matched rule.
+	 * Since fragment rules can never be the top-level rule matched by a lexer,
+	 * actions or commands placed in these rules can never be executed during
+	 * the lexing process.</p>
+	 *
+	 * <p>The following rule produces this warning.</p>
+	 *
+	 * <pre>
+	 * X1 : 'x' -> more    // ok
+	 *    ;
+	 * Y1 : 'x' {more();}  // ok
+	 *    ;
+	 * fragment
+	 * X2 : 'x' -> more    // warning 158
+	 *    ;
+	 * fragment
+	 * Y2 : 'x' {more();}  // warning 158
+	 *    ;
+	 * </pre>
+	 *
+	 * @since 4.2.1
+	 */
+	FRAGMENT_ACTION_IGNORED(158, "fragment rule '<arg>' contains an action or command which can never be executed", ErrorSeverity.WARNING),
+	/**
+	 * Compiler Error 159.
+	 *
+	 * <p>cannot declare a rule with reserved name '<em>rule</em>'</p>
+	 *
+	 * <p>A rule was declared with a reserved name.</p>
+	 *
+	 * <p>The following rule produces this error.</p>
+	 *
+	 * <pre>
+	 * EOF : ' '   // error 159 (EOF is a reserved name)
+	 *     ;
+	 * </pre>
+	 *
+	 * @since 4.2.1
+	 */
+	RESERVED_RULE_NAME(159, "cannot declare a rule with reserved name '<arg>'", ErrorSeverity.ERROR),
 
 	/*
 	 * Backward incompatibility errors

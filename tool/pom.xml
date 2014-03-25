@@ -35,13 +35,13 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr-runtime</artifactId>
-            <version>3.5</version>
+            <version>3.5.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>ST4</artifactId>
-            <version>4.0.7</version>
+            <version>4.0.8</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -53,8 +53,19 @@
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <includeDependencySources>true</includeDependencySources>
+                            <dependencySourceIncludes>
+                                <dependencySourceInclude>org.antlr:antlr4-*</dependencySourceInclude>
+                            </dependencySourceIncludes>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-shade-plugin</artifactId>
-                        <version>2.1</version>
+                        <version>2.2</version>
                         <inherited>false</inherited>
                         <executions>
                             <execution>
@@ -79,7 +90,6 @@
                                             <artifact>org.antlr:antlr4-annotations</artifact>
                                             <includes>
                                                 <include>org/antlr/v4/runtime/**</include>
-                                                <include>META-INF/services/**</include>
                                             </includes>
                                         </filter>
                                     </filters>
@@ -118,7 +128,7 @@
            <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr3-maven-plugin</artifactId>
-                <version>3.5</version>
+                <version>3.5.2</version>
                 <configuration>
                     <sourceDirectory>src</sourceDirectory>
                     <verbose>true</verbose>

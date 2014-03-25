@@ -31,7 +31,7 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.runtime.atn.ATNSimulator;
-import org.antlr.v4.runtime.misc.Tuple3;
+import org.antlr.v4.runtime.misc.Tuple2;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
@@ -39,6 +39,7 @@ import org.antlr.v4.tool.ast.AltAST;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class VisitorFile extends OutputFile {
@@ -55,10 +56,10 @@ public class VisitorFile extends OutputFile {
 		parserName = g.getRecognizerName();
 		grammarName = g.name;
 		for (Rule r : g.rules.values()) {
-			List<Tuple3<Integer,AltAST,String>> labels = r.getAltLabels();
+			Map<String, List<Tuple2<Integer, AltAST>>> labels = r.getAltLabels();
 			if ( labels!=null ) {
-				for (Tuple3<Integer,AltAST,String> pair : labels) {
-					visitorNames.add(pair.getItem3());
+				for (Map.Entry<String, List<Tuple2<Integer, AltAST>>> pair : labels.entrySet()) {
+					visitorNames.add(pair.getKey());
 				}
 			}
 			else if (r.name.indexOf(ATNSimulator.RULE_VARIANT_DELIMITER) < 0) {

@@ -32,7 +32,7 @@ package org.antlr.v4.tool;
 
 import org.antlr.v4.runtime.misc.MultiMap;
 import org.antlr.v4.runtime.misc.Tuple;
-import org.antlr.v4.runtime.misc.Tuple3;
+import org.antlr.v4.runtime.misc.Tuple2;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -206,13 +206,24 @@ public class Rule implements AttributeResolver {
 		return numberOfAlts;
 	}
 
-	/** Get -> labels. */
-	public List<Tuple3<Integer,AltAST,String>> getAltLabels() {
-		List<Tuple3<Integer,AltAST,String>> labels = new ArrayList<Tuple3<Integer,AltAST,String>>();
+	/**
+	 * Get {@code #} labels. The keys of the map are the labels applied to outer
+	 * alternatives of a lexer rule, and the values are collections of pairs
+	 * (alternative number and {@link AltAST}) identifying the alternatives with
+	 * this label. Unlabeled alternatives are not included in the result.
+	 */
+	public Map<String, List<Tuple2<Integer, AltAST>>> getAltLabels() {
+		Map<String, List<Tuple2<Integer, AltAST>>> labels = new HashMap<String, List<Tuple2<Integer, AltAST>>>();
 		for (int i=1; i<=numberOfAlts; i++) {
 			GrammarAST altLabel = alt[i].ast.altLabel;
 			if ( altLabel!=null ) {
-				labels.add(Tuple.create(i,alt[i].ast,altLabel.getText()));
+				List<Tuple2<Integer, AltAST>> list = labels.get(altLabel.getText());
+				if (list == null) {
+					list = new ArrayList<Tuple2<Integer, AltAST>>();
+					labels.put(altLabel.getText(), list);
+				}
+
+				list.add(Tuple.create(i, alt[i].ast));
 			}
 		}
 		if ( labels.isEmpty() ) return null;

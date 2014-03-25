@@ -54,8 +54,10 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -1268,7 +1270,8 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * {@link SemanticContext#evalPrecedence}.</li>
 	 * <li>Remove all configurations which predict an alternative greater than
 	 * 1, for which another configuration that predicts alternative 1 is in the
-	 * same ATN state. This transformation is valid for the following reasons:
+	 * same ATN state with the same prediction context. This transformation is
+	 * valid for the following reasons:
 	 * <ul>
 	 * <li>The closure block cannot contain any epsilon transitions which bypass
 	 * the body of the closure, so all states reachable via alternative 1 are
@@ -1283,6 +1286,28 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * </li>
 	 * </ol>
 	 *
+	 * <p>
+	 * The prediction context must be considered by this filter to address
+	 * situations like the following.
+	 * </p>
+	 * <code>
+	 * <pre>
+	 * grammar TA;
+	 * prog: statement* EOF;
+	 * statement: letterA | statement letterA 'b' ;
+	 * letterA: 'a';
+	 * </pre>
+	 * </code>
+	 * <p>
+	 * If the above grammar, the ATN state immediately before the token
+	 * reference {@code 'a'} in {@code letterA} is reachable from the left edge
+	 * of both the primary and closure blocks of the left-recursive rule
+	 * {@code statement}. The prediction context associated with each of these
+	 * configurations distinguishes between them, and prevents the alternative
+	 * which stepped out to {@code prog} (and then back in to {@code statement}
+	 * from being eliminated by the filter.
+	 * </p>
+	 *
 	 * @param configs The configuration set computed by
 	 * {@link #computeStartState} as the start state for the DFA.
 	 * @return The transformed configuration set representing the start state
@@ -1291,7 +1316,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 */
 	@NotNull
 	protected ATNConfigSet applyPrecedenceFilter(@NotNull ATNConfigSet configs, ParserRuleContext globalContext, PredictionContextCache contextCache) {
-		Set<Integer> statesFromAlt1 = new HashSet<Integer>();
+		Map<Integer, PredictionContext> statesFromAlt1 = new HashMap<Integer, PredictionContext>();
 		ATNConfigSet configSet = new ATNConfigSet();
 		for (ATNConfig config : configs) {
 			// handle alt 1 first
@@ -1305,7 +1330,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				continue;
 			}
 
-			statesFromAlt1.add(config.getState().stateNumber);
+			statesFromAlt1.put(config.getState().stateNumber, config.getContext());
 			if (updatedContext != config.getSemanticContext()) {
 				configSet.add(config.transform(config.getState(), updatedContext, false), contextCache);
 			}
@@ -1320,7 +1345,12 @@ public class ParserATNSimulator extends ATNSimulator {
 				continue;
 			}
 
-			if (statesFromAlt1.contains(config.getState().stateNumber)) {
+			/* In the future, this elimination step could be updated to also
+			 * filter the prediction context for alternatives predicting alt>1
+			 * (basically a graph subtraction algorithm).
+			 */
+			PredictionContext context = statesFromAlt1.get(config.getState().stateNumber);
+			if (context != null && context.equals(config.getContext())) {
 				// eliminated
 				continue;
 			}

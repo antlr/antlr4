@@ -37,6 +37,52 @@ public class TestLexerActions extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	/**
+	 * This is a regressing test for antlr/antlr4#469 "Not all internal lexer
+	 * rule actions are executed".
+	 * https://github.com/antlr/antlr4/issues/469
+	 */
+	@Test public void testEvalMultipleActions() throws Exception {
+		String grammar =
+			"lexer grammar L;\n" +
+			"\n" +
+			"@lexer::members\n" +
+			"{\n" +
+			"class Marker\n" +
+			"{\n" +
+			"   Marker (Lexer lexer) { this.lexer = lexer; }\n" +
+			"\n" +
+			"   public String getText ()\n" +
+			"   {\n" +
+			"      return lexer._input.getText (new Interval (start_index, stop_index));\n" +
+			"   }\n" +
+			"\n" +
+			"   public void start ()  { start_index = lexer._input.index (); System.out.println (\"Start:\" + start_index);}\n" +
+			"   public void stop () { stop_index = lexer._input.index (); System.out.println (\"Stop:\" + stop_index);}\n" +
+			"\n" +
+			"   private int start_index = 0;\n" +
+			"   private int stop_index = 0;\n" +
+			"   private Lexer lexer;\n" +
+			"}\n" +
+			"\n" +
+			"Marker m_name = new Marker (this);\n" +
+			"}\n" +
+			"\n" +
+			"HELLO: 'hello' WS { m_name.start (); } NAME { m_name.stop (); } '\\n' { System.out.println (\"Hello: \" + m_name.getText ()); };\n" +
+			"NAME: ('a'..'z' | 'A'..'Z')+ ('\\n')?;\n" +
+			"\n" +
+			"fragment WS: [ \\r\\t\\n]+ ;\n";
+		String found = execLexer("L.g4", grammar, "L", "hello Steve\n");
+		String expecting =
+			"Start:6\n" +
+			"Stop:11\n" +
+			"Hello: Steve\n" +
+			"\n" +
+			"[@0,0:11='hello Steve\\n',<1>,1:0]\n" +
+			"[@1,12:11='<EOF>',<-1>,2:12]\n";
+		assertEquals(expecting, found);
+	}
+
 	@Test public void test2ActionsIn1Rule() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+

@@ -5,6 +5,7 @@
 * [Wikipedia](https://en.wikipedia.org/wiki/ANTLR)
 * [Official site](http://www.antlr.org/)
 * [ANTLR v3](http://www.antlr3.org/)
+* [v3 to v4 Migration guide, differences](https://theantlrguy.atlassian.net/wiki/pages/viewpage.action?pageId=1900596)
 
 ## INTRODUCTION
 
@@ -21,7 +22,7 @@ Hi and welcome to the Honey Badger 4.2 release (February 3, 2014) of ANTLR!
    $ cd /usr/local/lib
    $ curl -O http://www.antlr4.org/download/antlr-4.2-complete.jar
    ```
-   Or just [download in browser](http://www.antlr4.org/download/antlr-4.2-complete.jar) and put it somewhere rational like `/usr/local/lib`.
+   Or just [download in browser](http://www.antlr.org/download/antlr-4.2-complete.jar) and put it somewhere rational like `/usr/local/lib`.
 
 2. Add `antlr-4.2-complete.jar` to your `CLASSPATH`:
    ```sh
@@ -40,7 +41,7 @@ Hi and welcome to the Honey Badger 4.2 release (February 3, 2014) of ANTLR!
 
 0. [Install Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) (version 1.6 or higher)
 
-1. Download [antlr-4.2-complete.jar](http://antlr.org/download/antlr-4.2-complete.jar)
+1. Download [antlr-4.2-complete.jar](http://www.antlr.org/download/antlr-4.2-complete.jar)
    Save to your directory for 3rd party Java libraries, say `C:\Javalib`
 
 2. Add `antlr-4.2-complete.jar` to `CLASSPATH`, either:
@@ -95,7 +96,7 @@ In a temporary directory, put the following grammar inside file `Hello.g4`:
 grammar Hello;
 r : 'hello' ID ;
 ID : [a-z]+ ;
-WS : [ \t\n]+ -> skip ; // skip spaces, tabs, newlines
+WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
 ```
 Then run ANTLR the tool on it:
 ```sh

@@ -185,7 +185,13 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	 *  the token). This is better than forcing you to override a method in
 	 *  your token objects because you don't have to go modify your lexer
 	 *  so that it creates a new Java type.
+	 *
+	 * @deprecated This method is not called by the ANTLR 4 Runtime. Specific
+	 * implementations of {@link ANTLRErrorStrategy} may provide a similar
+	 * feature when necessary. For example, see
+	 * {@link DefaultErrorStrategy#getTokenErrorDisplay}.
 	 */
+	@Deprecated
 	public String getTokenErrorDisplay(Token t) {
 		if ( t==null ) return "<no token>";
 		String s = t.getText();

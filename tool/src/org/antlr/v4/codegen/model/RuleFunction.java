@@ -52,7 +52,7 @@ import org.antlr.v4.parse.GrammarTreeVisitor;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
-import org.antlr.v4.runtime.misc.Tuple3;
+import org.antlr.v4.runtime.misc.Tuple2;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Rule;
@@ -160,17 +160,28 @@ public class RuleFunction extends OutputModelObject {
 
 		// make structs for -> labeled alts, define ctx labels for elements
 		altLabelCtxs = new HashMap<String,AltLabelStructDecl>();
-		List<Tuple3<Integer,AltAST,String>> labels = r.getAltLabels();
+		Map<String, List<Tuple2<Integer, AltAST>>> labels = r.getAltLabels();
 		if ( labels!=null ) {
-			for (Tuple3<Integer,AltAST,String> pair : labels) {
-				Integer altNum = pair.getItem1();
-				AltAST altAST = pair.getItem2();
-				String label = pair.getItem3();
-				altToContext[altNum] = new AltLabelStructDecl(factory, r, altNum, label);
-				altLabelCtxs.put(label, altToContext[altNum]);
-				Set<Decl> decls = getDeclsForAltElements(altAST);
-				// we know which ctx to put in, so do it directly
-				for (Decl d : decls) altToContext[altNum].addDecl(d);
+			for (Map.Entry<String, List<Tuple2<Integer, AltAST>>> entry : labels.entrySet()) {
+				String label = entry.getKey();
+				List<AltAST> alts = new ArrayList<AltAST>();
+				for (Tuple2<Integer, AltAST> pair : entry.getValue()) {
+					alts.add(pair.getItem2());
+				}
+
+				Set<Decl> decls = getDeclsForAllElements(alts);
+				for (Tuple2<Integer, AltAST> pair : entry.getValue()) {
+					Integer altNum = pair.getItem1();
+					altToContext[altNum] = new AltLabelStructDecl(factory, r, altNum, label);
+					if (!altLabelCtxs.containsKey(label)) {
+						altLabelCtxs.put(label, altToContext[altNum]);
+					}
+
+					// we know which ctx to put in, so do it directly
+					for (Decl d : decls) {
+						altToContext[altNum].addDecl(d);
+					}
+				}
 			}
 		}
 	}
@@ -239,32 +250,6 @@ public class RuleFunction extends OutputModelObject {
 			factory.getGrammar().tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, ex);
 			return new FrequencySet<String>();
 		}
-	}
-
-	/** Get list of decls for token/rule refs.
-	 *  Single ref X becomes X() getter
-	 *  Multiple refs to X becomes List X() method, X(int i) method.
-	 *  Ref X in a loop then we get List X(), X(int i)
-	 *
-	 *  Does not gen labels for literals like '+', 'begin', ';', ...
- 	 */
-	public Set<Decl> getDeclsForAltElements(AltAST altAST) {
-		IntervalSet reftypes = new IntervalSet(RULE_REF,
-											   TOKEN_REF);
-		List<GrammarAST> refs = altAST.getNodesWithType(reftypes);
-		Set<Decl> decls = new HashSet<Decl>();
-		FrequencySet<String> freq = getElementFrequenciesForAlt(altAST);
-		for (GrammarAST t : refs) {
-			String refLabelName = t.getText();
-			if (freq.count(refLabelName)==0) {
-				continue;
-			}
-
-			boolean needList = freq.count(refLabelName)>1;
-			List<Decl> d = getDeclForAltElement(t, refLabelName, needList);
-			decls.addAll(d);
-		}
-		return decls;
 	}
 
 	public List<Decl> getDeclForAltElement(GrammarAST t, String refLabelName, boolean needList) {

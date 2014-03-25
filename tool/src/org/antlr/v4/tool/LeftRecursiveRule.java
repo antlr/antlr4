@@ -34,13 +34,14 @@ import org.antlr.v4.analysis.LeftRecursiveRuleAltInfo;
 import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.runtime.misc.Tuple;
 import org.antlr.v4.runtime.misc.Tuple2;
-import org.antlr.v4.runtime.misc.Tuple3;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.RuleAST;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LeftRecursiveRule extends Rule {
 	public List<LeftRecursiveRuleAltInfo> recPrimaryAlts;
@@ -85,16 +86,20 @@ public class LeftRecursiveRule extends Rule {
 
 	/** Get -> labels from those alts we deleted for left-recursive rules. */
 	@Override
-	public List<Tuple3<Integer,AltAST,String>> getAltLabels() {
-		List<Tuple3<Integer,AltAST,String>> labels = new ArrayList<Tuple3<Integer,AltAST,String>>();
-		List<Tuple3<Integer,AltAST,String>> normalAltLabels = super.getAltLabels();
-		if ( normalAltLabels!=null ) labels.addAll(normalAltLabels);
+	public Map<String, List<Tuple2<Integer, AltAST>>> getAltLabels() {
+		Map<String, List<Tuple2<Integer, AltAST>>> labels = new HashMap<String, List<Tuple2<Integer, AltAST>>>();
+		Map<String, List<Tuple2<Integer, AltAST>>> normalAltLabels = super.getAltLabels();
+		if ( normalAltLabels!=null ) labels.putAll(normalAltLabels);
 		if ( recPrimaryAlts!=null ) {
 			for (LeftRecursiveRuleAltInfo altInfo : recPrimaryAlts) {
 				if (altInfo.altLabel != null) {
-					labels.add(Tuple.create(altInfo.altNum,
-																   altInfo.originalAltAST,
-																   altInfo.altLabel));
+					List<Tuple2<Integer, AltAST>> pairs = labels.get(altInfo.altLabel);
+					if (pairs == null) {
+						pairs = new ArrayList<Tuple2<Integer, AltAST>>();
+						labels.put(altInfo.altLabel, pairs);
+					}
+
+					pairs.add(Tuple.create(altInfo.altNum, altInfo.originalAltAST));
 				}
 			}
 		}
@@ -102,9 +107,13 @@ public class LeftRecursiveRule extends Rule {
 			for (int i = 0; i < recOpAlts.size(); i++) {
 				LeftRecursiveRuleAltInfo altInfo = recOpAlts.getElement(i);
 				if ( altInfo.altLabel!=null ) {
-					labels.add(Tuple.create(altInfo.altNum,
-																 altInfo.originalAltAST,
-																 altInfo.altLabel));
+					List<Tuple2<Integer, AltAST>> pairs = labels.get(altInfo.altLabel);
+					if (pairs == null) {
+						pairs = new ArrayList<Tuple2<Integer, AltAST>>();
+						labels.put(altInfo.altLabel, pairs);
+					}
+
+					pairs.add(Tuple.create(altInfo.altNum, altInfo.originalAltAST));
 				}
 			}
 		}

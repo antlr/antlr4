@@ -443,7 +443,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 				PredictionContext newContext = context.getParent(i); // "pop" return state
 				ATNState returnState = atn.states.get(returnStateNumber);
-				ATNConfig c = ATNConfig.create(returnState, config.getAlt(), newContext);
+				ATNConfig c = config.transform(returnState, newContext, false);
 				currentAltReachedAcceptState = closure(input, c, configs, currentAltReachedAcceptState, speculative);
 			}
 

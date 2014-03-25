@@ -39,12 +39,10 @@ import org.antlr.v4.runtime.atn.LoopEndState;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.PrecedencePredicateTransition;
 import org.antlr.v4.runtime.atn.PredicateTransition;
-import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.atn.RuleStartState;
 import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.atn.Transition;
-import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.Tuple;
 import org.antlr.v4.runtime.misc.Tuple2;
 
@@ -139,8 +137,16 @@ public class ParserInterpreter extends Parser {
 			case ATNState.RULE_STOP :
 				// pop; return from rule
 				if ( _ctx.isEmpty() ) {
-					exitRule();
-					return rootContext;
+					if (startRuleStartState.isPrecedenceRule) {
+						ParserRuleContext result = _ctx;
+						Tuple2<ParserRuleContext, Integer> parentContext = _parentContextStack.pop();
+						unrollRecursionContexts(parentContext.getItem1());
+						return result;
+					}
+					else {
+						exitRule();
+						return rootContext;
+					}
 				}
 
 				visitRuleStopState(p);
