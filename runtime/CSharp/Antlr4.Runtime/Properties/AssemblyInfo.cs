@@ -80,5 +80,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("4.2.0.0")]
 #if !NET_CF
 [assembly: AssemblyFileVersion("4.2.1.0")]
-[assembly: AssemblyInformationalVersion("4.2.1-alpha001")]
+[assembly: AssemblyInformationalVersion("4.2.1-dev")]
 #endif

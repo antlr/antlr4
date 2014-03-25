@@ -70,4 +70,4 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("4.2.0.0")]
 [assembly: AssemblyFileVersion("4.2.1.0")]
-[assembly: AssemblyInformationalVersion("4.2.1-alpha001")]
+[assembly: AssemblyInformationalVersion("4.2.1-dev")]
