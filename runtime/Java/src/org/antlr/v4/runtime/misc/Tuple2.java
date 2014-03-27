@@ -73,4 +73,9 @@ public class Tuple2<T1, T2> {
 		return hash;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("(%s, %s)", item1, item2);
+	}
+
 }
