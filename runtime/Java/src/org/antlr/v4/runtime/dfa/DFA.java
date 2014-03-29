@@ -201,7 +201,7 @@ public class DFA {
 
 	public boolean isContextSensitive() {
 		if (isPrecedenceDfa()) {
-			return s0full.get().getEdgeMap().isEmpty();
+			return !s0full.get().getEdgeMap().isEmpty();
 		}
 
 		return s0full.get() != null;
