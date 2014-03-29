@@ -357,11 +357,25 @@ public class Grammar implements AttributeResolver {
         }
     }
 
-    public void defineRule(Rule r) {
-		if ( rules.get(r.name)!=null ) return;
+	/**
+	 * Define the specified rule in the grammar. This method assigns the rule's
+	 * {@link Rule#index} according to the {@link #ruleNumber} field, and adds
+	 * the {@link Rule} instance to {@link #rules} and {@link #indexToRule}.
+	 *
+	 * @param r The rule to define in the grammar.
+	 * @return {@code true} if the rule was added to the {@link Grammar}
+	 * instance; otherwise, {@code false} if a rule with this name already
+	 * existed in the grammar instance.
+	 */
+	public boolean defineRule(@NotNull Rule r) {
+		if ( rules.get(r.name)!=null ) {
+			return false;
+		}
+
 		rules.put(r.name, r);
 		r.index = ruleNumber++;
 		indexToRule.add(r);
+		return true;
 	}
 
 //	public int getNumRules() {
