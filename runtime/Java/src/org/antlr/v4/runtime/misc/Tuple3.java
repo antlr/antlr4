@@ -81,4 +81,9 @@ public class Tuple3<T1, T2, T3> {
 		return hash;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("(%s, %s, %s)", item1, item2, item3);
+	}
+
 }
