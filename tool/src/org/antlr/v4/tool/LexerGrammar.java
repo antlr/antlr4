@@ -71,4 +71,15 @@ public class LexerGrammar extends Grammar {
 		modes.map(r.mode, r);
 		return true;
 	}
+
+	@Override
+	public boolean undefineRule(Rule r) {
+		if (!super.undefineRule(r)) {
+			return false;
+		}
+
+		boolean removed = modes.get(r.mode).remove(r);
+		assert removed;
+		return true;
+	}
 }

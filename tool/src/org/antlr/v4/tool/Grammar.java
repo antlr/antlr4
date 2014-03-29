@@ -378,6 +378,40 @@ public class Grammar implements AttributeResolver {
 		return true;
 	}
 
+	/**
+	 * Undefine the specified rule from this {@link Grammar} instance. The
+	 * instance {@code r} is removed from {@link #rules} and
+	 * {@link #indexToRule}. This method updates the {@link Rule#index} field
+	 * for all rules defined after {@code r}, and decrements {@link #ruleNumber}
+	 * in preparation for adding new rules.
+	 * <p>
+	 * This method does nothing if the current {@link Grammar} does not contain
+	 * the instance {@code r} at index {@code r.index} in {@link #indexToRule}.
+	 * </p>
+	 *
+	 * @param r
+	 * @return {@code true} if the rule was removed from the {@link Grammar}
+	 * instance; otherwise, {@code false} if the specified rule was not defined
+	 * in the grammar.
+	 */
+	public boolean undefineRule(@NotNull Rule r) {
+		if (r.index < 0 || r.index >= indexToRule.size() || indexToRule.get(r.index) != r) {
+			return false;
+		}
+
+		assert rules.get(r.name) == r;
+
+		rules.remove(r.name);
+		indexToRule.remove(r.index);
+		for (int i = r.index; i < indexToRule.size(); i++) {
+			assert indexToRule.get(i).index == i + 1;
+			indexToRule.get(i).index--;
+		}
+
+		ruleNumber--;
+		return true;
+	}
+
 //	public int getNumRules() {
 //		int n = rules.size();
 //		List<Grammar> imports = getAllImportedGrammars();
