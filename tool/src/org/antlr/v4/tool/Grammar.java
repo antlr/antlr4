@@ -363,11 +363,59 @@ public class Grammar implements AttributeResolver {
         }
     }
 
-    public void defineRule(Rule r) {
-		if ( rules.get(r.name)!=null ) return;
+	/**
+	 * Define the specified rule in the grammar. This method assigns the rule's
+	 * {@link Rule#index} according to the {@link #ruleNumber} field, and adds
+	 * the {@link Rule} instance to {@link #rules} and {@link #indexToRule}.
+	 *
+	 * @param r The rule to define in the grammar.
+	 * @return {@code true} if the rule was added to the {@link Grammar}
+	 * instance; otherwise, {@code false} if a rule with this name already
+	 * existed in the grammar instance.
+	 */
+	public boolean defineRule(@NotNull Rule r) {
+		if ( rules.get(r.name)!=null ) {
+			return false;
+		}
+
 		rules.put(r.name, r);
 		r.index = ruleNumber++;
 		indexToRule.add(r);
+		return true;
+	}
+
+	/**
+	 * Undefine the specified rule from this {@link Grammar} instance. The
+	 * instance {@code r} is removed from {@link #rules} and
+	 * {@link #indexToRule}. This method updates the {@link Rule#index} field
+	 * for all rules defined after {@code r}, and decrements {@link #ruleNumber}
+	 * in preparation for adding new rules.
+	 * <p>
+	 * This method does nothing if the current {@link Grammar} does not contain
+	 * the instance {@code r} at index {@code r.index} in {@link #indexToRule}.
+	 * </p>
+	 *
+	 * @param r
+	 * @return {@code true} if the rule was removed from the {@link Grammar}
+	 * instance; otherwise, {@code false} if the specified rule was not defined
+	 * in the grammar.
+	 */
+	public boolean undefineRule(@NotNull Rule r) {
+		if (r.index < 0 || r.index >= indexToRule.size() || indexToRule.get(r.index) != r) {
+			return false;
+		}
+
+		assert rules.get(r.name) == r;
+
+		rules.remove(r.name);
+		indexToRule.remove(r.index);
+		for (int i = r.index; i < indexToRule.size(); i++) {
+			assert indexToRule.get(i).index == i + 1;
+			indexToRule.get(i).index--;
+		}
+
+		ruleNumber--;
+		return true;
 	}
 
 //	public int getNumRules() {

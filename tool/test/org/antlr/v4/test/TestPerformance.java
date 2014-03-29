@@ -317,6 +317,12 @@ public class TestPerformance extends BaseTest {
 	 */
 	private static final boolean TIME_PARSE_ONLY = false;
 
+	/**
+	 * When {@code true}, messages will be printed to {@link System#err} when
+	 * the first stage (SLL) parsing resulted in a syntax error. This option is
+	 * ignored when {@link #TWO_STAGE_PARSING} is {@code false}.
+	 */
+	private static final boolean REPORT_SECOND_STAGE_RETRY = true;
 	private static final boolean REPORT_SYNTAX_ERRORS = true;
 	private static final boolean REPORT_AMBIGUITIES = false;
 	private static final boolean REPORT_FULL_CONTEXT = false;
@@ -1384,7 +1390,9 @@ public class TestPerformance extends BaseTest {
 
 							String sourceName = tokens.getSourceName();
 							sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName+": " : "";
-							System.err.println(sourceName+"Forced to retry with full context.");
+							if (REPORT_SECOND_STAGE_RETRY) {
+								System.err.println(sourceName+"Forced to retry with full context.");
+							}
 
 							if (!(ex.getCause() instanceof ParseCancellationException)) {
 								throw ex;

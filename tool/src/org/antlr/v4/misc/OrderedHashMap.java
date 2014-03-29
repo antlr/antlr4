@@ -63,7 +63,8 @@ public class OrderedHashMap<K,V> extends LinkedHashMap<K,V> {
 
 	@Override
 	public V remove(Object key) {
-		throw new UnsupportedOperationException();
+		elements.remove(key);
+		return super.remove(key);
 	}
 
 	@Override

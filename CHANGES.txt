@@ -1,3 +1,11 @@
+****************************************************************************
+As of ANTLR 4.2.1, March 25 2014, we are no longer updating this file. Instead,
+we are using the github release mechanism. For example, here is
+4.2.1 release notes:
+
+https://github.com/antlr/antlr4/releases/tag/4.2.1
+****************************************************************************
+
 ANTLR v4 Honey Badger
 
 January 15, 2014
