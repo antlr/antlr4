@@ -484,13 +484,17 @@ public class ParserATNSimulator extends ATNSimulator {
 				// ATN states in SLL implies LL will also get nowhere.
 				// If conflict in states that dip out, choose min since we
 				// will get error no matter what.
-				int alt = getAltThatFinishedDecisionEntryRule(previousD.configs);
+				NoViableAltException e = noViableAlt(input, outerContext, previousD.configs, startIndex);
+				input.seek(startIndex);
+				ATNConfigSet filtered =
+					filterForTruePredicates(previousD.configs, outerContext);
+				int alt = getAltThatFinishedDecisionEntryRule(filtered);
 				if ( alt!=ATN.INVALID_ALT_NUMBER ) {
 					// return w/o altering DFA
 					return alt;
 				}
 
-				throw noViableAlt(input, outerContext, previousD.configs, startIndex);
+				throw e;
 			}
 
 			if ( D.requiresFullContext && mode != PredictionMode.SLL ) {
@@ -694,11 +698,15 @@ public class ParserATNSimulator extends ATNSimulator {
 				// ATN states in SLL implies LL will also get nowhere.
 				// If conflict in states that dip out, choose min since we
 				// will get error no matter what.
-				int alt = getAltThatFinishedDecisionEntryRule(previous);
+				NoViableAltException e = noViableAlt(input, outerContext, previous, startIndex);
+				input.seek(startIndex);
+				ATNConfigSet filtered =
+					filterForTruePredicates(previous, outerContext);
+				int alt = getAltThatFinishedDecisionEntryRule(filtered);
 				if ( alt!=ATN.INVALID_ALT_NUMBER ) {
 					return alt;
 				}
-				throw noViableAlt(input, outerContext, previous, startIndex);
+				throw e;
 			}
 
 			Collection<BitSet> altSubSets = PredictionMode.getConflictingAltSubsets(reach);
@@ -1167,6 +1175,33 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 		if ( alts.size()==0 ) return ATN.INVALID_ALT_NUMBER;
 		return alts.getMinElement();
+	}
+
+	/** Walk the list of configurations and strip out any that have predicates,
+	 *  that evaluate to false. Create a new set so as not to alter the
+	 *  incoming parameter.
+	 *
+	 *  Assumption: the input stream has been restored to the starting point
+	 *  prediction, which is where predicates need to evaluate.
+ 	 */
+	protected ATNConfigSet filterForTruePredicates(ATNConfigSet configs,
+												   ParserRuleContext outerContext)
+	{
+		ATNConfigSet filtered = new ATNConfigSet(configs.fullCtx);
+		for (ATNConfig c : configs) {
+			if ( c.semanticContext!=SemanticContext.NONE ) {
+				// TODO: @Sam: do we need to examine pred.isCtxDependent?
+				// i.e., what do we do if the predicate examines $label?
+				boolean predicateEvaluationResult = c.semanticContext.eval(parser, outerContext);
+				if ( predicateEvaluationResult ) {
+					filtered.add(c);
+				}
+			}
+			else {
+				filtered.add(c);
+			}
+		}
+		return filtered;
 	}
 
 	/** Look through a list of predicate/alt pairs, returning alts for the
