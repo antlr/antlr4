@@ -46,6 +46,7 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -326,7 +327,7 @@ public class ParserATNSimulator extends ATNSimulator {
 							  @NotNull DFA[] decisionToDFA,
 							  @NotNull PredictionContextCache sharedContextCache)
 	{
-		super(atn,sharedContextCache);
+		super(atn, sharedContextCache);
 		this.parser = parser;
 		this.decisionToDFA = decisionToDFA;
 		//		DOTGenerator dot = new DOTGenerator(null);
@@ -484,13 +485,13 @@ public class ParserATNSimulator extends ATNSimulator {
 				// ATN states in SLL implies LL will also get nowhere.
 				// If conflict in states that dip out, choose min since we
 				// will get error no matter what.
-				int alt = getAltThatFinishedDecisionEntryRule(previousD.configs);
+				NoViableAltException e = noViableAlt(input, outerContext, previousD.configs, startIndex);
+				input.seek(startIndex);
+				int alt = getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(previousD.configs, outerContext);
 				if ( alt!=ATN.INVALID_ALT_NUMBER ) {
-					// return w/o altering DFA
 					return alt;
 				}
-
-				throw noViableAlt(input, outerContext, previousD.configs, startIndex);
+				throw e;
 			}
 
 			if ( D.requiresFullContext && mode != PredictionMode.SLL ) {
@@ -694,11 +695,13 @@ public class ParserATNSimulator extends ATNSimulator {
 				// ATN states in SLL implies LL will also get nowhere.
 				// If conflict in states that dip out, choose min since we
 				// will get error no matter what.
-				int alt = getAltThatFinishedDecisionEntryRule(previous);
+				NoViableAltException e = noViableAlt(input, outerContext, previous, startIndex);
+				input.seek(startIndex);
+				int alt = getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(previous, outerContext);
 				if ( alt!=ATN.INVALID_ALT_NUMBER ) {
 					return alt;
 				}
-				throw noViableAlt(input, outerContext, previous, startIndex);
+				throw e;
 			}
 
 			Collection<BitSet> altSubSets = PredictionMode.getConflictingAltSubsets(reach);
@@ -1159,6 +1162,85 @@ public class ParserATNSimulator extends ATNSimulator {
 		return pairs.toArray(new DFAState.PredPrediction[pairs.size()]);
 	}
 
+	/**
+	 * This method is used to improve the localization of error messages by
+	 * choosing an alternative rather than throwing a
+	 * {@link NoViableAltException} in particular prediction scenarios where the
+	 * {@link #ERROR} state was reached during ATN simulation.
+	 *
+	 * <p>
+	 * The default implementation of this method uses the following
+	 * algorithm to identify an ATN configuration which successfully parsed the
+	 * decision entry rule. Choosing such an alternative ensures that the
+	 * {@link ParserRuleContext} returned by the calling rule will be complete
+	 * and valid, and the syntax error will be reported later at a more
+	 * localized location.</p>
+	 *
+	 * <ul>
+	 * <li>If no configuration in {@code configs} reached the end of the
+	 * decision rule, return {@link ATN#INVALID_ALT_NUMBER}.</li>
+	 * <li>If all configurations in {@code configs} which reached the end of the
+	 * decision rule predict the same alternative, return that alternative.</li>
+	 * <li>If the configurations in {@code configs} which reached the end of the
+	 * decision rule predict multiple alternatives (call this <em>S</em>),
+	 * choose an alternative in the following order.
+	 * <ol>
+	 * <li>Filter the configurations in {@code configs} to only those
+	 * configurations which remain viable after evaluating semantic predicates.
+	 * If the set of these filtered configurations which also reached the end of
+	 * the decision rule is not empty, return the minimum alternative
+	 * represented in this set.</li>
+	 * <li>Otherwise, choose the minimum alternative in <em>S</em>.</li>
+	 * </ol>
+	 * </li>
+	 * </ul>
+	 *
+	 * <p>
+	 * In some scenarios, the algorithm described above could predict an
+	 * alternative which will result in a {@link FailedPredicateException} in
+	 * parser. Specifically, this could occur if the <em>only</em> configuration
+	 * capable of successfully parsing to the end of the decision rule is
+	 * blocked by a semantic predicate. By choosing this alternative within
+	 * {@link #adaptivePredict} instead of throwing a
+	 * {@link NoViableAltException}, the resulting
+	 * {@link FailedPredicateException} in the parser will identify the specific
+	 * predicate which is preventing the parser from successfully parsing the
+	 * decision rule, which helps developers identify and correct logic errors
+	 * in semantic predicates.
+	 * </p>
+	 *
+	 * @param input The input {@link TokenStream}
+	 * @param startIndex The start index for the current prediction, which is
+	 * the input index where any semantic context in {@code configs} should be
+	 * evaluated
+	 * @param configs The ATN configurations which were valid immediately before
+	 * the {@link #ERROR} state was reached
+	 *
+	 * @return The value to return from {@link #adaptivePredict}, or
+	 * {@link ATN#INVALID_ALT_NUMBER} if a suitable alternative was not
+	 * identified and {@link #adaptivePredict} should report an error instead.
+	 */
+	protected int getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(ATNConfigSet configs,
+																		  ParserRuleContext outerContext)
+	{
+		Pair<ATNConfigSet,ATNConfigSet> sets =
+			splitAccordingToSemanticValidity(configs, outerContext);
+		ATNConfigSet semValidConfigs = sets.a;
+		ATNConfigSet semInvalidConfigs = sets.b;
+		int alt = getAltThatFinishedDecisionEntryRule(semValidConfigs);
+		if ( alt!=ATN.INVALID_ALT_NUMBER ) { // semantically/syntactically viable path exists
+			return alt;
+		}
+		// Is there a syntactically valid path with a failed pred?
+		if ( semInvalidConfigs.size()>0 ) {
+			alt = getAltThatFinishedDecisionEntryRule(semInvalidConfigs);
+			if ( alt!=ATN.INVALID_ALT_NUMBER ) { // syntactically viable path exists
+				return alt;
+			}
+		}
+		return ATN.INVALID_ALT_NUMBER;
+	}
+
 	protected int getAltThatFinishedDecisionEntryRule(ATNConfigSet configs) {
 		IntervalSet alts = new IntervalSet();
 		for (ATNConfig c : configs) {
@@ -1168,6 +1250,38 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 		if ( alts.size()==0 ) return ATN.INVALID_ALT_NUMBER;
 		return alts.getMinElement();
+	}
+
+	/** Walk the list of configurations and split them according to
+	 *  those that have preds evaluating to true/false.  If no pred, assume
+	 *  true pred and include in succeeded set.  Returns Pair of sets.
+	 *
+	 *  Create a new set so as not to alter the incoming parameter.
+	 *
+	 *  Assumption: the input stream has been restored to the starting point
+	 *  prediction, which is where predicates need to evaluate.
+ 	 */
+	protected Pair<ATNConfigSet,ATNConfigSet> splitAccordingToSemanticValidity(
+		ATNConfigSet configs,
+		ParserRuleContext outerContext)
+	{
+		ATNConfigSet succeeded = new ATNConfigSet(configs.fullCtx);
+		ATNConfigSet failed = new ATNConfigSet(configs.fullCtx);
+		for (ATNConfig c : configs) {
+			if ( c.semanticContext!=SemanticContext.NONE ) {
+				boolean predicateEvaluationResult = c.semanticContext.eval(parser, outerContext);
+				if ( predicateEvaluationResult ) {
+					succeeded.add(c);
+				}
+				else {
+					failed.add(c);
+				}
+			}
+			else {
+				succeeded.add(c);
+			}
+		}
+		return new Pair(succeeded,failed);
 	}
 
 	/** Look through a list of predicate/alt pairs, returning alts for the
