@@ -484,7 +484,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				// ATN states in SLL implies LL will also get nowhere.
 				// If conflict in states that dip out, choose min since we
 				// will get error no matter what.
-				int alt = getAltThatFinishedDecisionEntryRule(previousD.configs);
+				int alt = getAltThatFinishedDecisionEntryRule(dfa, input, startIndex, previousD.configs);
 				if ( alt!=ATN.INVALID_ALT_NUMBER ) {
 					// return w/o altering DFA
 					return alt;
@@ -694,7 +694,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				// ATN states in SLL implies LL will also get nowhere.
 				// If conflict in states that dip out, choose min since we
 				// will get error no matter what.
-				int alt = getAltThatFinishedDecisionEntryRule(previous);
+				int alt = getAltThatFinishedDecisionEntryRule(dfa, input, startIndex, previous);
 				if ( alt!=ATN.INVALID_ALT_NUMBER ) {
 					return alt;
 				}
@@ -1159,15 +1159,62 @@ public class ParserATNSimulator extends ATNSimulator {
 		return pairs.toArray(new DFAState.PredPrediction[pairs.size()]);
 	}
 
-	protected int getAltThatFinishedDecisionEntryRule(ATNConfigSet configs) {
+	protected int getAltThatFinishedDecisionEntryRule(@NotNull DFA dfa, @NotNull TokenStream input, int startIndex, @NotNull ATNConfigSet configs) {
 		IntervalSet alts = new IntervalSet();
 		for (ATNConfig c : configs) {
 			if ( c.reachesIntoOuterContext>0 || (c.state instanceof RuleStopState && c.context.hasEmptyPath()) ) {
 				alts.add(c.alt);
 			}
 		}
-		if ( alts.size()==0 ) return ATN.INVALID_ALT_NUMBER;
-		return alts.getMinElement();
+
+		switch (alts.size()) {
+		case 0:
+			return ATN.INVALID_ALT_NUMBER;
+
+		case 1:
+			return alts.getMinElement();
+
+		default:
+			if (!configs.hasSemanticContext) {
+				return alts.getMinElement();
+			}
+
+			/*
+			 * Try to find a configuration set that not only dipped into the outer
+			 * context, but also isn't eliminated by a predicate.
+			 */
+			ATNConfigSet filteredConfigs = new ATNConfigSet(configs.fullCtx);
+			for (ATNConfig c : configs) {
+				if (c.reachesIntoOuterContext > 0 || (c.state instanceof RuleStopState && c.context.hasEmptyPath())) {
+					filteredConfigs.add(c);
+				}
+			}
+
+			BitSet altsToCollectPredsFrom = new BitSet();
+			for (int i : alts.toArray()) {
+				altsToCollectPredsFrom.set(i);
+			}
+
+			SemanticContext[] altToPred = getPredsForAmbigAlts(altsToCollectPredsFrom, filteredConfigs, alts.getMaxElement());
+			if (altToPred != null) {
+				DFAState.PredPrediction[] predicates = getPredicatePredictions(altsToCollectPredsFrom, altToPred);
+				if (predicates != null) {
+					int stopIndex = input.index();
+					try {
+						input.seek(startIndex);
+						BitSet filteredAlts = evalSemanticContext(predicates, _outerContext, false);
+						if (!filteredAlts.isEmpty()) {
+							return filteredAlts.nextSetBit(0);
+						}
+					}
+					finally {
+						input.seek(stopIndex);
+					}
+				}
+			}
+
+			return alts.getMinElement();
+		}
 	}
 
 	/** Look through a list of predicate/alt pairs, returning alts for the
