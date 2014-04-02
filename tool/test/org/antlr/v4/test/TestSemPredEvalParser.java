@@ -32,7 +32,8 @@ package org.antlr.v4.test;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class TestSemPredEvalParser extends BaseTest {
 	// TEST VALIDATING PREDS
@@ -592,6 +593,34 @@ public class TestSemPredEvalParser extends BaseTest {
 		String found = execParser("AnnotProcessor.g4", grammar, "AnnotProcessorParser", "AnnotProcessorLexer", "cppCompilationUnit",
 								  input, false);
 		assertEquals("", found);
+		assertNull(stderrDuringParse);
+	}
+
+	/** Loopback doesn't eval predicate at start of alt */
+	@Test public void testPredFromAltTestedInLoopBack() {
+		String grammar =
+			"grammar T2;\n" +
+			"\n" +
+			"file\n" +
+			"@after {System.out.println($ctx.toStringTree(this));}\n" +
+			"  : para para EOF ;" +
+			"para: paraContent NL NL ;\n"+
+			"paraContent : ('s'|'x'|{_input.LA(2)!=NL}? NL)+ ;\n"+
+			"NL : '\\n' ;\n"+
+			"S : 's' ;\n"+
+			"X : 'x' ;\n";
+
+		String input = "s\n\n\nx\n";
+		String found = execParser("T2.g4", grammar, "T2Parser", "T2Lexer", "file",
+								  input, true);
+		assertEquals("(file (para (paraContent s) \\n \\n) (para (paraContent \\n x \\n)) <EOF>)\n", found);
+		assertEquals(stderrDuringParse, "line 5:2 mismatched input '<EOF>' expecting '\n'\n");
+
+		input = "s\n\n\nx\n\n";
+		found = execParser("T2.g4", grammar, "T2Parser", "T2Lexer", "file",
+								  input, true);
+		assertEquals("(file (para (paraContent s) \\n \\n) (para (paraContent \\n x) \\n \\n) <EOF>)\n", found);
+
 		assertNull(stderrDuringParse);
 	}
 }
