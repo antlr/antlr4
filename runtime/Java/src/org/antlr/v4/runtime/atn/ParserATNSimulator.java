@@ -46,6 +46,7 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -326,7 +327,7 @@ public class ParserATNSimulator extends ATNSimulator {
 							  @NotNull DFA[] decisionToDFA,
 							  @NotNull PredictionContextCache sharedContextCache)
 	{
-		super(atn,sharedContextCache);
+		super(atn, sharedContextCache);
 		this.parser = parser;
 		this.decisionToDFA = decisionToDFA;
 		//		DOTGenerator dot = new DOTGenerator(null);
@@ -486,14 +487,10 @@ public class ParserATNSimulator extends ATNSimulator {
 				// will get error no matter what.
 				NoViableAltException e = noViableAlt(input, outerContext, previousD.configs, startIndex);
 				input.seek(startIndex);
-				ATNConfigSet filtered =
-					filterForTruePredicates(previousD.configs, outerContext);
-				int alt = getAltThatFinishedDecisionEntryRule(filtered);
+				int alt = getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(previousD.configs, outerContext);
 				if ( alt!=ATN.INVALID_ALT_NUMBER ) {
-					// return w/o altering DFA
 					return alt;
 				}
-
 				throw e;
 			}
 
@@ -700,9 +697,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				// will get error no matter what.
 				NoViableAltException e = noViableAlt(input, outerContext, previous, startIndex);
 				input.seek(startIndex);
-				ATNConfigSet filtered =
-					filterForTruePredicates(previous, outerContext);
-				int alt = getAltThatFinishedDecisionEntryRule(filtered);
+				int alt = getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(previous, outerContext);
 				if ( alt!=ATN.INVALID_ALT_NUMBER ) {
 					return alt;
 				}
@@ -1224,6 +1219,27 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * {@link ATN#INVALID_ALT_NUMBER} if a suitable alternative was not
 	 * identified and {@link #adaptivePredict} should report an error instead.
 	 */
+	protected int getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(ATNConfigSet configs,
+																		  ParserRuleContext outerContext)
+	{
+		Pair<ATNConfigSet,ATNConfigSet> sets =
+			splitAccordingToSemanticValidity(configs, outerContext);
+		ATNConfigSet semValidConfigs = sets.a;
+		ATNConfigSet semInvalidConfigs = sets.b;
+		int alt = getAltThatFinishedDecisionEntryRule(semValidConfigs);
+		if ( alt!=ATN.INVALID_ALT_NUMBER ) { // semantically/syntactically viable path exists
+			return alt;
+		}
+		// Is there a syntactically valid path with a failed pred?
+		if ( semInvalidConfigs.size()>0 ) {
+			alt = getAltThatFinishedDecisionEntryRule(semInvalidConfigs);
+			if ( alt!=ATN.INVALID_ALT_NUMBER ) { // syntactically viable path exists
+				return alt;
+			}
+		}
+		return ATN.INVALID_ALT_NUMBER;
+	}
+
 	protected int getAltThatFinishedDecisionEntryRule(ATNConfigSet configs) {
 		IntervalSet alts = new IntervalSet();
 		for (ATNConfig c : configs) {
@@ -1235,31 +1251,36 @@ public class ParserATNSimulator extends ATNSimulator {
 		return alts.getMinElement();
 	}
 
-	/** Walk the list of configurations and strip out any that have predicates,
-	 *  that evaluate to false. Create a new set so as not to alter the
-	 *  incoming parameter.
+	/** Walk the list of configurations and split them according to
+	 *  those that have preds evaluating to true/false.  If no pred, assume
+	 *  true pred and include in succeeded set.  Returns Pair of sets.
+	 *
+	 *  Create a new set so as not to alter the incoming parameter.
 	 *
 	 *  Assumption: the input stream has been restored to the starting point
 	 *  prediction, which is where predicates need to evaluate.
  	 */
-	protected ATNConfigSet filterForTruePredicates(ATNConfigSet configs,
-												   ParserRuleContext outerContext)
+	protected Pair<ATNConfigSet,ATNConfigSet> splitAccordingToSemanticValidity(
+		ATNConfigSet configs,
+		ParserRuleContext outerContext)
 	{
-		ATNConfigSet filtered = new ATNConfigSet(configs.fullCtx);
+		ATNConfigSet succeeded = new ATNConfigSet(configs.fullCtx);
+		ATNConfigSet failed = new ATNConfigSet(configs.fullCtx);
 		for (ATNConfig c : configs) {
 			if ( c.semanticContext!=SemanticContext.NONE ) {
-				// TODO: @Sam: do we need to examine pred.isCtxDependent?
-				// i.e., what do we do if the predicate examines $label?
 				boolean predicateEvaluationResult = c.semanticContext.eval(parser, outerContext);
 				if ( predicateEvaluationResult ) {
-					filtered.add(c);
+					succeeded.add(c);
+				}
+				else {
+					failed.add(c);
 				}
 			}
 			else {
-				filtered.add(c);
+				succeeded.add(c);
 			}
 		}
-		return filtered;
+		return new Pair(succeeded,failed);
 	}
 
 	/** Look through a list of predicate/alt pairs, returning alts for the
