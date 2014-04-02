@@ -1177,28 +1177,18 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * localized location.</p>
 	 *
 	 * <ul>
-	 * <li>If no configuration in {@code configs} reached the end of the
-	 * decision rule, return {@link ATN#INVALID_ALT_NUMBER}.</li>
-	 * <li>If all configurations in {@code configs} which reached the end of the
-	 * decision rule predict the same alternative, return that alternative.</li>
-	 * <li>If the configurations in {@code configs} which reached the end of the
-	 * decision rule predict multiple alternatives (call this <em>S</em>),
-	 * choose an alternative in the following order.
-	 * <ol>
-	 * <li>Filter the configurations in {@code configs} to only those
-	 * configurations which remain viable after evaluating semantic predicates.
-	 * If the set of these filtered configurations which also reached the end of
-	 * the decision rule is not empty, return the minimum alternative
-	 * represented in this set.</li>
-	 * <li>Otherwise, choose the minimum alternative in <em>S</em>.</li>
-	 * </ol>
+	 * <li>If a syntactically valid path or paths reach the end of the decision rule and
+	 * they are semantically valid if predicated, return the min associated alt.</li>
+	 * <li>Else, if a semantically invalid but syntactically valid path exist
+	 * or paths exist, return the minimum associated alt.
 	 * </li>
+	 * <li>Otherwise, return {@link ATN#INVALID_ALT_NUMBER}.</li>
 	 * </ul>
 	 *
 	 * <p>
 	 * In some scenarios, the algorithm described above could predict an
 	 * alternative which will result in a {@link FailedPredicateException} in
-	 * parser. Specifically, this could occur if the <em>only</em> configuration
+	 * the parser. Specifically, this could occur if the <em>only</em> configuration
 	 * capable of successfully parsing to the end of the decision rule is
 	 * blocked by a semantic predicate. By choosing this alternative within
 	 * {@link #adaptivePredict} instead of throwing a
@@ -1209,12 +1199,10 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * in semantic predicates.
 	 * </p>
 	 *
-	 * @param input The input {@link TokenStream}
-	 * @param startIndex The start index for the current prediction, which is
-	 * the input index where any semantic context in {@code configs} should be
-	 * evaluated
 	 * @param configs The ATN configurations which were valid immediately before
 	 * the {@link #ERROR} state was reached
+	 * @param outerContext The is the \gamma_0 initial parser context from the paper
+	 * or the parser stack at the instant before prediction commences.
 	 *
 	 * @return The value to return from {@link #adaptivePredict}, or
 	 * {@link ATN#INVALID_ALT_NUMBER} if a suitable alternative was not
