@@ -346,7 +346,8 @@ public class LexerATNSimulator extends ATNSimulator {
 						lexerActionExecutor = lexerActionExecutor.fixOffsetBeforeMatch(input.index() - startIndex);
 					}
 
-					if (closure(input, c.transform(target, lexerActionExecutor, true), reach, currentAltReachedAcceptState, true)) {
+					boolean treatEofAsEpsilon = t == CharStream.EOF;
+					if (closure(input, c.transform(target, lexerActionExecutor, true), reach, currentAltReachedAcceptState, true, treatEofAsEpsilon)) {
 						// any remaining configs for this alt have a lower priority than
 						// the one that just reached an accept state.
 						skipAlt = c.getAlt();
@@ -395,7 +396,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
 			ATNConfig c = ATNConfig.create(target, i+1, initialContext);
-			closure(input, c, configs, false, false);
+			closure(input, c, configs, false, false, false);
 		}
 		return configs;
 	}
@@ -410,7 +411,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	 * @return {@code true} if an accept state is reached, otherwise
 	 * {@code false}.
 	 */
-	protected boolean closure(@NotNull CharStream input, @NotNull ATNConfig config, @NotNull ATNConfigSet configs, boolean currentAltReachedAcceptState, boolean speculative) {
+	protected boolean closure(@NotNull CharStream input, @NotNull ATNConfig config, @NotNull ATNConfigSet configs, boolean currentAltReachedAcceptState, boolean speculative, boolean treatEofAsEpsilon) {
 		if ( debug ) {
 			System.out.println("closure("+config.toString(recog, true)+")");
 		}
@@ -444,7 +445,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				PredictionContext newContext = context.getParent(i); // "pop" return state
 				ATNState returnState = atn.states.get(returnStateNumber);
 				ATNConfig c = config.transform(returnState, newContext, false);
-				currentAltReachedAcceptState = closure(input, c, configs, currentAltReachedAcceptState, speculative);
+				currentAltReachedAcceptState = closure(input, c, configs, currentAltReachedAcceptState, speculative, treatEofAsEpsilon);
 			}
 
 			return currentAltReachedAcceptState;
@@ -460,9 +461,9 @@ public class LexerATNSimulator extends ATNSimulator {
 		ATNState p = config.getState();
 		for (int i=0; i<p.getNumberOfOptimizedTransitions(); i++) {
 			Transition t = p.getOptimizedTransition(i);
-			ATNConfig c = getEpsilonTarget(input, config, t, configs, speculative);
+			ATNConfig c = getEpsilonTarget(input, config, t, configs, speculative, treatEofAsEpsilon);
 			if ( c!=null ) {
-				currentAltReachedAcceptState = closure(input, c, configs, currentAltReachedAcceptState, speculative);
+				currentAltReachedAcceptState = closure(input, c, configs, currentAltReachedAcceptState, speculative, treatEofAsEpsilon);
 			}
 		}
 
@@ -475,7 +476,8 @@ public class LexerATNSimulator extends ATNSimulator {
 									  @NotNull ATNConfig config,
 									  @NotNull Transition t,
 									  @NotNull ATNConfigSet configs,
-									  boolean speculative)
+									  boolean speculative,
+									  boolean treatEofAsEpsilon)
 	{
 		ATNConfig c;
 
@@ -554,6 +556,18 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		case Transition.EPSILON:
 			c = config.transform(t.target, true);
+			break;
+
+		case Transition.ATOM:
+		case Transition.RANGE:
+		case Transition.SET:
+			if (treatEofAsEpsilon) {
+				if (t.matches(CharStream.EOF, Character.MIN_VALUE, Character.MAX_VALUE)) {
+					c = new LexerATNConfig(config, t.target);
+					break;
+				}
+			}
+
 			break;
 
 		default:

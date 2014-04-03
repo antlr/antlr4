@@ -1004,7 +1004,8 @@ public class ParserATNSimulator extends ATNSimulator {
 			 * operation on the intermediate set to compute its initial value.
 			 */
 			final boolean collectPredicates = false;
-			closure(reachIntermediate, reach, collectPredicates, hasMoreContext, contextCache);
+			boolean treatEofAsEpsilon = t == Token.EOF;
+			closure(reachIntermediate, reach, collectPredicates, hasMoreContext, contextCache, treatEofAsEpsilon);
 			stepIntoGlobal = reach.getDipsIntoOuterContext();
 
 			if (t == IntStream.EOF) {
@@ -1186,7 +1187,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 
 			final boolean collectPredicates = true;
-			closure(reachIntermediate, configs, collectPredicates, hasMoreContext, contextCache);
+			closure(reachIntermediate, configs, collectPredicates, hasMoreContext, contextCache, false);
 			boolean stepIntoGlobal = configs.getDipsIntoOuterContext();
 
 			DFAState next;
@@ -1510,7 +1511,8 @@ public class ParserATNSimulator extends ATNSimulator {
 						   @NotNull ATNConfigSet configs,
 						   boolean collectPredicates,
 						   boolean hasMoreContext,
-						   @Nullable PredictionContextCache contextCache)
+						   @Nullable PredictionContextCache contextCache,
+						   boolean treatEofAsEpsilon)
 	{
 		if (contextCache == null) {
 			contextCache = PredictionContextCache.UNCACHED;
@@ -1521,7 +1523,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		while (currentConfigs.size() > 0) {
 			ATNConfigSet intermediate = new ATNConfigSet();
 			for (ATNConfig config : currentConfigs) {
-				closure(config, configs, intermediate, closureBusy, collectPredicates, hasMoreContext, contextCache, 0);
+				closure(config, configs, intermediate, closureBusy, collectPredicates, hasMoreContext, contextCache, 0, treatEofAsEpsilon);
 			}
 
 			currentConfigs = intermediate;
@@ -1535,7 +1537,8 @@ public class ParserATNSimulator extends ATNSimulator {
 						   boolean collectPredicates,
 						   boolean hasMoreContexts,
 						   @NotNull PredictionContextCache contextCache,
-						   int depth)
+						   int depth,
+						   boolean treatEofAsEpsilon)
 	{
 		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
 
@@ -1553,7 +1556,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					// Make sure we track that we are now out of context.
 					c.setOuterContextDepth(config.getOuterContextDepth());
 					assert depth > Integer.MIN_VALUE;
-					closure(c, configs, intermediate, closureBusy, collectPredicates, hasMoreContexts, contextCache, depth - 1);
+					closure(c, configs, intermediate, closureBusy, collectPredicates, hasMoreContexts, contextCache, depth - 1, treatEofAsEpsilon);
 				}
 
 				if (!hasEmpty || !hasMoreContexts) {
@@ -1582,6 +1585,8 @@ public class ParserATNSimulator extends ATNSimulator {
 		// optimization
 		if ( !p.onlyHasEpsilonTransitions() ) {
             configs.add(config, contextCache);
+			// make sure to not return here, because EOF transitions can act as
+			// both epsilon transitions and non-epsilon transitions.
             if ( debug ) System.out.println("added config "+configs);
         }
 
@@ -1589,7 +1594,7 @@ public class ParserATNSimulator extends ATNSimulator {
             Transition t = p.getOptimizedTransition(i);
             boolean continueCollecting =
 				!(t instanceof ActionTransition) && collectPredicates;
-            ATNConfig c = getEpsilonTarget(config, t, continueCollecting, depth == 0, contextCache);
+            ATNConfig c = getEpsilonTarget(config, t, continueCollecting, depth == 0, contextCache, treatEofAsEpsilon);
 			if ( c!=null ) {
 				if (t instanceof RuleTransition) {
 					if (intermediate != null && !collectPredicates) {
@@ -1638,7 +1643,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					}
 				}
 
-				closure(c, configs, intermediate, closureBusy, continueCollecting, hasMoreContexts, contextCache, newDepth);
+				closure(c, configs, intermediate, closureBusy, continueCollecting, hasMoreContexts, contextCache, newDepth, treatEofAsEpsilon);
 			}
 		}
 	}
@@ -1650,7 +1655,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	@Nullable
-	protected ATNConfig getEpsilonTarget(@NotNull ATNConfig config, @NotNull Transition t, boolean collectPredicates, boolean inContext, PredictionContextCache contextCache) {
+	protected ATNConfig getEpsilonTarget(@NotNull ATNConfig config, @NotNull Transition t, boolean collectPredicates, boolean inContext, PredictionContextCache contextCache, boolean treatEofAsEpsilon) {
 		switch (t.getSerializationType()) {
 		case Transition.RULE:
 			return ruleTransition(config, (RuleTransition)t, contextCache);
@@ -1666,6 +1671,19 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		case Transition.EPSILON:
 			return config.transform(t.target, false);
+
+		case Transition.ATOM:
+		case Transition.RANGE:
+		case Transition.SET:
+			// EOF transitions act like epsilon transitions after the first EOF
+			// transition is traversed
+			if (treatEofAsEpsilon) {
+				if (t.matches(Token.EOF, 0, 1)) {
+					return new ATNConfig(config, t.target);
+				}
+			}
+
+			return null;
 
 		default:
 			return null;
