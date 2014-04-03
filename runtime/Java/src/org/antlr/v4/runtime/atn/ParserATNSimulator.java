@@ -32,6 +32,7 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.FailedPredicateException;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.Parser;
@@ -840,6 +841,64 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 	}
 
+	/**
+	 * This method is used to improve the localization of error messages by
+	 * choosing an alternative rather than throwing a
+	 * {@link NoViableAltException} in particular prediction scenarios where the
+	 * {@link #ERROR} state was reached during ATN simulation.
+	 *
+	 * <p>
+	 * The default implementation of this method uses the following
+	 * algorithm to identify an ATN configuration which successfully parsed the
+	 * decision entry rule. Choosing such an alternative ensures that the
+	 * {@link ParserRuleContext} returned by the calling rule will be complete
+	 * and valid, and the syntax error will be reported later at a more
+	 * localized location.</p>
+	 *
+	 * <ul>
+	 * <li>If no configuration in {@code configs} reached the end of the
+	 * decision rule, return {@link ATN#INVALID_ALT_NUMBER}.</li>
+	 * <li>If all configurations in {@code configs} which reached the end of the
+	 * decision rule predict the same alternative, return that alternative.</li>
+	 * <li>If the configurations in {@code configs} which reached the end of the
+	 * decision rule predict multiple alternatives (call this <em>S</em>),
+	 * choose an alternative in the following order.
+	 * <ol>
+	 * <li>Filter the configurations in {@code configs} to only those
+	 * configurations which remain viable after evaluating semantic predicates.
+	 * If the set of these filtered configurations which also reached the end of
+	 * the decision rule is not empty, return the minimum alternative
+	 * represented in this set.</li>
+	 * <li>Otherwise, choose the minimum alternative in <em>S</em>.</li>
+	 * </ol>
+	 * </li>
+	 * </ul>
+	 *
+	 * <p>
+	 * In some scenarios, the algorithm described above could predict an
+	 * alternative which will result in a {@link FailedPredicateException} in
+	 * parser. Specifically, this could occur if the <em>only</em> configuration
+	 * capable of successfully parsing to the end of the decision rule is
+	 * blocked by a semantic predicate. By choosing this alternative within
+	 * {@link #adaptivePredict} instead of throwing a
+	 * {@link NoViableAltException}, the resulting
+	 * {@link FailedPredicateException} in the parser will identify the specific
+	 * predicate which is preventing the parser from successfully parsing the
+	 * decision rule, which helps developers identify and correct logic errors
+	 * in semantic predicates.
+	 * </p>
+	 *
+	 * @param input The input {@link TokenStream}
+	 * @param startIndex The start index for the current prediction, which is
+	 * the input index where any semantic context in {@code configs} should be
+	 * evaluated
+	 * @param previous The ATN simulation state immediately before the
+	 * {@link #ERROR} state was reached
+	 *
+	 * @return The value to return from {@link #adaptivePredict}, or
+	 * {@link ATN#INVALID_ALT_NUMBER} if a suitable alternative was not
+	 * identified and {@link #adaptivePredict} should report an error instead.
+	 */
 	protected int handleNoViableAlt(@NotNull TokenStream input, int startIndex, @NotNull SimulatorState previous) {
 		if (previous.s0 != null) {
 			BitSet alts = new BitSet();
@@ -849,7 +908,57 @@ public class ParserATNSimulator extends ATNSimulator {
 				}
 			}
 
-			if (!alts.isEmpty()) {
+			switch (alts.cardinality()) {
+			case 0:
+				break;
+
+			case 1:
+				return alts.nextSetBit(0);
+
+			default:
+				if (!previous.s0.configs.hasSemanticContext()) {
+					// configs doesn't contain any predicates, so the predicate
+					// filtering code below would be pointless
+					return alts.nextSetBit(0);
+				}
+
+				/*
+				 * Try to find a configuration set that not only dipped into the outer
+				 * context, but also isn't eliminated by a predicate.
+				 */
+				ATNConfigSet filteredConfigs = new ATNConfigSet();
+				for (ATNConfig config : previous.s0.configs) {
+					if (config.getReachesIntoOuterContext() || config.getState() instanceof RuleStopState) {
+						filteredConfigs.add(config);
+					}
+				}
+
+				/* The following code blocks are adapted from predicateDFAState with
+				 * the following key changes.
+				 *
+				 *  1. The code operates on an ATNConfigSet rather than a DFAState.
+				 *  2. Predicates are collected for all alternatives represented in
+				 *     filteredConfigs, rather than restricting the evaluation to
+				 *     conflicting and/or unique configurations.
+				 */
+				SemanticContext[] altToPred = getPredsForAmbigAlts(alts, filteredConfigs, alts.previousSetBit(100));
+				if (altToPred != null) {
+					DFAState.PredPrediction[] predicates = getPredicatePredictions(alts, altToPred);
+					if (predicates != null) {
+						int stopIndex = input.index();
+						try {
+							input.seek(startIndex);
+							BitSet filteredAlts = evalSemanticContext(predicates, previous.outerContext, false);
+							if (!filteredAlts.isEmpty()) {
+								return filteredAlts.nextSetBit(0);
+							}
+						}
+						finally {
+							input.seek(stopIndex);
+						}
+					}
+				}
+
 				return alts.nextSetBit(0);
 			}
 		}
