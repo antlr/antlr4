@@ -563,11 +563,12 @@ public class LexerATNSimulator extends ATNSimulator {
 		case Transition.SET:
 			if (treatEofAsEpsilon) {
 				if (t.matches(CharStream.EOF, Character.MIN_VALUE, Character.MAX_VALUE)) {
-					c = new LexerATNConfig(config, t.target);
+					c = config.transform(t.target, false);
 					break;
 				}
 			}
 
+			c = null;
 			break;
 
 		default:

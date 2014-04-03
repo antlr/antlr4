@@ -1679,7 +1679,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			// transition is traversed
 			if (treatEofAsEpsilon) {
 				if (t.matches(Token.EOF, 0, 1)) {
-					return new ATNConfig(config, t.target);
+					return config.transform(t.target, false);
 				}
 			}
 
