@@ -1269,7 +1269,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				succeeded.add(c);
 			}
 		}
-		return new Pair(succeeded,failed);
+		return new Pair<ATNConfigSet, ATNConfigSet>(succeeded,failed);
 	}
 
 	/** Look through a list of predicate/alt pairs, returning alts for the
