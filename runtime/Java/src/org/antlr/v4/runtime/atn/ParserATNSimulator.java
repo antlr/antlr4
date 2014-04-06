@@ -1617,7 +1617,17 @@ public class ParserATNSimulator extends ATNSimulator {
 		return new ATNConfig(config, t.target, newContext);
 	}
 
-	protected BitSet getConflictingAlts(ATNConfigSet configs) {
+	/**
+	 * Gets a {@link BitSet} containing the alternatives in {@code configs}
+	 * which are part of one or more conflicting alternative subsets.
+	 *
+	 * @param configs The {@link ATNConfigSet} to analyze.
+	 * @return The alternatives in {@code configs} which are part of one or more
+	 * conflicting alternative subsets. If {@code configs} does not contain any
+	 * conflicting subsets, this method returns an empty {@link BitSet}.
+	 */
+	@NotNull
+	protected BitSet getConflictingAlts(@NotNull ATNConfigSet configs) {
 		Collection<BitSet> altsets = PredictionMode.getConflictingAltSubsets(configs);
 		return PredictionMode.getAlts(altsets);
 	}
