@@ -1417,7 +1417,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			if ( c!=null ) {
 				if (!t.isEpsilon() && !closureBusy.add(c)) {
 					// avoid infinite recursion for EOF* and EOF+
-					//continue;
+					continue;
 				}
 
 				int newDepth = depth;
