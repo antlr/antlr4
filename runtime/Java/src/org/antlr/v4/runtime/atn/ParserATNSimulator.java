@@ -848,9 +848,9 @@ public class ParserATNSimulator extends ATNSimulator {
 		 * The conditions assume that intermediate
 		 * contains all configurations relevant to the reach set, but this
 		 * condition is not true when one or more configurations have been
-		 * withheld in skippedStopStates.
+		 * withheld in skippedStopStates, or when the current symbol is EOF.
 		 */
-		if (skippedStopStates == null) {
+		if (skippedStopStates == null && t != Token.EOF) {
 			if ( intermediate.size()==1 ) {
 				// Don't pursue the closure if there is just one state.
 				// It can only have one alternative; just add to result
@@ -1415,6 +1415,11 @@ public class ParserATNSimulator extends ATNSimulator {
 			ATNConfig c = getEpsilonTarget(config, t, continueCollecting,
 										   depth == 0, fullCtx, treatEofAsEpsilon);
 			if ( c!=null ) {
+				if (!t.isEpsilon() && !closureBusy.add(c)) {
+					// avoid infinite recursion for EOF* and EOF+
+					//continue;
+				}
+
 				int newDepth = depth;
 				if ( config.state instanceof RuleStopState) {
 					assert !fullCtx;
