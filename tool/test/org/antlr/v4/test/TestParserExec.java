@@ -408,4 +408,37 @@ public class TestParserExec extends BaseTest {
 		assertEquals("", found);
 		assertNull(stderrDuringParse);
 	}
+
+	/**
+	 * This test ensures that {@link ParserATNSimulator} produces a correct
+	 * result when the grammar contains multiple explicit references to
+	 * {@code EOF} inside of parser rules.
+	 */
+	@Test
+	public void testMultipleEOFHandling() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"prog : ('x' | 'x' 'y') EOF EOF;\n";
+		String input = "x";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "prog", input, false);
+		assertEquals("", found);
+		assertNull(stderrDuringParse);
+	}
+
+	/**
+	 * This test ensures that {@link ParserATNSimulator} does not produce a
+	 * {@link StackOverflowError} when it encounters an {@code EOF} transition
+	 * inside a closure.
+	 */
+	@Test
+	public void testEOFInClosure() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"prog : stat EOF;\n" +
+			"stat : 'x' ('y' | EOF)*?;\n";
+		String input = "x";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "prog", input, false);
+		assertEquals("", found);
+		assertNull(stderrDuringParse);
+	}
 }
