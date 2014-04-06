@@ -109,8 +109,18 @@ public abstract class Transition {
 
 	public abstract int getSerializationType();
 
-	/** Are we epsilon, action, sempred? */
-	public boolean isEpsilon() { return false; }
+	/**
+	 * Determines if the transition is an "epsilon" transition.
+	 *
+	 * <p>The default implementation returns {@code false}.</p>
+	 *
+	 * @return {@code true} if traversing this transition in the ATN does not
+	 * consume an input symbol; otherwise, {@code false} if traversing this
+	 * transition consumes (matches) an input symbol.
+	 */
+	public boolean isEpsilon() {
+		return false;
+	}
 
 	@Nullable
 	public IntervalSet label() { return null; }
