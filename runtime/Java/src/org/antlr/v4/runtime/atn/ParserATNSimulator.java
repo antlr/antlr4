@@ -1101,9 +1101,9 @@ public class ParserATNSimulator extends ATNSimulator {
 			 * The conditions assume that intermediate
 			 * contains all configurations relevant to the reach set, but this
 			 * condition is not true when one or more configurations have been
-			 * withheld in skippedStopStates.
+			 * withheld in skippedStopStates, or when the current symbol is EOF.
 			 */
-			if (optimize_unique_closure && skippedStopStates == null && reachIntermediate.getUniqueAlt() != ATN.INVALID_ALT_NUMBER) {
+			if (optimize_unique_closure && skippedStopStates == null && t != Token.EOF && reachIntermediate.getUniqueAlt() != ATN.INVALID_ALT_NUMBER) {
 				reachIntermediate.setOutermostConfigSet(reach.isOutermostConfigSet());
 				reach = reachIntermediate;
 				break;
@@ -1710,6 +1710,11 @@ public class ParserATNSimulator extends ATNSimulator {
 						intermediate.add(c, contextCache);
 						continue;
 					}
+				}
+
+				if (!t.isEpsilon() && !closureBusy.add(c)) {
+					// avoid infinite recursion for EOF* and EOF+
+					continue;
 				}
 
 				int newDepth = depth;
