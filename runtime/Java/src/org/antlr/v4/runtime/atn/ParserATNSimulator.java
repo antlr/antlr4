@@ -902,9 +902,11 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected int handleNoViableAlt(@NotNull TokenStream input, int startIndex, @NotNull SimulatorState previous) {
 		if (previous.s0 != null) {
 			BitSet alts = new BitSet();
+			int maxAlt = 0;
 			for (ATNConfig config : previous.s0.configs) {
 				if (config.getReachesIntoOuterContext() || config.getState() instanceof RuleStopState) {
 					alts.set(config.getAlt());
+					maxAlt = Math.max(maxAlt, config.getAlt());
 				}
 			}
 
@@ -941,7 +943,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				 *     filteredConfigs, rather than restricting the evaluation to
 				 *     conflicting and/or unique configurations.
 				 */
-				SemanticContext[] altToPred = getPredsForAmbigAlts(alts, filteredConfigs, alts.previousSetBit(100));
+				SemanticContext[] altToPred = getPredsForAmbigAlts(alts, filteredConfigs, maxAlt);
 				if (altToPred != null) {
 					DFAState.PredPrediction[] predicates = getPredicatePredictions(alts, altToPred);
 					if (predicates != null) {
