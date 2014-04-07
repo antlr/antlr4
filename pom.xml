@@ -9,7 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.antlr</groupId>
     <artifactId>antlr4-master</artifactId>
-    <version>4.2.2</version>
+    <version>4.2.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>ANTLR 4</name>
@@ -93,7 +93,7 @@
         <url>https://github.com/antlr/antlr4/tree/master</url>
         <connection>scm:git:git://github.com/antlr/antlr4.git</connection>
         <developerConnection>scm:git:git@github.com:antlr/antlr4.git</developerConnection>
-      <tag>4.2.2</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <profiles>
