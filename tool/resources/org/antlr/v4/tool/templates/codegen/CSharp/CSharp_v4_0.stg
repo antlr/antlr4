@@ -29,6 +29,3 @@
  */
 
 import "CSharp.stg"
-
-// group files must contain at least 1 template
-dummy() ::= ""
