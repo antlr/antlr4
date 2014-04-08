@@ -371,7 +371,8 @@ namespace Antlr4.Runtime.Atn
                         {
                             lexerActionExecutor = lexerActionExecutor.FixOffsetBeforeMatch(input.Index - startIndex);
                         }
-                        if (Closure(input, c.Transform(target, lexerActionExecutor, true), reach, currentAltReachedAcceptState, true))
+                        bool treatEofAsEpsilon = t == CharStreamConstants.Eof;
+                        if (Closure(input, c.Transform(target, lexerActionExecutor, true), reach, currentAltReachedAcceptState, true, treatEofAsEpsilon))
                         {
                             // any remaining configs for this alt have a lower priority than
                             // the one that just reached an accept state.
@@ -418,7 +419,7 @@ namespace Antlr4.Runtime.Atn
             {
                 ATNState target = p.Transition(i).target;
                 ATNConfig c = ATNConfig.Create(target, i + 1, initialContext);
-                Closure(input, c, configs, false, false);
+                Closure(input, c, configs, false, false, false);
             }
             return configs;
         }
@@ -444,7 +445,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>false</code>
         /// .
         /// </returns>
-        protected internal virtual bool Closure(ICharStream input, ATNConfig config, ATNConfigSet configs, bool currentAltReachedAcceptState, bool speculative)
+        protected internal virtual bool Closure(ICharStream input, ATNConfig config, ATNConfigSet configs, bool currentAltReachedAcceptState, bool speculative, bool treatEofAsEpsilon)
         {
             if (config.State is RuleStopState)
             {
@@ -473,7 +474,7 @@ namespace Antlr4.Runtime.Atn
                     // "pop" return state
                     ATNState returnState = atn.states[returnStateNumber];
                     ATNConfig c = config.Transform(returnState, newContext, false);
-                    currentAltReachedAcceptState = Closure(input, c, configs, currentAltReachedAcceptState, speculative);
+                    currentAltReachedAcceptState = Closure(input, c, configs, currentAltReachedAcceptState, speculative, treatEofAsEpsilon);
                 }
                 return currentAltReachedAcceptState;
             }
@@ -489,10 +490,10 @@ namespace Antlr4.Runtime.Atn
             for (int i_1 = 0; i_1 < p.NumberOfOptimizedTransitions; i_1++)
             {
                 Transition t = p.GetOptimizedTransition(i_1);
-                ATNConfig c = GetEpsilonTarget(input, config, t, configs, speculative);
+                ATNConfig c = GetEpsilonTarget(input, config, t, configs, speculative, treatEofAsEpsilon);
                 if (c != null)
                 {
-                    currentAltReachedAcceptState = Closure(input, c, configs, currentAltReachedAcceptState, speculative);
+                    currentAltReachedAcceptState = Closure(input, c, configs, currentAltReachedAcceptState, speculative, treatEofAsEpsilon);
                 }
             }
             return currentAltReachedAcceptState;
@@ -500,7 +501,7 @@ namespace Antlr4.Runtime.Atn
 
         // side-effect: can alter configs.hasSemanticContext
         [return: Nullable]
-        protected internal virtual ATNConfig GetEpsilonTarget(ICharStream input, ATNConfig config, Transition t, ATNConfigSet configs, bool speculative)
+        protected internal virtual ATNConfig GetEpsilonTarget(ICharStream input, ATNConfig config, Transition t, ATNConfigSet configs, bool speculative, bool treatEofAsEpsilon)
         {
             ATNConfig c;
             switch (t.TransitionType)
@@ -572,6 +573,22 @@ namespace Antlr4.Runtime.Atn
                 case TransitionType.Epsilon:
                 {
                     c = config.Transform(t.target, true);
+                    break;
+                }
+
+                case TransitionType.Atom:
+                case TransitionType.Range:
+                case TransitionType.Set:
+                {
+                    if (treatEofAsEpsilon)
+                    {
+                        if (t.Matches(CharStreamConstants.Eof, char.MinValue, char.MaxValue))
+                        {
+                            c = config.Transform(t.target, false);
+                            break;
+                        }
+                    }
+                    c = null;
                     break;
                 }
 

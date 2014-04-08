@@ -889,21 +889,160 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
+        /// <summary>
+        /// This method is used to improve the localization of error messages by
+        /// choosing an alternative rather than throwing a
+        /// <see cref="Antlr4.Runtime.NoViableAltException">Antlr4.Runtime.NoViableAltException</see>
+        /// in particular prediction scenarios where the
+        /// <see cref="ATNSimulator.Error">ATNSimulator.Error</see>
+        /// state was reached during ATN simulation.
+        /// <p>
+        /// The default implementation of this method uses the following
+        /// algorithm to identify an ATN configuration which successfully parsed the
+        /// decision entry rule. Choosing such an alternative ensures that the
+        /// <see cref="Antlr4.Runtime.ParserRuleContext">Antlr4.Runtime.ParserRuleContext</see>
+        /// returned by the calling rule will be complete
+        /// and valid, and the syntax error will be reported later at a more
+        /// localized location.</p>
+        /// <ul>
+        /// <li>If no configuration in
+        /// <code>configs</code>
+        /// reached the end of the
+        /// decision rule, return
+        /// <see cref="ATN.InvalidAltNumber">ATN.InvalidAltNumber</see>
+        /// .</li>
+        /// <li>If all configurations in
+        /// <code>configs</code>
+        /// which reached the end of the
+        /// decision rule predict the same alternative, return that alternative.</li>
+        /// <li>If the configurations in
+        /// <code>configs</code>
+        /// which reached the end of the
+        /// decision rule predict multiple alternatives (call this <em>S</em>),
+        /// choose an alternative in the following order.
+        /// <ol>
+        /// <li>Filter the configurations in
+        /// <code>configs</code>
+        /// to only those
+        /// configurations which remain viable after evaluating semantic predicates.
+        /// If the set of these filtered configurations which also reached the end of
+        /// the decision rule is not empty, return the minimum alternative
+        /// represented in this set.</li>
+        /// <li>Otherwise, choose the minimum alternative in <em>S</em>.</li>
+        /// </ol>
+        /// </li>
+        /// </ul>
+        /// <p>
+        /// In some scenarios, the algorithm described above could predict an
+        /// alternative which will result in a
+        /// <see cref="Antlr4.Runtime.FailedPredicateException">Antlr4.Runtime.FailedPredicateException</see>
+        /// in
+        /// parser. Specifically, this could occur if the <em>only</em> configuration
+        /// capable of successfully parsing to the end of the decision rule is
+        /// blocked by a semantic predicate. By choosing this alternative within
+        /// <see cref="AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)">AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)</see>
+        /// instead of throwing a
+        /// <see cref="Antlr4.Runtime.NoViableAltException">Antlr4.Runtime.NoViableAltException</see>
+        /// , the resulting
+        /// <see cref="Antlr4.Runtime.FailedPredicateException">Antlr4.Runtime.FailedPredicateException</see>
+        /// in the parser will identify the specific
+        /// predicate which is preventing the parser from successfully parsing the
+        /// decision rule, which helps developers identify and correct logic errors
+        /// in semantic predicates.
+        /// </p>
+        /// </summary>
+        /// <param name="input">
+        /// The input
+        /// <see cref="Antlr4.Runtime.ITokenStream">Antlr4.Runtime.ITokenStream</see>
+        /// </param>
+        /// <param name="startIndex">
+        /// The start index for the current prediction, which is
+        /// the input index where any semantic context in
+        /// <code>configs</code>
+        /// should be
+        /// evaluated
+        /// </param>
+        /// <param name="previous">
+        /// The ATN simulation state immediately before the
+        /// <see cref="ATNSimulator.Error">ATNSimulator.Error</see>
+        /// state was reached
+        /// </param>
+        /// <returns>
+        /// The value to return from
+        /// <see cref="AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)">AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)</see>
+        /// , or
+        /// <see cref="ATN.InvalidAltNumber">ATN.InvalidAltNumber</see>
+        /// if a suitable alternative was not
+        /// identified and
+        /// <see cref="AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)">AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)</see>
+        /// should report an error instead.
+        /// </returns>
         protected internal virtual int HandleNoViableAlt(ITokenStream input, int startIndex, SimulatorState previous)
         {
             if (previous.s0 != null)
             {
                 BitSet alts = new BitSet();
+                int maxAlt = 0;
                 foreach (ATNConfig config in previous.s0.configs)
                 {
                     if (config.ReachesIntoOuterContext || config.State is RuleStopState)
                     {
                         alts.Set(config.Alt);
+                        maxAlt = Math.Max(maxAlt, config.Alt);
                     }
                 }
-                if (!alts.IsEmpty())
+                switch (alts.Cardinality())
                 {
-                    return alts.NextSetBit(0);
+                    case 0:
+                    {
+                        break;
+                    }
+
+                    case 1:
+                    {
+                        return alts.NextSetBit(0);
+                    }
+
+                    default:
+                    {
+                        if (!previous.s0.configs.HasSemanticContext)
+                        {
+                            // configs doesn't contain any predicates, so the predicate
+                            // filtering code below would be pointless
+                            return alts.NextSetBit(0);
+                        }
+                        ATNConfigSet filteredConfigs = new ATNConfigSet();
+                        foreach (ATNConfig config_1 in previous.s0.configs)
+                        {
+                            if (config_1.ReachesIntoOuterContext || config_1.State is RuleStopState)
+                            {
+                                filteredConfigs.AddItem(config_1);
+                            }
+                        }
+                        SemanticContext[] altToPred = GetPredsForAmbigAlts(alts, filteredConfigs, maxAlt);
+                        if (altToPred != null)
+                        {
+                            DFAState.PredPrediction[] predicates = GetPredicatePredictions(alts, altToPred);
+                            if (predicates != null)
+                            {
+                                int stopIndex = input.Index;
+                                try
+                                {
+                                    input.Seek(startIndex);
+                                    BitSet filteredAlts = EvalSemanticContext(predicates, previous.outerContext, false);
+                                    if (!filteredAlts.IsEmpty())
+                                    {
+                                        return filteredAlts.NextSetBit(0);
+                                    }
+                                }
+                                finally
+                                {
+                                    input.Seek(stopIndex);
+                                }
+                            }
+                        }
+                        return alts.NextSetBit(0);
+                    }
                 }
             }
             throw NoViableAlt(input, previous.outerContext, previous.s0.configs, startIndex);
@@ -1044,14 +1183,15 @@ namespace Antlr4.Runtime.Atn
                         }
                     }
                 }
-                if (optimize_unique_closure && skippedStopStates == null && reachIntermediate.UniqueAlt != ATN.InvalidAltNumber)
+                if (optimize_unique_closure && skippedStopStates == null && t != TokenConstants.Eof && reachIntermediate.UniqueAlt != ATN.InvalidAltNumber)
                 {
                     reachIntermediate.IsOutermostConfigSet = reach.IsOutermostConfigSet;
                     reach = reachIntermediate;
                     break;
                 }
                 bool collectPredicates = false;
-                Closure(reachIntermediate, reach, collectPredicates, hasMoreContext, contextCache);
+                bool treatEofAsEpsilon = t == TokenConstants.Eof;
+                Closure(reachIntermediate, reach, collectPredicates, hasMoreContext, contextCache, treatEofAsEpsilon);
                 stepIntoGlobal = reach.DipsIntoOuterContext;
                 if (t == IntStreamConstants.Eof)
                 {
@@ -1234,7 +1374,7 @@ namespace Antlr4.Runtime.Atn
                     configs.IsOutermostConfigSet = true;
                 }
                 bool collectPredicates = true;
-                Closure(reachIntermediate, configs, collectPredicates, hasMoreContext, contextCache);
+                Closure(reachIntermediate, configs, collectPredicates, hasMoreContext, contextCache, false);
                 bool stepIntoGlobal = configs.DipsIntoOuterContext;
                 DFAState next;
                 if (useContext && !enable_global_context_dfa)
@@ -1571,7 +1711,7 @@ namespace Antlr4.Runtime.Atn
             return predictions;
         }
 
-        protected internal virtual void Closure(ATNConfigSet sourceConfigs, ATNConfigSet configs, bool collectPredicates, bool hasMoreContext, PredictionContextCache contextCache)
+        protected internal virtual void Closure(ATNConfigSet sourceConfigs, ATNConfigSet configs, bool collectPredicates, bool hasMoreContext, PredictionContextCache contextCache, bool treatEofAsEpsilon)
         {
             if (contextCache == null)
             {
@@ -1584,13 +1724,13 @@ namespace Antlr4.Runtime.Atn
                 ATNConfigSet intermediate = new ATNConfigSet();
                 foreach (ATNConfig config in currentConfigs)
                 {
-                    Closure(config, configs, intermediate, closureBusy, collectPredicates, hasMoreContext, contextCache, 0);
+                    Closure(config, configs, intermediate, closureBusy, collectPredicates, hasMoreContext, contextCache, 0, treatEofAsEpsilon);
                 }
                 currentConfigs = intermediate;
             }
         }
 
-        protected internal virtual void Closure(ATNConfig config, ATNConfigSet configs, ATNConfigSet intermediate, HashSet<ATNConfig> closureBusy, bool collectPredicates, bool hasMoreContexts, PredictionContextCache contextCache, int depth)
+        protected internal virtual void Closure(ATNConfig config, ATNConfigSet configs, ATNConfigSet intermediate, HashSet<ATNConfig> closureBusy, bool collectPredicates, bool hasMoreContexts, PredictionContextCache contextCache, int depth, bool treatEofAsEpsilon)
         {
             if (config.State is RuleStopState)
             {
@@ -1610,7 +1750,7 @@ namespace Antlr4.Runtime.Atn
                         // Make sure we track that we are now out of context.
                         c.OuterContextDepth = config.OuterContextDepth;
                         System.Diagnostics.Debug.Assert(depth > int.MinValue);
-                        Closure(c, configs, intermediate, closureBusy, collectPredicates, hasMoreContexts, contextCache, depth - 1);
+                        Closure(c, configs, intermediate, closureBusy, collectPredicates, hasMoreContexts, contextCache, depth - 1, treatEofAsEpsilon);
                     }
                     if (!hasEmpty || !hasMoreContexts)
                     {
@@ -1642,11 +1782,13 @@ namespace Antlr4.Runtime.Atn
             {
                 configs.Add(config, contextCache);
             }
+            // make sure to not return here, because EOF transitions can act as
+            // both epsilon transitions and non-epsilon transitions.
             for (int i_1 = 0; i_1 < p.NumberOfOptimizedTransitions; i_1++)
             {
                 Transition t = p.GetOptimizedTransition(i_1);
                 bool continueCollecting = !(t is Antlr4.Runtime.Atn.ActionTransition) && collectPredicates;
-                ATNConfig c = GetEpsilonTarget(config, t, continueCollecting, depth == 0, contextCache);
+                ATNConfig c = GetEpsilonTarget(config, t, continueCollecting, depth == 0, contextCache, treatEofAsEpsilon);
                 if (c != null)
                 {
                     if (t is Antlr4.Runtime.Atn.RuleTransition)
@@ -1656,6 +1798,11 @@ namespace Antlr4.Runtime.Atn
                             intermediate.Add(c, contextCache);
                             continue;
                         }
+                    }
+                    if (!t.IsEpsilon && !closureBusy.AddItem(c))
+                    {
+                        // avoid infinite recursion for EOF* and EOF+
+                        continue;
                     }
                     int newDepth = depth;
                     if (config.State is RuleStopState)
@@ -1703,7 +1850,7 @@ namespace Antlr4.Runtime.Atn
                             }
                         }
                     }
-                    Closure(c, configs, intermediate, closureBusy, continueCollecting, hasMoreContexts, contextCache, newDepth);
+                    Closure(c, configs, intermediate, closureBusy, continueCollecting, hasMoreContexts, contextCache, newDepth, treatEofAsEpsilon);
                 }
             }
         }
@@ -1719,7 +1866,7 @@ namespace Antlr4.Runtime.Atn
         }
 
         [return: Nullable]
-        protected internal virtual ATNConfig GetEpsilonTarget(ATNConfig config, Transition t, bool collectPredicates, bool inContext, PredictionContextCache contextCache)
+        protected internal virtual ATNConfig GetEpsilonTarget(ATNConfig config, Transition t, bool collectPredicates, bool inContext, PredictionContextCache contextCache, bool treatEofAsEpsilon)
         {
             switch (t.TransitionType)
             {
@@ -1746,6 +1893,22 @@ namespace Antlr4.Runtime.Atn
                 case TransitionType.Epsilon:
                 {
                     return config.Transform(t.target, false);
+                }
+
+                case TransitionType.Atom:
+                case TransitionType.Range:
+                case TransitionType.Set:
+                {
+                    // EOF transitions act like epsilon transitions after the first EOF
+                    // transition is traversed
+                    if (treatEofAsEpsilon)
+                    {
+                        if (t.Matches(TokenConstants.Eof, 0, 1))
+                        {
+                            return config.Transform(t.target, false);
+                        }
+                    }
+                    return null;
                 }
 
                 default:
@@ -1816,9 +1979,9 @@ namespace Antlr4.Runtime.Atn
             return config.Transform(t.target, newContext, false);
         }
 
-        private sealed class _IComparer_1771 : IComparer<ATNConfig>
+        private sealed class _IComparer_1905 : IComparer<ATNConfig>
         {
-            public _IComparer_1771()
+            public _IComparer_1905()
             {
             }
 
@@ -1838,7 +2001,7 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        private static readonly IComparer<ATNConfig> StateAltSortComparator = new _IComparer_1771();
+        private static readonly IComparer<ATNConfig> StateAltSortComparator = new _IComparer_1905();
 
         private BitSet IsConflicted(ATNConfigSet configset, PredictionContextCache contextCache)
         {

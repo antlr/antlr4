@@ -95,7 +95,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>true</code>
         /// , this config set represents configurations where the entire
         /// outer context has been consumed by the ATN interpreter. This prevents the
-        /// <see cref="ParserATNSimulator.Closure(ATNConfigSet, ATNConfigSet, bool, bool, PredictionContextCache)">ParserATNSimulator.Closure(ATNConfigSet, ATNConfigSet, bool, bool, PredictionContextCache)</see>
+        /// <see cref="ParserATNSimulator.Closure(ATNConfigSet, ATNConfigSet, bool, bool, PredictionContextCache, bool)">ParserATNSimulator.Closure(ATNConfigSet, ATNConfigSet, bool, bool, PredictionContextCache, bool)</see>
         /// from pursuing the global FOLLOW when a
         /// rule stop state is reached with an empty prediction context.
         /// <p/>
