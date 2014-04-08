@@ -717,7 +717,7 @@
                 string lexerSerializedATN = (string)lexerSerializedATNField.GetValue(null);
                 for (int i = 0; i < NUMBER_OF_THREADS; i++)
                 {
-                    sharedLexerATNs[i] = ATNSimulator.Deserialize(lexerSerializedATN.ToCharArray());
+                    sharedLexerATNs[i] = new ATNDeserializer().Deserialize(lexerSerializedATN.ToCharArray());
                 }
             }
 
@@ -727,7 +727,7 @@
                 string parserSerializedATN = (string)parserSerializedATNField.GetValue(null);
                 for (int i = 0; i < NUMBER_OF_THREADS; i++)
                 {
-                    sharedParserATNs[i] = ATNSimulator.Deserialize(parserSerializedATN.ToCharArray());
+                    sharedParserATNs[i] = new ATNDeserializer().Deserialize(parserSerializedATN.ToCharArray());
                 }
             }
 
