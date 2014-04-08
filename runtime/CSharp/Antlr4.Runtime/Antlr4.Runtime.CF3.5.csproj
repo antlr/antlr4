@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Antlr4.VS2008.4.2.0-alpha001\build\Antlr4.props" Condition="Exists('..\packages\Antlr4.VS2008.4.2.0-alpha001\build\Antlr4.props')" />
+  <Import Project="..\packages\Antlr4.VS2008.4.2.1-alpha001\build\Antlr4.props" Condition="Exists('..\packages\Antlr4.VS2008.4.2.1-alpha001\build\Antlr4.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -269,7 +269,7 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
-  <Import Project="..\packages\Antlr4.VS2008.4.2.0-alpha001\build\Antlr4.targets" Condition="Exists('..\packages\Antlr4.VS2008.4.2.0-alpha001\build\Antlr4.targets')" />
+  <Import Project="..\packages\Antlr4.VS2008.4.2.1-alpha001\build\Antlr4.targets" Condition="Exists('..\packages\Antlr4.VS2008.4.2.1-alpha001\build\Antlr4.targets')" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.VS2008.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.VS2008.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
