@@ -371,7 +371,7 @@ namespace Antlr4.Runtime.Atn
                         {
                             lexerActionExecutor = lexerActionExecutor.FixOffsetBeforeMatch(input.Index - startIndex);
                         }
-                        bool treatEofAsEpsilon = t == CharStreamConstants.Eof;
+                        bool treatEofAsEpsilon = t == IntStreamConstants.Eof;
                         if (Closure(input, c.Transform(target, lexerActionExecutor, true), reach, currentAltReachedAcceptState, true, treatEofAsEpsilon))
                         {
                             // any remaining configs for this alt have a lower priority than
@@ -582,7 +582,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     if (treatEofAsEpsilon)
                     {
-                        if (t.Matches(CharStreamConstants.Eof, char.MinValue, char.MaxValue))
+                        if (t.Matches(IntStreamConstants.Eof, char.MinValue, char.MaxValue))
                         {
                             c = config.Transform(t.target, false);
                             break;

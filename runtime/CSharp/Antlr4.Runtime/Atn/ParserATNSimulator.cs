@@ -1799,7 +1799,7 @@ namespace Antlr4.Runtime.Atn
                             continue;
                         }
                     }
-                    if (!t.IsEpsilon && !closureBusy.AddItem(c))
+                    if (!t.IsEpsilon && !closureBusy.Add(c))
                     {
                         // avoid infinite recursion for EOF* and EOF+
                         continue;
