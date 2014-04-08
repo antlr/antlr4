@@ -606,7 +606,7 @@ StarBlock(choice, alts, sync, iteration) ::= <<
 State = <choice.stateNumber>;
 _errHandler.Sync(this);
 _alt = Interpreter.AdaptivePredict(_input,<choice.decision>,_ctx);
-while ( _alt!=<choice.exitAlt> && _alt!=-1 ) {
+while ( _alt!=<choice.exitAlt> && _alt!=ATN.InvalidAltNumber ) {
 	if ( _alt==1<if(!choice.ast.greedy)>+1<endif> ) {
 		<iteration>
 		<alts> <! should only be one !>
@@ -620,7 +620,7 @@ while ( _alt!=<choice.exitAlt> && _alt!=-1 ) {
 PlusBlock(choice, alts, error) ::= <<
 State = <choice.blockStartStateNumber>;<! alt block decision !>
 _errHandler.Sync(this);
-_alt = Interpreter.AdaptivePredict(_input,<choice.decision>,_ctx);
+_alt = 1<if(!choice.ast.greedy)>+1<endif>;
 do {
 	switch (_alt) {
 	<alts:{alt|
@@ -633,7 +633,7 @@ case <i><if(!choice.ast.greedy)>+1<endif>:
 	State = <choice.loopBackStateNumber>;<! loopback/exit decision !>
 	_errHandler.Sync(this);
 	_alt = Interpreter.AdaptivePredict(_input,<choice.decision>,_ctx);
-} while ( _alt!=<choice.exitAlt> && _alt!=-1 );
+} while ( _alt!=<choice.exitAlt> && _alt!=ATN.InvalidAltNumber );
 >>
 
 Sync(s) ::= "Sync(<s.expecting.name>);"
