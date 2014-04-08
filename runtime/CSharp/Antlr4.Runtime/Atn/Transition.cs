@@ -70,7 +70,22 @@ namespace Antlr4.Runtime.Atn
             get;
         }
 
-        /// <summary>Are we epsilon, action, sempred?</summary>
+        /// <summary>Determines if the transition is an "epsilon" transition.</summary>
+        /// <remarks>
+        /// Determines if the transition is an "epsilon" transition.
+        /// <p>The default implementation returns
+        /// <code>false</code>
+        /// .</p>
+        /// </remarks>
+        /// <returns>
+        /// 
+        /// <code>true</code>
+        /// if traversing this transition in the ATN does not
+        /// consume an input symbol; otherwise,
+        /// <code>false</code>
+        /// if traversing this
+        /// transition consumes (matches) an input symbol.
+        /// </returns>
         public virtual bool IsEpsilon
         {
             get

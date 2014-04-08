@@ -250,7 +250,7 @@ namespace Antlr4.Runtime.Dfa
         {
             if (IsPrecedenceDfa())
             {
-                return s0full.Get().EdgeMap.IsEmpty();
+                return !s0full.Get().EdgeMap.IsEmpty();
             }
             return s0full.Get() != null;
         }
