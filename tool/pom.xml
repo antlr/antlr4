@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tunnelvisionlabs</groupId>
     <artifactId>antlr4-csharp</artifactId>
-    <version>4.2.1-SNAPSHOT</version>
+    <version>4.2.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>ANTLR 4 Target C#</name>
@@ -76,13 +76,13 @@
         <dependency>
             <groupId>com.tunnelvisionlabs</groupId>
             <artifactId>antlr4</artifactId>
-            <version>4.2.1</version>
+            <version>4.2.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.tunnelvisionlabs</groupId>
             <artifactId>antlr4-runtime</artifactId>
-            <version>4.2.1</version>
+            <version>4.2.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

@@ -4,6 +4,6 @@
     <!-- Folder containing Antlr4BuildTasks.v3.5.dll -->
     <Antlr4BuildTaskPath>.</Antlr4BuildTaskPath>
     <!-- Path to the ANTLR tool itself -->
-    <Antlr4ToolPath>..\tools\antlr4-csharp-4.2.1-SNAPSHOT-complete.jar</Antlr4ToolPath>
+    <Antlr4ToolPath>..\tools\antlr4-csharp-4.2.2-SNAPSHOT-complete.jar</Antlr4ToolPath>
   </PropertyGroup>
 </Project>
