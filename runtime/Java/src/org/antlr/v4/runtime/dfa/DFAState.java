@@ -150,13 +150,17 @@ public class DFAState {
 		contextSymbols.set(symbol - edges.minIndex);
 	}
 
-	public synchronized void setContextSensitive(ATN atn) {
+	public void setContextSensitive(ATN atn) {
 		assert !configs.isOutermostConfigSet();
 		if (isContextSensitive()) {
 			return;
 		}
 
-		contextSymbols = new BitSet();
+		synchronized (this) {
+			if (contextSymbols == null) {
+				contextSymbols = new BitSet();
+			}
+		}
 	}
 
 	public synchronized DFAState getTarget(int symbol) {
