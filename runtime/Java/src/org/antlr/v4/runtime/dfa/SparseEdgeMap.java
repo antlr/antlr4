@@ -98,7 +98,7 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 	}
 
 	@Override
-	public T get(int key) {
+	public synchronized T get(int key) {
 		int index = Arrays.binarySearch(keys, 0, size(), key);
 		if (index < 0) {
 			return null;
@@ -108,7 +108,7 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 	}
 
 	@Override
-	public AbstractEdgeMap<T> put(int key, T value) {
+	public synchronized AbstractEdgeMap<T> put(int key, T value) {
 		if (key < minIndex || key > maxIndex) {
 			return this;
 		}

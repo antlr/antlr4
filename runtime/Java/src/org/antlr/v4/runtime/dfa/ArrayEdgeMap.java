@@ -67,7 +67,7 @@ public class ArrayEdgeMap<T> extends AbstractEdgeMap<T> {
 	}
 
 	@Override
-	public T get(int key) {
+	public synchronized T get(int key) {
 		if (key < minIndex || key > maxIndex) {
 			return null;
 		}
@@ -76,7 +76,7 @@ public class ArrayEdgeMap<T> extends AbstractEdgeMap<T> {
 	}
 
 	@Override
-	public ArrayEdgeMap<T> put(int key, T value) {
+	public synchronized ArrayEdgeMap<T> put(int key, T value) {
 		if (key >= minIndex && key <= maxIndex) {
 			T existing = arrayData[key - minIndex];
 			arrayData[key - minIndex] = value;

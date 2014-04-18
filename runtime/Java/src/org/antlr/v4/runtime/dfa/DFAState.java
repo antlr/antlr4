@@ -79,7 +79,7 @@ public class DFAState {
 	/** {@code edges.get(symbol)} points to target of symbol.
 	 */
 	@NotNull
-	private AbstractEdgeMap<DFAState> edges;
+	private volatile AbstractEdgeMap<DFAState> edges;
 
 	public boolean isAcceptState = false;
 
@@ -92,7 +92,7 @@ public class DFAState {
 
 	/** These keys for these edges are the top level element of the global context. */
 	@NotNull
-	private AbstractEdgeMap<DFAState> contextEdges;
+	private volatile AbstractEdgeMap<DFAState> contextEdges;
 
 	/** Symbols in this set require a global context transition before matching an input symbol. */
 	@Nullable
@@ -163,11 +163,11 @@ public class DFAState {
 		}
 	}
 
-	public synchronized DFAState getTarget(int symbol) {
+	public DFAState getTarget(int symbol) {
 		return edges.get(symbol);
 	}
 
-	public synchronized void setTarget(int symbol, DFAState target) {
+	public void setTarget(int symbol, DFAState target) {
 		edges = edges.put(symbol, target);
 	}
 
