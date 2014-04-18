@@ -2287,7 +2287,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				configs.optimizeConfigs(this);
 			}
 
-			DFAState proposed = createDFAState(configs);
+			DFAState proposed = createDFAState(dfa, configs);
 			DFAState existing = dfa.states.get(proposed);
 			if ( existing!=null ) return existing;
 		}
@@ -2299,7 +2299,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					int size = configs.size();
 					configs.stripHiddenConfigs();
 					if (enableDfa && configs.size() < size) {
-						DFAState proposed = createDFAState(configs);
+						DFAState proposed = createDFAState(dfa, configs);
 						DFAState existing = dfa.states.get(proposed);
 						if ( existing!=null ) return existing;
 					}
@@ -2307,7 +2307,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 		}
 
-		DFAState newState = createDFAState(configs.clone(true));
+		DFAState newState = createDFAState(dfa, configs.clone(true));
 		DecisionState decisionState = atn.getDecisionState(dfa.decision);
 		int predictedAlt = getUniqueAlt(configs);
 		if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
@@ -2332,8 +2332,8 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	@NotNull
-	protected DFAState createDFAState(@NotNull ATNConfigSet configs) {
-		return new DFAState(configs, -1, atn.maxTokenType);
+	protected DFAState createDFAState(@NotNull DFA dfa, @NotNull ATNConfigSet configs) {
+		return new DFAState(dfa, configs);
 	}
 
 	protected void reportAttemptingFullContext(@NotNull DFA dfa, @Nullable BitSet conflictingAlts, @NotNull SimulatorState conflictState, int startIndex, int stopIndex) {

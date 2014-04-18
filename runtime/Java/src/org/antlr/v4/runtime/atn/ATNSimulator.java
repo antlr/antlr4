@@ -31,6 +31,7 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.dfa.EmptyEdgeMap;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 
@@ -68,7 +69,7 @@ public abstract class ATNSimulator {
 	public final ATN atn;
 
 	static {
-		ERROR = new DFAState(new ATNConfigSet(), 0, 0);
+		ERROR = new DFAState(new EmptyEdgeMap<DFAState>(0, -1), new EmptyEdgeMap<DFAState>(0, -1), new ATNConfigSet());
 		ERROR.stateNumber = Integer.MAX_VALUE;
 	}
 

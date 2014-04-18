@@ -690,12 +690,12 @@ public class LexerATNSimulator extends ATNSimulator {
 		 */
 		assert !configs.hasSemanticContext();
 
-		DFAState proposed = new DFAState(configs, 0, MAX_DFA_EDGE);
+		DFAState proposed = new DFAState(atn.modeToDFA[mode], configs);
 		DFAState existing = atn.modeToDFA[mode].states.get(proposed);
 		if ( existing!=null ) return existing;
 
 		configs.optimizeConfigs(this);
-		DFAState newState = new DFAState(configs.clone(true), 0, MAX_DFA_EDGE);
+		DFAState newState = new DFAState(atn.modeToDFA[mode], configs.clone(true));
 
 		ATNConfig firstConfigWithRuleStopState = null;
 		for (ATNConfig c : configs) {
