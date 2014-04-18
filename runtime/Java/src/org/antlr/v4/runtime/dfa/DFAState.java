@@ -155,7 +155,7 @@ public class DFAState {
 		}
 
 		contextSymbols = new BitSet();
-		contextEdges = new SingletonEdgeMap<DFAState>(-1, atn.states.size() - 1);
+		contextEdges = new EmptyEdgeMap<DFAState>(-1, atn.states.size() - 1);
 	}
 
 	public synchronized DFAState getTarget(int symbol) {
@@ -168,7 +168,7 @@ public class DFAState {
 
 	public synchronized void setTarget(int symbol, DFAState target) {
 		if (edges == null) {
-			edges = new SingletonEdgeMap<DFAState>(minSymbol, maxSymbol);
+			edges = new EmptyEdgeMap<DFAState>(minSymbol, maxSymbol);
 		}
 
 		edges = edges.put(symbol, target);
