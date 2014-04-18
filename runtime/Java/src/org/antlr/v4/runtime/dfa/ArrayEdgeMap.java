@@ -118,13 +118,15 @@ public class ArrayEdgeMap<T> extends AbstractEdgeMap<T> {
 			return put(other.getKey(), other.getValue());
 		} else if (m instanceof SparseEdgeMap<?>) {
 			SparseEdgeMap<? extends T> other = (SparseEdgeMap<? extends T>)m;
-			int[] keys = other.getKeys();
-			List<? extends T> values = other.getValues();
-			ArrayEdgeMap<T> result = this;
-			for (int i = 0; i < values.size(); i++) {
-				result = result.put(keys[i], values.get(i));
+			synchronized (other) {
+				int[] keys = other.getKeys();
+				List<? extends T> values = other.getValues();
+				ArrayEdgeMap<T> result = this;
+				for (int i = 0; i < values.size(); i++) {
+					result = result.put(keys[i], values.get(i));
+				}
+				return result;
 			}
-			return result;
 		} else {
 			throw new UnsupportedOperationException(String.format("EdgeMap of type %s is supported yet.", m.getClass().getName()));
 		}
