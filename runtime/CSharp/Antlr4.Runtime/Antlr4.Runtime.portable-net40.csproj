@@ -10,11 +10,11 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Antlr4.Runtime</RootNamespace>
-    <AssemblyName>Antlr4.Runtime.Portable</AssemblyName>
+    <AssemblyName>Antlr4.Runtime.portable-net40</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Profile5</TargetFrameworkProfile>
+    <TargetFrameworkProfile>Profile136</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
-    <BaseIntermediateOutputPath>obj\Portable\</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\portable-net40\</BaseIntermediateOutputPath>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -23,9 +23,9 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Portable\Debug\</OutputPath>
+    <OutputPath>bin\portable-net40\Debug\</OutputPath>
     <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
-    <DefineConstants>TRACE;DEBUG;NET_2_0;NET_3_0;NET_3_5;NET_4_0;PORTABLE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;PORTABLE;NET40;NET40PLUS;NET35PLUS;NET30PLUS;NET20PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>1591</NoWarn>
@@ -33,9 +33,9 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Portable\Release\</OutputPath>
+    <OutputPath>bin\portable-net40\Release\</OutputPath>
     <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
-    <DefineConstants>TRACE;NET_2_0;NET_3_0;NET_3_5;NET_4_0;PORTABLE</DefineConstants>
+    <DefineConstants>TRACE;PORTABLE;NET40;NET40PLUS;NET35PLUS;NET30PLUS;NET20PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>1591</NoWarn>
@@ -46,9 +46,6 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\..\..\..\..\..\keys\antlr\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <ItemGroup>
-    <!-- A reference to the entire .NET Framework is automatically included -->
-  </ItemGroup>
   <ItemGroup>
     <Compile Include="AntlrFileStream.cs" />
     <Compile Include="AntlrInputStream.cs" />
@@ -194,6 +191,9 @@
     <Compile Include="Sharpen\AtomicReference`1.cs" />
     <Compile Include="Sharpen\BitSet.cs" />
     <Compile Include="Sharpen\Collections.cs" />
+    <Compile Include="Sharpen\Compat\CollectionDebuggerView`2.cs" />
+    <Compile Include="Sharpen\Compat\ConcurrentDictionary`2.cs" />
+    <Compile Include="Sharpen\Compat\SplitOrderedList`2.cs" />
     <Compile Include="Sharpen\DictionaryExtensions.cs" />
     <Compile Include="Sharpen\ListExtensions.cs" />
     <Compile Include="Sharpen\Runtime.cs" />
@@ -233,7 +233,7 @@
     <Compile Include="Tree\Xpath\XPathWildcardElement.cs" />
     <Compile Include="UnbufferedCharStream.cs" />
     <Compile Include="UnbufferedTokenStream.cs" />
-    <None Include="packages.Antlr4.Runtime.Portable.config" />
+    <None Include="packages.Antlr4.Runtime.portable-net40.config" />
     <Antlr4 Include="Tree\Xpath\XPathLexer.g4">
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>Antlr4.Runtime.Tree.Xpath</CustomToolNamespace>

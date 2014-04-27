@@ -288,6 +288,8 @@ namespace Antlr4.Runtime.Dfa
                         map = new ReadOnlyDictionary<int, DFAState>(new SortedDictionary<int, DFAState>(result));
 #elif COMPACT
                         map = new SortedList<int, DFAState>(result);
+#elif PORTABLE && !NET45PLUS
+                        map = new Dictionary<int, DFAState>(result);
 #else
                         map = new SortedDictionary<int, DFAState>(result);
 #endif

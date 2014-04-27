@@ -44,9 +44,9 @@
     <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net35-cf\$Configuration$\Antlr4.Runtime.net35-cf.pdb" target="lib\net35-cf"/>
     <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net35-cf\$Configuration$\Antlr4.Runtime.net35-cf.xml" target="lib\net35-cf"/>
 
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\Portable\$Configuration$\Antlr4.Runtime.Portable.dll" target="lib\portable-net40"/>
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\Portable\$Configuration$\Antlr4.Runtime.Portable.pdb" target="lib\portable-net40"/>
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\Portable\$Configuration$\Antlr4.Runtime.Portable.xml" target="lib\portable-net40"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net40\$Configuration$\Antlr4.Runtime.portable-net40.dll" target="lib\portable-net40+sl50+wp80+win"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net40\$Configuration$\Antlr4.Runtime.portable-net40.pdb" target="lib\portable-net40+sl50+wp80+win"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net40\$Configuration$\Antlr4.Runtime.portable-net40.xml" target="lib\portable-net40+sl50+wp80+win"/>
 
     <!-- Source Code -->
 

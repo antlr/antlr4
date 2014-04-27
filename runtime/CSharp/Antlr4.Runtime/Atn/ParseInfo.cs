@@ -104,6 +104,7 @@ namespace Antlr4.Runtime.Atn
             return Ll;
         }
 
+#if !PORTABLE || NET45PLUS
         /// <summary>
         /// Gets the total time spent during prediction across all decisions made
         /// during parsing.
@@ -124,6 +125,7 @@ namespace Antlr4.Runtime.Atn
             }
             return t;
         }
+#endif
 
         /// <summary>
         /// Gets the total number of SLL lookahead operations across all decisions

@@ -22,7 +22,7 @@
 //
 //
 
-#if !NET40PLUS
+#if !NET40PLUS || (PORTABLE && !NET45PLUS)
 
 using System;
 using System.Threading;
@@ -533,15 +533,16 @@ namespace Antlr4.Runtime.Sharpen
 #if COMPACT
 			Thread.Sleep(0);
 #else
+			ManualResetEvent mre = new ManualResetEvent (false);
 			if (isSingleCpu) {
 				// On a single-CPU system, spinning does no good
-				Thread.Sleep (0);
+				mre.WaitOne (0);
 			} else {
 				if (ntime % step == 0)
-					Thread.Sleep (0);
+					mre.WaitOne (0);
 				else
 					// Multi-CPU system might be hyper-threaded, let other thread run
-					Thread.SpinWait (Math.Min (ntime, maxTime) << 1);
+					mre.WaitOne (Math.Min (ntime, maxTime) << 1);
 			}
 #endif
 		}

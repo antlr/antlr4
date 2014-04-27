@@ -22,12 +22,13 @@
 //
 //
 
-#if !NET40PLUS
+#if !NET40PLUS || (PORTABLE && !NET45PLUS)
 
 using System;
 using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 using System.Diagnostics;
 
@@ -340,7 +341,7 @@ namespace Antlr4.Runtime.Sharpen
 			foreach (KeyValuePair<TKey, TValue> kvp in this)
 				temp.Add (extractor (kvp));
 
-			return temp.AsReadOnly ();
+			return new ReadOnlyCollection<T>(temp);
 		}
 
 		void ICollection.CopyTo (Array array, int startIndex)
