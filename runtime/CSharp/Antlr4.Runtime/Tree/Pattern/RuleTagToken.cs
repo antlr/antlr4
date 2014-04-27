@@ -39,7 +39,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// <see cref="Antlr4.Runtime.IToken">Antlr4.Runtime.IToken</see>
     /// object representing an entire subtree matched by a parser
     /// rule; e.g.,
-    /// <code><expr></code>
+    /// <code>&lt;expr&gt;</code>
     /// . These tokens are created for
     /// <see cref="TagChunk">TagChunk</see>
     /// chunks where the tag corresponds to a parser rule.
@@ -146,7 +146,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <summary>
         /// <inheritDoc></inheritDoc>
         /// <p>Rule tag tokens are always placed on the
-        /// <see cref="Antlr4.Runtime.IToken.DefaultChannel">Antlr4.Runtime.IToken.DefaultChannel</see>
+        /// <see cref="TokenConstants.DefaultChannel"/>
         /// .</p>
         /// </summary>
         public virtual int Channel

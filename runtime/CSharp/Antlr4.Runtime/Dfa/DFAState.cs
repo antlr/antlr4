@@ -48,7 +48,7 @@ namespace Antlr4.Runtime.Dfa
     /// input a1a2..an, the DFA is in a state that represents the
     /// subset T of the states of the ATN that are reachable from the
     /// ATN's start state along some path labeled a1a2..an."
-    /// In conventional NFA&rarr;DFA conversion, therefore, the subset T
+    /// In conventional NFA&#x2192;DFA conversion, therefore, the subset T
     /// would be a bitset representing the set of states the
     /// ATN could be in.  We need to track the alt predicted by each
     /// state as well, however.  More importantly, we need to maintain

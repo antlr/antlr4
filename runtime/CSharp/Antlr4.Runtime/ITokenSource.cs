@@ -124,7 +124,7 @@ namespace Antlr4.Runtime
         /// Gets the name of the underlying input source. This method returns a
         /// non-null, non-empty string. If such a name is not known, this method
         /// returns
-        /// <see cref="IIntStream.UnknownSourceName">IIntStream.UnknownSourceName</see>
+        /// <see cref="IntStreamConstants.UnknownSourceName"/>
         /// .
         /// </remarks>
         string SourceName

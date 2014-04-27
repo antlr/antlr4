@@ -55,7 +55,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Indicates whether
-        /// <see cref="CommonToken.Text(string)">CommonToken.Text(string)</see>
+        /// <see cref="CommonToken.Text"/>
         /// should be called after
         /// constructing tokens to explicitly set the text. This is useful for cases
         /// where the input stream might not be able to provide arbitrary substrings

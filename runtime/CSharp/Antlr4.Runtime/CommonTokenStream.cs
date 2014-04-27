@@ -54,12 +54,12 @@ namespace Antlr4.Runtime
     /// <p>
     /// By default, tokens are placed on the default channel
     /// (
-    /// <see cref="IToken.DefaultChannel">IToken.DefaultChannel</see>
+    /// <see cref="TokenConstants.DefaultChannel"/>
     /// ), but may be reassigned by using the
     /// <code>-&gt;channel(HIDDEN)</code>
     /// lexer command, or by using an embedded action to
     /// call
-    /// <see cref="Lexer.Channel(int)">Lexer.Channel(int)</see>
+    /// <see cref="Lexer.Channel"/>
     /// .
     /// </p>
     /// <p>
@@ -78,7 +78,7 @@ namespace Antlr4.Runtime
         /// Specifies the channel to use for filtering tokens.
         /// <p>
         /// The default value is
-        /// <see cref="IToken.DefaultChannel">IToken.DefaultChannel</see>
+        /// <see cref="TokenConstants.DefaultChannel"/>
         /// , which matches the
         /// default channel assigned to tokens created by the lexer.</p>
         /// </remarks>
@@ -89,7 +89,7 @@ namespace Antlr4.Runtime
         /// <see cref="CommonTokenStream">CommonTokenStream</see>
         /// using the specified token
         /// source and the default token channel (
-        /// <see cref="IToken.DefaultChannel">IToken.DefaultChannel</see>
+        /// <see cref="TokenConstants.DefaultChannel"/>
         /// ).
         /// </summary>
         /// <param name="tokenSource">The token source.</param>
@@ -109,7 +109,7 @@ namespace Antlr4.Runtime
         /// or have the
         /// <see cref="IToken.Type()">IToken.Type()</see>
         /// equal to
-        /// <see cref="IToken.Eof">IToken.Eof</see>
+        /// <see cref="TokenConstants.Eof"/>
         /// will be returned by the
         /// token stream lookahead methods.
         /// </summary>

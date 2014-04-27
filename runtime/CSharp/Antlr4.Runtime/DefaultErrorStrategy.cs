@@ -527,7 +527,7 @@ namespace Antlr4.Runtime
         /// , it will have
         /// call chain:</p>
         /// <pre>
-        /// stat &rarr; expr &rarr; atom
+        /// stat &#x2192; expr &#x2192; atom
         /// </pre>
         /// and it will be trying to match the
         /// <code>')'</code>

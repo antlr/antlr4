@@ -38,7 +38,7 @@ namespace Antlr4.Runtime.Atn
     /// Implements the
     /// <code>channel</code>
     /// lexer action by calling
-    /// <see cref="Antlr4.Runtime.Lexer.Channel(int)">Antlr4.Runtime.Lexer.Channel(int)</see>
+    /// <see cref="Lexer.Channel"/>
     /// with the assigned channel.
     /// </summary>
     /// <author>Sam Harwell</author>
@@ -54,7 +54,7 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="channel">
         /// The channel value to pass to
-        /// <see cref="Antlr4.Runtime.Lexer.Channel(int)">Antlr4.Runtime.Lexer.Channel(int)</see>
+        /// <see cref="Lexer.Channel"/>
         /// .
         /// </param>
         public LexerChannelAction(int channel)
@@ -102,7 +102,7 @@ namespace Antlr4.Runtime.Atn
         /// <summary>
         /// <inheritDoc></inheritDoc>
         /// <p>This action is implemented by calling
-        /// <see cref="Antlr4.Runtime.Lexer.Channel(int)">Antlr4.Runtime.Lexer.Channel(int)</see>
+        /// <see cref="Lexer.Channel"/>
         /// with the
         /// value provided by
         /// <see cref="GetChannel()">GetChannel()</see>

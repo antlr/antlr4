@@ -97,7 +97,7 @@ namespace Antlr4.Runtime.Dfa
         /// which is not stored in
         /// <see cref="states">states</see>
         /// . The
-        /// <see cref="DFAState#edges">DFAState#edges</see>
+        /// <see cref="DFAState.edges"/>
         /// array for this start state contains outgoing edges
         /// supplying individual start states corresponding to specific precedence
         /// values.
@@ -199,7 +199,7 @@ namespace Antlr4.Runtime.Dfa
         /// ; otherwise, it is initialized to a new
         /// <see cref="DFAState">DFAState</see>
         /// with an empty outgoing
-        /// <see cref="DFAState#edges">DFAState#edges</see>
+        /// <see cref="DFAState.edges"/>
         /// array to
         /// store the start states for individual precedence values.</li>
         /// <li>The

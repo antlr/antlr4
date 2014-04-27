@@ -137,7 +137,7 @@ namespace Antlr4.Runtime.Atn
             /// The hash code is only a function of the
             /// <see cref="ATNState.stateNumber">ATNState.stateNumber</see>
             /// and
-            /// <see cref="ATNConfig#context">ATNConfig#context</see>
+            /// <see cref="ATNConfig.context"/>
             /// .
             /// </summary>
             public override int GetHashCode(ATNConfig o)
@@ -393,7 +393,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>(s, j, ctx, _)</code>
         /// for
         /// <code>i!=j</code>
-        /// .
+        /// .</p>
         /// <p/>
         /// Reduce these configuration subsets to the set of possible alternatives.
         /// You can compute the alternative subsets in one pass as follows:

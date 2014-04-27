@@ -180,7 +180,7 @@ namespace Antlr4.Runtime.Atn
     /// it adds a new DFA object to that array.
     /// <see cref="AddDFAEdge(Antlr4.Runtime.Dfa.DFAState, int, Antlr4.Runtime.Dfa.DFAState)">AddDFAEdge(Antlr4.Runtime.Dfa.DFAState, int, Antlr4.Runtime.Dfa.DFAState)</see>
     /// locks on the DFA for the current decision when setting the
-    /// <see cref="DFAState#edges">DFAState#edges</see>
+    /// <see cref="DFAState.edges"/>
     /// field.
     /// <see cref="AddDFAState(Antlr4.Runtime.Dfa.DFA, ATNConfigSet, PredictionContextCache)">AddDFAState(Antlr4.Runtime.Dfa.DFA, ATNConfigSet, PredictionContextCache)</see>
     /// locks on
@@ -204,10 +204,10 @@ namespace Antlr4.Runtime.Atn
     /// . Once into the DFA, the DFA simulation does not reference the
     /// <see cref="Antlr4.Runtime.Dfa.DFA.states">Antlr4.Runtime.Dfa.DFA.states</see>
     /// map. It follows the
-    /// <see cref="DFAState#edges">DFAState#edges</see>
+    /// <see cref="DFAState.edges"/>
     /// field to new
     /// targets. The DFA simulator will either find
-    /// <see cref="DFAState#edges">DFAState#edges</see>
+    /// <see cref="DFAState.edges"/>
     /// to be
     /// <code>null</code>
     /// , to be non-
@@ -240,13 +240,13 @@ namespace Antlr4.Runtime.Atn
     /// parser.
     /// <see cref="Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}.Interpreter()">getInterpreter()</see>
     /// .
-    /// <see cref="PredictionMode(PredictionMode)">setPredictionMode</see>
+    /// <see cref="PredictionMode"/>
     /// <code>(</code>
-    /// <see cref="PredictionMode.Sll">PredictionMode.Sll</see>
+    /// <see cref="Atn.PredictionMode.Sll"/>
     /// <code>)</code>
     /// ;
     /// parser.
-    /// <see cref="Antlr4.Runtime.Parser.ErrorHandler(IAntlrErrorStrategy)">setErrorHandler</see>
+    /// <see cref="Parser.ErrorHandler"/>
     /// (new
     /// <see cref="Antlr4.Runtime.BailErrorStrategy">Antlr4.Runtime.BailErrorStrategy</see>
     /// ());
@@ -1444,7 +1444,7 @@ namespace Antlr4.Runtime.Atn
         /// set.
         /// <ol>
         /// <li>Evaluate the precedence predicates for each configuration using
-        /// <see cref="SemanticContext.EvalPrecedence(Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}, Antlr4.Runtime.RuleContext)">SemanticContext.EvalPrecedence(Antlr4.Runtime.Recognizer&lt;Symbol, ATNInterpreter&gt;, Antlr4.Runtime.RuleContext)</see>
+        /// <see cref="SemanticContext.EvalPrecedence{Symbol, ATNInterpreter}(Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}, Antlr4.Runtime.RuleContext)"/>
         /// .</li>
         /// <li>Remove all configurations which predict an alternative greater than
         /// 1, for which another configuration that predicts alternative 1 is in the

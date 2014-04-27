@@ -143,10 +143,10 @@ namespace Antlr4.Runtime.Misc
             }
         }
 
-        /// <summary>Convert array of strings to string&rarr;index map.</summary>
+        /// <summary>Convert array of strings to string&#x2192;index map.</summary>
         /// <remarks>
-        /// Convert array of strings to string&rarr;index map. Useful for
-        /// converting rulenames to name&rarr;ruleindex map.
+        /// Convert array of strings to string&#x2192;index map. Useful for
+        /// converting rulenames to name&#x2192;ruleindex map.
         /// </remarks>
         public static IDictionary<string, int> ToMap(string[] keys)
         {

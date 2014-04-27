@@ -134,7 +134,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <code>label</code>
         /// .
         /// <p>For example, for pattern
-        /// <code><id:ID></code>
+        /// <code>&lt;id:ID&gt;</code>
         /// ,
         /// <code>get("id")</code>
         /// returns the
@@ -146,9 +146,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <code>null</code>
         /// .</p>
         /// <p>Pattern tags like
-        /// <code><ID></code>
+        /// <code>&lt;ID&gt;</code>
         /// and
-        /// <code><expr></code>
+        /// <code>&lt;expr&gt;</code>
         /// without labels are
         /// considered to be labeled with
         /// <code>ID</code>
@@ -194,15 +194,15 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// the result will contain <em>all</em> of the following.</p>
         /// <ul>
         /// <li>Parse tree nodes matching tags of the form
-        /// <code><foo:anyRuleName></code>
+        /// <code>&lt;foo:anyRuleName&gt;</code>
         /// and
-        /// <code><foo:AnyTokenName></code>
+        /// <code>&lt;foo:AnyTokenName&gt;</code>
         /// .</li>
         /// <li>Parse tree nodes matching tags of the form
-        /// <code><anyLabel:foo></code>
+        /// <code>&lt;anyLabel:foo&gt;</code>
         /// .</li>
         /// <li>Parse tree nodes matching tags of the form
-        /// <code><foo></code>
+        /// <code>&lt;foo&gt;</code>
         /// .</li>
         /// </ul>
         /// </remarks>
@@ -227,9 +227,9 @@ namespace Antlr4.Runtime.Tree.Pattern
             return nodes;
         }
 
-        /// <summary>Return a mapping from label &rarr; [list of nodes].</summary>
+        /// <summary>Return a mapping from label &#x2192; [list of nodes].</summary>
         /// <remarks>
-        /// Return a mapping from label &rarr; [list of nodes].
+        /// Return a mapping from label &#x2192; [list of nodes].
         /// <p>The map includes special entries corresponding to the names of rules and
         /// tokens referenced in tags in the original pattern. For additional
         /// information, see the description of

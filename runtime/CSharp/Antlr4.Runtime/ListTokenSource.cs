@@ -42,7 +42,7 @@ namespace Antlr4.Runtime
     /// <see cref="IToken">IToken</see>
     /// objects.
     /// <p>If the final token in the list is an
-    /// <see cref="IToken.Eof">IToken.Eof</see>
+    /// <see cref="TokenConstants.Eof"/>
     /// token, it will be used
     /// as the EOF token for every call to
     /// <see cref="NextToken()">NextToken()</see>
@@ -89,11 +89,7 @@ namespace Antlr4.Runtime
         protected internal IToken eofToken;
 
         /// <summary>
-        /// This is the backing field for
-        /// <see cref="TokenFactory()">TokenFactory()</see>
-        /// and
-        /// <see cref="setTokenFactory">setTokenFactory</see>
-        /// .
+        /// This is the backing field for the <see cref="TokenFactory"/> property.
         /// </summary>
         private ITokenFactory _factory = CommonTokenFactory.Default;
 
