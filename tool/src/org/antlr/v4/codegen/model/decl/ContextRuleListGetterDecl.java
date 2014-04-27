@@ -41,4 +41,11 @@ public class ContextRuleListGetterDecl extends ContextGetterDecl {
 		super(factory, name);
 		this.ctxName = ctxName;
 	}
+
+	@Override
+	public boolean isList() {
+		return true;
+	}
+	
+	
 }

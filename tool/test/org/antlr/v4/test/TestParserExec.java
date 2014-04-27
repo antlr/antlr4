@@ -164,7 +164,7 @@ public class TestParserExec extends BaseTest {
 		"ID : 'a'..'z'+ ;\n" +
 		"WS : (' '|'\\n') -> channel(HIDDEN);\n";
 
-	@Test public void testIfIfElseGreedyBinding() throws Exception {
+	@Test public void testIfIfElseGreedyBinding1() throws Exception {
 		final String input = "if y if y x else x";
 		final String expectedInnerBound = "if y x else x\nif y if y x else x\n";
 
@@ -172,8 +172,14 @@ public class TestParserExec extends BaseTest {
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start", input, false);
 		assertEquals(expectedInnerBound, found);
 
-		grammar = String.format(ifIfElseGrammarFormat, "('else' statement|)");
-		found = execParser("T.g4", grammar, "TParser", "TLexer", "start", input, false);
+	}
+
+	@Test public void testIfIfElseGreedyBinding2() throws Exception {
+		final String input = "if y if y x else x";
+		final String expectedInnerBound = "if y x else x\nif y if y x else x\n";
+
+		String grammar = String.format(ifIfElseGrammarFormat, "('else' statement|)");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start", input, false);
 		assertEquals(expectedInnerBound, found);
 	}
 
@@ -256,7 +262,7 @@ public class TestParserExec extends BaseTest {
 	 * https://github.com/antlr/antlr4/issues/41
 	 */
 	@Test
-	public void testOptional() throws Exception {
+	public void testOptional1() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"stat : ifstat | 'x';\n" +
@@ -267,16 +273,46 @@ public class TestParserExec extends BaseTest {
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "x", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
+	}
+	
+	@Test
+	public void testOptional2() throws Exception {
+		String grammar =
+				"grammar T;\n" +
+				"stat : ifstat | 'x';\n" +
+				"ifstat : 'if' stat ('else' stat)?;\n" +
+				"WS : [ \\n\\t]+ -> skip ;"
+				;
 
-		found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if x else x", false);
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if x else x", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
+	}
+	
+	@Test
+	public void testOptional3() throws Exception {
+		String grammar =
+				"grammar T;\n" +
+				"stat : ifstat | 'x';\n" +
+				"ifstat : 'if' stat ('else' stat)?;\n" +
+				"WS : [ \\n\\t]+ -> skip ;"
+				;
 
-		found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if x", false);
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if x", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
-
-		found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if if x else x", false);
+	}
+	
+	@Test
+	public void testOptional4() throws Exception {
+		String grammar =
+				"grammar T;\n" +
+				"stat : ifstat | 'x';\n" +
+				"ifstat : 'if' stat ('else' stat)?;\n" +
+				"WS : [ \\n\\t]+ -> skip ;"
+				;
+		
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if if x else x", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 	}

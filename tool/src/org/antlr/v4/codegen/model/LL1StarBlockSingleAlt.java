@@ -38,6 +38,7 @@ import org.antlr.v4.tool.ast.GrammarAST;
 import java.util.List;
 
 /** */
+@SuppressWarnings("unused")
 public class LL1StarBlockSingleAlt extends LL1Loop {
 	public LL1StarBlockSingleAlt(OutputModelFactory factory, GrammarAST starRoot, List<CodeBlockForAlt> alts) {
 		super(factory, starRoot, alts);

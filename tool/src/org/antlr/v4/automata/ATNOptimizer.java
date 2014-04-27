@@ -53,6 +53,7 @@ import java.util.List;
  *
  * @author Sam Harwell
  */
+@SuppressWarnings("unused")
 public class ATNOptimizer {
 
 	public static void optimize(@NotNull Grammar g, @NotNull ATN atn) {

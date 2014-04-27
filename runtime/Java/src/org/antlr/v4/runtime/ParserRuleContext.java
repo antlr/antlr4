@@ -29,6 +29,10 @@
  */
 package org.antlr.v4.runtime;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -37,11 +41,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
-import org.antlr.v4.runtime.tree.pattern.RuleTagToken;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /** A rule invocation record for parsing.
  *

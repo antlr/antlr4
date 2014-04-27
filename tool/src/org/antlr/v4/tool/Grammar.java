@@ -565,6 +565,10 @@ public class Grammar implements AttributeResolver {
 	 *  char vocabulary, compute an ANTLR-valid (possibly escaped) char literal.
 	 */
 	public String getTokenDisplayName(int ttype) {
+		return getTokenDisplayName(ttype, true);
+	}
+	
+	public String getTokenDisplayName(int ttype, boolean asLiteral) {
 		String tokenName;
 		// inside any target's char range and is lexer grammar?
 		if ( isLexer() &&
@@ -578,7 +582,7 @@ public class Grammar implements AttributeResolver {
 		else {
 			if ( ttype>0 && ttype<typeToTokenList.size() ) {
 				tokenName = typeToTokenList.get(ttype);
-				if ( tokenName!=null &&
+				if ( tokenName!=null && asLiteral &&
 					 tokenName.startsWith(AUTO_GENERATED_TOKEN_NAME_PREFIX) &&
 					 ttype < typeToStringLiteralList.size() &&
 				     typeToStringLiteralList.get(ttype)!=null)

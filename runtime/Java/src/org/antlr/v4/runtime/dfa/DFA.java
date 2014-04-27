@@ -100,7 +100,6 @@ public class DFA {
 	 * @throws IllegalStateException if this is not a precedence DFA.
 	 * @see #isPrecedenceDfa()
 	 */
-	@SuppressWarnings("null")
 	public final DFAState getPrecedenceStartState(int precedence) {
 		if (!isPrecedenceDfa()) {
 			throw new IllegalStateException("Only precedence DFAs may contain a precedence start state.");
@@ -124,7 +123,6 @@ public class DFA {
 	 * @throws IllegalStateException if this is not a precedence DFA.
 	 * @see #isPrecedenceDfa()
 	 */
-	@SuppressWarnings({"SynchronizeOnNonFinalField", "null"})
 	public final void setPrecedenceStartState(int precedence, DFAState startState) {
 		if (!isPrecedenceDfa()) {
 			throw new IllegalStateException("Only precedence DFAs may contain a precedence start state.");

@@ -36,7 +36,9 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /** test runtime parse errors */
+@SuppressWarnings("unused")
 public class TestParseErrors extends BaseTest {
+	
 	@Test public void testTokenMismatch() throws Exception {
 		String grammar =
 			"grammar T;\n" +

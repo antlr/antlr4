@@ -40,6 +40,7 @@ import org.antlr.v4.runtime.misc.Nullable;
  * {@code <ID>}. These tokens are created for {@link TagChunk} chunks where the
  * tag corresponds to a lexer rule or token type.
  */
+@SuppressWarnings("serial")
 public class TokenTagToken extends CommonToken {
 	/**
 	 * This is the backing field for {@link #getTokenName}.

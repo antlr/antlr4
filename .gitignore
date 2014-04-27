@@ -28,3 +28,5 @@ nbactions*.xml
 
 # Playground
 #/tool/playground/
+/.DS_Store
+/.pydevproject

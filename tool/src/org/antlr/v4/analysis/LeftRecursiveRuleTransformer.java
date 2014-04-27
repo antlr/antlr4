@@ -30,8 +30,11 @@
 
 package org.antlr.v4.analysis;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
@@ -59,10 +62,6 @@ import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.GrammarASTWithOptions;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.antlr.v4.tool.ast.RuleAST;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /** Remove left-recursive rule refs, add precedence args to recursive rule refs.
  *  Rewrite rule so we can create ATN.

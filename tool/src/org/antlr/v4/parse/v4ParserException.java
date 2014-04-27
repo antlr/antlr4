@@ -34,6 +34,7 @@ import org.antlr.runtime.IntStream;
 import org.antlr.runtime.RecognitionException;
 
 /** */
+@SuppressWarnings("serial")
 public class v4ParserException extends RecognitionException {
 	public String msg;
 	/** Used for remote debugger deserialization */

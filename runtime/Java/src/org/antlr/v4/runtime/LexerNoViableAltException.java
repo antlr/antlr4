@@ -38,6 +38,7 @@ import org.antlr.v4.runtime.misc.Utils;
 
 import java.util.Locale;
 
+@SuppressWarnings("serial")
 public class LexerNoViableAltException extends RecognitionException {
 	/** Matching attempted at what input index? */
 	private final int startIndex;

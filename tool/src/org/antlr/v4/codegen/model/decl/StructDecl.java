@@ -80,8 +80,10 @@ public class StructDecl extends Decl {
 
 	public void addDecl(Decl d) {
 		d.ctx = this;
-		if ( d instanceof ContextGetterDecl ) getters.add(d);
-		else attrs.add(d);
+		if ( d instanceof ContextGetterDecl ) 
+			getters.add(d);
+		else if (factory.getGenerator().getTarget().wantsDeclaration(d))
+			attrs.add(d);
 	}
 
 	public void addDecl(Attribute a) {
@@ -89,7 +91,8 @@ public class StructDecl extends Decl {
 	}
 
 	public void addDecls(Collection<Attribute> attrList) {
-		for (Attribute a : attrList) addDecl(a);
+		for (Attribute a : attrList) 
+			addDecl(a);
 	}
 
 	public void implementInterface(OutputModelObject value) {

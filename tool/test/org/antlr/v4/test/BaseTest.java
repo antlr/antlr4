@@ -122,7 +122,7 @@ public abstract class BaseTest {
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
-	public static final boolean TEST_IN_SAME_PROCESS = Boolean.parseBoolean(System.getProperty("antlr.testinprocess"));
+	public static final boolean TEST_IN_SAME_PROCESS = true; // Boolean.parseBoolean(System.getProperty("antlr.testinprocess"));
 
     /**
      * Build up the full classpath we need, including the surefire path (if present)
@@ -151,8 +151,8 @@ public abstract class BaseTest {
 	public void setUp() throws Exception {
         // new output dir for each test
         tmpdir = new File(System.getProperty("java.io.tmpdir"),
-						  getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
-//		tmpdir = "/tmp";
+						  getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath(); 
+		// tmpdir = new File("/tmp").getAbsolutePath();
     }
 
     protected org.antlr.v4.Tool newTool(String[] args) {
@@ -536,10 +536,14 @@ public abstract class BaseTest {
 	}
 
 	public Class<?> loadClassFromTempDir(String name) throws Exception {
-		ClassLoader loader =
+		URLClassLoader loader =
 			new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() },
 							   ClassLoader.getSystemClassLoader());
-		return loader.loadClass(name);
+		try {
+			return loader.loadClass(name);
+		} finally {
+			loader.close();
+		}
 	}
 
 	public Class<? extends Lexer> loadLexerClassFromTempDir(String name) throws Exception {
@@ -639,44 +643,48 @@ public abstract class BaseTest {
 	public String execClass(String className) {
 		if (TEST_IN_SAME_PROCESS) {
 			try {
-				ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
-                final Class<?> mainClass = (Class<?>)loader.loadClass(className);
-				final Method mainMethod = mainClass.getDeclaredMethod("main", String[].class);
-				PipedInputStream stdoutIn = new PipedInputStream();
-				PipedInputStream stderrIn = new PipedInputStream();
-				PipedOutputStream stdoutOut = new PipedOutputStream(stdoutIn);
-				PipedOutputStream stderrOut = new PipedOutputStream(stderrIn);
-				StreamVacuum stdoutVacuum = new StreamVacuum(stdoutIn);
-				StreamVacuum stderrVacuum = new StreamVacuum(stderrIn);
-
-				PrintStream originalOut = System.out;
-				System.setOut(new PrintStream(stdoutOut));
-				try {
-					PrintStream originalErr = System.err;
+				URLClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
+                try {
+                	final Class<?> mainClass = (Class<?>)loader.loadClass(className);
+					final Method mainMethod = mainClass.getDeclaredMethod("main", String[].class);
+					PipedInputStream stdoutIn = new PipedInputStream();
+					PipedInputStream stderrIn = new PipedInputStream();
+					PipedOutputStream stdoutOut = new PipedOutputStream(stdoutIn);
+					PipedOutputStream stderrOut = new PipedOutputStream(stderrIn);
+					StreamVacuum stdoutVacuum = new StreamVacuum(stdoutIn);
+					StreamVacuum stderrVacuum = new StreamVacuum(stderrIn);
+	
+					PrintStream originalOut = System.out;
+					System.setOut(new PrintStream(stdoutOut));
 					try {
-						System.setErr(new PrintStream(stderrOut));
-						stdoutVacuum.start();
-						stderrVacuum.start();
-						mainMethod.invoke(null, (Object)new String[] { new File(tmpdir, "input").getAbsolutePath() });
+						PrintStream originalErr = System.err;
+						try {
+							System.setErr(new PrintStream(stderrOut));
+							stdoutVacuum.start();
+							stderrVacuum.start();
+							mainMethod.invoke(null, (Object)new String[] { new File(tmpdir, "input").getAbsolutePath() });
+						}
+						finally {
+							System.setErr(originalErr);
+						}
 					}
 					finally {
-						System.setErr(originalErr);
+						System.setOut(originalOut);
 					}
-				}
-				finally {
-					System.setOut(originalOut);
-				}
-
-				stdoutOut.close();
-				stderrOut.close();
-				stdoutVacuum.join();
-				stderrVacuum.join();
-				String output = stdoutVacuum.toString();
-				if ( stderrVacuum.toString().length()>0 ) {
-					this.stderrDuringParse = stderrVacuum.toString();
-					System.err.println("exec stderrVacuum: "+ stderrVacuum);
-				}
-				return output;
+	
+					stdoutOut.close();
+					stderrOut.close();
+					stdoutVacuum.join();
+					stderrVacuum.join();
+					String output = stdoutVacuum.toString();
+					if ( stderrVacuum.toString().length()>0 ) {
+						this.stderrDuringParse = stderrVacuum.toString();
+						System.err.println("exec stderrVacuum: "+ stderrVacuum);
+					}
+					return output;
+                } finally {
+                	loader.close();
+                }
 			} catch (MalformedURLException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
 				throw new RuntimeException(ex);

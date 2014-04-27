@@ -30,6 +30,19 @@
 
 package org.antlr.v4.codegen.model;
 
+import static org.antlr.v4.parse.ANTLRParser.RULE_REF;
+import static org.antlr.v4.parse.ANTLRParser.TOKEN_REF;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.TreeNodeStream;
@@ -59,19 +72,6 @@ import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.TerminalAST;
-
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.antlr.v4.parse.ANTLRParser.RULE_REF;
-import static org.antlr.v4.parse.ANTLRParser.TOKEN_REF;
 
 /** */
 public class RuleFunction extends OutputModelObject {
@@ -113,8 +113,8 @@ public class RuleFunction extends OutputModelObject {
 		addContextGetters(factory, r);
 
 		if ( r.args!=null ) {
-			ruleCtx.addDecls(r.args.attributes.values());
 			args = r.args.attributes.values();
+			ruleCtx.addDecls(args);
 			ruleCtx.ctorAttrs = args;
 		}
 		if ( r.retvals!=null ) {
@@ -240,8 +240,9 @@ public class RuleFunction extends OutputModelObject {
 			Rule rref = factory.getGrammar().getRule(t.getText());
 			String ctxName = factory.getGenerator().getTarget()
 							 .getRuleFunctionContextStructName(rref);
-			if ( needList ) {
-				decls.add( new ContextRuleListGetterDecl(factory, refLabelName, ctxName) );
+			if ( needList) {
+				if(factory.getGenerator().getTarget().supportsOverloadedMethods())
+					decls.add( new ContextRuleListGetterDecl(factory, refLabelName, ctxName) );
 				decls.add( new ContextRuleListIndexedGetterDecl(factory, refLabelName, ctxName) );
 			}
 			else {
@@ -250,7 +251,8 @@ public class RuleFunction extends OutputModelObject {
 		}
 		else {
 			if ( needList ) {
-				decls.add( new ContextTokenListGetterDecl(factory, refLabelName) );
+				if(factory.getGenerator().getTarget().supportsOverloadedMethods())
+					decls.add( new ContextTokenListGetterDecl(factory, refLabelName) );
 				decls.add( new ContextTokenListIndexedGetterDecl(factory, refLabelName) );
 			}
 			else {

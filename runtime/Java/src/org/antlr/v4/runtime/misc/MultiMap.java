@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+@SuppressWarnings("serial")
 public class MultiMap<K, V> extends LinkedHashMap<K, List<V>> {
 	public void map(K key, V value) {
 		List<V> elementsForKey = get(key);

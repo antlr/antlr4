@@ -40,6 +40,7 @@ import java.util.List;
  *  I need the replace/set-element-i functionality so I'm subclassing
  *  LinkedHashSet.
  */
+@SuppressWarnings("serial")
 public class OrderedHashSet<T> extends LinkedHashSet<T> {
     /** Track the elements as they are added to the set */
     protected ArrayList<T> elements = new ArrayList<T>();

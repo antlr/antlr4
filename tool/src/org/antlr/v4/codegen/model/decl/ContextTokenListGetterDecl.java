@@ -36,7 +36,14 @@ import org.antlr.v4.codegen.OutputModelFactory;
  *  public Token X(int i) { }}
  */
 public class ContextTokenListGetterDecl extends ContextGetterDecl {
+
 	public ContextTokenListGetterDecl(OutputModelFactory factory, String name) {
 		super(factory, name);
 	}
+	
+	@Override
+	public boolean isList() {
+		return true;
+	}
+
 }

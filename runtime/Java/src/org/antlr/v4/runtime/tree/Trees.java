@@ -111,7 +111,6 @@ public class Trees {
 		if ( t.getChildCount()==0 ) return s;
 		StringBuilder buf = new StringBuilder();
 		buf.append("(");
-		s = Utils.escapeWhitespace(getNodeText(t, ruleNames), false);
 		buf.append(s);
 		buf.append(' ');
 		for (int i = 0; i<t.getChildCount(); i++) {

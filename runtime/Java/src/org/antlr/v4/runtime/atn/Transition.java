@@ -52,6 +52,7 @@ import java.util.Map;
  *  the states. We'll use the term Edge for the DFA to distinguish them from
  *  ATN transitions.</p>
  */
+@SuppressWarnings("serial")
 public abstract class Transition {
 	// constants for serialization
 	public static final int EPSILON			= 1;

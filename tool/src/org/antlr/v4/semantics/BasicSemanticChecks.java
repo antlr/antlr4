@@ -79,11 +79,13 @@ import java.util.List;
  * REPEATED_PREQUEL
  * TOKEN_NAMES_MUST_START_UPPER
  */
+@SuppressWarnings("unused")
 public class BasicSemanticChecks extends GrammarTreeVisitor {
 	/** Set of valid imports.  Maps delegate to set of delegator grammar types.
 	 *  validDelegations.get(LEXER) gives list of the kinds of delegators
 	 *  that can import lexers.
 	 */
+	@SuppressWarnings("serial")
 	public static MultiMap<Integer,Integer> validImportTypes =
 		new MultiMap<Integer,Integer>() {
 			{

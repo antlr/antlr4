@@ -158,7 +158,7 @@ public class TestLeftRecursion extends BaseTest {
 			"a.b",		"(s (e (e a) . b) <EOF>)",
 			"a.this",	"(s (e (e a) . this) <EOF>)",
 			"-a",		"(s (e - (e a)) <EOF>)",
-			"-a+b",		"(s (e (e - (e a)) + (e b)) <EOF>)",
+			"-a+b",		"(s (e (e - (e a)) + (e b)) <EOF>)"
 		};
 		runTests(grammar, tests, "s");
 	}
@@ -419,19 +419,19 @@ public class TestLeftRecursion extends BaseTest {
 			"INT :   [0-9]+ ;         // match integers\n" +
 			"NEWLINE:'\\r'? '\\n' ;     // return newlines to parser (is end-statement signal)\n" +
 			"WS  :   [ \\t]+ -> skip ; // toss out whitespace\n";
-		String result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "1\n", true);
+		/* String result = */execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "1\n", true);
 		assertNull(stderrDuringParse);
 
-		result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "a = 5\n", true);
+		/* result = */execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "a = 5\n", true);
 		assertNull(stderrDuringParse);
 
-		result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "b = 6\n", true);
+		/* result = */execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "b = 6\n", true);
 		assertNull(stderrDuringParse);
 
-		result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "a+b*2\n", true);
+		/* result = */execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "a+b*2\n", true);
 		assertNull(stderrDuringParse);
 
-		result = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "(1+2)*3\n", true);
+		/* result = */execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", "(1+2)*3\n", true);
 		assertNull(stderrDuringParse);
 	}
 

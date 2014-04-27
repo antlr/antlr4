@@ -33,6 +33,7 @@ package org.antlr.v4.misc;
 import java.util.HashMap;
 
 /** Count how many of each key we have; not thread safe */
+@SuppressWarnings("serial")
 public class FrequencySet<T> extends HashMap<T, MutableInt> {
 	public int count(T key) {
 		MutableInt value = get(key);

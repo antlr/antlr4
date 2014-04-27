@@ -38,6 +38,7 @@ import org.antlr.v4.runtime.misc.Nullable;
  *  of the offending input and also knows where the parser was
  *  in the various paths when the error. Reported by reportNoViableAlternative()
  */
+@SuppressWarnings("serial")
 public class NoViableAltException extends RecognitionException {
 	/** Which configurations did we try at input.index() that couldn't match input.LT(1)? */
 	@Nullable

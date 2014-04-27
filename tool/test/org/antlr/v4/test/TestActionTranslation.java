@@ -33,6 +33,7 @@ package org.antlr.v4.test;
 import org.junit.Test;
 
 /** */
+@SuppressWarnings("unused")
 public class TestActionTranslation extends BaseTest {
 	String attributeTemplate =
 		"attributeTemplate(members,init,inline,finally,inline2) ::= <<\n" +
@@ -187,7 +188,7 @@ public class TestActionTranslation extends BaseTest {
     @Test public void testFullyQualifiedRefToCurrentRuleParameter() throws Exception {
         String action = "$a.i;";
     }
-    @Test public void testFullyQualifiedRefToCurrentRuleRetVal() throws Exception {
+	@Test public void testFullyQualifiedRefToCurrentRuleRetVal() throws Exception {
         String action = "$a.i;";
     }
     @Test public void testSetFullyQualifiedRefToCurrentRuleRetVal() throws Exception {

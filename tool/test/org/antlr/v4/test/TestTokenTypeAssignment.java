@@ -30,17 +30,18 @@
 
 package org.antlr.v4.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import static org.junit.Assert.*;
 
 public class TestTokenTypeAssignment extends BaseTest {
 

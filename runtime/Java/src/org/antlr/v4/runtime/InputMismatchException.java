@@ -34,6 +34,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 /** This signifies any kind of mismatched input exceptions such as
  *  when the current input does not match the expected token.
  */
+@SuppressWarnings("serial")
 public class InputMismatchException extends RecognitionException {
 	public InputMismatchException(@NotNull Parser recognizer) {
 		super(recognizer, recognizer.getInputStream(), recognizer._ctx);

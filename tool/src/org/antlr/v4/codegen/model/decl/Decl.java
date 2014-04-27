@@ -64,4 +64,8 @@ public class Decl extends SrcOp {
 		if ( obj instanceof ContextGetterDecl ) return false;
 		return name.equals(((Decl) obj).name);
 	}
+	
+	public boolean isList() {
+		return false;
+	}
 }

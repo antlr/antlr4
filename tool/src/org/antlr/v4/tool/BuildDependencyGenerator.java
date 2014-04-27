@@ -29,17 +29,16 @@
  */
 package org.antlr.v4.tool;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /** Given a grammar file, show the dependencies on .tokens etc...
  *  Using ST, emit a simple "make compatible" list of dependencies.

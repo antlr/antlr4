@@ -243,6 +243,8 @@ public class ErrorManager {
 				errors++;
 				tool.error(msg);
 				break;
+			default:
+				// avoid warning
 		}
 		errorTypes.add(etype);
 	}

@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.misc.Pair;
 
 import java.io.Serializable;
 
+@SuppressWarnings("serial")
 public class CommonToken implements WritableToken, Serializable {
 	/**
 	 * An empty {@link Pair} which is used as the default value of

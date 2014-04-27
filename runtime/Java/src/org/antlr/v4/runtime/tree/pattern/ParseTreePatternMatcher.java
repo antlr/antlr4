@@ -110,6 +110,7 @@ import java.util.List;
  * {@link #setDelimiters}. You must escape both start and stop strings
  * {@code \<} and {@code \>}.</p>
  */
+@SuppressWarnings("serial")
 public class ParseTreePatternMatcher {
 	public static class CannotInvokeStartRule extends RuntimeException {
 		public CannotInvokeStartRule(Throwable e) {
@@ -332,7 +333,6 @@ public class ParseTreePatternMatcher {
 			// (expr ...) and <expr>
 			RuleTagToken ruleTagToken = getRuleTagToken(r2);
 			if ( ruleTagToken!=null ) {
-				ParseTreeMatch m = null;
 				if ( r1.getRuleContext().getRuleIndex() == r2.getRuleContext().getRuleIndex() ) {
 					// track label->list-of-nodes for both rule name and label (if any)
 					labels.map(ruleTagToken.getRuleName(), tree);
@@ -439,7 +439,6 @@ public class ParseTreePatternMatcher {
 		int p = 0;
 		int n = pattern.length();
 		List<Chunk> chunks = new ArrayList<Chunk>();
-		StringBuilder buf = new StringBuilder();
 		// find all start and stop indexes first, then collect
 		List<Integer> starts = new ArrayList<Integer>();
 		List<Integer> stops = new ArrayList<Integer>();

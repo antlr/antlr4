@@ -39,6 +39,7 @@ import org.antlr.v4.runtime.misc.Nullable;
  *  in the input, where it is in the ATN, the rule invocation stack,
  *  and what kind of problem occurred.
  */
+@SuppressWarnings("serial")
 public class RecognitionException extends RuntimeException {
 	/** The {@link Recognizer} where this exception originated. */
 	@Nullable

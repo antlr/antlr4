@@ -42,7 +42,7 @@ import org.antlr.v4.runtime.WritableToken;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-
+@SuppressWarnings("serial")
 public class TestCommonTokenStream extends TestBufferedTokenStream {
 
 	@Override
@@ -118,12 +118,15 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
         assertEquals("=", tokens.LT(-3).getText());
         assertEquals("x", tokens.LT(-4).getText());
     }
+	
+	
 
 	@Test public void testFetchOffChannel() throws Exception {
 		TokenSource lexer = // simulate input " x =34  ; \n"
 		                    // token indexes   01234 56789
 			new TokenSource() {
 				int i = 0;
+				
 				WritableToken[] tokens = {
 				new CommonToken(1," ") {{channel = Lexer.HIDDEN;}}, // 0
 				new CommonToken(1,"x"),								// 1

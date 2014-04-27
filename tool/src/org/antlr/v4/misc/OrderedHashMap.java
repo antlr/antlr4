@@ -38,6 +38,7 @@ import java.util.Map;
 /** I need the get-element-i functionality so I'm subclassing
  *  LinkedHashMap.
  */
+@SuppressWarnings("serial")
 public class OrderedHashMap<K,V> extends LinkedHashMap<K,V> {
 	/** Track the elements as they are added to the set */
 	protected List<K> elements = new ArrayList<K>();

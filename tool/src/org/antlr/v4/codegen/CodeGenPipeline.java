@@ -74,11 +74,13 @@ public class CodeGenPipeline {
 			writeRecognizer(parser, gen);
 			if ( g.tool.gen_listener ) {
 				gen.writeListener(gen.generateListener());
-				gen.writeBaseListener(gen.generateBaseListener());
+				if (gen.getTarget().wantsBaseListener())
+					gen.writeBaseListener(gen.generateBaseListener());
 			}
 			if ( g.tool.gen_visitor ) {
 				gen.writeVisitor(gen.generateVisitor());
-				gen.writeBaseVisitor(gen.generateBaseVisitor());
+				if (gen.getTarget().wantsBaseVisitor())
+					gen.writeBaseVisitor(gen.generateBaseVisitor());
 			}
 			gen.writeHeaderFile();
 		}

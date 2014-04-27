@@ -42,6 +42,7 @@ import java.util.Locale;
  *  Disambiguating predicate evaluation occurs when we test a predicate during
  *  prediction.
  */
+@SuppressWarnings("serial")
 public class FailedPredicateException extends RecognitionException {
 	private final int ruleIndex;
 	private final int predicateIndex;

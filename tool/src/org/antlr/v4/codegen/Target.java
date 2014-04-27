@@ -32,6 +32,7 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.SerializedATN;
+import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
@@ -123,7 +124,7 @@ public abstract class Target {
 	 *  to a token type in the generated code.
 	 */
 	public String getTokenTypeAsTargetLabel(Grammar g, int ttype) {
-		String name = g.getTokenDisplayName(ttype);
+		String name = g.getTokenDisplayName(ttype, false);
 		// If name is a literal, return the token type instead
 		if ( name==null || name.charAt(0)=='\'' ) {
 			return String.valueOf(ttype);
@@ -360,5 +361,21 @@ public abstract class Target {
 		});
 
 		return result;
+	}
+
+	public boolean wantsBaseListener() {
+		return true;
+	}
+
+	public boolean wantsBaseVisitor() {
+		return true;
+	}
+
+	public boolean wantsDeclaration(Decl d) {
+		return true;
+	}
+
+	public boolean supportsOverloadedMethods() {
+		return true;
 	}
 }

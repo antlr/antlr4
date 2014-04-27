@@ -216,9 +216,12 @@ public class LexerATNSimulator extends ATNSimulator {
 			// This optimization makes a lot of sense for loops within DFA.
 			// A character will take us back to an existing DFA state
 			// that already has lots of edges out of it. e.g., .* in comments.
+			// System.out.println("Target for:" + s + " and:" + t);
 			DFAState target = getExistingTargetState(s, t);
+			// System.out.println("Existing:" + target);
 			if (target == null) {
 				target = computeTargetState(input, s, t);
+				// System.out.println("Computed:" + target);
 			}
 
 			if (target == ERROR) {
@@ -254,6 +257,7 @@ public class LexerATNSimulator extends ATNSimulator {
 	 * {@code t}, or {@code null} if the target state for this edge is not
 	 * already cached
 	 */
+	@SuppressWarnings("unused")
 	@Nullable
 	protected DFAState getExistingTargetState(@NotNull DFAState s, int t) {
 		if (s.edges == null || t < MIN_DFA_EDGE || t > MAX_DFA_EDGE) {

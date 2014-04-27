@@ -33,9 +33,6 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 
-import java.util.Collection;
-import java.util.List;
-
 /** The basic notion of a tree has a parent, a payload, and a list of children.
  *  It is the most abstract interface for all the trees used by ANTLR.
  */

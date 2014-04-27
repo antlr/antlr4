@@ -33,6 +33,7 @@ package org.antlr.v4.parse;
 import org.antlr.runtime.Token;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
+@SuppressWarnings("serial")
 public class v3TreeGrammarException extends ParseCancellationException {
 	public Token location;
 

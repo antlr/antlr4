@@ -377,6 +377,7 @@ public class ATNSerializer {
 		return data;
 	}
 
+	@SuppressWarnings("unused")
 	public String decode(char[] data) {
 		data = data.clone();
 		// don't adjust the first value since that's the version number

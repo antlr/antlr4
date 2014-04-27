@@ -34,7 +34,14 @@ import org.antlr.v4.codegen.OutputModelFactory;
 
 /** */
 public class TokenListDecl extends TokenDecl {
+
 	public TokenListDecl(OutputModelFactory factory, String varName) {
 		super(factory, varName);
 	}
+	
+	@Override
+	public boolean isList() {
+		return true;
+	}
+
 }

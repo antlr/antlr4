@@ -30,6 +30,7 @@
 
 package org.antlr.v4.misc;
 
+@SuppressWarnings("serial")
 public class MutableInt extends Number implements Comparable<Number> {
 	public int v;
 

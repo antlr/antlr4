@@ -37,6 +37,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+@SuppressWarnings("unused")
 public class TestCompositeGrammars extends BaseTest {
 	protected boolean debug = false;
 

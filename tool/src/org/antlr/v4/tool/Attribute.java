@@ -31,11 +31,12 @@
 package org.antlr.v4.tool;
 
 import org.antlr.runtime.Token;
+import org.antlr.v4.codegen.model.OutputModelObject;
 
 /** Track the names of attributes define in arg lists, return values,
  *  scope blocks etc...
  */
-public class Attribute {
+public class Attribute extends OutputModelObject {
     /** The entire declaration such as "String foo;" */
     public String decl;
 

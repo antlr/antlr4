@@ -285,6 +285,7 @@ import java.util.Set;
  * both SLL and LL parsing. Erroneous input will therefore require 2 passes over
  * the input.</p>
  */
+@SuppressWarnings("unused")
 public class ParserATNSimulator extends ATNSimulator {
 	public static final boolean debug = false;
 	public static final boolean debug_list_atn_decisions = false;
@@ -1269,7 +1270,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				succeeded.add(c);
 			}
 		}
-		return new Pair(succeeded,failed);
+		return new Pair<ATNConfigSet,ATNConfigSet>(succeeded,failed);
 	}
 
 	/** Look through a list of predicate/alt pairs, returning alts for the
@@ -1839,8 +1840,9 @@ public class ParserATNSimulator extends ATNSimulator {
             System.out.println("reportContextSensitivity decision="+dfa.decision+":"+configs+
                                ", input="+parser.getTokenStream().getText(interval));
         }
-        if ( parser!=null ) parser.getErrorListenerDispatch().reportContextSensitivity(parser, dfa, startIndex, stopIndex, prediction, configs);
-    }
+        if ( parser!=null ) 
+        	parser.getErrorListenerDispatch().reportContextSensitivity(parser, dfa, startIndex, stopIndex, prediction, configs);
+																															}
 
     /** If context sensitive parsing, we know it's ambiguity not conflict */
     protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex,

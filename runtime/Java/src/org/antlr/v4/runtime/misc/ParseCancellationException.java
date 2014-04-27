@@ -43,6 +43,7 @@ import java.util.concurrent.CancellationException;
  *
  * @author Sam Harwell
  */
+@SuppressWarnings("serial")
 public class ParseCancellationException extends CancellationException {
 
 	public ParseCancellationException() {

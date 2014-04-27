@@ -33,7 +33,14 @@ package org.antlr.v4.codegen.model.decl;
 import org.antlr.v4.codegen.OutputModelFactory;
 
 public class ElementListDecl extends Decl {
+
 	public ElementListDecl(OutputModelFactory factory, String name) {
 		super(factory, name);
 	}
+	
+	@Override
+	public boolean isList() {
+		return true;
+	}
+
 }

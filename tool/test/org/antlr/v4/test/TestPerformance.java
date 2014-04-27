@@ -109,6 +109,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+@SuppressWarnings("unused")
 public class TestPerformance extends BaseTest {
     /**
      * Parse all java files under this package within the JDK_SOURCE_ROOT
@@ -411,7 +412,7 @@ public class TestPerformance extends BaseTest {
     private final AtomicIntegerArray tokenCount = new AtomicIntegerArray(PASSES);
 
     @Test
-    //@org.junit.Ignore
+    @org.junit.Ignore
     public void compileJdk() throws IOException, InterruptedException, ExecutionException {
         String jdkSourceRoot = getSourceRoot("JDK");
 		assertTrue("The JDK_SOURCE_ROOT environment variable must be set for performance testing.", jdkSourceRoot != null && !jdkSourceRoot.isEmpty());
@@ -792,8 +793,7 @@ public class TestPerformance extends BaseTest {
 
     int configOutputSize = 0;
 
-    @SuppressWarnings("unused")
-	protected void parseSources(final int currentPass, final ParserFactory factory, Collection<InputDescriptor> sources, boolean shuffleSources) throws InterruptedException {
+ 	protected void parseSources(final int currentPass, final ParserFactory factory, Collection<InputDescriptor> sources, boolean shuffleSources) throws InterruptedException {
 		if (shuffleSources) {
 			List<InputDescriptor> sourcesList = new ArrayList<InputDescriptor>(sources);
 			synchronized (RANDOM) {
@@ -1184,165 +1184,85 @@ public class TestPerformance extends BaseTest {
 
     protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, final String entryPoint) {
         try {
-            ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
-            final Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
-            final Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
-            final Class<? extends ParseTreeListener> listenerClass = loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
-
-            final Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
-            final Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
-
-            // construct initial instances of the lexer and parser to deserialize their ATNs
-            TokenSource tokenSource = lexerCtor.newInstance(new ANTLRInputStream(""));
-            parserCtor.newInstance(new CommonTokenStream(tokenSource));
-
-            return new ParserFactory() {
-				@Override
-                public FileParseResult parseFile(CharStream input, int currentPass, int thread) {
-					final Checksum checksum = new CRC32();
-
-					final long startTime = System.nanoTime();
-					assert thread >= 0 && thread < NUMBER_OF_THREADS;
-
-                    try {
-						ParseTreeListener listener = sharedListeners[thread];
-						if (listener == null) {
-							listener = listenerClass.newInstance();
-							sharedListeners[thread] = listener;
-						}
-
-						Lexer lexer = sharedLexers[thread];
-                        if (REUSE_LEXER && lexer != null) {
-                            lexer.setInputStream(input);
-                        } else {
-							Lexer previousLexer = lexer;
-                            lexer = lexerCtor.newInstance(input);
-							DFA[] decisionToDFA = (FILE_GRANULARITY || previousLexer == null ? lexer : previousLexer).getInterpreter().decisionToDFA;
-							if (!REUSE_LEXER_DFA || (!FILE_GRANULARITY && previousLexer == null)) {
-								decisionToDFA = new DFA[decisionToDFA.length];
+        	URLClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
+            try {
+            	final Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
+	            final Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
+	            final Class<? extends ParseTreeListener> listenerClass = loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
+	
+	            final Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
+	            final Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
+	
+	            // construct initial instances of the lexer and parser to deserialize their ATNs
+	            TokenSource tokenSource = lexerCtor.newInstance(new ANTLRInputStream(""));
+	            parserCtor.newInstance(new CommonTokenStream(tokenSource));
+	
+	            return new ParserFactory() {
+					@Override
+	                public FileParseResult parseFile(CharStream input, int currentPass, int thread) {
+						final Checksum checksum = new CRC32();
+	
+						final long startTime = System.nanoTime();
+						assert thread >= 0 && thread < NUMBER_OF_THREADS;
+	
+	                    try {
+							ParseTreeListener listener = sharedListeners[thread];
+							if (listener == null) {
+								listener = listenerClass.newInstance();
+								sharedListeners[thread] = listener;
 							}
-
-							if (COMPUTE_TRANSITION_STATS) {
-								lexer.setInterpreter(new StatisticsLexerATNSimulator(lexer, lexer.getATN(), decisionToDFA, lexer.getInterpreter().getSharedContextCache()));
-							} else if (!REUSE_LEXER_DFA) {
-								lexer.setInterpreter(new LexerATNSimulator(lexer, lexer.getATN(), decisionToDFA, lexer.getInterpreter().getSharedContextCache()));
+	
+							Lexer lexer = sharedLexers[thread];
+	                        if (REUSE_LEXER && lexer != null) {
+	                            lexer.setInputStream(input);
+	                        } else {
+								Lexer previousLexer = lexer;
+	                            lexer = lexerCtor.newInstance(input);
+								DFA[] decisionToDFA = (FILE_GRANULARITY || previousLexer == null ? lexer : previousLexer).getInterpreter().decisionToDFA;
+								if (!REUSE_LEXER_DFA || (!FILE_GRANULARITY && previousLexer == null)) {
+									decisionToDFA = new DFA[decisionToDFA.length];
+								}
+	
+								if (COMPUTE_TRANSITION_STATS) {
+									lexer.setInterpreter(new StatisticsLexerATNSimulator(lexer, lexer.getATN(), decisionToDFA, lexer.getInterpreter().getSharedContextCache()));
+								} else if (!REUSE_LEXER_DFA) {
+									lexer.setInterpreter(new LexerATNSimulator(lexer, lexer.getATN(), decisionToDFA, lexer.getInterpreter().getSharedContextCache()));
+								}
+	
+								sharedLexers[thread] = lexer;
+	                        }
+	
+							lexer.removeErrorListeners();
+							lexer.addErrorListener(DescriptiveErrorListener.INSTANCE);
+	
+							if (lexer.getInterpreter().decisionToDFA[0] == null) {
+								ATN atn = lexer.getATN();
+								for (int i = 0; i < lexer.getInterpreter().decisionToDFA.length; i++) {
+									lexer.getInterpreter().decisionToDFA[i] = new DFA(atn.getDecisionState(i), i);
+								}
 							}
-
-							sharedLexers[thread] = lexer;
-                        }
-
-						lexer.removeErrorListeners();
-						lexer.addErrorListener(DescriptiveErrorListener.INSTANCE);
-
-						if (lexer.getInterpreter().decisionToDFA[0] == null) {
-							ATN atn = lexer.getATN();
-							for (int i = 0; i < lexer.getInterpreter().decisionToDFA.length; i++) {
-								lexer.getInterpreter().decisionToDFA[i] = new DFA(atn.getDecisionState(i), i);
+	
+	                        CommonTokenStream tokens = new CommonTokenStream(lexer);
+	                        tokens.fill();
+	                        tokenCount.addAndGet(currentPass, tokens.size());
+	
+							if (COMPUTE_CHECKSUM) {
+								for (Token token : tokens.getTokens()) {
+									updateChecksum(checksum, token);
+								}
 							}
-						}
-
-                        CommonTokenStream tokens = new CommonTokenStream(lexer);
-                        tokens.fill();
-                        tokenCount.addAndGet(currentPass, tokens.size());
-
-						if (COMPUTE_CHECKSUM) {
-							for (Token token : tokens.getTokens()) {
-								updateChecksum(checksum, token);
-							}
-						}
-
-                        if (!RUN_PARSER) {
-                            return new FileParseResult(input.getSourceName(), (int)checksum.getValue(), null, tokens.size(), startTime, lexer, null);
-                        }
-
-						final long parseStartTime = System.nanoTime();
-						Parser parser = sharedParsers[thread];
-                        if (REUSE_PARSER && parser != null) {
-                            parser.setInputStream(tokens);
-                        } else {
-							Parser previousParser = parser;
-
-							if (USE_PARSER_INTERPRETER) {
-								Parser referenceParser = parserCtor.newInstance(tokens);
-								parser = new ParserInterpreter(referenceParser.getGrammarFileName(), Arrays.asList(referenceParser.getTokenNames()), Arrays.asList(referenceParser.getRuleNames()), referenceParser.getATN(), tokens);
-							}
-							else {
-								parser = parserCtor.newInstance(tokens);
-							}
-
-							DFA[] decisionToDFA = (FILE_GRANULARITY || previousParser == null ? parser : previousParser).getInterpreter().decisionToDFA;
-							if (!REUSE_PARSER_DFA || (!FILE_GRANULARITY && previousParser == null)) {
-								decisionToDFA = new DFA[decisionToDFA.length];
-							}
-
-							if (COMPUTE_TRANSITION_STATS) {
-								parser.setInterpreter(new StatisticsParserATNSimulator(parser, parser.getATN(), decisionToDFA, parser.getInterpreter().getSharedContextCache()));
-							} else if (!REUSE_PARSER_DFA) {
-								parser.setInterpreter(new ParserATNSimulator(parser, parser.getATN(), decisionToDFA, parser.getInterpreter().getSharedContextCache()));
-							}
-
-							sharedParsers[thread] = parser;
-                        }
-
-						parser.removeParseListeners();
-						parser.removeErrorListeners();
-						if (!TWO_STAGE_PARSING) {
-							parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
-							parser.addErrorListener(new SummarizingDiagnosticErrorListener());
-						}
-
-						if (parser.getInterpreter().decisionToDFA[0] == null) {
-							ATN atn = parser.getATN();
-							for (int i = 0; i < parser.getInterpreter().decisionToDFA.length; i++) {
-								parser.getInterpreter().decisionToDFA[i] = new DFA(atn.getDecisionState(i), i);
-							}
-						}
-
-						parser.getInterpreter().setPredictionMode(TWO_STAGE_PARSING ? PredictionMode.SLL : PREDICTION_MODE);
-						parser.setBuildParseTree(BUILD_PARSE_TREES);
-						if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
-							parser.addParseListener(listener);
-						}
-						if (BAIL_ON_ERROR || TWO_STAGE_PARSING) {
-							parser.setErrorHandler(new BailErrorStrategy());
-						}
-
-                        Method parseMethod = parserClass.getMethod(entryPoint);
-                        Object parseResult;
-
-						try {
-							if (COMPUTE_CHECKSUM && !BUILD_PARSE_TREES) {
-								parser.addParseListener(new ChecksumParseTreeListener(checksum));
-							}
-
-							if (USE_PARSER_INTERPRETER) {
-								ParserInterpreter parserInterpreter = (ParserInterpreter)parser;
-								parseResult = parserInterpreter.parse(Collections.lastIndexOfSubList(Arrays.asList(parser.getRuleNames()), Collections.singletonList(entryPoint)));
-							}
-							else {
-								parseResult = parseMethod.invoke(parser);
-							}
-						} catch (InvocationTargetException ex) {
-							if (!TWO_STAGE_PARSING) {
-								throw ex;
-							}
-
-							String sourceName = tokens.getSourceName();
-							sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName+": " : "";
-							if (REPORT_SECOND_STAGE_RETRY) {
-								System.err.println(sourceName+"Forced to retry with full context.");
-							}
-
-							if (!(ex.getCause() instanceof ParseCancellationException)) {
-								throw ex;
-							}
-
-							tokens.reset();
-							if (REUSE_PARSER && parser != null) {
-								parser.setInputStream(tokens);
-							} else {
+	
+	                        if (!RUN_PARSER) {
+	                            return new FileParseResult(input.getSourceName(), (int)checksum.getValue(), null, tokens.size(), startTime, lexer, null);
+	                        }
+	
+							final long parseStartTime = System.nanoTime();
+							Parser parser = sharedParsers[thread];
+	                        if (REUSE_PARSER && parser != null) {
+	                            parser.setInputStream(tokens);
+	                        } else {
 								Parser previousParser = parser;
-
+	
 								if (USE_PARSER_INTERPRETER) {
 									Parser referenceParser = parserCtor.newInstance(tokens);
 									parser = new ParserInterpreter(referenceParser.getGrammarFileName(), Arrays.asList(referenceParser.getTokenNames()), Arrays.asList(referenceParser.getRuleNames()), referenceParser.getATN(), tokens);
@@ -1350,55 +1270,139 @@ public class TestPerformance extends BaseTest {
 								else {
 									parser = parserCtor.newInstance(tokens);
 								}
-
-								DFA[] decisionToDFA = previousParser.getInterpreter().decisionToDFA;
+	
+								DFA[] decisionToDFA = (FILE_GRANULARITY || previousParser == null ? parser : previousParser).getInterpreter().decisionToDFA;
+								if (!REUSE_PARSER_DFA || (!FILE_GRANULARITY && previousParser == null)) {
+									decisionToDFA = new DFA[decisionToDFA.length];
+								}
+	
 								if (COMPUTE_TRANSITION_STATS) {
 									parser.setInterpreter(new StatisticsParserATNSimulator(parser, parser.getATN(), decisionToDFA, parser.getInterpreter().getSharedContextCache()));
 								} else if (!REUSE_PARSER_DFA) {
 									parser.setInterpreter(new ParserATNSimulator(parser, parser.getATN(), decisionToDFA, parser.getInterpreter().getSharedContextCache()));
 								}
-
+	
 								sharedParsers[thread] = parser;
-							}
-
+	                        }
+	
 							parser.removeParseListeners();
 							parser.removeErrorListeners();
-							parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
-							parser.addErrorListener(new SummarizingDiagnosticErrorListener());
-							parser.getInterpreter().setPredictionMode(PredictionMode.LL);
-							parser.setBuildParseTree(BUILD_PARSE_TREES);
-							if (COMPUTE_CHECKSUM && !BUILD_PARSE_TREES) {
-								parser.addParseListener(new ChecksumParseTreeListener(checksum));
+							if (!TWO_STAGE_PARSING) {
+								parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
+								parser.addErrorListener(new SummarizingDiagnosticErrorListener());
 							}
+	
+							if (parser.getInterpreter().decisionToDFA[0] == null) {
+								ATN atn = parser.getATN();
+								for (int i = 0; i < parser.getInterpreter().decisionToDFA.length; i++) {
+									parser.getInterpreter().decisionToDFA[i] = new DFA(atn.getDecisionState(i), i);
+								}
+							}
+	
+							parser.getInterpreter().setPredictionMode(TWO_STAGE_PARSING ? PredictionMode.SLL : PREDICTION_MODE);
+							parser.setBuildParseTree(BUILD_PARSE_TREES);
 							if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
 								parser.addParseListener(listener);
 							}
-							if (BAIL_ON_ERROR) {
+							if (BAIL_ON_ERROR || TWO_STAGE_PARSING) {
 								parser.setErrorHandler(new BailErrorStrategy());
 							}
-
-							parseResult = parseMethod.invoke(parser);
-						}
-
-						assertThat(parseResult, instanceOf(ParseTree.class));
-						if (COMPUTE_CHECKSUM && BUILD_PARSE_TREES) {
-							ParseTreeWalker.DEFAULT.walk(new ChecksumParseTreeListener(checksum), (ParseTree)parseResult);
-						}
-                        if (BUILD_PARSE_TREES && BLANK_LISTENER) {
-                            ParseTreeWalker.DEFAULT.walk(listener, (ParseTree)parseResult);
-                        }
-
-						return new FileParseResult(input.getSourceName(), (int)checksum.getValue(), (ParseTree)parseResult, tokens.size(), TIME_PARSE_ONLY ? parseStartTime : startTime, lexer, parser);
-                    } catch (Exception e) {
-						if (!REPORT_SYNTAX_ERRORS && e instanceof ParseCancellationException) {
-							return new FileParseResult("unknown", (int)checksum.getValue(), null, 0, startTime, null, null);
-						}
-
-                        e.printStackTrace(System.out);
-                        throw new IllegalStateException(e);
-                    }
-                }
-            };
+	
+	                        Method parseMethod = parserClass.getMethod(entryPoint);
+	                        Object parseResult;
+	
+							try {
+								if (COMPUTE_CHECKSUM && !BUILD_PARSE_TREES) {
+									parser.addParseListener(new ChecksumParseTreeListener(checksum));
+								}
+	
+								if (USE_PARSER_INTERPRETER) {
+									ParserInterpreter parserInterpreter = (ParserInterpreter)parser;
+									parseResult = parserInterpreter.parse(Collections.lastIndexOfSubList(Arrays.asList(parser.getRuleNames()), Collections.singletonList(entryPoint)));
+								}
+								else {
+									parseResult = parseMethod.invoke(parser);
+								}
+							} catch (InvocationTargetException ex) {
+								if (!TWO_STAGE_PARSING) {
+									throw ex;
+								}
+	
+								String sourceName = tokens.getSourceName();
+								sourceName = sourceName != null && !sourceName.isEmpty() ? sourceName+": " : "";
+								if (REPORT_SECOND_STAGE_RETRY) {
+									System.err.println(sourceName+"Forced to retry with full context.");
+								}
+	
+								if (!(ex.getCause() instanceof ParseCancellationException)) {
+									throw ex;
+								}
+	
+								tokens.reset();
+								if (REUSE_PARSER && parser != null) {
+									parser.setInputStream(tokens);
+								} else {
+									Parser previousParser = parser;
+	
+									if (USE_PARSER_INTERPRETER) {
+										Parser referenceParser = parserCtor.newInstance(tokens);
+										parser = new ParserInterpreter(referenceParser.getGrammarFileName(), Arrays.asList(referenceParser.getTokenNames()), Arrays.asList(referenceParser.getRuleNames()), referenceParser.getATN(), tokens);
+									}
+									else {
+										parser = parserCtor.newInstance(tokens);
+									}
+	
+									DFA[] decisionToDFA = previousParser.getInterpreter().decisionToDFA;
+									if (COMPUTE_TRANSITION_STATS) {
+										parser.setInterpreter(new StatisticsParserATNSimulator(parser, parser.getATN(), decisionToDFA, parser.getInterpreter().getSharedContextCache()));
+									} else if (!REUSE_PARSER_DFA) {
+										parser.setInterpreter(new ParserATNSimulator(parser, parser.getATN(), decisionToDFA, parser.getInterpreter().getSharedContextCache()));
+									}
+	
+									sharedParsers[thread] = parser;
+								}
+	
+								parser.removeParseListeners();
+								parser.removeErrorListeners();
+								parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
+								parser.addErrorListener(new SummarizingDiagnosticErrorListener());
+								parser.getInterpreter().setPredictionMode(PredictionMode.LL);
+								parser.setBuildParseTree(BUILD_PARSE_TREES);
+								if (COMPUTE_CHECKSUM && !BUILD_PARSE_TREES) {
+									parser.addParseListener(new ChecksumParseTreeListener(checksum));
+								}
+								if (!BUILD_PARSE_TREES && BLANK_LISTENER) {
+									parser.addParseListener(listener);
+								}
+								if (BAIL_ON_ERROR) {
+									parser.setErrorHandler(new BailErrorStrategy());
+								}
+	
+								parseResult = parseMethod.invoke(parser);
+							}
+	
+							assertThat(parseResult, instanceOf(ParseTree.class));
+							if (COMPUTE_CHECKSUM && BUILD_PARSE_TREES) {
+								ParseTreeWalker.DEFAULT.walk(new ChecksumParseTreeListener(checksum), (ParseTree)parseResult);
+							}
+	                        if (BUILD_PARSE_TREES && BLANK_LISTENER) {
+	                            ParseTreeWalker.DEFAULT.walk(listener, (ParseTree)parseResult);
+	                        }
+	
+							return new FileParseResult(input.getSourceName(), (int)checksum.getValue(), (ParseTree)parseResult, tokens.size(), TIME_PARSE_ONLY ? parseStartTime : startTime, lexer, parser);
+	                    } catch (Exception e) {
+							if (!REPORT_SYNTAX_ERRORS && e instanceof ParseCancellationException) {
+								return new FileParseResult("unknown", (int)checksum.getValue(), null, 0, startTime, null, null);
+							}
+	
+	                        e.printStackTrace(System.out);
+	                        throw new IllegalStateException(e);
+	                    }
+	                }
+	            };
+            } finally {
+            	loader.close();
+            }
         } catch (Exception e) {
             e.printStackTrace(System.out);
             Assert.fail(e.getMessage());
