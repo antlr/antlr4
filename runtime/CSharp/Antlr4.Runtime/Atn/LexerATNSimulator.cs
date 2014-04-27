@@ -567,7 +567,6 @@ namespace Antlr4.Runtime.Atn
                         c = config.Transform(t.target, true);
                         break;
                     }
-                    goto case TransitionType.Epsilon;
                 }
 
                 case TransitionType.Epsilon:

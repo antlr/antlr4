@@ -342,7 +342,7 @@ namespace Antlr4.Runtime.Tree.Pattern
                 //			System.out.println("pattern tree = "+tree.toStringTree(parserInterp));
                 throw (RecognitionException)e.InnerException;
             }
-            catch (RecognitionException re)
+            catch (RecognitionException)
             {
                 throw;
             }
@@ -472,7 +472,6 @@ namespace Antlr4.Runtime.Tree.Pattern
                 RuleTagToken ruleTagToken = GetRuleTagToken(r2);
                 if (ruleTagToken != null)
                 {
-                    ParseTreeMatch m = null;
                     if (r1.GetRuleIndex() == r2.GetRuleIndex())
                     {
                         // track label->list-of-nodes for both rule name and label (if any)
