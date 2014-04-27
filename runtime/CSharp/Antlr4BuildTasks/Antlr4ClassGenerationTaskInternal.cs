@@ -37,7 +37,7 @@ namespace Antlr4.Build.Tasks
     using System.Text.RegularExpressions;
     using RegistryHive = Microsoft.Win32.RegistryHive;
     using RegistryKey = Microsoft.Win32.RegistryKey;
-#if NET_4_0
+#if NET40PLUS
     using RegistryView = Microsoft.Win32.RegistryView;
 #else
     using Registry = Microsoft.Win32.Registry;
@@ -156,7 +156,7 @@ namespace Antlr4.Build.Tasks
             }
         }
 
-#if NET_4_0
+#if NET40PLUS
         private string JavaHome
         {
             get

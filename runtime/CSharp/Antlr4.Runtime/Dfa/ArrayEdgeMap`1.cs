@@ -167,7 +167,7 @@ namespace Antlr4.Runtime.Dfa
             return this;
         }
 
-#if NET_4_5
+#if NET45PLUS
         public override IReadOnlyDictionary<int, T> ToMap()
 #else
         public override IDictionary<int, T> ToMap()
@@ -178,7 +178,7 @@ namespace Antlr4.Runtime.Dfa
                 return Sharpen.Collections.EmptyMap<int, T>();
             }
 
-#if NET_CF
+#if COMPACT
             IDictionary<int, T> result = new SortedList<int, T>();
 #else
             IDictionary<int, T> result = new SortedDictionary<int, T>();
@@ -191,7 +191,7 @@ namespace Antlr4.Runtime.Dfa
                 }
                 result[i + minIndex] = arrayData[i];
             }
-#if NET_4_5
+#if NET45PLUS
             return new ReadOnlyDictionary<int, T>(result);
 #else
             return result;

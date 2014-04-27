@@ -5,14 +5,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EBBDCC35-43CC-416C-860B-9FC115F1EB42}</ProjectGuid>
+    <ProjectGuid>{423978DF-85A4-409E-A16C-453683FE3969}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Antlr4.Runtime</RootNamespace>
-    <AssemblyName>Antlr4.Runtime.v3.0</AssemblyName>
-    <TargetFrameworkVersion>v3.0</TargetFrameworkVersion>
+    <AssemblyName>Antlr4.Runtime.net40</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BaseIntermediateOutputPath>obj\v3.0\</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\net40\</BaseIntermediateOutputPath>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
@@ -20,9 +20,9 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\v3.0\Debug\</OutputPath>
+    <OutputPath>bin\net40\Debug\</OutputPath>
     <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
-    <DefineConstants>DEBUG;TRACE;NET_2_0;NET_3_0</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET40;NET40PLUS;NET35PLUS;NET30PLUS;NET20PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>1591</NoWarn>
@@ -30,9 +30,9 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\v3.0\Release\</OutputPath>
+    <OutputPath>bin\net40\Release\</OutputPath>
     <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
-    <DefineConstants>TRACE;NET_2_0;NET_3_0</DefineConstants>
+    <DefineConstants>TRACE;NET40;NET40PLUS;NET35PLUS;NET30PLUS;NET20PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>1591</NoWarn>
@@ -45,6 +45,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -193,17 +197,6 @@
     <Compile Include="Sharpen\AtomicReference`1.cs" />
     <Compile Include="Sharpen\BitSet.cs" />
     <Compile Include="Sharpen\Collections.cs" />
-    <Compile Include="Sharpen\Compat\CollectionDebuggerView`2.cs" />
-    <Compile Include="Sharpen\Compat\ConcurrentDictionary`2.cs" />
-    <Compile Include="Sharpen\Compat\Enumerable.cs" />
-    <Compile Include="Sharpen\Compat\ExtensionAttribute.cs" />
-    <Compile Include="Sharpen\Compat\Funcs.cs" />
-    <Compile Include="Sharpen\Compat\HashSet`1.cs" />
-    <Compile Include="Sharpen\Compat\IStructuralComparable.cs" />
-    <Compile Include="Sharpen\Compat\IStructuralEquatable.cs" />
-    <Compile Include="Sharpen\Compat\SplitOrderedList`2.cs" />
-    <Compile Include="Sharpen\Compat\Tuple.cs" />
-    <Compile Include="Sharpen\Compat\Tuples.cs" />
     <Compile Include="Sharpen\DictionaryExtensions.cs" />
     <Compile Include="Sharpen\ListExtensions.cs" />
     <Compile Include="Sharpen\Runtime.cs" />
@@ -243,7 +236,7 @@
     <Compile Include="Tree\Xpath\XPathWildcardElement.cs" />
     <Compile Include="UnbufferedCharStream.cs" />
     <Compile Include="UnbufferedTokenStream.cs" />
-    <None Include="packages.Antlr4.Runtime.v3.0.config" />
+    <None Include="packages.Antlr4.Runtime.net40.config" />
     <Antlr4 Include="Tree\Xpath\XPathLexer.g4">
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>Antlr4.Runtime.Tree.Xpath</CustomToolNamespace>

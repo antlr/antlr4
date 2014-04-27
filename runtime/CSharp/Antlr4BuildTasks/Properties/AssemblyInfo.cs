@@ -35,12 +35,14 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-#if NET_4_0
-[assembly: AssemblyTitle("Antlr4BuildTasks.v4.0")]
-[assembly: AssemblyProduct("Antlr4BuildTasks.v4.0")]
+#if NET40
+[assembly: AssemblyTitle("Antlr4BuildTasks.net40")]
+[assembly: AssemblyProduct("Antlr4BuildTasks.net40")]
+#elif NET35
+[assembly: AssemblyTitle("Antlr4BuildTasks.net35")]
+[assembly: AssemblyProduct("Antlr4BuildTasks.net35")]
 #else
-[assembly: AssemblyTitle("Antlr4BuildTasks.v3.5")]
-[assembly: AssemblyProduct("Antlr4BuildTasks.v3.5")]
+#error Unknown assembly.
 #endif
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]

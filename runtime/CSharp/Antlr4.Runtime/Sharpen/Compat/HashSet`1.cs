@@ -26,7 +26,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#if !NET_3_5 || NET_CF
+#if !NET35PLUS || COMPACT
 
 using System;
 using System.Collections;
@@ -42,12 +42,12 @@ using System.Diagnostics;
 namespace Sharpen {
 
 	[Serializable]
-#if !NET_CF
+#if !COMPACT
 	[DebuggerDisplay ("Count={Count}")]
 	[DebuggerTypeProxy (typeof (CollectionDebuggerView<,>))]
 #endif
 	public class HashSet<T> : ICollection<T>
-#if !NET_CF
+#if !COMPACT
 		, ISerializable, IDeserializationCallback
 #endif
 	{
@@ -86,7 +86,7 @@ namespace Sharpen {
 		int threshold;
 
 		IEqualityComparer<T> comparer;
-#if !NET_CF
+#if !COMPACT
 		SerializationInfo si;
 #endif
 
@@ -127,7 +127,7 @@ namespace Sharpen {
 				Add (item);
 		}
 
-#if !NET_CF
+#if !COMPACT
 		protected HashSet (SerializationInfo info, StreamingContext context)
 		{
 			si = info;
@@ -579,7 +579,7 @@ namespace Sharpen {
 			return setComparer;
 		}
 
-#if !NET_CF
+#if !COMPACT
 		[SecurityPermission (SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
 		public virtual void GetObjectData (SerializationInfo info, StreamingContext context)
 		{

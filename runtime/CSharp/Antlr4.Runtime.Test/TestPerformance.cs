@@ -24,7 +24,7 @@
     using StreamReader = System.IO.StreamReader;
     using Thread = System.Threading.Thread;
 
-#if NET_4_0
+#if NET40PLUS
     using System.Collections.Concurrent;
     using System.Threading.Tasks;
     using System.Threading.Tasks.Schedulers;
@@ -386,7 +386,7 @@
             int sourceCount = 0;
             int inputSize = 0;
 
-#if NET_4_0
+#if NET40PLUS
             BlockingCollection<int> threadIdentifiers = new BlockingCollection<int>();
             for (int i = 0; i < NUMBER_OF_THREADS; i++)
                 threadIdentifiers.Add(i);
@@ -402,7 +402,7 @@
                 sourceCount++;
                 input.Seek(0);
                 inputSize += input.Size;
-#if NET_4_0
+#if NET40PLUS
                 Task<int> futureChecksum = Task.Factory.StartNew<int>(new Callable_1(input, factory, threadIdentifiers).call, CancellationToken.None, TaskCreationOptions.None, executorService);
 #else
                 Func<int> futureChecksum = new Callable_1(input, factory).call;
@@ -413,7 +413,7 @@
             Checksum checksum = new CRC32();
             foreach (var future in results)
             {
-#if NET_4_0
+#if NET40PLUS
                 int value = future.Result;
 #else
                 int value = future();
@@ -424,7 +424,7 @@
                 }
             }
 
-#if NET_4_0
+#if NET40PLUS
             executorServiceHost.Dispose();
 #endif
 
@@ -592,11 +592,11 @@
         {
             private readonly ICharStream input;
             private readonly ParserFactory factory;
-#if NET_4_0
+#if NET40PLUS
             private readonly BlockingCollection<int> threadNumbers;
 #endif
 
-#if NET_4_0
+#if NET40PLUS
             public Callable_1(ICharStream input, ParserFactory factory, BlockingCollection<int> threadNumbers)
 #else
             public Callable_1(ICharStream input, ParserFactory factory)
@@ -604,7 +604,7 @@
             {
                 this.input = input;
                 this.factory = factory;
-#if NET_4_0
+#if NET40PLUS
                 this.threadNumbers = threadNumbers;
 #endif
             }
@@ -613,7 +613,7 @@
             {
                 // this incurred a great deal of overhead and was causing significant variations in performance results.
                 //Console.Out.WriteLine("Parsing file {0}", input.getSourceName());
-#if NET_4_0
+#if NET40PLUS
                 int threadNumber = threadNumbers.Take();
 #else
                 int threadNumber = 0;
@@ -624,7 +624,7 @@
                 }
                 finally
                 {
-#if NET_4_0
+#if NET40PLUS
                     threadNumbers.Add(threadNumber);
 #endif
                 }

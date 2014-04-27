@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.v4.5", "Antlr4.Runtime\Antlr4.Runtime.v4.5.csproj", "{E1D192DE-5347-48C4-A9F4-A8CBA2AF3869}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.net45", "Antlr4.Runtime\Antlr4.Runtime.net45.csproj", "{E1D192DE-5347-48C4-A9F4-A8CBA2AF3869}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{47C0086D-577C-43DA-ADC7-544F27656E45}"
 	ProjectSection(SolutionItems) = preProject
@@ -16,31 +16,31 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\..\reference\sharpen.md = ..\..\reference\sharpen.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.v4.5", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.v4.5.csproj", "{9D8C43DF-71F9-4CC9-83AD-A39FAEBCECA0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.net45", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.net45.csproj", "{9D8C43DF-71F9-4CC9-83AD-A39FAEBCECA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4BuildTasks.v4.0", "Antlr4BuildTasks\Antlr4BuildTasks.v4.0.csproj", "{F63DFE80-AE1F-47A6-A31A-E39DA4C837BA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4BuildTasks.net40", "Antlr4BuildTasks\Antlr4BuildTasks.net40.csproj", "{F63DFE80-AE1F-47A6-A31A-E39DA4C837BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.v4.0", "Antlr4.Runtime\Antlr4.Runtime.v4.0.csproj", "{423978DF-85A4-409E-A16C-453683FE3969}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.net40", "Antlr4.Runtime\Antlr4.Runtime.net40.csproj", "{423978DF-85A4-409E-A16C-453683FE3969}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.v3.5", "Antlr4.Runtime\Antlr4.Runtime.v3.5.csproj", "{E186FDA3-1411-47EE-94C7-9F3745F0474B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.net35", "Antlr4.Runtime\Antlr4.Runtime.net35.csproj", "{E186FDA3-1411-47EE-94C7-9F3745F0474B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.v3.0", "Antlr4.Runtime\Antlr4.Runtime.v3.0.csproj", "{EBBDCC35-43CC-416C-860B-9FC115F1EB42}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.net30", "Antlr4.Runtime\Antlr4.Runtime.net30.csproj", "{EBBDCC35-43CC-416C-860B-9FC115F1EB42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.v2.0", "Antlr4.Runtime\Antlr4.Runtime.v2.0.csproj", "{E1A46D9D-66CB-46E8-93B0-7FC87299ABEF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.net20", "Antlr4.Runtime\Antlr4.Runtime.net20.csproj", "{E1A46D9D-66CB-46E8-93B0-7FC87299ABEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.v4.0", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.v4.0.csproj", "{706D364A-CD4E-4720-B94C-0DB82AF7B433}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.net40", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.net40.csproj", "{706D364A-CD4E-4720-B94C-0DB82AF7B433}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.v3.5", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.v3.5.csproj", "{C4A38390-8AA3-45AE-9A70-C392146B37D0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.net35", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.net35.csproj", "{C4A38390-8AA3-45AE-9A70-C392146B37D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.v3.0", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.v3.0.csproj", "{8A2F2331-A4A5-4C7F-8D5D-DEECEF54AEA7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.net30", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.net30.csproj", "{8A2F2331-A4A5-4C7F-8D5D-DEECEF54AEA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.v2.0", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.v2.0.csproj", "{0A4681C4-1248-4ACD-B59F-D6CC17CC2B4C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.net20", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.net20.csproj", "{0A4681C4-1248-4ACD-B59F-D6CC17CC2B4C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Portable", "Antlr4.Runtime\Antlr4.Runtime.Portable.csproj", "{06C182C5-095C-4D43-9C33-C87E305C6BC2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.Portable", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.Portable.csproj", "{97C32E42-51B2-4A29-B005-769B63CFEFCA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4BuildTasks.v3.5", "Antlr4BuildTasks\Antlr4BuildTasks.v3.5.csproj", "{0D3D20E9-3341-4449-80E7-76A4534F0E55}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4BuildTasks.net35", "Antlr4BuildTasks\Antlr4BuildTasks.net35.csproj", "{0D3D20E9-3341-4449-80E7-76A4534F0E55}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{4CE79A54-058D-4940-875E-7F6AA9922A7D}"
 	ProjectSection(SolutionItems) = preProject

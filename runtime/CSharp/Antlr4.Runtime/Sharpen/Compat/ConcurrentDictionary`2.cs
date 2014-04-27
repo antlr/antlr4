@@ -22,7 +22,7 @@
 //
 //
 
-#if !NET_4_0
+#if !NET40PLUS
 
 using System;
 using System.Threading;
@@ -38,7 +38,7 @@ namespace System.Collections.Concurrent
 
 namespace Sharpen
 {
-#if !NET_CF
+#if !COMPACT
 	[DebuggerDisplay ("Count={Count}")]
 	[DebuggerTypeProxy (typeof (CollectionDebuggerView<,>))]
 #endif

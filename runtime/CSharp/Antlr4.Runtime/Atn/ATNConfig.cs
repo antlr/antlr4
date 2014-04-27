@@ -394,7 +394,7 @@ namespace Antlr4.Runtime.Atn
 
         public virtual string ToDotString()
         {
-#if NET_CF
+#if COMPACT
             throw new NotImplementedException("The current platform does not provide RuntimeHelpers.GetHashCode(object).");
 #else
             StringBuilder builder = new StringBuilder();

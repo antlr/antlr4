@@ -71,7 +71,7 @@
         {
             get
             {
-#if NET_4_0
+#if NET40PLUS
                 return Environment.GetFolderPath(Environment.SpecialFolder.Windows);
 #else
                 string systemFolder = Environment.GetFolderPath(Environment.SpecialFolder.System);
@@ -84,7 +84,7 @@
         {
             get
             {
-#if NET_4_0
+#if NET40PLUS
                 return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 #else
                 string documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
@@ -95,7 +95,7 @@
 
         protected static string PathCombine(params string[] paths)
         {
-#if NET_4_0
+#if NET40PLUS
             return Path.Combine(paths);
 #else
             string result = paths[0];
@@ -225,7 +225,7 @@
             get
             {
                 string javaKey = "SOFTWARE\\JavaSoft\\Java Runtime Environment";
-#if NET_4_0
+#if NET40PLUS
                 using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default).OpenSubKey(javaKey))
 #else
                 using (var baseKey = Registry.LocalMachine.OpenSubKey(javaKey))

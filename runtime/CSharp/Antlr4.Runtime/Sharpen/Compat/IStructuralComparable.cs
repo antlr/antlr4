@@ -26,7 +26,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#if !NET_4_0
+#if !NET40PLUS
 
 using System;
 using System.Collections;

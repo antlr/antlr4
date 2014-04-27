@@ -26,7 +26,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#if !NET_4_0
+#if !NET40PLUS
 
 using System;
 using System.Collections.Generic;
@@ -46,7 +46,7 @@ namespace Sharpen
 			this.c = col;
 		}
 		
-#if !NET_CF
+#if !COMPACT
 		[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
 #endif
 		public T[] Items {
@@ -67,7 +67,7 @@ namespace Sharpen
 			this.c = col;
 		}
 
-#if !NET_CF
+#if !COMPACT
 		[DebuggerBrowsable (DebuggerBrowsableState.RootHidden)]
 #endif
 		public KeyValuePair<T, U>[] Items {

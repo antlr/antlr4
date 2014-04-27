@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.CF3.5", "Antlr4.Runtime\Antlr4.Runtime.CF3.5.csproj", "{C5F9C476-200F-4440-9524-C5C3F9BE16D7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.net35-cf", "Antlr4.Runtime\Antlr4.Runtime.net35-cf.csproj", "{C5F9C476-200F-4440-9524-C5C3F9BE16D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
