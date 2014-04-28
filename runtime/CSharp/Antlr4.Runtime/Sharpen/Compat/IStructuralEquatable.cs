@@ -33,7 +33,7 @@ using System.Collections;
 
 namespace Sharpen
 {
-	public interface IStructuralEquatable {
+	internal interface IStructuralEquatable {
 		bool Equals (object other, IEqualityComparer comparer);
 
 		int GetHashCode (IEqualityComparer comparer);

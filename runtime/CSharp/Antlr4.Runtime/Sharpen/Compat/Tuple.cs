@@ -32,7 +32,7 @@ using System;
 
 namespace Sharpen
 {
-	public static class Tuple
+	internal static class Tuple
 	{
 		public static Tuple<T1, T2, T3, T4, T5, T6, T7, Tuple<T8>> Create<T1, T2, T3, T4, T5, T6, T7, T8>
 			(

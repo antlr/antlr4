@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    public class SequenceEqualityComparer<T> : EqualityComparer<IEnumerable<T>>
+    internal class SequenceEqualityComparer<T> : EqualityComparer<IEnumerable<T>>
     {
         private static readonly SequenceEqualityComparer<T> _default = new SequenceEqualityComparer<T>();
 

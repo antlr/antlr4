@@ -1,6 +1,6 @@
 ﻿namespace Sharpen
 {
-    public interface Checksum
+    internal interface Checksum
     {
         long Value
         {

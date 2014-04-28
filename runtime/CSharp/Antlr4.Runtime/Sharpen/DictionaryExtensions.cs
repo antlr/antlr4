@@ -31,7 +31,7 @@ namespace Sharpen
 {
     using System.Collections.Generic;
 
-    public static class DictionaryExtensions
+    internal static class DictionaryExtensions
     {
         public static TValue Get<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
             where TValue : class
