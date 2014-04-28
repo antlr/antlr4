@@ -277,7 +277,7 @@ namespace Antlr4.Runtime
                 {
                     if (!Precpred(_ctx, ((PrecedencePredicateTransition)transition).precedence))
                     {
-                        throw new FailedPredicateException(this, string.Format("precpred(_ctx, %d)", ((PrecedencePredicateTransition)transition).precedence));
+                        throw new FailedPredicateException(this, string.Format("precpred(_ctx, {0})", ((PrecedencePredicateTransition)transition).precedence));
                     }
                     break;
                 }

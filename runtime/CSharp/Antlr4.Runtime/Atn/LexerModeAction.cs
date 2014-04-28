@@ -137,7 +137,7 @@ namespace Antlr4.Runtime.Atn
 
         public override string ToString()
         {
-            return string.Format("mode(%d)", mode);
+            return string.Format("mode({0})", mode);
         }
     }
 }

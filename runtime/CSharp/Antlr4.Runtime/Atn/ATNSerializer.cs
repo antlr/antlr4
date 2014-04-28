@@ -445,7 +445,7 @@ namespace Antlr4.Runtime.Atn
 
                         default:
                         {
-                            string message = string.Format(CultureInfo.CurrentCulture, "The specified lexer action type %s is not valid.", action.GetActionType());
+                            string message = string.Format(CultureInfo.CurrentCulture, "The specified lexer action type {0} is not valid.", action.GetActionType());
                             throw new ArgumentException(message);
                         }
                     }
@@ -477,14 +477,14 @@ namespace Antlr4.Runtime.Atn
             int version = ATNDeserializer.ToInt(data[p++]);
             if (version != ATNDeserializer.SerializedVersion)
             {
-                string reason = string.Format("Could not deserialize ATN with version %d (expected %d).", version, ATNDeserializer.SerializedVersion);
+                string reason = string.Format("Could not deserialize ATN with version {0} (expected {1}).", version, ATNDeserializer.SerializedVersion);
                 throw new NotSupportedException(new InvalidClassException(typeof(ATN).FullName, reason));
             }
             UUID uuid = ATNDeserializer.ToUUID(data, p);
             p += 8;
             if (!uuid.Equals(ATNDeserializer.SerializedUuid))
             {
-                string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with UUID %s (expected %s).", uuid, ATNDeserializer.SerializedUuid);
+                string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with UUID {0} (expected {1}).", uuid, ATNDeserializer.SerializedUuid);
                 throw new NotSupportedException(new InvalidClassException(typeof(ATN).FullName, reason));
             }
             p++;

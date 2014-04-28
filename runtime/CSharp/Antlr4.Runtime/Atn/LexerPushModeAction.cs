@@ -136,7 +136,7 @@ namespace Antlr4.Runtime.Atn
 
         public override string ToString()
         {
-            return string.Format("pushMode(%d)", mode);
+            return string.Format("pushMode({0})", mode);
         }
     }
 }

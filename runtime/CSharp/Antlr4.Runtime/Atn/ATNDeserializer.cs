@@ -151,14 +151,14 @@ namespace Antlr4.Runtime.Atn
             int version = ToInt(data[p++]);
             if (version != SerializedVersion)
             {
-                string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with version %d (expected %d).", version, SerializedVersion);
+                string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with version {0} (expected {1}).", version, SerializedVersion);
                 throw new NotSupportedException(reason);
             }
             Guid uuid = ToUUID(data, p);
             p += 8;
             if (!SupportedUuids.Contains(uuid))
             {
-                string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with UUID %s (expected %s or a legacy UUID).", uuid, SerializedUuid);
+                string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with UUID {0} (expected {1} or a legacy UUID).", uuid, SerializedUuid);
                 throw new NotSupportedException(reason);
             }
             bool supportsLexerActions = IsFeatureSupported(AddedLexerActions, uuid);
@@ -1263,7 +1263,7 @@ nextState_break: ;
 
                 default:
                 {
-                    string message = string.Format(CultureInfo.CurrentCulture, "The specified state type %d is not valid.", type);
+                    string message = string.Format(CultureInfo.CurrentCulture, "The specified state type {0} is not valid.", type);
                     throw new ArgumentException(message);
                 }
             }
@@ -1317,7 +1317,7 @@ nextState_break: ;
 
                 default:
                 {
-                    string message = string.Format(CultureInfo.CurrentCulture, "The specified lexer action type %d is not valid.", type);
+                    string message = string.Format(CultureInfo.CurrentCulture, "The specified lexer action type {0} is not valid.", type);
                     throw new ArgumentException(message);
                 }
             }

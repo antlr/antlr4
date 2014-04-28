@@ -132,7 +132,7 @@ namespace Antlr4.Runtime.Atn
 
         public override string ToString()
         {
-            return string.Format("type(%d)", type);
+            return string.Format("type({0})", type);
         }
     }
 }
