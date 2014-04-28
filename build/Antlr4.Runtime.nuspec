@@ -48,6 +48,14 @@
     <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net40\$Configuration$\Antlr4.Runtime.portable-net40.pdb" target="lib\portable-net40+sl50+wp80+win"/>
     <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net40\$Configuration$\Antlr4.Runtime.portable-net40.xml" target="lib\portable-net40+sl50+wp80+win"/>
 
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net45\$Configuration$\Antlr4.Runtime.portable-net45.dll" target="lib\portable-net45+wp80+win"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net45\$Configuration$\Antlr4.Runtime.portable-net45.pdb" target="lib\portable-net45+wp80+win"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net45\$Configuration$\Antlr4.Runtime.portable-net45.xml" target="lib\portable-net45+wp80+win"/>
+
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\netcore45\$Configuration$\Antlr4.Runtime.netcore45.dll" target="lib\netcore45"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\netcore45\$Configuration$\Antlr4.Runtime.netcore45.pdb" target="lib\netcore45"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\netcore45\$Configuration$\Antlr4.Runtime.netcore45.xml" target="lib\netcore45"/>
+
     <!-- Source Code -->
 
     <file exclude="..\runtime\CSharp\Antlr4.Runtime\obj\**\*.cs" src="..\runtime\CSharp\Antlr4.Runtime\**\*.cs" target="src"/>
