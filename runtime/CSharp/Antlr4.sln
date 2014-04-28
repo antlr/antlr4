@@ -20,17 +20,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.net45",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4BuildTasks.net40", "Antlr4BuildTasks\Antlr4BuildTasks.net40.csproj", "{F63DFE80-AE1F-47A6-A31A-E39DA4C837BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.net40", "Antlr4.Runtime\Antlr4.Runtime.net40.csproj", "{423978DF-85A4-409E-A16C-453683FE3969}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.net40-client", "Antlr4.Runtime\Antlr4.Runtime.net40-client.csproj", "{423978DF-85A4-409E-A16C-453683FE3969}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.net35", "Antlr4.Runtime\Antlr4.Runtime.net35.csproj", "{E186FDA3-1411-47EE-94C7-9F3745F0474B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.net35-client", "Antlr4.Runtime\Antlr4.Runtime.net35-client.csproj", "{E186FDA3-1411-47EE-94C7-9F3745F0474B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.net30", "Antlr4.Runtime\Antlr4.Runtime.net30.csproj", "{EBBDCC35-43CC-416C-860B-9FC115F1EB42}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.net20", "Antlr4.Runtime\Antlr4.Runtime.net20.csproj", "{E1A46D9D-66CB-46E8-93B0-7FC87299ABEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.net40", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.net40.csproj", "{706D364A-CD4E-4720-B94C-0DB82AF7B433}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.net40-client", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.net40-client.csproj", "{706D364A-CD4E-4720-B94C-0DB82AF7B433}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.net35", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.net35.csproj", "{C4A38390-8AA3-45AE-9A70-C392146B37D0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.net35-client", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.net35-client.csproj", "{C4A38390-8AA3-45AE-9A70-C392146B37D0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr4.Runtime.Test.net30", "Antlr4.Runtime.Test\Antlr4.Runtime.Test.net30.csproj", "{8A2F2331-A4A5-4C7F-8D5D-DEECEF54AEA7}"
 EndProject
