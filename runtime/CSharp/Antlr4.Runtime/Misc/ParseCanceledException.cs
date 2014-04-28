@@ -30,6 +30,10 @@
 using System;
 using Antlr4.Runtime.Sharpen;
 
+#if COMPACT
+using OperationCanceledException = System.Exception;
+#endif
+
 namespace Antlr4.Runtime.Misc
 {
     /// <summary>This exception is thrown to cancel a parsing operation.</summary>
@@ -47,12 +51,7 @@ namespace Antlr4.Runtime.Misc
 #if !PORTABLE
     [System.Serializable]
 #endif
-    public class ParseCanceledException
-#if COMPACT
-        : Exception
-#else
-        : OperationCanceledException
-#endif
+    public class ParseCanceledException : OperationCanceledException
     {
         public ParseCanceledException()
         {
