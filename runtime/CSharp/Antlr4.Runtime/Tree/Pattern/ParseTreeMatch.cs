@@ -298,7 +298,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <summary><inheritDoc></inheritDoc></summary>
         public override string ToString()
         {
-            return string.Format("Match %s; found %d labels", Succeeded() ? "succeeded" : "failed", GetLabels().Count);
+            return string.Format("Match {0}; found {1} labels", Succeeded() ? "succeeded" : "failed", GetLabels().Count);
         }
     }
 }
