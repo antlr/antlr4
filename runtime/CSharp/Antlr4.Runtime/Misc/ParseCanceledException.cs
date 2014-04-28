@@ -48,9 +48,7 @@ namespace Antlr4.Runtime.Misc
     /// response to a parse error.
     /// </remarks>
     /// <author>Sam Harwell</author>
-#if !PORTABLE
     [System.Serializable]
-#endif
     public class ParseCanceledException : OperationCanceledException
     {
         public ParseCanceledException()

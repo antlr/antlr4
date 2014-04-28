@@ -193,6 +193,7 @@
     <Compile Include="Sharpen\Collections.cs" />
     <Compile Include="Sharpen\Compat\CollectionDebuggerView`2.cs" />
     <Compile Include="Sharpen\Compat\ConcurrentDictionary`2.cs" />
+    <Compile Include="Sharpen\Compat\SerializableAttribute.cs" />
     <Compile Include="Sharpen\Compat\SplitOrderedList`2.cs" />
     <Compile Include="Sharpen\DictionaryExtensions.cs" />
     <Compile Include="Sharpen\ListExtensions.cs" />
