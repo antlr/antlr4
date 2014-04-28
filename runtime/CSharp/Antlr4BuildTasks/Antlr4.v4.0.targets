@@ -133,6 +133,7 @@
       ToolPath="$(Antlr4ToolLocation)"
       JavaVendor="$(Antlr4JavaVendor)"
       JavaInstallation="$(Antlr4JavaInstallation)"
+      JavaExecutable="$(Antlr4JavaExecutable)"
       BuildTaskPath="$(Antlr4BuildTaskLocation)"
       OutputPath="$(IntermediateOutputPath)"
       TargetLanguage="%(Antlr4.TargetLanguage)"

@@ -163,6 +163,12 @@ namespace Antlr4.Build.Tasks
             set;
         }
 
+        public string JavaExecutable
+        {
+            get;
+            set;
+        }
+
         [Output]
         public ITaskItem[] GeneratedCodeFiles
         {
@@ -332,6 +338,7 @@ namespace Antlr4.Build.Tasks
             wrapper.AbstractGrammar = AbstractGrammar;
             wrapper.JavaVendor = JavaVendor;
             wrapper.JavaInstallation = JavaInstallation;
+            wrapper.JavaExecutable = JavaExecutable;
             return wrapper;
         }
 
