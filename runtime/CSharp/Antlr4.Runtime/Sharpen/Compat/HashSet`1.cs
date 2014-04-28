@@ -39,7 +39,7 @@ using System.Diagnostics;
 
 // HashSet is basically implemented as a reduction of Dictionary<K, V>
 
-namespace Sharpen {
+namespace Antlr4.Runtime.Sharpen {
 
 	[Serializable]
 #if !NET_CF

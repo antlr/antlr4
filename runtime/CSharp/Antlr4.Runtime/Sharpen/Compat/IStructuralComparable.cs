@@ -31,7 +31,7 @@
 using System;
 using System.Collections;
 
-namespace Sharpen
+namespace Antlr4.Runtime.Sharpen
 {
 	internal interface IStructuralComparable {
 		int CompareTo (object other, IComparer comparer);

@@ -30,7 +30,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Antlr4.Runtime.Dfa;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Dfa
 {

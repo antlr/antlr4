@@ -33,8 +33,8 @@ using System.IO;
 using System.Reflection;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
-using Sharpen;
-using Sharpen.Reflect;
+using Antlr4.Runtime.Sharpen;
+using Antlr4.Runtime.Sharpen.Reflect;
 
 namespace Antlr4.Runtime.Misc
 {

@@ -31,7 +31,7 @@
 #if !PORTABLE
 
 using Antlr4.Runtime;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {

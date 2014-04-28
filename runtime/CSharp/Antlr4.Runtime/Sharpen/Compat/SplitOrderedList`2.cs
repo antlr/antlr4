@@ -30,7 +30,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Sharpen
+namespace Antlr4.Runtime.Sharpen
 {
 	internal class SplitOrderedList<TKey, T>
 	{

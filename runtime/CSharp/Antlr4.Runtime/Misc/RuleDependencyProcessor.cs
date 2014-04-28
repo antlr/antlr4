@@ -37,8 +37,8 @@ using Javax.Annotation.Processing;
 using Javax.Lang.Model.Element;
 using Javax.Lang.Model.Type;
 using Javax.Tools;
-using Sharpen;
-using Sharpen.Annotation;
+using Antlr4.Runtime.Sharpen;
+using Antlr4.Runtime.Sharpen.Annotation;
 
 namespace Antlr4.Runtime.Misc
 {

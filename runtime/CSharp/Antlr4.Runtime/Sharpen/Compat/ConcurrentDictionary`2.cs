@@ -36,7 +36,7 @@ namespace System.Collections.Concurrent
 {
 }
 
-namespace Sharpen
+namespace Antlr4.Runtime.Sharpen
 {
 #if !NET_CF
 	[DebuggerDisplay ("Count={Count}")]
