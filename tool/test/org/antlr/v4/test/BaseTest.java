@@ -80,6 +80,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -122,7 +123,7 @@ public abstract class BaseTest {
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
-	public static final boolean TEST_IN_SAME_PROCESS = true; // Boolean.parseBoolean(System.getProperty("antlr.testinprocess"));
+	public static final boolean TEST_IN_SAME_PROCESS = Boolean.parseBoolean(System.getProperty("antlr.testinprocess"));
 
     /**
      * Build up the full classpath we need, including the surefire path (if present)
@@ -130,7 +131,8 @@ public abstract class BaseTest {
     public static final String CLASSPATH = System.getProperty("java.class.path");
 
 	public String tmpdir = null;
-
+	public URLClassLoader loader = null;
+	
 	/** If error during parser execution, store stderr here; can't return
      *  stdout and stderr.  This doesn't trap errors from running antlr.
      */
@@ -143,9 +145,19 @@ public abstract class BaseTest {
 		protected void succeeded(Description description) {
 			// remove tmpdir if no error.
 			eraseTempDir();
+			freeLoader();
 		}
 
 	};
+
+	public void freeLoader() {
+		if(loader!=null) try {
+			loader.close();
+			loader = null;
+		} catch(Exception e) {
+			e.printStackTrace();
+		}	
+	}
 
     @Before
 	public void setUp() throws Exception {
@@ -536,13 +548,13 @@ public abstract class BaseTest {
 	}
 
 	public Class<?> loadClassFromTempDir(String name) throws Exception {
-		URLClassLoader loader =
-			new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() },
+		if(loader==null)
+			loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() },
 							   ClassLoader.getSystemClassLoader());
 		try {
 			return loader.loadClass(name);
 		} finally {
-			loader.close();
+			// loader.close();
 		}
 	}
 
@@ -643,7 +655,8 @@ public abstract class BaseTest {
 	public String execClass(String className) {
 		if (TEST_IN_SAME_PROCESS) {
 			try {
-				URLClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
+				if(loader==null)
+					loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
                 try {
                 	final Class<?> mainClass = (Class<?>)loader.loadClass(className);
 					final Method mainMethod = mainClass.getDeclaredMethod("main", String[].class);
@@ -683,7 +696,7 @@ public abstract class BaseTest {
 					}
 					return output;
                 } finally {
-                	loader.close();
+                	// loader.close();
                 }
 			} catch (MalformedURLException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);

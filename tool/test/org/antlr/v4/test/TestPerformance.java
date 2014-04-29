@@ -1184,7 +1184,8 @@ public class TestPerformance extends BaseTest {
 
     protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, final String entryPoint) {
         try {
-        	URLClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
+        	if(loader==null)
+        		loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
             try {
             	final Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
 	            final Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
@@ -1401,7 +1402,7 @@ public class TestPerformance extends BaseTest {
 	                }
 	            };
             } finally {
-            	loader.close();
+            	// loader.close();
             }
         } catch (Exception e) {
             e.printStackTrace(System.out);

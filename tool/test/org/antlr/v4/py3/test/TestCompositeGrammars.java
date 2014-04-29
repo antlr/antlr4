@@ -327,9 +327,9 @@ public class TestCompositeGrammars extends BaseTest {
 	@Test public void testDelegatorRuleOverridesLookaheadInDelegate() throws Exception {
 		String slave =
 			"parser grammar JavaDecl;\n" +
-			"type : 'int' ;\n" +
-			"decl : type ID ';'\n" +
-			"     | type ID init ';' {print(\"JavaDecl: \"+$text)}\n" +
+			"type_ : 'int' ;\n" +
+			"decl : type_ ID ';'\n" +
+			"     | type_ ID init ';' {print(\"JavaDecl: \"+$text)}\n" +
 			"     ;\n" +
 			"init : '=' INT ;\n";
 		mkdir(tmpdir);
@@ -338,7 +338,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"grammar Java;\n" +
 			"import JavaDecl;\n" +
 			"prog : decl ;\n" +
-			"type : 'int' | 'float' ;\n" +
+			"type_ : 'int' | 'float' ;\n" +
 			"\n" +
 			"ID  : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+ ;\n" +

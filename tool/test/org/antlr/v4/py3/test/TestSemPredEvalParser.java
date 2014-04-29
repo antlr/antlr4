@@ -609,7 +609,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar =
 			"grammar T2;\n" +
 			"\n" +
-			"file\n" +
+			"file_\n" +
 			"@after {print($ctx.toStringTree(recog=self))}\n" +
 			"  : para para EOF ;" +
 			"para: paraContent NL NL ;\n"+
@@ -618,19 +618,19 @@ public class TestSemPredEvalParser extends BaseTest {
 			"S : 's' ;\n"+
 			"X : 'x' ;\n";
 
-		return execParser("T2.g4", grammar, "T2Parser", "T2Lexer", "T2Listener", "T2Visitor", "file",
+		return execParser("T2.g4", grammar, "T2Parser", "T2Lexer", "T2Listener", "T2Visitor", "file_",
 								  input, true);
 	}
 	
 	@Test public void testPredFromAltTestedInLoopBack1() {
 		String found = testPredFromAltTestedInLoopBack("s\n\n\nx\n");
-		assertEquals("(file (para (paraContent s) \\n \\n) (para (paraContent \\n x \\n)) <EOF>)\n", found);
+		assertEquals("(file_ (para (paraContent s) \\n \\n) (para (paraContent \\n x \\n)) <EOF>)\n", found);
 		assertEquals("line 5:2 mismatched input '<EOF>' expecting '\n'\n", stderrDuringParse);
 	}
 	
 	@Test public void testPredFromAltTestedInLoopBack2() {
 		String found = testPredFromAltTestedInLoopBack("s\n\n\nx\n\n");
-		assertEquals("(file (para (paraContent s) \\n \\n) (para (paraContent \\n x) \\n \\n) <EOF>)\n", found);
+		assertEquals("(file_ (para (paraContent s) \\n \\n) (para (paraContent \\n x) \\n \\n) <EOF>)\n", found);
 		assertNull(stderrDuringParse);
 	}
 }

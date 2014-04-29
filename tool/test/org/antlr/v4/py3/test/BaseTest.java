@@ -122,7 +122,8 @@ public abstract class BaseTest {
     public static final String CLASSPATH = System.getProperty("java.class.path");
 
 	public String tmpdir = null;
-
+	public URLClassLoader loader = null;
+	
 	/** If error during parser execution, store stderr here; can't return
      *  stdout and stderr.  This doesn't trap errors from running antlr.
      */
@@ -136,10 +137,20 @@ public abstract class BaseTest {
 			// remove tmpdir if no error.
 			eraseTempPyCache();
 			eraseTempDir();
+			freeLoader();
 		}
 
 	};
 
+	public void freeLoader() {
+		if(loader!=null) try {
+			loader.close();
+			loader = null;
+		} catch(Exception e) {
+			e.printStackTrace();
+		}	
+	}
+	
     @Before
 	public void setUp() throws Exception {
         // new output dir for each test
@@ -451,14 +462,10 @@ public abstract class BaseTest {
 	}
 
 	public Class<?> loadClassFromTempDir(String name) throws Exception {
-		URLClassLoader loader =
-			new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() },
+		if(loader==null)
+			loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() },
 							   ClassLoader.getSystemClassLoader());
-		try {
-			return loader.loadClass(name);
-		} finally {
-			loader.close();
-		}
+		return loader.loadClass(name);
 	}
 
 	public Class<? extends Lexer> loadLexerClassFromTempDir(String name) throws Exception {

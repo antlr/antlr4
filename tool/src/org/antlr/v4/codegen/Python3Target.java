@@ -46,15 +46,23 @@ import java.util.Set;
  */
 public class Python3Target extends Target {
 
-	protected static final String[] javaKeywords = {
-		"abstract", "assert", "boolean", "break", "byte", "case", "catch",
-		"char", "class", "const", "continue", "default", "do", "double", "else",
-		"enum", "extends", "false", "final", "finally", "float", "for",
-		"if", "implements", "import", "instanceof", "int", "interface",
-		"long", "native", "new", "null", "package", "private", "protected",
-		"public", "return", "short", "static", "strictfp", "super", "switch",
-		"synchronized", "this", "throw", "throws", "transient", "true", "try",
-		"void", "volatile", "while"
+	protected static final String[] pythonKeywords = {
+		"abs", "divmod", "input", "open", "staticmethod", 
+		"all", "enumerate", "int", "ord", "str", 
+		"any", "eval", "isinstance", "pow", "sum",
+		"basestring", "execfile", "issubclass", "print", "super",
+		"bin", "file", "iter", "property", "tuple",
+		"bool", "filter", "len", "range", "type",
+		"bytearray", "float", "list", "raw_input", "unichr",
+		"callable", "format", "locals", "reduce", "unicode",
+		"chr", "frozenset", "long", "reload", "vars",
+		"classmethod", "getattr", "map", "repr", "xrange",
+		"cmp", "globals", "max", "reversed", "zip",
+		"compile", "hasattr", "memoryview", "round", "__import__",
+		"complex", "hash", "min", "set", "apply",
+		"delattr", "help", "next", "setattr", "buffer",
+		"dict", "hex", "object", "slice", "coerce",
+		"dir", "id", "oct", "sorted", "intern"
 	};
 
 	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
@@ -73,7 +81,7 @@ public class Python3Target extends Target {
 	}
 
 	protected void addBadWords() {
-		badWords.addAll(Arrays.asList(javaKeywords));
+		badWords.addAll(Arrays.asList(pythonKeywords));
 		badWords.add("rule");
 		badWords.add("parserRule");
 	}

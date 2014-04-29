@@ -71,7 +71,7 @@ public class TestParserExec extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"a : b1=b b2+=b* b3+=';' ;\n" +
-			"b : id=ID val+=INT*;\n" +
+			"b : id_=ID val+=INT*;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') -> skip ;\n";
@@ -426,7 +426,7 @@ public class TestParserExec extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"\n" +
-			"file @init{" +
+			"file_ @init{" +
 			"self._errHandler = BailErrorStrategy()" +
 			"} \n" +
 			"@after {" +
@@ -445,8 +445,8 @@ public class TestParserExec extends BaseTest {
 			"WS      : [ \\r\\t\\n]+ -> skip;\n";
 
 		String input = "a";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "file", input, false);
-		assertEquals("(file (item a) <EOF>)\n", found);
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "file_", input, false);
+		assertEquals("(file_ (item a) <EOF>)\n", found);
 		assertNull(stderrDuringParse);
 	}
 
