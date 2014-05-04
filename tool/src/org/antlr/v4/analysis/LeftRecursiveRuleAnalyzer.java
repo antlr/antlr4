@@ -31,6 +31,7 @@
 package org.antlr.v4.analysis;
 
 import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
@@ -44,15 +45,13 @@ import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarASTWithOptions;
+import org.antlr.v4.tool.ast.RuleRefAST;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /** Using a tree walker on the rules, determine if a rule is directly left-recursive and if it follows
  *  our pattern.
@@ -151,7 +150,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		if ( lrlabel!=null ) {
 			leftRecursiveRuleRefLabels.add(new Pair<GrammarAST,String>(lrlabel,altLabel));
 		}
-		stripAssocOptions(altTree);
+//		stripAssocOptions(altTree);
 		stripAltLabel(altTree);
 
 		// rewrite e to be e_[rec_arg]
@@ -257,16 +256,20 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		if ( t==null ) return null;
 		// get all top-level rule refs from ALT
 		List<GrammarAST> outerAltRuleRefs = t.getNodesWithTypePreorderDFS(IntervalSet.of(RULE_REF));
-		for (GrammarAST rref : outerAltRuleRefs) {
+		for (GrammarAST x : outerAltRuleRefs) {
+            RuleRefAST rref = (RuleRefAST)x;
 			boolean recursive = rref.getText().equals(ruleName);
 			boolean rightmost = rref == outerAltRuleRefs.get(outerAltRuleRefs.size()-1);
 			if ( recursive && rightmost ) {
-				rref.setText(ruleName+"<"+LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME+"="+prec+">");
+                GrammarAST dummyValueNode = new GrammarAST(new CommonToken(ANTLRParser.INT, ""+prec));
+                rref.setOption(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME, dummyValueNode);
+                //rref.setText(ruleName + "<" + LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME + "=" + prec + ">");
 			}
 		}
 		return t;
 	}
 
+    /* no longer needed? routine that generates alt text can deal with assoc if it wants
 	public void stripAssocOptions(GrammarAST t) {
 		if ( t==null ) return;
 		for (GrammarAST options : t.getNodesWithType(ELEMENT_OPTIONS)) {
@@ -287,6 +290,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 			}
 		}
 	}
+	*/
 
 	/**
 	 * Match (RULE RULE_REF (BLOCK (ALT .*) (ALT RULE_REF[self] .*) (ALT .*)))
@@ -349,9 +353,61 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 	public String text(GrammarAST t) {
 		if ( t==null ) return "";
-		CommonToken ta = (CommonToken) tokenStream.get(t.getTokenStartIndex());
-		CommonToken tb = (CommonToken) tokenStream.get(t.getTokenStopIndex());
-		return tokenStream.toString(ta, tb);
+
+        StringBuilder buf = new StringBuilder();
+        int a = t.getTokenStartIndex();
+        int b = t.getTokenStopIndex();
+
+        IntervalSet ignore = new IntervalSet();
+        // ignore tokens from existing option subtrees like:
+        //      ('+' (ELEMENT_OPTIONS (= assoc right)))
+        List<GrammarAST> optionsSubTrees = t.getNodesWithType(ELEMENT_OPTIONS);
+        for (GrammarAST sub : optionsSubTrees) {
+            ignore.add(sub.getTokenStartIndex(), sub.getTokenStopIndex());
+        }
+        IntervalSet noOptions = new IntervalSet();
+        // No options on labels: (ASSIGN label element)
+        List<GrammarAST> labeledSubTrees = t.getNodesWithType(new IntervalSet(ASSIGN,PLUS_ASSIGN));
+        for (GrammarAST sub : labeledSubTrees) {
+            noOptions.add(sub.getChild(0).getTokenStartIndex());
+        }
+
+        String options;
+        for (int i=a; i<=b; i++) {
+            options = "";
+            if ( ignore.contains(i) ) continue;
+
+            Token tok = tokenStream.get(i);
+//            System.out.println("token "+tok);
+            StringBuilder existingOptions = new StringBuilder();
+            GrammarAST node = t.getNodeWithTokenIndex(tok.getTokenIndex());
+            if ( node instanceof GrammarASTWithOptions ) {
+                GrammarASTWithOptions o = (GrammarASTWithOptions)node;
+                Map<String, GrammarAST> opts = o.getOptions();
+                if ( opts.size()>0 ) {
+                    existingOptions.append(",");
+                    for (String key : opts.keySet()) {
+                        existingOptions.append(key);
+                        existingOptions.append('=');
+                        existingOptions.append(opts.get(key).getText());
+                    }
+                }
+            }
+            if ( node!=null && !noOptions.contains(i) &&
+                 (tok.getType()==TOKEN_REF ||
+                  tok.getType()==STRING_LITERAL ||
+                  tok.getType()==RULE_REF) )
+            {
+                options = String.format("<charIndex=%d,line=%d,charPos=%d%s>",
+                        ((CommonToken) tok).getStartIndex(),
+                        tok.getLine(),
+                        tok.getCharPositionInLine(),
+                        existingOptions.toString());
+            }
+            buf.append(tok.getText());
+            buf.append(options);
+        }
+        return buf.toString();
 	}
 
 	public int precedence(int alt) {

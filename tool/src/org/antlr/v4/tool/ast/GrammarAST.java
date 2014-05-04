@@ -121,14 +121,29 @@ public class GrammarAST extends CommonTree {
 		return nodes;
 	}
 
-	public void getNodesWithTypePreorderDFS_(List<GrammarAST> nodes, IntervalSet types) {
-		if ( types.contains(this.getType()) ) nodes.add(this);
-		// walk all children of root.
-		for (int i= 0; i < getChildCount(); i++) {
-			GrammarAST child = (GrammarAST)getChild(i);
-			child.getNodesWithTypePreorderDFS_(nodes, types);
-		}
-	}
+    public void getNodesWithTypePreorderDFS_(List<GrammarAST> nodes, IntervalSet types) {
+   		if ( types.contains(this.getType()) ) nodes.add(this);
+   		// walk all children of root.
+   		for (int i= 0; i < getChildCount(); i++) {
+   			GrammarAST child = (GrammarAST)getChild(i);
+   			child.getNodesWithTypePreorderDFS_(nodes, types);
+   		}
+   	}
+
+    public GrammarAST getNodeWithTokenIndex(int index) {
+   		if ( this.getToken().getTokenIndex()==index ) {
+            return this;
+        }
+   		// walk all children of root.
+   		for (int i= 0; i < getChildCount(); i++) {
+   			GrammarAST child = (GrammarAST)getChild(i);
+   			GrammarAST result = child.getNodeWithTokenIndex(index);
+            if ( result!=null ) {
+                return result;
+            }
+   		}
+        return null;
+   	}
 
 	public AltAST getOutermostAltNode() {
 		if ( this instanceof AltAST && parent.parent instanceof RuleAST ) {
