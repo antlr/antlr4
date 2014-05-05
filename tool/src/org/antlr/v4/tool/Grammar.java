@@ -92,18 +92,18 @@ public class Grammar implements AttributeResolver {
 	public static final Set<String> ruleRefOptions = new HashSet<String>();
 	static {
 		ruleRefOptions.add(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME);
-        ruleRefOptions.add("charIndex");
-        ruleRefOptions.add("line");
-        ruleRefOptions.add("charPos");
+        ruleRefOptions.add(LeftRecursiveRuleTransformer.CHARINDEX_OPTION_NAME);
+        ruleRefOptions.add(LeftRecursiveRuleTransformer.LINE_OPTION_NAME);
+        ruleRefOptions.add(LeftRecursiveRuleTransformer.CHARPOS_OPTION_NAME);
 	}
 
 	/** Legal options for terminal refs like ID<assoc=right> */
 	public static final Set<String> tokenOptions = new HashSet<String>();
 	static {
         tokenOptions.add("assoc");
-        tokenOptions.add("charIndex");
-        tokenOptions.add("line");
-        tokenOptions.add("charPos");
+        tokenOptions.add(LeftRecursiveRuleTransformer.CHARINDEX_OPTION_NAME);
+        tokenOptions.add(LeftRecursiveRuleTransformer.LINE_OPTION_NAME);
+        tokenOptions.add(LeftRecursiveRuleTransformer.CHARPOS_OPTION_NAME);
     }
 
 	public static final Set<String> actionOptions = new HashSet<String>();

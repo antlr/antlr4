@@ -31,34 +31,17 @@
 package org.antlr.v4.analysis;
 
 import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.Tool;
 import org.antlr.v4.misc.OrderedHashMap;
-import org.antlr.v4.parse.ANTLRLexer;
-import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.parse.ScopeParser;
-import org.antlr.v4.parse.ToolANTLRParser;
+import org.antlr.v4.parse.*;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.semantics.BasicSemanticChecks;
 import org.antlr.v4.semantics.RuleCollector;
-import org.antlr.v4.tool.AttributeDict;
-import org.antlr.v4.tool.ErrorType;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.GrammarTransformPipeline;
-import org.antlr.v4.tool.LabelElementPair;
-import org.antlr.v4.tool.LeftRecursiveRule;
-import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.ActionAST;
-import org.antlr.v4.tool.ast.AltAST;
-import org.antlr.v4.tool.ast.BlockAST;
-import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.GrammarASTWithOptions;
-import org.antlr.v4.tool.ast.GrammarRootAST;
-import org.antlr.v4.tool.ast.RuleAST;
+import org.antlr.v4.tool.*;
+import org.antlr.v4.tool.ast.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,7 +53,10 @@ import java.util.List;
  *  MODIFIES grammar AST in place.
  */
 public class LeftRecursiveRuleTransformer {
-	public static final String PRECEDENCE_OPTION_NAME = "p";
+    public static final String PRECEDENCE_OPTION_NAME = "p";
+    public static final String CHARINDEX_OPTION_NAME = "charIndex";
+    public static final String LINE_OPTION_NAME = "line";
+    public static final String CHARPOS_OPTION_NAME = "charPos";
 
 	public GrammarRootAST ast;
 	public Collection<Rule> rules;
@@ -209,7 +195,8 @@ public class LeftRecursiveRuleTransformer {
 		try {
 			ParserRuleReturnScope r = p.rule();
 			RuleAST tree = (RuleAST)r.getTree();
-			GrammarTransformPipeline.setGrammarPtr(g, tree);
+            GrammarTransformPipeline.setGrammarPtr(g, tree);
+            GrammarTransformPipeline.augmentTokensWithOriginalPosition(g, tree);
 			return tree;
 		}
 		catch (Exception e) {
