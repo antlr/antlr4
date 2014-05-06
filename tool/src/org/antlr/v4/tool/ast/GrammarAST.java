@@ -68,6 +68,10 @@ public class GrammarAST extends CommonTree {
     public GrammarAST(int type) { super(new CommonToken(type, ANTLRParser.tokenNames[type])); }
     public GrammarAST(int type, Token t) {
 		this(new CommonToken(type, t.getText()));
+        if ( t instanceof CommonToken ) {
+            ((CommonToken) token).setStartIndex(((CommonToken) t).getStartIndex());
+            ((CommonToken) token).setStopIndex(((CommonToken) t).getStopIndex());
+        }
 		token.setInputStream(t.getInputStream());
 		token.setLine(t.getLine());
 		token.setCharPositionInLine(t.getCharPositionInLine());
@@ -75,6 +79,10 @@ public class GrammarAST extends CommonTree {
 	}
     public GrammarAST(int type, Token t, String text) {
 		this(new CommonToken(type, text));
+        if ( t instanceof CommonToken ) {
+            ((CommonToken) token).setStartIndex(((CommonToken) t).getStartIndex());
+            ((CommonToken) token).setStopIndex(((CommonToken) t).getStopIndex());
+        }
 		token.setInputStream(t.getInputStream());
 		token.setLine(t.getLine());
 		token.setCharPositionInLine(t.getCharPositionInLine());
