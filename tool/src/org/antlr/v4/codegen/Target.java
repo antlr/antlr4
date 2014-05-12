@@ -32,7 +32,6 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.SerializedATN;
-import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
@@ -368,10 +367,6 @@ public abstract class Target {
 	}
 
 	public boolean wantsBaseVisitor() {
-		return true;
-	}
-
-	public boolean wantsDeclaration(Decl d) {
 		return true;
 	}
 

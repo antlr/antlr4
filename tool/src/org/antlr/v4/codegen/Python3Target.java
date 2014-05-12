@@ -30,15 +30,14 @@
 
 package org.antlr.v4.codegen;
 
-import org.antlr.v4.codegen.model.decl.Decl;
-import org.antlr.v4.tool.ast.GrammarAST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.StringRenderer;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.StringRenderer;
 
 /**
  *
@@ -219,11 +218,6 @@ public class Python3Target extends Target {
 	@Override
 	public boolean wantsBaseVisitor() {
 		return false;
-	}
-
-	@Override
-	public boolean wantsDeclaration(Decl d) {
-		return d.isList();
 	}
 
 	@Override

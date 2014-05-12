@@ -78,7 +78,7 @@ class ParserRuleContext(RuleContext):
     #* COPY a ctx (I'm deliberately not using copy constructor)#/
     def copyFrom(self, ctx:ParserRuleContext):
         # from RuleContext
-        self.parent = ctx.parent
+        self.parentCtx = ctx.parentCtx
         self.invokingState = ctx.invokingState
         self.children = None
         self.start = ctx.start

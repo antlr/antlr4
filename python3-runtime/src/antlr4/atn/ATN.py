@@ -146,7 +146,7 @@ class ATN(object):
             following = self.nextTokens(rt.followState)
             expected.addSet(following);
             expected.remove(Token.EPSILON)
-            ctx = ctx.parent
+            ctx = ctx.parentCtx
         if Token.EPSILON in following:
             expected.addOne(Token.EOF)
         return expected

@@ -44,13 +44,12 @@ ParserFile(file, parser, namedActions) ::= <<
 from antlr4 import *
 from io import StringIO
 <if(file.genListener)>
-from <file.grammarName>Listener import <file.grammarName>Listener
+from .<file.grammarName>Listener import <file.grammarName>Listener
 <endif>
 <if(file.genVisitor)>
-from <file.grammarName>Visitor import <file.grammarName>Visitor
+from .<file.grammarName>Visitor import <file.grammarName>Visitor
 <endif>
 <namedActions.header>
-
 <parser>
 >>
 
@@ -104,7 +103,10 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 >>
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
+<if(parser.needsSuperClass)>
+from .<superClass> import <superClass>
 
+<endif>
 <atn>
 
 class <parser.name> ( <superClass> ):
@@ -291,7 +293,7 @@ def <currentRule.name>(self, _p:int=0<if(currentRule.args)>, <currentRule.args:{
 >>
 
 CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
-<if(currentOuterMostAltCodeBlock.altLabel)>localctx = <parser.name>.<currentOuterMostAltCodeBlock.altLabel; format="cap">Context(localctx)<endif>
+<if(currentOuterMostAltCodeBlock.altLabel)>localctx = <parser.name>.<currentOuterMostAltCodeBlock.altLabel; format="cap">Context(self, localctx)<endif>
 self.enterOuterAlt(localctx, <currentOuterMostAltCodeBlock.alt.altNum>)
 <CodeBlockForAlt(currentAltCodeBlock=currentOuterMostAltCodeBlock, ...)>
 >>
@@ -471,7 +473,7 @@ testShiftInRange(shiftAmount) ::= <<
 
 // produces smaller bytecode only when bits.ttypes contains more than two items
 bitsetBitfieldComparison(s, bits) ::= <%
-(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> and ((1 \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (1 \<\< self.<offsetShift(ttype, bits.shift)>)}; separator=" | ">)) != 0)
+(<testShiftInRange({<offsetShiftVar(s.varName, bits.shift)>})> and ((1 \<\< <offsetShiftVar(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (1 \<\< <offsetShiftType(ttype, bits.shift)>)}; separator=" | ">)) != 0)
 %>
 
 isZero ::= [
@@ -479,8 +481,12 @@ isZero ::= [
 default:false
 ]
 
-offsetShift(shiftAmount, offset) ::= <%
+offsetShiftVar(shiftAmount, offset) ::= <%
 <if(!isZero.(offset))>(<shiftAmount> - <offset>)<else><shiftAmount><endif>
+%>
+
+offsetShiftType(shiftAmount, offset) ::= <%
+<if(!isZero.(offset))>(self.<shiftAmount> - <offset>)<else>self.<shiftAmount><endif>
 %>
 
 // produces more efficient bytecode when bits.ttypes contains at most two items
@@ -489,7 +495,7 @@ bitsetInlineComparison(s, bits) ::= <%
 %>
 
 cases(ttypes) ::= <<
-<ttypes:{t | if token==self.<t>:}; separator="\n">
+if token in [<ttypes:{t | self.<t>}; separator=", ">]:
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
@@ -656,7 +662,7 @@ StructDecl(struct,attrs,getters,dispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext}) ::= <<
 class <struct.name>(<superClass>):
 
-    def __init__(self, parser, parent:ParserRuleContext, invokingState:int<struct.ctorAttrs:{a | , <a.name>:<a.type>}>):
+    def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1<struct.ctorAttrs:{a | , <a.name>:<a.type>}>):
         super().__init__(parent, invokingState)
         self.parser = parser
         <struct.ctorAttrs:{a | self.<a.name> = <a.name>}; separator="\n">
@@ -681,8 +687,9 @@ class <struct.name>(<superClass>):
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
 class <struct.name>(<currentRule.name; format="cap">Context):
 
-    def __init__(self, ctx:ParserRuleContext): # actually a <parser.name>.<currentRule.name; format="cap">Context)
-        <attrs:{a | self.<a>}; separator="\n">
+    def __init__(self, parser, ctx:ParserRuleContext): # actually a <parser.name>.<currentRule.name; format="cap">Context)
+        super().__init__(parser)
+        <attrs:{a | <a>}; separator="\n">
         self.copyFrom(ctx)
     
     <getters:{g | <g>}; separator="\n">
@@ -727,13 +734,13 @@ self.pushNewRecursionContext(localctx, _startState, self.RULE_<ruleName>)
 >>
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label) ::= <<
-localctx = <parser.name>.<currentAltLabel; format="cap">Context(<parser.name>.<ruleName; format="cap">Context(self, _parentctx, _parentState));
+localctx = <parser.name>.<currentAltLabel; format="cap">Context(self, <parser.name>.<ruleName; format="cap">Context(self, _parentctx, _parentState))
 <if(label)>localctx.<label> = _prevctx<endif>
 self.pushNewRecursionContext(localctx, _startState, self.RULE_<ruleName>)
 >>
 
 recRuleReplaceContext(ctxName) ::= <<
-localctx = <parser.name>.<ctxName>Context(localctx)
+localctx = <parser.name>.<ctxName>Context(self, localctx)
 self._ctx = localctx
 _prevctx = localctx
 >>
@@ -750,10 +757,10 @@ LexerFile(lexerFile, lexer, namedActions) ::= <<
 from antlr4 import *
 from io import StringIO
 <if(lexerFile.genListener)>
-from <lexerFile.grammarName>Listener import <lexerFile.grammarName>Listener
+from .<lexerFile.grammarName>Listener import <lexerFile.grammarName>Listener
 <endif>
 <if(lexerFile.genVisitor)>
-from <lexerFile.grammarName>Visitor import <lexerFile.grammarName>Visitor
+from .<lexerFile.grammarName>Visitor import <lexerFile.grammarName>Visitor
 <endif>
 <namedActions.header>
 
@@ -784,7 +791,7 @@ class <lexer.name>(<superClass>):
     grammarFileName = "<lexer.grammarFileName>"
     
     def __init__(self, input=None):
-        super(type(self), self).__init__(input)
+        super().__init__(input)
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
         self._predicates = None

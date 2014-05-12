@@ -251,30 +251,26 @@ class BufferedTokenStream(TokenStream):
     # Collect all tokens on specified channel to the right of
     #  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL or
     #  EOF. If channel is -1, find any non default channel token.
-    def getHiddenTokensToRight(self, tokenIndex:int, channel:int):
+    def getHiddenTokensToRight(self, tokenIndex:int, channel:int=-1):
         self.lazyInit()
         if self.tokenIndex<0 or tokenIndex>=len(self.tokens):
             raise Exception(str(tokenIndex) + " not in 0.." + str(len(self.tokens)-1))
-
+        from antlr4.Lexer import Lexer
         nextOnChannel = self.nextTokenOnChannel(tokenIndex + 1, Lexer.DEFAULT_TOKEN_CHANNEL)
         from_ = tokenIndex+1
         # if none onchannel to right, nextOnChannel=-1 so set to = last token
         to = (len(self.tokens)-1) if nextOnChannel==-1 else nextOnChannel
         return self.filterForChannel(from_, to, channel)
 
-    # Collect all hidden tokens (any off-default channel) to the right of
-    #  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL
-    #  of EOF.
-    def getHiddenTokensToRight(self, tokenIndex:int):
-        return self.getHiddenTokensToRight(tokenIndex, -1)
 
     # Collect all tokens on specified channel to the left of
     #  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
     #  If channel is -1, find any non default channel token.
-    def getHiddenTokensToLeft(self, tokenIndex:int, channel:int):
+    def getHiddenTokensToLeft(self, tokenIndex:int, channel:int=-1):
         self.lazyInit()
         if tokenIndex<0 or tokenIndex>=len(self.tokens):
             raise Exception(str(tokenIndex) + " not in 0.." + str(len(self.tokens)-1))
+        from antlr4.Lexer import Lexer
         prevOnChannel = self.previousTokenOnChannel(tokenIndex - 1, Lexer.DEFAULT_TOKEN_CHANNEL)
         if prevOnChannel == tokenIndex - 1:
             return None
@@ -289,6 +285,7 @@ class BufferedTokenStream(TokenStream):
         for i in range(left, right+1):
             t = self.tokens[i]
             if channel==-1:
+                from antlr4.Lexer import Lexer
                 if t.channel!= Lexer.DEFAULT_TOKEN_CHANNEL:
                     hidden.append(t)
             elif t.channel==channel:

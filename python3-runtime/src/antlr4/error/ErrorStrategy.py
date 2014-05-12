@@ -655,7 +655,7 @@ class DefaultErrorStrategy(ErrorStrategy):
             rt = invokingState.transitions[0]
             follow = atn.nextTokens(rt.followState)
             recoverSet.addSet(follow)
-            ctx = ctx.parent
+            ctx = ctx.parentCtx
         recoverSet.remove(Token.EPSILON)
         return recoverSet
 
@@ -705,7 +705,7 @@ class BailErrorStrategy(DefaultErrorStrategy):
         context = recognizer._ctx
         while context is not None:
             context.exception = e
-            context = context.parent
+            context = context.parentCtx
         raise ParseCancellationException(e)
 
     # Make sure we don't attempt to recover inline; if the parser

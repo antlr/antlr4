@@ -98,6 +98,8 @@ class Parser (Recognizer):
         self._syntaxErrors = 0
         self.setInputStream(input)
 
+    def __setattr__(self, key, value):
+        object.__setattr__(self, key, value)
 
     # reset the parser's state#
     def reset(self):
@@ -363,8 +365,8 @@ class Parser (Recognizer):
 
     def addContextToParseTree(self):
         # add current context to parent if we have a parent
-        if self._ctx.parent is not None:
-            self._ctx.parent.addChild(self._ctx)
+        if self._ctx.parentCtx is not None:
+            self._ctx.parentCtx.addChild(self._ctx)
 
     # Always called by generated parsers upon entry to a rule. Access field
     # {@link #_ctx} get the current context.
@@ -384,15 +386,15 @@ class Parser (Recognizer):
         if self._parseListeners is not None:
             self.triggerExitRuleEvent()
         self.state = self._ctx.invokingState
-        self._ctx = self._ctx.parent
+        self._ctx = self._ctx.parentCtx
 
     def enterOuterAlt(self, localctx:ParserRuleContext, altNum:int):
         # if we have new localctx, make sure we replace existing ctx
         # that is previous child of parse tree
         if self.buildParseTrees and self._ctx != localctx:
-            if self._ctx.parent is not None:
-                self._ctx.parent.removeLastChild()
-                self._ctx.parent.addChild(localctx)
+            if self._ctx.parentCtx is not None:
+                self._ctx.parentCtx.removeLastChild()
+                self._ctx.parentCtx.addChild(localctx)
         self._ctx = localctx
 
     # Get the precedence level for the top-most precedence rule.
@@ -419,7 +421,7 @@ class Parser (Recognizer):
     #
     def pushNewRecursionContext(self, localctx:ParserRuleContext, state:int, ruleIndex:int):
         previous = self._ctx
-        previous.parent = localctx
+        previous.parentCtx = localctx
         previous.invokingState = state
         previous.stop = self._input.LT(-1)
 
@@ -431,31 +433,31 @@ class Parser (Recognizer):
         if self._parseListeners is not None:
             self.triggerEnterRuleEvent() # simulates rule entry for left-recursive rules
 
-    def unrollRecursionContexts(self, parentctx:ParserRuleContext):
+    def unrollRecursionContexts(self, parentCtx:ParserRuleContext):
         self._precedenceStack.pop()
         self._ctx.stop = self._input.LT(-1)
-        retctx = self._ctx # save current ctx (return value)
+        retCtx = self._ctx # save current ctx (return value)
         # unroll so _ctx is as it was before call to recursive method
         if self._parseListeners is not None:
-            while self._ctx is not parentctx:
+            while self._ctx is not parentCtx:
                 self.triggerExitRuleEvent()
-                self._ctx = self._ctx.parent
+                self._ctx = self._ctx.parentCtx
         else:
-            self._ctx = parentctx
+            self._ctx = parentCtx
 
         # hook into tree
-        retctx.parent = parentctx
+        retCtx.parentCtx = parentCtx
 
-        if self.buildParseTrees and parentctx is not None:
+        if self.buildParseTrees and parentCtx is not None:
             # add return ctx into invoking rule's tree
-            parentctx.addChild(retctx)
+            parentCtx.addChild(retCtx)
 
     def getInvokingContext(self, ruleIndex:int):
         ctx = self._ctx
         while ctx is not None:
             if ctx.ruleIndex == ruleIndex:
                 return ctx
-            ctx = ctx.parent
+            ctx = ctx.parentCtx
         return None
 
 
@@ -496,7 +498,7 @@ class Parser (Recognizer):
             following = atn.nextTokens(rt.followState)
             if symbol in following:
                 return True
-            ctx = ctx.parent
+            ctx = ctx.parentCtx
 
         if Token.EPSILON in following and symbol == Token.EOF:
             return True
@@ -543,7 +545,7 @@ class Parser (Recognizer):
                 stack.append("n/a")
             else:
                 stack.append(self.ruleNames[ruleIndex])
-            p = p.parent
+            p = p.parentCtx
         return stack
 
     # For debugging and other purposes.#

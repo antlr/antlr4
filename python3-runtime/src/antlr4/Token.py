@@ -130,6 +130,7 @@ class CommonToken(Token):
         t.line = self.line
         t.column = self.column
         t.text = self.text
+        return t
 
     @property
     def text(self):

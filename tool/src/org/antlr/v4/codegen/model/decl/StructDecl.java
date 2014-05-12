@@ -82,7 +82,7 @@ public class StructDecl extends Decl {
 		d.ctx = this;
 		if ( d instanceof ContextGetterDecl ) 
 			getters.add(d);
-		else if (factory.getGenerator().getTarget().wantsDeclaration(d))
+		else
 			attrs.add(d);
 	}
 

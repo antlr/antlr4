@@ -64,17 +64,18 @@ class RuleContext(RuleNode):
     def __init__(self, parent:RuleContext=None, invokingState:int=-1):
         super().__init__()
         # What context invoked this rule?
-        self.parent = parent
+        self.parentCtx = parent
         # What state invoked the rule associated with this context?
         #  The "return address" is the followState of invokingState
         #  If parent is null, this should be -1.
         self.invokingState = invokingState
 
+
     def depth(self):
         n = 0
         p = self
         while p is not None:
-            p = p.parent
+            p = p.parentCtx
             n += 1
         return n
 
@@ -225,10 +226,10 @@ class RuleContext(RuleNode):
                     ruleName = ruleNames[ri] if ri >= 0 and ri < len(ruleNames) else str(ri)
                     buf.write(ruleName)
 
-                if p.parent is not None and (ruleNames is not None or not p.parent.isEmpty()):
+                if p.parentCtx is not None and (ruleNames is not None or not p.parentCtx.isEmpty()):
                     buf.write(" ")
 
-                p = p.parent
+                p = p.parentCtx
 
             buf.write("]")
             return buf.getvalue()
