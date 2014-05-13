@@ -320,12 +320,12 @@ case <index>: return <actions.(index)>;}; separator="\n">
 }
 >>
 
-RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
+RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
 
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=",">) throws RecognitionException {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<args; separator=",">) throws RecognitionException {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>);
 	enterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
 	<namedActions.init>
@@ -355,18 +355,18 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 }
 >>
 
-LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
+LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 	namedActions,finallyAction,postamble) ::=
 <<
 
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<currentRule.args; separator=", ">) throws RecognitionException {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<args; separator=", ">) throws RecognitionException {
 	return <currentRule.name>(0<currentRule.args:{a | , <a.name>}>);
 }
 
-private <currentRule.ctxType> <currentRule.name>(int _p<currentRule.args:{a | , <a>}>) throws RecognitionException {
+private <currentRule.ctxType> <currentRule.name>(int _p<args:{a | , <a>}>) throws RecognitionException {
 	ParserRuleContext _parentctx = _ctx;
 	int _parentState = getState();
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>);
@@ -697,11 +697,11 @@ SetNonLocalAttr(s, rhsChunks)	  ::=
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.add(<labelref(a.label)>);"
 
-TokenDecl(t) ::= "public <TokenLabelType()> <t.name>;"
+TokenDecl(t) ::= "<TokenLabelType()> <t.name>"
 TokenTypeDecl(t) ::= "int <t.name>;"
-TokenListDecl(t) ::= "public List\<Token> <t.name> = new ArrayList\<Token>();"
-RuleContextDecl(r) ::= "public <r.ctxName> <r.name>;"
-RuleContextListDecl(rdecl) ::= "public List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>();"
+TokenListDecl(t) ::= "List\<Token> <t.name> = new ArrayList\<Token>()"
+RuleContextDecl(r) ::= "<r.ctxName> <r.name>"
+RuleContextListDecl(rdecl) ::= "List\<<rdecl.ctxName>> <rdecl.name> = new ArrayList\<<rdecl.ctxName>>()"
 
 ContextTokenGetterDecl(t)      ::=
     "public TerminalNode <t.name>() { return getToken(<parser.name>.<t.name>, 0); }"
@@ -743,13 +743,13 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 
-StructDecl(struct,attrs,getters,dispatchMethods,interfaces,extensionMembers,
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext}) ::= <<
 public static class <struct.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
-	<attrs:{a | <a>}; separator="\n">
+	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	<if(struct.ctorAttrs)>public <struct.name>(ParserRuleContext parent, int invokingState) { super(parent, invokingState); }<endif>
-	public <struct.name>(ParserRuleContext parent, int invokingState<struct.ctorAttrs:{a | , <a>}>) {
+	<if(ctorAttrs)>public <struct.name>(ParserRuleContext parent, int invokingState) { super(parent, invokingState); }<endif>
+	public <struct.name>(ParserRuleContext parent, int invokingState<ctorAttrs:{a | , <a>}>) {
 		super(parent, invokingState);
 		<struct.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
 	}
@@ -768,7 +768,7 @@ public static class <struct.name> extends <superClass><if(interfaces)> implement
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
 public static class <struct.name> extends <currentRule.name; format="cap">Context {
-	<attrs:{a | <a>}; separator="\n">
+	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
 	public <struct.name>(<currentRule.name; format="cap">Context ctx) { copyFrom(ctx); }
 	<dispatchMethods; separator="\n">
@@ -790,7 +790,7 @@ public \<T> T accept(ParseTreeVisitor\<? extends T> visitor) {
 }
 >>
 
-AttributeDecl(d) ::= "public <d.decl>;"
+AttributeDecl(d) ::= "<d.type> <d.name>"
 
 /** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if(!x.isLocal)>((<x.ctx.name>)_localctx).<endif><x.name>"

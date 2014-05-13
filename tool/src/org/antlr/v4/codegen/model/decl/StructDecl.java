@@ -31,11 +31,7 @@
 package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.DispatchMethod;
-import org.antlr.v4.codegen.model.ListenerDispatchMethod;
-import org.antlr.v4.codegen.model.ModelElement;
-import org.antlr.v4.codegen.model.OutputModelObject;
-import org.antlr.v4.codegen.model.VisitorDispatchMethod;
+import org.antlr.v4.codegen.model.*;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.Rule;
@@ -52,7 +48,7 @@ public class StructDecl extends Decl {
 	public boolean provideCopyFrom;
 	@ModelElement public OrderedHashSet<Decl> attrs = new OrderedHashSet<Decl>();
 	@ModelElement public OrderedHashSet<Decl> getters = new OrderedHashSet<Decl>();
-	@ModelElement public Collection<Attribute> ctorAttrs;
+	@ModelElement public Collection<AttributeDecl> ctorAttrs;
 	@ModelElement public List<? super DispatchMethod> dispatchMethods;
 	@ModelElement public List<OutputModelObject> interfaces;
 	@ModelElement public List<OutputModelObject> extensionMembers;
@@ -85,7 +81,7 @@ public class StructDecl extends Decl {
 	}
 
 	public void addDecl(Attribute a) {
-		addDecl(new AttributeDecl(factory, a.name, a.decl));
+		addDecl(new AttributeDecl(factory, a));
 	}
 
 	public void addDecls(Collection<Attribute> attrList) {
