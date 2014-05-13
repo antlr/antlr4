@@ -130,6 +130,14 @@ public class TestCodeGeneration extends BaseTest {
 			CodeGenerator gen = new CodeGenerator(g);
 			ST outputFileST = gen.generateParser();
 
+//			STViz viz = outputFileST.inspect();
+//			try {
+//				viz.waitForClose();
+//			}
+//			catch (Exception e) {
+//				e.printStackTrace();
+//			}
+
 			boolean debug = false;
 			DebugInterpreter interp =
 					new DebugInterpreter(outputFileST.groupThatCreatedThisInstance,
