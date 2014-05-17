@@ -1,0 +1,6 @@
+import org.antlr.v4.runtime.RuleDependency;
+
+public class TestProcessorEnabled {
+    @RuleDependency(recognizer = SimpleParser.class, rule = SimpleParser.RULE_sourceFile, version = 0)
+    private int foo;
+}

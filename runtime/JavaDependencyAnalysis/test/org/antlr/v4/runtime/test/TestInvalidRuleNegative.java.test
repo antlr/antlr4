@@ -1,0 +1,6 @@
+import org.antlr.v4.runtime.RuleDependency;
+
+public class TestInvalidRuleNegative {
+    @RuleDependency(recognizer = SimpleParser.class, rule = -1, version = 0)
+    private int foo;
+}

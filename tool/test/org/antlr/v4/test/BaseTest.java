@@ -91,6 +91,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
+import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -339,6 +340,10 @@ public abstract class BaseTest {
 	 *  Had rules called r and modulo. Wouldn't compile til I changed to 'a'.
 	 */
 	protected boolean compile(String... fileNames) {
+		return compile(null, fileNames);
+	}
+
+	protected boolean compile(Writer out, String... fileNames) {
 		List<File> files = new ArrayList<File>();
 		for (String fileName : fileNames) {
 			File f = new File(tmpdir, fileName);
@@ -359,7 +364,7 @@ public abstract class BaseTest {
 			Arrays.asList("-g", "-source", "1.6", "-target", "1.6", "-implicit:class", "-Xlint:-options", "-d", tmpdir, "-cp", tmpdir+pathSep+CLASSPATH);
 
 		JavaCompiler.CompilationTask task =
-			compiler.getTask(null, fileManager, null, compileOptions, null,
+			compiler.getTask(out, fileManager, null, compileOptions, null,
 							 compilationUnits);
 		boolean ok = task.call();
 
