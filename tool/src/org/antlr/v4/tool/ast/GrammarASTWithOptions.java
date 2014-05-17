@@ -34,16 +34,16 @@ import org.antlr.runtime.Token;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.runtime.misc.NotNull;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class GrammarASTWithOptions extends GrammarAST {
-    protected Map<String, GrammarAST> options;
+    protected final Map<String, GrammarAST> options = new HashMap<String, GrammarAST>();
 
 	public GrammarASTWithOptions(GrammarASTWithOptions node) {
 		super(node);
-		this.options = node.options;
+
+		this.options.putAll(node.getOptions());
 	}
 
 	public GrammarASTWithOptions(Token t) { super(t); }
@@ -52,8 +52,7 @@ public abstract class GrammarASTWithOptions extends GrammarAST {
     public GrammarASTWithOptions(int type, Token t, String text) { super(type,t,text); }
 
     public void setOption(String key, GrammarAST node) {
-        if ( options==null ) options = new HashMap<String, GrammarAST>();
-        options.put(key, node);
+        this.options.put(key, node);
     }
 
 	public String getOptionString(String key) {
@@ -88,10 +87,6 @@ public abstract class GrammarASTWithOptions extends GrammarAST {
 
 	@NotNull
 	public Map<String, GrammarAST> getOptions() {
-		if (options == null) {
-			return Collections.emptyMap();
-		}
-
 		return options;
 	}
 }

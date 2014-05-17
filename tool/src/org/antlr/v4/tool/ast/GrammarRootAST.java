@@ -49,11 +49,13 @@ public class GrammarRootAST extends GrammarASTWithOptions {
 	/** Track stream used to create this tree */
 	@NotNull
 	public final TokenStream tokenStream;
-	public Map<String, String> cmdLineOptions; // -DsuperClass=T on command line
 	public String fileName;
+
+	private final HashMap<String, String> commandLineOptions = new HashMap<String, String>();
 
 	public GrammarRootAST(GrammarRootAST node) {
 		super(node);
+
 		this.grammarType = node.grammarType;
 		this.hasErrors = node.hasErrors;
 		this.tokenStream = node.tokenStream;
@@ -86,6 +88,10 @@ public class GrammarRootAST extends GrammarASTWithOptions {
 		this.tokenStream = tokenStream;
     }
 
+	public void applyCommandLineOptions(final Map<String, String> cmdLineOptions) {
+		this.commandLineOptions.putAll(cmdLineOptions);
+	}
+
 	public String getGrammarName() {
 		Tree t = getChild(0);
 		if ( t!=null ) return t.getText();
@@ -94,14 +100,7 @@ public class GrammarRootAST extends GrammarASTWithOptions {
 
 	@Override
 	public String getOptionString(String key) {
-		if ( cmdLineOptions!=null && cmdLineOptions.containsKey(key) ) {
-			return cmdLineOptions.get(key);
-		}
-		String value = super.getOptionString(key);
-		if ( value==null ) {
-			value = defaultOptions.get(key);
-		}
-		return value;
+		return this.getCombinedOptions().get(key);
 	}
 
 	@Override
@@ -109,4 +108,17 @@ public class GrammarRootAST extends GrammarASTWithOptions {
 
 	@Override
 	public GrammarRootAST dupNode() { return new GrammarRootAST(this); }
+
+	public Map<String, String> getCombinedOptions() {
+		final HashMap<String, String> combinedOptions = new HashMap<String, String>();
+		combinedOptions.putAll(defaultOptions);
+
+		for (final String key : this.getOptions().keySet()) {
+			combinedOptions.put(key, super.getOptionString(key));
+		}
+
+		combinedOptions.putAll(this.commandLineOptions);
+
+		return combinedOptions;
+	}
 }

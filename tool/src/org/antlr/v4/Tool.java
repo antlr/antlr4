@@ -134,7 +134,7 @@ public class Tool {
 	public boolean gen_visitor = false;
 	public boolean gen_dependencies = false;
 	public String genPackage = null;
-	public Map<String, String> grammarOptions = null;
+	public Map<String, String> commandLineOptions = new HashMap<String, String>();
 	public boolean warnings_are_errors = false;
 	public boolean longMessages = false;
 
@@ -223,7 +223,7 @@ public class Tool {
 			String arg = args[i];
 			i++;
 			if ( arg.startsWith("-D") ) { // -Dlanguage=Java syntax
-				handleOptionSetArg(arg);
+				handleOptionSetArg(arg.substring("-D".length()));
 				continue;
 			}
 			if ( arg.charAt(0)!='-' ) { // file name
@@ -295,28 +295,14 @@ public class Tool {
 	}
 
 	protected void handleOptionSetArg(String arg) {
-		int eq = arg.indexOf('=');
-		if ( eq>0 && arg.length()>3 ) {
-			String option = arg.substring("-D".length(), eq);
-			String value = arg.substring(eq+1);
-			if ( value.length()==0 ) {
-				errMgr.toolError(ErrorType.BAD_OPTION_SET_SYNTAX, arg);
-				return;
-			}
-			if ( Grammar.parserOptions.contains(option) ||
-				 Grammar.lexerOptions.contains(option) )
-			{
-				if ( grammarOptions==null ) grammarOptions = new HashMap<String, String>();
-				grammarOptions.put(option, value);
-			}
-			else {
-				errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
-									null,
-									null,
-									option);
-			}
-		}
-		else {
+		final String[] pieces = arg.split("=", 2);
+		final boolean hasEqualSign = arg.indexOf('=') > 0;
+
+		if (pieces.length == 2) {
+			commandLineOptions.put(pieces[0], pieces[1]);
+		} else if (hasEqualSign) {
+			commandLineOptions.put(pieces[0], "");
+		} else {
 			errMgr.toolError(ErrorType.BAD_OPTION_SET_SYNTAX, arg);
 		}
 	}
@@ -364,9 +350,7 @@ public class Tool {
 		{
 			lexerAST = transform.extractImplicitLexer(g); // alters g.ast
 			if ( lexerAST!=null ) {
-				if (grammarOptions != null) {
-					lexerAST.cmdLineOptions = grammarOptions;
-				}
+				lexerAST.applyCommandLineOptions(commandLineOptions);
 
 				lexerg = new LexerGrammar(this, lexerAST);
 				lexerg.fileName = g.fileName;
@@ -633,9 +617,7 @@ public class Tool {
 				if ( root instanceof GrammarRootAST) {
 					((GrammarRootAST)root).hasErrors = lexer.getNumberOfSyntaxErrors()>0 || p.getNumberOfSyntaxErrors()>0;
 					assert ((GrammarRootAST)root).tokenStream == tokens;
-					if ( grammarOptions!=null ) {
-						((GrammarRootAST)root).cmdLineOptions = grammarOptions;
-					}
+					((GrammarRootAST)root).applyCommandLineOptions(commandLineOptions);
 					return ((GrammarRootAST)root);
 				}
 			}
