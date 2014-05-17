@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.antlr</groupId>
+  <artifactId>antlr-runtime</artifactId>
+  <packaging>jar</packaging>
+  
+  <!--
+
+    Inherit from the ANTLR master pom, which tells us what
+    version we are and allows us to inherit dependencies
+    and so on.
+
+    -->
+  <parent>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr-master</artifactId>
+      <version>3.5.2</version>
+      <relativePath>../..</relativePath>
+  </parent>
+  
+  <name>ANTLR 3 Runtime</name>
+
+  <description>A framework for constructing recognizers, compilers, and translators from grammatical descriptions containing Java, C#, C++, or Python actions.</description>
+  <url>http://www.antlr.org</url>
+      <developers>
+        <developer>
+            <name>Terence Parr</name>
+            <organization>USFCA</organization>
+            <organizationUrl>http://www.cs.usfca.edu</organizationUrl>
+            <email>parrt@antlr.org</email>
+            <roles>
+                <role>Project Leader</role>
+                <role>Developer - Java Target</role>
+            </roles>
+            <timezone>PST</timezone>
+        </developer>
+        <developer>
+            <name>Jim Idle</name>
+            <organization>Temporal Wave LLC</organization>
+            <organizationUrl>http://www.temporal-wave.com</organizationUrl>
+            <email>jimi@temporal-wave.com</email>
+            <roles>
+                <role>Developer - Maven stuff</role>
+                <role>Developer - C Target</role>
+            </roles>
+            <timezone>PST</timezone>
+        </developer>
+    </developers>
+
+  <dependencies>
+    
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>stringtemplate</artifactId>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+
+  </dependencies>
+
+</project>

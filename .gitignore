@@ -17,16 +17,21 @@ nbactions*.xml
 *.ipr
 *.iws
 .idea/
+*.class
+*.pyc
+*/__pycache__/
 
 # Eclipse projects
 .classpath
 .project
 .settings/
+*.class
+*.pyc
+*/__pycache__/
 
 # Profiler results
 *.hprof
 
 # Playground
-#/tool/playground/
 /.DS_Store
 /.pydevproject

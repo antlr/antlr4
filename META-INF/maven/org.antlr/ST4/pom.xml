@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>9</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.antlr</groupId>
+    <artifactId>ST4</artifactId>
+    <packaging>jar</packaging>
+
+    <!--
+        The version number defined here in the version tag indicates how the
+        jar is named and released. When it ends with SNAPSHOT, it will be stored
+        in your local repository (~/m2 on UNIX) as stringtemplate-X.Y-SNAPSHOT, but
+        will be deplyed to the ANTLR snapshot repository at antlr.org with the word
+        SNAPSHOT replaced with the the data, time and unique number.
+    -->
+
+    <version>4.0.8</version>
+
+    <!--
+        The name of the project as seen by IDEs and release documentation etc.
+    -->
+
+    <name>StringTemplate 4</name>
+    <description>StringTemplate is a java template engine for generating source code,
+web pages, emails, or any other formatted text output.
+
+StringTemplate is particularly good at multi-targeted code generators,
+multiple site skins, and internationalization/localization. 
+
+It evolved over years of effort developing jGuru.com. 
+
+StringTemplate also generates the stringtemplate website: http://www.stringtemplate.org
+and powers the ANTLR v3 code generator. Its distinguishing characteristic 
+is that unlike other engines, it strictly enforces model-view separation.
+
+Strict separation makes websites and code generators more flexible
+and maintainable; it also provides an excellent defense against malicious
+template authors.
+
+There are currently about 600 StringTemplate source downloads a month.
+    </description>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java5.home>${env.JAVA5_HOME}</java5.home>
+        <java6.home>${env.JAVA6_HOME}</java6.home>
+        <bootclasspath.java5>${java5.home}/lib/rt.jar</bootclasspath.java5>
+        <bootclasspath.java6>${java6.home}/lib/rt.jar</bootclasspath.java6>
+        <bootclasspath.compile>${bootclasspath.java5}</bootclasspath.compile>
+        <bootclasspath.testCompile>${bootclasspath.java6}</bootclasspath.testCompile>
+    </properties>
+    
+    <!--
+        The URL of the base project
+      -->
+
+    <url>http://www.stringtemplate.org</url>
+    <developers>
+        <developer>
+            <name>Terence Parr</name>
+            <organization>USFCA</organization>
+            <organizationUrl>http://www.cs.usfca.edu</organizationUrl>
+            <email>parrt@antlr.org</email>
+            <roles>
+                <role>Project Leader</role>
+                <role>Developer - Java Target</role>
+            </roles>
+            <timezone>PST</timezone>
+        </developer>
+        <developer>
+            <name>Sam Harwell</name>
+            <organization>Tunnel Vision Laboratories, LLC</organization>
+            <organizationUrl>http://tunnelvisionlabs.com</organizationUrl>
+            <email>sam@tunnelvisionlabs.com</email>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>CST</timezone>
+        </developer>
+        <developer>
+            <name>Jim Idle</name>
+            <organization>Temporal Wave LLC</organization>
+            <organizationUrl>http://www.temporal-wave.com</organizationUrl>
+            <email>jimi@temporal-wave.com</email>
+            <roles>
+                <role>Developer - Maven stuff</role>
+            </roles>
+            <timezone>PST</timezone>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>BSD licence</name>
+            <url>http://antlr.org/license.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/antlr/stringtemplate4/issues</url>
+    </issueManagement>
+
+    <scm>
+        <url>git://github.com/antlr/stringtemplate4.git</url>
+        <connection>scm:git:git://github.com/antlr/stringtemplate4.git</connection>
+        <developerConnection>scm:git:git@github.com:antlr/stringtemplate4.git</developerConnection>
+      <tag>4.0.8</tag>
+  </scm>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr-runtime</artifactId>
+            <version>3.5.2</version>
+            <scope>compile</scope>
+        </dependency>
+            
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>sonatype-oss-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>default-compile</id>
+                                <configuration>
+                                    <compilerArguments>
+                                        <bootclasspath>${bootclasspath.compile}</bootclasspath>
+                                    </compilerArguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>default-testCompile</id>
+                                <configuration>
+                                    <compilerArguments>
+                                        <bootclasspath>${bootclasspath.testCompile}</bootclasspath>
+                                    </compilerArguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <version>2.2</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                                <configuration>
+                                    <minimizeJar>true</minimizeJar>
+                                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                                    <createSourcesJar>true</createSourcesJar>
+                                    <shadeSourcesContent>true</shadeSourcesContent>
+                                    <shadedClassifierName>complete</shadedClassifierName>
+                                    <relocations>
+                                        <relocation>
+                                            <pattern>org.antlr</pattern>
+                                            <shadedPattern>st4hidden.org.antlr</shadedPattern>
+                                        </relocation>
+                                    </relocations>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <build>
+        <defaultGoal>install</defaultGoal>
+
+        <!--
+            The root of the source code for StringTemplate
+        -->
+        <sourceDirectory>src</sourceDirectory>
+
+        <!--
+            The root of the test source code for StringTemplate.
+        -->
+        <testSourceDirectory>test</testSourceDirectory>
+
+        <!--
+            All the resources that should be on the classpath, when 
+            the junit tests are run. Here we need to include the test
+            source code directory as the .st files loaded dynamically
+            by the tests, are located underneath this tree.
+        -->
+        <testResources>
+            <testResource>
+                <directory>test</directory>
+            </testResource>
+        </testResources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+           <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr3-maven-plugin</artifactId>
+                <version>3.5.2</version>
+                <configuration>
+                    <libDirectory>src/org/stringtemplate/v4/compiler</libDirectory>
+                    <sourceDirectory>src</sourceDirectory>
+                    <verbose>true</verbose>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>antlr</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <sourceDirectory>src</sourceDirectory>
+                    <showWarnings>true</showWarnings>
+                    <showDeprecation>true</showDeprecation>
+                    <compilerArgs>
+                        <arg>-Xlint</arg>
+                        <arg>-Xlint:-serial</arg>
+                    </compilerArgs>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <configuration>
+                            <source>1.5</source>
+                            <target>1.5</target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <configuration>
+                            <source>1.6</source>
+                            <target>1.6</target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <!-- override the version inherited from the parent -->
+                <version>2.5</version>
+                <configuration>
+                    <arguments>-Psonatype-oss-release ${release.arguments}</arguments>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.17</version>
+                <configuration>
+                    <additionalClasspathElements>
+                        <additionalClasspathElement>${basedir}/src</additionalClasspathElement>
+                    </additionalClasspathElements>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <findbugsXmlOutput>true</findbugsXmlOutput>
+                    <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
+                    <xmlOutput>true</xmlOutput>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <!-- override the version inherited from the parent -->
+                <version>2.2.1</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <!-- override the version inherited from the parent -->
+                <version>2.9.1</version>
+                <configuration>
+                    <quiet>true</quiet>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <!-- override the version inherited from the parent -->
+                <version>1.5</version>
+            </plugin>
+
+        </plugins>
+    </build>
+</project>
+

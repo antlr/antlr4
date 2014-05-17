@@ -1,0 +1,90 @@
+/*
+ * [The "BSD license"]
+ *  Copyright (c) 2012 Terence Parr
+ *  Copyright (c) 2012 Sam Harwell
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+atn(startState, states, edges, rankdir, decisionRanks, useBox) ::= <<
+digraph ATN {
+rankdir=LR;
+<decisionRanks; separator="\n">
+<states; separator="\n">
+<edges; separator="\n">
+}
+>>
+
+dfa(name, startState, states, edges, rankdir, decisionRanks, useBox) ::= <<
+digraph <name>  {
+<if(rankdir)>rankdir=<rankdir>;<endif>
+<decisionRanks; separator="\n">
+<states; separator="\n">
+<edges; separator="\n">
+}
+>>
+
+decision-rank(states) ::= <<
+{rank=same; rankdir=TB; <states:{s | s<s>}; separator="; ">}
+>>
+
+edge(src,target,label,arrowhead,transitionIndex) ::= <<
+<src><if(transitionIndex)>:p<transitionIndex><endif> -> <target> [fontsize=11, fontname="Courier", arrowsize=.7, label = "<label>"<if(arrowhead)>, arrowhead = <arrowhead><endif>];
+>>
+
+action-edge(src,target,label,arrowhead,transitionIndex) ::= <<
+<src><if(transitionIndex)>:p<transitionIndex><endif> -> <target> [fontsize=11, fontname="Courier", arrowsize=.7, label = "<label>"<if(arrowhead)>, arrowhead = <arrowhead><endif>];
+>>
+
+epsilon-edge(src,label,target,arrowhead,transitionIndex,loopback=false) ::= <<
+<src><if(transitionIndex)>:p<transitionIndex><endif> -> <target> [fontname="Times-Italic", label="&epsilon;"<if(loopback)>, style="dashed"<endif>];
+>>
+
+state(state, label, name, transitions) ::= <%
+<name>[fontsize=11,
+    label="
+        <! rest(transition) tests for decision states: these nodes have a non-empty set of transitions after the first one. !>
+        <if(rest(transitions))>
+            {
+            <! Label on the left side of the record node. !>
+            <label>
+            |
+            <! Named ports in order on right side of record node, no display text. !>
+            {<transitions:{t|\<p<i0>>}; separator="|">}}
+        <else>
+            <label>
+        <endif>
+        "
+    <if(rest(transitions))>
+        , shape=record, fixedsize=false
+    <else>
+        , shape=circle, fixedsize=true, width=.55
+    <endif>
+    , peripheries=1];
+%>
+
+stopstate(name,label,actionIndex,useBox) ::= <<
+<name>[fontsize=11, label="<label><if(actionIndex)>,\naction:<actionIndex><endif>", <if(useBox)>shape=polygon,sides=4,peripheries=2,fixedsize=false<else>shape=doublecircle, fixedsize=true, width=.6<endif>];
+>>

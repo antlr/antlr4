@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Implementation-Vendor: ANTLR
+Implementation-Title: ANTLR 4 Tool
+Implementation-Version: 4.2.2
+Implementation-Vendor-Id: org.antlr
+Build-Jdk: 1.7.0_51
+Built-By: Sam Harwell
+Created-By: Apache Maven 3.0.5
+Main-Class: org.antlr.v4.Tool
+Archiver-Version: Plexus Archiver
+

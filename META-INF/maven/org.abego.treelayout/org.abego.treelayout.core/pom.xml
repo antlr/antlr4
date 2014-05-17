@@ -1,0 +1,91 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.abego.treelayout</groupId>
+    <artifactId>org.abego.treelayout.core</artifactId>
+    <version>1.0.1</version>
+    <packaging>jar</packaging>
+
+    <name>abego TreeLayout Core</name>
+    <description>Efficient and customizable TreeLayout Algorithm in Java.</description>
+    <url>http://code.google.com/p/treelayout/</url>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <licenses>
+        <license>
+            <name>BSD 3-Clause "New" or "Revised" License (BSD-3-Clause)</name>
+            <url>http://treelayout.googlecode.com/files/LICENSE.TXT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>http://code.google.com/p/treelayout/source/browse/</url>
+        <connection>scm:svn:http://treelayout.googlecode.com/svn/</connection>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>ub</id>
+            <name>Udo Borkowski</name>
+            <email>ub@abego.org</email>
+            <organization>abego Software GmbH, Germany</organization>
+            <organizationUrl>http://abego-software.de</organizationUrl>
+        </developer>
+    </developers>
+
+    <organization>
+        <name>abego Software GmbH, Germany</name>
+        <url>http://abego-software.de</url>
+    </organization>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
