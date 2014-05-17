@@ -238,20 +238,20 @@ class ArrayPredictionContext(PredictionContext):
         if self.isEmpty():
             return "[]"
         with StringIO() as buf:
-            buf.write("[")
+            buf.write(u"[")
             for i in range(0,len(self.returnStates)):
                 if i>0:
-                    buf.write(", ")
+                    buf.write(u", ")
                 if self.returnStates[i]==PredictionContext.EMPTY_RETURN_STATE:
-                    buf.write("$")
+                    buf.write(u"$")
                     continue
                 buf.write(self.returnStates[i])
                 if self.parents[i] is not None:
                     buf.write(' ')
                     buf.write(str(self.parents[i]))
                 else:
-                    buf.write("null")
-            buf.write("]")
+                    buf.write(u"null")
+            buf.write(u"]")
             return buf.getvalue()
 
 

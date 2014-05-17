@@ -119,6 +119,7 @@ import static org.junit.Assert.assertTrue;
 public abstract class BaseTest {
 	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
 	private static final Logger LOGGER = Logger.getLogger(BaseTest.class.getName());
+	public static final boolean useUniqueDir = false;
 
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
@@ -162,9 +163,11 @@ public abstract class BaseTest {
     @Before
 	public void setUp() throws Exception {
         // new output dir for each test
-        tmpdir = new File(System.getProperty("java.io.tmpdir"),
+        if(useUniqueDir)
+        	tmpdir = new File(System.getProperty("java.io.tmpdir"),
 						  getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath(); 
-		// tmpdir = new File("/tmp").getAbsolutePath();
+        else
+        	tmpdir = new File("/tmp").getAbsolutePath();
     }
 
     protected org.antlr.v4.Tool newTool(String[] args) {

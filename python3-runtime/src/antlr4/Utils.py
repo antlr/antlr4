@@ -48,11 +48,11 @@ def escapeWhitespace(s:str, escapeSpaces:bool):
             if c==' ' and escapeSpaces:
                 buf.write('\u00B7')
             elif c=='\t':
-                buf.write("\\t")
+                buf.write(u"\\t")
             elif c=='\n':
-                buf.write("\\n")
+                buf.write(u"\\n")
             elif c=='\r':
-                buf.write("\\r")
+                buf.write(u"\\r")
             else:
                 buf.write(c)
         return buf.getvalue()

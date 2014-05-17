@@ -110,7 +110,8 @@ import org.stringtemplate.v4.STGroupString;
 public abstract class BaseTest {
 	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
 	// private static final Logger LOGGER = Logger.getLogger(BaseTest.class.getName());
-
+	public static final boolean useUniqueDir = true;
+	
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
@@ -154,9 +155,10 @@ public abstract class BaseTest {
     @Before
 	public void setUp() throws Exception {
         // new output dir for each test
-        tmpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath(); 
-    	// tmpdir = "/tmp";
-    	// tmpdir = new File("tmp/").getAbsolutePath();
+        if(useUniqueDir)
+        	tmpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath(); 
+        else
+        	tmpdir = new File("tmp/").getAbsolutePath();
     }
 
     protected org.antlr.v4.Tool newTool(String[] args) {
@@ -900,7 +902,7 @@ public abstract class BaseTest {
 			"\n" +
 			"    def enterEveryRule(self, ctx:ParserRuleContext):\n" +
 			"        for child in ctx.getChildren():\n" +
-			"            parent = child.parent\n" +
+			"            parent = child.parentCtx\n" +
 			"            if not isinstance(parent, RuleNode) or parent.getRuleContext() != ctx:\n" +
 			"                raise IllegalStateException(\"Invalid parse tree shape detected.\")\n" +
 			"\n" +

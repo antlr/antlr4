@@ -35,6 +35,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -111,10 +112,10 @@ public class TestTokenTypeAssignment extends BaseTest {
 		foundLiterals = g.implicitLexer.stringLiteralToTypeMap.keySet().toString();
 		assertEquals("['x']", foundLiterals); // pushed in lexer from parser
 
-		String[] typeToTokenName = g.getTokenNames();
-		Set<String> tokens = new HashSet<String>();
+		String[] typeToTokenName = g.getTokenDisplayNames();
+		Set<String> tokens = new LinkedHashSet<String>();
 		for (String t : typeToTokenName) if ( t!=null ) tokens.add(t);
-		assertEquals("[E, 'x']", tokens.toString());
+		assertEquals("[<INVALID>, 'x', E]", tokens.toString());
 	}
 
 	@Test public void testPredDoesNotHideNameToLiteralMapInLexer() throws Exception {
@@ -171,7 +172,17 @@ public class TestTokenTypeAssignment extends BaseTest {
 	{
 		String[] typeToTokenName = g.getTokenNames();
 		Set<String> tokens = new HashSet<String>();
-		for (String t : typeToTokenName) if ( t!=null ) tokens.add(t);
+		for (int i = 0; i < typeToTokenName.length; i++) {
+			String t = typeToTokenName[i];
+			if ( t!=null ) {
+				if (t.startsWith(Grammar.AUTO_GENERATED_TOKEN_NAME_PREFIX)) {
+					tokens.add(g.getTokenDisplayName(i));
+				}
+				else {
+					tokens.add(t);
+				}
+			}
+		}
 
 		// make sure expected tokens are there
 		StringTokenizer st = new StringTokenizer(allValidTokensStr, ", ");

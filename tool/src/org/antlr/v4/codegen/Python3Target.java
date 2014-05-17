@@ -32,36 +32,38 @@ package org.antlr.v4.codegen;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
-
-import org.antlr.v4.tool.ast.GrammarAST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.StringRenderer;
 
 /**
  *
  * @author Eric Vergnaud
  */
-public class Python3Target extends Target {
+public class Python3Target extends AbstractPythonTarget {
 
-	protected static final String[] pythonKeywords = {
-		"abs", "divmod", "input", "open", "staticmethod", 
-		"all", "enumerate", "int", "ord", "str", 
-		"any", "eval", "isinstance", "pow", "sum",
-		"basestring", "execfile", "issubclass", "print", "super",
-		"bin", "file", "iter", "property", "tuple",
-		"bool", "filter", "len", "range", "type",
-		"bytearray", "float", "list", "raw_input", "unichr",
-		"callable", "format", "locals", "reduce", "unicode",
-		"chr", "frozenset", "long", "reload", "vars",
-		"classmethod", "getattr", "map", "repr", "xrange",
-		"cmp", "globals", "max", "reversed", "zip",
-		"compile", "hasattr", "memoryview", "round", "__import__",
-		"complex", "hash", "min", "set", "apply",
-		"delattr", "help", "next", "setattr", "buffer",
-		"dict", "hex", "object", "slice", "coerce",
-		"dir", "id", "oct", "sorted", "intern"
+	protected static final String[] python3Keywords = {
+		"abs", "all", "any", "apply", "as", 
+		"bin", "bool", "buffer", "bytearray", 
+		"callable", "chr", "classmethod", "coerce", "compile", "complex", 
+		"delattr", "dict", "dir", "divmod", 
+		"enumerate", "eval", "execfile",
+		"file", "filter", "float", "format", "frozenset", 
+		"getattr", "globals", 
+		"hasattr", "hash", "help", "hex", 
+		"id", "input", "int", "intern", "isinstance", "issubclass", "iter", 
+		"len", "list", "locals", 
+		"map", "max", "min", "next", 
+		"memoryview", 
+		"object", "oct", "open", "ord", 
+		"pow", "print", "property", 
+		"range", "raw_input", "reduce", "reload", "repr", "reversed", "round", 
+		"set", "setattr", "slice", "sorted", "staticmethod", "str", "sum", "super",
+		"tuple", "type", 
+		"unichr", "unicode",
+		"vars",
+		"with",
+		"zip",
+		"__import__",
+		"True", "False", "None"
 	};
 
 	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
@@ -80,150 +82,10 @@ public class Python3Target extends Target {
 	}
 
 	protected void addBadWords() {
-		badWords.addAll(Arrays.asList(pythonKeywords));
+		badWords.addAll(Arrays.asList(python3Keywords));
 		badWords.add("rule");
 		badWords.add("parserRule");
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * <p/>
-	 * For Java, this is the translation {@code 'a\n"'} &rarr; {@code "a\n\""}.
-	 * Expect single quotes around the incoming literal. Just flip the quotes
-	 * and replace double quotes with {@code \"}.
-	 * <p/>
-	 * Note that we have decided to allow people to use '\"' without penalty, so
-	 * we must build the target string in a loop as {@link String#replace}
-	 * cannot handle both {@code \"} and {@code "} without a lot of messing
-	 * around.
-	 */
-	@Override
-	public String getTargetStringLiteralFromANTLRStringLiteral(
-		CodeGenerator generator,
-		String literal, boolean addQuotes)
-	{
-		StringBuilder sb = new StringBuilder();
-		String is = literal;
 
-		if ( addQuotes ) sb.append('"');
-
-		for (int i = 1; i < is.length() -1; i++) {
-			if  (is.charAt(i) == '\\') {
-				// Anything escaped is what it is! We assume that
-				// people know how to escape characters correctly. However
-				// we catch anything that does not need an escape in Java (which
-				// is what the default implementation is dealing with and remove
-				// the escape. The C target does this for instance.
-				//
-				switch (is.charAt(i+1)) {
-					// Pass through any escapes that Java also needs
-					//
-					case    '"':
-					case    'n':
-					case    'r':
-					case    't':
-					case    'b':
-					case    'f':
-					case    '\\':
-						// Pass the escape through
-						sb.append('\\');
-						break;
-
-					case    'u':    // Assume unnnn
-						// Pass the escape through as double \\
-						// so that Java leaves as \u0000 string not char
-						sb.append('\\');
-						sb.append('\\');
-						break;
-
-					default:
-						// Remove the escape by virtue of not adding it here
-						// Thus \' becomes ' and so on
-						break;
-				}
-
-				// Go past the \ character
-				i++;
-			} else {
-				// Characters that don't need \ in ANTLR 'strings' but do in Java
-				if (is.charAt(i) == '"') {
-					// We need to escape " in Java
-					sb.append('\\');
-				}
-			}
-			// Add in the next character, which may have been escaped
-			sb.append(is.charAt(i));
-		}
-
-		if ( addQuotes ) sb.append('"');
-
-		return sb.toString();
-	}
-
-	@Override
-	public String encodeIntAsCharEscape(int v) {
-		if (v < Character.MIN_VALUE || v > Character.MAX_VALUE) {
-			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));
-		}
-
-		if (v >= 0 && v < targetCharValueEscape.length && targetCharValueEscape[v] != null) {
-			return targetCharValueEscape[v];
-		}
-
-		if (v >= 0x20 && v < 127 && (!Character.isDigit(v) || v == '8' || v == '9')) {
-			return String.valueOf((char)v);
-		}
-
-		if ( v>=0 && v<=127 ) {
-			String oct = Integer.toOctalString(v);
-			return "\\"+ oct;
-		}
-
-		String hex = Integer.toHexString(v|0x10000).substring(1,5);
-		return "\\u"+hex;
-	}
-
-	@Override
-	public int getSerializedATNSegmentLimit() {
-		// 65535 is the class file format byte limit for a UTF-8 encoded string literal
-		// 3 is the maximum number of bytes it takes to encode a value in the range 0-0xFFFF
-		return 65535 / 3;
-	}
-
-	@Override
-	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
-		return getBadWords().contains(idNode.getText());
-	}
-
-	@Override
-	protected STGroup loadTemplates() {
-		STGroup result = super.loadTemplates();
-		result.registerRenderer(String.class, new PythonStringRenderer(), true);
-		return result;
-	}
-
-	protected static class PythonStringRenderer extends StringRenderer {
-
-		@Override
-		public String toString(Object o, String formatString, Locale locale) {
-			return super.toString(o, formatString, locale);
-		}
-	}
-
-	@Override
-	public boolean wantsBaseListener() {
-		return false;
-	}
-
-	@Override
-	public boolean wantsBaseVisitor() {
-		return false;
-	}
-
-	@Override
-	public boolean supportsOverloadedMethods() {
-		return false;
-	}
-	
-	
 }

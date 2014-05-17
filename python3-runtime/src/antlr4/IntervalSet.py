@@ -119,16 +119,16 @@ class IntervalSet(object):
             return "{}"
         with StringIO() as buf:
             if len(self)>1:
-                buf.write("{")
+                buf.write(u"{")
             first = True
             for i in self.intervals:
                 for j in i:
                     if not first:
-                        buf.write(", ")
+                        buf.write(u", ")
                     buf.write(self.elementName(tokenNames, j))
                     first = False
             if len(self)>1:
-                buf.write("}")
+                buf.write(u"}")
             return buf.getvalue()
 
     def elementName(self, tokenNames:list, a:int):

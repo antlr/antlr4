@@ -139,9 +139,9 @@ class Predicate(SemanticContext):
     def __hash__(self):
         with StringIO() as buf:
             buf.write(str(self.ruleIndex))
-            buf.write("/")
+            buf.write(u"/")
             buf.write(str(self.predIndex))
-            buf.write("/")
+            buf.write(u"/")
             buf.write(str(self.isCtxDependent))
             return hash(buf.getvalue())
 
@@ -267,7 +267,7 @@ class AND(SemanticContext):
             first = True
             for o in self.opnds:
                 if not first:
-                    buf.write("&&")
+                    buf.write(u"&&")
                 buf.write(str(o))
                 first = False
             return buf.getvalue()
@@ -352,7 +352,7 @@ class OR (SemanticContext):
             first = True
             for o in self.opnds:
                 if not first:
-                    buf.write("||")
+                    buf.write(u"||")
                 buf.write(str(o))
                 first = False
             return buf.getvalue()

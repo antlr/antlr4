@@ -109,13 +109,13 @@ class ParserRuleContext(RuleContext):
     def addTokenNode(self, token:Token):
         node = TerminalNodeImpl(token)
         self.addChild(node)
-        node.parent = self
+        node.parentCtx = self
         return node
 
     def addErrorNode(self, badToken:Token):
         node = ErrorNodeImpl(badToken)
         self.addChild(node)
-        node.parent = self
+        node.parentCtx = self
         return node
 
     def getChild(self, i:int, type:type = None):

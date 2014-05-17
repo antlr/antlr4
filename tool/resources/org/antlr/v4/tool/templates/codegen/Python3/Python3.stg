@@ -43,12 +43,23 @@ ParserFile(file, parser, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 from antlr4 import *
 from io import StringIO
-<if(file.genListener)>
-from .<file.grammarName>Listener import <file.grammarName>Listener
-<endif>
-<if(file.genVisitor)>
-from .<file.grammarName>Visitor import <file.grammarName>Visitor
-<endif>
+package = globals().get("__package__", None)
+ischild = len(package)>0 if package is not None else False
+if ischild:
+    <if(file.genListener)>
+    from .<file.grammarName>Listener import <file.grammarName>Listener
+    <endif>
+    <if(file.genVisitor)>
+    from .<file.grammarName>Visitor import <file.grammarName>Visitor
+    <endif>
+else:
+    <if(file.genListener)>
+    from <file.grammarName>Listener import <file.grammarName>Listener
+    <endif>
+    <if(file.genVisitor)>
+    from <file.grammarName>Visitor import <file.grammarName>Visitor
+    <endif>
+
 <namedActions.header>
 <parser>
 >>
@@ -230,7 +241,7 @@ def <r.name>_sempred(self, localctx:<r.ctxType>, predIndex:int):
 
 >>
 
-RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
+RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
 
 <ruleCtx>
 
@@ -261,17 +272,17 @@ def <currentRule.name>(self<currentRule.args:{a | , <a.name>:<a.type>}>):
 
 >>
 
-LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
+LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 	namedActions,finallyAction,postamble) ::=
 <<
 
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-def <currentRule.name>(self, _p:int=0<if(currentRule.args)>, <currentRule.args:{a | , <a>}><endif>):
+def <currentRule.name>(self, _p:int=0<if(currentRule.args)>, <args:{a | , <a>}><endif>):
     _parentctx = self._ctx
     _parentState = self.state
-    localctx = <parser.name>.<currentRule.ctxType>(self, self._ctx, _parentState<currentRule.args:{a | , <a.name>}>)
+    localctx = <parser.name>.<currentRule.ctxType>(self, self._ctx, _parentState<args:{a | , <a.name>}>)
     _prevctx = localctx
     _startState = <currentRule.startState>
     self.enterRecursionRule(localctx, <currentRule.startState>, self.RULE_<currentRule.name>, _p)
@@ -658,15 +669,15 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = self._input.LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = self._input.LA(1)"
 
-StructDecl(struct,attrs,getters,dispatchMethods,interfaces,extensionMembers,
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext}) ::= <<
 class <struct.name>(<superClass>):
 
-    def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1<struct.ctorAttrs:{a | , <a.name>:<a.type>}>):
+    def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1<struct.ctorAttrs:{a | , <a.name>:<a.type>=None}>):
         super().__init__(parent, invokingState)
         self.parser = parser
-        <struct.ctorAttrs:{a | self.<a.name> = <a.name>}; separator="\n">
         <attrs:{a | <a>}; separator="\n">
+        <struct.ctorAttrs:{a | self.<a.name> = <a.name>}; separator="\n">
 
     <getters:{g | <g>}; separator="\n\n">
 
@@ -676,7 +687,7 @@ class <struct.name>(<superClass>):
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
     def copyFrom(self, ctx:ParserRuleContext):
         super().copyFrom(ctx)
-		<struct.attrs:{a | self.<a.name> = ctx.<a.name>}; separator="\n">
+        <struct.attrs:{a | self.<a.name> = ctx.<a.name>}; separator="\n">
 
 <endif>
     <dispatchMethods; separator="\n">
@@ -714,7 +725,7 @@ def accept(self, visitor:ParseTreeVisitor):
 
 >>
 
-AttributeDecl(d) ::= "<d.decl> = None"
+AttributeDecl(d) ::= "self.<d.name> = None"
 
 /** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if(!x.isLocal)>localctx.<endif><x.name>"
@@ -756,11 +767,24 @@ LexerFile(lexerFile, lexer, namedActions) ::= <<
 <fileHeader(lexerFile.grammarFileName, lexerFile.ANTLRVersion)>
 from antlr4 import *
 from io import StringIO
-<if(lexerFile.genListener)>
-from .<lexerFile.grammarName>Listener import <lexerFile.grammarName>Listener
-<endif>
-<if(lexerFile.genVisitor)>
-from .<lexerFile.grammarName>Visitor import <lexerFile.grammarName>Visitor
+<if(lexerFile.genListener || lexerFile.genVisitor)>
+package = globals().get("__package__", None)
+ischild = len(package)>0 if package is not None else False
+if ischild:
+    <if(lexerFile.genListener)>
+    from .<lexerFile.grammarName>Listener import <lexerFile.grammarName>Listener
+    <endif>
+    <if(lexerFile.genVisitor)>
+    from .<lexerFile.grammarName>Visitor import <lexerFile.grammarName>Visitor
+    <endif>
+else:
+    <if(lexerFile.genListener)>
+    from <lexerFile.grammarName>Listener import <lexerFile.grammarName>Listener
+    <endif>
+    <if(lexerFile.genVisitor)>
+    from <lexerFile.grammarName>Visitor import <lexerFile.grammarName>Visitor
+    <endif>
+
 <endif>
 <namedActions.header>
 

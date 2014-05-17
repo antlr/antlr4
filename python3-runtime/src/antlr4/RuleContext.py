@@ -216,7 +216,7 @@ class RuleContext(RuleNode):
     def toString(self, ruleNames:list, stop:RuleContext)->str:
         with StringIO() as buf:
             p = self
-            buf.write("[")
+            buf.write(u"[")
             while p is not None and p is not stop:
                 if ruleNames is None:
                     if not p.isEmpty():
@@ -227,10 +227,10 @@ class RuleContext(RuleNode):
                     buf.write(ruleName)
 
                 if p.parentCtx is not None and (ruleNames is not None or not p.parentCtx.isEmpty()):
-                    buf.write(" ")
+                    buf.write(u" ")
 
                 p = p.parentCtx
 
-            buf.write("]")
+            buf.write(u"]")
             return buf.getvalue()
 

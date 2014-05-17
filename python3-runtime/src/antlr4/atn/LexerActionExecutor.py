@@ -46,7 +46,7 @@ LexerActionExecutor = None
 
 class LexerActionExecutor(object):
 
-    def __init__(self, lexerActions:list=[]):
+    def __init__(self, lexerActions:list=list()):
         self.lexerActions = lexerActions
         # Caches the result of {@link #hashCode} since the hash code is an element
         # of the performance-critical {@link LexerATNConfig#hashCode} operation.

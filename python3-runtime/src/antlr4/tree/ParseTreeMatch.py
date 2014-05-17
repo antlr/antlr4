@@ -135,9 +135,9 @@ class ParseTreeMatch(object):
     #
     def __str__(self):
         with StringIO() as buf:
-            buf.write("Match ")
-            buf.write("succeeded" if self.succeeded() else "failed")
-            buf.write("; found ")
+            buf.write(u"Match ")
+            buf.write(u"succeeded" if self.succeeded() else "failed")
+            buf.write(u"; found ")
             buf.write(str(len(self.labels)))
-            buf.write(" labels")
+            buf.write(u" labels")
             return buf.getvalue()

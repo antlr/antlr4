@@ -66,34 +66,34 @@ class DiagnosticErrorListener(ErrorListener):
             return
 
         with StringIO() as buf:
-            buf.write("reportAmbiguity d=")
+            buf.write(u"reportAmbiguity d=")
             buf.write(self.getDecisionDescription(recognizer, dfa))
-            buf.write(": ambigAlts=")
+            buf.write(u": ambigAlts=")
             buf.write(str(self.getConflictingAlts(ambigAlts, configs)))
-            buf.write(", input='")
+            buf.write(u", input='")
             buf.write(recognizer.getTokenStream().getText((startIndex, stopIndex)))
-            buf.write("'")
+            buf.write(u"'")
             recognizer.notifyErrorListeners(buf.getvalue())
 
 
     def reportAttemptingFullContext(self, recognizer:Parser, dfa:DFA, startIndex:int,
                        stopIndex:int, conflictingAlts:set, configs:ATNConfigSet):
         with StringIO() as buf:
-            buf.write("reportAttemptingFullContext d=")
+            buf.write(u"reportAttemptingFullContext d=")
             buf.write(self.getDecisionDescription(recognizer, dfa))
-            buf.write(", input='")
+            buf.write(u", input='")
             buf.write(recognizer.getTokenStream().getText((startIndex, stopIndex)))
-            buf.write("'")
+            buf.write(u"'")
             recognizer.notifyErrorListeners(buf.getvalue())
 
     def reportContextSensitivity(self, recognizer:Parser, dfa:DFA, startIndex:int,
                        stopIndex:int, prediction:int, configs:ATNConfigSet):
         with StringIO() as buf:
-            buf.write("reportContextSensitivity d=")
+            buf.write(u"reportContextSensitivity d=")
             buf.write(self.getDecisionDescription(recognizer, dfa))
-            buf.write(", input='")
+            buf.write(u", input='")
             buf.write(recognizer.getTokenStream().getText((startIndex, stopIndex)))
-            buf.write("'")
+            buf.write(u"'")
             recognizer.notifyErrorListeners(buf.getvalue())
 
     def getDecisionDescription(self, recognizer:Parser, dfa:DFA):

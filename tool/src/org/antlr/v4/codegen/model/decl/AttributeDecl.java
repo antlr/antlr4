@@ -31,10 +31,13 @@
 package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.tool.Attribute;
 
 /** */
 public class AttributeDecl extends Decl {
-	public AttributeDecl(OutputModelFactory factory, String name, String decl) {
-		super(factory, name, decl);
+    public String type;
+	public AttributeDecl(OutputModelFactory factory, Attribute a) {
+		super(factory, a.name, a.decl);
+        this.type = a.type;
 	}
 }

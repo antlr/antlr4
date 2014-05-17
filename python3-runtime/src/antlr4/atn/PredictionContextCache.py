@@ -1,4 +1,0 @@
-
-class PredictionContextCache(object):
-
-    pass

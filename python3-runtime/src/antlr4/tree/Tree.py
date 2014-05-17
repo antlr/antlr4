@@ -78,8 +78,10 @@ del ParserRuleContext
 class TerminalNodeImpl(TerminalNode):
 
     def __init__(self, symbol:Token):
-        self.parent = None
+        self.parentCtx = None
         self.symbol = symbol
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
 
     def getChild(self, i:int):
         return None
@@ -88,7 +90,7 @@ class TerminalNodeImpl(TerminalNode):
         return self.symbol
 
     def getParent(self):
-        return self.parent
+        return self.parentCtx
 
     def getPayload(self):
         return self.symbol

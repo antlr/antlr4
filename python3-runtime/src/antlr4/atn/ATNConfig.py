@@ -108,17 +108,17 @@ class ATNConfig(object):
         with StringIO() as buf:
             buf.write('(')
             buf.write(str(self.state))
-            buf.write(",")
+            buf.write(u",")
             buf.write(str(self.alt))
             if self.context is not None:
-                buf.write(",[")
+                buf.write(u",[")
                 buf.write(str(self.context))
-                buf.write("]")
+                buf.write(u"]")
             if self.semanticContext is not None and self.semanticContext is not SemanticContext.NONE:
-                buf.write(",")
+                buf.write(u",")
                 buf.write(str(self.semanticContext))
             if self.reachesIntoOuterContext>0:
-                buf.write(",up=")
+                buf.write(u",up=")
                 buf.write(str(self.reachesIntoOuterContext))
             buf.write(')')
             return buf.getvalue()

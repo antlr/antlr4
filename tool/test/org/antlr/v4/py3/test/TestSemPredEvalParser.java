@@ -88,6 +88,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"grammar T;\n" +
 			"start : e[0] EOF;\n" +
 			"e[int _p]\n" +
+			"@init{$_p = 0}\n" +
 			"    :   ( 'a'\n" +
 			"        | 'b'+\n" +
 			"        )\n" +
@@ -377,7 +378,6 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test public void testPredicateDependentOnArg() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"@members {i=0}\n" +
 			"s : a[2] a[1];\n" +
 			"a[int i]" +
 			"  : {$i==1}? ID {print(\"alt 1\")}\n" +

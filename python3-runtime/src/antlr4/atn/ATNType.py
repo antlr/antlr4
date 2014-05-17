@@ -34,9 +34,9 @@ from enum import IntEnum
 
 class ATNType(IntEnum):
 
-	LEXER = 0
-	PARSER = 1
+    LEXER = 0
+    PARSER = 1
 
-	@classmethod
-	def fromOrdinal(cls, i:int):
-		return cls._value2member_map_[i]
+    @classmethod
+    def fromOrdinal(cls, i:int):
+        return cls._value2member_map_[i]

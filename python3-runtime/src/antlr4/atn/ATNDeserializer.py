@@ -112,7 +112,7 @@ class ATNDeserializer (object):
     def checkVersion(self):
         version = self.readInt()
         if version != SERIALIZED_VERSION:
-            raise Exception("Could not deserialize ATN with version " + version + " (expected " + str(SERIALIZED_VERSION) + ").")
+            raise Exception("Could not deserialize ATN with version " + str(version) + " (expected " + str(SERIALIZED_VERSION) + ").")
 
     def checkUUID(self):
         uuid = self.readUUID()

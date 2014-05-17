@@ -139,10 +139,10 @@ class DFAState(object):
     def __str__(self):
         with StringIO() as buf:
             buf.write(str(self.stateNumber))
-            buf.write(":")
+            buf.write(u":")
             buf.write(str(self.configs))
             if self.isAcceptState:
-                buf.write("=>");
+                buf.write(u"=>");
                 if self.predicates is not None:
                     buf.write(str(self.predicates))
                 else:

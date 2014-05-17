@@ -322,6 +322,7 @@ public class TestFullContextParsing extends BaseTest {
 			"    :   expr[0] {print($expr.ctx.toStringTree(recog=self))} ;\n" +
 			"\n" +
 			"expr[int _p]\n" +
+			"@init {$_p = 0}\n" +
 			"    :   ID\n" +
 			"        ( {5 >= $_p}? '*' expr[6]\n" +
 			"        | {4 >= $_p}? '+' expr[5]\n" +

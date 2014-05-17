@@ -211,16 +211,16 @@ class ATNConfigSet(object):
         with StringIO() as buf:
             buf.write(str_list(self.configs))
             if self.hasSemanticContext:
-                buf.write(",hasSemanticContext=")
+                buf.write(u",hasSemanticContext=")
                 buf.write(str(self.hasSemanticContext))
             if self.uniqueAlt!=ATN.INVALID_ALT_NUMBER:
-                buf.write(",uniqueAlt=")
+                buf.write(u",uniqueAlt=")
                 buf.write(str(self.uniqueAlt))
             if self.conflictingAlts is not None:
-                buf.write(",conflictingAlts=")
+                buf.write(u",conflictingAlts=")
                 buf.write(str(self.conflictingAlts))
             if self.dipsIntoOuterContext:
-                buf.write(",dipsIntoOuterContext")
+                buf.write(u",dipsIntoOuterContext")
             return buf.getvalue()
 
 

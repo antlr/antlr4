@@ -55,9 +55,9 @@ class DFASerializer(object):
                     if t is not None and t.stateNumber != 0x7FFFFFFF:
                         buf.write(self.getStateString(s))
                         label = self.getEdgeLabel(i)
-                        buf.write("-")
+                        buf.write(u"-")
                         buf.write(label)
-                        buf.write("->")
+                        buf.write(u"->")
                         buf.write(self.getStateString(t))
                         buf.write('\n')
             output = buf.getvalue()
