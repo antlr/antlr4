@@ -1,1 +1,0 @@
-exports.atn = require('./atn');
