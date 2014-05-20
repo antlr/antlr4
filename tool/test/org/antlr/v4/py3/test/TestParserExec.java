@@ -229,7 +229,25 @@ public class TestParserExec extends BaseTest {
 		assertEquals("abc\n", found);
 	}
 
-	// force complex decision
+    @Test public void testLL1OptionalBlock() throws Exception {
+   		String grammar =
+   			"grammar T;\n" +
+            "a : (ID|{}INT)? {" +
+   			"print($text)" +
+            "} ;\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+ ;\n" +
+   			"WS : (' '|'\\n') -> skip ;\n";
+
+   		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a",
+   								  "", false);
+   		assertEquals("\n", found);
+   		found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a",
+   								  "a", false);
+   		assertEquals("a\n", found);
+   	}
+
+    // force complex decision
 	@Test public void testAorAStar() throws Exception {
 		String grammar =
 			"grammar T;\n" +
