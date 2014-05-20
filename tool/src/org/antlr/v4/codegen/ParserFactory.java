@@ -41,9 +41,7 @@ import org.antlr.v4.codegen.model.InvokeRule;
 import org.antlr.v4.codegen.model.LL1AltBlock;
 import org.antlr.v4.codegen.model.LL1OptionalBlock;
 import org.antlr.v4.codegen.model.LL1OptionalBlockSingleAlt;
-import org.antlr.v4.codegen.model.LL1PlusBlock;
 import org.antlr.v4.codegen.model.LL1PlusBlockSingleAlt;
-import org.antlr.v4.codegen.model.LL1StarBlock;
 import org.antlr.v4.codegen.model.LL1StarBlockSingleAlt;
 import org.antlr.v4.codegen.model.LabeledOp;
 import org.antlr.v4.codegen.model.LeftRecursiveRuleFunction;
@@ -286,12 +284,10 @@ public class ParserFactory extends DefaultOutputModelFactory {
 				else c = new LL1OptionalBlock(this, ebnfRoot, alts);
 				break;
 			case ANTLRParser.CLOSURE :
-				if ( alts.size()==1 ) c = new LL1StarBlockSingleAlt(this, ebnfRoot, alts);
-				else c = new LL1StarBlock(this, ebnfRoot, alts);
+				c = new LL1StarBlockSingleAlt(this, ebnfRoot, alts);
 				break;
 			case ANTLRParser.POSITIVE_CLOSURE :
-				if ( alts.size()==1 ) c = new LL1PlusBlockSingleAlt(this, ebnfRoot, alts);
-				else c = new LL1PlusBlock(this, ebnfRoot, alts);
+				c = new LL1PlusBlockSingleAlt(this, ebnfRoot, alts);
 				break;
 		}
 		return c;

@@ -448,23 +448,6 @@ if (<expr>) {
 <!else if ( !(<followExpr>) ) <error>!>
 >>
 
-LL1StarBlock(choice, alts) ::= <<
-setState(<choice.stateNumber>);
-_errHandler.sync(this);
-<choice.loopLabel>:
-while (true) {
-	switch (_input.LA(1)) {
-	<choice.altLook,alts:{look,alt| <cases(look)>
-	<alt>
-	break;}; separator="\n">
-	<cases(choice.exitLook)>
-		break <choice.loopLabel>;
-	}
-	setState(<choice.loopBackStateNumber>);
-	_errHandler.sync(this);
-}
->>
-
 LL1StarBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
 setState(<choice.stateNumber>);
 _errHandler.sync(this);
@@ -475,23 +458,6 @@ while (<loopExpr>) {
 	_errHandler.sync(this);
 	<iteration>
 }
->>
-
-LL1PlusBlock(choice, alts, iteration, loopExpr, error) ::= <<
-setState(<choice.blockStartStateNumber>); <! alt block decision !>
-_errHandler.sync(this);
-do {
-	switch (_input.LA(1)) {
-	<choice.altLook,alts:{look,alt| <cases(look)>
-	<alt>
-	break;}; separator="\n">
-	default:
-		<error>
-	}
-	setState(<choice.stateNumber>);
-	_errHandler.sync(this);
-	<iteration>
-} while ( <loopExpr> );
 >>
 
 LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
