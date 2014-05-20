@@ -88,7 +88,12 @@ public class CodeGenerator {
 	}
 
 	public STGroup getTemplates() {
-		return getTarget().getTemplates();
+        STGroup templates = getTarget().getTemplates();
+        ST version = templates.getInstanceOf("VERSION");
+        if ( version==null || !version.render().equals(Tool.VERSION) ) {
+            tool.errMgr.toolError(ErrorType.INCOMPATIBLE_TOOL_AND_TEMPLATES, version, Tool.VERSION, language);
+        }
+        return templates;
 	}
 
 	protected void loadLanguageTarget(String language) {

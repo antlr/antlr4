@@ -60,7 +60,7 @@
 	"boss" : false, // Tolerate assignments inside if, for & while. Usually conditions & loops are for comparison, not assignments.
 	"debug" : false, // Allow debugger statements e.g. browser breakpoints.
 	"eqnull" : false, // Tolerate use of `== null`.
-	"es5" : true, // Allow EcmaScript 5 syntax. // es5 is default https://github.com/jshint/jshint/issues/1411
+	// "es5" : true, // Allow EcmaScript 5 syntax. // es5 is default https://github.com/jshint/jshint/issues/1411
 	"esnext" : false, // Allow ES.next (ECMAScript 6) specific features such as `const` and `let`.
 	"evil" : false, // Tolerate use of `eval`.
 	"expr" : false, // Tolerate `ExpressionStatement` as Programs.
@@ -87,7 +87,7 @@
 	// == Environments ====================================================
 	//
 	// These options pre-define global variables that are exposed by
-	// popular JavaScript libraries and runtime environments—such as
+	// popular JavaScript libraries and runtime environments such as
 	// browser or node.js. TODO JSHint Documentation has more, but it is not clear since what JSHint version they appeared 
 	"browser" : false, // Standard browser globals e.g. `window`, `document`.
 	"couch" : false, // Enable globals exposed by CouchDB.
