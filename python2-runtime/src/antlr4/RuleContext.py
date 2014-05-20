@@ -100,7 +100,7 @@ class RuleContext(RuleNode):
     #/
     def getText(self):
         if self.getChildCount() == 0:
-            return ""
+            return u""
         with StringIO() as builder:
             for child in self.getChildren():
                 builder.write(child.getText())

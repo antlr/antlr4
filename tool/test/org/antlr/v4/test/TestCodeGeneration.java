@@ -22,7 +22,7 @@ import static org.junit.Assert.assertFalse;
 
 public class TestCodeGeneration extends BaseTest {
     @Test public void testArgDecl() throws Exception { // should use template not string
-        ErrorQueue equeue = new ErrorQueue();
+        /*ErrorQueue equeue =*/ new ErrorQueue();
         String g =
                 "grammar T;\n" +
                 "a[int xyz] : 'a' ;\n";

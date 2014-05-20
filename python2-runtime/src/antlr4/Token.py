@@ -147,7 +147,7 @@ class CommonToken(Token):
         if self.start < n and self.stop < n:
             return input.getText(self.start, self.stop)
         else:
-            return "<EOF>"
+            return u"<EOF>"
 
     @text.setter
     def text(self, text):

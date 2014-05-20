@@ -65,11 +65,6 @@ import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.TerminalAST;
 
-import java.util.*;
-
-import static org.antlr.v4.parse.ANTLRParser.RULE_REF;
-import static org.antlr.v4.parse.ANTLRParser.TOKEN_REF;
-
 /** */
 public class RuleFunction extends OutputModelObject {
 	public String name;

@@ -41,7 +41,7 @@ class InputStream (object):
     
     def __init__(self, data):
         self.name = "<empty>"
-        self.strdata = data
+        self.strdata = unicode(data)
         self._loadString()
 
     def _loadString(self):    
@@ -126,7 +126,7 @@ class TestInputStream(unittest.TestCase):
         self.assertEqual(1, stream.index)
         stream.seek(5)
         self.assertEqual(Token.EOF, stream.LA(1))
-        self.assertEqual("bcd", stream.getText(1, 4))
+        self.assertEqual("bcd", stream.getText(1, 3))
         stream.reset()
         self.assertEqual(0, stream.index)
         

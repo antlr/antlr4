@@ -27,7 +27,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.antlr.v4.py2.test;
+package org.antlr.v4.js.test;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -110,7 +110,7 @@ import org.stringtemplate.v4.STGroupString;
 public abstract class BaseTest {
 	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
 	// private static final Logger LOGGER = Logger.getLogger(BaseTest.class.getName());
-	public static final boolean useUniqueDir = true;
+	public static final boolean useUniqueDir = false;
 
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
@@ -129,8 +129,7 @@ public abstract class BaseTest {
 		@Override
 		protected void succeeded(Description description) {
 			// remove tmpdir if no error.
-			eraseTempPyCache();
-			eraseTempDir();
+			// eraseTempDir();
 			freeLoader();
 		}
 
@@ -342,7 +341,7 @@ public abstract class BaseTest {
 		writeFile(tmpdir, fileName, grammarStr);
 		final List<String> options = new ArrayList<String>();
 		Collections.addAll(options, extraOptions);
-		options.add("-Dlanguage=Python2");
+		options.add("-Dlanguage=JavaScript");
 		options.add("-o");
 		options.add(tmpdir);
 		options.add("-lib");
@@ -401,7 +400,7 @@ public abstract class BaseTest {
 		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		writeLexerTestFile(lexerName, showDFA);
-		String output = execModule("Test.py");
+		String output = execModule("Test.js");
 		if ( stderrDuringParse!=null && stderrDuringParse.length()>0 ) {
 			System.err.println(stderrDuringParse);
 		}
@@ -522,16 +521,16 @@ public abstract class BaseTest {
 
 		List<String> files = new ArrayList<String>();
 		if ( lexerName!=null ) {
-			files.add(lexerName+".py");
+			files.add(lexerName+".js");
 		}
 		if ( parserName!=null ) {
-			files.add(parserName+".py");
+			files.add(parserName+".js");
 			Set<String> optionsSet = new HashSet<String>(Arrays.asList(extraOptions));
 			if (!optionsSet.contains("-no-listener")) {
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Listener.py");
+				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Listener.js");
 			}
 			if (optionsSet.contains("-visitor")) {
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Visitor.py");
+				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"Visitor.js");
 			}
 		}
 		return true; // allIsWell: no compile
@@ -559,17 +558,17 @@ public abstract class BaseTest {
 	}
 
 	public String execRecognizer() {
-		return execModule("Test.py");
+		return execModule("Test.js");
 	}
 
 	public String execModule(String fileName) {
-		String pythonPath = locatePython27();
+		String nodejsPath = locateNodeJS();
 		String runtimePath = locateRuntime();
 		String modulePath = new File(new File(tmpdir), fileName).getAbsolutePath();
 		String inputPath = new File(new File(tmpdir), "input").getAbsolutePath();
 		try {
-			ProcessBuilder builder = new ProcessBuilder( pythonPath, modulePath, inputPath );
-			builder.environment().put("PYTHONPATH",runtimePath);
+			ProcessBuilder builder = new ProcessBuilder( nodejsPath, modulePath, inputPath );
+			builder.environment().put("NODE_PATH",runtimePath + ":" + tmpdir);
 			builder.directory(new File(tmpdir)); 
 			Process process = builder.start();
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
@@ -593,15 +592,15 @@ public abstract class BaseTest {
 		return null;
 	}
 
-	private String locatePython27() {
-		return "/usr/local/bin/Python2.7";
+	private String locateNodeJS() {
+		return "/usr/local/bin/node";
 	}
 
 	private String locateRuntime() {
 		Path path = Paths.get(new File("").getAbsolutePath());
 		while(!("antlr4-master".equals(path.getFileName().toString())))
 			path = path.getParent();
-		return path.toAbsolutePath() + "/python2-runtime/src/";
+		return path.toAbsolutePath() + "/javascript-runtime/src/";
 	}
 
 	public void testErrors(String[] pairs, boolean printTree) {
@@ -923,31 +922,30 @@ public abstract class BaseTest {
 		outputFileST.add("listenerName", listenerName);
 		outputFileST.add("visitorName", visitorName);
 		outputFileST.add("parserStartRuleName", parserStartRuleName);
-		writeFile(tmpdir, "Test.py", outputFileST.render());
+		writeFile(tmpdir, "Test.js", outputFileST.render());
 	}
 
 	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
 		ST outputFileST = new ST(
-			"from __future__ import print_function\n" +
-			"import sys\n" +
-			"from antlr4 import *\n" +
-			"from <lexerName> import <lexerName>\n" +
+			"var antlr4 = require('antlr4');\n" +
+			"var <lexerName> = require('<lexerName>');\n" +
 			"\n" +
-			"def main(argv):\n" +
-			"    input = FileStream(argv[1])\n" +
-			"    lexer = <lexerName>(input)\n" +
-		    "    stream = CommonTokenStream(lexer)\n" +
-			"    stream.fill()\n" +
-		    "    [ print(str(t)) for t in stream.tokens ]\n" +
+			"function main(argv) {\n" +
+			"    var input = antlr4.FileStream(argv[1]);\n" +
+			"    var lexer = <lexerName>.<lexerName>(input);\n" +
+		    "    var stream = antlr4.CommonTokenStream(lexer);\n" +
+			"    stream.fill();\n" +
+		    "    for(var i=0; stream.tokens.length; i++)\n" +
+		    "		console.log(stream.tokens[i]);\n" +
 			(showDFA ? 
-			"    print(lexer._interp.decisionToDFA[Lexer.DEFAULT_MODE].toLexerString(), end='')\n"
+			"    console.log(lexer._interp.decisionToDFA[Lexer.DEFAULT_MODE].toLexerString(), end='');\n"
 				 :"") +
+			"}\n" +
 			"\n" +
-			"if __name__ == '__main__':\n" +
-			"    main(sys.argv)\n" +
+			"main(process.argv);\n" +
 			"\n");
 		outputFileST.add("lexerName", lexerName);
-		writeFile(tmpdir, "Test.py", outputFileST.render());
+		writeFile(tmpdir, "Test.js", outputFileST.render());
 	}
 
 	public void writeRecognizer(String parserName, String lexerName,
@@ -992,15 +990,7 @@ public abstract class BaseTest {
         }
     }
 
-    protected void eraseTempPyCache() {
-        File tmpdirF = new File(tmpdir+"/__pycache__");
-        if ( tmpdirF.exists() ) {
-            eraseFiles(tmpdirF);
-            tmpdirF.delete();
-        }
-    }
-
-    public String getFirstLineOfException() {
+   public String getFirstLineOfException() {
 		if ( this.stderrDuringParse ==null ) {
 			return null;
 		}

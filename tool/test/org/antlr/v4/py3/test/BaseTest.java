@@ -115,13 +115,6 @@ public abstract class BaseTest {
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
-	public static final boolean TEST_IN_SAME_PROCESS = Boolean.parseBoolean(System.getProperty("antlr.testinprocess"));
-
-    /**
-     * Build up the full classpath we need, including the surefire path (if present)
-     */
-    public static final String CLASSPATH = System.getProperty("java.class.path");
-
 	public String tmpdir = null;
 	public URLClassLoader loader = null;
 	
