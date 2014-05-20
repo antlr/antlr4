@@ -29,6 +29,14 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/** ANTLR tool checks output templates are compatible with tool code generation.
+ *  For now, a simple string match used on x.y of x.y.z scheme.
+ *  Must match Tool.VERSION during load to templates.
+ *
+ *  REQUIRED.
+ */
+VERSION() ::= "4.2" // use just "x.y" and don't include bug fix release number
+
 pythonTypeInitMap ::= [
 	"bool":"False",
 	"int":"0",
@@ -205,6 +213,7 @@ def sempred(self, localctx, ruleIndex, predIndex):
 parser_ctor(p) ::= <<
 def __init__(self, input):
     super(<parser.name>, self).__init__(input)
+    self.checkVersion("<file.ANTLRVersion>")
     self._interp = ParserATNSimulator(self, self.atn, self.decisionsToDFA, self.sharedContextCache)
     self._predicates = None
 
@@ -818,6 +827,7 @@ class <lexer.name>(<superClass>):
     
     def __init__(self, input=None):
         super(<lexer.name>, self).__init__(input)
+        self.checkVersion("<lexerFile.ANTLRVersion>")
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
         self._predicates = None
