@@ -28,6 +28,14 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/** ANTLR tool checks output templates are compatible with tool code generation.
+ *  For now, a simple string match used on x.y of x.y.z scheme.
+ *  Must match Tool.VERSION during load to templates.
+ *
+ *  REQUIRED.
+ */
+VERSION() ::= "4.2" // use just "x.y" and don't include bug fix release number
+
 javaTypeInitMap ::= [
 	"int":"0",
 	"long":"0",
@@ -214,6 +222,8 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class <parser.name> extends <superClass> {
+    static { RuntimeMetaData.checkVersion("<file.ANTLRVersion>"); }
+
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
@@ -848,6 +858,7 @@ import org.antlr.v4.runtime.misc.*;
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class <lexer.name> extends <superClass> {
+    static { RuntimeMetaData.checkVersion("<lexerFile.ANTLRVersion>"); }
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
