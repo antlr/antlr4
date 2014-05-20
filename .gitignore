@@ -33,5 +33,5 @@ nbactions*.xml
 *.hprof
 
 # Playground
-/.DS_Store
-/.pydevproject
+.DS_Store
+.pydevproject
