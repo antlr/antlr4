@@ -599,9 +599,11 @@ public abstract class BaseTest {
 
 	private String locateRuntime() {
 		Path path = Paths.get(new File("").getAbsolutePath());
-		while(!("antlr4-master".equals(path.getFileName().toString())))
+		while(!("antlr4".equals(path.getFileName().toString())))
 			path = path.getParent();
-		return path.toAbsolutePath() + "/python3-runtime/src/";
+		String runtimePath = path.toAbsolutePath() + "/antlr/antlr4-python3/src/";
+		System.out.println("Runtime path:" + runtimePath);
+		return runtimePath;
 	}
 
 	public void testErrors(String[] pairs, boolean printTree) {
