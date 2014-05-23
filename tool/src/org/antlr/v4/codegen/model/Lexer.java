@@ -41,6 +41,7 @@ import org.antlr.v4.tool.Rule;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +55,7 @@ public class Lexer extends OutputModelObject {
 	public Set<String> ruleNames;
 	public Collection<String> modes;
 	@ModelElement public ActionChunk superClass;
+	public Map<String,String> options;
 
 	@ModelElement public SerializedATN atn;
 	@ModelElement public LinkedHashMap<Rule, RuleActionFunction> actionFuncs =
@@ -100,6 +102,13 @@ public class Lexer extends OutputModelObject {
 		}
 		else {
 			superClass = new DefaultLexerSuperClass();
+		}
+		options = new HashMap<String,String>();
+		for (String name : Grammar.lexerOptions) {
+			String value = g.getOptionString(name);
+			if ( value!=null ) {
+				options.put(name, g.getOptionString(name));
+			}
 		}
 	}
 

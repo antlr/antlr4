@@ -41,6 +41,7 @@ import org.antlr.v4.tool.Rule;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ public class Parser extends OutputModelObject {
 	public String grammarFileName;
 	public String grammarName;
 	@ModelElement public ActionChunk superClass;
+	public Map<String,String> options;
 	public Map<String,Integer> tokens;
 	public String[] tokenNames;
 	public Set<String> ruleNames;
@@ -99,6 +101,13 @@ public class Parser extends OutputModelObject {
 		}
 		else {
 			superClass = new DefaultParserSuperClass();
+		}
+		options = new HashMap<String,String>();
+		for (String name : Grammar.parserOptions) {
+			String value = g.getOptionString(name);
+			if ( value!=null ) {
+				options.put(name, g.getOptionString(name));
+			}
 		}
 	}
 }
