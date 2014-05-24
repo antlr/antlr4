@@ -402,7 +402,8 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
                   tok.getType()==STRING_LITERAL ||
                   tok.getType()==RULE_REF) )
             {
-                options = String.format("<charIndex=%d,line=%d,charPos=%d%s>",
+                options = String.format("<tokenIndex=%d,charIndex=%d,line=%d,charPos=%d%s>",
+                        tok.getTokenIndex(),
                         ((CommonToken) tok).getStartIndex(),
                         tok.getLine(),
                         tok.getCharPositionInLine(),

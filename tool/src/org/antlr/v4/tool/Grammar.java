@@ -116,6 +116,7 @@ public class Grammar implements AttributeResolver {
         ruleRefOptions.add(LeftRecursiveRuleTransformer.CHARINDEX_OPTION_NAME);
         ruleRefOptions.add(LeftRecursiveRuleTransformer.LINE_OPTION_NAME);
         ruleRefOptions.add(LeftRecursiveRuleTransformer.CHARPOS_OPTION_NAME);
+        ruleRefOptions.add(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME);
 	}
 
 	/** Legal options for terminal refs like ID<assoc=right> */
@@ -125,6 +126,7 @@ public class Grammar implements AttributeResolver {
         tokenOptions.add(LeftRecursiveRuleTransformer.CHARINDEX_OPTION_NAME);
         tokenOptions.add(LeftRecursiveRuleTransformer.LINE_OPTION_NAME);
         tokenOptions.add(LeftRecursiveRuleTransformer.CHARPOS_OPTION_NAME);
+        tokenOptions.add(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME);
     }
 
 	public static final Set<String> actionOptions = new HashSet<String>();

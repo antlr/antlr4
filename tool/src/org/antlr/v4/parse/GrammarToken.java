@@ -11,6 +11,7 @@ public class GrammarToken extends CommonToken {
     public int _line = -1;
     public int _charPos = -1;
     public int _charIndex = -1;
+    public int _tokenIndex = -1;
 
     public GrammarToken(Token oldToken) {
         super(oldToken);
@@ -30,6 +31,11 @@ public class GrammarToken extends CommonToken {
     public int getLine() {
         if ( _line>=0 ) return _line;
         return super.getLine();
+    }
+
+    @Override
+    public int getTokenIndex() {
+        return _tokenIndex;
     }
 
     @Override
