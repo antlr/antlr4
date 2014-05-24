@@ -35,6 +35,7 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.TreeNodeStream;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.decl.AltLabelStructDecl;
+import org.antlr.v4.codegen.model.decl.AttributeDecl;
 import org.antlr.v4.codegen.model.decl.ContextRuleGetterDecl;
 import org.antlr.v4.codegen.model.decl.ContextRuleListGetterDecl;
 import org.antlr.v4.codegen.model.decl.ContextRuleListIndexedGetterDecl;
@@ -82,13 +83,13 @@ public class RuleFunction extends OutputModelObject {
 	public Collection<String> tokenLabels;
 	public ATNState startState;
 	public int index;
-	public Collection<Attribute> args = null;
 	public Rule rule;
 	public AltLabelStructDecl[] altToContext;
 	public boolean hasLookaheadBlock;
 
 	@ModelElement public List<SrcOp> code;
 	@ModelElement public OrderedHashSet<Decl> locals; // TODO: move into ctx?
+	@ModelElement public Collection<AttributeDecl> args = null;
 	@ModelElement public StructDecl ruleCtx;
 	@ModelElement public Map<String,AltLabelStructDecl> altLabelCtxs;
 	@ModelElement public Map<String,Action> namedActions;
@@ -113,9 +114,15 @@ public class RuleFunction extends OutputModelObject {
 		addContextGetters(factory, r);
 
 		if ( r.args!=null ) {
-			ruleCtx.addDecls(r.args.attributes.values());
-			args = r.args.attributes.values();
-			ruleCtx.ctorAttrs = args;
+			Collection<Attribute> decls = r.args.attributes.values();
+			if ( decls.size()>0 ) {
+				args = new ArrayList<AttributeDecl>();
+				ruleCtx.addDecls(decls);
+				for (Attribute a : decls) {
+					args.add(new AttributeDecl(factory, a));
+				}
+				ruleCtx.ctorAttrs = args;
+			}
 		}
 		if ( r.retvals!=null ) {
 			ruleCtx.addDecls(r.retvals.attributes.values());
