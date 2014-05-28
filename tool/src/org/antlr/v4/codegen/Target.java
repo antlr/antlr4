@@ -30,6 +30,7 @@
 
 package org.antlr.v4.codegen;
 
+import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.SerializedATN;
 import org.antlr.v4.misc.Utils;
@@ -87,10 +88,20 @@ public abstract class Target {
 		return language;
 	}
 
-	public STGroup getTemplates() {
-		if (templates == null) {
-			templates = loadTemplates();
-		}
+    /** ANTLR tool should check output templates / target are compatible with tool code generation.
+     *  For now, a simple string match used on x.y of x.y.z scheme. We use a method to avoid mismatches
+     *  between a template called VERSION. This value is checked against Tool.VERSION during load of templates.
+     */
+    public abstract String getVersion();
+
+    public STGroup getTemplates() {
+        if (templates == null) {
+            templates = loadTemplates();
+            String version = getVersion();
+            if (version == null || !version.equals(Tool.VERSION)) {
+                gen.tool.errMgr.toolError(ErrorType.INCOMPATIBLE_TOOL_AND_TEMPLATES, version, Tool.VERSION, language);
+            }
+        }
 
 		return templates;
 	}

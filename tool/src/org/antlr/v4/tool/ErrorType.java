@@ -172,9 +172,9 @@ public enum ErrorType {
     /**
    	 * Compiler Error 35.
    	 *
-   	 * <p>templates and tool aren't compatible</p>
+   	 * <p>templates/target and tool aren't compatible</p>
    	 */
-   	INCOMPATIBLE_TOOL_AND_TEMPLATES(35, "<arg3> code generation templates and tool versions disagree: <arg> != <arg2>", ErrorSeverity.ERROR),
+   	INCOMPATIBLE_TOOL_AND_TEMPLATES(35, "<arg3> code generation target requires ANTLR <arg2>; it can't be loaded by the current ANTLR <arg>", ErrorSeverity.ERROR),
 
 	/*
 	 * Grammar errors
