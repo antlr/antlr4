@@ -92,15 +92,15 @@ public abstract class Target {
      *  For now, a simple string match used on x.y of x.y.z scheme. We use a method to avoid mismatches
      *  between a template called VERSION. This value is checked against Tool.VERSION during load of templates.
      */
-    public abstract String getVersion();
+    public String getVersion() { return "4.3"; }
 
     public STGroup getTemplates() {
         if (templates == null) {
-            templates = loadTemplates();
             String version = getVersion();
             if (version == null || !version.equals(Tool.VERSION)) {
                 gen.tool.errMgr.toolError(ErrorType.INCOMPATIBLE_TOOL_AND_TEMPLATES, version, Tool.VERSION, language);
             }
+            templates = loadTemplates();
         }
 
 		return templates;
