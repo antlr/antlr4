@@ -91,8 +91,10 @@ public abstract class Target {
     /** ANTLR tool should check output templates / target are compatible with tool code generation.
      *  For now, a simple string match used on x.y of x.y.z scheme. We use a method to avoid mismatches
      *  between a template called VERSION. This value is checked against Tool.VERSION during load of templates.
+     *
+     *  This additional method forces all targets 4.3 and beyond to add this method.
      */
-    public String getVersion() { return "4.3"; }
+    public abstract String getVersion();
 
     public STGroup getTemplates() {
         if (templates == null) {
