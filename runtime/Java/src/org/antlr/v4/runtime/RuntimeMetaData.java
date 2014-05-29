@@ -27,6 +27,11 @@ public class RuntimeMetaData {
             this.generatedCodeVersion = generatedCodeVersion;
             this.runtimeLibVersion = runtimeLibVersion;
         }
+
+        @Override
+        public String getMessage() {
+            return super.getMessage()+": code version "+generatedCodeVersion+" != runtime version "+runtimeLibVersion;
+        }
     }
 
     /** Must match version of tool that generated recognizers */
