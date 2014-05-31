@@ -31,7 +31,6 @@
 package org.antlr.v4.analysis;
 
 import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
@@ -70,7 +69,8 @@ import java.util.List;
  *  MODIFIES grammar AST in place.
  */
 public class LeftRecursiveRuleTransformer {
-	public static final String PRECEDENCE_OPTION_NAME = "p";
+    public static final String PRECEDENCE_OPTION_NAME = "p";
+    public static final String TOKENINDEX_OPTION_NAME = "tokenIndex";
 
 	public GrammarRootAST ast;
 	public Collection<Rule> rules;
@@ -91,6 +91,7 @@ public class LeftRecursiveRuleTransformer {
 		for (Rule r : rules) {
 			if ( !Grammar.isTokenName(r.name) ) {
 				if ( LeftRecursiveRuleAnalyzer.hasImmediateRecursiveRuleRefs(r.ast, r.name) ) {
+					g.originalTokenStream = g.tokenStream;
 					boolean fitsPattern = translateLeftRecursiveRule(ast, (LeftRecursiveRule)r, language);
 					if ( fitsPattern ) leftRecursiveRuleNames.add(r.name);
 				}
@@ -114,7 +115,6 @@ public class LeftRecursiveRuleTransformer {
 											  String language)
 	{
 		//tool.log("grammar", ruleAST.toStringTree());
-		Grammar g = r.ast.g;
 		GrammarAST prevRuleAST = r.ast;
 		String ruleName = prevRuleAST.getChild(0).getText();
 		LeftRecursiveRuleAnalyzer leftRecursiveRuleWalker =
@@ -209,7 +209,8 @@ public class LeftRecursiveRuleTransformer {
 		try {
 			ParserRuleReturnScope r = p.rule();
 			RuleAST tree = (RuleAST)r.getTree();
-			GrammarTransformPipeline.setGrammarPtr(g, tree);
+            GrammarTransformPipeline.setGrammarPtr(g, tree);
+            GrammarTransformPipeline.augmentTokensWithOriginalPosition(g, tree);
 			return tree;
 		}
 		catch (Exception e) {

@@ -68,6 +68,10 @@ public class GrammarAST extends CommonTree {
     public GrammarAST(int type) { super(new CommonToken(type, ANTLRParser.tokenNames[type])); }
     public GrammarAST(int type, Token t) {
 		this(new CommonToken(type, t.getText()));
+        if ( t instanceof CommonToken ) {
+            ((CommonToken) token).setStartIndex(((CommonToken) t).getStartIndex());
+            ((CommonToken) token).setStopIndex(((CommonToken) t).getStopIndex());
+        }
 		token.setInputStream(t.getInputStream());
 		token.setLine(t.getLine());
 		token.setCharPositionInLine(t.getCharPositionInLine());
@@ -75,6 +79,10 @@ public class GrammarAST extends CommonTree {
 	}
     public GrammarAST(int type, Token t, String text) {
 		this(new CommonToken(type, text));
+        if ( t instanceof CommonToken ) {
+            ((CommonToken) token).setStartIndex(((CommonToken) t).getStartIndex());
+            ((CommonToken) token).setStopIndex(((CommonToken) t).getStopIndex());
+        }
 		token.setInputStream(t.getInputStream());
 		token.setLine(t.getLine());
 		token.setCharPositionInLine(t.getCharPositionInLine());
@@ -121,14 +129,29 @@ public class GrammarAST extends CommonTree {
 		return nodes;
 	}
 
-	public void getNodesWithTypePreorderDFS_(List<GrammarAST> nodes, IntervalSet types) {
-		if ( types.contains(this.getType()) ) nodes.add(this);
-		// walk all children of root.
-		for (int i= 0; i < getChildCount(); i++) {
-			GrammarAST child = (GrammarAST)getChild(i);
-			child.getNodesWithTypePreorderDFS_(nodes, types);
-		}
-	}
+    public void getNodesWithTypePreorderDFS_(List<GrammarAST> nodes, IntervalSet types) {
+   		if ( types.contains(this.getType()) ) nodes.add(this);
+   		// walk all children of root.
+   		for (int i= 0; i < getChildCount(); i++) {
+   			GrammarAST child = (GrammarAST)getChild(i);
+   			child.getNodesWithTypePreorderDFS_(nodes, types);
+   		}
+   	}
+
+    public GrammarAST getNodeWithTokenIndex(int index) {
+   		if ( this.getToken().getTokenIndex()==index ) {
+            return this;
+        }
+   		// walk all children of root.
+   		for (int i= 0; i < getChildCount(); i++) {
+   			GrammarAST child = (GrammarAST)getChild(i);
+   			GrammarAST result = child.getNodeWithTokenIndex(index);
+            if ( result!=null ) {
+                return result;
+            }
+   		}
+        return null;
+   	}
 
 	public AltAST getOutermostAltNode() {
 		if ( this instanceof AltAST && parent.parent instanceof RuleAST ) {

@@ -50,7 +50,6 @@ import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntSet;
-import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -114,13 +113,15 @@ public class Grammar implements AttributeResolver {
 	public static final Set<String> ruleRefOptions = new HashSet<String>();
 	static {
 		ruleRefOptions.add(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME);
+        ruleRefOptions.add(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME);
 	}
 
 	/** Legal options for terminal refs like ID<assoc=right> */
 	public static final Set<String> tokenOptions = new HashSet<String>();
 	static {
-		tokenOptions.add("assoc");
-	}
+        tokenOptions.add("assoc");
+        tokenOptions.add(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME);
+    }
 
 	public static final Set<String> actionOptions = new HashSet<String>();
 
@@ -151,6 +152,9 @@ public class Grammar implements AttributeResolver {
 	/** Track stream used to create this grammar */
 	@NotNull
 	public final org.antlr.runtime.TokenStream tokenStream;
+	/** If we transform grammar, track original unaltered token stream */
+	public org.antlr.runtime.TokenStream originalTokenStream;
+
     public String text; // testing only
     public String fileName;
 
