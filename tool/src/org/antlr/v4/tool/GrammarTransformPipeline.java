@@ -31,7 +31,11 @@
 package org.antlr.v4.tool;
 
 import org.antlr.runtime.CommonToken;
-import org.antlr.runtime.tree.*;
+import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.runtime.tree.Tree;
+import org.antlr.runtime.tree.TreeVisitor;
+import org.antlr.runtime.tree.TreeVisitorAction;
 import org.antlr.v4.Tool;
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.parse.ANTLRParser;
@@ -40,9 +44,20 @@ import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.GrammarToken;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.antlr.v4.runtime.misc.Pair;
-import org.antlr.v4.tool.ast.*;
+import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.BlockAST;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarASTWithOptions;
+import org.antlr.v4.tool.ast.GrammarRootAST;
+import org.antlr.v4.tool.ast.RuleAST;
+import org.antlr.v4.tool.ast.TerminalAST;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /** Handle left-recursion and block-set transforms */
 public class GrammarTransformPipeline {
