@@ -35,7 +35,7 @@
  *
  *  REQUIRED.
  */
-VERSION() ::= "4.2" // use just "x.y" and don't include bug fix release number
+VERSION() ::= "4.3" // use just "x.y" and don't include bug fix release number
 
 pythonTypeInitMap ::= [
 	"bool":"False",
