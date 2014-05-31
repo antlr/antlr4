@@ -113,9 +113,6 @@ public class Grammar implements AttributeResolver {
 	public static final Set<String> ruleRefOptions = new HashSet<String>();
 	static {
 		ruleRefOptions.add(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME);
-        ruleRefOptions.add(LeftRecursiveRuleTransformer.CHARINDEX_OPTION_NAME);
-        ruleRefOptions.add(LeftRecursiveRuleTransformer.LINE_OPTION_NAME);
-        ruleRefOptions.add(LeftRecursiveRuleTransformer.CHARPOS_OPTION_NAME);
         ruleRefOptions.add(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME);
 	}
 
@@ -123,9 +120,6 @@ public class Grammar implements AttributeResolver {
 	public static final Set<String> tokenOptions = new HashSet<String>();
 	static {
         tokenOptions.add("assoc");
-        tokenOptions.add(LeftRecursiveRuleTransformer.CHARINDEX_OPTION_NAME);
-        tokenOptions.add(LeftRecursiveRuleTransformer.LINE_OPTION_NAME);
-        tokenOptions.add(LeftRecursiveRuleTransformer.CHARPOS_OPTION_NAME);
         tokenOptions.add(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME);
     }
 
@@ -158,6 +152,9 @@ public class Grammar implements AttributeResolver {
 	/** Track stream used to create this grammar */
 	@NotNull
 	public final org.antlr.runtime.TokenStream tokenStream;
+	/** If we transform grammar, track original unaltered token stream */
+	public org.antlr.runtime.TokenStream originalTokenStream;
+
     public String text; // testing only
     public String fileName;
 

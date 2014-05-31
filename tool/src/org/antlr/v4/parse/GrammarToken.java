@@ -1,46 +1,43 @@
 package org.antlr.v4.parse;
 
-import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
+import org.antlr.v4.tool.Grammar;
 
 /** A CommonToken that can also track it's original location,
  *  derived from options on the element ref like BEGIN<line=34,...>.
  */
 public class GrammarToken extends CommonToken {
-    public int _line = -1;
-    public int _charPos = -1;
-    public int _charIndex = -1;
-    public int _tokenIndex = -1;
+	public Grammar g;
+    public int originalTokenIndex = -1;
 
-    public GrammarToken(Token oldToken) {
+    public GrammarToken(Grammar g, Token oldToken) {
         super(oldToken);
-    }
-
-    public GrammarToken(CharStream input, int type, int channel, int start, int stop) {
-        super(input, type, channel, start, stop);
+		this.g = g;
     }
 
     @Override
     public int getCharPositionInLine() {
-        if ( _charPos>=0 ) return _charPos;
+		if ( originalTokenIndex>=0 ) return g.originalTokenStream.get(originalTokenIndex).getCharPositionInLine();
         return super.getCharPositionInLine();
     }
 
     @Override
     public int getLine() {
-        if ( _line>=0 ) return _line;
+		if ( originalTokenIndex>=0 ) return g.originalTokenStream.get(originalTokenIndex).getLine();
         return super.getLine();
     }
 
     @Override
     public int getTokenIndex() {
-        return _tokenIndex;
+        return originalTokenIndex;
     }
 
     @Override
     public int getStartIndex() {
-        if ( _charIndex >=0 ) return _charIndex;
+		if ( originalTokenIndex>=0 ) {
+			return ((CommonToken)g.originalTokenStream.get(originalTokenIndex)).getStartIndex();
+		}
         return super.getStartIndex();
     }
 

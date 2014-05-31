@@ -70,9 +70,6 @@ import java.util.List;
  */
 public class LeftRecursiveRuleTransformer {
     public static final String PRECEDENCE_OPTION_NAME = "p";
-    public static final String CHARINDEX_OPTION_NAME = "charIndex";
-    public static final String LINE_OPTION_NAME = "line";
-    public static final String CHARPOS_OPTION_NAME = "charPos";
     public static final String TOKENINDEX_OPTION_NAME = "tokenIndex";
 
 	public GrammarRootAST ast;
@@ -94,6 +91,7 @@ public class LeftRecursiveRuleTransformer {
 		for (Rule r : rules) {
 			if ( !Grammar.isTokenName(r.name) ) {
 				if ( LeftRecursiveRuleAnalyzer.hasImmediateRecursiveRuleRefs(r.ast, r.name) ) {
+					g.originalTokenStream = g.tokenStream;
 					boolean fitsPattern = translateLeftRecursiveRule(ast, (LeftRecursiveRule)r, language);
 					if ( fitsPattern ) leftRecursiveRuleNames.add(r.name);
 				}
@@ -117,7 +115,6 @@ public class LeftRecursiveRuleTransformer {
 											  String language)
 	{
 		//tool.log("grammar", ruleAST.toStringTree());
-		Grammar g = r.ast.g;
 		GrammarAST prevRuleAST = r.ast;
 		String ruleName = prevRuleAST.getChild(0).getText();
 		LeftRecursiveRuleAnalyzer leftRecursiveRuleWalker =
