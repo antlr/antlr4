@@ -204,10 +204,25 @@ public abstract class SemanticContext {
 	}
 
 	/**
+	 * This is the base class for semantic context "operators", which operate on
+	 * a collection of semantic context "operands".
+	 */
+	public static abstract class Operator extends SemanticContext {
+		/**
+		 * Gets the operands for the semantic context operator.
+		 *
+		 * @return a collection of {@link SemanticContext} operands for the
+		 * operator.
+		 */
+		@NotNull
+		public abstract Collection<SemanticContext> getOperands();
+	}
+
+	/**
 	 * A semantic context which is true whenever none of the contained contexts
 	 * is false.
 	 */
-    public static class AND extends SemanticContext {
+    public static class AND extends Operator {
 		@NotNull public final SemanticContext[] opnds;
 
 		public AND(@NotNull SemanticContext a, @NotNull SemanticContext b) {
@@ -226,6 +241,11 @@ public abstract class SemanticContext {
 
 			opnds = operands.toArray(new SemanticContext[operands.size()]);
         }
+
+		@Override
+		public Collection<SemanticContext> getOperands() {
+			return Arrays.asList(opnds);
+		}
 
 		@Override
 		public boolean equals(Object obj) {
@@ -299,7 +319,7 @@ public abstract class SemanticContext {
 	 * A semantic context which is true whenever at least one of the contained
 	 * contexts is true.
 	 */
-    public static class OR extends SemanticContext {
+    public static class OR extends Operator {
 		@NotNull public final SemanticContext[] opnds;
 
 		public OR(@NotNull SemanticContext a, @NotNull SemanticContext b) {
@@ -318,6 +338,11 @@ public abstract class SemanticContext {
 
 			this.opnds = operands.toArray(new SemanticContext[operands.size()]);
         }
+
+		@Override
+		public Collection<SemanticContext> getOperands() {
+			return Arrays.asList(opnds);
+		}
 
 		@Override
 		public boolean equals(Object obj) {
