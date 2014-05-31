@@ -194,6 +194,21 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		return states;
 	}
 
+	/**
+	 * Gets the complete set of represented alternatives for the configuration
+	 * set.
+	 *
+	 * @return the set of represented alternatives in this configuration set
+	 */
+	@NotNull
+	public BitSet getAlts() {
+		BitSet alts = new BitSet();
+		for (ATNConfig config : configs) {
+			alts.set(config.alt);
+		}
+		return alts;
+	}
+
 	public List<SemanticContext> getPredicates() {
 		List<SemanticContext> preds = new ArrayList<SemanticContext>();
 		for (ATNConfig c : configs) {
