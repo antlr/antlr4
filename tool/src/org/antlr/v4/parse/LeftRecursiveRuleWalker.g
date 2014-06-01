@@ -179,8 +179,8 @@ element
     |	^(SET setElement+)
     |   RULE_REF
 	|	ebnf
-	|	ACTION
-	|	SEMPRED
+	|	^(ACTION elementOptions?)
+	|	^(SEMPRED elementOptions?)
 	|	EPSILON
 	;
 
