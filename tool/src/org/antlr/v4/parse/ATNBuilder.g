@@ -164,7 +164,9 @@ blockSet[boolean invert] returns [ATNFactory.Handle p]
 
 /** Don't combine with atom otherwise it will build spurious ATN nodes */
 setElement
-	:	STRING_LITERAL
+	:	^(STRING_LITERAL .)
+	|	^(TOKEN_REF .)
+	|	STRING_LITERAL
 	|	TOKEN_REF
 	|	^(RANGE a=STRING_LITERAL b=STRING_LITERAL)
     |   LEXER_CHAR_SET

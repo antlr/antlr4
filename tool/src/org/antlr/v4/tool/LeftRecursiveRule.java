@@ -45,6 +45,7 @@ import java.util.Map;
 public class LeftRecursiveRule extends Rule {
 	public List<LeftRecursiveRuleAltInfo> recPrimaryAlts;
 	public OrderedHashMap<Integer, LeftRecursiveRuleAltInfo> recOpAlts;
+	public RuleAST originalAST;
 
 	/** Did we delete any labels on direct left-recur refs? Points at ID of ^(= ID el) */
 	public List<Pair<GrammarAST,String>> leftRecursiveRuleRefLabels =
@@ -52,6 +53,7 @@ public class LeftRecursiveRule extends Rule {
 
 	public LeftRecursiveRule(Grammar g, String name, RuleAST ast) {
 		super(g, name, ast, 1);
+		originalAST = ast;
 		alt = new Alternative[numberOfAlts+1]; // always just one
 		for (int i=1; i<=numberOfAlts; i++) alt[i] = new Alternative(this, i);
 	}
@@ -67,6 +69,10 @@ public class LeftRecursiveRule extends Rule {
 		if ( recPrimaryAlts!=null ) n += recPrimaryAlts.size();
 		if ( recOpAlts!=null ) n += recOpAlts.size();
 		return n;
+	}
+
+	public RuleAST getOriginalAST() {
+		return originalAST;
 	}
 
 	@Override

@@ -106,10 +106,24 @@ setElement[boolean inLexer]
 @after {
 	GrammarTransformPipeline.setGrammarPtr(g, $tree);
 }
-	:	(	a=STRING_LITERAL {!inLexer || CharSupport.getCharValueFromGrammarCharLiteral($a.getText())!=-1}?
-		|	{!inLexer}?=> TOKEN_REF
+	:	(	^(a=STRING_LITERAL elementOptions) {!inLexer || CharSupport.getCharValueFromGrammarCharLiteral($a.getText())!=-1}?
+		|	  a=STRING_LITERAL {!inLexer || CharSupport.getCharValueFromGrammarCharLiteral($a.getText())!=-1}?
+		|	{!inLexer}?=> ^(TOKEN_REF elementOptions)
+		|	{!inLexer}?=>   TOKEN_REF
 		|	{inLexer}?=>  ^(RANGE a=STRING_LITERAL b=STRING_LITERAL)
 			{CharSupport.getCharValueFromGrammarCharLiteral($a.getText())!=-1 &&
 			 CharSupport.getCharValueFromGrammarCharLiteral($b.getText())!=-1}?
 		)
+	;
+
+elementOptions
+	:	^(ELEMENT_OPTIONS elementOption*)
+	;
+
+elementOption
+	:	ID
+	|	^(ASSIGN id=ID v=ID)
+	|	^(ASSIGN ID v=STRING_LITERAL)
+	|	^(ASSIGN ID v=ACTION)
+	|	^(ASSIGN ID v=INT)
 	;

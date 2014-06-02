@@ -198,8 +198,9 @@ public abstract class SemanticContext {
 		}
 
 		@Override
+		// precedence >= _precedenceStack.peek()
 		public String toString() {
-			return super.toString();
+			return "{"+precedence+">=prec}?";
 		}
 	}
 
