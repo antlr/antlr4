@@ -185,7 +185,9 @@ element
 	;
 
 setElement
-	:	STRING_LITERAL
+	:	^(STRING_LITERAL elementOptions)
+	|	^(TOKEN_REF elementOptions)
+	|	STRING_LITERAL
 	|	TOKEN_REF
 	;
 

@@ -102,7 +102,7 @@ public class GrammarAST extends CommonTree {
 		GrammarAST t;
 		while ( !work.isEmpty() ) {
 			t = work.remove(0);
-			if ( types.contains(t.getType()) ) nodes.add(t);
+			if ( types==null || types.contains(t.getType()) ) nodes.add(t);
 			if ( t.children!=null ) {
 				work.addAll(Arrays.asList(t.getChildrenAsArray()));
 			}
@@ -123,6 +123,21 @@ public class GrammarAST extends CommonTree {
 			GrammarAST child = (GrammarAST)getChild(i);
 			child.getNodesWithTypePreorderDFS_(nodes, types);
 		}
+	}
+
+	public GrammarAST getNodeWithTokenIndex(int index) {
+		if ( this.getToken().getTokenIndex()==index ) {
+			return this;
+		}
+		// walk all children of root.
+		for (int i= 0; i < getChildCount(); i++) {
+			GrammarAST child = (GrammarAST)getChild(i);
+			GrammarAST result = child.getNodeWithTokenIndex(index);
+			if ( result!=null ) {
+				return result;
+			}
+		}
+		return null;
 	}
 
 	public AltAST getOutermostAltNode() {

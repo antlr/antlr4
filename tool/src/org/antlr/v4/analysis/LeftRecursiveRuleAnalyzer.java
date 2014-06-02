@@ -31,6 +31,7 @@
 package org.antlr.v4.analysis;
 
 import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
@@ -44,6 +45,8 @@ import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarASTWithOptions;
+import org.antlr.v4.tool.ast.RuleRefAST;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
@@ -151,7 +154,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		if ( lrlabel!=null ) {
 			leftRecursiveRuleRefLabels.add(new Pair<GrammarAST,String>(lrlabel,altLabel));
 		}
-		stripAssocOptions(altTree);
+
 		stripAltLabel(altTree);
 
 		// rewrite e to be e_[rec_arg]
@@ -257,35 +260,16 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		if ( t==null ) return null;
 		// get all top-level rule refs from ALT
 		List<GrammarAST> outerAltRuleRefs = t.getNodesWithTypePreorderDFS(IntervalSet.of(RULE_REF));
-		for (GrammarAST rref : outerAltRuleRefs) {
+		for (GrammarAST x : outerAltRuleRefs) {
+			RuleRefAST rref = (RuleRefAST)x;
 			boolean recursive = rref.getText().equals(ruleName);
 			boolean rightmost = rref == outerAltRuleRefs.get(outerAltRuleRefs.size()-1);
 			if ( recursive && rightmost ) {
-				rref.setText(ruleName+"<"+LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME+"="+prec+">");
+				GrammarAST dummyValueNode = new GrammarAST(new CommonToken(ANTLRParser.INT, ""+prec));
+				rref.setOption(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME, dummyValueNode);
 			}
 		}
 		return t;
-	}
-
-	public void stripAssocOptions(GrammarAST t) {
-		if ( t==null ) return;
-		for (GrammarAST options : t.getNodesWithType(ELEMENT_OPTIONS)) {
-			int i=0;
-			while ( i<options.getChildCount() ) {
-				GrammarAST c = (GrammarAST)options.getChild(i);
-				if ( c.getChild(0).getText().equals("assoc") ) {
-					options.deleteChild(i); // kill this option
-				}
-				else {
-					i++;
-				}
-			}
-			if ( options.getChildCount()==0 )	{
-				Tree parent = options.getParent();
-				parent.deleteChild(options.getChildIndex()); // no more options
-				return;
-			}
-		}
 	}
 
 	/**
@@ -349,9 +333,69 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 	public String text(GrammarAST t) {
 		if ( t==null ) return "";
-		CommonToken ta = (CommonToken) tokenStream.get(t.getTokenStartIndex());
-		CommonToken tb = (CommonToken) tokenStream.get(t.getTokenStopIndex());
-		return tokenStream.toString(ta, tb);
+
+		int tokenStartIndex = t.getTokenStartIndex();
+		int tokenStopIndex = t.getTokenStopIndex();
+
+		// ignore tokens from existing option subtrees like:
+		//    (ELEMENT_OPTIONS (= assoc right))
+		//
+		// element options are added back according to the values in the map
+		// returned by getOptions().
+		IntervalSet ignore = new IntervalSet();
+		List<GrammarAST> optionsSubTrees = t.getNodesWithType(ELEMENT_OPTIONS);
+		for (GrammarAST sub : optionsSubTrees) {
+			ignore.add(sub.getTokenStartIndex(), sub.getTokenStopIndex());
+		}
+
+		// Individual labels appear as RULE_REF or TOKEN_REF tokens in the tree,
+		// but do not support the ELEMENT_OPTIONS syntax. Make sure to not try
+		// and add the tokenIndex option when writing these tokens.
+		IntervalSet noOptions = new IntervalSet();
+		List<GrammarAST> labeledSubTrees = t.getNodesWithType(new IntervalSet(ASSIGN,PLUS_ASSIGN));
+		for (GrammarAST sub : labeledSubTrees) {
+			noOptions.add(sub.getChild(0).getTokenStartIndex());
+		}
+
+		StringBuilder buf = new StringBuilder();
+		for (int i=tokenStartIndex; i<=tokenStopIndex; i++) {
+			if ( ignore.contains(i) ) {
+				continue;
+			}
+
+			Token tok = tokenStream.get(i);
+
+			StringBuilder elementOptions = new StringBuilder();
+			if (!noOptions.contains(i)) {
+				GrammarAST node = t.getNodeWithTokenIndex(tok.getTokenIndex());
+				if ( node!=null &&
+					 (tok.getType()==TOKEN_REF ||
+					  tok.getType()==STRING_LITERAL ||
+					  tok.getType()==RULE_REF) )
+				{
+					elementOptions.append("tokenIndex=").append(tok.getTokenIndex());
+				}
+
+				if ( node instanceof GrammarASTWithOptions ) {
+					GrammarASTWithOptions o = (GrammarASTWithOptions)node;
+					for (Map.Entry<String, GrammarAST> entry : o.getOptions().entrySet()) {
+						if (elementOptions.length() > 0) {
+							elementOptions.append(',');
+						}
+
+						elementOptions.append(entry.getKey());
+						elementOptions.append('=');
+						elementOptions.append(entry.getValue().getText());
+					}
+				}
+			}
+
+			buf.append(tok.getText());
+			if (elementOptions.length() > 0) {
+				buf.append('<').append(elementOptions).append('>');
+			}
+		}
+		return buf.toString();
 	}
 
 	public int precedence(int alt) {

@@ -912,8 +912,10 @@ setElement
 @after {
 	exitSetElement($start);
 }
-	:	STRING_LITERAL	{stringRef((TerminalAST)$STRING_LITERAL);}
-	|	TOKEN_REF		{tokenRef((TerminalAST)$TOKEN_REF);}
+	:	^(STRING_LITERAL elementOptions)    {stringRef((TerminalAST)$STRING_LITERAL);}
+	|	^(TOKEN_REF elementOptions) 		{tokenRef((TerminalAST)$TOKEN_REF);}
+	|	STRING_LITERAL                  	{stringRef((TerminalAST)$STRING_LITERAL);}
+	|	TOKEN_REF		                    {tokenRef((TerminalAST)$TOKEN_REF);}
 	|	^(RANGE a=STRING_LITERAL b=STRING_LITERAL)
 		{
 		stringRef((TerminalAST)$a);

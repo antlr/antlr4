@@ -557,7 +557,19 @@ public abstract class BaseTest {
 								String startRuleName,
 								String input, boolean debug)
 	{
-		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
+		return execParser(grammarFileName, grammarStr, parserName,
+				   lexerName, startRuleName, input, debug, false);
+	}
+
+	protected String execParser(String grammarFileName,
+								String grammarStr,
+								String parserName,
+								String lexerName,
+								String startRuleName,
+								String input, boolean debug,
+								boolean profile)
+	{
+	boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 														grammarStr,
 														parserName,
 														lexerName,
@@ -567,7 +579,8 @@ public abstract class BaseTest {
 		return rawExecRecognizer(parserName,
 								 lexerName,
 								 startRuleName,
-								 debug);
+								 debug,
+								 profile);
 	}
 
 	/** Return true if all is well */
@@ -615,7 +628,8 @@ public abstract class BaseTest {
 	protected String rawExecRecognizer(String parserName,
 									   String lexerName,
 									   String parserStartRuleName,
-									   boolean debug)
+									   boolean debug,
+									   boolean profile)
 	{
         this.stderrDuringParse = null;
 		if ( parserName==null ) {
@@ -625,7 +639,8 @@ public abstract class BaseTest {
 			writeTestFile(parserName,
 						  lexerName,
 						  parserStartRuleName,
-						  debug);
+						  debug,
+						  profile);
 		}
 
 		compile("Test.java");
@@ -1003,11 +1018,13 @@ public abstract class BaseTest {
 	protected void writeTestFile(String parserName,
 								 String lexerName,
 								 String parserStartRuleName,
-								 boolean debug)
+								 boolean debug,
+								 boolean profile)
 	{
 		ST outputFileST = new ST(
 			"import org.antlr.v4.runtime.*;\n" +
 			"import org.antlr.v4.runtime.tree.*;\n" +
+			"import org.antlr.v4.runtime.atn.*;\n" +
 			"\n" +
 			"public class Test {\n" +
 			"    public static void main(String[] args) throws Exception {\n" +
@@ -1016,7 +1033,9 @@ public abstract class BaseTest {
 			"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
 			"        <createParser>\n"+
 			"		 parser.setBuildParseTree(true);\n" +
+			"		 <profile>\n"+
 			"        ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
+			"		 <if(profile)>profiler.dump();<endif>\n" +
 			"        ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
 			"    }\n" +
 			"\n" +
@@ -1043,6 +1062,14 @@ public abstract class BaseTest {
 				new ST(
 				"        <parserName> parser = new <parserName>(tokens);\n" +
                 "        parser.addErrorListener(new DiagnosticErrorListener());\n");
+		}
+		if ( profile ) {
+			outputFileST.add("profile",
+							 "ProfilingATNSimulator profiler = new ProfilingATNSimulator(parser);\n" +
+							 "parser.setInterpreter(profiler);");
+		}
+		else {
+			outputFileST.add("profile", new ArrayList<Object>());
 		}
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);
@@ -1073,7 +1100,8 @@ public abstract class BaseTest {
 
 	public void writeRecognizerAndCompile(String parserName, String lexerName,
 										  String parserStartRuleName,
-										  boolean debug) {
+										  boolean debug,
+										  boolean profile) {
 		if ( parserName==null ) {
 			writeLexerTestFile(lexerName, debug);
 		}
@@ -1081,7 +1109,8 @@ public abstract class BaseTest {
 			writeTestFile(parserName,
 						  lexerName,
 						  parserStartRuleName,
-						  debug);
+						  debug,
+						  profile);
 		}
 
 		compile("Test.java");

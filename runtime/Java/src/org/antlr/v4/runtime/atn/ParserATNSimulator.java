@@ -32,6 +32,7 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.FailedPredicateException;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.Parser;
@@ -1903,5 +1904,9 @@ public class ParserATNSimulator extends ATNSimulator {
 	@NotNull
 	public final PredictionMode getPredictionMode() {
 		return mode;
+	}
+
+	public Parser getParser() {
+		return parser;
 	}
 }

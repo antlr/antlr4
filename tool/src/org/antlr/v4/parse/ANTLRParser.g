@@ -818,8 +818,8 @@ blockSet
     ;
 
 setElement
-	:	TOKEN_REF<TerminalAST>
-	|	STRING_LITERAL<TerminalAST>
+	:	TOKEN_REF<TerminalAST>^ elementOptions?
+	|	STRING_LITERAL<TerminalAST>^ elementOptions?
 	|	range
     |   LEXER_CHAR_SET
 	;
