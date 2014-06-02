@@ -143,6 +143,21 @@ public class GrammarTransformPipeline {
 					GrammarToken newTok = new GrammarToken(g, elWithOpt.getToken());
 					newTok.originalTokenIndex = Integer.valueOf(options.get(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME).getText());
 					elWithOpt.token = newTok;
+
+					GrammarAST originalNode = g.ast.getNodeWithTokenIndex(newTok.getTokenIndex());
+					if (originalNode != null) {
+						// update the AST node start/stop index to match the values
+						// of the corresponding node in the original parse tree.
+						elWithOpt.setTokenStartIndex(originalNode.getTokenStartIndex());
+						elWithOpt.setTokenStopIndex(originalNode.getTokenStopIndex());
+					}
+					else {
+						// the original AST node could not be located by index;
+						// make sure to assign valid values for the start/stop
+						// index so toTokenString will not throw exceptions.
+						elWithOpt.setTokenStartIndex(newTok.getTokenIndex());
+						elWithOpt.setTokenStopIndex(newTok.getTokenIndex());
+					}
 				}
 			}
 		}
