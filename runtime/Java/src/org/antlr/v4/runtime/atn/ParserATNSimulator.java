@@ -1265,7 +1265,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		ATNConfigSet failed = new ATNConfigSet(configs.fullCtx);
 		for (ATNConfig c : configs) {
 			if ( c.semanticContext!=SemanticContext.NONE ) {
-				boolean predicateEvaluationResult = c.semanticContext.eval(parser, outerContext);
+				boolean predicateEvaluationResult = evalSemanticContext(c.semanticContext, outerContext, c.alt, configs.fullCtx);
 				if ( predicateEvaluationResult ) {
 					succeeded.add(c);
 				}
@@ -1287,8 +1287,8 @@ public class ParserATNSimulator extends ATNSimulator {
 	 *  includes pairs with null predicates.
 	 */
 	protected BitSet evalSemanticContext(@NotNull DFAState.PredPrediction[] predPredictions,
-									  ParserRuleContext outerContext,
-									  boolean complete)
+										 ParserRuleContext outerContext,
+										 boolean complete)
 	{
 		BitSet predictions = new BitSet();
 		for (DFAState.PredPrediction pair : predPredictions) {
@@ -1300,7 +1300,8 @@ public class ParserATNSimulator extends ATNSimulator {
 				continue;
 			}
 
-			boolean predicateEvaluationResult = pair.pred.eval(parser, outerContext);
+			boolean fullCtx = false; // in dfa
+			boolean predicateEvaluationResult = evalSemanticContext(pair.pred, outerContext, pair.alt, fullCtx);
 			if ( debug || dfa_debug ) {
 				System.out.println("eval pred "+pair+"="+predicateEvaluationResult);
 			}
@@ -1317,6 +1318,17 @@ public class ParserATNSimulator extends ATNSimulator {
 		return predictions;
 	}
 
+	/** Evaluate the predicate context using the indicated parser stack and return the result.
+	 *  The alt parameter indicates the predicted alternative but is used only by the profiler
+	 *  at the moment. The profiler wants to track whether or not this predicate evaluated
+	 *  in SLL or LL mode and so we pass in evalInFullCtx.
+	 *
+	 *  All pred eval goes through here, even precedence preds, so we have a hook for profiling.
+	 *  Compiler should inline.
+	 */
+	protected boolean evalSemanticContext(SemanticContext pred, ParserRuleContext parserCallStack, int alt, boolean fullCtx) {
+		return pred.eval(parser, parserCallStack);
+	}
 
 	/* TODO: If we are doing predicates, there is no point in pursuing
 		 closure operations if we reach a DFA state that uniquely predicts
@@ -1544,7 +1556,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				// later during conflict resolution.
 				int currentPosition = _input.index();
 				_input.seek(_startIndex);
-				boolean predSucceeds = pt.getPredicate().eval(parser, _outerContext);
+				boolean predSucceeds = evalSemanticContext(pt.getPredicate(), _outerContext, config.alt, fullCtx);
 				_input.seek(currentPosition);
 				if ( predSucceeds ) {
 					c = new ATNConfig(config, pt.target); // no pred context
@@ -1592,7 +1604,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				// later during conflict resolution.
 				int currentPosition = _input.index();
 				_input.seek(_startIndex);
-				boolean predSucceeds = pt.getPredicate().eval(parser, _outerContext);
+				boolean predSucceeds = evalSemanticContext(pt.getPredicate(), _outerContext, config.alt, fullCtx);
 				_input.seek(currentPosition);
 				if ( predSucceeds ) {
 					c = new ATNConfig(config, pt.target); // no pred context
@@ -1894,7 +1906,7 @@ public class ParserATNSimulator extends ATNSimulator {
                                ", input="+parser.getTokenStream().getText(interval));
         }
         if ( parser!=null ) parser.getErrorListenerDispatch().reportAmbiguity(parser, dfa, startIndex, stopIndex,
-																			  exact, ambigAlts, configs);
+				exact, ambigAlts, configs);
     }
 
 	public final void setPredictionMode(@NotNull PredictionMode mode) {

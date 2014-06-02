@@ -162,40 +162,14 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 	}
 
 	@Override
-	protected BitSet evalSemanticContext(DFAState.PredPrediction[] predPredictions,
-										 ParserRuleContext outerContext,
-										 boolean complete) {
-		/* Force complete prediction for the purpose of gathering statistical
-		 * results. If the caller requested incomplete evaluation, the result is
-		 * modified before returning to behave as though incomplete evaluation
-		 * was used.
-		 */
-		BitSet predictions = super.evalSemanticContext(predPredictions, outerContext, true);
-		// must re-evaluate all preds as predictions can't map back to pred eval uniquely
-		int n = predPredictions.length;
-		boolean[] results = new boolean[n];
-		int i = 0;
-		// FOR INTERPRETER, these are all true unless precedence preds!
-		for (DFAState.PredPrediction pair : predPredictions) {
-			if ( pair.pred!=SemanticContext.NONE ) {
-				results[i] = pair.pred.eval(parser, outerContext);
-			}
-			i++;
-		}
-
+	protected boolean evalSemanticContext(SemanticContext pred, ParserRuleContext parserCallStack, int alt, boolean fullCtx) {
+		boolean result = super.evalSemanticContext(pred, parserCallStack, alt, fullCtx);
 		boolean fullContext = _llStopIndex >= 0;
 		int stopIndex = fullContext ? _llStopIndex : _sllStopIndex;
 		decisions[currentDecision].predicateEvals.add(
-			new PredicateEvalInfo(currentState, currentDecision, _input, _startIndex, stopIndex, results, predictions)
+			new PredicateEvalInfo(currentDecision, _input, _startIndex, stopIndex, pred, result, alt, fullCtx)
 		);
-
-		if (!complete && !predictions.isEmpty()) {
-			int minimum = predictions.nextSetBit(0);
-			predictions = new BitSet();
-			predictions.set(minimum);
-		}
-
-		return predictions;
+		return result;
 	}
 
 	@Override
