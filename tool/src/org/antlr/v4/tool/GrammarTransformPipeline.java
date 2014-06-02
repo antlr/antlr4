@@ -143,6 +143,11 @@ public class GrammarTransformPipeline {
 					GrammarToken newTok = new GrammarToken(g, elWithOpt.getToken());
 					newTok.originalTokenIndex = Integer.valueOf(options.get(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME).getText());
 					elWithOpt.token = newTok;
+					// make sure that previous tree node's start/stop token indexes point at this element
+					// since they might point somewhere bogus after left-recursion elim. I noticed that
+					// IDs on left edge after transform didn't have correct start/stop despite new token.
+					elWithOpt.setTokenStartIndex(newTok.getTokenIndex());
+					elWithOpt.setTokenStopIndex(newTok.getTokenIndex());
 				}
 			}
 		}
