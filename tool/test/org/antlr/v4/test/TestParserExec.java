@@ -33,7 +33,8 @@ package org.antlr.v4.test;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /** Test parser execution.
  *
@@ -203,6 +204,22 @@ public class TestParserExec extends BaseTest {
 		found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "a b c", false);
 		assertEquals("abc\n", found);
+	}
+
+	@Test public void testLL1OptionalBlock() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : (ID|{}INT)? {System.out.println($text);} ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+ ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n";
+
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
+								  "", false);
+		assertEquals("\n", found);
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
+								  "a", false);
+		assertEquals("a\n", found);
 	}
 
 	// force complex decision
