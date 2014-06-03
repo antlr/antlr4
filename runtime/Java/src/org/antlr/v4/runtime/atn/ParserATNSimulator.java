@@ -504,7 +504,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 			if ( D.requiresFullContext && mode != PredictionMode.SLL ) {
 				// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
-				BitSet conflictingAlts = null;
+				BitSet conflictingAlts = D.configs.conflictingAlts;
 				if ( D.predicates!=null ) {
 					if ( debug ) System.out.println("DFA state has preds in DFA sim LL failover");
 					int conflictIndex = input.index();
