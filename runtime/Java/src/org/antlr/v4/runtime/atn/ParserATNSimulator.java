@@ -1323,15 +1323,15 @@ public class ParserATNSimulator extends ATNSimulator {
 	 *
 	 * <p>
 	 * This method might not be called for every semantic context evaluated
-	 * during the prediction process. In particular, the following restrictions
-	 * are allowed:</p>
+	 * during the prediction process. In particular, we currently do not
+	 * evaluate the following but it may change in the future:</p>
 	 *
 	 * <ul>
 	 * <li>Precedence predicates (represented by
-	 * {@link SemanticContext.PrecedencePredicate}) may or may not be evaluated
+	 * {@link SemanticContext.PrecedencePredicate}) are not currently evaluated
 	 * through this method.</li>
 	 * <li>Operator predicates (represented by {@link SemanticContext.AND} and
-	 * {@link SemanticContext.OR}) may be evaluated as a single semantic
+	 * {@link SemanticContext.OR}) are evaluated as a single semantic
 	 * context, rather than evaluating the operands individually.
 	 * Implementations which require evaluation results from individual
 	 * predicates should override this method to explicitly handle evaluation of
