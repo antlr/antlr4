@@ -134,7 +134,9 @@ public interface ANTLRErrorListener {
 	 * @param stopIndex the input index where the SLL conflict occurred
 	 * @param conflictingAlts The specific conflicting alternatives. If this is
 	 * {@code null}, the conflicting alternatives are all alternatives
-	 * represented in {@code configs}.
+	 * represented in {@code configs}. At the moment, conflictingAlts is non-null
+	 * (for the reference implementation, but Sam's optimized version can see this
+	 * as null).
 	 * @param configs the ATN configuration set where the SLL conflict was
 	 * detected
 	 */
