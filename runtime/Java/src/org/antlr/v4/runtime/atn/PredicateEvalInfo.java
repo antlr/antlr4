@@ -84,9 +84,9 @@ public class PredicateEvalInfo extends DecisionEventInfo {
 	public PredicateEvalInfo(int decision,
 							 @NotNull TokenStream input, int startIndex, int stopIndex,
 							 @NotNull SemanticContext semctx,
-							 @NotNull boolean evalResult,
-							 @NotNull int predictedAlt,
-							 @NotNull boolean fullCtx)
+							 boolean evalResult,
+							 int predictedAlt,
+							 boolean fullCtx)
 	{
 		super(decision, new ATNConfigSet(), input, startIndex, stopIndex, fullCtx);
 		this.semctx = semctx;

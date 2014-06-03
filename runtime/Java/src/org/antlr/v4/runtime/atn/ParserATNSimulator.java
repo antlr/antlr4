@@ -1318,15 +1318,35 @@ public class ParserATNSimulator extends ATNSimulator {
 		return predictions;
 	}
 
-	/** Evaluate the predicate context using the indicated parser stack and return the result.
-	 *  The alt parameter indicates the predicted alternative but is used only by the profiler
-	 *  at the moment. The profiler wants to track whether or not this predicate evaluated
-	 *  in SLL or LL mode and so we pass in evalInFullCtx.
+	/**
+	 * Evaluate a semantic context within a specific parser context.
 	 *
-	 *  All pred eval goes through here, even precedence preds, so we have a hook for profiling.
-	 *  Compiler should inline.
+	 * <p>
+	 * This method might not be called for every semantic context evaluated
+	 * during the prediction process. In particular, the following restrictions
+	 * are allowed:</p>
+	 *
+	 * <ul>
+	 * <li>Precedence predicates (represented by
+	 * {@link SemanticContext.PrecedencePredicate}) may or may not be evaluated
+	 * through this method.</li>
+	 * <li>Operator predicates (represented by {@link SemanticContext.AND} and
+	 * {@link SemanticContext.OR}) may be evaluated as a single semantic
+	 * context, rather than evaluating the operands individually.
+	 * Implementations which require evaluation results from individual
+	 * predicates should override this method to explicitly handle evaluation of
+	 * the operands within operator predicates.</li>
+	 * </ul>
+	 *
+	 * @param pred The semantic context to evaluate
+	 * @param parserCallStack The parser context in which to evaluate the
+	 * semantic context
+	 * @param alt The alternative which is guarded by {@code pred}
+	 * @param fullCtx {@code true} if the evaluation is occurring during LL
+	 * prediction; otherwise, {@code false} if the evaluation is occurring
+	 * during SLL prediction
 	 */
-	protected boolean evalSemanticContext(SemanticContext pred, ParserRuleContext parserCallStack, int alt, boolean fullCtx) {
+	protected boolean evalSemanticContext(@NotNull SemanticContext pred, ParserRuleContext parserCallStack, int alt, boolean fullCtx) {
 		return pred.eval(parser, parserCallStack);
 	}
 
