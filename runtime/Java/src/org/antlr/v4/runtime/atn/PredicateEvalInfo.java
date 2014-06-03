@@ -30,6 +30,9 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.misc.NotNull;
 
@@ -40,8 +43,20 @@ import org.antlr.v4.runtime.misc.NotNull;
  * @see ParserATNSimulator#evalSemanticContext
  */
 public class PredicateEvalInfo extends DecisionEventInfo {
+	/**
+	 * The semantic context which was evaluated.
+	 */
 	public final SemanticContext semctx;
+	/**
+	 * The alternative number for the decision which is guarded by the semantic
+	 * context {@link #semctx}. Note that other ATN
+	 * configurations may predict the same alternative which are guarded by
+	 * other semantic contexts and/or {@link SemanticContext#NONE}.
+	 */
 	public final int predictedAlt;
+	/**
+	 * The result of evaluating the semantic context {@link #semctx}.
+	 */
 	public final boolean evalResult;
 
 	/**
@@ -52,22 +67,28 @@ public class PredicateEvalInfo extends DecisionEventInfo {
 	 * @param input The input token stream
 	 * @param startIndex The start index for the current prediction
 	 * @param stopIndex The index at which the predicate evaluation was
-	 * triggered. Note that the input stream may be reset to other locations for
+	 * triggered. Note that the input stream may be reset to other positions for
 	 * the actual evaluation of individual predicates.
-	 * @param evalResult The results of evaluating the semantic context.
-	 * @param predictedAlt Identifies the represented
-	 * alternative of {@code decision} that remains viable following the
-	 * evaluation of semantic predicates.
-	 * @param requiresFullContext Indicate if pred evaluated during full context prediction.
+	 * @param semctx The semantic context which was evaluated
+	 * @param evalResult The results of evaluating the semantic context
+	 * @param predictedAlt The alternative number for the decision which is
+	 * guarded by the semantic context {@code semctx}. See {@link #predictedAlt}
+	 * for more information.
+	 * @param fullCtx {@code true} if the semantic context was
+	 * evaluated during LL prediction; otherwise, {@code false} if the semantic
+	 * context was evaluated during SLL prediction
+	 *
+	 * @see ParserATNSimulator#evalSemanticContext(SemanticContext, ParserRuleContext, int, boolean)
+	 * @see SemanticContext#eval(Recognizer, RuleContext)
 	 */
 	public PredicateEvalInfo(int decision,
 							 @NotNull TokenStream input, int startIndex, int stopIndex,
 							 @NotNull SemanticContext semctx,
 							 @NotNull boolean evalResult,
 							 @NotNull int predictedAlt,
-							 @NotNull boolean requiresFullContext)
+							 @NotNull boolean fullCtx)
 	{
-		super(decision, new ATNConfigSet(), input, startIndex, stopIndex, requiresFullContext);
+		super(decision, new ATNConfigSet(), input, startIndex, stopIndex, fullCtx);
 		this.semctx = semctx;
 		this.evalResult = evalResult;
 		this.predictedAlt = predictedAlt;

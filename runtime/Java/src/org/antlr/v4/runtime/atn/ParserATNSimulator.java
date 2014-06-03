@@ -1287,8 +1287,8 @@ public class ParserATNSimulator extends ATNSimulator {
 	 *  includes pairs with null predicates.
 	 */
 	protected BitSet evalSemanticContext(@NotNull DFAState.PredPrediction[] predPredictions,
-										 ParserRuleContext outerContext,
-										 boolean complete)
+									  ParserRuleContext outerContext,
+									  boolean complete)
 	{
 		BitSet predictions = new BitSet();
 		for (DFAState.PredPrediction pair : predPredictions) {
@@ -1906,7 +1906,7 @@ public class ParserATNSimulator extends ATNSimulator {
                                ", input="+parser.getTokenStream().getText(interval));
         }
         if ( parser!=null ) parser.getErrorListenerDispatch().reportAmbiguity(parser, dfa, startIndex, stopIndex,
-				exact, ambigAlts, configs);
+																			  exact, ambigAlts, configs);
     }
 
 	public final void setPredictionMode(@NotNull PredictionMode mode) {
