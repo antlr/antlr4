@@ -284,10 +284,12 @@ public class ParserFactory extends DefaultOutputModelFactory {
 				else c = new LL1OptionalBlock(this, ebnfRoot, alts);
 				break;
 			case ANTLRParser.CLOSURE :
-				c = new LL1StarBlockSingleAlt(this, ebnfRoot, alts);
+				if ( alts.size()==1 ) c = new LL1StarBlockSingleAlt(this, ebnfRoot, alts);
+				else c = getComplexEBNFBlock(ebnfRoot, alts);
 				break;
 			case ANTLRParser.POSITIVE_CLOSURE :
-				c = new LL1PlusBlockSingleAlt(this, ebnfRoot, alts);
+				if ( alts.size()==1 ) c = new LL1PlusBlockSingleAlt(this, ebnfRoot, alts);
+				else c = getComplexEBNFBlock(ebnfRoot, alts);
 				break;
 		}
 		return c;
