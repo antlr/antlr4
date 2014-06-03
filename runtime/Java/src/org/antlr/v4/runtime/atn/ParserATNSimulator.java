@@ -1265,7 +1265,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		ATNConfigSet failed = new ATNConfigSet(configs.fullCtx);
 		for (ATNConfig c : configs) {
 			if ( c.semanticContext!=SemanticContext.NONE ) {
-				boolean predicateEvaluationResult = c.semanticContext.eval(parser, outerContext);
+				boolean predicateEvaluationResult = evalSemanticContext(c.semanticContext, outerContext, c.alt, configs.fullCtx);
 				if ( predicateEvaluationResult ) {
 					succeeded.add(c);
 				}
@@ -1300,7 +1300,8 @@ public class ParserATNSimulator extends ATNSimulator {
 				continue;
 			}
 
-			boolean predicateEvaluationResult = pair.pred.eval(parser, outerContext);
+			boolean fullCtx = false; // in dfa
+			boolean predicateEvaluationResult = evalSemanticContext(pair.pred, outerContext, pair.alt, fullCtx);
 			if ( debug || dfa_debug ) {
 				System.out.println("eval pred "+pair+"="+predicateEvaluationResult);
 			}
@@ -1317,6 +1318,37 @@ public class ParserATNSimulator extends ATNSimulator {
 		return predictions;
 	}
 
+	/**
+	 * Evaluate a semantic context within a specific parser context.
+	 *
+	 * <p>
+	 * This method might not be called for every semantic context evaluated
+	 * during the prediction process. In particular, the following restrictions
+	 * are allowed:</p>
+	 *
+	 * <ul>
+	 * <li>Precedence predicates (represented by
+	 * {@link SemanticContext.PrecedencePredicate}) may or may not be evaluated
+	 * through this method.</li>
+	 * <li>Operator predicates (represented by {@link SemanticContext.AND} and
+	 * {@link SemanticContext.OR}) may be evaluated as a single semantic
+	 * context, rather than evaluating the operands individually.
+	 * Implementations which require evaluation results from individual
+	 * predicates should override this method to explicitly handle evaluation of
+	 * the operands within operator predicates.</li>
+	 * </ul>
+	 *
+	 * @param pred The semantic context to evaluate
+	 * @param parserCallStack The parser context in which to evaluate the
+	 * semantic context
+	 * @param alt The alternative which is guarded by {@code pred}
+	 * @param fullCtx {@code true} if the evaluation is occurring during LL
+	 * prediction; otherwise, {@code false} if the evaluation is occurring
+	 * during SLL prediction
+	 */
+	protected boolean evalSemanticContext(@NotNull SemanticContext pred, ParserRuleContext parserCallStack, int alt, boolean fullCtx) {
+		return pred.eval(parser, parserCallStack);
+	}
 
 	/* TODO: If we are doing predicates, there is no point in pursuing
 		 closure operations if we reach a DFA state that uniquely predicts
@@ -1544,7 +1576,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				// later during conflict resolution.
 				int currentPosition = _input.index();
 				_input.seek(_startIndex);
-				boolean predSucceeds = pt.getPredicate().eval(parser, _outerContext);
+				boolean predSucceeds = evalSemanticContext(pt.getPredicate(), _outerContext, config.alt, fullCtx);
 				_input.seek(currentPosition);
 				if ( predSucceeds ) {
 					c = new ATNConfig(config, pt.target); // no pred context
@@ -1592,7 +1624,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				// later during conflict resolution.
 				int currentPosition = _input.index();
 				_input.seek(_startIndex);
-				boolean predSucceeds = pt.getPredicate().eval(parser, _outerContext);
+				boolean predSucceeds = evalSemanticContext(pt.getPredicate(), _outerContext, config.alt, fullCtx);
 				_input.seek(currentPosition);
 				if ( predSucceeds ) {
 					c = new ATNConfig(config, pt.target); // no pred context

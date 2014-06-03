@@ -72,13 +72,13 @@ public abstract class SemanticContext {
 	 * prediction, so we passed in the outer context here in case of context
 	 * dependent predicate evaluation.</p>
 	 */
-    public abstract boolean eval(Recognizer<?,?> parser, RuleContext outerContext);
+    public abstract boolean eval(Recognizer<?,?> parser, RuleContext parserCallStack);
 
 	/**
 	 * Evaluate the precedence predicates for the context and reduce the result.
 	 *
 	 * @param parser The parser instance.
-	 * @param outerContext The current parser context object.
+	 * @param parserCallStack
 	 * @return The simplified semantic context after precedence predicates are
 	 * evaluated, which will be one of the following values.
 	 * <ul>
@@ -92,7 +92,7 @@ public abstract class SemanticContext {
 	 * semantic context after precedence predicates are evaluated.</li>
 	 * </ul>
 	 */
-	public SemanticContext evalPrecedence(Recognizer<?,?> parser, RuleContext outerContext) {
+	public SemanticContext evalPrecedence(Recognizer<?,?> parser, RuleContext parserCallStack) {
 		return this;
 	}
 
@@ -114,8 +114,8 @@ public abstract class SemanticContext {
         }
 
         @Override
-        public boolean eval(Recognizer<?,?> parser, RuleContext outerContext) {
-            RuleContext localctx = isCtxDependent ? outerContext : null;
+        public boolean eval(Recognizer<?,?> parser, RuleContext parserCallStack) {
+            RuleContext localctx = isCtxDependent ? parserCallStack : null;
             return parser.sempred(localctx, ruleIndex, predIndex);
         }
 
@@ -157,13 +157,13 @@ public abstract class SemanticContext {
 		}
 
 		@Override
-		public boolean eval(Recognizer<?, ?> parser, RuleContext outerContext) {
-			return parser.precpred(outerContext, precedence);
+		public boolean eval(Recognizer<?, ?> parser, RuleContext parserCallStack) {
+			return parser.precpred(parserCallStack, precedence);
 		}
 
 		@Override
-		public SemanticContext evalPrecedence(Recognizer<?, ?> parser, RuleContext outerContext) {
-			if (parser.precpred(outerContext, precedence)) {
+		public SemanticContext evalPrecedence(Recognizer<?, ?> parser, RuleContext parserCallStack) {
+			if (parser.precpred(parserCallStack, precedence)) {
 				return SemanticContext.NONE;
 			}
 			else {
@@ -269,19 +269,19 @@ public abstract class SemanticContext {
 		 * unordered.</p>
 		 */
 		@Override
-		public boolean eval(Recognizer<?,?> parser, RuleContext outerContext) {
+		public boolean eval(Recognizer<?,?> parser, RuleContext parserCallStack) {
 			for (SemanticContext opnd : opnds) {
-				if ( !opnd.eval(parser, outerContext) ) return false;
+				if ( !opnd.eval(parser, parserCallStack) ) return false;
 			}
 			return true;
         }
 
 		@Override
-		public SemanticContext evalPrecedence(Recognizer<?, ?> parser, RuleContext outerContext) {
+		public SemanticContext evalPrecedence(Recognizer<?, ?> parser, RuleContext parserCallStack) {
 			boolean differs = false;
 			List<SemanticContext> operands = new ArrayList<SemanticContext>();
 			for (SemanticContext context : opnds) {
-				SemanticContext evaluated = context.evalPrecedence(parser, outerContext);
+				SemanticContext evaluated = context.evalPrecedence(parser, parserCallStack);
 				differs |= (evaluated != context);
 				if (evaluated == null) {
 					// The AND context is false if any element is false
@@ -366,19 +366,19 @@ public abstract class SemanticContext {
 		 * unordered.</p>
 		 */
 		@Override
-        public boolean eval(Recognizer<?,?> parser, RuleContext outerContext) {
+        public boolean eval(Recognizer<?,?> parser, RuleContext parserCallStack) {
 			for (SemanticContext opnd : opnds) {
-				if ( opnd.eval(parser, outerContext) ) return true;
+				if ( opnd.eval(parser, parserCallStack) ) return true;
 			}
 			return false;
         }
 
 		@Override
-		public SemanticContext evalPrecedence(Recognizer<?, ?> parser, RuleContext outerContext) {
+		public SemanticContext evalPrecedence(Recognizer<?, ?> parser, RuleContext parserCallStack) {
 			boolean differs = false;
 			List<SemanticContext> operands = new ArrayList<SemanticContext>();
 			for (SemanticContext context : opnds) {
-				SemanticContext evaluated = context.evalPrecedence(parser, outerContext);
+				SemanticContext evaluated = context.evalPrecedence(parser, parserCallStack);
 				differs |= (evaluated != context);
 				if (evaluated == NONE) {
 					// The OR context is true if any element is true

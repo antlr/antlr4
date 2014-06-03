@@ -30,11 +30,11 @@
 
 package org.antlr.v4.runtime.atn;
 
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.NotNull;
-
-import java.util.BitSet;
 
 /**
  * This class represents profiling event information for semantic predicate
@@ -44,52 +44,53 @@ import java.util.BitSet;
  */
 public class PredicateEvalInfo extends DecisionEventInfo {
 	/**
-	 * The DFA state at which predicate evaluation is required in order to
-	 * continue.
+	 * The semantic context which was evaluated.
 	 */
-	public final DFAState dfaState;
+	public final SemanticContext semctx;
 	/**
-	 * The results of evaluating specific semantic contexts. The elements of
-	 * this array correspond to the elements in {@link DFAState#predicates}, and
-	 * the value of each element is the result of evaluating the semantic
-	 * context {@link DFAState.PredPrediction#pred}.
+	 * The alternative number for the decision which is guarded by the semantic
+	 * context {@link #semctx}. Note that other ATN
+	 * configurations may predict the same alternative which are guarded by
+	 * other semantic contexts and/or {@link SemanticContext#NONE}.
 	 */
-	public final boolean[] evalResults;
+	public final int predictedAlt;
 	/**
-	 * A {@link BitSet} identifying the represented alternatives of
-	 * {@link #dfaState} which remain viable following the evaluation of
-	 * semantic predicates.
+	 * The result of evaluating the semantic context {@link #semctx}.
 	 */
-	public final BitSet predictions;
+	public final boolean evalResult;
 
 	/**
 	 * Constructs a new instance of the {@link PredicateEvalInfo} class with the
 	 * specified detailed predicate evaluation information.
 	 *
-	 * @param dfaState The DFA state containing information about the semantic
-	 * predicates to evaluate during the prediction process
 	 * @param decision The decision number
 	 * @param input The input token stream
 	 * @param startIndex The start index for the current prediction
 	 * @param stopIndex The index at which the predicate evaluation was
-	 * triggered. Note that the input stream may be reset to other locations for
+	 * triggered. Note that the input stream may be reset to other positions for
 	 * the actual evaluation of individual predicates.
-	 * @param evalResults The results of evaluating specific semantic contexts.
-	 * The elements of this array correspond to the elements in
-	 * {@link DFAState#predicates}, and the value of each element is the result
-	 * of evaluating the semantic context {@link DFAState.PredPrediction#pred}.
-	 * @param predictions A {@link BitSet} identifying the represented
-	 * alternatives of {@code dfaState} which remain viable following the
-	 * evaluation of semantic predicates
+	 * @param semctx The semantic context which was evaluated
+	 * @param evalResult The results of evaluating the semantic context
+	 * @param predictedAlt The alternative number for the decision which is
+	 * guarded by the semantic context {@code semctx}. See {@link #predictedAlt}
+	 * for more information.
+	 * @param fullCtx {@code true} if the semantic context was
+	 * evaluated during LL prediction; otherwise, {@code false} if the semantic
+	 * context was evaluated during SLL prediction
+	 *
+	 * @see ParserATNSimulator#evalSemanticContext(SemanticContext, ParserRuleContext, int, boolean)
+	 * @see SemanticContext#eval(Recognizer, RuleContext)
 	 */
-	public PredicateEvalInfo(@NotNull DFAState dfaState, int decision,
+	public PredicateEvalInfo(int decision,
 							 @NotNull TokenStream input, int startIndex, int stopIndex,
-							 @NotNull boolean[] evalResults,
-							 @NotNull BitSet predictions)
+							 @NotNull SemanticContext semctx,
+							 boolean evalResult,
+							 int predictedAlt,
+							 boolean fullCtx)
 	{
-		super(decision, dfaState.configs, input, startIndex, stopIndex, dfaState.requiresFullContext);
-		this.dfaState = dfaState;
-		this.evalResults = evalResults;
-		this.predictions = predictions;
+		super(decision, new ATNConfigSet(), input, startIndex, stopIndex, fullCtx);
+		this.semctx = semctx;
+		this.evalResult = evalResult;
+		this.predictedAlt = predictedAlt;
 	}
 }
