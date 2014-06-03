@@ -214,7 +214,14 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class <parser.name> extends <superClass> {
-    static { RuntimeMetaData.checkVersion("<file.ANTLRVersion>"); }
+	static {
+		try {
+			RuntimeMetaData.checkVersion("<file.ANTLRVersion>", RuntimeMetaData.VERSION, false);
+		}
+		catch (RuntimeMetaData.ANTLRVersionMismatchException ex) {
+			throw new ExceptionInInitializerError(ex);
+		}
+	}
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -850,7 +857,15 @@ import org.antlr.v4.runtime.misc.*;
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class <lexer.name> extends <superClass> {
-    static { RuntimeMetaData.checkVersion("<lexerFile.ANTLRVersion>"); }
+	static {
+		try {
+			RuntimeMetaData.checkVersion("<lexerFile.ANTLRVersion>", RuntimeMetaData.VERSION, false);
+		}
+		catch (RuntimeMetaData.ANTLRVersionMismatchException ex) {
+			throw new ExceptionInInitializerError(ex);
+		}
+	}
+
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
