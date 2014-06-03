@@ -164,11 +164,14 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 	@Override
 	protected boolean evalSemanticContext(SemanticContext pred, ParserRuleContext parserCallStack, int alt, boolean fullCtx) {
 		boolean result = super.evalSemanticContext(pred, parserCallStack, alt, fullCtx);
-		boolean fullContext = _llStopIndex >= 0;
-		int stopIndex = fullContext ? _llStopIndex : _sllStopIndex;
-		decisions[currentDecision].predicateEvals.add(
-			new PredicateEvalInfo(currentDecision, _input, _startIndex, stopIndex, pred, result, alt, fullCtx)
-		);
+		if (!(pred instanceof SemanticContext.PrecedencePredicate)) {
+			boolean fullContext = _llStopIndex >= 0;
+			int stopIndex = fullContext ? _llStopIndex : _sllStopIndex;
+			decisions[currentDecision].predicateEvals.add(
+				new PredicateEvalInfo(currentDecision, _input, _startIndex, stopIndex, pred, result, alt, fullCtx)
+			);
+		}
+
 		return result;
 	}
 
