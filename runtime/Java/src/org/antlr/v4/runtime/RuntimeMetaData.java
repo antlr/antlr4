@@ -224,7 +224,7 @@ public class RuntimeMetaData {
 	 * <em>expected</em> next release version. For official releases, the value
 	 * will be the actual published version of the library.</p>
 	 */
-	public static final String VERSION = "4.2.3";
+	public static final String VERSION = "4.3";
 
 	/**
 	 * Gets the currently executing version of the ANTLR 4 runtime library.
@@ -258,7 +258,7 @@ public class RuntimeMetaData {
 	 * </ul>
 	 *
 	 * <p>
-	 * Starting with ANTLR 4.2.3, the code generator emits a call to this method
+	 * Starting with ANTLR 4.3, the code generator emits a call to this method
 	 * using two constants in each generated lexer and parser: a hard-coded
 	 * constant indicating the version of the tool used to generate the parser
 	 * and a reference to the compile-time constant {@link #VERSION}. At
