@@ -147,19 +147,21 @@ Recognizer.prototype.precpred = function(localctx , precedence) {
     return true;
 };
 
-Recognizer.prototype.state = function() {
-    return this._stateNumber;
-};
+//Indicate that the recognizer has changed internal state that is
+//consistent with the ATN state passed in.  This way we always know
+//where we are in the ATN as the parser goes along. The rule
+//context objects form a stack that lets us see the stack of
+//invoking rules. Combine this and we have complete ATN
+//configuration information.
 
-// Indicate that the recognizer has changed internal state that is
-//  consistent with the ATN state passed in.  This way we always know
-//  where we are in the ATN as the parser goes along. The rule
-//  context objects form a stack that lets us see the stack of
-//  invoking rules. Combine this and we have complete ATN
-//  configuration information.
+Object.defineProperty(Recognizer.prototype, "state", {
+	get : function() {
+		return this._stateNumber;
+	},
+	set : function(state) {
+		this._stateNumber = state;
+	}
+});
 
-Recognizer.prototype.setState = function(atnState) {
-    this._stateNumber = atnState;
-};
 
 exports.Recognizer = Recognizer;

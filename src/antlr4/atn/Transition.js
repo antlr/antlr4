@@ -98,7 +98,7 @@ function AtomTransition(target, label) {
 	Transition.call(this, target);
 	this.label_ = label; // The token type or character value; or, signifies special label.
     this.label = this.makeLabel();
-    this.serializationType = this.ATOM;
+    this.serializationType = Transition.ATOM;
     return this;
 }
 
@@ -124,7 +124,7 @@ function RuleTransition(ruleStart, ruleIndex, precedence, followState) {
     this.ruleIndex = ruleIndex; // ptr to the rule definition object for this rule ref
     this.precedence = precedence;
     this.followState = followState; // what node to begin computations following ref to rule
-    this.serializationType = this.RULE;
+    this.serializationType = Transition.RULE;
     this.isEpsilon = true;
     return this;
 }
@@ -139,7 +139,7 @@ RuleTransition.prototype.matches = function(symbol, minVocabSymbol,  maxVocabSym
 
 function EpsilonTransition(target) {
 	Transition.call(this, target);
-    this.serializationType = this.EPSILON;
+    this.serializationType = Transition.EPSILON;
     this.isEpsilon = true;
     return this;
 }
@@ -157,7 +157,7 @@ EpsilonTransition.prototype.toString = function() {
 
 function RangeTransition(target, start, stop) {
 	Transition.call(this, target);
-	this.serializationType = this.RANGE;
+	this.serializationType = Transition.RANGE;
     this.start = start;
     this.stop = stop;
     this.label = this.makeLabel();
@@ -191,7 +191,7 @@ AbstractPredicateTransition.prototype.constructor = AbstractPredicateTransition;
 
 function PredicateTransition(target, ruleIndex, predIndex, isCtxDependent) {
 	AbstractPredicateTransition.call(this, target);
-    this.serializationType = this.PREDICATE;
+    this.serializationType = Transition.PREDICATE;
     this.ruleIndex = ruleIndex;
     this.predIndex = predIndex;
     this.isCtxDependent = isCtxDependent; // e.g., $i ref in pred
@@ -216,7 +216,7 @@ PredicateTransition.prototype.toString = function() {
 
 function ActionTransition(target, ruleIndex, actionIndex, isCtxDependent) {
 	Transition.call(this, target);
-    this.serializationType = this.ACTION;
+    this.serializationType = Transition.ACTION;
     this.ruleIndex = ruleIndex;
     this.actionIndex = actionIndex===undefined ? -1 : actionIndex;
     this.isCtxDependent = isCtxDependent===undefined ? false : isCtxDependent; // e.g., $i ref in pred
@@ -240,7 +240,7 @@ ActionTransition.prototype.toString = function() {
 // A transition containing a set of values.
 function SetTransition(target, set) {
 	Transition.call(this, target);
-	this.serializationType = this.SET;
+	this.serializationType = Transition.SET;
     if (set !==undefined && set !==null) {
         this.label = set;
     } else {
@@ -264,7 +264,7 @@ SetTransition.prototype.toString = function() {
 
 function NotSetTransition(target, set) {
 	SetTransition.call(this, target);
-	this.serializationType = this.NOT_SET;
+	this.serializationType = Transition.NOT_SET;
 	return this;
 }
 
@@ -282,7 +282,7 @@ NotSetTransition.prototype.toString = function() {
 
 function WildcardTransition(target) {
 	Transition.call(this, target);
-	this.serializationType = this.WILDCARD;
+	this.serializationType = Transition.WILDCARD;
 	return this;
 }
 
@@ -300,7 +300,7 @@ WildcardTransition.prototype.toString = function() {
 
 function PrecedencePredicateTransition(target, precedence) {
 	AbstractPredicateTransition.call(this, target);
-    this.serializationType = this.PRECEDENCE;
+    this.serializationType = Transition.PRECEDENCE;
     this.precedence = precedence;
     this.isEpsilon = true;
     return this;

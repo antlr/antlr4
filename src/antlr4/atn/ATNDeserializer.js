@@ -645,17 +645,17 @@ ATNDeserializer.prototype.stateFactory = function(type, ruleIndex) {
     if (type>this.stateFactories.length || this.stateFactories[type] === null) {
         throw("The specified state type " + type + " is not valid.");
     } else {
-        s = this.stateFactories[type]();
+        var s = this.stateFactories[type]();
         if (s!==null) {
             s.ruleIndex = ruleIndex;
+            return s;
         }
     }
-    return s;
 };
 
 ATNDeserializer.prototype.lexerActionFactory = function(type, data1, data2) {
     if (this.actionFactories === null) {
-        af = [];
+        var af = [];
         af[LexerActionType.CHANNEL] = function(data1, data2) { return new LexerChannelAction(data1); };
         af[LexerActionType.CUSTOM] = function(data1, data2) { return new LexerCustomAction(data1, data2); };
         af[LexerActionType.MODE] = function(data1, data2) { return new LexerModeAction(data1); };

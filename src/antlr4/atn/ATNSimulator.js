@@ -29,7 +29,8 @@
 //  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-var DFAState = require('./../dfa.DFAState').DFAState;
+var DFAState = require('./../dfa/DFAState').DFAState;
+var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
 
 function ATNSimulator(atn, sharedContextCache) {
 	
@@ -59,8 +60,7 @@ function ATNSimulator(atn, sharedContextCache) {
 }
 
 // Must distinguish between missing edge and edge we know leads nowhere///
-ATNSimulator.ERROR = new DFAState(new ATNConfigSet());
-ATNSimulator.ERROR.stateNumber = 0x7FFFFFFF;
+ATNSimulator.ERROR = new DFAState(0x7FFFFFFF, new ATNConfigSet());
 
 
 ATNSimulator.prototype.getCachedContext = function(context) {
@@ -71,3 +71,4 @@ ATNSimulator.prototype.getCachedContext = function(context) {
     return getCachedPredictionContext(context, this.sharedContextCache, visited);
 };
 
+exports.ATNSimulator = ATNSimulator;

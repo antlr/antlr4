@@ -29,7 +29,7 @@
 //  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-var ATNConfigSet = require('./../atn.ATNConfigSet').ATNConfigSet;
+var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet;
 
 // Map a predicate to a predicted alternative.///
 
@@ -69,10 +69,10 @@ PredPrediction.prototype.toString = function() {
 // /
 
 function DFAState(stateNumber, configs) {
-	if (stateNumber === undefined) {
+	if (stateNumber === null) {
 		stateNumber = -1;
 	}
-	if (configs === undefined) {
+	if (configs === null) {
 		configs = new ATNConfigSet();
 	}
 	this.stateNumber = stateNumber;
@@ -153,3 +153,5 @@ DFAState.prototype.toString = function() {
 	return "" + this.stateNumber + ":" + this.configs +
 			(this.isAcceptState ? "=>" + (this.predicates !== null ? this.predicates : this.prediction) : "");
 };
+
+exports.DFAState = DFAState;

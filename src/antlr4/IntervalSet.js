@@ -12,9 +12,11 @@ Interval.prototype.contains = function(item) {
 	return item >= this.start && item <= this.stop;
 };
 
-Interval.prototype.length = function() {
-	return this.stop - this.start;
-};
+Object.defineProperty(Interval.prototype, "length", {
+	get : function() {
+		return this.stop - this.start;
+	}
+});
 
 function IntervalSet() {
 	this.intervals = null;
@@ -94,13 +96,13 @@ IntervalSet.prototype.contains = function(item) {
 	}
 };
 
-IntervalSet.prototype.length = function() {
-	var xlen = 0;
-	for (var k = 0; k < this.intervals.length; k++) {
-		xlen += this.intervals[k].length;
+Object.defineProperty(IntervalSet.prototype, "length", {
+	get : function() {
+		var len = 0;
+		this.intervals.map(function(i) {len += i.length;});
+		return len;
 	}
-	return xlen;
-};
+});
 
 IntervalSet.prototype.remove = function(v) {
 	if (this.intervals !== null) {

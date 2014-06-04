@@ -28,6 +28,9 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 //  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+var DFAState = require('./DFAState').DFAState;
+var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet;
+
 function DFA(atnStartState, decision) {
 	if (decision === undefined) {
 		decision = 0;
@@ -38,6 +41,11 @@ function DFA(atnStartState, decision) {
 	// A set of all DFA states. Use {@link Map} so we can get old state back
 	// ({@link Set} only allows you to see if it's there).
 	this._states = {};
+	Object.defineProperty(this._states, "length", {
+		get: function() {
+			return Object.keys(this).length;
+		}
+	});
 	this.s0 = null;
 	// {@code true} if this DFA is for a precedence decision; otherwise,
 	// {@code false}. This is the backing field for {@link //isPrecedenceDfa},
@@ -122,9 +130,11 @@ DFA.prototype.setPrecedenceDfa = function(precedenceDfa) {
 	}
 };
 
-DFA.prototype.states = function() {
-	return this._states;
-};
+Object.defineProperty(DFA.prototype, "states", {
+	get : function() {
+		return this._states;
+	}
+});
 
 // Return a list of all states in this DFA, ordered by state number.
 DFA.prototype.sortedStates = function() {
