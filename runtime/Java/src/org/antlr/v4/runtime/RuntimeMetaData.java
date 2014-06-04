@@ -53,11 +53,14 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * in generated code, is provided in the documentation for the method.</p>
  *
  * <p>
- * By default, the {@link ConsoleListener#INSTANCE} listener is
- * automatically registered, and reports mismatched versions to
- * {@link System#err}. This default listener may be removed by calling
- * {@link #removeListener} or {@link #clearListeners}, and may be
- * re-registered by calling {@link #addListener}.</p>
+ * By default, the {@link DefaultListener#INSTANCE} listener is automatically
+ * registered. As long as the default listener is registered, it will always be
+ * the last listener notified in the event of a version mismatch. This behavior
+ * ensures the exception it throws will not prevent {@link #checkVersion} from
+ * notifying custom listeners registered by a user. This default listener may be
+ * removed by calling {@link #removeListener} for
+ * {@link DefaultListener#INSTANCE} or {@link #clearListeners}. If required, it
+ * may be re-registered by calling {@link #addListener}.</p>
  */
 public class RuntimeMetaData {
 	/**
@@ -68,7 +71,7 @@ public class RuntimeMetaData {
 	 *
 	 * @see #checkVersion
 	 */
-	public static class VersionMismatchDetails {
+	public static class VersionMismatchException extends RuntimeException {
 		/**
 		 * The version of the ANTLR 4 Tool a parser was generated with. This
 		 * value may be {@code null} if {@link #checkVersion} was called from
@@ -85,17 +88,20 @@ public class RuntimeMetaData {
 		public final String compileTimeRuntimeVersion;
 
 		/**
-		 * Constructs a new instance of the {@link VersionMismatchDetails} class
-		 * with the specified detailed information about a mismatch between
-		 * ANTLR tool and runtime versions used by a parser.
+		 * Constructs a new instance of the {@link VersionMismatchException}
+		 * class with the specified detailed information about a mismatch
+		 * between ANTLR tool and runtime versions used by a parser.
 		 *
+		 * @param message the detail message. The detail message is saved for
+		 * later retrieval by the {@link #getMessage()} method.
 		 * @param generatingToolVersion The version of the ANTLR 4 Tool a parser
 		 * was generated with, or {@code null} if the version check was not part
 		 * of the automatically-generated parser code
 		 * @param compileTimeRuntimeVersion The version of the ANTLR 4 Runtime
 		 * library the code was compiled against
 		 */
-		VersionMismatchDetails(@Nullable String generatingToolVersion, @NotNull String compileTimeRuntimeVersion) {
+		VersionMismatchException(@NotNull String message, @Nullable String generatingToolVersion, @NotNull String compileTimeRuntimeVersion) {
+			super(message);
 			this.generatingToolVersion = generatingToolVersion;
 			this.compileTimeRuntimeVersion = compileTimeRuntimeVersion;
 		}
@@ -110,56 +116,48 @@ public class RuntimeMetaData {
 		 * Report a version mismatch which was detected by
 		 * {@link #checkDetails}.
 		 *
-		 * <p>Note that if a registered listener throws an exception during the
-		 * handling of this event, the following will be impacted:</p>
-		 * 
+		 * <p>
+		 * Implementations of this method may, but are not required to, throw
+		 * the provided exception. Note that if a registered listener throws the
+		 * provided exception during the handling of this event, the following
+		 * will be impacted:</p>
+		 *
 		 * <ul>
 		 * <li>The lexer or parser which called {@link #checkVersion} will be
 		 * unusable due to throwing an exception in a static initializer
 		 * block.</li>
 		 * <li>No additional registered listeners will be notified about the
-		 * version mismatch.</li>
+		 * version mismatch. Since the default {@link DefaultListener} instance
+		 * is always the last listener called (unless it is unregistered), the
+		 * exception it throws will not affect the execution of any other
+		 * registered listeners.</li>
 		 * </ul>
 		 *
-		 * @param details a {@link VersionMismatchDetails} instance containing
+		 * @param ex a {@link VersionMismatchException} instance containing
 		 * detailed information about the specific version mismatch detected
 		 */
-		void reportVersionMismatch(@NotNull VersionMismatchDetails details);
+		void reportVersionMismatch(@NotNull VersionMismatchException ex)
+			throws VersionMismatchException;
 	}
 
 	/**
-	 * This class provides a basic implementation of {@link Listener} which
-	 * writes information about mismatched versions to {@link System#err}.
+	 * This class provides a default implementation of {@link Listener} which
+	 * responds to mismatched versions by throwing the provided
+	 * {@link VersionMismatchException}.
 	 */
-	public static class ConsoleListener implements Listener {
+	public static class DefaultListener implements Listener {
 		/**
 		 * A default instance of {@link ConsoleListener} which is automatically
 		 * registered to receive version mismatch events.
 		 */
-		public static final ConsoleListener INSTANCE = new ConsoleListener();
+		public static final DefaultListener INSTANCE = new DefaultListener();
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void reportVersionMismatch(@NotNull VersionMismatchDetails details) {
-			String message;
-			String referenceVersion;
-			if (details.generatingToolVersion != null && !VERSION.equals(details.generatingToolVersion)) {
-				referenceVersion = details.generatingToolVersion;
-				message = "ANTLR Tool version %s used for code generation does not match the current runtime version %s";
-			}
-			else if (!VERSION.equals(details.compileTimeRuntimeVersion)) {
-				referenceVersion = details.compileTimeRuntimeVersion;
-				message = "ANTLR Runtime version %s used for parser compilation does not match the current runtime version %s";
-			}
-			else {
-				referenceVersion = "";
-				message = "The ANTLR Runtime reported a version mismatch against the current runtime version %s%s";
-			}
-
-			String formatted = String.format(message, referenceVersion, VERSION);
-			System.err.println(formatted);
+		public void reportVersionMismatch(@NotNull VersionMismatchException ex) throws VersionMismatchException {
+			throw ex;
 		}
 	}
 
@@ -169,20 +167,26 @@ public class RuntimeMetaData {
 	 */
 	private static final Collection<Listener> listeners = new CopyOnWriteArraySet<Listener>();
 	static {
-		listeners.add(ConsoleListener.INSTANCE);
+		listeners.add(DefaultListener.INSTANCE);
 	}
 
 	/**
 	 * Register a listener to receive notifications of mismatched ANTLR
-	 * versions.
+	 * versions. This method ensures that as long as
+	 * {@link DefaultListener#INSTANCE} is registered as a listener, it will
+	 * always be the last listener notified of mismatched versions.
 	 *
 	 * @param listener the listener to notify if mismatched ANTLR versions are
 	 * detected
 	 *
 	 * @see #checkVersion
 	 */
-	public static void addListener(@NotNull Listener listener) {
+	public static synchronized void addListener(@NotNull Listener listener) {
+		boolean containedDefault = listeners.remove(DefaultListener.INSTANCE);
 		listeners.add(listener);
+		if (containedDefault) {
+			listeners.add(DefaultListener.INSTANCE);
+		}
 	}
 
 	/**
@@ -194,7 +198,7 @@ public class RuntimeMetaData {
 	 * {@code false} if the specified listener was not found in the list of
 	 * registered listeners
 	 */
-	public static boolean removeListener(@NotNull Listener listener) {
+	public static synchronized boolean removeListener(@NotNull Listener listener) {
 		return listeners.remove(listener);
 	}
 
@@ -202,7 +206,7 @@ public class RuntimeMetaData {
 	 * Remove all listeners registered to receive notifications of mismatched
 	 * ANTLR versions.
 	 */
-	public static void clearListeners() {
+	public static synchronized void clearListeners() {
 		listeners.clear();
 	}
 
@@ -241,6 +245,17 @@ public class RuntimeMetaData {
 	 * of ANTLR 4 used to generate a parser, the version of the ANTLR runtime a
 	 * parser was compiled against, and the version of the ANTLR runtime which
 	 * is currently executing.
+	 *
+	 * <p>
+	 * The version check is designed to detect the following two specific
+	 * scenarios.</p>
+	 *
+	 * <ul>
+	 * <li>The ANTLR Tool version used for code generation does not match the
+	 * currently executing runtime version.</li>
+	 * <li>The ANTLR Runtime version referenced at the time a parser was
+	 * compiled does not match the currently executing runtime version.</li>
+	 * </ul>
 	 *
 	 * <p>
 	 * Starting with ANTLR 4.2.3, the code generator emits a call to this method
@@ -285,17 +300,20 @@ public class RuntimeMetaData {
 	 */
 	public static void checkVersion(@Nullable String toolVersion, @NotNull String compileTimeVersion) {
 		boolean report = false;
+		String message = null;
 		if (toolVersion != null && !VERSION.equals(toolVersion)) {
 			report = true;
+			message = String.format("ANTLR Tool version %s used for code generation does not match the current runtime version %s", toolVersion, VERSION);
 		}
 		else if (!VERSION.equals(compileTimeVersion)) {
 			report = true;
+			message = String.format("ANTLR Runtime version %s used for parser compilation does not match the current runtime version %s", compileTimeVersion, VERSION);
 		}
 
 		if (report) {
-			VersionMismatchDetails details = new VersionMismatchDetails(toolVersion, compileTimeVersion);
+			VersionMismatchException ex = new VersionMismatchException(message, toolVersion, compileTimeVersion);
 			for (Listener listener : listeners) {
-				listener.reportVersionMismatch(details);
+				listener.reportVersionMismatch(ex);
 			}
 		}
 	}
