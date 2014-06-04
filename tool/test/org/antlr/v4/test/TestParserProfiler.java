@@ -167,16 +167,15 @@ public class TestParserProfiler extends BaseTest {
 	@Test public void testContextSensitivity() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"a : e ID ;\n" +
-			"b : e INT ID ;\n" +
+			"a : '.' e ID \n" +
+			"  | ';' e INT ID ;\n" +
 			"e : INT | ;\n",
 			lg);
-		DecisionInfo[] info = interpAndGetDecisionInfo(lg, g, "a", "1 x");
-		assertEquals(1, info.length);
+		DecisionInfo[] info = interpAndGetDecisionInfo(lg, g, "a", "; 1 x");
+		assertEquals(2, info.length);
 		String expecting =
-			"[{decision=0, contextSensitivities=1, errors=0, ambiguities=0, SLL_lookahead=3, " +
-			"SLL_ATNTransitions=2, SLL_DFATransitions=0, LL_Fallback=1, LL_lookahead=1, LL_ATNTransitions=1}]";
-		assertEquals(expecting, Arrays.toString(info));
+			"{decision=1, contextSensitivities=1, errors=0, ambiguities=0, SLL_lookahead=3, SLL_ATNTransitions=2, SLL_DFATransitions=0, LL_Fallback=1, LL_lookahead=3, LL_ATNTransitions=2}";
+		assertEquals(expecting, info[1].toString());
 	}
 
 	@Ignore
