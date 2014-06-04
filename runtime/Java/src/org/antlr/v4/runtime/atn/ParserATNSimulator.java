@@ -1904,22 +1904,6 @@ public class ParserATNSimulator extends ATNSimulator {
 								   @NotNull ATNConfigSet configs)
 	{
 		if ( debug || retry_debug ) {
-//			ParserATNPathFinder finder = new ParserATNPathFinder(parser, atn);
-//			int i = 1;
-//			for (Transition t : dfa.atnStartState.transitions) {
-//				System.out.println("ALT "+i+"=");
-//				System.out.println(startIndex+".."+stopIndex+", len(input)="+parser.getInputStream().size());
-//				TraceTree path = finder.trace(t.target, parser.getContext(), (TokenStream)parser.getInputStream(),
-//											  startIndex, stopIndex);
-//				if ( path!=null ) {
-//					System.out.println("path = "+path.toStringTree());
-//					for (TraceTree leaf : path.leaves) {
-//						List<ATNState> states = path.getPathToNode(leaf);
-//						System.out.println("states="+states);
-//					}
-//				}
-//				i++;
-//			}
 			Interval interval = Interval.of(startIndex, stopIndex);
 			System.out.println("reportAmbiguity "+
 							   ambigAlts+":"+configs+
