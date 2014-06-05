@@ -32,6 +32,7 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.FailedPredicateException;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.Parser;
@@ -340,6 +341,13 @@ public class ParserATNSimulator extends ATNSimulator {
 	public void reset() {
 	}
 
+	@Override
+	public void clearDFA() {
+		for (int d = 0; d < decisionToDFA.length; d++) {
+			decisionToDFA[d] = new DFA(atn.getDecisionState(d), d);
+		}
+	}
+
 	public int adaptivePredict(@NotNull TokenStream input, int decision,
 							   @Nullable ParserRuleContext outerContext)
 	{
@@ -355,7 +363,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		DFA dfa = decisionToDFA[decision];
 
 		int m = input.mark();
-		int index = input.index();
+		int index = _startIndex;
 
 		// Now we are certain to have a specific decision's DFA
 		// But, do we still need an initial state?
@@ -497,7 +505,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 			if ( D.requiresFullContext && mode != PredictionMode.SLL ) {
 				// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
-				BitSet conflictingAlts = null;
+				BitSet conflictingAlts = D.configs.conflictingAlts;
 				if ( D.predicates!=null ) {
 					if ( debug ) System.out.println("DFA state has preds in DFA sim LL failover");
 					int conflictIndex = input.index();
@@ -1258,7 +1266,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		ATNConfigSet failed = new ATNConfigSet(configs.fullCtx);
 		for (ATNConfig c : configs) {
 			if ( c.semanticContext!=SemanticContext.NONE ) {
-				boolean predicateEvaluationResult = c.semanticContext.eval(parser, outerContext);
+				boolean predicateEvaluationResult = evalSemanticContext(c.semanticContext, outerContext, c.alt, configs.fullCtx);
 				if ( predicateEvaluationResult ) {
 					succeeded.add(c);
 				}
@@ -1293,7 +1301,8 @@ public class ParserATNSimulator extends ATNSimulator {
 				continue;
 			}
 
-			boolean predicateEvaluationResult = pair.pred.eval(parser, outerContext);
+			boolean fullCtx = false; // in dfa
+			boolean predicateEvaluationResult = evalSemanticContext(pair.pred, outerContext, pair.alt, fullCtx);
 			if ( debug || dfa_debug ) {
 				System.out.println("eval pred "+pair+"="+predicateEvaluationResult);
 			}
@@ -1310,6 +1319,37 @@ public class ParserATNSimulator extends ATNSimulator {
 		return predictions;
 	}
 
+	/**
+	 * Evaluate a semantic context within a specific parser context.
+	 *
+	 * <p>
+	 * This method might not be called for every semantic context evaluated
+	 * during the prediction process. In particular, we currently do not
+	 * evaluate the following but it may change in the future:</p>
+	 *
+	 * <ul>
+	 * <li>Precedence predicates (represented by
+	 * {@link SemanticContext.PrecedencePredicate}) are not currently evaluated
+	 * through this method.</li>
+	 * <li>Operator predicates (represented by {@link SemanticContext.AND} and
+	 * {@link SemanticContext.OR}) are evaluated as a single semantic
+	 * context, rather than evaluating the operands individually.
+	 * Implementations which require evaluation results from individual
+	 * predicates should override this method to explicitly handle evaluation of
+	 * the operands within operator predicates.</li>
+	 * </ul>
+	 *
+	 * @param pred The semantic context to evaluate
+	 * @param parserCallStack The parser context in which to evaluate the
+	 * semantic context
+	 * @param alt The alternative which is guarded by {@code pred}
+	 * @param fullCtx {@code true} if the evaluation is occurring during LL
+	 * prediction; otherwise, {@code false} if the evaluation is occurring
+	 * during SLL prediction
+	 */
+	protected boolean evalSemanticContext(@NotNull SemanticContext pred, ParserRuleContext parserCallStack, int alt, boolean fullCtx) {
+		return pred.eval(parser, parserCallStack);
+	}
 
 	/* TODO: If we are doing predicates, there is no point in pursuing
 		 closure operations if we reach a DFA state that uniquely predicts
@@ -1537,7 +1577,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				// later during conflict resolution.
 				int currentPosition = _input.index();
 				_input.seek(_startIndex);
-				boolean predSucceeds = pt.getPredicate().eval(parser, _outerContext);
+				boolean predSucceeds = evalSemanticContext(pt.getPredicate(), _outerContext, config.alt, fullCtx);
 				_input.seek(currentPosition);
 				if ( predSucceeds ) {
 					c = new ATNConfig(config, pt.target); // no pred context
@@ -1585,7 +1625,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				// later during conflict resolution.
 				int currentPosition = _input.index();
 				_input.seek(_startIndex);
-				boolean predSucceeds = pt.getPredicate().eval(parser, _outerContext);
+				boolean predSucceeds = evalSemanticContext(pt.getPredicate(), _outerContext, config.alt, fullCtx);
 				_input.seek(currentPosition);
 				if ( predSucceeds ) {
 					c = new ATNConfig(config, pt.target); // no pred context
@@ -1866,22 +1906,6 @@ public class ParserATNSimulator extends ATNSimulator {
 								   @NotNull ATNConfigSet configs)
 	{
 		if ( debug || retry_debug ) {
-//			ParserATNPathFinder finder = new ParserATNPathFinder(parser, atn);
-//			int i = 1;
-//			for (Transition t : dfa.atnStartState.transitions) {
-//				System.out.println("ALT "+i+"=");
-//				System.out.println(startIndex+".."+stopIndex+", len(input)="+parser.getInputStream().size());
-//				TraceTree path = finder.trace(t.target, parser.getContext(), (TokenStream)parser.getInputStream(),
-//											  startIndex, stopIndex);
-//				if ( path!=null ) {
-//					System.out.println("path = "+path.toStringTree());
-//					for (TraceTree leaf : path.leaves) {
-//						List<ATNState> states = path.getPathToNode(leaf);
-//						System.out.println("states="+states);
-//					}
-//				}
-//				i++;
-//			}
 			Interval interval = Interval.of(startIndex, stopIndex);
 			System.out.println("reportAmbiguity "+
 							   ambigAlts+":"+configs+
@@ -1898,5 +1922,9 @@ public class ParserATNSimulator extends ATNSimulator {
 	@NotNull
 	public final PredictionMode getPredictionMode() {
 		return mode;
+	}
+
+	public Parser getParser() {
+		return parser;
 	}
 }

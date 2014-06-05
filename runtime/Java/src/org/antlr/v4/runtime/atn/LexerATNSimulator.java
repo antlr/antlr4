@@ -157,6 +157,13 @@ public class LexerATNSimulator extends ATNSimulator {
 		mode = Lexer.DEFAULT_MODE;
 	}
 
+	@Override
+	public void clearDFA() {
+		for (int d = 0; d < decisionToDFA.length; d++) {
+			decisionToDFA[d] = new DFA(atn.getDecisionState(d), d);
+		}
+	}
+
 	protected int matchATN(@NotNull CharStream input) {
 		ATNState startState = atn.modeToStartState.get(mode);
 

@@ -31,7 +31,32 @@
 package org.antlr.v4.codegen;
 
 import org.antlr.v4.analysis.AnalysisPipeline;
-import org.antlr.v4.codegen.model.*;
+import org.antlr.v4.codegen.model.Action;
+import org.antlr.v4.codegen.model.AddToLabelList;
+import org.antlr.v4.codegen.model.AltBlock;
+import org.antlr.v4.codegen.model.Choice;
+import org.antlr.v4.codegen.model.CodeBlockForAlt;
+import org.antlr.v4.codegen.model.CodeBlockForOuterMostAlt;
+import org.antlr.v4.codegen.model.InvokeRule;
+import org.antlr.v4.codegen.model.LL1AltBlock;
+import org.antlr.v4.codegen.model.LL1OptionalBlock;
+import org.antlr.v4.codegen.model.LL1OptionalBlockSingleAlt;
+import org.antlr.v4.codegen.model.LL1PlusBlockSingleAlt;
+import org.antlr.v4.codegen.model.LL1StarBlockSingleAlt;
+import org.antlr.v4.codegen.model.LabeledOp;
+import org.antlr.v4.codegen.model.LeftRecursiveRuleFunction;
+import org.antlr.v4.codegen.model.MatchNotSet;
+import org.antlr.v4.codegen.model.MatchSet;
+import org.antlr.v4.codegen.model.MatchToken;
+import org.antlr.v4.codegen.model.OptionalBlock;
+import org.antlr.v4.codegen.model.Parser;
+import org.antlr.v4.codegen.model.ParserFile;
+import org.antlr.v4.codegen.model.PlusBlock;
+import org.antlr.v4.codegen.model.RuleFunction;
+import org.antlr.v4.codegen.model.SemPred;
+import org.antlr.v4.codegen.model.SrcOp;
+import org.antlr.v4.codegen.model.StarBlock;
+import org.antlr.v4.codegen.model.TestSetInline;
 import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.codegen.model.decl.RuleContextDecl;
 import org.antlr.v4.codegen.model.decl.TokenDecl;
@@ -259,10 +284,12 @@ public class ParserFactory extends DefaultOutputModelFactory {
 				else c = new LL1OptionalBlock(this, ebnfRoot, alts);
 				break;
 			case ANTLRParser.CLOSURE :
-				c = new LL1StarBlockSingleAlt(this, ebnfRoot, alts);
+				if ( alts.size()==1 ) c = new LL1StarBlockSingleAlt(this, ebnfRoot, alts);
+				else c = getComplexEBNFBlock(ebnfRoot, alts);
 				break;
 			case ANTLRParser.POSITIVE_CLOSURE :
-				c = new LL1PlusBlockSingleAlt(this, ebnfRoot, alts);
+				if ( alts.size()==1 ) c = new LL1PlusBlockSingleAlt(this, ebnfRoot, alts);
+				else c = getComplexEBNFBlock(ebnfRoot, alts);
 				break;
 		}
 		return c;

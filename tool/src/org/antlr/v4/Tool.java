@@ -51,12 +51,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Tool {
-	public static final String VERSION;
-	static {
-		String version = Tool.class.getPackage().getImplementationVersion();
-		VERSION = version != null ? version : "4.2";
-	}
-
+	public static final String VERSION = "4.3";
 	public static final String GRAMMAR_EXTENSION = ".g4";
 	public static final String LEGACY_GRAMMAR_EXTENSION = ".g";
 

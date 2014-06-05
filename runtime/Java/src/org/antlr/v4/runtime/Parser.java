@@ -29,7 +29,15 @@
  */
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNDeserializationOptions;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
+import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ParseInfo;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.ProfilingATNSimulator;
+import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerStack;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -869,6 +877,27 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 
 	public String getSourceName() {
 		return _input.getSourceName();
+	}
+
+	@Override
+	public ParseInfo getParseInfo() {
+		ParserATNSimulator interp = getInterpreter();
+		if (interp instanceof ProfilingATNSimulator) {
+			return new ParseInfo((ProfilingATNSimulator)interp);
+		}
+		return null;
+	}
+
+	public void setProfile(boolean profile) {
+		ParserATNSimulator interp = getInterpreter();
+		if ( profile ) {
+			if (!(interp instanceof ProfilingATNSimulator)) {
+				setInterpreter(new ProfilingATNSimulator(this));
+			}
+		}
+		else if (interp instanceof ProfilingATNSimulator) {
+			setInterpreter(new ParserATNSimulator(this, getATN(), interp.decisionToDFA, interp.getSharedContextCache()));
+		}
 	}
 
 	/** During a parse is sometimes useful to listen in on the rule entry and exit

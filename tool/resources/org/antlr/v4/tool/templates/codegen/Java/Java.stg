@@ -28,14 +28,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** ANTLR tool checks output templates are compatible with tool code generation.
- *  For now, a simple string match used on x.y of x.y.z scheme.
- *  Must match Tool.VERSION during load to templates.
- *
- *  REQUIRED.
- */
-VERSION() ::= "4.2" // use just "x.y" and don't include bug fix release number
-
 javaTypeInitMap ::= [
 	"int":"0",
 	"long":"0",
@@ -222,7 +214,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class <parser.name> extends <superClass> {
-    static { RuntimeMetaData.checkVersion("<file.ANTLRVersion>"); }
+	static { RuntimeMetaData.checkVersion("<file.ANTLRVersion>", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -510,7 +502,7 @@ StarBlock(choice, alts, sync, iteration) ::= <<
 setState(<choice.stateNumber>);
 _errHandler.sync(this);
 _alt = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
-while ( _alt!=<choice.exitAlt> && _alt!=ATN.INVALID_ALT_NUMBER ) {
+while ( _alt!=<choice.exitAlt> && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 	if ( _alt==1<if(!choice.ast.greedy)>+1<endif> ) {
 		<iteration>
 		<alts> <! should only be one !>
@@ -537,7 +529,7 @@ case <i><if(!choice.ast.greedy)>+1<endif>:
 	setState(<choice.loopBackStateNumber>); <! loopback/exit decision !>
 	_errHandler.sync(this);
 	_alt = getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx);
-} while ( _alt!=<choice.exitAlt> && _alt!=ATN.INVALID_ALT_NUMBER );
+} while ( _alt!=<choice.exitAlt> && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
 >>
 
 Sync(s) ::= "sync(<s.expecting.name>);"
@@ -824,7 +816,8 @@ import org.antlr.v4.runtime.misc.*;
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class <lexer.name> extends <superClass> {
-    static { RuntimeMetaData.checkVersion("<lexerFile.ANTLRVersion>"); }
+	static { RuntimeMetaData.checkVersion("<lexerFile.ANTLRVersion>", RuntimeMetaData.VERSION); }
+
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();

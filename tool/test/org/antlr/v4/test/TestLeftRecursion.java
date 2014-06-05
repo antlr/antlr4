@@ -109,6 +109,23 @@ public class TestLeftRecursion extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	@Test
+	public void testSemPredFailOption() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"s @after {System.out.println($ctx.toStringTree(this));} : a ;\n" +
+			"a : a ID {false}?<fail='custom message'>\n" +
+			"  | ID" +
+			"  ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer",
+								  "s", "x y z", debug);
+		String expecting = "(s (a (a x) y z))\n";
+		assertEquals(expecting, found);
+		assertEquals("line 1:4 rule a custom message\n", stderrDuringParse);
+	}
+
 	@Test public void testTernaryExpr() throws Exception {
 		String grammar =
 			"grammar T;\n" +
@@ -556,7 +573,8 @@ public class TestLeftRecursion extends BaseTest {
 		writeRecognizerAndCompile("TParser",
 								  "TLexer",
 								  startRule,
-								  debug);
+								  debug,
+								  false);
 
 		for (int i=0; i<tests.length; i+=2) {
 			String test = tests[i];
