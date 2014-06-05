@@ -175,6 +175,7 @@ public class ActionTranslator implements ActionSplitterListener {
 				case RET: chunks.add(new RetValueRef(rf.ruleCtx, x.getText())); break;
 				case LOCAL: chunks.add(new LocalRef(nodeContext,x.getText())); break;
 				case PREDEFINED_RULE: chunks.add(getRulePropertyRef(x));	break;
+				default: // avoid warning
 			}
 		}
 		if ( node.resolver.resolvesToToken(x.getText(), node) ) {
@@ -229,6 +230,8 @@ public class ActionTranslator implements ActionSplitterListener {
 			case TOKEN:
 				chunks.add(getTokenPropertyRef(x, y));
 				break;
+			default:
+				// avoid warning
 		}
 	}
 

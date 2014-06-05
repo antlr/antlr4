@@ -52,12 +52,13 @@ public class Parser extends OutputModelObject {
 	public String grammarFileName;
 	public String grammarName;
 	@ModelElement public ActionChunk superClass;
+	public Boolean needsSuperClass = false;
 	public Map<String,Integer> tokens;
 	public String[] tokenNames;
 	public Set<String> ruleNames;
 	public Collection<Rule> rules;
 	public ParserFile file;
-
+	
 	@ModelElement public List<RuleFunction> funcs = new ArrayList<RuleFunction>();
 	@ModelElement public SerializedATN atn;
 	@ModelElement public LinkedHashMap<Rule, RuleSempredFunction> sempredFuncs =
@@ -96,6 +97,7 @@ public class Parser extends OutputModelObject {
 		atn = new SerializedATN(factory, g.atn);
 		if (g.getOptionString("superClass") != null) {
 			superClass = new ActionText(null, g.getOptionString("superClass"));
+			needsSuperClass = true;
 		}
 		else {
 			superClass = new DefaultParserSuperClass();

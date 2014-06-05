@@ -41,6 +41,9 @@ public class LexerFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
 	@ModelElement public Lexer lexer;
 	@ModelElement public Map<String, Action> namedActions;
+	public Boolean genListener = false;
+	public Boolean genVisitor = false;
+	public String grammarName;
 
 	public LexerFile(OutputModelFactory factory, String fileName) {
 		super(factory, fileName);
@@ -51,5 +54,9 @@ public class LexerFile extends OutputFile {
 			namedActions.put(name, new Action(factory, ast));
 		}
 		genPackage = factory.getGrammar().tool.genPackage;
+		// need the below members in the ST for Python
+		genListener = g.tool.gen_listener;
+		genVisitor = g.tool.gen_visitor;
+		grammarName = g.originalGrammar==null ? g.name : g.originalGrammar.name;
 	}
 }
