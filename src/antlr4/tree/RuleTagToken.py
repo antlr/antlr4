@@ -69,6 +69,6 @@ class RuleTagToken(Token):
 
     def getText(self):
         if self.label is None:
-            return "<" + self.ruleName + ">";
+            return "<" + self.ruleName + ">"
         else:
             return "<" + self.label + ":" + self.ruleName + ">"

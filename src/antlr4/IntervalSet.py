@@ -42,8 +42,6 @@ class IntervalSet(object):
         self.addRange(Interval(v, v+1))
 
     def addRange(self, v):
-        if not isinstance(v, Interval):
-            pass
         if self.intervals is None:
             self.intervals = list()
             self.intervals.append(v)
@@ -123,7 +121,7 @@ class IntervalSet(object):
                     return
                 # split existing range
                 elif v<i.stop-1:
-                    x = xrange(i.start, v)
+                    x = Interval(i.start, v)
                     i.start = v + 1
                     self.intervals.insert(k, x)
                     return

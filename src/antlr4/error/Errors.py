@@ -101,7 +101,7 @@ class RecognitionException(Exception):
 class LexerNoViableAltException(RecognitionException):
 
     def __init__(self, lexer, input, startIndex, deadEndConfigs):
-        super(LexerNoViableAltException, self).__init__(message=None, recognizer=lexer, input=input, ctx=None);
+        super(LexerNoViableAltException, self).__init__(message=None, recognizer=lexer, input=input, ctx=None)
         self.startIndex = startIndex
         self.deadEndConfigs = deadEndConfigs
 

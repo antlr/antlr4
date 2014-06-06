@@ -161,7 +161,7 @@ class Parser (Recognizer):
             self._errHandler.reportMatch(self)
             self.consume()
         else:
-            t = self._errHandler.recoverInline(self);
+            t = self._errHandler.recoverInline(self)
             if self._buildParseTrees and t.tokenIndex == -1:
                 # we must have conjured up a new token during single token insertion
                 # if it's not the current symbol

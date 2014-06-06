@@ -283,7 +283,7 @@ class OR (SemanticContext):
             for o in a.opnds:
                 operands.add(o)
         else:
-            operands.add(a);
+            operands.add(a)
         if isinstance( b, OR):
             for o in b.opnds:
                 operands.add(o)
@@ -324,7 +324,7 @@ class OR (SemanticContext):
         differs = False
         operands = []
         for context in self.opnds:
-            evaluated = context.evalPrecedence(parser, outerContext);
+            evaluated = context.evalPrecedence(parser, outerContext)
             differs |= evaluated is not context
             if evaluated is SemanticContext.NONE:
                 # The OR context is true if any element is true

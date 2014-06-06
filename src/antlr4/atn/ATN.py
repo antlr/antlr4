@@ -133,13 +133,13 @@ class ATN(object):
         if Token.EPSILON not in following:
             return following
         expected = IntervalSet()
-        expected.addSet(following);
-        expected.remove(Token.EPSILON);
+        expected.addSet(following)
+        expected.remove(Token.EPSILON)
         while (ctx != None and ctx.invokingState >= 0 and Token.EPSILON in following):
             invokingState = self.states[ctx.invokingState]
             rt = invokingState.transitions[0]
             following = self.nextTokens(rt.followState)
-            expected.addSet(following);
+            expected.addSet(following)
             expected.remove(Token.EPSILON)
             ctx = ctx.parentCtx
         if Token.EPSILON in following:

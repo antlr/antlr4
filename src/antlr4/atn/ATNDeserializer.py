@@ -185,7 +185,7 @@ class ATNDeserializer (object):
         atn.ruleToStopState = [0] * nrules
         for state in atn.states:
             if not isinstance(state, RuleStopState):
-                continue;
+                continue
             atn.ruleToStopState[state.ruleIndex] = state
             atn.ruleToStartState[state.ruleIndex].stopState = state
 
@@ -273,7 +273,7 @@ class ATNDeserializer (object):
                 data2 = self.readInt()
                 if data2 == 0xFFFF:
                     data2 = -1
-                lexerAction = self.lexerActionFactory(actionType, data1, data2);
+                lexerAction = self.lexerActionFactory(actionType, data1, data2)
                 atn.lexerActions[i] = lexerAction
 
     def generateRuleBypassTransitions(self, atn):
@@ -514,7 +514,7 @@ class ATNDeserializer (object):
             s = self.stateFactories[type]()
             if s is not None:
                 s.ruleIndex = ruleIndex
-        return s
+            return s
 
     def lexerActionFactory(self, type, data1, data2):
         if self.actionFactories is None:

@@ -570,7 +570,7 @@ class ParserATNSimulator(ATNSimulator):
         altToPred = self.getPredsForAmbigAlts(altsToCollectPredsFrom, dfaState.configs, nalts)
         if altToPred is not None:
             dfaState.predicates = self.getPredicatePredictions(altsToCollectPredsFrom, altToPred)
-            dfaState.prediction = ATN.INVALID_ALT_NUMBER; # make sure we use preds
+            dfaState.prediction = ATN.INVALID_ALT_NUMBER # make sure we use preds
         else:
             # There are preds in configs but they might go away
             # when OR'd together like {p}? || NONE == NONE. If neither

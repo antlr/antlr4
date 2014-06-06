@@ -134,9 +134,9 @@ class XPath(object):
         lexer.addErrorListener(ErrorListener()) # XPathErrorListener does no more
         tokenStream = CommonTokenStream(lexer)
         try:
-            tokenStream.fill();
+            tokenStream.fill()
         except LexerNoViableAltException as e:
-            pos = lexer.getColumn();
+            pos = lexer.getColumn()
             msg = "Invalid tokens or characters at index " + str(pos) + " in path '" + path + "'"
             raise Exception(msg, e)
 

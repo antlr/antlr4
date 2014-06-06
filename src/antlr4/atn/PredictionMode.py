@@ -211,7 +211,7 @@ class PredictionMode(object):
             # since we'll often fail over anyway.
             if configs.hasSemanticContext:
                 # dup configs, tossing out semantic predicates
-                dup = ATNConfigSet();
+                dup = ATNConfigSet()
                 for c in configs:
                     c = ATNConfig(c,SemanticContext.NONE)
                     dup.add(c)

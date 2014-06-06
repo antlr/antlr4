@@ -41,6 +41,7 @@
 #  the states. We'll use the term Edge for the DFA to distinguish them from
 #  ATN transitions.</p>
 #
+from __builtin__ import unicode
 from antlr4.IntervalSet import IntervalSet, Interval
 from antlr4.Token import Token
 from antlr4.atn.SemanticContext import Predicate, PrecedencePredicate
@@ -193,7 +194,7 @@ class ActionTransition(Transition):
         return False
 
     def __unicode__(self):
-        return "action_"+self.ruleIndex+":"+self.actionIndex
+        return u"action_" + unicode(self.ruleIndex) + u":" + unicode(self.actionIndex)
 
 # A transition containing a set of values.
 class SetTransition(Transition):
@@ -205,7 +206,7 @@ class SetTransition(Transition):
             self.label = set
         else:
             self.label = IntervalSet()
-            self.label.addRange(range(Token.INVALID_TYPE, Token.INVALID_TYPE + 1))
+            self.label.addRange(Interval(Token.INVALID_TYPE, Token.INVALID_TYPE + 1))
 
     def matches( self, symbol, minVocabSymbol,  maxVocabSymbol):
         return symbol in self.label
@@ -238,7 +239,7 @@ class WildcardTransition(Transition):
         return symbol >= minVocabSymbol and symbol <= maxVocabSymbol
 
     def __unicode__(self):
-        return "."
+        return u"."
 
 
 class PrecedencePredicateTransition(AbstractPredicateTransition):

@@ -28,6 +28,7 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+from __builtin__ import unicode
 from antlr4.Token import Token
 from antlr4.error.ErrorListener import ProxyErrorListener, ConsoleErrorListener
 
@@ -42,7 +43,7 @@ class Recognizer(object):
         self._stateNumber = -1
 
     def checkVersion(self, toolVersion):
-        runtimeVersion = "4.2"
+        runtimeVersion = "4.4"
         if not runtimeVersion==toolVersion:
             print("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion)
 
@@ -74,7 +75,7 @@ class Recognizer(object):
         if result is None:
             result = zip( ruleNames, range(0, len(ruleNames)))
             self.ruleIndexMapCache[ruleNames] = result
-        return result;
+        return result
 
     def getTokenType(self, tokenName):
         ttype = self.getTokenTypeMap().get(tokenName, None)
@@ -88,7 +89,7 @@ class Recognizer(object):
     def getErrorHeader(self, e):
         line = e.getOffendingToken().line
         column = e.getOffendingToken().column
-        return "line "+line+":"+column
+        return u"line " + unicode(line) + u":" + unicode(column)
 
 
     # How should a token be displayed in an error message? The default

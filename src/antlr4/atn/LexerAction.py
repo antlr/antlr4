@@ -98,7 +98,7 @@ class LexerTypeAction(LexerAction):
         if self is other:
             return True
         elif not isinstance(other, LexerTypeAction):
-            return False;
+            return False
         else:
             return self.type == other.type
 
@@ -126,7 +126,7 @@ class LexerPushModeAction(LexerAction):
         if self is other:
             return True
         elif not isinstance(other, LexerPushModeAction):
-            return False;
+            return False
         else:
             return self.mode == other.mode
 
@@ -194,7 +194,7 @@ class LexerModeAction(LexerAction):
         if self is other:
             return True
         elif not isinstance(other, LexerModeAction):
-            return False;
+            return False
         else:
             return self.mode == other.mode
 
@@ -238,7 +238,7 @@ class LexerCustomAction(LexerAction):
         if self is other:
             return True
         elif not isinstance(other, LexerCustomAction):
-            return False;
+            return False
         else:
             return self.ruleIndex == other.ruleIndex and self.actionIndex == other.actionIndex
 
@@ -264,7 +264,7 @@ class LexerChannelAction(LexerAction):
         if self is other:
             return True
         elif not isinstance(other, LexerChannelAction):
-            return False;
+            return False
         else:
             return self.channel == other.channel
 
@@ -311,6 +311,6 @@ class LexerIndexedCustomAction(LexerAction):
         if self is other:
             return True
         elif not isinstance(other, LexerIndexedCustomAction):
-            return False;
+            return False
         else:
             return self.offset == other.offset and self.action == other.action
