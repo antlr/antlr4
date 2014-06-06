@@ -50,7 +50,6 @@ public class Parser extends OutputModelObject {
 	public String grammarFileName;
 	public String grammarName;
 	@ModelElement public ActionChunk superClass;
-	public Boolean needsSuperClass = false;
 	public Map<String,Integer> tokens;
 	public String[] tokenNames;
 	public Set<String> ruleNames;
@@ -95,7 +94,6 @@ public class Parser extends OutputModelObject {
 		atn = new SerializedATN(factory, g.atn);
 		if (g.getOptionString("superClass") != null) {
 			superClass = new ActionText(null, g.getOptionString("superClass"));
-			needsSuperClass = true;
 		}
 	}
 }
