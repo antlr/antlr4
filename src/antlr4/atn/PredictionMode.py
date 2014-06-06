@@ -214,7 +214,7 @@ class PredictionMode(Enum):
             # since we'll often fail over anyway.
             if configs.hasSemanticContext:
                 # dup configs, tossing out semantic predicates
-                dup = ATNConfigSet();
+                dup = ATNConfigSet()
                 for c in configs:
                     c = ATNConfig(c,SemanticContext.NONE)
                     dup.add(c)
@@ -541,7 +541,7 @@ class PredictionMode(Enum):
         viableAlts = set()
         for alts in altsets:
             minAlt = min(alts)
-            viableAlts.add(minAlt);
+            viableAlts.add(minAlt)
             if len(viableAlts)>1 : # more than 1 viable alt
                 return ATN.INVALID_ALT_NUMBER
         return min(viableAlts)

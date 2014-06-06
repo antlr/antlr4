@@ -220,7 +220,7 @@ class LexerATNSimulator(ATNSimulator):
 
         target = s.edges[t - self.MIN_DFA_EDGE]
         if self.debug and target is not None:
-            print("reuse state "+s.stateNumber+ " edge to "+target.stateNumber);
+            print("reuse state "+s.stateNumber+ " edge to "+target.stateNumber)
 
         return target
 
@@ -382,7 +382,7 @@ class LexerATNSimulator(ATNSimulator):
                 c = LexerATNConfig(state=t.target, config=config, context=newContext)
 
         elif t.serializationType==Transition.PRECEDENCE:
-                raise UnsupportedOperationException("Precedence predicates are not supported in lexers.");
+                raise UnsupportedOperationException("Precedence predicates are not supported in lexers.")
 
         elif t.serializationType==Transition.PREDICATE:
                 #  Track traversing semantic predicates. If we traverse,
@@ -570,7 +570,7 @@ class LexerATNSimulator(ATNSimulator):
         return input.getText(self.startIndex, input.index-1)
 
     def consume(self, input:InputStream):
-        curChar = input.LA(1);
+        curChar = input.LA(1)
         if curChar==ord('\n'):
             self.line += 1
             self.column = 0

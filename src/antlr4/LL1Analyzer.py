@@ -43,7 +43,7 @@ class LL1Analyzer (object):
     #* Special value added to the lookahead sets to indicate that we hit
     #  a predicate during analysis if {@code seeThruPreds==false}.
     #/
-    HIT_PRED = Token.INVALID_TYPE;
+    HIT_PRED = Token.INVALID_TYPE
 
     def __init__(self, atn:ATN):
         self.atn = atn
@@ -133,7 +133,7 @@ class LL1Analyzer (object):
     #/
     def _LOOK(self, s:ATNState, stopState:ATNState , ctx:PredictionContext, look:IntervalSet, lookBusy:set, \
                      calledRuleStack:set, seeThruPreds:bool, addEOF:bool):
-        c = ATNConfig(s, 0, ctx);
+        c = ATNConfig(s, 0, ctx)
 
         if c in lookBusy:
             return

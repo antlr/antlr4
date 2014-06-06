@@ -118,7 +118,7 @@ class ParserInterpreter(Parser):
     def visitState(self, p:ATNState):
         edge = 0
         if len(p.transitions) > 1:
-            self._errHandler.sync(self);
+            self._errHandler.sync(self)
             edge = self._interp.adaptivePredict(self._input, p.decision, self._ctx)
         else:
             edge = 1

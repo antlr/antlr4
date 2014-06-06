@@ -101,7 +101,7 @@ class ATNConfigSet(object):
             self.dipsIntoOuterContext = True
         existing = self.getOrAdd(config)
         if existing is config:
-            self.cachedHashCode = -1;
+            self.cachedHashCode = -1
             self.configs.append(config)  # track order here
             return True
         # a previous (s,i,pi,_), merge with it and save result
@@ -132,7 +132,7 @@ class ATNConfigSet(object):
         for c in self.configs:
             if c.semanticContext!=SemanticContext.NONE:
                 preds.append(c.semanticContext)
-        return preds;
+        return preds
 
     def get(self, i:int):
         return self.configs[i]
@@ -143,7 +143,7 @@ class ATNConfigSet(object):
         if len(self.configLookup)==0:
             return
         for config in self.configs:
-            config.context = interpreter.getCachedContext(config.context);
+            config.context = interpreter.getCachedContext(config.context)
 
     def addAll(self, coll:list):
         for c in coll:
@@ -154,7 +154,7 @@ class ATNConfigSet(object):
         if self is other:
             return True
         elif not isinstance(other, ATNConfigSet):
-            return False;
+            return False
 
         same = self.configs is not None and \
             self.configs==other.configs and \

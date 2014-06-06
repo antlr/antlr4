@@ -117,7 +117,7 @@ class Lexer(Recognizer, TokenSource):
         self._text = None
 
         self._hitEOF = False
-        self._mode = Lexer.DEFAULT_MODE;
+        self._mode = Lexer.DEFAULT_MODE
         self._modeStack = []
 
         self._interp.reset()
@@ -245,7 +245,7 @@ class Lexer(Recognizer, TokenSource):
             cpos = self._token.column + n
         eof = self._factory.create(self._tokenFactorySourcePair, Token.EOF, None, Token.DEFAULT_CHANNEL, self._input.index,
                                    self._input.index-1, self.line, cpos)
-        self.emitToken(eof);
+        self.emitToken(eof)
         return eof
 
     @property
@@ -300,7 +300,7 @@ class Lexer(Recognizer, TokenSource):
         while t.type!=Token.EOF:
             tokens.append(t)
             t = self.nextToken()
-        return tokens;
+        return tokens
 
     def notifyListeners(self, e:LexerNoViableAltException):
         start = self._tokenStartCharIndex

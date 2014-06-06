@@ -230,7 +230,7 @@ class BufferedTokenStream(TokenStream):
     def nextTokenOnChannel(self, i:int, channel:int):
         self.sync(i)
         if i>=len(self.tokens):
-            return -1;
+            return -1
         token = self.tokens[i]
         while token.channel!=self.channel:
             if token.type==Token.EOF:

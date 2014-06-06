@@ -575,7 +575,7 @@ class ParserATNSimulator(ATNSimulator):
         altToPred = self.getPredsForAmbigAlts(altsToCollectPredsFrom, dfaState.configs, nalts)
         if altToPred is not None:
             dfaState.predicates = self.getPredicatePredictions(altsToCollectPredsFrom, altToPred)
-            dfaState.prediction = ATN.INVALID_ALT_NUMBER; # make sure we use preds
+            dfaState.prediction = ATN.INVALID_ALT_NUMBER # make sure we use preds
         else:
             # There are preds in configs but they might go away
             # when OR'd together like {p}? || NONE == NONE. If neither
@@ -1117,7 +1117,7 @@ class ParserATNSimulator(ATNSimulator):
     #
 
     def closure(self, config:ATNConfig, configs:ATNConfigSet, closureBusy:set, collectPredicates:bool, fullCtx:bool, treatEofAsEpsilon:bool):
-        initialDepth = 0;
+        initialDepth = 0
         self.closureCheckingStopState(config, configs, closureBusy, collectPredicates,
                                  fullCtx, initialDepth, treatEofAsEpsilon)
         assert not fullCtx or not configs.dipsIntoOuterContext
@@ -1254,7 +1254,7 @@ class ParserATNSimulator(ATNSimulator):
                 # later during conflict resolution.
                 currentPosition = self._input.index
                 self._input.seek(self._startIndex)
-                predSucceeds = pt.getPredicate().eval(self.parser, self._outerContext);
+                predSucceeds = pt.getPredicate().eval(self.parser, self._outerContext)
                 self._input.seek(currentPosition)
                 if predSucceeds:
                     c = ATNConfig(state=pt.target, config=config) # no pred context

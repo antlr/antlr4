@@ -129,10 +129,10 @@ class SingletonPredictionContext(PredictionContext):
             # someone can pass in the bits of an array ctx that mean $
             return SingletonPredictionContext.EMPTY
         else:
-            return SingletonPredictionContext(parent, returnState);
+            return SingletonPredictionContext(parent, returnState)
 
     def __init__(self, parent:PredictionContext, returnState:int):
-        assert returnState!=ATNState.INVALID_STATE_NUMBER;
+        assert returnState!=ATNState.INVALID_STATE_NUMBER
         hashCode = calculateHashCode(parent, returnState) if parent is not None else calculateEmptyHashCode()
         super().__init__(hashCode)
         self.parentCtx = parent
@@ -146,7 +146,7 @@ class SingletonPredictionContext(PredictionContext):
         return self.parentCtx
 
     def getReturnState(self, index:int):
-        assert index == 0;
+        assert index == 0
         return self.returnState
 
     def __eq__(self, other):
@@ -271,7 +271,7 @@ def PredictionContextFromRuleContext(atn:ATN, outerContext:RuleContext=None):
     parent = PredictionContextFromRuleContext(atn, outerContext.parentCtx)
     state = atn.states[outerContext.invokingState]
     transition = state.transitions[0]
-    return SingletonPredictionContext.create(parent, transition.followState.stateNumber);
+    return SingletonPredictionContext.create(parent, transition.followState.stateNumber)
 
 
 def calculateListsHashCode(parents:[], returnStates:int ):
@@ -291,7 +291,7 @@ def merge(a:PredictionContext, b:PredictionContext, rootIsWildcard:bool, mergeCa
         return a
 
     if isinstance(a, SingletonPredictionContext) and isinstance(b, SingletonPredictionContext):
-        return mergeSingletons(a, b, rootIsWildcard, mergeCache);
+        return mergeSingletons(a, b, rootIsWildcard, mergeCache)
 
     # At least one of a or b is array
     # If one is $ and rootIsWildcard, return $ as# wildcard
@@ -362,7 +362,7 @@ def mergeSingletons(a:SingletonPredictionContext, b:SingletonPredictionContext, 
         # merge parents x and y, giving array node with x,y then remainders
         # of those graphs.  dup a, a' points at merged array
         # new joined parent so create new singleton pointing to it, a'
-        a_ = SingletonPredictionContext.create(parent, a.returnState);
+        a_ = SingletonPredictionContext.create(parent, a.returnState)
         if mergeCache is not None:
             mergeCache.put(a, b, a_)
         return a_
@@ -378,7 +378,7 @@ def mergeSingletons(a:SingletonPredictionContext, b:SingletonPredictionContext, 
                 payloads[0] = b.returnState
                 payloads[1] = a.returnState
             parents = [singleParent, singleParent]
-            a_ = ArrayPredictionContext(parents, payloads);
+            a_ = ArrayPredictionContext(parents, payloads)
             if mergeCache is not None:
                 mergeCache.put(a, b, a_)
             return a_
@@ -484,9 +484,9 @@ def mergeArrays(a:ArrayPredictionContext, b:ArrayPredictionContext, rootIsWildca
             return previous
 
     # merge sorted payloads a + b => M
-    i = 0; # walks a
-    j = 0; # walks b
-    k = 0; # walks target M array
+    i = 0 # walks a
+    j = 0 # walks b
+    k = 0 # walks target M array
 
     mergedReturnStates = [] * (len(a.returnState) + len( b.returnStates))
     mergedParents = [] * len(mergedReturnStates)
@@ -569,7 +569,7 @@ def combineCommonParents(parents:list):
     uniqueParents = dict()
 
     for p in range(0, len(parents)):
-        parent = parents[p];
+        parent = parents[p]
         if uniqueParents.get(parent, None) is None:
             uniqueParents[parent] = parent
 
@@ -652,6 +652,6 @@ def getAllContextNodes(context:PredictionContext, nodes:list=None, visited:dict=
         visited.put(context, context)
         nodes.add(context)
         for i in range(0, len(context)):
-            getAllContextNodes(context.getParent(i), nodes, visited);
+            getAllContextNodes(context.getParent(i), nodes, visited)
         return nodes
 

@@ -172,7 +172,7 @@ class ParseTreePatternMatcher(object):
     #
     def matchPattern(self, tree:ParseTree, pattern:ParseTreePattern):
         labels = dict()
-        mismatchedNode = self.matchImpl(tree, pattern.patternTree, labels);
+        mismatchedNode = self.matchImpl(tree, pattern.patternTree, labels)
         from antlr4.tree.ParseTreeMatch import ParseTreeMatch
         return ParseTreeMatch(tree, pattern, labels, mismatchedNode)
 
@@ -190,7 +190,7 @@ class ParseTreePatternMatcher(object):
         tree = None
         try:
             parserInterp.setErrorHandler(BailErrorStrategy())
-            tree = parserInterp.parse(patternRuleIndex);
+            tree = parserInterp.parse(patternRuleIndex)
         except ParseCancellationException as e:
             raise e.cause
         except RecognitionException as e:
@@ -273,10 +273,10 @@ class ParseTreePatternMatcher(object):
                 if childMatch is not None:
                     return childMatch
 
-            return mismatchedNode;
+            return mismatchedNode
 
         # if nodes aren't both tokens or both rule nodes, can't match
-        return tree;
+        return tree
 
     def map(self, labels, label, tree):
         v = labels.get(label, None)
@@ -289,7 +289,7 @@ class ParseTreePatternMatcher(object):
     def getRuleTagToken(self, tree:ParseTree):
         if isinstance( tree, RuleNode ):
             if tree.getChildCount()==1 and isinstance(tree.getChild(0), TerminalNode ):
-                c = tree.getChild(0);
+                c = tree.getChild(0)
                 if isinstance( c.symbol, RuleTagToken ):
                     return c.symbol
         return None

@@ -142,7 +142,7 @@ class DFAState(object):
             buf.write(u":")
             buf.write(str(self.configs))
             if self.isAcceptState:
-                buf.write(u"=>");
+                buf.write(u"=>")
                 if self.predicates is not None:
                     buf.write(str(self.predicates))
                 else:
