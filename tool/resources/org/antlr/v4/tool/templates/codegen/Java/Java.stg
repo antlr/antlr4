@@ -213,7 +213,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public class <parser.name> extends <superClass> {
+public class <parser.name> extends <if(superClass)><superClass><else>Parser<endif> {
 	static { RuntimeMetaData.checkVersion("<file.ANTLRVersion>", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
@@ -623,9 +623,6 @@ LexerChannelCommand(arg)   ::= "_channel = <arg>;"
 LexerModeCommand(arg)      ::= "_mode = <arg>;"
 LexerPushModeCommand(arg)  ::= "pushMode(<arg>);"
 
-DefaultParserSuperClass(s) ::= "Parser"
-DefaultLexerSuperClass(s)  ::= "Lexer"
-
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
 ArgRef(a) ::= "_localctx.<a.name>"
@@ -815,7 +812,7 @@ import org.antlr.v4.runtime.misc.*;
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public class <lexer.name> extends <superClass> {
+public class <lexer.name> extends <if(superClass)><superClass><else>Lexer<endif> {
 	static { RuntimeMetaData.checkVersion("<lexerFile.ANTLRVersion>", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
