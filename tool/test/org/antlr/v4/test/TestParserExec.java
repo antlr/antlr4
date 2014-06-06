@@ -197,36 +197,36 @@ public class TestParserExec extends BaseTest {
 		assertEquals(expectedOuterBound, found);
 	}
 
-    @Test public void testAStar() throws Exception {
-   		String grammar =
-   			"grammar T;\n" +
-   			"a : ID* {System.out.println($text);} ;\n" +
-   			"ID : 'a'..'z'+ ;\n" +
-   			"WS : (' '|'\\n') -> skip ;\n";
+	@Test public void testAStar() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : ID* {System.out.println($text);} ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n";
 
-   		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
-   								  "", false);
-   		assertEquals("\n", found);
-   		found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
-   								  "a b c", false);
-   		assertEquals("abc\n", found);
-   	}
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
+								  "", false);
+		assertEquals("\n", found);
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
+								  "a b c", false);
+		assertEquals("abc\n", found);
+	}
 
-    @Test public void testLL1OptionalBlock() throws Exception {
-   		String grammar =
-   			"grammar T;\n" +
-            "a : (ID|{}INT)? {System.out.println($text);} ;\n" +
-            "ID : 'a'..'z'+ ;\n" +
-            "INT : '0'..'9'+ ;\n" +
-   			"WS : (' '|'\\n') -> skip ;\n";
+	@Test public void testLL1OptionalBlock() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : (ID|{}INT)? {System.out.println($text);} ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+ ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n";
 
-   		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
-   								  "", false);
-   		assertEquals("\n", found);
-   		found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
-   								  "a", false);
-   		assertEquals("a\n", found);
-   	}
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
+								  "", false);
+		assertEquals("\n", found);
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
+								  "a", false);
+		assertEquals("a\n", found);
+	}
 
 	// force complex decision
 	@Test public void testAorAStar() throws Exception {
@@ -493,5 +493,26 @@ public class TestParserExec extends BaseTest {
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "prog", input, false);
 		assertEquals("", found);
 		assertNull(stderrDuringParse);
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#561 "Issue with parser
+	 * generation in 4.2.2"
+	 * https://github.com/antlr/antlr4/issues/561
+	 */
+	@Test public void testReferenceToATN() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : (ID|ATN)* ATN? {System.out.println($text);} ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"ATN : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') -> skip ;\n";
+
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
+								  "", false);
+		assertEquals("\n", found);
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
+								  "a 34 c", false);
+		assertEquals("a34c\n", found);
 	}
 }
