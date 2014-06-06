@@ -39,7 +39,7 @@ public class TestListeners extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"@header {import org.antlr.v4.runtime.tree.*;}\n"+
-			"@members {\n" +
+			"@parser::members {\n" +
 			"public static class LeafListener extends TBaseListener {\n" +
 			"    public void visitTerminal(TerminalNode node) {\n" +
 			"      System.out.println(node.getSymbol().getText());\n" +
@@ -70,7 +70,7 @@ public class TestListeners extends BaseTest {
 	@Test public void testTokenGetters() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"@members {\n" +
+			"@parser::members {\n" +
 			"public static class LeafListener extends TBaseListener {\n" +
 			"    public void exitA(TParser.AContext ctx) {\n" +
 			"      if (ctx.getChildCount()==2) System.out.printf(\"%s %s %s\",ctx.INT(0).getSymbol().getText(),ctx.INT(1).getSymbol().getText(),ctx.INT());\n" +
@@ -107,7 +107,7 @@ public class TestListeners extends BaseTest {
 	@Test public void testRuleGetters() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"@members {\n" +
+			"@parser::members {\n" +
 			"public static class LeafListener extends TBaseListener {\n" +
 			"    public void exitA(TParser.AContext ctx) {\n" +
 			"      if (ctx.getChildCount()==2) {\n" +
@@ -147,7 +147,7 @@ public class TestListeners extends BaseTest {
 	@Test public void testLR() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"@members {\n" +
+			"@parser::members {\n" +
 			"public static class LeafListener extends TBaseListener {\n" +
 			"    public void exitE(TParser.EContext ctx) {\n" +
 			"      if (ctx.getChildCount()==3) {\n" +
@@ -188,7 +188,7 @@ public class TestListeners extends BaseTest {
 	@Test public void testLRWithLabels() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"@members {\n" +
+			"@parser::members {\n" +
 			"  public static class LeafListener extends TBaseListener {\n" +
 			"    public void exitCall(TParser.CallContext ctx) {\n" +
 			"      System.out.printf(\"%s %s\",ctx.e().start.getText(),\n" +

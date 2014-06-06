@@ -62,7 +62,7 @@ public class TestFullContextParsing extends BaseTest {
 					 this.stderrDuringParse);
 	}
 
-	public String testCtxSensitiveDFA(String input) {
+	@Test public void testCtxSensitiveDFA() {
 		String grammar =
 			"grammar T;\n"+
 			"s @after {dumpDFA();}\n" +
@@ -73,12 +73,8 @@ public class TestFullContextParsing extends BaseTest {
 			"ID : 'a'..'z'+ ;\n"+
 			"INT : '0'..'9'+ ;\n"+
 			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "s", input, true);
-	}
-	
-	@Test
-	public void  testCtxSensitiveDFA1() {
-		String result = testCtxSensitiveDFA("$ 34 abc");
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
+								   "$ 34 abc", true);
 		String expecting =
 			"Decision 1:\n" +
 			"s0-INT->s1\n" +
@@ -87,12 +83,10 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("line 1:5 reportAttemptingFullContext d=1 (e), input='34abc'\n" +
 					 "line 1:2 reportContextSensitivity d=1 (e), input='34'\n",
 					 this.stderrDuringParse);
-	}
-	
-	@Test
-	public void  testCtxSensitiveDFA2() {
-		String result = testCtxSensitiveDFA("@ 34 abc");
-		String expecting =
+
+		result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
+							"@ 34 abc", true);
+		expecting =
 			"Decision 1:\n" +
 			"s0-INT->s1\n" +
 			"s1-ID->:s2^=>1\n";
