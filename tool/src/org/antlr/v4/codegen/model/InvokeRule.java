@@ -47,7 +47,6 @@ import org.antlr.v4.tool.ast.GrammarAST;
 import java.util.List;
 
 /** */
-@SuppressWarnings("unused")
 public class InvokeRule extends RuleElement implements LabeledOp {
 	public String name;
 	public OrderedHashSet<Decl> labels = new OrderedHashSet<Decl>(); // TODO: should need just 1
