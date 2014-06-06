@@ -49,7 +49,7 @@ public class TestSemPredEvalParser extends BaseTest {
 				"INT : '0'..'9'+;\n" +
 				"WS : (' '|'\\n') -> skip ;\n";
 
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
+		/*String found = */execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x", false);
 
 		String expecting = "line 1:0 no viable alternative at input 'x'\n";
@@ -327,7 +327,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		// can't see preds, resolves to first alt found (1 in this case)
 		String grammar =
 			"grammar T;\n" +
-			"@members {int i;}\n" +
+			"@parser::members {int i;}\n" +
 			"s : a+ ;\n" +
 			"a : {i=1;} ID {i==1}? {System.out.println(\"alt 1\");}\n" +
 			"  | {i=2;} ID {i==2}? {System.out.println(\"alt 2\");}\n" +
@@ -353,7 +353,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test public void testToLeftWithVaryingPredicate() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"@members {int i=0;}\n" +
+			"@parser::members {int i=0;}\n" +
 			"s : ({i++; System.out.println(\"i=\"+i);} a)+ ;\n" +
 			"a : {i % 2 == 0}? ID {System.out.println(\"alt 1\");}\n" +
 			"  | {i % 2 != 0}? ID {System.out.println(\"alt 2\");}\n" +
@@ -383,7 +383,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test public void testPredicateDependentOnArg() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"@members {int i=0;}\n" +
+			"@parser::members {int i=0;}\n" +
 			"s : a[2] a[1];\n" +
 			"a[int i]" +
 			"  : {$i==1}? ID {System.out.println(\"alt 1\");}\n" +
@@ -477,7 +477,7 @@ public class TestSemPredEvalParser extends BaseTest {
     @Test public void testPredsInGlobalFOLLOW() throws Exception {
         String grammar =
         "grammar T;\n" +
-        "@members {" +
+        "@parser::members {" +
         "void f(Object s) {System.out.println(s);}\n" +
         "boolean p(boolean v) {System.out.println(\"eval=\"+v); return v;}\n" +
         "}\n" +
@@ -502,7 +502,7 @@ public class TestSemPredEvalParser extends BaseTest {
    	@Test public void testDepedentPredsInGlobalFOLLOW() throws Exception {
    		String grammar =
    			"grammar T;\n" +
-   			"@members {" +
+   			"@parser::members {" +
    			"void f(Object s) {System.out.println(s);}\n" +
    			"boolean p(boolean v) {System.out.println(\"eval=\"+v); return v;}\n" +
    			"}\n" +
@@ -530,7 +530,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test public void testActionsHidePredsInGlobalFOLLOW() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"@members {" +
+			"@parser::members {" +
 			"void f(Object s) {System.out.println(s);}\n" +
 			"boolean p(boolean v) {System.out.println(\"eval=\"+v); return v;}\n" +
 			"}\n" +
@@ -553,7 +553,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"\n" +
-			"@members {boolean enumKeyword = true;}\n" +
+			"@parser::members {boolean enumKeyword = true;}\n" +
 			"\n" +
 			"primary\n" +
 			"    :   ID                       {System.out.println(\"ID \"+$ID.text);}\n" +
