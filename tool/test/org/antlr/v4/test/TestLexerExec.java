@@ -224,8 +224,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(stderrDuringParse);
 	}
 
-	@Test 
-	public void testRecursiveLexerRuleRefWithWildcardStar1() throws Exception {
+	@Test public void testRecursiveLexerRuleRefWithWildcardStar() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
 			"CMT : '/*' (CMT | .)*? '*/' ;\n" +
@@ -246,24 +245,14 @@ public class TestLexerExec extends BaseTest {
 						  "/* /*nested*/ */\n");
 		assertEquals(expecting, found);
 		assertNull(stderrDuringParse);
-	}
-	
-	@Test 
-	public void testRecursiveLexerRuleRefWithWildcardStar2() throws Exception {
-		String grammar =
-			"lexer grammar L;\n"+
-			"CMT : '/*' (CMT | .)*? '*/' ;\n" +
-			"WS : (' '|'\\n')+ ;\n"
-			/*+ "ANY : .;"*/;
-
 		// stuff on end of comment doesn't match another rule
-		String expecting =
+		expecting =
 			"[@0,0:8='/* ick */',<1>,1:0]\n" +
 			"[@1,10:10='\\n',<2>,1:10]\n" +
 			"[@2,11:36='/* /* */x\\n/* /*nested*/ */',<1>,2:0]\n" +
 			"[@3,38:38='\\n',<2>,3:17]\n" +
 			"[@4,39:38='<EOF>',<-1>,4:18]\n";
-		String found = execLexer("L.g4", grammar, "L",
+		found = execLexer("L.g4", grammar, "L",
 						  "/* ick */x\n" +
 						  "/* /* */x\n" +
 						  "/* /*nested*/ */x\n");
@@ -273,8 +262,7 @@ public class TestLexerExec extends BaseTest {
 			"line 3:16 token recognition error at: 'x'\n", stderrDuringParse);
 	}
 
-	@Test 
-	public void testRecursiveLexerRuleRefWithWildcardPlus1() throws Exception {
+	@Test public void testRecursiveLexerRuleRefWithWildcardPlus() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
 			"CMT : '/*' (CMT | .)+? '*/' ;\n" +
@@ -295,24 +283,14 @@ public class TestLexerExec extends BaseTest {
 						  "/* /*nested*/ */\n");
 		assertEquals(expecting, found);
 		assertNull(stderrDuringParse);
-	}
-	
-	@Test 
-	public void testRecursiveLexerRuleRefWithWildcardPlus2() throws Exception {
-		String grammar =
-			"lexer grammar L;\n"+
-			"CMT : '/*' (CMT | .)+? '*/' ;\n" +
-			"WS : (' '|'\\n')+ ;\n"
-			/*+ "ANY : .;"*/;
-
 		// stuff on end of comment doesn't match another rule
-		String expecting =
+		expecting =
 			"[@0,0:8='/* ick */',<1>,1:0]\n" +
 			"[@1,10:10='\\n',<2>,1:10]\n" +
 			"[@2,11:36='/* /* */x\\n/* /*nested*/ */',<1>,2:0]\n" +
 			"[@3,38:38='\\n',<2>,3:17]\n" +
 			"[@4,39:38='<EOF>',<-1>,4:18]\n";
-		String found = execLexer("L.g4", grammar, "L",
+		found = execLexer("L.g4", grammar, "L",
 						  "/* ick */x\n" +
 						  "/* /* */x\n" +
 						  "/* /*nested*/ */x\n");
