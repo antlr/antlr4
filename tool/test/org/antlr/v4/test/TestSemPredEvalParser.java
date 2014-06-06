@@ -49,7 +49,7 @@ public class TestSemPredEvalParser extends BaseTest {
 				"INT : '0'..'9'+;\n" +
 				"WS : (' '|'\\n') -> skip ;\n";
 
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
+		/*String found = */execParser("T.g4", grammar, "TParser", "TLexer", "s",
 								  "x", false);
 
 		String expecting = "line 1:0 no viable alternative at input 'x'\n";
