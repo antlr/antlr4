@@ -30,12 +30,86 @@
 package org.antlr.v4.py3.test;
 
 import org.antlr.v4.py.test.BasePythonTest;
+import org.stringtemplate.v4.ST;
 
 public abstract class BasePython3Test extends BasePythonTest {
 
 	@Override
-	protected String getPropertyPrefix() {
-		return "antlr-python3";
+	protected String getLanguage() {
+		return "Python3";
 	}
 
+	@Override
+	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
+		ST outputFileST = new ST(
+				"import sys\n"
+						+ "from antlr4 import *\n"
+						+ "from <lexerName> import <lexerName>\n"
+						+ "\n"
+						+ "def main(argv):\n"
+						+ "    input = FileStream(argv[1])\n"
+						+ "    lexer = <lexerName>(input)\n"
+						+ "    stream = CommonTokenStream(lexer)\n"
+						+ "    stream.fill()\n"
+						+ "    [ print(str(t)) for t in stream.tokens ]\n"
+						+ (showDFA ? "    print(lexer._interp.decisionToDFA[Lexer.DEFAULT_MODE].toLexerString(), end='')\n"
+								: "") + "\n" + "if __name__ == '__main__':\n"
+						+ "    main(sys.argv)\n" + "\n");
+		outputFileST.add("lexerName", lexerName);
+		writeFile(tmpdir, "Test.py", outputFileST.render());
+	}
+
+	@Override
+	protected void writeParserTestFile(String parserName, String lexerName,
+			String listenerName, String visitorName,
+			String parserStartRuleName, boolean debug) {
+		ST outputFileST = new ST(
+				"import sys\n"
+						+ "from antlr4 import *\n"
+						+ "from <lexerName> import <lexerName>\n"
+						+ "from <parserName> import <parserName>\n"
+						+ "from <listenerName> import <listenerName>\n"
+						+ "from <visitorName> import <visitorName>\n"
+						+ "\n"
+						+ "class TreeShapeListener(ParseTreeListener):\n"
+						+ "\n"
+						+ "    def visitTerminal(self, node:TerminalNode):\n"
+						+ "        pass\n"
+						+ "\n"
+						+ "    def visitErrorNode(self, node:ErrorNode):\n"
+						+ "        pass\n"
+						+ "\n"
+						+ "    def exitEveryRule(self, ctx:ParserRuleContext):\n"
+						+ "        pass\n"
+						+ "\n"
+						+ "    def enterEveryRule(self, ctx:ParserRuleContext):\n"
+						+ "        for child in ctx.getChildren():\n"
+						+ "            parent = child.parentCtx\n"
+						+ "            if not isinstance(parent, RuleNode) or parent.getRuleContext() != ctx:\n"
+						+ "                raise IllegalStateException(\"Invalid parse tree shape detected.\")\n"
+						+ "\n"
+						+ "def main(argv):\n"
+						+ "    input = FileStream(argv[1])\n"
+						+ "    lexer = <lexerName>(input)\n"
+						+ "    stream = CommonTokenStream(lexer)\n"
+						+ "<createParser>"
+						+ "    parser.buildParseTrees = True\n"
+						+ "    tree = parser.<parserStartRuleName>()\n"
+						+ "    ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree)\n"
+						+ "\n" + "if __name__ == '__main__':\n"
+						+ "    main(sys.argv)\n" + "\n");
+		ST createParserST = new ST("    parser = <parserName>(stream)\n");
+		if (debug) {
+			createParserST = new ST(
+					"    parser = <parserName>(stream)\n"
+							+ "    parser.addErrorListener(DiagnosticErrorListener())\n");
+		}
+		outputFileST.add("createParser", createParserST);
+		outputFileST.add("parserName", parserName);
+		outputFileST.add("lexerName", lexerName);
+		outputFileST.add("listenerName", listenerName);
+		outputFileST.add("visitorName", visitorName);
+		outputFileST.add("parserStartRuleName", parserStartRuleName);
+		writeFile(tmpdir, "Test.py", outputFileST.render());
+	}
 }

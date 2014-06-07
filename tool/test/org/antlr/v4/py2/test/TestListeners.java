@@ -38,7 +38,7 @@ public class TestListeners extends BasePython2Test {
 	@Test public void testBasic() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-		    "@members {\n" +
+		    "@parser::members {\n" +
 			"class LeafListener(TListener):\n" +
 			"    def visitTerminal(self, node):\n" +
 			"        print(node.symbol.text)\n" +
@@ -69,7 +69,7 @@ public class TestListeners extends BasePython2Test {
 	public String testTokenGetters(String input) throws Exception {
 		String grammar =
 			"grammar T;\n" +
-		    "@members {\n" +
+		    "@parser::members {\n" +
 			"class LeafListener(TListener):\n" +
 			"    def exitA(self, ctx):\n" +
 			"        if ctx.getChildCount()==2:\n" +
@@ -115,7 +115,7 @@ public class TestListeners extends BasePython2Test {
 	@Test public void testRuleGetters() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-		    "@members {\n" +
+		    "@parser::members {\n" +
 			"class LeafListener(TListener):\n" +
 			"    def exitA(self, ctx):\n" +
 			"        if ctx.getChildCount()==2:\n" +
@@ -153,7 +153,7 @@ public class TestListeners extends BasePython2Test {
 	@Test public void testLR() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-		    "@members {\n" +
+		    "@parser::members {\n" +
 			"class LeafListener(TListener):\n" +
 			"    def exitE(self, ctx):\n" +
 			"        if ctx.getChildCount()==3:\n" +
@@ -190,7 +190,7 @@ public class TestListeners extends BasePython2Test {
 	@Test public void testLRWithLabels() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-		    "@members {\n" +
+		    "@parser::members {\n" +
 			"class LeafListener(TListener):\n" +
 			"    def exitCall(self, ctx):\n" +
 			"        print(ctx.e().start.text + ' ' + str(ctx.eList()))\n" +
