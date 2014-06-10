@@ -35,6 +35,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /** Test parser execution.
  *
@@ -526,5 +527,44 @@ public class TestParserExec extends BaseTest {
 		String found = execParser("Psl.g4", grammar, "PslParser", "PslLexer", "floating_constant", " . 234", false);
 		assertEquals("", found);
 		assertEquals("line 1:6 rule floating_constant DEC:A floating-point constant cannot have internal white space\n", stderrDuringParse);
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#563 "Inconsistent token
+	 * handling in ANTLR4".
+	 * https://github.com/antlr/antlr4/issues/563
+	 */
+	@Test public void testAlternateQuotes() throws Exception {
+		String lexerGrammar =
+			"lexer grammar ModeTagsLexer;\n" +
+			"\n" +
+			"// Default mode rules (the SEA)\n" +
+			"OPEN  : '«'     -> mode(ISLAND) ;       // switch to ISLAND mode\n" +
+			"TEXT  : ~'«'+ ;                         // clump all text together\n" +
+			"\n" +
+			"mode ISLAND;\n" +
+			"CLOSE : '»'     -> mode(DEFAULT_MODE) ; // back to SEA mode \n" +
+			"SLASH : '/' ;\n" +
+			"ID    : [a-zA-Z]+ ;                     // match/send ID in tag to parser\n";
+		String parserGrammar =
+			"parser grammar ModeTagsParser;\n" +
+			"\n" +
+			"options { tokenVocab=ModeTagsLexer; } // use tokens from ModeTagsLexer.g4\n" +
+			"\n" +
+			"file: (tag | TEXT)* ;\n" +
+			"\n" +
+			"tag : '«' ID '»'\n" +
+			"    | '«' '/' ID '»'\n" +
+			"    ;";
+
+		boolean success = rawGenerateAndBuildRecognizer("ModeTagsLexer.g4",
+														lexerGrammar,
+														null,
+														"ModeTagsLexer");
+		assertTrue(success);
+
+		String found = execParser("ModeTagsParser.g4", parserGrammar, "ModeTagsParser", "ModeTagsLexer", "file", "", false);
+		assertEquals("", found);
+		assertNull(stderrDuringParse);
 	}
 }

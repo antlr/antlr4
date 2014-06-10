@@ -604,7 +604,7 @@ public class Tool {
 			return null;
 		}
 
-		ANTLRFileStream in = new ANTLRFileStream(importedFile.getAbsolutePath());
+		ANTLRFileStream in = new ANTLRFileStream(importedFile.getAbsolutePath(), grammarEncoding);
 		GrammarRootAST root = parse(g.fileName, in);
 		Grammar imported = createGrammar(root);
 		imported.fileName = importedFile.getAbsolutePath();

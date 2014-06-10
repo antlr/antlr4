@@ -83,10 +83,11 @@ import javax.tools.ToolProvider;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
@@ -452,6 +453,8 @@ public abstract class BaseTest {
 		options.add(tmpdir);
 		options.add("-lib");
 		options.add(tmpdir);
+		options.add("-encoding");
+		options.add("UTF-8");
 		options.add(new File(tmpdir,grammarFileName).toString());
 
 		final String[] optionsA = new String[options.size()];
@@ -1025,7 +1028,8 @@ public abstract class BaseTest {
 	public static void writeFile(String dir, String fileName, String content) {
 		try {
 			File f = new File(dir, fileName);
-			FileWriter w = new FileWriter(f);
+			FileOutputStream outputStream = new FileOutputStream(f);
+			OutputStreamWriter w = new OutputStreamWriter(outputStream, "UTF-8");
 			BufferedWriter bw = new BufferedWriter(w);
 			bw.write(content);
 			bw.close();
