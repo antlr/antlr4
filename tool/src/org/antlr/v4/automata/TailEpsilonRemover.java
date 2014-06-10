@@ -32,8 +32,8 @@ package org.antlr.v4.automata;
 
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.ActionTransition;
 import org.antlr.v4.runtime.atn.BlockEndState;
+import org.antlr.v4.runtime.atn.EpsilonTransition;
 import org.antlr.v4.runtime.atn.PlusLoopbackState;
 import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.atn.StarLoopbackState;
@@ -64,7 +64,7 @@ public class TailEpsilonRemover extends ATNVisitor {
 				// if edge out of q is single epsilon to block end
 				// we can strip epsilon p-x->q-eps->r
 				Transition trans = q.transition(0);
-				if (q.getNumberOfTransitions() == 1 && trans.isEpsilon() && !(trans instanceof ActionTransition)) {
+				if (q.getNumberOfTransitions() == 1 && trans instanceof EpsilonTransition) {
 					ATNState r = trans.target;
 					if (r instanceof BlockEndState || r instanceof PlusLoopbackState || r instanceof StarLoopbackState) {
 						// skip over q
