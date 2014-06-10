@@ -37,6 +37,7 @@
 var Token = require('./Token').Token;
 var Recognizer = require('./Recognizer').Recognizer;
 var CommonTokenFactory = require('./CommonTokenFactory').CommonTokenFactory;
+var LexerNoViableAltException = require('./error/Errors').LexerNoViableAltException;
 
 function TokenSource() {
 	return this;

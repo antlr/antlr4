@@ -41,6 +41,7 @@
 
 var Token = require('./Token').Token;
 var Lexer = require('./Lexer').Lexer;
+var Interval = require('./IntervalSet').Interval;
 
 // this is just to keep meaningful parameter types to Parser
 function TokenStream() {

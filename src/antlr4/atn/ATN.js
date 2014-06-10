@@ -131,6 +131,7 @@ ATN.prototype.getDecisionState = function( decision) {
 // specified state in the specified context.
 // @throws IllegalArgumentException if the ATN does not contain a state with
 // number {@code stateNumber}
+var Token = require('./../Token').Token;
 
 ATN.prototype.getExpectedTokens = function( stateNumber, ctx ) {
     if ( stateNumber < 0 || stateNumber >= this.states.length ) {
@@ -144,11 +145,11 @@ ATN.prototype.getExpectedTokens = function( stateNumber, ctx ) {
     var expected = new IntervalSet();
     expected.addSet(following);
     expected.remove(Token.EPSILON);
-    while (ctx != None && ctx.invokingState >= 0 && Token.EPSILON in following) {
+    while (ctx !== null && ctx.invokingState >= 0 && Token.EPSILON in following) {
         var invokingState = this.states[ctx.invokingState];
         var rt = invokingState.transitions[0];
         following = this.nextTokens(rt.followState);
-        expected.addSet(following);;
+        expected.addSet(following);
         expected.remove(Token.EPSILON);
         ctx = ctx.parentCtx;
     }

@@ -47,13 +47,19 @@ var PlusBlockStartState = ATNStates.PlusBlockStartState;
 var Transitions = require('./Transition');
 var Transition = Transitions.Transition;
 var AtomTransition = Transitions.AtomTransition;
+var SetTransition = Transitions.SetTransition;
 var RuleTransition = Transitions.RuleTransition;
+var ActionTransition = Transitions.ActionTransition;
 var EpsilonTransition = Transitions.EpsilonTransition;
-
+var IntervalSet = require('./../IntervalSet').IntervalSet;
+var Interval = require('./../IntervalSet').Interval;
 var ATNDeserializationOptions = require('./ATNDeserializationOptions').ATNDeserializationOptions;
+var LexerActions = require('./LexerAction');
+var LexerActionType = LexerActions.LexerActionType;
+var LexerSkipAction = LexerActions.LexerSkipAction;
 
 // This is the earliest supported serialized UUID.
-// stick to serialzed version for now, we don't need a UUID instance
+// stick to serialized version for now, we don't need a UUID instance
 var BASE_SERIALIZED_UUID = "AADB8D7E-AEEF-4415-AD2B-8204D6CF042E";
 
 // This list contains all of the currently supported UUIDs, ordered by when
@@ -259,7 +265,7 @@ ATNDeserializer.prototype.readSets = function(atn) {
         if (containsEof!==0) {
             iset.addOne(-1);
         }
-        for (var j; j<n; j++) {
+        for (var j=0; j<n; j++) {
             var i1 = this.readInt();
             var i2 = this.readInt();
             iset.addRange(new Interval(i1, i2 + 1)); // range upper limit is

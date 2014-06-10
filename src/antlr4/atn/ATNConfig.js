@@ -117,11 +117,10 @@ ATNConfig.prototype.toString = function() {
 
 function LexerATNConfig(params, config) {
 	ATNConfig.call(this, params, config);
-    if(params.lexerActionExecutor===undefined) {
-        params.lexerActionExecutor = config!==null ? config.lexerActionExecutor : null;
-    }
+    
     // This is the backing field for {@link //getLexerActionExecutor}.
-    this.lexerActionExecutor = params.lexerActionExecutor;
+	var lexerActionExecutor = params.lexerActionExecutor || null;
+    this.lexerActionExecutor = lexerActionExecutor || (config!==null ? config.lexerActionExecutor : null);
     this.passedThroughNonGreedyDecision = config!==null ? this.checkNonGreedyDecision(config, this.state) : false;
     return this;
 }

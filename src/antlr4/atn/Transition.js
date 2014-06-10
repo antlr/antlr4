@@ -40,6 +40,8 @@
 //  the states. We'll use the term Edge for the DFA to distinguish them from
 //  ATN transitions.</p>
 
+var Token = require('./../Token').Token;
+var Interval = require('./../IntervalSet').Interval;
 var IntervalSet = require('./../IntervalSet').IntervalSet;
 
 function Transition (target) {
@@ -254,12 +256,12 @@ SetTransition.prototype = Object.create(Transition.prototype);
 SetTransition.prototype.constructor = SetTransition;
 
 SetTransition.prototype.matches = function(symbol, minVocabSymbol,  maxVocabSymbol) {
-	return this.label.indexOf(symbol)>=0;
+	return this.label.contains(symbol);
 };
         
 
 SetTransition.prototype.toString = function() {
-	return this.label;
+	return this.label.toString();
 };
 
 function NotSetTransition(target, set) {
@@ -323,5 +325,7 @@ PrecedencePredicateTransition.prototype.toString = function() {
         
 exports.Transition = Transition;
 exports.AtomTransition = AtomTransition;
+exports.SetTransition = SetTransition;
 exports.RuleTransition = RuleTransition;
+exports.ActionTransition = ActionTransition;
 exports.EpsilonTransition = EpsilonTransition;

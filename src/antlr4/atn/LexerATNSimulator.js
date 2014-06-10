@@ -57,6 +57,8 @@ var SingletonPredictionContext = require('./../PredictionContext').SingletonPred
 var RuleStopState = require('./ATNState').RuleStopState;
 var LexerATNConfig = require('./ATNConfig').LexerATNConfig;
 var Transition = require('./Transition').Transition;
+var LexerActionExecutor = require('./LexerActionExecutor').LexerActionExecutor;
+var LexerNoViableAltException = require('./../error/Errors').LexerNoViableAltException;
 
 function resetSimState(sim) {
 	sim.index = -1;
@@ -233,6 +235,9 @@ LexerATNSimulator.prototype.getExistingTargetState = function(s, t) {
 	}
 
 	var target = s.edges[t - LexerATNSimulator.MIN_DFA_EDGE];
+	if(target===undefined) {
+		target = null;
+	}
 	if (this.debug && target !== null) {
 		console.log("reuse state " + s.stateNumber + " edge to " + target.stateNumber);
 	}

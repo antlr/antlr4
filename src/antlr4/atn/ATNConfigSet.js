@@ -246,14 +246,11 @@ ATNConfigSet.prototype.setReadonly = function(readonly) {
 };
 
 ATNConfigSet.prototype.toString = function() {
-	return this.configs.toString()
-			+ (this.hasSemanticContext ? ",hasSemanticContext="
-					+ this.hasSemanticContext : "")
-			+ (this.uniqueAlt !== ATN.INVALID_ALT_NUMBER ? ",uniqueAlt="
-					+ this.uniqueAlt : "")
-			+ (this.conflictingAlts !== null ? ",conflictingAlts="
-					+ this.conflictingAlts : "")
-			+ (this.dipsIntoOuterContext ? ",dipsIntoOuterContext" : "");
+	return this.configs.toString() +
+		(this.hasSemanticContext ? ",hasSemanticContext=" + this.hasSemanticContext : "") +
+		(this.uniqueAlt !== ATN.INVALID_ALT_NUMBER ? ",uniqueAlt=" + this.uniqueAlt : "") +
+		(this.conflictingAlts !== null ? ",conflictingAlts=" + this.conflictingAlts : "") +
+		(this.dipsIntoOuterContext ? ",dipsIntoOuterContext" : "");
 };
 
 function OrderedATNConfigSet() {
