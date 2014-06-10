@@ -59,7 +59,7 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 	 *  an ambiguity, it is not treated as a context sensitivity because LL prediction
 	 *  was not required in order to produce a correct prediction for this decision and input sequence.
 	 *  It may in fact still be a context sensitivity but we don't know by looking at the
-	 *  minimum alternatives.
+	 *  minimum alternatives for the current input.
  	 */
 	protected int conflictingAltResolvedBySLL;
 
@@ -211,9 +211,17 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 	}
 
 	@Override
-	protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex, boolean exact, @Nullable BitSet ambigAlts, @NotNull ATNConfigSet configs) {
-		int prediction = configs.getAlts().nextSetBit(0);
-		if ( prediction != conflictingAltResolvedBySLL ) {
+	protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex, boolean exact,
+								   @Nullable BitSet ambigAlts, @NotNull ATNConfigSet configs)
+	{
+		int prediction;
+		if ( ambigAlts!=null ) {
+			prediction = ambigAlts.nextSetBit(0);
+		}
+		else {
+			prediction = configs.getAlts().nextSetBit(0);
+		}
+		if ( configs.fullCtx && prediction != conflictingAltResolvedBySLL ) {
 			// Even though this is an ambiguity we are reporting, we can
 			// still detect some context sensitivities.  Both SLL and LL
 			// are showing a conflict, hence an ambiguity, but if they resolve
