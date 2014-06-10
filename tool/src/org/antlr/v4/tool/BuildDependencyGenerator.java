@@ -31,7 +31,6 @@ package org.antlr.v4.tool;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -252,7 +251,7 @@ public class BuildDependencyGenerator {
     public void loadDependencyTemplates() {
         if (templates != null) return;
         String fileName = "org/antlr/v4/tool/templates/depend.stg";
-        templates = new STGroupFile(fileName);
+        templates = new STGroupFile(fileName, "UTF-8");
     }
 
     public CodeGenerator getGenerator() {
