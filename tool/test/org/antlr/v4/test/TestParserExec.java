@@ -515,4 +515,16 @@ public class TestParserExec extends BaseTest {
 								  "a 34 c", false);
 		assertEquals("a34c\n", found);
 	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#588 "ClassCastException during
+	 * semantic predicate handling".
+	 * https://github.com/antlr/antlr4/issues/588
+	 */
+	@Test public void testFailedPredicateExceptionState() throws Exception {
+		String grammar = load("Psl.g4", "UTF-8");
+		String found = execParser("Psl.g4", grammar, "PslParser", "PslLexer", "floating_constant", " . 234", false);
+		assertEquals("", found);
+		assertEquals("line 1:6 rule floating_constant DEC:A floating-point constant cannot have internal white space\n", stderrDuringParse);
+	}
 }

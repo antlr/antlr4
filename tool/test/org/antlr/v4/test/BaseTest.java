@@ -335,6 +335,33 @@ public abstract class BaseTest {
 		return null;
 	}
 
+	protected String load(String fileName, @Nullable String encoding)
+		throws IOException
+	{
+		if ( fileName==null ) {
+			return null;
+		}
+
+		String fullFileName = getClass().getPackage().getName().replace('.', '/') + '/' + fileName;
+		int size = 65000;
+		InputStreamReader isr;
+		InputStream fis = getClass().getClassLoader().getResourceAsStream(fullFileName);
+		if ( encoding!=null ) {
+			isr = new InputStreamReader(fis, encoding);
+		}
+		else {
+			isr = new InputStreamReader(fis);
+		}
+		try {
+			char[] data = new char[size];
+			int n = isr.read(data);
+			return new String(data, 0, n);
+		}
+		finally {
+			isr.close();
+		}
+	}
+
 	/** Wow! much faster than compiling outside of VM. Finicky though.
 	 *  Had rules called r and modulo. Wouldn't compile til I changed to 'a'.
 	 */

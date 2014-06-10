@@ -657,31 +657,4 @@ public class TestLexerExec extends BaseTest {
 			"[@1,5:4='<EOF>',<-1>,1:5]\n";
 		assertEquals(expecting, found);
 	}
-
-	protected String load(String fileName, @Nullable String encoding)
-		throws IOException
-	{
-		if ( fileName==null ) {
-			return null;
-		}
-
-		String fullFileName = getClass().getPackage().getName().replace('.', '/') + '/' + fileName;
-		int size = 65000;
-		InputStreamReader isr;
-		InputStream fis = getClass().getClassLoader().getResourceAsStream(fullFileName);
-		if ( encoding!=null ) {
-			isr = new InputStreamReader(fis, encoding);
-		}
-		else {
-			isr = new InputStreamReader(fis);
-		}
-		try {
-			char[] data = new char[size];
-			int n = isr.read(data);
-			return new String(data, 0, n);
-		}
-		finally {
-			isr.close();
-		}
-	}
 }
