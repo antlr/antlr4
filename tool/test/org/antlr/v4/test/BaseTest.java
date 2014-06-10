@@ -1025,6 +1025,7 @@ public abstract class BaseTest {
 			"import org.antlr.v4.runtime.*;\n" +
 			"import org.antlr.v4.runtime.tree.*;\n" +
 			"import org.antlr.v4.runtime.atn.*;\n" +
+			"import java.util.Arrays;\n"+
 			"\n" +
 			"public class Test {\n" +
 			"    public static void main(String[] args) throws Exception {\n" +
@@ -1035,7 +1036,7 @@ public abstract class BaseTest {
 			"		 parser.setBuildParseTree(true);\n" +
 			"		 <profile>\n"+
 			"        ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
-			"		 <if(profile)>profiler.dump();<endif>\n" +
+			"		 <if(profile)>System.out.println(Arrays.toString(profiler.getDecisionInfo()));<endif>\n" +
 			"        ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
 			"    }\n" +
 			"\n" +
