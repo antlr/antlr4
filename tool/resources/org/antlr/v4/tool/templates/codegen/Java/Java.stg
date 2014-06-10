@@ -76,12 +76,22 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 public interface <file.grammarName>Listener extends ParseTreeListener {
 	<file.listenerNames:{lname |
 /**
+<if(file.listenerLabelRuleNames.(lname))>
+ * Enter a parse tree produced by the {@code <lname>\}
+ * labeled alternative in {@link <file.parserName>#<file.listenerLabelRuleNames.(lname)>\}.
+<else>
  * Enter a parse tree produced by {@link <file.parserName>#<lname>\}.
+<endif>
  * @param ctx the parse tree
  */
 void enter<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx);
 /**
+<if(file.listenerLabelRuleNames.(lname))>
+ * Exit a parse tree produced by the {@code <lname>\}
+ * labeled alternative in {@link <file.parserName>#<file.listenerLabelRuleNames.(lname)>\}.
+<else>
  * Exit a parse tree produced by {@link <file.parserName>#<lname>\}.
+<endif>
  * @param ctx the parse tree
  */
 void exit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
@@ -166,7 +176,12 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 public interface <file.grammarName>Visitor\<T> extends ParseTreeVisitor\<T> {
 	<file.visitorNames:{lname |
 /**
+<if(file.visitorLabelRuleNames.(lname))>
+ * Visit a parse tree produced by the {@code <lname>\}
+ * labeled alternative in {@link <file.parserName>#<file.visitorLabelRuleNames.(lname)>\}.
+<else>
  * Visit a parse tree produced by {@link <file.parserName>#<lname>\}.
+<endif>
  * @param ctx the parse tree
  * @return the visitor result
  */
