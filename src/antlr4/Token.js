@@ -159,8 +159,7 @@ Object.defineProperty(CommonToken.prototype, "text", {
 CommonToken.prototype.toString = function() {
 	var txt = this.text;
 	if (txt !== null) {
-		txt = txt.replace("\n", "\\n").replace("\r", "\\r")
-				.replace("\t", "\\t");
+		txt = txt.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t");
 	} else {
 		txt = "<no text>";
 	}

@@ -138,8 +138,7 @@ function SingletonPredictionContext(parent, returnState) {
 	this.returnState = returnState;
 }
 
-SingletonPredictionContext.prototype = Object
-		.create(PredictionContext.prototype);
+SingletonPredictionContext.prototype = Object.create(PredictionContext.prototype);
 SingletonPredictionContext.prototype.contructor = SingletonPredictionContext;
 
 SingletonPredictionContext.create = function(parent, returnState) {
@@ -746,3 +745,4 @@ function getAllContextNodes(context, nodes, visited) {
 exports.merge = merge;
 exports.PredictionContext = PredictionContext;
 exports.PredictionContextCache = PredictionContextCache;
+exports.SingletonPredictionContext = SingletonPredictionContext;

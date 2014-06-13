@@ -247,7 +247,7 @@ function SetTransition(target, set) {
         this.label = set;
     } else {
         this.label = new IntervalSet();
-        this.label.addRange(new Interval(Token.INVALID_TYPE, Token.INVALID_TYPE + 1));
+        this.label.addOne(Token.INVALID_TYPE);
     }
     return this;
 }
@@ -265,7 +265,7 @@ SetTransition.prototype.toString = function() {
 };
 
 function NotSetTransition(target, set) {
-	SetTransition.call(this, target);
+	SetTransition.call(this, target, set);
 	this.serializationType = Transition.NOT_SET;
 	return this;
 }
@@ -275,11 +275,11 @@ NotSetTransition.prototype.constructor = NotSetTransition;
 
 NotSetTransition.prototype.matches = function(symbol, minVocabSymbol,  maxVocabSymbol) {
 	return symbol >= minVocabSymbol && symbol <= maxVocabSymbol &&
-			SetTransition.matches.call(this, symbol, minVocabSymbol, maxVocabSymbol);
+			!SetTransition.prototype.matches.call(this, symbol, minVocabSymbol, maxVocabSymbol);
 };
 
 NotSetTransition.prototype.toString = function() {
-	return '~' + SetTransition.toString.call(this);
+	return '~' + SetTransition.prototype.toString.call(this);
 };
 
 function WildcardTransition(target) {
@@ -326,6 +326,10 @@ PrecedencePredicateTransition.prototype.toString = function() {
 exports.Transition = Transition;
 exports.AtomTransition = AtomTransition;
 exports.SetTransition = SetTransition;
+exports.NotSetTransition = NotSetTransition;
 exports.RuleTransition = RuleTransition;
 exports.ActionTransition = ActionTransition;
 exports.EpsilonTransition = EpsilonTransition;
+exports.RangeTransition = RangeTransition;
+exports.WildcardTransition = WildcardTransition;
+exports.PredicateTransition = PredicateTransition;

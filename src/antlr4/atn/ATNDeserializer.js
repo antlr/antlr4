@@ -44,20 +44,31 @@ var PlusLoopbackState = ATNStates.PlusLoopbackState;
 var StarLoopbackState = ATNStates.StarLoopbackState;
 var StarLoopEntryState = ATNStates.StarLoopEntryState;
 var PlusBlockStartState = ATNStates.PlusBlockStartState;
+var StarBlockStartState = ATNStates.StarBlockStartState;
+var BasicBlockStartState = ATNStates.BasicBlockStartState;
 var Transitions = require('./Transition');
 var Transition = Transitions.Transition;
 var AtomTransition = Transitions.AtomTransition;
 var SetTransition = Transitions.SetTransition;
+var NotSetTransition = Transitions.NotSetTransition;
 var RuleTransition = Transitions.RuleTransition;
+var RangeTransition = Transitions.RangeTransition;
 var ActionTransition = Transitions.ActionTransition;
 var EpsilonTransition = Transitions.EpsilonTransition;
+var WildcardTransition = Transitions.WildcardTransition;
+var PredicateTransition = Transitions.PredicateTransition;
 var IntervalSet = require('./../IntervalSet').IntervalSet;
 var Interval = require('./../IntervalSet').Interval;
 var ATNDeserializationOptions = require('./ATNDeserializationOptions').ATNDeserializationOptions;
 var LexerActions = require('./LexerAction');
 var LexerActionType = LexerActions.LexerActionType;
 var LexerSkipAction = LexerActions.LexerSkipAction;
-
+var LexerCustomAction = LexerActions.LexerCustomAction;
+var LexerMoreAction = LexerActions.LexerMoreAction;
+var LexerTypeAction = LexerActions.LexerTypeAction;
+var LexerPushModeAction = LexerActions.LexerPushModeAction;
+var LexerPopModeAction = LexerActions.LexerPopModeAction;
+var LexerModeAction = LexerActions.LexerModeAction;
 // This is the earliest supported serialized UUID.
 // stick to serialized version for now, we don't need a UUID instance
 var BASE_SERIALIZED_UUID = "AADB8D7E-AEEF-4415-AD2B-8204D6CF042E";
@@ -83,7 +94,6 @@ function ATNDeserializer (options) {
         options = ATNDeserializationOptions.defaultOptions;
     }
     this.deserializationOptions = options;
-    this.edgeFactories = null;
     this.stateFactories = null;
     this.actionFactories = null;
     
@@ -185,10 +195,10 @@ ATNDeserializer.prototype.readStates = function(atn) {
         var s = this.stateFactory(stype, ruleIndex);
         if (stype === ATNState.LOOP_END) { // special case
             var loopBackStateNumber = this.readInt();
-            loopBackStateNumbers.append((s, loopBackStateNumber));
+            loopBackStateNumbers.push([s, loopBackStateNumber]);
         } else if(s instanceof BlockStartState) {
         	var endStateNumber = this.readInt();
-            endStateNumbers.append((s, endStateNumber));
+            endStateNumbers.push([s, endStateNumber]);
         }
         atn.addState(s);
     }
@@ -217,8 +227,8 @@ ATNDeserializer.prototype.readStates = function(atn) {
     }
 };
 
-ATNDeserializer.prototype.readRules = function(atn) {     
-    var nrules = this.readInt()
+ATNDeserializer.prototype.readRules = function(atn) {
+    var nrules = this.readInt();
     if (atn.grammarType === ATNType.LEXER ) {
         atn.ruleToTokenType = initArray(nrules, 0);
     }
@@ -268,8 +278,7 @@ ATNDeserializer.prototype.readSets = function(atn) {
         for (var j=0; j<n; j++) {
             var i1 = this.readInt();
             var i2 = this.readInt();
-            iset.addRange(new Interval(i1, i2 + 1)); // range upper limit is
-														// exclusive
+            iset.addRange(new Interval(i1, i2 + 1)); // range upper limit is exclusive
         }
     }
     return sets;
@@ -503,10 +512,9 @@ ATNDeserializer.prototype.verifyATN = function(atn) {
         this.checkCondition(state.epsilonOnlyTransitions || state.transitions.length <= 1);
         if (state instanceof PlusBlockStartState) {
             this.checkCondition(state.loopBackState !== null);
-        }
-        if (state instanceof StarLoopEntryState) {
+        } else  if (state instanceof StarLoopEntryState) {
             this.checkCondition(state.loopBackState !== null);
-            this.checkCondition(state.transitions === 2);
+            this.checkCondition(state.transitions.length === 2);
             if (state.transitions[0].target instanceof StarBlockStartState) {
                 this.checkCondition(state.transitions[1].target instanceof LoopEndState);
                 this.checkCondition(!state.nonGreedy);
@@ -516,24 +524,18 @@ ATNDeserializer.prototype.verifyATN = function(atn) {
             } else {
                 throw("IllegalState");
             }
-        }
-        if (state instanceof StarLoopbackState) {
+        } else if (state instanceof StarLoopbackState) {
             this.checkCondition(state.transitions.length === 1);
             this.checkCondition(state.transitions[0].target instanceof StarLoopEntryState);
-        }
-        if (state instanceof LoopEndState) {
+        } else if (state instanceof LoopEndState) {
             this.checkCondition(state.loopBackState !== null);
-        }
-        if (state instanceof RuleStartState) {
+        } else if (state instanceof RuleStartState) {
             this.checkCondition(state.stopState !== null);
-        }
-        if (state instanceof BlockStartState) {
+        } else if (state instanceof BlockStartState) {
             this.checkCondition(state.endState !== null);
-        }
-        if (state instanceof BlockEndState) {
+        } else if (state instanceof BlockEndState) {
             this.checkCondition(state.startState !== null);
-        }
-        if (state instanceof DecisionState) {
+        } else if (state instanceof DecisionState) {
             this.checkCondition(state.transitions.length <= 1 || state.decision >= 0);
         } else {
             this.checkCondition(state.transitions.length <= 1 || (state instanceof RuleStopState));
@@ -543,7 +545,7 @@ ATNDeserializer.prototype.verifyATN = function(atn) {
 
 ATNDeserializer.prototype.checkCondition = function(condition, message) {
     if (!condition) {
-        if (message == undefined || message==null) {
+        if (message === undefined || message===null) {
             message = "IllegalState";
         }
         throw (message);
@@ -596,37 +598,29 @@ ATNDeserializer.prototype.readUUID = function() {
 
 ATNDeserializer.prototype.edgeFactory = function(atn, type, src, trg, arg1, arg2, arg3, sets) {
     var target = atn.states[trg];
-    if (this.edgeFactories === null) {
-        var ef = [];
-        ef[0] = null;
-        ef[Transition.EPSILON] = function(atn, src, trg, arg1, arg2, arg3, sets, target)
-            { return new EpsilonTransition(target); };
-        ef[Transition.RANGE] = function(atn, src, trg, arg1, arg2, arg3, sets, target)
-            { return arg3 !== 0 ? new RangeTransition(target, Token.EOF, arg2)
-                                : new RangeTransition(target, arg1, arg2); };
-        ef[Transition.RULE] = function(atn, src, trg, arg1, arg2, arg3, sets, target)
-            { return new RuleTransition(atn.states[arg1], arg2, arg3, target); };
-        ef[Transition.PREDICATE] = function(atn, src, trg, arg1, arg2, arg3, sets, target)
-            { return new PredicateTransition(target, arg1, arg2, arg3 !== 0); };
-        ef[Transition.PRECEDENCE] = function(atn, src, trg, arg1, arg2, arg3, sets, target)
-            { return new PrecedencePredicateTransition(target, arg1); };
-        ef[Transition.ATOM] = function(atn, src, trg, arg1, arg2, arg3, sets, target)
-            { return arg3 !== 0 ? new AtomTransition(target, Token.EOF)
-                                : new AtomTransition(target, arg1); };
-        ef[Transition.ACTION] = function(atn, src, trg, arg1, arg2, arg3, sets, target)
-            { return new ActionTransition(target, arg1, arg2, arg3 !== 0); };
-        ef[Transition.SET] = function(atn, src, trg, arg1, arg2, arg3, sets, target)
-            { return new SetTransition(target, sets[arg1]); };
-        ef[Transition.NOT_SET] = function(atn, src, trg, arg1, arg2, arg3, sets, target)
-            { return new NotSetTransition(target, sets[arg1]); };
-        ef[Transition.WILDCARD] = function(atn, src, trg, arg1, arg2, arg3, sets, target)
-            { return new WildcardTransition(target); };
-        this.edgeFactories = ef;
-    }
-    if (type>this.edgeFactories.length || this.edgeFactories[type] === null) {
-        throw("The specified transition type: " + type + " is not valid.");
-    } else {
-        return this.edgeFactories[type](atn, src, trg, arg1, arg2, arg3, sets, target);
+    switch(type) {
+    case Transition.EPSILON:
+    	return new EpsilonTransition(target);
+    case Transition.RANGE:
+    	return arg3 !== 0 ? new RangeTransition(target, Token.EOF, arg2) : new RangeTransition(target, arg1, arg2);
+    case Transition.RULE:
+    	return new RuleTransition(atn.states[arg1], arg2, arg3, target);
+    case Transition.PREDICATE:
+    	return new PredicateTransition(target, arg1, arg2, arg3 !== 0);
+    case Transition.PRECEDENCE:
+    	return new PrecedencePredicateTransition(target, arg1);
+    case Transition.ATOM:
+    	return arg3 !== 0 ? new AtomTransition(target, Token.EOF) : new AtomTransition(target, arg1);
+    case Transition.ACTION:
+    	return new ActionTransition(target, arg1, arg2, arg3 !== 0);
+    case Transition.SET:
+    	return new SetTransition(target, sets[arg1]);
+    case Transition.NOT_SET:
+    	return new NotSetTransition(target, sets[arg1]);
+    case Transition.WILDCARD:
+    	return new WildcardTransition(target);
+    default:
+    	throw "The specified transition type: " + type + " is not valid.";
     }
 };
 

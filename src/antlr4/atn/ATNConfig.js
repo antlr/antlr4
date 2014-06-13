@@ -144,7 +144,7 @@ LexerATNConfig.prototype.equals = function(other) {
     } else if (this.lexerActionExecutor !== other.lexerActionExecutor) {
         return false;
     } else {
-        return Object.getPrototypeOf(this).equals.call(this, other);
+        return ATNConfig.prototype.equals.call(this, other);
     }
 };
 

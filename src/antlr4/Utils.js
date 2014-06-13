@@ -23,11 +23,11 @@ function Set() {
 Set.prototype.add = function(value) {
 	var key = "hash_" + value.hashString().hashCode();
 	if(key in this.data) {
-		this.data[key].map(function(v) {
-			if (value.equals(v)) {
-				return v;
+		for(var i=0;i<this.data.length; i++) {
+			if(value.equals(this.data[i])) {
+				return this.data[i];
 			}
-		});
+		}
 		this.data[key].push(value);
 		return value;
 	} else {

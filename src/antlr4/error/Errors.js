@@ -97,10 +97,10 @@ LexerNoViableAltException.prototype.constructor = LexerNoViableAltException;
 
 LexerNoViableAltException.prototype.toString = function() {
     var symbol = "";
-    if (this.startIndex >= 0 && this.startIndex < this.input.size()) {
+    if (this.startIndex >= 0 && this.startIndex < this.input.size) {
         symbol = this.input.getText((this.startIndex,this.startIndex));
     }
-    return LexerNoViableAltException.toString.call(this) + symbol;
+    return "LexerNoViableAltException" + symbol;
 };
 
 // Indicates that the parser could not decide which of two or more paths

@@ -393,7 +393,8 @@ LexerATNSimulator.prototype.closure = function(input, config, configs,
 				configs.add(config);
 				return true;
 			} else {
-				configs.add(new LexerATNConfig(config.state, config, PredictionContext.EMPTY));
+				var params = { state:config.state, alt:null, context:PredictionContext.EMPTY, semantic:null };
+				configs.add(new LexerATNConfig(params, config));
 				currentAltReachedAcceptState = true;
 			}
 		}
@@ -435,7 +436,7 @@ LexerATNSimulator.prototype.getEpsilonTarget = function(input, config, trans,
 	var cfg = null;
 	var params = null;
 	if (trans.serializationType === Transition.RULE) {
-		var newContext = new SingletonPredictionContext.create(config.context, trans.followState.stateNumber);
+		var newContext = SingletonPredictionContext.create(config.context, trans.followState.stateNumber);
 		params = { state:trans.target, alt:null, context:newContext, semantic:null };
 		cfg = new LexerATNConfig( params, config);
 	} else if (trans.serializationType === Transition.PRECEDENCE) {

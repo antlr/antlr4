@@ -313,22 +313,20 @@ Lexer.prototype.getCharIndex = function() {
 	return this._input.index;
 };
 
-// Return the text matched so far for the current token or any
-// text override.
-Lexer.prototype.getText = function() {
-	if (this._text !== null) {
-		return this._text;
-	} else {
-		return this._interp.getText(this._input);
+// Return the text matched so far for the current token or any text override.
+//Set the complete text of this token; it wipes any previous changes to the text.
+Object.defineProperty(Lexer.prototype, "text", {
+	get : function() {
+		if (this._text !== null) {
+			return this._text;
+		} else {
+			return this._interp.getText(this._input);
+		}
+	},
+	set : function(text) {
+		this._text = text;
 	}
-};
-
-// Set the complete text of this token; it wipes any previous
-// changes to the text.
-Lexer.prototype.setText = function(txt) {
-	this._text = txt;
-};
-
+});
 // Return a list of all Token objects in input char stream.
 // Forces load of all tokens. Does not include EOF token.
 // /

@@ -346,3 +346,5 @@ exports.PlusLoopbackState = PlusLoopbackState;
 exports.StarLoopbackState = StarLoopbackState;
 exports.StarLoopEntryState = StarLoopEntryState;
 exports.PlusBlockStartState = PlusBlockStartState;
+exports.StarBlockStartState = StarBlockStartState;
+exports.BasicBlockStartState = BasicBlockStartState;

@@ -9,7 +9,7 @@ function Interval(start, stop) {
 }
 
 Interval.prototype.contains = function(item) {
-	return item >= this.start && item <= this.stop;
+	return item >= this.start && item < this.stop;
 };
 
 Object.defineProperty(Interval.prototype, "length", {

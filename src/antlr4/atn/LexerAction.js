@@ -374,4 +374,10 @@ LexerIndexedCustomAction.prototype.equals = function(other) {
 
 exports.LexerActionType = LexerActionType;
 exports.LexerSkipAction = LexerSkipAction;
+exports.LexerCustomAction = LexerCustomAction;
 exports.LexerIndexedCustomAction = LexerIndexedCustomAction;
+exports.LexerMoreAction = LexerMoreAction;
+exports.LexerTypeAction = LexerTypeAction;
+exports.LexerPushModeAction = LexerPushModeAction;
+exports.LexerPopModeAction = LexerPopModeAction;
+exports.LexerModeAction = LexerModeAction;
