@@ -55,6 +55,11 @@ import java.util.Set;
  */
 public class IntervalSet implements IntSet {
 	public static final IntervalSet COMPLETE_CHAR_SET = IntervalSet.of(0, Lexer.MAX_CHAR_VALUE);
+	public static final IntervalSet KNOWN_NEGATIVE_ELEMENTS =
+		new IntervalSet().or(IntervalSet.of(Token.EOF)).or(IntervalSet.of(Token.EPSILON));
+	public static final IntervalSet COMPLETE_SET =
+		IntervalSet.of(0, Lexer.MAX_CHAR_VALUE).or(KNOWN_NEGATIVE_ELEMENTS);
+
 	public static final IntervalSet EMPTY_SET = new IntervalSet();
 
 	/** The list of sorted, disjoint intervals. */
@@ -204,6 +209,9 @@ public class IntervalSet implements IntSet {
      *  this.  The computation is (vocabulary - this).
      *
      *  'this' is assumed to be either a subset or equal to vocabulary.
+	 *
+	 *  complement() does not add EOF or EPSILON or any other negative number
+	 *  to the complement.
      */
     @Override
     public IntervalSet complement(IntSet vocabulary) {
@@ -225,7 +233,8 @@ public class IntervalSet implements IntSet {
 		Interval first = intervals.get(0);
 		// add a range from 0 to first.a constrained to vocab
 		if ( first.a > 0 ) {
-			IntervalSet s = IntervalSet.of(0, first.a-1);
+			int minKnownElement = KNOWN_NEGATIVE_ELEMENTS.getMinElement();
+			IntervalSet s = IntervalSet.of(minKnownElement, first.a-1);
 			IntervalSet a = s.and(vocabularyIS);
 			compl.addAll(a);
 		}
@@ -259,7 +268,7 @@ public class IntervalSet implements IntSet {
 		// will be empty.  The only problem would be when this' set max value
 		// goes beyond MAX_CHAR_VALUE, but hopefully the constant MAX_CHAR_VALUE
 		// will prevent this.
-		return this.and(((IntervalSet)other).complement(COMPLETE_CHAR_SET));
+		return this.and(((IntervalSet)other).complement(COMPLETE_SET));
 	}
 
 	@Override
@@ -400,21 +409,13 @@ public class IntervalSet implements IntSet {
 		return last.b;
 	}
 
-	/** Return minimum element &gt;= 0 */
+	/** Return minimum element */
 	public int getMinElement() {
 		if ( isNil() ) {
 			return Token.INVALID_TYPE;
 		}
-		int n = intervals.size();
-		for (int i = 0; i < n; i++) {
-			Interval I = intervals.get(i);
-			int a = I.a;
-			int b = I.b;
-			for (int v=a; v<=b; v++) {
-				if ( v>=0 ) return v;
-			}
-		}
-		return Token.INVALID_TYPE;
+
+		return intervals.get(0).a;
 	}
 
     /** Return a list of Interval objects. */
@@ -465,7 +466,7 @@ public class IntervalSet implements IntSet {
 			int a = I.a;
 			int b = I.b;
 			if ( a==b ) {
-				if ( a==-1 ) buf.append("<EOF>");
+				if ( a==Token.EOF ) buf.append("<EOF>");
 				else if ( elemAreChar ) buf.append("'").append((char)a).append("'");
 				else buf.append(a);
 			}
