@@ -30,6 +30,7 @@
 ///
 
 var Dict = require('./Utils').Dict;
+var RuleContext = require('./RuleContext').RuleContext;
 
 function PredictionContext(cachedHashString) {
 	this.cachedHashString = cachedHashString;
@@ -420,11 +421,11 @@ function mergeSingletons(a, b, rootIsWildcard, mergeCache) {
 		// merge parents x and y, giving array node with x,y then remainders
 		// of those graphs. dup a, a' points at merged array
 		// new joined parent so create new singleton pointing to it, a'
-		var a_ = SingletonPredictionContext.create(parent, a.returnState);
+		var spc = SingletonPredictionContext.create(parent, a.returnState);
 		if (mergeCache !== null) {
-			mergeCache.put(a, b, a_);
+			mergeCache.put(a, b, spc);
 		}
-		return a_;
+		return spc;
 	} else { // a != b payloads differ
 		// see if we can collapse parents due to $+x parents if local ctx
 		var singleParent = null;
@@ -441,11 +442,11 @@ function mergeSingletons(a, b, rootIsWildcard, mergeCache) {
 				payloads[1] = a.returnState;
 			}
 			var parents = [ singleParent, singleParent ];
-			var a_ = new ArrayPredictionContext(parents, payloads);
+			var apc = new ArrayPredictionContext(parents, payloads);
 			if (mergeCache !== null) {
-				mergeCache.put(a, b, a_);
+				mergeCache.put(a, b, apc);
 			}
-			return a_;
+			return apc;
 		}
 		// parents differ and can't merge them. Just pack together
 		// into array; can't merge.

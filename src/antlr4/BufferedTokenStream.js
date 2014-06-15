@@ -363,11 +363,11 @@ BufferedTokenStream.prototype.getText = function(interval) {
 	if (interval === undefined || interval === null) {
 		interval = new Interval(0, this.tokens.length - 1);
 	}
-	var start = interval[0];
+	var start = interval.start;
 	if (start instanceof Token) {
 		start = start.tokenIndex;
 	}
-	var stop = interval[1];
+	var stop = interval.stop;
 	if (stop instanceof Token) {
 		stop = stop.tokenIndex;
 	}

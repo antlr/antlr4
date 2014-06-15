@@ -1,7 +1,11 @@
 exports.atn = require('./atn');
 exports.dfa = require('./dfa');
+exports.tree = require('./tree');
 exports.FileStream = require('./FileStream').FileStream;
 exports.CommonTokenStream = require('./CommonTokenStream').CommonTokenStream;
 exports.Lexer = require('./Lexer').Lexer;
+exports.Parser = require('./Parser').Parser;
 var pc = require('./PredictionContext');
 exports.PredictionContextCache = pc.PredictionContextCache;
+exports.ParserRuleContext = require('./ParserRuleContext').ParserRuleContext;
+exports.Interval = require('./IntervalSet').Interval;

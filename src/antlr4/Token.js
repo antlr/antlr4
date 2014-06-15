@@ -107,6 +107,7 @@ function CommonToken(source, type, channel, start, stop) {
 	} else {
 		this.column = -1;
 	}
+	return this;
 }
 
 CommonToken.prototype = Object.create(Token.prototype);
