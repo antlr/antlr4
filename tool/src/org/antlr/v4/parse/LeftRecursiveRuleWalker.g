@@ -121,14 +121,14 @@ outerAlternative returns [boolean isLeftRec]
     ;
 
 binary
-	:	^( ALT elementOptions? recurse element+ recurse ACTION? )
+	:	^( ALT elementOptions? recurse element+ recurse epsilonElement* )
         {setAltAssoc((AltAST)$ALT,currentOuterAltNumber);}
 	;
 
 prefix
 	:	^(	ALT elementOptions?
 			({!((CommonTree)input.LT(1)).getText().equals(ruleName)}? element)+
-			recurse ACTION?
+			recurse epsilonElement*
 		 )
          {setAltAssoc((AltAST)$ALT,currentOuterAltNumber);}
 	;
@@ -179,9 +179,15 @@ element
     |	^(SET setElement+)
     |   RULE_REF
 	|	ebnf
-	|	^(ACTION elementOptions?)
-	|	^(SEMPRED elementOptions?)
+	|	epsilonElement
+	;
+
+epsilonElement
+	:	ACTION
+	|	SEMPRED
 	|	EPSILON
+	|	^(ACTION elementOptions)
+	|	^(SEMPRED elementOptions)
 	;
 
 setElement
