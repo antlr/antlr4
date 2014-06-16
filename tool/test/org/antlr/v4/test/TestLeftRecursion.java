@@ -568,6 +568,53 @@ public class TestLeftRecursion extends BaseTest {
 		assertEquals("(prog (statement (letterA a)) (statement (letterA a)) <EOF>)\n", found);
 	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#625 "Duplicate action breaks
+	 * operator precedence"
+	 * https://github.com/antlr/antlr4/issues/625
+	 */
+	@Test public void testMultipleActions() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"s @after {System.out.println($ctx.toStringTree(this));} : e ;\n" +
+			"e : a=e op=('*'|'/') b=e  {}{}\n" +
+			"  | INT {}{}\n" +
+			"  | '(' x=e ')' {}{}\n" +
+			"  ;\n" +
+			"INT : '0'..'9'+ ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n";
+		String[] tests = {
+			"4",		"(s (e 4))",
+		"1*2/3",		"(s (e (e (e 1) * (e 2)) / (e 3)))",
+		"(1/2)*3",		"(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))",
+		};
+		runTests(grammar, tests, "s");
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#625 "Duplicate action breaks
+	 * operator precedence"
+	 * https://github.com/antlr/antlr4/issues/625
+	 */
+	@Test public void testMultipleActionsPredicatesOptions() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"s @after {System.out.println($ctx.toStringTree(this));} : e ;\n" +
+			"e : a=e op=('*'|'/') b=e  {}{true}?\n" +
+			"  | a=e op=('+'|'-') b=e  {}<p=3>{true}?<fail='Message'>\n" +
+			"  | INT {}{}\n" +
+			"  | '(' x=e ')' {}{}\n" +
+			"  ;\n" +
+			"INT : '0'..'9'+ ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n";
+		String[] tests = {
+			"4",		"(s (e 4))",
+		"1*2/3",		"(s (e (e (e 1) * (e 2)) / (e 3)))",
+		"(1/2)*3",		"(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))",
+		};
+		runTests(grammar, tests, "s");
+	}
+
 	public void runTests(String grammar, String[] tests, String startRule) {
 		rawGenerateAndBuildRecognizer("T.g4", grammar, "TParser", "TLexer");
 		writeRecognizerAndCompile("TParser",
