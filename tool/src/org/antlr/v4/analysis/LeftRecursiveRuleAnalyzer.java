@@ -285,6 +285,12 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 			GrammarAST alt = (GrammarAST)blk.getChildren().get(i);
 			Tree first = alt.getChild(0);
 			if ( first==null ) continue;
+			if (first.getType() == ELEMENT_OPTIONS) {
+				first = alt.getChild(1);
+				if (first == null) {
+					continue;
+				}
+			}
 			if ( first.getType()==RULE_REF && first.getText().equals(ruleName) ) return true;
 			Tree rref = first.getChild(1);
 			if ( rref!=null && rref.getType()==RULE_REF && rref.getText().equals(ruleName) ) return true;

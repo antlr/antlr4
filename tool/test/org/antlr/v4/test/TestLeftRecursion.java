@@ -152,6 +152,36 @@ public class TestLeftRecursion extends BaseTest {
 		runTests(grammar, tests, "s");
 	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#542 "First alternative cannot
+	 * be right-associative".
+	 * https://github.com/antlr/antlr4/issues/542
+	 */
+	@Test public void testTernaryExprExplicitAssociativity() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"s @after {System.out.println($ctx.toStringTree(this));} : e EOF ;\n" + // must indicate EOF can follow or 'a<EOF>' won't match
+			"e :<assoc=right> e '*' e" +
+			"  |<assoc=right> e '+' e" +
+			"  |<assoc=right> e '?' e ':' e" +
+			"  |<assoc=right> e '=' e" +
+			"  | ID" +
+			"  ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n";
+		String[] tests = {
+			"a",			"(s (e a) <EOF>)",
+			"a+b",			"(s (e (e a) + (e b)) <EOF>)",
+			"a*b",			"(s (e (e a) * (e b)) <EOF>)",
+			"a?b:c",		"(s (e (e a) ? (e b) : (e c)) <EOF>)",
+			"a=b=c",		"(s (e (e a) = (e (e b) = (e c))) <EOF>)",
+			"a?b+c:d",		"(s (e (e a) ? (e (e b) + (e c)) : (e d)) <EOF>)",
+			"a?b=c:d",		"(s (e (e a) ? (e (e b) = (e c)) : (e d)) <EOF>)",
+			"a? b?c:d : e",	"(s (e (e a) ? (e (e b) ? (e c) : (e d)) : (e e)) <EOF>)",
+			"a?b: c?d:e",	"(s (e (e a) ? (e b) : (e (e c) ? (e d) : (e e))) <EOF>)",
+		};
+		runTests(grammar, tests, "s");
+	}
 
 	@Test public void testExpressions() throws Exception {
 		String grammar =
