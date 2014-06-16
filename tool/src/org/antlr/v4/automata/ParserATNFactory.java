@@ -769,8 +769,8 @@ public class ParserATNFactory implements ATNFactory {
 		for (Object alt : block.getChildren()) {
 			if ( !(alt instanceof AltAST) ) continue;
 			AltAST altAST = (AltAST)alt;
-			if ( altAST.getChildCount()==1 ) {
-				Tree e = altAST.getChild(0);
+			if ( altAST.getChildCount()==1 || (altAST.getChildCount() == 2 && altAST.getChild(0).getType() == ANTLRParser.ELEMENT_OPTIONS) ) {
+				Tree e = altAST.getChild(altAST.getChildCount() - 1);
 				if ( e.getType()==ANTLRParser.WILDCARD ) {
 					return true;
 				}

@@ -767,7 +767,7 @@ alternative
 	exitAlternative((AltAST)$start);
 }
 	:	^(ALT elementOptions? element+)
-	|	^(ALT EPSILON)
+	|	^(ALT elementOptions? EPSILON)
     ;
 
 lexerCommand

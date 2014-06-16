@@ -658,10 +658,11 @@ alternative
     paraphrases.pop();
     Grammar.setNodeOptions($tree, $o.tree);
 }
-    :	o=elementOptions?
-        e+=element+                     -> ^(ALT<AltAST> elementOptions? $e+)
-    |                                   -> ^(ALT<AltAST> EPSILON) // empty alt
-    ;
+	:	o=elementOptions?
+		(	e+=element+                     -> ^(ALT<AltAST> elementOptions? $e+)
+		|                                   -> ^(ALT<AltAST> elementOptions? EPSILON) // empty alt
+		)
+	;
 
 element
 @init {

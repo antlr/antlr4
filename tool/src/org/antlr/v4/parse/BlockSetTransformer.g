@@ -95,10 +95,10 @@ boolean inLexer = Grammar.isTokenName(currentRuleName);
 	GrammarTransformPipeline.setGrammarPtr(g, $tree);
 }
 	:	{inContext("RULE")}? // top-level: rule block and > 1 alt
-		^(BLOCK ^(alt=ALT {((AltAST)$alt).altLabel==null}? setElement[inLexer]) ( ^(ALT setElement[inLexer]) )+)
+		^(BLOCK ^(alt=ALT elementOptions? {((AltAST)$alt).altLabel==null}? setElement[inLexer]) ( ^(ALT elementOptions? setElement[inLexer]) )+)
 		-> ^(BLOCK<BlockAST>[$BLOCK.token] ^(ALT<AltAST>[$BLOCK.token,"ALT"] ^(SET[$BLOCK.token, "SET"] setElement+)))
 	|	{!inContext("RULE")}? // if not rule block and > 1 alt
-		^(BLOCK ^(ALT setElement[inLexer]) ( ^(ALT setElement[inLexer]) )+)
+		^(BLOCK ^(ALT elementOptions? setElement[inLexer]) ( ^(ALT elementOptions? setElement[inLexer]) )+)
 		-> ^(SET[$BLOCK.token, "SET"] setElement+)
 	;
 

@@ -139,7 +139,7 @@ suffix
     ;
 
 nonLeftRecur
-    :   ^(ALT element+)  // no assoc for these; ignore if <assoc=...> present
+    :   ^(ALT elementOptions? element+)
     ;
 
 recurse
