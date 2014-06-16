@@ -320,31 +320,58 @@ public class BufferedTokenStream implements TokenStream {
 		return getTokens(start,stop, s);
     }
 
-	/** Given a starting index, return the index of the next token on channel.
-	 *  Return i if tokens[i] is on channel.  Return -1 if there are no tokens
-	 *  on channel between i and EOF.
+	/**
+	 * Given a starting index, return the index of the next token on channel.
+	 * Return {@code i} if {@code tokens[i]} is on channel. Return the index of
+	 * the EOF token if there are no tokens on channel between {@code i} and
+	 * EOF.
 	 */
 	protected int nextTokenOnChannel(int i, int channel) {
 		sync(i);
+		if (i >= size()) {
+			return size() - 1;
+		}
+
 		Token token = tokens.get(i);
-		if ( i>=size() ) return -1;
 		while ( token.getChannel()!=channel ) {
-			if ( token.getType()==Token.EOF ) return -1;
+			if ( token.getType()==Token.EOF ) {
+				return i;
+			}
+
 			i++;
 			sync(i);
 			token = tokens.get(i);
 		}
+
 		return i;
 	}
 
-	/** Given a starting index, return the index of the previous token on channel.
-	 *  Return i if tokens[i] is on channel. Return -1 if there are no tokens
-	 *  on channel between i and 0.
+	/**
+	 * Given a starting index, return the index of the previous token on
+	 * channel. Return {@code i} if {@code tokens[i]} is on channel. Return -1
+	 * if there are no tokens on channel between {@code i} and 0.
+	 *
+	 * <p>
+	 * If {@code i} specifies an index at or after the EOF token, the EOF token
+	 * index is returned. This is due to the fact that the EOF token is treated
+	 * as though it were on every channel.</p>
 	 */
 	protected int previousTokenOnChannel(int i, int channel) {
-		while ( i>=0 && tokens.get(i).getChannel()!=channel ) {
+		sync(i);
+		if (i >= size()) {
+			// the EOF token is on every channel
+			return size() - 1;
+		}
+
+		while (i >= 0) {
+			Token token = tokens.get(i);
+			if (token.getType() == Token.EOF || token.getChannel() == channel) {
+				return i;
+			}
+
 			i--;
 		}
+
 		return i;
 	}
 
@@ -385,6 +412,11 @@ public class BufferedTokenStream implements TokenStream {
 		lazyInit();
 		if ( tokenIndex<0 || tokenIndex>=tokens.size() ) {
 			throw new IndexOutOfBoundsException(tokenIndex+" not in 0.."+(tokens.size()-1));
+		}
+
+		if (tokenIndex == 0) {
+			// obviously no tokens can appear before the first token
+			return null;
 		}
 
 		int prevOnChannel =
