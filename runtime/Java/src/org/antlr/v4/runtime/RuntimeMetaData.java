@@ -114,7 +114,7 @@ public class RuntimeMetaData {
 	public interface Listener {
 		/**
 		 * Report a version mismatch which was detected by
-		 * {@link #checkDetails}.
+		 * {@link #checkVersion}.
 		 *
 		 * <p>
 		 * Implementations of this method may, but are not required to, throw
@@ -147,7 +147,7 @@ public class RuntimeMetaData {
 	 */
 	public static class DefaultListener implements Listener {
 		/**
-		 * A default instance of {@link ConsoleListener} which is automatically
+		 * A default instance of {@link DefaultListener} which is automatically
 		 * registered to receive version mismatch events.
 		 */
 		public static final DefaultListener INSTANCE = new DefaultListener();

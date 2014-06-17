@@ -208,7 +208,7 @@ public class IntervalSet implements IntSet {
         return this.complement(IntervalSet.of(minElement,maxElement));
     }
 
-    /** {@inheritDoc */
+    /** {@inheritDoc} */
     @Override
     public IntervalSet complement(IntSet vocabulary) {
 		if ( vocabulary==null || vocabulary.isNil() ) {

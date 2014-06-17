@@ -91,7 +91,7 @@ public class DecisionInfo {
 	public long SLL_MaxLook;
 	/**
 	 * Gets the {@link LookaheadEventInfo} associated with the event where the
-	 * {@link #sllMaxLook} value was set.
+	 * {@link #SLL_MaxLook} value was set.
 	 */
 	public LookaheadEventInfo SLL_MaxLookEvent;
 
