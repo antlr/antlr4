@@ -30,6 +30,8 @@
 package org.antlr.v4.runtime.misc;
 
 
+import org.antlr.v4.runtime.Token;
+
 import java.util.List;
 
 /**
@@ -121,7 +123,7 @@ public interface IntSet {
 	 * <li>{@code x.complement(y)}</li>
 	 * </ul>
 	 *
-	 * @param elements The set to compare with the current set. A {@code null}
+	 * @param a The set to compare with the current set. A {@code null}
 	 * argument is treated as though it were an empty set.
 	 * @return A new {@link IntSet} instance containing the elements present in
 	 * {@code elements} but not present in the current set. The value

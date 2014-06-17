@@ -88,7 +88,7 @@ public interface ANTLRErrorListener {
 	 *
 	 * <p>Each full-context prediction which does not result in a syntax error
 	 * will call either {@link #reportContextSensitivity} or
-	 * {@link reportAmbiguity}.</p>
+	 * {@link #reportAmbiguity}.</p>
 	 *
 	 * <p>When {@code ambigAlts} is not null, it contains the set of potentially
 	 * viable alternatives identified by the prediction algorithm. When
@@ -166,7 +166,7 @@ public interface ANTLRErrorListener {
 	 *
 	 * <p>Each full-context prediction which does not result in a syntax error
 	 * will call either {@link #reportContextSensitivity} or
-	 * {@link reportAmbiguity}.</p>
+	 * {@link #reportAmbiguity}.</p>
 	 *
 	 * <p>For prediction implementations that only evaluate full-context
 	 * predictions when an SLL conflict is found (including the default
