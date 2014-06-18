@@ -48,6 +48,7 @@ import org.antlr.v4.parse.GrammarTreeVisitor;
 import org.antlr.v4.parse.ToolANTLRLexer;
 import org.antlr.v4.parse.ToolANTLRParser;
 import org.antlr.v4.parse.v3TreeGrammarException;
+import org.antlr.v4.runtime.RuntimeMetaData;
 import org.antlr.v4.runtime.misc.LogManager;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
@@ -87,7 +88,10 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Tool {
-	public static final String VERSION = "4.3";
+	public static final String VERSION;
+	static {
+		VERSION = RuntimeMetaData.VERSION;
+	}
 
 	public static final String GRAMMAR_EXTENSION = ".g4";
 	public static final String LEGACY_GRAMMAR_EXTENSION = ".g";
