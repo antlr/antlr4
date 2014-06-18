@@ -64,6 +64,22 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 public class RuntimeMetaData {
 	/**
+	 * A compile-time constant containing the current version of the ANTLR 4
+	 * runtime library.
+	 *
+	 * <p>
+	 * This compile-time constant value allows generated parsers and other
+	 * libraries to include a literal reference to the version of the ANTLR 4
+	 * runtime library the code was compiled against.</p>
+	 *
+	 * <p>
+	 * During development (between releases), this value contains the
+	 * <em>expected</em> next release version. For official releases, the value
+	 * will be the actual published version of the library.</p>
+	 */
+	public static final String VERSION = "4.3";
+
+	/**
 	 * This class provides detailed information about a mismatch between the
 	 * version of the tool a parser was generated with, the version of the
 	 * runtime a parser was compiled against, and/or the currently executing
@@ -209,22 +225,6 @@ public class RuntimeMetaData {
 	public static synchronized void clearListeners() {
 		listeners.clear();
 	}
-
-	/**
-	 * A compile-time constant containing the current version of the ANTLR 4
-	 * runtime library.
-	 *
-	 * <p>
-	 * This compile-time constant value allows generated parsers and other
-	 * libraries to include a literal reference to the version of the ANTLR 4
-	 * runtime library the code was compiled against.</p>
-	 *
-	 * <p>
-	 * During development (between releases), this value contains the
-	 * <em>expected</em> next release version. For official releases, the value
-	 * will be the actual published version of the library.</p>
-	 */
-	public static final String VERSION = "4.3";
 
 	/**
 	 * Gets the currently executing version of the ANTLR 4 runtime library.
