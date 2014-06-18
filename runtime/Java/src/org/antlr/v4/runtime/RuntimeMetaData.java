@@ -56,9 +56,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * By default, the {@link DefaultListener#INSTANCE} listener is automatically
  * registered. As long as the default listener is registered, it will always be
  * the last listener notified in the event of a version mismatch. This behavior
- * ensures the exception it throws will not prevent {@link #checkVersion} from
- * notifying custom listeners registered by a user. This default listener may be
- * removed by calling {@link #removeListener} for
+ * ensures that custom listeners registered by a user will be notified even in
+ * the event the default listener throws an exception. This default listener may
+ * be removed by calling {@link #removeListener} for
  * {@link DefaultListener#INSTANCE} or {@link #clearListeners}. If required, it
  * may be re-registered by calling {@link #addListener}.</p>
  */
@@ -144,9 +144,9 @@ public class RuntimeMetaData {
 		 * block.</li>
 		 * <li>No additional registered listeners will be notified about the
 		 * version mismatch. Since the default {@link DefaultListener} instance
-		 * is always the last listener called (unless it is unregistered), the
-		 * exception it throws will not affect the execution of any other
-		 * registered listeners.</li>
+		 * is always the last listener called (unless it is unregistered), it
+		 * will not affect the execution of any other registered listeners, even
+		 * in the case where it throws an exception.</li>
 		 * </ul>
 		 *
 		 * @param ex a {@link VersionMismatchException} instance containing
@@ -159,7 +159,30 @@ public class RuntimeMetaData {
 	/**
 	 * This class provides a default implementation of {@link Listener} which
 	 * responds to mismatched versions by throwing the provided
-	 * {@link VersionMismatchException}.
+	 * {@link VersionMismatchException} if the reported version mismatch
+	 * indicates the versions differ by more than the <em>major</em> and
+	 * <em>minor</em> version components.
+	 *
+	 * <p>
+	 * For the purposes of this listener, version numbers are assumed to have
+	 * the form
+	 * <em>major</em>.<em>minor</em>.<em>patch</em>.<em>revision</em>-<em>suffix</em>,
+	 * with the individual components defined as follows.</p>
+	 *
+	 * <ul>
+	 * <li><em>major</em> is a required non-negative integer, and is equal to
+	 * {@code 4} for ANTLR 4.</li>
+	 * <li><em>minor</em> is a required non-negative integer.</li>
+	 * <li><em>patch</em> is an optional non-negative integer. When
+	 * <em>patch</em> is omitted, the {@code .} (dot) appearing before it is
+	 * also omitted.</li>
+	 * <li><em>revision</em> is an optional non-negative integer, and may only
+	 * be included when <em>patch</em> is also included. When <em>revision</em>
+	 * is omitted, the {@code .} (dot) appearing before it is also omitted.</li>
+	 * <li><em>suffix</em> is an optional string. When <em>suffix</em> is
+	 * omitted, the {@code -} (hyphen-minus) appearing before it is also
+	 * omitted.</li>
+	 * </ul>
 	 */
 	public static class DefaultListener implements Listener {
 		/**
@@ -170,10 +193,66 @@ public class RuntimeMetaData {
 
 		/**
 		 * {@inheritDoc}
+		 *
+		 * <p>
+		 * The default implementation only throws an exception when the reported
+		 * version mismatch contains a mismatched <em>major</em> or
+		 * <em>minor</em> version component. For details about the syntax of the
+		 * input {@code version}, see the documentation for
+		 * {@link DefaultListener}.</p>
 		 */
 		@Override
 		public void reportVersionMismatch(@NotNull VersionMismatchException ex) throws VersionMismatchException {
-			throw ex;
+			if (!isMinorVersionMatch(ex)) {
+				throw ex;
+			}
+		}
+
+		/**
+		 * Determines if the reported version mismatch are a match when
+		 * considering only the <em>major</em> and <em>minor</em> version
+		 * components of the version strings.
+		 *
+		 * @param ex a {@link VersionMismatchException} instance containing
+		 * detailed information about the specific version mismatch detected
+		 * @return {@code true} if the <em>major</em> and <em>minor</em> version
+		 * components of the version strings match; otherwise, {@code false}.
+		 */
+		protected boolean isMinorVersionMatch(@NotNull VersionMismatchException ex) {
+			String generatingToolVersion = ex.generatingToolVersion;
+			if (generatingToolVersion != null) {
+				if (!getMajorMinorVersion(VERSION).equals(getMajorMinorVersion(generatingToolVersion))) {
+					return false;
+				}
+			}
+
+			return getMajorMinorVersion(VERSION).equals(getMajorMinorVersion(ex.compileTimeRuntimeVersion));
+		}
+
+		/**
+		 * Gets the major and minor version numbers from a version string. For
+		 * details about the syntax of the input {@code version}, see the
+		 * documentation for {@link DefaultListener}.
+		 *
+		 * @param version The complete version string.
+		 * @return A string of the form <em>major</em>.<em>minor</em> containing
+		 * only the major and minor components of the version string.
+		 */
+		@NotNull
+		protected String getMajorMinorVersion(@NotNull String version) {
+			int firstDot = version.indexOf('.');
+			int secondDot = firstDot >= 0 ? version.indexOf('.', firstDot + 1) : -1;
+			int firstDash = version.indexOf('-');
+			int referenceLength = version.length();
+			if (secondDot >= 0) {
+				referenceLength = Math.min(referenceLength, secondDot);
+			}
+
+			if (firstDash >= 0) {
+				referenceLength = Math.min(referenceLength, firstDash);
+			}
+
+			return version.substring(0, referenceLength);
 		}
 	}
 
@@ -270,7 +349,8 @@ public class RuntimeMetaData {
 	 * This method does not perform any detection or filtering of semantic
 	 * changes between tool and runtime versions. It simply checks for a simple
 	 * version match and notifies the registered listeners any time a difference
-	 * is detected.</p>
+	 * is detected. A default instance of {@link DefaultListener} is notified
+	 * unless it is explicitly removed.</p>
 	 *
 	 * <p>
 	 * Note that some breaking changes between releases could result in other
