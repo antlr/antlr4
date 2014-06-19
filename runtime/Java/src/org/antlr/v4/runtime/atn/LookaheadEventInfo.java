@@ -37,6 +37,8 @@ import org.antlr.v4.runtime.misc.Nullable;
 /**
  * This class represents profiling event information for tracking the lookahead
  * depth required in order to make a prediction.
+ *
+ * @since 4.3
  */
 public class LookaheadEventInfo extends DecisionEventInfo {
 	/**

@@ -199,6 +199,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 * set.
 	 *
 	 * @return the set of represented alternatives in this configuration set
+	 *
+	 * @since 4.3
 	 */
 	@NotNull
 	public BitSet getAlts() {

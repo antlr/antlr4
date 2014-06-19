@@ -43,6 +43,8 @@ import java.util.List;
  * operations are started). For best results, gather and use aggregate
  * statistics from a large sample of inputs representing the inputs expected in
  * production before using the results to make changes in the grammar.</p>
+ *
+ * @since 4.3
  */
 public class DecisionInfo {
 	/**

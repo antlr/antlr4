@@ -160,6 +160,8 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 
 	/** If profiling during the parse/lex, this will return DecisionInfo records
 	 *  for each decision in recognizer in a ParseInfo object.
+	 *
+	 * @since 4.3
 	 */
 	public ParseInfo getParseInfo() {
 		return null;

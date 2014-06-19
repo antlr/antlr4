@@ -61,6 +61,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * be removed by calling {@link #removeListener} for
  * {@link DefaultListener#INSTANCE} or {@link #clearListeners}. If required, it
  * may be re-registered by calling {@link #addListener}.</p>
+ *
+ * @since 4.3
  */
 public class RuntimeMetaData {
 	/**
@@ -71,13 +73,8 @@ public class RuntimeMetaData {
 	 * This compile-time constant value allows generated parsers and other
 	 * libraries to include a literal reference to the version of the ANTLR 4
 	 * runtime library the code was compiled against.</p>
-	 *
-	 * <p>
-	 * During development (between releases), this value contains the
-	 * <em>expected</em> next release version. For official releases, the value
-	 * will be the actual published version of the library.</p>
 	 */
-	public static final String VERSION = "4.3";
+	public static final String VERSION = "4.3-SNAPSHOT";
 
 	/**
 	 * This class provides detailed information about a mismatch between the

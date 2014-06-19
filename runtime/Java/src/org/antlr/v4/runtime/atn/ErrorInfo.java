@@ -45,6 +45,8 @@ import org.antlr.v4.runtime.misc.NotNull;
  *
  * @see Parser#notifyErrorListeners(Token, String, RecognitionException)
  * @see ANTLRErrorListener#syntaxError
+ *
+ * @since 4.3
  */
 public class ErrorInfo extends DecisionEventInfo {
 	/**

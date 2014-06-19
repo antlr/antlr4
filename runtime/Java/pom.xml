@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-master</artifactId>
-        <version>4.2.3-SNAPSHOT</version>
+        <version>4.3-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
 
@@ -104,7 +104,7 @@
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.2</version>
+                <version>4.2.2</version>
                 <configuration>
                     <sourceDirectory>src</sourceDirectory>
                 </configuration>
