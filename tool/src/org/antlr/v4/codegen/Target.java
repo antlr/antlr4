@@ -93,6 +93,8 @@ public abstract class Target {
      *  between a template called VERSION. This value is checked against Tool.VERSION during load of templates.
      *
      *  This additional method forces all targets 4.3 and beyond to add this method.
+     *
+     * @since 4.3
      */
     public abstract String getVersion();
 
@@ -376,14 +378,23 @@ public abstract class Target {
 		return result;
 	}
 
+	/**
+	 * @since 4.3
+	 */
 	public boolean wantsBaseListener() {
 		return true;
 	}
 
+	/**
+	 * @since 4.3
+	 */
 	public boolean wantsBaseVisitor() {
 		return true;
 	}
 
+	/**
+	 * @since 4.3
+	 */
 	public boolean supportsOverloadedMethods() {
 		return true;
 	}

@@ -37,6 +37,8 @@ import org.antlr.v4.runtime.misc.Nullable;
 /**
  * This is the base class for gathering detailed information about prediction
  * events which occur during parsing.
+ *
+ * @since 4.3
  */
 public class DecisionEventInfo {
 	/**

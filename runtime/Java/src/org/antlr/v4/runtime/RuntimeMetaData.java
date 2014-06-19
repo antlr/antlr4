@@ -61,6 +61,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * be removed by calling {@link #removeListener} for
  * {@link DefaultListener#INSTANCE} or {@link #clearListeners}. If required, it
  * may be re-registered by calling {@link #addListener}.</p>
+ *
+ * @since 4.3
  */
 public class RuntimeMetaData {
 	/**

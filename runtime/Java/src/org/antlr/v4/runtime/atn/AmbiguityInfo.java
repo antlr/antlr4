@@ -60,6 +60,8 @@ import org.antlr.v4.runtime.misc.NotNull;
  *
  * @see ParserATNSimulator#reportAmbiguity
  * @see ANTLRErrorListener#reportAmbiguity
+ *
+ * @since 4.3
  */
 public class AmbiguityInfo extends DecisionEventInfo {
 	/**

@@ -1345,6 +1345,8 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * @param fullCtx {@code true} if the evaluation is occurring during LL
 	 * prediction; otherwise, {@code false} if the evaluation is occurring
 	 * during SLL prediction
+	 *
+	 * @since 4.3
 	 */
 	protected boolean evalSemanticContext(@NotNull SemanticContext pred, ParserRuleContext parserCallStack, int alt, boolean fullCtx) {
 		return pred.eval(parser, parserCallStack);
@@ -1922,6 +1924,9 @@ public class ParserATNSimulator extends ATNSimulator {
 		return mode;
 	}
 
+	/**
+	 * @since 4.3
+	 */
 	public Parser getParser() {
 		return parser;
 	}

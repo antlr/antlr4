@@ -41,6 +41,8 @@ import org.antlr.v4.runtime.misc.NotNull;
  * evaluations which occur during prediction.
  *
  * @see ParserATNSimulator#evalSemanticContext
+ *
+ * @since 4.3
  */
 public class PredicateEvalInfo extends DecisionEventInfo {
 	/**
