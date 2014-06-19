@@ -164,6 +164,12 @@ public class RuntimeMetaData {
 	 * <em>minor</em> version components.
 	 *
 	 * <p>
+	 * For example, version strings x.y and x.y.z are considered "compatible",
+	 * and this listener will not throw an exception. Likewise, version strings
+	 * x.y-SNAPSHOT and x.y.z are considered "compatible" because the major and
+	 * minor components x.y are the same in each.</p>
+	 *
+	 * <p>
 	 * For the purposes of this listener, version numbers are assumed to have
 	 * the form
 	 * <em>major</em>.<em>minor</em>.<em>patch</em>.<em>revision</em>-<em>suffix</em>,

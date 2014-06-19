@@ -90,6 +90,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Tool {
 	public static final String VERSION;
 	static {
+		// Assigned in a static{} block to prevent the field from becoming a
+		// compile-time constant
 		VERSION = RuntimeMetaData.VERSION;
 	}
 
