@@ -42,24 +42,26 @@ var SemanticContext = require('./SemanticContext').SemanticContext;
 
 function checkParams(params, isCfg) {
 	if(params===null) {
-		return { state:null, alt:null, context:null, semantic:null };
-	} else {
-		var props = ["state", "alt", "context", "semantic"];
-		props.map(function(p) {
-			if(!(p in params)) {
-				params[p] = null;
-			}
-		});
+		var result = { state:null, alt:null, context:null, semanticContext:null };
 		if(isCfg) {
-			if(!("reachesIntoOuterContext" in params)) {
-				params.reachesIntoOuterContext = 0;
-			}
+			result.reachesIntoOuterContext = 0;
 		}
-		return params;
+		return result;
+	} else {
+		var props = {};
+		props.state = params.state || null;
+		props.alt = params.alt || null;
+		props.context = params.context || null;
+		props.semanticContext = params.semanticContext || null;
+		if(isCfg) {
+			props.reachesIntoOuterContext = params.reachesIntoOuterContext || 0;
+		}
+		return props;
 	}
 }
 
 function ATNConfig(params, config) {
+	this.checkContext(params, config);
 	params = checkParams(params);
 	config = checkParams(config, true);
     // The ATN state associated with this configuration///
@@ -70,8 +72,8 @@ function ATNConfig(params, config) {
     //  with this config.  We track only those contexts pushed during
     //  execution of the ATN simulator.
     this.context = params.context!==null ? params.context : config.context;
-    this.semanticContext = params.semantic!==null ? params.semantic :
-        (config.semantic!==null ? config.semantic : SemanticContext.NONE);
+    this.semanticContext = params.semanticContext!==null ? params.semanticContext :
+        (config.semanticContext!==null ? config.semanticContext : SemanticContext.NONE);
     // We cannot execute predicates dependent upon local context unless
     // we know for sure we are in the correct context. Because there is
     // no way to do this efficiently, we simply cannot evaluate
@@ -84,6 +86,13 @@ function ATNConfig(params, config) {
     this.reachesIntoOuterContext = config.reachesIntoOuterContext;
     return this;
 }
+
+ATNConfig.prototype.checkContext = function(params, config) {
+	if((params.context===null || params.context===undefined) &&
+			(config===null || config.context===null || config.context===undefined)) {
+		this.context = null;
+	}
+};
 
 // An ATN configuration is equal to another if both have
 //  the same state, they predict the same alternative, and
@@ -153,4 +162,5 @@ LexerATNConfig.prototype.checkNonGreedyDecision = function(source, target) {
         (target instanceof DecisionState) && target.nonGreedy;
 };
 
+exports.ATNConfig = ATNConfig;
 exports.LexerATNConfig = LexerATNConfig;

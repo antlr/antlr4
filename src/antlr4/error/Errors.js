@@ -153,7 +153,7 @@ InputMismatchException.prototype.constructor = InputMismatchException;
 // prediction.
 
 function FailedPredicateException(recognizer, predicate, message) {
-	RecognitionException.call(this, {message:this.formatMessage(predicate,message), recognizer:recognizer,
+	RecognitionException.call(this, {message:this.formatMessage(predicate,message || null), recognizer:recognizer,
                          input:recognizer.getInputStream(), ctx:recognizer._ctx});
     var s = recognizer._interp.atn.states[recognizer.state];
     var trans = s.transitions[0];
@@ -189,6 +189,7 @@ function ParseCancellationException() {
 ParseCancellationException.prototype = Object.create(Error.prototype);
 ParseCancellationException.prototype.constructor = ParseCancellationException;
 
+exports.RecognitionException = RecognitionException;
 exports.NoViableAltException = NoViableAltException;
 exports.LexerNoViableAltException = LexerNoViableAltException;
 exports.InputMismatchException = InputMismatchException;

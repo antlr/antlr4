@@ -29,7 +29,6 @@
 //  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-var Dict = require('./Utils').Dict;
 var RuleContext = require('./RuleContext').RuleContext;
 
 function PredictionContext(cachedHashString) {
@@ -101,7 +100,7 @@ function calculateEmptyHashString() {
 // can be used for both lexers and parsers.
 
 function PredictionContextCache() {
-	this.cache = new Dict();
+	this.cache = {};
 	return this;
 }
 
@@ -667,8 +666,8 @@ function combineCommonParents(parents) {
 			uniqueParents[parent] = parent;
 		}
 	}
-	for (var p = 0; p < parents.length; p++) {
-		parents[p] = uniqueParents[parents[p]];
+	for (var q = 0; q < parents.length; q++) {
+		parents[q] = uniqueParents[parents[q]];
 	}
 }
 
@@ -676,7 +675,7 @@ function getCachedPredictionContext(context, contextCache, visited) {
 	if (context.isEmpty()) {
 		return context;
 	}
-	var existing = visited.get(context);
+	var existing = visited[context] || null;
 	if (existing !== null) {
 		return existing;
 	}
@@ -688,8 +687,7 @@ function getCachedPredictionContext(context, contextCache, visited) {
 	var changed = false;
 	var parents = [];
 	for (var i = 0; i < parents.length; i++) {
-		var parent = getCachedPredictionContext(context.getParent(i),
-				contextCache, visited);
+		var parent = getCachedPredictionContext(context.getParent(i), contextCache, visited);
 		if (changed || parent !== context.getParent(i)) {
 			if (!changed) {
 				parents = [];
@@ -747,3 +745,5 @@ exports.merge = merge;
 exports.PredictionContext = PredictionContext;
 exports.PredictionContextCache = PredictionContextCache;
 exports.SingletonPredictionContext = SingletonPredictionContext;
+exports.predictionContextFromRuleContext = predictionContextFromRuleContext;
+exports.getCachedPredictionContext = getCachedPredictionContext;

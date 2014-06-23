@@ -164,6 +164,7 @@ DefaultErrorStrategy.prototype.reportError = function(recognizer, e) {
         this.reportFailedPredicate(recognizer, e);
     } else {
         console.log("unknown recognition error type: " + e.constructor.name);
+        console.log(e.stack);
         recognizer.notifyErrorListeners(e.getOffendingToken(), e.getMessage(), e);
     }
 };
@@ -176,7 +177,7 @@ DefaultErrorStrategy.prototype.reportError = function(recognizer, e) {
 //
 DefaultErrorStrategy.prototype.recover = function(recognizer, e) {
     if (this.lastErrorIndex===recognizer.getInputStream().index &&
-        this.lastErrorStates !== null && this.lastErrorStates.contains(recognizer.state)) {
+        this.lastErrorStates !== null && this.lastErrorStates.indexOf(recognizer.state)>=0) {
 		// uh oh, another error at same token index and previously-visited
 		// state in ATN; must be a case where LT(1) is in the recovery
 		// token set so nothing got consumed. Consume a single token

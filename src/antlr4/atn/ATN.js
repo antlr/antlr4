@@ -27,6 +27,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 //  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+var LL1Analyzer = require('./../LL1Analyzer').LL1Analyzer;
 
 function ATN(grammarType , maxTokenType) {
 

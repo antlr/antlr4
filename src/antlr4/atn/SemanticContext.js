@@ -37,6 +37,8 @@
 //  {@link SemanticContext} within the scope of this outer class.</p>
 //
 
+var Set = require('./../Utils').Set;
+
 function SemanticContext() {
 	return this;
 }
@@ -191,17 +193,13 @@ PrecedencePredicate.prototype.equals = function(other) {
 	}
 };
 
-PrecedencePredicate.filterPrecedencePredicates = function(collection) {
-	var result = null;
-	for (var i = 0; i < collection.length; i++) {
-		var context = collection[i];
+PrecedencePredicate.filterPrecedencePredicates = function(set) {
+	var result = [];
+	set.values().map( function(context) {
 		if (context instanceof PrecedencePredicate) {
-			if (result === null) {
-				result = [];
-			}
 			result.push(context);
 		}
-	}
+	});
 	return result;
 };
 
@@ -225,8 +223,7 @@ function AND(a, b) {
 	} else {
 		operands.add(b);
 	}
-	var precedencePredicates = PrecedencePredicate
-			.filterPrecedencePredicates(operands);
+	var precedencePredicates = PrecedencePredicate.filterPrecedencePredicates(operands);
 	if (precedencePredicates.length > 0) {
 		// interested in the transition with the lowest precedence
 		var reduced = Math.min(precedencePredicates);
@@ -327,8 +324,7 @@ function OR(a, b) {
 		operands.add(b);
 	}
 
-	var precedencePredicates = PrecedencePredicate
-			.filterPrecedencePredicates(operands);
+	var precedencePredicates = PrecedencePredicate.filterPrecedencePredicates(operands);
 	if (precedencePredicates.length > 0) {
 		// interested in the transition with the highest precedence
 		var s = precedencePredicates.sort(function(a, b) {
@@ -409,3 +405,4 @@ AND.prototype.toString = function() {
 };
 
 exports.SemanticContext = SemanticContext;
+exports.Predicate = Predicate;

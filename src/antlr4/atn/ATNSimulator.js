@@ -31,6 +31,7 @@
 
 var DFAState = require('./../dfa/DFAState').DFAState;
 var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
+var getCachedPredictionContext = require('./../PredictionContext').getCachedPredictionContext;
 
 function ATNSimulator(atn, sharedContextCache) {
 	
