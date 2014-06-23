@@ -77,7 +77,7 @@ public class Python2Target extends AbstractPythonTarget {
 	
 	@Override
 	public String getVersion() {
-		return "4.4";
+		return "4.4.0";
 	}
 
 	public Set<String> getBadWords() {

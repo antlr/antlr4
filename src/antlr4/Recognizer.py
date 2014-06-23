@@ -43,7 +43,7 @@ class Recognizer(object):
         self._stateNumber = -1
 
     def checkVersion(self, toolVersion):
-        runtimeVersion = "4.4"
+        runtimeVersion = "4.4.0"
         if not runtimeVersion==toolVersion:
             print("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion)
 
