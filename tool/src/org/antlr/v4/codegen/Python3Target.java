@@ -68,7 +68,7 @@ public class Python3Target extends AbstractPythonTarget {
 
 	@Override
 	public String getVersion() {
-		return "4.4";
+		return "4.4.0";
 	}
 
 	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
