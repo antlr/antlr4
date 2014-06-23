@@ -1478,7 +1478,7 @@ class ParserATNSimulator(ATNSimulator):
         if self.debug or self.retry_debug:
             interval = range(startIndex, stopIndex + 1)
             print("reportContextSensitivity decision=" + str(dfa.decision) + ":" + str(configs) +
-                               ", input=" + str.parser.getTokenStream().getText(interval))
+                               ", input=" + self.parser.getTokenStream().getText(interval))
         if self.parser is not None:
             self.parser.getErrorListenerDispatch().reportContextSensitivity(self.parser, dfa, startIndex, stopIndex, prediction, configs)
 

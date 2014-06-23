@@ -37,8 +37,6 @@ from antlr4.error.Errors import UnsupportedOperationException
 from antlr4.tree.ParseTreePatternMatcher import ParseTreePatternMatcher
 from antlr4.tree.Tree import ParseTreeListener
 
-Parser = None
-
 class TraceListener(ParseTreeListener):
     
     def enterEveryRule(self, parser, ctx):
@@ -92,9 +90,6 @@ class Parser (Recognizer):
         # incremented each time {@link #notifyErrorListeners} is called.
         self._syntaxErrors = 0
         self.setInputStream(input)
-
-    def __setattr__(self, key, value):
-        object.__setattr__(self, key, value)
 
     # reset the parser's state#
     def reset(self):
@@ -366,7 +361,7 @@ class Parser (Recognizer):
     # Always called by generated parsers upon entry to a rule. Access field
     # {@link #_ctx} get the current context.
     #
-    def enterRule(self, localctx , state , ruleIndexint ):
+    def enterRule(self, localctx , state , ruleIndex ):
         self.state = state
         self._ctx = localctx
         self._ctx.start = self._input.LT(1)

@@ -59,8 +59,6 @@ class ErrorNode(TerminalNode):
 class ParseTreeVisitor(object):
     pass
 
-ParserRuleContext = None
-
 class ParseTreeListener(object):
 
     def visitTerminal(self, node):
@@ -74,8 +72,6 @@ class ParseTreeListener(object):
 
     def exitEveryRule(self, ctx):
         pass
-
-del ParserRuleContext
 
 class TerminalNodeImpl(TerminalNode):
 
