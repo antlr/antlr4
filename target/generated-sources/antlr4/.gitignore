@@ -4,3 +4,5 @@
 /TLexer.tokens
 /TListener.java
 /TParser.java
+/PositionAdjustingLexer.java
+/PositionAdjustingLexer.tokens
