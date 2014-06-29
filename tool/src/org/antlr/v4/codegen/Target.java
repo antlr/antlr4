@@ -35,6 +35,7 @@ import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.SerializedATN;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.runtime.RuntimeMetaData;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
@@ -88,24 +89,26 @@ public abstract class Target {
 		return language;
 	}
 
-    /** ANTLR tool should check output templates / target are compatible with tool code generation.
-     *  For now, a simple string match used on x.y of x.y.z scheme. We use a method to avoid mismatches
-     *  between a template called VERSION. This value is checked against Tool.VERSION during load of templates.
-     *
-     *  This additional method forces all targets 4.3 and beyond to add this method.
-     *
-     * @since 4.3
-     */
-    public abstract String getVersion();
+	/** ANTLR tool should check output templates / target are compatible with tool code generation.
+	 *  For now, a simple string match used on x.y of x.y.z scheme. We use a method to avoid mismatches
+	 *  between a template called VERSION. This value is checked against Tool.VERSION during load of templates.
+	 *
+	 *  This additional method forces all targets 4.3 and beyond to add this method.
+	 *
+	 * @since 4.3
+	 */
+	public abstract String getVersion();
 
-    public STGroup getTemplates() {
-        if (templates == null) {
-            String version = getVersion();
-            if (version == null || !version.equals(Tool.VERSION)) {
-                gen.tool.errMgr.toolError(ErrorType.INCOMPATIBLE_TOOL_AND_TEMPLATES, version, Tool.VERSION, language);
-            }
-            templates = loadTemplates();
-        }
+	public STGroup getTemplates() {
+		if (templates == null) {
+			String version = getVersion();
+			if ( version==null ||
+				 !RuntimeMetaData.getMajorMinorVersion(version).equals(RuntimeMetaData.getMajorMinorVersion(Tool.VERSION)))
+			{
+				gen.tool.errMgr.toolError(ErrorType.INCOMPATIBLE_TOOL_AND_TEMPLATES, version, Tool.VERSION, language);
+			}
+			templates = loadTemplates();
+		}
 
 		return templates;
 	}
@@ -311,33 +314,33 @@ public abstract class Target {
 
 	public boolean grammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
 		switch (idNode.getParent().getType()) {
-		case ANTLRParser.ASSIGN:
-			switch (idNode.getParent().getParent().getType()) {
+			case ANTLRParser.ASSIGN:
+				switch (idNode.getParent().getParent().getType()) {
+					case ANTLRParser.ELEMENT_OPTIONS:
+					case ANTLRParser.OPTIONS:
+						return false;
+
+					default:
+						break;
+				}
+
+				break;
+
+			case ANTLRParser.AT:
 			case ANTLRParser.ELEMENT_OPTIONS:
-			case ANTLRParser.OPTIONS:
 				return false;
+
+			case ANTLRParser.LEXER_ACTION_CALL:
+				if (idNode.getChildIndex() == 0) {
+					// first child is the command name which is part of the ANTLR language
+					return false;
+				}
+
+				// arguments to the command should be checked
+				break;
 
 			default:
 				break;
-			}
-
-			break;
-
-		case ANTLRParser.AT:
-		case ANTLRParser.ELEMENT_OPTIONS:
-			return false;
-
-		case ANTLRParser.LEXER_ACTION_CALL:
-			if (idNode.getChildIndex() == 0) {
-				// first child is the command name which is part of the ANTLR language
-				return false;
-			}
-
-			// arguments to the command should be checked
-			break;
-
-		default:
-			break;
 		}
 
 		return visibleGrammarSymbolCausesIssueInGeneratedCode(idNode);
