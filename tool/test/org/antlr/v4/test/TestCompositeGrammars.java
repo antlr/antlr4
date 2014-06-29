@@ -35,10 +35,97 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class TestCompositeGrammars extends BaseTest {
 	protected boolean debug = false;
+
+	@Test public void testImportFileLocationInSubdir() throws Exception {
+		String slave =
+			"parser grammar S;\n" +
+			"a : B {System.out.println(\"S.a\");} ;\n";
+		mkdir(tmpdir);
+		String subdir = tmpdir + "/sub";
+		mkdir(subdir);
+		writeFile(subdir, "S.g4", slave);
+		String master =
+			"grammar M;\n" +
+			"import S;\n" +
+			"s : a ;\n" +
+			"B : 'b' ;" + // defines B from inherited token space
+			"WS : (' '|'\\n') -> skip ;\n" ;
+		writeFile(tmpdir, "M.g4", master);
+		ErrorQueue equeue = antlr("M.g4", false, "-lib", subdir);
+		assertEquals(equeue.size(), 0);
+	}
+
+	@Test public void testImportFileNotSearchedForInOutputDir() throws Exception {
+		String slave =
+			"parser grammar S;\n" +
+			"a : B {System.out.println(\"S.a\");} ;\n";
+		mkdir(tmpdir);
+		String outdir = tmpdir + "/out";
+		mkdir(outdir);
+		writeFile(outdir, "S.g4", slave);
+		String master =
+			"grammar M;\n" +
+			"import S;\n" +
+			"s : a ;\n" +
+			"B : 'b' ;" + // defines B from inherited token space
+			"WS : (' '|'\\n') -> skip ;\n" ;
+		writeFile(tmpdir, "M.g4", master);
+		ErrorQueue equeue = antlr("M.g4", false, "-o", outdir);
+		assertEquals(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, equeue.errors.get(0).getErrorType());
+	}
+
+	@Test public void testOutputDirShouldNotEffectImports() throws Exception {
+		String slave =
+			"parser grammar S;\n" +
+			"a : B {System.out.println(\"S.a\");} ;\n";
+		mkdir(tmpdir);
+		String subdir = tmpdir + "/sub";
+		mkdir(subdir);
+		writeFile(subdir, "S.g4", slave);
+		String master =
+			"grammar M;\n" +
+			"import S;\n" +
+			"s : a ;\n" +
+			"B : 'b' ;" + // defines B from inherited token space
+			"WS : (' '|'\\n') -> skip ;\n" ;
+		writeFile(tmpdir, "M.g4", master);
+		String outdir = tmpdir + "/out";
+		mkdir(outdir);
+		ErrorQueue equeue = antlr("M.g4", false, "-o", outdir, "-lib", subdir);
+		assertEquals(0, equeue.size());
+	}
+
+	@Test public void testTokensFileInOutputDirAndImportFileInSubdir() throws Exception {
+		String slave =
+			"parser grammar S;\n" +
+			"a : B {System.out.println(\"S.a\");} ;\n";
+		mkdir(tmpdir);
+		String subdir = tmpdir + "/sub";
+		mkdir(subdir);
+		writeFile(subdir, "S.g4", slave);
+		String parser =
+			"parser grammar MParser;\n" +
+			"import S;\n" +
+			"options {tokenVocab=MLexer;}\n" +
+			"s : a ;\n";
+		writeFile(tmpdir, "MParser.g4", parser);
+		String lexer =
+			"lexer grammar MLexer;\n" +
+			"B : 'b' ;" + // defines B from inherited token space
+			"WS : (' '|'\\n') -> skip ;\n" ;
+		writeFile(tmpdir, "MLexer.g4", lexer);
+		String outdir = tmpdir + "/out";
+		mkdir(outdir);
+		ErrorQueue equeue = antlr("MLexer.g4", false, "-o", outdir);
+		assertEquals(0, equeue.size());
+		equeue = antlr("MParser.g4", false, "-o", outdir, "-lib", subdir);
+		assertEquals(0, equeue.size());
+	}
 
 	@Test public void testDelegatorInvokesDelegateRule() throws Exception {
 		String slave =
@@ -641,7 +728,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"s : a ;\n" +
 			"B : 'b' ;" + // defines B from inherited token space
 			"WS : (' '|'\\n') -> skip ;\n" ;
-		ErrorQueue equeue = antlr("M.g4", "M.g4", master, false);
+		ErrorQueue equeue = antlr("M.g4", master, false);
 		int expecting = 0; // should be ok
 		assertEquals(expecting, equeue.errors.size());
 	}

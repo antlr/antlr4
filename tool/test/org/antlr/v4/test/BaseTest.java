@@ -59,6 +59,7 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRMessage;
@@ -81,13 +82,10 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
@@ -442,19 +440,21 @@ public abstract class BaseTest {
 		*/
 	}
 
-	/** Return true if all is ok, no errors */
-	protected ErrorQueue antlr(String fileName, String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
-		System.out.println("dir "+tmpdir);
-		mkdir(tmpdir);
-		writeFile(tmpdir, fileName, grammarStr);
+	protected ErrorQueue antlr(String grammarFileName, boolean defaultListener, String... extraOptions) {
 		final List<String> options = new ArrayList<String>();
 		Collections.addAll(options, extraOptions);
-		options.add("-o");
-		options.add(tmpdir);
-		options.add("-lib");
-		options.add(tmpdir);
-		options.add("-encoding");
-		options.add("UTF-8");
+		if ( !options.contains("-o") ) {
+			options.add("-o");
+			options.add(tmpdir);
+		}
+		if ( !options.contains("-lib") ) {
+			options.add("-lib");
+			options.add(tmpdir);
+		}
+		if ( !options.contains("-encoding") ) {
+			options.add("-encoding");
+			options.add("UTF-8");
+		}
 		options.add(new File(tmpdir,grammarFileName).toString());
 
 		final String[] optionsA = new String[options.size()];
@@ -474,7 +474,12 @@ public abstract class BaseTest {
 				System.err.println(msg);
 			}
 			System.out.println("!!!\ngrammar:");
-			System.out.println(grammarStr);
+			try {
+				System.out.println(new String(Utils.readFile(tmpdir+"/"+grammarFileName)));
+			}
+			catch (IOException ioe) {
+				System.err.println(ioe.toString());
+			}
 			System.out.println("###");
 		}
 		if ( !defaultListener && !equeue.warnings.isEmpty() ) {
@@ -486,6 +491,13 @@ public abstract class BaseTest {
 		}
 
 		return equeue;
+	}
+
+	protected ErrorQueue antlr(String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
+		System.out.println("dir "+tmpdir);
+		mkdir(tmpdir);
+		writeFile(tmpdir, grammarFileName, grammarStr);
+		return antlr(grammarFileName, defaultListener, extraOptions);
 	}
 
 	protected String execLexer(String grammarFileName,
@@ -599,7 +611,7 @@ public abstract class BaseTest {
 								String input, boolean debug,
 								boolean profile)
 	{
-	boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 														grammarStr,
 														parserName,
 														lexerName,
@@ -632,7 +644,7 @@ public abstract class BaseTest {
 													String... extraOptions)
 	{
 		ErrorQueue equeue =
-			antlr(grammarFileName, grammarFileName, grammarStr, defaultListener, extraOptions);
+			antlr(grammarFileName, grammarStr, defaultListener, extraOptions);
 		if (!equeue.errors.isEmpty()) {
 			return false;
 		}
@@ -789,7 +801,7 @@ public abstract class BaseTest {
 
 			String[] lines = input.split("\n");
 			String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
-			ErrorQueue equeue = antlr(fileName, fileName, input, false);
+			ErrorQueue equeue = antlr(fileName, input, false);
 
 			String actual = equeue.toString(true);
 			actual = actual.replace(tmpdir + File.separator, "");
@@ -1027,13 +1039,7 @@ public abstract class BaseTest {
 
 	public static void writeFile(String dir, String fileName, String content) {
 		try {
-			File f = new File(dir, fileName);
-			FileOutputStream outputStream = new FileOutputStream(f);
-			OutputStreamWriter w = new OutputStreamWriter(outputStream, "UTF-8");
-			BufferedWriter bw = new BufferedWriter(w);
-			bw.write(content);
-			bw.close();
-			w.close();
+			Utils.writeFile(dir+"/"+fileName, content, "UTF-8");
 		}
 		catch (IOException ioe) {
 			System.err.println("can't write file");
