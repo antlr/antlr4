@@ -49,7 +49,8 @@ public class CodeGenPipeline {
 
 	public void process() {
 		CodeGenerator gen = new CodeGenerator(g);
-		if (gen.getTarget() == null) {
+		Target target = gen.getTarget();
+		if (target == null) {
 			return;
 		}
 
@@ -59,14 +60,12 @@ public class CodeGenPipeline {
 		idTypes.add(ANTLRParser.TOKEN_REF);
 		List<GrammarAST> idNodes = g.ast.getNodesWithType(idTypes);
 		for (GrammarAST idNode : idNodes) {
-			if ( gen.getTarget().grammarSymbolCausesIssueInGeneratedCode(idNode) ) {
+			if ( target.grammarSymbolCausesIssueInGeneratedCode(idNode) ) {
 				g.tool.errMgr.grammarError(ErrorType.USE_OF_BAD_WORD,
 										   g.fileName, idNode.getToken(),
 										   idNode.getText());
 			}
 		}
-
-		if ( gen.getTemplates()==null ) return;
 
 		if ( g.isLexer() ) {
 			ST lexer = gen.generateLexer();
@@ -77,12 +76,12 @@ public class CodeGenPipeline {
 			writeRecognizer(parser, gen);
 			if ( g.tool.gen_listener ) {
 				gen.writeListener(gen.generateListener());
-				if (gen.getTarget().wantsBaseListener())
+				if (target.wantsBaseListener())
 					gen.writeBaseListener(gen.generateBaseListener());
 			}
 			if ( g.tool.gen_visitor ) {
 				gen.writeVisitor(gen.generateVisitor());
-				if (gen.getTarget().wantsBaseVisitor())
+				if (target.wantsBaseVisitor())
 					gen.writeBaseVisitor(gen.generateBaseVisitor());
 			}
 			gen.writeHeaderFile();
