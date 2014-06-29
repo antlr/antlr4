@@ -375,7 +375,13 @@ public class Tool {
 				lexerg.originalGrammar = g;
 				g.implicitLexer = lexerg;
 				lexerg.implicitLexerOwner = g;
+
+				int prevErrors = errMgr.getNumErrors();
 				processNonCombinedGrammar(lexerg, gencode);
+				if (errMgr.getNumErrors() > prevErrors) {
+					return;
+				}
+
 //				System.out.println("lexer tokens="+lexerg.tokenNameToTypeMap);
 //				System.out.println("lexer strings="+lexerg.stringLiteralToTypeMap);
 			}
