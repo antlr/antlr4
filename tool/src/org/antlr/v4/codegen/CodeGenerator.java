@@ -143,7 +143,12 @@ public class CodeGenerator {
 	}
 
 	private ST walk(OutputModelObject outputModel) {
-		OutputModelWalker walker = new OutputModelWalker(tool, getTemplates());
+		Target target = getTarget();
+		if (target == null) {
+			throw new UnsupportedOperationException("Cannot generate code without a target.");
+		}
+
+		OutputModelWalker walker = new OutputModelWalker(tool, target.getTemplates());
 		return walker.walk(outputModel);
 	}
 
@@ -187,43 +192,78 @@ public class CodeGenerator {
 	}
 
 	public void writeRecognizer(ST outputFileST) {
-		getTarget().genFile(g, outputFileST, getRecognizerFileName());
+		Target target = getTarget();
+		if (target == null) {
+			throw new UnsupportedOperationException("Cannot generate code without a target.");
+		}
+
+		target.genFile(g, outputFileST, getRecognizerFileName());
 	}
 
 	public void writeListener(ST outputFileST) {
-		getTarget().genFile(g,outputFileST, getListenerFileName());
+		Target target = getTarget();
+		if (target == null) {
+			throw new UnsupportedOperationException("Cannot generate code without a target.");
+		}
+
+		target.genFile(g,outputFileST, getListenerFileName());
 	}
 
 	public void writeBaseListener(ST outputFileST) {
-		getTarget().genFile(g,outputFileST, getBaseListenerFileName());
+		Target target = getTarget();
+		if (target == null) {
+			throw new UnsupportedOperationException("Cannot generate code without a target.");
+		}
+
+		target.genFile(g,outputFileST, getBaseListenerFileName());
 	}
 
 	public void writeVisitor(ST outputFileST) {
-		getTarget().genFile(g,outputFileST, getVisitorFileName());
+		Target target = getTarget();
+		if (target == null) {
+			throw new UnsupportedOperationException("Cannot generate code without a target.");
+		}
+
+		target.genFile(g,outputFileST, getVisitorFileName());
 	}
 
 	public void writeBaseVisitor(ST outputFileST) {
-		getTarget().genFile(g,outputFileST, getBaseVisitorFileName());
+		Target target = getTarget();
+		if (target == null) {
+			throw new UnsupportedOperationException("Cannot generate code without a target.");
+		}
+
+		target.genFile(g,outputFileST, getBaseVisitorFileName());
 	}
 
 	public void writeHeaderFile() {
+		Target target = getTarget();
+		if (target == null) {
+			throw new UnsupportedOperationException("Cannot generate code without a target.");
+		}
+
 		String fileName = getHeaderFileName();
 		if ( fileName==null ) return;
-		if ( getTemplates().isDefined("headerFile") ) {
-			ST extST = getTemplates().getInstanceOf("headerFileExtension");
+		if ( target.getTemplates().isDefined("headerFile") ) {
+			ST extST = target.getTemplates().getInstanceOf("headerFileExtension");
 			ST headerFileST = null;
 			// TODO:  don't hide this header file generation here!
-			getTarget().genRecognizerHeaderFile(g,headerFileST,extST.render(lineWidth));
+			target.genRecognizerHeaderFile(g,headerFileST,extST.render(lineWidth));
 		}
 	}
 
 	public void writeVocabFile() {
+		Target target = getTarget();
+		if (target == null) {
+			throw new UnsupportedOperationException("Cannot generate code without a target.");
+		}
+
 		// write out the vocab interchange file; used by antlr,
 		// does not change per target
 		ST tokenVocabSerialization = getTokenVocabOutput();
 		String fileName = getVocabFileName();
 		if ( fileName!=null ) {
-			getTarget().genFile(g, tokenVocabSerialization, fileName);
+			target.genFile(g, tokenVocabSerialization, fileName);
 		}
 	}
 
@@ -248,7 +288,12 @@ public class CodeGenerator {
 	 *  just use T.java as output regardless of type.
 	 */
 	public String getRecognizerFileName() {
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		Target target = getTarget();
+		if (target == null) {
+			throw new UnsupportedOperationException("Cannot generate code without a target.");
+		}
+
+		ST extST = target.getTemplates().getInstanceOf("codeFileExtension");
 		String recognizerName = g.getRecognizerName();
 		return recognizerName+extST.render();
 	}
@@ -257,8 +302,13 @@ public class CodeGenerator {
 	 *  TListener.java, if we're using the Java target.
  	 */
 	public String getListenerFileName() {
+		Target target = getTarget();
+		if (target == null) {
+			throw new UnsupportedOperationException("Cannot generate code without a target.");
+		}
+
 		assert g.name != null;
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		ST extST = target.getTemplates().getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "Listener";
 		return listenerName+extST.render();
 	}
@@ -267,8 +317,13 @@ public class CodeGenerator {
 	 *  TVisitor.java, if we're using the Java target.
  	 */
 	public String getVisitorFileName() {
+		Target target = getTarget();
+		if (target == null) {
+			throw new UnsupportedOperationException("Cannot generate code without a target.");
+		}
+
 		assert g.name != null;
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		ST extST = target.getTemplates().getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "Visitor";
 		return listenerName+extST.render();
 	}
@@ -277,8 +332,13 @@ public class CodeGenerator {
 	 *  such as TBaseListener.java, if we're using the Java target.
  	 */
 	public String getBaseListenerFileName() {
+		Target target = getTarget();
+		if (target == null) {
+			throw new UnsupportedOperationException("Cannot generate code without a target.");
+		}
+
 		assert g.name != null;
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		ST extST = target.getTemplates().getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "BaseListener";
 		return listenerName+extST.render();
 	}
@@ -287,8 +347,13 @@ public class CodeGenerator {
 	 *  such as TBaseListener.java, if we're using the Java target.
  	 */
 	public String getBaseVisitorFileName() {
+		Target target = getTarget();
+		if (target == null) {
+			throw new UnsupportedOperationException("Cannot generate code without a target.");
+		}
+
 		assert g.name != null;
-		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		ST extST = target.getTemplates().getInstanceOf("codeFileExtension");
 		String listenerName = g.name + "BaseVisitor";
 		return listenerName+extST.render();
 	}
@@ -301,7 +366,12 @@ public class CodeGenerator {
 	}
 
 	public String getHeaderFileName() {
-		ST extST = getTemplates().getInstanceOf("headerFileExtension");
+		Target target = getTarget();
+		if (target == null) {
+			throw new UnsupportedOperationException("Cannot generate code without a target.");
+		}
+
+		ST extST = target.getTemplates().getInstanceOf("headerFileExtension");
 		if ( extST==null ) return null;
 		String recognizerName = g.getRecognizerName();
 		return recognizerName+extST.render();
