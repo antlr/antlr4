@@ -34,6 +34,7 @@ import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.stringtemplate.v4.AutoIndentWriter;
@@ -79,6 +80,7 @@ public class CodeGenerator {
 		this.language = language != null ? language : DEFAULT_LANGUAGE;
 	}
 
+	@Nullable
 	public Target getTarget() {
 		if (target == null) {
 			loadLanguageTarget(language);
@@ -87,6 +89,7 @@ public class CodeGenerator {
 		return target;
 	}
 
+	@Nullable
 	public STGroup getTemplates() {
 		Target target = getTarget();
 		if (target == null) {
