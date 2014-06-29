@@ -36,6 +36,7 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.AutoIndentWriter;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -83,12 +84,11 @@ public class CodeGenerator {
 		if (target == null) {
 			loadLanguageTarget(language);
 		}
-
 		return target;
 	}
 
 	public STGroup getTemplates() {
-        return getTarget().getTemplates();
+		return getTarget().getTemplates();
 	}
 
 	protected void loadLanguageTarget(String language) {
@@ -122,6 +122,10 @@ public class CodeGenerator {
 			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
 						 cnfe,
 						 targetName);
+		}
+		if ( target == null ) {
+			// Try to fake our way through execution of the tool using the Java target object
+			target = new JavaTarget(this);
 		}
 	}
 

@@ -318,6 +318,16 @@ public class ErrorManager {
         e.printStackTrace(System.err);
     }
 
+	public void panic(ErrorType errorType, Object... args) {
+		ToolMessage msg = new ToolMessage(errorType, args);
+		ST msgST = getMessageTemplate(msg);
+		String outputMsg = msgST.render();
+		if ( formatWantsSingleLineMessage() ) {
+			outputMsg = outputMsg.replace('\n', ' ');
+		}
+		panic(outputMsg);
+	}
+
 	public static void panic(String msg) {
 		rawError(msg);
 		panic();
