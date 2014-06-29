@@ -88,7 +88,12 @@ public class CodeGenerator {
 	}
 
 	public STGroup getTemplates() {
-        return getTarget().getTemplates();
+		Target target = getTarget();
+		if (target == null) {
+			return null;
+		}
+
+		return target.getTemplates();
 	}
 
 	protected void loadLanguageTarget(String language) {
