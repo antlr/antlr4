@@ -41,6 +41,8 @@ import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.LeftRecursiveRuleWalker;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.ast.AltAST;
@@ -80,7 +82,9 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 	public GrammarAST retvals;
 
+	@NotNull
 	public STGroup recRuleTemplates;
+	@NotNull
 	public STGroup codegenTemplates;
 	public String language;
 
@@ -110,7 +114,14 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 		// use codegen to get correct language templates; that's it though
 		CodeGenerator gen = new CodeGenerator(tool, null, language);
-		codegenTemplates = gen.getTemplates();
+		STGroup templates = gen.getTemplates();
+		if (templates == null) {
+			// this class will still operate using Java templates
+			templates = new CodeGenerator(tool, null, "Java").getTemplates();
+			assert templates != null;
+		}
+
+		codegenTemplates = templates;
 	}
 
 	@Override
