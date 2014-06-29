@@ -63,6 +63,10 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 	protected DefaultOutputModelFactory(@NotNull CodeGenerator gen) {
 		this.gen = gen;
 		this.g = gen.g;
+
+		if (gen.getTarget() == null) {
+			throw new UnsupportedOperationException("Cannot build an output model without a target.");
+		}
 	}
 
 	@Override
@@ -83,6 +87,13 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 
 	@Override
 	public CodeGenerator getGenerator() { return gen; }
+
+	@Override
+	public Target getTarget() {
+		Target target = getGenerator().getTarget();
+		assert target != null;
+		return target;
+	}
 
 	@Override
 	public OutputModelObject getRoot() { return controller.getRoot(); }
