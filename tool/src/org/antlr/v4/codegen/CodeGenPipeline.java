@@ -49,6 +49,9 @@ public class CodeGenPipeline {
 
 	public void process() {
 		CodeGenerator gen = new CodeGenerator(g);
+		if (gen.getTarget() == null) {
+			return;
+		}
 
 		IntervalSet idTypes = new IntervalSet();
 		idTypes.add(ANTLRParser.ID);
