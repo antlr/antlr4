@@ -43,6 +43,7 @@ import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
@@ -55,7 +56,11 @@ import java.util.List;
 public interface OutputModelFactory {
 	Grammar getGrammar();
 
+	@NotNull
 	CodeGenerator getGenerator();
+
+	@NotNull
+	Target getTarget();
 
 	void setController(OutputModelController controller);
 

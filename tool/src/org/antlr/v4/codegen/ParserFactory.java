@@ -169,7 +169,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	}
 
 	public TokenListDecl getTokenListLabelDecl(String label) {
-		return new TokenListDecl(this, gen.getTarget().getListLabel(label));
+		return new TokenListDecl(this, getTarget().getListLabel(label));
 	}
 
 	@Override
@@ -232,7 +232,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 			c.label = d;
 			getCurrentRuleFunction().addContextDecl(labelAST.getAltLabel(), d);
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN  ) {
-				String listLabel = gen.getTarget().getListLabel(label);
+				String listLabel = getTarget().getListLabel(label);
 				TokenListDecl l = new TokenListDecl(this, listLabel);
 				getCurrentRuleFunction().addContextDecl(labelAST.getAltLabel(), l);
 			}
@@ -333,20 +333,20 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		Decl d;
 		if ( ast.getType()==ANTLRParser.SET || ast.getType()==ANTLRParser.WILDCARD ) {
 			String implLabel =
-				gen.getTarget().getImplicitSetLabel(String.valueOf(ast.token.getTokenIndex()));
+				getTarget().getImplicitSetLabel(String.valueOf(ast.token.getTokenIndex()));
 			d = getTokenLabelDecl(implLabel);
 			((TokenDecl)d).isImplicit = true;
 		}
 		else if ( ast.getType()==ANTLRParser.RULE_REF ) { // a rule reference?
 			Rule r = g.getRule(ast.getText());
-			String implLabel = gen.getTarget().getImplicitRuleLabel(ast.getText());
+			String implLabel = getTarget().getImplicitRuleLabel(ast.getText());
 			String ctxName =
-				gen.getTarget().getRuleFunctionContextStructName(r);
+				getTarget().getRuleFunctionContextStructName(r);
 			d = new RuleContextDecl(this, implLabel, ctxName);
 			((RuleContextDecl)d).isImplicit = true;
 		}
 		else {
-			String implLabel = gen.getTarget().getImplicitTokenLabel(ast.getText());
+			String implLabel = getTarget().getImplicitTokenLabel(ast.getText());
 			d = getTokenLabelDecl(implLabel);
 			((TokenDecl)d).isImplicit = true;
 		}
@@ -358,7 +358,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	public AddToLabelList getAddToListOpIfListLabelPresent(LabeledOp op, GrammarAST label) {
 		AddToLabelList labelOp = null;
 		if ( label!=null && label.parent.getType()==ANTLRParser.PLUS_ASSIGN ) {
-			String listLabel = gen.getTarget().getListLabel(label.getText());
+			String listLabel = getTarget().getListLabel(label.getText());
 			labelOp = new AddToLabelList(this, listLabel, op.getLabels().get(0));
 		}
 		return labelOp;

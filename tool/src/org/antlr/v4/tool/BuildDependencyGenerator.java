@@ -31,6 +31,7 @@ package org.antlr.v4.tool;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.Target;
 import org.antlr.v4.parse.ANTLRParser;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -99,6 +100,12 @@ public class BuildDependencyGenerator {
      *  name files ANTLR will emit from T.g.
      */
     public List<File> getGeneratedFileList() {
+		Target target = generator.getTarget();
+		if (target == null) {
+			// if the target could not be loaded, no code will be generated.
+			return new ArrayList<File>();
+		}
+
         List<File> files = new ArrayList<File>();
 
         // add generated recognizer; e.g., TParser.java
@@ -107,11 +114,11 @@ public class BuildDependencyGenerator {
         // the base output directory, which will be just . if there is no -o option
         //
 		files.add(getOutputFile(generator.getVocabFileName()));
-        // are we generating a .h file?
+		// are we generating a .h file?
         ST headerExtST = null;
-        ST extST = generator.getTemplates().getInstanceOf("codeFileExtension");
-        if (generator.getTemplates().isDefined("headerFile")) {
-            headerExtST = generator.getTemplates().getInstanceOf("headerFileExtension");
+        ST extST = target.getTemplates().getInstanceOf("codeFileExtension");
+        if (target.getTemplates().isDefined("headerFile")) {
+            headerExtST = target.getTemplates().getInstanceOf("headerFileExtension");
             String suffix = Grammar.getGrammarTypeToFileNameSuffix(g.getType());
             String fileName = g.name + suffix + headerExtST.render();
             files.add(getOutputFile(fileName));

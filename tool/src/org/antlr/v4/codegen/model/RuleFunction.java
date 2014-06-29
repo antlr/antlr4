@@ -245,10 +245,10 @@ public class RuleFunction extends OutputModelObject {
 		List<Decl> decls = new ArrayList<Decl>();
 		if ( t.getType()==RULE_REF ) {
 			Rule rref = factory.getGrammar().getRule(t.getText());
-			String ctxName = factory.getGenerator().getTarget()
+			String ctxName = factory.getTarget()
 							 .getRuleFunctionContextStructName(rref);
 			if ( needList) {
-				if(factory.getGenerator().getTarget().supportsOverloadedMethods())
+				if(factory.getTarget().supportsOverloadedMethods())
 					decls.add( new ContextRuleListGetterDecl(factory, refLabelName, ctxName) );
 				decls.add( new ContextRuleListIndexedGetterDecl(factory, refLabelName, ctxName) );
 			}
@@ -258,7 +258,7 @@ public class RuleFunction extends OutputModelObject {
 		}
 		else {
 			if ( needList ) {
-				if(factory.getGenerator().getTarget().supportsOverloadedMethods())
+				if(factory.getTarget().supportsOverloadedMethods())
 					decls.add( new ContextTokenListGetterDecl(factory, refLabelName) );
 				decls.add( new ContextTokenListIndexedGetterDecl(factory, refLabelName) );
 			}
