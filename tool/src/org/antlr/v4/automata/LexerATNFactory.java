@@ -33,6 +33,7 @@ package org.antlr.v4.automata;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.Target;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.IntStream;
@@ -76,6 +77,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class LexerATNFactory extends ParserATNFactory {
+	@Nullable
 	public STGroup codegenTemplates;
 
 	/**
@@ -111,7 +113,8 @@ public class LexerATNFactory extends ParserATNFactory {
 		// use codegen to get correct language templates for lexer commands
 		String language = g.getOptionString("language");
 		CodeGenerator gen = new CodeGenerator(g.tool, null, language);
-		codegenTemplates = gen.getTemplates();
+		Target target = gen.getTarget();
+		codegenTemplates = target != null ? target.getTemplates() : null;
 	}
 
 	@Override
@@ -218,6 +221,11 @@ public class LexerATNFactory extends ParserATNFactory {
 			return action(ID, lexerAction);
 		}
 
+		if (codegenTemplates == null) {
+			// suppress reporting a single missing template when the target couldn't be loaded
+			return epsilon(ID);
+		}
+
 		// fall back to standard action generation for the command
 		ST cmdST = codegenTemplates.getInstanceOf("Lexer" +
 												  CharSupport.capitalize(ID.getText())+
@@ -241,6 +249,11 @@ public class LexerATNFactory extends ParserATNFactory {
 		LexerAction lexerAction = createLexerAction(ID, null);
 		if (lexerAction != null) {
 			return action(ID, lexerAction);
+		}
+
+		if (codegenTemplates == null) {
+			// suppress reporting a single missing template when the target couldn't be loaded
+			return epsilon(ID);
 		}
 
 		// fall back to standard action generation for the command
