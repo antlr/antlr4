@@ -49,9 +49,8 @@ public class MatchToken extends RuleElement implements LabeledOp {
 	public MatchToken(OutputModelFactory factory, TerminalAST ast) {
 		super(factory, ast);
 		Grammar g = factory.getGrammar();
-		CodeGenerator gen = factory.getGenerator();
 		ttype = g.getTokenType(ast.getText());
-		name = gen.getTarget().getTokenTypeAsTargetLabel(g, ttype);
+		name = factory.getTarget().getTokenTypeAsTargetLabel(g, ttype);
 	}
 
 	public MatchToken(OutputModelFactory factory, GrammarAST ast) {
