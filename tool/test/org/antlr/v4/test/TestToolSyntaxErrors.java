@@ -545,4 +545,27 @@ public class TestToolSyntaxErrors extends BaseTest {
 
 		super.testErrors(pair, true);
 	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#649 "unknown target causes
+	 * null ptr exception.".
+	 * https://github.com/antlr/antlr4/issues/649
+	 */
+	@Test public void testInvalidLanguageInGrammarWithLexerCommand() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options { language=Foo; }\n" +
+			"start : 'T' EOF;\n" +
+			"Something : 'something' -> channel(CUSTOM);";
+		String expected =
+			"error(" + ErrorType.CANNOT_CREATE_TARGET_GENERATOR.code + "):  ANTLR cannot generate 'org.antlr.v4.codegen.FooTarget' code as of version " + Tool.VERSION + "\n" +
+			"warning(" + ErrorType.UNKNOWN_LEXER_CONSTANT.code + "): T.g4:4:35: rule 'Something' contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output\n";
+
+		String[] pair = new String[] {
+			grammar,
+			expected
+		};
+
+		super.testErrors(pair, true);
+	}
 }
