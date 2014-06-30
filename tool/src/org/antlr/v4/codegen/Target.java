@@ -124,11 +124,12 @@ public abstract class Target {
 	 *  to a token type in the generated code.
 	 */
 	public String getTokenTypeAsTargetLabel(Grammar g, int ttype) {
-		String name = g.getTokenDisplayName(ttype);
-		// If name is a literal, return the token type instead
-		if ( name==null || name.charAt(0)=='\'' ) {
+		String name = g.getTokenName(ttype);
+		// If name is not valid, return the token type instead
+		if ( Grammar.INVALID_TOKEN_NAME.equals(name) ) {
 			return String.valueOf(ttype);
 		}
+
 		return name;
 	}
 
