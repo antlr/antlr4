@@ -350,6 +350,18 @@ public abstract class Target {
 
 	protected abstract boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode);
 
+	public boolean templatesExist() {
+		String groupFileName = CodeGenerator.TEMPLATE_ROOT + "/" + getLanguage() + "/" + getLanguage() + STGroup.GROUP_FILE_EXTENSION;
+		STGroup result = null;
+		try {
+			result = new STGroupFile(groupFileName);
+		}
+		catch (IllegalArgumentException iae) {
+			result = null;
+		}
+		return result!=null;
+	}
+
 	@Nullable
 	protected STGroup loadTemplates() {
 		String groupFileName = CodeGenerator.TEMPLATE_ROOT + "/" + getLanguage() + "/" + getLanguage() + STGroup.GROUP_FILE_EXTENSION;

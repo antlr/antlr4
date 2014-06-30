@@ -70,6 +70,12 @@ public class CodeGenerator {
 
 	public int lineWidth = 72;
 
+	private CodeGenerator(String language) {
+		this.g = null;
+		this.tool = null;
+		this.language = language;
+	}
+
 	public CodeGenerator(@NotNull Grammar g) {
 		this(g.tool, g, g.getOptionString("language"));
 	}
@@ -81,32 +87,17 @@ public class CodeGenerator {
 	}
 
 	public static boolean targetExists(String language) {
-		boolean exists = true;
 		String targetName = "org.antlr.v4.codegen."+language+"Target";
 		try {
 			Class<? extends Target> c = Class.forName(targetName).asSubclass(Target.class);
 			Constructor<? extends Target> ctor = c.getConstructor(CodeGenerator.class);
+			CodeGenerator gen = new CodeGenerator(language);
+			Target target = ctor.newInstance(gen);
+			return target.templatesExist();
 		}
-		catch (Exception e) {
-			exists = false;
+		catch (Exception e) { // ignore errors; we're detecting presence only
 		}
-		if ( !exists ) {
-			return false; // can't find XTarget; don't return from exception clause
-		}
-
-		return templatesExist(language);
-	}
-
-	public static boolean templatesExist(String language) {
-		String groupFileName = TEMPLATE_ROOT + "/" + language + "/" + language + STGroup.GROUP_FILE_EXTENSION;
-		STGroup result = null;
-		try {
-			result = new STGroupFile(groupFileName);
-		}
-		catch (IllegalArgumentException iae) {
-			result = null;
-		}
-		return result!=null;
+		return false;
 	}
 
 	@Nullable
