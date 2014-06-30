@@ -32,6 +32,7 @@ package org.antlr.v4.test;
 
 import org.antlr.v4.parse.ScopeParser;
 import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.Grammar;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -55,11 +56,12 @@ public class TestScopeParsing extends BaseTest {
         "i,j, k",                           "{i=null i, j=null j, k=null k}",
     };
 
-    @Test public void testArgs() {
+    @Test public void testArgs() throws Exception {
         for (int i = 0; i < argPairs.length; i+=2) {
             String input = argPairs[i];
             String expected = argPairs[i+1];
-            String actual = ScopeParser.parseTypedArgList(null, input, new ErrorManager(null)).attributes.toString();
+			Grammar dummy = new Grammar("grammar T; a:'a';");
+			String actual = ScopeParser.parseTypedArgList(null, input, dummy).attributes.toString();
             assertEquals(expected, actual);
         }
     }

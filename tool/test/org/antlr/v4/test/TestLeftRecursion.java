@@ -491,7 +491,7 @@ public class TestLeftRecursion extends BaseTest {
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') -> skip ;\n";
 		String expected =
-			"error(" + ErrorType.NO_NON_LR_ALTS.code + "): T.g4:3:0: left recursive rule 'a' must contain an alternative which is not left recursive\n";
+			"error(" + ErrorType.NO_NON_LR_ALTS.code + "): T.g4:3:0: left recursive rule a must contain an alternative which is not left recursive\n";
 		testErrors(new String[] { grammar, expected }, false);
 	}
 
@@ -505,7 +505,7 @@ public class TestLeftRecursion extends BaseTest {
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') -> skip ;\n";
 		String expected =
-			"error(" + ErrorType.EPSILON_LR_FOLLOW.code + "): T.g4:3:0: left recursive rule 'a' contains a left recursive alternative which can be followed by the empty string\n";
+			"error(" + ErrorType.EPSILON_LR_FOLLOW.code + "): T.g4:3:0: left recursive rule a contains a left recursive alternative which can be followed by the empty string\n";
 		testErrors(new String[] { grammar, expected }, false);
 	}
 

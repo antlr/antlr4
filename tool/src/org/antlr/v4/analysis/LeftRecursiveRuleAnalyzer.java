@@ -131,7 +131,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 					assoc = ASSOC.left;
 				}
 				else {
-					tool.errMgr.toolError(ErrorType.ILLEGAL_OPTION_VALUE, "assoc", assoc);
+					tool.errMgr.toolError(ErrorType.ILLEGAL_OPTION_VALUE, t.getToken(), "assoc", assoc);
 				}
 			}
 		}

@@ -34,6 +34,7 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
 import org.antlr.v4.Tool;
 import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.parse.ANTLRLexer;
@@ -177,7 +178,7 @@ public class LeftRecursiveRuleTransformer {
 		// update Rule to just one alt and add prec alt
 		ActionAST arg = (ActionAST)r.ast.getFirstChildWithType(ANTLRParser.ARG_ACTION);
 		if ( arg!=null ) {
-			r.args = ScopeParser.parseTypedArgList(arg, arg.getText(), g.tool.errMgr);
+			r.args = ScopeParser.parseTypedArgList(arg, arg.getText(), g);
 			r.args.type = AttributeDict.DictType.ARG;
 			r.args.ast = arg;
 			arg.resolver = r.alt[1]; // todo: isn't this Rule or something?
@@ -206,15 +207,18 @@ public class LeftRecursiveRuleTransformer {
 		lexer.tokens = tokens;
 		ToolANTLRParser p = new ToolANTLRParser(tokens, tool);
 		p.setTreeAdaptor(adaptor);
+		Token ruleStart = null;
 		try {
 			ParserRuleReturnScope r = p.rule();
 			RuleAST tree = (RuleAST)r.getTree();
+			ruleStart = (Token)r.getStart();
 			GrammarTransformPipeline.setGrammarPtr(g, tree);
 			GrammarTransformPipeline.augmentTokensWithOriginalPosition(g, tree);
 			return tree;
 		}
 		catch (Exception e) {
 			tool.errMgr.toolError(ErrorType.INTERNAL_ERROR,
+								  ruleStart,
 								  "error parsing rule created during left-recursion detection: "+ruleText,
 								  e);
 		}

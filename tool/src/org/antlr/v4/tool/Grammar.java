@@ -30,6 +30,7 @@
 
 package org.antlr.v4.tool;
 
+import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.Tool;
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.misc.CharSupport;
@@ -355,7 +356,8 @@ public class Grammar implements AttributeResolver {
             GrammarAST t = (GrammarAST)c;
             String importedGrammarName = null;
             if ( t.getType()==ANTLRParser.ASSIGN ) {
-                importedGrammarName = t.getChild(1).getText();
+				t = (GrammarAST)t.getChild(1);
+				importedGrammarName = t.getText();
                 tool.log("grammar", "import "+ importedGrammarName);
             }
             else if ( t.getType()==ANTLRParser.ID ) {
@@ -364,11 +366,14 @@ public class Grammar implements AttributeResolver {
 			}
 			Grammar g;
 			try {
-				g = tool.loadImportedGrammar(this, importedGrammarName);
+				g = tool.loadImportedGrammar(this, t);
 			}
 			catch (IOException ioe) {
-				tool.errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, ioe,
-									  importedGrammarName);
+				tool.errMgr.grammarError(ErrorType.ERROR_READING_IMPORTED_GRAMMAR,
+										 importedGrammarName,
+										 t.getToken(),
+										 importedGrammarName,
+										 name);
 				continue;
 			}
 			// did it come back as error node or missing?
@@ -811,7 +816,7 @@ public class Grammar implements AttributeResolver {
 	public void importTokensFromTokensFile() {
 		String vocab = getOptionString("tokenVocab");
 		if ( vocab!=null ) {
-			TokenVocabParser vparser = new TokenVocabParser(tool, vocab);
+			TokenVocabParser vparser = new TokenVocabParser(this);
 			Map<String,Integer> tokens = vparser.load();
 			tool.log("grammar", "tokens=" + tokens);
 			for (String t : tokens.keySet()) {
