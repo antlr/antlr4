@@ -34,18 +34,18 @@ import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.AutoIndentWriter;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.STWriter;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,7 +55,7 @@ public class CodeGenerator {
 	public static final String TEMPLATE_ROOT = "org/antlr/v4/tool/templates/codegen";
 	public static final String VOCAB_FILE_EXTENSION = ".tokens";
 	public static final String DEFAULT_LANGUAGE = "Java";
-	public final static String vocabFilePattern =
+	public static final String vocabFilePattern =
 		"<tokens.keys:{t | <t>=<tokens.(t)>\n}>" +
 		"<literals.keys:{t | <t>=<literals.(t)>\n}>";
 
@@ -80,15 +80,47 @@ public class CodeGenerator {
 		this.language = language != null ? language : DEFAULT_LANGUAGE;
 	}
 
+	public static boolean targetExists(String language) {
+		boolean exists = true;
+		String targetName = "org.antlr.v4.codegen."+language+"Target";
+		try {
+			Class<? extends Target> c = Class.forName(targetName).asSubclass(Target.class);
+			Constructor<? extends Target> ctor = c.getConstructor(CodeGenerator.class);
+		}
+		catch (Exception e) {
+			exists = false;
+		}
+		if ( !exists ) {
+			return false; // can't find XTarget; don't return from exception clause
+		}
+
+		return templatesExist(language);
+	}
+
+	public static boolean templatesExist(String language) {
+		String groupFileName = TEMPLATE_ROOT + "/" + language + "/" + language + STGroup.GROUP_FILE_EXTENSION;
+		STGroup result = null;
+		try {
+			result = new STGroupFile(groupFileName);
+		}
+		catch (IllegalArgumentException iae) {
+			result = null;
+		}
+		return result!=null;
+	}
+
+	@Nullable
 	public Target getTarget() {
-		if (target == null) {
+		if ( target == null && targetExists(language) ) {
 			loadLanguageTarget(language);
 		}
 		return target;
 	}
 
+	@Nullable
 	public STGroup getTemplates() {
-		return getTarget().getTemplates();
+		Target t = getTarget();
+		return t==null ? null : t.getTemplates();
 	}
 
 	protected void loadLanguageTarget(String language) {
@@ -98,34 +130,10 @@ public class CodeGenerator {
 			Constructor<? extends Target> ctor = c.getConstructor(CodeGenerator.class);
 			target = ctor.newInstance(this);
 		}
-		catch (ClassNotFoundException cnfe) {
+		catch (Exception e) {
 			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-						 cnfe,
+						 e,
 						 targetName);
-		}
-		catch (NoSuchMethodException nsme) {
-			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-						 nsme,
-						 targetName);
-		}
-		catch (InvocationTargetException ite) {
-			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-						 ite,
-						 targetName);
-		}
-		catch (InstantiationException ie) {
-			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-						 ie,
-						 targetName);
-		}
-		catch (IllegalAccessException cnfe) {
-			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-						 cnfe,
-						 targetName);
-		}
-		if ( target == null ) {
-			// Try to fake our way through execution of the tool using the Java target object
-			target = new JavaTarget(this);
 		}
 	}
 
@@ -187,19 +195,19 @@ public class CodeGenerator {
 	}
 
 	public void writeListener(ST outputFileST) {
-		getTarget().genFile(g,outputFileST, getListenerFileName());
+		getTarget().genFile(g, outputFileST, getListenerFileName());
 	}
 
 	public void writeBaseListener(ST outputFileST) {
-		getTarget().genFile(g,outputFileST, getBaseListenerFileName());
+		getTarget().genFile(g, outputFileST, getBaseListenerFileName());
 	}
 
 	public void writeVisitor(ST outputFileST) {
-		getTarget().genFile(g,outputFileST, getVisitorFileName());
+		getTarget().genFile(g, outputFileST, getVisitorFileName());
 	}
 
 	public void writeBaseVisitor(ST outputFileST) {
-		getTarget().genFile(g,outputFileST, getBaseVisitorFileName());
+		getTarget().genFile(g, outputFileST, getBaseVisitorFileName());
 	}
 
 	public void writeHeaderFile() {
@@ -209,7 +217,7 @@ public class CodeGenerator {
 			ST extST = getTemplates().getInstanceOf("headerFileExtension");
 			ST headerFileST = null;
 			// TODO:  don't hide this header file generation here!
-			getTarget().genRecognizerHeaderFile(g,headerFileST,extST.render(lineWidth));
+			getTarget().genRecognizerHeaderFile(g, headerFileST, extST.render(lineWidth));
 		}
 	}
 
@@ -302,4 +310,5 @@ public class CodeGenerator {
 		String recognizerName = g.getRecognizerName();
 		return recognizerName+extST.render();
 	}
+
 }
