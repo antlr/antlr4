@@ -218,9 +218,9 @@ public class LeftRecursiveRuleTransformer {
 		}
 		catch (Exception e) {
 			tool.errMgr.toolError(ErrorType.INTERNAL_ERROR,
+								  e,
 								  ruleStart,
-								  "error parsing rule created during left-recursion detection: "+ruleText,
-								  e);
+								  "error parsing rule created during left-recursion detection: "+ruleText);
 		}
 		return null;
 	}

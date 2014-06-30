@@ -164,15 +164,11 @@ public class ErrorManager {
      * @param args The arguments to pass to the StringTemplate
      */
 	public void toolError(ErrorType errorType, Object... args) {
-		toolError(errorType, null, Token.INVALID_TOKEN, args);
+		toolError(errorType, null, args);
 	}
 
-	public void toolError(ErrorType errorType, Token offendingToken, Object... args) {
-		toolError(errorType, null, offendingToken, args);
-	}
-
-	public void toolError(ErrorType errorType, Throwable e, Token offendingToken, Object... args) {
-		ToolMessage msg = new ToolMessage(errorType, e, offendingToken, args);
+	public void toolError(ErrorType errorType, Throwable e, Object... args) {
+		ToolMessage msg = new ToolMessage(errorType, e, args);
 		emit(errorType, msg);
 	}
 

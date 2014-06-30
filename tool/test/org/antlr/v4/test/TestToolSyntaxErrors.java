@@ -538,7 +538,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"start : 'T' EOF;\n" +
 			"Something : 'something' -> channel(CUSTOM);";
 		String expected =
-			"error(" + ErrorType.CANNOT_CREATE_TARGET_GENERATOR.code + "):  ANTLR cannot generate 'Foo' code as of version " + Tool.VERSION + "\n";
+			"error(" + ErrorType.CANNOT_CREATE_TARGET_GENERATOR.code + "):  ANTLR cannot generate Foo code as of version " + Tool.VERSION + "\n";
 		String[] pair = new String[] {
 			grammar,
 			expected
@@ -558,7 +558,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"options { language=Foo; }\n" +
 			"start : 'T' EOF;\n";
 		String expected =
-			"error(" + ErrorType.CANNOT_CREATE_TARGET_GENERATOR.code + "):  ANTLR cannot generate 'Foo' code as of version " + Tool.VERSION + "\n";
+			"error(" + ErrorType.CANNOT_CREATE_TARGET_GENERATOR.code + "):  ANTLR cannot generate Foo code as of version " + Tool.VERSION + "\n";
 
 		String[] pair = new String[] {
 			grammar,
