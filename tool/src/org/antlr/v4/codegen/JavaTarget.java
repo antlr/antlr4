@@ -30,6 +30,7 @@
 
 package org.antlr.v4.codegen;
 
+import org.antlr.v4.Tool;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
@@ -39,10 +40,6 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-/**
- *
- * @author Sam Harwell
- */
 public class JavaTarget extends Target {
 
 	protected static final String[] javaKeywords = {
@@ -63,7 +60,12 @@ public class JavaTarget extends Target {
 		super(gen, "Java");
 	}
 
-	public Set<String> getBadWords() {
+    @Override
+    public String getVersion() {
+        return Tool.VERSION; // Java and tool versions move in lock step
+    }
+
+    public Set<String> getBadWords() {
 		if (badWords.isEmpty()) {
 			addBadWords();
 		}

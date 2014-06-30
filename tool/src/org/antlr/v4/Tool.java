@@ -90,7 +90,7 @@ public class Tool {
 	public static final String VERSION;
 	static {
 		String version = Tool.class.getPackage().getImplementationVersion();
-		VERSION = version != null ? version : "4.x";
+		VERSION = version != null ? version : "4.3";
 	}
 
 	public static final String GRAMMAR_EXTENSION = ".g4";

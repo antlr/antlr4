@@ -169,6 +169,12 @@ public enum ErrorType {
 	 * no mapping to template name for output model class '<em>class</em>'</p>
 	 */
 	NO_MODEL_TO_TEMPLATE_MAPPING(34, "no mapping to template name for output model class '<arg>'", ErrorSeverity.ERROR),
+    /**
+   	 * Compiler Error 35.
+   	 *
+   	 * <p>templates/target and tool aren't compatible</p>
+   	 */
+   	INCOMPATIBLE_TOOL_AND_TEMPLATES(35, "<arg3> code generation target requires ANTLR <arg2>; it can't be loaded by the current ANTLR <arg>", ErrorSeverity.ERROR),
 
 	/*
 	 * Grammar errors
@@ -694,7 +700,7 @@ public enum ErrorType {
 	 * <p>Some lexer commands require an argument.</p>
 	 *
 	 * <p>The following rule produces this error.</p>
-	 * 
+	 *
 	 * <pre>
 	 * X : 'foo' -> type(Foo); // ok
 	 * Y : 'foo' -> type;      // error 150 (the type command requires an argument)
