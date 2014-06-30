@@ -147,7 +147,7 @@ public enum ErrorType {
 	 * ANTLR cannot generate '<em>language</em>' code as of version
 	 * <em>version</em></p>
 	 */
-	CANNOT_CREATE_TARGET_GENERATOR(31, "ANTLR cannot generate '<arg>' code as of version "+ Tool.VERSION, ErrorSeverity.ERROR_ONE_OFF),
+	CANNOT_CREATE_TARGET_GENERATOR(31, "ANTLR cannot generate <arg> code as of version "+ Tool.VERSION, ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 32.
 	 *

@@ -600,9 +600,10 @@ public class Tool {
 	/**
 	 * Try current dir then dir of g then lib dir
 	 * @param g
-	 * @param name The imported grammar name.
+	 * @param nameNode The node associated with the imported grammar name.
 	 */
-	public Grammar loadImportedGrammar(Grammar g, String name) throws IOException {
+	public Grammar loadImportedGrammar(Grammar g, GrammarAST nameNode) throws IOException {
+		String name = nameNode.getText();
 		g.tool.log("grammar", "load " + name + " from " + g.fileName);
 		File importedFile = null;
 		for (String extension : ALL_GRAMMAR_EXTENSIONS) {
@@ -613,12 +614,15 @@ public class Tool {
 		}
 
 		if ( importedFile==null ) {
-			errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, name, g.fileName);
+			errMgr.grammarError(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, g.fileName, nameNode.getToken(), name);
 			return null;
 		}
 
 		ANTLRFileStream in = new ANTLRFileStream(importedFile.getAbsolutePath(), grammarEncoding);
 		GrammarRootAST root = parse(g.fileName, in);
+		if ( root==null ) {
+			return null;
+		}
 		Grammar imported = createGrammar(root);
 		imported.fileName = importedFile.getAbsolutePath();
 		return imported;

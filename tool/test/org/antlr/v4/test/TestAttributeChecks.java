@@ -16,7 +16,7 @@
  *  3. The name of the author may not be used to endorse or promote products
  *     derived from this software without specific prior written permission.
  *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS AND ANY EXPRESS OR
  *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
  *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
@@ -55,8 +55,8 @@ public class TestAttributeChecks extends BaseTest {
         "c   :   ;\n";
 
     String[] membersChecks = {
-		"$a",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:2:11: unknown attribute reference 'a' in '$a'\n",
-        "$a.y",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:2:11: unknown attribute reference 'a' in '$a.y'\n",
+		"$a",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:2:11: unknown attribute reference a in $a\n",
+        "$a.y",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:2:11: unknown attribute reference a in $a.y\n",
     };
 
     String[] initChecks = {
@@ -68,8 +68,8 @@ public class TestAttributeChecks extends BaseTest {
 		"$ids",			"",
 		"$labs",		"",
 
-		"$c",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:5:8: unknown attribute reference 'c' in '$c'\n",
-		"$a.q",			"error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:5:10: unknown attribute 'q' for rule 'a' in '$a.q'\n",
+		"$c",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:5:8: unknown attribute reference c in $c\n",
+		"$a.q",			"error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:5:10: unknown attribute q for rule a in $a.q\n",
     };
 
 	String[] inlineChecks = {
@@ -92,21 +92,21 @@ public class TestAttributeChecks extends BaseTest {
 	};
 
 	String[] bad_inlineChecks = {
-		"$lab",			"error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:7:4: missing attribute access on rule reference 'lab' in '$lab'\n",
-		"$q",           "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'q' in '$q'\n",
-		"$q.y",         "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'q' in '$q.y'\n",
-		"$q = 3",       "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'q' in '$q'\n",
-		"$q = 3;",      "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'q' in '$q = 3;'\n",
-		"$q.y = 3;",    "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'q' in '$q.y'\n",
-		"$q = $blort;", "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'q' in '$q = $blort;'\n" +
-						"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:9: unknown attribute reference 'blort' in '$blort'\n",
-		"$a.ick",       "error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:7:6: unknown attribute 'ick' for rule 'a' in '$a.ick'\n",
-		"$a.ick = 3;",  "error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:7:6: unknown attribute 'ick' for rule 'a' in '$a.ick'\n",
-		"$b.d",         "error(" + ErrorType.INVALID_RULE_PARAMETER_REF.code + "): A.g4:7:6: parameter 'd' of rule 'b' is not accessible in this scope: $b.d\n",  // can't see rule ref's arg
-		"$d.text",      "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'd' in '$d.text'\n", // valid rule, but no ref
-		"$lab.d",		"error(" + ErrorType.INVALID_RULE_PARAMETER_REF.code + "): A.g4:7:8: parameter 'd' of rule 'b' is not accessible in this scope: $lab.d\n",
-		"$ids = null;",	"error(" + ErrorType.ASSIGNMENT_TO_LIST_LABEL.code + "): A.g4:7:4: cannot assign a value to list label 'ids'\n",
-		"$labs = null;","error(" + ErrorType.ASSIGNMENT_TO_LIST_LABEL.code + "): A.g4:7:4: cannot assign a value to list label 'labs'\n",
+		"$lab",			"error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:7:4: missing attribute access on rule reference lab in $lab\n",
+		"$q",           "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference q in $q\n",
+		"$q.y",         "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference q in $q.y\n",
+		"$q = 3",       "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference q in $q\n",
+		"$q = 3;",      "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference q in $q = 3;\n",
+		"$q.y = 3;",    "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference q in $q.y\n",
+		"$q = $blort;", "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference q in $q = $blort;\n" +
+						"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:9: unknown attribute reference blort in $blort\n",
+		"$a.ick",       "error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:7:6: unknown attribute ick for rule a in $a.ick\n",
+		"$a.ick = 3;",  "error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:7:6: unknown attribute ick for rule a in $a.ick\n",
+		"$b.d",         "error(" + ErrorType.INVALID_RULE_PARAMETER_REF.code + "): A.g4:7:6: parameter d of rule b is not accessible in this scope: $b.d\n",  // cant see rule refs arg
+		"$d.text",      "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference d in $d.text\n", // valid rule, but no ref
+		"$lab.d",		"error(" + ErrorType.INVALID_RULE_PARAMETER_REF.code + "): A.g4:7:8: parameter d of rule b is not accessible in this scope: $lab.d\n",
+		"$ids = null;",	"error(" + ErrorType.ASSIGNMENT_TO_LIST_LABEL.code + "): A.g4:7:4: cannot assign a value to list label ids\n",
+		"$labs = null;","error(" + ErrorType.ASSIGNMENT_TO_LIST_LABEL.code + "): A.g4:7:4: cannot assign a value to list label labs\n",
 	};
 
 	String[] finallyChecks = {
@@ -121,97 +121,97 @@ public class TestAttributeChecks extends BaseTest {
 		"$ids",			"",
 		"$labs",		"",
 
-		"$lab",			"error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:10:14: missing attribute access on rule reference 'lab' in '$lab'\n",
-		"$q",           "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'q' in '$q'\n",
-		"$q.y",         "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'q' in '$q.y'\n",
-		"$q = 3",       "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'q' in '$q'\n",
-		"$q = 3;",      "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'q' in '$q = 3;'\n",
-		"$q.y = 3;",    "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'q' in '$q.y'\n",
-		"$q = $blort;", "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'q' in '$q = $blort;'\n" +
-						"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:19: unknown attribute reference 'blort' in '$blort'\n",
-		"$a.ick",       "error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:10:16: unknown attribute 'ick' for rule 'a' in '$a.ick'\n",
-		"$a.ick = 3;",  "error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:10:16: unknown attribute 'ick' for rule 'a' in '$a.ick'\n",
-		"$b.e",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'b' in '$b.e'\n", // can't see rule refs outside alts
-		"$b.d",         "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'b' in '$b.d'\n",
-		"$c.text",      "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'c' in '$c.text'\n",
-		"$lab.d",		"error(" + ErrorType.INVALID_RULE_PARAMETER_REF.code + "): A.g4:10:18: parameter 'd' of rule 'b' is not accessible in this scope: $lab.d\n",
+		"$lab",			"error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:10:14: missing attribute access on rule reference lab in $lab\n",
+		"$q",           "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference q in $q\n",
+		"$q.y",         "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference q in $q.y\n",
+		"$q = 3",       "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference q in $q\n",
+		"$q = 3;",      "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference q in $q = 3;\n",
+		"$q.y = 3;",    "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference q in $q.y\n",
+		"$q = $blort;", "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference q in $q = $blort;\n" +
+						"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:19: unknown attribute reference blort in $blort\n",
+		"$a.ick",       "error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:10:16: unknown attribute ick for rule a in $a.ick\n",
+		"$a.ick = 3;",  "error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:10:16: unknown attribute ick for rule a in $a.ick\n",
+		"$b.e",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference b in $b.e\n", // cant see rule refs outside alts
+		"$b.d",         "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference b in $b.d\n",
+		"$c.text",      "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference c in $c.text\n",
+		"$lab.d",		"error(" + ErrorType.INVALID_RULE_PARAMETER_REF.code + "): A.g4:10:18: parameter d of rule b is not accessible in this scope: $lab.d\n",
 	};
 
 	String[] dynMembersChecks = {
-		"$S",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:2:11: unknown attribute reference 'S' in '$S'\n",
-		"$S::i",		"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:2:11: reference to undefined rule 'S' in non-local ref '$S::i'\n",
-		"$S::i=$S::i",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:2:11: reference to undefined rule 'S' in non-local ref '$S::i'\n" +
-						"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:2:17: reference to undefined rule 'S' in non-local ref '$S::i'\n",
+		"$S",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:2:11: unknown attribute reference S in $S\n",
+		"$S::i",		"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:2:11: reference to undefined rule S in non-local ref $S::i\n",
+		"$S::i=$S::i",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:2:11: reference to undefined rule S in non-local ref $S::i\n" +
+						"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:2:17: reference to undefined rule S in non-local ref $S::i\n",
 
-		"$b::f",		"error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:2:14: unknown attribute 'f' for rule 'b' in '$b::f'\n",
-		"$S::j",		"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:2:11: reference to undefined rule 'S' in non-local ref '$S::j'\n",
-		"$S::j = 3;",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:2:11: reference to undefined rule 'S' in non-local ref '$S::j = 3;'\n",
-		"$S::j = $S::k;",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:2:11: reference to undefined rule 'S' in non-local ref '$S::j = $S::k;'\n",
+		"$b::f",		"error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:2:14: unknown attribute f for rule b in $b::f\n",
+		"$S::j",		"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:2:11: reference to undefined rule S in non-local ref $S::j\n",
+		"$S::j = 3;",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:2:11: reference to undefined rule S in non-local ref $S::j = 3;\n",
+		"$S::j = $S::k;",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:2:11: reference to undefined rule S in non-local ref $S::j = $S::k;\n",
 	};
 
 	String[] dynInitChecks = {
-		"$a",			"error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:5:8: missing attribute access on rule reference 'a' in '$a'\n",
-		"$b",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:5:8: unknown attribute reference 'b' in '$b'\n",
-		"$lab",			"error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:5:8: missing attribute access on rule reference 'lab' in '$lab'\n",
-		"$b::f",		"error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:5:11: unknown attribute 'f' for rule 'b' in '$b::f'\n",
-		"$S::i",		"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:5:8: reference to undefined rule 'S' in non-local ref '$S::i'\n",
-		"$S::i=$S::i",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:5:8: reference to undefined rule 'S' in non-local ref '$S::i'\n" +
-						"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:5:14: reference to undefined rule 'S' in non-local ref '$S::i'\n",
-		"$a::z",		"error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:5:11: unknown attribute 'z' for rule 'a' in '$a::z'\n",
-		"$S",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:5:8: unknown attribute reference 'S' in '$S'\n",
+		"$a",			"error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:5:8: missing attribute access on rule reference a in $a\n",
+		"$b",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:5:8: unknown attribute reference b in $b\n",
+		"$lab",			"error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:5:8: missing attribute access on rule reference lab in $lab\n",
+		"$b::f",		"error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:5:11: unknown attribute f for rule b in $b::f\n",
+		"$S::i",		"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:5:8: reference to undefined rule S in non-local ref $S::i\n",
+		"$S::i=$S::i",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:5:8: reference to undefined rule S in non-local ref $S::i\n" +
+						"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:5:14: reference to undefined rule S in non-local ref $S::i\n",
+		"$a::z",		"error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:5:11: unknown attribute z for rule a in $a::z\n",
+		"$S",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:5:8: unknown attribute reference S in $S\n",
 
-		"$S::j",		"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:5:8: reference to undefined rule 'S' in non-local ref '$S::j'\n",
-		"$S::j = 3;",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:5:8: reference to undefined rule 'S' in non-local ref '$S::j = 3;'\n",
-		"$S::j = $S::k;",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:5:8: reference to undefined rule 'S' in non-local ref '$S::j = $S::k;'\n",
+		"$S::j",		"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:5:8: reference to undefined rule S in non-local ref $S::j\n",
+		"$S::j = 3;",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:5:8: reference to undefined rule S in non-local ref $S::j = 3;\n",
+		"$S::j = $S::k;",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:5:8: reference to undefined rule S in non-local ref $S::j = $S::k;\n",
 	};
 
 	String[] dynInlineChecks = {
-		"$a",			"error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:7:4: missing attribute access on rule reference 'a' in '$a'\n",
-		"$b",			"error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:7:4: missing attribute access on rule reference 'b' in '$b'\n",
-		"$lab",			"error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:7:4: missing attribute access on rule reference 'lab' in '$lab'\n",
-		"$b::f",		"error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:7:7: unknown attribute 'f' for rule 'b' in '$b::f'\n",
-		"$S::i",		"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:7:4: reference to undefined rule 'S' in non-local ref '$S::i'\n",
-		"$S::i=$S::i",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:7:4: reference to undefined rule 'S' in non-local ref '$S::i'\n" +
-						"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:7:10: reference to undefined rule 'S' in non-local ref '$S::i'\n",
-		"$a::z",		"error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:7:7: unknown attribute 'z' for rule 'a' in '$a::z'\n",
+		"$a",			"error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:7:4: missing attribute access on rule reference a in $a\n",
+		"$b",			"error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:7:4: missing attribute access on rule reference b in $b\n",
+		"$lab",			"error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:7:4: missing attribute access on rule reference lab in $lab\n",
+		"$b::f",		"error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:7:7: unknown attribute f for rule b in $b::f\n",
+		"$S::i",		"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:7:4: reference to undefined rule S in non-local ref $S::i\n",
+		"$S::i=$S::i",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:7:4: reference to undefined rule S in non-local ref $S::i\n" +
+						"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:7:10: reference to undefined rule S in non-local ref $S::i\n",
+		"$a::z",		"error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:7:7: unknown attribute z for rule a in $a::z\n",
 
-		"$S::j",			"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:7:4: reference to undefined rule 'S' in non-local ref '$S::j'\n",
-		"$S::j = 3;",		"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:7:4: reference to undefined rule 'S' in non-local ref '$S::j = 3;'\n",
-		"$S::j = $S::k;",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:7:4: reference to undefined rule 'S' in non-local ref '$S::j = $S::k;'\n",
-		"$Q[-1]::y",        "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'Q' in '$Q'\n",
-		"$Q[-i]::y",        "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'Q' in '$Q'\n",
-		"$Q[i]::y",    		"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'Q' in '$Q'\n",
-		"$Q[0]::y",    		"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'Q' in '$Q'\n",
-		"$Q[-1]::y = 23;",  "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'Q' in '$Q'\n",
-		"$Q[-i]::y = 23;",  "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'Q' in '$Q'\n",
-		"$Q[i]::y = 23;",   "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'Q' in '$Q'\n",
-		"$Q[0]::y = 23;",   "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'Q' in '$Q'\n",
-		"$S[-1]::y",        "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'S' in '$S'\n",
-		"$S[-i]::y",        "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'S' in '$S'\n",
-		"$S[i]::y",     	"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'S' in '$S'\n",
-		"$S[0]::y",     	"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'S' in '$S'\n",
-		"$S[-1]::y = 23;",  "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'S' in '$S'\n",
-		"$S[-i]::y = 23;",  "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'S' in '$S'\n",
-		"$S[i]::y = 23;",   "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'S' in '$S'\n",
-		"$S[0]::y = 23;",   "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'S' in '$S'\n",
-		"$S[$S::y]::i",		"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference 'S' in '$S'\n" +
-							"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:7:7: reference to undefined rule 'S' in non-local ref '$S::y'\n"
+		"$S::j",			"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:7:4: reference to undefined rule S in non-local ref $S::j\n",
+		"$S::j = 3;",		"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:7:4: reference to undefined rule S in non-local ref $S::j = 3;\n",
+		"$S::j = $S::k;",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:7:4: reference to undefined rule S in non-local ref $S::j = $S::k;\n",
+		"$Q[-1]::y",        "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference Q in $Q\n",
+		"$Q[-i]::y",        "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference Q in $Q\n",
+		"$Q[i]::y",    		"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference Q in $Q\n",
+		"$Q[0]::y",    		"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference Q in $Q\n",
+		"$Q[-1]::y = 23;",  "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference Q in $Q\n",
+		"$Q[-i]::y = 23;",  "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference Q in $Q\n",
+		"$Q[i]::y = 23;",   "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference Q in $Q\n",
+		"$Q[0]::y = 23;",   "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference Q in $Q\n",
+		"$S[-1]::y",        "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference S in $S\n",
+		"$S[-i]::y",        "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference S in $S\n",
+		"$S[i]::y",     	"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference S in $S\n",
+		"$S[0]::y",     	"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference S in $S\n",
+		"$S[-1]::y = 23;",  "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference S in $S\n",
+		"$S[-i]::y = 23;",  "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference S in $S\n",
+		"$S[i]::y = 23;",   "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference S in $S\n",
+		"$S[0]::y = 23;",   "error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference S in $S\n",
+		"$S[$S::y]::i",		"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:7:4: unknown attribute reference S in $S\n" +
+							"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:7:7: reference to undefined rule S in non-local ref $S::y\n"
 	};
 
 	String[] dynFinallyChecks = {
-		"$a",			"error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:10:14: missing attribute access on rule reference 'a' in '$a'\n",
-		"$b",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'b' in '$b'\n",
-		"$lab",			"error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:10:14: missing attribute access on rule reference 'lab' in '$lab'\n",
-		"$b::f",		"error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:10:17: unknown attribute 'f' for rule 'b' in '$b::f'\n",
-		"$S",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference 'S' in '$S'\n",
-		"$S::i",		"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:10:14: reference to undefined rule 'S' in non-local ref '$S::i'\n",
-		"$S::i=$S::i",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:10:14: reference to undefined rule 'S' in non-local ref '$S::i'\n" +
-						"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:10:20: reference to undefined rule 'S' in non-local ref '$S::i'\n",
-		"$a::z",		"error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:10:17: unknown attribute 'z' for rule 'a' in '$a::z'\n",
+		"$a",			"error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:10:14: missing attribute access on rule reference a in $a\n",
+		"$b",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference b in $b\n",
+		"$lab",			"error(" + ErrorType.ISOLATED_RULE_REF.code + "): A.g4:10:14: missing attribute access on rule reference lab in $lab\n",
+		"$b::f",		"error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:10:17: unknown attribute f for rule b in $b::f\n",
+		"$S",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:10:14: unknown attribute reference S in $S\n",
+		"$S::i",		"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:10:14: reference to undefined rule S in non-local ref $S::i\n",
+		"$S::i=$S::i",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:10:14: reference to undefined rule S in non-local ref $S::i\n" +
+						"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:10:20: reference to undefined rule S in non-local ref $S::i\n",
+		"$a::z",		"error(" + ErrorType.UNKNOWN_RULE_ATTRIBUTE.code + "): A.g4:10:17: unknown attribute z for rule a in $a::z\n",
 
-		"$S::j",		"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:10:14: reference to undefined rule 'S' in non-local ref '$S::j'\n",
-		"$S::j = 3;",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:10:14: reference to undefined rule 'S' in non-local ref '$S::j = 3;'\n",
-		"$S::j = $S::k;",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:10:14: reference to undefined rule 'S' in non-local ref '$S::j = $S::k;'\n",
+		"$S::j",		"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:10:14: reference to undefined rule S in non-local ref $S::j\n",
+		"$S::j = 3;",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:10:14: reference to undefined rule S in non-local ref $S::j = 3;\n",
+		"$S::j = $S::k;",	"error(" + ErrorType.UNDEFINED_RULE_IN_NONLOCAL_REF.code + "): A.g4:10:14: reference to undefined rule S in non-local ref $S::j = $S::k;\n",
 	};
 
     @Test public void testMembersActions() throws RecognitionException {

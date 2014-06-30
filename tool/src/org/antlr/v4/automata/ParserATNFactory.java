@@ -306,7 +306,7 @@ public class ParserATNFactory implements ATNFactory {
 	public Handle _ruleRef(@NotNull GrammarAST node) {
 		Rule r = g.getRule(node.getText());
 		if ( r==null ) {
-			g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, "Rule "+node.getText()+" undefined");
+			g.tool.errMgr.grammarError(ErrorType.INTERNAL_ERROR, g.fileName, node.getToken(), "Rule "+node.getText()+" undefined");
 			return null;
 		}
 		RuleStartState start = atn.ruleToStartState[r.index];

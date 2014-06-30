@@ -40,7 +40,7 @@ public class TestToolSyntaxErrors extends BaseTest {
         "grammar A;\n" +
         "",
         // YIELDS
-        "error(" + ErrorType.NO_RULES.code + "): A.g4::: grammar 'A' has no rules\n",
+        "error(" + ErrorType.NO_RULES.code + "): A.g4::: grammar A has no rules\n",
 
 		"A;",
 		"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:1:0: syntax error: 'A' came as a complete surprise to me\n",
@@ -274,8 +274,8 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"X : 'foo' -> popmode;\n" + // "meant" to use -> popMode
 			"Y : 'foo' -> token(Foo);", // "meant" to use -> type(Foo)
 
-			"error(" + ErrorType.INVALID_LEXER_COMMAND.code + "): A.g4:4:13: lexer command 'popmode' does not exist or is not supported by the current target\n" +
-			"error(" + ErrorType.INVALID_LEXER_COMMAND.code + "): A.g4:5:13: lexer command 'token' does not exist or is not supported by the current target\n"
+			"error(" + ErrorType.INVALID_LEXER_COMMAND.code + "): A.g4:4:13: lexer command popmode does not exist or is not supported by the current target\n" +
+			"error(" + ErrorType.INVALID_LEXER_COMMAND.code + "): A.g4:5:13: lexer command token does not exist or is not supported by the current target\n"
 		};
 		super.testErrors(pair, true);
 	}
@@ -288,8 +288,8 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"X : 'foo' -> popMode(Foo);\n" + // "meant" to use -> popMode
 			"Y : 'foo' -> type;", // "meant" to use -> type(Foo)
 
-			"error(" + ErrorType.UNWANTED_LEXER_COMMAND_ARGUMENT.code + "): A.g4:4:13: lexer command 'popMode' does not take any arguments\n" +
-			"error(" + ErrorType.MISSING_LEXER_COMMAND_ARGUMENT.code + "): A.g4:5:13: missing argument for lexer command 'type'\n"
+			"error(" + ErrorType.UNWANTED_LEXER_COMMAND_ARGUMENT.code + "): A.g4:4:13: lexer command popMode does not take any arguments\n" +
+			"error(" + ErrorType.MISSING_LEXER_COMMAND_ARGUMENT.code + "): A.g4:5:13: missing argument for lexer command type\n"
 		};
 		super.testErrors(pair, true);
 	}
@@ -304,7 +304,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"A : 'a' ;\n" +
 			"B : 'b' ;\n",
 
-			"error(" + ErrorType.RULE_REDEFINITION.code + "): Oops.g4:4:0: rule 'ret_ty' redefinition; previous at line 3\n"
+			"error(" + ErrorType.RULE_REDEFINITION.code + "): Oops.g4:4:0: rule ret_ty redefinition; previous at line 3\n"
 		};
 		super.testErrors(pair, true);
 	}
@@ -318,9 +318,9 @@ public class TestToolSyntaxErrors extends BaseTest {
 			+ "z1 : ('foo' | 'bar'? 'bar2'?)*;\n"
 			+ "z2 : ('foo' | 'bar' 'bar2'? | 'bar2')*;\n";
 		String expected =
-			"error(" + ErrorType.EPSILON_CLOSURE.code + "): A.g4:3:0: rule 'y1' contains a closure with at least one alternative that can match an empty string\n" +
-			"error(" + ErrorType.EPSILON_CLOSURE.code + "): A.g4:4:0: rule 'y2' contains a closure with at least one alternative that can match an empty string\n" +
-			"error(" + ErrorType.EPSILON_CLOSURE.code + "): A.g4:5:0: rule 'z1' contains a closure with at least one alternative that can match an empty string\n";
+			"error(" + ErrorType.EPSILON_CLOSURE.code + "): A.g4:3:0: rule y1 contains a closure with at least one alternative that can match an empty string\n" +
+			"error(" + ErrorType.EPSILON_CLOSURE.code + "): A.g4:4:0: rule y2 contains a closure with at least one alternative that can match an empty string\n" +
+			"error(" + ErrorType.EPSILON_CLOSURE.code + "): A.g4:5:0: rule z1 contains a closure with at least one alternative that can match an empty string\n";
 
 		String[] pair = new String[] {
 			grammar,
@@ -338,8 +338,8 @@ public class TestToolSyntaxErrors extends BaseTest {
 			+ "z1 : ('foo' | 'bar'? 'bar2'?)?;\n"
 			+ "z2 : ('foo' | 'bar' 'bar2'? | 'bar2')?;\n";
 		String expected =
-			"warning(" + ErrorType.EPSILON_OPTIONAL.code + "): A.g4:3:0: rule 'y' contains an optional block with at least one alternative that can match an empty string\n" +
-			"warning(" + ErrorType.EPSILON_OPTIONAL.code + "): A.g4:4:0: rule 'z1' contains an optional block with at least one alternative that can match an empty string\n";
+			"warning(" + ErrorType.EPSILON_OPTIONAL.code + "): A.g4:3:0: rule y contains an optional block with at least one alternative that can match an empty string\n" +
+			"warning(" + ErrorType.EPSILON_OPTIONAL.code + "): A.g4:4:0: rule z1 contains an optional block with at least one alternative that can match an empty string\n";
 
 		String[] pair = new String[] {
 			grammar,
@@ -465,7 +465,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"  |<assoc=right> x '*' x   // ok\n" +
 			"  ;\n";
 		String expected =
-			"warning(" + ErrorType.UNRECOGNIZED_ASSOC_OPTION.code + "): A.g4:3:10: rule 'x' contains an 'assoc' terminal option in an unrecognized location\n";
+			"warning(" + ErrorType.UNRECOGNIZED_ASSOC_OPTION.code + "): A.g4:3:10: rule x contains an assoc terminal option in an unrecognized location\n";
 
 		String[] pair = new String[] {
 			grammar,
@@ -493,8 +493,8 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"Y2 : 'x' {more();}  // warning 158\n" +
 			"   ;\n";
 		String expected =
-			"warning(" + ErrorType.FRAGMENT_ACTION_IGNORED.code + "): A.g4:7:12: fragment rule 'X2' contains an action or command which can never be executed\n" +
-			"warning(" + ErrorType.FRAGMENT_ACTION_IGNORED.code + "): A.g4:10:9: fragment rule 'Y2' contains an action or command which can never be executed\n";
+			"warning(" + ErrorType.FRAGMENT_ACTION_IGNORED.code + "): A.g4:7:12: fragment rule X2 contains an action or command which can never be executed\n" +
+			"warning(" + ErrorType.FRAGMENT_ACTION_IGNORED.code + "): A.g4:10:9: fragment rule Y2 contains an action or command which can never be executed\n";
 
 		String[] pair = new String[] {
 			grammar,
@@ -515,7 +515,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"WS : ' ';\n" +
 			" EOF : 'a';\n";
 		String expected =
-			"error(" + ErrorType.RESERVED_RULE_NAME.code + "): A.g4:3:1: cannot declare a rule with reserved name 'EOF'\n";
+			"error(" + ErrorType.RESERVED_RULE_NAME.code + "): A.g4:3:1: cannot declare a rule with reserved name EOF\n";
 
 		String[] pair = new String[] {
 			grammar,

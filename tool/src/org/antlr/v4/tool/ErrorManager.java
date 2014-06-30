@@ -30,14 +30,14 @@
 
 package org.antlr.v4.tool;
 
+import org.antlr.runtime.Token;
 import org.antlr.v4.Tool;
 import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STErrorListener;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.misc.ErrorBuffer;
-import org.stringtemplate.v4.misc.STMessage;
 
+import java.io.File;
 import java.net.URL;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -62,29 +62,6 @@ public class ErrorManager {
     String formatName;
 
     ErrorBuffer initSTListener = new ErrorBuffer();
-
-    STErrorListener theDefaultSTListener =
-        new STErrorListener() {
-            @Override
-            public void compileTimeError(STMessage msg) {
-                ErrorManager.internalError(msg.toString());
-            }
-
-            @Override
-            public void runTimeError(STMessage msg) {
-                ErrorManager.internalError(msg.toString());
-            }
-
-            @Override
-            public void IOError(STMessage msg) {
-                ErrorManager.internalError(msg.toString());
-            }
-
-            @Override
-            public void internalError(STMessage msg) {
-                ErrorManager.internalError(msg.toString());
-            }
-        };
 
 	public ErrorManager(Tool tool) {
 		this.tool = tool;
@@ -111,7 +88,13 @@ public class ErrorManager {
 			locationValid = true;
 		}
 		if (msg.fileName != null) {
-			locationST.add("file", msg.fileName);
+			File f = new File(msg.fileName);
+			// Don't show path to file in messages; too long.
+			String displayFileName = msg.fileName;
+			if ( f.exists() ) {
+				displayFileName = f.getName();
+			}
+			locationST.add("file", displayFileName);
 			locationValid = true;
 		}
 
@@ -181,12 +164,15 @@ public class ErrorManager {
      * @param args The arguments to pass to the StringTemplate
      */
 	public void toolError(ErrorType errorType, Object... args) {
-		ToolMessage msg = new ToolMessage(errorType, args);
-		emit(errorType, msg);
+		toolError(errorType, null, Token.INVALID_TOKEN, args);
 	}
 
-	public void toolError(ErrorType errorType, Throwable e, Object... args) {
-		ToolMessage msg = new ToolMessage(errorType, e, args);
+	public void toolError(ErrorType errorType, Token offendingToken, Object... args) {
+		toolError(errorType, null, offendingToken, args);
+	}
+
+	public void toolError(ErrorType errorType, Throwable e, Token offendingToken, Object... args) {
+		ToolMessage msg = new ToolMessage(errorType, e, offendingToken, args);
 		emit(errorType, msg);
 	}
 
