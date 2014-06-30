@@ -41,6 +41,7 @@ import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenPipeline;
+import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.Graph;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -397,6 +398,12 @@ public class Tool {
 		// MAKE SURE GRAMMAR IS SEMANTICALLY CORRECT (FILL IN GRAMMAR OBJECT)
 		SemanticPipeline sem = new SemanticPipeline(g);
 		sem.process();
+
+		String language = g.getOptionString("language");
+		if ( !CodeGenerator.targetExists(language) ) {
+			errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR, language);
+			return;
+		}
 
 		if ( errMgr.getNumErrors()>prevErrors ) return;
 

@@ -37,6 +37,7 @@ import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.RuntimeMetaData;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
@@ -99,6 +100,7 @@ public abstract class Target {
 	 */
 	public abstract String getVersion();
 
+	@Nullable
 	public STGroup getTemplates() {
 		if (templates == null) {
 			String version = getVersion();
@@ -348,8 +350,31 @@ public abstract class Target {
 
 	protected abstract boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode);
 
+	public boolean templatesExist() {
+		String groupFileName = CodeGenerator.TEMPLATE_ROOT + "/" + getLanguage() + "/" + getLanguage() + STGroup.GROUP_FILE_EXTENSION;
+		STGroup result = null;
+		try {
+			result = new STGroupFile(groupFileName);
+		}
+		catch (IllegalArgumentException iae) {
+			result = null;
+		}
+		return result!=null;
+	}
+
+	@Nullable
 	protected STGroup loadTemplates() {
-		STGroup result = new STGroupFile(CodeGenerator.TEMPLATE_ROOT+"/"+getLanguage()+"/"+getLanguage()+STGroup.GROUP_FILE_EXTENSION);
+		String groupFileName = CodeGenerator.TEMPLATE_ROOT + "/" + getLanguage() + "/" + getLanguage() + STGroup.GROUP_FILE_EXTENSION;
+		STGroup result = null;
+		try {
+			result = new STGroupFile(groupFileName);
+		}
+		catch (IllegalArgumentException iae) {
+			gen.tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
+						 iae,
+						 language);
+		}
+		if ( result==null ) return null;
 		result.registerRenderer(Integer.class, new NumberRenderer());
 		result.registerRenderer(String.class, new StringRenderer());
 		result.setListener(new STErrorListener() {
