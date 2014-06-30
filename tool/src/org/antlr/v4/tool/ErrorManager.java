@@ -186,9 +186,9 @@ public class ErrorManager {
 
 	}
 
-	public void leftRecursionCycles(String fileName, Token startTokenOfFirstRuleInCycle, Collection<? extends Collection<Rule>> cycles) {
+	public void leftRecursionCycles(String fileName, Collection<? extends Collection<Rule>> cycles) {
 		errors++;
-		ANTLRMessage msg = new LeftRecursionCyclesMessage(fileName, startTokenOfFirstRuleInCycle, cycles);
+		ANTLRMessage msg = new LeftRecursionCyclesMessage(fileName, cycles);
 		tool.error(msg);
 	}
 

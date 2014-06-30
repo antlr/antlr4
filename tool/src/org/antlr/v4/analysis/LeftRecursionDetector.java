@@ -74,9 +74,7 @@ public class LeftRecursionDetector {
 		}
 		//System.out.println("cycles="+listOfRecursiveCycles);
 		if ( !listOfRecursiveCycles.isEmpty() ) {
-			RuleStartState firstRuleStartState = atn.ruleToStartState[0];
-			Rule r = g.getRule(firstRuleStartState.ruleIndex);
-			g.tool.errMgr.leftRecursionCycles(g.fileName, r.ast.getToken(), listOfRecursiveCycles);
+			g.tool.errMgr.leftRecursionCycles(g.fileName, listOfRecursiveCycles);
 		}
 	}
 

@@ -16,7 +16,7 @@
  *  3. The name of the author may not be used to endorse or promote products
  *     derived from this software without specific prior written permission.
  *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS AND ANY EXPRESS OR
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
  *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
@@ -178,7 +178,7 @@ public enum ErrorType {
     /**
    	 * Compiler Error 35.
    	 *
-   	 * <p>templates/target and tool arent compatible</p>
+   	 * <p>templates/target and tool aren't compatible</p>
    	 */
    	INCOMPATIBLE_TOOL_AND_TEMPLATES(35, "<arg3> code generation target requires ANTLR <arg2>; it can't be loaded by the current ANTLR <arg>", ErrorSeverity.ERROR),
 
@@ -697,8 +697,8 @@ public enum ErrorType {
 	 * <p>The following rule produces this error.</p>
 	 *
 	 * <pre>
-	 * X : foo -> type(Foo);  // ok
-	 * Y : foo -> token(Foo); // error 149 (token is not a supported lexer command)
+	 * X : 'foo' -> type(Foo);  // ok
+	 * Y : 'foo' -> token(Foo); // error 149 (token is not a supported lexer command)
 	 * </pre>
 	 *
 	 * @since 4.1
@@ -714,8 +714,8 @@ public enum ErrorType {
 	 * <p>The following rule produces this error.</p>
 	 *
 	 * <pre>
-	 * X : foo -> type(Foo); // ok
-	 * Y : foo -> type;      // error 150 (the type command requires an argument)
+	 * X : 'foo' -> type(Foo); // ok
+	 * Y : 'foo' -> type;      // error 150 (the type command requires an argument)
 	 * </pre>
 	 *
 	 * @since 4.1
@@ -732,8 +732,8 @@ public enum ErrorType {
 	 * <p>The following rule produces this error.</p>
 	 *
 	 * <pre>
-	 * X : foo -> popMode;    // ok
-	 * Y : foo -> popMode(A); // error 151 (the popMode command does not take an argument)
+	 * X : 'foo' -> popMode;    // ok
+	 * Y : 'foo' -> popMode(A); // error 151 (the popMode command does not take an argument)
 	 * </pre>
 	 *
 	 * @since 4.1
@@ -749,8 +749,8 @@ public enum ErrorType {
 	 * <p>The following rule produces this error.</p>
 	 *
 	 * <pre>
-	 * x : x; // ok
-	 * y : y;  // error 152
+	 * x : 'x'; // ok
+	 * y : 'y';  // error 152
 	 * </pre>
 	 *
 	 * @since 4.1
@@ -771,8 +771,8 @@ public enum ErrorType {
 	 * <pre>
 	 * x  : ;
 	 * y  : x+;                                // error 153
-	 * z1 : (foo | bar? bar2?)*;         // error 153
-	 * z2 : (foo | bar bar2? | bar2)*; // ok
+	 * z1 : ('foo' | 'bar'? 'bar2'?)*;         // error 153
+	 * z2 : ('foo' | 'bar' 'bar2'? | 'bar2')*; // ok
 	 * </pre>
 	 *
 	 * @since 4.1
@@ -793,8 +793,8 @@ public enum ErrorType {
 	 * <pre>
 	 * x  : ;
 	 * y  : x?;                                // warning 154
-	 * z1 : (foo | bar? bar2?)?;         // warning 154
-	 * z2 : (foo | bar bar2? | bar2)?; // ok
+	 * z1 : ('foo' | 'bar'? 'bar2'?)?;         // warning 154
+	 * z2 : ('foo' | 'bar' 'bar2'? | 'bar2')?; // ok
 	 * </pre>
 	 *
 	 * @since 4.1
@@ -820,8 +820,8 @@ public enum ErrorType {
 	 * public static final int CUSTOM = HIDDEN + 1;
 	 * }
 	 *
-	 * X : foo -> channel(HIDDEN);           // ok
-	 * Y : bar -> channel(CUSTOM);           // warning 155
+	 * X : 'foo' -> channel(HIDDEN);           // ok
+	 * Y : 'bar' -> channel(CUSTOM);           // warning 155
 	 * </pre>
 	 *
 	 * @since 4.2
@@ -837,8 +837,8 @@ public enum ErrorType {
 	 * <p>The following rule produces this error.</p>
 	 *
 	 * <pre>
-	 * x : x;  // ok
-	 * y : \u005Cu; // error 156
+	 * x : 'x';  // ok
+	 * y : '\u005Cu'; // error 156
 	 * </pre>
 	 *
 	 * @since 4.2.1
@@ -861,8 +861,8 @@ public enum ErrorType {
 	 * <p>The following rule produces this warning.</p>
 	 *
 	 * <pre>
-	 * x : x
-	 *   | x +&lt;assoc=right&gt; x   // warning 157
+	 * x : 'x'
+	 *   | x '+'&lt;assoc=right&gt; x   // warning 157
 	 *   |&lt;assoc=right&gt; x * x   // ok
 	 *   ;
 	 * </pre>
@@ -886,15 +886,15 @@ public enum ErrorType {
 	 * <p>The following rule produces this warning.</p>
 	 *
 	 * <pre>
-	 * X1 : x -> more    // ok
+	 * X1 : 'x' -> more    // ok
 	 *    ;
-	 * Y1 : x {more();}  // ok
-	 *    ;
-	 * fragment
-	 * X2 : x -> more    // warning 158
+	 * Y1 : 'x' {more();}  // ok
 	 *    ;
 	 * fragment
-	 * Y2 : x {more();}  // warning 158
+	 * X2 : 'x' -> more    // warning 158
+	 *    ;
+	 * fragment
+	 * Y2 : 'x' {more();}  // warning 158
 	 *    ;
 	 * </pre>
 	 *
@@ -911,7 +911,7 @@ public enum ErrorType {
 	 * <p>The following rule produces this error.</p>
 	 *
 	 * <pre>
-	 * EOF :     // error 159 (EOF is a reserved name)
+	 * EOF :  ' '   // error 159 (EOF is a reserved name)
 	 *     ;
 	 * </pre>
 	 *
@@ -1005,7 +1005,7 @@ public enum ErrorType {
 	 * <p>{@code (...)=>} syntactic predicates are not supported in ANTLR 4</p>
 	 *
 	 * <p>
-	 * ANTLR 4s improved lookahead algorithms do not require the use of
+	 * ANTLR 4's improved lookahead algorithms do not require the use of
 	 * syntactic predicates to disambiguate long lookahead sequences. The
 	 * syntactic predicates should be removed when migrating a grammar from
 	 * ANTLR 3 to ANTLR 4.</p>
