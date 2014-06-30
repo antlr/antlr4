@@ -45,17 +45,17 @@ public interface ParserErrorListener extends ANTLRErrorListener<Token> {
 	/**
 	 * This method is called by the parser when a full-context prediction
 	 * results in an ambiguity.
-	 * <p/>
-	 * When {@code exact} is {@code true}, <em>all</em> of the alternatives in
+	 *
+	 * <p>When {@code exact} is {@code true}, <em>all</em> of the alternatives in
 	 * {@code ambigAlts} are viable, i.e. this is reporting an exact ambiguity.
 	 * When {@code exact} is {@code false}, <em>at least two</em> of the
 	 * alternatives in {@code ambigAlts} are viable for the current input, but
 	 * the prediction algorithm terminated as soon as it determined that at
-	 * least the <em>minimum</em> alternative in {@code ambigAlts} is viable.
-	 * <p/>
-	 * When the {@link PredictionMode#LL_EXACT_AMBIG_DETECTION} prediction mode
+	 * least the <em>minimum</em> alternative in {@code ambigAlts} is viable.</p>
+	 *
+	 * <p>When the {@link PredictionMode#LL_EXACT_AMBIG_DETECTION} prediction mode
 	 * is used, the parser is required to identify exact ambiguities so
-	 * {@code exact} will always be {@code true}.
+	 * {@code exact} will always be {@code true}.</p>
 	 *
 	 * @param recognizer the parser instance
 	 * @param dfa the DFA for the current decision
@@ -79,11 +79,11 @@ public interface ParserErrorListener extends ANTLRErrorListener<Token> {
 	/**
 	 * This method is called when an SLL conflict occurs and the parser is about
 	 * to use the full context information to make an LL decision.
-	 * <p/>
-	 * If one or more configurations in {@code configs} contains a semantic
+	 *
+	 * <p>If one or more configurations in {@code configs} contains a semantic
 	 * predicate, the predicates are evaluated before this method is called. The
 	 * subset of alternatives which are still viable after predicates are
-	 * evaluated is reported in {@code conflictingAlts}.
+	 * evaluated is reported in {@code conflictingAlts}.</p>
 	 *
 	 * @param recognizer the parser instance
 	 * @param dfa the DFA for the current decision
@@ -105,19 +105,19 @@ public interface ParserErrorListener extends ANTLRErrorListener<Token> {
 	/**
 	 * This method is called by the parser when a full-context prediction has a
 	 * unique result.
-	 * <p/>
-	 * For prediction implementations that only evaluate full-context
+	 *
+	 * <p>For prediction implementations that only evaluate full-context
 	 * predictions when an SLL conflict is found (including the default
 	 * {@link ParserATNSimulator} implementation), this method reports cases
 	 * where SLL conflicts were resolved to unique full-context predictions,
 	 * i.e. the decision was context-sensitive. This report does not necessarily
 	 * indicate a problem, and it may appear even in completely unambiguous
-	 * grammars.
-	 * <p/>
-	 * {@code configs} may have more than one represented alternative if the
+	 * grammars.</p>
+	 *
+	 * <p>{@code configs} may have more than one represented alternative if the
 	 * full-context prediction algorithm does not evaluate predicates before
 	 * beginning the full-context prediction. In all cases, the final prediction
-	 * is passed as the {@code prediction} argument.
+	 * is passed as the {@code prediction} argument.</p>
 	 *
 	 * @param recognizer the parser instance
 	 * @param dfa the DFA for the current decision
