@@ -90,6 +90,19 @@ public abstract class ATNSimulator {
 	public abstract void reset();
 
 	/**
+	 * Clear the DFA cache used by the current instance. Since the DFA cache may
+	 * be shared by multiple ATN simulators, this method may affect the
+	 * performance (but not accuracy) of other parsers which are being used
+	 * concurrently.
+	 *
+	 * @throws UnsupportedOperationException if the current instance does not
+	 * support clearing the DFA.
+	 */
+	public void clearDFA() {
+		atn.clearDFA();
+	}
+
+	/**
 	 * @deprecated Use {@link ATNDeserializer#deserialize} instead.
 	 */
 	@Deprecated
