@@ -48,9 +48,10 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSerializer;
+import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntSet;
-import org.antlr.v4.runtime.misc.IntegerList;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -61,6 +62,7 @@ import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.GrammarASTWithOptions;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.antlr.v4.tool.ast.PredAST;
+import org.antlr.v4.tool.ast.RuleAST;
 import org.antlr.v4.tool.ast.TerminalAST;
 
 import java.io.IOException;
@@ -119,12 +121,14 @@ public class Grammar implements AttributeResolver {
 	public static final Set<String> ruleRefOptions = new HashSet<String>();
 	static {
 		ruleRefOptions.add(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME);
+		ruleRefOptions.add(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME);
 	}
 
 	/** Legal options for terminal refs like ID<assoc=right> */
 	public static final Set<String> tokenOptions = new HashSet<String>();
 	static {
 		tokenOptions.add("assoc");
+		tokenOptions.add(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME);
 	}
 
 	public static final Set<String> actionOptions = new HashSet<String>();
@@ -157,6 +161,9 @@ public class Grammar implements AttributeResolver {
 	/** Track stream used to create this grammar */
 	@NotNull
 	public final org.antlr.runtime.TokenStream tokenStream;
+	/** If we transform grammar, track original unaltered token stream */
+	public org.antlr.runtime.TokenStream originalTokenStream;
+
     public String text; // testing only
     public String fileName;
 
@@ -185,6 +192,8 @@ public class Grammar implements AttributeResolver {
 	 *  or epsilon.  It is more suitable to analysis than an AST representation.
 	 */
 	public ATN atn;
+
+	public Map<Integer, Interval> stateToGrammarRegionMap;
 
 	public Map<Integer, DFA> decisionDFAs = new HashMap<Integer, DFA>();
 
@@ -244,6 +253,8 @@ public class Grammar implements AttributeResolver {
 	 *  sempred index is 0..n-1
 	 */
 	public LinkedHashMap<PredAST, Integer> sempreds = new LinkedHashMap<PredAST, Integer>();
+	/** Map the other direction upon demand */
+	public LinkedHashMap<Integer, PredAST> indexToPredMap;
 
 	public static final String AUTO_GENERATED_TOKEN_NAME_PREFIX = "T__";
 
@@ -722,6 +733,58 @@ public class Grammar implements AttributeResolver {
 		return tokenNames;
 	}
 
+	/** Given an arbitrarily complex SemanticContext, walk the "tree" and get display string.
+	 *  Pull predicates from grammar text.
+	 */
+	public String getSemanticContextDisplayString(SemanticContext semctx) {
+		if ( semctx instanceof SemanticContext.Predicate ) {
+			return getPredicateDisplayString((SemanticContext.Predicate)semctx);
+		}
+		if ( semctx instanceof SemanticContext.AND ) {
+			SemanticContext.AND and = (SemanticContext.AND)semctx;
+			return joinPredicateOperands(and, " and ");
+		}
+		if ( semctx instanceof SemanticContext.OR ) {
+			SemanticContext.OR or = (SemanticContext.OR)semctx;
+			return joinPredicateOperands(or, " or ");
+		}
+		return semctx.toString();
+	}
+
+	public String joinPredicateOperands(SemanticContext.Operator op, String separator) {
+		StringBuilder buf = new StringBuilder();
+		for (SemanticContext operand : op.getOperands()) {
+			if (buf.length() > 0) {
+				buf.append(separator);
+			}
+
+			buf.append(getSemanticContextDisplayString(operand));
+		}
+
+		return buf.toString();
+	}
+
+	public LinkedHashMap<Integer, PredAST> getIndexToPredicateMap() {
+		LinkedHashMap<Integer, PredAST> indexToPredMap = new LinkedHashMap<Integer, PredAST>();
+		for (Rule r : rules.values()) {
+			for (ActionAST a : r.actions) {
+				if (a instanceof PredAST) {
+					PredAST p = (PredAST) a;
+					indexToPredMap.put(sempreds.get(p), p);
+				}
+			}
+		}
+		return indexToPredMap;
+	}
+
+	public String getPredicateDisplayString(SemanticContext.Predicate pred) {
+		if ( indexToPredMap==null ) {
+			indexToPredMap = getIndexToPredicateMap();
+		}
+		ActionAST actionAST = indexToPredMap.get(pred.predIndex);
+		return actionAST.getText();
+	}
+
 	/** What is the max char value possible for this grammar's target?  Use
 	 *  unicode max if no target defined.
 	 */
@@ -1017,6 +1080,49 @@ public class Grammar implements AttributeResolver {
 
 	public void setLookaheadDFA(int decision, DFA lookaheadDFA) {
 		decisionDFAs.put(decision, lookaheadDFA);
+	}
+
+	public static Map<Integer, Interval> getStateToGrammarRegionMap(GrammarRootAST ast, IntervalSet grammarTokenTypes) {
+		Map<Integer, Interval> stateToGrammarRegionMap = new HashMap<Integer, Interval>();
+		if ( ast==null ) return stateToGrammarRegionMap;
+
+		List<GrammarAST> nodes = ast.getNodesWithType(grammarTokenTypes);
+		for (GrammarAST n : nodes) {
+			if (n.atnState != null) {
+				Interval tokenRegion = Interval.of(n.getTokenStartIndex(), n.getTokenStopIndex());
+				org.antlr.runtime.tree.Tree ruleNode = null;
+				// RULEs, BLOCKs of transformed recursive rules point to original token interval
+				switch ( n.getType() ) {
+					case ANTLRParser.RULE :
+						ruleNode = n;
+						break;
+					case ANTLRParser.BLOCK :
+					case ANTLRParser.CLOSURE :
+						ruleNode = n.getAncestor(ANTLRParser.RULE);
+						break;
+				}
+				if ( ruleNode instanceof RuleAST ) {
+					String ruleName = ((RuleAST) ruleNode).getRuleName();
+					Rule r = ast.g.getRule(ruleName);
+					if ( r instanceof LeftRecursiveRule ) {
+						RuleAST originalAST = ((LeftRecursiveRule) r).getOriginalAST();
+						tokenRegion = Interval.of(originalAST.getTokenStartIndex(), originalAST.getTokenStopIndex());
+					}
+				}
+				stateToGrammarRegionMap.put(n.atnState.stateNumber, tokenRegion);
+			}
+		}
+		return stateToGrammarRegionMap;
+	}
+
+	/** Given an ATN state number, return the token index range within the grammar from which that ATN state was derived. */
+	public Interval getStateToGrammarRegion(int atnStateNumber) {
+		if ( stateToGrammarRegionMap==null ) {
+			stateToGrammarRegionMap = getStateToGrammarRegionMap(ast, null); // map all nodes with non-null atn state ptr
+		}
+		if ( stateToGrammarRegionMap==null ) return Interval.INVALID;
+
+		return stateToGrammarRegionMap.get(atnStateNumber);
 	}
 
 	public LexerInterpreter createLexerInterpreter(CharStream input) {

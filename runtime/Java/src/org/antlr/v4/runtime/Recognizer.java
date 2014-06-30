@@ -32,6 +32,7 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.atn.ParseInfo;
 import org.antlr.v4.runtime.misc.Args;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -158,6 +159,13 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	@NotNull
 	public ATNInterpreter getInterpreter() {
 		return _interp;
+	}
+
+	/** If profiling during the parse/lex, this will return DecisionInfo records
+	 *  for each decision in recognizer in a ParseInfo object.
+	 */
+	public ParseInfo getParseInfo() {
+		return null;
 	}
 
 	/**

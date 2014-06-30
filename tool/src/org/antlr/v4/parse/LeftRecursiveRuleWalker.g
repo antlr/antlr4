@@ -179,13 +179,15 @@ element
     |	^(SET setElement+)
     |   RULE_REF
 	|	ebnf
-	|	ACTION
-	|	SEMPRED
+	|	^(ACTION elementOptions?)
+	|	^(SEMPRED elementOptions?)
 	|	EPSILON
 	;
 
 setElement
-	:	STRING_LITERAL
+	:	^(STRING_LITERAL elementOptions)
+	|	^(TOKEN_REF elementOptions)
+	|	STRING_LITERAL
 	|	TOKEN_REF
 	;
 

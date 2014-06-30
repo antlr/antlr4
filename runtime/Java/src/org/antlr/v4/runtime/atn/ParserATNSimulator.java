@@ -2395,4 +2395,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return context;
 	}
 
+	public Parser getParser() {
+		return parser;
+	}
 }

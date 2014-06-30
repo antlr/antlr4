@@ -31,14 +31,17 @@
 package org.antlr.v4.tool;
 
 import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
 import org.antlr.v4.Tool;
+import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.BlockSetTransformer;
 import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.GrammarToken;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.antlr.v4.runtime.misc.Tuple2;
 import org.antlr.v4.tool.ast.AltAST;
@@ -53,6 +56,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /** Handle left-recursion and block-set transforms */
@@ -124,6 +128,39 @@ public class GrammarTransformPipeline {
 			@Override
 			public Object post(Object t) { return t; }
 		});
+	}
+
+	public static void augmentTokensWithOriginalPosition(final Grammar g, GrammarAST tree) {
+		if ( tree==null ) return;
+
+		List<GrammarAST> optionsSubTrees = tree.getNodesWithType(ANTLRParser.ELEMENT_OPTIONS);
+		for (int i = 0; i < optionsSubTrees.size(); i++) {
+			GrammarAST t = optionsSubTrees.get(i);
+			CommonTree elWithOpt = t.parent;
+			if ( elWithOpt instanceof GrammarASTWithOptions ) {
+				Map<String, GrammarAST> options = ((GrammarASTWithOptions) elWithOpt).getOptions();
+				if ( options.containsKey(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME) ) {
+					GrammarToken newTok = new GrammarToken(g, elWithOpt.getToken());
+					newTok.originalTokenIndex = Integer.valueOf(options.get(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME).getText());
+					elWithOpt.token = newTok;
+
+					GrammarAST originalNode = g.ast.getNodeWithTokenIndex(newTok.getTokenIndex());
+					if (originalNode != null) {
+						// update the AST node start/stop index to match the values
+						// of the corresponding node in the original parse tree.
+						elWithOpt.setTokenStartIndex(originalNode.getTokenStartIndex());
+						elWithOpt.setTokenStopIndex(originalNode.getTokenStopIndex());
+					}
+					else {
+						// the original AST node could not be located by index;
+						// make sure to assign valid values for the start/stop
+						// index so toTokenString will not throw exceptions.
+						elWithOpt.setTokenStartIndex(newTok.getTokenIndex());
+						elWithOpt.setTokenStopIndex(newTok.getTokenIndex());
+					}
+				}
+			}
+		}
 	}
 
 	/** Merge all the rules, token definitions, and named actions from
