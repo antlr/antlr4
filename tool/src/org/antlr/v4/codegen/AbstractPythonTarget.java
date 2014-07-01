@@ -42,11 +42,9 @@ import org.stringtemplate.v4.StringRenderer;
  * @author Eric Vergnaud
  */
 public abstract class AbstractPythonTarget extends Target {
-
 	protected AbstractPythonTarget(CodeGenerator gen, String name) {
 		super(gen, name);
 	}
-
 
 	/**
 	 * {@inheritDoc}
@@ -151,9 +149,9 @@ public abstract class AbstractPythonTarget extends Target {
 		// set to something stupid to avoid segmentation
 		return 2 ^ 31;
 	}
-	
+
 	public abstract Set<String> getBadWords();
-	
+
 	@Override
 	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
 		return getBadWords().contains(idNode.getText());
@@ -188,6 +186,6 @@ public abstract class AbstractPythonTarget extends Target {
 	public boolean supportsOverloadedMethods() {
 		return false;
 	}
-	
-	
+
+
 }
