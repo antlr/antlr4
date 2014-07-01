@@ -30,7 +30,7 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.ANTLRErrorListener;
+import org.antlr.v4.runtime.ParserErrorListener;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.misc.NotNull;
 
@@ -46,9 +46,9 @@ import org.antlr.v4.runtime.misc.NotNull;
  * determine that the SLL conflict is truly an ambiguity. For example, if none
  * of the ATN configurations in the conflicting SLL configuration set have
  * traversed a global follow transition (i.e.
- * {@link ATNConfig#reachesIntoOuterContext} is 0 for all configurations), then
- * the result of SLL prediction for that input is known to be equivalent to the
- * result of LL prediction for that input.</p>
+ * {@link ATNConfig#getReachesIntoOuterContext} is {@code false} for all
+ * configurations), then the result of SLL prediction for that input is known to
+ * be equivalent to the result of LL prediction for that input.</p>
  *
  * <p>
  * In some cases, the minimum represented alternative in the conflicting LL
@@ -59,7 +59,7 @@ import org.antlr.v4.runtime.misc.NotNull;
  * for that input.</p>
  *
  * @see ParserATNSimulator#reportAmbiguity
- * @see ANTLRErrorListener#reportAmbiguity
+ * @see ParserErrorListener#reportAmbiguity
  *
  * @since 4.3
  */

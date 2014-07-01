@@ -36,6 +36,7 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Tuple2;
 
 import java.util.BitSet;
@@ -236,8 +237,14 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 	}
 
 	@Override
-	protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex, boolean exact, @NotNull BitSet ambigAlts, @NotNull ATNConfigSet configs) {
-		int prediction = ambigAlts.nextSetBit(0);
+	protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex, boolean exact, @Nullable BitSet ambigAlts, @NotNull ATNConfigSet configs) {
+		int prediction;
+		if ( ambigAlts!=null ) {
+			prediction = ambigAlts.nextSetBit(0);
+		}
+		else {
+			prediction = configs.getRepresentedAlternatives().nextSetBit(0);
+		}
 		if ( conflictingAltResolvedBySLL != ATN.INVALID_ALT_NUMBER && prediction != conflictingAltResolvedBySLL ) {
 			// Even though this is an ambiguity we are reporting, we can
 			// still detect some context sensitivities.  Both SLL and LL

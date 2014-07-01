@@ -51,10 +51,12 @@ public interface ParserErrorListener extends ANTLRErrorListener<Token> {
 	 * will call either {@link #reportContextSensitivity} or
 	 * {@link #reportAmbiguity}.</p>
 	 *
-	 * <p>When {@code ambigAlts} is not null, it contains the set of potentially
+	 * <p>
+	 * When {@code ambigAlts} is not null, it contains the set of potentially
 	 * viable alternatives identified by the prediction algorithm. When
-	 * {@code ambigAlts} is null, use {@link ATNConfigSet#getAlts} to obtain the
-	 * represented alternatives from the {@code configs} argument.</p>
+	 * {@code ambigAlts} is null, use
+	 * {@link ATNConfigSet#getRepresentedAlternatives} to obtain the represented
+	 * alternatives from the {@code configs} argument.</p>
 	 *
 	 * <p>When {@code exact} is {@code true}, <em>all</em> of the potentially
 	 * viable alternatives are truly viable, i.e. this is reporting an exact
@@ -75,7 +77,9 @@ public interface ParserErrorListener extends ANTLRErrorListener<Token> {
 	 * @param exact {@code true} if the ambiguity is exactly known, otherwise
 	 * {@code false}. This is always {@code true} when
 	 * {@link PredictionMode#LL_EXACT_AMBIG_DETECTION} is used.
-	 * @param ambigAlts the potentially ambiguous alternatives
+	 * @param ambigAlts the potentially ambiguous alternatives, or {@code null}
+	 * to indicate that the potentially ambiguous alternatives are the complete
+	 * set of represented alternatives in {@code configs}
 	 * @param configs the ATN configuration set where the ambiguity was
 	 * identified
 	 */
@@ -84,7 +88,7 @@ public interface ParserErrorListener extends ANTLRErrorListener<Token> {
 						 int startIndex,
 						 int stopIndex,
 						 boolean exact,
-						 @NotNull BitSet ambigAlts,
+						 @Nullable BitSet ambigAlts,
 						 @NotNull ATNConfigSet configs);
 
 	/**

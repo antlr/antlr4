@@ -2357,7 +2357,7 @@ public class ParserATNSimulator extends ATNSimulator {
     /** If context sensitive parsing, we know it's ambiguity not conflict */
     protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex,
 								   boolean exact,
-								   @NotNull BitSet ambigAlts,
+								   @Nullable BitSet ambigAlts,
 								   @NotNull ATNConfigSet configs)
 	{
 		if ( debug || retry_debug ) {

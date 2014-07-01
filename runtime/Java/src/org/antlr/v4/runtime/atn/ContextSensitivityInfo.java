@@ -30,7 +30,7 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.ANTLRErrorListener;
+import org.antlr.v4.runtime.ParserErrorListener;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.misc.NotNull;
 
@@ -48,7 +48,7 @@ import org.antlr.v4.runtime.misc.NotNull;
  * input.</p>
  *
  * @see ParserATNSimulator#reportContextSensitivity
- * @see ANTLRErrorListener#reportContextSensitivity
+ * @see ParserErrorListener#reportContextSensitivity
  *
  * @since 4.3
  */

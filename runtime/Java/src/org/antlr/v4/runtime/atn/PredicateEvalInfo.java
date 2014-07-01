@@ -78,7 +78,7 @@ public class PredicateEvalInfo extends DecisionEventInfo {
 	 * guarded by the semantic context {@code semctx}. See {@link #predictedAlt}
 	 * for more information.
 	 *
-	 * @see ParserATNSimulator#evalSemanticContext(SemanticContext, ParserRuleContext, int, boolean)
+	 * @see ParserATNSimulator#evalSemanticContext(SemanticContext, ParserRuleContext, int)
 	 * @see SemanticContext#eval(Recognizer, RuleContext)
 	 */
 	public PredicateEvalInfo(@NotNull SimulatorState state, int decision,
