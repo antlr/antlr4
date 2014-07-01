@@ -37,6 +37,7 @@ import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,16 @@ public class ListenerFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
 	public String grammarName;
 	public String parserName;
+	/**
+	 * The names of all listener contexts.
+	 */
 	public Set<String> listenerNames = new HashSet<String>();
+	/**
+	 * For listener contexts created for a labeled outer alternative, maps from
+	 * a listener context name to the name of the rule which defines the
+	 * context.
+	 */
+	public Map<String, String> listenerLabelRuleNames = new HashMap<String, String>();
 
 	@ModelElement public Action header;
 
@@ -63,6 +73,7 @@ public class ListenerFile extends OutputFile {
 			if ( labels!=null ) {
 				for (Map.Entry<String, List<Tuple2<Integer, AltAST>>> pair : labels.entrySet()) {
 					listenerNames.add(pair.getKey());
+					listenerLabelRuleNames.put(pair.getKey(), r.name);
 				}
 			}
 			else if (r.name.indexOf(ATNSimulator.RULE_VARIANT_DELIMITER) < 0) {

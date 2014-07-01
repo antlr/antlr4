@@ -372,4 +372,16 @@ public abstract class Target {
 
 		return result;
 	}
+
+	public boolean wantsBaseListener() {
+		return true;
+	}
+
+	public boolean wantsBaseVisitor() {
+		return true;
+	}
+
+	public boolean supportsOverloadedMethods() {
+		return true;
+	}
 }

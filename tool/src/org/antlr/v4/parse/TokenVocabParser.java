@@ -37,9 +37,10 @@ import org.antlr.v4.tool.ErrorType;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -60,12 +61,20 @@ public class TokenVocabParser {
 		Map<String,Integer> tokens = new LinkedHashMap<String,Integer>();
 		int maxTokenType = -1;
 		File fullFile = getImportedVocabFile();
-		FileReader fr = null;
+		FileInputStream fis = null;
 		BufferedReader br = null;
 		try {
 			Pattern tokenDefPattern = Pattern.compile("([^\n]+?)[ \\t]*?=[ \\t]*?([0-9]+)");
-			fr = new FileReader(fullFile);
-			br = new BufferedReader(fr);
+			fis = new FileInputStream(fullFile);
+			InputStreamReader isr;
+			if (tool.grammarEncoding != null) {
+				isr = new InputStreamReader(fis, tool.grammarEncoding);
+			}
+			else {
+				isr = new InputStreamReader(fis);
+			}
+
+			br = new BufferedReader(isr);
 			String tokenDef = br.readLine();
 			int lineNum = 1;
 			while ( tokenDef!=null ) {

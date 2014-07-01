@@ -84,10 +84,11 @@ import org.antlr.v4.runtime.misc.Tuple2;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
@@ -341,6 +342,33 @@ public abstract class BaseTest {
 		return null;
 	}
 
+	protected String load(String fileName, @Nullable String encoding)
+		throws IOException
+	{
+		if ( fileName==null ) {
+			return null;
+		}
+
+		String fullFileName = getClass().getPackage().getName().replace('.', '/') + '/' + fileName;
+		int size = 65000;
+		InputStreamReader isr;
+		InputStream fis = getClass().getClassLoader().getResourceAsStream(fullFileName);
+		if ( encoding!=null ) {
+			isr = new InputStreamReader(fis, encoding);
+		}
+		else {
+			isr = new InputStreamReader(fis);
+		}
+		try {
+			char[] data = new char[size];
+			int n = isr.read(data);
+			return new String(data, 0, n);
+		}
+		finally {
+			isr.close();
+		}
+	}
+
 	/** Wow! much faster than compiling outside of VM. Finicky though.
 	 *  Had rules called r and modulo. Wouldn't compile til I changed to 'a'.
 	 */
@@ -473,6 +501,8 @@ public abstract class BaseTest {
 		options.add(tmpdir);
 		options.add("-lib");
 		options.add(tmpdir);
+		options.add("-encoding");
+		options.add("UTF-8");
 		options.add(new File(tmpdir,grammarFileName).toString());
 
 		final String[] optionsA = new String[options.size()];
@@ -1056,7 +1086,8 @@ public abstract class BaseTest {
 	public static void writeFile(String dir, String fileName, String content) {
 		try {
 			File f = new File(dir, fileName);
-			FileWriter w = new FileWriter(f);
+			FileOutputStream outputStream = new FileOutputStream(f);
+			OutputStreamWriter w = new OutputStreamWriter(outputStream, "UTF-8");
 			BufferedWriter bw = new BufferedWriter(w);
 			bw.write(content);
 			bw.close();
@@ -1083,6 +1114,7 @@ public abstract class BaseTest {
 			"import org.antlr.v4.runtime.*;\n" +
 			"import org.antlr.v4.runtime.tree.*;\n" +
 			"import org.antlr.v4.runtime.atn.*;\n" +
+			"import java.util.Arrays;\n"+
 			"\n" +
 			"public class Test {\n" +
 			"    public static void main(String[] args) throws Exception {\n" +
@@ -1094,7 +1126,7 @@ public abstract class BaseTest {
 			"		 parser.getInterpreter().reportAmbiguities = true;\n" +
 			"		 <profile>\n"+
 			"        ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
-			"		 <if(profile)>profiler.dump();<endif>\n" +
+			"		 <if(profile)>System.out.println(Arrays.toString(profiler.getDecisionInfo()));<endif>\n" +
 			"        ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
 			"    }\n" +
 			"\n" +

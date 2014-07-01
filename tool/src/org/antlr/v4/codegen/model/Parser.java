@@ -34,7 +34,6 @@ import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.chunk.ActionChunk;
 import org.antlr.v4.codegen.model.chunk.ActionText;
-import org.antlr.v4.codegen.model.chunk.DefaultParserSuperClass;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
@@ -47,7 +46,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/** */
 public class Parser extends OutputModelObject {
 	public String name;
 	public String grammarFileName;
@@ -98,9 +96,6 @@ public class Parser extends OutputModelObject {
 		atn = new SerializedATN(factory, g.atn, Arrays.asList(g.getRuleNames()));
 		if (g.getOptionString("superClass") != null) {
 			superClass = new ActionText(null, g.getOptionString("superClass"));
-		}
-		else {
-			superClass = new DefaultParserSuperClass();
 		}
 
 		abstractRecognizer = g.isAbstract();

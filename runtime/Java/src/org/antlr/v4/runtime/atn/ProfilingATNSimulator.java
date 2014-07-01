@@ -52,6 +52,19 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 	protected int currentDecision;
 	protected SimulatorState currentState;
 
+ 	/** At the point of LL failover, we record how SLL would resolve the conflict so that
+	 *  we can determine whether or not a decision / input pair is context-sensitive.
+	 *  If LL gives a different result than SLL's predicted alternative, we have a
+	 *  context sensitivity for sure. The converse is not necessarily true, however.
+	 *  It's possible that after conflict resolution chooses minimum alternatives,
+	 *  SLL could get the same answer as LL. Regardless of whether or not the result indicates
+	 *  an ambiguity, it is not treated as a context sensitivity because LL prediction
+	 *  was not required in order to produce a correct prediction for this decision and input sequence.
+	 *  It may in fact still be a context sensitivity but we don't know by looking at the
+	 *  minimum alternatives for the current input.
+ 	 */
+	protected int conflictingAltResolvedBySLL;
+
 	public ProfilingATNSimulator(Parser parser) {
 		super(parser, parser.getInterpreter().atn);
 		optimize_ll1 = false;
@@ -72,6 +85,7 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 			this._llStopIndex = -1;
 			this.currentDecision = decision;
 			this.currentState = null;
+			this.conflictingAltResolvedBySLL = ATN.INVALID_ALT_NUMBER;
 			long start = System.nanoTime(); // expensive but useful info
 			int alt = super.adaptivePredict(input, decision, outerContext);
 			long stop = System.nanoTime();
@@ -198,20 +212,39 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 
 	@Override
 	protected void reportContextSensitivity(DFA dfa, int prediction, SimulatorState acceptState, int startIndex, int stopIndex) {
-		decisions[currentDecision].contextSensitivities.add(
-			new ContextSensitivityInfo(currentDecision, acceptState, _input, startIndex, stopIndex)
-		);
+		if ( prediction != conflictingAltResolvedBySLL ) {
+			decisions[currentDecision].contextSensitivities.add(
+				new ContextSensitivityInfo(currentDecision, acceptState, _input, startIndex, stopIndex)
+			);
+		}
 		super.reportContextSensitivity(dfa, prediction, acceptState, startIndex, stopIndex);
 	}
 
 	@Override
 	protected void reportAttemptingFullContext(DFA dfa, BitSet conflictingAlts, SimulatorState conflictState, int startIndex, int stopIndex) {
+		if ( conflictingAlts!=null ) {
+			conflictingAltResolvedBySLL = conflictingAlts.nextSetBit(0);
+		}
+		else {
+			conflictingAltResolvedBySLL = conflictState.s0.configs.getRepresentedAlternatives().nextSetBit(0);
+		}
 		decisions[currentDecision].LL_Fallback++;
 		super.reportAttemptingFullContext(dfa, conflictingAlts, conflictState, startIndex, stopIndex);
 	}
 
 	@Override
 	protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex, boolean exact, @NotNull BitSet ambigAlts, @NotNull ATNConfigSet configs) {
+		int prediction = ambigAlts.nextSetBit(0);
+		if ( conflictingAltResolvedBySLL != ATN.INVALID_ALT_NUMBER && prediction != conflictingAltResolvedBySLL ) {
+			// Even though this is an ambiguity we are reporting, we can
+			// still detect some context sensitivities.  Both SLL and LL
+			// are showing a conflict, hence an ambiguity, but if they resolve
+			// to different minimum alternatives we have also identified a
+			// context sensitivity.
+			decisions[currentDecision].contextSensitivities.add(
+					new ContextSensitivityInfo(currentDecision, currentState, _input, startIndex, stopIndex)
+			);
+		}
 		decisions[currentDecision].ambiguities.add(
 			new AmbiguityInfo(currentDecision, currentState, _input, startIndex, stopIndex)
 		);

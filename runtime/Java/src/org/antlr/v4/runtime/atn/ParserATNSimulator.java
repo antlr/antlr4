@@ -1608,15 +1608,15 @@ public class ParserATNSimulator extends ATNSimulator {
 	 *
 	 * <p>
 	 * This method might not be called for every semantic context evaluated
-	 * during the prediction process. In particular, the following restrictions
-	 * are allowed:</p>
+	 * during the prediction process. In particular, we currently do not
+	 * evaluate the following but it may change in the future:</p>
 	 *
 	 * <ul>
 	 * <li>Precedence predicates (represented by
-	 * {@link SemanticContext.PrecedencePredicate}) may or may not be evaluated
+	 * {@link SemanticContext.PrecedencePredicate}) are not currently evaluated
 	 * through this method.</li>
 	 * <li>Operator predicates (represented by {@link SemanticContext.AND} and
-	 * {@link SemanticContext.OR}) may be evaluated as a single semantic
+	 * {@link SemanticContext.OR}) are evaluated as a single semantic
 	 * context, rather than evaluating the operands individually.
 	 * Implementations which require evaluation results from individual
 	 * predicates should override this method to explicitly handle evaluation of
@@ -2359,22 +2359,6 @@ public class ParserATNSimulator extends ATNSimulator {
 								   @NotNull ATNConfigSet configs)
 	{
 		if ( debug || retry_debug ) {
-//			ParserATNPathFinder finder = new ParserATNPathFinder(parser, atn);
-//			int i = 1;
-//			for (Transition t : dfa.atnStartState.transitions) {
-//				System.out.println("ALT "+i+"=");
-//				System.out.println(startIndex+".."+stopIndex+", len(input)="+parser.getInputStream().size());
-//				TraceTree path = finder.trace(t.target, parser.getContext(), (TokenStream)parser.getInputStream(),
-//											  startIndex, stopIndex);
-//				if ( path!=null ) {
-//					System.out.println("path = "+path.toStringTree());
-//					for (TraceTree leaf : path.leaves) {
-//						List<ATNState> states = path.getPathToNode(leaf);
-//						System.out.println("states="+states);
-//					}
-//				}
-//				i++;
-//			}
 			Interval interval = Interval.of(startIndex, stopIndex);
 			System.out.println("reportAmbiguity "+
 							   ambigAlts+":"+configs+

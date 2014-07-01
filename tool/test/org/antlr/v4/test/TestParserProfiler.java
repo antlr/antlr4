@@ -167,16 +167,15 @@ public class TestParserProfiler extends BaseTest {
 	@Test public void testContextSensitivity() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
-			"a : e ID ;\n" +
-			"b : e INT ID ;\n" +
+			"a : '.' e ID \n" +
+			"  | ';' e INT ID ;\n" +
 			"e : INT | ;\n",
 			lg);
-		DecisionInfo[] info = interpAndGetDecisionInfo(lg, g, "a", "1 x");
-		assertEquals(1, info.length);
+		DecisionInfo[] info = interpAndGetDecisionInfo(lg, g, "a", "; 1 x");
+		assertEquals(2, info.length);
 		String expecting =
-			"[{decision=0, contextSensitivities=1, errors=0, ambiguities=0, SLL_lookahead=3, " +
-			"SLL_ATNTransitions=2, SLL_DFATransitions=0, LL_Fallback=1, LL_lookahead=1, LL_ATNTransitions=1}]";
-		assertEquals(expecting, Arrays.toString(info));
+			"{decision=1, contextSensitivities=1, errors=0, ambiguities=0, SLL_lookahead=3, SLL_ATNTransitions=2, SLL_DFATransitions=0, LL_Fallback=1, LL_lookahead=3, LL_ATNTransitions=2}";
+		assertEquals(expecting, info[1].toString());
 	}
 
 	@Ignore
@@ -209,6 +208,7 @@ public class TestParserProfiler extends BaseTest {
 
 		// pred forces to
 		// ambig and ('+' e)* tail recursion forces lookahead to fall out of e
+		// any non-precedence predicates are always evaluated as true by the interpreter
 		DecisionInfo[] info = interpAndGetDecisionInfo(lg, g, "s", "a+b+c;");
 		// at "+b" it uses k=1 and enters loop then calls e for b...
 		// e matches and d=2 uses "+c;" for k=3
@@ -219,6 +219,32 @@ public class TestParserProfiler extends BaseTest {
 			 "{decision=1, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=4, " +
 			  "SLL_ATNTransitions=2, SLL_DFATransitions=2, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}]";
 		assertEquals(expecting, Arrays.toString(info));
+	}
+
+	@Test public void testProfilerGeneratedCode() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"s : a+ ID EOF ;\n" +
+			"a : ID ';'{}\n" +
+			"  | ID '.'\n" +
+			"  ;\n"+
+			"WS : [ \\r\\t\\n]+ -> channel(HIDDEN) ;\n" +
+			"SEMI : ';' ;\n" +
+			"DOT : '.' ;\n" +
+			"ID : [a-zA-Z]+ ;\n" +
+			"INT : [0-9]+ ;\n" +
+			"PLUS : '+' ;\n" +
+			"MULT : '*' ;\n";
+
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
+								  "xyz;abc;z.q", false, true);
+		String expecting =
+			"[{decision=0, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=6, SLL_ATNTransitions=4, " +
+			"SLL_DFATransitions=2, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}," +
+			" {decision=1, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=6, " +
+			"SLL_ATNTransitions=3, SLL_DFATransitions=3, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}]\n";
+		assertEquals(expecting, found);
+		assertEquals(null, stderrDuringParse);
 	}
 
 	public DecisionInfo[] interpAndGetDecisionInfo(

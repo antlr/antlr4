@@ -33,7 +33,9 @@ package org.antlr.v4.test;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /** Test parser execution.
  *
@@ -164,7 +166,7 @@ public class TestParserExec extends BaseTest {
 		"ID : 'a'..'z'+ ;\n" +
 		"WS : (' '|'\\n') -> channel(HIDDEN);\n";
 
-	@Test public void testIfIfElseGreedyBinding() throws Exception {
+	@Test public void testIfIfElseGreedyBinding1() throws Exception {
 		final String input = "if y if y x else x";
 		final String expectedInnerBound = "if y x else x\nif y if y x else x\n";
 
@@ -172,8 +174,14 @@ public class TestParserExec extends BaseTest {
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start", input, false);
 		assertEquals(expectedInnerBound, found);
 
-		grammar = String.format(ifIfElseGrammarFormat, "('else' statement|)");
-		found = execParser("T.g4", grammar, "TParser", "TLexer", "start", input, false);
+	}
+
+	@Test public void testIfIfElseGreedyBinding2() throws Exception {
+		final String input = "if y if y x else x";
+		final String expectedInnerBound = "if y x else x\nif y if y x else x\n";
+
+		String grammar = String.format(ifIfElseGrammarFormat, "('else' statement|)");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start", input, false);
 		assertEquals(expectedInnerBound, found);
 	}
 
@@ -203,6 +211,22 @@ public class TestParserExec extends BaseTest {
 		found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "a b c", false);
 		assertEquals("abc\n", found);
+	}
+
+	@Test public void testLL1OptionalBlock() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"a : (ID|{}INT)? {System.out.println($text);} ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+ ;\n" +
+			"WS : (' '|'\\n') -> skip ;\n";
+
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
+								  "", false);
+		assertEquals("\n", found);
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
+								  "a", false);
+		assertEquals("a\n", found);
 	}
 
 	// force complex decision
@@ -256,7 +280,7 @@ public class TestParserExec extends BaseTest {
 	 * https://github.com/antlr/antlr4/issues/41
 	 */
 	@Test
-	public void testOptional() throws Exception {
+	public void testOptional1() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"stat : ifstat | 'x';\n" +
@@ -267,16 +291,46 @@ public class TestParserExec extends BaseTest {
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "x", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
+	}
+	
+	@Test
+	public void testOptional2() throws Exception {
+		String grammar =
+				"grammar T;\n" +
+				"stat : ifstat | 'x';\n" +
+				"ifstat : 'if' stat ('else' stat)?;\n" +
+				"WS : [ \\n\\t]+ -> skip ;"
+				;
 
-		found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if x else x", false);
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if x else x", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
+	}
+	
+	@Test
+	public void testOptional3() throws Exception {
+		String grammar =
+				"grammar T;\n" +
+				"stat : ifstat | 'x';\n" +
+				"ifstat : 'if' stat ('else' stat)?;\n" +
+				"WS : [ \\n\\t]+ -> skip ;"
+				;
 
-		found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if x", false);
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if x", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
-
-		found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if if x else x", false);
+	}
+	
+	@Test
+	public void testOptional4() throws Exception {
+		String grammar =
+				"grammar T;\n" +
+				"stat : ifstat | 'x';\n" +
+				"ifstat : 'if' stat ('else' stat)?;\n" +
+				"WS : [ \\n\\t]+ -> skip ;"
+				;
+		
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "stat", "if if x else x", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -460,5 +514,56 @@ public class TestParserExec extends BaseTest {
 		found = execParser("T.g4", grammar, "TParser", "TLexer", "a",
 								  "a 34 c", false);
 		assertEquals("a34c\n", found);
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#588 "ClassCastException during
+	 * semantic predicate handling".
+	 * https://github.com/antlr/antlr4/issues/588
+	 */
+	@Test public void testFailedPredicateExceptionState() throws Exception {
+		String grammar = load("Psl.g4", "UTF-8");
+		String found = execParser("Psl.g4", grammar, "PslParser", "PslLexer", "floating_constant", " . 234", false);
+		assertEquals("", found);
+		assertEquals("line 1:6 rule floating_constant DEC:A floating-point constant cannot have internal white space\n", stderrDuringParse);
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#563 "Inconsistent token
+	 * handling in ANTLR4".
+	 * https://github.com/antlr/antlr4/issues/563
+	 */
+	@Test public void testAlternateQuotes() throws Exception {
+		String lexerGrammar =
+			"lexer grammar ModeTagsLexer;\n" +
+			"\n" +
+			"// Default mode rules (the SEA)\n" +
+			"OPEN  : '«'     -> mode(ISLAND) ;       // switch to ISLAND mode\n" +
+			"TEXT  : ~'«'+ ;                         // clump all text together\n" +
+			"\n" +
+			"mode ISLAND;\n" +
+			"CLOSE : '»'     -> mode(DEFAULT_MODE) ; // back to SEA mode \n" +
+			"SLASH : '/' ;\n" +
+			"ID    : [a-zA-Z]+ ;                     // match/send ID in tag to parser\n";
+		String parserGrammar =
+			"parser grammar ModeTagsParser;\n" +
+			"\n" +
+			"options { tokenVocab=ModeTagsLexer; } // use tokens from ModeTagsLexer.g4\n" +
+			"\n" +
+			"file: (tag | TEXT)* ;\n" +
+			"\n" +
+			"tag : '«' ID '»'\n" +
+			"    | '«' '/' ID '»'\n" +
+			"    ;";
+
+		boolean success = rawGenerateAndBuildRecognizer("ModeTagsLexer.g4",
+														lexerGrammar,
+														null,
+														"ModeTagsLexer");
+		assertTrue(success);
+
+		String found = execParser("ModeTagsParser.g4", parserGrammar, "ModeTagsParser", "ModeTagsLexer", "file", "", false);
+		assertEquals("", found);
+		assertNull(stderrDuringParse);
 	}
 }

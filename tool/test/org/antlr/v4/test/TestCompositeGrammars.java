@@ -116,7 +116,7 @@ public class TestCompositeGrammars extends BaseTest {
 	@Test public void testDelegatorAccessesDelegateMembers() throws Exception {
 		String slave =
 			"parser grammar S;\n" +
-			"@members {\n" +
+			"@parser::members {\n" +
 			"  public void foo() {System.out.println(\"foo\");}\n" +
 			"}\n" +
 			"a : B ;\n";

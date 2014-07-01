@@ -77,12 +77,22 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 public interface <file.grammarName>Listener extends ParseTreeListener {
 	<file.listenerNames:{lname |
 /**
+<if(file.listenerLabelRuleNames.(lname))>
+ * Enter a parse tree produced by the {@code <lname>\}
+ * labeled alternative in {@link <file.parserName>#<file.listenerLabelRuleNames.(lname)>\}.
+<else>
  * Enter a parse tree produced by {@link <file.parserName>#<lname>\}.
+<endif>
  * @param ctx the parse tree
  */
 void enter<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx);
 /**
+<if(file.listenerLabelRuleNames.(lname))>
+ * Exit a parse tree produced by the {@code <lname>\}
+ * labeled alternative in {@link <file.parserName>#<file.listenerLabelRuleNames.(lname)>\}.
+<else>
  * Exit a parse tree produced by {@link <file.parserName>#<lname>\}.
+<endif>
  * @param ctx the parse tree
  */
 void exit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
@@ -169,7 +179,12 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 public interface <file.grammarName>Visitor\<Result> extends ParseTreeVisitor\<Result> {
 	<file.visitorNames:{lname |
 /**
+<if(file.visitorLabelRuleNames.(lname))>
+ * Visit a parse tree produced by the {@code <lname>\}
+ * labeled alternative in {@link <file.parserName>#<file.visitorLabelRuleNames.(lname)>\}.
+<else>
  * Visit a parse tree produced by {@link <file.parserName>#<lname>\}.
+<endif>
  * @param ctx the parse tree
  * @return the visitor result
  */
@@ -216,7 +231,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 >>
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
-public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extends <superClass> {
+public <if(parser.abstractRecognizer)>abstract <endif>class <parser.name> extends <superClass; null="Parser"> {
 	<if(parser.tokens)>
 	public static final int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
@@ -506,23 +521,6 @@ if (<expr>) {
 <!else if ( !(<followExpr>) ) <error>!>
 >>
 
-LL1StarBlock(choice, alts) ::= <<
-setState(<choice.stateNumber>);
-_errHandler.sync(this);
-<choice.loopLabel>:
-while (true) {
-	switch (_input.LA(1)) {
-	<choice.altLook,alts:{look,alt| <cases(look)>
-	<alt>
-	break;}; separator="\n">
-	<cases(choice.exitLook)>
-		break <choice.loopLabel>;
-	}
-	setState(<choice.loopBackStateNumber>);
-	_errHandler.sync(this);
-}
->>
-
 LL1StarBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
 setState(<choice.stateNumber>);
 _errHandler.sync(this);
@@ -533,23 +531,6 @@ while (<loopExpr>) {
 	_errHandler.sync(this);
 	<iteration>
 }
->>
-
-LL1PlusBlock(choice, alts, iteration, loopExpr, error) ::= <<
-setState(<choice.blockStartStateNumber>); <! alt block decision !>
-_errHandler.sync(this);
-do {
-	switch (_input.LA(1)) {
-	<choice.altLook,alts:{look,alt| <cases(look)>
-	<alt>
-	break;}; separator="\n">
-	default:
-		<error>
-	}
-	setState(<choice.stateNumber>);
-	_errHandler.sync(this);
-	<iteration>
-} while ( <loopExpr> );
 >>
 
 LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
@@ -714,9 +695,6 @@ LexerTypeCommand(arg)      ::= "_type = <arg>;"
 LexerChannelCommand(arg)   ::= "_channel = <arg>;"
 LexerModeCommand(arg)      ::= "_mode = <arg>;"
 LexerPushModeCommand(arg)  ::= "pushMode(<arg>);"
-
-DefaultParserSuperClass(s) ::= "Parser"
-DefaultLexerSuperClass(s)  ::= "Lexer"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
@@ -909,7 +887,7 @@ import org.antlr.v4.runtime.misc.*;
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
-public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends <superClass> {
+public <if(lexer.abstractRecognizer)>abstract <endif>class <lexer.name> extends <superClass; null="Lexer"> {
 	public static final int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<rest(lexer.modes):{m| public static final int <m> = <i>;}; separator="\n">
