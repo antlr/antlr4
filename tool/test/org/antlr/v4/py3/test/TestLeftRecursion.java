@@ -54,12 +54,12 @@ public class TestLeftRecursion extends BasePython3Test {
 		String expecting = "(s (a x))\n";
 		assertEquals(expecting, found);
 
-		found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", 
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 						   "s", "x y", debug);
 		expecting = "(s (a (a x) y))\n";
 		assertEquals(expecting, found);
 
-		found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", 
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 						   "s", "x y z", debug);
 		expecting = "(s (a (a (a x) y) z))\n";
 		assertEquals(expecting, found);
@@ -78,17 +78,17 @@ public class TestLeftRecursion extends BasePython3Test {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') -> skip ;\n";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", 
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "x", debug);
 		String expecting = "(a x)\n";
 		assertEquals(expecting, found);
 
-		found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", 
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 						   "a", "x y", debug);
 		expecting = "(a (a x) y)\n";
 		assertEquals(expecting, found);
 
-		found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", 
+		found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 						   "a", "x y z", debug);
 		expecting = "(a (a (a x) y) z)\n";
 		assertEquals(expecting, found);
@@ -103,7 +103,7 @@ public class TestLeftRecursion extends BasePython3Test {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') -> skip ;\n";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", 
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "s", "x y z", debug);
 		String expecting = "(s (a (a (a x) y) z))\n";
 		assertEquals(expecting, found);
@@ -226,7 +226,7 @@ public class TestLeftRecursion extends BasePython3Test {
 			"INT : '0'..'9'+ ;\n" +
 			"WS : (' '|'\\n') -> skip ;\n";
 		String[] tests = {
-			"a|b&c",	"(s (e (e a) | (e (e b) & (e c))) <EOF>)", 
+			"a|b&c",	"(s (e (e a) | (e (e b) & (e c))) <EOF>)",
 			"(a|b)&c",	"(s (e (e ( (e (e a) | (e b)) )) & (e c)) <EOF>)",
             "a > b",	"(s (e (e a) > (e b)) <EOF>)",
 			"a >> b",	"(s (e (e a) >> (e b)) <EOF>)",
@@ -237,7 +237,7 @@ public class TestLeftRecursion extends BasePython3Test {
 			"(T)t.f()",						"(s (e (e ( (type T) ) (e (e t) . f)) ( )) <EOF>)",
 			"a.f(x)==T.c",					"(s (e (e (e (e a) . f) ( (expressionList (e x)) )) == (e (e T) . c)) <EOF>)",
 			"a.f().g(x,1)",					"(s (e (e (e (e (e a) . f) ( )) . g) ( (expressionList (e x) , (e 1)) )) <EOF>)",
-			"new T[((n-1) * x) + 1]",		"(s (e new (type T) [ (e (e ( (e (e ( (e (e n) - (e 1)) )) * (e x)) )) + (e 1)) ]) <EOF>)", 
+			"new T[((n-1) * x) + 1]",		"(s (e new (type T) [ (e (e ( (e (e ( (e (e n) - (e 1)) )) * (e x)) )) + (e 1)) ]) <EOF>)",
 		};
 		runTests(grammar, tests, "s");
 	}
@@ -305,9 +305,9 @@ public class TestLeftRecursion extends BasePython3Test {
 			"INT : '0'..'9'+ ;\n" +
 			"WS : (' '|'\\n') -> skip ;\n";
 		String[] tests = {
-		"4",		"(s (e 4))", 
+		"4",		"(s (e 4))",
 		"1*2/3",		"(s (e (e (e 1) * (e 2)) / (e 3)))",
-		"(1/2)*3",		"(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))", 
+		"(1/2)*3",		"(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))",
 		};
 		runTests(grammar, tests, "s");
 	}
@@ -444,7 +444,7 @@ public class TestLeftRecursion extends BasePython3Test {
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') -> skip ;\n";
 		String expected =
-			"error(" + ErrorType.NO_NON_LR_ALTS.code + "): T.g4:3:0: left recursive rule 'a' must contain an alternative which is not left recursive\n";
+			"error(" + ErrorType.NO_NON_LR_ALTS.code + "): T.g4:3:0: left recursive rule a must contain an alternative which is not left recursive\n";
 		testErrors(new String[] { grammar, expected }, false);
 	}
 
@@ -458,7 +458,7 @@ public class TestLeftRecursion extends BasePython3Test {
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') -> skip ;\n";
 		String expected =
-			"error(" + ErrorType.EPSILON_LR_FOLLOW.code + "): T.g4:3:0: left recursive rule 'a' contains a left recursive alternative which can be followed by the empty string\n";
+			"error(" + ErrorType.EPSILON_LR_FOLLOW.code + "): T.g4:3:0: left recursive rule a contains a left recursive alternative which can be followed by the empty string\n";
 		testErrors(new String[] { grammar, expected }, false);
 	}
 
