@@ -84,6 +84,23 @@ namespace Antlr4.Runtime.Atn
 
         public abstract void Reset();
 
+        /// <summary>Clear the DFA cache used by the current instance.</summary>
+        /// <remarks>
+        /// Clear the DFA cache used by the current instance. Since the DFA cache may
+        /// be shared by multiple ATN simulators, this method may affect the
+        /// performance (but not accuracy) of other parsers which are being used
+        /// concurrently.
+        /// </remarks>
+        /// <exception cref="System.NotSupportedException">
+        /// if the current instance does not
+        /// support clearing the DFA.
+        /// </exception>
+        /// <since>4.3</since>
+        public virtual void ClearDFA()
+        {
+            atn.ClearDFA();
+        }
+
         [Obsolete]
         [System.ObsoleteAttribute(@"Use ATNDeserializer.Deserialize(char[]) instead.")]
         public static ATN Deserialize(char[] data)

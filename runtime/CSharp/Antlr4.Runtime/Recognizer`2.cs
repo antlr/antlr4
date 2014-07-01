@@ -45,9 +45,9 @@ namespace Antlr4.Runtime
 
         private static readonly IDictionary<string[], IDictionary<string, int>> ruleIndexMapCache = new WeakHashMap<string[], IDictionary<string, int>>();
 
-        private sealed class _CopyOnWriteArrayList_58 : CopyOnWriteArrayList<IAntlrErrorListener<Symbol>>
+        private sealed class _CopyOnWriteArrayList_59 : CopyOnWriteArrayList<IAntlrErrorListener<Symbol>>
         {
-            public _CopyOnWriteArrayList_58()
+            public _CopyOnWriteArrayList_59()
             {
                 {
                     this.AddItem(ConsoleErrorListener.Instance);
@@ -56,7 +56,7 @@ namespace Antlr4.Runtime
         }
 
         [NotNull]
-        private IList<IAntlrErrorListener<Symbol>> _listeners = new _CopyOnWriteArrayList_58();
+        private IList<IAntlrErrorListener<Symbol>> _listeners = new _CopyOnWriteArrayList_59();
 
         protected internal ATNInterpreter _interp;
 
@@ -209,6 +209,20 @@ namespace Antlr4.Runtime
                 ATNInterpreter interpreter = value;
                 _interp = interpreter;
             }
+        }
+
+        /// <summary>
+        /// If profiling during the parse/lex, this will return DecisionInfo records
+        /// for each decision in recognizer in a ParseInfo object.
+        /// </summary>
+        /// <remarks>
+        /// If profiling during the parse/lex, this will return DecisionInfo records
+        /// for each decision in recognizer in a ParseInfo object.
+        /// </remarks>
+        /// <since>4.3</since>
+        public virtual ParseInfo GetParseInfo()
+        {
+            return null;
         }
 
         /// <summary>What is the error header, normally line/character position information?</summary>

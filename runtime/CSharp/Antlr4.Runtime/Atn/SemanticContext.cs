@@ -87,12 +87,12 @@ namespace Antlr4.Runtime.Atn
         /// prediction, so we passed in the outer context here in case of context
         /// dependent predicate evaluation.</p>
         /// </remarks>
-        public abstract bool Eval<_T0>(Recognizer<_T0> parser, RuleContext outerContext);
+        public abstract bool Eval<_T0>(Recognizer<_T0> parser, RuleContext parserCallStack);
 
         /// <summary>Evaluate the precedence predicates for the context and reduce the result.</summary>
         /// <remarks>Evaluate the precedence predicates for the context and reduce the result.</remarks>
         /// <param name="parser">The parser instance.</param>
-        /// <param name="outerContext">The current parser context object.</param>
+        /// <param name="parserCallStack"></param>
         /// <returns>
         /// The simplified semantic context after precedence predicates are
         /// evaluated, which will be one of the following values.
@@ -121,7 +121,7 @@ namespace Antlr4.Runtime.Atn
         /// semantic context after precedence predicates are evaluated.</li>
         /// </ul>
         /// </returns>
-        public virtual SemanticContext EvalPrecedence<_T0>(Recognizer<_T0> parser, RuleContext outerContext)
+        public virtual SemanticContext EvalPrecedence<_T0>(Recognizer<_T0> parser, RuleContext parserCallStack)
         {
             return this;
         }
@@ -149,9 +149,9 @@ namespace Antlr4.Runtime.Atn
                 this.isCtxDependent = isCtxDependent;
             }
 
-            public override bool Eval<_T0>(Recognizer<_T0> parser, RuleContext outerContext)
+            public override bool Eval<_T0>(Recognizer<_T0> parser, RuleContext parserCallStack)
             {
-                RuleContext localctx = isCtxDependent ? outerContext : null;
+                RuleContext localctx = isCtxDependent ? parserCallStack : null;
                 return parser.Sempred(localctx, ruleIndex, predIndex);
             }
 
@@ -199,14 +199,14 @@ namespace Antlr4.Runtime.Atn
                 this.precedence = precedence;
             }
 
-            public override bool Eval<_T0>(Recognizer<_T0> parser, RuleContext outerContext)
+            public override bool Eval<_T0>(Recognizer<_T0> parser, RuleContext parserCallStack)
             {
-                return parser.Precpred(outerContext, precedence);
+                return parser.Precpred(parserCallStack, precedence);
             }
 
-            public override SemanticContext EvalPrecedence<_T0>(Recognizer<_T0> parser, RuleContext outerContext)
+            public override SemanticContext EvalPrecedence<_T0>(Recognizer<_T0> parser, RuleContext parserCallStack)
             {
-                if (parser.Precpred(outerContext, precedence))
+                if (parser.Precpred(parserCallStack, precedence))
                 {
                     return SemanticContext.None;
                 }
@@ -244,8 +244,33 @@ namespace Antlr4.Runtime.Atn
 
             public override string ToString()
             {
-                return base.ToString();
+                // precedence >= _precedenceStack.peek()
+                return "{" + precedence + ">=prec}?";
             }
+        }
+
+        /// <summary>
+        /// This is the base class for semantic context "operators", which operate on
+        /// a collection of semantic context "operands".
+        /// </summary>
+        /// <remarks>
+        /// This is the base class for semantic context "operators", which operate on
+        /// a collection of semantic context "operands".
+        /// </remarks>
+        /// <since>4.3</since>
+        public abstract class Operator : SemanticContext
+        {
+            /// <summary>Gets the operands for the semantic context operator.</summary>
+            /// <remarks>Gets the operands for the semantic context operator.</remarks>
+            /// <returns>
+            /// a collection of
+            /// <see cref="SemanticContext">SemanticContext</see>
+            /// operands for the
+            /// operator.
+            /// </returns>
+            /// <since>4.3</since>
+            [NotNull]
+            public abstract ICollection<SemanticContext> GetOperands();
         }
 
         /// <summary>
@@ -256,7 +281,7 @@ namespace Antlr4.Runtime.Atn
         /// A semantic context which is true whenever none of the contained contexts
         /// is false.
         /// </remarks>
-        public class AND : SemanticContext
+        public class AND : SemanticContext.Operator
         {
             [NotNull]
             public readonly SemanticContext[] opnds;
@@ -290,6 +315,11 @@ namespace Antlr4.Runtime.Atn
                 opnds = Sharpen.Collections.ToArray(operands, new SemanticContext[operands.Count]);
             }
 
+            public override ICollection<SemanticContext> GetOperands()
+            {
+                return Arrays.AsList(opnds);
+            }
+
             public override bool Equals(object obj)
             {
                 if (this == obj)
@@ -315,11 +345,11 @@ namespace Antlr4.Runtime.Atn
             /// The evaluation of predicates by this context is short-circuiting, but
             /// unordered.</p>
             /// </summary>
-            public override bool Eval<_T0>(Recognizer<_T0> parser, RuleContext outerContext)
+            public override bool Eval<_T0>(Recognizer<_T0> parser, RuleContext parserCallStack)
             {
                 foreach (SemanticContext opnd in opnds)
                 {
-                    if (!opnd.Eval(parser, outerContext))
+                    if (!opnd.Eval(parser, parserCallStack))
                     {
                         return false;
                     }
@@ -327,13 +357,13 @@ namespace Antlr4.Runtime.Atn
                 return true;
             }
 
-            public override SemanticContext EvalPrecedence<_T0>(Recognizer<_T0> parser, RuleContext outerContext)
+            public override SemanticContext EvalPrecedence<_T0>(Recognizer<_T0> parser, RuleContext parserCallStack)
             {
                 bool differs = false;
                 IList<SemanticContext> operands = new List<SemanticContext>();
                 foreach (SemanticContext context in opnds)
                 {
-                    SemanticContext evaluated = context.EvalPrecedence(parser, outerContext);
+                    SemanticContext evaluated = context.EvalPrecedence(parser, parserCallStack);
                     differs |= (evaluated != context);
                     if (evaluated == null)
                     {
@@ -380,7 +410,7 @@ namespace Antlr4.Runtime.Atn
         /// A semantic context which is true whenever at least one of the contained
         /// contexts is true.
         /// </remarks>
-        public class OR : SemanticContext
+        public class OR : SemanticContext.Operator
         {
             [NotNull]
             public readonly SemanticContext[] opnds;
@@ -414,6 +444,11 @@ namespace Antlr4.Runtime.Atn
                 this.opnds = Sharpen.Collections.ToArray(operands, new SemanticContext[operands.Count]);
             }
 
+            public override ICollection<SemanticContext> GetOperands()
+            {
+                return Arrays.AsList(opnds);
+            }
+
             public override bool Equals(object obj)
             {
                 if (this == obj)
@@ -439,11 +474,11 @@ namespace Antlr4.Runtime.Atn
             /// The evaluation of predicates by this context is short-circuiting, but
             /// unordered.</p>
             /// </summary>
-            public override bool Eval<_T0>(Recognizer<_T0> parser, RuleContext outerContext)
+            public override bool Eval<_T0>(Recognizer<_T0> parser, RuleContext parserCallStack)
             {
                 foreach (SemanticContext opnd in opnds)
                 {
-                    if (opnd.Eval(parser, outerContext))
+                    if (opnd.Eval(parser, parserCallStack))
                     {
                         return true;
                     }
@@ -451,13 +486,13 @@ namespace Antlr4.Runtime.Atn
                 return false;
             }
 
-            public override SemanticContext EvalPrecedence<_T0>(Recognizer<_T0> parser, RuleContext outerContext)
+            public override SemanticContext EvalPrecedence<_T0>(Recognizer<_T0> parser, RuleContext parserCallStack)
             {
                 bool differs = false;
                 IList<SemanticContext> operands = new List<SemanticContext>();
                 foreach (SemanticContext context in opnds)
                 {
-                    SemanticContext evaluated = context.EvalPrecedence(parser, outerContext);
+                    SemanticContext evaluated = context.EvalPrecedence(parser, parserCallStack);
                     differs |= (evaluated != context);
                     if (evaluated == None)
                     {

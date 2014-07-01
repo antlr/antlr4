@@ -542,7 +542,6 @@ namespace Antlr4.Runtime.Atn
         protected internal virtual int ExecDFA(DFA dfa, ITokenStream input, int startIndex, SimulatorState state)
         {
             ParserRuleContext outerContext = state.outerContext;
-            DFAState acceptState = null;
             DFAState s = state.s0;
             int t = input.La(1);
             ParserRuleContext remainingOuterContext = state.remainingOuterContext;
@@ -564,6 +563,7 @@ namespace Antlr4.Runtime.Atn
                             SimulatorState initialState = new SimulatorState(state.outerContext, s, state.useContext, remainingOuterContext);
                             return ExecATN(dfa, input, startIndex, initialState);
                         }
+                        System.Diagnostics.Debug.Assert(remainingOuterContext != null);
                         remainingOuterContext = ((ParserRuleContext)remainingOuterContext.Parent);
                         s = next;
                     }
@@ -573,7 +573,6 @@ namespace Antlr4.Runtime.Atn
                     if (s.predicates != null)
                     {
                     }
-                    acceptState = s;
                     // keep going unless we're at EOF or state only has one alt number
                     // mentioned in configs; check if something else could match
                     // TODO: don't we always stop? only lexer would keep going
@@ -583,7 +582,7 @@ namespace Antlr4.Runtime.Atn
                 // t is not updated if one of these states is reached
                 System.Diagnostics.Debug.Assert(!s.isAcceptState);
                 // if no edge, pop over to ATN interpreter, update DFA and return
-                DFAState target = s.GetTarget(t);
+                DFAState target = GetExistingTargetState(s, t);
                 if (target == null)
                 {
                     if (dfa_debug && t >= 0)
@@ -593,19 +592,6 @@ namespace Antlr4.Runtime.Atn
                     int alt;
                     SimulatorState initialState = new SimulatorState(outerContext, s, state.useContext, remainingOuterContext);
                     alt = ExecATN(dfa, input, startIndex, initialState);
-                    // this adds edge even if next state is accept for
-                    // same alt; e.g., s0-A->:s1=>2-B->:s2=>2
-                    // TODO: This next stuff kills edge, but extra states remain. :(
-                    if (s.isAcceptState && alt != -1)
-                    {
-                        DFAState d = s.GetTarget(input.La(1));
-                        if (d.isAcceptState && d.prediction == s.prediction)
-                        {
-                            // we can carve it out.
-                            s.SetTarget(input.La(1), Error);
-                        }
-                    }
-                    // IGNORE really not error
                     //dump(dfa);
                     // action already executed
                     return alt;
@@ -630,11 +616,11 @@ namespace Antlr4.Runtime.Atn
             //			if ( debug ) System.out.println("!!! no viable alt in dfa");
             //			return -1;
             //		}
-            if (acceptState.configs.ConflictingAlts != null)
+            if (s.configs.ConflictingAlts != null)
             {
                 if (dfa.atnStartState is DecisionState)
                 {
-                    if (!userWantsCtxSensitive || !acceptState.configs.DipsIntoOuterContext || (treat_sllk1_conflict_as_ambiguity && input.Index == startIndex))
+                    if (!userWantsCtxSensitive || !s.configs.DipsIntoOuterContext || (treat_sllk1_conflict_as_ambiguity && input.Index == startIndex))
                     {
                     }
                     else
@@ -648,14 +634,15 @@ namespace Antlr4.Runtime.Atn
                         // disambiguating or validating predicates to evaluate which allow an
                         // immediate decision
                         BitSet conflictingAlts = null;
-                        if (acceptState.predicates != null)
+                        DFAState.PredPrediction[] predicates = s.predicates;
+                        if (predicates != null)
                         {
                             int conflictIndex = input.Index;
                             if (conflictIndex != startIndex)
                             {
                                 input.Seek(startIndex);
                             }
-                            conflictingAlts = EvalSemanticContext(s.predicates, outerContext, true);
+                            conflictingAlts = EvalSemanticContext(predicates, outerContext, true);
                             if (conflictingAlts.Cardinality() == 1)
                             {
                                 return conflictingAlts.NextSetBit(0);
@@ -669,7 +656,7 @@ namespace Antlr4.Runtime.Atn
                         }
                         if (reportAmbiguities)
                         {
-                            SimulatorState conflictState = new SimulatorState(outerContext, acceptState, state.useContext, remainingOuterContext);
+                            SimulatorState conflictState = new SimulatorState(outerContext, s, state.useContext, remainingOuterContext);
                             ReportAttemptingFullContext(dfa, conflictingAlts, conflictState, startIndex, input.Index);
                         }
                         input.Seek(startIndex);
@@ -679,14 +666,15 @@ namespace Antlr4.Runtime.Atn
             }
             // Before jumping to prediction, check to see if there are
             // disambiguating or validating predicates to evaluate
-            if (s.predicates != null)
+            DFAState.PredPrediction[] predicates_1 = s.predicates;
+            if (predicates_1 != null)
             {
                 int stopIndex = input.Index;
                 if (startIndex != stopIndex)
                 {
                     input.Seek(startIndex);
                 }
-                BitSet alts = EvalSemanticContext(s.predicates, outerContext, reportAmbiguities && predictionMode == Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection);
+                BitSet alts = EvalSemanticContext(predicates_1, outerContext, reportAmbiguities && predictionMode == Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection);
                 switch (alts.Cardinality())
                 {
                     case 0:
@@ -712,7 +700,7 @@ namespace Antlr4.Runtime.Atn
                     }
                 }
             }
-            return acceptState.prediction;
+            return s.prediction;
         }
 
         /// <summary>
@@ -1062,6 +1050,7 @@ namespace Antlr4.Runtime.Atn
                     {
                         break;
                     }
+                    System.Diagnostics.Debug.Assert(remainingGlobalContext != null);
                     remainingGlobalContext = ((ParserRuleContext)remainingGlobalContext.Parent);
                     s = next;
                 }
@@ -1637,7 +1626,7 @@ namespace Antlr4.Runtime.Atn
                 // if no (null, i), then no default prediction.
                 if (ambigAlts != null && ambigAlts.Get(i) && pred == SemanticContext.None)
                 {
-                    pairs.AddItem(new DFAState.PredPrediction(null, i));
+                    pairs.AddItem(new DFAState.PredPrediction(pred, i));
                 }
                 else
                 {
@@ -1672,7 +1661,7 @@ namespace Antlr4.Runtime.Atn
             BitSet predictions = new BitSet();
             foreach (DFAState.PredPrediction pair in predPredictions)
             {
-                if (pair.pred == null)
+                if (pair.pred == SemanticContext.None)
                 {
                     predictions.Set(pair.alt);
                     if (!complete)
@@ -1681,7 +1670,7 @@ namespace Antlr4.Runtime.Atn
                     }
                     continue;
                 }
-                bool evaluatedResult = pair.pred.Eval(parser, outerContext);
+                bool evaluatedResult = EvalSemanticContext(pair.pred, outerContext, pair.alt);
                 if (debug || dfa_debug)
                 {
                     System.Console.Out.WriteLine("eval pred " + pair + "=" + evaluatedResult);
@@ -1700,6 +1689,44 @@ namespace Antlr4.Runtime.Atn
                 }
             }
             return predictions;
+        }
+
+        /// <summary>Evaluate a semantic context within a specific parser context.</summary>
+        /// <remarks>
+        /// Evaluate a semantic context within a specific parser context.
+        /// <p>
+        /// This method might not be called for every semantic context evaluated
+        /// during the prediction process. In particular, we currently do not
+        /// evaluate the following but it may change in the future:</p>
+        /// <ul>
+        /// <li>Precedence predicates (represented by
+        /// <see cref="PrecedencePredicate">PrecedencePredicate</see>
+        /// ) are not currently evaluated
+        /// through this method.</li>
+        /// <li>Operator predicates (represented by
+        /// <see cref="AND">AND</see>
+        /// and
+        /// <see cref="OR">OR</see>
+        /// ) are evaluated as a single semantic
+        /// context, rather than evaluating the operands individually.
+        /// Implementations which require evaluation results from individual
+        /// predicates should override this method to explicitly handle evaluation of
+        /// the operands within operator predicates.</li>
+        /// </ul>
+        /// </remarks>
+        /// <param name="pred">The semantic context to evaluate</param>
+        /// <param name="parserCallStack">
+        /// The parser context in which to evaluate the
+        /// semantic context
+        /// </param>
+        /// <param name="alt">
+        /// The alternative which is guarded by
+        /// <code>pred</code>
+        /// </param>
+        /// <since>4.3</since>
+        protected internal virtual bool EvalSemanticContext(SemanticContext pred, ParserRuleContext parserCallStack, int alt)
+        {
+            return pred.Eval(parser, parserCallStack);
         }
 
         protected internal virtual void Closure(ATNConfigSet sourceConfigs, ATNConfigSet configs, bool collectPredicates, bool hasMoreContext, PredictionContextCache contextCache, bool treatEofAsEpsilon)
@@ -1918,7 +1945,7 @@ namespace Antlr4.Runtime.Atn
         [Nullable]
         protected internal virtual ATNConfig PrecedenceTransition(ATNConfig config, PrecedencePredicateTransition pt, bool collectPredicates, bool inContext)
         {
-            ATNConfig c = null;
+            ATNConfig c;
             if (collectPredicates && inContext)
             {
                 SemanticContext newSemCtx = SemanticContext.And(config.SemanticContext, pt.GetPredicate());
@@ -1970,9 +1997,9 @@ namespace Antlr4.Runtime.Atn
             return config.Transform(t.target, newContext, false);
         }
 
-        private sealed class _IComparer_1905 : IComparer<ATNConfig>
+        private sealed class _IComparer_1928 : IComparer<ATNConfig>
         {
-            public _IComparer_1905()
+            public _IComparer_1928()
             {
             }
 
@@ -1992,7 +2019,7 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        private static readonly IComparer<ATNConfig> StateAltSortComparator = new _IComparer_1905();
+        private static readonly IComparer<ATNConfig> StateAltSortComparator = new _IComparer_1928();
 
         private BitSet IsConflicted(ATNConfigSet configset, PredictionContextCache contextCache)
         {
@@ -2010,9 +2037,8 @@ namespace Antlr4.Runtime.Atn
             // minAlt from the first state, #2 will fail if the assumption was
             // incorrect
             int currentState = configs[0].State.NonStopStateNumber;
-            for (int i = 0; i < configs.Count; i++)
+            foreach (ATNConfig config in configs)
             {
-                ATNConfig config = configs[i];
                 int stateNumber = config.State.NonStopStateNumber;
                 if (stateNumber != currentState)
                 {
@@ -2023,32 +2049,30 @@ namespace Antlr4.Runtime.Atn
                     currentState = stateNumber;
                 }
             }
-            BitSet representedAlts = null;
+            BitSet representedAlts;
             if (exact)
             {
                 currentState = configs[0].State.NonStopStateNumber;
                 // get the represented alternatives of the first state
                 representedAlts = new BitSet();
                 int maxAlt = minAlt;
-                for (int i_1 = 0; i_1 < configs.Count; i_1++)
+                foreach (ATNConfig config_1 in configs)
                 {
-                    ATNConfig config = configs[i_1];
-                    if (config.State.NonStopStateNumber != currentState)
+                    if (config_1.State.NonStopStateNumber != currentState)
                     {
                         break;
                     }
-                    int alt = config.Alt;
+                    int alt = config_1.Alt;
                     representedAlts.Set(alt);
                     maxAlt = alt;
                 }
                 // quick check #3:
                 currentState = configs[0].State.NonStopStateNumber;
                 int currentAlt = minAlt;
-                for (int i_2 = 0; i_2 < configs.Count; i_2++)
+                foreach (ATNConfig config_2 in configs)
                 {
-                    ATNConfig config = configs[i_2];
-                    int stateNumber = config.State.NonStopStateNumber;
-                    int alt = config.Alt;
+                    int stateNumber = config_2.State.NonStopStateNumber;
+                    int alt = config_2.Alt;
                     if (stateNumber != currentState)
                     {
                         if (currentAlt != maxAlt)
@@ -2075,31 +2099,31 @@ namespace Antlr4.Runtime.Atn
             int firstIndexCurrentState = 0;
             int lastIndexCurrentStateMinAlt = 0;
             PredictionContext joinedCheckContext = configs[0].Context;
-            for (int i_3 = 1; i_3 < configs.Count; i_3++)
+            for (int i = 1; i < configs.Count; i++)
             {
-                ATNConfig config = configs[i_3];
-                if (config.Alt != minAlt)
+                ATNConfig config_1 = configs[i];
+                if (config_1.Alt != minAlt)
                 {
                     break;
                 }
-                if (config.State.NonStopStateNumber != currentState)
+                if (config_1.State.NonStopStateNumber != currentState)
                 {
                     break;
                 }
-                lastIndexCurrentStateMinAlt = i_3;
-                joinedCheckContext = contextCache.Join(joinedCheckContext, configs[i_3].Context);
+                lastIndexCurrentStateMinAlt = i;
+                joinedCheckContext = contextCache.Join(joinedCheckContext, configs[i].Context);
             }
-            for (int i_4 = lastIndexCurrentStateMinAlt + 1; i_4 < configs.Count; i_4++)
+            for (int i_1 = lastIndexCurrentStateMinAlt + 1; i_1 < configs.Count; i_1++)
             {
-                ATNConfig config = configs[i_4];
-                ATNState state = config.State;
-                alts.Set(config.Alt);
+                ATNConfig config_1 = configs[i_1];
+                ATNState state = config_1.State;
+                alts.Set(config_1.Alt);
                 if (state.NonStopStateNumber != currentState)
                 {
                     currentState = state.NonStopStateNumber;
-                    firstIndexCurrentState = i_4;
-                    lastIndexCurrentStateMinAlt = i_4;
-                    joinedCheckContext = config.Context;
+                    firstIndexCurrentState = i_1;
+                    lastIndexCurrentStateMinAlt = i_1;
+                    joinedCheckContext = config_1.Context;
                     for (int j = firstIndexCurrentState + 1; j < configs.Count; j++)
                     {
                         ATNConfig config2 = configs[j];
@@ -2114,12 +2138,12 @@ namespace Antlr4.Runtime.Atn
                         lastIndexCurrentStateMinAlt = j;
                         joinedCheckContext = contextCache.Join(joinedCheckContext, config2.Context);
                     }
-                    i_4 = lastIndexCurrentStateMinAlt;
+                    i_1 = lastIndexCurrentStateMinAlt;
                     continue;
                 }
-                PredictionContext joinedCheckContext2 = config.Context;
-                int currentAlt = config.Alt;
-                int lastIndexCurrentStateCurrentAlt = i_4;
+                PredictionContext joinedCheckContext2 = config_1.Context;
+                int currentAlt = config_1.Alt;
+                int lastIndexCurrentStateCurrentAlt = i_1;
                 for (int j_1 = lastIndexCurrentStateCurrentAlt + 1; j_1 < configs.Count; j_1++)
                 {
                     ATNConfig config2 = configs[j_1];
@@ -2134,7 +2158,7 @@ namespace Antlr4.Runtime.Atn
                     lastIndexCurrentStateCurrentAlt = j_1;
                     joinedCheckContext2 = contextCache.Join(joinedCheckContext2, config2.Context);
                 }
-                i_4 = lastIndexCurrentStateCurrentAlt;
+                i_1 = lastIndexCurrentStateCurrentAlt;
                 if (exact)
                 {
                     if (!joinedCheckContext.Equals(joinedCheckContext2))
@@ -2155,19 +2179,19 @@ namespace Antlr4.Runtime.Atn
                     for (int j = firstIndexCurrentState; j_1 <= lastIndexCurrentStateMinAlt; j_1++)
                     {
                         ATNConfig checkConfig = configs[j_1];
-                        if (checkConfig.SemanticContext != SemanticContext.None && !checkConfig.SemanticContext.Equals(config.SemanticContext))
+                        if (checkConfig.SemanticContext != SemanticContext.None && !checkConfig.SemanticContext.Equals(config_1.SemanticContext))
                         {
                             continue;
                         }
                         if (joinedCheckContext != checkConfig.Context)
                         {
-                            PredictionContext check = contextCache.Join(checkConfig.Context, config.Context);
+                            PredictionContext check = contextCache.Join(checkConfig.Context, config_1.Context);
                             if (!checkConfig.Context.Equals(check))
                             {
                                 continue;
                             }
                         }
-                        config.IsHidden = true;
+                        config_1.IsHidden = true;
                     }
                 }
             }
@@ -2466,22 +2490,6 @@ namespace Antlr4.Runtime.Atn
         {
             if (debug || retry_debug)
             {
-                //			ParserATNPathFinder finder = new ParserATNPathFinder(parser, atn);
-                //			int i = 1;
-                //			for (Transition t : dfa.atnStartState.transitions) {
-                //				System.out.println("ALT "+i+"=");
-                //				System.out.println(startIndex+".."+stopIndex+", len(input)="+parser.getInputStream().size());
-                //				TraceTree path = finder.trace(t.target, parser.getContext(), (TokenStream)parser.getInputStream(),
-                //											  startIndex, stopIndex);
-                //				if ( path!=null ) {
-                //					System.out.println("path = "+path.toStringTree());
-                //					for (TraceTree leaf : path.leaves) {
-                //						List<ATNState> states = path.getPathToNode(leaf);
-                //						System.out.println("states="+states);
-                //					}
-                //				}
-                //				i++;
-                //			}
                 Interval interval = Interval.Of(startIndex, stopIndex);
                 System.Console.Out.WriteLine("reportAmbiguity " + ambigAlts + ":" + configs + ", input=" + ((ITokenStream)parser.InputStream).GetText(interval));
             }
@@ -2520,6 +2528,12 @@ namespace Antlr4.Runtime.Atn
                 context = ((ParserRuleContext)context.Parent);
             }
             return context;
+        }
+
+        /// <since>4.3</since>
+        public virtual Parser GetParser()
+        {
+            return parser;
         }
     }
 }

@@ -1160,6 +1160,36 @@ namespace Antlr4.Runtime
             }
         }
 
+        public override ParseInfo GetParseInfo()
+        {
+            ParserATNSimulator interp = Interpreter;
+            if (interp is ProfilingATNSimulator)
+            {
+                return new ParseInfo((ProfilingATNSimulator)interp);
+            }
+            return null;
+        }
+
+        /// <since>4.3</since>
+        public virtual void SetProfile(bool profile)
+        {
+            ParserATNSimulator interp = Interpreter;
+            if (profile)
+            {
+                if (!(interp is ProfilingATNSimulator))
+                {
+                    Interpreter = new ProfilingATNSimulator(this);
+                }
+            }
+            else
+            {
+                if (interp is ProfilingATNSimulator)
+                {
+                    Interpreter = new ParserATNSimulator(this, Atn);
+                }
+            }
+        }
+
         /// <summary>
         /// During a parse is sometimes useful to listen in on the rule entry and exit
         /// events as well as token matches.
