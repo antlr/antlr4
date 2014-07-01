@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tunnelvisionlabs</groupId>
     <artifactId>antlr4-csharp</artifactId>
-    <version>4.2.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>ANTLR 4 Target C#</name>
@@ -45,9 +45,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java5.home>${env.JAVA5_HOME}</java5.home>
         <java6.home>${env.JAVA6_HOME}</java6.home>
-        <bootclasspath.java5>${java5.home}/lib/rt.jar</bootclasspath.java5>
         <bootclasspath.java6>${java6.home}/lib/rt.jar</bootclasspath.java6>
         <bootclasspath.compile>${bootclasspath.java6}</bootclasspath.compile>
         <bootclasspath.testCompile>${bootclasspath.java6}</bootclasspath.testCompile>
@@ -63,26 +61,26 @@
 
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/sharwell/antlr4cs/issues</url>
+        <url>https://github.com/tunnelvisionlabs/antlr4cs/issues</url>
     </issueManagement>
 
     <scm>
-        <url>https://github.com/sharwell/antlr4cs/tree/master</url>
-        <connection>scm:git:git://github.com/sharwell/antlr4cs.git</connection>
-        <developerConnection>scm:git:git@github.com:sharwell/antlr4cs.git</developerConnection>
+        <url>https://github.com/tunnelvisionlabs/antlr4cs/tree/master</url>
+        <connection>scm:git:git://github.com/tunnelvisionlabs/antlr4cs.git</connection>
+        <developerConnection>scm:git:git@github.com:tunnelvisionlabs/antlr4cs.git</developerConnection>
     </scm>
 
     <dependencies>
         <dependency>
             <groupId>com.tunnelvisionlabs</groupId>
             <artifactId>antlr4</artifactId>
-            <version>4.2.2</version>
+            <version>4.3</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.tunnelvisionlabs</groupId>
             <artifactId>antlr4-runtime</artifactId>
-            <version>4.2.2</version>
+            <version>4.3</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -100,7 +98,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
+            <version>4.11</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -142,7 +140,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-shade-plugin</artifactId>
-                        <version>2.1</version>
+                        <version>2.3</version>
                         <inherited>false</inherited>
                         <executions>
                             <execution>

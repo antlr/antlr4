@@ -68,12 +68,22 @@ using IToken = Antlr4.Runtime.IToken;
 public interface I<file.grammarName>Listener : IParseTreeListener {
 	<file.listenerNames:{lname |
 /// \<summary>
-/// Enter a parse tree produced by \<see cref="<csIdentifier.(file.parserName)>.<csIdentifier.(lname)>"/>.
+<if(file.listenerLabelRuleNames.(lname))>
+/// Enter a parse tree produced by the \<c><lname>\</c>
+/// labeled alternative in \<see cref="<file.parserName>.<file.listenerLabelRuleNames.(lname)>"/>.
+<else>
+/// Enter a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+<endif>
 /// \</summary>
 /// \<param name="context">The parse tree.\</param>
 void Enter<lname; format="cap">([NotNull] <csIdentifier.(file.parserName)>.<lname; format="cap">Context context);
 /// \<summary>
-/// Exit a parse tree produced by \<see cref="<csIdentifier.(file.parserName)>.<csIdentifier.(lname)>"/>.
+<if(file.listenerLabelRuleNames.(lname))>
+/// Exit a parse tree produced by the \<c><lname>\</c>
+/// labeled alternative in \<see cref="<file.parserName>.<file.listenerLabelRuleNames.(lname)>"/>.
+<else>
+/// Exit a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+<endif>
 /// \</summary>
 /// \<param name="context">The parse tree.\</param>
 void Exit<lname; format="cap">([NotNull] <csIdentifier.(file.parserName)>.<lname; format="cap">Context context);}; separator="\n">
@@ -156,7 +166,12 @@ using IToken = Antlr4.Runtime.IToken;
 public interface I<file.grammarName>Visitor\<Result> : IParseTreeVisitor\<Result> {
 	<file.visitorNames:{lname |
 /// \<summary>
-/// Visit a parse tree produced by \<see cref="<csIdentifier.(file.parserName)>.<csIdentifier.(lname)>"/>.
+<if(file.visitorLabelRuleNames.(lname))>
+/// Visit a parse tree produced by the \<c><lname>\</c>
+/// labeled alternative in \<see cref="<file.parserName>.<file.visitorLabelRuleNames.(lname)>"/>.
+<else>
+/// Visit a parse tree produced by \<see cref="<file.parserName>.<lname>"/>.
+<endif>
 /// \</summary>
 /// \<param name="context">The parse tree.\</param>
 /// \<return>The visitor result.\</return>
@@ -233,7 +248,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
 [System.CLSCompliant(false)]
-public <if(parser.abstractRecognizer)>abstract <endif>partial class <csIdentifier.(parser.name)> : <superClass> {
+public <if(parser.abstractRecognizer)>abstract <endif>partial class <csIdentifier.(parser.name)> : <superClass; null="Parser"> {
 	<if(parser.tokens)>
 	public const int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
@@ -329,13 +344,13 @@ case <index>: return <actions.(index)>;}; separator="\n">
 }
 >>
 
-RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
+RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
 
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 [RuleVersion(<namedActions.version; null="0">)]
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<currentRule.args:{a | <a.type> <csIdentifier.(a.name)><if(a.initValue)> = <a.initValue><endif>}; separator=", ">) {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<args; separator=", ">) {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
 	EnterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
 	<namedActions.init>
@@ -365,10 +380,10 @@ RuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAc
 }
 >>
 
-LeftFactoredRuleFunction(currentRule,code,locals,namedActions,finallyAction,postamble) ::=
+LeftFactoredRuleFunction(currentRule,args,code,locals,namedActions,finallyAction,postamble) ::=
 <<
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<currentRule.args:{a | <a.type> <csIdentifier.(a.name)><if(a.initValue)> = <a.initValue><endif>}; separator=", ">) {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<args; separator=", ">) {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
 	EnterLeftFactoredRule(_localctx, <currentRule.startState>, RULE_<currentRule.variantOf>);
 	<namedActions.init>
@@ -397,10 +412,10 @@ LeftFactoredRuleFunction(currentRule,code,locals,namedActions,finallyAction,post
 // This behaves similar to RuleFunction (enterRule is called, and no adjustments
 // are made to the parse tree), but since it's still a variant no context class
 // needs to be generated.
-LeftUnfactoredRuleFunction(currentRule,code,locals,namedActions,finallyAction,postamble) ::=
+LeftUnfactoredRuleFunction(currentRule,args,code,locals,namedActions,finallyAction,postamble) ::=
 <<
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<currentRule.args:{a | <a.type> <csIdentifier.(a.name)><if(a.initValue)> = <a.initValue><endif>}; separator=", ">) {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<args; separator=", ">) {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
 	EnterRule(_localctx, <currentRule.startState>, RULE_<currentRule.variantOf>);
 	<namedActions.init>
@@ -426,7 +441,7 @@ LeftUnfactoredRuleFunction(currentRule,code,locals,namedActions,finallyAction,po
 }
 >>
 
-LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
+LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 	namedActions,finallyAction,postamble) ::=
 <<
 
@@ -434,11 +449,11 @@ LeftRecursiveRuleFunction(currentRule,code,locals,ruleCtx,altLabelCtxs,
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 [RuleVersion(<namedActions.version; null="0">)]
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<currentRule.args:{a | <a.type> <csIdentifier.(a.name)><if(a.initValue)> = <a.initValue><endif>}; separator=", ">) {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<args; separator=", ">) {
 	return <csIdentifier.(currentRule.name)>(0<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
 }
 
-private <currentRule.ctxType> <csIdentifier.(currentRule.name)>(int _p<currentRule.args:{a | , <a.type> <csIdentifier.(a.name)><if(a.initValue)> = <a.initValue><endif>}>) {
+private <currentRule.ctxType> <csIdentifier.(currentRule.name)>(int _p<args:{a | , <a>}>) {
 	ParserRuleContext _parentctx = _ctx;
 	int _parentState = State;
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
@@ -518,23 +533,6 @@ if (<expr>) {
 <!else if ( !(<followExpr>) ) <error>!>
 >>
 
-LL1StarBlock(choice, alts) ::= <<
-State = <choice.stateNumber>;
-_errHandler.Sync(this);
-<choice.loopLabel>:
-while (true) {
-	switch (_input.La(1)) {
-	<choice.altLook,alts:{look,alt| <cases(look)>
-	<alt>
-	break;}; separator="\n">
-	<cases(choice.exitLook)>
-		break <choice.loopLabel>;
-	}
-	State = <choice.loopBackStateNumber>;
-	_errHandler.Sync(this);
-}
->>
-
 LL1StarBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
 State = <choice.stateNumber>;
 _errHandler.Sync(this);
@@ -545,23 +543,6 @@ while (<loopExpr>) {
 	_errHandler.Sync(this);
 	<iteration>
 }
->>
-
-LL1PlusBlock(choice, alts, iteration, loopExpr, error) ::= <<
-State = <choice.blockStartStateNumber>;<! alt block decision !>
-_errHandler.Sync(this);
-do {
-	switch (_input.La(1)) {
-	<choice.altLook,alts:{look,alt| <cases(look)>
-	<alt>
-	break;}; separator="\n">
-	default:
-		<error>
-	}
-	State = <choice.stateNumber>;
-	_errHandler.Sync(this);
-	<iteration>
-} while ( <loopExpr> );
 >>
 
 LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
@@ -606,7 +587,7 @@ StarBlock(choice, alts, sync, iteration) ::= <<
 State = <choice.stateNumber>;
 _errHandler.Sync(this);
 _alt = Interpreter.AdaptivePredict(_input,<choice.decision>,_ctx);
-while ( _alt!=<choice.exitAlt> && _alt!=ATN.InvalidAltNumber ) {
+while ( _alt!=<choice.exitAlt> && _alt!=global::Antlr4.Runtime.Atn.ATN.InvalidAltNumber ) {
 	if ( _alt==1<if(!choice.ast.greedy)>+1<endif> ) {
 		<iteration>
 		<alts> <! should only be one !>
@@ -633,7 +614,7 @@ case <i><if(!choice.ast.greedy)>+1<endif>:
 	State = <choice.loopBackStateNumber>;<! loopback/exit decision !>
 	_errHandler.Sync(this);
 	_alt = Interpreter.AdaptivePredict(_input,<choice.decision>,_ctx);
-} while ( _alt!=<choice.exitAlt> && _alt!=ATN.InvalidAltNumber );
+} while ( _alt!=<choice.exitAlt> && _alt!=global::Antlr4.Runtime.Atn.ATN.InvalidAltNumber );
 >>
 
 Sync(s) ::= "Sync(<s.expecting.name>);"
@@ -727,9 +708,6 @@ LexerChannelCommand(arg)   ::= "_channel = <channelName.(arg)>;"
 LexerModeCommand(arg)      ::= "_mode = <modeName.(arg)>;"
 LexerPushModeCommand(arg)  ::= "PushMode(<modeName.(arg)>);"
 
-DefaultParserSuperClass(s) ::= "Parser"
-DefaultLexerSuperClass(s)  ::= "Lexer"
-
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
 ArgRef(a) ::= "_localctx.<csIdentifier.(a.name)>"
@@ -769,11 +747,11 @@ SetNonLocalAttr(s, rhsChunks)	  ::=
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.Add(<labelref(a.label)>);"
 
-TokenDecl(t) ::= "public <TokenLabelType()> <csIdentifier.(tokenType.(t.name))>;"
+TokenDecl(t) ::= "<TokenLabelType()> <csIdentifier.(tokenType.(t.name))>"
 TokenTypeDecl(t) ::= "int <csIdentifier.(tokenType.(t.name))>;"
-TokenListDecl(t) ::= "public IList\<IToken> <csIdentifier.(tokenType.(t.name))> = new List\<IToken>();"
-RuleContextDecl(r) ::= "public <r.ctxName> <csIdentifier.(r.name)>;"
-RuleContextListDecl(rdecl) ::= "public IList\<<rdecl.ctxName>> <csIdentifier.(rdecl.name)> = new List\<<rdecl.ctxName>>();"
+TokenListDecl(t) ::= "IList\<IToken> <csIdentifier.(tokenType.(t.name))> = new List\<IToken>()"
+RuleContextDecl(r) ::= "<r.ctxName> <csIdentifier.(r.name)>"
+RuleContextListDecl(rdecl) ::= "IList\<<rdecl.ctxName>> <csIdentifier.(rdecl.name)> = new List\<<rdecl.ctxName>>()"
 
 contextGetterCollection(elementType) ::= <%
 <elementType>[]
@@ -820,13 +798,13 @@ ListLabelName(label)		  ::= "_<label>"
 CaptureNextToken(d) ::= "<d.varName> = _input.Lt(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.La(1);"
 
-StructDecl(struct,attrs,getters,dispatchMethods,interfaces,extensionMembers,
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext}) ::= <<
 public partial class <struct.name> : <superClass><if(interfaces)>, <interfaces; separator=", "><endif> {
-	<attrs:{a | <a>}; separator="\n">
+	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	<if(struct.ctorAttrs)>public <struct.name>(ParserRuleContext parent, int invokingState) : base(parent, invokingState) { }<endif>
-	public <struct.name>(ParserRuleContext parent, int invokingState<struct.ctorAttrs:{a | , <a.type> <csIdentifier.(a.name)>}>)
+	<if(ctorAttrs)>public <struct.name>(ParserRuleContext parent, int invokingState) : base(parent, invokingState) { }<endif>
+	public <struct.name>(ParserRuleContext parent, int invokingState<ctorAttrs:{a | , <a>}>)
 		: base(parent, invokingState)
 	{
 		<struct.ctorAttrs:{a | this.<csIdentifier.(a.name)> = <csIdentifier.(a.name)>;}; separator="\n">
@@ -846,7 +824,7 @@ public partial class <struct.name> : <superClass><if(interfaces)>, <interfaces; 
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
 public partial class <struct.name> : <currentRule.name; format="cap">Context {
-	<attrs:{a | <a>}; separator="\n">
+	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
 	public <struct.name>(<currentRule.name; format="cap">Context context) { CopyFrom(context); }
 	<dispatchMethods; separator="\n">
@@ -868,7 +846,7 @@ public override TResult Accept\<TResult>(IParseTreeVisitor\<TResult> visitor) {
 }
 >>
 
-AttributeDecl(d) ::= "public <d.decl>;"
+AttributeDecl(d) ::= "<d.type> <csIdentifier.(d.name)>"
 
 /** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if(!x.isLocal)><typedContext(x.ctx)>.<endif><csIdentifier.(x.name)>"
@@ -928,7 +906,7 @@ using DFA = Antlr4.Runtime.Dfa.DFA;
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
 [System.CLSCompliant(false)]
-public <if(lexer.abstractRecognizer)>abstract <endif>partial class <csIdentifier.(lexer.name)> : <superClass> {
+public <if(lexer.abstractRecognizer)>abstract <endif>partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
 	public const int
 		<lexer.tokens:{k | <tokenType.(k)>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<rest(lexer.modes):{m| public const int <modeName.(m)> = <i>;}; separator="\n">
@@ -937,8 +915,7 @@ public <if(lexer.abstractRecognizer)>abstract <endif>partial class <csIdentifier
 	};
 
 	public static readonly string[] tokenNames = {
-		"\<INVALID>",
-		<lexer.tokenNames:{t | <t>}; separator=", ", wrap, anchor>
+		<lexer.tokenNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor>
 	};
 	public static readonly string[] ruleNames = {
 		<lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
