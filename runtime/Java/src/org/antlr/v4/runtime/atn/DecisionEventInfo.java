@@ -46,12 +46,12 @@ public class DecisionEventInfo {
 	 */
 	public final int decision;
 	/**
-	 * The configuration set containing additional information relevant to the
+	 * The simulator state containing additional information relevant to the
 	 * prediction state when the current event occurred, or {@code null} if no
 	 * additional information is relevant or available.
 	 */
 	@Nullable
-	public final ATNConfigSet configs;
+	public final SimulatorState state;
 	/**
 	 * The input token stream which is being parsed.
 	 */
@@ -72,7 +72,7 @@ public class DecisionEventInfo {
 	 */
 	public final boolean fullCtx;
 
-	public DecisionEventInfo(int decision, @Nullable ATNConfigSet configs,
+	public DecisionEventInfo(int decision, @Nullable SimulatorState state,
 							 @NotNull TokenStream input, int startIndex,
 							 int stopIndex, boolean fullCtx)
 	{
@@ -81,6 +81,6 @@ public class DecisionEventInfo {
 		this.stopIndex = stopIndex;
 		this.input = input;
 		this.startIndex = startIndex;
-		this.configs = configs;
+		this.state = state;
 	}
 }

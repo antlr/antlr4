@@ -170,7 +170,7 @@ public class ParseInfo {
 	 */
 	public int getDFASize() {
 		int n = 0;
-		DFA[] decisionToDFA = atnSimulator.decisionToDFA;
+		DFA[] decisionToDFA = atnSimulator.atn.decisionToDFA;
 		for (int i = 0; i < decisionToDFA.length; i++) {
 			n += getDFASize(i);
 		}
@@ -182,7 +182,7 @@ public class ParseInfo {
 	 * particular decision.
 	 */
 	public int getDFASize(int decision) {
-		DFA decisionToDFA = atnSimulator.decisionToDFA[decision];
+		DFA decisionToDFA = atnSimulator.atn.decisionToDFA[decision];
 		return decisionToDFA.states.size();
 	}
 }

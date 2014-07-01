@@ -52,18 +52,15 @@ public class ErrorInfo extends DecisionEventInfo {
 	 * specified detailed syntax error information.
 	 *
 	 * @param decision The decision number
-	 * @param configs The final configuration set reached during prediction
+	 * @param state The final simulator state reached during prediction
 	 * prior to reaching the {@link ATNSimulator#ERROR} state
 	 * @param input The input token stream
 	 * @param startIndex The start index for the current prediction
 	 * @param stopIndex The index at which the syntax error was identified
-	 * @param fullCtx {@code true} if the syntax error was identified during LL
-	 * prediction; otherwise, {@code false} if the syntax error was identified
-	 * during SLL prediction
 	 */
-	public ErrorInfo(int decision, @NotNull ATNConfigSet configs, @NotNull TokenStream input,
-					 int startIndex, int stopIndex, boolean fullCtx)
+	public ErrorInfo(int decision, @NotNull SimulatorState state, @NotNull TokenStream input,
+					 int startIndex, int stopIndex)
 	{
-		super(decision, configs, input, startIndex, stopIndex, fullCtx);
+		super(decision, state, input, startIndex, stopIndex, state.useContext);
 	}
 }

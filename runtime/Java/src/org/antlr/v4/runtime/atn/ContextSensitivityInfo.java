@@ -56,16 +56,16 @@ public class ContextSensitivityInfo extends DecisionEventInfo {
 	 * with the specified detailed context sensitivity information.
 	 *
 	 * @param decision The decision number
-	 * @param configs The final configuration set containing the unique
+	 * @param state The final simulator state containing the unique
 	 * alternative identified by full-context prediction
 	 * @param input The input token stream
 	 * @param startIndex The start index for the current prediction
 	 * @param stopIndex The index at which the context sensitivity was
 	 * identified during full-context prediction
 	 */
-	public ContextSensitivityInfo(int decision, @NotNull ATNConfigSet configs,
+	public ContextSensitivityInfo(int decision, @NotNull SimulatorState state,
 								  @NotNull TokenStream input, int startIndex, int stopIndex)
 	{
-		super(decision, configs, input, startIndex, stopIndex, true);
+		super(decision, state, input, startIndex, stopIndex, true);
 	}
 }

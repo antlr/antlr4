@@ -541,7 +541,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			assert !s.isAcceptState;
 
 			// if no edge, pop over to ATN interpreter, update DFA and return
-			DFAState target = s.getTarget(t);
+			DFAState target = getExistingTargetState(s, t);
 			if ( target == null ) {
 				if ( dfa_debug && t>=0 ) System.out.println("no edge for "+parser.getTokenNames()[t]);
 				int alt;

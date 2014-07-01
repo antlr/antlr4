@@ -67,19 +67,16 @@ public class AmbiguityInfo extends DecisionEventInfo {
 	 * specified detailed ambiguity information.
 	 *
 	 * @param decision The decision number
-	 * @param configs The final configuration set identifying the ambiguous
+	 * @param state The final simulator state identifying the ambiguous
 	 * alternatives for the current input
 	 * @param input The input token stream
 	 * @param startIndex The start index for the current prediction
 	 * @param stopIndex The index at which the ambiguity was identified during
 	 * prediction
-	 * @param fullCtx {@code true} if the ambiguity was identified during LL
-	 * prediction; otherwise, {@code false} if the ambiguity was identified
-	 * during SLL prediction
 	 */
-	public AmbiguityInfo(int decision, @NotNull ATNConfigSet configs, @NotNull TokenStream input,
-						 int startIndex, int stopIndex, boolean fullCtx)
+	public AmbiguityInfo(int decision, @NotNull SimulatorState state, @NotNull TokenStream input,
+						 int startIndex, int stopIndex)
 	{
-		super(decision, configs, input, startIndex, stopIndex, fullCtx);
+		super(decision, state, input, startIndex, stopIndex, state.useContext);
 	}
 }

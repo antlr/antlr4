@@ -44,9 +44,9 @@ public class LookaheadEventInfo extends DecisionEventInfo {
 	 * the specified detailed lookahead information.
 	 *
 	 * @param decision The decision number
-	 * @param configs The final configuration set containing the necessary
+	 * @param state The final simulator state containing the necessary
 	 * information to determine the result of a prediction, or {@code null} if
-	 * the final configuration set is not available
+	 * the final state is not available
 	 * @param input The input token stream
 	 * @param startIndex The start index for the current prediction
 	 * @param stopIndex The index at which the prediction was finally made
@@ -54,10 +54,10 @@ public class LookaheadEventInfo extends DecisionEventInfo {
 	 * prediction; otherwise, {@code false} if the current lookahead is part of
 	 * an SLL prediction
 	 */
-	public LookaheadEventInfo(int decision, @Nullable ATNConfigSet configs,
+	public LookaheadEventInfo(int decision, @Nullable SimulatorState state,
 							  @NotNull TokenStream input, int startIndex, int stopIndex,
 							  boolean fullCtx)
 	{
-		super(decision, configs, input, startIndex, stopIndex, fullCtx);
+		super(decision, state, input, startIndex, stopIndex, fullCtx);
 	}
 }

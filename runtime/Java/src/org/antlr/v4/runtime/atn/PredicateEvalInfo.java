@@ -44,11 +44,6 @@ import java.util.BitSet;
  */
 public class PredicateEvalInfo extends DecisionEventInfo {
 	/**
-	 * The DFA state at which predicate evaluation is required in order to
-	 * continue.
-	 */
-	public final DFAState dfaState;
-	/**
 	 * The results of evaluating specific semantic contexts. The elements of
 	 * this array correspond to the elements in {@link DFAState#predicates}, and
 	 * the value of each element is the result of evaluating the semantic
@@ -66,8 +61,7 @@ public class PredicateEvalInfo extends DecisionEventInfo {
 	 * Constructs a new instance of the {@link PredicateEvalInfo} class with the
 	 * specified detailed predicate evaluation information.
 	 *
-	 * @param dfaState The DFA state containing information about the semantic
-	 * predicates to evaluate during the prediction process
+	 * @param state The simulator state 
 	 * @param decision The decision number
 	 * @param input The input token stream
 	 * @param startIndex The start index for the current prediction
@@ -82,13 +76,12 @@ public class PredicateEvalInfo extends DecisionEventInfo {
 	 * alternatives of {@code dfaState} which remain viable following the
 	 * evaluation of semantic predicates
 	 */
-	public PredicateEvalInfo(@NotNull DFAState dfaState, int decision,
+	public PredicateEvalInfo(@NotNull SimulatorState state, int decision,
 							 @NotNull TokenStream input, int startIndex, int stopIndex,
 							 @NotNull boolean[] evalResults,
 							 @NotNull BitSet predictions)
 	{
-		super(decision, dfaState.configs, input, startIndex, stopIndex, dfaState.requiresFullContext);
-		this.dfaState = dfaState;
+		super(decision, state, input, startIndex, stopIndex, state.useContext);
 		this.evalResults = evalResults;
 		this.predictions = predictions;
 	}
