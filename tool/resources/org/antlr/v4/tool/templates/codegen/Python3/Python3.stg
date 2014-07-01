@@ -29,6 +29,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// I don't check this template anymore...do you need it?
 /** ANTLR tool checks output templates are compatible with tool code generation.
  *  For now, a simple string match used on x.y of x.y.z scheme.
  *  Must match Tool.VERSION during load to templates.
