@@ -554,16 +554,6 @@ public class ParserATNSimulator extends ATNSimulator {
 
 				SimulatorState initialState = new SimulatorState(outerContext, s, state.useContext, remainingOuterContext);
 				alt = execATN(dfa, input, startIndex, initialState);
-				// this adds edge even if next state is accept for
-				// same alt; e.g., s0-A->:s1=>2-B->:s2=>2
-				// TODO: This next stuff kills edge, but extra states remain. :(
-				if ( s.isAcceptState && alt!=-1 ) {
-					DFAState d = s.getTarget(input.LA(1));
-					if ( d.isAcceptState && d.prediction==s.prediction ) {
-						// we can carve it out.
-						s.setTarget(input.LA(1), ERROR); // IGNORE really not error
-					}
-				}
 				if ( dfa_debug ) {
 					System.out.println("back from DFA update, alt="+alt+", dfa=\n"+dfa.toString(parser.getTokenNames(), parser.getRuleNames()));
 					//dump(dfa);
