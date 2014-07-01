@@ -49,9 +49,9 @@ namespace Antlr4.Runtime
     /// . If your
     /// parser requires the token stream filter tokens to only those on a particular
     /// channel, such as
-    /// <see cref="IToken.DefaultChannel">IToken.DefaultChannel</see>
+    /// <see cref="TokenConstants.DefaultChannel"/>
     /// or
-    /// <see cref="IToken.HiddenChannel">IToken.HiddenChannel</see>
+    /// <see cref="TokenConstants.HiddenChannel"/>
     /// , use a filtering token stream such a
     /// <see cref="CommonTokenStream">CommonTokenStream</see>
     /// .</p>
@@ -104,7 +104,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Indicates whether the
-        /// <see cref="IToken.Eof">IToken.Eof</see>
+        /// <see cref="TokenConstants.Eof"/>
         /// token has been fetched from
         /// <see cref="tokenSource">tokenSource</see>
         /// and added to
@@ -129,7 +129,7 @@ namespace Antlr4.Runtime
         /// : The check to prevent adding multiple EOF symbols into
         /// <see cref="tokens">tokens</see>
         /// is trivial with this field.</li>
-        /// <ul>
+        /// </ul>
         /// </summary>
         protected internal bool fetchedEOF;
 

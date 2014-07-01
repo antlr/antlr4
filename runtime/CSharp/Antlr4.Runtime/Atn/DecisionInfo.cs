@@ -29,7 +29,9 @@
  */
 using System.Collections.Generic;
 using Antlr4.Runtime.Atn;
+using Antlr4.Runtime.Dfa;
 using Sharpen;
+using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -49,14 +51,14 @@ namespace Antlr4.Runtime.Atn
     {
         /// <summary>
         /// The decision number, which is an index into
-        /// <see cref="ATN.decisionToState">ATN.decisionToState</see>
+        /// <see cref="ATN.decisionToState"/>
         /// .
         /// </summary>
         public readonly int decision;
 
         /// <summary>
         /// The total number of times
-        /// <see cref="ParserATNSimulator.AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)">ParserATNSimulator.AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)</see>
+        /// <see cref="ParserATNSimulator.AdaptivePredict(ITokenStream, int, ParserRuleContext)"/>
         /// was
         /// invoked for this decision.
         /// </summary>
@@ -64,21 +66,15 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// The total time spent in
-        /// <see cref="ParserATNSimulator.AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)">ParserATNSimulator.AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)</see>
+        /// <see cref="ParserATNSimulator.AdaptivePredict(ITokenStream, int, ParserRuleContext)"/>
         /// for
         /// this decision, in nanoseconds.
         /// <p>
-        /// The value of this field contains the sum of differential results obtained
-        /// by
-        /// <see cref="Sharpen.Runtime.NanoTime()">Sharpen.Runtime.NanoTime()</see>
-        /// , and is not adjusted to compensate for JIT
-        /// and/or garbage collection overhead. For best accuracy, use a modern JVM
-        /// implementation that provides precise results from
-        /// <see cref="Sharpen.Runtime.NanoTime()">Sharpen.Runtime.NanoTime()</see>
-        /// , and perform profiling in a separate process
-        /// which is warmed up by parsing the input prior to profiling. If desired,
-        /// call
-        /// <see cref="ATNSimulator.ClearDFA()">ATNSimulator.ClearDFA()</see>
+        /// The value of this field is computed by <see cref="Stopwatch"/>,
+        /// and is not adjusted to compensate for JIT
+        /// and/or garbage collection overhead. For best accuracy, perform profiling
+        /// in a separate process which is warmed up by parsing the input prior to
+        /// profiling. If desired, call <see cref="ATNSimulator.ClearDFA()"/>
         /// to reset the DFA cache to its initial
         /// state before starting the profiling measurement pass.</p>
         /// </summary>
@@ -89,9 +85,9 @@ namespace Antlr4.Runtime.Atn
         /// The sum of the lookahead required for SLL prediction for this decision.
         /// Note that SLL prediction is used before LL prediction for performance
         /// reasons even when
-        /// <see cref="PredictionMode.Ll">PredictionMode.Ll</see>
+        /// <see cref="PredictionMode.Ll"/>
         /// or
-        /// <see cref="PredictionMode.LlExactAmbigDetection">PredictionMode.LlExactAmbigDetection</see>
+        /// <see cref="PredictionMode.LlExactAmbigDetection"/>
         /// is used.
         /// </remarks>
         public long SLL_TotalLook;
@@ -122,9 +118,9 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Gets the
-        /// <see cref="LookaheadEventInfo">LookaheadEventInfo</see>
+        /// <see cref="LookaheadEventInfo"/>
         /// associated with the event where the
-        /// <see cref="SLL_MaxLook">SLL_MaxLook</see>
+        /// <see cref="SLL_MaxLook"/>
         /// value was set.
         /// </summary>
         public LookaheadEventInfo SLL_MaxLookEvent;
@@ -145,9 +141,9 @@ namespace Antlr4.Runtime.Atn
         /// Gets the minimum lookahead required for any single LL prediction to
         /// complete for this decision. An LL prediction completes when the algorithm
         /// reaches a unique prediction, a conflict state (for
-        /// <see cref="PredictionMode.Ll">PredictionMode.Ll</see>
+        /// <see cref="PredictionMode.Ll"/>
         /// , an ambiguity state (for
-        /// <see cref="PredictionMode.LlExactAmbigDetection">PredictionMode.LlExactAmbigDetection</see>
+        /// <see cref="PredictionMode.LlExactAmbigDetection"/>
         /// , or a syntax error.
         /// </remarks>
         public long LL_MinLook;
@@ -160,60 +156,60 @@ namespace Antlr4.Runtime.Atn
         /// Gets the maximum lookahead required for any single LL prediction to
         /// complete for this decision. An LL prediction completes when the algorithm
         /// reaches a unique prediction, a conflict state (for
-        /// <see cref="PredictionMode.Ll">PredictionMode.Ll</see>
+        /// <see cref="PredictionMode.Ll"/>
         /// , an ambiguity state (for
-        /// <see cref="PredictionMode.LlExactAmbigDetection">PredictionMode.LlExactAmbigDetection</see>
+        /// <see cref="PredictionMode.LlExactAmbigDetection"/>
         /// , or a syntax error.
         /// </remarks>
         public long LL_MaxLook;
 
         /// <summary>
         /// Gets the
-        /// <see cref="LookaheadEventInfo">LookaheadEventInfo</see>
+        /// <see cref="LookaheadEventInfo"/>
         /// associated with the event where the
-        /// <see cref="LL_MaxLook">LL_MaxLook</see>
+        /// <see cref="LL_MaxLook"/>
         /// value was set.
         /// </summary>
         public LookaheadEventInfo LL_MaxLookEvent;
 
         /// <summary>
         /// A collection of
-        /// <see cref="ContextSensitivityInfo">ContextSensitivityInfo</see>
+        /// <see cref="ContextSensitivityInfo"/>
         /// instances describing the
         /// context sensitivities encountered during LL prediction for this decision.
         /// </summary>
-        /// <seealso cref="ContextSensitivityInfo">ContextSensitivityInfo</seealso>
+        /// <seealso cref="ContextSensitivityInfo"/>
         public readonly IList<ContextSensitivityInfo> contextSensitivities = new List<ContextSensitivityInfo>();
 
         /// <summary>
         /// A collection of
-        /// <see cref="ErrorInfo">ErrorInfo</see>
+        /// <see cref="ErrorInfo"/>
         /// instances describing the parse errors
         /// identified during calls to
-        /// <see cref="ParserATNSimulator.AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)">ParserATNSimulator.AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)</see>
+        /// <see cref="ParserATNSimulator.AdaptivePredict(ITokenStream, int, ParserRuleContext)"/>
         /// for
         /// this decision.
         /// </summary>
-        /// <seealso cref="ErrorInfo">ErrorInfo</seealso>
+        /// <seealso cref="ErrorInfo"/>
         public readonly IList<ErrorInfo> errors = new List<ErrorInfo>();
 
         /// <summary>
         /// A collection of
-        /// <see cref="AmbiguityInfo">AmbiguityInfo</see>
+        /// <see cref="AmbiguityInfo"/>
         /// instances describing the
         /// ambiguities encountered during LL prediction for this decision.
         /// </summary>
-        /// <seealso cref="AmbiguityInfo">AmbiguityInfo</seealso>
+        /// <seealso cref="AmbiguityInfo"/>
         public readonly IList<AmbiguityInfo> ambiguities = new List<AmbiguityInfo>();
 
         /// <summary>
         /// A collection of
-        /// <see cref="PredicateEvalInfo">PredicateEvalInfo</see>
+        /// <see cref="PredicateEvalInfo"/>
         /// instances describing the
         /// results of evaluating individual predicates during prediction for this
         /// decision.
         /// </summary>
-        /// <seealso cref="PredicateEvalInfo">PredicateEvalInfo</seealso>
+        /// <seealso cref="PredicateEvalInfo"/>
         public readonly IList<PredicateEvalInfo> predicateEvals = new List<PredicateEvalInfo>();
 
         /// <summary>
@@ -231,9 +227,9 @@ namespace Antlr4.Runtime.Atn
         /// future parsing of this decision. Otherwise, the SLL parsing algorithm
         /// will use ATN transitions exclusively.</p>
         /// </remarks>
-        /// <seealso cref="SLL_ATNTransitions">SLL_ATNTransitions</seealso>
-        /// <seealso cref="ParserATNSimulator.ComputeTargetState(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.Dfa.DFAState, Antlr4.Runtime.ParserRuleContext, int, bool, PredictionContextCache)">ParserATNSimulator.ComputeTargetState(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.Dfa.DFAState, Antlr4.Runtime.ParserRuleContext, int, bool, PredictionContextCache)</seealso>
-        /// <seealso cref="LexerATNSimulator.ComputeTargetState(Antlr4.Runtime.ICharStream, Antlr4.Runtime.Dfa.DFAState, int)">LexerATNSimulator.ComputeTargetState(Antlr4.Runtime.ICharStream, Antlr4.Runtime.Dfa.DFAState, int)</seealso>
+        /// <seealso cref="SLL_ATNTransitions"/>
+        /// <seealso cref="ParserATNSimulator.ComputeTargetState"/>
+        /// <seealso cref="LexerATNSimulator.ComputeTargetState"/>
         public long SLL_ATNTransitions;
 
         /// <summary>
@@ -246,8 +242,8 @@ namespace Antlr4.Runtime.Atn
         /// <p>If the ATN simulator implementation does not use DFA caching for SLL
         /// transitions, this value will be 0.</p>
         /// </remarks>
-        /// <seealso cref="ParserATNSimulator.GetExistingTargetState(Antlr4.Runtime.Dfa.DFAState, int)">ParserATNSimulator.GetExistingTargetState(Antlr4.Runtime.Dfa.DFAState, int)</seealso>
-        /// <seealso cref="LexerATNSimulator.GetExistingTargetState(Antlr4.Runtime.Dfa.DFAState, int)">LexerATNSimulator.GetExistingTargetState(Antlr4.Runtime.Dfa.DFAState, int)</seealso>
+        /// <seealso cref="ParserATNSimulator.GetExistingTargetState"/>
+        /// <seealso cref="LexerATNSimulator.GetExistingTargetState"/>
         public long SLL_DFATransitions;
 
         /// <summary>
@@ -286,9 +282,9 @@ namespace Antlr4.Runtime.Atn
         /// future parsing of this decision. Otherwise, the LL parsing algorithm will
         /// use ATN transitions exclusively.</p>
         /// </remarks>
-        /// <seealso cref="LL_DFATransitions">LL_DFATransitions</seealso>
-        /// <seealso cref="ParserATNSimulator.ComputeTargetState(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.Dfa.DFAState, Antlr4.Runtime.ParserRuleContext, int, bool, PredictionContextCache)">ParserATNSimulator.ComputeTargetState(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.Dfa.DFAState, Antlr4.Runtime.ParserRuleContext, int, bool, PredictionContextCache)</seealso>
-        /// <seealso cref="LexerATNSimulator.ComputeTargetState(Antlr4.Runtime.ICharStream, Antlr4.Runtime.Dfa.DFAState, int)">LexerATNSimulator.ComputeTargetState(Antlr4.Runtime.ICharStream, Antlr4.Runtime.Dfa.DFAState, int)</seealso>
+        /// <seealso cref="LL_DFATransitions"/>
+        /// <seealso cref="ParserATNSimulator.ComputeTargetState"/>
+        /// <seealso cref="LexerATNSimulator.ComputeTargetState"/>
         public long LL_ATNTransitions;
 
         /// <summary>
@@ -301,13 +297,13 @@ namespace Antlr4.Runtime.Atn
         /// <p>If the ATN simulator implementation does not use DFA caching for LL
         /// transitions, this value will be 0.</p>
         /// </remarks>
-        /// <seealso cref="ParserATNSimulator.GetExistingTargetState(Antlr4.Runtime.Dfa.DFAState, int)">ParserATNSimulator.GetExistingTargetState(Antlr4.Runtime.Dfa.DFAState, int)</seealso>
-        /// <seealso cref="LexerATNSimulator.GetExistingTargetState(Antlr4.Runtime.Dfa.DFAState, int)">LexerATNSimulator.GetExistingTargetState(Antlr4.Runtime.Dfa.DFAState, int)</seealso>
+        /// <seealso cref="ParserATNSimulator.GetExistingTargetState"/>
+        /// <seealso cref="LexerATNSimulator.GetExistingTargetState"/>
         public long LL_DFATransitions;
 
         /// <summary>
         /// Constructs a new instance of the
-        /// <see cref="DecisionInfo">DecisionInfo</see>
+        /// <see cref="DecisionInfo"/>
         /// class to contain
         /// statistics for a particular decision.
         /// </summary>

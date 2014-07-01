@@ -45,7 +45,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// <p>Patterns are strings of source input text with special tags representing
     /// token or rule references such as:</p>
     /// <p>
-    /// <code><ID> = <expr>;</code>
+    /// <code>&lt;ID&gt; = &lt;expr&gt;;</code>
     /// </p>
     /// <p>Given a pattern start rule such as
     /// <code>statement</code>
@@ -61,12 +61,12 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// routines can compare an actual
     /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
     /// from a parse with this pattern. Tag
-    /// <code><ID></code>
+    /// <code>&lt;ID&gt;</code>
     /// matches
     /// any
     /// <code>ID</code>
     /// token and tag
-    /// <code><expr></code>
+    /// <code>&lt;expr&gt;</code>
     /// references the result of the
     /// <code>expr</code>
     /// rule (generally an instance of
@@ -95,7 +95,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// object that
     /// contains the parse tree, the parse tree pattern, and a map from tag name to
     /// matched nodes (more below). A subtree that fails to match, returns with
-    /// <see cref="ParseTreeMatch#mismatchedNode">ParseTreeMatch#mismatchedNode</see>
+    /// <see cref="ParseTreeMatch.GetMismatchedNode"/>
     /// set to the first tree node that did not
     /// match.</p>
     /// <p>For efficiency, you can compile a tree pattern in string form to a
@@ -118,7 +118,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// <see cref="ParseTreePatternMatcher">ParseTreePatternMatcher</see>
     /// constructor are used to parse the pattern in string form. The lexer converts
     /// the
-    /// <code><ID> = <expr>;</code>
+    /// <code>&lt;ID&gt; = &lt;expr&gt;;</code>
     /// into a sequence of four tokens (assuming lexer
     /// throws out whitespace or puts it on a hidden channel). Be aware that the
     /// input stream is reset for the lexer (but not the parser; a
@@ -127,7 +127,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// fields you have put into the lexer might get changed when this mechanism asks
     /// it to scan the pattern string.</p>
     /// <p>Normally a parser does not accept token
-    /// <code><expr></code>
+    /// <code>&lt;expr&gt;</code>
     /// as a valid
     /// <code>expr</code>
     /// but, from the parser passed in, we create a special version of
@@ -135,7 +135,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// <see cref="Antlr4.Runtime.Atn.ATN">Antlr4.Runtime.Atn.ATN</see>
     /// ) that allows imaginary
     /// tokens representing rules (
-    /// <code><expr></code>
+    /// <code>&lt;expr&gt;</code>
     /// ) to match entire rules. We call
     /// these <em>bypass alternatives</em>.</p>
     /// <p>Delimiters are
@@ -342,7 +342,7 @@ namespace Antlr4.Runtime.Tree.Pattern
                 //			System.out.println("pattern tree = "+tree.toStringTree(parserInterp));
                 throw (RecognitionException)e.InnerException;
             }
-            catch (RecognitionException re)
+            catch (RecognitionException)
             {
                 throw;
             }
@@ -391,7 +391,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <code>patternTree</code>
         /// , filling
         /// <code>match.</code>
-        /// <see cref="ParseTreeMatch#labels">labels</see>
+        /// <see cref="ParseTreeMatch.GetLabels"/>
         /// .
         /// </summary>
         /// <returns>
@@ -440,7 +440,7 @@ namespace Antlr4.Runtime.Tree.Pattern
                     }
                     else
                     {
-                        if (t1.GetText().Equals(t2.GetText()))
+                        if (t1.GetText().Equals(t2.GetText(), StringComparison.Ordinal))
                         {
                         }
                         else
@@ -472,7 +472,6 @@ namespace Antlr4.Runtime.Tree.Pattern
                 RuleTagToken ruleTagToken = GetRuleTagToken(r2);
                 if (ruleTagToken != null)
                 {
-                    ParseTreeMatch m = null;
                     if (r1.GetRuleIndex() == r2.GetRuleIndex())
                     {
                         // track label->list-of-nodes for both rule name and label (if any)
@@ -519,7 +518,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// Is
         /// <code>t</code>
         /// 
-        /// <code>(expr <expr>)</code>
+        /// <code>(expr &lt;expr&gt;)</code>
         /// subtree?
         /// </summary>
         protected internal virtual RuleTagToken GetRuleTagToken(IParseTree t)
@@ -599,7 +598,7 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// Split
-        /// <code><ID> = <e:expr> ;</code>
+        /// <code>&lt;ID&gt; = &lt;e:expr&gt; ;</code>
         /// into 4 chunks for tokenizing by
         /// <see cref="Tokenize(string)">Tokenize(string)</see>
         /// .

@@ -95,7 +95,7 @@ namespace Antlr4.Runtime.Atn
         /// <summary>
         /// <inheritDoc></inheritDoc>
         /// <p>This action is implemented by calling
-        /// <see cref="Antlr4.Runtime.Lexer.Type(int)">Antlr4.Runtime.Lexer.Type(int)</see>
+        /// <see cref="Lexer.Type"/>
         /// with the
         /// value provided by
         /// <see cref="GetType()">GetType()</see>

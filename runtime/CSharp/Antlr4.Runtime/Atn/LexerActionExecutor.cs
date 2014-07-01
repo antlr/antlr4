@@ -59,7 +59,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="hashCode">hashCode</see>
         /// since the hash code is an element
         /// of the performance-critical
-        /// <see cref="LexerATNConfig.hashCode">LexerATNConfig#hashCode</see>
+        /// <see cref="ATNConfig.GetHashCode()"/>
         /// operation.
         /// </summary>
         private readonly int hashCode;

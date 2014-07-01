@@ -43,7 +43,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// An empty
-        /// <see cref="Antlr4.Runtime.Misc.Tuple2{T1, T2}">Antlr4.Runtime.Misc.Tuple2&lt;T1, T2&gt;</see>
+        /// <see cref="Tuple{T1, T2}"/>
         /// which is used as the default value of
         /// <see cref="source">source</see>
         /// for tokens that do not have a source.
@@ -51,38 +51,22 @@ namespace Antlr4.Runtime
         protected internal static readonly Tuple<ITokenSource, ICharStream> EmptySource = Tuple.Create<ITokenSource, ICharStream>(null, null);
 
         /// <summary>
-        /// This is the backing field for
-        /// <see cref="Type()">Type()</see>
-        /// and
-        /// <see cref="Type(int)">Type(int)</see>
-        /// .
+        /// This is the backing field for the <see cref="Type"/> property.
         /// </summary>
         protected internal int type;
 
         /// <summary>
-        /// This is the backing field for
-        /// <see cref="Line()">Line()</see>
-        /// and
-        /// <see cref="Line(int)">Line(int)</see>
-        /// .
+        /// This is the backing field for the <see cref="Line"/> property.
         /// </summary>
         protected internal int line;
 
         /// <summary>
-        /// This is the backing field for
-        /// <see cref="Column()">Column()</see>
-        /// and
-        /// <see cref="Column(int)">Column(int)</see>
-        /// .
+        /// This is the backing field for the <see cref="Column"/> property.
         /// </summary>
         protected internal int charPositionInLine = -1;
 
         /// <summary>
-        /// This is the backing field for
-        /// <see cref="Channel()">Channel()</see>
-        /// and
-        /// <see cref="Channel(int)">Channel(int)</see>
-        /// .
+        /// This is the backing field for the <see cref="Channel"/> property.
         /// </summary>
         protected internal int channel = TokenConstants.DefaultChannel;
 
@@ -99,47 +83,30 @@ namespace Antlr4.Runtime
         /// <see cref="CommonTokenFactory">CommonTokenFactory</see>
         /// from
         /// the same source and input stream share a reference to the same
-        /// <see cref="Antlr4.Runtime.Misc.Tuple2{T1, T2}">Antlr4.Runtime.Misc.Tuple2&lt;T1, T2&gt;</see>
+        /// <see cref="Tuple{T1, T2}"/>
         /// containing these values.</p>
         /// </summary>
         [NotNull]
         protected internal Tuple<ITokenSource, ICharStream> source;
 
         /// <summary>
-        /// This is the backing field for
-        /// <see cref="Text()">Text()</see>
-        /// when the token text is
-        /// explicitly set in the constructor or via
-        /// <see cref="Text(string)">Text(string)</see>
-        /// .
+        /// This is the backing field for the <see cref="Text"/> property.
         /// </summary>
-        /// <seealso cref="Text()">Text()</seealso>
+        /// <seealso cref="Text"/>
         protected internal string text;
 
         /// <summary>
-        /// This is the backing field for
-        /// <see cref="TokenIndex()">TokenIndex()</see>
-        /// and
-        /// <see cref="TokenIndex(int)">TokenIndex(int)</see>
-        /// .
+        /// This is the backing field for the <see cref="TokenIndex"/> property.
         /// </summary>
         protected internal int index = -1;
 
         /// <summary>
-        /// This is the backing field for
-        /// <see cref="StartIndex()">StartIndex()</see>
-        /// and
-        /// <see cref="SetStartIndex(int)">SetStartIndex(int)</see>
-        /// .
+        /// This is the backing field for the <see cref="StartIndex"/> property.
         /// </summary>
         protected internal int start;
 
         /// <summary>
-        /// This is the backing field for
-        /// <see cref="StopIndex()">StopIndex()</see>
-        /// and
-        /// <see cref="SetStopIndex(int)">SetStopIndex(int)</see>
-        /// .
+        /// This is the backing field for the <see cref="StopIndex"/> property.
         /// </summary>
         protected internal int stop;
 
@@ -202,7 +169,7 @@ namespace Antlr4.Runtime
         /// <see cref="text">text</see>
         /// field and
         /// the
-        /// <see cref="Antlr4.Runtime.Misc.Tuple2{T1, T2}">Antlr4.Runtime.Misc.Tuple2&lt;T1, T2&gt;</see>
+        /// <see cref="Tuple{T1, T2}"/>
         /// stored in
         /// <see cref="source">source</see>
         /// . Otherwise,

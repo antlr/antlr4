@@ -38,7 +38,7 @@ namespace Antlr4.Runtime.Tree.Pattern
 {
     /// <summary>
     /// A pattern like
-    /// <code><ID> = <expr>;</code>
+    /// <code>&lt;ID&gt; = &lt;expr&gt;;</code>
     /// converted to a
     /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
     /// by

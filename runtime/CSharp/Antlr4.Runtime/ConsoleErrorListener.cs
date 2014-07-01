@@ -40,7 +40,7 @@ namespace Antlr4.Runtime
     {
         /// <summary>
         /// Provides a default instance of
-        /// <see cref="ConsoleErrorListener">ConsoleErrorListener</see>
+        /// <see cref="ConsoleErrorListener{Symbol}"/>
         /// .
         /// </summary>
         public static readonly ConsoleErrorListener<Symbol> Instance = new ConsoleErrorListener<Symbol>();

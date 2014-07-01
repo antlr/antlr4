@@ -137,7 +137,7 @@ namespace Antlr4.Runtime.Atn
             /// The hash code is only a function of the
             /// <see cref="ATNState.stateNumber">ATNState.stateNumber</see>
             /// and
-            /// <see cref="ATNConfig#context">ATNConfig#context</see>
+            /// <see cref="ATNConfig.Context"/>
             /// .
             /// </summary>
             public override int GetHashCode(ATNConfig o)
@@ -381,19 +381,19 @@ namespace Antlr4.Runtime.Atn
         /// and singleton subsets with
         /// non-conflicting configurations. Two configurations conflict if they have
         /// identical
-        /// <see cref="ATNConfig.state">ATNConfig#state</see>
+        /// <see cref="ATNConfig.State"/>
         /// and
-        /// <see cref="ATNConfig.context">ATNConfig#context</see>
+        /// <see cref="ATNConfig.Context"/>
         /// values
         /// but different
-        /// <see cref="ATNConfig.Alt()">ATNConfig.Alt()</see>
+        /// <see cref="ATNConfig.Alt"/>
         /// value, e.g.
         /// <code>(s, i, ctx, _)</code>
         /// and
         /// <code>(s, j, ctx, _)</code>
         /// for
         /// <code>i!=j</code>
-        /// .
+        /// .</p>
         /// <p/>
         /// Reduce these configuration subsets to the set of possible alternatives.
         /// You can compute the alternative subsets in one pass as follows:
@@ -861,9 +861,9 @@ namespace Antlr4.Runtime.Atn
         /// :
         /// <pre>
         /// map[c.
-        /// <see cref="ATNConfig.state">state</see>
+        /// <see cref="ATNConfig.State"/>
         /// ] U= c.
-        /// <see cref="ATNConfig.Alt()">getAlt()</see>
+        /// <see cref="ATNConfig.Alt"/>
         /// </pre>
         /// </remarks>
         [return: NotNull]

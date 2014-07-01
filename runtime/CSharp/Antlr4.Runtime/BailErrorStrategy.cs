@@ -65,7 +65,7 @@ namespace Antlr4.Runtime
     /// <code>myparser.setErrorHandler(new BailErrorStrategy());</code>
     /// </p>
     /// </summary>
-    /// <seealso cref="Parser.ErrorHandler(IAntlrErrorStrategy)">Parser.ErrorHandler(IAntlrErrorStrategy)</seealso>
+    /// <seealso cref="Parser.ErrorHandler"/>
     public class BailErrorStrategy : DefaultErrorStrategy
     {
         /// <summary>

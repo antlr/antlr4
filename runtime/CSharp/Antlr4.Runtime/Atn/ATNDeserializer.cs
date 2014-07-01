@@ -49,7 +49,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// This UUID indicates an extension of
-        /// <see cref="#ADDED_PRECEDENCE_TRANSITIONS">#ADDED_PRECEDENCE_TRANSITIONS</see>
+        /// <see cref="BaseSerializedUuid"/>
         /// for the addition of lexer actions encoded as a sequence of
         /// <see cref="ILexerAction">ILexerAction</see>
         /// instances.
@@ -100,19 +100,19 @@ namespace Antlr4.Runtime.Atn
         /// <summary>
         /// Determines if a particular serialized representation of an ATN supports
         /// a particular feature, identified by the
-        /// <see cref="Sharpen.UUID">Sharpen.UUID</see>
+        /// <see cref="Guid"/>
         /// used for serializing
         /// the ATN at the time the feature was first introduced.
         /// </summary>
         /// <param name="feature">
         /// The
-        /// <see cref="Sharpen.UUID">Sharpen.UUID</see>
+        /// <see cref="Guid"/>
         /// marking the first time the feature was
         /// supported in the serialized ATN.
         /// </param>
         /// <param name="actualUuid">
         /// The
-        /// <see cref="Sharpen.UUID">Sharpen.UUID</see>
+        /// <see cref="Guid"/>
         /// of the actual serialized ATN which is
         /// currently being deserialized.
         /// </param>
@@ -878,7 +878,7 @@ namespace Antlr4.Runtime.Atn
                     }
 nextTransition_continue: ;
                 }
-nextTransition_break: ;
+
                 if (optimizedTransitions != null)
                 {
                     if (state.IsOptimized)
@@ -894,7 +894,7 @@ nextTransition_break: ;
                     }
                 }
             }
-nextState_break: ;
+
             return removedEdges;
         }
 

@@ -187,7 +187,6 @@ namespace Antlr4.Runtime.Tree.Xpath
                         throw new ArgumentException("Unknowth path element " + el);
                     }
                 }
-loop_continue: ;
             }
 loop_break: ;
             return elements.ToArray();

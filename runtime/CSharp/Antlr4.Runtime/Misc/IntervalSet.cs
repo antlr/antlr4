@@ -554,7 +554,7 @@ namespace Antlr4.Runtime.Misc
         /// <returns>
         /// the maximum value contained in the set. If the set is empty, this
         /// method returns
-        /// <see cref="Antlr4.Runtime.IToken.InvalidType">Antlr4.Runtime.IToken.InvalidType</see>
+        /// <see cref="TokenConstants.InvalidType"/>
         /// .
         /// </returns>
         public virtual int GetMaxElement()
@@ -572,7 +572,7 @@ namespace Antlr4.Runtime.Misc
         /// <returns>
         /// the minimum value contained in the set. If the set is empty, this
         /// method returns
-        /// <see cref="Antlr4.Runtime.IToken.InvalidType">Antlr4.Runtime.IToken.InvalidType</see>
+        /// <see cref="TokenConstants.InvalidType"/>
         /// .
         /// </returns>
         public virtual int GetMinElement()

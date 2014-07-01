@@ -93,8 +93,8 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="predictedAlt">predictedAlt</see>
         /// for more information.
         /// </param>
-        /// <seealso cref="ParserATNSimulator.EvalSemanticContext(SemanticContext, Antlr4.Runtime.ParserRuleContext, int)">ParserATNSimulator.EvalSemanticContext(SemanticContext, Antlr4.Runtime.ParserRuleContext, int)</seealso>
-        /// <seealso cref="SemanticContext.Eval(Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}, Antlr4.Runtime.RuleContext)">SemanticContext.Eval(Antlr4.Runtime.Recognizer&lt;Symbol, ATNInterpreter&gt;, Antlr4.Runtime.RuleContext)</seealso>
+        /// <seealso cref="ParserATNSimulator.EvalSemanticContext(SemanticContext, ParserRuleContext, int)"/>
+        /// <seealso cref="SemanticContext.Eval"/>
         public PredicateEvalInfo(SimulatorState state, int decision, ITokenStream input, int startIndex, int stopIndex, SemanticContext semctx, bool evalResult, int predictedAlt)
             : base(decision, state, input, startIndex, stopIndex, state.useContext)
         {
