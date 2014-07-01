@@ -1583,7 +1583,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				continue;
 			}
 
-			boolean evaluatedResult = pair.pred.eval(parser, outerContext);
+			boolean evaluatedResult = evalSemanticContext(pair.pred, outerContext, pair.alt);
 			if ( debug || dfa_debug ) {
 				System.out.println("eval pred "+pair+"="+evaluatedResult);
 			}
@@ -1600,6 +1600,34 @@ public class ParserATNSimulator extends ATNSimulator {
 		return predictions;
 	}
 
+	/**
+	 * Evaluate a semantic context within a specific parser context.
+	 *
+	 * <p>
+	 * This method might not be called for every semantic context evaluated
+	 * during the prediction process. In particular, the following restrictions
+	 * are allowed:</p>
+	 *
+	 * <ul>
+	 * <li>Precedence predicates (represented by
+	 * {@link SemanticContext.PrecedencePredicate}) may or may not be evaluated
+	 * through this method.</li>
+	 * <li>Operator predicates (represented by {@link SemanticContext.AND} and
+	 * {@link SemanticContext.OR}) may be evaluated as a single semantic
+	 * context, rather than evaluating the operands individually.
+	 * Implementations which require evaluation results from individual
+	 * predicates should override this method to explicitly handle evaluation of
+	 * the operands within operator predicates.</li>
+	 * </ul>
+	 *
+	 * @param pred The semantic context to evaluate
+	 * @param parserCallStack The parser context in which to evaluate the
+	 * semantic context
+	 * @param alt The alternative which is guarded by {@code pred}
+	 */
+	protected boolean evalSemanticContext(@NotNull SemanticContext pred, ParserRuleContext parserCallStack, int alt) {
+		return pred.eval(parser, parserCallStack);
+	}
 
 	/* TODO: If we are doing predicates, there is no point in pursuing
 		 closure operations if we reach a DFA state that uniquely predicts
