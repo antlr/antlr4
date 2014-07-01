@@ -38,7 +38,7 @@ import java.util.Set;
  *
  * @author Eric Vergnaud
  */
-public class Python2Target extends AbstractPython3Target {
+public class Python2Target extends AbstractPythonTarget {
 
 	protected static final String[] python2Keywords = {
 		"abs", "all", "any", "apply", "as",
