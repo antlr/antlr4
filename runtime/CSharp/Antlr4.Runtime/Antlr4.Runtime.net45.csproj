@@ -9,10 +9,10 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Antlr4.Runtime</RootNamespace>
-    <AssemblyName>Antlr4.Runtime.v4.5</AssemblyName>
+    <AssemblyName>Antlr4.Runtime.net45</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BaseIntermediateOutputPath>obj\v4.5\</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\net45\</BaseIntermediateOutputPath>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
@@ -20,9 +20,9 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\v4.5\Debug\</OutputPath>
+    <OutputPath>bin\net45\Debug\</OutputPath>
     <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
-    <DefineConstants>TRACE;DEBUG;NET_2_0;NET_3_0;NET_3_5;NET_4_0;NET_4_5</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET45;NET45PLUS;NET40PLUS;NET35PLUS;NET30PLUS;NET20PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>1591</NoWarn>
@@ -30,9 +30,9 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\v4.5\Release\</OutputPath>
+    <OutputPath>bin\net45\Release\</OutputPath>
     <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
-    <DefineConstants>TRACE;NET_2_0;NET_3_0;NET_3_5;NET_4_0;NET_4_5</DefineConstants>
+    <DefineConstants>TRACE;NET45;NET45PLUS;NET40PLUS;NET35PLUS;NET30PLUS;NET20PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>1591</NoWarn>
@@ -236,7 +236,7 @@
     <Compile Include="Tree\Xpath\XPathWildcardElement.cs" />
     <Compile Include="UnbufferedCharStream.cs" />
     <Compile Include="UnbufferedTokenStream.cs" />
-    <None Include="packages.Antlr4.Runtime.v4.5.config" />
+    <None Include="packages.Antlr4.Runtime.net45.config" />
     <Antlr4 Include="Tree\Xpath\XPathLexer.g4">
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>Antlr4.Runtime.Tree.Xpath</CustomToolNamespace>

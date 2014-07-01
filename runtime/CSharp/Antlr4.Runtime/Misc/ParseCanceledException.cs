@@ -48,7 +48,7 @@ namespace Antlr4.Runtime.Misc
     [System.Serializable]
 #endif
     public class ParseCanceledException
-#if NET_CF
+#if COMPACT
         : Exception
 #else
         : OperationCanceledException

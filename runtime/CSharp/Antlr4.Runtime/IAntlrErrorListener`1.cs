@@ -34,7 +34,7 @@ namespace Antlr4.Runtime
 {
     /// <summary>How to emit recognition errors.</summary>
     /// <remarks>How to emit recognition errors.</remarks>
-#if NET_CF
+#if COMPACT
     public interface IAntlrErrorListener<TSymbol>
 #else
     public interface IAntlrErrorListener<in TSymbol>

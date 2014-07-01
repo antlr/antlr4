@@ -36,7 +36,7 @@ using File = System.IO.File;
 
 namespace Antlr4.Runtime
 {
-#if NET_CF
+#if COMPACT
     using StreamReader = System.IO.StreamReader;
 #endif
 
@@ -72,7 +72,7 @@ namespace Antlr4.Runtime
             }
 
             string text;
-#if !NET_CF
+#if !COMPACT
             if (encoding != null)
                 text = File.ReadAllText(fileName, encoding);
             else
@@ -96,7 +96,7 @@ namespace Antlr4.Runtime
             }
         }
 
-#if NET_CF
+#if COMPACT
         private static string ReadAllText(string path)
         {
             using (var reader = new StreamReader(path))

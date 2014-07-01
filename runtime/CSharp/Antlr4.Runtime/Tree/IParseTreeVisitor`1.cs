@@ -43,7 +43,7 @@ namespace Antlr4.Runtime.Tree
     /// .
     /// </remarks>
     /// <author>Sam Harwell</author>
-#if NET_CF
+#if COMPACT
     public interface IParseTreeVisitor<Result>
 #else
     public interface IParseTreeVisitor<out Result>

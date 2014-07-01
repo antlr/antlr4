@@ -39,7 +39,7 @@ namespace Antlr4.Runtime.Misc
     {
         public static string Join<T>(string separator, IEnumerable<T> items)
         {
-#if NET_4_0
+#if NET40PLUS
             return string.Join(separator, items);
 #else
             List<string> elements = new List<string>();

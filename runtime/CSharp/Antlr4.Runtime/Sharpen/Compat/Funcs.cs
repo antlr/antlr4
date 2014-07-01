@@ -25,7 +25,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 //
 
-#if !NET_3_5
+#if !NET35PLUS
 
 using System.Runtime.CompilerServices;
 

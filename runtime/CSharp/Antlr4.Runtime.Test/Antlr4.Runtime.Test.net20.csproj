@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8A2F2331-A4A5-4C7F-8D5D-DEECEF54AEA7}</ProjectGuid>
+    <ProjectGuid>{0A4681C4-1248-4ACD-B59F-D6CC17CC2B4C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Antlr4.Runtime.Test</RootNamespace>
@@ -17,7 +17,7 @@
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
-    <BaseIntermediateOutputPath>obj\v3.0\</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\net20\</BaseIntermediateOutputPath>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
@@ -25,8 +25,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\v3.0\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <OutputPath>bin\net20\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NET20;NET20PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -34,8 +34,8 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\v3.0\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <OutputPath>bin\net20\Release\</OutputPath>
+    <DefineConstants>TRACE;NET20;NET20PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -66,9 +66,9 @@
     <Compile Include="TestPerformance.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Antlr4.Runtime\Antlr4.Runtime.v3.0.csproj">
-      <Project>{ebbdcc35-43cc-416c-860b-9fc115f1eb42}</Project>
-      <Name>Antlr4.Runtime.v3.0</Name>
+    <ProjectReference Include="..\Antlr4.Runtime\Antlr4.Runtime.net20.csproj">
+      <Project>{e1a46d9d-66cb-46e8-93b0-7fc87299abef}</Project>
+      <Name>Antlr4.Runtime.net20</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -77,7 +77,7 @@
     <Antlr4 Include="Java.g4" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.Antlr4.Runtime.Test.v3.0.config" />
+    <None Include="packages.Antlr4.Runtime.Test.net20.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

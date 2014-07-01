@@ -22,7 +22,7 @@
 //
 //
 
-#if !NET_4_0
+#if !NET40PLUS
 
 using System;
 using System.Threading;
@@ -438,7 +438,7 @@ namespace Antlr4.Runtime.Sharpen
 					while ((rwlock & (RwWrite | RwWait)) > 0)
 						sw.SpinOnce ();
 
-#if NET_CF
+#if COMPACT
 					if ((InterlockedAdd (ref rwlock, RwRead) & (RwWait | RwWait)) == 0)
 						return;
 
@@ -454,7 +454,7 @@ namespace Antlr4.Runtime.Sharpen
 
 			public void ExitReadLock ()
 			{
-#if NET_CF
+#if COMPACT
 				InterlockedAdd (ref rwlock, -RwRead);
 #else
 				Interlocked.Add (ref rwlock, -RwRead);
@@ -482,14 +482,14 @@ namespace Antlr4.Runtime.Sharpen
 
 			public void ExitWriteLock ()
 			{
-#if NET_CF
+#if COMPACT
 				InterlockedAdd (ref rwlock, -RwWrite);
 #else
 				Interlocked.Add (ref rwlock, -RwWrite);
 #endif
 			}
 
-#if NET_CF
+#if COMPACT
 			/// <summary>
 			/// Adds two 32-bit integers and replaces the first integer with the sum, as an atomic operation.
 			/// </summary>
@@ -521,7 +521,7 @@ namespace Antlr4.Runtime.Sharpen
 		// The number of step until SpinOnce yield on multicore machine
 		const           int  step = 10;
 		const           int  maxTime = 200;
-#if !NET_CF
+#if !COMPACT
 		static readonly bool isSingleCpu = (Environment.ProcessorCount == 1);
 #endif
 
@@ -530,7 +530,7 @@ namespace Antlr4.Runtime.Sharpen
 		public void SpinOnce ()
 		{
 			ntime += 1;
-#if NET_CF
+#if COMPACT
 			Thread.Sleep(0);
 #else
 			if (isSingleCpu) {

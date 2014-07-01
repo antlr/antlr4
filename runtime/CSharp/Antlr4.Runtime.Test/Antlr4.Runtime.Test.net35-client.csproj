@@ -17,7 +17,7 @@
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
-    <BaseIntermediateOutputPath>obj\v3.5\</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\net35\</BaseIntermediateOutputPath>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
@@ -25,8 +25,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\v3.5\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;NET_3_5</DefineConstants>
+    <OutputPath>bin\net35\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NET35;NET35PLUS;NET30PLUS;NET20PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -34,8 +34,8 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\v3.5\Release\</OutputPath>
-    <DefineConstants>TRACE;NET_3_5</DefineConstants>
+    <OutputPath>bin\net35\Release\</OutputPath>
+    <DefineConstants>TRACE;NET35;NET35PLUS;NET30PLUS;NET20PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -66,9 +66,9 @@
     <Compile Include="TestPerformance.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Antlr4.Runtime\Antlr4.Runtime.v3.5.csproj">
+    <ProjectReference Include="..\Antlr4.Runtime\Antlr4.Runtime.net35-client.csproj">
       <Project>{e186fda3-1411-47ee-94c7-9f3745f0474b}</Project>
-      <Name>Antlr4.Runtime.v3.5</Name>
+      <Name>Antlr4.Runtime.net35-client</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -77,7 +77,7 @@
     <Antlr4 Include="Java.g4" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.Antlr4.Runtime.Test.v3.5.config" />
+    <None Include="packages.Antlr4.Runtime.Test.net35-client.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

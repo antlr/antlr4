@@ -20,29 +20,29 @@
   <files>
     <!-- Runtime Libraries -->
 
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\v2.0\$Configuration$\Antlr4.Runtime.v2.0.dll" target="lib\net20"/>
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\v2.0\$Configuration$\Antlr4.Runtime.v2.0.pdb" target="lib\net20"/>
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\v2.0\$Configuration$\Antlr4.Runtime.v2.0.xml" target="lib\net20"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net20\$Configuration$\Antlr4.Runtime.net20.dll" target="lib\net20"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net20\$Configuration$\Antlr4.Runtime.net20.pdb" target="lib\net20"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net20\$Configuration$\Antlr4.Runtime.net20.xml" target="lib\net20"/>
 
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\v3.0\$Configuration$\Antlr4.Runtime.v3.0.dll" target="lib\net30"/>
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\v3.0\$Configuration$\Antlr4.Runtime.v3.0.pdb" target="lib\net30"/>
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\v3.0\$Configuration$\Antlr4.Runtime.v3.0.xml" target="lib\net30"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net30\$Configuration$\Antlr4.Runtime.net30.dll" target="lib\net30"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net30\$Configuration$\Antlr4.Runtime.net30.pdb" target="lib\net30"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net30\$Configuration$\Antlr4.Runtime.net30.xml" target="lib\net30"/>
 
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\v3.5\$Configuration$\Antlr4.Runtime.v3.5.dll" target="lib\net35"/>
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\v3.5\$Configuration$\Antlr4.Runtime.v3.5.pdb" target="lib\net35"/>
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\v3.5\$Configuration$\Antlr4.Runtime.v3.5.xml" target="lib\net35"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net35-client\$Configuration$\Antlr4.Runtime.net35.dll" target="lib\net35-client"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net35-client\$Configuration$\Antlr4.Runtime.net35.pdb" target="lib\net35-client"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net35-client\$Configuration$\Antlr4.Runtime.net35.xml" target="lib\net35-client"/>
 
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\v4.0\$Configuration$\Antlr4.Runtime.v4.0.dll" target="lib\net40"/>
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\v4.0\$Configuration$\Antlr4.Runtime.v4.0.pdb" target="lib\net40"/>
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\v4.0\$Configuration$\Antlr4.Runtime.v4.0.xml" target="lib\net40"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net40-client\$Configuration$\Antlr4.Runtime.net40.dll" target="lib\net40-client"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net40-client\$Configuration$\Antlr4.Runtime.net40.pdb" target="lib\net40-client"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net40-client\$Configuration$\Antlr4.Runtime.net40.xml" target="lib\net40-client"/>
 
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\v4.5\$Configuration$\Antlr4.Runtime.v4.5.dll" target="lib\net45"/>
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\v4.5\$Configuration$\Antlr4.Runtime.v4.5.pdb" target="lib\net45"/>
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\v4.5\$Configuration$\Antlr4.Runtime.v4.5.xml" target="lib\net45"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net45\$Configuration$\Antlr4.Runtime.net45.dll" target="lib\net45"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net45\$Configuration$\Antlr4.Runtime.net45.pdb" target="lib\net45"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net45\$Configuration$\Antlr4.Runtime.net45.xml" target="lib\net45"/>
 
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\CF3.5\$Configuration$\Antlr4.Runtime.CF3.5.dll" target="lib\net35-cf"/>
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\CF3.5\$Configuration$\Antlr4.Runtime.CF3.5.pdb" target="lib\net35-cf"/>
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\CF3.5\$Configuration$\Antlr4.Runtime.CF3.5.xml" target="lib\net35-cf"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net35-cf\$Configuration$\Antlr4.Runtime.net35-cf.dll" target="lib\net35-cf"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net35-cf\$Configuration$\Antlr4.Runtime.net35-cf.pdb" target="lib\net35-cf"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net35-cf\$Configuration$\Antlr4.Runtime.net35-cf.xml" target="lib\net35-cf"/>
 
     <file src="..\runtime\CSharp\Antlr4.Runtime\bin\Portable\$Configuration$\Antlr4.Runtime.Portable.dll" target="lib\portable-net40"/>
     <file src="..\runtime\CSharp\Antlr4.Runtime\bin\Portable\$Configuration$\Antlr4.Runtime.Portable.pdb" target="lib\portable-net40"/>

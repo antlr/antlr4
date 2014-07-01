@@ -37,16 +37,16 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 #if PORTABLE
 [assembly: AssemblyTitle("Antlr4.Runtime.Portable")]
-#elif NET_4_5
-[assembly: AssemblyTitle("Antlr4.Runtime.v4.5")]
-#elif NET_4_0
-[assembly: AssemblyTitle("Antlr4.Runtime.v4.0")]
-#elif NET_3_5
-[assembly: AssemblyTitle("Antlr4.Runtime.v3.5")]
-#elif NET_3_0
-[assembly: AssemblyTitle("Antlr4.Runtime.v3.0")]
-#elif NET_2_0
-[assembly: AssemblyTitle("Antlr4.Runtime.v2.0")]
+#elif NET45
+[assembly: AssemblyTitle("Antlr4.Runtime.net45")]
+#elif NET40
+[assembly: AssemblyTitle("Antlr4.Runtime.net40")]
+#elif NET35
+[assembly: AssemblyTitle("Antlr4.Runtime.net35")]
+#elif NET30
+[assembly: AssemblyTitle("Antlr4.Runtime.net30")]
+#elif NET20
+[assembly: AssemblyTitle("Antlr4.Runtime.net20")]
 #else
 #error Unknown assembly.
 #endif
@@ -78,7 +78,7 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("4.2.0.0")]
-#if !NET_CF
+#if !COMPACT
 [assembly: AssemblyFileVersion("4.2.2.0")]
 [assembly: AssemblyInformationalVersion("4.2.2-dev")]
 #endif
