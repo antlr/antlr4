@@ -18,7 +18,9 @@
     using File = System.IO.File;
     using FileInfo = System.IO.FileInfo;
     using Interlocked = System.Threading.Interlocked;
+    using IOException = System.IO.IOException;
     using Path = System.IO.Path;
+    using SearchOption = System.IO.SearchOption;
     using Stopwatch = System.Diagnostics.Stopwatch;
     using Stream = System.IO.Stream;
     using StreamReader = System.IO.StreamReader;
@@ -44,6 +46,18 @@
          * {@link #TOP_PACKAGE}.
          */
         private static readonly bool RECURSIVE = true;
+        /**
+         * {@code true} to read all source files from disk into memory before
+         * starting the parse. The default value is {@code true} to help prevent
+         * drive speed from affecting the performance results. This value may be set
+         * to {@code false} to support parsing large input sets which would not
+         * otherwise fit into memory.
+         */
+        private static readonly bool PRELOAD_SOURCES = true;
+        /**
+         * The encoding to use when reading source files.
+         */
+        private static readonly Encoding ENCODING = Encoding.UTF8;
 
         /**
          * {@code true} to use the Java grammar with expressions in the v4
@@ -95,7 +109,7 @@
          * {@code true} to use {@link BailErrorStrategy}, {@code false} to use
          * {@link DefaultErrorStrategy}.
          */
-        private static readonly bool BAIL_ON_ERROR = true;
+        private static readonly bool BAIL_ON_ERROR = false;
         /**
          * {@code true} to compute a checksum for verifying consistency across
          * optimizations and multiple passes.
@@ -230,7 +244,7 @@
             DirectoryInfo directory = new DirectoryInfo(jdkSourceRoot);
             Assert.IsTrue(directory.Exists);
 
-            IEnumerable<ICharStream> sources = loadSources(directory, "*.java", RECURSIVE);
+            IEnumerable<InputDescriptor> sources = LoadSources(directory, "*.java", RECURSIVE);
 
             Console.Out.Write(getOptionsDescription(TOP_PACKAGE));
 
@@ -327,7 +341,7 @@
          *  This method is separate from {@link #parse2} so the first pass can be distinguished when analyzing
          *  profiler results.
          */
-        protected void parse1(ParserFactory factory, IEnumerable<ICharStream> sources)
+        protected void parse1(ParserFactory factory, IEnumerable<InputDescriptor> sources)
         {
             GC.Collect();
             parseSources(factory, sources);
@@ -337,49 +351,33 @@
          *  This method is separate from {@link #parse1} so the first pass can be distinguished when analyzing
          *  profiler results.
          */
-        protected void parse2(ParserFactory factory, IEnumerable<ICharStream> sources)
+        protected void parse2(ParserFactory factory, IEnumerable<InputDescriptor> sources)
         {
             GC.Collect();
             parseSources(factory, sources);
         }
 
-        protected IEnumerable<ICharStream> loadSources(DirectoryInfo directory, string filter, bool recursive)
+        protected IList<InputDescriptor> LoadSources(DirectoryInfo directory, string filter, bool recursive)
         {
-            return loadSources(directory, filter, null, recursive);
-        }
-
-        protected IEnumerable<ICharStream> loadSources(DirectoryInfo directory, string filter, Encoding encoding, bool recursive)
-        {
-            ICollection<ICharStream> result = new List<ICharStream>();
-            loadSources(directory, filter, encoding, recursive, result);
+            IList<InputDescriptor> result = new List<InputDescriptor>();
+            LoadSources(directory, filter, recursive, result);
             return result;
         }
 
-        protected void loadSources(DirectoryInfo directory, string filter, Encoding encoding, bool recursive, ICollection<ICharStream> result)
+        protected void LoadSources(DirectoryInfo directory, string filter, bool recursive, ICollection<InputDescriptor> result)
         {
             Debug.Assert(directory.Exists);
 
-            FileInfo[] sources = directory.GetFiles(filter);
+            FileInfo[] sources = directory.GetFiles(filter, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
             foreach (FileInfo file in sources)
             {
-                var stream = new StreamReader(File.OpenRead(file.FullName), encoding);
-                ICharStream input = new AntlrInputStream(stream);
-                result.Add(input);
-            }
-
-            if (recursive)
-            {
-                DirectoryInfo[] children = directory.GetDirectories();
-                foreach (DirectoryInfo child in children)
-                {
-                    loadSources(child, filter, encoding, true, result);
-                }
+                result.Add(new InputDescriptor(file.FullName));
             }
         }
 
         int configOutputSize = 0;
 
-        protected void parseSources(ParserFactory factory, IEnumerable<ICharStream> sources)
+        protected void parseSources(ParserFactory factory, IEnumerable<InputDescriptor> sources)
         {
             Stopwatch startTime = Stopwatch.StartNew();
             Thread.VolatileWrite(ref tokenCount, 0);
@@ -397,8 +395,9 @@
 #else
             ICollection<Func<int>> results = new List<Func<int>>();
 #endif
-            foreach (ICharStream input in sources)
+            foreach (InputDescriptor inputDescriptor in sources)
             {
+                ICharStream input = inputDescriptor.GetInputStream();
                 sourceCount++;
                 input.Seek(0);
                 inputSize += input.Size;
@@ -1094,5 +1093,107 @@
                 updateChecksum(checksum, ctx.Stop);
             }
         }
+
+        protected sealed class InputDescriptor
+        {
+            private readonly string source;
+            private WeakReference<CloneableAntlrFileStream> inputStream;
+            private CloneableAntlrFileStream strongInputStream;
+
+            public InputDescriptor([NotNull] String source)
+            {
+                this.source = source;
+                if (PRELOAD_SOURCES)
+                {
+                    GetInputStream();
+                }
+            }
+
+            [return: NotNull]
+            public ICharStream GetInputStream()
+            {
+                CloneableAntlrFileStream stream;
+                if (!TryGetTarget(out stream))
+                {
+                    stream = new CloneableAntlrFileStream(source, ENCODING);
+                    SetTarget(stream);
+                }
+
+                return new JavaUnicodeInputStream(stream.CreateCopy());
+            }
+
+            private void SetTarget(CloneableAntlrFileStream stream)
+            {
+                if (PRELOAD_SOURCES)
+                {
+                    strongInputStream = stream;
+                }
+                else
+                {
+                    inputStream = new WeakReference<CloneableAntlrFileStream>(stream);
+                }
+            }
+
+            private bool TryGetTarget(out CloneableAntlrFileStream stream)
+            {
+                if (PRELOAD_SOURCES)
+                {
+                    stream = strongInputStream;
+                    return strongInputStream != null;
+                }
+                else
+                {
+                    if (inputStream == null)
+                    {
+                        stream = null;
+                        return false;
+                    }
+
+                    return inputStream.TryGetTarget(out stream);
+                }
+            }
+        }
+
+#if PORTABLE
+        protected class CloneableAntlrFileStream : AntlrInputStream
+#else
+        protected class CloneableAntlrFileStream : AntlrFileStream
+#endif
+        {
+            public CloneableAntlrFileStream(String fileName, Encoding encoding)
+#if PORTABLE
+                : base(File.ReadAllText(fileName, encoding))
+#else
+                : base(fileName, encoding)
+#endif
+            {
+            }
+
+            public AntlrInputStream CreateCopy()
+            {
+                AntlrInputStream stream = new AntlrInputStream(this.data, this.n);
+                stream.name = this.SourceName;
+                return stream;
+            }
+        }
+
+#if !NET45
+        private sealed class WeakReference<T>
+            where T : class
+        {
+            private readonly WeakReference _reference;
+
+            public WeakReference(T reference)
+            {
+                _reference = new WeakReference(reference);
+            }
+
+            public bool TryGetTarget(out T reference)
+            {
+                reference = (T)_reference.Target;
+                return reference != null;
+            }
+        }
+#endif
     }
 }

@@ -268,11 +268,11 @@
                 string compiler = PathCombine(JavaHome, "bin", "java.exe");
 
                 List<string> classpath = new List<string>();
-                classpath.Add(GetMavenArtifact("com.tunnelvisionlabs", "antlr4-csharp", "4.0.1-SNAPSHOT"));
-                classpath.Add(GetMavenArtifact("com.tunnelvisionlabs", "antlr4-runtime", "4.0.1-SNAPSHOT"));
-                classpath.Add(GetMavenArtifact("com.tunnelvisionlabs", "antlr4", "4.0.1-SNAPSHOT"));
-                classpath.Add(GetMavenArtifact("org.antlr", "antlr-runtime", "3.5"));
-                classpath.Add(GetMavenArtifact("org.antlr", "ST4", "4.0.7"));
+                classpath.Add(GetMavenArtifact("com.tunnelvisionlabs", "antlr4-csharp", "4.3-SNAPSHOT"));
+                classpath.Add(GetMavenArtifact("com.tunnelvisionlabs", "antlr4-runtime", "4.3"));
+                classpath.Add(GetMavenArtifact("com.tunnelvisionlabs", "antlr4", "4.3"));
+                classpath.Add(GetMavenArtifact("org.antlr", "antlr-runtime", "3.5.2"));
+                classpath.Add(GetMavenArtifact("org.antlr", "ST4", "4.0.8"));
 
                 List<string> options = new List<string>();
                 options.Add("-cp");
@@ -284,7 +284,23 @@
                 options.Add(tmpdir);
                 options.Add("-lib");
                 options.Add(tmpdir);
-                options.Add("-Dlanguage=CSharp");
+
+#if PORTABLE
+                options.Add("-Dlanguage=CSharp_v4_5");
+#elif NET45
+                options.Add("-Dlanguage=CSharp_v4_5");
+#elif NET40
+                options.Add("-Dlanguage=CSharp_v4_0");
+#elif NET35
+                options.Add("-Dlanguage=CSharp_v3_5");
+#elif NET30
+                options.Add("-Dlanguage=CSharp_v3_0");
+#elif NET20
+                options.Add("-Dlanguage=CSharp_v2_0");
+#else
+#error Unknown assembly.
+#endif
+
                 options.Add(grammarFileName);
 
                 System.Diagnostics.Process process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(compiler, '"' + Utils.Join("\" \"", options) + '"')
