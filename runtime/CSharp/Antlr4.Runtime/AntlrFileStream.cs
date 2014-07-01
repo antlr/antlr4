@@ -30,7 +30,7 @@
 
 #if !PORTABLE
 
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 using Encoding = System.Text.Encoding;
 using File = System.IO.File;
 

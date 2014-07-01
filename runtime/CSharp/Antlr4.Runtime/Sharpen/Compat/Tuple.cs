@@ -30,7 +30,7 @@
 
 using System;
 
-namespace Sharpen
+namespace Antlr4.Runtime.Sharpen
 {
 	internal static class Tuple
 	{

@@ -35,7 +35,7 @@ using System.Text;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Dfa
 {

@@ -31,7 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Antlr4.Runtime.Dfa;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Dfa
 {

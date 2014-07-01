@@ -29,7 +29,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace Sharpen {
+namespace Antlr4.Runtime.Sharpen {
 
 	public delegate TResult Func<TResult> ();
 	

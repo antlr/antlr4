@@ -30,7 +30,7 @@
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
