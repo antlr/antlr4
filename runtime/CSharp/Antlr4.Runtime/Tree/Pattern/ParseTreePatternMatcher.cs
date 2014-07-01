@@ -440,7 +440,7 @@ namespace Antlr4.Runtime.Tree.Pattern
                     }
                     else
                     {
-                        if (t1.GetText().Equals(t2.GetText()))
+                        if (t1.GetText().Equals(t2.GetText(), StringComparison.Ordinal))
                         {
                         }
                         else
