@@ -45,40 +45,52 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// This method is called by the parser when a full-context prediction
         /// results in an ambiguity.
-        /// <p/>
+        /// <p>Each full-context prediction which does not result in a syntax error
+        /// will call either
+        /// <see cref="ReportContextSensitivity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, int, Antlr4.Runtime.Atn.SimulatorState)">ReportContextSensitivity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, int, Antlr4.Runtime.Atn.SimulatorState)</see>
+        /// or
+        /// <see cref="ReportAmbiguity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, Sharpen.BitSet, Antlr4.Runtime.Atn.ATNConfigSet)">ReportAmbiguity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, Sharpen.BitSet, Antlr4.Runtime.Atn.ATNConfigSet)</see>
+        /// .</p>
+        /// <p>
         /// When
+        /// <code>ambigAlts</code>
+        /// is not null, it contains the set of potentially
+        /// viable alternatives identified by the prediction algorithm. When
+        /// <code>ambigAlts</code>
+        /// is null, use
+        /// <see cref="Antlr4.Runtime.Atn.ATNConfigSet.GetRepresentedAlternatives()">Antlr4.Runtime.Atn.ATNConfigSet.GetRepresentedAlternatives()</see>
+        /// to obtain the represented
+        /// alternatives from the
+        /// <code>configs</code>
+        /// argument.</p>
+        /// <p>When
         /// <code>exact</code>
         /// is
         /// <code>true</code>
-        /// , <em>all</em> of the alternatives in
-        /// <code>ambigAlts</code>
-        /// are viable, i.e. this is reporting an exact ambiguity.
-        /// When
+        /// , <em>all</em> of the potentially
+        /// viable alternatives are truly viable, i.e. this is reporting an exact
+        /// ambiguity. When
         /// <code>exact</code>
         /// is
         /// <code>false</code>
-        /// , <em>at least two</em> of the
-        /// alternatives in
-        /// <code>ambigAlts</code>
-        /// are viable for the current input, but
+        /// , <em>at least two</em> of
+        /// the potentially viable alternatives are viable for the current input, but
         /// the prediction algorithm terminated as soon as it determined that at
-        /// least the <em>minimum</em> alternative in
-        /// <code>ambigAlts</code>
-        /// is viable.
-        /// <p/>
-        /// When the
+        /// least the <em>minimum</em> potentially viable alternative is truly
+        /// viable.</p>
+        /// <p>When the
         /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection">Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection</see>
-        /// prediction mode
-        /// is used, the parser is required to identify exact ambiguities so
+        /// prediction
+        /// mode is used, the parser is required to identify exact ambiguities so
         /// <code>exact</code>
         /// will always be
         /// <code>true</code>
-        /// .
+        /// .</p>
         /// </remarks>
         /// <param name="recognizer">the parser instance</param>
         /// <param name="dfa">the DFA for the current decision</param>
         /// <param name="startIndex">the input index where the decision started</param>
-        /// <param name="stopIndex">the input input where the ambiguity is reported</param>
+        /// <param name="stopIndex">the input input where the ambiguity was identified</param>
         /// <param name="exact">
         /// 
         /// <code>true</code>
@@ -90,10 +102,16 @@ namespace Antlr4.Runtime
         /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection">Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection</see>
         /// is used.
         /// </param>
-        /// <param name="ambigAlts">the potentially ambiguous alternatives</param>
+        /// <param name="ambigAlts">
+        /// the potentially ambiguous alternatives, or
+        /// <code>null</code>
+        /// to indicate that the potentially ambiguous alternatives are the complete
+        /// set of represented alternatives in
+        /// <code>configs</code>
+        /// </param>
         /// <param name="configs">
         /// the ATN configuration set where the ambiguity was
-        /// determined
+        /// identified
         /// </param>
         void ReportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, bool exact, BitSet ambigAlts, ATNConfigSet configs);
 
@@ -104,15 +122,14 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// This method is called when an SLL conflict occurs and the parser is about
         /// to use the full context information to make an LL decision.
-        /// <p/>
-        /// If one or more configurations in
+        /// <p>If one or more configurations in
         /// <code>configs</code>
         /// contains a semantic
         /// predicate, the predicates are evaluated before this method is called. The
         /// subset of alternatives which are still viable after predicates are
         /// evaluated is reported in
         /// <code>conflictingAlts</code>
-        /// .
+        /// .</p>
         /// </remarks>
         /// <param name="recognizer">the parser instance</param>
         /// <param name="dfa">the DFA for the current decision</param>
@@ -139,23 +156,35 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// This method is called by the parser when a full-context prediction has a
         /// unique result.
-        /// <p/>
-        /// For prediction implementations that only evaluate full-context
+        /// <p>Each full-context prediction which does not result in a syntax error
+        /// will call either
+        /// <see cref="ReportContextSensitivity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, int, Antlr4.Runtime.Atn.SimulatorState)">ReportContextSensitivity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, int, Antlr4.Runtime.Atn.SimulatorState)</see>
+        /// or
+        /// <see cref="ReportAmbiguity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, Sharpen.BitSet, Antlr4.Runtime.Atn.ATNConfigSet)">ReportAmbiguity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, Sharpen.BitSet, Antlr4.Runtime.Atn.ATNConfigSet)</see>
+        /// .</p>
+        /// <p>For prediction implementations that only evaluate full-context
         /// predictions when an SLL conflict is found (including the default
         /// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator">Antlr4.Runtime.Atn.ParserATNSimulator</see>
         /// implementation), this method reports cases
         /// where SLL conflicts were resolved to unique full-context predictions,
         /// i.e. the decision was context-sensitive. This report does not necessarily
         /// indicate a problem, and it may appear even in completely unambiguous
-        /// grammars.
-        /// <p/>
+        /// grammars.</p>
+        /// <p>
         /// <code>configs</code>
         /// may have more than one represented alternative if the
         /// full-context prediction algorithm does not evaluate predicates before
         /// beginning the full-context prediction. In all cases, the final prediction
         /// is passed as the
         /// <code>prediction</code>
-        /// argument.
+        /// argument.</p>
+        /// <p>Note that the definition of "context sensitivity" in this method
+        /// differs from the concept in
+        /// <see cref="Antlr4.Runtime.Atn.DecisionInfo.contextSensitivities">Antlr4.Runtime.Atn.DecisionInfo.contextSensitivities</see>
+        /// .
+        /// This method reports all instances where an SLL conflict occurred but LL
+        /// parsing produced a unique result, whether or not that unique result
+        /// matches the minimum alternative in the SLL conflicting set.</p>
         /// </remarks>
         /// <param name="recognizer">the parser instance</param>
         /// <param name="dfa">the DFA for the current decision</param>

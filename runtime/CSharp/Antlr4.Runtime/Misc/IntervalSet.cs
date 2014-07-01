@@ -38,27 +38,32 @@ using Sharpen;
 namespace Antlr4.Runtime.Misc
 {
     /// <summary>
-    /// A set of integers that relies on ranges being common to do
-    /// "run-length-encoded" like compression (if you view an IntSet like
-    /// a BitSet with runs of 0s and 1s).
+    /// This class implements the
+    /// <see cref="IIntSet">IIntSet</see>
+    /// backed by a sorted array of
+    /// non-overlapping intervals. It is particularly efficient for representing
+    /// large collections of numbers, where the majority of elements appear as part
+    /// of a sequential range of numbers that are all part of the set. For example,
+    /// the set { 1, 2, 3, 4, 7, 8 } may be represented as { [1, 4], [7, 8] }.
+    /// <p>
+    /// This class is able to represent sets containing any combination of values in
+    /// the range
+    /// <see cref="int.MinValue">int.MinValue</see>
+    /// to
+    /// <see cref="int.MaxValue">int.MaxValue</see>
+    /// (inclusive).</p>
     /// </summary>
-    /// <remarks>
-    /// A set of integers that relies on ranges being common to do
-    /// "run-length-encoded" like compression (if you view an IntSet like
-    /// a BitSet with runs of 0s and 1s).  Only ranges are recorded so that
-    /// a few ints up near value 1000 don't cause massive bitsets, just two
-    /// integer intervals.
-    /// element values may be negative.  Useful for sets of EPSILON and EOF.
-    /// 0..9 char range is index pair ['\u0030','\u0039'].
-    /// Multiple ranges are encoded with multiple index pairs.  Isolated
-    /// elements are encoded with an index pair where both intervals are the same.
-    /// The ranges are ordered and disjoint so that 2..6 appears before 101..103.
-    /// </remarks>
     public class IntervalSet : IIntSet
     {
-        public static readonly Antlr4.Runtime.Misc.IntervalSet CompleteCharSet = Antlr4.Runtime.Misc.IntervalSet.Of(0, Lexer.MaxCharValue);
+        public static readonly Antlr4.Runtime.Misc.IntervalSet CompleteCharSet = Antlr4.Runtime.Misc.IntervalSet.Of(Lexer.MinCharValue, Lexer.MaxCharValue);
 
         public static readonly Antlr4.Runtime.Misc.IntervalSet EmptySet = new Antlr4.Runtime.Misc.IntervalSet();
+
+        static IntervalSet()
+        {
+            CompleteCharSet.SetReadonly(true);
+            EmptySet.SetReadonly(true);
+        }
 
         /// <summary>The list of sorted, disjoint intervals.</summary>
         /// <remarks>The list of sorted, disjoint intervals.</remarks>
@@ -226,17 +231,23 @@ namespace Antlr4.Runtime.Misc
             {
                 return this;
             }
-            if (!(set is Antlr4.Runtime.Misc.IntervalSet))
+            if (set is Antlr4.Runtime.Misc.IntervalSet)
             {
-                throw new ArgumentException("can't add non IntSet (" + set.GetType().FullName + ") to IntervalSet");
+                Antlr4.Runtime.Misc.IntervalSet other = (Antlr4.Runtime.Misc.IntervalSet)set;
+                // walk set and add each interval
+                int n = other.intervals.Count;
+                for (int i = 0; i < n; i++)
+                {
+                    Interval I = other.intervals[i];
+                    this.Add(I.a, I.b);
+                }
             }
-            Antlr4.Runtime.Misc.IntervalSet other = (Antlr4.Runtime.Misc.IntervalSet)set;
-            // walk set and add each interval
-            int n = other.intervals.Count;
-            for (int i = 0; i < n; i++)
+            else
             {
-                Interval I = other.intervals[i];
-                this.Add(I.a, I.b);
+                foreach (int value in set.ToList())
+                {
+                    Add(value);
+                }
             }
             return this;
         }
@@ -247,79 +258,133 @@ namespace Antlr4.Runtime.Misc
         }
 
         /// <summary>
-        /// Given the set of possible values (rather than, say UNICODE or MAXINT),
-        /// return a new set containing all elements in vocabulary, but not in
-        /// this.
+        /// <inheritDoc></inheritDoc>
+        /// 
         /// </summary>
-        /// <remarks>
-        /// Given the set of possible values (rather than, say UNICODE or MAXINT),
-        /// return a new set containing all elements in vocabulary, but not in
-        /// this.  The computation is (vocabulary - this).
-        /// 'this' is assumed to be either a subset or equal to vocabulary.
-        /// </remarks>
         public virtual Antlr4.Runtime.Misc.IntervalSet Complement(IIntSet vocabulary)
         {
-            if (vocabulary == null)
+            if (vocabulary == null || vocabulary.IsNil())
             {
                 return null;
             }
             // nothing in common with null set
-            if (!(vocabulary is Antlr4.Runtime.Misc.IntervalSet))
+            Antlr4.Runtime.Misc.IntervalSet vocabularyIS;
+            if (vocabulary is Antlr4.Runtime.Misc.IntervalSet)
             {
-                throw new ArgumentException("can't complement with non IntervalSet (" + vocabulary.GetType().FullName + ")");
+                vocabularyIS = (Antlr4.Runtime.Misc.IntervalSet)vocabulary;
             }
-            Antlr4.Runtime.Misc.IntervalSet vocabularyIS = ((Antlr4.Runtime.Misc.IntervalSet)vocabulary);
-            int maxElement = vocabularyIS.GetMaxElement();
-            Antlr4.Runtime.Misc.IntervalSet compl = new Antlr4.Runtime.Misc.IntervalSet();
-            int n = intervals.Count;
-            if (n == 0)
+            else
             {
-                return compl;
+                vocabularyIS = new Antlr4.Runtime.Misc.IntervalSet();
+                vocabularyIS.AddAll(vocabulary);
             }
-            Interval first = intervals[0];
-            // add a range from 0 to first.a constrained to vocab
-            if (first.a > 0)
-            {
-                Antlr4.Runtime.Misc.IntervalSet s = Antlr4.Runtime.Misc.IntervalSet.Of(0, first.a - 1);
-                Antlr4.Runtime.Misc.IntervalSet a = s.And(vocabularyIS);
-                compl.AddAll(a);
-            }
-            for (int i = 1; i < n; i++)
-            {
-                // from 2nd interval .. nth
-                Interval previous = intervals[i - 1];
-                Interval current = intervals[i];
-                Antlr4.Runtime.Misc.IntervalSet s = Antlr4.Runtime.Misc.IntervalSet.Of(previous.b + 1, current.a - 1);
-                Antlr4.Runtime.Misc.IntervalSet a = s.And(vocabularyIS);
-                compl.AddAll(a);
-            }
-            Interval last = intervals[n - 1];
-            // add a range from last.b to maxElement constrained to vocab
-            if (last.b < maxElement)
-            {
-                Antlr4.Runtime.Misc.IntervalSet s = Antlr4.Runtime.Misc.IntervalSet.Of(last.b + 1, maxElement);
-                Antlr4.Runtime.Misc.IntervalSet a = s.And(vocabularyIS);
-                compl.AddAll(a);
-            }
-            return compl;
+            return vocabularyIS.Subtract(this);
         }
 
-        /// <summary>Compute this-other via this&amp;~other.</summary>
-        /// <remarks>
-        /// Compute this-other via this&amp;~other.
-        /// Return a new set containing all elements in this but not in other.
-        /// other is assumed to be a subset of this;
-        /// anything that is in other but not in this will be ignored.
-        /// </remarks>
-        public virtual Antlr4.Runtime.Misc.IntervalSet Subtract(IIntSet other)
+        public virtual Antlr4.Runtime.Misc.IntervalSet Subtract(IIntSet a)
         {
-            // assume the whole unicode range here for the complement
-            // because it doesn't matter.  Anything beyond the max of this' set
-            // will be ignored since we are doing this & ~other.  The intersection
-            // will be empty.  The only problem would be when this' set max value
-            // goes beyond MAX_CHAR_VALUE, but hopefully the constant MAX_CHAR_VALUE
-            // will prevent this.
-            return this.And(((Antlr4.Runtime.Misc.IntervalSet)other).Complement(CompleteCharSet));
+            if (a == null || a.IsNil())
+            {
+                return new Antlr4.Runtime.Misc.IntervalSet(this);
+            }
+            if (a is Antlr4.Runtime.Misc.IntervalSet)
+            {
+                return Subtract(this, (Antlr4.Runtime.Misc.IntervalSet)a);
+            }
+            Antlr4.Runtime.Misc.IntervalSet other = new Antlr4.Runtime.Misc.IntervalSet();
+            other.AddAll(a);
+            return Subtract(this, other);
+        }
+
+        /// <summary>Compute the set difference between two interval sets.</summary>
+        /// <remarks>
+        /// Compute the set difference between two interval sets. The specific
+        /// operation is
+        /// <code>left - right</code>
+        /// . If either of the input sets is
+        /// <code>null</code>
+        /// , it is treated as though it was an empty set.
+        /// </remarks>
+        [return: NotNull]
+        public static Antlr4.Runtime.Misc.IntervalSet Subtract(Antlr4.Runtime.Misc.IntervalSet left, Antlr4.Runtime.Misc.IntervalSet right)
+        {
+            if (left == null || left.IsNil())
+            {
+                return new Antlr4.Runtime.Misc.IntervalSet();
+            }
+            Antlr4.Runtime.Misc.IntervalSet result = new Antlr4.Runtime.Misc.IntervalSet(left);
+            if (right == null || right.IsNil())
+            {
+                // right set has no elements; just return the copy of the current set
+                return result;
+            }
+            int resultI = 0;
+            int rightI = 0;
+            while (resultI < result.intervals.Count && rightI < right.intervals.Count)
+            {
+                Interval resultInterval = result.intervals[resultI];
+                Interval rightInterval = right.intervals[rightI];
+                // operation: (resultInterval - rightInterval) and update indexes
+                if (rightInterval.b < resultInterval.a)
+                {
+                    rightI++;
+                    continue;
+                }
+                if (rightInterval.a > resultInterval.b)
+                {
+                    resultI++;
+                    continue;
+                }
+                Interval? beforeCurrent = null;
+                Interval? afterCurrent = null;
+                if (rightInterval.a > resultInterval.a)
+                {
+                    beforeCurrent = new Interval(resultInterval.a, rightInterval.a - 1);
+                }
+                if (rightInterval.b < resultInterval.b)
+                {
+                    afterCurrent = new Interval(rightInterval.b + 1, resultInterval.b);
+                }
+                if (beforeCurrent != null)
+                {
+                    if (afterCurrent != null)
+                    {
+                        // split the current interval into two
+                        result.intervals[resultI] = beforeCurrent.Value;
+                        result.intervals.Insert(resultI + 1, afterCurrent.Value);
+                        resultI++;
+                        rightI++;
+                        continue;
+                    }
+                    else
+                    {
+                        // replace the current interval
+                        result.intervals[resultI] = beforeCurrent.Value;
+                        resultI++;
+                        continue;
+                    }
+                }
+                else
+                {
+                    if (afterCurrent != null)
+                    {
+                        // replace the current interval
+                        result.intervals[resultI] = afterCurrent.Value;
+                        rightI++;
+                        continue;
+                    }
+                    else
+                    {
+                        // remove the current interval (thus no need to increment resultI)
+                        result.intervals.RemoveAt(resultI);
+                        continue;
+                    }
+                }
+            }
+            // If rightI reached right.intervals.size(), no more intervals to subtract from result.
+            // If resultI reached result.intervals.size(), we would be subtracting from an empty set.
+            // Either way, we are done.
+            return result;
         }
 
         public virtual Antlr4.Runtime.Misc.IntervalSet Or(IIntSet a)
@@ -330,13 +395,10 @@ namespace Antlr4.Runtime.Misc
             return o;
         }
 
-        /// <summary>Return a new set with the intersection of this set with other.</summary>
-        /// <remarks>
-        /// Return a new set with the intersection of this set with other.  Because
-        /// the intervals are sorted, we can use an iterator for each list and
-        /// just walk them together.  This is roughly O(min(n,m)) for interval
-        /// list lengths n and m.
-        /// </remarks>
+        /// <summary>
+        /// <inheritDoc></inheritDoc>
+        /// 
+        /// </summary>
         public virtual Antlr4.Runtime.Misc.IntervalSet And(IIntSet other)
         {
             if (other == null)
@@ -435,7 +497,10 @@ namespace Antlr4.Runtime.Misc
             return intersection;
         }
 
-        /// <summary>Is el in any range of this set?</summary>
+        /// <summary>
+        /// <inheritDoc></inheritDoc>
+        /// 
+        /// </summary>
         public virtual bool Contains(int el)
         {
             int n = intervals.Count;
@@ -458,13 +523,19 @@ namespace Antlr4.Runtime.Misc
             return false;
         }
 
-        /// <summary>return true if this set has no members</summary>
+        /// <summary>
+        /// <inheritDoc></inheritDoc>
+        /// 
+        /// </summary>
         public virtual bool IsNil()
         {
             return intervals == null || intervals.Count == 0;
         }
 
-        /// <summary>If this set is a single integer, return it otherwise Token.INVALID_TYPE</summary>
+        /// <summary>
+        /// <inheritDoc></inheritDoc>
+        /// 
+        /// </summary>
         public virtual int GetSingleElement()
         {
             if (intervals != null && intervals.Count == 1)
@@ -478,6 +549,14 @@ namespace Antlr4.Runtime.Misc
             return TokenConstants.InvalidType;
         }
 
+        /// <summary>Returns the maximum value contained in the set.</summary>
+        /// <remarks>Returns the maximum value contained in the set.</remarks>
+        /// <returns>
+        /// the maximum value contained in the set. If the set is empty, this
+        /// method returns
+        /// <see cref="Antlr4.Runtime.IToken.InvalidType">Antlr4.Runtime.IToken.InvalidType</see>
+        /// .
+        /// </returns>
         public virtual int GetMaxElement()
         {
             if (IsNil())
@@ -488,28 +567,21 @@ namespace Antlr4.Runtime.Misc
             return last.b;
         }
 
-        /// <summary>Return minimum element &gt;= 0</summary>
+        /// <summary>Returns the minimum value contained in the set.</summary>
+        /// <remarks>Returns the minimum value contained in the set.</remarks>
+        /// <returns>
+        /// the minimum value contained in the set. If the set is empty, this
+        /// method returns
+        /// <see cref="Antlr4.Runtime.IToken.InvalidType">Antlr4.Runtime.IToken.InvalidType</see>
+        /// .
+        /// </returns>
         public virtual int GetMinElement()
         {
             if (IsNil())
             {
                 return TokenConstants.InvalidType;
             }
-            int n = intervals.Count;
-            for (int i = 0; i < n; i++)
-            {
-                Interval I = intervals[i];
-                int a = I.a;
-                int b = I.b;
-                for (int v = a; v <= b; v++)
-                {
-                    if (v >= 0)
-                    {
-                        return v;
-                    }
-                }
-            }
-            return TokenConstants.InvalidType;
+            return intervals[0].a;
         }
 
         /// <summary>Return a list of Interval objects.</summary>
@@ -580,7 +652,7 @@ namespace Antlr4.Runtime.Misc
                 int b = I.b;
                 if (a == b)
                 {
-                    if (a == -1)
+                    if (a == TokenConstants.Eof)
                     {
                         buf.Append("<EOF>");
                     }
@@ -804,6 +876,10 @@ namespace Antlr4.Runtime.Misc
 
         public virtual void SetReadonly(bool @readonly)
         {
+            if (this.@readonly && !@readonly)
+            {
+                throw new InvalidOperationException("can't alter readonly IntervalSet");
+            }
             this.@readonly = @readonly;
         }
 
