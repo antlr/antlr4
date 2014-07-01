@@ -496,7 +496,6 @@ public class ParserATNSimulator extends ATNSimulator {
 											" exec LA(1)=="+ getLookaheadName(input) +
 											", outerContext="+outerContext.toString(parser));
 		if ( dfa_debug ) System.out.print(dfa.toString(parser.getTokenNames(), parser.getRuleNames()));
-		DFAState acceptState = null;
 		DFAState s = state.s0;
 
 		int t = input.LA(1);
@@ -529,7 +528,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				else {
 					if ( dfa_debug ) System.out.println("accept; predict "+s.prediction +" in state "+s.stateNumber);
 				}
-				acceptState = s;
+
 				// keep going unless we're at EOF or state only has one alt number
 				// mentioned in configs; check if something else could match
 				// TODO: don't we always stop? only lexer would keep going
@@ -578,10 +577,10 @@ public class ParserATNSimulator extends ATNSimulator {
 //			return -1;
 //		}
 
-		if ( acceptState.configs.getConflictingAlts()!=null ) {
+		if ( s.configs.getConflictingAlts()!=null ) {
 			if ( dfa.atnStartState instanceof DecisionState ) {
 				if (!userWantsCtxSensitive ||
-					!acceptState.configs.getDipsIntoOuterContext() ||
+					!s.configs.getDipsIntoOuterContext() ||
 					(treat_sllk1_conflict_as_ambiguity && input.index() == startIndex))
 				{
 					// we don't report the ambiguity again
@@ -596,7 +595,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					// disambiguating or validating predicates to evaluate which allow an
 					// immediate decision
 					BitSet conflictingAlts = null;
-					if ( acceptState.predicates!=null ) {
+					if ( s.predicates!=null ) {
 						int conflictIndex = input.index();
 						if (conflictIndex != startIndex) {
 							input.seek(startIndex);
@@ -615,7 +614,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					}
 
 					if (reportAmbiguities) {
-						SimulatorState conflictState = new SimulatorState(outerContext, acceptState, state.useContext, remainingOuterContext);
+						SimulatorState conflictState = new SimulatorState(outerContext, s, state.useContext, remainingOuterContext);
 						reportAttemptingFullContext(dfa, conflictingAlts, conflictState, startIndex, input.index());
 					}
 
@@ -654,8 +653,8 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 
 		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
-											" predicts "+acceptState.prediction);
-		return acceptState.prediction;
+											" predicts "+s.prediction);
+		return s.prediction;
 	}
 
 	/** Performs ATN simulation to compute a predicted alternative based
