@@ -1962,8 +1962,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		// minAlt from the first state, #2 will fail if the assumption was
 		// incorrect
 		int currentState = configs.get(0).getState().getNonStopStateNumber();
-		for (int i = 0; i < configs.size(); i++) {
-			ATNConfig config = configs.get(i);
+		for (ATNConfig config : configs) {
 			int stateNumber = config.getState().getNonStopStateNumber();
 			if (stateNumber != currentState) {
 				if (config.getAlt() != minAlt) {
@@ -1981,8 +1980,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			// get the represented alternatives of the first state
 			representedAlts = new BitSet();
 			int maxAlt = minAlt;
-			for (int i = 0; i < configs.size(); i++) {
-				ATNConfig config = configs.get(i);
+			for (ATNConfig config : configs) {
 				if (config.getState().getNonStopStateNumber() != currentState) {
 					break;
 				}
@@ -1995,8 +1993,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			// quick check #3:
 			currentState = configs.get(0).getState().getNonStopStateNumber();
 			int currentAlt = minAlt;
-			for (int i = 0; i < configs.size(); i++) {
-				ATNConfig config = configs.get(i);
+			for (ATNConfig config : configs) {
 				int stateNumber = config.getState().getNonStopStateNumber();
 				int alt = config.getAlt();
 				if (stateNumber != currentState) {
