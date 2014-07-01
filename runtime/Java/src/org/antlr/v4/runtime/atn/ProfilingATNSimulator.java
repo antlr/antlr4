@@ -36,7 +36,6 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Tuple2;
 
 import java.util.BitSet;
@@ -212,7 +211,7 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 	}
 
 	@Override
-	protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex, boolean exact, @Nullable BitSet ambigAlts, @NotNull ATNConfigSet configs) {
+	protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex, boolean exact, @NotNull BitSet ambigAlts, @NotNull ATNConfigSet configs) {
 		decisions[currentDecision].ambiguities.add(
 			new AmbiguityInfo(currentDecision, currentState, _input, startIndex, stopIndex)
 		);

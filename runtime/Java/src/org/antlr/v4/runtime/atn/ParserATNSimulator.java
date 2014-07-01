@@ -517,6 +517,7 @@ public class ParserATNSimulator extends ATNSimulator {
 						return execATN(dfa, input, startIndex, initialState);
 					}
 
+					assert remainingOuterContext != null;
 					remainingOuterContext = remainingOuterContext.getParent();
 					s = next;
 				}
@@ -595,13 +596,14 @@ public class ParserATNSimulator extends ATNSimulator {
 					// disambiguating or validating predicates to evaluate which allow an
 					// immediate decision
 					BitSet conflictingAlts = null;
-					if ( s.predicates!=null ) {
+					DFAState.PredPrediction[] predicates = s.predicates;
+					if ( predicates!=null ) {
 						int conflictIndex = input.index();
 						if (conflictIndex != startIndex) {
 							input.seek(startIndex);
 						}
 
-						conflictingAlts = evalSemanticContext(s.predicates, outerContext, true);
+						conflictingAlts = evalSemanticContext(predicates, outerContext, true);
 						if ( conflictingAlts.cardinality() == 1 ) {
 							return conflictingAlts.nextSetBit(0);
 						}
@@ -626,13 +628,14 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		// Before jumping to prediction, check to see if there are
 		// disambiguating or validating predicates to evaluate
-		if ( s.predicates != null ) {
+		DFAState.PredPrediction[] predicates = s.predicates;
+		if ( predicates != null ) {
 			int stopIndex = input.index();
 			if (startIndex != stopIndex) {
 				input.seek(startIndex);
 			}
 
-			BitSet alts = evalSemanticContext(s.predicates, outerContext, reportAmbiguities && predictionMode == PredictionMode.LL_EXACT_AMBIG_DETECTION);
+			BitSet alts = evalSemanticContext(predicates, outerContext, reportAmbiguities && predictionMode == PredictionMode.LL_EXACT_AMBIG_DETECTION);
 			switch (alts.cardinality()) {
 			case 0:
 				throw noViableAlt(input, outerContext, s.configs, startIndex);
@@ -974,6 +977,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					break;
 				}
 
+				assert remainingGlobalContext != null;
 				remainingGlobalContext = remainingGlobalContext.getParent();
 				s = next;
 			}
@@ -1845,7 +1849,7 @@ public class ParserATNSimulator extends ATNSimulator {
             }
 		}
 
-        ATNConfig c = null;
+        ATNConfig c;
         if (collectPredicates && inContext) {
             SemanticContext newSemCtx = SemanticContext.and(config.getSemanticContext(), pt.getPredicate());
             c = config.transform(pt.target, newSemCtx, false);
@@ -1970,7 +1974,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 		}
 
-		BitSet representedAlts = null;
+		BitSet representedAlts;
 		if (exact) {
 			currentState = configs.get(0).getState().getNonStopStateNumber();
 
@@ -2354,7 +2358,7 @@ public class ParserATNSimulator extends ATNSimulator {
     /** If context sensitive parsing, we know it's ambiguity not conflict */
     protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex,
 								   boolean exact,
-								   @Nullable BitSet ambigAlts,
+								   @NotNull BitSet ambigAlts,
 								   @NotNull ATNConfigSet configs)
 	{
 		if ( debug || retry_debug ) {
