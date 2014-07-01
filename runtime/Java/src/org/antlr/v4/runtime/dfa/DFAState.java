@@ -111,7 +111,7 @@ public class DFAState {
 		@NotNull
 		public SemanticContext pred; // never null; at least SemanticContext.NONE
 		public int alt;
-		public PredPrediction(SemanticContext pred, int alt) {
+		public PredPrediction(@NotNull SemanticContext pred, int alt) {
 			this.alt = alt;
 			this.pred = pred;
 		}

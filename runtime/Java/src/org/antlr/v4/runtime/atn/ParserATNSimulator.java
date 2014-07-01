@@ -1547,7 +1547,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			// (null, i) means alt i is the default prediction
 			// if no (null, i), then no default prediction.
 			if (ambigAlts!=null && ambigAlts.get(i) && pred==SemanticContext.NONE) {
-				pairs.add(new DFAState.PredPrediction(null, i));
+				pairs.add(new DFAState.PredPrediction(pred, i));
 			}
 			else if ( pred!=SemanticContext.NONE ) {
 				containsPredicate = true;
@@ -1573,7 +1573,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	{
 		BitSet predictions = new BitSet();
 		for (DFAState.PredPrediction pair : predPredictions) {
-			if ( pair.pred==null ) {
+			if ( pair.pred==SemanticContext.NONE ) {
 				predictions.set(pair.alt);
 				if (!complete) {
 					break;
