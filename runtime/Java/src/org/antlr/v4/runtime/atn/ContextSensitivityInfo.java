@@ -49,6 +49,8 @@ import org.antlr.v4.runtime.misc.NotNull;
  *
  * @see ParserATNSimulator#reportContextSensitivity
  * @see ANTLRErrorListener#reportContextSensitivity
+ *
+ * @since 4.3
  */
 public class ContextSensitivityInfo extends DecisionEventInfo {
 	/**

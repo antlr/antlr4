@@ -260,9 +260,6 @@ public class Rule implements AttributeResolver {
 	/** $x.y	Attribute: x is surrounding rule, label ref (in any alts) */
 	@Override
 	public Attribute resolveToAttribute(String x, String y, ActionAST node) {
-		if ( this.name.equals(x) ) { // x is this rule?
-			return resolveToAttribute(y, node);
-		}
 		LabelElementPair anyLabelDef = getAnyLabelDef(x);
 		if ( anyLabelDef!=null ) {
 			if ( anyLabelDef.type==LabelType.RULE_LABEL ) {
@@ -307,7 +304,6 @@ public class Rule implements AttributeResolver {
 	@Override
 	public boolean resolvesToAttributeDict(String x, ActionAST node) {
 		if ( resolvesToToken(x, node) ) return true;
-		if ( x.equals(name) ) return true; // $r for action in rule r, $r is a dict
 		return false;
 	}
 

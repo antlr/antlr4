@@ -79,7 +79,7 @@ public class TestAttributeChecks extends BaseTest {
 		"$x = $y",		"",
 		"$y = $x",		"",
 		"$y.b = 3;",	"",
-		"$a.x = $a.y",	"",
+		"$ctx.x = $ctx.y",	"",
 		"$lab.e",		"",
 		"$lab.text",	"",
 		"$b.e",			"",

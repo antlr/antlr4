@@ -908,6 +908,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return null;
 	}
 
+	/**
+	 * @since 4.3
+	 */
 	public void setProfile(boolean profile) {
 		ParserATNSimulator interp = getInterpreter();
 		if ( profile ) {

@@ -31,6 +31,7 @@
 package org.antlr.v4.test;
 
 import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.junit.Test;
 
@@ -42,21 +43,26 @@ public class TestIntervalSet extends BaseTest {
 
     /** Public default constructor used by TestRig */
     public TestIntervalSet() {
-    }
+	}
 
-    @Test
-	public void testSingleElement() throws Exception {
-        IntervalSet s = IntervalSet.of(99);
-        String expecting = "99";
-        assertEquals(s.toString(), expecting);
-    }
+	@Test public void testSingleElement() throws Exception {
+		IntervalSet s = IntervalSet.of(99);
+		String expecting = "99";
+		assertEquals(s.toString(), expecting);
+	}
 
-    @Test public void testIsolatedElements() throws Exception {
-        IntervalSet s = new IntervalSet();
-        s.add(1);
-        s.add('z');
-        s.add('\uFFF0');
-        String expecting = "{1, 122, 65520}";
+	@Test public void testMin() throws Exception {
+		assertEquals(0, IntervalSet.COMPLETE_CHAR_SET.getMinElement());
+		assertEquals(Token.EPSILON, IntervalSet.COMPLETE_CHAR_SET.or(IntervalSet.of(Token.EPSILON)).getMinElement());
+		assertEquals(Token.EOF, IntervalSet.COMPLETE_CHAR_SET.or(IntervalSet.of(Token.EOF)).getMinElement());
+	}
+
+	@Test public void testIsolatedElements() throws Exception {
+		IntervalSet s = new IntervalSet();
+		s.add(1);
+		s.add('z');
+		s.add('\uFFF0');
+		String expecting = "{1, 122, 65520}";
         assertEquals(s.toString(), expecting);
     }
 
@@ -140,7 +146,7 @@ public class TestIntervalSet extends BaseTest {
         IntervalSet vocabulary = IntervalSet.of(1,255);
         vocabulary.add(1000,2000);
         vocabulary.add(9999);
-        IntervalSet s = IntervalSet.of(50,60);
+        IntervalSet s = IntervalSet.of(50, 60);
         s.add(3);
         s.add(250,300);
         s.add(10000); // this is outside range of vocab and should be ignored
@@ -157,10 +163,19 @@ public class TestIntervalSet extends BaseTest {
         assertEquals(expecting, result);
     }
 
-    @Test public void testSubtractOfOverlappingRangeFromLeft() throws Exception {
-        IntervalSet s = IntervalSet.of(10,20);
-        IntervalSet s2 = IntervalSet.of(5,11);
-        String expecting = "{12..20}";
+	@Test public void testSubtractFromSetWithEOF() throws Exception {
+		IntervalSet s = IntervalSet.of(10,20);
+		s.add(Token.EOF);
+		IntervalSet s2 = IntervalSet.of(12,15);
+		String expecting = "{<EOF>, 10..11, 16..20}";
+		String result = (s.subtract(s2)).toString();
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testSubtractOfOverlappingRangeFromLeft() throws Exception {
+		IntervalSet s = IntervalSet.of(10,20);
+		IntervalSet s2 = IntervalSet.of(5,11);
+		String expecting = "{12..20}";
         String result = (s.subtract(s2)).toString();
         assertEquals(expecting, result);
 

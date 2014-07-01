@@ -97,6 +97,8 @@ public abstract class ATNSimulator {
 	 *
 	 * @throws UnsupportedOperationException if the current instance does not
 	 * support clearing the DFA.
+	 *
+	 * @since 4.3
 	 */
 	public void clearDFA() {
 		atn.clearDFA();

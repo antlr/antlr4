@@ -39,6 +39,8 @@ import java.util.List;
 /**
  * This class provides access to specific and aggregate statistics gathered
  * during profiling of a parser.
+ *
+ * @since 4.3
  */
 public class ParseInfo {
 	protected final ProfilingATNSimulator atnSimulator;

@@ -9,7 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tunnelvisionlabs</groupId>
     <artifactId>antlr4-master</artifactId>
-    <version>4.2.3-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>ANTLR 4</name>

@@ -43,6 +43,8 @@ import java.util.List;
  * operations are started). For best results, gather and use aggregate
  * statistics from a large sample of inputs representing the inputs expected in
  * production before using the results to make changes in the grammar.</p>
+ *
+ * @since 4.3
  */
 public class DecisionInfo {
 	/**
@@ -91,7 +93,7 @@ public class DecisionInfo {
 	public long SLL_MaxLook;
 	/**
 	 * Gets the {@link LookaheadEventInfo} associated with the event where the
-	 * {@link #sllMaxLook} value was set.
+	 * {@link #SLL_MaxLook} value was set.
 	 */
 	public LookaheadEventInfo SLL_MaxLookEvent;
 

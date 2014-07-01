@@ -1627,6 +1627,8 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * @param parserCallStack The parser context in which to evaluate the
 	 * semantic context
 	 * @param alt The alternative which is guarded by {@code pred}
+	 *
+	 * @since 4.3
 	 */
 	protected boolean evalSemanticContext(@NotNull SemanticContext pred, ParserRuleContext parserCallStack, int alt) {
 		return pred.eval(parser, parserCallStack);
@@ -2397,6 +2399,9 @@ public class ParserATNSimulator extends ATNSimulator {
 		return context;
 	}
 
+	/**
+	 * @since 4.3
+	 */
 	public Parser getParser() {
 		return parser;
 	}

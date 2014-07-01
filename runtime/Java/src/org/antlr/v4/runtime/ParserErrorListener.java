@@ -30,6 +30,7 @@
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.atn.DecisionInfo;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.atn.SimulatorState;
@@ -46,27 +47,37 @@ public interface ParserErrorListener extends ANTLRErrorListener<Token> {
 	 * This method is called by the parser when a full-context prediction
 	 * results in an ambiguity.
 	 *
-	 * <p>When {@code exact} is {@code true}, <em>all</em> of the alternatives in
-	 * {@code ambigAlts} are viable, i.e. this is reporting an exact ambiguity.
-	 * When {@code exact} is {@code false}, <em>at least two</em> of the
-	 * alternatives in {@code ambigAlts} are viable for the current input, but
-	 * the prediction algorithm terminated as soon as it determined that at
-	 * least the <em>minimum</em> alternative in {@code ambigAlts} is viable.</p>
+	 * <p>Each full-context prediction which does not result in a syntax error
+	 * will call either {@link #reportContextSensitivity} or
+	 * {@link #reportAmbiguity}.</p>
 	 *
-	 * <p>When the {@link PredictionMode#LL_EXACT_AMBIG_DETECTION} prediction mode
-	 * is used, the parser is required to identify exact ambiguities so
+	 * <p>When {@code ambigAlts} is not null, it contains the set of potentially
+	 * viable alternatives identified by the prediction algorithm. When
+	 * {@code ambigAlts} is null, use {@link ATNConfigSet#getAlts} to obtain the
+	 * represented alternatives from the {@code configs} argument.</p>
+	 *
+	 * <p>When {@code exact} is {@code true}, <em>all</em> of the potentially
+	 * viable alternatives are truly viable, i.e. this is reporting an exact
+	 * ambiguity. When {@code exact} is {@code false}, <em>at least two</em> of
+	 * the potentially viable alternatives are viable for the current input, but
+	 * the prediction algorithm terminated as soon as it determined that at
+	 * least the <em>minimum</em> potentially viable alternative is truly
+	 * viable.</p>
+	 *
+	 * <p>When the {@link PredictionMode#LL_EXACT_AMBIG_DETECTION} prediction
+	 * mode is used, the parser is required to identify exact ambiguities so
 	 * {@code exact} will always be {@code true}.</p>
 	 *
 	 * @param recognizer the parser instance
 	 * @param dfa the DFA for the current decision
 	 * @param startIndex the input index where the decision started
-	 * @param stopIndex the input input where the ambiguity is reported
+	 * @param stopIndex the input input where the ambiguity was identified
 	 * @param exact {@code true} if the ambiguity is exactly known, otherwise
 	 * {@code false}. This is always {@code true} when
 	 * {@link PredictionMode#LL_EXACT_AMBIG_DETECTION} is used.
 	 * @param ambigAlts the potentially ambiguous alternatives
 	 * @param configs the ATN configuration set where the ambiguity was
-	 * determined
+	 * identified
 	 */
 	void reportAmbiguity(@NotNull Parser recognizer,
 						 @NotNull DFA dfa,
@@ -106,6 +117,10 @@ public interface ParserErrorListener extends ANTLRErrorListener<Token> {
 	 * This method is called by the parser when a full-context prediction has a
 	 * unique result.
 	 *
+	 * <p>Each full-context prediction which does not result in a syntax error
+	 * will call either {@link #reportContextSensitivity} or
+	 * {@link #reportAmbiguity}.</p>
+	 *
 	 * <p>For prediction implementations that only evaluate full-context
 	 * predictions when an SLL conflict is found (including the default
 	 * {@link ParserATNSimulator} implementation), this method reports cases
@@ -118,6 +133,12 @@ public interface ParserErrorListener extends ANTLRErrorListener<Token> {
 	 * full-context prediction algorithm does not evaluate predicates before
 	 * beginning the full-context prediction. In all cases, the final prediction
 	 * is passed as the {@code prediction} argument.</p>
+	 *
+	 * <p>Note that the definition of "context sensitivity" in this method
+	 * differs from the concept in {@link DecisionInfo#contextSensitivities}.
+	 * This method reports all instances where an SLL conflict occurred but LL
+	 * parsing produced a unique result, whether or not that unique result
+	 * matches the minimum alternative in the SLL conflicting set.</p>
 	 *
 	 * @param recognizer the parser instance
 	 * @param dfa the DFA for the current decision

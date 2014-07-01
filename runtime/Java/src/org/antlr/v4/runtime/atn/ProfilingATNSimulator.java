@@ -40,6 +40,9 @@ import org.antlr.v4.runtime.misc.Tuple2;
 
 import java.util.BitSet;
 
+/**
+ * @since 4.3
+ */
 public class ProfilingATNSimulator extends ParserATNSimulator {
 	protected final DecisionInfo[] decisions;
 	protected int numDecisions;

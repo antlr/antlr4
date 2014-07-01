@@ -32,7 +32,7 @@
     </target>
 
     <target name="build-init" depends="basic-init">
-        <property name="version" value="4.3-opt-dev"/>
+        <property name="version" value="4.3-opt-SNAPSHOT"/>
         <property name="build.sysclasspath" value="ignore"/>
         <property name="install.root.dir" value="${dist.dir}/antlr-${version}" />
         <property name="jar.file" value="${dist.dir}/antlr-${version}-complete.jar" />

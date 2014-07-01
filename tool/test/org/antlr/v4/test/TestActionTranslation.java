@@ -120,25 +120,25 @@ public class TestActionTranslation extends BaseTest {
 	}
 
 	@Test public void testArguments() throws Exception {
-		String action = "$x; $a.x";
+		String action = "$x; $ctx.x";
 		String expected = "_localctx.x; _localctx.x";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
 
 	@Test public void testReturnValue() throws Exception {
-		String action = "$x; $a.x";
-		String expected = "_localctx.x; _localctx.x";
+		String action = "$y; $ctx.y";
+		String expected = "_localctx.y; _localctx.y";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
 
 	@Test public void testReturnValueWithNumber() throws Exception {
-		String action = "$a.x1";
+		String action = "$ctx.x1";
 		String expected = "_localctx.x1";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
 
 	@Test public void testReturnValuesCurrentRule() throws Exception {
-		String action = "$y; $a.y;";
+		String action = "$y; $ctx.y;";
 		String expected = "_localctx.y; _localctx.y;";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
@@ -168,11 +168,11 @@ public class TestActionTranslation extends BaseTest {
     }
 
 	@Test public void testRefToTextAttributeForCurrentRule() throws Exception {
-        String action = "$a.text; $text";
+        String action = "$ctx.text; $text";
 
 		// this is the expected translation for all cases
 		String expected =
-			"_input.getText(_localctx.start, _input.LT(-1)); _input.getText(_localctx.start, _input.LT(-1))";
+			"_localctx.text; _input.getText(_localctx.start, _input.LT(-1))";
 
 		testActions(attributeTemplate, "init", action, expected);
 		testActions(attributeTemplate, "inline", action, expected);

@@ -207,6 +207,8 @@ public abstract class SemanticContext {
 	/**
 	 * This is the base class for semantic context "operators", which operate on
 	 * a collection of semantic context "operands".
+	 *
+	 * @since 4.3
 	 */
 	public static abstract class Operator extends SemanticContext {
 		/**
@@ -214,6 +216,8 @@ public abstract class SemanticContext {
 		 *
 		 * @return a collection of {@link SemanticContext} operands for the
 		 * operator.
+		 *
+		 * @since 4.3
 		 */
 		@NotNull
 		public abstract Collection<SemanticContext> getOperands();

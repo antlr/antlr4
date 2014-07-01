@@ -91,7 +91,6 @@ public class Alternative implements AttributeResolver {
         if ( ruleRefs.get(x)!=null ) return true; // rule ref in this alt?
         LabelElementPair anyLabelDef = getAnyLabelDef(x);
         if ( anyLabelDef!=null && anyLabelDef.type==LabelType.RULE_LABEL ) return true;
-		if ( x.equals(rule.name) ) return true; // $r for action in rule r, $r is a dict
 		return false;
 	}
 
@@ -107,9 +106,6 @@ public class Alternative implements AttributeResolver {
 	 */
 	@Override
 	public Attribute resolveToAttribute(String x, String y, ActionAST node) {
-		if ( rule.name.equals(x) ) { // x is this rule?
-			return rule.resolveToAttribute(x, y, node);
-		}
         if ( tokenRefs.get(x)!=null ) { // token ref in this alt?
             return rule.getPredefinedScope(LabelType.TOKEN_LABEL).get(y);
         }
@@ -161,7 +157,6 @@ public class Alternative implements AttributeResolver {
 		if ( anyLabelDef!=null && anyLabelDef.type==LabelType.RULE_LABEL ) {
             return rule.g.getRule(anyLabelDef.element.getText());
         }
-		if ( x.equals(rule.name) ) return rule;
         return null;
     }
 }
