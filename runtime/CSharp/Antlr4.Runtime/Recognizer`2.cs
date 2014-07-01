@@ -206,6 +206,20 @@ namespace Antlr4.Runtime
             }
         }
 
+        /// <summary>
+        /// If profiling during the parse/lex, this will return DecisionInfo records
+        /// for each decision in recognizer in a ParseInfo object.
+        /// </summary>
+        /// <remarks>
+        /// If profiling during the parse/lex, this will return DecisionInfo records
+        /// for each decision in recognizer in a ParseInfo object.
+        /// </remarks>
+        /// <since>4.3</since>
+        public virtual ParseInfo GetParseInfo()
+        {
+            return null;
+        }
+
         /// <summary>What is the error header, normally line/character position information?</summary>
         [return: NotNull]
         public virtual string GetErrorHeader(RecognitionException e)

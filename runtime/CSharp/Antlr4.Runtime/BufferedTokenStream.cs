@@ -461,26 +461,25 @@ namespace Antlr4.Runtime
         /// <code>i</code>
         /// if
         /// <code>tokens[i]</code>
-        /// is on channel.  Return
-        /// <code>-1</code>
-        /// if there are no tokens
-        /// on channel between
+        /// is on channel. Return the index of
+        /// the EOF token if there are no tokens on channel between
         /// <code>i</code>
-        /// and EOF.
+        /// and
+        /// EOF.
         /// </remarks>
         protected internal virtual int NextTokenOnChannel(int i, int channel)
         {
             Sync(i);
-            IToken token = tokens[i];
             if (i >= Size)
             {
-                return -1;
+                return Size - 1;
             }
+            IToken token = tokens[i];
             while (token.Channel != channel)
             {
                 if (token.Type == TokenConstants.Eof)
                 {
-                    return -1;
+                    return i;
                 }
                 i++;
                 Sync(i);
@@ -489,26 +488,42 @@ namespace Antlr4.Runtime
             return i;
         }
 
-        /// <summary>Given a starting index, return the index of the previous token on channel.</summary>
+        /// <summary>
+        /// Given a starting index, return the index of the previous token on
+        /// channel.
+        /// </summary>
         /// <remarks>
-        /// Given a starting index, return the index of the previous token on channel.
-        /// Return
+        /// Given a starting index, return the index of the previous token on
+        /// channel. Return
         /// <code>i</code>
         /// if
         /// <code>tokens[i]</code>
-        /// is on channel. Return
-        /// <code>-1</code>
-        /// if there are no tokens
-        /// on channel between
+        /// is on channel. Return -1
+        /// if there are no tokens on channel between
         /// <code>i</code>
-        /// and
-        /// <code>0</code>
-        /// .
+        /// and 0.
+        /// <p>
+        /// If
+        /// <code>i</code>
+        /// specifies an index at or after the EOF token, the EOF token
+        /// index is returned. This is due to the fact that the EOF token is treated
+        /// as though it were on every channel.</p>
         /// </remarks>
         protected internal virtual int PreviousTokenOnChannel(int i, int channel)
         {
-            while (i >= 0 && tokens[i].Channel != channel)
+            Sync(i);
+            if (i >= Size)
             {
+                // the EOF token is on every channel
+                return Size - 1;
+            }
+            while (i >= 0)
+            {
+                IToken token = tokens[i];
+                if (token.Type == TokenConstants.Eof || token.Channel == channel)
+                {
+                    return i;
+                }
                 i--;
             }
             return i;
@@ -575,6 +590,11 @@ namespace Antlr4.Runtime
             if (tokenIndex < 0 || tokenIndex >= tokens.Count)
             {
                 throw new ArgumentOutOfRangeException(tokenIndex + " not in 0.." + (tokens.Count - 1));
+            }
+            if (tokenIndex == 0)
+            {
+                // obviously no tokens can appear before the first token
+                return null;
             }
             int prevOnChannel = PreviousTokenOnChannel(tokenIndex - 1, Lexer.DefaultTokenChannel);
             if (prevOnChannel == tokenIndex - 1)
