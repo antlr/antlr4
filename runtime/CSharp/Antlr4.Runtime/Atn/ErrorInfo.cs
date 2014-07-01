@@ -43,8 +43,8 @@ namespace Antlr4.Runtime.Atn
     /// algorithm is unable to identify an alternative which would lead to a
     /// successful parse.
     /// </remarks>
-    /// <seealso cref="Antlr4.Runtime.Parser.NotifyErrorListeners(Antlr4.Runtime.IToken, string, Antlr4.Runtime.RecognitionException)">Antlr4.Runtime.Parser.NotifyErrorListeners(Antlr4.Runtime.IToken, string, Antlr4.Runtime.RecognitionException)</seealso>
-    /// <seealso cref="Antlr4.Runtime.IANTLRErrorListener{Symbol}.SyntaxError{T}(Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}, object, int, int, string, Antlr4.Runtime.RecognitionException)">Antlr4.Runtime.IANTLRErrorListener&lt;Symbol&gt;.SyntaxError&lt;T&gt;(Antlr4.Runtime.Recognizer&lt;Symbol, ATNInterpreter&gt;, object, int, int, string, Antlr4.Runtime.RecognitionException)</seealso>
+    /// <seealso cref="Parser.NotifyErrorListeners(IToken, string, RecognitionException)"/>
+    /// <seealso cref="IAntlrErrorListener{TSymbol}.SyntaxError"/>
     /// <since>4.3</since>
     public class ErrorInfo : DecisionEventInfo
     {

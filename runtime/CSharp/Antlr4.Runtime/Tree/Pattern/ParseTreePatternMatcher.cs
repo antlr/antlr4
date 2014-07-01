@@ -95,7 +95,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// object that
     /// contains the parse tree, the parse tree pattern, and a map from tag name to
     /// matched nodes (more below). A subtree that fails to match, returns with
-    /// <see cref="ParseTreeMatch.mismatchedNode"/>
+    /// <see cref="ParseTreeMatch.GetMismatchedNode"/>
     /// set to the first tree node that did not
     /// match.</p>
     /// <p>For efficiency, you can compile a tree pattern in string form to a
@@ -391,7 +391,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <code>patternTree</code>
         /// , filling
         /// <code>match.</code>
-        /// <see cref="ParseTreeMatch.labels"/>
+        /// <see cref="ParseTreeMatch.GetLabels"/>
         /// .
         /// </summary>
         /// <returns>

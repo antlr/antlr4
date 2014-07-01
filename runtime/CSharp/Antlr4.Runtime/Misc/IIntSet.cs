@@ -244,7 +244,7 @@ namespace Antlr4.Runtime.Misc
         /// <see cref="Size()">Size()</see>
         /// is 1;
         /// otherwise, returns
-        /// <see cref="Antlr4.Runtime.IToken.InvalidType">Antlr4.Runtime.IToken.InvalidType</see>
+        /// <see cref="TokenConstants.InvalidType"/>
         /// .
         /// </summary>
         /// <returns>
@@ -252,7 +252,7 @@ namespace Antlr4.Runtime.Misc
         /// <see cref="Size()">Size()</see>
         /// is 1;
         /// otherwise, returns
-        /// <see cref="Antlr4.Runtime.IToken.InvalidType">Antlr4.Runtime.IToken.InvalidType</see>
+        /// <see cref="TokenConstants.InvalidType"/>
         /// .
         /// </returns>
         int GetSingleElement();

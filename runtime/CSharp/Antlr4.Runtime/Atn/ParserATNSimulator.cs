@@ -1709,13 +1709,13 @@ namespace Antlr4.Runtime.Atn
         /// evaluate the following but it may change in the future:</p>
         /// <ul>
         /// <li>Precedence predicates (represented by
-        /// <see cref="PrecedencePredicate">PrecedencePredicate</see>
+        /// <see cref="SemanticContext.PrecedencePredicate"/>
         /// ) are not currently evaluated
         /// through this method.</li>
         /// <li>Operator predicates (represented by
-        /// <see cref="AND">AND</see>
+        /// <see cref="SemanticContext.AND"/>
         /// and
-        /// <see cref="OR">OR</see>
+        /// <see cref="SemanticContext.OR"/>
         /// ) are evaluated as a single semantic
         /// context, rather than evaluating the operands individually.
         /// Implementations which require evaluation results from individual
