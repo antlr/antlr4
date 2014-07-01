@@ -10,7 +10,6 @@
     using Antlr4.Runtime.Misc;
     using Antlr4.Runtime.Tree;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Arrays = Sharpen.Arrays;
     using BitSet = Sharpen.BitSet;
     using Checksum = Sharpen.Checksum;
     using CRC32 = Sharpen.CRC32;
@@ -252,8 +251,10 @@
                         sharedParsers[0].Atn.ClearDFA();
                     }
 
-                    Arrays.Fill(sharedLexers, null);
-                    Arrays.Fill(sharedParsers, null);
+                    for (int j = 0; j < sharedLexers.Length; j++)
+                        sharedLexers[j] = null;
+                    for (int j = 0; j < sharedParsers.Length; j++)
+                        sharedParsers[j] = null;
                 }
 
                 parse2(factory, sources);
@@ -1053,7 +1054,7 @@
             }
         }
 
-        protected class ChecksumParseTreeListener : IParseTreeListener
+        internal class ChecksumParseTreeListener : IParseTreeListener
         {
             private const int VISIT_TERMINAL = 1;
             private const int VISIT_ERROR_NODE = 2;

@@ -31,7 +31,7 @@ namespace Sharpen
 {
     using System.Collections.Generic;
 
-    public static class ListExtensions
+    internal static class ListExtensions
     {
         public static T Set<T>(this IList<T> list, int index, T value)
             where T : class

@@ -33,7 +33,7 @@ using System.Collections;
 
 namespace Sharpen
 {
-	public interface IStructuralComparable {
+	internal interface IStructuralComparable {
 		int CompareTo (object other, IComparer comparer);
 	}
 }

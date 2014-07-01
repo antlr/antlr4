@@ -2,7 +2,7 @@
 {
     using System;
 
-    public class CRC32 : Checksum
+    internal class CRC32 : Checksum
     {
         private uint _crc;
 
