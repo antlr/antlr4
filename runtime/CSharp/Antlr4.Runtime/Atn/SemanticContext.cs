@@ -271,7 +271,7 @@ namespace Antlr4.Runtime.Atn
             /// operator.
             /// </returns>
             /// <since>4.3</since>
-            [NotNull]
+            [return: NotNull]
             public abstract ICollection<SemanticContext> GetOperands();
         }
 

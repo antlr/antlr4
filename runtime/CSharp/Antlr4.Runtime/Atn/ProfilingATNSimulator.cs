@@ -32,6 +32,7 @@ using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Sharpen;
+using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -96,11 +97,10 @@ namespace Antlr4.Runtime.Atn
                 this.currentDecision = decision;
                 this.currentState = null;
                 this.conflictingAltResolvedBySLL = ATN.InvalidAltNumber;
-                long start = Sharpen.Runtime.NanoTime();
+                Stopwatch stopwatch = Stopwatch.StartNew();
                 // expensive but useful info
                 int alt = base.AdaptivePredict(input, decision, outerContext);
-                long stop = Sharpen.Runtime.NanoTime();
-                decisions[decision].timeInPrediction += (stop - start);
+                decisions[decision].timeInPrediction += stopwatch.ElapsedTicks * 100;
                 decisions[decision].invocations++;
                 int SLL_k = _sllStopIndex - _startIndex + 1;
                 decisions[decision].SLL_TotalLook += SLL_k;
@@ -150,7 +150,7 @@ namespace Antlr4.Runtime.Atn
             if (reachState == null)
             {
                 // no reach on current lookahead symbol. ERROR.
-                decisions[currentDecision].errors.AddItem(new ErrorInfo(currentDecision, previous, _input, _startIndex, _input.Index));
+                decisions[currentDecision].errors.Add(new ErrorInfo(currentDecision, previous, _input, _startIndex, _input.Index));
             }
             currentState = reachState;
             return reachState;
@@ -185,7 +185,7 @@ namespace Antlr4.Runtime.Atn
                 if (existingTargetState == Error)
                 {
                     SimulatorState state = new SimulatorState(currentState.outerContext, previousD, currentState.useContext, currentState.remainingOuterContext);
-                    decisions[currentDecision].errors.AddItem(new ErrorInfo(currentDecision, state, _input, _startIndex, _input.Index));
+                    decisions[currentDecision].errors.Add(new ErrorInfo(currentDecision, state, _input, _startIndex, _input.Index));
                 }
             }
             return existingTargetState;
@@ -212,7 +212,7 @@ namespace Antlr4.Runtime.Atn
             {
                 bool fullContext = _llStopIndex >= 0;
                 int stopIndex = fullContext ? _llStopIndex : _sllStopIndex;
-                decisions[currentDecision].predicateEvals.AddItem(new PredicateEvalInfo(currentState, currentDecision, _input, _startIndex, stopIndex, pred, result, alt));
+                decisions[currentDecision].predicateEvals.Add(new PredicateEvalInfo(currentState, currentDecision, _input, _startIndex, stopIndex, pred, result, alt));
             }
             return result;
         }
@@ -221,7 +221,7 @@ namespace Antlr4.Runtime.Atn
         {
             if (prediction != conflictingAltResolvedBySLL)
             {
-                decisions[currentDecision].contextSensitivities.AddItem(new ContextSensitivityInfo(currentDecision, acceptState, _input, startIndex, stopIndex));
+                decisions[currentDecision].contextSensitivities.Add(new ContextSensitivityInfo(currentDecision, acceptState, _input, startIndex, stopIndex));
             }
             base.ReportContextSensitivity(dfa, prediction, acceptState, startIndex, stopIndex);
         }
@@ -258,9 +258,9 @@ namespace Antlr4.Runtime.Atn
                 // are showing a conflict, hence an ambiguity, but if they resolve
                 // to different minimum alternatives we have also identified a
                 // context sensitivity.
-                decisions[currentDecision].contextSensitivities.AddItem(new ContextSensitivityInfo(currentDecision, currentState, _input, startIndex, stopIndex));
+                decisions[currentDecision].contextSensitivities.Add(new ContextSensitivityInfo(currentDecision, currentState, _input, startIndex, stopIndex));
             }
-            decisions[currentDecision].ambiguities.AddItem(new AmbiguityInfo(currentDecision, currentState, _input, startIndex, stopIndex));
+            decisions[currentDecision].ambiguities.Add(new AmbiguityInfo(currentDecision, currentState, _input, startIndex, stopIndex));
             base.ReportAmbiguity(dfa, D, startIndex, stopIndex, exact, ambigAlts, configs);
         }
 

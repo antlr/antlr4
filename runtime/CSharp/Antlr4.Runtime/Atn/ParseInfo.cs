@@ -65,7 +65,7 @@ namespace Antlr4.Runtime.Atn
         /// instances, indexed by decision
         /// number.
         /// </returns>
-        [NotNull]
+        [return: NotNull]
         public virtual DecisionInfo[] GetDecisionInfo()
         {
             return atnSimulator.GetDecisionInfo();
@@ -85,7 +85,7 @@ namespace Antlr4.Runtime.Atn
         /// A list of decision numbers which required one or more
         /// full-context predictions during parsing.
         /// </returns>
-        [NotNull]
+        [return: NotNull]
         public virtual IList<int> GetLLDecisions()
         {
             DecisionInfo[] decisions = atnSimulator.GetDecisionInfo();
@@ -95,7 +95,7 @@ namespace Antlr4.Runtime.Atn
                 long fallBack = decisions[i].LL_Fallback;
                 if (fallBack > 0)
                 {
-                    Ll.AddItem(i);
+                    Ll.Add(i);
                 }
             }
             return Ll;

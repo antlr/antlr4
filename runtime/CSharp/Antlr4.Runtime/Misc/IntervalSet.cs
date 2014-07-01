@@ -57,15 +57,11 @@ namespace Antlr4.Runtime.Misc
     {
         public static readonly Antlr4.Runtime.Misc.IntervalSet CompleteCharSet = Antlr4.Runtime.Misc.IntervalSet.Of(Lexer.MinCharValue, Lexer.MaxCharValue);
 
-        static IntervalSet()
-        {
-            CompleteCharSet.SetReadonly(true);
-        }
-
         public static readonly Antlr4.Runtime.Misc.IntervalSet EmptySet = new Antlr4.Runtime.Misc.IntervalSet();
 
         static IntervalSet()
         {
+            CompleteCharSet.SetReadonly(true);
             EmptySet.SetReadonly(true);
         }
 
@@ -309,7 +305,7 @@ namespace Antlr4.Runtime.Misc
         /// <code>null</code>
         /// , it is treated as though it was an empty set.
         /// </remarks>
-        [NotNull]
+        [return: NotNull]
         public static Antlr4.Runtime.Misc.IntervalSet Subtract(Antlr4.Runtime.Misc.IntervalSet left, Antlr4.Runtime.Misc.IntervalSet right)
         {
             if (left == null || left.IsNil())
@@ -339,8 +335,8 @@ namespace Antlr4.Runtime.Misc
                     resultI++;
                     continue;
                 }
-                Interval beforeCurrent = null;
-                Interval afterCurrent = null;
+                Interval? beforeCurrent = null;
+                Interval? afterCurrent = null;
                 if (rightInterval.a > resultInterval.a)
                 {
                     beforeCurrent = new Interval(resultInterval.a, rightInterval.a - 1);
@@ -354,8 +350,8 @@ namespace Antlr4.Runtime.Misc
                     if (afterCurrent != null)
                     {
                         // split the current interval into two
-                        result.intervals.Set(resultI, beforeCurrent);
-                        result.intervals.Add(resultI + 1, afterCurrent);
+                        result.intervals[resultI] = beforeCurrent.Value;
+                        result.intervals.Insert(resultI + 1, afterCurrent.Value);
                         resultI++;
                         rightI++;
                         continue;
@@ -363,7 +359,7 @@ namespace Antlr4.Runtime.Misc
                     else
                     {
                         // replace the current interval
-                        result.intervals.Set(resultI, beforeCurrent);
+                        result.intervals[resultI] = beforeCurrent.Value;
                         resultI++;
                         continue;
                     }
@@ -373,7 +369,7 @@ namespace Antlr4.Runtime.Misc
                     if (afterCurrent != null)
                     {
                         // replace the current interval
-                        result.intervals.Set(resultI, afterCurrent);
+                        result.intervals[resultI] = afterCurrent.Value;
                         rightI++;
                         continue;
                     }
