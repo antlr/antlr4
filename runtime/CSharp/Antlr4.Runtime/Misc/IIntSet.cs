@@ -220,7 +220,10 @@ namespace Antlr4.Runtime.Misc
         /// the total number of elements represented by the current set,
         /// regardless of the manner in which the elements are stored.
         /// </returns>
-        int Size();
+        int Count
+        {
+            get;
+        }
 
         /// <summary>
         /// Returns
@@ -234,14 +237,17 @@ namespace Antlr4.Runtime.Misc
         /// <code>false</code>
         /// .
         /// </returns>
-        bool IsNil();
+        bool IsNil
+        {
+            get;
+        }
 
         /// <summary><inheritDoc></inheritDoc></summary>
         bool Equals(object obj);
 
         /// <summary>
         /// Returns the single value contained in the set, if
-        /// <see cref="Size()">Size()</see>
+        /// <see cref="Count()">Count()</see>
         /// is 1;
         /// otherwise, returns
         /// <see cref="Antlr4.Runtime.IToken.InvalidType">Antlr4.Runtime.IToken.InvalidType</see>
@@ -249,13 +255,16 @@ namespace Antlr4.Runtime.Misc
         /// </summary>
         /// <returns>
         /// the single value contained in the set, if
-        /// <see cref="Size()">Size()</see>
+        /// <see cref="Count()">Count()</see>
         /// is 1;
         /// otherwise, returns
         /// <see cref="Antlr4.Runtime.IToken.InvalidType">Antlr4.Runtime.IToken.InvalidType</see>
         /// .
         /// </returns>
-        int GetSingleElement();
+        int SingleElement
+        {
+            get;
+        }
 
         /// <summary>
         /// Returns

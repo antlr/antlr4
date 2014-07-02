@@ -127,7 +127,7 @@ namespace Antlr4.Runtime
         /// This is the backing field for
         /// <see cref="StartIndex()">StartIndex()</see>
         /// and
-        /// <see cref="SetStartIndex(int)">SetStartIndex(int)</see>
+        /// <see cref="StartIndex(int)">StartIndex(int)</see>
         /// .
         /// </summary>
         protected internal int start;
@@ -136,7 +136,7 @@ namespace Antlr4.Runtime
         /// This is the backing field for
         /// <see cref="StopIndex()">StopIndex()</see>
         /// and
-        /// <see cref="SetStopIndex(int)">SetStopIndex(int)</see>
+        /// <see cref="StopIndex(int)">StopIndex(int)</see>
         /// .
         /// </summary>
         protected internal int stop;
@@ -342,11 +342,11 @@ namespace Antlr4.Runtime
             {
                 return start;
             }
-        }
-
-        public virtual void SetStartIndex(int start)
-        {
-            this.start = start;
+            set
+            {
+                int start = value;
+                this.start = start;
+            }
         }
 
         public virtual int StopIndex
@@ -355,11 +355,11 @@ namespace Antlr4.Runtime
             {
                 return stop;
             }
-        }
-
-        public virtual void SetStopIndex(int stop)
-        {
-            this.stop = stop;
+            set
+            {
+                int stop = value;
+                this.stop = stop;
+            }
         }
 
         public virtual int TokenIndex

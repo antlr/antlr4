@@ -72,9 +72,12 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="Antlr4.Runtime.IToken">Antlr4.Runtime.IToken</see>
         /// created by the lexer.
         /// </returns>
-        public int GetChannel()
+        public int Channel
         {
-            return channel;
+            get
+            {
+                return channel;
+            }
         }
 
         /// <summary><inheritDoc></inheritDoc></summary>
@@ -83,9 +86,12 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="LexerActionType.Channel">LexerActionType.Channel</see>
         /// .
         /// </returns>
-        public LexerActionType GetActionType()
+        public LexerActionType ActionType
         {
-            return LexerActionType.Channel;
+            get
+            {
+                return LexerActionType.Channel;
+            }
         }
 
         /// <summary><inheritDoc></inheritDoc></summary>
@@ -94,9 +100,12 @@ namespace Antlr4.Runtime.Atn
         /// <code>false</code>
         /// .
         /// </returns>
-        public bool IsPositionDependent()
+        public bool IsPositionDependent
         {
-            return false;
+            get
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -105,7 +114,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="Antlr4.Runtime.Lexer.Channel(int)">Antlr4.Runtime.Lexer.Channel(int)</see>
         /// with the
         /// value provided by
-        /// <see cref="GetChannel()">GetChannel()</see>
+        /// <see cref="Channel()">Channel()</see>
         /// .</p>
         /// </summary>
         public void Execute(Lexer lexer)
@@ -116,7 +125,7 @@ namespace Antlr4.Runtime.Atn
         public override int GetHashCode()
         {
             int hash = MurmurHash.Initialize();
-            hash = MurmurHash.Update(hash, (int)(GetActionType()));
+            hash = MurmurHash.Update(hash, (int)(ActionType));
             hash = MurmurHash.Update(hash, channel);
             return MurmurHash.Finish(hash, 2);
         }

@@ -62,14 +62,20 @@ namespace Antlr4.Runtime.Dfa
             }
         }
 
-        public virtual int GetKey()
+        public virtual int Key
         {
-            return key;
+            get
+            {
+                return key;
+            }
         }
 
-        public virtual T GetValue()
+        public virtual T Value
         {
-            return value;
+            get
+            {
+                return value;
+            }
         }
 
         public override int Count

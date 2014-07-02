@@ -101,9 +101,12 @@ namespace Antlr4.Runtime.Atn
         /// at which the lexer
         /// action should be executed.
         /// </returns>
-        public int GetOffset()
+        public int Offset
         {
-            return offset;
+            get
+            {
+                return offset;
+            }
         }
 
         /// <summary>Gets the lexer action to execute.</summary>
@@ -113,25 +116,30 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="ILexerAction">ILexerAction</see>
         /// object which executes the lexer action.
         /// </returns>
-        [NotNull]
-        public ILexerAction GetAction()
+        public ILexerAction Action
         {
-            return action;
+            get
+            {
+                return action;
+            }
         }
 
         /// <summary><inheritDoc></inheritDoc></summary>
         /// <returns>
         /// This method returns the result of calling
-        /// <see cref="GetActionType()">GetActionType()</see>
+        /// <see cref="ActionType()">ActionType()</see>
         /// on the
         /// <see cref="ILexerAction">ILexerAction</see>
         /// returned by
-        /// <see cref="GetAction()">GetAction()</see>
+        /// <see cref="Action()">Action()</see>
         /// .
         /// </returns>
-        public LexerActionType GetActionType()
+        public LexerActionType ActionType
         {
-            return action.GetActionType();
+            get
+            {
+                return action.ActionType;
+            }
         }
 
         /// <summary><inheritDoc></inheritDoc></summary>
@@ -140,9 +148,12 @@ namespace Antlr4.Runtime.Atn
         /// <code>true</code>
         /// .
         /// </returns>
-        public bool IsPositionDependent()
+        public bool IsPositionDependent
         {
-            return true;
+            get
+            {
+                return true;
+            }
         }
 
         /// <summary>
@@ -150,7 +161,7 @@ namespace Antlr4.Runtime.Atn
         /// <p>This method calls
         /// <see cref="Execute(Antlr4.Runtime.Lexer)">Execute(Antlr4.Runtime.Lexer)</see>
         /// on the result of
-        /// <see cref="GetAction()">GetAction()</see>
+        /// <see cref="Action()">Action()</see>
         /// using the provided
         /// <code>lexer</code>
         /// .</p>

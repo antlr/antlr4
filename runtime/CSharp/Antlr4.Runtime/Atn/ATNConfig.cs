@@ -223,9 +223,12 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        public virtual bool HasPassedThroughNonGreedyDecision()
+        public virtual bool PassedThroughNonGreedyDecision
         {
-            return false;
+            get
+            {
+                return false;
+            }
         }
 
         public Antlr4.Runtime.Atn.ATNConfig Clone()
@@ -282,7 +285,7 @@ namespace Antlr4.Runtime.Atn
 
         private static bool CheckNonGreedyDecision(Antlr4.Runtime.Atn.ATNConfig source, ATNState target)
         {
-            return source.HasPassedThroughNonGreedyDecision() || target is DecisionState && ((DecisionState)target).nonGreedy;
+            return source.PassedThroughNonGreedyDecision || target is DecisionState && ((DecisionState)target).nonGreedy;
         }
 
         public virtual Antlr4.Runtime.Atn.ATNConfig AppendContext(int context, PredictionContextCache contextCache)
@@ -375,7 +378,7 @@ namespace Antlr4.Runtime.Atn
                     return false;
                 }
             }
-            return this.State.stateNumber == other.State.stateNumber && this.Alt == other.Alt && this.ReachesIntoOuterContext == other.ReachesIntoOuterContext && this.Context.Equals(other.Context) && this.SemanticContext.Equals(other.SemanticContext) && this.HasPassedThroughNonGreedyDecision() == other.HasPassedThroughNonGreedyDecision() && ObjectEqualityComparator.Instance.Equals(this.ActionExecutor, other.ActionExecutor);
+            return this.State.stateNumber == other.State.stateNumber && this.Alt == other.Alt && this.ReachesIntoOuterContext == other.ReachesIntoOuterContext && this.Context.Equals(other.Context) && this.SemanticContext.Equals(other.SemanticContext) && this.PassedThroughNonGreedyDecision == other.PassedThroughNonGreedyDecision && ObjectEqualityComparator.Instance.Equals(this.ActionExecutor, other.ActionExecutor);
         }
 
         public override int GetHashCode()
@@ -386,7 +389,7 @@ namespace Antlr4.Runtime.Atn
             hashCode = MurmurHash.Update(hashCode, ReachesIntoOuterContext ? 1 : 0);
             hashCode = MurmurHash.Update(hashCode, Context);
             hashCode = MurmurHash.Update(hashCode, SemanticContext);
-            hashCode = MurmurHash.Update(hashCode, HasPassedThroughNonGreedyDecision() ? 1 : 0);
+            hashCode = MurmurHash.Update(hashCode, PassedThroughNonGreedyDecision ? 1 : 0);
             hashCode = MurmurHash.Update(hashCode, ActionExecutor);
             hashCode = MurmurHash.Finish(hashCode, 7);
             return hashCode;
@@ -541,9 +544,12 @@ namespace Antlr4.Runtime.Atn
                 }
             }
 
-            public override bool HasPassedThroughNonGreedyDecision()
+            public override bool PassedThroughNonGreedyDecision
             {
-                return passedThroughNonGreedyDecision;
+                get
+                {
+                    return passedThroughNonGreedyDecision;
+                }
             }
         }
 
@@ -575,9 +581,12 @@ namespace Antlr4.Runtime.Atn
                 }
             }
 
-            public override bool HasPassedThroughNonGreedyDecision()
+            public override bool PassedThroughNonGreedyDecision
             {
-                return passedThroughNonGreedyDecision;
+                get
+                {
+                    return passedThroughNonGreedyDecision;
+                }
             }
         }
     }

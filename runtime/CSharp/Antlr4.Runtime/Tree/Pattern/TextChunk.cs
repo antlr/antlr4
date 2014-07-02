@@ -46,7 +46,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     {
         /// <summary>
         /// This is the backing field for
-        /// <see cref="GetText()">GetText()</see>
+        /// <see cref="Text()">Text()</see>
         /// .
         /// </summary>
         [NotNull]
@@ -78,10 +78,12 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <summary>Gets the raw text of this chunk.</summary>
         /// <remarks>Gets the raw text of this chunk.</remarks>
         /// <returns>The text of the chunk.</returns>
-        [NotNull]
-        public string GetText()
+        public string Text
         {
-            return text;
+            get
+            {
+                return text;
+            }
         }
 
         /// <summary>
@@ -89,7 +91,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <p>The implementation for
         /// <see cref="TextChunk">TextChunk</see>
         /// returns the result of
-        /// <see cref="GetText()">GetText()</see>
+        /// <see cref="Text()">Text()</see>
         /// in single quotes.</p>
         /// </summary>
         public override string ToString()

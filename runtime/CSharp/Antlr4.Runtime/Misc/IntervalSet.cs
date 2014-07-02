@@ -267,7 +267,7 @@ namespace Antlr4.Runtime.Misc
         /// </summary>
         public virtual Antlr4.Runtime.Misc.IntervalSet Complement(IIntSet vocabulary)
         {
-            if (vocabulary == null || vocabulary.IsNil())
+            if (vocabulary == null || vocabulary.IsNil)
             {
                 return null;
             }
@@ -287,7 +287,7 @@ namespace Antlr4.Runtime.Misc
 
         public virtual Antlr4.Runtime.Misc.IntervalSet Subtract(IIntSet a)
         {
-            if (a == null || a.IsNil())
+            if (a == null || a.IsNil)
             {
                 return new Antlr4.Runtime.Misc.IntervalSet(this);
             }
@@ -312,12 +312,12 @@ namespace Antlr4.Runtime.Misc
         [NotNull]
         public static Antlr4.Runtime.Misc.IntervalSet Subtract(Antlr4.Runtime.Misc.IntervalSet left, Antlr4.Runtime.Misc.IntervalSet right)
         {
-            if (left == null || left.IsNil())
+            if (left == null || left.IsNil)
             {
                 return new Antlr4.Runtime.Misc.IntervalSet();
             }
             Antlr4.Runtime.Misc.IntervalSet result = new Antlr4.Runtime.Misc.IntervalSet(left);
-            if (right == null || right.IsNil())
+            if (right == null || right.IsNil)
             {
                 // right set has no elements; just return the copy of the current set
                 return result;
@@ -531,26 +531,32 @@ namespace Antlr4.Runtime.Misc
         /// <inheritDoc></inheritDoc>
         /// 
         /// </summary>
-        public virtual bool IsNil()
+        public virtual bool IsNil
         {
-            return intervals == null || intervals.IsEmpty();
+            get
+            {
+                return intervals == null || intervals.IsEmpty();
+            }
         }
 
         /// <summary>
         /// <inheritDoc></inheritDoc>
         /// 
         /// </summary>
-        public virtual int GetSingleElement()
+        public virtual int SingleElement
         {
-            if (intervals != null && intervals.Count == 1)
+            get
             {
-                Interval I = intervals[0];
-                if (I.a == I.b)
+                if (intervals != null && intervals.Count == 1)
                 {
-                    return I.a;
+                    Interval I = intervals[0];
+                    if (I.a == I.b)
+                    {
+                        return I.a;
+                    }
                 }
+                return TokenConstants.InvalidType;
             }
-            return TokenConstants.InvalidType;
         }
 
         /// <summary>Returns the maximum value contained in the set.</summary>
@@ -561,14 +567,17 @@ namespace Antlr4.Runtime.Misc
         /// <see cref="Antlr4.Runtime.IToken.InvalidType">Antlr4.Runtime.IToken.InvalidType</see>
         /// .
         /// </returns>
-        public virtual int GetMaxElement()
+        public virtual int MaxElement
         {
-            if (IsNil())
+            get
             {
-                return TokenConstants.InvalidType;
+                if (IsNil)
+                {
+                    return TokenConstants.InvalidType;
+                }
+                Interval last = intervals[intervals.Count - 1];
+                return last.b;
             }
-            Interval last = intervals[intervals.Count - 1];
-            return last.b;
         }
 
         /// <summary>Returns the minimum value contained in the set.</summary>
@@ -579,13 +588,16 @@ namespace Antlr4.Runtime.Misc
         /// <see cref="Antlr4.Runtime.IToken.InvalidType">Antlr4.Runtime.IToken.InvalidType</see>
         /// .
         /// </returns>
-        public virtual int GetMinElement()
+        public virtual int MinElement
         {
-            if (IsNil())
+            get
             {
-                return TokenConstants.InvalidType;
+                if (IsNil)
+                {
+                    return TokenConstants.InvalidType;
+                }
+                return intervals[0].a;
             }
-            return intervals[0].a;
         }
 
         /// <summary>Return a list of Interval objects.</summary>
@@ -640,7 +652,7 @@ namespace Antlr4.Runtime.Misc
             {
                 return "{}";
             }
-            if (this.Size() > 1)
+            if (this.Count > 1)
             {
                 buf.Append("{");
             }
@@ -684,7 +696,7 @@ namespace Antlr4.Runtime.Misc
                     buf.Append(", ");
                 }
             }
-            if (this.Size() > 1)
+            if (this.Count > 1)
             {
                 buf.Append("}");
             }
@@ -698,7 +710,7 @@ namespace Antlr4.Runtime.Misc
             {
                 return "{}";
             }
-            if (this.Size() > 1)
+            if (this.Count > 1)
             {
                 buf.Append("{");
             }
@@ -728,7 +740,7 @@ namespace Antlr4.Runtime.Misc
                     buf.Append(", ");
                 }
             }
-            if (this.Size() > 1)
+            if (this.Count > 1)
             {
                 buf.Append("}");
             }
@@ -754,26 +766,29 @@ namespace Antlr4.Runtime.Misc
             }
         }
 
-        public virtual int Size()
+        public virtual int Count
         {
-            int n = 0;
-            int numIntervals = intervals.Count;
-            if (numIntervals == 1)
+            get
             {
-                Interval firstInterval = this.intervals[0];
-                return firstInterval.b - firstInterval.a + 1;
+                int n = 0;
+                int numIntervals = intervals.Count;
+                if (numIntervals == 1)
+                {
+                    Interval firstInterval = this.intervals[0];
+                    return firstInterval.b - firstInterval.a + 1;
+                }
+                for (int i = 0; i < numIntervals; i++)
+                {
+                    Interval I = intervals[i];
+                    n += (I.b - I.a + 1);
+                }
+                return n;
             }
-            for (int i = 0; i < numIntervals; i++)
-            {
-                Interval I = intervals[i];
-                n += (I.b - I.a + 1);
-            }
-            return n;
         }
 
         public virtual List<int> ToIntegerList()
         {
-            List<int> values = new List<int>(Size());
+            List<int> values = new List<int>(Count);
             int n = intervals.Count;
             for (int i = 0; i < n; i++)
             {
@@ -872,10 +887,13 @@ namespace Antlr4.Runtime.Misc
             }
         }
 
-        // add [x+1..b]
-        public virtual bool IsReadonly()
+        public virtual bool IsReadOnly
         {
-            return @readonly;
+            get
+            {
+                // add [x+1..b]
+                return @readonly;
+            }
         }
 
         public virtual void SetReadonly(bool @readonly)

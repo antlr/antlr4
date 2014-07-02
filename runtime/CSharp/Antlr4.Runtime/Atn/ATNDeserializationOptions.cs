@@ -28,7 +28,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using System;
-using Antlr4.Runtime.Misc;
 using Sharpen;
 
 namespace Antlr4.Runtime.Atn
@@ -66,15 +65,20 @@ namespace Antlr4.Runtime.Atn
             this.optimize = options.optimize;
         }
 
-        [NotNull]
-        public static Antlr4.Runtime.Atn.ATNDeserializationOptions GetDefaultOptions()
+        public static Antlr4.Runtime.Atn.ATNDeserializationOptions Default
         {
-            return defaultOptions;
+            get
+            {
+                return defaultOptions;
+            }
         }
 
-        public bool IsReadOnly()
+        public bool IsReadOnly
         {
-            return readOnly;
+            get
+            {
+                return readOnly;
+            }
         }
 
         public void MakeReadOnly()
@@ -82,42 +86,51 @@ namespace Antlr4.Runtime.Atn
             readOnly = true;
         }
 
-        public bool IsVerifyATN()
+        public bool VerifyAtn
         {
-            return verifyATN;
+            get
+            {
+                return verifyATN;
+            }
+            set
+            {
+                bool verifyATN = value;
+                ThrowIfReadOnly();
+                this.verifyATN = verifyATN;
+            }
         }
 
-        public void SetVerifyATN(bool verifyATN)
+        public bool GenerateRuleBypassTransitions
         {
-            ThrowIfReadOnly();
-            this.verifyATN = verifyATN;
+            get
+            {
+                return generateRuleBypassTransitions;
+            }
+            set
+            {
+                bool generateRuleBypassTransitions = value;
+                ThrowIfReadOnly();
+                this.generateRuleBypassTransitions = generateRuleBypassTransitions;
+            }
         }
 
-        public bool IsGenerateRuleBypassTransitions()
+        public bool Optimize
         {
-            return generateRuleBypassTransitions;
-        }
-
-        public void SetGenerateRuleBypassTransitions(bool generateRuleBypassTransitions)
-        {
-            ThrowIfReadOnly();
-            this.generateRuleBypassTransitions = generateRuleBypassTransitions;
-        }
-
-        public bool IsOptimize()
-        {
-            return optimize;
-        }
-
-        public void SetOptimize(bool optimize)
-        {
-            ThrowIfReadOnly();
-            this.optimize = optimize;
+            get
+            {
+                return optimize;
+            }
+            set
+            {
+                bool optimize = value;
+                ThrowIfReadOnly();
+                this.optimize = optimize;
+            }
         }
 
         protected internal virtual void ThrowIfReadOnly()
         {
-            if (IsReadOnly())
+            if (IsReadOnly)
             {
                 throw new InvalidOperationException("The object is read only.");
             }

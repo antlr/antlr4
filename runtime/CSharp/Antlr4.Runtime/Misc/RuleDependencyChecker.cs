@@ -455,7 +455,7 @@ namespace Antlr4.Runtime.Misc
                 {
                     continue;
                 }
-                foreach (Transition transition in state.GetTransitions())
+                foreach (Transition transition in state.Transitions)
                 {
                     if (transition.TransitionType != TransitionType.Rule)
                     {

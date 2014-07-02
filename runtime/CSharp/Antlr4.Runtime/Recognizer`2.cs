@@ -86,25 +86,27 @@ namespace Antlr4.Runtime
         /// Get a map from token names to token types.
         /// <p>Used for XPath and tree pattern compilation.</p>
         /// </remarks>
-        [NotNull]
-        public virtual IDictionary<string, int> GetTokenTypeMap()
+        public virtual IDictionary<string, int> TokenTypeMap
         {
-            string[] tokenNames = TokenNames;
-            if (tokenNames == null)
+            get
             {
-                throw new NotSupportedException("The current recognizer does not provide a list of token names.");
-            }
-            lock (tokenTypeMapCache)
-            {
-                IDictionary<string, int> result = tokenTypeMapCache.Get(tokenNames);
-                if (result == null)
+                string[] tokenNames = TokenNames;
+                if (tokenNames == null)
                 {
-                    result = Utils.ToMap(tokenNames);
-                    result.Put("EOF", TokenConstants.Eof);
-                    result = Sharpen.Collections.UnmodifiableMap(result);
-                    tokenTypeMapCache.Put(tokenNames, result);
+                    throw new NotSupportedException("The current recognizer does not provide a list of token names.");
                 }
-                return result;
+                lock (tokenTypeMapCache)
+                {
+                    IDictionary<string, int> result = tokenTypeMapCache.Get(tokenNames);
+                    if (result == null)
+                    {
+                        result = Utils.ToMap(tokenNames);
+                        result.Put("EOF", TokenConstants.Eof);
+                        result = Sharpen.Collections.UnmodifiableMap(result);
+                        tokenTypeMapCache.Put(tokenNames, result);
+                    }
+                    return result;
+                }
             }
         }
 
@@ -113,29 +115,31 @@ namespace Antlr4.Runtime
         /// Get a map from rule names to rule indexes.
         /// <p>Used for XPath and tree pattern compilation.</p>
         /// </remarks>
-        [NotNull]
-        public virtual IDictionary<string, int> GetRuleIndexMap()
+        public virtual IDictionary<string, int> RuleIndexMap
         {
-            string[] ruleNames = RuleNames;
-            if (ruleNames == null)
+            get
             {
-                throw new NotSupportedException("The current recognizer does not provide a list of rule names.");
-            }
-            lock (ruleIndexMapCache)
-            {
-                IDictionary<string, int> result = ruleIndexMapCache.Get(ruleNames);
-                if (result == null)
+                string[] ruleNames = RuleNames;
+                if (ruleNames == null)
                 {
-                    result = Sharpen.Collections.UnmodifiableMap(Utils.ToMap(ruleNames));
-                    ruleIndexMapCache.Put(ruleNames, result);
+                    throw new NotSupportedException("The current recognizer does not provide a list of rule names.");
                 }
-                return result;
+                lock (ruleIndexMapCache)
+                {
+                    IDictionary<string, int> result = ruleIndexMapCache.Get(ruleNames);
+                    if (result == null)
+                    {
+                        result = Sharpen.Collections.UnmodifiableMap(Utils.ToMap(ruleNames));
+                        ruleIndexMapCache.Put(ruleNames, result);
+                    }
+                    return result;
+                }
             }
         }
 
         public virtual int GetTokenType(string tokenName)
         {
-            int ttype = GetTokenTypeMap().Get(tokenName);
+            int ttype = TokenTypeMap.Get(tokenName);
             if (ttype != null)
             {
                 return ttype;
@@ -220,9 +224,12 @@ namespace Antlr4.Runtime
         /// for each decision in recognizer in a ParseInfo object.
         /// </remarks>
         /// <since>4.3</since>
-        public virtual ParseInfo GetParseInfo()
+        public virtual Antlr4.Runtime.Atn.ParseInfo ParseInfo
         {
-            return null;
+            get
+            {
+                return null;
+            }
         }
 
         /// <summary>What is the error header, normally line/character position information?</summary>
@@ -298,15 +305,20 @@ namespace Antlr4.Runtime
             _listeners.Clear();
         }
 
-        [NotNull]
-        public virtual IList<IAntlrErrorListener<Symbol>> GetErrorListeners()
+        public virtual IList<IAntlrErrorListener<Symbol>> ErrorListeners
         {
-            return new List<IAntlrErrorListener<Symbol>>(_listeners);
+            get
+            {
+                return new List<IAntlrErrorListener<Symbol>>(_listeners);
+            }
         }
 
-        public virtual IAntlrErrorListener<Symbol> GetErrorListenerDispatch()
+        public virtual IAntlrErrorListener<Symbol> ErrorListenerDispatch
         {
-            return new ProxyErrorListener<Symbol>(GetErrorListeners());
+            get
+            {
+                return new ProxyErrorListener<Symbol>(ErrorListeners);
+            }
         }
 
         // subclass needs to override these if there are sempreds or actions

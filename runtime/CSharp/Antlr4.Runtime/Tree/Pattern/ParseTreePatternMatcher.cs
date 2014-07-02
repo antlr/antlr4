@@ -173,14 +173,14 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="GetLexer()">GetLexer()</see>
+        /// <see cref="Lexer()">Lexer()</see>
         /// .
         /// </summary>
         private readonly Lexer lexer;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="GetParser()">GetParser()</see>
+        /// <see cref="Parser()">Parser()</see>
         /// .
         /// </summary>
         private readonly Parser parser;
@@ -275,7 +275,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         public virtual bool Matches(IParseTree tree, ParseTreePattern pattern)
         {
             MultiMap<string, IParseTree> labels = new MultiMap<string, IParseTree>();
-            IParseTree mismatchedNode = MatchImpl(tree, pattern.GetPatternTree(), labels);
+            IParseTree mismatchedNode = MatchImpl(tree, pattern.PatternTree, labels);
             return mismatchedNode == null;
         }
 
@@ -312,7 +312,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         public virtual ParseTreeMatch Match(IParseTree tree, ParseTreePattern pattern)
         {
             MultiMap<string, IParseTree> labels = new MultiMap<string, IParseTree>();
-            IParseTree mismatchedNode = MatchImpl(tree, pattern.GetPatternTree(), labels);
+            IParseTree mismatchedNode = MatchImpl(tree, pattern.PatternTree, labels);
             return new ParseTreeMatch(tree, pattern, labels, mismatchedNode);
         }
 
@@ -359,10 +359,12 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// Used to convert the tree pattern string into a series of tokens. The
         /// input stream is reset.
         /// </remarks>
-        [NotNull]
-        public virtual Lexer GetLexer()
+        public virtual Lexer Lexer
         {
-            return lexer;
+            get
+            {
+                return lexer;
+            }
         }
 
         /// <summary>
@@ -373,10 +375,12 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// Used to collect to the grammar file name, token names, rule names for
         /// used to parse the pattern into a parse tree.
         /// </remarks>
-        [NotNull]
-        public virtual Parser GetParser()
+        public virtual Parser Parser
         {
-            return parser;
+            get
+            {
+                return parser;
+            }
         }
 
         // ---- SUPPORT CODE ----
@@ -427,10 +431,10 @@ namespace Antlr4.Runtime.Tree.Pattern
                         // x and <ID>
                         TokenTagToken tokenTagToken = (TokenTagToken)t2.Symbol;
                         // track label->list-of-nodes for both token name and label (if any)
-                        labels.Map(tokenTagToken.GetTokenName(), tree);
-                        if (tokenTagToken.GetLabel() != null)
+                        labels.Map(tokenTagToken.TokenName, tree);
+                        if (tokenTagToken.Label != null)
                         {
-                            labels.Map(tokenTagToken.GetLabel(), tree);
+                            labels.Map(tokenTagToken.Label, tree);
                         }
                     }
                     else
@@ -468,13 +472,13 @@ namespace Antlr4.Runtime.Tree.Pattern
                 if (ruleTagToken != null)
                 {
                     ParseTreeMatch m = null;
-                    if (r1.RuleContext.GetRuleIndex() == r2.RuleContext.GetRuleIndex())
+                    if (r1.RuleContext.RuleIndex == r2.RuleContext.RuleIndex)
                     {
                         // track label->list-of-nodes for both rule name and label (if any)
-                        labels.Map(ruleTagToken.GetRuleName(), tree);
-                        if (ruleTagToken.GetLabel() != null)
+                        labels.Map(ruleTagToken.RuleName, tree);
+                        if (ruleTagToken.Label != null)
                         {
-                            labels.Map(ruleTagToken.GetLabel(), tree);
+                            labels.Map(ruleTagToken.Label, tree);
                         }
                     }
                     else
@@ -547,38 +551,38 @@ namespace Antlr4.Runtime.Tree.Pattern
                 {
                     TagChunk tagChunk = (TagChunk)chunk;
                     // add special rule token or conjure up new token from name
-                    if (System.Char.IsUpper(tagChunk.GetTag()[0]))
+                    if (System.Char.IsUpper(tagChunk.Tag[0]))
                     {
-                        int ttype = parser.GetTokenType(tagChunk.GetTag());
+                        int ttype = parser.GetTokenType(tagChunk.Tag);
                         if (ttype == TokenConstants.InvalidType)
                         {
-                            throw new ArgumentException("Unknown token " + tagChunk.GetTag() + " in pattern: " + pattern);
+                            throw new ArgumentException("Unknown token " + tagChunk.Tag + " in pattern: " + pattern);
                         }
-                        TokenTagToken t = new TokenTagToken(tagChunk.GetTag(), ttype, tagChunk.GetLabel());
+                        TokenTagToken t = new TokenTagToken(tagChunk.Tag, ttype, tagChunk.Label);
                         tokens.AddItem(t);
                     }
                     else
                     {
-                        if (System.Char.IsLower(tagChunk.GetTag()[0]))
+                        if (System.Char.IsLower(tagChunk.Tag[0]))
                         {
-                            int ruleIndex = parser.GetRuleIndex(tagChunk.GetTag());
+                            int ruleIndex = parser.GetRuleIndex(tagChunk.Tag);
                             if (ruleIndex == -1)
                             {
-                                throw new ArgumentException("Unknown rule " + tagChunk.GetTag() + " in pattern: " + pattern);
+                                throw new ArgumentException("Unknown rule " + tagChunk.Tag + " in pattern: " + pattern);
                             }
                             int ruleImaginaryTokenType = parser.GetATNWithBypassAlts().ruleToTokenType[ruleIndex];
-                            tokens.AddItem(new RuleTagToken(tagChunk.GetTag(), ruleImaginaryTokenType, tagChunk.GetLabel()));
+                            tokens.AddItem(new RuleTagToken(tagChunk.Tag, ruleImaginaryTokenType, tagChunk.Label));
                         }
                         else
                         {
-                            throw new ArgumentException("invalid tag: " + tagChunk.GetTag() + " in pattern: " + pattern);
+                            throw new ArgumentException("invalid tag: " + tagChunk.Tag + " in pattern: " + pattern);
                         }
                     }
                 }
                 else
                 {
                     TextChunk textChunk = (TextChunk)chunk;
-                    AntlrInputStream @in = new AntlrInputStream(textChunk.GetText());
+                    AntlrInputStream @in = new AntlrInputStream(textChunk.Text);
                     lexer.SetInputStream(@in);
                     IToken t = lexer.NextToken();
                     while (t.Type != TokenConstants.Eof)
@@ -710,8 +714,8 @@ namespace Antlr4.Runtime.Tree.Pattern
                 if (c is TextChunk)
                 {
                     TextChunk tc = (TextChunk)c;
-                    string unescaped = tc.GetText().Replace(escape, string.Empty);
-                    if (unescaped.Length < tc.GetText().Length)
+                    string unescaped = tc.Text.Replace(escape, string.Empty);
+                    if (unescaped.Length < tc.Text.Length)
                     {
                         chunks.Set(i_2, new TextChunk(unescaped));
                     }

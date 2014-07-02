@@ -71,7 +71,7 @@ namespace Antlr4.Runtime.Dfa
         /// . This is the backing field for
         /// <see cref="IsPrecedenceDfa()">IsPrecedenceDfa()</see>
         /// ,
-        /// <see cref="SetPrecedenceDfa(bool)">SetPrecedenceDfa(bool)</see>
+        /// <see cref="IsPrecedenceDfa(bool)">IsPrecedenceDfa(bool)</see>
         /// .
         /// </summary>
         private volatile bool precedenceDfa;
@@ -107,76 +107,7 @@ namespace Antlr4.Runtime.Dfa
         /// <code>false</code>
         /// .
         /// </returns>
-        /// <seealso cref="Antlr4.Runtime.Parser.GetPrecedence()">Antlr4.Runtime.Parser.GetPrecedence()</seealso>
-        public bool IsPrecedenceDfa()
-        {
-            return precedenceDfa;
-        }
-
-        /// <summary>Get the start state for a specific precedence value.</summary>
-        /// <remarks>Get the start state for a specific precedence value.</remarks>
-        /// <param name="precedence">The current precedence.</param>
-        /// <returns>
-        /// The start state corresponding to the specified precedence, or
-        /// <code>null</code>
-        /// if no start state exists for the specified precedence.
-        /// </returns>
-        /// <exception cref="System.InvalidOperationException">if this is not a precedence DFA.</exception>
-        /// <seealso cref="IsPrecedenceDfa()">IsPrecedenceDfa()</seealso>
-        public DFAState GetPrecedenceStartState(int precedence, bool fullContext)
-        {
-            if (!IsPrecedenceDfa())
-            {
-                throw new InvalidOperationException("Only precedence DFAs may contain a precedence start state.");
-            }
-            // s0.get() and s0full.get() are never null for a precedence DFA
-            if (fullContext)
-            {
-                return s0full.Get().GetTarget(precedence);
-            }
-            else
-            {
-                return s0.Get().GetTarget(precedence);
-            }
-        }
-
-        /// <summary>Set the start state for a specific precedence value.</summary>
-        /// <remarks>Set the start state for a specific precedence value.</remarks>
-        /// <param name="precedence">The current precedence.</param>
-        /// <param name="startState">
-        /// The start state corresponding to the specified
-        /// precedence.
-        /// </param>
-        /// <exception cref="System.InvalidOperationException">if this is not a precedence DFA.</exception>
-        /// <seealso cref="IsPrecedenceDfa()">IsPrecedenceDfa()</seealso>
-        public void SetPrecedenceStartState(int precedence, bool fullContext, DFAState startState)
-        {
-            if (!IsPrecedenceDfa())
-            {
-                throw new InvalidOperationException("Only precedence DFAs may contain a precedence start state.");
-            }
-            if (precedence < 0)
-            {
-                return;
-            }
-            if (fullContext)
-            {
-                lock (s0full)
-                {
-                    // s0full.get() is never null for a precedence DFA
-                    s0full.Get().SetTarget(precedence, startState);
-                }
-            }
-            else
-            {
-                lock (s0)
-                {
-                    // s0.get() is never null for a precedence DFA
-                    s0.Get().SetTarget(precedence, startState);
-                }
-            }
-        }
-
+        /// <seealso cref="Antlr4.Runtime.Parser.Precedence()">Antlr4.Runtime.Parser.Precedence()</seealso>
         /// <summary>Sets whether this is a precedence DFA.</summary>
         /// <remarks>
         /// Sets whether this is a precedence DFA. If the specified value differs
@@ -205,54 +136,132 @@ namespace Antlr4.Runtime.Dfa
         /// field is updated</li>
         /// </ul>
         /// </remarks>
-        /// <param name="precedenceDfa">
+        /// <value>
         /// 
         /// <code>true</code>
         /// if this is a precedence DFA; otherwise,
         /// <code>false</code>
-        /// </param>
-        public void SetPrecedenceDfa(bool precedenceDfa)
+        /// </value>
+        public bool IsPrecedenceDfa
         {
-            lock (this)
+            get
             {
-                if (this.precedenceDfa != precedenceDfa)
+                return precedenceDfa;
+            }
+            set
+            {
+                bool precedenceDfa = value;
+                // s0.get() and s0full.get() are never null for a precedence DFA
+                // s0full.get() is never null for a precedence DFA
+                // s0.get() is never null for a precedence DFA
+                lock (this)
                 {
-                    this.states.Clear();
-                    if (precedenceDfa)
+                    if (this.precedenceDfa != precedenceDfa)
                     {
-                        DFAState precedenceState = new DFAState(new ATNConfigSet(), 0, 200);
-                        precedenceState.isAcceptState = false;
-                        this.s0.Set(precedenceState);
-                        DFAState fullContextPrecedenceState = new DFAState(new ATNConfigSet(), 0, 200);
-                        fullContextPrecedenceState.isAcceptState = false;
-                        this.s0full.Set(fullContextPrecedenceState);
+                        this.states.Clear();
+                        if (precedenceDfa)
+                        {
+                            DFAState precedenceState = new DFAState(new ATNConfigSet(), 0, 200);
+                            precedenceState.isAcceptState = false;
+                            this.s0.Set(precedenceState);
+                            DFAState fullContextPrecedenceState = new DFAState(new ATNConfigSet(), 0, 200);
+                            fullContextPrecedenceState.isAcceptState = false;
+                            this.s0full.Set(fullContextPrecedenceState);
+                        }
+                        else
+                        {
+                            this.s0.Set(null);
+                            this.s0full.Set(null);
+                        }
+                        this.precedenceDfa = precedenceDfa;
                     }
-                    else
-                    {
-                        this.s0.Set(null);
-                        this.s0full.Set(null);
-                    }
-                    this.precedenceDfa = precedenceDfa;
                 }
             }
         }
 
-        public virtual bool IsEmpty()
+        /// <summary>Get the start state for a specific precedence value.</summary>
+        /// <remarks>Get the start state for a specific precedence value.</remarks>
+        /// <param name="precedence">The current precedence.</param>
+        /// <returns>
+        /// The start state corresponding to the specified precedence, or
+        /// <code>null</code>
+        /// if no start state exists for the specified precedence.
+        /// </returns>
+        /// <exception cref="System.InvalidOperationException">if this is not a precedence DFA.</exception>
+        /// <seealso cref="IsPrecedenceDfa()">IsPrecedenceDfa()</seealso>
+        public DFAState GetPrecedenceStartState(int precedence, bool fullContext)
         {
-            if (IsPrecedenceDfa())
+            if (!IsPrecedenceDfa)
             {
-                return s0.Get().EdgeMap.IsEmpty() && s0full.Get().EdgeMap.IsEmpty();
+                throw new InvalidOperationException("Only precedence DFAs may contain a precedence start state.");
             }
-            return s0.Get() == null && s0full.Get() == null;
+            if (fullContext)
+            {
+                return s0full.Get().GetTarget(precedence);
+            }
+            else
+            {
+                return s0.Get().GetTarget(precedence);
+            }
         }
 
-        public virtual bool IsContextSensitive()
+        /// <summary>Set the start state for a specific precedence value.</summary>
+        /// <remarks>Set the start state for a specific precedence value.</remarks>
+        /// <param name="precedence">The current precedence.</param>
+        /// <param name="startState">
+        /// The start state corresponding to the specified
+        /// precedence.
+        /// </param>
+        /// <exception cref="System.InvalidOperationException">if this is not a precedence DFA.</exception>
+        /// <seealso cref="IsPrecedenceDfa()">IsPrecedenceDfa()</seealso>
+        public void SetPrecedenceStartState(int precedence, bool fullContext, DFAState startState)
         {
-            if (IsPrecedenceDfa())
+            if (!IsPrecedenceDfa)
             {
-                return !s0full.Get().EdgeMap.IsEmpty();
+                throw new InvalidOperationException("Only precedence DFAs may contain a precedence start state.");
             }
-            return s0full.Get() != null;
+            if (precedence < 0)
+            {
+                return;
+            }
+            if (fullContext)
+            {
+                lock (s0full)
+                {
+                    s0full.Get().SetTarget(precedence, startState);
+                }
+            }
+            else
+            {
+                lock (s0)
+                {
+                    s0.Get().SetTarget(precedence, startState);
+                }
+            }
+        }
+
+        public virtual bool IsEmpty
+        {
+            get
+            {
+                if (IsPrecedenceDfa)
+                {
+                    return s0.Get().EdgeMap.IsEmpty() && s0full.Get().EdgeMap.IsEmpty();
+                }
+                return s0.Get() == null && s0full.Get() == null;
+            }
+        }
+
+        public virtual bool IsContextSensitive
+        {
+            get
+            {
+                if (IsPrecedenceDfa)
+                {
+                    return !s0full.Get().EdgeMap.IsEmpty();
+                }
+                return s0full.Get() != null;
+            }
         }
 
         public virtual DFAState AddState(DFAState state)

@@ -64,9 +64,12 @@ namespace Antlr4.Runtime.Atn
             return false;
         }
 
-        public SemanticContext.PrecedencePredicate GetPredicate()
+        public SemanticContext.PrecedencePredicate Predicate
         {
-            return new SemanticContext.PrecedencePredicate(precedence);
+            get
+            {
+                return new SemanticContext.PrecedencePredicate(precedence);
+            }
         }
 
         public override string ToString()

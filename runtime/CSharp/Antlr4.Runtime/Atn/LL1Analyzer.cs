@@ -89,7 +89,7 @@ namespace Antlr4.Runtime.Atn
                 Look(s.Transition(alt).target, null, PredictionContext.EmptyLocal, look[alt], lookBusy, new BitSet(), seeThruPreds, false);
                 // Wipe out lookahead for this alternative if we found nothing
                 // or we had a predicate when we !seeThruPreds
-                if (look[alt].Size() == 0 || look[alt].Contains(HitPred))
+                if (look[alt].Count == 0 || look[alt].Contains(HitPred))
                 {
                     look[alt] = null;
                 }

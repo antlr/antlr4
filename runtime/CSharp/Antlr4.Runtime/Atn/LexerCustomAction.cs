@@ -85,9 +85,12 @@ namespace Antlr4.Runtime.Atn
         /// .
         /// </summary>
         /// <returns>The rule index for the custom action.</returns>
-        public int GetRuleIndex()
+        public int RuleIndex
         {
-            return ruleIndex;
+            get
+            {
+                return ruleIndex;
+            }
         }
 
         /// <summary>
@@ -96,9 +99,12 @@ namespace Antlr4.Runtime.Atn
         /// .
         /// </summary>
         /// <returns>The action index for the custom action.</returns>
-        public int GetActionIndex()
+        public int ActionIndex
         {
-            return actionIndex;
+            get
+            {
+                return actionIndex;
+            }
         }
 
         /// <summary><inheritDoc></inheritDoc></summary>
@@ -107,9 +113,12 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="LexerActionType.Custom">LexerActionType.Custom</see>
         /// .
         /// </returns>
-        public LexerActionType GetActionType()
+        public LexerActionType ActionType
         {
-            return LexerActionType.Custom;
+            get
+            {
+                return LexerActionType.Custom;
+            }
         }
 
         /// <summary>Gets whether the lexer action is position-dependent.</summary>
@@ -128,9 +137,12 @@ namespace Antlr4.Runtime.Atn
         /// <code>true</code>
         /// .
         /// </returns>
-        public bool IsPositionDependent()
+        public bool IsPositionDependent
         {
-            return true;
+            get
+            {
+                return true;
+            }
         }
 
         /// <summary>
@@ -148,7 +160,7 @@ namespace Antlr4.Runtime.Atn
         public override int GetHashCode()
         {
             int hash = MurmurHash.Initialize();
-            hash = MurmurHash.Update(hash, (int)(GetActionType()));
+            hash = MurmurHash.Update(hash, (int)(ActionType));
             hash = MurmurHash.Update(hash, ruleIndex);
             hash = MurmurHash.Update(hash, actionIndex);
             return MurmurHash.Finish(hash, 3);

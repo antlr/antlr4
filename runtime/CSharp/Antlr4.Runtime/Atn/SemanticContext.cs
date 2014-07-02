@@ -269,8 +269,10 @@ namespace Antlr4.Runtime.Atn
             /// operator.
             /// </returns>
             /// <since>4.3</since>
-            [NotNull]
-            public abstract ICollection<SemanticContext> GetOperands();
+            public abstract ICollection<SemanticContext> Operands
+            {
+                get;
+            }
         }
 
         /// <summary>
@@ -315,9 +317,12 @@ namespace Antlr4.Runtime.Atn
                 opnds = Sharpen.Collections.ToArray(operands, new SemanticContext[operands.Count]);
             }
 
-            public override ICollection<SemanticContext> GetOperands()
+            public override ICollection<SemanticContext> Operands
             {
-                return Arrays.AsList(opnds);
+                get
+                {
+                    return Arrays.AsList(opnds);
+                }
             }
 
             public override bool Equals(object obj)
@@ -444,9 +449,12 @@ namespace Antlr4.Runtime.Atn
                 this.opnds = Sharpen.Collections.ToArray(operands, new SemanticContext[operands.Count]);
             }
 
-            public override ICollection<SemanticContext> GetOperands()
+            public override ICollection<SemanticContext> Operands
             {
-                return Arrays.AsList(opnds);
+                get
+                {
+                    return Arrays.AsList(opnds);
+                }
             }
 
             public override bool Equals(object obj)

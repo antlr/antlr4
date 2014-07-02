@@ -350,7 +350,7 @@ namespace Antlr4.Runtime.Atn
         public bool treat_sllk1_conflict_as_ambiguity = false;
 
         [Nullable]
-        protected internal readonly Parser parser;
+        protected internal readonly Antlr4.Runtime.Parser parser;
 
         /// <summary>
         /// When
@@ -392,7 +392,7 @@ namespace Antlr4.Runtime.Atn
         {
         }
 
-        public ParserATNSimulator(Parser parser, ATN atn)
+        public ParserATNSimulator(Antlr4.Runtime.Parser parser, ATN atn)
             : base(atn)
         {
             this.parser = parser;
@@ -424,7 +424,7 @@ namespace Antlr4.Runtime.Atn
         {
             DFA dfa = atn.decisionToDFA[decision];
             System.Diagnostics.Debug.Assert(dfa != null);
-            if (optimize_ll1 && !dfa.IsPrecedenceDfa() && !dfa.IsEmpty())
+            if (optimize_ll1 && !dfa.IsPrecedenceDfa && !dfa.IsEmpty)
             {
                 int ll_1 = input.La(1);
                 if (ll_1 >= 0 && ll_1 <= short.MaxValue)
@@ -445,7 +445,7 @@ namespace Antlr4.Runtime.Atn
             {
                 if (!always_try_local_context)
                 {
-                    useContext |= dfa.IsContextSensitive();
+                    useContext |= dfa.IsContextSensitive;
                 }
             }
             userWantsCtxSensitive = useContext || (predictionMode != Antlr4.Runtime.Atn.PredictionMode.Sll && outerContext != null && !atn.decisionToState[decision].sll);
@@ -454,7 +454,7 @@ namespace Antlr4.Runtime.Atn
                 outerContext = ParserRuleContext.EmptyContext;
             }
             SimulatorState state = null;
-            if (!dfa.IsEmpty())
+            if (!dfa.IsEmpty)
             {
                 state = GetStartState(dfa, input, outerContext, useContext);
             }
@@ -484,11 +484,11 @@ namespace Antlr4.Runtime.Atn
         {
             if (!useContext)
             {
-                if (dfa.IsPrecedenceDfa())
+                if (dfa.IsPrecedenceDfa)
                 {
                     // the start state for a precedence DFA depends on the current
                     // parser precedence, and is provided by a DFA method.
-                    DFAState state = dfa.GetPrecedenceStartState(parser.GetPrecedence(), false);
+                    DFAState state = dfa.GetPrecedenceStartState(parser.Precedence, false);
                     if (state == null)
                     {
                         return null;
@@ -511,9 +511,9 @@ namespace Antlr4.Runtime.Atn
             ParserRuleContext remainingContext = outerContext;
             System.Diagnostics.Debug.Assert(outerContext != null);
             DFAState s0;
-            if (dfa.IsPrecedenceDfa())
+            if (dfa.IsPrecedenceDfa)
             {
-                s0 = dfa.GetPrecedenceStartState(parser.GetPrecedence(), true);
+                s0 = dfa.GetPrecedenceStartState(parser.Precedence, true);
             }
             else
             {
@@ -523,7 +523,7 @@ namespace Antlr4.Runtime.Atn
             {
                 remainingContext = SkipTailCalls(remainingContext);
                 s0 = s0.GetContextTarget(GetReturnState(remainingContext));
-                if (remainingContext.IsEmpty())
+                if (remainingContext.IsEmpty)
                 {
                     System.Diagnostics.Debug.Assert(s0 == null || !s0.IsContextSensitive);
                 }
@@ -773,7 +773,7 @@ namespace Antlr4.Runtime.Atn
                     int predictedAlt = conflictingAlts == null ? GetUniqueAlt(D.configs) : ATN.InvalidAltNumber;
                     if (predictedAlt != ATN.InvalidAltNumber)
                     {
-                        if (optimize_ll1 && input.Index == startIndex && !dfa.IsPrecedenceDfa() && nextState.outerContext == nextState.remainingOuterContext && dfa.decision >= 0 && !D.configs.HasSemanticContext)
+                        if (optimize_ll1 && input.Index == startIndex && !dfa.IsPrecedenceDfa && nextState.outerContext == nextState.remainingOuterContext && dfa.decision >= 0 && !D.configs.HasSemanticContext)
                         {
                             if (t >= 0 && t <= short.MaxValue)
                             {
@@ -1198,7 +1198,7 @@ namespace Antlr4.Runtime.Atn
                     {
                         contextElements = new List<int>();
                     }
-                    if (remainingGlobalContext.IsEmpty())
+                    if (remainingGlobalContext.IsEmpty)
                     {
                         remainingGlobalContext = null;
                     }
@@ -1278,7 +1278,7 @@ namespace Antlr4.Runtime.Atn
         [NotNull]
         protected internal virtual SimulatorState ComputeStartState(DFA dfa, ParserRuleContext globalContext, bool useContext)
         {
-            DFAState s0 = dfa.IsPrecedenceDfa() ? dfa.GetPrecedenceStartState(parser.GetPrecedence(), useContext) : useContext ? dfa.s0full.Get() : dfa.s0.Get();
+            DFAState s0 = dfa.IsPrecedenceDfa ? dfa.GetPrecedenceStartState(parser.Precedence, useContext) : useContext ? dfa.s0full.Get() : dfa.s0.Get();
             if (s0 != null)
             {
                 if (!useContext)
@@ -1300,7 +1300,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     while (remainingGlobalContext != null)
                     {
-                        if (remainingGlobalContext.IsEmpty())
+                        if (remainingGlobalContext.IsEmpty)
                         {
                             previousContext = PredictionContext.EmptyFullStateKey;
                             remainingGlobalContext = null;
@@ -1317,7 +1317,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     DFAState next;
                     remainingGlobalContext = SkipTailCalls(remainingGlobalContext);
-                    if (remainingGlobalContext.IsEmpty())
+                    if (remainingGlobalContext.IsEmpty)
                     {
                         next = s0.GetContextTarget(PredictionContext.EmptyFullStateKey);
                         previousContext = PredictionContext.EmptyFullStateKey;
@@ -1370,14 +1370,14 @@ namespace Antlr4.Runtime.Atn
                 {
                     if (s0 == null)
                     {
-                        if (!dfa.IsPrecedenceDfa() && dfa.atnStartState is StarLoopEntryState)
+                        if (!dfa.IsPrecedenceDfa && dfa.atnStartState is StarLoopEntryState)
                         {
                             if (((StarLoopEntryState)dfa.atnStartState).precedenceRuleDecision)
                             {
-                                dfa.SetPrecedenceDfa(true);
+                                dfa.IsPrecedenceDfa = true;
                             }
                         }
-                        if (!dfa.IsPrecedenceDfa())
+                        if (!dfa.IsPrecedenceDfa)
                         {
                             AtomicReference<DFAState> reference = useContext ? dfa.s0full : dfa.s0;
                             next = AddDFAState(dfa, configs, contextCache);
@@ -1390,12 +1390,12 @@ namespace Antlr4.Runtime.Atn
                         {
                             configs = ApplyPrecedenceFilter(configs, globalContext, contextCache);
                             next = AddDFAState(dfa, configs, contextCache);
-                            dfa.SetPrecedenceStartState(parser.GetPrecedence(), useContext, next);
+                            dfa.SetPrecedenceStartState(parser.Precedence, useContext, next);
                         }
                     }
                     else
                     {
-                        if (dfa.IsPrecedenceDfa())
+                        if (dfa.IsPrecedenceDfa)
                         {
                             configs = ApplyPrecedenceFilter(configs, globalContext, contextCache);
                         }
@@ -1413,7 +1413,7 @@ namespace Antlr4.Runtime.Atn
                 configs.Clear();
                 remainingGlobalContext = SkipTailCalls(remainingGlobalContext);
                 int nextContextElement = GetReturnState(remainingGlobalContext);
-                if (remainingGlobalContext.IsEmpty())
+                if (remainingGlobalContext.IsEmpty)
                 {
                     remainingGlobalContext = null;
                 }
@@ -1497,7 +1497,7 @@ namespace Antlr4.Runtime.Atn
         /// The transformed configuration set representing the start state
         /// for a precedence DFA at a particular precedence level (determined by
         /// calling
-        /// <see cref="Antlr4.Runtime.Parser.GetPrecedence()">Antlr4.Runtime.Parser.GetPrecedence()</see>
+        /// <see cref="Antlr4.Runtime.Parser.Precedence()">Antlr4.Runtime.Parser.Precedence()</see>
         /// ).
         /// </returns>
         [NotNull]
@@ -1948,7 +1948,7 @@ namespace Antlr4.Runtime.Atn
             ATNConfig c;
             if (collectPredicates && inContext)
             {
-                SemanticContext newSemCtx = SemanticContext.And(config.SemanticContext, pt.GetPredicate());
+                SemanticContext newSemCtx = SemanticContext.And(config.SemanticContext, pt.Predicate);
                 c = config.Transform(pt.target, newSemCtx, false);
             }
             else
@@ -1964,7 +1964,7 @@ namespace Antlr4.Runtime.Atn
             ATNConfig c;
             if (collectPredicates && (!pt.isCtxDependent || (pt.isCtxDependent && inContext)))
             {
-                SemanticContext newSemCtx = SemanticContext.And(config.SemanticContext, pt.GetPredicate());
+                SemanticContext newSemCtx = SemanticContext.And(config.SemanticContext, pt.Predicate);
                 c = config.Transform(pt.target, newSemCtx, false);
             }
             else
@@ -2248,7 +2248,7 @@ namespace Antlr4.Runtime.Atn
         public virtual void DumpDeadEndConfigs(NoViableAltException nvae)
         {
             System.Console.Error.WriteLine("dead end configs: ");
-            foreach (ATNConfig c in nvae.GetDeadEndConfigs())
+            foreach (ATNConfig c in nvae.DeadEndConfigs)
             {
                 string trans = "no edges";
                 if (c.State.NumberOfOptimizedTransitions > 0)
@@ -2318,7 +2318,7 @@ namespace Antlr4.Runtime.Atn
         [NotNull]
         protected internal virtual DFAState AddDFAEdge(DFA dfa, DFAState fromState, int t, List<int> contextTransitions, ATNConfigSet toConfigs, PredictionContextCache contextCache)
         {
-            System.Diagnostics.Debug.Assert(contextTransitions == null || contextTransitions.IsEmpty() || dfa.IsContextSensitive());
+            System.Diagnostics.Debug.Assert(contextTransitions == null || contextTransitions.IsEmpty() || dfa.IsContextSensitive);
             DFAState from = fromState;
             DFAState to = AddDFAState(dfa, toConfigs, contextCache);
             if (contextTransitions != null)
@@ -2468,7 +2468,7 @@ namespace Antlr4.Runtime.Atn
             }
             if (parser != null)
             {
-                ((IParserErrorListener)parser.GetErrorListenerDispatch()).ReportAttemptingFullContext(parser, dfa, startIndex, stopIndex, conflictingAlts, conflictState);
+                ((IParserErrorListener)parser.ErrorListenerDispatch).ReportAttemptingFullContext(parser, dfa, startIndex, stopIndex, conflictingAlts, conflictState);
             }
         }
 
@@ -2481,7 +2481,7 @@ namespace Antlr4.Runtime.Atn
             }
             if (parser != null)
             {
-                ((IParserErrorListener)parser.GetErrorListenerDispatch()).ReportContextSensitivity(parser, dfa, startIndex, stopIndex, prediction, acceptState);
+                ((IParserErrorListener)parser.ErrorListenerDispatch).ReportContextSensitivity(parser, dfa, startIndex, stopIndex, prediction, acceptState);
             }
         }
 
@@ -2495,13 +2495,13 @@ namespace Antlr4.Runtime.Atn
             }
             if (parser != null)
             {
-                ((IParserErrorListener)parser.GetErrorListenerDispatch()).ReportAmbiguity(parser, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
+                ((IParserErrorListener)parser.ErrorListenerDispatch).ReportAmbiguity(parser, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
             }
         }
 
         protected internal int GetReturnState(RuleContext context)
         {
-            if (context.IsEmpty())
+            if (context.IsEmpty)
             {
                 return PredictionContext.EmptyFullStateKey;
             }
@@ -2516,7 +2516,7 @@ namespace Antlr4.Runtime.Atn
             {
                 return context;
             }
-            while (!context.IsEmpty())
+            while (!context.IsEmpty)
             {
                 ATNState state = atn.states[context.invokingState];
                 System.Diagnostics.Debug.Assert(state.NumberOfTransitions == 1 && state.Transition(0).TransitionType == TransitionType.Rule);
@@ -2531,9 +2531,12 @@ namespace Antlr4.Runtime.Atn
         }
 
         /// <since>4.3</since>
-        public virtual Parser GetParser()
+        public virtual Antlr4.Runtime.Parser Parser
         {
-            return parser;
+            get
+            {
+                return parser;
+            }
         }
     }
 }

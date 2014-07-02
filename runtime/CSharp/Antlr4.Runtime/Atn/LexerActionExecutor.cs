@@ -173,7 +173,7 @@ namespace Antlr4.Runtime.Atn
             ILexerAction[] updatedLexerActions = null;
             for (int i = 0; i < lexerActions.Length; i++)
             {
-                if (lexerActions[i].IsPositionDependent() && !(lexerActions[i] is LexerIndexedCustomAction))
+                if (lexerActions[i].IsPositionDependent && !(lexerActions[i] is LexerIndexedCustomAction))
                 {
                     if (updatedLexerActions == null)
                     {
@@ -192,10 +192,12 @@ namespace Antlr4.Runtime.Atn
         /// <summary>Gets the lexer actions to be executed by this executor.</summary>
         /// <remarks>Gets the lexer actions to be executed by this executor.</remarks>
         /// <returns>The lexer actions to be executed by this executor.</returns>
-        [NotNull]
-        public virtual ILexerAction[] GetLexerActions()
+        public virtual ILexerAction[] LexerActions
         {
-            return lexerActions;
+            get
+            {
+                return lexerActions;
+            }
         }
 
         /// <summary>
@@ -243,14 +245,14 @@ namespace Antlr4.Runtime.Atn
                 {
                     if (lexerAction is LexerIndexedCustomAction)
                     {
-                        int offset = ((LexerIndexedCustomAction)lexerAction).GetOffset();
+                        int offset = ((LexerIndexedCustomAction)lexerAction).Offset;
                         input.Seek(startIndex + offset);
-                        lexerAction = ((LexerIndexedCustomAction)lexerAction).GetAction();
+                        lexerAction = ((LexerIndexedCustomAction)lexerAction).Action;
                         requiresSeek = (startIndex + offset) != stopIndex;
                     }
                     else
                     {
-                        if (lexerAction.IsPositionDependent())
+                        if (lexerAction.IsPositionDependent)
                         {
                             input.Seek(stopIndex);
                             requiresSeek = false;

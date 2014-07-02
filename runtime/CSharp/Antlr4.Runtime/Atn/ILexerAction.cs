@@ -29,7 +29,6 @@
  */
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
-using Antlr4.Runtime.Misc;
 using Sharpen;
 
 namespace Antlr4.Runtime.Atn
@@ -50,8 +49,10 @@ namespace Antlr4.Runtime.Atn
         /// <summary>Gets the serialization type of the lexer action.</summary>
         /// <remarks>Gets the serialization type of the lexer action.</remarks>
         /// <returns>The serialization type of the lexer action.</returns>
-        [NotNull]
-        LexerActionType GetActionType();
+        LexerActionType ActionType
+        {
+            get;
+        }
 
         /// <summary>Gets whether the lexer action is position-dependent.</summary>
         /// <remarks>
@@ -82,7 +83,10 @@ namespace Antlr4.Runtime.Atn
         /// <code>false</code>
         /// .
         /// </returns>
-        bool IsPositionDependent();
+        bool IsPositionDependent
+        {
+            get;
+        }
 
         /// <summary>
         /// Execute the lexer action in the context of the specified

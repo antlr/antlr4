@@ -36,13 +36,13 @@ namespace Antlr4.Runtime
     /// This class extends
     /// <see cref="ParserRuleContext">ParserRuleContext</see>
     /// by allowing the value of
-    /// <see cref="GetRuleIndex()">GetRuleIndex()</see>
+    /// <see cref="RuleIndex()">RuleIndex()</see>
     /// to be explicitly set for the context.
     /// <p>
     /// <see cref="ParserRuleContext">ParserRuleContext</see>
     /// does not include field storage for the rule index
     /// since the context classes created by the code generator override the
-    /// <see cref="GetRuleIndex()">GetRuleIndex()</see>
+    /// <see cref="RuleIndex()">RuleIndex()</see>
     /// method to return the correct value for that context.
     /// Since the parser interpreter does not use the context classes generated for a
     /// parser, this class (with slightly more memory overhead per node) is used to
@@ -52,7 +52,7 @@ namespace Antlr4.Runtime
     {
         /// <summary>
         /// This is the backing field for
-        /// <see cref="GetRuleIndex()">GetRuleIndex()</see>
+        /// <see cref="RuleIndex()">RuleIndex()</see>
         /// .
         /// </summary>
         private readonly int ruleIndex;
@@ -72,9 +72,12 @@ namespace Antlr4.Runtime
             this.ruleIndex = ruleIndex;
         }
 
-        public override int GetRuleIndex()
+        public override int RuleIndex
         {
-            return ruleIndex;
+            get
+            {
+                return ruleIndex;
+            }
         }
     }
 }
