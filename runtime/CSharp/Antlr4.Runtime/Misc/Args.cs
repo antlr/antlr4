@@ -33,7 +33,7 @@ using Antlr4.Runtime.Sharpen;
 namespace Antlr4.Runtime.Misc
 {
     /// <author>Sam Harwell</author>
-    public sealed class Args
+    public static class Args
     {
         /// <exception cref="System.ArgumentNullException">
         /// if
@@ -46,12 +46,8 @@ namespace Antlr4.Runtime.Misc
         {
             if (value == null)
             {
-                throw new ArgumentNullException(parameterName + " cannot be null.");
+                throw new ArgumentNullException(parameterName);
             }
-        }
-
-        private Args()
-        {
         }
     }
 }
