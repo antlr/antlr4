@@ -27,8 +27,8 @@ def mkjar():
     manifest = """Version: %s
 Main-Class: org.antlr.v4.Tool
 """ % VERSION
-    # copy 3.5.1 in there
     unjar("runtime/Java/lib/org.abego.treelayout.core.jar", trgdir="out")
+    unjar(os.path.join(JARCACHE,"antlr-3.5.1-complete.jar"), trgdir="out")
     jar("dist/antlr-"+VERSION+"-complete.jar", srcdir="out", manifest=manifest)
 
 def all():
