@@ -4,12 +4,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{706D364A-CD4E-4720-B94C-0DB82AF7B433}</ProjectGuid>
+    <ProjectGuid>{5844076E-3C92-4122-BB7A-0D745C3F5334}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Antlr4.Runtime.Test</RootNamespace>
     <AssemblyName>Antlr4.Runtime.Test</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -17,7 +17,7 @@
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
-    <BaseIntermediateOutputPath>obj\net40\</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\portable-net45\</BaseIntermediateOutputPath>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
@@ -25,8 +25,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\net40\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;NET40;NET40PLUS;NET35PLUS;NET30PLUS;NET20PLUS</DefineConstants>
+    <OutputPath>bin\portable-net45\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;PORTABLE;NET45;NET45PLUS;NET40PLUS;NET35PLUS;NET30PLUS;NET20PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -34,8 +34,8 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\net40\Release\</OutputPath>
-    <DefineConstants>TRACE;NET40;NET40PLUS;NET35PLUS;NET30PLUS;NET20PLUS</DefineConstants>
+    <OutputPath>bin\portable-net45\Release\</OutputPath>
+    <DefineConstants>TRACE;PORTABLE;NET45;NET45PLUS;NET40PLUS;NET35PLUS;NET30PLUS;NET20PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -74,9 +74,9 @@
     <Compile Include="TestPerformance.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Antlr4.Runtime\Antlr4.Runtime.net40-client.csproj">
-      <Project>{423978df-85a4-409e-a16c-453683fe3969}</Project>
-      <Name>Antlr4.Runtime.net40-client</Name>
+    <ProjectReference Include="..\Antlr4.Runtime\Antlr4.Runtime.portable-net45.csproj">
+      <Project>{12269283-ee92-4faa-b849-53cd24f341fa}</Project>
+      <Name>Antlr4.Runtime.portable-net45</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -85,7 +85,7 @@
     <Antlr4 Include="Java.g4" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.Antlr4.Runtime.Test.net40-client.config" />
+    <None Include="packages.Antlr4.Runtime.Test.portable-net45.config" />
     <None Include="TestingKey.snk" />
   </ItemGroup>
   <Choose>

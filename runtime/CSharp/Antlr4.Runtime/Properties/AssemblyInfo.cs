@@ -35,8 +35,14 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-#if PORTABLE
-[assembly: AssemblyTitle("Antlr4.Runtime.Portable")]
+#if PORTABLE && NET45
+#if WINRT
+[assembly: AssemblyTitle("Antlr4.Runtime.netcore45")]
+#else
+[assembly: AssemblyTitle("Antlr4.Runtime.portable-net45")]
+#endif
+#elif PORTABLE && NET40
+[assembly: AssemblyTitle("Antlr4.Runtime.portable-net40")]
 #elif NET45
 [assembly: AssemblyTitle("Antlr4.Runtime.net45")]
 #elif NET40
@@ -57,15 +63,19 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright © Sam Harwell 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+[assembly: CLSCompliant(false)]
 
+#if !PORTABLE || NET45PLUS
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
-[assembly: CLSCompliant(false)]
 
+#if !PORTABLE
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("bc228eb9-e79c-4e5a-a1b9-0434ea566bab")]
+#endif
+#endif
 
 // Version information for an assembly consists of the following four values:
 //

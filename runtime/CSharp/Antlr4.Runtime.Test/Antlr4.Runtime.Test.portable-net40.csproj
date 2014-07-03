@@ -17,7 +17,7 @@
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
-    <BaseIntermediateOutputPath>obj\Portable\</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\portable-net40\</BaseIntermediateOutputPath>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
@@ -25,7 +25,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Portable\Debug\</OutputPath>
+    <OutputPath>bin\portable-net40\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE;PORTABLE;NET40;NET40PLUS;NET35PLUS;NET30PLUS;NET20PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -34,11 +34,17 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Portable\Release\</OutputPath>
+    <OutputPath>bin\portable-net40\Release\</OutputPath>
     <DefineConstants>TRACE;PORTABLE;NET40;NET40PLUS;NET35PLUS;NET30PLUS;NET20PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>TestingKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -68,9 +74,9 @@
     <Compile Include="TestPerformance.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Antlr4.Runtime\Antlr4.Runtime.Portable.csproj">
+    <ProjectReference Include="..\Antlr4.Runtime\Antlr4.Runtime.portable-net40.csproj">
       <Project>{06c182c5-095c-4d43-9c33-c87e305c6bc2}</Project>
-      <Name>Antlr4.Runtime.Portable</Name>
+      <Name>Antlr4.Runtime.portable-net40</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -79,7 +85,8 @@
     <Antlr4 Include="Java.g4" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.Antlr4.Runtime.Test.Portable.config" />
+    <None Include="packages.Antlr4.Runtime.Test.portable-net40.config" />
+    <None Include="TestingKey.snk" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

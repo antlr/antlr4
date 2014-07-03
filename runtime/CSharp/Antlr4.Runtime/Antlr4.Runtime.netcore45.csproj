@@ -3,19 +3,16 @@
   <Import Project="..\packages\Antlr4.4.2.1-alpha001\build\Antlr4.props" Condition="Exists('..\packages\Antlr4.4.2.1-alpha001\build\Antlr4.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{06C182C5-095C-4D43-9C33-C87E305C6BC2}</ProjectGuid>
+    <ProjectGuid>{F3145DCA-EA26-4482-80D6-5232A79E2A3A}</ProjectGuid>
+    <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Antlr4.Runtime</RootNamespace>
-    <AssemblyName>Antlr4.Runtime.Portable</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Profile5</TargetFrameworkProfile>
+    <AssemblyName>Antlr4.Runtime.netcore45</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <BaseIntermediateOutputPath>obj\Portable\</BaseIntermediateOutputPath>
-    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <BaseIntermediateOutputPath>obj\netcore45\</BaseIntermediateOutputPath>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
@@ -23,9 +20,9 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Portable\Debug\</OutputPath>
+    <OutputPath>bin\netcore45\Debug\</OutputPath>
     <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
-    <DefineConstants>TRACE;DEBUG;NET_2_0;NET_3_0;NET_3_5;NET_4_0;PORTABLE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;WINRT;PORTABLE;NET45;NET45PLUS;NET40PLUS;NET35PLUS;NET30PLUS;NET20PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>1591</NoWarn>
@@ -33,9 +30,9 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Portable\Release\</OutputPath>
+    <OutputPath>bin\netcore45\Release\</OutputPath>
     <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
-    <DefineConstants>TRACE;NET_2_0;NET_3_0;NET_3_5;NET_4_0;PORTABLE</DefineConstants>
+    <DefineConstants>TRACE;WINRT;PORTABLE;NET45;NET45PLUS;NET40PLUS;NET35PLUS;NET30PLUS;NET20PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>1591</NoWarn>
@@ -46,9 +43,6 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\..\..\..\..\..\keys\antlr\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <ItemGroup>
-    <!-- A reference to the entire .NET Framework is automatically included -->
-  </ItemGroup>
   <ItemGroup>
     <Compile Include="AntlrFileStream.cs" />
     <Compile Include="AntlrInputStream.cs" />
@@ -164,13 +158,13 @@
       <Link>Key.snk</Link>
     </None>
     <None Include="Misc\Array2DHashSet`1.cs" />
-    <Compile Include="Misc\MurmurHash.cs" />
     <Compile Include="Misc\NullableAttribute.cs" />
     <None Include="Misc\DoubleKeyMap`3.cs" />
     <Compile Include="Misc\IIntSet.cs" />
     <Compile Include="Misc\Interval.cs" />
     <Compile Include="Misc\IntervalSet.cs" />
     <Compile Include="Misc\MultiMap`2.cs" />
+    <Compile Include="Misc\MurmurHash.cs" />
     <Compile Include="Misc\NotNullAttribute.cs" />
     <None Include="Misc\OrderedHashSet`1.cs" />
     <Compile Include="Misc\ParseCanceledException.cs" />
@@ -194,6 +188,7 @@
     <Compile Include="Sharpen\AtomicReference`1.cs" />
     <Compile Include="Sharpen\BitSet.cs" />
     <Compile Include="Sharpen\Collections.cs" />
+    <Compile Include="Sharpen\Compat\SerializableAttribute.cs" />
     <Compile Include="Sharpen\DictionaryExtensions.cs" />
     <Compile Include="Sharpen\ListExtensions.cs" />
     <Compile Include="Sharpen\Runtime.cs" />
@@ -233,13 +228,13 @@
     <Compile Include="Tree\Xpath\XPathWildcardElement.cs" />
     <Compile Include="UnbufferedCharStream.cs" />
     <Compile Include="UnbufferedTokenStream.cs" />
-    <None Include="packages.Antlr4.Runtime.Portable.config" />
+    <None Include="packages.Antlr4.Runtime.netcore45.config" />
     <Antlr4 Include="Tree\Xpath\XPathLexer.g4">
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>Antlr4.Runtime.Tree.Xpath</CustomToolNamespace>
     </Antlr4>
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>

@@ -155,9 +155,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// </summary>
     public class ParseTreePatternMatcher
     {
-#if !PORTABLE
         [System.Serializable]
-#endif
         public class CannotInvokeStartRule : Exception
         {
             public CannotInvokeStartRule(Exception e)
@@ -166,9 +164,7 @@ namespace Antlr4.Runtime.Tree.Pattern
             }
         }
 
-#if !PORTABLE
         [System.Serializable]
-#endif
         public class StartRuleDoesNotConsumeFullPattern : Exception
         {
             // Fixes https://github.com/antlr/antlr4/issues/413
