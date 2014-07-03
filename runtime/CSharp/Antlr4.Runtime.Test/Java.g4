@@ -168,14 +168,48 @@
 grammar Java;
 
 @lexer::members {
-  protected const int EOF = Eof;
-  protected const int HIDDEN = Hidden;
-  protected bool enumIsKeyword = true;
-  protected bool assertIsKeyword = true;
+
+private static bool IsJavaIdentifierCharacter(char c, bool start)
+{
+	switch (char.GetUnicodeCategory(c))
+	{
+	case System.Globalization.UnicodeCategory.UppercaseLetter:
+	case System.Globalization.UnicodeCategory.LowercaseLetter:
+	case System.Globalization.UnicodeCategory.TitlecaseLetter:
+	case System.Globalization.UnicodeCategory.ModifierLetter:
+	case System.Globalization.UnicodeCategory.OtherLetter:
+		// isLetter returns true
+		return true;
+
+	case System.Globalization.UnicodeCategory.LetterNumber:
+		// getType returns LETTER_NUMBER
+		return true;
+
+	case System.Globalization.UnicodeCategory.CurrencySymbol:
+		// a currency symbol (such as "$")
+		return true;
+
+	case System.Globalization.UnicodeCategory.ConnectorPunctuation:
+		// a connecting punctuation character (such as "_")
+		return true;
+
+	case System.Globalization.UnicodeCategory.DecimalDigitNumber:
+		// it is a digit
+		return !start;
+
+	case System.Globalization.UnicodeCategory.SpacingCombiningMark:
+		// it is a combining mark
+		return !start;
+
+	case System.Globalization.UnicodeCategory.NonSpacingMark:
+		// it is a non-spacing mark
+		return !start;
+
+	default:
+		return false;
+	}
 }
 
-@parser::members {
-  protected const int EOF = Eof;
 }
 
 // starting point for parsing a java file
@@ -213,14 +247,15 @@ classOrInterfaceModifiers
     ;
 
 classOrInterfaceModifier
-    :   annotation   // class or interface
-    |   'public'     // class or interface
-    |   'protected'  // class or interface
-    |   'private'    // class or interface
-    |   'abstract'   // class or interface
-    |   'static'     // class or interface
-    |   'final'      // class only -- does not apply to interfaces
-    |   'strictfp'   // class or interface
+    :   annotation       // class or interface
+    |   (   'public'     // class or interface
+        |   'protected'  // class or interface
+        |   'private'    // class or interface
+        |   'abstract'   // class or interface
+        |   'static'     // class or interface
+        |   'final'      // class only -- does not apply to interfaces
+        |   'strictfp'   // class or interface
+        )
     ;
 
 modifiers
@@ -417,17 +452,18 @@ arrayInitializer
 
 modifier
     :   annotation
-    |   'public'
-    |   'protected'
-    |   'private'
-    |   'static'
-    |   'abstract'
-    |   'final'
-    |   'native'
-    |   'synchronized'
-    |   'transient'
-    |   'volatile'
-    |   'strictfp'
+    |   (   'public'
+        |   'protected'
+        |   'private'
+        |   'static'
+        |   'abstract'
+        |   'final'
+        |   'native'
+        |   'synchronized'
+        |   'transient'
+        |   'volatile'
+        |   'strictfp'
+        )
     ;
 
 packageOrTypeName
@@ -498,37 +534,20 @@ methodBody
     ;
 
 constructorBody
-    :   '{' explicitConstructorInvocation? blockStatement* '}'
+    :   block
     ;
-
-explicitConstructorInvocation
-    :   nonWildcardTypeArguments? ('this' | 'super') arguments ';'
-    |   primary '.' nonWildcardTypeArguments? 'super' arguments ';'
-    ;
-
 
 qualifiedName
     :   Identifier ('.' Identifier)*
     ;
     
 literal 
-    :   integerLiteral
+    :   IntegerLiteral
     |   FloatingPointLiteral
     |   CharacterLiteral
     |   StringLiteral
-    |   booleanLiteral
+    |   BooleanLiteral
     |   'null'
-    ;
-
-integerLiteral
-    :   HexLiteral
-    |   OctalLiteral
-    |   DecimalLiteral
-    ;
-
-booleanLiteral
-    :   'true'
-    |   'false'
     ;
 
 // ANNOTATIONS
@@ -573,6 +592,7 @@ annotationTypeBody
     
 annotationTypeElementDeclaration
     :   modifiers annotationTypeElementRest
+	|	';' // this is not allowed by the grammar, but apparently allowed by the actual compiler
     ;
     
 annotationTypeElementRest
@@ -625,18 +645,14 @@ variableModifiers
     ;
 
 statement
-//@leftfactor{catches}
-    : block
+    :	block
     |   ASSERT expression (':' expression)? ';'
     |   'if' parExpression statement ('else' statement)?
     |   'for' '(' forControl ')' statement
     |   'while' parExpression statement
     |   'do' statement 'while' parExpression ';'
-    |   'try' block
-        ( catches 'finally' block
-        | catches
-        |   'finally' block
-        )
+    |   'try' block (catches finallyBlock? | finallyBlock)
+	|	'try' resourceSpecification block catches? finallyBlock?
     |   'switch' parExpression '{' switchBlockStatementGroups '}'
     |   'synchronized' parExpression block
     |   'return' expression? ';'
@@ -647,14 +663,34 @@ statement
     |   statementExpression ';'
     |   Identifier ':' statement
     ;
-    
+
 catches
-    :   catchClause (catchClause)*
+    :   catchClause+
     ;
     
 catchClause
-    :   'catch' '(' formalParameter ')' block
+    :   'catch' '(' variableModifiers catchType Identifier ')' block
     ;
+
+catchType
+	:	qualifiedName ('|' qualifiedName)*
+	;
+
+finallyBlock
+	:	'finally' block
+	;
+
+resourceSpecification
+	:	'(' resources ';'? ')'
+	;
+
+resources
+	:	resource (';' resource)*
+	;
+
+resource
+	:	variableModifiers classOrInterfaceType variableDeclaratorId '=' expression
+	;
 
 formalParameter
     :   variableModifiers type variableDeclaratorId
@@ -728,27 +764,13 @@ assignmentOperator
     |   '|='
     |   '^='
     |   '%='
-    |   t1='<' t2='<' t3='='
-//        { $t1.getLine() == $t2.getLine() &&
-//          $t1.getCharPositionInLine() + 1 == $t2.getCharPositionInLine() &&
-//          $t2.getLine() == $t3.getLine() &&
-//          $t2.getCharPositionInLine() + 1 == $t3.getCharPositionInLine() }?
-    |   t1='>' t2='>' t3='>' t4='='
-//        { $t1.getLine() == $t2.getLine() &&
-//          $t1.getCharPositionInLine() + 1 == $t2.getCharPositionInLine() &&
-//          $t2.getLine() == $t3.getLine() &&
-//          $t2.getCharPositionInLine() + 1 == $t3.getCharPositionInLine() &&
-//          $t3.getLine() == $t4.getLine() &&
-//          $t3.getCharPositionInLine() + 1 == $t4.getCharPositionInLine() }?
-    |   t1='>' t2='>' t3='='
-//        { $t1.getLine() == $t2.getLine() &&
-//          $t1.getCharPositionInLine() + 1 == $t2.getCharPositionInLine() &&
-//          $t2.getLine() == $t3.getLine() &&
-//          $t2.getCharPositionInLine() + 1 == $t3.getCharPositionInLine() }?
+    |   '<<='
+    |   '>>='
+    |   '>>>='
     ;
 
 conditionalExpression
-    :   conditionalOrExpression ( '?' conditionalExpression ':' conditionalExpression )?
+    :   conditionalOrExpression ( '?' expression ':' conditionalExpression )?
     ;
 
 conditionalOrExpression
@@ -784,14 +806,10 @@ relationalExpression
     ;
     
 relationalOp
-    :   t1='<' t2='='
-//        { $t1.getLine() == $t2.getLine() &&
-//          $t1.getCharPositionInLine() + 1 == $t2.getCharPositionInLine() }?
-    |   t1='>' t2='='
-//        { $t1.getLine() == $t2.getLine() &&
-//          $t1.getCharPositionInLine() + 1 == $t2.getCharPositionInLine() }?
-    |   '<' 
-    |   '>' 
+    :   '<='
+    |   '>='
+    |   '<'
+    |   '>'
     ;
 
 shiftExpression
@@ -843,10 +861,11 @@ castExpression
 
 primary
     :   parExpression
-    |   'this' ('.' Identifier)* identifierSuffix?
+    |   'this' arguments?
     |   'super' superSuffix
     |   literal
     |   'new' creator
+	|	nonWildcardTypeArguments (explicitGenericInvocationSuffix | 'this' arguments)
     |   Identifier ('.' Identifier)* identifierSuffix?
     |   primitiveType ('[' ']')* '.' 'class'
     |   'void' '.' 'class'
@@ -854,13 +873,13 @@ primary
 
 identifierSuffix
     :   ('[' ']')+ '.' 'class'
-    |   ('[' expression ']')+ // can also be matched by selector, but do here
+    |   '[' expression ']'
     |   arguments
     |   '.' 'class'
     |   '.' explicitGenericInvocation
     |   '.' 'this'
     |   '.' 'super' arguments
-    |   '.' 'new' innerCreator
+    |   '.' 'new' nonWildcardTypeArguments? innerCreator
     ;
 
 creator
@@ -869,12 +888,12 @@ creator
     ;
 
 createdName
-    :   classOrInterfaceType
-    |   primitiveType
+    :   Identifier typeArgumentsOrDiamond? ('.' Identifier typeArgumentsOrDiamond?)*
+	|	primitiveType
     ;
     
 innerCreator
-    :   nonWildcardTypeArguments? Identifier classCreatorRest
+    :   Identifier nonWildcardTypeArgumentsOrDiamond? classCreatorRest
     ;
 
 arrayCreatorRest
@@ -889,18 +908,29 @@ classCreatorRest
     ;
     
 explicitGenericInvocation
-    :   nonWildcardTypeArguments Identifier arguments
+    :   nonWildcardTypeArguments explicitGenericInvocationSuffix
     ;
     
 nonWildcardTypeArguments
     :   '<' typeList '>'
     ;
-    
+
+typeArgumentsOrDiamond
+	:	'<' '>'
+	|	typeArguments
+	;
+
+nonWildcardTypeArgumentsOrDiamond
+	:	'<' '>'
+	|	nonWildcardTypeArguments
+	;
+
 selector
     :   '.' Identifier arguments?
+	|	'.' explicitGenericInvocation
     |   '.' 'this'
     |   '.' 'super' superSuffix
-    |   '.' 'new' innerCreator
+    |   '.' 'new' nonWildcardTypeArguments? innerCreator
     |   '[' expression ']'
     ;
     
@@ -909,128 +939,439 @@ superSuffix
     |   '.' Identifier arguments?
     ;
 
+explicitGenericInvocationSuffix
+	:	'super' superSuffix
+	|	Identifier arguments
+	;
+
 arguments
     :   '(' expressionList? ')'
     ;
 
 // LEXER
 
-HexLiteral : '0' ('x'|'X') HexDigit+ IntegerTypeSuffix? ;
+// §3.9 Keywords
 
-DecimalLiteral : ('0' | '1'..'9' '0'..'9'*) IntegerTypeSuffix? ;
+ABSTRACT : 'abstract';
+ASSERT : 'assert';
+BOOLEAN : 'boolean';
+BREAK : 'break';
+BYTE : 'byte';
+CASE : 'case';
+CATCH : 'catch';
+CHAR : 'char';
+CLASS : 'class';
+CONST : 'const';
+CONTINUE : 'continue';
+DEFAULT : 'default';
+DO : 'do';
+DOUBLE : 'double';
+ELSE : 'else';
+ENUM : 'enum';
+EXTENDS : 'extends';
+FINAL : 'final';
+FINALLY : 'finally';
+FLOAT : 'float';
+FOR : 'for';
+IF : 'if';
+GOTO : 'goto';
+IMPLEMENTS : 'implements';
+IMPORT : 'import';
+INSTANCEOF : 'instanceof';
+INT : 'int';
+INTERFACE : 'interface';
+LONG : 'long';
+NATIVE : 'native';
+NEW : 'new';
+PACKAGE : 'package';
+PRIVATE : 'private';
+PROTECTED : 'protected';
+PUBLIC : 'public';
+RETURN : 'return';
+SHORT : 'short';
+STATIC : 'static';
+STRICTFP : 'strictfp';
+SUPER : 'super';
+SWITCH : 'switch';
+SYNCHRONIZED : 'synchronized';
+THIS : 'this';
+THROW : 'throw';
+THROWS : 'throws';
+TRANSIENT : 'transient';
+TRY : 'try';
+VOID : 'void';
+VOLATILE : 'volatile';
+WHILE : 'while';
 
-OctalLiteral : '0' ('0'..'7')+ IntegerTypeSuffix? ;
+// §3.10.1 Integer Literals
+
+IntegerLiteral
+	:	DecimalIntegerLiteral
+	|	HexIntegerLiteral
+	|	OctalIntegerLiteral
+	|	BinaryIntegerLiteral
+	;
 
 fragment
-HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;
+DecimalIntegerLiteral
+	:	DecimalNumeral IntegerTypeSuffix?
+	;
 
 fragment
-IntegerTypeSuffix : ('l'|'L') ;
+HexIntegerLiteral
+	:	HexNumeral IntegerTypeSuffix?
+	;
+
+fragment
+OctalIntegerLiteral
+	:	OctalNumeral IntegerTypeSuffix?
+	;
+
+fragment
+BinaryIntegerLiteral
+	:	BinaryNumeral IntegerTypeSuffix?
+	;
+
+fragment
+IntegerTypeSuffix
+	:	[lL]
+	;
+
+fragment
+DecimalNumeral
+	:	'0'
+	|	NonZeroDigit (Digits? | Underscores Digits)
+	;
+
+fragment
+Digits
+	:	Digit (DigitsAndUnderscores? Digit)?
+	;
+
+fragment
+Digit
+	:	'0'
+	|	NonZeroDigit
+	;
+
+fragment
+NonZeroDigit
+	:	[1-9]
+	;
+
+fragment
+DigitsAndUnderscores
+	:	DigitOrUnderscore+
+	;
+
+fragment
+DigitOrUnderscore
+	:	Digit
+	|	'_'
+	;
+
+fragment
+Underscores
+	:	'_'+
+	;
+
+fragment
+HexNumeral
+	:	'0' [xX] HexDigits
+	;
+
+fragment
+HexDigits
+	:	HexDigit (HexDigitsAndUnderscores? HexDigit)?
+	;
+
+fragment
+HexDigit
+	:	[0-9a-fA-F]
+	;
+
+fragment
+HexDigitsAndUnderscores
+	:	HexDigitOrUnderscore+
+	;
+
+fragment
+HexDigitOrUnderscore
+	:	HexDigit
+	|	'_'
+	;
+
+fragment
+OctalNumeral
+	:	'0' Underscores? OctalDigits
+	;
+
+fragment
+OctalDigits
+	:	OctalDigit (OctalDigitsAndUnderscores? OctalDigit)?
+	;
+
+fragment
+OctalDigit
+	:	[0-7]
+	;
+
+fragment
+OctalDigitsAndUnderscores
+	:	OctalDigitOrUnderscore+
+	;
+
+fragment
+OctalDigitOrUnderscore
+	:	OctalDigit
+	|	'_'
+	;
+
+fragment
+BinaryNumeral
+	:	'0' [bB] BinaryDigits
+	;
+
+fragment
+BinaryDigits
+	:	BinaryDigit (BinaryDigitsAndUnderscores? BinaryDigit)?
+	;
+
+fragment
+BinaryDigit
+	:	[01]
+	;
+
+fragment
+BinaryDigitsAndUnderscores
+	:	BinaryDigitOrUnderscore+
+	;
+
+fragment
+BinaryDigitOrUnderscore
+	:	BinaryDigit
+	|	'_'
+	;
+
+// §3.10.2 Floating-Point Literals
 
 FloatingPointLiteral
-    :   ('0'..'9')+ '.' ('0'..'9')* Exponent? FloatTypeSuffix?
-    |   '.' ('0'..'9')+ Exponent? FloatTypeSuffix?
-    |   ('0'..'9')+ Exponent FloatTypeSuffix?
-    |   ('0'..'9')+ FloatTypeSuffix
-    |   '0' ('x'|'X')
-        (   HexDigit+ ('.' HexDigit*)? HexExponent FloatTypeSuffix?
-        |   '.' HexDigit+ HexExponent FloatTypeSuffix?
-        )
-    ;
+	:	DecimalFloatingPointLiteral
+	|	HexadecimalFloatingPointLiteral
+	;
 
 fragment
-Exponent : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;
+DecimalFloatingPointLiteral
+	:	Digits '.' Digits? ExponentPart? FloatTypeSuffix?
+	|	'.' Digits ExponentPart? FloatTypeSuffix?
+	|	Digits ExponentPart FloatTypeSuffix?
+	|	Digits FloatTypeSuffix
+	;
 
 fragment
-HexExponent : ('p'|'P') ('+'|'-')? ('0'..'9')+ ;
+ExponentPart
+	:	ExponentIndicator SignedInteger
+	;
 
 fragment
-FloatTypeSuffix : ('f'|'F'|'d'|'D') ;
+ExponentIndicator
+	:	[eE]
+	;
+
+fragment
+SignedInteger
+	:	Sign? Digits
+	;
+
+fragment
+Sign
+	:	[+-]
+	;
+
+fragment
+FloatTypeSuffix
+	:	[fFdD]
+	;
+
+fragment
+HexadecimalFloatingPointLiteral
+	:	HexSignificand BinaryExponent FloatTypeSuffix?
+	;
+
+fragment
+HexSignificand
+	:	HexNumeral '.'?
+	|	'0' [xX] HexDigits? '.' HexDigits
+	;
+
+fragment
+BinaryExponent
+	:	BinaryExponentIndicator SignedInteger
+	;
+
+fragment
+BinaryExponentIndicator
+	:	[pP]
+	;
+
+// §3.10.3 Boolean Literals
+
+BooleanLiteral
+	:	'true'
+	|	'false'
+	;
+
+// §3.10.4 Character Literals
 
 CharacterLiteral
-    :   '\'' ( EscapeSequence | ~('\''|'\\') ) '\''
-    ;
+	:	'\'' SingleCharacter '\''
+	|	'\'' EscapeSequence '\''
+	;
+
+fragment
+SingleCharacter
+	:	~['\\]
+	;
+
+// §3.10.5 String Literals
 
 StringLiteral
-    :  '"' ( EscapeSequence | ~('\\'|'"') )* '"'
-    ;
+	:	'"' StringCharacters? '"'
+	;
+
+fragment
+StringCharacters
+	:	StringCharacter+
+	;
+
+fragment
+StringCharacter
+	:	~["\\]
+	|	EscapeSequence
+	;
+
+// §3.10.6 Escape Sequences for Character and String Literals
 
 fragment
 EscapeSequence
-    :   '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\')
-    |   UnicodeEscape
-    |   OctalEscape
-    ;
+	:	'\\' [btnfr"'\\]
+	|	OctalEscape
+	;
 
 fragment
 OctalEscape
-    :   '\\' ('0'..'3') ('0'..'7') ('0'..'7')
-    |   '\\' ('0'..'7') ('0'..'7')
-    |   '\\' ('0'..'7')
-    ;
+	:	'\\' OctalDigit
+	|	'\\' OctalDigit OctalDigit
+	|	'\\' ZeroToThree OctalDigit OctalDigit
+	;
 
 fragment
-UnicodeEscape
-    :   '\\' 'u' HexDigit HexDigit HexDigit HexDigit
-    ;
+ZeroToThree
+	:	[0-3]
+	;
 
-ENUM:   'enum' {enumIsKeyword}?
-    ;
-    
-ASSERT
-    :   'assert' {assertIsKeyword}?
-    ;
-    
-Identifier 
-    :   Letter (Letter|JavaIDDigit)*
-    ;
+// §3.10.7 The Null Literal
 
-/**I found this char range in JavaCC's grammar, but Letter and Digit overlap.
-   Still works, but...
- */
+NullLiteral
+	:	'null'
+	;
+
+// §3.11 Separators
+
+LPAREN : '(';
+RPAREN : ')';
+LBRACE : '{';
+RBRACE : '}';
+LBRACK : '[';
+RBRACK : ']';
+SEMI : ';';
+COMMA : ',';
+DOT : '.';
+
+// §3.12 Operators
+
+ASSIGN : '=';
+GT : '>';
+LT : '<';
+BANG : '!';
+TILDE : '~';
+QUESTION : '?';
+COLON : ':';
+EQUAL : '==';
+LE : '<=';
+GE : '>=';
+NOTEQUAL : '!=';
+AND : '&&';
+OR : '||';
+INC : '++';
+DEC : '--';
+ADD : '+';
+SUB : '-';
+MUL : '*';
+DIV : '/';
+BITAND : '&';
+BITOR : '|';
+CARET : '^';
+MOD : '%';
+
+ADD_ASSIGN : '+=';
+SUB_ASSIGN : '-=';
+MUL_ASSIGN : '*=';
+DIV_ASSIGN : '/=';
+AND_ASSIGN : '&=';
+OR_ASSIGN : '|=';
+XOR_ASSIGN : '^=';
+MOD_ASSIGN : '%=';
+LSHIFT_ASSIGN : '<<=';
+RSHIFT_ASSIGN : '>>=';
+URSHIFT_ASSIGN : '>>>=';
+
+// §3.8 Identifiers (must appear after all keywords in the grammar)
+
+Identifier
+	:	JavaLetter JavaLetterOrDigit*
+	;
+
 fragment
-Letter
-    :  '\u0024' |
-       '\u0041'..'\u005a' |
-       '\u005f' |
-       '\u0061'..'\u007a' |
-       '\u00c0'..'\u00d6' |
-       '\u00d8'..'\u00f6' |
-       '\u00f8'..'\u00ff' |
-       '\u0100'..'\u1fff' |
-       '\u3040'..'\u318f' |
-       '\u3300'..'\u337f' |
-       '\u3400'..'\u3d2d' |
-       '\u4e00'..'\u9fff' |
-       '\uf900'..'\ufaff'
-    ;
+JavaLetter
+	:	[a-zA-Z$_] // these are the "java letters" below 0xFF
+	|	// covers all characters above 0xFF which are not a surrogate
+		~[\u0000-\u00FF\uD800-\uDBFF]
+		{IsJavaIdentifierCharacter((char)_input.La(-1), true)}?
+	//|	// covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
+	//	[\uD800-\uDBFF] [\uDC00-\uDFFF]
+	//	{Character.isJavaIdentifierStart(Character.toCodePoint((char)_input.La(-2), (char)_input.La(-1)))}?
+	;
 
 fragment
-JavaIDDigit
-    :  '\u0030'..'\u0039' |
-       '\u0660'..'\u0669' |
-       '\u06f0'..'\u06f9' |
-       '\u0966'..'\u096f' |
-       '\u09e6'..'\u09ef' |
-       '\u0a66'..'\u0a6f' |
-       '\u0ae6'..'\u0aef' |
-       '\u0b66'..'\u0b6f' |
-       '\u0be7'..'\u0bef' |
-       '\u0c66'..'\u0c6f' |
-       '\u0ce6'..'\u0cef' |
-       '\u0d66'..'\u0d6f' |
-       '\u0e50'..'\u0e59' |
-       '\u0ed0'..'\u0ed9' |
-       '\u1040'..'\u1049'
-   ;
+JavaLetterOrDigit
+	:	[a-zA-Z0-9$_] // these are the "java letters or digits" below 0xFF
+	|	// covers all characters above 0xFF which are not a surrogate
+		~[\u0000-\u00FF\uD800-\uDBFF]
+		{IsJavaIdentifierCharacter((char)_input.La(-1), false)}?
+	//|	// covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
+	//	[\uD800-\uDBFF] [\uDC00-\uDFFF]
+	//	{Character.isJavaIdentifierPart(Character.toCodePoint((char)_input.La(-2), (char)_input.La(-1)))}?
+	;
 
-WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ -> channel(HIDDEN)
+//
+// Additional symbols not defined in the lexical specification
+//
+
+AT : '@';
+ELLIPSIS : '...';
+
+//
+// Whitespace and comments
+//
+
+WS  :  [ \t\r\n\u000C]+ -> skip
     ;
 
 COMMENT
-    :   '/*' .*? '*/' -> channel(HIDDEN)
+    :   '/*' .*? '*/' -> skip
     ;
 
 LINE_COMMENT
-    : '//' ~('\n'|'\r')* '\r'? '\n' -> channel(HIDDEN)
+    :   '//' ~[\r\n]* -> skip
     ;
