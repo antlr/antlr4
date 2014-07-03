@@ -6,6 +6,8 @@ sys.path.append(os.path.abspath("/Users/parrt/github/bild"))
 from bilder import *
 
 VERSION = "4.4"
+PYTHON2_TARGET = "../antlr4-python2"
+PYTHON3_TARGET = "../antlr4-python3"
 
 def parsers():
     antlr3("tool/src/org/antlr/v4/parse", "gen", package="org.antlr.v4.parse")
@@ -52,5 +54,7 @@ def mkdoc():
     mkdir("doc/Java/org/antlr/v4/runtime/atn/images")
     for f in glob.glob("runtime/Java/src/main/dot/org/antlr/v4/runtime/atn/images/*.dot"):
         dot(f, "doc/Java/org/antlr/v4/runtime/atn/images", format="svg")
+    zip("doc/antlr4-runtime.zip", "doc/Java")
+    zip("doc/antlr4-tool.zip", "doc/JavaTool")
 
 processargs(globals()) # E.g., "python bild.py all"
