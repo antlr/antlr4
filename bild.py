@@ -28,9 +28,7 @@ def compile():
 	javac("gen", "out", version="1.6", cp=cp, args=args)
 	# pull in targets
 	for t in TARGETS:
-		javac(TARGETS[t]+"/tool/src/org/antlr/v4/codegen/"+t+"Target.java",
-			  "out/org/antlr/v4/tool/templates/codegen",
-			  version="1.6", cp=cp, args=args)
+		javac(TARGETS[t]+"/tool/src", "out", version="1.6", cp=cp, args=args)
 
 def mkjar():
 	require(compile)
@@ -60,7 +58,13 @@ def mkdoc():
 	mkdir("doc/Java")
 	mkdir("doc/JavaTool")
 	javadoc(srcdir="runtime/Java/src", trgdir="doc/Java", packages="org.antlr.v4.runtime")
-	javadoc(srcdir="tool/src", trgdir="doc/JavaTool", packages="org.antlr.v4")
+	toolsrc = ["tool/src"]+ [TARGETS[t]+"/tool/src" for t in TARGETS]
+	toolsrc = string.join(toolsrc, ":")
+	javadoc(srcdir=toolsrc, trgdir="doc/JavaTool", packages="org.antlr.v4")
+	# for t in TARGETS:
+	# 	javadoc(srcdir=TARGETS[t]+"/tool/src",
+	# 			trgdir="doc/JavaTool",
+	# 			packages="org.antlr.v4.codegen")
 	# build stack merge PredictionContext and ATNState images from DOT
 	# DOT Images are in runtime/Java/src/main/dot/org/antlr/v4/runtime/atn/images/
 	# Gen into E.g., doc/Java/org/antlr/v4/runtime/atn/images/SingletonMerge_DiffRootSamePar.svg
