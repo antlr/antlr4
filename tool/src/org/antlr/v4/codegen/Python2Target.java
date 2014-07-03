@@ -41,23 +41,23 @@ import java.util.Set;
 public class Python2Target extends AbstractPythonTarget {
 
 	protected static final String[] python2Keywords = {
-		"abs", "all", "any", "apply", "as", 
-		"bin", "bool", "buffer", "bytearray", 
-		"callable", "chr", "classmethod", "coerce", "compile", "complex", 
-		"delattr", "dict", "dir", "divmod", 
+		"abs", "all", "any", "apply", "as",
+		"bin", "bool", "buffer", "bytearray",
+		"callable", "chr", "classmethod", "coerce", "compile", "complex",
+		"delattr", "dict", "dir", "divmod",
 		"enumerate", "eval", "execfile",
-		"file", "filter", "float", "format", "frozenset", 
-		"getattr", "globals", 
-		"hasattr", "hash", "help", "hex", 
-		"id", "input", "int", "intern", "isinstance", "issubclass", "iter", 
-		"len", "list", "locals", 
-		"map", "max", "min", "next", 
-		"memoryview", 
-		"object", "oct", "open", "ord", 
-		"pow", "print", "property", 
-		"range", "raw_input", "reduce", "reload", "repr", "reversed", "round", 
+		"file", "filter", "float", "format", "frozenset",
+		"getattr", "globals",
+		"hasattr", "hash", "help", "hex",
+		"id", "input", "int", "intern", "isinstance", "issubclass", "iter",
+		"len", "list", "locals",
+		"map", "max", "min", "next",
+		"memoryview",
+		"object", "oct", "open", "ord",
+		"pow", "print", "property",
+		"range", "raw_input", "reduce", "reload", "repr", "reversed", "round",
 		"set", "setattr", "slice", "sorted", "staticmethod", "str", "sum", "super",
-		"tuple", "type", 
+		"tuple", "type",
 		"unichr", "unicode",
 		"vars",
 		"with",
@@ -74,7 +74,7 @@ public class Python2Target extends AbstractPythonTarget {
 		super(gen, "Python2");
 	}
 
-	
+
 	@Override
 	public String getVersion() {
 		return "4.4.0";
