@@ -30,16 +30,20 @@
 
 package org.antlr.v4.codegen;
 
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.StringRenderer;
+
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 /**
  *
  * @author Eric Vergnaud
  */
-public class Python2Target extends AbstractPythonTarget {
-
+public class Python2Target extends Target {
 	protected static final String[] python2Keywords = {
 		"abs", "all", "any", "apply", "as",
 		"bin", "bool", "buffer", "bytearray",
@@ -74,10 +78,50 @@ public class Python2Target extends AbstractPythonTarget {
 		super(gen, "Python2");
 	}
 
+	@Override
+	public int getSerializedATNSegmentLimit() {
+		// set to something stupid to avoid segmentation
+		return 2 ^ 31;
+	}
+
+	@Override
+	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
+		return getBadWords().contains(idNode.getText());
+	}
+
+	@Override
+	protected STGroup loadTemplates() {
+		STGroup result = super.loadTemplates();
+		result.registerRenderer(String.class, new PythonStringRenderer(), true);
+		return result;
+	}
+
+	protected static class PythonStringRenderer extends StringRenderer {
+
+		@Override
+		public String toString(Object o, String formatString, Locale locale) {
+			return super.toString(o, formatString, locale);
+		}
+	}
+
+	@Override
+	public boolean wantsBaseListener() {
+		return false;
+	}
+
+	@Override
+	public boolean wantsBaseVisitor() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsOverloadedMethods() {
+		return false;
+	}
 
 	@Override
 	public String getVersion() {
-		return "4.4.0";
+		return "4.4";
 	}
 
 	public Set<String> getBadWords() {
@@ -93,6 +137,4 @@ public class Python2Target extends AbstractPythonTarget {
 		badWords.add("rule");
 		badWords.add("parserRule");
 	}
-
-
 }
