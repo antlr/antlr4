@@ -82,15 +82,21 @@ namespace Antlr4.Runtime
             this.OffendingToken = offendingToken;
         }
 
-        public virtual IToken GetStartToken()
+        public virtual IToken StartToken
         {
-            return startToken;
+            get
+            {
+                return startToken;
+            }
         }
 
-        [return: Nullable]
-        public virtual ATNConfigSet GetDeadEndConfigs()
+        [Nullable]
+        public virtual ATNConfigSet DeadEndConfigs
         {
-            return deadEndConfigs;
+            get
+            {
+                return deadEndConfigs;
+            }
         }
     }
 }

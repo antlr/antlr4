@@ -65,10 +65,13 @@ namespace Antlr4.Runtime.Atn
         /// instances, indexed by decision
         /// number.
         /// </returns>
-        [return: NotNull]
-        public virtual DecisionInfo[] GetDecisionInfo()
+        [NotNull]
+        public virtual Antlr4.Runtime.Atn.DecisionInfo[] DecisionInfo
         {
-            return atnSimulator.GetDecisionInfo();
+            get
+            {
+                return atnSimulator.DecisionInfo;
+            }
         }
 
         /// <summary>
@@ -88,7 +91,7 @@ namespace Antlr4.Runtime.Atn
         [return: NotNull]
         public virtual IList<int> GetLLDecisions()
         {
-            DecisionInfo[] decisions = atnSimulator.GetDecisionInfo();
+            Antlr4.Runtime.Atn.DecisionInfo[] decisions = atnSimulator.DecisionInfo;
             IList<int> Ll = new List<int>();
             for (int i = 0; i < decisions.Length; i++)
             {
@@ -113,7 +116,7 @@ namespace Antlr4.Runtime.Atn
         /// </remarks>
         public virtual long GetTotalTimeInPrediction()
         {
-            DecisionInfo[] decisions = atnSimulator.GetDecisionInfo();
+            Antlr4.Runtime.Atn.DecisionInfo[] decisions = atnSimulator.DecisionInfo;
             long t = 0;
             for (int i = 0; i < decisions.Length; i++)
             {
@@ -134,7 +137,7 @@ namespace Antlr4.Runtime.Atn
         /// </remarks>
         public virtual long GetTotalSLLLookaheadOps()
         {
-            DecisionInfo[] decisions = atnSimulator.GetDecisionInfo();
+            Antlr4.Runtime.Atn.DecisionInfo[] decisions = atnSimulator.DecisionInfo;
             long k = 0;
             for (int i = 0; i < decisions.Length; i++)
             {
@@ -155,7 +158,7 @@ namespace Antlr4.Runtime.Atn
         /// </remarks>
         public virtual long GetTotalLLLookaheadOps()
         {
-            DecisionInfo[] decisions = atnSimulator.GetDecisionInfo();
+            Antlr4.Runtime.Atn.DecisionInfo[] decisions = atnSimulator.DecisionInfo;
             long k = 0;
             for (int i = 0; i < decisions.Length; i++)
             {
@@ -174,7 +177,7 @@ namespace Antlr4.Runtime.Atn
         /// </remarks>
         public virtual long GetTotalSLLATNLookaheadOps()
         {
-            DecisionInfo[] decisions = atnSimulator.GetDecisionInfo();
+            Antlr4.Runtime.Atn.DecisionInfo[] decisions = atnSimulator.DecisionInfo;
             long k = 0;
             for (int i = 0; i < decisions.Length; i++)
             {
@@ -193,7 +196,7 @@ namespace Antlr4.Runtime.Atn
         /// </remarks>
         public virtual long GetTotalLLATNLookaheadOps()
         {
-            DecisionInfo[] decisions = atnSimulator.GetDecisionInfo();
+            Antlr4.Runtime.Atn.DecisionInfo[] decisions = atnSimulator.DecisionInfo;
             long k = 0;
             for (int i = 0; i < decisions.Length; i++)
             {
@@ -218,7 +221,7 @@ namespace Antlr4.Runtime.Atn
         /// </remarks>
         public virtual long GetTotalATNLookaheadOps()
         {
-            DecisionInfo[] decisions = atnSimulator.GetDecisionInfo();
+            Antlr4.Runtime.Atn.DecisionInfo[] decisions = atnSimulator.DecisionInfo;
             long k = 0;
             for (int i = 0; i < decisions.Length; i++)
             {

@@ -84,20 +84,29 @@ namespace Antlr4.Runtime
             this.OffendingToken = recognizer.CurrentToken;
         }
 
-        public virtual int GetRuleIndex()
+        public virtual int RuleIndex
         {
-            return ruleIndex;
+            get
+            {
+                return ruleIndex;
+            }
         }
 
-        public virtual int GetPredIndex()
+        public virtual int PredIndex
         {
-            return predicateIndex;
+            get
+            {
+                return predicateIndex;
+            }
         }
 
-        [return: Nullable]
-        public virtual string GetPredicate()
+        [Nullable]
+        public virtual string Predicate
         {
-            return predicate;
+            get
+            {
+                return predicate;
+            }
         }
 
         [return: NotNull]

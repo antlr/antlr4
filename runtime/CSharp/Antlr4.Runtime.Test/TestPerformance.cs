@@ -462,7 +462,7 @@
                         }
                     }
 
-                    Console.Out.WriteLine("There are {0} lexer DFAState instances, {1} configs ({2} unique), {3} prediction contexts.", states, configs, uniqueConfigs.Count, lexerInterpreter.atn.GetContextCacheSize());
+                    Console.Out.WriteLine("There are {0} lexer DFAState instances, {1} configs ({2} unique), {3} prediction contexts.", states, configs, uniqueConfigs.Count, lexerInterpreter.atn.ContextCacheSize);
                 }
             }
 
@@ -495,7 +495,7 @@
                         }
                     }
 
-                    Console.Out.WriteLine("There are {0} parser DFAState instances, {1} configs ({2} unique), {3} prediction contexts.", states, configs, uniqueConfigs.Count, interpreter.atn.GetContextCacheSize());
+                    Console.Out.WriteLine("There are {0} parser DFAState instances, {1} configs ({2} unique), {3} prediction contexts.", states, configs, uniqueConfigs.Count, interpreter.atn.ContextCacheSize);
                 }
 
                 int localDfaCount = 0;
@@ -1083,14 +1083,14 @@
             public void EnterEveryRule(ParserRuleContext ctx)
             {
                 checksum.Update(ENTER_RULE);
-                updateChecksum(checksum, ctx.GetRuleIndex());
+                updateChecksum(checksum, ctx.RuleIndex);
                 updateChecksum(checksum, ctx.Start);
             }
 
             public void ExitEveryRule(ParserRuleContext ctx)
             {
                 checksum.Update(EXIT_RULE);
-                updateChecksum(checksum, ctx.GetRuleIndex());
+                updateChecksum(checksum, ctx.RuleIndex);
                 updateChecksum(checksum, ctx.Stop);
             }
         }

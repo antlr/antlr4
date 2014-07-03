@@ -67,14 +67,14 @@ namespace Antlr4.Runtime.Tree.Pattern
     {
         /// <summary>
         /// This is the backing field for
-        /// <see cref="GetTag()">GetTag()</see>
+        /// <see cref="Tag()">Tag()</see>
         /// .
         /// </summary>
         private readonly string tag;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="GetLabel()">GetLabel()</see>
+        /// <see cref="Label()">Label()</see>
         /// .
         /// </summary>
         private readonly string label;
@@ -142,10 +142,13 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <summary>Get the tag for this chunk.</summary>
         /// <remarks>Get the tag for this chunk.</remarks>
         /// <returns>The tag for the chunk.</returns>
-        [return: NotNull]
-        public string GetTag()
+        [NotNull]
+        public string Tag
         {
-            return tag;
+            get
+            {
+                return tag;
+            }
         }
 
         /// <summary>Get the label, if any, assigned to this chunk.</summary>
@@ -156,10 +159,13 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// if no label is
         /// assigned to the chunk.
         /// </returns>
-        [return: Nullable]
-        public string GetLabel()
+        [Nullable]
+        public string Label
         {
-            return label;
+            get
+            {
+                return label;
+            }
         }
 
         /// <summary>This method returns a text representation of the tag chunk.</summary>

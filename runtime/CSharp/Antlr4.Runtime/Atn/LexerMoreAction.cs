@@ -70,9 +70,12 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="LexerActionType.More">LexerActionType.More</see>
         /// .
         /// </returns>
-        public LexerActionType GetActionType()
+        public LexerActionType ActionType
         {
-            return LexerActionType.More;
+            get
+            {
+                return LexerActionType.More;
+            }
         }
 
         /// <summary><inheritDoc></inheritDoc></summary>
@@ -81,9 +84,12 @@ namespace Antlr4.Runtime.Atn
         /// <code>false</code>
         /// .
         /// </returns>
-        public bool IsPositionDependent()
+        public bool IsPositionDependent
         {
-            return false;
+            get
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -100,7 +106,7 @@ namespace Antlr4.Runtime.Atn
         public override int GetHashCode()
         {
             int hash = MurmurHash.Initialize();
-            hash = MurmurHash.Update(hash, (int)(GetActionType()));
+            hash = MurmurHash.Update(hash, (int)(ActionType));
             return MurmurHash.Finish(hash, 1);
         }
 

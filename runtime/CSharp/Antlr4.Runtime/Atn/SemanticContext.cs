@@ -271,8 +271,11 @@ namespace Antlr4.Runtime.Atn
             /// operator.
             /// </returns>
             /// <since>4.3</since>
-            [return: NotNull]
-            public abstract ICollection<SemanticContext> GetOperands();
+            [NotNull]
+            public abstract ICollection<SemanticContext> Operands
+            {
+                get;
+            }
         }
 
         /// <summary>
@@ -317,9 +320,12 @@ namespace Antlr4.Runtime.Atn
                 opnds = operands.ToArray();
             }
 
-            public override ICollection<SemanticContext> GetOperands()
+            public override ICollection<SemanticContext> Operands
             {
-                return Arrays.AsList(opnds);
+                get
+                {
+                    return Arrays.AsList(opnds);
+                }
             }
 
             public override bool Equals(object obj)
@@ -446,9 +452,12 @@ namespace Antlr4.Runtime.Atn
                 this.opnds = operands.ToArray();
             }
 
-            public override ICollection<SemanticContext> GetOperands()
+            public override ICollection<SemanticContext> Operands
             {
-                return Arrays.AsList(opnds);
+                get
+                {
+                    return Arrays.AsList(opnds);
+                }
             }
 
             public override bool Equals(object obj)

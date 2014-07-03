@@ -49,14 +49,14 @@ namespace Antlr4.Runtime.Tree.Pattern
     {
         /// <summary>
         /// This is the backing field for
-        /// <see cref="GetPatternRuleIndex()">GetPatternRuleIndex()</see>
+        /// <see cref="PatternRuleIndex()">PatternRuleIndex()</see>
         /// .
         /// </summary>
         private readonly int patternRuleIndex;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="GetPattern()">GetPattern()</see>
+        /// <see cref="Pattern()">Pattern()</see>
         /// .
         /// </summary>
         [NotNull]
@@ -64,7 +64,7 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="GetPatternTree()">GetPatternTree()</see>
+        /// <see cref="PatternTree()">PatternTree()</see>
         /// .
         /// </summary>
         [NotNull]
@@ -72,7 +72,7 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="GetMatcher()">GetMatcher()</see>
+        /// <see cref="Matcher()">Matcher()</see>
         /// .
         /// </summary>
         [NotNull]
@@ -140,7 +140,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// </returns>
         public virtual bool Matches(IParseTree tree)
         {
-            return matcher.Match(tree, this).Succeeded();
+            return matcher.Match(tree, this).Succeeded;
         }
 
         /// <summary>
@@ -167,12 +167,12 @@ namespace Antlr4.Runtime.Tree.Pattern
         [return: NotNull]
         public virtual IList<ParseTreeMatch> FindAll(IParseTree tree, string xpath)
         {
-            ICollection<IParseTree> subtrees = XPath.FindAll(tree, xpath, matcher.GetParser());
+            ICollection<IParseTree> subtrees = XPath.FindAll(tree, xpath, matcher.Parser);
             IList<ParseTreeMatch> matches = new List<ParseTreeMatch>();
             foreach (IParseTree t in subtrees)
             {
                 ParseTreeMatch match = Match(t);
-                if (match.Succeeded())
+                if (match.Succeeded)
                 {
                     matches.Add(match);
                 }
@@ -191,19 +191,25 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// which created this tree
         /// pattern.
         /// </returns>
-        [return: NotNull]
-        public virtual ParseTreePatternMatcher GetMatcher()
+        [NotNull]
+        public virtual ParseTreePatternMatcher Matcher
         {
-            return matcher;
+            get
+            {
+                return matcher;
+            }
         }
 
         /// <summary>Get the tree pattern in concrete syntax form.</summary>
         /// <remarks>Get the tree pattern in concrete syntax form.</remarks>
         /// <returns>The tree pattern in concrete syntax form.</returns>
-        [return: NotNull]
-        public virtual string GetPattern()
+        [NotNull]
+        public virtual string Pattern
         {
-            return pattern;
+            get
+            {
+                return pattern;
+            }
         }
 
         /// <summary>
@@ -218,9 +224,12 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// The parser rule which serves as the outermost rule for the tree
         /// pattern.
         /// </returns>
-        public virtual int GetPatternRuleIndex()
+        public virtual int PatternRuleIndex
         {
-            return patternRuleIndex;
+            get
+            {
+                return patternRuleIndex;
+            }
         }
 
         /// <summary>
@@ -239,10 +248,13 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
         /// .
         /// </returns>
-        [return: NotNull]
-        public virtual IParseTree GetPatternTree()
+        [NotNull]
+        public virtual IParseTree PatternTree
         {
-            return patternTree;
+            get
+            {
+                return patternTree;
+            }
         }
     }
 }

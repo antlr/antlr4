@@ -82,9 +82,12 @@ namespace Antlr4.Runtime.Atn
             return false;
         }
 
-        public SemanticContext.Predicate GetPredicate()
+        public SemanticContext.Predicate Predicate
         {
-            return new SemanticContext.Predicate(ruleIndex, predIndex, isCtxDependent);
+            get
+            {
+                return new SemanticContext.Predicate(ruleIndex, predIndex, isCtxDependent);
+            }
         }
 
         [return: NotNull]

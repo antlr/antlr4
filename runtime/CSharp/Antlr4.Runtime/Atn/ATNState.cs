@@ -177,9 +177,12 @@ namespace Antlr4.Runtime.Atn
             return stateNumber.ToString();
         }
 
-        public virtual Transition[] GetTransitions()
+        public virtual Transition[] Transitions
         {
-            return transitions.ToArray();
+            get
+            {
+                return transitions.ToArray();
+            }
         }
 
         public virtual int NumberOfTransitions

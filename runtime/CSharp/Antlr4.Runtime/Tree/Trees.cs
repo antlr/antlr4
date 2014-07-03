@@ -113,7 +113,7 @@ namespace Antlr4.Runtime.Tree
             {
                 if (t is IRuleNode)
                 {
-                    int ruleIndex = ((IRuleNode)t).RuleContext.GetRuleIndex();
+                    int ruleIndex = ((IRuleNode)t).RuleContext.RuleIndex;
                     string ruleName = ruleNames[ruleIndex];
                     return ruleName;
                 }
@@ -213,7 +213,7 @@ namespace Antlr4.Runtime.Tree
                 if (!findTokens && t is ParserRuleContext)
                 {
                     ParserRuleContext ctx = (ParserRuleContext)t;
-                    if (ctx.GetRuleIndex() == index)
+                    if (ctx.RuleIndex == index)
                     {
                         nodes.Add(t);
                     }

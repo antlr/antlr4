@@ -137,9 +137,12 @@ namespace Antlr4.Runtime.Misc
         /// Return the List holding list of table elements.  Note that you are
         /// NOT getting a copy so don't write to the list.
         /// </remarks>
-        public virtual IList<T> Elements()
+        public virtual IList<T> Elements
         {
-            return elements;
+            get
+            {
+                return elements;
+            }
         }
 
         public override object Clone()

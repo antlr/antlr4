@@ -349,13 +349,13 @@ namespace Antlr4.Runtime
             string input;
             if (tokens != null)
             {
-                if (e.GetStartToken().Type == TokenConstants.Eof)
+                if (e.StartToken.Type == TokenConstants.Eof)
                 {
                     input = "<EOF>";
                 }
                 else
                 {
-                    input = tokens.GetText(e.GetStartToken(), e.OffendingToken);
+                    input = tokens.GetText(e.StartToken, e.OffendingToken);
                 }
             }
             else
@@ -394,7 +394,7 @@ namespace Antlr4.Runtime
         /// <param name="e">the recognition exception</param>
         protected internal virtual void ReportFailedPredicate(Parser recognizer, FailedPredicateException e)
         {
-            string ruleName = recognizer.RuleNames[recognizer._ctx.GetRuleIndex()];
+            string ruleName = recognizer.RuleNames[recognizer._ctx.RuleIndex];
             string msg = "rule " + ruleName + " " + e.Message;
             NotifyErrorListeners(recognizer, msg, e);
         }
@@ -706,7 +706,7 @@ namespace Antlr4.Runtime
         {
             IToken currentSymbol = recognizer.CurrentToken;
             IntervalSet expecting = GetExpectedTokens(recognizer);
-            int expectedTokenType = expecting.GetMinElement();
+            int expectedTokenType = expecting.MinElement;
             // get any element
             string tokenText;
             if (expectedTokenType == TokenConstants.Eof)

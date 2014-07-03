@@ -311,11 +311,11 @@ namespace Antlr4.Runtime
             {
                 return start;
             }
-        }
-
-        public virtual void SetStartIndex(int start)
-        {
-            this.start = start;
+            set
+            {
+                int start = value;
+                this.start = start;
+            }
         }
 
         public virtual int StopIndex
@@ -324,11 +324,11 @@ namespace Antlr4.Runtime
             {
                 return stop;
             }
-        }
-
-        public virtual void SetStopIndex(int stop)
-        {
-            this.stop = stop;
+            set
+            {
+                int stop = value;
+                this.stop = stop;
+            }
         }
 
         public virtual int TokenIndex

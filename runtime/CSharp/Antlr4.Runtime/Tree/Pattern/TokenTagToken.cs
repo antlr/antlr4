@@ -50,7 +50,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     {
         /// <summary>
         /// This is the backing field for
-        /// <see cref="GetTokenName()">GetTokenName()</see>
+        /// <see cref="TokenName()">TokenName()</see>
         /// .
         /// </summary>
         [NotNull]
@@ -58,7 +58,7 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="GetLabel()">GetLabel()</see>
+        /// <see cref="Label()">Label()</see>
         /// .
         /// </summary>
         [Nullable]
@@ -101,10 +101,13 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <summary>Gets the token name.</summary>
         /// <remarks>Gets the token name.</remarks>
         /// <returns>The token name.</returns>
-        [return: NotNull]
-        public string GetTokenName()
+        [NotNull]
+        public string TokenName
         {
-            return tokenName;
+            get
+            {
+                return tokenName;
+            }
         }
 
         /// <summary>Gets the label associated with the rule tag.</summary>
@@ -114,10 +117,13 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <code>null</code>
         /// if this is an unlabeled rule tag.
         /// </returns>
-        [return: Nullable]
-        public string GetLabel()
+        [Nullable]
+        public string Label
         {
-            return label;
+            get
+            {
+                return label;
+            }
         }
 
         /// <summary>

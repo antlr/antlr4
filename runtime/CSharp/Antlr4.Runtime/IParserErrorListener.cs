@@ -58,7 +58,7 @@ namespace Antlr4.Runtime
         /// viable alternatives identified by the prediction algorithm. When
         /// <code>ambigAlts</code>
         /// is null, use
-        /// <see cref="Antlr4.Runtime.Atn.ATNConfigSet.GetRepresentedAlternatives()">Antlr4.Runtime.Atn.ATNConfigSet.GetRepresentedAlternatives()</see>
+        /// <see cref="Antlr4.Runtime.Atn.ATNConfigSet.RepresentedAlternatives()">Antlr4.Runtime.Atn.ATNConfigSet.RepresentedAlternatives()</see>
         /// to obtain the represented
         /// alternatives from the
         /// <code>configs</code>

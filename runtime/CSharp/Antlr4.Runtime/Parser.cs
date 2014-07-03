@@ -49,12 +49,12 @@ namespace Antlr4.Runtime
         {
             public virtual void EnterEveryRule(ParserRuleContext ctx)
             {
-                System.Console.Out.WriteLine("enter   " + this._enclosing.RuleNames[ctx.GetRuleIndex()] + ", LT(1)=" + this._enclosing._input.Lt(1).Text);
+                System.Console.Out.WriteLine("enter   " + this._enclosing.RuleNames[ctx.RuleIndex] + ", LT(1)=" + this._enclosing._input.Lt(1).Text);
             }
 
             public virtual void ExitEveryRule(ParserRuleContext ctx)
             {
-                System.Console.Out.WriteLine("exit    " + this._enclosing.RuleNames[ctx.GetRuleIndex()] + ", LT(1)=" + this._enclosing._input.Lt(1).Text);
+                System.Console.Out.WriteLine("exit    " + this._enclosing.RuleNames[ctx.RuleIndex] + ", LT(1)=" + this._enclosing._input.Lt(1).Text);
             }
 
             public virtual void VisitErrorNode(IErrorNode node)
@@ -65,7 +65,7 @@ namespace Antlr4.Runtime
             {
                 ParserRuleContext parent = (ParserRuleContext)((IRuleNode)node.Parent).RuleContext;
                 IToken token = node.Symbol;
-                System.Console.Out.WriteLine("consume " + token + " rule " + this._enclosing.RuleNames[parent.GetRuleIndex()]);
+                System.Console.Out.WriteLine("consume " + token + " rule " + this._enclosing.RuleNames[parent.RuleIndex]);
             }
 
             internal TraceListener(Parser _enclosing)
@@ -108,7 +108,7 @@ namespace Antlr4.Runtime
         /// with
         /// bypass alternatives.
         /// </summary>
-        /// <seealso cref="Antlr4.Runtime.Atn.ATNDeserializationOptions.IsGenerateRuleBypassTransitions()">Antlr4.Runtime.Atn.ATNDeserializationOptions.IsGenerateRuleBypassTransitions()</seealso>
+        /// <seealso cref="Antlr4.Runtime.Atn.ATNDeserializationOptions.GenerateRuleBypassTransitions()">Antlr4.Runtime.Atn.ATNDeserializationOptions.GenerateRuleBypassTransitions()</seealso>
         private static readonly IDictionary<string, ATN> bypassAltsAtnCache = new Dictionary<string, ATN>();
 
         /// <summary>The error handling strategy for the parser.</summary>
@@ -554,9 +554,12 @@ namespace Antlr4.Runtime
             }
         }
 
-        public virtual ITokenFactory GetTokenFactory()
+        public virtual ITokenFactory TokenFactory
         {
-            return _input.TokenSource.TokenFactory;
+            get
+            {
+                return _input.TokenSource.TokenFactory;
+            }
         }
 
         /// <summary>
@@ -587,7 +590,7 @@ namespace Antlr4.Runtime
                 if (result == null)
                 {
                     ATNDeserializationOptions deserializationOptions = new ATNDeserializationOptions();
-                    deserializationOptions.SetGenerateRuleBypassTransitions(true);
+                    deserializationOptions.GenerateRuleBypassTransitions = true;
                     result = new ATNDeserializer(deserializationOptions).Deserialize(serializedAtn.ToCharArray());
                     bypassAltsAtnCache.Put(serializedAtn, result);
                 }
@@ -694,7 +697,7 @@ namespace Antlr4.Runtime
                 line = offendingToken.Line;
                 charPositionInLine = offendingToken.Column;
             }
-            IAntlrErrorListener<IToken> listener = ((IParserErrorListener)GetErrorListenerDispatch());
+            IAntlrErrorListener<IToken> listener = ((IParserErrorListener)ErrorListenerDispatch);
             listener.SyntaxError(this, offendingToken, line, charPositionInLine, msg, e);
         }
 
@@ -854,13 +857,16 @@ namespace Antlr4.Runtime
         /// The precedence level for the top-most precedence rule, or -1 if
         /// the parser context is not nested within a precedence rule.
         /// </returns>
-        public int GetPrecedence()
+        public int Precedence
         {
-            if (_precedenceStack.Count == 0)
+            get
             {
-                return -1;
+                if (_precedenceStack.Count == 0)
+                {
+                    return -1;
+                }
+                return _precedenceStack[_precedenceStack.Count - 1];
             }
-            return _precedenceStack[_precedenceStack.Count - 1];
         }
 
         [Obsolete(@"UseEnterRecursionRule(ParserRuleContext, int, int, int) instead.")]
@@ -939,7 +945,7 @@ namespace Antlr4.Runtime
             ParserRuleContext p = _ctx;
             while (p != null)
             {
-                if (p.GetRuleIndex() == ruleIndex)
+                if (p.RuleIndex == ruleIndex)
                 {
                     return p;
                 }
@@ -954,11 +960,11 @@ namespace Antlr4.Runtime
             {
                 return _ctx;
             }
-        }
-
-        public virtual void SetContext(ParserRuleContext ctx)
-        {
-            _ctx = ctx;
+            set
+            {
+                ParserRuleContext ctx = value;
+                _ctx = ctx;
+            }
         }
 
         public override bool Precpred(RuleContext localctx, int precedence)
@@ -966,9 +972,12 @@ namespace Antlr4.Runtime
             return precedence >= _precedenceStack[_precedenceStack.Count - 1];
         }
 
-        public override IAntlrErrorListener<IToken> GetErrorListenerDispatch()
+        public override IAntlrErrorListener<IToken> ErrorListenerDispatch
         {
-            return new ProxyParserErrorListener(GetErrorListeners());
+            get
+            {
+                return new ProxyParserErrorListener(ErrorListeners);
+            }
         }
 
         public virtual bool InContext(string context)
@@ -1065,7 +1074,7 @@ namespace Antlr4.Runtime
         public virtual int GetRuleIndex(string ruleName)
         {
             int ruleIndex;
-            if (GetRuleIndexMap().TryGetValue(ruleName, out ruleIndex))
+            if (RuleIndexMap.TryGetValue(ruleName, out ruleIndex))
             {
                 return ruleIndex;
             }
@@ -1103,7 +1112,7 @@ namespace Antlr4.Runtime
             while (p != null)
             {
                 // compute what follows who invoked us
-                int ruleIndex = p.GetRuleIndex();
+                int ruleIndex = p.RuleIndex;
                 if (ruleIndex < 0)
                 {
                     stack.Add("n/a");
@@ -1139,7 +1148,7 @@ namespace Antlr4.Runtime
             for (int d = 0; d < _interp.atn.decisionToDFA.Length; d++)
             {
                 DFA dfa = _interp.atn.decisionToDFA[d];
-                if (!dfa.IsEmpty())
+                if (!dfa.IsEmpty)
                 {
                     if (seenOne)
                     {
@@ -1161,32 +1170,39 @@ namespace Antlr4.Runtime
             }
         }
 
-        public override ParseInfo GetParseInfo()
+        public override ParseInfo ParseInfo
         {
-            ParserATNSimulator interp = Interpreter;
-            if (interp is ProfilingATNSimulator)
+            get
             {
-                return new ParseInfo((ProfilingATNSimulator)interp);
+                ParserATNSimulator interp = Interpreter;
+                if (interp is ProfilingATNSimulator)
+                {
+                    return new ParseInfo((ProfilingATNSimulator)interp);
+                }
+                return null;
             }
-            return null;
         }
 
         /// <since>4.3</since>
-        public virtual void SetProfile(bool profile)
+        public virtual bool Profile
         {
-            ParserATNSimulator interp = Interpreter;
-            if (profile)
+            set
             {
-                if (!(interp is ProfilingATNSimulator))
+                bool profile = value;
+                ParserATNSimulator interp = Interpreter;
+                if (profile)
                 {
-                    Interpreter = new ProfilingATNSimulator(this);
+                    if (!(interp is ProfilingATNSimulator))
+                    {
+                        Interpreter = new ProfilingATNSimulator(this);
+                    }
                 }
-            }
-            else
-            {
-                if (interp is ProfilingATNSimulator)
+                else
                 {
-                    Interpreter = new ParserATNSimulator(this, Atn);
+                    if (interp is ProfilingATNSimulator)
+                    {
+                        Interpreter = new ParserATNSimulator(this, Atn);
+                    }
                 }
             }
         }

@@ -151,7 +151,7 @@ namespace Antlr4.Runtime.Atn
 
         public static Antlr4.Runtime.Atn.PredictionContext FromRuleContext(ATN atn, RuleContext outerContext, bool fullContext)
         {
-            if (outerContext.IsEmpty())
+            if (outerContext.IsEmpty)
             {
                 return fullContext ? EmptyFull : EmptyLocal;
             }

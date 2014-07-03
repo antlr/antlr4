@@ -39,7 +39,7 @@ namespace Antlr4.Runtime.Atn
     /// <since>4.3</since>
     public class ProfilingATNSimulator : ParserATNSimulator
     {
-        protected internal readonly DecisionInfo[] decisions;
+        protected internal readonly Antlr4.Runtime.Atn.DecisionInfo[] decisions;
 
         protected internal int numDecisions;
 
@@ -79,10 +79,10 @@ namespace Antlr4.Runtime.Atn
             optimize_ll1 = false;
             reportAmbiguities = true;
             numDecisions = atn.decisionToState.Count;
-            decisions = new DecisionInfo[numDecisions];
+            decisions = new Antlr4.Runtime.Atn.DecisionInfo[numDecisions];
             for (int i = 0; i < numDecisions; i++)
             {
-                decisions[i] = new DecisionInfo(i);
+                decisions[i] = new Antlr4.Runtime.Atn.DecisionInfo(i);
             }
         }
 
@@ -234,7 +234,7 @@ namespace Antlr4.Runtime.Atn
             }
             else
             {
-                conflictingAltResolvedBySLL = conflictState.s0.configs.GetRepresentedAlternatives().NextSetBit(0);
+                conflictingAltResolvedBySLL = conflictState.s0.configs.RepresentedAlternatives.NextSetBit(0);
             }
             decisions[currentDecision].LL_Fallback++;
             base.ReportAttemptingFullContext(dfa, conflictingAlts, conflictState, startIndex, stopIndex);
@@ -249,7 +249,7 @@ namespace Antlr4.Runtime.Atn
             }
             else
             {
-                prediction = configs.GetRepresentedAlternatives().NextSetBit(0);
+                prediction = configs.RepresentedAlternatives.NextSetBit(0);
             }
             if (conflictingAltResolvedBySLL != ATN.InvalidAltNumber && prediction != conflictingAltResolvedBySLL)
             {
@@ -264,10 +264,13 @@ namespace Antlr4.Runtime.Atn
             base.ReportAmbiguity(dfa, D, startIndex, stopIndex, exact, ambigAlts, configs);
         }
 
-        // ---------------------------------------------------------------------
-        public virtual DecisionInfo[] GetDecisionInfo()
+        public virtual Antlr4.Runtime.Atn.DecisionInfo[] DecisionInfo
         {
-            return decisions;
+            get
+            {
+                // ---------------------------------------------------------------------
+                return decisions;
+            }
         }
     }
 }

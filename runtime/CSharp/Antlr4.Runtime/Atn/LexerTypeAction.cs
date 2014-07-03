@@ -65,9 +65,12 @@ namespace Antlr4.Runtime.Atn
         /// <summary>Gets the type to assign to a token created by the lexer.</summary>
         /// <remarks>Gets the type to assign to a token created by the lexer.</remarks>
         /// <returns>The type to assign to a token created by the lexer.</returns>
-        public virtual int GetType()
+        public virtual int Type
         {
-            return type;
+            get
+            {
+                return type;
+            }
         }
 
         /// <summary><inheritDoc></inheritDoc></summary>
@@ -76,9 +79,12 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="LexerActionType.Type">LexerActionType.Type</see>
         /// .
         /// </returns>
-        public virtual LexerActionType GetActionType()
+        public virtual LexerActionType ActionType
         {
-            return LexerActionType.Type;
+            get
+            {
+                return LexerActionType.Type;
+            }
         }
 
         /// <summary><inheritDoc></inheritDoc></summary>
@@ -87,9 +93,12 @@ namespace Antlr4.Runtime.Atn
         /// <code>false</code>
         /// .
         /// </returns>
-        public virtual bool IsPositionDependent()
+        public virtual bool IsPositionDependent
         {
-            return false;
+            get
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -98,7 +107,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="Lexer.Type"/>
         /// with the
         /// value provided by
-        /// <see cref="GetType()">GetType()</see>
+        /// <see cref="Type()">Type()</see>
         /// .</p>
         /// </summary>
         public virtual void Execute(Lexer lexer)
@@ -109,7 +118,7 @@ namespace Antlr4.Runtime.Atn
         public override int GetHashCode()
         {
             int hash = MurmurHash.Initialize();
-            hash = MurmurHash.Update(hash, (int)(GetActionType()));
+            hash = MurmurHash.Update(hash, (int)(ActionType));
             hash = MurmurHash.Update(hash, type);
             return MurmurHash.Finish(hash, 2);
         }

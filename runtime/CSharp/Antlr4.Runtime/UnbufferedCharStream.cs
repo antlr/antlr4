@@ -366,10 +366,10 @@ namespace Antlr4.Runtime
             if (index > currentCharIndex)
             {
                 Sync(index - currentCharIndex);
-                index = Math.Min(index, GetBufferStartIndex() + n - 1);
+                index = Math.Min(index, BufferStartIndex + n - 1);
             }
             // index == to bufferStartIndex should set p to 0
-            int i = index - GetBufferStartIndex();
+            int i = index - BufferStartIndex;
             if (i < 0)
             {
                 throw new ArgumentException("cannot seek to negative index " + index);
@@ -378,7 +378,7 @@ namespace Antlr4.Runtime
             {
                 if (i >= n)
                 {
-                    throw new NotSupportedException("seek to index outside buffer: " + index + " not in " + GetBufferStartIndex() + ".." + (GetBufferStartIndex() + n));
+                    throw new NotSupportedException("seek to index outside buffer: " + index + " not in " + BufferStartIndex + ".." + (BufferStartIndex + n));
                 }
             }
             p = i;
@@ -415,7 +415,7 @@ namespace Antlr4.Runtime
             {
                 throw new ArgumentException("invalid interval");
             }
-            int bufferStartIndex = GetBufferStartIndex();
+            int bufferStartIndex = BufferStartIndex;
             if (n > 0 && data[n - 1] == char.MaxValue)
             {
                 if (interval.a + interval.Length > bufferStartIndex + n)
@@ -432,9 +432,12 @@ namespace Antlr4.Runtime
             return new string(data, i, interval.Length);
         }
 
-        protected internal int GetBufferStartIndex()
+        protected internal int BufferStartIndex
         {
-            return currentCharIndex - p;
+            get
+            {
+                return currentCharIndex - p;
+            }
         }
     }
 }

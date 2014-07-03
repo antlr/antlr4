@@ -137,15 +137,15 @@ namespace Antlr4.Runtime.Dfa
                 {
                     SingletonEdgeMap<T> other = (SingletonEdgeMap<T>)m;
                     System.Diagnostics.Debug.Assert(!other.IsEmpty);
-                    return ((Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)Put(other.GetKey(), other.GetValue()));
+                    return ((Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)Put(other.Key, other.Value));
                 }
                 else
                 {
                     if (m is SparseEdgeMap<T>)
                     {
                         SparseEdgeMap<T> other = (SparseEdgeMap<T>)m;
-                        int[] keys = other.GetKeys();
-                        IList<T> values = other.GetValues();
+                        int[] keys = other.Keys;
+                        IList<T> values = other.Values;
                         Antlr4.Runtime.Dfa.ArrayEdgeMap<T> result = this;
                         for (int i = 0; i < values.Count; i++)
                         {

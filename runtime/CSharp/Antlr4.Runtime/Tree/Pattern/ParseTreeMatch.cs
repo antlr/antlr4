@@ -45,28 +45,28 @@ namespace Antlr4.Runtime.Tree.Pattern
     {
         /// <summary>
         /// This is the backing field for
-        /// <see cref="GetTree()">GetTree()</see>
+        /// <see cref="Tree()">Tree()</see>
         /// .
         /// </summary>
         private readonly IParseTree tree;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="GetPattern()">GetPattern()</see>
+        /// <see cref="Pattern()">Pattern()</see>
         /// .
         /// </summary>
         private readonly ParseTreePattern pattern;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="GetLabels()">GetLabels()</see>
+        /// <see cref="Labels()">Labels()</see>
         /// .
         /// </summary>
         private readonly MultiMap<string, IParseTree> labels;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="GetMismatchedNode()">GetMismatchedNode()</see>
+        /// <see cref="MismatchedNode()">MismatchedNode()</see>
         /// .
         /// </summary>
         private readonly IParseTree mismatchedNode;
@@ -240,10 +240,13 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// A mapping from labels to parse tree nodes. If the parse tree
         /// pattern did not contain any rule or token tags, this map will be empty.
         /// </returns>
-        [return: NotNull]
-        public virtual MultiMap<string, IParseTree> GetLabels()
+        [NotNull]
+        public virtual MultiMap<string, IParseTree> Labels
         {
-            return labels;
+            get
+            {
+                return labels;
+            }
         }
 
         /// <summary>Get the node at which we first detected a mismatch.</summary>
@@ -253,10 +256,13 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <code>null</code>
         /// if the match was successful.
         /// </returns>
-        [return: Nullable]
-        public virtual IParseTree GetMismatchedNode()
+        [Nullable]
+        public virtual IParseTree MismatchedNode
         {
-            return mismatchedNode;
+            get
+            {
+                return mismatchedNode;
+            }
         }
 
         /// <summary>Gets a value indicating whether the match operation succeeded.</summary>
@@ -268,18 +274,24 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <code>false</code>
         /// .
         /// </returns>
-        public virtual bool Succeeded()
+        public virtual bool Succeeded
         {
-            return mismatchedNode == null;
+            get
+            {
+                return mismatchedNode == null;
+            }
         }
 
         /// <summary>Get the tree pattern we are matching against.</summary>
         /// <remarks>Get the tree pattern we are matching against.</remarks>
         /// <returns>The tree pattern we are matching against.</returns>
-        [return: NotNull]
-        public virtual ParseTreePattern GetPattern()
+        [NotNull]
+        public virtual ParseTreePattern Pattern
         {
-            return pattern;
+            get
+            {
+                return pattern;
+            }
         }
 
         /// <summary>Get the parse tree we are trying to match to a pattern.</summary>
@@ -289,16 +301,19 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
         /// we are trying to match to a pattern.
         /// </returns>
-        [return: NotNull]
-        public virtual IParseTree GetTree()
+        [NotNull]
+        public virtual IParseTree Tree
         {
-            return tree;
+            get
+            {
+                return tree;
+            }
         }
 
         /// <summary><inheritDoc></inheritDoc></summary>
         public override string ToString()
         {
-            return string.Format("Match {0}; found {1} labels", Succeeded() ? "succeeded" : "failed", GetLabels().Count);
+            return string.Format("Match {0}; found {1} labels", Succeeded ? "succeeded" : "failed", Labels.Count);
         }
     }
 }

@@ -49,9 +49,12 @@ namespace Antlr4.Runtime.Atn
             this.fullContext = fullContext;
         }
 
-        public bool IsFullContext()
+        public bool IsFullContext
         {
-            return fullContext;
+            get
+            {
+                return fullContext;
+            }
         }
 
         protected internal override PredictionContext AddEmptyContext()

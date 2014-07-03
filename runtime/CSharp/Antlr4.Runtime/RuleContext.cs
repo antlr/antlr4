@@ -108,9 +108,12 @@ namespace Antlr4.Runtime
         /// A context is empty if there is no invoking state; meaning nobody call
         /// current context.
         /// </remarks>
-        public virtual bool IsEmpty()
+        public virtual bool IsEmpty
         {
-            return invokingState == -1;
+            get
+            {
+                return invokingState == -1;
+            }
         }
 
         public virtual Interval SourceInterval
@@ -201,9 +204,12 @@ namespace Antlr4.Runtime
             return builder.ToString();
         }
 
-        public virtual int GetRuleIndex()
+        public virtual int RuleIndex
         {
-            return -1;
+            get
+            {
+                return -1;
+            }
         }
 
         public virtual IParseTree GetChild(int i)
@@ -293,18 +299,18 @@ namespace Antlr4.Runtime
             {
                 if (ruleNames == null)
                 {
-                    if (!p.IsEmpty())
+                    if (!p.IsEmpty)
                     {
                         buf.Append(p.invokingState);
                     }
                 }
                 else
                 {
-                    int ruleIndex = p.GetRuleIndex();
+                    int ruleIndex = p.RuleIndex;
                     string ruleName = ruleIndex >= 0 && ruleIndex < ruleNames.Count ? ruleNames[ruleIndex] : ruleIndex.ToString();
                     buf.Append(ruleName);
                 }
-                if (p.parent != null && (ruleNames != null || !p.parent.IsEmpty()))
+                if (p.parent != null && (ruleNames != null || !p.parent.IsEmpty))
                 {
                     buf.Append(" ");
                 }

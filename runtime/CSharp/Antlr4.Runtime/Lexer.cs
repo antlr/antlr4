@@ -175,8 +175,8 @@ namespace Antlr4.Runtime
                     _token = null;
                     _channel = TokenConstants.DefaultChannel;
                     _tokenStartCharIndex = _input.Index;
-                    _tokenStartCharPositionInLine = Interpreter.GetCharPositionInLine();
-                    _tokenStartLine = Interpreter.GetLine();
+                    _tokenStartCharPositionInLine = Interpreter.Column;
+                    _tokenStartLine = Interpreter.Line;
                     _text = null;
                     do
                     {
@@ -371,12 +371,12 @@ outer_continue: ;
         {
             get
             {
-                return Interpreter.GetLine();
+                return Interpreter.Line;
             }
             set
             {
                 int line = value;
-                Interpreter.SetLine(line);
+                Interpreter.Line = line;
             }
         }
 
@@ -384,12 +384,12 @@ outer_continue: ;
         {
             get
             {
-                return Interpreter.GetCharPositionInLine();
+                return Interpreter.Column;
             }
             set
             {
                 int charPositionInLine = value;
-                Interpreter.SetCharPositionInLine(charPositionInLine);
+                Interpreter.Column = charPositionInLine;
             }
         }
 
@@ -531,7 +531,7 @@ outer_continue: ;
         {
             string text = _input.GetText(Interval.Of(_tokenStartCharIndex, _input.Index));
             string msg = "token recognition error at: '" + GetErrorDisplay(text) + "'";
-            IAntlrErrorListener<int> listener = GetErrorListenerDispatch();
+            IAntlrErrorListener<int> listener = ErrorListenerDispatch;
             listener.SyntaxError(this, 0, _tokenStartLine, _tokenStartCharPositionInLine, msg, e);
         }
 

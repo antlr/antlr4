@@ -428,7 +428,7 @@ namespace Antlr4.Runtime.Test
             s.Add(50, 55);
             s.Add(5, 19);
             String expecting = "32";
-            String result = s.Size().ToString();
+            String result = s.Count.ToString();
             Assert.AreEqual(expecting, result);
         }
 

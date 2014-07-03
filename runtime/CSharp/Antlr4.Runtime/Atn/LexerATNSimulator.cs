@@ -354,7 +354,7 @@ namespace Antlr4.Runtime.Atn
             foreach (ATNConfig c in closure)
             {
                 bool currentAltReachedAcceptState = c.Alt == skipAlt;
-                if (currentAltReachedAcceptState && c.HasPassedThroughNonGreedyDecision())
+                if (currentAltReachedAcceptState && c.PassedThroughNonGreedyDecision)
                 {
                     continue;
                 }
@@ -481,7 +481,7 @@ namespace Antlr4.Runtime.Atn
             // optimization
             if (!config.State.OnlyHasEpsilonTransitions)
             {
-                if (!currentAltReachedAcceptState || !config.HasPassedThroughNonGreedyDecision())
+                if (!currentAltReachedAcceptState || !config.PassedThroughNonGreedyDecision)
                 {
                     configs.AddItem(config);
                 }
@@ -763,24 +763,30 @@ namespace Antlr4.Runtime.Atn
             return input.GetText(Interval.Of(startIndex, input.Index - 1));
         }
 
-        public virtual int GetLine()
+        public virtual int Line
         {
-            return line;
+            get
+            {
+                return line;
+            }
+            set
+            {
+                int line = value;
+                this.line = line;
+            }
         }
 
-        public virtual void SetLine(int line)
+        public virtual int Column
         {
-            this.line = line;
-        }
-
-        public virtual int GetCharPositionInLine()
-        {
-            return charPositionInLine;
-        }
-
-        public virtual void SetCharPositionInLine(int charPositionInLine)
-        {
-            this.charPositionInLine = charPositionInLine;
+            get
+            {
+                return charPositionInLine;
+            }
+            set
+            {
+                int charPositionInLine = value;
+                this.charPositionInLine = charPositionInLine;
+            }
         }
 
         public virtual void Consume(ICharStream input)

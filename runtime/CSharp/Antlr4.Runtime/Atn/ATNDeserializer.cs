@@ -84,7 +84,7 @@ namespace Antlr4.Runtime.Atn
         private readonly ATNDeserializationOptions deserializationOptions;
 
         public ATNDeserializer()
-            : this(ATNDeserializationOptions.GetDefaultOptions())
+            : this(ATNDeserializationOptions.Default)
         {
         }
 
@@ -92,7 +92,7 @@ namespace Antlr4.Runtime.Atn
         {
             if (deserializationOptions == null)
             {
-                deserializationOptions = ATNDeserializationOptions.GetDefaultOptions();
+                deserializationOptions = ATNDeserializationOptions.Default;
             }
             this.deserializationOptions = deserializationOptions;
         }
@@ -463,11 +463,11 @@ namespace Antlr4.Runtime.Atn
             {
                 atn.decisionToDFA[i_12] = new DFA(atn.decisionToState[i_12], i_12);
             }
-            if (deserializationOptions.IsVerifyATN())
+            if (deserializationOptions.VerifyAtn)
             {
                 VerifyATN(atn);
             }
-            if (deserializationOptions.IsGenerateRuleBypassTransitions() && atn.grammarType == ATNType.Parser)
+            if (deserializationOptions.GenerateRuleBypassTransitions && atn.grammarType == ATNType.Parser)
             {
                 atn.ruleToTokenType = new int[atn.ruleToStartState.Length];
                 for (int i_10 = 0; i_10 < atn.ruleToStartState.Length; i_10++)
@@ -552,13 +552,13 @@ namespace Antlr4.Runtime.Atn
                     matchState.AddTransition(new AtomTransition(bypassStop, atn.ruleToTokenType[i_13]));
                     bypassStart.AddTransition(new EpsilonTransition(matchState));
                 }
-                if (deserializationOptions.IsVerifyATN())
+                if (deserializationOptions.VerifyAtn)
                 {
                     // reverify after modification
                     VerifyATN(atn);
                 }
             }
-            if (deserializationOptions.IsOptimize())
+            if (deserializationOptions.Optimize)
             {
                 while (true)
                 {
@@ -572,7 +572,7 @@ namespace Antlr4.Runtime.Atn
                         break;
                     }
                 }
-                if (deserializationOptions.IsVerifyATN())
+                if (deserializationOptions.VerifyAtn)
                 {
                     // reverify after modification
                     VerifyATN(atn);
@@ -936,7 +936,7 @@ nextTransition_continue: ;
                         setTransitions.Add(i);
                     }
                 }
-                if (setTransitions.Size() <= 1)
+                if (setTransitions.Count <= 1)
                 {
                     continue;
                 }
@@ -948,7 +948,7 @@ nextTransition_continue: ;
                         optimizedTransitions.Add(decision.GetOptimizedTransition(i_1));
                     }
                 }
-                ATNState blockEndState = decision.GetOptimizedTransition(setTransitions.GetMinElement()).target.GetOptimizedTransition(0).target;
+                ATNState blockEndState = decision.GetOptimizedTransition(setTransitions.MinElement).target.GetOptimizedTransition(0).target;
                 IntervalSet matchSet = new IntervalSet();
                 for (int i_2 = 0; i_2 < setTransitions.GetIntervals().Count; i_2++)
                 {
@@ -969,9 +969,9 @@ nextTransition_continue: ;
                 Transition newTransition;
                 if (matchSet.GetIntervals().Count == 1)
                 {
-                    if (matchSet.Size() == 1)
+                    if (matchSet.Count == 1)
                     {
-                        newTransition = new AtomTransition(blockEndState, matchSet.GetMinElement());
+                        newTransition = new AtomTransition(blockEndState, matchSet.MinElement);
                     }
                     else
                     {

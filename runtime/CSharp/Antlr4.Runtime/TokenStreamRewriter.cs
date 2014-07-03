@@ -254,9 +254,12 @@ namespace Antlr4.Runtime
             lastRewriteTokenIndexes = new Dictionary<string, int>();
         }
 
-        public ITokenStream GetTokenStream()
+        public ITokenStream TokenStream
         {
-            return tokens;
+            get
+            {
+                return tokens;
+            }
         }
 
         public virtual void Rollback(int instructionIndex)
@@ -405,9 +408,12 @@ namespace Antlr4.Runtime
             Replace(programName, from, to, null);
         }
 
-        public virtual int GetLastRewriteTokenIndex()
+        public virtual int LastRewriteTokenIndex
         {
-            return GetLastRewriteTokenIndex(DefaultProgramName);
+            get
+            {
+                return GetLastRewriteTokenIndex(DefaultProgramName);
+            }
         }
 
         protected internal virtual int GetLastRewriteTokenIndex(string programName)

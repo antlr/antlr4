@@ -69,9 +69,12 @@ namespace Antlr4.Runtime.Atn
         /// <code>pushMode</code>
         /// command.
         /// </returns>
-        public int GetMode()
+        public int Mode
         {
-            return mode;
+            get
+            {
+                return mode;
+            }
         }
 
         /// <summary><inheritDoc></inheritDoc></summary>
@@ -80,9 +83,12 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="LexerActionType.PushMode">LexerActionType.PushMode</see>
         /// .
         /// </returns>
-        public LexerActionType GetActionType()
+        public LexerActionType ActionType
         {
-            return LexerActionType.PushMode;
+            get
+            {
+                return LexerActionType.PushMode;
+            }
         }
 
         /// <summary><inheritDoc></inheritDoc></summary>
@@ -91,9 +97,12 @@ namespace Antlr4.Runtime.Atn
         /// <code>false</code>
         /// .
         /// </returns>
-        public bool IsPositionDependent()
+        public bool IsPositionDependent
         {
-            return false;
+            get
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -102,7 +111,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="Antlr4.Runtime.Lexer.PushMode(int)">Antlr4.Runtime.Lexer.PushMode(int)</see>
         /// with the
         /// value provided by
-        /// <see cref="GetMode()">GetMode()</see>
+        /// <see cref="Mode()">Mode()</see>
         /// .</p>
         /// </summary>
         public void Execute(Lexer lexer)
@@ -113,7 +122,7 @@ namespace Antlr4.Runtime.Atn
         public override int GetHashCode()
         {
             int hash = MurmurHash.Initialize();
-            hash = MurmurHash.Update(hash, (int)(GetActionType()));
+            hash = MurmurHash.Update(hash, (int)(ActionType));
             hash = MurmurHash.Update(hash, mode);
             return MurmurHash.Finish(hash, 2);
         }

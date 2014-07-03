@@ -68,7 +68,7 @@ namespace Antlr4.Runtime.Tree
         /// </summary>
         public virtual Result VisitChildren(IRuleNode node)
         {
-            Result result = DefaultResult();
+            Result result = DefaultResult;
             int n = node.ChildCount;
             for (int i = 0; i < n; i++)
             {
@@ -91,7 +91,7 @@ namespace Antlr4.Runtime.Tree
         /// </summary>
         public virtual Result VisitTerminal(ITerminalNode node)
         {
-            return DefaultResult();
+            return DefaultResult;
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace Antlr4.Runtime.Tree
         /// </summary>
         public virtual Result VisitErrorNode(IErrorNode node)
         {
-            return DefaultResult();
+            return DefaultResult;
         }
 
         /// <summary>Gets the default value returned by visitor methods.</summary>
@@ -121,9 +121,12 @@ namespace Antlr4.Runtime.Tree
         /// .</p>
         /// </remarks>
         /// <returns>The default value returned by visitor methods.</returns>
-        protected internal virtual Result DefaultResult()
+        protected internal virtual Result DefaultResult
         {
-            return default(Result);
+            get
+            {
+                return default(Result);
+            }
         }
 
         /// <summary>Aggregates the results of visiting multiple children of a node.</summary>

@@ -809,7 +809,7 @@ public partial class <struct.name> : <superClass><if(interfaces)>, <interfaces; 
 	{
 		<struct.ctorAttrs:{a | this.<csIdentifier.(a.name)> = <csIdentifier.(a.name)>;}; separator="\n">
 	}
-	public override int GetRuleIndex() { return RULE_<struct.derivedFromName>; }
+	public override int RuleIndex { get { return RULE_<struct.derivedFromName>; } }
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
 	public <struct.name>() { }
 	public virtual void CopyFrom(<struct.name> context) {

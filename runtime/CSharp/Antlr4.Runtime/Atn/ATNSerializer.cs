@@ -378,12 +378,12 @@ namespace Antlr4.Runtime.Atn
                 data.Add(atn.lexerActions.Length);
                 foreach (ILexerAction action in atn.lexerActions)
                 {
-                    data.Add((int)(action.GetActionType()));
-                    switch (action.GetActionType())
+                    data.Add((int)(action.ActionType));
+                    switch (action.ActionType)
                     {
                         case LexerActionType.Channel:
                         {
-                            int channel = ((LexerChannelAction)action).GetChannel();
+                            int channel = ((LexerChannelAction)action).Channel;
                             data.Add(channel != -1 ? channel : unchecked((int)(0xFFFF)));
                             data.Add(0);
                             break;
@@ -391,8 +391,8 @@ namespace Antlr4.Runtime.Atn
 
                         case LexerActionType.Custom:
                         {
-                            int ruleIndex = ((LexerCustomAction)action).GetRuleIndex();
-                            int actionIndex = ((LexerCustomAction)action).GetActionIndex();
+                            int ruleIndex = ((LexerCustomAction)action).RuleIndex;
+                            int actionIndex = ((LexerCustomAction)action).ActionIndex;
                             data.Add(ruleIndex != -1 ? ruleIndex : unchecked((int)(0xFFFF)));
                             data.Add(actionIndex != -1 ? actionIndex : unchecked((int)(0xFFFF)));
                             break;
@@ -400,7 +400,7 @@ namespace Antlr4.Runtime.Atn
 
                         case LexerActionType.Mode:
                         {
-                            int mode = ((LexerModeAction)action).GetMode();
+                            int mode = ((LexerModeAction)action).Mode;
                             data.Add(mode != -1 ? mode : unchecked((int)(0xFFFF)));
                             data.Add(0);
                             break;
@@ -422,7 +422,7 @@ namespace Antlr4.Runtime.Atn
 
                         case LexerActionType.PushMode:
                         {
-                            mode = ((LexerPushModeAction)action).GetMode();
+                            mode = ((LexerPushModeAction)action).Mode;
                             data.Add(mode != -1 ? mode : unchecked((int)(0xFFFF)));
                             data.Add(0);
                             break;
@@ -437,7 +437,7 @@ namespace Antlr4.Runtime.Atn
 
                         case LexerActionType.Type:
                         {
-                            int type = ((LexerTypeAction)action).GetType();
+                            int type = ((LexerTypeAction)action).Type;
                             data.Add(type != -1 ? type : unchecked((int)(0xFFFF)));
                             data.Add(0);
                             break;
@@ -445,7 +445,7 @@ namespace Antlr4.Runtime.Atn
 
                         default:
                         {
-                            string message = string.Format(CultureInfo.CurrentCulture, "The specified lexer action type {0} is not valid.", action.GetActionType());
+                            string message = string.Format(CultureInfo.CurrentCulture, "The specified lexer action type {0} is not valid.", action.ActionType);
                             throw new ArgumentException(message);
                         }
                     }

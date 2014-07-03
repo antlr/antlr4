@@ -151,7 +151,6 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        // if (!readonly && set.isReadOnly()) -> addAll is called from clone()
         /// <summary>
         /// Get the set of all alternatives represented by configurations in this
         /// set.
@@ -160,19 +159,23 @@ namespace Antlr4.Runtime.Atn
         /// Get the set of all alternatives represented by configurations in this
         /// set.
         /// </remarks>
-        [return: NotNull]
-        public virtual BitSet GetRepresentedAlternatives()
+        [NotNull]
+        public virtual BitSet RepresentedAlternatives
         {
-            if (conflictingAlts != null)
+            get
             {
-                return (BitSet)conflictingAlts.Clone();
+                // if (!readonly && set.isReadOnly()) -> addAll is called from clone()
+                if (conflictingAlts != null)
+                {
+                    return (BitSet)conflictingAlts.Clone();
+                }
+                BitSet alts = new BitSet();
+                foreach (ATNConfig config in this)
+                {
+                    alts.Set(config.Alt);
+                }
+                return alts;
             }
-            BitSet alts = new BitSet();
-            foreach (ATNConfig config in this)
-            {
-                alts.Set(config.Alt);
-            }
-            return alts;
         }
 
         public bool IsReadOnly
@@ -223,14 +226,17 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        public virtual HashSet<ATNState> GetStates()
+        public virtual HashSet<ATNState> States
         {
-            HashSet<ATNState> states = new HashSet<ATNState>();
-            foreach (ATNConfig c in this.configs)
+            get
             {
-                states.Add(c.State);
+                HashSet<ATNState> states = new HashSet<ATNState>();
+                foreach (ATNConfig c in this.configs)
+                {
+                    states.Add(c.State);
+                }
+                return states;
             }
-            return states;
         }
 
         public virtual void OptimizeConfigs(ATNSimulator interpreter)
@@ -513,7 +519,7 @@ namespace Antlr4.Runtime.Atn
         {
             StringBuilder buf = new StringBuilder();
             List<ATNConfig> sortedConfigs = new List<ATNConfig>(configs);
-            sortedConfigs.Sort(new _IComparer_490());
+            sortedConfigs.Sort(new _IComparer_495());
             buf.Append("[");
             for (int i = 0; i < sortedConfigs.Count; i++)
             {
@@ -543,9 +549,9 @@ namespace Antlr4.Runtime.Atn
             return buf.ToString();
         }
 
-        private sealed class _IComparer_490 : IComparer<ATNConfig>
+        private sealed class _IComparer_495 : IComparer<ATNConfig>
         {
-            public _IComparer_490()
+            public _IComparer_495()
             {
             }
 

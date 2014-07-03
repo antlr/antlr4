@@ -136,13 +136,13 @@ namespace Antlr4.Runtime
             }
             while (true)
             {
-                ATNState p = GetATNState();
+                ATNState p = AtnState;
                 switch (p.StateType)
                 {
                     case StateType.RuleStop:
                     {
                         // pop; return from rule
-                        if (_ctx.IsEmpty())
+                        if (_ctx.IsEmpty)
                         {
                             if (startRuleStartState.isPrecedenceRule)
                             {
@@ -186,9 +186,12 @@ namespace Antlr4.Runtime
             base.EnterRecursionRule(localctx, state, ruleIndex, precedence);
         }
 
-        protected internal virtual ATNState GetATNState()
+        protected internal virtual ATNState AtnState
         {
-            return atn.states[State];
+            get
+            {
+                return atn.states[State];
+            }
         }
 
         protected internal virtual void VisitState(ATNState p)
@@ -210,8 +213,8 @@ namespace Antlr4.Runtime
                 {
                     if (pushRecursionContextStates.Get(p.stateNumber) && !(transition.target is LoopEndState))
                     {
-                        InterpreterRuleContext ctx = new InterpreterRuleContext(_parentContextStack.Peek().Item1, _parentContextStack.Peek().Item2, _ctx.GetRuleIndex());
-                        PushNewRecursionContext(ctx, atn.ruleToStartState[p.ruleIndex].stateNumber, _ctx.GetRuleIndex());
+                        InterpreterRuleContext ctx = new InterpreterRuleContext(_parentContextStack.Peek().Item1, _parentContextStack.Peek().Item2, _ctx.RuleIndex);
+                        PushNewRecursionContext(ctx, atn.ruleToStartState[p.ruleIndex].stateNumber, _ctx.RuleIndex);
                     }
                     break;
                 }
