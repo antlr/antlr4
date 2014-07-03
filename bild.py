@@ -42,9 +42,15 @@ def clean():
     rmdir("doc")
 
 def mkdoc():
-    mkdirs("doc/Java")
-    mkdirs("doc/JavaTool")
+    mkdir("doc/Java")
+    mkdir("doc/JavaTool")
     javadoc(srcdir="runtime/Java/src", trgdir="doc/Java", packages="org.antlr.v4.runtime")
     javadoc(srcdir="tool/src", trgdir="doc/JavaTool", packages="org.antlr.v4")
+    # build stack merge PredictionContext and ATNState images from DOT
+    # DOT Images are in runtime/Java/src/main/dot/org/antlr/v4/runtime/atn/images/
+    # Gen into E.g., doc/Java/org/antlr/v4/runtime/atn/images/SingletonMerge_DiffRootSamePar.svg
+    mkdir("doc/Java/org/antlr/v4/runtime/atn/images")
+    for f in glob.glob("runtime/Java/src/main/dot/org/antlr/v4/runtime/atn/images/*.dot"):
+        dot(f, "doc/Java/org/antlr/v4/runtime/atn/images", format="svg")
 
-processargs(globals()) # if you want cmd-line arg processing. Or, just call your target
+processargs(globals()) # E.g., "python bild.py all"
