@@ -69,7 +69,7 @@ namespace Antlr4.Runtime.Misc
             // update list
             base.Remove(oldElement);
             // now update the set: remove/add
-            base.AddItem(value);
+            base.Add(value);
             return oldElement;
         }
 
@@ -88,13 +88,13 @@ namespace Antlr4.Runtime.Misc
         /// Key is object itself.  Good for say asking if a certain string is in
         /// a list of strings.
         /// </remarks>
-        public override bool AddItem(T value)
+        public override bool Add(T value)
         {
-            bool result = base.AddItem(value);
+            bool result = base.Add(value);
             if (result)
             {
                 // only track if new element not in set
-                elements.AddItem(value);
+                elements.Add(value);
             }
             return result;
         }

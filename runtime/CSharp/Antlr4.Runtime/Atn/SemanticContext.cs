@@ -50,23 +50,23 @@ namespace Antlr4.Runtime.Atn
     /// <code>p1||p2</code>
     /// .
     /// <p>I have scoped the
-    /// <see cref="AND">AND</see>
+    /// <see cref="AND"/>
     /// ,
-    /// <see cref="OR">OR</see>
+    /// <see cref="OR"/>
     /// , and
-    /// <see cref="Predicate">Predicate</see>
+    /// <see cref="Predicate"/>
     /// subclasses of
-    /// <see cref="SemanticContext">SemanticContext</see>
+    /// <see cref="SemanticContext"/>
     /// within the scope of this outer class.</p>
     /// </remarks>
     public abstract class SemanticContext
     {
         /// <summary>
         /// The default
-        /// <see cref="SemanticContext">SemanticContext</see>
+        /// <see cref="SemanticContext"/>
         /// , which is semantically equivalent to
         /// a predicate of the form
-        /// <code></code>
+        /// <code/>
         /// 
         /// true}?}.
         /// </summary>
@@ -93,13 +93,13 @@ namespace Antlr4.Runtime.Atn
         /// <summary>Evaluate the precedence predicates for the context and reduce the result.</summary>
         /// <remarks>Evaluate the precedence predicates for the context and reduce the result.</remarks>
         /// <param name="parser">The parser instance.</param>
-        /// <param name="parserCallStack"></param>
+        /// <param name="parserCallStack"/>
         /// <returns>
         /// The simplified semantic context after precedence predicates are
         /// evaluated, which will be one of the following values.
         /// <ul>
         /// <li>
-        /// <see cref="None">None</see>
+        /// <see cref="None"/>
         /// : if the predicate simplifies to
         /// <code>true</code>
         /// after
@@ -117,7 +117,7 @@ namespace Antlr4.Runtime.Atn
         /// <li>A non-
         /// <code>null</code>
         /// 
-        /// <see cref="SemanticContext">SemanticContext</see>
+        /// <see cref="SemanticContext"/>
         /// : the new simplified
         /// semantic context after precedence predicates are evaluated.</li>
         /// </ul>
@@ -266,7 +266,7 @@ namespace Antlr4.Runtime.Atn
             /// <remarks>Gets the operands for the semantic context operator.</remarks>
             /// <returns>
             /// a collection of
-            /// <see cref="SemanticContext">SemanticContext</see>
+            /// <see cref="SemanticContext"/>
             /// operands for the
             /// operator.
             /// </returns>
@@ -348,7 +348,7 @@ namespace Antlr4.Runtime.Atn
             }
 
             /// <summary>
-            /// <inheritDoc></inheritDoc>
+            /// <inheritDoc/>
             /// <p>
             /// The evaluation of predicates by this context is short-circuiting, but
             /// unordered.</p>
@@ -480,7 +480,7 @@ namespace Antlr4.Runtime.Atn
             }
 
             /// <summary>
-            /// <inheritDoc></inheritDoc>
+            /// <inheritDoc/>
             /// <p>
             /// The evaluation of predicates by this context is short-circuiting, but
             /// unordered.</p>
@@ -560,7 +560,7 @@ namespace Antlr4.Runtime.Atn
             return result;
         }
 
-        /// <seealso cref="ParserATNSimulator.GetPredsForAmbigAlts(Sharpen.BitSet, ATNConfigSet, int)">ParserATNSimulator.GetPredsForAmbigAlts(Sharpen.BitSet, ATNConfigSet, int)</seealso>
+        /// <seealso cref="ParserATNSimulator.GetPredsForAmbigAlts(Antlr4.Runtime.Sharpen.BitSet, ATNConfigSet, int)"/>
         public static SemanticContext Or(SemanticContext a, SemanticContext b)
         {
             if (a == null)

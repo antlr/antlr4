@@ -31,8 +31,8 @@ using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Tree;
 using Antlr4.Runtime.Sharpen;
+using Antlr4.Runtime.Tree;
 
 namespace Antlr4.Runtime
 {
@@ -54,7 +54,7 @@ namespace Antlr4.Runtime
     /// For the special case of parsers, we use the subclass
     /// ParserRuleContext.
     /// </remarks>
-    /// <seealso cref="ParserRuleContext">ParserRuleContext</seealso>
+    /// <seealso cref="ParserRuleContext"/>
     public class RuleContext : IRuleNode
     {
         /// <summary>What context invoked this rule?</summary>

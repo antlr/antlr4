@@ -174,12 +174,12 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Get the
-        /// <see cref="Antlr4.Runtime.Atn.ATN">Antlr4.Runtime.Atn.ATN</see>
+        /// <see cref="Antlr4.Runtime.Atn.ATN"/>
         /// used by the recognizer for prediction.
         /// </summary>
         /// <returns>
         /// The
-        /// <see cref="Antlr4.Runtime.Atn.ATN">Antlr4.Runtime.Atn.ATN</see>
+        /// <see cref="Antlr4.Runtime.Atn.ATN"/>
         /// used by the recognizer for prediction.
         /// </returns>
         public virtual ATN Atn

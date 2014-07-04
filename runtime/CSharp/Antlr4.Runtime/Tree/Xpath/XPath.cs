@@ -32,9 +32,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Antlr4.Runtime;
+using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
 using Antlr4.Runtime.Tree.Xpath;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Tree.Xpath
 {
@@ -60,7 +60,7 @@ namespace Antlr4.Runtime.Tree.Xpath
     /// .
     /// But that is just shorthand for:</p>
     /// <pre>
-    /// <see cref="XPath">XPath</see>
+    /// <see cref="XPath"/>
     /// p = new
     /// <see cref="XPath(Antlr4.Runtime.Parser, string)">XPath</see>
     /// (parser, pathString);
@@ -272,13 +272,13 @@ loop_break: ;
         /// path. The root
         /// <code>/</code>
         /// is relative to the node passed to
-        /// <see cref="Evaluate(Antlr4.Runtime.Tree.IParseTree)">Evaluate(Antlr4.Runtime.Tree.IParseTree)</see>
+        /// <see cref="Evaluate(Antlr4.Runtime.Tree.IParseTree)"/>
         /// .
         /// </summary>
         public virtual ICollection<IParseTree> Evaluate(IParseTree t)
         {
             ParserRuleContext dummyRoot = new ParserRuleContext();
-            dummyRoot.children = Sharpen.Collections.SingletonList(t);
+            dummyRoot.children = Antlr4.Runtime.Sharpen.Collections.SingletonList(t);
             // don't set t's parent.
             ICollection<IParseTree> work = new[] { dummyRoot };
             int i = 0;

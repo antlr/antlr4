@@ -35,12 +35,12 @@ namespace Antlr4.Runtime
 {
     /// <summary>
     /// This implementation of
-    /// <see cref="IAntlrErrorStrategy">IAntlrErrorStrategy</see>
+    /// <see cref="IAntlrErrorStrategy"/>
     /// responds to syntax errors
     /// by immediately canceling the parse operation with a
-    /// <see cref="ParseCanceledException">ParseCanceledException</see>
+    /// <see cref="ParseCanceledException"/>
     /// . The implementation ensures that the
-    /// <see cref="ParserRuleContext.exception">ParserRuleContext.exception</see>
+    /// <see cref="ParserRuleContext.exception"/>
     /// field is set for all parse tree nodes
     /// that were not completed prior to encountering the error.
     /// <p>
@@ -51,13 +51,13 @@ namespace Antlr4.Runtime
     /// encountered, and immediately fall back to the second stage. In addition to
     /// avoiding wasted work by attempting to recover from errors here, the empty
     /// implementation of
-    /// <see cref="Sync(Parser)">Sync(Parser)</see>
+    /// <see cref="Sync(Parser)"/>
     /// improves the performance of
     /// the first stage.</li>
     /// <li><strong>Silent validation:</strong> When syntax errors are not being
     /// reported or logged, and the parse result is simply ignored if errors occur,
     /// the
-    /// <see cref="BailErrorStrategy">BailErrorStrategy</see>
+    /// <see cref="BailErrorStrategy"/>
     /// avoids wasting work on recovering from errors
     /// when the result will be ignored either way.</li>
     /// </ul>
@@ -73,13 +73,13 @@ namespace Antlr4.Runtime
         /// <code>e</code>
         /// , re-throw it wrapped
         /// in a
-        /// <see cref="ParseCanceledException">ParseCanceledException</see>
+        /// <see cref="ParseCanceledException"/>
         /// so it is not caught by the
         /// rule function catches.  Use
-        /// <see cref="System.Exception.InnerException()">System.Exception.InnerException()</see>
+        /// <see cref="System.Exception.InnerException()"/>
         /// to get the
         /// original
-        /// <see cref="RecognitionException">RecognitionException</see>
+        /// <see cref="RecognitionException"/>
         /// .
         /// </summary>
         public override void Recover(Parser recognizer, RecognitionException e)
@@ -99,7 +99,7 @@ namespace Antlr4.Runtime
         /// Make sure we don't attempt to recover inline; if the parser
         /// successfully recovers, it won't throw an exception.
         /// </remarks>
-        /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
+        /// <exception cref="Antlr4.Runtime.RecognitionException"/>
         public override IToken RecoverInline(Parser recognizer)
         {
             InputMismatchException e = new InputMismatchException(recognizer);

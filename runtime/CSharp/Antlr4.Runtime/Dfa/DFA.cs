@@ -43,10 +43,10 @@ namespace Antlr4.Runtime.Dfa
         /// <summary>A set of all DFA states.</summary>
         /// <remarks>
         /// A set of all DFA states. Use
-        /// <see cref="System.Collections.Generic.IDictionary{TKey, TValue}">IDictionary&lt;TKey, TValue&gt;</see>
+        /// <see cref="System.Collections.Generic.IDictionary{K, V}"/>
         /// so we can get old state back
         /// (
-        /// <see cref="HashSet{T}">HashSet&lt;T&gt;</see>
+        /// <see cref="HashSet{T}"/>
         /// only allows you to see if it's there).
         /// </remarks>
         [NotNull]
@@ -89,9 +89,9 @@ namespace Antlr4.Runtime.Dfa
         /// <remarks>
         /// Gets whether this DFA is a precedence DFA. Precedence DFAs use a special
         /// start state
-        /// <see cref="s0">s0</see>
+        /// <see cref="s0"/>
         /// which is not stored in
-        /// <see cref="states">states</see>
+        /// <see cref="states"/>
         /// . The
         /// <see cref="DFAState.edges"/>
         /// array for this start state contains outgoing edges
@@ -105,7 +105,7 @@ namespace Antlr4.Runtime.Dfa
         /// <code>false</code>
         /// .
         /// </returns>
-        /// <seealso cref="Antlr4.Runtime.Parser.Precedence()">Antlr4.Runtime.Parser.Precedence()</seealso>
+        /// <seealso cref="Antlr4.Runtime.Parser.Precedence()"/>
         /// <summary>Sets whether this is a precedence DFA.</summary>
         /// <remarks>
         /// Sets whether this is a precedence DFA. If the specified value differs
@@ -113,24 +113,24 @@ namespace Antlr4.Runtime.Dfa
         /// otherwise no changes are made to the current DFA.
         /// <ul>
         /// <li>The
-        /// <see cref="states">states</see>
+        /// <see cref="states"/>
         /// map is cleared</li>
         /// <li>If
         /// <code>precedenceDfa</code>
         /// is
         /// <code>false</code>
         /// , the initial state
-        /// <see cref="s0">s0</see>
+        /// <see cref="s0"/>
         /// is set to
         /// <code>null</code>
         /// ; otherwise, it is initialized to a new
-        /// <see cref="DFAState">DFAState</see>
+        /// <see cref="DFAState"/>
         /// with an empty outgoing
         /// <see cref="DFAState.edges"/>
         /// array to
         /// store the start states for individual precedence values.</li>
         /// <li>The
-        /// <see cref="precedenceDfa">precedenceDfa</see>
+        /// <see cref="precedenceDfa"/>
         /// field is updated</li>
         /// </ul>
         /// </remarks>
@@ -186,7 +186,7 @@ namespace Antlr4.Runtime.Dfa
         /// if no start state exists for the specified precedence.
         /// </returns>
         /// <exception cref="System.InvalidOperationException">if this is not a precedence DFA.</exception>
-        /// <seealso cref="IsPrecedenceDfa()">IsPrecedenceDfa()</seealso>
+        /// <seealso cref="IsPrecedenceDfa()"/>
         public DFAState GetPrecedenceStartState(int precedence, bool fullContext)
         {
             if (!IsPrecedenceDfa)
@@ -211,7 +211,7 @@ namespace Antlr4.Runtime.Dfa
         /// precedence.
         /// </param>
         /// <exception cref="System.InvalidOperationException">if this is not a precedence DFA.</exception>
-        /// <seealso cref="IsPrecedenceDfa()">IsPrecedenceDfa()</seealso>
+        /// <seealso cref="IsPrecedenceDfa()"/>
         public void SetPrecedenceStartState(int precedence, bool fullContext, DFAState startState)
         {
             if (!IsPrecedenceDfa)

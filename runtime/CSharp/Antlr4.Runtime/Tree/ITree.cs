@@ -27,8 +27,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using Antlr4.Runtime.Tree;
 using Antlr4.Runtime.Sharpen;
+using Antlr4.Runtime.Tree;
 
 namespace Antlr4.Runtime.Tree
 {
@@ -53,13 +53,13 @@ namespace Antlr4.Runtime.Tree
         /// <remarks>
         /// This method returns whatever object represents the data at this note. For
         /// example, for parse trees, the payload can be a
-        /// <see cref="Antlr4.Runtime.IToken">Antlr4.Runtime.IToken</see>
+        /// <see cref="Antlr4.Runtime.IToken"/>
         /// representing
         /// a leaf node or a
-        /// <see cref="Antlr4.Runtime.RuleContext">Antlr4.Runtime.RuleContext</see>
+        /// <see cref="Antlr4.Runtime.RuleContext"/>
         /// object representing a rule
         /// invocation. For abstract syntax trees (ASTs), this is a
-        /// <see cref="Antlr4.Runtime.IToken">Antlr4.Runtime.IToken</see>
+        /// <see cref="Antlr4.Runtime.IToken"/>
         /// object.
         /// </remarks>
         object Payload

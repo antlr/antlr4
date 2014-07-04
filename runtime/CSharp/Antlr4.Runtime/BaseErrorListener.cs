@@ -36,7 +36,7 @@ namespace Antlr4.Runtime
 {
     /// <summary>
     /// Provides an empty default implementation of
-    /// <see cref="IAntlrErrorListener{Symbol}">IAntlrErrorListener&lt;Symbol&gt;</see>
+    /// <see cref="IAntlrErrorListener{Symbol}"/>
     /// . The
     /// default implementation of each method does nothing, but can be overridden as
     /// necessary.

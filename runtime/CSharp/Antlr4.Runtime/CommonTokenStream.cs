@@ -34,22 +34,22 @@ namespace Antlr4.Runtime
 {
     /// <summary>
     /// This class extends
-    /// <see cref="BufferedTokenStream">BufferedTokenStream</see>
+    /// <see cref="BufferedTokenStream"/>
     /// with functionality to filter
     /// token streams to tokens on a particular channel (tokens where
-    /// <see cref="IToken.Channel()">IToken.Channel()</see>
+    /// <see cref="IToken.Channel()"/>
     /// returns a particular value).
     /// <p>
     /// This token stream provides access to all tokens by index or when calling
     /// methods like
-    /// <see cref="BufferedTokenStream.GetText()">BufferedTokenStream.GetText()</see>
+    /// <see cref="BufferedTokenStream.GetText()"/>
     /// . The channel filtering is only used for code
     /// accessing tokens via the lookahead methods
-    /// <see cref="BufferedTokenStream.La(int)">BufferedTokenStream.La(int)</see>
+    /// <see cref="BufferedTokenStream.La(int)"/>
     /// ,
-    /// <see cref="Lt(int)">Lt(int)</see>
+    /// <see cref="Lt(int)"/>
     /// , and
-    /// <see cref="Lb(int)">Lb(int)</see>
+    /// <see cref="Lb(int)"/>
     /// .</p>
     /// <p>
     /// By default, tokens are placed on the default channel
@@ -66,7 +66,7 @@ namespace Antlr4.Runtime
     /// Note: lexer rules which use the
     /// <code>-&gt;skip</code>
     /// lexer command or call
-    /// <see cref="Lexer.Skip()">Lexer.Skip()</see>
+    /// <see cref="Lexer.Skip()"/>
     /// do not produce tokens at all, so input text matched by
     /// such a rule will not be available as part of the token stream, regardless of
     /// channel.</p>
@@ -86,7 +86,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Constructs a new
-        /// <see cref="CommonTokenStream">CommonTokenStream</see>
+        /// <see cref="CommonTokenStream"/>
         /// using the specified token
         /// source and the default token channel (
         /// <see cref="TokenConstants.DefaultChannel"/>
@@ -100,14 +100,14 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Constructs a new
-        /// <see cref="CommonTokenStream">CommonTokenStream</see>
+        /// <see cref="CommonTokenStream"/>
         /// using the specified token
         /// source and filtering tokens to the specified channel. Only tokens whose
-        /// <see cref="IToken.Channel()">IToken.Channel()</see>
+        /// <see cref="IToken.Channel()"/>
         /// matches
         /// <code>channel</code>
         /// or have the
-        /// <see cref="IToken.Type()">IToken.Type()</see>
+        /// <see cref="IToken.Type()"/>
         /// equal to
         /// <see cref="TokenConstants.Eof"/>
         /// will be returned by the

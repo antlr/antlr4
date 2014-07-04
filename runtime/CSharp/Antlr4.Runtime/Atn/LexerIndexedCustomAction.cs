@@ -36,18 +36,18 @@ namespace Antlr4.Runtime.Atn
 {
     /// <summary>
     /// This implementation of
-    /// <see cref="ILexerAction">ILexerAction</see>
+    /// <see cref="ILexerAction"/>
     /// is used for tracking input offsets
     /// for position-dependent actions within a
-    /// <see cref="LexerActionExecutor">LexerActionExecutor</see>
+    /// <see cref="LexerActionExecutor"/>
     /// .
     /// <p>This action is not serialized as part of the ATN, and is only required for
     /// position-dependent lexer actions which appear at a location other than the
     /// end of a rule. For more information about DFA optimizations employed for
     /// lexer actions, see
-    /// <see cref="LexerActionExecutor.Append(LexerActionExecutor, ILexerAction)">LexerActionExecutor.Append(LexerActionExecutor, ILexerAction)</see>
+    /// <see cref="LexerActionExecutor.Append(LexerActionExecutor, ILexerAction)"/>
     /// and
-    /// <see cref="LexerActionExecutor.FixOffsetBeforeMatch(int)">LexerActionExecutor.FixOffsetBeforeMatch(int)</see>
+    /// <see cref="LexerActionExecutor.FixOffsetBeforeMatch(int)"/>
     /// .</p>
     /// </summary>
     /// <author>Sam Harwell</author>
@@ -61,17 +61,17 @@ namespace Antlr4.Runtime.Atn
         /// <summary>
         /// Constructs a new indexed custom action by associating a character offset
         /// with a
-        /// <see cref="ILexerAction">ILexerAction</see>
+        /// <see cref="ILexerAction"/>
         /// .
         /// <p>Note: This class is only required for lexer actions for which
-        /// <see cref="ILexerAction.IsPositionDependent()">ILexerAction.IsPositionDependent()</see>
+        /// <see cref="ILexerAction.IsPositionDependent()"/>
         /// returns
         /// <code>true</code>
         /// .</p>
         /// </summary>
         /// <param name="offset">
         /// The offset into the input
-        /// <see cref="Antlr4.Runtime.ICharStream">Antlr4.Runtime.ICharStream</see>
+        /// <see cref="Antlr4.Runtime.ICharStream"/>
         /// , relative to
         /// the token start index, at which the specified lexer action should be
         /// executed.
@@ -79,7 +79,7 @@ namespace Antlr4.Runtime.Atn
         /// <param name="action">
         /// The lexer action to execute at a particular offset in the
         /// input
-        /// <see cref="Antlr4.Runtime.ICharStream">Antlr4.Runtime.ICharStream</see>
+        /// <see cref="Antlr4.Runtime.ICharStream"/>
         /// .
         /// </param>
         public LexerIndexedCustomAction(int offset, ILexerAction action)
@@ -90,14 +90,14 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Gets the location in the input
-        /// <see cref="Antlr4.Runtime.ICharStream">Antlr4.Runtime.ICharStream</see>
+        /// <see cref="Antlr4.Runtime.ICharStream"/>
         /// at which the lexer
         /// action should be executed. The value is interpreted as an offset relative
         /// to the token start index.
         /// </summary>
         /// <returns>
         /// The location in the input
-        /// <see cref="Antlr4.Runtime.ICharStream">Antlr4.Runtime.ICharStream</see>
+        /// <see cref="Antlr4.Runtime.ICharStream"/>
         /// at which the lexer
         /// action should be executed.
         /// </returns>
@@ -113,7 +113,7 @@ namespace Antlr4.Runtime.Atn
         /// <remarks>Gets the lexer action to execute.</remarks>
         /// <returns>
         /// A
-        /// <see cref="ILexerAction">ILexerAction</see>
+        /// <see cref="ILexerAction"/>
         /// object which executes the lexer action.
         /// </returns>
         [NotNull]
@@ -125,14 +125,14 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        /// <summary><inheritDoc></inheritDoc></summary>
+        /// <summary><inheritDoc/></summary>
         /// <returns>
         /// This method returns the result of calling
-        /// <see cref="ActionType()">ActionType()</see>
+        /// <see cref="ActionType()"/>
         /// on the
-        /// <see cref="ILexerAction">ILexerAction</see>
+        /// <see cref="ILexerAction"/>
         /// returned by
-        /// <see cref="Action()">Action()</see>
+        /// <see cref="Action()"/>
         /// .
         /// </returns>
         public LexerActionType ActionType
@@ -143,7 +143,7 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        /// <summary><inheritDoc></inheritDoc></summary>
+        /// <summary><inheritDoc/></summary>
         /// <returns>
         /// This method returns
         /// <code>true</code>
@@ -158,11 +158,11 @@ namespace Antlr4.Runtime.Atn
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>This method calls
-        /// <see cref="Execute(Antlr4.Runtime.Lexer)">Execute(Antlr4.Runtime.Lexer)</see>
+        /// <see cref="Execute(Antlr4.Runtime.Lexer)"/>
         /// on the result of
-        /// <see cref="Action()">Action()</see>
+        /// <see cref="Action()"/>
         /// using the provided
         /// <code>lexer</code>
         /// .</p>

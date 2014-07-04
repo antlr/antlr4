@@ -36,16 +36,16 @@ namespace Antlr4.Runtime
 {
     /// <summary>
     /// This default implementation of
-    /// <see cref="ITokenFactory">ITokenFactory</see>
+    /// <see cref="ITokenFactory"/>
     /// creates
-    /// <see cref="CommonToken">CommonToken</see>
+    /// <see cref="CommonToken"/>
     /// objects.
     /// </summary>
     public class CommonTokenFactory : ITokenFactory
     {
         /// <summary>
         /// The default
-        /// <see cref="CommonTokenFactory">CommonTokenFactory</see>
+        /// <see cref="CommonTokenFactory"/>
         /// instance.
         /// <p>
         /// This token factory does not explicitly copy token text when constructing
@@ -61,14 +61,14 @@ namespace Antlr4.Runtime
         /// where the input stream might not be able to provide arbitrary substrings
         /// of text from the input after the lexer creates a token (e.g. the
         /// implementation of
-        /// <see cref="ICharStream.GetText(Antlr4.Runtime.Misc.Interval)">ICharStream.GetText(Antlr4.Runtime.Misc.Interval)</see>
+        /// <see cref="ICharStream.GetText(Antlr4.Runtime.Misc.Interval)"/>
         /// in
-        /// <see cref="UnbufferedCharStream">UnbufferedCharStream</see>
+        /// <see cref="UnbufferedCharStream"/>
         /// throws an
-        /// <see cref="System.NotSupportedException">System.NotSupportedException</see>
+        /// <see cref="System.NotSupportedException"/>
         /// ). Explicitly setting the token text
         /// allows
-        /// <see cref="IToken.Text()">IToken.Text()</see>
+        /// <see cref="IToken.Text()"/>
         /// to be called at any time regardless of the
         /// input stream implementation.
         /// <p>
@@ -81,9 +81,9 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Constructs a
-        /// <see cref="CommonTokenFactory">CommonTokenFactory</see>
+        /// <see cref="CommonTokenFactory"/>
         /// with the specified value for
-        /// <see cref="copyText">copyText</see>
+        /// <see cref="copyText"/>
         /// .
         /// <p>
         /// When
@@ -91,13 +91,13 @@ namespace Antlr4.Runtime
         /// is
         /// <code>false</code>
         /// , the
-        /// <see cref="Default">Default</see>
+        /// <see cref="Default"/>
         /// instance
         /// should be used instead of constructing a new instance.</p>
         /// </summary>
         /// <param name="copyText">
         /// The value for
-        /// <see cref="copyText">copyText</see>
+        /// <see cref="copyText"/>
         /// .
         /// </param>
         public CommonTokenFactory(bool copyText)
@@ -107,15 +107,15 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Constructs a
-        /// <see cref="CommonTokenFactory">CommonTokenFactory</see>
+        /// <see cref="CommonTokenFactory"/>
         /// with
-        /// <see cref="copyText">copyText</see>
+        /// <see cref="copyText"/>
         /// set to
         /// <code>false</code>
         /// .
         /// <p>
         /// The
-        /// <see cref="Default">Default</see>
+        /// <see cref="Default"/>
         /// instance should be used instead of calling this
         /// directly.</p>
         /// </summary>

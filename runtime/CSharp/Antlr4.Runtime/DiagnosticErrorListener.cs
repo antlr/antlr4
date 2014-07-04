@@ -41,7 +41,7 @@ namespace Antlr4.Runtime
     /// can be used to identify
     /// certain potential correctness and performance problems in grammars. "Reports"
     /// are made by calling
-    /// <see cref="Parser.NotifyErrorListeners(string)">Parser.NotifyErrorListeners(string)</see>
+    /// <see cref="Parser.NotifyErrorListeners(string)"/>
     /// with the appropriate
     /// message.
     /// <ul>
@@ -69,7 +69,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Initializes a new instance of
-        /// <see cref="DiagnosticErrorListener">DiagnosticErrorListener</see>
+        /// <see cref="DiagnosticErrorListener"/>
         /// which only
         /// reports exact ambiguities.
         /// </summary>
@@ -80,7 +80,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Initializes a new instance of
-        /// <see cref="DiagnosticErrorListener">DiagnosticErrorListener</see>
+        /// <see cref="DiagnosticErrorListener"/>
         /// , specifying
         /// whether all ambiguities or only exact ambiguities are reported.
         /// </summary>

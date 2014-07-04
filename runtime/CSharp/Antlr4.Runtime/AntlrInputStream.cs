@@ -37,14 +37,14 @@ namespace Antlr4.Runtime
 {
     /// <summary>
     /// Vacuum all input from a
-    /// <see cref="System.IO.TextReader">System.IO.TextReader</see>
+    /// <see cref="System.IO.TextReader"/>
     /// /
-    /// <see cref="System.IO.Stream">System.IO.Stream</see>
+    /// <see cref="System.IO.Stream"/>
     /// and then treat it
     /// like a
     /// <code>char[]</code>
     /// buffer. Can also pass in a
-    /// <see cref="string">string</see>
+    /// <see cref="string"/>
     /// or
     /// <code>char[]</code>
     /// to use.
@@ -86,43 +86,43 @@ namespace Antlr4.Runtime
             this.n = numberOfActualCharsInArray;
         }
 
-        /// <exception cref="System.IO.IOException"></exception>
+        /// <exception cref="System.IO.IOException"/>
         public AntlrInputStream(TextReader r)
             : this(r, InitialBufferSize, ReadBufferSize)
         {
         }
 
-        /// <exception cref="System.IO.IOException"></exception>
+        /// <exception cref="System.IO.IOException"/>
         public AntlrInputStream(TextReader r, int initialSize)
             : this(r, initialSize, ReadBufferSize)
         {
         }
 
-        /// <exception cref="System.IO.IOException"></exception>
+        /// <exception cref="System.IO.IOException"/>
         public AntlrInputStream(TextReader r, int initialSize, int readChunkSize)
         {
             Load(r, initialSize, readChunkSize);
         }
 
-        /// <exception cref="System.IO.IOException"></exception>
+        /// <exception cref="System.IO.IOException"/>
         public AntlrInputStream(Stream input)
             : this(new StreamReader(input), InitialBufferSize)
         {
         }
 
-        /// <exception cref="System.IO.IOException"></exception>
+        /// <exception cref="System.IO.IOException"/>
         public AntlrInputStream(Stream input, int initialSize)
             : this(new StreamReader(input), initialSize)
         {
         }
 
-        /// <exception cref="System.IO.IOException"></exception>
+        /// <exception cref="System.IO.IOException"/>
         public AntlrInputStream(Stream input, int initialSize, int readChunkSize)
             : this(new StreamReader(input), initialSize, readChunkSize)
         {
         }
 
-        /// <exception cref="System.IO.IOException"></exception>
+        /// <exception cref="System.IO.IOException"/>
         public virtual void Load(TextReader r, int size, int readChunkSize)
         {
             if (r == null)

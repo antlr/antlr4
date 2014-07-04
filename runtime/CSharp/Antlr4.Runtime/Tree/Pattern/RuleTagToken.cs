@@ -36,19 +36,19 @@ namespace Antlr4.Runtime.Tree.Pattern
 {
     /// <summary>
     /// A
-    /// <see cref="Antlr4.Runtime.IToken">Antlr4.Runtime.IToken</see>
+    /// <see cref="Antlr4.Runtime.IToken"/>
     /// object representing an entire subtree matched by a parser
     /// rule; e.g.,
     /// <code>&lt;expr&gt;</code>
     /// . These tokens are created for
-    /// <see cref="TagChunk">TagChunk</see>
+    /// <see cref="TagChunk"/>
     /// chunks where the tag corresponds to a parser rule.
     /// </summary>
     public class RuleTagToken : IToken
     {
         /// <summary>
         /// This is the backing field for
-        /// <see cref="RuleName()">RuleName()</see>
+        /// <see cref="RuleName()"/>
         /// .
         /// </summary>
         private readonly string ruleName;
@@ -62,14 +62,14 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="Label()">Label()</see>
+        /// <see cref="Label()"/>
         /// .
         /// </summary>
         private readonly string label;
 
         /// <summary>
         /// Constructs a new instance of
-        /// <see cref="RuleTagToken">RuleTagToken</see>
+        /// <see cref="RuleTagToken"/>
         /// with the specified rule
         /// name and bypass token type and no label.
         /// </summary>
@@ -90,7 +90,7 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// Constructs a new instance of
-        /// <see cref="RuleTagToken">RuleTagToken</see>
+        /// <see cref="RuleTagToken"/>
         /// with the specified rule
         /// name, bypass token type, and label.
         /// </summary>
@@ -150,7 +150,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>Rule tag tokens are always placed on the
         /// <see cref="TokenConstants.DefaultChannel"/>
         /// .</p>
@@ -164,7 +164,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>This method returns the rule tag formatted with
         /// <code>&lt;</code>
         /// and
@@ -184,7 +184,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>Rule tag tokens have types assigned according to the rule bypass
         /// transitions created during ATN deserialization.</p>
         /// </summary>
@@ -197,9 +197,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>The implementation for
-        /// <see cref="RuleTagToken">RuleTagToken</see>
+        /// <see cref="RuleTagToken"/>
         /// always returns 0.</p>
         /// </summary>
         public virtual int Line
@@ -211,9 +211,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>The implementation for
-        /// <see cref="RuleTagToken">RuleTagToken</see>
+        /// <see cref="RuleTagToken"/>
         /// always returns -1.</p>
         /// </summary>
         public virtual int Column
@@ -225,9 +225,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>The implementation for
-        /// <see cref="RuleTagToken">RuleTagToken</see>
+        /// <see cref="RuleTagToken"/>
         /// always returns -1.</p>
         /// </summary>
         public virtual int TokenIndex
@@ -239,9 +239,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>The implementation for
-        /// <see cref="RuleTagToken">RuleTagToken</see>
+        /// <see cref="RuleTagToken"/>
         /// always returns -1.</p>
         /// </summary>
         public virtual int StartIndex
@@ -253,9 +253,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>The implementation for
-        /// <see cref="RuleTagToken">RuleTagToken</see>
+        /// <see cref="RuleTagToken"/>
         /// always returns -1.</p>
         /// </summary>
         public virtual int StopIndex
@@ -267,9 +267,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>The implementation for
-        /// <see cref="RuleTagToken">RuleTagToken</see>
+        /// <see cref="RuleTagToken"/>
         /// always returns
         /// <code>null</code>
         /// .</p>
@@ -283,9 +283,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>The implementation for
-        /// <see cref="RuleTagToken">RuleTagToken</see>
+        /// <see cref="RuleTagToken"/>
         /// always returns
         /// <code>null</code>
         /// .</p>
@@ -299,9 +299,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>The implementation for
-        /// <see cref="RuleTagToken">RuleTagToken</see>
+        /// <see cref="RuleTagToken"/>
         /// returns a string of the form
         /// <code>ruleName:bypassTokenType</code>
         /// .</p>

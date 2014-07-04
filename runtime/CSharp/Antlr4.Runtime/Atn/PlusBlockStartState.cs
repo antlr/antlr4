@@ -38,7 +38,7 @@ namespace Antlr4.Runtime.Atn
     /// loop. Technically a decision state, but
     /// we don't use for code generation; somebody might need it, so I'm defining
     /// it for completeness. In reality, the
-    /// <see cref="PlusLoopbackState">PlusLoopbackState</see>
+    /// <see cref="PlusLoopbackState"/>
     /// node is the
     /// real decision-making note for
     /// <code>A+</code>

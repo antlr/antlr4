@@ -47,17 +47,17 @@ namespace Antlr4.Runtime
     /// <p>
     /// You can insert stuff, replace, and delete chunks. Note that the operations
     /// are done lazily--only if you convert the buffer to a
-    /// <see cref="string">string</see>
+    /// <see cref="string"/>
     /// with
-    /// <see cref="ITokenStream.GetText()">ITokenStream.GetText()</see>
+    /// <see cref="ITokenStream.GetText()"/>
     /// . This is very efficient because you are not
     /// moving data around all the time. As the buffer of tokens is converted to
     /// strings, the
-    /// <see cref="GetText()">GetText()</see>
+    /// <see cref="GetText()"/>
     /// method(s) scan the input token stream and
     /// check to see if there is an operation at the current index. If so, the
     /// operation is done and then normal
-    /// <see cref="string">string</see>
+    /// <see cref="string"/>
     /// rendering continues on the
     /// buffer. This is like having multiple Turing machine instruction streams
     /// (programs) operating on a single input tape. :)</p>
@@ -65,20 +65,20 @@ namespace Antlr4.Runtime
     /// This rewriter makes no modifications to the token stream. It does not ask the
     /// stream to fill itself up nor does it advance the input cursor. The token
     /// stream
-    /// <see cref="IIntStream.Index()">IIntStream.Index()</see>
+    /// <see cref="IIntStream.Index()"/>
     /// will return the same value before and
     /// after any
-    /// <see cref="GetText()">GetText()</see>
+    /// <see cref="GetText()"/>
     /// call.</p>
     /// <p>
     /// The rewriter only works on tokens that you have in the buffer and ignores the
     /// current input cursor. If you are buffering tokens on-demand, calling
-    /// <see cref="GetText()">GetText()</see>
+    /// <see cref="GetText()"/>
     /// halfway through the input will only do rewrites for those
     /// tokens in the first half of the file.</p>
     /// <p>
     /// Since the operations are done lazily at
-    /// <see cref="GetText()">GetText()</see>
+    /// <see cref="GetText()"/>
     /// -time, operations do
     /// not screw up the token index values. That is, an insert operation at token
     /// index

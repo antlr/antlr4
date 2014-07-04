@@ -164,7 +164,7 @@ namespace Antlr4.Runtime.Atn
                         SetTransition st = (SetTransition)t;
                         if (!setIndices.ContainsKey(st.set))
                         {
-                            sets.AddItem(st.set);
+                            sets.Add(st.set);
                             setIndices.Put(st.set, sets.Count - 1);
                         }
                     }
@@ -480,7 +480,7 @@ namespace Antlr4.Runtime.Atn
                 string reason = string.Format("Could not deserialize ATN with version {0} (expected {1}).", version, ATNDeserializer.SerializedVersion);
                 throw new NotSupportedException(new InvalidClassException(typeof(ATN).FullName, reason));
             }
-            UUID uuid = ATNDeserializer.ToUUID(data, p);
+            Guid uuid = ATNDeserializer.ToUUID(data, p);
             p += 8;
             if (!uuid.Equals(ATNDeserializer.SerializedUuid))
             {
@@ -662,7 +662,7 @@ namespace Antlr4.Runtime.Atn
                         }
                         // turn on the bit above max "\uFFFF" value so that we pad with zeros
                         // then only take last 4 digits
-                        string hex = Sharpen.Runtime.Substring(Sharpen.Extensions.ToHexString(t | unchecked((int)(0x10000))).ToUpper(), 1, 5);
+                        string hex = Sharpen.Runtime.Substring(Antlr4.Runtime.Sharpen.Extensions.ToHexString(t | unchecked((int)(0x10000))).ToUpper(), 1, 5);
                         string unicodeStr = "'\\u" + hex + "'";
                         return unicodeStr;
                     }

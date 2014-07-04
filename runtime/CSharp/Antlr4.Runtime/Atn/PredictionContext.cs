@@ -53,7 +53,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Stores the computed hash code of this
-        /// <see cref="PredictionContext">PredictionContext</see>
+        /// <see cref="PredictionContext"/>
         /// . The hash
         /// code is computed in parts to match the following reference algorithm.
         /// <pre>
@@ -61,10 +61,10 @@ namespace Antlr4.Runtime.Atn
         /// int hash =
         /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Initialize()">MurmurHash.initialize</see>
         /// (
-        /// <see cref="InitialHash">InitialHash</see>
+        /// <see cref="InitialHash"/>
         /// );
         /// for (int i = 0; i &lt;
-        /// <see cref="Size()">Size()</see>
+        /// <see cref="Size()"/>
         /// ; i++) {
         /// hash =
         /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Update(int, int)">MurmurHash.update</see>
@@ -73,7 +73,7 @@ namespace Antlr4.Runtime.Atn
         /// (i));
         /// }
         /// for (int i = 0; i &lt;
-        /// <see cref="Size()">Size()</see>
+        /// <see cref="Size()"/>
         /// ; i++) {
         /// hash =
         /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Update(int, int)">MurmurHash.update</see>
@@ -84,7 +84,7 @@ namespace Antlr4.Runtime.Atn
         /// hash =
         /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Finish(int, int)">MurmurHash.finish</see>
         /// (hash, 2 *
-        /// <see cref="Size()">Size()</see>
+        /// <see cref="Size()"/>
         /// );
         /// return hash;
         /// }

@@ -39,17 +39,17 @@ namespace Antlr4.Runtime.Atn
 {
     /// <summary>
     /// The following images show the relation of states and
-    /// <see cref="transitions">transitions</see>
+    /// <see cref="transitions"/>
     /// for various grammar constructs.
     /// <ul>
     /// <li>Solid edges marked with an &#0949; indicate a required
-    /// <see cref="EpsilonTransition">EpsilonTransition</see>
+    /// <see cref="EpsilonTransition"/>
     /// .</li>
     /// <li>Dashed edges indicate locations where any transition derived from
-    /// <see cref="Transition">Transition</see>
+    /// <see cref="Transition"/>
     /// might appear.</li>
     /// <li>Dashed nodes are place holders for either a sequence of linked
-    /// <see cref="BasicState">BasicState</see>
+    /// <see cref="BasicState"/>
     /// states or the inclusion of a block representing a nested
     /// construct in one of the forms below.</li>
     /// <li>Nodes showing multiple outgoing alternatives with a
@@ -132,13 +132,13 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// For all states except
-        /// <see cref="RuleStopState">RuleStopState</see>
+        /// <see cref="RuleStopState"/>
         /// , this returns the state
         /// number. Returns -1 for stop states.
         /// </summary>
         /// <returns>
         /// -1 for
-        /// <see cref="RuleStopState">RuleStopState</see>
+        /// <see cref="RuleStopState"/>
         /// , otherwise the state number
         /// </returns>
         public virtual int NonStopStateNumber

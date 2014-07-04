@@ -33,19 +33,19 @@ using System.Collections.Generic;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Sharpen;
+using Antlr4.Runtime.Sharpen.Annotation;
 using Javax.Annotation.Processing;
 using Javax.Lang.Model.Element;
 using Javax.Lang.Model.Type;
 using Javax.Tools;
-using Antlr4.Runtime.Sharpen;
-using Antlr4.Runtime.Sharpen.Annotation;
 
 namespace Antlr4.Runtime.Misc
 {
     /// <summary>A compile-time validator for rule dependencies.</summary>
     /// <remarks>A compile-time validator for rule dependencies.</remarks>
-    /// <seealso cref="Antlr4.Runtime.RuleDependency">Antlr4.Runtime.RuleDependency</seealso>
-    /// <seealso cref="Antlr4.Runtime.RuleDependencies">Antlr4.Runtime.RuleDependencies</seealso>
+    /// <seealso cref="Antlr4.Runtime.RuleDependency"/>
+    /// <seealso cref="Antlr4.Runtime.RuleDependencies"/>
     /// <author>Sam Harwell</author>
     public class RuleDependencyProcessor : AbstractProcessor
     {
@@ -76,7 +76,7 @@ namespace Antlr4.Runtime.Misc
                     list = new List<Tuple<RuleDependency, IElement>>();
                     recognizerDependencies.Put(recognizerType, list);
                 }
-                list.AddItem(dependency);
+                list.Add(dependency);
             }
             foreach (KeyValuePair<ITypeMirror, IList<Tuple<RuleDependency, IElement>>> entry in recognizerDependencies.EntrySet())
             {
@@ -409,7 +409,7 @@ namespace Antlr4.Runtime.Misc
                         }
                         while (result.Count <= index)
                         {
-                            result.AddItem(string.Empty);
+                            result.Add(string.Empty);
                         }
                         result.Set(index, name);
                     }
@@ -433,7 +433,7 @@ namespace Antlr4.Runtime.Misc
                 {
                     continue;
                 }
-                result.AddItem(Tuple.Create(dependency, element));
+                result.Add(Tuple.Create(dependency, element));
             }
             elements = roundEnv.GetElementsAnnotatedWith(typeof(RuleDependencies));
             foreach (IElement element_1 in elements)
@@ -445,7 +445,7 @@ namespace Antlr4.Runtime.Misc
                 }
                 foreach (RuleDependency dependency in dependencies.Value())
                 {
-                    result.AddItem(Tuple.Create(dependency, element_1));
+                    result.Add(Tuple.Create(dependency, element_1));
                 }
             }
             return result;

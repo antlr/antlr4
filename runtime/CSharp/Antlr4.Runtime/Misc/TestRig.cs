@@ -79,7 +79,7 @@ namespace Antlr4.Runtime.Misc
 
         protected internal bool Sll = false;
 
-        /// <exception cref="System.Exception"></exception>
+        /// <exception cref="System.Exception"/>
         public TestRig(string[] args)
         {
             if (args.Length < 2)
@@ -101,7 +101,7 @@ namespace Antlr4.Runtime.Misc
                 if (arg[0] != '-')
                 {
                     // input file name
-                    inputFiles.AddItem(arg);
+                    inputFiles.Add(arg);
                     continue;
                 }
                 if (arg.Equals("-tree"))
@@ -166,7 +166,7 @@ namespace Antlr4.Runtime.Misc
             }
         }
 
-        /// <exception cref="System.Exception"></exception>
+        /// <exception cref="System.Exception"/>
         public static void Main(string[] args)
         {
             Antlr4.Runtime.Misc.TestRig testRig = new Antlr4.Runtime.Misc.TestRig(args);
@@ -176,12 +176,12 @@ namespace Antlr4.Runtime.Misc
             }
         }
 
-        /// <exception cref="System.Exception"></exception>
+        /// <exception cref="System.Exception"/>
         public virtual void Process()
         {
             //		System.out.println("exec "+grammarName+"."+startRuleName);
             string lexerName = grammarName + "Lexer";
-            ClassLoader cl = Sharpen.Thread.CurrentThread().GetContextClassLoader();
+            ClassLoader cl = Antlr4.Runtime.Sharpen.Thread.CurrentThread().GetContextClassLoader();
             Type lexerClass = null;
             try
             {
@@ -256,10 +256,10 @@ namespace Antlr4.Runtime.Misc
             }
         }
 
-        /// <exception cref="System.IO.IOException"></exception>
-        /// <exception cref="System.MemberAccessException"></exception>
-        /// <exception cref="System.Reflection.TargetInvocationException"></exception>
-        /// <exception cref="Javax.Print.PrintException"></exception>
+        /// <exception cref="System.IO.IOException"/>
+        /// <exception cref="System.MemberAccessException"/>
+        /// <exception cref="System.Reflection.TargetInvocationException"/>
+        /// <exception cref="Javax.Print.PrintException"/>
         protected internal virtual void Process<_T0>(Lexer lexer, Type<_T0> parserClass, Parser parser, Stream @is, StreamReader r)
             where _T0 : Parser
         {

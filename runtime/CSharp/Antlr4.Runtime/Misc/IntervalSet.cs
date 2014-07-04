@@ -39,7 +39,7 @@ namespace Antlr4.Runtime.Misc
 {
     /// <summary>
     /// This class implements the
-    /// <see cref="IIntSet">IIntSet</see>
+    /// <see cref="IIntSet"/>
     /// backed by a sorted array of
     /// non-overlapping intervals. It is particularly efficient for representing
     /// large collections of numbers, where the majority of elements appear as part
@@ -48,9 +48,9 @@ namespace Antlr4.Runtime.Misc
     /// <p>
     /// This class is able to represent sets containing any combination of values in
     /// the range
-    /// <see cref="int.MinValue">int.MinValue</see>
+    /// <see cref="int.MinValue"/>
     /// to
-    /// <see cref="int.MaxValue">int.MaxValue</see>
+    /// <see cref="int.MaxValue"/>
     /// (inclusive).</p>
     /// </summary>
     public class IntervalSet : IIntSet
@@ -258,7 +258,7 @@ namespace Antlr4.Runtime.Misc
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// 
         /// </summary>
         public virtual Antlr4.Runtime.Misc.IntervalSet Complement(IIntSet vocabulary)
@@ -396,7 +396,7 @@ namespace Antlr4.Runtime.Misc
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// 
         /// </summary>
         public virtual Antlr4.Runtime.Misc.IntervalSet And(IIntSet other)
@@ -498,7 +498,7 @@ namespace Antlr4.Runtime.Misc
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// 
         /// </summary>
         public virtual bool Contains(int el)
@@ -524,7 +524,7 @@ namespace Antlr4.Runtime.Misc
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// 
         /// </summary>
         public virtual bool IsNil
@@ -536,7 +536,7 @@ namespace Antlr4.Runtime.Misc
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// 
         /// </summary>
         public virtual int SingleElement

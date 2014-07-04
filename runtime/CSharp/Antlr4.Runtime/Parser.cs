@@ -34,9 +34,9 @@ using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
 using Antlr4.Runtime.Tree.Pattern;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
@@ -104,18 +104,18 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// This field maps from the serialized ATN string to the deserialized
-        /// <see cref="Antlr4.Runtime.Atn.ATN">Antlr4.Runtime.Atn.ATN</see>
+        /// <see cref="Antlr4.Runtime.Atn.ATN"/>
         /// with
         /// bypass alternatives.
         /// </summary>
-        /// <seealso cref="Antlr4.Runtime.Atn.ATNDeserializationOptions.GenerateRuleBypassTransitions()">Antlr4.Runtime.Atn.ATNDeserializationOptions.GenerateRuleBypassTransitions()</seealso>
+        /// <seealso cref="Antlr4.Runtime.Atn.ATNDeserializationOptions.GenerateRuleBypassTransitions()"/>
         private static readonly IDictionary<string, ATN> bypassAltsAtnCache = new Dictionary<string, ATN>();
 
         /// <summary>The error handling strategy for the parser.</summary>
         /// <remarks>
         /// The error handling strategy for the parser. The default value is a new
         /// instance of
-        /// <see cref="DefaultErrorStrategy">DefaultErrorStrategy</see>
+        /// <see cref="DefaultErrorStrategy"/>
         /// .
         /// </remarks>
         /// <seealso cref="ErrorHandler"/>
@@ -124,15 +124,15 @@ namespace Antlr4.Runtime
 
         /// <summary>The input stream.</summary>
         /// <remarks>The input stream.</remarks>
-        /// <seealso cref="InputStream()">InputStream()</seealso>
-        /// <seealso cref="SetInputStream(ITokenStream)">SetInputStream(ITokenStream)</seealso>
+        /// <seealso cref="InputStream()"/>
+        /// <seealso cref="SetInputStream(ITokenStream)"/>
         protected internal ITokenStream _input;
 
         protected internal readonly List<int> _precedenceStack = new List<int> { 0 };
 
         /// <summary>
         /// The
-        /// <see cref="ParserRuleContext">ParserRuleContext</see>
+        /// <see cref="ParserRuleContext"/>
         /// object for the currently executing rule.
         /// This is always non-null during the parsing process.
         /// </summary>
@@ -157,7 +157,7 @@ namespace Antlr4.Runtime
         /// <see cref="Trace"/>
         /// <code>(true)</code>
         /// is called, a reference to the
-        /// <see cref="TraceListener">TraceListener</see>
+        /// <see cref="TraceListener"/>
         /// is stored here so it can be easily removed in a
         /// later call to
         /// <see cref="Trace"/>
@@ -171,11 +171,11 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// The list of
-        /// <see cref="Antlr4.Runtime.Tree.IParseTreeListener">Antlr4.Runtime.Tree.IParseTreeListener</see>
+        /// <see cref="Antlr4.Runtime.Tree.IParseTreeListener"/>
         /// listeners registered to receive
         /// events during the parse.
         /// </summary>
-        /// <seealso cref="AddParseListener(Antlr4.Runtime.Tree.IParseTreeListener)">AddParseListener(Antlr4.Runtime.Tree.IParseTreeListener)</seealso>
+        /// <seealso cref="AddParseListener(Antlr4.Runtime.Tree.IParseTreeListener)"/>
         [Nullable]
         protected internal IList<IParseTreeListener> _parseListeners;
 
@@ -183,7 +183,7 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// The number of syntax errors reported during parsing. This value is
         /// incremented each time
-        /// <see cref="NotifyErrorListeners(string)">NotifyErrorListeners(string)</see>
+        /// <see cref="NotifyErrorListeners(string)"/>
         /// is called.
         /// </remarks>
         protected internal int _syntaxErrors;
@@ -220,23 +220,23 @@ namespace Antlr4.Runtime
         /// <code>ttype</code>
         /// . If the symbol type
         /// matches,
-        /// <see cref="IAntlrErrorStrategy.ReportMatch(Parser)">IAntlrErrorStrategy.ReportMatch(Parser)</see>
+        /// <see cref="IAntlrErrorStrategy.ReportMatch(Parser)"/>
         /// and
-        /// <see cref="Consume()">Consume()</see>
+        /// <see cref="Consume()"/>
         /// are
         /// called to complete the match process.
         /// <p>If the symbol type does not match,
-        /// <see cref="IAntlrErrorStrategy.RecoverInline(Parser)">IAntlrErrorStrategy.RecoverInline(Parser)</see>
+        /// <see cref="IAntlrErrorStrategy.RecoverInline(Parser)"/>
         /// is called on the current error
         /// strategy to attempt recovery. If
-        /// <see cref="BuildParseTree()">BuildParseTree()</see>
+        /// <see cref="BuildParseTree()"/>
         /// is
         /// <code>true</code>
         /// and the token index of the symbol returned by
-        /// <see cref="IAntlrErrorStrategy.RecoverInline(Parser)">IAntlrErrorStrategy.RecoverInline(Parser)</see>
+        /// <see cref="IAntlrErrorStrategy.RecoverInline(Parser)"/>
         /// is -1, the symbol is added to
         /// the parse tree by calling
-        /// <see cref="ParserRuleContext.AddErrorNode(IToken)">ParserRuleContext.AddErrorNode(IToken)</see>
+        /// <see cref="ParserRuleContext.AddErrorNode(IToken)"/>
         /// .</p>
         /// </summary>
         /// <param name="ttype">the token type to match</param>
@@ -247,7 +247,7 @@ namespace Antlr4.Runtime
         /// and the error strategy could not recover from the
         /// mismatched symbol
         /// </exception>
-        /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
+        /// <exception cref="Antlr4.Runtime.RecognitionException"/>
         [return: NotNull]
         public virtual IToken Match(int ttype)
         {
@@ -274,22 +274,22 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// Match current input symbol as a wildcard. If the symbol type matches
         /// (i.e. has a value greater than 0),
-        /// <see cref="IAntlrErrorStrategy.ReportMatch(Parser)">IAntlrErrorStrategy.ReportMatch(Parser)</see>
+        /// <see cref="IAntlrErrorStrategy.ReportMatch(Parser)"/>
         /// and
-        /// <see cref="Consume()">Consume()</see>
+        /// <see cref="Consume()"/>
         /// are called to complete the match process.
         /// <p>If the symbol type does not match,
-        /// <see cref="IAntlrErrorStrategy.RecoverInline(Parser)">IAntlrErrorStrategy.RecoverInline(Parser)</see>
+        /// <see cref="IAntlrErrorStrategy.RecoverInline(Parser)"/>
         /// is called on the current error
         /// strategy to attempt recovery. If
-        /// <see cref="BuildParseTree()">BuildParseTree()</see>
+        /// <see cref="BuildParseTree()"/>
         /// is
         /// <code>true</code>
         /// and the token index of the symbol returned by
-        /// <see cref="IAntlrErrorStrategy.RecoverInline(Parser)">IAntlrErrorStrategy.RecoverInline(Parser)</see>
+        /// <see cref="IAntlrErrorStrategy.RecoverInline(Parser)"/>
         /// is -1, the symbol is added to
         /// the parse tree by calling
-        /// <see cref="ParserRuleContext.AddErrorNode(IToken)">ParserRuleContext.AddErrorNode(IToken)</see>
+        /// <see cref="ParserRuleContext.AddErrorNode(IToken)"/>
         /// .</p>
         /// </remarks>
         /// <returns>the matched symbol</returns>
@@ -298,7 +298,7 @@ namespace Antlr4.Runtime
         /// a wildcard and the error strategy could not recover from the mismatched
         /// symbol
         /// </exception>
-        /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
+        /// <exception cref="Antlr4.Runtime.RecognitionException"/>
         [return: NotNull]
         public virtual IToken MatchWildcard()
         {
@@ -323,13 +323,13 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Track the
-        /// <see cref="ParserRuleContext">ParserRuleContext</see>
+        /// <see cref="ParserRuleContext"/>
         /// objects during the parse and hook
         /// them up using the
-        /// <see cref="ParserRuleContext.children">ParserRuleContext.children</see>
+        /// <see cref="ParserRuleContext.children"/>
         /// list so that it
         /// forms a parse tree. The
-        /// <see cref="ParserRuleContext">ParserRuleContext</see>
+        /// <see cref="ParserRuleContext"/>
         /// returned from the start
         /// rule represents the root of the parse tree.
         /// <p>Note that if we are not building parse trees, rule contexts only point
@@ -337,7 +337,7 @@ namespace Antlr4.Runtime
         /// collected if nobody holds a reference. It points upwards but nobody
         /// points at it.</p>
         /// <p>When we build parse trees, we are adding all of these contexts to
-        /// <see cref="ParserRuleContext.children">ParserRuleContext.children</see>
+        /// <see cref="ParserRuleContext.children"/>
         /// list. Contexts are then not candidates
         /// for garbage collection.</p>
         /// </summary>
@@ -382,17 +382,17 @@ namespace Antlr4.Runtime
         /// 
         /// <code>true</code>
         /// to trim the capacity of the
-        /// <see cref="ParserRuleContext.children">ParserRuleContext.children</see>
+        /// <see cref="ParserRuleContext.children"/>
         /// list to its size after a rule is parsed.
         /// </value>
         /// <returns>
         /// 
         /// <code>true</code>
         /// if the
-        /// <see cref="ParserRuleContext.children">ParserRuleContext.children</see>
+        /// <see cref="ParserRuleContext.children"/>
         /// list is trimmed
         /// using the default
-        /// <see cref="TrimToSizeListener">TrimToSizeListener</see>
+        /// <see cref="TrimToSizeListener"/>
         /// during the parse process.
         /// </returns>
         public virtual bool TrimParseTree
@@ -440,7 +440,7 @@ namespace Antlr4.Runtime
         /// limited to left-recursion removal, automated left-factoring, and
         /// optimized code generation), calls to listener methods during the parse
         /// may differ substantially from calls made by
-        /// <see cref="Antlr4.Runtime.Tree.ParseTreeWalker.Default">Antlr4.Runtime.Tree.ParseTreeWalker.Default</see>
+        /// <see cref="Antlr4.Runtime.Tree.ParseTreeWalker.Default"/>
         /// used after the parse is complete. In
         /// particular, rule entry and exit events may occur in a different order
         /// during the parse than after the parser. In addition, calls to certain
@@ -460,7 +460,7 @@ namespace Antlr4.Runtime
         /// <param name="listener">the listener to add</param>
         /// <exception cref="System.ArgumentNullException">
         /// if
-        /// <code></code>
+        /// <code/>
         /// listener is
         /// <code>null</code>
         /// </exception>
@@ -488,7 +488,7 @@ namespace Antlr4.Runtime
         /// or has not been added as a parse
         /// listener, this method does nothing.</p>
         /// </summary>
-        /// <seealso cref="AddParseListener(Antlr4.Runtime.Tree.IParseTreeListener)">AddParseListener(Antlr4.Runtime.Tree.IParseTreeListener)</seealso>
+        /// <seealso cref="AddParseListener(Antlr4.Runtime.Tree.IParseTreeListener)"/>
         /// <param name="listener">the listener to remove</param>
         public virtual void RemoveParseListener(IParseTreeListener listener)
         {
@@ -506,7 +506,7 @@ namespace Antlr4.Runtime
 
         /// <summary>Remove all parse listeners.</summary>
         /// <remarks>Remove all parse listeners.</remarks>
-        /// <seealso cref="AddParseListener(Antlr4.Runtime.Tree.IParseTreeListener)">AddParseListener(Antlr4.Runtime.Tree.IParseTreeListener)</seealso>
+        /// <seealso cref="AddParseListener(Antlr4.Runtime.Tree.IParseTreeListener)"/>
         public virtual void RemoveParseListeners()
         {
             _parseListeners = null;
@@ -514,7 +514,7 @@ namespace Antlr4.Runtime
 
         /// <summary>Notify any parse listeners of an enter rule event.</summary>
         /// <remarks>Notify any parse listeners of an enter rule event.</remarks>
-        /// <seealso cref="AddParseListener(Antlr4.Runtime.Tree.IParseTreeListener)">AddParseListener(Antlr4.Runtime.Tree.IParseTreeListener)</seealso>
+        /// <seealso cref="AddParseListener(Antlr4.Runtime.Tree.IParseTreeListener)"/>
         protected internal virtual void TriggerEnterRuleEvent()
         {
             foreach (IParseTreeListener listener in _parseListeners)
@@ -526,7 +526,7 @@ namespace Antlr4.Runtime
 
         /// <summary>Notify any parse listeners of an exit rule event.</summary>
         /// <remarks>Notify any parse listeners of an exit rule event.</remarks>
-        /// <seealso cref="AddParseListener(Antlr4.Runtime.Tree.IParseTreeListener)">AddParseListener(Antlr4.Runtime.Tree.IParseTreeListener)</seealso>
+        /// <seealso cref="AddParseListener(Antlr4.Runtime.Tree.IParseTreeListener)"/>
         protected internal virtual void TriggerExitRuleEvent()
         {
             // reverse order walk of listeners
@@ -542,10 +542,10 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// Gets the number of syntax errors reported during parsing. This value is
         /// incremented each time
-        /// <see cref="NotifyErrorListeners(string)">NotifyErrorListeners(string)</see>
+        /// <see cref="NotifyErrorListeners(string)"/>
         /// is called.
         /// </remarks>
-        /// <seealso cref="NotifyErrorListeners(string)">NotifyErrorListeners(string)</seealso>
+        /// <seealso cref="NotifyErrorListeners(string)"/>
         public virtual int NumberOfSyntaxErrors
         {
             get
@@ -573,7 +573,7 @@ namespace Antlr4.Runtime
         /// <exception cref="System.NotSupportedException">
         /// if the current parser does not
         /// implement the
-        /// <see cref="Recognizer{Symbol, ATNInterpreter}.SerializedAtn()">Recognizer&lt;Symbol, ATNInterpreter&gt;.SerializedAtn()</see>
+        /// <see cref="Recognizer{Symbol, ATNInterpreter}.SerializedAtn()"/>
         /// method.
         /// </exception>
         [return: NotNull]
@@ -625,9 +625,9 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// The same as
-        /// <see cref="CompileParseTreePattern(string, int)">CompileParseTreePattern(string, int)</see>
+        /// <see cref="CompileParseTreePattern(string, int)"/>
         /// but specify a
-        /// <see cref="Lexer">Lexer</see>
+        /// <see cref="Lexer"/>
         /// rather than trying to deduce it from this parser.
         /// </summary>
         public virtual ParseTreePattern CompileParseTreePattern(string pattern, int patternRuleIndex, Lexer lexer)
@@ -722,15 +722,15 @@ namespace Antlr4.Runtime
         /// </pre>
         /// If the parser is not in error recovery mode, the consumed symbol is added
         /// to the parse tree using
-        /// <see cref="ParserRuleContext.AddChild(IToken)">ParserRuleContext.AddChild(IToken)</see>
+        /// <see cref="ParserRuleContext.AddChild(IToken)"/>
         /// , and
-        /// <see cref="Antlr4.Runtime.Tree.IParseTreeListener.VisitTerminal(Antlr4.Runtime.Tree.ITerminalNode)">Antlr4.Runtime.Tree.IParseTreeListener.VisitTerminal(Antlr4.Runtime.Tree.ITerminalNode)</see>
+        /// <see cref="Antlr4.Runtime.Tree.IParseTreeListener.VisitTerminal(Antlr4.Runtime.Tree.ITerminalNode)"/>
         /// is called on any parse listeners.
         /// If the parser <em>is</em> in error recovery mode, the consumed symbol is
         /// added to the parse tree using
-        /// <see cref="ParserRuleContext.AddErrorNode(IToken)">ParserRuleContext.AddErrorNode(IToken)</see>
+        /// <see cref="ParserRuleContext.AddErrorNode(IToken)"/>
         /// , and
-        /// <see cref="Antlr4.Runtime.Tree.IParseTreeListener.VisitErrorNode(Antlr4.Runtime.Tree.IErrorNode)">Antlr4.Runtime.Tree.IParseTreeListener.VisitErrorNode(Antlr4.Runtime.Tree.IErrorNode)</see>
+        /// <see cref="Antlr4.Runtime.Tree.IParseTreeListener.VisitErrorNode(Antlr4.Runtime.Tree.IErrorNode)"/>
         /// is called on any parse
         /// listeners.
         /// </summary>
@@ -783,7 +783,7 @@ namespace Antlr4.Runtime
         /// <summary>Always called by generated parsers upon entry to a rule.</summary>
         /// <remarks>
         /// Always called by generated parsers upon entry to a rule. Access field
-        /// <see cref="_ctx">_ctx</see>
+        /// <see cref="_ctx"/>
         /// get the current context.
         /// </remarks>
         public virtual void EnterRule(ParserRuleContext localctx, int state, int ruleIndex)
@@ -890,7 +890,7 @@ namespace Antlr4.Runtime
         // simulates rule entry for left-recursive rules
         /// <summary>
         /// Like
-        /// <see cref="EnterRule(ParserRuleContext, int, int)">EnterRule(ParserRuleContext, int, int)</see>
+        /// <see cref="EnterRule(ParserRuleContext, int, int)"/>
         /// but for recursive rules.
         /// </summary>
         public virtual void PushNewRecursionContext(ParserRuleContext localctx, int state, int ruleIndex)
@@ -1045,13 +1045,13 @@ namespace Antlr4.Runtime
         /// <summary>
         /// Computes the set of input symbols which could follow the current parser
         /// state and context, as given by
-        /// <see cref="Recognizer{Symbol, ATNInterpreter}.State()">Recognizer&lt;Symbol, ATNInterpreter&gt;.State()</see>
+        /// <see cref="Recognizer{Symbol, ATNInterpreter}.State()"/>
         /// and
-        /// <see cref="Context()">Context()</see>
+        /// <see cref="Context()"/>
         /// ,
         /// respectively.
         /// </summary>
-        /// <seealso cref="Antlr4.Runtime.Atn.ATN.GetExpectedTokens(int, RuleContext)">Antlr4.Runtime.Atn.ATN.GetExpectedTokens(int, RuleContext)</seealso>
+        /// <seealso cref="Antlr4.Runtime.Atn.ATN.GetExpectedTokens(int, RuleContext)"/>
         [return: NotNull]
         public virtual IntervalSet GetExpectedTokens()
         {

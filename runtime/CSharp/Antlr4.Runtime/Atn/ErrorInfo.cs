@@ -50,7 +50,7 @@ namespace Antlr4.Runtime.Atn
     {
         /// <summary>
         /// Constructs a new instance of the
-        /// <see cref="ErrorInfo">ErrorInfo</see>
+        /// <see cref="ErrorInfo"/>
         /// class with the
         /// specified detailed syntax error information.
         /// </summary>
@@ -58,7 +58,7 @@ namespace Antlr4.Runtime.Atn
         /// <param name="state">
         /// The final simulator state reached during prediction
         /// prior to reaching the
-        /// <see cref="ATNSimulator.Error">ATNSimulator.Error</see>
+        /// <see cref="ATNSimulator.Error"/>
         /// state
         /// </param>
         /// <param name="input">The input token stream</param>

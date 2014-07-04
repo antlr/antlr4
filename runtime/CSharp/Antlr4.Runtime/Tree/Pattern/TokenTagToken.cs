@@ -35,11 +35,11 @@ namespace Antlr4.Runtime.Tree.Pattern
 {
     /// <summary>
     /// A
-    /// <see cref="Antlr4.Runtime.IToken">Antlr4.Runtime.IToken</see>
+    /// <see cref="Antlr4.Runtime.IToken"/>
     /// object representing a token of a particular type; e.g.,
     /// <code>&lt;ID&gt;</code>
     /// . These tokens are created for
-    /// <see cref="TagChunk">TagChunk</see>
+    /// <see cref="TagChunk"/>
     /// chunks where the
     /// tag corresponds to a lexer rule or token type.
     /// </summary>
@@ -48,7 +48,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     {
         /// <summary>
         /// This is the backing field for
-        /// <see cref="TokenName()">TokenName()</see>
+        /// <see cref="TokenName()"/>
         /// .
         /// </summary>
         [NotNull]
@@ -56,7 +56,7 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="Label()">Label()</see>
+        /// <see cref="Label()"/>
         /// .
         /// </summary>
         [Nullable]
@@ -64,7 +64,7 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// Constructs a new instance of
-        /// <see cref="TokenTagToken">TokenTagToken</see>
+        /// <see cref="TokenTagToken"/>
         /// for an unlabeled tag
         /// with the specified token name and type.
         /// </summary>
@@ -77,7 +77,7 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// Constructs a new instance of
-        /// <see cref="TokenTagToken">TokenTagToken</see>
+        /// <see cref="TokenTagToken"/>
         /// with the specified
         /// token name, type, and label.
         /// </summary>
@@ -125,9 +125,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>The implementation for
-        /// <see cref="TokenTagToken">TokenTagToken</see>
+        /// <see cref="TokenTagToken"/>
         /// returns the token tag
         /// formatted with
         /// <code>&lt;</code>
@@ -148,9 +148,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>The implementation for
-        /// <see cref="TokenTagToken">TokenTagToken</see>
+        /// <see cref="TokenTagToken"/>
         /// returns a string of the form
         /// <code>tokenName:type</code>
         /// .</p>

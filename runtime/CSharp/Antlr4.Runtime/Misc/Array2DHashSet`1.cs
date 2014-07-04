@@ -36,7 +36,7 @@ using Antlr4.Runtime.Sharpen;
 namespace Antlr4.Runtime.Misc
 {
     /// <summary>
-    /// <see cref="Sharpen.ISet{E}">Sharpen.ISet&lt;E&gt;</see>
+    /// <see cref="Antlr4.Runtime.Sharpen.ISet{E}"/>
     /// implementation with closed hashing (open addressing).
     /// </summary>
     public class Array2DHashSet<T> : HashSet<T>
@@ -90,7 +90,7 @@ namespace Antlr4.Runtime.Misc
         /// <code>o</code>
         /// to set if not there; return existing value if already
         /// there. This method performs the same operation as
-        /// <see cref="Array2DHashSet{T}.AddItem(object)">Array2DHashSet&lt;T&gt;.AddItem(object)</see>
+        /// <see cref="Array2DHashSet{T}.Add(object)"/>
         /// aside from
         /// the return value.
         /// </summary>
@@ -270,7 +270,7 @@ namespace Antlr4.Runtime.Misc
             System.Diagnostics.Debug.Assert(n == oldSize);
         }
 
-        public bool AddItem(T t)
+        public bool Add(T t)
         {
             T existing = GetOrAdd(t);
             return existing == t;
@@ -592,12 +592,12 @@ namespace Antlr4.Runtime.Misc
         /// <code>null</code>
         /// . The base implementation does not perform any
         /// type checks; override this method to provide strong type checks for the
-        /// <see cref="Array2DHashSet{T}.Contains(object)">Array2DHashSet&lt;T&gt;.Contains(object)</see>
+        /// <see cref="Array2DHashSet{T}.Contains(object)"/>
         /// and
-        /// <see cref="Array2DHashSet{T}.Remove(object)">Array2DHashSet&lt;T&gt;.Remove(object)</see>
+        /// <see cref="Array2DHashSet{T}.Remove(object)"/>
         /// methods to ensure the arguments to
         /// the
-        /// <see cref="IEqualityComparator{T}">IEqualityComparator&lt;T&gt;</see>
+        /// <see cref="IEqualityComparator{T}"/>
         /// for the set always have the expected
         /// types.
         /// </summary>

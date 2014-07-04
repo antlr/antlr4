@@ -42,7 +42,7 @@ namespace Antlr4.Runtime
 
     /// <summary>
     /// This is an
-    /// <see cref="AntlrInputStream">AntlrInputStream</see>
+    /// <see cref="AntlrInputStream"/>
     /// that is loaded from a file all at once
     /// when you construct the object.
     /// </summary>
@@ -50,20 +50,20 @@ namespace Antlr4.Runtime
     {
         protected internal string fileName;
 
-        /// <exception cref="System.IO.IOException"></exception>
+        /// <exception cref="System.IO.IOException"/>
         public AntlrFileStream(string fileName)
             : this(fileName, null)
         {
         }
 
-        /// <exception cref="System.IO.IOException"></exception>
+        /// <exception cref="System.IO.IOException"/>
         public AntlrFileStream(string fileName, Encoding encoding)
         {
             this.fileName = fileName;
             Load(fileName, encoding);
         }
 
-        /// <exception cref="System.IO.IOException"></exception>
+        /// <exception cref="System.IO.IOException"/>
         public virtual void Load(string fileName, Encoding encoding)
         {
             if (fileName == null)

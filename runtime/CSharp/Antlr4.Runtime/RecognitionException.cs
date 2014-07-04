@@ -64,10 +64,10 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// The current
-        /// <see cref="IToken">IToken</see>
+        /// <see cref="IToken"/>
         /// when an error occurred. Since not all streams
         /// support accessing symbols by index, we have to track the
-        /// <see cref="IToken">IToken</see>
+        /// <see cref="IToken"/>
         /// instance itself.
         /// </summary>
         private IToken offendingToken;
@@ -111,11 +111,11 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// Get the ATN state number the parser was in at the time the error
         /// occurred. For
-        /// <see cref="NoViableAltException">NoViableAltException</see>
+        /// <see cref="NoViableAltException"/>
         /// and
-        /// <see cref="LexerNoViableAltException">LexerNoViableAltException</see>
+        /// <see cref="LexerNoViableAltException"/>
         /// exceptions, this is the
-        /// <see cref="Antlr4.Runtime.Atn.DecisionState">Antlr4.Runtime.Atn.DecisionState</see>
+        /// <see cref="Antlr4.Runtime.Atn.DecisionState"/>
         /// number. For others, it is the state whose outgoing
         /// edge we couldn't match.
         /// <p>If the state number is not known, this method returns -1.</p>
@@ -163,7 +163,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Gets the
-        /// <see cref="RuleContext">RuleContext</see>
+        /// <see cref="RuleContext"/>
         /// at the time this exception was thrown.
         /// <p>If the context is not available, this method returns
         /// <code>null</code>
@@ -171,7 +171,7 @@ namespace Antlr4.Runtime
         /// </summary>
         /// <returns>
         /// The
-        /// <see cref="RuleContext">RuleContext</see>
+        /// <see cref="RuleContext"/>
         /// at the time this exception was thrown.
         /// If the context is not available, this method returns
         /// <code>null</code>

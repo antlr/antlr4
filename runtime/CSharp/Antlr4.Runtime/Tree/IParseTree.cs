@@ -28,22 +28,22 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using Antlr4.Runtime;
-using Antlr4.Runtime.Tree;
 using Antlr4.Runtime.Sharpen;
+using Antlr4.Runtime.Tree;
 
 namespace Antlr4.Runtime.Tree
 {
     /// <summary>
     /// An interface to access the tree of
-    /// <see cref="Antlr4.Runtime.RuleContext">Antlr4.Runtime.RuleContext</see>
+    /// <see cref="Antlr4.Runtime.RuleContext"/>
     /// objects created
     /// during a parse that makes the data structure look like a simple parse tree.
     /// This node represents both internal nodes, rule invocations,
     /// and leaf nodes, token matches.
     /// <p>The payload is either a
-    /// <see cref="Antlr4.Runtime.IToken">Antlr4.Runtime.IToken</see>
+    /// <see cref="Antlr4.Runtime.IToken"/>
     /// or a
-    /// <see cref="Antlr4.Runtime.RuleContext">Antlr4.Runtime.RuleContext</see>
+    /// <see cref="Antlr4.Runtime.RuleContext"/>
     /// object.</p>
     /// </summary>
     public interface IParseTree : ISyntaxTree
@@ -58,7 +58,7 @@ namespace Antlr4.Runtime.Tree
 
         /// <summary>
         /// The
-        /// <see cref="IParseTreeVisitor{Result}">IParseTreeVisitor&lt;Result&gt;</see>
+        /// <see cref="IParseTreeVisitor{Result}"/>
         /// needs a double dispatch method.
         /// </summary>
         T Accept<T>(IParseTreeVisitor<T> visitor);

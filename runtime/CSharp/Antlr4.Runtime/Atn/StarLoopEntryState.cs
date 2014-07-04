@@ -45,12 +45,12 @@ namespace Antlr4.Runtime.Atn
         /// decision making.
         /// <p>This is a computed property that is calculated during ATN deserialization
         /// and stored for use in
-        /// <see cref="ParserATNSimulator">ParserATNSimulator</see>
+        /// <see cref="ParserATNSimulator"/>
         /// and
-        /// <see cref="Antlr4.Runtime.ParserInterpreter">Antlr4.Runtime.ParserInterpreter</see>
+        /// <see cref="Antlr4.Runtime.ParserInterpreter"/>
         /// .</p>
         /// </remarks>
-        /// <seealso cref="Antlr4.Runtime.Dfa.DFA.IsPrecedenceDfa()">Antlr4.Runtime.Dfa.DFA.IsPrecedenceDfa()</seealso>
+        /// <seealso cref="Antlr4.Runtime.Dfa.DFA.IsPrecedenceDfa()"/>
         public bool precedenceRuleDecision;
 
         public override Antlr4.Runtime.Atn.StateType StateType

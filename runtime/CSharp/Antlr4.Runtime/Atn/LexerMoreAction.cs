@@ -38,13 +38,13 @@ namespace Antlr4.Runtime.Atn
     /// Implements the
     /// <code>more</code>
     /// lexer action by calling
-    /// <see cref="Antlr4.Runtime.Lexer.More()">Antlr4.Runtime.Lexer.More()</see>
+    /// <see cref="Antlr4.Runtime.Lexer.More()"/>
     /// .
     /// <p>The
     /// <code>more</code>
     /// command does not have any parameters, so this action is
     /// implemented as a singleton instance exposed by
-    /// <see cref="Instance">Instance</see>
+    /// <see cref="Instance"/>
     /// .</p>
     /// </summary>
     /// <author>Sam Harwell</author>
@@ -64,10 +64,10 @@ namespace Antlr4.Runtime.Atn
         {
         }
 
-        /// <summary><inheritDoc></inheritDoc></summary>
+        /// <summary><inheritDoc/></summary>
         /// <returns>
         /// This method returns
-        /// <see cref="LexerActionType.More">LexerActionType.More</see>
+        /// <see cref="LexerActionType.More"/>
         /// .
         /// </returns>
         public LexerActionType ActionType
@@ -78,7 +78,7 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        /// <summary><inheritDoc></inheritDoc></summary>
+        /// <summary><inheritDoc/></summary>
         /// <returns>
         /// This method returns
         /// <code>false</code>
@@ -93,9 +93,9 @@ namespace Antlr4.Runtime.Atn
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>This action is implemented by calling
-        /// <see cref="Antlr4.Runtime.Lexer.More()">Antlr4.Runtime.Lexer.More()</see>
+        /// <see cref="Antlr4.Runtime.Lexer.More()"/>
         /// .</p>
         /// </summary>
         public void Execute(Lexer lexer)

@@ -43,7 +43,7 @@ namespace Antlr4.Runtime
         /// An empty
         /// <see cref="Tuple{T1, T2}"/>
         /// which is used as the default value of
-        /// <see cref="source">source</see>
+        /// <see cref="source"/>
         /// for tokens that do not have a source.
         /// </summary>
         protected internal static readonly Tuple<ITokenSource, ICharStream> EmptySource = Tuple.Create<ITokenSource, ICharStream>(null, null);
@@ -70,15 +70,15 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="TokenSource()">TokenSource()</see>
+        /// <see cref="TokenSource()"/>
         /// and
-        /// <see cref="InputStream()">InputStream()</see>
+        /// <see cref="InputStream()"/>
         /// .
         /// <p>
         /// These properties share a field to reduce the memory footprint of
-        /// <see cref="CommonToken">CommonToken</see>
+        /// <see cref="CommonToken"/>
         /// . Tokens created by a
-        /// <see cref="CommonTokenFactory">CommonTokenFactory</see>
+        /// <see cref="CommonTokenFactory"/>
         /// from
         /// the same source and input stream share a reference to the same
         /// <see cref="Tuple{T1, T2}"/>
@@ -110,7 +110,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Constructs a new
-        /// <see cref="CommonToken">CommonToken</see>
+        /// <see cref="CommonToken"/>
         /// with the specified token type.
         /// </summary>
         /// <param name="type">The token type.</param>
@@ -137,7 +137,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Constructs a new
-        /// <see cref="CommonToken">CommonToken</see>
+        /// <see cref="CommonToken"/>
         /// with the specified token type and
         /// text.
         /// </summary>
@@ -153,34 +153,34 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Constructs a new
-        /// <see cref="CommonToken">CommonToken</see>
+        /// <see cref="CommonToken"/>
         /// as a copy of another
-        /// <see cref="IToken">IToken</see>
+        /// <see cref="IToken"/>
         /// .
         /// <p>
         /// If
         /// <code>oldToken</code>
         /// is also a
-        /// <see cref="CommonToken">CommonToken</see>
+        /// <see cref="CommonToken"/>
         /// instance, the newly
         /// constructed token will share a reference to the
-        /// <see cref="text">text</see>
+        /// <see cref="text"/>
         /// field and
         /// the
         /// <see cref="Tuple{T1, T2}"/>
         /// stored in
-        /// <see cref="source">source</see>
+        /// <see cref="source"/>
         /// . Otherwise,
-        /// <see cref="text">text</see>
+        /// <see cref="text"/>
         /// will
         /// be assigned the result of calling
-        /// <see cref="Text()">Text()</see>
+        /// <see cref="Text()"/>
         /// , and
-        /// <see cref="source">source</see>
+        /// <see cref="source"/>
         /// will be constructed from the result of
-        /// <see cref="IToken.TokenSource()">IToken.TokenSource()</see>
+        /// <see cref="IToken.TokenSource()"/>
         /// and
-        /// <see cref="IToken.InputStream()">IToken.InputStream()</see>
+        /// <see cref="IToken.InputStream()"/>
         /// .</p>
         /// </summary>
         /// <param name="oldToken">The token to copy.</param>
@@ -236,7 +236,7 @@ namespace Antlr4.Runtime
         /// Explicitly set the text for this token. If {code text} is not
         /// <code>null</code>
         /// , then
-        /// <see cref="Text()">Text()</see>
+        /// <see cref="Text()"/>
         /// will return this value rather than
         /// extracting the text from the input.
         /// </remarks>

@@ -29,10 +29,10 @@
  */
 using System.Collections.Generic;
 using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
 using Antlr4.Runtime.Tree.Pattern;
 using Antlr4.Runtime.Tree.Xpath;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Tree.Pattern
 {
@@ -40,23 +40,23 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// A pattern like
     /// <code>&lt;ID&gt; = &lt;expr&gt;;</code>
     /// converted to a
-    /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
+    /// <see cref="Antlr4.Runtime.Tree.IParseTree"/>
     /// by
-    /// <see cref="ParseTreePatternMatcher.Compile(string, int)">ParseTreePatternMatcher.Compile(string, int)</see>
+    /// <see cref="ParseTreePatternMatcher.Compile(string, int)"/>
     /// .
     /// </summary>
     public class ParseTreePattern
     {
         /// <summary>
         /// This is the backing field for
-        /// <see cref="PatternRuleIndex()">PatternRuleIndex()</see>
+        /// <see cref="PatternRuleIndex()"/>
         /// .
         /// </summary>
         private readonly int patternRuleIndex;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="Pattern()">Pattern()</see>
+        /// <see cref="Pattern()"/>
         /// .
         /// </summary>
         [NotNull]
@@ -64,7 +64,7 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="PatternTree()">PatternTree()</see>
+        /// <see cref="PatternTree()"/>
         /// .
         /// </summary>
         [NotNull]
@@ -72,7 +72,7 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="Matcher()">Matcher()</see>
+        /// <see cref="Matcher()"/>
         /// .
         /// </summary>
         [NotNull]
@@ -80,12 +80,12 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// Construct a new instance of the
-        /// <see cref="ParseTreePattern">ParseTreePattern</see>
+        /// <see cref="ParseTreePattern"/>
         /// class.
         /// </summary>
         /// <param name="matcher">
         /// The
-        /// <see cref="ParseTreePatternMatcher">ParseTreePatternMatcher</see>
+        /// <see cref="ParseTreePatternMatcher"/>
         /// which created this
         /// tree pattern.
         /// </param>
@@ -96,7 +96,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// </param>
         /// <param name="patternTree">
         /// The tree pattern in
-        /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
+        /// <see cref="Antlr4.Runtime.Tree.IParseTree"/>
         /// form.
         /// </param>
         public ParseTreePattern(ParseTreePatternMatcher matcher, string pattern, int patternRuleIndex, IParseTree patternTree)
@@ -112,10 +112,10 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <param name="tree">The parse tree to match against this tree pattern.</param>
         /// <returns>
         /// A
-        /// <see cref="ParseTreeMatch">ParseTreeMatch</see>
+        /// <see cref="ParseTreeMatch"/>
         /// object describing the result of the
         /// match operation. The
-        /// <see cref="ParseTreeMatch.Succeeded()">ParseTreeMatch.Succeeded()</see>
+        /// <see cref="ParseTreeMatch.Succeeded()"/>
         /// method can be
         /// used to determine whether or not the match was successful.
         /// </returns>
@@ -153,13 +153,13 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// </remarks>
         /// <param name="tree">
         /// The
-        /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
+        /// <see cref="Antlr4.Runtime.Tree.IParseTree"/>
         /// to match against this pattern.
         /// </param>
         /// <param name="xpath">An expression matching the nodes</param>
         /// <returns>
         /// A collection of
-        /// <see cref="ParseTreeMatch">ParseTreeMatch</see>
+        /// <see cref="ParseTreeMatch"/>
         /// objects describing the
         /// successful matches. Unsuccessful matches are omitted from the result,
         /// regardless of the reason for the failure.
@@ -182,12 +182,12 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// Get the
-        /// <see cref="ParseTreePatternMatcher">ParseTreePatternMatcher</see>
+        /// <see cref="ParseTreePatternMatcher"/>
         /// which created this tree pattern.
         /// </summary>
         /// <returns>
         /// The
-        /// <see cref="ParseTreePatternMatcher">ParseTreePatternMatcher</see>
+        /// <see cref="ParseTreePatternMatcher"/>
         /// which created this tree
         /// pattern.
         /// </returns>
@@ -234,18 +234,18 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// Get the tree pattern as a
-        /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
+        /// <see cref="Antlr4.Runtime.Tree.IParseTree"/>
         /// . The rule and token tags from
         /// the pattern are present in the parse tree as terminal nodes with a symbol
         /// of type
-        /// <see cref="RuleTagToken">RuleTagToken</see>
+        /// <see cref="RuleTagToken"/>
         /// or
-        /// <see cref="TokenTagToken">TokenTagToken</see>
+        /// <see cref="TokenTagToken"/>
         /// .
         /// </summary>
         /// <returns>
         /// The tree pattern as a
-        /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
+        /// <see cref="Antlr4.Runtime.Tree.IParseTree"/>
         /// .
         /// </returns>
         [NotNull]

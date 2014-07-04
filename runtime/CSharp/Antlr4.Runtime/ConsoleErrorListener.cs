@@ -46,10 +46,10 @@ namespace Antlr4.Runtime
         public static readonly ConsoleErrorListener<Symbol> Instance = new ConsoleErrorListener<Symbol>();
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>
         /// This implementation prints messages to
-        /// <see cref="System.Console.Error">System.Console.Error</see>
+        /// <see cref="System.Console.Error"/>
         /// containing the
         /// values of
         /// <code>line</code>

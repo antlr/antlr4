@@ -55,7 +55,7 @@ namespace Antlr4.Runtime.Atn
         /// When we hit an accept state in either the DFA or the ATN, we
         /// have to notify the character stream to start buffering characters
         /// via
-        /// <see cref="Antlr4.Runtime.IIntStream.Mark()">Antlr4.Runtime.IIntStream.Mark()</see>
+        /// <see cref="Antlr4.Runtime.IIntStream.Mark()"/>
         /// and record the current state. The current sim state
         /// includes the current index into the input, the current line,
         /// and current character position in that line. Note that the Lexer is
@@ -292,7 +292,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>t</code>
         /// does not lead to a valid DFA state, this method
         /// returns
-        /// <see cref="ATNSimulator.Error">ATNSimulator.Error</see>
+        /// <see cref="ATNSimulator.Error"/>
         /// .
         /// </returns>
         [return: NotNull]
@@ -452,14 +452,14 @@ namespace Antlr4.Runtime.Atn
                 PredictionContext context = config.Context;
                 if (context.IsEmpty)
                 {
-                    configs.AddItem(config);
+                    configs.Add(config);
                     return true;
                 }
                 else
                 {
                     if (context.HasEmpty)
                     {
-                        configs.AddItem(config.Transform(config.State, PredictionContext.EmptyFull, true));
+                        configs.Add(config.Transform(config.State, PredictionContext.EmptyFull, true));
                         currentAltReachedAcceptState = true;
                     }
                 }
@@ -483,7 +483,7 @@ namespace Antlr4.Runtime.Atn
             {
                 if (!currentAltReachedAcceptState || !config.PassedThroughNonGreedyDecision)
                 {
-                    configs.AddItem(config);
+                    configs.Add(config);
                 }
             }
             ATNState p = config.State;
@@ -608,24 +608,24 @@ namespace Antlr4.Runtime.Atn
         /// is
         /// <code>true</code>
         /// , this method was called before
-        /// <see cref="Consume(Antlr4.Runtime.ICharStream)">Consume(Antlr4.Runtime.ICharStream)</see>
+        /// <see cref="Consume(Antlr4.Runtime.ICharStream)"/>
         /// for the matched character. This method should call
-        /// <see cref="Consume(Antlr4.Runtime.ICharStream)">Consume(Antlr4.Runtime.ICharStream)</see>
+        /// <see cref="Consume(Antlr4.Runtime.ICharStream)"/>
         /// before evaluating the predicate to ensure position
         /// sensitive values, including
-        /// <see cref="Antlr4.Runtime.Lexer.Text()">Antlr4.Runtime.Lexer.Text()</see>
+        /// <see cref="Antlr4.Runtime.Lexer.Text()"/>
         /// ,
-        /// <see cref="Antlr4.Runtime.Lexer.Line()">Antlr4.Runtime.Lexer.Line()</see>
+        /// <see cref="Antlr4.Runtime.Lexer.Line()"/>
         /// ,
         /// and
-        /// <see cref="Antlr4.Runtime.Lexer.Column()">Antlr4.Runtime.Lexer.Column()</see>
+        /// <see cref="Antlr4.Runtime.Lexer.Column()"/>
         /// , properly reflect the current
         /// lexer state. This method should restore
         /// <code>input</code>
         /// and the simulator
         /// to the original state before returning (i.e. undo the actions made by the
         /// call to
-        /// <see cref="Consume(Antlr4.Runtime.ICharStream)">Consume(Antlr4.Runtime.ICharStream)</see>
+        /// <see cref="Consume(Antlr4.Runtime.ICharStream)"/>
         /// .</p>
         /// </remarks>
         /// <param name="input">The input stream.</param>

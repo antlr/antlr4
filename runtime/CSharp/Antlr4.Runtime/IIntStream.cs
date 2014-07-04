@@ -38,20 +38,20 @@ namespace Antlr4.Runtime
     /// interface provides <em>marked ranges</em> with support for a minimum level
     /// of buffering necessary to implement arbitrary lookahead during prediction.
     /// For more information on marked ranges, see
-    /// <see cref="Mark()">Mark()</see>
+    /// <see cref="Mark()"/>
     /// .
     /// <p><strong>Initializing Methods:</strong> Some methods in this interface have
     /// unspecified behavior if no call to an initializing method has occurred after
     /// the stream was constructed. The following is a list of initializing methods:</p>
     /// <ul>
     /// <li>
-    /// <see cref="La(int)">La(int)</see>
+    /// <see cref="La(int)"/>
     /// </li>
     /// <li>
-    /// <see cref="Consume()">Consume()</see>
+    /// <see cref="Consume()"/>
     /// </li>
     /// <li>
-    /// <see cref="Size()">Size()</see>
+    /// <see cref="Size()"/>
     /// </li>
     /// </ul>
     /// </remarks>
@@ -80,7 +80,7 @@ namespace Antlr4.Runtime
         /// is
         /// incremented by exactly 1, as that would preclude the ability to implement
         /// filtering streams (e.g.
-        /// <see cref="CommonTokenStream">CommonTokenStream</see>
+        /// <see cref="CommonTokenStream"/>
         /// which distinguishes
         /// between "on-channel" and "off-channel" tokens).
         /// </remarks>
@@ -140,7 +140,7 @@ namespace Antlr4.Runtime
         /// <code>i</code>
         /// represents a position at or beyond the end of the stream,
         /// this method returns
-        /// <see cref="IntStreamConstants.Eof">Eof</see>
+        /// <see cref="IntStreamConstants.Eof"/>
         /// .</p>
         /// <p>The return value is unspecified if
         /// <code>i&lt;0</code>
@@ -236,7 +236,7 @@ namespace Antlr4.Runtime
         /// <code>mark()</code>
         /// , the behavior is unspecified.
         /// <p>For more information and an example, see
-        /// <see cref="Mark()">Mark()</see>
+        /// <see cref="Mark()"/>
         /// .</p>
         /// </summary>
         /// <param name="marker">
@@ -244,7 +244,7 @@ namespace Antlr4.Runtime
         /// <code>mark()</code>
         /// .
         /// </param>
-        /// <seealso cref="Mark()">Mark()</seealso>
+        /// <seealso cref="Mark()"/>
         void Release(int marker);
 
         /// <summary>
@@ -286,13 +286,13 @@ namespace Antlr4.Runtime
         /// <li>
         /// <code>LA(1)</code>
         /// returns
-        /// <see cref="IntStreamConstants.Eof">Eof</see>
+        /// <see cref="IntStreamConstants.Eof"/>
         /// </li>
         /// </ul>
         /// This operation is guaranteed to not throw an exception if
         /// <code>index</code>
         /// lies within a marked region. For more information on marked regions, see
-        /// <see cref="Mark()">Mark()</see>
+        /// <see cref="Mark()"/>
         /// . The behavior of this method is unspecified if no call to
         /// an
         /// <see cref="IIntStream">initializing method</see>
@@ -333,7 +333,7 @@ namespace Antlr4.Runtime
         /// Gets the name of the underlying symbol source. This method returns a
         /// non-null, non-empty string. If such a name is not known, this method
         /// returns
-        /// <see cref="IntStreamConstants.UnknownSourceName">UnknownSourceName</see>
+        /// <see cref="IntStreamConstants.UnknownSourceName"/>
         /// .
         /// </remarks>
         string SourceName
@@ -354,7 +354,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// The value returned by
-        /// <see cref="IIntStream.SourceName()">SourceName()</see>
+        /// <see cref="IIntStream.SourceName"/>
         /// when the actual name of the
         /// underlying source is not known.
         /// </summary>

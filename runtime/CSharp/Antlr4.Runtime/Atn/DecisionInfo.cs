@@ -258,15 +258,15 @@ namespace Antlr4.Runtime.Atn
         /// Gets the total number of times SLL prediction completed in a conflict
         /// state, resulting in fallback to LL prediction.
         /// <p>Note that this value is not related to whether or not
-        /// <see cref="PredictionMode.Sll">PredictionMode.Sll</see>
+        /// <see cref="PredictionMode.Sll"/>
         /// may be used successfully with a particular
         /// grammar. If the ambiguity resolution algorithm applied to the SLL
         /// conflicts for this decision produce the same result as LL prediction for
         /// this decision,
-        /// <see cref="PredictionMode.Sll">PredictionMode.Sll</see>
+        /// <see cref="PredictionMode.Sll"/>
         /// would produce the same overall
         /// parsing result as
-        /// <see cref="PredictionMode.Ll">PredictionMode.Ll</see>
+        /// <see cref="PredictionMode.Ll"/>
         /// .</p>
         /// </remarks>
         public long LL_Fallback;

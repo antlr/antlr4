@@ -166,7 +166,7 @@ namespace Antlr4.Runtime.Dfa
             {
                 return Sharpen.Collections.EmptyMap<int, T>();
             }
-            return Sharpen.Collections.SingletonMap(key, value);
+            return Antlr4.Runtime.Sharpen.Collections.SingletonMap(key, value);
         }
     }
 }

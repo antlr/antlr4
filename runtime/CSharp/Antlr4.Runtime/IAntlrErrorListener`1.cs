@@ -44,12 +44,12 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// Upon syntax error, notify any interested parties. This is not how to
         /// recover from errors or compute error messages.
-        /// <see cref="IAntlrErrorStrategy">IAntlrErrorStrategy</see>
+        /// <see cref="IAntlrErrorStrategy"/>
         /// specifies how to recover from syntax errors and how to compute error
         /// messages. This listener's job is simply to emit a computed message,
         /// though it has enough information to create its own message in many cases.
         /// <p>The
-        /// <see cref="RecognitionException">RecognitionException</see>
+        /// <see cref="RecognitionException"/>
         /// is non-null for all syntax errors except
         /// when we discover mismatched token errors that we can recover from
         /// in-line, without returning from the surrounding rule (via the single

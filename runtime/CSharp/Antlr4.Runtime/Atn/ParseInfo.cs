@@ -55,13 +55,13 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Gets an array of
-        /// <see cref="DecisionInfo">DecisionInfo</see>
+        /// <see cref="DecisionInfo"/>
         /// instances containing the profiling
         /// information gathered for each decision in the ATN.
         /// </summary>
         /// <returns>
         /// An array of
-        /// <see cref="DecisionInfo">DecisionInfo</see>
+        /// <see cref="DecisionInfo"/>
         /// instances, indexed by decision
         /// number.
         /// </returns>
@@ -81,7 +81,7 @@ namespace Antlr4.Runtime.Atn
         /// <remarks>
         /// Gets the decision numbers for decisions that required one or more
         /// full-context predictions during parsing. These are decisions for which
-        /// <see cref="DecisionInfo.LL_Fallback">DecisionInfo.LL_Fallback</see>
+        /// <see cref="DecisionInfo.LL_Fallback"/>
         /// is non-zero.
         /// </remarks>
         /// <returns>
@@ -112,7 +112,7 @@ namespace Antlr4.Runtime.Atn
         /// <remarks>
         /// Gets the total time spent during prediction across all decisions made
         /// during parsing. This value is the sum of
-        /// <see cref="DecisionInfo.timeInPrediction">DecisionInfo.timeInPrediction</see>
+        /// <see cref="DecisionInfo.timeInPrediction"/>
         /// for all decisions.
         /// </remarks>
         public virtual long GetTotalTimeInPrediction()
@@ -134,7 +134,7 @@ namespace Antlr4.Runtime.Atn
         /// <remarks>
         /// Gets the total number of SLL lookahead operations across all decisions
         /// made during parsing. This value is the sum of
-        /// <see cref="DecisionInfo.SLL_TotalLook">DecisionInfo.SLL_TotalLook</see>
+        /// <see cref="DecisionInfo.SLL_TotalLook"/>
         /// for all decisions.
         /// </remarks>
         public virtual long GetTotalSLLLookaheadOps()
@@ -155,7 +155,7 @@ namespace Antlr4.Runtime.Atn
         /// <remarks>
         /// Gets the total number of LL lookahead operations across all decisions
         /// made during parsing. This value is the sum of
-        /// <see cref="DecisionInfo.LL_TotalLook">DecisionInfo.LL_TotalLook</see>
+        /// <see cref="DecisionInfo.LL_TotalLook"/>
         /// for all decisions.
         /// </remarks>
         public virtual long GetTotalLLLookaheadOps()
@@ -216,9 +216,9 @@ namespace Antlr4.Runtime.Atn
         /// prediction across all decisions made during parsing.
         /// <p>
         /// This value is the sum of
-        /// <see cref="GetTotalSLLATNLookaheadOps()">GetTotalSLLATNLookaheadOps()</see>
+        /// <see cref="GetTotalSLLATNLookaheadOps()"/>
         /// and
-        /// <see cref="GetTotalLLATNLookaheadOps()">GetTotalLLATNLookaheadOps()</see>
+        /// <see cref="GetTotalLLATNLookaheadOps()"/>
         /// .</p>
         /// </remarks>
         public virtual long GetTotalATNLookaheadOps()

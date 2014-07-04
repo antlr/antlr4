@@ -55,7 +55,7 @@ namespace Antlr4.Runtime.Atn
         /// <summary>
         /// Calculates the SLL(1) expected lookahead set for each outgoing transition
         /// of an
-        /// <see cref="ATNState">ATNState</see>
+        /// <see cref="ATNState"/>
         /// . The returned array has one element for each
         /// outgoing transition in
         /// <code>s</code>
@@ -119,7 +119,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>null</code>
         /// and the end of the outermost rule is
         /// reached,
-        /// <see cref="Antlr4.Runtime.TokenConstants.Eof">Antlr4.Runtime.TokenConstants.Eof</see>
+        /// <see cref="TokenConstants.Eof"/>
         /// is added to the result set.</p>
         /// </summary>
         /// <param name="s">the ATN state</param>
@@ -171,7 +171,7 @@ namespace Antlr4.Runtime.Atn
         /// <param name="s">the ATN state</param>
         /// <param name="stopState">
         /// the ATN state to stop at. This can be a
-        /// <see cref="BlockEndState">BlockEndState</see>
+        /// <see cref="BlockEndState"/>
         /// to detect epsilon paths through a closure.
         /// </param>
         /// <param name="ctx">
@@ -210,7 +210,7 @@ namespace Antlr4.Runtime.Atn
         /// If
         /// <code>ctx</code>
         /// is
-        /// <see cref="PredictionContext.EmptyLocal">PredictionContext.EmptyLocal</see>
+        /// <see cref="PredictionContext.EmptyLocal"/>
         /// and
         /// <code>stopState</code>
         /// or the end of the rule containing
@@ -220,7 +220,7 @@ namespace Antlr4.Runtime.Atn
         /// is added to the result set. If
         /// <code>ctx</code>
         /// is not
-        /// <see cref="PredictionContext.EmptyLocal">PredictionContext.EmptyLocal</see>
+        /// <see cref="PredictionContext.EmptyLocal"/>
         /// and
         /// <code>addEOF</code>
         /// is
@@ -234,12 +234,12 @@ namespace Antlr4.Runtime.Atn
         /// <param name="s">the ATN state.</param>
         /// <param name="stopState">
         /// the ATN state to stop at. This can be a
-        /// <see cref="BlockEndState">BlockEndState</see>
+        /// <see cref="BlockEndState"/>
         /// to detect epsilon paths through a closure.
         /// </param>
         /// <param name="ctx">
         /// The outer context, or
-        /// <see cref="PredictionContext.EmptyLocal">PredictionContext.EmptyLocal</see>
+        /// <see cref="PredictionContext.EmptyLocal"/>
         /// if
         /// the outer context should not be used.
         /// </param>
@@ -265,7 +265,7 @@ namespace Antlr4.Runtime.Atn
         /// and "see through them", otherwise
         /// <code>false</code>
         /// to treat semantic predicates as opaque and add
-        /// <see cref="HitPred">HitPred</see>
+        /// <see cref="HitPred"/>
         /// to the
         /// result if one is encountered.
         /// </param>
@@ -276,7 +276,7 @@ namespace Antlr4.Runtime.Atn
         /// outermost context is reached. This parameter has no effect if
         /// <code>ctx</code>
         /// is
-        /// <see cref="PredictionContext.EmptyLocal">PredictionContext.EmptyLocal</see>
+        /// <see cref="PredictionContext.EmptyLocal"/>
         /// .
         /// </param>
         protected internal virtual void Look(ATNState s, ATNState stopState, PredictionContext ctx, IntervalSet look, HashSet<ATNConfig> lookBusy, BitSet calledRuleStack, bool seeThruPreds, bool addEOF)

@@ -51,7 +51,7 @@ namespace Antlr4.Runtime.Atn
         /// This UUID indicates an extension of
         /// <see cref="BaseSerializedUuid"/>
         /// for the addition of lexer actions encoded as a sequence of
-        /// <see cref="ILexerAction">ILexerAction</see>
+        /// <see cref="ILexerAction"/>
         /// instances.
         /// </summary>
         private static readonly Guid AddedLexerActions;
@@ -584,10 +584,10 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Analyze the
-        /// <see cref="StarLoopEntryState">StarLoopEntryState</see>
+        /// <see cref="StarLoopEntryState"/>
         /// states in the specified ATN to set
         /// the
-        /// <see cref="StarLoopEntryState.precedenceRuleDecision">StarLoopEntryState.precedenceRuleDecision</see>
+        /// <see cref="StarLoopEntryState.precedenceRuleDecision"/>
         /// field to the
         /// correct value.
         /// </summary>

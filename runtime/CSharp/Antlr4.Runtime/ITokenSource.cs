@@ -35,19 +35,19 @@ namespace Antlr4.Runtime
 {
     /// <summary>
     /// A source of tokens must provide a sequence of tokens via
-    /// <see cref="NextToken()">NextToken()</see>
+    /// <see cref="NextToken()"/>
     /// and also must reveal it's source of characters;
-    /// <see cref="CommonToken">CommonToken</see>
+    /// <see cref="CommonToken"/>
     /// 's text is
     /// computed from a
-    /// <see cref="ICharStream">ICharStream</see>
+    /// <see cref="ICharStream"/>
     /// ; it only store indices into the char
     /// stream.
     /// <p>Errors from the lexer are never passed to the parser. Either you want to keep
     /// going or you do not upon token recognition error. If you do not want to
     /// continue lexing then you do not want to continue parsing. Just throw an
     /// exception not under
-    /// <see cref="RecognitionException">RecognitionException</see>
+    /// <see cref="RecognitionException"/>
     /// and Java will naturally toss
     /// you all the way out of the recognizers. If you want to continue lexing then
     /// you should not throw an exception to the parser--it has already requested a
@@ -58,9 +58,9 @@ namespace Antlr4.Runtime
     {
         /// <summary>
         /// Return a
-        /// <see cref="IToken">IToken</see>
+        /// <see cref="IToken"/>
         /// object from your input stream (usually a
-        /// <see cref="ICharStream">ICharStream</see>
+        /// <see cref="ICharStream"/>
         /// ). Do not fail/return upon lexing error; keep chewing
         /// on the characters until you get a good one; errors are not passed through
         /// to the parser.
@@ -101,13 +101,13 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Get the
-        /// <see cref="ICharStream">ICharStream</see>
+        /// <see cref="ICharStream"/>
         /// from which this token source is currently
         /// providing tokens.
         /// </summary>
         /// <returns>
         /// The
-        /// <see cref="ICharStream">ICharStream</see>
+        /// <see cref="ICharStream"/>
         /// associated with the current position in
         /// the input, or
         /// <code>null</code>
@@ -134,27 +134,27 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Set the
-        /// <see cref="ITokenFactory">ITokenFactory</see>
+        /// <see cref="ITokenFactory"/>
         /// this token source should use for creating
-        /// <see cref="IToken">IToken</see>
+        /// <see cref="IToken"/>
         /// objects from the input.
         /// </summary>
         /// <value>
         /// The
-        /// <see cref="ITokenFactory">ITokenFactory</see>
+        /// <see cref="ITokenFactory"/>
         /// to use for creating tokens.
         /// </value>
         /// <summary>
         /// Gets the
-        /// <see cref="ITokenFactory">ITokenFactory</see>
+        /// <see cref="ITokenFactory"/>
         /// this token source is currently using for
         /// creating
-        /// <see cref="IToken">IToken</see>
+        /// <see cref="IToken"/>
         /// objects from the input.
         /// </summary>
         /// <returns>
         /// The
-        /// <see cref="ITokenFactory">ITokenFactory</see>
+        /// <see cref="ITokenFactory"/>
         /// currently used by this token source.
         /// </returns>
         ITokenFactory TokenFactory
