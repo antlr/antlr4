@@ -31,7 +31,7 @@ using System;
 using System.Collections.Generic;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -49,7 +49,7 @@ namespace Antlr4.Runtime.Atn
     /// </remarks>
     public abstract class Transition
     {
-        public static readonly IList<string> serializationNames = Sharpen.Collections.UnmodifiableList(Arrays.AsList("INVALID", "EPSILON", "RANGE", "RULE", "PREDICATE", "ATOM", "ACTION", "SET", "NOT_SET", "WILDCARD", "PRECEDENCE"));
+        public static readonly IList<string> serializationNames = Antlr4.Runtime.Sharpen.Collections.UnmodifiableList(Arrays.AsList("INVALID", "EPSILON", "RANGE", "RULE", "PREDICATE", "ATOM", "ACTION", "SET", "NOT_SET", "WILDCARD", "PRECEDENCE"));
 
         /// <summary>The target of this transition.</summary>
         /// <remarks>The target of this transition.</remarks>

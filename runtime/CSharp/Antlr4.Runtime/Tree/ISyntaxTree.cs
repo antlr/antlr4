@@ -28,8 +28,8 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
-using Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
@@ -46,14 +46,14 @@ namespace Antlr4.Runtime.Tree
     {
         /// <summary>
         /// Return an
-        /// <see cref="Antlr4.Runtime.Misc.Interval">Antlr4.Runtime.Misc.Interval</see>
+        /// <see cref="Antlr4.Runtime.Misc.Interval"/>
         /// indicating the index in the
-        /// <see cref="Antlr4.Runtime.ITokenStream">Antlr4.Runtime.ITokenStream</see>
+        /// <see cref="Antlr4.Runtime.ITokenStream"/>
         /// of the first and last token associated with this
         /// subtree. If this node is a leaf, then the interval represents a single
         /// token.
         /// <p>If source interval is unknown, this returns
-        /// <see cref="Antlr4.Runtime.Misc.Interval.Invalid">Antlr4.Runtime.Misc.Interval.Invalid</see>
+        /// <see cref="Antlr4.Runtime.Misc.Interval.Invalid"/>
         /// .</p>
         /// </summary>
         Interval SourceInterval

@@ -29,7 +29,7 @@
  */
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -41,7 +41,7 @@ namespace Antlr4.Runtime.Atn
     /// This class represents profiling event information for semantic predicate
     /// evaluations which occur during prediction.
     /// </remarks>
-    /// <seealso cref="ParserATNSimulator.EvalSemanticContext(Antlr4.Runtime.Dfa.DFAState.PredPrediction[], Antlr4.Runtime.ParserRuleContext, bool)">ParserATNSimulator.EvalSemanticContext(Antlr4.Runtime.Dfa.DFAState.PredPrediction[], Antlr4.Runtime.ParserRuleContext, bool)</seealso>
+    /// <seealso cref="ParserATNSimulator.EvalSemanticContext(Antlr4.Runtime.Dfa.DFAState.PredPrediction[], Antlr4.Runtime.ParserRuleContext, bool)"/>
     /// <since>4.3</since>
     public class PredicateEvalInfo : DecisionEventInfo
     {
@@ -52,25 +52,25 @@ namespace Antlr4.Runtime.Atn
         /// <summary>
         /// The alternative number for the decision which is guarded by the semantic
         /// context
-        /// <see cref="semctx">semctx</see>
+        /// <see cref="semctx"/>
         /// . Note that other ATN
         /// configurations may predict the same alternative which are guarded by
         /// other semantic contexts and/or
-        /// <see cref="SemanticContext.None">SemanticContext.None</see>
+        /// <see cref="SemanticContext.None"/>
         /// .
         /// </summary>
         public readonly int predictedAlt;
 
         /// <summary>
         /// The result of evaluating the semantic context
-        /// <see cref="semctx">semctx</see>
+        /// <see cref="semctx"/>
         /// .
         /// </summary>
         public readonly bool evalResult;
 
         /// <summary>
         /// Constructs a new instance of the
-        /// <see cref="PredicateEvalInfo">PredicateEvalInfo</see>
+        /// <see cref="PredicateEvalInfo"/>
         /// class with the
         /// specified detailed predicate evaluation information.
         /// </summary>
@@ -90,11 +90,11 @@ namespace Antlr4.Runtime.Atn
         /// guarded by the semantic context
         /// <code>semctx</code>
         /// . See
-        /// <see cref="predictedAlt">predictedAlt</see>
+        /// <see cref="predictedAlt"/>
         /// for more information.
         /// </param>
-        /// <seealso cref="ParserATNSimulator.EvalSemanticContext(SemanticContext, Antlr4.Runtime.ParserRuleContext, int)">ParserATNSimulator.EvalSemanticContext(SemanticContext, Antlr4.Runtime.ParserRuleContext, int)</seealso>
-        /// <seealso cref="SemanticContext.Eval(Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}, Antlr4.Runtime.RuleContext)">SemanticContext.Eval(Antlr4.Runtime.Recognizer&lt;Symbol, ATNInterpreter&gt;, Antlr4.Runtime.RuleContext)</seealso>
+        /// <seealso cref="ParserATNSimulator.EvalSemanticContext(SemanticContext, Antlr4.Runtime.ParserRuleContext, int)"/>
+        /// <seealso cref="SemanticContext.Eval(Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}, Antlr4.Runtime.RuleContext)"/>
         public PredicateEvalInfo(SimulatorState state, int decision, ITokenStream input, int startIndex, int stopIndex, SemanticContext semctx, bool evalResult, int predictedAlt)
             : base(decision, state, input, startIndex, stopIndex, state.useContext)
         {

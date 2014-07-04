@@ -30,7 +30,7 @@
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -38,13 +38,13 @@ namespace Antlr4.Runtime.Atn
     /// Implements the
     /// <code>skip</code>
     /// lexer action by calling
-    /// <see cref="Antlr4.Runtime.Lexer.Skip()">Antlr4.Runtime.Lexer.Skip()</see>
+    /// <see cref="Antlr4.Runtime.Lexer.Skip()"/>
     /// .
     /// <p>The
     /// <code>skip</code>
     /// command does not have any parameters, so this action is
     /// implemented as a singleton instance exposed by
-    /// <see cref="Instance">Instance</see>
+    /// <see cref="Instance"/>
     /// .</p>
     /// </summary>
     /// <author>Sam Harwell</author>
@@ -64,10 +64,10 @@ namespace Antlr4.Runtime.Atn
         {
         }
 
-        /// <summary><inheritDoc></inheritDoc></summary>
+        /// <summary><inheritDoc/></summary>
         /// <returns>
         /// This method returns
-        /// <see cref="LexerActionType.Skip">LexerActionType.Skip</see>
+        /// <see cref="LexerActionType.Skip"/>
         /// .
         /// </returns>
         public LexerActionType ActionType
@@ -78,7 +78,7 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        /// <summary><inheritDoc></inheritDoc></summary>
+        /// <summary><inheritDoc/></summary>
         /// <returns>
         /// This method returns
         /// <code>false</code>
@@ -93,9 +93,9 @@ namespace Antlr4.Runtime.Atn
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>This action is implemented by calling
-        /// <see cref="Antlr4.Runtime.Lexer.Skip()">Antlr4.Runtime.Lexer.Skip()</see>
+        /// <see cref="Antlr4.Runtime.Lexer.Skip()"/>
         /// .</p>
         /// </summary>
         public void Execute(Lexer lexer)

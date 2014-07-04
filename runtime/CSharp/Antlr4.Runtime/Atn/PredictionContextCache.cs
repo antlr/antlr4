@@ -29,13 +29,13 @@
  */
 using System.Collections.Generic;
 using Antlr4.Runtime.Atn;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
     /// <summary>
     /// Used to cache
-    /// <see cref="PredictionContext">PredictionContext</see>
+    /// <see cref="PredictionContext"/>
     /// objects. Its used for the shared
     /// context cash associated with contexts in DFA states. This cache
     /// can be used for both lexers and parsers.

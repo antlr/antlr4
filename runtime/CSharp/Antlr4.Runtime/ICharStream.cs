@@ -29,7 +29,7 @@
  */
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
@@ -48,7 +48,7 @@ namespace Antlr4.Runtime
         /// <code>interval</code>
         /// lies entirely within a marked range. For more
         /// information about marked ranges, see
-        /// <see cref="IIntStream.Mark()">IIntStream.Mark()</see>
+        /// <see cref="IIntStream.Mark()"/>
         /// .
         /// </remarks>
         /// <param name="interval">an interval within the stream</param>

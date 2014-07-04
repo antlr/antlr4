@@ -28,9 +28,9 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using System.Collections.Generic;
+using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
 using Antlr4.Runtime.Tree.Xpath;
-using Sharpen;
 
 namespace Antlr4.Runtime.Tree.Xpath
 {

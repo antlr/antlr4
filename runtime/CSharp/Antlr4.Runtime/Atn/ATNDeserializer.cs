@@ -34,7 +34,7 @@ using System.IO;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -54,9 +54,9 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// This UUID indicates an extension of
-        /// <see cref="#ADDED_PRECEDENCE_TRANSITIONS">#ADDED_PRECEDENCE_TRANSITIONS</see>
+        /// <see cref="#ADDED_PRECEDENCE_TRANSITIONS"/>
         /// for the addition of lexer actions encoded as a sequence of
-        /// <see cref="ILexerAction">ILexerAction</see>
+        /// <see cref="ILexerAction"/>
         /// instances.
         /// </summary>
         private static readonly UUID AddedLexerActions;
@@ -105,19 +105,19 @@ namespace Antlr4.Runtime.Atn
         /// <summary>
         /// Determines if a particular serialized representation of an ATN supports
         /// a particular feature, identified by the
-        /// <see cref="Sharpen.UUID">Sharpen.UUID</see>
+        /// <see cref="Antlr4.Runtime.Sharpen.UUID"/>
         /// used for serializing
         /// the ATN at the time the feature was first introduced.
         /// </summary>
         /// <param name="feature">
         /// The
-        /// <see cref="Sharpen.UUID">Sharpen.UUID</see>
+        /// <see cref="Antlr4.Runtime.Sharpen.UUID"/>
         /// marking the first time the feature was
         /// supported in the serialized ATN.
         /// </param>
         /// <param name="actualUuid">
         /// The
-        /// <see cref="Sharpen.UUID">Sharpen.UUID</see>
+        /// <see cref="Antlr4.Runtime.Sharpen.UUID"/>
         /// of the actual serialized ATN which is
         /// currently being deserialized.
         /// </param>
@@ -588,10 +588,10 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Analyze the
-        /// <see cref="StarLoopEntryState">StarLoopEntryState</see>
+        /// <see cref="StarLoopEntryState"/>
         /// states in the specified ATN to set
         /// the
-        /// <see cref="StarLoopEntryState.precedenceRuleDecision">StarLoopEntryState.precedenceRuleDecision</see>
+        /// <see cref="StarLoopEntryState.precedenceRuleDecision"/>
         /// field to the
         /// correct value.
         /// </summary>

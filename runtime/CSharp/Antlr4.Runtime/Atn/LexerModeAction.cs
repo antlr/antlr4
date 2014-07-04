@@ -30,7 +30,7 @@
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -38,7 +38,7 @@ namespace Antlr4.Runtime.Atn
     /// Implements the
     /// <code>mode</code>
     /// lexer action by calling
-    /// <see cref="Antlr4.Runtime.Lexer.Mode(int)">Antlr4.Runtime.Lexer.Mode(int)</see>
+    /// <see cref="Antlr4.Runtime.Lexer.Mode(int)"/>
     /// with
     /// the assigned mode.
     /// </summary>
@@ -55,7 +55,7 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="mode">
         /// The mode value to pass to
-        /// <see cref="Antlr4.Runtime.Lexer.Mode(int)">Antlr4.Runtime.Lexer.Mode(int)</see>
+        /// <see cref="Antlr4.Runtime.Lexer.Mode(int)"/>
         /// .
         /// </param>
         public LexerModeAction(int mode)
@@ -78,10 +78,10 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        /// <summary><inheritDoc></inheritDoc></summary>
+        /// <summary><inheritDoc/></summary>
         /// <returns>
         /// This method returns
-        /// <see cref="LexerActionType.Mode">LexerActionType.Mode</see>
+        /// <see cref="LexerActionType.Mode"/>
         /// .
         /// </returns>
         public LexerActionType ActionType
@@ -92,7 +92,7 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        /// <summary><inheritDoc></inheritDoc></summary>
+        /// <summary><inheritDoc/></summary>
         /// <returns>
         /// This method returns
         /// <code>false</code>
@@ -107,12 +107,12 @@ namespace Antlr4.Runtime.Atn
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>This action is implemented by calling
-        /// <see cref="Antlr4.Runtime.Lexer.Mode(int)">Antlr4.Runtime.Lexer.Mode(int)</see>
+        /// <see cref="Antlr4.Runtime.Lexer.Mode(int)"/>
         /// with the
         /// value provided by
-        /// <see cref="Mode()">Mode()</see>
+        /// <see cref="Mode()"/>
         /// .</p>
         /// </summary>
         public void Execute(Lexer lexer)

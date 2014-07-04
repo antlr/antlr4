@@ -34,7 +34,7 @@ using System.IO;
 using System.Text;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -662,7 +662,7 @@ namespace Antlr4.Runtime.Atn
                         }
                         // turn on the bit above max "\uFFFF" value so that we pad with zeros
                         // then only take last 4 digits
-                        string hex = Sharpen.Runtime.Substring(Sharpen.Extensions.ToHexString(t | unchecked((int)(0x10000))).ToUpper(), 1, 5);
+                        string hex = Sharpen.Runtime.Substring(Antlr4.Runtime.Sharpen.Extensions.ToHexString(t | unchecked((int)(0x10000))).ToUpper(), 1, 5);
                         string unicodeStr = "'\\u" + hex + "'";
                         return unicodeStr;
                     }

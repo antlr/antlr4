@@ -29,7 +29,7 @@
  */
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -43,14 +43,14 @@ namespace Antlr4.Runtime.Atn
     /// algorithm is unable to identify an alternative which would lead to a
     /// successful parse.
     /// </remarks>
-    /// <seealso cref="Antlr4.Runtime.Parser.NotifyErrorListeners(Antlr4.Runtime.IToken, string, Antlr4.Runtime.RecognitionException)">Antlr4.Runtime.Parser.NotifyErrorListeners(Antlr4.Runtime.IToken, string, Antlr4.Runtime.RecognitionException)</seealso>
-    /// <seealso cref="Antlr4.Runtime.IANTLRErrorListener{Symbol}.SyntaxError{T}(Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}, object, int, int, string, Antlr4.Runtime.RecognitionException)">Antlr4.Runtime.IANTLRErrorListener&lt;Symbol&gt;.SyntaxError&lt;T&gt;(Antlr4.Runtime.Recognizer&lt;Symbol, ATNInterpreter&gt;, object, int, int, string, Antlr4.Runtime.RecognitionException)</seealso>
+    /// <seealso cref="Antlr4.Runtime.Parser.NotifyErrorListeners(Antlr4.Runtime.IToken, string, Antlr4.Runtime.RecognitionException)"/>
+    /// <seealso cref="Antlr4.Runtime.IANTLRErrorListener{Symbol}.SyntaxError{T}(Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}, object, int, int, string, Antlr4.Runtime.RecognitionException)"/>
     /// <since>4.3</since>
     public class ErrorInfo : DecisionEventInfo
     {
         /// <summary>
         /// Constructs a new instance of the
-        /// <see cref="ErrorInfo">ErrorInfo</see>
+        /// <see cref="ErrorInfo"/>
         /// class with the
         /// specified detailed syntax error information.
         /// </summary>
@@ -58,7 +58,7 @@ namespace Antlr4.Runtime.Atn
         /// <param name="state">
         /// The final simulator state reached during prediction
         /// prior to reaching the
-        /// <see cref="ATNSimulator.Error">ATNSimulator.Error</see>
+        /// <see cref="ATNSimulator.Error"/>
         /// state
         /// </param>
         /// <param name="input">The input token stream</param>

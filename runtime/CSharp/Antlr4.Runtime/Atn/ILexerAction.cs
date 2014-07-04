@@ -29,7 +29,7 @@
  */
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -58,7 +58,7 @@ namespace Antlr4.Runtime.Atn
         /// <remarks>
         /// Gets whether the lexer action is position-dependent. Position-dependent
         /// actions may have different semantics depending on the
-        /// <see cref="Antlr4.Runtime.ICharStream">Antlr4.Runtime.ICharStream</see>
+        /// <see cref="Antlr4.Runtime.ICharStream"/>
         /// index at the time the action is executed.
         /// <p>Many lexer commands, including
         /// <code>type</code>
@@ -69,7 +69,7 @@ namespace Antlr4.Runtime.Atn
         /// , do not check the input index during their execution.
         /// Actions like this are position-independent, and may be stored more
         /// efficiently as part of the
-        /// <see cref="ATNConfig.ActionExecutor()">ATNConfig.ActionExecutor()</see>
+        /// <see cref="ATNConfig.ActionExecutor()"/>
         /// .</p>
         /// </remarks>
         /// <returns>
@@ -77,7 +77,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>true</code>
         /// if the lexer action semantics can be affected by the
         /// position of the input
-        /// <see cref="Antlr4.Runtime.ICharStream">Antlr4.Runtime.ICharStream</see>
+        /// <see cref="Antlr4.Runtime.ICharStream"/>
         /// at the time it is executed;
         /// otherwise,
         /// <code>false</code>
@@ -90,7 +90,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Execute the lexer action in the context of the specified
-        /// <see cref="Antlr4.Runtime.Lexer">Antlr4.Runtime.Lexer</see>
+        /// <see cref="Antlr4.Runtime.Lexer"/>
         /// .
         /// <p>For position-dependent actions, the input stream must already be
         /// positioned correctly prior to calling this method.</p>

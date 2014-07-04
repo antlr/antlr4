@@ -31,8 +31,8 @@ using System;
 using System.Collections.Generic;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
-using Sharpen;
 
 namespace Antlr4.Runtime
 {
@@ -289,7 +289,7 @@ namespace Antlr4.Runtime
         {
             if (children == null)
             {
-                return Sharpen.Collections.EmptyList();
+                return Antlr4.Runtime.Sharpen.Collections.EmptyList();
             }
             IList<ITerminalNode> tokens = null;
             foreach (IParseTree o in children)
@@ -310,7 +310,7 @@ namespace Antlr4.Runtime
             }
             if (tokens == null)
             {
-                return Sharpen.Collections.EmptyList();
+                return Antlr4.Runtime.Sharpen.Collections.EmptyList();
             }
             return tokens;
         }
@@ -328,7 +328,7 @@ namespace Antlr4.Runtime
         {
             if (children == null)
             {
-                return Sharpen.Collections.EmptyList();
+                return Antlr4.Runtime.Sharpen.Collections.EmptyList();
             }
             IList<T> contexts = null;
             foreach (IParseTree o in children)
@@ -344,7 +344,7 @@ namespace Antlr4.Runtime
             }
             if (contexts == null)
             {
-                return Sharpen.Collections.EmptyList();
+                return Antlr4.Runtime.Sharpen.Collections.EmptyList();
             }
             return contexts;
         }
@@ -389,7 +389,7 @@ namespace Antlr4.Runtime
         public virtual string ToInfoString(Parser recognizer)
         {
             IList<string> rules = recognizer.GetRuleInvocationStack(this);
-            Sharpen.Collections.Reverse(rules);
+            Antlr4.Runtime.Sharpen.Collections.Reverse(rules);
             return "ParserRuleContext" + rules + "{" + "start=" + start + ", stop=" + stop + '}';
         }
     }

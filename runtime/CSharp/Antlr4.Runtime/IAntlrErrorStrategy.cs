@@ -29,7 +29,7 @@
  */
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
@@ -48,7 +48,7 @@ namespace Antlr4.Runtime
     /// <li>A predicate evaluated to false</li>
     /// </ul>
     /// Implementations of this interface report syntax errors by calling
-    /// <see cref="Parser.NotifyErrorListeners(string)">Parser.NotifyErrorListeners(string)</see>
+    /// <see cref="Parser.NotifyErrorListeners(string)"/>
     /// .
     /// <p>TODO: what to do about lexers</p>
     /// </remarks>
@@ -65,17 +65,17 @@ namespace Antlr4.Runtime
         /// <summary>
         /// This method is called when an unexpected symbol is encountered during an
         /// inline match operation, such as
-        /// <see cref="Parser.Match(int)">Parser.Match(int)</see>
+        /// <see cref="Parser.Match(int)"/>
         /// . If the error
         /// strategy successfully recovers from the match failure, this method
         /// returns the
-        /// <see cref="IToken">IToken</see>
+        /// <see cref="IToken"/>
         /// instance which should be treated as the
         /// successful result of the match.
         /// <p>Note that the calling code will not report an error if this method
         /// returns successfully. The error strategy implementation is responsible
         /// for calling
-        /// <see cref="Parser.NotifyErrorListeners(string)">Parser.NotifyErrorListeners(string)</see>
+        /// <see cref="Parser.NotifyErrorListeners(string)"/>
         /// as appropriate.</p>
         /// </summary>
         /// <param name="recognizer">the parser instance</param>
@@ -83,7 +83,7 @@ namespace Antlr4.Runtime
         /// if the error strategy was not able to
         /// recover from the unexpected input symbol
         /// </exception>
-        /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
+        /// <exception cref="Antlr4.Runtime.RecognitionException"/>
         [NotNull]
         IToken RecoverInline(Parser recognizer);
 
@@ -92,27 +92,27 @@ namespace Antlr4.Runtime
         /// <code>e</code>
         /// . This method is
         /// called after
-        /// <see cref="ReportError(Parser, RecognitionException)">ReportError(Parser, RecognitionException)</see>
+        /// <see cref="ReportError(Parser, RecognitionException)"/>
         /// by the default exception handler
         /// generated for a rule method.
         /// </summary>
-        /// <seealso cref="ReportError(Parser, RecognitionException)">ReportError(Parser, RecognitionException)</seealso>
+        /// <seealso cref="ReportError(Parser, RecognitionException)"/>
         /// <param name="recognizer">the parser instance</param>
         /// <param name="e">the recognition exception to recover from</param>
         /// <exception cref="RecognitionException">
         /// if the error strategy could not recover from
         /// the recognition exception
         /// </exception>
-        /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
+        /// <exception cref="Antlr4.Runtime.RecognitionException"/>
         void Recover(Parser recognizer, RecognitionException e);
 
         /// <summary>
         /// This method provides the error handler with an opportunity to handle
         /// syntactic or semantic errors in the input stream before they result in a
-        /// <see cref="RecognitionException">RecognitionException</see>
+        /// <see cref="RecognitionException"/>
         /// .
         /// <p>The generated code currently contains calls to
-        /// <see cref="Sync(Parser)">Sync(Parser)</see>
+        /// <see cref="Sync(Parser)"/>
         /// after
         /// entering the decision state of a closure block (
         /// <code>(...)*</code>
@@ -120,17 +120,17 @@ namespace Antlr4.Runtime
         /// <code>(...)+</code>
         /// ).</p>
         /// <p>For an implementation based on Jim Idle's "magic sync" mechanism, see
-        /// <see cref="DefaultErrorStrategy.Sync(Parser)">DefaultErrorStrategy.Sync(Parser)</see>
+        /// <see cref="DefaultErrorStrategy.Sync(Parser)"/>
         /// .</p>
         /// </summary>
-        /// <seealso cref="DefaultErrorStrategy.Sync(Parser)">DefaultErrorStrategy.Sync(Parser)</seealso>
+        /// <seealso cref="DefaultErrorStrategy.Sync(Parser)"/>
         /// <param name="recognizer">the parser instance</param>
         /// <exception cref="RecognitionException">
         /// if an error is detected by the error
         /// strategy but cannot be automatically recovered at the current state in
         /// the parsing process
         /// </exception>
-        /// <exception cref="Antlr4.Runtime.RecognitionException"></exception>
+        /// <exception cref="Antlr4.Runtime.RecognitionException"/>
         void Sync(Parser recognizer);
 
         /// <summary>
@@ -138,12 +138,12 @@ namespace Antlr4.Runtime
         /// <code>recognizer</code>
         /// is in the process of recovering
         /// from an error. In error recovery mode,
-        /// <see cref="Parser.Consume()">Parser.Consume()</see>
+        /// <see cref="Parser.Consume()"/>
         /// adds
         /// symbols to the parse tree by calling
-        /// <see cref="ParserRuleContext.AddErrorNode(IToken)">ParserRuleContext.AddErrorNode(IToken)</see>
+        /// <see cref="ParserRuleContext.AddErrorNode(IToken)"/>
         /// instead of
-        /// <see cref="ParserRuleContext.AddChild(IToken)">ParserRuleContext.AddChild(IToken)</see>
+        /// <see cref="ParserRuleContext.AddChild(IToken)"/>
         /// .
         /// </summary>
         /// <param name="recognizer">the parser instance</param>
@@ -169,7 +169,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Report any kind of
-        /// <see cref="RecognitionException">RecognitionException</see>
+        /// <see cref="RecognitionException"/>
         /// . This method is called by
         /// the default exception handler generated for a rule method.
         /// </summary>

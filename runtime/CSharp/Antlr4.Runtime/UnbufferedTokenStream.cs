@@ -31,7 +31,7 @@ using System;
 using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
@@ -105,7 +105,7 @@ namespace Antlr4.Runtime
         /// <code>LT(-1)</code>
         /// token for the
         /// first token in
-        /// <see cref="tokens">tokens</see>
+        /// <see cref="tokens"/>
         /// . Otherwise, this is
         /// <code>null</code>
         /// .
@@ -120,7 +120,7 @@ namespace Antlr4.Runtime
         /// although the stream size is unknown before the end is reached.
         /// <p>This value is used to set the token indexes if the stream provides tokens
         /// that implement
-        /// <see cref="IWritableToken">IWritableToken</see>
+        /// <see cref="IWritableToken"/>
         /// .</p>
         /// </remarks>
         protected internal int currentTokenIndex = 0;

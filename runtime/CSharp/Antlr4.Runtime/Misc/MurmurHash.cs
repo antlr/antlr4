@@ -27,7 +27,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Misc
 {
@@ -122,7 +122,7 @@ namespace Antlr4.Runtime.Misc
         /// Utility function to compute the hash code of an array using the
         /// MurmurHash algorithm.
         /// </remarks>
-        /// <?></?>
+        /// <?/>
         /// <param name="data">the array data</param>
         /// <param name="seed">the seed for the MurmurHash algorithm</param>
         /// <returns>the hash code of the data</returns>

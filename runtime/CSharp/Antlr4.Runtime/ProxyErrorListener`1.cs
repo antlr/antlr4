@@ -30,13 +30,13 @@
 using System;
 using System.Collections.Generic;
 using Antlr4.Runtime;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
     /// <summary>
     /// This implementation of
-    /// <see cref="IANTLRErrorListener{Symbol}">IANTLRErrorListener&lt;Symbol&gt;</see>
+    /// <see cref="IANTLRErrorListener{Symbol}"/>
     /// dispatches all calls to a
     /// collection of delegate listeners. This reduces the effort required to support multiple
     /// listeners.

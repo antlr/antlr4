@@ -27,8 +27,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
-using Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
@@ -43,14 +43,14 @@ namespace Antlr4.Runtime.Tree
     /// .
     /// </remarks>
     /// <author>Sam Harwell</author>
-    /// <?></?>
+    /// <?/>
     public interface IParseTreeVisitor<Result>
     {
         /// <summary>Visit a parse tree, and return a user-defined result of the operation.</summary>
         /// <remarks>Visit a parse tree, and return a user-defined result of the operation.</remarks>
         /// <param name="tree">
         /// The
-        /// <see cref="IParseTree">IParseTree</see>
+        /// <see cref="IParseTree"/>
         /// to visit.
         /// </param>
         /// <returns>The result of visiting the parse tree.</returns>
@@ -66,7 +66,7 @@ namespace Antlr4.Runtime.Tree
         /// </remarks>
         /// <param name="node">
         /// The
-        /// <see cref="IRuleNode">IRuleNode</see>
+        /// <see cref="IRuleNode"/>
         /// whose children should be visited.
         /// </param>
         /// <returns>The result of visiting the children of the node.</returns>
@@ -76,7 +76,7 @@ namespace Antlr4.Runtime.Tree
         /// <remarks>Visit a terminal node, and return a user-defined result of the operation.</remarks>
         /// <param name="node">
         /// The
-        /// <see cref="ITerminalNode">ITerminalNode</see>
+        /// <see cref="ITerminalNode"/>
         /// to visit.
         /// </param>
         /// <returns>The result of visiting the node.</returns>
@@ -86,7 +86,7 @@ namespace Antlr4.Runtime.Tree
         /// <remarks>Visit an error node, and return a user-defined result of the operation.</remarks>
         /// <param name="node">
         /// The
-        /// <see cref="IErrorNode">IErrorNode</see>
+        /// <see cref="IErrorNode"/>
         /// to visit.
         /// </param>
         /// <returns>The result of visiting the node.</returns>

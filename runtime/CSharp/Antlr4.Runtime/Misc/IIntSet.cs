@@ -29,13 +29,13 @@
  */
 using System.Collections.Generic;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Misc
 {
     /// <summary>A generic set of integers.</summary>
     /// <remarks>A generic set of integers.</remarks>
-    /// <seealso cref="IntervalSet">IntervalSet</seealso>
+    /// <seealso cref="IntervalSet"/>
     public interface IIntSet
     {
         /// <summary>Adds the specified value to the current set.</summary>
@@ -49,7 +49,7 @@ namespace Antlr4.Runtime.Misc
 
         /// <summary>
         /// Modify the current
-        /// <see cref="IIntSet">IIntSet</see>
+        /// <see cref="IIntSet"/>
         /// object to contain all elements that are
         /// present in itself, the specified
         /// <code>set</code>
@@ -75,7 +75,7 @@ namespace Antlr4.Runtime.Misc
 
         /// <summary>
         /// Return a new
-        /// <see cref="IIntSet">IIntSet</see>
+        /// <see cref="IIntSet"/>
         /// object containing all elements that are
         /// present in both the current set and the specified set
         /// <code>a</code>
@@ -88,7 +88,7 @@ namespace Antlr4.Runtime.Misc
         /// </param>
         /// <returns>
         /// A new
-        /// <see cref="IIntSet">IIntSet</see>
+        /// <see cref="IIntSet"/>
         /// instance containing the intersection of the
         /// current set and
         /// <code>a</code>
@@ -102,13 +102,13 @@ namespace Antlr4.Runtime.Misc
 
         /// <summary>
         /// Return a new
-        /// <see cref="IIntSet">IIntSet</see>
+        /// <see cref="IIntSet"/>
         /// object containing all elements that are
         /// present in
         /// <code>elements</code>
         /// but not present in the current set. The
         /// following expressions are equivalent for input non-null
-        /// <see cref="IIntSet">IIntSet</see>
+        /// <see cref="IIntSet"/>
         /// instances
         /// <code>x</code>
         /// and
@@ -130,7 +130,7 @@ namespace Antlr4.Runtime.Misc
         /// </param>
         /// <returns>
         /// A new
-        /// <see cref="IIntSet">IIntSet</see>
+        /// <see cref="IIntSet"/>
         /// instance containing the elements present in
         /// <code>elements</code>
         /// but not present in the current set. The value
@@ -142,16 +142,16 @@ namespace Antlr4.Runtime.Misc
 
         /// <summary>
         /// Return a new
-        /// <see cref="IIntSet">IIntSet</see>
+        /// <see cref="IIntSet"/>
         /// object containing all elements that are
         /// present in the current set, the specified set
         /// <code>a</code>
         /// , or both.
         /// <p>
         /// This method is similar to
-        /// <see cref="AddAll(IIntSet)">AddAll(IIntSet)</see>
+        /// <see cref="AddAll(IIntSet)"/>
         /// , but returns a new
-        /// <see cref="IIntSet">IIntSet</see>
+        /// <see cref="IIntSet"/>
         /// instance instead of modifying the current set.</p>
         /// </summary>
         /// <param name="a">
@@ -162,7 +162,7 @@ namespace Antlr4.Runtime.Misc
         /// </param>
         /// <returns>
         /// A new
-        /// <see cref="IIntSet">IIntSet</see>
+        /// <see cref="IIntSet"/>
         /// instance containing the union of the current
         /// set and
         /// <code>a</code>
@@ -176,13 +176,13 @@ namespace Antlr4.Runtime.Misc
 
         /// <summary>
         /// Return a new
-        /// <see cref="IIntSet">IIntSet</see>
+        /// <see cref="IIntSet"/>
         /// object containing all elements that are
         /// present in the current set but not present in the input set
         /// <code>a</code>
         /// .
         /// The following expressions are equivalent for input non-null
-        /// <see cref="IIntSet">IIntSet</see>
+        /// <see cref="IIntSet"/>
         /// instances
         /// <code>x</code>
         /// and
@@ -204,7 +204,7 @@ namespace Antlr4.Runtime.Misc
         /// </param>
         /// <returns>
         /// A new
-        /// <see cref="IIntSet">IIntSet</see>
+        /// <see cref="IIntSet"/>
         /// instance containing the elements present in
         /// <code>elements</code>
         /// but not present in the current set. The value
@@ -242,23 +242,23 @@ namespace Antlr4.Runtime.Misc
             get;
         }
 
-        /// <summary><inheritDoc></inheritDoc></summary>
+        /// <summary><inheritDoc/></summary>
         bool Equals(object obj);
 
         /// <summary>
         /// Returns the single value contained in the set, if
-        /// <see cref="Count()">Count()</see>
+        /// <see cref="Count()"/>
         /// is 1;
         /// otherwise, returns
-        /// <see cref="Antlr4.Runtime.IToken.InvalidType">Antlr4.Runtime.IToken.InvalidType</see>
+        /// <see cref="Antlr4.Runtime.IToken.InvalidType"/>
         /// .
         /// </summary>
         /// <returns>
         /// the single value contained in the set, if
-        /// <see cref="Count()">Count()</see>
+        /// <see cref="Count()"/>
         /// is 1;
         /// otherwise, returns
-        /// <see cref="Antlr4.Runtime.IToken.InvalidType">Antlr4.Runtime.IToken.InvalidType</see>
+        /// <see cref="Antlr4.Runtime.IToken.InvalidType"/>
         /// .
         /// </returns>
         int SingleElement
@@ -307,7 +307,7 @@ namespace Antlr4.Runtime.Misc
         [NotNull]
         IList<int> ToList();
 
-        /// <summary><inheritDoc></inheritDoc></summary>
+        /// <summary><inheritDoc/></summary>
         string ToString();
     }
 }

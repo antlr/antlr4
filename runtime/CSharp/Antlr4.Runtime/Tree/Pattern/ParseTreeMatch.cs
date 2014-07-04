@@ -30,50 +30,50 @@
 using System;
 using System.Collections.Generic;
 using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
 using Antlr4.Runtime.Tree.Pattern;
-using Sharpen;
 
 namespace Antlr4.Runtime.Tree.Pattern
 {
     /// <summary>
     /// Represents the result of matching a
-    /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
+    /// <see cref="Antlr4.Runtime.Tree.IParseTree"/>
     /// against a tree pattern.
     /// </summary>
     public class ParseTreeMatch
     {
         /// <summary>
         /// This is the backing field for
-        /// <see cref="Tree()">Tree()</see>
+        /// <see cref="Tree()"/>
         /// .
         /// </summary>
         private readonly IParseTree tree;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="Pattern()">Pattern()</see>
+        /// <see cref="Pattern()"/>
         /// .
         /// </summary>
         private readonly ParseTreePattern pattern;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="Labels()">Labels()</see>
+        /// <see cref="Labels()"/>
         /// .
         /// </summary>
         private readonly MultiMap<string, IParseTree> labels;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="MismatchedNode()">MismatchedNode()</see>
+        /// <see cref="MismatchedNode()"/>
         /// .
         /// </summary>
         private readonly IParseTree mismatchedNode;
 
         /// <summary>
         /// Constructs a new instance of
-        /// <see cref="ParseTreeMatch">ParseTreeMatch</see>
+        /// <see cref="ParseTreeMatch"/>
         /// from the specified
         /// parse tree and pattern.
         /// </summary>
@@ -81,7 +81,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <param name="pattern">The parse tree pattern.</param>
         /// <param name="labels">
         /// A mapping from label names to collections of
-        /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
+        /// <see cref="Antlr4.Runtime.Tree.IParseTree"/>
         /// objects located by the tree pattern matching process.
         /// </param>
         /// <param name="mismatchedNode">
@@ -159,7 +159,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <param name="label">The label to check.</param>
         /// <returns>
         /// The last
-        /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
+        /// <see cref="Antlr4.Runtime.Tree.IParseTree"/>
         /// to match a tag with the specified
         /// label, or
         /// <code>null</code>
@@ -209,7 +209,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <param name="label">The label.</param>
         /// <returns>
         /// A collection of all
-        /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
+        /// <see cref="Antlr4.Runtime.Tree.IParseTree"/>
         /// nodes matching tags with
         /// the specified
         /// <code>label</code>
@@ -222,7 +222,7 @@ namespace Antlr4.Runtime.Tree.Pattern
             IList<IParseTree> nodes = labels.Get(label);
             if (nodes == null)
             {
-                return Sharpen.Collections.EmptyList();
+                return Antlr4.Runtime.Sharpen.Collections.EmptyList();
             }
             return nodes;
         }
@@ -233,7 +233,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <p>The map includes special entries corresponding to the names of rules and
         /// tokens referenced in tags in the original pattern. For additional
         /// information, see the description of
-        /// <see cref="GetAll(string)">GetAll(string)</see>
+        /// <see cref="GetAll(string)"/>
         /// .</p>
         /// </remarks>
         /// <returns>
@@ -295,7 +295,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <remarks>Get the parse tree we are trying to match to a pattern.</remarks>
         /// <returns>
         /// The
-        /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
+        /// <see cref="Antlr4.Runtime.Tree.IParseTree"/>
         /// we are trying to match to a pattern.
         /// </returns>
         public virtual IParseTree Tree
@@ -306,7 +306,7 @@ namespace Antlr4.Runtime.Tree.Pattern
             }
         }
 
-        /// <summary><inheritDoc></inheritDoc></summary>
+        /// <summary><inheritDoc/></summary>
         public override string ToString()
         {
             return string.Format("Match %s; found %d labels", Succeeded ? "succeeded" : "failed", Labels.Count);

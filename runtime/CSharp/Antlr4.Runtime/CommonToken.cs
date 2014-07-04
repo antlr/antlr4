@@ -30,7 +30,7 @@
 using System;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
@@ -41,63 +41,63 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// An empty
-        /// <see cref="Antlr4.Runtime.Misc.Tuple2{T1, T2}">Antlr4.Runtime.Misc.Tuple2&lt;T1, T2&gt;</see>
+        /// <see cref="Antlr4.Runtime.Misc.Tuple2{T1, T2}"/>
         /// which is used as the default value of
-        /// <see cref="source">source</see>
+        /// <see cref="source"/>
         /// for tokens that do not have a source.
         /// </summary>
         protected internal static readonly Tuple<ITokenSource, ICharStream> EmptySource = Tuple.Create<ITokenSource, ICharStream>(null, null);
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="Type()">Type()</see>
+        /// <see cref="Type()"/>
         /// and
-        /// <see cref="Type(int)">Type(int)</see>
+        /// <see cref="Type(int)"/>
         /// .
         /// </summary>
         protected internal int type;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="Line()">Line()</see>
+        /// <see cref="Line()"/>
         /// and
-        /// <see cref="Line(int)">Line(int)</see>
+        /// <see cref="Line(int)"/>
         /// .
         /// </summary>
         protected internal int line;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="Column()">Column()</see>
+        /// <see cref="Column()"/>
         /// and
-        /// <see cref="Column(int)">Column(int)</see>
+        /// <see cref="Column(int)"/>
         /// .
         /// </summary>
         protected internal int charPositionInLine = -1;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="Channel()">Channel()</see>
+        /// <see cref="Channel()"/>
         /// and
-        /// <see cref="Channel(int)">Channel(int)</see>
+        /// <see cref="Channel(int)"/>
         /// .
         /// </summary>
         protected internal int channel = TokenConstants.DefaultChannel;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="TokenSource()">TokenSource()</see>
+        /// <see cref="TokenSource()"/>
         /// and
-        /// <see cref="InputStream()">InputStream()</see>
+        /// <see cref="InputStream()"/>
         /// .
         /// <p>
         /// These properties share a field to reduce the memory footprint of
-        /// <see cref="CommonToken">CommonToken</see>
+        /// <see cref="CommonToken"/>
         /// . Tokens created by a
-        /// <see cref="CommonTokenFactory">CommonTokenFactory</see>
+        /// <see cref="CommonTokenFactory"/>
         /// from
         /// the same source and input stream share a reference to the same
-        /// <see cref="Antlr4.Runtime.Misc.Tuple2{T1, T2}">Antlr4.Runtime.Misc.Tuple2&lt;T1, T2&gt;</see>
+        /// <see cref="Antlr4.Runtime.Misc.Tuple2{T1, T2}"/>
         /// containing these values.</p>
         /// </summary>
         [NotNull]
@@ -105,45 +105,45 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="Text()">Text()</see>
+        /// <see cref="Text()"/>
         /// when the token text is
         /// explicitly set in the constructor or via
-        /// <see cref="Text(string)">Text(string)</see>
+        /// <see cref="Text(string)"/>
         /// .
         /// </summary>
-        /// <seealso cref="Text()">Text()</seealso>
+        /// <seealso cref="Text()"/>
         protected internal string text;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="TokenIndex()">TokenIndex()</see>
+        /// <see cref="TokenIndex()"/>
         /// and
-        /// <see cref="TokenIndex(int)">TokenIndex(int)</see>
+        /// <see cref="TokenIndex(int)"/>
         /// .
         /// </summary>
         protected internal int index = -1;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="StartIndex()">StartIndex()</see>
+        /// <see cref="StartIndex()"/>
         /// and
-        /// <see cref="StartIndex(int)">StartIndex(int)</see>
+        /// <see cref="StartIndex(int)"/>
         /// .
         /// </summary>
         protected internal int start;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="StopIndex()">StopIndex()</see>
+        /// <see cref="StopIndex()"/>
         /// and
-        /// <see cref="StopIndex(int)">StopIndex(int)</see>
+        /// <see cref="StopIndex(int)"/>
         /// .
         /// </summary>
         protected internal int stop;
 
         /// <summary>
         /// Constructs a new
-        /// <see cref="CommonToken">CommonToken</see>
+        /// <see cref="CommonToken"/>
         /// with the specified token type.
         /// </summary>
         /// <param name="type">The token type.</param>
@@ -170,7 +170,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Constructs a new
-        /// <see cref="CommonToken">CommonToken</see>
+        /// <see cref="CommonToken"/>
         /// with the specified token type and
         /// text.
         /// </summary>
@@ -186,34 +186,34 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Constructs a new
-        /// <see cref="CommonToken">CommonToken</see>
+        /// <see cref="CommonToken"/>
         /// as a copy of another
-        /// <see cref="IToken">IToken</see>
+        /// <see cref="IToken"/>
         /// .
         /// <p>
         /// If
         /// <code>oldToken</code>
         /// is also a
-        /// <see cref="CommonToken">CommonToken</see>
+        /// <see cref="CommonToken"/>
         /// instance, the newly
         /// constructed token will share a reference to the
-        /// <see cref="text">text</see>
+        /// <see cref="text"/>
         /// field and
         /// the
-        /// <see cref="Antlr4.Runtime.Misc.Tuple2{T1, T2}">Antlr4.Runtime.Misc.Tuple2&lt;T1, T2&gt;</see>
+        /// <see cref="Antlr4.Runtime.Misc.Tuple2{T1, T2}"/>
         /// stored in
-        /// <see cref="source">source</see>
+        /// <see cref="source"/>
         /// . Otherwise,
-        /// <see cref="text">text</see>
+        /// <see cref="text"/>
         /// will
         /// be assigned the result of calling
-        /// <see cref="Text()">Text()</see>
+        /// <see cref="Text()"/>
         /// , and
-        /// <see cref="source">source</see>
+        /// <see cref="source"/>
         /// will be constructed from the result of
-        /// <see cref="IToken.TokenSource()">IToken.TokenSource()</see>
+        /// <see cref="IToken.TokenSource()"/>
         /// and
-        /// <see cref="IToken.InputStream()">IToken.InputStream()</see>
+        /// <see cref="IToken.InputStream()"/>
         /// .</p>
         /// </summary>
         /// <param name="oldToken">The token to copy.</param>
@@ -269,7 +269,7 @@ namespace Antlr4.Runtime
         /// Explicitly set the text for this token. If {code text} is not
         /// <code>null</code>
         /// , then
-        /// <see cref="Text()">Text()</see>
+        /// <see cref="Text()"/>
         /// will return this value rather than
         /// extracting the text from the input.
         /// </remarks>

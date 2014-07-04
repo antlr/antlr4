@@ -28,13 +28,13 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using System.IO;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
     /// <summary>
     /// This is an
-    /// <see cref="AntlrInputStream">AntlrInputStream</see>
+    /// <see cref="AntlrInputStream"/>
     /// that is loaded from a file all at once
     /// when you construct the object.
     /// </summary>
@@ -42,20 +42,20 @@ namespace Antlr4.Runtime
     {
         protected internal string fileName;
 
-        /// <exception cref="System.IO.IOException"></exception>
+        /// <exception cref="System.IO.IOException"/>
         public AntlrFileStream(string fileName)
             : this(fileName, null)
         {
         }
 
-        /// <exception cref="System.IO.IOException"></exception>
+        /// <exception cref="System.IO.IOException"/>
         public AntlrFileStream(string fileName, string encoding)
         {
             this.fileName = fileName;
             Load(fileName, encoding);
         }
 
-        /// <exception cref="System.IO.IOException"></exception>
+        /// <exception cref="System.IO.IOException"/>
         public virtual void Load(string fileName, string encoding)
         {
             if (fileName == null)

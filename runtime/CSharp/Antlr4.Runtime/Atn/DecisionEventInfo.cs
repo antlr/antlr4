@@ -30,7 +30,7 @@
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -47,7 +47,7 @@ namespace Antlr4.Runtime.Atn
     {
         /// <summary>The invoked decision number which this event is related to.</summary>
         /// <remarks>The invoked decision number which this event is related to.</remarks>
-        /// <seealso cref="ATN.decisionToState">ATN.decisionToState</seealso>
+        /// <seealso cref="ATN.decisionToState"/>
         public readonly int decision;
 
         /// <summary>

@@ -28,21 +28,21 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using Antlr4.Runtime;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
     /// <summary>
     /// This class extends
-    /// <see cref="ParserRuleContext">ParserRuleContext</see>
+    /// <see cref="ParserRuleContext"/>
     /// by allowing the value of
-    /// <see cref="RuleIndex()">RuleIndex()</see>
+    /// <see cref="RuleIndex()"/>
     /// to be explicitly set for the context.
     /// <p>
-    /// <see cref="ParserRuleContext">ParserRuleContext</see>
+    /// <see cref="ParserRuleContext"/>
     /// does not include field storage for the rule index
     /// since the context classes created by the code generator override the
-    /// <see cref="RuleIndex()">RuleIndex()</see>
+    /// <see cref="RuleIndex()"/>
     /// method to return the correct value for that context.
     /// Since the parser interpreter does not use the context classes generated for a
     /// parser, this class (with slightly more memory overhead per node) is used to
@@ -52,14 +52,14 @@ namespace Antlr4.Runtime
     {
         /// <summary>
         /// This is the backing field for
-        /// <see cref="RuleIndex()">RuleIndex()</see>
+        /// <see cref="RuleIndex()"/>
         /// .
         /// </summary>
         private readonly int ruleIndex;
 
         /// <summary>
         /// Constructs a new
-        /// <see cref="InterpreterRuleContext">InterpreterRuleContext</see>
+        /// <see cref="InterpreterRuleContext"/>
         /// with the specified
         /// parent, invoking state, and rule index.
         /// </summary>

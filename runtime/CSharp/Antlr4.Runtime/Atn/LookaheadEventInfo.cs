@@ -29,7 +29,7 @@
  */
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -46,7 +46,7 @@ namespace Antlr4.Runtime.Atn
     {
         /// <summary>
         /// Constructs a new instance of the
-        /// <see cref="LookaheadEventInfo">LookaheadEventInfo</see>
+        /// <see cref="LookaheadEventInfo"/>
         /// class with
         /// the specified detailed lookahead information.
         /// </summary>

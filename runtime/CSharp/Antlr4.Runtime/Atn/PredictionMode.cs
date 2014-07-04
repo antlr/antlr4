@@ -30,7 +30,7 @@
 using System.Collections.Generic;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -58,15 +58,15 @@ namespace Antlr4.Runtime.Atn
         /// <p>
         /// When using this prediction mode, the parser will either return a correct
         /// parse tree (i.e. the same parse tree that would be returned with the
-        /// <see cref="Ll">Ll</see>
+        /// <see cref="Ll"/>
         /// prediction mode), or it will report a syntax error. If a
         /// syntax error is encountered when using the
-        /// <see cref="Sll">Sll</see>
+        /// <see cref="Sll"/>
         /// prediction mode,
         /// it may be due to either an actual syntax error in the input or indicate
         /// that the particular combination of grammar and input requires the more
         /// powerful
-        /// <see cref="Ll">Ll</see>
+        /// <see cref="Ll"/>
         /// prediction abilities to complete successfully.</p>
         /// <p>
         /// This prediction mode does not provide any guarantees for prediction
@@ -97,7 +97,7 @@ namespace Antlr4.Runtime.Atn
         /// <remarks>
         /// The LL(*) prediction mode with exact ambiguity detection. In addition to
         /// the correctness guarantees provided by the
-        /// <see cref="Ll">Ll</see>
+        /// <see cref="Ll"/>
         /// prediction mode,
         /// this prediction mode instructs the prediction algorithm to determine the
         /// complete and exact set of ambiguous alternatives for every ambiguous
@@ -133,9 +133,9 @@ namespace Antlr4.Runtime.Atn
 
             /// <summary>
             /// The hash code is only a function of the
-            /// <see cref="ATNState.stateNumber">ATNState.stateNumber</see>
+            /// <see cref="ATNState.stateNumber"/>
             /// and
-            /// <see cref="ATNConfig#context">ATNConfig#context</see>
+            /// <see cref="ATNConfig#context"/>
             /// .
             /// </summary>
             public override int GetHashCode(ATNConfig o)
@@ -180,10 +180,10 @@ namespace Antlr4.Runtime.Atn
         /// <p>Assuming combined SLL+LL parsing, an SLL configuration set with only
         /// conflicting subsets should fall back to full LL, even if the
         /// configuration sets don't resolve to the same alternative (e.g.
-        /// <code></code>
+        /// <code/>
         /// 
         /// 1,2}} and
-        /// <code></code>
+        /// <code/>
         /// 
         /// 3,4}}. If there is at least one non-conflicting
         /// configuration, SLL could continue with the hopes that more lookahead will
@@ -237,12 +237,12 @@ namespace Antlr4.Runtime.Atn
         /// This means that SLL termination detection can totally ignore semantic
         /// predicates.</p>
         /// <p>Implementation-wise,
-        /// <see cref="ATNConfigSet">ATNConfigSet</see>
+        /// <see cref="ATNConfigSet"/>
         /// combines stack contexts but not
         /// semantic predicate contexts so we might see two configurations like the
         /// following.</p>
         /// <p>
-        /// <code></code>
+        /// <code/>
         /// (s, 1, x,
         /// ), (s, 1, x', {p})}</p>
         /// <p>Before testing these configurations against others, we have to merge
@@ -255,14 +255,14 @@ namespace Antlr4.Runtime.Atn
         /// when looking for conflicts in
         /// the following configurations.</p>
         /// <p>
-        /// <code></code>
+        /// <code/>
         /// (s, 1, x,
         /// ), (s, 1, x', {p}), (s, 2, x'', {})}</p>
         /// <p>If the configuration set has predicates (as indicated by
-        /// <see cref="ATNConfigSet.HasSemanticContext()">ATNConfigSet.HasSemanticContext()</see>
+        /// <see cref="ATNConfigSet.HasSemanticContext()"/>
         /// ), this algorithm makes a copy of
         /// the configurations to strip out all of the predicates so that a standard
-        /// <see cref="ATNConfigSet">ATNConfigSet</see>
+        /// <see cref="ATNConfigSet"/>
         /// will merge everything ignoring predicates.</p>
         /// </remarks>
         public static bool HasSLLConflictTerminatingPrediction(PredictionMode mode, ATNConfigSet configs)
@@ -300,7 +300,7 @@ namespace Antlr4.Runtime.Atn
         /// Checks if any configuration in
         /// <code>configs</code>
         /// is in a
-        /// <see cref="RuleStopState">RuleStopState</see>
+        /// <see cref="RuleStopState"/>
         /// . Configurations meeting this condition have reached
         /// the end of the decision rule (local context) or end of start rule (full
         /// context).
@@ -312,7 +312,7 @@ namespace Antlr4.Runtime.Atn
         /// if any configuration in
         /// <code>configs</code>
         /// is in a
-        /// <see cref="RuleStopState">RuleStopState</see>
+        /// <see cref="RuleStopState"/>
         /// , otherwise
         /// <code>false</code>
         /// </returns>
@@ -332,7 +332,7 @@ namespace Antlr4.Runtime.Atn
         /// Checks if all configurations in
         /// <code>configs</code>
         /// are in a
-        /// <see cref="RuleStopState">RuleStopState</see>
+        /// <see cref="RuleStopState"/>
         /// . Configurations meeting this condition have reached
         /// the end of the decision rule (local context) or end of start rule (full
         /// context).
@@ -344,7 +344,7 @@ namespace Antlr4.Runtime.Atn
         /// if all configurations in
         /// <code>configs</code>
         /// are in a
-        /// <see cref="RuleStopState">RuleStopState</see>
+        /// <see cref="RuleStopState"/>
         /// , otherwise
         /// <code>false</code>
         /// </returns>
@@ -379,12 +379,12 @@ namespace Antlr4.Runtime.Atn
         /// and singleton subsets with
         /// non-conflicting configurations. Two configurations conflict if they have
         /// identical
-        /// <see cref="ATNConfig#state">ATNConfig#state</see>
+        /// <see cref="ATNConfig#state"/>
         /// and
-        /// <see cref="ATNConfig#context">ATNConfig#context</see>
+        /// <see cref="ATNConfig#context"/>
         /// values
         /// but different
-        /// <see cref="ATNConfig.Alt()">ATNConfig.Alt()</see>
+        /// <see cref="ATNConfig.Alt()"/>
         /// value, e.g.
         /// <code>(s, i, ctx, _)</code>
         /// and
@@ -396,7 +396,7 @@ namespace Antlr4.Runtime.Atn
         /// Reduce these configuration subsets to the set of possible alternatives.
         /// You can compute the alternative subsets in one pass as follows:
         /// <p/>
-        /// <code></code>
+        /// <code/>
         /// A_s,ctx =
         /// i | (s, i, ctx, _)}} for each configuration in
         /// <code>C</code>
@@ -528,16 +528,16 @@ namespace Antlr4.Runtime.Atn
         /// ,
         /// <code>(s', 2, y)</code>
         /// yields non-conflicting set
-        /// <code></code>
+        /// <code/>
         /// 
         /// 3}} U conflicting sets
-        /// <code></code>
+        /// <code/>
         /// min(
         /// 1,2})} U
-        /// <code></code>
+        /// <code/>
         /// min(
         /// 1,2})} =
-        /// <code></code>
+        /// <code/>
         /// 
         /// 1,3}} =&gt; continue
         /// </li>
@@ -552,16 +552,16 @@ namespace Antlr4.Runtime.Atn
         /// ,
         /// <code>(s'', 1, z)</code>
         /// yields non-conflicting set
-        /// <code></code>
+        /// <code/>
         /// 
         /// 1}} U conflicting sets
-        /// <code></code>
+        /// <code/>
         /// min(
         /// 1,2})} U
-        /// <code></code>
+        /// <code/>
         /// min(
         /// 1,2})} =
-        /// <code></code>
+        /// <code/>
         /// 
         /// 1}} =&gt; stop and predict 1</li>
         /// <li>
@@ -573,17 +573,17 @@ namespace Antlr4.Runtime.Atn
         /// ,
         /// <code>(s', 2, y)</code>
         /// yields conflicting, reduced sets
-        /// <code></code>
+        /// <code/>
         /// 
         /// 1}} U
-        /// <code></code>
+        /// <code/>
         /// 
         /// 1}} =
-        /// <code></code>
+        /// <code/>
         /// 
         /// 1}} =&gt; stop and predict 1, can announce
         /// ambiguity
-        /// <code></code>
+        /// <code/>
         /// 
         /// 1,2}}</li>
         /// <li>
@@ -595,13 +595,13 @@ namespace Antlr4.Runtime.Atn
         /// ,
         /// <code>(s', 3, y)</code>
         /// yields conflicting, reduced sets
-        /// <code></code>
+        /// <code/>
         /// 
         /// 1}} U
-        /// <code></code>
+        /// <code/>
         /// 
         /// 2}} =
-        /// <code></code>
+        /// <code/>
         /// 
         /// 1,2}} =&gt; continue</li>
         /// <li>
@@ -613,13 +613,13 @@ namespace Antlr4.Runtime.Atn
         /// ,
         /// <code>(s', 4, y)</code>
         /// yields conflicting, reduced sets
-        /// <code></code>
+        /// <code/>
         /// 
         /// 1}} U
-        /// <code></code>
+        /// <code/>
         /// 
         /// 3}} =
-        /// <code></code>
+        /// <code/>
         /// 
         /// 1,3}} =&gt; continue</li>
         /// </ul>
@@ -633,20 +633,20 @@ namespace Antlr4.Runtime.Atn
         /// have more than one alternative and all
         /// <code>A_i</code>
         /// are the same. If
-        /// <code></code>
+        /// <code/>
         /// A=
         /// {1,2}, {1,3}}}, then regular LL prediction would terminate
         /// because the resolved set is
-        /// <code></code>
+        /// <code/>
         /// 
         /// 1}}. To determine what the real
         /// ambiguity is, we have to know whether the ambiguity is between one and
         /// two or one and three so we keep going. We can only stop prediction when
         /// we need exact ambiguity detection when the sets look like
-        /// <code></code>
+        /// <code/>
         /// A=
         /// {1,2}}} or
-        /// <code></code>
+        /// <code/>
         /// 
         /// {1,2},{1,2}}}, etc...</p>
         /// </remarks>
@@ -666,11 +666,11 @@ namespace Antlr4.Runtime.Atn
         /// 
         /// <code>true</code>
         /// if every
-        /// <see cref="Sharpen.BitSet">Sharpen.BitSet</see>
+        /// <see cref="Antlr4.Runtime.Sharpen.BitSet"/>
         /// in
         /// <code>altsets</code>
         /// has
-        /// <see cref="Sharpen.BitSet.Cardinality()">cardinality</see>
+        /// <see cref="Antlr4.Runtime.Sharpen.BitSet.Cardinality()">cardinality</see>
         /// &gt; 1, otherwise
         /// <code>false</code>
         /// </returns>
@@ -692,9 +692,9 @@ namespace Antlr4.Runtime.Atn
         /// if
         /// <code>altsets</code>
         /// contains a
-        /// <see cref="Sharpen.BitSet">Sharpen.BitSet</see>
+        /// <see cref="Antlr4.Runtime.Sharpen.BitSet"/>
         /// with
-        /// <see cref="Sharpen.BitSet.Cardinality()">cardinality</see>
+        /// <see cref="Antlr4.Runtime.Sharpen.BitSet.Cardinality()">cardinality</see>
         /// 1, otherwise
         /// <code>false</code>
         /// </returns>
@@ -723,9 +723,9 @@ namespace Antlr4.Runtime.Atn
         /// if
         /// <code>altsets</code>
         /// contains a
-        /// <see cref="Sharpen.BitSet">Sharpen.BitSet</see>
+        /// <see cref="Antlr4.Runtime.Sharpen.BitSet"/>
         /// with
-        /// <see cref="Sharpen.BitSet.Cardinality()">cardinality</see>
+        /// <see cref="Antlr4.Runtime.Sharpen.BitSet.Cardinality()">cardinality</see>
         /// &gt; 1, otherwise
         /// <code>false</code>
         /// </returns>
@@ -775,7 +775,7 @@ namespace Antlr4.Runtime.Atn
         /// Returns the unique alternative predicted by all alternative subsets in
         /// <code>altsets</code>
         /// . If no such alternative exists, this method returns
-        /// <see cref="ATN.InvalidAltNumber">ATN.InvalidAltNumber</see>
+        /// <see cref="ATN.InvalidAltNumber"/>
         /// .
         /// </summary>
         /// <param name="altsets">a collection of alternative subsets</param>
@@ -796,7 +796,7 @@ namespace Antlr4.Runtime.Atn
         /// <remarks>
         /// Gets the complete set of represented alternatives for a collection of
         /// alternative subsets. This method returns the union of each
-        /// <see cref="Sharpen.BitSet">Sharpen.BitSet</see>
+        /// <see cref="Antlr4.Runtime.Sharpen.BitSet"/>
         /// in
         /// <code>altsets</code>
         /// .

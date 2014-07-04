@@ -31,8 +31,8 @@ using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
-using Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
@@ -43,7 +43,7 @@ namespace Antlr4.Runtime.Tree
         /// <summary>Print out a whole tree in LISP form.</summary>
         /// <remarks>
         /// Print out a whole tree in LISP form.
-        /// <see cref="GetNodeText(ITree, Antlr4.Runtime.Parser)">GetNodeText(ITree, Antlr4.Runtime.Parser)</see>
+        /// <see cref="GetNodeText(ITree, Antlr4.Runtime.Parser)"/>
         /// is used on the
         /// node payloads to get the text for the nodes.  Detect
         /// parse trees and extract data appropriately.
@@ -56,7 +56,7 @@ namespace Antlr4.Runtime.Tree
         /// <summary>Print out a whole tree in LISP form.</summary>
         /// <remarks>
         /// Print out a whole tree in LISP form.
-        /// <see cref="GetNodeText(ITree, Antlr4.Runtime.Parser)">GetNodeText(ITree, Antlr4.Runtime.Parser)</see>
+        /// <see cref="GetNodeText(ITree, Antlr4.Runtime.Parser)"/>
         /// is used on the
         /// node payloads to get the text for the nodes.  Detect
         /// parse trees and extract data appropriately.
@@ -71,7 +71,7 @@ namespace Antlr4.Runtime.Tree
         /// <summary>Print out a whole tree in LISP form.</summary>
         /// <remarks>
         /// Print out a whole tree in LISP form.
-        /// <see cref="GetNodeText(ITree, Antlr4.Runtime.Parser)">GetNodeText(ITree, Antlr4.Runtime.Parser)</see>
+        /// <see cref="GetNodeText(ITree, Antlr4.Runtime.Parser)"/>
         /// is used on the
         /// node payloads to get the text for the nodes.  Detect
         /// parse trees and extract data appropriately.
@@ -167,7 +167,7 @@ namespace Antlr4.Runtime.Tree
         {
             if (t.Parent == null)
             {
-                return Sharpen.Collections.EmptyList();
+                return Antlr4.Runtime.Sharpen.Collections.EmptyList();
             }
             IList<ITree> ancestors = new List<ITree>();
             t = t.Parent;

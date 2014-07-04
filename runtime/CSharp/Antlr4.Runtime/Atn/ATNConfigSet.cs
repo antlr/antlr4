@@ -32,7 +32,7 @@ using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -41,16 +41,16 @@ namespace Antlr4.Runtime.Atn
     {
         /// <summary>
         /// This maps (state, alt) -&gt; merged
-        /// <see cref="ATNConfig">ATNConfig</see>
+        /// <see cref="ATNConfig"/>
         /// . The key does not account for
         /// the
-        /// <see cref="ATNConfig.SemanticContext()">ATNConfig.SemanticContext()</see>
+        /// <see cref="ATNConfig.SemanticContext()"/>
         /// of the value, which is only a problem if a single
         /// <code>ATNConfigSet</code>
         /// contains two configs with the same state and alternative
         /// but different semantic contexts. When this case arises, the first config
         /// added to this map stays, and the remaining configs are placed in
-        /// <see cref="unmerged">unmerged</see>
+        /// <see cref="unmerged"/>
         /// .
         /// <p>
         /// This map is only used for optimizing the process of adding configs to the set,
@@ -63,7 +63,7 @@ namespace Antlr4.Runtime.Atn
         /// <summary>
         /// This is an "overflow" list holding configs which cannot be merged with one
         /// of the configs in
-        /// <see cref="mergedConfigs">mergedConfigs</see>
+        /// <see cref="mergedConfigs"/>
         /// but have a colliding key. This
         /// occurs when two configs in the set have the same state and alternative but
         /// different semantic contexts.
@@ -92,14 +92,14 @@ namespace Antlr4.Runtime.Atn
         /// <code>true</code>
         /// , this config set represents configurations where the entire
         /// outer context has been consumed by the ATN interpreter. This prevents the
-        /// <see cref="ParserATNSimulator.Closure(ATNConfigSet, ATNConfigSet, bool, bool, PredictionContextCache, bool)">ParserATNSimulator.Closure(ATNConfigSet, ATNConfigSet, bool, bool, PredictionContextCache, bool)</see>
+        /// <see cref="ParserATNSimulator.Closure(ATNConfigSet, ATNConfigSet, bool, bool, PredictionContextCache, bool)"/>
         /// from pursuing the global FOLLOW when a
         /// rule stop state is reached with an empty prediction context.
         /// <p>
         /// Note:
         /// <code>outermostConfigSet</code>
         /// and
-        /// <see cref="dipsIntoOuterContext">dipsIntoOuterContext</see>
+        /// <see cref="dipsIntoOuterContext"/>
         /// should never
         /// be true at the same time.
         /// </summary>

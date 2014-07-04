@@ -30,18 +30,18 @@
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
     /// <summary>
     /// Executes a custom lexer action by calling
-    /// <see cref="Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}.Action(Antlr4.Runtime.RuleContext, int, int)">Antlr4.Runtime.Recognizer&lt;Symbol, ATNInterpreter&gt;.Action(Antlr4.Runtime.RuleContext, int, int)</see>
+    /// <see cref="Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}.Action(Antlr4.Runtime.RuleContext, int, int)"/>
     /// with the
     /// rule and action indexes assigned to the custom action. The implementation of
     /// a custom action is added to the generated code for the lexer in an override
     /// of
-    /// <see cref="Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}.Action(Antlr4.Runtime.RuleContext, int, int)">Antlr4.Runtime.Recognizer&lt;Symbol, ATNInterpreter&gt;.Action(Antlr4.Runtime.RuleContext, int, int)</see>
+    /// <see cref="Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}.Action(Antlr4.Runtime.RuleContext, int, int)"/>
     /// when the grammar is compiled.
     /// <p>This class may represent embedded actions created with the <code>{...}</code>
     /// syntax in ANTLR 4, as well as actions created for lexer commands where the
@@ -65,12 +65,12 @@ namespace Antlr4.Runtime.Atn
         /// </remarks>
         /// <param name="ruleIndex">
         /// The rule index to use for calls to
-        /// <see cref="Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}.Action(Antlr4.Runtime.RuleContext, int, int)">Antlr4.Runtime.Recognizer&lt;Symbol, ATNInterpreter&gt;.Action(Antlr4.Runtime.RuleContext, int, int)</see>
+        /// <see cref="Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}.Action(Antlr4.Runtime.RuleContext, int, int)"/>
         /// .
         /// </param>
         /// <param name="actionIndex">
         /// The action index to use for calls to
-        /// <see cref="Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}.Action(Antlr4.Runtime.RuleContext, int, int)">Antlr4.Runtime.Recognizer&lt;Symbol, ATNInterpreter&gt;.Action(Antlr4.Runtime.RuleContext, int, int)</see>
+        /// <see cref="Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}.Action(Antlr4.Runtime.RuleContext, int, int)"/>
         /// .
         /// </param>
         public LexerCustomAction(int ruleIndex, int actionIndex)
@@ -81,7 +81,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Gets the rule index to use for calls to
-        /// <see cref="Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}.Action(Antlr4.Runtime.RuleContext, int, int)">Antlr4.Runtime.Recognizer&lt;Symbol, ATNInterpreter&gt;.Action(Antlr4.Runtime.RuleContext, int, int)</see>
+        /// <see cref="Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}.Action(Antlr4.Runtime.RuleContext, int, int)"/>
         /// .
         /// </summary>
         /// <returns>The rule index for the custom action.</returns>
@@ -95,7 +95,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Gets the action index to use for calls to
-        /// <see cref="Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}.Action(Antlr4.Runtime.RuleContext, int, int)">Antlr4.Runtime.Recognizer&lt;Symbol, ATNInterpreter&gt;.Action(Antlr4.Runtime.RuleContext, int, int)</see>
+        /// <see cref="Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}.Action(Antlr4.Runtime.RuleContext, int, int)"/>
         /// .
         /// </summary>
         /// <returns>The action index for the custom action.</returns>
@@ -107,10 +107,10 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        /// <summary><inheritDoc></inheritDoc></summary>
+        /// <summary><inheritDoc/></summary>
         /// <returns>
         /// This method returns
-        /// <see cref="LexerActionType.Custom">LexerActionType.Custom</see>
+        /// <see cref="LexerActionType.Custom"/>
         /// .
         /// </returns>
         public LexerActionType ActionType
@@ -125,11 +125,11 @@ namespace Antlr4.Runtime.Atn
         /// <remarks>
         /// Gets whether the lexer action is position-dependent. Position-dependent
         /// actions may have different semantics depending on the
-        /// <see cref="Antlr4.Runtime.ICharStream">Antlr4.Runtime.ICharStream</see>
+        /// <see cref="Antlr4.Runtime.ICharStream"/>
         /// index at the time the action is executed.
         /// <p>Custom actions are position-dependent since they may represent a
         /// user-defined embedded action which makes calls to methods like
-        /// <see cref="Antlr4.Runtime.Lexer.Text()">Antlr4.Runtime.Lexer.Text()</see>
+        /// <see cref="Antlr4.Runtime.Lexer.Text()"/>
         /// .</p>
         /// </remarks>
         /// <returns>
@@ -146,9 +146,9 @@ namespace Antlr4.Runtime.Atn
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>Custom actions are implemented by calling
-        /// <see cref="Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}.Action(Antlr4.Runtime.RuleContext, int, int)">Antlr4.Runtime.Recognizer&lt;Symbol, ATNInterpreter&gt;.Action(Antlr4.Runtime.RuleContext, int, int)</see>
+        /// <see cref="Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}.Action(Antlr4.Runtime.RuleContext, int, int)"/>
         /// with the
         /// appropriate rule and action indexes.</p>
         /// </summary>

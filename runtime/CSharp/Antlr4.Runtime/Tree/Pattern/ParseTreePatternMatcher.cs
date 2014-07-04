@@ -32,15 +32,15 @@ using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
 using Antlr4.Runtime.Tree.Pattern;
-using Sharpen;
 
 namespace Antlr4.Runtime.Tree.Pattern
 {
     /// <summary>
     /// A tree pattern matching mechanism for ANTLR
-    /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
+    /// <see cref="Antlr4.Runtime.Tree.IParseTree"/>
     /// s.
     /// <p>Patterns are strings of source input text with special tags representing
     /// token or rule references such as:</p>
@@ -51,15 +51,15 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// <code>statement</code>
     /// , this object constructs
     /// a
-    /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
+    /// <see cref="Antlr4.Runtime.Tree.IParseTree"/>
     /// with placeholders for the
     /// <code>ID</code>
     /// and
     /// <code>expr</code>
     /// subtree. Then the
-    /// <see cref="Match(Antlr4.Runtime.Tree.IParseTree, ParseTreePattern)">Match(Antlr4.Runtime.Tree.IParseTree, ParseTreePattern)</see>
+    /// <see cref="Match(Antlr4.Runtime.Tree.IParseTree, ParseTreePattern)"/>
     /// routines can compare an actual
-    /// <see cref="Antlr4.Runtime.Tree.IParseTree">Antlr4.Runtime.Tree.IParseTree</see>
+    /// <see cref="Antlr4.Runtime.Tree.IParseTree"/>
     /// from a parse with this pattern. Tag
     /// <code><ID></code>
     /// matches
@@ -82,47 +82,47 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// <code>0</code>
     /// .</p>
     /// <p>The
-    /// <see cref="Matches(Antlr4.Runtime.Tree.IParseTree, ParseTreePattern)">Matches(Antlr4.Runtime.Tree.IParseTree, ParseTreePattern)</see>
+    /// <see cref="Matches(Antlr4.Runtime.Tree.IParseTree, ParseTreePattern)"/>
     /// routines return
     /// <code>true</code>
     /// or
     /// <code>false</code>
     /// based
     /// upon a match for the tree rooted at the parameter sent in. The
-    /// <see cref="Match(Antlr4.Runtime.Tree.IParseTree, ParseTreePattern)">Match(Antlr4.Runtime.Tree.IParseTree, ParseTreePattern)</see>
+    /// <see cref="Match(Antlr4.Runtime.Tree.IParseTree, ParseTreePattern)"/>
     /// routines return a
-    /// <see cref="ParseTreeMatch">ParseTreeMatch</see>
+    /// <see cref="ParseTreeMatch"/>
     /// object that
     /// contains the parse tree, the parse tree pattern, and a map from tag name to
     /// matched nodes (more below). A subtree that fails to match, returns with
-    /// <see cref="ParseTreeMatch#mismatchedNode">ParseTreeMatch#mismatchedNode</see>
+    /// <see cref="ParseTreeMatch#mismatchedNode"/>
     /// set to the first tree node that did not
     /// match.</p>
     /// <p>For efficiency, you can compile a tree pattern in string form to a
-    /// <see cref="ParseTreePattern">ParseTreePattern</see>
+    /// <see cref="ParseTreePattern"/>
     /// object.</p>
     /// <p>See
     /// <code>TestParseTreeMatcher</code>
     /// for lots of examples.
-    /// <see cref="ParseTreePattern">ParseTreePattern</see>
+    /// <see cref="ParseTreePattern"/>
     /// has two static helper methods:
-    /// <see cref="ParseTreePattern.FindAll(Antlr4.Runtime.Tree.IParseTree, string)">ParseTreePattern.FindAll(Antlr4.Runtime.Tree.IParseTree, string)</see>
+    /// <see cref="ParseTreePattern.FindAll(Antlr4.Runtime.Tree.IParseTree, string)"/>
     /// and
-    /// <see cref="ParseTreePattern.Match(Antlr4.Runtime.Tree.IParseTree)">ParseTreePattern.Match(Antlr4.Runtime.Tree.IParseTree)</see>
+    /// <see cref="ParseTreePattern.Match(Antlr4.Runtime.Tree.IParseTree)"/>
     /// that
     /// are easy to use but not super efficient because they create new
-    /// <see cref="ParseTreePatternMatcher">ParseTreePatternMatcher</see>
+    /// <see cref="ParseTreePatternMatcher"/>
     /// objects each time and have to compile the
     /// pattern in string form before using it.</p>
     /// <p>The lexer and parser that you pass into the
-    /// <see cref="ParseTreePatternMatcher">ParseTreePatternMatcher</see>
+    /// <see cref="ParseTreePatternMatcher"/>
     /// constructor are used to parse the pattern in string form. The lexer converts
     /// the
     /// <code><ID> = <expr>;</code>
     /// into a sequence of four tokens (assuming lexer
     /// throws out whitespace or puts it on a hidden channel). Be aware that the
     /// input stream is reset for the lexer (but not the parser; a
-    /// <see cref="Antlr4.Runtime.ParserInterpreter">Antlr4.Runtime.ParserInterpreter</see>
+    /// <see cref="Antlr4.Runtime.ParserInterpreter"/>
     /// is created to parse the input.). Any user-defined
     /// fields you have put into the lexer might get changed when this mechanism asks
     /// it to scan the pattern string.</p>
@@ -132,7 +132,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// <code>expr</code>
     /// but, from the parser passed in, we create a special version of
     /// the underlying grammar representation (an
-    /// <see cref="Antlr4.Runtime.Atn.ATN">Antlr4.Runtime.Atn.ATN</see>
+    /// <see cref="Antlr4.Runtime.Atn.ATN"/>
     /// ) that allows imaginary
     /// tokens representing rules (
     /// <code><expr></code>
@@ -146,7 +146,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// <code>\</code>
     /// as the escape string
     /// by default, but you can set them to whatever you want using
-    /// <see cref="SetDelimiters(string, string, string)">SetDelimiters(string, string, string)</see>
+    /// <see cref="SetDelimiters(string, string, string)"/>
     /// . You must escape both start and stop strings
     /// <code>\&lt;</code>
     /// and
@@ -173,14 +173,14 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="Lexer()">Lexer()</see>
+        /// <see cref="Lexer()"/>
         /// .
         /// </summary>
         private readonly Lexer lexer;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="Parser()">Parser()</see>
+        /// <see cref="Parser()"/>
         /// .
         /// </summary>
         private readonly Parser parser;
@@ -193,11 +193,11 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// Constructs a
-        /// <see cref="ParseTreePatternMatcher">ParseTreePatternMatcher</see>
+        /// <see cref="ParseTreePatternMatcher"/>
         /// or from a
-        /// <see cref="Antlr4.Runtime.Lexer">Antlr4.Runtime.Lexer</see>
+        /// <see cref="Antlr4.Runtime.Lexer"/>
         /// and
-        /// <see cref="Antlr4.Runtime.Parser">Antlr4.Runtime.Parser</see>
+        /// <see cref="Antlr4.Runtime.Parser"/>
         /// object. The lexer input stream is altered for tokenizing
         /// the tree patterns. The parser is used as a convenient mechanism to get
         /// the grammar name, plus token, rule names.
@@ -287,7 +287,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// against
         /// <code>tree</code>
         /// and return a
-        /// <see cref="ParseTreeMatch">ParseTreeMatch</see>
+        /// <see cref="ParseTreeMatch"/>
         /// object that contains the
         /// matched elements, or the node at which the match failed.
         /// </summary>
@@ -303,7 +303,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// matched against
         /// <code>tree</code>
         /// and return a
-        /// <see cref="ParseTreeMatch">ParseTreeMatch</see>
+        /// <see cref="ParseTreeMatch"/>
         /// object that contains the matched elements, or the
         /// node at which the match failed. Pass in a compiled pattern instead of a
         /// string representation of a tree pattern.
@@ -318,7 +318,7 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// For repeated use of a tree pattern, compile it to a
-        /// <see cref="ParseTreePattern">ParseTreePattern</see>
+        /// <see cref="ParseTreePattern"/>
         /// using this method.
         /// </summary>
         public virtual ParseTreePattern Compile(string pattern, int patternRuleIndex)
@@ -600,7 +600,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// Split
         /// <code><ID> = <e:expr> ;</code>
         /// into 4 chunks for tokenizing by
-        /// <see cref="Tokenize(string)">Tokenize(string)</see>
+        /// <see cref="Tokenize(string)"/>
         /// .
         /// </summary>
         public virtual IList<Chunk> Split(string pattern)

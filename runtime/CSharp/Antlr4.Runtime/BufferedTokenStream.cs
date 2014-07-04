@@ -32,35 +32,35 @@ using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
     /// <summary>
     /// This implementation of
-    /// <see cref="ITokenStream">ITokenStream</see>
+    /// <see cref="ITokenStream"/>
     /// loads tokens from a
-    /// <see cref="ITokenSource">ITokenSource</see>
+    /// <see cref="ITokenSource"/>
     /// on-demand, and places the tokens in a buffer to provide
     /// access to any previous token by index.
     /// <p>
     /// This token stream ignores the value of
-    /// <see cref="IToken.Channel()">IToken.Channel()</see>
+    /// <see cref="IToken.Channel()"/>
     /// . If your
     /// parser requires the token stream filter tokens to only those on a particular
     /// channel, such as
-    /// <see cref="IToken.DefaultChannel">IToken.DefaultChannel</see>
+    /// <see cref="IToken.DefaultChannel"/>
     /// or
-    /// <see cref="IToken.HiddenChannel">IToken.HiddenChannel</see>
+    /// <see cref="IToken.HiddenChannel"/>
     /// , use a filtering token stream such a
-    /// <see cref="CommonTokenStream">CommonTokenStream</see>
+    /// <see cref="CommonTokenStream"/>
     /// .</p>
     /// </summary>
     public class BufferedTokenStream : ITokenStream
     {
         /// <summary>
         /// The
-        /// <see cref="ITokenSource">ITokenSource</see>
+        /// <see cref="ITokenSource"/>
         /// from which tokens for this stream are fetched.
         /// </summary>
         [NotNull]
@@ -70,7 +70,7 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// A collection of all tokens fetched from the token source. The list is
         /// considered a complete view of the input once
-        /// <see cref="fetchedEOF">fetchedEOF</see>
+        /// <see cref="fetchedEOF"/>
         /// is set
         /// to
         /// <code>true</code>
@@ -80,23 +80,23 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// The index into
-        /// <see cref="tokens">tokens</see>
+        /// <see cref="tokens"/>
         /// of the current token (next token to
-        /// <see cref="Consume()">Consume()</see>
+        /// <see cref="Consume()"/>
         /// ).
-        /// <see cref="tokens">tokens</see>
+        /// <see cref="tokens"/>
         /// <code>[</code>
-        /// <see cref="p">p</see>
+        /// <see cref="p"/>
         /// <code>]</code>
         /// should be
         /// <see cref="Lt(int)">LT(1)</see>
         /// .
         /// <p>This field is set to -1 when the stream is first constructed or when
-        /// <see cref="SetTokenSource(ITokenSource)">SetTokenSource(ITokenSource)</see>
+        /// <see cref="SetTokenSource(ITokenSource)"/>
         /// is called, indicating that the first token has
         /// not yet been fetched from the token source. For additional information,
         /// see the documentation of
-        /// <see cref="IIntStream">IIntStream</see>
+        /// <see cref="IIntStream"/>
         /// for a description of
         /// Initializing Methods.</p>
         /// </summary>
@@ -104,30 +104,30 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Indicates whether the
-        /// <see cref="IToken.Eof">IToken.Eof</see>
+        /// <see cref="IToken.Eof"/>
         /// token has been fetched from
-        /// <see cref="tokenSource">tokenSource</see>
+        /// <see cref="tokenSource"/>
         /// and added to
-        /// <see cref="tokens">tokens</see>
+        /// <see cref="tokens"/>
         /// . This field improves
         /// performance for the following cases:
         /// <ul>
         /// <li>
-        /// <see cref="Consume()">Consume()</see>
+        /// <see cref="Consume()"/>
         /// : The lookahead check in
-        /// <see cref="Consume()">Consume()</see>
+        /// <see cref="Consume()"/>
         /// to prevent
         /// consuming the EOF symbol is optimized by checking the values of
-        /// <see cref="fetchedEOF">fetchedEOF</see>
+        /// <see cref="fetchedEOF"/>
         /// and
-        /// <see cref="p">p</see>
+        /// <see cref="p"/>
         /// instead of calling
-        /// <see cref="La(int)">La(int)</see>
+        /// <see cref="La(int)"/>
         /// .</li>
         /// <li>
-        /// <see cref="Fetch(int)">Fetch(int)</see>
+        /// <see cref="Fetch(int)"/>
         /// : The check to prevent adding multiple EOF symbols into
-        /// <see cref="tokens">tokens</see>
+        /// <see cref="tokens"/>
         /// is trivial with this field.</li>
         /// <ul>
         /// </summary>
@@ -233,7 +233,7 @@ namespace Antlr4.Runtime
         /// <code>false</code>
         /// .
         /// </returns>
-        /// <seealso cref="Get(int)">Get(int)</seealso>
+        /// <seealso cref="Get(int)"/>
         protected internal virtual bool Sync(int i)
         {
             System.Diagnostics.Debug.Assert(i >= 0);
@@ -364,7 +364,7 @@ namespace Antlr4.Runtime
         /// exception is thrown in this method, the current stream index should not be
         /// changed.
         /// <p>For example,
-        /// <see cref="CommonTokenStream">CommonTokenStream</see>
+        /// <see cref="CommonTokenStream"/>
         /// overrides this method to ensure that
         /// the seek target is always an on-channel token.</p>
         /// </remarks>
@@ -532,7 +532,7 @@ namespace Antlr4.Runtime
         /// <summary>
         /// Collect all tokens on specified channel to the right of
         /// the current token up until we see a token on
-        /// <see cref="Lexer.DefaultTokenChannel">Lexer.DefaultTokenChannel</see>
+        /// <see cref="Lexer.DefaultTokenChannel"/>
         /// or
         /// EOF. If
         /// <code>channel</code>
@@ -565,7 +565,7 @@ namespace Antlr4.Runtime
         /// <summary>
         /// Collect all hidden tokens (any off-default channel) to the right of
         /// the current token up until we see a token on
-        /// <see cref="Lexer.DefaultTokenChannel">Lexer.DefaultTokenChannel</see>
+        /// <see cref="Lexer.DefaultTokenChannel"/>
         /// or EOF.
         /// </summary>
         public virtual IList<IToken> GetHiddenTokensToRight(int tokenIndex)
@@ -576,7 +576,7 @@ namespace Antlr4.Runtime
         /// <summary>
         /// Collect all tokens on specified channel to the left of
         /// the current token up until we see a token on
-        /// <see cref="Lexer.DefaultTokenChannel">Lexer.DefaultTokenChannel</see>
+        /// <see cref="Lexer.DefaultTokenChannel"/>
         /// .
         /// If
         /// <code>channel</code>
@@ -610,7 +610,7 @@ namespace Antlr4.Runtime
         /// <summary>
         /// Collect all hidden tokens (any off-default channel) to the left of
         /// the current token up until we see a token on
-        /// <see cref="Lexer.DefaultTokenChannel">Lexer.DefaultTokenChannel</see>
+        /// <see cref="Lexer.DefaultTokenChannel"/>
         /// .
         /// </summary>
         public virtual IList<IToken> GetHiddenTokensToLeft(int tokenIndex)

@@ -28,7 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using System;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Misc
 {
@@ -36,10 +36,10 @@ namespace Antlr4.Runtime.Misc
     /// <remarks>
     /// This exception is thrown to cancel a parsing operation. This exception does
     /// not extend
-    /// <see cref="Antlr4.Runtime.RecognitionException">Antlr4.Runtime.RecognitionException</see>
+    /// <see cref="Antlr4.Runtime.RecognitionException"/>
     /// , allowing it to bypass the standard
     /// error recovery mechanisms.
-    /// <see cref="Antlr4.Runtime.BailErrorStrategy">Antlr4.Runtime.BailErrorStrategy</see>
+    /// <see cref="Antlr4.Runtime.BailErrorStrategy"/>
     /// throws this exception in
     /// response to a parse error.
     /// </remarks>
@@ -60,13 +60,13 @@ namespace Antlr4.Runtime.Misc
 
         public ParseCanceledException(Exception cause)
         {
-            Sharpen.Extensions.InitCause(this, cause);
+            Antlr4.Runtime.Sharpen.Extensions.InitCause(this, cause);
         }
 
         public ParseCanceledException(string message, Exception cause)
             : base(message)
         {
-            Sharpen.Extensions.InitCause(this, cause);
+            Antlr4.Runtime.Sharpen.Extensions.InitCause(this, cause);
         }
     }
 }

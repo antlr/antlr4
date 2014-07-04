@@ -28,8 +28,8 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using System;
+using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree.Pattern;
-using Sharpen;
 
 namespace Antlr4.Runtime.Tree.Pattern
 {
@@ -66,21 +66,21 @@ namespace Antlr4.Runtime.Tree.Pattern
     {
         /// <summary>
         /// This is the backing field for
-        /// <see cref="Tag()">Tag()</see>
+        /// <see cref="Tag()"/>
         /// .
         /// </summary>
         private readonly string tag;
 
         /// <summary>
         /// This is the backing field for
-        /// <see cref="Label()">Label()</see>
+        /// <see cref="Label()"/>
         /// .
         /// </summary>
         private readonly string label;
 
         /// <summary>
         /// Construct a new instance of
-        /// <see cref="TagChunk">TagChunk</see>
+        /// <see cref="TagChunk"/>
         /// using the specified tag and
         /// no label.
         /// </summary>
@@ -104,7 +104,7 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// Construct a new instance of
-        /// <see cref="TagChunk">TagChunk</see>
+        /// <see cref="TagChunk"/>
         /// using the specified label
         /// and tag.
         /// </summary>
@@ -112,7 +112,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// The label for the tag. If this is
         /// <code>null</code>
         /// , the
-        /// <see cref="TagChunk">TagChunk</see>
+        /// <see cref="TagChunk"/>
         /// represents an unlabeled tag.
         /// </param>
         /// <param name="tag">

@@ -30,7 +30,7 @@
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -38,7 +38,7 @@ namespace Antlr4.Runtime.Atn
     /// Implements the
     /// <code>type</code>
     /// lexer action by calling
-    /// <see cref="Antlr4.Runtime.Lexer.Type(int)">Antlr4.Runtime.Lexer.Type(int)</see>
+    /// <see cref="Antlr4.Runtime.Lexer.Type(int)"/>
     /// with the assigned type.
     /// </summary>
     /// <author>Sam Harwell</author>
@@ -54,7 +54,7 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="type">
         /// The type to assign to the token using
-        /// <see cref="Antlr4.Runtime.Lexer.Type(int)">Antlr4.Runtime.Lexer.Type(int)</see>
+        /// <see cref="Antlr4.Runtime.Lexer.Type(int)"/>
         /// .
         /// </param>
         public LexerTypeAction(int type)
@@ -73,10 +73,10 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        /// <summary><inheritDoc></inheritDoc></summary>
+        /// <summary><inheritDoc/></summary>
         /// <returns>
         /// This method returns
-        /// <see cref="LexerActionType.Type">LexerActionType.Type</see>
+        /// <see cref="LexerActionType.Type"/>
         /// .
         /// </returns>
         public virtual LexerActionType ActionType
@@ -87,7 +87,7 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        /// <summary><inheritDoc></inheritDoc></summary>
+        /// <summary><inheritDoc/></summary>
         /// <returns>
         /// This method returns
         /// <code>false</code>
@@ -102,12 +102,12 @@ namespace Antlr4.Runtime.Atn
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>This action is implemented by calling
-        /// <see cref="Antlr4.Runtime.Lexer.Type(int)">Antlr4.Runtime.Lexer.Type(int)</see>
+        /// <see cref="Antlr4.Runtime.Lexer.Type(int)"/>
         /// with the
         /// value provided by
-        /// <see cref="Type()">Type()</see>
+        /// <see cref="Type()"/>
         /// .</p>
         /// </summary>
         public virtual void Execute(Lexer lexer)

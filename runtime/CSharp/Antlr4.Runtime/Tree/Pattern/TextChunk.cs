@@ -29,8 +29,8 @@
  */
 using System;
 using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree.Pattern;
-using Sharpen;
 
 namespace Antlr4.Runtime.Tree.Pattern
 {
@@ -46,7 +46,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     {
         /// <summary>
         /// This is the backing field for
-        /// <see cref="Text()">Text()</see>
+        /// <see cref="Text()"/>
         /// .
         /// </summary>
         [NotNull]
@@ -54,7 +54,7 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// Constructs a new instance of
-        /// <see cref="TextChunk">TextChunk</see>
+        /// <see cref="TextChunk"/>
         /// with the specified text.
         /// </summary>
         /// <param name="text">The text of this chunk.</param>
@@ -87,11 +87,11 @@ namespace Antlr4.Runtime.Tree.Pattern
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>The implementation for
-        /// <see cref="TextChunk">TextChunk</see>
+        /// <see cref="TextChunk"/>
         /// returns the result of
-        /// <see cref="Text()">Text()</see>
+        /// <see cref="Text()"/>
         /// in single quotes.</p>
         /// </summary>
         public override string ToString()

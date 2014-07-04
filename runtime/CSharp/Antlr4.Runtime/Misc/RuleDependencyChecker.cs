@@ -35,10 +35,10 @@ using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Sharpen;
-using Sharpen.Annotation;
-using Sharpen.Logging;
-using Sharpen.Reflect;
+using Antlr4.Runtime.Sharpen;
+using Antlr4.Runtime.Sharpen.Annotation;
+using Antlr4.Runtime.Sharpen.Logging;
+using Antlr4.Runtime.Sharpen.Reflect;
 
 namespace Antlr4.Runtime.Misc
 {

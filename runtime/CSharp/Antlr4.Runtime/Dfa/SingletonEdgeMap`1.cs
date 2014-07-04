@@ -29,7 +29,7 @@
  */
 using System.Collections.Generic;
 using Antlr4.Runtime.Dfa;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Dfa
 {
@@ -159,9 +159,9 @@ namespace Antlr4.Runtime.Dfa
         {
             if (IsEmpty)
             {
-                return Sharpen.Collections.EmptyMap();
+                return Antlr4.Runtime.Sharpen.Collections.EmptyMap();
             }
-            return Sharpen.Collections.SingletonMap(key, value);
+            return Antlr4.Runtime.Sharpen.Collections.SingletonMap(key, value);
         }
     }
 }

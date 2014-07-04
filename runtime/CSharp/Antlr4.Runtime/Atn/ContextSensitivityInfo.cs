@@ -29,7 +29,7 @@
  */
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -43,19 +43,19 @@ namespace Antlr4.Runtime.Atn
     /// equal to the minimum represented alternative in the conflicting SLL
     /// configuration set. Grammars and inputs which result in this scenario are
     /// unable to use
-    /// <see cref="PredictionMode.Sll">PredictionMode.Sll</see>
+    /// <see cref="PredictionMode.Sll"/>
     /// , which in turn means they cannot use
     /// the two-stage parsing strategy to improve parsing performance for that
     /// input.</p>
     /// </remarks>
-    /// <seealso cref="ParserATNSimulator.ReportContextSensitivity(Antlr4.Runtime.Dfa.DFA, int, SimulatorState, int, int)">ParserATNSimulator.ReportContextSensitivity(Antlr4.Runtime.Dfa.DFA, int, SimulatorState, int, int)</seealso>
-    /// <seealso cref="Antlr4.Runtime.IParserErrorListener.ReportContextSensitivity(Antlr4.Runtime.Parser, Antlr4.Runtime.Dfa.DFA, int, int, int, SimulatorState)">Antlr4.Runtime.IParserErrorListener.ReportContextSensitivity(Antlr4.Runtime.Parser, Antlr4.Runtime.Dfa.DFA, int, int, int, SimulatorState)</seealso>
+    /// <seealso cref="ParserATNSimulator.ReportContextSensitivity(Antlr4.Runtime.Dfa.DFA, int, SimulatorState, int, int)"/>
+    /// <seealso cref="Antlr4.Runtime.IParserErrorListener.ReportContextSensitivity(Antlr4.Runtime.Parser, Antlr4.Runtime.Dfa.DFA, int, int, int, SimulatorState)"/>
     /// <since>4.3</since>
     public class ContextSensitivityInfo : DecisionEventInfo
     {
         /// <summary>
         /// Constructs a new instance of the
-        /// <see cref="ContextSensitivityInfo">ContextSensitivityInfo</see>
+        /// <see cref="ContextSensitivityInfo"/>
         /// class
         /// with the specified detailed context sensitivity information.
         /// </summary>

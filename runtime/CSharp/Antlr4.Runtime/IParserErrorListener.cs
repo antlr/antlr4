@@ -30,7 +30,7 @@
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
@@ -47,9 +47,9 @@ namespace Antlr4.Runtime
         /// results in an ambiguity.
         /// <p>Each full-context prediction which does not result in a syntax error
         /// will call either
-        /// <see cref="ReportContextSensitivity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, int, Antlr4.Runtime.Atn.SimulatorState)">ReportContextSensitivity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, int, Antlr4.Runtime.Atn.SimulatorState)</see>
+        /// <see cref="ReportContextSensitivity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, int, Antlr4.Runtime.Atn.SimulatorState)"/>
         /// or
-        /// <see cref="ReportAmbiguity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, Sharpen.BitSet, Antlr4.Runtime.Atn.ATNConfigSet)">ReportAmbiguity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, Sharpen.BitSet, Antlr4.Runtime.Atn.ATNConfigSet)</see>
+        /// <see cref="ReportAmbiguity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, Antlr4.Runtime.Sharpen.BitSet, Antlr4.Runtime.Atn.ATNConfigSet)"/>
         /// .</p>
         /// <p>
         /// When
@@ -58,7 +58,7 @@ namespace Antlr4.Runtime
         /// viable alternatives identified by the prediction algorithm. When
         /// <code>ambigAlts</code>
         /// is null, use
-        /// <see cref="Antlr4.Runtime.Atn.ATNConfigSet.RepresentedAlternatives()">Antlr4.Runtime.Atn.ATNConfigSet.RepresentedAlternatives()</see>
+        /// <see cref="Antlr4.Runtime.Atn.ATNConfigSet.RepresentedAlternatives()"/>
         /// to obtain the represented
         /// alternatives from the
         /// <code>configs</code>
@@ -79,7 +79,7 @@ namespace Antlr4.Runtime
         /// least the <em>minimum</em> potentially viable alternative is truly
         /// viable.</p>
         /// <p>When the
-        /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection">Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection</see>
+        /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection"/>
         /// prediction
         /// mode is used, the parser is required to identify exact ambiguities so
         /// <code>exact</code>
@@ -99,7 +99,7 @@ namespace Antlr4.Runtime
         /// . This is always
         /// <code>true</code>
         /// when
-        /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection">Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection</see>
+        /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection"/>
         /// is used.
         /// </param>
         /// <param name="ambigAlts">
@@ -158,13 +158,13 @@ namespace Antlr4.Runtime
         /// unique result.
         /// <p>Each full-context prediction which does not result in a syntax error
         /// will call either
-        /// <see cref="ReportContextSensitivity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, int, Antlr4.Runtime.Atn.SimulatorState)">ReportContextSensitivity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, int, Antlr4.Runtime.Atn.SimulatorState)</see>
+        /// <see cref="ReportContextSensitivity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, int, Antlr4.Runtime.Atn.SimulatorState)"/>
         /// or
-        /// <see cref="ReportAmbiguity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, Sharpen.BitSet, Antlr4.Runtime.Atn.ATNConfigSet)">ReportAmbiguity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, Sharpen.BitSet, Antlr4.Runtime.Atn.ATNConfigSet)</see>
+        /// <see cref="ReportAmbiguity(Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, Antlr4.Runtime.Sharpen.BitSet, Antlr4.Runtime.Atn.ATNConfigSet)"/>
         /// .</p>
         /// <p>For prediction implementations that only evaluate full-context
         /// predictions when an SLL conflict is found (including the default
-        /// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator">Antlr4.Runtime.Atn.ParserATNSimulator</see>
+        /// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator"/>
         /// implementation), this method reports cases
         /// where SLL conflicts were resolved to unique full-context predictions,
         /// i.e. the decision was context-sensitive. This report does not necessarily
@@ -180,7 +180,7 @@ namespace Antlr4.Runtime
         /// argument.</p>
         /// <p>Note that the definition of "context sensitivity" in this method
         /// differs from the concept in
-        /// <see cref="Antlr4.Runtime.Atn.DecisionInfo.contextSensitivities">Antlr4.Runtime.Atn.DecisionInfo.contextSensitivities</see>
+        /// <see cref="Antlr4.Runtime.Atn.DecisionInfo.contextSensitivities"/>
         /// .
         /// This method reports all instances where an SLL conflict occurred but LL
         /// parsing produced a unique result, whether or not that unique result

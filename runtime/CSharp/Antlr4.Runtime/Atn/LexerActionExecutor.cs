@@ -30,7 +30,7 @@
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -44,7 +44,7 @@ namespace Antlr4.Runtime.Atn
     /// <p>The executor tracks position information for position-dependent lexer actions
     /// efficiently, ensuring that actions appearing only at the end of the rule do
     /// not cause bloating of the
-    /// <see cref="Antlr4.Runtime.Dfa.DFA">Antlr4.Runtime.Dfa.DFA</see>
+    /// <see cref="Antlr4.Runtime.Dfa.DFA"/>
     /// created for the lexer.</p>
     /// </remarks>
     /// <author>Sam Harwell</author>
@@ -56,17 +56,17 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Caches the result of
-        /// <see cref="hashCode">hashCode</see>
+        /// <see cref="hashCode"/>
         /// since the hash code is an element
         /// of the performance-critical
-        /// <see cref="LexerATNConfig#hashCode">LexerATNConfig#hashCode</see>
+        /// <see cref="LexerATNConfig#hashCode"/>
         /// operation.
         /// </summary>
         private readonly int hashCode;
 
         /// <summary>
         /// Constructs an executor for a sequence of
-        /// <see cref="ILexerAction">ILexerAction</see>
+        /// <see cref="ILexerAction"/>
         /// actions.
         /// </summary>
         /// <param name="lexerActions">The lexer actions to execute.</param>
@@ -83,7 +83,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Creates a
-        /// <see cref="LexerActionExecutor">LexerActionExecutor</see>
+        /// <see cref="LexerActionExecutor"/>
         /// which executes the actions for
         /// the input
         /// <code>lexerActionExecutor</code>
@@ -94,7 +94,7 @@ namespace Antlr4.Runtime.Atn
         /// <param name="lexerActionExecutor">
         /// The executor for actions already traversed by
         /// the lexer while matching a token within a particular
-        /// <see cref="ATNConfig">ATNConfig</see>
+        /// <see cref="ATNConfig"/>
         /// . If this is
         /// <code>null</code>
         /// , the method behaves as though
@@ -108,7 +108,7 @@ namespace Antlr4.Runtime.Atn
         /// </param>
         /// <returns>
         /// A
-        /// <see cref="LexerActionExecutor">LexerActionExecutor</see>
+        /// <see cref="LexerActionExecutor"/>
         /// for executing the combine actions
         /// of
         /// <code>lexerActionExecutor</code>
@@ -130,17 +130,17 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Creates a
-        /// <see cref="LexerActionExecutor">LexerActionExecutor</see>
+        /// <see cref="LexerActionExecutor"/>
         /// which encodes the current offset
         /// for position-dependent lexer actions.
         /// <p>Normally, when the executor encounters lexer actions where
-        /// <see cref="ILexerAction.IsPositionDependent()">ILexerAction.IsPositionDependent()</see>
+        /// <see cref="ILexerAction.IsPositionDependent()"/>
         /// returns
         /// <code>true</code>
         /// , it calls
-        /// <see cref="Antlr4.Runtime.IIntStream.Seek(int)">Antlr4.Runtime.IIntStream.Seek(int)</see>
+        /// <see cref="Antlr4.Runtime.IIntStream.Seek(int)"/>
         /// on the input
-        /// <see cref="Antlr4.Runtime.ICharStream">Antlr4.Runtime.ICharStream</see>
+        /// <see cref="Antlr4.Runtime.ICharStream"/>
         /// to set the input
         /// position to the <em>end</em> of the current token. This behavior provides
         /// for efficient DFA representation of lexer actions which appear at the end
@@ -164,7 +164,7 @@ namespace Antlr4.Runtime.Atn
         /// </param>
         /// <returns>
         /// A
-        /// <see cref="LexerActionExecutor">LexerActionExecutor</see>
+        /// <see cref="LexerActionExecutor"/>
         /// which stores input stream offsets
         /// for all position-dependent lexer actions.
         /// </returns>
@@ -203,16 +203,16 @@ namespace Antlr4.Runtime.Atn
         /// <summary>
         /// Execute the actions encapsulated by this executor within the context of a
         /// particular
-        /// <see cref="Antlr4.Runtime.Lexer">Antlr4.Runtime.Lexer</see>
+        /// <see cref="Antlr4.Runtime.Lexer"/>
         /// .
         /// <p>This method calls
-        /// <see cref="Antlr4.Runtime.IIntStream.Seek(int)">Antlr4.Runtime.IIntStream.Seek(int)</see>
+        /// <see cref="Antlr4.Runtime.IIntStream.Seek(int)"/>
         /// to set the position of the
         /// <code>input</code>
         /// 
-        /// <see cref="Antlr4.Runtime.ICharStream">Antlr4.Runtime.ICharStream</see>
+        /// <see cref="Antlr4.Runtime.ICharStream"/>
         /// prior to calling
-        /// <see cref="ILexerAction.Execute(Antlr4.Runtime.Lexer)">ILexerAction.Execute(Antlr4.Runtime.Lexer)</see>
+        /// <see cref="ILexerAction.Execute(Antlr4.Runtime.Lexer)"/>
         /// on a position-dependent action. Before the
         /// method returns, the input position will be restored to the same position
         /// it was in when the method was invoked.</p>
@@ -221,7 +221,7 @@ namespace Antlr4.Runtime.Atn
         /// <param name="input">
         /// The input stream which is the source for the current token.
         /// When this method is called, the current
-        /// <see cref="Antlr4.Runtime.IIntStream.Index()">Antlr4.Runtime.IIntStream.Index()</see>
+        /// <see cref="Antlr4.Runtime.IIntStream.Index()"/>
         /// for
         /// <code>input</code>
         /// should be the start of the following token, i.e. 1
@@ -229,7 +229,7 @@ namespace Antlr4.Runtime.Atn
         /// </param>
         /// <param name="startIndex">
         /// The token start index. This value may be passed to
-        /// <see cref="Antlr4.Runtime.IIntStream.Seek(int)">Antlr4.Runtime.IIntStream.Seek(int)</see>
+        /// <see cref="Antlr4.Runtime.IIntStream.Seek(int)"/>
         /// to set the
         /// <code>input</code>
         /// position to the beginning

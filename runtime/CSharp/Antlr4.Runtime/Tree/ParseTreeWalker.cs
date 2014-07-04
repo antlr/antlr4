@@ -28,8 +28,8 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using Antlr4.Runtime;
+using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree;
-using Sharpen;
 
 namespace Antlr4.Runtime.Tree
 {
@@ -64,9 +64,9 @@ namespace Antlr4.Runtime.Tree
 
         /// <summary>
         /// The discovery of a rule node, involves sending two events: the generic
-        /// <see cref="IParseTreeListener.EnterEveryRule(Antlr4.Runtime.ParserRuleContext)">IParseTreeListener.EnterEveryRule(Antlr4.Runtime.ParserRuleContext)</see>
+        /// <see cref="IParseTreeListener.EnterEveryRule(Antlr4.Runtime.ParserRuleContext)"/>
         /// and a
-        /// <see cref="Antlr4.Runtime.RuleContext">Antlr4.Runtime.RuleContext</see>
+        /// <see cref="Antlr4.Runtime.RuleContext"/>
         /// -specific event. First we trigger the generic and then
         /// the rule specific. We to them in reverse order upon finishing the node.
         /// </summary>

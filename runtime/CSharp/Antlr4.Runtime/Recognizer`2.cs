@@ -32,7 +32,7 @@ using System.Collections.Generic;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
@@ -102,7 +102,7 @@ namespace Antlr4.Runtime
                     {
                         result = Utils.ToMap(tokenNames);
                         result.Put("EOF", TokenConstants.Eof);
-                        result = Sharpen.Collections.UnmodifiableMap(result);
+                        result = Antlr4.Runtime.Sharpen.Collections.UnmodifiableMap(result);
                         tokenTypeMapCache.Put(tokenNames, result);
                     }
                     return result;
@@ -129,7 +129,7 @@ namespace Antlr4.Runtime
                     IDictionary<string, int> result = ruleIndexMapCache.Get(ruleNames);
                     if (result == null)
                     {
-                        result = Sharpen.Collections.UnmodifiableMap(Utils.ToMap(ruleNames));
+                        result = Antlr4.Runtime.Sharpen.Collections.UnmodifiableMap(Utils.ToMap(ruleNames));
                         ruleIndexMapCache.Put(ruleNames, result);
                     }
                     return result;
@@ -177,12 +177,12 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Get the
-        /// <see cref="Antlr4.Runtime.Atn.ATN">Antlr4.Runtime.Atn.ATN</see>
+        /// <see cref="Antlr4.Runtime.Atn.ATN"/>
         /// used by the recognizer for prediction.
         /// </summary>
         /// <returns>
         /// The
-        /// <see cref="Antlr4.Runtime.Atn.ATN">Antlr4.Runtime.Atn.ATN</see>
+        /// <see cref="Antlr4.Runtime.Atn.ATN"/>
         /// used by the recognizer for prediction.
         /// </returns>
         public virtual ATN Atn

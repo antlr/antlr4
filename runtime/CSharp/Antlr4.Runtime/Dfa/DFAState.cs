@@ -33,7 +33,7 @@ using System.Text;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Dfa
 {
@@ -84,9 +84,9 @@ namespace Antlr4.Runtime.Dfa
         /// <summary>
         /// if accept state, what ttype do we match or alt do we predict?
         /// This is set to
-        /// <see cref="Antlr4.Runtime.Atn.ATN.InvalidAltNumber">Antlr4.Runtime.Atn.ATN.InvalidAltNumber</see>
+        /// <see cref="Antlr4.Runtime.Atn.ATN.InvalidAltNumber"/>
         /// when
-        /// <see cref="predicates">predicates</see>
+        /// <see cref="predicates"/>
         /// <code>!=null</code>
         /// .
         /// </summary>
@@ -106,7 +106,7 @@ namespace Antlr4.Runtime.Dfa
 
         /// <summary>
         /// This list is computed by
-        /// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.PredicateDFAState(DFAState, Antlr4.Runtime.Atn.ATNConfigSet, int)">Antlr4.Runtime.Atn.ParserATNSimulator.PredicateDFAState(DFAState, Antlr4.Runtime.Atn.ATNConfigSet, int)</see>
+        /// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.PredicateDFAState(DFAState, Antlr4.Runtime.Atn.ATNConfigSet, int)"/>
         /// .
         /// </summary>
         [Nullable]
@@ -212,7 +212,7 @@ namespace Antlr4.Runtime.Dfa
             {
                 if (edges == null)
                 {
-                    return Sharpen.Collections.EmptyMap();
+                    return Antlr4.Runtime.Sharpen.Collections.EmptyMap();
                 }
                 return edges.ToMap();
             }
@@ -256,14 +256,14 @@ namespace Antlr4.Runtime.Dfa
             {
                 if (contextEdges == null)
                 {
-                    return Sharpen.Collections.EmptyMap();
+                    return Antlr4.Runtime.Sharpen.Collections.EmptyMap();
                 }
                 IDictionary<int, DFAState> map = contextEdges.ToMap();
                 if (map.ContainsKey(-1))
                 {
                     if (map.Count == 1)
                     {
-                        return Sharpen.Collections.SingletonMap(PredictionContext.EmptyFullStateKey, map.Get(-1));
+                        return Antlr4.Runtime.Sharpen.Collections.SingletonMap(PredictionContext.EmptyFullStateKey, map.Get(-1));
                     }
                     else
                     {
@@ -293,17 +293,17 @@ namespace Antlr4.Runtime.Dfa
 
         /// <summary>
         /// Two
-        /// <see cref="DFAState">DFAState</see>
+        /// <see cref="DFAState"/>
         /// instances are equal if their ATN configuration sets
         /// are the same. This method is used to see if a state already exists.
         /// <p>Because the number of alternatives and number of ATN configurations are
         /// finite, there is a finite number of DFA states that can be processed.
         /// This is necessary to show that the algorithm terminates.</p>
         /// <p>Cannot test the DFA state numbers here because in
-        /// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.AddDFAState(DFA, Antlr4.Runtime.Atn.ATNConfigSet, Antlr4.Runtime.Atn.PredictionContextCache)">Antlr4.Runtime.Atn.ParserATNSimulator.AddDFAState(DFA, Antlr4.Runtime.Atn.ATNConfigSet, Antlr4.Runtime.Atn.PredictionContextCache)</see>
+        /// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.AddDFAState(DFA, Antlr4.Runtime.Atn.ATNConfigSet, Antlr4.Runtime.Atn.PredictionContextCache)"/>
         /// we need to know if any other state
         /// exists that has this exact set of ATN configurations. The
-        /// <see cref="stateNumber">stateNumber</see>
+        /// <see cref="stateNumber"/>
         /// is irrelevant.</p>
         /// </summary>
         public override bool Equals(object o)

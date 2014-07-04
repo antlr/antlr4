@@ -28,7 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using Antlr4.Runtime;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
@@ -37,16 +37,16 @@ namespace Antlr4.Runtime
     {
         /// <summary>
         /// Provides a default instance of
-        /// <see cref="ConsoleErrorListener">ConsoleErrorListener</see>
+        /// <see cref="ConsoleErrorListener"/>
         /// .
         /// </summary>
         public static readonly ConsoleErrorListener Instance = new ConsoleErrorListener();
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>
         /// This implementation prints messages to
-        /// <see cref="System.Console.Error">System.Console.Error</see>
+        /// <see cref="System.Console.Error"/>
         /// containing the
         /// values of
         /// <code>line</code>

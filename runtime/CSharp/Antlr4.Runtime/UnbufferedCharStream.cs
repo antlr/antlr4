@@ -31,7 +31,7 @@ using System;
 using System.IO;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
@@ -258,7 +258,7 @@ namespace Antlr4.Runtime
         /// <see cref="input">input</see>
         /// .
         /// </summary>
-        /// <exception cref="System.IO.IOException"></exception>
+        /// <exception cref="System.IO.IOException"/>
         protected internal virtual int NextChar()
         {
             return input.Read();
@@ -321,7 +321,7 @@ namespace Antlr4.Runtime
 
         /// <summary>Decrement number of markers, resetting buffer if we hit 0.</summary>
         /// <remarks>Decrement number of markers, resetting buffer if we hit 0.</remarks>
-        /// <param name="marker"></param>
+        /// <param name="marker"/>
         public virtual void Release(int marker)
         {
             int expectedMark = -numMarkers;

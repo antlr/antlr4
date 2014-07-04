@@ -33,7 +33,7 @@ using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -162,52 +162,52 @@ namespace Antlr4.Runtime.Atn
     /// All instances of the same parser share the same decision DFAs through a
     /// static field. Each instance gets its own ATN simulator but they share the
     /// same
-    /// <see cref="ATN.decisionToDFA">ATN.decisionToDFA</see>
+    /// <see cref="ATN.decisionToDFA"/>
     /// field. They also share a
-    /// <see cref="PredictionContextCache">PredictionContextCache</see>
+    /// <see cref="PredictionContextCache"/>
     /// object that makes sure that all
-    /// <see cref="PredictionContext">PredictionContext</see>
+    /// <see cref="PredictionContext"/>
     /// objects are shared among the DFA states. This makes
     /// a big size difference.</p>
     /// <p>
     /// <strong>THREAD SAFETY</strong></p>
     /// <p>
     /// The
-    /// <see cref="ParserATNSimulator">ParserATNSimulator</see>
+    /// <see cref="ParserATNSimulator"/>
     /// locks on the
-    /// <see cref="ATN.decisionToDFA">ATN.decisionToDFA</see>
+    /// <see cref="ATN.decisionToDFA"/>
     /// field when
     /// it adds a new DFA object to that array.
-    /// <see cref="AddDFAEdge(Antlr4.Runtime.Dfa.DFAState, int, Antlr4.Runtime.Dfa.DFAState)">AddDFAEdge(Antlr4.Runtime.Dfa.DFAState, int, Antlr4.Runtime.Dfa.DFAState)</see>
+    /// <see cref="AddDFAEdge(Antlr4.Runtime.Dfa.DFAState, int, Antlr4.Runtime.Dfa.DFAState)"/>
     /// locks on the DFA for the current decision when setting the
-    /// <see cref="DFAState#edges">DFAState#edges</see>
+    /// <see cref="DFAState#edges"/>
     /// field.
-    /// <see cref="AddDFAState(Antlr4.Runtime.Dfa.DFA, ATNConfigSet, PredictionContextCache)">AddDFAState(Antlr4.Runtime.Dfa.DFA, ATNConfigSet, PredictionContextCache)</see>
+    /// <see cref="AddDFAState(Antlr4.Runtime.Dfa.DFA, ATNConfigSet, PredictionContextCache)"/>
     /// locks on
     /// the DFA for the current decision when looking up a DFA state to see if it
     /// already exists. We must make sure that all requests to add DFA states that
     /// are equivalent result in the same shared DFA object. This is because lots of
     /// threads will be trying to update the DFA at once. The
-    /// <see cref="AddDFAState(Antlr4.Runtime.Dfa.DFA, ATNConfigSet, PredictionContextCache)">AddDFAState(Antlr4.Runtime.Dfa.DFA, ATNConfigSet, PredictionContextCache)</see>
+    /// <see cref="AddDFAState(Antlr4.Runtime.Dfa.DFA, ATNConfigSet, PredictionContextCache)"/>
     /// method also locks inside the DFA lock
     /// but this time on the shared context cache when it rebuilds the
     /// configurations'
-    /// <see cref="PredictionContext">PredictionContext</see>
+    /// <see cref="PredictionContext"/>
     /// objects using cached
     /// subgraphs/nodes. No other locking occurs, even during DFA simulation. This is
     /// safe as long as we can guarantee that all threads referencing
     /// <code>s.edge[t]</code>
     /// get the same physical target
-    /// <see cref="Antlr4.Runtime.Dfa.DFAState">Antlr4.Runtime.Dfa.DFAState</see>
+    /// <see cref="Antlr4.Runtime.Dfa.DFAState"/>
     /// , or
     /// <code>null</code>
     /// . Once into the DFA, the DFA simulation does not reference the
-    /// <see cref="Antlr4.Runtime.Dfa.DFA.states">Antlr4.Runtime.Dfa.DFA.states</see>
+    /// <see cref="Antlr4.Runtime.Dfa.DFA.states"/>
     /// map. It follows the
-    /// <see cref="DFAState#edges">DFAState#edges</see>
+    /// <see cref="DFAState#edges"/>
     /// field to new
     /// targets. The DFA simulator will either find
-    /// <see cref="DFAState#edges">DFAState#edges</see>
+    /// <see cref="DFAState#edges"/>
     /// to be
     /// <code>null</code>
     /// , to be non-
@@ -217,7 +217,7 @@ namespace Antlr4.Runtime.Atn
     /// null, or
     /// <code>dfa.edges[t]</code>
     /// to be non-null. The
-    /// <see cref="AddDFAEdge(Antlr4.Runtime.Dfa.DFAState, int, Antlr4.Runtime.Dfa.DFAState)">AddDFAEdge(Antlr4.Runtime.Dfa.DFAState, int, Antlr4.Runtime.Dfa.DFAState)</see>
+    /// <see cref="AddDFAEdge(Antlr4.Runtime.Dfa.DFAState, int, Antlr4.Runtime.Dfa.DFAState)"/>
     /// method could be racing to set the field
     /// but in either case the DFA simulator works; if
     /// <code>null</code>
@@ -234,7 +234,7 @@ namespace Antlr4.Runtime.Atn
     /// point in doing full LL, which is slower. We only have to try LL if we get a
     /// syntax error. For maximum speed, Sam starts the parser set to pure SLL
     /// mode with the
-    /// <see cref="Antlr4.Runtime.BailErrorStrategy">Antlr4.Runtime.BailErrorStrategy</see>
+    /// <see cref="Antlr4.Runtime.BailErrorStrategy"/>
     /// :</p>
     /// <pre>
     /// parser.
@@ -242,13 +242,13 @@ namespace Antlr4.Runtime.Atn
     /// .
     /// <see cref="PredictionMode(PredictionMode)">setPredictionMode</see>
     /// <code>(</code>
-    /// <see cref="PredictionMode.Sll">PredictionMode.Sll</see>
+    /// <see cref="PredictionMode.Sll"/>
     /// <code>)</code>
     /// ;
     /// parser.
     /// <see cref="Antlr4.Runtime.Parser.ErrorHandler(IAntlrErrorStrategy)">setErrorHandler</see>
     /// (new
-    /// <see cref="Antlr4.Runtime.BailErrorStrategy">Antlr4.Runtime.BailErrorStrategy</see>
+    /// <see cref="Antlr4.Runtime.BailErrorStrategy"/>
     /// ());
     /// </pre>
     /// <p>
@@ -271,31 +271,31 @@ namespace Antlr4.Runtime.Atn
     /// alternatives.</p>
     /// <p>
     /// Let's say we have a set of SLL conflicting alternatives
-    /// <code></code>
+    /// <code/>
     /// 
     /// 1, 2, 3}} and
     /// a smaller LL set called <em>s</em>. If <em>s</em> is
-    /// <code></code>
+    /// <code/>
     /// 
     /// 2, 3}}, then SLL
     /// parsing will get an error because SLL will pursue alternative 1. If
     /// <em>s</em> is
-    /// <code></code>
+    /// <code/>
     /// 
     /// 1, 2}} or
-    /// <code></code>
+    /// <code/>
     /// 
     /// 1, 3}} then both SLL and LL will
     /// choose the same alternative because alternative one is the minimum of either
     /// set. If <em>s</em> is
-    /// <code></code>
+    /// <code/>
     /// 
     /// 2}} or
-    /// <code></code>
+    /// <code/>
     /// 
     /// 3}} then SLL will get a syntax
     /// error. If <em>s</em> is
-    /// <code></code>
+    /// <code/>
     /// 
     /// 1}} then SLL will succeed.</p>
     /// <p>
@@ -357,7 +357,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>true</code>
         /// , ambiguous alternatives are reported when they are
         /// encountered within
-        /// <see cref="ExecATN(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.ITokenStream, int, SimulatorState)">ExecATN(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.ITokenStream, int, SimulatorState)</see>
+        /// <see cref="ExecATN(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.ITokenStream, int, SimulatorState)"/>
         /// . When
         /// <code>false</code>
         /// , these messages
@@ -875,15 +875,15 @@ namespace Antlr4.Runtime.Atn
         /// <summary>
         /// This method is used to improve the localization of error messages by
         /// choosing an alternative rather than throwing a
-        /// <see cref="Antlr4.Runtime.NoViableAltException">Antlr4.Runtime.NoViableAltException</see>
+        /// <see cref="Antlr4.Runtime.NoViableAltException"/>
         /// in particular prediction scenarios where the
-        /// <see cref="ATNSimulator.Error">ATNSimulator.Error</see>
+        /// <see cref="ATNSimulator.Error"/>
         /// state was reached during ATN simulation.
         /// <p>
         /// The default implementation of this method uses the following
         /// algorithm to identify an ATN configuration which successfully parsed the
         /// decision entry rule. Choosing such an alternative ensures that the
-        /// <see cref="Antlr4.Runtime.ParserRuleContext">Antlr4.Runtime.ParserRuleContext</see>
+        /// <see cref="Antlr4.Runtime.ParserRuleContext"/>
         /// returned by the calling rule will be complete
         /// and valid, and the syntax error will be reported later at a more
         /// localized location.</p>
@@ -892,7 +892,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>configs</code>
         /// reached the end of the
         /// decision rule, return
-        /// <see cref="ATN.InvalidAltNumber">ATN.InvalidAltNumber</see>
+        /// <see cref="ATN.InvalidAltNumber"/>
         /// .</li>
         /// <li>If all configurations in
         /// <code>configs</code>
@@ -918,16 +918,16 @@ namespace Antlr4.Runtime.Atn
         /// <p>
         /// In some scenarios, the algorithm described above could predict an
         /// alternative which will result in a
-        /// <see cref="Antlr4.Runtime.FailedPredicateException">Antlr4.Runtime.FailedPredicateException</see>
+        /// <see cref="Antlr4.Runtime.FailedPredicateException"/>
         /// in
         /// parser. Specifically, this could occur if the <em>only</em> configuration
         /// capable of successfully parsing to the end of the decision rule is
         /// blocked by a semantic predicate. By choosing this alternative within
-        /// <see cref="AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)">AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)</see>
+        /// <see cref="AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)"/>
         /// instead of throwing a
-        /// <see cref="Antlr4.Runtime.NoViableAltException">Antlr4.Runtime.NoViableAltException</see>
+        /// <see cref="Antlr4.Runtime.NoViableAltException"/>
         /// , the resulting
-        /// <see cref="Antlr4.Runtime.FailedPredicateException">Antlr4.Runtime.FailedPredicateException</see>
+        /// <see cref="Antlr4.Runtime.FailedPredicateException"/>
         /// in the parser will identify the specific
         /// predicate which is preventing the parser from successfully parsing the
         /// decision rule, which helps developers identify and correct logic errors
@@ -936,7 +936,7 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="input">
         /// The input
-        /// <see cref="Antlr4.Runtime.ITokenStream">Antlr4.Runtime.ITokenStream</see>
+        /// <see cref="Antlr4.Runtime.ITokenStream"/>
         /// </param>
         /// <param name="startIndex">
         /// The start index for the current prediction, which is
@@ -947,17 +947,17 @@ namespace Antlr4.Runtime.Atn
         /// </param>
         /// <param name="previous">
         /// The ATN simulation state immediately before the
-        /// <see cref="ATNSimulator.Error">ATNSimulator.Error</see>
+        /// <see cref="ATNSimulator.Error"/>
         /// state was reached
         /// </param>
         /// <returns>
         /// The value to return from
-        /// <see cref="AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)">AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)</see>
+        /// <see cref="AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)"/>
         /// , or
-        /// <see cref="ATN.InvalidAltNumber">ATN.InvalidAltNumber</see>
+        /// <see cref="ATN.InvalidAltNumber"/>
         /// if a suitable alternative was not
         /// identified and
-        /// <see cref="AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)">AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)</see>
+        /// <see cref="AdaptivePredict(Antlr4.Runtime.ITokenStream, int, Antlr4.Runtime.ParserRuleContext)"/>
         /// should report an error instead.
         /// </returns>
         protected internal virtual int HandleNoViableAlt(ITokenStream input, int startIndex, SimulatorState previous)
@@ -1108,12 +1108,12 @@ namespace Antlr4.Runtime.Atn
         /// Compute a target state for an edge in the DFA, and attempt to add the
         /// computed state and corresponding edge to the DFA.
         /// </remarks>
-        /// <param name="dfa"></param>
+        /// <param name="dfa"/>
         /// <param name="s">The current DFA state</param>
-        /// <param name="remainingGlobalContext"></param>
+        /// <param name="remainingGlobalContext"/>
         /// <param name="t">The next input symbol</param>
-        /// <param name="useContext"></param>
-        /// <param name="contextCache"></param>
+        /// <param name="useContext"/>
+        /// <param name="contextCache"/>
         /// <returns>
         /// The computed target DFA state for the given input symbol
         /// <code>t</code>
@@ -1121,7 +1121,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>t</code>
         /// does not lead to a valid DFA state, this method
         /// returns
-        /// <see cref="ATNSimulator.Error">ATNSimulator.Error</see>
+        /// <see cref="ATNSimulator.Error"/>
         /// .
         /// </returns>
         [NotNull]
@@ -1230,7 +1230,7 @@ namespace Antlr4.Runtime.Atn
         /// Return a configuration set containing only the configurations from
         /// <code>configs</code>
         /// which are in a
-        /// <see cref="RuleStopState">RuleStopState</see>
+        /// <see cref="RuleStopState"/>
         /// . If all
         /// configurations in
         /// <code>configs</code>
@@ -1242,7 +1242,7 @@ namespace Antlr4.Runtime.Atn
         /// <param name="configs">the configuration set to update</param>
         /// <param name="contextCache">
         /// the
-        /// <see cref="PredictionContext">PredictionContext</see>
+        /// <see cref="PredictionContext"/>
         /// cache
         /// </param>
         /// <returns>
@@ -1432,14 +1432,14 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// This method transforms the start state computed by
-        /// <see cref="ComputeStartState(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.ParserRuleContext, bool)">ComputeStartState(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.ParserRuleContext, bool)</see>
+        /// <see cref="ComputeStartState(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.ParserRuleContext, bool)"/>
         /// to the special start state used by a
         /// precedence DFA for a particular precedence value. The transformation
         /// process applies the following changes to the start state's configuration
         /// set.
         /// <ol>
         /// <li>Evaluate the precedence predicates for each configuration using
-        /// <see cref="SemanticContext.EvalPrecedence(Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}, Antlr4.Runtime.RuleContext)">SemanticContext.EvalPrecedence(Antlr4.Runtime.Recognizer&lt;Symbol, ATNInterpreter&gt;, Antlr4.Runtime.RuleContext)</see>
+        /// <see cref="SemanticContext.EvalPrecedence(Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}, Antlr4.Runtime.RuleContext)"/>
         /// .</li>
         /// <li>Remove all configurations which predict an alternative greater than
         /// 1, for which another configuration that predicts alternative 1 is in the
@@ -1490,14 +1490,14 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="configs">
         /// The configuration set computed by
-        /// <see cref="ComputeStartState(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.ParserRuleContext, bool)">ComputeStartState(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.ParserRuleContext, bool)</see>
+        /// <see cref="ComputeStartState(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.ParserRuleContext, bool)"/>
         /// as the start state for the DFA.
         /// </param>
         /// <returns>
         /// The transformed configuration set representing the start state
         /// for a precedence DFA at a particular precedence level (determined by
         /// calling
-        /// <see cref="Antlr4.Runtime.Parser.Precedence()">Antlr4.Runtime.Parser.Precedence()</see>
+        /// <see cref="Antlr4.Runtime.Parser.Precedence()"/>
         /// ).
         /// </returns>
         [NotNull]
@@ -1700,13 +1700,13 @@ namespace Antlr4.Runtime.Atn
         /// evaluate the following but it may change in the future:</p>
         /// <ul>
         /// <li>Precedence predicates (represented by
-        /// <see cref="PrecedencePredicate">PrecedencePredicate</see>
+        /// <see cref="PrecedencePredicate"/>
         /// ) are not currently evaluated
         /// through this method.</li>
         /// <li>Operator predicates (represented by
-        /// <see cref="AND">AND</see>
+        /// <see cref="AND"/>
         /// and
-        /// <see cref="OR">OR</see>
+        /// <see cref="OR"/>
         /// ) are evaluated as a single semantic
         /// context, rather than evaluating the operands individually.
         /// Implementations which require evaluation results from individual

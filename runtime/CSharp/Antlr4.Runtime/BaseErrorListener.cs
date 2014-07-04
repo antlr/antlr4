@@ -30,13 +30,13 @@
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
     /// <summary>
     /// Provides an empty default implementation of
-    /// <see cref="IANTLRErrorListener{Symbol}">IANTLRErrorListener&lt;Symbol&gt;</see>
+    /// <see cref="IANTLRErrorListener{Symbol}"/>
     /// . The
     /// default implementation of each method does nothing, but can be overridden as
     /// necessary.

@@ -29,7 +29,7 @@
  */
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -45,7 +45,7 @@ namespace Antlr4.Runtime.Atn
     /// determine that the SLL conflict is truly an ambiguity. For example, if none
     /// of the ATN configurations in the conflicting SLL configuration set have
     /// traversed a global follow transition (i.e.
-    /// <see cref="ATNConfig.ReachesIntoOuterContext()">ATNConfig.ReachesIntoOuterContext()</see>
+    /// <see cref="ATNConfig.ReachesIntoOuterContext()"/>
     /// is
     /// <code>false</code>
     /// for all
@@ -56,19 +56,19 @@ namespace Antlr4.Runtime.Atn
     /// configuration set is not equal to the minimum represented alternative in the
     /// conflicting SLL configuration set. Grammars and inputs which result in this
     /// scenario are unable to use
-    /// <see cref="PredictionMode.Sll">PredictionMode.Sll</see>
+    /// <see cref="PredictionMode.Sll"/>
     /// , which in turn means
     /// they cannot use the two-stage parsing strategy to improve parsing performance
     /// for that input.</p>
     /// </remarks>
-    /// <seealso cref="ParserATNSimulator.ReportAmbiguity(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.Dfa.DFAState, int, int, bool, Sharpen.BitSet, ATNConfigSet)">ParserATNSimulator.ReportAmbiguity(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.Dfa.DFAState, int, int, bool, Sharpen.BitSet, ATNConfigSet)</seealso>
-    /// <seealso cref="Antlr4.Runtime.IParserErrorListener.ReportAmbiguity(Antlr4.Runtime.Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, Sharpen.BitSet, ATNConfigSet)">Antlr4.Runtime.IParserErrorListener.ReportAmbiguity(Antlr4.Runtime.Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, Sharpen.BitSet, ATNConfigSet)</seealso>
+    /// <seealso cref="ParserATNSimulator.ReportAmbiguity(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.Dfa.DFAState, int, int, bool, Antlr4.Runtime.Sharpen.BitSet, ATNConfigSet)"/>
+    /// <seealso cref="Antlr4.Runtime.IParserErrorListener.ReportAmbiguity(Antlr4.Runtime.Parser, Antlr4.Runtime.Dfa.DFA, int, int, bool, Antlr4.Runtime.Sharpen.BitSet, ATNConfigSet)"/>
     /// <since>4.3</since>
     public class AmbiguityInfo : DecisionEventInfo
     {
         /// <summary>
         /// Constructs a new instance of the
-        /// <see cref="AmbiguityInfo">AmbiguityInfo</see>
+        /// <see cref="AmbiguityInfo"/>
         /// class with the
         /// specified detailed ambiguity information.
         /// </summary>

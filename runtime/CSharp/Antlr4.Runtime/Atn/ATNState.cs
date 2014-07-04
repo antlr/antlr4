@@ -32,23 +32,23 @@ using System.Collections.Generic;
 using System.Globalization;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
     /// <summary>
     /// The following images show the relation of states and
-    /// <see cref="transitions">transitions</see>
+    /// <see cref="transitions"/>
     /// for various grammar constructs.
     /// <ul>
     /// <li>Solid edges marked with an &#0949; indicate a required
-    /// <see cref="EpsilonTransition">EpsilonTransition</see>
+    /// <see cref="EpsilonTransition"/>
     /// .</li>
     /// <li>Dashed edges indicate locations where any transition derived from
-    /// <see cref="Transition">Transition</see>
+    /// <see cref="Transition"/>
     /// might appear.</li>
     /// <li>Dashed nodes are place holders for either a sequence of linked
-    /// <see cref="BasicState">BasicState</see>
+    /// <see cref="BasicState"/>
     /// states or the inclusion of a block representing a nested
     /// construct in one of the forms below.</li>
     /// <li>Nodes showing multiple outgoing alternatives with a
@@ -95,7 +95,7 @@ namespace Antlr4.Runtime.Atn
     {
         public const int InitialNumTransitions = 4;
 
-        public static readonly IList<string> serializationNames = Sharpen.Collections.UnmodifiableList(Arrays.AsList("INVALID", "BASIC", "RULE_START", "BLOCK_START", "PLUS_BLOCK_START", "STAR_BLOCK_START", "TOKEN_START", "RULE_STOP", "BLOCK_END", "STAR_LOOP_BACK", "STAR_LOOP_ENTRY", "PLUS_LOOP_BACK", "LOOP_END"));
+        public static readonly IList<string> serializationNames = Antlr4.Runtime.Sharpen.Collections.UnmodifiableList(Arrays.AsList("INVALID", "BASIC", "RULE_START", "BLOCK_START", "PLUS_BLOCK_START", "STAR_BLOCK_START", "TOKEN_START", "RULE_STOP", "BLOCK_END", "STAR_LOOP_BACK", "STAR_LOOP_ENTRY", "PLUS_LOOP_BACK", "LOOP_END"));
 
         public const int InvalidStateNumber = -1;
 
@@ -131,13 +131,13 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// For all states except
-        /// <see cref="RuleStopState">RuleStopState</see>
+        /// <see cref="RuleStopState"/>
         /// , this returns the state
         /// number. Returns -1 for stop states.
         /// </summary>
         /// <returns>
         /// -1 for
-        /// <see cref="RuleStopState">RuleStopState</see>
+        /// <see cref="RuleStopState"/>
         /// , otherwise the state number
         /// </returns>
         public virtual int NonStopStateNumber

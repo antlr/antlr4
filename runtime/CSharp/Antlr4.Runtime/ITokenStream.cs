@@ -29,44 +29,44 @@
  */
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
     /// <summary>
     /// An
-    /// <see cref="IIntStream">IIntStream</see>
+    /// <see cref="IIntStream"/>
     /// whose symbols are
-    /// <see cref="IToken">IToken</see>
+    /// <see cref="IToken"/>
     /// instances.
     /// </summary>
     public interface ITokenStream : IIntStream
     {
         /// <summary>
         /// Get the
-        /// <see cref="IToken">IToken</see>
+        /// <see cref="IToken"/>
         /// instance associated with the value returned by
         /// <see cref="IIntStream.La(int)">LA(k)</see>
         /// . This method has the same pre- and post-conditions as
-        /// <see cref="IIntStream.La(int)">IIntStream.La(int)</see>
+        /// <see cref="IIntStream.La(int)"/>
         /// . In addition, when the preconditions of this method
         /// are met, the return value is non-null and the value of
         /// <code>LT(k).getType()==LA(k)</code>
         /// .
         /// </summary>
-        /// <seealso cref="IIntStream.La(int)">IIntStream.La(int)</seealso>
+        /// <seealso cref="IIntStream.La(int)"/>
         [NotNull]
         IToken Lt(int k);
 
         /// <summary>
         /// Gets the
-        /// <see cref="IToken">IToken</see>
+        /// <see cref="IToken"/>
         /// at the specified
         /// <code>index</code>
         /// in the stream. When
         /// the preconditions of this method are met, the return value is non-null.
         /// <p>The preconditions for this method are the same as the preconditions of
-        /// <see cref="IIntStream.Seek(int)">IIntStream.Seek(int)</see>
+        /// <see cref="IIntStream.Seek(int)"/>
         /// . If the behavior of
         /// <code>seek(index)</code>
         /// is
@@ -98,7 +98,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Gets the underlying
-        /// <see cref="ITokenSource">ITokenSource</see>
+        /// <see cref="ITokenSource"/>
         /// which provides tokens for this
         /// stream.
         /// </summary>
@@ -113,7 +113,7 @@ namespace Antlr4.Runtime
         /// . This
         /// method behaves like the following code (including potential exceptions
         /// for violating preconditions of
-        /// <see cref="Get(int)">Get(int)</see>
+        /// <see cref="Get(int)"/>
         /// , but may be optimized by the
         /// specific implementation.
         /// <pre>
@@ -145,9 +145,9 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// Return the text of all tokens in the stream. This method behaves like the
         /// following code, including potential exceptions from the calls to
-        /// <see cref="IIntStream.Size()">IIntStream.Size()</see>
+        /// <see cref="IIntStream.Size()"/>
         /// and
-        /// <see cref="GetText(Antlr4.Runtime.Misc.Interval)">GetText(Antlr4.Runtime.Misc.Interval)</see>
+        /// <see cref="GetText(Antlr4.Runtime.Misc.Interval)"/>
         /// , but may be
         /// optimized by the specific implementation.
         /// <pre>
@@ -167,7 +167,7 @@ namespace Antlr4.Runtime
         /// Return the text of all tokens in the source interval of the specified
         /// context. This method behaves like the following code, including potential
         /// exceptions from the call to
-        /// <see cref="GetText(Antlr4.Runtime.Misc.Interval)">GetText(Antlr4.Runtime.Misc.Interval)</see>
+        /// <see cref="GetText(Antlr4.Runtime.Misc.Interval)"/>
         /// , but may be
         /// optimized by the specific implementation.
         /// <p>If
@@ -208,7 +208,7 @@ namespace Antlr4.Runtime
         /// <code>start</code>
         /// token, the behavior is unspecified.</p>
         /// <p>For streams which ensure that the
-        /// <see cref="IToken.TokenIndex()">IToken.TokenIndex()</see>
+        /// <see cref="IToken.TokenIndex()"/>
         /// method is
         /// accurate for all of its provided tokens, this method behaves like the
         /// following code. Other streams may implement this method in other ways

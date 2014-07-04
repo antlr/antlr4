@@ -28,7 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using Antlr4.Runtime;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
@@ -125,7 +125,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Gets the
-        /// <see cref="ITokenSource">ITokenSource</see>
+        /// <see cref="ITokenSource"/>
         /// which created this token.
         /// </summary>
         ITokenSource TokenSource
@@ -135,7 +135,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Gets the
-        /// <see cref="ICharStream">ICharStream</see>
+        /// <see cref="ICharStream"/>
         /// from which this token was derived.
         /// </summary>
         ICharStream InputStream

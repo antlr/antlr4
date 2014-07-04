@@ -30,7 +30,7 @@
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Sharpen;
+using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -38,7 +38,7 @@ namespace Antlr4.Runtime.Atn
     /// Implements the
     /// <code>channel</code>
     /// lexer action by calling
-    /// <see cref="Antlr4.Runtime.Lexer.Channel(int)">Antlr4.Runtime.Lexer.Channel(int)</see>
+    /// <see cref="Antlr4.Runtime.Lexer.Channel(int)"/>
     /// with the assigned channel.
     /// </summary>
     /// <author>Sam Harwell</author>
@@ -54,7 +54,7 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="channel">
         /// The channel value to pass to
-        /// <see cref="Antlr4.Runtime.Lexer.Channel(int)">Antlr4.Runtime.Lexer.Channel(int)</see>
+        /// <see cref="Antlr4.Runtime.Lexer.Channel(int)"/>
         /// .
         /// </param>
         public LexerChannelAction(int channel)
@@ -64,12 +64,12 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Gets the channel to use for the
-        /// <see cref="Antlr4.Runtime.IToken">Antlr4.Runtime.IToken</see>
+        /// <see cref="Antlr4.Runtime.IToken"/>
         /// created by the lexer.
         /// </summary>
         /// <returns>
         /// The channel to use for the
-        /// <see cref="Antlr4.Runtime.IToken">Antlr4.Runtime.IToken</see>
+        /// <see cref="Antlr4.Runtime.IToken"/>
         /// created by the lexer.
         /// </returns>
         public int Channel
@@ -80,10 +80,10 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        /// <summary><inheritDoc></inheritDoc></summary>
+        /// <summary><inheritDoc/></summary>
         /// <returns>
         /// This method returns
-        /// <see cref="LexerActionType.Channel">LexerActionType.Channel</see>
+        /// <see cref="LexerActionType.Channel"/>
         /// .
         /// </returns>
         public LexerActionType ActionType
@@ -94,7 +94,7 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        /// <summary><inheritDoc></inheritDoc></summary>
+        /// <summary><inheritDoc/></summary>
         /// <returns>
         /// This method returns
         /// <code>false</code>
@@ -109,12 +109,12 @@ namespace Antlr4.Runtime.Atn
         }
 
         /// <summary>
-        /// <inheritDoc></inheritDoc>
+        /// <inheritDoc/>
         /// <p>This action is implemented by calling
-        /// <see cref="Antlr4.Runtime.Lexer.Channel(int)">Antlr4.Runtime.Lexer.Channel(int)</see>
+        /// <see cref="Antlr4.Runtime.Lexer.Channel(int)"/>
         /// with the
         /// value provided by
-        /// <see cref="Channel()">Channel()</see>
+        /// <see cref="Channel()"/>
         /// .</p>
         /// </summary>
         public void Execute(Lexer lexer)

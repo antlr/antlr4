@@ -27,8 +27,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Tree.Pattern;
-using Sharpen;
 
 namespace Antlr4.Runtime.Tree.Pattern
 {
@@ -40,18 +40,18 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// A chunk is either a token tag, a rule tag, or a span of literal text within a
     /// tree pattern.
     /// <p>The method
-    /// <see cref="ParseTreePatternMatcher.Split(string)">ParseTreePatternMatcher.Split(string)</see>
+    /// <see cref="ParseTreePatternMatcher.Split(string)"/>
     /// returns a list of
     /// chunks in preparation for creating a token stream by
-    /// <see cref="ParseTreePatternMatcher.Tokenize(string)">ParseTreePatternMatcher.Tokenize(string)</see>
+    /// <see cref="ParseTreePatternMatcher.Tokenize(string)"/>
     /// . From there, we get a parse
     /// tree from with
-    /// <see cref="ParseTreePatternMatcher.Compile(string, int)">ParseTreePatternMatcher.Compile(string, int)</see>
+    /// <see cref="ParseTreePatternMatcher.Compile(string, int)"/>
     /// . These
     /// chunks are converted to
-    /// <see cref="RuleTagToken">RuleTagToken</see>
+    /// <see cref="RuleTagToken"/>
     /// ,
-    /// <see cref="TokenTagToken">TokenTagToken</see>
+    /// <see cref="TokenTagToken"/>
     /// , or the
     /// regular tokens of the text surrounding the tags.</p>
     /// </remarks>
