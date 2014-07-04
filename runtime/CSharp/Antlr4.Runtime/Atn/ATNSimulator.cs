@@ -51,7 +51,7 @@ namespace Antlr4.Runtime.Atn
         /// <remarks>This is the current serialized UUID.</remarks>
         [System.ObsoleteAttribute(@"Use ATNDeserializer.CheckCondition(bool) instead.")]
         [Obsolete]
-        public static readonly UUID SerializedUuid;
+        public static readonly Guid SerializedUuid;
 
         static ATNSimulator()
         {
@@ -145,7 +145,7 @@ namespace Antlr4.Runtime.Atn
 
         [Obsolete]
         [System.ObsoleteAttribute(@"Use ATNDeserializer.ToUUID(char[], int) instead.")]
-        public static UUID ToUUID(char[] data, int offset)
+        public static Guid ToUUID(char[] data, int offset)
         {
             return ATNDeserializer.ToUUID(data, offset);
         }

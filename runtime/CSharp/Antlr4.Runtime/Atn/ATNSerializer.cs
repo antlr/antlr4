@@ -480,7 +480,7 @@ namespace Antlr4.Runtime.Atn
                 string reason = string.Format("Could not deserialize ATN with version %d (expected %d).", version, ATNDeserializer.SerializedVersion);
                 throw new NotSupportedException(new InvalidClassException(typeof(ATN).FullName, reason));
             }
-            UUID uuid = ATNDeserializer.ToUUID(data, p);
+            Guid uuid = ATNDeserializer.ToUUID(data, p);
             p += 8;
             if (!uuid.Equals(ATNDeserializer.SerializedUuid))
             {
@@ -699,7 +699,7 @@ namespace Antlr4.Runtime.Atn
             return new Antlr4.Runtime.Atn.ATNSerializer(atn, ruleNames, tokenNames).Decode(data);
         }
 
-        private void SerializeUUID(List<int> data, UUID uuid)
+        private void SerializeUUID(List<int> data, Guid uuid)
         {
             SerializeLong(data, uuid.GetLeastSignificantBits());
             SerializeLong(data, uuid.GetMostSignificantBits());

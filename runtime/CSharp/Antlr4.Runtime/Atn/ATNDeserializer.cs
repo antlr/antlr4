@@ -50,7 +50,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>This is the earliest supported serialized UUID.</summary>
         /// <remarks>This is the earliest supported serialized UUID.</remarks>
-        private static readonly UUID BaseSerializedUuid;
+        private static readonly Guid BaseSerializedUuid;
 
         /// <summary>
         /// This UUID indicates an extension of
@@ -59,7 +59,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="ILexerAction"/>
         /// instances.
         /// </summary>
-        private static readonly UUID AddedLexerActions;
+        private static readonly Guid AddedLexerActions;
 
         /// <summary>
         /// This list contains all of the currently supported UUIDs, ordered by when
@@ -69,17 +69,17 @@ namespace Antlr4.Runtime.Atn
         /// This list contains all of the currently supported UUIDs, ordered by when
         /// the feature first appeared in this branch.
         /// </remarks>
-        private static readonly IList<UUID> SupportedUuids;
+        private static readonly IList<Guid> SupportedUuids;
 
         /// <summary>This is the current serialized UUID.</summary>
         /// <remarks>This is the current serialized UUID.</remarks>
-        public static readonly UUID SerializedUuid;
+        public static readonly Guid SerializedUuid;
 
         static ATNDeserializer()
         {
-            BaseSerializedUuid = UUID.FromString("E4178468-DF95-44D0-AD87-F22A5D5FB6D3");
-            AddedLexerActions = UUID.FromString("AB35191A-1603-487E-B75A-479B831EAF6D");
-            SupportedUuids = new List<UUID>();
+            BaseSerializedUuid = Guid.FromString("E4178468-DF95-44D0-AD87-F22A5D5FB6D3");
+            AddedLexerActions = Guid.FromString("AB35191A-1603-487E-B75A-479B831EAF6D");
+            SupportedUuids = new List<Guid>();
             SupportedUuids.Add(BaseSerializedUuid);
             SupportedUuids.Add(AddedLexerActions);
             SerializedUuid = AddedLexerActions;
@@ -105,19 +105,19 @@ namespace Antlr4.Runtime.Atn
         /// <summary>
         /// Determines if a particular serialized representation of an ATN supports
         /// a particular feature, identified by the
-        /// <see cref="Antlr4.Runtime.Sharpen.UUID"/>
+        /// <see cref="System.Guid"/>
         /// used for serializing
         /// the ATN at the time the feature was first introduced.
         /// </summary>
         /// <param name="feature">
         /// The
-        /// <see cref="Antlr4.Runtime.Sharpen.UUID"/>
+        /// <see cref="System.Guid"/>
         /// marking the first time the feature was
         /// supported in the serialized ATN.
         /// </param>
         /// <param name="actualUuid">
         /// The
-        /// <see cref="Antlr4.Runtime.Sharpen.UUID"/>
+        /// <see cref="System.Guid"/>
         /// of the actual serialized ATN which is
         /// currently being deserialized.
         /// </param>
@@ -134,7 +134,7 @@ namespace Antlr4.Runtime.Atn
         /// <code>false</code>
         /// .
         /// </returns>
-        protected internal virtual bool IsFeatureSupported(UUID feature, UUID actualUuid)
+        protected internal virtual bool IsFeatureSupported(Guid feature, Guid actualUuid)
         {
             int featureIndex = SupportedUuids.IndexOf(feature);
             if (featureIndex < 0)
@@ -159,7 +159,7 @@ namespace Antlr4.Runtime.Atn
                 string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with version %d (expected %d).", version, SerializedVersion);
                 throw new NotSupportedException(new InvalidClassException(typeof(ATN).FullName, reason));
             }
-            UUID uuid = ToUUID(data, p);
+            Guid uuid = ToUUID(data, p);
             p += 8;
             if (!SupportedUuids.Contains(uuid))
             {
@@ -1096,11 +1096,11 @@ nextState_break: ;
             return lowOrder | ((long)ToInt32(data, offset + 2) << 32);
         }
 
-        protected internal static UUID ToUUID(char[] data, int offset)
+        protected internal static Guid ToUUID(char[] data, int offset)
         {
             long leastSigBits = ToLong(data, offset);
             long mostSigBits = ToLong(data, offset + 4);
-            return new UUID(mostSigBits, leastSigBits);
+            return new Guid(mostSigBits, leastSigBits);
         }
 
         [NotNull]

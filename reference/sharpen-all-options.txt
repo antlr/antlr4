@@ -143,6 +143,7 @@
 -typeMapping java.util.concurrent.Semaphore System.Threading.Semaphore
 -typeMapping java.util.Enumeration System.Collections.Generic.IEnumeration
 -typeMapping java.lang.ProcessBuilder System.Diagnostics.ProcessStartInfo
+-typeMapping java.util.UUID System.Guid
 -propertyMapping java.lang.Class.getSimpleName Name
 -propertyMapping java.nio.charset.Charset.defaultCharset Default
 -propertyMapping java.util.Locale.getDefault CurrentCulture
