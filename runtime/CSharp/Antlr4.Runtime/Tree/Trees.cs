@@ -152,7 +152,7 @@ namespace Antlr4.Runtime.Tree
             IList<ITree> kids = new List<ITree>();
             for (int i = 0; i < t.ChildCount; i++)
             {
-                kids.AddItem(t.GetChild(i));
+                kids.Add(t.GetChild(i));
             }
             return kids;
         }
@@ -205,7 +205,7 @@ namespace Antlr4.Runtime.Tree
                 ITerminalNode tnode = (ITerminalNode)t;
                 if (tnode.Symbol.Type == index)
                 {
-                    nodes.AddItem(t);
+                    nodes.Add(t);
                 }
             }
             else
@@ -215,7 +215,7 @@ namespace Antlr4.Runtime.Tree
                     ParserRuleContext ctx = (ParserRuleContext)t;
                     if (ctx.RuleIndex == index)
                     {
-                        nodes.AddItem(t);
+                        nodes.Add(t);
                     }
                 }
             }
@@ -229,7 +229,7 @@ namespace Antlr4.Runtime.Tree
         public static IList<IParseTree> Descendants(IParseTree t)
         {
             IList<IParseTree> nodes = new List<IParseTree>();
-            nodes.AddItem(t);
+            nodes.Add(t);
             int n = t.ChildCount;
             for (int i = 0; i < n; i++)
             {

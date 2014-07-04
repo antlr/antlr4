@@ -162,7 +162,7 @@ namespace Antlr4.Runtime.Tree.Xpath
                         }
                         XPathElement pathElement = GetXPathElement(next, anywhere);
                         pathElement.invert = invert;
-                        elements.AddItem(pathElement);
+                        elements.Add(pathElement);
                         i++;
                         break;
                     }
@@ -171,7 +171,7 @@ namespace Antlr4.Runtime.Tree.Xpath
                     case XPathLexer.RuleRef:
                     case XPathLexer.Wildcard:
                     {
-                        elements.AddItem(GetXPathElement(el, false));
+                        elements.Add(GetXPathElement(el, false));
                         i++;
                         break;
                     }

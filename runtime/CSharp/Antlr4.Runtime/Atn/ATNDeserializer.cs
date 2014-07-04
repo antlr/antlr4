@@ -80,8 +80,8 @@ namespace Antlr4.Runtime.Atn
             BaseSerializedUuid = UUID.FromString("E4178468-DF95-44D0-AD87-F22A5D5FB6D3");
             AddedLexerActions = UUID.FromString("AB35191A-1603-487E-B75A-479B831EAF6D");
             SupportedUuids = new List<UUID>();
-            SupportedUuids.AddItem(BaseSerializedUuid);
-            SupportedUuids.AddItem(AddedLexerActions);
+            SupportedUuids.Add(BaseSerializedUuid);
+            SupportedUuids.Add(AddedLexerActions);
             SerializedUuid = AddedLexerActions;
         }
 
@@ -195,14 +195,14 @@ namespace Antlr4.Runtime.Atn
                 {
                     // special case
                     int loopBackStateNumber = ToInt(data[p++]);
-                    loopBackStateNumbers.AddItem(Tuple.Create((LoopEndState)s, loopBackStateNumber));
+                    loopBackStateNumbers.Add(Tuple.Create((LoopEndState)s, loopBackStateNumber));
                 }
                 else
                 {
                     if (s is BlockStartState)
                     {
                         int endStateNumber = ToInt(data[p++]);
-                        endStateNumbers.AddItem(Tuple.Create((BlockStartState)s, endStateNumber));
+                        endStateNumbers.Add(Tuple.Create((BlockStartState)s, endStateNumber));
                     }
                 }
                 atn.AddState(s);
@@ -287,7 +287,7 @@ namespace Antlr4.Runtime.Atn
             for (int i_6 = 0; i_6 < nmodes; i_6++)
             {
                 int s = ToInt(data[p++]);
-                atn.modeToStartState.AddItem((TokensStartState)atn.states[s]);
+                atn.modeToStartState.Add((TokensStartState)atn.states[s]);
             }
             atn.modeToDFA = new DFA[nmodes];
             for (int i_7 = 0; i_7 < nmodes; i_7++)
@@ -304,7 +304,7 @@ namespace Antlr4.Runtime.Atn
                 int nintervals = ToInt(data[p]);
                 p++;
                 IntervalSet set = new IntervalSet();
-                sets.AddItem(set);
+                sets.Add(set);
                 bool containsEof = ToInt(data[p++]) != 0;
                 if (containsEof)
                 {
@@ -409,7 +409,7 @@ namespace Antlr4.Runtime.Atn
             {
                 int s = ToInt(data[p++]);
                 DecisionState decState = (DecisionState)atn.states[s];
-                atn.decisionToState.AddItem(decState);
+                atn.decisionToState.Add(decState);
                 decState.decision = i_11 - 1;
             }
             //
@@ -456,7 +456,7 @@ namespace Antlr4.Runtime.Atn
                             int actionIndex = ((ActionTransition)transition).actionIndex;
                             LexerCustomAction lexerAction = new LexerCustomAction(ruleIndex, actionIndex);
                             state_3.SetTransition(i_10, new ActionTransition(transition.target, ruleIndex, legacyLexerActions.Count, false));
-                            legacyLexerActions.AddItem(lexerAction);
+                            legacyLexerActions.Add(lexerAction);
                         }
                     }
                     atn.lexerActions = Sharpen.Collections.ToArray(legacyLexerActions, new ILexerAction[legacyLexerActions.Count]);
@@ -761,7 +761,7 @@ namespace Antlr4.Runtime.Atn
                     {
                         if (optimizedTransitions != null)
                         {
-                            optimizedTransitions.AddItem(transition);
+                            optimizedTransitions.Add(transition);
                         }
                         continue;
                     }
@@ -771,7 +771,7 @@ namespace Antlr4.Runtime.Atn
                     {
                         if (optimizedTransitions != null)
                         {
-                            optimizedTransitions.AddItem(transition);
+                            optimizedTransitions.Add(transition);
                         }
                         continue;
                     }
@@ -780,7 +780,7 @@ namespace Antlr4.Runtime.Atn
                         optimizedTransitions = new List<Transition>();
                         for (int j = 0; j < i_1; j++)
                         {
-                            optimizedTransitions.AddItem(state.GetOptimizedTransition(i_1));
+                            optimizedTransitions.Add(state.GetOptimizedTransition(i_1));
                         }
                     }
                     inlinedCalls++;
@@ -788,7 +788,7 @@ namespace Antlr4.Runtime.Atn
                     ATNState intermediateState = new BasicState();
                     intermediateState.SetRuleIndex(target.ruleIndex);
                     atn.AddState(intermediateState);
-                    optimizedTransitions.AddItem(new EpsilonTransition(intermediateState));
+                    optimizedTransitions.Add(new EpsilonTransition(intermediateState));
                     switch (effective.TransitionType)
                     {
                         case TransitionType.Atom:
@@ -851,7 +851,7 @@ namespace Antlr4.Runtime.Atn
                     {
                         if (optimizedTransitions != null)
                         {
-                            optimizedTransitions.AddItem(transition);
+                            optimizedTransitions.Add(transition);
                         }
                         goto nextTransition_continue;
                     }
@@ -861,7 +861,7 @@ namespace Antlr4.Runtime.Atn
                         {
                             if (optimizedTransitions != null)
                             {
-                                optimizedTransitions.AddItem(transition);
+                                optimizedTransitions.Add(transition);
                             }
                             goto nextTransition_continue;
                         }
@@ -872,13 +872,13 @@ namespace Antlr4.Runtime.Atn
                         optimizedTransitions = new List<Transition>();
                         for (int j_1 = 0; j_1 < i; j_1++)
                         {
-                            optimizedTransitions.AddItem(state.GetOptimizedTransition(j_1));
+                            optimizedTransitions.Add(state.GetOptimizedTransition(j_1));
                         }
                     }
                     for (int j_2 = 0; j_2 < intermediate.NumberOfOptimizedTransitions; j_2++)
                     {
                         ATNState target = intermediate.GetOptimizedTransition(j_2).target;
-                        optimizedTransitions.AddItem(new EpsilonTransition(target));
+                        optimizedTransitions.Add(new EpsilonTransition(target));
                     }
 nextTransition_continue: ;
                 }
@@ -949,7 +949,7 @@ nextState_break: ;
                 {
                     if (!setTransitions.Contains(i_1))
                     {
-                        optimizedTransitions.AddItem(decision.GetOptimizedTransition(i_1));
+                        optimizedTransitions.Add(decision.GetOptimizedTransition(i_1));
                     }
                 }
                 ATNState blockEndState = decision.GetOptimizedTransition(setTransitions.MinElement).target.GetOptimizedTransition(0).target;
@@ -991,7 +991,7 @@ nextState_break: ;
                 setOptimizedState.SetRuleIndex(decision.ruleIndex);
                 atn.AddState(setOptimizedState);
                 setOptimizedState.AddTransition(newTransition);
-                optimizedTransitions.AddItem(new EpsilonTransition(setOptimizedState));
+                optimizedTransitions.Add(new EpsilonTransition(setOptimizedState));
                 removedPaths += decision.NumberOfOptimizedTransitions - optimizedTransitions.Count;
                 if (decision.IsOptimized)
                 {
@@ -1051,7 +1051,7 @@ nextState_break: ;
             }
             BitSet reachable = new BitSet(atn.states.Count);
             IDeque<ATNState> worklist = new ArrayDeque<ATNState>();
-            worklist.AddItem(transition.followState);
+            worklist.Add(transition.followState);
             while (!worklist.IsEmpty())
             {
                 ATNState state = worklist.Pop();
@@ -1074,7 +1074,7 @@ nextState_break: ;
                     {
                         return false;
                     }
-                    worklist.AddItem(t.target);
+                    worklist.Add(t.target);
                 }
             }
             return true;

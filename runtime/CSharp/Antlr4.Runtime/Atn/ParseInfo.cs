@@ -97,7 +97,7 @@ namespace Antlr4.Runtime.Atn
                 long fallBack = decisions[i].LL_Fallback;
                 if (fallBack > 0)
                 {
-                    Ll.AddItem(i);
+                    Ll.Add(i);
                 }
             }
             return Ll;

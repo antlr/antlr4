@@ -172,7 +172,7 @@ namespace Antlr4.Runtime
             {
                 children = new List<IParseTree>();
             }
-            children.AddItem(t);
+            children.Add(t);
         }
 
         public virtual void AddChild(RuleContext ruleInvocation)
@@ -181,7 +181,7 @@ namespace Antlr4.Runtime
             {
                 children = new List<IParseTree>();
             }
-            children.AddItem(ruleInvocation);
+            children.Add(ruleInvocation);
         }
 
         /// <summary>
@@ -304,7 +304,7 @@ namespace Antlr4.Runtime
                         {
                             tokens = new List<ITerminalNode>();
                         }
-                        tokens.AddItem(tnode);
+                        tokens.Add(tnode);
                     }
                 }
             }
@@ -339,7 +339,7 @@ namespace Antlr4.Runtime
                     {
                         contexts = new List<T>();
                     }
-                    contexts.AddItem(ctxType.Cast(o));
+                    contexts.Add(ctxType.Cast(o));
                 }
             }
             if (contexts == null)

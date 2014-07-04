@@ -90,7 +90,7 @@ namespace Antlr4.Runtime.Misc
         /// <code>o</code>
         /// to set if not there; return existing value if already
         /// there. This method performs the same operation as
-        /// <see cref="Array2DHashSet{T}.AddItem(object)"/>
+        /// <see cref="Array2DHashSet{T}.Add(object)"/>
         /// aside from
         /// the return value.
         /// </summary>
@@ -270,7 +270,7 @@ namespace Antlr4.Runtime.Misc
             System.Diagnostics.Debug.Assert(n == oldSize);
         }
 
-        public bool AddItem(T t)
+        public bool Add(T t)
         {
             T existing = GetOrAdd(t);
             return existing == t;

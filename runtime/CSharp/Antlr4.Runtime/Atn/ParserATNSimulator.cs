@@ -999,7 +999,7 @@ namespace Antlr4.Runtime.Atn
                         {
                             if (config_1.ReachesIntoOuterContext || config_1.State is RuleStopState)
                             {
-                                filteredConfigs.AddItem(config_1);
+                                filteredConfigs.Add(config_1);
                             }
                         }
                         SemanticContext[] altToPred = GetPredsForAmbigAlts(alts, filteredConfigs, maxAlt);
@@ -1151,7 +1151,7 @@ namespace Antlr4.Runtime.Atn
                             {
                                 skippedStopStates = new List<ATNConfig>();
                             }
-                            skippedStopStates.AddItem(c);
+                            skippedStopStates.Add(c);
                         }
                         continue;
                     }
@@ -1350,7 +1350,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     // for each transition
                     ATNState target = p.Transition(ti).target;
-                    reachIntermediate.AddItem(ATNConfig.Create(target, ti + 1, initialContext));
+                    reachIntermediate.Add(ATNConfig.Create(target, ti + 1, initialContext));
                 }
                 bool hasMoreContext = remainingGlobalContext != null;
                 if (!hasMoreContext)
@@ -1626,14 +1626,14 @@ namespace Antlr4.Runtime.Atn
                 // if no (null, i), then no default prediction.
                 if (ambigAlts != null && ambigAlts.Get(i) && pred == SemanticContext.None)
                 {
-                    pairs.AddItem(new DFAState.PredPrediction(pred, i));
+                    pairs.Add(new DFAState.PredPrediction(pred, i));
                 }
                 else
                 {
                     if (pred != SemanticContext.None)
                     {
                         containsPredicate = true;
-                        pairs.AddItem(new DFAState.PredPrediction(pred, i));
+                        pairs.Add(new DFAState.PredPrediction(pred, i));
                     }
                 }
             }
@@ -1817,7 +1817,7 @@ namespace Antlr4.Runtime.Atn
                             continue;
                         }
                     }
-                    if (!t.IsEpsilon && !closureBusy.AddItem(c))
+                    if (!t.IsEpsilon && !closureBusy.Add(c))
                     {
                         // avoid infinite recursion for EOF* and EOF+
                         continue;
@@ -1830,7 +1830,7 @@ namespace Antlr4.Runtime.Atn
                         // track how far we dip into outer context.  Might
                         // come in handy and we avoid evaluating context dependent
                         // preds if this is > 0.
-                        if (!closureBusy.AddItem(c))
+                        if (!closureBusy.Add(c))
                         {
                             // avoid infinite recursion for right-recursive rules
                             continue;
@@ -2368,7 +2368,7 @@ namespace Antlr4.Runtime.Atn
                 ATNConfigSet contextConfigs = new ATNConfigSet();
                 foreach (ATNConfig config in configs)
                 {
-                    contextConfigs.AddItem(config.AppendContext(returnContext, contextCache));
+                    contextConfigs.Add(config.AppendContext(returnContext, contextCache));
                 }
                 return AddDFAState(dfa, contextConfigs, contextCache);
             }

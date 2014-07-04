@@ -297,7 +297,7 @@ namespace Antlr4.Runtime.Atn
                 }
                 else
                 {
-                    operands.AddItem(a);
+                    operands.Add(a);
                 }
                 if (b is SemanticContext.AND)
                 {
@@ -305,14 +305,14 @@ namespace Antlr4.Runtime.Atn
                 }
                 else
                 {
-                    operands.AddItem(b);
+                    operands.Add(b);
                 }
                 IList<SemanticContext.PrecedencePredicate> precedencePredicates = FilterPrecedencePredicates(operands);
                 if (!precedencePredicates.IsEmpty())
                 {
                     // interested in the transition with the lowest precedence
                     SemanticContext.PrecedencePredicate reduced = Antlr4.Runtime.Sharpen.Collections.Min(precedencePredicates);
-                    operands.AddItem(reduced);
+                    operands.Add(reduced);
                 }
                 opnds = Sharpen.Collections.ToArray(operands, new SemanticContext[operands.Count]);
             }
@@ -380,7 +380,7 @@ namespace Antlr4.Runtime.Atn
                         if (evaluated != None)
                         {
                             // Reduce the result by skipping true elements
-                            operands.AddItem(evaluated);
+                            operands.Add(evaluated);
                         }
                     }
                 }
@@ -429,7 +429,7 @@ namespace Antlr4.Runtime.Atn
                 }
                 else
                 {
-                    operands.AddItem(a);
+                    operands.Add(a);
                 }
                 if (b is SemanticContext.OR)
                 {
@@ -437,14 +437,14 @@ namespace Antlr4.Runtime.Atn
                 }
                 else
                 {
-                    operands.AddItem(b);
+                    operands.Add(b);
                 }
                 IList<SemanticContext.PrecedencePredicate> precedencePredicates = FilterPrecedencePredicates(operands);
                 if (!precedencePredicates.IsEmpty())
                 {
                     // interested in the transition with the highest precedence
                     SemanticContext.PrecedencePredicate reduced = Antlr4.Runtime.Sharpen.Collections.Max(precedencePredicates);
-                    operands.AddItem(reduced);
+                    operands.Add(reduced);
                 }
                 this.opnds = Sharpen.Collections.ToArray(operands, new SemanticContext[operands.Count]);
             }
@@ -512,7 +512,7 @@ namespace Antlr4.Runtime.Atn
                         if (evaluated != null)
                         {
                             // Reduce the result by skipping false elements
-                            operands.AddItem(evaluated);
+                            operands.Add(evaluated);
                         }
                     }
                 }
@@ -593,7 +593,7 @@ namespace Antlr4.Runtime.Atn
                     {
                         result = new List<SemanticContext.PrecedencePredicate>();
                     }
-                    result.AddItem((SemanticContext.PrecedencePredicate)context);
+                    result.Add((SemanticContext.PrecedencePredicate)context);
                     iterator.Remove();
                 }
             }

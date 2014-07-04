@@ -86,7 +86,7 @@
 -methodMapping java.lang.Appendable.append(java.lang.CharSequence,int,int) AppendRange
 -methodMapping java.util.Date.Date(long) Antlr4.Runtime.Sharpen.Extensions.CreateDate
 -methodMapping java.lang.Long.signum Antlr4.Runtime.Sharpen.Extensions.Signum
--methodMapping java.util.Collection.add AddItem
+-methodMapping java.util.Collection.add Add
 -methodMapping java.util.ArrayList.removeElement Remove
 -methodMapping java.net.InetAddress.getByName Antlr4.Runtime.Sharpen.Extensions.GetAddressByName
 -methodMapping java.net.ServerSocket.ServerSocket Antlr4.Runtime.Sharpen.Extensions.CreateServerSocket

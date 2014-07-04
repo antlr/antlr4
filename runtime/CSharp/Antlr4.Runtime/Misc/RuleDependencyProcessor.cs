@@ -76,7 +76,7 @@ namespace Antlr4.Runtime.Misc
                     list = new List<Tuple<RuleDependency, IElement>>();
                     recognizerDependencies.Put(recognizerType, list);
                 }
-                list.AddItem(dependency);
+                list.Add(dependency);
             }
             foreach (KeyValuePair<ITypeMirror, IList<Tuple<RuleDependency, IElement>>> entry in recognizerDependencies.EntrySet())
             {
@@ -409,7 +409,7 @@ namespace Antlr4.Runtime.Misc
                         }
                         while (result.Count <= index)
                         {
-                            result.AddItem(string.Empty);
+                            result.Add(string.Empty);
                         }
                         result.Set(index, name);
                     }
@@ -433,7 +433,7 @@ namespace Antlr4.Runtime.Misc
                 {
                     continue;
                 }
-                result.AddItem(Tuple.Create(dependency, element));
+                result.Add(Tuple.Create(dependency, element));
             }
             elements = roundEnv.GetElementsAnnotatedWith(typeof(RuleDependencies));
             foreach (IElement element_1 in elements)
@@ -445,7 +445,7 @@ namespace Antlr4.Runtime.Misc
                 }
                 foreach (RuleDependency dependency in dependencies.Value())
                 {
-                    result.AddItem(Tuple.Create(dependency, element_1));
+                    result.Add(Tuple.Create(dependency, element_1));
                 }
             }
             return result;

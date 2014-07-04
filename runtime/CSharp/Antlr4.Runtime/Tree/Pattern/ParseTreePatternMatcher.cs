@@ -559,7 +559,7 @@ namespace Antlr4.Runtime.Tree.Pattern
                             throw new ArgumentException("Unknown token " + tagChunk.Tag + " in pattern: " + pattern);
                         }
                         TokenTagToken t = new TokenTagToken(tagChunk.Tag, ttype, tagChunk.Label);
-                        tokens.AddItem(t);
+                        tokens.Add(t);
                     }
                     else
                     {
@@ -571,7 +571,7 @@ namespace Antlr4.Runtime.Tree.Pattern
                                 throw new ArgumentException("Unknown rule " + tagChunk.Tag + " in pattern: " + pattern);
                             }
                             int ruleImaginaryTokenType = parser.GetATNWithBypassAlts().ruleToTokenType[ruleIndex];
-                            tokens.AddItem(new RuleTagToken(tagChunk.Tag, ruleImaginaryTokenType, tagChunk.Label));
+                            tokens.Add(new RuleTagToken(tagChunk.Tag, ruleImaginaryTokenType, tagChunk.Label));
                         }
                         else
                         {
@@ -587,7 +587,7 @@ namespace Antlr4.Runtime.Tree.Pattern
                     IToken t = lexer.NextToken();
                     while (t.Type != TokenConstants.Eof)
                     {
-                        tokens.AddItem(t);
+                        tokens.Add(t);
                         t = lexer.NextToken();
                     }
                 }
@@ -628,14 +628,14 @@ namespace Antlr4.Runtime.Tree.Pattern
                     {
                         if (p == pattern.IndexOf(start, p))
                         {
-                            starts.AddItem(p);
+                            starts.Add(p);
                             p += start.Length;
                         }
                         else
                         {
                             if (p == pattern.IndexOf(stop, p))
                             {
-                                stops.AddItem(p);
+                                stops.Add(p);
                                 p += stop.Length;
                             }
                             else
@@ -669,13 +669,13 @@ namespace Antlr4.Runtime.Tree.Pattern
             if (ntags == 0)
             {
                 string text = Sharpen.Runtime.Substring(pattern, 0, n);
-                chunks.AddItem(new TextChunk(text));
+                chunks.Add(new TextChunk(text));
             }
             if (ntags > 0 && starts[0] > 0)
             {
                 // copy text up to first tag into chunks
                 string text = Sharpen.Runtime.Substring(pattern, 0, starts[0]);
-                chunks.AddItem(new TextChunk(text));
+                chunks.Add(new TextChunk(text));
             }
             for (int i_1 = 0; i_1 < ntags; i_1++)
             {
@@ -689,12 +689,12 @@ namespace Antlr4.Runtime.Tree.Pattern
                     label = Sharpen.Runtime.Substring(tag, 0, colon);
                     ruleOrToken = Sharpen.Runtime.Substring(tag, colon + 1, tag.Length);
                 }
-                chunks.AddItem(new TagChunk(label, ruleOrToken));
+                chunks.Add(new TagChunk(label, ruleOrToken));
                 if (i_1 + 1 < ntags)
                 {
                     // copy from end of <tag> to start of next
                     string text = Sharpen.Runtime.Substring(pattern, stops[i_1] + stop.Length, starts[i_1 + 1]);
-                    chunks.AddItem(new TextChunk(text));
+                    chunks.Add(new TextChunk(text));
                 }
             }
             if (ntags > 0)
@@ -704,7 +704,7 @@ namespace Antlr4.Runtime.Tree.Pattern
                 {
                     // copy text from end of last tag to end
                     string text = Sharpen.Runtime.Substring(pattern, afterLastTag, n);
-                    chunks.AddItem(new TextChunk(text));
+                    chunks.Add(new TextChunk(text));
                 }
             }
             // strip out the escape sequences from text chunks but not tags

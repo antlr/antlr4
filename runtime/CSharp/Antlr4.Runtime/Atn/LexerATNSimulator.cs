@@ -448,14 +448,14 @@ namespace Antlr4.Runtime.Atn
                 PredictionContext context = config.Context;
                 if (context.IsEmpty)
                 {
-                    configs.AddItem(config);
+                    configs.Add(config);
                     return true;
                 }
                 else
                 {
                     if (context.HasEmpty)
                     {
-                        configs.AddItem(config.Transform(config.State, PredictionContext.EmptyFull, true));
+                        configs.Add(config.Transform(config.State, PredictionContext.EmptyFull, true));
                         currentAltReachedAcceptState = true;
                     }
                 }
@@ -479,7 +479,7 @@ namespace Antlr4.Runtime.Atn
             {
                 if (!currentAltReachedAcceptState || !config.PassedThroughNonGreedyDecision)
                 {
-                    configs.AddItem(config);
+                    configs.Add(config);
                 }
             }
             ATNState p = config.State;

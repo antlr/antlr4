@@ -174,7 +174,7 @@ namespace Antlr4.Runtime.Tree.Pattern
                 ParseTreeMatch match = Match(t);
                 if (match.Succeeded)
                 {
-                    matches.AddItem(match);
+                    matches.Add(match);
                 }
             }
             return matches;

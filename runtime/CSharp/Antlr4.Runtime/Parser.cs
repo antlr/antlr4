@@ -474,7 +474,7 @@ namespace Antlr4.Runtime
             {
                 _parseListeners = new List<IParseTreeListener>();
             }
-            this._parseListeners.AddItem(listener);
+            this._parseListeners.Add(listener);
         }
 
         /// <summary>
@@ -1116,11 +1116,11 @@ namespace Antlr4.Runtime
                 int ruleIndex = p.RuleIndex;
                 if (ruleIndex < 0)
                 {
-                    stack.AddItem("n/a");
+                    stack.Add("n/a");
                 }
                 else
                 {
-                    stack.AddItem(ruleNames[ruleIndex]);
+                    stack.Add(ruleNames[ruleIndex]);
                 }
                 p = p.parent;
             }
@@ -1135,7 +1135,7 @@ namespace Antlr4.Runtime
             for (int d = 0; d < _interp.atn.decisionToDFA.Length; d++)
             {
                 DFA dfa = _interp.atn.decisionToDFA[d];
-                s.AddItem(dfa.ToString(TokenNames, RuleNames));
+                s.Add(dfa.ToString(TokenNames, RuleNames));
             }
             return s;
         }

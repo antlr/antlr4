@@ -284,7 +284,7 @@ namespace Antlr4.Runtime.Atn
                     foreach (ATNConfig c in configs)
                     {
                         c = c.Transform(c.State, SemanticContext.None, false);
-                        dup.AddItem(c);
+                        dup.Add(c);
                     }
                     configs = dup;
                 }

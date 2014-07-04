@@ -77,7 +77,7 @@ namespace Antlr4.Runtime.Misc
                         list = new List<Tuple<RuleDependency, IAnnotatedElement>>();
                         recognizerDependencies.Put(recognizerType, list);
                     }
-                    list.AddItem(dependency);
+                    list.Add(dependency);
                 }
                 foreach (KeyValuePair<Type, IList<Tuple<RuleDependency, IAnnotatedElement>>> entry in recognizerDependencies.EntrySet())
                 {
@@ -97,7 +97,7 @@ namespace Antlr4.Runtime.Misc
 
         private static void GetTypesToCheck<_T0>(Type<_T0> clazz, HashSet<Type> result)
         {
-            if (!result.AddItem(clazz))
+            if (!result.Add(clazz))
             {
                 return;
             }
@@ -119,7 +119,7 @@ namespace Antlr4.Runtime.Misc
         {
             lock (checkedTypes)
             {
-                checkedTypes.AddItem(clazz);
+                checkedTypes.Add(clazz);
             }
         }
 
@@ -424,7 +424,7 @@ namespace Antlr4.Runtime.Misc
             RuleDependency dependency = annotatedElement.GetAnnotation<RuleDependency>();
             if (dependency != null)
             {
-                result.AddItem(Tuple.Create(dependency, annotatedElement));
+                result.Add(Tuple.Create(dependency, annotatedElement));
             }
             RuleDependencies dependencies = annotatedElement.GetAnnotation<RuleDependencies>();
             if (dependencies != null)
@@ -433,7 +433,7 @@ namespace Antlr4.Runtime.Misc
                 {
                     if (d != null)
                     {
-                        result.AddItem(Tuple.Create(d, annotatedElement));
+                        result.Add(Tuple.Create(d, annotatedElement));
                     }
                 }
             }

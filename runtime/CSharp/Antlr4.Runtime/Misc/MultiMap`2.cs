@@ -47,7 +47,7 @@ namespace Antlr4.Runtime.Misc
                 elementsForKey = new List<V>();
                 base.Put(key, elementsForKey);
             }
-            elementsForKey.AddItem(value);
+            elementsForKey.Add(value);
         }
 
         public virtual IList<Tuple<K, V>> GetPairs()
@@ -57,7 +57,7 @@ namespace Antlr4.Runtime.Misc
             {
                 foreach (V value in Get(key))
                 {
-                    pairs.AddItem(Tuple.Create(key, value));
+                    pairs.Add(Tuple.Create(key, value));
                 }
             }
             return pairs;

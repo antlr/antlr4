@@ -150,7 +150,7 @@ namespace Antlr4.Runtime.Dfa
                 {
                     // stay sparse and add new entry
                     keys[insertIndex] = key;
-                    values.AddItem(value);
+                    values.Add(value);
                     return this;
                 }
                 int desiredSize = Count >= MaxSparseSize ? MaxSparseSize * 2 : MaxSparseSize;

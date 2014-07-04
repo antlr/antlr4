@@ -51,7 +51,7 @@ namespace Antlr4.Runtime.Tree.Xpath
             IList<IParseTree> kids = new List<IParseTree>();
             foreach (ITree c in Trees.GetChildren(t))
             {
-                kids.AddItem((IParseTree)c);
+                kids.Add((IParseTree)c);
             }
             return kids;
         }

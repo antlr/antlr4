@@ -283,7 +283,7 @@ namespace Antlr4.Runtime.Atn
         {
             //		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);
             ATNConfig c = ATNConfig.Create(s, 0, ctx);
-            if (!lookBusy.AddItem(c))
+            if (!lookBusy.Add(c))
             {
                 return;
             }

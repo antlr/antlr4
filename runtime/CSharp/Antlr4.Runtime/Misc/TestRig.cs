@@ -101,7 +101,7 @@ namespace Antlr4.Runtime.Misc
                 if (arg[0] != '-')
                 {
                     // input file name
-                    inputFiles.AddItem(arg);
+                    inputFiles.Add(arg);
                     continue;
                 }
                 if (arg.Equals("-tree"))

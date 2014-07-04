@@ -207,7 +207,7 @@ namespace Antlr4.Runtime.Atn
                 state.atn = this;
                 state.stateNumber = states.Count;
             }
-            states.AddItem(state);
+            states.Add(state);
         }
 
         public virtual void RemoveState(ATNState state)
@@ -219,7 +219,7 @@ namespace Antlr4.Runtime.Atn
         public virtual void DefineMode(string name, TokensStartState s)
         {
             modeNameToStartState.Put(name, s);
-            modeToStartState.AddItem(s);
+            modeToStartState.Add(s);
             modeToDFA = Arrays.CopyOf(modeToDFA, modeToStartState.Count);
             modeToDFA[modeToDFA.Length - 1] = new DFA(s);
             DefineDecisionState(s);
@@ -227,7 +227,7 @@ namespace Antlr4.Runtime.Atn
 
         public virtual int DefineDecisionState(DecisionState s)
         {
-            decisionToState.AddItem(s);
+            decisionToState.Add(s);
             s.decision = decisionToState.Count - 1;
             decisionToDFA = Arrays.CopyOf(decisionToDFA, decisionToState.Count);
             decisionToDFA[decisionToDFA.Length - 1] = new DFA(s, s.decision);

@@ -164,7 +164,7 @@ namespace Antlr4.Runtime.Atn
                         SetTransition st = (SetTransition)t;
                         if (!setIndices.ContainsKey(st.set))
                         {
-                            sets.AddItem(st.set);
+                            sets.Add(st.set);
                             setIndices.Put(st.set, sets.Count - 1);
                         }
                     }

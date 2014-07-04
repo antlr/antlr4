@@ -267,7 +267,7 @@ namespace Antlr4.Runtime
                 {
                     ((IWritableToken)t).TokenIndex = tokens.Count;
                 }
-                tokens.AddItem(t);
+                tokens.Add(t);
                 if (t.Type == TokenConstants.Eof)
                 {
                     fetchedEOF = true;
@@ -307,7 +307,7 @@ namespace Antlr4.Runtime
                 {
                     break;
                 }
-                subset.AddItem(t);
+                subset.Add(t);
             }
             return subset;
         }
@@ -437,7 +437,7 @@ namespace Antlr4.Runtime
                 IToken t = tokens[i];
                 if (types == null || types.Get(t.Type))
                 {
-                    filteredTokens.AddItem(t);
+                    filteredTokens.Add(t);
                 }
             }
             if (filteredTokens.IsEmpty())
@@ -628,14 +628,14 @@ namespace Antlr4.Runtime
                 {
                     if (t.Channel != Lexer.DefaultTokenChannel)
                     {
-                        hidden.AddItem(t);
+                        hidden.Add(t);
                     }
                 }
                 else
                 {
                     if (t.Channel == channel)
                     {
-                        hidden.AddItem(t);
+                        hidden.Add(t);
                     }
                 }
             }

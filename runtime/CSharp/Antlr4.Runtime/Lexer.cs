@@ -506,7 +506,7 @@ outer_break: ;
             IToken t = NextToken();
             while (t.Type != TokenConstants.Eof)
             {
-                tokens.AddItem(t);
+                tokens.Add(t);
                 t = NextToken();
             }
             return tokens;

@@ -215,7 +215,7 @@ namespace Antlr4.Runtime.Misc
             // if disjoint and after r, a future iteration will handle it
             // ok, must be after last interval (and disjoint from last interval)
             // just add it
-            intervals.AddItem(addition);
+            intervals.Add(addition);
         }
 
         /// <summary>combine all sets in the array returned the or'd value</summary>
@@ -814,7 +814,7 @@ namespace Antlr4.Runtime.Misc
                 int b = I.b;
                 for (int v = a; v <= b; v++)
                 {
-                    values.AddItem(v);
+                    values.Add(v);
                 }
             }
             return values;
@@ -829,7 +829,7 @@ namespace Antlr4.Runtime.Misc
                 int b = I.b;
                 for (int v = a; v <= b; v++)
                 {
-                    s.AddItem(v);
+                    s.Add(v);
                 }
             }
             return s;

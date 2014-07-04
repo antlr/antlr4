@@ -274,7 +274,7 @@ namespace Antlr4.Runtime.Atn
             {
                 optimizedTransitions = new List<Antlr4.Runtime.Atn.Transition>();
             }
-            optimizedTransitions.AddItem(e);
+            optimizedTransitions.Add(e);
         }
 
         public virtual void SetOptimizedTransition(int i, Antlr4.Runtime.Atn.Transition e)

@@ -236,7 +236,7 @@ namespace Antlr4.Runtime.Atn
                 HashSet<ATNState> states = new HashSet<ATNState>();
                 foreach (ATNConfig c in this.configs)
                 {
-                    states.AddItem(c.State);
+                    states.Add(c.State);
                 }
                 return states;
             }
@@ -311,7 +311,7 @@ namespace Antlr4.Runtime.Atn
             return Sharpen.Collections.ToArray(configs);
         }
 
-        public virtual bool AddItem(ATNConfig e)
+        public virtual bool Add(ATNConfig e)
         {
             return Add(e, null);
         }
@@ -362,14 +362,14 @@ namespace Antlr4.Runtime.Atn
                     return true;
                 }
             }
-            configs.AddItem(e);
+            configs.Add(e);
             if (addKey)
             {
                 mergedConfigs.Put(key, e);
             }
             else
             {
-                unmerged.AddItem(e);
+                unmerged.Add(e);
             }
             UpdatePropertiesForAddedConfig(e);
             return true;
