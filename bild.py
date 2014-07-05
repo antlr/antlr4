@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys
 import os
 sys.path.append(os.path.abspath("/Users/parrt/github/bild"))
@@ -46,8 +47,23 @@ Main-Class: org.antlr.v4.Tool
 				 "out/org/antlr/v4/tool/templates/codegen/"+t)
 	jar("dist/antlr-"+VERSION+"-complete.jar", srcdir="out", manifest=manifest)
 
+def tests():
+	require(compile)
+	junit_jar, hamcrest_jar = load_junitjars()
+	cp = uniformpath("out")+os.pathsep+ \
+		 os.path.join(JARCACHE,"antlr-3.5.1-complete.jar")+os.pathsep+ \
+		 "runtime/Java/lib/org.abego.treelayout.core.jar"+os.pathsep+junit_jar+ \
+		 os.pathsep+hamcrest_jar
+	args = ["-Xlint", "-Xlint:-serial", "-g"]
+	javac("tool/test", "out/test/Java", version="1.6", cp=cp, args=args)
+	junit("out/test/Java", cp=cp)
+	# for t in TARGETS:
+	# 	javac(TARGETS[t]+"/tool/test", "out/test", version="1.6", cp=cp, args=args)
+
 def all():
 	mkjar()
+	tests()
+	mkdoc()
 
 def clean():
 	rmdir("out")
