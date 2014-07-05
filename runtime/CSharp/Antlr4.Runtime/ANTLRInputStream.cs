@@ -37,7 +37,7 @@ namespace Antlr4.Runtime
 {
     /// <summary>
     /// Vacuum all input from a
-    /// <see cref="System.IO.StreamReader"/>
+    /// <see cref="System.IO.TextReader"/>
     /// /
     /// <see cref="System.IO.Stream"/>
     /// and then treat it
@@ -87,19 +87,19 @@ namespace Antlr4.Runtime
         }
 
         /// <exception cref="System.IO.IOException"/>
-        public AntlrInputStream(StreamReader r)
+        public AntlrInputStream(TextReader r)
             : this(r, InitialBufferSize, ReadBufferSize)
         {
         }
 
         /// <exception cref="System.IO.IOException"/>
-        public AntlrInputStream(StreamReader r, int initialSize)
+        public AntlrInputStream(TextReader r, int initialSize)
             : this(r, initialSize, ReadBufferSize)
         {
         }
 
         /// <exception cref="System.IO.IOException"/>
-        public AntlrInputStream(StreamReader r, int initialSize, int readChunkSize)
+        public AntlrInputStream(TextReader r, int initialSize, int readChunkSize)
         {
             Load(r, initialSize, readChunkSize);
         }
@@ -123,7 +123,7 @@ namespace Antlr4.Runtime
         }
 
         /// <exception cref="System.IO.IOException"/>
-        public virtual void Load(StreamReader r, int size, int readChunkSize)
+        public virtual void Load(TextReader r, int size, int readChunkSize)
         {
             if (r == null)
             {

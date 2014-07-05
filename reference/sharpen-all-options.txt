@@ -132,7 +132,7 @@
 -typeMapping java.util.zip.ZipException ICSharpCode.SharpZipLib.SharpZipBaseException
 -typeMapping java.util.zip.DataFormatException ICSharpCode.SharpZipLib.SharpZipBaseException
 -typeMapping java.io.FileNotFoundException System.IO.FileNotFoundException
--typeMapping java.io.Reader System.IO.StreamReader
+-typeMapping java.io.Reader System.IO.TextReader
 -typeMapping java.util.SortedSet<> System.Collections.Generic.ICollection
 -typeMapping java.lang.AssertionError System.Exception
 -typeMapping java.io.InterruptedIOException System.Threading.ThreadInterruptedException
