@@ -220,7 +220,7 @@ namespace Antlr4.Runtime.Misc
             if (inputFiles.IsEmpty())
             {
                 Stream @is = Sharpen.Runtime.@in;
-                StreamReader r;
+                TextReader r;
                 if (encoding != null)
                 {
                     r = new StreamReader(@is, encoding);
@@ -239,7 +239,7 @@ namespace Antlr4.Runtime.Misc
                 {
                     @is = new FileInputStream(inputFile);
                 }
-                StreamReader r;
+                TextReader r;
                 if (encoding != null)
                 {
                     r = new StreamReader(@is, encoding);
@@ -260,7 +260,7 @@ namespace Antlr4.Runtime.Misc
         /// <exception cref="System.MemberAccessException"/>
         /// <exception cref="System.Reflection.TargetInvocationException"/>
         /// <exception cref="Javax.Print.PrintException"/>
-        protected internal virtual void Process<_T0>(Lexer lexer, Type<_T0> parserClass, Parser parser, Stream @is, StreamReader r)
+        protected internal virtual void Process<_T0>(Lexer lexer, Type<_T0> parserClass, Parser parser, Stream @is, TextReader r)
             where _T0 : Parser
         {
             try

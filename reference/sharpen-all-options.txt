@@ -18,10 +18,15 @@
 -typeMapping java.util.Comparator System.Collections.IComparer
 -typeMapping java.util.ArrayList System.Collections.ArrayList
 
+-typeMapping java.util.ArrayDeque<> System.Collections.Generic.Stack
+-typeMapping java.util.Deque<> System.Collections.Generic.Stack
+
 -methodMapping java.util.List.addAll AddRange
 -methodMapping java.util.List.remove(int) RemoveAt
 -methodMapping java.util.AbstractList.addAll AddRange 
 -methodMapping java.util.ArrayList.addAll AddRange      
+
+-methodMapping java.util.concurrent.ConcurrentMap.putIfAbsent GetOrAdd
 
 -fullyQualify File  
 -namespaceMapping java.lang.ref Antlr4.Runtime.Sharpen
@@ -127,7 +132,7 @@
 -typeMapping java.util.zip.ZipException ICSharpCode.SharpZipLib.SharpZipBaseException
 -typeMapping java.util.zip.DataFormatException ICSharpCode.SharpZipLib.SharpZipBaseException
 -typeMapping java.io.FileNotFoundException System.IO.FileNotFoundException
--typeMapping java.io.Reader System.IO.StreamReader
+-typeMapping java.io.Reader System.IO.TextReader
 -typeMapping java.util.SortedSet<> System.Collections.Generic.ICollection
 -typeMapping java.lang.AssertionError System.Exception
 -typeMapping java.io.InterruptedIOException System.Threading.ThreadInterruptedException
