@@ -62,7 +62,7 @@ namespace Antlr4.Runtime
 
         protected internal readonly string[] ruleNames;
 
-        protected internal readonly IDeque<Tuple<ParserRuleContext, int>> _parentContextStack = new ArrayDeque<Tuple<ParserRuleContext, int>>();
+        protected internal readonly Stack<Tuple<ParserRuleContext, int>> _parentContextStack = new Stack<Tuple<ParserRuleContext, int>>();
 
         public ParserInterpreter(string grammarFileName, ICollection<string> tokenNames, ICollection<string> ruleNames, ATN atn, ITokenStream input)
             : base(input)

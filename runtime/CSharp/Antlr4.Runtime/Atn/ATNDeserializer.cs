@@ -1050,7 +1050,7 @@ nextState_break: ;
                 return true;
             }
             BitSet reachable = new BitSet(atn.states.Count);
-            IDeque<ATNState> worklist = new ArrayDeque<ATNState>();
+            Stack<ATNState> worklist = new Stack<ATNState>();
             worklist.Add(transition.followState);
             while (!worklist.IsEmpty())
             {

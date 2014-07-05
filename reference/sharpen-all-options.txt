@@ -18,6 +18,9 @@
 -typeMapping java.util.Comparator System.Collections.IComparer
 -typeMapping java.util.ArrayList System.Collections.ArrayList
 
+-typeMapping java.util.ArrayDeque<> System.Collections.Generic.Stack
+-typeMapping java.util.Deque<> System.Collections.Generic.Stack
+
 -methodMapping java.util.List.addAll AddRange
 -methodMapping java.util.List.remove(int) RemoveAt
 -methodMapping java.util.AbstractList.addAll AddRange 
