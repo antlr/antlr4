@@ -267,7 +267,7 @@ namespace Antlr4.Runtime.Dfa
         public virtual DFAState AddState(DFAState state)
         {
             state.stateNumber = nextStateNumber.GetAndIncrement();
-            DFAState existing = states.PutIfAbsent(state, state);
+            DFAState existing = states.GetOrAdd(state, state);
             if (existing != null)
             {
                 return existing;

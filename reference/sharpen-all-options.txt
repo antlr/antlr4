@@ -23,6 +23,8 @@
 -methodMapping java.util.AbstractList.addAll AddRange 
 -methodMapping java.util.ArrayList.addAll AddRange      
 
+-methodMapping java.util.concurrent.ConcurrentMap.putIfAbsent GetOrAdd
+
 -fullyQualify File  
 -namespaceMapping java.lang.ref Antlr4.Runtime.Sharpen
 -namespaceMapping java.lang Antlr4.Runtime.Sharpen

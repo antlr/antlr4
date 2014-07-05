@@ -353,7 +353,7 @@ namespace Antlr4.Runtime.Atn
             }
             if (!changed)
             {
-                existing = contextCache.PutIfAbsent(context, context);
+                existing = contextCache.GetOrAdd(context, context);
                 visited.Put(context, existing != null ? existing : context);
                 return context;
             }
@@ -368,7 +368,7 @@ namespace Antlr4.Runtime.Atn
                 ArrayPredictionContext arrayPredictionContext = (ArrayPredictionContext)context;
                 updated = new ArrayPredictionContext(parents, arrayPredictionContext.returnStates, context.cachedHashCode);
             }
-            existing = contextCache.PutIfAbsent(updated, updated);
+            existing = contextCache.GetOrAdd(updated, updated);
             visited.Put(updated, existing != null ? existing : updated);
             visited.Put(context, existing != null ? existing : updated);
             return updated;
