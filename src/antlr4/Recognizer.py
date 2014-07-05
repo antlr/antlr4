@@ -46,7 +46,7 @@ class Recognizer(object):
         self._stateNumber = -1
 
     def checkVersion(self, toolVersion):
-        runtimeVersion = "4.4.0"
+        runtimeVersion = "4.4"
         rv=runtimeVersion[0:max(runtimeVersion.rfind("."),runtimeVersion.rfind("-"))]
         tv=toolVersion[0:max(toolVersion.rfind("."),toolVersion.rfind("-"))]
         if not rv==tv:
