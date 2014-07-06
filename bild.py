@@ -90,13 +90,6 @@ Created-By: http://www.bildtool.org
 	unjar("runtime/Java/lib/org.abego.treelayout.core.jar", trgdir="out/runtime")
 	jar("dist/antlr-runtime-"+VERSION+".jar", srcdir="out/runtime", manifest=manifest)
 
-	# now remove org/antlr/v4/runtime/tree/gui/* and tree lib to make minimal jar
-	rmdir("out/runtime/org/antlr/v4/runtime/tree/gui")
-	rmdir("out/runtime/org/abego")
-	rmdir("out/runtime/META-INF/maven")
-	manifest = manifest.replace("ANTLR 4 Runtime", "ANTLR 4 Min Runtime")
-	jar("dist/antlr-min-runtime-"+VERSION+".jar", srcdir="out/runtime", manifest=manifest)
-
 
 def tests():
 	require(mkjar)
