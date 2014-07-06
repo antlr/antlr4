@@ -461,7 +461,7 @@ public abstract class Target {
 			result = new STGroupFile(groupFileName);
 		}
 		catch (IllegalArgumentException iae) {
-			gen.tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
+			gen.tool.errMgr.toolError(ErrorType.MISSING_CODE_GEN_TEMPLATES,
 						 iae,
 						 language);
 		}
