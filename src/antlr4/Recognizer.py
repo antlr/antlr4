@@ -45,11 +45,23 @@ class Recognizer(object):
         self._interp = None
         self._stateNumber = -1
 
+    def extractVersion(self, version):
+        pos = version.find(".")
+        major = version[0:pos]
+        version = version[pos+1:]
+        pos = version.find(".")
+        if pos==-1:
+            pos = version.find("-")
+        if pos==-1:
+            pos = len(version)
+        minor = version[0:pos]
+        return major, minor
+
     def checkVersion(self, toolVersion):
-        runtimeVersion = "4.4"
-        rv=runtimeVersion[0:max(runtimeVersion.rfind("."),runtimeVersion.rfind("-"))]
-        tv=toolVersion[0:max(toolVersion.rfind("."),toolVersion.rfind("-"))]
-        if not rv==tv:
+        runtimeVersion = "4.4.0"
+        rvmajor, rvminor = self.extractVersion(runtimeVersion)
+        tvmajor, tvminor = self.extractVersion(toolVersion)
+        if rvmajor!=tvmajor or rvminor!=tvminor:
             print("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion)
 
     def addErrorListener(self, listener):
@@ -151,3 +163,17 @@ class Recognizer(object):
         self._stateNumber = atnState
 
 del RecognitionException
+
+import unittest
+class Test(unittest.TestCase):
+
+    def testVersion(self):
+        major, minor = Recognizer().extractVersion("1.2")
+        self.assertEqual("1", major)
+        self.assertEqual("2", minor)
+        major, minor = Recognizer().extractVersion("1.2.3")
+        self.assertEqual("1", major)
+        self.assertEqual("2", minor)
+        major, minor = Recognizer().extractVersion("1.2-snapshot")
+        self.assertEqual("1", major)
+        self.assertEqual("2", minor)
