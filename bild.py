@@ -66,7 +66,7 @@ Main-Class: org.antlr.v4.Tool
 def tests():
 	require(mkjar)
 	junit_jar, hamcrest_jar = load_junitjars()
-	cp = "dist/antlr-"+VERSION+"-complete.jar"+os.pathsep+ \
+	cp = uniformpath("dist/antlr-"+VERSION+"-complete.jar")+os.pathsep+ \
 		 uniformpath("out/test/Java")+os.pathsep+ \
 		 string.join([uniformpath(TARGETS[t]+"/tool/test") for t in TARGETS],os.pathsep)+os.pathsep+ \
 		 junit_jar+os.pathsep+hamcrest_jar
