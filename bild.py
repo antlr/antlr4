@@ -22,7 +22,6 @@ test_properties = {
 	"antlr-python3-runtime":uniformpath(PYTHON3_TARGET)+"/src",
 }
 
-# TARGETS			= {"Java":JAVA_TARGET, "Python2":PYTHON2_TARGET, "Python3":PYTHON3_TARGET, "CSharp":CSHARP_TARGET}
 TARGETS	= {"Java":uniformpath(JAVA_TARGET),
 		   "Python2":uniformpath(PYTHON2_TARGET),
 		   "Python3":uniformpath(PYTHON3_TARGET),
@@ -49,7 +48,7 @@ def compile():
 
 def mkjar():
 	require(compile)
-	copytree(src="tool/resources", dst="out")
+	copytree(src="tool/resources", dst="out") # messages, Java code gen, etc...
 	manifest = \
 """Version: %s
 Main-Class: org.antlr.v4.Tool
@@ -59,8 +58,10 @@ Main-Class: org.antlr.v4.Tool
 	unjar(os.path.join(JARCACHE,"antlr-3.5.1-complete.jar"), trgdir="out")
 	# pull in target templates
 	for t in TARGETS:
+		trgdir = "out/org/antlr/v4/tool/templates/codegen/"+t
+		mkdir(trgdir)
 		copyfile(TARGETS[t]+"/tool/resources/org/antlr/v4/tool/templates/codegen/"+t+"/"+t+".stg",
-				 "out/org/antlr/v4/tool/templates/codegen/"+t)
+				 trgdir)
 	jar("dist/antlr-"+VERSION+"-complete.jar", srcdir="out", manifest=manifest)
 
 def tests():
@@ -76,7 +77,6 @@ def tests():
 	for t in TARGETS:
 		print "Test %7s --------------" % t
 		javac(TARGETS[t]+"/tool/test", "out/test/"+t, version="1.6", cp=cp, args=args)
-		copytree(src=TARGETS[t]+"/tool/resources", dst="out/test/"+t)
 		junit("out/test/"+t, cp=cp, verbose=False, args=properties)
 
 def all():
