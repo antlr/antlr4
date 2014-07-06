@@ -50,9 +50,14 @@ def mkjar():
 	require(compile)
 	copytree(src="tool/resources", dst="out") # messages, Java code gen, etc...
 	manifest = \
-"""Version: %s
-Main-Class: org.antlr.v4.Tool
-""" % VERSION
+"""Main-Class: org.antlr.v4.Tool
+Implementation-Vendor: ANTLR
+Implementation-Title: ANTLR 4 Tool
+Implementation-Version: %s
+Built-By: %s
+Build-Jdk: 1.6
+Created-By: http://www.bildtool.org
+""" % (VERSION,os.getlogin())
 	# unjar required libraries
 	unjar("runtime/Java/lib/org.abego.treelayout.core.jar", trgdir="out")
 	unjar(os.path.join(JARCACHE,"antlr-3.5.1-complete.jar"), trgdir="out")
@@ -63,6 +68,35 @@ Main-Class: org.antlr.v4.Tool
 		copyfile(TARGETS[t]+"/tool/resources/org/antlr/v4/tool/templates/codegen/"+t+"/"+t+".stg",
 				 trgdir)
 	jar("dist/antlr-"+VERSION+"-complete.jar", srcdir="out", manifest=manifest)
+
+	mkruntimejar()
+
+def mkruntimejar():
+	# out/... dir is full of tool-related stuff, make special dir out/runtime
+	cp = uniformpath("out/runtime")+os.pathsep+ \
+		 "runtime/Java/lib/org.abego.treelayout.core.jar"
+	args = ["-Xlint", "-Xlint:-serial", "-g"]
+	javac("runtime/JavaAnnotations/src/", "out/runtime", version="1.6", cp=cp, args=args)
+	javac("runtime/Java/src", "out/runtime", version="1.6", cp=cp, args=args)
+	manifest = \
+"""Implementation-Vendor: ANTLR
+Implementation-Title: ANTLR 4 Runtime
+Implementation-Version: %s
+Built-By: %s
+Build-Jdk: 1.6
+Created-By: http://www.bildtool.org
+""" % (VERSION,os.getlogin())
+	# unjar required library
+	unjar("runtime/Java/lib/org.abego.treelayout.core.jar", trgdir="out/runtime")
+	jar("dist/antlr-runtime-"+VERSION+".jar", srcdir="out/runtime", manifest=manifest)
+
+	# now remove org/antlr/v4/runtime/tree/gui/* and tree lib to make minimal jar
+	rmdir("out/runtime/org/antlr/v4/runtime/tree/gui")
+	rmdir("out/runtime/org/abego")
+	rmdir("out/runtime/META-INF/maven")
+	manifest = manifest.replace("ANTLR 4 Runtime", "ANTLR 4 Min Runtime")
+	jar("dist/antlr-min-runtime-"+VERSION+".jar", srcdir="out/runtime", manifest=manifest)
+
 
 def tests():
 	require(mkjar)
