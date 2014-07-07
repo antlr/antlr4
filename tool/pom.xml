@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tunnelvisionlabs</groupId>
     <artifactId>antlr4-csharp</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>ANTLR 4 Target C#</name>
