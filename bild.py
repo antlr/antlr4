@@ -18,7 +18,7 @@ VERSION = "4.4"
 JAVA_TARGET	= "."
 PYTHON2_TARGET	= "../antlr4-python2"
 PYTHON3_TARGET	= "../antlr4-python3"
-CSHARP_TARGET	= "../antlr4cs"
+CSHARP_TARGET	= "../antlr4-csharp"
 
 # Properties needed to run Python[23] tests
 test_properties = {
