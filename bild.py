@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import sys
 import os
 import string
 
@@ -55,7 +54,7 @@ def compile():
 
 def mkjar():
 	require(compile)
-	copytree(src="tool/resources", dst="out") # messages, Java code gen, etc...
+	copytree(src="tool/resources", trg="out") # messages, Java code gen, etc...
 	manifest = \
 """Main-Class: org.antlr.v4.Tool
 Implementation-Vendor: ANTLR
