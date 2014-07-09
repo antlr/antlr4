@@ -1,11 +1,18 @@
 #!/usr/bin/env python
 import sys
 import os
-# requires support lib:
-# 	https://raw.githubusercontent.com/parrt/bild/master/src/python/bilder.py
-sys.path.append(os.path.abspath("/Users/parrt/github/bild/src/python"))
 import string
 
+# bootstrap by downloading bilder.py if not found
+import urllib
+
+if not os.path.exists("bilder.py"):
+    print "bootstrapping; downloading bilder.py"
+    urllib.urlretrieve(
+        "https://raw.githubusercontent.com/parrt/bild/master/src/python/bilder.py",
+        "bilder.py")
+
+# assumes bilder.py is in current directory
 from bilder import *
 
 VERSION = "4.4"
