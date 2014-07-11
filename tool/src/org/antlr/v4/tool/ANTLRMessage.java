@@ -30,6 +30,7 @@
 
 package org.antlr.v4.tool;
 
+import org.antlr.runtime.Token;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.stringtemplate.v4.ST;
@@ -50,18 +51,25 @@ public class ANTLRMessage {
     public int line = -1;
     public int charPosition = -1;
 
-    public ANTLRMessage(@NotNull ErrorType errorType) {
-        this(errorType, (Throwable)null);
+	public Grammar g;
+	/** Most of the time, we'll have a token such as an undefined rule ref
+     *  and so this will be set.
+     */
+    public Token offendingToken;
+
+	public ANTLRMessage(@NotNull ErrorType errorType) {
+        this(errorType, (Throwable)null, Token.INVALID_TOKEN);
     }
 
-    public ANTLRMessage(@NotNull ErrorType errorType, Object... args) {
-        this(errorType, null, args);
-    }
+    public ANTLRMessage(@NotNull ErrorType errorType, Token offendingToken, Object... args) {
+        this(errorType, null, offendingToken, args);
+	}
 
-    public ANTLRMessage(@NotNull ErrorType errorType, @Nullable Throwable e, Object... args) {
+    public ANTLRMessage(@NotNull ErrorType errorType, @Nullable Throwable e, Token offendingToken, Object... args) {
         this.errorType = errorType;
         this.e = e;
         this.args = args;
+		this.offendingToken = offendingToken;
     }
 
 	@NotNull
@@ -80,6 +88,7 @@ public class ANTLRMessage {
 
 	public ST getMessageTemplate(boolean verbose) {
 		ST messageST = new ST(getErrorType().msg);
+		messageST.impl.name = errorType.name();
 
 		messageST.add("verbose", verbose);
 		Object[] args = getArgs();

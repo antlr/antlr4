@@ -30,6 +30,8 @@
 
 package org.antlr.v4.tool;
 
+import org.antlr.runtime.Token;
+
 /** A generic message from the tool such as "file not found" type errors; there
  *  is no reason to create a special object for each error unlike the grammar
  *  errors, which may be rather complex.
@@ -43,9 +45,9 @@ public class ToolMessage extends ANTLRMessage {
 		super(errorType);
 	}
     public ToolMessage(ErrorType errorType, Object... args) {
-        super(errorType, null, args);
+        super(errorType, null, Token.INVALID_TOKEN, args);
     }
     public ToolMessage(ErrorType errorType, Throwable e, Object... args) {
-        super(errorType, e, args);
+        super(errorType, e, Token.INVALID_TOKEN, args);
     }
 }

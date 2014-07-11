@@ -41,6 +41,7 @@ import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenPipeline;
+import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.Graph;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -122,7 +123,7 @@ public class Tool {
 
 	// fields set by option manager
 
-	public File inputDirectory;
+	public File inputDirectory; // used by mvn plugin but not set by tool itself.
 	public String outputDirectory;
 	public String libDirectory;
 	public boolean generate_ATN_dot = false;
@@ -398,6 +399,12 @@ public class Tool {
 		SemanticPipeline sem = new SemanticPipeline(g);
 		sem.process();
 
+		String language = g.getOptionString("language");
+		if ( !CodeGenerator.targetExists(language) ) {
+			errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR, language);
+			return;
+		}
+
 		if ( errMgr.getNumErrors()>prevErrors ) return;
 
 		// BUILD ATN FROM AST
@@ -427,7 +434,8 @@ public class Tool {
 	 * Important enough to avoid multiple definitions that we do very early,
 	 * right after AST construction. Also check for undefined rules in
 	 * parser/lexer to avoid exceptions later. Return true if we find multiple
-	 * definitions of the same rule or a reference to an undefined rule.
+	 * definitions of the same rule or a reference to an undefined rule or
+	 * parser rule ref in lexer rule.
 	 */
 	public boolean checkForRuleIssues(final Grammar g) {
 		// check for redefined rules
@@ -459,7 +467,7 @@ public class Tool {
 
 		// check for undefined rules
 		class UndefChecker extends GrammarTreeVisitor {
-			public boolean undefined = false;
+			public boolean badref = false;
 			@Override
 			public void tokenRef(TerminalAST ref) {
 				if ("EOF".equals(ref.getText())) {
@@ -473,18 +481,28 @@ public class Tool {
 			@Override
 			public void ruleRef(GrammarAST ref, ActionAST arg) {
 				RuleAST ruleAST = ruleToAST.get(ref.getText());
-				if ( ruleAST==null ) {
-					undefined = true;
+				if (Character.isUpperCase(currentRuleName.charAt(0)) &&
+					Character.isLowerCase(ref.getText().charAt(0)))
+				{
+					badref = true;
+					String fileName = ref.getToken().getInputStream().getSourceName();
+					errMgr.grammarError(ErrorType.PARSER_RULE_REF_IN_LEXER_RULE,
+										fileName, ref.getToken(), ref.getText(), currentRuleName);
+				}
+				else if ( ruleAST==null ) {
+					badref = true;
 					errMgr.grammarError(ErrorType.UNDEFINED_RULE_REF,
 										g.fileName, ref.token, ref.getText());
 				}
 			}
+			@Override
+			public ErrorManager getErrorManager() { return errMgr; }
 		}
 
 		UndefChecker chk = new UndefChecker();
 		chk.visitGrammar(g.ast);
 
-		return redefinition || chk.undefined;
+		return redefinition || chk.badref;
 	}
 
 	public List<GrammarRootAST> sortGrammarByTokenVocab(List<String> fileNames) {
@@ -593,9 +611,10 @@ public class Tool {
 	/**
 	 * Try current dir then dir of g then lib dir
 	 * @param g
-	 * @param name The imported grammar name.
+	 * @param nameNode The node associated with the imported grammar name.
 	 */
-	public Grammar loadImportedGrammar(Grammar g, String name) throws IOException {
+	public Grammar loadImportedGrammar(Grammar g, GrammarAST nameNode) throws IOException {
+		String name = nameNode.getText();
 		g.tool.log("grammar", "load " + name + " from " + g.fileName);
 		File importedFile = null;
 		for (String extension : ALL_GRAMMAR_EXTENSIONS) {
@@ -606,12 +625,15 @@ public class Tool {
 		}
 
 		if ( importedFile==null ) {
-			errMgr.toolError(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, name, g.fileName);
+			errMgr.grammarError(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, g.fileName, nameNode.getToken(), name);
 			return null;
 		}
 
 		ANTLRFileStream in = new ANTLRFileStream(importedFile.getAbsolutePath(), grammarEncoding);
 		GrammarRootAST root = parse(g.fileName, in);
+		if ( root==null ) {
+			return null;
+		}
 		Grammar imported = createGrammar(root);
 		imported.fileName = importedFile.getAbsolutePath();
 		return imported;

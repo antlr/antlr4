@@ -36,6 +36,7 @@ import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.GrammarTreeVisitor;
 import org.antlr.v4.parse.ScopeParser;
 import org.antlr.v4.tool.AttributeDict;
+import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.Rule;
@@ -52,13 +53,20 @@ import java.util.Map;
 public class RuleCollector extends GrammarTreeVisitor {
 	/** which grammar are we checking */
 	public Grammar g;
+	public ErrorManager errMgr;
 
 	// stuff to collect. this is the output
 	public OrderedHashMap<String, Rule> rules = new OrderedHashMap<String, Rule>();
 	public MultiMap<String,GrammarAST> ruleToAltLabels = new MultiMap<String, GrammarAST>();
 	public Map<String,String> altLabelToRuleName = new HashMap<String, String>();
 
-	public RuleCollector(Grammar g) { this.g = g; }
+	public RuleCollector(Grammar g) {
+		this.g = g;
+		this.errMgr = g.tool.errMgr;
+	}
+
+	@Override
+	public ErrorManager getErrorManager() { return errMgr; }
 
 	public void process(GrammarAST ast) { visitGrammar(ast); }
 
@@ -81,20 +89,20 @@ public class RuleCollector extends GrammarTreeVisitor {
 		rules.put(r.name, r);
 
 		if ( arg!=null ) {
-			r.args = ScopeParser.parseTypedArgList(arg, arg.getText(), g.tool.errMgr);
+			r.args = ScopeParser.parseTypedArgList(arg, arg.getText(), g);
 			r.args.type = AttributeDict.DictType.ARG;
 			r.args.ast = arg;
 			arg.resolver = r.alt[currentOuterAltNumber];
 		}
 
 		if ( returns!=null ) {
-			r.retvals = ScopeParser.parseTypedArgList(returns, returns.getText(), g.tool.errMgr);
+			r.retvals = ScopeParser.parseTypedArgList(returns, returns.getText(), g);
 			r.retvals.type = AttributeDict.DictType.RET;
 			r.retvals.ast = returns;
 		}
 
 		if ( locals!=null ) {
-			r.locals = ScopeParser.parseTypedArgList(locals, locals.getText(), g.tool.errMgr);
+			r.locals = ScopeParser.parseTypedArgList(locals, locals.getText(), g);
 			r.locals.type = AttributeDict.DictType.LOCAL;
 			r.locals.ast = locals;
 		}

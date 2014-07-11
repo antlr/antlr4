@@ -48,8 +48,9 @@ public class CodeGenPipeline {
 	}
 
 	public void process() {
-		CodeGenerator gen = new CodeGenerator(g);
+		if ( !CodeGenerator.targetExists(g.getOptionString("language")) ) return;
 
+		CodeGenerator gen = new CodeGenerator(g);
 		IntervalSet idTypes = new IntervalSet();
 		idTypes.add(ANTLRParser.ID);
 		idTypes.add(ANTLRParser.RULE_REF);
@@ -63,8 +64,6 @@ public class CodeGenPipeline {
 			}
 		}
 
-		if ( gen.getTemplates()==null ) return;
-
 		if ( g.isLexer() ) {
 			ST lexer = gen.generateLexer();
 			writeRecognizer(lexer, gen);
@@ -74,13 +73,15 @@ public class CodeGenPipeline {
 			writeRecognizer(parser, gen);
 			if ( g.tool.gen_listener ) {
 				gen.writeListener(gen.generateListener());
-				if (gen.getTarget().wantsBaseListener())
+				if (gen.getTarget().wantsBaseListener()) {
 					gen.writeBaseListener(gen.generateBaseListener());
+				}
 			}
 			if ( g.tool.gen_visitor ) {
 				gen.writeVisitor(gen.generateVisitor());
-				if (gen.getTarget().wantsBaseVisitor())
+				if (gen.getTarget().wantsBaseVisitor()) {
 					gen.writeBaseVisitor(gen.generateBaseVisitor());
+				}
 			}
 			gen.writeHeaderFile();
 		}
@@ -93,7 +94,9 @@ public class CodeGenPipeline {
 			if (g.tool.ST_inspector_wait_for_close) {
 				try {
 					viz.waitForClose();
-				} catch (InterruptedException ex) {
+				}
+				catch (InterruptedException ex) {
+					g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, ex);
 				}
 			}
 		}

@@ -36,7 +36,7 @@ import java.util.Locale;
 import java.util.Map;
 
 public class PostScriptDocument {
-	public static final String DEFAULT_FONT = "Courier New";
+	public static final String DEFAULT_FONT = "CourierNew";
 
 	public static final Map<String, String> POSTSCRIPT_FONT_NAMES;
 	static {
