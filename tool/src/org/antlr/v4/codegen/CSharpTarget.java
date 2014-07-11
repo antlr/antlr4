@@ -47,6 +47,11 @@ public abstract class CSharpTarget extends Target {
 		targetCharValueEscape[0x000B] = "\\v";
 	}
 
+    @Override
+    public String getVersion() {
+        return "4.4"; // crossing fingers that it's close enough.
+    }
+
 	@Override
 	public String encodeIntAsCharEscape(int v) {
 		if (v < Character.MIN_VALUE || v > Character.MAX_VALUE) {
