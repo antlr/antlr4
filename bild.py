@@ -4,6 +4,7 @@ import string
 
 # bootstrap by downloading bilder.py if not found
 import urllib
+import os
 
 if not os.path.exists("bilder.py"):
     print "bootstrapping; downloading bilder.py"
@@ -34,20 +35,20 @@ TARGETS	= {"Java":uniformpath(JAVA_TARGET),
 		   "CSharp":uniformpath(CSHARP_TARGET)}
 
 def parsers():
-	antlr3("tool/src/org/antlr/v4/parse", "gen", package="org.antlr.v4.parse")
-	antlr3("tool/src/org/antlr/v4/codegen", "gen", package="org.antlr.v4.codegen", args=["-lib","tool/src/org/antlr/v4/parse"])
-	antlr4("runtime/Java/src/org/antlr/v4/runtime/tree/xpath", "gen", package="org.antlr.v4.runtime.tree.xpath")
+	antlr3("tool/src/org/antlr/v4/parse", "gen3", package="org.antlr.v4.parse")
+	antlr3("tool/src/org/antlr/v4/codegen", "gen3", package="org.antlr.v4.codegen", args=["-lib",uniformpath("gen3/org/antlr/v4/parse")])
+	antlr4("runtime/Java/src/org/antlr/v4/runtime/tree/xpath", "gen4", package="org.antlr.v4.runtime.tree.xpath")
 
 def compile():
 	require(parsers)
 	cp = uniformpath("out")+os.pathsep+ \
 		 os.path.join(JARCACHE,"antlr-3.5.1-complete.jar")+os.pathsep+ \
-		 "runtime/Java/lib/org.abego.treelayout.core.jar"
-	args = ["-Xlint", "-Xlint:-serial", "-g"]
-	javac("runtime/JavaAnnotations/src/", "out", version="1.6", cp=cp, args=args)
-	javac("runtime/Java/src", "out", version="1.6", cp=cp, args=args)
-	javac("tool/src", "out", version="1.6", cp=cp, args=args)
-	javac("gen", "out", version="1.6", cp=cp, args=args)
+		 "runtime/Java/lib/org.abego.treelayout.core.jar"+os.pathsep+ \
+		 JARCACHE+"/antlr-4.4-complete.jar"
+	srcpath = ["gen3", "gen4", "runtime/JavaAnnotations/src", "runtime/Java/src", "tool/src"]
+	args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
+	for sp in srcpath:
+		javac(sp, "out", version="1.6", cp=cp, args=args)
 	# pull in targets
 	for t in TARGETS:
 		javac(TARGETS[t]+"/tool/src", "out", version="1.6", cp=cp, args=args)
@@ -82,8 +83,10 @@ def mkruntimejar():
 	cp = uniformpath("out/runtime")+os.pathsep+ \
 		 "runtime/Java/lib/org.abego.treelayout.core.jar"
 	args = ["-Xlint", "-Xlint:-serial", "-g"]
-	javac("runtime/JavaAnnotations/src/", "out/runtime", version="1.6", cp=cp, args=args)
-	javac("runtime/Java/src", "out/runtime", version="1.6", cp=cp, args=args)
+	srcpath = ["runtime/JavaAnnotations/src", "runtime/Java/src"]
+	args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
+	for sp in srcpath:
+		javac(sp, "out", version="1.6", cp=cp, args=args)
 	manifest = \
 """Implementation-Vendor: ANTLR
 Implementation-Title: ANTLR 4 Runtime
@@ -119,7 +122,8 @@ def all():
 
 def clean():
 	rmdir("out")
-	rmdir("gen")
+	rmdir("gen3")
+	rmdir("gen4")
 	rmdir("doc")
 
 def mkdoc():
