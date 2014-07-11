@@ -53,7 +53,7 @@ def compile():
 	for t in TARGETS:
 		javac(TARGETS[t]+"/tool/src", "out", version="1.6", cp=cp, args=args)
 
-def mkjar():
+def mkjar_complete():
 	require(compile)
 	copytree(src="tool/resources", trg="out") # messages, Java code gen, etc...
 	manifest = \
@@ -74,11 +74,11 @@ Created-By: http://www.bildtool.org
 		mkdir(trgdir)
 		copyfile(TARGETS[t]+"/tool/resources/org/antlr/v4/tool/templates/codegen/"+t+"/"+t+".stg",
 				 trgdir)
-	jar("dist/antlr-"+VERSION+"-complete.jar", srcdir="out", manifest=manifest)
+	jarfile = "dist/antlr-"+VERSION+"-complete.jar"
+	jar(jarfile, srcdir="out", manifest=manifest)
+	print "Generated "+jarfile
 
-	mkruntimejar()
-
-def mkruntimejar():
+def mkjar_runtime():
 	# out/... dir is full of tool-related stuff, make special dir out/runtime
 	cp = uniformpath("out/runtime")+os.pathsep+ \
 		 "runtime/Java/lib/org.abego.treelayout.core.jar"
@@ -97,8 +97,20 @@ Created-By: http://www.bildtool.org
 """ % (VERSION,os.getlogin())
 	# unjar required library
 	unjar("runtime/Java/lib/org.abego.treelayout.core.jar", trgdir="out/runtime")
-	jar("dist/antlr-runtime-"+VERSION+".jar", srcdir="out/runtime", manifest=manifest)
+	jarfile = "dist/antlr-runtime-" + VERSION + ".jar"
+	jar(jarfile, srcdir="out/runtime", manifest=manifest)
+	print "Generated "+jarfile
 
+def mkjar():
+	mkjar_complete()
+	# put it in JARCARCHE too so bild can find it during antlr4()
+	copyfile(src="dist/antlr-4.4-complete.jar", trg=JARCACHE)
+	# rebuild/bootstrap XPath with 4.4 so it can use 4.4 runtime (gen'd with 4.3 at this point)
+	rmdir("gen4/org/antlr/v4/runtime/tree/xpath") # kill 4.3-generated version
+	antlr4("runtime/Java/src/org/antlr/v4/runtime/tree/xpath", "gen4", version="4.4",  package="org.antlr.v4.runtime.tree.xpath")
+	compile()
+	mkjar_complete() # make it again with up to date XPath lexer
+	mkjar_runtime()	 # now build the runtime jar
 
 def tests():
 	require(mkjar)
