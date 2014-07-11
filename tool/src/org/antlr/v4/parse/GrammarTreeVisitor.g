@@ -76,6 +76,7 @@ options {
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.antlr.v4.parse;
+import org.antlr.v4.Tool;
 import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.*;
 import java.lang.reflect.Method;
@@ -86,13 +87,14 @@ public String grammarName;
 public GrammarAST currentRuleAST;
 public String currentModeName = LexerGrammar.DEFAULT_MODE_NAME;
 public String currentRuleName;
-//public GrammarAST currentRuleBlock;
 public GrammarAST currentOuterAltRoot;
 public int currentOuterAltNumber = 1; // 1..n
 public int rewriteEBNFLevel = 0;
 
 public GrammarTreeVisitor() { this(null); }
 
+// Should be abstract but can't make gen'd parser abstract;
+// subclasses should implement else everything goes to stderr!
 public ErrorManager getErrorManager() { return null; }
 
 public void visitGrammar(GrammarAST t) { visit(t, "grammarSpec"); }
@@ -742,6 +744,7 @@ lexerAtom
     |   WILDCARD
     |	LEXER_CHAR_SET
     |   range
+    |   ruleref
     ;
 
 actionElement

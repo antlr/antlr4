@@ -4,6 +4,7 @@ import string
 
 # bootstrap by downloading bilder.py if not found
 import urllib
+import os
 
 if not os.path.exists("bilder.py"):
     print "bootstrapping; downloading bilder.py"
@@ -34,25 +35,25 @@ TARGETS	= {"Java":uniformpath(JAVA_TARGET),
 		   "CSharp":uniformpath(CSHARP_TARGET)}
 
 def parsers():
-	antlr3("tool/src/org/antlr/v4/parse", "gen", package="org.antlr.v4.parse")
-	antlr3("tool/src/org/antlr/v4/codegen", "gen", package="org.antlr.v4.codegen", args=["-lib","tool/src/org/antlr/v4/parse"])
-	antlr4("runtime/Java/src/org/antlr/v4/runtime/tree/xpath", "gen", package="org.antlr.v4.runtime.tree.xpath")
+	antlr3("tool/src/org/antlr/v4/parse", "gen3", package="org.antlr.v4.parse")
+	antlr3("tool/src/org/antlr/v4/codegen", "gen3", package="org.antlr.v4.codegen", args=["-lib",uniformpath("gen3/org/antlr/v4/parse")])
+	antlr4("runtime/Java/src/org/antlr/v4/runtime/tree/xpath", "gen4", package="org.antlr.v4.runtime.tree.xpath")
 
 def compile():
 	require(parsers)
 	cp = uniformpath("out")+os.pathsep+ \
 		 os.path.join(JARCACHE,"antlr-3.5.1-complete.jar")+os.pathsep+ \
-		 "runtime/Java/lib/org.abego.treelayout.core.jar"
-	args = ["-Xlint", "-Xlint:-serial", "-g"]
-	javac("runtime/JavaAnnotations/src/", "out", version="1.6", cp=cp, args=args)
-	javac("runtime/Java/src", "out", version="1.6", cp=cp, args=args)
-	javac("tool/src", "out", version="1.6", cp=cp, args=args)
-	javac("gen", "out", version="1.6", cp=cp, args=args)
+		 "runtime/Java/lib/org.abego.treelayout.core.jar"+os.pathsep+ \
+		 JARCACHE+"/antlr-4.4-complete.jar"
+	srcpath = ["gen3", "gen4", "runtime/JavaAnnotations/src", "runtime/Java/src", "tool/src"]
+	args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
+	for sp in srcpath:
+		javac(sp, "out", version="1.6", cp=cp, args=args)
 	# pull in targets
 	for t in TARGETS:
 		javac(TARGETS[t]+"/tool/src", "out", version="1.6", cp=cp, args=args)
 
-def mkjar():
+def mkjar_complete():
 	require(compile)
 	copytree(src="tool/resources", trg="out") # messages, Java code gen, etc...
 	manifest = \
@@ -73,17 +74,19 @@ Created-By: http://www.bildtool.org
 		mkdir(trgdir)
 		copyfile(TARGETS[t]+"/tool/resources/org/antlr/v4/tool/templates/codegen/"+t+"/"+t+".stg",
 				 trgdir)
-	jar("dist/antlr-"+VERSION+"-complete.jar", srcdir="out", manifest=manifest)
+	jarfile = "dist/antlr-"+VERSION+"-complete.jar"
+	jar(jarfile, srcdir="out", manifest=manifest)
+	print "Generated "+jarfile
 
-	mkruntimejar()
-
-def mkruntimejar():
+def mkjar_runtime():
 	# out/... dir is full of tool-related stuff, make special dir out/runtime
 	cp = uniformpath("out/runtime")+os.pathsep+ \
 		 "runtime/Java/lib/org.abego.treelayout.core.jar"
 	args = ["-Xlint", "-Xlint:-serial", "-g"]
-	javac("runtime/JavaAnnotations/src/", "out/runtime", version="1.6", cp=cp, args=args)
-	javac("runtime/Java/src", "out/runtime", version="1.6", cp=cp, args=args)
+	srcpath = ["runtime/JavaAnnotations/src", "runtime/Java/src"]
+	args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
+	for sp in srcpath:
+		javac(sp, "out", version="1.6", cp=cp, args=args)
 	manifest = \
 """Implementation-Vendor: ANTLR
 Implementation-Title: ANTLR 4 Runtime
@@ -94,8 +97,20 @@ Created-By: http://www.bildtool.org
 """ % (VERSION,os.getlogin())
 	# unjar required library
 	unjar("runtime/Java/lib/org.abego.treelayout.core.jar", trgdir="out/runtime")
-	jar("dist/antlr-runtime-"+VERSION+".jar", srcdir="out/runtime", manifest=manifest)
+	jarfile = "dist/antlr-runtime-" + VERSION + ".jar"
+	jar(jarfile, srcdir="out/runtime", manifest=manifest)
+	print "Generated "+jarfile
 
+def mkjar():
+	mkjar_complete()
+	# put it in JARCARCHE too so bild can find it during antlr4()
+	copyfile(src="dist/antlr-4.4-complete.jar", trg=JARCACHE)
+	# rebuild/bootstrap XPath with 4.4 so it can use 4.4 runtime (gen'd with 4.3 at this point)
+	rmdir("gen4/org/antlr/v4/runtime/tree/xpath") # kill 4.3-generated version
+	antlr4("runtime/Java/src/org/antlr/v4/runtime/tree/xpath", "gen4", version="4.4",  package="org.antlr.v4.runtime.tree.xpath")
+	compile()
+	mkjar_complete() # make it again with up to date XPath lexer
+	mkjar_runtime()	 # now build the runtime jar
 
 def tests():
 	require(mkjar)
@@ -119,7 +134,8 @@ def all():
 
 def clean():
 	rmdir("out")
-	rmdir("gen")
+	rmdir("gen3")
+	rmdir("gen4")
 	rmdir("doc")
 
 def mkdoc():
