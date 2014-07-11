@@ -28,6 +28,8 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.antlr.v4.test;
+
+import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ATNPrinter;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
@@ -35,9 +37,11 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestATNConstruction extends BaseTest {
 	@Test
@@ -390,6 +394,30 @@ public class TestATNConstruction extends BaseTest {
 				"RuleStop_a_1-EOF->s8\n";
 		checkRuleATN(g, "a", expecting);
 	}
+
+	@Test public void testParserRuleRefInLexerRule() throws Exception {
+		boolean threwException = false;
+		try {
+			String gstr =
+				"lexer grammar U;\n"+
+				"A : a;";
+
+			Tool tool = new Tool();
+			tool.removeListeners();
+			ErrorQueue errorQueue = new ErrorQueue();
+			tool.addListener(errorQueue);
+			System.out.println("errors:"+errorQueue.errors);
+			System.out.println("warns:"+errorQueue.warnings);
+			GrammarRootAST grammarRootAST = tool.parseGrammarFromString(gstr);
+			Grammar g = tool.createGrammar(grammarRootAST);
+			tool.process(g, false);
+		}
+		catch (Exception e) {
+			threwException = true;
+		}
+		assertTrue(!threwException);
+	}
+
 /*
 	@Test public void testMultiplePredicates() throws Exception {
 		Grammar g = new Grammar(
