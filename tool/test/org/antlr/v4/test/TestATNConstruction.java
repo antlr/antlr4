@@ -35,10 +35,13 @@ import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -397,24 +400,32 @@ public class TestATNConstruction extends BaseTest {
 
 	@Test public void testParserRuleRefInLexerRule() throws Exception {
 		boolean threwException = false;
+		ErrorQueue errorQueue = new ErrorQueue();
 		try {
 			String gstr =
-				"lexer grammar U;\n"+
-				"A : a;";
+				"grammar U;\n"+
+				"a : A;\n"+
+				"A : a;\n";
 
 			Tool tool = new Tool();
 			tool.removeListeners();
-			ErrorQueue errorQueue = new ErrorQueue();
 			tool.addListener(errorQueue);
-			System.out.println("errors:"+errorQueue.errors);
-			System.out.println("warns:"+errorQueue.warnings);
+			assertEquals(0, errorQueue.size());
 			GrammarRootAST grammarRootAST = tool.parseGrammarFromString(gstr);
+			assertEquals(0, errorQueue.size());
 			Grammar g = tool.createGrammar(grammarRootAST);
+			assertEquals(0, errorQueue.size());
+			g.fileName = "<string>";
 			tool.process(g, false);
 		}
 		catch (Exception e) {
 			threwException = true;
+			e.printStackTrace();
 		}
+		System.out.println(errorQueue);
+		assertEquals(1, errorQueue.errors.size());
+		assertEquals(ErrorType.PARSER_RULE_REF_IN_LEXER_RULE, errorQueue.errors.get(0).getErrorType());
+		assertEquals("[a, A]", Arrays.toString(errorQueue.errors.get(0).getArgs()));
 		assertTrue(!threwException);
 	}
 

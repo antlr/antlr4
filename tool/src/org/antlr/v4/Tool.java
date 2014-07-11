@@ -434,7 +434,8 @@ public class Tool {
 	 * Important enough to avoid multiple definitions that we do very early,
 	 * right after AST construction. Also check for undefined rules in
 	 * parser/lexer to avoid exceptions later. Return true if we find multiple
-	 * definitions of the same rule or a reference to an undefined rule.
+	 * definitions of the same rule or a reference to an undefined rule or
+	 * parser rule ref in lexer rule.
 	 */
 	public boolean checkForRuleIssues(final Grammar g) {
 		// check for redefined rules
@@ -466,7 +467,7 @@ public class Tool {
 
 		// check for undefined rules
 		class UndefChecker extends GrammarTreeVisitor {
-			public boolean undefined = false;
+			public boolean badref = false;
 			@Override
 			public void tokenRef(TerminalAST ref) {
 				if ("EOF".equals(ref.getText())) {
@@ -480,18 +481,28 @@ public class Tool {
 			@Override
 			public void ruleRef(GrammarAST ref, ActionAST arg) {
 				RuleAST ruleAST = ruleToAST.get(ref.getText());
-				if ( ruleAST==null ) {
-					undefined = true;
+				if (Character.isUpperCase(currentRuleName.charAt(0)) &&
+					Character.isLowerCase(ref.getText().charAt(0)))
+				{
+					badref = true;
+					String fileName = ref.getToken().getInputStream().getSourceName();
+					errMgr.grammarError(ErrorType.PARSER_RULE_REF_IN_LEXER_RULE,
+										fileName, ref.getToken(), ref.getText(), currentRuleName);
+				}
+				else if ( ruleAST==null ) {
+					badref = true;
 					errMgr.grammarError(ErrorType.UNDEFINED_RULE_REF,
 										g.fileName, ref.token, ref.getText());
 				}
 			}
+			@Override
+			public ErrorManager getErrorManager() { return errMgr; }
 		}
 
 		UndefChecker chk = new UndefChecker();
 		chk.visitGrammar(g.ast);
 
-		return redefinition || chk.undefined;
+		return redefinition || chk.badref;
 	}
 
 	public List<GrammarRootAST> sortGrammarByTokenVocab(List<String> fileNames) {
