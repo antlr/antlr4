@@ -43,8 +43,9 @@ def compile():
 	require(parsers)
 	cp = uniformpath("out")+os.pathsep+ \
 		 os.path.join(JARCACHE,"antlr-3.5.1-complete.jar")+os.pathsep+ \
-		 "runtime/Java/lib/org.abego.treelayout.core.jar"+os.pathsep+ \
-		 JARCACHE+"/antlr-4.4-complete.jar"
+		 "runtime/Java/lib/org.abego.treelayout.core.jar"+os.pathsep
+	if os.path.exists(JARCACHE+"/antlr-4.4-complete.jar"):
+		 cp += JARCACHE+"/antlr-4.4-complete.jar"
 	srcpath = ["gen3", "gen4", "runtime/JavaAnnotations/src", "runtime/Java/src", "tool/src"]
 	args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
 	for sp in srcpath:
@@ -80,10 +81,12 @@ Created-By: http://www.bildtool.org
 
 def mkjar_runtime():
 	# out/... dir is full of tool-related stuff, make special dir out/runtime
+	# unjar required library
+	unjar("runtime/Java/lib/org.abego.treelayout.core.jar", trgdir="out/runtime")
 	cp = uniformpath("out/runtime")+os.pathsep+ \
 		 "runtime/Java/lib/org.abego.treelayout.core.jar"
 	args = ["-Xlint", "-Xlint:-serial", "-g"]
-	srcpath = ["runtime/JavaAnnotations/src", "runtime/Java/src"]
+	srcpath = ["gen4", "runtime/JavaAnnotations/src", "runtime/Java/src"]
 	args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
 	for sp in srcpath:
 		javac(sp, "out", version="1.6", cp=cp, args=args)
@@ -95,8 +98,6 @@ Built-By: %s
 Build-Jdk: 1.6
 Created-By: http://www.bildtool.org
 """ % (VERSION,os.getlogin())
-	# unjar required library
-	unjar("runtime/Java/lib/org.abego.treelayout.core.jar", trgdir="out/runtime")
 	jarfile = "dist/antlr-runtime-" + VERSION + ".jar"
 	jar(jarfile, srcdir="out/runtime", manifest=manifest)
 	print "Generated "+jarfile
