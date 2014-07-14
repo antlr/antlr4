@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='antlr4-python3-runtime',
-    version='4.4.0',
+    version='4.4.1',
     packages=['antlr4', 'antlr4.atn', 'antlr4.dfa', 'antlr4.tree', 'antlr4.error', 'antlr4.xpath'],
     package_dir={'': 'src'},
     url='http://www.antlr.org',
