@@ -400,4 +400,31 @@ public class RuntimeMetaData {
 			}
 		}
 	}
+	
+	/**
+	 * Gets the major and minor version numbers from a version string. For
+	 * details about the syntax of the input {@code version}, see the
+	 * documentation for {@link org.antlr.v4.runtime.RuntimeMetaData.DefaultListener}.
+	 * E.g., from x.y.z return x.y.
+	 *
+	 * @param version The complete version string.
+	 * @return A string of the form <em>major</em>.<em>minor</em> containing
+	 * only the major and minor components of the version string.
+	 */
+	@NotNull
+	public static String getMajorMinorVersion(@NotNull String version) {
+		int firstDot = version.indexOf('.');
+		int secondDot = firstDot >= 0 ? version.indexOf('.', firstDot + 1) : -1;
+		int firstDash = version.indexOf('-');
+		int referenceLength = version.length();
+		if (secondDot >= 0) {
+			referenceLength = Math.min(referenceLength, secondDot);
+		}
+
+		if (firstDash >= 0) {
+			referenceLength = Math.min(referenceLength, firstDash);
+		}
+
+		return version.substring(0, referenceLength);
+	}
 }
