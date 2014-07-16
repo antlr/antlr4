@@ -161,11 +161,13 @@ def mkdoc():
 	mkdir("doc/JavaTool")
 	javadoc(srcdir=["runtime/Java/src","runtime/JavaAnnotations/src"],
 			trgdir="doc/Java", classpath=JARCACHE+"/antlr-4.4-complete.jar",
+			title="ANTLR 4.4 Runtime",
 			packages="org.antlr.v4.runtime")
 	toolsrc = [TARGETS[t]+"/tool/src" for t in TARGETS]
 	toolsrc = string.join(toolsrc, ":")
 	javadoc(srcdir=toolsrc, trgdir="doc/JavaTool",
 			classpath=JARCACHE+"/antlr-4.4-complete.jar",
+			title="ANTLR 4.4 Tool",
 			packages="org.antlr.v4")
 	# build stack merge PredictionContext and ATNState images from DOT
 	# DOT Images are in runtime/Java/src/main/dot/org/antlr/v4/runtime/atn/images/
