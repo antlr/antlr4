@@ -156,6 +156,26 @@ def tests():
 		javac(TARGETS[t]+"/tool/test", "out/test/"+t, version="1.6", cp=cp, args=args)
 		junit("out/test/"+t, cp=cp, verbose=False, args=properties)
 
+def mkdoc():
+	mkdir("doc/Java")
+	mkdir("doc/JavaTool")
+	javadoc(srcdir=["runtime/Java/src","runtime/JavaAnnotations/src"],
+			trgdir="doc/Java", classpath=JARCACHE+"/antlr-4.4-complete.jar",
+			packages="org.antlr.v4.runtime")
+	toolsrc = [TARGETS[t]+"/tool/src" for t in TARGETS]
+	toolsrc = string.join(toolsrc, ":")
+	javadoc(srcdir=toolsrc, trgdir="doc/JavaTool",
+			classpath=JARCACHE+"/antlr-4.4-complete.jar",
+			packages="org.antlr.v4")
+	# build stack merge PredictionContext and ATNState images from DOT
+	# DOT Images are in runtime/Java/src/main/dot/org/antlr/v4/runtime/atn/images/
+	# Gen into E.g., doc/Java/org/antlr/v4/runtime/atn/images/SingletonMerge_DiffRootSamePar.svg
+	mkdir("doc/Java/org/antlr/v4/runtime/atn/images")
+	for f in glob.glob("runtime/Java/src/main/dot/org/antlr/v4/runtime/atn/images/*.dot"):
+		dot(f, "doc/Java/org/antlr/v4/runtime/atn/images", format="svg")
+	zip("doc/antlr4-runtime.zip", "doc/Java")
+	zip("doc/antlr4-tool.zip", "doc/JavaTool")
+
 def all():
 	mkjar()
 	tests()
@@ -166,22 +186,5 @@ def clean():
 	rmdir("gen3")
 	rmdir("gen4")
 	rmdir("doc")
-
-def mkdoc():
-	mkdir("doc/Java")
-	mkdir("doc/JavaTool")
-	javadoc(srcdir=["runtime/Java/src","runtime/JavaAnnotations/src"],
-			trgdir="doc/Java", packages="org.antlr.v4.runtime")
-	toolsrc = [TARGETS[t]+"/tool/src" for t in TARGETS]
-	toolsrc = string.join(toolsrc, ":")
-	javadoc(srcdir=toolsrc, trgdir="doc/JavaTool", packages="org.antlr.v4")
-	# build stack merge PredictionContext and ATNState images from DOT
-	# DOT Images are in runtime/Java/src/main/dot/org/antlr/v4/runtime/atn/images/
-	# Gen into E.g., doc/Java/org/antlr/v4/runtime/atn/images/SingletonMerge_DiffRootSamePar.svg
-	mkdir("doc/Java/org/antlr/v4/runtime/atn/images")
-	for f in glob.glob("runtime/Java/src/main/dot/org/antlr/v4/runtime/atn/images/*.dot"):
-		dot(f, "doc/Java/org/antlr/v4/runtime/atn/images", format="svg")
-	zip("doc/antlr4-runtime.zip", "doc/Java")
-	zip("doc/antlr4-tool.zip", "doc/JavaTool")
 
 processargs(globals()) # E.g., "python bild.py all"
