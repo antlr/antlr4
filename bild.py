@@ -162,7 +162,8 @@ def clean():
 def mkdoc():
 	mkdir("doc/Java")
 	mkdir("doc/JavaTool")
-	javadoc(srcdir="runtime/Java/src", trgdir="doc/Java", packages="org.antlr.v4.runtime")
+	javadoc(srcdir=["runtime/Java/src","runtime/JavaAnnotations/src"],
+			trgdir="doc/Java", packages="org.antlr.v4.runtime")
 	toolsrc = [TARGETS[t]+"/tool/src" for t in TARGETS]
 	toolsrc = string.join(toolsrc, ":")
 	javadoc(srcdir=toolsrc, trgdir="doc/JavaTool", packages="org.antlr.v4")
