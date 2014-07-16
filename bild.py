@@ -3,11 +3,14 @@ import os
 import string
 
 """
-This script use my experimental build tool http://www.bildtool.org
+This script uses my experimental build tool http://www.bildtool.org
 
 In order to build the complete ANTLR4 product with Java, Python 2, and Python 3
 targets, do the following from a UNIX command line.  Windows build using this script
 is not yet supported. Please use the mvn build or ant build.
+
+!!!You must set path values in test_properties dictionary below to ensure Python
+tests run.!!!
 
 mkdir -p /usr/local/antlr # somewhere appropriate where you want to install stuff
 cd /usr/local/antlr
