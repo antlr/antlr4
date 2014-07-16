@@ -2,6 +2,24 @@
 import os
 import string
 
+"""
+This script use my experimental build tool http://www.bildtool.org
+
+In order to build the complete ANTLR4 product with Java, Python 2, and Python 3
+targets, do the following from a UNIX command line.  Windows build using this script
+is not yet supported. Please use the mvn build or ant build.
+
+mkdir -p /usr/local/antlr # somewhere appropriate where you want to install stuff
+cd /usr/local/antlr
+git clone git@github.com:parrt/antlr4.git
+git clone git@github.com:parrt/antlr4-python3.git
+git clone git@github.com:parrt/antlr4-python2.git
+# git clone git@github.com:antlr/antlr4-csharp.git  not quite ready use:
+# https://github.com/tunnelvisionlabs/antlr4cs/releases/tag/v4.3.0
+cd antlr4
+./bild.py tests
+"""
+
 # bootstrap by downloading bilder.py if not found
 import urllib
 import os
@@ -32,7 +50,8 @@ test_properties = {
 TARGETS	= {"Java":uniformpath(JAVA_TARGET),
 		   "Python2":uniformpath(PYTHON2_TARGET),
 		   "Python3":uniformpath(PYTHON3_TARGET),
-		   "CSharp":uniformpath(CSHARP_TARGET)}
+		   #"CSharp":uniformpath(CSHARP_TARGET)
+		  }
 
 def parsers():
 	antlr3("tool/src/org/antlr/v4/parse", "gen3", package="org.antlr.v4.parse")
