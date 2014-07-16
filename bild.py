@@ -90,7 +90,12 @@ Created-By: http://www.bildtool.org
 """ % (VERSION,os.getlogin())
 	# unjar required libraries
 	unjar("runtime/Java/lib/org.abego.treelayout.core.jar", trgdir="out")
-	unjar(os.path.join(JARCACHE,"antlr-3.5.1-complete.jar"), trgdir="out")
+	v3runtime = "antlr-3.5.2-runtime.jar"
+	download("http://www.antlr3.org/download/"+v3runtime, JARCACHE)
+	unjar(os.path.join(JARCACHE, v3runtime), trgdir="out")
+	STruntime = "ST-4.0.8-no-antlr3-runtime.jar"
+	download("http://www.stringtemplate.org/download/"+STruntime, JARCACHE)
+	unjar(os.path.join(JARCACHE, STruntime), trgdir="out")
 	# pull in target templates
 	for t in TARGETS:
 		trgdir = "out/org/antlr/v4/tool/templates/codegen/"+t
@@ -111,7 +116,7 @@ def mkjar_runtime():
 	srcpath = ["gen4", "runtime/JavaAnnotations/src", "runtime/Java/src"]
 	args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
 	for sp in srcpath:
-		javac(sp, "out", version="1.6", cp=cp, args=args)
+		javac(sp, "out/runtime", version="1.6", cp=cp, args=args)
 	manifest = \
 """Implementation-Vendor: ANTLR
 Implementation-Title: ANTLR 4 Runtime
