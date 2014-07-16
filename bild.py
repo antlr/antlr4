@@ -118,13 +118,14 @@ def tests():
 	junit_jar, hamcrest_jar = load_junitjars()
 	cp = uniformpath("dist/antlr-"+VERSION+"-complete.jar")+os.pathsep+ \
 		 uniformpath("out/test/Java")+os.pathsep+ \
-		 string.join([uniformpath(TARGETS[t]+"/tool/test") for t in TARGETS],os.pathsep)+os.pathsep+ \
 		 junit_jar+os.pathsep+hamcrest_jar
 	properties = ["-D%s=%s" % (p, test_properties[p]) for p in test_properties]
 	args = ["-Xlint", "-Xlint:-serial", "-g"]
 	javac("tool/test", "out/test/Java", version="1.6", cp=cp, args=args) # all targets can use org.antlr.v4.test.*
 	for t in TARGETS:
 		print "Test %7s --------------" % t
+		# Prefix CLASSPATH with individual target tests
+		cp = uniformpath(TARGETS[t]+"/tool/test") + os.pathsep + cp
 		javac(TARGETS[t]+"/tool/test", "out/test/"+t, version="1.6", cp=cp, args=args)
 		junit("out/test/"+t, cp=cp, verbose=False, args=properties)
 
