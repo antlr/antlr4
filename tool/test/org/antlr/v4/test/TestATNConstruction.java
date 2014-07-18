@@ -33,15 +33,23 @@ import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ATNPrinter;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
+import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.GrammarRootAST;
+import org.antlr.v4.tool.ast.RuleAST;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -285,6 +293,33 @@ public class TestATNConstruction extends BaseTest {
 				"s6->RuleStop_a_1\n" +
 				"RuleStop_a_1-EOF->s7\n";
 		checkRuleATN(g, "a", expecting);
+	}
+	@Test public void testAplusSingleAltHasPlusASTPointingAtLoopBackState() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"s : a B ;\n" +			// (RULE a (BLOCK (ALT (+ (BLOCK (ALT A))))))
+			"a : A+;");
+		String expecting =
+			"RuleStart_a_2->PlusBlockStart_8\n" +
+			"PlusBlockStart_8->s7\n" +
+			"s7-A->BlockEnd_9\n" +
+			"BlockEnd_9->PlusLoopBack_10\n" +
+			"PlusLoopBack_10->PlusBlockStart_8\n" +
+			"PlusLoopBack_10->s11\n" +
+			"s11->RuleStop_a_3\n" +
+			"RuleStop_a_3->s5\n";
+		checkRuleATN(g, "a", expecting);
+		// Get all AST -> ATNState relationships. Make sure loopback is covered when no loop entry decision
+		List<GrammarAST> ruleNodes = g.ast.getNodesWithType(ANTLRParser.RULE);
+		RuleAST a = (RuleAST)ruleNodes.get(1);
+		List<GrammarAST> nodesInRule = a.getNodesWithType(null);
+		Map<GrammarAST, ATNState> covered = new LinkedHashMap<GrammarAST, ATNState>();
+		for (GrammarAST node : nodesInRule) {
+			if ( node.atnState != null ) {
+				covered.put(node, node.atnState);
+			}
+		}
+		assertEquals("{RULE=2, BLOCK=8, +=10, BLOCK=8, A=7}", covered.toString());
 	}
 	@Test public void testAorBplus() throws Exception {
 		Grammar g = new Grammar(
