@@ -63,7 +63,6 @@ import org.antlr.v4.codegen.model.decl.TokenDecl;
 import org.antlr.v4.codegen.model.decl.TokenListDecl;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.DecisionState;
-import org.antlr.v4.runtime.atn.PlusBlockStartState;
 import org.antlr.v4.runtime.atn.PlusLoopbackState;
 import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -247,12 +246,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 		if (!g.tool.force_atn) {
 			int decision;
 			if ( ebnfRoot.getType()==ANTLRParser.POSITIVE_CLOSURE ) {
-				if ( ebnfRoot.atnState instanceof PlusBlockStartState ) {
-					decision = ((PlusBlockStartState) ebnfRoot.atnState).loopBackState.decision;
-				}
-				else {
-					decision = ((PlusLoopbackState)ebnfRoot.atnState).decision;
-				}
+				decision = ((PlusLoopbackState)ebnfRoot.atnState).decision;
 			}
 			else if ( ebnfRoot.getType()==ANTLRParser.CLOSURE ) {
 				decision = ((StarLoopEntryState)ebnfRoot.atnState).decision;
