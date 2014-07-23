@@ -2,9 +2,9 @@
 <project name="ANTLR4" default="distribute" basedir=".">
     <target name="basic-init">
         <property file="user.build.properties"/>
-        <property name="dist.dir" value="${basedir}/dist" />
-        <property name="build.dir" value="${basedir}/build" />
-        <property name="lib.dir" value="${basedir}/lib" />
+        <property name="dist.dir" value="${basedir}/dist/opt" />
+        <property name="build.dir" value="${basedir}/build/opt" />
+        <property name="lib.dir" value="${basedir}/lib/opt" />
     </target>
 
     <target name="antlr3-init" depends="basic-init">
@@ -21,10 +21,14 @@
 
     <target name="antlr4-init" depends="basic-init">
         <property name="antlr4.version" value="4.2.2"/>
-        <property name="antlr4.jar.name" value="antlr-${antlr4.version}-complete.jar"/>
+        <property name="antlr4.runtime.jar.name" value="antlr4-runtime-${antlr4.version}-complete.jar"/>
+        <property name="antlr4.runtime.jar" value="${lib.dir}/${antlr4.runtime.jar.name}"/>
+        <property name="antlr4.jar.name" value="antlr4-${antlr4.version}-complete.jar"/>
         <property name="antlr4.jar" value="${lib.dir}/${antlr4.jar.name}"/>
         <mkdir dir="${lib.dir}"/>
-        <get src="http://www.antlr.org/download/${antlr4.jar.name}" dest="${antlr4.jar}" skipexisting="true"/>
+        <get src="https://oss.sonatype.org/content/repositories/releases/com/tunnelvisionlabs/antlr4-runtime/${antlr4.version}/${antlr4.runtime.jar.name}" dest="${antlr4.runtime.jar}" skipexisting="true"/>
+        <get src="https://oss.sonatype.org/content/repositories/releases/com/tunnelvisionlabs/antlr4/${antlr4.version}/${antlr4.jar.name}" dest="${antlr4.jar}" skipexisting="true"/>
+        <path id="cp.antlr4.runtime" path="${antlr4.runtime.jar}"/>
         <path id="cp.antlr4" path="${antlr4.jar}"/>
 
         <property name="build.antlr4.dir" value="${build.dir}/generated-sources/antlr4" />
@@ -32,7 +36,8 @@
     </target>
 
     <target name="build-init" depends="basic-init">
-        <property name="version" value="4.3.1-opt-SNAPSHOT"/>
+        <xmlproperty file="${basedir}/pom.xml" prefix="pom"/>
+        <property name="version" value="${pom.project.version}"/>
         <property name="build.sysclasspath" value="ignore"/>
         <property name="install.root.dir" value="${dist.dir}/antlr-${version}" />
         <property name="jar.file" value="${dist.dir}/antlr-${version}-complete.jar" />
@@ -145,6 +150,7 @@
                 <arg line="${sources.antlr4.local}"/>
                 <classpath>
                     <path refid="cp.antlr4"/>
+                    <path refid="cp.antlr4.runtime"/>
                     <pathelement location="${java.class.path}"/>
                 </classpath>
             </java>
