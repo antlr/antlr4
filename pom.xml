@@ -202,6 +202,8 @@
                 <version>2.4.2</version>
                 <configuration>
                     <arguments>-Psonatype-oss-release ${release.arguments}</arguments>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <tagNameFormat>@{project.version}-opt</tagNameFormat>
                 </configuration>
             </plugin>
         </plugins>
