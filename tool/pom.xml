@@ -57,7 +57,7 @@
                         <configuration>
                             <includeDependencySources>true</includeDependencySources>
                             <dependencySourceIncludes>
-                                <dependencySourceInclude>org.antlr:antlr4-*</dependencySourceInclude>
+                                <dependencySourceInclude>com.tunnelvisionlabs:antlr4-*</dependencySourceInclude>
                             </dependencySourceIncludes>
                         </configuration>
                     </plugin>
@@ -81,13 +81,13 @@
                                     <shadedClassifierName>complete</shadedClassifierName>
                                     <filters>
                                         <filter>
-                                            <artifact>org.antlr:antlr4-runtime</artifact>
+                                            <artifact>com.tunnelvisionlabs:antlr4-runtime</artifact>
                                             <includes>
                                                 <include>org/antlr/v4/runtime/**</include>
                                             </includes>
                                         </filter>
                                         <filter>
-                                            <artifact>org.antlr:antlr4-annotations</artifact>
+                                            <artifact>com.tunnelvisionlabs:antlr4-annotations</artifact>
                                             <includes>
                                                 <include>org/antlr/v4/runtime/**</include>
                                             </includes>
