@@ -36,7 +36,7 @@ namespace Antlr4.Runtime.Atn
 {
     /// <summary>
     /// Implements the
-    /// <code>channel</code>
+    /// <c>channel</c>
     /// lexer action by calling
     /// <see cref="Antlr4.Runtime.Lexer.Channel(int)"/>
     /// with the assigned channel.
@@ -49,7 +49,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Constructs a new
-        /// <code>channel</code>
+        /// <paramref name="channel"/>
         /// action with the specified channel value.
         /// </summary>
         /// <param name="channel">
@@ -97,7 +97,7 @@ namespace Antlr4.Runtime.Atn
         /// <summary><inheritDoc/></summary>
         /// <returns>
         /// This method returns
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// .
         /// </returns>
         public bool IsPositionDependent

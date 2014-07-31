@@ -46,7 +46,7 @@ namespace Antlr4.Runtime.Misc
 
         /// <summary>
         /// Initialize the hash using the specified
-        /// <code>seed</code>
+        /// <paramref name="seed"/>
         /// .
         /// </summary>
         /// <param name="seed">the seed</param>
@@ -58,7 +58,7 @@ namespace Antlr4.Runtime.Misc
 
         /// <summary>
         /// Update the intermediate hash value for the next input
-        /// <code>value</code>
+        /// <paramref name="value"/>
         /// .
         /// </summary>
         /// <param name="hash">the intermediate hash value</param>
@@ -84,7 +84,7 @@ namespace Antlr4.Runtime.Misc
 
         /// <summary>
         /// Update the intermediate hash value for the next input
-        /// <code>value</code>
+        /// <paramref name="value"/>
         /// .
         /// </summary>
         /// <param name="hash">the intermediate hash value</param>
@@ -97,7 +97,7 @@ namespace Antlr4.Runtime.Misc
 
         /// <summary>
         /// Apply the final computation steps to the intermediate value
-        /// <code>hash</code>
+        /// <paramref name="hash"/>
         /// to form the final result of the MurmurHash 3 hash function.
         /// </summary>
         /// <param name="hash">the intermediate hash value</param>

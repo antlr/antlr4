@@ -39,24 +39,24 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// following forms.
     /// <ul>
     /// <li>
-    /// <code>expr</code>
+    /// <c>expr</c>
     /// : An unlabeled placeholder for a parser rule
-    /// <code>expr</code>
+    /// <c>expr</c>
     /// .</li>
     /// <li>
-    /// <code>ID</code>
+    /// <c>ID</c>
     /// : An unlabeled placeholder for a token of type
-    /// <code>ID</code>
+    /// <c>ID</c>
     /// .</li>
     /// <li>
-    /// <code>e:expr</code>
+    /// <c>e:expr</c>
     /// : A labeled placeholder for a parser rule
-    /// <code>expr</code>
+    /// <c>expr</c>
     /// .</li>
     /// <li>
-    /// <code>id:ID</code>
+    /// <c>id:ID</c>
     /// : A labeled placeholder for a token of type
-    /// <code>ID</code>
+    /// <c>ID</c>
     /// .</li>
     /// </ul>
     /// This class does not perform any validation on the tag or label names aside
@@ -91,9 +91,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <exception>
         /// IllegalArgumentException
         /// if
-        /// <code>tag</code>
+        /// <paramref name="tag"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// or
         /// empty.
         /// </exception>
@@ -110,7 +110,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// </summary>
         /// <param name="label">
         /// The label for the tag. If this is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// , the
         /// <see cref="TagChunk"/>
         /// represents an unlabeled tag.
@@ -122,9 +122,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <exception>
         /// IllegalArgumentException
         /// if
-        /// <code>tag</code>
+        /// <paramref name="tag"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// or
         /// empty.
         /// </exception>
@@ -153,7 +153,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <remarks>Get the label, if any, assigned to this chunk.</remarks>
         /// <returns>
         /// The label assigned to this chunk, or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if no label is
         /// assigned to the chunk.
         /// </returns>
@@ -169,7 +169,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <remarks>
         /// This method returns a text representation of the tag chunk. Labeled tags
         /// are returned in the form
-        /// <code>label:tag</code>
+        /// <c>label:tag</c>
         /// , and unlabeled tags are
         /// returned as just the tag name.
         /// </remarks>

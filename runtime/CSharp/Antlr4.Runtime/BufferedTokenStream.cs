@@ -73,7 +73,7 @@ namespace Antlr4.Runtime
         /// <see cref="fetchedEOF"/>
         /// is set
         /// to
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// .
         /// </remarks>
         protected internal IList<IToken> tokens = new List<IToken>(100);
@@ -85,9 +85,9 @@ namespace Antlr4.Runtime
         /// <see cref="Consume()"/>
         /// ).
         /// <see cref="tokens"/>
-        /// <code>[</code>
+        /// <c>[</c>
         /// <see cref="p"/>
-        /// <code>]</code>
+        /// <c>]</c>
         /// should be
         /// <see cref="Lt(int)">LT(1)</see>
         /// .
@@ -221,16 +221,16 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Make sure index
-        /// <code>i</code>
+        /// <paramref name="i"/>
         /// in tokens has a token.
         /// </summary>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if a token is located at index
-        /// <code>i</code>
+        /// <paramref name="i"/>
         /// , otherwise
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// .
         /// </returns>
         /// <seealso cref="Get(int)"/>
@@ -250,7 +250,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Add
-        /// <code>n</code>
+        /// <paramref name="n"/>
         /// elements to buffer.
         /// </summary>
         /// <returns>The actual number of elements added to the buffer.</returns>
@@ -359,7 +359,7 @@ namespace Antlr4.Runtime
         /// Allowed derived classes to modify the behavior of operations which change
         /// the current stream position by adjusting the target token index of a seek
         /// operation. The default implementation simply returns
-        /// <code>i</code>
+        /// <paramref name="i"/>
         /// . If an
         /// exception is thrown in this method, the current stream index should not be
         /// changed.
@@ -410,12 +410,12 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Given a start and stop index, return a
-        /// <code>List</code>
+        /// <c>List</c>
         /// of all tokens in
         /// the token type
-        /// <code>BitSet</code>
+        /// <c>BitSet</c>
         /// .  Return
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if no tokens were found.  This
         /// method looks at both on and off channel tokens.
         /// </summary>
@@ -458,12 +458,12 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// Given a starting index, return the index of the next token on channel.
         /// Return
-        /// <code>i</code>
+        /// <paramref name="i"/>
         /// if
-        /// <code>tokens[i]</code>
+        /// <c>tokens[i]</c>
         /// is on channel. Return the index of
         /// the EOF token if there are no tokens on channel between
-        /// <code>i</code>
+        /// <paramref name="i"/>
         /// and
         /// EOF.
         /// </remarks>
@@ -495,16 +495,16 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// Given a starting index, return the index of the previous token on
         /// channel. Return
-        /// <code>i</code>
+        /// <paramref name="i"/>
         /// if
-        /// <code>tokens[i]</code>
+        /// <c>tokens[i]</c>
         /// is on channel. Return -1
         /// if there are no tokens on channel between
-        /// <code>i</code>
+        /// <paramref name="i"/>
         /// and 0.
         /// <p>
         /// If
-        /// <code>i</code>
+        /// <paramref name="i"/>
         /// specifies an index at or after the EOF token, the EOF token
         /// index is returned. This is due to the fact that the EOF token is treated
         /// as though it were on every channel.</p>
@@ -535,9 +535,9 @@ namespace Antlr4.Runtime
         /// <see cref="Lexer.DefaultTokenChannel"/>
         /// or
         /// EOF. If
-        /// <code>channel</code>
+        /// <paramref name="channel"/>
         /// is
-        /// <code>-1</code>
+        /// <c>-1</c>
         /// , find any non default channel token.
         /// </summary>
         public virtual IList<IToken> GetHiddenTokensToRight(int tokenIndex, int channel)
@@ -579,9 +579,9 @@ namespace Antlr4.Runtime
         /// <see cref="Lexer.DefaultTokenChannel"/>
         /// .
         /// If
-        /// <code>channel</code>
+        /// <paramref name="channel"/>
         /// is
-        /// <code>-1</code>
+        /// <c>-1</c>
         /// , find any non default channel token.
         /// </summary>
         public virtual IList<IToken> GetHiddenTokensToLeft(int tokenIndex, int channel)

@@ -56,7 +56,7 @@ namespace Antlr4.Runtime
     /// (
     /// <see cref="IToken.DefaultChannel"/>
     /// ), but may be reassigned by using the
-    /// <code>-&gt;channel(HIDDEN)</code>
+    /// <c>-&gt;channel(HIDDEN)</c>
     /// lexer command, or by using an embedded action to
     /// call
     /// <see cref="Lexer.Channel(int)"/>
@@ -64,7 +64,7 @@ namespace Antlr4.Runtime
     /// </p>
     /// <p>
     /// Note: lexer rules which use the
-    /// <code>-&gt;skip</code>
+    /// <c>-&gt;skip</c>
     /// lexer command or call
     /// <see cref="Lexer.Skip()"/>
     /// do not produce tokens at all, so input text matched by
@@ -105,7 +105,7 @@ namespace Antlr4.Runtime
         /// source and filtering tokens to the specified channel. Only tokens whose
         /// <see cref="IToken.Channel()"/>
         /// matches
-        /// <code>channel</code>
+        /// <paramref name="channel"/>
         /// or have the
         /// <see cref="IToken.Type()"/>
         /// equal to

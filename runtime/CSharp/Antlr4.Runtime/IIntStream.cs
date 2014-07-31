@@ -65,18 +65,18 @@ namespace Antlr4.Runtime
         /// <li><strong>Forward movement:</strong> The value of
         /// <see cref="Index()">index()</see>
         /// before calling this method is less than the value of
-        /// <code>index()</code>
+        /// <c>index()</c>
         /// after calling this method.</li>
         /// <li><strong>Ordered lookahead:</strong> The value of
-        /// <code>LA(1)</code>
+        /// <c>LA(1)</c>
         /// before
         /// calling this method becomes the value of
-        /// <code>LA(-1)</code>
+        /// <c>LA(-1)</c>
         /// after calling
         /// this method.</li>
         /// </ul>
         /// Note that calling this method does not guarantee that
-        /// <code>index()</code>
+        /// <c>index()</c>
         /// is
         /// incremented by exactly 1, as that would preclude the ability to implement
         /// filtering streams (e.g.
@@ -87,65 +87,65 @@ namespace Antlr4.Runtime
         /// <exception cref="System.InvalidOperationException">
         /// if an attempt is made to consume the the
         /// end of the stream (i.e. if
-        /// <code>LA(1)==</code>
+        /// <c>LA(1)==</c>
         /// <see cref="Eof">EOF</see>
         /// before calling
-        /// <code>consume</code>
+        /// <c>consume</c>
         /// ).
         /// </exception>
         void Consume();
 
         /// <summary>
         /// Gets the value of the symbol at offset
-        /// <code>i</code>
+        /// <paramref name="i"/>
         /// from the current
         /// position. When
-        /// <code>i==1</code>
+        /// <c>i==1</c>
         /// , this method returns the value of the current
         /// symbol in the stream (which is the next symbol to be consumed). When
-        /// <code>i==-1</code>
+        /// <c>i==-1</c>
         /// , this method returns the value of the previously read
         /// symbol in the stream. It is not valid to call this method with
-        /// <code>i==0</code>
+        /// <c>i==0</c>
         /// , but the specific behavior is unspecified because this
         /// method is frequently called from performance-critical code.
         /// <p>This method is guaranteed to succeed if any of the following are true:</p>
         /// <ul>
         /// <li>
-        /// <code>i&gt;0</code>
+        /// <c>i&gt;0</c>
         /// </li>
         /// <li>
-        /// <code>i==-1</code>
+        /// <c>i==-1</c>
         /// and
         /// <see cref="Index()">index()</see>
         /// returns a value greater
         /// than the value of
-        /// <code>index()</code>
+        /// <c>index()</c>
         /// after the stream was constructed
         /// and
-        /// <code>LA(1)</code>
+        /// <c>LA(1)</c>
         /// was called in that order. Specifying the current
-        /// <code>index()</code>
+        /// <c>index()</c>
         /// relative to the index after the stream was created
         /// allows for filtering implementations that do not return every symbol
         /// from the underlying source. Specifying the call to
-        /// <code>LA(1)</code>
+        /// <c>LA(1)</c>
         /// allows for lazily initialized streams.</li>
         /// <li>
-        /// <code>LA(i)</code>
+        /// <c>LA(i)</c>
         /// refers to a symbol consumed within a marked region
         /// that has not yet been released.</li>
         /// </ul>
         /// <p>If
-        /// <code>i</code>
+        /// <paramref name="i"/>
         /// represents a position at or beyond the end of the stream,
         /// this method returns
         /// <see cref="Eof"/>
         /// .</p>
         /// <p>The return value is unspecified if
-        /// <code>i&lt;0</code>
+        /// <c>i&lt;0</c>
         /// and fewer than
-        /// <code>-i</code>
+        /// <c>-i</c>
         /// calls to
         /// <see cref="Consume()">consume()</see>
         /// have occurred from the beginning of
@@ -162,22 +162,22 @@ namespace Antlr4.Runtime
         /// <see cref="Seek(int)">seek()</see>
         /// operations will be
         /// valid over a "marked range" extending from the index where
-        /// <code>mark()</code>
+        /// <c>mark()</c>
         /// was called to the current
         /// <see cref="Index()">index()</see>
         /// . This allows the use of
         /// streaming input sources by specifying the minimum buffering requirements
         /// to support arbitrary lookahead during prediction.
         /// <p>The returned mark is an opaque handle (type
-        /// <code>int</code>
+        /// <c>int</c>
         /// ) which is passed
         /// to
         /// <see cref="Release(int)">release()</see>
         /// when the guarantees provided by the marked
         /// range are no longer necessary. When calls to
-        /// <code>mark()</code>
+        /// <c>mark()</c>
         /// /
-        /// <code>release()</code>
+        /// <c>release()</c>
         /// are nested, the marks must be released
         /// in reverse order of which they were obtained. Since marked regions are
         /// used during performance-critical sections of prediction, the specific
@@ -226,14 +226,14 @@ namespace Antlr4.Runtime
         /// This method releases a marked range created by a call to
         /// <see cref="Mark()">mark()</see>
         /// . Calls to
-        /// <code>release()</code>
+        /// <c>release()</c>
         /// must appear in the
         /// reverse order of the corresponding calls to
-        /// <code>mark()</code>
+        /// <c>mark()</c>
         /// . If a mark is
         /// released twice, or if marks are not released in reverse order of the
         /// corresponding calls to
-        /// <code>mark()</code>
+        /// <c>mark()</c>
         /// , the behavior is unspecified.
         /// <p>For more information and an example, see
         /// <see cref="Mark()"/>
@@ -241,7 +241,7 @@ namespace Antlr4.Runtime
         /// </summary>
         /// <param name="marker">
         /// A marker returned by a call to
-        /// <code>mark()</code>
+        /// <c>mark()</c>
         /// .
         /// </param>
         /// <seealso cref="Mark()"/>
@@ -249,7 +249,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Return the index into the stream of the input symbol referred to by
-        /// <code>LA(1)</code>
+        /// <c>LA(1)</c>
         /// .
         /// <p>The behavior of this method is unspecified if no call to an
         /// <see cref="IIntStream">initializing method</see>
@@ -263,11 +263,11 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Set the input cursor to the position indicated by
-        /// <code>index</code>
+        /// <paramref name="index"/>
         /// . If the
         /// specified index lies past the end of the stream, the operation behaves as
         /// though
-        /// <code>index</code>
+        /// <paramref name="index"/>
         /// was the index of the EOF symbol. After this method
         /// returns without throwing an exception, the at least one of the following
         /// will be true.
@@ -276,21 +276,21 @@ namespace Antlr4.Runtime
         /// <see cref="Index()">index()</see>
         /// will return the index of the first symbol
         /// appearing at or after the specified
-        /// <code>index</code>
+        /// <paramref name="index"/>
         /// . Specifically,
         /// implementations which filter their sources should automatically
         /// adjust
-        /// <code>index</code>
+        /// <paramref name="index"/>
         /// forward the minimum amount required for the
         /// operation to target a non-ignored symbol.</li>
         /// <li>
-        /// <code>LA(1)</code>
+        /// <c>LA(1)</c>
         /// returns
         /// <see cref="Eof"/>
         /// </li>
         /// </ul>
         /// This operation is guaranteed to not throw an exception if
-        /// <code>index</code>
+        /// <paramref name="index"/>
         /// lies within a marked region. For more information on marked regions, see
         /// <see cref="Mark()"/>
         /// . The behavior of this method is unspecified if no call to
@@ -302,7 +302,7 @@ namespace Antlr4.Runtime
         /// <param name="index">The absolute index to seek to.</param>
         /// <exception cref="System.ArgumentException">
         /// if
-        /// <code>index</code>
+        /// <paramref name="index"/>
         /// is less than 0
         /// </exception>
         /// <exception cref="System.NotSupportedException">

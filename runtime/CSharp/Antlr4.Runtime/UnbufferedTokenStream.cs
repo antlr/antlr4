@@ -54,7 +54,7 @@ namespace Antlr4.Runtime
         /// <see cref="tokens">tokens</see>
         /// .
         /// <p>This is not the buffer capacity, that's
-        /// <code>tokens.length</code>
+        /// <c>tokens.length</c>
         /// .</p>
         /// </summary>
         protected internal int n;
@@ -64,11 +64,11 @@ namespace Antlr4.Runtime
         /// <see cref="tokens">tokens</see>
         /// of next token.
         /// <p>The
-        /// <code>LT(1)</code>
+        /// <c>LT(1)</c>
         /// token is
-        /// <code>tokens[p]</code>
+        /// <c>tokens[p]</c>
         /// . If
-        /// <code>p == n</code>
+        /// <c>p == n</c>
         /// , we are
         /// out of buffered tokens.</p>
         /// </summary>
@@ -80,34 +80,34 @@ namespace Antlr4.Runtime
         /// and down with
         /// <see cref="Release(int)">release()</see>
         /// . When we
-        /// <code>release()</code>
+        /// <c>release()</c>
         /// the last mark,
-        /// <code>numMarkers</code>
+        /// <c>numMarkers</c>
         /// reaches 0 and we reset the buffer. Copy
-        /// <code>tokens[p]..tokens[n-1]</code>
+        /// <c>tokens[p]..tokens[n-1]</c>
         /// to
-        /// <code>tokens[0]..tokens[(n-1)-p]</code>
+        /// <c>tokens[0]..tokens[(n-1)-p]</c>
         /// .
         /// </summary>
         protected internal int numMarkers = 0;
 
         /// <summary>
         /// This is the
-        /// <code>LT(-1)</code>
+        /// <c>LT(-1)</c>
         /// token for the current position.
         /// </summary>
         protected internal IToken lastToken;
 
         /// <summary>
         /// When
-        /// <code>numMarkers &gt; 0</code>
+        /// <c>numMarkers &gt; 0</c>
         /// , this is the
-        /// <code>LT(-1)</code>
+        /// <c>LT(-1)</c>
         /// token for the
         /// first token in
         /// <see cref="tokens"/>
         /// . Otherwise, this is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .
         /// </summary>
         protected internal IToken lastTokenBufferStart;
@@ -115,7 +115,7 @@ namespace Antlr4.Runtime
         /// <summary>Absolute token index.</summary>
         /// <remarks>
         /// Absolute token index. It's the index of the token about to be read via
-        /// <code>LT(1)</code>
+        /// <c>LT(1)</c>
         /// . Goes from 0 to the number of tokens in the entire stream,
         /// although the stream size is unknown before the end is reached.
         /// <p>This value is used to set the token indexes if the stream provides tokens
@@ -230,16 +230,16 @@ namespace Antlr4.Runtime
         /// Make sure we have 'need' elements from current position
         /// <see cref="p">p</see>
         /// . Last valid
-        /// <code>p</code>
+        /// <c>p</c>
         /// index is
-        /// <code>tokens.length-1</code>
+        /// <c>tokens.length-1</c>
         /// .
-        /// <code>p+need-1</code>
+        /// <c>p+need-1</c>
         /// is the tokens index 'need' elements
         /// ahead.  If we need 1 element,
-        /// <code>(p+1-1)==p</code>
+        /// <c>(p+1-1)==p</c>
         /// must be less than
-        /// <code>tokens.length</code>
+        /// <c>tokens.length</c>
         /// .
         /// </summary>
         protected internal virtual void Sync(int want)
@@ -254,13 +254,13 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Add
-        /// <code>n</code>
+        /// <paramref name="n"/>
         /// elements to the buffer. Returns the number of tokens
         /// actually added to the buffer. If the return value is less than
-        /// <code>n</code>
+        /// <paramref name="n"/>
         /// ,
         /// then EOF was reached before
-        /// <code>n</code>
+        /// <paramref name="n"/>
         /// tokens could be added.
         /// </summary>
         protected internal virtual int Fill(int n)
@@ -295,9 +295,9 @@ namespace Antlr4.Runtime
         /// Return a marker that we can release later.
         /// <p>The specific marker value used for this class allows for some level of
         /// protection against misuse where
-        /// <code>seek()</code>
+        /// <c>seek()</c>
         /// is called on a mark or
-        /// <code>release()</code>
+        /// <c>release()</c>
         /// is called in the wrong order.</p>
         /// </remarks>
         public virtual int Mark()

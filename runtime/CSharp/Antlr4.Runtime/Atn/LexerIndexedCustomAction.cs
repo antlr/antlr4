@@ -66,7 +66,7 @@ namespace Antlr4.Runtime.Atn
         /// <p>Note: This class is only required for lexer actions for which
         /// <see cref="ILexerAction.IsPositionDependent()"/>
         /// returns
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// .</p>
         /// </summary>
         /// <param name="offset">
@@ -145,7 +145,7 @@ namespace Antlr4.Runtime.Atn
         /// <summary><inheritDoc/></summary>
         /// <returns>
         /// This method returns
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// .
         /// </returns>
         public bool IsPositionDependent
@@ -163,7 +163,7 @@ namespace Antlr4.Runtime.Atn
         /// on the result of
         /// <see cref="Action()"/>
         /// using the provided
-        /// <code>lexer</code>
+        /// <paramref name="lexer"/>
         /// .</p>
         /// </summary>
         public void Execute(Lexer lexer)

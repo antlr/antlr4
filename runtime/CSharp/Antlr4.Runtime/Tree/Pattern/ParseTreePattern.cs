@@ -38,7 +38,7 @@ namespace Antlr4.Runtime.Tree.Pattern
 {
     /// <summary>
     /// A pattern like
-    /// <code><ID> = <expr>;</code>
+    /// <c>&lt;ID&gt; = &lt;expr&gt;;</c>
     /// converted to a
     /// <see cref="Antlr4.Runtime.Tree.IParseTree"/>
     /// by
@@ -130,12 +130,12 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <param name="tree">The parse tree to match against this tree pattern.</param>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if
-        /// <code>tree</code>
+        /// <paramref name="tree"/>
         /// is a match for the current tree
         /// pattern; otherwise,
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// .
         /// </returns>
         public virtual bool Matches(IParseTree tree)

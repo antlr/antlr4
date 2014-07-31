@@ -47,7 +47,7 @@ namespace Antlr4.Runtime.Atn
     /// traversed a global follow transition (i.e.
     /// <see cref="ATNConfig.ReachesIntoOuterContext()"/>
     /// is
-    /// <code>false</code>
+    /// <see langword="false"/>
     /// for all
     /// configurations), then the result of SLL prediction for that input is known to
     /// be equivalent to the result of LL prediction for that input.</p>

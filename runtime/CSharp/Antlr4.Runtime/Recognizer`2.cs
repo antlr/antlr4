@@ -255,7 +255,6 @@ namespace Antlr4.Runtime
         /// your token objects because you don't have to go modify your lexer
         /// so that it creates a new Java type.
         /// </remarks>
-        [Obsolete]
         [System.ObsoleteAttribute(@"This method is not called by the ANTLR 4 Runtime. Specific implementations of IAntlrErrorStrategy may provide a similar feature when necessary. For example, seeDefaultErrorStrategy.GetTokenErrorDisplay(IToken) .")]
         public virtual string GetTokenErrorDisplay(IToken t)
         {
@@ -284,9 +283,9 @@ namespace Antlr4.Runtime
         /// <exception>
         /// NullPointerException
         /// if
-        /// <code>listener</code>
+        /// <paramref name="listener"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .
         /// </exception>
         public virtual void AddErrorListener<_T0>(IAntlrErrorListener<_T0> listener)

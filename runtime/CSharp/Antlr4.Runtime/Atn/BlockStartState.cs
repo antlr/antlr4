@@ -34,7 +34,7 @@ namespace Antlr4.Runtime.Atn
 {
     /// <summary>
     /// The start of a regular
-    /// <code>(...)</code>
+    /// <c>(...)</c>
     /// block.
     /// </summary>
     public abstract class BlockStartState : DecisionState

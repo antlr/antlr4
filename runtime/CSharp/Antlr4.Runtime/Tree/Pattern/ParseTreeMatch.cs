@@ -91,23 +91,23 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <exception>
         /// IllegalArgumentException
         /// if
-        /// <code>tree</code>
+        /// <paramref name="tree"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// </exception>
         /// <exception>
         /// IllegalArgumentException
         /// if
-        /// <code>pattern</code>
+        /// <paramref name="pattern"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// </exception>
         /// <exception>
         /// IllegalArgumentException
         /// if
-        /// <code>labels</code>
+        /// <paramref name="labels"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// </exception>
         public ParseTreeMatch(IParseTree tree, ParseTreePattern pattern, MultiMap<string, IParseTree> labels, IParseTree mismatchedNode)
         {
@@ -131,29 +131,29 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// Get the last node associated with a specific
-        /// <code>label</code>
+        /// <paramref name="label"/>
         /// .
         /// <p>For example, for pattern
-        /// <code><id:ID></code>
+        /// <c>&lt;id:ID&gt;</c>
         /// ,
-        /// <code>get("id")</code>
+        /// <c>get("id")</c>
         /// returns the
         /// node matched for that
-        /// <code>ID</code>
+        /// <c>ID</c>
         /// . If more than one node
         /// matched the specified label, only the last is returned. If there is
         /// no node associated with the label, this returns
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .</p>
         /// <p>Pattern tags like
-        /// <code><ID></code>
+        /// <c>&lt;ID&gt;</c>
         /// and
-        /// <code><expr></code>
+        /// <c>&lt;expr&gt;</c>
         /// without labels are
         /// considered to be labeled with
-        /// <code>ID</code>
+        /// <c>ID</c>
         /// and
-        /// <code>expr</code>
+        /// <c>expr</c>
         /// , respectively.</p>
         /// </summary>
         /// <param name="label">The label to check.</param>
@@ -162,7 +162,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <see cref="Antlr4.Runtime.Tree.IParseTree"/>
         /// to match a tag with the specified
         /// label, or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if no parse tree matched a tag with the label.
         /// </returns>
         [Nullable]
@@ -181,28 +181,28 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <remarks>
         /// Return all nodes matching a rule or token tag with the specified label.
         /// <p>If the
-        /// <code>label</code>
+        /// <paramref name="label"/>
         /// is the name of a parser rule or token in the
         /// grammar, the resulting list will contain both the parse trees matching
         /// rule or tags explicitly labeled with the label and the complete set of
         /// parse trees matching the labeled and unlabeled tags in the pattern for
         /// the parser rule or token. For example, if
-        /// <code>label</code>
+        /// <paramref name="label"/>
         /// is
-        /// <code>"foo"</code>
+        /// <c>"foo"</c>
         /// ,
         /// the result will contain <em>all</em> of the following.</p>
         /// <ul>
         /// <li>Parse tree nodes matching tags of the form
-        /// <code><foo:anyRuleName></code>
+        /// <c>&lt;foo:anyRuleName&gt;</c>
         /// and
-        /// <code><foo:AnyTokenName></code>
+        /// <c>&lt;foo:AnyTokenName&gt;</c>
         /// .</li>
         /// <li>Parse tree nodes matching tags of the form
-        /// <code><anyLabel:foo></code>
+        /// <c>&lt;anyLabel:foo&gt;</c>
         /// .</li>
         /// <li>Parse tree nodes matching tags of the form
-        /// <code><foo></code>
+        /// <c>&lt;foo&gt;</c>
         /// .</li>
         /// </ul>
         /// </remarks>
@@ -212,7 +212,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <see cref="Antlr4.Runtime.Tree.IParseTree"/>
         /// nodes matching tags with
         /// the specified
-        /// <code>label</code>
+        /// <paramref name="label"/>
         /// . If no nodes matched the label, an empty list
         /// is returned.
         /// </returns>
@@ -252,7 +252,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <remarks>Get the node at which we first detected a mismatch.</remarks>
         /// <returns>
         /// the node at which we first detected a mismatch, or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if the match was successful.
         /// </returns>
         public virtual IParseTree MismatchedNode
@@ -267,9 +267,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <remarks>Gets a value indicating whether the match operation succeeded.</remarks>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if the match operation succeeded; otherwise,
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// .
         /// </returns>
         public virtual bool Succeeded

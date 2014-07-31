@@ -56,7 +56,7 @@ namespace Antlr4.Runtime
     {
         /// <summary>
         /// Reset the error handler state for the specified
-        /// <code>recognizer</code>
+        /// <paramref name="recognizer"/>
         /// .
         /// </summary>
         /// <param name="recognizer">the parser instance</param>
@@ -89,7 +89,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// This method is called to recover from exception
-        /// <code>e</code>
+        /// <paramref name="e"/>
         /// . This method is
         /// called after
         /// <see cref="ReportError(Parser, RecognitionException)"/>
@@ -115,9 +115,9 @@ namespace Antlr4.Runtime
         /// <see cref="Sync(Parser)"/>
         /// after
         /// entering the decision state of a closure block (
-        /// <code>(...)*</code>
+        /// <c>(...)*</c>
         /// or
-        /// <code>(...)+</code>
+        /// <c>(...)+</c>
         /// ).</p>
         /// <p>For an implementation based on Jim Idle's "magic sync" mechanism, see
         /// <see cref="DefaultErrorStrategy.Sync(Parser)"/>
@@ -135,7 +135,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Tests whether or not
-        /// <code>recognizer</code>
+        /// <paramref name="recognizer"/>
         /// is in the process of recovering
         /// from an error. In error recovery mode,
         /// <see cref="Parser.Consume()"/>
@@ -149,10 +149,10 @@ namespace Antlr4.Runtime
         /// <param name="recognizer">the parser instance</param>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if the parser is currently recovering from a parse
         /// error, otherwise
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// </returns>
         bool InErrorRecoveryMode(Parser recognizer);
 

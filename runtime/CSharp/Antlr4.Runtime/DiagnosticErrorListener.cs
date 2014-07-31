@@ -62,7 +62,7 @@ namespace Antlr4.Runtime
     {
         /// <summary>
         /// When
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// , only exactly known ambiguities are reported.
         /// </summary>
         protected internal readonly bool exactOnly;
@@ -86,9 +86,9 @@ namespace Antlr4.Runtime
         /// </summary>
         /// <param name="exactOnly">
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// to report only exact ambiguities, otherwise
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// to report all ambiguities.
         /// </param>
         public DiagnosticErrorListener(bool exactOnly)
@@ -163,12 +163,12 @@ namespace Antlr4.Runtime
         /// <param name="configs">The conflicting or ambiguous configuration set.</param>
         /// <returns>
         /// Returns
-        /// <code>reportedAlts</code>
+        /// <paramref name="reportedAlts"/>
         /// if it is not
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// , otherwise
         /// returns the set of alternatives represented in
-        /// <code>configs</code>
+        /// <paramref name="configs"/>
         /// .
         /// </returns>
         [NotNull]

@@ -52,10 +52,10 @@ namespace Antlr4.Runtime.Atn
     /// states or the inclusion of a block representing a nested
     /// construct in one of the forms below.</li>
     /// <li>Nodes showing multiple outgoing alternatives with a
-    /// <code>...</code>
+    /// <c>...</c>
     /// support
     /// any number of alternatives (one or more). Nodes without the
-    /// <code>...</code>
+    /// <c>...</c>
     /// only
     /// support the exact number of alternatives shown in the diagram.</li>
     /// </ul>
@@ -66,28 +66,28 @@ namespace Antlr4.Runtime.Atn
     /// <embed src="images/Block.svg" type="image/svg+xml"/>
     /// <h2>Greedy Loops</h2>
     /// <h3>Greedy Closure:
-    /// <code>(...)*</code>
+    /// <c>(...)*</c>
     /// </h3>
     /// <embed src="images/ClosureGreedy.svg" type="image/svg+xml"/>
     /// <h3>Greedy Positive Closure:
-    /// <code>(...)+</code>
+    /// <c>(...)+</c>
     /// </h3>
     /// <embed src="images/PositiveClosureGreedy.svg" type="image/svg+xml"/>
     /// <h3>Greedy Optional:
-    /// <code>(...)?</code>
+    /// <c>(...)?</c>
     /// </h3>
     /// <embed src="images/OptionalGreedy.svg" type="image/svg+xml"/>
     /// <h2>Non-Greedy Loops</h2>
     /// <h3>Non-Greedy Closure:
-    /// <code>(...)*?</code>
+    /// <c>(...)*?</c>
     /// </h3>
     /// <embed src="images/ClosureNonGreedy.svg" type="image/svg+xml"/>
     /// <h3>Non-Greedy Positive Closure:
-    /// <code>(...)+?</code>
+    /// <c>(...)+?</c>
     /// </h3>
     /// <embed src="images/PositiveClosureNonGreedy.svg" type="image/svg+xml"/>
     /// <h3>Non-Greedy Optional:
-    /// <code>(...)??</code>
+    /// <c>(...)??</c>
     /// </h3>
     /// <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
     /// </summary>

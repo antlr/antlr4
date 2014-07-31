@@ -51,7 +51,7 @@ namespace Antlr4.Runtime
         /// <see cref="IIntStream.La(int)"/>
         /// . In addition, when the preconditions of this method
         /// are met, the return value is non-null and the value of
-        /// <code>LT(k).getType()==LA(k)</code>
+        /// <c>LT(k).getType()==LA(k)</c>
         /// .
         /// </summary>
         /// <seealso cref="IIntStream.La(int)"/>
@@ -62,30 +62,30 @@ namespace Antlr4.Runtime
         /// Gets the
         /// <see cref="IToken"/>
         /// at the specified
-        /// <code>index</code>
+        /// <c>index</c>
         /// in the stream. When
         /// the preconditions of this method are met, the return value is non-null.
         /// <p>The preconditions for this method are the same as the preconditions of
         /// <see cref="IIntStream.Seek(int)"/>
         /// . If the behavior of
-        /// <code>seek(index)</code>
+        /// <c>seek(index)</c>
         /// is
         /// unspecified for the current state and given
-        /// <code>index</code>
+        /// <c>index</c>
         /// , then the
         /// behavior of this method is also unspecified.</p>
         /// <p>The symbol referred to by
-        /// <code>index</code>
+        /// <c>index</c>
         /// differs from
-        /// <code>seek()</code>
+        /// <c>seek()</c>
         /// only
         /// in the case of filtering streams where
-        /// <code>index</code>
+        /// <c>index</c>
         /// lies before the end
         /// of the stream. Unlike
-        /// <code>seek()</code>
+        /// <c>seek()</c>
         /// , this method does not adjust
-        /// <code>index</code>
+        /// <c>index</c>
         /// to point to a non-ignored symbol.</p>
         /// </summary>
         /// <exception cref="System.ArgumentException">if {code index} is less than 0</exception>
@@ -109,7 +109,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Return the text of all tokens within the specified
-        /// <code>interval</code>
+        /// <paramref name="interval"/>
         /// . This
         /// method behaves like the following code (including potential exceptions
         /// for violating preconditions of
@@ -134,9 +134,9 @@ namespace Antlr4.Runtime
         /// </returns>
         /// <exception cref="System.ArgumentNullException">
         /// if
-        /// <code>interval</code>
+        /// <paramref name="interval"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// </exception>
         [NotNull]
         string GetText(Interval interval);
@@ -171,7 +171,7 @@ namespace Antlr4.Runtime
         /// , but may be
         /// optimized by the specific implementation.
         /// <p>If
-        /// <code>ctx.getSourceInterval()</code>
+        /// <c>ctx.getSourceInterval()</c>
         /// does not return a valid interval of
         /// tokens provided by this stream, the behavior is unspecified.</p>
         /// <pre>
@@ -185,7 +185,7 @@ namespace Antlr4.Runtime
         /// </param>
         /// <returns>
         /// The text of all tokens within the source interval of
-        /// <code>ctx</code>
+        /// <paramref name="ctx"/>
         /// .
         /// </returns>
         [NotNull]
@@ -193,19 +193,19 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Return the text of all tokens in this stream between
-        /// <code>start</code>
+        /// <paramref name="start"/>
         /// and
-        /// <code>stop</code>
+        /// <paramref name="stop"/>
         /// (inclusive).
         /// <p>If the specified
-        /// <code>start</code>
+        /// <paramref name="start"/>
         /// or
-        /// <code>stop</code>
+        /// <paramref name="stop"/>
         /// token was not provided by
         /// this stream, or if the
-        /// <code>stop</code>
+        /// <paramref name="stop"/>
         /// occurred before the
-        /// <code>start</code>
+        /// <paramref name="start"/>
         /// token, the behavior is unspecified.</p>
         /// <p>For streams which ensure that the
         /// <see cref="IToken.TokenIndex()"/>
@@ -225,9 +225,9 @@ namespace Antlr4.Runtime
         /// <param name="stop">The last token in the interval to get text for (inclusive).</param>
         /// <returns>
         /// The text of all tokens lying between the specified
-        /// <code>start</code>
+        /// <paramref name="start"/>
         /// and
-        /// <code>stop</code>
+        /// <paramref name="stop"/>
         /// tokens.
         /// </returns>
         /// <exception cref="System.NotSupportedException">

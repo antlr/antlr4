@@ -88,7 +88,7 @@ namespace Antlr4.Runtime.Atn
         /// <param name="predictedAlt">
         /// The alternative number for the decision which is
         /// guarded by the semantic context
-        /// <code>semctx</code>
+        /// <paramref name="semctx"/>
         /// . See
         /// <see cref="predictedAlt"/>
         /// for more information.

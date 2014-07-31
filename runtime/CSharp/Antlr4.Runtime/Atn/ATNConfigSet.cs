@@ -46,7 +46,7 @@ namespace Antlr4.Runtime.Atn
         /// the
         /// <see cref="ATNConfig.SemanticContext()"/>
         /// of the value, which is only a problem if a single
-        /// <code>ATNConfigSet</code>
+        /// <c>ATNConfigSet</c>
         /// contains two configs with the same state and alternative
         /// but different semantic contexts. When this case arises, the first config
         /// added to this map stays, and the remaining configs are placed in
@@ -55,7 +55,7 @@ namespace Antlr4.Runtime.Atn
         /// <p>
         /// This map is only used for optimizing the process of adding configs to the set,
         /// and is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// for read-only sets stored in the DFA.
         /// </summary>
         private readonly Dictionary<long, ATNConfig> mergedConfigs;
@@ -70,7 +70,7 @@ namespace Antlr4.Runtime.Atn
         /// <p>
         /// This list is only used for optimizing the process of adding configs to the set,
         /// and is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// for read-only sets stored in the DFA.
         /// </summary>
         private readonly List<ATNConfig> unmerged;
@@ -89,7 +89,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// When
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// , this config set represents configurations where the entire
         /// outer context has been consumed by the ATN interpreter. This prevents the
         /// <see cref="ParserATNSimulator.Closure(ATNConfigSet, ATNConfigSet, bool, bool, PredictionContextCache, bool)"/>
@@ -97,7 +97,7 @@ namespace Antlr4.Runtime.Atn
         /// rule stop state is reached with an empty prediction context.
         /// <p>
         /// Note:
-        /// <code>outermostConfigSet</code>
+        /// <c>outermostConfigSet</c>
         /// and
         /// <see cref="dipsIntoOuterContext"/>
         /// should never

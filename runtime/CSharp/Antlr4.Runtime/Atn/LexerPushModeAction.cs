@@ -36,7 +36,7 @@ namespace Antlr4.Runtime.Atn
 {
     /// <summary>
     /// Implements the
-    /// <code>pushMode</code>
+    /// <c>pushMode</c>
     /// lexer action by calling
     /// <see cref="Antlr4.Runtime.Lexer.PushMode(int)"/>
     /// with the assigned mode.
@@ -49,7 +49,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Constructs a new
-        /// <code>pushMode</code>
+        /// <c>pushMode</c>
         /// action with the specified mode value.
         /// </summary>
         /// <param name="mode">
@@ -66,7 +66,7 @@ namespace Antlr4.Runtime.Atn
         /// <remarks>Get the lexer mode this action should transition the lexer to.</remarks>
         /// <returns>
         /// The lexer mode for this
-        /// <code>pushMode</code>
+        /// <c>pushMode</c>
         /// command.
         /// </returns>
         public int Mode
@@ -94,7 +94,7 @@ namespace Antlr4.Runtime.Atn
         /// <summary><inheritDoc/></summary>
         /// <returns>
         /// This method returns
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// .
         /// </returns>
         public bool IsPositionDependent

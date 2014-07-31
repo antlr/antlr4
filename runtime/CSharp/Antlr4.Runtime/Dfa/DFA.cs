@@ -65,9 +65,9 @@ namespace Antlr4.Runtime.Dfa
         private readonly AtomicInteger nextStateNumber = new AtomicInteger();
 
         /// <summary>
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if this DFA is for a precedence decision; otherwise,
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// . This is the backing field for
         /// <see cref="IsPrecedenceDfa()"/>
         /// ,
@@ -102,9 +102,9 @@ namespace Antlr4.Runtime.Dfa
         /// </remarks>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if this is a precedence DFA; otherwise,
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// .
         /// </returns>
         /// <seealso cref="Antlr4.Runtime.Parser.Precedence()"/>
@@ -118,13 +118,13 @@ namespace Antlr4.Runtime.Dfa
         /// <see cref="states"/>
         /// map is cleared</li>
         /// <li>If
-        /// <code>precedenceDfa</code>
+        /// <c>precedenceDfa</c>
         /// is
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// , the initial state
         /// <see cref="s0"/>
         /// is set to
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// ; otherwise, it is initialized to a new
         /// <see cref="DFAState"/>
         /// with an empty outgoing
@@ -138,9 +138,9 @@ namespace Antlr4.Runtime.Dfa
         /// </remarks>
         /// <value>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if this is a precedence DFA; otherwise,
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// </value>
         public bool IsPrecedenceDfa
         {
@@ -184,7 +184,7 @@ namespace Antlr4.Runtime.Dfa
         /// <param name="precedence">The current precedence.</param>
         /// <returns>
         /// The start state corresponding to the specified precedence, or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if no start state exists for the specified precedence.
         /// </returns>
         /// <exception cref="System.InvalidOperationException">if this is not a precedence DFA.</exception>

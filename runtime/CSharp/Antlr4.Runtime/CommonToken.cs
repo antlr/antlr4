@@ -192,7 +192,7 @@ namespace Antlr4.Runtime
         /// .
         /// <p>
         /// If
-        /// <code>oldToken</code>
+        /// <paramref name="oldToken"/>
         /// is also a
         /// <see cref="CommonToken"/>
         /// instance, the newly
@@ -267,7 +267,7 @@ namespace Antlr4.Runtime
         /// <summary>Explicitly set the text for this token.</summary>
         /// <remarks>
         /// Explicitly set the text for this token. If {code text} is not
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// , then
         /// <see cref="Text()"/>
         /// will return this value rather than
@@ -275,7 +275,7 @@ namespace Antlr4.Runtime
         /// </remarks>
         /// <value>
         /// The explicit text of the token, or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if the text
         /// should be obtained from the input along with the start and stop indexes
         /// of the token.

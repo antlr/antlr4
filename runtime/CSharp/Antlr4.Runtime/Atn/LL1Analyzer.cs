@@ -39,7 +39,7 @@ namespace Antlr4.Runtime.Atn
         /// <summary>
         /// Special value added to the lookahead sets to indicate that we hit
         /// a predicate during analysis if
-        /// <code>seeThruPreds==false</code>
+        /// <c>seeThruPreds==false</c>
         /// .
         /// </summary>
         public const int HitPred = TokenConstants.InvalidType;
@@ -58,17 +58,17 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="ATNState"/>
         /// . The returned array has one element for each
         /// outgoing transition in
-        /// <code>s</code>
+        /// <paramref name="s"/>
         /// . If the closure from transition
         /// <em>i</em> leads to a semantic predicate before matching a symbol, the
         /// element at index <em>i</em> of the result will be
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .
         /// </summary>
         /// <param name="s">the ATN state</param>
         /// <returns>
         /// the expected symbols for each outgoing transition of
-        /// <code>s</code>
+        /// <paramref name="s"/>
         /// .
         /// </returns>
         [Nullable]
@@ -99,24 +99,24 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Compute set of tokens that can follow
-        /// <code>s</code>
+        /// <paramref name="s"/>
         /// in the ATN in the
         /// specified
-        /// <code>ctx</code>
+        /// <paramref name="ctx"/>
         /// .
         /// <p>If
-        /// <code>ctx</code>
+        /// <paramref name="ctx"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// and the end of the rule containing
-        /// <code>s</code>
+        /// <paramref name="s"/>
         /// is reached,
         /// <see cref="Antlr4.Runtime.IToken.Epsilon"/>
         /// is added to the result set.
         /// If
-        /// <code>ctx</code>
+        /// <paramref name="ctx"/>
         /// is not
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// and the end of the outermost rule is
         /// reached,
         /// <see cref="Antlr4.Runtime.IToken.Eof"/>
@@ -125,16 +125,16 @@ namespace Antlr4.Runtime.Atn
         /// <param name="s">the ATN state</param>
         /// <param name="ctx">
         /// the complete parser context, or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if the context
         /// should be ignored
         /// </param>
         /// <returns>
         /// The set of tokens that can follow
-        /// <code>s</code>
+        /// <paramref name="s"/>
         /// in the ATN in the
         /// specified
-        /// <code>ctx</code>
+        /// <paramref name="ctx"/>
         /// .
         /// </returns>
         [NotNull]
@@ -145,24 +145,24 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Compute set of tokens that can follow
-        /// <code>s</code>
+        /// <paramref name="s"/>
         /// in the ATN in the
         /// specified
-        /// <code>ctx</code>
+        /// <paramref name="ctx"/>
         /// .
         /// <p>If
-        /// <code>ctx</code>
+        /// <paramref name="ctx"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// and the end of the rule containing
-        /// <code>s</code>
+        /// <paramref name="s"/>
         /// is reached,
         /// <see cref="Antlr4.Runtime.IToken.Epsilon"/>
         /// is added to the result set.
         /// If
-        /// <code>ctx</code>
+        /// <paramref name="ctx"/>
         /// is not
-        /// <code>PredictionContext#EMPTY_LOCAL</code>
+        /// <c>PredictionContext#EMPTY_LOCAL</c>
         /// and the end of the outermost rule is
         /// reached,
         /// <see cref="Antlr4.Runtime.IToken.Eof"/>
@@ -176,16 +176,16 @@ namespace Antlr4.Runtime.Atn
         /// </param>
         /// <param name="ctx">
         /// the complete parser context, or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if the context
         /// should be ignored
         /// </param>
         /// <returns>
         /// The set of tokens that can follow
-        /// <code>s</code>
+        /// <paramref name="s"/>
         /// in the ATN in the
         /// specified
-        /// <code>ctx</code>
+        /// <paramref name="ctx"/>
         /// .
         /// </returns>
         [NotNull]
@@ -201,32 +201,32 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Compute set of tokens that can follow
-        /// <code>s</code>
+        /// <paramref name="s"/>
         /// in the ATN in the
         /// specified
-        /// <code>ctx</code>
+        /// <paramref name="ctx"/>
         /// .
         /// <p/>
         /// If
-        /// <code>ctx</code>
+        /// <paramref name="ctx"/>
         /// is
         /// <see cref="PredictionContext.EmptyLocal"/>
         /// and
-        /// <code>stopState</code>
+        /// <paramref name="stopState"/>
         /// or the end of the rule containing
-        /// <code>s</code>
+        /// <paramref name="s"/>
         /// is reached,
         /// <see cref="Antlr4.Runtime.IToken.Epsilon"/>
         /// is added to the result set. If
-        /// <code>ctx</code>
+        /// <paramref name="ctx"/>
         /// is not
         /// <see cref="PredictionContext.EmptyLocal"/>
         /// and
-        /// <code>addEOF</code>
+        /// <paramref name="addEOF"/>
         /// is
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// and
-        /// <code>stopState</code>
+        /// <paramref name="stopState"/>
         /// or the end of the outermost rule is reached,
         /// <see cref="Antlr4.Runtime.IToken.Eof"/>
         /// is added to the result set.
@@ -247,23 +247,23 @@ namespace Antlr4.Runtime.Atn
         /// <param name="lookBusy">
         /// A set used for preventing epsilon closures in the ATN
         /// from causing a stack overflow. Outside code should pass
-        /// <code>new HashSet<ATNConfig></code>
+        /// <c>new HashSet&lt;ATNConfig&gt;</c>
         /// for this argument.
         /// </param>
         /// <param name="calledRuleStack">
         /// A set used for preventing left recursion in the
         /// ATN from causing a stack overflow. Outside code should pass
-        /// <code>new BitSet()</code>
+        /// <c>new BitSet()</c>
         /// for this argument.
         /// </param>
         /// <param name="seeThruPreds">
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// to true semantic predicates as
         /// implicitly
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// and "see through them", otherwise
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// to treat semantic predicates as opaque and add
         /// <see cref="HitPred"/>
         /// to the
@@ -274,7 +274,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="Antlr4.Runtime.IToken.Eof"/>
         /// to the result if the end of the
         /// outermost context is reached. This parameter has no effect if
-        /// <code>ctx</code>
+        /// <paramref name="ctx"/>
         /// is
         /// <see cref="PredictionContext.EmptyLocal"/>
         /// .

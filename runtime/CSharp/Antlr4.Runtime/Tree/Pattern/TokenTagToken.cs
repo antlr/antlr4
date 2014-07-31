@@ -37,7 +37,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// A
     /// <see cref="Antlr4.Runtime.IToken"/>
     /// object representing a token of a particular type; e.g.,
-    /// <code><ID></code>
+    /// <c>&lt;ID&gt;</c>
     /// . These tokens are created for
     /// <see cref="TagChunk"/>
     /// chunks where the
@@ -85,7 +85,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <param name="type">The token type.</param>
         /// <param name="label">
         /// The label associated with the token tag, or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if
         /// the token tag is unlabeled.
         /// </param>
@@ -111,7 +111,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <remarks>Gets the label associated with the rule tag.</remarks>
         /// <returns>
         /// The name of the label associated with the rule tag, or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if this is an unlabeled rule tag.
         /// </returns>
         public string Label
@@ -128,9 +128,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <see cref="TokenTagToken"/>
         /// returns the token tag
         /// formatted with
-        /// <code>&lt;</code>
+        /// <c>&lt;</c>
         /// and
-        /// <code>&gt;</code>
+        /// <c>&gt;</c>
         /// delimiters.</p>
         /// </summary>
         public override string Text
@@ -150,7 +150,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <p>The implementation for
         /// <see cref="TokenTagToken"/>
         /// returns a string of the form
-        /// <code>tokenName:type</code>
+        /// <c>tokenName:type</c>
         /// .</p>
         /// </summary>
         public override string ToString()

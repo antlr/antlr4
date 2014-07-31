@@ -196,11 +196,11 @@ namespace Antlr4.Runtime.Atn
     /// objects using cached
     /// subgraphs/nodes. No other locking occurs, even during DFA simulation. This is
     /// safe as long as we can guarantee that all threads referencing
-    /// <code>s.edge[t]</code>
+    /// <c>s.edge[t]</c>
     /// get the same physical target
     /// <see cref="Antlr4.Runtime.Dfa.DFAState"/>
     /// , or
-    /// <code>null</code>
+    /// <see langword="null"/>
     /// . Once into the DFA, the DFA simulation does not reference the
     /// <see cref="Antlr4.Runtime.Dfa.DFA.states"/>
     /// map. It follows the
@@ -209,21 +209,21 @@ namespace Antlr4.Runtime.Atn
     /// targets. The DFA simulator will either find
     /// <see cref="DFAState#edges"/>
     /// to be
-    /// <code>null</code>
+    /// <see langword="null"/>
     /// , to be non-
-    /// <code>null</code>
+    /// <see langword="null"/>
     /// and
-    /// <code>dfa.edges[t]</code>
+    /// <c>dfa.edges[t]</c>
     /// null, or
-    /// <code>dfa.edges[t]</code>
+    /// <c>dfa.edges[t]</c>
     /// to be non-null. The
     /// <see cref="AddDFAEdge(Antlr4.Runtime.Dfa.DFAState, int, Antlr4.Runtime.Dfa.DFAState)"/>
     /// method could be racing to set the field
     /// but in either case the DFA simulator works; if
-    /// <code>null</code>
+    /// <see langword="null"/>
     /// , and requests ATN
     /// simulation. It could also race trying to get
-    /// <code>dfa.edges[t]</code>
+    /// <c>dfa.edges[t]</c>
     /// , but either
     /// way it will work because it's not doing a test and set operation.</p>
     /// <p>
@@ -241,9 +241,9 @@ namespace Antlr4.Runtime.Atn
     /// <see cref="Antlr4.Runtime.Recognizer{Symbol, ATNInterpreter}.Interpreter()">getInterpreter()</see>
     /// .
     /// <see cref="PredictionMode(PredictionMode)">setPredictionMode</see>
-    /// <code>(</code>
+    /// <c>(</c>
     /// <see cref="PredictionMode.Sll"/>
-    /// <code>)</code>
+    /// <c>)</c>
     /// ;
     /// parser.
     /// <see cref="Antlr4.Runtime.Parser.ErrorHandler(IAntlrErrorStrategy)">setErrorHandler</see>
@@ -271,31 +271,31 @@ namespace Antlr4.Runtime.Atn
     /// alternatives.</p>
     /// <p>
     /// Let's say we have a set of SLL conflicting alternatives
-    /// <code/>
+    /// <c/>
     /// 
     /// 1, 2, 3}} and
     /// a smaller LL set called <em>s</em>. If <em>s</em> is
-    /// <code/>
+    /// <c/>
     /// 
     /// 2, 3}}, then SLL
     /// parsing will get an error because SLL will pursue alternative 1. If
     /// <em>s</em> is
-    /// <code/>
+    /// <c/>
     /// 
     /// 1, 2}} or
-    /// <code/>
+    /// <c/>
     /// 
     /// 1, 3}} then both SLL and LL will
     /// choose the same alternative because alternative one is the minimum of either
     /// set. If <em>s</em> is
-    /// <code/>
+    /// <c/>
     /// 
     /// 2}} or
-    /// <code/>
+    /// <c/>
     /// 
     /// 3}} then SLL will get a syntax
     /// error. If <em>s</em> is
-    /// <code/>
+    /// <c/>
     /// 
     /// 1}} then SLL will succeed.</p>
     /// <p>
@@ -321,7 +321,7 @@ namespace Antlr4.Runtime.Atn
         /// <summary>Determines whether the DFA is used for full-context predictions.</summary>
         /// <remarks>
         /// Determines whether the DFA is used for full-context predictions. When
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// , the DFA stores transition information for both full-context
         /// and SLL parsing; otherwise, the DFA only stores SLL transition
         /// information.
@@ -332,7 +332,7 @@ namespace Antlr4.Runtime.Atn
         /// configuration sets, and prediction contexts.</p>
         /// <p>
         /// The default value is
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// .</p>
         /// </remarks>
         public bool enable_global_context_dfa = false;
@@ -354,20 +354,20 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// When
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// , ambiguous alternatives are reported when they are
         /// encountered within
         /// <see cref="ExecATN(Antlr4.Runtime.Dfa.DFA, Antlr4.Runtime.ITokenStream, int, SimulatorState)"/>
         /// . When
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// , these messages
         /// are suppressed. The default is
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// .
         /// <p>
         /// When messages about ambiguous alternatives are not required, setting this
         /// to
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// enables additional internal optimizations which may lose
         /// this information.
         /// </summary>
@@ -889,23 +889,23 @@ namespace Antlr4.Runtime.Atn
         /// localized location.</p>
         /// <ul>
         /// <li>If no configuration in
-        /// <code>configs</code>
+        /// <c>configs</c>
         /// reached the end of the
         /// decision rule, return
         /// <see cref="ATN.InvalidAltNumber"/>
         /// .</li>
         /// <li>If all configurations in
-        /// <code>configs</code>
+        /// <c>configs</c>
         /// which reached the end of the
         /// decision rule predict the same alternative, return that alternative.</li>
         /// <li>If the configurations in
-        /// <code>configs</code>
+        /// <c>configs</c>
         /// which reached the end of the
         /// decision rule predict multiple alternatives (call this <em>S</em>),
         /// choose an alternative in the following order.
         /// <ol>
         /// <li>Filter the configurations in
-        /// <code>configs</code>
+        /// <c>configs</c>
         /// to only those
         /// configurations which remain viable after evaluating semantic predicates.
         /// If the set of these filtered configurations which also reached the end of
@@ -941,7 +941,7 @@ namespace Antlr4.Runtime.Atn
         /// <param name="startIndex">
         /// The start index for the current prediction, which is
         /// the input index where any semantic context in
-        /// <code>configs</code>
+        /// <c>configs</c>
         /// should be
         /// evaluated
         /// </param>
@@ -1081,16 +1081,16 @@ namespace Antlr4.Runtime.Atn
         /// Get an existing target state for an edge in the DFA. If the target state
         /// for the edge has not yet been computed or is otherwise not available,
         /// this method returns
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .
         /// </remarks>
         /// <param name="s">The current DFA state</param>
         /// <param name="t">The next input symbol</param>
         /// <returns>
         /// The existing target DFA state for the given input symbol
-        /// <code>t</code>
+        /// <paramref name="t"/>
         /// , or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if the target state for this edge is not
         /// already cached
         /// </returns>
@@ -1116,9 +1116,9 @@ namespace Antlr4.Runtime.Atn
         /// <param name="contextCache"/>
         /// <returns>
         /// The computed target DFA state for the given input symbol
-        /// <code>t</code>
+        /// <paramref name="t"/>
         /// . If
-        /// <code>t</code>
+        /// <paramref name="t"/>
         /// does not lead to a valid DFA state, this method
         /// returns
         /// <see cref="ATNSimulator.Error"/>
@@ -1228,15 +1228,15 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Return a configuration set containing only the configurations from
-        /// <code>configs</code>
+        /// <paramref name="configs"/>
         /// which are in a
         /// <see cref="RuleStopState"/>
         /// . If all
         /// configurations in
-        /// <code>configs</code>
+        /// <paramref name="configs"/>
         /// are already in a rule stop state, this
         /// method simply returns
-        /// <code>configs</code>
+        /// <paramref name="configs"/>
         /// .
         /// </summary>
         /// <param name="configs">the configuration set to update</param>
@@ -1247,13 +1247,13 @@ namespace Antlr4.Runtime.Atn
         /// </param>
         /// <returns>
         /// 
-        /// <code>configs</code>
+        /// <paramref name="configs"/>
         /// if all configurations in
-        /// <code>configs</code>
+        /// <paramref name="configs"/>
         /// are in a
         /// rule stop state, otherwise return a new configuration set containing only
         /// the configurations from
-        /// <code>configs</code>
+        /// <paramref name="configs"/>
         /// which are in a rule stop state
         /// </returns>
         [NotNull]
@@ -1473,18 +1473,18 @@ namespace Antlr4.Runtime.Atn
         /// <p>
         /// If the above grammar, the ATN state immediately before the token
         /// reference
-        /// <code>'a'</code>
+        /// <c>'a'</c>
         /// in
-        /// <code>letterA</code>
+        /// <c>letterA</c>
         /// is reachable from the left edge
         /// of both the primary and closure blocks of the left-recursive rule
-        /// <code>statement</code>
+        /// <c>statement</c>
         /// . The prediction context associated with each of these
         /// configurations distinguishes between them, and prevents the alternative
         /// which stepped out to
-        /// <code>prog</code>
+        /// <c>prog</c>
         /// (and then back in to
-        /// <code>statement</code>
+        /// <c>statement</c>
         /// from being eliminated by the filter.
         /// </p>
         /// </summary>
@@ -1652,7 +1652,7 @@ namespace Antlr4.Runtime.Atn
         /// <remarks>
         /// Look through a list of predicate/alt pairs, returning alts for the
         /// pairs that win. A
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// predicate indicates an alt containing an
         /// unpredicated config which behaves as "always true."
         /// </remarks>
@@ -1721,7 +1721,7 @@ namespace Antlr4.Runtime.Atn
         /// </param>
         /// <param name="alt">
         /// The alternative which is guarded by
-        /// <code>pred</code>
+        /// <paramref name="pred"/>
         /// </param>
         /// <since>4.3</since>
         protected internal virtual bool EvalSemanticContext(SemanticContext pred, ParserRuleContext parserCallStack, int alt)

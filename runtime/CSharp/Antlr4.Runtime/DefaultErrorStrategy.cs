@@ -132,7 +132,7 @@ namespace Antlr4.Runtime
         /// in error recovery mode. Otherwise, it calls
         /// <see cref="BeginErrorCondition(Parser)"/>
         /// and dispatches the reporting task based on the runtime type of
-        /// <code>e</code>
+        /// <paramref name="e"/>
         /// according to the following table.</p>
         /// <ul>
         /// <li>
@@ -251,9 +251,9 @@ namespace Antlr4.Runtime
         /// rule and uses the default error recovery, which consumes until the
         /// resynchronization set of the current rule.
         /// <p>If the sub rule is optional (
-        /// <code>(...)?</code>
+        /// <c>(...)?</c>
         /// ,
-        /// <code>(...)*</code>
+        /// <c>(...)*</c>
         /// , or block
         /// with an empty alternative), then the expected set includes what follows
         /// the subrule.</p>
@@ -405,10 +405,10 @@ namespace Antlr4.Runtime
         /// This method is called to report a syntax error which requires the removal
         /// of a token from the input stream. At the time this method is called, the
         /// erroneous symbol is current
-        /// <code>LT(1)</code>
+        /// <c>LT(1)</c>
         /// symbol and has not yet been
         /// removed from the input stream. When this method returns,
-        /// <code>recognizer</code>
+        /// <paramref name="recognizer"/>
         /// is in error recovery mode.
         /// <p>This method is called when
         /// <see cref="SingleTokenDeletion(Parser)"/>
@@ -447,7 +447,7 @@ namespace Antlr4.Runtime
         /// insertion of a missing token into the input stream. At the time this
         /// method is called, the missing token has not yet been inserted. When this
         /// method returns,
-        /// <code>recognizer</code>
+        /// <paramref name="recognizer"/>
         /// is in error recovery mode.
         /// <p>This method is called when
         /// <see cref="SingleTokenInsertion(Parser)"/>
@@ -485,26 +485,26 @@ namespace Antlr4.Runtime
         /// .</p>
         /// <p><strong>EXTRA TOKEN</strong> (single token deletion)</p>
         /// <p>
-        /// <code>LA(1)</code>
+        /// <c>LA(1)</c>
         /// is not what we are looking for. If
-        /// <code>LA(2)</code>
+        /// <c>LA(2)</c>
         /// has the
         /// right token, however, then assume
-        /// <code>LA(1)</code>
+        /// <c>LA(1)</c>
         /// is some extra spurious
         /// token and delete it. Then consume and return the next token (which was
         /// the
-        /// <code>LA(2)</code>
+        /// <c>LA(2)</c>
         /// token) as the successful result of the match operation.</p>
         /// <p>This recovery strategy is implemented by
         /// <see cref="SingleTokenDeletion(Parser)"/>
         /// .</p>
         /// <p><strong>MISSING TOKEN</strong> (single token insertion)</p>
         /// <p>If current token (at
-        /// <code>LA(1)</code>
+        /// <c>LA(1)</c>
         /// ) is consistent with what could come
         /// after the expected
-        /// <code>LA(1)</code>
+        /// <c>LA(1)</c>
         /// token, then assume the token is missing
         /// and use the parser's
         /// <see cref="ITokenFactory"/>
@@ -516,19 +516,19 @@ namespace Antlr4.Runtime
         /// .</p>
         /// <p><strong>EXAMPLE</strong></p>
         /// <p>For example, Input
-        /// <code>i=(3;</code>
+        /// <c>i=(3;</c>
         /// is clearly missing the
-        /// <code>')'</code>
+        /// <c>')'</c>
         /// . When
         /// the parser returns from the nested call to
-        /// <code>expr</code>
+        /// <c>expr</c>
         /// , it will have
         /// call chain:</p>
         /// <pre>
         /// stat &rarr; expr &rarr; atom
         /// </pre>
         /// and it will be trying to match the
-        /// <code>')'</code>
+        /// <c>')'</c>
         /// at this point in the
         /// derivation:
         /// <pre>
@@ -536,21 +536,21 @@ namespace Antlr4.Runtime
         /// ^
         /// </pre>
         /// The attempt to match
-        /// <code>')'</code>
+        /// <c>')'</c>
         /// will fail when it sees
-        /// <code>';'</code>
+        /// <c>';'</c>
         /// and
         /// call
         /// <see cref="RecoverInline(Parser)"/>
         /// . To recover, it sees that
-        /// <code>LA(1)==';'</code>
+        /// <c>LA(1)==';'</c>
         /// is in the set of tokens that can follow the
-        /// <code>')'</code>
+        /// <c>')'</c>
         /// token reference
         /// in rule
-        /// <code>atom</code>
+        /// <c>atom</c>
         /// . It can assume that you forgot the
-        /// <code>')'</code>
+        /// <c>')'</c>
         /// .
         /// </summary>
         /// <exception cref="Antlr4.Runtime.RecognitionException"/>
@@ -585,29 +585,29 @@ namespace Antlr4.Runtime
         /// if the single-token
         /// deletion strategy fails to recover from the mismatched input. If this
         /// method returns
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// ,
-        /// <code>recognizer</code>
+        /// <paramref name="recognizer"/>
         /// will be in error recovery
         /// mode.
         /// <p>This method determines whether or not single-token insertion is viable by
         /// checking if the
-        /// <code>LA(1)</code>
+        /// <c>LA(1)</c>
         /// input symbol could be successfully matched
         /// if it were instead the
-        /// <code>LA(2)</code>
+        /// <c>LA(2)</c>
         /// symbol. If this method returns
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// , the caller is responsible for creating and inserting a
         /// token with the correct type to produce this behavior.</p>
         /// </remarks>
         /// <param name="recognizer">the parser instance</param>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if single-token insertion is a viable recovery
         /// strategy for the current mismatched input, otherwise
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// </returns>
         protected internal virtual bool SingleTokenInsertion(Parser recognizer)
         {
@@ -639,7 +639,7 @@ namespace Antlr4.Runtime
         /// to attempt to recover
         /// from mismatched input. If this method returns null, the parser and error
         /// handler state will not have changed. If this method returns non-null,
-        /// <code>recognizer</code>
+        /// <paramref name="recognizer"/>
         /// will <em>not</em> be in error recovery mode since the
         /// returned token was a successful match.
         /// <p>If the single-token deletion is successful, this method calls
@@ -658,7 +658,7 @@ namespace Antlr4.Runtime
         /// <see cref="IToken"/>
         /// instance if single-token
         /// deletion successfully recovers from the mismatched input, otherwise
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// </returns>
         [Nullable]
         protected internal virtual IToken SingleTokenDeletion(Parser recognizer)

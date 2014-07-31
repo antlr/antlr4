@@ -185,14 +185,14 @@ namespace Antlr4.Runtime.Misc
 
         /// <summary>
         /// Return the interval with elements from
-        /// <code>this</code>
+        /// <c>this</c>
         /// not in
-        /// <code>other</code>
+        /// <paramref name="other"/>
         /// ;
-        /// <code>other</code>
+        /// <paramref name="other"/>
         /// must not be totally enclosed (properly contained)
         /// within
-        /// <code>this</code>
+        /// <c>this</c>
         /// , which would result in two disjoint intervals
         /// instead of the single one returned by this method.
         /// </summary>

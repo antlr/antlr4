@@ -45,48 +45,48 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// <p>Patterns are strings of source input text with special tags representing
     /// token or rule references such as:</p>
     /// <p>
-    /// <code><ID> = <expr>;</code>
+    /// <c>&lt;ID&gt; = &lt;expr&gt;;</c>
     /// </p>
     /// <p>Given a pattern start rule such as
-    /// <code>statement</code>
+    /// <c>statement</c>
     /// , this object constructs
     /// a
     /// <see cref="Antlr4.Runtime.Tree.IParseTree"/>
     /// with placeholders for the
-    /// <code>ID</code>
+    /// <c>ID</c>
     /// and
-    /// <code>expr</code>
+    /// <c>expr</c>
     /// subtree. Then the
     /// <see cref="Match(Antlr4.Runtime.Tree.IParseTree, ParseTreePattern)"/>
     /// routines can compare an actual
     /// <see cref="Antlr4.Runtime.Tree.IParseTree"/>
     /// from a parse with this pattern. Tag
-    /// <code><ID></code>
+    /// <c>&lt;ID&gt;</c>
     /// matches
     /// any
-    /// <code>ID</code>
+    /// <c>ID</c>
     /// token and tag
-    /// <code><expr></code>
+    /// <c>&lt;expr&gt;</c>
     /// references the result of the
-    /// <code>expr</code>
+    /// <c>expr</c>
     /// rule (generally an instance of
-    /// <code>ExprContext</code>
+    /// <c>ExprContext</c>
     /// .</p>
     /// <p>Pattern
-    /// <code>x = 0;</code>
+    /// <c>x = 0;</c>
     /// is a similar pattern that matches the same pattern
     /// except that it requires the identifier to be
-    /// <code>x</code>
+    /// <c>x</c>
     /// and the expression to
     /// be
-    /// <code>0</code>
+    /// <c>0</c>
     /// .</p>
     /// <p>The
     /// <see cref="Matches(Antlr4.Runtime.Tree.IParseTree, ParseTreePattern)"/>
     /// routines return
-    /// <code>true</code>
+    /// <see langword="true"/>
     /// or
-    /// <code>false</code>
+    /// <see langword="false"/>
     /// based
     /// upon a match for the tree rooted at the parameter sent in. The
     /// <see cref="Match(Antlr4.Runtime.Tree.IParseTree, ParseTreePattern)"/>
@@ -102,7 +102,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// <see cref="ParseTreePattern"/>
     /// object.</p>
     /// <p>See
-    /// <code>TestParseTreeMatcher</code>
+    /// <c>TestParseTreeMatcher</c>
     /// for lots of examples.
     /// <see cref="ParseTreePattern"/>
     /// has two static helper methods:
@@ -118,7 +118,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// <see cref="ParseTreePatternMatcher"/>
     /// constructor are used to parse the pattern in string form. The lexer converts
     /// the
-    /// <code><ID> = <expr>;</code>
+    /// <c>&lt;ID&gt; = &lt;expr&gt;;</c>
     /// into a sequence of four tokens (assuming lexer
     /// throws out whitespace or puts it on a hidden channel). Be aware that the
     /// input stream is reset for the lexer (but not the parser; a
@@ -127,30 +127,30 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// fields you have put into the lexer might get changed when this mechanism asks
     /// it to scan the pattern string.</p>
     /// <p>Normally a parser does not accept token
-    /// <code><expr></code>
+    /// <c>&lt;expr&gt;</c>
     /// as a valid
-    /// <code>expr</code>
+    /// <c>expr</c>
     /// but, from the parser passed in, we create a special version of
     /// the underlying grammar representation (an
     /// <see cref="Antlr4.Runtime.Atn.ATN"/>
     /// ) that allows imaginary
     /// tokens representing rules (
-    /// <code><expr></code>
+    /// <c>&lt;expr&gt;</c>
     /// ) to match entire rules. We call
     /// these <em>bypass alternatives</em>.</p>
     /// <p>Delimiters are
-    /// <code>&lt;</code>
+    /// <c>&lt;</c>
     /// and
-    /// <code>&gt;</code>
+    /// <c>&gt;</c>
     /// , with
-    /// <code>\</code>
+    /// <c>\</c>
     /// as the escape string
     /// by default, but you can set them to whatever you want using
     /// <see cref="SetDelimiters(string, string, string)"/>
     /// . You must escape both start and stop strings
-    /// <code>\&lt;</code>
+    /// <c>\&lt;</c>
     /// and
-    /// <code>\&gt;</code>
+    /// <c>\&gt;</c>
     /// .</p>
     /// </summary>
     public class ParseTreePatternMatcher
@@ -223,17 +223,17 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <exception>
         /// IllegalArgumentException
         /// if
-        /// <code>start</code>
+        /// <paramref name="start"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// or empty.
         /// </exception>
         /// <exception>
         /// IllegalArgumentException
         /// if
-        /// <code>stop</code>
+        /// <paramref name="stop"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// or empty.
         /// </exception>
         public virtual void SetDelimiters(string start, string stop, string escapeLeft)
@@ -253,11 +253,11 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// Does
-        /// <code>pattern</code>
+        /// <paramref name="pattern"/>
         /// matched as rule
-        /// <code>patternRuleIndex</code>
+        /// <paramref name="patternRuleIndex"/>
         /// match
-        /// <code>tree</code>
+        /// <paramref name="tree"/>
         /// ?
         /// </summary>
         public virtual bool Matches(IParseTree tree, string pattern, int patternRuleIndex)
@@ -268,7 +268,7 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// Does
-        /// <code>pattern</code>
+        /// <paramref name="pattern"/>
         /// matched as rule patternRuleIndex match tree? Pass in a
         /// compiled pattern instead of a string representation of a tree pattern.
         /// </summary>
@@ -281,11 +281,11 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// Compare
-        /// <code>pattern</code>
+        /// <paramref name="pattern"/>
         /// matched as rule
-        /// <code>patternRuleIndex</code>
+        /// <paramref name="patternRuleIndex"/>
         /// against
-        /// <code>tree</code>
+        /// <paramref name="tree"/>
         /// and return a
         /// <see cref="ParseTreeMatch"/>
         /// object that contains the
@@ -299,9 +299,9 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// Compare
-        /// <code>pattern</code>
+        /// <paramref name="pattern"/>
         /// matched against
-        /// <code>tree</code>
+        /// <paramref name="tree"/>
         /// and return a
         /// <see cref="ParseTreeMatch"/>
         /// object that contains the matched elements, or the
@@ -386,22 +386,22 @@ namespace Antlr4.Runtime.Tree.Pattern
         // ---- SUPPORT CODE ----
         /// <summary>
         /// Recursively walk
-        /// <code>tree</code>
+        /// <paramref name="tree"/>
         /// against
-        /// <code>patternTree</code>
+        /// <paramref name="patternTree"/>
         /// , filling
-        /// <code>match.</code>
+        /// <c>match.</c>
         /// <see cref="ParseTreeMatch#labels">labels</see>
         /// .
         /// </summary>
         /// <returns>
         /// the first node encountered in
-        /// <code>tree</code>
+        /// <paramref name="tree"/>
         /// which does not match
         /// a corresponding node in
-        /// <code>patternTree</code>
+        /// <paramref name="patternTree"/>
         /// , or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if the match
         /// was successful. The specific node returned depends on the matching
         /// algorithm used by the implementation, and may be overridden.
@@ -516,9 +516,9 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// Is
-        /// <code>t</code>
+        /// <paramref name="t"/>
         /// 
-        /// <code>(expr <expr>)</code>
+        /// <c>(expr &lt;expr&gt;)</c>
         /// subtree?
         /// </summary>
         protected internal virtual RuleTagToken GetRuleTagToken(IParseTree t)
@@ -598,7 +598,7 @@ namespace Antlr4.Runtime.Tree.Pattern
 
         /// <summary>
         /// Split
-        /// <code><ID> = <e:expr> ;</code>
+        /// <c>&lt;ID&gt; = &lt;e:expr&gt; ;</c>
         /// into 4 chunks for tokenizing by
         /// <see cref="Tokenize(string)"/>
         /// .

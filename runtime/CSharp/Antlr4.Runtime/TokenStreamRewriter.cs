@@ -81,9 +81,9 @@ namespace Antlr4.Runtime
     /// -time, operations do
     /// not screw up the token index values. That is, an insert operation at token
     /// index
-    /// <code>i</code>
+    /// <c>i</c>
     /// does not change the index values for tokens
-    /// <code>i</code>
+    /// <c>i</c>
     /// +1..n-1.</p>
     /// <p>
     /// Because operations never actually alter the buffer, you may always get the

@@ -180,10 +180,10 @@ namespace Antlr4.Runtime.Atn
         /// <p>Assuming combined SLL+LL parsing, an SLL configuration set with only
         /// conflicting subsets should fall back to full LL, even if the
         /// configuration sets don't resolve to the same alternative (e.g.
-        /// <code/>
+        /// <c/>
         /// 
         /// 1,2}} and
-        /// <code/>
+        /// <c/>
         /// 
         /// 3,4}}. If there is at least one non-conflicting
         /// configuration, SLL could continue with the hopes that more lookahead will
@@ -197,25 +197,25 @@ namespace Antlr4.Runtime.Atn
         /// The single-alt-state thing lets prediction continue upon rules like
         /// (otherwise, it would admit defeat too soon):</p>
         /// <p>
-        /// <code>[12|1|[], 6|2|[], 12|2|[]]. s : (ID | ID ID?) ';' ;</code>
+        /// <c>[12|1|[], 6|2|[], 12|2|[]]. s : (ID | ID ID?) ';' ;</c>
         /// </p>
         /// <p>When the ATN simulation reaches the state before
-        /// <code>';'</code>
+        /// <c>';'</c>
         /// , it has a
         /// DFA state that looks like:
-        /// <code>[12|1|[], 6|2|[], 12|2|[]]</code>
+        /// <c>[12|1|[], 6|2|[], 12|2|[]]</c>
         /// . Naturally
-        /// <code>12|1|[]</code>
+        /// <c>12|1|[]</c>
         /// and
-        /// <code>12|2|[]</code>
+        /// <c>12|2|[]</c>
         /// conflict, but we cannot stop
         /// processing this node because alternative to has another way to continue,
         /// via
-        /// <code>[6|2|[]]</code>
+        /// <c>[6|2|[]]</c>
         /// .</p>
         /// <p>It also let's us continue for this rule:</p>
         /// <p>
-        /// <code>[1|1|[], 1|2|[], 8|3|[]] a : A | A | A B ;</code>
+        /// <c>[1|1|[], 1|2|[], 8|3|[]] a : A | A | A B ;</c>
         /// </p>
         /// <p>After matching input A, we reach the stop state for rule A, state 1.
         /// State 8 is the state right before B. Clearly alternatives 1 and 2
@@ -242,20 +242,20 @@ namespace Antlr4.Runtime.Atn
         /// semantic predicate contexts so we might see two configurations like the
         /// following.</p>
         /// <p>
-        /// <code/>
+        /// <c/>
         /// (s, 1, x,
         /// ), (s, 1, x', {p})}</p>
         /// <p>Before testing these configurations against others, we have to merge
-        /// <code>x</code>
+        /// <c>x</c>
         /// and
-        /// <code>x'</code>
+        /// <c>x'</c>
         /// (without modifying the existing configurations).
         /// For example, we test
-        /// <code>(x+x')==x''</code>
+        /// <c>(x+x')==x''</c>
         /// when looking for conflicts in
         /// the following configurations.</p>
         /// <p>
-        /// <code/>
+        /// <c/>
         /// (s, 1, x,
         /// ), (s, 1, x', {p}), (s, 2, x'', {})}</p>
         /// <p>If the configuration set has predicates (as indicated by
@@ -298,7 +298,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Checks if any configuration in
-        /// <code>configs</code>
+        /// <paramref name="configs"/>
         /// is in a
         /// <see cref="RuleStopState"/>
         /// . Configurations meeting this condition have reached
@@ -308,13 +308,13 @@ namespace Antlr4.Runtime.Atn
         /// <param name="configs">the configuration set to test</param>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if any configuration in
-        /// <code>configs</code>
+        /// <paramref name="configs"/>
         /// is in a
         /// <see cref="RuleStopState"/>
         /// , otherwise
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// </returns>
         public static bool HasConfigInRuleStopState(IEnumerable<ATNConfig> configs)
         {
@@ -330,7 +330,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Checks if all configurations in
-        /// <code>configs</code>
+        /// <paramref name="configs"/>
         /// are in a
         /// <see cref="RuleStopState"/>
         /// . Configurations meeting this condition have reached
@@ -340,13 +340,13 @@ namespace Antlr4.Runtime.Atn
         /// <param name="configs">the configuration set to test</param>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if all configurations in
-        /// <code>configs</code>
+        /// <paramref name="configs"/>
         /// are in a
         /// <see cref="RuleStopState"/>
         /// , otherwise
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// </returns>
         public static bool AllConfigsInRuleStopStates(IEnumerable<ATNConfig> configs)
         {
@@ -372,10 +372,10 @@ namespace Antlr4.Runtime.Atn
         /// minimums. That means we need more look ahead to decide which of those
         /// alternatives we should predict.</p>
         /// <p>The basic idea is to split the set of configurations
-        /// <code>C</code>
+        /// <c>C</c>
         /// , into
         /// conflicting subsets
-        /// <code>(s, _, ctx, _)</code>
+        /// <c>(s, _, ctx, _)</c>
         /// and singleton subsets with
         /// non-conflicting configurations. Two configurations conflict if they have
         /// identical
@@ -386,30 +386,30 @@ namespace Antlr4.Runtime.Atn
         /// but different
         /// <see cref="ATNConfig.Alt()"/>
         /// value, e.g.
-        /// <code>(s, i, ctx, _)</code>
+        /// <c>(s, i, ctx, _)</c>
         /// and
-        /// <code>(s, j, ctx, _)</code>
+        /// <c>(s, j, ctx, _)</c>
         /// for
-        /// <code>i!=j</code>
+        /// <c>i!=j</c>
         /// .
         /// <p/>
         /// Reduce these configuration subsets to the set of possible alternatives.
         /// You can compute the alternative subsets in one pass as follows:
         /// <p/>
-        /// <code/>
+        /// <c/>
         /// A_s,ctx =
         /// i | (s, i, ctx, _)}} for each configuration in
-        /// <code>C</code>
+        /// <c>C</c>
         /// holding
-        /// <code>s</code>
+        /// <c>s</c>
         /// and
-        /// <code>ctx</code>
+        /// <c>ctx</c>
         /// fixed.
         /// <p/>
         /// Or in pseudo-code, for each configuration
-        /// <code>c</code>
+        /// <c>c</c>
         /// in
-        /// <code>C</code>
+        /// <c>C</c>
         /// :
         /// <pre>
         /// map[c] U= c.
@@ -418,16 +418,16 @@ namespace Antlr4.Runtime.Atn
         /// alt and not pred
         /// </pre>
         /// <p>The values in
-        /// <code>map</code>
+        /// <c>map</c>
         /// are the set of
-        /// <code>A_s,ctx</code>
+        /// <c>A_s,ctx</c>
         /// sets.</p>
         /// <p>If
-        /// <code>|A_s,ctx|=1</code>
+        /// <c>|A_s,ctx|=1</c>
         /// then there is no conflict associated with
-        /// <code>s</code>
+        /// <c>s</c>
         /// and
-        /// <code>ctx</code>
+        /// <c>ctx</c>
         /// .</p>
         /// <p>Reduce the subsets to singletons by choosing a minimum of each subset. If
         /// the union of these alternative subsets is a singleton, then no amount of
@@ -447,57 +447,57 @@ namespace Antlr4.Runtime.Atn
         /// check.</p>
         /// <p><strong>CONFLICTING CONFIGS</strong></p>
         /// <p>Two configurations
-        /// <code>(s, i, x)</code>
+        /// <c>(s, i, x)</c>
         /// and
-        /// <code>(s, j, x')</code>
+        /// <c>(s, j, x')</c>
         /// , conflict
         /// when
-        /// <code>i!=j</code>
+        /// <c>i!=j</c>
         /// but
-        /// <code>x=x'</code>
+        /// <c>x=x'</c>
         /// . Because we merge all
-        /// <code>(s, i, _)</code>
+        /// <c>(s, i, _)</c>
         /// configurations together, that means that there are at
         /// most
-        /// <code>n</code>
+        /// <c>n</c>
         /// configurations associated with state
-        /// <code>s</code>
+        /// <c>s</c>
         /// for
-        /// <code>n</code>
+        /// <c>n</c>
         /// possible alternatives in the decision. The merged stacks
         /// complicate the comparison of configuration contexts
-        /// <code>x</code>
+        /// <c>x</c>
         /// and
-        /// <code>x'</code>
+        /// <c>x'</c>
         /// . Sam checks to see if one is a subset of the other by calling
         /// merge and checking to see if the merged result is either
-        /// <code>x</code>
+        /// <c>x</c>
         /// or
-        /// <code>x'</code>
+        /// <c>x'</c>
         /// . If the
-        /// <code>x</code>
+        /// <c>x</c>
         /// associated with lowest alternative
-        /// <code>i</code>
+        /// <c>i</c>
         /// is the superset, then
-        /// <code>i</code>
+        /// <c>i</c>
         /// is the only possible prediction since the
         /// others resolve to
-        /// <code>min(i)</code>
+        /// <c>min(i)</c>
         /// as well. However, if
-        /// <code>x</code>
+        /// <c>x</c>
         /// is
         /// associated with
-        /// <code>j&gt;i</code>
+        /// <c>j&gt;i</c>
         /// then at least one stack configuration for
-        /// <code>j</code>
+        /// <c>j</c>
         /// is not in conflict with alternative
-        /// <code>i</code>
+        /// <c>i</c>
         /// . The algorithm
         /// should keep going, looking for more lookahead due to the uncertainty.</p>
         /// <p>For simplicity, I'm doing a equality check between
-        /// <code>x</code>
+        /// <c>x</c>
         /// and
-        /// <code>x'</code>
+        /// <c>x'</c>
         /// that lets the algorithm continue to consume lookahead longer
         /// than necessary. The reason I like the equality is of course the
         /// simplicity but also because that is the test you need to detect the
@@ -507,7 +507,7 @@ namespace Antlr4.Runtime.Atn
         /// conflicting alternative subsets has more than one alternative. We are
         /// uncertain about which alternative to predict.</p>
         /// <p>The complete set of alternatives,
-        /// <code>[i for (_,i,_)]</code>
+        /// <c>[i for (_,i,_)]</c>
         /// , tells us which
         /// alternatives are still in the running for the amount of input we've
         /// consumed at this point. The conflicting sets let us to strip away
@@ -518,108 +518,108 @@ namespace Antlr4.Runtime.Atn
         /// <ul>
         /// <li>no conflicts and more than 1 alternative in set =&gt; continue</li>
         /// <li>
-        /// <code>(s, 1, x)</code>
+        /// <c>(s, 1, x)</c>
         /// ,
-        /// <code>(s, 2, x)</code>
+        /// <c>(s, 2, x)</c>
         /// ,
-        /// <code>(s, 3, z)</code>
+        /// <c>(s, 3, z)</c>
         /// ,
-        /// <code>(s', 1, y)</code>
+        /// <c>(s', 1, y)</c>
         /// ,
-        /// <code>(s', 2, y)</code>
+        /// <c>(s', 2, y)</c>
         /// yields non-conflicting set
-        /// <code/>
+        /// <c/>
         /// 
         /// 3}} U conflicting sets
-        /// <code/>
+        /// <c/>
         /// min(
         /// 1,2})} U
-        /// <code/>
+        /// <c/>
         /// min(
         /// 1,2})} =
-        /// <code/>
+        /// <c/>
         /// 
         /// 1,3}} =&gt; continue
         /// </li>
         /// <li>
-        /// <code>(s, 1, x)</code>
+        /// <c>(s, 1, x)</c>
         /// ,
-        /// <code>(s, 2, x)</code>
+        /// <c>(s, 2, x)</c>
         /// ,
-        /// <code>(s', 1, y)</code>
+        /// <c>(s', 1, y)</c>
         /// ,
-        /// <code>(s', 2, y)</code>
+        /// <c>(s', 2, y)</c>
         /// ,
-        /// <code>(s'', 1, z)</code>
+        /// <c>(s'', 1, z)</c>
         /// yields non-conflicting set
-        /// <code/>
+        /// <c/>
         /// 
         /// 1}} U conflicting sets
-        /// <code/>
+        /// <c/>
         /// min(
         /// 1,2})} U
-        /// <code/>
+        /// <c/>
         /// min(
         /// 1,2})} =
-        /// <code/>
+        /// <c/>
         /// 
         /// 1}} =&gt; stop and predict 1</li>
         /// <li>
-        /// <code>(s, 1, x)</code>
+        /// <c>(s, 1, x)</c>
         /// ,
-        /// <code>(s, 2, x)</code>
+        /// <c>(s, 2, x)</c>
         /// ,
-        /// <code>(s', 1, y)</code>
+        /// <c>(s', 1, y)</c>
         /// ,
-        /// <code>(s', 2, y)</code>
+        /// <c>(s', 2, y)</c>
         /// yields conflicting, reduced sets
-        /// <code/>
+        /// <c/>
         /// 
         /// 1}} U
-        /// <code/>
+        /// <c/>
         /// 
         /// 1}} =
-        /// <code/>
+        /// <c/>
         /// 
         /// 1}} =&gt; stop and predict 1, can announce
         /// ambiguity
-        /// <code/>
+        /// <c/>
         /// 
         /// 1,2}}</li>
         /// <li>
-        /// <code>(s, 1, x)</code>
+        /// <c>(s, 1, x)</c>
         /// ,
-        /// <code>(s, 2, x)</code>
+        /// <c>(s, 2, x)</c>
         /// ,
-        /// <code>(s', 2, y)</code>
+        /// <c>(s', 2, y)</c>
         /// ,
-        /// <code>(s', 3, y)</code>
+        /// <c>(s', 3, y)</c>
         /// yields conflicting, reduced sets
-        /// <code/>
+        /// <c/>
         /// 
         /// 1}} U
-        /// <code/>
+        /// <c/>
         /// 
         /// 2}} =
-        /// <code/>
+        /// <c/>
         /// 
         /// 1,2}} =&gt; continue</li>
         /// <li>
-        /// <code>(s, 1, x)</code>
+        /// <c>(s, 1, x)</c>
         /// ,
-        /// <code>(s, 2, x)</code>
+        /// <c>(s, 2, x)</c>
         /// ,
-        /// <code>(s', 3, y)</code>
+        /// <c>(s', 3, y)</c>
         /// ,
-        /// <code>(s', 4, y)</code>
+        /// <c>(s', 4, y)</c>
         /// yields conflicting, reduced sets
-        /// <code/>
+        /// <c/>
         /// 
         /// 1}} U
-        /// <code/>
+        /// <c/>
         /// 
         /// 3}} =
-        /// <code/>
+        /// <c/>
         /// 
         /// 1,3}} =&gt; continue</li>
         /// </ul>
@@ -629,24 +629,24 @@ namespace Antlr4.Runtime.Atn
         /// <p><code>|A_<em>i</em>|&gt;1</code> and
         /// <code>A_<em>i</em> = A_<em>j</em></code> for all <em>i</em>, <em>j</em>.</p>
         /// <p>In other words, we continue examining lookahead until all
-        /// <code>A_i</code>
+        /// <c>A_i</c>
         /// have more than one alternative and all
-        /// <code>A_i</code>
+        /// <c>A_i</c>
         /// are the same. If
-        /// <code/>
+        /// <c/>
         /// A=
         /// {1,2}, {1,3}}}, then regular LL prediction would terminate
         /// because the resolved set is
-        /// <code/>
+        /// <c/>
         /// 
         /// 1}}. To determine what the real
         /// ambiguity is, we have to know whether the ambiguity is between one and
         /// two or one and three so we keep going. We can only stop prediction when
         /// we need exact ambiguity detection when the sets look like
-        /// <code/>
+        /// <c/>
         /// A=
         /// {1,2}}} or
-        /// <code/>
+        /// <c/>
         /// 
         /// {1,2},{1,2}}}, etc...</p>
         /// </remarks>
@@ -657,22 +657,22 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Determines if every alternative subset in
-        /// <code>altsets</code>
+        /// <paramref name="altsets"/>
         /// contains more
         /// than one alternative.
         /// </summary>
         /// <param name="altsets">a collection of alternative subsets</param>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if every
         /// <see cref="Antlr4.Runtime.Sharpen.BitSet"/>
         /// in
-        /// <code>altsets</code>
+        /// <paramref name="altsets"/>
         /// has
         /// <see cref="Antlr4.Runtime.Sharpen.BitSet.Cardinality()">cardinality</see>
         /// &gt; 1, otherwise
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// </returns>
         public static bool AllSubsetsConflict(IEnumerable<BitSet> altsets)
         {
@@ -681,22 +681,22 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Determines if any single alternative subset in
-        /// <code>altsets</code>
+        /// <paramref name="altsets"/>
         /// contains
         /// exactly one alternative.
         /// </summary>
         /// <param name="altsets">a collection of alternative subsets</param>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if
-        /// <code>altsets</code>
+        /// <paramref name="altsets"/>
         /// contains a
         /// <see cref="Antlr4.Runtime.Sharpen.BitSet"/>
         /// with
         /// <see cref="Antlr4.Runtime.Sharpen.BitSet.Cardinality()">cardinality</see>
         /// 1, otherwise
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// </returns>
         public static bool HasNonConflictingAltSet(IEnumerable<BitSet> altsets)
         {
@@ -712,22 +712,22 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Determines if any single alternative subset in
-        /// <code>altsets</code>
+        /// <paramref name="altsets"/>
         /// contains
         /// more than one alternative.
         /// </summary>
         /// <param name="altsets">a collection of alternative subsets</param>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if
-        /// <code>altsets</code>
+        /// <paramref name="altsets"/>
         /// contains a
         /// <see cref="Antlr4.Runtime.Sharpen.BitSet"/>
         /// with
         /// <see cref="Antlr4.Runtime.Sharpen.BitSet.Cardinality()">cardinality</see>
         /// &gt; 1, otherwise
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// </returns>
         public static bool HasConflictingAltSet(IEnumerable<BitSet> altsets)
         {
@@ -743,18 +743,18 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Determines if every alternative subset in
-        /// <code>altsets</code>
+        /// <paramref name="altsets"/>
         /// is equivalent.
         /// </summary>
         /// <param name="altsets">a collection of alternative subsets</param>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if every member of
-        /// <code>altsets</code>
+        /// <paramref name="altsets"/>
         /// is equal to the
         /// others, otherwise
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// </returns>
         public static bool AllSubsetsEqual(IEnumerable<BitSet> altsets)
         {
@@ -773,7 +773,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Returns the unique alternative predicted by all alternative subsets in
-        /// <code>altsets</code>
+        /// <paramref name="altsets"/>
         /// . If no such alternative exists, this method returns
         /// <see cref="ATN.InvalidAltNumber"/>
         /// .
@@ -798,13 +798,13 @@ namespace Antlr4.Runtime.Atn
         /// alternative subsets. This method returns the union of each
         /// <see cref="Antlr4.Runtime.Sharpen.BitSet"/>
         /// in
-        /// <code>altsets</code>
+        /// <paramref name="altsets"/>
         /// .
         /// </remarks>
         /// <param name="altsets">a collection of alternative subsets</param>
         /// <returns>
         /// the set of represented alternatives in
-        /// <code>altsets</code>
+        /// <paramref name="altsets"/>
         /// </returns>
         public static BitSet GetAlts(IEnumerable<BitSet> altsets)
         {
@@ -820,9 +820,9 @@ namespace Antlr4.Runtime.Atn
         /// <remarks>
         /// This function gets the conflicting alt subsets from a configuration set.
         /// For each configuration
-        /// <code>c</code>
+        /// <c>c</c>
         /// in
-        /// <code>configs</code>
+        /// <paramref name="configs"/>
         /// :
         /// <pre>
         /// map[c] U= c.
@@ -852,9 +852,9 @@ namespace Antlr4.Runtime.Atn
         /// <remarks>
         /// Get a map from state to alt subset from a configuration set. For each
         /// configuration
-        /// <code>c</code>
+        /// <c>c</c>
         /// in
-        /// <code>configs</code>
+        /// <paramref name="configs"/>
         /// :
         /// <pre>
         /// map[c.

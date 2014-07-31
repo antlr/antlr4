@@ -36,12 +36,12 @@ namespace Antlr4.Runtime.Atn
 {
     /// <summary>
     /// Implements the
-    /// <code>skip</code>
+    /// <c>skip</c>
     /// lexer action by calling
     /// <see cref="Antlr4.Runtime.Lexer.Skip()"/>
     /// .
     /// <p>The
-    /// <code>skip</code>
+    /// <c>skip</c>
     /// command does not have any parameters, so this action is
     /// implemented as a singleton instance exposed by
     /// <see cref="Instance"/>
@@ -57,7 +57,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Constructs the singleton instance of the lexer
-        /// <code>skip</code>
+        /// <c>skip</c>
         /// command.
         /// </summary>
         private LexerSkipAction()
@@ -81,7 +81,7 @@ namespace Antlr4.Runtime.Atn
         /// <summary><inheritDoc/></summary>
         /// <returns>
         /// This method returns
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// .
         /// </returns>
         public bool IsPositionDependent

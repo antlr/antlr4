@@ -69,7 +69,7 @@ namespace Antlr4.Runtime.Dfa
         public readonly ATNConfigSet configs;
 
         /// <summary>
-        /// <code>edges.get(symbol)</code>
+        /// <c>edges.get(symbol)</c>
         /// points to target of symbol.
         /// </summary>
         [Nullable]
@@ -87,7 +87,7 @@ namespace Antlr4.Runtime.Dfa
         /// <see cref="Antlr4.Runtime.Atn.ATN.InvalidAltNumber"/>
         /// when
         /// <see cref="predicates"/>
-        /// <code>!=null</code>
+        /// <c>!=null</c>
         /// .
         /// </summary>
         public int prediction;

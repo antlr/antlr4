@@ -55,7 +55,7 @@ namespace Antlr4.Runtime.Tree
         /// <see cref="AbstractParseTreeVisitor{Result}.ShouldVisitNextChild(IRuleNode, object)">shouldVisitNextChild</see>
         /// ; if the result
         /// is
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// no more children are visited and the current aggregate
         /// result is returned. After visiting a child, the aggregate result is
         /// updated by calling
@@ -117,7 +117,7 @@ namespace Antlr4.Runtime.Tree
         /// <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)">visitChildren</see>
         /// initializes its aggregate result to this value.
         /// <p>The base implementation returns
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .</p>
         /// </remarks>
         /// <returns>The default value returned by visitor methods.</returns>
@@ -135,12 +135,12 @@ namespace Antlr4.Runtime.Tree
         /// either all children are visited or
         /// <see cref="AbstractParseTreeVisitor{Result}.ShouldVisitNextChild(IRuleNode, object)"/>
         /// returns
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// , the aggregate value is returned as the result of
         /// <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
         /// .
         /// <p>The default implementation returns
-        /// <code>nextResult</code>
+        /// <paramref name="nextResult"/>
         /// , meaning
         /// <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
         /// will return the result of the last child visited
@@ -151,7 +151,7 @@ namespace Antlr4.Runtime.Tree
         /// implementation, the aggregate value is initialized to
         /// <see cref="AbstractParseTreeVisitor{Result}.DefaultResult()"/>
         /// , which is passed as the
-        /// <code>aggregate</code>
+        /// <paramref name="aggregate"/>
         /// argument
         /// to this method after the first child node is visited.
         /// </param>
@@ -170,7 +170,7 @@ namespace Antlr4.Runtime.Tree
         /// <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
         /// . This method is first called before the first
         /// child is visited; at that point
-        /// <code>currentResult</code>
+        /// <paramref name="currentResult"/>
         /// will be the initial
         /// value (in the default implementation, the initial value is returned by a
         /// call to
@@ -178,9 +178,9 @@ namespace Antlr4.Runtime.Tree
         /// . This method is not called after the last
         /// child is visited.
         /// <p>The default implementation always returns
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// , indicating that
-        /// <code>visitChildren</code>
+        /// <c>visitChildren</c>
         /// should only return after all children are visited.
         /// One reason to override this method is to provide a "short circuit"
         /// evaluation option for situations where the result of visiting a single
@@ -199,9 +199,9 @@ namespace Antlr4.Runtime.Tree
         /// </param>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// to continue visiting children. Otherwise return
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// to stop visiting children and immediately return the
         /// current aggregate result from
         /// <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>

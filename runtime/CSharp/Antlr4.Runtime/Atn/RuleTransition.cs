@@ -49,7 +49,6 @@ namespace Antlr4.Runtime.Atn
 
         public bool optimizedTailCall;
 
-        [Obsolete]
         [System.ObsoleteAttribute(@"UseRuleTransition(RuleStartState, int, int, ATNState) instead.")]
         public RuleTransition(RuleStartState ruleStart, int ruleIndex, ATNState followState)
             : this(ruleStart, ruleIndex, 0, followState)

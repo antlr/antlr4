@@ -34,7 +34,7 @@ namespace Antlr4.Runtime.Atn
 {
     /// <summary>
     /// Terminal node of a simple
-    /// <code>(a|b|c)</code>
+    /// <c>(a|b|c)</c>
     /// block.
     /// </summary>
     public sealed class BlockEndState : ATNState

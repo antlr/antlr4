@@ -38,7 +38,7 @@ namespace Antlr4.Runtime.Tree.Pattern
     /// <see cref="Antlr4.Runtime.IToken"/>
     /// object representing an entire subtree matched by a parser
     /// rule; e.g.,
-    /// <code><expr></code>
+    /// <c>&lt;expr&gt;</c>
     /// . These tokens are created for
     /// <see cref="TagChunk"/>
     /// chunks where the tag corresponds to a parser rule.
@@ -77,9 +77,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <exception>
         /// IllegalArgumentException
         /// if
-        /// <code>ruleName</code>
+        /// <paramref name="ruleName"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// or empty.
         /// </exception>
         public RuleTagToken(string ruleName, int bypassTokenType)
@@ -97,16 +97,16 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <param name="bypassTokenType">The bypass token type assigned to the parser rule.</param>
         /// <param name="label">
         /// The label associated with the rule tag, or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if
         /// the rule tag is unlabeled.
         /// </param>
         /// <exception>
         /// IllegalArgumentException
         /// if
-        /// <code>ruleName</code>
+        /// <paramref name="ruleName"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// or empty.
         /// </exception>
         public RuleTagToken(string ruleName, int bypassTokenType, string label)
@@ -135,7 +135,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <remarks>Gets the label associated with the rule tag.</remarks>
         /// <returns>
         /// The name of the label associated with the rule tag, or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if this is an unlabeled rule tag.
         /// </returns>
         public string Label
@@ -163,9 +163,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <summary>
         /// <inheritDoc/>
         /// <p>This method returns the rule tag formatted with
-        /// <code>&lt;</code>
+        /// <c>&lt;</c>
         /// and
-        /// <code>&gt;</code>
+        /// <c>&gt;</c>
         /// delimiters.</p>
         /// </summary>
         public virtual string Text
@@ -268,7 +268,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <p>The implementation for
         /// <see cref="RuleTagToken"/>
         /// always returns
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .</p>
         /// </summary>
         public virtual ITokenSource TokenSource
@@ -284,7 +284,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <p>The implementation for
         /// <see cref="RuleTagToken"/>
         /// always returns
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .</p>
         /// </summary>
         public virtual ICharStream InputStream
@@ -300,7 +300,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <p>The implementation for
         /// <see cref="RuleTagToken"/>
         /// returns a string of the form
-        /// <code>ruleName:bypassTokenType</code>
+        /// <c>ruleName:bypassTokenType</c>
         /// .</p>
         /// </summary>
         public override string ToString()

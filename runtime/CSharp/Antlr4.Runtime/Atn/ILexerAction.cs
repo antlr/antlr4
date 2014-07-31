@@ -61,11 +61,11 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="Antlr4.Runtime.ICharStream"/>
         /// index at the time the action is executed.
         /// <p>Many lexer commands, including
-        /// <code>type</code>
+        /// <c>type</c>
         /// ,
-        /// <code>skip</code>
+        /// <c>skip</c>
         /// , and
-        /// <code>more</code>
+        /// <c>more</c>
         /// , do not check the input index during their execution.
         /// Actions like this are position-independent, and may be stored more
         /// efficiently as part of the
@@ -74,13 +74,13 @@ namespace Antlr4.Runtime.Atn
         /// </remarks>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if the lexer action semantics can be affected by the
         /// position of the input
         /// <see cref="Antlr4.Runtime.ICharStream"/>
         /// at the time it is executed;
         /// otherwise,
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// .
         /// </returns>
         bool IsPositionDependent
