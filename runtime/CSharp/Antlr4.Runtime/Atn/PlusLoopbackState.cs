@@ -34,9 +34,9 @@ namespace Antlr4.Runtime.Atn
 {
     /// <summary>
     /// Decision state for
-    /// <code>A+</code>
+    /// <c>A+</c>
     /// and
-    /// <code>(A|B)+</code>
+    /// <c>(A|B)+</c>
     /// .  It has two transitions:
     /// one to the loop back to start of the block and one to exit.
     /// </summary>

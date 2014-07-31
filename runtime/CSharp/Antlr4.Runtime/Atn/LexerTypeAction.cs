@@ -36,7 +36,7 @@ namespace Antlr4.Runtime.Atn
 {
     /// <summary>
     /// Implements the
-    /// <code>type</code>
+    /// <c>type</c>
     /// lexer action by calling
     /// <see cref="Lexer.Type"/>
     /// with the assigned type.
@@ -49,7 +49,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Constructs a new
-        /// <code>type</code>
+        /// <paramref name="type"/>
         /// action with the specified token type value.
         /// </summary>
         /// <param name="type">
@@ -90,7 +90,7 @@ namespace Antlr4.Runtime.Atn
         /// <summary><inheritDoc/></summary>
         /// <returns>
         /// This method returns
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// .
         /// </returns>
         public virtual bool IsPositionDependent

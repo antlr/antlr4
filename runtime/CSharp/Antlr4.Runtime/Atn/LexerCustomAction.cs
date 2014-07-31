@@ -134,7 +134,7 @@ namespace Antlr4.Runtime.Atn
         /// </remarks>
         /// <returns>
         /// This method returns
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// .
         /// </returns>
         public bool IsPositionDependent

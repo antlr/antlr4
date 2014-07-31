@@ -59,7 +59,7 @@ namespace Antlr4.Runtime
         /// <see cref="data">data</see>
         /// .
         /// <p>This is not the buffer capacity, that's
-        /// <code>data.length</code>
+        /// <c>data.length</c>
         /// .</p>
         /// </summary>
         protected internal int n;
@@ -69,11 +69,11 @@ namespace Antlr4.Runtime
         /// <see cref="data">data</see>
         /// of next character.
         /// <p>The
-        /// <code>LA(1)</code>
+        /// <c>LA(1)</c>
         /// character is
-        /// <code>data[p]</code>
+        /// <c>data[p]</c>
         /// . If
-        /// <code>p == n</code>
+        /// <c>p == n</c>
         /// , we are
         /// out of buffered characters.</p>
         /// </summary>
@@ -85,29 +85,29 @@ namespace Antlr4.Runtime
         /// and down with
         /// <see cref="Release(int)">release()</see>
         /// . When we
-        /// <code>release()</code>
+        /// <c>release()</c>
         /// the last mark,
-        /// <code>numMarkers</code>
+        /// <c>numMarkers</c>
         /// reaches 0 and we reset the buffer. Copy
-        /// <code>data[p]..data[n-1]</code>
+        /// <c>data[p]..data[n-1]</c>
         /// to
-        /// <code>data[0]..data[(n-1)-p]</code>
+        /// <c>data[0]..data[(n-1)-p]</c>
         /// .
         /// </summary>
         protected internal int numMarkers = 0;
 
         /// <summary>
         /// This is the
-        /// <code>LA(-1)</code>
+        /// <c>LA(-1)</c>
         /// character for the current position.
         /// </summary>
         protected internal int lastChar = -1;
 
         /// <summary>
         /// When
-        /// <code>numMarkers &gt; 0</code>
+        /// <c>numMarkers &gt; 0</c>
         /// , this is the
-        /// <code>LA(-1)</code>
+        /// <c>LA(-1)</c>
         /// character for the
         /// first character in
         /// <see cref="data">data</see>
@@ -119,7 +119,7 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// Absolute character index. It's the index of the character about to be
         /// read via
-        /// <code>LA(1)</code>
+        /// <c>LA(1)</c>
         /// . Goes from 0 to the number of characters in the
         /// entire stream, although the stream size is unknown before the end is
         /// reached.
@@ -199,16 +199,16 @@ namespace Antlr4.Runtime
         /// <see cref="p">p</see>
         /// .
         /// Last valid
-        /// <code>p</code>
+        /// <c>p</c>
         /// index is
-        /// <code>data.length-1</code>
+        /// <c>data.length-1</c>
         /// .
-        /// <code>p+need-1</code>
+        /// <c>p+need-1</c>
         /// is
         /// the char index 'need' elements ahead. If we need 1 element,
-        /// <code>(p+1-1)==p</code>
+        /// <c>(p+1-1)==p</c>
         /// must be less than
-        /// <code>data.length</code>
+        /// <c>data.length</c>
         /// .
         /// </summary>
         protected internal virtual void Sync(int want)
@@ -223,13 +223,13 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Add
-        /// <code>n</code>
+        /// <paramref name="n"/>
         /// characters to the buffer. Returns the number of characters
         /// actually added to the buffer. If the return value is less than
-        /// <code>n</code>
+        /// <paramref name="n"/>
         /// ,
         /// then EOF was reached before
-        /// <code>n</code>
+        /// <paramref name="n"/>
         /// characters could be added.
         /// </summary>
         protected internal virtual int Fill(int n)
@@ -297,9 +297,9 @@ namespace Antlr4.Runtime
         /// Return a marker that we can release later.
         /// <p>The specific marker value used for this class allows for some level of
         /// protection against misuse where
-        /// <code>seek()</code>
+        /// <c>seek()</c>
         /// is called on a mark or
-        /// <code>release()</code>
+        /// <c>release()</c>
         /// is called in the wrong order.</p>
         /// </remarks>
         public virtual int Mark()
@@ -352,9 +352,9 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// Seek to absolute character index, which might not be in the current
         /// sliding window.  Move
-        /// <code>p</code>
+        /// <c>p</c>
         /// to
-        /// <code>index-bufferStartIndex</code>
+        /// <c>index-bufferStartIndex</c>
         /// .
         /// </remarks>
         public virtual void Seek(int index)

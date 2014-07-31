@@ -75,15 +75,15 @@ namespace Antlr4.Runtime.Atn
         /// <remarks>
         /// Determines if the transition is an "epsilon" transition.
         /// <p>The default implementation returns
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// .</p>
         /// </remarks>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if traversing this transition in the ATN does not
         /// consume an input symbol; otherwise,
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// if traversing this
         /// transition consumes (matches) an input symbol.
         /// </returns>

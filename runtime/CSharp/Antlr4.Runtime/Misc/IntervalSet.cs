@@ -300,9 +300,9 @@ namespace Antlr4.Runtime.Misc
         /// <remarks>
         /// Compute the set difference between two interval sets. The specific
         /// operation is
-        /// <code>left - right</code>
+        /// <c>left - right</c>
         /// . If either of the input sets is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// , it is treated as though it was an empty set.
         /// </remarks>
         [return: NotNull]

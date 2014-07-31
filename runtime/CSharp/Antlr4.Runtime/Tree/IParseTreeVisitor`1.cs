@@ -36,10 +36,10 @@ namespace Antlr4.Runtime.Tree
     /// <remarks>
     /// This interface defines the basic notion of a parse tree visitor. Generated
     /// visitors implement this interface and the
-    /// <code>XVisitor</code>
+    /// <c>XVisitor</c>
     /// interface for
     /// grammar
-    /// <code>X</code>
+    /// <c>X</c>
     /// .
     /// </remarks>
     /// <author>Sam Harwell</author>

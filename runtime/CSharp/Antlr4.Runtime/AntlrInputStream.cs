@@ -42,11 +42,11 @@ namespace Antlr4.Runtime
     /// <see cref="System.IO.Stream"/>
     /// and then treat it
     /// like a
-    /// <code>char[]</code>
+    /// <c>char[]</c>
     /// buffer. Can also pass in a
     /// <see cref="string"/>
     /// or
-    /// <code>char[]</code>
+    /// <c>char[]</c>
     /// to use.
     /// <p>If you need encoding, pass in stream/reader with correct encoding.</p>
     /// </summary>

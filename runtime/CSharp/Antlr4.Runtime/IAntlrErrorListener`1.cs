@@ -64,7 +64,7 @@ namespace Antlr4.Runtime
         /// The offending token in the input token
         /// stream, unless recognizer is a lexer (then it's null). If
         /// no viable alternative error,
-        /// <code>e</code>
+        /// <paramref name="e"/>
         /// has token at which we
         /// started production for the decision.
         /// </param>

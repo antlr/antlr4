@@ -52,18 +52,18 @@ namespace Antlr4.Runtime.Misc
         /// <see cref="IIntSet"/>
         /// object to contain all elements that are
         /// present in itself, the specified
-        /// <code>set</code>
+        /// <paramref name="set"/>
         /// , or both.
         /// </summary>
         /// <param name="set">
         /// The set to add to the current set. A
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// argument is
         /// treated as though it were an empty set.
         /// </param>
         /// <returns>
         /// 
-        /// <code>this</code>
+        /// <c>this</c>
         /// (to support chained calls)
         /// </returns>
         /// <exception>
@@ -78,12 +78,12 @@ namespace Antlr4.Runtime.Misc
         /// <see cref="IIntSet"/>
         /// object containing all elements that are
         /// present in both the current set and the specified set
-        /// <code>a</code>
+        /// <paramref name="a"/>
         /// .
         /// </summary>
         /// <param name="a">
         /// The set to intersect with the current set. A
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// argument is treated as though it were an empty set.
         /// </param>
         /// <returns>
@@ -91,9 +91,9 @@ namespace Antlr4.Runtime.Misc
         /// <see cref="IIntSet"/>
         /// instance containing the intersection of the
         /// current set and
-        /// <code>a</code>
+        /// <paramref name="a"/>
         /// . The value
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// may be returned in
         /// place of an empty result set.
         /// </returns>
@@ -105,36 +105,36 @@ namespace Antlr4.Runtime.Misc
         /// <see cref="IIntSet"/>
         /// object containing all elements that are
         /// present in
-        /// <code>elements</code>
+        /// <paramref name="elements"/>
         /// but not present in the current set. The
         /// following expressions are equivalent for input non-null
         /// <see cref="IIntSet"/>
         /// instances
-        /// <code>x</code>
+        /// <c>x</c>
         /// and
-        /// <code>y</code>
+        /// <c>y</c>
         /// .
         /// <ul>
         /// <li>
-        /// <code>x.complement(y)</code>
+        /// <c>x.complement(y)</c>
         /// </li>
         /// <li>
-        /// <code>y.subtract(x)</code>
+        /// <c>y.subtract(x)</c>
         /// </li>
         /// </ul>
         /// </summary>
         /// <param name="elements">
         /// The set to compare with the current set. A
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// argument is treated as though it were an empty set.
         /// </param>
         /// <returns>
         /// A new
         /// <see cref="IIntSet"/>
         /// instance containing the elements present in
-        /// <code>elements</code>
+        /// <paramref name="elements"/>
         /// but not present in the current set. The value
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// may be returned in place of an empty result set.
         /// </returns>
         [return: Nullable]
@@ -145,7 +145,7 @@ namespace Antlr4.Runtime.Misc
         /// <see cref="IIntSet"/>
         /// object containing all elements that are
         /// present in the current set, the specified set
-        /// <code>a</code>
+        /// <paramref name="a"/>
         /// , or both.
         /// <p>
         /// This method is similar to
@@ -156,7 +156,7 @@ namespace Antlr4.Runtime.Misc
         /// </summary>
         /// <param name="a">
         /// The set to union with the current set. A
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// argument
         /// is treated as though it were an empty set.
         /// </param>
@@ -165,9 +165,9 @@ namespace Antlr4.Runtime.Misc
         /// <see cref="IIntSet"/>
         /// instance containing the union of the current
         /// set and
-        /// <code>a</code>
+        /// <paramref name="a"/>
         /// . The value
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// may be returned in place of an
         /// empty result set.
         /// </returns>
@@ -179,36 +179,36 @@ namespace Antlr4.Runtime.Misc
         /// <see cref="IIntSet"/>
         /// object containing all elements that are
         /// present in the current set but not present in the input set
-        /// <code>a</code>
+        /// <paramref name="a"/>
         /// .
         /// The following expressions are equivalent for input non-null
         /// <see cref="IIntSet"/>
         /// instances
-        /// <code>x</code>
+        /// <c>x</c>
         /// and
-        /// <code>y</code>
+        /// <c>y</c>
         /// .
         /// <ul>
         /// <li>
-        /// <code>y.subtract(x)</code>
+        /// <c>y.subtract(x)</c>
         /// </li>
         /// <li>
-        /// <code>x.complement(y)</code>
+        /// <c>x.complement(y)</c>
         /// </li>
         /// </ul>
         /// </summary>
         /// <param name="a">
         /// The set to compare with the current set. A
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// argument is treated as though it were an empty set.
         /// </param>
         /// <returns>
         /// A new
         /// <see cref="IIntSet"/>
         /// instance containing the elements present in
-        /// <code>elements</code>
+        /// <c>elements</c>
         /// but not present in the current set. The value
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// may be returned in place of an empty result set.
         /// </returns>
         [return: Nullable]
@@ -227,14 +227,14 @@ namespace Antlr4.Runtime.Misc
 
         /// <summary>
         /// Returns
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if this set contains no elements.
         /// </summary>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if the current set contains no elements; otherwise,
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// .
         /// </returns>
         bool IsNil
@@ -268,17 +268,17 @@ namespace Antlr4.Runtime.Misc
 
         /// <summary>
         /// Returns
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if the set contains the specified element.
         /// </summary>
         /// <param name="el">The element to check for.</param>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if the set contains
-        /// <code>el</code>
+        /// <paramref name="el"/>
         /// ; otherwise
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// .
         /// </returns>
         bool Contains(int el);

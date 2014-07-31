@@ -83,7 +83,7 @@ namespace Antlr4.Runtime.Atn
         /// type if the
         /// <see cref="ATNDeserializationOptions.GenerateRuleBypassTransitions()"/>
         /// deserialization option was specified; otherwise, this is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .
         /// </remarks>
         public int[] ruleToTokenType;
@@ -156,18 +156,18 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Compute the set of valid tokens that can occur starting in state
-        /// <code>s</code>
+        /// <paramref name="s"/>
         /// .
         /// If
-        /// <code>ctx</code>
+        /// <paramref name="ctx"/>
         /// is
         /// <see cref="PredictionContext.EmptyLocal"/>
         /// , the set of tokens will not include what can follow
         /// the rule surrounding
-        /// <code>s</code>
+        /// <paramref name="s"/>
         /// . In other words, the set will be
         /// restricted to tokens reachable staying within
-        /// <code>s</code>
+        /// <paramref name="s"/>
         /// 's rule.
         /// </summary>
         [return: NotNull]
@@ -181,7 +181,7 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Compute the set of valid tokens that can occur starting in
-        /// <code>s</code>
+        /// <paramref name="s"/>
         /// and
         /// staying in same rule.
         /// <see cref="TokenConstants.Epsilon"/>
@@ -253,9 +253,9 @@ namespace Antlr4.Runtime.Atn
 
         /// <summary>
         /// Computes the set of input symbols which could follow ATN state number
-        /// <code>stateNumber</code>
+        /// <paramref name="stateNumber"/>
         /// in the specified full
-        /// <code>context</code>
+        /// <paramref name="context"/>
         /// . This method
         /// considers the complete parser context, but does not evaluate semantic
         /// predicates (i.e. all predicates encountered during the calculation are
@@ -266,9 +266,9 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="TokenConstants.Eof"/>
         /// is added to the returned set.
         /// <p>If
-        /// <code>context</code>
+        /// <paramref name="context"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// , it is treated as
         /// <see cref="ParserRuleContext.EmptyContext"/>
         /// .</p>
@@ -282,7 +282,7 @@ namespace Antlr4.Runtime.Atn
         /// <exception cref="System.ArgumentException">
         /// if the ATN does not contain a state with
         /// number
-        /// <code>stateNumber</code>
+        /// <paramref name="stateNumber"/>
         /// </exception>
         [return: NotNull]
         public virtual IntervalSet GetExpectedTokens(int stateNumber, RuleContext context)

@@ -53,26 +53,26 @@ namespace Antlr4.Runtime
         /// .</p>
         /// <p>
         /// When
-        /// <code>ambigAlts</code>
+        /// <paramref name="ambigAlts"/>
         /// is not null, it contains the set of potentially
         /// viable alternatives identified by the prediction algorithm. When
-        /// <code>ambigAlts</code>
+        /// <paramref name="ambigAlts"/>
         /// is null, use
         /// <see cref="Antlr4.Runtime.Atn.ATNConfigSet.RepresentedAlternatives()"/>
         /// to obtain the represented
         /// alternatives from the
-        /// <code>configs</code>
+        /// <paramref name="configs"/>
         /// argument.</p>
         /// <p>When
-        /// <code>exact</code>
+        /// <paramref name="exact"/>
         /// is
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// , <em>all</em> of the potentially
         /// viable alternatives are truly viable, i.e. this is reporting an exact
         /// ambiguity. When
-        /// <code>exact</code>
+        /// <paramref name="exact"/>
         /// is
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// , <em>at least two</em> of
         /// the potentially viable alternatives are viable for the current input, but
         /// the prediction algorithm terminated as soon as it determined that at
@@ -82,9 +82,9 @@ namespace Antlr4.Runtime
         /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection"/>
         /// prediction
         /// mode is used, the parser is required to identify exact ambiguities so
-        /// <code>exact</code>
+        /// <paramref name="exact"/>
         /// will always be
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// .</p>
         /// </remarks>
         /// <param name="recognizer">the parser instance</param>
@@ -93,21 +93,21 @@ namespace Antlr4.Runtime
         /// <param name="stopIndex">the input input where the ambiguity was identified</param>
         /// <param name="exact">
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if the ambiguity is exactly known, otherwise
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// . This is always
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// when
         /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection"/>
         /// is used.
         /// </param>
         /// <param name="ambigAlts">
         /// the potentially ambiguous alternatives, or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// to indicate that the potentially ambiguous alternatives are the complete
         /// set of represented alternatives in
-        /// <code>configs</code>
+        /// <paramref name="configs"/>
         /// </param>
         /// <param name="configs">
         /// the ATN configuration set where the ambiguity was
@@ -123,12 +123,12 @@ namespace Antlr4.Runtime
         /// This method is called when an SLL conflict occurs and the parser is about
         /// to use the full context information to make an LL decision.
         /// <p>If one or more configurations in
-        /// <code>configs</code>
+        /// <c>configs</c>
         /// contains a semantic
         /// predicate, the predicates are evaluated before this method is called. The
         /// subset of alternatives which are still viable after predicates are
         /// evaluated is reported in
-        /// <code>conflictingAlts</code>
+        /// <paramref name="conflictingAlts"/>
         /// .</p>
         /// </remarks>
         /// <param name="recognizer">the parser instance</param>
@@ -137,10 +137,10 @@ namespace Antlr4.Runtime
         /// <param name="stopIndex">the input index where the SLL conflict occurred</param>
         /// <param name="conflictingAlts">
         /// The specific conflicting alternatives. If this is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// , the conflicting alternatives are all alternatives
         /// represented in
-        /// <code>configs</code>
+        /// <c>configs</c>
         /// .
         /// </param>
         /// <param name="conflictState">
@@ -171,12 +171,12 @@ namespace Antlr4.Runtime
         /// indicate a problem, and it may appear even in completely unambiguous
         /// grammars.</p>
         /// <p>
-        /// <code>configs</code>
+        /// <c>configs</c>
         /// may have more than one represented alternative if the
         /// full-context prediction algorithm does not evaluate predicates before
         /// beginning the full-context prediction. In all cases, the final prediction
         /// is passed as the
-        /// <code>prediction</code>
+        /// <paramref name="prediction"/>
         /// argument.</p>
         /// <p>Note that the definition of "context sensitivity" in this method
         /// differs from the concept in

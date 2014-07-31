@@ -61,7 +61,7 @@ namespace Antlr4.Runtime
         /// <summary>The name of the input source.</summary>
         /// <remarks>
         /// The name of the input source. If this value is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// , a call to
         /// <see cref="SourceName()"/>
         /// should return the source name used to create the
@@ -111,9 +111,9 @@ namespace Antlr4.Runtime
         /// <exception>
         /// NullPointerException
         /// if
-        /// <code>tokens</code>
+        /// <paramref name="tokens"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// </exception>
         public ListTokenSource(IList<IToken> tokens)
             : this(tokens, null)
@@ -139,7 +139,7 @@ namespace Antlr4.Runtime
         /// The name of the
         /// <see cref="ITokenSource"/>
         /// . If this value is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// ,
         /// <see cref="SourceName()"/>
         /// will attempt to infer the name from
@@ -151,9 +151,9 @@ namespace Antlr4.Runtime
         /// <exception>
         /// NullPointerException
         /// if
-        /// <code>tokens</code>
+        /// <paramref name="tokens"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// </exception>
         public ListTokenSource(IList<IToken> tokens, string sourceName)
         {

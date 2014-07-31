@@ -280,9 +280,9 @@ namespace Antlr4.Runtime
         /// <exception>
         /// NullPointerException
         /// if
-        /// <code>listener</code>
+        /// <paramref name="listener"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .
         /// </exception>
         public virtual void AddErrorListener(IAntlrErrorListener<Symbol> listener)

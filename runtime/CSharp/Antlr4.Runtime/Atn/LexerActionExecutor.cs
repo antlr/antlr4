@@ -86,9 +86,9 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="LexerActionExecutor"/>
         /// which executes the actions for
         /// the input
-        /// <code>lexerActionExecutor</code>
+        /// <paramref name="lexerActionExecutor"/>
         /// followed by a specified
-        /// <code>lexerAction</code>
+        /// <paramref name="lexerAction"/>
         /// .
         /// </summary>
         /// <param name="lexerActionExecutor">
@@ -96,14 +96,14 @@ namespace Antlr4.Runtime.Atn
         /// the lexer while matching a token within a particular
         /// <see cref="ATNConfig"/>
         /// . If this is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// , the method behaves as though
         /// it were an empty executor.
         /// </param>
         /// <param name="lexerAction">
         /// The lexer action to execute after the actions
         /// specified in
-        /// <code>lexerActionExecutor</code>
+        /// <paramref name="lexerActionExecutor"/>
         /// .
         /// </param>
         /// <returns>
@@ -111,9 +111,9 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="LexerActionExecutor"/>
         /// for executing the combine actions
         /// of
-        /// <code>lexerActionExecutor</code>
+        /// <paramref name="lexerActionExecutor"/>
         /// and
-        /// <code>lexerAction</code>
+        /// <paramref name="lexerAction"/>
         /// .
         /// </returns>
         [return: NotNull]
@@ -136,7 +136,7 @@ namespace Antlr4.Runtime.Atn
         /// <p>Normally, when the executor encounters lexer actions where
         /// <see cref="ILexerAction.IsPositionDependent()"/>
         /// returns
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// , it calls
         /// <see cref="Antlr4.Runtime.IIntStream.Seek(int)"/>
         /// on the input
@@ -155,7 +155,7 @@ namespace Antlr4.Runtime.Atn
         /// position in the input stream.</p>
         /// <p>If the current executor already has offsets assigned to all
         /// position-dependent lexer actions, the method returns
-        /// <code>this</code>
+        /// <c>this</c>
         /// .</p>
         /// </summary>
         /// <param name="offset">
@@ -209,7 +209,7 @@ namespace Antlr4.Runtime.Atn
         /// <p>This method calls
         /// <see cref="Antlr4.Runtime.IIntStream.Seek(int)"/>
         /// to set the position of the
-        /// <code>input</code>
+        /// <paramref name="input"/>
         /// 
         /// <see cref="Antlr4.Runtime.ICharStream"/>
         /// prior to calling
@@ -224,7 +224,7 @@ namespace Antlr4.Runtime.Atn
         /// When this method is called, the current
         /// <see cref="Antlr4.Runtime.IIntStream.Index()"/>
         /// for
-        /// <code>input</code>
+        /// <paramref name="input"/>
         /// should be the start of the following token, i.e. 1
         /// character past the end of the current token.
         /// </param>
@@ -232,7 +232,7 @@ namespace Antlr4.Runtime.Atn
         /// The token start index. This value may be passed to
         /// <see cref="Antlr4.Runtime.IIntStream.Seek(int)"/>
         /// to set the
-        /// <code>input</code>
+        /// <paramref name="input"/>
         /// position to the beginning
         /// of the token.
         /// </param>

@@ -36,9 +36,9 @@ namespace Antlr4.Runtime.Tree.Xpath
 {
     /// <summary>
     /// Either
-    /// <code>ID</code>
+    /// <c>ID</c>
     /// at start of path or
-    /// <code>...//ID</code>
+    /// <c>...//ID</c>
     /// in middle of path.
     /// </summary>
     public class XPathRuleAnywhereElement : XPathElement

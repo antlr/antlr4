@@ -61,9 +61,9 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// <exception>
         /// IllegalArgumentException
         /// if
-        /// <code>text</code>
+        /// <paramref name="text"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .
         /// </exception>
         public TextChunk(string text)

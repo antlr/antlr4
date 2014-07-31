@@ -41,11 +41,11 @@ namespace Antlr4.Runtime.Tree.Xpath
 
         /// <summary>
         /// Construct element like
-        /// <code>/ID</code>
+        /// <c>/ID</c>
         /// or
-        /// <code>ID</code>
+        /// <c>ID</c>
         /// or
-        /// <code>/*</code>
+        /// <c>/*</c>
         /// etc...
         /// op is null if just node
         /// </summary>
@@ -56,7 +56,7 @@ namespace Antlr4.Runtime.Tree.Xpath
 
         /// <summary>
         /// Given tree rooted at
-        /// <code>t</code>
+        /// <paramref name="t"/>
         /// return all nodes matched by this path
         /// element.
         /// </summary>

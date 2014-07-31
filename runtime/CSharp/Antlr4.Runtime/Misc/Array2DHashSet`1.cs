@@ -87,7 +87,7 @@ namespace Antlr4.Runtime.Misc
 
         /// <summary>
         /// Add
-        /// <code>o</code>
+        /// <paramref name="o"/>
         /// to set if not there; return existing value if already
         /// there. This method performs the same operation as
         /// <see cref="Array2DHashSet{T}.Add(object)"/>
@@ -580,16 +580,16 @@ namespace Antlr4.Runtime.Misc
 
         /// <summary>
         /// Return
-        /// <code>o</code>
+        /// <paramref name="o"/>
         /// as an instance of the element type
-        /// <code>T</code>
+        /// <c>T</c>
         /// . If
-        /// <code>o</code>
+        /// <paramref name="o"/>
         /// is non-null but known to not be an instance of
-        /// <code>T</code>
+        /// <c>T</c>
         /// , this
         /// method returns
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// . The base implementation does not perform any
         /// type checks; override this method to provide strong type checks for the
         /// <see cref="Array2DHashSet{T}.Contains(object)"/>
@@ -604,11 +604,11 @@ namespace Antlr4.Runtime.Misc
         /// <param name="o">the object to try and cast to the element type of the set</param>
         /// <returns>
         /// 
-        /// <code>o</code>
+        /// <paramref name="o"/>
         /// if it could be an instance of
-        /// <code>T</code>
+        /// <c>T</c>
         /// , otherwise
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .
         /// </returns>
         protected internal virtual T AsElementType(object o)
@@ -618,9 +618,9 @@ namespace Antlr4.Runtime.Misc
 
         /// <summary>
         /// Return an array of
-        /// <code>T[]</code>
+        /// <c>T[]</c>
         /// with length
-        /// <code>capacity</code>
+        /// <paramref name="capacity"/>
         /// .
         /// </summary>
         /// <param name="capacity">the length of the array to return</param>
@@ -632,9 +632,9 @@ namespace Antlr4.Runtime.Misc
 
         /// <summary>
         /// Return an array of
-        /// <code>T</code>
+        /// <c>T</c>
         /// with length
-        /// <code>capacity</code>
+        /// <paramref name="capacity"/>
         /// .
         /// </summary>
         /// <param name="capacity">the length of the array to return</param>

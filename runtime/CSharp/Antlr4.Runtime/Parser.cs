@@ -145,7 +145,7 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// Specifies whether or not the parser should construct a parse tree during
         /// the parsing process. The default value is
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// .
         /// </remarks>
         /// <seealso cref="BuildParseTree"/>
@@ -155,13 +155,13 @@ namespace Antlr4.Runtime
         /// <summary>
         /// When
         /// <see cref="Trace"/>
-        /// <code>(true)</code>
+        /// <c>(true)</c>
         /// is called, a reference to the
         /// <see cref="TraceListener"/>
         /// is stored here so it can be easily removed in a
         /// later call to
         /// <see cref="Trace"/>
-        /// <code>(false)</code>
+        /// <c>(false)</c>
         /// . The listener itself is
         /// implemented as a parser listener so this field is not directly used by
         /// other parser methods.
@@ -217,7 +217,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Match current input symbol against
-        /// <code>ttype</code>
+        /// <paramref name="ttype"/>
         /// . If the symbol type
         /// matches,
         /// <see cref="IAntlrErrorStrategy.ReportMatch(Parser)"/>
@@ -231,7 +231,7 @@ namespace Antlr4.Runtime
         /// strategy to attempt recovery. If
         /// <see cref="BuildParseTree()"/>
         /// is
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// and the token index of the symbol returned by
         /// <see cref="IAntlrErrorStrategy.RecoverInline(Parser)"/>
         /// is -1, the symbol is added to
@@ -243,7 +243,7 @@ namespace Antlr4.Runtime
         /// <returns>the matched symbol</returns>
         /// <exception cref="RecognitionException">
         /// if the current input symbol did not match
-        /// <code>ttype</code>
+        /// <paramref name="ttype"/>
         /// and the error strategy could not recover from the
         /// mismatched symbol
         /// </exception>
@@ -284,7 +284,7 @@ namespace Antlr4.Runtime
         /// strategy to attempt recovery. If
         /// <see cref="BuildParseTree()"/>
         /// is
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// and the token index of the symbol returned by
         /// <see cref="IAntlrErrorStrategy.RecoverInline(Parser)"/>
         /// is -1, the symbol is added to
@@ -348,15 +348,15 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// Gets whether or not a complete parse tree will be constructed while
         /// parsing. This property is
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// for a newly constructed parser.
         /// </remarks>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if a complete parse tree will be constructed while
         /// parsing, otherwise
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// </returns>
         public virtual bool BuildParseTree
         {
@@ -375,19 +375,19 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// Trim the internal lists of the parse tree during parsing to conserve memory.
         /// This property is set to
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// by default for a newly constructed parser.
         /// </remarks>
         /// <value>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// to trim the capacity of the
         /// <see cref="ParserRuleContext.children"/>
         /// list to its size after a rule is parsed.
         /// </value>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if the
         /// <see cref="ParserRuleContext.children"/>
         /// list is trimmed
@@ -434,7 +434,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Registers
-        /// <code>listener</code>
+        /// <paramref name="listener"/>
         /// to receive events during the parsing process.
         /// <p>To support output-preserving grammar transformations (including but not
         /// limited to left-recursion removal, automated left-factoring, and
@@ -460,9 +460,9 @@ namespace Antlr4.Runtime
         /// <param name="listener">the listener to add</param>
         /// <exception cref="System.ArgumentNullException">
         /// if
-        /// <code/>
+        /// <c/>
         /// listener is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// </exception>
         public virtual void AddParseListener(IParseTreeListener listener)
         {
@@ -479,12 +479,12 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Remove
-        /// <code>listener</code>
+        /// <paramref name="listener"/>
         /// from the list of parse listeners.
         /// <p>If
-        /// <code>listener</code>
+        /// <paramref name="listener"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// or has not been added as a parse
         /// listener, this method does nothing.</p>
         /// </summary>
@@ -709,12 +709,12 @@ namespace Antlr4.Runtime
         /// </linkplain>
         /// .
         /// <p>E.g., given the following input with
-        /// <code>A</code>
+        /// <c>A</c>
         /// being the current
         /// lookahead symbol, this function moves the cursor to
-        /// <code>B</code>
+        /// <c>B</c>
         /// and returns
-        /// <code>A</code>
+        /// <c>A</c>
         /// .</p>
         /// <pre>
         /// A B
@@ -988,7 +988,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Checks whether or not
-        /// <code>symbol</code>
+        /// <paramref name="symbol"/>
         /// can follow the current state in the
         /// ATN. The behavior of this method is equivalent to the following, but is
         /// implemented such that the complete context-sensitive follow set does not
@@ -1000,12 +1000,12 @@ namespace Antlr4.Runtime
         /// <param name="symbol">the symbol type to check</param>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if
-        /// <code>symbol</code>
+        /// <paramref name="symbol"/>
         /// can follow the current state in
         /// the ATN, otherwise
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// .
         /// </returns>
         public virtual bool IsExpectedToken(int symbol)
@@ -1068,7 +1068,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Get a rule's index (i.e.,
-        /// <code>RULE_ruleName</code>
+        /// <c>RULE_ruleName</c>
         /// field) or -1 if not found.
         /// </summary>
         public virtual int GetRuleIndex(string ruleName)

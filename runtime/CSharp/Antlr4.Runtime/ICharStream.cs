@@ -45,7 +45,7 @@ namespace Antlr4.Runtime
         /// This method returns the text for a range of characters within this input
         /// stream. This method is guaranteed to not throw an exception if the
         /// specified
-        /// <code>interval</code>
+        /// <paramref name="interval"/>
         /// lies entirely within a marked range. For more
         /// information about marked ranges, see
         /// <see cref="IIntStream.Mark()"/>
@@ -55,17 +55,17 @@ namespace Antlr4.Runtime
         /// <returns>the text of the specified interval</returns>
         /// <exception cref="System.ArgumentNullException">
         /// if
-        /// <code>interval</code>
+        /// <paramref name="interval"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// </exception>
         /// <exception cref="System.ArgumentException">
         /// if
-        /// <code>interval.a &lt; 0</code>
+        /// <c>interval.a &lt; 0</c>
         /// , or if
-        /// <code>interval.b &lt; interval.a - 1</code>
+        /// <c>interval.b &lt; interval.a - 1</c>
         /// , or if
-        /// <code>interval.b</code>
+        /// <c>interval.b</c>
         /// lies at or
         /// past the end of the stream
         /// </exception>

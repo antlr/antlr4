@@ -142,13 +142,13 @@ namespace Antlr4.Runtime
         /// previously matched symbol at the time this exception was thrown.
         /// <p>If the set of expected tokens is not known and could not be computed,
         /// this method returns
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .</p>
         /// </remarks>
         /// <returns>
         /// The set of token types that could potentially follow the current
         /// state in the ATN, or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if the information is not available.
         /// </returns>
         [return: Nullable]
@@ -166,7 +166,7 @@ namespace Antlr4.Runtime
         /// <see cref="RuleContext"/>
         /// at the time this exception was thrown.
         /// <p>If the context is not available, this method returns
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .</p>
         /// </summary>
         /// <returns>
@@ -174,7 +174,7 @@ namespace Antlr4.Runtime
         /// <see cref="RuleContext"/>
         /// at the time this exception was thrown.
         /// If the context is not available, this method returns
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .
         /// </returns>
         public virtual RuleContext Context
@@ -193,13 +193,13 @@ namespace Antlr4.Runtime
         /// Gets the input stream which is the symbol source for the recognizer where
         /// this exception was thrown.
         /// <p>If the input stream is not available, this method returns
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .</p>
         /// </remarks>
         /// <returns>
         /// The input stream which is the symbol source for the recognizer
         /// where this exception was thrown, or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if the stream is not
         /// available.
         /// </returns>
@@ -229,12 +229,12 @@ namespace Antlr4.Runtime
         /// <see cref="IRecognizer"/>
         /// where this exception occurred.
         /// <p>If the recognizer is not available, this method returns
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .</p>
         /// </summary>
         /// <returns>
         /// The recognizer where this exception occurred, or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if
         /// the recognizer is not available.
         /// </returns>

@@ -47,16 +47,16 @@ namespace Antlr4.Runtime.Tree.Xpath
     /// parse trees.
     /// <p>
     /// Split path into words and separators
-    /// <code>/</code>
+    /// <c>/</c>
     /// and
-    /// <code>//</code>
+    /// <c>//</c>
     /// via ANTLR
     /// itself then walk path elements from left to right. At each separator-word
     /// pair, find set of nodes. Next stage uses those as work list.</p>
     /// <p>
     /// The basic interface is
     /// <see cref="FindAll(Antlr4.Runtime.Tree.IParseTree, string, Antlr4.Runtime.Parser)">ParseTree.findAll</see>
-    /// <code>(tree, pathString, parser)</code>
+    /// <c>(tree, pathString, parser)</c>
     /// .
     /// But that is just shorthand for:</p>
     /// <pre>
@@ -70,7 +70,7 @@ namespace Antlr4.Runtime.Tree.Xpath
     /// </pre>
     /// <p>
     /// See
-    /// <code>org.antlr.v4.test.TestXPath</code>
+    /// <c>org.antlr.v4.test.TestXPath</c>
     /// for descriptions. In short, this
     /// allows operators:</p>
     /// <dl>
@@ -207,18 +207,18 @@ loop_break: ;
 
         /// <summary>
         /// Convert word like
-        /// <code>*</code>
+        /// <c>*</c>
         /// or
-        /// <code>ID</code>
+        /// <c>ID</c>
         /// or
-        /// <code>expr</code>
+        /// <c>expr</c>
         /// to a path
         /// element.
-        /// <code>anywhere</code>
+        /// <paramref name="anywhere"/>
         /// is
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if
-        /// <code>//</code>
+        /// <c>//</c>
         /// precedes the
         /// word.
         /// </summary>
@@ -267,10 +267,10 @@ loop_break: ;
 
         /// <summary>
         /// Return a list of all nodes starting at
-        /// <code>t</code>
+        /// <paramref name="t"/>
         /// as root that satisfy the
         /// path. The root
-        /// <code>/</code>
+        /// <c>/</c>
         /// is relative to the node passed to
         /// <see cref="Evaluate(Antlr4.Runtime.Tree.IParseTree)"/>
         /// .

@@ -123,7 +123,7 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// The exception that forced this rule to return. If the rule successfully
         /// completed, this is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .
         /// </remarks>
         public RecognitionException exception;

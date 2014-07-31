@@ -52,11 +52,11 @@ namespace Antlr4.Runtime
         /// <see cref="System.Console.Error"/>
         /// containing the
         /// values of
-        /// <code>line</code>
+        /// <paramref name="line"/>
         /// ,
-        /// <code>charPositionInLine</code>
+        /// <paramref name="charPositionInLine"/>
         /// , and
-        /// <code>msg</code>
+        /// <paramref name="msg"/>
         /// using
         /// the following format.</p>
         /// <pre>

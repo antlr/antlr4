@@ -248,16 +248,16 @@ namespace Antlr4.Runtime.Atn
         /// Get an existing target state for an edge in the DFA. If the target state
         /// for the edge has not yet been computed or is otherwise not available,
         /// this method returns
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .
         /// </remarks>
         /// <param name="s">The current DFA state</param>
         /// <param name="t">The next input symbol</param>
         /// <returns>
         /// The existing target DFA state for the given input symbol
-        /// <code>t</code>
+        /// <paramref name="t"/>
         /// , or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if the target state for this edge is not
         /// already cached
         /// </returns>
@@ -287,9 +287,9 @@ namespace Antlr4.Runtime.Atn
         /// <param name="t">The next input symbol</param>
         /// <returns>
         /// The computed target DFA state for the given input symbol
-        /// <code>t</code>
+        /// <paramref name="t"/>
         /// . If
-        /// <code>t</code>
+        /// <paramref name="t"/>
         /// does not lead to a valid DFA state, this method
         /// returns
         /// <see cref="ATNSimulator.Error"/>
@@ -340,9 +340,9 @@ namespace Antlr4.Runtime.Atn
         /// <summary>
         /// Given a starting configuration set, figure out all ATN configurations
         /// we can reach upon input
-        /// <code>t</code>
+        /// <paramref name="t"/>
         /// . Parameter
-        /// <code>reach</code>
+        /// <paramref name="reach"/>
         /// is a return
         /// parameter.
         /// </summary>
@@ -434,15 +434,15 @@ namespace Antlr4.Runtime.Atn
         /// preference, this method stops pursuing the closure as soon as an accept
         /// state is reached. After the first accept state is reached by depth-first
         /// search from
-        /// <code>config</code>
+        /// <paramref name="config"/>
         /// , all other (potentially reachable) states for
         /// this rule would have a lower priority.
         /// </remarks>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if an accept state is reached, otherwise
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// .
         /// </returns>
         protected internal virtual bool Closure(ICharStream input, ATNConfig config, ATNConfigSet configs, bool currentAltReachedAcceptState, bool speculative, bool treatEofAsEpsilon)
@@ -604,9 +604,9 @@ namespace Antlr4.Runtime.Atn
         /// <remarks>
         /// Evaluate a predicate specified in the lexer.
         /// <p>If
-        /// <code>speculative</code>
+        /// <paramref name="speculative"/>
         /// is
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// , this method was called before
         /// <see cref="Consume(Antlr4.Runtime.ICharStream)"/>
         /// for the matched character. This method should call
@@ -621,7 +621,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="Antlr4.Runtime.Lexer.Column()"/>
         /// , properly reflect the current
         /// lexer state. This method should restore
-        /// <code>input</code>
+        /// <paramref name="input"/>
         /// and the simulator
         /// to the original state before returning (i.e. undo the actions made by the
         /// call to
@@ -633,17 +633,17 @@ namespace Antlr4.Runtime.Atn
         /// <param name="predIndex">The index of the predicate within the rule.</param>
         /// <param name="speculative">
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if the current index in
-        /// <code>input</code>
+        /// <paramref name="input"/>
         /// is
         /// one character before the predicate's location.
         /// </param>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if the specified predicate evaluates to
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// .
         /// </returns>
         protected internal virtual bool EvaluatePredicate(ICharStream input, int ruleIndex, int predIndex, bool speculative)

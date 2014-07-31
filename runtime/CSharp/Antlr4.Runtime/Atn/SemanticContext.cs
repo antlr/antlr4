@@ -45,9 +45,9 @@ namespace Antlr4.Runtime.Atn
     /// A tree structure used to record the semantic context in which
     /// an ATN configuration is valid.  It's either a single predicate,
     /// a conjunction
-    /// <code>p1&amp;&amp;p2</code>
+    /// <c>p1&amp;&amp;p2</c>
     /// , or a sum of products
-    /// <code>p1||p2</code>
+    /// <c>p1||p2</c>
     /// .
     /// <p>I have scoped the
     /// <see cref="AND"/>
@@ -66,7 +66,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="SemanticContext"/>
         /// , which is semantically equivalent to
         /// a predicate of the form
-        /// <code/>
+        /// <c/>
         /// 
         /// true}?}.
         /// </summary>
@@ -101,21 +101,21 @@ namespace Antlr4.Runtime.Atn
         /// <li>
         /// <see cref="None"/>
         /// : if the predicate simplifies to
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// after
         /// precedence predicates are evaluated.</li>
         /// <li>
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// : if the predicate simplifies to
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// after
         /// precedence predicates are evaluated.</li>
         /// <li>
-        /// <code>this</code>
+        /// <c>this</c>
         /// : if the semantic context is not changed as a result of
         /// precedence predicate evaluation.</li>
         /// <li>A non-
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// 
         /// <see cref="SemanticContext"/>
         /// : the new simplified

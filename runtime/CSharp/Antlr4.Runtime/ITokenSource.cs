@@ -110,7 +110,7 @@ namespace Antlr4.Runtime
         /// <see cref="ICharStream"/>
         /// associated with the current position in
         /// the input, or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if no input stream is available for the token
         /// source.
         /// </returns>

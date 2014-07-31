@@ -73,7 +73,7 @@ namespace Antlr4.Runtime
         /// input stream implementation.
         /// <p>
         /// The default value is
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// to avoid the performance and memory
         /// overhead of copying text for every token unless explicitly requested.</p>
         /// </summary>
@@ -87,9 +87,9 @@ namespace Antlr4.Runtime
         /// .
         /// <p>
         /// When
-        /// <code>copyText</code>
+        /// <paramref name="copyText"/>
         /// is
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// , the
         /// <see cref="Default"/>
         /// instance
@@ -111,7 +111,7 @@ namespace Antlr4.Runtime
         /// with
         /// <see cref="copyText"/>
         /// set to
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// .
         /// <p>
         /// The

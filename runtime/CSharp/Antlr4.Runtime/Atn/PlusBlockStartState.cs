@@ -34,14 +34,14 @@ namespace Antlr4.Runtime.Atn
 {
     /// <summary>
     /// Start of
-    /// <code>(A|B|...)+</code>
+    /// <c>(A|B|...)+</c>
     /// loop. Technically a decision state, but
     /// we don't use for code generation; somebody might need it, so I'm defining
     /// it for completeness. In reality, the
     /// <see cref="PlusLoopbackState"/>
     /// node is the
     /// real decision-making note for
-    /// <code>A+</code>
+    /// <c>A+</c>
     /// .
     /// </summary>
     public sealed class PlusBlockStartState : BlockStartState

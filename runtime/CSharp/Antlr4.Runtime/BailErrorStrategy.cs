@@ -62,7 +62,7 @@ namespace Antlr4.Runtime
     /// when the result will be ignored either way.</li>
     /// </ul>
     /// <p>
-    /// <code>myparser.setErrorHandler(new BailErrorStrategy());</code>
+    /// <c>myparser.setErrorHandler(new BailErrorStrategy());</c>
     /// </p>
     /// </summary>
     /// <seealso cref="Parser.ErrorHandler"/>
@@ -70,7 +70,7 @@ namespace Antlr4.Runtime
     {
         /// <summary>
         /// Instead of recovering from exception
-        /// <code>e</code>
+        /// <paramref name="e"/>
         /// , re-throw it wrapped
         /// in a
         /// <see cref="ParseCanceledException"/>

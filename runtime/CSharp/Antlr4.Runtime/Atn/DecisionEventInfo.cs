@@ -53,7 +53,7 @@ namespace Antlr4.Runtime.Atn
         /// <summary>
         /// The simulator state containing additional information relevant to the
         /// prediction state when the current event occurred, or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if no
         /// additional information is relevant or available.
         /// </summary>
@@ -80,10 +80,10 @@ namespace Antlr4.Runtime.Atn
         public readonly int stopIndex;
 
         /// <summary>
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if the current event occurred during LL prediction;
         /// otherwise,
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// if the input occurred during SLL prediction.
         /// </summary>
         public readonly bool fullCtx;

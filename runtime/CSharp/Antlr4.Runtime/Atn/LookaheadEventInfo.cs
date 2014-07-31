@@ -54,7 +54,7 @@ namespace Antlr4.Runtime.Atn
         /// <param name="state">
         /// The final simulator state containing the necessary
         /// information to determine the result of a prediction, or
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// if
         /// the final state is not available
         /// </param>
@@ -63,10 +63,10 @@ namespace Antlr4.Runtime.Atn
         /// <param name="stopIndex">The index at which the prediction was finally made</param>
         /// <param name="fullCtx">
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if the current lookahead is part of an LL
         /// prediction; otherwise,
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// if the current lookahead is part of
         /// an SLL prediction
         /// </param>

@@ -118,15 +118,15 @@ namespace Antlr4.Runtime.Atn
         /// </param>
         /// <returns>
         /// 
-        /// <code>true</code>
+        /// <see langword="true"/>
         /// if the
-        /// <code>actualUuid</code>
+        /// <paramref name="actualUuid"/>
         /// value represents a
         /// serialized ATN at or after the feature identified by
-        /// <code>feature</code>
+        /// <paramref name="feature"/>
         /// was
         /// introduced; otherwise,
-        /// <code>false</code>
+        /// <see langword="false"/>
         /// .
         /// </returns>
         protected internal virtual bool IsFeatureSupported(Guid feature, Guid actualUuid)

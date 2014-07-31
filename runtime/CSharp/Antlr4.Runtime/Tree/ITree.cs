@@ -69,7 +69,7 @@ namespace Antlr4.Runtime.Tree
 
         /// <summary>
         /// If there are children, get the
-        /// <code>i</code>
+        /// <paramref name="i"/>
         /// th value indexed from 0.
         /// </summary>
         ITree GetChild(int i);
@@ -89,7 +89,7 @@ namespace Antlr4.Runtime.Tree
 
         /// <summary>
         /// Print out a whole tree, not just a node, in LISP format
-        /// <code>(root child1 .. childN)</code>
+        /// <c>(root child1 .. childN)</c>
         /// . Print just a node if this is a leaf.
         /// </summary>
         string ToStringTree();

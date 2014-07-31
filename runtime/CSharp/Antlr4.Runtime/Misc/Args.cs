@@ -37,9 +37,9 @@ namespace Antlr4.Runtime.Misc
     {
         /// <exception cref="System.ArgumentNullException">
         /// if
-        /// <code>value</code>
+        /// <paramref name="value"/>
         /// is
-        /// <code>null</code>
+        /// <see langword="null"/>
         /// .
         /// </exception>
         public static void NotNull(string parameterName, object value)
