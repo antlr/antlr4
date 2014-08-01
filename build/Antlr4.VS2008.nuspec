@@ -13,6 +13,7 @@
     <copyright>Copyright © Sam Harwell 2014</copyright>
     <releaseNotes>https://github.com/sharwell/antlr4cs/releases/v$version$</releaseNotes>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <developmentDependency>true</developmentDependency>
     <tags>antlr antlr4 parsing</tags>
     <title>ANTLR 4 (Visual Studio 2008)</title>
     <summary>The C# target of the ANTLR 4 parser generator for Visual Studio 2008 projects.</summary>
