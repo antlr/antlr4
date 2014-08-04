@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-  <metadata minClientVersion="2.5">
+  <metadata minClientVersion="2.7">
     <id>Antlr4.VS2008</id>
     <version>0.0.0</version>
     <authors>Sam Harwell, Terence Parr</authors>
@@ -13,6 +13,7 @@
     <copyright>Copyright © Sam Harwell 2014</copyright>
     <releaseNotes>https://github.com/sharwell/antlr4cs/releases/v$version$</releaseNotes>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <developmentDependency>true</developmentDependency>
     <tags>antlr antlr4 parsing</tags>
     <title>ANTLR 4 (Visual Studio 2008)</title>
     <summary>The C# target of the ANTLR 4 parser generator for Visual Studio 2008 projects.</summary>
