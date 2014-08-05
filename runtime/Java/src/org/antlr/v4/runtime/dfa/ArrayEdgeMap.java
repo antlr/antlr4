@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
  *
  * @author Sam Harwell
  */
-public class ArrayEdgeMap<T> extends AbstractEdgeMap<T> {
+public final class ArrayEdgeMap<T> extends AbstractEdgeMap<T> {
 
 	private final AtomicReferenceArray<T> arrayData;
 	private final AtomicInteger size;

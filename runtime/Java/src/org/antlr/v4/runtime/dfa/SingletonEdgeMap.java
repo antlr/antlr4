@@ -37,7 +37,7 @@ import java.util.Set;
  *
  * @author Sam Harwell
  */
-public class SingletonEdgeMap<T> extends AbstractEdgeMap<T> {
+public final class SingletonEdgeMap<T> extends AbstractEdgeMap<T> {
 
 	private final int key;
 	private final T value;

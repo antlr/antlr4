@@ -41,7 +41,7 @@ import java.util.Set;
  *
  * @author Sam Harwell
  */
-public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
+public final class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 	private static final int DEFAULT_MAX_SIZE = 5;
 
 	private final int[] keys;
@@ -59,26 +59,26 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 
 	private SparseEdgeMap(@NotNull SparseEdgeMap<T> map, int maxSparseSize) {
 		super(map.minIndex, map.maxIndex);
-		if (maxSparseSize < map.values.size()) {
-			throw new IllegalArgumentException();
-		}
-
 		synchronized (map) {
+			if (maxSparseSize < map.values.size()) {
+				throw new IllegalArgumentException();
+			}
+
 			keys = Arrays.copyOf(map.keys, maxSparseSize);
 			values = new ArrayList<T>(maxSparseSize);
 			values.addAll(map.values);
 		}
 	}
 
-	public int[] getKeys() {
+	public final int[] getKeys() {
 		return keys;
 	}
 
-	public List<T> getValues() {
+	public final List<T> getValues() {
 		return values;
 	}
 
-	public int getMaxSparseSize() {
+	public final int getMaxSparseSize() {
 		return keys.length;
 	}
 
@@ -99,14 +99,15 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 
 	@Override
 	public T get(int key) {
-		synchronized (this) {
-			int index = Arrays.binarySearch(keys, 0, size(), key);
-			if (index < 0) {
-				return null;
-			}
-
-			return values.get(index);
+		// Special property of this collection: values are only even added to
+		// the end, else a new object is returned from put(). Therefore no lock
+		// is required in this method.
+		int index = Arrays.binarySearch(keys, 0, size(), key);
+		if (index < 0) {
+			return null;
 		}
+
+		return values.get(index);
 	}
 
 	@Override
@@ -147,7 +148,7 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 			}
 			else {
 				SparseEdgeMap<T> resized = new SparseEdgeMap<T>(this, desiredSize);
-				System.arraycopy(resized.keys, insertIndex, resized.keys, insertIndex + 1, resized.keys.length - insertIndex - 1);
+				System.arraycopy(resized.keys, insertIndex, resized.keys, insertIndex + 1, size() - insertIndex);
 				resized.keys[insertIndex] = key;
 				resized.values.add(insertIndex, value);
 				return resized;
@@ -163,11 +164,6 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 				return this;
 			}
 
-			if (index == values.size() - 1) {
-				values.remove(index);
-				return this;
-			}
-
 			SparseEdgeMap<T> result = new SparseEdgeMap<T>(this, getMaxSparseSize());
 			System.arraycopy(result.keys, index + 1, result.keys, index, size() - index - 1);
 			result.values.remove(index);
@@ -176,14 +172,12 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 	}
 
 	@Override
-	public SparseEdgeMap<T> clear() {
+	public AbstractEdgeMap<T> clear() {
 		if (isEmpty()) {
 			return this;
 		}
 
-		SparseEdgeMap<T> result = new SparseEdgeMap<T>(this, getMaxSparseSize());
-		result.values.clear();
-		return result;
+		return new EmptyEdgeMap<T>(minIndex, maxIndex);
 	}
 
 	@Override
