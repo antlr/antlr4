@@ -144,6 +144,7 @@ nonLeftRecur
 
 recurse
 	:	^(ASSIGN ID recurseNoLabel)
+	|	^(PLUS_ASSIGN ID recurseNoLabel)
 	|	recurseNoLabel
 	;
 
