@@ -342,6 +342,70 @@ public class TestLeftRecursion extends BaseTest {
 		runTests(grammar, tests, "s");
 	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#677 "labels not working in
+	 * grammar file".
+	 * https://github.com/antlr/antlr4/issues/677
+	 *
+	 * <p>This test treats {@code ,} and {@code >>} as part of a single compound
+	 * operator (similar to a ternary operator).</p>
+	 */
+	@Test public void testReturnValueAndActionsList1() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"s @after {System.out.println($ctx.toStringTree(this));} : expr EOF;\n" +
+			"expr:\n" +
+			"    a=expr '*' a=expr #Factor\n" +
+			"    | b+=expr (',' b+=expr)* '>>' c=expr #Send\n" +
+			"    | ID #JustId //semantic check on modifiers\n" +
+			";\n" +
+			"\n" +
+			"ID  : ('a'..'z'|'A'..'Z'|'_')\n" +
+			"      ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*\n" +
+			";\n" +
+			"\n" +
+			"WS : [ \\t\\n]+ -> skip ;\n";
+		String[] tests = {
+			"a*b",			"(s (expr (expr a) * (expr b)) <EOF>)",
+			"a,c>>x",		"(s (expr (expr a) , (expr c) >> (expr x)) <EOF>)",
+			"x",			"(s (expr x) <EOF>)",
+			"a*b,c,x*y>>r",	"(s (expr (expr (expr a) * (expr b)) , (expr c) , (expr (expr x) * (expr y)) >> (expr r)) <EOF>)",
+		};
+		runTests(grammar, tests, "s");
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#677 "labels not working in
+	 * grammar file".
+	 * https://github.com/antlr/antlr4/issues/677
+	 *
+	 * <p>This test treats the {@code ,} and {@code >>} operators separately.</p>
+	 */
+	@Test public void testReturnValueAndActionsList2() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"s @after {System.out.println($ctx.toStringTree(this));} : expr EOF;\n" +
+			"expr:\n" +
+			"    a=expr '*' a=expr #Factor\n" +
+			"    | b+=expr ',' b+=expr #Comma\n" +
+			"    | b+=expr '>>' c=expr #Send\n" +
+			"    | ID #JustId //semantic check on modifiers\n" +
+			";\n" +
+			"\n" +
+			"ID  : ('a'..'z'|'A'..'Z'|'_')\n" +
+			"      ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*\n" +
+			";\n" +
+			"\n" +
+			"WS : [ \\t\\n]+ -> skip ;\n";
+		String[] tests = {
+			"a*b",			"(s (expr (expr a) * (expr b)) <EOF>)",
+			"a,c>>x",		"(s (expr (expr (expr a) , (expr c)) >> (expr x)) <EOF>)",
+			"x",			"(s (expr x) <EOF>)",
+			"a*b,c,x*y>>r",	"(s (expr (expr (expr (expr (expr a) * (expr b)) , (expr c)) , (expr (expr x) * (expr y))) >> (expr r)) <EOF>)",
+		};
+		runTests(grammar, tests, "s");
+	}
+
 	@Test public void testLabelsOnOpSubrule() throws Exception {
 		String grammar =
 			"grammar T;\n" +
