@@ -35,6 +35,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /** */
 public class TestLeftRecursion extends BaseTest {
@@ -646,7 +647,8 @@ public class TestLeftRecursion extends BaseTest {
 	}
 
 	public void runTests(String grammar, String[] tests, String startRule) {
-		rawGenerateAndBuildRecognizer("T.g4", grammar, "TParser", "TLexer");
+		boolean success = rawGenerateAndBuildRecognizer("T.g4", grammar, "TParser", "TLexer");
+		assertTrue(success);
 		writeRecognizerAndCompile("TParser",
 								  "TLexer",
 								  startRule,
