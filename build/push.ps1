@@ -1,7 +1,7 @@
 . .\version.ps1
 
 If ($AntlrVersion.EndsWith('-dev')) {
-	Write-Host "Cannot push development version '$AntlrVersion' to NuGet."
+	$host.ui.WriteErrorLine("Cannot push development version '$AntlrVersion' to NuGet.")
 	Exit 1
 }
 

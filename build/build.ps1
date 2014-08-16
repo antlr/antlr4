@@ -30,7 +30,7 @@ $msbuild = "$env:windir\Microsoft.NET\Framework64\v4.0.30319\msbuild.exe"
 
 &$msbuild '/nologo' '/m' '/nr:false' '/t:rebuild' "/p:Configuration=$BuildConfig" $SolutionPath
 if ($LASTEXITCODE -ne 0) {
-	echo "Build failed, aborting!"
+	$host.ui.WriteErrorLine('Build failed, aborting!')
 	exit $p.ExitCode
 }
 
@@ -39,7 +39,7 @@ $msbuild = "$env:windir\Microsoft.NET\Framework\v4.0.30319\msbuild.exe"
 
 &$msbuild '/nologo' '/m' '/nr:false' '/t:rebuild' "/p:Configuration=$BuildConfig" $CF35SolutionPath
 if ($LASTEXITCODE -ne 0) {
-	echo ".NET 3.5 Compact Framework Build failed, aborting!"
+	$host.ui.WriteErrorLine('.NET 3.5 Compact Framework Build failed, aborting!')
 	exit $p.ExitCode
 }
 
@@ -51,7 +51,7 @@ if (-not (Test-Path 'nuget')) {
 
 $JarPath = "..\tool\target\antlr4-csharp-$CSharpToolVersion-complete.jar"
 if (!(Test-Path $JarPath)) {
-	echo "Couldn't locate the complete jar used for building C# parsers: $JarPath"
+	$host.ui.WriteErrorLine("Couldn't locate the complete jar used for building C# parsers: $JarPath")
 	exit 1
 }
 
