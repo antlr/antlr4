@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Antlr4.Runtime</RootNamespace>
-    <AssemblyName>Antlr4.Runtime.netcore45</AssemblyName>
+    <AssemblyName>Antlr4.Runtime</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <BaseIntermediateOutputPath>obj\netcore45\</BaseIntermediateOutputPath>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -41,7 +41,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\..\..\..\..\..\keys\antlr\Key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\..\..\..\..\keys\antlr\antlr-netcore45.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AntlrFileStream.cs" />
@@ -154,8 +154,8 @@
     <Compile Include="LexerNoViableAltException.cs" />
     <Compile Include="ListTokenSource.cs" />
     <Compile Include="Misc\Args.cs" />
-    <None Include="..\..\..\..\..\..\keys\antlr\Key.snk">
-      <Link>Key.snk</Link>
+    <None Include="..\..\..\..\..\..\keys\antlr\antlr-netcore45.snk">
+      <Link>antlr-netcore45.snk</Link>
     </None>
     <None Include="Misc\Array2DHashSet`1.cs" />
     <Compile Include="Misc\NullableAttribute.cs" />
@@ -235,6 +235,7 @@
     </Antlr4>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <Import Project="$(SolutionDir)\build\KeyReporting.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
