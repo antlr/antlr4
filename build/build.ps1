@@ -5,7 +5,8 @@ param (
 	[string]$Java6Home,
 	[string]$MavenHome,
 	[string]$MavenRepo = "$($env:USERPROFILE)\.m2",
-	[switch]$SkipMaven
+	[switch]$SkipMaven,
+	[switch]$SkipKeyCheck
 )
 
 # build the solutions
@@ -106,6 +107,20 @@ $JarPath = "..\tool\target\antlr4-csharp-$CSharpToolVersion-complete.jar"
 if (!(Test-Path $JarPath)) {
 	$host.ui.WriteErrorLine("Couldn't locate the complete jar used for building C# parsers: $JarPath")
 	exit 1
+}
+
+# By default, do not create a NuGet package unless the expected strong name key files were used
+if (-not $SkipKeyCheck) {
+	. .\keys.ps1
+
+	foreach ($pair in $Keys.GetEnumerator()) {
+		$assembly = Resolve-FullPath -Path "..\runtime\CSharp\Antlr4.Runtime\bin\$($pair.Key)\$BuildConfig\Antlr4.Runtime.dll"
+		# Run the actual check in a separate process or the current process will keep the assembly file locked
+		powershell -Command ".\check-key.ps1 -Assembly '$assembly' -ExpectedKey '$($pair.Value)' -Build '$($pair.Key)'"
+		if ($LASTEXITCODE -ne 0) {
+			Exit $p.ExitCode
+		}
+	}
 }
 
 $packages = @(
