@@ -44,13 +44,13 @@
     <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net35-cf\$Configuration$\Antlr4.Runtime.net35-cf.pdb" target="lib\net35-cf"/>
     <file src="..\runtime\CSharp\Antlr4.Runtime\bin\net35-cf\$Configuration$\Antlr4.Runtime.net35-cf.xml" target="lib\net35-cf"/>
 
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net40\$Configuration$\Antlr4.Runtime.portable-net40.dll" target="lib\portable-net4+sl5+netcore45+wp8+MonoAndroid1+MonoTouch1"/>
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net40\$Configuration$\Antlr4.Runtime.portable-net40.pdb" target="lib\portable-net4+sl5+netcore45+wp8+MonoAndroid1+MonoTouch1"/>
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net40\$Configuration$\Antlr4.Runtime.portable-net40.xml" target="lib\portable-net4+sl5+netcore45+wp8+MonoAndroid1+MonoTouch1"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net40\$Configuration$\Antlr4.Runtime.portable-net40.dll" target="lib\portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net40\$Configuration$\Antlr4.Runtime.portable-net40.pdb" target="lib\portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net40\$Configuration$\Antlr4.Runtime.portable-net40.xml" target="lib\portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1"/>
 
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net45\$Configuration$\Antlr4.Runtime.portable-net45.dll" target="lib\portable-net45+netcore45+wp8+MonoAndroid1+MonoTouch1"/>
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net45\$Configuration$\Antlr4.Runtime.portable-net45.pdb" target="lib\portable-net45+netcore45+wp8+MonoAndroid1+MonoTouch1"/>
-    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net45\$Configuration$\Antlr4.Runtime.portable-net45.xml" target="lib\portable-net45+netcore45+wp8+MonoAndroid1+MonoTouch1"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net45\$Configuration$\Antlr4.Runtime.portable-net45.dll" target="lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net45\$Configuration$\Antlr4.Runtime.portable-net45.pdb" target="lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1"/>
+    <file src="..\runtime\CSharp\Antlr4.Runtime\bin\portable-net45\$Configuration$\Antlr4.Runtime.portable-net45.xml" target="lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1"/>
 
     <file src="..\runtime\CSharp\Antlr4.Runtime\bin\netcore45\$Configuration$\Antlr4.Runtime.netcore45.dll" target="lib\netcore45"/>
     <file src="..\runtime\CSharp\Antlr4.Runtime\bin\netcore45\$Configuration$\Antlr4.Runtime.netcore45.pdb" target="lib\netcore45"/>
