@@ -1,5 +1,7 @@
 param (
-	[switch]$Debug
+	[switch]$Debug,
+	[string]$VisualStudioVersion = "12.0",
+	[switch]$NoClean
 )
 
 # build the solutions
@@ -20,6 +22,12 @@ If ($Debug) {
 	$BuildConfig = 'Release'
 }
 
+If ($NoClean) {
+	$Target = 'build'
+} Else {
+	$Target = 'rebuild'
+}
+
 # this is configured here for path checking, but also in the .props and .targets files
 [xml]$pom = Get-Content "..\tool\pom.xml"
 $CSharpToolVersionNodeInfo = Select-Xml "/mvn:project/mvn:version" -Namespace @{mvn='http://maven.apache.org/POM/4.0.0'} $pom
@@ -28,7 +36,7 @@ $CSharpToolVersion = $CSharpToolVersionNodeInfo.Node.InnerText.trim()
 # build the main project
 $msbuild = "$env:windir\Microsoft.NET\Framework64\v4.0.30319\msbuild.exe"
 
-&$msbuild '/nologo' '/m' '/nr:false' '/t:rebuild' "/p:Configuration=$BuildConfig" $SolutionPath
+&$msbuild '/nologo' '/m' '/nr:false' "/t:$Target" "/p:Configuration=$BuildConfig" "/p:VisualStudioVersion=$VisualStudioVersion" $SolutionPath
 if ($LASTEXITCODE -ne 0) {
 	$host.ui.WriteErrorLine('Build failed, aborting!')
 	exit $p.ExitCode
