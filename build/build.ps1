@@ -55,6 +55,17 @@ if (!(Test-Path $JarPath)) {
 	exit 1
 }
 
-..\runtime\CSharp\.nuget\NuGet.exe pack .\Antlr4.Runtime.nuspec -OutputDirectory nuget -Prop Configuration=$BuildConfig -Version $AntlrVersion -Prop M2_REPO=$M2_REPO -Prop CSharpToolVersion=$CSharpToolVersion -Symbols
-..\runtime\CSharp\.nuget\NuGet.exe pack .\Antlr4.nuspec -OutputDirectory nuget -Prop Configuration=$BuildConfig -Version $AntlrVersion -Prop M2_REPO=$M2_REPO -Prop CSharpToolVersion=$CSharpToolVersion -Symbols
-..\runtime\CSharp\.nuget\NuGet.exe pack .\Antlr4.VS2008.nuspec -OutputDirectory nuget -Prop Configuration=$BuildConfig -Version $AntlrVersion -Prop M2_REPO=$M2_REPO -Prop CSharpToolVersion=$CSharpToolVersion -Symbols
+$packages = @(
+	'Antlr4.Runtime'
+	'Antlr4'
+	'Antlr4.VS2008')
+
+$nuget = '..\runtime\CSharp\.nuget\NuGet.exe'
+ForEach ($package in $packages) {
+	If (-not (Test-Path ".\$package.nuspec")) {
+		$host.ui.WriteErrorLine("Couldn't locate NuGet package specification: $package")
+		exit 1
+	}
+
+	&$nuget 'pack' ".\$package.nuspec" '-OutputDirectory' 'nuget' '-Prop' "Configuration=$BuildConfig" '-Version' "$AntlrVersion" '-Prop' "M2_REPO=$M2_REPO" '-Prop' "CSharpToolVersion=$CSharpToolVersion" '-Symbols'
+}

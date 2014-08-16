@@ -5,6 +5,25 @@ If ($AntlrVersion.EndsWith('-dev')) {
 	Exit 1
 }
 
-..\runtime\CSharp\.nuget\NuGet.exe push ".\nuget\Antlr4.Runtime.$AntlrVersion.nupkg"
-..\runtime\CSharp\.nuget\NuGet.exe push ".\nuget\Antlr4.$AntlrVersion.nupkg"
-..\runtime\CSharp\.nuget\NuGet.exe push ".\nuget\Antlr4.VS2008.$AntlrVersion.nupkg"
+$packages = @(
+	'Antlr4.Runtime'
+	'Antlr4'
+	'Antlr4.VS2008')
+
+# Make sure all packages exist before pushing any packages
+ForEach ($package in $packages) {
+	If (-not (Test-Path ".\nuget\$package.$AntlrVersion.nupkg")) {
+		$host.ui.WriteErrorLine("Couldn't locate NuGet package: $JarPath")
+		exit 1
+	}
+
+	If (-not (Test-Path ".\nuget\$package.$AntlrVersion.symbols.nupkg")) {
+		$host.ui.WriteErrorLine("Couldn't locate NuGet symbols package: $JarPath")
+		exit 1
+	}
+}
+
+$nuget = '..\runtime\CSharp\.nuget\NuGet.exe'
+ForEach ($package in $packages) {
+	&$nuget 'push' ".\nuget\$package.$AntlrVersion.nupkg"
+}
