@@ -3,8 +3,13 @@
 *.csproj.user
 *.sln.cache
 
+# Ignored testing and profiling files
+TestResults/
+*.vsp
+*.testsettings
+
 # Roslyn Cache
-*.sln.ide
+*.sln.ide/
 
 # ignore C# build directories
 [Dd]ebug/
