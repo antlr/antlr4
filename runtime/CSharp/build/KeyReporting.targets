@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) Rackspace, US Inc. All Rights Reserved. Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Target Name="EnsureAssemblySigningKeyPresent"
+          Condition="('$(SignAssembly)' == 'true') And ('$(AssemblyOriginatorKeyFile)' != '')"
+          BeforeTargets="CoreCompile">
+
+    <PropertyGroup>
+      <ErrorText>This project references a strong name key that is missing on this computer. Run 'sn -k {0}' to generate the file.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists($([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '$(AssemblyOriginatorKeyFile)')))"
+           Text="$([System.String]::Format('$(ErrorText)', '$([System.IO.Path]::GetFullPath('$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '$(AssemblyOriginatorKeyFile)'))'))'))" />
+
+  </Target>
+</Project>

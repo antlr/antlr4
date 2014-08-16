@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Antlr4.Runtime</RootNamespace>
-    <AssemblyName>Antlr4.Runtime.portable-net45</AssemblyName>
+    <AssemblyName>Antlr4.Runtime</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -44,7 +44,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\..\..\..\..\..\keys\antlr\Key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\..\..\..\..\keys\antlr\antlr-portable-net45.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AntlrFileStream.cs" />
@@ -157,8 +157,8 @@
     <Compile Include="LexerNoViableAltException.cs" />
     <Compile Include="ListTokenSource.cs" />
     <Compile Include="Misc\Args.cs" />
-    <None Include="..\..\..\..\..\..\keys\antlr\Key.snk">
-      <Link>Key.snk</Link>
+    <None Include="..\..\..\..\..\..\keys\antlr\antlr-portable-net45.snk">
+      <Link>antlr-portable-net45.snk</Link>
     </None>
     <None Include="Misc\Array2DHashSet`1.cs" />
     <Compile Include="Misc\MurmurHash.cs" />
@@ -241,6 +241,7 @@
     </Antlr4>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <Import Project="$(SolutionDir)\build\KeyReporting.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>

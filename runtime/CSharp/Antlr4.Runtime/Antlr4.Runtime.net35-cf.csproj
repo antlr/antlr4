@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Antlr4.Runtime</RootNamespace>
-    <AssemblyName>Antlr4.Runtime.net35-cf</AssemblyName>
+    <AssemblyName>Antlr4.Runtime</AssemblyName>
     <ProjectTypeGuids>{4D628B5B-2FBC-4AA6-8C16-197242AEB884};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <PlatformFamilyName>WindowsCE</PlatformFamilyName>
     <PlatformID>E2BECB1F-8C8C-41ba-B736-9BE7D946A398</PlatformID>
@@ -58,7 +58,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\..\..\..\..\..\keys\antlr\Key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\..\..\..\..\keys\antlr\antlr-net35-cf.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
@@ -178,8 +178,8 @@
     <Compile Include="LexerNoViableAltException.cs" />
     <Compile Include="ListTokenSource.cs" />
     <Compile Include="Misc\Args.cs" />
-    <None Include="..\..\..\..\..\..\keys\antlr\Key.snk">
-      <Link>Key.snk</Link>
+    <None Include="..\..\..\..\..\..\keys\antlr\antlr-net35-cf.snk">
+      <Link>antlr-net35-cf.snk</Link>
     </None>
     <None Include="Misc\Array2DHashSet`1.cs" />
     <Compile Include="Misc\MurmurHash.cs" />

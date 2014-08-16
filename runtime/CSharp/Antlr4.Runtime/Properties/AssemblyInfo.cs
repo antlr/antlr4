@@ -35,27 +35,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-#if PORTABLE && NET45
-#if WINRT
-[assembly: AssemblyTitle("Antlr4.Runtime.netcore45")]
-#else
-[assembly: AssemblyTitle("Antlr4.Runtime.portable-net45")]
-#endif
-#elif PORTABLE && NET40
-[assembly: AssemblyTitle("Antlr4.Runtime.portable-net40")]
-#elif NET45
-[assembly: AssemblyTitle("Antlr4.Runtime.net45")]
-#elif NET40
-[assembly: AssemblyTitle("Antlr4.Runtime.net40")]
-#elif NET35
-[assembly: AssemblyTitle("Antlr4.Runtime.net35")]
-#elif NET30
-[assembly: AssemblyTitle("Antlr4.Runtime.net30")]
-#elif NET20
-[assembly: AssemblyTitle("Antlr4.Runtime.net20")]
-#else
-#error Unknown assembly.
-#endif
+[assembly: AssemblyTitle("Antlr4.Runtime")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Tunnel Vision Laboratories, LLC")]
