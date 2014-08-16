@@ -1,7 +1,11 @@
 param (
 	[switch]$Debug,
 	[string]$VisualStudioVersion = "12.0",
-	[switch]$NoClean
+	[switch]$NoClean,
+	[string]$Java6Home,
+	[string]$MavenHome,
+	[string]$MavenRepo = "$($env:USERPROFILE)\.m2",
+	[switch]$SkipMaven
 )
 
 # build the solutions
@@ -26,6 +30,20 @@ If ($NoClean) {
 	$Target = 'build'
 } Else {
 	$Target = 'rebuild'
+}
+
+If (-not $MavenHome) {
+	$MavenHome = $env:M2_HOME
+}
+
+$Java6RegKey = 'HKLM:\SOFTWARE\JavaSoft\Java Runtime Environment\1.6'
+$Java6RegValue = 'JavaHome'
+If (-not $Java6Home -and (Test-Path $Java6RegKey)) {
+	$JavaHomeKey = Get-Item -LiteralPath $Java6RegKey
+	If ($JavaHomeKey.GetValue($Java6RegValue, $null) -ne $null) {
+		$JavaHomeProperty = Get-ItemProperty $Java6RegKey $Java6RegValue
+		$Java6Home = $JavaHomeProperty.$Java6RegValue
+	}
 }
 
 # this is configured here for path checking, but also in the .props and .targets files
@@ -55,7 +73,34 @@ if (-not (Test-Path 'nuget')) {
 	mkdir "nuget"
 }
 
-# TODO: Build the Java library using Maven
+# Build the Java library using Maven
+If (-not $SkipMaven) {
+	$OriginalPath = $PWD
+
+	cd '..\tool'
+	$MavenPath = "$MavenHome\bin\mvn.bat"
+	If (-not (Test-Path $MavenPath)) {
+		$host.ui.WriteErrorLine("Couldn't locate Maven binary: $MavenPath")
+		cd $OriginalPath
+		exit 1
+	}
+
+	If (-not (Test-Path $Java6Home)) {
+		$host.ui.WriteErrorLine("Couldn't locate Java 6 installation: $Java6Home")
+		cd $OriginalPath
+		exit 1
+	}
+
+	$MavenGoal = 'package'
+	&$MavenPath '-DskipTests=true' '--errors' '-e' '-Dgpg.useagent=true' "-Djava6.home=$Java6Home" '-Psonatype-oss-release' $MavenGoal
+	if ($LASTEXITCODE -ne 0) {
+		$host.ui.WriteErrorLine('Maven build of the C# Target custom Tool failed, aborting!')
+		cd $OriginalPath
+		exit $p.ExitCode
+	}
+
+	cd $OriginalPath
+}
 
 $JarPath = "..\tool\target\antlr4-csharp-$CSharpToolVersion-complete.jar"
 if (!(Test-Path $JarPath)) {
