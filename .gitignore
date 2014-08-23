@@ -7,6 +7,11 @@ dist/
 lib/
 user.build.properties
 
+# Other build folders
+gen3/
+gen4/
+out/
+
 # MacOSX files
 .DS_Store
 
