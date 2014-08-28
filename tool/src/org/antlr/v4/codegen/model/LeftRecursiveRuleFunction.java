@@ -33,6 +33,7 @@ package org.antlr.v4.codegen.model;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.decl.RuleContextDecl;
+import org.antlr.v4.codegen.model.decl.RuleContextListDecl;
 import org.antlr.v4.codegen.model.decl.StructDecl;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.misc.Tuple2;
@@ -54,7 +55,14 @@ public class LeftRecursiveRuleFunction extends RuleFunction {
 			if ( rrefAST.getType() == ANTLRParser.RULE_REF ) {
 				Rule targetRule = factory.getGrammar().getRule(rrefAST.getText());
 				String ctxName = factory.getTarget().getRuleFunctionContextStructName(targetRule);
-				RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
+				RuleContextDecl d;
+				if (idAST.getParent().getType() == ANTLRParser.ASSIGN) {
+					d = new RuleContextDecl(factory, label, ctxName);
+				}
+				else {
+					d = new RuleContextListDecl(factory, label, ctxName);
+				}
+
 				StructDecl struct = ruleCtx;
 				if ( altLabelCtxs!=null ) {
 					StructDecl s = altLabelCtxs.get(altLabel);

@@ -131,6 +131,9 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		this.errMgr = g.tool.errMgr;
 	}
 
+	@Override
+	public ErrorManager getErrorManager() { return errMgr; }
+
 	public void process() {	visitGrammar(g.ast); }
 
 	// Routines to route visitor traffic to the checking routines
@@ -379,8 +382,8 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	void checkInvalidRuleRef(Token ruleID) {
 		String fileName = ruleID.getInputStream().getSourceName();
 		if ( g.isLexer() && Character.isLowerCase(ruleID.getText().charAt(0)) ) {
-			g.tool.errMgr.grammarError(ErrorType.PARSER_RULES_NOT_ALLOWED,
-									   fileName, ruleID, ruleID.getText());
+			g.tool.errMgr.grammarError(ErrorType.PARSER_RULE_REF_IN_LEXER_RULE,
+									   fileName, ruleID, ruleID.getText(), currentRuleName);
 		}
 	}
 

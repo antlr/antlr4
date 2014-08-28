@@ -219,6 +219,12 @@ public enum ErrorType {
 	 */
 	UNDEFINED_RULE_REF(56, "reference to undefined rule: <arg>", ErrorSeverity.ERROR),
 	/**
+	 * Compiler Error 160.
+	 *
+	 * <p>reference to undefined rule: <em>rule</em></p>
+	 */
+	PARSER_RULE_REF_IN_LEXER_RULE(160, "reference to parser rule <arg> in lexer rule <arg2>", ErrorSeverity.ERROR),
+	/**
 	 * Compiler Error 57.
 	 *
 	 * <p>

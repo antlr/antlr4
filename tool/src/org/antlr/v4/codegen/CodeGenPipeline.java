@@ -67,23 +67,44 @@ public class CodeGenPipeline {
 			}
 		}
 
+		// all templates are generated in memory to report the most complete
+		// error information possible, but actually writing output files stops
+		// after the first error is reported
+		int errorCount = g.tool.errMgr.getNumErrors();
+
 		if ( g.isLexer() ) {
 			ST lexer = gen.generateLexer();
-			writeRecognizer(lexer, gen);
+			if (g.tool.errMgr.getNumErrors() == errorCount) {
+				writeRecognizer(lexer, gen);
+			}
 		}
 		else {
 			ST parser = gen.generateParser();
-			writeRecognizer(parser, gen);
+			if (g.tool.errMgr.getNumErrors() == errorCount) {
+				writeRecognizer(parser, gen);
+			}
 			if ( g.tool.gen_listener ) {
-				gen.writeListener(gen.generateListener());
+				ST listener = gen.generateListener();
+				if (g.tool.errMgr.getNumErrors() == errorCount) {
+					gen.writeListener(listener);
+				}
 				if (target.wantsBaseListener()) {
-					gen.writeBaseListener(gen.generateBaseListener());
+					ST baseListener = gen.generateBaseListener();
+					if (g.tool.errMgr.getNumErrors() == errorCount) {
+						gen.writeBaseListener(baseListener);
+					}
 				}
 			}
 			if ( g.tool.gen_visitor ) {
-				gen.writeVisitor(gen.generateVisitor());
+				ST visitor = gen.generateVisitor();
+				if (g.tool.errMgr.getNumErrors() == errorCount) {
+					gen.writeVisitor(visitor);
+				}
 				if (target.wantsBaseVisitor()) {
-					gen.writeBaseVisitor(gen.generateBaseVisitor());
+					ST baseVisitor = gen.generateBaseVisitor();
+					if (g.tool.errMgr.getNumErrors() == errorCount) {
+						gen.writeBaseVisitor(baseVisitor);
+					}
 				}
 			}
 			gen.writeHeaderFile();

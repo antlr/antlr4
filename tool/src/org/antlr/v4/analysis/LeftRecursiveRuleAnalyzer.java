@@ -161,9 +161,12 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		AltAST altTree = (AltAST)originalAltTree.dupTree();
 		String altLabel = altTree.altLabel!=null ? altTree.altLabel.getText() : null;
 
+		String label = null;
+		boolean isListLabel = false;
 		GrammarAST lrlabel = stripLeftRecursion(altTree);
-		String label = lrlabel != null ? lrlabel.getText() : null;
 		if ( lrlabel!=null ) {
+			label = lrlabel.getText();
+			isListLabel = lrlabel.getParent().getType() == PLUS_ASSIGN;
 			leftRecursiveRuleRefLabels.add(Tuple.create(lrlabel,altLabel));
 		}
 
@@ -177,7 +180,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		String altText = text(altTree);
 		altText = altText.trim();
 		LeftRecursiveRuleAltInfo a =
-			new LeftRecursiveRuleAltInfo(alt, altText, label, altLabel, originalAltTree);
+			new LeftRecursiveRuleAltInfo(alt, altText, label, altLabel, isListLabel, originalAltTree);
 		a.nextPrec = nextPrec;
 		binaryAlts.put(alt, a);
 		//System.out.println("binaryAlt " + alt + ": " + altText + ", rewrite=" + rewriteText);
@@ -195,7 +198,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		altText = altText.trim();
 		String altLabel = altTree.altLabel!=null ? altTree.altLabel.getText() : null;
 		LeftRecursiveRuleAltInfo a =
-			new LeftRecursiveRuleAltInfo(alt, altText, null, altLabel, originalAltTree);
+			new LeftRecursiveRuleAltInfo(alt, altText, null, altLabel, false, originalAltTree);
 		a.nextPrec = nextPrec;
 		prefixAlts.add(a);
 		//System.out.println("prefixAlt " + alt + ": " + altText + ", rewrite=" + rewriteText);
@@ -206,16 +209,19 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		AltAST altTree = (AltAST)originalAltTree.dupTree();
 		String altLabel = altTree.altLabel!=null ? altTree.altLabel.getText() : null;
 
+		String label = null;
+		boolean isListLabel = false;
 		GrammarAST lrlabel = stripLeftRecursion(altTree);
-		String label = lrlabel != null ? lrlabel.getText() : null;
 		if ( lrlabel!=null ) {
+			label = lrlabel.getText();
+			isListLabel = lrlabel.getParent().getType() == PLUS_ASSIGN;
 			leftRecursiveRuleRefLabels.add(Tuple.create(lrlabel,altLabel));
 		}
 		stripAltLabel(altTree);
 		String altText = text(altTree);
 		altText = altText.trim();
 		LeftRecursiveRuleAltInfo a =
-			new LeftRecursiveRuleAltInfo(alt, altText, label, altLabel, originalAltTree);
+			new LeftRecursiveRuleAltInfo(alt, altText, label, altLabel, isListLabel, originalAltTree);
 		suffixAlts.put(alt, a);
 //		System.out.println("suffixAlt " + alt + ": " + altText + ", rewrite=" + rewriteText);
 	}
@@ -227,7 +233,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		String altText = text(altTree);
 		String altLabel = altTree.altLabel!=null ? altTree.altLabel.getText() : null;
 		LeftRecursiveRuleAltInfo a =
-			new LeftRecursiveRuleAltInfo(alt, altText, null, altLabel, originalAltTree);
+			new LeftRecursiveRuleAltInfo(alt, altText, null, altLabel, false, originalAltTree);
 		otherAlts.add(a);
 //		System.out.println("otherAlt " + alt + ": " + altText);
 	}
@@ -325,7 +331,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		if ( (first.getType()==RULE_REF && first.getText().equals(ruleName)) ||
 			 (rref!=null && rref.getType()==RULE_REF && rref.getText().equals(ruleName)) )
 		{
-			if ( first.getType()==ASSIGN ) lrlabel = (GrammarAST)first.getChild(0);
+			if ( first.getType()==ASSIGN || first.getType()==PLUS_ASSIGN ) lrlabel = (GrammarAST)first.getChild(0);
 			// remove rule ref (first child unless options present)
 			altAST.deleteChild(leftRecurRuleIndex);
 			// reset index so it prints properly (sets token range of

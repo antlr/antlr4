@@ -929,14 +929,11 @@ public abstract class BaseTest {
 	}
 
 	void checkRuleATN(Grammar g, String ruleName, String expecting) {
-		ParserATNFactory f = new ParserATNFactory(g);
-		ATN atn = f.createATN();
-
 		DOTGenerator dot = new DOTGenerator(g);
-		System.out.println(dot.getDOT(atn.ruleToStartState[g.getRule(ruleName).index]));
+		System.out.println(dot.getDOT(g.atn.ruleToStartState[g.getRule(ruleName).index]));
 
 		Rule r = g.getRule(ruleName);
-		ATNState startState = atn.ruleToStartState[r.index];
+		ATNState startState = g.atn.ruleToStartState[r.index];
 		ATNPrinter serializer = new ATNPrinter(g, startState);
 		String result = serializer.asString();
 

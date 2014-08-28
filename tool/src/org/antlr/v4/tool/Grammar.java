@@ -30,7 +30,6 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.Tool;
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.misc.CharSupport;
@@ -1078,6 +1077,8 @@ public class Grammar implements AttributeResolver {
 			public void stringRef(TerminalAST ref) {
 				strings.add(ref.getText());
 			}
+			@Override
+			public ErrorManager getErrorManager() { return tool.errMgr; }
 		};
 		collector.visitGrammar(ast);
 		return strings;

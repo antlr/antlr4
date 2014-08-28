@@ -32,8 +32,6 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
-import org.antlr.runtime.tree.TreeNodeStream;
-import org.antlr.v4.analysis.LeftFactoringRuleTransformer;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.decl.AltLabelStructDecl;
 import org.antlr.v4.codegen.model.decl.AttributeDecl;
@@ -46,10 +44,9 @@ import org.antlr.v4.codegen.model.decl.ContextTokenListIndexedGetterDecl;
 import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.codegen.model.decl.StructDecl;
 import org.antlr.v4.misc.FrequencySet;
-import org.antlr.v4.misc.MutableInt;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.GrammarASTAdaptor;
-import org.antlr.v4.parse.GrammarTreeVisitor;
+import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
@@ -60,12 +57,9 @@ import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.TerminalAST;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -74,9 +68,6 @@ import java.util.Set;
 
 import static org.antlr.v4.parse.ANTLRParser.RULE_REF;
 import static org.antlr.v4.parse.ANTLRParser.TOKEN_REF;
-import org.antlr.v4.runtime.atn.ATNSimulator;
-import org.antlr.v4.tool.ast.GrammarASTWithOptions;
-
 
 /** */
 public class RuleFunction extends OutputModelObject {
@@ -314,159 +305,5 @@ public class RuleFunction extends OutputModelObject {
 			}
 		}
 		ruleCtx.addDecl(d); // stick in overall rule's ctx
-	}
-
-	protected static class ElementFrequenciesVisitor extends GrammarTreeVisitor {
-		final Deque<FrequencySet<String>> frequencies;
-
-		public ElementFrequenciesVisitor(TreeNodeStream input) {
-			super(input);
-			frequencies = new ArrayDeque<FrequencySet<String>>();
-			frequencies.push(new FrequencySet<String>());
-		}
-
-		/*
-		 * Common
-		 */
-
-		/**
-		 * Generate a frequency set as the union of two input sets. If an
-		 * element is contained in both sets, the value for the output will be
-		 * the maximum of the two input values.
-		 *
-		 * @param a The first set.
-		 * @param b The second set.
-		 * @return The union of the two sets, with the maximum value chosen
-		 * whenever both sets contain the same key.
-		 */
-		protected static FrequencySet<String> combineMax(FrequencySet<String> a, FrequencySet<String> b) {
-			FrequencySet<String> result = combineAndClip(a, b, 1);
-			for (Map.Entry<String, MutableInt> entry : a.entrySet()) {
-				result.get(entry.getKey()).v = entry.getValue().v;
-			}
-
-			for (Map.Entry<String, MutableInt> entry : b.entrySet()) {
-				MutableInt slot = result.get(entry.getKey());
-				slot.v = Math.max(slot.v, entry.getValue().v);
-			}
-
-			return result;
-		}
-
-		/**
-		 * Generate a frequency set as the union of two input sets, with the
-		 * values clipped to a specified maximum value. If an element is
-		 * contained in both sets, the value for the output, prior to clipping,
-		 * will be the sum of the two input values.
-		 *
-		 * @param a The first set.
-		 * @param b The second set.
-		 * @param clip The maximum value to allow for any output.
-		 * @return The sum of the two sets, with the individual elements clipped
-		 * to the maximum value gived by {@code clip}.
-		 */
-		protected static FrequencySet<String> combineAndClip(FrequencySet<String> a, FrequencySet<String> b, int clip) {
-			FrequencySet<String> result = new FrequencySet<String>();
-			for (Map.Entry<String, MutableInt> entry : a.entrySet()) {
-				for (int i = 0; i < entry.getValue().v; i++) {
-					result.add(entry.getKey());
-				}
-			}
-
-			for (Map.Entry<String, MutableInt> entry : b.entrySet()) {
-				for (int i = 0; i < entry.getValue().v; i++) {
-					result.add(entry.getKey());
-				}
-			}
-
-			for (Map.Entry<String, MutableInt> entry : result.entrySet()) {
-				entry.getValue().v = Math.min(entry.getValue().v, clip);
-			}
-
-			return result;
-		}
-
-		@Override
-		public void tokenRef(TerminalAST ref) {
-			frequencies.peek().add(ref.getText());
-		}
-
-		@Override
-		public void ruleRef(GrammarAST ref, ActionAST arg) {
-			if (ref instanceof GrammarASTWithOptions) {
-				GrammarASTWithOptions grammarASTWithOptions = (GrammarASTWithOptions)ref;
-				if (Boolean.parseBoolean(grammarASTWithOptions.getOptionString(LeftFactoringRuleTransformer.SUPPRESS_ACCESSOR))) {
-					return;
-				}
-			}
-
-			frequencies.peek().add(ref.getText());
-		}
-
-		/*
-		 * Parser rules
-		 */
-
-		@Override
-		protected void enterAlternative(AltAST tree) {
-			frequencies.push(new FrequencySet<String>());
-		}
-
-		@Override
-		protected void exitAlternative(AltAST tree) {
-			frequencies.push(combineMax(frequencies.pop(), frequencies.pop()));
-		}
-
-		@Override
-		protected void enterElement(GrammarAST tree) {
-			frequencies.push(new FrequencySet<String>());
-		}
-
-		@Override
-		protected void exitElement(GrammarAST tree) {
-			frequencies.push(combineAndClip(frequencies.pop(), frequencies.pop(), 2));
-		}
-
-		@Override
-		protected void exitSubrule(GrammarAST tree) {
-			if (tree.getType() == CLOSURE || tree.getType() == POSITIVE_CLOSURE) {
-				for (Map.Entry<String, MutableInt> entry : frequencies.peek().entrySet()) {
-					entry.getValue().v = 2;
-				}
-			}
-		}
-
-		/*
-		 * Lexer rules
-		 */
-
-		@Override
-		protected void enterLexerAlternative(GrammarAST tree) {
-			frequencies.push(new FrequencySet<String>());
-		}
-
-		@Override
-		protected void exitLexerAlternative(GrammarAST tree) {
-			frequencies.push(combineMax(frequencies.pop(), frequencies.pop()));
-		}
-
-		@Override
-		protected void enterLexerElement(GrammarAST tree) {
-			frequencies.push(new FrequencySet<String>());
-		}
-
-		@Override
-		protected void exitLexerElement(GrammarAST tree) {
-			frequencies.push(combineAndClip(frequencies.pop(), frequencies.pop(), 2));
-		}
-
-		@Override
-		protected void exitLexerSubrule(GrammarAST tree) {
-			if (tree.getType() == CLOSURE || tree.getType() == POSITIVE_CLOSURE) {
-				for (Map.Entry<String, MutableInt> entry : frequencies.peek().entrySet()) {
-					entry.getValue().v = 2;
-				}
-			}
-		}
 	}
 }
