@@ -78,17 +78,16 @@ public class Parser extends OutputModelObject {
 		tokenNames = g.getTokenDisplayNames();
 		for (int i = 0; i < tokenNames.length; i++) {
 			if ( tokenNames[i]==null ) continue;
-			CodeGenerator gen = factory.getGenerator();
 			if ( tokenNames[i].charAt(0)=='\'' ) {
 				boolean addQuotes = false;
 				tokenNames[i] =
-					gen.getTarget().getTargetStringLiteralFromANTLRStringLiteral(gen,
+					factory.getTarget().getTargetStringLiteralFromANTLRStringLiteral(factory.getGenerator(),
 																			tokenNames[i],
 																			addQuotes);
 				tokenNames[i] = "\"'"+tokenNames[i]+"'\"";
 			}
 			else {
-				tokenNames[i] = gen.getTarget().getTargetStringLiteralFromString(tokenNames[i], true);
+				tokenNames[i] = factory.getTarget().getTargetStringLiteralFromString(tokenNames[i], true);
 			}
 		}
 		ruleNames = g.rules.keySet();

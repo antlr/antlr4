@@ -307,12 +307,12 @@ public class ActionTranslator implements ActionSplitterListener {
 
 	public String getTokenLabel(String x) {
 		if ( node.resolver.resolvesToLabel(x, node) ) return x;
-		return factory.getGenerator().getTarget().getImplicitTokenLabel(x);
+		return factory.getTarget().getImplicitTokenLabel(x);
 	}
 
 	public String getRuleLabel(String x) {
 		if ( node.resolver.resolvesToLabel(x, node) ) return x;
-		return factory.getGenerator().getTarget().getImplicitRuleLabel(x);
+		return factory.getTarget().getImplicitRuleLabel(x);
 	}
 
 }

@@ -212,8 +212,8 @@ public class OutputModelController {
 		buildNormalRuleFunction(r, function);
 
 		// now inject code to start alts
-		CodeGenerator gen = delegate.getGenerator();
-		STGroup codegenTemplates = gen.getTemplates();
+		Target target = delegate.getTarget();
+		STGroup codegenTemplates = target.getTemplates();
 
 		// pick out alt(s) for primaries
 		CodeBlockForOuterMostAlt outerAlt = (CodeBlockForOuterMostAlt)function.code.get(0);
@@ -300,7 +300,7 @@ public class OutputModelController {
 			e.printStackTrace(System.err);
 		}
 
-		function.ctxType = gen.getTarget().getRuleFunctionContextStructName(function);
+		function.ctxType = delegate.getTarget().getRuleFunctionContextStructName(function);
 
 		function.postamble = rulePostamble(function, r);
 	}
@@ -312,7 +312,7 @@ public class OutputModelController {
 
 		CodeGenerator gen = delegate.getGenerator();
 		Grammar g = delegate.getGrammar();
-		String ctxType = gen.getTarget().getRuleFunctionContextStructName(r);
+		String ctxType = delegate.getTarget().getRuleFunctionContextStructName(r);
 		RuleActionFunction raf = lexer.actionFuncs.get(r);
 		if ( raf==null ) {
 			raf = new RuleActionFunction(delegate, r, ctxType);

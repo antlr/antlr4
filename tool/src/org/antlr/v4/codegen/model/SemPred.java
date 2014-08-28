@@ -73,12 +73,11 @@ public class SemPred extends Action {
 			&& ast.atnState.transition(0) instanceof AbstractPredicateTransition;
 
 		GrammarAST failNode = ast.getOptionAST("fail");
-		CodeGenerator gen = factory.getGenerator();
 		predicate = ast.getText();
 		if (predicate.startsWith("{") && predicate.endsWith("}?")) {
 			predicate = predicate.substring(1, predicate.length() - 2);
 		}
-		predicate = gen.getTarget().getTargetStringLiteralFromString(predicate);
+		predicate = factory.getTarget().getTargetStringLiteralFromString(predicate);
 
 		if ( failNode==null ) return;
 
@@ -90,7 +89,7 @@ public class SemPred extends Action {
 														  failActionNode);
 		}
 		else {
-			msg = gen.getTarget().getTargetStringLiteralFromANTLRStringLiteral(gen,
+			msg = factory.getTarget().getTargetStringLiteralFromANTLRStringLiteral(factory.getGenerator(),
 																		  failNode.getText(),
 																		  true);
 		}

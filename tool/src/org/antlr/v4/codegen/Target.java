@@ -36,6 +36,7 @@ import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
@@ -88,6 +89,7 @@ public abstract class Target {
 		return language;
 	}
 
+	@NotNull
 	public STGroup getTemplates() {
 		if (templates == null) {
 			templates = loadTemplates();
@@ -340,6 +342,7 @@ public abstract class Target {
 
 	protected abstract boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode);
 
+	@NotNull
 	protected STGroup loadTemplates() {
 		STGroup result = new STGroupFile(CodeGenerator.TEMPLATE_ROOT+"/"+getLanguage()+"/"+getLanguage()+STGroup.GROUP_FILE_EXTENSION);
 		result.registerRenderer(Integer.class, new NumberRenderer());

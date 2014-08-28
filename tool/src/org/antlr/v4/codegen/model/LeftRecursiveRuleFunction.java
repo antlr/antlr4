@@ -44,7 +44,6 @@ public class LeftRecursiveRuleFunction extends RuleFunction {
 	public LeftRecursiveRuleFunction(OutputModelFactory factory, LeftRecursiveRule r) {
 		super(factory, r);
 
-		CodeGenerator gen = factory.getGenerator();
 		// Since we delete x=lr, we have to manually add decls for all labels
 		// on left-recur refs to proper structs
 		for (Tuple2<GrammarAST,String> pair : r.leftRecursiveRuleRefLabels) {
@@ -54,7 +53,7 @@ public class LeftRecursiveRuleFunction extends RuleFunction {
 			GrammarAST rrefAST = (GrammarAST)idAST.getParent().getChild(1);
 			if ( rrefAST.getType() == ANTLRParser.RULE_REF ) {
 				Rule targetRule = factory.getGrammar().getRule(rrefAST.getText());
-				String ctxName = gen.getTarget().getRuleFunctionContextStructName(targetRule);
+				String ctxName = factory.getTarget().getRuleFunctionContextStructName(targetRule);
 				RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
 				StructDecl struct = ruleCtx;
 				if ( altLabelCtxs!=null ) {
