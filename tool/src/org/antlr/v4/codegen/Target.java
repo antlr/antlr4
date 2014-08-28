@@ -306,33 +306,33 @@ public abstract class Target {
 
 	public boolean grammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
 		switch (idNode.getParent().getType()) {
-		case ANTLRParser.ASSIGN:
-			switch (idNode.getParent().getParent().getType()) {
+			case ANTLRParser.ASSIGN:
+				switch (idNode.getParent().getParent().getType()) {
+					case ANTLRParser.ELEMENT_OPTIONS:
+					case ANTLRParser.OPTIONS:
+						return false;
+
+					default:
+						break;
+				}
+
+				break;
+
+			case ANTLRParser.AT:
 			case ANTLRParser.ELEMENT_OPTIONS:
-			case ANTLRParser.OPTIONS:
 				return false;
+
+			case ANTLRParser.LEXER_ACTION_CALL:
+				if (idNode.getChildIndex() == 0) {
+					// first child is the command name which is part of the ANTLR language
+					return false;
+				}
+
+				// arguments to the command should be checked
+				break;
 
 			default:
 				break;
-			}
-
-			break;
-
-		case ANTLRParser.AT:
-		case ANTLRParser.ELEMENT_OPTIONS:
-			return false;
-
-		case ANTLRParser.LEXER_ACTION_CALL:
-			if (idNode.getChildIndex() == 0) {
-				// first child is the command name which is part of the ANTLR language
-				return false;
-			}
-
-			// arguments to the command should be checked
-			break;
-
-		default:
-			break;
 		}
 
 		return visibleGrammarSymbolCausesIssueInGeneratedCode(idNode);

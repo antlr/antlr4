@@ -120,7 +120,7 @@ public class Tool {
 
 	// fields set by option manager
 
-	public File inputDirectory;
+	public File inputDirectory; // used by mvn plugin but not set by tool itself.
 	public String outputDirectory;
 	public String libDirectory;
 	public boolean generate_ATN_dot = false;
