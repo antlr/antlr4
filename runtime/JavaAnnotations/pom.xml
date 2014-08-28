@@ -14,6 +14,15 @@
     <name>ANTLR 4 Runtime Annotations</name>
     <description>A set of annotations used within the ANTLR 4 Runtime</description>
 
+    <packaging>bundle</packaging>
+
+    <properties>
+        <osgi.export>
+            org.antlr.v4.runtime.misc;version=${project.version}
+        </osgi.export>
+        <osgi.fragmentHost>${antlr4-runtime.symbolicName}</osgi.fragmentHost>
+    </properties>
+
     <build>
         <sourceDirectory>src</sourceDirectory>
         <resources>
@@ -30,6 +39,15 @@
                     <compilerArgs>
                         <compilerArg>-proc:none</compilerArg>
                     </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Fragment-Host>${osgi.fragmentHost}</Fragment-Host>
+                    </instructions>
                 </configuration>
             </plugin>
         </plugins>
