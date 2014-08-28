@@ -511,8 +511,8 @@ self.consume()
 >>
 
 Wildcard(w) ::= <<
-setState(<w.stateNumber>);
-<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>matchWildcard()
+self.state = <w.stateNumber>
+<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>self.matchWildcard()
 >>
 
 // ACTION STUFF
