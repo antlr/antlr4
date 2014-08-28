@@ -55,7 +55,7 @@ public class CodeGenerator {
 	public static final String TEMPLATE_ROOT = "org/antlr/v4/tool/templates/codegen";
 	public static final String VOCAB_FILE_EXTENSION = ".tokens";
 	public static final String DEFAULT_LANGUAGE = "Java";
-	public final static String vocabFilePattern =
+	public static final String vocabFilePattern =
 		"<tokens.keys:{t | <t>=<tokens.(t)>\n}>" +
 		"<literals.keys:{t | <t>=<literals.(t)>\n}>";
 
@@ -206,7 +206,7 @@ public class CodeGenerator {
 			throw new UnsupportedOperationException("Cannot generate code without a target.");
 		}
 
-		target.genFile(g,outputFileST, getListenerFileName());
+		target.genFile(g, outputFileST, getListenerFileName());
 	}
 
 	public void writeBaseListener(ST outputFileST) {
@@ -215,7 +215,7 @@ public class CodeGenerator {
 			throw new UnsupportedOperationException("Cannot generate code without a target.");
 		}
 
-		target.genFile(g,outputFileST, getBaseListenerFileName());
+		target.genFile(g, outputFileST, getBaseListenerFileName());
 	}
 
 	public void writeVisitor(ST outputFileST) {
@@ -224,7 +224,7 @@ public class CodeGenerator {
 			throw new UnsupportedOperationException("Cannot generate code without a target.");
 		}
 
-		target.genFile(g,outputFileST, getVisitorFileName());
+		target.genFile(g, outputFileST, getVisitorFileName());
 	}
 
 	public void writeBaseVisitor(ST outputFileST) {
@@ -233,7 +233,7 @@ public class CodeGenerator {
 			throw new UnsupportedOperationException("Cannot generate code without a target.");
 		}
 
-		target.genFile(g,outputFileST, getBaseVisitorFileName());
+		target.genFile(g, outputFileST, getBaseVisitorFileName());
 	}
 
 	public void writeHeaderFile() {
@@ -248,7 +248,7 @@ public class CodeGenerator {
 			ST extST = target.getTemplates().getInstanceOf("headerFileExtension");
 			ST headerFileST = null;
 			// TODO:  don't hide this header file generation here!
-			target.genRecognizerHeaderFile(g,headerFileST,extST.render(lineWidth));
+			target.genRecognizerHeaderFile(g, headerFileST, extST.render(lineWidth));
 		}
 	}
 

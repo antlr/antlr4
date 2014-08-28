@@ -253,7 +253,8 @@ public class RuleFunction extends OutputModelObject {
 			}
 
 			return visitor.frequencies.peek();
-		} catch (RecognitionException ex) {
+		}
+		catch (RecognitionException ex) {
 			factory.getGrammar().tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, ex);
 			return new FrequencySet<String>();
 		}

@@ -76,13 +76,15 @@ public class CodeGenPipeline {
 			writeRecognizer(parser, gen);
 			if ( g.tool.gen_listener ) {
 				gen.writeListener(gen.generateListener());
-				if (target.wantsBaseListener())
+				if (target.wantsBaseListener()) {
 					gen.writeBaseListener(gen.generateBaseListener());
+				}
 			}
 			if ( g.tool.gen_visitor ) {
 				gen.writeVisitor(gen.generateVisitor());
-				if (target.wantsBaseVisitor())
+				if (target.wantsBaseVisitor()) {
 					gen.writeBaseVisitor(gen.generateBaseVisitor());
+				}
 			}
 			gen.writeHeaderFile();
 		}
@@ -95,7 +97,9 @@ public class CodeGenPipeline {
 			if (g.tool.ST_inspector_wait_for_close) {
 				try {
 					viz.waitForClose();
-				} catch (InterruptedException ex) {
+				}
+				catch (InterruptedException ex) {
+					g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, ex);
 				}
 			}
 		}

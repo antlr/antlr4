@@ -62,15 +62,15 @@ public enum ErrorType {
 	/**
 	 * Compiler Error 3.
 	 *
-	 * <p>cannot find tokens file '<em>filename</em>'</p>
+	 * <p>cannot find tokens file '<em>filename</em>' given for '<em>arg2</em>'</p>
 	 */
-	CANNOT_FIND_TOKENS_FILE(3, "cannot find tokens file '<arg>'", ErrorSeverity.ERROR),
+	CANNOT_FIND_TOKENS_FILE_GIVEN_ON_CMDLINE(3, "cannot find tokens file '<arg>' given for '<arg2>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 4.
 	 *
-	 * <p>cannot find tokens file '<em>filename</em>': <em>reason</em></p>
+	 * <p>error reading tokens file '<em>filename</em>': <em>reason</em></p>
 	 */
-	ERROR_READING_TOKENS_FILE(4, "cannot find tokens file '<arg>': <arg2>", ErrorSeverity.ERROR),
+	ERROR_READING_TOKENS_FILE(4, "error reading tokens file '<arg>': <arg2>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 5.
 	 *
@@ -108,6 +108,12 @@ public enum ErrorType {
 	 * <p>warning treated as error</p>
 	 */
 	WARNING_TREATED_AS_ERROR(10, "warning treated as error", ErrorSeverity.ERROR_ONE_OFF),
+	/**
+	 * Compiler Error 11.
+	 *
+	 * <p>error reading imported grammar '<em>arg</em>' referenced in '<em>arg2</em>'</p>
+	 */
+	ERROR_READING_IMPORTED_GRAMMAR(11, "error reading imported grammar '<arg>' referenced in '<arg2>'", ErrorSeverity.ERROR),
 
 	/**
 	 * Compiler Error 20.
@@ -382,10 +388,9 @@ public enum ErrorType {
 	 * Compiler Error 110.
 	 *
 	 * <p>
-	 * can't find or load grammar '<em>grammar</em>' from
-	 * '<em>filename</em>'</p>
+	 * can't find or load grammar <em>grammar</em></p>
 	 */
-	CANNOT_FIND_IMPORTED_GRAMMAR(110, "can't find or load grammar '<arg>' from '<arg2>'", ErrorSeverity.ERROR),
+	CANNOT_FIND_IMPORTED_GRAMMAR(110, "can't find or load grammar '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 111.
 	 *
@@ -403,6 +408,12 @@ public enum ErrorType {
 	 * '<em>recognizer</em>'</p>
 	 */
 	IMPORT_NAME_CLASH(113, "<arg.typeString> grammar '<arg.name>' and imported <arg2.typeString> grammar '<arg2.name>' both generate '<arg2.recognizerName>'", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 160.
+	 *
+	 * <p>cannot find tokens file '<em>filename</em>'</p>
+	 */
+	CANNOT_FIND_TOKENS_FILE_REFD_IN_GRAMMAR(160, "cannot find tokens file '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Warning 118.
 	 *

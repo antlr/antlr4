@@ -30,14 +30,32 @@
 
 package org.antlr.v4.tool;
 
+import org.antlr.runtime.Token;
+
 import java.util.Collection;
 
 public class LeftRecursionCyclesMessage extends ANTLRMessage {
-	public Collection<? extends Collection<Rule>> cycles;
-
 	public LeftRecursionCyclesMessage(String fileName, Collection<? extends Collection<Rule>> cycles) {
-		super(ErrorType.LEFT_RECURSION_CYCLES, cycles);
-		this.cycles = cycles;
+		super(ErrorType.LEFT_RECURSION_CYCLES, getStartTokenOfFirstRule(cycles), cycles);
 		this.fileName = fileName;
+	}
+
+	protected static Token getStartTokenOfFirstRule(Collection<? extends Collection<Rule>> cycles) {
+	    if (cycles == null) {
+	        return null;
+	    }
+
+	    for (Collection<Rule> collection : cycles) {
+	        if (collection == null) {
+	            return null;
+	        }
+
+	        for (Rule rule : collection) {
+	            if (rule.ast != null) {
+	                return rule.ast.getToken();
+	            }
+	        }
+	    }
+		return null;
 	}
 }

@@ -326,7 +326,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 			grammar,
 			expected
 		};
-			
+
 		super.testErrors(pair, true);
 	}
 
@@ -374,7 +374,7 @@ public class TestToolSyntaxErrors extends BaseTest {
 			"WS   : [ \\r\\t\\n]+ -> skip ;\n";
 		String expected =
 			"";
-		
+
 		String[] pair = new String[] { grammar, expected };
 		super.testErrors(pair, true);
 	}

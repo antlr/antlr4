@@ -34,6 +34,8 @@ import org.antlr.runtime.Token;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -48,12 +50,10 @@ import java.util.regex.Pattern;
 
 /** */
 public class TokenVocabParser {
-	protected final Tool tool;
-	protected final String vocabName;
+	protected final Grammar g;
 
-	public TokenVocabParser(Tool tool, String vocabName) {
-		this.tool = tool;
-		this.vocabName = vocabName;
+	public TokenVocabParser(Grammar g) {
+		this.g = g;
 	}
 
 	/** Load a vocab file {@code <vocabName>.tokens} and return mapping. */
@@ -63,6 +63,8 @@ public class TokenVocabParser {
 		File fullFile = getImportedVocabFile();
 		FileInputStream fis = null;
 		BufferedReader br = null;
+		Tool tool = g.tool;
+		String vocabName = g.getOptionString("tokenVocab");
 		try {
 			Pattern tokenDefPattern = Pattern.compile("([^\n]+?)[ \\t]*?=[ \\t]*?([0-9]+)");
 			fis = new FileInputStream(fullFile);
@@ -102,7 +104,7 @@ public class TokenVocabParser {
 					if ( tokenDef.length()>0 ) { // ignore blank lines
 						tool.errMgr.toolError(ErrorType.TOKENS_FILE_SYNTAX_ERROR,
 											  vocabName + CodeGenerator.VOCAB_FILE_EXTENSION,
-											  " bad token def: "+tokenDef,
+											  " bad token def: " + tokenDef,
 											  lineNum);
 					}
 				}
@@ -110,13 +112,25 @@ public class TokenVocabParser {
 			}
 		}
 		catch (FileNotFoundException fnfe) {
-			tool.errMgr.toolError(ErrorType.CANNOT_FIND_TOKENS_FILE,
-								  fullFile);
+			GrammarAST inTree = g.ast.getOptionAST("tokenVocab");
+			String inTreeValue = inTree.getToken().getText();
+			if ( vocabName.equals(inTreeValue) ) {
+				tool.errMgr.grammarError(ErrorType.CANNOT_FIND_TOKENS_FILE_REFD_IN_GRAMMAR,
+										 g.fileName,
+										 inTree.getToken(),
+										 fullFile);
+			}
+			else { // must be from -D option on cmd-line not token in tree
+				tool.errMgr.toolError(ErrorType.CANNOT_FIND_TOKENS_FILE_GIVEN_ON_CMDLINE,
+									  fullFile,
+									  g.name);
+			}
 		}
 		catch (Exception e) {
 			tool.errMgr.toolError(ErrorType.ERROR_READING_TOKENS_FILE,
+								  e,
 								  fullFile,
-								  e);
+								  e.getMessage());
 		}
 		finally {
 			try {
@@ -124,8 +138,9 @@ public class TokenVocabParser {
 			}
 			catch (IOException ioe) {
 				tool.errMgr.toolError(ErrorType.ERROR_READING_TOKENS_FILE,
+									  ioe,
 									  fullFile,
-									  ioe);
+									  ioe.getMessage());
 			}
 		}
 		return tokens;
@@ -141,8 +156,8 @@ public class TokenVocabParser {
 	 *  was no output directory specified.
 	 */
 	public File getImportedVocabFile() {
-
-		File f = new File(tool.libDirectory,
+		String vocabName = g.getOptionString("tokenVocab");
+		File f = new File(g.tool.libDirectory,
 						  File.separator +
 						  vocabName +
 						  CodeGenerator.VOCAB_FILE_EXTENSION);
@@ -154,7 +169,7 @@ public class TokenVocabParser {
 		// to look for it in the output directory which is where .tokens
 		// files are generated (in the base, not relative to the input
 		// location.)
-		f = new File(tool.outputDirectory, vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
+		f = new File(g.tool.outputDirectory, vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
 		return f;
 	}
 }
