@@ -659,8 +659,10 @@ public class TestLexerExec extends BaseTest {
 	}
 
 	/**
-	 * This is a regression test for antlr/antlr4#688 "Lexer cannot match
+	 * This is a regression test for antlr/antlr4#687 "Empty zero-length tokens
+	 * cannot have lexer commands" and antlr/antlr4#688 "Lexer cannot match
 	 * zero-length tokens"
+	 * https://github.com/antlr/antlr4/issues/687
 	 * https://github.com/antlr/antlr4/issues/688
 	 */
 	@Test public void testZeroLengthToken() throws Exception {
@@ -674,7 +676,7 @@ public class TestLexerExec extends BaseTest {
 			"mode StringMode;\n" +
 			"\n" +
 			"	StringMode_X : 'x' -> more;\n" +
-			"	StringMode_Done : {} -> more, mode(EndStringMode);\n" +
+			"	StringMode_Done : -> more, mode(EndStringMode);\n" +
 			"\n" +
 			"mode EndStringMode;	\n" +
 			"\n" +
