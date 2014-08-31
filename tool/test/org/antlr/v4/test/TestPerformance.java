@@ -270,7 +270,6 @@ public class TestPerformance extends BaseTest {
     private static final boolean TRY_LOCAL_CONTEXT_FIRST = true;
 	private static final boolean OPTIMIZE_LL1 = true;
 	private static final boolean OPTIMIZE_UNIQUE_CLOSURE = true;
-	private static final boolean OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS = false;
 	private static final boolean OPTIMIZE_TAIL_CALLS = true;
 	private static final boolean TAIL_CALL_PRESERVES_SLL = true;
 	private static final boolean TREAT_SLLK1_CONFLICT_AS_AMBIGUITY = false;
@@ -1329,7 +1328,6 @@ public class TestPerformance extends BaseTest {
 						parser.getInterpreter().enable_global_context_dfa = ENABLE_PARSER_FULL_CONTEXT_DFA;
 						parser.getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
 						parser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
-						parser.getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
 						parser.getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
 						parser.getInterpreter().tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
 						parser.getInterpreter().treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
@@ -1403,7 +1401,6 @@ public class TestPerformance extends BaseTest {
 							parser.getInterpreter().enable_global_context_dfa = ENABLE_PARSER_FULL_CONTEXT_DFA;
 							parser.getInterpreter().optimize_ll1 = OPTIMIZE_LL1;
 							parser.getInterpreter().optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
-							parser.getInterpreter().optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
 							parser.getInterpreter().optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
 							parser.getInterpreter().tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
 							parser.getInterpreter().treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;

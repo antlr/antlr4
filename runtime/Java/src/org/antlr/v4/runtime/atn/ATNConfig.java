@@ -53,6 +53,14 @@ public class ATNConfig {
 	@NotNull
 	private final ATNState state;
 
+	/**
+	 * This is a bit-field currently containing the following values.
+	 *
+	 * <ul>
+	 * <li>0x00FFFFFF: Alternative</li>
+	 * <li>0x7F000000: Outer context depth</li>
+	 * </ul>
+	 */
 	private int altAndOuterContextDepth;
 
 	/** The stack of invoking states leading to the rule/states associated
@@ -68,14 +76,14 @@ public class ATNConfig {
 	{
 		assert (alt & 0xFFFFFF) == alt;
 		this.state = state;
-		this.altAndOuterContextDepth = alt & 0x7FFFFFFF;
+		this.altAndOuterContextDepth = alt;
 		this.context = context;
 	}
 
 	protected ATNConfig(@NotNull ATNConfig c, @NotNull ATNState state, @NotNull PredictionContext context)
     {
 		this.state = state;
-		this.altAndOuterContextDepth = c.altAndOuterContextDepth & 0x7FFFFFFF;
+		this.altAndOuterContextDepth = c.altAndOuterContextDepth;
 		this.context = context;
 	}
 
@@ -115,17 +123,6 @@ public class ATNConfig {
 		return altAndOuterContextDepth & 0x00FFFFFF;
 	}
 
-	public final boolean isHidden() {
-		return altAndOuterContextDepth < 0;
-	}
-
-	public void setHidden(boolean value) {
-		if (value) {
-			altAndOuterContextDepth |= 0x80000000;
-		} else {
-			altAndOuterContextDepth &= ~0x80000000;
-		}
-	}
 	@NotNull
 	public final PredictionContext getContext() {
 		return context;

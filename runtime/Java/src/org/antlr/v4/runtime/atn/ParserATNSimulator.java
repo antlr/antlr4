@@ -317,6 +317,10 @@ public class ParserATNSimulator extends ATNSimulator {
 	public boolean enable_global_context_dfa = false;
 	public boolean optimize_unique_closure = true;
 	public boolean optimize_ll1 = true;
+	/**
+	 * @deprecated This flag is not currently used by the ATN simulator.
+	 */
+	@Deprecated
 	public boolean optimize_hidden_conflicted_configs = false;
 	public boolean optimize_tail_calls = true;
 	public boolean tail_call_preserves_sll = true;
@@ -2091,27 +2095,6 @@ public class ParserATNSimulator extends ATNSimulator {
 					return null;
 				}
 			}
-
-			if (!exact && optimize_hidden_conflicted_configs) {
-				for (int j = firstIndexCurrentState; j <= lastIndexCurrentStateMinAlt; j++) {
-					ATNConfig checkConfig = configs.get(j);
-
-					if (checkConfig.getSemanticContext() != SemanticContext.NONE
-						&& !checkConfig.getSemanticContext().equals(config.getSemanticContext()))
-					{
-						continue;
-					}
-
-					if (joinedCheckContext != checkConfig.getContext()) {
-						PredictionContext check = contextCache.join(checkConfig.getContext(), config.getContext());
-						if (!checkConfig.getContext().equals(check)) {
-							continue;
-						}
-					}
-
-					config.setHidden(true);
-				}
-			}
 		}
 
 		return alts;
@@ -2295,15 +2278,6 @@ public class ParserATNSimulator extends ATNSimulator {
 		if (!configs.isReadOnly()) {
 			if (configs.getConflictingAlts() == null) {
 				configs.setConflictingAlts(isConflicted(configs, contextCache));
-				if (optimize_hidden_conflicted_configs && configs.getConflictingAlts() != null) {
-					int size = configs.size();
-					configs.stripHiddenConfigs();
-					if (enableDfa && configs.size() < size) {
-						DFAState proposed = createDFAState(configs);
-						DFAState existing = dfa.states.get(proposed);
-						if ( existing!=null ) return existing;
-					}
-				}
 			}
 		}
 
