@@ -491,7 +491,8 @@ public class TestSemPredEvalParser extends BaseTest {
    		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
    								  "a!", false);
    		String expecting =
-   			"eval=true\n" + // now we are parsing
+   			"eval=false\n" +
+   			"eval=true\n" +
    			"parse\n";
    		assertEquals(expecting, found);
    	}

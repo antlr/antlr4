@@ -1716,6 +1716,10 @@ public class ParserATNSimulator extends ATNSimulator {
 					// no need to keep full context overhead when we step out
 					config = config.transform(config.getState(), PredictionContext.EMPTY_LOCAL, false);
 				}
+				else if (!config.getReachesIntoOuterContext() && PredictionContext.isEmptyLocal(config.getContext())) {
+					// add stop state when leaving decision rule for the first time
+					configs.add(config, contextCache);
+				}
 			}
 		}
 
