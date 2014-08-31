@@ -409,8 +409,8 @@ public class TestFullContextParsing extends BaseTest {
 			"s2**-ctx:19(stat)->s3**\n" +
 			"s3**-ctx:7(s)->s4\n" +
 			"s4-'else'->s5\n" +
-			"s5-ID->s6\n" +
-			"s6-'}'->:s7=>1\n";
+			"s5-ID->:s6=>1\n" +
+			":s6=>1-'}'->:s7=>1\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:29 reportAttemptingFullContext d=1 (stat), input='else'\n" +
 					 "line 1:38 reportAmbiguity d=1 (stat): ambigAlts={1, 2}, input='elsefoo}'\n",
@@ -431,8 +431,8 @@ public class TestFullContextParsing extends BaseTest {
 			"s2**-ctx:19(stat)->s3**\n" +
 			"s3**-ctx:7(s)->s4\n" +
 			"s4-'else'->s5\n" +
-			"s5-ID->s6\n" +
-			"s6-'else'->:s7=>1\n" +
+			"s5-ID->:s6=>1\n" +
+			":s6=>1-'else'->:s7=>1\n" +
 			"s8-'else'->:s7=>1\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:29 reportAttemptingFullContext d=1 (stat), input='else'\n" +
@@ -455,8 +455,8 @@ public class TestFullContextParsing extends BaseTest {
 			"s3-'else'->:s4=>1\n" +
 			"s5**-ctx:7(s)->s6\n" +
 			"s6-'else'->s7\n" +
-			"s7-ID->s8\n" +
-			"s8-'}'->:s9=>1\n";
+			"s7-ID->:s8=>1\n" +
+			":s8=>1-'}'->:s9=>1\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:19 reportAttemptingFullContext d=1 (stat), input='else'\n" +
 					 "line 1:19 reportContextSensitivity d=1 (stat), input='else'\n" +
@@ -478,8 +478,8 @@ public class TestFullContextParsing extends BaseTest {
 				"s3-'else'->:s4=>1\n" +
 				"s5**-ctx:7(s)->s6\n" +
 				"s6-'else'->s7\n" +
-				"s7-ID->s8\n" +
-				"s8-'}'->:s9=>1\n";
+				"s7-ID->:s8=>1\n" +
+				":s8=>1-'}'->:s9=>1\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:19 reportAttemptingFullContext d=1 (stat), input='else'\n" +
 					 "line 1:19 reportContextSensitivity d=1 (stat), input='else'\n" +
@@ -542,6 +542,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("alt 1\n", found);
 
 		String expecting =
+			"line 1:1 reportAttemptingFullContext d=0 (prog), input='a@'\n" +
 			"line 1:2 reportAmbiguity d=0 (prog): ambigAlts={1, 2}, input='a@'\n" +
 			"line 1:1 reportAttemptingFullContext d=1 (expr), input='a@'\n" +
 			"line 1:2 reportContextSensitivity d=1 (expr), input='a@'\n";

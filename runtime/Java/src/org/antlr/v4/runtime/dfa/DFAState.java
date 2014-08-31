@@ -83,14 +83,7 @@ public class DFAState {
 	private final int minSymbol;
 	private final int maxSymbol;
 
-	private boolean isAcceptState = false;
-
-	/** if accept state, what ttype do we match or alt do we predict?
-	 *  This is set to {@link ATN#INVALID_ALT_NUMBER} when {@link #predicates}{@code !=null}.
-	 */
-	private int prediction;
-
-	private LexerActionExecutor lexerActionExecutor;
+	private AcceptStateInfo acceptStateInfo;
 
 	/** These keys for these edges are the top level element of the global context. */
 	@Nullable
@@ -158,28 +151,32 @@ public class DFAState {
 		contextEdges = new SingletonEdgeMap<DFAState>(-1, atn.states.size() - 1);
 	}
 
-	public final boolean isAcceptState() {
-		return this.isAcceptState;
+	public final AcceptStateInfo getAcceptStateInfo() {
+		return acceptStateInfo;
 	}
 
-	public final void setAcceptState(boolean value) {
-		this.isAcceptState = value;
+	public final void setAcceptState(AcceptStateInfo acceptStateInfo) {
+		this.acceptStateInfo = acceptStateInfo;
+	}
+
+	public final boolean isAcceptState() {
+		return acceptStateInfo != null;
 	}
 
 	public final int getPrediction() {
-		return this.prediction;
-	}
+		if (acceptStateInfo == null) {
+			return ATN.INVALID_ALT_NUMBER;
+		}
 
-	public final void setPrediction(int value) {
-		this.prediction = value;
+		return acceptStateInfo.getPrediction();
 	}
 
 	public final LexerActionExecutor getLexerActionExecutor() {
-		return this.lexerActionExecutor;
-	}
+		if (acceptStateInfo == null) {
+			return null;
+		}
 
-	public final void setLexerActionExecutor(LexerActionExecutor value) {
-		this.lexerActionExecutor = value;
+		return acceptStateInfo.getLexerActionExecutor();
 	}
 
 	public synchronized DFAState getTarget(int symbol) {

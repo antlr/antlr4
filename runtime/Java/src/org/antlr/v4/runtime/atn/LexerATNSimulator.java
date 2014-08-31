@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.LexerNoViableAltException;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.dfa.AcceptStateInfo;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.Interval;
@@ -706,9 +707,9 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		if ( firstConfigWithRuleStopState!=null ) {
-			newState.setAcceptState(true);
-			newState.setLexerActionExecutor(firstConfigWithRuleStopState.getLexerActionExecutor());
-			newState.setPrediction(atn.ruleToTokenType[firstConfigWithRuleStopState.getState().ruleIndex]);
+			int prediction = atn.ruleToTokenType[firstConfigWithRuleStopState.getState().ruleIndex];
+			LexerActionExecutor lexerActionExecutor = firstConfigWithRuleStopState.getLexerActionExecutor();
+			newState.setAcceptState(new AcceptStateInfo(prediction, lexerActionExecutor));
 		}
 
 		return atn.modeToDFA[mode].addState(newState);
