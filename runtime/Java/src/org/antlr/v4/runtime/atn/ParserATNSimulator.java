@@ -2110,14 +2110,6 @@ public class ParserATNSimulator extends ATNSimulator {
 		return conflictingAlts;
 	}
 
-	protected int resolveToMinAlt(@NotNull DFAState D, BitSet conflictingAlts) {
-		// kill dead alts so we don't chase them ever
-//		killAlts(conflictingAlts, D.configset);
-		D.setPrediction(conflictingAlts.nextSetBit(0));
-		if ( debug ) System.out.println("RESOLVED TO "+D.getPrediction()+" for "+D);
-		return D.getPrediction();
-	}
-
 	@NotNull
 	public String getTokenName(int t) {
 		if ( t==Token.EOF ) return "EOF";
@@ -2289,7 +2281,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			newState.setPrediction(predictedAlt);
 		} else if (configs.getConflictingAlts() != null) {
 			newState.setAcceptState(true);
-			newState.setPrediction(resolveToMinAlt(newState, newState.configs.getConflictingAlts()));
+			newState.setPrediction(newState.configs.getConflictingAlts().nextSetBit(0));
 		}
 
 		if (newState.isAcceptState() && configs.hasSemanticContext()) {
