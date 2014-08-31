@@ -1083,7 +1083,7 @@ public class TestPerformance extends BaseTest {
                             contextsInDFAState = Arrays.copyOf(contextsInDFAState, state.configs.size() + 1);
                         }
 
-                        if (state.isAcceptState) {
+                        if (state.isAcceptState()) {
                             boolean hasGlobal = false;
                             for (ATNConfig config : state.configs) {
                                 if (config.getReachesIntoOuterContext()) {

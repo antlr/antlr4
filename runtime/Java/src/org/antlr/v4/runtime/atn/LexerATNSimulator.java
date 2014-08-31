@@ -224,7 +224,7 @@ public class LexerATNSimulator extends ATNSimulator {
 				break;
 			}
 
-			if (target.isAcceptState) {
+			if (target.isAcceptState()) {
 				captureSimState(prevAccept, input, target);
 				if (t == IntStream.EOF) {
 					break;
@@ -303,10 +303,10 @@ public class LexerATNSimulator extends ATNSimulator {
 							   ATNConfigSet reach, int t)
 	{
 		if (prevAccept.dfaState != null) {
-			LexerActionExecutor lexerActionExecutor = prevAccept.dfaState.lexerActionExecutor;
+			LexerActionExecutor lexerActionExecutor = prevAccept.dfaState.getLexerActionExecutor();
 			accept(input, lexerActionExecutor, startIndex,
 				prevAccept.index, prevAccept.line, prevAccept.charPos);
-			return prevAccept.dfaState.prediction;
+			return prevAccept.dfaState.getPrediction();
 		}
 		else {
 			// if no accept and EOF is first char, return EOF
@@ -706,9 +706,9 @@ public class LexerATNSimulator extends ATNSimulator {
 		}
 
 		if ( firstConfigWithRuleStopState!=null ) {
-			newState.isAcceptState = true;
-			newState.lexerActionExecutor = firstConfigWithRuleStopState.getLexerActionExecutor();
-			newState.prediction = atn.ruleToTokenType[firstConfigWithRuleStopState.getState().ruleIndex];
+			newState.setAcceptState(true);
+			newState.setLexerActionExecutor(firstConfigWithRuleStopState.getLexerActionExecutor());
+			newState.setPrediction(atn.ruleToTokenType[firstConfigWithRuleStopState.getState().ruleIndex]);
 		}
 
 		return atn.modeToDFA[mode].addState(newState);

@@ -92,7 +92,7 @@ public class DOTGenerator {
 
 		// define stop states first; seems to be a bug in DOT where doublecircle
 		for (DFAState d : dfa.states.keySet()) {
-			if ( !d.isAcceptState ) continue;
+			if ( !d.isAcceptState() ) continue;
 			ST st = stlib.getInstanceOf("stopstate");
 			st.add("name", "s"+d.stateNumber);
 			st.add("label", getStateLabel(d));
@@ -100,7 +100,7 @@ public class DOTGenerator {
 		}
 
 		for (DFAState d : dfa.states.keySet()) {
-			if ( d.isAcceptState ) continue;
+			if ( d.isAcceptState() ) continue;
 			if ( d.stateNumber == Integer.MAX_VALUE ) continue;
 			ST st = stlib.getInstanceOf("state");
 			st.add("name", "s"+d.stateNumber);
@@ -136,8 +136,8 @@ public class DOTGenerator {
 		StringBuilder buf = new StringBuilder(250);
 		buf.append('s');
 		buf.append(s.stateNumber);
-		if ( s.isAcceptState ) {
-			buf.append("=>").append(s.prediction);
+		if ( s.isAcceptState() ) {
+			buf.append("=>").append(s.getPrediction());
 		}
 		if ( grammar!=null ) {
 			BitSet alts = s.configs.getRepresentedAlternatives();

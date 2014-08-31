@@ -526,12 +526,12 @@ public class ParserATNSimulator extends ATNSimulator {
 					s = next;
 				}
 			}
-			if ( s.isAcceptState ) {
+			if ( s.isAcceptState() ) {
 				if ( s.predicates!=null ) {
 					if ( dfa_debug ) System.out.println("accept "+s);
 				}
 				else {
-					if ( dfa_debug ) System.out.println("accept; predict "+s.prediction +" in state "+s.stateNumber);
+					if ( dfa_debug ) System.out.println("accept; predict "+s.getPrediction() +" in state "+s.stateNumber);
 				}
 
 				// keep going unless we're at EOF or state only has one alt number
@@ -542,7 +542,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 
 			// t is not updated if one of these states is reached
-			assert !s.isAcceptState;
+			assert !s.isAcceptState();
 
 			// if no edge, pop over to ATN interpreter, update DFA and return
 			DFAState target = getExistingTargetState(s, t);
@@ -572,7 +572,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				return handleNoViableAlt(input, startIndex, errorState);
 			}
 			s = target;
-			if (!s.isAcceptState && t != IntStream.EOF) {
+			if (!s.isAcceptState() && t != IntStream.EOF) {
 				input.consume();
 				t = input.LA(1);
 			}
@@ -660,8 +660,8 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 
 		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
-											" predicts "+s.prediction);
-		return s.prediction;
+											" predicts "+s.getPrediction());
+		return s.getPrediction();
 	}
 
 	/** Performs ATN simulation to compute a predicted alternative based
@@ -731,11 +731,11 @@ public class ParserATNSimulator extends ATNSimulator {
 			DFAState D = nextState.s0;
 
 			// predicted alt => accept state
-			assert D.isAcceptState || getUniqueAlt(D.configs) == ATN.INVALID_ALT_NUMBER;
+			assert D.isAcceptState() || getUniqueAlt(D.configs) == ATN.INVALID_ALT_NUMBER;
 			// conflicted => accept state
-			assert D.isAcceptState || D.configs.getConflictingAlts() == null;
+			assert D.isAcceptState() || D.configs.getConflictingAlts() == null;
 
-			if (D.isAcceptState) {
+			if (D.isAcceptState()) {
 				BitSet conflictingAlts = D.configs.getConflictingAlts();
 				int predictedAlt = conflictingAlts == null ? getUniqueAlt(D.configs) : ATN.INVALID_ALT_NUMBER;
 				if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
@@ -757,7 +757,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					}
 				}
 
-				predictedAlt = D.prediction;
+				predictedAlt = D.getPrediction();
 //				int k = input.index() - startIndex + 1; // how much input we used
 //				System.out.println("used k="+k);
 				boolean attemptFullContext = conflictingAlts != null && userWantsCtxSensitive;
@@ -815,7 +815,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				}
 				else {
 					assert !useContext;
-					assert D.isAcceptState;
+					assert D.isAcceptState();
 
 					if ( debug ) System.out.println("RETRY with outerContext="+outerContext);
 					SimulatorState fullContextState = computeStartState(dfa, outerContext, true);
@@ -987,8 +987,8 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 		}
 
-		assert !s.isAcceptState;
-		if ( s.isAcceptState ) {
+		assert !s.isAcceptState();
+		if ( s.isAcceptState() ) {
 			return new SimulatorState(previous.outerContext, s, useContext, remainingGlobalContext);
 		}
 
@@ -1494,7 +1494,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			// Update DFA so reach becomes accept state with predicate
 			predPredictions = getPredicatePredictions(conflictingAlts, altToPred);
 			D.predicates = predPredictions;
-			D.prediction = ATN.INVALID_ALT_NUMBER; // make sure we use preds
+			D.setPrediction(ATN.INVALID_ALT_NUMBER); // make sure we use preds
 		}
 		return predPredictions;
 	}
@@ -2113,9 +2113,9 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected int resolveToMinAlt(@NotNull DFAState D, BitSet conflictingAlts) {
 		// kill dead alts so we don't chase them ever
 //		killAlts(conflictingAlts, D.configset);
-		D.prediction = conflictingAlts.nextSetBit(0);
-		if ( debug ) System.out.println("RESOLVED TO "+D.prediction+" for "+D);
-		return D.prediction;
+		D.setPrediction(conflictingAlts.nextSetBit(0));
+		if ( debug ) System.out.println("RESOLVED TO "+D.getPrediction()+" for "+D);
+		return D.getPrediction();
 	}
 
 	@NotNull
@@ -2285,14 +2285,14 @@ public class ParserATNSimulator extends ATNSimulator {
 		DecisionState decisionState = atn.getDecisionState(dfa.decision);
 		int predictedAlt = getUniqueAlt(configs);
 		if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
-			newState.isAcceptState = true;
-			newState.prediction = predictedAlt;
+			newState.setAcceptState(true);
+			newState.setPrediction(predictedAlt);
 		} else if (configs.getConflictingAlts() != null) {
-			newState.isAcceptState = true;
-			newState.prediction = resolveToMinAlt(newState, newState.configs.getConflictingAlts());
+			newState.setAcceptState(true);
+			newState.setPrediction(resolveToMinAlt(newState, newState.configs.getConflictingAlts()));
 		}
 
-		if (newState.isAcceptState && configs.hasSemanticContext()) {
+		if (newState.isAcceptState() && configs.hasSemanticContext()) {
 			predicateDFAState(newState, configs, decisionState.getNumberOfTransitions());
 		}
 
