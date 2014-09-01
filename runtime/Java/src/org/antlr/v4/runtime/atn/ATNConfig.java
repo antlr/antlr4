@@ -43,6 +43,13 @@ import org.antlr.v4.runtime.misc.Nullable;
  *  an ATN state.
  */
 public class ATNConfig {
+	/**
+	 * This field stores the bit mask for implementing the
+	 * {@link #isPrecedenceFilterSuppressed} property as a bit within the
+	 * existing {@link #reachesIntoOuterContext} field.
+	 */
+	private static final int SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
+
 	/** The ATN state associated with this configuration */
 	@NotNull
 	public final ATNState state;
@@ -64,9 +71,21 @@ public class ATNConfig {
 	 * dependent predicates unless we are in the rule that initially
 	 * invokes the ATN simulator.
 	 *
-	 * closure() tracks the depth of how far we dip into the
-	 * outer context: depth &gt; 0.  Note that it may not be totally
-	 * accurate depth since I don't ever decrement. TODO: make it a boolean then
+	 * <p>
+	 * closure() tracks the depth of how far we dip into the outer context:
+	 * depth &gt; 0.  Note that it may not be totally accurate depth since I
+	 * don't ever decrement. TODO: make it a boolean then</p>
+	 *
+	 * <p>
+	 * For memory efficiency, the {@link #isPrecedenceFilterSuppressed} method
+	 * is also backed by this field. Since the field is publicly accessible, the
+	 * highest bit which would not cause the value to become negative is used to
+	 * store this field. This choice minimizes the risk that code which only
+	 * compares this value to 0 would be affected by the new purpose of the
+	 * flag. It also ensures the performance of the existing {@link ATNConfig}
+	 * constructors as well as certain operations like
+	 * {@link ATNConfigSet#add(ATNConfig, DoubleKeyMap)} method are
+	 * <em>completely</em> unaffected by the change.</p>
 	 */
 	public int reachesIntoOuterContext;
 
@@ -132,6 +151,28 @@ public class ATNConfig {
 		this.reachesIntoOuterContext = c.reachesIntoOuterContext;
 	}
 
+	/**
+	 * This method gets the value of the {@link #reachesIntoOuterContext} field
+	 * as it existed prior to the introduction of the
+	 * {@link #isPrecedenceFilterSuppressed} method.
+	 */
+	public final int getOuterContextDepth() {
+		return reachesIntoOuterContext & ~SUPPRESS_PRECEDENCE_FILTER;
+	}
+
+	public final boolean isPrecedenceFilterSuppressed() {
+		return (reachesIntoOuterContext & SUPPRESS_PRECEDENCE_FILTER) != 0;
+	}
+
+	public final void setPrecedenceFilterSuppressed(boolean value) {
+		if (value) {
+			this.reachesIntoOuterContext |= 0x40000000;
+		}
+		else {
+			this.reachesIntoOuterContext &= ~SUPPRESS_PRECEDENCE_FILTER;
+		}
+	}
+
 	/** An ATN configuration is equal to another if both have
      *  the same state, they predict the same alternative, and
      *  syntactic/semantic contexts are the same.
@@ -155,7 +196,8 @@ public class ATNConfig {
 		return this.state.stateNumber==other.state.stateNumber
 			&& this.alt==other.alt
 			&& (this.context==other.context || (this.context != null && this.context.equals(other.context)))
-			&& this.semanticContext.equals(other.semanticContext);
+			&& this.semanticContext.equals(other.semanticContext)
+			&& this.isPrecedenceFilterSuppressed() == other.isPrecedenceFilterSuppressed();
 	}
 
 	@Override
@@ -195,8 +237,8 @@ public class ATNConfig {
             buf.append(",");
             buf.append(semanticContext);
         }
-        if ( reachesIntoOuterContext>0 ) {
-            buf.append(",up=").append(reachesIntoOuterContext);
+        if ( getOuterContextDepth()>0 ) {
+            buf.append(",up=").append(getOuterContextDepth());
         }
 		buf.append(')');
 		return buf.toString();

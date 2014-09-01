@@ -320,7 +320,15 @@ public class ATNDeserializer {
 				}
 
 				RuleTransition ruleTransition = (RuleTransition)t;
-				atn.ruleToStopState[ruleTransition.target.ruleIndex].addTransition(new EpsilonTransition(ruleTransition.followState));
+				int outermostPrecedenceReturn = -1;
+				if (atn.ruleToStartState[ruleTransition.target.ruleIndex].isPrecedenceRule) {
+					if (ruleTransition.precedence == 0) {
+						outermostPrecedenceReturn = ruleTransition.target.ruleIndex;
+					}
+				}
+
+				EpsilonTransition returnTransition = new EpsilonTransition(ruleTransition.followState, outermostPrecedenceReturn);
+				atn.ruleToStopState[ruleTransition.target.ruleIndex].addTransition(returnTransition);
 			}
 		}
 

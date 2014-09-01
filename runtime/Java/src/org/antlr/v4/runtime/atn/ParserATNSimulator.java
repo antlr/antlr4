@@ -316,6 +316,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected TokenStream _input;
 	protected int _startIndex;
 	protected ParserRuleContext _outerContext;
+	protected DFA _dfa;
 
 	/** Testing only! */
 	public ParserATNSimulator(@NotNull ATN atn, @NotNull DFA[] decisionToDFA,
@@ -360,6 +361,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		_startIndex = input.index();
 		_outerContext = outerContext;
 		DFA dfa = decisionToDFA[decision];
+		_dfa = dfa;
 
 		int m = input.mark();
 		int index = _startIndex;
@@ -426,6 +428,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 		finally {
 			mergeCache = null; // wack cache after each prediction
+			_dfa = null;
 			input.seek(index);
 			input.release(m);
 		}
@@ -999,8 +1002,9 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * <ol>
 	 * <li>Evaluate the precedence predicates for each configuration using
 	 * {@link SemanticContext#evalPrecedence}.</li>
-	 * <li>Remove all configurations which predict an alternative greater than
-	 * 1, for which another configuration that predicts alternative 1 is in the
+	 * <li>When {@link ATNConfig#isPrecedenceFilterSuppressed} is {@code false},
+	 * remove all configurations which predict an alternative greater than 1,
+	 * for which another configuration that predicts alternative 1 is in the
 	 * same ATN state with the same prediction context. This transformation is
 	 * valid for the following reasons:
 	 * <ul>
@@ -1012,7 +1016,10 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * epsilon transition, so the only way an alternative other than 1 can exist
 	 * in a state that is also reachable via alternative 1 is by nesting calls
 	 * to the left-recursive rule, with the outer calls not being at the
-	 * preferred precedence level.</li>
+	 * preferred precedence level. The
+	 * {@link ATNConfig#isPrecedenceFilterSuppressed} property marks ATN
+	 * configurations which do not meet this condition, and therefore are not
+	 * eligible for elimination during the filtering process.</li>
 	 * </ul>
 	 * </li>
 	 * </ol>
@@ -1076,14 +1083,16 @@ public class ParserATNSimulator extends ATNSimulator {
 				continue;
 			}
 
-			/* In the future, this elimination step could be updated to also
-			 * filter the prediction context for alternatives predicting alt>1
-			 * (basically a graph subtraction algorithm).
-			 */
-			PredictionContext context = statesFromAlt1.get(config.state.stateNumber);
-			if (context != null && context.equals(config.context)) {
-				// eliminated
-				continue;
+			if (!config.isPrecedenceFilterSuppressed()) {
+				/* In the future, this elimination step could be updated to also
+				 * filter the prediction context for alternatives predicting alt>1
+				 * (basically a graph subtraction algorithm).
+				 */
+				PredictionContext context = statesFromAlt1.get(config.state.stateNumber);
+				if (context != null && context.equals(config.context)) {
+					// eliminated
+					continue;
+				}
 			}
 
 			configSet.add(config, mergeCache);
@@ -1240,7 +1249,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected int getAltThatFinishedDecisionEntryRule(ATNConfigSet configs) {
 		IntervalSet alts = new IntervalSet();
 		for (ATNConfig c : configs) {
-			if ( c.reachesIntoOuterContext>0 || (c.state instanceof RuleStopState && c.context.hasEmptyPath()) ) {
+			if ( c.getOuterContextDepth()>0 || (c.state instanceof RuleStopState && c.context.hasEmptyPath()) ) {
 				alts.add(c.alt);
 			}
 		}
@@ -1409,6 +1418,10 @@ public class ParserATNSimulator extends ATNSimulator {
 					// While we have context to pop back from, we may have
 					// gotten that context AFTER having falling off a rule.
 					// Make sure we track that we are now out of context.
+					//
+					// This assignment also propagates the
+					// isPrecedenceFilterSuppressed() value to the new
+					// configuration.
 					c.reachesIntoOuterContext = config.reachesIntoOuterContext;
 					assert depth > Integer.MIN_VALUE;
 					closureCheckingStopState(c, configs, closureBusy, collectPredicates,
@@ -1474,6 +1487,13 @@ public class ParserATNSimulator extends ATNSimulator {
 					if (!closureBusy.add(c)) {
 						// avoid infinite recursion for right-recursive rules
 						continue;
+					}
+
+					if (_dfa != null && _dfa.isPrecedenceDfa()) {
+						int outermostPrecedenceReturn = ((EpsilonTransition)t).outermostPrecedenceReturn();
+						if (outermostPrecedenceReturn == _dfa.atnStartState.ruleIndex) {
+							c.setPrecedenceFilterSuppressed(true);
+						}
 					}
 
 					c.reachesIntoOuterContext++;

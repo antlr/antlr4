@@ -121,7 +121,7 @@ outerAlternative returns [boolean isLeftRec]
     ;
 
 binary
-	:	^( ALT elementOptions? recurse element+ recurse epsilonElement* )
+	:	^( ALT elementOptions? recurse element* recurse epsilonElement* )
         {setAltAssoc((AltAST)$ALT,currentOuterAltNumber);}
 	;
 

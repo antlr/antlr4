@@ -161,7 +161,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		if ( config.semanticContext!=SemanticContext.NONE ) {
 			hasSemanticContext = true;
 		}
-		if (config.reachesIntoOuterContext > 0) {
+		if (config.getOuterContextDepth() > 0) {
 			dipsIntoOuterContext = true;
 		}
 		ATNConfig existing = configLookup.getOrAdd(config);
@@ -179,6 +179,12 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		// cache at both places.
 		existing.reachesIntoOuterContext =
 			Math.max(existing.reachesIntoOuterContext, config.reachesIntoOuterContext);
+
+		// make sure to preserve the precedence filter suppression during the merge
+		if (config.isPrecedenceFilterSuppressed()) {
+			existing.setPrecedenceFilterSuppressed(true);
+		}
+
 		existing.context = merged; // replace context; no need to alt mapping
 		return true;
 	}
