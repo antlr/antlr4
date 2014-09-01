@@ -567,4 +567,90 @@ public class TestToolSyntaxErrors extends BaseTest {
 
 		super.testErrors(pair, true);
 	}
+
+	@Test public void testChannelDefinitionInLexer() throws Exception {
+		String grammar =
+			"lexer grammar T;\n" +
+			"\n" +
+			"channels {\n" +
+			"	WHITESPACE_CHANNEL,\n" +
+			"	COMMENT_CHANNEL\n" +
+			"}\n" +
+			"\n" +
+			"COMMENT:    '//' ~[\\n]+ -> channel(COMMENT_CHANNEL);\n" +
+			"WHITESPACE: [ \\t]+      -> channel(WHITESPACE_CHANNEL);\n";
+
+		String expected = "";
+
+		String[] pair = { grammar, expected };
+		super.testErrors(pair, true);
+	}
+
+	@Test public void testChannelDefinitionInParser() throws Exception {
+		String grammar =
+			"parser grammar T;\n" +
+			"\n" +
+			"channels {\n" +
+			"	WHITESPACE_CHANNEL,\n" +
+			"	COMMENT_CHANNEL\n" +
+			"}\n" +
+			"\n" +
+			"start : EOF;\n";
+
+		String expected =
+			"error(" + ErrorType.CHANNELS_BLOCK_IN_PARSER_GRAMMAR.code + "): T.g4:3:0: custom channels are not supported in parser grammars\n";
+
+		String[] pair = { grammar, expected };
+		super.testErrors(pair, true);
+	}
+
+	@Test public void testChannelDefinitionInCombined() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"\n" +
+			"channels {\n" +
+			"	WHITESPACE_CHANNEL,\n" +
+			"	COMMENT_CHANNEL\n" +
+			"}\n" +
+			"\n" +
+			"start : EOF;\n" +
+			"\n" +
+			"COMMENT:    '//' ~[\\n]+ -> channel(COMMENT_CHANNEL);\n" +
+			"WHITESPACE: [ \\t]+      -> channel(WHITESPACE_CHANNEL);\n";
+
+		String expected =
+			"warning(" + ErrorType.UNKNOWN_LEXER_CONSTANT.code + "): T.g4:10:35: rule COMMENT contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output\n" +
+			"warning(" + ErrorType.UNKNOWN_LEXER_CONSTANT.code + "): T.g4:11:35: rule WHITESPACE contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output\n" +
+			"error(" + ErrorType.CHANNELS_BLOCK_IN_COMBINED_GRAMMAR.code + "): T.g4:3:0: custom channels are not supported in combined grammars\n";
+
+		String[] pair = { grammar, expected };
+		super.testErrors(pair, true);
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#497 now that antlr/antlr4#309
+	 * is resolved.
+	 * https://github.com/antlr/antlr4/issues/497
+	 * https://github.com/antlr/antlr4/issues/309
+	 */
+	@Test public void testChannelDefinitions() throws Exception {
+		String grammar =
+			"lexer grammar T;\n" +
+			"\n" +
+			"channels {\n" +
+			"	WHITESPACE_CHANNEL,\n" +
+			"	COMMENT_CHANNEL\n" +
+			"}\n" +
+			"\n" +
+			"COMMENT:    '//' ~[\\n]+ -> channel(COMMENT_CHANNEL);\n" +
+			"WHITESPACE: [ \\t]+      -> channel(WHITESPACE_CHANNEL);\n" +
+			"NEWLINE:    '\\r'? '\\n' -> channel(NEWLINE_CHANNEL);";
+
+		// WHITESPACE_CHANNEL and COMMENT_CHANNEL are defined, but NEWLINE_CHANNEL is not
+		String expected =
+			"warning(" + ErrorType.UNKNOWN_LEXER_CONSTANT.code + "): T.g4:10:34: rule NEWLINE contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output\n";
+
+		String[] pair = { grammar, expected };
+		super.testErrors(pair, true);
+	}
 }

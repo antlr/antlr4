@@ -48,6 +48,7 @@ public class Lexer extends OutputModelObject {
 	public String name;
 	public String grammarFileName;
 	public Map<String,Integer> tokens;
+	public Map<String,Integer> channels;
 	public LexerFile file;
 	public String[] tokenNames;
 	public Set<String> ruleNames;
@@ -67,6 +68,7 @@ public class Lexer extends OutputModelObject {
 		grammarFileName = new File(g.fileName).getName();
 		name = g.getRecognizerName();
 		tokens = new LinkedHashMap<String,Integer>();
+		channels = new LinkedHashMap<String,Integer>();
 		LexerGrammar lg = (LexerGrammar)g;
 		atn = new SerializedATN(factory, lg.atn);
 		modes = lg.modes.keySet();
@@ -74,6 +76,10 @@ public class Lexer extends OutputModelObject {
 		for (String t : g.tokenNameToTypeMap.keySet()) {
 			Integer ttype = g.tokenNameToTypeMap.get(t);
 			if ( ttype>0 ) tokens.put(t, ttype);
+		}
+
+		for (Map.Entry<String, Integer> channel : g.channelNameToValueMap.entrySet()) {
+			channels.put(channel.getKey(), channel.getValue());
 		}
 
 		tokenNames = g.getTokenDisplayNames();

@@ -231,6 +231,26 @@ public class Grammar implements AttributeResolver {
 	 */
 	public final List<String> typeToTokenList = new ArrayList<String>();
 
+	/**
+	 * The maximum channel value which is assigned by this grammar. Values below
+	 * {@link Token#MIN_USER_CHANNEL_VALUE} are assumed to be predefined.
+	 */
+	int maxChannelType = Token.MIN_USER_CHANNEL_VALUE - 1;
+
+	/**
+	 * Map channel like {@code COMMENTS_CHANNEL} to its constant channel value.
+	 * Only user-defined channels are defined in this map.
+	 */
+	public final Map<String, Integer> channelNameToValueMap = new LinkedHashMap<String, Integer>();
+
+	/**
+	 * Map a constant channel value to its name. Indexed with raw channel value.
+	 * The predefined channels {@link Token#DEFAULT_CHANNEL} and
+	 * {@link Token#HIDDEN_CHANNEL} are not stored in this list, so the values
+	 * at the corresponding indexes is {@code null}.
+	 */
+	public final List<String> channelValueToNameList = new ArrayList<String>();
+
     /** Map a name to an action.
      *  The code generator will use this to fill holes in the output files.
      *  I track the AST node for the action in case I need the line number
@@ -666,6 +686,26 @@ public class Grammar implements AttributeResolver {
 	}
 
 	/**
+	 * Gets the constant channel value for a user-defined channel.
+	 *
+	 * <p>
+	 * This method only returns channel values for user-defined channels. All
+	 * other channels, including the predefined channels
+	 * {@link Token#DEFAULT_CHANNEL} and {@link Token#HIDDEN_CHANNEL} along with
+	 * any channel defined in code (e.g. in a {@code @members{}} block), are
+	 * ignored.</p>
+	 *
+	 * @param channel The channel name.
+	 * @return The channel value, if {@code channel} is the name of a known
+	 * user-defined token channel; otherwise, -1.
+	 */
+	public int getChannelValue(String channel) {
+		Integer I = channelNameToValueMap.get(channel);
+		int i = (I != null) ? I : -1;
+		return i;
+	}
+
+	/**
 	 * Gets an array of rule names for rules defined or imported by the
 	 * grammar. The array index is the rule index, and the value is the name of
 	 * the rule with the corresponding {@link Rule#index}.
@@ -812,6 +852,12 @@ public class Grammar implements AttributeResolver {
 		return maxTokenType;
 	}
 
+	/** Return a new unique integer in the channel value space. */
+	public int getNewChannelNumber() {
+		maxChannelType++;
+		return maxChannelType;
+	}
+
 	public void importTokensFromTokensFile() {
 		String vocab = getOptionString("tokenVocab");
 		if ( vocab!=null ) {
@@ -832,6 +878,9 @@ public class Grammar implements AttributeResolver {
 		for (String tokenName: importG.stringLiteralToTypeMap.keySet()) {
 			defineStringLiteral(tokenName, importG.stringLiteralToTypeMap.get(tokenName));
 		}
+		for (Map.Entry<String, Integer> channel : importG.channelNameToValueMap.entrySet()) {
+			defineChannelName(channel.getKey(), channel.getValue());
+		}
 //		this.tokenNameToTypeMap.putAll( importG.tokenNameToTypeMap );
 //		this.stringLiteralToTypeMap.putAll( importG.stringLiteralToTypeMap );
 		int max = Math.max(this.typeToTokenList.size(), importG.typeToTokenList.size());
@@ -839,6 +888,13 @@ public class Grammar implements AttributeResolver {
 		for (int ttype=0; ttype<importG.typeToTokenList.size(); ttype++) {
 			maxTokenType = Math.max(maxTokenType, ttype);
 			this.typeToTokenList.set(ttype, importG.typeToTokenList.get(ttype));
+		}
+
+		max = Math.max(this.channelValueToNameList.size(), importG.channelValueToNameList.size());
+		Utils.setSize(channelValueToNameList, max);
+		for (int channelValue = 0; channelValue < importG.channelValueToNameList.size(); channelValue++) {
+			maxChannelType = Math.max(maxChannelType, channelValue);
+			this.channelValueToNameList.set(channelValue, importG.channelValueToNameList.get(channelValue));
 		}
 	}
 
@@ -900,6 +956,68 @@ public class Grammar implements AttributeResolver {
 		if ( prevToken==null || prevToken.charAt(0)=='\'' ) {
 			// only record if nothing there before or if thing before was a literal
 			typeToTokenList.set(ttype, text);
+		}
+	}
+
+	/**
+	 * Define a token channel with a specified name.
+	 *
+	 * <p>
+	 * If a channel with the specified name already exists, the previously
+	 * assigned channel value is returned.</p>
+	 *
+	 * @param name The channel name.
+	 * @return The constant channel value assigned to the channel.
+	 */
+	public int defineChannelName(String name) {
+		Integer prev = channelNameToValueMap.get(name);
+		if (prev == null) {
+			return defineChannelName(name, getNewChannelNumber());
+		}
+
+		return prev;
+	}
+
+	/**
+	 * Define a token channel with a specified name.
+	 *
+	 * <p>
+	 * If a channel with the specified name already exists, the previously
+	 * assigned channel value is not altered.</p>
+	 *
+	 * @param name The channel name.
+	 * @return The constant channel value assigned to the channel.
+	 */
+	public int defineChannelName(String name, int value) {
+		Integer prev = channelNameToValueMap.get(name);
+		if (prev != null) {
+			return prev;
+		}
+
+		channelNameToValueMap.put(name, value);
+		setChannelNameForValue(value, name);
+		maxChannelType = Math.max(maxChannelType, value);
+		return value;
+	}
+
+	/**
+	 * Sets the channel name associated with a particular channel value.
+	 *
+	 * <p>
+	 * If a name has already been assigned to the channel with constant value
+	 * {@code channelValue}, this method does nothing.</p>
+	 *
+	 * @param channelValue The constant value for the channel.
+	 * @param name The channel name.
+	 */
+	public void setChannelNameForValue(int channelValue, String name) {
+		if (channelValue >= channelValueToNameList.size()) {
+			Utils.setSize(channelValueToNameList, channelValue + 1);
+		}
+
+		String prevChannel = channelValueToNameList.get(channelValue);
+		if (prevChannel == null) {
+			channelValueToNameList.set(channelValue, name);
 		}
 	}
 

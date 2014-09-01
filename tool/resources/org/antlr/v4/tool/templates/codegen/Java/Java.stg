@@ -848,6 +848,10 @@ public class <lexer.name> extends <superClass; null="Lexer"> {
 		new PredictionContextCache();
 	public static final int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
+	<if(lexer.channels)>
+	public static final int
+		<lexer.channels:{k | <k>=<lexer.channels.(k)>}; separator=", ", wrap, anchor>;
+	<endif>
 	<rest(lexer.modes):{m| public static final int <m> = <i>;}; separator="\n">
 	public static String[] modeNames = {
 		<lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor>
