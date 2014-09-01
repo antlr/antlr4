@@ -222,14 +222,10 @@ public enum ErrorType {
 	 * Compiler Error 56.
 	 *
 	 * <p>reference to undefined rule: <em>rule</em></p>
+	 *
+	 * @see #PARSER_RULE_REF_IN_LEXER_RULE
 	 */
 	UNDEFINED_RULE_REF(56, "reference to undefined rule: <arg>", ErrorSeverity.ERROR),
-	/**
-	 * Compiler Error 160.
-	 *
-	 * <p>reference to undefined rule: <em>rule</em></p>
-	 */
-	PARSER_RULE_REF_IN_LEXER_RULE(160, "reference to parser rule <arg> in lexer rule <arg2>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 57.
 	 *
@@ -924,6 +920,14 @@ public enum ErrorType {
 	 * @since 4.2.1
 	 */
 	RESERVED_RULE_NAME(159, "cannot declare a rule with reserved name <arg>", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 160.
+	 *
+	 * <p>reference to parser rule <em>rule</em> in lexer rule <em>name</em></p>
+	 *
+	 * @see #UNDEFINED_RULE_REF
+	 */
+	PARSER_RULE_REF_IN_LEXER_RULE(160, "reference to parser rule <arg> in lexer rule <arg2>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 161.
 	 *
