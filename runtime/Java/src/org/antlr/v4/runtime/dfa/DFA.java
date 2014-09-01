@@ -174,13 +174,8 @@ public class DFA {
 		if (this.precedenceDfa != precedenceDfa) {
 			this.states.clear();
 			if (precedenceDfa) {
-				DFAState precedenceState = new DFAState(new ATNConfigSet(), 0, 200);
-				precedenceState.isAcceptState = false;
-				this.s0.set(precedenceState);
-
-				DFAState fullContextPrecedenceState = new DFAState(new ATNConfigSet(), 0, 200);
-				fullContextPrecedenceState.isAcceptState = false;
-				this.s0full.set(fullContextPrecedenceState);
+				this.s0.set(new DFAState(new ATNConfigSet(), 0, 200));
+				this.s0full.set(new DFAState(new ATNConfigSet(), 0, 200));
 			}
 			else {
 				this.s0.set(null);

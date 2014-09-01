@@ -83,14 +83,7 @@ public class DFAState {
 	private final int minSymbol;
 	private final int maxSymbol;
 
-	public boolean isAcceptState = false;
-
-	/** if accept state, what ttype do we match or alt do we predict?
-	 *  This is set to {@link ATN#INVALID_ALT_NUMBER} when {@link #predicates}{@code !=null}.
-	 */
-	public int prediction;
-
-	public LexerActionExecutor lexerActionExecutor;
+	private AcceptStateInfo acceptStateInfo;
 
 	/** These keys for these edges are the top level element of the global context. */
 	@Nullable
@@ -156,6 +149,34 @@ public class DFAState {
 
 		contextSymbols = new BitSet();
 		contextEdges = new SingletonEdgeMap<DFAState>(-1, atn.states.size() - 1);
+	}
+
+	public final AcceptStateInfo getAcceptStateInfo() {
+		return acceptStateInfo;
+	}
+
+	public final void setAcceptState(AcceptStateInfo acceptStateInfo) {
+		this.acceptStateInfo = acceptStateInfo;
+	}
+
+	public final boolean isAcceptState() {
+		return acceptStateInfo != null;
+	}
+
+	public final int getPrediction() {
+		if (acceptStateInfo == null) {
+			return ATN.INVALID_ALT_NUMBER;
+		}
+
+		return acceptStateInfo.getPrediction();
+	}
+
+	public final LexerActionExecutor getLexerActionExecutor() {
+		if (acceptStateInfo == null) {
+			return null;
+		}
+
+		return acceptStateInfo.getLexerActionExecutor();
 	}
 
 	public synchronized DFAState getTarget(int symbol) {
@@ -270,13 +291,13 @@ public class DFAState {
 	public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append(stateNumber).append(":").append(configs);
-        if ( isAcceptState ) {
+        if ( isAcceptState() ) {
             buf.append("=>");
             if ( predicates!=null ) {
                 buf.append(Arrays.toString(predicates));
             }
             else {
-                buf.append(prediction);
+                buf.append(getPrediction());
             }
         }
 		return buf.toString();

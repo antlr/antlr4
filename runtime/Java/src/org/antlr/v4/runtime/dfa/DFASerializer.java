@@ -166,12 +166,12 @@ public class DFASerializer {
 
 		int n = s.stateNumber;
 		String stateStr = "s"+n;
-		if ( s.isAcceptState ) {
+		if ( s.isAcceptState() ) {
             if ( s.predicates!=null ) {
                 stateStr = ":s"+n+"=>"+Arrays.toString(s.predicates);
             }
             else {
-                stateStr = ":s"+n+"=>"+s.prediction;
+                stateStr = ":s"+n+"=>"+s.getPrediction();
             }
 		}
 

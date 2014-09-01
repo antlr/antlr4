@@ -566,4 +566,59 @@ public class TestParserExec extends BaseTest {
 		assertEquals("", found);
 		assertNull(stderrDuringParse);
 	}
+
+	/**
+	 * This is a regression test for tunnelvisionlabs/antlr4cs#71 "Erroneous
+	 * extraneous input detected in C# (but not in Java)".
+	 * https://github.com/tunnelvisionlabs/antlr4cs/issues/71
+	 */
+	@Test
+	public void testCSharpIssue71() {
+		String grammar =
+			"grammar Expr;\n" +
+			"\n" +
+			"root\n" +
+			"	:	assignment EOF\n" +
+			"	;\n" +
+			"\n" +
+			"assignment\n" +
+			"	:	LOCAL_VARIABLE '=' expression\n" +
+			"	;\n" +
+			"\n" +
+			"expression\n" +
+			"	:	logical_and_expression\n" +
+			"	;\n" +
+			"\n" +
+			"logical_and_expression\n" +
+			"	:	relational_expression ('AND' relational_expression)*\n" +
+			"	;\n" +
+			"\n" +
+			"relational_expression\n" +
+			"	:	primary_expression (('<'|'>') primary_expression)*\n" +
+			"	;\n" +
+			"\n" +
+			"primary_expression\n" +
+			"	:	'(' + expression + ')'\n" +
+			"	|	UNSIGNED_INT\n" +
+			"	|	LOCAL_VARIABLE\n" +
+			"	;\n" +
+			"\n" +
+			"LOCAL_VARIABLE\n" +
+			"	:	[_a-z][_a-zA-Z0-9]*\n" +
+			"	;\n" +
+			"\n" +
+			"UNSIGNED_INT\n" +
+			"	:	('0'|'1'..'9''0'..'9'*)\n" +
+			"	;\n" +
+			"\n" +
+			"WS\n" +
+			"	:	[ \\t\\r\\n]+ -> channel(HIDDEN)\n" +
+			"	;\n";
+
+		String input = "b = (((a > 10)) AND ((a < 15)))";
+		String found = execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "root",
+								  input, false);
+		assertEquals("", found);
+		assertNull(stderrDuringParse);
+	}
 }

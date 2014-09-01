@@ -81,7 +81,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	private final ArrayList<ATNConfig> configs;
 
 	private int uniqueAlt;
-	private BitSet conflictingAlts;
+	private ConflictInfo conflictInfo;
 	// Used in parser and lexer. In lexer, it indicates we hit a pred
 	// while computing a closure operation.  Don't make a DFA state from this.
 	private boolean hasSemanticContext;
@@ -128,7 +128,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 		if (readonly || !set.isReadOnly()) {
 			this.uniqueAlt = set.uniqueAlt;
-			this.conflictingAlts = set.conflictingAlts;
+			this.conflictInfo = set.conflictInfo;
 		}
 
 		// if (!readonly && set.isReadOnly()) -> addAll is called from clone()
@@ -140,8 +140,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 */
 	@NotNull
 	public BitSet getRepresentedAlternatives() {
-		if (conflictingAlts != null) {
-			return (BitSet)conflictingAlts.clone();
+		if (conflictInfo != null) {
+			return (BitSet)conflictInfo.getConflictedAlts().clone();
 		}
 
 		BitSet alts = new BitSet();
@@ -154,31 +154,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 	public final boolean isReadOnly() {
 		return mergedConfigs == null;
-	}
-
-	public final void stripHiddenConfigs() {
-		ensureWritable();
-
-		Iterator<Map.Entry<Long, ATNConfig>> iterator = mergedConfigs.entrySet().iterator();
-		while (iterator.hasNext()) {
-			if (iterator.next().getValue().isHidden()) {
-				iterator.remove();
-			}
-		}
-
-		ListIterator<ATNConfig> iterator2 = unmerged.listIterator();
-		while (iterator2.hasNext()) {
-			if (iterator2.next().isHidden()) {
-				iterator2.remove();
-			}
-		}
-
-		iterator2 = configs.listIterator();
-		while (iterator2.hasNext()) {
-			if (iterator2.next().isHidden()) {
-				iterator2.remove();
-			}
-		}
 	}
 
 	public boolean isOutermostConfigSet() {
@@ -278,7 +253,6 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	public boolean add(ATNConfig e, @Nullable PredictionContextCache contextCache) {
 		ensureWritable();
 		assert !outermostConfigSet || !e.getReachesIntoOuterContext();
-		assert !e.isHidden();
 
 		if (contextCache == null) {
 			contextCache = PredictionContextCache.UNCACHED;
@@ -431,7 +405,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		dipsIntoOuterContext = false;
 		hasSemanticContext = false;
 		uniqueAlt = ATN.INVALID_ALT_NUMBER;
-		conflictingAlts = null;
+		conflictInfo = null;
 	}
 
 	@Override
@@ -446,7 +420,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 		ATNConfigSet other = (ATNConfigSet)obj;
 		return this.outermostConfigSet == other.outermostConfigSet
-			&& Utils.equals(conflictingAlts, other.conflictingAlts)
+			&& Utils.equals(conflictInfo, other.conflictInfo)
 			&& configs.equals(other.configs);
 	}
 
@@ -501,7 +475,12 @@ public class ATNConfigSet implements Set<ATNConfig> {
 
 		if ( hasSemanticContext ) buf.append(",hasSemanticContext=").append(hasSemanticContext);
 		if ( uniqueAlt!=ATN.INVALID_ALT_NUMBER ) buf.append(",uniqueAlt=").append(uniqueAlt);
-		if ( conflictingAlts!=null ) buf.append(",conflictingAlts=").append(conflictingAlts);
+		if ( conflictInfo!=null ) {
+			buf.append(",conflictingAlts=").append(conflictInfo.getConflictedAlts());
+			if (!conflictInfo.isExact()) {
+				buf.append("*");
+			}
+		}
 		if ( dipsIntoOuterContext ) buf.append(",dipsIntoOuterContext");
 		return buf.toString();
 	}
@@ -524,13 +503,29 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		hasSemanticContext = true;
 	}
 
-	public BitSet getConflictingAlts() {
-		return conflictingAlts;
+	public ConflictInfo getConflictInfo() {
+		return conflictInfo;
 	}
 
-	public void setConflictingAlts(BitSet conflictingAlts) {
+	public void setConflictInfo(ConflictInfo conflictInfo) {
 		ensureWritable();
-		this.conflictingAlts = conflictingAlts;
+		this.conflictInfo = conflictInfo;
+	}
+
+	public BitSet getConflictingAlts() {
+		if (conflictInfo == null) {
+			return null;
+		}
+
+		return conflictInfo.getConflictedAlts();
+	}
+
+	public boolean isExactConflict() {
+		if (conflictInfo == null) {
+			return false;
+		}
+
+		return conflictInfo.isExact();
 	}
 
 	public boolean getDipsIntoOuterContext() {
