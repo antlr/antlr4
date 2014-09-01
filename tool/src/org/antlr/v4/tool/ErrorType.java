@@ -924,6 +924,30 @@ public enum ErrorType {
 	 * @since 4.2.1
 	 */
 	RESERVED_RULE_NAME(159, "cannot declare a rule with reserved name <arg>", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 161.
+	 *
+	 * <p>channel <em>name</em> conflicts with token with same name</p>
+	 */
+	CHANNEL_CONFLICTS_WITH_TOKEN(161, "channel <arg> conflicts with token with same name", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 162.
+	 *
+	 * <p>channel <em>name</em> conflicts with mode with same name</p>
+	 */
+	CHANNEL_CONFLICTS_WITH_MODE(162, "channel <arg> conflicts with mode with same name", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 163.
+	 *
+	 * <p>custom channels are not supported in parser grammars</p>
+	 */
+	CHANNELS_BLOCK_IN_PARSER_GRAMMAR(163, "custom channels are not supported in parser grammars", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 164.
+	 *
+	 * <p>custom channels are not supported in combined grammars</p>
+	 */
+	CHANNELS_BLOCK_IN_COMBINED_GRAMMAR(164, "custom channels are not supported in combined grammars", ErrorSeverity.ERROR),
 
 	/*
 	 * Backward incompatibility errors

@@ -434,12 +434,13 @@ NESTED_ACTION
 // keywords used to specify ANTLR v3 grammars. Keywords may not be used as
 // labels for rules or in any other context where they would be ambiguous
 // with the keyword vs some other identifier
-// OPTIONS and TOKENS must also consume the opening brace that captures
-// their option block, as this is teh easiest way to parse it separate
-// to an ACTION block, despite it usingthe same {} delimiters.
+// OPTIONS, TOKENS, and CHANNELS must also consume the opening brace that captures
+// their option block, as this is the easiest way to parse it separate
+// to an ACTION block, despite it using the same {} delimiters.
 //
-OPTIONS      : 'options' WSNLCHARS* '{'  ;
-TOKENS_SPEC  : 'tokens'  WSNLCHARS* '{'  ;
+OPTIONS      : 'options'  WSNLCHARS* '{'  ;
+TOKENS_SPEC  : 'tokens'   WSNLCHARS* '{'  ;
+CHANNELS     : 'channels' WSNLCHARS* '{'  ;
 
 IMPORT       : 'import'               ;
 FRAGMENT     : 'fragment'             ;

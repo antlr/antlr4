@@ -58,6 +58,19 @@ public interface Token {
 	public static final int HIDDEN_CHANNEL = 1;
 
 	/**
+	 * This is the minimum constant value which can be assigned to a
+	 * user-defined token channel.
+	 *
+	 * <p>
+	 * The non-negative numbers less than {@link #MIN_USER_CHANNEL_VALUE} are
+	 * assigned to the predefined channels {@link #DEFAULT_CHANNEL} and
+	 * {@link #HIDDEN_CHANNEL}.</p>
+	 *
+	 * @see Token#getChannel()
+	 */
+	public static final int MIN_USER_CHANNEL_VALUE = 2;
+
+	/**
 	 * Get the text of the token.
 	 */
 	String getText();
