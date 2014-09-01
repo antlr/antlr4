@@ -474,6 +474,11 @@ public class LexerATNFactory extends ParserATNFactory {
 			return tokenType;
 		}
 
+		int channelValue = g.getChannelValue(name);
+		if (channelValue >= org.antlr.v4.runtime.Token.MIN_USER_CHANNEL_VALUE) {
+			return channelValue;
+		}
+
 		List<String> modeNames = new ArrayList<String>(((LexerGrammar)g).modes.keySet());
 		int mode = modeNames.indexOf(name);
 		if (mode >= 0) {

@@ -349,6 +349,8 @@ public class ParserATNSimulator extends ATNSimulator {
 	 */
 	protected boolean userWantsCtxSensitive = true;
 
+	private DFA dfa;
+
 	/** Testing only! */
 	public ParserATNSimulator(@NotNull ATN atn) {
 		this(null, atn);
@@ -396,6 +398,8 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 		}
 
+		this.dfa = dfa;
+
 		if (force_global_context) {
 			useContext = true;
 		}
@@ -430,6 +434,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			return alt;
 		}
 		finally {
+			this.dfa = null;
 			input.seek(index);
 			input.release(m);
 		}
@@ -1333,6 +1338,14 @@ public class ParserATNSimulator extends ATNSimulator {
 				configs.setOutermostConfigSet(true);
 			}
 
+			if (!useContext || enable_global_context_dfa) {
+				if (!dfa.isPrecedenceDfa() && dfa.atnStartState instanceof StarLoopEntryState) {
+					if (((StarLoopEntryState)dfa.atnStartState).precedenceRuleDecision) {
+						dfa.setPrecedenceDfa(true);
+					}
+				}
+			}
+
 			final boolean collectPredicates = true;
 			closure(reachIntermediate, configs, collectPredicates, hasMoreContext, contextCache, false);
 			boolean stepIntoGlobal = configs.getDipsIntoOuterContext();
@@ -1343,12 +1356,6 @@ public class ParserATNSimulator extends ATNSimulator {
 				break;
 			}
 			else if (s0 == null) {
-				if (!dfa.isPrecedenceDfa() && dfa.atnStartState instanceof StarLoopEntryState) {
-					if (((StarLoopEntryState)dfa.atnStartState).precedenceRuleDecision) {
-						dfa.setPrecedenceDfa(true);
-					}
-				}
-
 				if (!dfa.isPrecedenceDfa()) {
 					AtomicReference<DFAState> reference = useContext ? dfa.s0full : dfa.s0;
 					next = addDFAState(dfa, configs, contextCache);
@@ -1416,8 +1423,9 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * <ol>
 	 * <li>Evaluate the precedence predicates for each configuration using
 	 * {@link SemanticContext#evalPrecedence}.</li>
-	 * <li>Remove all configurations which predict an alternative greater than
-	 * 1, for which another configuration that predicts alternative 1 is in the
+	 * <li>When {@link ATNConfig#isPrecedenceFilterSuppressed} is {@code false},
+	 * remove all configurations which predict an alternative greater than 1,
+	 * for which another configuration that predicts alternative 1 is in the
 	 * same ATN state with the same prediction context. This transformation is
 	 * valid for the following reasons:
 	 * <ul>
@@ -1429,7 +1437,10 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * epsilon transition, so the only way an alternative other than 1 can exist
 	 * in a state that is also reachable via alternative 1 is by nesting calls
 	 * to the left-recursive rule, with the outer calls not being at the
-	 * preferred precedence level.</li>
+	 * preferred precedence level. The
+	 * {@link ATNConfig#isPrecedenceFilterSuppressed} property marks ATN
+	 * configurations which do not meet this condition, and therefore are not
+	 * eligible for elimination during the filtering process.</li>
 	 * </ul>
 	 * </li>
 	 * </ol>
@@ -1493,14 +1504,16 @@ public class ParserATNSimulator extends ATNSimulator {
 				continue;
 			}
 
-			/* In the future, this elimination step could be updated to also
-			 * filter the prediction context for alternatives predicting alt>1
-			 * (basically a graph subtraction algorithm).
-			 */
-			PredictionContext context = statesFromAlt1.get(config.getState().stateNumber);
-			if (context != null && context.equals(config.getContext())) {
-				// eliminated
-				continue;
+			if (!config.isPrecedenceFilterSuppressed()) {
+				/* In the future, this elimination step could be updated to also
+				 * filter the prediction context for alternatives predicting alt>1
+				 * (basically a graph subtraction algorithm).
+				 */
+				PredictionContext context = statesFromAlt1.get(config.getState().stateNumber);
+				if (context != null && context.equals(config.getContext())) {
+					// eliminated
+					continue;
+				}
 			}
 
 			configSet.add(config, contextCache);
@@ -1731,6 +1744,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					// gotten that context AFTER having fallen off a rule.
 					// Make sure we track that we are now out of context.
 					c.setOuterContextDepth(config.getOuterContextDepth());
+					c.setPrecedenceFilterSuppressed(config.isPrecedenceFilterSuppressed());
 					assert depth > Integer.MIN_VALUE;
 					closure(c, configs, intermediate, closureBusy, collectPredicates, hasMoreContexts, contextCache, depth - 1, treatEofAsEpsilon);
 				}
@@ -1799,6 +1813,13 @@ public class ParserATNSimulator extends ATNSimulator {
 					if (!closureBusy.add(c)) {
 						// avoid infinite recursion for right-recursive rules
 						continue;
+					}
+
+					if (dfa != null && dfa.isPrecedenceDfa()) {
+						int outermostPrecedenceReturn = ((EpsilonTransition)t).outermostPrecedenceReturn();
+						if (outermostPrecedenceReturn == dfa.atnStartState.ruleIndex) {
+							c.setPrecedenceFilterSuppressed(true);
+						}
 					}
 
 					c.setOuterContextDepth(c.getOuterContextDepth() + 1);

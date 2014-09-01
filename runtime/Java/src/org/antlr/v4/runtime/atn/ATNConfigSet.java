@@ -264,6 +264,9 @@ public class ATNConfigSet implements Set<ATNConfig> {
 		addKey = (mergedConfig == null);
 		if (mergedConfig != null && canMerge(e, key, mergedConfig)) {
 			mergedConfig.setOuterContextDepth(Math.max(mergedConfig.getOuterContextDepth(), e.getOuterContextDepth()));
+			if (e.isPrecedenceFilterSuppressed()) {
+				mergedConfig.setPrecedenceFilterSuppressed(true);
+			}
 
 			PredictionContext joined = PredictionContext.join(mergedConfig.getContext(), e.getContext(), contextCache);
 			updatePropertiesForMergedConfig(e);
@@ -279,6 +282,9 @@ public class ATNConfigSet implements Set<ATNConfig> {
 			ATNConfig unmergedConfig = unmerged.get(i);
 			if (canMerge(e, key, unmergedConfig)) {
 				unmergedConfig.setOuterContextDepth(Math.max(unmergedConfig.getOuterContextDepth(), e.getOuterContextDepth()));
+				if (e.isPrecedenceFilterSuppressed()) {
+					unmergedConfig.setPrecedenceFilterSuppressed(true);
+				}
 
 				PredictionContext joined = PredictionContext.join(unmergedConfig.getContext(), e.getContext(), contextCache);
 				updatePropertiesForMergedConfig(e);

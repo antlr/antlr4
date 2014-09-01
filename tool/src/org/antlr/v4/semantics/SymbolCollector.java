@@ -65,6 +65,7 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	public List<GrammarAST> tokenIDRefs = new ArrayList<GrammarAST>();
 	public Set<String> strings = new HashSet<String>();
 	public List<GrammarAST> tokensDefs = new ArrayList<GrammarAST>();
+	public List<GrammarAST> channelDefs = new ArrayList<GrammarAST>();
 
 	/** Track action name node in @parser::members {...} or @members {...} */
 	List<GrammarAST> namedActions = new ArrayList<GrammarAST>();
@@ -95,6 +96,11 @@ public class SymbolCollector extends GrammarTreeVisitor {
 		terminals.add(ID);
 		tokenIDRefs.add(ID);
 		tokensDefs.add(ID);
+	}
+
+	@Override
+	public void defineChannel(GrammarAST ID) {
+		channelDefs.add(ID);
 	}
 
 	@Override

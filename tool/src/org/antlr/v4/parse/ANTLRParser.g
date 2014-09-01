@@ -237,6 +237,9 @@ prequelConstruct
       // {tree} parser.
       tokensSpec
 
+	| // A list of custom channels used by the grammar
+	  channelsSpec
+
     | // A declaration of language target implemented constructs. All such
       // action sections start with '@' and are given to the language target's
       // StringTemplate group. For instance @parser::header and @lexer::header
@@ -299,6 +302,10 @@ v3tokenSpec
 		|								-> id
 		)
 		SEMI
+	;
+
+channelsSpec
+	:	CHANNELS^ id (COMMA! id)* RBRACE!
 	;
 
 // A declaration of a language target specifc section,

@@ -334,7 +334,15 @@ public class ATNDeserializer {
 					continue;
 				}
 
-				atn.ruleToStopState[ruleTransition.target.ruleIndex].addTransition(new EpsilonTransition(ruleTransition.followState));
+				int outermostPrecedenceReturn = -1;
+				if (atn.ruleToStartState[ruleTransition.target.ruleIndex].isPrecedenceRule) {
+					if (ruleTransition.precedence == 0) {
+						outermostPrecedenceReturn = ruleTransition.target.ruleIndex;
+					}
+				}
+
+				EpsilonTransition returnTransition = new EpsilonTransition(ruleTransition.followState, outermostPrecedenceReturn);
+				atn.ruleToStopState[ruleTransition.target.ruleIndex].addTransition(returnTransition);
 			}
 		}
 
@@ -794,6 +802,7 @@ public class ATNDeserializer {
 				Transition transition = state.getOptimizedTransition(i);
 				ATNState intermediate = transition.target;
 				if (transition.getSerializationType() != Transition.EPSILON
+					|| ((EpsilonTransition)transition).outermostPrecedenceReturn() != -1
 					|| intermediate.getStateType() != ATNState.BASIC
 					|| !intermediate.onlyHasEpsilonTransitions())
 				{
@@ -805,7 +814,9 @@ public class ATNDeserializer {
 				}
 
 				for (int j = 0; j < intermediate.getNumberOfOptimizedTransitions(); j++) {
-					if (intermediate.getOptimizedTransition(j).getSerializationType() != Transition.EPSILON) {
+					if (intermediate.getOptimizedTransition(j).getSerializationType() != Transition.EPSILON
+						|| ((EpsilonTransition)intermediate.getOptimizedTransition(j)).outermostPrecedenceReturn() != -1)
+					{
 						if (optimizedTransitions != null) {
 							optimizedTransitions.add(transition);
 						}

@@ -125,6 +125,7 @@ public void grammarOption(GrammarAST ID, GrammarAST valueAST) { }
 public void ruleOption(GrammarAST ID, GrammarAST valueAST) { }
 public void blockOption(GrammarAST ID, GrammarAST valueAST) { }
 public void defineToken(GrammarAST ID) { }
+public void defineChannel(GrammarAST ID) { }
 public void globalNamedAction(GrammarAST scope, GrammarAST ID, ActionAST action) { }
 public void importGrammar(GrammarAST label, GrammarAST ID) { }
 
@@ -188,6 +189,12 @@ protected void exitTokensSpec(GrammarAST tree) { }
 
 protected void enterTokenSpec(GrammarAST tree) { }
 protected void exitTokenSpec(GrammarAST tree) { }
+
+protected void enterChannelsSpec(GrammarAST tree) { }
+protected void exitChannelsSpec(GrammarAST tree) { }
+
+protected void enterChannelSpec(GrammarAST tree) { }
+protected void exitChannelSpec(GrammarAST tree) { }
 
 protected void enterAction(GrammarAST tree) { }
 protected void exitAction(GrammarAST tree) { }
@@ -366,6 +373,7 @@ prequelConstruct
 	:   optionsSpec
     |   delegateGrammars
     |   tokensSpec
+    |   channelsSpec
     |   action
     ;
 
@@ -448,6 +456,26 @@ tokenSpec
 	exitTokenSpec($start);
 }
 	:	ID					{defineToken($ID);}
+	;
+
+channelsSpec
+@init {
+	enterChannelsSpec($start);
+}
+@after {
+	exitChannelsSpec($start);
+}
+	:   ^(CHANNELS channelSpec+)
+	;
+
+channelSpec
+@init {
+	enterChannelSpec($start);
+}
+@after {
+	exitChannelSpec($start);
+}
+	:	ID					{defineChannel($ID);}
 	;
 
 action

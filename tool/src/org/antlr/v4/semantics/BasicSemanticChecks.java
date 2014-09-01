@@ -258,6 +258,21 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
+	protected void enterChannelsSpec(GrammarAST tree) {
+		if (g.isParser()) {
+			g.tool.errMgr.grammarError(ErrorType.CHANNELS_BLOCK_IN_PARSER_GRAMMAR, g.fileName, tree.token);
+		}
+		else if (g.isCombined()) {
+			g.tool.errMgr.grammarError(ErrorType.CHANNELS_BLOCK_IN_COMBINED_GRAMMAR, g.fileName, tree.token);
+		}
+	}
+
+	@Override
+	public void defineChannel(GrammarAST ID) {
+		checkChannelDefinition(ID.token);
+	}
+
+	@Override
 	public void elementOption(GrammarASTWithOptions elem, GrammarAST ID, GrammarAST valueAST) {
 		String v = null;
 		@SuppressWarnings("unused")
@@ -395,6 +410,9 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 									   tokenID,
 									   tokenID.getText());
 		}
+	}
+
+	void checkChannelDefinition(Token tokenID) {
 	}
 
 	@Override
