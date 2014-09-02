@@ -178,7 +178,6 @@ public class TestParserProfiler extends BaseTest {
 		assertEquals(expecting, info[1].toString());
 	}
 
-	@Ignore
 	@Test public void testSimpleLanguage() throws Exception {
 		Grammar g = new Grammar(TestXPath.grammar);
 		String input =
@@ -187,15 +186,25 @@ public class TestParserProfiler extends BaseTest {
 			"def h(x) { a=3; x=0+1; return a*x; }\n";
 		DecisionInfo[] info = interpAndGetDecisionInfo(g.getImplicitLexer(), g, "prog", input);
 		String expecting =
-			"[{decision=0, contextSensitivities=1, errors=0, ambiguities=0, SLL_lookahead=3, " +
-			"SLL_ATNTransitions=2, SLL_DFATransitions=0, LL_Fallback=1, LL_ATNTransitions=1}]";
-
+			"[{decision=0, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=3, " +
+			  "SLL_ATNTransitions=2, SLL_DFATransitions=1, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}, " +
+			 "{decision=1, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=9, " +
+			  "SLL_ATNTransitions=2, SLL_DFATransitions=7, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}, " +
+			 "{decision=2, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=7, " +
+			  "SLL_ATNTransitions=4, SLL_DFATransitions=3, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}, " +
+			 "{decision=3, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=11, " +
+			  "SLL_ATNTransitions=5, SLL_DFATransitions=6, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}, " +
+			 "{decision=4, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=13, " +
+			  "SLL_ATNTransitions=3, SLL_DFATransitions=10, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}, " +
+			 "{decision=5, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=24, " +
+			  "SLL_ATNTransitions=7, SLL_DFATransitions=17, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}, " +
+			 "{decision=6, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=19, " +
+			  "SLL_ATNTransitions=2, SLL_DFATransitions=17, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}]";
 
 		assertEquals(expecting, Arrays.toString(info));
-		assertEquals(1, info.length);
+		assertEquals(7, info.length);
 	}
 
-	@Ignore
 	@Test public void testDeepLookahead() throws Exception {
 		Grammar g = new Grammar(
 				"parser grammar T;\n" +
@@ -216,8 +225,8 @@ public class TestParserProfiler extends BaseTest {
 		String expecting =
 			"[{decision=0, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=6, " +
 			  "SLL_ATNTransitions=6, SLL_DFATransitions=0, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}, " +
-			 "{decision=1, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=4, " +
-			  "SLL_ATNTransitions=2, SLL_DFATransitions=2, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}]";
+			 "{decision=1, contextSensitivities=0, errors=0, ambiguities=1, SLL_lookahead=5, " +
+			  "SLL_ATNTransitions=2, SLL_DFATransitions=3, LL_Fallback=2, LL_lookahead=3, LL_ATNTransitions=3}]";
 		assertEquals(expecting, Arrays.toString(info));
 	}
 
