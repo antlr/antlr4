@@ -30,22 +30,12 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
-import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.dfa.EmptyEdgeMap;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Tuple;
-import org.antlr.v4.runtime.misc.Tuple2;
 
-import java.io.InvalidClassException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Deque;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 public abstract class ATNSimulator {
@@ -79,7 +69,7 @@ public abstract class ATNSimulator {
 	public final ATN atn;
 
 	static {
-		ERROR = new DFAState(new ATNConfigSet(), 0, 0);
+		ERROR = new DFAState(new EmptyEdgeMap<DFAState>(0, -1), new EmptyEdgeMap<DFAState>(0, -1), new ATNConfigSet());
 		ERROR.stateNumber = Integer.MAX_VALUE;
 	}
 

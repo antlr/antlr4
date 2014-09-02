@@ -27,7 +27,6 @@
  */
 package org.antlr.v4.runtime.dfa;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -35,30 +34,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
  *
- * @author sam
+ * @author Sam Harwell
  */
-public class ArrayEdgeMap<T> extends AbstractEdgeMap<T> {
+public final class ArrayEdgeMap<T> extends AbstractEdgeMap<T> {
 
-	private final T[] arrayData;
-	private int size;
+	private final AtomicReferenceArray<T> arrayData;
+	private final AtomicInteger size;
 
 	@SuppressWarnings("unchecked")
 	public ArrayEdgeMap(int minIndex, int maxIndex) {
 		super(minIndex, maxIndex);
-		arrayData = (T[])new Object[maxIndex - minIndex + 1];
+		arrayData = new AtomicReferenceArray<T>(maxIndex - minIndex + 1);
+		size = new AtomicInteger();
 	}
 
 	@Override
 	public int size() {
-		return size;
+		return size.get();
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return size == 0;
+		return size() == 0;
 	}
 
 	@Override
@@ -72,18 +74,17 @@ public class ArrayEdgeMap<T> extends AbstractEdgeMap<T> {
 			return null;
 		}
 
-		return arrayData[key - minIndex];
+		return arrayData.get(key - minIndex);
 	}
 
 	@Override
 	public ArrayEdgeMap<T> put(int key, T value) {
 		if (key >= minIndex && key <= maxIndex) {
-			T existing = arrayData[key - minIndex];
-			arrayData[key - minIndex] = value;
+			T existing = arrayData.getAndSet(key - minIndex, value);
 			if (existing == null && value != null) {
-				size++;
+				size.incrementAndGet();
 			} else if (existing != null && value == null) {
-				size--;
+				size.decrementAndGet();
 			}
 		}
 
@@ -105,38 +106,35 @@ public class ArrayEdgeMap<T> extends AbstractEdgeMap<T> {
 			ArrayEdgeMap<? extends T> other = (ArrayEdgeMap<? extends T>)m;
 			int minOverlap = Math.max(minIndex, other.minIndex);
 			int maxOverlap = Math.min(maxIndex, other.maxIndex);
+			ArrayEdgeMap<T> result = this;
 			for (int i = minOverlap; i <= maxOverlap; i++) {
-				T target = other.arrayData[i - other.minIndex];
-				if (target != null) {
-					T current = this.arrayData[i - this.minIndex];
-					this.arrayData[i - this.minIndex] = target;
-					size += (current != null ? 0 : 1);
-				}
+				result = result.put(i, m.get(i));
 			}
 
-			return this;
+			return result;
 		} else if (m instanceof SingletonEdgeMap<?>) {
 			SingletonEdgeMap<? extends T> other = (SingletonEdgeMap<? extends T>)m;
 			assert !other.isEmpty();
 			return put(other.getKey(), other.getValue());
 		} else if (m instanceof SparseEdgeMap<?>) {
 			SparseEdgeMap<? extends T> other = (SparseEdgeMap<? extends T>)m;
-			int[] keys = other.getKeys();
-			List<? extends T> values = other.getValues();
-			ArrayEdgeMap<T> result = this;
-			for (int i = 0; i < values.size(); i++) {
-				result = result.put(keys[i], values.get(i));
+			synchronized (other) {
+				int[] keys = other.getKeys();
+				List<? extends T> values = other.getValues();
+				ArrayEdgeMap<T> result = this;
+				for (int i = 0; i < values.size(); i++) {
+					result = result.put(keys[i], values.get(i));
+				}
+				return result;
 			}
-			return result;
 		} else {
 			throw new UnsupportedOperationException(String.format("EdgeMap of type %s is supported yet.", m.getClass().getName()));
 		}
 	}
 
 	@Override
-	public ArrayEdgeMap<T> clear() {
-		Arrays.fill(arrayData, null);
-		return this;
+	public EmptyEdgeMap<T> clear() {
+		return new EmptyEdgeMap<T>(minIndex, maxIndex);
 	}
 
 	@Override
@@ -146,12 +144,13 @@ public class ArrayEdgeMap<T> extends AbstractEdgeMap<T> {
 		}
 
 		Map<Integer, T> result = new LinkedHashMap<Integer, T>();
-		for (int i = 0; i < arrayData.length; i++) {
-			if (arrayData[i] == null) {
+		for (int i = 0; i < arrayData.length(); i++) {
+			T element = arrayData.get(i);
+			if (element == null) {
 				continue;
 			}
 
-			result.put(i + minIndex, arrayData[i]);
+			result.put(i + minIndex, element);
 		}
 
 		return result;
@@ -170,29 +169,30 @@ public class ArrayEdgeMap<T> extends AbstractEdgeMap<T> {
 	}
 
 	private class EntryIterator implements Iterator<Map.Entry<Integer, T>> {
-		private int current;
-		private int currentIndex;
+		private int currentIndex = -1;
 
 		@Override
 		public boolean hasNext() {
-			return current < size();
+			return currentIndex < arrayData.length() - 1;
 		}
 
 		@Override
 		public Map.Entry<Integer, T> next() {
-			if (current >= size()) {
+			T element = null;
+			while (element == null && currentIndex < arrayData.length() - 1) {
+				currentIndex++;
+				element = arrayData.get(currentIndex);
+			}
+
+			if (element == null) {
 				throw new NoSuchElementException();
 			}
 
-			while (arrayData[currentIndex] == null) {
-				currentIndex++;
-			}
-
-			current++;
 			currentIndex++;
+			final T currentElement = element;
 			return new Map.Entry<Integer, T>() {
 				private final int key = minIndex + currentIndex - 1;
-				private final T value = arrayData[currentIndex - 1];
+				private final T value = currentElement;
 
 				@Override
 				public Integer getKey() {

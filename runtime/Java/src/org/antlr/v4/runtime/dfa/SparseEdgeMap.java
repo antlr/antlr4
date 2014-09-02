@@ -32,18 +32,16 @@ import org.antlr.v4.runtime.misc.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
  *
  * @author Sam Harwell
  */
-public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
+public final class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 	private static final int DEFAULT_MAX_SIZE = 5;
 
 	private final int[] keys;
@@ -61,24 +59,26 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 
 	private SparseEdgeMap(@NotNull SparseEdgeMap<T> map, int maxSparseSize) {
 		super(map.minIndex, map.maxIndex);
-		if (maxSparseSize < map.values.size()) {
-			throw new IllegalArgumentException();
-		}
+		synchronized (map) {
+			if (maxSparseSize < map.values.size()) {
+				throw new IllegalArgumentException();
+			}
 
-		keys = Arrays.copyOf(map.keys, maxSparseSize);
-		values = new ArrayList<T>(maxSparseSize);
-		values.addAll(map.values);
+			keys = Arrays.copyOf(map.keys, maxSparseSize);
+			values = new ArrayList<T>(maxSparseSize);
+			values.addAll(map.values);
+		}
 	}
 
-	public int[] getKeys() {
+	public final int[] getKeys() {
 		return keys;
 	}
 
-	public List<T> getValues() {
+	public final List<T> getValues() {
 		return values;
 	}
 
-	public int getMaxSparseSize() {
+	public final int getMaxSparseSize() {
 		return keys.length;
 	}
 
@@ -99,6 +99,9 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 
 	@Override
 	public T get(int key) {
+		// Special property of this collection: values are only even added to
+		// the end, else a new object is returned from put(). Therefore no lock
+		// is required in this method.
 		int index = Arrays.binarySearch(keys, 0, size(), key);
 		if (index < 0) {
 			return null;
@@ -117,7 +120,7 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 			return remove(key);
 		}
 
-		synchronized (values) {
+		synchronized (this) {
 			int index = Arrays.binarySearch(keys, 0, size(), key);
 			if (index >= 0) {
 				// replace existing entry
@@ -145,7 +148,7 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 			}
 			else {
 				SparseEdgeMap<T> resized = new SparseEdgeMap<T>(this, desiredSize);
-				System.arraycopy(resized.keys, insertIndex, resized.keys, insertIndex + 1, resized.keys.length - insertIndex - 1);
+				System.arraycopy(resized.keys, insertIndex, resized.keys, insertIndex + 1, size() - insertIndex);
 				resized.keys[insertIndex] = key;
 				resized.values.add(insertIndex, value);
 				return resized;
@@ -155,31 +158,26 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 
 	@Override
 	public SparseEdgeMap<T> remove(int key) {
-		int index = Arrays.binarySearch(keys, 0, size(), key);
-		if (index < 0) {
-			return this;
-		}
+		synchronized (this) {
+			int index = Arrays.binarySearch(keys, 0, size(), key);
+			if (index < 0) {
+				return this;
+			}
 
-		if (index == values.size() - 1) {
-			values.remove(index);
-			return this;
+			SparseEdgeMap<T> result = new SparseEdgeMap<T>(this, getMaxSparseSize());
+			System.arraycopy(result.keys, index + 1, result.keys, index, size() - index - 1);
+			result.values.remove(index);
+			return result;
 		}
-
-		SparseEdgeMap<T> result = new SparseEdgeMap<T>(this, getMaxSparseSize());
-		System.arraycopy(result.keys, index + 1, result.keys, index, size() - index - 1);
-		result.values.remove(index);
-		return result;
 	}
 
 	@Override
-	public SparseEdgeMap<T> clear() {
+	public AbstractEdgeMap<T> clear() {
 		if (isEmpty()) {
 			return this;
 		}
 
-		SparseEdgeMap<T> result = new SparseEdgeMap<T>(this, getMaxSparseSize());
-		result.values.clear();
-		return result;
+		return new EmptyEdgeMap<T>(minIndex, maxIndex);
 	}
 
 	@Override
@@ -188,65 +186,18 @@ public class SparseEdgeMap<T> extends AbstractEdgeMap<T> {
 			return Collections.emptyMap();
 		}
 
-		Map<Integer, T> result = new LinkedHashMap<Integer, T>();
-		for (int i = 0; i < size(); i++) {
-			result.put(keys[i], values.get(i));
-		}
+		synchronized (this) {
+			Map<Integer, T> result = new LinkedHashMap<Integer, T>();
+			for (int i = 0; i < size(); i++) {
+				result.put(keys[i], values.get(i));
+			}
 
-		return result;
+			return result;
+		}
 	}
 
 	@Override
 	public Set<Map.Entry<Integer, T>> entrySet() {
-		return new EntrySet();
-	}
-
-	private class EntrySet extends AbstractEntrySet {
-		@Override
-		public Iterator<Map.Entry<Integer, T>> iterator() {
-			return new EntryIterator();
-		}
-	}
-
-	private class EntryIterator implements Iterator<Map.Entry<Integer, T>> {
-		private int current;
-
-		@Override
-		public boolean hasNext() {
-			return current < size();
-		}
-
-		@Override
-		public Map.Entry<Integer, T> next() {
-			if (current >= size()) {
-				throw new NoSuchElementException();
-			}
-
-			current++;
-			return new Map.Entry<Integer, T>() {
-				private final int key = keys[current - 1];
-				private final T value = values.get(current - 1);
-
-				@Override
-				public Integer getKey() {
-					return key;
-				}
-
-				@Override
-				public T getValue() {
-					return value;
-				}
-
-				@Override
-				public T setValue(T value) {
-					throw new UnsupportedOperationException("Not supported yet.");
-				}
-			};
-		}
-
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException("Not supported yet.");
-		}
+		return toMap().entrySet();
 	}
 }

@@ -37,16 +37,10 @@ import java.util.Set;
  *
  * @author Sam Harwell
  */
-public class SingletonEdgeMap<T> extends AbstractEdgeMap<T> {
+public final class SingletonEdgeMap<T> extends AbstractEdgeMap<T> {
 
 	private final int key;
 	private final T value;
-
-	public SingletonEdgeMap(int minIndex, int maxIndex) {
-		super(minIndex, maxIndex);
-		this.key = 0;
-		this.value = null;
-	}
 
 	public SingletonEdgeMap(int minIndex, int maxIndex, int key, T value) {
 		super(minIndex, maxIndex);
@@ -110,18 +104,18 @@ public class SingletonEdgeMap<T> extends AbstractEdgeMap<T> {
 	}
 
 	@Override
-	public SingletonEdgeMap<T> remove(int key) {
+	public AbstractEdgeMap<T> remove(int key) {
 		if (key == this.key && this.value != null) {
-			return new SingletonEdgeMap<T>(minIndex, maxIndex);
+			return new EmptyEdgeMap<T>(minIndex, maxIndex);
 		}
 
 		return this;
 	}
 
 	@Override
-	public SingletonEdgeMap<T> clear() {
+	public AbstractEdgeMap<T> clear() {
 		if (this.value != null) {
-			return new SingletonEdgeMap<T>(minIndex, maxIndex);
+			return new EmptyEdgeMap<T>(minIndex, maxIndex);
 		}
 
 		return this;

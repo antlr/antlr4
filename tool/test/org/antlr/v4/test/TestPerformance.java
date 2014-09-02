@@ -59,6 +59,7 @@ import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.atn.SimulatorState;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
+import org.antlr.v4.runtime.dfa.EmptyEdgeMap;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -1904,6 +1905,7 @@ public class TestPerformance extends BaseTest {
 	}
 
 	protected static class NonCachingParserATNSimulator extends StatisticsParserATNSimulator {
+		private static final EmptyEdgeMap<DFAState> emptyMap = new EmptyEdgeMap<DFAState>(-1, -1);
 
 		public NonCachingParserATNSimulator(Parser parser, ATN atn) {
 			super(parser, atn);
@@ -1911,8 +1913,8 @@ public class TestPerformance extends BaseTest {
 
 		@NotNull
 		@Override
-		protected DFAState createDFAState(@NotNull ATNConfigSet configs) {
-			return new DFAState(configs, -1, -1);
+		protected DFAState createDFAState(@NotNull DFA dfa, @NotNull ATNConfigSet configs) {
+			return new DFAState(emptyMap, dfa.getEmptyContextEdgeMap(), configs);
 		}
 
 	}

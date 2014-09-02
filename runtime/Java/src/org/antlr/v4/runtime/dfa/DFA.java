@@ -29,11 +29,15 @@
  */
 package org.antlr.v4.runtime.dfa;
 
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.ATNType;
+import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.Parser;
 
 import java.util.Map;
 import java.util.Set;
@@ -63,6 +67,20 @@ public class DFA {
 
 	private final AtomicInteger nextStateNumber = new AtomicInteger();
 
+	private final int minDfaEdge;
+
+	private final int maxDfaEdge;
+
+	@NotNull
+	private static final EmptyEdgeMap<DFAState> emptyPrecedenceEdges =
+		new EmptyEdgeMap<DFAState>(0, 200);
+
+	@NotNull
+	private final EmptyEdgeMap<DFAState> emptyEdgeMap;
+
+	@NotNull
+	private final EmptyEdgeMap<DFAState> emptyContextEdgeMap;
+
 	/**
 	 * {@code true} if this DFA is for a precedence decision; otherwise,
 	 * {@code false}. This is the backing field for {@link #isPrecedenceDfa},
@@ -77,6 +95,36 @@ public class DFA {
 	public DFA(@NotNull ATNState atnStartState, int decision) {
 		this.atnStartState = atnStartState;
 		this.decision = decision;
+
+		if (this.atnStartState.atn.grammarType == ATNType.LEXER) {
+			minDfaEdge = LexerATNSimulator.MIN_DFA_EDGE;
+			maxDfaEdge = LexerATNSimulator.MAX_DFA_EDGE;
+		}
+		else {
+			minDfaEdge = Token.EOF;
+			maxDfaEdge = atnStartState.atn.maxTokenType;
+		}
+
+		this.emptyEdgeMap = new EmptyEdgeMap<DFAState>(minDfaEdge, maxDfaEdge);
+		this.emptyContextEdgeMap = new EmptyEdgeMap<DFAState>(-1, atnStartState.atn.states.size() - 1);
+	}
+
+	public final int getMinDfaEdge() {
+		return minDfaEdge;
+	}
+
+	public final int getMaxDfaEdge() {
+		return maxDfaEdge;
+	}
+
+	@NotNull
+	public EmptyEdgeMap<DFAState> getEmptyEdgeMap() {
+		return emptyEdgeMap;
+	}
+
+	@NotNull
+	public EmptyEdgeMap<DFAState> getEmptyContextEdgeMap() {
+		return emptyContextEdgeMap;
 	}
 
 	/**
@@ -174,8 +222,8 @@ public class DFA {
 		if (this.precedenceDfa != precedenceDfa) {
 			this.states.clear();
 			if (precedenceDfa) {
-				this.s0.set(new DFAState(new ATNConfigSet(), 0, 200));
-				this.s0full.set(new DFAState(new ATNConfigSet(), 0, 200));
+				this.s0.set(new DFAState(emptyPrecedenceEdges, getEmptyContextEdgeMap(), new ATNConfigSet()));
+				this.s0full.set(new DFAState(emptyPrecedenceEdges, getEmptyContextEdgeMap(), new ATNConfigSet()));
 			}
 			else {
 				this.s0.set(null);
