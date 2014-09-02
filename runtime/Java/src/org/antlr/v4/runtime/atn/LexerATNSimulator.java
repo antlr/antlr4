@@ -190,6 +190,13 @@ public class LexerATNSimulator extends ATNSimulator {
 			System.out.format(Locale.getDefault(), "start state closure=%s\n", ds0.configs);
 		}
 
+		if (ds0.isAcceptState()) {
+			// allow zero-length tokens
+			captureSimState(prevAccept, input, ds0);
+			// adjust index since the current input character was not yet consumed
+			prevAccept.index--;
+		}
+
 		int t = input.LA(1);
 		@NotNull
 		DFAState s = ds0; // s is current/from DFA state

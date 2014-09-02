@@ -554,11 +554,11 @@ lexerAlt
 		(	lexerCommands	-> ^(LEXER_ALT_ACTION<AltAST> lexerElements lexerCommands)
 		|					-> lexerElements
 		)
-	|						-> ^(ALT<AltAST> EPSILON) // empty alt
 	;
 
 lexerElements
-    :	lexerElement+ -> ^(ALT<AltAST> lexerElement+)
+    :	lexerElement+	-> ^(ALT<AltAST> lexerElement+)
+	|					-> ^(ALT<AltAST> EPSILON) // empty alt
     ;
 
 lexerElement
