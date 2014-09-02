@@ -85,7 +85,8 @@ public class ProfilingATNSimulator extends ParserATNSimulator {
 		try {
 			this._input = input;
 			this._startIndex = input.index();
-			this._sllStopIndex = -1;
+			// it's possible for SLL to reach a conflict state without consuming any input
+			this._sllStopIndex = _startIndex - 1;
 			this._llStopIndex = -1;
 			this.currentDecision = decision;
 			this.currentState = null;
