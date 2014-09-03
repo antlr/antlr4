@@ -57,6 +57,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.ast.ActionAST;
+import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.GrammarASTWithOptions;
 import org.antlr.v4.tool.ast.GrammarRootAST;
@@ -107,6 +108,9 @@ public class Grammar implements AttributeResolver {
 	public static final Set<String> lexerOptions = parserOptions;
 
 	public static final Set<String> ruleOptions = new HashSet<String>();
+	static {
+		ruleOptions.add("baseContext");
+	}
 
 	public static final Set<String> ParserBlockOptions = new HashSet<String>();
 
@@ -178,6 +182,23 @@ public class Grammar implements AttributeResolver {
 	 */
     public OrderedHashMap<String, Rule> rules = new OrderedHashMap<String, Rule>();
 	public List<Rule> indexToRule = new ArrayList<Rule>();
+
+	/**
+	 * This maps a context name &rarr; a collection of {@link RuleAST} nodes in
+	 * the original grammar. The union of accessors and labels identified by
+	 * these ASTs define the accessor methods and fields of the generated
+	 * context classes.
+	 *
+	 * <p>
+	 * The keys of this map match the result of {@link Rule#getBaseContext}.</p>
+	 * <p>
+	 * The values in this map are clones of the nodes in the original grammar
+	 * (provided by {@link GrammarAST#dupTree}) to ensure that grammar
+	 * transformations do not affect the values generated for the contexts. The
+	 * duplication is performed after nodes from imported grammars are merged
+	 * into the AST.</p>
+	 */
+	public final Map<String, List<RuleAST>> contextASTs = new HashMap<String, List<RuleAST>>();
 
 	int ruleNumber = 0; // used to get rule indexes (0..n-1)
 	int stringLiteralRuleNumber = 0; // used to invent rule names for 'keyword', ';', ... (0..n-1)
@@ -508,6 +529,27 @@ public class Grammar implements AttributeResolver {
 			return g.rules.get(ruleName);
 		}
 		return getRule(ruleName);
+	}
+
+	protected String getBaseContextName(String ruleName) {
+		Rule referencedRule = rules.get(ruleName);
+		if (referencedRule != null) {
+			ruleName = referencedRule.getBaseContext();
+		}
+
+		return ruleName;
+	}
+
+	public List<AltAST> getUnlabeledAlternatives(RuleAST ast) throws org.antlr.runtime.RecognitionException {
+		AltLabelVisitor visitor = new AltLabelVisitor(new org.antlr.runtime.tree.CommonTreeNodeStream(new GrammarASTAdaptor(), ast));
+		visitor.rule();
+		return visitor.getUnlabeledAlternatives();
+	}
+
+	public Map<String, List<Pair<Integer, AltAST>>> getLabeledAlternatives(RuleAST ast) throws org.antlr.runtime.RecognitionException {
+		AltLabelVisitor visitor = new AltLabelVisitor(new org.antlr.runtime.tree.CommonTreeNodeStream(new GrammarASTAdaptor(), ast));
+		visitor.rule();
+		return visitor.getLabeledAlternatives();
 	}
 
     /** Get list of all imports from all grammars in the delegate subtree of g.
@@ -1256,5 +1298,40 @@ public class Grammar implements AttributeResolver {
 		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
 		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
 		return new ParserInterpreter(fileName, Arrays.asList(getTokenDisplayNames()), Arrays.asList(getRuleNames()), deserialized, tokenStream);
+	}
+
+	protected static class AltLabelVisitor extends GrammarTreeVisitor {
+		private final Map<String, List<Pair<Integer, AltAST>>> labeledAlternatives =
+			new HashMap<String, List<Pair<Integer, AltAST>>>();
+		private final List<AltAST> unlabeledAlternatives =
+			new ArrayList<AltAST>();
+
+		public AltLabelVisitor(org.antlr.runtime.tree.TreeNodeStream input) {
+			super(input);
+		}
+
+		public Map<String, List<Pair<Integer, AltAST>>> getLabeledAlternatives() {
+			return labeledAlternatives;
+		}
+
+		public List<AltAST> getUnlabeledAlternatives() {
+			return unlabeledAlternatives;
+		}
+
+		@Override
+		public void discoverOuterAlt(AltAST alt) {
+			if (alt.altLabel != null) {
+				List<Pair<Integer, AltAST>> list = labeledAlternatives.get(alt.altLabel.getText());
+				if (list == null) {
+					list = new ArrayList<Pair<Integer, AltAST>>();
+					labeledAlternatives.put(alt.altLabel.getText(), list);
+				}
+
+				list.add(new Pair<Integer, AltAST>(currentOuterAltNumber, alt));
+			}
+			else {
+				unlabeledAlternatives.add(alt);
+			}
+		}
 	}
 }

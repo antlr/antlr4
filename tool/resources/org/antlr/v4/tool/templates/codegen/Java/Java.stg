@@ -339,7 +339,9 @@ case <index>: return <actions.(index)>;}; separator="\n">
 
 RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
 
+<if(ruleCtx)>
 <ruleCtx>
+<endif>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<args; separator=",">) throws RecognitionException {

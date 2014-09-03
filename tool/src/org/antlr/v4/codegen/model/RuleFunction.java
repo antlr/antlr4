@@ -32,6 +32,7 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.runtime.tree.TreeNodeStream;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.decl.AltLabelStructDecl;
 import org.antlr.v4.codegen.model.decl.AttributeDecl;
@@ -45,17 +46,22 @@ import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.codegen.model.decl.StructDecl;
 import org.antlr.v4.misc.FrequencySet;
 import org.antlr.v4.misc.Utils;
+import static org.antlr.v4.parse.ANTLRParser.RULE_REF;
+import static org.antlr.v4.parse.ANTLRParser.TOKEN_REF;
 import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.parse.GrammarTreeVisitor;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.ErrorType;
+import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.RuleAST;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,9 +70,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static org.antlr.v4.parse.ANTLRParser.RULE_REF;
-import static org.antlr.v4.parse.ANTLRParser.TOKEN_REF;
 
 /** */
 public class RuleFunction extends OutputModelObject {
@@ -78,7 +81,6 @@ public class RuleFunction extends OutputModelObject {
 	public ATNState startState;
 	public int index;
 	public Rule rule;
-	public AltLabelStructDecl[] altToContext;
 	public boolean hasLookaheadBlock;
 
 	@ModelElement public List<SrcOp> code;
@@ -103,26 +105,32 @@ public class RuleFunction extends OutputModelObject {
 
 		index = r.index;
 
-		ruleCtx = new StructDecl(factory, r);
-		altToContext = new AltLabelStructDecl[r.getOriginalNumberOfAlts()+1];
-		addContextGetters(factory, r);
+		if (r.name.equals(r.getBaseContext())) {
+			ruleCtx = new StructDecl(factory, r);
+			addContextGetters(factory, r.g.contextASTs.get(r.name));
 
-		if ( r.args!=null ) {
-			Collection<Attribute> decls = r.args.attributes.values();
-			if ( decls.size()>0 ) {
-				args = new ArrayList<AttributeDecl>();
-				ruleCtx.addDecls(decls);
-				for (Attribute a : decls) {
-					args.add(new AttributeDecl(factory, a));
+			if ( r.args!=null ) {
+				Collection<Attribute> decls = r.args.attributes.values();
+				if ( decls.size()>0 ) {
+					args = new ArrayList<AttributeDecl>();
+					ruleCtx.addDecls(decls);
+					for (Attribute a : decls) {
+						args.add(new AttributeDecl(factory, a));
+					}
+					ruleCtx.ctorAttrs = args;
 				}
-				ruleCtx.ctorAttrs = args;
+			}
+			if ( r.retvals!=null ) {
+				ruleCtx.addDecls(r.retvals.attributes.values());
+			}
+			if ( r.locals!=null ) {
+				ruleCtx.addDecls(r.locals.attributes.values());
 			}
 		}
-		if ( r.retvals!=null ) {
-			ruleCtx.addDecls(r.retvals.attributes.values());
-		}
-		if ( r.locals!=null ) {
-			ruleCtx.addDecls(r.locals.attributes.values());
+		else {
+			if (r.args != null || r.retvals != null || r.locals != null) {
+				throw new UnsupportedOperationException("customized fields are not yet supported for customized context objects");
+			}
 		}
 
 		ruleLabels = r.getElementLabelNames();
@@ -139,38 +147,48 @@ public class RuleFunction extends OutputModelObject {
 		startState = factory.getGrammar().atn.ruleToStartState[r.index];
 	}
 
-	public void addContextGetters(OutputModelFactory factory, Rule r) {
-		// Add ctx labels for elements in alts with no -> label
-		List<AltAST> altsNoLabels = r.getUnlabeledAltASTs();
-		if ( altsNoLabels!=null ) {
-			Set<Decl> decls = getDeclsForAllElements(altsNoLabels);
-			// we know to put in rule ctx, so do it directly
-			for (Decl d : decls) ruleCtx.addDecl(d);
+	public void addContextGetters(OutputModelFactory factory, Collection<RuleAST> contextASTs) {
+		List<AltAST> unlabeledAlternatives = new ArrayList<AltAST>();
+		Map<String, List<AltAST>> labeledAlternatives = new HashMap<String, List<AltAST>>();
+
+		for (RuleAST ast : contextASTs) {
+			try {
+				unlabeledAlternatives.addAll(rule.g.getUnlabeledAlternatives(ast));
+				for (Map.Entry<String, List<Pair<Integer, AltAST>>> entry : rule.g.getLabeledAlternatives(ast).entrySet()) {
+					List<AltAST> list = labeledAlternatives.get(entry.getKey());
+					if (list == null) {
+						list = new ArrayList<AltAST>();
+						labeledAlternatives.put(entry.getKey(), list);
+					}
+
+					for (Pair<Integer, AltAST> tuple : entry.getValue()) {
+						list.add(tuple.b);
+					}
+				}
+			}
+			catch (RecognitionException ex) {
+			}
 		}
 
-		// make structs for -> labeled alts, define ctx labels for elements
-		altLabelCtxs = new HashMap<String,AltLabelStructDecl>();
-		Map<String, List<Pair<Integer, AltAST>>> labels = r.getAltLabels();
-		if ( labels!=null ) {
-			for (Map.Entry<String, List<Pair<Integer, AltAST>>> entry : labels.entrySet()) {
-				String label = entry.getKey();
-				List<AltAST> alts = new ArrayList<AltAST>();
-				for (Pair<Integer, AltAST> pair : entry.getValue()) {
-					alts.add(pair.b);
-				}
+		// Add ctx labels for elements in alts with no '#' label
+		if (!unlabeledAlternatives.isEmpty()) {
+			Set<Decl> decls = getDeclsForAllElements(unlabeledAlternatives);
 
-				Set<Decl> decls = getDeclsForAllElements(alts);
-				for (Pair<Integer, AltAST> pair : entry.getValue()) {
-					Integer altNum = pair.a;
-					altToContext[altNum] = new AltLabelStructDecl(factory, r, altNum, label);
-					if (!altLabelCtxs.containsKey(label)) {
-						altLabelCtxs.put(label, altToContext[altNum]);
-					}
+			// put directly in base context
+			for (Decl decl : decls) {
+				ruleCtx.addDecl(decl);
+			}
+		}
 
-					// we know which ctx to put in, so do it directly
-					for (Decl d : decls) {
-						altToContext[altNum].addDecl(d);
-					}
+		// make structs for '#' labeled alts, define ctx labels for elements
+		altLabelCtxs = new HashMap<String, AltLabelStructDecl>();
+		if (!labeledAlternatives.isEmpty()) {
+			for (Map.Entry<String, List<AltAST>> entry : labeledAlternatives.entrySet()) {
+				AltLabelStructDecl labelDecl = new AltLabelStructDecl(factory, rule, entry.getKey());
+				altLabelCtxs.put(entry.getKey(), labelDecl);
+				Set<Decl> decls = getDeclsForAllElements(entry.getValue());
+				for (Decl decl : decls) {
+					labelDecl.addDecl(decl);
 				}
 			}
 		}
@@ -201,7 +219,7 @@ public class RuleFunction extends OutputModelObject {
 			allRefs.addAll(refs);
 			FrequencySet<String> altFreq = getElementFrequenciesForAlt(ast);
 			for (GrammarAST t : refs) {
-				String refLabelName = t.getText();
+				String refLabelName = getLabelName(rule.g, t);
 				if ( altFreq.count(refLabelName)>1 ) {
 					needsList.add(refLabelName);
 				}
@@ -209,7 +227,7 @@ public class RuleFunction extends OutputModelObject {
 		}
 		Set<Decl> decls = new HashSet<Decl>();
 		for (GrammarAST t : allRefs) {
-			String refLabelName = t.getText();
+			String refLabelName = getLabelName(rule.g, t);
 			List<Decl> d = getDeclForAltElement(t,
 												refLabelName,
 												needsList.contains(refLabelName));
@@ -218,10 +236,20 @@ public class RuleFunction extends OutputModelObject {
 		return decls;
 	}
 
+	public static String getLabelName(Grammar g, GrammarAST t) {
+		String labelName = t.getText();
+		Rule referencedRule = g.rules.get(labelName);
+		if (referencedRule != null) {
+			labelName = referencedRule.getBaseContext();
+		}
+
+		return labelName;
+	}
+
 	/** Given list of X and r refs in alt, compute how many of each there are */
 	protected FrequencySet<String> getElementFrequenciesForAlt(AltAST ast) {
 		try {
-			ElementFrequenciesVisitor visitor = new ElementFrequenciesVisitor(new CommonTreeNodeStream(new GrammarASTAdaptor(), ast));
+			ElementFrequenciesVisitor visitor = new ElementFrequenciesVisitor(rule.g, new CommonTreeNodeStream(new GrammarASTAdaptor(), ast));
 			visitor.outerAlternative();
 			if (visitor.frequencies.size() != 1) {
 				factory.getGrammar().tool.errMgr.toolError(ErrorType.INTERNAL_ERROR);

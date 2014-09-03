@@ -29,12 +29,14 @@
  */
 package org.antlr.v4.codegen.model;
 
+import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.RuleAST;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,19 +66,30 @@ public class VisitorFile extends OutputFile {
 		Grammar g = factory.getGrammar();
 		parserName = g.getRecognizerName();
 		grammarName = g.name;
+
+		for (Map.Entry<String, List<RuleAST>> entry : g.contextASTs.entrySet()) {
+			for (RuleAST ruleAST : entry.getValue()) {
+				try {
+					Map<String, List<Pair<Integer, AltAST>>> labeledAlternatives = g.getLabeledAlternatives(ruleAST);
+					visitorNames.addAll(labeledAlternatives.keySet());
+				} catch (RecognitionException ex) {
+				}
+			}
+		}
+
 		for (Rule r : g.rules.values()) {
-			Map<String, List<Pair<Integer, AltAST>>> labels = r.getAltLabels();
+			visitorNames.add(r.getBaseContext());
+		}
+
+		for (Rule r : g.rules.values()) {
+			Map<String, List<Pair<Integer,AltAST>>> labels = r.getAltLabels();
 			if ( labels!=null ) {
 				for (Map.Entry<String, List<Pair<Integer, AltAST>>> pair : labels.entrySet()) {
-					visitorNames.add(pair.getKey());
 					visitorLabelRuleNames.put(pair.getKey(), r.name);
 				}
 			}
-			else {
-				// if labels, must label all. no need for generic rule visitor then
-				visitorNames.add(r.name);
-			}
 		}
+
 		ActionAST ast = g.namedActions.get("header");
 		if ( ast!=null ) header = new Action(factory, ast);
 		genPackage = factory.getGrammar().tool.genPackage;

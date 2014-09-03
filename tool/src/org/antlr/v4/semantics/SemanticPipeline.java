@@ -40,7 +40,9 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.RuleAST;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -81,6 +83,17 @@ public class SemanticPipeline {
 		// COLLECT RULE OBJECTS
 		RuleCollector ruleCollector = new RuleCollector(g);
 		ruleCollector.process(g.ast);
+
+		// CLONE RULE ASTs FOR CONTEXT REFERENCE
+		for (Rule rule : ruleCollector.rules.values()) {
+			List<RuleAST> list = g.contextASTs.get(rule.getBaseContext());
+			if (list == null) {
+				list = new ArrayList<RuleAST>();
+				g.contextASTs.put(rule.getBaseContext(), list);
+			}
+
+			list.add((RuleAST)rule.ast.dupTree());
+		}
 
 		// DO BASIC / EASY SEMANTIC CHECKS
 		BasicSemanticChecks basics = new BasicSemanticChecks(g, ruleCollector);

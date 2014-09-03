@@ -38,14 +38,11 @@ import org.antlr.v4.tool.Rule;
 
 import java.util.ArrayList;
 
-/** A StructDecl to handle a -> label on alt */
+/** A StructDecl to handle a '#' label on alt */
 public class AltLabelStructDecl extends StructDecl {
-	public int altNum;
-	public AltLabelStructDecl(OutputModelFactory factory, Rule r,
-							  int altNum, String label)
+	public AltLabelStructDecl(OutputModelFactory factory, Rule r, String label)
 	{
 		super(factory, r);
-		this.altNum = altNum;
 		this.name = // override name set in super to the label ctx
 			factory.getGenerator().getTarget().getAltLabelContextStructName(label);
 		derivedFromName = label;

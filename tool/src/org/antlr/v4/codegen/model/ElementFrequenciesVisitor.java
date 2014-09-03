@@ -5,6 +5,7 @@ import org.antlr.v4.misc.FrequencySet;
 import org.antlr.v4.misc.MutableInt;
 import org.antlr.v4.parse.GrammarTreeVisitor;
 import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -15,10 +16,12 @@ import java.util.Deque;
 import java.util.Map;
 
 public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
+	final Grammar grammar;
 	final Deque<FrequencySet<String>> frequencies;
 
-	public ElementFrequenciesVisitor(TreeNodeStream input) {
+	public ElementFrequenciesVisitor(Grammar grammar, TreeNodeStream input) {
 		super(input);
+		this.grammar = grammar;
 		frequencies = new ArrayDeque<FrequencySet<String>>();
 		frequencies.push(new FrequencySet<String>());
 	}
@@ -95,7 +98,7 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 
 	@Override
 	public void ruleRef(GrammarAST ref, ActionAST arg) {
-		frequencies.peek().add(ref.getText());
+		frequencies.peek().add(RuleFunction.getLabelName(grammar, ref));
 	}
 
 	/*

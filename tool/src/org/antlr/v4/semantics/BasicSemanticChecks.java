@@ -54,6 +54,7 @@ import org.stringtemplate.v4.misc.MultiMap;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /** No side-effects except for setting options into the appropriate node.
  *  TODO:  make the side effects into a separate pass this
@@ -285,6 +286,32 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
+	public void finishGrammar(GrammarRootAST root, GrammarAST ID) {
+		MultiMap<String, Rule> baseContexts = new MultiMap<String, Rule>();
+		for (Rule r : ruleCollector.rules.values()) {
+			baseContexts.map(r.getBaseContext(), r);
+		}
+
+		for (Map.Entry<String, List<Rule>> entry : baseContexts.entrySet()) {
+			int altLabelCount = 0;
+			int outerAltCount = 0;
+			for (Rule rule : entry.getValue()) {
+				outerAltCount += rule.numberOfAlts;
+				List<GrammarAST> altLabels = ruleCollector.ruleToAltLabels.get(rule.name);
+				if (altLabels != null) {
+					altLabelCount += altLabels.size();
+				}
+			}
+
+			if (altLabelCount != 0 && altLabelCount != outerAltCount) {
+				Rule errorRule = entry.getValue().get(0);
+				g.tool.errMgr.grammarError(ErrorType.RULE_WITH_TOO_FEW_ALT_LABELS,
+										   g.fileName, ((CommonTree)errorRule.ast.getChild(0)).getToken(), errorRule.name);
+			}
+		}
+	}
+
+	@Override
 	public void finishRule(RuleAST rule, GrammarAST ID, GrammarAST block) {
 		if ( rule.isLexerRule() ) return;
 		BlockAST blk = (BlockAST)rule.getFirstChildWithType(BLOCK);
@@ -314,13 +341,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 											   prevRuleForLabel);
 				}
 			}
-		}
-		List<GrammarAST> altLabels = ruleCollector.ruleToAltLabels.get(rule.getRuleName());
-		int numAltLabels = 0;
-		if ( altLabels!=null ) numAltLabels = altLabels.size();
-		if ( numAltLabels>0 && nalts != numAltLabels ) {
-			g.tool.errMgr.grammarError(ErrorType.RULE_WITH_TOO_FEW_ALT_LABELS,
-									   g.fileName, idAST.token, rule.getRuleName());
 		}
 	}
 

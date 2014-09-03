@@ -330,7 +330,9 @@ public abstract class Target {
 		if ( r.g.isLexer() ) {
 			return getTemplates().getInstanceOf("LexerRuleContext").render();
 		}
-		return Utils.capitalize(r.name)+getTemplates().getInstanceOf("RuleContextNameSuffix").render();
+
+		String baseName = r.getBaseContext();
+		return Utils.capitalize(baseName)+getTemplates().getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	public String getAltLabelContextStructName(String label) {
@@ -347,7 +349,9 @@ public abstract class Target {
 		if ( r.g.isLexer() ) {
 			return getTemplates().getInstanceOf("LexerRuleContext").render();
 		}
-		return Utils.capitalize(r.name)+getTemplates().getInstanceOf("RuleContextNameSuffix").render();
+
+		String baseName = r.getBaseContext();
+		return Utils.capitalize(baseName)+getTemplates().getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	// should be same for all refs to same token like ctx.ID within single rule function
