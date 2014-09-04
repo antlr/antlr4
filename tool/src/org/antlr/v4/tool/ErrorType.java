@@ -958,6 +958,12 @@ public enum ErrorType {
 	 * <p>rule <em>rule</em>: must label all alternatives in rules with the same base context, or none</p>
 	 */
 	RULE_WITH_TOO_FEW_ALT_LABELS_GROUP(165, "rule <arg>: must label all alternatives in rules with the same base context, or none", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 166.
+	 *
+	 * <p>rule <em>rule</em>: baseContext option value must reference a rule</p>
+	 */
+	BASE_CONTEXT_MUST_BE_RULE_NAME(166, "rule <arg>: baseContext option value must reference a rule", ErrorSeverity.ERROR),
 
 	/*
 	 * Backward incompatibility errors

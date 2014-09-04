@@ -286,16 +286,37 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	/**
-	 * This method detects error
-	 * {@link ErrorType#RULE_WITH_TOO_FEW_ALT_LABELS_GROUP}, which requires
-	 * analysis across the whole grammar for rules according to their base
-	 * context.
+	 * This method detects the following errors, which require analysis across
+	 * the whole grammar for rules according to their base context.
+	 *
+	 * <ul>
+	 * <li>{@link ErrorType#RULE_WITH_TOO_FEW_ALT_LABELS_GROUP}</li>
+	 * <li>{@link ErrorType#BASE_CONTEXT_MUST_BE_RULE_NAME}</li>
+	 * </ul>
 	 */
 	@Override
 	public void finishGrammar(GrammarRootAST root, GrammarAST ID) {
 		MultiMap<String, Rule> baseContexts = new MultiMap<String, Rule>();
 		for (Rule r : ruleCollector.rules.values()) {
 			baseContexts.map(r.getBaseContext(), r);
+
+			GrammarAST optionAST = r.ast.getOptionAST("baseContext");
+
+			// It's unlikely for this to occur when optionAST is null, but checking
+			// anyway means it can detect certain errors within the logic of the
+			// Tool itself.
+			if (!ruleCollector.rules.containsKey(r.getBaseContext())) {
+				Token errorToken;
+				if (optionAST != null) {
+					errorToken = optionAST.getToken();
+				}
+				else {
+					errorToken = ((CommonTree)r.ast.getChild(0)).getToken();
+				}
+
+				g.tool.errMgr.grammarError(ErrorType.BASE_CONTEXT_MUST_BE_RULE_NAME,
+										   g.fileName, errorToken, r.name);
+			}
 		}
 
 		for (Map.Entry<String, List<Rule>> entry : baseContexts.entrySet()) {
