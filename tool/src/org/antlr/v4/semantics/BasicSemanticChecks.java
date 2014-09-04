@@ -293,15 +293,27 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	 * <li>{@link ErrorType#RULE_WITH_TOO_FEW_ALT_LABELS_GROUP}</li>
 	 * <li>{@link ErrorType#BASE_CONTEXT_MUST_BE_RULE_NAME}</li>
 	 * <li>{@link ErrorType#BASE_CONTEXT_CANNOT_BE_TRANSITIVE}</li>
+	 * <li>{@link ErrorType#LEXER_RULE_CANNOT_HAVE_BASE_CONTEXT}</li>
 	 * </ul>
 	 */
 	@Override
 	public void finishGrammar(GrammarRootAST root, GrammarAST ID) {
 		MultiMap<String, Rule> baseContexts = new MultiMap<String, Rule>();
 		for (Rule r : ruleCollector.rules.values()) {
+			GrammarAST optionAST = r.ast.getOptionAST("baseContext");
+
+			if (r.ast.isLexerRule()) {
+				if (optionAST != null) {
+					Token errorToken = optionAST.getToken();
+					g.tool.errMgr.grammarError(ErrorType.LEXER_RULE_CANNOT_HAVE_BASE_CONTEXT,
+											   g.fileName, errorToken, r.name);
+				}
+
+				continue;
+			}
+
 			baseContexts.map(r.getBaseContext(), r);
 
-			GrammarAST optionAST = r.ast.getOptionAST("baseContext");
 			if (optionAST != null) {
 				Rule targetRule = ruleCollector.rules.get(r.getBaseContext());
 				boolean targetSpecifiesBaseContext =

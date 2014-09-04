@@ -970,6 +970,12 @@ public enum ErrorType {
 	 * <p>rule <em>rule</em>: base context must reference a rule that does not specify a base context</p>
 	 */
 	BASE_CONTEXT_CANNOT_BE_TRANSITIVE(167, "rule <arg>: base context must reference a rule that does not specify a base context", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 168.
+	 *
+	 * <p>rule <em>rule</em>: lexer rules cannot specify a base context</p>
+	 */
+	LEXER_RULE_CANNOT_HAVE_BASE_CONTEXT(168, "rule <arg>: lexer rules cannot specify a base context", ErrorSeverity.ERROR),
 
 	/*
 	 * Backward incompatibility errors
