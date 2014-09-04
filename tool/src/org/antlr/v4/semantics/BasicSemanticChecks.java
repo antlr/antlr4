@@ -285,6 +285,12 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 //		}
 	}
 
+	/**
+	 * This method detects error
+	 * {@link ErrorType#RULE_WITH_TOO_FEW_ALT_LABELS_GROUP}, which requires
+	 * analysis across the whole grammar for rules according to their base
+	 * context.
+	 */
 	@Override
 	public void finishGrammar(GrammarRootAST root, GrammarAST ID) {
 		MultiMap<String, Rule> baseContexts = new MultiMap<String, Rule>();
@@ -293,19 +299,32 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		}
 
 		for (Map.Entry<String, List<Rule>> entry : baseContexts.entrySet()) {
+			// suppress RULE_WITH_TOO_FEW_ALT_LABELS_GROUP if RULE_WITH_TOO_FEW_ALT_LABELS
+			// would already have been reported for at least one rule with this
+			// base context.
+			boolean suppressError = false;
 			int altLabelCount = 0;
 			int outerAltCount = 0;
 			for (Rule rule : entry.getValue()) {
 				outerAltCount += rule.numberOfAlts;
 				List<GrammarAST> altLabels = ruleCollector.ruleToAltLabels.get(rule.name);
-				if (altLabels != null) {
+				if (altLabels != null && !altLabels.isEmpty()) {
+					if (altLabels.size() != rule.numberOfAlts) {
+						suppressError = true;
+						break;
+					}
+
 					altLabelCount += altLabels.size();
 				}
 			}
 
+			if (suppressError) {
+				continue;
+			}
+
 			if (altLabelCount != 0 && altLabelCount != outerAltCount) {
 				Rule errorRule = entry.getValue().get(0);
-				g.tool.errMgr.grammarError(ErrorType.RULE_WITH_TOO_FEW_ALT_LABELS,
+				g.tool.errMgr.grammarError(ErrorType.RULE_WITH_TOO_FEW_ALT_LABELS_GROUP,
 										   g.fileName, ((CommonTree)errorRule.ast.getChild(0)).getToken(), errorRule.name);
 			}
 		}
@@ -341,6 +360,13 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 											   prevRuleForLabel);
 				}
 			}
+		}
+		List<GrammarAST> altLabels = ruleCollector.ruleToAltLabels.get(rule.getRuleName());
+		int numAltLabels = 0;
+		if ( altLabels!=null ) numAltLabels = altLabels.size();
+		if ( numAltLabels>0 && nalts != numAltLabels ) {
+			g.tool.errMgr.grammarError(ErrorType.RULE_WITH_TOO_FEW_ALT_LABELS,
+									   g.fileName, idAST.token, rule.getRuleName());
 		}
 	}
 

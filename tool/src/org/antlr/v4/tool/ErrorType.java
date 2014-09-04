@@ -952,6 +952,12 @@ public enum ErrorType {
 	 * <p>custom channels are not supported in combined grammars</p>
 	 */
 	CHANNELS_BLOCK_IN_COMBINED_GRAMMAR(164, "custom channels are not supported in combined grammars", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 165.
+	 *
+	 * <p>rule <em>rule</em>: must label all alternatives in rules with the same base context, or none</p>
+	 */
+	RULE_WITH_TOO_FEW_ALT_LABELS_GROUP(165, "rule <arg>: must label all alternatives in rules with the same base context, or none", ErrorSeverity.ERROR),
 
 	/*
 	 * Backward incompatibility errors
