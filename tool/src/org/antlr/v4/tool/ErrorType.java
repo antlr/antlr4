@@ -964,6 +964,12 @@ public enum ErrorType {
 	 * <p>rule <em>rule</em>: baseContext option value must reference a rule</p>
 	 */
 	BASE_CONTEXT_MUST_BE_RULE_NAME(166, "rule <arg>: baseContext option value must reference a rule", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 167.
+	 *
+	 * <p>rule <em>rule</em>: base context must reference a rule that does not specify a base context</p>
+	 */
+	BASE_CONTEXT_CANNOT_BE_TRANSITIVE(167, "rule <arg>: base context must reference a rule that does not specify a base context", ErrorSeverity.ERROR),
 
 	/*
 	 * Backward incompatibility errors

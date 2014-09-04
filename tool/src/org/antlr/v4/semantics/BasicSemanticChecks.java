@@ -292,6 +292,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	 * <ul>
 	 * <li>{@link ErrorType#RULE_WITH_TOO_FEW_ALT_LABELS_GROUP}</li>
 	 * <li>{@link ErrorType#BASE_CONTEXT_MUST_BE_RULE_NAME}</li>
+	 * <li>{@link ErrorType#BASE_CONTEXT_CANNOT_BE_TRANSITIVE}</li>
 	 * </ul>
 	 */
 	@Override
@@ -301,6 +302,20 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 			baseContexts.map(r.getBaseContext(), r);
 
 			GrammarAST optionAST = r.ast.getOptionAST("baseContext");
+			if (optionAST != null) {
+				Rule targetRule = ruleCollector.rules.get(r.getBaseContext());
+				boolean targetSpecifiesBaseContext =
+					targetRule != null
+					&& targetRule.ast != null
+					&& (targetRule.ast.getOptionAST("baseContext") != null
+						|| !targetRule.name.equals(targetRule.getBaseContext()));
+
+				if (targetSpecifiesBaseContext) {
+					Token errorToken = optionAST.getToken();
+					g.tool.errMgr.grammarError(ErrorType.BASE_CONTEXT_CANNOT_BE_TRANSITIVE,
+											   g.fileName, errorToken, r.name);
+				}
+			}
 
 			// It's unlikely for this to occur when optionAST is null, but checking
 			// anyway means it can detect certain errors within the logic of the
