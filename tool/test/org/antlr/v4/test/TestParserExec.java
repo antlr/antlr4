@@ -567,4 +567,31 @@ public class TestParserExec extends BaseTest {
 		assertEquals("", found);
 		assertNull(stderrDuringParse);
 	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#672 "Initialization failed in
+	 * locals".
+	 * https://github.com/antlr/antlr4/issues/672
+	 */
+	@Test public void testAttributeValueInitialization() throws Exception {
+		String grammar =
+			"grammar Data; \n" +
+			"\n" +
+			"file : group+ EOF; \n" +
+			"\n" +
+			"group: INT sequence {System.out.println($sequence.values.size());} ; \n" +
+			"\n" +
+			"sequence returns [List<Integer> values = new ArrayList<Integer>()] \n" +
+			"  locals[List<Integer> localValues = new ArrayList<Integer>()]\n" +
+			"         : (INT {$localValues.add($INT.int);})* {$values.addAll($localValues);}\n" +
+			"; \n" +
+			"\n" +
+			"INT : [0-9]+ ; // match integers \n" +
+			"WS : [ \\t\\n\\r]+ -> skip ; // toss out all whitespace\n";
+
+		String input = "2 9 10 3 1 2 3";
+		String found = execParser("Data.g4", grammar, "DataParser", "DataLexer", "file", input, false);
+		assertEquals("6\n", found);
+		assertNull(stderrDuringParse);
+	}
 }
