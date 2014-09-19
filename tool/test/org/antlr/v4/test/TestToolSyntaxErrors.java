@@ -654,4 +654,125 @@ public class TestToolSyntaxErrors extends BaseTest {
 		String[] pair = { grammar, expected };
 		super.testErrors(pair, true);
 	}
+
+	/**
+	 * This is a test for {@link ErrorType#RULE_WITH_TOO_FEW_ALT_LABELS_GROUP}.
+	 *
+	 * <p>
+	 * This test verifies that
+	 * {@link ErrorType#RULE_WITH_TOO_FEW_ALT_LABELS_GROUP} is reported if one
+	 * of the rules in a base context group uses alt labels, and another does
+	 * not.</p>
+	 */
+	@Test public void testRuleWithTooFewAltLabelsGroup() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"tokens { Foo1, Foo2 }\n" +
+			"start options { baseContext = start2; }\n" +
+			"  : Foo1 EOF\n" +
+			"  ;\n" +
+			"start2\n" +
+			"  : Foo1 EOF # labeled\n" +
+			"  | Foo2 EOF # labeled\n" +
+			"  ;\n";
+
+		String expected =
+			"error(" + ErrorType.RULE_WITH_TOO_FEW_ALT_LABELS_GROUP.code + "): T.g4:3:0: rule 'start': must label all alternatives in rules with the same base context, or none\n";
+
+		String[] pair = { grammar, expected };
+		super.testErrors(pair, true);
+	}
+
+	/**
+	 * This is a test for {@link ErrorType#RULE_WITH_TOO_FEW_ALT_LABELS_GROUP}.
+	 *
+	 * <p>
+	 * This test verifies that
+	 * {@link ErrorType#RULE_WITH_TOO_FEW_ALT_LABELS_GROUP} is disabled if
+	 * {@link ErrorType#RULE_WITH_TOO_FEW_ALT_LABELS} is reported for one of the
+	 * rules with the base context of the group.</p>
+	 */
+	@Test public void testRuleWithTooFewAltLabelsGroupSuppressed() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"tokens { Foo1, Foo2 }\n" +
+			"start options { baseContext = start2; }\n" +
+			"  : Foo1 EOF\n" +
+			"  ;\n" +
+			"start2\n" +
+			"  : Foo1 EOF\n" +
+			"  | Foo2 EOF # labeled\n" +
+			"  ;\n";
+
+		String expected =
+			"error(" + ErrorType.RULE_WITH_TOO_FEW_ALT_LABELS.code + "): T.g4:6:0: rule 'start2': must label all alternatives or none\n";
+
+		String[] pair = { grammar, expected };
+		super.testErrors(pair, true);
+	}
+
+	/**
+	 * This is a test for {@link ErrorType#BASE_CONTEXT_MUST_BE_RULE_NAME}.
+	 */
+	@Test public void testBaseContextMustBeRuleName() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"tokens { Foo1, Foo2 }\n" +
+			"start options { baseContext = start2; }\n" +
+			"  : Foo1 EOF\n" +
+			"  ;\n";
+
+		String expected =
+			"error(" + ErrorType.BASE_CONTEXT_MUST_BE_RULE_NAME.code + "): T.g4:3:30: rule 'start': baseContext option value must reference a rule\n";
+
+		String[] pair = { grammar, expected };
+		super.testErrors(pair, true);
+	}
+
+	/**
+	 * This is a test for {@link ErrorType#BASE_CONTEXT_CANNOT_BE_TRANSITIVE}.
+	 */
+	@Test public void testBaseContextCannotBeTransitive() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"tokens { Foo1, Foo2 }\n" +
+			"start options { baseContext = start2; }\n" +
+			"  : Foo1 EOF\n" +
+			"  ;\n" +
+			"start2 options { baseContext = start3; }\n" +
+			"  : Foo1 EOF\n" +
+			"  ;\n" +
+			"start3\n" +
+			"  : Foo1 EOF\n" +
+			"  ;\n";
+
+		String expected =
+			"error(" + ErrorType.BASE_CONTEXT_CANNOT_BE_TRANSITIVE.code + "): T.g4:3:30: rule 'start': base context must reference a rule that does not specify a base context\n";
+
+		String[] pair = { grammar, expected };
+		super.testErrors(pair, true);
+	}
+
+	/**
+	 * This is a test for {@link ErrorType#BASE_CONTEXT_CANNOT_BE_TRANSITIVE}.
+	 *
+	 * <p>
+	 * This test verifies that
+	 * {@link ErrorType#BASE_CONTEXT_CANNOT_BE_TRANSITIVE} applies when the base
+	 * context option is explicitly set to the enclosing rule.</p>
+	 */
+	@Test public void testBaseContextCannotBeTransitive_Self() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"tokens { Foo1 }\n" +
+			"start options { baseContext = start; }\n" +
+			"  : Foo1 EOF\n" +
+			"  ;\n";
+
+		String expected =
+			"error(" + ErrorType.BASE_CONTEXT_CANNOT_BE_TRANSITIVE.code + "): T.g4:3:30: rule 'start': base context must reference a rule that does not specify a base context\n";
+
+		String[] pair = { grammar, expected };
+		super.testErrors(pair, true);
+	}
 }

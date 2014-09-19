@@ -945,6 +945,30 @@ public enum ErrorType {
 	 * <p>custom channels are not supported in combined grammars</p>
 	 */
 	CHANNELS_BLOCK_IN_COMBINED_GRAMMAR(164, "custom channels are not supported in combined grammars", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 165.
+	 *
+	 * <p>rule '<em>rule</em>': must label all alternatives in rules with the same base context, or none</p>
+	 */
+	RULE_WITH_TOO_FEW_ALT_LABELS_GROUP(165, "rule '<arg>': must label all alternatives in rules with the same base context, or none", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 166.
+	 *
+	 * <p>rule '<em>rule</em>': baseContext option value must reference a rule</p>
+	 */
+	BASE_CONTEXT_MUST_BE_RULE_NAME(166, "rule '<arg>': baseContext option value must reference a rule", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 167.
+	 *
+	 * <p>rule '<em>rule</em>': base context must reference a rule that does not specify a base context</p>
+	 */
+	BASE_CONTEXT_CANNOT_BE_TRANSITIVE(167, "rule '<arg>': base context must reference a rule that does not specify a base context", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 168.
+	 *
+	 * <p>rule '<em>rule</em>': lexer rules cannot specify a base context</p>
+	 */
+	LEXER_RULE_CANNOT_HAVE_BASE_CONTEXT(168, "rule '<arg>': lexer rules cannot specify a base context", ErrorSeverity.ERROR),
 
 	/*
 	 * Backward incompatibility errors

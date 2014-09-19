@@ -29,13 +29,14 @@
  */
 package org.antlr.v4.codegen.model;
 
+import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.misc.Tuple2;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.RuleAST;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,19 +69,30 @@ public class ListenerFile extends OutputFile {
 		Grammar g = factory.getGrammar();
 		parserName = g.getRecognizerName();
 		grammarName = g.name;
+
+		for (Map.Entry<String, List<RuleAST>> entry : g.contextASTs.entrySet()) {
+			for (RuleAST ruleAST : entry.getValue()) {
+				try {
+					Map<String, List<Tuple2<Integer, AltAST>>> labeledAlternatives = g.getLabeledAlternatives(ruleAST);
+					listenerNames.addAll(labeledAlternatives.keySet());
+				} catch (RecognitionException ex) {
+				}
+			}
+		}
+
+		for (Rule r : g.rules.values()) {
+			listenerNames.add(r.getBaseContext());
+		}
+
 		for (Rule r : g.rules.values()) {
 			Map<String, List<Tuple2<Integer,AltAST>>> labels = r.getAltLabels();
 			if ( labels!=null ) {
 				for (Map.Entry<String, List<Tuple2<Integer, AltAST>>> pair : labels.entrySet()) {
-					listenerNames.add(pair.getKey());
 					listenerLabelRuleNames.put(pair.getKey(), r.name);
 				}
 			}
-			else if (r.name.indexOf(ATNSimulator.RULE_VARIANT_DELIMITER) < 0) {
-				// only add rule context if no labels
-				listenerNames.add(r.name);
-			}
 		}
+
 		ActionAST ast = g.namedActions.get("header");
 		if ( ast!=null ) header = new Action(factory, ast);
 		genPackage = factory.getGrammar().tool.genPackage;

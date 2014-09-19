@@ -352,6 +352,7 @@ methodDeclaratorRest
     ;
     
 voidMethodDeclaratorRest
+options { baseContext = methodDeclaratorRest; }
     :   formalParameters ('throws' qualifiedNameList)?
         (   methodBody
         |   ';'
@@ -368,6 +369,7 @@ interfaceGenericMethodDecl
     ;
     
 voidInterfaceMethodDeclaratorRest
+options { baseContext = interfaceMethodDeclaratorRest; }
     :   formalParameters ('throws' qualifiedNameList)? ';'
     ;
     
