@@ -830,7 +830,7 @@ public \<Result> Result accept(ParseTreeVisitor\<? extends Result> visitor) {
 }
 >>
 
-AttributeDecl(d) ::= "<d.type> <d.name>"
+AttributeDecl(d) ::= "<d.type> <d.name><if(d.initValue)> = <d.initValue><endif>"
 
 /** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if(!x.isLocal)><typedContext(x.ctx)>.<endif><x.name>"
