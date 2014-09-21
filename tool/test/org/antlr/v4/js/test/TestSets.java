@@ -47,7 +47,7 @@ public class TestSets extends BaseTest {
 		// from a nonfragment rule does not set the overall token.
 		String grammar =
 			"grammar P;\n" +
-			"a : C {print(self._input.getText())} ;\n" +
+			"a : C {console.log(this._input.getText());} ;\n" +
 			"fragment A : '1' | '2';\n" +
 			"fragment B : '3' '4';\n" +
 			"C : A | B;\n";
@@ -59,7 +59,7 @@ public class TestSets extends BaseTest {
 	@Test public void testParserSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : t=('x'|'y') {print($t.text)} ;\n";
+			"a : t=('x'|'y') {console.log($t.text);} ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "x", debug);
 		assertEquals("x\n", found);
@@ -68,7 +68,7 @@ public class TestSets extends BaseTest {
 	@Test public void testParserNotSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : t=~('x'|'y') 'z' {print($t.text)} ;\n";
+			"a : t=~('x'|'y') 'z' {console.log($t.text);} ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "zz", debug);
 		assertEquals("z\n", found);
@@ -77,7 +77,7 @@ public class TestSets extends BaseTest {
 	@Test public void testParserNotToken() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ~'x' 'z' {print(self._input.getText())} ;\n";
+			"a : ~'x' 'z' {console.log(this._input.getText());} ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "zz", debug);
 		assertEquals("zz\n", found);
@@ -86,7 +86,7 @@ public class TestSets extends BaseTest {
 	@Test public void testParserNotTokenWithLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : t=~'x' 'z' {print($t.text)} ;\n";
+			"a : t=~'x' 'z' {console.log($t.text);} ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "zz", debug);
 		assertEquals("z\n", found);
@@ -95,7 +95,7 @@ public class TestSets extends BaseTest {
 	@Test public void testRuleAsSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a @after {print(self._input.getText())} : 'a' | 'b' |'c' ;\n";
+			"a @after {console.log(this._input.getText());} : 'a' | 'b' |'c' ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "b", debug);
 		assertEquals("b\n", found);
@@ -104,7 +104,7 @@ public class TestSets extends BaseTest {
 	@Test public void testNotChar() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : A {print($A.text)} ;\n" +
+			"a : A {console.log($A.text);} ;\n" +
 			"A : ~'b' ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "x", debug);
@@ -114,7 +114,7 @@ public class TestSets extends BaseTest {
 	@Test public void testOptionalSingleElement() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : A? 'c' {print(self._input.getText())} ;\n" +
+			"a : A? 'c' {console.log(this._input.getText());} ;\n" +
 			"A : 'b' ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "bc", debug);
@@ -124,7 +124,7 @@ public class TestSets extends BaseTest {
 	@Test public void testOptionalLexerSingleElement() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : A {print(self._input.getText())} ;\n" +
+			"a : A {console.log(this._input.getText());} ;\n" +
 			"A : 'b'? 'c' ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "bc", debug);
@@ -134,7 +134,7 @@ public class TestSets extends BaseTest {
 	@Test public void testStarLexerSingleElement() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : A {print(self._input.getText())} ;\n" +
+			"a : A {console.log(this._input.getText());} ;\n" +
 			"A : 'b'* 'c' ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "bbbbc", debug);
@@ -147,7 +147,7 @@ public class TestSets extends BaseTest {
 	@Test public void testPlusLexerSingleElement() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : A {print(self._input.getText())} ;\n" +
+			"a : A {console.log(this._input.getText());} ;\n" +
 			"A : 'b'+ 'c' ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "bbbbc", debug);
@@ -157,7 +157,7 @@ public class TestSets extends BaseTest {
 	@Test public void testOptionalSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ('a'|'b')? 'c' {print(self._input.getText())} ;\n";
+			"a : ('a'|'b')? 'c' {console.log(this._input.getText());} ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "ac", debug);
 		assertEquals("ac\n", found);
@@ -166,7 +166,7 @@ public class TestSets extends BaseTest {
 	@Test public void testStarSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ('a'|'b')* 'c' {print(self._input.getText())} ;\n";
+			"a : ('a'|'b')* 'c' {console.log(this._input.getText());} ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "abaac", debug);
 		assertEquals("abaac\n", found);
@@ -175,7 +175,7 @@ public class TestSets extends BaseTest {
 	@Test public void testPlusSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : ('a'|'b')+ 'c' {print(self._input.getText())} ;\n";
+			"a : ('a'|'b')+ 'c' {console.log(this._input.getText());} ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "abaac", debug);
 		assertEquals("abaac\n", found);
@@ -184,7 +184,7 @@ public class TestSets extends BaseTest {
 	@Test public void testLexerOptionalSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : A {print(self._input.getText())} ;\n" +
+			"a : A {console.log(this._input.getText());} ;\n" +
 			"A : ('a'|'b')? 'c' ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "ac", debug);
@@ -194,7 +194,7 @@ public class TestSets extends BaseTest {
 	@Test public void testLexerStarSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : A {print(self._input.getText())} ;\n" +
+			"a : A {console.log(this._input.getText());} ;\n" +
 			"A : ('a'|'b')* 'c' ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "abaac", debug);
@@ -204,7 +204,7 @@ public class TestSets extends BaseTest {
 	@Test public void testLexerPlusSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : A {print(self._input.getText())} ;\n" +
+			"a : A {console.log(this._input.getText());} ;\n" +
 			"A : ('a'|'b')+ 'c' ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "abaac", debug);
@@ -214,7 +214,7 @@ public class TestSets extends BaseTest {
 	@Test public void testNotCharSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : A {print($A.text)} ;\n" +
+			"a : A {console.log($A.text);} ;\n" +
 			"A : ~('b'|'c') ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "x", debug);
@@ -224,7 +224,7 @@ public class TestSets extends BaseTest {
 	@Test public void testNotCharSetWithLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : A {print($A.text)} ;\n" +
+			"a : A {console.log($A.text);} ;\n" +
 			"A : h=~('b'|'c') ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",
 								  "a", "x", debug);
@@ -235,10 +235,10 @@ public class TestSets extends BaseTest {
 		// might be a useful feature to add someday
 		String[] pair = new String[] {
 			"grammar T;\n" +
-			"a : A {print($A.text)} ;\n" +
+			"a : A {console.log($A.text);} ;\n" +
 			"A : ~('a'|B) ;\n" +
 			"B : 'b' ;\n",
-			"error(" + ErrorType.UNSUPPORTED_REFERENCE_IN_LEXER_SET.code + "): T.g4:3:10: rule reference 'B' is not currently supported in a set\n"
+			"error(" + ErrorType.UNSUPPORTED_REFERENCE_IN_LEXER_SET.code + "): T.g4:3:10: rule reference B is not currently supported in a set\n"
 		};
 		super.testErrors(pair, true);
 	}
@@ -247,7 +247,7 @@ public class TestSets extends BaseTest {
 		// might be a useful feature to add someday
 		String[] pair = new String[] {
 			"grammar T;\n" +
-			"a : A {print($A.text)} ;\n" +
+			"a : A {console.log($A.text);} ;\n" +
 			"A : ~('a'|'aa') ;\n" +
 			"B : 'b' ;\n",
 			"error(" + ErrorType.INVALID_LITERAL_IN_LEXER_SET.code + "): T.g4:3:10: multi-character literals are not allowed in lexer sets: 'aa'\n"
@@ -258,7 +258,7 @@ public class TestSets extends BaseTest {
 	@Test public void testNotCharSetWithRuleRef3() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : A {print($A.text)} ;\n" +
+			"a : A {console.log($A.text);} ;\n" +
 			"A : ('a'|B) ;\n" +  // this doesn't collapse to set but works
 			"fragment\n" +
 			"B : ~('a'|'c') ;\n";
@@ -270,7 +270,7 @@ public class TestSets extends BaseTest {
 	@Test public void testCharSetLiteral() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : (A {print($A.text)})+ ;\n" +
+			"a : (A {console.log($A.text);})+ ;\n" +
 			"A : [AaBb] ;\n" +
 			"WS : (' '|'\\n')+ -> skip ;\n";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor",

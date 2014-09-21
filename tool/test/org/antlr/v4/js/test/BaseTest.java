@@ -131,6 +131,9 @@ public abstract class BaseTest {
     		tmpdir = prop;
     	else
     		tmpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath(); 
+    	File dir = new File(tmpdir);
+    	if(dir.exists())
+    		this.eraseFiles(dir);
     }
 
     protected org.antlr.v4.Tool newTool(String[] args) {

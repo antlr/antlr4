@@ -48,16 +48,16 @@ public class TestLexerActions extends BaseTest {
 			"\n" +
 			"@lexer::members\n" +
 			"{\n" +
-			"this.getRecordedText = function() {\n" +
+			"L.prototype.getRecordedText = function() {\n" +
 			"    return this._input.getText (this.start_index, this.stop_index);\n" +
 			"}\n" +
 			"\n" +
-			"this.start = function() {\n" +
+			"L.prototype.start = function() {\n" +
 			"    this.start_index = this._input.index;\n" +
 			"    console.log(\"Start:\" + this.start_index);\n" +
 			"}\n" +
 			"\n" +
-			"this.stop = function() {\n" +
+			"L.prototype.stop = function() {\n" +
 			"    this.stop_index = this._input.index;\n" +
 			"    console.log(\"Stop:\" + this.stop_index);\n" +
 			"}\n" +

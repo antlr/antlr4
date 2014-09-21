@@ -35,8 +35,6 @@
  *
  *  REQUIRED.
  */
-VERSION() ::= "4.2" // use just "x.y" and don't include bug fix release number
-
 
 pythonTypeInitMap ::= [
 	"bool":"False",
@@ -235,7 +233,7 @@ case <index>:
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-<parser.name>.prototype.<r.name>_sempred = function(localctx, predIndex) {
+<if(parser)><parser.name><else><lexer.name><endif>.prototype.<r.name>_sempred = function(localctx, predIndex) {
 	switch(predIndex) {
 		<actions:{index| case <index>:
 	return <actions.(index)>;}; separator="\n">
@@ -462,7 +460,7 @@ testShiftInRange(shiftAmount) ::= <<
 
 // produces smaller bytecode only when bits.ttypes contains more than two items
 bitsetBitfieldComparison(s, bits) ::= <%
-(<testShiftInRange({<offsetShiftVar(s.varName, bits.shift)>})> and ((1 \<\< <offsetShiftVar(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (1 \<\< <offsetShiftType(ttype, bits.shift)>)}; separator=" | ">)) != 0)
+(<testShiftInRange({<offsetShiftVar(s.varName, bits.shift)>})> && ((1 \<\< <offsetShiftVar(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (1 \<\< <offsetShiftType(ttype, bits.shift)>)}; separator=" | ">)) !== 0)
 %>
 
 isZero ::= [
@@ -475,7 +473,7 @@ offsetShiftVar(shiftAmount, offset) ::= <%
 %>
 
 offsetShiftType(shiftAmount, offset) ::= <%
-<if(!isZero.(offset))>(self.<shiftAmount> - <offset>)<else>self.<shiftAmount><endif>
+<if(!isZero.(offset))>(<shiftAmount> - <offset>)<else><shiftAmount><endif>
 %>
 
 // produces more efficient bytecode when bits.ttypes contains at most two items
@@ -505,7 +503,7 @@ CommonSetStuff(m, expr, capture, invert) ::= <<
 this.state = <m.stateNumber>;
 <if(m.labels)><m.labels:{l | <labelref(l)> = }>this._input.LT(1);<endif>
 <capture>
-<if(invert)>if(<m.varName>\<=0 || <expr><else>if(!(<expr>))<endif> {
+<if(invert)>if(<m.varName>\<=0 || <expr>)<else>if(!(<expr>))<endif> {
     <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>this._errHandler.recoverInline(this);
 }
 this.consume();
@@ -718,7 +716,7 @@ VisitorDispatchMethod(method) ::= <<
 
 >>
 
-AttributeDecl(d) ::= "self.<d.name> = None"
+AttributeDecl(d) ::= "this.<d.name> = <if(d.initValue)><d.initValue><else>null<endif>"
 
 /** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if(!x.isLocal)>localctx.<endif><x.name>"
