@@ -270,7 +270,8 @@ public class <parser.name> extends <superClass; null="Parser"> {
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
 		<parser.sempredFuncs.values:{f|
-case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
+case <f.ruleIndex>: 
+	return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
 		}
 		return true;
 	}
@@ -286,8 +287,10 @@ dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 @Override
 public void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
 	switch (ruleIndex) {
-	<recog.actionFuncs.values:{f|
-case <f.ruleIndex>: <f.name>_action((<f.ctxType>)_localctx, actionIndex); break;}; separator="\n">
+	<recog.actionFuncs.values:{f| 
+case <f.ruleIndex>: 
+	<f.name>_action((<f.ctxType>)_localctx, actionIndex); 
+	break;}; separator="\n">
 	}
 }
 <actionFuncs.values; separator="\n">
@@ -297,7 +300,8 @@ case <f.ruleIndex>: <f.name>_action((<f.ctxType>)_localctx, actionIndex); break;
 public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 	switch (ruleIndex) {
 	<recog.sempredFuncs.values:{f|
-case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
+case <f.ruleIndex>: 
+	return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
 	}
 	return true;
 }
@@ -319,7 +323,9 @@ RuleActionFunction(r, actions) ::= <<
 private void <r.name>_action(<r.ctxType> _localctx, int actionIndex) {
 	switch (actionIndex) {
 	<actions:{index|
-case <index>: <actions.(index)> break;}; separator="\n">
+case <index>: 
+	<actions.(index)> 
+	break;}; separator="\n">
 	}
 }
 >>
@@ -331,7 +337,8 @@ RuleSempredFunction(r, actions) ::= <<
 private boolean <r.name>_sempred(<r.ctxType> _localctx, int predIndex) {
 	switch (predIndex) {
 	<actions:{index|
-case <index>: return <actions.(index)>;}; separator="\n">
+case <index>: 
+	return <actions.(index)>;}; separator="\n">
 	}
 	return true;
 }

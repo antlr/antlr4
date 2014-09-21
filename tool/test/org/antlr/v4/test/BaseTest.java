@@ -156,6 +156,8 @@ public abstract class BaseTest {
             // new output dir for each test
     		tmpdir = new File(System.getProperty("java.io.tmpdir"),
 						  getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
+    	if(new File(tmpdir).exists())
+    		eraseFiles();
     }
 
     protected org.antlr.v4.Tool newTool(String[] args) {
