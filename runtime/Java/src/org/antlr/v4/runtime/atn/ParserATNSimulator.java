@@ -589,7 +589,7 @@ public class ParserATNSimulator extends ATNSimulator {
 //			return -1;
 //		}
 
-		if ( s.configs.getConflictInfo()!=null ) {
+		if ( !state.useContext && s.configs.getConflictInfo()!=null ) {
 			if ( dfa.atnStartState instanceof DecisionState ) {
 				if (!userWantsCtxSensitive ||
 					(!s.configs.getDipsIntoOuterContext() && s.configs.isExactConflict()) ||
