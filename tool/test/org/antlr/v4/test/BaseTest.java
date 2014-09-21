@@ -81,6 +81,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -148,10 +149,15 @@ public abstract class BaseTest {
 
     @Before
 	public void setUp() throws Exception {
-        // new output dir for each test
-        tmpdir = new File(System.getProperty("java.io.tmpdir"),
+       	String prop = System.getProperty("antlr-java-test-dir");
+    	if(prop!=null && prop.length()>0)
+    		tmpdir = prop;
+    	else
+            // new output dir for each test
+    		tmpdir = new File(System.getProperty("java.io.tmpdir"),
 						  getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
-//		tmpdir = "/tmp";
+    	if(new File(tmpdir).exists())
+    		eraseFiles();
     }
 
     protected org.antlr.v4.Tool newTool(String[] args) {
@@ -1175,10 +1181,17 @@ public abstract class BaseTest {
     }
 
     protected void eraseTempDir() {
-        File tmpdirF = new File(tmpdir);
-        if ( tmpdirF.exists() ) {
-            eraseFiles();
-            tmpdirF.delete();
+       	boolean doErase = true;
+    	String propName = "antlr-java-erase-test-dir";
+    	String prop = System.getProperty(propName);
+    	if(prop!=null && prop.length()>0)
+    		doErase = Boolean.getBoolean(prop);
+        if(doErase) {
+	        File tmpdirF = new File(tmpdir);
+	        if ( tmpdirF.exists() ) {
+	            eraseFiles();
+	            tmpdirF.delete();
+	        }
         }
     }
 
