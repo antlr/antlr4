@@ -4,3 +4,4 @@ exports.LexerNoViableAltException = require('./Errors').LexerNoViableAltExceptio
 exports.InputMismatchException = require('./Errors').InputMismatchException;
 exports.FailedPredicateException = require('./Errors').FailedPredicateException;
 exports.DiagnosticErrorListener = require('./DiagnosticErrorListener').DiagnosticErrorListener;
+exports.BailErrorStrategy = require('./ErrorStrategy').BailErrorStrategy;

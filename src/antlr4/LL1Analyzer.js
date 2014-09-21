@@ -30,6 +30,7 @@
 ///
 
 var Set = require('./Utils').Set;
+var BitSet = require('./Utils').BitSet;
 var Token = require('./Token').Token;
 var ATNConfig = require('./atn/ATNConfig').ATNConfig;
 var IntervalSet = require('./IntervalSet').IntervalSet;
@@ -39,7 +40,9 @@ var NotSetTransition = require('./atn/Transition').NotSetTransition;
 var WildcardTransition = require('./atn/Transition').WildcardTransition;
 var AbstractPredicateTransition = require('./atn/Transition').AbstractPredicateTransition;
 
-var predictionContextFromRuleContext = require('./PredictionContext').predictionContextFromRuleContext;
+var predictionContext = require('./PredictionContext');
+var predictionContextFromRuleContext = predictionContext.predictionContextFromRuleContext;
+var SingletonPredictionContext = predictionContext.SingletonPredictionContext;
 
 function LL1Analyzer (atn) {
     this.atn = atn;
@@ -68,11 +71,11 @@ LL1Analyzer.prototype.getDecisionLookahead = function(s) {
     var count = s.transitions.length;
     var look = [];
     for(var alt=0; alt< count; alt++) {
-        look[alt] = new Set();
+        look[alt] = new IntervalSet();
         var lookBusy = new Set();
         var seeThruPreds = false; // fail to get lookahead upon pred
         this._LOOK(s.transition(alt).target, null, PredictionContext.EMPTY,
-              look[alt], lookBusy, new Set(), seeThruPreds, false);
+              look[alt], lookBusy, new BitSet(), seeThruPreds, false);
         // Wipe out lookahead for this alternative if we found nothing
         // or we had a predicate when we !seeThruPreds
         if (look[alt].length===0 || look[alt].contains(LL1Analyzer.HIT_PRED)) {
@@ -105,7 +108,7 @@ LL1Analyzer.prototype.LOOK = function(s, stopState, ctx) {
     var seeThruPreds = true; // ignore preds; get all lookahead
 	ctx = ctx || null;
     var lookContext = ctx!==null ? predictionContextFromRuleContext(s.atn, ctx) : null;
-    this._LOOK(s, stopState, lookContext, r, new Set(), new Set(), seeThruPreds, true);
+    this._LOOK(s, stopState, lookContext, r, new Set(), new BitSet(), seeThruPreds, true);
     return r;
 };
     
@@ -127,7 +130,7 @@ LL1Analyzer.prototype.LOOK = function(s, stopState, ctx) {
 // @param look The result lookahead set.
 // @param lookBusy A set used for preventing epsilon closures in the ATN
 // from causing a stack overflow. Outside code should pass
-// {@code new HashSet<ATNConfig>} for this argument.
+// {@code new Set<ATNConfig>} for this argument.
 // @param calledRuleStack A set used for preventing left recursion in the
 // ATN from causing a stack overflow. Outside code should pass
 // {@code new BitSet()} for this argument.
@@ -180,7 +183,7 @@ LL1Analyzer.prototype._LOOK = function(s, stopState , ctx, look, lookBusy, calle
         }
     }
     for(var j=0; j<s.transitions.length; j++) {
-    	var t = s.transitions[j];
+        var t = s.transitions[j];
         if (t.constructor === RuleTransition) {
             if (calledRuleStack.contains(t.target.ruleIndex)) {
                 continue;

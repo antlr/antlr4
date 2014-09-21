@@ -374,6 +374,7 @@ LexerIndexedCustomAction.prototype.equals = function(other) {
 
 exports.LexerActionType = LexerActionType;
 exports.LexerSkipAction = LexerSkipAction;
+exports.LexerChannelAction = LexerChannelAction;
 exports.LexerCustomAction = LexerCustomAction;
 exports.LexerIndexedCustomAction = LexerIndexedCustomAction;
 exports.LexerMoreAction = LexerMoreAction;

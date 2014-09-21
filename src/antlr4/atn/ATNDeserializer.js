@@ -63,6 +63,7 @@ var ATNDeserializationOptions = require('./ATNDeserializationOptions').ATNDeseri
 var LexerActions = require('./LexerAction');
 var LexerActionType = LexerActions.LexerActionType;
 var LexerSkipAction = LexerActions.LexerSkipAction;
+var LexerChannelAction = LexerActions.LexerChannelAction;
 var LexerCustomAction = LexerActions.LexerCustomAction;
 var LexerMoreAction = LexerActions.LexerMoreAction;
 var LexerTypeAction = LexerActions.LexerTypeAction;

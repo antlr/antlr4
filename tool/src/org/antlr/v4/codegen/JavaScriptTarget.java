@@ -65,7 +65,7 @@ public class JavaScriptTarget extends Target {
 
     @Override
     public String getVersion() {
-        return "4.5"; 
+        return "4.4.0"; 
     }
 
     public Set<String> getBadWords() {

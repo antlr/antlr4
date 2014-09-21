@@ -171,12 +171,11 @@ Object.defineProperty(<parser.name>.prototype, "atn", {
 <parser.name>.prototype.sempred = function(localctx, ruleIndex, predIndex) {
 	switch(ruleIndex) {
 	<parser.sempredFuncs.values:{f | case <f.ruleIndex>:
-		this.<f.name>_sempred(localctx, predIndex);
-		break;}; separator="\n">
+		return this.<f.name>_sempred(localctx, predIndex);}; separator="\n">
     default:
         throw "No predicate with index:" + ruleIndex;
    }
-}
+};
 
 <sempredFuncs.values; separator="\n">
 <endif>
@@ -187,7 +186,7 @@ exports.<parser.name> = <parser.name>;
 
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
-this.action = function(localctx, ruleIndex, actionIndex) {
+<lexer.name>.prototype.action = function(localctx, ruleIndex, actionIndex) {
 	switch (ruleIndex) {
 	<recog.actionFuncs.values:{f|
 case <f.ruleIndex>:
@@ -198,18 +197,18 @@ case <f.ruleIndex>:
 	}
 };
 			
-<actionFuncs.values; separator="\n">
-		
+<actionFuncs.values; separator="\n">	
 <endif>
 <if(sempredFuncs)>
-<parser.name>.prototype.sempred = function(localctx, ruleIndex, predIndex) {
+<lexer.name>.prototype.sempred = function(localctx, ruleIndex, predIndex) {
 	switch (ruleIndex) {
-	<recog.sempredFuncs.values:{f| case <f.ruleIndex>:
-		return this.<f.name>_sempred(localctx, predIndex);}; separator="\n">
-    default:
-    	throw "No registered predicate for:" + ruleIndex;
+		<recog.sempredFuncs.values:{f| case <f.ruleIndex>:
+	return this.<f.name>_sempred(localctx, predIndex);}; separator="\n">
+    	default:
+    		throw "No registered predicate for:" + ruleIndex;
     }
 };
+
 <sempredFuncs.values; separator="\n">
 <endif>
 >>
@@ -220,7 +219,7 @@ case <f.ruleIndex>:
  */
 RuleActionFunction(r, actions) ::= <<
 
-this.<r.name>_action = function(localctx , actionIndex) {
+<lexer.name>.prototype.<r.name>_action = function(localctx , actionIndex) {
 	switch (actionIndex) {
 	<actions:{index|
 case <index>:
@@ -238,9 +237,8 @@ case <index>:
 RuleSempredFunction(r, actions) ::= <<
 <parser.name>.prototype.<r.name>_sempred = function(localctx, predIndex) {
 	switch(predIndex) {
-	    <actions:{index| case <index>:
-			return <actions.(index)>;
-}; separator="\n">
+		<actions:{index| case <index>:
+	return <actions.(index)>;}; separator="\n">
 		default:
 			throw "No predicate with index:" + predIndex;
 	}
@@ -316,7 +314,7 @@ def <currentRule.name>(self, _p=0<if(currentRule.args)>, <args:{a | , <a>}><endi
 >>
 
 CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
-<if(currentOuterMostAltCodeBlock.altLabel)>localctx = new <currentOuterMostAltCodeBlock.altLabel; format="cap">Context(self, localctx);<endif>
+<if(currentOuterMostAltCodeBlock.altLabel)>localctx = new <currentOuterMostAltCodeBlock.altLabel; format="cap">Context(this, localctx);<endif>
 this.enterOuterAlt(localctx, <currentOuterMostAltCodeBlock.alt.altNum>);
 <CodeBlockForAlt(currentAltCodeBlock=currentOuterMostAltCodeBlock, ...)>
 >>
@@ -332,19 +330,19 @@ this.state = <choice.stateNumber>;
 <!_errHandler.sync(this);!>
 <if(choice.label)><labelref(choice.label)> = this._input.LT(1);<endif>
 <preamble; separator="\n">
-var token = this._input.LA(1);
+switch(this._input.LA(1)) {
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
     <alt>
-	}; separator="\n} else ">
-} else {
+    break;}; separator="\n">
+default:
     <error>
 }
 >>
 
 LL1OptionalBlock(choice, alts, error) ::= <<
-setState(<choice.stateNumber>);
+this.state = <choice.stateNumber>;
 <!_errHandler.sync(this);!>
-switch (_input.LA(1)) {
+switch (this._input.LA(1)) {
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
 	break;}; separator="\n">
@@ -354,12 +352,12 @@ default:
 >>
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
-self.state = <choice.stateNumber>
+this.state = <choice.stateNumber>;
 <!_errHandler.sync(this);!>
 <preamble; separator="\n">
-if <expr>:
+if(<expr>) {
     <alts; separator="\n">
-
+}
 <!else if ( !(<followExpr>) ) <error>!>
 >>
 
@@ -379,15 +377,12 @@ LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
 this.state = <choice.blockStartStateNumber>; <! alt block decision !>
 this._errHandler.sync(this);
 <preamble; separator="\n">
-while(true) {
+do {
     <alts; separator="\n">
     this.state = <choice.stateNumber>; <! loopback/exit decision !>
     this._errHandler.sync(this);
     <iteration>
-    if (!(<loopExpr>)) {
-        break;
-	}
-}
+} while(<loopExpr>);
 >>
 
 // LL(*) stuff
@@ -419,16 +414,18 @@ if(la_===<i><if(!choice.ast.greedy)>+1<endif>) {
 >>
 
 StarBlock(choice, alts, sync, iteration) ::= <<
-self.state = <choice.stateNumber>
-self._errHandler.sync(self)
-_alt = self._interp.adaptivePredict(self._input,<choice.decision>,self._ctx)
-while _alt!=<choice.exitAlt> and _alt!=ATN.INVALID_ALT_NUMBER:
-    if _alt==1<if(!choice.ast.greedy)>+1<endif>:
+this.state = <choice.stateNumber>;
+this._errHandler.sync(this);
+var _alt = this._interp.adaptivePredict(this._input,<choice.decision>,this._ctx)
+while(_alt!=<choice.exitAlt> && _alt!=ATN.INVALID_ALT_NUMBER) {
+    if(_alt===1<if(!choice.ast.greedy)>+1<endif>) {
         <iteration>
         <alts> <! should only be one !>
-    self.state = <choice.loopBackStateNumber>
-    self._errHandler.sync(self)
-    _alt = self._interp.adaptivePredict(self._input,<choice.decision>,self._ctx)
+    }
+    this.state = <choice.loopBackStateNumber>;
+    this._errHandler.sync(this);
+    _alt = this._interp.adaptivePredict(this._input,<choice.decision>,this._ctx);
+}
 
 >>
 
@@ -438,8 +435,9 @@ this._errHandler.sync(this);
 var _alt = 1<if(!choice.ast.greedy)>+1<endif>;
 while(_alt!==<choice.exitAlt> && _alt!==ATN.INVALID_ALT_NUMBER) {
     <alts:{alt|
-if _alt == <i><if(!choice.ast.greedy)>+1<endif>:
+if(_alt === <i><if(!choice.ast.greedy)>+1<endif>) \{
     <alt>
+\}
 }; separator="\nel">
     else:
         <error>
@@ -486,7 +484,7 @@ bitsetInlineComparison(s, bits) ::= <%
 %>
 
 cases(ttypes) ::= <<
-if([<ttypes:{t | <t>}; separator=", ">].indexOf(token)>=0) {
+case <ttypes:{t | <t>}; separator=", ">:
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
@@ -514,8 +512,8 @@ this.consume();
 >>
 
 Wildcard(w) ::= <<
-setState(<w.stateNumber>);
-<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>matchWildcard()
+this.state = <w.stateNumber>;
+<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>matchWildcard();
 >>
 
 // ACTION STUFF
@@ -563,7 +561,7 @@ SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.name> = <rhsChunks>"
 TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"
 
-TokenPropertyRef_text(t) ::= "(None if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.text)"
+TokenPropertyRef_text(t) ::= "(<ctx(t)>.<t.label>===null ? null : <ctx(t)>.<t.label>.text)"
 TokenPropertyRef_type(t) ::= "(0 if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.type()"
 TokenPropertyRef_line(t) ::= "(0 if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.line)"
 TokenPropertyRef_pos(t) ::= "(0 if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.column)"
@@ -571,9 +569,9 @@ TokenPropertyRef_channel(t) ::= "(0 if (<ctx(t)>.<t.label> is None else <ctx(t)>
 TokenPropertyRef_index(t) ::= "(0 if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.tokenIndex)"
 TokenPropertyRef_int(t) ::= "(0 if <ctx(t)>.<t.label> is None else int(<ctx(t)>.<t.label>.text))"
 
-RulePropertyRef_start(r) ::= "(None if <ctx(r)>.<r.label> is None else <ctx(r)>.<r.label>.start)"
+RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label>===null ? null : <ctx(r)>.<r.label>.start)"
 RulePropertyRef_stop(r)	 ::= "(None if <ctx(r)>.<r.label> is None else <ctx(r)>.<r.label>.stop)"
-RulePropertyRef_text(r)	 ::= "(None if <ctx(r)>.<r.label> is None else self._input.getText((<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop)))"
+RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label>===null ? null : this._input.getText((<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop)))"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
 
 ThisRulePropertyRef_start(r) ::= "localctx.start"
@@ -584,13 +582,13 @@ ThisRulePropertyRef_ctx(r)	 ::= "localctx"
 NonLocalAttrRef(s)		 	 ::= "getInvokingContext(<s.ruleIndex>).<s.name>"
 SetNonLocalAttr(s, rhsChunks)  ::= "getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
 
-AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.append(<labelref(a.label)>)"
+AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.push(<labelref(a.label)>);"
 
-TokenDecl(t) ::= "self.<t.name> = None # <TokenLabelType()>"
+TokenDecl(t) ::= "this.<t.name> = null; // <TokenLabelType()>"
 TokenTypeDecl(t) ::= "var <t.name> = 0; // <TokenLabelType()> type"
-TokenListDecl(t) ::= "self.<t.name> = list() # of <TokenLabelType()>s"
-RuleContextDecl(r) ::= "self.<r.name> = None # <r.ctxName>"
-RuleContextListDecl(rdecl) ::= "self.<rdecl.name> = list() # of <rdecl.ctxName>s"
+TokenListDecl(t) ::= "this.<t.name> = []; // of <TokenLabelType()>s"
+RuleContextDecl(r) ::= "this.<r.name> = null; // <r.ctxName>"
+RuleContextListDecl(rdecl) ::= "this.<rdecl.name> = []; // of <rdecl.ctxName>s"
 
 ContextTokenGetterDecl(t)      ::= <<
 <t.name> = function() {
@@ -674,10 +672,10 @@ function <struct.name>(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.
 <getters:{g | <struct.name>.prototype.<g>}; separator="\n\n">
 
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
-    def copyFrom(self, ctx):
-        super(<parser.name>.<struct.name>, self).copyFrom(ctx)
-        <struct.attrs:{a | self.<a.name> = ctx.<a.name>}; separator="\n">
-
+<struct.name>.prototype.copyFrom = function(ctx) {
+    <superClass>.prototype.copyFrom.call(this, ctx);
+    <struct.attrs:{a | this.<a.name> = ctx.<a.name>;}; separator="\n">
+};
 <endif>
 <dispatchMethods; separator="\n">
 <extensionMembers; separator="\n">
@@ -685,16 +683,18 @@ function <struct.name>(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.
 >>
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
-class <struct.name>(<currentRule.name; format="cap">Context):
+function <struct.name>(parser, ctx) {
+	<currentRule.name; format="cap">Context.call(this, parser);
+    <attrs:{a | <a>;}; separator="\n">
+    <currentRule.name; format="cap">Context.prototype.copyFrom.call(this, ctx);
+    return this;
+}
 
-    def __init__(self, parser, ctx): # actually a <parser.name>.<currentRule.name; format="cap">Context)
-        super(<parser.name>.<struct.name>, self).__init__(parser)
-        <attrs:{a | <a>}; separator="\n">
-        self.copyFrom(ctx)
-    
-    <getters:{g | <g>}; separator="\n">
+<struct.name>.prototype = Object.create(<currentRule.name; format="cap">Context.prototype);
+<struct.name>.prototype.constructor = <struct.name>;
 
-    <dispatchMethods; separator="\n">
+<getters:{g | <struct.name>.prototype.<g>}; separator="\n\n">
+<dispatchMethods; separator="\n">
 
 >>
 
@@ -790,15 +790,15 @@ var grammarFileName = "<lexer.grammarFileName>";
 function <lexer.name>(input) {
 	<if(superClass)><superClass><else>antlr4.Lexer<endif>.call(this, input);
     this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.PredictionContextCache());
-        
-    <namedActions.members>
-        
-    <dumpActions(lexer, "", actionFuncs, sempredFuncs)>
     return this;
 }
 
 <lexer.name>.prototype = Object.create(<if(superClass)><superClass><else>antlr4.Lexer<endif>.prototype);
 <lexer.name>.prototype.constructor = <lexer.name>;
+
+<namedActions.members>
+        
+<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 
 exports.<lexer.name> = <lexer.name>;
 

@@ -77,6 +77,33 @@ BitSet.prototype.add = function(value) {
 	this.data[value] = true;
 };
 
+BitSet.prototype.remove = function(value) {
+	delete this.data[value];
+};
+
+BitSet.prototype.contains = function(value) {
+	return this.data[value] === true;
+};
+
+BitSet.prototype.values = function() {
+	return Object.keys(this.data);
+};
+
+BitSet.prototype.minValue = function() {
+	return Math.min.apply(null, this.values());
+};
+
+BitSet.prototype.hashString = function() {
+	return this.values().toString();
+};
+
+BitSet.prototype.equals = function(other) {
+	if(!(other instanceof BitSet)) {
+		return false;
+	}
+	return this.hashString()===other.hashString();
+};
+
 
 function Dict() {
 	this.data = {};
@@ -130,7 +157,19 @@ AltDict.prototype.values = function() {
 	});
 };
 
+function escapeWhitespace(s, escapeSpaces) {
+	s = s.replace("\t","\\t");
+	s = s.replace("\n","\\n");
+	s = s.replace("\r","\\r");
+	if(escapeSpaces) {
+		s = s.replace(" ","\u00B7");
+	}
+	return s;
+}
+
+
 exports.Dict = Dict;
 exports.Set = Set;
 exports.BitSet = BitSet;
 exports.AltDict = AltDict;
+exports.escapeWhitespace = escapeWhitespace;

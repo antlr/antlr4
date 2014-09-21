@@ -36,6 +36,7 @@
 var Set = require('./../Utils').Set;
 var BitSet = require('./../Utils').BitSet;
 var AltDict = require('./../Utils').AltDict;
+var ATN = require('./ATN').ATN;
 var RuleStopState = require('./ATNState').RuleStopState;
 
 function PredictionMode() {
@@ -498,7 +499,7 @@ PredictionMode.getUniqueAlt = function(altsets) {
 // @return the set of represented alternatives in {@code altsets}
 //
 PredictionMode.getAlts = function(altsets) {
-    var all = new Set();
+    var all = new BitSet();
     altsets.map( function(alts) { all.add(alts); });
     return all;
 };
@@ -558,8 +559,7 @@ PredictionMode.getStateToAltMap = function(configs) {
 PredictionMode.hasStateAssociatedWithOneAlt = function(configs) {
     var values = PredictionMode.getStateToAltMap(configs).values();
     for(var i=0;i<values.length;i++) {
-    	var alts = values[i];
-        if (alts.length===1) {
+        if (values[i].length===1) {
             return true;
         }
     }
@@ -567,16 +567,17 @@ PredictionMode.hasStateAssociatedWithOneAlt = function(configs) {
 };
 
 PredictionMode.getSingleViableAlt = function(altsets) {
-    var viableAlts = new Set();
+    var result = null;
 	for(var i=0;i<altsets.length;i++) {
 		var alts = altsets[i];
-        var minAlt = Math.min(alts);
-        viableAlts.add(minAlt);
-        if (viableAlts.length>1) { // more than 1 viable alt
+        var minAlt = alts.minValue();
+        if(result===null) {
+            result = minAlt;
+        } else if(result!==minAlt) { // more than 1 viable alt
             return ATN.INVALID_ALT_NUMBER;
         }
 	}
-    return Math.min(viableAlts);
+    return result;
 };
 
 exports.PredictionMode = PredictionMode;

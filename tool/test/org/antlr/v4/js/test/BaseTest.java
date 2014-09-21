@@ -815,7 +815,7 @@ public abstract class BaseTest {
 			"	for(var i=0;i\\<ctx.getChildCount; i++) {\n" +
 			"		var child = ctx.getChild(i);\n" +
 			"       var parent = child.parentCtx;\n" +
-			"       if(parent.getRuleContext() != ctx || !(parent instanceof antlr4.tree.RuleNode)) {\n" +
+			"       if(parent.getRuleContext() !== ctx || !(parent instanceof antlr4.tree.RuleNode)) {\n" +
 			"           throw \"Invalid parse tree shape detected.\";\n" +
 			"		}\n" +
 			"	}\n" +	

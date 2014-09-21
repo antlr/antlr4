@@ -31,14 +31,14 @@ lexer grammar PositionAdjustingLexer;
 
 @members {
 
-this.resetAcceptPosition = function(index, line, column) {
+PositionAdjustingLexer.prototype.resetAcceptPosition = function(index, line, column) {
 	this._input.seek(index);
 	this.line = line;
 	this.column = column;
 	this._interp.consume(this._input);
 };
 
-this.nextToken = function() {
+PositionAdjustingLexer.prototype.nextToken = function() {
 	if (!("resetAcceptPosition" in this._interp)) {
 		var lexer = this;
 		this._interp.resetAcceptPosition = function(index, line, column) { lexer.resetAcceptPosition(index, line, column); };
@@ -46,7 +46,7 @@ this.nextToken = function() {
 	return antlr4.Lexer.prototype.nextToken.call(this);
 };
 
-this.emit = function() {
+PositionAdjustingLexer.prototype.emit = function() {
 	switch(this._type) {
 	case TOKENS:
 		this.handleAcceptPositionForKeyword("tokens");
@@ -58,7 +58,7 @@ this.emit = function() {
 	return antlr4.Lexer.prototype.emit.call(this);
 };
 
-this.handleAcceptPositionForIdentifier = function() {
+PositionAdjustingLexer.prototype.handleAcceptPositionForIdentifier = function() {
 	var tokenText = this.text;
 	var identifierLength = 0;
 	while (identifierLength < tokenText.length && 
@@ -76,7 +76,7 @@ this.handleAcceptPositionForIdentifier = function() {
 	}
 };
 
-this.handleAcceptPositionForKeyword = function(keyword) {
+PositionAdjustingLexer.prototype.handleAcceptPositionForKeyword = function(keyword) {
 	if (this._input.index > this._tokenStartCharIndex + keyword.length) {
 		var offset = keyword.length - 1;
 		this._interp.resetAcceptPosition(this._tokenStartCharIndex + offset, 

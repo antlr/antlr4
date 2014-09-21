@@ -129,9 +129,15 @@ RuleContext.prototype.accept = function(visitor) {
 	return visitor.visitChildren(this);
 };
 
+//need to manage circular dependencies, so export now
+exports.RuleContext = RuleContext;
+var Trees = require('./tree/Trees').Trees;
+
+
 // Print out a whole tree, not just a node, in LISP format
 // (root child1 .. childN). Print just a node if this is a leaf.
 //
+
 RuleContext.prototype.toStringTree = function(ruleNames, recog) {
 	return Trees.toStringTree(this, ruleNames, recog);
 };
@@ -161,4 +167,3 @@ RuleContext.prototype.toString = function(ruleNames, stop) {
 	return s;
 };
 
-exports.RuleContext = RuleContext;

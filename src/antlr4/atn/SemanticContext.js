@@ -226,7 +226,7 @@ function AND(a, b) {
 	var precedencePredicates = PrecedencePredicate.filterPrecedencePredicates(operands);
 	if (precedencePredicates.length > 0) {
 		// interested in the transition with the lowest precedence
-		var reduced = Math.min(precedencePredicates);
+		var reduced = Math.min.apply(null, precedencePredicates);
 		operands.add(reduced);
 	}
 	this.opnds = operands.values();

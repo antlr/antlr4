@@ -6,3 +6,9 @@
 /TParser.java
 /PositionAdjustingLexer.java
 /PositionAdjustingLexer.tokens
+/L.java
+/L.tokens
+/TestLexer.java
+/TestLexer.tokens
+/Demo.java
+/Demo.tokens

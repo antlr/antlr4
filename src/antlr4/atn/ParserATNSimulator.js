@@ -258,11 +258,13 @@
 //
 
 var Set = require('./../Utils').Set;
+var BitSet = require('./../Utils').BitSet;
 var ATN = require('./ATN').ATN;
 var ATNConfig = require('./ATNConfig').ATNConfig;
 var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
 var Token = require('./../Token').Token;
 var DFAState = require('./../dfa/DFAState').DFAState;
+var PredPrediction = require('./../dfa/DFAState').PredPrediction;
 var ATNSimulator = require('./ATNSimulator').ATNSimulator;
 var PredictionMode = require('./PredictionMode').PredictionMode;
 var RuleContext = require('./../RuleContext').RuleContext;
@@ -270,6 +272,7 @@ var ParserRuleContext = require('./../ParserRuleContext').ParserRuleContext;
 var SemanticContext = require('./SemanticContext').SemanticContext;
 var StarLoopEntryState = require('./ATNState').StarLoopEntryState;
 var RuleStopState = require('./ATNState').RuleStopState;
+var PredictionContext = require('./../PredictionContext').PredictionContext;
 var Interval = require('./../IntervalSet').Interval;
 var Transitions = require('./Transition');
 var Transition = Transitions.Transition;
@@ -474,7 +477,7 @@ ParserATNSimulator.prototype.execATN = function(dfa, s0, input, startIndex, oute
                     if(this.debug) {
                     	console.log("Full LL avoided");
                     }
-                    return Math.min(conflictingAlts);
+                    return Math.min.apply(null, conflictingAlts);
                 }
                 if (conflictIndex !== startIndex) {
                     // restore the index so reporting the fallback to full
@@ -501,12 +504,12 @@ ParserATNSimulator.prototype.execATN = function(dfa, s0, input, startIndex, oute
             if (alts.length===0) {
                 throw this.noViableAlt(input, outerContext, D.configs, startIndex);
             } else if (alts.length===1) {
-                return Math.min(alts);
+                return alts[0];
             } else {
                 // report ambiguity after predicate evaluation to make sure the correct
                 // set of ambig alts is reported.
                 this.reportAmbiguity(dfa, D, startIndex, stopIndex, false, alts, D.configs);
-                return Math.min(alts);
+                return Math.min.apply(null, alts);
             }
         }
         previousD = D;
@@ -530,10 +533,10 @@ ParserATNSimulator.prototype.execATN = function(dfa, s0, input, startIndex, oute
 //
 ParserATNSimulator.prototype.getExistingTargetState = function(previousD, t) {
     var edges = previousD.edges;
-    if (edges===null || t + 1 < 0 || t + 1 >= edges.length) {
+    if (edges===null) {
         return null;
     } else {
-        return edges[t + 1];
+        return edges[t + 1] || null;
     }
 };
 //
@@ -577,7 +580,7 @@ ParserATNSimulator.prototype.computeTargetState = function(dfa, previousD, t) {
         D.requiresFullContext = true;
         // in SLL-only mode, we will stop at this state and return the minimum alt
         D.isAcceptState = true;
-        D.prediction = Math.min(D.configs.conflictingAlts);
+        D.prediction = Math.min.apply(null, D.configs.conflictingAlts);
     }
     if (D.isAcceptState && D.configs.hasSemanticContext) {
         this.predicateDFAState(D, this.atn.getDecisionState(dfa.decision));
@@ -605,7 +608,7 @@ ParserATNSimulator.prototype.predicateDFAState = function(dfaState, decisionStat
         // There are preds in configs but they might go away
         // when OR'd together like {p}? || NONE == NONE. If neither
         // alt has preds, resolve to min alt
-        dfaState.prediction = Math.min(altsToCollectPredsFrom);
+        dfaState.prediction = Math.min.apply(null, altsToCollectPredsFrom);
     }
 };
 
@@ -863,8 +866,8 @@ ParserATNSimulator.prototype.removeAllConfigsNotInRuleStopState = function(confi
         return configs;
     }
     var result = new ATNConfigSet(configs.fullCtx);
-    for(var i=0; i<configs.length;i++) {
-    	var config = configs[i];
+    for(var i=0; i<configs.items.length;i++) {
+        var config = configs.items[i];
         if (config.state instanceof RuleStopState) {
             result.add(config, this.mergeCache);
             continue;
@@ -1012,13 +1015,13 @@ ParserATNSimulator.prototype.getPredsForAmbigAlts = function(ambigAlts, configs,
     // From this, it is clear that NONE||anything==NONE.
     //
     var altToPred = [];
-    for(var i=0;i<configs.length;i++) {
-    	var c = configs[i];
+    for(var i=0;i<configs.items.length;i++) {
+        var c = configs.items[i];
         if(ambigAlts.contains( c.alt )) {
-            altToPred[c.alt] = orContext(altToPred[c.alt], c.semanticContext);
+            altToPred[c.alt] = SemanticContext.orContext(altToPred[c.alt] || null, c.semanticContext);
         }
     }
-    nPredAlts = 0;
+    var nPredAlts = 0;
     for (i =1;i< nalts+1;i++) {
         if (altToPred[i]===null) {
             altToPred[i] = SemanticContext.NONE;
@@ -1132,7 +1135,7 @@ ParserATNSimulator.prototype.getAltThatFinishedDecisionEntryRule = function(conf
     if (alts.length===0) {
         return ATN.INVALID_ALT_NUMBER;
     } else {
-        return Math.min(alts);
+        return Math.min.apply(null, alts);
     }
 };
 // Walk the list of configurations and split them according to
@@ -1170,7 +1173,7 @@ ParserATNSimulator.prototype.splitAccordingToSemanticValidity = function( config
 //  includes pairs with null predicates.
 //
 ParserATNSimulator.prototype.evalSemanticContext = function(predPredictions, outerContext, complete) {
-    var predictions = new Set();
+    var predictions = new BitSet();
     for(var i=0;i<predPredictions.length;i++) {
     	var pair = predPredictions[i];
         if (pair.pred === SemanticContext.NONE) {
@@ -1427,7 +1430,7 @@ ParserATNSimulator.prototype.ruleTransition = function(config, t) {
 };
 
 ParserATNSimulator.prototype.getConflictingAlts = function(configs) {
-    altsets = PredictionMode.getConflictingAltSubsets(configs);
+    var altsets = PredictionMode.getConflictingAltSubsets(configs);
     return PredictionMode.getAlts(altsets);
 };
 
@@ -1470,7 +1473,7 @@ ParserATNSimulator.prototype.getConflictingAlts = function(configs) {
 ParserATNSimulator.prototype.getConflictingAltsOrUniqueAlt = function(configs) {
     var conflictingAlts = null;
     if (configs.uniqueAlt!== ATN.INVALID_ALT_NUMBER) {
-        conflictingAlts = new Set();
+        conflictingAlts = new BitSet();
         conflictingAlts.add(configs.uniqueAlt);
     } else {
         conflictingAlts = configs.conflictingAlts;

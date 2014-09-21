@@ -155,3 +155,4 @@ DFAState.prototype.toString = function() {
 };
 
 exports.DFAState = DFAState;
+exports.PredPrediction = PredPrediction;

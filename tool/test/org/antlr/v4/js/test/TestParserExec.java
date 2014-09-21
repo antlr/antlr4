@@ -169,7 +169,7 @@ public class TestParserExec extends BaseTest {
 		"start : statement+ ;\n" +
 		"statement : 'x' | ifStatement;\n" +
 		"ifStatement : 'if' 'y' statement %s {" +
-		"print($text)" +
+		"console.log($text);" +
 		"};\n" +
 		"ID : 'a'..'z'+ ;\n" +
 		"WS : (' '|'\\n') -> channel(HIDDEN);\n";
@@ -233,7 +233,7 @@ public class TestParserExec extends BaseTest {
    		String grammar =
    			"grammar T;\n" +
             "a : (ID|{}INT)? {" +
-   			"print($text)" +
+   			"console.log($text);" +
             "} ;\n" +
             "ID : 'a'..'z'+ ;\n" +
             "INT : '0'..'9'+ ;\n" +
@@ -378,7 +378,7 @@ public class TestParserExec extends BaseTest {
 			;
 
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s",
-								  "if x if x a else b", true);
+								  "if x if x a else b", false);
 		String expecting = "";
 		assertEquals(expecting, found);
 		assertNull(this.stderrDuringParse);
@@ -419,10 +419,10 @@ public class TestParserExec extends BaseTest {
 			"start : a* EOF;\n" +
 			"a\n" +
 			"  : label=subrule {" +
-			"print($label.text)" +
+			"console.log($label.text);" +
 			"} #One\n" +
 			"  | label='y' {" +
-			"print($label.text)" +
+			"console.log($label.text);" +
 			"} #Two\n" +
 			"  ;\n" +
 			"subrule : 'x';\n" +
@@ -443,10 +443,10 @@ public class TestParserExec extends BaseTest {
 			"grammar T;\n" +
 			"\n" +
 			"file_ @init{" +
-			"self._errHandler = BailErrorStrategy()" +
+			"this._errHandler = new antlr4.error.BailErrorStrategy();" +
 			"} \n" +
 			"@after {" +
-			"print($ctx.toStringTree(recog=self))" +
+			"console.log($ctx.toStringTree(null, this));" +
 			"}\n" +
 			"  :   item (SEMICOLON item)* SEMICOLON? EOF ;\n" +
 			"item : A B?;\n" +
