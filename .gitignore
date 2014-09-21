@@ -36,3 +36,5 @@ nbactions*.xml
 
 # Playground
 #/tool/playground/
+
+*.pyc
