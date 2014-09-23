@@ -30,6 +30,8 @@
 
 var DFAState = require('./DFAState').DFAState;
 var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet;
+var DFASerializer = require('./DFASerializer').DFASerializer;
+var LexerDFASerializer = require('./DFASerializer').LexerDFASerializer;
 
 function DFA(atnStartState, decision) {
 	if (decision === undefined) {
@@ -115,7 +117,7 @@ DFA.prototype.setPrecedenceStartState = function(precedence, startState) {
 // {@code false}
 
 DFA.prototype.setPrecedenceDfa = function(precedenceDfa) {
-	if (!(this.precedenceDfa.equals(precedenceDfa))) {
+	if (this.precedenceDfa!==precedenceDfa) {
 		this._states = {};
 		if (precedenceDfa) {
 			var precedenceState = new DFAState(new ATNConfigSet());
@@ -138,7 +140,13 @@ Object.defineProperty(DFA.prototype, "states", {
 
 // Return a list of all states in this DFA, ordered by state number.
 DFA.prototype.sortedStates = function() {
-	return this._states.sort(function(a, b) {
+	// states_ is a map of state/state, where key=value
+	var keys = Object.keys(this._states);
+	var list = [];
+	for(var i=0;i<keys.length;i++) {
+		list.push(this._states[keys[i]]);
+	}
+	return list.sort(function(a, b) {
 		return a.stateNumber - b.stateNumber;
 	});
 };
@@ -150,7 +158,7 @@ DFA.prototype.toString = function(tokenNames) {
 	if (this.s0 === null) {
 		return "";
 	}
-	var serializer = new DFASerializer(tokenNames);
+	var serializer = new DFASerializer(this, tokenNames);
 	return serializer.toString();
 };
 
@@ -158,7 +166,7 @@ DFA.prototype.toLexerString = function() {
 	if (this.s0 === null) {
 		return "";
 	}
-	var serializer = new LexerDFASerializer();
+	var serializer = new LexerDFASerializer(this);
 	return serializer.toString();
 };
 

@@ -537,7 +537,7 @@ Parser.prototype.getInvokingContext = function(ruleIndex) {
 };
 
 Parser.prototype.precpred = function(localctx, precedence) {
-	return precedence >= this._precedenceStack[-1];
+	return precedence >= this._precedenceStack[this._precedenceStack.length-1];
 };
 
 Parser.prototype.inContext = function(context) {

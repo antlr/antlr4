@@ -613,8 +613,8 @@ LexerATNSimulator.prototype.addDFAState = function(configs) {
 		proposed.prediction = this.atn.ruleToTokenType[firstConfigWithRuleStopState.state.ruleIndex];
 	}
 	var dfa = this.decisionToDFA[this.mode];
-	var existing = dfa.states[proposed];
-	if (existing !== undefined && existing!==null) {
+	var existing = dfa.states[proposed.hashString()] || null;
+	if (existing!==null) {
 		return existing;
 	}
 	var newState = proposed;
@@ -622,7 +622,7 @@ LexerATNSimulator.prototype.addDFAState = function(configs) {
 	newState.stateNumber = dfa.states.length;
 	configs.setReadonly(true);
 	newState.configs = configs;
-	dfa.states[newState] = newState;
+	dfa.states[newState.hashString()] = newState;
 	return newState;
 };
 

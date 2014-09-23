@@ -864,7 +864,7 @@ public abstract class BaseTest {
 		    "		console.log(stream.tokens[i].toString());\n" +
 			"    }\n" +
 			(showDFA ? 
-			"    console.log(lexer._interp.decisionToDFA[Lexer.DEFAULT_MODE].toLexerString(), end='');\n"
+			"    process.stdout.write(lexer._interp.decisionToDFA[antlr4.Lexer.DEFAULT_MODE].toLexerString());\n"
 				 :"") +
 			"}\n" +
 			"\n" +

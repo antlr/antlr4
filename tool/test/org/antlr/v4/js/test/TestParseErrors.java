@@ -83,7 +83,7 @@ public class TestParseErrors extends BaseTest {
 	@Test public void testConjuringUpToken() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : 'a' x='b' {print(\"conjured=\"+str($x))} 'c' ;";
+			"a : 'a' x='b' {console.log(\"conjured=\"+$x.toString());} 'c' ;";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "ac", false);
 		String expecting = "conjured=[@-1,-1:-1='<missing 'b'>',<1>,1:1]\n";
 		assertEquals(expecting, result);
@@ -102,7 +102,7 @@ public class TestParseErrors extends BaseTest {
 	@Test public void testConjuringUpTokenFromSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a : 'a' x=('b'|'c') {print(\"conjured=\"+str($x))} 'd' ;";
+			"a : 'a' x=('b'|'c') {console.log(\"conjured=\"+$x.toString());} 'd' ;";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "ad", false);
 		String expecting = "conjured=[@-1,-1:-1='<missing 'b'>',<1>,1:1]\n";
 		assertEquals(expecting, result);
@@ -260,7 +260,7 @@ public class TestParseErrors extends BaseTest {
 			"WS : ' ' -> skip ;" +
 			"acClass\n" +
 			"@init\n" +
-			"{print(self.getExpectedTokens().toString(self.tokenNames))}\n" +
+			"{console.log(this.getExpectedTokens().toString(this.tokenNames));}\n" +
 			"  : ;\n";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "start", "dog and software", false);
 		String expecting = "{'hardware', 'software'}\n";
@@ -293,14 +293,15 @@ public class TestParseErrors extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"@parser::members{\n" +
-			"def foo():\n" +
-			"    s = SContext()\n" +
-			"    a = s.a()\n" +
-			"    b = s.b()\n" +
+			"function foo() {\n" +
+			"    var s = new SContext();\n" +
+			"    var a = s.a();\n" +
+			"    var b = s.b();\n" +
+			"}\n" +
 			"}\n" +
 			"s : (a | b)+;\n" +
-			"a : 'a' {print('a',end='')};\n" +
-			"b : 'b' {print('b',end='')};\n" +
+			"a : 'a' {process.stdout.write('a');};\n" +
+			"b : 'b' {process.stdout.write('b');};\n" +
 			"";
 		String result = execParser("T.g", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "abab", true);
 		String expecting = "abab\n";
@@ -359,7 +360,7 @@ public class TestParseErrors extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"start : ID ':' expr;\n" +
-			"expr : primary expr? {pass} | expr '->' ID;\n" +
+			"expr : primary expr? {} | expr '->' ID;\n" +
 			"primary : ID;\n" +
 			"ID : [a-z]+;\n" +
 			"\n";
@@ -383,8 +384,7 @@ public class TestParseErrors extends BaseTest {
 			"DOT : '.' ;\n" +
 			"WS : [ \\t\\r\\n]+ -> skip;\n";
 		/* String found = */ execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "a.", false);
-		String expecting =
-				"line 1:1 mismatched input '.' expecting '!'\n";
+		String expecting = "line 1:1 mismatched input '.' expecting '!'\n";
 		String result = stderrDuringParse;
 		assertEquals(expecting, result);
 	}

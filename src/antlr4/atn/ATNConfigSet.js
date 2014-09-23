@@ -112,8 +112,7 @@ ATNConfigSet.prototype.add = function(config, mergeCache) {
 	}
 	// a previous (s,i,pi,_), merge with it and save result
 	var rootIsWildcard = !this.fullCtx;
-	var merged = merge(existing.context, config.context, rootIsWildcard,
-			mergeCache);
+	var merged = merge(existing.context, config.context, rootIsWildcard, mergeCache);
 	// no need to check for existing.context, config.context in cache
 	// since only way to create new graphs is "call rule" and here. We
 	// cache at both places.

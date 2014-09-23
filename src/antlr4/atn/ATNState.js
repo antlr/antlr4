@@ -172,7 +172,7 @@ ATNState.prototype.addTransition = function(trans, index) {
 
 function BasicState() {
 	ATNState.call(this);
-    this.stateType = this.BASIC;
+    this.stateType = ATNState.BASIC;
     return this;
 }
 
@@ -204,7 +204,7 @@ BlockStartState.prototype.constructor = BlockStartState;
 
 function BasicBlockStartState() {
 	BlockStartState.call(this);
-	this.stateType = this.BLOCK_START;
+	this.stateType = ATNState.BLOCK_START;
 	return this;
 }
 
@@ -215,7 +215,7 @@ BasicBlockStartState.prototype.constructor = BasicBlockStartState;
 // Terminal node of a simple {@code (a|b|c)} block.
 function BlockEndState() {
 	ATNState.call(this);
-	this.stateType = this.BLOCK_END;
+	this.stateType = ATNState.BLOCK_END;
     this.startState = null;
     return this;
 }
@@ -231,7 +231,7 @@ BlockEndState.prototype.constructor = BlockEndState;
 //
 function RuleStopState() {
 	ATNState.call(this);
-    this.stateType = this.RULE_STOP;
+    this.stateType = ATNState.RULE_STOP;
     return this;
 }
 
@@ -240,7 +240,7 @@ RuleStopState.prototype.constructor = RuleStopState;
 
 function RuleStartState() {
 	ATNState.call(this);
-	this.stateType = this.RULE_START;
+	this.stateType = ATNState.RULE_START;
 	this.stopState = null;
 	this.isPrecedenceRule = false;
 	return this;
@@ -254,7 +254,7 @@ RuleStartState.prototype.constructor = RuleStartState;
 //
 function PlusLoopbackState() {
 	DecisionState.call(this);
-	this.stateType = this.PLUS_LOOP_BACK;
+	this.stateType = ATNState.PLUS_LOOP_BACK;
 	return this;
 }
 
@@ -269,7 +269,7 @@ PlusLoopbackState.prototype.constructor = PlusLoopbackState;
 //
 function PlusBlockStartState() {
 	BlockStartState.call(this);
-	this.stateType = this.PLUS_BLOCK_START;
+	this.stateType = ATNState.PLUS_BLOCK_START;
     this.loopBackState = null;
     return this;
 }
@@ -280,7 +280,7 @@ PlusBlockStartState.prototype.constructor = PlusBlockStartState;
 // The block that begins a closure loop.
 function StarBlockStartState() {
 	BlockStartState.call(this);
-	this.stateType = this.STAR_BLOCK_START;
+	this.stateType = ATNState.STAR_BLOCK_START;
 	return this;
 }
 
@@ -290,7 +290,7 @@ StarBlockStartState.prototype.constructor = StarBlockStartState;
 
 function StarLoopbackState() {
 	ATNState.call(this);
-	this.stateType = this.STAR_LOOP_BACK;
+	this.stateType = ATNState.STAR_LOOP_BACK;
 	return this;
 }
 
@@ -300,7 +300,7 @@ StarLoopbackState.prototype.constructor = StarLoopbackState;
 
 function StarLoopEntryState() {
 	DecisionState.call(this);
-	this.stateType = this.STAR_LOOP_ENTRY;
+	this.stateType = ATNState.STAR_LOOP_ENTRY;
     this.loopBackState = null;
     // Indicates whether this state can benefit from a precedence DFA during SLL decision making.
     this.precedenceRuleDecision = null;
@@ -314,7 +314,7 @@ StarLoopEntryState.prototype.constructor = StarLoopEntryState;
 // Mark the end of a * or + loop.
 function LoopEndState() {
 	ATNState.call(this);
-	this.stateType = this.LOOP_END;
+	this.stateType = ATNState.LOOP_END;
 	this.loopBackState = null;
 	return this;
 }
@@ -326,7 +326,7 @@ LoopEndState.prototype.constructor = LoopEndState;
 // The Tokens rule start state linking to each lexer rule start state */
 function TokensStartState() {
 	DecisionState.call(this);
-	this.stateType = this.TOKEN_START;
+	this.stateType = ATNState.TOKEN_START;
 	return this;
 }
 

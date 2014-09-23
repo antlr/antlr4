@@ -157,6 +157,25 @@ AltDict.prototype.values = function() {
 	});
 };
 
+function DoubleDict() {
+	return this;
+}
+
+DoubleDict.prototype.get = function(a, b) {
+	var d = this[a] || null;
+	return d===null ? null : (d[b] || null);
+};
+
+DoubleDict.prototype.set = function(a, b, o) {
+	var d = this[a] || null;
+	if(d===null) {
+		d = {};
+		this[a] = d;
+	}
+	d[b] = o;
+};
+
+
 function escapeWhitespace(s, escapeSpaces) {
 	s = s.replace("\t","\\t");
 	s = s.replace("\n","\\n");
@@ -167,9 +186,15 @@ function escapeWhitespace(s, escapeSpaces) {
 	return s;
 }
 
+function arrayToString(a) {
+	return "[" + a.join(", ") + "]";
+}
+
 
 exports.Dict = Dict;
 exports.Set = Set;
 exports.BitSet = BitSet;
 exports.AltDict = AltDict;
+exports.DoubleDict = DoubleDict;
 exports.escapeWhitespace = escapeWhitespace;
+exports.arrayToString = arrayToString;

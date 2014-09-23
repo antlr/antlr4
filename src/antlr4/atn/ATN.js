@@ -28,6 +28,7 @@
 //  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 var LL1Analyzer = require('./../LL1Analyzer').LL1Analyzer;
+var IntervalSet = require('./../IntervalSet').IntervalSet;
 
 function ATN(grammarType , maxTokenType) {
 
@@ -66,7 +67,7 @@ function ATN(grammarType , maxTokenType) {
 //  restricted to tokens reachable staying within {@code s}'s rule.
 ATN.prototype.nextTokensInContext = function(s, ctx) {
     var anal = new LL1Analyzer(this);
-    return anal.LOOK(s, ctx);
+    return anal.LOOK(s, null, ctx);
 };
 
 // Compute the set of valid tokens that can occur starting in {@code s} and
@@ -140,13 +141,13 @@ ATN.prototype.getExpectedTokens = function( stateNumber, ctx ) {
     }
     var s = this.states[stateNumber];
     var following = this.nextTokens(s);
-    if (following.indexOf(Token.EPSILON)<0) {
+    if (!following.contains(Token.EPSILON)) {
         return following;
     }
     var expected = new IntervalSet();
     expected.addSet(following);
     expected.remove(Token.EPSILON);
-    while (ctx !== null && ctx.invokingState >= 0 && Token.EPSILON in following) {
+    while (ctx !== null && ctx.invokingState >= 0 && following.contains(Token.EPSILON)) {
         var invokingState = this.states[ctx.invokingState];
         var rt = invokingState.transitions[0];
         following = this.nextTokens(rt.followState);
@@ -154,7 +155,7 @@ ATN.prototype.getExpectedTokens = function( stateNumber, ctx ) {
         expected.remove(Token.EPSILON);
         ctx = ctx.parentCtx;
     }
-    if (Token.EPSILON in following) {
+    if (following.contains(Token.EPSILON)) {
         expected.addOne(Token.EOF);
     }
     return expected;

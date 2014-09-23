@@ -39,8 +39,8 @@ public class TestSemPredEvalLexer extends BaseTest {
 	@Test public void testDisableRule() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"E1 : 'enum' { False }? ;\n" +
-			"E2 : 'enum' { True }? ;\n" +  // winner not E1 or ID
+			"E1 : 'enum' { false }? ;\n" +
+			"E2 : 'enum' { true }? ;\n" +  // winner not E1 or ID
 			"ID : 'a'..'z'+ ;\n"+
 			"WS : (' '|'\\n') -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "enum abc", true);
@@ -61,7 +61,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 	@Test public void testIDvsEnum() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"ENUM : 'enum' { False }? ;\n" +
+			"ENUM : 'enum' { false }? ;\n" +
 			"ID : 'a'..'z'+ ;\n"+
 			"WS : (' '|'\\n') -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "enum abc enum", true);
@@ -83,7 +83,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 	@Test public void testIDnotEnum() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"ENUM : [a-z]+ { False }? ;\n" +
+			"ENUM : [a-z]+ { false }? ;\n" +
 			"ID   : [a-z]+ ;\n"+
 			"WS : (' '|'\\n') -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "enum abc enum", true);
@@ -99,7 +99,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 	@Test public void testEnumNotID() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"ENUM : [a-z]+ { self.text==\"enum\" }? ;\n" +
+			"ENUM : [a-z]+ { this.text===\"enum\" }? ;\n" +
 			"ID   : [a-z]+ ;\n"+
 			"WS : (' '|'\\n') -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "enum abc enum", true);
@@ -116,8 +116,8 @@ public class TestSemPredEvalLexer extends BaseTest {
 		String grammar =
 			"lexer grammar L;\n"+
 			"ID : [a-z]+ ;\n"+
-			"INDENT : [ \\t]+ { self._tokenStartColumn==0 }? \n" +
-			"         { print(\"INDENT\") }  ;"+
+			"INDENT : [ \\t]+ { this._tokenStartColumn===0 }? \n" +
+			"         { console.log(\"INDENT\"); }  ;"+
 			"NL     : '\\n' ;"+
 			"WS     : [ \\t]+ ;";
 		String found = execLexer("L.g4", grammar, "L", "abc\n  def  \n", true);
@@ -144,10 +144,10 @@ public class TestSemPredEvalLexer extends BaseTest {
 	@Test public void testLexerInputPositionSensitivePredicates() throws Exception {
 		String grammar =
 			"lexer grammar L;\n"+
-			"WORD1 : ID1+ { print( self.text ) } ;\n"+
-			"WORD2 : ID2+ { print( self.text ) } ;\n"+
-			"fragment ID1 : { self.column < 2 }? [a-zA-Z];\n"+
-			"fragment ID2 : { self.column >= 2 }? [a-zA-Z];\n"+
+			"WORD1 : ID1+ { console.log( this.text ); } ;\n"+
+			"WORD2 : ID2+ { console.log( this.text ); } ;\n"+
+			"fragment ID1 : { this.column < 2 }? [a-zA-Z];\n"+
+			"fragment ID2 : { this.column >= 2 }? [a-zA-Z];\n"+
 			"WS : (' '|'\\n') -> skip;\n";
 		String found = execLexer("L.g4", grammar, "L", "a cde\nabcde\n");
 		String expecting =
@@ -166,8 +166,8 @@ public class TestSemPredEvalLexer extends BaseTest {
 	@Test public void testPredicatedKeywords() {
 		String grammar =
 			"lexer grammar A;" +
-			"ENUM : [a-z]+ { self.text==\"enum\" }? { print(\"enum!\") } ;\n" +
-			"ID   : [a-z]+ { print(\"ID \"+self.text) } ;\n" +
+			"ENUM : [a-z]+ { this.text===\"enum\" }? { console.log(\"enum!\"); } ;\n" +
+			"ID   : [a-z]+ { console.log(\"ID \"+this.text); } ;\n" +
 			"WS   : [ \\n] -> skip ;";
 		String found = execLexer("A.g4", grammar, "A", "enum enu a");
 		String expecting =

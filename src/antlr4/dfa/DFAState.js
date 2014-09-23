@@ -150,8 +150,16 @@ DFAState.prototype.equals = function(other) {
 };
 
 DFAState.prototype.toString = function() {
-	return "" + this.stateNumber + ":" + this.configs +
-			(this.isAcceptState ? "=>" + (this.predicates !== null ? this.predicates : this.prediction) : "");
+	return "" + this.stateNumber + ":" + this.hashString();
+};
+
+DFAState.prototype.hashString = function() {
+	return "" +  this.configs +
+			(this.isAcceptState ?
+					"=>" + (this.predicates !== null ?
+								this.predicates :
+								this.prediction) :
+					"");
 };
 
 exports.DFAState = DFAState;

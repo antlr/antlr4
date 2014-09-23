@@ -121,7 +121,7 @@ PredictionContextCache.prototype.add = function(ctx) {
 };
 
 PredictionContextCache.prototype.get = function(ctx) {
-	return this.cache[ctx];
+	return this.cache[ctx] || null;
 };
 
 Object.defineProperty(PredictionContextCache.prototype, "length", {
@@ -402,7 +402,7 @@ function mergeSingletons(a, b, rootIsWildcard, mergeCache) {
 	var rootMerge = mergeRoot(a, b, rootIsWildcard);
 	if (rootMerge !== null) {
 		if (mergeCache !== null) {
-			mergeCache.put(a, b, rootMerge);
+			mergeCache.set(a, b, rootMerge);
 		}
 		return rootMerge;
 	}
@@ -422,7 +422,7 @@ function mergeSingletons(a, b, rootIsWildcard, mergeCache) {
 		// new joined parent so create new singleton pointing to it, a'
 		var spc = SingletonPredictionContext.create(parent, a.returnState);
 		if (mergeCache !== null) {
-			mergeCache.put(a, b, spc);
+			mergeCache.set(a, b, spc);
 		}
 		return spc;
 	} else { // a != b payloads differ
@@ -443,7 +443,7 @@ function mergeSingletons(a, b, rootIsWildcard, mergeCache) {
 			var parents = [ singleParent, singleParent ];
 			var apc = new ArrayPredictionContext(parents, payloads);
 			if (mergeCache !== null) {
-				mergeCache.put(a, b, apc);
+				mergeCache.set(a, b, apc);
 			}
 			return apc;
 		}
@@ -459,7 +459,7 @@ function mergeSingletons(a, b, rootIsWildcard, mergeCache) {
 		}
 		var a_ = new ArrayPredictionContext(parents, payloads);
 		if (mergeCache !== null) {
-			mergeCache.put(a, b, a_);
+			mergeCache.set(a, b, a_);
 		}
 		return a_;
 	}
@@ -583,8 +583,7 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
 				mergedParents[k] = a_parent; // choose left
 				mergedReturnStates[k] = payload;
 			} else { // ax+ay -> a'[x,y]
-				var mergedParent = merge(a_parent, b_parent, rootIsWildcard,
-						mergeCache);
+				var mergedParent = merge(a_parent, b_parent, rootIsWildcard, mergeCache);
 				mergedParents[k] = mergedParent;
 				mergedReturnStates[k] = payload;
 			}
@@ -621,7 +620,7 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
 			var a_ = SingletonPredictionContext.create(mergedParents[0],
 					mergedReturnStates[0]);
 			if (mergeCache !== null) {
-				mergeCache.put(a, b, a_);
+				mergeCache.set(a, b, a_);
 			}
 			return a_;
 		}
@@ -635,20 +634,20 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
 	// TODO: track whether this is possible above during merge sort for speed
 	if (M === a) {
 		if (mergeCache !== null) {
-			mergeCache.put(a, b, a);
+			mergeCache.set(a, b, a);
 		}
 		return a;
 	}
 	if (M === b) {
 		if (mergeCache !== null) {
-			mergeCache.put(a, b, b);
+			mergeCache.set(a, b, b);
 		}
 		return b;
 	}
 	combineCommonParents(mergedParents);
 
 	if (mergeCache !== null) {
-		mergeCache.put(a, b, M);
+		mergeCache.set(a, b, M);
 	}
 	return M;
 }

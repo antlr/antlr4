@@ -202,7 +202,11 @@ ParserRuleContext.prototype.getTypedRuleContexts = function(ctxType) {
 };
 
 ParserRuleContext.prototype.getChildCount = function() {
-    return this.children.length;
+	if (this.children=== null) {
+		return 0;
+	} else {
+		return this.children.length;
+	}
 };
 
 ParserRuleContext.prototype.getSourceInterval = function() {

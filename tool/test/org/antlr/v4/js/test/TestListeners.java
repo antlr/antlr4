@@ -38,17 +38,26 @@ public class TestListeners extends BaseTest {
 	@Test public void testBasic() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-		    "@members {\n" +
-			"class LeafListener(TListener):\n" +
-			"    def visitTerminal(self, node):\n" +
-			"        print(node.symbol.text)\n" +
+			"@parser::header {\n" +
+		    "var TListener = require('./TListener').TListener;\n" +
+		    "}\n" +
+		    "\n" +
+		    "@parser::members {\n" +
+			"function LeafListener() {\n" +
+			"    this.visitTerminal = function(node) {\n" +
+			"        console.log(node.symbol.text);\n" +
+			"    };\n" +
+			"    return this;\n" +
+		    "}\n" +
+		    "LeafListener.prototype = Object.create(TListener.prototype);\n" +
+			"LeafListener.prototype.constructor = LeafListener;\n" +
 		    "}\n" +
 		    "\n" +
 			"s\n" +
 			"@after {" +
-			"print($r.ctx.toStringTree(recog=self))\n" +
-			"walker = ParseTreeWalker()\n" +
-			"walker.walk(TParser.LeafListener(), $r.ctx)\n" +
+			"console.log($r.ctx.toStringTree(null, this));\n" +
+			"var walker = new antlr4.tree.ParseTreeWalker();\n" +
+			"walker.walk(new LeafListener(), $r.ctx);\n" +
 			"}\n" +
 			"  : r=a ;\n" +
 			"a : INT INT" +
@@ -69,21 +78,31 @@ public class TestListeners extends BaseTest {
 	public String testTokenGetters(String input) throws Exception {
 		String grammar =
 			"grammar T;\n" +
-		    "@members {\n" +
-			"class LeafListener(TListener):\n" +
-			"    def exitA(self, ctx):\n" +
-			"        if ctx.getChildCount()==2:\n" +
-			"            print(ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + str_list(ctx.INT()))\n" +
-			"        else:\n" +
-			"            print(str(ctx.ID().symbol))\n" +
+			"@parser::header {\n" +
+		    "var TListener = require('./TListener').TListener;\n" +
+		    "}\n" +
+		    "\n" +
+		    "@parser::members {\n" +
+			"function LeafListener() {\n" +
+			"    this.exitA = function(ctx) {\n" +
+			"        if(ctx.getChildCount()===2) {\n" +
+			"            console.log(ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + antlr4.Utils.arrayToString(ctx.INT()));\n" +
+			"        } else {\n" +
+			"            console.log(ctx.ID().symbol.toString());\n" +
+			"        }\n" +
+			"    };\n" +
+			"    return this;\n" +
+		    "}\n" +
+		    "LeafListener.prototype = Object.create(TListener.prototype);\n" +
+			"LeafListener.prototype.constructor = LeafListener;\n" +
 		    "}\n" +
 		    "\n" +
 			"\n" +
 			"s\n" +
 			"@after {" +
-			"print($r.ctx.toStringTree(recog=self))\n" +
-			"walker = ParseTreeWalker()\n" +
-			"walker.walk(TParser.LeafListener(), $r.ctx)\n" +
+			"console.log($r.ctx.toStringTree(null, this));\n" +
+			"var walker = new antlr4.tree.ParseTreeWalker();\n" +
+			"walker.walk(new LeafListener(), $r.ctx);\n" +
 			"}\n" +
 			"  : r=a ;\n" +
 			"a : INT INT" +
@@ -115,19 +134,29 @@ public class TestListeners extends BaseTest {
 	@Test public void testRuleGetters() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-		    "@members {\n" +
-			"class LeafListener(TListener):\n" +
-			"    def exitA(self, ctx):\n" +
-			"        if ctx.getChildCount()==2:\n" +
-			"            print(ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text)\n" +
-			"        else:\n" +
-			"            print(ctx.b(0).start.text)\n" +
+			"@parser::header {\n" +
+		    "var TListener = require('./TListener').TListener;\n" +
+		    "}\n" +
+		    "\n" +
+		    "@parser::members {\n" +
+			"function LeafListener() {\n" +
+			"    this.exitA = function(ctx) {\n" +
+			"        if(ctx.getChildCount()===2) {\n" +
+			"            console.log(ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text);\n" +
+			"        } else {\n" +
+			"            console.log(ctx.b(0).start.text);\n" +
+			"        }\n" +
+			"    };\n" +
+			"    return this;\n" +
+		    "}\n" +
+		    "LeafListener.prototype = Object.create(TListener.prototype);\n" +
+			"LeafListener.prototype.constructor = LeafListener;\n" +
 		    "}\n" +
 			"s\n" +
 			"@after {" +
-			"print($r.ctx.toStringTree(recog=self))\n" +
-			"walker = ParseTreeWalker()\n" +
-			"walker.walk(TParser.LeafListener(), $r.ctx)\n" +
+			"console.log($r.ctx.toStringTree(null, this));\n" +
+			"var walker = new antlr4.tree.ParseTreeWalker();\n" +
+			"walker.walk(new LeafListener(), $r.ctx);\n" +
 			"}\n" +
 			"  : r=a ;\n" +
 			"a : b b" +		// forces list
@@ -153,19 +182,29 @@ public class TestListeners extends BaseTest {
 	@Test public void testLR() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-		    "@members {\n" +
-			"class LeafListener(TListener):\n" +
-			"    def exitE(self, ctx):\n" +
-			"        if ctx.getChildCount()==3:\n" +
-			"            print(ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text)\n" +
-			"        else:\n" +
-			"            print(ctx.INT().symbol.text)\n" +
+			"@parser::header {\n" +
+		    "var TListener = require('./TListener').TListener;\n" +
+		    "}\n" +
+		    "\n" +
+		    "@parser::members {\n" +
+			"function LeafListener() {\n" +
+			"    this.exitE = function(ctx) {\n" +
+			"        if(ctx.getChildCount()===3) {\n" +
+			"            console.log(ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text);\n" +
+			"        } else {\n" +
+			"            console.log(ctx.INT().symbol.text);\n" +
+			"        }\n" +
+			"    };\n" +
+			"    return this;\n" +
+		    "}\n" +
+		    "LeafListener.prototype = Object.create(TListener.prototype);\n" +
+			"LeafListener.prototype.constructor = LeafListener;\n" +
 		    "}\n" +
 			"s\n" +
 			"@after {" +
-			"print($r.ctx.toStringTree(recog=self))\n" +
-			"walker = ParseTreeWalker()\n" +
-			"walker.walk(TParser.LeafListener(), $r.ctx)\n" +
+			"console.log($r.ctx.toStringTree(null, this));\n" +
+			"var walker = new antlr4.tree.ParseTreeWalker();\n" +
+			"walker.walk(new LeafListener(), $r.ctx);\n" +
 			"}\n" +
 			"  : r=e ;\n" +
 			"e : e op='*' e\n" +
@@ -190,18 +229,28 @@ public class TestListeners extends BaseTest {
 	@Test public void testLRWithLabels() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-		    "@members {\n" +
-			"class LeafListener(TListener):\n" +
-			"    def exitCall(self, ctx):\n" +
-			"        print(ctx.e().start.text + ' ' + str(ctx.eList()))\n" +
-			"    def exitInt(self, ctx):\n" +
-			"        print(ctx.INT().symbol.text)\n" +
+			"@parser::header {\n" +
+		    "var TListener = require('./TListener').TListener;\n" +
+		    "}\n" +
+		    "\n" +
+		    "@parser::members {\n" +
+			"function LeafListener() {\n" +
+			"    this.exitCall = function(ctx) {\n" +
+			"        console.log(ctx.e().start.text + ' ' + ctx.eList());\n" +
+			"    };\n" +
+			"    this.exitInt = function(ctx) {\n" +
+			"        console.log(ctx.INT().symbol.text);\n" +
+			"    };\n" +
+			"    return this;\n" +
+		    "}\n" +
+		    "LeafListener.prototype = Object.create(TListener.prototype);\n" +
+			"LeafListener.prototype.constructor = LeafListener;\n" +
 		    "}\n" +
 			"s\n" +
 			"@after {" +
-			"print($r.ctx.toStringTree(recog=self))\n" +
-			"walker = ParseTreeWalker()\n" +
-			"walker.walk(TParser.LeafListener(), $r.ctx)\n" +
+			"console.log($r.ctx.toStringTree(null, this));\n" +
+			"var walker = new antlr4.tree.ParseTreeWalker();\n" +
+			"walker.walk(new LeafListener(), $r.ctx);\n" +
 			"}\n" +
 			"  : r=e ;\n" +
 			"e : e '(' eList ')' # Call\n" +

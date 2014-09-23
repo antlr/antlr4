@@ -405,4 +405,5 @@ AND.prototype.toString = function() {
 };
 
 exports.SemanticContext = SemanticContext;
+exports.PrecedencePredicate = PrecedencePredicate;
 exports.Predicate = Predicate;

@@ -63,7 +63,6 @@ var <file.grammarName>Visitor = require('./<file.grammarName>Visitor').<file.gra
 ListenerFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 var antlr4 = require('antlr4');
-<header>
 
 // This class defines a complete listener for a parse tree produced by <file.parserName>.
 function <file.grammarName>Listener() {
@@ -149,6 +148,7 @@ function <parser.name> (input) {
 	<superClass; null="antlr4.Parser">.call(this, input);
     this._interp = new antlr4.atn.ParserATNSimulator(this, atn, decisionsToDFA, sharedContextCache);
     this.ruleNames = ruleNames;
+    this.tokenNames = tokenNames;
     return this;
 }
 
@@ -287,27 +287,36 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-def <currentRule.name>(self, _p=0<if(currentRule.args)>, <args:{a | , <a>}><endif>):
-    _parentctx = self._ctx
-    _parentState = self.state
-    localctx = <parser.name>.<currentRule.ctxType>(self, self._ctx, _parentState<args:{a | , <a.name>}>)
-    _prevctx = localctx
-    _startState = <currentRule.startState>
-    self.enterRecursionRule(localctx, <currentRule.startState>, self.RULE_<currentRule.name>, _p)
+<parser.name>.prototype.<currentRule.name> = function(_p<if(currentRule.args)>, <args:{a | , <a>}><endif>) {
+	if(_p===undefined) {
+	    _p = 0;
+	}
+    var _parentctx = this._ctx;
+    var _parentState = this.state;
+    var localctx = new <currentRule.ctxType>(this, this._ctx, _parentState<args:{a | , <a.name>}>);
+    var _prevctx = localctx;
+    var _startState = <currentRule.startState>;
+    this.enterRecursionRule(localctx, <currentRule.startState>, RULE_<currentRule.name>, _p);
     <namedActions.init>
     <locals; separator="\n">
-    try:
+    try {
         <code>
         <postamble; separator="\n">
         <namedActions.after>
-    except RecognitionException as re:
-        localctx.exception = re
-        self._errHandler.reportError(self, re)
-        self._errHandler.recover(self, re)
-    finally:
+    } catch( error) {
+        if(error instanceof antlr4.error.RecognitionException) {
+	        localctx.exception = error;
+	        this._errHandler.reportError(this, error);
+	        this._errHandler.recover(this, error);
+	    } else {
+	    	throw error;
+	    }
+    } finally {
         <finallyAction>
-        self.unrollRecursionContexts(_parentctx)
-    return localctx
+        this.unrollRecursionContexts(_parentctx)
+    }
+    return localctx;
+};
 
 >>
 
@@ -415,7 +424,7 @@ StarBlock(choice, alts, sync, iteration) ::= <<
 this.state = <choice.stateNumber>;
 this._errHandler.sync(this);
 var _alt = this._interp.adaptivePredict(this._input,<choice.decision>,this._ctx)
-while(_alt!=<choice.exitAlt> && _alt!=ATN.INVALID_ALT_NUMBER) {
+while(_alt!=<choice.exitAlt> && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
     if(_alt===1<if(!choice.ast.greedy)>+1<endif>) {
         <iteration>
         <alts> <! should only be one !>
@@ -431,7 +440,7 @@ PlusBlock(choice, alts, error) ::= <<
 this.state = <choice.blockStartStateNumber>; <! alt block decision !>
 this._errHandler.sync(this);
 var _alt = 1<if(!choice.ast.greedy)>+1<endif>;
-while(_alt!==<choice.exitAlt> && _alt!==ATN.INVALID_ALT_NUMBER) {
+while(_alt!==<choice.exitAlt> && _alt!==antlr4.atn.ATN.INVALID_ALT_NUMBER) {
     <alts:{alt|
 if(_alt === <i><if(!choice.ast.greedy)>+1<endif>) \{
     <alt>
@@ -590,7 +599,7 @@ RuleContextListDecl(rdecl) ::= "this.<rdecl.name> = []; // of <rdecl.ctxName>s"
 
 ContextTokenGetterDecl(t)      ::= <<
 <t.name> = function() {
-    return this.parser.getToken(<t.name>, 0);
+    return this.getToken(<t.name>, 0);
 };
 >>
 
@@ -602,7 +611,9 @@ def <t.name>_list(self):
 
 ContextTokenListIndexedGetterDecl(t)  ::= <<
 <t.name> = function(i) {
-	i = i || null;
+	if(i===undefined) {
+		i = null;
+	}
     if(i===null) {
         return this.getTokens(<t.name>);
     } else {
@@ -627,7 +638,9 @@ def <r.name>_list(self):
 
 ContextRuleListIndexedGetterDecl(r)   ::= <<
 <r.name> = function(i) {
-    i = i || null;
+    if(i===undefined) {
+        i = null;
+    }
     if(i===null) {
         return this.getTypedRuleContexts(<r.ctxName>);
     } else {
@@ -654,13 +667,17 @@ CaptureNextTokenType(d) ::= "<d.varName> = this._input.LA(1);"
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
            superClass={antlr4.ParserRuleContext}) ::= <<
 function <struct.name>(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.name>}>) {
-	parent = parent || null;
-	invokingState = invokingState || -1;
+	if(parent===undefined) {
+	    parent = null;
+	}
+	if(invokingState===undefined || invokingState===null) {
+		invokingState = -1;
+	}
 	<superClass>.call(this, parent, invokingState);
     this.parser = parser;
     this.ruleIndex = RULE_<struct.derivedFromName>;
     <attrs:{a | <a>}; separator="\n">
-    <struct.ctorAttrs:{a | self.<a.name> = <a.name> || null;}; separator="\n">
+    <struct.ctorAttrs:{a | this.<a.name> = <a.name> || null;}; separator="\n">
     return this;
 }
 
@@ -725,32 +742,33 @@ labelref(x) ::= "<if(!x.isLocal)>localctx.<endif><x.name>"
 ctx(actionChunk) ::= "localctx"
 
 // used for left-recursive rules
-recRuleAltPredicate(ruleName,opPrec)  ::= "self.precpred(self._ctx, <opPrec>)"
+recRuleAltPredicate(ruleName,opPrec)  ::= "this.precpred(this._ctx, <opPrec>)"
 recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>"
-recRuleSetStopToken()                 ::= "self._ctx.stop = self._input.LT(-1)"
+recRuleSetStopToken()                 ::= "this._ctx.stop = this._input.LT(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
-localctx = <parser.name>.<ctxName>Context(self, _parentctx, _parentState)
-<if(label)>localctx.<label> = _prevctx<endif>
-self.pushNewRecursionContext(localctx, _startState, self.RULE_<ruleName>)
+localctx = new <ctxName>Context(this, _parentctx, _parentState);
+<if(label)>localctx.<label> = _prevctx;<endif>
+this.pushNewRecursionContext(localctx, _startState, RULE_<ruleName>);
 >>
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label) ::= <<
-localctx = <parser.name>.<currentAltLabel; format="cap">Context(self, <parser.name>.<ruleName; format="cap">Context(self, _parentctx, _parentState))
-<if(label)>localctx.<label> = _prevctx<endif>
-self.pushNewRecursionContext(localctx, _startState, self.RULE_<ruleName>)
+localctx = new <currentAltLabel; format="cap">Context(this, new <ruleName; format="cap">Context(this, _parentctx, _parentState));
+<if(label)>localctx.<label> = _prevctx;<endif>
+this.pushNewRecursionContext(localctx, _startState, RULE_<ruleName>);
 >>
 
 recRuleReplaceContext(ctxName) ::= <<
-localctx = <parser.name>.<ctxName>Context(self, localctx)
-self._ctx = localctx
-_prevctx = localctx
+localctx = new <ctxName>Context(this, localctx);
+this._ctx = localctx;
+_prevctx = localctx;
 >>
 
 recRuleSetPrevCtx() ::= <<
-if self._parseListeners is not None:
-    self.triggerExitRuleEvent()
-_prevctx = localctx
+if(this._parseListeners!==null) {
+    this.triggerExitRuleEvent();
+}
+_prevctx = localctx;
 >>
 
 

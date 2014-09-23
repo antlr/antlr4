@@ -23,6 +23,14 @@ function IntervalSet() {
 	this.readOnly = false;
 }
 
+IntervalSet.prototype.first = function(v) {
+	if (this.intervals === null) {
+		return null;
+	} else {
+		return this.intervals[0].start;
+	}
+};
+
 IntervalSet.prototype.addOne = function(v) {
 	this.addRange(new Interval(v, v + 1));
 };

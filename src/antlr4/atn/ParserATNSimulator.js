@@ -259,6 +259,7 @@
 
 var Set = require('./../Utils').Set;
 var BitSet = require('./../Utils').BitSet;
+var DoubleDict = require('./../Utils').DoubleDict;
 var ATN = require('./ATN').ATN;
 var ATNConfig = require('./ATNConfig').ATNConfig;
 var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
@@ -509,7 +510,7 @@ ParserATNSimulator.prototype.execATN = function(dfa, s0, input, startIndex, oute
                 // report ambiguity after predicate evaluation to make sure the correct
                 // set of ambig alts is reported.
                 this.reportAmbiguity(dfa, D, startIndex, stopIndex, false, alts, D.configs);
-                return Math.min.apply(null, alts);
+                return alts.minValue();
             }
         }
         previousD = D;
@@ -727,7 +728,7 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
         console.log("in computeReachSet, starting closure: " + closure);
     }
     if( this.mergeCache===null) {
-        this.mergeCache = {};
+        this.mergeCache = new DoubleDict();
     }
     var intermediate = new ATNConfigSet(fullCtx);
 
@@ -955,8 +956,8 @@ ParserATNSimulator.prototype.applyPrecedenceFilter = function(configs) {
 	var config;
 	var statesFromAlt1 = [];
     var configSet = new ATNConfigSet(configs.fullCtx);
-    for(var i=0; i<configs.length; i++) {
-    	config = configs[i];
+    for(var i=0; i<configs.items.length; i++) {
+    	config = configs.items[i];
         // handle alt 1 first
         if (config.alt !== 1) {
             continue;
@@ -973,8 +974,8 @@ ParserATNSimulator.prototype.applyPrecedenceFilter = function(configs) {
             configSet.add(config, this.mergeCache);
         }
     }
-    for(i=0; i<configs.length; i++) {
-    	config = configs[i];
+    for(i=0; i<configs.items.length; i++) {
+    	config = configs.items[i];
         if (config.alt === 1) {
             // already handled
             continue;
@@ -1370,11 +1371,11 @@ ParserATNSimulator.prototype.precedenceTransition = function(config, pt,  collec
             var predSucceeds = pt.getPredicate().eval(this.parser, this._outerContext);
             this._input.seek(currentPosition);
             if (predSucceeds) {
-                c = new ATNConfig(parms1 = {state:pt.target}, config); // no pred context
+                c = new ATNConfig({state:pt.target}, config); // no pred context
             }
         } else {
             newSemCtx = SemanticContext.andContext(config.semanticContext, pt.getPredicate());
-            c = ATNConfig({state:pt.target, semanticContext:newSemCtx}, config);
+            c = new ATNConfig({state:pt.target, semanticContext:newSemCtx}, config);
         }
     } else {
         c = new ATNConfig({state:pt.target}, config);

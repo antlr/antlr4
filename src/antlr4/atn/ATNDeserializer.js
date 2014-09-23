@@ -57,6 +57,7 @@ var ActionTransition = Transitions.ActionTransition;
 var EpsilonTransition = Transitions.EpsilonTransition;
 var WildcardTransition = Transitions.WildcardTransition;
 var PredicateTransition = Transitions.PredicateTransition;
+var PrecedencePredicateTransition = Transitions.PrecedencePredicateTransition;
 var IntervalSet = require('./../IntervalSet').IntervalSet;
 var Interval = require('./../IntervalSet').Interval;
 var ATNDeserializationOptions = require('./ATNDeserializationOptions').ATNDeserializationOptions;
@@ -480,17 +481,17 @@ ATNDeserializer.prototype.stateIsEndStateFor = function(state, idx) {
 //
 ATNDeserializer.prototype.markPrecedenceDecisions = function(atn) {
 	for(var i=0; i<atn.states.length; i++) {
-    	var state = atn.states[i];
-    	if (!( state instanceof StarLoopEntryState)) {
+		var state = atn.states[i];
+		if (!( state instanceof StarLoopEntryState)) {
             continue;
-    	}
+        }
         // We analyze the ATN to determine if this ATN decision state is the
         // decision for the closure block that determines whether a
         // precedence rule should continue or complete.
         //
         if ( atn.ruleToStartState[state.ruleIndex].isPrecedenceRule) {
-            var maybeLoopEndState = state.transitions[len(state.transitions) - 1].target;
-            if (isinstance(maybeLoopEndState, LoopEndState)) {
+            var maybeLoopEndState = state.transitions[state.transitions.length - 1].target;
+            if (maybeLoopEndState instanceof LoopEndState) {
                 if ( maybeLoopEndState.epsilonOnlyTransitions &&
                         (maybeLoopEndState.transitions[0].target instanceof RuleStopState)) {
                     state.precedenceRuleDecision = true;

@@ -36,6 +36,7 @@ var InputMismatchException = Errors.InputMismatchException;
 var FailedPredicateException = Errors.FailedPredicateException;
 var ParseCancellationException = Errors.ParseCancellationException;
 var ATNState = require('./../atn/ATNState').ATNState;
+var Interval = require('./../IntervalSet').Interval;
 var IntervalSet = require('./../IntervalSet').IntervalSet;
 
 function ErrorStrategy() {
@@ -253,21 +254,28 @@ DefaultErrorStrategy.prototype.sync = function(recognizer) {
     if(recognizer.isExpectedToken(la)) {
         return;
     }
-    if ([ATNState.BLOCK_START, ATNState.STAR_BLOCK_START,
-           ATNState.PLUS_BLOCK_START, ATNState.STAR_LOOP_ENTRY].contains(s.stateType)) {
+    switch (s.stateType) {
+    case ATNState.BLOCK_START:
+    case ATNState.STAR_BLOCK_START:
+    case ATNState.PLUS_BLOCK_START:
+    case ATNState.STAR_LOOP_ENTRY:
        // report error and recover if possible
         if( this.singleTokenDeletion(recognizer) !== null) {
             return;
         } else {
             throw new InputMismatchException(recognizer);
         }
-    } else if([ATNState.PLUS_LOOP_BACK, ATNState.STAR_LOOP_BACK].contains(s.stateType)) {
+        break;
+    case ATNState.PLUS_LOOP_BACK:
+    case ATNState.STAR_LOOP_BACK:
         this.reportUnwantedToken(recognizer);
         var expecting = recognizer.getExpectedTokens();
         var whatFollowsLoopIterationOrRule = expecting.addSet(this.getErrorRecoverySet(recognizer));
         this.consumeUntil(recognizer, whatFollowsLoopIterationOrRule);
-    } // else
-       // do nothing if we can't identify the exact kind of ATN state
+        break;
+    default:
+        // do nothing if we can't identify the exact kind of ATN state
+    }
 };
 
 // This is called by {@link //reportError} when the exception is a
@@ -285,7 +293,7 @@ DefaultErrorStrategy.prototype.reportNoViableAlternative = function(recognizer, 
         if (e.startToken.type===Token.EOF) {
             input = "<EOF>";
         } else {
-            input = tokens.getText((e.startToken, e.offendingToken));
+            input = tokens.getText(new Interval(e.startToken, e.offendingToken));
         }
     } else {
         input = "<unknown input>";
@@ -540,7 +548,7 @@ DefaultErrorStrategy.prototype.singleTokenDeletion = function(recognizer) {
 DefaultErrorStrategy.prototype.getMissingSymbol = function(recognizer) {
     var currentSymbol = recognizer.getCurrentToken();
     var expecting = this.getExpectedTokens(recognizer);
-    var expectedTokenType = expecting[0]; // get any element
+    var expectedTokenType = expecting.first(); // get any element
     var tokenText;
     if (expectedTokenType===Token.EOF) {
         tokenText = "<missing EOF>";

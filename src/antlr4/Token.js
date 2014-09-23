@@ -154,6 +154,9 @@ Object.defineProperty(CommonToken.prototype, "text", {
 		} else {
 			return "<EOF>";
 		}
+	},
+	set : function(text) {
+		this._text = text;
 	}
 });
 
