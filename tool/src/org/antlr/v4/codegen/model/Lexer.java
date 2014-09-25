@@ -30,78 +30,29 @@
 
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.chunk.ActionChunk;
-import org.antlr.v4.codegen.model.chunk.ActionText;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
-public class Lexer extends OutputModelObject {
-	public String name;
-	public String grammarFileName;
-	public Map<String,Integer> tokens;
+public class Lexer extends Recognizer {
 	public Map<String,Integer> channels;
 	public LexerFile file;
-	public String[] tokenNames;
-	public Set<String> ruleNames;
 	public Collection<String> modes;
-	@ModelElement public ActionChunk superClass;
 
-	@ModelElement public SerializedATN atn;
 	@ModelElement public LinkedHashMap<Rule, RuleActionFunction> actionFuncs =
 		new LinkedHashMap<Rule, RuleActionFunction>();
-	@ModelElement public LinkedHashMap<Rule, RuleSempredFunction> sempredFuncs =
-		new LinkedHashMap<Rule, RuleSempredFunction>();
 
 	public Lexer(OutputModelFactory factory, LexerFile file) {
-		this.factory = factory;
+		super(factory);
 		this.file = file; // who contains us?
+
 		Grammar g = factory.getGrammar();
-		grammarFileName = new File(g.fileName).getName();
-		name = g.getRecognizerName();
-		tokens = new LinkedHashMap<String,Integer>();
-		channels = new LinkedHashMap<String,Integer>();
-		LexerGrammar lg = (LexerGrammar)g;
-		atn = new SerializedATN(factory, lg.atn);
-		modes = lg.modes.keySet();
-
-		for (String t : g.tokenNameToTypeMap.keySet()) {
-			Integer ttype = g.tokenNameToTypeMap.get(t);
-			if ( ttype>0 ) tokens.put(t, ttype);
-		}
-
-		for (Map.Entry<String, Integer> channel : g.channelNameToValueMap.entrySet()) {
-			channels.put(channel.getKey(), channel.getValue());
-		}
-
-		tokenNames = g.getTokenDisplayNames();
-        for (int i = 0; i < tokenNames.length; i++) {
-            if ( tokenNames[i]==null ) continue;
-            CodeGenerator gen = factory.getGenerator();
-            if ( tokenNames[i].charAt(0)=='\'' ) {
-				boolean addQuotes = false;
-				tokenNames[i] =
-					gen.getTarget().getTargetStringLiteralFromANTLRStringLiteral(gen,
-																			tokenNames[i],
-																			addQuotes);
-				tokenNames[i] = "\"'"+tokenNames[i]+"'\"";
-            }
-            else {
-                tokenNames[i] = gen.getTarget().getTargetStringLiteralFromString(tokenNames[i], true);
-            }
-        }
-		ruleNames = g.rules.keySet();
-
-		if (g.getOptionString("superClass") != null) {
-			superClass = new ActionText(null, g.getOptionString("superClass"));
-		}
+		channels = new LinkedHashMap<String, Integer>(g.channelNameToValueMap);
+		modes = ((LexerGrammar)g).modes.keySet();
 	}
 }

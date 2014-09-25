@@ -30,70 +30,18 @@
 
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.chunk.ActionChunk;
-import org.antlr.v4.codegen.model.chunk.ActionText;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.Rule;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-public class Parser extends OutputModelObject {
-	public String name;
-	public String grammarFileName;
-	public String grammarName;
-	@ModelElement public ActionChunk superClass;
-	public Map<String,Integer> tokens;
-	public String[] tokenNames;
-	public Set<String> ruleNames;
-	public Collection<Rule> rules;
+public class Parser extends Recognizer {
 	public ParserFile file;
 
 	@ModelElement public List<RuleFunction> funcs = new ArrayList<RuleFunction>();
-	@ModelElement public SerializedATN atn;
-	@ModelElement public LinkedHashMap<Rule, RuleSempredFunction> sempredFuncs =
-		new LinkedHashMap<Rule, RuleSempredFunction>();
 
 	public Parser(OutputModelFactory factory, ParserFile file) {
-		this.factory = factory;
+		super(factory);
 		this.file = file; // who contains us?
-		Grammar g = factory.getGrammar();
-		grammarFileName = new File(g.fileName).getName();
-		grammarName = g.name;
-		name = g.getRecognizerName();
-		tokens = new LinkedHashMap<String,Integer>();
-		for (String t : g.tokenNameToTypeMap.keySet()) {
-			Integer ttype = g.tokenNameToTypeMap.get(t);
-			if ( ttype>0 ) tokens.put(t, ttype);
-		}
-		tokenNames = g.getTokenDisplayNames();
-		for (int i = 0; i < tokenNames.length; i++) {
-			if ( tokenNames[i]==null ) continue;
-			CodeGenerator gen = factory.getGenerator();
-			if ( tokenNames[i].charAt(0)=='\'' ) {
-				boolean addQuotes = false;
-				tokenNames[i] =
-					gen.getTarget().getTargetStringLiteralFromANTLRStringLiteral(gen,
-																			tokenNames[i],
-																			addQuotes);
-				tokenNames[i] = "\"'"+tokenNames[i]+"'\"";
-			}
-			else {
-				tokenNames[i] = gen.getTarget().getTargetStringLiteralFromString(tokenNames[i], true);
-			}
-		}
-		ruleNames = g.rules.keySet();
-		rules = g.rules.values();
-		atn = new SerializedATN(factory, g.atn);
-		if (g.getOptionString("superClass") != null) {
-			superClass = new ActionText(null, g.getOptionString("superClass"));
-		}
 	}
 }
