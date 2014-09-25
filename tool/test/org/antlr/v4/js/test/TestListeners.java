@@ -43,21 +43,21 @@ public class TestListeners extends BaseTest {
 		    "}\n" +
 		    "\n" +
 		    "@parser::members {\n" +
-			"function LeafListener() {\n" +
+			"this.LeafListener = function() {\n" +
 			"    this.visitTerminal = function(node) {\n" +
 			"        console.log(node.symbol.text);\n" +
 			"    };\n" +
 			"    return this;\n" +
 		    "}\n" +
-		    "LeafListener.prototype = Object.create(TListener.prototype);\n" +
-			"LeafListener.prototype.constructor = LeafListener;\n" +
+		    "this.LeafListener.prototype = Object.create(TListener.prototype);\n" +
+			"this.LeafListener.prototype.constructor = this.LeafListener;\n" +
 		    "}\n" +
 		    "\n" +
 			"s\n" +
 			"@after {" +
 			"console.log($r.ctx.toStringTree(null, this));\n" +
 			"var walker = new antlr4.tree.ParseTreeWalker();\n" +
-			"walker.walk(new LeafListener(), $r.ctx);\n" +
+			"walker.walk(new this.LeafListener(), $r.ctx);\n" +
 			"}\n" +
 			"  : r=a ;\n" +
 			"a : INT INT" +
@@ -83,7 +83,7 @@ public class TestListeners extends BaseTest {
 		    "}\n" +
 		    "\n" +
 		    "@parser::members {\n" +
-			"function LeafListener() {\n" +
+			"this.LeafListener = function() {\n" +
 			"    this.exitA = function(ctx) {\n" +
 			"        if(ctx.getChildCount()===2) {\n" +
 			"            console.log(ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + antlr4.Utils.arrayToString(ctx.INT()));\n" +
@@ -93,8 +93,8 @@ public class TestListeners extends BaseTest {
 			"    };\n" +
 			"    return this;\n" +
 		    "}\n" +
-		    "LeafListener.prototype = Object.create(TListener.prototype);\n" +
-			"LeafListener.prototype.constructor = LeafListener;\n" +
+		    "this.LeafListener.prototype = Object.create(TListener.prototype);\n" +
+			"this.LeafListener.prototype.constructor = this.LeafListener;\n" +
 		    "}\n" +
 		    "\n" +
 			"\n" +
@@ -102,7 +102,7 @@ public class TestListeners extends BaseTest {
 			"@after {" +
 			"console.log($r.ctx.toStringTree(null, this));\n" +
 			"var walker = new antlr4.tree.ParseTreeWalker();\n" +
-			"walker.walk(new LeafListener(), $r.ctx);\n" +
+			"walker.walk(new this.LeafListener(), $r.ctx);\n" +
 			"}\n" +
 			"  : r=a ;\n" +
 			"a : INT INT" +
@@ -139,7 +139,7 @@ public class TestListeners extends BaseTest {
 		    "}\n" +
 		    "\n" +
 		    "@parser::members {\n" +
-			"function LeafListener() {\n" +
+			"this.LeafListener = function() {\n" +
 			"    this.exitA = function(ctx) {\n" +
 			"        if(ctx.getChildCount()===2) {\n" +
 			"            console.log(ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text);\n" +
@@ -149,14 +149,14 @@ public class TestListeners extends BaseTest {
 			"    };\n" +
 			"    return this;\n" +
 		    "}\n" +
-		    "LeafListener.prototype = Object.create(TListener.prototype);\n" +
-			"LeafListener.prototype.constructor = LeafListener;\n" +
+		    "this.LeafListener.prototype = Object.create(TListener.prototype);\n" +
+			"this.LeafListener.prototype.constructor = this.LeafListener;\n" +
 		    "}\n" +
 			"s\n" +
 			"@after {" +
 			"console.log($r.ctx.toStringTree(null, this));\n" +
 			"var walker = new antlr4.tree.ParseTreeWalker();\n" +
-			"walker.walk(new LeafListener(), $r.ctx);\n" +
+			"walker.walk(new this.LeafListener(), $r.ctx);\n" +
 			"}\n" +
 			"  : r=a ;\n" +
 			"a : b b" +		// forces list
@@ -187,7 +187,7 @@ public class TestListeners extends BaseTest {
 		    "}\n" +
 		    "\n" +
 		    "@parser::members {\n" +
-			"function LeafListener() {\n" +
+			"this.LeafListener = function() {\n" +
 			"    this.exitE = function(ctx) {\n" +
 			"        if(ctx.getChildCount()===3) {\n" +
 			"            console.log(ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text);\n" +
@@ -197,14 +197,14 @@ public class TestListeners extends BaseTest {
 			"    };\n" +
 			"    return this;\n" +
 		    "}\n" +
-		    "LeafListener.prototype = Object.create(TListener.prototype);\n" +
-			"LeafListener.prototype.constructor = LeafListener;\n" +
+		    "this.LeafListener.prototype = Object.create(TListener.prototype);\n" +
+			"this.LeafListener.prototype.constructor = this.LeafListener;\n" +
 		    "}\n" +
 			"s\n" +
 			"@after {" +
 			"console.log($r.ctx.toStringTree(null, this));\n" +
 			"var walker = new antlr4.tree.ParseTreeWalker();\n" +
-			"walker.walk(new LeafListener(), $r.ctx);\n" +
+			"walker.walk(new this.LeafListener(), $r.ctx);\n" +
 			"}\n" +
 			"  : r=e ;\n" +
 			"e : e op='*' e\n" +
@@ -234,7 +234,7 @@ public class TestListeners extends BaseTest {
 		    "}\n" +
 		    "\n" +
 		    "@parser::members {\n" +
-			"function LeafListener() {\n" +
+			"this.LeafListener = function() {\n" +
 			"    this.exitCall = function(ctx) {\n" +
 			"        console.log(ctx.e().start.text + ' ' + ctx.eList());\n" +
 			"    };\n" +
@@ -243,14 +243,14 @@ public class TestListeners extends BaseTest {
 			"    };\n" +
 			"    return this;\n" +
 		    "}\n" +
-		    "LeafListener.prototype = Object.create(TListener.prototype);\n" +
-			"LeafListener.prototype.constructor = LeafListener;\n" +
+		    "this.LeafListener.prototype = Object.create(TListener.prototype);\n" +
+			"this.LeafListener.prototype.constructor = this.LeafListener;\n" +
 		    "}\n" +
 			"s\n" +
 			"@after {" +
 			"console.log($r.ctx.toStringTree(null, this));\n" +
 			"var walker = new antlr4.tree.ParseTreeWalker();\n" +
-			"walker.walk(new LeafListener(), $r.ctx);\n" +
+			"walker.walk(new this.LeafListener(), $r.ctx);\n" +
 			"}\n" +
 			"  : r=e ;\n" +
 			"e : e '(' eList ')' # Call\n" +
