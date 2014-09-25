@@ -238,20 +238,16 @@ public class <parser.name> extends <superClass; null="Parser"> {
 	public static final int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<endif>
-	public static final String[] tokenNames = {
-		<parser.tokenNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor>
-	};
 	public static final int
 		<parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
 	public static final String[] ruleNames = {
 		<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	};
 
-	@Override
-	public String getGrammarFileName() { return "<parser.grammarFileName; format="java-escape">"; }
+	<vocabulary(parser.literalNames, parser.symbolicNames)>
 
 	@Override
-	public String[] getTokenNames() { return tokenNames; }
+	public String getGrammarFileName() { return "<parser.grammarFileName; format="java-escape">"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
@@ -278,6 +274,47 @@ case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}
 <endif>
 
 	<atn>
+}
+>>
+
+vocabulary(literalNames, symbolicNames) ::= <<
+private static final String[] _LITERAL_NAMES = {
+	<literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor>
+};
+private static final String[] _SYMBOLIC_NAMES = {
+	<symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor>
+};
+public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
+
+/**
+ * @deprecated Use {@link #VOCABULARY} instead.
+ */
+@Deprecated
+public static final String[] tokenNames;
+static {
+	tokenNames = new String[_SYMBOLIC_NAMES.length];
+	for (int i = 0; i \< tokenNames.length; i++) {
+		tokenNames[i] = VOCABULARY.getLiteralName(i);
+		if (tokenNames[i] == null) {
+			tokenNames[i] = VOCABULARY.getSymbolicName(i);
+		}
+
+		if (tokenNames[i] == null) {
+			tokenNames[i] = "\<INVALID>";
+		}
+	}
+}
+
+@Override
+@Deprecated
+public String[] getTokenNames() {
+	return tokenNames;
+}
+
+@Override
+@NotNull
+public Vocabulary getVocabulary() {
+	return VOCABULARY;
 }
 >>
 
@@ -857,12 +894,11 @@ public class <lexer.name> extends <superClass; null="Lexer"> {
 		<lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor>
 	};
 
-	public static final String[] tokenNames = {
-		<lexer.tokenNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor>
-	};
 	public static final String[] ruleNames = {
 		<lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	};
+
+	<vocabulary(lexer.literalNames, lexer.symbolicNames)>
 
 	<namedActions.members>
 
@@ -873,9 +909,6 @@ public class <lexer.name> extends <superClass; null="Lexer"> {
 
 	@Override
 	public String getGrammarFileName() { return "<lexer.grammarFileName>"; }
-
-	@Override
-	public String[] getTokenNames() { return tokenNames; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }

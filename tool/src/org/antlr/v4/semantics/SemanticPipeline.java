@@ -189,7 +189,10 @@ public class SemanticPipeline {
 			for (String lit : conflictingLiterals) {
 				// Remove literal if repeated across rules so it's not
 				// found by parser grammar.
-				G.stringLiteralToTypeMap.remove(lit);
+				Integer value = G.stringLiteralToTypeMap.remove(lit);
+				if (value != null && value > 0 && value < G.typeToStringLiteralList.size() && lit.equals(G.typeToStringLiteralList.get(value))) {
+					G.typeToStringLiteralList.set(value, null);
+				}
 			}
 		}
 

@@ -292,7 +292,7 @@ public class DOTGenerator {
 					SetTransition set = (SetTransition)edge;
 					String label = set.label().toString();
 					if ( isLexer ) label = set.label().toString(true);
-					else if ( grammar!=null ) label = set.label().toString(grammar.getTokenDisplayNames());
+					else if ( grammar!=null ) label = set.label().toString(grammar.getVocabulary());
 					if ( edge instanceof NotSetTransition ) label = "~"+label;
 					edgeST.add("label", getEdgeLabel(label));
 				}
@@ -301,7 +301,7 @@ public class DOTGenerator {
 					RangeTransition range = (RangeTransition)edge;
 					String label = range.label().toString();
 					if ( isLexer ) label = range.toString();
-					else if ( grammar!=null ) label = range.label().toString(grammar.getTokenDisplayNames());
+					else if ( grammar!=null ) label = range.label().toString(grammar.getVocabulary());
 					edgeST.add("label", getEdgeLabel(label));
 				}
 				else {

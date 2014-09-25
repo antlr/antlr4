@@ -64,10 +64,25 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	/** Used to print out token names like ID during debugging and
 	 *  error reporting.  The generated parsers implement a method
 	 *  that overrides this to point to their String[] tokenNames.
+	 *
+	 * @deprecated Use {@link #getVocabulary()} instead.
 	 */
+	@Deprecated
 	public abstract String[] getTokenNames();
 
 	public abstract String[] getRuleNames();
+
+	/**
+	 * Get the vocabulary used by the recognizer.
+	 *
+	 * @return A {@link Vocabulary} instance providing information about the
+	 * vocabulary used by the grammar.
+	 */
+	@NotNull
+	@SuppressWarnings("deprecation")
+	public Vocabulary getVocabulary() {
+		return VocabularyImpl.fromTokenNames(getTokenNames());
+	}
 
 	/**
 	 * Get a map from token names to token types.

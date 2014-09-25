@@ -45,6 +45,8 @@ import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSerializer;
@@ -767,6 +769,53 @@ public class Grammar implements AttributeResolver {
 		return tokenNames;
 	}
 
+	/**
+	 * Gets the literal names assigned to tokens in the grammar.
+	 */
+	@NotNull
+	public String[] getTokenLiteralNames() {
+		int numTokens = getMaxTokenType();
+		String[] literalNames = new String[numTokens+1];
+		for (int i = 0; i < Math.min(literalNames.length, typeToStringLiteralList.size()); i++) {
+			literalNames[i] = typeToStringLiteralList.get(i);
+		}
+
+		for (Map.Entry<String, Integer> entry : stringLiteralToTypeMap.entrySet()) {
+			if (entry.getValue() >= 0 && entry.getValue() < literalNames.length && literalNames[entry.getValue()] == null) {
+				literalNames[entry.getValue()] = entry.getKey();
+			}
+		}
+
+		return literalNames;
+	}
+
+	/**
+	 * Gets the symbolic names assigned to tokens in the grammar.
+	 */
+	@NotNull
+	public String[] getTokenSymbolicNames() {
+		int numTokens = getMaxTokenType();
+		String[] symbolicNames = new String[numTokens+1];
+		for (int i = 0; i < Math.min(symbolicNames.length, typeToTokenList.size()); i++) {
+			if (typeToTokenList.get(i) == null || typeToTokenList.get(i).startsWith(AUTO_GENERATED_TOKEN_NAME_PREFIX)) {
+				continue;
+			}
+
+			symbolicNames[i] = typeToTokenList.get(i);
+		}
+
+		return symbolicNames;
+	}
+
+	/**
+	 * Gets a {@link Vocabulary} instance describing the vocabulary used by the
+	 * grammar.
+	 */
+	@NotNull
+	public Vocabulary getVocabulary() {
+		return new VocabularyImpl(getTokenLiteralNames(), getTokenSymbolicNames());
+	}
+
 	/** Given an arbitrarily complex SemanticContext, walk the "tree" and get display string.
 	 *  Pull predicates from grammar text.
 	 */
@@ -1251,7 +1300,7 @@ public class Grammar implements AttributeResolver {
 
 		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
 		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
-		return new LexerInterpreter(fileName, Arrays.asList(getTokenDisplayNames()), Arrays.asList(getRuleNames()), ((LexerGrammar)this).modes.keySet(), deserialized, input);
+		return new LexerInterpreter(fileName, getVocabulary(), Arrays.asList(getRuleNames()), ((LexerGrammar)this).modes.keySet(), deserialized, input);
 	}
 
 	public ParserInterpreter createParserInterpreter(TokenStream tokenStream) {
@@ -1261,6 +1310,6 @@ public class Grammar implements AttributeResolver {
 
 		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
 		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
-		return new ParserInterpreter(fileName, Arrays.asList(getTokenDisplayNames()), Arrays.asList(getRuleNames()), deserialized, tokenStream);
+		return new ParserInterpreter(fileName, getVocabulary(), Arrays.asList(getRuleNames()), deserialized, tokenStream);
 	}
 }

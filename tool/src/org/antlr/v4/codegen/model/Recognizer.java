@@ -37,6 +37,7 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -47,7 +48,8 @@ public abstract class Recognizer extends OutputModelObject {
 	public String grammarName;
 	public String grammarFileName;
 	public Map<String,Integer> tokens;
-	public String[] tokenNames;
+	public String[] literalNames;
+	public String[] symbolicNames;
 	public Set<String> ruleNames;
 	public Collection<Rule> rules;
 	@ModelElement public ActionChunk superClass;
@@ -71,23 +73,6 @@ public abstract class Recognizer extends OutputModelObject {
 			}
 		}
 
-		tokenNames = g.getTokenDisplayNames();
-		for (int i = 0; i < tokenNames.length; i++) {
-			if ( tokenNames[i]==null ) continue;
-			CodeGenerator gen = factory.getGenerator();
-			if ( tokenNames[i].charAt(0)=='\'' ) {
-				boolean addQuotes = false;
-				tokenNames[i] =
-					gen.getTarget().getTargetStringLiteralFromANTLRStringLiteral(gen,
-																			tokenNames[i],
-																			addQuotes);
-				tokenNames[i] = "\"'"+tokenNames[i]+"'\"";
-			}
-			else {
-				tokenNames[i] = gen.getTarget().getTargetStringLiteralFromString(tokenNames[i], true);
-			}
-		}
-
 		ruleNames = g.rules.keySet();
 		rules = g.rules.values();
 		atn = new SerializedATN(factory, g.atn);
@@ -97,5 +82,44 @@ public abstract class Recognizer extends OutputModelObject {
 		else {
 			superClass = null;
 		}
+
+		CodeGenerator gen = factory.getGenerator();
+		literalNames = translateTokenStringsToTarget(g.getTokenLiteralNames(), gen);
+		symbolicNames = translateTokenStringsToTarget(g.getTokenSymbolicNames(), gen);
 	}
+
+	protected static String[] translateTokenStringsToTarget(String[] tokenStrings, CodeGenerator gen) {
+		String[] result = tokenStrings.clone();
+		for (int i = 0; i < tokenStrings.length; i++) {
+			result[i] = translateTokenStringToTarget(tokenStrings[i], gen);
+		}
+
+		int lastTrueEntry = result.length - 1;
+		while (lastTrueEntry >= 0 && result[lastTrueEntry] == null) {
+			lastTrueEntry --;
+		}
+
+		if (lastTrueEntry < result.length - 1) {
+			result = Arrays.copyOf(result, lastTrueEntry + 1);
+		}
+
+		return result;
+	}
+
+	protected static String translateTokenStringToTarget(String tokenName, CodeGenerator gen) {
+		if (tokenName == null) {
+			return null;
+		}
+
+		if (tokenName.charAt(0) == '\'') {
+			boolean addQuotes = false;
+			String targetString =
+				gen.getTarget().getTargetStringLiteralFromANTLRStringLiteral(gen, tokenName, addQuotes);
+			return "\"'" + targetString + "'\"";
+		}
+		else {
+			return gen.getTarget().getTargetStringLiteralFromString(tokenName, true);
+		}
+	}
+
 }

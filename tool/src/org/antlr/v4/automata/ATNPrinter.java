@@ -106,7 +106,7 @@ public class ATNPrinter {
 						buf.append("-").append(not?"~":"").append(st.toString()).append("->").append(getStateString(t.target)).append('\n');
 					}
 					else {
-						buf.append("-").append(not?"~":"").append(st.label().toString(g.getTokenDisplayNames())).append("->").append(getStateString(t.target)).append('\n');
+						buf.append("-").append(not?"~":"").append(st.label().toString(g.getVocabulary())).append("->").append(getStateString(t.target)).append('\n');
 					}
 				}
 				else if ( t instanceof AtomTransition ) {
