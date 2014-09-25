@@ -40,14 +40,14 @@ public class TestParseTrees extends BaseTest {
 			"grammar T;\n" +
 			"s\n" +
 			"@init {" +
-			"self._buildParseTrees = True" +
+			"this.buildParseTrees = true;" +
 			"}\n" +
 			"@after {" +
-			"print($r.ctx.toStringTree(recog=self))" +
+			"console.log($r.ctx.toStringTree(null, this));" +
 			"}\n" +
 			"  :r=a ;\n" +
 			"a : 'x' {" + 
-			"print(str_list(self.getRuleInvocationStack()))" +
+			"console.log(antlr4.Utils.arrayToString(this.getRuleInvocationStack()));" +
 			"} ;\n";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x", false);
 		String expecting = "[a, s]\n(a x)\n";
@@ -59,10 +59,10 @@ public class TestParseTrees extends BaseTest {
 			"grammar T;\n" +
 			"s\n" +
 			"@init {" +
-			"self._buildParseTrees = True" +
+			"this.buildParseTrees = true;" +
 			"}\n" +
 			"@after {" +
-			"print($r.ctx.toStringTree(recog=self))" +
+			"console.log($r.ctx.toStringTree(null, this));" +
 			"}\n" +
 			"  :r=a ;\n" +
 			"a : 'x' 'y'\n" +
@@ -77,10 +77,10 @@ public class TestParseTrees extends BaseTest {
 			"grammar T;\n" +
 			"s\n" +
 			"@init {" +
-			"self._buildParseTrees = True" +
+			"this.buildParseTrees = true;" +
 			"}\n" +
 			"@after {" +
-			"print($r.ctx.toStringTree(recog=self))" +
+			"console.log($r.ctx.toStringTree(null, this));" +
 			"}\n" +
 			"  :r=a ;\n" +
 			"a : 'x' | 'y'\n" +
@@ -95,10 +95,10 @@ public class TestParseTrees extends BaseTest {
 			"grammar T;\n" +
 			"s\n" +
 			"@init {" +
-			"self._buildParseTrees = True" +
+			"this.buildParseTrees = true;" +
 			"}\n" +
 			"@after {" +
-			"print($r.ctx.toStringTree(recog=self))" +
+			"console.log($r.ctx.toStringTree(null, this));" +
 			"}\n" +
 			"  :r=a ;\n" +
 			"a : ('x' | 'y')* 'z'\n" +
@@ -113,10 +113,10 @@ public class TestParseTrees extends BaseTest {
 			"grammar T;\n" +
 			"s\n" +
 			"@init {" +
-			"self._buildParseTrees = True" +
+			"this.buildParseTrees = true;" +
 			"}\n" +
 			"@after {" +
-			"print($r.ctx.toStringTree(recog=self))" +
+			"console.log($r.ctx.toStringTree(null, this));" +
 			"}\n" +
 			"  : r=a ;\n" +
 			"a : b 'x'\n" +
@@ -134,10 +134,10 @@ public class TestParseTrees extends BaseTest {
 			"grammar T;\n" +
 			"s\n" +
 			"@init {" +
-			"self._buildParseTrees = True" +
+			"this.buildParseTrees = true;" +
 			"}\n" +
 			"@after {" +
-			"print($r.ctx.toStringTree(recog=self))" +
+			"console.log($r.ctx.toStringTree(null, this));" +
 			"}\n" +
 			"  : r=a ;\n" +
 			"a : 'x' 'y'\n" +
@@ -153,10 +153,10 @@ public class TestParseTrees extends BaseTest {
 			"grammar T;\n" +
 			"s\n" +
 			"@init {" +
-			"self.buildParseTrees = True" +
+			"this.buildParseTrees = true;" +
 			"}\n" +
 			"@after {" +
-			"print($r.ctx.toStringTree(recog=self))" +
+			"console.log($r.ctx.toStringTree(null, this));" +
 			"}\n" +
 			"  : r=a ;\n" +
 			"a : 'x' | 'y'\n" +
@@ -172,10 +172,10 @@ public class TestParseTrees extends BaseTest {
 			"grammar T;\n" +
 			"s\n" +
 			"@init {" +
-			"self._buildParseTrees = True" +
+			"this.buildParseTrees = true;" +
 			"}\n" +
 			"@after {" +
-			"print($r.ctx.toStringTree(recog=self))" +
+			"console.log($r.ctx.toStringTree(null, this));" +
 			"}\n" +
 			"  : r=a ;\n" +
 			"a : 'x' 'y'* '!'\n" +
