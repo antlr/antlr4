@@ -109,18 +109,10 @@ LexerNoViableAltException.prototype.toString = function() {
 // in the various paths when the error. Reported by reportNoViableAlternative()
 //
 function NoViableAltException(recognizer, input, startToken, offendingToken, deadEndConfigs, ctx) {
-    if (ctx === null) {
-        ctx = recognizer._ctx;
-    }
-    if (offendingToken === null) {
-        offendingToken = recognizer.getCurrentToken();
-    }
-    if (startToken === null) {
-        startToken = recognizer.getCurrentToken();
-    }
-    if (input === null) {
-        input = recognizer.getInputStream();
-    }
+	ctx = ctx || recognizer._ctx;
+	offendingToken = offendingToken || recognizer.getCurrentToken();
+	startToken = startToken || recognizer.getCurrentToken();
+	input = input || recognizer.getInputStream();
 	RecognitionException.call(this, {message:"", recognizer:recognizer, input:input, ctx:ctx});
     // Which configurations did we try at input.index() that couldn't match
 	// input.LT(1)?//

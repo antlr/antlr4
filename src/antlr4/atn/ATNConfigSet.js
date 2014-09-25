@@ -35,9 +35,26 @@
 ///
 
 var ATN = require('./ATN').ATN;
-var Set = require('./../Utils').Set;
+var Utils = require('./../Utils');
+var Set = Utils.Set;
 var SemanticContext = require('./SemanticContext').SemanticContext;
 var merge = require('./../PredictionContext').merge;
+
+function hashATNConfig(c) {
+	return c.shortHashString();
+}
+
+function equalATNConfigs(a, b) {
+	if ( a===b ) {
+		return true;
+	}
+	if ( a===null || b===null ) {
+		return false;
+	}
+	return a.state.stateNumber===b.state.stateNumber &&
+		a.alt===b.alt && a.semanticContext.equals(b.semanticContext);
+}
+
 
 function ATNConfigSet(fullCtx) {
 	//
@@ -51,7 +68,7 @@ function ATNConfigSet(fullCtx) {
 	// use a hash table that lets us specify the equals/hashcode operation.
 	// All configs but hashed by (s, i, _, pi) not including context. Wiped out
 	// when we go readonly as this set becomes a DFA state.
-	this.configLookup = new Set();
+	this.configLookup = new Set(hashATNConfig, equalATNConfigs);
 	// Indicates that this configuration set is part of a full context
 	// LL prediction. It will be used to determine how to merge $. With SLL
 	// it's a wildcard whereas it is not for LL context merge.
@@ -104,7 +121,7 @@ ATNConfigSet.prototype.add = function(config, mergeCache) {
 	if (config.reachesIntoOuterContext > 0) {
 		this.dipsIntoOuterContext = true;
 	}
-	var existing = this.getOrAdd(config);
+	var existing = this.configLookup.add(config);
 	if (existing === config) {
 		this.cachedHashString = "-1";
 		this.configs.push(config); // track order here
@@ -120,10 +137,6 @@ ATNConfigSet.prototype.add = function(config, mergeCache) {
 			existing.reachesIntoOuterContext, config.reachesIntoOuterContext);
 	existing.context = merged; // replace context; no need to alt mapping
 	return true;
-};
-
-ATNConfigSet.prototype.getOrAdd = function(config) {
-	return this.configLookup.add(config);
 };
 
 ATNConfigSet.prototype.getStates = function() {
@@ -245,7 +258,7 @@ ATNConfigSet.prototype.setReadonly = function(readonly) {
 };
 
 ATNConfigSet.prototype.toString = function() {
-	return this.configs.toString() +
+	return Utils.arrayToString(this.configs) +
 		(this.hasSemanticContext ? ",hasSemanticContext=" + this.hasSemanticContext : "") +
 		(this.uniqueAlt !== ATN.INVALID_ALT_NUMBER ? ",uniqueAlt=" + this.uniqueAlt : "") +
 		(this.conflictingAlts !== null ? ",conflictingAlts=" + this.conflictingAlts : "") +

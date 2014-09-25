@@ -113,10 +113,6 @@ RuleContext.prototype.getText = function() {
 	}
 };
 
-RuleContext.prototype.getRuleIndex = function() {
-	return -1;
-};
-
 RuleContext.prototype.getChild = function(i) {
 	return null;
 };
@@ -153,7 +149,7 @@ RuleContext.prototype.toString = function(ruleNames, stop) {
 				s += p.invokingState;
 			}
 		} else {
-			var ri = p.getRuleIndex();
+			var ri = p.ruleIndex;
 			var ruleName = (ri >= 0 && ri < ruleNames.length) ? ruleNames[ri]
 					: "" + ri;
 			s += ruleName;

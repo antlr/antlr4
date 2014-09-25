@@ -48,6 +48,7 @@
 // this situation occurs.</li>
 // </ul>
 
+var BitSet = require('./../Utils').BitSet;
 var ErrorListener = require('./ErrorListener').ErrorListener;
 var Interval = require('./../IntervalSet').Interval;
 
@@ -94,8 +95,7 @@ DiagnosticErrorListener.prototype.reportContextSensitivity = function(
 	recognizer.notifyErrorListeners(msg);
 };
 
-DiagnosticErrorListener.prototype.getDecisionDescription = function(recognizer,
-		dfa) {
+DiagnosticErrorListener.prototype.getDecisionDescription = function(recognizer, dfa) {
 	var decision = dfa.decision;
 	var ruleIndex = dfa.atnStartState.ruleIndex;
 
@@ -121,16 +121,15 @@ DiagnosticErrorListener.prototype.getDecisionDescription = function(recognizer,
 // @return Returns {@code reportedAlts} if it is not {@code null}, otherwise
 // returns the set of alternatives represented in {@code configs}.
 //
-DiagnosticErrorListener.prototype.getConflictingAlts = function(reportedAlts,
-		configs) {
+DiagnosticErrorListener.prototype.getConflictingAlts = function(reportedAlts, configs) {
 	if (reportedAlts !== null) {
 		return reportedAlts;
 	}
-	var result = new Set();
+	var result = new BitSet();
 	for (var i = 0; i < configs.items.length; i++) {
 		result.add(configs.items[i].alt);
 	}
-	return result;
+	return "{" + result.values().join(", ") + "}";
 };
 
 exports.DiagnosticErrorListener = DiagnosticErrorListener;

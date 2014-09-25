@@ -627,7 +627,7 @@ Parser.prototype.getRuleInvocationStack = function(p) {
 	var stack = [];
 	while (p !== null) {
 		// compute what follows who invoked us
-		var ruleIndex = p.getRuleIndex();
+		var ruleIndex = p.ruleIndex;
 		if (ruleIndex < 0) {
 			stack.push("n/a");
 		} else {

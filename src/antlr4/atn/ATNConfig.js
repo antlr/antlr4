@@ -111,6 +111,10 @@ ATNConfig.prototype.equals = function(other) {
     }
 };
 
+ATNConfig.prototype.shortHashString = function() {
+    return "" + this.state.stateNumber + "/" + this.alt + "/" + this.semanticContext;
+};
+
 ATNConfig.prototype.hashString = function() {
     return "" + this.state.stateNumber + "/" + this.alt + "/" +
              this.context + "/" + this.semanticContext;

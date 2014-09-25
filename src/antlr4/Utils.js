@@ -1,3 +1,7 @@
+function arrayToString(a) {
+	return "[" + a.join(", ") + "]";
+}
+
 String.prototype.hashCode = function(s) {
 	var hash = 0;
 	if (this.length === 0) {
@@ -11,8 +15,10 @@ String.prototype.hashCode = function(s) {
 	return hash;
 };
 
-function Set() {
+function Set(hashFunction, equalsFunction) {
 	this.data = {};
+	this.hashFunction = hashFunction || null;
+	this.equalsFunction = equalsFunction || null;
 	return this;
 }
 
@@ -23,12 +29,22 @@ Object.defineProperty(Set.prototype, "length", {
 });
 
 Set.prototype.add = function(value) {
-	var key = "hash_" + value.hashString().hashCode();
+	var hash = this.hashFunction===null ? value.hashString() : this.hashFunction(value);
+	var key = "hash_" + hash.hashCode();
 	if(key in this.data) {
+		var i;
 		var values = this.data[key];
-		for(var i=0;i<values.length; i++) {
-			if(value.equals(values[i])) {
-				return values[i];
+		if(this.equalsFunction===null) {
+			for(i=0;i<values.length; i++) {
+				if(value.equals(values[i])) {
+					return values[i];
+				}
+			}
+		} else {
+			for(i=0;i<values.length; i++) {
+				if(this.equalsFunction(value, values[i])) {
+					return values[i];
+				}
 			}
 		}
 		values.push(value);
@@ -62,19 +78,22 @@ Set.prototype.values = function() {
 	return l;
 };
 
+Set.prototype.toString = function() {
+	return arrayToString(this.values());
+};
+
 function BitSet() {
 	this.data = [];
 	return this;
 }
 
-Object.defineProperty(BitSet.prototype, "length", {
-	get : function() {
-		return this.data.length;
-	}
-});
-
 BitSet.prototype.add = function(value) {
 	this.data[value] = true;
+};
+
+BitSet.prototype.or = function(set) {
+	var bits = this;
+	Object.keys(set.data).map( function(alt) { bits.add(alt); });
 };
 
 BitSet.prototype.remove = function(value) {
@@ -104,30 +123,14 @@ BitSet.prototype.equals = function(other) {
 	return this.hashString()===other.hashString();
 };
 
-
-function Dict() {
-	this.data = {};
-	return this;
-}
-
-Dict.prototype.get = function(key) {
-	if(key in this.data){
-		return this.data[key];
-	} else {
-		return null;
+Object.defineProperty(BitSet.prototype, "length", {
+	get : function() {
+		return this.values().length;
 	}
-};
+});
 
-Dict.prototype.put = function(key, value) {
-	this.data[key] = value;
-};
-
-Dict.prototype.values = function() {
-	var data = this.data;
-	var keys = Object.keys(this.data);
-	return keys.map(function(key) {
-		return data[key];
-	});
+BitSet.prototype.toString = function() {
+	return "{" + this.values().join(", ") + "}";
 };
 
 function AltDict() {
@@ -186,12 +189,7 @@ function escapeWhitespace(s, escapeSpaces) {
 	return s;
 }
 
-function arrayToString(a) {
-	return "[" + a.join(", ") + "]";
-}
 
-
-exports.Dict = Dict;
 exports.Set = Set;
 exports.BitSet = BitSet;
 exports.AltDict = AltDict;

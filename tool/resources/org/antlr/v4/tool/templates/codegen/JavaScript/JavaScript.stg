@@ -149,6 +149,7 @@ function <parser.name> (input) {
     this._interp = new antlr4.atn.ParserATNSimulator(this, atn, decisionsToDFA, sharedContextCache);
     this.ruleNames = ruleNames;
     this.tokenNames = tokenNames;
+	<namedActions.members>
     return this;
 }
 
@@ -161,7 +162,6 @@ Object.defineProperty(<parser.name>.prototype, "atn", {
 	}
 });
 	
-<namedActions.members>
 
 <funcs; separator="\n">
 
@@ -250,7 +250,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-<parser.name>.prototype.<currentRule.name> = function(<currentRule.args:{a | <a.name>; separator=", "}>) {
+<parser.name>.prototype.<currentRule.name> = function(<currentRule.args:{a | <a.name>}; separator=", ">) {
 	
     var localctx = new <currentRule.ctxType>(this, this._ctx, this.state<currentRule.args:{a | , <a.name>}>);
     this.enterRule(localctx, <currentRule.startState>, RULE_<currentRule.name>);
@@ -440,18 +440,19 @@ PlusBlock(choice, alts, error) ::= <<
 this.state = <choice.blockStartStateNumber>; <! alt block decision !>
 this._errHandler.sync(this);
 var _alt = 1<if(!choice.ast.greedy)>+1<endif>;
-while(_alt!==<choice.exitAlt> && _alt!==antlr4.atn.ATN.INVALID_ALT_NUMBER) {
-    <alts:{alt|
-if(_alt === <i><if(!choice.ast.greedy)>+1<endif>) \{
-    <alt>
-\}
-}; separator="\nel">
-    else:
-        <error>
-    self.state = <choice.loopBackStateNumber> <! loopback/exit decision !>
-    self._errHandler.sync(self)
-    _alt = self._interp.adaptivePredict(self._input,<choice.decision>,self._ctx)
-
+do {
+	switch (_alt) {
+	<alts:{alt|
+case <i><if(!choice.ast.greedy)>+1<endif>:
+	<alt>
+	break;}; separator="\n">
+	default:
+		<error>
+	}
+	this.state = <choice.loopBackStateNumber>; <! loopback/exit decision !>
+	this._errHandler.sync(this);
+	_alt = this._interp.adaptivePredict(this._input,<choice.decision>, this._ctx);
+} while ( _alt!=<choice.exitAlt> && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER );
 >>
 
 Sync(s) ::= "sync(<s.expecting.name>)"

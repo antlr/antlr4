@@ -257,9 +257,10 @@
 // the input.</p>
 //
 
-var Set = require('./../Utils').Set;
-var BitSet = require('./../Utils').BitSet;
-var DoubleDict = require('./../Utils').DoubleDict;
+var Utils = require('./../Utils');
+var Set = Utils.Set;
+var BitSet = Utils.BitSet;
+var DoubleDict = Utils.DoubleDict;
 var ATN = require('./ATN').ATN;
 var ATNConfig = require('./ATNConfig').ATNConfig;
 var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
@@ -311,10 +312,10 @@ function ParserATNSimulator(parser, atn, decisionToDFA, sharedContextCache) {
 ParserATNSimulator.prototype = Object.create(ATNSimulator.prototype);
 ParserATNSimulator.prototype.constructor = ParserATNSimulator;
 
-ParserATNSimulator.debug = false;
-ParserATNSimulator.debug_list_atn_decisions = false;
-ParserATNSimulator.dfa_debug = false;
-ParserATNSimulator.retry_debug = false;
+ParserATNSimulator.prototype.debug = false;
+ParserATNSimulator.prototype.debug_list_atn_decisions = false;
+ParserATNSimulator.prototype.dfa_debug = false;
+ParserATNSimulator.prototype.retry_debug = false;
 
 
 ParserATNSimulator.prototype.reset = function() {
@@ -354,7 +355,7 @@ ParserATNSimulator.prototype.adaptivePredict = function(input, decision, outerCo
             if (this.debug || this.debug_list_atn_decisions) {
                 console.log("predictATN decision " + dfa.decision +
                                    " exec LA(1)==" + this.getLookaheadName(input) +
-                                   ", outerContext=" + outerContext.toString(this.parser));
+                                   ", outerContext=" + outerContext.toString(this.parser.ruleNames));
             }
             // If this is not a precedence DFA, we check the ATN start state
             // to determine if this ATN start state is the decision for the
@@ -478,7 +479,7 @@ ParserATNSimulator.prototype.execATN = function(dfa, s0, input, startIndex, oute
                     if(this.debug) {
                     	console.log("Full LL avoided");
                     }
-                    return Math.min.apply(null, conflictingAlts);
+                    return conflictingAlts.minValue();
                 }
                 if (conflictIndex !== startIndex) {
                     // restore the index so reporting the fallback to full
@@ -505,10 +506,9 @@ ParserATNSimulator.prototype.execATN = function(dfa, s0, input, startIndex, oute
             if (alts.length===0) {
                 throw this.noViableAlt(input, outerContext, D.configs, startIndex);
             } else if (alts.length===1) {
-                return alts[0];
+                return alts.minValue();
             } else {
-                // report ambiguity after predicate evaluation to make sure the correct
-                // set of ambig alts is reported.
+                // report ambiguity after predicate evaluation to make sure the correct set of ambig alts is reported.
                 this.reportAmbiguity(dfa, D, startIndex, stopIndex, false, alts, D.configs);
                 return alts.minValue();
             }
@@ -565,7 +565,7 @@ ParserATNSimulator.prototype.computeTargetState = function(dfa, previousD, t) {
 
     if (this.debug) {
         var altSubSets = PredictionMode.getConflictingAltSubsets(reach);
-        console.log("SLL altSubSets=" + altSubSets + ", configs=" + reach +
+        console.log("SLL altSubSets=" + Utils.arrayToString(altSubSets) + ", configs=" + reach +
                     ", predict=" + predictedAlt + ", allSubsetsConflict=" +
                     PredictionMode.allSubsetsConflict(altSubSets) + ", conflictingAlts=" +
                     this.getConflictingAlts(reach));
@@ -609,7 +609,7 @@ ParserATNSimulator.prototype.predicateDFAState = function(dfaState, decisionStat
         // There are preds in configs but they might go away
         // when OR'd together like {p}? || NONE == NONE. If neither
         // alt has preds, resolve to min alt
-        dfaState.prediction = Math.min.apply(null, altsToCollectPredsFrom);
+        dfaState.prediction = altsToCollectPredsFrom.minValue();
     }
 };
 
@@ -1126,10 +1126,10 @@ ParserATNSimulator.prototype.getSynValidOrSemInvalidAltThatFinishedDecisionEntry
 ParserATNSimulator.prototype.getAltThatFinishedDecisionEntryRule = function(configs) {
     var alts = [];
     for(var i=0;i<configs.items.length; i++) {
-    	var c = configs.items[i];
+        var c = configs.items[i];
         if (c.reachesIntoOuterContext>0 || ((c.state instanceof RuleStopState) && c.context.hasEmptyPath())) {
             if(alts.indexOf(c.alt)<0) {
-            	alts.push(c.alt);
+                alts.push(c.alt);
             }
         }
     }
@@ -1218,6 +1218,7 @@ ParserATNSimulator.prototype.closure = function(config, configs, closureBusy, co
 ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon) {
     if (this.debug) {
         console.log("closure(" + config.toString(this.parser,true) + ")");
+        console.log("configs(" + configs.toString() + ")");
     }
     if (config.state instanceof RuleStopState) {
         // We hit rule end. If we have context info, use it
@@ -1226,7 +1227,7 @@ ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs
             for ( var i =0; i<config.context.length; i++) {
                 if (config.context.getReturnState(i) === PredictionContext.EMPTY_RETURN_STATE) {
                     if (fullCtx) {
-                        configs.add(ATNConfig({state:config.state, context:PredictionContext.EMPTY}, config), this.mergeCache);
+                        configs.add(new ATNConfig({state:config.state, context:PredictionContext.EMPTY}, config), this.mergeCache);
                         continue;
                     } else {
                         // we have no context info, just chase follow links (if greedy)
@@ -1268,16 +1269,16 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
     var p = config.state;
     // optimization
     if (! p.epsilonOnlyTransitions) {
-        configs.add(config, this.mergeCache)
+        configs.add(config, this.mergeCache);
         // make sure to not return here, because EOF transitions can act as
         // both epsilon transitions and non-epsilon transitions.
     }
     for(var i = 0;i<p.transitions.length; i++) {
-    	var t = p.transitions[i];
+        var t = p.transitions[i];
         var continueCollecting = collectPredicates && !(t instanceof ActionTransition);
-        var c = this.getEpsilonTarget(config, t, continueCollecting, depth == 0, fullCtx, treatEofAsEpsilon);
+        var c = this.getEpsilonTarget(config, t, continueCollecting, depth === 0, fullCtx, treatEofAsEpsilon);
         if (c!==null) {
-            newDepth = depth;
+            var newDepth = depth;
             if ( config.state instanceof RuleStopState) {
                 // target fell off end of rule; mark resulting c as having dipped into outer context
                 // We can't get here if incoming config was rule stop and we had context
@@ -1291,9 +1292,9 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
                 }
                 closureBusy.add(c);
 
-                c.reachesIntoOuterContext += 1
+                c.reachesIntoOuterContext += 1;
                 configs.dipsIntoOuterContext = true; // TODO: can remove? only care when we add to set per middle of this method
-                newDepth -= 1
+                newDepth -= 1;
                 if (this.debug) {
                     console.log("dips into outer ctx: " + c);
                 }
@@ -1356,7 +1357,7 @@ ParserATNSimulator.prototype.precedenceTransition = function(config, pt,  collec
         console.log("PRED (collectPredicates=" + collectPredicates + ") " +
                 pt.precedence + ">=_p, ctx dependent=true");
         if (this.parser!==null) {
-        	console.log("context surrounding pred is " + this.parser.getRuleInvocationStack());
+        	console.log("context surrounding pred is " + Utils.arrayToString(this.parser.getRuleInvocationStack()));
         }
     }
     var c = null;
@@ -1391,7 +1392,7 @@ ParserATNSimulator.prototype.predTransition = function(config, pt, collectPredic
         console.log("PRED (collectPredicates=" + collectPredicates + ") " + pt.ruleIndex +
                 ":" + pt.predIndex + ", ctx dependent=" + pt.isCtxDependent);
         if (this.parser!==null) {
-        	console.log("context surrounding pred is " + this.parser.getRuleInvocationStack());
+            console.log("context surrounding pred is " + Utils.arrayToString(this.parser.getRuleInvocationStack()));
         }
     }
     var c = null;
@@ -1491,7 +1492,7 @@ ParserATNSimulator.prototype.getTokenName = function( t) {
             console.log("" + t + " ttype out of range: " + this.parser.tokenNames);
             console.log("" + this.parser.getInputStream().getTokens());
         } else {
-            return this.parser.tokensNames[t] + "<" + t + ">";
+            return this.parser.tokenNames[t] + "<" + t + ">";
         }
     }
     return "" + t;
@@ -1602,7 +1603,8 @@ ParserATNSimulator.prototype.addDFAState = function(dfa, D) {
     if (D == ATNSimulator.ERROR) {
         return D;
     }
-    var existing = dfa.states[D] || null;
+    var hash = D.hashString();
+    var existing = dfa.states[hash] || null;
     if(existing!==null) {
         return existing;
     }
@@ -1611,7 +1613,7 @@ ParserATNSimulator.prototype.addDFAState = function(dfa, D) {
         D.configs.optimizeConfigs(this);
         D.configs.setReadonly(true);
     }
-    dfa.states[D] = D;
+    dfa.states[hash] = D;
     if (this.debug) {
         console.log("adding new DFA state: " + D);
     }

@@ -485,7 +485,7 @@ PredictionMode.allSubsetsEqual = function(altsets) {
 PredictionMode.getUniqueAlt = function(altsets) {
     var all = PredictionMode.getAlts(altsets);
     if (all.length===1) {
-        return all[0];
+        return all.minValue();
     } else {
         return ATN.INVALID_ALT_NUMBER;
     }
@@ -500,7 +500,7 @@ PredictionMode.getUniqueAlt = function(altsets) {
 //
 PredictionMode.getAlts = function(altsets) {
     var all = new BitSet();
-    altsets.map( function(alts) { all.add(alts); });
+    altsets.map( function(alts) { all.or(alts); });
     return all;
 };
 

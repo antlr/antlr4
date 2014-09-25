@@ -42,8 +42,8 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 				"s : a ;\n" +
-				"a : {False}? ID  {print(\"alt 1\")}\n" +
-				"  | {True}?  INT {print(\"alt 2\")}\n" +
+				"a : {false}? ID  {console.log(\"alt 1\");}\n" +
+				"  | {true}?  INT {console.log(\"alt 2\");}\n" +
 				"  ;\n" +
 				"ID : 'a'..'z'+ ;\n" +
 				"INT : '0'..'9'+;\n" +
@@ -60,8 +60,8 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 				"s : a a a;\n" +
-				"a : {False}? ID  {print(\"alt 1\")}\n" +
-				"  | {True}?  INT {print(\"alt 2\")}\n" +
+				"a : {false}? ID  {console.log(\"alt 1\");}\n" +
+				"  | {true}?  INT {console.log(\"alt 2\");}\n" +
 				"  ;\n" +
 				"ID : 'a'..'z'+ ;\n" +
 				"INT : '0'..'9'+;\n" +
@@ -109,8 +109,8 @@ public class TestSemPredEvalParser extends BaseTest {
 				// ';' helps us to resynchronize without consuming
 				// 2nd 'a' reference. We our testing that the DFA also
 				// throws an exception if the validating predicate fails
-				"a : {False}? ID  {print(\"alt 1\")}\n" +
-				"  | {True}?  INT {print(\"alt 2\")}\n" +
+				"a : {false}? ID  {console.log(\"alt 1\");}\n" +
+				"  | {true}?  INT {console.log(\"alt 2\");}\n" +
 				"  ;\n" +
 				"ID : 'a'..'z'+ ;\n" +
 				"INT : '0'..'9'+;\n" +
@@ -133,9 +133,9 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 				"s : a a a;\n" + // do 3x: once in ATN, next in DFA then INT in ATN
-				"a : {False}? ID {print(\"alt 1\")}\n" +
-				"  | {True}?  ID {print(\"alt 2\")}\n" +
-				"  | INT         {print(\"alt 3\")}\n" +
+				"a : {false}? ID {console.log(\"alt 1\");}\n" +
+				"  | {true}?  ID {console.log(\"alt 2\");}\n" +
+				"  | INT         {console.log(\"alt 3\");}\n" +
 				"  ;\n" +
 				"ID : 'a'..'z'+ ;\n" +
 				"INT : '0'..'9'+;\n" +
@@ -159,8 +159,8 @@ public class TestSemPredEvalParser extends BaseTest {
 				"s : a {} a;\n" + // do 2x: once in ATN, next in DFA;
 								  // action blocks lookahead from falling off of 'a'
 								  // and looking into 2nd 'a' ref. !ctx dependent pred
-				"a :          ID {print(\"alt 1\")}\n" +
-				"  | {True}?  ID {print(\"alt 2\")}\n" +
+				"a :          ID {console.log(\"alt 1\");}\n" +
+				"  | {true}?  ID {console.log(\"alt 2\");}\n" +
 				"  ;\n" +
 				"ID : 'a'..'z'+ ;\n" +
 				"INT : '0'..'9'+;\n" +
@@ -178,11 +178,11 @@ public class TestSemPredEvalParser extends BaseTest {
 		// We have n-2 predicates for n alternatives. pick first alt
 		String grammar =
 			"grammar T;\n" +
-			"s : {self._interp.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION}\n" +
+			"s : {this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION}\n" +
 			"    a ';' a;\n" + // do 2x: once in ATN, next in DFA
-			"a :          ID {print(\"alt 1\")}\n" +
-			"  |          ID {print(\"alt 2\")}\n" +
-			"  | {False}? ID {print(\"alt 3\")}\n" +
+			"a :          ID {console.log(\"alt 1\");}\n" +
+			"  |          ID {console.log(\"alt 2\");}\n" +
+			"  | {false}? ID {console.log(\"alt 3\");}\n" +
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -204,12 +204,12 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test public void test2UnpredicatedAltsAndOneOrthogonalAlt() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : {self._interp.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION}\n" +
+			"s : {this._interp.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION}\n" +
 			"    a ';' a ';' a;\n" +
-			"a : INT         {print(\"alt 1\")}\n" +
-			"  |          ID {print(\"alt 2\")}\n" + // must pick this one for ID since pred is false
-			"  |          ID {print(\"alt 3\")}\n" +
-			"  | {False}? ID {print(\"alt 4\")}\n" +
+			"a : INT         {console.log(\"alt 1\");}\n" +
+			"  |          ID {console.log(\"alt 2\");}\n" + // must pick this one for ID since pred is false
+			"  |          ID {console.log(\"alt 3\");}\n" +
+			"  | {false}? ID {console.log(\"alt 4\");}\n" +
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -236,8 +236,8 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 				"s : a a;\n" +
-				"a : {self._input.LT(1).text==\"x\"}? ID INT {print(\"alt 1\")}\n" +
-				"  | {self._input.LT(1).text==\"y\"}? ID INT {print(\"alt 2\")}\n" +
+				"a : {this._input.LT(1).text==\"x\"}? ID INT {console.log(\"alt 1\");}\n" +
+				"  | {this._input.LT(1).text==\"y\"}? ID INT {console.log(\"alt 2\");}\n" +
 				"  ;\n" +
 				"ID : 'a'..'z'+ ;\n" +
 				"INT : '0'..'9'+;\n" +
@@ -257,8 +257,8 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"s : a a;\n" +
-			"a : {False}? ID INT {print(\"alt 1\")}\n" +
-			"  | {False}? ID INT {print(\"alt 2\")}\n" +
+			"a : {false}? ID INT {console.log(\"alt 1\");}\n" +
+			"  | {false}? ID INT {console.log(\"alt 2\");}\n" +
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -275,8 +275,8 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 				"s : a+ ;\n" +
-   			"a : {False}? ID {print(\"alt 1\")}\n" +
-   			"  | {True}?  ID {print(\"alt 2\")}\n" +
+   			"a : {false}? ID {console.log(\"alt 1\");}\n" +
+   			"  | {true}?  ID {console.log(\"alt 2\");}\n" +
    			"  ;\n" +
    			"ID : 'a'..'z'+ ;\n" +
    			"INT : '0'..'9'+;\n" +
@@ -295,10 +295,10 @@ public class TestSemPredEvalParser extends BaseTest {
 	public void testUnpredicatedPathsInAlt() throws Exception{
 		String grammar =
 			"grammar T;\n" +
-				"s : a {print(\"alt 1\")}\n" +
-				"  | b {print(\"alt 2\")}\n" +
+				"s : a {console.log(\"alt 1\");}\n" +
+				"  | b {console.log(\"alt 2\");}\n" +
 				"  ;\n" +
-				"a : {False}? ID INT\n" +
+				"a : {false}? ID INT\n" +
 				"  | ID INT\n" +
 				"  ;\n" +
 				"b : ID ID\n" +
@@ -323,8 +323,8 @@ public class TestSemPredEvalParser extends BaseTest {
 			"grammar T;\n" +
 			"@members {i=0}\n" +
 			"s : a+ ;\n" +
-			"a : {self.i=1} ID {self.i==1}? {print(\"alt 1\")}\n" +
-			"  | {self.i=2;} ID {self.i==2}? {print(\"alt 2\")}\n" +
+			"a : {this.i=1} ID {this.i==1}? {console.log(\"alt 1\");}\n" +
+			"  | {this.i=2;} ID {this.i==2}? {console.log(\"alt 2\");}\n" +
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -347,10 +347,10 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test public void testToLeftWithVaryingPredicate() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"@members {i=0}\n" +
-			"s : ({self.i += 1\nprint(\"i=\"+str(self.i))} a)+ ;\n" +
-			"a : {self.i % 2 == 0}? ID {print(\"alt 1\")}\n" +
-			"  | {self.i % 2 != 0}? ID {print(\"alt 2\")}\n" +
+			"@members {this.i=0}\n" +
+			"s : ({this.i += 1\nconsole.log(\"i=\"+this.i);} a)+ ;\n" +
+			"a : {this.i % 2 == 0}? ID {console.log(\"alt 1\");}\n" +
+			"  | {this.i % 2 != 0}? ID {console.log(\"alt 2\");}\n" +
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -380,8 +380,8 @@ public class TestSemPredEvalParser extends BaseTest {
 			"@members {i=0}\n" +
 			"s : a[2] a[1];\n" +
 			"a[int i]" +
-			"  : {$i==1}? ID {print(\"alt 1\")}\n" +
-			"  | {$i==2}? ID {print(\"alt 2\")}\n" +
+			"  : {$i==1}? ID {console.log(\"alt 1\");}\n" +
+			"  | {$i==2}? ID {console.log(\"alt 2\");}\n" +
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -431,8 +431,8 @@ public class TestSemPredEvalParser extends BaseTest {
             "s : b[2] ';' |  b[2] '.' ;\n" + // decision in s drills down to ctx-dependent pred in a;
             "b[int i] : a[i] ;\n" +
             "a[int i]" +
-            "  : {$i==1}? ID {print(\"alt 1\")}\n" +
-            "  | {$i==2}? ID {print(\"alt 2\")}\n" +
+            "  : {$i==1}? ID {console.log(\"alt 1\");}\n" +
+            "  | {$i==2}? ID {console.log(\"alt 2\");}\n" +
             "  ;" +
             "ID : 'a'..'z'+ ;\n" +
             "INT : '0'..'9'+;\n" +
@@ -451,8 +451,8 @@ public class TestSemPredEvalParser extends BaseTest {
             "s : b ';' |  b '.' ;\n" +
             "b : a ;\n" +
             "a" +
-            "  : {False}? ID {print(\"alt 1\")}\n" +
-            "  | {True}? ID {print(\"alt 2\")}\n" +
+            "  : {false}? ID {console.log(\"alt 1\");}\n" +
+            "  | {true}? ID {console.log(\"alt 2\");}\n" +
             "  ;" +
             "ID : 'a'..'z'+ ;\n" +
             "INT : '0'..'9'+;\n" +
@@ -478,8 +478,8 @@ public class TestSemPredEvalParser extends BaseTest {
         "    print(\"eval=\"+str(v))\n" +
         "    return v\n" +
         "}\n" +
-        "s : e {self.p(True)}? {self.f(\"parse\")} '!' ;\n" +
-        "t : e {self.p(False)}? ID ;\n" +
+        "s : e {this.p(true)}? {this.f(\"parse\");} '!' ;\n" +
+        "t : e {this.p(false)}? ID ;\n" +
         "e : ID | ;\n" + // non-LL(1) so we use ATN
         "ID : 'a'..'z'+ ;\n" +
         "INT : '0'..'9'+;\n" +
@@ -500,15 +500,17 @@ public class TestSemPredEvalParser extends BaseTest {
    		String grammar =
    			"grammar T;\n" +
    			"@members {" +
-   			"def f(self, s):\n" +
-   			"    print(str(s))\n" +
-   			"def p(self, v):\n" +
-   			"    print(\"eval=\"+str(v))\n" +
-   			"    return v\n" +
+   			"this.f = function(s) {\n" +
+   			"    console.log(s.toString());\n" +
+   			"};\n" +
+   			"this.p = function(v) {\n" +
+   			"    console.log(\"eval=\"+v.toString());\n" +
+   			"    return v;\n" +
+   			"}\n" +
    			"}\n" +
    			"s : a[99] ;\n" +
-   			"a[int i] : e {self.p($i==99)}? {self.f(\"parse\")} '!' ;\n" +
-   			"b[int i] : e {self.p($i==99)}? ID ;\n" +
+   			"a[int i] : e {this.p($i==99)}? {this.f(\"parse\");} '!' ;\n" +
+   			"b[int i] : e {this.p($i==99)}? ID ;\n" +
    			"e : ID | ;\n" + // non-LL(1) so we use ATN
    			"ID : 'a'..'z'+ ;\n" +
    			"INT : '0'..'9'+;\n" +
@@ -517,7 +519,7 @@ public class TestSemPredEvalParser extends BaseTest {
    		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s",
    								  "a!", false);
    		String expecting =
-   			"eval=True\n" +
+   			"eval=true\n" +
    			"parse\n";
    		assertEquals(expecting, found);
    	}
@@ -531,14 +533,16 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"@members {" +
-			"def f(self, s):\n" +
-			"    print(str(s))\n\n" +
-			"def p(self, v):\n" +
-			"    print(\"eval=\"+str(v))\n" +
-			"    return v\n\n" +
+			"this.f = function(s) {\n" +
+			"    console.log(s.toString());\n" +
+			"};\n" +
+			"this.p = function(v) {\n" +
+			"    console.log(\"eval=\"+v.toString());\n" +
+			"    return v;\n" +
+			"};\n" +
 			"}\n" +
-			"s : e {} {self.p(True)}? {self.f(\"parse\")} '!' ;\n" +
-			"t : e {} {self.p(False)}? ID ;\n" +
+			"s : e {} {this.p(true)}? {this.f(\"parse\");} '!' ;\n" +
+			"t : e {} {this.p(false)}? ID ;\n" +
 			"e : ID | ;\n" + // non-LL(1) so we use ATN
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -547,7 +551,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s",
 								  "a!", false);
 		String expecting =
-			"eval=True\n" +
+			"eval=true\n" +
 			"parse\n";
 		assertEquals(expecting, found);
 	}
@@ -556,11 +560,11 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"\n" +
-			"@members {enumKeyword = True}\n" +
+			"@members {this.enumKeyword = true}\n" +
 			"\n" +
 			"primary\n" +
-			"    :   ID                       {print(\"ID \"+$ID.text)}\n" +
-			"    |   {not self.enumKeyword}? 'enum'   {print(\"enum\")}\n" +
+			"    :   ID                       {console.log(\"ID \"+$ID.text);}\n" +
+			"    |   {!this.enumKeyword}? 'enum'   {console.log(\"enum\");}\n" +
 			"    ;\n" +
 			"\n" +
 			"ID : [a-z]+ ;\n" +
@@ -591,7 +595,7 @@ public class TestSemPredEvalParser extends BaseTest {
 			"\n" +
 			"cppCompilationUnit : content+ EOF;\n" +
 			"\n" +
-			"content: anything | {False}? .;\n" +
+			"content: anything | {false}? .;\n" +
 			"\n" +
 			"anything: ANY_CHAR;\n" +
 			"\n" +
@@ -609,22 +613,22 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar =
 			"grammar T2;\n" +
 			"\n" +
-			"file_\n" +
-			"@after {print($ctx.toStringTree(recog=self))}\n" +
+			"file\n" +
+			"@after {console.log($ctx.toStringTree(null, this));}\n" +
 			"  : para para EOF ;" +
 			"para: paraContent NL NL ;\n"+
-			"paraContent : ('s'|'x'|{self._input.LA(2)!=self.NL}? NL)+ ;\n"+
+			"paraContent : ('s'|'x'|{this._input.LA(2)!==NL}? NL)+ ;\n"+
 			"NL : '\\n' ;\n"+
 			"S : 's' ;\n"+
 			"X : 'x' ;\n";
 
-		return execParser("T2.g4", grammar, "T2Parser", "T2Lexer", "T2Listener", "T2Visitor", "file_",
+		return execParser("T2.g4", grammar, "T2Parser", "T2Lexer", "T2Listener", "T2Visitor", "file",
 								  input, true);
 	}
 	
 	@Test public void testPredFromAltTestedInLoopBack1() {
 		String found = testPredFromAltTestedInLoopBack("s\n\n\nx\n");
-		assertEquals("(file_ (para (paraContent s) \\n \\n) (para (paraContent \\n x \\n)) <EOF>)\n", found);
+		assertEquals("(file (para (paraContent s) \\n \\n) (para (paraContent \\n x \\n)) <EOF>)\n", found);
 		assertEquals("line 5:2 mismatched input '<EOF>' expecting '\n'\n", stderrDuringParse);
 	}
 	

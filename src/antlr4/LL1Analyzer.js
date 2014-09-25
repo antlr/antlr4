@@ -40,9 +40,10 @@ var NotSetTransition = require('./atn/Transition').NotSetTransition;
 var WildcardTransition = require('./atn/Transition').WildcardTransition;
 var AbstractPredicateTransition = require('./atn/Transition').AbstractPredicateTransition;
 
-var predictionContext = require('./PredictionContext');
-var predictionContextFromRuleContext = predictionContext.predictionContextFromRuleContext;
-var SingletonPredictionContext = predictionContext.SingletonPredictionContext;
+var pc = require('./PredictionContext');
+var predictionContextFromRuleContext = pc.predictionContextFromRuleContext;
+var PredictionContext = pc.PredictionContext;
+var SingletonPredictionContext = pc.SingletonPredictionContext;
 
 function LL1Analyzer (atn) {
     this.atn = atn;
@@ -171,8 +172,8 @@ LL1Analyzer.prototype._LOOK = function(s, stopState , ctx, look, lookBusy, calle
                 var returnState = this.atn.states[ctx.getReturnState(i)];
                 var removed = calledRuleStack.contains(returnState.ruleIndex); 
                 try {
-                    calledRuleStack.discard(returnState.ruleIndex);
-                    self._LOOK(returnState, stopState, ctx.getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+                    calledRuleStack.remove(returnState.ruleIndex);
+                    this._LOOK(returnState, stopState, ctx.getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
                 } finally {
                     if (removed) {
                         calledRuleStack.add(returnState.ruleIndex);
