@@ -377,11 +377,9 @@ public class Grammar implements AttributeResolver {
             if ( t.getType()==ANTLRParser.ASSIGN ) {
 				t = (GrammarAST)t.getChild(1);
 				importedGrammarName = t.getText();
-                tool.log("grammar", "import "+ importedGrammarName);
             }
             else if ( t.getType()==ANTLRParser.ID ) {
                 importedGrammarName = t.getText();
-                tool.log("grammar", "import " + t.getText());
 			}
 			Grammar g;
 			try {
