@@ -608,6 +608,8 @@ public class Tool {
 		return g;
 	}
 
+	private final Map<String, Grammar> importedGrammars = new HashMap<String, Grammar>();
+
 	/**
 	 * Try current dir then dir of g then lib dir
 	 * @param g
@@ -615,27 +617,34 @@ public class Tool {
 	 */
 	public Grammar loadImportedGrammar(Grammar g, GrammarAST nameNode) throws IOException {
 		String name = nameNode.getText();
-		g.tool.log("grammar", "load " + name + " from " + g.fileName);
-		File importedFile = null;
-		for (String extension : ALL_GRAMMAR_EXTENSIONS) {
-			importedFile = getImportedGrammarFile(g, name + extension);
-			if (importedFile != null) {
-				break;
+		Grammar imported = importedGrammars.get(name);
+		if (imported == null) {
+			g.tool.log("grammar", "load " + name + " from " + g.fileName);
+			File importedFile = null;
+			for (String extension : ALL_GRAMMAR_EXTENSIONS) {
+				importedFile = getImportedGrammarFile(g, name + extension);
+				if (importedFile != null) {
+					break;
+				}
 			}
+
+			if ( importedFile==null ) {
+				errMgr.grammarError(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, g.fileName, nameNode.getToken(), name);
+				return null;
+			}
+
+			String absolutePath = importedFile.getAbsolutePath();
+			ANTLRFileStream in = new ANTLRFileStream(absolutePath, grammarEncoding);
+			GrammarRootAST root = parse(g.fileName, in);
+			if (root == null) {
+				return null;
+			}
+
+			imported = createGrammar(root);
+			imported.fileName = absolutePath;
+			importedGrammars.put(root.getGrammarName(), imported);
 		}
 
-		if ( importedFile==null ) {
-			errMgr.grammarError(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, g.fileName, nameNode.getToken(), name);
-			return null;
-		}
-
-		ANTLRFileStream in = new ANTLRFileStream(importedFile.getAbsolutePath(), grammarEncoding);
-		GrammarRootAST root = parse(g.fileName, in);
-		if ( root==null ) {
-			return null;
-		}
-		Grammar imported = createGrammar(root);
-		imported.fileName = importedFile.getAbsolutePath();
 		return imported;
 	}
 
