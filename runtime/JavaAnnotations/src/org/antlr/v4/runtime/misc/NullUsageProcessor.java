@@ -33,7 +33,6 @@ package org.antlr.v4.runtime.misc;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -83,7 +82,6 @@ import java.util.Set;
  * @author Sam Harwell
  */
 @SupportedAnnotationTypes({NullUsageProcessor.NotNullClassName, NullUsageProcessor.NullableClassName})
-@SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class NullUsageProcessor extends AbstractProcessor {
 	public static final String NotNullClassName = "org.antlr.v4.runtime.misc.NotNull";
 	public static final String NullableClassName = "org.antlr.v4.runtime.misc.Nullable";
@@ -92,6 +90,22 @@ public class NullUsageProcessor extends AbstractProcessor {
 	private TypeElement nullableType;
 
 	public NullUsageProcessor() {
+	}
+
+	@Override
+	public SourceVersion getSupportedSourceVersion() {
+		SourceVersion latestSupported = SourceVersion.latestSupported();
+
+		if (latestSupported.ordinal() <= 6) {
+			return SourceVersion.RELEASE_6;
+		}
+		else if (latestSupported.ordinal() <= 8) {
+			return latestSupported;
+		}
+		else {
+			// this annotation processor is tested through Java 8
+			return SourceVersion.values()[8];
+		}
 	}
 
 	@Override
