@@ -429,6 +429,8 @@ public enum ErrorType {
 	 * <p>
 	 * all operators of alt <em>alt</em> of left-recursive rule must have same
 	 * associativity</p>
+	 *
+	 * @deprecated This warning is no longer applicable with the current syntax for specifying associativity.
 	 */
 	ALL_OPS_NEED_SAME_ASSOC(118, "all operators of alt <arg> of left-recursive rule must have same associativity", ErrorSeverity.WARNING),
 	/**
