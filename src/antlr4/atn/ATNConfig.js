@@ -117,14 +117,19 @@ ATNConfig.prototype.shortHashString = function() {
 
 ATNConfig.prototype.hashString = function() {
     return "" + this.state.stateNumber + "/" + this.alt + "/" +
-             this.context + "/" + this.semanticContext;
+             (this.context===null ? "" : this.context.hashString()) +
+             "/" + this.semanticContext.hashString();
 };
 
 ATNConfig.prototype.toString = function() {
     return "(" + this.state + "," + this.alt +
-        (this.context!==null ? ",[" + this.context + "]" : "") +
-        (this.semanticContext !== SemanticContext.NONE ? "," + this.semanticContext : "") +
-        (this.reachesIntoOuterContext>0 ? ",up=" + this.reachesIntoOuterContext : "") + ")";
+        (this.context!==null ? ",[" + this.context.toString() + "]" : "") +
+        (this.semanticContext !== SemanticContext.NONE ?
+                ("," + this.semanticContext.toString())
+                : "") +
+        (this.reachesIntoOuterContext>0 ?
+                (",up=" + this.reachesIntoOuterContext)
+                : "") + ")";
 };
 
 

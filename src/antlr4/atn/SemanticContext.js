@@ -193,6 +193,12 @@ PrecedencePredicate.prototype.equals = function(other) {
 	}
 };
 
+PrecedencePredicate.prototype.toString = function() {
+	return "{"+this.precedence+">=prec}?";
+};
+
+
+
 PrecedencePredicate.filterPrecedencePredicates = function(set) {
 	var result = [];
 	set.values().map( function(context) {
@@ -202,6 +208,7 @@ PrecedencePredicate.filterPrecedencePredicates = function(set) {
 	});
 	return result;
 };
+
 
 // A semantic context which is true whenever none of the contained contexts
 // is false.

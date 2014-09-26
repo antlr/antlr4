@@ -18,3 +18,9 @@
 /T2Lexer.tokens
 /T2Listener.java
 /T2Parser.java
+/AnnotProcessor.tokens
+/AnnotProcessorBaseListener.java
+/AnnotProcessorLexer.java
+/AnnotProcessorLexer.tokens
+/AnnotProcessorListener.java
+/AnnotProcessorParser.java

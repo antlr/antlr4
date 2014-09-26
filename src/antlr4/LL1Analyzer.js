@@ -33,6 +33,7 @@ var Set = require('./Utils').Set;
 var BitSet = require('./Utils').BitSet;
 var Token = require('./Token').Token;
 var ATNConfig = require('./atn/ATNConfig').ATNConfig;
+var Interval = require('./IntervalSet').Interval;
 var IntervalSet = require('./IntervalSet').IntervalSet;
 var RuleStopState = require('./atn/ATNState').RuleStopState;
 var RuleTransition = require('./atn/Transition').RuleTransition;

@@ -56,12 +56,22 @@ Set.prototype.add = function(value) {
 };
 
 Set.prototype.contains = function(value) {
-	var key = "hash_" + value.hashString().hashCode();
+	var hash = this.hashFunction===null ? value.hashString() : this.hashFunction(value);
+	var key = hash.hashCode();
 	if(key in this.data) {
+		var i;
 		var values = this.data[key];
-		for(var i=0;i<values.length; i++) {
-			if(value.equals(values[i])) {
-				return true;
+		if(this.equalsFunction===null) {
+			for(i=0;i<values.length; i++) {
+				if(value.equals(values[i])) {
+					return true;
+				}
+			}
+		} else {
+			for(i=0;i<values.length; i++) {
+				if(this.equalsFunction(value, values[i])) {
+					return true;
+				}
 			}
 		}
 	}

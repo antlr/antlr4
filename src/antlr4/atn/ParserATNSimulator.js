@@ -891,7 +891,8 @@ ParserATNSimulator.prototype.computeStartState = function(p, ctx, fullCtx) {
     for(var i=0;i<p.transitions.length;i++) {
         var target = p.transitions[i].target;
         var c = new ATNConfig({ state:target, alt:i+1, context:initialContext }, null);
-        this.closure(c, configs, new Set(), true, fullCtx, false);
+        var closureBusy = new Set();
+        this.closure(c, configs, closureBusy, true, fullCtx, false);
     }
     return configs;
 };
@@ -1278,6 +1279,10 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
         var continueCollecting = collectPredicates && !(t instanceof ActionTransition);
         var c = this.getEpsilonTarget(config, t, continueCollecting, depth === 0, fullCtx, treatEofAsEpsilon);
         if (c!==null) {
+			if (!t.isEpsilon && closureBusy.add(c)===c) {
+				// avoid infinite recursion for EOF* and EOF+
+				continue;
+			}
             var newDepth = depth;
             if ( config.state instanceof RuleStopState) {
                 // target fell off end of rule; mark resulting c as having dipped into outer context
@@ -1286,12 +1291,11 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
                 // come in handy and we avoid evaluating context dependent
                 // preds if this is > 0.
 
-                if (closureBusy.contains(c)) {
+                if (closureBusy.add(c)!==c) {
                     // avoid infinite recursion for right-recursive rules
                     continue;
                 }
-                closureBusy.add(c);
-
+ 
                 c.reachesIntoOuterContext += 1;
                 configs.dipsIntoOuterContext = true; // TODO: can remove? only care when we add to set per middle of this method
                 newDepth -= 1;

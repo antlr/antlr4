@@ -204,7 +204,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test public void test2UnpredicatedAltsAndOneOrthogonalAlt() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : {this._interp.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION}\n" +
+			"s : {this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION}\n" +
 			"    a ';' a ';' a;\n" +
 			"a : INT         {console.log(\"alt 1\");}\n" +
 			"  |          ID {console.log(\"alt 2\");}\n" + // must pick this one for ID since pred is false
@@ -472,11 +472,13 @@ public class TestSemPredEvalParser extends BaseTest {
         String grammar =
         "grammar T;\n" +
         "@members {" +
-        "def f(self, s):\n" +
-        "    print(str(s))\n" +
-        "def p(self, v):\n" +
-        "    print(\"eval=\"+str(v))\n" +
-        "    return v\n" +
+        "this.f = function(s) {\n" +
+        "    console.log(s.toString());\n" +
+        "}\n" +
+        "this.p = function(v) {\n" +
+        "    console.log(\"eval=\"+v.toString());\n" +
+        "    return v;\n" +
+        "}\n" +
         "}\n" +
         "s : e {this.p(true)}? {this.f(\"parse\");} '!' ;\n" +
         "t : e {this.p(false)}? ID ;\n" +
@@ -488,7 +490,7 @@ public class TestSemPredEvalParser extends BaseTest {
    		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s",
    								  "a!", false);
    		String expecting =
-   			"eval=True\n" + // now we are parsing
+   			"eval=true\n" + // now we are parsing
    			"parse\n";
    		assertEquals(expecting, found);
    	}
@@ -634,7 +636,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	
 	@Test public void testPredFromAltTestedInLoopBack2() {
 		String found = testPredFromAltTestedInLoopBack("s\n\n\nx\n\n");
-		assertEquals("(file_ (para (paraContent s) \\n \\n) (para (paraContent \\n x) \\n \\n) <EOF>)\n", found);
+		assertEquals("(file (para (paraContent s) \\n \\n) (para (paraContent \\n x) \\n \\n) <EOF>)\n", found);
 		assertNull(stderrDuringParse);
 	}
 }
