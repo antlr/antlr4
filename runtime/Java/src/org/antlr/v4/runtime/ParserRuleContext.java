@@ -31,16 +31,18 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ErrorNodeImpl;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
-import org.antlr.v4.runtime.tree.pattern.RuleTagToken;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
 
 /** A rule invocation record for parsing.
@@ -67,6 +69,54 @@ import java.util.List;
  *  satisfy the superclass interface.
  */
 public class ParserRuleContext extends RuleContext {
+
+	/** A TokenSource that wraps a context node, streaming it's terminal tokens. */
+	static class ContextSource extends WrappedSource {
+		protected final ParserRuleContext context;
+
+		// Tree-walking continuation by maintaining a stack of Pair<last parent, last index>
+		protected final Deque<Pair<ParseTree, Integer>> walkStack;
+		protected ParseTree parent;
+		protected int childIndex;
+
+		ContextSource(ParserRuleContext context) {
+			this.context = context;
+
+			this.walkStack = new ArrayDeque<Pair<ParseTree, Integer>>();
+			this.parent = context;
+			this.childIndex = 0;
+		}
+
+		@Override
+		public Token nextToken() {
+			ParseTree node = parent.getChild(childIndex);
+			if (node instanceof TerminalNode) {
+				childIndex++;
+				Token t = ((TerminalNode) node).getSymbol();
+				return cloneToken(t);
+			} else if (node != null) {
+				walkStack.addLast(new Pair<ParseTree, Integer>(parent, childIndex));
+				parent = node;
+				childIndex = 0;
+				return nextToken();
+			} else if (! walkStack.isEmpty()) {
+				Pair<ParseTree, Integer> priorState = walkStack.removeLast();
+				parent = priorState.a;
+				childIndex = priorState.b + 1;
+				return nextToken();
+			} else {
+				return createEOF();
+			}
+		}
+
+		@Override
+		public String getSourceName() {
+			return String.format("ContextSource {start=%d, stop=%d}",
+					context.start.getTokenIndex(), context.stop.getTokenIndex());
+		}
+	}
+
+
 	/** If we are debugging or building a parse tree for a visitor,
 	 *  we need to track all of the tokens and rule invocations associated
 	 *  with this rule's context. This is empty for parsing w/o tree constr.
@@ -276,6 +326,11 @@ public class ParserRuleContext extends RuleContext {
 	public Interval getSourceInterval() {
 		if ( start==null || stop==null ) return Interval.INVALID;
 		return Interval.of(start.getTokenIndex(), stop.getTokenIndex());
+	}
+
+	/** Return a TokenSource representing the tokens beneath this tree node */
+	public TokenSource toSource() {
+		return new ContextSource(this);
 	}
 
 	public Token getStart() { return start; }
