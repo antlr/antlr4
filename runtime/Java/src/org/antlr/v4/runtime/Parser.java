@@ -921,4 +921,14 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 			addParseListener(_tracer);
 		}
 	}
+
+	/**
+	 * Gets whether a {@link TraceListener} is registered as a parse listener
+	 * for the parser.
+	 *
+	 * @see #setTrace(boolean)
+	 */
+	public boolean isTrace() {
+		return _tracer != null;
+	}
 }
