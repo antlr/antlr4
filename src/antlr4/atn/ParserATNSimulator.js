@@ -584,7 +584,7 @@ ParserATNSimulator.prototype.computeTargetState = function(dfa, previousD, t) {
         D.requiresFullContext = true;
         // in SLL-only mode, we will stop at this state and return the minimum alt
         D.isAcceptState = true;
-        D.prediction = Math.min.apply(null, D.configs.conflictingAlts);
+        D.prediction = D.configs.conflictingAlts.minValue();
     }
     if (D.isAcceptState && D.configs.hasSemanticContext) {
         this.predicateDFAState(D, this.atn.getDecisionState(dfa.decision));

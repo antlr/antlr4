@@ -48,8 +48,8 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar =
 			"grammar T;\n"+
 			"s" +
-			"@after {self.dumpDFA()}\n" +
-			"    : ID | ID {pass} ;\n" +
+			"@after {this.dumpDFA();}\n" +
+			"    : ID | ID {} ;\n" +
 			"ID : 'a'..'z'+ ;\n"+
 			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s",
@@ -65,7 +65,7 @@ public class TestFullContextParsing extends BaseTest {
 	public String testCtxSensitiveDFA(String input) {
 		String grammar =
 			"grammar T;\n"+
-			"s @after {self.dumpDFA()}\n" +
+			"s @after {this.dumpDFA();}\n" +
 			"  : '$' a | '@' b ;\n" +
 			"a : e ID ;\n" +
 			"b : e INT ID ;\n" +
@@ -102,7 +102,7 @@ public class TestFullContextParsing extends BaseTest {
 	@Test public void testCtxSensitiveDFATwoDiffInput() {
 		String grammar =
 			"grammar T;\n"+
-			"s @after {self.dumpDFA()}\n" +
+			"s @after {this.dumpDFA();}\n" +
 			"  : ('$' a | '@' b)+ ;\n" +
 			"a : e ID ;\n" +
 			"b : e INT ID ;\n" +
@@ -128,7 +128,7 @@ public class TestFullContextParsing extends BaseTest {
 	public void testSLLSeesEOFInLLGrammar() {
 		String grammar =
 			"grammar T;\n"+
-			"s @after {self.dumpDFA()}\n" +
+			"s @after {this.dumpDFA();}\n" +
 			"  : a ;\n" +
 			"a : e ID ;\n" +
 			"b : e INT ID ;\n" +
@@ -152,8 +152,8 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar =
 			"grammar T;\n"+
 			"s" +
-			"@init {self._interp.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION}\n" +
-			"@after {self.dumpDFA();}\n" +
+			"@init {this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;}\n" +
+			"@after {this.dumpDFA();}\n" +
 			"    : '{' stat* '}'" +
 			"    ;\n" +
 			"stat: 'if' ID 'then' stat ('else' ID)?\n" +
@@ -260,11 +260,11 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"prog\n" +
-			"@init {self._interp.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION}\n" +
+			"@init {this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;}\n" +
 			"    : expr_or_assign*;\n" +
 			"expr_or_assign\n" +
-			"    :   expr '++' {print('fail.')}\n" +
-			"    |   expr {print('pass: '+$expr.text)}\n" +
+			"    :   expr '++' {console.log('fail.');}\n" +
+			"    |   expr {console.log('pass: '+$expr.text);}\n" +
 			"    ;\n" +
 			"expr: expr_primary ('<-' ID)? ;\n" +
 			"expr_primary\n" +
@@ -290,8 +290,8 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"prog\n" +
-			"@init {self._interp.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION}\n" +
-			"    : expr expr {print('alt 1')}\n" +
+			"@init {this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;}\n" +
+			"    : expr expr {console.log('alt 1');}\n" +
 			"    | expr\n" +
 			"    ;\n" +
 			"expr: '@'\n" +
@@ -317,8 +317,8 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"s\n" +
-			"@init {self._interp.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION}\n" +
-			"    :   expr[0] {print($expr.ctx.toStringTree(recog=self))} ;\n" +
+			"@init {this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;}\n" +
+			"    :   expr[0] {console.log($expr.ctx.toStringTree(null, this));} ;\n" +
 			"\n" +
 			"expr[int _p]\n" +
 			"    :   ID\n" +

@@ -108,7 +108,7 @@ ATNConfig.prototype.equals = function(other) {
     } else {
         return this.state.stateNumber===other.state.stateNumber &&
             this.alt===other.alt &&
-            this.context.equals(other.context) &&
+            (this.context===null ? other.context===null : this.context.equals(other.context)) &&
             this.semanticContext.equals(other.semanticContext) &&
             this.precedenceFilterSuppressed===other.precedenceFilterSuppressed;
     }

@@ -199,8 +199,7 @@ function EmptyPredictionContext() {
 	return this;
 }
 
-EmptyPredictionContext.prototype = Object
-		.create(SingletonPredictionContext.prototype);
+EmptyPredictionContext.prototype = Object.create(SingletonPredictionContext.prototype);
 EmptyPredictionContext.prototype.constructor = EmptyPredictionContext;
 
 EmptyPredictionContext.prototype.isEmpty = function() {
@@ -313,8 +312,7 @@ function predictionContextFromRuleContext(atn, outerContext) {
 	var parent = predictionContextFromRuleContext(atn, outerContext.parentCtx);
 	var state = atn.states[outerContext.invokingState];
 	var transition = state.transitions[0];
-	return SingletonPredictionContext.create(parent,
-			transition.followState.stateNumber);
+	return SingletonPredictionContext.create(parent, transition.followState.stateNumber);
 }
 
 function calculateListsHashString(parents, returnStates) {
@@ -348,10 +346,10 @@ function merge(a, b, rootIsWildcard, mergeCache) {
 	}
 	// convert singleton so both are arrays to normalize
 	if (a instanceof SingletonPredictionContext) {
-		a = new ArrayPredictionContext(a);
+		a = new ArrayPredictionContext([a.getParent()], [a.returnState]);
 	}
 	if (b instanceof SingletonPredictionContext) {
-		b = new ArrayPredictionContext(b);
+		b = new ArrayPredictionContext([b.getParent()], [b.returnState]);
 	}
 	return mergeArrays(a, b, rootIsWildcard, mergeCache);
 }

@@ -579,7 +579,7 @@ TokenPropertyRef_int(t) ::= "(0 if <ctx(t)>.<t.label> is None else int(<ctx(t)>.
 
 RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label>===null ? null : <ctx(r)>.<r.label>.start)"
 RulePropertyRef_stop(r)	 ::= "(None if <ctx(r)>.<r.label> is None else <ctx(r)>.<r.label>.stop)"
-RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label>===null ? null : this._input.getText((<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop)))"
+RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label>===null ? null : this._input.getText(new antlr4.Interval(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop)))"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
 
 ThisRulePropertyRef_start(r) ::= "localctx.start"
