@@ -1224,6 +1224,9 @@ ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs
     if (this.debug) {
         console.log("closure(" + config.toString(this.parser,true) + ")");
         console.log("configs(" + configs.toString() + ")");
+        if(config.reachesIntoOuterContext>5) {
+            throw "problem";
+        }
     }
     if (config.state instanceof RuleStopState) {
         // We hit rule end. If we have context info, use it

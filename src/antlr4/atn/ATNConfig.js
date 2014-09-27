@@ -55,6 +55,7 @@ function checkParams(params, isCfg) {
 		props.semanticContext = params.semanticContext || null;
 		if(isCfg) {
 			props.reachesIntoOuterContext = params.reachesIntoOuterContext || 0;
+			props.precedenceFilterSuppressed = params.precedenceFilterSuppressed || false;
 		}
 		return props;
 	}
@@ -84,7 +85,7 @@ function ATNConfig(params, config) {
     // outer context: depth &gt; 0.  Note that it may not be totally
     // accurate depth since I don't ever decrement. TODO: make it a boolean then
     this.reachesIntoOuterContext = config.reachesIntoOuterContext;
-    this.precedenceFilterSuppressed = config.precedenceFilterSuppressed || false;
+    this.precedenceFilterSuppressed = config.precedenceFilterSuppressed;
     return this;
 }
 
