@@ -133,8 +133,11 @@ ATNConfigSet.prototype.add = function(config, mergeCache) {
 	// no need to check for existing.context, config.context in cache
 	// since only way to create new graphs is "call rule" and here. We
 	// cache at both places.
-	existing.reachesIntoOuterContext = Math.max(
-			existing.reachesIntoOuterContext, config.reachesIntoOuterContext);
+	existing.reachesIntoOuterContext = Math.max( existing.reachesIntoOuterContext, config.reachesIntoOuterContext);
+	// make sure to preserve the precedence filter suppression during the merge
+	if (config.precedenceFilterSuppressed) {
+		existing.precedenceFilterSuppressed = true;
+	}
 	existing.context = merged; // replace context; no need to alt mapping
 	return true;
 };

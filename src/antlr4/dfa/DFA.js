@@ -33,6 +33,16 @@ var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet;
 var DFASerializer = require('./DFASerializer').DFASerializer;
 var LexerDFASerializer = require('./DFASerializer').LexerDFASerializer;
 
+function DFAStatesSet() {
+	return this;
+}
+
+Object.defineProperty(DFAStatesSet.prototype, "length", {
+	get : function() {
+		return Object.keys(this).length;
+	}
+});
+
 function DFA(atnStartState, decision) {
 	if (decision === undefined) {
 		decision = 0;
@@ -42,12 +52,7 @@ function DFA(atnStartState, decision) {
 	this.decision = decision;
 	// A set of all DFA states. Use {@link Map} so we can get old state back
 	// ({@link Set} only allows you to see if it's there).
-	this._states = {};
-	Object.defineProperty(this._states, "length", {
-		get: function() {
-			return Object.keys(this).length;
-		}
-	});
+	this._states = new DFAStatesSet();
 	this.s0 = null;
 	// {@code true} if this DFA is for a precedence decision; otherwise,
 	// {@code false}. This is the backing field for {@link //isPrecedenceDfa},
@@ -118,7 +123,7 @@ DFA.prototype.setPrecedenceStartState = function(precedence, startState) {
 
 DFA.prototype.setPrecedenceDfa = function(precedenceDfa) {
 	if (this.precedenceDfa!==precedenceDfa) {
-		this._states = {};
+		this._states = new DFAStatesSet();
 		if (precedenceDfa) {
 			var precedenceState = new DFAState(new ATNConfigSet());
 			precedenceState.edges = [];

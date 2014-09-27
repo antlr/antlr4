@@ -297,6 +297,7 @@ function ParserATNSimulator(parser, atn, decisionToDFA, sharedContextCache) {
     this._input = null;
     this._startIndex = 0;
     this._outerContext = null;
+    this._dfa = null;
     // Each prediction operation uses a cache for merge of prediction contexts.
     //  Don't keep around as it wastes huge amounts of memory. DoubleKeyMap
     //  isn't synchronized but we're ok since two threads shouldn't reuse same
@@ -333,6 +334,7 @@ ParserATNSimulator.prototype.adaptivePredict = function(input, decision, outerCo
     this._outerContext = outerContext;
     
     var dfa = this.decisionToDFA[decision];
+    this._dfa = dfa;
     var m = input.mark();
     var index = input.index;
 
@@ -391,6 +393,7 @@ ParserATNSimulator.prototype.adaptivePredict = function(input, decision, outerCo
         }
         return alt;
     } finally {
+        this._dfa = null;
         this.mergeCache = null; // wack cache after each prediction
         input.seek(index);
         input.release(m);
@@ -460,7 +463,7 @@ ParserATNSimulator.prototype.execATN = function(dfa, s0, input, startIndex, oute
             if(alt!==ATN.INVALID_ALT_NUMBER) {
                 return alt;
             } else {
-            	throw e;
+                throw e;
             }
         }
         if(D.requiresFullContext && this.predictionMode !== PredictionMode.SLL) {
@@ -477,7 +480,7 @@ ParserATNSimulator.prototype.execATN = function(dfa, s0, input, startIndex, oute
                 conflictingAlts = this.evalSemanticContext(D.predicates, outerContext, true);
                 if (conflictingAlts.length===1) {
                     if(this.debug) {
-                    	console.log("Full LL avoided");
+                        console.log("Full LL avoided");
                     }
                     return conflictingAlts.minValue();
                 }
@@ -488,7 +491,7 @@ ParserATNSimulator.prototype.execATN = function(dfa, s0, input, startIndex, oute
                 }
             }
             if (this.dfa_debug) {
-            	console.log("ctx sensitive state " + outerContext +" in " + D);
+                console.log("ctx sensitive state " + outerContext +" in " + D);
             }
             var fullCtx = true;
             var s0_closure = this.computeStartState(dfa.atnStartState, outerContext, fullCtx);
@@ -659,7 +662,7 @@ ParserATNSimulator.prototype.execATNWithFullContext = function(dfa, D, // how fa
         reach.uniqueAlt = this.getUniqueAlt(reach);
         // unique prediction?
         if(reach.uniqueAlt!==ATN.INVALID_ALT_NUMBER) {
-        	predictedAlt = reach.uniqueAlt;
+            predictedAlt = reach.uniqueAlt;
             break;
         } else if (this.predictionMode !== PredictionMode.LL_EXACT_AMBIG_DETECTION) {
             predictedAlt = PredictionMode.resolvesToJustOneViableAlt(altSubSets);
@@ -746,7 +749,7 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
 
     // First figure out where we can reach on input t
     for (var i=0; i<closure.items.length;i++) {
-    	var c = closure.items[i];
+        var c = closure.items[i];
         if(this.debug) {
             console.log("testing " + this.getTokenName(t) + " at " + c);
         }
@@ -760,7 +763,7 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
             continue;
         }
         for(var j=0;j<c.state.transitions.length;j++) {
-        	var trans = c.state.transitions[j];
+            var trans = c.state.transitions[j];
             var target = this.getReachableTarget(trans, t);
             if (target!==null) {
                 intermediate.add(new ATNConfig({state:target}, c), this.mergeCache);
@@ -779,7 +782,7 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
     // condition is not true when one or more configurations have been
     // withheld in skippedStopStates.
     //
-    if (skippedStopStates===null) {
+    if (skippedStopStates===null && t!==Token.EOF) {
         if (intermediate.items.length===1) {
             // Don't pursue the closure if there is just one state.
             // It can only have one alternative; just add to result
@@ -832,9 +835,9 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
     // multiple alternatives are viable.
     //
     if (skippedStopStates!==null && ( (! fullCtx) || (! PredictionMode.hasConfigInRuleStopState(reach)))) {
-    	for (var l=0; l<skippedStopStates.length;l++) {
+        for (var l=0; l<skippedStopStates.length;l++) {
             reach.add(skippedStopStates[l], this.mergeCache);
-    	}
+        }
     }
     if (reach.items.length===0) {
         return null;
@@ -976,7 +979,7 @@ ParserATNSimulator.prototype.applyPrecedenceFilter = function(configs) {
         }
     }
     for(i=0; i<configs.items.length; i++) {
-    	config = configs.items[i];
+        config = configs.items[i];
         if (config.alt === 1) {
             // already handled
             continue;
@@ -984,12 +987,13 @@ ParserATNSimulator.prototype.applyPrecedenceFilter = function(configs) {
         // In the future, this elimination step could be updated to also
         // filter the prediction context for alternatives predicting alt>1
         // (basically a graph subtraction algorithm).
-        //
-        var context = statesFromAlt1[config.state.stateNumber] || null;
-        if (context===config.context) {
-            // eliminated
-            continue;
-        }
+		if (!config.precedenceFilterSuppressed) {
+            var context = statesFromAlt1[config.state.stateNumber] || null;
+            if (context!==null && context.equals(config.context)) {
+                // eliminated
+                continue;
+            }
+		}
         configSet.add(config, this.mergeCache);
     }
     return configSet;
@@ -1295,7 +1299,13 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
                     // avoid infinite recursion for right-recursive rules
                     continue;
                 }
- 
+
+				if (this._dfa !== null && this._dfa.precedenceDfa) {
+					if (t.outermostPrecedenceReturn === this._dfa.atnStartState.ruleIndex) {
+						c.precedenceFilterSuppressed = true;
+					}
+				}
+
                 c.reachesIntoOuterContext += 1;
                 configs.dipsIntoOuterContext = true; // TODO: can remove? only care when we add to set per middle of this method
                 newDepth -= 1;

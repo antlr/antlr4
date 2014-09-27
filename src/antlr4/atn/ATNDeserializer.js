@@ -287,32 +287,41 @@ ATNDeserializer.prototype.readSets = function(atn) {
 };
 
 ATNDeserializer.prototype.readEdges = function(atn, sets) {
+	var i, j, state, trans, target;
     var nedges = this.readInt();
-    for (var i=0; i<nedges; i++) {
+    for (i=0; i<nedges; i++) {
         var src = this.readInt();
         var trg = this.readInt();
         var ttype = this.readInt();
         var arg1 = this.readInt();
         var arg2 = this.readInt();
         var arg3 = this.readInt();
-        var trans = this.edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets);
+        trans = this.edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets);
         var srcState = atn.states[src];
         srcState.addTransition(trans);
     }
     // edges for rule stop states can be derived, so they aren't serialized
-    for (var i=0; i<atn.states.length; i++) {
-    	var state = atn.states[i];
-        for (var j=0; j<state.transitions.length; j++) {
+    for (i=0; i<atn.states.length; i++) {
+        state = atn.states[i];
+        for (j=0; j<state.transitions.length; j++) {
             var t = state.transitions[j];
             if (!(t instanceof RuleTransition)) {
                 continue;
             }
-            atn.ruleToStopState[t.target.ruleIndex].addTransition(new EpsilonTransition(t.followState));
+			var outermostPrecedenceReturn = -1;
+			if (atn.ruleToStartState[t.target.ruleIndex].isPrecedenceRule) {
+				if (t.precedence === 0) {
+					outermostPrecedenceReturn = t.target.ruleIndex;
+				}
+			}
+
+			trans = new EpsilonTransition(t.followState, outermostPrecedenceReturn);
+            atn.ruleToStopState[t.target.ruleIndex].addTransition(trans);
         }
     }
 
-    for (var i=0; i<atn.states.length; i++) {
-    	var state = atn.states[i];
+    for (i=0; i<atn.states.length; i++) {
+        state = atn.states[i];
         if (state instanceof BlockStartState) {
             // we need to know the end state to set its start state
             if (state.endState === null) {
@@ -326,15 +335,15 @@ ATNDeserializer.prototype.readEdges = function(atn, sets) {
             state.endState.startState = state;
         }
         if (state instanceof PlusLoopbackState) {
-            for (var j=0; j<state.transitions.length; j++) {
-                var target = state.transitions[j].target;
+            for (j=0; j<state.transitions.length; j++) {
+                target = state.transitions[j].target;
                 if (target instanceof PlusBlockStartState) {
                     target.loopBackState = state;
                 }
             }
         } else if (state instanceof StarLoopbackState) {
-            for (var j=0; j<state.transitions.length; j++) {
-            	var target = state.transitions[j].target;
+            for (j=0; j<state.transitions.length; j++) {
+                target = state.transitions[j].target;
                 if (target instanceof StarLoopEntryState) {
                     target.loopBackState = state;
                 }
@@ -344,10 +353,10 @@ ATNDeserializer.prototype.readEdges = function(atn, sets) {
 };
 
 ATNDeserializer.prototype.readDecisions = function(atn) {
-    ndecisions = this.readInt()
+    var ndecisions = this.readInt();
     for (var i=0; i<ndecisions; i++) {
-        s = this.readInt();
-        decState = atn.states[s];
+        var s = this.readInt();
+        var decState = atn.states[s];
         atn.decisionToState.push(decState);
         decState.decision = i;
     }

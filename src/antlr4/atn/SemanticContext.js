@@ -337,7 +337,7 @@ function OR(a, b) {
 		var s = precedencePredicates.sort(function(a, b) {
 			return a.compareTo(b);
 		});
-		var reduced = s[-1];
+		var reduced = s[s.length-1];
 		operands.add(reduced);
 	}
 	this.opnds = operands.values();

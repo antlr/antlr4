@@ -84,6 +84,7 @@ function ATNConfig(params, config) {
     // outer context: depth &gt; 0.  Note that it may not be totally
     // accurate depth since I don't ever decrement. TODO: make it a boolean then
     this.reachesIntoOuterContext = config.reachesIntoOuterContext;
+    this.precedenceFilterSuppressed = config.precedenceFilterSuppressed || false;
     return this;
 }
 
@@ -107,7 +108,8 @@ ATNConfig.prototype.equals = function(other) {
         return this.state.stateNumber===other.state.stateNumber &&
             this.alt===other.alt &&
             this.context.equals(other.context) &&
-            this.semanticContext.equals(other.semanticContext);
+            this.semanticContext.equals(other.semanticContext) &&
+            this.precedenceFilterSuppressed===other.precedenceFilterSuppressed;
     }
 };
 

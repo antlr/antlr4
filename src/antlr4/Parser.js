@@ -468,7 +468,7 @@ Parser.prototype.getPrecedence = function() {
 	if (this._precedenceStack.length === 0) {
 		return -1;
 	} else {
-		return this._precedenceStack[-1];
+		return this._precedenceStack[this._precedenceStack.length-1];
 	}
 };
 
