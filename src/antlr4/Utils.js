@@ -15,10 +15,18 @@ String.prototype.hashCode = function(s) {
 	return hash;
 };
 
+function standardEqualsFunction(a,b) {
+	return a.equals(b);
+}
+
+function standardHashFunction(a) {
+	return a.hashString();
+}
+
 function Set(hashFunction, equalsFunction) {
 	this.data = {};
-	this.hashFunction = hashFunction || null;
-	this.equalsFunction = equalsFunction || null;
+	this.hashFunction = hashFunction || standardHashFunction;
+	this.equalsFunction = equalsFunction || standardEqualsFunction;
 	return this;
 }
 
@@ -29,22 +37,14 @@ Object.defineProperty(Set.prototype, "length", {
 });
 
 Set.prototype.add = function(value) {
-	var hash = this.hashFunction===null ? value.hashString() : this.hashFunction(value);
+	var hash = this.hashFunction(value);
 	var key = "hash_" + hash.hashCode();
 	if(key in this.data) {
 		var i;
 		var values = this.data[key];
-		if(this.equalsFunction===null) {
-			for(i=0;i<values.length; i++) {
-				if(value.equals(values[i])) {
-					return values[i];
-				}
-			}
-		} else {
-			for(i=0;i<values.length; i++) {
-				if(this.equalsFunction(value, values[i])) {
-					return values[i];
-				}
+		for(i=0;i<values.length; i++) {
+			if(this.equalsFunction(value, values[i])) {
+				return values[i];
 			}
 		}
 		values.push(value);
@@ -56,22 +56,14 @@ Set.prototype.add = function(value) {
 };
 
 Set.prototype.contains = function(value) {
-	var hash = this.hashFunction===null ? value.hashString() : this.hashFunction(value);
+	var hash = this.hashFunction(value);
 	var key = hash.hashCode();
 	if(key in this.data) {
 		var i;
 		var values = this.data[key];
-		if(this.equalsFunction===null) {
-			for(i=0;i<values.length; i++) {
-				if(value.equals(values[i])) {
-					return true;
-				}
-			}
-		} else {
-			for(i=0;i<values.length; i++) {
-				if(this.equalsFunction(value, values[i])) {
-					return true;
-				}
+		for(i=0;i<values.length; i++) {
+			if(this.equalsFunction(value, values[i])) {
+				return true;
 			}
 		}
 	}
