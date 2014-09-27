@@ -540,8 +540,7 @@ LexerATNSimulator.prototype.evaluatePredicate = function(input, ruleIndex,
 	}
 };
 
-LexerATNSimulator.prototype.captureSimState = function(settings, input,
-		dfaState) {
+LexerATNSimulator.prototype.captureSimState = function(settings, input, dfaState) {
 	settings.index = input.index;
 	settings.line = this.line;
 	settings.column = this.column;
