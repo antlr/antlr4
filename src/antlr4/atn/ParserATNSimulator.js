@@ -1029,9 +1029,10 @@ ParserATNSimulator.prototype.getPredsForAmbigAlts = function(ambigAlts, configs,
     }
     var nPredAlts = 0;
     for (i =1;i< nalts+1;i++) {
-        if (altToPred[i]===null) {
+        var pred = altToPred[i] || null;
+        if (pred===null) {
             altToPred[i] = SemanticContext.NONE;
-        } else if (altToPred[i] !== SemanticContext.NONE) {
+        } else if (pred !== SemanticContext.NONE) {
             nPredAlts += 1;
         }
     }
@@ -1040,7 +1041,7 @@ ParserATNSimulator.prototype.getPredsForAmbigAlts = function(ambigAlts, configs,
         altToPred = null;
     }
     if (this.debug) {
-        console.log("getPredsForAmbigAlts result " + altToPred);
+        console.log("getPredsForAmbigAlts result " + Utils.arrayToString(altToPred));
     }
     return altToPred;
 };
