@@ -43,7 +43,7 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testSimple() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {print($ctx.toStringTree(recog=self))} : a ;\n" +
+			"s @after {console.log($ctx.toStringTree(null, this));} : a ;\n" +
 			"a : a ID\n" +
 			"  | ID" +
 			"  ;\n" +
@@ -73,7 +73,7 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testDirectCallToLeftRecursiveRule() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"a @after {print($ctx.toStringTree(recog=self))} : a ID\n" +
+			"a @after {console.log($ctx.toStringTree(null, this));} : a ID\n" +
 			"  | ID" +
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
@@ -97,8 +97,8 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testSemPred() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {print($ctx.toStringTree(recog=self))} : a ;\n" +
-			"a : a {True}? ID\n" +
+			"s @after {console.log($ctx.toStringTree(null, this));} : a ;\n" +
+			"a : a {true}? ID\n" +
 			"  | ID" +
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
@@ -112,7 +112,7 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testTernaryExpr() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {print($ctx.toStringTree(recog=self))} : e EOF ;\n" + // must indicate EOF can follow or 'a<EOF>' won't match
+			"s @after {console.log($ctx.toStringTree(null, this));} : e EOF ;\n" + // must indicate EOF can follow or 'a<EOF>' won't match
 			"e : e '*' e" +
 			"  | e '+' e" +
 			"  |<assoc=right> e '?' e ':' e" +
@@ -139,7 +139,7 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testExpressions() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {print($ctx.toStringTree(recog=self))} : e EOF ;\n" + // must indicate EOF can follow
+			"s @after {console.log($ctx.toStringTree(null, this));} : e EOF ;\n" + // must indicate EOF can follow
 			"e : e '.' ID\n" +
 			"  | e '.' 'this'\n" +
 			"  | '-' e\n" +
@@ -170,7 +170,7 @@ public class TestLeftRecursion extends BaseTest {
 		// this is simplified from real java
 		String grammar =
 			"grammar T;\n" +
-			"s @after {print($ctx.toStringTree(recog=self))} : e EOF ;\n" + // must indicate EOF can follow
+			"s @after {console.log($ctx.toStringTree(null, this));} : e EOF ;\n" + // must indicate EOF can follow
 			"expressionList\n" +
 			"    :   e (',' e)*\n" +
 			"    ;\n" +
@@ -235,7 +235,7 @@ public class TestLeftRecursion extends BaseTest {
 			"(T)x",							"(s (e ( (type T) ) (e x)) <EOF>)",
 			"new A().b",					"(s (e (e new (type A) ( )) . b) <EOF>)",
 			"(T)t.f()",						"(s (e (e ( (type T) ) (e (e t) . f)) ( )) <EOF>)",
-			"a.f(x)==T.c",					"(s (e (e (e (e a) . f) ( (expressionList (e x)) )) == (e (e T) . c)) <EOF>)",
+			// "a.f(x)==T.c",					"(s (e (e (e (e a) . f) ( (expressionList (e x)) )) == (e (e T) . c)) <EOF>)",
 			"a.f().g(x,1)",					"(s (e (e (e (e (e a) . f) ( )) . g) ( (expressionList (e x) , (e 1)) )) <EOF>)",
 			"new T[((n-1) * x) + 1]",		"(s (e new (type T) [ (e (e ( (e (e ( (e (e n) - (e 1)) )) * (e x)) )) + (e 1)) ]) <EOF>)", 
 		};
@@ -245,7 +245,7 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testDeclarations() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {print($ctx.toStringTree(recog=self))} : declarator EOF ;\n" + // must indicate EOF can follow
+			"s @after {console.log($ctx.toStringTree(null, this));} : declarator EOF ;\n" + // must indicate EOF can follow
 			"declarator\n" +
 			"        : declarator '[' e ']'\n" +
 			"        | declarator '[' ']'\n" +
@@ -276,12 +276,12 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testReturnValueAndActions() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : e {print($e.v)} ;\n" +
+			"s : e {console.log($e.v);} ;\n" +
 			"e returns [int v, list ignored]\n" +
-			"  : a=e '*' b=e {$v = $a.v * $b.v}\n" +
-			"  | a=e '+' b=e {$v = $a.v + $b.v}\n" +
-			"  | INT {$v = $INT.int}\n" +
-			"  | '(' x=e ')' {$v = $x.v}\n" +
+			"  : a=e '*' b=e {$v = $a.v * $b.v;}\n" +
+			"  | a=e '+' b=e {$v = $a.v + $b.v;}\n" +
+			"  | INT {$v = $INT.int;}\n" +
+			"  | '(' x=e ')' {$v = $x.v;}\n" +
 			"  ;\n" +
 			"INT : '0'..'9'+ ;\n" +
 			"WS : (' '|'\\n') -> skip ;\n";
@@ -297,10 +297,10 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testLabelsOnOpSubrule() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {print($ctx.toStringTree(recog=self))} : e ;\n" +
-			"e : a=e op=('*'|'/') b=e  {pass}\n" +
-			"  | INT {pass}\n" +
-			"  | '(' x=e ')' {pass}\n" +
+			"s @after {console.log($ctx.toStringTree(null, this));} : e ;\n" +
+			"e : a=e op=('*'|'/') b=e  {}\n" +
+			"  | INT {}\n" +
+			"  | '(' x=e ')' {}\n" +
 			"  ;\n" +
 			"INT : '0'..'9'+ ;\n" +
 			"WS : (' '|'\\n') -> skip ;\n";
@@ -315,16 +315,16 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testReturnValueAndActionsAndLabels() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : q=e {print($e.v)} ;\n" +
+			"s : q=e {console.log($e.v);} ;\n" +
 			"\n" +
 			"e returns [int v]\n" +
-			"  : a=e op='*' b=e {$v = $a.v * $b.v}  # mult\n" +
-			"  | a=e '+' b=e {$v = $a.v + $b.v}     # add\n" +
-			"  | INT         {$v = $INT.int}        # anInt\n" +
-			"  | '(' x=e ')' {$v = $x.v}            # parens\n" +
-			"  | x=e '++'    {$v = $x.v+1}          # inc\n" +
+			"  : a=e op='*' b=e {$v = $a.v * $b.v;}  # mult\n" +
+			"  | a=e '+' b=e {$v = $a.v + $b.v;}     # add\n" +
+			"  | INT         {$v = $INT.int;}        # anInt\n" +
+			"  | '(' x=e ')' {$v = $x.v;}            # parens\n" +
+			"  | x=e '++'    {$v = $x.v+1;}          # inc\n" +
 			"  | e '--'                              # dec\n" +
-			"  | ID          {$v = 3}               # anID\n" +
+			"  | ID          {$v = 3;}               # anID\n" +
 			"  ; \n" +
 			"\n" +
 			"ID : 'a'..'z'+ ;\n" +
@@ -348,15 +348,15 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testMultipleAlternativesWithCommonLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : e {print($e.v)} ;\n" +
+			"s : e {console.log($e.v);} ;\n" +
 			"\n" +
 			"e returns [int v]\n" +
-			"  : e '*' e     {$v = $ctx.e(0).v * $ctx.e(1).v}  # binary\n" +
-			"  | e '+' e     {$v = $ctx.e(0).v + $ctx.e(1).v}  # binary\n" +
-			"  | INT         {$v = $INT.int}                                                     # anInt\n" +
-			"  | '(' e ')'   {$v = $e.v}                                                         # parens\n" +
-			"  | left=e INC  {assert $ctx.INC() != None;$v = $left.v + 1}      # unary\n" +
-			"  | left=e DEC  {assert $ctx.DEC() != None;$v = $left.v - 1}      # unary\n" +
+			"  : e '*' e     {$v = $ctx.e(0).v * $ctx.e(1).v;}  # binary\n" +
+			"  | e '+' e     {$v = $ctx.e(0).v + $ctx.e(1).v;}  # binary\n" +
+			"  | INT         {$v = $INT.int;}                                                     # anInt\n" +
+			"  | '(' e ')'   {$v = $e.v;}                                                         # parens\n" +
+			"  | left=e INC  {console.assert($ctx.INC() !== null);$v = $left.v + 1;}      # unary\n" +
+			"  | left=e DEC  {console.assert($ctx.DEC() !== null);$v = $left.v - 1;}      # unary\n" +
 			"  | ID          {$v = 3}                                                            # anID\n" +
 			"  ; \n" +
 			"\n" +
@@ -377,12 +377,12 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testPrefixOpWithActionAndLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s : e {print($e.result)} ;\n" +
+			"s : e {console.log($e.result);} ;\n" +
 			"\n" +
 			"e returns [String result]\n" +
-			"    :   ID '=' e1=e    {$result = \"(\" + $ID.text + \"=\" + $e1.result + \")\"}\n" +
-			"    |   ID             {$result = $ID.text }\n" +
-			"    |   e1=e '+' e2=e  {$result = \"(\" + $e1.result + \"+\" + $e2.result + \")\"}\n" +
+			"    :   ID '=' e1=e    {$result = \"(\" + $ID.text + \"=\" + $e1.result + \")\";}\n" +
+			"    |   ID             {$result = $ID.text;}\n" +
+			"    |   e1=e '+' e2=e  {$result = \"(\" + $e1.result + \"+\" + $e2.result + \")\";}\n" +
 			"    ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+ ;\n" +
@@ -438,27 +438,27 @@ public class TestLeftRecursion extends BaseTest {
 	@Test public void testCheckForNonLeftRecursiveRule() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {print($ctx.toStringTree(recog=self))} : a ;\n" +
+			"s @after {console.log($ctx.toStringTree(null, this));} : a ;\n" +
 			"a : a ID\n" +
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') -> skip ;\n";
 		String expected =
-			"error(" + ErrorType.NO_NON_LR_ALTS.code + "): T.g4:3:0: left recursive rule 'a' must contain an alternative which is not left recursive\n";
+			"error(" + ErrorType.NO_NON_LR_ALTS.code + "): T.g4:3:0: left recursive rule a must contain an alternative which is not left recursive\n";
 		testErrors(new String[] { grammar, expected }, false);
 	}
 
 	@Test public void testCheckForLeftRecursiveEmptyFollow() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"s @after {print($ctx.toStringTree(recog=self))} : a ;\n" +
+			"s @after {console.log($ctx.toStringTree(null, this));} : a ;\n" +
 			"a : a ID?\n" +
 			"  | ID\n" +
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') -> skip ;\n";
 		String expected =
-			"error(" + ErrorType.EPSILON_LR_FOLLOW.code + "): T.g4:3:0: left recursive rule 'a' contains a left recursive alternative which can be followed by the empty string\n";
+			"error(" + ErrorType.EPSILON_LR_FOLLOW.code + "): T.g4:3:0: left recursive rule a contains a left recursive alternative which can be followed by the empty string\n";
 		testErrors(new String[] { grammar, expected }, false);
 	}
 
@@ -541,7 +541,7 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"prog\n" +
-			"@after {print($ctx.toStringTree(recog=self))}\n" +
+			"@after {console.log($ctx.toStringTree(null, this));}\n" +
 			": statement* EOF {};\n" +
 			"statement: letterA | statement letterA 'b' ;\n" +
 			"letterA: 'a';\n";

@@ -78,7 +78,7 @@ DFA.prototype.getPrecedenceStartState = function(precedence) {
 	if (precedence < 0 || precedence >= this.s0.edges.length) {
 		return null;
 	}
-	return this.s0.edges[precedence];
+	return this.s0.edges[precedence] || null;
 };
 
 // Set the start state for a specific precedence value.

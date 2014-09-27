@@ -45,7 +45,7 @@ public class TestCompositeGrammars extends BaseTest {
 	@Test public void testDelegatorInvokesDelegateRule() throws Exception {
 		String slave =
 			"parser grammar S;\n" +
-			"a : B {print(\"S.a\")} ;\n";
+			"a : B {console.log(\"S.a\");} ;\n";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave);
 		String master =
@@ -62,7 +62,7 @@ public class TestCompositeGrammars extends BaseTest {
 	@Test public void testBringInLiteralsFromDelegate() throws Exception {
 		String slave =
 			"parser grammar S;\n" +
-			"a : '=' 'a' {print(\"S.a\")} ;\n";
+			"a : '=' 'a' {console.log(\"S.a\");} ;\n";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave);
 		String master =
@@ -81,13 +81,13 @@ public class TestCompositeGrammars extends BaseTest {
 		// in M.
 		String slave =
 			"parser grammar S;\n" +
-			"a[int x] returns [int y] : B {print('S.a',end='');$y=1000} ;\n";
+			"a[int x] returns [int y] : B {process.stdout.write('S.a');$y=1000;} ;\n";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave);
 		String master =
 			"grammar M;\n" +
 			"import S;\n" +
-			"s : label=a[3] {print($label.y)} ;\n" +
+			"s : label=a[3] {console.log($label.y);} ;\n" +
 			"B : 'b' ;" + // defines B from inherited token space
 			"WS : (' '|'\\n') -> skip ;\n" ;
 		String found = execParser("M.g4", master, "MParser", "MLexer", "MListener", "MVisitor",
@@ -101,13 +101,13 @@ public class TestCompositeGrammars extends BaseTest {
 		// in M.
 		String slave =
 			"parser grammar S;\n" +
-			"a : B {print('S.a', end='')} ;\n";
+			"a : B {process.stdout.write('S.a');} ;\n";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave);
 		String master =
 			"grammar M;\n" +
 			"import S;\n" +
-			"s : a {print($a.text,end='')} ;\n" +
+			"s : a {process.stdout.write($a.text);} ;\n" +
 			"B : 'b' ;" + // defines B from inherited token space
 			"WS : (' '|'\\n') -> skip ;\n" ;
 		String found = execParser("M.g4", master, "MParser", "MLexer", "MListener", "MVisitor",
@@ -119,8 +119,9 @@ public class TestCompositeGrammars extends BaseTest {
 		String slave =
 			"parser grammar S;\n" +
 			"@members {\n" +
-			"def foo(self):\n" +
-			"    print('foo')\n" +
+			"this.foo = function() {\n" +
+			"    console.log('foo');\n" +
+			"};\n" +
 			"}\n" +
 			"a : B ;\n";
 		mkdir(tmpdir);
@@ -128,7 +129,7 @@ public class TestCompositeGrammars extends BaseTest {
 		String master =
 			"grammar M;\n" +		// uses no rules from the import
 			"import S;\n" +
-			"s : 'b' {self.foo()} ;\n" + // gS is import pointer
+			"s : 'b' {this.foo();} ;\n" + // gS is import pointer
 			"WS : (' '|'\\n') -> skip ;\n" ;
 		String found = execParser("M.g4", master, "MParser", "MLexer", "MListener", "MVisitor",
 								  "s", "b", debug);
@@ -138,13 +139,13 @@ public class TestCompositeGrammars extends BaseTest {
 	@Test public void testDelegatorInvokesFirstVersionOfDelegateRule() throws Exception {
 		String slave =
 			"parser grammar S;\n" +
-			"a : b {print(\"S.a\")} ;\n" +
+			"a : b {console.log(\"S.a\");} ;\n" +
 			"b : B ;\n" ;
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave);
 		String slave2 =
 			"parser grammar T;\n" +
-			"a : B {print(\"T.a\")} ;\n"; // hidden by S.a
+			"a : B {console.log(\"T.a\");} ;\n"; // hidden by S.a
 		writeFile(tmpdir, "T.g4", slave2);
 		String master =
 			"grammar M;\n" +
@@ -161,13 +162,13 @@ public class TestCompositeGrammars extends BaseTest {
 		String slave =
 			"parser grammar S;\n" + // A, B, C token type order
 			"tokens { A, B, C }\n" +
-			"x : A {print(\"S.x\")} ;\n";
+			"x : A {console.log(\"S.x\");} ;\n";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave);
 		String slave2 =
 			"parser grammar T;\n" +
 			"tokens { C, B, A }\n" + // reverse order
-			"y : A {print(\"T.y\")} ;\n";
+			"y : A {console.log(\"T.y\");} ;\n";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "T.g4", slave2);
 		// The lexer will create rules to match letters a, b, c.
@@ -200,13 +201,13 @@ public class TestCompositeGrammars extends BaseTest {
 		String slave =
 			"parser grammar S;\n" + // A, B, C token type order
 			"tokens { A, B, C }\n" +
-			"x : A {print(\"S.x\")} ;\n";
+			"x : A {console.log(\"S.x\");} ;\n";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave);
 		String slave2 =
 			"parser grammar T;\n" +
 			"tokens { C, B, A }\n" + // reverse order
-			"y : A {print(\"T.y\")} ;\n";
+			"y : A {console.log(\"T.y\");} ;\n";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "T.g4", slave2);
 
@@ -242,7 +243,7 @@ public class TestCompositeGrammars extends BaseTest {
 		String slave =
 			"grammar S;\n" + // A, B, C token type order
 			"tokens { A, B, C }\n" +
-			"x : 'x' INT {print(\"S.x\")} ;\n" +
+			"x : 'x' INT {console.log(\"S.x\");} ;\n" +
 			"INT : '0'..'9'+ ;\n" +
 			"WS : (' '|'\\n') -> skip ;\n";
 		mkdir(tmpdir);
@@ -312,7 +313,7 @@ public class TestCompositeGrammars extends BaseTest {
 	@Test public void testDelegatorRuleOverridesDelegate() throws Exception {
 		String slave =
 			"parser grammar S;\n" +
-			"a : b {print('S.a')} ;\n" +
+			"a : b {console.log('S.a');} ;\n" +
 			"b : B ;\n" ;
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave);
@@ -331,7 +332,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"parser grammar JavaDecl;\n" +
 			"type_ : 'int' ;\n" +
 			"decl : type_ ID ';'\n" +
-			"     | type_ ID init ';' {print(\"JavaDecl: \"+$text)}\n" +
+			"     | type_ ID init ';' {console.log(\"JavaDecl: \"+$text);}\n" +
 			"     ;\n" +
 			"init : '=' INT ;\n";
 		mkdir(tmpdir);
@@ -354,7 +355,7 @@ public class TestCompositeGrammars extends BaseTest {
     @Test public void testDelegatorRuleOverridesDelegates() throws Exception {
         String slave =
             "parser grammar S;\n" +
-            "a : b {print(\"S.a\")} ;\n" +
+            "a : b {console.log(\"S.a\");} ;\n" +
             "b : 'b' ;\n" ;
         mkdir(tmpdir);
         writeFile(tmpdir, "S.g4", slave);
@@ -362,13 +363,13 @@ public class TestCompositeGrammars extends BaseTest {
         String slave2 =
             "parser grammar T;\n" +
             "tokens { A }\n" +
-            "b : 'b' {print(\"T.b\")} ;\n";
+            "b : 'b' {console.log(\"T.b\");} ;\n";
         writeFile(tmpdir, "T.g4", slave2);
 
         String master =
             "grammar M;\n" +
             "import S, T;\n" +
-            "b : 'b'|'c' {print(\"M.b\")}|B|A ;\n" +
+            "b : 'b'|'c' {console.log(\"M.b\");}|B|A ;\n" +
             "WS : (' '|'\\n') -> skip ;\n" ;
         String found = execParser("M.g4", master, "MParser", "MLexer", "MListener", "MVisitor",
                                   "a", "c", debug);
@@ -380,7 +381,7 @@ public class TestCompositeGrammars extends BaseTest {
 	@Test public void testLexerDelegatorInvokesDelegateRule() throws Exception {
 		String slave =
 			"lexer grammar S;\n" +
-			"A : 'a' {print(\"S.A\")} ;\n" +
+			"A : 'a' {console.log(\"S.A\");} ;\n" +
 			"C : 'c' ;\n";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave);
@@ -402,14 +403,14 @@ public class TestCompositeGrammars extends BaseTest {
 	@Test public void testLexerDelegatorRuleOverridesDelegate() throws Exception {
 		String slave =
 			"lexer grammar S;\n" +
-			"A : 'a' {print(\"S.A\")} ;\n" +
-			"B : 'b' {print(\"S.B\")} ;\n";
+			"A : 'a' {console.log(\"S.A\");} ;\n" +
+			"B : 'b' {console.log(\"S.B\");} ;\n";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave);
 		String master =
 			"lexer grammar M;\n" +
 			"import S;\n" +
-			"A : 'a' B {print(\"M.A\")} ;\n" +
+			"A : 'a' B {console.log(\"M.A\");} ;\n" +
 			"WS : (' '|'\\n') -> skip ;\n" ;
 		String found = execLexer("M.g4", master, "M", "ab", debug);
 		assertEquals("M.A\n" +
@@ -430,8 +431,8 @@ public class TestCompositeGrammars extends BaseTest {
 		String master =
 			"grammar M;\n" +
 			"import S;\n" +
-			"a : A {print(\"M.a: \"+str($A))} ;\n" +
-			"A : 'abc' {print(\"M.A\")} ;\n" +
+			"a : A {console.log(\"M.a: \"+$A.toString());} ;\n" +
+			"A : 'abc' {console.log(\"M.A\");} ;\n" +
 			"WS : (' '|'\\n') -> skip ;\n" ;
 		String found = execParser("M.g4", master, "MParser", "MLexer", "MListener", "MVisitor",
 								  "a", "abc", debug);
