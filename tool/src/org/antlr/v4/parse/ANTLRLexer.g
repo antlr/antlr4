@@ -261,15 +261,11 @@ COMMENT
            }
        )
        {
-         // Unless we had a documentation comment, then we do not wish to
-         // pass the comments in to the parser. If you are writing a formatter
-         // then you will want to preserve the comments off channel, but could
-         // just skip and save token space if not.
+         // We do not wish to pass the comments in to the parser. If you are
+         // writing a formatter then you will want to preserve the comments off
+         // channel, but could just skip and save token space if not.
          //
-         if ($type != DOC_COMMENT) {
-
-             $channel=2;  // Comments are on channel 2
-         }
+         $channel=2;  // Comments are on channel 2
        }
     ;
 

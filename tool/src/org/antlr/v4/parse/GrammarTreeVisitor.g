@@ -343,7 +343,7 @@ grammarSpec
 @after {
 	exitGrammarSpec($start);
 }
-    :   ^(	GRAMMAR ID {grammarName=$ID.text;} DOC_COMMENT?
+    :   ^(	GRAMMAR ID {grammarName=$ID.text;}
     		{discoverGrammar((GrammarRootAST)$GRAMMAR, $ID);}
  		   	prequelConstructs
     		{finishPrequels($prequelConstructs.firstOne);}
@@ -519,7 +519,7 @@ lexerRule
 }
 	:	^(	RULE TOKEN_REF
 			{currentRuleName=$TOKEN_REF.text; currentRuleAST=$RULE;}
-			DOC_COMMENT? (^(RULEMODIFIERS m=FRAGMENT {mods.add($m);}))?
+			(^(RULEMODIFIERS m=FRAGMENT {mods.add($m);}))?
       		{discoverLexerRule((RuleAST)$RULE, $TOKEN_REF, mods, (GrammarAST)input.LT(1));}
       		lexerRuleBlock
       		{
@@ -540,7 +540,7 @@ rule
 	exitRule($start);
 }
 	:   ^(	RULE RULE_REF {currentRuleName=$RULE_REF.text; currentRuleAST=$RULE;}
-			DOC_COMMENT? (^(RULEMODIFIERS (m=ruleModifier{mods.add($m.start);})+))?
+			(^(RULEMODIFIERS (m=ruleModifier{mods.add($m.start);})+))?
 			ARG_ACTION?
       		ret=ruleReturns?
       		thr=throwsSpec?
