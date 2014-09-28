@@ -289,8 +289,28 @@ public class GrammarTransformPipeline {
 
 			GrammarAST optionsRoot = (GrammarAST)imp.ast.getFirstChildWithType(ANTLRParser.OPTIONS);
 			if ( optionsRoot!=null ) {
-				rootGrammar.tool.errMgr.grammarError(ErrorType.OPTIONS_IN_DELEGATE,
-									optionsRoot.g.fileName, optionsRoot.token, imp.name);
+				// suppress the warning if the options match the options specified
+				// in the root grammar
+				// https://github.com/antlr/antlr4/issues/707
+
+				boolean hasNewOption = false;
+				for (Map.Entry<String, GrammarAST> option : imp.ast.getOptions().entrySet()) {
+					String importOption = imp.ast.getOptionString(option.getKey());
+					if (importOption == null) {
+						continue;
+					}
+
+					String rootOption = rootGrammar.ast.getOptionString(option.getKey());
+					if (!importOption.equals(rootOption)) {
+						hasNewOption = true;
+						break;
+					}
+				}
+
+				if (hasNewOption) {
+					rootGrammar.tool.errMgr.grammarError(ErrorType.OPTIONS_IN_DELEGATE,
+										optionsRoot.g.fileName, optionsRoot.token, imp.name);
+				}
 			}
 		}
 		rootGrammar.tool.log("grammar", "Grammar: "+rootGrammar.ast.toStringTree());

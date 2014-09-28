@@ -404,11 +404,9 @@ public class Grammar implements AttributeResolver {
             if ( t.getType()==ANTLRParser.ASSIGN ) {
 				t = (GrammarAST)t.getChild(1);
 				importedGrammarName = t.getText();
-                tool.log("grammar", "import "+ importedGrammarName);
             }
             else if ( t.getType()==ANTLRParser.ID ) {
                 importedGrammarName = t.getText();
-                tool.log("grammar", "import " + t.getText());
 			}
 			Grammar g;
 			try {
@@ -562,16 +560,24 @@ public class Grammar implements AttributeResolver {
      *  The grammars are in import tree preorder.  Don't include ourselves
      *  in list as we're not a delegate of ourselves.
      */
-    public List<Grammar> getAllImportedGrammars() {
-        if ( importedGrammars==null ) return null;
-        List<Grammar> delegates = new ArrayList<Grammar>();
-		for (Grammar d : importedGrammars) {
-			delegates.add(d);
-			List<Grammar> ds = d.getAllImportedGrammars();
-			if (ds != null) delegates.addAll(ds);
+	public List<Grammar> getAllImportedGrammars() {
+		if (importedGrammars == null) {
+			return null;
 		}
-        return delegates;
-    }
+
+		LinkedHashMap<String, Grammar> delegates = new LinkedHashMap<String, Grammar>();
+		for (Grammar d : importedGrammars) {
+			delegates.put(d.fileName, d);
+			List<Grammar> ds = d.getAllImportedGrammars();
+			if (ds != null) {
+				for (Grammar imported : ds) {
+					delegates.put(imported.fileName, imported);
+				}
+			}
+		}
+
+		return new ArrayList<Grammar>(delegates.values());
+	}
 
     public List<Grammar> getImportedGrammars() { return importedGrammars; }
 
