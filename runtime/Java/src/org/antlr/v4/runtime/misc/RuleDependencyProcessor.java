@@ -73,13 +73,28 @@ import java.util.Set;
  * @author Sam Harwell
  */
 @SupportedAnnotationTypes({RuleDependencyProcessor.RuleDependencyClassName, RuleDependencyProcessor.RuleDependenciesClassName, RuleDependencyProcessor.RuleVersionClassName})
-@SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class RuleDependencyProcessor extends AbstractProcessor {
 	public static final String RuleDependencyClassName = "org.antlr.v4.runtime.RuleDependency";
 	public static final String RuleDependenciesClassName = "org.antlr.v4.runtime.RuleDependencies";
 	public static final String RuleVersionClassName = "org.antlr.v4.runtime.RuleVersion";
 
 	public RuleDependencyProcessor() {
+	}
+
+	@Override
+	public SourceVersion getSupportedSourceVersion() {
+		SourceVersion latestSupported = SourceVersion.latestSupported();
+
+		if (latestSupported.ordinal() <= 6) {
+			return SourceVersion.RELEASE_6;
+		}
+		else if (latestSupported.ordinal() <= 8) {
+			return latestSupported;
+		}
+		else {
+			// this annotation processor is tested through Java 8
+			return SourceVersion.values()[8];
+		}
 	}
 
 	@Override
