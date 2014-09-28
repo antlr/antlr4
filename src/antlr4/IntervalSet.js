@@ -2,6 +2,7 @@
 
 var Token = require('./Token').Token;
 
+/* stop is not included! */
 function Interval(start, stop) {
 	this.start = start;
 	this.stop = stop;
@@ -11,6 +12,15 @@ function Interval(start, stop) {
 Interval.prototype.contains = function(item) {
 	return item >= this.start && item < this.stop;
 };
+
+Interval.prototype.toString = function() {
+	if(this.start===this.stop-1) {
+		return this.start.toString();
+	} else {
+		return this.start.toString() + ".." + (this.stop-1).toString();
+	}
+};
+
 
 Object.defineProperty(Interval.prototype, "length", {
 	get : function() {
@@ -32,10 +42,14 @@ IntervalSet.prototype.first = function(v) {
 };
 
 IntervalSet.prototype.addOne = function(v) {
-	this.addRange(new Interval(v, v + 1));
+	this.addInterval(new Interval(v, v + 1));
 };
 
-IntervalSet.prototype.addRange = function(v) {
+IntervalSet.prototype.addRange = function(l, h) {
+	this.addInterval(new Interval(l, h + 1));
+};
+
+IntervalSet.prototype.addInterval = function(v) {
 	if (this.intervals === null) {
 		this.intervals = [];
 		this.intervals.push(v);
@@ -55,8 +69,7 @@ IntervalSet.prototype.addRange = function(v) {
 			}
 			// overlapping range -> adjust and reduce
 			else if (v.start <= i.stop) {
-				this.intervals[k] = new Interval(Math.min(i.start, v.start),
-						Math.max(i.stop, v.stop));
+				this.intervals[k] = new Interval(Math.min(i.start, v.start), Math.max(i.stop, v.stop));
 				this.reduce(k);
 				return;
 			}
@@ -69,7 +82,8 @@ IntervalSet.prototype.addRange = function(v) {
 IntervalSet.prototype.addSet = function(other) {
 	if (other.intervals !== null) {
 		for (var k = 0; k < other.intervals.length; k++) {
-			this.addRange(other.intervals[k]);
+			var i = other.intervals[k];
+			this.addInterval(new Interval(i.start, i.stop));
 		}
 	}
 	return this;
@@ -146,22 +160,76 @@ IntervalSet.prototype.remove = function(v) {
 	}
 };
 
-IntervalSet.prototype.toString = function(tokenNames) {
+IntervalSet.prototype.toString = function(tokenNames, elemsAreChar) {
+	tokenNames = tokenNames || null;
+	elemsAreChar = elemsAreChar || false;
 	if (this.intervals === null) {
 		return "{}";
+	} else if(tokenNames!==null) {
+		return this.toTokenString(tokenNames);
+	} else if(elemsAreChar) {
+		return this.toCharString();
 	} else {
-		var names = [];
-		for (var i = 0; i < this.intervals.length; i++) {
-			var v = this.intervals[i];
-			for (var j = v.start; j < v.stop; j++) {
-				names.push(this.elementName(tokenNames, j));
+		return this.toIndexString();
+	}
+};
+
+IntervalSet.prototype.toCharString = function() {
+	var names = [];
+	for (var i = 0; i < this.intervals.length; i++) {
+		var v = this.intervals[i];
+		if(v.stop===v.start+1) {
+			if ( v.start===Token.EOF ) {
+				names.push("<EOF>");
+			} else {
+				names.push("'" + String.fromCharCode(v.start) + "'");
 			}
-		}
-		if (names.length > 1) {
-			return "{" + names.join(", ") + "}";
 		} else {
-			return names[0];
+			names.push("'" + String.fromCharCode(v.start) + "'..'" + String.fromCharCode(v.stop-1) + "'");
 		}
+	}
+	if (names.length > 1) {
+		return "{" + names.join(", ") + "}";
+	} else {
+		return names[0];
+	}
+};
+
+
+IntervalSet.prototype.toIndexString = function() {
+	var names = [];
+	for (var i = 0; i < this.intervals.length; i++) {
+		var v = this.intervals[i];
+		if(v.stop===v.start+1) {
+			if ( v.start===Token.EOF ) {
+				names.push("<EOF>");
+			} else {
+				names.push(v.start.toString());
+			}
+		} else {
+			names.push(v.start.toString() + ".." + (v.stop-1).toString());
+		}
+	}
+	if (names.length > 1) {
+		return "{" + names.join(", ") + "}";
+	} else {
+		return names[0];
+	}
+};
+
+
+IntervalSet.prototype.toTokenString = function(tokenNames, elemsAreChar) {
+	var names = [];
+	for (var i = 0; i < this.intervals.length; i++) {
+		var v = this.intervals[i];
+		for (var j = v.start; j < v.stop; j++) {
+			names.push(this.elementName(tokenNames, j));
+		}
+	}
+	if (names.length > 1) {
+		return "{" + names.join(", ") + "}";
+	} else {
+		return names[0];
 	}
 };
 

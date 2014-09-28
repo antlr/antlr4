@@ -160,18 +160,18 @@ LL1Analyzer.prototype._LOOK = function(s, stopState , ctx, look, lookBusy, calle
         }
     }
     if (s instanceof RuleStopState ) {
-    	if (ctx ===null) {
+        if (ctx ===null) {
             look.addOne(Token.EPSILON);
             return;
         } else if (ctx.isEmpty() && addEOF) {
-            look.addOne(Token.EOF)
+            look.addOne(Token.EOF);
             return;
         }
         if (ctx !== PredictionContext.EMPTY) {
             // run thru all possible stack tops in ctx
             for(var i=0; i<ctx.length; i++) {
                 var returnState = this.atn.states[ctx.getReturnState(i)];
-                var removed = calledRuleStack.contains(returnState.ruleIndex); 
+                var removed = calledRuleStack.contains(returnState.ruleIndex);
                 try {
                     calledRuleStack.remove(returnState.ruleIndex);
                     this._LOOK(returnState, stopState, ctx.getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
@@ -199,14 +199,14 @@ LL1Analyzer.prototype._LOOK = function(s, stopState , ctx, look, lookBusy, calle
             }
         } else if (t instanceof AbstractPredicateTransition ) {
             if (seeThruPreds) {
-            	this._LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+                this._LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
             } else {
                 look.addOne(LL1Analyzer.HIT_PRED);
             }
         } else if( t.isEpsilon) {
-        	this._LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+            this._LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
         } else if (t.constructor === WildcardTransition) {
-            look.addRange( new Interval(Token.MIN_USER_TOKEN_TYPE, this.atn.maxTokenType + 1) );
+            look.addRange( Token.MIN_USER_TOKEN_TYPE, this.atn.maxTokenType );
         } else {
             var set = t.label;
             if (set !== null) {

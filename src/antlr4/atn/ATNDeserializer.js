@@ -180,6 +180,7 @@ ATNDeserializer.prototype.readATN = function() {
 };
 
 ATNDeserializer.prototype.readStates = function(atn) {
+	var j, pair, stateNumber;
     var loopBackStateNumbers = [];
     var endStateNumbers = [];
     var nstates = this.readInt();
@@ -199,57 +200,58 @@ ATNDeserializer.prototype.readStates = function(atn) {
             var loopBackStateNumber = this.readInt();
             loopBackStateNumbers.push([s, loopBackStateNumber]);
         } else if(s instanceof BlockStartState) {
-        	var endStateNumber = this.readInt();
+            var endStateNumber = this.readInt();
             endStateNumbers.push([s, endStateNumber]);
         }
         atn.addState(s);
     }
     // delay the assignment of loop back and end states until we know all the
 	// state instances have been initialized
-    for (var j=0; j<loopBackStateNumbers.length; j++) {
-    	var pair = loopBackStateNumbers[j];
+    for (j=0; j<loopBackStateNumbers.length; j++) {
+        pair = loopBackStateNumbers[j];
         pair[0].loopBackState = atn.states[pair[1]];
     }
 
-    for (var j=0; j<endStateNumbers.length; j++) {
-    	var pair = endStateNumbers[j];
+    for (j=0; j<endStateNumbers.length; j++) {
+        pair = endStateNumbers[j];
         pair[0].endState = atn.states[pair[1]];
     }
     
     var numNonGreedyStates = this.readInt();
-    for (var j=0; j<numNonGreedyStates; j++) {
-        var stateNumber = this.readInt();
+    for (j=0; j<numNonGreedyStates; j++) {
+        stateNumber = this.readInt();
         atn.states[stateNumber].nonGreedy = true;
     }
 
     var numPrecedenceStates = this.readInt();
-    for (var j=0; j<numPrecedenceStates; j++) {
-        var stateNumber = this.readInt();
+    for (j=0; j<numPrecedenceStates; j++) {
+        stateNumber = this.readInt();
         atn.states[stateNumber].isPrecedenceRule = true;
     }
 };
 
 ATNDeserializer.prototype.readRules = function(atn) {
+    var i;
     var nrules = this.readInt();
     if (atn.grammarType === ATNType.LEXER ) {
         atn.ruleToTokenType = initArray(nrules, 0);
     }
     atn.ruleToStartState = initArray(nrules, 0);
-    for (var i=0; i<nrules; i++) {
+    for (i=0; i<nrules; i++) {
         var s = this.readInt();
         var startState = atn.states[s];
         atn.ruleToStartState[i] = startState;
         if ( atn.grammarType === ATNType.LEXER ) {
             var tokenType = this.readInt();
-            if (tokenType === 0xFFFF) {;
+            if (tokenType === 0xFFFF) {
                 tokenType = Token.EOF;
             }
             atn.ruleToTokenType[i] = tokenType;
         }
     }
     atn.ruleToStopState = initArray(nrules, 0);
-    for (var i=0; i<atn.states.length; i++) {
-    	var state = atn.states[i];
+    for (i=0; i<atn.states.length; i++) {
+        var state = atn.states[i];
         if (!(state instanceof RuleStopState)) {
             continue;
         }
@@ -280,7 +282,7 @@ ATNDeserializer.prototype.readSets = function(atn) {
         for (var j=0; j<n; j++) {
             var i1 = this.readInt();
             var i2 = this.readInt();
-            iset.addRange(new Interval(i1, i2 + 1)); // range upper limit is exclusive
+            iset.addRange(i1, i2);
         }
     }
     return sets;
@@ -383,18 +385,18 @@ ATNDeserializer.prototype.readLexerActions = function(atn) {
 };
 
 ATNDeserializer.prototype.generateRuleBypassTransitions = function(atn) {
-
+	var i;
     var count = atn.ruleToStartState.length;
-    for(var i=0; i<count; i++) {
+    for(i=0; i<count; i++) {
         atn.ruleToTokenType[i] = atn.maxTokenType + i + 1;
     }
-    for(var i=0; i<count; i++) {
+    for(i=0; i<count; i++) {
         this.generateRuleBypassTransition(atn, i);
     }
 };
 
 ATNDeserializer.prototype.generateRuleBypassTransition = function(atn, idx) {
-
+	var i, state;
     var bypassStart = new BasicBlockStartState();
     bypassStart.ruleIndex = idx;
     atn.addState(bypassStart);
@@ -414,8 +416,8 @@ ATNDeserializer.prototype.generateRuleBypassTransition = function(atn, idx) {
     if (atn.ruleToStartState[idx].isPrecedenceRule) {
         // wrap from the beginning of the rule to the StarLoopEntryState
         endState = null;
-        for(var i=0; i<atn.states.length; i++) {
-        	var state = atn.states[i];
+        for(i=0; i<atn.states.length; i++) {
+            state = atn.states[i];
             if (this.stateIsEndStateFor(state, idx)) {
                 endState = state;
                 excludeTransition = state.loopBackState.transitions[0];
@@ -426,22 +428,22 @@ ATNDeserializer.prototype.generateRuleBypassTransition = function(atn, idx) {
             throw ("Couldn't identify final state of the precedence rule prefix section.");
         }
     } else {
-        endState = atn.ruleToStopState[idx]
+        endState = atn.ruleToStopState[idx];
     }
     
     // all non-excluded transitions that currently target end state need to
 	// target blockEnd instead
-    for(var i=0; i<atn.states.length; i++) {
-    	var state = atn.states[i];
-    	for(var j=0; j<state.transitions.length; j++) {
-    		var transition = state.transitions[j];
+    for(i=0; i<atn.states.length; i++) {
+        state = atn.states[i];
+        for(var j=0; j<state.transitions.length; j++) {
+            var transition = state.transitions[j];
             if (transition === excludeTransition) {
                 continue;
             }
             if (transition.target === endState) {
                 transition.target = bypassStop;
             }
-    	}
+        }
     }
 
     // all transitions leaving the rule start state need to leave blockStart
@@ -463,18 +465,18 @@ ATNDeserializer.prototype.generateRuleBypassTransition = function(atn, idx) {
 };
 
 ATNDeserializer.prototype.stateIsEndStateFor = function(state, idx) {
-    if ( state.ruleIndex != idx) {
+    if ( state.ruleIndex !== idx) {
         return null;
     }
     if (!( state instanceof StarLoopEntryState)) {
         return null;
     }
-    var maybeLoopEndState = state.transitions[len(state.transitions) - 1].target;
+    var maybeLoopEndState = state.transitions[state.transitions.length - 1].target;
     if (!( maybeLoopEndState instanceof LoopEndState)) {
         return null;
     }
-    if (maybeLoopEndState.epsilonOnlyTransitions && 
-    		(maybeLoopEndState.transitions[0].target instanceof RuleStopState)) {
+    if (maybeLoopEndState.epsilonOnlyTransitions &&
+        (maybeLoopEndState.transitions[0].target instanceof RuleStopState)) {
         return state;
     } else {
         return null;
@@ -516,7 +518,7 @@ ATNDeserializer.prototype.verifyATN = function(atn) {
     }
     // verify assumptions
 	for(var i=0; i<atn.states.length; i++) {
-    	var state = atn.states[i];
+        var state = atn.states[i];
         if (state === null) {
             continue;
         }
@@ -611,33 +613,33 @@ ATNDeserializer.prototype.edgeFactory = function(atn, type, src, trg, arg1, arg2
     var target = atn.states[trg];
     switch(type) {
     case Transition.EPSILON:
-    	return new EpsilonTransition(target);
+        return new EpsilonTransition(target);
     case Transition.RANGE:
-    	return arg3 !== 0 ? new RangeTransition(target, Token.EOF, arg2) : new RangeTransition(target, arg1, arg2);
+        return arg3 !== 0 ? new RangeTransition(target, Token.EOF, arg2) : new RangeTransition(target, arg1, arg2);
     case Transition.RULE:
-    	return new RuleTransition(atn.states[arg1], arg2, arg3, target);
+        return new RuleTransition(atn.states[arg1], arg2, arg3, target);
     case Transition.PREDICATE:
-    	return new PredicateTransition(target, arg1, arg2, arg3 !== 0);
+        return new PredicateTransition(target, arg1, arg2, arg3 !== 0);
     case Transition.PRECEDENCE:
-    	return new PrecedencePredicateTransition(target, arg1);
+        return new PrecedencePredicateTransition(target, arg1);
     case Transition.ATOM:
-    	return arg3 !== 0 ? new AtomTransition(target, Token.EOF) : new AtomTransition(target, arg1);
+        return arg3 !== 0 ? new AtomTransition(target, Token.EOF) : new AtomTransition(target, arg1);
     case Transition.ACTION:
-    	return new ActionTransition(target, arg1, arg2, arg3 !== 0);
+        return new ActionTransition(target, arg1, arg2, arg3 !== 0);
     case Transition.SET:
-    	return new SetTransition(target, sets[arg1]);
+        return new SetTransition(target, sets[arg1]);
     case Transition.NOT_SET:
-    	return new NotSetTransition(target, sets[arg1]);
+        return new NotSetTransition(target, sets[arg1]);
     case Transition.WILDCARD:
-    	return new WildcardTransition(target);
+        return new WildcardTransition(target);
     default:
-    	throw "The specified transition type: " + type + " is not valid.";
+        throw "The specified transition type: " + type + " is not valid.";
     }
 };
 
 ATNDeserializer.prototype.stateFactory = function(type, ruleIndex) {
     if (this.stateFactories === null) {
-        sf = [];
+        var sf = [];
         sf[ATNState.INVALID_TYPE] = null;
         sf[ATNState.BASIC] = function() { return new BasicState(); };
         sf[ATNState.RULE_START] = function() { return new RuleStartState(); };

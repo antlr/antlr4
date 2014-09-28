@@ -235,7 +235,7 @@ public class TestLeftRecursion extends BaseTest {
 			"(T)x",							"(s (e ( (type T) ) (e x)) <EOF>)",
 			"new A().b",					"(s (e (e new (type A) ( )) . b) <EOF>)",
 			"(T)t.f()",						"(s (e (e ( (type T) ) (e (e t) . f)) ( )) <EOF>)",
-			// "a.f(x)==T.c",					"(s (e (e (e (e a) . f) ( (expressionList (e x)) )) == (e (e T) . c)) <EOF>)",
+			"a.f(x)==T.c",					"(s (e (e (e (e a) . f) ( (expressionList (e x)) )) == (e (e T) . c)) <EOF>)",
 			"a.f().g(x,1)",					"(s (e (e (e (e (e a) . f) ( )) . g) ( (expressionList (e x) , (e 1)) )) <EOF>)",
 			"new T[((n-1) * x) + 1]",		"(s (e new (type T) [ (e (e ( (e (e ( (e (e n) - (e 1)) )) * (e x)) )) + (e 1)) ]) <EOF>)", 
 		};

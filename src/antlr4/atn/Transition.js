@@ -174,7 +174,7 @@ RangeTransition.prototype.constructor = RangeTransition;
 
 RangeTransition.prototype.makeLabel = function() {
     var s = new IntervalSet();
-    s.addRange(new Interval(this.start, this.stop + 1));
+    s.addRange(this.start, this.stop);
     return s;
 };
 

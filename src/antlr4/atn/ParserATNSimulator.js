@@ -556,7 +556,10 @@ ParserATNSimulator.prototype.getExistingTargetState = function(previousD, t) {
 // returns {@link //ERROR}.
 //
 ParserATNSimulator.prototype.computeTargetState = function(dfa, previousD, t) {
-    var reach = this.computeReachSet(previousD.configs, t, false);
+	if("[(61,1,[$]), (64,1,[$]), (67,1,[$]), (70,1,[$]), (73,1,[$]), (76,1,[$]), (79,1,[$]), (82,1,[$]), (85,1,[$]), (88,1,[$]), (91,1,[$]), (94,1,[$]), (100,1,[$]), (103,1,[$]), (106,1,[$]), (109,1,[$]), (117,1,[$]), (126,1,[$]), (131,1,[$]), (133,1,[$]), (9,2,[$],up=5), (12,2,[$],up=5), (47,2,[$],up=2), (115,2,[$],up=2), (124,2,[$],up=2), (137,2,[$],up=2), (31,2,[$],up=5), (50,2,[$],up=5), (96,2,[$],up=5), (128,2,[$],up=5)],dipsIntoOuterContext" === previousD.configs.toString()) {
+		var i = 0;
+	}
+   var reach = this.computeReachSet(previousD.configs, t, false);
     if(reach===null) {
         this.addDFAEdge(dfa, previousD, t, ATNSimulator.ERROR);
         return ATNSimulator.ERROR;
@@ -568,8 +571,11 @@ ParserATNSimulator.prototype.computeTargetState = function(dfa, previousD, t) {
 
     if (this.debug) {
         var altSubSets = PredictionMode.getConflictingAltSubsets(reach);
-        console.log("SLL altSubSets=" + Utils.arrayToString(altSubSets) + ", configs=" + reach +
-                    ", predict=" + predictedAlt + ", allSubsetsConflict=" +
+        console.log("SLL altSubSets=" + Utils.arrayToString(altSubSets) +
+                    ", previous=" + previousD.configs +
+                    ", configs=" + reach +
+                    ", predict=" + predictedAlt +
+                    ", allSubsetsConflict=" +
                     PredictionMode.allSubsetsConflict(altSubSets) + ", conflictingAlts=" +
                     this.getConflictingAlts(reach));
     }
@@ -759,6 +765,9 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
                     skippedStopStates = [];
                 }
                 skippedStopStates.push(c);
+                if(this.debug) {
+                    console.log("added " + c + " to skippedStopStates");
+                }
             }
             continue;
         }
@@ -766,7 +775,11 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
             var trans = c.state.transitions[j];
             var target = this.getReachableTarget(trans, t);
             if (target!==null) {
-                intermediate.add(new ATNConfig({state:target}, c), this.mergeCache);
+            	var cfg = new ATNConfig({state:target}, c);
+                intermediate.add(cfg, this.mergeCache);
+                if(this.debug) {
+                    console.log("added " + cfg + " to intermediate");
+                }           	
             }
         }
     }
@@ -1225,7 +1238,7 @@ ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs
     if (this.debug) {
         console.log("closure(" + config.toString(this.parser,true) + ")");
         console.log("configs(" + configs.toString() + ")");
-        if(config.reachesIntoOuterContext>5) {
+        if(config.reachesIntoOuterContext>50) {
             throw "problem";
         }
     }
