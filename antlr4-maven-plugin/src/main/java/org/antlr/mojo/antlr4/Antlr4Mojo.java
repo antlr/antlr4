@@ -150,6 +150,7 @@ public class Antlr4Mojo extends AbstractMojo {
 	 * A set of Ant-like inclusion patterns used to select files from the source
 	 * directory for processing. By default, the pattern
 	 * <code>**&#47;*.g4</code> is used to select grammar files.
+	 * </p>
 	 */
     @Parameter
     protected Set<String> includes = new HashSet<String>();
