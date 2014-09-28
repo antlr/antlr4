@@ -29,6 +29,8 @@
  */
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Utils;
 
 import java.io.IOException;
@@ -40,16 +42,16 @@ import java.io.IOException;
 public class ANTLRFileStream extends ANTLRInputStream {
 	protected String fileName;
 
-	public ANTLRFileStream(String fileName) throws IOException {
+	public ANTLRFileStream(@NotNull String fileName) throws IOException {
 		this(fileName, null);
 	}
 
-	public ANTLRFileStream(String fileName, String encoding) throws IOException {
+	public ANTLRFileStream(@NotNull String fileName, String encoding) throws IOException {
 		this.fileName = fileName;
 		load(fileName, encoding);
 	}
 
-	public void load(String fileName, String encoding)
+	public void load(@NotNull String fileName, @Nullable String encoding)
 		throws IOException
 	{
 		data = Utils.readFile(fileName, encoding);
