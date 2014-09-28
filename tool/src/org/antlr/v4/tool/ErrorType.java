@@ -432,6 +432,7 @@ public enum ErrorType {
 	 *
 	 * @deprecated This warning is no longer applicable with the current syntax for specifying associativity.
 	 */
+	@Deprecated
 	ALL_OPS_NEED_SAME_ASSOC(118, "all operators of alt <arg> of left-recursive rule must have same associativity", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Error 119.
