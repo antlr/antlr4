@@ -201,7 +201,7 @@ public class TestLexerErrors extends BaseTest {
 		String result = execLexer("T.g4", grammar, "TLexer", "x : x", false);
 		String expecting =
 			"[@0,0:0='x',<3>,1:0]\n" +
-			"[@1,2:2=':',<2>,1:2]\n" +
+			"[@1,2:2=':',<1>,1:2]\n" +
 			"[@2,4:4='x',<3>,1:4]\n" +
 			"[@3,5:4='<EOF>',<-1>,1:5]\n";
 		assertEquals(expecting, result);
