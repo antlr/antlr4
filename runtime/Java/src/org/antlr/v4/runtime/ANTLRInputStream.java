@@ -238,6 +238,10 @@ public class ANTLRInputStream implements CharStream {
 
 	@Override
 	public String getSourceName() {
+		if (name == null || name.isEmpty()) {
+			return UNKNOWN_SOURCE_NAME;
+		}
+
 		return name;
 	}
 

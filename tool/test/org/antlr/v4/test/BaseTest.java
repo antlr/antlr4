@@ -1269,7 +1269,7 @@ public abstract class BaseTest {
 
 		@Override
 		public String getSourceName() {
-			return null;
+			return UNKNOWN_SOURCE_NAME;
 		}
 
 		@Override
