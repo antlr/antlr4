@@ -59,7 +59,7 @@ TARGETS	= {"Java":uniformpath(JAVA_TARGET),
 def parsers():
 	antlr3("tool/src/org/antlr/v4/parse", "gen3", package="org.antlr.v4.parse")
 	antlr3("tool/src/org/antlr/v4/codegen", "gen3", package="org.antlr.v4.codegen", args=["-lib",uniformpath("gen3/org/antlr/v4/parse")])
-	antlr4("runtime/Java/src/org/antlr/v4/runtime/tree/xpath", "gen4", package="org.antlr.v4.runtime.tree.xpath")
+	antlr4("runtime/Java/src/org/antlr/v4/runtime/tree/xpath", "gen4", version="4.4", package="org.antlr.v4.runtime.tree.xpath")
 
 def compile():
 	require(parsers)
