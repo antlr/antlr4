@@ -58,4 +58,5 @@ YYYY/MM/DD, github id, Full name, email
 2014/03/18, aphyr, Kyle Kingsbury, aphyr@aphyr.com
 2014/06/07, ericvergnaud, Eric Vergnaud, eric.vergnaud@wanadoo.fr
 2014/07/04, jimidle, Jim Idle, jimi@Idle.ws
+2014/09/04. jeduden, Jan-Eric Duden, jeduden@gmail.com
 2014/09/27, petrbel, Petr Bělohlávek, antlr@petrbel.cz

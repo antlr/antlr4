@@ -146,10 +146,11 @@ public class Antlr4Mojo extends AbstractMojo {
 	 * the generate phase of the plugin. Note that the plugin is smart enough to
 	 * realize that imported grammars should be included but not acted upon
 	 * directly by the ANTLR Tool.
-	 * <p/>
+	 * <p>
 	 * A set of Ant-like inclusion patterns used to select files from the source
 	 * directory for processing. By default, the pattern
 	 * <code>**&#47;*.g4</code> is used to select grammar files.
+	 * </p>
 	 */
     @Parameter
     protected Set<String> includes = new HashSet<String>();
