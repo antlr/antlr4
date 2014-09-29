@@ -36,8 +36,8 @@ import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,13 +52,13 @@ public class ListenerFile extends OutputFile {
 	/**
 	 * The names of all listener contexts.
 	 */
-	public Set<String> listenerNames = new HashSet<String>();
+	public Set<String> listenerNames = new LinkedHashSet<String>();
 	/**
 	 * For listener contexts created for a labeled outer alternative, maps from
 	 * a listener context name to the name of the rule which defines the
 	 * context.
 	 */
-	public Map<String, String> listenerLabelRuleNames = new HashMap<String, String>();
+	public Map<String, String> listenerLabelRuleNames = new LinkedHashMap<String, String>();
 
 	@ModelElement public Action header;
 

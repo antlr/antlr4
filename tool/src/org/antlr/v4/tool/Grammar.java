@@ -72,6 +72,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1229,7 +1230,7 @@ public class Grammar implements AttributeResolver {
 	}
 
 	public Set<String> getStringLiterals() {
-		final Set<String> strings = new HashSet<String>();
+		final Set<String> strings = new LinkedHashSet<String>();
 		GrammarTreeVisitor collector = new GrammarTreeVisitor() {
 			@Override
 			public void stringRef(TerminalAST ref) {
