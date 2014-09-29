@@ -647,7 +647,7 @@ public class TestLexerExec extends BaseTest {
 		grammar.append("lexer grammar L;\n");
 		grammar.append("WS : [ \\t\\r\\n]+ -> skip;\n");
 		for (int i = 0; i < 4000; i++) {
-			grammar.append("KW").append(i).append(" : '").append("KW").append(i).append("';\n");
+			grammar.append("KW").append(i).append(" : 'KW' '").append(i).append("';\n");
 		}
 
 		String input = "KW400";

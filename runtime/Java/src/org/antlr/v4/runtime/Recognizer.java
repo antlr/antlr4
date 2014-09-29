@@ -38,6 +38,7 @@ import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Utils;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -46,8 +47,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	public static final int EOF=-1;
 
-	private static final Map<String[], Map<String, Integer>> tokenTypeMapCache =
-		new WeakHashMap<String[], Map<String, Integer>>();
+	private static final Map<Vocabulary, Map<String, Integer>> tokenTypeMapCache =
+		new WeakHashMap<Vocabulary, Map<String, Integer>>();
 	private static final Map<String[], Map<String, Integer>> ruleIndexMapCache =
 		new WeakHashMap<String[], Map<String, Integer>>();
 
@@ -64,10 +65,25 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	/** Used to print out token names like ID during debugging and
 	 *  error reporting.  The generated parsers implement a method
 	 *  that overrides this to point to their String[] tokenNames.
+	 *
+	 * @deprecated Use {@link #getVocabulary()} instead.
 	 */
+	@Deprecated
 	public abstract String[] getTokenNames();
 
 	public abstract String[] getRuleNames();
+
+	/**
+	 * Get the vocabulary used by the recognizer.
+	 *
+	 * @return A {@link Vocabulary} instance providing information about the
+	 * vocabulary used by the grammar.
+	 */
+	@NotNull
+	@SuppressWarnings("deprecation")
+	public Vocabulary getVocabulary() {
+		return VocabularyImpl.fromTokenNames(getTokenNames());
+	}
 
 	/**
 	 * Get a map from token names to token types.
@@ -76,18 +92,26 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	 */
 	@NotNull
 	public Map<String, Integer> getTokenTypeMap() {
-		String[] tokenNames = getTokenNames();
-		if (tokenNames == null) {
-			throw new UnsupportedOperationException("The current recognizer does not provide a list of token names.");
-		}
-
+		Vocabulary vocabulary = getVocabulary();
 		synchronized (tokenTypeMapCache) {
-			Map<String, Integer> result = tokenTypeMapCache.get(tokenNames);
+			Map<String, Integer> result = tokenTypeMapCache.get(vocabulary);
 			if (result == null) {
-				result = Utils.toMap(tokenNames);
+				result = new HashMap<String, Integer>();
+				for (int i = 0; i < getATN().maxTokenType; i++) {
+					String literalName = vocabulary.getLiteralName(i);
+					if (literalName != null) {
+						result.put(literalName, i);
+					}
+
+					String symbolicName = vocabulary.getSymbolicName(i);
+					if (symbolicName != null) {
+						result.put(symbolicName, i);
+					}
+				}
+
 				result.put("EOF", Token.EOF);
 				result = Collections.unmodifiableMap(result);
-				tokenTypeMapCache.put(tokenNames, result);
+				tokenTypeMapCache.put(vocabulary, result);
 			}
 
 			return result;

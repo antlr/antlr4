@@ -31,7 +31,6 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.BailErrorStrategy;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.FailedPredicateException;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.NoViableAltException;
@@ -40,6 +39,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
@@ -423,7 +424,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 
 			int alt = execATN(dfa, s0, input, index, outerContext);
-			if ( debug ) System.out.println("DFA after predictATN: "+ dfa.toString(parser.getTokenNames()));
+			if ( debug ) System.out.println("DFA after predictATN: "+ dfa.toString(parser.getVocabulary()));
 			return alt;
 		}
 		finally {
@@ -1852,18 +1853,17 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	@NotNull
 	public String getTokenName(int t) {
-		if ( t==Token.EOF ) return "EOF";
-		if ( parser!=null && parser.getTokenNames()!=null ) {
-			String[] tokensNames = parser.getTokenNames();
-			if ( t>=tokensNames.length ) {
-				System.err.println(t+" ttype out of range: "+ Arrays.toString(tokensNames));
-				System.err.println(((CommonTokenStream)parser.getInputStream()).getTokens());
-			}
-			else {
-				return tokensNames[t]+"<"+t+">";
-			}
+		if (t == Token.EOF) {
+			return "EOF";
 		}
-		return String.valueOf(t);
+
+		Vocabulary vocabulary = parser != null ? parser.getVocabulary() : VocabularyImpl.EMPTY_VOCABULARY;
+		String displayName = vocabulary.getDisplayName(t);
+		if (displayName.equals(Integer.toString(t))) {
+			return displayName;
+		}
+
+		return displayName + "<" + t + ">";
 	}
 
 	public String getLookaheadName(TokenStream input) {
@@ -1966,7 +1966,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 
 		if ( debug ) {
-			System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getTokenNames():null));
+			System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getVocabulary():VocabularyImpl.EMPTY_VOCABULARY));
 		}
 
 		return to;

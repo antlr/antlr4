@@ -29,11 +29,13 @@
  */
 package org.antlr.v4.runtime.dfa;
 
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.Parser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -198,11 +200,24 @@ public class DFA {
 	}
 
 	@Override
-	public String toString() { return toString(null); }
+	public String toString() { return toString(VocabularyImpl.EMPTY_VOCABULARY); }
 
+	/**
+	 * @deprecated Use {@link #toString(Vocabulary)} instead.
+	 */
+	@Deprecated
 	public String toString(@Nullable String[] tokenNames) {
 		if ( s0==null ) return "";
 		DFASerializer serializer = new DFASerializer(this,tokenNames);
+		return serializer.toString();
+	}
+
+	public String toString(@NotNull Vocabulary vocabulary) {
+		if (s0 == null) {
+			return "";
+		}
+
+		DFASerializer serializer = new DFASerializer(this, vocabulary);
 		return serializer.toString();
 	}
 
