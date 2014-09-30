@@ -34,19 +34,12 @@ using Antlr4.Runtime.Sharpen;
 namespace Antlr4.Runtime.Dfa
 {
     /// <author>Sam Harwell</author>
-    public class SingletonEdgeMap<T> : AbstractEdgeMap<T>
+    public sealed class SingletonEdgeMap<T> : AbstractEdgeMap<T>
         where T : class
     {
         private readonly int key;
 
         private readonly T value;
-
-        public SingletonEdgeMap(int minIndex, int maxIndex)
-            : base(minIndex, maxIndex)
-        {
-            this.key = 0;
-            this.value = null;
-        }
 
         public SingletonEdgeMap(int minIndex, int maxIndex, int key, T value)
             : base(minIndex, maxIndex)
@@ -63,7 +56,7 @@ namespace Antlr4.Runtime.Dfa
             }
         }
 
-        public virtual int Key
+        public int Key
         {
             get
             {
@@ -71,7 +64,7 @@ namespace Antlr4.Runtime.Dfa
             }
         }
 
-        public virtual T Value
+        public T Value
         {
             get
             {
@@ -142,7 +135,7 @@ namespace Antlr4.Runtime.Dfa
         {
             if (key == this.key && this.value != null)
             {
-                return new Antlr4.Runtime.Dfa.SingletonEdgeMap<T>(minIndex, maxIndex);
+                return new EmptyEdgeMap<T>(minIndex, maxIndex);
             }
             return this;
         }
@@ -151,7 +144,7 @@ namespace Antlr4.Runtime.Dfa
         {
             if (this.value != null)
             {
-                return new Antlr4.Runtime.Dfa.SingletonEdgeMap<T>(minIndex, maxIndex);
+                return new EmptyEdgeMap<T>(minIndex, maxIndex);
             }
             return this;
         }

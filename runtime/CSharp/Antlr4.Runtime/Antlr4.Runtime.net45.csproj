@@ -73,6 +73,7 @@
     <Compile Include="Atn\BasicState.cs" />
     <Compile Include="Atn\BlockEndState.cs" />
     <Compile Include="Atn\BlockStartState.cs" />
+    <Compile Include="Atn\ConflictInfo.cs" />
     <Compile Include="Atn\ContextSensitivityInfo.cs" />
     <Compile Include="Atn\DecisionEventInfo.cs" />
     <Compile Include="Atn\DecisionInfo.cs" />
@@ -135,10 +136,12 @@
     <Compile Include="DefaultErrorStrategy.cs" />
     <Compile Include="Dependents.cs" />
     <Compile Include="Dfa\AbstractEdgeMap`1.cs" />
+    <Compile Include="Dfa\AcceptStateInfo.cs" />
     <Compile Include="Dfa\ArrayEdgeMap`1.cs" />
     <Compile Include="Dfa\DFA.cs" />
     <Compile Include="Dfa\DFASerializer.cs" />
     <Compile Include="Dfa\DFAState.cs" />
+    <Compile Include="Dfa\EmptyEdgeMap`1.cs" />
     <Compile Include="Dfa\IEdgeMap`1.cs" />
     <Compile Include="Dfa\LexerDFASerializer.cs" />
     <Compile Include="Dfa\SingletonEdgeMap`1.cs" />
@@ -157,6 +160,7 @@
     <Compile Include="ITokenFactory.cs" />
     <Compile Include="ITokenSource.cs" />
     <Compile Include="ITokenStream.cs" />
+    <Compile Include="IVocabulary.cs" />
     <Compile Include="IWritableToken.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="LexerInterpreter.cs" />
@@ -236,6 +240,7 @@
     <Compile Include="Tree\Xpath\XPathWildcardElement.cs" />
     <Compile Include="UnbufferedCharStream.cs" />
     <Compile Include="UnbufferedTokenStream.cs" />
+    <Compile Include="Vocabulary.cs" />
     <None Include="packages.Antlr4.Runtime.net45.config" />
     <Antlr4 Include="Tree\Xpath\XPathLexer.g4">
       <Generator>MSBuild:Compile</Generator>

@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
+using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
@@ -59,19 +60,34 @@ namespace Antlr4.Runtime
 
         protected internal readonly BitSet pushRecursionContextStates;
 
+        [Obsolete]
         protected internal readonly string[] tokenNames;
 
         protected internal readonly string[] ruleNames;
 
+        [NotNull]
+        private readonly IVocabulary vocabulary;
+
         protected internal readonly Stack<Tuple<ParserRuleContext, int>> _parentContextStack = new Stack<Tuple<ParserRuleContext, int>>();
 
+        [System.ObsoleteAttribute(@"Use ParserInterpreter(string, IVocabulary, System.Collections.Generic.ICollection{E}, Antlr4.Runtime.Atn.ATN, ITokenStream) instead.")]
         public ParserInterpreter(string grammarFileName, IEnumerable<string> tokenNames, IEnumerable<string> ruleNames, ATN atn, ITokenStream input)
+            : this(grammarFileName, Antlr4.Runtime.Vocabulary.FromTokenNames(Sharpen.Collections.ToArray(tokenNames, new string[tokenNames.Count])), ruleNames, atn, input)
+        {
+        }
+
+        public ParserInterpreter(string grammarFileName, IVocabulary vocabulary, ICollection<string> ruleNames, ATN atn, ITokenStream input)
             : base(input)
         {
             this.grammarFileName = grammarFileName;
             this.atn = atn;
-            this.tokenNames = tokenNames.ToArray();
+            this.tokenNames = new string[atn.maxTokenType];
+            for (int i = 0; i < tokenNames.Length; i++)
+            {
+                tokenNames[i] = vocabulary.GetDisplayName(i);
+            }
             this.ruleNames = ruleNames.ToArray();
+            this.vocabulary = vocabulary;
             // identify the ATN states where pushNewRecursionContext must be called
             this.pushRecursionContextStates = new BitSet(atn.states.Count);
             foreach (ATNState state in atn.states)
@@ -102,6 +118,14 @@ namespace Antlr4.Runtime
             get
             {
                 return tokenNames;
+            }
+        }
+
+        public override IVocabulary Vocabulary
+        {
+            get
+            {
+                return vocabulary;
             }
         }
 

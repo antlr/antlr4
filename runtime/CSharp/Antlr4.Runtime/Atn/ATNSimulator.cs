@@ -55,7 +55,7 @@ namespace Antlr4.Runtime.Atn
         /// <summary>Must distinguish between missing edge and edge we know leads nowhere</summary>
         [NotNull]
         public static readonly DFAState Error =
-            new DFAState(new ATNConfigSet(), 0, 0)
+            new DFAState(new EmptyEdgeMap<DFAState>(0, -1), new EmptyEdgeMap<DFAState>(0, -1), new ATNConfigSet())
             {
                 stateNumber = int.MaxValue
             };

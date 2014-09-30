@@ -84,7 +84,7 @@ namespace Antlr4.Runtime.Atn
 
         private int uniqueAlt;
 
-        private BitSet conflictingAlts;
+        private ConflictInfo conflictInfo;
 
         private bool hasSemanticContext;
 
@@ -147,7 +147,7 @@ namespace Antlr4.Runtime.Atn
             if (@readonly || !set.IsReadOnly)
             {
                 this.uniqueAlt = set.uniqueAlt;
-                this.conflictingAlts = set.conflictingAlts;
+                this.conflictInfo = set.conflictInfo;
             }
         }
 
@@ -165,9 +165,9 @@ namespace Antlr4.Runtime.Atn
             get
             {
                 // if (!readonly && set.isReadOnly()) -> addAll is called from clone()
-                if (conflictingAlts != null)
+                if (conflictInfo != null)
                 {
-                    return (BitSet)conflictingAlts.Clone();
+                    return (BitSet)conflictInfo.ConflictedAlts.Clone();
                 }
                 BitSet alts = new BitSet();
                 foreach (ATNConfig config in this)
@@ -184,28 +184,6 @@ namespace Antlr4.Runtime.Atn
             {
                 return mergedConfigs == null;
             }
-        }
-
-        public void StripHiddenConfigs()
-        {
-            EnsureWritable();
-
-            List<long> toRemove = new List<long>();
-            foreach (var pair in mergedConfigs)
-            {
-                if (pair.Value.IsHidden)
-                {
-                    toRemove.Add(pair.Key);
-                }
-            }
-
-            foreach (long key in toRemove)
-            {
-                mergedConfigs.Remove(key);
-            }
-
-            unmerged.RemoveAll(config => config.IsHidden);
-            configs.RemoveAll(config => config.IsHidden);
         }
 
         public virtual bool IsOutermostConfigSet
@@ -322,7 +300,6 @@ namespace Antlr4.Runtime.Atn
         {
             EnsureWritable();
             System.Diagnostics.Debug.Assert(!outermostConfigSet || !e.ReachesIntoOuterContext);
-            System.Diagnostics.Debug.Assert(!e.IsHidden);
             if (contextCache == null)
             {
                 contextCache = PredictionContextCache.Uncached;
@@ -334,6 +311,10 @@ namespace Antlr4.Runtime.Atn
             if (mergedConfig != null && CanMerge(e, key, mergedConfig))
             {
                 mergedConfig.OuterContextDepth = Math.Max(mergedConfig.OuterContextDepth, e.OuterContextDepth);
+                if (e.PrecedenceFilterSuppressed)
+                {
+                    mergedConfig.PrecedenceFilterSuppressed = true;
+                }
                 PredictionContext joined = PredictionContext.Join(mergedConfig.Context, e.Context, contextCache);
                 UpdatePropertiesForMergedConfig(e);
                 if (mergedConfig.Context == joined)
@@ -349,6 +330,10 @@ namespace Antlr4.Runtime.Atn
                 if (CanMerge(e, key, unmergedConfig))
                 {
                     unmergedConfig.OuterContextDepth = Math.Max(unmergedConfig.OuterContextDepth, e.OuterContextDepth);
+                    if (e.PrecedenceFilterSuppressed)
+                    {
+                        unmergedConfig.PrecedenceFilterSuppressed = true;
+                    }
                     PredictionContext joined = PredictionContext.Join(unmergedConfig.Context, e.Context, contextCache);
                     UpdatePropertiesForMergedConfig(e);
                     if (unmergedConfig.Context == joined)
@@ -477,7 +462,7 @@ namespace Antlr4.Runtime.Atn
             dipsIntoOuterContext = false;
             hasSemanticContext = false;
             uniqueAlt = ATN.InvalidAltNumber;
-            conflictingAlts = null;
+            conflictInfo = null;
         }
 
         public override bool Equals(object obj)
@@ -491,7 +476,7 @@ namespace Antlr4.Runtime.Atn
                 return false;
             }
             Antlr4.Runtime.Atn.ATNConfigSet other = (Antlr4.Runtime.Atn.ATNConfigSet)obj;
-            return this.outermostConfigSet == other.outermostConfigSet && Utils.Equals(conflictingAlts, other.conflictingAlts) && configs.SequenceEqual(other.configs);
+            return this.outermostConfigSet == other.outermostConfigSet && Utils.Equals(conflictInfo, other.conflictInfo) && configs.SequenceEqual(other.configs);
         }
 
         public override int GetHashCode()
@@ -519,7 +504,7 @@ namespace Antlr4.Runtime.Atn
         {
             StringBuilder buf = new StringBuilder();
             List<ATNConfig> sortedConfigs = new List<ATNConfig>(configs);
-            sortedConfigs.Sort(new _IComparer_495());
+            sortedConfigs.Sort(new _IComparer_475());
             buf.Append("[");
             for (int i = 0; i < sortedConfigs.Count; i++)
             {
@@ -538,9 +523,13 @@ namespace Antlr4.Runtime.Atn
             {
                 buf.Append(",uniqueAlt=").Append(uniqueAlt);
             }
-            if (conflictingAlts != null)
+            if (conflictInfo != null)
             {
-                buf.Append(",conflictingAlts=").Append(conflictingAlts);
+                buf.Append(",conflictingAlts=").Append(conflictInfo.ConflictedAlts);
+                if (!conflictInfo.IsExact)
+                {
+                    buf.Append("*");
+                }
             }
             if (dipsIntoOuterContext)
             {
@@ -549,9 +538,9 @@ namespace Antlr4.Runtime.Atn
             return buf.ToString();
         }
 
-        private sealed class _IComparer_495 : IComparer<ATNConfig>
+        private sealed class _IComparer_475 : IComparer<ATNConfig>
         {
-            public _IComparer_495()
+            public _IComparer_475()
             {
             }
 
@@ -603,17 +592,41 @@ namespace Antlr4.Runtime.Atn
             hasSemanticContext = true;
         }
 
+        public virtual ConflictInfo ConflictInformation
+        {
+            get
+            {
+                return conflictInfo;
+            }
+            set
+            {
+                ConflictInfo conflictInfo = value;
+                EnsureWritable();
+                this.conflictInfo = conflictInfo;
+            }
+        }
+
         public virtual BitSet ConflictingAlts
         {
             get
             {
-                return conflictingAlts;
+                if (conflictInfo == null)
+                {
+                    return null;
+                }
+                return conflictInfo.ConflictedAlts;
             }
-            set
+        }
+
+        public virtual bool IsExactConflict
+        {
+            get
             {
-                BitSet conflictingAlts = value;
-                EnsureWritable();
-                this.conflictingAlts = conflictingAlts;
+                if (conflictInfo == null)
+                {
+                    return false;
+                }
+                return conflictInfo.IsExact;
             }
         }
 

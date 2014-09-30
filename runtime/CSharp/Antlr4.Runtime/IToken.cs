@@ -182,5 +182,25 @@ namespace Antlr4.Runtime
         /// by parser.
         /// </remarks>
         public const int HiddenChannel = 1;
+
+        /// <summary>
+        /// This is the minimum constant value which can be assigned to a
+        /// user-defined token channel.
+        /// </summary>
+        /// <remarks>
+        /// This is the minimum constant value which can be assigned to a
+        /// user-defined token channel.
+        /// <p>
+        /// The non-negative numbers less than
+        /// <see cref="MinUserChannelValue"/>
+        /// are
+        /// assigned to the predefined channels
+        /// <see cref="DefaultChannel"/>
+        /// and
+        /// <see cref="HiddenChannel"/>
+        /// .</p>
+        /// </remarks>
+        /// <seealso cref="Channel()"/>
+        public const int MinUserChannelValue = 2;
     }
 }

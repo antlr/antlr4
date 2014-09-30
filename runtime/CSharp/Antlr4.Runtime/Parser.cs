@@ -1134,7 +1134,7 @@ namespace Antlr4.Runtime
             for (int d = 0; d < _interp.atn.decisionToDFA.Length; d++)
             {
                 DFA dfa = _interp.atn.decisionToDFA[d];
-                s.Add(dfa.ToString(TokenNames, RuleNames));
+                s.Add(dfa.ToString(Vocabulary, RuleNames));
             }
             return s;
         }
@@ -1155,7 +1155,7 @@ namespace Antlr4.Runtime
                         System.Console.Out.WriteLine();
                     }
                     System.Console.Out.WriteLine("Decision " + dfa.decision + ":");
-                    System.Console.Out.Write(dfa.ToString(TokenNames, RuleNames));
+                    System.Console.Out.Write(dfa.ToString(Vocabulary, RuleNames));
                     seenOne = true;
                 }
             }

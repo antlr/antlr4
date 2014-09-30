@@ -41,7 +41,7 @@ namespace Antlr4.Runtime
     {
         public const int Eof = -1;
 
-        private static readonly IDictionary<string[], IDictionary<string, int>> tokenTypeMapCache = new Dictionary<string[], IDictionary<string, int>>();
+        private static readonly IDictionary<IVocabulary, IDictionary<string, int>> tokenTypeMapCache = new ConditionalWeakTable<IVocabulary, IDictionary<string, int>>();
 
         private static readonly IDictionary<string[], IDictionary<string, int>> ruleIndexMapCache = new Dictionary<string[], IDictionary<string, int>>();
 
@@ -66,6 +66,7 @@ namespace Antlr4.Runtime
         /// error reporting.  The generated parsers implement a method
         /// that overrides this to point to their String[] tokenNames.
         /// </remarks>
+        [System.ObsoleteAttribute(@"Use Recognizer{Symbol, ATNInterpreter}.Vocabulary() instead.")]
         public abstract string[] TokenNames
         {
             get;
@@ -74,6 +75,22 @@ namespace Antlr4.Runtime
         public abstract string[] RuleNames
         {
             get;
+        }
+
+        /// <summary>Get the vocabulary used by the recognizer.</summary>
+        /// <remarks>Get the vocabulary used by the recognizer.</remarks>
+        /// <returns>
+        /// A
+        /// <see cref="IVocabulary"/>
+        /// instance providing information about the
+        /// vocabulary used by the grammar.
+        /// </returns>
+        public virtual IVocabulary Vocabulary
+        {
+            get
+            {
+                return Antlr4.Runtime.Vocabulary.FromTokenNames(TokenNames);
+            }
         }
 
         /// <summary>Get a map from token names to token types.</summary>
@@ -86,19 +103,28 @@ namespace Antlr4.Runtime
         {
             get
             {
-                string[] tokenNames = TokenNames;
-                if (tokenNames == null)
-                {
-                    throw new NotSupportedException("The current recognizer does not provide a list of token names.");
-                }
+                IVocabulary vocabulary = Vocabulary;
                 lock (tokenTypeMapCache)
                 {
-                    IDictionary<string, int> result = tokenTypeMapCache.Get(tokenNames);
+                    IDictionary<string, int> result = tokenTypeMapCache.Get(vocabulary);
                     if (result == null)
                     {
-                        result = Utils.ToMap(tokenNames);
+                        result = new Dictionary<string, int>();
+                        for (int i = 0; i < Atn.maxTokenType; i++)
+                        {
+                            string literalName = vocabulary.GetLiteralName(i);
+                            if (literalName != null)
+                            {
+                                result.Put(literalName, i);
+                            }
+                            string symbolicName = vocabulary.GetSymbolicName(i);
+                            if (symbolicName != null)
+                            {
+                                result.Put(symbolicName, i);
+                            }
+                        }
                         result["EOF"] = TokenConstants.Eof;
-                        tokenTypeMapCache.Put(tokenNames, result);
+                        tokenTypeMapCache.Put(vocabulary, result);
                     }
                     return result;
                 }

@@ -27,6 +27,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime;
@@ -42,10 +43,10 @@ namespace Antlr4.Runtime.Dfa
     public class DFASerializer
     {
         [NotNull]
-        internal readonly DFA dfa;
+        private readonly DFA dfa;
 
-        [Nullable]
-        internal readonly string[] tokenNames;
+        [NotNull]
+        private readonly IVocabulary vocabulary;
 
         [Nullable]
         internal readonly string[] ruleNames;
@@ -53,20 +54,32 @@ namespace Antlr4.Runtime.Dfa
         [Nullable]
         internal readonly ATN atn;
 
+        [System.ObsoleteAttribute(@"Use DFASerializer(DFA, Antlr4.Runtime.IVocabulary) instead.")]
         public DFASerializer(DFA dfa, string[] tokenNames)
-            : this(dfa, tokenNames, null, null)
+            : this(dfa, Vocabulary.FromTokenNames(tokenNames), null, null)
+        {
+        }
+
+        public DFASerializer(DFA dfa, IVocabulary vocabulary)
+            : this(dfa, vocabulary, null, null)
         {
         }
 
         public DFASerializer(DFA dfa, IRecognizer parser)
-            : this(dfa, parser != null ? parser.TokenNames : null, parser != null ? parser.RuleNames : null, parser != null ? parser.Atn : null)
+            : this(dfa, parser != null ? parser.Vocabulary : Vocabulary.EmptyVocabulary, parser != null ? parser.RuleNames : null, parser != null ? parser.Atn : null)
         {
         }
 
+        [System.ObsoleteAttribute(@"Use DFASerializer(DFA, Antlr4.Runtime.IVocabulary, string[], Antlr4.Runtime.Atn.ATN) instead.")]
         public DFASerializer(DFA dfa, string[] tokenNames, string[] ruleNames, ATN atn)
+            : this(dfa, Vocabulary.FromTokenNames(tokenNames), ruleNames, atn)
+        {
+        }
+
+        public DFASerializer(DFA dfa, IVocabulary vocabulary, string[] ruleNames, ATN atn)
         {
             this.dfa = dfa;
-            this.tokenNames = tokenNames;
+            this.vocabulary = vocabulary;
             this.ruleNames = ruleNames;
             this.atn = atn;
         }
@@ -81,7 +94,7 @@ namespace Antlr4.Runtime.Dfa
             if (dfa.states != null)
             {
                 List<DFAState> states = new List<DFAState>(dfa.states.Values);
-                states.Sort(new _IComparer_85());
+                states.Sort(new _IComparer_103());
                 foreach (DFAState s in states)
                 {
                     IEnumerable<KeyValuePair<int, DFAState>> edges = s.EdgeMap;
@@ -130,9 +143,9 @@ namespace Antlr4.Runtime.Dfa
             return output;
         }
 
-        private sealed class _IComparer_85 : IComparer<DFAState>
+        private sealed class _IComparer_103 : IComparer<DFAState>
         {
-            public _IComparer_85()
+            public _IComparer_103()
             {
             }
 
@@ -169,20 +182,7 @@ namespace Antlr4.Runtime.Dfa
 
         protected internal virtual string GetEdgeLabel(int i)
         {
-            string label;
-            if (i == -1)
-            {
-                return "EOF";
-            }
-            if (tokenNames != null)
-            {
-                label = tokenNames[i];
-            }
-            else
-            {
-                label = i.ToString();
-            }
-            return label;
+            return vocabulary.GetDisplayName(i);
         }
 
         internal virtual string GetStateString(DFAState s)
@@ -193,7 +193,7 @@ namespace Antlr4.Runtime.Dfa
             }
             int n = s.stateNumber;
             string stateStr = "s" + n;
-            if (s.isAcceptState)
+            if (s.IsAcceptState)
             {
                 if (s.predicates != null)
                 {
@@ -201,7 +201,7 @@ namespace Antlr4.Runtime.Dfa
                 }
                 else
                 {
-                    stateStr = ":s" + n + "=>" + s.prediction;
+                    stateStr = ":s" + n + "=>" + s.Prediction;
                 }
             }
             if (s.IsContextSensitive)

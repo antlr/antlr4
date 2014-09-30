@@ -48,10 +48,29 @@ namespace Antlr4.Runtime.Atn
     /// </remarks>
     public class ATNConfig
     {
+        /// <summary>
+        /// This field stores the bit mask for implementing the
+        /// <see cref="PrecedenceFilterSuppressed()"/>
+        /// property as a bit within the
+        /// existing
+        /// <see cref="altAndOuterContextDepth"/>
+        /// field.
+        /// </summary>
+        private const int SuppressPrecedenceFilter = unchecked((int)(0x80000000));
+
         /// <summary>The ATN state associated with this configuration</summary>
         [NotNull]
         private readonly ATNState state;
 
+        /// <summary>This is a bit-field currently containing the following values.</summary>
+        /// <remarks>
+        /// This is a bit-field currently containing the following values.
+        /// <ul>
+        /// <li>0x00FFFFFF: Alternative</li>
+        /// <li>0x7F000000: Outer context depth</li>
+        /// <li>0x80000000: Suppress precedence filter</li>
+        /// </ul>
+        /// </remarks>
         private int altAndOuterContextDepth;
 
         /// <summary>
@@ -70,14 +89,14 @@ namespace Antlr4.Runtime.Atn
         {
             System.Diagnostics.Debug.Assert((alt & unchecked((int)(0xFFFFFF))) == alt);
             this.state = state;
-            this.altAndOuterContextDepth = alt & unchecked((int)(0x7FFFFFFF));
+            this.altAndOuterContextDepth = alt;
             this.context = context;
         }
 
         protected internal ATNConfig(Antlr4.Runtime.Atn.ATNConfig c, ATNState state, PredictionContext context)
         {
             this.state = state;
-            this.altAndOuterContextDepth = c.altAndOuterContextDepth & unchecked((int)(0x7FFFFFFF));
+            this.altAndOuterContextDepth = c.altAndOuterContextDepth;
             this.context = context;
         }
 
@@ -137,25 +156,6 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        public virtual bool IsHidden
-        {
-            get
-            {
-                return altAndOuterContextDepth < 0;
-            }
-            set
-            {
-                if (value)
-                {
-                    altAndOuterContextDepth |= unchecked((int)(0x80000000));
-                }
-                else
-                {
-                    altAndOuterContextDepth &= ~unchecked((int)(0x80000000));
-                }
-            }
-        }
-
         public virtual PredictionContext Context
         {
             get
@@ -187,9 +187,10 @@ namespace Antlr4.Runtime.Atn
         /// no way to do this efficiently, we simply cannot evaluate
         /// dependent predicates unless we are in the rule that initially
         /// invokes the ATN simulator.
-        /// closure() tracks the depth of how far we dip into the
-        /// outer context: depth &gt; 0.  Note that it may not be totally
-        /// accurate depth since I don't ever decrement. TODO: make it a boolean then
+        /// <p>
+        /// closure() tracks the depth of how far we dip into the outer context:
+        /// depth &gt; 0.  Note that it may not be totally accurate depth since I
+        /// don't ever decrement. TODO: make it a boolean then</p>
         /// </remarks>
         public virtual int OuterContextDepth
         {
@@ -346,6 +347,25 @@ namespace Antlr4.Runtime.Atn
             return false;
         }
 
+        public bool PrecedenceFilterSuppressed
+        {
+            get
+            {
+                return (altAndOuterContextDepth & SuppressPrecedenceFilter) != 0;
+            }
+            set
+            {
+                if (value)
+                {
+                    this.altAndOuterContextDepth |= SuppressPrecedenceFilter;
+                }
+                else
+                {
+                    this.altAndOuterContextDepth &= ~SuppressPrecedenceFilter;
+                }
+            }
+        }
+
         /// <summary>
         /// An ATN configuration is equal to another if both have
         /// the same state, they predict the same alternative, and
@@ -378,7 +398,7 @@ namespace Antlr4.Runtime.Atn
                     return false;
                 }
             }
-            return this.State.stateNumber == other.State.stateNumber && this.Alt == other.Alt && this.ReachesIntoOuterContext == other.ReachesIntoOuterContext && this.Context.Equals(other.Context) && this.SemanticContext.Equals(other.SemanticContext) && this.PassedThroughNonGreedyDecision == other.PassedThroughNonGreedyDecision && EqualityComparer<LexerActionExecutor>.Default.Equals(this.ActionExecutor, other.ActionExecutor);
+            return this.State.stateNumber == other.State.stateNumber && this.Alt == other.Alt && this.ReachesIntoOuterContext == other.ReachesIntoOuterContext && this.Context.Equals(other.Context) && this.SemanticContext.Equals(other.SemanticContext) && this.PrecedenceFilterSuppressed == other.PrecedenceFilterSuppressed && this.PassedThroughNonGreedyDecision == other.PassedThroughNonGreedyDecision && EqualityComparer<LexerActionExecutor>.Default.Equals(this.ActionExecutor, other.ActionExecutor);
         }
 
         public override int GetHashCode()

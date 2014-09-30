@@ -326,7 +326,7 @@ namespace Antlr4.Runtime.Tree.Pattern
             IList<IToken> tokenList = Tokenize(pattern);
             ListTokenSource tokenSrc = new ListTokenSource(tokenList);
             CommonTokenStream tokens = new CommonTokenStream(tokenSrc);
-            ParserInterpreter parserInterp = new ParserInterpreter(parser.GrammarFileName, Arrays.AsList(parser.TokenNames), Arrays.AsList(parser.RuleNames), parser.GetATNWithBypassAlts(), tokens);
+            ParserInterpreter parserInterp = new ParserInterpreter(parser.GrammarFileName, parser.Vocabulary, Arrays.AsList(parser.RuleNames), parser.GetATNWithBypassAlts(), tokens);
             IParseTree tree = null;
             try
             {
