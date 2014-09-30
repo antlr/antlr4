@@ -289,7 +289,7 @@ namespace Antlr4.Build.Tasks
                         framework = "v4.5";
 
                     string language;
-                    if (TargetLanguage.Equals("CSharp"))
+                    if (TargetLanguage.Equals("CSharp", StringComparison.OrdinalIgnoreCase))
                         language = TargetLanguage + '_' + framework.Replace('.', '_');
                     else
                         language = TargetLanguage;
