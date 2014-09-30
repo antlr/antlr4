@@ -229,7 +229,11 @@ namespace Antlr4.Runtime.Dfa
             edges = edges.Put(symbol, target);
         }
 
+#if NET45PLUS
+        public virtual IReadOnlyDictionary<int, DFAState> EdgeMap
+#else
         public virtual IDictionary<int, DFAState> EdgeMap
+#endif
         {
             get
             {

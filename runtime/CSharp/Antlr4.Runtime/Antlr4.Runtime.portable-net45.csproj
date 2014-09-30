@@ -58,6 +58,10 @@
     <Compile Include="Atn\ATNConfigSet.cs" />
     <Compile Include="Atn\ATNDeserializationOptions.cs" />
     <Compile Include="Atn\ATNDeserializer.cs" />
+    <Compile Include="Atn\ConflictInfo.cs" />
+    <Compile Include="Dfa\AcceptStateInfo.cs" />
+    <Compile Include="Dfa\EmptyEdgeMap`1.cs" />
+    <Compile Include="Vocabulary.cs" />
     <None Include="Atn\ATNSerializer.cs" />
     <Compile Include="Atn\ATNSimulator.cs" />
     <Compile Include="Atn\ATNState.cs" />
@@ -151,6 +155,7 @@
     <Compile Include="ITokenFactory.cs" />
     <Compile Include="ITokenSource.cs" />
     <Compile Include="ITokenStream.cs" />
+    <Compile Include="IVocabulary.cs" />
     <Compile Include="IWritableToken.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="LexerInterpreter.cs" />

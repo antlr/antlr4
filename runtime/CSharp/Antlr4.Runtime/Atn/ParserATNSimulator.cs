@@ -2301,7 +2301,7 @@ namespace Antlr4.Runtime.Atn
             }
             IVocabulary vocabulary = parser != null ? parser.Vocabulary : Vocabulary.EmptyVocabulary;
             string displayName = vocabulary.GetDisplayName(t);
-            if (displayName.Equals(Antlr4.Runtime.Sharpen.Extensions.ToString(t)))
+            if (displayName.Equals(t.ToString(), StringComparison.Ordinal))
             {
                 return displayName;
             }

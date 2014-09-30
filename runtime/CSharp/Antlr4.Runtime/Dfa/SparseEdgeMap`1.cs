@@ -68,7 +68,7 @@ namespace Antlr4.Runtime.Dfa
                 }
                 keys = Arrays.CopyOf(map.keys, maxSparseSize);
                 values = new List<T>(maxSparseSize);
-                Sharpen.Collections.AddAll(values, map.values);
+                values.AddRange(map.Values);
             }
         }
 

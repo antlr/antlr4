@@ -32,6 +32,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Sharpen;
+using Interlocked = System.Threading.Interlocked;
+
+#if NET45PLUS
+using Volatile = System.Threading.Volatile;
+#elif !PORTABLE && !COMPACT
+using Thread = System.Threading.Thread;
+#endif
 
 namespace Antlr4.Runtime.Dfa
 {
@@ -39,22 +46,27 @@ namespace Antlr4.Runtime.Dfa
     public sealed class ArrayEdgeMap<T> : AbstractEdgeMap<T>
         where T : class
     {
-        private readonly AtomicReferenceArray<T> arrayData;
+        private readonly T[] arrayData;
 
-        private readonly AtomicInteger size;
+        private int size;
 
         public ArrayEdgeMap(int minIndex, int maxIndex)
             : base(minIndex, maxIndex)
         {
-            arrayData = new AtomicReferenceArray<T>(maxIndex - minIndex + 1);
-            size = new AtomicInteger();
+            arrayData = new T[maxIndex - minIndex + 1];
         }
 
         public override int Count
         {
             get
             {
-                return size.Get();
+#if NET45PLUS
+                return Volatile.Read(ref size);
+#elif !PORTABLE && !COMPACT
+                return Thread.VolatileRead(ref size);
+#else
+                return Interlocked.CompareExchange(ref size, 0, 0);
+#endif
             }
         }
 
@@ -79,7 +91,12 @@ namespace Antlr4.Runtime.Dfa
                 {
                     return null;
                 }
-                return arrayData.Get(key - minIndex);
+
+#if NET45PLUS
+                return Volatile.Read(ref arrayData[key - minIndex]);
+#else
+                return Interlocked.CompareExchange(ref arrayData[key - minIndex], null, null);
+#endif
             }
         }
 
@@ -87,16 +104,16 @@ namespace Antlr4.Runtime.Dfa
         {
             if (key >= minIndex && key <= maxIndex)
             {
-                T existing = arrayData.GetAndSet(key - minIndex, value);
+                T existing = Interlocked.Exchange(ref arrayData[key - minIndex], value);
                 if (existing == null && value != null)
                 {
-                    size.IncrementAndGet();
+                    Interlocked.Increment(ref size);
                 }
                 else
                 {
                     if (existing != null && value == null)
                     {
-                        size.DecrementAndGet();
+                        Interlocked.Decrement(ref size);
                     }
                 }
             }
@@ -182,14 +199,14 @@ namespace Antlr4.Runtime.Dfa
 #else
             IDictionary<int, T> result = new SortedDictionary<int, T>();
 #endif
-            for (int i = 0; i < arrayData.Length(); i++)
+            for (int i = 0; i < arrayData.Length; i++)
             {
-                T element = arrayData.Get(i);
+                T element = arrayData[i];
                 if (element == null)
                 {
                     continue;
                 }
-                result.Put(i + minIndex, element);
+                result[i + minIndex] = element;
             }
 #if NET45PLUS
             return new ReadOnlyDictionary<int, T>(result);

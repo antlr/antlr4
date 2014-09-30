@@ -149,7 +149,6 @@
         private static readonly bool TRY_LOCAL_CONTEXT_FIRST = true;
         private static readonly bool OPTIMIZE_LL1 = true;
         private static readonly bool OPTIMIZE_UNIQUE_CLOSURE = true;
-        private static readonly bool OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS = false;
         private static readonly bool OPTIMIZE_TAIL_CALLS = true;
         private static readonly bool TAIL_CALL_PRESERVES_SLL = true;
         private static readonly bool TREAT_SLLK1_CONFLICT_AS_AMBIGUITY = false;
@@ -520,7 +519,7 @@
                                 Array.Resize(ref contextsInDFAState, state.configs.Count + 1);
                             }
 
-                            if (state.isAcceptState)
+                            if (state.IsAcceptState)
                             {
                                 bool hasGlobal = false;
                                 foreach (ATNConfig config in state.configs)
@@ -848,7 +847,6 @@
                     parser.Interpreter.always_try_local_context = TRY_LOCAL_CONTEXT_FIRST || TWO_STAGE_PARSING;
                     parser.Interpreter.optimize_ll1 = OPTIMIZE_LL1;
                     parser.Interpreter.optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
-                    parser.Interpreter.optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
                     parser.Interpreter.optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
                     parser.Interpreter.tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
                     parser.Interpreter.treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
@@ -916,7 +914,6 @@
                         parser.Interpreter.always_try_local_context = TRY_LOCAL_CONTEXT_FIRST;
                         parser.Interpreter.optimize_ll1 = OPTIMIZE_LL1;
                         parser.Interpreter.optimize_unique_closure = OPTIMIZE_UNIQUE_CLOSURE;
-                        parser.Interpreter.optimize_hidden_conflicted_configs = OPTIMIZE_HIDDEN_CONFLICTED_CONFIGS;
                         parser.Interpreter.optimize_tail_calls = OPTIMIZE_TAIL_CALLS;
                         parser.Interpreter.tail_call_preserves_sll = TAIL_CALL_PRESERVES_SLL;
                         parser.Interpreter.treat_sllk1_conflict_as_ambiguity = TREAT_SLLK1_CONFLICT_AS_AMBIGUITY;
@@ -1041,15 +1038,17 @@
 
         protected class NonCachingParserATNSimulator : ParserATNSimulator
         {
+            private static readonly EmptyEdgeMap<DFAState> emptyMap = new EmptyEdgeMap<DFAState>(-1, -1);
+
             public NonCachingParserATNSimulator(Parser parser, ATN atn)
                 : base(parser, atn)
             {
             }
 
             [return: NotNull]
-            protected override DFAState CreateDFAState([NotNull] ATNConfigSet configs)
+            protected override DFAState CreateDFAState([NotNull] DFA dfa, [NotNull] ATNConfigSet configs)
             {
-                return new DFAState(configs, -1, -1);
+                return new DFAState(emptyMap, dfa.EmptyContextEdgeMap, configs);
             }
         }
 

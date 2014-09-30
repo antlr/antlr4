@@ -72,20 +72,22 @@ namespace Antlr4.Runtime
 
         [System.ObsoleteAttribute(@"Use ParserInterpreter(string, IVocabulary, System.Collections.Generic.ICollection{E}, Antlr4.Runtime.Atn.ATN, ITokenStream) instead.")]
         public ParserInterpreter(string grammarFileName, IEnumerable<string> tokenNames, IEnumerable<string> ruleNames, ATN atn, ITokenStream input)
-            : this(grammarFileName, Antlr4.Runtime.Vocabulary.FromTokenNames(Sharpen.Collections.ToArray(tokenNames, new string[tokenNames.Count])), ruleNames, atn, input)
+            : this(grammarFileName, Antlr4.Runtime.Vocabulary.FromTokenNames(tokenNames.ToArray()), ruleNames, atn, input)
         {
         }
 
-        public ParserInterpreter(string grammarFileName, IVocabulary vocabulary, ICollection<string> ruleNames, ATN atn, ITokenStream input)
+        public ParserInterpreter(string grammarFileName, IVocabulary vocabulary, IEnumerable<string> ruleNames, ATN atn, ITokenStream input)
             : base(input)
         {
             this.grammarFileName = grammarFileName;
             this.atn = atn;
+#pragma warning disable 612 // 'fieldName' is obsolete
             this.tokenNames = new string[atn.maxTokenType];
             for (int i = 0; i < tokenNames.Length; i++)
             {
                 tokenNames[i] = vocabulary.GetDisplayName(i);
             }
+#pragma warning restore 612
             this.ruleNames = ruleNames.ToArray();
             this.vocabulary = vocabulary;
             // identify the ATN states where pushNewRecursionContext must be called
@@ -113,6 +115,7 @@ namespace Antlr4.Runtime
             }
         }
 
+        [Obsolete]
         public override string[] TokenNames
         {
             get

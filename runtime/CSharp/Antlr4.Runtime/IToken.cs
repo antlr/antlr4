@@ -200,7 +200,7 @@ namespace Antlr4.Runtime
         /// <see cref="HiddenChannel"/>
         /// .</p>
         /// </remarks>
-        /// <seealso cref="Channel()"/>
+        /// <seealso cref="IToken.Channel"/>
         public const int MinUserChannelValue = 2;
     }
 }

@@ -55,11 +55,11 @@ namespace Antlr4.Runtime
 
         [Obsolete]
         public LexerInterpreter(string grammarFileName, IEnumerable<string> tokenNames, IEnumerable<string> ruleNames, IEnumerable<string> modeNames, ATN atn, ICharStream input)
-            : this(grammarFileName, Antlr4.Runtime.Vocabulary.FromTokenNames(Sharpen.Collections.ToArray(tokenNames, new string[tokenNames.Count])), ruleNames, modeNames, atn, input)
+            : this(grammarFileName, Antlr4.Runtime.Vocabulary.FromTokenNames(tokenNames.ToArray()), ruleNames, modeNames, atn, input)
         {
         }
 
-        public LexerInterpreter(string grammarFileName, IVocabulary vocabulary, ICollection<string> ruleNames, ICollection<string> modeNames, ATN atn, ICharStream input)
+        public LexerInterpreter(string grammarFileName, IVocabulary vocabulary, IEnumerable<string> ruleNames, IEnumerable<string> modeNames, ATN atn, ICharStream input)
             : base(input)
         {
             if (atn.grammarType != ATNType.Lexer)
@@ -68,11 +68,13 @@ namespace Antlr4.Runtime
             }
             this.grammarFileName = grammarFileName;
             this.atn = atn;
+#pragma warning disable 612 // 'fieldName' is obsolete
             this.tokenNames = new string[atn.maxTokenType];
             for (int i = 0; i < tokenNames.Length; i++)
             {
                 tokenNames[i] = vocabulary.GetDisplayName(i);
             }
+#pragma warning restore 612
             this.ruleNames = ruleNames.ToArray();
             this.modeNames = modeNames.ToArray();
             this.vocabulary = vocabulary;
@@ -95,6 +97,7 @@ namespace Antlr4.Runtime
             }
         }
 
+        [Obsolete]
         public override string[] TokenNames
         {
             get

@@ -52,7 +52,7 @@ namespace Antlr4.Runtime
         /// <see cref="GetDisplayName(int)"/>
         /// returns the numeric value for all tokens
         /// except
-        /// <see cref="IToken.Eof"/>
+        /// <see cref="TokenConstants.Eof"/>
         /// .</p>
         /// </summary>
         [NotNull]
@@ -175,7 +175,7 @@ namespace Antlr4.Runtime
                 {
                     continue;
                 }
-                if (!tokenName.IsEmpty())
+                if (tokenName.Length > 0)
                 {
                     char firstChar = tokenName[0];
                     if (firstChar == '\'')
@@ -199,7 +199,7 @@ namespace Antlr4.Runtime
             return new Vocabulary(literalNames, symbolicNames, tokenNames);
         }
 
-        [Nullable]
+        [return: Nullable]
         public virtual string GetLiteralName(int tokenType)
         {
             if (tokenType >= 0 && tokenType < literalNames.Length)
@@ -209,7 +209,7 @@ namespace Antlr4.Runtime
             return null;
         }
 
-        [Nullable]
+        [return: Nullable]
         public virtual string GetSymbolicName(int tokenType)
         {
             if (tokenType >= 0 && tokenType < symbolicNames.Length)
@@ -223,7 +223,7 @@ namespace Antlr4.Runtime
             return null;
         }
 
-        [NotNull]
+        [return: NotNull]
         public virtual string GetDisplayName(int tokenType)
         {
             if (tokenType >= 0 && tokenType < displayNames.Length)
@@ -244,7 +244,7 @@ namespace Antlr4.Runtime
             {
                 return symbolicName;
             }
-            return Antlr4.Runtime.Sharpen.Extensions.ToString(tokenType);
+            return tokenType.ToString();
         }
     }
 }

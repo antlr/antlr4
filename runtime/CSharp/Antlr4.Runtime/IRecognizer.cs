@@ -29,11 +29,18 @@
  */
 namespace Antlr4.Runtime
 {
+    using System;
     using Antlr4.Runtime.Atn;
 
     public interface IRecognizer
     {
+        [Obsolete]
         string[] TokenNames
+        {
+            get;
+        }
+
+        IVocabulary Vocabulary
         {
             get;
         }

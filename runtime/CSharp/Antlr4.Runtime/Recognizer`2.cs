@@ -34,6 +34,10 @@ using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
 
+#if NET40PLUS
+using System.Runtime.CompilerServices;
+#endif
+
 namespace Antlr4.Runtime
 {
     public abstract class Recognizer<Symbol, ATNInterpreter> : IRecognizer
@@ -41,9 +45,10 @@ namespace Antlr4.Runtime
     {
         public const int Eof = -1;
 
-        private static readonly IDictionary<IVocabulary, IDictionary<string, int>> tokenTypeMapCache = new ConditionalWeakTable<IVocabulary, IDictionary<string, int>>();
-
-        private static readonly IDictionary<string[], IDictionary<string, int>> ruleIndexMapCache = new Dictionary<string[], IDictionary<string, int>>();
+#if NET40PLUS
+        private static readonly ConditionalWeakTable<IVocabulary, IDictionary<string, int>> tokenTypeMapCache = new ConditionalWeakTable<IVocabulary, IDictionary<string, int>>();
+        private static readonly ConditionalWeakTable<string[], IDictionary<string, int>> ruleIndexMapCache = new ConditionalWeakTable<string[], IDictionary<string, int>>();
+#endif
 
         [NotNull]
         private IAntlrErrorListener<Symbol>[] _listeners =
@@ -89,7 +94,9 @@ namespace Antlr4.Runtime
         {
             get
             {
+#pragma warning disable 618 // 'propertyName' is obsolete: message
                 return Antlr4.Runtime.Vocabulary.FromTokenNames(TokenNames);
+#pragma warning restore 618
             }
         }
 
@@ -103,32 +110,32 @@ namespace Antlr4.Runtime
         {
             get
             {
-                IVocabulary vocabulary = Vocabulary;
-                lock (tokenTypeMapCache)
+#if NET40PLUS
+                return tokenTypeMapCache.GetValue(Vocabulary, CreateTokenTypeMap);
+#else
+                return CreateTokenTypeMap(Vocabulary);
+#endif
+            }
+        }
+
+        protected virtual IDictionary<string, int> CreateTokenTypeMap(IVocabulary vocabulary)
+        {
+            var result = new Dictionary<string, int>();
+            for (int i = 0; i < Atn.maxTokenType; i++)
+            {
+                string literalName = vocabulary.GetLiteralName(i);
+                if (literalName != null)
                 {
-                    IDictionary<string, int> result = tokenTypeMapCache.Get(vocabulary);
-                    if (result == null)
-                    {
-                        result = new Dictionary<string, int>();
-                        for (int i = 0; i < Atn.maxTokenType; i++)
-                        {
-                            string literalName = vocabulary.GetLiteralName(i);
-                            if (literalName != null)
-                            {
-                                result.Put(literalName, i);
-                            }
-                            string symbolicName = vocabulary.GetSymbolicName(i);
-                            if (symbolicName != null)
-                            {
-                                result.Put(symbolicName, i);
-                            }
-                        }
-                        result["EOF"] = TokenConstants.Eof;
-                        tokenTypeMapCache.Put(vocabulary, result);
-                    }
-                    return result;
+                    result[literalName] = i;
+                }
+                string symbolicName = vocabulary.GetSymbolicName(i);
+                if (symbolicName != null)
+                {
+                    result[symbolicName] = i;
                 }
             }
+            result["EOF"] = TokenConstants.Eof;
+            return result;
         }
 
         /// <summary>Get a map from rule names to rule indexes.</summary>
@@ -146,16 +153,11 @@ namespace Antlr4.Runtime
                 {
                     throw new NotSupportedException("The current recognizer does not provide a list of rule names.");
                 }
-                lock (ruleIndexMapCache)
-                {
-                    IDictionary<string, int> result = ruleIndexMapCache.Get(ruleNames);
-                    if (result == null)
-                    {
-                        result = Utils.ToMap(ruleNames);
-                        ruleIndexMapCache.Put(ruleNames, result);
-                    }
-                    return result;
-                }
+#if NET40PLUS
+                return ruleIndexMapCache.GetValue(ruleNames, Utils.ToMap);
+#else
+                return Utils.ToMap(ruleNames);
+#endif
             }
         }
 

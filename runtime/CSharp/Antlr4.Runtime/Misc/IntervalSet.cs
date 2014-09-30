@@ -755,7 +755,7 @@ namespace Antlr4.Runtime.Misc
             return ElementName(Vocabulary.FromTokenNames(tokenNames), a);
         }
 
-        [NotNull]
+        [return: NotNull]
         protected internal virtual string ElementName(IVocabulary vocabulary, int a)
         {
             if (a == TokenConstants.Eof)

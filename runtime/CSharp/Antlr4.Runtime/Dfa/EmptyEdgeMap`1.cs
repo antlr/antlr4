@@ -31,6 +31,10 @@ using System.Collections.Generic;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Sharpen;
 
+#if NET45PLUS
+using System.Collections.ObjectModel;
+#endif
+
 namespace Antlr4.Runtime.Dfa
 {
     /// <summary>
@@ -40,6 +44,7 @@ namespace Antlr4.Runtime.Dfa
     /// </summary>
     /// <author>Sam Harwell</author>
     public sealed class EmptyEdgeMap<T> : AbstractEdgeMap<T>
+        where T : class
     {
         public EmptyEdgeMap(int minIndex, int maxIndex)
             : base(minIndex, maxIndex)
@@ -95,14 +100,18 @@ namespace Antlr4.Runtime.Dfa
             }
         }
 
+#if NET45PLUS
+        public override IReadOnlyDictionary<int, T> ToMap()
+#else
         public override IDictionary<int, T> ToMap()
+#endif
         {
-            return Antlr4.Runtime.Sharpen.Collections.EmptyMap();
-        }
-
-        public override HashSet<KeyValuePair<int, T>> EntrySet()
-        {
-            return Antlr4.Runtime.Sharpen.Collections.EmptyMap<int, T>().EntrySet();
+            Dictionary<int, T> result = new Dictionary<int, T>();
+#if NET45PLUS
+            return new ReadOnlyDictionary<int, T>(result);
+#else
+            return result;
+#endif
         }
     }
 }
