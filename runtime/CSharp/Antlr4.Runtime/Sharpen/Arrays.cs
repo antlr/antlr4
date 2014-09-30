@@ -37,6 +37,9 @@ namespace Antlr4.Runtime.Sharpen
     {
         public static T[] CopyOf<T>(T[] array, int newSize)
         {
+            if (array.Length == newSize)
+                return (T[])array.Clone();
+
             Array.Resize(ref array, newSize);
             return array;
         }
