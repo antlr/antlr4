@@ -354,7 +354,16 @@ namespace Antlr4.Runtime.Atn
                     {
                         continue;
                     }
-                    atn.ruleToStopState[ruleTransition.target.ruleIndex].AddTransition(new EpsilonTransition(ruleTransition.followState));
+                    int outermostPrecedenceReturn = -1;
+                    if (atn.ruleToStartState[ruleTransition.target.ruleIndex].isPrecedenceRule)
+                    {
+                        if (ruleTransition.precedence == 0)
+                        {
+                            outermostPrecedenceReturn = ruleTransition.target.ruleIndex;
+                        }
+                    }
+                    EpsilonTransition returnTransition = new EpsilonTransition(ruleTransition.followState, outermostPrecedenceReturn);
+                    atn.ruleToStopState[ruleTransition.target.ruleIndex].AddTransition(returnTransition);
                 }
             }
             foreach (ATNState state_2 in atn.states)
@@ -847,7 +856,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     Transition transition = state.GetOptimizedTransition(i);
                     ATNState intermediate = transition.target;
-                    if (transition.TransitionType != TransitionType.Epsilon || intermediate.StateType != StateType.Basic || !intermediate.OnlyHasEpsilonTransitions)
+                    if (transition.TransitionType != TransitionType.Epsilon || ((EpsilonTransition)transition).OutermostPrecedenceReturn != -1 || intermediate.StateType != StateType.Basic || !intermediate.OnlyHasEpsilonTransitions)
                     {
                         if (optimizedTransitions != null)
                         {
@@ -857,7 +866,7 @@ namespace Antlr4.Runtime.Atn
                     }
                     for (int j = 0; j < intermediate.NumberOfOptimizedTransitions; j++)
                     {
-                        if (intermediate.GetOptimizedTransition(j).TransitionType != TransitionType.Epsilon)
+                        if (intermediate.GetOptimizedTransition(j).TransitionType != TransitionType.Epsilon || ((EpsilonTransition)intermediate.GetOptimizedTransition(j)).OutermostPrecedenceReturn != -1)
                         {
                             if (optimizedTransitions != null)
                             {

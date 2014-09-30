@@ -27,6 +27,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using Antlr4.Runtime;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
@@ -36,7 +37,7 @@ namespace Antlr4.Runtime.Dfa
     public class LexerDFASerializer : DFASerializer
     {
         public LexerDFASerializer(DFA dfa)
-            : base(dfa, (string[])null)
+            : base(dfa, Vocabulary.EmptyVocabulary)
         {
         }
 

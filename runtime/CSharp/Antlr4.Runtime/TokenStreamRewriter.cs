@@ -274,7 +274,7 @@ namespace Antlr4.Runtime
         /// <remarks>
         /// Rollback the instruction stream for a program so that
         /// the indicated instruction (via instructionIndex) is no
-        /// longer in the stream.  UNTESTED!
+        /// longer in the stream. UNTESTED!
         /// </remarks>
         public virtual void Rollback(string programName, int instructionIndex)
         {
@@ -549,8 +549,8 @@ namespace Antlr4.Runtime
         /// </summary>
         /// <remarks>
         /// We need to combine operations and report invalid operations (like
-        /// overlapping replaces that are not completed nested).  Inserts to
-        /// same index need to be combined etc...   Here are the cases:
+        /// overlapping replaces that are not completed nested). Inserts to
+        /// same index need to be combined etc...  Here are the cases:
         /// I.i.u I.j.v								leave alone, nonoverlapping
         /// I.i.u I.i.v								combine: Iivu
         /// R.i-j.u R.x-y.v	| i-j in x-y			delete first R
@@ -567,7 +567,7 @@ namespace Antlr4.Runtime
         /// R.x-y.v I.i.u | i not in x-y			leave alone, nonoverlapping
         /// I.i.u = insert u before op @ index i
         /// R.x-y.u = replace x-y indexed tokens with u
-        /// First we need to examine replaces.  For any replace op:
+        /// First we need to examine replaces. For any replace op:
         /// 1. wipe out any insertions before op within that range.
         /// 2. Drop any replace op before that is contained completely within
         /// that range.
@@ -580,7 +580,7 @@ namespace Antlr4.Runtime
         /// Don't actually delete; make op null in list. Easier to walk list.
         /// Later we can throw as we add to index &rarr; op map.
         /// Note that I.2 R.2-2 will wipe out I.2 even though, technically, the
-        /// inserted stuff would be before the replace range.  But, if you
+        /// inserted stuff would be before the replace range. But, if you
         /// add tokens in front of a method body '{' and then delete the method
         /// body, I think the stuff before the '{' you added should disappear too.
         /// Return a map from token index to operation.

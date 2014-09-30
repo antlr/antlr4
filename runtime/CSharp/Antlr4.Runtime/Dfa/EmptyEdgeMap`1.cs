@@ -27,47 +27,82 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using Antlr4.Runtime.Misc;
+using System.Collections.Generic;
+using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Sharpen;
 
-namespace Antlr4.Runtime
+namespace Antlr4.Runtime.Dfa
 {
     /// <summary>
-    /// This is an
-    /// <see cref="AntlrInputStream"/>
-    /// that is loaded from a file all at once
-    /// when you construct the object.
+    /// This implementation of
+    /// <see cref="AbstractEdgeMap{T}"/>
+    /// represents an empty edge map.
     /// </summary>
-    public class AntlrFileStream : AntlrInputStream
+    /// <author>Sam Harwell</author>
+    public sealed class EmptyEdgeMap<T> : AbstractEdgeMap<T>
     {
-        protected internal string fileName;
-
-        /// <exception cref="System.IO.IOException"/>
-        public AntlrFileStream(string fileName)
-            : this(fileName, null)
+        public EmptyEdgeMap(int minIndex, int maxIndex)
+            : base(minIndex, maxIndex)
         {
         }
 
-        /// <exception cref="System.IO.IOException"/>
-        public AntlrFileStream(string fileName, string encoding)
+        public override AbstractEdgeMap<T> Put(int key, T value)
         {
-            this.fileName = fileName;
-            Load(fileName, encoding);
+            if (value == null || key < minIndex || key > maxIndex)
+            {
+                // remains empty
+                return this;
+            }
+            return new SingletonEdgeMap<T>(minIndex, maxIndex, key, value);
         }
 
-        /// <exception cref="System.IO.IOException"/>
-        public virtual void Load(string fileName, string encoding)
+        public override AbstractEdgeMap<T> Clear()
         {
-            data = Utils.ReadFile(fileName, encoding);
-            this.n = data.Length;
+            return this;
         }
 
-        public override string SourceName
+        public override AbstractEdgeMap<T> Remove(int key)
+        {
+            return this;
+        }
+
+        public override int Count
         {
             get
             {
-                return fileName;
+                return 0;
             }
+        }
+
+        public override bool IsEmpty
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override bool ContainsKey(int key)
+        {
+            return false;
+        }
+
+        public override T this[int key]
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        public override IDictionary<int, T> ToMap()
+        {
+            return Antlr4.Runtime.Sharpen.Collections.EmptyMap();
+        }
+
+        public override HashSet<KeyValuePair<int, T>> EntrySet()
+        {
+            return Antlr4.Runtime.Sharpen.Collections.EmptyMap<int, T>().EntrySet();
         }
     }
 }

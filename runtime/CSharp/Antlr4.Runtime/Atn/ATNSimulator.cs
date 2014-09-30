@@ -71,7 +71,7 @@ namespace Antlr4.Runtime.Atn
 
         static ATNSimulator()
         {
-            Error = new DFAState(new ATNConfigSet(), 0, 0);
+            Error = new DFAState(new EmptyEdgeMap<DFAState>(0, -1), new EmptyEdgeMap<DFAState>(0, -1), new ATNConfigSet());
             Error.stateNumber = int.MaxValue;
         }
 

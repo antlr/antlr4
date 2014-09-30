@@ -36,6 +36,7 @@ using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
 using Antlr4.Runtime.Sharpen.Annotation;
 using Javax.Annotation.Processing;
+using Javax.Lang.Model;
 using Javax.Lang.Model.Element;
 using Javax.Lang.Model.Type;
 using Javax.Tools;
@@ -57,6 +58,27 @@ namespace Antlr4.Runtime.Misc
 
         public RuleDependencyProcessor()
         {
+        }
+
+        public override SourceVersion GetSupportedSourceVersion()
+        {
+            SourceVersion latestSupported = SourceVersion.LatestSupported();
+            if ((int)(latestSupported) <= 6)
+            {
+                return SourceVersion.Release6;
+            }
+            else
+            {
+                if ((int)(latestSupported) <= 8)
+                {
+                    return latestSupported;
+                }
+                else
+                {
+                    // this annotation processor is tested through Java 8
+                    return SourceVersion.Values()[8];
+                }
+            }
         }
 
         public override bool Process<_T0>(HashSet<_T0> annotations, IRoundEnvironment roundEnv)

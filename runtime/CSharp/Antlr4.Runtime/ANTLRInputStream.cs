@@ -314,6 +314,10 @@ namespace Antlr4.Runtime
         {
             get
             {
+                if (name == null || name.IsEmpty())
+                {
+                    return IntStreamConstants.UnknownSourceName;
+                }
                 return name;
             }
         }

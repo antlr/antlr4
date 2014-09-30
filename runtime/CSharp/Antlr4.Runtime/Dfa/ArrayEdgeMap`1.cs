@@ -34,24 +34,25 @@ using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Dfa
 {
-    /// <author>sam</author>
-    public class ArrayEdgeMap<T> : AbstractEdgeMap<T>
+    /// <author>Sam Harwell</author>
+    public sealed class ArrayEdgeMap<T> : AbstractEdgeMap<T>
     {
-        private readonly T[] arrayData;
+        private readonly AtomicReferenceArray<T> arrayData;
 
-        private int size;
+        private readonly AtomicInteger size;
 
         public ArrayEdgeMap(int minIndex, int maxIndex)
             : base(minIndex, maxIndex)
         {
-            arrayData = (T[])new object[maxIndex - minIndex + 1];
+            arrayData = new AtomicReferenceArray<T>(maxIndex - minIndex + 1);
+            size = new AtomicInteger();
         }
 
         public override int Count
         {
             get
             {
-                return size;
+                return size.Get();
             }
         }
 
@@ -59,7 +60,7 @@ namespace Antlr4.Runtime.Dfa
         {
             get
             {
-                return size == 0;
+                return Count == 0;
             }
         }
 
@@ -76,7 +77,7 @@ namespace Antlr4.Runtime.Dfa
                 {
                     return null;
                 }
-                return arrayData[key - minIndex];
+                return arrayData.Get(key - minIndex);
             }
         }
 
@@ -84,17 +85,16 @@ namespace Antlr4.Runtime.Dfa
         {
             if (key >= minIndex && key <= maxIndex)
             {
-                T existing = arrayData[key - minIndex];
-                arrayData[key - minIndex] = value;
+                T existing = arrayData.GetAndSet(key - minIndex, value);
                 if (existing == null && value != null)
                 {
-                    size++;
+                    size.IncrementAndGet();
                 }
                 else
                 {
                     if (existing != null && value == null)
                     {
-                        size--;
+                        size.DecrementAndGet();
                     }
                 }
             }
@@ -117,17 +117,12 @@ namespace Antlr4.Runtime.Dfa
                 Antlr4.Runtime.Dfa.ArrayEdgeMap<T> other = (Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)m;
                 int minOverlap = Math.Max(minIndex, other.minIndex);
                 int maxOverlap = Math.Min(maxIndex, other.maxIndex);
+                Antlr4.Runtime.Dfa.ArrayEdgeMap<T> result = this;
                 for (int i = minOverlap; i <= maxOverlap; i++)
                 {
-                    T target = other.arrayData[i - other.minIndex];
-                    if (target != null)
-                    {
-                        T current = this.arrayData[i - this.minIndex];
-                        this.arrayData[i - this.minIndex] = target;
-                        size += (current != null ? 0 : 1);
-                    }
+                    result = ((Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)result.Put(i, m[i]));
                 }
-                return this;
+                return result;
             }
             else
             {
@@ -142,14 +137,17 @@ namespace Antlr4.Runtime.Dfa
                     if (m is SparseEdgeMap<object>)
                     {
                         SparseEdgeMap<T> other = (SparseEdgeMap<T>)m;
-                        int[] keys = other.Keys;
-                        IList<T> values = other.Values;
-                        Antlr4.Runtime.Dfa.ArrayEdgeMap<T> result = this;
-                        for (int i = 0; i < values.Count; i++)
+                        lock (other)
                         {
-                            result = ((Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)result.Put(keys[i], values[i]));
+                            int[] keys = other.Keys;
+                            IList<T> values = other.Values;
+                            Antlr4.Runtime.Dfa.ArrayEdgeMap<T> result = this;
+                            for (int i = 0; i < values.Count; i++)
+                            {
+                                result = ((Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)result.Put(keys[i], values[i]));
+                            }
+                            return result;
                         }
-                        return result;
                     }
                     else
                     {
@@ -161,8 +159,7 @@ namespace Antlr4.Runtime.Dfa
 
         public override AbstractEdgeMap<T> Clear()
         {
-            Arrays.Fill(arrayData, null);
-            return this;
+            return new EmptyEdgeMap<T>(minIndex, maxIndex);
         }
 
         public override IDictionary<int, T> ToMap()
@@ -172,13 +169,14 @@ namespace Antlr4.Runtime.Dfa
                 return Antlr4.Runtime.Sharpen.Collections.EmptyMap();
             }
             IDictionary<int, T> result = new LinkedHashMap<int, T>();
-            for (int i = 0; i < arrayData.Length; i++)
+            for (int i = 0; i < arrayData.Length(); i++)
             {
-                if (arrayData[i] == null)
+                T element = arrayData.Get(i);
+                if (element == null)
                 {
                     continue;
                 }
-                result.Put(i + minIndex, arrayData[i]);
+                result.Put(i + minIndex, element);
             }
             return result;
         }

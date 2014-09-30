@@ -703,7 +703,13 @@ namespace Antlr4.Runtime.Misc
             return buf.ToString();
         }
 
+        [System.ObsoleteAttribute(@"Use ToString(Antlr4.Runtime.IVocabulary) instead.")]
         public virtual string ToString(string[] tokenNames)
+        {
+            return ToString(Vocabulary.FromTokenNames(tokenNames));
+        }
+
+        public virtual string ToString(IVocabulary vocabulary)
         {
             StringBuilder buf = new StringBuilder();
             if (this.intervals == null || this.intervals.IsEmpty())
@@ -722,7 +728,7 @@ namespace Antlr4.Runtime.Misc
                 int b = I.b;
                 if (a == b)
                 {
-                    buf.Append(ElementName(tokenNames, a));
+                    buf.Append(ElementName(vocabulary, a));
                 }
                 else
                 {
@@ -732,7 +738,7 @@ namespace Antlr4.Runtime.Misc
                         {
                             buf.Append(", ");
                         }
-                        buf.Append(ElementName(tokenNames, i));
+                        buf.Append(ElementName(vocabulary, i));
                     }
                 }
                 if (iter.HasNext())
@@ -747,7 +753,14 @@ namespace Antlr4.Runtime.Misc
             return buf.ToString();
         }
 
+        [System.ObsoleteAttribute(@"Use ElementName(Antlr4.Runtime.IVocabulary, int) instead.")]
         protected internal virtual string ElementName(string[] tokenNames, int a)
+        {
+            return ElementName(Vocabulary.FromTokenNames(tokenNames), a);
+        }
+
+        [NotNull]
+        protected internal virtual string ElementName(IVocabulary vocabulary, int a)
         {
             if (a == TokenConstants.Eof)
             {
@@ -761,7 +774,7 @@ namespace Antlr4.Runtime.Misc
                 }
                 else
                 {
-                    return tokenNames[a];
+                    return vocabulary.GetDisplayName(a);
                 }
             }
         }

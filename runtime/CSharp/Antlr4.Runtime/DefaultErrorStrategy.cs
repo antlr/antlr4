@@ -376,7 +376,7 @@ namespace Antlr4.Runtime
         /// <param name="e">the recognition exception</param>
         protected internal virtual void ReportInputMismatch(Parser recognizer, InputMismatchException e)
         {
-            string msg = "mismatched input " + GetTokenErrorDisplay(e.OffendingToken) + " expecting " + e.GetExpectedTokens().ToString(recognizer.TokenNames);
+            string msg = "mismatched input " + GetTokenErrorDisplay(e.OffendingToken) + " expecting " + e.GetExpectedTokens().ToString(recognizer.Vocabulary);
             NotifyErrorListeners(recognizer, msg, e);
         }
 
@@ -434,7 +434,7 @@ namespace Antlr4.Runtime
             IToken t = recognizer.CurrentToken;
             string tokenName = GetTokenErrorDisplay(t);
             IntervalSet expecting = GetExpectedTokens(recognizer);
-            string msg = "extraneous input " + tokenName + " expecting " + expecting.ToString(recognizer.TokenNames);
+            string msg = "extraneous input " + tokenName + " expecting " + expecting.ToString(recognizer.Vocabulary);
             recognizer.NotifyErrorListeners(t, msg, null);
         }
 
@@ -472,7 +472,7 @@ namespace Antlr4.Runtime
             BeginErrorCondition(recognizer);
             IToken t = recognizer.CurrentToken;
             IntervalSet expecting = GetExpectedTokens(recognizer);
-            string msg = "missing " + expecting.ToString(recognizer.TokenNames) + " at " + GetTokenErrorDisplay(t);
+            string msg = "missing " + expecting.ToString(recognizer.Vocabulary) + " at " + GetTokenErrorDisplay(t);
             recognizer.NotifyErrorListeners(t, msg, null);
         }
 
@@ -713,7 +713,7 @@ namespace Antlr4.Runtime
             }
             else
             {
-                tokenText = "<missing " + recognizer.TokenNames[expectedTokenType] + ">";
+                tokenText = "<missing " + recognizer.Vocabulary.GetDisplayName(expectedTokenType) + ">";
             }
             IToken current = currentSymbol;
             IToken lookback = ((ITokenStream)recognizer.InputStream).Lt(-1);

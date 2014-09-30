@@ -72,32 +72,15 @@ namespace Antlr4.Runtime.Dfa
         /// <c>edges.get(symbol)</c>
         /// points to target of symbol.
         /// </summary>
-        [Nullable]
-        private AbstractEdgeMap<Antlr4.Runtime.Dfa.DFAState> edges;
+        [NotNull]
+        private volatile AbstractEdgeMap<Antlr4.Runtime.Dfa.DFAState> edges;
 
-        private readonly int minSymbol;
-
-        private readonly int maxSymbol;
-
-        public bool isAcceptState = false;
-
-        /// <summary>
-        /// if accept state, what ttype do we match or alt do we predict?
-        /// This is set to
-        /// <see cref="Antlr4.Runtime.Atn.ATN.InvalidAltNumber"/>
-        /// when
-        /// <see cref="predicates"/>
-        /// <c>!=null</c>
-        /// .
-        /// </summary>
-        public int prediction;
-
-        public LexerActionExecutor lexerActionExecutor;
+        private Antlr4.Runtime.Dfa.AcceptStateInfo acceptStateInfo;
 
         /// <summary>These keys for these edges are the top level element of the global context.</summary>
         /// <remarks>These keys for these edges are the top level element of the global context.</remarks>
-        [Nullable]
-        private AbstractEdgeMap<Antlr4.Runtime.Dfa.DFAState> contextEdges;
+        [NotNull]
+        private volatile AbstractEdgeMap<Antlr4.Runtime.Dfa.DFAState> contextEdges;
 
         /// <summary>Symbols in this set require a global context transition before matching an input symbol.</summary>
         /// <remarks>Symbols in this set require a global context transition before matching an input symbol.</remarks>
@@ -134,86 +117,120 @@ namespace Antlr4.Runtime.Dfa
             }
         }
 
-        public DFAState(ATNConfigSet configs, int minSymbol, int maxSymbol)
+        public DFAState(DFA dfa, ATNConfigSet configs)
+            : this(dfa.EmptyEdgeMap, dfa.EmptyContextEdgeMap, configs)
+        {
+        }
+
+        public DFAState(EmptyEdgeMap<DFAState> emptyEdges, EmptyEdgeMap<DFAState> emptyContextEdges, ATNConfigSet configs)
         {
             this.configs = configs;
-            this.minSymbol = minSymbol;
-            this.maxSymbol = maxSymbol;
+            this.edges = emptyEdges;
+            this.contextEdges = emptyContextEdges;
         }
 
         public bool IsContextSensitive
         {
             get
             {
-                return contextEdges != null;
+                return contextSymbols != null;
             }
         }
 
         public bool IsContextSymbol(int symbol)
         {
-            if (!IsContextSensitive || symbol < minSymbol)
+            if (!IsContextSensitive || symbol < edges.minIndex)
             {
                 return false;
             }
-            return contextSymbols.Get(symbol - minSymbol);
+            return contextSymbols.Get(symbol - edges.minIndex);
         }
 
         public void SetContextSymbol(int symbol)
         {
             System.Diagnostics.Debug.Assert(IsContextSensitive);
-            if (symbol < minSymbol)
+            if (symbol < edges.minIndex)
             {
                 return;
             }
-            contextSymbols.Set(symbol - minSymbol);
+            contextSymbols.Set(symbol - edges.minIndex);
         }
 
         public virtual void SetContextSensitive(ATN atn)
         {
+            System.Diagnostics.Debug.Assert(!configs.IsOutermostConfigSet);
+            if (IsContextSensitive)
+            {
+                return;
+            }
             lock (this)
             {
-                System.Diagnostics.Debug.Assert(!configs.IsOutermostConfigSet);
-                if (IsContextSensitive)
+                if (contextSymbols == null)
                 {
-                    return;
+                    contextSymbols = new BitSet();
                 }
-                contextSymbols = new BitSet();
-                contextEdges = new SingletonEdgeMap<DFAState>(-1, atn.states.Count - 1);
+            }
+        }
+
+        public AcceptStateInfo AcceptStateInfo
+        {
+            get
+            {
+                return acceptStateInfo;
+            }
+            set
+            {
+                AcceptStateInfo acceptStateInfo = value;
+                this.acceptStateInfo = acceptStateInfo;
+            }
+        }
+
+        public bool IsAcceptState
+        {
+            get
+            {
+                return acceptStateInfo != null;
+            }
+        }
+
+        public int Prediction
+        {
+            get
+            {
+                if (acceptStateInfo == null)
+                {
+                    return ATN.InvalidAltNumber;
+                }
+                return acceptStateInfo.Prediction;
+            }
+        }
+
+        public LexerActionExecutor LexerActionExecutor
+        {
+            get
+            {
+                if (acceptStateInfo == null)
+                {
+                    return null;
+                }
+                return acceptStateInfo.LexerActionExecutor;
             }
         }
 
         public virtual DFAState GetTarget(int symbol)
         {
-            lock (this)
-            {
-                if (edges == null)
-                {
-                    return null;
-                }
-                return edges[symbol];
-            }
+            return edges[symbol];
         }
 
         public virtual void SetTarget(int symbol, DFAState target)
         {
-            lock (this)
-            {
-                if (edges == null)
-                {
-                    edges = new SingletonEdgeMap<DFAState>(minSymbol, maxSymbol);
-                }
-                edges = edges.Put(symbol, target);
-            }
+            edges = edges.Put(symbol, target);
         }
 
         public virtual IDictionary<int, DFAState> EdgeMap
         {
             get
             {
-                if (edges == null)
-                {
-                    return Antlr4.Runtime.Sharpen.Collections.EmptyMap();
-                }
                 return edges.ToMap();
             }
         }
@@ -222,10 +239,6 @@ namespace Antlr4.Runtime.Dfa
         {
             lock (this)
             {
-                if (contextEdges == null)
-                {
-                    return null;
-                }
                 if (invokingState == PredictionContext.EmptyFullStateKey)
                 {
                     invokingState = -1;
@@ -238,7 +251,7 @@ namespace Antlr4.Runtime.Dfa
         {
             lock (this)
             {
-                if (contextEdges == null)
+                if (!IsContextSensitive)
                 {
                     throw new InvalidOperationException("The state is not context sensitive.");
                 }
@@ -254,10 +267,6 @@ namespace Antlr4.Runtime.Dfa
         {
             get
             {
-                if (contextEdges == null)
-                {
-                    return Antlr4.Runtime.Sharpen.Collections.EmptyMap();
-                }
                 IDictionary<int, DFAState> map = contextEdges.ToMap();
                 if (map.ContainsKey(-1))
                 {
@@ -327,7 +336,7 @@ namespace Antlr4.Runtime.Dfa
         {
             StringBuilder buf = new StringBuilder();
             buf.Append(stateNumber).Append(":").Append(configs);
-            if (isAcceptState)
+            if (IsAcceptState)
             {
                 buf.Append("=>");
                 if (predicates != null)
@@ -336,7 +345,7 @@ namespace Antlr4.Runtime.Dfa
                 }
                 else
                 {
-                    buf.Append(prediction);
+                    buf.Append(Prediction);
                 }
             }
             return buf.ToString();
