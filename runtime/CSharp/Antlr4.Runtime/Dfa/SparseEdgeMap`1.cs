@@ -141,7 +141,7 @@ namespace Antlr4.Runtime.Dfa
             }
             if (value == null)
             {
-                return ((Antlr4.Runtime.Dfa.SparseEdgeMap<T>)Remove(key));
+                return Remove(key);
             }
             lock (this)
             {

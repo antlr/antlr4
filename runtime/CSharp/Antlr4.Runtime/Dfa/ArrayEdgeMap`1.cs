@@ -122,7 +122,7 @@ namespace Antlr4.Runtime.Dfa
 
         public override AbstractEdgeMap<T> Remove(int key)
         {
-            return ((Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)Put(key, null));
+            return Put(key, null);
         }
 
         public override AbstractEdgeMap<T> PutAll(IEdgeMap<T> m)
@@ -149,7 +149,7 @@ namespace Antlr4.Runtime.Dfa
                 {
                     SingletonEdgeMap<T> other = (SingletonEdgeMap<T>)m;
                     System.Diagnostics.Debug.Assert(!other.IsEmpty);
-                    return ((Antlr4.Runtime.Dfa.ArrayEdgeMap<T>)Put(other.Key, other.Value));
+                    return Put(other.Key, other.Value);
                 }
                 else
                 {
