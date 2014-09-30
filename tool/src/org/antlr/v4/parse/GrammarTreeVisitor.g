@@ -465,7 +465,7 @@ channelsSpec
 @after {
 	exitChannelsSpec($start);
 }
-	:   ^(CHANNELS channelSpec+)
+	:   ^(CHANNELS channelSpec*)
 	;
 
 channelSpec

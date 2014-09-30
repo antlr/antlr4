@@ -298,7 +298,7 @@ v3tokenSpec
 	;
 
 channelsSpec
-	:	CHANNELS^ id (COMMA! id)* RBRACE!
+	:	CHANNELS^ (id (COMMA! id)* COMMA?)? RBRACE!
 	;
 
 // A declaration of a language target specifc section,
