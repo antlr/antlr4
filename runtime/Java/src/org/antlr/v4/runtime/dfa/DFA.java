@@ -32,6 +32,8 @@ package org.antlr.v4.runtime.dfa;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.ATNType;
@@ -261,17 +263,43 @@ public class DFA {
 	}
 
 	@Override
-	public String toString() { return toString(null); }
+	public String toString() { return toString(VocabularyImpl.EMPTY_VOCABULARY); }
 
+	/**
+	 * @deprecated Use {@link #toString(Vocabulary)} instead.
+	 */
+	@Deprecated
 	public String toString(@Nullable String[] tokenNames) {
 		if ( s0.get()==null ) return "";
 		DFASerializer serializer = new DFASerializer(this,tokenNames);
 		return serializer.toString();
 	}
 
+	public String toString(@NotNull Vocabulary vocabulary) {
+		if (s0.get() == null) {
+			return "";
+		}
+
+		DFASerializer serializer = new DFASerializer(this, vocabulary);
+		return serializer.toString();
+	}
+
+	/**
+	 * @deprecated Use {@link #toString(Vocabulary, String[])} instead.
+	 */
+	@Deprecated
 	public String toString(@Nullable String[] tokenNames, @Nullable String[] ruleNames) {
 		if ( s0.get()==null ) return "";
 		DFASerializer serializer = new DFASerializer(this,tokenNames,ruleNames,atnStartState.atn);
+		return serializer.toString();
+	}
+
+	public String toString(@NotNull Vocabulary vocabulary, @Nullable String[] ruleNames) {
+		if (s0.get() == null) {
+			return "";
+		}
+
+		DFASerializer serializer = new DFASerializer(this, vocabulary, ruleNames, atnStartState.atn);
 		return serializer.toString();
 	}
 

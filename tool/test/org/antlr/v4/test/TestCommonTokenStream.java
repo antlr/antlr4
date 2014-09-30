@@ -34,6 +34,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.CommonTokenFactory;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenFactory;
@@ -238,7 +239,7 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
 
 			@Override
 			public String getSourceName() {
-				return null;
+				return IntStream.UNKNOWN_SOURCE_NAME;
 			}
 
 			@Override
@@ -286,7 +287,7 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
 
 			@Override
 			public String getSourceName() {
-				return null;
+				return IntStream.UNKNOWN_SOURCE_NAME;
 			}
 
 			@Override

@@ -220,7 +220,7 @@ public class ParseTreePatternMatcher {
 		CommonTokenStream tokens = new CommonTokenStream(tokenSrc);
 
 		ParserInterpreter parserInterp = new ParserInterpreter(parser.getGrammarFileName(),
-															   Arrays.asList(parser.getTokenNames()),
+															   parser.getVocabulary(),
 															   Arrays.asList(parser.getRuleNames()),
 															   parser.getATNWithBypassAlts(),
 															   tokens);

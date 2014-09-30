@@ -418,6 +418,7 @@ public class GrammarTransformPipeline {
 		// add strings from combined grammar (and imported grammars) into lexer
 		// put them first as they are keywords; must resolve ambigs to these rules
 //		tool.log("grammar", "strings from parser: "+stringLiterals);
+		int insertIndex = 0;
 		nextLit:
 		for (String lit : stringLiterals) {
 			// if lexer already has a rule for literal, continue
@@ -439,9 +440,12 @@ public class GrammarTransformPipeline {
 			CommonToken idToken = new CommonToken(ANTLRParser.TOKEN_REF, rname);
 			litRule.addChild(new TerminalAST(idToken));
 			litRule.addChild(blk);
-			lexerRulesRoot.insertChild(0, litRule);        // add first
+			lexerRulesRoot.insertChild(insertIndex, litRule);
 //			lexerRulesRoot.getChildren().add(0, litRule);
 			lexerRulesRoot.freshenParentAndChildIndexes(); // reset indexes and set litRule parent
+
+			// next literal will be added after the one just added
+			insertIndex++;
 		}
 
 		// TODO: take out after stable if slow

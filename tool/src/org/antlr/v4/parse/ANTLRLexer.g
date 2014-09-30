@@ -150,6 +150,8 @@ import org.antlr.v4.tool.*;
 
 
 @members {
+	public static final int COMMENTS_CHANNEL = 2;
+
     public CommonTokenStream tokens; // track stream we push to; need for context info
     public boolean isLexerRule = false;
 
@@ -261,15 +263,11 @@ COMMENT
            }
        )
        {
-         // Unless we had a documentation comment, then we do not wish to
-         // pass the comments in to the parser. If you are writing a formatter
-         // then you will want to preserve the comments off channel, but could
-         // just skip and save token space if not.
+         // We do not wish to pass the comments in to the parser. If you are
+         // writing a formatter then you will want to preserve the comments off
+         // channel, but could just skip and save token space if not.
          //
-         if ($type != DOC_COMMENT) {
-
-             $channel=2;  // Comments are on channel 2
-         }
+         $channel=COMMENTS_CHANNEL;
        }
     ;
 

@@ -31,6 +31,8 @@
 package org.antlr.v4.runtime.dfa;
 
 import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNSimulator;
@@ -49,28 +51,44 @@ import java.util.Map;
 /** A DFA walker that knows how to dump them to serialized strings. */
 public class DFASerializer {
 	@NotNull
-	final DFA dfa;
-	@Nullable
-	final String[] tokenNames;
+	private final DFA dfa;
+	@NotNull
+	private final Vocabulary vocabulary;
 	@Nullable
 	final String[] ruleNames;
 	@Nullable
 	final ATN atn;
 
+	/**
+	 * @deprecated Use {@link #DFASerializer(DFA, Vocabulary)} instead.
+	 */
+	@Deprecated
 	public DFASerializer(@NotNull DFA dfa, @Nullable String[] tokenNames) {
-		this(dfa, tokenNames, null, null);
+		this(dfa, VocabularyImpl.fromTokenNames(tokenNames), null, null);
+	}
+
+	public DFASerializer(@NotNull DFA dfa, @NotNull Vocabulary vocabulary) {
+		this(dfa, vocabulary, null, null);
 	}
 
 	public DFASerializer(@NotNull DFA dfa, @Nullable Recognizer<?, ?> parser) {
 		this(dfa,
-			 parser != null ? parser.getTokenNames() : null,
+			 parser != null ? parser.getVocabulary() : VocabularyImpl.EMPTY_VOCABULARY,
 			 parser != null ? parser.getRuleNames() : null,
 			 parser != null ? parser.getATN() : null);
 	}
 
+	/**
+	 * @deprecated Use {@link #DFASerializer(DFA, Vocabulary, String[], ATN)} instead.
+	 */
+	@Deprecated
 	public DFASerializer(@NotNull DFA dfa, @Nullable String[] tokenNames, @Nullable String[] ruleNames, @Nullable ATN atn) {
+		this(dfa, VocabularyImpl.fromTokenNames(tokenNames), ruleNames, atn);
+	}
+
+	public DFASerializer(@NotNull DFA dfa, @NotNull Vocabulary vocabulary, @Nullable String[] ruleNames, @Nullable ATN atn) {
 		this.dfa = dfa;
-		this.tokenNames = tokenNames;
+		this.vocabulary = vocabulary;
 		this.ruleNames = ruleNames;
 		this.atn = atn;
 	}
@@ -152,11 +170,7 @@ public class DFASerializer {
 	}
 
 	protected String getEdgeLabel(int i) {
-		String label;
-		if ( i==-1 ) return "EOF";
-		if ( tokenNames!=null ) label = tokenNames[i];
-		else label = String.valueOf(i);
-		return label;
+		return vocabulary.getDisplayName(i);
 	}
 
 	String getStateString(DFAState s) {

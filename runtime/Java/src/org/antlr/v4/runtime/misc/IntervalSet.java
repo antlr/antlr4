@@ -31,6 +31,8 @@ package org.antlr.v4.runtime.misc;
 
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -544,7 +546,15 @@ public class IntervalSet implements IntSet {
 		return buf.toString();
 	}
 
+	/**
+	 * @deprecated Use {@link #toString(Vocabulary)} instead.
+	 */
+	@Deprecated
 	public String toString(String[] tokenNames) {
+		return toString(VocabularyImpl.fromTokenNames(tokenNames));
+	}
+
+	public String toString(@NotNull Vocabulary vocabulary) {
 		StringBuilder buf = new StringBuilder();
 		if ( this.intervals==null || this.intervals.isEmpty() ) {
 			return "{}";
@@ -558,12 +568,12 @@ public class IntervalSet implements IntSet {
 			int a = I.a;
 			int b = I.b;
 			if ( a==b ) {
-				buf.append(elementName(tokenNames, a));
+				buf.append(elementName(vocabulary, a));
 			}
 			else {
 				for (int i=a; i<=b; i++) {
 					if ( i>a ) buf.append(", ");
-                    buf.append(elementName(tokenNames, i));
+                    buf.append(elementName(vocabulary, i));
 				}
 			}
 			if ( iter.hasNext() ) {
@@ -576,12 +586,26 @@ public class IntervalSet implements IntSet {
         return buf.toString();
     }
 
-    protected String elementName(String[] tokenNames, int a) {
-        if ( a==Token.EOF ) return "<EOF>";
-        else if ( a==Token.EPSILON ) return "<EPSILON>";
-        else return tokenNames[a];
+	/**
+	 * @deprecated Use {@link #elementName(Vocabulary, int)} instead.
+	 */
+	@Deprecated
+	protected String elementName(String[] tokenNames, int a) {
+		return elementName(VocabularyImpl.fromTokenNames(tokenNames), a);
+	}
 
-    }
+	@NotNull
+	protected String elementName(@NotNull Vocabulary vocabulary, int a) {
+		if (a == Token.EOF) {
+			return "<EOF>";
+		}
+		else if (a == Token.EPSILON) {
+			return "<EPSILON>";
+		}
+		else {
+			return vocabulary.getDisplayName(a);
+		}
+	}
 
     @Override
     public int size() {

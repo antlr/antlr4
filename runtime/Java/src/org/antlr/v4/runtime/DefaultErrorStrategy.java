@@ -328,7 +328,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 									   @NotNull InputMismatchException e)
 	{
 		String msg = "mismatched input "+getTokenErrorDisplay(e.getOffendingToken(recognizer))+
-		" expecting "+e.getExpectedTokens().toString(recognizer.getTokenNames());
+		" expecting "+e.getExpectedTokens().toString(recognizer.getVocabulary());
 		notifyErrorListeners(recognizer, msg, e);
 	}
 
@@ -378,7 +378,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		String tokenName = getTokenErrorDisplay(t);
 		IntervalSet expecting = getExpectedTokens(recognizer);
 		String msg = "extraneous input "+tokenName+" expecting "+
-			expecting.toString(recognizer.getTokenNames());
+			expecting.toString(recognizer.getVocabulary());
 		recognizer.notifyErrorListeners(t, msg, null);
 	}
 
@@ -408,7 +408,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 
 		Token t = recognizer.getCurrentToken();
 		IntervalSet expecting = getExpectedTokens(recognizer);
-		String msg = "missing "+expecting.toString(recognizer.getTokenNames())+
+		String msg = "missing "+expecting.toString(recognizer.getVocabulary())+
 			" at "+getTokenErrorDisplay(t);
 
 		recognizer.notifyErrorListeners(t, msg, null);
@@ -586,7 +586,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		int expectedTokenType = expecting.getMinElement(); // get any element
 		String tokenText;
 		if ( expectedTokenType== Token.EOF ) tokenText = "<missing EOF>";
-		else tokenText = "<missing "+recognizer.getTokenNames()[expectedTokenType]+">";
+		else tokenText = "<missing "+recognizer.getVocabulary().getDisplayName(expectedTokenType)+">";
 		Token current = currentSymbol;
 		Token lookback = recognizer.getInputStream().LT(-1);
 		if ( current.getType() == Token.EOF && lookback!=null ) {

@@ -42,6 +42,7 @@ public class TestXPath extends BaseTest {
 		"DIV :   '/' ;\n" +
 		"ADD :   '+' ;\n" +
 		"SUB :   '-' ;\n" +
+		"RETURN : 'return' ;\n" +
 		"ID  :   [a-zA-Z]+ ;      // match identifiers\n" +
 		"INT :   [0-9]+ ;         // match integers\n" +
 		"NEWLINE:'\\r'? '\\n' -> skip;     // return newlines to parser (is end-statement signal)\n" +
@@ -67,7 +68,8 @@ public class TestXPath extends BaseTest {
 			"//ID",				// any ID in tree
 			"//expr/primary/ID",// any ID child of a primary under any expr
 			"//body//ID",		// any ID under a body
-			"//'return'",		// any 'return' literal in tree
+			"//'return'",		// any 'return' literal in tree, matched by literal name
+			"//RETURN",			// any 'return' literal in tree, matched by symbolic name
 			"//primary/*",		// all kids of any primary
 			"//func/*/stat",	// all stat nodes grandkids of any func node
 			"/prog/func/'def'",	// all def literal kids of func kid of prog
@@ -89,6 +91,7 @@ public class TestXPath extends BaseTest {
 			"[f, x, y, x, y, g, x, x]",
 			"[y, x]",
 			"[x, y, x]",
+			"[return]",
 			"[return]",
 			"[3, 4, y, 1, 2, x]",
 			"[stat, stat, stat, stat]",

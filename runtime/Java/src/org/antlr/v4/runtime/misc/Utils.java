@@ -105,11 +105,11 @@ public class Utils {
 		return buf.toString();
 	}
 
-	public static void writeFile(String fileName, String content) throws IOException {
+	public static void writeFile(@NotNull String fileName, @NotNull String content) throws IOException {
 		writeFile(fileName, content, null);
 	}
 
-	public static void writeFile(String fileName, String content, String encoding) throws IOException {
+	public static void writeFile(@NotNull String fileName, @NotNull String content, @Nullable String encoding) throws IOException {
 		File f = new File(fileName);
 		FileOutputStream fos = new FileOutputStream(f);
 		OutputStreamWriter osw;
@@ -128,14 +128,13 @@ public class Utils {
 		}
 	}
 
-	public static char[] readFile(String fileName) throws IOException {
+	@NotNull
+	public static char[] readFile(@NotNull String fileName) throws IOException {
 		return readFile(fileName, null);
 	}
 
-	public static char[] readFile(String fileName, String encoding) throws IOException {
-		if ( fileName==null ) {
-			return null;
-		}
+	@NotNull
+	public static char[] readFile(@NotNull String fileName, @Nullable String encoding) throws IOException {
 		File f = new File(fileName);
 		int size = (int)f.length();
 		InputStreamReader isr;

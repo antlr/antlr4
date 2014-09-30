@@ -31,7 +31,6 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.BailErrorStrategy;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.FailedPredicateException;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.NoViableAltException;
@@ -40,6 +39,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.dfa.AcceptStateInfo;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
@@ -430,7 +431,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		int index = input.index();
 		try {
 			int alt = execDFA(dfa, input, index, state);
-			if ( debug ) System.out.println("DFA after predictATN: "+dfa.toString(parser.getTokenNames(), parser.getRuleNames()));
+			if ( debug ) System.out.println("DFA after predictATN: "+dfa.toString(parser.getVocabulary(), parser.getRuleNames()));
 			return alt;
 		}
 		finally {
@@ -505,7 +506,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		if ( dfa_debug ) System.out.println("DFA decision "+dfa.decision+
 											" exec LA(1)=="+ getLookaheadName(input) +
 											", outerContext="+outerContext.toString(parser));
-		if ( dfa_debug ) System.out.print(dfa.toString(parser.getTokenNames(), parser.getRuleNames()));
+		if ( dfa_debug ) System.out.print(dfa.toString(parser.getVocabulary(), parser.getRuleNames()));
 		DFAState s = state.s0;
 
 		int t = input.LA(1);
@@ -554,7 +555,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			// if no edge, pop over to ATN interpreter, update DFA and return
 			DFAState target = getExistingTargetState(s, t);
 			if ( target == null ) {
-				if ( dfa_debug && t>=0 ) System.out.println("no edge for "+parser.getTokenNames()[t]);
+				if ( dfa_debug && t>=0 ) System.out.println("no edge for "+parser.getVocabulary().getDisplayName(t));
 				int alt;
 				if ( dfa_debug ) {
 					Interval interval = Interval.of(startIndex, parser.getInputStream().index());
@@ -566,7 +567,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				SimulatorState initialState = new SimulatorState(outerContext, s, state.useContext, remainingOuterContext);
 				alt = execATN(dfa, input, startIndex, initialState);
 				if ( dfa_debug ) {
-					System.out.println("back from DFA update, alt="+alt+", dfa=\n"+dfa.toString(parser.getTokenNames(), parser.getRuleNames()));
+					System.out.println("back from DFA update, alt="+alt+", dfa=\n"+dfa.toString(parser.getVocabulary(), parser.getRuleNames()));
 					//dump(dfa);
 				}
 				// action already executed
@@ -2173,18 +2174,17 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	@NotNull
 	public String getTokenName(int t) {
-		if ( t==Token.EOF ) return "EOF";
-		if ( parser!=null && parser.getTokenNames()!=null ) {
-			String[] tokensNames = parser.getTokenNames();
-			if ( t>=tokensNames.length ) {
-				System.err.println(t+" ttype out of range: "+ Arrays.toString(tokensNames));
-				System.err.println(((CommonTokenStream)parser.getInputStream()).getTokens());
-			}
-			else {
-				return tokensNames[t]+"<"+t+">";
-			}
+		if (t == Token.EOF) {
+			return "EOF";
 		}
-		return String.valueOf(t);
+
+		Vocabulary vocabulary = parser != null ? parser.getVocabulary() : VocabularyImpl.EMPTY_VOCABULARY;
+		String displayName = vocabulary.getDisplayName(t);
+		if (displayName.equals(Integer.toString(t))) {
+			return displayName;
+		}
+
+		return displayName + "<" + t + ">";
 	}
 
 	public String getLookaheadName(TokenStream input) {
@@ -2285,7 +2285,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
         if ( debug ) System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
 		addDFAEdge(from, t, to);
-		if ( debug ) System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getTokenNames():null, parser!=null?parser.getRuleNames():null));
+		if ( debug ) System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getVocabulary():VocabularyImpl.EMPTY_VOCABULARY, parser!=null?parser.getRuleNames():null));
 		return to;
 	}
 

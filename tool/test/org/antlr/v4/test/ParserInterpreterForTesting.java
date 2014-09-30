@@ -65,6 +65,7 @@ public class ParserInterpreterForTesting {
 		}
 
 		@Override
+		@Deprecated
 		public String[] getTokenNames() {
 			return g.getTokenNames();
 		}

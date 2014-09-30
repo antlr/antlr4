@@ -77,8 +77,6 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -1292,7 +1290,7 @@ public class TestPerformance extends BaseTest {
 
 							if (USE_PARSER_INTERPRETER) {
 								Parser referenceParser = parserCtor.newInstance(tokens);
-								parser = new ParserInterpreter(referenceParser.getGrammarFileName(), Arrays.asList(referenceParser.getTokenNames()), Arrays.asList(referenceParser.getRuleNames()), referenceParser.getATN(), tokens);
+								parser = new ParserInterpreter(referenceParser.getGrammarFileName(), referenceParser.getVocabulary(), Arrays.asList(referenceParser.getRuleNames()), referenceParser.getATN(), tokens);
 							}
 							else {
 								parser = parserCtor.newInstance(tokens);
@@ -1376,7 +1374,7 @@ public class TestPerformance extends BaseTest {
 							} else {
 								if (USE_PARSER_INTERPRETER) {
 									Parser referenceParser = parserCtor.newInstance(tokens);
-									parser = new ParserInterpreter(referenceParser.getGrammarFileName(), Arrays.asList(referenceParser.getTokenNames()), Arrays.asList(referenceParser.getRuleNames()), referenceParser.getATN(), tokens);
+									parser = new ParserInterpreter(referenceParser.getGrammarFileName(), referenceParser.getVocabulary(), Arrays.asList(referenceParser.getRuleNames()), referenceParser.getATN(), tokens);
 								}
 								else {
 									parser = parserCtor.newInstance(tokens);

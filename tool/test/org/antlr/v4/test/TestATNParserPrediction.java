@@ -526,7 +526,7 @@ public class TestATNParserPrediction extends BaseTest {
 				nvae.printStackTrace(System.err);
 			}
 			DFA dfa = interp.getATNSimulator().atn.decisionToDFA[decision];
-			assertEquals(dfaString[i], dfa.toString(g.getTokenDisplayNames(), g.rules.keySet().toArray(new String[g.rules.size()])));
+			assertEquals(dfaString[i], dfa.toString(g.getVocabulary(), g.rules.keySet().toArray(new String[g.rules.size()])));
 		}
 	}
 }

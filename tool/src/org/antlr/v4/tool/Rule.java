@@ -43,6 +43,7 @@ import org.antlr.v4.tool.ast.RuleAST;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -237,7 +238,7 @@ public class Rule implements AttributeResolver {
 	 * this label. Unlabeled alternatives are not included in the result.
 	 */
 	public Map<String, List<Tuple2<Integer, AltAST>>> getAltLabels() {
-		Map<String, List<Tuple2<Integer, AltAST>>> labels = new HashMap<String, List<Tuple2<Integer, AltAST>>>();
+		Map<String, List<Tuple2<Integer, AltAST>>> labels = new LinkedHashMap<String, List<Tuple2<Integer, AltAST>>>();
 		for (int i=1; i<=numberOfAlts; i++) {
 			GrammarAST altLabel = alt[i].ast.altLabel;
 			if ( altLabel!=null ) {

@@ -43,6 +43,7 @@ import org.antlr.v4.runtime.atn.RuleStartState;
 import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.atn.StarLoopEntryState;
 import org.antlr.v4.runtime.atn.Transition;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Tuple;
 import org.antlr.v4.runtime.misc.Tuple2;
 
@@ -69,19 +70,36 @@ public class ParserInterpreter extends Parser {
 	protected final ATN atn;
 	protected final BitSet pushRecursionContextStates;
 
+	@Deprecated
 	protected final String[] tokenNames;
 	protected final String[] ruleNames;
+	@NotNull
+	private final Vocabulary vocabulary;
 
 	protected final Deque<Tuple2<ParserRuleContext, Integer>> _parentContextStack = new ArrayDeque<Tuple2<ParserRuleContext, Integer>>();
 
+	/**
+	 * @deprecated Use {@link #ParserInterpreter(String, Vocabulary, Collection, ATN, TokenStream)} instead.
+	 */
+	@Deprecated
 	public ParserInterpreter(String grammarFileName, Collection<String> tokenNames,
+							 Collection<String> ruleNames, ATN atn, TokenStream input) {
+		this(grammarFileName, VocabularyImpl.fromTokenNames(tokenNames.toArray(new String[tokenNames.size()])), ruleNames, atn, input);
+	}
+
+	public ParserInterpreter(String grammarFileName, @NotNull Vocabulary vocabulary,
 							 Collection<String> ruleNames, ATN atn, TokenStream input)
 	{
 		super(input);
 		this.grammarFileName = grammarFileName;
 		this.atn = atn;
-		this.tokenNames = tokenNames.toArray(new String[tokenNames.size()]);
+		this.tokenNames = new String[atn.maxTokenType];
+		for (int i = 0; i < tokenNames.length; i++) {
+			tokenNames[i] = vocabulary.getDisplayName(i);
+		}
+
 		this.ruleNames = ruleNames.toArray(new String[ruleNames.size()]);
+		this.vocabulary = vocabulary;
 
 		// identify the ATN states where pushNewRecursionContext must be called
 		this.pushRecursionContextStates = new BitSet(atn.states.size());
@@ -105,8 +123,14 @@ public class ParserInterpreter extends Parser {
 	}
 
 	@Override
+	@Deprecated
 	public String[] getTokenNames() {
 		return tokenNames;
+	}
+
+	@Override
+	public Vocabulary getVocabulary() {
+		return vocabulary;
 	}
 
 	@Override
