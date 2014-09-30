@@ -285,7 +285,7 @@ namespace Antlr4.Build.Tasks
                     string framework = TargetFrameworkVersion;
                     if (string.IsNullOrEmpty(framework))
                         framework = "v2.0";
-                    if (framework == "v4.5.1")
+                    if (framework.StartsWith("v4.5."))
                         framework = "v4.5";
 
                     string language;
