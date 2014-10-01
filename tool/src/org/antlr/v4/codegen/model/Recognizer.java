@@ -86,6 +86,7 @@ public abstract class Recognizer extends OutputModelObject {
 
 		literalNames = translateTokenStringsToTarget(g.getTokenLiteralNames(), factory);
 		symbolicNames = translateTokenStringsToTarget(g.getTokenSymbolicNames(), factory);
+		abstractRecognizer = g.isAbstract();
 	}
 
 	protected static String[] translateTokenStringsToTarget(String[] tokenStrings, OutputModelFactory factory) {
