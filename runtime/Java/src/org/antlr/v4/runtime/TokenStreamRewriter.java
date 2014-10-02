@@ -31,7 +31,7 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.tree.SyntaxTree;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -386,24 +386,14 @@ public class TokenStreamRewriter {
 		return getText(DEFAULT_PROGRAM_NAME, interval);
 	}
 
-	/** Return the text associated with the tokens given by ParserRuleContext
+	/** Return the text associated with the tokens given by SyntaxTree
 	 */
-	public String getText(ParserRuleContext ctx) {
+	public String getText(SyntaxTree ctx) {
 		return getText(DEFAULT_PROGRAM_NAME, ctx);
 	}
 
-	public String getText(String programName, ParserRuleContext ctx) {
+	public String getText(String programName, SyntaxTree ctx) {
 		return getText(programName, ctx.getSourceInterval());
-	}
-
-	/** Return the text associated with the terminal node given
-	 */
-	public String getText(TerminalNode tn) {
-		return getText(DEFAULT_PROGRAM_NAME, tn);
-	}
-
-	public String getText(String programName, TerminalNode tn) {
-		return getText(programName, tn.getSourceInterval());
 	}
 
 	public String getText(String programName, Interval interval) {
