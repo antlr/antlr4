@@ -385,6 +385,16 @@ public class TokenStreamRewriter {
 		return getText(DEFAULT_PROGRAM_NAME, interval);
 	}
 
+	/** Return the text associated with the tokens given by ParserRuleContext
+	 */
+	public String getText(ParserRuleContext ctx) {
+		return getText(DEFAULT_PROGRAM_NAME, ctx);
+	}
+
+	public String getText(String programName, ParserRuleContext ctx) {
+		return getText(programName, ctx.getSourceInterval());
+	}
+
 	public String getText(String programName, Interval interval) {
 		List<RewriteOperation> rewrites = programs.get(programName);
 		int start = interval.a;
