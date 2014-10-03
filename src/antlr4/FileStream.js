@@ -34,8 +34,12 @@
 //  when you construct the object.
 // 
 var InputStream = require('./InputStream').InputStream;
-var fs = require("fs");
-
+try {
+	var fs = require("fs");
+} catch(ex) {
+	// probably running from browser, no "Node.js/fs" makes sense 
+}
+	
 function FileStream(fileName) {
 	var data = fs.readFileSync(fileName, "utf8");
 	InputStream.call(this, data);

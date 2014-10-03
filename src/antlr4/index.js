@@ -1,8 +1,9 @@
-exports.atn = require('./atn');
-exports.dfa = require('./dfa');
-exports.tree = require('./tree');
-exports.error = require('./error');
+exports.atn = require('./atn/index');
+exports.dfa = require('./dfa/index');
+exports.tree = require('./tree/index');
+exports.error = require('./error/index');
 exports.Token = require('./Token').Token;
+exports.InputStream = require('./InputStream').InputStream;
 exports.FileStream = require('./FileStream').FileStream;
 exports.CommonTokenStream = require('./CommonTokenStream').CommonTokenStream;
 exports.Lexer = require('./Lexer').Lexer;

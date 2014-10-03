@@ -28,7 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.js.test;
+package org.antlr.v4.js.node.test;
 
 import org.antlr.v4.tool.ErrorType;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package org.antlr.v4.js.test;
+package org.antlr.v4.js.node.test;
 
 import org.junit.Test;
 

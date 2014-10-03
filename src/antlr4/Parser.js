@@ -315,8 +315,7 @@ Parser.prototype.getATNWithBypassAlts = function() {
 
 var Lexer = require('./Lexer').Lexer;
 
-Parser.prototype.compileParseTreePattern = function(pattern, patternRuleIndex,
-		lexer) {
+Parser.prototype.compileParseTreePattern = function(pattern, patternRuleIndex, lexer) {
 	lexer = lexer || null;
 	if (lexer === null) {
 		if (this.getTokenStream() !== null) {

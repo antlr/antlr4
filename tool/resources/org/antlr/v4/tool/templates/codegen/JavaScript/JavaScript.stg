@@ -48,7 +48,7 @@ pythonTypeInitMap ::= [
 
 ParserFile(file, parser, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-var antlr4 = require('antlr4');
+var antlr4 = require('antlr4/index');
 <if(file.genListener)>
 var <file.grammarName>Listener = require('./<file.grammarName>Listener').<file.grammarName>Listener;
 <endif>
@@ -62,7 +62,7 @@ var <file.grammarName>Visitor = require('./<file.grammarName>Visitor').<file.gra
 
 ListenerFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-var antlr4 = require('antlr4');
+var antlr4 = require('antlr4/index');
 
 // This class defines a complete listener for a parse tree produced by <file.parserName>.
 function <file.grammarName>Listener() {
@@ -90,7 +90,7 @@ exports.<file.grammarName>Listener = <file.grammarName>Listener;
 
 VisitorFile(file, header) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-var antlr4 = require('antlr4');
+var antlr4 = require('antlr4/index');
 <header>
 
 // This class defines a complete generic visitor for a parse tree produced by <file.parserName>.
@@ -775,7 +775,7 @@ _prevctx = localctx;
 
 LexerFile(lexerFile, lexer, namedActions) ::= <<
 <fileHeader(lexerFile.grammarFileName, lexerFile.ANTLRVersion)>
-var antlr4 = require('antlr4');
+var antlr4 = require('antlr4/index');
 
 <namedActions.header>
 
