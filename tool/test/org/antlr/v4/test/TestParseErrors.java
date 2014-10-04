@@ -320,19 +320,24 @@ public class TestParseErrors extends BaseTest {
 
 	@Test
 	public void testDuplicatedLeftRecursiveCall1() throws Exception {
-		testDuplicatedLeftRecursiveCall("xx");
+		testDuplicatedLeftRecursiveCall("x");
 	}
 	
 	@Test
 	public void testDuplicatedLeftRecursiveCall2() throws Exception {
-		testDuplicatedLeftRecursiveCall("xxx");
+		testDuplicatedLeftRecursiveCall("xx");
 	}
 
 	@Test
 	public void testDuplicatedLeftRecursiveCall3() throws Exception {
-		testDuplicatedLeftRecursiveCall("xxxx");
+		testDuplicatedLeftRecursiveCall("xxx");
 	}
 
+	@Test
+	public void testDuplicatedLeftRecursiveCall4() throws Exception {
+		testDuplicatedLeftRecursiveCall("xxxx");
+	}
+	
 	/**
 	 * This is a regression test for #45 "NullPointerException in ATNConfig.hashCode".
 	 * https://github.com/antlr/antlr4/issues/45
