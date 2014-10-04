@@ -304,8 +304,7 @@ public class TestParseErrors extends BaseTest {
 	 * This is a regression test for #26 "an exception upon simple rule with double recursion in an alternative".
 	 * https://github.com/antlr/antlr4/issues/26
 	 */
-	@Test
-	public void testDuplicatedLeftRecursiveCall() throws Exception {
+	void testDuplicatedLeftRecursiveCall(String input) throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"start : expr EOF;\n" +
@@ -313,22 +312,25 @@ public class TestParseErrors extends BaseTest {
 			"     | expr expr\n" +
 			"     ;\n" +
 			"\n";
-
-		String result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "x", true);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "start", input, true);
 		assertEquals("", result);
 		assertNull(this.stderrDuringParse);
+	}
+	
 
-		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xx", true);
-		assertEquals("", result);
-		assertNull(this.stderrDuringParse);
+	@Test
+	public void testDuplicatedLeftRecursiveCall1() throws Exception {
+		testDuplicatedLeftRecursiveCall("xx");
+	}
+	
+	@Test
+	public void testDuplicatedLeftRecursiveCall2() throws Exception {
+		testDuplicatedLeftRecursiveCall("xxx");
+	}
 
-		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xxx", true);
-		assertEquals("", result);
-		assertNull(this.stderrDuringParse);
-
-		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xxxx", true);
-		assertEquals("", result);
-		assertNull(this.stderrDuringParse);
+	@Test
+	public void testDuplicatedLeftRecursiveCall3() throws Exception {
+		testDuplicatedLeftRecursiveCall("xxxx");
 	}
 
 	/**
