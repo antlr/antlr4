@@ -488,7 +488,7 @@ public abstract class BaseTest {
 		String inputPath = new File(new File(tmpdir), "input").getAbsolutePath();
 		try {
 			ProcessBuilder builder = new ProcessBuilder( nodejsPath, modulePath, inputPath );
-			builder.environment().put("NODE_PATH",runtimePath + ":" + tmpdir);
+			builder.environment().put("NODE_PATH",runtimePath + File.pathSeparator + tmpdir);
 			builder.directory(new File(tmpdir)); 
 			Process process = builder.start();
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
