@@ -48,6 +48,15 @@ public abstract class Recognizer extends OutputModelObject {
 	public String grammarName;
 	public String grammarFileName;
 	public Map<String,Integer> tokens;
+
+	/**
+	 * @deprecated This field is provided only for compatibility with code
+	 * generation targets which have not yet been updated to use
+	 * {@link #literalNames} and {@link #symbolicNames}.
+	 */
+	@Deprecated
+	public String[] tokenNames;
+
 	public String[] literalNames;
 	public String[] symbolicNames;
 	public Set<String> ruleNames;
@@ -84,6 +93,7 @@ public abstract class Recognizer extends OutputModelObject {
 		}
 
 		CodeGenerator gen = factory.getGenerator();
+		tokenNames = translateTokenStringsToTarget(g.getTokenDisplayNames(), gen);
 		literalNames = translateTokenStringsToTarget(g.getTokenLiteralNames(), gen);
 		symbolicNames = translateTokenStringsToTarget(g.getTokenSymbolicNames(), gen);
 	}
