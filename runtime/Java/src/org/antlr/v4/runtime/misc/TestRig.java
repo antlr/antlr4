@@ -40,7 +40,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.PredictionMode;
 
-import javax.print.PrintException;
+//import javax.print.PrintException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -210,7 +210,7 @@ public class TestRig {
 		}
 	}
 
-	protected void process(Lexer lexer, Class<? extends Parser> parserClass, Parser parser, InputStream is, Reader r) throws IOException, IllegalAccessException, InvocationTargetException, PrintException {
+	protected void process(Lexer lexer, Class<? extends Parser> parserClass, Parser parser, InputStream is, Reader r) throws IOException, IllegalAccessException, InvocationTargetException {
 		try {
 			ANTLRInputStream input = new ANTLRInputStream(r);
 			lexer.setInputStream(input);
@@ -250,7 +250,7 @@ public class TestRig {
 					System.out.println(tree.toStringTree(parser));
 				}
 				if ( gui ) {
-					tree.inspect(parser);
+//					tree.inspect(parser);
 				}
 				if ( psFile!=null ) {
 					tree.save(parser, psFile); // Generate postscript
