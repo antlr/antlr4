@@ -1,0 +1,13 @@
+grammar <grammarName>;
+s
+@init {<LL_EXACT_AMBIG_DETECTION()>}
+:   expr[0] {<ToStringTree("$expr.ctx"):writeln()>};
+	expr[int _p]
+		: ID 
+		( 
+			{5 >= $_p}? '*' expr[6]
+			| {4 >= $_p}? '+' expr[5]
+		)*
+		;
+ID  : [a-zA-Z]+ ;
+WS  : [ \r\n\t]+ -> skip ;
