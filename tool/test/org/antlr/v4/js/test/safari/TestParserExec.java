@@ -28,7 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.js.safari.test;
+package org.antlr.v4.js.test.safari;
 
 import org.junit.Test;
 

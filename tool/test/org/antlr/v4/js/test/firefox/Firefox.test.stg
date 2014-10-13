@@ -1,0 +1,154 @@
+TestFile(file) ::= <<
+package org.antlr.v4.js.test.firefox;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+<if(file.importErrorQueue)>
+import org.antlr.v4.test.ErrorQueue;
+<endif>
+<if(file.importGrammar)>
+import org.antlr.v4.tool.Grammar;
+<endif>
+
+public class Test<file.name> extends BaseTest {
+
+	<file.tests:{test | <test>}; separator="\n", wrap, anchor>
+
+}
+>>
+
+LexerTestMethod(test) ::= <<
+@Test
+public void test<test.name>() throws Exception {
+<test.slaveGrammars:{ grammar | 
+	String slave_<grammar.grammarName> = <grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
+	mkdir(tmpdir);
+	writeFile(tmpdir, "<grammar.grammarName>.g4", slave_<grammar.grammarName>);
+	};separator="\n", wrap, anchor>
+	String grammar = <test.grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
+	<test.afterGrammar>
+	String found = execLexer("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName>", "<test.input>");
+	assertEquals(<test.outputLines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>", found);
+	<if(test.expectedErrors)>
+	assertEquals("<test.expectedErrors>", this.stderrDuringParse);
+	<else>
+	assertNull(this.stderrDuringParse);
+	<endif>
+}
+
+>>
+
+CompositeLexerTestMethod(test) ::= <<
+<LexerTestMethod(test)>
+>>
+
+
+ParserTestMethod(test) ::= <<
+@Test
+public void test<test.name>() throws Exception {
+<test.slaveGrammars:{ grammar | 
+	String slave_<grammar.grammarName> = <grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
+	mkdir(tmpdir);
+	writeFile(tmpdir, "<grammar.grammarName>.g4", slave_<grammar.grammarName>);
+	};separator="\n", wrap, anchor>
+	String grammar = <test.grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
+	<test.afterGrammar>
+	String found = execParser("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName>Parser", "<test.grammar.grammarName>Lexer", "<test.grammar.grammarName>Listener", "<test.grammar.grammarName>Visitor", "<test.startRule>", "<test.input>");
+	assertEquals("<test.expectedOutput>", found);
+	<if(test.expectedErrors)>
+	assertEquals("<test.expectedErrors>", this.stderrDuringParse);
+	<else>
+	assertNull(this.stderrDuringParse);
+	<endif>
+}
+
+>>
+
+CompositeParserTestMethod(test) ::= <<
+<ParserTestMethod(test)>
+>>
+
+local() ::= ""
+
+dumpDFA() ::= "this.dumpDFA();"
+
+writeln(s) ::= <<document.getElementById('output').value += <s> + '\\n';>>
+
+write(s) ::= <<document.getElementById('output').value += <s>;>>
+
+inputLANotEqual(i, t) ::= <%this._input.LA(<i>) !== <t>%>
+
+BailErrorStrategy() ::= <%this._errHandler = new antlr4.error.BailErrorStrategy();%>
+
+ToStringTree(s) ::= <%<s>.toStringTree(null, this);%>
+
+declare_foo() ::= "this.foo = function() {document.getElementById('output').value += 'foo\\n'};"
+			
+invoke_foo() ::= "this.foo();"
+
+LL_EXACT_AMBIG_DETECTION() ::= <<this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
+
+PositionAdjustingLexer() ::= <<
+
+PositionAdjustingLexer.prototype.resetAcceptPosition = function(index, line, column) {
+	this._input.seek(index);
+	this.line = line;
+	this.column = column;
+	this._interp.consume(this._input);
+};
+
+PositionAdjustingLexer.prototype.nextToken = function() {
+	if (!("resetAcceptPosition" in this._interp)) {
+		var lexer = this;
+		this._interp.resetAcceptPosition = function(index, line, column) { lexer.resetAcceptPosition(index, line, column); };
+	}
+	return antlr4.Lexer.prototype.nextToken.call(this);
+};
+
+PositionAdjustingLexer.prototype.emit = function() {
+	switch(this._type) {
+	case TOKENS:
+		this.handleAcceptPositionForKeyword("tokens");
+		break;
+	case LABEL:
+		this.handleAcceptPositionForIdentifier();
+		break;
+	}
+	return antlr4.Lexer.prototype.emit.call(this);
+};
+
+PositionAdjustingLexer.prototype.handleAcceptPositionForIdentifier = function() {
+	var tokenText = this.text;
+	var identifierLength = 0;
+	while (identifierLength \< tokenText.length && 
+		PositionAdjustingLexer.isIdentifierChar(tokenText[identifierLength])
+	) {
+		identifierLength += 1;
+	}
+	if (this._input.index > this._tokenStartCharIndex + identifierLength) {
+		var offset = identifierLength - 1;
+		this._interp.resetAcceptPosition(this._tokenStartCharIndex + offset, 
+				this._tokenStartLine, this._tokenStartColumn + offset);
+		return true;
+	} else {
+		return false;
+	}
+};
+
+PositionAdjustingLexer.prototype.handleAcceptPositionForKeyword = function(keyword) {
+	if (this._input.index > this._tokenStartCharIndex + keyword.length) {
+		var offset = keyword.length - 1;
+		this._interp.resetAcceptPosition(this._tokenStartCharIndex + offset, 
+			this._tokenStartLine, this._tokenStartColumn + offset);
+		return true;
+	} else {
+		return false;
+	}
+};
+
+PositionAdjustingLexer.isIdentifierChar = function(c) {
+	return c.match(/^[0-9a-zA-Z_]+$/);
+}
+
+>>

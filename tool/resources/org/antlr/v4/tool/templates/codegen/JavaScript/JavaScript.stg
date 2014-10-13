@@ -138,7 +138,7 @@ var EOF = antlr4.Token.EOF;
 <parser.tokens:{k | var <k> = <parser.tokens.(k)>;}; separator="\n", wrap, anchor>
 <endif>
 
-var tokenNames = [ <parser.tokenNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor> ];
+var tokenNames = [ <parser.symbolicNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor> ];
 
 <parser.rules:{r | var RULE_<r.name> = <r.index>;}; separator="\n", wrap, anchor>
 
@@ -798,7 +798,7 @@ var decisionsToDFA = atn.decisionToState.map( function(ds, index) { return new a
 var modeNames = [ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> ];
     
 var tokenNames = [ "\<INVALID>",
-            <lexer.tokenNames:{t | <t>}; separator=", ", wrap, anchor> ];
+            <lexer.symbolicNames:{t | <t>}; separator=", ", wrap, anchor> ];
     
 var ruleNames = [ <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> ];
     

@@ -27,7 +27,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.antlr.v4.js.node.test;
+package org.antlr.v4.js.test.safari;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -73,7 +73,6 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
@@ -89,10 +88,18 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.junit.Before;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+import org.openqa.selenium.By.ById;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.safari.SafariDriver;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
@@ -186,19 +193,6 @@ public abstract class BaseTest {
 		}
 	}
 
-	public DFA createDFA(Grammar g, DecisionState s) {
-//		PredictionDFAFactory conv = new PredictionDFAFactory(g, s);
-//		DFA dfa = conv.createDFA();
-//		conv.issueAmbiguityWarnings();
-//		System.out.print("DFA="+dfa);
-//		return dfa;
-		return null;
-	}
-
-//	public void minimizeDFA(DFA dfa) {
-//		DFAMinimizer dmin = new DFAMinimizer(dfa);
-//		dfa.minimized = dmin.minimize();
-//	}
 
 	IntegerList getTypesFromString(Grammar g, String expecting) {
 		IntegerList expectingTokenTypes = new IntegerList();
@@ -251,85 +245,21 @@ public abstract class BaseTest {
 		return tokenTypes;
 	}
 
-	List<ANTLRMessage> checkRuleDFA(String gtext, String ruleName, String expecting)
-		throws Exception
-	{
-		ErrorQueue equeue = new ErrorQueue();
-		Grammar g = new Grammar(gtext, equeue);
-		ATN atn = createATN(g, false);
-		ATNState s = atn.ruleToStartState[g.getRule(ruleName).index];
-		if ( s==null ) {
-			System.err.println("no such rule: "+ruleName);
-			return null;
-		}
-		ATNState t = s.transition(0).target;
-		if ( !(t instanceof DecisionState) ) {
-			System.out.println(ruleName+" has no decision");
-			return null;
-		}
-		DecisionState blk = (DecisionState)t;
-		checkRuleDFA(g, blk, expecting);
-		return equeue.all;
-	}
-
-	List<ANTLRMessage> checkRuleDFA(String gtext, int decision, String expecting)
-		throws Exception
-	{
-		ErrorQueue equeue = new ErrorQueue();
-		Grammar g = new Grammar(gtext, equeue);
-		ATN atn = createATN(g, false);
-		DecisionState blk = atn.decisionToState.get(decision);
-		checkRuleDFA(g, blk, expecting);
-		return equeue.all;
-	}
-
-	void checkRuleDFA(Grammar g, DecisionState blk, String expecting)
-		throws Exception
-	{
-		DFA dfa = createDFA(g, blk);
-		String result = null;
-		if ( dfa!=null ) result = dfa.toString();
-		assertEquals(expecting, result);
-	}
-
-	List<ANTLRMessage> checkLexerDFA(String gtext, String expecting)
-		throws Exception
-	{
-		return checkLexerDFA(gtext, LexerGrammar.DEFAULT_MODE_NAME, expecting);
-	}
-
-	List<ANTLRMessage> checkLexerDFA(String gtext, String modeName, String expecting)
-		throws Exception
-	{
-		ErrorQueue equeue = new ErrorQueue();
-		LexerGrammar g = new LexerGrammar(gtext, equeue);
-		g.atn = createATN(g, false);
-//		LexerATNToDFAConverter conv = new LexerATNToDFAConverter(g);
-//		DFA dfa = conv.createDFA(modeName);
-//		g.setLookaheadDFA(0, dfa); // only one decision to worry about
-//
-//		String result = null;
-//		if ( dfa!=null ) result = dfa.toString();
-//		assertEquals(expecting, result);
-//
-//		return equeue.all;
-		return null;
-	}
-
 
 	/** Return true if all is ok, no errors */
 	protected ErrorQueue antlr(String fileName, String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
-		System.out.println("dir "+tmpdir);
-		mkdir(tmpdir);
-		writeFile(tmpdir, fileName, grammarStr);
+		String parserDir = tmpdir + "/parser";
+		System.out.println("dir "+parserDir);
+		mkdir(parserDir);
+		writeFile(parserDir, fileName, grammarStr);
 		final List<String> options = new ArrayList<String>();
 		Collections.addAll(options, extraOptions);
 		options.add("-Dlanguage=JavaScript");
 		options.add("-o");
-		options.add(tmpdir);
+		options.add(parserDir);
 		options.add("-lib");
-		options.add(tmpdir);
-		options.add(new File(tmpdir,grammarFileName).toString());
+		options.add(parserDir);
+		options.add(new File(parserDir,grammarFileName).toString());
 
 		final String[] optionsA = new String[options.size()];
 		options.toArray(optionsA);
@@ -365,25 +295,15 @@ public abstract class BaseTest {
 	protected String execLexer(String grammarFileName,
 							   String grammarStr,
 							   String lexerName,
-							   String input)
-	{
-		return execLexer(grammarFileName, grammarStr, lexerName, input, false);
-	}
-
-	protected String execLexer(String grammarFileName,
-							   String grammarStr,
-							   String lexerName,
-							   String input,
-							   boolean showDFA)
+							   String input) throws Exception
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 									  grammarStr,
 									  null,
 									  lexerName,"-no-listener");
 		assertTrue(success);
-		writeFile(tmpdir, "input", input);
-		writeLexerTestFile(lexerName, showDFA);
-		String output = execModule("Test.js");
+		writeLexerTestFile(lexerName);
+		String output = execHtmlPage("Test.html", input);
 		if ( stderrDuringParse!=null && stderrDuringParse.length()>0 ) {
 			System.err.println(stderrDuringParse);
 		}
@@ -397,7 +317,7 @@ public abstract class BaseTest {
 								String listenerName,
 								String visitorName,
 								String startRuleName,
-								String input, boolean debug)
+								String input) throws Exception
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 														grammarStr,
@@ -405,14 +325,12 @@ public abstract class BaseTest {
 														lexerName,
 														"-visitor");
 		assertTrue(success);
-		writeFile(tmpdir, "input", input);
 		rawBuildRecognizerTestFile(parserName,
 								 lexerName,
 								 listenerName,
 								 visitorName,
-								 startRuleName,
-								 debug);
-		return execRecognizer();
+								 startRuleName);
+		return execRecognizer(input);
 	}
 
 	/** Return true if all is well */
@@ -460,65 +378,65 @@ public abstract class BaseTest {
 									   String lexerName,
 									   String listenerName,
 									   String visitorName,
-									   String parserStartRuleName,
-									   boolean debug)
+									   String parserStartRuleName)
 	{
         this.stderrDuringParse = null;
 		if ( parserName==null ) {
-			writeLexerTestFile(lexerName, false);
+			writeLexerTestFile(lexerName);
 		}
 		else {
 			writeParserTestFile(parserName,
 						  lexerName,
 						  listenerName,
 						  visitorName,
-						  parserStartRuleName,
-						  debug);
+						  parserStartRuleName);
 		}
 	}
 
-	public String execRecognizer() {
-		return execModule("Test.js");
+	public String execRecognizer(String input) throws Exception {
+		return execHtmlPage("Test.html", input);
 	}
 
-	public String execModule(String fileName) {
-		String nodejsPath = locateNodeJS();
+	public String execHtmlPage(String fileName, String input) throws Exception {
 		String runtimePath = locateRuntime();
-		String modulePath = new File(new File(tmpdir), fileName).getAbsolutePath();
-		String inputPath = new File(new File(tmpdir), "input").getAbsolutePath();
+		Server server = new Server(8080);
 		try {
-			ProcessBuilder builder = new ProcessBuilder( nodejsPath, modulePath, inputPath );
-			builder.environment().put("NODE_PATH",runtimePath + ":" + tmpdir);
-			builder.directory(new File(tmpdir)); 
-			Process process = builder.start();
-			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-			stdoutVacuum.start();
-			stderrVacuum.start();
-			process.waitFor();
-			stdoutVacuum.join();
-			stderrVacuum.join();
-			String output = stdoutVacuum.toString();
-			if ( stderrVacuum.toString().length()>0 ) {
-				this.stderrDuringParse = stderrVacuum.toString();
-				System.err.println("exec stderrVacuum: "+ stderrVacuum);
+			// start Jetty, since 'file' protocol is not supported by Selenium Safari driver
+			ResourceHandler rh1 = new ResourceHandler();
+			rh1.setDirectoriesListed(false);
+			rh1.setResourceBase(tmpdir);
+			rh1.setWelcomeFiles(new String[] { fileName });
+			ResourceHandler rh2 = new ResourceHandler();
+			rh2.setDirectoriesListed(false);
+			rh2.setResourceBase(runtimePath);
+			HandlerList handlers = new HandlerList();
+			handlers.setHandlers(new Handler[] { rh1, rh2, new DefaultHandler() });
+			server.setHandler(handlers);
+			server.start();
+			// System.setProperty("webdriver.safari.driver", "/Users/ericvergnaud/Desktop/TestSafari/org/openqa/selenium/safari/SafariDriver.safariextz");
+			System.setProperty("webdriver.safari.noinstall", "true");
+			WebDriver driver = new SafariDriver();
+			try {
+				driver.get("http://localhost:8080/" + fileName);
+				driver.findElement(new ById("input")).sendKeys(input);
+				driver.findElement(new ById("submit")).click();
+				String errors = driver.findElement(new ById("errors")).getText();
+				if(errors!=null && errors.length()>0) {
+					this.stderrDuringParse = errors;
+					System.err.print(errors);
+				}
+				return driver.findElement(new ById("output")).getAttribute("value");
+			} finally {
+				driver.close();
 			}
-			return output;
 		}
 		catch (Exception e) {
 			System.err.println("can't exec recognizer");
 			e.printStackTrace(System.err);
+		} finally {
+			server.stop();
 		}
 		return null;
-	}
-
-	private String locateNodeJS() {
-		// typically /usr/local/bin/node
-		String propName = "antlr-javascript-nodejs";
-		String prop = System.getProperty(propName);
-		if(prop==null || prop.length()==0)
-			throw new RuntimeException("Missing system property:" + propName);
-		return prop;
 	}
 
 	private String locateRuntime() {
@@ -793,64 +711,79 @@ public abstract class BaseTest {
 	}
 
 	protected void writeParserTestFile(String parserName,
-								 String lexerName,
-								 String listenerName,
-								 String visitorName,
-								 String parserStartRuleName,
-								 boolean debug)
-	{
-		ST outputFileST = new ST(
-			"var antlr4 = require('antlr4');\n" +
-			"var <lexerName> = require('./<lexerName>');\n" +
-			"var <parserName> = require('./<parserName>');\n" +
-			"var <listenerName> = require('./<listenerName>').<listenerName>;\n" +
-			"var <visitorName> = require('./<visitorName>').<visitorName>;\n" +
-			"\n" +
-			"function TreeShapeListener() {\n" +
-			"	antlr4.tree.ParseTreeListener.call(this);\n" +
-			"	return this;\n" +
-			"}\n" +
-			"\n" +
-			"TreeShapeListener.prototype = Object.create(antlr4.tree.ParseTreeListener.prototype);\n" +
-			"TreeShapeListener.prototype.constructor = TreeShapeListener;\n" +
-			"\n" +
-			"TreeShapeListener.prototype.enterEveryRule = function(ctx) {\n" +
-			"	for(var i=0;i\\<ctx.getChildCount; i++) {\n" +
-			"		var child = ctx.getChild(i);\n" +
-			"       var parent = child.parentCtx;\n" +
-			"       if(parent.getRuleContext() !== ctx || !(parent instanceof antlr4.tree.RuleNode)) {\n" +
-			"           throw \"Invalid parse tree shape detected.\";\n" +
-			"		}\n" +
-			"	}\n" +	
-			"};\n" +
-			"\n" +
-			"function main(argv) {\n" +
-			"    var input = new antlr4.FileStream(argv[2]);\n" +
-			"    var lexer = new <lexerName>.<lexerName>(input);\n" +
-		    "    var stream = new antlr4.CommonTokenStream(lexer);\n" +
-			"<createParser>"+
-			"    parser.buildParseTrees = true;\n" +
-			"    var tree = parser.<parserStartRuleName>();\n" +
-			"    antlr4.tree.ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
-			"}\n" +
-			"\n" +
-			"main(process.argv);\n" +
-			"\n");
-        ST createParserST = new ST("	var parser = new <parserName>.<parserName>(stream);\n");
-		if ( debug ) {
-			createParserST = new ST("	var parser = new <parserName>.<parserName>(stream);\n" +
-						"	parser.addErrorListener(new antlr4.error.DiagnosticErrorListener());\n");
-		}
-		outputFileST.add("createParser", createParserST);
-		outputFileST.add("parserName", parserName);
-		outputFileST.add("lexerName", lexerName);
-		outputFileST.add("listenerName", listenerName);
-		outputFileST.add("visitorName", visitorName);
-		outputFileST.add("parserStartRuleName", parserStartRuleName);
-		writeFile(tmpdir, "Test.js", outputFileST.render());
-	}
-
-	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
+			 String lexerName,
+			 String listenerName,
+			 String visitorName,
+			 String parserStartRuleName) {
+		String html = "<!DOCTYPE html>\r\n" +
+		"<html>\r\n" +
+	    "	<head>\r\n" +
+        "		<script src='lib/require.js'></script>\r\n" +
+        "		<script>\r\n" +
+        "			antlr4 = null;\r\n" +
+        "			TreeShapeListener = null;\r\n" +
+        "			" + lexerName + " = null;\r\n" +
+        "			" + parserName + " = null;\r\n" +
+        "			" + listenerName + " = null;\r\n" +
+        "			" + visitorName + " = null;\r\n" +
+		"\r\n" +			
+		"			loadParser = function() {\r\n" +			
+        "				try {\r\n" +
+        "					antlr4 = require('antlr4/index');\r\n" +
+		"					" + lexerName + " = require('./parser/" + lexerName + "');\n" +
+		"					" + parserName + " = require('./parser/" + parserName + "');\n" +
+		"					" + listenerName + " = require('./parser/" + listenerName + "');\n" +
+		"					" + visitorName + " = require('./parser/" + visitorName + "');\n" +
+        "				} catch (ex) {\r\n" +
+        "					document.getElementById('errors').value = ex.toString();\r\n" +
+        "				}\r\n" +
+		"\r\n" +			
+        "				TreeShapeListener = function() {\r\n" +
+        "					antlr4.tree.ParseTreeListener.call(this);\r\n" +
+        "					return this;\r\n" +
+        "				};\r\n" +
+		"\r\n" +			
+		"				TreeShapeListener.prototype = Object.create(antlr4.tree.ParseTreeListener.prototype);\r\n" +
+		"				TreeShapeListener.prototype.constructor = TreeShapeListener;\r\n" +
+		"\r\n" +			
+		"				TreeShapeListener.prototype.enterEveryRule = function(ctx) {\r\n" +
+		"					for(var i=0;i<ctx.getChildCount; i++) {\r\n" +
+		"						var child = ctx.getChild(i);\r\n" +
+		"						var parent = child.parentCtx;\r\n" +
+		"						if(parent.getRuleContext() !== ctx || !(parent instanceof antlr4.tree.RuleNode)) {\r\n" +
+		"							throw 'Invalid parse tree shape detected.';\r\n" +
+		"						}\r\n" +
+		"					}\r\n" +
+		"				};\r\n" +
+		"			}\r\n" +
+		"\r\n" +			
+		"			test = function() {\r\n" +
+		"				document.getElementById('output').value = ''\r\n" +
+		"				var input = document.getElementById('input').value;\r\n" +
+		"    			var stream = new antlr4.InputStream(input);\n" +
+		"    			var lexer = new " + lexerName + "." + lexerName + "(stream);\n" +
+	    "    			var tokens = new antlr4.CommonTokenStream(lexer);\n" +
+	    "				var parser = new " + parserName + "." + parserName + "(tokens);\n" +
+	    "    			parser.buildParseTrees = true;\n" +
+		"    			var tree = parser." + parserStartRuleName + "();\n" +
+		"    			antlr4.tree.ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
+		"			};\r\n" +
+		"\r\n" +			
+        "		</script>\r\n" +
+	    "	</head>\r\n" +
+	    "	<body>\r\n" +
+	    "		<textarea id='input'></textarea><br>\r\n" +
+	    "		<button id='submit' type='button' onclick='test()'>Test</button><br>\r\n" +
+	    "		<textarea id='output'></textarea><br>\r\n" +
+	    "		<textarea id='errors'></textarea><br>\r\n" +
+	    "		<script>loadParser();</script>\r\n" +	
+	    "	</body>\r\n" +
+	    "</html>\r\n";
+		writeFile(tmpdir, "Test.html", html);	
+	};
+	
+	
+	protected void writeLexerTestFile(String lexerName) {
 		ST outputFileST = new ST(
 			"var antlr4 = require('antlr4');\n" +
 			"var <lexerName> = require('./<lexerName>');\n" +
@@ -863,9 +796,6 @@ public abstract class BaseTest {
 		    "    for(var i=0; i\\<stream.tokens.length; i++) {\n" +
 		    "		console.log(stream.tokens[i].toString());\n" +
 			"    }\n" +
-			(showDFA ? 
-			"    process.stdout.write(lexer._interp.decisionToDFA[antlr4.Lexer.DEFAULT_MODE].toLexerString());\n"
-				 :"") +
 			"}\n" +
 			"\n" +
 			"main(process.argv);\n" +
@@ -876,17 +806,16 @@ public abstract class BaseTest {
 
 	public void writeRecognizer(String parserName, String lexerName,
 								String listenerName, String visitorName,
-								String parserStartRuleName, boolean debug) {
+								String parserStartRuleName) {
 		if ( parserName==null ) {
-			writeLexerTestFile(lexerName, debug);
+			writeLexerTestFile(lexerName);
 		}
 		else {
 			writeParserTestFile(parserName,
 						  lexerName,
 						  listenerName,
 						  visitorName,
-						  parserStartRuleName,
-						  debug);
+						  parserStartRuleName);
 		}
 	}
 

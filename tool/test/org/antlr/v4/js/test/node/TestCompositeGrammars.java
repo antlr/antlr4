@@ -28,15 +28,13 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.js.node.test;
+package org.antlr.v4.js.test.node;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import org.antlr.v4.test.ErrorQueue;
-import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.junit.Test;
 
 public class TestCompositeGrammars extends BaseTest {
@@ -261,53 +259,6 @@ public class TestCompositeGrammars extends BaseTest {
 		String found = execParser("M.g4", master, "MParser", "MLexer", "MListener", "MVisitor",
 								  "s", "x 34 9", debug);
 		assertEquals("S.x\n", found);
-	}
-
-	@Test public void testImportedTokenVocabIgnoredWithWarning() throws Exception {
-		ErrorQueue equeue = new ErrorQueue();
-		String slave =
-			"parser grammar S;\n" +
-			"options {tokenVocab=whatever;}\n" +
-			"tokens { A }\n" +
-			"x : A {print(\"S.x\")} ;\n";
-		mkdir(tmpdir);
-		writeFile(tmpdir, "S.g4", slave);
-
-		String master =
-			"grammar M;\n" +
-			"import S;\n" +
-			"s : x ;\n" +
-			"WS : (' '|'\\n') -> skip ;\n" ;
-		writeFile(tmpdir, "M.g4", master);
-		Grammar g = new Grammar(tmpdir+"/M.g4", master, equeue);
-
-		Object expectedArg = "S";
-		ErrorType expectedMsgID = ErrorType.OPTIONS_IN_DELEGATE;
-		GrammarSemanticsMessage expectedMessage =
-			new GrammarSemanticsMessage(expectedMsgID, g.fileName, null, expectedArg);
-		checkGrammarSemanticsWarning(equeue, expectedMessage);
-
-		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
-		assertEquals("unexpected warnings: "+equeue, 1, equeue.warnings.size());
-	}
-
-	@Test public void testSyntaxErrorsInImportsNotThrownOut() throws Exception {
-		ErrorQueue equeue = new ErrorQueue();
-		String slave =
-			"parser grammar S;\n" +
-			"options {toke\n";
-		mkdir(tmpdir);
-		writeFile(tmpdir, "S.g4", slave);
-
-		String master =
-			"grammar M;\n" +
-			"import S;\n" +
-			"s : x ;\n" +
-			"WS : (' '|'\\n') -> skip ;\n" ;
-		writeFile(tmpdir, "M.g4", master);
-		/* Grammar g = */ new Grammar(tmpdir+"/M.g4", master, equeue);
-
-		assertEquals(ErrorType.SYNTAX_ERROR, equeue.errors.get(0).getErrorType());
 	}
 
 	@Test public void testDelegatorRuleOverridesDelegate() throws Exception {

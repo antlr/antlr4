@@ -28,7 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.js.node.test;
+package org.antlr.v4.js.test.node;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -392,7 +392,7 @@ public class TestParserExec extends BaseTest {
 	@Test public void testStartRuleWithoutEOF() {
 		String grammar =
 			"grammar T;\n"+
-			"s @after { self.dumpDFA() }\n" +
+			"s @after { this.dumpDFA() }\n" +
 			"  : ID | ID INT ID ;\n" +
 			"ID : 'a'..'z'+ ;\n"+
 			"INT : '0'..'9'+ ;\n"+

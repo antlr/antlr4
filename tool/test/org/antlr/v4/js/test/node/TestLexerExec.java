@@ -28,7 +28,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.antlr.v4.js.node.test;
+package org.antlr.v4.js.test.node;
 
 import org.antlr.v4.runtime.misc.Nullable;
 import org.junit.Test;
