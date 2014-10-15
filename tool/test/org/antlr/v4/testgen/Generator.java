@@ -1,8 +1,5 @@
 package org.antlr.v4.testgen;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -14,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
@@ -116,8 +112,46 @@ public class Generator {
 		list.add(buildFullContextParsing());
 		list.add(buildLeftRecursion());
 		list.add(buildLexerErrors());
+		list.add(buildListeners());
 		return list;
 		
+	}
+
+	private TestFile buildListeners() throws Exception {
+		TestFile file = new TestFile("Listeners");
+		file.addParserTest(input, "Basic", "T", "s", 
+				"1 2", 
+				"(a 1 2)\n" + "1\n" + "2\n",
+				null);
+		file.addParserTests(input, "TokenGetters", "T", "s", 
+				"1 2", 
+				"(a 1 2)\n" +
+				"1 2 [1, 2]\n",
+				"abc",
+				"(a abc)\n" +
+				"[@0,0:2='abc',<4>,1:0]\n");
+		file.addParserTests(input, "RuleGetters", "T", "s", 
+				"1 2", 
+				"(a (b 1) (b 2))\n" +
+				"1 2 1\n",
+				"abc", 
+				"(a (b abc))\n" +
+				"abc\n");
+		file.addParserTest(input, "LR", "T", "s", 
+				"1+2*3", 
+				"(e (e 1) + (e (e 2) * (e 3)))\n" +
+				"1\n" +
+				"2\n" +
+				"3\n" +
+				"2 3 2\n" +
+				"1 2 1\n",
+				null);
+		file.addParserTest(input, "LRWithLabels", "T", "s", 
+				"1(2,3)", 
+				"(e (e 1) ( (eList (e 2) , (e 3)) ))\n" +
+				"1\n" + "2\n" + "3\n" + "1 [13 6]\n",
+				null);
+		return file;
 	}
 
 	private TestFile buildLexerErrors() throws Exception {

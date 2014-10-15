@@ -1,0 +1,24 @@
+grammar <grammarName>;
+@parser::header {
+<importListener(grammarName)>
+}
+
+@parser::members {
+<RuleGetterListener(grammarName)>
+}
+
+s
+@after {
+<ToStringTree("$ctx.r"):writeln()>
+<walkListener("$ctx.r")>
+}
+  : r=a ;
+a : b b		// forces list
+  | b		// a list still
+  ;
+b : ID | INT;
+MULT: '*' ;
+ADD : '+' ;
+INT : [0-9]+ ;
+ID  : [a-z]+ ;
+WS : [ \t\n]+ -> skip ;
