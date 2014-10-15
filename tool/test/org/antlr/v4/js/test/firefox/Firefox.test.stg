@@ -115,6 +115,8 @@ LL_EXACT_AMBIG_DETECTION() ::= <<this._interp.predictionMode = antlr4.atn.Predic
 
 True() ::= "true"
 
+importListener(X) ::= <<var <X>Listener = require('./<X>Listener').<X>Listener;>>
+
 PositionAdjustingLexer() ::= <<
 
 PositionAdjustingLexer.prototype.resetAcceptPosition = function(index, line, column) {
@@ -176,5 +178,95 @@ PositionAdjustingLexer.prototype.handleAcceptPositionForKeyword = function(keywo
 PositionAdjustingLexer.isIdentifierChar = function(c) {
 	return c.match(/^[0-9a-zA-Z_]+$/);
 }
+
+>>
+
+BasicListener(X) ::= <<
+this.LeafListener = function() {
+    this.visitTerminal = function(node) {
+    	document.getElementById('output').value += node.symbol.text + '\\n';
+    };
+    return this;
+};
+this.LeafListener.prototype = Object.create(<X>Listener.prototype);
+this.LeafListener.prototype.constructor = this.LeafListener;
+
+>>
+
+walkListener(s) ::= <<
+var walker = new antlr4.tree.ParseTreeWalker();
+walker.walk(new this.LeafListener(), <s>);
+
+>>
+
+TokenGetterListener(X) ::= <<
+this.LeafListener = function() {
+    this.exitA = function(ctx) {
+    	var str;
+        if(ctx.getChildCount()===2) {
+            str = ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + antlr4.Utils.arrayToString(ctx.INT());
+        } else {
+            str = ctx.ID().symbol.toString();
+        }
+    	document.getElementById('output').value += str + '\\n';
+    };
+    return this;
+};
+this.LeafListener.prototype = Object.create(<X>Listener.prototype);\n" +
+this.LeafListener.prototype.constructor = this.LeafListener;\n" +
+
+>>
+
+RuleGetterListener(X) ::= <<
+this.LeafListener = function() {
+    this.exitA = function(ctx) {
+    	var str;
+        if(ctx.getChildCount()===2) {
+            str = ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text;
+        } else {
+            str = ctx.b(0).start.text;
+        }
+    	document.getElementById('output').value += str + '\\n';
+    };
+    return this;
+};
+this.LeafListener.prototype = Object.create(<X>Listener.prototype);\n" +
+this.LeafListener.prototype.constructor = this.LeafListener;\n" +
+
+>>
+
+
+LRListener(X) ::= <<
+this.LeafListener = function() {
+    this.exitE = function(ctx) {
+    	var str;
+        if(ctx.getChildCount()===3) {
+            str = ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text;
+        } else {
+            str = ctx.INT().symbol.text;
+        }
+    	document.getElementById('output').value += str + '\\n';
+    };
+    return this;
+};
+this.LeafListener.prototype = Object.create(<X>Listener.prototype);
+this.LeafListener.prototype.constructor = this.LeafListener;
+
+>>
+
+LRWithLabelsListener(X) ::= <<
+this.LeafListener = function() {
+    this.exitCall = function(ctx) {
+    	var str = ctx.e().start.text + ' ' + ctx.eList();
+    	document.getElementById('output').value += str + '\\n';
+    };
+    this.exitInt = function(ctx) {
+        var str = ctx.INT().symbol.text;
+        document.getElementById('output').value += str + '\\n';
+    };
+    return this;
+};
+this.LeafListener.prototype = Object.create(<X>Listener.prototype);
+this.LeafListener.prototype.constructor = this.LeafListener;
 
 >>
