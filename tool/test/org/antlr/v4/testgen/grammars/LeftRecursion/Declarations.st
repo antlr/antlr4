@@ -1,0 +1,14 @@
+grammar <grammarName>;
+s @after {<ToStringTree("$ctx"):writeln()>} : declarator EOF ; // must indicate EOF can follow
+declarator
+        : declarator '[' e ']'
+        | declarator '[' ']'
+        | declarator '(' ')'
+        | '*' declarator // binds less tight than suffixes
+        | '(' declarator ')'
+        | ID
+        ;
+e : INT ;
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+ ;
+WS : (' '|'\n') -> skip ;

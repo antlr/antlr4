@@ -23,16 +23,39 @@ public class TestFile {
 		return name;
 	}
 
-	public void addParserTest(File grammarDir, String name, String grammarName, String methodName,
-			String input, String expectedOutput, String expectedErrors) throws Exception {
-		addParserTest( grammarDir, name, grammarName, methodName, input, expectedOutput, expectedErrors, null);
-	}
-	
 	public ParserTestMethod addParserTest(File grammarDir, String name, String grammarName, String methodName,
-			String input, String expectedOutput, String expectedErrors, Integer index) throws Exception {
-		ParserTestMethod tm = new ParserTestMethod(name, grammarName, methodName, input, expectedOutput, expectedErrors, index);
+			String input, String expectedOutput, String expectedErrors) throws Exception {
+		ParserTestMethod tm = new ParserTestMethod(name, grammarName, methodName, input, expectedOutput, expectedErrors);
 		tm.loadGrammars(grammarDir, this.name);
 		unitTests.add(tm);
+		return tm;
+	}
+	
+	public AbstractParserTestMethod addParserTests(File grammarDir, String name, String grammarName, String methodName,
+			String ... inputsAndOuputs) throws Exception {
+		AbstractParserTestMethod tm = new AbstractParserTestMethod(name, grammarName, methodName);
+		tm.loadGrammars(grammarDir, this.name);
+		unitTests.add(tm);
+		for(int i=0; i<inputsAndOuputs.length; i+=2) {
+			ConcreteParserTestMethod cm = new ConcreteParserTestMethod(name, 
+					inputsAndOuputs[i], inputsAndOuputs[i+1], null, 
+					1 + (i/2));
+			unitTests.add(cm);
+		}
+		return tm;
+	}
+
+	public AbstractParserTestMethod addParserTestsWithErrors(File grammarDir, String name, String grammarName, String methodName,
+			String ... inputsOuputsAndErrors) throws Exception {
+		AbstractParserTestMethod tm = new AbstractParserTestMethod(name, grammarName, methodName);
+		tm.loadGrammars(grammarDir, this.name);
+		unitTests.add(tm);
+		for(int i=0; i<inputsOuputsAndErrors.length; i+=3) {
+			ConcreteParserTestMethod cm = new ConcreteParserTestMethod(name, 
+					inputsOuputsAndErrors[i], inputsOuputsAndErrors[i+1], inputsOuputsAndErrors[i+2],
+					1 + (i/3));
+			unitTests.add(cm);
+		}
 		return tm;
 	}
 
@@ -74,9 +97,5 @@ public class TestFile {
 			tests.add(template.render());
 		}
 	}
-
-
-
-	
 
 }

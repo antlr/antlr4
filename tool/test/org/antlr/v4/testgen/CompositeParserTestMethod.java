@@ -11,7 +11,7 @@ public class CompositeParserTestMethod extends ParserTestMethod {
 	public CompositeParserTestMethod(String name, String grammarName,
 			String startRule, String input, String expectedOutput,
 			String expectedErrors, String ... slaves) {
-		super(name, grammarName, startRule, input, expectedOutput, expectedErrors, null);
+		super(name, grammarName, startRule, input, expectedOutput, expectedErrors);
 		this.slaveGrammars = new Grammar[slaves.length];
 		for(int i=0;i<slaves.length;i++)
 			this.slaveGrammars[i] = new Grammar(name + "_" + slaves[i], slaves[i]);
