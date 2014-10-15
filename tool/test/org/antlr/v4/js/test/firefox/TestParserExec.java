@@ -148,34 +148,31 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
-	@Test
-	public void testAStar_1() throws Exception {
+	String testAStar(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : ID* {\n" +
 	                  "document.getElementById('output').value += $text + '\\n';\n" +
 	                  "};\n" +
 	                  "ID : 'a'..'z'+;\n" +
 	                  "WS : (' '|'\\n') -> skip;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "");
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", input);
+	}
+
+	@Test
+	public void testAStar_1() throws Exception {
+		String found = testAStar("");
 		assertEquals("\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testAStar_2() throws Exception {
-		String grammar = "grammar T;\n" +
-	                  "a : ID* {\n" +
-	                  "document.getElementById('output').value += $text + '\\n';\n" +
-	                  "};\n" +
-	                  "ID : 'a'..'z'+;\n" +
-	                  "WS : (' '|'\\n') -> skip;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "a b c");
+		String found = testAStar("a b c");
 		assertEquals("abc\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
-	@Test
-	public void testLL1OptionalBlock_1() throws Exception {
+	String testLL1OptionalBlock(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : (ID|{}INT)? {\n" +
 	                  "document.getElementById('output').value += $text + '\\n';\n" +
@@ -183,47 +180,43 @@ public class TestParserExec extends BaseTest {
 	                  "ID : 'a'..'z'+;\n" +
 	                  "INT : '0'..'9'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "");
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", input);
+	}
+
+	@Test
+	public void testLL1OptionalBlock_1() throws Exception {
+		String found = testLL1OptionalBlock("");
 		assertEquals("\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testLL1OptionalBlock_2() throws Exception {
-		String grammar = "grammar T;\n" +
-	                  "a : (ID|{}INT)? {\n" +
-	                  "document.getElementById('output').value += $text + '\\n';\n" +
-	                  "};\n" +
-	                  "ID : 'a'..'z'+;\n" +
-	                  "INT : '0'..'9'+ ;\n" +
-	                  "WS : (' '|'\\n') -> skip;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "a");
+		String found = testLL1OptionalBlock("a");
 		assertEquals("a\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
-	@Test
-	public void testAorAStar_1() throws Exception {
+	String testAorAStar(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : (ID|ID)* {\n" +
 	                  "document.getElementById('output').value += $text + '\\n';\n" +
 	                  "};\n" +
 	                  "ID : 'a'..'z'+;\n" +
 	                  "WS : (' '|'\\n') -> skip;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "");
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", input);
+	}
+
+	@Test
+	public void testAorAStar_1() throws Exception {
+		String found = testAorAStar("");
 		assertEquals("\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testAorAStar_2() throws Exception {
-		String grammar = "grammar T;\n" +
-	                  "a : (ID|ID)* {\n" +
-	                  "document.getElementById('output').value += $text + '\\n';\n" +
-	                  "};\n" +
-	                  "ID : 'a'..'z'+;\n" +
-	                  "WS : (' '|'\\n') -> skip;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "a b c");
+		String found = testAorAStar("a b c");
 		assertEquals("abc\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -243,8 +236,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
-	@Test
-	public void testAorBStar_1() throws Exception {
+	String testAorBStar(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : (ID|INT{\n" +
 	                  "})* {\n" +
@@ -253,66 +245,55 @@ public class TestParserExec extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "");
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", input);
+	}
+
+	@Test
+	public void testAorBStar_1() throws Exception {
+		String found = testAorBStar("");
 		assertEquals("\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testAorBStar_2() throws Exception {
-		String grammar = "grammar T;\n" +
-	                  "a : (ID|INT{\n" +
-	                  "})* {\n" +
-	                  "document.getElementById('output').value += $text + '\\n';\n" +
-	                  "};\n" +
-	                  "ID : 'a'..'z'+ ;\n" +
-	                  "INT : '0'..'9'+;\n" +
-	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "a 34 c");
+		String found = testAorBStar("a 34 c");
 		assertEquals("a34c\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
-	@Test
-	public void testOptional_1() throws Exception {
+	String testOptional(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "stat : ifstat | 'x';\n" +
 	                  "ifstat : 'if' stat ('else' stat)?;\n" +
 	                  "WS : [ \\n\\t]+ -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "stat", "x");
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "stat", input);
+	}
+
+	@Test
+	public void testOptional_1() throws Exception {
+		String found = testOptional("x");
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testOptional_2() throws Exception {
-		String grammar = "grammar T;\n" +
-	                  "stat : ifstat | 'x';\n" +
-	                  "ifstat : 'if' stat ('else' stat)?;\n" +
-	                  "WS : [ \\n\\t]+ -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "stat", "if x");
+		String found = testOptional("if x");
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testOptional_3() throws Exception {
-		String grammar = "grammar T;\n" +
-	                  "stat : ifstat | 'x';\n" +
-	                  "ifstat : 'if' stat ('else' stat)?;\n" +
-	                  "WS : [ \\n\\t]+ -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "stat", "if x else x");
+		String found = testOptional("if x else x");
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testOptional_4() throws Exception {
-		String grammar = "grammar T;\n" +
-	                  "stat : ifstat | 'x';\n" +
-	                  "ifstat : 'if' stat ('else' stat)?;\n" +
-	                  "WS : [ \\n\\t]+ -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "stat", "if if x else x");
+		String found = testOptional("if if x else x");
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 	}

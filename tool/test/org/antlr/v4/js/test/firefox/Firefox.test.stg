@@ -69,6 +69,28 @@ CompositeParserTestMethod(test) ::= <<
 <ParserTestMethod(test)>
 >>
 
+AbstractParserTestMethod(test) ::= <<
+String test<test.name>(String input) throws Exception {
+	String grammar = <test.grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
+	return execParser("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName>Parser", "<test.grammar.grammarName>Lexer", "<test.grammar.grammarName>Listener", "<test.grammar.grammarName>Visitor", "<test.startRule>", input);
+}
+
+>>
+
+ConcreteParserTestMethod(test) ::= <<
+@Test
+public void test<test.name>() throws Exception {
+	String found = test<test.baseName>("<test.input>");
+	assertEquals("<test.expectedOutput>", found);
+	<if(test.expectedErrors)>
+	assertEquals("<test.expectedErrors>", this.stderrDuringParse);
+	<else>
+	assertNull(this.stderrDuringParse);
+	<endif>
+}
+
+>>
+
 local() ::= ""
 
 dumpDFA() ::= "this.dumpDFA();"
@@ -76,6 +98,8 @@ dumpDFA() ::= "this.dumpDFA();"
 writeln(s) ::= <<document.getElementById('output').value += <s> + '\\n';>>
 
 write(s) ::= <<document.getElementById('output').value += <s>;>>
+
+assert(s) ::= <<console.assert(<s>);>>
 
 inputLANotEqual(i, t) ::= <%this._input.LA(<i>) !== <t>%>
 
@@ -88,6 +112,8 @@ declare_foo() ::= "this.foo = function() {document.getElementById('output').valu
 invoke_foo() ::= "this.foo();"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
+
+True() ::= "true"
 
 PositionAdjustingLexer() ::= <<
 
