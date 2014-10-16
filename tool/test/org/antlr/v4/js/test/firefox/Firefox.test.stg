@@ -101,6 +101,8 @@ write(s) ::= <<document.getElementById('output').value += <s>;>>
 
 assert(s) ::= <<console.assert(<s>);>>
 
+pass() ::= ""
+
 inputLANotEqual(i, t) ::= <%this._input.LA(<i>) !== <t>%>
 
 BailErrorStrategy() ::= <%this._errHandler = new antlr4.error.BailErrorStrategy();%>
@@ -111,11 +113,21 @@ declare_foo() ::= "this.foo = function() {document.getElementById('output').valu
 			
 invoke_foo() ::= "this.foo();"
 
+declareContextListGettersFunction() ::= <<
+	function foo() {
+		var s = new SContext();
+	    var a = s.a();
+	    var b = s.b();
+    };
+>>
+
 LL_EXACT_AMBIG_DETECTION() ::= <<this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
 
 True() ::= "true"
 
 importListener(X) ::= <<var <X>Listener = require('./<X>Listener').<X>Listener;>>
+
+getExpectedTokenNames() ::= <<this.getExpectedTokens().toString(this.tokenNames));>>
 
 PositionAdjustingLexer() ::= <<
 
