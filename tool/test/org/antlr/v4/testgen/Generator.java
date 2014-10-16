@@ -114,7 +114,46 @@ public class Generator {
 		list.add(buildListeners());
 		list.add(buildParserErrors());
 		list.add(buildParserExec());
+		list.add(buildParseTrees());
 		return list;		
+	}
+
+	private TestFile buildParseTrees() throws Exception {
+		TestFile file = new TestFile("ParseTrees");
+		file.addParserTest(input, "TokenAndRuleContextString", "T", "s", 
+				"x", 
+				"[a, s]\n(a x)\n",
+				null);
+		file.addParserTest(input, "Token2", "T", "s", 
+				"xy", 
+				"(a x y)\n",
+				null);
+		file.addParserTest(input, "test2Alts", "T", "s", 
+				"y", 
+				"(a y)\n",
+				null);
+		file.addParserTest(input, "2AltLoop", "T", "s",
+				"xyyxyxz", 
+				"(a x y y x y x z)\n",
+				null);
+		file.addParserTest(input, "RuleRef", "T", "s", 
+				"yx", 
+				"(a (b y) x)\n",
+				null);
+		// ERRORs not shown. z is colored red in tree view
+		file.addParserTest(input, "ExtraToken", "T", "s", 
+				"xzy", 
+				"(a x z y)\n",
+				null);
+		file.addParserTest(input, "NoViableAlt", "T", "s", 
+				"z",
+				"(a z)\n",
+				null);
+		file.addParserTest(input, "Sync", "T", "s", 
+				"xzyy!", 
+				"(a x z y y !)\n",
+				null);
+		return file;
 	}
 
 	private TestFile buildParserErrors() throws Exception {
