@@ -105,16 +105,125 @@ public class Generator {
 
 	private Collection<TestFile> buildTests() throws Exception {
 		List<TestFile> list = new ArrayList<TestFile>();
-		list.add(buildLexerExec());
-		list.add(buildParserExec());
 		list.add(buildCompositeLexers());
 		list.add(buildCompositeParsers());
 		list.add(buildFullContextParsing());
 		list.add(buildLeftRecursion());
 		list.add(buildLexerErrors());
+		list.add(buildLexerExec());
 		list.add(buildListeners());
-		return list;
-		
+		list.add(buildParserErrors());
+		list.add(buildParserExec());
+		return list;		
+	}
+
+	private TestFile buildParserErrors() throws Exception {
+		TestFile file = new TestFile("ParserErrors");
+		file.addParserTest(input, "TokenMismatch", "T", "a", 
+				"aa", 
+				"",
+				"line 1:1 mismatched input 'a' expecting 'b'\n");
+		file.addParserTest(input, "SingleTokenDeletion", "T", "a", 
+				"aab", 
+				"",
+				"line 1:1 extraneous input 'a' expecting 'b'\n");
+		file.addParserTest(input, "SingleTokenDeletionExpectingSet", "T", "a",
+				"aab", 
+				"",
+				"line 1:1 extraneous input 'a' expecting {'b', 'c'}\n");
+		file.addParserTest(input, "SingleTokenInsertion", "T", "a",
+				"ac",
+				"",
+				"line 1:1 missing 'b' at 'c'\n");
+		file.addParserTest(input, "ConjuringUpToken", "T", "a", 
+				"ac", 
+				"conjured=[@-1,-1:-1='<missing 'b'>',<1>,1:1]\n",
+				null);
+		file.addParserTest(input, "SingleSetInsertion", "T", "a", 
+				"ad", 
+				"",
+				"line 1:1 missing {'b', 'c'} at 'd'\n");
+		file.addParserTest(input, "ConjuringUpTokenFromSet", "T", "a", 
+				"ad", 
+				"conjured=[@-1,-1:-1='<missing 'b'>',<1>,1:1]\n",
+				null);
+		file.addParserTest(input, "LL2", "T", "a",
+				"ae", 
+				"",
+				"line 1:1 no viable alternative at input 'ae'\n");
+		file.addParserTest(input, "LL3", "T", "a", 
+				"abe", 
+				"",
+				"line 1:2 no viable alternative at input 'abe'\n");
+		file.addParserTest(input, "LLStar", "T", "a", 
+				"aaae", 
+				"",
+				"line 1:3 no viable alternative at input 'aaae'\n");
+		file.addParserTest(input, "SingleTokenDeletionBeforeLoop", "T", "a",
+				"aabc", 
+				"",
+				"line 1:1 extraneous input 'a' expecting {<EOF>, 'b'}\n" +
+				"line 1:3 token recognition error at: 'c'\n");
+		file.addParserTest(input, "MultiTokenDeletionBeforeLoop", "T", "a",
+				"aacabc", 
+				"",
+				"line 1:1 extraneous input 'a' expecting {'b', 'c'}\n");
+		file.addParserTest(input, "SingleTokenDeletionDuringLoop", "T", "a", 
+				"ababbc", 
+				"",
+				"line 1:2 extraneous input 'a' expecting {'b', 'c'}\n");
+		file.addParserTest(input, "MultiTokenDeletionDuringLoop", "T", "a", 
+				"abaaababc", 
+				"",
+				"line 1:2 extraneous input 'a' expecting {'b', 'c'}\n" +
+				"line 1:6 extraneous input 'a' expecting {'b', 'c'}\n");
+		file.addParserTest(input, "SingleTokenDeletionBeforeLoop2", "T", "a", 
+				"aabc", 
+				"",
+				"line 1:1 extraneous input 'a' expecting {<EOF>, 'b', 'z'}\n" +
+				"line 1:3 token recognition error at: 'c'\n");
+		file.addParserTest(input, "MultiTokenDeletionBeforeLoop2", "T", "a", 
+				"aacabc", 
+				"",
+				"line 1:1 extraneous input 'a' expecting {'b', 'z', 'c'}\n");
+		file.addParserTest(input, "SingleTokenDeletionDuringLoop2", "T", "a",
+				"ababbc", 
+				"",
+				"line 1:2 extraneous input 'a' expecting {'b', 'z', 'c'}\n");
+		file.addParserTest(input, "MultiTokenDeletionDuringLoop2", "T", "a", 
+				"abaaababc", 
+				"",
+				"line 1:2 extraneous input 'a' expecting {'b', 'z', 'c'}\n" +
+				"line 1:6 extraneous input 'a' expecting {'b', 'z', 'c'}\n");
+		file.addParserTest(input, "LL1ErrorInfo", "T", "start", 
+				"dog and software", 
+				"{'hardware', 'software'}\n",
+				null);
+		file.addParserTest(input, "InvalidEmptyInput", "T", "start", 
+				"", 
+				"",
+				"line 1:0 missing ID at '<EOF>'\n");
+		file.addParserTest(input, "ContextListGetters", "T", "s",
+				"abab", 
+				"abab\n",
+				null);
+		file.addParserTestsWithErrors(input, "DuplicatedLeftRecursiveCall", "T", "start", 
+				"xx", "", null,
+				"xxx", "", null,
+				"xxxx", "", null);
+		file.addParserTest(input, "InvalidATNStateRemoval", "T", "start", 
+				"x:x", 
+				"",
+				null);
+		// "a." matches 'a' to rule e but then realizes '.' won't match.
+		// previously would cause noviablealt. now prediction pretends to
+		// have "a' predict 2nd alt of e. Will get syntax error later so
+		// let it get farther.
+		file.addParserTest(input, "NoViableAltAvoidance", "T", "s", 
+				"a.", 
+				"",
+				"line 1:1 mismatched input '.' expecting '!'\n");
+		return file;
 	}
 
 	private TestFile buildListeners() throws Exception {
