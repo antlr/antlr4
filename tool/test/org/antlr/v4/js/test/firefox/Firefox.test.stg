@@ -125,7 +125,19 @@ declareContextListGettersFunction() ::= <<
 
 LL_EXACT_AMBIG_DETECTION() ::= <<this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
 
+False() ::= "false"
+
 True() ::= "true"
+
+Column() ::= "this.column"
+
+Text() ::= "this.text"
+
+TextEquals(a) ::= <%this.text==="<a>"%>
+
+PlusText(a) ::= <%"<a>" + this.text%>
+
+TokenStartColumnEquals(i) ::= <%this._tokenStartColumn===<i>%>
 
 importListener(X) ::= <<var <X>Listener = require('./<X>Listener').<X>Listener;>>
 
