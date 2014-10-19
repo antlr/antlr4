@@ -411,14 +411,14 @@ public class TestSemPredEvalParser extends BaseTest {
 	@Test
 	public void testPredFromAltTestedInLoopBack_1() throws Exception {
 		String found = testPredFromAltTestedInLoopBack("s\n\n\nx\n");
-		assertEquals("(file (para (paraContent s) \\n \\n) (para (paraContent \\n x \\n)) <EOF>)\n", found);
+		assertEquals("(file_ (para (paraContent s) \n \n) (para (paraContent \n x \n)) <EOF>)\n", found);
 		assertEquals("line 5:2 mismatched input '<EOF>' expecting '\n'\n", this.stderrDuringParse);
 	}
 
 	@Test
 	public void testPredFromAltTestedInLoopBack_2() throws Exception {
 		String found = testPredFromAltTestedInLoopBack("s\n\n\nx\n\n");
-		assertEquals("(file (para (paraContent s) \\n \\n) (para (paraContent \\n x) \\n \\n) <EOF>)\n", found);
+		assertEquals("(file_ (para (paraContent s) \n \n) (para (paraContent \n x) \n \n) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 

@@ -135,6 +135,8 @@ TextEquals(a) ::= <%this.text==="<a>"%>
 
 PlusText(a) ::= <%"<a>" + this.text%>
 
+InputText() ::= "this._input.getText()"
+
 LTEquals(i, v) ::= <%this._input.LT(<i>).text===<v>%>
 
 LANotEquals(i, v) ::= <%this._input.LA(<i>)!=<v>%>
