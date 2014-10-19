@@ -303,7 +303,7 @@ public class TestParserExec extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "s : stmt EOF ;\n" +
 	                  "stmt : ifStmt | ID;\n" +
-	                  "ifStmt : 'if' ID stmt ('else' stmt | { this._input.LA(1) !== ELSE }?);\n" +
+	                  "ifStmt : 'if' ID stmt ('else' stmt | { this._input.LA(1)!=ELSE }?);\n" +
 	                  "ELSE : 'else';\n" +
 	                  "ID : [a-zA-Z]+;\n" +
 	                  "WS : [ \\n\\t]+ -> skip;";
@@ -352,7 +352,7 @@ public class TestParserExec extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "ifStatement\n" +
 	                  "@after {\n" +
-	                  "items = $ctx.elseIfStatement() \n" +
+	                  "var items = $ctx.elseIfStatement() \n" +
 	                  "}\n" +
 	                  "    : 'if' expression\n" +
 	                  "      ( ( 'then'\n" +

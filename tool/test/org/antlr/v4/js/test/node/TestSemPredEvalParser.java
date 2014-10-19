@@ -321,7 +321,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		// can't see preds, resolves to first alt found (1 in this case)
 		String grammar =
 			"grammar T;\n" +
-			"@members {i=0}\n" +
+			"@members {this.i=0}\n" +
 			"s : a+ ;\n" +
 			"a : {this.i=1} ID {this.i==1}? {console.log(\"alt 1\");}\n" +
 			"  | {this.i=2;} ID {this.i==2}? {console.log(\"alt 2\");}\n" +
