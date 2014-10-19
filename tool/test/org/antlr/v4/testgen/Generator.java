@@ -117,7 +117,98 @@ public class Generator {
 		list.add(buildParseTrees());
 		list.add(buildSemPredEvalLexer());
 		list.add(buildSemPredEvalParser());
+		list.add(buildSets());
 		return list;		
+	}
+
+	private TestFile buildSets() throws Exception {
+		TestFile file = new TestFile("Sets");
+		// this must return A not I to the parser; calling a nonfragment rule
+		// from a nonfragment rule does not set the overall token.
+		file.addParserTest(input, "SeqDoesNotBecomeSet", "T", "a",
+				"34",
+				"34\n", 
+				null);
+		file.addParserTest(input, "ParserSet", "T", "a",
+				"x", 
+				"x\n", 
+				null);
+		file.addParserTest(input, "ParserNotSet", "T", "a",
+				"zz", 
+				"z\n", 
+				null);
+		file.addParserTest(input, "ParserNotToken", "T", "a", 
+				"zz", 
+				"zz\n", 
+				null);
+		file.addParserTest(input, "ParserNotTokenWithLabel", "T", "a", 
+				"zz",
+				"z\n", 
+				null);
+		file.addParserTest(input, "RuleAsSet", "T", "a", 
+				"b", 
+				"b\n", 
+				null);
+		file.addParserTest(input, "NotChar", "T", "a", 
+				"x", 
+				"x\n", 
+				null);
+		file.addParserTest(input, "OptionalSingleElement", "T", "a", 
+				"bc", 
+				"bc\n", 
+				null);
+		file.addParserTest(input, "OptionalLexerSingleElement", "T", "a",
+				"bc", 
+				"bc\n",
+				null);
+		file.addParserTests(input, "StarLexerSingleElement", "T", "a", 
+				"bbbbc", "bbbbc\n", 
+				"c", "c\n");
+		file.addParserTest(input, "PlusLexerSingleElement", "T", "a",
+				"bbbbc", 
+				"bbbbc\n", 
+				null);
+		file.addParserTest(input, "OptionalSet", "T", "a", 
+				"ac",
+				"ac\n", 
+				null);
+		file.addParserTest(input, "StarSet", "T", "a", 
+				"abaac", 
+				"abaac\n", 
+				null);
+		file.addParserTest(input, "PlusSet", "T", "a", 
+				"abaac", 
+				"abaac\n", 
+				null);
+		file.addParserTest(input, "LexerOptionalSet", "T", "a", 
+				"ac", 
+				"ac\n", 
+				null);
+		file.addParserTest(input, "LexerStarSet", "T", "a", 
+				"abaac",
+				"abaac\n", 
+				null);
+		file.addParserTest(input, "LexerPlusSet", "T", "a",
+				"abaac", 
+				"abaac\n", 
+				null);
+		file.addParserTest(input, "NotCharSet", "T", "a", 
+				"x", 
+				"x\n", 
+				null);
+		file.addParserTest(input, "NotCharSetWithLabel", "T", "a", 
+				"x", 
+				"x\n", 
+				null);
+		file.addParserTest(input, "NotCharSetWithRuleRef3", "T", "a", 
+				"x", 
+				"x\n", 
+				null);
+		file.addParserTest(input, "CharSetLiteral", "T", "a", 
+				"A a B b", 
+				"A\n" + "a\n" + "B\n" + "b\n", 
+				null);
+		return file;
 	}
 
 	private TestFile buildSemPredEvalParser() throws Exception {
