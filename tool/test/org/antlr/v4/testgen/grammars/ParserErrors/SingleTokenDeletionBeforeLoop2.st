@@ -1,2 +1,2 @@
 grammar <grammarName>;
-a : 'a' ('b'|'z'{<pass()>})*;
+a : 'a' ('b'|'z'{<Pass()>})*;

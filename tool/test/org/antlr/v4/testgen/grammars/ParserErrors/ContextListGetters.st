@@ -1,6 +1,6 @@
 grammar <grammarName>;
 @parser::members{
-<declareContextListGettersFunction()>
+<DeclareContextListGettersFunction()>
 }
 s : (a | b)+;
 a : 'a' {<write("'a'")>};

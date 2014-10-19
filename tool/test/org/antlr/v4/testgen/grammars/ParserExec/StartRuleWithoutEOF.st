@@ -1,5 +1,5 @@
 grammar <grammarName>;
-s @after { <dumpDFA()> }
+s @after { <DumpDFA()> }
   : ID | ID INT ID ;
 ID : 'a'..'z'+ ;
 INT : '0'..'9'+;

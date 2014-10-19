@@ -10,5 +10,5 @@ SOFTWARE: 'software';
 WS : ' ' -> skip ;
 acClass
 @init
-{<getExpectedTokenNames():writeln()>}
+{<GetExpectedTokenNames():writeln()>}
   : ;

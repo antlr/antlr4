@@ -1,6 +1,6 @@
 grammar <grammarName>;
 @parser::header {
-<importListener(grammarName)>
+<ImportListener(grammarName)>
 }
 
 @parser::members {

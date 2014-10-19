@@ -1,5 +1,5 @@
 grammar <grammarName>;
-s @after {<dumpDFA()>}
+s @after {<DumpDFA()>}
   : '$' a | '@' b ;
 a : e ID ;
 b : e INT ID ;

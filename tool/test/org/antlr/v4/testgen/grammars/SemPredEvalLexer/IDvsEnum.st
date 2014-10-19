@@ -1,4 +1,4 @@
 lexer grammar <grammarName>;
-ENUM : 'enum' { <False()> }? ;
+ENUM : 'enum' { <false> }? ;
 ID : 'a'..'z'+ ;
 WS : (' '|'\n') -> skip;

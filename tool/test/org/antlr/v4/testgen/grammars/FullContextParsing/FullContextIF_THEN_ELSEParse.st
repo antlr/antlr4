@@ -1,7 +1,7 @@
 grammar <grammarName>;
 s 
 @init {<LL_EXACT_AMBIG_DETECTION()>}
-@after {<dumpDFA()>}
+@after {<DumpDFA()>}
 	: '{' stat* '}' ;
 stat: 'if' ID 'then' stat ('else' ID)?
 		| 'return

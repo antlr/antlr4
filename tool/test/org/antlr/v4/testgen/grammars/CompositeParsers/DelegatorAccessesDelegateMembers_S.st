@@ -1,5 +1,5 @@
 parser grammar S;
 @members {
-<declare_foo()>
+<Declare_foo()>
 }
 a : B;

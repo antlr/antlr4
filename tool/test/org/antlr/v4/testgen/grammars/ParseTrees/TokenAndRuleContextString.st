@@ -1,12 +1,12 @@
 grammar <grammarName>;
 s
 @init {
-<buildParseTrees()>
+<BuildParseTrees()>
 }
 @after {
 <ToStringTree("$r.ctx"):writeln()>
 }
   : r=a ;
 a : 'x' { 
-<writeRuleInvocationStack()>
+<WriteRuleInvocationStack()>
 } ;

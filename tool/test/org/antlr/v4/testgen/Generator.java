@@ -116,7 +116,166 @@ public class Generator {
 		list.add(buildParserExec());
 		list.add(buildParseTrees());
 		list.add(buildSemPredEvalLexer());
+		list.add(buildSemPredEvalParser());
 		return list;		
+	}
+
+	private TestFile buildSemPredEvalParser() throws Exception {
+		TestFile file = new TestFile("SemPredEvalParser");
+		file.addParserTest(input, "SimpleValidate", "T", "s",
+				"x",  
+				"", 
+				"line 1:0 no viable alternative at input 'x'\n");
+		file.addParserTest(input, "SimpleValidate2", "T", "s",
+				"3 4 x", 
+				"alt 2\n" + "alt 2\n", 
+				"line 1:4 no viable alternative at input 'x'\n");
+		file.addParserTest(input, "AtomWithClosureInTranslatedLRRule", "T", "start",
+				"a+b+a", 
+				"", 
+				null);
+		file.addParserTest(input, "ValidateInDFA", "T", "s",
+				"x ; y", 
+				"",
+				"line 1:0 no viable alternative at input 'x'\n" +
+				"line 1:4 no viable alternative at input 'y'\n");
+		file.addParserTest(input, "Simple", "T", "s",
+				"x y 3", 
+				"alt 2\n" + "alt 2\n" + "alt 3\n",
+				null);
+		// Under new predicate ordering rules (see antlr/antlr4#29), the first
+		// alt with an acceptable config (unpredicated, or predicated and evaluates
+		// to true) is chosen.
+		file.addParserTest(input, "Order", "T", "s",
+				"x y", 
+				"alt 1\n" + "alt 1\n",
+				null);
+		// We have n-2 predicates for n alternatives. pick first alt
+		file.addParserTest(input, "2UnpredicatedAlts", "T", "s",
+				"x; y",
+				"alt 1\n" +
+				"alt 1\n",
+				"line 1:0 reportAttemptingFullContext d=0 (a), input='x'\n" +
+				"line 1:0 reportAmbiguity d=0 (a): ambigAlts={1, 2}, input='x'\n" +
+				"line 1:3 reportAttemptingFullContext d=0 (a), input='y'\n" +
+				"line 1:3 reportAmbiguity d=0 (a): ambigAlts={1, 2}, input='y'\n");
+		file.addParserTest(input, "2UnpredicatedAltsAndOneOrthogonalAlt", "T", "s",
+				"34; x; y", 
+				"alt 1\n" + "alt 2\n" + "alt 2\n",
+				"line 1:4 reportAttemptingFullContext d=0 (a), input='x'\n" +
+				"line 1:4 reportAmbiguity d=0 (a): ambigAlts={2, 3}, input='x'\n" +
+				"line 1:7 reportAttemptingFullContext d=0 (a), input='y'\n" +
+				"line 1:7 reportAmbiguity d=0 (a): ambigAlts={2, 3}, input='y'\n");
+		// The parser consumes ID and moves to the 2nd token INT.
+		// To properly evaluate the predicates after matching ID INT,
+		// we must correctly see come back to starting index so LT(1) works
+		file.addParserTest(input, "RewindBeforePredEval", "T", "s",
+				"y 3 x 4", 
+				"alt 2\n" + "alt 1\n",
+				null);
+		// checks that we throw exception if all alts
+		// are covered with a predicate and none succeeds
+		file.addParserTest(input, "NoTruePredsThrowsNoViableAlt", "T", "s",
+				"y 3 x 4", 
+				"",
+				"line 1:0 no viable alternative at input 'y'\n");
+		file.addParserTest(input, "ToLeft", "T", "s",
+				"x x y", 
+				"alt 2\n" + "alt 2\n" + "alt 2\n",
+				null);
+		file.addParserTest(input, "UnpredicatedPathsInAlt", "T", "s",
+				"x 4",
+				"alt 1\n",
+				null);
+		file.addParserTest(input, "ActionHidesPreds", "T", "s",
+				"x x y", 
+				"alt 1\n" + "alt 1\n" + "alt 1\n",
+				null);
+		/** In this case, we use predicates that depend on global information
+		 *  like we would do for a symbol table. We simply execute
+		 *  the predicates assuming that all necessary information is available.
+		 *  The i++ action is done outside of the prediction and so it is executed.
+		 */
+		file.addParserTest(input, "ToLeftWithVaryingPredicate", "T", "s",
+				"x x y", 
+				"i=1\n" + "alt 2\n" + "i=2\n" + "alt 1\n" + "i=3\n" + "alt 2\n",
+				null);
+		/**
+		 * In this case, we're passing a parameter into a rule that uses that
+		 * information to predict the alternatives. This is the special case
+		 * where we know exactly which context we are in. The context stack
+		 * is empty and we have not dipped into the outer context to make a decision.
+		 */
+		file.addParserTest(input, "PredicateDependentOnArg", "T", "s",
+				"a b", 
+				"alt 2\n" + "alt 1\n",
+				null);
+		/** In this case, we have to ensure that the predicates are not
+		 tested during the closure after recognizing the 1st ID. The
+		 closure will fall off the end of 'a' 1st time and reach into the
+		 a[1] rule invocation. It should not execute predicates because it
+		 does not know what the parameter is. The context stack will not
+		 be empty and so they should be ignored. It will not affect
+		 recognition, however. We are really making sure the ATN
+	     simulation doesn't crash with context object issues when it
+	     encounters preds during FOLLOW.
+	     */
+		file.addParserTest(input, "PredicateDependentOnArg2", "T", "s",
+				"a b", 
+				"",
+				null);
+	    // uses ID ';' or ID '.' lookahead to solve s. preds not tested.
+		file.addParserTest(input, "DependentPredNotInOuterCtxShouldBeIgnored", "T", "s",
+				"a;",
+				"alt 2\n",
+				null);
+		file.addParserTest(input, "IndependentPredNotPassedOuterCtxToAvoidCastException", "T", "s",
+				"a;", 
+				"alt 2\n",
+				null);
+	    /** During a global follow operation, we still collect semantic
+	     *  predicates as long as they are not dependent on local context
+	     */
+		file.addParserTest(input, "PredsInGlobalFOLLOW", "T", "s",
+				"a!",
+				"eval=true\n" + /* now we are parsing */ "parse\n",
+				null);
+	   	/** We cannot collect predicates that are dependent on local context if
+	   	 *  we are doing a global follow. They appear as if they were not there at all.
+	   	 */
+		file.addParserTest(input, "DepedentPredsInGlobalFOLLOW","T", "s",
+				"a!", 
+				"eval=true\n" + "parse\n",
+				null);
+ 		/** Regular non-forced actions can create side effects used by semantic
+		 *  predicates and so we cannot evaluate any semantic predicate
+		 *  encountered after having seen a regular action. This includes
+		 *  during global follow operations.
+		 */
+		file.addParserTest(input, "ActionsHidePredsInGlobalFOLLOW", "T", "s",
+				"a!", 
+				"eval=true\n" + "parse\n",
+				null);
+		file.addParserTestsWithErrors(input, "PredTestedEvenWhenUnAmbig", "T", "primary",
+				"abc", "ID abc\n", null,
+				"enum", "", "line 1:0 no viable alternative at input 'enum'\n");
+		/**
+		 * This is a regression test for antlr/antlr4#218 "ANTLR4 EOF Related Bug".
+		 * https://github.com/antlr/antlr4/issues/218
+		 */
+		file.addParserTest(input, "DisabledAlternative", "T", "cppCompilationUnit",
+				"hello",
+				"", 
+				null);
+		/** Loopback doesn't eval predicate at start of alt */
+		file.addParserTestsWithErrors(input, "PredFromAltTestedInLoopBack", "T", "file_",
+				"s\n\n\nx\n",
+				"(file_ (para (paraContent s) \n \n) (para (paraContent \n x \n)) <EOF>)\n", 
+				"line 5:2 mismatched input '<EOF>' expecting '\n'\n",
+				"s\n\n\nx\n\n",
+				"(file_ (para (paraContent s) \n \n) (para (paraContent \n x) \n \n) <EOF>)\n",
+				null);
+		return file;
 	}
 
 	private TestFile buildSemPredEvalLexer() throws Exception {

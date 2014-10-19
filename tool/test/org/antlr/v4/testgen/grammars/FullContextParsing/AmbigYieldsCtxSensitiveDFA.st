@@ -1,5 +1,5 @@
 grammar <grammarName>;
-s @after {<dumpDFA()>}
+s @after {<DumpDFA()>}
 	: ID | ID {} ;
 ID : 'a'..'z'+;
 WS : (' '|'\t'|'\n')+ -> skip ;
