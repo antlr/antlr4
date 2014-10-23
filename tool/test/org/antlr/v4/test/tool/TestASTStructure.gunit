@@ -1,0 +1,155 @@
+/** Test ANTLRParser's AST construction.  Translate to junit tests with:
+ *
+ *  $ java org.antlr.v4.gunit.Gen TestASTStructure.gunit
+
+ NO LONGER using gunit!!!
+
+ */
+gunit TestASTStructure;
+
+@header {package org.antlr.v4.test;}
+options {
+	adaptor = org.antlr.v4.parse.GrammarASTAdaptor;
+	parser = org.antlr.v4.parse.ANTLRParser;
+	lexer = org.antlr.v4.parse.ANTLRLexer;
+}
+
+grammarSpec:
+    "parser grammar P; a : A;"
+    -> (PARSER_GRAMMAR P (RULES (RULE a (BLOCK (ALT A)))))
+
+    <<
+    parser grammar P;
+    tokens { A; B='33'; }
+    @header {foo}
+    a : A;
+    >>
+    ->
+    (PARSER_GRAMMAR P
+    (tokens { A (= B '33'))
+    (@ header {foo})
+    (RULES (RULE a (BLOCK (ALT A)))))
+
+    <<
+    parser grammar P;
+    @header {foo}
+    tokens { A; B='33'; }
+    a : A;
+    >>
+    ->
+    (PARSER_GRAMMAR P
+    (@ header {foo})
+    (tokens { A (= B '33'))
+    (RULES (RULE a (BLOCK (ALT A)))))
+
+    <<
+    parser grammar P;
+    import A=B, C;
+    a : A;
+    >>
+    ->
+    (PARSER_GRAMMAR P
+    (import (= A B) C)
+    (RULES (RULE a (BLOCK (ALT A)))))
+
+delegateGrammars:
+	"import A;" -> (import A)
+
+rule:
+	"a : A<X,Y=a.b.c>;" ->
+	(RULE a (BLOCK (ALT (A (ELEMENT_OPTIONS X (= Y a.b.c))))))
+	"A : B+;"   -> (RULE A (BLOCK (ALT (+ (BLOCK (ALT B))))))
+
+    <<
+    public a[int i] returns [int y]
+    options {backtrack=true;}
+    @init {blort}
+      : ID ;
+    >>
+    ->
+    (RULE a
+    (RULEMODIFIERS public)
+    int i
+    (returns int y)
+    (OPTIONS (= backtrack true))
+    (@ init {blort})
+    (BLOCK (ALT ID)))
+
+    <<
+    a[int i] returns [int y]
+    @init {blort}
+    options {backtrack=true;}
+      : ID;
+    >>
+    ->
+    (RULE a int i
+    (returns int y)
+    (@ init {blort})
+    (OPTIONS (= backtrack true))
+    (BLOCK (ALT ID)))
+
+    <<
+    a : ID ;
+      catch[A b] {foo}
+      finally {bar}
+    >>
+    ->
+    (RULE a (BLOCK (ALT ID))
+    (catch A b {foo}) (finally {bar}))
+
+    <<
+    a : ID ;
+      catch[A a] {foo}
+      catch[B b] {fu}
+      finally {bar}
+    >>
+    ->
+    (RULE a (BLOCK (ALT ID))
+    (catch A a {foo}) (catch B b {fu}) (finally {bar}))
+
+	<<
+	a[int i]
+	locals [int a, float b]
+		:	A
+		;
+	>>
+	-> (RULE a int i (locals int a, float b) (BLOCK (ALT A)))
+
+	<<
+	a[int i] throws a.b.c
+		:	A
+		;
+	>>
+	-> (RULE a int i (throws a.b.c) (BLOCK (ALT A)))
+
+ebnf:
+	"(A|B)"					-> (BLOCK (ALT A) (ALT B))
+	"(A|B)?"				-> (? (BLOCK (ALT A) (ALT B)))
+	"(A|B)*"				-> (* (BLOCK (ALT A) (ALT B)))
+	"(A|B)+"				-> (+ (BLOCK (ALT A) (ALT B)))
+
+element:
+	"~A"		-> (~ (SET A))
+	"b+"		-> (+ (BLOCK (ALT b)))
+	"(b)+"		-> (+ (BLOCK (ALT b)))
+	"b?"  		-> (? (BLOCK (ALT b)))
+	"(b)?"		-> (? (BLOCK (ALT b)))
+	"(b)*"		-> (* (BLOCK (ALT b)))
+	"b*"		-> (* (BLOCK (ALT b)))
+	"'while'*"	-> (* (BLOCK (ALT 'while')))
+	"'a'+"		-> (+ (BLOCK (ALT 'a')))
+	"a[3]"		-> (a 3)
+	"'a'..'z'+" -> (+ (BLOCK (ALT (.. 'a' 'z'))))
+	"x=ID"		-> (= x ID)
+	"x=ID?"		-> (? (BLOCK (ALT (= x ID))))
+	"x=ID*"		-> (* (BLOCK (ALT (= x ID))))
+	"x=b"		-> (= x b)
+	"x=(A|B)"	-> (= x (BLOCK (ALT A) (ALT B)))
+	"x=~(A|B)"	-> (= x (~ (SET A B)))
+	"x+=~(A|B)"	-> (+= x (~ (SET A B)))
+	"x+=~(A|B)+"-> (+ (BLOCK (ALT (+= x (~ (SET A B))))))
+	"x=b+"		-> (+ (BLOCK (ALT (= x b))))
+	"x+=ID*"	-> (* (BLOCK (ALT (+= x ID))))
+	"x+='int'*"	-> (* (BLOCK (ALT (+= x 'int'))))
+	"x+=b+"		-> (+ (BLOCK (ALT (+= x b))))
+	"({blort} 'x')*" -> (* (BLOCK (ALT {blort} 'x')))
