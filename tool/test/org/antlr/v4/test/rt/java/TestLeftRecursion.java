@@ -7,7 +7,7 @@ public class TestLeftRecursion extends BaseTest {
 
 	String testSimple(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {System.out.println($ctx.toStringTree(null, this););} : a ;\n" +
+	                  "s @after {System.out.println($ctx.toStringTree(this));} : a ;\n" +
 	                  "a : a ID\n" +
 	                  "  | ID\n" +
 	                  "  ;\n" +
@@ -39,7 +39,7 @@ public class TestLeftRecursion extends BaseTest {
 
 	String testDirectCallToLeftRecursiveRule(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "a @after {System.out.println($ctx.toStringTree(null, this););} : a ID\n" +
+	                  "a @after {System.out.println($ctx.toStringTree(this));} : a ID\n" +
 	                  "  | ID\n" +
 	                  "  ;\n" +
 	                  "ID : 'a'..'z'+ ;\n" +
@@ -71,7 +71,7 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testSemPred() throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {System.out.println($ctx.toStringTree(null, this););} : a ;\n" +
+	                  "s @after {System.out.println($ctx.toStringTree(this));} : a ;\n" +
 	                  "a : a {true}? ID\n" +
 	                  "  | ID\n" +
 	                  "  ;\n" +
@@ -84,7 +84,7 @@ public class TestLeftRecursion extends BaseTest {
 
 	String testTernaryExpr(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {System.out.println($ctx.toStringTree(null, this););} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n" +
+	                  "s @after {System.out.println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n" +
 	                  "e : e '*' e\n" +
 	                  "  | e '+' e\n" +
 	                  "  |<assoc=right> e '?' e ':' e\n" +
@@ -161,7 +161,7 @@ public class TestLeftRecursion extends BaseTest {
 
 	String testExpressions(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {System.out.println($ctx.toStringTree(null, this););} : e EOF ; // must indicate EOF can follow\n" +
+	                  "s @after {System.out.println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n" +
 	                  "e : e '.' ID\n" +
 	                  "  | e '.' 'this'\n" +
 	                  "  | '-' e\n" +
@@ -227,7 +227,7 @@ public class TestLeftRecursion extends BaseTest {
 
 	String testJavaExpressions(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {System.out.println($ctx.toStringTree(null, this););} : e EOF ; // must indicate EOF can follow\n" +
+	                  "s @after {System.out.println($ctx.toStringTree(this));} : e EOF ; // must indicate EOF can follow\n" +
 	                  "expressionList\n" +
 	                  "    :   e (',' e)*\n" +
 	                  "    ;\n" +
@@ -371,7 +371,7 @@ public class TestLeftRecursion extends BaseTest {
 
 	String testDeclarations(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {System.out.println($ctx.toStringTree(null, this););} : declarator EOF ; // must indicate EOF can follow\n" +
+	                  "s @after {System.out.println($ctx.toStringTree(this));} : declarator EOF ; // must indicate EOF can follow\n" +
 	                  "declarator\n" +
 	                  "        : declarator '[' e ']'\n" +
 	                  "        | declarator '[' ']'\n" +
@@ -501,7 +501,7 @@ public class TestLeftRecursion extends BaseTest {
 
 	String testLabelsOnOpSubrule(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {System.out.println($ctx.toStringTree(null, this););} : e;\n" +
+	                  "s @after {System.out.println($ctx.toStringTree(this));} : e;\n" +
 	                  "e : a=e op=('*'|'/') b=e  {}\n" +
 	                  "  | INT {}\n" +
 	                  "  | '(' x=e ')' {}\n" +
@@ -792,7 +792,7 @@ public class TestLeftRecursion extends BaseTest {
 	public void testPrecedenceFilterConsidersContext() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "prog \n" +
-	                  "@after {System.out.println($ctx.toStringTree(null, this););}\n" +
+	                  "@after {System.out.println($ctx.toStringTree(this));}\n" +
 	                  ": statement* EOF {};\n" +
 	                  "statement: letterA | statement letterA 'b' ;\n" +
 	                  "letterA: 'a';";

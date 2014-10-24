@@ -1,7 +1,7 @@
 grammar <grammarName>;
 ifStatement
 @after {
-<LocalVar()>items = $ctx.elseIfStatement() 
+<DeclareLocal("items = $ctx.elseIfStatement()")> 
 }
     : 'if' expression
       ( ( 'then'

@@ -13,7 +13,7 @@ public class TestParserExec extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "abc 34", false);
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "abc 34;", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -27,7 +27,7 @@ public class TestParserExec extends BaseTest {
 	                  "INT : '0'..'9'+;\n" +
 	                  "FLOAT : [0-9]+ '.' [0-9]+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "abc 34", false);
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "abc 34;", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -331,10 +331,10 @@ public class TestParserExec extends BaseTest {
 	public void testPredictionIssue334() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "file_ @init{\n" +
-	                  "this._errHandler = new antlr4.error.BailErrorStrategy();\n" +
+	                  "setErrorHandler(new BailErrorStrategy());\n" +
 	                  "} \n" +
 	                  "@after {\n" +
-	                  "System.out.println($ctx.toStringTree(null, this););\n" +
+	                  "System.out.println($ctx.toStringTree(this));\n" +
 	                  "}\n" +
 	                  "  :   item (SEMICOLON item)* SEMICOLON? EOF ;\n" +
 	                  "item : A B?;\n" +
@@ -352,7 +352,7 @@ public class TestParserExec extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "ifStatement\n" +
 	                  "@after {\n" +
-	                  "var items = $ctx.elseIfStatement() \n" +
+	                  "Object items = $ctx.elseIfStatement(); \n" +
 	                  "}\n" +
 	                  "    : 'if' expression\n" +
 	                  "      ( ( 'then'\n" +
@@ -370,6 +370,71 @@ public class TestParserExec extends BaseTest {
 	                  "executableStatement : 'a' ;\n" +
 	                  "elseStatement : 'a' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "expression", "a", false);
+		assertEquals("", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testMultipleEOFHandling() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "prog : ('x' | 'x' 'y') EOF EOF;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "prog", "x", false);
+		assertEquals("", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testEOFInClosure() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "prog : stat EOF;\n" +
+	                  "stat : 'x' ('y' | EOF)*?;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "prog", "x", false);
+		assertEquals("", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	String testReferenceToATN(String input) throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "a : (ID|ATN)* ATN? {System.out.println($text);} ;\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "ATN : '0'..'9'+;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
+		return execParser("T.g4", grammar, "TParser", "TLexer", "a", input, false);
+	}
+
+	@Test
+	public void testReferenceToATN_1() throws Exception {
+		String found = testReferenceToATN("");
+		assertEquals("\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testReferenceToATN_2() throws Exception {
+		String found = testReferenceToATN("a 34 c");
+		assertEquals("a34c\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testAlternateQuotes() throws Exception {
+		String slave_ModeTagsLexer = "lexer grammar ModeTagsLexer;\n" +
+	                              "// Default mode rules (the SEA)\n" +
+	                              "OPEN  : '«'     -> mode(ISLAND) ;       // switch to ISLAND mode\n" +
+	                              "TEXT  : ~'«'+ ;                         // clump all text together\n" +
+	                              "mode ISLAND;\n" +
+	                              "CLOSE : '»'     -> mode(DEFAULT_MODE) ; // back to SEA mode\n" +
+	                              "SLASH : '/' ;\n" +
+	                              "ID    : [a-zA-Z]+ ;                     // match/send ID in tag to parser";
+		rawGenerateAndBuildRecognizer("ModeTagsLexer.g4", slave_ModeTagsLexer, null, "ModeTagsLexer");
+
+		String grammar = "parser grammar ModeTagsParser;\n" +
+	                  "options { tokenVocab=ModeTagsLexer; } // use tokens from ModeTagsLexer.g4\n" +
+	                  "file_: (tag | TEXT)* ;\n" +
+	                  "tag : '«' ID '»'\n" +
+	                  "    | '«' '/' ID '»'\n" +
+	                  "    ;";
+		String found = execParser("ModeTagsParser.g4", grammar, "ModeTagsParser", "ModeTagsLexer", "file_", "", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 	}

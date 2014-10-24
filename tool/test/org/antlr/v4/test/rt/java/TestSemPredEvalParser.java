@@ -398,7 +398,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	String testPredFromAltTestedInLoopBack(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "file_\n" +
-	                  "@after {System.out.println($ctx.toStringTree(null, this););}\n" +
+	                  "@after {System.out.println($ctx.toStringTree(this));}\n" +
 	                  "  : para para EOF ;\n" +
 	                  "para: paraContent NL NL ;\n" +
 	                  "paraContent : ('s'|'x'|{this._input.LA(2)!=NL}? NL)+ ;\n" +

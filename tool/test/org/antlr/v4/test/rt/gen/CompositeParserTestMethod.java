@@ -7,6 +7,7 @@ import org.stringtemplate.v4.STGroup;
 public class CompositeParserTestMethod extends ParserTestMethod {
 
 	public Grammar[] slaveGrammars;
+	public boolean slaveIsLexer = false;
 	
 	public CompositeParserTestMethod(String name, String grammarName,
 			String startRule, String input, String expectedOutput,

@@ -177,7 +177,7 @@ public class TestFullContextParsing extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "s\n" +
 	                  "@init {this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;}\n" +
-	                  ":   expr[0] {System.out.println($expr.ctx.toStringTree(null, this););};\n" +
+	                  ":   expr[0] {System.out.println($expr.ctx.toStringTree(this));};\n" +
 	                  "	expr[int _p]\n" +
 	                  "		: ID \n" +
 	                  "		( \n" +

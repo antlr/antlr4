@@ -1,5 +1,7 @@
 package org.antlr.v4.test.rt.gen;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.antlr.v4.test.rt.java.BaseTest;
+import org.junit.Test;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
@@ -1230,8 +1233,8 @@ public class Generator {
 
 	private TestFile buildParserExec() throws Exception {
 		TestFile file = new TestFile("ParserExec");
-		file.addParserTest(input, "Labels", "T", "a", "abc 34", "", null);
-		file.addParserTest(input, "ListLabelsOnSet", "T", "a", "abc 34", "", null);
+		file.addParserTest(input, "Labels", "T", "a", "abc 34;", "", null);
+		file.addParserTest(input, "ListLabelsOnSet", "T", "a", "abc 34;", "", null);
 		file.addParserTest(input, "AorB", "T", "a", "34", "alt 2\n", null);
 		file.addParserTest(input, "Basic", "T", "a", "abc 34", "abc34\n", null);
 		file.addParserTest(input, "APlus", "T", "a", "a b c", "abc\n", null);
@@ -1268,6 +1271,28 @@ public class Generator {
 		file.addParserTest(input, "LabelAliasingAcrossLabeledAlternatives", "T", "start", "xy", "x\ny\n", null);
 		file.addParserTest(input, "PredictionIssue334", "T", "file_", "a", "(file_ (item a) <EOF>)\n", null);
 		file.addParserTest(input, "ListLabelForClosureContext", "T", "expression", "a", "", null);
+		/**
+		 * This test ensures that {@link ParserATNSimulator} produces a correct
+		 * result when the grammar contains multiple explicit references to
+		 * {@code EOF} inside of parser rules.
+		 */
+		file.addParserTest(input, "MultipleEOFHandling", "T", "prog", "x", "", null);
+		/**
+		 * This test ensures that {@link ParserATNSimulator} does not produce a
+		 * {@link StackOverflowError} when it encounters an {@code EOF} transition
+		 * inside a closure.
+		 */
+		file.addParserTest(input, "EOFInClosure", "T", "prog", "x", "", null);
+		/**
+		 * This is a regression test for antlr/antlr4#561 "Issue with parser
+		 * generation in 4.2.2"
+		 * https://github.com/antlr/antlr4/issues/561
+		 */
+		file.addParserTests(input, "ReferenceToATN", "T", "a",
+			"", "\n", 
+			"a 34 c", "a34c\n");
+		CompositeParserTestMethod tm = file.addCompositeParserTest(input, "AlternateQuotes", "ModeTagsParser", "file_", "", "", null, "ModeTagsLexer");
+		tm.slaveIsLexer = true;
 		return file;
 	}
 

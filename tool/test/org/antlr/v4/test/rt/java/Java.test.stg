@@ -49,12 +49,16 @@ ParserTestMethod(test) ::= <<
 public void test<test.name>() throws Exception {
 <test.slaveGrammars:{ grammar | 
 	String slave_<grammar.grammarName> = <grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
+	<if(test.slaveIsLexer)>
+	rawGenerateAndBuildRecognizer("<grammar.grammarName>.g4", slave_<grammar.grammarName>, null, "<grammar.grammarName>");
+	<else>
 	mkdir(tmpdir);
 	writeFile(tmpdir, "<grammar.grammarName>.g4", slave_<grammar.grammarName>);
+	<endif>
 	};separator="\n", wrap, anchor>
 	String grammar = <test.grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
 	<test.afterGrammar>
-	String found = execParser("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName>Parser", "<test.grammar.grammarName>Lexer", "<test.startRule>", "<test.input>", false);
+	String found = execParser("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName><if(!test.slaveIsLexer)>Parser<endif>", "<if(test.slaveIsLexer)><first(test.slaveGrammars).grammarName><else><test.grammar.grammarName>Lexer<endif>", "<test.startRule>", "<test.input>", false);
 	assertEquals("<test.expectedOutput>", found);
 	<if(test.expectedErrors)>
 	assertEquals("<test.expectedErrors>", this.stderrDuringParse);
@@ -97,7 +101,7 @@ write(s) ::= <<System.out.print(<s>);>>
 
 assert(s) ::= <<console.assert(<s>);>>
 
-LocalVar() ::= "var "
+DeclareLocal(s) ::= "Object <s>;"
 
 InitMember(n,v) ::= <%this.<n> = <v>;%>
 
@@ -121,9 +125,9 @@ Pass() ::= ""
 
 BuildParseTrees() ::= "this.buildParseTrees = true;"
 
-BailErrorStrategy() ::= <%this._errHandler = new antlr4.error.BailErrorStrategy();%>
+BailErrorStrategy() ::= <%setErrorHandler(new BailErrorStrategy());%>
 
-ToStringTree(s) ::= <%<s>.toStringTree(null, this);%>
+ToStringTree(s) ::= <%<s>.toStringTree(this)%>
 
 Column() ::= "this.getCharPositionInLine()"
 

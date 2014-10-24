@@ -13,7 +13,7 @@ public class TestParseTrees extends BaseTest {
 	                  "this.buildParseTrees = true;\n" +
 	                  "}\n" +
 	                  "@after {\n" +
-	                  "System.out.println($r.ctx.toStringTree(null, this););\n" +
+	                  "System.out.println($r.ctx.toStringTree(this));\n" +
 	                  "}\n" +
 	                  "  : r=a ;\n" +
 	                  "a : 'x' { \n" +
@@ -32,7 +32,7 @@ public class TestParseTrees extends BaseTest {
 	                  "this.buildParseTrees = true;\n" +
 	                  "}\n" +
 	                  "@after {\n" +
-	                  "System.out.println($r.ctx.toStringTree(null, this););\n" +
+	                  "System.out.println($r.ctx.toStringTree(this));\n" +
 	                  "}\n" +
 	                  "  : r=a ;\n" +
 	                  "a : 'x' 'y'\n" +
@@ -50,7 +50,7 @@ public class TestParseTrees extends BaseTest {
 	                  "this.buildParseTrees = true;\n" +
 	                  "}\n" +
 	                  "@after {\n" +
-	                  "System.out.println($r.ctx.toStringTree(null, this););\n" +
+	                  "System.out.println($r.ctx.toStringTree(this));\n" +
 	                  "}\n" +
 	                  "  : r=a ;\n" +
 	                  "a : 'x' | 'y'\n" +
@@ -68,7 +68,7 @@ public class TestParseTrees extends BaseTest {
 	                  "this.buildParseTrees = true;\n" +
 	                  "}\n" +
 	                  "@after {\n" +
-	                  "System.out.println($r.ctx.toStringTree(null, this););\n" +
+	                  "System.out.println($r.ctx.toStringTree(this));\n" +
 	                  "}\n" +
 	                  "  : r=a ;\n" +
 	                  "a : ('x' | 'y')* 'z'\n" +
@@ -86,7 +86,7 @@ public class TestParseTrees extends BaseTest {
 	                  "this.buildParseTrees = true;\n" +
 	                  "}\n" +
 	                  "@after {\n" +
-	                  "System.out.println($r.ctx.toStringTree(null, this););\n" +
+	                  "System.out.println($r.ctx.toStringTree(this));\n" +
 	                  "}\n" +
 	                  "  : r=a ;\n" +
 	                  "a : b 'x'\n" +
@@ -106,7 +106,7 @@ public class TestParseTrees extends BaseTest {
 	                  "this.buildParseTrees = true;\n" +
 	                  "}\n" +
 	                  "@after {\n" +
-	                  "System.out.println($r.ctx.toStringTree(null, this););\n" +
+	                  "System.out.println($r.ctx.toStringTree(this));\n" +
 	                  "}\n" +
 	                  "  : r=a ;\n" +
 	                  "a : 'x' 'y'\n" +
@@ -126,7 +126,7 @@ public class TestParseTrees extends BaseTest {
 	                  "this.buildParseTrees = true;\n" +
 	                  "}\n" +
 	                  "@after {\n" +
-	                  "System.out.println($r.ctx.toStringTree(null, this););\n" +
+	                  "System.out.println($r.ctx.toStringTree(this));\n" +
 	                  "}\n" +
 	                  "  : r=a ;\n" +
 	                  "a : 'x' | 'y'\n" +
@@ -147,7 +147,7 @@ public class TestParseTrees extends BaseTest {
 	                  "this.buildParseTrees = true;\n" +
 	                  "}\n" +
 	                  "@after {\n" +
-	                  "System.out.println($r.ctx.toStringTree(null, this););\n" +
+	                  "System.out.println($r.ctx.toStringTree(this));\n" +
 	                  "}\n" +
 	                  "  : r=a ;\n" +
 	                  "a : 'x' 'y'* '!'\n" +

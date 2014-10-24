@@ -26,7 +26,7 @@ public class TestListeners extends BaseTest {
 	                  "\n" +
 	                  "s\n" +
 	                  "@after {\n" +
-	                  "System.out.println($ctx.r.toStringTree(null, this););\n" +
+	                  "System.out.println($ctx.r.toStringTree(this));\n" +
 	                  "var walker = new antlr4.tree.ParseTreeWalker();\n" +
 	                  "walker.walk(new this.LeafListener(), $ctx.r);\n" +
 	                  "\n" +
@@ -71,7 +71,7 @@ public class TestListeners extends BaseTest {
 	                  "\n" +
 	                  "s\n" +
 	                  "@after {\n" +
-	                  "System.out.println($ctx.r.toStringTree(null, this););\n" +
+	                  "System.out.println($ctx.r.toStringTree(this));\n" +
 	                  "var walker = new antlr4.tree.ParseTreeWalker();\n" +
 	                  "walker.walk(new this.LeafListener(), $ctx.r);\n" +
 	                  "\n" +
@@ -128,7 +128,7 @@ public class TestListeners extends BaseTest {
 	                  "\n" +
 	                  "s\n" +
 	                  "@after {\n" +
-	                  "System.out.println($ctx.r.toStringTree(null, this););\n" +
+	                  "System.out.println($ctx.r.toStringTree(this));\n" +
 	                  "var walker = new antlr4.tree.ParseTreeWalker();\n" +
 	                  "walker.walk(new this.LeafListener(), $ctx.r);\n" +
 	                  "\n" +
@@ -187,7 +187,7 @@ public class TestListeners extends BaseTest {
 	                  "\n" +
 	                  "s\n" +
 	                  "@after {\n" +
-	                  "System.out.println($ctx.r.toStringTree(null, this););\n" +
+	                  "System.out.println($ctx.r.toStringTree(this));\n" +
 	                  "var walker = new antlr4.tree.ParseTreeWalker();\n" +
 	                  "walker.walk(new this.LeafListener(), $ctx.r);\n" +
 	                  "\n" +
@@ -233,7 +233,7 @@ public class TestListeners extends BaseTest {
 	                  "\n" +
 	                  "s\n" +
 	                  "@after {\n" +
-	                  "System.out.println($ctx.r.toStringTree(null, this););\n" +
+	                  "System.out.println($ctx.r.toStringTree(this));\n" +
 	                  "var walker = new antlr4.tree.ParseTreeWalker();\n" +
 	                  "walker.walk(new this.LeafListener(), $ctx.r);\n" +
 	                  "\n" +
