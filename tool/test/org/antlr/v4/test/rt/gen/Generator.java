@@ -485,7 +485,7 @@ public class Generator {
 				"xy", 
 				"(a x y)\n",
 				null);
-		file.addParserTest(input, "test2Alts", "T", "s", 
+		file.addParserTest(input, "2Alts", "T", "s", 
 				"y", 
 				"(a y)\n",
 				null);
@@ -496,20 +496,19 @@ public class Generator {
 		file.addParserTest(input, "RuleRef", "T", "s", 
 				"yx", 
 				"(a (b y) x)\n",
-				null);
-		// ERRORs not shown. z is colored red in tree view
+				null);	
 		file.addParserTest(input, "ExtraToken", "T", "s", 
 				"xzy", 
-				"(a x z y)\n",
-				null);
+				"(a x z y)\n", // ERRORs not shown. z is colored red in tree view
+				"line 1:1 extraneous input 'z' expecting 'y'\n");
 		file.addParserTest(input, "NoViableAlt", "T", "s", 
 				"z",
 				"(a z)\n",
-				null);
+				"line 1:0 mismatched input 'z' expecting {'x', 'y'}\n");
 		file.addParserTest(input, "Sync", "T", "s", 
 				"xzyy!", 
 				"(a x z y y !)\n",
-				null);
+				"line 1:1 extraneous input 'z' expecting {'y', '!'}\n");
 		return file;
 	}
 

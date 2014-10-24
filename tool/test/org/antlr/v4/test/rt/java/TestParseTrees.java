@@ -10,14 +10,14 @@ public class TestParseTrees extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "s\n" +
 	                  "@init {\n" +
-	                  "this.buildParseTrees = true;\n" +
+	                  "setBuildParseTree(true);\n" +
 	                  "}\n" +
 	                  "@after {\n" +
 	                  "System.out.println($r.ctx.toStringTree(this));\n" +
 	                  "}\n" +
 	                  "  : r=a ;\n" +
 	                  "a : 'x' { \n" +
-	                  "document.getElementById('output').value += antlr4.Utils.arrayToString(this.getRuleInvocationStack()) + '\\n';\n" +
+	                  "System.out.println(getRuleInvocationStack());\n" +
 	                  "} ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "x", false);
 		assertEquals("[a, s]\n(a x)\n", found);
@@ -29,7 +29,7 @@ public class TestParseTrees extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "s\n" +
 	                  "@init {\n" +
-	                  "this.buildParseTrees = true;\n" +
+	                  "setBuildParseTree(true);\n" +
 	                  "}\n" +
 	                  "@after {\n" +
 	                  "System.out.println($r.ctx.toStringTree(this));\n" +
@@ -43,11 +43,11 @@ public class TestParseTrees extends BaseTest {
 	}
 
 	@Test
-	public void testtest2Alts() throws Exception {
+	public void test2Alts() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s\n" +
 	                  "@init {\n" +
-	                  "this.buildParseTrees = true;\n" +
+	                  "setBuildParseTree(true);\n" +
 	                  "}\n" +
 	                  "@after {\n" +
 	                  "System.out.println($r.ctx.toStringTree(this));\n" +
@@ -65,7 +65,7 @@ public class TestParseTrees extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "s\n" +
 	                  "@init {\n" +
-	                  "this.buildParseTrees = true;\n" +
+	                  "setBuildParseTree(true);\n" +
 	                  "}\n" +
 	                  "@after {\n" +
 	                  "System.out.println($r.ctx.toStringTree(this));\n" +
@@ -83,7 +83,7 @@ public class TestParseTrees extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "s\n" +
 	                  "@init {\n" +
-	                  "this.buildParseTrees = true;\n" +
+	                  "setBuildParseTree(true);\n" +
 	                  "}\n" +
 	                  "@after {\n" +
 	                  "System.out.println($r.ctx.toStringTree(this));\n" +
@@ -103,7 +103,7 @@ public class TestParseTrees extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "s\n" +
 	                  "@init {\n" +
-	                  "this.buildParseTrees = true;\n" +
+	                  "setBuildParseTree(true);\n" +
 	                  "}\n" +
 	                  "@after {\n" +
 	                  "System.out.println($r.ctx.toStringTree(this));\n" +
@@ -115,7 +115,7 @@ public class TestParseTrees extends BaseTest {
 	                  "  ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "xzy", false);
 		assertEquals("(a x z y)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertEquals("line 1:1 extraneous input 'z' expecting 'y'\n", this.stderrDuringParse);
 	}
 
 	@Test
@@ -123,7 +123,7 @@ public class TestParseTrees extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "s\n" +
 	                  "@init {\n" +
-	                  "this.buildParseTrees = true;\n" +
+	                  "setBuildParseTree(true);\n" +
 	                  "}\n" +
 	                  "@after {\n" +
 	                  "System.out.println($r.ctx.toStringTree(this));\n" +
@@ -136,7 +136,7 @@ public class TestParseTrees extends BaseTest {
 	                  " ";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "z", false);
 		assertEquals("(a z)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertEquals("line 1:0 mismatched input 'z' expecting {'x', 'y'}\n", this.stderrDuringParse);
 	}
 
 	@Test
@@ -144,7 +144,7 @@ public class TestParseTrees extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "s\n" +
 	                  "@init {\n" +
-	                  "this.buildParseTrees = true;\n" +
+	                  "setBuildParseTree(true);\n" +
 	                  "}\n" +
 	                  "@after {\n" +
 	                  "System.out.println($r.ctx.toStringTree(this));\n" +
@@ -156,7 +156,7 @@ public class TestParseTrees extends BaseTest {
 	                  "  ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "xzyy!", false);
 		assertEquals("(a x z y y !)\n", found);
-		assertNull(this.stderrDuringParse);
+		assertEquals("line 1:1 extraneous input 'z' expecting {'y', '!'}\n", this.stderrDuringParse);
 	}
 
 

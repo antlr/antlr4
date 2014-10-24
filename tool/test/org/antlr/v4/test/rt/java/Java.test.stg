@@ -131,7 +131,7 @@ Pass() ::= ""
 
 StringList() ::= "List\<String>"
 
-BuildParseTrees() ::= "this.buildParseTrees = true;"
+BuildParseTrees() ::= "setBuildParseTree(true);"
 
 BailErrorStrategy() ::= <%setErrorHandler(new BailErrorStrategy());%>
 
@@ -159,7 +159,7 @@ ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.tokenNames)"
 
-WriteRuleInvocationStack() ::= "document.getElementById('output').value += antlr4.Utils.arrayToString(this.getRuleInvocationStack()) + '\\n';"
+WriteRuleInvocationStack() ::= "System.out.println(getRuleInvocationStack());"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
 
