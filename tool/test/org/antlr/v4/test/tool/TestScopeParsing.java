@@ -31,7 +31,6 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.parse.ScopeParser;
-import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.Grammar;
 import org.junit.Test;
 

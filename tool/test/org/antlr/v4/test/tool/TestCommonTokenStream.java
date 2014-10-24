@@ -55,7 +55,8 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
         TokenSource lexer = // simulate input " x =34  ;\n"
             new TokenSource() {
                 int i = 0;
-                WritableToken[] tokens = {
+                @SuppressWarnings("serial")
+				WritableToken[] tokens = {
                     new CommonToken(1," ") {{channel = Lexer.HIDDEN;}},
                     new CommonToken(1,"x"),
                     new CommonToken(1," ") {{channel = Lexer.HIDDEN;}},
@@ -125,6 +126,7 @@ public class TestCommonTokenStream extends TestBufferedTokenStream {
 		                    // token indexes   01234 56789
 			new TokenSource() {
 				int i = 0;
+				@SuppressWarnings("serial")
 				WritableToken[] tokens = {
 				new CommonToken(1," ") {{channel = Lexer.HIDDEN;}}, // 0
 				new CommonToken(1,"x"),								// 1

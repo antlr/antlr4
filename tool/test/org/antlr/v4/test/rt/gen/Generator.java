@@ -975,8 +975,8 @@ public class Generator {
 					"line 1:19 reportContextSensitivity d=1 (stat), input='else'\n", 
 			"{ if x then if y then return else foo }",
 				"Decision 1:\n" +
-				"s0-'else'->:s1^=>1\n" +
-				"s0-'}'->:s2=>2\n",
+				"s0-'}'->:s2=>2\n" +
+				"s0-'else'->:s1^=>1\n",
 					"line 1:29 reportAttemptingFullContext d=1 (stat), input='else'\n" +
 					"line 1:38 reportAmbiguity d=1 (stat): ambigAlts={1, 2}, input='elsefoo}'\n",
 			// should not be ambiguous because the second 'else bar' clearly
@@ -992,8 +992,8 @@ public class Generator {
 			"{ if x then return else foo\n" +
 				"if x then if y then return else foo }",
 				"Decision 1:\n" +
-				"s0-'else'->:s1^=>1\n" +
-				"s0-'}'->:s2=>2\n",
+				"s0-'}'->:s2=>2\n" +
+				"s0-'else'->:s1^=>1\n",
 					"line 1:19 reportAttemptingFullContext d=1 (stat), input='else'\n" +
 					"line 1:19 reportContextSensitivity d=1 (stat), input='else'\n" +
 					"line 2:27 reportAttemptingFullContext d=1 (stat), input='else'\n" +
@@ -1001,8 +1001,8 @@ public class Generator {
 			"{ if x then return else foo\n" +
 				"if x then if y then return else foo }",
 				"Decision 1:\n" +
-				"s0-'else'->:s1^=>1\n" +
-				"s0-'}'->:s2=>2\n",
+				"s0-'}'->:s2=>2\n" +
+				"s0-'else'->:s1^=>1\n",
 					"line 1:19 reportAttemptingFullContext d=1 (stat), input='else'\n" +
 					"line 1:19 reportContextSensitivity d=1 (stat), input='else'\n" +
 					"line 2:27 reportAttemptingFullContext d=1 (stat), input='else'\n" +

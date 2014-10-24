@@ -107,6 +107,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+@SuppressWarnings("unused")
 public class TestPerformance extends BaseTest {
     /**
      * Parse all java files under this package within the JDK_SOURCE_ROOT
@@ -790,7 +791,6 @@ public class TestPerformance extends BaseTest {
 
     int configOutputSize = 0;
 
-    @SuppressWarnings("unused")
 	protected void parseSources(final int currentPass, final ParserFactory factory, Collection<InputDescriptor> sources, boolean shuffleSources) throws InterruptedException {
 		if (shuffleSources) {
 			List<InputDescriptor> sourcesList = new ArrayList<InputDescriptor>(sources);
@@ -1168,6 +1168,7 @@ public class TestPerformance extends BaseTest {
             parserCtor.newInstance(new CommonTokenStream(tokenSource));
 
             return new ParserFactory() {
+				
 				@Override
                 public FileParseResult parseFile(CharStream input, int currentPass, int thread) {
 					final Checksum checksum = new CRC32();

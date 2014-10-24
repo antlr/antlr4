@@ -4,7 +4,7 @@ s
 @after {<DumpDFA()>}
 	: '{' stat* '}' ;
 stat: 'if' ID 'then' stat ('else' ID)?
-		| 'return
+		| 'return'
 		;
 ID : 'a'..'z'+ ;
 WS : (' '|'\t'|'\n')+ -> skip ;

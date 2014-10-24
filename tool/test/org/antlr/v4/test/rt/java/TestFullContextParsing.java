@@ -83,7 +83,7 @@ public class TestFullContextParsing extends BaseTest {
 	                  "@after {this.dumpDFA();}\n" +
 	                  "	: '{' stat* '}' ;\n" +
 	                  "stat: 'if' ID 'then' stat ('else' ID)?\n" +
-	                  "		| 'return\n" +
+	                  "		| 'return'\n" +
 	                  "		;\n" +
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "WS : (' '|'\\t'|'\\n')+ -> skip ;";
@@ -107,7 +107,7 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_3() throws Exception {
 		String found = testFullContextIF_THEN_ELSEParse("{ if x then if y then return else foo }");
-		assertEquals("Decision 1:\ns0-'else'->:s1^=>1\ns0-'}'->:s2=>2\n", found);
+		assertEquals("Decision 1:\ns0-'}'->:s2=>2\ns0-'else'->:s1^=>1\n", found);
 		assertEquals("line 1:29 reportAttemptingFullContext d=1 (stat), input='else'\nline 1:38 reportAmbiguity d=1 (stat): ambigAlts={1, 2}, input='elsefoo}'\n", this.stderrDuringParse);
 	}
 
@@ -121,14 +121,14 @@ public class TestFullContextParsing extends BaseTest {
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_5() throws Exception {
 		String found = testFullContextIF_THEN_ELSEParse("{ if x then return else foo\nif x then if y then return else foo }");
-		assertEquals("Decision 1:\ns0-'else'->:s1^=>1\ns0-'}'->:s2=>2\n", found);
+		assertEquals("Decision 1:\ns0-'}'->:s2=>2\ns0-'else'->:s1^=>1\n", found);
 		assertEquals("line 1:19 reportAttemptingFullContext d=1 (stat), input='else'\nline 1:19 reportContextSensitivity d=1 (stat), input='else'\nline 2:27 reportAttemptingFullContext d=1 (stat), input='else'\nline 2:36 reportAmbiguity d=1 (stat): ambigAlts={1, 2}, input='elsefoo}'\n", this.stderrDuringParse);
 	}
 
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_6() throws Exception {
 		String found = testFullContextIF_THEN_ELSEParse("{ if x then return else foo\nif x then if y then return else foo }");
-		assertEquals("Decision 1:\ns0-'else'->:s1^=>1\ns0-'}'->:s2=>2\n", found);
+		assertEquals("Decision 1:\ns0-'}'->:s2=>2\ns0-'else'->:s1^=>1\n", found);
 		assertEquals("line 1:19 reportAttemptingFullContext d=1 (stat), input='else'\nline 1:19 reportContextSensitivity d=1 (stat), input='else'\nline 2:27 reportAttemptingFullContext d=1 (stat), input='else'\nline 2:36 reportAmbiguity d=1 (stat): ambigAlts={1, 2}, input='elsefoo}'\n", this.stderrDuringParse);
 	}
 
