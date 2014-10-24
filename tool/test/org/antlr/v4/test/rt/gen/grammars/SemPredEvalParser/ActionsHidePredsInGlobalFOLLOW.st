@@ -1,6 +1,5 @@
 grammar <grammarName>;
 @members {
-this.p = function(v) {
 <Declare_pred()>
 }
 s : e {} {<true:Invoke_pred()>}? {<writeln("\"parse\"")>} '!' ;

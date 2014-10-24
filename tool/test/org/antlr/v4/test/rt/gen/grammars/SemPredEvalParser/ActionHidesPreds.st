@@ -1,5 +1,5 @@
 grammar <grammarName>;
-@members {<InitMember("i","0")>}
+@members {<InitIntMember("i","0")>}
 s : a+ ;
 a : {<SetMember("i","1")>} ID {<MemberEquals("i","1")>}? {<writeln("\"alt 1\"")>}
   | {<SetMember("i","2")>} ID {<MemberEquals("i","2")>}? {<writeln("\"alt 2\"")>}

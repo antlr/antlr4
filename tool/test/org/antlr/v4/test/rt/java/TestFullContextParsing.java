@@ -79,7 +79,7 @@ public class TestFullContextParsing extends BaseTest {
 	String testFullContextIF_THEN_ELSEParse(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s \n" +
-	                  "@init {this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;}\n" +
+	                  "@init {_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);}\n" +
 	                  "@after {this.dumpDFA();}\n" +
 	                  "	: '{' stat* '}' ;\n" +
 	                  "stat: 'if' ID 'then' stat ('else' ID)?\n" +
@@ -136,7 +136,7 @@ public class TestFullContextParsing extends BaseTest {
 	public void testLoopsSimulateTailRecursion() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "prog\n" +
-	                  "@init {this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;}\n" +
+	                  "@init {_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);}\n" +
 	                  "	: expr_or_assign*;\n" +
 	                  "expr_or_assign\n" +
 	                  "	: expr '++' {System.out.println(\"fail.\");}\n" +
@@ -158,7 +158,7 @@ public class TestFullContextParsing extends BaseTest {
 	public void testAmbiguityNoLoop() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "prog\n" +
-	                  "@init {this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;}\n" +
+	                  "@init {_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);}\n" +
 	                  "	: expr expr {System.out.println(\"alt 1\");}\n" +
 	                  "	| expr\n" +
 	                  "	;\n" +
@@ -176,7 +176,7 @@ public class TestFullContextParsing extends BaseTest {
 	String testExprAmbiguity(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s\n" +
-	                  "@init {this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;}\n" +
+	                  "@init {_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);}\n" +
 	                  ":   expr[0] {System.out.println($expr.ctx.toStringTree(this));};\n" +
 	                  "	expr[int _p]\n" +
 	                  "		: ID \n" +

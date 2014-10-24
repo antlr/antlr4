@@ -1,5 +1,5 @@
 grammar <grammarName>;
-@members {<InitMember("enumKeyword",true)>}
+@members {<InitBooleanMember("enumKeyword",true)>}
 primary
     :   ID {<writeln("\"ID \"+$ID.text")>}
     |   {!<GetMember("enumKeyword")>}? 'enum' {<writeln("\"enum\"")>}
