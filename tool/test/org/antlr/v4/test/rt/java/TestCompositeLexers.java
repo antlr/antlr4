@@ -8,7 +8,7 @@ public class TestCompositeLexers extends BaseTest {
 	@Test
 	public void testLexerDelegatorInvokesDelegateRule() throws Exception {
 		String slave_S = "lexer grammar S;\n" +
-	                  "A : 'a' {document.getElementById('output').value += \"S.a\";};\n" +
+	                  "A : 'a' {System.out.println(\"S.A\");};\n" +
 	                  "C : 'c' ;";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave_S);
@@ -29,14 +29,14 @@ public class TestCompositeLexers extends BaseTest {
 	@Test
 	public void testLexerDelegatorRuleOverridesDelegate() throws Exception {
 		String slave_S = "lexer grammar S;\n" +
-	                  "A : 'a' {document.getElementById('output').value += \"S.A\";};\n" +
-	                  "B : 'b' {document.getElementById('output').value += \"S.B\";};";
+	                  "A : 'a' {System.out.println(\"S.A\");};\n" +
+	                  "B : 'b' {System.out.println(\"S.B\");};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave_S);
 
 		String grammar = "lexer grammar M;\n" +
 	                  "import S;\n" +
-	                  "A : 'a' B {document.getElementById('output').value += \"M.A\";};\n" +
+	                  "A : 'a' B {System.out.println(\"M.A\");};\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execLexer("M.g4", grammar, "M", "ab", false);
 		assertEquals("M.A\n" + 

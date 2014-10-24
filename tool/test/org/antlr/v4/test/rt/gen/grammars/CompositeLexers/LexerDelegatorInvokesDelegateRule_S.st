@@ -1,3 +1,3 @@
 lexer grammar S;
-A : 'a' {<write("\"S.a\"")>};
+A : 'a' {<writeln("\"S.A\"")>};
 C : 'c' ;

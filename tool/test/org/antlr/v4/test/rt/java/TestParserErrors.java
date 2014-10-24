@@ -219,8 +219,8 @@ public class TestParserErrors extends BaseTest {
 	                  "    };\n" +
 	                  "}\n" +
 	                  "s : (a | b)+;\n" +
-	                  "a : 'a' {document.getElementById('output').value += 'a';};\n" +
-	                  "b : 'b' {document.getElementById('output').value += 'b';};\n" +
+	                  "a : 'a' {System.out.print('a');};\n" +
+	                  "b : 'b' {System.out.print('b');};\n" +
 	                  ";";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "abab", false);
 		assertEquals("abab\n", found);

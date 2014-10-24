@@ -93,7 +93,7 @@ public void test<test.name>() throws Exception {
 
 writeln(s) ::= <<System.out.println(<s>);>>
 
-write(s) ::= <<document.getElementById('output').value += <s>;>>
+write(s) ::= <<System.out.print(<s>);>>
 
 assert(s) ::= <<console.assert(<s>);>>
 

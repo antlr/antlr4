@@ -28,7 +28,7 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testBringInLiteralsFromDelegate() throws Exception {
 		String slave_S = "parser grammar S;\n" +
-	                  "a : '=' 'a' {document.getElementById('output').value += \"S.a\";};";
+	                  "a : '=' 'a' {System.out.print(\"S.a\");};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave_S);
 
@@ -44,7 +44,7 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testDelegatorInvokesDelegateRuleWithArgs() throws Exception {
 		String slave_S = "parser grammar S;\n" +
-	                  "a[int x] returns [int y] : B {document.getElementById('output').value += \"S.a\";;$y=1000;};";
+	                  "a[int x] returns [int y] : B {System.out.print(\"S.a\");;$y=1000;};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave_S);
 
@@ -61,13 +61,13 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testDelegatorInvokesDelegateRuleWithReturnStruct() throws Exception {
 		String slave_S = "parser grammar S;\n" +
-	                  "A : B {document.getElementById('output').value += \"S.a\";};";
+	                  "A : B {System.out.print(\"S.a\");};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave_S);
 
 		String grammar = "grammar M;\n" +
 	                  "import S;\n" +
-	                  "s : a {document.getElementById('output').value += $a.text;} ;\n" +
+	                  "s : a {System.out.print($a.text);} ;\n" +
 	                  "B : 'b' ; // defines B from inherited token space\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("M.g4", grammar, "MParser", "MLexer", "s", "b", false);
@@ -121,13 +121,13 @@ public class TestCompositeParsers extends BaseTest {
 	public void testDelegatesSeeSameTokenType() throws Exception {
 		String slave_S = "parser grammar S;\n" +
 	                  "tokens { A, B, C }\n" +
-	                  "x : A {document.getElementById('output').value += \"S.x\";};";
+	                  "x : A {System.out.print(\"S.x\");};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave_S);
 
 		String slave_T = "parser grammar S;\n" +
 	                  "tokens { C, B, A } // reverse order\n" +
-	                  "y : A {document.getElementById('output').value += \"T.y\";};";
+	                  "y : A {System.out.print(\"T.y\");};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "T.g4", slave_T);
 
@@ -190,7 +190,7 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testDelegatorRuleOverridesDelegate() throws Exception {
 		String slave_S = "parser grammar S;\n" +
-	                  "a : b {document.getElementById('output').value += \"S.a\";};\n" +
+	                  "a : b {System.out.print(\"S.a\");};\n" +
 	                  "b : B ;";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave_S);
@@ -210,7 +210,7 @@ public class TestCompositeParsers extends BaseTest {
 	                  "type_ : 'int' ;\n" +
 	                  "decl : type_ ID ';'\n" +
 	                  "	| type_ ID init ';' {\n" +
-	                  "		document.getElementById('output').value += \"decl: \" + $text;\n" +
+	                  "		System.out.print(\"decl: \" + $text);\n" +
 	                  "	};\n" +
 	                  "init : '=' INT;";
 		mkdir(tmpdir);
@@ -231,7 +231,7 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testDelegatorRuleOverridesDelegates() throws Exception {
 		String slave_S = "parser grammar S;\n" +
-	                  "a : b {document.getElementById('output').value += \"S.a\";};\n" +
+	                  "a : b {System.out.print(\"S.a\");};\n" +
 	                  "b : 'b' ;\n" +
 	                  "   ";
 		mkdir(tmpdir);
@@ -239,13 +239,13 @@ public class TestCompositeParsers extends BaseTest {
 
 		String slave_T = "parser grammar S;\n" +
 	                  "tokens { A }\n" +
-	                  "b : 'b' {document.getElementById('output').value += \"T.b\";};";
+	                  "b : 'b' {System.out.print(\"T.b\");};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "T.g4", slave_T);
 
 		String grammar = "grammar M;\n" +
 	                  "import S, T;\n" +
-	                  "b : 'b'|'c' {document.getElementById('output').value += \"M.b\";}|B|A;\n" +
+	                  "b : 'b'|'c' {System.out.print(\"M.b\");}|B|A;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("M.g4", grammar, "MParser", "MLexer", "a", "c", false);
 		assertEquals("M.b\nS.a\n", found);
