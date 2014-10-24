@@ -747,61 +747,61 @@ public class Generator {
 		file.addParserTest(input, "SemPred", "T", "s", "x y z",
 				"(s (a (a (a x) y) z))\n", null);
 		file.addParserTests(input, "TernaryExpr", "T", "s",
-				"a",			"(s (e a) <EOF>)",
-				"a+b",			"(s (e (e a) + (e b)) <EOF>)",
-				"a*b",			"(s (e (e a) * (e b)) <EOF>)",
-				"a?b:c",		"(s (e (e a) ? (e b) : (e c)) <EOF>)",
-				"a=b=c",		"(s (e (e a) = (e (e b) = (e c))) <EOF>)",
-				"a?b+c:d",		"(s (e (e a) ? (e (e b) + (e c)) : (e d)) <EOF>)",
-				"a?b=c:d",		"(s (e (e a) ? (e (e b) = (e c)) : (e d)) <EOF>)",
-				"a? b?c:d : e",	"(s (e (e a) ? (e (e b) ? (e c) : (e d)) : (e e)) <EOF>)",
-				"a?b: c?d:e",	"(s (e (e a) ? (e b) : (e (e c) ? (e d) : (e e))) <EOF>)");
+				"a",			"(s (e a) <EOF>)\n",
+				"a+b",			"(s (e (e a) + (e b)) <EOF>)\n",
+				"a*b",			"(s (e (e a) * (e b)) <EOF>)\n",
+				"a?b:c",		"(s (e (e a) ? (e b) : (e c)) <EOF>)\n",
+				"a=b=c",		"(s (e (e a) = (e (e b) = (e c))) <EOF>)\n",
+				"a?b+c:d",		"(s (e (e a) ? (e (e b) + (e c)) : (e d)) <EOF>)\n",
+				"a?b=c:d",		"(s (e (e a) ? (e (e b) = (e c)) : (e d)) <EOF>)\n",
+				"a? b?c:d : e",	"(s (e (e a) ? (e (e b) ? (e c) : (e d)) : (e e)) <EOF>)\n",
+				"a?b: c?d:e",	"(s (e (e a) ? (e b) : (e (e c) ? (e d) : (e e))) <EOF>)\n");
 		file.addParserTests(input, "Expressions", "T", "s",
-				"a",		"(s (e a) <EOF>)",
-				"1",		"(s (e 1) <EOF>)",
-				"a-1",		"(s (e (e a) - (e 1)) <EOF>)",
-				"a.b",		"(s (e (e a) . b) <EOF>)",
-				"a.this",	"(s (e (e a) . this) <EOF>)",
-				"-a",		"(s (e - (e a)) <EOF>)",
-				"-a+b",		"(s (e (e - (e a)) + (e b)) <EOF>)");
+				"a",		"(s (e a) <EOF>)\n",
+				"1",		"(s (e 1) <EOF>)\n",
+				"a-1",		"(s (e (e a) - (e 1)) <EOF>)\n",
+				"a.b",		"(s (e (e a) . b) <EOF>)\n",
+				"a.this",	"(s (e (e a) . this) <EOF>)\n",
+				"-a",		"(s (e - (e a)) <EOF>)\n",
+				"-a+b",		"(s (e (e - (e a)) + (e b)) <EOF>)\n");
 		file.addParserTests(input, "JavaExpressions", "T", "s",
-				"a|b&c",	"(s (e (e a) | (e (e b) & (e c))) <EOF>)", 
-				"(a|b)&c",	"(s (e (e ( (e (e a) | (e b)) )) & (e c)) <EOF>)",
-	            "a > b",	"(s (e (e a) > (e b)) <EOF>)",
-				"a >> b",	"(s (e (e a) >> (e b)) <EOF>)",
-				"a=b=c",	"(s (e (e a) = (e (e b) = (e c))) <EOF>)",
-				"a^b^c",	"(s (e (e a) ^ (e (e b) ^ (e c))) <EOF>)",
-				"(T)x",							"(s (e ( (type T) ) (e x)) <EOF>)",
-				"new A().b",					"(s (e (e new (type A) ( )) . b) <EOF>)",
-				"(T)t.f()",						"(s (e (e ( (type T) ) (e (e t) . f)) ( )) <EOF>)",
-				"a.f(x)==T.c",					"(s (e (e (e (e a) . f) ( (expressionList (e x)) )) == (e (e T) . c)) <EOF>)",
-				"a.f().g(x,1)",					"(s (e (e (e (e (e a) . f) ( )) . g) ( (expressionList (e x) , (e 1)) )) <EOF>)",
-				"new T[((n-1) * x) + 1]",		"(s (e new (type T) [ (e (e ( (e (e ( (e (e n) - (e 1)) )) * (e x)) )) + (e 1)) ]) <EOF>)");
+				"a|b&c",	"(s (e (e a) | (e (e b) & (e c))) <EOF>)\n", 
+				"(a|b)&c",	"(s (e (e ( (e (e a) | (e b)) )) & (e c)) <EOF>)\n",
+	            "a > b",	"(s (e (e a) > (e b)) <EOF>)\n",
+				"a >> b",	"(s (e (e a) >> (e b)) <EOF>)\n",
+				"a=b=c",	"(s (e (e a) = (e (e b) = (e c))) <EOF>)\n",
+				"a^b^c",	"(s (e (e a) ^ (e (e b) ^ (e c))) <EOF>)\n",
+				"(T)x",							"(s (e ( (type T) ) (e x)) <EOF>)\n",
+				"new A().b",					"(s (e (e new (type A) ( )) . b) <EOF>)\n",
+				"(T)t.f()",						"(s (e (e ( (type T) ) (e (e t) . f)) ( )) <EOF>)\n",
+				"a.f(x)==T.c",					"(s (e (e (e (e a) . f) ( (expressionList (e x)) )) == (e (e T) . c)) <EOF>)\n",
+				"a.f().g(x,1)",					"(s (e (e (e (e (e a) . f) ( )) . g) ( (expressionList (e x) , (e 1)) )) <EOF>)\n",
+				"new T[((n-1) * x) + 1]",		"(s (e new (type T) [ (e (e ( (e (e ( (e (e n) - (e 1)) )) * (e x)) )) + (e 1)) ]) <EOF>)\n");
 		file.addParserTests(input, "Declarations", "T", "s",
-				"a",		"(s (declarator a) <EOF>)",
-				"*a",		"(s (declarator * (declarator a)) <EOF>)",
-				"**a",		"(s (declarator * (declarator * (declarator a))) <EOF>)",
-				"a[3]",		"(s (declarator (declarator a) [ (e 3) ]) <EOF>)",
-				"b[]",		"(s (declarator (declarator b) [ ]) <EOF>)",
-				"(a)",		"(s (declarator ( (declarator a) )) <EOF>)",
-				"a[]()",	"(s (declarator (declarator (declarator a) [ ]) ( )) <EOF>)",
-				"a[][]",	"(s (declarator (declarator (declarator a) [ ]) [ ]) <EOF>)",
-				"*a[]",		"(s (declarator * (declarator (declarator a) [ ])) <EOF>)",
-				"(*a)[]",	"(s (declarator (declarator ( (declarator * (declarator a)) )) [ ]) <EOF>)");
+				"a",		"(s (declarator a) <EOF>)\n",
+				"*a",		"(s (declarator * (declarator a)) <EOF>)\n",
+				"**a",		"(s (declarator * (declarator * (declarator a))) <EOF>)\n",
+				"a[3]",		"(s (declarator (declarator a) [ (e 3) ]) <EOF>)\n",
+				"b[]",		"(s (declarator (declarator b) [ ]) <EOF>)\n",
+				"(a)",		"(s (declarator ( (declarator a) )) <EOF>)\n",
+				"a[]()",	"(s (declarator (declarator (declarator a) [ ]) ( )) <EOF>)\n",
+				"a[][]",	"(s (declarator (declarator (declarator a) [ ]) [ ]) <EOF>)\n",
+				"*a[]",		"(s (declarator * (declarator (declarator a) [ ])) <EOF>)\n",
+				"(*a)[]",	"(s (declarator (declarator ( (declarator * (declarator a)) )) [ ]) <EOF>)\n");
 		file.addParserTests(input, "ReturnValueAndActions", "T", "s",
-				"4",		"4",
-				"1+2",		"3",
-				"1+2*3",	"7",
-				"(1+2)*3",	"9");
+				"4",		"4\n",
+				"1+2",		"3\n",
+				"1+2*3",	"7\n",
+				"(1+2)*3",	"9\n");
 		file.addParserTests(input, "LabelsOnOpSubrule", "T", "s",
-				"4",		"(s (e 4))", 
-				"1*2/3",	"(s (e (e (e 1) * (e 2)) / (e 3)))",
-				"(1/2)*3",	"(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))");
+				"4",		"(s (e 4))\n", 
+				"1*2/3",	"(s (e (e (e 1) * (e 2)) / (e 3)))\n",
+				"(1/2)*3",	"(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))\n");
 		file.addParserTests(input, "ReturnValueAndActionsAndLabels", "T", "s",
-				"4",			"4",
-				"1+2",			"3",
-				"1+2*3",		"7",
-				"i++*3",		"12");
+				"4",			"4\n",
+				"1+2",			"3\n",
+				"1+2*3",		"7\n",
+				"i++*3",		"12\n");
 		/**
 		 * This is a regression test for antlr/antlr4#433 "Not all context accessor
 		 * methods are generated when an alternative rule label is used for multiple
@@ -809,14 +809,14 @@ public class Generator {
 		 * https://github.com/antlr/antlr4/issues/433
 		 */
 		file.addParserTests(input, "MultipleAlternativesWithCommonLabel", "T", "s",
-				"4",			"4",
-				"1+2",			"3",
-				"1+2*3",		"7",
-				"i++*3",		"12");
+				"4",			"4\n",
+				"1+2",			"3\n",
+				"1+2*3",		"7\n",
+				"i++*3",		"12\n");
 		file.addParserTests(input, "PrefixOpWithActionAndLabel", "T", "s",
-				"a",			"a",
-				"a+b",			"(a+b)",
-				"a=b+c",		"((a=b)+c)");
+				"a",			"a\n",
+				"a+b",			"(a+b)\n",
+				"a=b+c",		"((a=b)+c)\n");
 		file.addParserTests(input, "AmbigLR", "Expr", "prog", 
 				"1\n", "",
 				"a = 5\n", "",
@@ -839,6 +839,69 @@ public class Generator {
 		file.addParserTest(input, "PrecedenceFilterConsidersContext", "T", "prog",
 				"aa",
 				"(prog (statement (letterA a)) (statement (letterA a)) <EOF>)\n", null);
+		/**
+		 * This is a regression test for antlr/antlr4#625 "Duplicate action breaks
+		 * operator precedence"
+		 * https://github.com/antlr/antlr4/issues/625
+		 */
+		file.addParserTests(input, "MultipleActions", "T", "s",
+				"4", "(s (e 4))\n",
+				"1*2/3", "(s (e (e (e 1) * (e 2)) / (e 3)))\n",
+				"(1/2)*3", "(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))\n");
+		/**
+		 * This is a regression test for antlr/antlr4#625 "Duplicate action breaks
+		 * operator precedence"
+		 * https://github.com/antlr/antlr4/issues/625
+		 */
+		file.addParserTests(input, "MultipleActionsPredicatesOptions", "T", "s",
+				"4", "(s (e 4))\n",
+				"1*2/3", "(s (e (e (e 1) * (e 2)) / (e 3)))\n",
+				"(1/2)*3", "(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))\n");
+		file.addParserTest(input, "SemPredFailOption", "T", "s", 
+				"x y z", 
+				"(s (a (a x) y z))\n",
+				"line 1:4 rule a custom message\n");
+		/**
+		 * This is a regression test for antlr/antlr4#542 "First alternative cannot
+		 * be right-associative".
+		 * https://github.com/antlr/antlr4/issues/542
+		 */
+		file.addParserTests(input, "TernaryExprExplicitAssociativity", "T", "s",
+				"a",			"(s (e a) <EOF>)\n",
+				"a+b",			"(s (e (e a) + (e b)) <EOF>)\n",
+				"a*b",			"(s (e (e a) * (e b)) <EOF>)\n",
+				"a?b:c",		"(s (e (e a) ? (e b) : (e c)) <EOF>)\n",
+				"a=b=c",		"(s (e (e a) = (e (e b) = (e c))) <EOF>)\n",
+				"a?b+c:d",		"(s (e (e a) ? (e (e b) + (e c)) : (e d)) <EOF>)\n",
+				"a?b=c:d",		"(s (e (e a) ? (e (e b) = (e c)) : (e d)) <EOF>)\n",
+				"a? b?c:d : e",	"(s (e (e a) ? (e (e b) ? (e c) : (e d)) : (e e)) <EOF>)\n",
+				"a?b: c?d:e",	"(s (e (e a) ? (e b) : (e (e c) ? (e d) : (e e))) <EOF>)\n");
+		/**
+		 * This is a regression test for antlr/antlr4#677 "labels not working in
+		 * grammar file".
+		 * https://github.com/antlr/antlr4/issues/677
+		 *
+		 * <p>This test treats {@code ,} and {@code >>} as part of a single compound
+		 * operator (similar to a ternary operator).</p>
+		 */
+		file.addParserTests(input, "ReturnValueAndActionsList1", "T", "s",
+				"a*b",			"(s (expr (expr a) * (expr b)) <EOF>)\n",
+				"a,c>>x",		"(s (expr (expr a) , (expr c) >> (expr x)) <EOF>)\n",
+				"x",			"(s (expr x) <EOF>)\n",
+				"a*b,c,x*y>>r",	"(s (expr (expr (expr a) * (expr b)) , (expr c) , (expr (expr x) * (expr y)) >> (expr r)) <EOF>)\n");
+
+		/**
+		 * This is a regression test for antlr/antlr4#677 "labels not working in
+		 * grammar file".
+		 * https://github.com/antlr/antlr4/issues/677
+		 *
+		 * <p>This test treats the {@code ,} and {@code >>} operators separately.</p>
+		 */
+		file.addParserTests(input, "ReturnValueAndActionsList2", "T", "s",
+				"a*b",			"(s (expr (expr a) * (expr b)) <EOF>)\n",
+				"a,c>>x",		"(s (expr (expr (expr a) , (expr c)) >> (expr x)) <EOF>)\n",
+				"x",			"(s (expr x) <EOF>)\n",
+				"a*b,c,x*y>>r",	"(s (expr (expr (expr (expr (expr a) * (expr b)) , (expr c)) , (expr (expr x) * (expr y))) >> (expr r)) <EOF>)\n");
 		return file;
 	}
 

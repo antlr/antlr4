@@ -1,6 +1,6 @@
 grammar <grammarName>;
 s : e {<writeln("$e.v")>}; 
-e returns [int v, list ignored]
+e returns [int v, <StringList()> ignored]
   : a=e '*' b=e {$v = $a.v * $b.v;}
   | a=e '+' b=e {$v = $a.v + $b.v;}
   | INT {$v = $INT.int;}

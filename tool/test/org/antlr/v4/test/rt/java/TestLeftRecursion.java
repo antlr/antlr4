@@ -99,63 +99,63 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testTernaryExpr_1() throws Exception {
 		String found = testTernaryExpr("a");
-		assertEquals("(s (e a) <EOF>)", found);
+		assertEquals("(s (e a) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testTernaryExpr_2() throws Exception {
 		String found = testTernaryExpr("a+b");
-		assertEquals("(s (e (e a) + (e b)) <EOF>)", found);
+		assertEquals("(s (e (e a) + (e b)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testTernaryExpr_3() throws Exception {
 		String found = testTernaryExpr("a*b");
-		assertEquals("(s (e (e a) * (e b)) <EOF>)", found);
+		assertEquals("(s (e (e a) * (e b)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testTernaryExpr_4() throws Exception {
 		String found = testTernaryExpr("a?b:c");
-		assertEquals("(s (e (e a) ? (e b) : (e c)) <EOF>)", found);
+		assertEquals("(s (e (e a) ? (e b) : (e c)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testTernaryExpr_5() throws Exception {
 		String found = testTernaryExpr("a=b=c");
-		assertEquals("(s (e (e a) = (e (e b) = (e c))) <EOF>)", found);
+		assertEquals("(s (e (e a) = (e (e b) = (e c))) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testTernaryExpr_6() throws Exception {
 		String found = testTernaryExpr("a?b+c:d");
-		assertEquals("(s (e (e a) ? (e (e b) + (e c)) : (e d)) <EOF>)", found);
+		assertEquals("(s (e (e a) ? (e (e b) + (e c)) : (e d)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testTernaryExpr_7() throws Exception {
 		String found = testTernaryExpr("a?b=c:d");
-		assertEquals("(s (e (e a) ? (e (e b) = (e c)) : (e d)) <EOF>)", found);
+		assertEquals("(s (e (e a) ? (e (e b) = (e c)) : (e d)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testTernaryExpr_8() throws Exception {
 		String found = testTernaryExpr("a? b?c:d : e");
-		assertEquals("(s (e (e a) ? (e (e b) ? (e c) : (e d)) : (e e)) <EOF>)", found);
+		assertEquals("(s (e (e a) ? (e (e b) ? (e c) : (e d)) : (e e)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testTernaryExpr_9() throws Exception {
 		String found = testTernaryExpr("a?b: c?d:e");
-		assertEquals("(s (e (e a) ? (e b) : (e (e c) ? (e d) : (e e))) <EOF>)", found);
+		assertEquals("(s (e (e a) ? (e b) : (e (e c) ? (e d) : (e e))) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
@@ -179,49 +179,49 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testExpressions_1() throws Exception {
 		String found = testExpressions("a");
-		assertEquals("(s (e a) <EOF>)", found);
+		assertEquals("(s (e a) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testExpressions_2() throws Exception {
 		String found = testExpressions("1");
-		assertEquals("(s (e 1) <EOF>)", found);
+		assertEquals("(s (e 1) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testExpressions_3() throws Exception {
 		String found = testExpressions("a-1");
-		assertEquals("(s (e (e a) - (e 1)) <EOF>)", found);
+		assertEquals("(s (e (e a) - (e 1)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testExpressions_4() throws Exception {
 		String found = testExpressions("a.b");
-		assertEquals("(s (e (e a) . b) <EOF>)", found);
+		assertEquals("(s (e (e a) . b) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testExpressions_5() throws Exception {
 		String found = testExpressions("a.this");
-		assertEquals("(s (e (e a) . this) <EOF>)", found);
+		assertEquals("(s (e (e a) . this) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testExpressions_6() throws Exception {
 		String found = testExpressions("-a");
-		assertEquals("(s (e - (e a)) <EOF>)", found);
+		assertEquals("(s (e - (e a)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testExpressions_7() throws Exception {
 		String found = testExpressions("-a+b");
-		assertEquals("(s (e (e - (e a)) + (e b)) <EOF>)", found);
+		assertEquals("(s (e (e - (e a)) + (e b)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
@@ -288,84 +288,84 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_1() throws Exception {
 		String found = testJavaExpressions("a|b&c");
-		assertEquals("(s (e (e a) | (e (e b) & (e c))) <EOF>)", found);
+		assertEquals("(s (e (e a) | (e (e b) & (e c))) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testJavaExpressions_2() throws Exception {
 		String found = testJavaExpressions("(a|b)&c");
-		assertEquals("(s (e (e ( (e (e a) | (e b)) )) & (e c)) <EOF>)", found);
+		assertEquals("(s (e (e ( (e (e a) | (e b)) )) & (e c)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testJavaExpressions_3() throws Exception {
 		String found = testJavaExpressions("a > b");
-		assertEquals("(s (e (e a) > (e b)) <EOF>)", found);
+		assertEquals("(s (e (e a) > (e b)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testJavaExpressions_4() throws Exception {
 		String found = testJavaExpressions("a >> b");
-		assertEquals("(s (e (e a) >> (e b)) <EOF>)", found);
+		assertEquals("(s (e (e a) >> (e b)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testJavaExpressions_5() throws Exception {
 		String found = testJavaExpressions("a=b=c");
-		assertEquals("(s (e (e a) = (e (e b) = (e c))) <EOF>)", found);
+		assertEquals("(s (e (e a) = (e (e b) = (e c))) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testJavaExpressions_6() throws Exception {
 		String found = testJavaExpressions("a^b^c");
-		assertEquals("(s (e (e a) ^ (e (e b) ^ (e c))) <EOF>)", found);
+		assertEquals("(s (e (e a) ^ (e (e b) ^ (e c))) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testJavaExpressions_7() throws Exception {
 		String found = testJavaExpressions("(T)x");
-		assertEquals("(s (e ( (type T) ) (e x)) <EOF>)", found);
+		assertEquals("(s (e ( (type T) ) (e x)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testJavaExpressions_8() throws Exception {
 		String found = testJavaExpressions("new A().b");
-		assertEquals("(s (e (e new (type A) ( )) . b) <EOF>)", found);
+		assertEquals("(s (e (e new (type A) ( )) . b) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testJavaExpressions_9() throws Exception {
 		String found = testJavaExpressions("(T)t.f()");
-		assertEquals("(s (e (e ( (type T) ) (e (e t) . f)) ( )) <EOF>)", found);
+		assertEquals("(s (e (e ( (type T) ) (e (e t) . f)) ( )) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testJavaExpressions_10() throws Exception {
 		String found = testJavaExpressions("a.f(x)==T.c");
-		assertEquals("(s (e (e (e (e a) . f) ( (expressionList (e x)) )) == (e (e T) . c)) <EOF>)", found);
+		assertEquals("(s (e (e (e (e a) . f) ( (expressionList (e x)) )) == (e (e T) . c)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testJavaExpressions_11() throws Exception {
 		String found = testJavaExpressions("a.f().g(x,1)");
-		assertEquals("(s (e (e (e (e (e a) . f) ( )) . g) ( (expressionList (e x) , (e 1)) )) <EOF>)", found);
+		assertEquals("(s (e (e (e (e (e a) . f) ( )) . g) ( (expressionList (e x) , (e 1)) )) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testJavaExpressions_12() throws Exception {
 		String found = testJavaExpressions("new T[((n-1) * x) + 1]");
-		assertEquals("(s (e new (type T) [ (e (e ( (e (e ( (e (e n) - (e 1)) )) * (e x)) )) + (e 1)) ]) <EOF>)", found);
+		assertEquals("(s (e new (type T) [ (e (e ( (e (e ( (e (e n) - (e 1)) )) * (e x)) )) + (e 1)) ]) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
@@ -390,77 +390,77 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testDeclarations_1() throws Exception {
 		String found = testDeclarations("a");
-		assertEquals("(s (declarator a) <EOF>)", found);
+		assertEquals("(s (declarator a) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testDeclarations_2() throws Exception {
 		String found = testDeclarations("*a");
-		assertEquals("(s (declarator * (declarator a)) <EOF>)", found);
+		assertEquals("(s (declarator * (declarator a)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testDeclarations_3() throws Exception {
 		String found = testDeclarations("**a");
-		assertEquals("(s (declarator * (declarator * (declarator a))) <EOF>)", found);
+		assertEquals("(s (declarator * (declarator * (declarator a))) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testDeclarations_4() throws Exception {
 		String found = testDeclarations("a[3]");
-		assertEquals("(s (declarator (declarator a) [ (e 3) ]) <EOF>)", found);
+		assertEquals("(s (declarator (declarator a) [ (e 3) ]) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testDeclarations_5() throws Exception {
 		String found = testDeclarations("b[]");
-		assertEquals("(s (declarator (declarator b) [ ]) <EOF>)", found);
+		assertEquals("(s (declarator (declarator b) [ ]) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testDeclarations_6() throws Exception {
 		String found = testDeclarations("(a)");
-		assertEquals("(s (declarator ( (declarator a) )) <EOF>)", found);
+		assertEquals("(s (declarator ( (declarator a) )) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testDeclarations_7() throws Exception {
 		String found = testDeclarations("a[]()");
-		assertEquals("(s (declarator (declarator (declarator a) [ ]) ( )) <EOF>)", found);
+		assertEquals("(s (declarator (declarator (declarator a) [ ]) ( )) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testDeclarations_8() throws Exception {
 		String found = testDeclarations("a[][]");
-		assertEquals("(s (declarator (declarator (declarator a) [ ]) [ ]) <EOF>)", found);
+		assertEquals("(s (declarator (declarator (declarator a) [ ]) [ ]) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testDeclarations_9() throws Exception {
 		String found = testDeclarations("*a[]");
-		assertEquals("(s (declarator * (declarator (declarator a) [ ])) <EOF>)", found);
+		assertEquals("(s (declarator * (declarator (declarator a) [ ])) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testDeclarations_10() throws Exception {
 		String found = testDeclarations("(*a)[]");
-		assertEquals("(s (declarator (declarator ( (declarator * (declarator a)) )) [ ]) <EOF>)", found);
+		assertEquals("(s (declarator (declarator ( (declarator * (declarator a)) )) [ ]) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	String testReturnValueAndActions(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s : e {System.out.println($e.v);}; \n" +
-	                  "e returns [int v, list ignored]\n" +
+	                  "e returns [int v, List<String> ignored]\n" +
 	                  "  : a=e '*' b=e {$v = $a.v * $b.v;}\n" +
 	                  "  | a=e '+' b=e {$v = $a.v + $b.v;}\n" +
 	                  "  | INT {$v = $INT.int;}\n" +
@@ -474,28 +474,28 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActions_1() throws Exception {
 		String found = testReturnValueAndActions("4");
-		assertEquals("4", found);
+		assertEquals("4\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testReturnValueAndActions_2() throws Exception {
 		String found = testReturnValueAndActions("1+2");
-		assertEquals("3", found);
+		assertEquals("3\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testReturnValueAndActions_3() throws Exception {
 		String found = testReturnValueAndActions("1+2*3");
-		assertEquals("7", found);
+		assertEquals("7\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testReturnValueAndActions_4() throws Exception {
 		String found = testReturnValueAndActions("(1+2)*3");
-		assertEquals("9", found);
+		assertEquals("9\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
@@ -514,21 +514,21 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testLabelsOnOpSubrule_1() throws Exception {
 		String found = testLabelsOnOpSubrule("4");
-		assertEquals("(s (e 4))", found);
+		assertEquals("(s (e 4))\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testLabelsOnOpSubrule_2() throws Exception {
 		String found = testLabelsOnOpSubrule("1*2/3");
-		assertEquals("(s (e (e (e 1) * (e 2)) / (e 3)))", found);
+		assertEquals("(s (e (e (e 1) * (e 2)) / (e 3)))\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testLabelsOnOpSubrule_3() throws Exception {
 		String found = testLabelsOnOpSubrule("(1/2)*3");
-		assertEquals("(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))", found);
+		assertEquals("(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
@@ -553,28 +553,28 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testReturnValueAndActionsAndLabels_1() throws Exception {
 		String found = testReturnValueAndActionsAndLabels("4");
-		assertEquals("4", found);
+		assertEquals("4\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testReturnValueAndActionsAndLabels_2() throws Exception {
 		String found = testReturnValueAndActionsAndLabels("1+2");
-		assertEquals("3", found);
+		assertEquals("3\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testReturnValueAndActionsAndLabels_3() throws Exception {
 		String found = testReturnValueAndActionsAndLabels("1+2*3");
-		assertEquals("7", found);
+		assertEquals("7\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testReturnValueAndActionsAndLabels_4() throws Exception {
 		String found = testReturnValueAndActionsAndLabels("i++*3");
-		assertEquals("12", found);
+		assertEquals("12\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
@@ -582,13 +582,13 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "s : e {System.out.println($e.v);}; \n" +
 	                  "e returns [int v]\n" +
-	                  "  : e '*' e     {$v = $ctx.e(0).v * $ctx.e(1).v;}  # binary\n" +
-	                  "  | e '+' e     {$v = $ctx.e(0).v + $ctx.e(1).v;}  # binary\n" +
+	                  "  : e '*' e     {$v = ((BinaryContext)$ctx).e(0).v * ((BinaryContext)$ctx).e(1).v;}  # binary\n" +
+	                  "  | e '+' e     {$v = ((BinaryContext)$ctx).e(0).v + ((BinaryContext)$ctx).e(1).v;}  # binary\n" +
 	                  "  | INT         {$v = $INT.int;}                   # anInt\n" +
 	                  "  | '(' e ')'   {$v = $e.v;}                       # parens\n" +
-	                  "  | left=e INC  {console.assert($ctx.INC() !== null);;$v = $left.v + 1;}      # unary\n" +
-	                  "  | left=e DEC  {console.assert($ctx.DEC() !== null);;$v = $left.v - 1;}      # unary\n" +
-	                  "  | ID          {$v = 3}                                                     # anID\n" +
+	                  "  | left=e INC  {assert(((UnaryContext)$ctx).INC() != null);$v = $left.v + 1;}      # unary\n" +
+	                  "  | left=e DEC  {assert(((UnaryContext)$ctx).DEC() != null);$v = $left.v - 1;}      # unary\n" +
+	                  "  | ID          {$v = 3;}                                                     # anID\n" +
 	                  "  ; \n" +
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+ ;\n" +
@@ -601,28 +601,28 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_1() throws Exception {
 		String found = testMultipleAlternativesWithCommonLabel("4");
-		assertEquals("4", found);
+		assertEquals("4\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_2() throws Exception {
 		String found = testMultipleAlternativesWithCommonLabel("1+2");
-		assertEquals("3", found);
+		assertEquals("3\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_3() throws Exception {
 		String found = testMultipleAlternativesWithCommonLabel("1+2*3");
-		assertEquals("7", found);
+		assertEquals("7\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_4() throws Exception {
 		String found = testMultipleAlternativesWithCommonLabel("i++*3");
-		assertEquals("12", found);
+		assertEquals("12\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
@@ -630,9 +630,9 @@ public class TestLeftRecursion extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "s : e {System.out.println($e.result);} ;\n" +
 	                  "e returns [String result]\n" +
-	                  "    :   ID '=' e1=e    {$result = \\\"(\\\" + $ID.text + \\\"=\\\" + $e1.result + \\\")\\\";}\n" +
+	                  "    :   ID '=' e1=e    {$result = \"(\" + $ID.text + \"=\" + $e1.result + \")\";}\n" +
 	                  "    |   ID             {$result = $ID.text;}\n" +
-	                  "    |   e1=e '+' e2=e  {$result = \\\"(\\\" + $e1.result + \\\"+\\\" + $e2.result + \\\")\\\";}\n" +
+	                  "    |   e1=e '+' e2=e  {$result = \"(\" + $e1.result + \"+\" + $e2.result + \")\";}\n" +
 	                  "    ;\n" +
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+ ;\n" +
@@ -643,21 +643,21 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testPrefixOpWithActionAndLabel_1() throws Exception {
 		String found = testPrefixOpWithActionAndLabel("a");
-		assertEquals("a", found);
+		assertEquals("a\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testPrefixOpWithActionAndLabel_2() throws Exception {
 		String found = testPrefixOpWithActionAndLabel("a+b");
-		assertEquals("(a+b)", found);
+		assertEquals("(a+b)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testPrefixOpWithActionAndLabel_3() throws Exception {
 		String found = testPrefixOpWithActionAndLabel("a=b+c");
-		assertEquals("((a=b)+c)", found);
+		assertEquals("((a=b)+c)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
@@ -770,7 +770,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  "SQ_STRING       : '\\'' ('\\'\\'' | ~'\\'')* '\\'';\n" +
 	                  "DQ_STRING       : '\\\"' ('\\\\\"' | ~'\\\"')* '\\\"';\n" +
 	                  "WS              : [ \\t\\n\\r]+ -> skip ;\n" +
-	                  "COMMENTS        : ('/*' .*? '*/' | '//' ~'\\n'* '\\n' ) -> skip;\\n\";";
+	                  "COMMENTS        : ('/*' .*? '*/' | '//' ~'\\n'* '\\n' ) -> skip;";
 		return execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "prog", input, false);
 	}
 
@@ -798,6 +798,253 @@ public class TestLeftRecursion extends BaseTest {
 	                  "letterA: 'a';";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "prog", "aa", false);
 		assertEquals("(prog (statement (letterA a)) (statement (letterA a)) <EOF>)\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	String testMultipleActions(String input) throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "s @after {System.out.println($ctx.toStringTree(this));} : e ;\n" +
+	                  "e : a=e op=('*'|'/') b=e  {}{}\n" +
+	                  "  | INT {}{}\n" +
+	                  "  | '(' x=e ')' {}{}\n" +
+	                  "  ;\n" +
+	                  "INT : '0'..'9'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
+		return execParser("T.g4", grammar, "TParser", "TLexer", "s", input, false);
+	}
+
+	@Test
+	public void testMultipleActions_1() throws Exception {
+		String found = testMultipleActions("4");
+		assertEquals("(s (e 4))\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testMultipleActions_2() throws Exception {
+		String found = testMultipleActions("1*2/3");
+		assertEquals("(s (e (e (e 1) * (e 2)) / (e 3)))\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testMultipleActions_3() throws Exception {
+		String found = testMultipleActions("(1/2)*3");
+		assertEquals("(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	String testMultipleActionsPredicatesOptions(String input) throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "s @after {System.out.println($ctx.toStringTree(this));} : e ;\n" +
+	                  "e : a=e op=('*'|'/') b=e  {}{true}?\n" +
+	                  "  | a=e op=('+'|'-') b=e  {}<p=3>{true}?<fail='Message'>\n" +
+	                  "  | INT {}{}\n" +
+	                  "  | '(' x=e ')' {}{}\n" +
+	                  "  ;\n" +
+	                  "INT : '0'..'9'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
+		return execParser("T.g4", grammar, "TParser", "TLexer", "s", input, false);
+	}
+
+	@Test
+	public void testMultipleActionsPredicatesOptions_1() throws Exception {
+		String found = testMultipleActionsPredicatesOptions("4");
+		assertEquals("(s (e 4))\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testMultipleActionsPredicatesOptions_2() throws Exception {
+		String found = testMultipleActionsPredicatesOptions("1*2/3");
+		assertEquals("(s (e (e (e 1) * (e 2)) / (e 3)))\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testMultipleActionsPredicatesOptions_3() throws Exception {
+		String found = testMultipleActionsPredicatesOptions("(1/2)*3");
+		assertEquals("(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testSemPredFailOption() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "s @after {System.out.println($ctx.toStringTree(this));} : a ;\n" +
+	                  "a : a ID {false}?<fail='custom message'>\n" +
+	                  "  | ID\n" +
+	                  "  ;\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "x y z", false);
+		assertEquals("(s (a (a x) y z))\n", found);
+		assertEquals("line 1:4 rule a custom message\n", this.stderrDuringParse);
+	}
+
+	String testTernaryExprExplicitAssociativity(String input) throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "s @after {System.out.println($ctx.toStringTree(this));} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n" +
+	                  "e :<assoc=right> e '*' e\n" +
+	                  "  |<assoc=right> e '+' e\n" +
+	                  "  |<assoc=right> e '?' e ':' e\n" +
+	                  "  |<assoc=right> e '=' e\n" +
+	                  "  | ID\n" +
+	                  "  ;\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
+		return execParser("T.g4", grammar, "TParser", "TLexer", "s", input, false);
+	}
+
+	@Test
+	public void testTernaryExprExplicitAssociativity_1() throws Exception {
+		String found = testTernaryExprExplicitAssociativity("a");
+		assertEquals("(s (e a) <EOF>)\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testTernaryExprExplicitAssociativity_2() throws Exception {
+		String found = testTernaryExprExplicitAssociativity("a+b");
+		assertEquals("(s (e (e a) + (e b)) <EOF>)\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testTernaryExprExplicitAssociativity_3() throws Exception {
+		String found = testTernaryExprExplicitAssociativity("a*b");
+		assertEquals("(s (e (e a) * (e b)) <EOF>)\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testTernaryExprExplicitAssociativity_4() throws Exception {
+		String found = testTernaryExprExplicitAssociativity("a?b:c");
+		assertEquals("(s (e (e a) ? (e b) : (e c)) <EOF>)\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testTernaryExprExplicitAssociativity_5() throws Exception {
+		String found = testTernaryExprExplicitAssociativity("a=b=c");
+		assertEquals("(s (e (e a) = (e (e b) = (e c))) <EOF>)\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testTernaryExprExplicitAssociativity_6() throws Exception {
+		String found = testTernaryExprExplicitAssociativity("a?b+c:d");
+		assertEquals("(s (e (e a) ? (e (e b) + (e c)) : (e d)) <EOF>)\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testTernaryExprExplicitAssociativity_7() throws Exception {
+		String found = testTernaryExprExplicitAssociativity("a?b=c:d");
+		assertEquals("(s (e (e a) ? (e (e b) = (e c)) : (e d)) <EOF>)\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testTernaryExprExplicitAssociativity_8() throws Exception {
+		String found = testTernaryExprExplicitAssociativity("a? b?c:d : e");
+		assertEquals("(s (e (e a) ? (e (e b) ? (e c) : (e d)) : (e e)) <EOF>)\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testTernaryExprExplicitAssociativity_9() throws Exception {
+		String found = testTernaryExprExplicitAssociativity("a?b: c?d:e");
+		assertEquals("(s (e (e a) ? (e b) : (e (e c) ? (e d) : (e e))) <EOF>)\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	String testReturnValueAndActionsList1(String input) throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "s @after {System.out.println($ctx.toStringTree(this));} : expr EOF;\n" +
+	                  "expr:\n" +
+	                  "    a=expr '*' a=expr #Factor\n" +
+	                  "    | b+=expr (',' b+=expr)* '>>' c=expr #Send\n" +
+	                  "    | ID #JustId //semantic check on modifiers\n" +
+	                  ";\n" +
+	                  "\n" +
+	                  "ID  : ('a'..'z'|'A'..'Z'|'_')\n" +
+	                  "      ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*\n" +
+	                  ";\n" +
+	                  "\n" +
+	                  "WS : [ \\t\\n]+ -> skip ;";
+		return execParser("T.g4", grammar, "TParser", "TLexer", "s", input, false);
+	}
+
+	@Test
+	public void testReturnValueAndActionsList1_1() throws Exception {
+		String found = testReturnValueAndActionsList1("a*b");
+		assertEquals("(s (expr (expr a) * (expr b)) <EOF>)\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testReturnValueAndActionsList1_2() throws Exception {
+		String found = testReturnValueAndActionsList1("a,c>>x");
+		assertEquals("(s (expr (expr a) , (expr c) >> (expr x)) <EOF>)\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testReturnValueAndActionsList1_3() throws Exception {
+		String found = testReturnValueAndActionsList1("x");
+		assertEquals("(s (expr x) <EOF>)\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testReturnValueAndActionsList1_4() throws Exception {
+		String found = testReturnValueAndActionsList1("a*b,c,x*y>>r");
+		assertEquals("(s (expr (expr (expr a) * (expr b)) , (expr c) , (expr (expr x) * (expr y)) >> (expr r)) <EOF>)\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	String testReturnValueAndActionsList2(String input) throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "s @after {System.out.println($ctx.toStringTree(this));} : expr EOF;\n" +
+	                  "expr:\n" +
+	                  "    a=expr '*' a=expr #Factor\n" +
+	                  "    | b+=expr ',' b+=expr #Comma\n" +
+	                  "    | b+=expr '>>' c=expr #Send\n" +
+	                  "    | ID #JustId //semantic check on modifiers\n" +
+	                  "	;\n" +
+	                  "ID  : ('a'..'z'|'A'..'Z'|'_')\n" +
+	                  "      ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*\n" +
+	                  ";\n" +
+	                  "WS : [ \\t\\n]+ -> skip ;";
+		return execParser("T.g4", grammar, "TParser", "TLexer", "s", input, false);
+	}
+
+	@Test
+	public void testReturnValueAndActionsList2_1() throws Exception {
+		String found = testReturnValueAndActionsList2("a*b");
+		assertEquals("(s (expr (expr a) * (expr b)) <EOF>)\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testReturnValueAndActionsList2_2() throws Exception {
+		String found = testReturnValueAndActionsList2("a,c>>x");
+		assertEquals("(s (expr (expr (expr a) , (expr c)) >> (expr x)) <EOF>)\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testReturnValueAndActionsList2_3() throws Exception {
+		String found = testReturnValueAndActionsList2("x");
+		assertEquals("(s (expr x) <EOF>)\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testReturnValueAndActionsList2_4() throws Exception {
+		String found = testReturnValueAndActionsList2("a*b,c,x*y>>r");
+		assertEquals("(s (expr (expr (expr (expr (expr a) * (expr b)) , (expr c)) , (expr (expr x) * (expr y))) >> (expr r)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 

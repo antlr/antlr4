@@ -99,9 +99,15 @@ writeln(s) ::= <<System.out.println(<s>);>>
 
 write(s) ::= <<System.out.print(<s>);>>
 
-assert(s) ::= <<console.assert(<s>);>>
+Assert(s) ::= <<assert(<s>);>>
 
-DeclareLocal(s) ::= "Object <s>;"
+Cast(t,v) ::= "((<t>)<v>)"
+
+Concat(a,b) ::= "<a><b>"
+
+DeclareLocal(s,v) ::= "Object <s> = <v>;"
+
+AssignLocal(s,v) ::= "<s> = <v>;"
 
 InitMember(n,v) ::= <%this.<n> = <v>;%>
 
@@ -122,6 +128,8 @@ ModMemberNotEquals(n,m,v) ::= <%this.<n> % m != <v>%>
 DumpDFA() ::= "this.dumpDFA();"
 
 Pass() ::= ""
+
+StringList() ::= "List\<String>"
 
 BuildParseTrees() ::= "this.buildParseTrees = true;"
 

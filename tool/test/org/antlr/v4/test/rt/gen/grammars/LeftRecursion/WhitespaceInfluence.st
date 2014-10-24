@@ -46,4 +46,4 @@ DATE            : '\'' DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT (
 SQ_STRING       : '\'' ('\'\'' | ~'\'')* '\'';
 DQ_STRING       : '\"' ('\\\"' | ~'\"')* '\"';
 WS              : [ \t\n\r]+ -> skip ;
-COMMENTS        : ('/*' .*? '*/' | '//' ~'\n'* '\n' ) -> skip;\n";
+COMMENTS        : ('/*' .*? '*/' | '//' ~'\n'* '\n' ) -> skip;
