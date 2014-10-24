@@ -382,7 +382,7 @@ public class Generator {
 
 	private TestFile buildSemPredEvalLexer() throws Exception {
 		TestFile file = new TestFile("SemPredEvalLexer");
-		file.addLexerTest(input, "DisableRule", "L",
+		LexerTestMethod tm = file.addLexerTest(input, "DisableRule", "L",
 				"enum abc", 
 				"[@0,0:3='enum',<2>,1:0]\n" +
 				"[@1,5:7='abc',<3>,1:5]\n" +
@@ -395,7 +395,8 @@ public class Generator {
 				":s6=>3-'b'->:s6=>3\n" +
 				":s6=>3-'c'->:s6=>3\n",
 				null);
-		file.addLexerTest(input, "IDvsEnum", "L",
+		tm.showDFA = true;
+		tm = file.addLexerTest(input, "IDvsEnum", "L",
 				"enum abc enum", 
 				"[@0,0:3='enum',<2>,1:0]\n" +
 				"[@1,5:7='abc',<2>,1:5]\n" +
@@ -409,7 +410,8 @@ public class Generator {
 				":s4=>2-'b'->:s4=>2\n" +
 				":s4=>2-'c'->:s4=>2\n", // no 'm'-> transition...conflicts with pred
 				null); 
-		file.addLexerTest(input, "IDnotEnum", "L",
+		tm.showDFA = true;
+		tm = file.addLexerTest(input, "IDnotEnum", "L",
 				"enum abc enum", 
 				"[@0,0:3='enum',<2>,1:0]\n" +
 				"[@1,5:7='abc',<2>,1:5]\n" +
@@ -417,7 +419,8 @@ public class Generator {
 				"[@3,13:12='<EOF>',<-1>,1:13]\n" +
 				"s0-' '->:s2=>3\n", // no edges in DFA for enum/id. all paths lead to pred.
 				null);
-		file.addLexerTest(input, "EnumNotID", "L",
+		tm.showDFA = true;
+		tm = file.addLexerTest(input, "EnumNotID", "L",
 				"enum abc enum", 
 				"[@0,0:3='enum',<1>,1:0]\n" +
 				"[@1,5:7='abc',<2>,1:5]\n" +
@@ -425,7 +428,8 @@ public class Generator {
 				"[@3,13:12='<EOF>',<-1>,1:13]\n" +
 				"s0-' '->:s3=>3\n", // no edges in DFA for enum/id. all paths lead to pred.
 				null);
-		file.addLexerTest(input, "Indent", "L",
+		tm.showDFA = true;
+		tm = file.addLexerTest(input, "Indent", "L",
 				"abc\n  def  \n", 
 				"INDENT\n" +                        // action output
 				"[@0,0:2='abc',<1>,1:0]\n" +		// ID
@@ -444,7 +448,8 @@ public class Generator {
 				":s1=>1-'e'->:s1=>1\n" +
 				":s1=>1-'f'->:s1=>1\n",
 				null);
-		file.addLexerTest(input, "LexerInputPositionSensitivePredicates", "L",
+		tm.showDFA = true;
+		tm = file.addLexerTest(input, "LexerInputPositionSensitivePredicates", "L",
 				"a cde\nabcde\n",
 				"a\n" +
 				"cde\n" +
@@ -456,6 +461,7 @@ public class Generator {
 				"[@3,8:10='cde',<2>,2:2]\n" +
 				"[@4,12:11='<EOF>',<-1>,3:0]\n",
 				null);
+		tm.showDFA = true;
 		file.addLexerTest(input, "PredicatedKeywords", "L",
 				"enum enu a",
 				"enum!\n" +

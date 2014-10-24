@@ -17,7 +17,7 @@ public class TestCompositeLexers extends BaseTest {
 	                  "import S;\n" +
 	                  "B : 'b';\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execLexer("M.g4", grammar, "M", "abc");
+		String found = execLexer("M.g4", grammar, "M", "abc", false);
 		assertEquals("S.A\n" + 
 	              "[@0,0:0='a',<3>,1:0]\n" + 
 	              "[@1,1:1='b',<1>,1:1]\n" + 
@@ -38,7 +38,7 @@ public class TestCompositeLexers extends BaseTest {
 	                  "import S;\n" +
 	                  "A : 'a' B {document.getElementById('output').value += \"M.A\";};\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execLexer("M.g4", grammar, "M", "ab");
+		String found = execLexer("M.g4", grammar, "M", "ab", false);
 		assertEquals("M.A\n" + 
 	              "[@0,0:1='ab',<1>,1:0]\n" + 
 	              "[@1,2:1='<EOF>',<-1>,1:2]\n", found);

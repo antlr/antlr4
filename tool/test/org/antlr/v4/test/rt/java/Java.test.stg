@@ -28,7 +28,7 @@ public void test<test.name>() throws Exception {
 	};separator="\n", wrap, anchor>
 	String grammar = <test.grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
 	<test.afterGrammar>
-	String found = execLexer("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName><if(!test.lexerOnly)>Lexer<endif>", "<test.input>");
+	String found = execLexer("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName><if(!test.lexerOnly)>Lexer<endif>", "<test.input>", <test.showDFA>);
 	assertEquals(<test.outputLines:{ line | "<line>\\n"};separator=" + \n", wrap, anchor>, found);
 	<if(test.expectedErrors)>
 	assertEquals("<test.expectedErrors>", this.stderrDuringParse);
@@ -125,13 +125,13 @@ BailErrorStrategy() ::= <%this._errHandler = new antlr4.error.BailErrorStrategy(
 
 ToStringTree(s) ::= <%<s>.toStringTree(null, this);%>
 
-Column() ::= "this.column"
+Column() ::= "this.getCharPositionInLine()"
 
 Text() ::= "this.getText()"
 
 ValEquals(a,b) ::= <%<a>===<b>%>
 
-TextEquals(a) ::= <%this.text==="<a>"%>
+TextEquals(a) ::= <%this.getText().equals("<a>")%>
 
 PlusText(a) ::= <%"<a>" + this.getText()%>
 
@@ -141,7 +141,7 @@ LTEquals(i, v) ::= <%this._input.LT(<i>).text===<v>%>
 
 LANotEquals(i, v) ::= <%this._input.LA(<i>)!=<v>%>
 
-TokenStartColumnEquals(i) ::= <%this._tokenStartColumn===<i>%>
+TokenStartColumnEquals(i) ::= <%this._tokenStartCharPositionInLine==<i>%>
 
 ImportListener(X) ::= <<var <X>Listener = require('./<X>Listener').<X>Listener;>>
 

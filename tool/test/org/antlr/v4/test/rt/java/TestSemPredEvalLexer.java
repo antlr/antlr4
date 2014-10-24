@@ -12,7 +12,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 	                  "E2 : 'enum' { true }? ;  // winner not E1 or ID\n" +
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip;";
-		String found = execLexer("L.g4", grammar, "L", "enum abc");
+		String found = execLexer("L.g4", grammar, "L", "enum abc", true);
 		assertEquals("[@0,0:3='enum',<2>,1:0]\n" + 
 	              "[@1,5:7='abc',<3>,1:5]\n" + 
 	              "[@2,8:7='<EOF>',<-1>,1:8]\n" + 
@@ -32,7 +32,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 	                  "ENUM : 'enum' { false }? ;\n" +
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip;";
-		String found = execLexer("L.g4", grammar, "L", "enum abc enum");
+		String found = execLexer("L.g4", grammar, "L", "enum abc enum", true);
 		assertEquals("[@0,0:3='enum',<2>,1:0]\n" + 
 	              "[@1,5:7='abc',<2>,1:5]\n" + 
 	              "[@2,9:12='enum',<2>,1:9]\n" + 
@@ -53,7 +53,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 	                  "ENUM : [a-z]+  { false }? ;\n" +
 	                  "ID : [a-z]+  ;\n" +
 	                  "WS : (' '|'\\n') -> skip;";
-		String found = execLexer("L.g4", grammar, "L", "enum abc enum");
+		String found = execLexer("L.g4", grammar, "L", "enum abc enum", true);
 		assertEquals("[@0,0:3='enum',<2>,1:0]\n" + 
 	              "[@1,5:7='abc',<2>,1:5]\n" + 
 	              "[@2,9:12='enum',<2>,1:9]\n" + 
@@ -65,10 +65,10 @@ public class TestSemPredEvalLexer extends BaseTest {
 	@Test
 	public void testEnumNotID() throws Exception {
 		String grammar = "lexer grammar L;\n" +
-	                  "ENUM : [a-z]+  { this.text===\"enum\" }? ;\n" +
+	                  "ENUM : [a-z]+  { this.getText().equals(\"enum\") }? ;\n" +
 	                  "ID : [a-z]+  ;\n" +
 	                  "WS : (' '|'\\n') -> skip;";
-		String found = execLexer("L.g4", grammar, "L", "enum abc enum");
+		String found = execLexer("L.g4", grammar, "L", "enum abc enum", true);
 		assertEquals("[@0,0:3='enum',<1>,1:0]\n" + 
 	              "[@1,5:7='abc',<2>,1:5]\n" + 
 	              "[@2,9:12='enum',<1>,1:9]\n" + 
@@ -81,11 +81,11 @@ public class TestSemPredEvalLexer extends BaseTest {
 	public void testIndent() throws Exception {
 		String grammar = "lexer grammar L;\n" +
 	                  "ID : [a-z]+  ;\n" +
-	                  "INDENT : [ \\t]+ { this._tokenStartColumn===0 }? \\n\" +\n" +
-	                  "         { System.out.println(\"INDENT\"); }  ;\"+\n" +
+	                  "INDENT : [ \\t]+ { this._tokenStartCharPositionInLine==0 }?\n" +
+	                  "         { System.out.println(\"INDENT\"); }  ;\n" +
 	                  "NL : '\\n';\n" +
 	                  "WS : [ \\t]+ ;";
-		String found = execLexer("L.g4", grammar, "L", "abc\n  def  \n");
+		String found = execLexer("L.g4", grammar, "L", "abc\n  def  \n", true);
 		assertEquals("INDENT\n" + 
 	              "[@0,0:2='abc',<1>,1:0]\n" + 
 	              "[@1,3:3='\\n',<3>,1:3]\n" + 
@@ -110,10 +110,10 @@ public class TestSemPredEvalLexer extends BaseTest {
 		String grammar = "lexer grammar L;\n" +
 	                  "WORD1 : ID1+ { System.out.println(this.getText()); } ;\n" +
 	                  "WORD2 : ID2+ { System.out.println(this.getText()); } ;\n" +
-	                  "fragment ID1 : { this.column < 2 }? [a-zA-Z];\n" +
-	                  "fragment ID2 : { this.column >= 2 }? [a-zA-Z];\n" +
+	                  "fragment ID1 : { this.getCharPositionInLine() < 2 }? [a-zA-Z];\n" +
+	                  "fragment ID2 : { this.getCharPositionInLine() >= 2 }? [a-zA-Z];\n" +
 	                  "WS : (' '|'\\n') -> skip;";
-		String found = execLexer("L.g4", grammar, "L", "a cde\nabcde\n");
+		String found = execLexer("L.g4", grammar, "L", "a cde\nabcde\n", true);
 		assertEquals("a\n" + 
 	              "cde\n" + 
 	              "ab\n" + 
@@ -129,10 +129,10 @@ public class TestSemPredEvalLexer extends BaseTest {
 	@Test
 	public void testPredicatedKeywords() throws Exception {
 		String grammar = "lexer grammar L;\n" +
-	                  "ENUM : [a-z]+ { this.text===\"enum\" }? { System.out.println(\"enum!\"); } ;\n" +
-	                  "ID   : [a-z]+ { System.out.println(\"ID\" + this.getText()); } ;\n" +
+	                  "ENUM : [a-z]+ { this.getText().equals(\"enum\") }? { System.out.println(\"enum!\"); } ;\n" +
+	                  "ID   : [a-z]+ { System.out.println(\"ID \" + this.getText()); } ;\n" +
 	                  "WS   : [ \\n] -> skip ;";
-		String found = execLexer("L.g4", grammar, "L", "enum enu a");
+		String found = execLexer("L.g4", grammar, "L", "enum enu a", false);
 		assertEquals("enum!\n" + 
 	              "ID enu\n" + 
 	              "ID a\n" + 

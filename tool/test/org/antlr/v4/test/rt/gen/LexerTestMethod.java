@@ -4,6 +4,7 @@ public class LexerTestMethod extends TestMethod {
 
 	public String[] outputLines;
 	public boolean lexerOnly = true;
+	public boolean showDFA = false;
 	
 	public LexerTestMethod(String name, String grammarName, String input, 
 			String expectedOutput, String expectedErrors, Integer index) {
