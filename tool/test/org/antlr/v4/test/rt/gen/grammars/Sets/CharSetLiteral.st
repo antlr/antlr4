@@ -1,4 +1,4 @@
 grammar <grammarName>;
 a : (A {<writeln("$A.text")>})+ ;
-a : [AaBb] ;
+A : [AaBb] ;
 WS : (' '|'\n')+ -> skip ;

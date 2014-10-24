@@ -66,7 +66,7 @@ public class TestSets extends BaseTest {
 	public void testNotChar() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : A {System.out.println($A.text);} ;\n" +
-	                  "a : ~'b' ;";
+	                  "A : ~'b' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "x", false);
 		assertEquals("x\n", found);
 		assertNull(this.stderrDuringParse);
@@ -76,7 +76,7 @@ public class TestSets extends BaseTest {
 	public void testOptionalSingleElement() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : A? 'c' {System.out.println(this._input.getText());} ;\n" +
-	                  "a : 'b' ;";
+	                  "A : 'b' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "bc", false);
 		assertEquals("bc\n", found);
 		assertNull(this.stderrDuringParse);
@@ -86,7 +86,7 @@ public class TestSets extends BaseTest {
 	public void testOptionalLexerSingleElement() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : A {System.out.println(this._input.getText());} ;\n" +
-	                  "a : 'b'? 'c' ;";
+	                  "A : 'b'? 'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "bc", false);
 		assertEquals("bc\n", found);
 		assertNull(this.stderrDuringParse);
@@ -95,7 +95,7 @@ public class TestSets extends BaseTest {
 	String testStarLexerSingleElement(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : A {System.out.println(this._input.getText());} ;\n" +
-	                  "a : 'b'* 'c' ;";
+	                  "A : 'b'* 'c' ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "a", input, false);
 	}
 
@@ -117,7 +117,7 @@ public class TestSets extends BaseTest {
 	public void testPlusLexerSingleElement() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : A {System.out.println(this._input.getText());} ;\n" +
-	                  "a : 'b'+ 'c' ;";
+	                  "A : 'b'+ 'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "bbbbc", false);
 		assertEquals("bbbbc\n", found);
 		assertNull(this.stderrDuringParse);
@@ -154,7 +154,7 @@ public class TestSets extends BaseTest {
 	public void testLexerOptionalSet() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : A {System.out.println(this._input.getText());} ;\n" +
-	                  "a : ('a'|'b')? 'c' ;";
+	                  "A : ('a'|'b')? 'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "ac", false);
 		assertEquals("ac\n", found);
 		assertNull(this.stderrDuringParse);
@@ -164,7 +164,7 @@ public class TestSets extends BaseTest {
 	public void testLexerStarSet() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : A {System.out.println(this._input.getText());} ;\n" +
-	                  "a : ('a'|'b')* 'c' ;";
+	                  "A : ('a'|'b')* 'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "abaac", false);
 		assertEquals("abaac\n", found);
 		assertNull(this.stderrDuringParse);
@@ -174,7 +174,7 @@ public class TestSets extends BaseTest {
 	public void testLexerPlusSet() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : A {System.out.println(this._input.getText());} ;\n" +
-	                  "a : ('a'|'b')+ 'c' ;";
+	                  "A : ('a'|'b')+ 'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "abaac", false);
 		assertEquals("abaac\n", found);
 		assertNull(this.stderrDuringParse);
@@ -184,7 +184,7 @@ public class TestSets extends BaseTest {
 	public void testNotCharSet() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : A {System.out.println($A.text);} ;\n" +
-	                  "a : ~('b'|'c') ;";
+	                  "A : ~('b'|'c') ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "x", false);
 		assertEquals("x\n", found);
 		assertNull(this.stderrDuringParse);
@@ -194,7 +194,7 @@ public class TestSets extends BaseTest {
 	public void testNotCharSetWithLabel() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : A {System.out.println($A.text);} ;\n" +
-	                  "a : h=~('b'|'c') ;";
+	                  "A : h=~('b'|'c') ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "x", false);
 		assertEquals("x\n", found);
 		assertNull(this.stderrDuringParse);
@@ -204,7 +204,7 @@ public class TestSets extends BaseTest {
 	public void testNotCharSetWithRuleRef3() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : A {System.out.println($A.text);} ;\n" +
-	                  "a : ('a'|B) ;  // this doesn't collapse to set but works\n" +
+	                  "A : ('a'|B) ;  // this doesn't collapse to set but works\n" +
 	                  "fragment\n" +
 	                  "B : ~('a'|'c') ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "x", false);
@@ -216,7 +216,7 @@ public class TestSets extends BaseTest {
 	public void testCharSetLiteral() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : (A {System.out.println($A.text);})+ ;\n" +
-	                  "a : [AaBb] ;\n" +
+	                  "A : [AaBb] ;\n" +
 	                  "WS : (' '|'\\n')+ -> skip ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "A a B b", false);
 		assertEquals("A\na\nB\nb\n", found);
