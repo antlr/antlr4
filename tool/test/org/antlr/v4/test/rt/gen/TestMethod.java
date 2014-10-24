@@ -12,6 +12,7 @@ public abstract class TestMethod {
 	public String input;
 	public String expectedOutput;
 	public String expectedErrors;
+	public boolean debug = false;
 	
 	protected TestMethod(String name, String grammarName, String input, 
 			String expectedOutput, String expectedErrors, Integer index) {

@@ -58,7 +58,7 @@ public void test<test.name>() throws Exception {
 	};separator="\n", wrap, anchor>
 	String grammar = <test.grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
 	<test.afterGrammar>
-	String found = execParser("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName><if(!test.slaveIsLexer)>Parser<endif>", "<if(test.slaveIsLexer)><first(test.slaveGrammars).grammarName><else><test.grammar.grammarName>Lexer<endif>", "<test.startRule>", "<test.input>", false);
+	String found = execParser("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName><if(!test.slaveIsLexer)>Parser<endif>", "<if(test.slaveIsLexer)><first(test.slaveGrammars).grammarName><else><test.grammar.grammarName>Lexer<endif>", "<test.startRule>", "<test.input>", <test.debug>);
 	assertEquals("<test.expectedOutput>", found);
 	<if(test.expectedErrors)>
 	assertEquals("<test.expectedErrors>", this.stderrDuringParse);
@@ -76,7 +76,7 @@ CompositeParserTestMethod(test) ::= <<
 AbstractParserTestMethod(test) ::= <<
 String test<test.name>(String input) throws Exception {
 	String grammar = <test.grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
-	return execParser("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName>Parser", "<test.grammar.grammarName>Lexer", "<test.startRule>", input, false);
+	return execParser("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName>Parser", "<test.grammar.grammarName>Lexer", "<test.startRule>", input, <test.debug>);
 }
 
 >>

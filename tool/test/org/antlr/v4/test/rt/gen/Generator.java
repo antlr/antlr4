@@ -1,7 +1,5 @@
 package org.antlr.v4.test.rt.gen;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -846,11 +844,12 @@ public class Generator {
 
 	private TestFile buildFullContextParsing() throws Exception {
 		TestFile file = new TestFile("FullContextParsing");
-		file.addParserTest(input, "AmbigYieldsCtxSensitiveDFA", "T", "s", "abc", 
+		TestMethod tm = file.addParserTest(input, "AmbigYieldsCtxSensitiveDFA", "T", "s", "abc", 
 				"Decision 0:\n" +
 				"s0-ID->:s1^=>1\n",
 				"line 1:0 reportAttemptingFullContext d=0 (s), input='abc'\n");
-		file.addParserTestsWithErrors(input, "CtxSensitiveDFA", "T", "s", 
+		tm.debug = true;
+		tm = file.addParserTestsWithErrors(input, "CtxSensitiveDFA", "T", "s", 
 				"$ 34 abc",
 				"Decision 1:\n" +
 				"s0-INT->s1\n" +
@@ -863,7 +862,8 @@ public class Generator {
 				"s1-ID->:s2^=>1\n",
 				"line 1:5 reportAttemptingFullContext d=1 (e), input='34abc'\n" +
 				"line 1:5 reportContextSensitivity d=1 (e), input='34abc'\n");
-		file.addParserTest(input, "CtxSensitiveDFATwoDiffInput", "T", "s",
+		tm.debug = true;
+		tm = file.addParserTest(input, "CtxSensitiveDFATwoDiffInput", "T", "s",
 				"$ 34 abc @ 34 abc",
 				"Decision 2:\n" +
 				"s0-INT->s1\n" +
@@ -872,14 +872,16 @@ public class Generator {
 				 "line 1:2 reportContextSensitivity d=2 (e), input='34'\n" +
 				 "line 1:14 reportAttemptingFullContext d=2 (e), input='34abc'\n" +
 				 "line 1:14 reportContextSensitivity d=2 (e), input='34abc'\n");
-		file.addParserTest(input, "SLLSeesEOFInLLGrammar", "T", "s",
+		tm.debug = true;
+		tm = file.addParserTest(input, "SLLSeesEOFInLLGrammar", "T", "s",
 				"34 abc",
 				"Decision 0:\n" +
 				"s0-INT->s1\n" +
 				"s1-ID->:s2^=>1\n",
 				"line 1:3 reportAttemptingFullContext d=0 (e), input='34abc'\n" +
 				"line 1:0 reportContextSensitivity d=0 (e), input='34'\n");
-		file.addParserTestsWithErrors(input, "FullContextIF_THEN_ELSEParse", "T", "s",
+		tm.debug = true;
+		tm = file.addParserTestsWithErrors(input, "FullContextIF_THEN_ELSEParse", "T", "s",
 			"{ if x then return }",
 				"Decision 1:\n" +
 				"s0-'}'->:s1=>2\n", 
@@ -923,19 +925,22 @@ public class Generator {
 					"line 1:19 reportContextSensitivity d=1 (stat), input='else'\n" +
 					"line 2:27 reportAttemptingFullContext d=1 (stat), input='else'\n" +
 					"line 2:36 reportAmbiguity d=1 (stat): ambigAlts={1, 2}, input='elsefoo}'\n");
-		file.addParserTest(input, "LoopsSimulateTailRecursion", "T", "prog", 
+		tm.debug = true;
+		tm = file.addParserTest(input, "LoopsSimulateTailRecursion", "T", "prog", 
 				"a(i)<-x",
 				"pass: a(i)<-x\n",
 				"line 1:3 reportAttemptingFullContext d=3 (expr_primary), input='a(i)'\n" +
 				"line 1:7 reportAmbiguity d=3 (expr_primary): ambigAlts={2, 3}, input='a(i)<-x'\n");
-		file.addParserTest(input, "AmbiguityNoLoop", "T", "prog", 
+		tm.debug = true;
+		tm = file.addParserTest(input, "AmbiguityNoLoop", "T", "prog", 
 				"a@",
 				"alt 1\n", 
 				"line 1:2 reportAttemptingFullContext d=0 (prog), input='a@'\n" +
 				"line 1:2 reportAmbiguity d=0 (prog): ambigAlts={1, 2}, input='a@'\n" +
 				"line 1:2 reportAttemptingFullContext d=1 (expr), input='a@'\n" +
 				"line 1:2 reportContextSensitivity d=1 (expr), input='a@'\n");
-		file.addParserTestsWithErrors(input, "ExprAmbiguity", "T", "s", 
+		tm.debug = true;
+		tm = file.addParserTestsWithErrors(input, "ExprAmbiguity", "T", "s", 
 			"a+b",
 				"(expr a + (expr b))\n",
 					"line 1:1 reportAttemptingFullContext d=1 (expr), input='+'\n" +
@@ -946,6 +951,7 @@ public class Generator {
 					"line 1:2 reportContextSensitivity d=1 (expr), input='+b'\n" +
 					"line 1:3 reportAttemptingFullContext d=1 (expr), input='*'\n" +
 					"line 1:5 reportAmbiguity d=1 (expr): ambigAlts={1, 2}, input='*c'\n");
+		tm.debug = true;
 		return file;
 	}
 
