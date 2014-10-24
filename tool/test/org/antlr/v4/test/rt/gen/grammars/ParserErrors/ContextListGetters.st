@@ -5,4 +5,3 @@ grammar <grammarName>;
 s : (a | b)+;
 a : 'a' {<write("'a'")>};
 b : 'b' {<write("'b'")>};
-;

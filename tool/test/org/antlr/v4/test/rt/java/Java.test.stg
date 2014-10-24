@@ -149,7 +149,7 @@ TokenStartColumnEquals(i) ::= <%this._tokenStartCharPositionInLine==<i>%>
 
 ImportListener(X) ::= <<var <X>Listener = require('./<X>Listener').<X>Listener;>>
 
-GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.tokenNames));"
+GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.tokenNames)"
 
 WriteRuleInvocationStack() ::= "document.getElementById('output').value += antlr4.Utils.arrayToString(this.getRuleInvocationStack()) + '\\n';"
 
@@ -330,11 +330,11 @@ this.LeafListener.prototype.constructor = this.LeafListener;
 >>
 
 DeclareContextListGettersFunction() ::= <<
-	function foo() {
-		var s = new SContext();
-	    var a = s.a();
-	    var b = s.b();
-    };
+void foo() {
+	SContext s = null;
+	List\<? extends AContext> a = s.a();
+	List\<? extends BContext> b = s.b();
+}
 >>
 
 Declare_foo() ::= "this.foo = function() {document.getElementById('output').value += 'foo\\n'};"

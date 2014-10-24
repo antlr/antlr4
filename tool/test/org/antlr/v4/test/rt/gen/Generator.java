@@ -536,16 +536,16 @@ public class Generator {
 				"line 1:1 missing 'b' at 'c'\n");
 		file.addParserTest(input, "ConjuringUpToken", "T", "a", 
 				"ac", 
-				"conjured=[@-1,-1:-1='<missing 'b'>',<1>,1:1]\n",
-				null);
+				"conjured=[@-1,-1:-1='<missing 'b'>',<2>,1:1]\n",
+				"line 1:1 missing 'b' at 'c'\n");
 		file.addParserTest(input, "SingleSetInsertion", "T", "a", 
 				"ad", 
 				"",
 				"line 1:1 missing {'b', 'c'} at 'd'\n");
 		file.addParserTest(input, "ConjuringUpTokenFromSet", "T", "a", 
 				"ad", 
-				"conjured=[@-1,-1:-1='<missing 'b'>',<1>,1:1]\n",
-				null);
+				"conjured=[@-1,-1:-1='<missing 'b'>',<2>,1:1]\n",
+				"line 1:1 missing {'b', 'c'} at 'd'\n");
 		file.addParserTest(input, "LL2", "T", "a",
 				"ae", 
 				"",

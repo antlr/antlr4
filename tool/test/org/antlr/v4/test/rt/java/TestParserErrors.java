@@ -46,8 +46,8 @@ public class TestParserErrors extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "a : 'a' x='b' {System.out.println(\"conjured=\"+$x);} 'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "ac", false);
-		assertEquals("conjured=[@-1,-1:-1='<missing 'b'>',<1>,1:1]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertEquals("conjured=[@-1,-1:-1='<missing 'b'>',<2>,1:1]\n", found);
+		assertEquals("line 1:1 missing 'b' at 'c'\n", this.stderrDuringParse);
 	}
 
 	@Test
@@ -64,8 +64,8 @@ public class TestParserErrors extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "a : 'a' x=('b'|'c') {System.out.println(\"conjured=\"+$x);} 'd' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "ad", false);
-		assertEquals("conjured=[@-1,-1:-1='<missing 'b'>',<1>,1:1]\n", found);
-		assertNull(this.stderrDuringParse);
+		assertEquals("conjured=[@-1,-1:-1='<missing 'b'>',<2>,1:1]\n", found);
+		assertEquals("line 1:1 missing {'b', 'c'} at 'd'\n", this.stderrDuringParse);
 	}
 
 	@Test
@@ -190,7 +190,7 @@ public class TestParserErrors extends BaseTest {
 	                  "WS : ' ' -> skip ;\n" +
 	                  "acClass\n" +
 	                  "@init\n" +
-	                  "{System.out.println(this.getExpectedTokens().toString(this.tokenNames)););}\n" +
+	                  "{System.out.println(this.getExpectedTokens().toString(this.tokenNames));}\n" +
 	                  "  : ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start", "dog and software", false);
 		assertEquals("{'hardware', 'software'}\n", found);
@@ -201,8 +201,7 @@ public class TestParserErrors extends BaseTest {
 	public void testInvalidEmptyInput() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "start : ID+;\n" +
-	                  "ID : [a-z]+;\n" +
-	                  ";";
+	                  "ID : [a-z]+;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start", "", false);
 		assertEquals("", found);
 		assertEquals("line 1:0 missing ID at '<EOF>'\n", this.stderrDuringParse);
@@ -212,16 +211,15 @@ public class TestParserErrors extends BaseTest {
 	public void testContextListGetters() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "@parser::members{\n" +
-	                  "	function foo() {\n" +
-	                  "		var s = new SContext();\n" +
-	                  "	    var a = s.a();\n" +
-	                  "	    var b = s.b();\n" +
-	                  "    };\n" +
+	                  "void foo() {\n" +
+	                  "	SContext s = null;\n" +
+	                  "	List<? extends AContext> a = s.a();\n" +
+	                  "	List<? extends BContext> b = s.b();\n" +
+	                  "}\n" +
 	                  "}\n" +
 	                  "s : (a | b)+;\n" +
 	                  "a : 'a' {System.out.print('a');};\n" +
-	                  "b : 'b' {System.out.print('b');};\n" +
-	                  ";";
+	                  "b : 'b' {System.out.print('b');};";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s", "abab", false);
 		assertEquals("abab\n", found);
 		assertNull(this.stderrDuringParse);
@@ -232,8 +230,7 @@ public class TestParserErrors extends BaseTest {
 	                  "start : expr EOF;\n" +
 	                  "expr : 'x'\n" +
 	                  "     | expr expr\n" +
-	                  "     ;\n" +
-	                  ";";
+	                  "     ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "start", input, false);
 	}
 
@@ -264,8 +261,7 @@ public class TestParserErrors extends BaseTest {
 	                  "start : ID ':' expr;\n" +
 	                  "expr : primary expr? {} | expr '->' ID;\n" +
 	                  "primary : ID;\n" +
-	                  "ID : [a-z]+;\n" +
-	                  ";";
+	                  "ID : [a-z]+;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "start", "x:x", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
