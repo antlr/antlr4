@@ -716,14 +716,15 @@ public class Generator {
 				"abx",
 				"[@0,3:2='<EOF>',<-1>,1:3]\n",
 				"line 1:0 token recognition error at: 'abx'\n");
-		file.addLexerTest(input, "LexerExecDFA", "L",
+		LexerTestMethod tm = file.addLexerTest(input, "LexerExecDFA", "L",
 				"x : x", 
 				"[@0,0:0='x',<3>,1:0]\n" +
-				"[@1,2:2=':',<2>,1:2]\n" +
+				"[@1,2:2=':',<1>,1:2]\n" +
 				"[@2,4:4='x',<3>,1:4]\n" +
 				"[@3,5:4='<EOF>',<-1>,1:5]\n",
 				"line 1:1 token recognition error at: ' '\n" +
 				"line 1:3 token recognition error at: ' '\n");
+		tm.lexerOnly = false;
 		return file;
 	}
 
@@ -1172,6 +1173,13 @@ public class Generator {
 				"[@9,53:52='<EOF>',<-1>,7:0]\n", null);
 		file.addLexerTest(input, "LargeLexer", "L", "KW400",
 				"[@0,0:4='KW400',<402>,1:0]\n" +
+				"[@1,5:4='<EOF>',<-1>,1:5]\n", null);
+		/**
+		 * This is a regression test for antlr/antlr4#687 "Empty zero-length tokens
+		 * cannot have lexer commands" and antlr/antlr4#688 "Lexer cannot match
+		 * zero-length tokens" */
+		file.addLexerTest(input, "ZeroLengthToken", "L", "'xxx'",
+				"[@0,0:4=''xxx'',<1>,1:0]\n" +
 				"[@1,5:4='<EOF>',<-1>,1:5]\n", null);
 		return file;
 	}

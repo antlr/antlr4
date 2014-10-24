@@ -4623,5 +4623,22 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	@Test
+	public void testZeroLengthToken() throws Exception {
+		String grammar = "lexer grammar L;\n" +
+	                  "BeginString\n" +
+	                  "	:	'\\'' -> more, pushMode(StringMode)\n" +
+	                  "	;\n" +
+	                  "mode StringMode;\n" +
+	                  "	StringMode_X : 'x' -> more;\n" +
+	                  "	StringMode_Done : -> more, mode(EndStringMode);\n" +
+	                  "mode EndStringMode;	\n" +
+	                  "	EndString : '\\'' -> popMode;";
+		String found = execLexer("L.g4", grammar, "L", "'xxx'");
+		assertEquals("[@0,0:4=''xxx'',<1>,1:0]\n" + 
+	              "[@1,5:4='<EOF>',<-1>,1:5]\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
 
 }

@@ -123,15 +123,14 @@ public class TestLexerErrors extends BaseTest {
 
 	@Test
 	public void testLexerExecDFA() throws Exception {
-		String grammar = "lexer grammar L;\n" +
+		String grammar = "grammar L;\n" +
 	                  "start : ID ':' expr;\n" +
 	                  "expr : primary expr? {} | expr '->' ID;\n" +
 	                  "primary : ID;\n" +
-	                  "ID : [a-z]+;\n" +
-	                  ";";
-		String found = execLexer("L.g4", grammar, "L", "x : x");
+	                  "ID : [a-z]+;";
+		String found = execLexer("L.g4", grammar, "LLexer", "x : x");
 		assertEquals("[@0,0:0='x',<3>,1:0]\n" + 
-	              "[@1,2:2=':',<2>,1:2]\n" + 
+	              "[@1,2:2=':',<1>,1:2]\n" + 
 	              "[@2,4:4='x',<3>,1:4]\n" + 
 	              "[@3,5:4='<EOF>',<-1>,1:5]\n", found);
 		assertEquals("line 1:1 token recognition error at: ' '\nline 1:3 token recognition error at: ' '\n", this.stderrDuringParse);

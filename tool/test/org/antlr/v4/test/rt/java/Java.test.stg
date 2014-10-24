@@ -28,7 +28,7 @@ public void test<test.name>() throws Exception {
 	};separator="\n", wrap, anchor>
 	String grammar = <test.grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
 	<test.afterGrammar>
-	String found = execLexer("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName>", "<test.input>");
+	String found = execLexer("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName><if(!test.lexerOnly)>Lexer<endif>", "<test.input>");
 	assertEquals(<test.outputLines:{ line | "<line>\\n"};separator=" + \n", wrap, anchor>, found);
 	<if(test.expectedErrors)>
 	assertEquals("<test.expectedErrors>", this.stderrDuringParse);
