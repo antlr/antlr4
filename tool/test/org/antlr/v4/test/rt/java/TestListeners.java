@@ -9,27 +9,21 @@ public class TestListeners extends BaseTest {
 	public void testBasic() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "@parser::header {\n" +
-	                  "var TListener = require('./TListener').TListener;\n" +
 	                  "}\n" +
 	                  "\n" +
 	                  "@parser::members {\n" +
-	                  "this.LeafListener = function() {\n" +
-	                  "    this.visitTerminal = function(node) {\n" +
-	                  "    	document.getElementById('output').value += node.symbol.text + '\\n';\n" +
-	                  "    };\n" +
-	                  "    return this;\n" +
-	                  "};\n" +
-	                  "this.LeafListener.prototype = Object.create(TListener.prototype);\n" +
-	                  "this.LeafListener.prototype.constructor = this.LeafListener;\n" +
-	                  "\n" +
+	                  "public static class LeafListener extends TBaseListener {\n" +
+	                  "	public void visitTerminal(TerminalNode node) {\n" +
+	                  "		System.out.println(node.getSymbol().getText());\n" +
+	                  "	}\n" +
+	                  "}\n" +
 	                  "}\n" +
 	                  "\n" +
 	                  "s\n" +
 	                  "@after {\n" +
 	                  "System.out.println($ctx.r.toStringTree(this));\n" +
-	                  "var walker = new antlr4.tree.ParseTreeWalker();\n" +
-	                  "walker.walk(new this.LeafListener(), $ctx.r);\n" +
-	                  "\n" +
+	                  "ParseTreeWalker walker = new ParseTreeWalker();\n" +
+	                  "walker.walk(new LeafListener(), $ctx.r);\n" +
 	                  "}\n" +
 	                  "  : r=a ;\n" +
 	                  "a : INT INT\n" +
@@ -48,33 +42,25 @@ public class TestListeners extends BaseTest {
 	String testTokenGetters(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "@parser::header {\n" +
-	                  "var TListener = require('./TListener').TListener;\n" +
 	                  "}\n" +
 	                  "\n" +
 	                  "@parser::members {\n" +
-	                  "this.LeafListener = function() {\n" +
-	                  "    this.exitA = function(ctx) {\n" +
-	                  "    	var str;\n" +
-	                  "        if(ctx.getChildCount()===2) {\n" +
-	                  "            str = ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + antlr4.Utils.arrayToString(ctx.INT());\n" +
-	                  "        } else {\n" +
-	                  "            str = ctx.ID().symbol.toString();\n" +
-	                  "        }\n" +
-	                  "    	document.getElementById('output').value += str + '\\n';\n" +
-	                  "    };\n" +
-	                  "    return this;\n" +
-	                  "};\n" +
-	                  "this.LeafListener.prototype = Object.create(TListener.prototype);\\n\" +\n" +
-	                  "this.LeafListener.prototype.constructor = this.LeafListener;\\n\" +\n" +
-	                  "\n" +
+	                  "public static class LeafListener extends TBaseListener {\n" +
+	                  "	public void exitA(TParser.AContext ctx) {\n" +
+	                  "		if (ctx.getChildCount()==2) \n" +
+	                  "			System.out.printf(\"%s %s %s\",ctx.INT(0).getSymbol().getText(),\n" +
+	                  "				ctx.INT(1).getSymbol().getText(),ctx.INT());\n" +
+	                  "		else\n" +
+	                  "			System.out.println(ctx.ID().getSymbol());\n" +
+	                  "	}\n" +
+	                  "}\n" +
 	                  "}\n" +
 	                  "\n" +
 	                  "s\n" +
 	                  "@after {\n" +
 	                  "System.out.println($ctx.r.toStringTree(this));\n" +
-	                  "var walker = new antlr4.tree.ParseTreeWalker();\n" +
-	                  "walker.walk(new this.LeafListener(), $ctx.r);\n" +
-	                  "\n" +
+	                  "ParseTreeWalker walker = new ParseTreeWalker();\n" +
+	                  "walker.walk(new LeafListener(), $ctx.r);\n" +
 	                  "}\n" +
 	                  "  : r=a ;\n" +
 	                  "a : INT INT\n" +
@@ -105,33 +91,25 @@ public class TestListeners extends BaseTest {
 	String testRuleGetters(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "@parser::header {\n" +
-	                  "var TListener = require('./TListener').TListener;\n" +
 	                  "}\n" +
 	                  "\n" +
 	                  "@parser::members {\n" +
-	                  "this.LeafListener = function() {\n" +
-	                  "    this.exitA = function(ctx) {\n" +
-	                  "    	var str;\n" +
-	                  "        if(ctx.getChildCount()===2) {\n" +
-	                  "            str = ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text;\n" +
-	                  "        } else {\n" +
-	                  "            str = ctx.b(0).start.text;\n" +
-	                  "        }\n" +
-	                  "    	document.getElementById('output').value += str + '\\n';\n" +
-	                  "    };\n" +
-	                  "    return this;\n" +
-	                  "};\n" +
-	                  "this.LeafListener.prototype = Object.create(TListener.prototype);\\n\" +\n" +
-	                  "this.LeafListener.prototype.constructor = this.LeafListener;\\n\" +\n" +
-	                  "\n" +
+	                  "public static class LeafListener extends TBaseListener {\n" +
+	                  "	public void exitA(TParser.AContext ctx) {\n" +
+	                  "		if (ctx.getChildCount()==2) {\n" +
+	                  "			System.out.printf(\"%s %s %s\",ctx.b(0).start.getText(),\n" +
+	                  "				ctx.b(1).start.getText(),ctx.b().get(0).start.getText());\n" +
+	                  "		} else \n" +
+	                  "			System.out.println(ctx.b(0).start.getText());\n" +
+	                  "	}\n" +
+	                  "}\n" +
 	                  "}\n" +
 	                  "\n" +
 	                  "s\n" +
 	                  "@after {\n" +
 	                  "System.out.println($ctx.r.toStringTree(this));\n" +
-	                  "var walker = new antlr4.tree.ParseTreeWalker();\n" +
-	                  "walker.walk(new this.LeafListener(), $ctx.r);\n" +
-	                  "\n" +
+	                  "ParseTreeWalker walker = new ParseTreeWalker();\n" +
+	                  "walker.walk(new LeafListener(), $ctx.r);\n" +
 	                  "}\n" +
 	                  "  : r=a ;\n" +
 	                  "a : b b		// forces list\n" +
@@ -164,33 +142,25 @@ public class TestListeners extends BaseTest {
 	public void testLR() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "@parser::header {\n" +
-	                  "var TListener = require('./TListener').TListener;\n" +
 	                  "}\n" +
 	                  "\n" +
 	                  "@parser::members {\n" +
-	                  "this.LeafListener = function() {\n" +
-	                  "    this.exitE = function(ctx) {\n" +
-	                  "    	var str;\n" +
-	                  "        if(ctx.getChildCount()===3) {\n" +
-	                  "            str = ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text;\n" +
-	                  "        } else {\n" +
-	                  "            str = ctx.INT().symbol.text;\n" +
-	                  "        }\n" +
-	                  "    	document.getElementById('output').value += str + '\\n';\n" +
-	                  "    };\n" +
-	                  "    return this;\n" +
-	                  "};\n" +
-	                  "this.LeafListener.prototype = Object.create(TListener.prototype);\n" +
-	                  "this.LeafListener.prototype.constructor = this.LeafListener;\n" +
-	                  "\n" +
+	                  "public static class LeafListener extends TBaseListener {\n" +
+	                  "	public void exitE(TParser.EContext ctx) {\n" +
+	                  "		if (ctx.getChildCount()==3) {\n" +
+	                  "			System.out.printf(\"%s %s %s\\n\",ctx.e(0).start.getText(),\n" +
+	                  "				ctx.e(1).start.getText(), ctx.e().get(0).start.getText());\n" +
+	                  "		} else \n" +
+	                  "			System.out.println(ctx.INT().getSymbol().getText());\n" +
+	                  "	}\n" +
+	                  "}\n" +
 	                  "}\n" +
 	                  "\n" +
 	                  "s\n" +
 	                  "@after {\n" +
 	                  "System.out.println($ctx.r.toStringTree(this));\n" +
-	                  "var walker = new antlr4.tree.ParseTreeWalker();\n" +
-	                  "walker.walk(new this.LeafListener(), $ctx.r);\n" +
-	                  "\n" +
+	                  "ParseTreeWalker walker = new ParseTreeWalker();\n" +
+	                  "walker.walk(new LeafListener(), $ctx.r);\n" +
 	                  "}\n" +
 	                  "	: r=e ;\n" +
 	                  "e : e op='*' e\n" +
@@ -211,32 +181,24 @@ public class TestListeners extends BaseTest {
 	public void testLRWithLabels() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "@parser::header {\n" +
-	                  "var TListener = require('./TListener').TListener;\n" +
 	                  "}\n" +
 	                  "\n" +
 	                  "@parser::members {\n" +
-	                  "this.LeafListener = function() {\n" +
-	                  "    this.exitCall = function(ctx) {\n" +
-	                  "    	var str = ctx.e().start.text + ' ' + ctx.eList();\n" +
-	                  "    	document.getElementById('output').value += str + '\\n';\n" +
-	                  "    };\n" +
-	                  "    this.exitInt = function(ctx) {\n" +
-	                  "        var str = ctx.INT().symbol.text;\n" +
-	                  "        document.getElementById('output').value += str + '\\n';\n" +
-	                  "    };\n" +
-	                  "    return this;\n" +
-	                  "};\n" +
-	                  "this.LeafListener.prototype = Object.create(TListener.prototype);\n" +
-	                  "this.LeafListener.prototype.constructor = this.LeafListener;\n" +
-	                  "\n" +
+	                  "public static class LeafListener extends TBaseListener {\n" +
+	                  "	public void exitCall(TParser.CallContext ctx) {\n" +
+	                  "		System.out.printf(\"%s %s\",ctx.e().start.getText(),ctx.eList());\n" +
+	                  "	}\n" +
+	                  "	public void exitInt(TParser.IntContext ctx) {\n" +
+	                  "		System.out.println(ctx.INT().getSymbol().getText());\n" +
+	                  "	}\n" +
+	                  "}\n" +
 	                  "}\n" +
 	                  "\n" +
 	                  "s\n" +
 	                  "@after {\n" +
 	                  "System.out.println($ctx.r.toStringTree(this));\n" +
-	                  "var walker = new antlr4.tree.ParseTreeWalker();\n" +
-	                  "walker.walk(new this.LeafListener(), $ctx.r);\n" +
-	                  "\n" +
+	                  "ParseTreeWalker walker = new ParseTreeWalker();\n" +
+	                  "walker.walk(new LeafListener(), $ctx.r);\n" +
 	                  "}\n" +
 	                  "  : r=e ;\n" +
 	                  "e : e '(' eList ')' # Call\n" +

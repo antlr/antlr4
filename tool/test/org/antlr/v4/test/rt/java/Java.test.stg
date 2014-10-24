@@ -155,7 +155,7 @@ LANotEquals(i, v) ::= <%this._input.LA(<i>)!=<v>%>
 
 TokenStartColumnEquals(i) ::= <%this._tokenStartCharPositionInLine==<i>%>
 
-ImportListener(X) ::= <<var <X>Listener = require('./<X>Listener').<X>Listener;>>
+ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.tokenNames)"
 
@@ -248,93 +248,64 @@ protected static class PositionAdjustingLexerATNSimulator extends LexerATNSimula
 >>
 
 BasicListener(X) ::= <<
-this.LeafListener = function() {
-    this.visitTerminal = function(node) {
-    	document.getElementById('output').value += node.symbol.text + '\\n';
-    };
-    return this;
-};
-this.LeafListener.prototype = Object.create(<X>Listener.prototype);
-this.LeafListener.prototype.constructor = this.LeafListener;
-
+public static class LeafListener extends TBaseListener {
+	public void visitTerminal(TerminalNode node) {
+		System.out.println(node.getSymbol().getText());
+	}
+}
 >>
 
-walkListener(s) ::= <<
-var walker = new antlr4.tree.ParseTreeWalker();
-walker.walk(new this.LeafListener(), <s>);
-
+WalkListener(s) ::= <<
+ParseTreeWalker walker = new ParseTreeWalker();
+walker.walk(new LeafListener(), <s>);
 >>
 
 TokenGetterListener(X) ::= <<
-this.LeafListener = function() {
-    this.exitA = function(ctx) {
-    	var str;
-        if(ctx.getChildCount()===2) {
-            str = ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + antlr4.Utils.arrayToString(ctx.INT());
-        } else {
-            str = ctx.ID().symbol.toString();
-        }
-    	document.getElementById('output').value += str + '\\n';
-    };
-    return this;
-};
-this.LeafListener.prototype = Object.create(<X>Listener.prototype);\n" +
-this.LeafListener.prototype.constructor = this.LeafListener;\n" +
-
+public static class LeafListener extends TBaseListener {
+	public void exitA(TParser.AContext ctx) {
+		if (ctx.getChildCount()==2) 
+			System.out.printf("%s %s %s",ctx.INT(0).getSymbol().getText(),
+				ctx.INT(1).getSymbol().getText(),ctx.INT());
+		else
+			System.out.println(ctx.ID().getSymbol());
+	}
+}
 >>
 
 RuleGetterListener(X) ::= <<
-this.LeafListener = function() {
-    this.exitA = function(ctx) {
-    	var str;
-        if(ctx.getChildCount()===2) {
-            str = ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text;
-        } else {
-            str = ctx.b(0).start.text;
-        }
-    	document.getElementById('output').value += str + '\\n';
-    };
-    return this;
-};
-this.LeafListener.prototype = Object.create(<X>Listener.prototype);\n" +
-this.LeafListener.prototype.constructor = this.LeafListener;\n" +
-
+public static class LeafListener extends TBaseListener {
+	public void exitA(TParser.AContext ctx) {
+		if (ctx.getChildCount()==2) {
+			System.out.printf("%s %s %s",ctx.b(0).start.getText(),
+				ctx.b(1).start.getText(),ctx.b().get(0).start.getText());
+		} else 
+			System.out.println(ctx.b(0).start.getText());
+	}
+}
 >>
 
 
 LRListener(X) ::= <<
-this.LeafListener = function() {
-    this.exitE = function(ctx) {
-    	var str;
-        if(ctx.getChildCount()===3) {
-            str = ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text;
-        } else {
-            str = ctx.INT().symbol.text;
-        }
-    	document.getElementById('output').value += str + '\\n';
-    };
-    return this;
-};
-this.LeafListener.prototype = Object.create(<X>Listener.prototype);
-this.LeafListener.prototype.constructor = this.LeafListener;
-
+public static class LeafListener extends TBaseListener {
+	public void exitE(TParser.EContext ctx) {
+		if (ctx.getChildCount()==3) {
+			System.out.printf("%s %s %s\n",ctx.e(0).start.getText(),
+				ctx.e(1).start.getText(), ctx.e().get(0).start.getText());
+		} else 
+			System.out.println(ctx.INT().getSymbol().getText());
+	}
+}
 >>
 
 LRWithLabelsListener(X) ::= <<
-this.LeafListener = function() {
-    this.exitCall = function(ctx) {
-    	var str = ctx.e().start.text + ' ' + ctx.eList();
-    	document.getElementById('output').value += str + '\\n';
-    };
-    this.exitInt = function(ctx) {
-        var str = ctx.INT().symbol.text;
-        document.getElementById('output').value += str + '\\n';
-    };
-    return this;
-};
-this.LeafListener.prototype = Object.create(<X>Listener.prototype);
-this.LeafListener.prototype.constructor = this.LeafListener;
-
+public static class LeafListener extends TBaseListener {
+	public void exitCall(TParser.CallContext ctx) {
+		System.out.printf("%s %s",ctx.e().start.getText(),ctx.eList());
+	}
+	public void exitInt(TParser.IntContext ctx) {
+		System.out.println(ctx.INT().getSymbol().getText());
+	}
+}
 >>
 
 DeclareContextListGettersFunction() ::= <<

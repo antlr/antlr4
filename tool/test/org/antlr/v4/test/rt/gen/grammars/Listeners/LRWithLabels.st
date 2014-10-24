@@ -10,7 +10,7 @@ grammar <grammarName>;
 s
 @after {
 <ToStringTree("$ctx.r"):writeln()>
-<walkListener("$ctx.r")>
+<WalkListener("$ctx.r")>
 }
   : r=e ;
 e : e '(' eList ')' # Call
