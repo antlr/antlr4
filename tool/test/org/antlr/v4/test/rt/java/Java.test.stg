@@ -337,7 +337,7 @@ void foo() {
 }
 >>
 
-Declare_foo() ::= "this.foo = function() {document.getElementById('output').value += 'foo\\n'};"
+Declare_foo() ::= <<public void foo() {System.out.println("foo");}>>
 			
 Invoke_foo() ::= "this.foo();"
 

@@ -1,2 +1,2 @@
 parser grammar S;
-a : @after {} : B;
+a @after {} : B;

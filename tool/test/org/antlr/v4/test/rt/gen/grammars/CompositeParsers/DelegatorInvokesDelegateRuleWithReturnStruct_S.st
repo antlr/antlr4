@@ -1,2 +1,2 @@
 parser grammar S;
-A : B {<write("\"S.a\"")>};
+a : B {<write("\"S.a\"")>};

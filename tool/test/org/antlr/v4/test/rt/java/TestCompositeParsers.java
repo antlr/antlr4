@@ -53,7 +53,7 @@ public class TestCompositeParsers extends BaseTest {
 	                  "s : label=a[3] {System.out.println($label.y);} ;\n" +
 	                  "B : 'b' ; // defines B from inherited token space\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("M.g4", grammar, "MParser", "MLexer", "s", "a", false);
+		String found = execParser("M.g4", grammar, "MParser", "MLexer", "s", "b", false);
 		assertEquals("S.a1000\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -61,7 +61,7 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testDelegatorInvokesDelegateRuleWithReturnStruct() throws Exception {
 		String slave_S = "parser grammar S;\n" +
-	                  "A : B {System.out.print(\"S.a\");};";
+	                  "a : B {System.out.print(\"S.a\");};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave_S);
 
@@ -79,7 +79,7 @@ public class TestCompositeParsers extends BaseTest {
 	public void testDelegatorAccessesDelegateMembers() throws Exception {
 		String slave_S = "parser grammar S;\n" +
 	                  "@members {\n" +
-	                  "this.foo = function() {document.getElementById('output').value += 'foo\\n'};\n" +
+	                  "public void foo() {System.out.println(\"foo\");}\n" +
 	                  "}\n" +
 	                  "a : B;";
 		mkdir(tmpdir);
@@ -121,13 +121,13 @@ public class TestCompositeParsers extends BaseTest {
 	public void testDelegatesSeeSameTokenType() throws Exception {
 		String slave_S = "parser grammar S;\n" +
 	                  "tokens { A, B, C }\n" +
-	                  "x : A {System.out.print(\"S.x\");};";
+	                  "x : A {System.out.println(\"S.x\");};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave_S);
 
 		String slave_T = "parser grammar S;\n" +
 	                  "tokens { C, B, A } // reverse order\n" +
-	                  "y : A {System.out.print(\"T.y\");};";
+	                  "y : A {System.out.println(\"T.y\");};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "T.g4", slave_T);
 
@@ -210,7 +210,7 @@ public class TestCompositeParsers extends BaseTest {
 	                  "type_ : 'int' ;\n" +
 	                  "decl : type_ ID ';'\n" +
 	                  "	| type_ ID init ';' {\n" +
-	                  "		System.out.print(\"decl: \" + $text);\n" +
+	                  "		System.out.print(\"Decl: \" + $text);\n" +
 	                  "	};\n" +
 	                  "init : '=' INT;";
 		mkdir(tmpdir);
@@ -231,7 +231,7 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testDelegatorRuleOverridesDelegates() throws Exception {
 		String slave_S = "parser grammar S;\n" +
-	                  "a : b {System.out.print(\"S.a\");};\n" +
+	                  "a : b {System.out.println(\"S.a\");};\n" +
 	                  "b : 'b' ;\n" +
 	                  "   ";
 		mkdir(tmpdir);
@@ -239,13 +239,13 @@ public class TestCompositeParsers extends BaseTest {
 
 		String slave_T = "parser grammar S;\n" +
 	                  "tokens { A }\n" +
-	                  "b : 'b' {System.out.print(\"T.b\");};";
+	                  "b : 'b' {System.out.println(\"T.b\");};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "T.g4", slave_T);
 
 		String grammar = "grammar M;\n" +
 	                  "import S, T;\n" +
-	                  "b : 'b'|'c' {System.out.print(\"M.b\");}|B|A;\n" +
+	                  "b : 'b'|'c' {System.out.println(\"M.b\");}|B|A;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("M.g4", grammar, "MParser", "MLexer", "a", "c", false);
 		assertEquals("M.b\nS.a\n", found);
@@ -272,7 +272,7 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testImportedRuleWithAction() throws Exception {
 		String slave_S = "parser grammar S;\n" +
-	                  "a : @after {} : B;";
+	                  "a @after {} : B;";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave_S);
 

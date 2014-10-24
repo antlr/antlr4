@@ -1,3 +1,3 @@
 parser grammar S;
 tokens { A }
-b : 'b' {<write("\"T.b\"")>};
+b : 'b' {<writeln("\"T.b\"")>};

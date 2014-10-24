@@ -2,6 +2,6 @@ parser grammar S;
 type_ : 'int' ;
 decl : type_ ID ';'
 	| type_ ID init ';' {
-		<write("\"decl: \" + $text")>
+		<write("\"Decl: \" + $text")>
 	};
 init : '=' INT;

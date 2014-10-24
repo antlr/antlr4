@@ -1,4 +1,4 @@
 parser grammar S;
-a : b {<write("\"S.a\"")>};
+a : b {<writeln("\"S.a\"")>};
 b : 'b' ;
    
