@@ -275,7 +275,7 @@ namespace Antlr4.Build.Tasks
                     arguments.Add("-no-visitor");
 
                 if (ForceAtn)
-                    arguments.Add("-force-atn");
+                    arguments.Add("-Xforce-atn");
 
                 if (AbstractGrammar)
                     arguments.Add("-Dabstract=true");
