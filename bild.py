@@ -42,6 +42,8 @@ PYTHON2_TARGET	= "../antlr4-python2"
 PYTHON3_TARGET	= "../antlr4-python3"
 CSHARP_TARGET	= "../antlr4-csharp"
 
+JAVA_VERSION = os.environ.get('ANTLR_JAVA_VERSION', None)
+
 # Properties needed to run Python[23] tests
 test_properties = {
 	"antlr-python2-python":"/usr/local/Cellar/python/2.7.5/bin/python2.7",
@@ -71,10 +73,10 @@ def compile():
 	srcpath = ["gen3", "gen4", "runtime/JavaAnnotations/src", "runtime/Java/src", "tool/src"]
 	args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
 	for sp in srcpath:
-		javac(sp, "out", version="1.6", cp=cp, args=args)
+		javac(sp, "out", version=JAVA_VERSION, cp=cp, args=args)
 	# pull in targets
 	for t in TARGETS:
-		javac(TARGETS[t]+"/tool/src", "out", version="1.6", cp=cp, args=args)
+		javac(TARGETS[t]+"/tool/src", "out", version=JAVA_VERSION, cp=cp, args=args)
 
 def mkjar_complete():
 	require(compile)
@@ -116,7 +118,7 @@ def mkjar_runtime():
 	srcpath = ["gen4", "runtime/JavaAnnotations/src", "runtime/Java/src"]
 	args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
 	for sp in srcpath:
-		javac(sp, "out/runtime", version="1.6", cp=cp, args=args)
+		javac(sp, "out/runtime", version=JAVA_VERSION, cp=cp, args=args)
 	manifest = \
 """Implementation-Vendor: ANTLR
 Implementation-Title: ANTLR 4 Runtime
@@ -148,12 +150,12 @@ def tests():
 		 junit_jar+os.pathsep+hamcrest_jar
 	properties = ["-D%s=%s" % (p, test_properties[p]) for p in test_properties]
 	args = ["-Xlint", "-Xlint:-serial", "-g"]
-	javac("tool/test", "out/test/Java", version="1.6", cp=cp, args=args) # all targets can use org.antlr.v4.test.*
+	javac("tool/test", "out/test/Java", version=JAVA_VERSION, cp=cp, args=args) # all targets can use org.antlr.v4.test.*
 	for t in TARGETS:
 		print "Test %7s --------------" % t
 		# Prefix CLASSPATH with individual target tests
 		cp = uniformpath(TARGETS[t]+"/tool/test") + os.pathsep + cp
-		javac(TARGETS[t]+"/tool/test", "out/test/"+t, version="1.6", cp=cp, args=args)
+		javac(TARGETS[t]+"/tool/test", "out/test/"+t, version=JAVA_VERSION, cp=cp, args=args)
 		junit("out/test/"+t, cp=cp, verbose=False, args=properties)
 
 def mkdoc():
