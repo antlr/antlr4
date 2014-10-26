@@ -156,7 +156,7 @@ def tests():
 	for t in TARGETS:
 		print "Test %7s --------------" % t
 		# Prefix CLASSPATH with individual target tests
-		cp = uniformpath(TARGETS[t]+"/tool/test") + os.pathsep + cp
+		cp = uniformpath("out/test/"+t) + os.pathsep + cp
 		javac(TARGETS[t]+"/tool/test", "out/test/"+t, version=JAVA_VERSION, cp=cp, args=args)
 		junit(TARGETS[t]+"/tool/test", cp=cp, verbose=False, args=properties)
 
