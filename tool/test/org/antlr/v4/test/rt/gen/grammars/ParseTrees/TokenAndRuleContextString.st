@@ -8,5 +8,5 @@ s
 }
   : r=a ;
 a : 'x' { 
-<WriteRuleInvocationStack()>
+<RuleInvocationStack():writeln()>
 } ;

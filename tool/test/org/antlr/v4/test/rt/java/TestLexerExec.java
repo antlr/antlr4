@@ -341,12 +341,12 @@ public class TestLexerExec extends BaseTest {
 		String grammar = "lexer grammar L;\n" +
 	                  "I : '0'..'9'+ {System.out.println(\"I\");} ;\n" +
 	                  "WS : [ \\n\\u000D] -> skip ;";
-		String found = execLexer("L.g4", grammar, "L", "34\r\n 34", false);
+		String found = execLexer("L.g4", grammar, "L", "34\n 34", false);
 		assertEquals("I\n" + 
 	              "I\n" + 
 	              "[@0,0:1='34',<1>,1:0]\n" + 
-	              "[@1,5:6='34',<1>,2:1]\n" + 
-	              "[@2,7:6='<EOF>',<-1>,2:3]\n", found);
+	              "[@1,4:5='34',<1>,2:1]\n" + 
+	              "[@2,6:5='<EOF>',<-1>,2:3]\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
@@ -355,12 +355,12 @@ public class TestLexerExec extends BaseTest {
 		String grammar = "lexer grammar L;\n" +
 	                  "I : '0'..'9'+ {System.out.println(\"I\");} ;\n" +
 	                  "WS : [ \\n\\u000D]+ -> skip ;";
-		String found = execLexer("L.g4", grammar, "L", "34\r\n 34", false);
+		String found = execLexer("L.g4", grammar, "L", "34\n 34", false);
 		assertEquals("I\n" + 
 	              "I\n" + 
 	              "[@0,0:1='34',<1>,1:0]\n" + 
-	              "[@1,5:6='34',<1>,2:1]\n" + 
-	              "[@2,7:6='<EOF>',<-1>,2:3]\n", found);
+	              "[@1,4:5='34',<1>,2:1]\n" + 
+	              "[@2,6:5='<EOF>',<-1>,2:3]\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
@@ -397,16 +397,16 @@ public class TestLexerExec extends BaseTest {
 	                  "I : [0-9]+ {System.out.println(\"I\");} ;\n" +
 	                  "ID : [a-zA-Z] [a-zA-Z0-9]* {System.out.println(\"ID\");} ;\n" +
 	                  "WS : [ \\n\\u0009\\r]+ -> skip ;";
-		String found = execLexer("L.g4", grammar, "L", "34\r 34 a2 abc \n   ", false);
+		String found = execLexer("L.g4", grammar, "L", "34\n 34 a2 abc \n   ", false);
 		assertEquals("I\n" + 
 	              "I\n" + 
 	              "ID\n" + 
 	              "ID\n" + 
 	              "[@0,0:1='34',<1>,1:0]\n" + 
-	              "[@1,4:5='34',<1>,1:4]\n" + 
-	              "[@2,7:8='a2',<2>,1:7]\n" + 
-	              "[@3,10:12='abc',<2>,1:10]\n" + 
-	              "[@4,18:17='<EOF>',<-1>,2:3]\n", found);
+	              "[@1,4:5='34',<1>,2:1]\n" + 
+	              "[@2,7:8='a2',<2>,2:4]\n" + 
+	              "[@3,10:12='abc',<2>,2:7]\n" + 
+	              "[@4,18:17='<EOF>',<-1>,3:3]\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
@@ -415,10 +415,10 @@ public class TestLexerExec extends BaseTest {
 		String grammar = "lexer grammar L;\n" +
 	                  "I : [0-]+ {System.out.println(\"I\");} ;\n" +
 	                  "WS : [ \\n\\u000D]+ -> skip ;";
-		String found = execLexer("L.g4", grammar, "L", "00\r\n", false);
+		String found = execLexer("L.g4", grammar, "L", "00\n", false);
 		assertEquals("I\n" + 
 	              "[@0,0:1='00',<1>,1:0]\n" + 
-	              "[@1,4:3='<EOF>',<-1>,2:0]\n", found);
+	              "[@1,3:2='<EOF>',<-1>,2:0]\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 

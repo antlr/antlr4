@@ -34,6 +34,8 @@ public class Generator {
 		Map<String, File> configs = new HashMap<String, File>();
 		configs.put("Source", readGrammarDir()); // source of test templates
 		configs.put("Java", readJavaDir()); // generated Java tests
+		configs.put("NodeJS", readNodeJSDir()); // generated NodeJS tests
+		configs.put("Safari", readSafariDir()); // generated Firefox tests
 		configs.put("Firefox", readFirefoxDir()); // generated Firefox tests
 		return configs;
 	}
@@ -44,6 +46,16 @@ public class Generator {
 		URL url = ClassLoader.getSystemResource(className);
 		String uri = url.toURI().toString().replace("target/test-classes", "test");
 		return new File(new URI(uri));
+	}
+
+	private static File readNodeJSDir() {
+		// TODO Auto-generated method stub
+		return new File("/Users/ericvergnaud/Development/antlr4/antlr/antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/node");
+	}
+
+	private static File readSafariDir() {
+		// TODO read from env variable
+		return new File("/Users/ericvergnaud/Development/antlr4/antlr/antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/safari");
 	}
 
 	private static File readFirefoxDir() {
@@ -1189,18 +1201,18 @@ public class Generator {
 		file.addLexerTest(input, "EOFSuffixInFirstRule", "L", "a",
 				"[@0,0:0='a',<1>,1:0]\n" +
 				"[@1,1:0='<EOF>',<-1>,1:1]\n", null, 2);
-		file.addLexerTest(input, "CharSet", "L", "34\r\n 34",
+		file.addLexerTest(input, "CharSet", "L", "34\n 34",
 				"I\n" +
 				"I\n" +
 				"[@0,0:1='34',<1>,1:0]\n" +
-				"[@1,5:6='34',<1>,2:1]\n" +
-				"[@2,7:6='<EOF>',<-1>,2:3]\n", null);
-		file.addLexerTest(input, "CharSetPlus", "L", "34\r\n 34",
+				"[@1,4:5='34',<1>,2:1]\n" +
+				"[@2,6:5='<EOF>',<-1>,2:3]\n", null);
+		file.addLexerTest(input, "CharSetPlus", "L", "34\n 34",
 				"I\n" +
 				"I\n" +
 				"[@0,0:1='34',<1>,1:0]\n" +
-				"[@1,5:6='34',<1>,2:1]\n" +
-				"[@2,7:6='<EOF>',<-1>,2:3]\n", null);
+				"[@1,4:5='34',<1>,2:1]\n" +
+				"[@2,6:5='<EOF>',<-1>,2:3]\n", null);
 		file.addLexerTest(input, "CharSetNot", "L", "xaf",
 				"I\n" +
 				"[@0,0:2='xaf',<1>,1:0]\n" +
@@ -1211,20 +1223,20 @@ public class Generator {
 				"[@0,0:0='a',<1>,1:0]\n" +
 				"[@1,2:2='x',<1>,1:2]\n" +
 				"[@2,3:2='<EOF>',<-1>,1:3]\n", null);
-		file.addLexerTest(input, "CharSetRange", "L", "34\r 34 a2 abc \n   ",
+		file.addLexerTest(input, "CharSetRange", "L", "34\n 34 a2 abc \n   ",
 				"I\n" +
 				"I\n" +
 				"ID\n" +
 				"ID\n" +
 				"[@0,0:1='34',<1>,1:0]\n" +
-				"[@1,4:5='34',<1>,1:4]\n" +
-				"[@2,7:8='a2',<2>,1:7]\n" +
-				"[@3,10:12='abc',<2>,1:10]\n" +
-				"[@4,18:17='<EOF>',<-1>,2:3]\n", null);
-		file.addLexerTest(input, "CharSetWithMissingEndRange", "L", "00\r\n",
+				"[@1,4:5='34',<1>,2:1]\n" +
+				"[@2,7:8='a2',<2>,2:4]\n" +
+				"[@3,10:12='abc',<2>,2:7]\n" +
+				"[@4,18:17='<EOF>',<-1>,3:3]\n", null);
+		file.addLexerTest(input, "CharSetWithMissingEndRange", "L", "00\n",
 				"I\n" +
 				"[@0,0:1='00',<1>,1:0]\n" +
-				"[@1,4:3='<EOF>',<-1>,2:0]\n", null);
+				"[@1,3:2='<EOF>',<-1>,2:0]\n", null);
 		file.addLexerTest(input, "CharSetWithMissingEscapeChar", "L", "34 ",
 				"I\n" +
 				"[@0,0:1='34',<1>,1:0]\n" +

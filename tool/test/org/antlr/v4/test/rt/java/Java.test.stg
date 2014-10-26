@@ -161,7 +161,7 @@ ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.tokenNames)"
 
-WriteRuleInvocationStack() ::= "System.out.println(getRuleInvocationStack());"
+RuleInvocationStack() ::= "getRuleInvocationStack()"
 
 LL_EXACT_AMBIG_DETECTION() ::= <<_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);>>
 
