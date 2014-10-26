@@ -141,6 +141,12 @@ def mkjar():
 	mkjar_complete() # make it again with up to date XPath lexer
 	mkjar_runtime()	 # now build the runtime jar
 
+def mkdist():
+    global JAVA_VERSION
+    if JAVA_VERSION is None:
+        JAVA_VERSION = "1.6"
+    mkjar()
+
 def tests():
 	require(mkjar)
 	junit_jar, hamcrest_jar = load_junitjars()
