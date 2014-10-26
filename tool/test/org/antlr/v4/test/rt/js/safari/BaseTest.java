@@ -440,7 +440,7 @@ public abstract class BaseTest {
 			driver.findElement(new ById("input")).sendKeys(input);
 			driver.findElement(new ById("load")).click();
 			driver.findElement(new ById("submit")).click();
-			String errors = driver.findElement(new ById("errors")).getText();
+			String errors = driver.findElement(new ById("errors")).getAttribute("value");
 			if(errors!=null && errors.length()>0) {
 				this.stderrDuringParse = errors;
 				System.err.print(errors);
@@ -807,29 +807,40 @@ public abstract class BaseTest {
         "		<script src='lib/require.js'></script>\r\n" +
         "		<script>\r\n" +
         "			antlr4 = null;\r\n" +
+        "			listener = null;\r\n" +
         "			" + lexerName + " = null;\r\n" +
  		"\r\n" +			
 		"			loadLexer = function() {\r\n" +			
         "				try {\r\n" +
         "					antlr4 = require('antlr4/index');\r\n" +
-		"					" + lexerName + " = require('./parser/" + lexerName + "');\n" +
+		"					" + lexerName + " = require('./parser/" + lexerName + "');\r\n" +
         "				} catch (ex) {\r\n" +
         "					document.getElementById('errors').value = ex.toString();\r\n" +
         "				}\r\n" +
+		"				listener = function() {\r\n" +
+		"					antlr4.error.ErrorListener.call(this);\r\n" +
+		"					return this;\r\n" +
+		"				}\r\n" +
+		"				listener.prototype = Object.create(antlr4.error.ErrorListener.prototype);\r\n" +
+		"				listener.prototype.constructor = listener;\r\n" +
+		"				listener.prototype.syntaxError = function(recognizer, offendingSymbol, line, column, msg, e) {\r\n" +
+		"    				document.getElementById('errors').value += 'line ' + line + ':' + column + ' ' + msg + '\\r\\n';\r\n" +
+		"				};\r\n" +
 		"			}\r\n" +
 		"\r\n" +			
 		"			test = function() {\r\n" +
 		"				document.getElementById('output').value = ''\r\n" +
 		"				var input = document.getElementById('input').value;\r\n" +
-		"    			var chars = new antlr4.InputStream(input);\n" +
-		"    			var lexer = new " + lexerName + "." + lexerName + "(chars);\n" +
-	    "    			var stream = new antlr4.CommonTokenStream(lexer);\n" +
-		"    			stream.fill();\n" +
-	    "    			for(var i=0; i<stream.tokens.length; i++) {\n" +
-	    "					document.getElementById('output').value += stream.tokens[i].toString() + '\\r\\n';\n" +
+		"    			var chars = new antlr4.InputStream(input);\r\n" +
+		"    			var lexer = new " + lexerName + "." + lexerName + "(chars);\r\n" +
+		"				lexer._listeners = [new listener()];\r\n" +
+	    "    			var stream = new antlr4.CommonTokenStream(lexer);\r\n" +
+		"    			stream.fill();\r\n" +
+	    "    			for(var i=0; i<stream.tokens.length; i++) {\r\n" +
+	    "					document.getElementById('output').value += stream.tokens[i].toString() + '\\r\\n';\r\n" +
 		"    			}\n" +
 		(showDFA ? 
-		"    			document.getElementById('output').value +=(lexer._interp.decisionToDFA[antlr4.Lexer.DEFAULT_MODE].toLexerString());\n"
+		"    			document.getElementById('output').value += lexer._interp.decisionToDFA[antlr4.Lexer.DEFAULT_MODE].toLexerString();\r\n"
 						:"") +
 		"			};\r\n" +
 		"\r\n" +			
