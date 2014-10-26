@@ -10,9 +10,6 @@ In order to build the complete ANTLR4 product with Java, Python 2, and Python 3
 targets, do the following from a UNIX command line.  Windows build using this script
 is not yet supported. Please use the mvn build or ant build.
 
-!!!You must set path values in test_properties dictionary below to ensure Python
-tests run.!!!
-
 mkdir -p /usr/local/antlr # somewhere appropriate where you want to install stuff
 cd /usr/local/antlr
 git clone git@github.com:parrt/antlr4.git
@@ -47,9 +44,9 @@ JAVA_VERSION = os.environ.get('ANTLR_JAVA_VERSION', None)
 
 # Properties needed to run Python[23] tests
 test_properties = {
-	"antlr-python2-python":"/usr/local/Cellar/python/2.7.5/bin/python2.7",
+	"antlr-python2-python":os.environ.get('ANTLR_PYTHON2_PYTHON', "python"),
 	"antlr-python2-runtime":uniformpath(PYTHON2_TARGET)+"/src",
-	"antlr-python3-python":"/usr/local/Cellar/python3/3.4.1/bin/python3",
+	"antlr-python3-python":os.environ.get('ANTLR_PYTHON3_PYTHON', "python3"),
 	"antlr-python3-runtime":uniformpath(PYTHON3_TARGET)+"/src",
 }
 
