@@ -156,7 +156,7 @@ def tests():
 		# Prefix CLASSPATH with individual target tests
 		cp = uniformpath(TARGETS[t]+"/tool/test") + os.pathsep + cp
 		javac(TARGETS[t]+"/tool/test", "out/test/"+t, version=JAVA_VERSION, cp=cp, args=args)
-		junit("out/test/"+t, cp=cp, verbose=False, args=properties)
+		junit(TARGETS[t]+"/tool/test", cp=cp, verbose=False, args=properties)
 
 def mkdoc():
 	mkdir("doc/Java")
