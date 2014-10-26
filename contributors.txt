@@ -61,3 +61,4 @@ YYYY/MM/DD, github id, Full name, email
 2014/09/04. jeduden, Jan-Eric Duden, jeduden@gmail.com
 2014/09/27, petrbel, Petr Bělohlávek, antlr@petrbel.cz
 2014/10/18, sergiusignacius, Sérgio Silva, serge.a.silva@gmail.com
+2014/10/26, bdkearns, Brian Kearns, bdkearns@gmail.com
