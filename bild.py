@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import string
+from collections import OrderedDict
 
 """
 This script uses my experimental build tool http://www.bildtool.org
@@ -52,11 +53,12 @@ test_properties = {
 	"antlr-python3-runtime":uniformpath(PYTHON3_TARGET)+"/src",
 }
 
-TARGETS	= {"Java":uniformpath(JAVA_TARGET),
-		   "Python2":uniformpath(PYTHON2_TARGET),
-		   "Python3":uniformpath(PYTHON3_TARGET),
-		   #"CSharp":uniformpath(CSHARP_TARGET)
-		  }
+TARGETS = OrderedDict([
+    ("Java", uniformpath(JAVA_TARGET)),
+    ("Python2", uniformpath(PYTHON2_TARGET)),
+    ("Python3", uniformpath(PYTHON3_TARGET)),
+    #("CSharp":uniformpath(CSHARP_TARGET)),
+])
 
 def parsers():
 	antlr3("tool/src/org/antlr/v4/parse", "gen3", package="org.antlr.v4.parse")
