@@ -1,4 +1,4 @@
-package org.antlr.v4.test.rt.js.firefox;
+package org.antlr.v4.test.rt.js.node;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -9,7 +9,7 @@ public class TestParserErrors extends BaseTest {
 	public void testTokenMismatch() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : 'a' 'b' ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "aa");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "aa", false);
 		assertEquals("", found);
 		assertEquals("line 1:1 mismatched input 'a' expecting 'b'\n", this.stderrDuringParse);
 	}
@@ -18,7 +18,7 @@ public class TestParserErrors extends BaseTest {
 	public void testSingleTokenDeletion() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : 'a' 'b' ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "aab");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "aab", false);
 		assertEquals("", found);
 		assertEquals("line 1:1 extraneous input 'a' expecting 'b'\n", this.stderrDuringParse);
 	}
@@ -27,7 +27,7 @@ public class TestParserErrors extends BaseTest {
 	public void testSingleTokenDeletionExpectingSet() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : 'a' ('b'|'c') ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "aab");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "aab", false);
 		assertEquals("", found);
 		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
 	}
@@ -36,7 +36,7 @@ public class TestParserErrors extends BaseTest {
 	public void testSingleTokenInsertion() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : 'a' 'b' 'c' ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "ac");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "ac", false);
 		assertEquals("", found);
 		assertEquals("line 1:1 missing 'b' at 'c'\n", this.stderrDuringParse);
 	}
@@ -44,8 +44,8 @@ public class TestParserErrors extends BaseTest {
 	@Test
 	public void testConjuringUpToken() throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "a : 'a' x='b' {document.getElementById('output').value += \"conjured=\"+$x + '\\n';} 'c' ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "ac");
+	                  "a : 'a' x='b' {console.log(\"conjured=\"+$x);} 'c' ;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "ac", false);
 		assertEquals("conjured=[@-1,-1:-1='<missing 'b'>',<2>,1:1]\n", found);
 		assertEquals("line 1:1 missing 'b' at 'c'\n", this.stderrDuringParse);
 	}
@@ -54,7 +54,7 @@ public class TestParserErrors extends BaseTest {
 	public void testSingleSetInsertion() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : 'a' ('b'|'c') 'd' ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "ad");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "ad", false);
 		assertEquals("", found);
 		assertEquals("line 1:1 missing {'b', 'c'} at 'd'\n", this.stderrDuringParse);
 	}
@@ -62,8 +62,8 @@ public class TestParserErrors extends BaseTest {
 	@Test
 	public void testConjuringUpTokenFromSet() throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "a : 'a' x=('b'|'c') {document.getElementById('output').value += \"conjured=\"+$x + '\\n';} 'd' ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "ad");
+	                  "a : 'a' x=('b'|'c') {console.log(\"conjured=\"+$x);} 'd' ;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "ad", false);
 		assertEquals("conjured=[@-1,-1:-1='<missing 'b'>',<2>,1:1]\n", found);
 		assertEquals("line 1:1 missing {'b', 'c'} at 'd'\n", this.stderrDuringParse);
 	}
@@ -75,7 +75,7 @@ public class TestParserErrors extends BaseTest {
 	                  "  | 'a' 'c'\n" +
 	                  ";\n" +
 	                  "q : 'e' ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "ae");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "ae", false);
 		assertEquals("", found);
 		assertEquals("line 1:1 no viable alternative at input 'ae'\n", this.stderrDuringParse);
 	}
@@ -87,7 +87,7 @@ public class TestParserErrors extends BaseTest {
 	                  "  | 'a' 'b' 'd'\n" +
 	                  ";\n" +
 	                  "q : 'e' ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "abe");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "abe", false);
 		assertEquals("", found);
 		assertEquals("line 1:2 no viable alternative at input 'abe'\n", this.stderrDuringParse);
 	}
@@ -99,7 +99,7 @@ public class TestParserErrors extends BaseTest {
 	                  "  | 'a'+ 'c'\n" +
 	                  ";\n" +
 	                  "q : 'e' ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "aaae");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "aaae", false);
 		assertEquals("", found);
 		assertEquals("line 1:3 no viable alternative at input 'aaae'\n", this.stderrDuringParse);
 	}
@@ -108,7 +108,7 @@ public class TestParserErrors extends BaseTest {
 	public void testSingleTokenDeletionBeforeLoop() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : 'a' 'b'* ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "aabc");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "aabc", false);
 		assertEquals("", found);
 		assertEquals("line 1:1 extraneous input 'a' expecting {<EOF>, 'b'}\nline 1:3 token recognition error at: 'c'\n", this.stderrDuringParse);
 	}
@@ -117,7 +117,7 @@ public class TestParserErrors extends BaseTest {
 	public void testMultiTokenDeletionBeforeLoop() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : 'a' 'b'* 'c';";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "aacabc");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "aacabc", false);
 		assertEquals("", found);
 		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
 	}
@@ -126,7 +126,7 @@ public class TestParserErrors extends BaseTest {
 	public void testSingleTokenDeletionDuringLoop() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : 'a' 'b'* 'c' ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "ababbc");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "ababbc", false);
 		assertEquals("", found);
 		assertEquals("line 1:2 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
 	}
@@ -135,7 +135,7 @@ public class TestParserErrors extends BaseTest {
 	public void testMultiTokenDeletionDuringLoop() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : 'a' 'b'* 'c' ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "abaaababc");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "abaaababc", false);
 		assertEquals("", found);
 		assertEquals("line 1:2 extraneous input 'a' expecting {'b', 'c'}\nline 1:6 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
 	}
@@ -144,7 +144,7 @@ public class TestParserErrors extends BaseTest {
 	public void testSingleTokenDeletionBeforeLoop2() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : 'a' ('b'|'z'{})*;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "aabc");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "aabc", false);
 		assertEquals("", found);
 		assertEquals("line 1:1 extraneous input 'a' expecting {<EOF>, 'b', 'z'}\nline 1:3 token recognition error at: 'c'\n", this.stderrDuringParse);
 	}
@@ -153,7 +153,7 @@ public class TestParserErrors extends BaseTest {
 	public void testMultiTokenDeletionBeforeLoop2() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : 'a' ('b'|'z'{})* 'c';";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "aacabc");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "aacabc", false);
 		assertEquals("", found);
 		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'z', 'c'}\n", this.stderrDuringParse);
 	}
@@ -162,7 +162,7 @@ public class TestParserErrors extends BaseTest {
 	public void testSingleTokenDeletionDuringLoop2() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : 'a' ('b'|'z'{})* 'c' ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "ababbc");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "ababbc", false);
 		assertEquals("", found);
 		assertEquals("line 1:2 extraneous input 'a' expecting {'b', 'z', 'c'}\n", this.stderrDuringParse);
 	}
@@ -171,7 +171,7 @@ public class TestParserErrors extends BaseTest {
 	public void testMultiTokenDeletionDuringLoop2() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : 'a' ('b'|'z'{})* 'c' ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "abaaababc");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "abaaababc", false);
 		assertEquals("", found);
 		assertEquals("line 1:2 extraneous input 'a' expecting {'b', 'z', 'c'}\nline 1:6 extraneous input 'a' expecting {'b', 'z', 'c'}\n", this.stderrDuringParse);
 	}
@@ -190,9 +190,9 @@ public class TestParserErrors extends BaseTest {
 	                  "WS : ' ' -> skip ;\n" +
 	                  "acClass\n" +
 	                  "@init\n" +
-	                  "{document.getElementById('output').value += this.getExpectedTokens().toString(this.tokenNames)); + '\\n';}\n" +
+	                  "{console.log(this.getExpectedTokens().toString(this.literalNames));}\n" +
 	                  "  : ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "start", "dog and software");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "start", "dog and software", false);
 		assertEquals("{'hardware', 'software'}\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -202,7 +202,7 @@ public class TestParserErrors extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "start : ID+;\n" +
 	                  "ID : [a-z]+;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "start", "");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "start", "", false);
 		assertEquals("", found);
 		assertEquals("line 1:0 missing ID at '<EOF>'\n", this.stderrDuringParse);
 	}
@@ -218,9 +218,9 @@ public class TestParserErrors extends BaseTest {
 	                  "    };\n" +
 	                  "}\n" +
 	                  "s : (a | b)+;\n" +
-	                  "a : 'a' {document.getElementById('output').value += 'a';};\n" +
-	                  "b : 'b' {document.getElementById('output').value += 'b';};";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "abab");
+	                  "a : 'a' {process.stdout.write('a');};\n" +
+	                  "b : 'b' {process.stdout.write('b');};";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "abab", false);
 		assertEquals("abab\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -231,7 +231,7 @@ public class TestParserErrors extends BaseTest {
 	                  "expr : 'x'\n" +
 	                  "     | expr expr\n" +
 	                  "     ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "start", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "start", input, false);
 	}
 
 	@Test
@@ -262,7 +262,7 @@ public class TestParserErrors extends BaseTest {
 	                  "expr : primary expr? {} | expr '->' ID;\n" +
 	                  "primary : ID;\n" +
 	                  "ID : [a-z]+;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "start", "x:x");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "start", "x:x", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -276,7 +276,7 @@ public class TestParserErrors extends BaseTest {
 	                  "  ;\n" +
 	                  "DOT : '.' ;\n" +
 	                  "WS : [ \\t\\r\\n]+ -> skip;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "a.");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "a.", false);
 		assertEquals("", found);
 		assertEquals("line 1:1 mismatched input '.' expecting '!'\n", this.stderrDuringParse);
 	}

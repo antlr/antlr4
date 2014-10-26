@@ -1,4 +1,4 @@
-package org.antlr.v4.test.rt.js.firefox;
+package org.antlr.v4.test.rt.js.safari;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -15,7 +15,7 @@ public class TestListeners extends BaseTest {
 	                  "@parser::members {\n" +
 	                  "this.LeafListener = function() {\n" +
 	                  "    this.visitTerminal = function(node) {\n" +
-	                  "    	document.getElementById('output').value += node.symbol.text + '\\n';\n" +
+	                  "    	console.log(node.symbol.text);\n" +
 	                  "    };\n" +
 	                  "    return this;\n" +
 	                  "};\n" +
@@ -26,7 +26,7 @@ public class TestListeners extends BaseTest {
 	                  "\n" +
 	                  "s\n" +
 	                  "@after {\n" +
-	                  "document.getElementById('output').value += $ctx.r.toStringTree(null, this); + '\\n';\n" +
+	                  "document.getElementById('output').value += $ctx.r.toStringTree(null, this) + '\\n';\n" +
 	                  "var walker = new antlr4.tree.ParseTreeWalker();\n" +
 	                  "walker.walk(new this.LeafListener(), $ctx.r);\n" +
 	                  "}\n" +
@@ -39,7 +39,7 @@ public class TestListeners extends BaseTest {
 	                  "INT : [0-9]+ ;\n" +
 	                  "ID  : [a-z]+ ;\n" +
 	                  "WS : [ \\t\\n]+ -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "1 2");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "1 2", false);
 		assertEquals("(a 1 2)\n1\n2\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -59,18 +59,18 @@ public class TestListeners extends BaseTest {
 	                  "        } else {\n" +
 	                  "            str = ctx.ID().symbol.toString();\n" +
 	                  "        }\n" +
-	                  "    	document.getElementById('output').value += str + '\\n';\n" +
+	                  "    	console.log(str);\n" +
 	                  "    };\n" +
 	                  "    return this;\n" +
 	                  "};\n" +
-	                  "this.LeafListener.prototype = Object.create(TListener.prototype);\\n\" +\n" +
-	                  "this.LeafListener.prototype.constructor = this.LeafListener;\\n\" +\n" +
+	                  "this.LeafListener.prototype = Object.create(TListener.prototype);\n" +
+	                  "this.LeafListener.prototype.constructor = this.LeafListener;\n" +
 	                  "\n" +
 	                  "}\n" +
 	                  "\n" +
 	                  "s\n" +
 	                  "@after {\n" +
-	                  "document.getElementById('output').value += $ctx.r.toStringTree(null, this); + '\\n';\n" +
+	                  "document.getElementById('output').value += $ctx.r.toStringTree(null, this) + '\\n';\n" +
 	                  "var walker = new antlr4.tree.ParseTreeWalker();\n" +
 	                  "walker.walk(new this.LeafListener(), $ctx.r);\n" +
 	                  "}\n" +
@@ -83,7 +83,7 @@ public class TestListeners extends BaseTest {
 	                  "INT : [0-9]+ ;\n" +
 	                  "ID  : [a-z]+ ;\n" +
 	                  "WS : [ \\t\\n]+ -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
 	@Test
@@ -115,18 +115,18 @@ public class TestListeners extends BaseTest {
 	                  "        } else {\n" +
 	                  "            str = ctx.b(0).start.text;\n" +
 	                  "        }\n" +
-	                  "    	document.getElementById('output').value += str + '\\n';\n" +
+	                  "    	console.log(str);\n" +
 	                  "    };\n" +
 	                  "    return this;\n" +
 	                  "};\n" +
-	                  "this.LeafListener.prototype = Object.create(TListener.prototype);\\n\" +\n" +
-	                  "this.LeafListener.prototype.constructor = this.LeafListener;\\n\" +\n" +
+	                  "this.LeafListener.prototype = Object.create(TListener.prototype);\n" +
+	                  "this.LeafListener.prototype.constructor = this.LeafListener;\n" +
 	                  "\n" +
 	                  "}\n" +
 	                  "\n" +
 	                  "s\n" +
 	                  "@after {\n" +
-	                  "document.getElementById('output').value += $ctx.r.toStringTree(null, this); + '\\n';\n" +
+	                  "document.getElementById('output').value += $ctx.r.toStringTree(null, this) + '\\n';\n" +
 	                  "var walker = new antlr4.tree.ParseTreeWalker();\n" +
 	                  "walker.walk(new this.LeafListener(), $ctx.r);\n" +
 	                  "}\n" +
@@ -140,7 +140,7 @@ public class TestListeners extends BaseTest {
 	                  "INT : [0-9]+ ;\n" +
 	                  "ID  : [a-z]+ ;\n" +
 	                  "WS : [ \\t\\n]+ -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
 	@Test
@@ -173,7 +173,7 @@ public class TestListeners extends BaseTest {
 	                  "        } else {\n" +
 	                  "            str = ctx.INT().symbol.text;\n" +
 	                  "        }\n" +
-	                  "    	document.getElementById('output').value += str + '\\n';\n" +
+	                  "    	console.log(str);\n" +
 	                  "    };\n" +
 	                  "    return this;\n" +
 	                  "};\n" +
@@ -184,7 +184,7 @@ public class TestListeners extends BaseTest {
 	                  "\n" +
 	                  "s\n" +
 	                  "@after {\n" +
-	                  "document.getElementById('output').value += $ctx.r.toStringTree(null, this); + '\\n';\n" +
+	                  "document.getElementById('output').value += $ctx.r.toStringTree(null, this) + '\\n';\n" +
 	                  "var walker = new antlr4.tree.ParseTreeWalker();\n" +
 	                  "walker.walk(new this.LeafListener(), $ctx.r);\n" +
 	                  "}\n" +
@@ -198,7 +198,7 @@ public class TestListeners extends BaseTest {
 	                  "INT : [0-9]+ ;\n" +
 	                  "ID  : [a-z]+ ;\n" +
 	                  "WS : [ \\t\\n]+ -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "1+2*3");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "1+2*3", false);
 		assertEquals("(e (e 1) + (e (e 2) * (e 3)))\n1\n2\n3\n2 3 2\n1 2 1\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -214,11 +214,11 @@ public class TestListeners extends BaseTest {
 	                  "this.LeafListener = function() {\n" +
 	                  "    this.exitCall = function(ctx) {\n" +
 	                  "    	var str = ctx.e().start.text + ' ' + ctx.eList();\n" +
-	                  "    	document.getElementById('output').value += str + '\\n';\n" +
+	                  "    	console.log(str);\n" +
 	                  "    };\n" +
 	                  "    this.exitInt = function(ctx) {\n" +
 	                  "        var str = ctx.INT().symbol.text;\n" +
-	                  "        document.getElementById('output').value += str + '\\n';\n" +
+	                  "        console.log(str);\n" +
 	                  "    };\n" +
 	                  "    return this;\n" +
 	                  "};\n" +
@@ -229,7 +229,7 @@ public class TestListeners extends BaseTest {
 	                  "\n" +
 	                  "s\n" +
 	                  "@after {\n" +
-	                  "document.getElementById('output').value += $ctx.r.toStringTree(null, this); + '\\n';\n" +
+	                  "document.getElementById('output').value += $ctx.r.toStringTree(null, this) + '\\n';\n" +
 	                  "var walker = new antlr4.tree.ParseTreeWalker();\n" +
 	                  "walker.walk(new this.LeafListener(), $ctx.r);\n" +
 	                  "}\n" +
@@ -243,7 +243,7 @@ public class TestListeners extends BaseTest {
 	                  "INT : [0-9]+ ;\n" +
 	                  "ID  : [a-z]+ ;\n" +
 	                  "WS : [ \\t\\n]+ -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "1(2,3)");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "1(2,3)", false);
 		assertEquals("(e (e 1) ( (eList (e 2) , (e 3)) ))\n1\n2\n3\n1 [13 6]\n", found);
 		assertNull(this.stderrDuringParse);
 	}

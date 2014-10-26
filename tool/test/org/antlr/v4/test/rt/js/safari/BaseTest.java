@@ -80,6 +80,7 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
+import org.antlr.v4.test.tool.ErrorQueue;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.DefaultToolListener;
@@ -87,13 +88,14 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
-import org.antlr.v4.xtest.ErrorQueue;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -129,6 +131,21 @@ public abstract class BaseTest {
 
 	};
 
+	static WebDriver driver;
+	
+	@BeforeClass
+	public static void initWebDriver() {
+		// System.setProperty("webdriver.safari.driver", "/Users/ericvergnaud/Desktop/TestSafari/org/openqa/selenium/safari/SafariDriver.safariextz");
+		System.setProperty("webdriver.safari.noinstall", "true");
+		driver = new SafariDriver();
+		
+	}
+	
+	@AfterClass
+	public static void closeWebDriver() {
+		driver.quit();
+		driver = null;
+	}
 	
     @Before
 	public void setUp() throws Exception {
@@ -295,14 +312,14 @@ public abstract class BaseTest {
 	protected String execLexer(String grammarFileName,
 							   String grammarStr,
 							   String lexerName,
-							   String input) throws Exception
+							   String input, boolean showDFA) throws Exception
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 									  grammarStr,
 									  null,
 									  lexerName,"-no-listener");
 		assertTrue(success);
-		writeLexerTestFile(lexerName);
+		writeLexerTestFile(lexerName, showDFA);
 		String output = execHtmlPage("Test.html", input);
 		if ( stderrDuringParse!=null && stderrDuringParse.length()>0 ) {
 			System.err.println(stderrDuringParse);
@@ -317,7 +334,8 @@ public abstract class BaseTest {
 								String listenerName,
 								String visitorName,
 								String startRuleName,
-								String input) throws Exception
+								String input, 
+								boolean debug) throws Exception
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 														grammarStr,
@@ -382,7 +400,7 @@ public abstract class BaseTest {
 	{
         this.stderrDuringParse = null;
 		if ( parserName==null ) {
-			writeLexerTestFile(lexerName);
+			writeLexerTestFile(lexerName, false);
 		}
 		else {
 			writeParserTestFile(parserName,
@@ -413,22 +431,21 @@ public abstract class BaseTest {
 			handlers.setHandlers(new Handler[] { rh1, rh2, new DefaultHandler() });
 			server.setHandler(handlers);
 			server.start();
-			// System.setProperty("webdriver.safari.driver", "/Users/ericvergnaud/Desktop/TestSafari/org/openqa/selenium/safari/SafariDriver.safariextz");
-			System.setProperty("webdriver.safari.noinstall", "true");
-			WebDriver driver = new SafariDriver();
-			try {
-				driver.get("http://localhost:8080/" + fileName);
-				driver.findElement(new ById("input")).sendKeys(input);
-				driver.findElement(new ById("submit")).click();
-				String errors = driver.findElement(new ById("errors")).getText();
-				if(errors!=null && errors.length()>0) {
-					this.stderrDuringParse = errors;
-					System.err.print(errors);
-				}
-				return driver.findElement(new ById("output")).getAttribute("value");
-			} finally {
-				driver.close();
+			Thread.sleep(500);
+			driver.get("http://localhost:8080/" + fileName);
+			driver.findElement(new ById("input")).clear();
+			driver.findElement(new ById("output")).clear();
+			driver.findElement(new ById("errors")).clear();
+			driver.navigate().refresh();
+			driver.findElement(new ById("input")).sendKeys(input);
+			driver.findElement(new ById("load")).click();
+			driver.findElement(new ById("submit")).click();
+			String errors = driver.findElement(new ById("errors")).getText();
+			if(errors!=null && errors.length()>0) {
+				this.stderrDuringParse = errors;
+				System.err.print(errors);
 			}
+			return driver.findElement(new ById("output")).getAttribute("value");
 		}
 		catch (Exception e) {
 			System.err.println("can't exec recognizer");
@@ -773,42 +790,67 @@ public abstract class BaseTest {
 	    "	</head>\r\n" +
 	    "	<body>\r\n" +
 	    "		<textarea id='input'></textarea><br>\r\n" +
+	    "		<button id='load' type='button' onclick='loadParser()'>Load</button><br>\r\n" +
 	    "		<button id='submit' type='button' onclick='test()'>Test</button><br>\r\n" +
 	    "		<textarea id='output'></textarea><br>\r\n" +
 	    "		<textarea id='errors'></textarea><br>\r\n" +
-	    "		<script>loadParser();</script>\r\n" +	
 	    "	</body>\r\n" +
 	    "</html>\r\n";
 		writeFile(tmpdir, "Test.html", html);	
 	};
 	
 	
-	protected void writeLexerTestFile(String lexerName) {
-		ST outputFileST = new ST(
-			"var antlr4 = require('antlr4');\n" +
-			"var <lexerName> = require('./<lexerName>');\n" +
-			"\n" +
-			"function main(argv) {\n" +
-			"    var input = new antlr4.FileStream(argv[2]);\n" +
-			"    var lexer = new <lexerName>.<lexerName>(input);\n" +
-		    "    var stream = new antlr4.CommonTokenStream(lexer);\n" +
-			"    stream.fill();\n" +
-		    "    for(var i=0; i\\<stream.tokens.length; i++) {\n" +
-		    "		console.log(stream.tokens[i].toString());\n" +
-			"    }\n" +
-			"}\n" +
-			"\n" +
-			"main(process.argv);\n" +
-			"\n");
-		outputFileST.add("lexerName", lexerName);
-		writeFile(tmpdir, "Test.js", outputFileST.render());
+	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
+		String html = "<!DOCTYPE html>\r\n" +
+		"<html>\r\n" +
+	    "	<head>\r\n" +
+        "		<script src='lib/require.js'></script>\r\n" +
+        "		<script>\r\n" +
+        "			antlr4 = null;\r\n" +
+        "			" + lexerName + " = null;\r\n" +
+ 		"\r\n" +			
+		"			loadLexer = function() {\r\n" +			
+        "				try {\r\n" +
+        "					antlr4 = require('antlr4/index');\r\n" +
+		"					" + lexerName + " = require('./parser/" + lexerName + "');\n" +
+        "				} catch (ex) {\r\n" +
+        "					document.getElementById('errors').value = ex.toString();\r\n" +
+        "				}\r\n" +
+		"			}\r\n" +
+		"\r\n" +			
+		"			test = function() {\r\n" +
+		"				document.getElementById('output').value = ''\r\n" +
+		"				var input = document.getElementById('input').value;\r\n" +
+		"    			var chars = new antlr4.InputStream(input);\n" +
+		"    			var lexer = new " + lexerName + "." + lexerName + "(chars);\n" +
+	    "    			var stream = new antlr4.CommonTokenStream(lexer);\n" +
+		"    			stream.fill();\n" +
+	    "    			for(var i=0; i<stream.tokens.length; i++) {\n" +
+	    "					document.getElementById('output').value += stream.tokens[i].toString() + '\\r\\n';\n" +
+		"    			}\n" +
+		(showDFA ? 
+		"    			document.getElementById('output').value +=(lexer._interp.decisionToDFA[antlr4.Lexer.DEFAULT_MODE].toLexerString());\n"
+						:"") +
+		"			};\r\n" +
+		"\r\n" +			
+        "		</script>\r\n" +
+	    "	</head>\r\n" +
+	    "	<body>\r\n" +
+	    "		<textarea id='input'></textarea><br>\r\n" +
+	    "		<button id='load' type='button' onclick='loadLexer()'>Load</button><br>\r\n" +
+	    "		<button id='submit' type='button' onclick='test()'>Test</button><br>\r\n" +
+	    "		<textarea id='output'></textarea><br>\r\n" +
+	    "		<textarea id='errors'></textarea><br>\r\n" +
+	    "	</body>\r\n" +
+	    "</html>\r\n";
+		writeFile(tmpdir, "Test.html", html);	
 	}
 
 	public void writeRecognizer(String parserName, String lexerName,
 								String listenerName, String visitorName,
-								String parserStartRuleName) {
+								String parserStartRuleName, boolean debug) {
 		if ( parserName==null ) {
-			writeLexerTestFile(lexerName);
+			writeLexerTestFile(lexerName, debug);
 		}
 		else {
 			writeParserTestFile(parserName,

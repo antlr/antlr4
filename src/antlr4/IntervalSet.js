@@ -160,13 +160,14 @@ IntervalSet.prototype.remove = function(v) {
 	}
 };
 
-IntervalSet.prototype.toString = function(tokenNames, elemsAreChar) {
-	tokenNames = tokenNames || null;
+IntervalSet.prototype.toString = function(literalNames, symbolicNames, elemsAreChar) {
+	literalNames = literalNames || null;
+	symbolicNames = symbolicNames || null;
 	elemsAreChar = elemsAreChar || false;
 	if (this.intervals === null) {
 		return "{}";
-	} else if(tokenNames!==null) {
-		return this.toTokenString(tokenNames);
+	} else if(literalNames!==null || symbolicNames!==null) {
+		return this.toTokenString(literalNames, symbolicNames);
 	} else if(elemsAreChar) {
 		return this.toCharString();
 	} else {
@@ -218,12 +219,12 @@ IntervalSet.prototype.toIndexString = function() {
 };
 
 
-IntervalSet.prototype.toTokenString = function(tokenNames, elemsAreChar) {
+IntervalSet.prototype.toTokenString = function(literalNames, symbolicNames) {
 	var names = [];
 	for (var i = 0; i < this.intervals.length; i++) {
 		var v = this.intervals[i];
 		for (var j = v.start; j < v.stop; j++) {
-			names.push(this.elementName(tokenNames, j));
+			names.push(this.elementName(literalNames, symbolicNames, j));
 		}
 	}
 	if (names.length > 1) {
@@ -233,13 +234,13 @@ IntervalSet.prototype.toTokenString = function(tokenNames, elemsAreChar) {
 	}
 };
 
-IntervalSet.prototype.elementName = function(tokenNames, a) {
+IntervalSet.prototype.elementName = function(literalNames, symbolicNames, a) {
 	if (a === Token.EOF) {
 		return "<EOF>";
 	} else if (a === Token.EPSILON) {
 		return "<EPSILON>";
 	} else {
-		return tokenNames[a];
+		return literalNames[a] || symbolicNames[a];
 	}
 };
 

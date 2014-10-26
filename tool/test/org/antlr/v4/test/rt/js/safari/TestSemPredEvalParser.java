@@ -1,4 +1,4 @@
-package org.antlr.v4.test.rt.js.firefox;
+package org.antlr.v4.test.rt.js.safari;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -15,7 +15,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x", true);
 		assertEquals("", found);
 		assertEquals("line 1:0 no viable alternative at input 'x'\n", this.stderrDuringParse);
 	}
@@ -30,7 +30,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "3 4 x");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "3 4 x", true);
 		assertEquals("alt 2\nalt 2\n", found);
 		assertEquals("line 1:4 no viable alternative at input 'x'\n", this.stderrDuringParse);
 	}
@@ -42,7 +42,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "e[int _p]\n" +
 	                  "    :   ( 'a' | 'b'+ ) ( {3 >= $_p}? '+' e[4] )*\n" +
 	                  "    ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "start", "a+b+a");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "start", "a+b+a", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -60,7 +60,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x ; y");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x ; y", true);
 		assertEquals("", found);
 		assertEquals("line 1:0 no viable alternative at input 'x'\nline 1:4 no viable alternative at input 'y'\n", this.stderrDuringParse);
 	}
@@ -76,7 +76,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x y 3");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x y 3", true);
 		assertEquals("alt 2\nalt 2\nalt 3\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -93,7 +93,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x y");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x y", false);
 		assertEquals("alt 1\nalt 1\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -109,7 +109,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x; y");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x; y", true);
 		assertEquals("alt 1\nalt 1\n", found);
 		assertEquals("line 1:0 reportAttemptingFullContext d=0 (a), input='x'\nline 1:0 reportAmbiguity d=0 (a): ambigAlts={1, 2}, input='x'\nline 1:3 reportAttemptingFullContext d=0 (a), input='y'\nline 1:3 reportAmbiguity d=0 (a): ambigAlts={1, 2}, input='y'\n", this.stderrDuringParse);
 	}
@@ -126,7 +126,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "34; x; y");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "34; x; y", true);
 		assertEquals("alt 1\nalt 2\nalt 2\n", found);
 		assertEquals("line 1:4 reportAttemptingFullContext d=0 (a), input='x'\nline 1:4 reportAmbiguity d=0 (a): ambigAlts={2, 3}, input='x'\nline 1:7 reportAttemptingFullContext d=0 (a), input='y'\nline 1:7 reportAmbiguity d=0 (a): ambigAlts={2, 3}, input='y'\n", this.stderrDuringParse);
 	}
@@ -141,7 +141,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "y 3 x 4");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "y 3 x 4", true);
 		assertEquals("alt 2\nalt 1\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -156,7 +156,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "y 3 x 4");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "y 3 x 4", false);
 		assertEquals("", found);
 		assertEquals("line 1:0 no viable alternative at input 'y'\n", this.stderrDuringParse);
 	}
@@ -171,7 +171,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x x y");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x x y", true);
 		assertEquals("alt 2\nalt 2\nalt 2\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -190,7 +190,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x 4");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x 4", true);
 		assertEquals("alt 1\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -206,7 +206,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x x y");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x x y", false);
 		assertEquals("alt 1\nalt 1\nalt 1\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -223,7 +223,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x x y");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x x y", true);
 		assertEquals("i=1\nalt 2\ni=2\nalt 1\ni=3\nalt 2\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -240,7 +240,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "a b");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "a b", true);
 		assertEquals("alt 2\nalt 1\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -257,7 +257,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "a b");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "a b", true);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -274,7 +274,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "a;");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "a;", true);
 		assertEquals("alt 2\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -291,7 +291,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "a;");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "a;", true);
 		assertEquals("alt 2\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -301,7 +301,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "@members {\n" +
 	                  "this.pred = function(v) {\n" +
-	                  "	document.getElementById('output').value += 'eval=\" + v.toString() + '\\n';\n" +
+	                  "	console.log(\"eval=\" + v.toString());\n" +
 	                  "	return v;\n" +
 	                  "};\n" +
 	                  "}\n" +
@@ -311,7 +311,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "a!");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "a!", true);
 		assertEquals("eval=true\nparse\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -321,7 +321,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "@members {\n" +
 	                  "this.pred = function(v) {\n" +
-	                  "	document.getElementById('output').value += 'eval=\" + v.toString() + '\\n';\n" +
+	                  "	console.log(\"eval=\" + v.toString());\n" +
 	                  "	return v;\n" +
 	                  "};\n" +
 	                  "}\n" +
@@ -332,7 +332,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "a!");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "a!", true);
 		assertEquals("eval=true\nparse\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -342,7 +342,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "@members {\n" +
 	                  "this.pred = function(v) {\n" +
-	                  "	document.getElementById('output').value += 'eval=\" + v.toString() + '\\n';\n" +
+	                  "	console.log(\"eval=\" + v.toString());\n" +
 	                  "	return v;\n" +
 	                  "};\n" +
 	                  "}\n" +
@@ -352,7 +352,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "a!");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "a!", true);
 		assertEquals("eval=true\nparse\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -366,7 +366,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "    ;\n" +
 	                  "ID : [a-z]+ ;\n" +
 	                  "WS : [ \\t\\n\\r]+ -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "primary", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "primary", input, true);
 	}
 
 	@Test
@@ -390,7 +390,7 @@ public class TestSemPredEvalParser extends BaseTest {
 	                  "content: anything | {false}? .;\n" +
 	                  "anything: ANY_CHAR;\n" +
 	                  "ANY_CHAR: [_a-zA-Z0-9];";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "cppCompilationUnit", "hello");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "cppCompilationUnit", "hello", true);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -398,14 +398,14 @@ public class TestSemPredEvalParser extends BaseTest {
 	String testPredFromAltTestedInLoopBack(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "file_\n" +
-	                  "@after {document.getElementById('output').value += $ctx.toStringTree(null, this); + '\\n';}\n" +
+	                  "@after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';}\n" +
 	                  "  : para para EOF ;\n" +
 	                  "para: paraContent NL NL ;\n" +
 	                  "paraContent : ('s'|'x'|{this._input.LA(2)!=NL}? NL)+ ;\n" +
 	                  "NL : '\\n' ;\n" +
 	                  "s : 's' ;\n" +
 	                  "X : 'x' ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "file_", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "file_", input, true);
 	}
 
 	@Test

@@ -1,4 +1,4 @@
-package org.antlr.v4.test.rt.js.firefox;
+package org.antlr.v4.test.rt.js.node;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -11,7 +11,7 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testDelegatorInvokesDelegateRule() throws Exception {
 		String slave_S = "parser grammar S;\n" +
-	                  "a : B {document.getElementById('output').value += \"S.a\" + '\\n';};";
+	                  "a : B {console.log(\"S.a\");};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave_S);
 
@@ -20,7 +20,7 @@ public class TestCompositeParsers extends BaseTest {
 	                  "s : a ;\n" +
 	                  "B : 'b' ; // defines B from inherited token space\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "b");
+		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "b", false);
 		assertEquals("S.a\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -28,7 +28,7 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testBringInLiteralsFromDelegate() throws Exception {
 		String slave_S = "parser grammar S;\n" +
-	                  "a : '=' 'a' {document.getElementById('output').value += \"S.a\";};";
+	                  "a : '=' 'a' {process.stdout.write(\"S.a\");};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave_S);
 
@@ -36,7 +36,7 @@ public class TestCompositeParsers extends BaseTest {
 	                  "import S;\n" +
 	                  "s : a ;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "=a");
+		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "=a", false);
 		assertEquals("S.a\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -44,16 +44,16 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testDelegatorInvokesDelegateRuleWithArgs() throws Exception {
 		String slave_S = "parser grammar S;\n" +
-	                  "a[int x] returns [int y] : B {document.getElementById('output').value += \"S.a\";;$y=1000;};";
+	                  "a[int x] returns [int y] : B {process.stdout.write(\"S.a\");;$y=1000;};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave_S);
 
 		String grammar = "grammar M;\n" +
 	                  "import S;\n" +
-	                  "s : label=a[3] {document.getElementById('output').value += $label.y + '\\n';} ;\n" +
+	                  "s : label=a[3] {console.log($label.y);} ;\n" +
 	                  "B : 'b' ; // defines B from inherited token space\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "b");
+		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "b", false);
 		assertEquals("S.a1000\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -61,16 +61,16 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testDelegatorInvokesDelegateRuleWithReturnStruct() throws Exception {
 		String slave_S = "parser grammar S;\n" +
-	                  "a : B {document.getElementById('output').value += \"S.a\";};";
+	                  "a : B {process.stdout.write(\"S.a\");};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave_S);
 
 		String grammar = "grammar M;\n" +
 	                  "import S;\n" +
-	                  "s : a {document.getElementById('output').value += $a.text;} ;\n" +
+	                  "s : a {process.stdout.write($a.text);} ;\n" +
 	                  "B : 'b' ; // defines B from inherited token space\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "b");
+		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "b", false);
 		assertEquals("S.ab\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -79,7 +79,7 @@ public class TestCompositeParsers extends BaseTest {
 	public void testDelegatorAccessesDelegateMembers() throws Exception {
 		String slave_S = "parser grammar S;\n" +
 	                  "@members {\n" +
-	                  "this.foo = function() {document.getElementById('output').value += 'foo\\n'};\n" +
+	                  "this.foo = function() {console.log('foo');};\n" +
 	                  "}\n" +
 	                  "a : B;";
 		mkdir(tmpdir);
@@ -89,7 +89,7 @@ public class TestCompositeParsers extends BaseTest {
 	                  "import S;\n" +
 	                  "s : 'b'{this.foo();}; // gS is import pointer\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "b");
+		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "b", false);
 		assertEquals("foo\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -97,13 +97,13 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testDelegatorInvokesFirstVersionOfDelegateRule() throws Exception {
 		String slave_S = "parser grammar S;\n" +
-	                  "a : B {document.getElementById('output').value += \"S.a\" + '\\n';};\n" +
+	                  "a : B {console.log(\"S.a\");};\n" +
 	                  "b : B;";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave_S);
 
 		String slave_T = "parser grammar T;\n" +
-	                  "a : B {document.getElementById('output').value += \"T.a\" + '\\n';};";
+	                  "a : B {console.log(\"T.a\");};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "T.g4", slave_T);
 
@@ -112,7 +112,7 @@ public class TestCompositeParsers extends BaseTest {
 	                  "s : a ;\n" +
 	                  "B : 'b' ; // defines B from inherited token space\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "b");
+		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "b", false);
 		assertEquals("S.a\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -121,13 +121,13 @@ public class TestCompositeParsers extends BaseTest {
 	public void testDelegatesSeeSameTokenType() throws Exception {
 		String slave_S = "parser grammar S;\n" +
 	                  "tokens { A, B, C }\n" +
-	                  "x : A {document.getElementById('output').value += \"S.x\" + '\\n';};";
+	                  "x : A {console.log(\"S.x\");};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave_S);
 
 		String slave_T = "parser grammar S;\n" +
 	                  "tokens { C, B, A } // reverse order\n" +
-	                  "y : A {document.getElementById('output').value += \"T.y\" + '\\n';};";
+	                  "y : A {console.log(\"T.y\");};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "T.g4", slave_T);
 
@@ -159,7 +159,7 @@ public class TestCompositeParsers extends BaseTest {
 		assertEquals(expectedTypeToTokenList, realElements(g.typeToTokenList).toString());
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 
-		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "aa");
+		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "aa", false);
 		assertEquals("S.x\nT.y\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -168,7 +168,7 @@ public class TestCompositeParsers extends BaseTest {
 	public void testCombinedImportsCombined() throws Exception {
 		String slave_S = "parser grammar S;\n" +
 	                  "tokens { A, B, C }\n" +
-	                  "x : 'x' INT {document.getElementById('output').value += \"S.x\" + '\\n';};\n" +
+	                  "x : 'x' INT {console.log(\"S.x\");};\n" +
 	                  "INT : '0'..'9'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
 		mkdir(tmpdir);
@@ -182,7 +182,7 @@ public class TestCompositeParsers extends BaseTest {
 		new Grammar(tmpdir+"/M.g4", grammar, equeue);
 		assertEquals("unexpected errors: " + equeue, 0, equeue.errors.size());
 
-		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "x 34 9");
+		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "x 34 9", false);
 		assertEquals("S.x\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -190,7 +190,7 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testDelegatorRuleOverridesDelegate() throws Exception {
 		String slave_S = "parser grammar S;\n" +
-	                  "a : b {document.getElementById('output').value += \"S.a\";};\n" +
+	                  "a : b {process.stdout.write(\"S.a\");};\n" +
 	                  "b : B ;";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave_S);
@@ -199,7 +199,7 @@ public class TestCompositeParsers extends BaseTest {
 	                  "import S;\n" +
 	                  "b : 'b'|'c';\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "a", "c");
+		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "a", "c", false);
 		assertEquals("S.a\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -210,7 +210,7 @@ public class TestCompositeParsers extends BaseTest {
 	                  "type_ : 'int' ;\n" +
 	                  "decl : type_ ID ';'\n" +
 	                  "	| type_ ID init ';' {\n" +
-	                  "		document.getElementById('output').value += \"Decl: \" + $text;\n" +
+	                  "		process.stdout.write(\"Decl: \" + $text);\n" +
 	                  "	};\n" +
 	                  "init : '=' INT;";
 		mkdir(tmpdir);
@@ -223,7 +223,7 @@ public class TestCompositeParsers extends BaseTest {
 	                  "ID  : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip;";
-		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "prog", "float x = 3;");
+		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "prog", "float x = 3;", false);
 		assertEquals("Decl: floatx=3;\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -231,7 +231,7 @@ public class TestCompositeParsers extends BaseTest {
 	@Test
 	public void testDelegatorRuleOverridesDelegates() throws Exception {
 		String slave_S = "parser grammar S;\n" +
-	                  "a : b {document.getElementById('output').value += \"S.a\" + '\\n';};\n" +
+	                  "a : b {console.log(\"S.a\");};\n" +
 	                  "b : 'b' ;\n" +
 	                  "   ";
 		mkdir(tmpdir);
@@ -239,15 +239,15 @@ public class TestCompositeParsers extends BaseTest {
 
 		String slave_T = "parser grammar S;\n" +
 	                  "tokens { A }\n" +
-	                  "b : 'b' {document.getElementById('output').value += \"T.b\" + '\\n';};";
+	                  "b : 'b' {console.log(\"T.b\");};";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "T.g4", slave_T);
 
 		String grammar = "grammar M;\n" +
 	                  "import S, T;\n" +
-	                  "b : 'b'|'c' {document.getElementById('output').value += \"M.b\" + '\\n';}|B|A;\n" +
+	                  "b : 'b'|'c' {console.log(\"M.b\");}|B|A;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "a", "c");
+		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "a", "c", false);
 		assertEquals("M.b\nS.a\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -261,10 +261,10 @@ public class TestCompositeParsers extends BaseTest {
 
 		String grammar = "grammar M;\n" +
 	                  "import S;\n" +
-	                  "a : A {document.getElementById('output').value += \"M.a: \"+$A + '\\n';};\n" +
-	                  "A : 'abc' {document.getElementById('output').value += \"M.A\" + '\\n';};\n" +
+	                  "a : A {console.log(\"M.a: \"+$A);};\n" +
+	                  "A : 'abc' {console.log(\"M.A\");};\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "a", "abc");
+		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "a", "abc", false);
 		assertEquals("M.A\nM.a: [@0,0:2='abc',<1>,1:0]\n", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -281,7 +281,7 @@ public class TestCompositeParsers extends BaseTest {
 	                  "s : a;\n" +
 	                  "B : 'b';\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "b");
+		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "b", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -299,7 +299,7 @@ public class TestCompositeParsers extends BaseTest {
 	                  "s : a;\n" +
 	                  "B : 'b';\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "b");
+		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "s", "b", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 	}
@@ -319,7 +319,7 @@ public class TestCompositeParsers extends BaseTest {
 	                  "import S;\n" +
 	                  "program : 'test' 'test';\n" +
 	                  "WS : (UNICODE_CLASS_Zs)+ -> skip;";
-		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "program", "test test");
+		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "program", "test test", false);
 		assertEquals("", found);
 		assertNull(this.stderrDuringParse);
 	}

@@ -1,4 +1,4 @@
-package org.antlr.v4.test.rt.js.firefox;
+package org.antlr.v4.test.rt.js.safari;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -7,13 +7,13 @@ public class TestLeftRecursion extends BaseTest {
 
 	String testSimple(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this); + '\\n';} : a ;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : a ;\n" +
 	                  "a : a ID\n" +
 	                  "  | ID\n" +
 	                  "  ;\n" +
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
 	@Test
@@ -39,12 +39,12 @@ public class TestLeftRecursion extends BaseTest {
 
 	String testDirectCallToLeftRecursiveRule(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "a @after {document.getElementById('output').value += $ctx.toStringTree(null, this); + '\\n';} : a ID\n" +
+	                  "a @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : a ID\n" +
 	                  "  | ID\n" +
 	                  "  ;\n" +
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", input, false);
 	}
 
 	@Test
@@ -71,20 +71,20 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testSemPred() throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this); + '\\n';} : a ;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : a ;\n" +
 	                  "a : a {true}? ID\n" +
 	                  "  | ID\n" +
 	                  "  ;\n" +
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x y z");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x y z", false);
 		assertEquals("(s (a (a (a x) y) z))\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	String testTernaryExpr(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this); + '\\n';} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n" +
 	                  "e : e '*' e\n" +
 	                  "  | e '+' e\n" +
 	                  "  |<assoc=right> e '?' e ':' e\n" +
@@ -93,7 +93,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  "  ;\n" +
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
 	@Test
@@ -161,7 +161,7 @@ public class TestLeftRecursion extends BaseTest {
 
 	String testExpressions(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this); + '\\n';} : e EOF ; // must indicate EOF can follow\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e EOF ; // must indicate EOF can follow\n" +
 	                  "e : e '.' ID\n" +
 	                  "  | e '.' 'this'\n" +
 	                  "  | '-' e\n" +
@@ -173,7 +173,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
 	@Test
@@ -227,7 +227,7 @@ public class TestLeftRecursion extends BaseTest {
 
 	String testJavaExpressions(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this); + '\\n';} : e EOF ; // must indicate EOF can follow\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e EOF ; // must indicate EOF can follow\n" +
 	                  "expressionList\n" +
 	                  "    :   e (',' e)*\n" +
 	                  "    ;\n" +
@@ -282,7 +282,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  "ID : ('a'..'z'|'A'..'Z'|'_'|'$')+;\n" +
 	                  "INT : '0'..'9'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
 	@Test
@@ -371,7 +371,7 @@ public class TestLeftRecursion extends BaseTest {
 
 	String testDeclarations(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this); + '\\n';} : declarator EOF ; // must indicate EOF can follow\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : declarator EOF ; // must indicate EOF can follow\n" +
 	                  "declarator\n" +
 	                  "        : declarator '[' e ']'\n" +
 	                  "        | declarator '[' ']'\n" +
@@ -384,7 +384,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
 	@Test
@@ -468,7 +468,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  "  ;\n" +
 	                  "INT : '0'..'9'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
 	@Test
@@ -501,14 +501,14 @@ public class TestLeftRecursion extends BaseTest {
 
 	String testLabelsOnOpSubrule(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this); + '\\n';} : e;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e;\n" +
 	                  "e : a=e op=('*'|'/') b=e  {}\n" +
 	                  "  | INT {}\n" +
 	                  "  | '(' x=e ')' {}\n" +
 	                  "  ;\n" +
 	                  "INT : '0'..'9'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
 	@Test
@@ -547,7 +547,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
 	@Test
@@ -595,7 +595,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  "INC : '++' ;\n" +
 	                  "DEC : '--' ;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
 	@Test
@@ -637,7 +637,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "INT : '0'..'9'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
 	@Test
@@ -683,7 +683,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  "INT :   [0-9]+ ;         // match integers\n" +
 	                  "NEWLINE:'\\r'? '\\n' ;     // return newlines to parser (is end-statement signal)\n" +
 	                  "WS  :   [ \\t]+ -> skip ; // toss out whitespace";
-		return execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "ExprListener", "ExprVisitor", "prog", input);
+		return execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "ExprListener", "ExprVisitor", "prog", input, false);
 	}
 
 	@Test
@@ -771,7 +771,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  "DQ_STRING       : '\\\"' ('\\\\\"' | ~'\\\"')* '\\\"';\n" +
 	                  "WS              : [ \\t\\n\\r]+ -> skip ;\n" +
 	                  "COMMENTS        : ('/*' .*? '*/' | '//' ~'\\n'* '\\n' ) -> skip;";
-		return execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "ExprListener", "ExprVisitor", "prog", input);
+		return execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "ExprListener", "ExprVisitor", "prog", input, false);
 	}
 
 	@Test
@@ -792,25 +792,25 @@ public class TestLeftRecursion extends BaseTest {
 	public void testPrecedenceFilterConsidersContext() throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "prog \n" +
-	                  "@after {document.getElementById('output').value += $ctx.toStringTree(null, this); + '\\n';}\n" +
+	                  "@after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';}\n" +
 	                  ": statement* EOF {};\n" +
 	                  "statement: letterA | statement letterA 'b' ;\n" +
 	                  "letterA: 'a';";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "prog", "aa");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "prog", "aa", false);
 		assertEquals("(prog (statement (letterA a)) (statement (letterA a)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	String testMultipleActions(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this); + '\\n';} : e ;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e ;\n" +
 	                  "e : a=e op=('*'|'/') b=e  {}{}\n" +
 	                  "  | INT {}{}\n" +
 	                  "  | '(' x=e ')' {}{}\n" +
 	                  "  ;\n" +
 	                  "INT : '0'..'9'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
 	@Test
@@ -836,7 +836,7 @@ public class TestLeftRecursion extends BaseTest {
 
 	String testMultipleActionsPredicatesOptions(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this); + '\\n';} : e ;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e ;\n" +
 	                  "e : a=e op=('*'|'/') b=e  {}{true}?\n" +
 	                  "  | a=e op=('+'|'-') b=e  {}<p=3>{true}?<fail='Message'>\n" +
 	                  "  | INT {}{}\n" +
@@ -844,7 +844,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  "  ;\n" +
 	                  "INT : '0'..'9'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
 	@Test
@@ -871,20 +871,20 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testSemPredFailOption() throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this); + '\\n';} : a ;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : a ;\n" +
 	                  "a : a ID {false}?<fail='custom message'>\n" +
 	                  "  | ID\n" +
 	                  "  ;\n" +
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x y z");
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "x y z", false);
 		assertEquals("(s (a (a x) y z))\n", found);
 		assertEquals("line 1:4 rule a custom message\n", this.stderrDuringParse);
 	}
 
 	String testTernaryExprExplicitAssociativity(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this); + '\\n';} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n" +
 	                  "e :<assoc=right> e '*' e\n" +
 	                  "  |<assoc=right> e '+' e\n" +
 	                  "  |<assoc=right> e '?' e ':' e\n" +
@@ -893,7 +893,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  "  ;\n" +
 	                  "ID : 'a'..'z'+ ;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
 	@Test
@@ -961,7 +961,7 @@ public class TestLeftRecursion extends BaseTest {
 
 	String testReturnValueAndActionsList1(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this); + '\\n';} : expr EOF;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : expr EOF;\n" +
 	                  "expr:\n" +
 	                  "    a=expr '*' a=expr #Factor\n" +
 	                  "    | b+=expr (',' b+=expr)* '>>' c=expr #Send\n" +
@@ -973,7 +973,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  ";\n" +
 	                  "\n" +
 	                  "WS : [ \\t\\n]+ -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
 	@Test
@@ -1006,7 +1006,7 @@ public class TestLeftRecursion extends BaseTest {
 
 	String testReturnValueAndActionsList2(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this); + '\\n';} : expr EOF;\n" +
+	                  "s @after {document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';} : expr EOF;\n" +
 	                  "expr:\n" +
 	                  "    a=expr '*' a=expr #Factor\n" +
 	                  "    | b+=expr ',' b+=expr #Comma\n" +
@@ -1017,7 +1017,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  "      ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*\n" +
 	                  ";\n" +
 	                  "WS : [ \\t\\n]+ -> skip ;";
-		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input);
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
 	@Test

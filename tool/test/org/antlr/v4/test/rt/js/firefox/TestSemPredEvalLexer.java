@@ -81,8 +81,8 @@ public class TestSemPredEvalLexer extends BaseTest {
 	public void testIndent() throws Exception {
 		String grammar = "lexer grammar L;\n" +
 	                  "ID : [a-z]+  ;\n" +
-	                  "INDENT : [ \\t]+ { this._tokenStartColumn===0 }? \\n\" +\n" +
-	                  "         { document.getElementById('output').value += \"INDENT\" + '\\n'; }  ;\"+\n" +
+	                  "INDENT : [ \\t]+ { this._tokenStartColumn===0 }?\n" +
+	                  "         { document.getElementById('output').value += \"INDENT\" + '\\n'; }  ;\n" +
 	                  "NL : '\\n';\n" +
 	                  "WS : [ \\t]+ ;";
 		String found = execLexer("L.g4", grammar, "L", "abc\n  def  \n");
@@ -130,7 +130,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 	public void testPredicatedKeywords() throws Exception {
 		String grammar = "lexer grammar L;\n" +
 	                  "ENUM : [a-z]+ { this.text===\"enum\" }? { document.getElementById('output').value += \"enum!\" + '\\n'; } ;\n" +
-	                  "ID   : [a-z]+ { document.getElementById('output').value += \"ID\" + this.text + '\\n'; } ;\n" +
+	                  "ID   : [a-z]+ { document.getElementById('output').value += \"ID \" + this.text + '\\n'; } ;\n" +
 	                  "WS   : [ \\n] -> skip ;";
 		String found = execLexer("L.g4", grammar, "L", "enum enu a");
 		assertEquals("enum!\n" +

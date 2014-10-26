@@ -170,6 +170,12 @@ LexerATNSimulator.prototype.execATN = function(input, ds0) {
 	if (this.debug) {
 		console.log("start state closure=" + ds0.configs);
 	}
+	if (ds0.isAcceptState) {
+		// allow zero-length tokens
+		this.captureSimState(this.prevAccept, input, ds0);
+		// adjust index since the current input character was not yet consumed
+		this.prevAccept.index--;
+	}
 	var t = input.LA(1);
 	var s = ds0; // s is current/from DFA state
 
@@ -319,8 +325,7 @@ LexerATNSimulator.prototype.getReachableConfigSet = function(input, closure,
 				if (this.closure(input, config, reach,
 						currentAltReachedAcceptState, true, treatEofAsEpsilon)) {
 					// any remaining configs for this alt have a lower priority
-					// than
-					// the one that just reached an accept state.
+					// than the one that just reached an accept state.
 					skipAlt = cfg.alt;
 				}
 			}

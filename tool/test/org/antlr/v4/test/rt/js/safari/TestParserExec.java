@@ -1,84 +1,443 @@
-/*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 package org.antlr.v4.test.rt.js.safari;
 
 import org.junit.Test;
-
 import static org.junit.Assert.*;
 
-/** Test parser execution.
- *
- *  For the non-greedy stuff, the rule is that .* or any other non-greedy loop
- *  (any + or * loop that has an alternative with '.' in it is automatically
- *  non-greedy) never sees past the end of the rule containing that loop.
- *  There is no automatic way to detect when the exit branch of a non-greedy
- *  loop has seen enough input to determine how much the loop should consume
- *  yet still allow matching the entire input. Of course, this is extremely
- *  inefficient, particularly for things like
- *
- *     block : '{' (block|.)* '}' ;
- *
- *  that need only see one symbol to know when it hits a '}'. So, I
- *  came up with a practical solution.  During prediction, the ATN
- *  simulator never fall off the end of a rule to compute the global
- *  FOLLOW. Instead, we terminate the loop, choosing the exit branch.
- *  Otherwise, we predict to reenter the loop.  For example, input
- *  "{ foo }" will allow the loop to match foo, but that's it. During
- *  prediction, the ATN simulator will see that '}' reaches the end of a
- *  rule that contains a non-greedy loop and stop prediction. It will choose
- *  the exit branch of the inner loop. So, the way in which you construct
- *  the rule containing a non-greedy loop dictates how far it will scan ahead.
- *  Include everything after the non-greedy loop that you know it must scan
- *  in order to properly make a prediction decision. these beasts are tricky,
- *  so be careful. don't liberally sprinkle them around your code.
- *
- *  To simulate filter mode, use ( .* (pattern1|pattern2|...) )*
- *
- *  Nongreedy loops match as much input as possible while still allowing
- *  the remaining input to match.
- */
 public class TestParserExec extends BaseTest {
 
-	@Test public void testBasic() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"a : ID INT {" +
-			"document.getElementById('output').value += $text + '\\n';" +
-			"} ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') -> skip ;\n";
-
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "abc 34");
-		assertEquals("abc34\n", found);
+	@Test
+	public void testLabels() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "a : b1=b b2+=b* b3+=';' ;\n" +
+	                  "b : id_=ID val+=INT*;\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "INT : '0'..'9'+;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "abc 34;", false);
+		assertEquals("", found);
+		assertNull(this.stderrDuringParse);
 	}
+
+	@Test
+	public void testListLabelsOnSet() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "a : b b* ';' ;\n" +
+	                  "b : ID val+=(INT | FLOAT)*;\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "INT : '0'..'9'+;\n" +
+	                  "FLOAT : [0-9]+ '.' [0-9]+;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "abc 34;", false);
+		assertEquals("", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testAorB() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "a : ID {\n" +
+	                  "document.getElementById('output').value += \"alt 1\" + '\\n';\n" +
+	                  "} | INT {\n" +
+	                  "document.getElementById('output').value += \"alt 2\" + '\\n';\n" +
+	                  "};\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "INT : '0'..'9'+;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "34", false);
+		assertEquals("alt 2\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testBasic() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "a : ID INT {\n" +
+	                  "document.getElementById('output').value += $text + '\\n';\n" +
+	                  "};\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "INT : '0'..'9'+;\n" +
+	                  "WS : (' '|'\\n') -> skip;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "abc 34", false);
+		assertEquals("abc34\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testAPlus() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "a : ID+ {\n" +
+	                  "document.getElementById('output').value += $text + '\\n';\n" +
+	                  "};\n" +
+	                  "ID : 'a'..'z'+;\n" +
+	                  "WS : (' '|'\\n') -> skip;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "a b c", false);
+		assertEquals("abc\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testAorAPlus() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "a : (ID|ID)+ {\n" +
+	                  "document.getElementById('output').value += $text + '\\n';\n" +
+	                  "};\n" +
+	                  "ID : 'a'..'z'+;\n" +
+	                  "WS : (' '|'\\n') -> skip;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "a b c", false);
+		assertEquals("abc\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testIfIfElseGreedyBinding1() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "start : statement+ ;\n" +
+	                  "statement : 'x' | ifStatement;\n" +
+	                  "ifStatement : 'if' 'y' statement ('else' statement)? {\n" +
+	                  "document.getElementById('output').value += $text + '\\n';\n" +
+	                  "};\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "WS : (' '|'\\n') -> channel(HIDDEN);";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "start", "if y if y x else x", false);
+		assertEquals("if y x else x\nif y if y x else x\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testIfIfElseGreedyBinding2() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "start : statement+ ;\n" +
+	                  "statement : 'x' | ifStatement;\n" +
+	                  "ifStatement : 'if' 'y' statement ('else' statement|) {\n" +
+	                  "document.getElementById('output').value += $text + '\\n';\n" +
+	                  "};\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "WS : (' '|'\\n') -> channel(HIDDEN);";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "start", "if y if y x else x", false);
+		assertEquals("if y x else x\nif y if y x else x\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testIfIfElseNonGreedyBinding1() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "start : statement+ ;\n" +
+	                  "statement : 'x' | ifStatement;\n" +
+	                  "ifStatement : 'if' 'y' statement ('else' statement)?? {\n" +
+	                  "document.getElementById('output').value += $text + '\\n';\n" +
+	                  "};\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "WS : (' '|'\\n') -> channel(HIDDEN);";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "start", "if y if y x else x", false);
+		assertEquals("if y x\nif y if y x else x\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testIfIfElseNonGreedyBinding2() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "start : statement+ ;\n" +
+	                  "statement : 'x' | ifStatement;\n" +
+	                  "ifStatement : 'if' 'y' statement (|'else' statement) {\n" +
+	                  "document.getElementById('output').value += $text + '\\n';\n" +
+	                  "};\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "WS : (' '|'\\n') -> channel(HIDDEN);";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "start", "if y if y x else x", false);
+		assertEquals("if y x\nif y if y x else x\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	String testAStar(String input) throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "a : ID* {\n" +
+	                  "document.getElementById('output').value += $text + '\\n';\n" +
+	                  "};\n" +
+	                  "ID : 'a'..'z'+;\n" +
+	                  "WS : (' '|'\\n') -> skip;";
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", input, false);
+	}
+
+	@Test
+	public void testAStar_1() throws Exception {
+		String found = testAStar("");
+		assertEquals("\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testAStar_2() throws Exception {
+		String found = testAStar("a b c");
+		assertEquals("abc\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	String testLL1OptionalBlock(String input) throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "a : (ID|{}INT)? {\n" +
+	                  "document.getElementById('output').value += $text + '\\n';\n" +
+	                  "};\n" +
+	                  "ID : 'a'..'z'+;\n" +
+	                  "INT : '0'..'9'+ ;\n" +
+	                  "WS : (' '|'\\n') -> skip;";
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", input, false);
+	}
+
+	@Test
+	public void testLL1OptionalBlock_1() throws Exception {
+		String found = testLL1OptionalBlock("");
+		assertEquals("\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testLL1OptionalBlock_2() throws Exception {
+		String found = testLL1OptionalBlock("a");
+		assertEquals("a\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	String testAorAStar(String input) throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "a : (ID|ID)* {\n" +
+	                  "document.getElementById('output').value += $text + '\\n';\n" +
+	                  "};\n" +
+	                  "ID : 'a'..'z'+;\n" +
+	                  "WS : (' '|'\\n') -> skip;";
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", input, false);
+	}
+
+	@Test
+	public void testAorAStar_1() throws Exception {
+		String found = testAorAStar("");
+		assertEquals("\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testAorAStar_2() throws Exception {
+		String found = testAorAStar("a b c");
+		assertEquals("abc\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testAorBPlus() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "a : (ID|INT{\n" +
+	                  "})+ {\n" +
+	                  "document.getElementById('output').value += $text + '\\n';\n" +
+	                  "};\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "INT : '0'..'9'+;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", "a 34 c", false);
+		assertEquals("a34c\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	String testAorBStar(String input) throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "a : (ID|INT{\n" +
+	                  "})* {\n" +
+	                  "document.getElementById('output').value += $text + '\\n';\n" +
+	                  "};\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "INT : '0'..'9'+;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", input, false);
+	}
+
+	@Test
+	public void testAorBStar_1() throws Exception {
+		String found = testAorBStar("");
+		assertEquals("\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testAorBStar_2() throws Exception {
+		String found = testAorBStar("a 34 c");
+		assertEquals("a34c\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	String testOptional(String input) throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "stat : ifstat | 'x';\n" +
+	                  "ifstat : 'if' stat ('else' stat)?;\n" +
+	                  "WS : [ \\n\\t]+ -> skip ;";
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "stat", input, false);
+	}
+
+	@Test
+	public void testOptional_1() throws Exception {
+		String found = testOptional("x");
+		assertEquals("", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testOptional_2() throws Exception {
+		String found = testOptional("if x");
+		assertEquals("", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testOptional_3() throws Exception {
+		String found = testOptional("if x else x");
+		assertEquals("", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testOptional_4() throws Exception {
+		String found = testOptional("if if x else x");
+		assertEquals("", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testPredicatedIfIfElse() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "s : stmt EOF ;\n" +
+	                  "stmt : ifStmt | ID;\n" +
+	                  "ifStmt : 'if' ID stmt ('else' stmt | { this._input.LA(1)!=ELSE }?);\n" +
+	                  "ELSE : 'else';\n" +
+	                  "ID : [a-zA-Z]+;\n" +
+	                  "WS : [ \\n\\t]+ -> skip;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", "if x if x a else b", false);
+		assertEquals("", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testLabelAliasingAcrossLabeledAlternatives() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "start : a* EOF;\n" +
+	                  "a\n" +
+	                  "  : label=subrule { document.getElementById('output').value += $label.text + '\\n'; } #One\n" +
+	                  "  | label='y' { document.getElementById('output').value += $label.text + '\\n'; } #Two\n" +
+	                  "  ;\n" +
+	                  "subrule : 'x';\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "start", "xy", false);
+		assertEquals("x\ny\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testPredictionIssue334() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "file_ @init{\n" +
+	                  "this._errHandler = new antlr4.error.BailErrorStrategy();\n" +
+	                  "} \n" +
+	                  "@after {\n" +
+	                  "document.getElementById('output').value += $ctx.toStringTree(null, this) + '\\n';\n" +
+	                  "}\n" +
+	                  "  :   item (SEMICOLON item)* SEMICOLON? EOF ;\n" +
+	                  "item : A B?;\n" +
+	                  "SEMICOLON: ';';\n" +
+	                  "A : 'a'|'A';\n" +
+	                  "B : 'b'|'B';\n" +
+	                  "WS      : [ \\r\\t\\n]+ -> skip;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "file_", "a", false);
+		assertEquals("(file_ (item a) <EOF>)\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testListLabelForClosureContext() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "ifStatement\n" +
+	                  "@after {\n" +
+	                  "var items = $ctx.elseIfStatement(); \n" +
+	                  "}\n" +
+	                  "    : 'if' expression\n" +
+	                  "      ( ( 'then'\n" +
+	                  "          executableStatement*\n" +
+	                  "          elseIfStatement*  // <--- problem is here\n" +
+	                  "          elseStatement?\n" +
+	                  "          'end' 'if'\n" +
+	                  "        ) | executableStatement )\n" +
+	                  "    ;\n" +
+	                  "\n" +
+	                  "elseIfStatement\n" +
+	                  "    : 'else' 'if' expression 'then' executableStatement*\n" +
+	                  "    ;\n" +
+	                  "expression : 'a' ;\n" +
+	                  "executableStatement : 'a' ;\n" +
+	                  "elseStatement : 'a' ;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "expression", "a", false);
+		assertEquals("", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testMultipleEOFHandling() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "prog : ('x' | 'x' 'y') EOF EOF;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "prog", "x", false);
+		assertEquals("", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testEOFInClosure() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "prog : stat EOF;\n" +
+	                  "stat : 'x' ('y' | EOF)*?;";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "prog", "x", false);
+		assertEquals("", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	String testReferenceToATN(String input) throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "a : (ID|ATN)* ATN? {document.getElementById('output').value += $text + '\\n';} ;\n" +
+	                  "ID : 'a'..'z'+ ;\n" +
+	                  "ATN : '0'..'9'+;\n" +
+	                  "WS : (' '|'\\n') -> skip ;";
+		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", input, false);
+	}
+
+	@Test
+	public void testReferenceToATN_1() throws Exception {
+		String found = testReferenceToATN("");
+		assertEquals("\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testReferenceToATN_2() throws Exception {
+		String found = testReferenceToATN("a 34 c");
+		assertEquals("a34c\n", found);
+		assertNull(this.stderrDuringParse);
+	}
+
+	@Test
+	public void testAlternateQuotes() throws Exception {
+		String slave_ModeTagsLexer = "lexer grammar ModeTagsLexer;\n" +
+	                              "// Default mode rules (the SEA)\n" +
+	                              "OPEN  : '«'     -> mode(ISLAND) ;       // switch to ISLAND mode\n" +
+	                              "TEXT  : ~'«'+ ;                         // clump all text together\n" +
+	                              "mode ISLAND;\n" +
+	                              "CLOSE : '»'     -> mode(DEFAULT_MODE) ; // back to SEA mode\n" +
+	                              "SLASH : '/' ;\n" +
+	                              "ID    : [a-zA-Z]+ ;                     // match/send ID in tag to parser";
+		rawGenerateAndBuildRecognizer("ModeTagsLexer.g4", slave_ModeTagsLexer, null, "ModeTagsLexer");
+
+		String grammar = "parser grammar ModeTagsParser;\n" +
+	                  "options { tokenVocab=ModeTagsLexer; } // use tokens from ModeTagsLexer.g4\n" +
+	                  "file_: (tag | TEXT)* ;\n" +
+	                  "tag : '«' ID '»'\n" +
+	                  "    | '«' '/' ID '»'\n" +
+	                  "    ;";
+		String found = execParser("ModeTagsParser.g4", grammar, "ModeTagsParser", "ModeTagsLexer", "ModeTagsParserListener", "ModeTagsParserVisitor", "file_", "", false);
+		assertEquals("", found);
+		assertNull(this.stderrDuringParse);
+	}
+
 
 }

@@ -651,7 +651,7 @@ Parser.prototype.dumpDFA = function() {
 				console.log();
 			}
 			console.log("Decision " + dfa.decision + ":");
-			process.stdout.write(dfa.toString(this.tokenNames));
+			process.stdout.write(dfa.toString(this.literalNames, this.symbolicNames));
 			seenOne = true;
 		}
 	}
