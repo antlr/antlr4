@@ -194,8 +194,8 @@ public class TestFullContextParsing extends BasePython2Test {
 							input, true);
 		expecting =
 			"Decision 1:\n" +
-			"s0-'else'->:s1^=>1\n" +
-			"s0-'}'->:s2=>2\n";
+			"s0-'}'->:s2=>2\n" +
+			"s0-'else'->:s1^=>1\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:29 reportAttemptingFullContext d=1 (stat), input='else'\n" +
 					 "line 1:38 reportAmbiguity d=1 (stat): ambigAlts={1, 2}, input='elsefoo}'\n",
@@ -226,8 +226,8 @@ public class TestFullContextParsing extends BasePython2Test {
 							input, true);
 		expecting =
 			"Decision 1:\n" +
-			"s0-'else'->:s1^=>1\n" +
-			"s0-'}'->:s2=>2\n";
+			"s0-'}'->:s2=>2\n" +
+			"s0-'else'->:s1^=>1\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:19 reportAttemptingFullContext d=1 (stat), input='else'\n" +
 					 "line 1:19 reportContextSensitivity d=1 (stat), input='else'\n" +
@@ -242,8 +242,8 @@ public class TestFullContextParsing extends BasePython2Test {
 							input, true);
 		expecting =
 				"Decision 1:\n" +
-				"s0-'else'->:s1^=>1\n" +
-				"s0-'}'->:s2=>2\n";
+				"s0-'}'->:s2=>2\n" +
+				"s0-'else'->:s1^=>1\n";
 		assertEquals(expecting, result);
 		assertEquals("line 1:19 reportAttemptingFullContext d=1 (stat), input='else'\n" +
 					 "line 1:19 reportContextSensitivity d=1 (stat), input='else'\n" +
