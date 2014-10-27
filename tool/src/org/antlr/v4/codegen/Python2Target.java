@@ -79,12 +79,6 @@ public class Python2Target extends Target {
 	}
 
 	@Override
-	public int getSerializedATNSegmentLimit() {
-		// set to something stupid to avoid segmentation
-		return 2 ^ 31;
-	}
-
-	@Override
 	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
 		return getBadWords().contains(idNode.getText());
 	}
