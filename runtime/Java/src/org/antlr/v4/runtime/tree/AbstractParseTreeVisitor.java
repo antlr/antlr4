@@ -69,7 +69,7 @@ public abstract class AbstractParseTreeVisitor<T> implements ParseTreeVisitor<T>
 			}
 
 			ParseTree c = node.getChild(i);
-			T childResult = c.accept(this);
+			T childResult = visit(c);
 			result = aggregateResult(result, childResult);
 		}
 
