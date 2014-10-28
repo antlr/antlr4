@@ -15,7 +15,7 @@ public class TestListeners extends BaseTest {
 	                  "@parser::members {\n" +
 	                  "this.LeafListener = function() {\n" +
 	                  "    this.visitTerminal = function(node) {\n" +
-	                  "    	console.log(node.symbol.text);\n" +
+	                  "    	document.getElementById('output').value += node.symbol.text + '\\n';\n" +
 	                  "    };\n" +
 	                  "    return this;\n" +
 	                  "};\n" +
@@ -59,7 +59,7 @@ public class TestListeners extends BaseTest {
 	                  "        } else {\n" +
 	                  "            str = ctx.ID().symbol.toString();\n" +
 	                  "        }\n" +
-	                  "    	console.log(str);\n" +
+	                  "    	document.getElementById('output').value += str + '\\n';\n" +
 	                  "    };\n" +
 	                  "    return this;\n" +
 	                  "};\n" +
@@ -115,7 +115,7 @@ public class TestListeners extends BaseTest {
 	                  "        } else {\n" +
 	                  "            str = ctx.b(0).start.text;\n" +
 	                  "        }\n" +
-	                  "    	console.log(str);\n" +
+	                  "    	document.getElementById('output').value += str + '\\n';\n" +
 	                  "    };\n" +
 	                  "    return this;\n" +
 	                  "};\n" +
@@ -173,7 +173,7 @@ public class TestListeners extends BaseTest {
 	                  "        } else {\n" +
 	                  "            str = ctx.INT().symbol.text;\n" +
 	                  "        }\n" +
-	                  "    	console.log(str);\n" +
+	                  "    	document.getElementById('output').value += str + '\\n';\n" +
 	                  "    };\n" +
 	                  "    return this;\n" +
 	                  "};\n" +
@@ -214,11 +214,11 @@ public class TestListeners extends BaseTest {
 	                  "this.LeafListener = function() {\n" +
 	                  "    this.exitCall = function(ctx) {\n" +
 	                  "    	var str = ctx.e().start.text + ' ' + ctx.eList();\n" +
-	                  "    	console.log(str);\n" +
+	                  "    	document.getElementById('output').value += str + '\\n';\n" +
 	                  "    };\n" +
 	                  "    this.exitInt = function(ctx) {\n" +
 	                  "        var str = ctx.INT().symbol.text;\n" +
-	                  "        console.log(str);\n" +
+	                  "        document.getElementById('output').value += str + '\\n';\n" +
 	                  "    };\n" +
 	                  "    return this;\n" +
 	                  "};\n" +

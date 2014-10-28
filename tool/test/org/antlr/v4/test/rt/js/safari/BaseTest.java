@@ -42,6 +42,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.BindException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ATNFactory;
@@ -113,6 +115,7 @@ public abstract class BaseTest {
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
+	public String httpdir = null;
 	public String tmpdir = null;
 	
 	/** If error during parser execution, store stderr here; can't return
@@ -143,8 +146,10 @@ public abstract class BaseTest {
 	
 	@AfterClass
 	public static void closeWebDriver() {
-		driver.quit();
-		driver = null;
+		if(driver!=null) {
+			driver.quit();
+			driver = null;
+		}
 	}
 	
     @Before
@@ -152,12 +157,13 @@ public abstract class BaseTest {
         // new output dir for each test
     	String prop = System.getProperty("antlr-javascript-test-dir");
     	if(prop!=null && prop.length()>0)
-    		tmpdir = prop;
+    		httpdir = prop;
     	else
-    		tmpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath(); 
-    	File dir = new File(tmpdir);
+    		httpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath(); 
+    	File dir = new File(httpdir);
     	if(dir.exists())
     		this.eraseFiles(dir);
+    	tmpdir = new File(httpdir, "parser").getAbsolutePath();
     }
 
     protected org.antlr.v4.Tool newTool(String[] args) {
@@ -265,18 +271,17 @@ public abstract class BaseTest {
 
 	/** Return true if all is ok, no errors */
 	protected ErrorQueue antlr(String fileName, String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
-		String parserDir = tmpdir + "/parser";
-		System.out.println("dir "+parserDir);
-		mkdir(parserDir);
-		writeFile(parserDir, fileName, grammarStr);
+		System.out.println("dir "+tmpdir);
+		mkdir(tmpdir);
+		writeFile(tmpdir, fileName, grammarStr);
 		final List<String> options = new ArrayList<String>();
 		Collections.addAll(options, extraOptions);
 		options.add("-Dlanguage=JavaScript");
 		options.add("-o");
-		options.add(parserDir);
+		options.add(tmpdir);
 		options.add("-lib");
-		options.add(parserDir);
-		options.add(new File(parserDir,grammarFileName).toString());
+		options.add(tmpdir);
+		options.add(new File(tmpdir,grammarFileName).toString());
 
 		final String[] optionsA = new String[options.size()];
 		options.toArray(optionsA);
@@ -347,7 +352,8 @@ public abstract class BaseTest {
 								 lexerName,
 								 listenerName,
 								 visitorName,
-								 startRuleName);
+								 startRuleName,
+								 debug);
 		return execRecognizer(input);
 	}
 
@@ -396,7 +402,7 @@ public abstract class BaseTest {
 									   String lexerName,
 									   String listenerName,
 									   String visitorName,
-									   String parserStartRuleName)
+									   String parserStartRuleName, boolean debug)
 	{
         this.stderrDuringParse = null;
 		if ( parserName==null ) {
@@ -407,7 +413,8 @@ public abstract class BaseTest {
 						  lexerName,
 						  listenerName,
 						  visitorName,
-						  parserStartRuleName);
+						  parserStartRuleName,
+						  debug);
 		}
 	}
 
@@ -415,24 +422,60 @@ public abstract class BaseTest {
 		return execHtmlPage("Test.html", input);
 	}
 
+	static int httpPort = 8080;
+
+	class ServerThread extends Thread {
+		
+		Server server;
+		String runtimePath;
+		String fileName;
+		Exception ex;
+		
+		public ServerThread(String fileName) {
+			this.runtimePath = locateRuntime();
+			this.fileName = fileName;
+		}
+
+		@Override
+		public void run() {
+			try {
+				Server server = new Server(httpPort);
+				ResourceHandler rh1 = new ResourceHandler();
+				rh1.setDirectoriesListed(false);
+				rh1.setResourceBase(httpdir);
+				rh1.setWelcomeFiles(new String[] { fileName });
+				ResourceHandler rh2 = new ResourceHandler();
+				rh2.setDirectoriesListed(false);
+				rh2.setResourceBase(runtimePath);
+				HandlerList handlers = new HandlerList();
+				handlers.setHandlers(new Handler[] { rh1, rh2, new DefaultHandler() });
+				server.setHandler(handlers);
+				server.start();
+				this.server = server;
+				this.server.join();
+			} catch(BindException e) {
+				httpPort++;
+				run();
+			} catch (Exception e) {
+				ex = e;
+			}
+		}
+	}
+	
 	public String execHtmlPage(String fileName, String input) throws Exception {
-		String runtimePath = locateRuntime();
-		Server server = new Server(8080);
+		// 'file' protocol is not supported by Selenium Safari driver
+		// so we run an embedded Jetty server
+		ServerThread thread = new ServerThread(fileName);
+		thread.start();
 		try {
-			// start Jetty, since 'file' protocol is not supported by Selenium Safari driver
-			ResourceHandler rh1 = new ResourceHandler();
-			rh1.setDirectoriesListed(false);
-			rh1.setResourceBase(tmpdir);
-			rh1.setWelcomeFiles(new String[] { fileName });
-			ResourceHandler rh2 = new ResourceHandler();
-			rh2.setDirectoriesListed(false);
-			rh2.setResourceBase(runtimePath);
-			HandlerList handlers = new HandlerList();
-			handlers.setHandlers(new Handler[] { rh1, rh2, new DefaultHandler() });
-			server.setHandler(handlers);
-			server.start();
-			Thread.sleep(500);
-			driver.get("http://localhost:8080/" + fileName);
+			while(thread.server==null && thread.ex==null)
+				Thread.sleep(10);
+			if(thread.ex!=null)
+				throw thread.ex;
+			while(thread.server.isStarting())
+				Thread.sleep(10);
+			Thread.sleep(400); // despite all the above precautions, driver.get often fails if you don't give time to Jetty
+			driver.get("http://localhost:" + httpPort + "/" + fileName);
 			driver.findElement(new ById("input")).clear();
 			driver.findElement(new ById("output")).clear();
 			driver.findElement(new ById("errors")).clear();
@@ -445,13 +488,22 @@ public abstract class BaseTest {
 				this.stderrDuringParse = errors;
 				System.err.print(errors);
 			}
-			return driver.findElement(new ById("output")).getAttribute("value");
+			String value = driver.findElement(new ById("output")).getAttribute("value");
+			// mimic stdout which adds a NL
+			if(value.length()>0 && !value.endsWith("\n"))
+				value = value + "\n";
+			return value;
 		}
 		catch (Exception e) {
 			System.err.println("can't exec recognizer");
 			e.printStackTrace(System.err);
 		} finally {
-			server.stop();
+			if(thread.server!=null) {
+				thread.server.stop();
+				while(!thread.server.isStopped())
+					Thread.sleep(10);
+				Thread.sleep(100); // ensure the port is freed
+			}
 		}
 		return null;
 	}
@@ -731,18 +783,24 @@ public abstract class BaseTest {
 			 String lexerName,
 			 String listenerName,
 			 String visitorName,
-			 String parserStartRuleName) {
+			 String parserStartRuleName, boolean debug) {
 		String html = "<!DOCTYPE html>\r\n" +
 		"<html>\r\n" +
 	    "	<head>\r\n" +
         "		<script src='lib/require.js'></script>\r\n" +
         "		<script>\r\n" +
         "			antlr4 = null;\r\n" +
+        "			listener = null;\r\n" +
         "			TreeShapeListener = null;\r\n" +
         "			" + lexerName + " = null;\r\n" +
         "			" + parserName + " = null;\r\n" +
         "			" + listenerName + " = null;\r\n" +
         "			" + visitorName + " = null;\r\n" +
+        "			printer = function() {\r\n" +
+        "				this.println = function(s) { document.getElementById('output').value += s + '\\n'; }\r\n" +
+        "				this.print = function(s) { document.getElementById('output').value += s; }\r\n" +
+        "				return this;\r\n" +
+        "			};\r\n" +
 		"\r\n" +			
 		"			loadParser = function() {\r\n" +			
         "				try {\r\n" +
@@ -754,6 +812,16 @@ public abstract class BaseTest {
         "				} catch (ex) {\r\n" +
         "					document.getElementById('errors').value = ex.toString();\r\n" +
         "				}\r\n" +
+		"\r\n" +			
+		"				listener = function() {\r\n" +
+		"					antlr4.error.ErrorListener.call(this);\r\n" +
+		"					return this;\r\n" +
+		"				}\r\n" +
+		"				listener.prototype = Object.create(antlr4.error.ErrorListener.prototype);\r\n" +
+		"				listener.prototype.constructor = listener;\r\n" +
+		"				listener.prototype.syntaxError = function(recognizer, offendingSymbol, line, column, msg, e) {\r\n" +
+		"    				document.getElementById('errors').value += 'line ' + line + ':' + column + ' ' + msg + '\\r\\n';\r\n" +
+		"				};\r\n" +
 		"\r\n" +			
         "				TreeShapeListener = function() {\r\n" +
         "					antlr4.tree.ParseTreeListener.call(this);\r\n" +
@@ -779,9 +847,14 @@ public abstract class BaseTest {
 		"				var input = document.getElementById('input').value;\r\n" +
 		"    			var stream = new antlr4.InputStream(input);\n" +
 		"    			var lexer = new " + lexerName + "." + lexerName + "(stream);\n" +
+		"				lexer._listeners = [new listener()];\r\n" +	
 	    "    			var tokens = new antlr4.CommonTokenStream(lexer);\n" +
 	    "				var parser = new " + parserName + "." + parserName + "(tokens);\n" +
+	    "				parser._listeners.push(new listener());\n" +
+	    (debug ?
+	    "				parser._listeners.push(new antlr4.error.DiagnosticErrorListener());\n" : "") +
 	    "    			parser.buildParseTrees = true;\n" +
+	    "    			parser.printer = new printer();\n" +
 		"    			var tree = parser." + parserStartRuleName + "();\n" +
 		"    			antlr4.tree.ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
 		"			};\r\n" +
@@ -796,7 +869,7 @@ public abstract class BaseTest {
 	    "		<textarea id='errors'></textarea><br>\r\n" +
 	    "	</body>\r\n" +
 	    "</html>\r\n";
-		writeFile(tmpdir, "Test.html", html);	
+		writeFile(httpdir, "Test.html", html);	
 	};
 	
 	
@@ -854,31 +927,30 @@ public abstract class BaseTest {
 	    "		<textarea id='errors'></textarea><br>\r\n" +
 	    "	</body>\r\n" +
 	    "</html>\r\n";
-		writeFile(tmpdir, "Test.html", html);	
+		writeFile(httpdir, "Test.html", html);	
 	}
 
 	public void writeRecognizer(String parserName, String lexerName,
 								String listenerName, String visitorName,
 								String parserStartRuleName, boolean debug) {
-		if ( parserName==null ) {
+		if ( parserName==null )
 			writeLexerTestFile(lexerName, debug);
-		}
-		else {
+		else
 			writeParserTestFile(parserName,
 						  lexerName,
 						  listenerName,
 						  visitorName,
-						  parserStartRuleName);
-		}
+						  parserStartRuleName,
+						  debug);
 	}
 
 
     protected void eraseFiles(final String filesEndingWith) {
-        File tmpdirF = new File(tmpdir);
+        File tmpdirF = new File(httpdir);
         String[] files = tmpdirF.list();
         for(int i = 0; files!=null && i < files.length; i++) {
             if ( files[i].endsWith(filesEndingWith) ) {
-                new File(tmpdir+"/"+files[i]).delete();
+                new File(httpdir+"/"+files[i]).delete();
             }
         }
     }
@@ -897,7 +969,7 @@ public abstract class BaseTest {
     	if(prop!=null && prop.length()>0)
     		doErase = Boolean.getBoolean(prop);
         if(doErase) {
-	        File tmpdirF = new File(tmpdir);
+	        File tmpdirF = new File(httpdir);
 	        if ( tmpdirF.exists() ) {
 	            eraseFiles(tmpdirF);
 	            tmpdirF.delete();

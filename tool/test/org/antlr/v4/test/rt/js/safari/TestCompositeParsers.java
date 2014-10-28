@@ -79,7 +79,7 @@ public class TestCompositeParsers extends BaseTest {
 	public void testDelegatorAccessesDelegateMembers() throws Exception {
 		String slave_S = "parser grammar S;\n" +
 	                  "@members {\n" +
-	                  "this.foo = function() {console.log('foo');};\n" +
+	                  "this.foo = function() {document.getElementById('output').value += 'foo' + '\\n';};\n" +
 	                  "}\n" +
 	                  "a : B;";
 		mkdir(tmpdir);

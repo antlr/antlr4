@@ -232,7 +232,7 @@ PositionAdjustingLexer.isIdentifierChar = function(c) {
 BasicListener(X) ::= <<
 this.LeafListener = function() {
     this.visitTerminal = function(node) {
-    	console.log(node.symbol.text);
+    	document.getElementById('output').value += node.symbol.text + '\\n';
     };
     return this;
 };
@@ -255,7 +255,7 @@ this.LeafListener = function() {
         } else {
             str = ctx.ID().symbol.toString();
         }
-    	console.log(str);
+    	document.getElementById('output').value += str + '\\n';
     };
     return this;
 };
@@ -273,7 +273,7 @@ this.LeafListener = function() {
         } else {
             str = ctx.b(0).start.text;
         }
-    	console.log(str);
+    	document.getElementById('output').value += str + '\\n';
     };
     return this;
 };
@@ -292,7 +292,7 @@ this.LeafListener = function() {
         } else {
             str = ctx.INT().symbol.text;
         }
-    	console.log(str);
+    	document.getElementById('output').value += str + '\\n';
     };
     return this;
 };
@@ -305,11 +305,11 @@ LRWithLabelsListener(X) ::= <<
 this.LeafListener = function() {
     this.exitCall = function(ctx) {
     	var str = ctx.e().start.text + ' ' + ctx.eList();
-    	console.log(str);
+    	document.getElementById('output').value += str + '\\n';
     };
     this.exitInt = function(ctx) {
         var str = ctx.INT().symbol.text;
-        console.log(str);
+        document.getElementById('output').value += str + '\\n';
     };
     return this;
 };
@@ -326,12 +326,12 @@ DeclareContextListGettersFunction() ::= <<
     };
 >>
 
-Declare_foo() ::= "this.foo = function() {console.log('foo');};"
+Declare_foo() ::= "this.foo = function() {document.getElementById('output').value += 'foo' + '\\n';};"
 			
 Invoke_foo() ::= "this.foo();"
 
 Declare_pred() ::= <<this.pred = function(v) {
-	console.log("eval=" + v.toString());
+	document.getElementById('output').value += 'eval=' + v.toString() + '\\n';
 	return v;
 };
 >>

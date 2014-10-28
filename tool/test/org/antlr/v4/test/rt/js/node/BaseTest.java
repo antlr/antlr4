@@ -397,7 +397,8 @@ public abstract class BaseTest {
 								String listenerName,
 								String visitorName,
 								String startRuleName,
-								String input, boolean debug)
+								String input, 
+								boolean debug)
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 														grammarStr,

@@ -301,7 +301,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "@members {\n" +
 	                  "this.pred = function(v) {\n" +
-	                  "	console.log(\"eval=\" + v.toString());\n" +
+	                  "	document.getElementById('output').value += 'eval=' + v.toString() + '\\n';\n" +
 	                  "	return v;\n" +
 	                  "};\n" +
 	                  "}\n" +
@@ -321,7 +321,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "@members {\n" +
 	                  "this.pred = function(v) {\n" +
-	                  "	console.log(\"eval=\" + v.toString());\n" +
+	                  "	document.getElementById('output').value += 'eval=' + v.toString() + '\\n';\n" +
 	                  "	return v;\n" +
 	                  "};\n" +
 	                  "}\n" +
@@ -342,7 +342,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "@members {\n" +
 	                  "this.pred = function(v) {\n" +
-	                  "	console.log(\"eval=\" + v.toString());\n" +
+	                  "	document.getElementById('output').value += 'eval=' + v.toString() + '\\n';\n" +
 	                  "	return v;\n" +
 	                  "};\n" +
 	                  "}\n" +
