@@ -3,3 +3,5 @@
 __pycache__
 src/TestAntLR.py
 /dist
+/MANIFEST
+*.egg-info/
