@@ -52,7 +52,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ATNFactory;
@@ -103,7 +102,6 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.openqa.selenium.By.ById;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.safari.SafariDriver;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
@@ -138,18 +136,12 @@ public abstract class BaseTest {
 	
 	@BeforeClass
 	public static void initWebDriver() {
-		// System.setProperty("webdriver.safari.driver", "/Users/ericvergnaud/Desktop/TestSafari/org/openqa/selenium/safari/SafariDriver.safariextz");
-		System.setProperty("webdriver.safari.noinstall", "true");
-		driver = new SafariDriver();
-		
+		driver = SharedWebDriver.init();
 	}
 	
 	@AfterClass
 	public static void closeWebDriver() {
-		if(driver!=null) {
-			driver.quit();
-			driver = null;
-		}
+		SharedWebDriver.close();
 	}
 	
     @Before
