@@ -42,20 +42,24 @@ CSHARP_TARGET	= "../antlr4-csharp"
 
 JAVA_VERSION = os.environ.get('ANTLR_JAVA_VERSION', None)
 
-# Properties needed to run Python[23] tests
-test_properties = {
-	"antlr-python2-python":os.environ.get('ANTLR_PYTHON2_PYTHON', "python"),
-	"antlr-python2-runtime":uniformpath(PYTHON2_TARGET)+"/src",
-	"antlr-python3-python":os.environ.get('ANTLR_PYTHON3_PYTHON', "python3"),
-	"antlr-python3-runtime":uniformpath(PYTHON3_TARGET)+"/src",
-}
-
 TARGETS = OrderedDict([
     ("Java", uniformpath(JAVA_TARGET)),
     ("Python2", uniformpath(PYTHON2_TARGET)),
     ("Python3", uniformpath(PYTHON3_TARGET)),
     #("CSharp":uniformpath(CSHARP_TARGET)),
 ])
+
+# Properties needed to run Python[23] tests
+PROPERTIES = {
+    'Python2': {
+        "antlr-python2-python": os.environ.get('ANTLR_PYTHON2_PYTHON', "python"),
+        "antlr-python2-runtime": uniformpath(PYTHON2_TARGET) + "/src",
+    },
+    'Python3': {
+        "antlr-python3-python": os.environ.get('ANTLR_PYTHON3_PYTHON', "python3"),
+        "antlr-python3-runtime": uniformpath(PYTHON3_TARGET) + "/src",
+    },
+}
 
 def parsers():
 	antlr3("tool/src/org/antlr/v4/parse", "gen3", package="org.antlr.v4.parse")
@@ -153,7 +157,6 @@ def tests():
 	cp = uniformpath("dist/antlr-"+VERSION+"-complete.jar")+os.pathsep+ \
 		 uniformpath("out/test/Java")+os.pathsep+ \
 		 junit_jar+os.pathsep+hamcrest_jar
-	properties = ["-D%s=%s" % (p, test_properties[p]) for p in test_properties]
 	args = ["-Xlint", "-Xlint:-serial", "-g"]
 	javac("tool/test", "out/test/Java", version=JAVA_VERSION, cp=cp, args=args) # all targets can use org.antlr.v4.test.*
 	for t in TARGETS:
@@ -161,6 +164,10 @@ def tests():
 		# Prefix CLASSPATH with individual target tests
 		cp = uniformpath("out/test/"+t) + os.pathsep + cp
 		javac(TARGETS[t]+"/tool/test", "out/test/"+t, version=JAVA_VERSION, cp=cp, args=args)
+                try:
+                    properties = ["-D%s=%s" % i for i in PROPERTIES[t].items()]
+                except KeyError:
+                    properties = []
 		junit(TARGETS[t]+"/tool/test", cp=cp, verbose=False, args=properties)
 
 def mkdoc():
