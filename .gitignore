@@ -7,6 +7,12 @@ dist/
 lib/
 user.build.properties
 
+# bild.py outputs
+/bilder.py*
+/gen3/
+/gen4/
+/out/
+
 # MacOSX files
 .DS_Store
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import string
+from collections import OrderedDict
 
 """
 This script uses my experimental build tool http://www.bildtool.org
@@ -8,9 +9,6 @@ This script uses my experimental build tool http://www.bildtool.org
 In order to build the complete ANTLR4 product with Java, Python 2, and Python 3
 targets, do the following from a UNIX command line.  Windows build using this script
 is not yet supported. Please use the mvn build or ant build.
-
-!!!You must set path values in test_properties dictionary below to ensure Python
-tests run.!!!
 
 mkdir -p /usr/local/antlr # somewhere appropriate where you want to install stuff
 cd /usr/local/antlr
@@ -42,19 +40,26 @@ PYTHON2_TARGET	= "../antlr4-python2"
 PYTHON3_TARGET	= "../antlr4-python3"
 CSHARP_TARGET	= "../antlr4-csharp"
 
-# Properties needed to run Python[23] tests
-test_properties = {
-	"antlr-python2-python":"/usr/local/Cellar/python/2.7.5/bin/python2.7",
-	"antlr-python2-runtime":uniformpath(PYTHON2_TARGET)+"/src",
-	"antlr-python3-python":"/usr/local/Cellar/python3/3.4.1/bin/python3",
-	"antlr-python3-runtime":uniformpath(PYTHON3_TARGET)+"/src",
-}
+JAVA_VERSION = os.environ.get('ANTLR_JAVA_VERSION', None)
 
-TARGETS	= {"Java":uniformpath(JAVA_TARGET),
-		   "Python2":uniformpath(PYTHON2_TARGET),
-		   "Python3":uniformpath(PYTHON3_TARGET),
-		   #"CSharp":uniformpath(CSHARP_TARGET)
-		  }
+TARGETS = OrderedDict([
+    ("Java", uniformpath(JAVA_TARGET)),
+    ("Python2", uniformpath(PYTHON2_TARGET)),
+    ("Python3", uniformpath(PYTHON3_TARGET)),
+    #("CSharp":uniformpath(CSHARP_TARGET)),
+])
+
+# Properties needed to run Python[23] tests
+PROPERTIES = {
+    'Python2': {
+        "antlr-python2-python": os.environ.get('ANTLR_PYTHON2_PYTHON', "python"),
+        "antlr-python2-runtime": uniformpath(PYTHON2_TARGET) + "/src",
+    },
+    'Python3': {
+        "antlr-python3-python": os.environ.get('ANTLR_PYTHON3_PYTHON', "python3"),
+        "antlr-python3-runtime": uniformpath(PYTHON3_TARGET) + "/src",
+    },
+}
 
 def parsers():
 	antlr3("tool/src/org/antlr/v4/parse", "gen3", package="org.antlr.v4.parse")
@@ -71,10 +76,10 @@ def compile():
 	srcpath = ["gen3", "gen4", "runtime/JavaAnnotations/src", "runtime/Java/src", "tool/src"]
 	args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
 	for sp in srcpath:
-		javac(sp, "out", version="1.6", cp=cp, args=args)
+		javac(sp, "out", version=JAVA_VERSION, cp=cp, args=args)
 	# pull in targets
 	for t in TARGETS:
-		javac(TARGETS[t]+"/tool/src", "out", version="1.6", cp=cp, args=args)
+		javac(TARGETS[t]+"/tool/src", "out", version=JAVA_VERSION, cp=cp, args=args)
 
 def mkjar_complete():
 	require(compile)
@@ -116,7 +121,7 @@ def mkjar_runtime():
 	srcpath = ["gen4", "runtime/JavaAnnotations/src", "runtime/Java/src"]
 	args = ["-Xlint", "-Xlint:-serial", "-g", "-sourcepath", string.join(srcpath, os.pathsep)]
 	for sp in srcpath:
-		javac(sp, "out/runtime", version="1.6", cp=cp, args=args)
+		javac(sp, "out/runtime", version=JAVA_VERSION, cp=cp, args=args)
 	manifest = \
 """Implementation-Vendor: ANTLR
 Implementation-Title: ANTLR 4 Runtime
@@ -140,21 +145,30 @@ def mkjar():
 	mkjar_complete() # make it again with up to date XPath lexer
 	mkjar_runtime()	 # now build the runtime jar
 
+def mkdist():
+    global JAVA_VERSION
+    if JAVA_VERSION is None:
+        JAVA_VERSION = "1.6"
+    mkjar()
+
 def tests():
 	require(mkjar)
 	junit_jar, hamcrest_jar = load_junitjars()
 	cp = uniformpath("dist/antlr-"+VERSION+"-complete.jar")+os.pathsep+ \
 		 uniformpath("out/test/Java")+os.pathsep+ \
 		 junit_jar+os.pathsep+hamcrest_jar
-	properties = ["-D%s=%s" % (p, test_properties[p]) for p in test_properties]
 	args = ["-Xlint", "-Xlint:-serial", "-g"]
-	javac("tool/test", "out/test/Java", version="1.6", cp=cp, args=args) # all targets can use org.antlr.v4.test.*
+	javac("tool/test", "out/test/Java", version=JAVA_VERSION, cp=cp, args=args) # all targets can use org.antlr.v4.test.*
 	for t in TARGETS:
 		print "Test %7s --------------" % t
 		# Prefix CLASSPATH with individual target tests
-		cp = uniformpath(TARGETS[t]+"/tool/test") + os.pathsep + cp
-		javac(TARGETS[t]+"/tool/test", "out/test/"+t, version="1.6", cp=cp, args=args)
-		junit("out/test/"+t, cp=cp, verbose=False, args=properties)
+		cp = uniformpath("out/test/"+t) + os.pathsep + cp
+		javac(TARGETS[t]+"/tool/test", "out/test/"+t, version=JAVA_VERSION, cp=cp, args=args)
+                try:
+                    properties = ["-D%s=%s" % i for i in PROPERTIES[t].items()]
+                except KeyError:
+                    properties = []
+		junit(TARGETS[t]+"/tool/test", cp=cp, verbose=False, args=properties)
 
 def mkdoc():
 	mkdir("doc/Java")
