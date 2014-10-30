@@ -134,11 +134,11 @@ class DFA(object):
     def __unicode__(self):
         return self.toString(None)
 
-    def toString(self, tokenNames=None):
+    def toString(self, literalNames=None, symbolicNames=None):
         if self.s0 is None:
             return ""
         from antlr4.dfa.DFASerializer import DFASerializer
-        serializer = DFASerializer(self,tokenNames)
+        serializer = DFASerializer(self, literalNames, symbolicNames)
         return unicode(serializer)
 
     def toLexerString(self):

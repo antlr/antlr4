@@ -36,9 +36,10 @@ from antlr4.Utils import str_list
 
 class DFASerializer(object):
 
-    def __init__(self, dfa, tokenNames=None):
+    def __init__(self, dfa, literalNames=None, symbolicNames=None):
         self.dfa = dfa
-        self.tokenNames = tokenNames
+        self.literalNames = literalNames
+        self.symbolicNames = symbolicNames
 
     def __str__(self):
         return unicode(self)
@@ -70,8 +71,10 @@ class DFASerializer(object):
     def getEdgeLabel(self, i):
         if i==0:
             return u"EOF"
-        if self.tokenNames is not None:
-            return self.tokenNames[i-1]
+        if self.literalNames is not None and i<=len(self.literalNames):
+            return self.literalNames[i-1]
+        elif self.symbolicNames is not None and i<=len(self.symbolicNames):
+            return self.symbolicNames[i-1]
         else:
             return unicode(i-1)
 

@@ -260,7 +260,7 @@ public class TestParseErrors extends BasePython2Test {
 			"WS : ' ' -> skip ;" +
 			"acClass\n" +
 			"@init\n" +
-			"{print(self.getExpectedTokens().toString(self.tokenNames))}\n" +
+			"{print(self.getExpectedTokens().toString(self.literalNames, self.symbolicNames))}\n" +
 			"  : ;\n";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "start", "dog and software", false);
 		String expecting = "{'hardware', 'software'}\n";
