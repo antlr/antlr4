@@ -33,7 +33,7 @@ package org.antlr.v4.py2.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import org.antlr.v4.test.ErrorQueue;
+import org.antlr.v4.test.tool.ErrorQueue;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
