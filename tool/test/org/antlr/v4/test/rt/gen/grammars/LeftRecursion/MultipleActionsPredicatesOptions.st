@@ -1,7 +1,7 @@
 grammar <grammarName>;
 s @after {<ToStringTree("$ctx"):writeln()>} : e ;
-e : a=e op=('*'|'/') b=e  {}{true}?
-  | a=e op=('+'|'-') b=e  {}\<p=3>{true}?\<fail='Message'>
+e : a=e op=('*'|'/') b=e  {}{<True()>}?
+  | a=e op=('+'|'-') b=e  {}\<p=3>{<True()>}?\<fail='Message'>
   | INT {}{}
   | '(' x=e ')' {}{}
   ;

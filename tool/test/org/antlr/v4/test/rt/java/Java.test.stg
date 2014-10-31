@@ -99,9 +99,17 @@ writeln(s) ::= <<System.out.println(<s>);>>
 
 write(s) ::= <<System.out.print(<s>);>>
 
+False() ::= "false"
+
+True() ::= "true"
+
+Not(v) ::= "!<v>"
+
 Assert(s) ::= <<assert(<s>);>>
 
 Cast(t,v) ::= "((<t>)<v>)"
+
+Append(a,b) ::= "<a> + <b>"
 
 Concat(a,b) ::= "<a><b>"
 

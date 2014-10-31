@@ -216,7 +216,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "@members {int i = 0;}\n" +
 	                  "s : ({this.i += 1;\n" +
-	                  "	  System.out.println(\"i=\" + this.i);} a)+ ;\n" +
+	                  "System.out.println(\"i=\" + this.i);} a)+ ;\n" +
 	                  "a : {this.i % 2 == 0}? ID {System.out.println(\"alt 1\");}\n" +
 	                  "  | {this.i % 2 != 0}? ID {System.out.println(\"alt 2\");}\n" +
 	                  "  ;\n" +

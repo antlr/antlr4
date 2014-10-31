@@ -34,9 +34,11 @@ public class Generator {
 		Map<String, File> configs = new HashMap<String, File>();
 		configs.put("Source", readGrammarDir()); // source of test templates
 		configs.put("Java", readJavaDir()); // generated Java tests
+		configs.put("Python2", readPython2Dir()); // generated Python2 tests
+		configs.put("Python3", readPython3Dir()); // generated Python3 tests
 		configs.put("NodeJS", readNodeJSDir()); // generated NodeJS tests
 		configs.put("Safari", readSafariDir()); // generated Firefox tests
-		configs.put("Firefox", readFirefoxDir()); // generated Firefox tests
+		// configs.put("Firefox", readFirefoxDir()); // generated Firefox tests
 		return configs;
 	}
 	
@@ -46,6 +48,16 @@ public class Generator {
 		URL url = ClassLoader.getSystemResource(className);
 		String uri = url.toURI().toString().replace("target/test-classes", "test");
 		return new File(new URI(uri));
+	}
+
+	private static File readPython2Dir() {
+		// TODO Auto-generated method stub
+		return new File("/Users/ericvergnaud/Development/antlr4/antlr/antlr4-python2/tool/test/org/antlr/v4/test/rt/py2");
+	}
+
+	private static File readPython3Dir() {
+		// TODO Auto-generated method stub
+		return new File("/Users/ericvergnaud/Development/antlr4/antlr/antlr4-python3/tool/test/org/antlr/v4/test/rt/py3");
 	}
 
 	private static File readNodeJSDir() {
@@ -802,12 +814,12 @@ public class Generator {
 				"a >> b",	"(s (e (e a) >> (e b)) <EOF>)\n",
 				"a=b=c",	"(s (e (e a) = (e (e b) = (e c))) <EOF>)\n",
 				"a^b^c",	"(s (e (e a) ^ (e (e b) ^ (e c))) <EOF>)\n",
-				"(T)x",							"(s (e ( (type T) ) (e x)) <EOF>)\n",
-				"new A().b",					"(s (e (e new (type A) ( )) . b) <EOF>)\n",
-				"(T)t.f()",						"(s (e (e ( (type T) ) (e (e t) . f)) ( )) <EOF>)\n",
+				"(T)x",							"(s (e ( (type_ T) ) (e x)) <EOF>)\n",
+				"new A().b",					"(s (e (e new (type_ A) ( )) . b) <EOF>)\n",
+				"(T)t.f()",						"(s (e (e ( (type_ T) ) (e (e t) . f)) ( )) <EOF>)\n",
 				"a.f(x)==T.c",					"(s (e (e (e (e a) . f) ( (expressionList (e x)) )) == (e (e T) . c)) <EOF>)\n",
 				"a.f().g(x,1)",					"(s (e (e (e (e (e a) . f) ( )) . g) ( (expressionList (e x) , (e 1)) )) <EOF>)\n",
-				"new T[((n-1) * x) + 1]",		"(s (e new (type T) [ (e (e ( (e (e ( (e (e n) - (e 1)) )) * (e x)) )) + (e 1)) ]) <EOF>)\n");
+				"new T[((n-1) * x) + 1]",		"(s (e new (type_ T) [ (e (e ( (e (e ( (e (e n) - (e 1)) )) * (e x)) )) + (e 1)) ]) <EOF>)\n");
 		file.addParserTests(input, "Declarations", "T", "s",
 				"a",		"(s (declarator a) <EOF>)\n",
 				"*a",		"(s (declarator * (declarator a)) <EOF>)\n",

@@ -1,8 +1,8 @@
 grammar <grammarName>;
-@members {<InitBooleanMember("enumKeyword",true)>}
+@members {<InitBooleanMember("enumKeyword",True())>}
 primary
     :   ID {<writeln("\"ID \"+$ID.text")>}
-    |   {!<GetMember("enumKeyword")>}? 'enum' {<writeln("\"enum\"")>}
+    |   {<GetMember("enumKeyword"):Not()>}? 'enum' {<writeln("\"enum\"")>}
     ;
 ID : [a-z]+ ;
 WS : [ \t\n\r]+ -> skip ;

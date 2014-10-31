@@ -1,5 +1,5 @@
 grammar <grammarName>;
-a : (ID|ATN)* ATN? {<writeln("$text")>} ;
+a : (ID|ATN_)* ATN_? {<writeln("$text")>} ;
 ID : 'a'..'z'+ ;
-ATN : '0'..'9'+;
+ATN_ : '0'..'9'+;
 WS : (' '|'\n') -> skip ;

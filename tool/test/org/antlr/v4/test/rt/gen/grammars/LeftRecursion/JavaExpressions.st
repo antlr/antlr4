@@ -8,14 +8,14 @@ e   :   '(' e ')'
     |   'super'
     |   INT
     |   ID
-    |   type '.' 'class'
+    |   type_ '.' 'class'
     |   e '.' ID
     |   e '.' 'this'
     |   e '.' 'super' '(' expressionList? ')'
     |   e '.' 'new' ID '(' expressionList? ')'
-	 |	 'new' type ( '(' expressionList? ')' | ('[' e ']')+)
+	 |	 'new' type_ ( '(' expressionList? ')' | ('[' e ']')+)
     |   e '[' e ']'
-    |   '(' type ')' e
+    |   '(' type_ ')' e
     |   e ('++' | '--')
     |   e '(' expressionList? ')'
     |   ('+'|'-'|'++'|'--') e
@@ -46,7 +46,7 @@ e   :   '(' e ')'
           |'\<\<='
           |'%=') e
     ;
-type: ID 
+type_: ID 
     | ID '[' ']'
     | 'int'
 	 | 'int' '[' ']' 

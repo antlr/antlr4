@@ -1,5 +1,5 @@
 grammar M;
 import S;
-a : A {<writeln("\"M.a: \"+$A")>};
+a : A {<Append("\"M.a: \"","$A"):writeln()>};
 A : 'abc' {<writeln("\"M.A\"")>};
 WS : (' '|'\n') -> skip ;

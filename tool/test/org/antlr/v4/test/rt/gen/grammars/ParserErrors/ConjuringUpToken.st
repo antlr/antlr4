@@ -1,2 +1,2 @@
 grammar <grammarName>;
-a : 'a' x='b' {<writeln("\"conjured=\"+$x")>} 'c' ;
+a : 'a' x='b' {<Append("\"conjured=\"","$x"):writeln()>} 'c' ;

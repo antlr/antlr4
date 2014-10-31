@@ -1,6 +1,6 @@
 grammar <grammarName>;
 s @after {<ToStringTree("$ctx"):writeln()>} : a ;
-a : a {<true>}? ID
+a : a {<True()>}? ID
   | ID
   ;
 ID : 'a'..'z'+ ;

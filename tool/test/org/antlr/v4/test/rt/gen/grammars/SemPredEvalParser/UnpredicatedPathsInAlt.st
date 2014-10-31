@@ -2,7 +2,7 @@ grammar <grammarName>;
 s : a {<writeln("\"alt 1\"")>}
   | b {<writeln("\"alt 2\"")>}
   ;
-a : {<false>}? ID INT
+a : {<False()>}? ID INT
   | ID INT
   ;
 b : ID ID

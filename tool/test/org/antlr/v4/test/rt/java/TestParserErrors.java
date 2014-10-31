@@ -44,7 +44,7 @@ public class TestParserErrors extends BaseTest {
 	@Test
 	public void testConjuringUpToken() throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "a : 'a' x='b' {System.out.println(\"conjured=\"+$x);} 'c' ;";
+	                  "a : 'a' x='b' {System.out.println(\"conjured=\" + $x);} 'c' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "ac", false);
 		assertEquals("conjured=[@-1,-1:-1='<missing 'b'>',<2>,1:1]\n", found);
 		assertEquals("line 1:1 missing 'b' at 'c'\n", this.stderrDuringParse);
@@ -62,7 +62,7 @@ public class TestParserErrors extends BaseTest {
 	@Test
 	public void testConjuringUpTokenFromSet() throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "a : 'a' x=('b'|'c') {System.out.println(\"conjured=\"+$x);} 'd' ;";
+	                  "a : 'a' x=('b'|'c') {System.out.println(\"conjured=\" + $x);} 'd' ;";
 		String found = execParser("T.g4", grammar, "TParser", "TLexer", "a", "ad", false);
 		assertEquals("conjured=[@-1,-1:-1='<missing 'b'>',<2>,1:1]\n", found);
 		assertEquals("line 1:1 missing {'b', 'c'} at 'd'\n", this.stderrDuringParse);
