@@ -38,9 +38,10 @@ from antlr4.dfa.DFAState import DFAState
 
 class DFASerializer(object):
 
-    def __init__(self, dfa:DFA, tokenNames:list=None):
+    def __init__(self, dfa:DFA, literalNames:list=None, symbolicNames:list=None):
         self.dfa = dfa
-        self.tokenNames = tokenNames
+        self.literalNames = literalNames
+        self.symbolicNames = symbolicNames
 
     def __str__(self):
         if self.dfa.s0 is None:
@@ -69,8 +70,10 @@ class DFASerializer(object):
     def getEdgeLabel(self, i:int):
         if i==0:
             return "EOF"
-        if self.tokenNames is not None:
-            return self.tokenNames[i-1]
+        if self.literalNames is not None and i<=len(self.literalNames):
+            return self.literalNames[i-1]
+        elif self.symbolicNames is not None and i<=len(self.symbolicNames):
+            return self.symbolicNames[i-1]
         else:
             return str(i-1)
 

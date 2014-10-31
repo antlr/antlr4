@@ -1,4 +1,4 @@
-package org.antlr.v4.py3.test;
+package org.antlr.v4.test.rt.py3;
 
 import org.junit.Test;
 

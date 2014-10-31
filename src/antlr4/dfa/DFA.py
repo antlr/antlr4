@@ -132,11 +132,11 @@ class DFA(object):
     def __str__(self):
         return self.toString(None)
 
-    def toString(self, tokenNames:list=None):
+    def toString(self, literalNames:list=None, symbolicNames:list=None):
         if self.s0 is None:
             return ""
         from antlr4.dfa.DFASerializer import DFASerializer
-        serializer = DFASerializer(self,tokenNames)
+        serializer = DFASerializer(self,literalNames,symbolicNames)
         return str(serializer)
 
     def toLexerString(self):

@@ -27,7 +27,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.antlr.v4.py3.test;
+package org.antlr.v4.test.rt.py3;
 
 import org.antlr.v4.py.test.BasePythonTest;
 import org.stringtemplate.v4.ST;

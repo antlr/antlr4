@@ -297,6 +297,7 @@ class ParserATNSimulator(ATNSimulator):
         self._input = None
         self._startIndex = 0
         self._outerContext = None
+        self._dfa = None
         # Each prediction operation uses a cache for merge of prediction contexts.
         #  Don't keep around as it wastes huge amounts of memory. DoubleKeyMap
         #  isn't synchronized but we're ok since two threads shouldn't reuse same
@@ -322,6 +323,7 @@ class ParserATNSimulator(ATNSimulator):
         self._outerContext = outerContext
         
         dfa = self.decisionToDFA[decision]
+        self._dfa = dfa
         m = input.mark()
         index = input.index
 
@@ -375,6 +377,7 @@ class ParserATNSimulator(ATNSimulator):
                 print("DFA after predictATN: " + dfa.toString(self.parser.tokenNames))
             return alt
         finally:
+            self._dfa = None
             self.mergeCache = None # wack cache after each prediction
             input.seek(index)
             input.release(m)
@@ -736,9 +739,9 @@ class ParserATNSimulator(ATNSimulator):
         # The conditions assume that intermediate
         # contains all configurations relevant to the reach set, but this
         # condition is not true when one or more configurations have been
-        # withheld in skippedStopStates.
+        # withheld in skippedStopStates, or when the current symbol is EOF.
         #
-        if skippedStopStates is None:
+        if skippedStopStates is None and t!=Token.EOF:
             if len(intermediate)==1:
                 # Don't pursue the closure if there is just one state.
                 # It can only have one alternative; just add to result
@@ -927,10 +930,11 @@ class ParserATNSimulator(ATNSimulator):
             # filter the prediction context for alternatives predicting alt>1
             # (basically a graph subtraction algorithm).
             #
-            context = statesFromAlt1.get(config.state.stateNumber, None)
-            if context==config.context:
-                # eliminated
-                continue
+            if not config.precedenceFilterSuppressed:
+                context = statesFromAlt1.get(config.state.stateNumber, None)
+                if context==config.context:
+                    # eliminated
+                    continue
 
             configSet.add(config, self.mergeCache)
 
@@ -1177,6 +1181,11 @@ class ParserATNSimulator(ATNSimulator):
             continueCollecting = collectPredicates and not isinstance(t, ActionTransition)
             c = self.getEpsilonTarget(config, t, continueCollecting, depth == 0, fullCtx, treatEofAsEpsilon)
             if c is not None:
+                if not t.isEpsilon:
+                    if c in closureBusy:
+                        # avoid infinite recursion for EOF* and EOF+
+                        continue
+                    closureBusy.add(c)
                 newDepth = depth
                 if isinstance( config.state, RuleStopState):
                     assert not fullCtx
@@ -1191,6 +1200,9 @@ class ParserATNSimulator(ATNSimulator):
                         continue
                     closureBusy.add(c)
 
+                    if self._dfa is not None and self._dfa.precedenceDfa:
+                        if t.outermostPrecedenceReturn == self._dfa.atnStartState.ruleIndex:
+                            c.precedenceFilterSuppressed = True
                     c.reachesIntoOuterContext += 1
                     configs.dipsIntoOuterContext = True # TODO: can remove? only care when we add to set per middle of this method
                     assert newDepth > - 2**63
@@ -1227,7 +1239,7 @@ class ParserATNSimulator(ATNSimulator):
             # transition is traversed
             if treatEofAsEpsilon:
                 if t.matches(Token.EOF, 0, 1):
-                    return ATNConfig(config, t.target)
+                    return ATNConfig(state=t.target, config=config)
             return None
 
         else:

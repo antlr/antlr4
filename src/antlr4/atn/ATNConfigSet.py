@@ -111,6 +111,9 @@ class ATNConfigSet(object):
         # since only way to create new graphs is "call rule" and here. We
         # cache at both places.
         existing.reachesIntoOuterContext = max(existing.reachesIntoOuterContext, config.reachesIntoOuterContext)
+        # make sure to preserve the precedence filter suppression during the merge
+        if config.precedenceFilterSuppressed:
+            existing.precedenceFilterSuppressed = True
         existing.context = merged # replace context; no need to alt mapping
         return True
 

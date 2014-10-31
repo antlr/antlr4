@@ -158,6 +158,12 @@ class LexerATNSimulator(ATNSimulator):
         if self.debug:
             print("start state closure=" + str(ds0.configs))
 
+        if ds0.isAcceptState:
+            # allow zero-length tokens
+            self.captureSimState(self.prevAccept, input, ds0)
+            # adjust index since the current input character was not yet consumed
+            self.prevAccept.index -= 1
+
         t = input.LA(1)
         s = ds0 # s is current/from DFA state
 

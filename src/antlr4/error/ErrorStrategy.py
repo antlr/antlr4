@@ -153,7 +153,7 @@ class DefaultErrorStrategy(ErrorStrategy):
             self.reportFailedPredicate(recognizer, e)
         else:
             print("unknown recognition error type: " + type(e).__name__)
-            recognizer.notifyErrorListeners(e.getOffendingToken(), e.getMessage(), e)
+            recognizer.notifyErrorListeners(e.message, e.offendingToken, e)
 
     #
     # {@inheritDoc}
@@ -288,7 +288,7 @@ class DefaultErrorStrategy(ErrorStrategy):
     #
     def reportInputMismatch(self, recognizer:Parser, e:InputMismatchException):
         msg = "mismatched input " + self.getTokenErrorDisplay(e.offendingToken) \
-              + " expecting " + e.getExpectedTokens().toString(recognizer.tokenNames)
+              + " expecting " + e.getExpectedTokens().toString(recognizer.literalNames, recognizer.symbolicNames)
         recognizer.notifyErrorListeners(msg, e.offendingToken, e)
 
     #
@@ -300,10 +300,10 @@ class DefaultErrorStrategy(ErrorStrategy):
     # @param recognizer the parser instance
     # @param e the recognition exception
     #
-    def reportFailedPredicate(self, recognizer:Parser, e:FailedPredicateException):
-        ruleName = recognizer.ruleNames[recognizer._ctx.ruleIndex]
+    def reportFailedPredicate(self, recognizer, e):
+        ruleName = recognizer.ruleNames[recognizer._ctx.getRuleIndex()]
         msg = "rule " + ruleName + " " + e.message
-        recognizer.notifyErrorListeners(e.offendingToken, msg, e)
+        recognizer.notifyErrorListeners(msg, e.offendingToken, e)
 
     # This method is called to report a syntax error which requires the removal
     # of a token from the input stream. At the time this method is called, the
@@ -331,7 +331,7 @@ class DefaultErrorStrategy(ErrorStrategy):
         tokenName = self.getTokenErrorDisplay(t)
         expecting = self.getExpectedTokens(recognizer)
         msg = "extraneous input " + tokenName + " expecting " \
-            + expecting.toString(recognizer.tokenNames)
+            + expecting.toString(recognizer.literalNames, recognizer.symbolicNames)
         recognizer.notifyErrorListeners(msg, t, None)
 
     # This method is called to report a syntax error which requires the
@@ -356,7 +356,7 @@ class DefaultErrorStrategy(ErrorStrategy):
         self.beginErrorCondition(recognizer)
         t = recognizer.getCurrentToken()
         expecting = self.getExpectedTokens(recognizer)
-        msg = "missing " + expecting.toString(recognizer.tokenNames) \
+        msg = "missing " + expecting.toString(recognizer.literalNames, recognizer.symbolicNames) \
               + " at " + self.getTokenErrorDisplay(t)
         recognizer.notifyErrorListeners(msg, t, None)
 
@@ -516,7 +516,12 @@ class DefaultErrorStrategy(ErrorStrategy):
         if expectedTokenType==Token.EOF:
             tokenText = "<missing EOF>"
         else:
-            tokenText = "<missing " + recognizer.tokenNames[expectedTokenType] + ">"
+            name = None
+            if expectedTokenType < len(recognizer.literalNames):
+                name = recognizer.literalNames[expectedTokenType]
+            if name is None and expectedTokenType < len(recognizer.symbolicNames):
+                name = recognizer.symbolicNames[expectedTokenType]
+            tokenText = "<missing " + str(name) + ">"
         current = currentSymbol
         lookback = recognizer.getTokenStream().LT(-1)
         if current.type==Token.EOF and lookback is not None:

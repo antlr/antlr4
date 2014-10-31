@@ -68,6 +68,7 @@ class RecognitionException(Exception):
 
     def __init__(self, message:str=None, recognizer:Recognizer=None, input:InputStream=None, ctx:ParserRulecontext=None):
         super().__init__(message)
+        self.message = message
         self.recognizer = recognizer
         self.input = input
         self.ctx = ctx
@@ -166,6 +167,7 @@ class FailedPredicateException(RecognitionException):
                          input=recognizer.getInputStream(), ctx=recognizer._ctx)
         s = recognizer._interp.atn.states[recognizer.state]
         trans = s.transitions[0]
+        from antlr4.atn.Transition import PredicateTransition
         if isinstance(trans, PredicateTransition):
             self.ruleIndex = trans.ruleIndex
             self.predicateIndex = trans.predIndex

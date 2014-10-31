@@ -114,7 +114,7 @@ class IntervalSet(object):
                 k += 1
 
 
-    def toString(self, tokenNames:list):
+    def toString(self, literalNames:list, symbolicNames:list):
         if self.intervals is None:
             return "{}"
         with StringIO() as buf:
@@ -125,19 +125,23 @@ class IntervalSet(object):
                 for j in i:
                     if not first:
                         buf.write(u", ")
-                    buf.write(self.elementName(tokenNames, j))
+                    buf.write(self.elementName(literalNames, symbolicNames, j))
                     first = False
             if len(self)>1:
                 buf.write(u"}")
             return buf.getvalue()
 
-    def elementName(self, tokenNames:list, a:int):
+    def elementName(self, literalNames:list, symbolicNames:list, a:int):
         if a==Token.EOF:
             return "<EOF>"
         elif a==Token.EPSILON:
             return "<EPSILON>"
         else:
-            return tokenNames[a]
+            if a<len(literalNames):
+                return literalNames[a]
+            if a<len(symbolicNames):
+                return symbolicNames[a]
+            return "<UNKNOWN>"
 
 
 class TestIntervalSet(unittest.TestCase):

@@ -85,7 +85,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.test.ErrorQueue;
+import org.antlr.v4.test.tool.ErrorQueue;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.DefaultToolListener;

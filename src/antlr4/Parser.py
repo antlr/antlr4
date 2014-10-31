@@ -561,7 +561,7 @@ class Parser (Recognizer):
                 if seenOne:
                     print()
                 print("Decision " + str(dfa.decision) + ":")
-                print(dfa.toString(self.tokenNames), end='')
+                print(dfa.toString(self.literalNames, self.symbolicNames), end='')
                 seenOne = True
 
 
