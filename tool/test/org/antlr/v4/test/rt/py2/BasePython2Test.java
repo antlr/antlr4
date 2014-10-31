@@ -1,4 +1,4 @@
-package org.antlr.v4.py2.test;
+package org.antlr.v4.test.rt.py2;
 
 import org.antlr.v4.py.test.BasePythonTest;
 import org.stringtemplate.v4.ST;

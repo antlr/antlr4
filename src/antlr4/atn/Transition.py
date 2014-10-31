@@ -124,10 +124,11 @@ class RuleTransition(Transition):
 
 class EpsilonTransition(Transition):
 
-    def __init__(self, target):
+    def __init__(self, target, outermostPrecedenceReturn=-1):
         super(EpsilonTransition, self).__init__(target)
         self.serializationType = self.EPSILON
         self.isEpsilon = True
+        self.outermostPrecedenceReturn = outermostPrecedenceReturn
 
     def matches( self, symbol, minVocabSymbol,  maxVocabSymbol):
         return False

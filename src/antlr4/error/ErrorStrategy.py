@@ -296,9 +296,9 @@ class DefaultErrorStrategy(ErrorStrategy):
     # @param e the recognition exception
     #
     def reportFailedPredicate(self, recognizer, e):
-        ruleName = recognizer.ruleNames[recognizer._ctx.ruleIndex]
+        ruleName = recognizer.ruleNames[recognizer._ctx.getRuleIndex()]
         msg = "rule " + ruleName + " " + e.message
-        recognizer.notifyErrorListeners(e.offendingToken, msg, e)
+        recognizer.notifyErrorListeners(msg, e.offendingToken, e)
 
     # This method is called to report a syntax error which requires the removal
     # of a token from the input stream. At the time this method is called, the

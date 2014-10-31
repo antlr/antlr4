@@ -230,7 +230,12 @@ class ATNDeserializer (object):
                 t = state.transitions[i]
                 if not isinstance(t, RuleTransition):
                     continue
-                atn.ruleToStopState[t.target.ruleIndex].addTransition(EpsilonTransition(t.followState))
+                outermostPrecedenceReturn = -1
+                if atn.ruleToStartState[t.target.ruleIndex].isPrecedenceRule:
+                    if t.precedence == 0:
+                        outermostPrecedenceReturn = t.target.ruleIndex
+                trans = EpsilonTransition(t.followState, outermostPrecedenceReturn)
+                atn.ruleToStopState[t.target.ruleIndex].addTransition(trans)
 
         for state in atn.states:
             if isinstance(state, BlockStartState):

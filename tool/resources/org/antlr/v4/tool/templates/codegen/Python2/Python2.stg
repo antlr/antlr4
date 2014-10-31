@@ -49,6 +49,7 @@ pythonTypeInitMap ::= [
 
 ParserFile(file, parser, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
+# encoding: utf-8
 from __future__ import print_function
 from antlr4 import *
 from io import StringIO
@@ -131,6 +132,11 @@ from .<superClass> import <superClass>
 <endif>
 <atn>
 
+EOF = <TokenLabelType()>.EOF
+<if(parser.tokens)>
+<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator="\n", wrap, anchor>
+<endif>
+
 class <parser.name> ( <if(superClass)><superClass><else>Parser<endif> ):
 	
     grammarFileName = "<parser.grammarFileName; format="java-escape">"
@@ -141,11 +147,6 @@ class <parser.name> ( <if(superClass)><superClass><else>Parser<endif> ):
 	
     sharedContextCache = PredictionContextCache()
 	
-    EOF = <TokenLabelType()>.EOF
-	<if(parser.tokens)>
-    <parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator="\n", wrap, anchor>
-	<endif>
-
     literalNames = [ <parser.literalNames:{t | u<t>}; null="u\"\<INVALID>\"", separator=", ", wrap, anchor> ]
 
     symbolicNames = [ <parser.symbolicNames:{t | u<t>}; null="u\"\<INVALID>\"", separator=", ", wrap, anchor> ]
@@ -477,16 +478,16 @@ offsetShiftVar(shiftAmount, offset) ::= <%
 %>
 
 offsetShiftType(shiftAmount, offset) ::= <%
-<if(!isZero.(offset))>(self.<shiftAmount> - <offset>)<else>self.<shiftAmount><endif>
+<if(!isZero.(offset))>(<shiftAmount> - <offset>)<else><shiftAmount><endif>
 %>
 
 // produces more efficient bytecode when bits.ttypes contains at most two items
 bitsetInlineComparison(s, bits) ::= <%
-<bits.ttypes:{ttype | <s.varName>==<parser.name>.<ttype>}; separator=" or ">
+<bits.ttypes:{ttype | <s.varName>==<ttype>}; separator=" or ">
 %>
 
 cases(ttypes) ::= <<
-if token in [<ttypes:{t | self.<t>}; separator=", ">]:
+if token in [<ttypes:{t | <t>}; separator=", ">]:
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
@@ -496,7 +497,7 @@ self.state = <r.stateNumber>
 
 MatchToken(m) ::= <<
 self.state = <m.stateNumber>
-<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>self.match(self.<m.name>)
+<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>self.match(<m.name>)
 >>
 
 MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
@@ -526,6 +527,7 @@ ArgAction(a, chunks) ::= "<chunks>"
 SemPred(p, chunks, failChunks) ::= <<
 self.state = <p.stateNumber>
 if not <chunks>:
+    from antlr4.error.Errors import FailedPredicateException
     raise FailedPredicateException(self, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><endif>)
 >>
 
@@ -592,21 +594,21 @@ RuleContextListDecl(rdecl) ::= "self.<rdecl.name> = list() # of <rdecl.ctxName>s
 
 ContextTokenGetterDecl(t)      ::= <<
 def <t.name>(self):
-    return self.getToken(<parser.name>.<t.name>, 0)
+    return self.getToken(<t.name>, 0)
 >>
 
 // should never be called
 ContextTokenListGetterDecl(t)  ::= <<
 def <t.name>_list(self):
-    return self.getTokens(<parser.name>.<t.name>)
+    return self.getTokens(<t.name>)
 >>
 
 ContextTokenListIndexedGetterDecl(t)  ::= <<
 def <t.name>(self, i=None):
     if i is None:
-        return self.getTokens(<parser.name>.<t.name>)
+        return self.getTokens(<t.name>)
     else:
-        return self.getToken(<parser.name>.<t.name>, i)
+        return self.getToken(<t.name>, i)
 >>
 
 ContextRuleGetterDecl(r)       ::= <<
@@ -721,11 +723,18 @@ localctx = <parser.name>.<ctxName>Context(self, _parentctx, _parentState)
 self.pushNewRecursionContext(localctx, _startState, self.RULE_<ruleName>)
 >>
 
-recRuleLabeledAltStartAction(ruleName, currentAltLabel, label) ::= <<
+recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= <<
 localctx = <parser.name>.<currentAltLabel; format="cap">Context(self, <parser.name>.<ruleName; format="cap">Context(self, _parentctx, _parentState))
-<if(label)>localctx.<label> = _prevctx<endif>
+<if(label)>
+<if(isListLabel)>
+localctx.<label>.append(_prevctx)
+<else>
+localctx.<label> = _prevctx
+<endif>
+<endif>
 self.pushNewRecursionContext(localctx, _startState, self.RULE_<ruleName>)
 >>
+
 
 recRuleReplaceContext(ctxName) ::= <<
 localctx = <parser.name>.<ctxName>Context(self, localctx)
@@ -742,6 +751,7 @@ _prevctx = localctx
 
 LexerFile(lexerFile, lexer, namedActions) ::= <<
 <fileHeader(lexerFile.grammarFileName, lexerFile.ANTLRVersion)>
+# encoding: utf-8
 from __future__ import print_function
 from antlr4 import *
 from io import StringIO
@@ -755,13 +765,13 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 
 <atn>
 
+<lexer.tokens:{k | <k> = <lexer.tokens.(k)>}; separator="\n", wrap, anchor>
+    
 class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
 
     atn = ATNDeserializer().deserialize(serializedATN())
     
     decisionsToDFA = [ DFA(ds, i) for i, ds in enumerate(atn.decisionToState) ]
-    
-    <lexer.tokens:{k | <k> = <lexer.tokens.(k)>}; separator="\n", wrap, anchor>
     
     <rest(lexer.modes):{m| <m> = <i>}; separator="\n">
     
