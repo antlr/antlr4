@@ -831,6 +831,12 @@ public abstract class BaseTest {
 		    "    var stream = new antlr4.CommonTokenStream(lexer);\n" +
 			"<createParser>"+
 			"    parser.buildParseTrees = true;\n" +
+	        "	 printer = function() {\n" +
+	        "		this.println = function(s) { console.log(s); }\n" +
+	        "		this.print = function(s) { process.stdout.write(s); }\n" +
+	        "		return this;\n" +
+	        "	 };\n" +
+			"    parser.printer = new printer();\n" +
 			"    var tree = parser.<parserStartRuleName>();\n" +
 			"    antlr4.tree.ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
 			"}\n" +

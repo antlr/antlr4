@@ -317,8 +317,8 @@ public class TestParserExec extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "start : a* EOF;\n" +
 	                  "a\n" +
-	                  "  : label=subrule { document.getElementById('output').value += $label.text + '\\n'; } #One\n" +
-	                  "  | label='y' { document.getElementById('output').value += $label.text + '\\n'; } #Two\n" +
+	                  "  : label=subrule {document.getElementById('output').value += $label.text + '\\n';} #One\n" +
+	                  "  | label='y' {document.getElementById('output').value += $label.text + '\\n';} #Two\n" +
 	                  "  ;\n" +
 	                  "subrule : 'x';\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
@@ -395,9 +395,9 @@ public class TestParserExec extends BaseTest {
 
 	String testReferenceToATN(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "a : (ID|ATN)* ATN? {document.getElementById('output').value += $text + '\\n';} ;\n" +
+	                  "a : (ID|ATN_)* ATN_? {document.getElementById('output').value += $text + '\\n';} ;\n" +
 	                  "ID : 'a'..'z'+ ;\n" +
-	                  "ATN : '0'..'9'+;\n" +
+	                  "ATN_ : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", input, false);
 	}

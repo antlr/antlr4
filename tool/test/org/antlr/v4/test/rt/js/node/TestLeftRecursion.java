@@ -236,14 +236,14 @@ public class TestLeftRecursion extends BaseTest {
 	                  "    |   'super'\n" +
 	                  "    |   INT\n" +
 	                  "    |   ID\n" +
-	                  "    |   type '.' 'class'\n" +
+	                  "    |   type_ '.' 'class'\n" +
 	                  "    |   e '.' ID\n" +
 	                  "    |   e '.' 'this'\n" +
 	                  "    |   e '.' 'super' '(' expressionList? ')'\n" +
 	                  "    |   e '.' 'new' ID '(' expressionList? ')'\n" +
-	                  "	 |	 'new' type ( '(' expressionList? ')' | ('[' e ']')+)\n" +
+	                  "	 |	 'new' type_ ( '(' expressionList? ')' | ('[' e ']')+)\n" +
 	                  "    |   e '[' e ']'\n" +
-	                  "    |   '(' type ')' e\n" +
+	                  "    |   '(' type_ ')' e\n" +
 	                  "    |   e ('++' | '--')\n" +
 	                  "    |   e '(' expressionList? ')'\n" +
 	                  "    |   ('+'|'-'|'++'|'--') e\n" +
@@ -274,7 +274,7 @@ public class TestLeftRecursion extends BaseTest {
 	                  "          |'<<='\n" +
 	                  "          |'%=') e\n" +
 	                  "    ;\n" +
-	                  "type: ID \n" +
+	                  "type_: ID \n" +
 	                  "    | ID '[' ']'\n" +
 	                  "    | 'int'\n" +
 	                  "	 | 'int' '[' ']' \n" +
@@ -330,21 +330,21 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_7() throws Exception {
 		String found = testJavaExpressions("(T)x");
-		assertEquals("(s (e ( (type T) ) (e x)) <EOF>)\n", found);
+		assertEquals("(s (e ( (type_ T) ) (e x)) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testJavaExpressions_8() throws Exception {
 		String found = testJavaExpressions("new A().b");
-		assertEquals("(s (e (e new (type A) ( )) . b) <EOF>)\n", found);
+		assertEquals("(s (e (e new (type_ A) ( )) . b) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
 	@Test
 	public void testJavaExpressions_9() throws Exception {
 		String found = testJavaExpressions("(T)t.f()");
-		assertEquals("(s (e (e ( (type T) ) (e (e t) . f)) ( )) <EOF>)\n", found);
+		assertEquals("(s (e (e ( (type_ T) ) (e (e t) . f)) ( )) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 
@@ -365,7 +365,7 @@ public class TestLeftRecursion extends BaseTest {
 	@Test
 	public void testJavaExpressions_12() throws Exception {
 		String found = testJavaExpressions("new T[((n-1) * x) + 1]");
-		assertEquals("(s (e new (type T) [ (e (e ( (e (e ( (e (e n) - (e 1)) )) * (e x)) )) + (e 1)) ]) <EOF>)\n", found);
+		assertEquals("(s (e new (type_ T) [ (e (e ( (e (e ( (e (e n) - (e 1)) )) * (e x)) )) + (e 1)) ]) <EOF>)\n", found);
 		assertNull(this.stderrDuringParse);
 	}
 

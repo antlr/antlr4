@@ -317,8 +317,8 @@ public class TestParserExec extends BaseTest {
 		String grammar = "grammar T;\n" +
 	                  "start : a* EOF;\n" +
 	                  "a\n" +
-	                  "  : label=subrule { console.log($label.text); } #One\n" +
-	                  "  | label='y' { console.log($label.text); } #Two\n" +
+	                  "  : label=subrule {console.log($label.text);} #One\n" +
+	                  "  | label='y' {console.log($label.text);} #Two\n" +
 	                  "  ;\n" +
 	                  "subrule : 'x';\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
@@ -395,9 +395,9 @@ public class TestParserExec extends BaseTest {
 
 	String testReferenceToATN(String input) throws Exception {
 		String grammar = "grammar T;\n" +
-	                  "a : (ID|ATN)* ATN? {console.log($text);} ;\n" +
+	                  "a : (ID|ATN_)* ATN_? {console.log($text);} ;\n" +
 	                  "ID : 'a'..'z'+ ;\n" +
-	                  "ATN : '0'..'9'+;\n" +
+	                  "ATN_ : '0'..'9'+;\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", input, false);
 	}

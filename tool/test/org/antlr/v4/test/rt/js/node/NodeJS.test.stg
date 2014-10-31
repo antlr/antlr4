@@ -99,9 +99,17 @@ writeln(s) ::= <<console.log(<s>);>>
 
 write(s) ::= <<process.stdout.write(<s>);>>
 
+False() ::= "false"
+
+True() ::= "true"
+
+Not(v) ::= "!<v>"
+
 Assert(s) ::= <<console.assert(<s>);>>
 
 Cast(t,v) ::= "<v>"
+
+Append(a,b) ::= "<a> + <b>"
 
 Concat(a,b) ::= "<a><b>"
 

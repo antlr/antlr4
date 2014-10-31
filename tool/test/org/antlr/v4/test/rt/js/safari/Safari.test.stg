@@ -99,9 +99,17 @@ writeln(s) ::= <<document.getElementById('output').value += <s> + '\\n';>>
 
 write(s) ::= <<document.getElementById('output').value += <s>;>>
 
+False() ::= "false"
+
+True() ::= "true"
+
+Not(v) ::= "!<v>"
+
 Assert(s) ::= ""
 
 Cast(t,v) ::= "<v>"
+
+Append(a,b) ::= "<a> + <b>"
 
 Concat(a,b) ::= "<a><b>"
 

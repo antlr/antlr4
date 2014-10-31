@@ -209,9 +209,7 @@ public class TestCompositeParsers extends BaseTest {
 		String slave_S = "parser grammar S;\n" +
 	                  "type_ : 'int' ;\n" +
 	                  "decl : type_ ID ';'\n" +
-	                  "	| type_ ID init ';' {\n" +
-	                  "		process.stdout.write(\"Decl: \" + $text);\n" +
-	                  "	};\n" +
+	                  "	| type_ ID init ';' {process.stdout.write(\"Decl: \" + $text);};\n" +
 	                  "init : '=' INT;";
 		mkdir(tmpdir);
 		writeFile(tmpdir, "S.g4", slave_S);
@@ -261,7 +259,7 @@ public class TestCompositeParsers extends BaseTest {
 
 		String grammar = "grammar M;\n" +
 	                  "import S;\n" +
-	                  "a : A {console.log(\"M.a: \"+$A);};\n" +
+	                  "a : A {console.log(\"M.a: \" + $A);};\n" +
 	                  "A : 'abc' {console.log(\"M.A\");};\n" +
 	                  "WS : (' '|'\\n') -> skip ;";
 		String found = execParser("M.g4", grammar, "MParser", "MLexer", "MListener", "MVisitor", "a", "abc", false);
