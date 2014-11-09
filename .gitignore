@@ -31,3 +31,15 @@ nbactions*.xml
 
 # Playground
 #/tool/playground/
+
+# Generated files
+out/
+doc/
+gen3/
+gen4/
+tmp/
+
+# Configurable build files
+bild.py
+bild*
+
