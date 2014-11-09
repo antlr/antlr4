@@ -34,10 +34,11 @@ public class Generator {
 		Map<String, File> configs = new HashMap<String, File>();
 		configs.put("Source", readGrammarDir()); // source of test templates
 		configs.put("Java", readJavaDir()); // generated Java tests
-		configs.put("Python2", readPython2Dir()); // generated Python2 tests
-		configs.put("Python3", readPython3Dir()); // generated Python3 tests
-		configs.put("NodeJS", readNodeJSDir()); // generated NodeJS tests
-		configs.put("Safari", readSafariDir()); // generated Firefox tests
+		configs.put("CSharp", readCSharpDir()); // generated CSharp tests
+		// configs.put("Python2", readPython2Dir()); // generated Python2 tests
+		// configs.put("Python3", readPython3Dir()); // generated Python3 tests
+		// configs.put("NodeJS", readNodeJSDir()); // generated NodeJS tests
+		// configs.put("Safari", readSafariDir()); // generated Firefox tests
 		// configs.put("Firefox", readFirefoxDir()); // generated Firefox tests
 		return configs;
 	}
@@ -48,6 +49,11 @@ public class Generator {
 		URL url = ClassLoader.getSystemResource(className);
 		String uri = url.toURI().toString().replace("target/test-classes", "test");
 		return new File(new URI(uri));
+	}
+
+	private static File readCSharpDir() {
+		// TODO Auto-generated method stub
+		return new File("/Users/ericvergnaud/Development/antlr4/antlr/antlr4-csharp/tool/test/org/antlr/v4/test/rt/csharp");
 	}
 
 	private static File readPython2Dir() {
