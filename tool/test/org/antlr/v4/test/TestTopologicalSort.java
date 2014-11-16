@@ -53,7 +53,7 @@ public class TestTopologicalSort extends BaseTest {
         g.addEdge("F", "H");
         g.addEdge("E", "F");
 
-        String expecting = "[H, F, E, D, G, A, B, C]";
+        String expecting = "[H, F, G, E, D, A, B, C]";
         List<String> nodes = g.sort();
         String result = nodes.toString();
         assertEquals(expecting, result);
@@ -95,7 +95,7 @@ public class TestTopologicalSort extends BaseTest {
         g.addEdge("Def.g4", "Java.tokens");    // walkers feed off generated tokens
         g.addEdge("Ref.g4", "Java.tokens");
 
-        String expecting = "[MyJava.tokens, Java.g4, Java.tokens, Ref.g4, Def.g4]";
+        String expecting = "[MyJava.tokens, Java.g4, Java.tokens, Def.g4, Ref.g4]";
         List<String> nodes = g.sort();
         String result = nodes.toString();
         assertEquals(expecting, result);
@@ -109,7 +109,7 @@ public class TestTopologicalSort extends BaseTest {
         g.addEdge("Def.g4", "JavaLexer.tokens");
         g.addEdge("Ref.g4", "JavaLexer.tokens");
 
-        String expecting = "[JavaLexer.g4, JavaLexer.tokens, JavaParser.g4, Ref.g4, Def.g4]";
+        String expecting = "[JavaLexer.g4, JavaLexer.tokens, JavaParser.g4, Def.g4, Ref.g4]";
         List<String> nodes = g.sort();
         String result = nodes.toString();
         assertEquals(expecting, result);

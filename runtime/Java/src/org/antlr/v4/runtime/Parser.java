@@ -857,7 +857,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 			List<String> s = new ArrayList<String>();
 			for (int d = 0; d < _interp.decisionToDFA.length; d++) {
 				DFA dfa = _interp.decisionToDFA[d];
-				s.add( dfa.toString(getTokenNames()) );
+				s.add( dfa.toString(getVocabulary()) );
 			}
 			return s;
 		}
@@ -872,7 +872,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 				if ( !dfa.states.isEmpty() ) {
 					if ( seenOne ) System.out.println();
 					System.out.println("Decision " + dfa.decision + ":");
-					System.out.print(dfa.toString(getTokenNames()));
+					System.out.print(dfa.toString(getVocabulary()));
 					seenOne = true;
 				}
 			}
@@ -920,5 +920,15 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 			else _tracer = new TraceListener();
 			addParseListener(_tracer);
 		}
+	}
+
+	/**
+	 * Gets whether a {@link TraceListener} is registered as a parse listener
+	 * for the parser.
+	 *
+	 * @see #setTrace(boolean)
+	 */
+	public boolean isTrace() {
+		return _tracer != null;
 	}
 }

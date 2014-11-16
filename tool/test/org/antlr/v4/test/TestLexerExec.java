@@ -147,7 +147,7 @@ public class TestLexerExec extends BaseTest {
 		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
 		assertEquals(
 			"[@0,0:13='//blah\\n//blah\\n',<1>,1:0]\n" +
-			"[@1,14:13='<EOF>',<-1>,3:14]\n", found);
+			"[@1,14:13='<EOF>',<-1>,3:0]\n", found);
 		assertNull(stderrDuringParse);
 	}
 
@@ -162,7 +162,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(
 			"[@0,0:6='//blah\\n',<1>,1:0]\n" +
 			"[@1,7:13='//blah\\n',<1>,2:0]\n" +
-			"[@2,14:13='<EOF>',<-1>,3:7]\n", found);
+			"[@2,14:13='<EOF>',<-1>,3:0]\n", found);
 		assertNull(stderrDuringParse);
 	}
 
@@ -176,7 +176,7 @@ public class TestLexerExec extends BaseTest {
 		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
 		assertEquals(
 			"[@0,0:13='//blah\\n//blah\\n',<1>,1:0]\n" +
-			"[@1,14:13='<EOF>',<-1>,3:14]\n", found);
+			"[@1,14:13='<EOF>',<-1>,3:0]\n", found);
 		assertNull(stderrDuringParse);
 	}
 
@@ -191,7 +191,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(
 			"[@0,0:6='//blah\\n',<1>,1:0]\n" +
 			"[@1,7:13='//blah\\n',<1>,2:0]\n" +
-			"[@2,14:13='<EOF>',<-1>,3:7]\n", found);
+			"[@2,14:13='<EOF>',<-1>,3:0]\n", found);
 		assertNull(stderrDuringParse);
 	}
 
@@ -205,7 +205,7 @@ public class TestLexerExec extends BaseTest {
 		String found = execLexer("L.g4", grammar, "L", "//blah\n//blah\n");
 		assertEquals(
 			"[@0,0:13='//blah\\n//blah\\n',<1>,1:0]\n" +
-			"[@1,14:13='<EOF>',<-1>,3:14]\n", found);
+			"[@1,14:13='<EOF>',<-1>,3:0]\n", found);
 		assertNull(stderrDuringParse);
 	}
 
@@ -220,7 +220,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals(
 			"[@0,0:6='//blah\\n',<1>,1:0]\n" +
 			"[@1,7:13='//blah\\n',<1>,2:0]\n" +
-			"[@2,14:13='<EOF>',<-1>,3:7]\n", found);
+			"[@2,14:13='<EOF>',<-1>,3:0]\n", found);
 		assertNull(stderrDuringParse);
 	}
 
@@ -237,7 +237,7 @@ public class TestLexerExec extends BaseTest {
 			"[@1,9:9='\\n',<2>,1:9]\n" +
 			"[@2,10:34='/* /* */\\n/* /*nested*/ */',<1>,2:0]\n" +
 			"[@3,35:35='\\n',<2>,3:16]\n" +
-			"[@4,36:35='<EOF>',<-1>,4:17]\n";
+			"[@4,36:35='<EOF>',<-1>,4:0]\n";
 
 		// stuff on end of comment matches another rule
 		String found = execLexer("L.g4", grammar, "L",
@@ -262,7 +262,7 @@ public class TestLexerExec extends BaseTest {
 			"[@1,10:10='\\n',<2>,1:10]\n" +
 			"[@2,11:36='/* /* */x\\n/* /*nested*/ */',<1>,2:0]\n" +
 			"[@3,38:38='\\n',<2>,3:17]\n" +
-			"[@4,39:38='<EOF>',<-1>,4:18]\n";
+			"[@4,39:38='<EOF>',<-1>,4:0]\n";
 		String found = execLexer("L.g4", grammar, "L",
 						  "/* ick */x\n" +
 						  "/* /* */x\n" +
@@ -286,7 +286,7 @@ public class TestLexerExec extends BaseTest {
 			"[@1,9:9='\\n',<2>,1:9]\n" +
 			"[@2,10:34='/* /* */\\n/* /*nested*/ */',<1>,2:0]\n" +
 			"[@3,35:35='\\n',<2>,3:16]\n" +
-			"[@4,36:35='<EOF>',<-1>,4:17]\n";
+			"[@4,36:35='<EOF>',<-1>,4:0]\n";
 
 		// stuff on end of comment matches another rule
 		String found = execLexer("L.g4", grammar, "L",
@@ -311,7 +311,7 @@ public class TestLexerExec extends BaseTest {
 			"[@1,10:10='\\n',<2>,1:10]\n" +
 			"[@2,11:36='/* /* */x\\n/* /*nested*/ */',<1>,2:0]\n" +
 			"[@3,38:38='\\n',<2>,3:17]\n" +
-			"[@4,39:38='<EOF>',<-1>,4:18]\n";
+			"[@4,39:38='<EOF>',<-1>,4:0]\n";
 		String found = execLexer("L.g4", grammar, "L",
 						  "/* ick */x\n" +
 						  "/* /* */x\n" +
@@ -647,13 +647,43 @@ public class TestLexerExec extends BaseTest {
 		grammar.append("lexer grammar L;\n");
 		grammar.append("WS : [ \\t\\r\\n]+ -> skip;\n");
 		for (int i = 0; i < 4000; i++) {
-			grammar.append("KW").append(i).append(" : '").append("KW").append(i).append("';\n");
+			grammar.append("KW").append(i).append(" : 'KW' '").append(i).append("';\n");
 		}
 
 		String input = "KW400";
 		String found = execLexer("L.g4", grammar.toString(), "L", input);
 		String expecting =
 			"[@0,0:4='KW400',<402>,1:0]\n" +
+			"[@1,5:4='<EOF>',<-1>,1:5]\n";
+		assertEquals(expecting, found);
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#687 "Empty zero-length tokens
+	 * cannot have lexer commands" and antlr/antlr4#688 "Lexer cannot match
+	 * zero-length tokens"
+	 * https://github.com/antlr/antlr4/issues/687
+	 * https://github.com/antlr/antlr4/issues/688
+	 */
+	@Test public void testZeroLengthToken() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"\n" +
+			"BeginString\n" +
+			"	:	'\\'' -> more, pushMode(StringMode)\n" +
+			"	;\n" +
+			"\n" +
+			"mode StringMode;\n" +
+			"\n" +
+			"	StringMode_X : 'x' -> more;\n" +
+			"	StringMode_Done : -> more, mode(EndStringMode);\n" +
+			"\n" +
+			"mode EndStringMode;	\n" +
+			"\n" +
+			"	EndString : '\\'' -> popMode;\n";
+		String found = execLexer("L.g4", grammar, "L", "'xxx'");
+		String expecting =
+			"[@0,0:4=''xxx'',<1>,1:0]\n" +
 			"[@1,5:4='<EOF>',<-1>,1:5]\n";
 		assertEquals(expecting, found);
 	}

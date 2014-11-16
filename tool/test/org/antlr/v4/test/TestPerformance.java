@@ -72,8 +72,6 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
@@ -1237,7 +1235,7 @@ public class TestPerformance extends BaseTest {
 
 							if (USE_PARSER_INTERPRETER) {
 								Parser referenceParser = parserCtor.newInstance(tokens);
-								parser = new ParserInterpreter(referenceParser.getGrammarFileName(), Arrays.asList(referenceParser.getTokenNames()), Arrays.asList(referenceParser.getRuleNames()), referenceParser.getATN(), tokens);
+								parser = new ParserInterpreter(referenceParser.getGrammarFileName(), referenceParser.getVocabulary(), Arrays.asList(referenceParser.getRuleNames()), referenceParser.getATN(), tokens);
 							}
 							else {
 								parser = parserCtor.newInstance(tokens);
@@ -1318,7 +1316,7 @@ public class TestPerformance extends BaseTest {
 
 								if (USE_PARSER_INTERPRETER) {
 									Parser referenceParser = parserCtor.newInstance(tokens);
-									parser = new ParserInterpreter(referenceParser.getGrammarFileName(), Arrays.asList(referenceParser.getTokenNames()), Arrays.asList(referenceParser.getRuleNames()), referenceParser.getATN(), tokens);
+									parser = new ParserInterpreter(referenceParser.getGrammarFileName(), referenceParser.getVocabulary(), Arrays.asList(referenceParser.getRuleNames()), referenceParser.getATN(), tokens);
 								}
 								else {
 									parser = parserCtor.newInstance(tokens);
@@ -1997,5 +1995,37 @@ public class TestPerformance extends BaseTest {
 								  input, false);
 		Assert.assertEquals("", found);
 		Assert.assertEquals(null, stderrDuringParse);
+	}
+
+	@Test(timeout = 20000)
+	public void testExponentialInclude() {
+		String grammarFormat =
+			"parser grammar Level_%d_%d;\n" +
+			"\n" +
+			"%s import Level_%d_1, Level_%d_2;\n" +
+			"\n" +
+			"rule_%d_%d : EOF;\n";
+
+		System.out.println("dir "+tmpdir);
+		mkdir(tmpdir);
+
+		long startTime = System.nanoTime();
+
+		int levels = 20;
+		for (int level = 0; level < levels; level++) {
+			String leafPrefix = level == levels - 1 ? "//" : "";
+			String grammar1 = String.format(grammarFormat, level, 1, leafPrefix, level + 1, level + 1, level, 1);
+			writeFile(tmpdir, "Level_" + level + "_1.g4", grammar1);
+			if (level > 0) {
+				String grammar2 = String.format(grammarFormat, level, 2, leafPrefix, level + 1, level + 1, level, 1);
+				writeFile(tmpdir, "Level_" + level + "_2.g4", grammar2);
+			}
+		}
+
+		ErrorQueue equeue = antlr("Level_0_1.g4", false);
+		Assert.assertTrue(equeue.errors.isEmpty());
+
+		long endTime = System.nanoTime();
+		System.out.format("%s milliseconds.%n", (endTime - startTime) / 1000000.0);
 	}
 }

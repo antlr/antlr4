@@ -37,6 +37,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
 
@@ -127,6 +128,8 @@ public class SemanticPipeline {
 							 collector.tokenIDRefs, collector.terminals);
 		}
 
+		assignChannelTypes(g, collector.channelDefs);
+
 		// CHECK RULE REFS NOW (that we've defined rules in grammar)
 		symcheck.checkRuleArgs(g, collector.rulerefs);
 		identifyStartRules(collector);
@@ -186,7 +189,10 @@ public class SemanticPipeline {
 			for (String lit : conflictingLiterals) {
 				// Remove literal if repeated across rules so it's not
 				// found by parser grammar.
-				G.stringLiteralToTypeMap.remove(lit);
+				Integer value = G.stringLiteralToTypeMap.remove(lit);
+				if (value != null && value > 0 && value < G.typeToStringLiteralList.size() && lit.equals(G.typeToStringLiteralList.get(value))) {
+					G.typeToStringLiteralList.set(value, null);
+				}
 			}
 		}
 
@@ -256,5 +262,39 @@ public class SemanticPipeline {
 
 		g.tool.log("semantics", "tokens="+g.tokenNameToTypeMap);
         g.tool.log("semantics", "strings="+g.stringLiteralToTypeMap);
+	}
+
+	/**
+	 * Assign constant values to custom channels defined in a grammar.
+	 *
+	 * @param g The grammar.
+	 * @param channelDefs A collection of AST nodes defining individual channels
+	 * within a {@code channels{}} block in the grammar.
+	 */
+	void assignChannelTypes(Grammar g, List<GrammarAST> channelDefs) {
+		Grammar outermost = g.getOutermostGrammar();
+		for (GrammarAST channel : channelDefs) {
+			String channelName = channel.getText();
+
+			// Channel names can't alias tokens or modes, because constant
+			// values are also assigned to them and the ->channel(NAME) lexer
+			// command does not distinguish between the various ways a constant
+			// can be declared. This method does not verify that channels do not
+			// alias rules, because rule names are not associated with constant
+			// values in ANTLR grammar semantics.
+
+			if (g.getTokenType(channelName) != Token.INVALID_TYPE) {
+				g.tool.errMgr.grammarError(ErrorType.CHANNEL_CONFLICTS_WITH_TOKEN, g.fileName, channel.token, channelName);
+			}
+
+			if (outermost instanceof LexerGrammar) {
+				LexerGrammar lexerGrammar = (LexerGrammar)outermost;
+				if (lexerGrammar.modes.containsKey(channelName)) {
+					g.tool.errMgr.grammarError(ErrorType.CHANNEL_CONFLICTS_WITH_MODE, g.fileName, channel.token, channelName);
+				}
+			}
+
+			outermost.defineChannelName(channel.getText());
+		}
 	}
 }

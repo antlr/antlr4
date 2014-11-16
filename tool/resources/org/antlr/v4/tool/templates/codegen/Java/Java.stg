@@ -238,20 +238,16 @@ public class <parser.name> extends <superClass; null="Parser"> {
 	public static final int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<endif>
-	public static final String[] tokenNames = {
-		<parser.tokenNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor>
-	};
 	public static final int
 		<parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
 	public static final String[] ruleNames = {
 		<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	};
 
-	@Override
-	public String getGrammarFileName() { return "<parser.grammarFileName; format="java-escape">"; }
+	<vocabulary(parser.literalNames, parser.symbolicNames)>
 
 	@Override
-	public String[] getTokenNames() { return tokenNames; }
+	public String getGrammarFileName() { return "<parser.grammarFileName; format="java-escape">"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
@@ -270,7 +266,8 @@ public class <parser.name> extends <superClass; null="Parser"> {
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
 		<parser.sempredFuncs.values:{f|
-case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
+case <f.ruleIndex>: 
+	return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
 		}
 		return true;
 	}
@@ -281,13 +278,56 @@ case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}
 }
 >>
 
+vocabulary(literalNames, symbolicNames) ::= <<
+private static final String[] _LITERAL_NAMES = {
+	<literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor>
+};
+private static final String[] _SYMBOLIC_NAMES = {
+	<symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor>
+};
+public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
+
+/**
+ * @deprecated Use {@link #VOCABULARY} instead.
+ */
+@Deprecated
+public static final String[] tokenNames;
+static {
+	tokenNames = new String[_SYMBOLIC_NAMES.length];
+	for (int i = 0; i \< tokenNames.length; i++) {
+		tokenNames[i] = VOCABULARY.getLiteralName(i);
+		if (tokenNames[i] == null) {
+			tokenNames[i] = VOCABULARY.getSymbolicName(i);
+		}
+
+		if (tokenNames[i] == null) {
+			tokenNames[i] = "\<INVALID>";
+		}
+	}
+}
+
+@Override
+@Deprecated
+public String[] getTokenNames() {
+	return tokenNames;
+}
+
+@Override
+@NotNull
+public Vocabulary getVocabulary() {
+	return VOCABULARY;
+}
+>>
+
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
 @Override
 public void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
 	switch (ruleIndex) {
-	<recog.actionFuncs.values:{f|
-case <f.ruleIndex>: <f.name>_action((<f.ctxType>)_localctx, actionIndex); break;}; separator="\n">
+	<recog.actionFuncs.values:{f| 
+case <f.ruleIndex>: 
+	<f.name>_action((<f.ctxType>)_localctx, actionIndex); 
+	break;}; separator="\n">
 	}
 }
 <actionFuncs.values; separator="\n">
@@ -297,7 +337,8 @@ case <f.ruleIndex>: <f.name>_action((<f.ctxType>)_localctx, actionIndex); break;
 public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 	switch (ruleIndex) {
 	<recog.sempredFuncs.values:{f|
-case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
+case <f.ruleIndex>: 
+	return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
 	}
 	return true;
 }
@@ -319,7 +360,9 @@ RuleActionFunction(r, actions) ::= <<
 private void <r.name>_action(<r.ctxType> _localctx, int actionIndex) {
 	switch (actionIndex) {
 	<actions:{index|
-case <index>: <actions.(index)> break;}; separator="\n">
+case <index>: 
+	<actions.(index)> 
+	break;}; separator="\n">
 	}
 }
 >>
@@ -331,7 +374,8 @@ RuleSempredFunction(r, actions) ::= <<
 private boolean <r.name>_sempred(<r.ctxType> _localctx, int predIndex) {
 	switch (predIndex) {
 	<actions:{index|
-case <index>: return <actions.(index)>;}; separator="\n">
+case <index>: 
+	return <actions.(index)>;}; separator="\n">
 	}
 	return true;
 }
@@ -584,11 +628,13 @@ cases(ttypes) ::= <<
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
-setState(<r.stateNumber>); <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
+setState(<r.stateNumber>); 
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
 >>
 
 MatchToken(m) ::= <<
-setState(<m.stateNumber>); <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>match(<m.name>);
+setState(<m.stateNumber>); 
+<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>match(<m.name>);
 >>
 
 MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
@@ -770,7 +816,7 @@ public \<T> T accept(ParseTreeVisitor\<? extends T> visitor) {
 }
 >>
 
-AttributeDecl(d) ::= "<d.type> <d.name>"
+AttributeDecl(d) ::= "<d.type> <d.name><if(d.initValue)> = <d.initValue><endif>"
 
 /** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if(!x.isLocal)>((<x.ctx.name>)_localctx).<endif><x.name>"
@@ -783,15 +829,28 @@ recRuleAltPredicate(ruleName,opPrec)  ::= "precpred(_ctx, <opPrec>)"
 recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>;"
 recRuleSetStopToken()                 ::= "_ctx.stop = _input.LT(-1);"
 
-recRuleAltStartAction(ruleName, ctxName, label) ::= <<
+recRuleAltStartAction(ruleName, ctxName, label, isListLabel) ::= <<
 _localctx = new <ctxName>Context(_parentctx, _parentState);
+<if(label)>
+<if(isListLabel)>
+_localctx.<label>.add(_prevctx);
+<else>
+_localctx.<label> = _prevctx;
+<endif>
+<endif>
 <if(label)>_localctx.<label> = _prevctx;<endif>
 pushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
 >>
 
-recRuleLabeledAltStartAction(ruleName, currentAltLabel, label) ::= <<
+recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= <<
 _localctx = new <currentAltLabel; format="cap">Context(new <ruleName; format="cap">Context(_parentctx, _parentState));
-<if(label)>((<currentAltLabel; format="cap">Context)_localctx).<label> = _prevctx;<endif>
+<if(label)>
+<if(isListLabel)>
+((<currentAltLabel; format="cap">Context)_localctx).<label>.add(_prevctx);
+<else>
+((<currentAltLabel; format="cap">Context)_localctx).<label> = _prevctx;
+<endif>
+<endif>
 pushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
 >>
 
@@ -835,17 +894,20 @@ public class <lexer.name> extends <superClass; null="Lexer"> {
 		new PredictionContextCache();
 	public static final int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
+	<if(lexer.channels)>
+	public static final int
+		<lexer.channels:{k | <k>=<lexer.channels.(k)>}; separator=", ", wrap, anchor>;
+	<endif>
 	<rest(lexer.modes):{m| public static final int <m> = <i>;}; separator="\n">
 	public static String[] modeNames = {
 		<lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor>
 	};
 
-	public static final String[] tokenNames = {
-		<lexer.tokenNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor>
-	};
 	public static final String[] ruleNames = {
 		<lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	};
+
+	<vocabulary(lexer.literalNames, lexer.symbolicNames)>
 
 	<namedActions.members>
 
@@ -856,9 +918,6 @@ public class <lexer.name> extends <superClass; null="Lexer"> {
 
 	@Override
 	public String getGrammarFileName() { return "<lexer.grammarFileName>"; }
-
-	@Override
-	public String[] getTokenNames() { return tokenNames; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }

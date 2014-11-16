@@ -797,4 +797,24 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("", found);
 		assertNull(stderrDuringParse);
 	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#670 "exception when importing
+	 * grammar".
+	 * https://github.com/antlr/antlr4/issues/670
+	 */
+	@Test
+	public void testImportLargeGrammar() throws Exception {
+		String slave = load("Java.g4", "UTF-8");
+		String master =
+			"grammar NewJava;\n" +
+			"import Java;\n";
+
+		System.out.println("dir "+tmpdir);
+		mkdir(tmpdir);
+		writeFile(tmpdir, "Java.g4", slave);
+		String found = execParser("NewJava.g4", master, "NewJavaParser", "NewJavaLexer", "compilationUnit", "package Foo;", debug);
+		assertEquals("", found);
+		assertNull(stderrDuringParse);
+	}
 }

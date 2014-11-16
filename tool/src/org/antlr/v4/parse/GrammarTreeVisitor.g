@@ -125,6 +125,7 @@ public void grammarOption(GrammarAST ID, GrammarAST valueAST) { }
 public void ruleOption(GrammarAST ID, GrammarAST valueAST) { }
 public void blockOption(GrammarAST ID, GrammarAST valueAST) { }
 public void defineToken(GrammarAST ID) { }
+public void defineChannel(GrammarAST ID) { }
 public void globalNamedAction(GrammarAST scope, GrammarAST ID, ActionAST action) { }
 public void importGrammar(GrammarAST label, GrammarAST ID) { }
 
@@ -188,6 +189,12 @@ protected void exitTokensSpec(GrammarAST tree) { }
 
 protected void enterTokenSpec(GrammarAST tree) { }
 protected void exitTokenSpec(GrammarAST tree) { }
+
+protected void enterChannelsSpec(GrammarAST tree) { }
+protected void exitChannelsSpec(GrammarAST tree) { }
+
+protected void enterChannelSpec(GrammarAST tree) { }
+protected void exitChannelSpec(GrammarAST tree) { }
 
 protected void enterAction(GrammarAST tree) { }
 protected void exitAction(GrammarAST tree) { }
@@ -336,7 +343,7 @@ grammarSpec
 @after {
 	exitGrammarSpec($start);
 }
-    :   ^(	GRAMMAR ID {grammarName=$ID.text;} DOC_COMMENT?
+    :   ^(	GRAMMAR ID {grammarName=$ID.text;}
     		{discoverGrammar((GrammarRootAST)$GRAMMAR, $ID);}
  		   	prequelConstructs
     		{finishPrequels($prequelConstructs.firstOne);}
@@ -366,6 +373,7 @@ prequelConstruct
 	:   optionsSpec
     |   delegateGrammars
     |   tokensSpec
+    |   channelsSpec
     |   action
     ;
 
@@ -450,6 +458,26 @@ tokenSpec
 	:	ID					{defineToken($ID);}
 	;
 
+channelsSpec
+@init {
+	enterChannelsSpec($start);
+}
+@after {
+	exitChannelsSpec($start);
+}
+	:   ^(CHANNELS channelSpec+)
+	;
+
+channelSpec
+@init {
+	enterChannelSpec($start);
+}
+@after {
+	exitChannelSpec($start);
+}
+	:	ID					{defineChannel($ID);}
+	;
+
 action
 @init {
 	enterAction($start);
@@ -491,7 +519,7 @@ lexerRule
 }
 	:	^(	RULE TOKEN_REF
 			{currentRuleName=$TOKEN_REF.text; currentRuleAST=$RULE;}
-			DOC_COMMENT? (^(RULEMODIFIERS m=FRAGMENT {mods.add($m);}))?
+			(^(RULEMODIFIERS m=FRAGMENT {mods.add($m);}))?
       		{discoverLexerRule((RuleAST)$RULE, $TOKEN_REF, mods, (GrammarAST)input.LT(1));}
       		lexerRuleBlock
       		{
@@ -512,7 +540,7 @@ rule
 	exitRule($start);
 }
 	:   ^(	RULE RULE_REF {currentRuleName=$RULE_REF.text; currentRuleAST=$RULE;}
-			DOC_COMMENT? (^(RULEMODIFIERS (m=ruleModifier{mods.add($m.start);})+))?
+			(^(RULEMODIFIERS (m=ruleModifier{mods.add($m.start);})+))?
 			ARG_ACTION?
       		ret=ruleReturns?
       		thr=throwsSpec?

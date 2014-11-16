@@ -45,6 +45,8 @@ import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSerializer;
@@ -70,6 +72,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -231,6 +234,26 @@ public class Grammar implements AttributeResolver {
 	 */
 	public final List<String> typeToTokenList = new ArrayList<String>();
 
+	/**
+	 * The maximum channel value which is assigned by this grammar. Values below
+	 * {@link Token#MIN_USER_CHANNEL_VALUE} are assumed to be predefined.
+	 */
+	int maxChannelType = Token.MIN_USER_CHANNEL_VALUE - 1;
+
+	/**
+	 * Map channel like {@code COMMENTS_CHANNEL} to its constant channel value.
+	 * Only user-defined channels are defined in this map.
+	 */
+	public final Map<String, Integer> channelNameToValueMap = new LinkedHashMap<String, Integer>();
+
+	/**
+	 * Map a constant channel value to its name. Indexed with raw channel value.
+	 * The predefined channels {@link Token#DEFAULT_CHANNEL} and
+	 * {@link Token#HIDDEN_CHANNEL} are not stored in this list, so the values
+	 * at the corresponding indexes is {@code null}.
+	 */
+	public final List<String> channelValueToNameList = new ArrayList<String>();
+
     /** Map a name to an action.
      *  The code generator will use this to fill holes in the output files.
      *  I track the AST node for the action in case I need the line number
@@ -357,11 +380,9 @@ public class Grammar implements AttributeResolver {
             if ( t.getType()==ANTLRParser.ASSIGN ) {
 				t = (GrammarAST)t.getChild(1);
 				importedGrammarName = t.getText();
-                tool.log("grammar", "import "+ importedGrammarName);
             }
             else if ( t.getType()==ANTLRParser.ID ) {
                 importedGrammarName = t.getText();
-                tool.log("grammar", "import " + t.getText());
 			}
 			Grammar g;
 			try {
@@ -494,16 +515,24 @@ public class Grammar implements AttributeResolver {
      *  The grammars are in import tree preorder.  Don't include ourselves
      *  in list as we're not a delegate of ourselves.
      */
-    public List<Grammar> getAllImportedGrammars() {
-        if ( importedGrammars==null ) return null;
-        List<Grammar> delegates = new ArrayList<Grammar>();
-		for (Grammar d : importedGrammars) {
-			delegates.add(d);
-			List<Grammar> ds = d.getAllImportedGrammars();
-			if (ds != null) delegates.addAll(ds);
+	public List<Grammar> getAllImportedGrammars() {
+		if (importedGrammars == null) {
+			return null;
 		}
-        return delegates;
-    }
+
+		LinkedHashMap<String, Grammar> delegates = new LinkedHashMap<String, Grammar>();
+		for (Grammar d : importedGrammars) {
+			delegates.put(d.fileName, d);
+			List<Grammar> ds = d.getAllImportedGrammars();
+			if (ds != null) {
+				for (Grammar imported : ds) {
+					delegates.put(imported.fileName, imported);
+				}
+			}
+		}
+
+		return new ArrayList<Grammar>(delegates.values());
+	}
 
     public List<Grammar> getImportedGrammars() { return importedGrammars; }
 
@@ -666,6 +695,26 @@ public class Grammar implements AttributeResolver {
 	}
 
 	/**
+	 * Gets the constant channel value for a user-defined channel.
+	 *
+	 * <p>
+	 * This method only returns channel values for user-defined channels. All
+	 * other channels, including the predefined channels
+	 * {@link Token#DEFAULT_CHANNEL} and {@link Token#HIDDEN_CHANNEL} along with
+	 * any channel defined in code (e.g. in a {@code @members{}} block), are
+	 * ignored.</p>
+	 *
+	 * @param channel The channel name.
+	 * @return The channel value, if {@code channel} is the name of a known
+	 * user-defined token channel; otherwise, -1.
+	 */
+	public int getChannelValue(String channel) {
+		Integer I = channelNameToValueMap.get(channel);
+		int i = (I != null) ? I : -1;
+		return i;
+	}
+
+	/**
 	 * Gets an array of rule names for rules defined or imported by the
 	 * grammar. The array index is the rule index, and the value is the name of
 	 * the rule with the corresponding {@link Rule#index}.
@@ -719,6 +768,53 @@ public class Grammar implements AttributeResolver {
 		}
 
 		return tokenNames;
+	}
+
+	/**
+	 * Gets the literal names assigned to tokens in the grammar.
+	 */
+	@NotNull
+	public String[] getTokenLiteralNames() {
+		int numTokens = getMaxTokenType();
+		String[] literalNames = new String[numTokens+1];
+		for (int i = 0; i < Math.min(literalNames.length, typeToStringLiteralList.size()); i++) {
+			literalNames[i] = typeToStringLiteralList.get(i);
+		}
+
+		for (Map.Entry<String, Integer> entry : stringLiteralToTypeMap.entrySet()) {
+			if (entry.getValue() >= 0 && entry.getValue() < literalNames.length && literalNames[entry.getValue()] == null) {
+				literalNames[entry.getValue()] = entry.getKey();
+			}
+		}
+
+		return literalNames;
+	}
+
+	/**
+	 * Gets the symbolic names assigned to tokens in the grammar.
+	 */
+	@NotNull
+	public String[] getTokenSymbolicNames() {
+		int numTokens = getMaxTokenType();
+		String[] symbolicNames = new String[numTokens+1];
+		for (int i = 0; i < Math.min(symbolicNames.length, typeToTokenList.size()); i++) {
+			if (typeToTokenList.get(i) == null || typeToTokenList.get(i).startsWith(AUTO_GENERATED_TOKEN_NAME_PREFIX)) {
+				continue;
+			}
+
+			symbolicNames[i] = typeToTokenList.get(i);
+		}
+
+		return symbolicNames;
+	}
+
+	/**
+	 * Gets a {@link Vocabulary} instance describing the vocabulary used by the
+	 * grammar.
+	 */
+	@NotNull
+	public Vocabulary getVocabulary() {
+		return new VocabularyImpl(getTokenLiteralNames(), getTokenSymbolicNames());
 	}
 
 	/** Given an arbitrarily complex SemanticContext, walk the "tree" and get display string.
@@ -812,6 +908,12 @@ public class Grammar implements AttributeResolver {
 		return maxTokenType;
 	}
 
+	/** Return a new unique integer in the channel value space. */
+	public int getNewChannelNumber() {
+		maxChannelType++;
+		return maxChannelType;
+	}
+
 	public void importTokensFromTokensFile() {
 		String vocab = getOptionString("tokenVocab");
 		if ( vocab!=null ) {
@@ -832,6 +934,9 @@ public class Grammar implements AttributeResolver {
 		for (String tokenName: importG.stringLiteralToTypeMap.keySet()) {
 			defineStringLiteral(tokenName, importG.stringLiteralToTypeMap.get(tokenName));
 		}
+		for (Map.Entry<String, Integer> channel : importG.channelNameToValueMap.entrySet()) {
+			defineChannelName(channel.getKey(), channel.getValue());
+		}
 //		this.tokenNameToTypeMap.putAll( importG.tokenNameToTypeMap );
 //		this.stringLiteralToTypeMap.putAll( importG.stringLiteralToTypeMap );
 		int max = Math.max(this.typeToTokenList.size(), importG.typeToTokenList.size());
@@ -839,6 +944,13 @@ public class Grammar implements AttributeResolver {
 		for (int ttype=0; ttype<importG.typeToTokenList.size(); ttype++) {
 			maxTokenType = Math.max(maxTokenType, ttype);
 			this.typeToTokenList.set(ttype, importG.typeToTokenList.get(ttype));
+		}
+
+		max = Math.max(this.channelValueToNameList.size(), importG.channelValueToNameList.size());
+		Utils.setSize(channelValueToNameList, max);
+		for (int channelValue = 0; channelValue < importG.channelValueToNameList.size(); channelValue++) {
+			maxChannelType = Math.max(maxChannelType, channelValue);
+			this.channelValueToNameList.set(channelValue, importG.channelValueToNameList.get(channelValue));
 		}
 	}
 
@@ -900,6 +1012,68 @@ public class Grammar implements AttributeResolver {
 		if ( prevToken==null || prevToken.charAt(0)=='\'' ) {
 			// only record if nothing there before or if thing before was a literal
 			typeToTokenList.set(ttype, text);
+		}
+	}
+
+	/**
+	 * Define a token channel with a specified name.
+	 *
+	 * <p>
+	 * If a channel with the specified name already exists, the previously
+	 * assigned channel value is returned.</p>
+	 *
+	 * @param name The channel name.
+	 * @return The constant channel value assigned to the channel.
+	 */
+	public int defineChannelName(String name) {
+		Integer prev = channelNameToValueMap.get(name);
+		if (prev == null) {
+			return defineChannelName(name, getNewChannelNumber());
+		}
+
+		return prev;
+	}
+
+	/**
+	 * Define a token channel with a specified name.
+	 *
+	 * <p>
+	 * If a channel with the specified name already exists, the previously
+	 * assigned channel value is not altered.</p>
+	 *
+	 * @param name The channel name.
+	 * @return The constant channel value assigned to the channel.
+	 */
+	public int defineChannelName(String name, int value) {
+		Integer prev = channelNameToValueMap.get(name);
+		if (prev != null) {
+			return prev;
+		}
+
+		channelNameToValueMap.put(name, value);
+		setChannelNameForValue(value, name);
+		maxChannelType = Math.max(maxChannelType, value);
+		return value;
+	}
+
+	/**
+	 * Sets the channel name associated with a particular channel value.
+	 *
+	 * <p>
+	 * If a name has already been assigned to the channel with constant value
+	 * {@code channelValue}, this method does nothing.</p>
+	 *
+	 * @param channelValue The constant value for the channel.
+	 * @param name The channel name.
+	 */
+	public void setChannelNameForValue(int channelValue, String name) {
+		if (channelValue >= channelValueToNameList.size()) {
+			Utils.setSize(channelValueToNameList, channelValue + 1);
+		}
+
+		String prevChannel = channelValueToNameList.get(channelValue);
+		if (prevChannel == null) {
+			channelValueToNameList.set(channelValue, name);
 		}
 	}
 
@@ -1056,7 +1230,7 @@ public class Grammar implements AttributeResolver {
 	}
 
 	public Set<String> getStringLiterals() {
-		final Set<String> strings = new HashSet<String>();
+		final Set<String> strings = new LinkedHashSet<String>();
 		GrammarTreeVisitor collector = new GrammarTreeVisitor() {
 			@Override
 			public void stringRef(TerminalAST ref) {
@@ -1127,7 +1301,7 @@ public class Grammar implements AttributeResolver {
 
 		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
 		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
-		return new LexerInterpreter(fileName, Arrays.asList(getTokenDisplayNames()), Arrays.asList(getRuleNames()), ((LexerGrammar)this).modes.keySet(), deserialized, input);
+		return new LexerInterpreter(fileName, getVocabulary(), Arrays.asList(getRuleNames()), ((LexerGrammar)this).modes.keySet(), deserialized, input);
 	}
 
 	public ParserInterpreter createParserInterpreter(TokenStream tokenStream) {
@@ -1137,6 +1311,6 @@ public class Grammar implements AttributeResolver {
 
 		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
 		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
-		return new ParserInterpreter(fileName, Arrays.asList(getTokenDisplayNames()), Arrays.asList(getRuleNames()), deserialized, tokenStream);
+		return new ParserInterpreter(fileName, getVocabulary(), Arrays.asList(getRuleNames()), deserialized, tokenStream);
 	}
 }

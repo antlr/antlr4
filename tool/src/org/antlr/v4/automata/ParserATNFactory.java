@@ -557,7 +557,7 @@ public class ParserATNFactory implements ATNFactory {
 		blkStart.loopBackState = loop;
 		end.loopBackState = loop;
 
-		plusAST.atnState = blkStart;
+		plusAST.atnState = loop;
 		epsilon(blkEnd, loop);		// blk can see loop back
 
 		BlockAST blkAST = (BlockAST)plusAST.getChild(0);

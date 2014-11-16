@@ -91,6 +91,7 @@ public interface TokenSource {
 	 * non-null, non-empty string. If such a name is not known, this method
 	 * returns {@link IntStream#UNKNOWN_SOURCE_NAME}.
 	 */
+	@NotNull
 	public String getSourceName();
 
 	/**

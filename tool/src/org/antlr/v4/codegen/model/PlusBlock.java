@@ -33,6 +33,7 @@ package org.antlr.v4.codegen.model;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.runtime.atn.PlusBlockStartState;
 import org.antlr.v4.runtime.atn.PlusLoopbackState;
+import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 
 import java.util.List;
@@ -45,9 +46,9 @@ public class PlusBlock extends Loop {
 					 List<CodeBlockForAlt> alts)
 	{
 		super(factory, plusRoot, alts);
-
-		PlusBlockStartState blkStart = (PlusBlockStartState)plusRoot.atnState;
-		PlusLoopbackState loop = ((PlusBlockStartState)plusRoot.atnState).loopBackState;
+		BlockAST blkAST = (BlockAST)plusRoot.getChild(0);
+		PlusBlockStartState blkStart = (PlusBlockStartState)blkAST.atnState;
+		PlusLoopbackState loop = blkStart.loopBackState;
 		stateNumber = blkStart.loopBackState.stateNumber;
 		blockStartStateNumber = blkStart.stateNumber;
 		loopBackStateNumber = loop.stateNumber;

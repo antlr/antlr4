@@ -30,6 +30,8 @@
 
 package org.antlr.v4.runtime.dfa;
 
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
 
@@ -39,13 +41,21 @@ import java.util.List;
 /** A DFA walker that knows how to dump them to serialized strings. */
 public class DFASerializer {
 	@NotNull
-	final DFA dfa;
-	@Nullable
-	final String[] tokenNames;
+	private final DFA dfa;
+	@NotNull
+	private final Vocabulary vocabulary;
 
+	/**
+	 * @deprecated Use {@link #DFASerializer(DFA, Vocabulary)} instead.
+	 */
+	@Deprecated
 	public DFASerializer(@NotNull DFA dfa, @Nullable String[] tokenNames) {
+		this(dfa, VocabularyImpl.fromTokenNames(tokenNames));
+	}
+
+	public DFASerializer(@NotNull DFA dfa, @NotNull Vocabulary vocabulary) {
 		this.dfa = dfa;
-		this.tokenNames = tokenNames;
+		this.vocabulary = vocabulary;
 	}
 
 	@Override
@@ -73,11 +83,7 @@ public class DFASerializer {
 	}
 
 	protected String getEdgeLabel(int i) {
-		String label;
-		if ( i==0 ) return "EOF";
-		if ( tokenNames!=null ) label = tokenNames[i-1];
-		else label = String.valueOf(i-1);
-		return label;
+		return vocabulary.getDisplayName(i - 1);
 	}
 
 	@NotNull

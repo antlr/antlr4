@@ -42,6 +42,11 @@ import java.util.Set;
 
 public class JavaTarget extends Target {
 
+	/**
+	 * The Java target can cache the code generation templates.
+	 */
+	private static final ThreadLocal<STGroup> targetTemplates = new ThreadLocal<STGroup>();
+
 	protected static final String[] javaKeywords = {
 		"abstract", "assert", "boolean", "break", "byte", "case", "catch",
 		"char", "class", "const", "continue", "default", "do", "double", "else",
@@ -93,8 +98,13 @@ public class JavaTarget extends Target {
 
 	@Override
 	protected STGroup loadTemplates() {
-		STGroup result = super.loadTemplates();
-		result.registerRenderer(String.class, new JavaStringRenderer(), true);
+		STGroup result = targetTemplates.get();
+		if (result == null) {
+			result = super.loadTemplates();
+			result.registerRenderer(String.class, new JavaStringRenderer(), true);
+			targetTemplates.set(result);
+		}
+
 		return result;
 	}
 

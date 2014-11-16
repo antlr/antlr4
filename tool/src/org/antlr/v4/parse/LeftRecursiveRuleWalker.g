@@ -67,7 +67,7 @@ rec_rule returns [boolean isLeftRec]
 	currentOuterAltNumber = 1;
 }
 	:	^(	r=RULE id=RULE_REF {ruleName=$id.getText();}
-			DOC_COMMENT? ruleModifier?
+			ruleModifier?
 //			(ARG_ACTION)? shouldn't allow args, right?
 			(^(RETURNS a=ARG_ACTION {setReturnValues($a);}))?
 //      		( ^(THROWS .+) )? don't allow
@@ -121,7 +121,7 @@ outerAlternative returns [boolean isLeftRec]
     ;
 
 binary
-	:	^( ALT elementOptions? recurse element+ recurse epsilonElement* )
+	:	^( ALT elementOptions? recurse element* recurse epsilonElement* )
         {setAltAssoc((AltAST)$ALT,currentOuterAltNumber);}
 	;
 
@@ -144,6 +144,7 @@ nonLeftRecur
 
 recurse
 	:	^(ASSIGN ID recurseNoLabel)
+	|	^(PLUS_ASSIGN ID recurseNoLabel)
 	|	recurseNoLabel
 	;
 

@@ -289,8 +289,28 @@ public class GrammarTransformPipeline {
 
 			GrammarAST optionsRoot = (GrammarAST)imp.ast.getFirstChildWithType(ANTLRParser.OPTIONS);
 			if ( optionsRoot!=null ) {
-				rootGrammar.tool.errMgr.grammarError(ErrorType.OPTIONS_IN_DELEGATE,
-									optionsRoot.g.fileName, optionsRoot.token, imp.name);
+				// suppress the warning if the options match the options specified
+				// in the root grammar
+				// https://github.com/antlr/antlr4/issues/707
+
+				boolean hasNewOption = false;
+				for (Map.Entry<String, GrammarAST> option : imp.ast.getOptions().entrySet()) {
+					String importOption = imp.ast.getOptionString(option.getKey());
+					if (importOption == null) {
+						continue;
+					}
+
+					String rootOption = rootGrammar.ast.getOptionString(option.getKey());
+					if (!importOption.equals(rootOption)) {
+						hasNewOption = true;
+						break;
+					}
+				}
+
+				if (hasNewOption) {
+					rootGrammar.tool.errMgr.grammarError(ErrorType.OPTIONS_IN_DELEGATE,
+										optionsRoot.g.fileName, optionsRoot.token, imp.name);
+				}
 			}
 		}
 		rootGrammar.tool.log("grammar", "Grammar: "+rootGrammar.ast.toStringTree());
@@ -398,6 +418,7 @@ public class GrammarTransformPipeline {
 		// add strings from combined grammar (and imported grammars) into lexer
 		// put them first as they are keywords; must resolve ambigs to these rules
 //		tool.log("grammar", "strings from parser: "+stringLiterals);
+		int insertIndex = 0;
 		nextLit:
 		for (String lit : stringLiterals) {
 			// if lexer already has a rule for literal, continue
@@ -419,9 +440,12 @@ public class GrammarTransformPipeline {
 			CommonToken idToken = new CommonToken(ANTLRParser.TOKEN_REF, rname);
 			litRule.addChild(new TerminalAST(idToken));
 			litRule.addChild(blk);
-			lexerRulesRoot.insertChild(0, litRule);        // add first
+			lexerRulesRoot.insertChild(insertIndex, litRule);
 //			lexerRulesRoot.getChildren().add(0, litRule);
 			lexerRulesRoot.freshenParentAndChildIndexes(); // reset indexes and set litRule parent
+
+			// next literal will be added after the one just added
+			insertIndex++;
 		}
 
 		// TODO: take out after stable if slow

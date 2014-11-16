@@ -3,11 +3,14 @@ import os
 import string
 
 """
-This script use my experimental build tool http://www.bildtool.org
+This script uses my experimental build tool http://www.bildtool.org
 
 In order to build the complete ANTLR4 product with Java, Python 2, and Python 3
 targets, do the following from a UNIX command line.  Windows build using this script
 is not yet supported. Please use the mvn build or ant build.
+
+!!!You must set path values in test_properties dictionary below to ensure Python
+tests run.!!!
 
 mkdir -p /usr/local/antlr # somewhere appropriate where you want to install stuff
 cd /usr/local/antlr
@@ -58,7 +61,6 @@ def parsers():
     antlr3("tool/src/org/antlr/v4/codegen", "gen3", package="org.antlr.v4.codegen",
            args=["-lib", uniformpath("gen3/org/antlr/v4/parse")])
     antlr4("runtime/Java/src/org/antlr/v4/runtime/tree/xpath", "gen4", package="org.antlr.v4.runtime.tree.xpath")
-
 
 def compile():
     require(parsers)
@@ -125,7 +127,6 @@ def mkjar_runtime():
     jar(jarfile, srcdir="out/runtime", manifest=manifest)
     print "Generated " + jarfile
 
-
 def mkjar():
     mkjar_complete()
     # put it in JARCARCHE too so bild can find it during antlr4()
@@ -154,7 +155,6 @@ def tests():
         cp = uniformpath(TARGETS[t] + "/tool/test") + os.pathsep + cp
         javac(TARGETS[t] + "/tool/test", "out/test/" + t, version="1.6", cp=cp, args=args)
         junit("out/test/" + t, cp=cp, verbose=False, args=properties)
-
 
 def all():
     clean(True)

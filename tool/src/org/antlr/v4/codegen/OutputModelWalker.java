@@ -41,9 +41,9 @@ import org.stringtemplate.v4.compiler.FormalArgument;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -143,7 +143,7 @@ public class OutputModelWalker {
 				}
 				else if ( o instanceof Map ) {
 					Map<?, ?> nestedOmoMap = (Map<?, ?>)o;
-					Map<Object, ST> m = new HashMap<Object, ST>();
+					Map<Object, ST> m = new LinkedHashMap<Object, ST>();
 					for (Map.Entry<?, ?> entry : nestedOmoMap.entrySet()) {
 						ST nestedST = walk((OutputModelObject)entry.getValue());
 //						System.out.println("set ModelElement "+fieldName+"="+nestedST+" in "+templateName);

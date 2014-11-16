@@ -68,6 +68,8 @@ import java.util.Set;
 import static org.antlr.v4.parse.ANTLRParser.RULE_REF;
 import static org.antlr.v4.parse.ANTLRParser.TOKEN_REF;
 
+import java.util.LinkedHashSet;
+
 /** */
 public class RuleFunction extends OutputModelObject {
 	public String name;
@@ -207,7 +209,7 @@ public class RuleFunction extends OutputModelObject {
 				}
 			}
 		}
-		Set<Decl> decls = new HashSet<Decl>();
+		Set<Decl> decls = new LinkedHashSet<Decl>();
 		for (GrammarAST t : allRefs) {
 			String refLabelName = t.getText();
 			List<Decl> d = getDeclForAltElement(t,

@@ -82,7 +82,7 @@ public class TestParseErrors extends BaseTest {
 			"grammar T;\n" +
 			"a : 'a' x='b' {System.out.println(\"conjured=\"+$x);} 'c' ;";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "a", "ac", false);
-		String expecting = "conjured=[@-1,-1:-1='<missing 'b'>',<1>,1:1]\n";
+		String expecting = "conjured=[@-1,-1:-1='<missing 'b'>',<2>,1:1]\n";
 		assertEquals(expecting, result);
 	}
 
@@ -101,7 +101,7 @@ public class TestParseErrors extends BaseTest {
 			"grammar T;\n" +
 			"a : 'a' x=('b'|'c') {System.out.println(\"conjured=\"+$x);} 'd' ;";
 		String result = execParser("T.g4", grammar, "TParser", "TLexer", "a", "ad", false);
-		String expecting = "conjured=[@-1,-1:-1='<missing 'b'>',<1>,1:1]\n";
+		String expecting = "conjured=[@-1,-1:-1='<missing 'b'>',<2>,1:1]\n";
 		assertEquals(expecting, result);
 	}
 
@@ -304,8 +304,7 @@ public class TestParseErrors extends BaseTest {
 	 * This is a regression test for #26 "an exception upon simple rule with double recursion in an alternative".
 	 * https://github.com/antlr/antlr4/issues/26
 	 */
-	@Test
-	public void testDuplicatedLeftRecursiveCall() throws Exception {
+	void testDuplicatedLeftRecursiveCall(String input) throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"start : expr EOF;\n" +
@@ -313,24 +312,32 @@ public class TestParseErrors extends BaseTest {
 			"     | expr expr\n" +
 			"     ;\n" +
 			"\n";
-
-		String result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "x", true);
-		assertEquals("", result);
-		assertNull(this.stderrDuringParse);
-
-		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xx", true);
-		assertEquals("", result);
-		assertNull(this.stderrDuringParse);
-
-		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xxx", true);
-		assertEquals("", result);
-		assertNull(this.stderrDuringParse);
-
-		result = execParser("T.g4", grammar, "TParser", "TLexer", "start", "xxxx", true);
+		String result = execParser("T.g4", grammar, "TParser", "TLexer", "start", input, true);
 		assertEquals("", result);
 		assertNull(this.stderrDuringParse);
 	}
+	
 
+	@Test
+	public void testDuplicatedLeftRecursiveCall1() throws Exception {
+		testDuplicatedLeftRecursiveCall("x");
+	}
+	
+	@Test
+	public void testDuplicatedLeftRecursiveCall2() throws Exception {
+		testDuplicatedLeftRecursiveCall("xx");
+	}
+
+	@Test
+	public void testDuplicatedLeftRecursiveCall3() throws Exception {
+		testDuplicatedLeftRecursiveCall("xxx");
+	}
+
+	@Test
+	public void testDuplicatedLeftRecursiveCall4() throws Exception {
+		testDuplicatedLeftRecursiveCall("xxxx");
+	}
+	
 	/**
 	 * This is a regression test for #45 "NullPointerException in ATNConfig.hashCode".
 	 * https://github.com/antlr/antlr4/issues/45

@@ -26,10 +26,12 @@ Programmers run into parsing problems all the time. Whether it’s a data format
 root directory name is the all-lowercase name of the language parsed
 by the grammar. For example, java, cpp, csharp, c, etc...
 
-## Authors
+## Authors and major contributors
 
-[Terence Parr](http://www.cs.usfca.edu/~parrt/), parrt@cs.usfca.edu  
+[Terence Parr](http://www.cs.usfca.edu/~parrt/), parrt@cs.usfca.edu
 ANTLR project lead and supreme dictator for life
 [University of San Francisco](http://www.usfca.edu/)
 
 [Sam Harwell](http://tunnelvisionlabs.com/)
+
+Eric Vergnaud (Python2, Python3 targets)

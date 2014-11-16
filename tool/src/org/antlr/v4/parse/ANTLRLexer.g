@@ -150,6 +150,8 @@ import org.antlr.v4.tool.*;
 
 
 @members {
+	public static final int COMMENTS_CHANNEL = 2;
+
     public CommonTokenStream tokens; // track stream we push to; need for context info
     public boolean isLexerRule = false;
 
@@ -261,15 +263,11 @@ COMMENT
            }
        )
        {
-         // Unless we had a documentation comment, then we do not wish to
-         // pass the comments in to the parser. If you are writing a formatter
-         // then you will want to preserve the comments off channel, but could
-         // just skip and save token space if not.
+         // We do not wish to pass the comments in to the parser. If you are
+         // writing a formatter then you will want to preserve the comments off
+         // channel, but could just skip and save token space if not.
          //
-         if ($type != DOC_COMMENT) {
-
-             $channel=2;  // Comments are on channel 2
-         }
+         $channel=COMMENTS_CHANNEL;
        }
     ;
 
@@ -434,12 +432,13 @@ NESTED_ACTION
 // keywords used to specify ANTLR v3 grammars. Keywords may not be used as
 // labels for rules or in any other context where they would be ambiguous
 // with the keyword vs some other identifier
-// OPTIONS and TOKENS must also consume the opening brace that captures
-// their option block, as this is teh easiest way to parse it separate
-// to an ACTION block, despite it usingthe same {} delimiters.
+// OPTIONS, TOKENS, and CHANNELS must also consume the opening brace that captures
+// their option block, as this is the easiest way to parse it separate
+// to an ACTION block, despite it using the same {} delimiters.
 //
-OPTIONS      : 'options' WSNLCHARS* '{'  ;
-TOKENS_SPEC  : 'tokens'  WSNLCHARS* '{'  ;
+OPTIONS      : 'options'  WSNLCHARS* '{'  ;
+TOKENS_SPEC  : 'tokens'   WSNLCHARS* '{'  ;
+CHANNELS     : 'channels' WSNLCHARS* '{'  ;
 
 IMPORT       : 'import'               ;
 FRAGMENT     : 'fragment'             ;

@@ -63,9 +63,9 @@ public class Antlr4ErrorLog implements ANTLRToolListener {
 
     /**
      * {@inheritDoc}
-     * <p/>
+     * <p>
      * This implementation passes the message to the Maven log.
-     *
+     * </p>
      * @param message The message to send to Maven
      */
     @Override
@@ -78,9 +78,9 @@ public class Antlr4ErrorLog implements ANTLRToolListener {
 
     /**
      * {@inheritDoc}
-     * <p/>
+     * <p>
      * This implementation passes the message to the Maven log.
-     *
+     * </p>
      * @param message The message to send to Maven.
      */
     @Override
@@ -101,9 +101,9 @@ public class Antlr4ErrorLog implements ANTLRToolListener {
 
     /**
      * {@inheritDoc}
-     * <p/>
+     * <p>
      * This implementation passes the message to the Maven log.
-     *
+     * </p>
      * @param message
      */
     @Override

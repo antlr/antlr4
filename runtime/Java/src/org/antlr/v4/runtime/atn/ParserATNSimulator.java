@@ -31,7 +31,6 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.BailErrorStrategy;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.FailedPredicateException;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.NoViableAltException;
@@ -40,6 +39,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
@@ -316,6 +317,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected TokenStream _input;
 	protected int _startIndex;
 	protected ParserRuleContext _outerContext;
+	protected DFA _dfa;
 
 	/** Testing only! */
 	public ParserATNSimulator(@NotNull ATN atn, @NotNull DFA[] decisionToDFA,
@@ -360,6 +362,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		_startIndex = input.index();
 		_outerContext = outerContext;
 		DFA dfa = decisionToDFA[decision];
+		_dfa = dfa;
 
 		int m = input.mark();
 		int index = _startIndex;
@@ -421,11 +424,12 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 
 			int alt = execATN(dfa, s0, input, index, outerContext);
-			if ( debug ) System.out.println("DFA after predictATN: "+ dfa.toString(parser.getTokenNames()));
+			if ( debug ) System.out.println("DFA after predictATN: "+ dfa.toString(parser.getVocabulary()));
 			return alt;
 		}
 		finally {
 			mergeCache = null; // wack cache after each prediction
+			_dfa = null;
 			input.seek(index);
 			input.release(m);
 		}
@@ -989,6 +993,113 @@ public class ParserATNSimulator extends ATNSimulator {
 		return configs;
 	}
 
+	/* parrt internal source braindump that doesn't mess up
+	 * external API spec.
+
+		applyPrecedenceFilter is an optimization to avoid highly
+		nonlinear prediction of expressions and other left recursive
+		rules. The precedence predicates such as {3>=prec}? Are highly
+		context-sensitive in that they can only be properly evaluated
+		in the context of the proper prec argument. Without pruning,
+		these predicates are normal predicates evaluated when we reach
+		conflict state (or unique prediction). As we cannot evaluate
+		these predicates out of context, the resulting conflict leads
+		to full LL evaluation and nonlinear prediction which shows up
+		very clearly with fairly large expressions.
+
+		Example grammar:
+
+		e : e '*' e
+		  | e '+' e
+		  | INT
+		  ;
+
+		We convert that to the following:
+
+		e[int prec]
+			:   INT
+				( {3>=prec}? '*' e[4]
+				| {2>=prec}? '+' e[3]
+				)*
+			;
+
+		The (..)* loop has a decision for the inner block as well as
+		an enter or exit decision, which is what concerns us here. At
+		the 1st + of input 1+2+3, the loop entry sees both predicates
+		and the loop exit also sees both predicates by falling off the
+		edge of e.  This is because we have no stack information with
+		SLL and find the follow of e, which will hit the return states
+		inside the loop after e[4] and e[3], which brings it back to
+		the enter or exit decision. In this case, we know that we
+		cannot evaluate those predicates because we have fallen off
+		the edge of the stack and will in general not know which prec
+		parameter is the right one to use in the predicate.
+
+		Because we have special information, that these are precedence
+		predicates, we can resolve them without failing over to full
+		LL despite their context sensitive nature. We make an
+		assumption that prec[-1] <= prec[0], meaning that the current
+		precedence level is greater than or equal to the precedence
+		level of recursive invocations above us in the stack. For
+		example, if predicate {3>=prec}? is true of the current prec,
+		then one option is to enter the loop to match it now. The
+		other option is to exit the loop and the left recursive rule
+		to match the current operator in rule invocation further up
+		the stack. But, we know that all of those prec are lower or
+		the same value and so we can decide to enter the loop instead
+		of matching it later. That means we can strip out the other
+		configuration for the exit branch.
+
+		So imagine we have (14,1,$,{2>=prec}?) and then
+		(14,2,$-dipsIntoOuterContext,{2>=prec}?). The optimization
+		allows us to collapse these two configurations. We know that
+		if {2>=prec}? is true for the current prec parameter, it will
+		also be true for any prec from an invoking e call, indicated
+		by dipsIntoOuterContext. As the predicates are both true, we
+		have the option to evaluate them early in the decision start
+		state. We do this by stripping both predicates and choosing to
+		enter the loop as it is consistent with the notion of operator
+		precedence. It's also how the full LL conflict resolution
+		would work.
+
+		The solution requires a different DFA start state for each
+		precedence level.
+
+		The basic filter mechanism is to remove configurations of the
+		form (p, 2, pi) if (p, 1, pi) exists for the same p and pi. In
+		other words, for the same ATN state and predicate context,
+		remove any configuration associated with an exit branch if
+		there is a configuration associated with the enter branch.
+
+		It's also the case that the filter evaluates precedence
+		predicates and resolves conflicts according to precedence
+		levels. For example, for input 1+2+3 at the first +, we see
+		prediction filtering
+
+		[(11,1,[$],{3>=prec}?), (14,1,[$],{2>=prec}?), (5,2,[$],up=1),
+		 (11,2,[$],up=1), (14,2,[$],up=1)],hasSemanticContext=true,dipsIntoOuterContext
+
+		to
+
+		[(11,1,[$]), (14,1,[$]), (5,2,[$],up=1)],dipsIntoOuterContext
+
+		This filters because {3>=prec}? evals to true and collapses
+		(11,1,[$],{3>=prec}?) and (11,2,[$],up=1) since early conflict
+		resolution based upon rules of operator precedence fits with
+		our usual match first alt upon conflict.
+
+		We noticed a problem where a recursive call resets precedence
+		to 0. Sam's fix: each config has flag indicating if it has
+		returned from an expr[0] call. then just don't filter any
+		config with that flag set. flag is carried along in
+		closure(). so to avoid adding field, set bit just under sign
+		bit of dipsIntoOuterContext (SUPPRESS_PRECEDENCE_FILTER).
+		With the change you filter "unless (p, 2, pi) was reached
+		after leaving the rule stop state of the LR rule containing
+		state p, corresponding to a rule invocation with precedence
+		level 0"
+	 */
+	
 	/**
 	 * This method transforms the start state computed by
 	 * {@link #computeStartState} to the special start state used by a
@@ -999,8 +1110,9 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * <ol>
 	 * <li>Evaluate the precedence predicates for each configuration using
 	 * {@link SemanticContext#evalPrecedence}.</li>
-	 * <li>Remove all configurations which predict an alternative greater than
-	 * 1, for which another configuration that predicts alternative 1 is in the
+	 * <li>When {@link ATNConfig#isPrecedenceFilterSuppressed} is {@code false},
+	 * remove all configurations which predict an alternative greater than 1,
+	 * for which another configuration that predicts alternative 1 is in the
 	 * same ATN state with the same prediction context. This transformation is
 	 * valid for the following reasons:
 	 * <ul>
@@ -1012,7 +1124,10 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * epsilon transition, so the only way an alternative other than 1 can exist
 	 * in a state that is also reachable via alternative 1 is by nesting calls
 	 * to the left-recursive rule, with the outer calls not being at the
-	 * preferred precedence level.</li>
+	 * preferred precedence level. The
+	 * {@link ATNConfig#isPrecedenceFilterSuppressed} property marks ATN
+	 * configurations which do not meet this condition, and therefore are not
+	 * eligible for elimination during the filtering process.</li>
 	 * </ul>
 	 * </li>
 	 * </ol>
@@ -1076,14 +1191,16 @@ public class ParserATNSimulator extends ATNSimulator {
 				continue;
 			}
 
-			/* In the future, this elimination step could be updated to also
-			 * filter the prediction context for alternatives predicting alt>1
-			 * (basically a graph subtraction algorithm).
-			 */
-			PredictionContext context = statesFromAlt1.get(config.state.stateNumber);
-			if (context != null && context.equals(config.context)) {
-				// eliminated
-				continue;
+			if (!config.isPrecedenceFilterSuppressed()) {
+				/* In the future, this elimination step could be updated to also
+				 * filter the prediction context for alternatives predicting alt>1
+				 * (basically a graph subtraction algorithm).
+				 */
+				PredictionContext context = statesFromAlt1.get(config.state.stateNumber);
+				if (context != null && context.equals(config.context)) {
+					// eliminated
+					continue;
+				}
 			}
 
 			configSet.add(config, mergeCache);
@@ -1240,7 +1357,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected int getAltThatFinishedDecisionEntryRule(ATNConfigSet configs) {
 		IntervalSet alts = new IntervalSet();
 		for (ATNConfig c : configs) {
-			if ( c.reachesIntoOuterContext>0 || (c.state instanceof RuleStopState && c.context.hasEmptyPath()) ) {
+			if ( c.getOuterContextDepth()>0 || (c.state instanceof RuleStopState && c.context.hasEmptyPath()) ) {
 				alts.add(c.alt);
 			}
 		}
@@ -1409,6 +1526,10 @@ public class ParserATNSimulator extends ATNSimulator {
 					// While we have context to pop back from, we may have
 					// gotten that context AFTER having falling off a rule.
 					// Make sure we track that we are now out of context.
+					//
+					// This assignment also propagates the
+					// isPrecedenceFilterSuppressed() value to the new
+					// configuration.
 					c.reachesIntoOuterContext = config.reachesIntoOuterContext;
 					assert depth > Integer.MIN_VALUE;
 					closureCheckingStopState(c, configs, closureBusy, collectPredicates,
@@ -1474,6 +1595,13 @@ public class ParserATNSimulator extends ATNSimulator {
 					if (!closureBusy.add(c)) {
 						// avoid infinite recursion for right-recursive rules
 						continue;
+					}
+
+					if (_dfa != null && _dfa.isPrecedenceDfa()) {
+						int outermostPrecedenceReturn = ((EpsilonTransition)t).outermostPrecedenceReturn();
+						if (outermostPrecedenceReturn == _dfa.atnStartState.ruleIndex) {
+							c.setPrecedenceFilterSuppressed(true);
+						}
 					}
 
 					c.reachesIntoOuterContext++;
@@ -1725,18 +1853,17 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	@NotNull
 	public String getTokenName(int t) {
-		if ( t==Token.EOF ) return "EOF";
-		if ( parser!=null && parser.getTokenNames()!=null ) {
-			String[] tokensNames = parser.getTokenNames();
-			if ( t>=tokensNames.length ) {
-				System.err.println(t+" ttype out of range: "+ Arrays.toString(tokensNames));
-				System.err.println(((CommonTokenStream)parser.getInputStream()).getTokens());
-			}
-			else {
-				return tokensNames[t]+"<"+t+">";
-			}
+		if (t == Token.EOF) {
+			return "EOF";
 		}
-		return String.valueOf(t);
+
+		Vocabulary vocabulary = parser != null ? parser.getVocabulary() : VocabularyImpl.EMPTY_VOCABULARY;
+		String displayName = vocabulary.getDisplayName(t);
+		if (displayName.equals(Integer.toString(t))) {
+			return displayName;
+		}
+
+		return displayName + "<" + t + ">";
 	}
 
 	public String getLookaheadName(TokenStream input) {
@@ -1839,7 +1966,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 
 		if ( debug ) {
-			System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getTokenNames():null));
+			System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getVocabulary():VocabularyImpl.EMPTY_VOCABULARY));
 		}
 
 		return to;
