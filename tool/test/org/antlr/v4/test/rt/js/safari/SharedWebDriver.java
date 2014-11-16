@@ -13,7 +13,6 @@ public class SharedWebDriver {
 	
 	public static WebDriver init() {
 		if(driver==null) {
-			// System.setProperty("webdriver.safari.driver", "/Users/ericvergnaud/Desktop/TestSafari/org/openqa/selenium/safari/SafariDriver.safariextz");
 			System.setProperty("webdriver.safari.noinstall", "true");
 			driver = new SafariDriver();
 		} else if(timer!=null) {
