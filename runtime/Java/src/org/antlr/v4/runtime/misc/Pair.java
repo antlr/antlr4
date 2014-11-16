@@ -30,7 +30,9 @@
 
 package org.antlr.v4.runtime.misc;
 
-public class Pair<A,B> {
+import java.io.Serializable;
+
+public class Pair<A,B> implements Serializable {
 	public final A a;
 	public final B b;
 
