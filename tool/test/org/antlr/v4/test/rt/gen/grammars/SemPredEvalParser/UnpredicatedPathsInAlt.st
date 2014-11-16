@@ -1,0 +1,12 @@
+grammar <grammarName>;
+s : a {<writeln("\"alt 1\"")>}
+  | b {<writeln("\"alt 2\"")>}
+  ;
+a : {<False()>}? ID INT
+  | ID INT
+  ;
+b : ID ID
+  ;
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+;
+WS : (' '|'\n') -> skip ;
