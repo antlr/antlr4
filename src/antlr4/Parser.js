@@ -650,12 +650,19 @@ Parser.prototype.dumpDFA = function() {
 			if (seenOne) {
 				console.log();
 			}
-			console.log("Decision " + dfa.decision + ":");
-			process.stdout.write(dfa.toString(this.tokenNames));
+			this.printer.println("Decision " + dfa.decision + ":");
+			this.printer.print(dfa.toString(this.literalNames, this.symbolicNames));
 			seenOne = true;
 		}
 	}
 };
+
+/*
+"			printer = function() {\r\n" +
+"				this.println = function(s) { document.getElementById('output') += s + '\\n'; }\r\n" +
+"				this.print = function(s) { document.getElementById('output') += s; }\r\n" +
+"			};\r\n" +
+*/
 
 Parser.prototype.getSourceName = function() {
 	return this._input.sourceName;

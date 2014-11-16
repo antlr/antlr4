@@ -389,7 +389,7 @@ ParserATNSimulator.prototype.adaptivePredict = function(input, decision, outerCo
         }
         var alt = this.execATN(dfa, s0, input, index, outerContext);
         if (this.debug) {
-            console.log("DFA after predictATN: " + dfa.toString(this.parser.tokenNames));
+            console.log("DFA after predictATN: " + dfa.toString(this.parser.literalNames));
         }
         return alt;
     } finally {
@@ -556,9 +556,6 @@ ParserATNSimulator.prototype.getExistingTargetState = function(previousD, t) {
 // returns {@link //ERROR}.
 //
 ParserATNSimulator.prototype.computeTargetState = function(dfa, previousD, t) {
-	if("[(61,1,[$]), (64,1,[$]), (67,1,[$]), (70,1,[$]), (73,1,[$]), (76,1,[$]), (79,1,[$]), (82,1,[$]), (85,1,[$]), (88,1,[$]), (91,1,[$]), (94,1,[$]), (100,1,[$]), (103,1,[$]), (106,1,[$]), (109,1,[$]), (117,1,[$]), (126,1,[$]), (131,1,[$]), (133,1,[$]), (9,2,[$],up=5), (12,2,[$],up=5), (47,2,[$],up=2), (115,2,[$],up=2), (124,2,[$],up=2), (137,2,[$],up=2), (31,2,[$],up=5), (50,2,[$],up=5), (96,2,[$],up=5), (128,2,[$],up=5)],dipsIntoOuterContext" === previousD.configs.toString()) {
-		var i = 0;
-	}
    var reach = this.computeReachSet(previousD.configs, t, false);
     if(reach===null) {
         this.addDFAEdge(dfa, previousD, t, ATNSimulator.ERROR);
@@ -775,11 +772,11 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
             var trans = c.state.transitions[j];
             var target = this.getReachableTarget(trans, t);
             if (target!==null) {
-            	var cfg = new ATNConfig({state:target}, c);
+                var cfg = new ATNConfig({state:target}, c);
                 intermediate.add(cfg, this.mergeCache);
                 if(this.debug) {
                     console.log("added " + cfg + " to intermediate");
-                }           	
+                }
             }
         }
     }
@@ -793,7 +790,7 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
     // The conditions assume that intermediate
     // contains all configurations relevant to the reach set, but this
     // condition is not true when one or more configurations have been
-    // withheld in skippedStopStates.
+    // withheld in skippedStopStates, or when the current symbol is EOF.
     //
     if (skippedStopStates===null && t!==Token.EOF) {
         if (intermediate.items.length===1) {
@@ -974,7 +971,7 @@ ParserATNSimulator.prototype.applyPrecedenceFilter = function(configs) {
 	var statesFromAlt1 = [];
     var configSet = new ATNConfigSet(configs.fullCtx);
     for(var i=0; i<configs.items.length; i++) {
-    	config = configs.items[i];
+        config = configs.items[i];
         // handle alt 1 first
         if (config.alt !== 1) {
             continue;
@@ -1171,9 +1168,9 @@ ParserATNSimulator.prototype.splitAccordingToSemanticValidity = function( config
     var succeeded = new ATNConfigSet(configs.fullCtx);
     var failed = new ATNConfigSet(configs.fullCtx);
     for(var i=0;i<configs.items.length; i++) {
-    	var c = configs.items[i];
+        var c = configs.items[i];
         if (c.semanticContext !== SemanticContext.NONE) {
-            predicateEvaluationResult = c.semanticContext.eval(this.parser, outerContext);
+            var predicateEvaluationResult = c.semanticContext.evaluate(this.parser, outerContext);
             if (predicateEvaluationResult) {
                 succeeded.add(c);
             } else {
@@ -1203,7 +1200,7 @@ ParserATNSimulator.prototype.evalSemanticContext = function(predPredictions, out
             }
             continue;
         }
-        var predicateEvaluationResult = pair.pred.eval(this.parser, outerContext);
+        var predicateEvaluationResult = pair.pred.evaluate(this.parser, outerContext);
         if (this.debug || this.dfa_debug) {
             console.log("eval pred " + pair + "=" + predicateEvaluationResult);
         }
@@ -1300,7 +1297,7 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
         var continueCollecting = collectPredicates && !(t instanceof ActionTransition);
         var c = this.getEpsilonTarget(config, t, continueCollecting, depth === 0, fullCtx, treatEofAsEpsilon);
         if (c!==null) {
-			if (!t.isEpsilon && closureBusy.add(c)===c) {
+			if (!t.isEpsilon && closureBusy.add(c)!==c){
 				// avoid infinite recursion for EOF* and EOF+
 				continue;
 			}
@@ -1400,7 +1397,7 @@ ParserATNSimulator.prototype.precedenceTransition = function(config, pt,  collec
             // later during conflict resolution.
             var currentPosition = this._input.index;
             this._input.seek(this._startIndex);
-            var predSucceeds = pt.getPredicate().eval(this.parser, this._outerContext);
+            var predSucceeds = pt.getPredicate().evaluate(this.parser, this._outerContext);
             this._input.seek(currentPosition);
             if (predSucceeds) {
                 c = new ATNConfig({state:pt.target}, config); // no pred context
@@ -1435,7 +1432,7 @@ ParserATNSimulator.prototype.predTransition = function(config, pt, collectPredic
             // later during conflict resolution.
             var currentPosition = this._input.index;
             this._input.seek(this._startIndex);
-            var predSucceeds = pt.getPredicate().eval(this.parser, this._outerContext);
+            var predSucceeds = pt.getPredicate().evaluate(this.parser, this._outerContext);
             this._input.seek(currentPosition);
             if (predSucceeds) {
                 c = new ATNConfig({state:pt.target}, config); // no pred context
@@ -1518,12 +1515,12 @@ ParserATNSimulator.prototype.getTokenName = function( t) {
     if (t===Token.EOF) {
         return "EOF";
     }
-    if( this.parser!==null && this.parser.tokenNames!==null) {
-        if (t >= this.parser.tokenNames.length) {
-            console.log("" + t + " ttype out of range: " + this.parser.tokenNames);
+    if( this.parser!==null && this.parser.literalNames!==null) {
+        if (t >= this.parser.literalNames.length) {
+            console.log("" + t + " ttype out of range: " + this.parser.literalNames);
             console.log("" + this.parser.getInputStream().getTokens());
         } else {
-            return this.parser.tokenNames[t] + "<" + t + ">";
+            return this.parser.literalNames[t] + "<" + t + ">";
         }
     }
     return "" + t;
@@ -1610,7 +1607,7 @@ ParserATNSimulator.prototype.addDFAEdge = function(dfa, from_, t, to) {
     from_.edges[t+1] = to; // connect
 
     if (this.debug) {
-        var names = this.parser===null ? null : this.parser.tokenNames;
+        var names = this.parser===null ? null : this.parser.literalNames;
         console.log("DFA=\n" + dfa.toString(names));
     }
     return to;

@@ -30,9 +30,10 @@
 // A DFA walker that knows how to dump them to serialized strings.#/
 
 
-function DFASerializer(dfa, tokenNames) {
+function DFASerializer(dfa, literalNames, symbolicNames) {
 	this.dfa = dfa;
-	this.tokenNames = tokenNames || null;
+	this.literalNames = literalNames || [];
+	this.symbolicNames = symbolicNames || [];
 	return this;
 }
 
@@ -45,7 +46,7 @@ DFASerializer.prototype.toString = function() {
    for(var i=0;i<states.length;i++) {
        var s = states[i];
        if(s.edges!==null) {
-            var n = s.edges.length; 
+            var n = s.edges.length;
             for(var j=0;j<n;j++) {
                 var t = s.edges[j] || null;
                 if(t!==null && t.stateNumber !== 0x7FFFFFFF) {
@@ -65,8 +66,8 @@ DFASerializer.prototype.toString = function() {
 DFASerializer.prototype.getEdgeLabel = function(i) {
     if (i===0) {
         return "EOF";
-    } else if(this.tokenNames !==null) {
-        return this.tokenNames[i-1];
+    } else if(this.literalNames !==null || this.symbolicNames!==null) {
+        return this.literalNames[i-1] || this.symbolicNames[i-1];
     } else {
         return String.fromCharCode(i-1);
     }
