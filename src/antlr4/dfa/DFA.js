@@ -156,14 +156,13 @@ DFA.prototype.sortedStates = function() {
 	});
 };
 
-DFA.prototype.toString = function(tokenNames) {
-	if (tokenNames === undefined) {
-		tokenNames = null;
-	}
+DFA.prototype.toString = function(literalNames, symbolicNames) {
+	literalNames = literalNames || null;
+	symbolicNames = symbolicNames || null;
 	if (this.s0 === null) {
 		return "";
 	}
-	var serializer = new DFASerializer(this, tokenNames);
+	var serializer = new DFASerializer(this, literalNames, symbolicNames);
 	return serializer.toString();
 };
 

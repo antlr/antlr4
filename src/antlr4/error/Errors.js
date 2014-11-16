@@ -37,7 +37,11 @@ var PredicateTransition = require('./../atn/Transition').PredicateTransition;
 
 function RecognitionException(params) {
 	Error.call(this);
-	Error.captureStackTrace(this, RecognitionException);
+	if (!!Error.captureStackTrace) {
+        Error.captureStackTrace(this, RecognitionException);
+	} else {
+		var stack = new Error().stack;
+	}
 	this.message = params.message;
     this.recognizer = params.recognizer;
     this.input = params.input;

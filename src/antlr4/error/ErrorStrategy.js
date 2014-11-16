@@ -313,7 +313,7 @@ DefaultErrorStrategy.prototype.reportNoViableAlternative = function(recognizer, 
 //
 DefaultErrorStrategy.prototype.reportInputMismatch = function(recognizer, e) {
     var msg = "mismatched input " + this.getTokenErrorDisplay(e.offendingToken) +
-          " expecting " + e.getExpectedTokens().toString(recognizer.tokenNames);
+          " expecting " + e.getExpectedTokens().toString(recognizer.literalNames, recognizer.symbolicNames);
     recognizer.notifyErrorListeners(msg, e.offendingToken, e);
 };
 
@@ -329,7 +329,7 @@ DefaultErrorStrategy.prototype.reportInputMismatch = function(recognizer, e) {
 DefaultErrorStrategy.prototype.reportFailedPredicate = function(recognizer, e) {
     var ruleName = recognizer.ruleNames[recognizer._ctx.ruleIndex];
     var msg = "rule " + ruleName + " " + e.message;
-    recognizer.notifyErrorListeners(e.offendingToken, msg, e);
+    recognizer.notifyErrorListeners(msg, e.offendingToken, e);
 };
 
 // This method is called to report a syntax error which requires the removal
@@ -358,7 +358,7 @@ DefaultErrorStrategy.prototype.reportUnwantedToken = function(recognizer) {
     var tokenName = this.getTokenErrorDisplay(t);
     var expecting = this.getExpectedTokens(recognizer);
     var msg = "extraneous input " + tokenName + " expecting " +
-        expecting.toString(recognizer.tokenNames);
+        expecting.toString(recognizer.literalNames, recognizer.symbolicNames);
     recognizer.notifyErrorListeners(msg, t, null);
 };
 // This method is called to report a syntax error which requires the
@@ -384,7 +384,7 @@ DefaultErrorStrategy.prototype.reportMissingToken = function(recognizer) {
     this.beginErrorCondition(recognizer);
     var t = recognizer.getCurrentToken();
     var expecting = this.getExpectedTokens(recognizer);
-    var msg = "missing " + expecting.toString(recognizer.tokenNames) +
+    var msg = "missing " + expecting.toString(recognizer.literalNames, recognizer.symbolicNames) +
           " at " + this.getTokenErrorDisplay(t);
     recognizer.notifyErrorListeners(msg, t, null);
 };
@@ -553,7 +553,7 @@ DefaultErrorStrategy.prototype.getMissingSymbol = function(recognizer) {
     if (expectedTokenType===Token.EOF) {
         tokenText = "<missing EOF>";
     } else {
-        tokenText = "<missing " + recognizer.tokenNames[expectedTokenType] + ">";
+        tokenText = "<missing " + recognizer.literalNames[expectedTokenType] + ">";
     }
     var current = currentSymbol;
     var lookback = recognizer.getTokenStream().LT(-1);

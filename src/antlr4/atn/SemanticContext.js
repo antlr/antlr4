@@ -55,7 +55,7 @@ function SemanticContext() {
 // prediction, so we passed in the outer context here in case of context
 // dependent predicate evaluation.</p>
 //
-SemanticContext.prototype.eval = function(parser, outerContext) {
+SemanticContext.prototype.evaluate = function(parser, outerContext) {
 };
 
 //
@@ -130,7 +130,7 @@ Predicate.prototype.constructor = Predicate;
 SemanticContext.NONE = new Predicate();
 
 
-Predicate.prototype.eval = function(parser, outerContext) {
+Predicate.prototype.evaluate = function(parser, outerContext) {
 	var localctx = this.isCtxDependent ? outerContext : null;
 	return parser.sempred(localctx, this.ruleIndex, this.predIndex);
 };
@@ -163,7 +163,7 @@ function PrecedencePredicate(precedence) {
 PrecedencePredicate.prototype = Object.create(SemanticContext.prototype);
 PrecedencePredicate.prototype.constructor = PrecedencePredicate;
 
-PrecedencePredicate.prototype.eval = function(parser, outerContext) {
+PrecedencePredicate.prototype.evaluate = function(parser, outerContext) {
 	return parser.precpred(outerContext, this.precedence);
 };
 
@@ -268,9 +268,9 @@ AND.prototype.hashString = function() {
 // The evaluation of predicates by this context is short-circuiting, but
 // unordered.</p>
 //
-AND.prototype.eval = function(parser, outerContext) {
+AND.prototype.evaluate = function(parser, outerContext) {
 	for (var i = 0; i < this.opnds.length; i++) {
-		if (!this.opnds[i].eval(parser, outerContext)) {
+		if (!this.opnds[i].evaluate(parser, outerContext)) {
 			return false;
 		}
 	}
@@ -370,9 +370,9 @@ OR.prototype.hashString = function() {
 // The evaluation of predicates by this context is short-circuiting, but
 // unordered.</p>
 //
-OR.prototype.eval = function(parser, outerContext) {
+OR.prototype.evaluate = function(parser, outerContext) {
 	for (var i = 0; i < this.opnds.length; i++) {
-		if (this.opnds[i].eval(parser, outerContext)) {
+		if (this.opnds[i].evaluate(parser, outerContext)) {
 			return true;
 		}
 	}
