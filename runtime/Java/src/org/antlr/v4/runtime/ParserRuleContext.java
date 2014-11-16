@@ -278,7 +278,17 @@ public class ParserRuleContext extends RuleContext {
 		return Interval.of(start.getTokenIndex(), stop.getTokenIndex());
 	}
 
+	/** 
+	 * Get the initial token in this context. 
+	 * Note that the range from start to stop is inclusive, so for rules that do not consume anything
+	 * (for example, zero length or error productions) this token may exceed stop.
+	 */
 	public Token getStart() { return start; }
+	/** 
+	 * Get the final token in this context.
+	 * Note that the range from start to stop is inclusive, so for rules that do not consume anything
+	 * (for example, zero length or error productions) this token may precede start.
+	 */
 	public Token getStop() { return stop; }
 
     /** Used for rule context info debugging during parse-time, not so much for ATN debugging */
