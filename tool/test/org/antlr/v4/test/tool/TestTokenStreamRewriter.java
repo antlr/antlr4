@@ -881,4 +881,25 @@ public class TestTokenStreamRewriter extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
+	// Test for https://github.com/antlr/antlr4/issues/550
+	@Test public void testPreservesOrderOfContiguousInserts() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+											 "lexer grammar T;\n"+
+											 "A : 'a';\n" +
+											 "B : 'b';\n" +
+											 "C : 'c';\n");
+		String input = "aa";
+		LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRInputStream(input));
+		CommonTokenStream stream = new CommonTokenStream(lexEngine);
+		stream.fill();
+		TokenStreamRewriter tokens = new TokenStreamRewriter(stream);
+		tokens.insertBefore(0, "<b>");
+		tokens.insertAfter(0, "</b>");
+		tokens.insertBefore(1, "<b>");
+		tokens.insertAfter(1, "</b>");
+		String result = tokens.getText();
+		String expecting = "<b>a</b><b>a</b>"; // fails with <b>a<b></b>a</b>"
+		assertEquals(expecting, result);
+	}
+
 }
