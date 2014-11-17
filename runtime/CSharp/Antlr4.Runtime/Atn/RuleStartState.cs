@@ -38,8 +38,6 @@ namespace Antlr4.Runtime.Atn
 
         public bool isPrecedenceRule;
 
-        public bool leftFactored;
-
         public override Antlr4.Runtime.Atn.StateType StateType
         {
             get

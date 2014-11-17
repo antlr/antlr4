@@ -45,13 +45,13 @@ namespace Antlr4.Runtime.Atn
 
         protected internal int numDecisions;
 
-        protected internal ITokenStream _input;
+        private ITokenStream _input;
 
-        protected internal int _startIndex;
+		private int _startIndex;
 
-        protected internal int _sllStopIndex;
+		private int _sllStopIndex;
 
-        protected internal int _llStopIndex;
+		private int _llStopIndex;
 
         protected internal int currentDecision;
 

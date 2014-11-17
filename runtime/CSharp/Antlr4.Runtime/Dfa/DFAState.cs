@@ -89,7 +89,7 @@ namespace Antlr4.Runtime.Dfa
         [Nullable]
         private BitSet contextSymbols;
 
-        /// <summary>
+		/// <summary>
         /// This list is computed by
         /// <see cref="Antlr4.Runtime.Atn.ParserATNSimulator.PredicateDFAState(DFAState, Antlr4.Runtime.Atn.ATNConfigSet, int)"/>
         /// .

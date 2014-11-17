@@ -95,7 +95,7 @@ namespace Antlr4.Runtime
         /// if we are debugging/tracing.
         /// This does not trace states visited during prediction.
         /// </remarks>
-        public IToken start;
+        private IToken _start;
 
         /// <summary>
         /// For debugging/tracing purposes, we want to track all of the nodes in
@@ -117,7 +117,7 @@ namespace Antlr4.Runtime
         /// if we are debugging/tracing.
         /// This does not trace states visited during prediction.
         /// </remarks>
-        public IToken stop;
+        private IToken _stop;
 
         /// <summary>The exception that forced this rule to return.</summary>
         /// <remarks>
@@ -145,10 +145,10 @@ namespace Antlr4.Runtime
         public virtual void CopyFrom(Antlr4.Runtime.ParserRuleContext ctx)
         {
             // from RuleContext
-            this.parent = ctx.parent;
+            this.Parent = ctx.Parent;
             this.invokingState = ctx.invokingState;
-            this.start = ctx.start;
-            this.stop = ctx.stop;
+            this._start = ctx._start;
+            this._stop = ctx._stop;
         }
 
         public ParserRuleContext(Antlr4.Runtime.ParserRuleContext parent, int invokingStateNumber)
@@ -209,7 +209,7 @@ namespace Antlr4.Runtime
         {
             TerminalNodeImpl t = new TerminalNodeImpl(matchedToken);
             AddChild(t);
-            t.parent = this;
+            t.Parent = this;
             return t;
         }
 
@@ -217,17 +217,10 @@ namespace Antlr4.Runtime
         {
             ErrorNodeImpl t = new ErrorNodeImpl(badToken);
             AddChild(t);
-            t.parent = this;
+            t.Parent = this;
             return t;
         }
 
-        public override RuleContext Parent
-        {
-            get
-            {
-                return (Antlr4.Runtime.ParserRuleContext)base.Parent;
-            }
-        }
 
         public override IParseTree GetChild(int i)
         {
@@ -375,11 +368,11 @@ namespace Antlr4.Runtime
         {
             get
             {
-                if (start == null || stop == null)
+                if (_start == null || _stop == null)
                 {
                     return Interval.Invalid;
                 }
-                return Interval.Of(start.TokenIndex, stop.TokenIndex);
+                return Interval.Of(_start.TokenIndex, _stop.TokenIndex);
             }
         }
 
@@ -387,16 +380,24 @@ namespace Antlr4.Runtime
         {
             get
             {
-                return start;
+                return _start;
             }
+			set 
+			{
+				_start = value;
+			}
         }
 
         public virtual IToken Stop
         {
             get
             {
-                return stop;
+                return _stop;
             }
+			set 
+			{
+				_stop = value;
+			}
         }
 
         /// <summary>Used for rule context info debugging during parse-time, not so much for ATN debugging</summary>
@@ -404,7 +405,7 @@ namespace Antlr4.Runtime
         {
             List<string> rules = new List<string>(recognizer.GetRuleInvocationStack(this));
             rules.Reverse();
-            return "ParserRuleContext" + rules + "{" + "start=" + start + ", stop=" + stop + '}';
+            return "ParserRuleContext" + rules + "{" + "start=" + _start + ", stop=" + _stop + '}';
         }
     }
 }

@@ -54,41 +54,25 @@ namespace Antlr4.Runtime
     /// </remarks>
     public class ParserInterpreter : Parser
     {
-        protected internal readonly string grammarFileName;
+        private readonly string _grammarFileName;
 
-        protected internal readonly ATN atn;
+        private readonly ATN _atn;
 
         protected internal readonly BitSet pushRecursionContextStates;
 
-        [Obsolete]
-        protected internal readonly string[] tokenNames;
-
-        protected internal readonly string[] ruleNames;
+		private readonly string[] _ruleNames;
 
         [NotNull]
         private readonly IVocabulary vocabulary;
 
-        protected internal readonly Stack<Tuple<ParserRuleContext, int>> _parentContextStack = new Stack<Tuple<ParserRuleContext, int>>();
-
-        [System.ObsoleteAttribute(@"Use ParserInterpreter(string, IVocabulary, System.Collections.Generic.ICollection{E}, Antlr4.Runtime.Atn.ATN, ITokenStream) instead.")]
-        public ParserInterpreter(string grammarFileName, IEnumerable<string> tokenNames, IEnumerable<string> ruleNames, ATN atn, ITokenStream input)
-            : this(grammarFileName, Antlr4.Runtime.Vocabulary.FromTokenNames(tokenNames.ToArray()), ruleNames, atn, input)
-        {
-        }
+        private readonly Stack<Tuple<ParserRuleContext, int>> _parentContextStack = new Stack<Tuple<ParserRuleContext, int>>();
 
         public ParserInterpreter(string grammarFileName, IVocabulary vocabulary, IEnumerable<string> ruleNames, ATN atn, ITokenStream input)
             : base(input)
         {
-            this.grammarFileName = grammarFileName;
-            this.atn = atn;
-#pragma warning disable 612 // 'fieldName' is obsolete
-            this.tokenNames = new string[atn.maxTokenType];
-            for (int i = 0; i < tokenNames.Length; i++)
-            {
-                tokenNames[i] = vocabulary.GetDisplayName(i);
-            }
-#pragma warning restore 612
-            this.ruleNames = ruleNames.ToArray();
+            this._grammarFileName = grammarFileName;
+            this._atn = atn;
+            this._ruleNames = ruleNames.ToArray();
             this.vocabulary = vocabulary;
             // identify the ATN states where pushNewRecursionContext must be called
             this.pushRecursionContextStates = new BitSet(atn.states.Count);
@@ -111,16 +95,7 @@ namespace Antlr4.Runtime
         {
             get
             {
-                return atn;
-            }
-        }
-
-        [Obsolete]
-        public override string[] TokenNames
-        {
-            get
-            {
-                return tokenNames;
+                return _atn;
             }
         }
 
@@ -136,7 +111,7 @@ namespace Antlr4.Runtime
         {
             get
             {
-                return ruleNames;
+                return _ruleNames;
             }
         }
 
@@ -144,14 +119,14 @@ namespace Antlr4.Runtime
         {
             get
             {
-                return grammarFileName;
+                return _grammarFileName;
             }
         }
 
         /// <summary>Begin parsing at startRuleIndex</summary>
         public virtual ParserRuleContext Parse(int startRuleIndex)
         {
-            RuleStartState startRuleStartState = atn.ruleToStartState[startRuleIndex];
+            RuleStartState startRuleStartState = _atn.ruleToStartState[startRuleIndex];
             InterpreterRuleContext rootContext = new InterpreterRuleContext(null, ATNState.InvalidStateNumber, startRuleIndex);
             if (startRuleStartState.isPrecedenceRule)
             {
@@ -169,11 +144,11 @@ namespace Antlr4.Runtime
                     case StateType.RuleStop:
                     {
                         // pop; return from rule
-                        if (_ctx.IsEmpty)
+						if (RuleContext.IsEmpty)
                         {
                             if (startRuleStartState.isPrecedenceRule)
                             {
-                                ParserRuleContext result = _ctx;
+								ParserRuleContext result = RuleContext;
                                 Tuple<ParserRuleContext, int> parentContext = _parentContextStack.Pop();
                                 UnrollRecursionContexts(parentContext.Item1);
                                 return result;
@@ -196,7 +171,7 @@ namespace Antlr4.Runtime
                         }
                         catch (RecognitionException e)
                         {
-                            State = atn.ruleToStopState[p.ruleIndex].stateNumber;
+                            State = _atn.ruleToStopState[p.ruleIndex].stateNumber;
                             Context.exception = e;
                             ErrorHandler.ReportError(this, e);
                             ErrorHandler.Recover(this, e);
@@ -209,7 +184,7 @@ namespace Antlr4.Runtime
 
         public override void EnterRecursionRule(ParserRuleContext localctx, int state, int ruleIndex, int precedence)
         {
-            _parentContextStack.Push(Tuple.Create(_ctx, localctx.invokingState));
+			_parentContextStack.Push(Tuple.Create(RuleContext, localctx.invokingState));
             base.EnterRecursionRule(localctx, state, ruleIndex, precedence);
         }
 
@@ -217,7 +192,7 @@ namespace Antlr4.Runtime
         {
             get
             {
-                return atn.states[State];
+                return _atn.states[State];
             }
         }
 
@@ -227,7 +202,7 @@ namespace Antlr4.Runtime
             if (p.NumberOfTransitions > 1)
             {
                 ErrorHandler.Sync(this);
-                edge = Interpreter.AdaptivePredict(_input, ((DecisionState)p).decision, _ctx);
+				edge = Interpreter.AdaptivePredict(TokenStream, ((DecisionState)p).decision, RuleContext);
             }
             else
             {
@@ -240,15 +215,15 @@ namespace Antlr4.Runtime
                 {
                     if (pushRecursionContextStates.Get(p.stateNumber) && !(transition.target is LoopEndState))
                     {
-                        InterpreterRuleContext ctx = new InterpreterRuleContext(_parentContextStack.Peek().Item1, _parentContextStack.Peek().Item2, _ctx.RuleIndex);
-                        PushNewRecursionContext(ctx, atn.ruleToStartState[p.ruleIndex].stateNumber, _ctx.RuleIndex);
+						InterpreterRuleContext ctx = new InterpreterRuleContext(_parentContextStack.Peek().Item1, _parentContextStack.Peek().Item2, RuleContext.RuleIndex);
+						PushNewRecursionContext(ctx, _atn.ruleToStartState[p.ruleIndex].stateNumber, RuleContext.RuleIndex);
                     }
                     break;
                 }
 
                 case TransitionType.Atom:
                 {
-                    Match(((AtomTransition)transition).label);
+					Match(((AtomTransition)transition).token);
                     break;
                 }
 
@@ -256,9 +231,9 @@ namespace Antlr4.Runtime
                 case TransitionType.Set:
                 case TransitionType.NotSet:
                 {
-                    if (!transition.Matches(_input.La(1), TokenConstants.MinUserTokenType, 65535))
+                    if (!transition.Matches(TokenStream.La(1), TokenConstants.MinUserTokenType, 65535))
                     {
-                        _errHandler.RecoverInline(this);
+						ErrorHandler.RecoverInline(this);
                     }
                     MatchWildcard();
                     break;
@@ -274,7 +249,7 @@ namespace Antlr4.Runtime
                 {
                     RuleStartState ruleStartState = (RuleStartState)transition.target;
                     int ruleIndex = ruleStartState.ruleIndex;
-                    InterpreterRuleContext ctx_1 = new InterpreterRuleContext(_ctx, p.stateNumber, ruleIndex);
+					InterpreterRuleContext ctx_1 = new InterpreterRuleContext(RuleContext, p.stateNumber, ruleIndex);
                     if (ruleStartState.isPrecedenceRule)
                     {
                         EnterRecursionRule(ctx_1, ruleStartState.stateNumber, ruleIndex, ((RuleTransition)transition).precedence);
@@ -289,7 +264,7 @@ namespace Antlr4.Runtime
                 case TransitionType.Predicate:
                 {
                     PredicateTransition predicateTransition = (PredicateTransition)transition;
-                    if (!Sempred(_ctx, predicateTransition.ruleIndex, predicateTransition.predIndex))
+					if (!Sempred(RuleContext, predicateTransition.ruleIndex, predicateTransition.predIndex))
                     {
                         throw new FailedPredicateException(this);
                     }
@@ -299,13 +274,13 @@ namespace Antlr4.Runtime
                 case TransitionType.Action:
                 {
                     ActionTransition actionTransition = (ActionTransition)transition;
-                    Action(_ctx, actionTransition.ruleIndex, actionTransition.actionIndex);
+					Action(RuleContext, actionTransition.ruleIndex, actionTransition.actionIndex);
                     break;
                 }
 
                 case TransitionType.Precedence:
                 {
-                    if (!Precpred(_ctx, ((PrecedencePredicateTransition)transition).precedence))
+					if (!Precpred(RuleContext, ((PrecedencePredicateTransition)transition).precedence))
                     {
                         throw new FailedPredicateException(this, string.Format("precpred(_ctx, {0})", ((PrecedencePredicateTransition)transition).precedence));
                     }
@@ -322,7 +297,7 @@ namespace Antlr4.Runtime
 
         protected internal virtual void VisitRuleStopState(ATNState p)
         {
-            RuleStartState ruleStartState = atn.ruleToStartState[p.ruleIndex];
+            RuleStartState ruleStartState = _atn.ruleToStartState[p.ruleIndex];
             if (ruleStartState.isPrecedenceRule)
             {
                 Tuple<ParserRuleContext, int> parentContext = _parentContextStack.Pop();
@@ -333,7 +308,7 @@ namespace Antlr4.Runtime
             {
                 ExitRule();
             }
-            RuleTransition ruleTransition = (RuleTransition)atn.states[State].Transition(0);
+            RuleTransition ruleTransition = (RuleTransition)_atn.states[State].Transition(0);
             State = ruleTransition.followState.stateNumber;
         }
     }

@@ -305,7 +305,7 @@ namespace Antlr4.Runtime.Atn
 
         public virtual bool Contains(Antlr4.Runtime.Atn.ATNConfig subconfig)
         {
-            if (this.State.stateNumber != subconfig.State.stateNumber || this.Alt != subconfig.Alt || !this.SemanticContext.Equals(subconfig.SemanticContext))
+            if (this.state.stateNumber != subconfig.State.stateNumber || this.Alt != subconfig.Alt || !this.SemanticContext.Equals(subconfig.SemanticContext))
             {
                 return false;
             }

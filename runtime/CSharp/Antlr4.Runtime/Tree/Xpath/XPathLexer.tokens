@@ -1,0 +1,12 @@
+TokenRef=1
+RuleRef=2
+Anywhere=3
+Root=4
+Wildcard=5
+Bang=6
+ID=7
+String=8
+'//'=3
+'/'=4
+'*'=5
+'!'=6

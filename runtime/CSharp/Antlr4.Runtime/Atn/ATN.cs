@@ -102,10 +102,10 @@ namespace Antlr4.Runtime.Atn
         private readonly ConcurrentDictionary<PredictionContext, PredictionContext> contextCache = new ConcurrentDictionary<PredictionContext, PredictionContext>();
 
         [NotNull]
-        public DFA[] decisionToDFA = new DFA[0];
+		public DFA[] decisionToDFA = new DFA[0];
 
         [NotNull]
-        public DFA[] modeToDFA = new DFA[0];
+		public DFA[] modeToDFA = new DFA[0];
 
         protected internal readonly ConcurrentDictionary<int, int> LL1Table = new ConcurrentDictionary<int, int>();
 
@@ -143,15 +143,6 @@ namespace Antlr4.Runtime.Atn
         public virtual PredictionContext GetCachedContext(PredictionContext context)
         {
             return PredictionContext.GetCachedContext(context, contextCache, new PredictionContext.IdentityHashMap());
-        }
-
-        public DFA[] DecisionToDfa
-        {
-            get
-            {
-                System.Diagnostics.Debug.Assert(decisionToDFA != null && decisionToDFA.Length == decisionToState.Count);
-                return decisionToDFA;
-            }
         }
 
         /// <summary>
@@ -308,7 +299,7 @@ namespace Antlr4.Runtime.Atn
                 following = NextTokens(rt.followState);
                 expected.AddAll(following);
                 expected.Remove(TokenConstants.Epsilon);
-                ctx = ctx.parent;
+                ctx = ctx.Parent;
             }
             if (following.Contains(TokenConstants.Epsilon))
             {

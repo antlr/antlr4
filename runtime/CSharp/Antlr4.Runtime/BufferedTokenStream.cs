@@ -64,7 +64,7 @@ namespace Antlr4.Runtime
         /// from which tokens for this stream are fetched.
         /// </summary>
         [NotNull]
-        protected internal ITokenSource tokenSource;
+        private ITokenSource _tokenSource;
 
         /// <summary>A collection of all tokens fetched from the token source.</summary>
         /// <remarks>
@@ -139,14 +139,14 @@ namespace Antlr4.Runtime
             {
                 throw new ArgumentNullException("tokenSource cannot be null");
             }
-            this.tokenSource = tokenSource;
+            this._tokenSource = tokenSource;
         }
 
         public virtual ITokenSource TokenSource
         {
             get
             {
-                return tokenSource;
+                return _tokenSource;
             }
         }
 
@@ -262,7 +262,7 @@ namespace Antlr4.Runtime
             }
             for (int i = 0; i < n; i++)
             {
-                IToken t = tokenSource.NextToken();
+                IToken t = _tokenSource.NextToken();
                 if (t is IWritableToken)
                 {
                     ((IWritableToken)t).TokenIndex = tokens.Count;
@@ -393,7 +393,7 @@ namespace Antlr4.Runtime
         /// <remarks>Reset this token stream by setting its token source.</remarks>
         public virtual void SetTokenSource(ITokenSource tokenSource)
         {
-            this.tokenSource = tokenSource;
+            this._tokenSource = tokenSource;
             tokens.Clear();
             p = -1;
         }
@@ -650,7 +650,7 @@ namespace Antlr4.Runtime
         {
             get
             {
-                return tokenSource.SourceName;
+                return _tokenSource.SourceName;
             }
         }
 

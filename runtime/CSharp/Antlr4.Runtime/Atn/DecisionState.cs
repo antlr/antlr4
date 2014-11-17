@@ -37,7 +37,5 @@ namespace Antlr4.Runtime.Atn
         public int decision = -1;
 
         public bool nonGreedy;
-
-        public bool sll;
     }
 }

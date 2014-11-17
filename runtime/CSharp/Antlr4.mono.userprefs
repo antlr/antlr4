@@ -1,0 +1,11 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/Users/ericvergnaud/Development/antlr4/antlr/antlr4-csharp/runtime/CSharp/Antlr4.Test.mono/TParser.cs" line="158" column="1" />
+      <Breakpoint file="/Users/ericvergnaud/Development/antlr4/antlr/antlr4-csharp/runtime/CSharp/Antlr4.Test.mono/TParser.cs" line="106" column="1" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

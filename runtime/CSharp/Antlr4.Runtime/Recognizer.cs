@@ -58,7 +58,7 @@ namespace Antlr4.Runtime
 #endif
         };
 
-        protected internal ATNInterpreter _interp;
+        private ATNInterpreter _interp;
 
         private int _stateNumber = -1;
 
@@ -71,16 +71,12 @@ namespace Antlr4.Runtime
         /// error reporting.  The generated parsers implement a method
         /// that overrides this to point to their String[] tokenNames.
         /// </remarks>
-        [System.ObsoleteAttribute(@"Use Recognizer{Symbol, ATNInterpreter}.Vocabulary() instead.")]
-        public abstract string[] TokenNames
-        {
-            get;
-        }
 
         public abstract string[] RuleNames
         {
             get;
         }
+
 
         /// <summary>Get the vocabulary used by the recognizer.</summary>
         /// <remarks>Get the vocabulary used by the recognizer.</remarks>
@@ -90,15 +86,10 @@ namespace Antlr4.Runtime
         /// instance providing information about the
         /// vocabulary used by the grammar.
         /// </returns>
-        public virtual IVocabulary Vocabulary
+        public abstract IVocabulary Vocabulary
         {
-            get
-            {
-#pragma warning disable 618 // 'propertyName' is obsolete: message
-                return Antlr4.Runtime.Vocabulary.FromTokenNames(TokenNames);
-#pragma warning restore 618
-            }
-        }
+			get;
+       }
 
         /// <summary>Get a map from token names to token types.</summary>
         /// <remarks>
@@ -233,10 +224,9 @@ namespace Antlr4.Runtime
             {
                 return _interp;
             }
-            set
+            protected set
             {
-                ATNInterpreter interpreter = value;
-                _interp = interpreter;
+				_interp = value;
             }
         }
 

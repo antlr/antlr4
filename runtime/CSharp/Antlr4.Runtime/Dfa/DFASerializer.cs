@@ -54,12 +54,6 @@ namespace Antlr4.Runtime.Dfa
         [Nullable]
         internal readonly ATN atn;
 
-        [System.ObsoleteAttribute(@"Use DFASerializer(DFA, Antlr4.Runtime.IVocabulary) instead.")]
-        public DFASerializer(DFA dfa, string[] tokenNames)
-            : this(dfa, Vocabulary.FromTokenNames(tokenNames), null, null)
-        {
-        }
-
         public DFASerializer(DFA dfa, IVocabulary vocabulary)
             : this(dfa, vocabulary, null, null)
         {
@@ -67,12 +61,6 @@ namespace Antlr4.Runtime.Dfa
 
         public DFASerializer(DFA dfa, IRecognizer parser)
             : this(dfa, parser != null ? parser.Vocabulary : Vocabulary.EmptyVocabulary, parser != null ? parser.RuleNames : null, parser != null ? parser.Atn : null)
-        {
-        }
-
-        [System.ObsoleteAttribute(@"Use DFASerializer(DFA, Antlr4.Runtime.IVocabulary, string[], Antlr4.Runtime.Atn.ATN) instead.")]
-        public DFASerializer(DFA dfa, string[] tokenNames, string[] ruleNames, ATN atn)
-            : this(dfa, Vocabulary.FromTokenNames(tokenNames), ruleNames, atn)
         {
         }
 
@@ -191,32 +179,20 @@ namespace Antlr4.Runtime.Dfa
             {
                 return "ERROR";
             }
-            int n = s.stateNumber;
-            string stateStr = "s" + n;
-            if (s.IsAcceptState)
-            {
-                if (s.predicates != null)
-                {
-                    stateStr = ":s" + n + "=>" + Arrays.ToString(s.predicates);
-                }
-                else
-                {
-                    stateStr = ":s" + n + "=>" + s.Prediction;
-                }
-            }
-            if (s.IsContextSensitive)
-            {
-                stateStr += "*";
-                foreach (ATNConfig config in s.configs)
-                {
-                    if (config.ReachesIntoOuterContext)
-                    {
-                        stateStr += "*";
-                        break;
-                    }
-                }
-            }
-            return stateStr;
+
+			int n = s.stateNumber;
+			string baseStateStr = (s.IsAcceptState ? ":" : "") + "s" + n + (s.IsContextSensitive ? "^" : "");
+			if ( s.IsAcceptState ) {
+				if ( s.predicates!=null ) {
+					return baseStateStr + "=>" + Arrays.ToString(s.predicates);
+				}
+				else {
+					return baseStateStr + "=>" + s.Prediction;
+				}
+			}
+			else {
+				return baseStateStr;
+			}
         }
     }
 }

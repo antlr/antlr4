@@ -197,7 +197,7 @@ namespace Antlr4.Runtime.Tree
             return nodes;
         }
 
-        public static void _findAllNodes(IParseTree t, int index, bool findTokens, IList<IParseTree> nodes)
+        private static void _findAllNodes(IParseTree t, int index, bool findTokens, IList<IParseTree> nodes)
         {
             // check this node (the root) first
             if (findTokens && t is ITerminalNode)

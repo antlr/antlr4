@@ -64,7 +64,7 @@ namespace Antlr4.Runtime
         }
 
         public FailedPredicateException(Parser recognizer, string predicate, string message)
-            : base(FormatMessage(predicate, message), recognizer, ((ITokenStream)recognizer.InputStream), recognizer._ctx)
+			: base(FormatMessage(predicate, message), recognizer, ((ITokenStream)recognizer.InputStream), recognizer.RuleContext)
         {
             ATNState s = recognizer.Interpreter.atn.states[recognizer.State];
             AbstractPredicateTransition trans = (AbstractPredicateTransition)s.Transition(0);

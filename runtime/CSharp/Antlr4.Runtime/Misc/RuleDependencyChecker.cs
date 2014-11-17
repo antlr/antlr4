@@ -815,8 +815,8 @@ namespace Antlr4.Runtime.Misc
                         int index = (int)field.GetValue(null);
                         if (index < 0 || index >= versions.Length)
                         {
-                            object[] @params = new object[] { index, field.Name, recognizerClass.Name };
 #if false
+							object[] @params = new object[] { index, field.Name, recognizerClass.Name };
                             Logger.Log(Level.Warning, "Rule index {0} for rule ''{1}'' out of bounds for recognizer {2}.", @params);
 #endif
                             continue;
@@ -824,8 +824,8 @@ namespace Antlr4.Runtime.Misc
                         MethodInfo ruleMethod = GetRuleMethod(recognizerClass, name);
                         if (ruleMethod == null)
                         {
-                            object[] @params = new object[] { name, recognizerClass.Name };
 #if false
+							object[] @params = new object[] { name, recognizerClass.Name };
                             Logger.Log(Level.Warning, "Could not find rule method for rule ''{0}'' in recognizer {1}.", @params);
 #endif
                             continue;
@@ -932,7 +932,7 @@ namespace Antlr4.Runtime.Misc
                 {
                     continue;
                 }
-                foreach (Transition transition in state.Transitions)
+                foreach (Transition transition in state.TransitionsArray)
                 {
                     if (transition.TransitionType != TransitionType.Rule)
                     {

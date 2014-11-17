@@ -394,7 +394,7 @@ namespace Antlr4.Runtime
         /// <param name="e">the recognition exception</param>
         protected internal virtual void ReportFailedPredicate(Parser recognizer, FailedPredicateException e)
         {
-            string ruleName = recognizer.RuleNames[recognizer._ctx.RuleIndex];
+			string ruleName = recognizer.RuleNames[recognizer.RuleContext.RuleIndex];
             string msg = "rule " + ruleName + " " + e.Message;
             NotifyErrorListeners(recognizer, msg, e);
         }
@@ -620,7 +620,7 @@ namespace Antlr4.Runtime
             ATNState currentState = recognizer.Interpreter.atn.states[recognizer.State];
             ATNState next = currentState.Transition(0).target;
             ATN atn = recognizer.Interpreter.atn;
-            IntervalSet expectingAtLL2 = atn.NextTokens(next, PredictionContext.FromRuleContext(atn, recognizer._ctx));
+			IntervalSet expectingAtLL2 = atn.NextTokens(next, PredictionContext.FromRuleContext(atn, recognizer.RuleContext));
             //		System.out.println("LT(2) set="+expectingAtLL2.toString(recognizer.getTokenNames()));
             if (expectingAtLL2.Contains(currentSymbolType))
             {
@@ -797,7 +797,7 @@ namespace Antlr4.Runtime
         protected internal virtual IntervalSet GetErrorRecoverySet(Parser recognizer)
         {
             ATN atn = recognizer.Interpreter.atn;
-            RuleContext ctx = recognizer._ctx;
+			RuleContext ctx = recognizer.RuleContext;
             IntervalSet recoverSet = new IntervalSet();
             while (ctx != null && ctx.invokingState >= 0)
             {
@@ -806,7 +806,7 @@ namespace Antlr4.Runtime
                 RuleTransition rt = (RuleTransition)invokingState.Transition(0);
                 IntervalSet follow = atn.NextTokens(rt.followState);
                 recoverSet.AddAll(follow);
-                ctx = ctx.parent;
+                ctx = ctx.Parent;
             }
             recoverSet.Remove(TokenConstants.Epsilon);
             //		System.out.println("recover set "+recoverSet.toString(recognizer.getTokenNames()));

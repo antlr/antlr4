@@ -51,12 +51,12 @@ namespace Antlr4.Runtime
         /// <summary>
         /// This is the backing field for the <see cref="Type"/> property.
         /// </summary>
-        protected internal int type;
+        private int _type;
 
         /// <summary>
         /// This is the backing field for the <see cref="Line"/> property.
         /// </summary>
-        protected internal int line;
+        private int _line;
 
         /// <summary>
         /// This is the backing field for the <see cref="Column"/> property.
@@ -66,7 +66,7 @@ namespace Antlr4.Runtime
         /// <summary>
         /// This is the backing field for the <see cref="Channel"/> property.
         /// </summary>
-        protected internal int channel = TokenConstants.DefaultChannel;
+        private int _channel = TokenConstants.DefaultChannel;
 
         /// <summary>
         /// This is the backing field for
@@ -91,7 +91,7 @@ namespace Antlr4.Runtime
         /// This is the backing field for the <see cref="Text"/> property.
         /// </summary>
         /// <seealso cref="Text"/>
-        protected internal string text;
+        private string _text;
 
         /// <summary>
         /// This is the backing field for the <see cref="TokenIndex"/> property.
@@ -117,20 +117,20 @@ namespace Antlr4.Runtime
         public CommonToken(int type)
         {
             // set to invalid position
-            this.type = type;
+            this._type = type;
             this.source = EmptySource;
         }
 
         public CommonToken(Tuple<ITokenSource, ICharStream> source, int type, int channel, int start, int stop)
         {
             this.source = source;
-            this.type = type;
-            this.channel = channel;
+            this._type = type;
+            this._channel = channel;
             this.start = start;
             this.stop = stop;
             if (source.Item1 != null)
             {
-                this.line = source.Item1.Line;
+                this._line = source.Item1.Line;
                 this.charPositionInLine = source.Item1.Column;
             }
         }
@@ -145,9 +145,9 @@ namespace Antlr4.Runtime
         /// <param name="text">The text of the token.</param>
         public CommonToken(int type, string text)
         {
-            this.type = type;
-            this.channel = TokenConstants.DefaultChannel;
-            this.text = text;
+            this._type = type;
+            this._channel = TokenConstants.DefaultChannel;
+            this._text = text;
             this.source = EmptySource;
         }
 
@@ -186,21 +186,21 @@ namespace Antlr4.Runtime
         /// <param name="oldToken">The token to copy.</param>
         public CommonToken(IToken oldToken)
         {
-            type = oldToken.Type;
-            line = oldToken.Line;
+            _type = oldToken.Type;
+            _line = oldToken.Line;
             index = oldToken.TokenIndex;
             charPositionInLine = oldToken.Column;
-            channel = oldToken.Channel;
+            _channel = oldToken.Channel;
             start = oldToken.StartIndex;
             stop = oldToken.StopIndex;
             if (oldToken is Antlr4.Runtime.CommonToken)
             {
-                text = ((Antlr4.Runtime.CommonToken)oldToken).text;
+                _text = ((Antlr4.Runtime.CommonToken)oldToken)._text;
                 source = ((Antlr4.Runtime.CommonToken)oldToken).source;
             }
             else
             {
-                text = oldToken.Text;
+                _text = oldToken.Text;
                 source = Tuple.Create(oldToken.TokenSource, oldToken.InputStream);
             }
         }
@@ -209,12 +209,11 @@ namespace Antlr4.Runtime
         {
             get
             {
-                return type;
+                return _type;
             }
             set
             {
-                int type = value;
-                this.type = type;
+ 				this._type = value;
             }
         }
 
@@ -222,12 +221,11 @@ namespace Antlr4.Runtime
         {
             get
             {
-                return line;
+                return _line;
             }
             set
             {
-                int line = value;
-                this.line = line;
+ 				this._line = value;
             }
         }
 
@@ -251,9 +249,9 @@ namespace Antlr4.Runtime
         {
             get
             {
-                if (text != null)
+                if (_text != null)
                 {
-                    return text;
+                    return _text;
                 }
                 ICharStream input = InputStream;
                 if (input == null)
@@ -272,8 +270,7 @@ namespace Antlr4.Runtime
             }
             set
             {
-                string text = value;
-                this.text = text;
+ 				this._text = value;
             }
         }
 
@@ -294,12 +291,11 @@ namespace Antlr4.Runtime
         {
             get
             {
-                return channel;
+                return _channel;
             }
             set
             {
-                int channel = value;
-                this.channel = channel;
+                this._channel = value;
             }
         }
 
@@ -361,9 +357,9 @@ namespace Antlr4.Runtime
         public override string ToString()
         {
             string channelStr = string.Empty;
-            if (channel > 0)
+            if (_channel > 0)
             {
-                channelStr = ",channel=" + channel;
+                channelStr = ",channel=" + _channel;
             }
             string txt = Text;
             if (txt != null)
@@ -376,7 +372,7 @@ namespace Antlr4.Runtime
             {
                 txt = "<no text>";
             }
-            return "[@" + TokenIndex + "," + start + ":" + stop + "='" + txt + "',<" + type + ">" + channelStr + "," + line + ":" + Column + "]";
+            return "[@" + TokenIndex + "," + start + ":" + stop + "='" + txt + "',<" + _type + ">" + channelStr + "," + _line + ":" + Column + "]";
         }
     }
 }

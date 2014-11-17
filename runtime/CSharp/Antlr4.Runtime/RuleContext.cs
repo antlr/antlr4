@@ -58,7 +58,7 @@ namespace Antlr4.Runtime
     public class RuleContext : IRuleNode
     {
         /// <summary>What context invoked this rule?</summary>
-        public Antlr4.Runtime.RuleContext parent;
+        private Antlr4.Runtime.RuleContext _parent;
 
         /// <summary>
         /// What state invoked the rule associated with this context?
@@ -78,7 +78,7 @@ namespace Antlr4.Runtime
 
         public RuleContext(Antlr4.Runtime.RuleContext parent, int invokingState)
         {
-            this.parent = parent;
+            this._parent = parent;
             //if ( parent!=null ) System.out.println("invoke "+stateNumber+" from "+parent);
             this.invokingState = invokingState;
         }
@@ -94,7 +94,7 @@ namespace Antlr4.Runtime
             Antlr4.Runtime.RuleContext p = this;
             while (p != null)
             {
-                p = p.parent;
+                p = p._parent;
                 n++;
             }
             return n;
@@ -137,8 +137,12 @@ namespace Antlr4.Runtime
         {
             get
             {
-                return parent;
+                return _parent;
             }
+			set 
+			{
+				_parent = value;
+			}
         }
 
         IRuleNode IRuleNode.Parent
@@ -310,11 +314,11 @@ namespace Antlr4.Runtime
                     string ruleName = ruleIndex >= 0 && ruleIndex < ruleNames.Count ? ruleNames[ruleIndex] : ruleIndex.ToString();
                     buf.Append(ruleName);
                 }
-                if (p.parent != null && (ruleNames != null || !p.parent.IsEmpty))
+                if (p.Parent != null && (ruleNames != null || !p.Parent.IsEmpty))
                 {
                     buf.Append(" ");
                 }
-                p = p.parent;
+                p = p.Parent;
             }
             buf.Append("]");
             return buf.ToString();

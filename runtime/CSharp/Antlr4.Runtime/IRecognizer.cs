@@ -34,12 +34,6 @@ namespace Antlr4.Runtime
 
     public interface IRecognizer
     {
-        [Obsolete]
-        string[] TokenNames
-        {
-            get;
-        }
-
         IVocabulary Vocabulary
         {
             get;

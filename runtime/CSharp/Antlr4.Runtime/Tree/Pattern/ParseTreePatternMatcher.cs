@@ -610,7 +610,6 @@ namespace Antlr4.Runtime.Tree.Pattern
             int p = 0;
             int n = pattern.Length;
             IList<Chunk> chunks = new List<Chunk>();
-            StringBuilder buf = new StringBuilder();
             // find all start and stop indexes first, then collect
             IList<int> starts = new List<int>();
             IList<int> stops = new List<int>();
