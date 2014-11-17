@@ -327,17 +327,6 @@ namespace Antlr4.Runtime.Dfa
             return ToString(Vocabulary.EmptyVocabulary);
         }
 
-        [System.ObsoleteAttribute(@"Use ToString(Antlr4.Runtime.IVocabulary) instead.")]
-        public virtual string ToString(string[] tokenNames)
-        {
-            if (s0.Get() == null)
-            {
-                return string.Empty;
-            }
-            DFASerializer serializer = new DFASerializer(this, tokenNames);
-            return serializer.ToString();
-        }
-
         public virtual string ToString(IVocabulary vocabulary)
         {
             if (s0.Get() == null)
@@ -345,17 +334,6 @@ namespace Antlr4.Runtime.Dfa
                 return string.Empty;
             }
             DFASerializer serializer = new DFASerializer(this, vocabulary);
-            return serializer.ToString();
-        }
-
-        [System.ObsoleteAttribute(@"Use ToString(Antlr4.Runtime.IVocabulary, string[]) instead.")]
-        public virtual string ToString(string[] tokenNames, string[] ruleNames)
-        {
-            if (s0.Get() == null)
-            {
-                return string.Empty;
-            }
-            DFASerializer serializer = new DFASerializer(this, tokenNames, ruleNames, atnStartState.atn);
             return serializer.ToString();
         }
 

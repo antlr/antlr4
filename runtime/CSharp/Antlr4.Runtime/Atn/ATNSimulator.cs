@@ -93,42 +93,6 @@ namespace Antlr4.Runtime.Atn
             return new ATNDeserializer().Deserialize(data);
         }
 
-        [Obsolete(@"Use ATNDeserializer.CheckCondition(bool) instead.")]
-        public static void CheckCondition(bool condition)
-        {
-            new ATNDeserializer().CheckCondition(condition);
-        }
-
-        [Obsolete(@"Use ATNDeserializer.CheckCondition(bool, string) instead.")]
-        public static void CheckCondition(bool condition, string message)
-        {
-            new ATNDeserializer().CheckCondition(condition, message);
-        }
-
-        [Obsolete(@"Use ATNDeserializer.ToInt(char) instead.")]
-        public static int ToInt(char c)
-        {
-            return ATNDeserializer.ToInt(c);
-        }
-
-        [Obsolete(@"Use ATNDeserializer.ToInt32(char[], int) instead.")]
-        public static int ToInt32(char[] data, int offset)
-        {
-            return ATNDeserializer.ToInt32(data, offset);
-        }
-
-        [Obsolete(@"Use ATNDeserializer.ToLong(char[], int) instead.")]
-        public static long ToLong(char[] data, int offset)
-        {
-            return ATNDeserializer.ToLong(data, offset);
-        }
-
-        [Obsolete(@"Use ATNDeserializer.ToUUID(char[], int) instead.")]
-        public static Guid ToUUID(char[] data, int offset)
-        {
-            return ATNDeserializer.ToUUID(data, offset);
-        }
-
         [return: NotNull]
         [Obsolete(@"Use ATNDeserializer.EdgeFactory(ATN, TransitionType, int, int, int, int, int, System.Collections.Generic.IList{E}) instead.")]
         public static Transition EdgeFactory(ATN atn, TransitionType type, int src, int trg, int arg1, int arg2, int arg3, IList<IntervalSet> sets)

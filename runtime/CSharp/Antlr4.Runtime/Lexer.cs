@@ -56,12 +56,12 @@ namespace Antlr4.Runtime
 
         public const int MaxCharValue = '\uFFFE';
 
-        public ICharStream _input;
+        private ICharStream _input;
 
-        protected internal Tuple<ITokenSource, ICharStream> _tokenFactorySourcePair;
+		private Tuple<ITokenSource, ICharStream> _tokenFactorySourcePair;
 
         /// <summary>How to create token objects</summary>
-        protected internal ITokenFactory _factory = CommonTokenFactory.Default;
+		private ITokenFactory _factory = CommonTokenFactory.Default;
 
         /// <summary>The goal of all lexer rules/methods is to create a token object.</summary>
         /// <remarks>
@@ -73,7 +73,7 @@ namespace Antlr4.Runtime
         /// something nonnull so that the auto token emit mechanism will not
         /// emit another token.
         /// </remarks>
-        public IToken _token;
+        private IToken _token;
 
         /// <summary>
         /// What character index in the stream did the current token start at?
@@ -84,30 +84,30 @@ namespace Antlr4.Runtime
         /// Needed, for example, to get the text for current token.  Set at
         /// the start of nextToken.
         /// </remarks>
-        public int _tokenStartCharIndex = -1;
+        private int _tokenStartCharIndex = -1;
 
         /// <summary>The line on which the first character of the token resides</summary>
-        public int _tokenStartLine;
+		private int _tokenStartLine;
 
         /// <summary>The character position of first character within the line</summary>
-        public int _tokenStartCharPositionInLine;
+		private int _tokenStartColumn;
 
         /// <summary>Once we see EOF on char stream, next token will be EOF.</summary>
         /// <remarks>
         /// Once we see EOF on char stream, next token will be EOF.
         /// If you have DONE : EOF ; then you see DONE EOF.
         /// </remarks>
-        public bool _hitEOF;
+		private bool _hitEOF;
 
         /// <summary>The channel number for the current token</summary>
-        public int _channel;
+		private int _channel;
 
         /// <summary>The token type for the current token</summary>
-        public int _type;
+		private int _type;
 
-        public readonly List<int> _modeStack = new List<int>();
+		private readonly List<int> _modeStack = new List<int>();
 
-        public int _mode = Antlr4.Runtime.Lexer.DefaultMode;
+		private int _mode = Antlr4.Runtime.Lexer.DefaultMode;
 
         /// <summary>
         /// You can set the text for the current token to override what is in
@@ -117,7 +117,7 @@ namespace Antlr4.Runtime
         /// You can set the text for the current token to override what is in
         /// the input char buffer.  Use setText() or can set this instance var.
         /// </remarks>
-        public string _text;
+		private string _text;
 
         public Lexer(ICharStream input)
         {
@@ -137,7 +137,7 @@ namespace Antlr4.Runtime
             _type = TokenConstants.InvalidType;
             _channel = TokenConstants.DefaultChannel;
             _tokenStartCharIndex = -1;
-            _tokenStartCharPositionInLine = -1;
+            _tokenStartColumn = -1;
             _tokenStartLine = -1;
             _text = null;
             _hitEOF = false;
@@ -175,7 +175,7 @@ namespace Antlr4.Runtime
                     _token = null;
                     _channel = TokenConstants.DefaultChannel;
                     _tokenStartCharIndex = _input.Index;
-                    _tokenStartCharPositionInLine = Interpreter.Column;
+                    _tokenStartColumn = Interpreter.Column;
                     _tokenStartLine = Interpreter.Line;
                     _text = null;
                     do
@@ -314,7 +314,7 @@ outer_continue: ;
         {
             get
             {
-                return (ICharStream)InputStream;
+				return _input;
             }
         }
 
@@ -347,7 +347,7 @@ outer_continue: ;
         /// </remarks>
         public virtual IToken Emit()
         {
-            IToken t = _factory.Create(_tokenFactorySourcePair, _type, _text, _channel, _tokenStartCharIndex, CharIndex - 1, _tokenStartLine, _tokenStartCharPositionInLine);
+            IToken t = _factory.Create(_tokenFactorySourcePair, _type, _text, _channel, _tokenStartCharIndex, CharIndex - 1, _tokenStartLine, _tokenStartColumn);
             Emit(t);
             return t;
         }
@@ -401,6 +401,30 @@ outer_continue: ;
                 return _input.Index;
             }
         }
+
+		public virtual int TokenStartCharIndex
+		{
+			get 
+			{
+				return _tokenStartCharIndex;
+			}
+		}
+
+		public virtual int TokenStartLine
+		{
+			get 
+			{
+				return _tokenStartLine;
+			}
+		}
+
+		public virtual int TokenStartColumn
+		{
+			get 
+			{
+				return _tokenStartColumn;
+			}
+		}
 
         /// <summary>
         /// Return the text matched so far for the current token or any text
@@ -484,23 +508,6 @@ outer_continue: ;
             }
         }
 
-        /// <summary>
-        /// Used to print out token names like ID during debugging and
-        /// error reporting.
-        /// </summary>
-        /// <remarks>
-        /// Used to print out token names like ID during debugging and
-        /// error reporting.  The generated parsers implement a method
-        /// that overrides this to point to their String[] tokenNames.
-        /// </remarks>
-        [Obsolete]
-        public override string[] TokenNames
-        {
-            get
-            {
-                return null;
-            }
-        }
 
         /// <summary>Return a list of all Token objects in input char stream.</summary>
         /// <remarks>
@@ -533,7 +540,7 @@ outer_continue: ;
             string text = _input.GetText(Interval.Of(_tokenStartCharIndex, _input.Index));
             string msg = "token recognition error at: '" + GetErrorDisplay(text) + "'";
             IAntlrErrorListener<int> listener = ErrorListenerDispatch;
-            listener.SyntaxError(this, 0, _tokenStartLine, _tokenStartCharPositionInLine, msg, e);
+            listener.SyntaxError(this, 0, _tokenStartLine, _tokenStartColumn, msg, e);
         }
 
         public virtual string GetErrorDisplay(string s)

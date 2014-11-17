@@ -38,12 +38,12 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Antlr4.Runtime")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Tunnel Vision Laboratories, LLC")]
+[assembly: AssemblyCompany("Antlr organization")]
 [assembly: AssemblyProduct("Antlr4.Runtime")]
-[assembly: AssemblyCopyright("Copyright © Sam Harwell 2014")]
+[assembly: AssemblyCopyright("Antlr organization")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: CLSCompliant(false)]
+[assembly: CLSCompliant(true)]
 
 #if !PORTABLE || NET45PLUS
 // Setting ComVisible to false makes the types in this assembly not visible 

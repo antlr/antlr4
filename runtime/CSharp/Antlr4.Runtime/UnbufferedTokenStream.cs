@@ -37,7 +37,7 @@ namespace Antlr4.Runtime
 {
     public class UnbufferedTokenStream : ITokenStream
     {
-        protected internal ITokenSource tokenSource;
+        private ITokenSource _tokenSource;
 
         /// <summary>A moving window buffer of the data being scanned.</summary>
         /// <remarks>
@@ -132,7 +132,7 @@ namespace Antlr4.Runtime
 
         public UnbufferedTokenStream(ITokenSource tokenSource, int bufferSize)
         {
-            this.tokenSource = tokenSource;
+            this.TokenSource = tokenSource;
             this.tokens = new IToken[bufferSize];
             n = 0;
             Fill(1);
@@ -178,8 +178,12 @@ namespace Antlr4.Runtime
         {
             get
             {
-                return tokenSource;
+                return _tokenSource;
             }
+			set 
+			{
+				_tokenSource = value;
+			}
         }
 
         [return: NotNull]
@@ -271,7 +275,7 @@ namespace Antlr4.Runtime
                 {
                     return i;
                 }
-                IToken t = tokenSource.NextToken();
+                IToken t = TokenSource.NextToken();
                 Add(t);
             }
             return n;
@@ -392,7 +396,7 @@ namespace Antlr4.Runtime
         {
             get
             {
-                return tokenSource.SourceName;
+                return TokenSource.SourceName;
             }
         }
 

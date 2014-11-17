@@ -157,7 +157,7 @@ namespace Antlr4.Runtime.Tree.Pattern
         /// </summary>
         public override string ToString()
         {
-            return tokenName + ":" + type;
+            return tokenName + ":" + Type;
         }
     }
 }

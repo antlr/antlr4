@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{EDC70A11-C4C1-4209-93A6-CCE2B19E8E95}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Antlr4.Test.mono</RootNamespace>
+    <AssemblyName>Test</AssemblyName>
+    <StartupObject>Test</StartupObject>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Externalconsole>true</Externalconsole>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Externalconsole>true</Externalconsole>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System"/>
+  </ItemGroup>
+  <ItemGroup>
+<Compile Include="TBaseListener.cs"/>
+<Compile Include="TBaseVisitor.cs"/>
+<Compile Include="AssemblyInfo.cs"/>
+<Compile Include="TListener.cs"/>
+<Compile Include="Test.cs"/>
+<Compile Include="TVisitor.cs"/>
+<Compile Include="TParser.cs"/>
+<Compile Include="TLexer.cs"/>
+</ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets"/>
+  <ItemGroup>
+    <ProjectReference Include="\users\ericvergnaud\Development\antlr4\antlr\antlr4-csharp\runtime\CSharp\Antlr4.Runtime\Antlr4.Runtime.mono.csproj">
+      <Project>{E1A46D9D-66CB-46E8-93B0-7FC87299ABEF}</Project>
+      <Name>Antlr4.Runtime.mono</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

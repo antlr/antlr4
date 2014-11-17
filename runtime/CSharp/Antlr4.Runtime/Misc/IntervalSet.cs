@@ -699,12 +699,6 @@ namespace Antlr4.Runtime.Misc
             return buf.ToString();
         }
 
-        [System.ObsoleteAttribute(@"Use ToString(Antlr4.Runtime.IVocabulary) instead.")]
-        public virtual string ToString(string[] tokenNames)
-        {
-            return ToString(Vocabulary.FromTokenNames(tokenNames));
-        }
-
         public virtual string ToString(IVocabulary vocabulary)
         {
             StringBuilder buf = new StringBuilder();
@@ -747,12 +741,6 @@ namespace Antlr4.Runtime.Misc
                 buf.Append("}");
             }
             return buf.ToString();
-        }
-
-        [System.ObsoleteAttribute(@"Use ElementName(Antlr4.Runtime.IVocabulary, int) instead.")]
-        protected internal virtual string ElementName(string[] tokenNames, int a)
-        {
-            return ElementName(Vocabulary.FromTokenNames(tokenNames), a);
         }
 
         [return: NotNull]

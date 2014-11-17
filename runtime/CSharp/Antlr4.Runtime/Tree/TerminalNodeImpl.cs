@@ -36,13 +36,13 @@ namespace Antlr4.Runtime.Tree
 {
     public class TerminalNodeImpl : ITerminalNode
     {
-        public IToken symbol;
+        private IToken _symbol;
 
-        public IRuleNode parent;
+        private IRuleNode _parent;
 
         public TerminalNodeImpl(IToken symbol)
         {
-            this.symbol = symbol;
+            this._symbol = symbol;
         }
 
         public virtual IParseTree GetChild(int i)
@@ -59,7 +59,7 @@ namespace Antlr4.Runtime.Tree
         {
             get
             {
-                return symbol;
+                return _symbol;
             }
         }
 
@@ -67,8 +67,12 @@ namespace Antlr4.Runtime.Tree
         {
             get
             {
-                return parent;
+                return _parent;
             }
+			set 
+			{
+				_parent = value;
+			}
         }
 
         IParseTree IParseTree.Parent
@@ -91,7 +95,7 @@ namespace Antlr4.Runtime.Tree
         {
             get
             {
-                return symbol;
+                return Symbol;
             }
         }
 
@@ -107,9 +111,9 @@ namespace Antlr4.Runtime.Tree
         {
             get
             {
-                if (symbol != null)
+                if (Symbol != null)
                 {
-                    int tokenIndex = symbol.TokenIndex;
+                    int tokenIndex = Symbol.TokenIndex;
                     return new Interval(tokenIndex, tokenIndex);
                 }
                 return Interval.Invalid;
@@ -131,9 +135,9 @@ namespace Antlr4.Runtime.Tree
 
         public virtual string GetText()
         {
-            if (symbol != null)
+            if (Symbol != null)
             {
-                return symbol.Text;
+                return Symbol.Text;
             }
             return null;
         }
@@ -145,13 +149,13 @@ namespace Antlr4.Runtime.Tree
 
         public override string ToString()
         {
-            if (symbol != null)
+            if (Symbol != null)
             {
-                if (symbol.Type == TokenConstants.Eof)
+                if (Symbol.Type == TokenConstants.Eof)
                 {
                     return "<EOF>";
                 }
-                return symbol.Text;
+                return Symbol.Text;
             }
             else
             {

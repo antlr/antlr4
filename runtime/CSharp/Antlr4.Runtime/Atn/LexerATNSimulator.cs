@@ -101,7 +101,7 @@ namespace Antlr4.Runtime.Atn
         protected internal int startIndex = -1;
 
         /// <summary>line number 1..n within the input</summary>
-        protected internal int line = 1;
+        private int _line = 1;
 
         /// <summary>The index of the character relative to the beginning of the line 0..n-1</summary>
         protected internal int charPositionInLine = 0;
@@ -128,7 +128,7 @@ namespace Antlr4.Runtime.Atn
         public virtual void CopyState(LexerATNSimulator simulator)
         {
             this.charPositionInLine = simulator.charPositionInLine;
-            this.line = simulator.line;
+            this._line = simulator._line;
             this.mode = simulator.mode;
             this.startIndex = simulator.startIndex;
         }
@@ -162,7 +162,7 @@ namespace Antlr4.Runtime.Atn
         {
             prevAccept.Reset();
             startIndex = -1;
-            line = 1;
+            _line = 1;
             charPositionInLine = 0;
             mode = Lexer.DefaultMode;
         }
@@ -170,7 +170,6 @@ namespace Antlr4.Runtime.Atn
         protected internal virtual int MatchATN(ICharStream input)
         {
             ATNState startState = atn.modeToStartState[mode];
-            int old_mode = mode;
             ATNConfigSet s0_closure = ComputeStartState(input, startState);
             bool suppressEdge = s0_closure.HasSemanticContext;
             if (suppressEdge)
@@ -273,10 +272,12 @@ namespace Antlr4.Runtime.Atn
         {
             DFAState target = s.GetTarget(t);
 #if !PORTABLE
+			#pragma warning disable 162, 429
             if (debug && target != null)
             {
                 System.Console.Out.WriteLine("reuse state " + s.stateNumber + " edge to " + target.stateNumber);
             }
+			#pragma warning restore 162, 429
 #endif
             return target;
         }
@@ -395,7 +396,7 @@ namespace Antlr4.Runtime.Atn
         {
             // seek to after last char in token
             input.Seek(index);
-            this.line = line;
+            this._line = line;
             this.charPositionInLine = charPos;
             if (input.La(1) != IntStreamConstants.Eof)
             {
@@ -665,7 +666,7 @@ namespace Antlr4.Runtime.Atn
                 return recog.Sempred(null, ruleIndex, predIndex);
             }
             int savedCharPositionInLine = charPositionInLine;
-            int savedLine = line;
+            int savedLine = _line;
             int index = input.Index;
             int marker = input.Mark();
             try
@@ -676,7 +677,7 @@ namespace Antlr4.Runtime.Atn
             finally
             {
                 charPositionInLine = savedCharPositionInLine;
-                line = savedLine;
+                _line = savedLine;
                 input.Seek(index);
                 input.Release(marker);
             }
@@ -685,7 +686,7 @@ namespace Antlr4.Runtime.Atn
         protected internal virtual void CaptureSimState(LexerATNSimulator.SimState settings, ICharStream input, DFAState dfaState)
         {
             settings.index = input.Index;
-            settings.line = line;
+            settings.line = _line;
             settings.charPos = charPositionInLine;
             settings.dfaState = dfaState;
         }
@@ -774,12 +775,11 @@ namespace Antlr4.Runtime.Atn
         {
             get
             {
-                return line;
+                return _line;
             }
             set
             {
-                int line = value;
-                this.line = line;
+                this._line = value;
             }
         }
 
@@ -801,7 +801,7 @@ namespace Antlr4.Runtime.Atn
             int curChar = input.La(1);
             if (curChar == '\n')
             {
-                line++;
+                _line++;
                 charPositionInLine = 0;
             }
             else

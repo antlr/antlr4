@@ -1,0 +1,345 @@
+TestFile(file) ::= <<
+package org.antlr.v4.test.rt.csharp;
+
+import org.junit.Test;
+
+<if(file.importErrorQueue)>
+import org.antlr.v4.test.tool.ErrorQueue;
+<endif>
+<if(file.importGrammar)>
+import org.antlr.v4.tool.Grammar;
+<endif>
+
+public class Test<file.name> extends BaseTest {
+
+	<file.tests:{test | <test>}; separator="\n", wrap, anchor>
+
+}
+>>
+
+LexerTestMethod(test) ::= <<
+@Test
+public void test<test.name>() throws Exception {
+<test.slaveGrammars:{ grammar | 
+	String slave_<grammar.grammarName> = <grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
+	mkdir(tmpdir);
+	writeFile(tmpdir, "<grammar.grammarName>.g4", slave_<grammar.grammarName>);
+	};separator="\n", wrap, anchor>
+	String grammar = <test.grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
+	<test.afterGrammar>
+	String found = execLexer("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName><if(!test.lexerOnly)>Lexer<endif>", "<test.input>", <test.showDFA>);
+	assertEquals(<test.outputLines:{ line | "<line>\\n"};separator=" + \n", wrap, anchor>, found);
+	<if(test.expectedErrors)>
+	assertEquals("<test.expectedErrors>", this.stderrDuringParse);
+	<else>
+	assertNull(this.stderrDuringParse);
+	<endif>
+}
+
+>>
+
+CompositeLexerTestMethod(test) ::= <<
+<LexerTestMethod(test)>
+>>
+
+
+ParserTestMethod(test) ::= <<
+@Test
+public void test<test.name>() throws Exception {
+<test.slaveGrammars:{ grammar | 
+	String slave_<grammar.grammarName> = <grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
+	<if(test.slaveIsLexer)>
+	rawGenerateRecognizer("<grammar.grammarName>.g4", slave_<grammar.grammarName>, null, "<grammar.grammarName>");
+	<else>
+	mkdir(tmpdir);
+	writeFile(tmpdir, "<grammar.grammarName>.g4", slave_<grammar.grammarName>);
+	<endif>
+	};separator="\n", wrap, anchor>
+	String grammar = <test.grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
+	<test.afterGrammar>
+	String found = execParser("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName><if(!test.slaveIsLexer)>Parser<endif>", "<if(test.slaveIsLexer)><first(test.slaveGrammars).grammarName><else><test.grammar.grammarName>Lexer<endif>", "<test.startRule>", "<test.input>", <test.debug>);
+	assertEquals("<test.expectedOutput>", found);
+	<if(test.expectedErrors)>
+	assertEquals("<test.expectedErrors>", this.stderrDuringParse);
+	<else>
+	assertNull(this.stderrDuringParse);
+	<endif>
+}
+
+>>
+
+CompositeParserTestMethod(test) ::= <<
+<ParserTestMethod(test)>
+>>
+
+AbstractParserTestMethod(test) ::= <<
+String test<test.name>(String input) throws Exception {
+	String grammar = <test.grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
+	return execParser("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName>Parser", "<test.grammar.grammarName>Lexer", "<test.startRule>", input, <test.debug>);
+}
+
+>>
+
+ConcreteParserTestMethod(test) ::= <<
+@Test
+public void test<test.name>() throws Exception {
+	String found = test<test.baseName>("<test.input>");
+	assertEquals("<test.expectedOutput>", found);
+	<if(test.expectedErrors)>
+	assertEquals("<test.expectedErrors>", this.stderrDuringParse);
+	<else>
+	assertNull(this.stderrDuringParse);
+	<endif>
+}
+
+>>
+
+writeln(s) ::= <<Console.WriteLine(<s>);>>
+
+write(s) ::= <<Console.Write(<s>);>>
+
+False() ::= "false"
+
+True() ::= "true"
+
+Not(v) ::= "!<v>"
+
+Assert(s) ::= <<Debug.Assert(<s>);>>
+
+Cast(t,v) ::= "((<t>)<v>)"
+
+Append(a,b) ::= "<a> + <b>"
+
+Concat(a,b) ::= "<a><b>"
+
+DeclareLocal(s,v) ::= "Object <s> = <v>;"
+
+AssignLocal(s,v) ::= "<s> = <v>;"
+
+InitIntMember(n,v) ::= <%int <n> = <v>;%>
+
+InitBooleanMember(n,v) ::= <%bool <n> = <v>;%>
+
+GetMember(n) ::= <%this.<n>%>
+
+SetMember(n,v) ::= <%this.<n> = <v>;%>
+
+AddMember(n,v) ::= <%this.<n> += <v>;%>
+
+PlusMember(v,n) ::= <%<v> + this.<n>%>
+
+MemberEquals(n,v) ::= <%this.<n> == <v>%>
+
+ModMemberEquals(n,m,v) ::= <%this.<n> % <m> == <v>%>
+
+ModMemberNotEquals(n,m,v) ::= <%this.<n> % <m> != <v>%>
+
+DumpDFA() ::= "this.DumpDFA();"
+
+Pass() ::= ""
+
+StringList() ::= "List\<String>"
+
+BuildParseTrees() ::= "this.BuildParseTree = true;"
+
+BailErrorStrategy() ::= <%ErrorHandler = new BailErrorStrategy();%>
+
+ToStringTree(s) ::= <%<s>.ToStringTree(this)%>
+
+Column() ::= "this.Column"
+
+Text() ::= "this.Text"
+
+ValEquals(a,b) ::= <%<a>==<b>%>
+
+TextEquals(a) ::= <%this.Text.Equals("<a>")%>
+
+PlusText(a) ::= <%"<a>" + this.Text%>
+
+InputText() ::= "this.TokenStream.GetText()"
+
+LTEquals(i, v) ::= <%this.TokenStream.Lt(<i>).Text.Equals(<v>)%>
+
+LANotEquals(i, v) ::= <%this.InputStream.La(<i>)!=<v>%>
+
+TokenStartColumnEquals(i) ::= <%this.TokenStartColumn==<i>%>
+
+ImportListener(X) ::= ""
+
+GetExpectedTokenNames() ::= "this.GetExpectedTokens().ToString(this.Vocabulary)"
+
+RuleInvocationStack() ::= "GetRuleInvocationStackAsString()"
+
+LL_EXACT_AMBIG_DETECTION() ::= <<Interpreter.PredictionMode = PredictionMode.LlExactAmbigDetection;>>
+
+PositionAdjustingLexer() ::= <<
+
+public override IToken NextToken() {
+	if (!(Interpreter is PositionAdjustingLexerATNSimulator)) {
+		Interpreter = new PositionAdjustingLexerATNSimulator(this, _ATN);
+	}
+
+	return base.NextToken();
+}
+
+public override IToken Emit() {
+	switch (Type) {
+	case TOKENS:
+		HandleAcceptPositionForKeyword("tokens");
+		break;
+
+	case LABEL:
+		HandleAcceptPositionForIdentifier();
+		break;
+
+	default:
+		break;
+	}
+
+	return base.Emit();
+}
+
+private bool HandleAcceptPositionForIdentifier() {
+	string tokenText = this.Text;
+	int identifierLength = 0;
+	while (identifierLength \< tokenText.Length && IsIdentifierChar(tokenText[identifierLength])) {
+		identifierLength++;
+	}
+
+	if (InputStream.Index > TokenStartCharIndex + identifierLength) {
+		int offset = identifierLength - 1;
+		getInterpreter().ResetAcceptPosition((ICharStream)InputStream, TokenStartCharIndex + offset, TokenStartLine, TokenStartColumn + offset);
+		return true;
+	}
+
+	return false;
+}
+
+private bool HandleAcceptPositionForKeyword(string keyword) {
+	if (InputStream.Index > TokenStartCharIndex + keyword.Length) {
+		int offset = keyword.Length - 1;
+		getInterpreter().ResetAcceptPosition((ICharStream)InputStream, TokenStartCharIndex + offset, TokenStartLine, TokenStartColumn + offset);
+		return true;
+	}
+
+	return false;
+}
+
+public PositionAdjustingLexerATNSimulator getInterpreter() {
+	return (PositionAdjustingLexerATNSimulator)base.Interpreter;
+}
+
+private static bool IsIdentifierChar(char c) {
+	return Char.IsLetterOrDigit(c) || c == '_';
+}
+
+public class PositionAdjustingLexerATNSimulator : LexerATNSimulator {
+
+	public PositionAdjustingLexerATNSimulator(Lexer recog, ATN atn)
+	: base(recog, atn)
+	{
+	}
+
+	public void ResetAcceptPosition(ICharStream input, int index, int line, int column) {
+		input.Seek(index);
+		this.Line = line;
+		this.Column = column;
+		Consume(input);
+	}
+
+}
+
+>>
+
+BasicListener(X) ::= <<
+public class LeafListener : TBaseListener {
+	public override void VisitTerminal(ITerminalNode node) {
+		Console.WriteLine(node.Symbol.Text);
+	}
+}
+>>
+
+WalkListener(s) ::= <<
+ParseTreeWalker walker = new ParseTreeWalker();
+walker.Walk(new LeafListener(), <s>);
+>>
+
+TokenGetterListener(X) ::= <<
+public class LeafListener : TBaseListener {
+	public override void ExitA(TParser.AContext ctx) {
+		if (ctx.ChildCount==2) 
+		{
+			StringBuilder sb = new StringBuilder ("[");
+			foreach (ITerminalNode node in ctx.INT ()) {
+				sb.Append (node.ToString ());
+				sb.Append (", ");
+			}
+			sb.Length = sb.Length - 2;
+			sb.Append ("]");
+			Console.Write ("{0} {1} {2}", ctx.INT (0).Symbol.Text,
+				ctx.INT (1).Symbol.Text, sb.ToString());
+		}
+		else
+			Console.WriteLine(ctx.ID().Symbol);
+	}
+}
+>>
+
+RuleGetterListener(X) ::= <<
+public class LeafListener : TBaseListener {
+	public override void ExitA(TParser.AContext ctx) {
+		if (ctx.ChildCount==2) {
+			Console.Write("{0} {1} {2}",ctx.b(0).Start.Text,
+				ctx.b(1).Start.Text,ctx.b()[0].Start.Text);
+		} else 
+			Console.WriteLine(ctx.b(0).Start.Text);
+	}
+}
+>>
+
+
+LRListener(X) ::= <<
+public class LeafListener : TBaseListener {
+	public override void ExitE(TParser.EContext ctx) {
+		if (ctx.ChildCount==3) {
+			Console.Write("{0} {1} {2}\n",ctx.e(0).Start.Text,
+				ctx.e(1).Start.Text, ctx.e()[0].Start.Text);
+		} else 
+			Console.WriteLine(ctx.INT().Symbol.Text);
+	}
+}
+>>
+
+LRWithLabelsListener(X) ::= <<
+public class LeafListener : TBaseListener {
+	public override void ExitCall(TParser.CallContext ctx) {
+		Console.Write("{0} {1}",ctx.e().Start.Text,ctx.eList());
+	}
+	public override void ExitInt(TParser.IntContext ctx) {
+		Console.WriteLine(ctx.INT().Symbol.Text);
+	}
+}
+>>
+
+DeclareContextListGettersFunction() ::= <<
+void foo() {
+	SContext s = null;
+	AContext[] a = s.a();
+	BContext[] b = s.b();
+}
+>>
+
+Declare_foo() ::= <<public void foo() {Console.WriteLine("foo");}>>
+			
+Invoke_foo() ::= "this.foo();"
+
+Declare_pred() ::= <<bool pred(bool v) {
+	Console.WriteLine("eval="+v.ToString().ToLower());
+	return v;
+}
+>>
+
+Invoke_pred(v) ::= <<this.pred(<v>)>>
+
+
+

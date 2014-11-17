@@ -156,9 +156,9 @@ namespace Antlr4.Runtime.Atn
                 return fullContext ? EmptyFull : EmptyLocal;
             }
             Antlr4.Runtime.Atn.PredictionContext parent;
-            if (outerContext.parent != null)
+            if (outerContext.Parent != null)
             {
-                parent = Antlr4.Runtime.Atn.PredictionContext.FromRuleContext(atn, outerContext.parent, fullContext);
+                parent = Antlr4.Runtime.Atn.PredictionContext.FromRuleContext(atn, outerContext.Parent, fullContext);
             }
             else
             {

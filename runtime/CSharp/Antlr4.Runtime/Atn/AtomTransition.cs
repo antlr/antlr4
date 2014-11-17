@@ -38,12 +38,12 @@ namespace Antlr4.Runtime.Atn
     {
         /// <summary>The token type or character value; or, signifies special label.</summary>
         /// <remarks>The token type or character value; or, signifies special label.</remarks>
-        public readonly int label;
+        public readonly int token;
 
-        public AtomTransition(ATNState target, int label)
+		public AtomTransition(ATNState target, int token)
             : base(target)
         {
-            this.label = label;
+			this.token = token;
         }
 
         public override Antlr4.Runtime.Atn.TransitionType TransitionType
@@ -58,19 +58,19 @@ namespace Antlr4.Runtime.Atn
         {
             get
             {
-                return IntervalSet.Of(label);
+				return IntervalSet.Of(token);
             }
         }
 
         public override bool Matches(int symbol, int minVocabSymbol, int maxVocabSymbol)
         {
-            return label == symbol;
+			return token == symbol;
         }
 
         [return: NotNull]
         public override string ToString()
         {
-            return label.ToString();
+			return token.ToString();
         }
     }
 }

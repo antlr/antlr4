@@ -39,25 +39,16 @@ namespace Antlr4.Runtime
 {
     public class LexerInterpreter : Lexer
     {
-        protected internal readonly string grammarFileName;
+		private readonly string grammarFileName;
 
-        protected internal readonly ATN atn;
+		private readonly ATN atn;
 
-        [Obsolete]
-        protected internal readonly string[] tokenNames;
+		private readonly string[] ruleNames;
 
-        protected internal readonly string[] ruleNames;
-
-        protected internal readonly string[] modeNames;
+		private readonly string[] modeNames;
 
         [NotNull]
         private readonly IVocabulary vocabulary;
-
-        [Obsolete]
-        public LexerInterpreter(string grammarFileName, IEnumerable<string> tokenNames, IEnumerable<string> ruleNames, IEnumerable<string> modeNames, ATN atn, ICharStream input)
-            : this(grammarFileName, Antlr4.Runtime.Vocabulary.FromTokenNames(tokenNames.ToArray()), ruleNames, modeNames, atn, input)
-        {
-        }
 
         public LexerInterpreter(string grammarFileName, IVocabulary vocabulary, IEnumerable<string> ruleNames, IEnumerable<string> modeNames, ATN atn, ICharStream input)
             : base(input)
@@ -68,17 +59,10 @@ namespace Antlr4.Runtime
             }
             this.grammarFileName = grammarFileName;
             this.atn = atn;
-#pragma warning disable 612 // 'fieldName' is obsolete
-            this.tokenNames = new string[atn.maxTokenType];
-            for (int i = 0; i < tokenNames.Length; i++)
-            {
-                tokenNames[i] = vocabulary.GetDisplayName(i);
-            }
-#pragma warning restore 612
             this.ruleNames = ruleNames.ToArray();
             this.modeNames = modeNames.ToArray();
             this.vocabulary = vocabulary;
-            this._interp = new LexerATNSimulator(this, atn);
+            this.Interpreter = new LexerATNSimulator(this, atn);
         }
 
         public override ATN Atn
@@ -94,15 +78,6 @@ namespace Antlr4.Runtime
             get
             {
                 return grammarFileName;
-            }
-        }
-
-        [Obsolete]
-        public override string[] TokenNames
-        {
-            get
-            {
-                return tokenNames;
             }
         }
 
@@ -126,11 +101,7 @@ namespace Antlr4.Runtime
         {
             get
             {
-                if (vocabulary != null)
-                {
-                    return vocabulary;
-                }
-                return base.Vocabulary;
+                return vocabulary;
             }
         }
     }

@@ -118,18 +118,6 @@ namespace Antlr4.Runtime.Atn
         /// <summary>Used to cache lookahead during parsing, not used during construction</summary>
         public IntervalSet nextTokenWithinRule;
 
-        /// <summary>Gets the state number.</summary>
-        /// <remarks>Gets the state number.</remarks>
-        /// <returns>the state number</returns>
-        public int StateNumber
-        {
-            get
-            {
-                // at runtime, we don't have Rule objects
-                return stateNumber;
-            }
-        }
-
         /// <summary>
         /// For all states except
         /// <see cref="RuleStopState"/>
@@ -145,7 +133,7 @@ namespace Antlr4.Runtime.Atn
         {
             get
             {
-                return StateNumber;
+                return stateNumber;
             }
         }
 
@@ -177,7 +165,7 @@ namespace Antlr4.Runtime.Atn
             return stateNumber.ToString();
         }
 
-        public virtual Transition[] Transitions
+        public virtual Transition[] TransitionsArray
         {
             get
             {

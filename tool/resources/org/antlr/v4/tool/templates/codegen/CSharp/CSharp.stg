@@ -36,11 +36,14 @@ ParserFile(file, parser, namedActions) ::= <<
 namespace <file.genPackage> {
 <endif>
 <namedActions.header>
+using System;
+using System.Text;
+using System.Diagnostics;
+using System.Collections.Generic;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
-using System.Collections.Generic;
 using DFA = Antlr4.Runtime.Dfa.DFA;
 
 <parser>
@@ -248,7 +251,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
 [System.CLSCompliant(false)]
-public <if(parser.abstractRecognizer)>abstract <endif>partial class <csIdentifier.(parser.name)> : <superClass; null="Parser"> {
+public partial class <csIdentifier.(parser.name)> : <superClass; null="Parser"> {
 	<if(parser.tokens)>
 	public const int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
@@ -295,34 +298,6 @@ private static readonly string[] _SymbolicNames = {
 };
 public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
-[System.Obsolete("Use Vocabulary instead.")]
-public static readonly string[] tokenNames = GenerateTokenNames(DefaultVocabulary, _SymbolicNames.Length);
-
-private static string[] GenerateTokenNames(IVocabulary vocabulary, int length) {
-	string[] tokenNames = new string[length];
-	for (int i = 0; i \< tokenNames.Length; i++) {
-		tokenNames[i] = vocabulary.GetLiteralName(i);
-		if (tokenNames[i] == null) {
-			tokenNames[i] = vocabulary.GetSymbolicName(i);
-		}
-
-		if (tokenNames[i] == null) {
-			tokenNames[i] = "\<INVALID>";
-		}
-	}
-
-	return tokenNames;
-}
-
-[System.Obsolete]
-public override string[] TokenNames
-{
-	get
-	{
-		return tokenNames;
-	}
-}
-
 [NotNull]
 public override IVocabulary Vocabulary
 {
@@ -356,10 +331,10 @@ case <f.ruleIndex> : return <f.name>_sempred(<if(!recog.modes)>(<f.ctxType>)<end
 >>
 
 parser_ctor(parser) ::= <<
-<if(parser.abstractRecognizer)>protected<else>public<endif> <csIdentifier.(parser.name)>(ITokenStream input)
+public <csIdentifier.(parser.name)>(ITokenStream input)
 	: base(input)
 {
-	_interp = new ParserATNSimulator(this,_ATN);
+	Interpreter = new ParserATNSimulator(this,_ATN);
 }
 >>
 
@@ -397,7 +372,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 
 [RuleVersion(<namedActions.version; null="0">)]
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<args; separator=", ">) {
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(Context, State<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
 	EnterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
 	<namedActions.init>
 	<locals; separator="\n">
@@ -414,8 +389,8 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 	<else>
 	catch (RecognitionException re) {
 		_localctx.exception = re;
-		_errHandler.ReportError(this, re);
-		_errHandler.Recover(this, re);
+		ErrorHandler.ReportError(this, re);
+		ErrorHandler.Recover(this, re);
 	}
 	<endif>
 	finally {
@@ -430,7 +405,7 @@ LeftFactoredRuleFunction(currentRule,args,code,locals,namedActions,finallyAction
 <<
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<args; separator=", ">) {
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(Context, State<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
 	EnterLeftFactoredRule(_localctx, <currentRule.startState>, RULE_<currentRule.variantOf>);
 	<namedActions.init>
 	<locals; separator="\n">
@@ -444,8 +419,8 @@ LeftFactoredRuleFunction(currentRule,args,code,locals,namedActions,finallyAction
 	}
 	catch (RecognitionException re) {
 		_localctx.exception = re;
-		_errHandler.ReportError(this, re);
-		_errHandler.Recover(this, re);
+		ErrorHandler.ReportError(this, re);
+		ErrorHandler.Recover(this, re);
 	}
 	finally {
 		<finallyAction>
@@ -462,7 +437,7 @@ LeftUnfactoredRuleFunction(currentRule,args,code,locals,namedActions,finallyActi
 <<
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <csIdentifier.(currentRule.name)>(<args; separator=", ">) {
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, State<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(Context, State<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
 	EnterRule(_localctx, <currentRule.startState>, RULE_<currentRule.variantOf>);
 	<namedActions.init>
 	<locals; separator="\n">
@@ -476,8 +451,8 @@ LeftUnfactoredRuleFunction(currentRule,args,code,locals,namedActions,finallyActi
 	}
 	catch (RecognitionException re) {
 		_localctx.exception = re;
-		_errHandler.ReportError(this, re);
-		_errHandler.Recover(this, re);
+		ErrorHandler.ReportError(this, re);
+		ErrorHandler.Recover(this, re);
 	}
 	finally {
 		<finallyAction>
@@ -500,9 +475,9 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 }
 
 private <currentRule.ctxType> <csIdentifier.(currentRule.name)>(int _p<args:{a | , <a>}>) {
-	ParserRuleContext _parentctx = _ctx;
+	ParserRuleContext _parentctx = Context;
 	int _parentState = State;
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(Context, _parentState<currentRule.args:{a | , <csIdentifier.(a.name)>}>);
 	<currentRule.ctxType> _prevctx = _localctx;
 	int _startState = <currentRule.startState>;
 	EnterRecursionRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>, _p);
@@ -518,8 +493,8 @@ private <currentRule.ctxType> <csIdentifier.(currentRule.name)>(int _p<args:{a |
 	}
 	catch (RecognitionException re) {
 		_localctx.exception = re;
-		_errHandler.ReportError(this, re);
-		_errHandler.Recover(this, re);
+		ErrorHandler.ReportError(this, re);
+		ErrorHandler.Recover(this, re);
 	}
 	finally {
 		<finallyAction>
@@ -545,10 +520,10 @@ CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
 
 LL1AltBlock(choice, preamble, alts, error) ::= <<
 State = <choice.stateNumber>;
-<!_errHandler.sync(this);!>
-<if(choice.label)><labelref(choice.label)> = _input.Lt(1);<endif>
+<!ErrorHandler.sync(this);!>
+<if(choice.label)><labelref(choice.label)> = TokenStream.Lt(1);<endif>
 <preamble; separator="\n">
-switch (_input.La(1)) {
+switch (TokenStream.La(1)) {
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
 	break;}; separator="\n">
@@ -559,8 +534,8 @@ default:
 
 LL1OptionalBlock(choice, alts, error) ::= <<
 State = <choice.stateNumber>;
-<!_errHandler.sync(this);!>
-switch (_input.La(1)) {
+<!ErrorHandler.sync(this);!>
+switch (TokenStream.La(1)) {
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
 	break;}; separator="\n">
@@ -571,7 +546,7 @@ default:
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
 State = <choice.stateNumber>;
-<!_errHandler.sync(this);!>
+<!ErrorHandler.sync(this);!>
 <preamble; separator="\n">
 if (<expr>) {
 	<alts; separator="\n">
@@ -581,24 +556,24 @@ if (<expr>) {
 
 LL1StarBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
 State = <choice.stateNumber>;
-_errHandler.Sync(this);
+ErrorHandler.Sync(this);
 <preamble; separator="\n">
 while (<loopExpr>) {
 	<alts; separator="\n">
 	State = <choice.loopBackStateNumber>;
-	_errHandler.Sync(this);
+	ErrorHandler.Sync(this);
 	<iteration>
 }
 >>
 
 LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
 State = <choice.blockStartStateNumber>;<! alt block decision !>
-_errHandler.Sync(this);
+ErrorHandler.Sync(this);
 <preamble; separator="\n">
 do {
 	<alts; separator="\n">
 	State = <choice.stateNumber>;<! loopback/exit decision !>
-	_errHandler.Sync(this);
+	ErrorHandler.Sync(this);
 	<iteration>
 } while ( <loopExpr> );
 >>
@@ -607,10 +582,10 @@ do {
 
 AltBlock(choice, preamble, alts, error) ::= <<
 State = <choice.stateNumber>;
-<!_errHandler.sync(this);!>
-<if(choice.label)><labelref(choice.label)> = _input.Lt(1);<endif>
+<!ErrorHandler.sync(this);!>
+<if(choice.label)><labelref(choice.label)> = TokenStream.Lt(1);<endif>
 <preamble; separator="\n">
-switch ( Interpreter.AdaptivePredict(_input,<choice.decision>,_ctx) ) {
+switch ( Interpreter.AdaptivePredict(TokenStream,<choice.decision>,Context) ) {
 <alts:{alt |
 case <i>:
 	<alt>
@@ -620,8 +595,8 @@ case <i>:
 
 OptionalBlock(choice, alts, error) ::= <<
 State = <choice.stateNumber>;
-<!_errHandler.sync(this);!>
-switch ( Interpreter.AdaptivePredict(_input,<choice.decision>,_ctx) ) {
+<!ErrorHandler.sync(this);!>
+switch ( Interpreter.AdaptivePredict(TokenStream,<choice.decision>,Context) ) {
 <alts:{alt |
 case <i><if(!choice.ast.greedy)>+1<endif>:
 	<alt>
@@ -631,22 +606,22 @@ case <i><if(!choice.ast.greedy)>+1<endif>:
 
 StarBlock(choice, alts, sync, iteration) ::= <<
 State = <choice.stateNumber>;
-_errHandler.Sync(this);
-_alt = Interpreter.AdaptivePredict(_input,<choice.decision>,_ctx);
+ErrorHandler.Sync(this);
+_alt = Interpreter.AdaptivePredict(TokenStream,<choice.decision>,Context);
 while ( _alt!=<choice.exitAlt> && _alt!=global::Antlr4.Runtime.Atn.ATN.InvalidAltNumber ) {
 	if ( _alt==1<if(!choice.ast.greedy)>+1<endif> ) {
 		<iteration>
 		<alts> <! should only be one !>
 	}
 	State = <choice.loopBackStateNumber>;
-	_errHandler.Sync(this);
-	_alt = Interpreter.AdaptivePredict(_input,<choice.decision>,_ctx);
+	ErrorHandler.Sync(this);
+	_alt = Interpreter.AdaptivePredict(TokenStream,<choice.decision>,Context);
 }
 >>
 
 PlusBlock(choice, alts, error) ::= <<
 State = <choice.blockStartStateNumber>;<! alt block decision !>
-_errHandler.Sync(this);
+ErrorHandler.Sync(this);
 _alt = 1<if(!choice.ast.greedy)>+1<endif>;
 do {
 	switch (_alt) {
@@ -658,8 +633,8 @@ case <i><if(!choice.ast.greedy)>+1<endif>:
 		<error>
 	}
 	State = <choice.loopBackStateNumber>;<! loopback/exit decision !>
-	_errHandler.Sync(this);
-	_alt = Interpreter.AdaptivePredict(_input,<choice.decision>,_ctx);
+	ErrorHandler.Sync(this);
+	_alt = Interpreter.AdaptivePredict(TokenStream,<choice.decision>,Context);
 } while ( _alt!=<choice.exitAlt> && _alt!=global::Antlr4.Runtime.Atn.ATN.InvalidAltNumber );
 >>
 
@@ -713,10 +688,10 @@ MatchNotSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, true)>"
 
 CommonSetStuff(m, expr, capture, invert) ::= <<
 State = <m.stateNumber>;
-<if(m.labels)><m.labels:{l | <labelref(l)> = }>_input.Lt(1);<endif>
+<if(m.labels)><m.labels:{l | <labelref(l)> = }>TokenStream.Lt(1);<endif>
 <capture>
 if ( <if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>) ) {
-	<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>_errHandler.RecoverInline(this);
+	<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>ErrorHandler.RecoverInline(this);
 }
 Consume();
 >>
@@ -777,14 +752,14 @@ TokenPropertyRef_channel(t) ::= "(<ctx(t)>.<tokenType.(t.label)>!=null?<ctx(t)>.
 TokenPropertyRef_index(t) ::= "(<ctx(t)>.<tokenType.(t.label)>!=null?<ctx(t)>.<tokenType.(t.label)>.TokenIndex:0)"
 TokenPropertyRef_int(t) ::= "(<ctx(t)>.<tokenType.(t.label)>!=null?int.Parse(<ctx(t)>.<tokenType.(t.label)>.Text):0)"
 
-RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label>!=null?(<ctx(r)>.<r.label>.start):null)"
-RulePropertyRef_stop(r)	 ::= "(<ctx(r)>.<r.label>!=null?(<ctx(r)>.<r.label>.stop):null)"
-RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label>!=null?_input.GetText(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop):null)"
+RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label>!=null?(<ctx(r)>.<r.label>.Start):null)"
+RulePropertyRef_stop(r)	 ::= "(<ctx(r)>.<r.label>!=null?(<ctx(r)>.<r.label>.Stop):null)"
+RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label>!=null?TokenStream.GetText(<ctx(r)>.<r.label>.Start,<ctx(r)>.<r.label>.Stop):null)"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
 
-ThisRulePropertyRef_start(r) ::= "_localctx.start"
-ThisRulePropertyRef_stop(r)	 ::= "_localctx.stop"
-ThisRulePropertyRef_text(r)	 ::= "_input.GetText(_localctx.start, _input.Lt(-1))"
+ThisRulePropertyRef_start(r) ::= "_localctx.Start"
+ThisRulePropertyRef_stop(r)	 ::= "_localctx.Stop"
+ThisRulePropertyRef_text(r)	 ::= "TokenStream.GetText(_localctx.Start, TokenStream.Lt(-1))"
 ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
 
 NonLocalAttrRef(s)		 ::= <%((<s.ruleName; format="cap">Context)GetInvokingContext(<s.ruleIndex>)).<csIdentifier.(s.name)>%>
@@ -841,8 +816,8 @@ ImplicitRuleLabel(ruleName)	  ::= "_<ruleName>"
 ImplicitSetLabel(id)		  ::= "_tset<id>"
 ListLabelName(label)		  ::= "_<label>"
 
-CaptureNextToken(d) ::= "<d.varName> = _input.Lt(1);"
-CaptureNextTokenType(d) ::= "<d.varName> = _input.La(1);"
+CaptureNextToken(d) ::= "<d.varName> = TokenStream.Lt(1);"
+CaptureNextTokenType(d) ::= "<d.varName> = TokenStream.La(1);"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext}) ::= <<
@@ -904,9 +879,9 @@ ctx(actionChunk) ::= "<typedContext(actionChunk.ctx)>"
 typedContext(ctx) ::= "<if(ctx.provideCopyFrom)>((<ctx.name>)_localctx)<else>_localctx<endif>"
 
 // used for left-recursive rules
-recRuleAltPredicate(ruleName,opPrec)  ::= "Precpred(_ctx, <opPrec>)"
+recRuleAltPredicate(ruleName,opPrec)  ::= "Precpred(Context, <opPrec>)"
 recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>;"
-recRuleSetStopToken()                 ::= "_ctx.stop = _input.Lt(-1);"
+recRuleSetStopToken()                 ::= "Context.Stop = TokenStream.Lt(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label, isListLabel) ::= <<
 _localctx = new <ctxName>Context(_parentctx, _parentState);
@@ -934,12 +909,13 @@ PushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
 
 recRuleReplaceContext(ctxName) ::= <<
 _localctx = new <ctxName>Context(_localctx);
-_ctx = _localctx;
+Context = _localctx;
 _prevctx = _localctx;
 >>
 
 recRuleSetPrevCtx() ::= <<
-if ( _parseListeners!=null ) TriggerExitRuleEvent();
+if ( ParseListeners!=null ) 
+	TriggerExitRuleEvent();
 _prevctx = _localctx;
 >>
 
@@ -950,6 +926,7 @@ LexerFile(file, lexer, namedActions) ::= <<
 namespace <file.genPackage> {
 <endif>
 <namedActions.header>
+using System;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
@@ -964,7 +941,7 @@ using DFA = Antlr4.Runtime.Dfa.DFA;
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
 [System.CLSCompliant(false)]
-public <if(lexer.abstractRecognizer)>abstract <endif>partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
+public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
 	public const int
 		<lexer.tokens:{k | <tokenType.(k)>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<if(lexer.channels)>
@@ -982,10 +959,10 @@ public <if(lexer.abstractRecognizer)>abstract <endif>partial class <csIdentifier
 
 	<namedActions.members>
 
-	<if(lexer.abstractRecognizer)>protected<else>public<endif> <csIdentifier.(lexer.name)>(ICharStream input)
+	public <csIdentifier.(lexer.name)>(ICharStream input)
 		: base(input)
 	{
-		_interp = new LexerATNSimulator(this,_ATN);
+		Interpreter = new LexerATNSimulator(this,_ATN);
 	}
 
 	<vocabulary(lexer.literalNames, lexer.symbolicNames)>
