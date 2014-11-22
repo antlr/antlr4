@@ -40,8 +40,9 @@ public class Generator {
 		configs.put("Python2", readPython2Dir()); // generated Python2 tests
 		configs.put("Python3", readPython3Dir()); // generated Python3 tests
 		configs.put("NodeJS", readNodeJSDir()); // generated NodeJS tests
-		// configs.put("Safari", readSafariDir()); // generated Firefox tests
-		// configs.put("Firefox", readFirefoxDir()); // generated Firefox tests
+		configs.put("Safari", readSafariDir()); // generated Safari tests
+		configs.put("Firefox", readFirefoxDir()); // generated Firefox tests
+		configs.put("Chrome", readChromeDir()); // generated Chrome tests
 		return configs;
 	}
 
@@ -80,6 +81,11 @@ public class Generator {
 	}
 
 	private static File readFirefoxDir() {
+		// TODO read from env variable
+		return new File("/Users/ericvergnaud/Development/antlr4/antlr/antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/firefox");
+	}
+	
+	private static File readChromeDir() {
 		// TODO read from env variable
 		return new File("/Users/ericvergnaud/Development/antlr4/antlr/antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/firefox");
 	}
