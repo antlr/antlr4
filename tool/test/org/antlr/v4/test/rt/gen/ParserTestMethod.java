@@ -1,6 +1,6 @@
 package org.antlr.v4.test.rt.gen;
 
-public class ParserTestMethod extends TestMethod {
+public class ParserTestMethod extends JUnitTestMethod {
 
 	public String startRule;
 

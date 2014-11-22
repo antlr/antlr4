@@ -7,15 +7,15 @@ import java.util.List;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
-public class TestFile {
+public class JUnitTestFile {
 	
-	List<TestMethod> unitTests = new ArrayList<TestMethod>();
+	List<JUnitTestMethod> unitTests = new ArrayList<JUnitTestMethod>();
 	public String name;
 	public List<String> tests = new ArrayList<String>();
 	public boolean importErrorQueue = false;
 	public boolean importGrammar = false;
 	
-	public TestFile(String name) {
+	public JUnitTestFile(String name) {
 		this.name = name;
 	}
 	
@@ -89,7 +89,7 @@ public class TestFile {
 	}
 
 	public void generateUnitTests(STGroup group) {
-		for(TestMethod tm : unitTests) {
+		for(JUnitTestMethod tm : unitTests) {
 			tm.generateGrammars(group);
 			String name = tm.getClass().getSimpleName();
 			ST template = group.getInstanceOf(name);

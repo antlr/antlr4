@@ -1,6 +1,6 @@
 package org.antlr.v4.test.rt.gen;
 
-public class LexerTestMethod extends TestMethod {
+public class LexerTestMethod extends JUnitTestMethod {
 
 	public String[] outputLines;
 	public boolean lexerOnly = true;

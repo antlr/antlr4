@@ -25,6 +25,7 @@ nbactions*.xml
 .classpath
 .project
 .settings/
+.metadata
 
 # Profiler results
 *.hprof

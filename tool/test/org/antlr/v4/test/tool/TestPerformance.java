@@ -410,7 +410,7 @@ public class TestPerformance extends BaseTest {
     private final AtomicIntegerArray tokenCount = new AtomicIntegerArray(PASSES);
 
     @Test
-    //@org.junit.Ignore
+    @org.junit.Ignore
     public void compileJdk() throws IOException, InterruptedException, ExecutionException {
         String jdkSourceRoot = getSourceRoot("JDK");
 		assertTrue("The JDK_SOURCE_ROOT environment variable must be set for performance testing.", jdkSourceRoot != null && !jdkSourceRoot.isEmpty());
