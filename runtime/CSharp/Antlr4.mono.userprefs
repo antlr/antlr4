@@ -1,6 +1,11 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Antlr4.Runtime/Atn/LexerATNSimulator.cs">
+    <Files>
+      <File FileName="Antlr4.Runtime/Lexer.cs" Line="1" Column="1" />
+      <File FileName="Antlr4.Runtime/Atn/LexerATNSimulator.cs" Line="39" Column="39" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="/Users/ericvergnaud/Development/antlr4/antlr/antlr4-csharp/runtime/CSharp/Antlr4.Test.mono/TParser.cs" line="158" column="1" />

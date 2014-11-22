@@ -355,14 +355,8 @@ outer_continue: ;
         public virtual IToken EmitEOF()
         {
             int cpos = Column;
-            // The character position for EOF is one beyond the position of
-            // the previous token's last character
-            if (_token != null)
-            {
-                int n = _token.StopIndex - _token.StartIndex + 1;
-                cpos = _token.Column + n;
-            }
-            IToken eof = _factory.Create(_tokenFactorySourcePair, TokenConstants.Eof, null, TokenConstants.DefaultChannel, _input.Index, _input.Index - 1, Line, cpos);
+			int line = Line;
+            IToken eof = _factory.Create(_tokenFactorySourcePair, TokenConstants.Eof, null, TokenConstants.DefaultChannel, _input.Index, _input.Index - 1, line, cpos);
             Emit(eof);
             return eof;
         }
