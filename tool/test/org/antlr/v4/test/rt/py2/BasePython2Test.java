@@ -1,6 +1,6 @@
 package org.antlr.v4.test.rt.py2;
 
-import org.antlr.v4.py.test.BasePythonTest;
+import org.antlr.v4.test.rt.py.BasePythonTest;
 import org.stringtemplate.v4.ST;
 
 public abstract class BasePython2Test extends BasePythonTest {
@@ -8,6 +8,11 @@ public abstract class BasePython2Test extends BasePythonTest {
 	@Override
 	protected String getLanguage() {
 		return "Python2";
+	}
+
+	@Override
+	protected String getPythonExecutable() {
+		return "Python2.7";
 	}
 
 	@Override

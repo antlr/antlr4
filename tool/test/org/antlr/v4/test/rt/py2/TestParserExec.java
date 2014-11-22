@@ -416,28 +416,5 @@ public class TestParserExec extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
-	@Test
-	public void testAlternateQuotes() throws Exception {
-		String slave_ModeTagsLexer = "lexer grammar ModeTagsLexer;\n" +
-	                              "// Default mode rules (the SEA)\n" +
-	                              "OPEN  : '«'     -> mode(ISLAND) ;       // switch to ISLAND mode\n" +
-	                              "TEXT  : ~'«'+ ;                         // clump all text together\n" +
-	                              "mode ISLAND;\n" +
-	                              "CLOSE : '»'     -> mode(DEFAULT_MODE) ; // back to SEA mode\n" +
-	                              "SLASH : '/' ;\n" +
-	                              "ID    : [a-zA-Z]+ ;                     // match/send ID in tag to parser";
-		rawGenerateAndBuildRecognizer("ModeTagsLexer.g4", slave_ModeTagsLexer, null, "ModeTagsLexer");
-
-		String grammar = "parser grammar ModeTagsParser;\n" +
-	                  "options { tokenVocab=ModeTagsLexer; } // use tokens from ModeTagsLexer.g4\n" +
-	                  "file_: (tag | TEXT)* ;\n" +
-	                  "tag : '«' ID '»'\n" +
-	                  "    | '«' '/' ID '»'\n" +
-	                  "    ;";
-		String found = execParser("ModeTagsParser.g4", grammar, "ModeTagsParser", "ModeTagsLexer", "ModeTagsParserListener", "ModeTagsParserVisitor", "file_", "", false);
-		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
-	}
-
 
 }
