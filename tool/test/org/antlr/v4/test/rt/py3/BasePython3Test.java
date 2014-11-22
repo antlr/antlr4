@@ -29,7 +29,7 @@
  */
 package org.antlr.v4.test.rt.py3;
 
-import org.antlr.v4.py.test.BasePythonTest;
+import org.antlr.v4.test.rt.py.BasePythonTest;
 import org.stringtemplate.v4.ST;
 
 public abstract class BasePython3Test extends BasePythonTest {
@@ -37,6 +37,11 @@ public abstract class BasePython3Test extends BasePythonTest {
 	@Override
 	protected String getLanguage() {
 		return "Python3";
+	}
+
+	@Override
+	protected String getPythonExecutable() {
+		return "Python3.4";
 	}
 
 	@Override

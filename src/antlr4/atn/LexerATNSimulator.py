@@ -161,8 +161,6 @@ class LexerATNSimulator(ATNSimulator):
         if ds0.isAcceptState:
             # allow zero-length tokens
             self.captureSimState(self.prevAccept, input, ds0)
-            # adjust index since the current input character was not yet consumed
-            self.prevAccept.index -= 1
 
         t = input.LA(1)
         s = ds0 # s is current/from DFA state
@@ -198,14 +196,19 @@ class LexerATNSimulator(ATNSimulator):
             if target == self.ERROR:
                 break
 
+            # If this is a consumable input element, make sure to consume before
+            # capturing the accept state so the input index, line, and char
+            # position accurately reflect the state of the interpreter at the
+            # end of the token.
+            if t != Token.EOF:
+                self.consume(input)
+
             if target.isAcceptState:
                 self.captureSimState(self.prevAccept, input, target)
                 if t == Token.EOF:
                     break
 
-            if t != Token.EOF:
-                self.consume(input)
-                t = input.LA(1)
+            t = input.LA(1)
 
             s = target # flip; current DFA target becomes new src/from state
 
@@ -307,8 +310,6 @@ class LexerATNSimulator(ATNSimulator):
         input.seek(index)
         self.line = line
         self.column = charPos
-        if input.LA(1) != Token.EOF:
-            self.consume(input)
 
         if lexerActionExecutor is not None and self.recog is not None:
             lexerActionExecutor.execute(self.recog, input, startIndex)
