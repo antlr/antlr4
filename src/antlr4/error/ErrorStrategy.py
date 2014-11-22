@@ -661,7 +661,7 @@ class DefaultErrorStrategy(ErrorStrategy):
             follow = atn.nextTokens(rt.followState)
             recoverSet.addSet(follow)
             ctx = ctx.parentCtx
-        recoverSet.remove(Token.EPSILON)
+        recoverSet.removeOne(Token.EPSILON)
         return recoverSet
 
     # Consume tokens until one matches the given token set.#

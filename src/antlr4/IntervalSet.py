@@ -23,6 +23,7 @@ class IntervalSet(object):
                 return k
             else:
                 i += 1
+        return Token.INVALID_TYPE
 
     def addOne(self, v:int):
         self.addRange(range(v, v+1))
@@ -71,6 +72,13 @@ class IntervalSet(object):
                 self.intervals[k] = range(l.start, r.stop)
                 self.intervals.pop(k+1)
 
+    def complement(self, start, stop):
+        result = IntervalSet()
+        result.addRange(range(start,stop+1))
+        for i in self.intervals:
+            result.removeRange(i)
+        return result
+
     def __contains__(self, item):
         if self.intervals is None:
             return False
@@ -86,7 +94,34 @@ class IntervalSet(object):
             xlen += len(i)
         return xlen
 
-    def remove(self, v:int):
+    def removeRange(self, v):
+        if v.start==v.stop-1:
+            self.removeOne(v.start)
+        elif self.intervals is not None:
+            k = 0
+            for i in self.intervals:
+                # intervals are ordered
+                if v.stop<=i.start:
+                    return
+                # check for including range, split it
+                elif v.start>i.start and v.stop<i.stop:
+                    self.intervals[k] = range(i.start, v.start)
+                    x = range(v.stop, i.stop)
+                    self.intervals.insert(k, x)
+                    return
+                # check for included range, remove it
+                elif v.start<=i.start and v.stop>=i.stop:
+                    self.intervals.pop(k)
+                    k = k - 1 # need another pass
+                # check for lower boundary
+                elif v.start<i.stop:
+                    self.intervals[k] = range(i.start, v.start)
+                # check for upper boundary
+                elif v.stop<i.stop:
+                    self.intervals[k] = range(v.stop, i.stop)
+                k += 1
+
+    def removeOne(self, v):
         if self.intervals is not None:
             k = 0
             for i in self.intervals:
@@ -233,3 +268,14 @@ class TestIntervalSet(unittest.TestCase):
         self.assertEquals(1,len(s.intervals))
         self.assertTrue(20 in s)
         self.assertTrue(60 in s)
+
+    def testComplement(self):
+        s = IntervalSet()
+        s.addRange(range(10,21))
+        c = s.complement(1,100)
+        self.assertTrue(1 in c)
+        self.assertTrue(100 in c)
+        self.assertTrue(10 not in c)
+        self.assertTrue(20 not in c)
+
+

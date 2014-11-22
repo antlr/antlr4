@@ -238,13 +238,9 @@ class Lexer(Recognizer, TokenSource):
 
     def emitEOF(self):
         cpos = self.column
-        # The character position for EOF is one beyond the position of
-        # the previous token's last character
-        if self._token is not None:
-            n = self._token.stop - self._token.start + 1
-            cpos = self._token.column + n
+        lpos = self.line
         eof = self._factory.create(self._tokenFactorySourcePair, Token.EOF, None, Token.DEFAULT_CHANNEL, self._input.index,
-                                   self._input.index-1, self.line, cpos)
+                                   self._input.index-1, lpos, cpos)
         self.emitToken(eof)
         return eof
 

@@ -27,7 +27,7 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.antlr.v4.py.test;
+package org.antlr.v4.test.rt.py;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -537,21 +537,37 @@ public abstract class BasePythonTest {
 		return null;
 	}
 
+	private String locateTool(String tool) {
+		String[] roots = { "/usr/bin/", "/usr/local/bin/" };
+		for(String root : roots) {
+			if(new File(root + tool).exists())
+				return root + tool;
+		}
+		throw new RuntimeException("Could not locate " + tool);
+	}
+
 	protected String locatePython() {
-		// typically "/usr/local/bin/Python2.7"
-    	String propName = getPropertyPrefix() + "-python";
+		String propName = getPropertyPrefix() + "-python";
     	String prop = System.getProperty(propName);
     	if(prop==null || prop.length()==0)
-    		throw new RuntimeException("Missing system property:" + propName);
-		return prop;
+    		prop = locateTool(getPythonExecutable());
+		File file = new File(prop);
+		if(!file.exists())
+			throw new RuntimeException("Missing system property:" + propName);
+		return file.getAbsolutePath();
 	}
+
+	protected abstract String getPythonExecutable();
 
 	private String locateRuntime() {
     	String propName = getPropertyPrefix() + "-runtime";
     	String prop = System.getProperty(propName);
     	if(prop==null || prop.length()==0)
+    		prop = "../../antlr4-" + getLanguage() + "/src";
+		File file = new File(prop);
+		if(!file.exists())
     		throw new RuntimeException("Missing system property:" + propName);
-		return prop;
+		return file.getAbsolutePath();
 	}
 	
 	public void testErrors(String[] pairs, boolean printTree) {

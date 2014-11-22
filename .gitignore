@@ -3,3 +3,4 @@
 __pycache__
 src/TestAntLR.py
 /dist
+.DS_Store
