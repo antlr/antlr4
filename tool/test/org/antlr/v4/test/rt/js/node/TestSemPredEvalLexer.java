@@ -7,11 +7,13 @@ public class TestSemPredEvalLexer extends BaseTest {
 
 	@Test
 	public void testDisableRule() throws Exception {
-		String grammar = "lexer grammar L;\n" +
-	                  "E1 : 'enum' { false }? ;\n" +
-	                  "E2 : 'enum' { true }? ;  // winner not E1 or ID\n" +
-	                  "ID : 'a'..'z'+ ;\n" +
-	                  "WS : (' '|'\\n') -> skip;";
+		StringBuilder sb = new StringBuilder();
+		sb.append("lexer grammar L;\n");
+		sb.append("E1 : 'enum' { false }? ;\n");
+		sb.append("E2 : 'enum' { true }? ;  // winner not E1 or ID\n");
+		sb.append("ID : 'a'..'z'+ ;\n");
+		sb.append("WS : (' '|'\\n') -> skip;\n");
+		String grammar = sb.toString();
 		String found = execLexer("L.g4", grammar, "L", "enum abc", true);
 		assertEquals("[@0,0:3='enum',<2>,1:0]\n" + 
 	              "[@1,5:7='abc',<3>,1:5]\n" + 
@@ -28,10 +30,12 @@ public class TestSemPredEvalLexer extends BaseTest {
 
 	@Test
 	public void testIDvsEnum() throws Exception {
-		String grammar = "lexer grammar L;\n" +
-	                  "ENUM : 'enum' { false }? ;\n" +
-	                  "ID : 'a'..'z'+ ;\n" +
-	                  "WS : (' '|'\\n') -> skip;";
+		StringBuilder sb = new StringBuilder();
+		sb.append("lexer grammar L;\n");
+		sb.append("ENUM : 'enum' { false }? ;\n");
+		sb.append("ID : 'a'..'z'+ ;\n");
+		sb.append("WS : (' '|'\\n') -> skip;\n");
+		String grammar = sb.toString();
 		String found = execLexer("L.g4", grammar, "L", "enum abc enum", true);
 		assertEquals("[@0,0:3='enum',<2>,1:0]\n" + 
 	              "[@1,5:7='abc',<2>,1:5]\n" + 
@@ -49,10 +53,12 @@ public class TestSemPredEvalLexer extends BaseTest {
 
 	@Test
 	public void testIDnotEnum() throws Exception {
-		String grammar = "lexer grammar L;\n" +
-	                  "ENUM : [a-z]+  { false }? ;\n" +
-	                  "ID : [a-z]+  ;\n" +
-	                  "WS : (' '|'\\n') -> skip;";
+		StringBuilder sb = new StringBuilder();
+		sb.append("lexer grammar L;\n");
+		sb.append("ENUM : [a-z]+  { false }? ;\n");
+		sb.append("ID : [a-z]+  ;\n");
+		sb.append("WS : (' '|'\\n') -> skip;\n");
+		String grammar = sb.toString();
 		String found = execLexer("L.g4", grammar, "L", "enum abc enum", true);
 		assertEquals("[@0,0:3='enum',<2>,1:0]\n" + 
 	              "[@1,5:7='abc',<2>,1:5]\n" + 
@@ -64,10 +70,12 @@ public class TestSemPredEvalLexer extends BaseTest {
 
 	@Test
 	public void testEnumNotID() throws Exception {
-		String grammar = "lexer grammar L;\n" +
-	                  "ENUM : [a-z]+  { this.text===\"enum\" }? ;\n" +
-	                  "ID : [a-z]+  ;\n" +
-	                  "WS : (' '|'\\n') -> skip;";
+		StringBuilder sb = new StringBuilder();
+		sb.append("lexer grammar L;\n");
+		sb.append("ENUM : [a-z]+  { this.text===\"enum\" }? ;\n");
+		sb.append("ID : [a-z]+  ;\n");
+		sb.append("WS : (' '|'\\n') -> skip;\n");
+		String grammar = sb.toString();
 		String found = execLexer("L.g4", grammar, "L", "enum abc enum", true);
 		assertEquals("[@0,0:3='enum',<1>,1:0]\n" + 
 	              "[@1,5:7='abc',<2>,1:5]\n" + 
@@ -79,12 +87,14 @@ public class TestSemPredEvalLexer extends BaseTest {
 
 	@Test
 	public void testIndent() throws Exception {
-		String grammar = "lexer grammar L;\n" +
-	                  "ID : [a-z]+  ;\n" +
-	                  "INDENT : [ \\t]+ { this._tokenStartColumn===0 }?\n" +
-	                  "         { console.log(\"INDENT\"); }  ;\n" +
-	                  "NL : '\\n';\n" +
-	                  "WS : [ \\t]+ ;";
+		StringBuilder sb = new StringBuilder();
+		sb.append("lexer grammar L;\n");
+		sb.append("ID : [a-z]+  ;\n");
+		sb.append("INDENT : [ \\t]+ { this._tokenStartColumn===0 }?\n");
+		sb.append("         { console.log(\"INDENT\"); }  ;\n");
+		sb.append("NL : '\\n';\n");
+		sb.append("WS : [ \\t]+ ;\n");
+		String grammar = sb.toString();
 		String found = execLexer("L.g4", grammar, "L", "abc\n  def  \n", true);
 		assertEquals("INDENT\n" + 
 	              "[@0,0:2='abc',<1>,1:0]\n" + 
@@ -93,7 +103,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 	              "[@3,6:8='def',<1>,2:2]\n" + 
 	              "[@4,9:10='  ',<4>,2:5]\n" + 
 	              "[@5,11:11='\\n',<3>,2:7]\n" + 
-	              "[@6,12:11='<EOF>',<-1>,3:8]\n" + 
+	              "[@6,12:11='<EOF>',<-1>,3:0]\n" + 
 	              "s0-'\n" + 
 	              "'->:s2=>3\n" + 
 	              "s0-'a'->:s1=>1\n" + 
@@ -107,12 +117,14 @@ public class TestSemPredEvalLexer extends BaseTest {
 
 	@Test
 	public void testLexerInputPositionSensitivePredicates() throws Exception {
-		String grammar = "lexer grammar L;\n" +
-	                  "WORD1 : ID1+ { console.log(this.text); } ;\n" +
-	                  "WORD2 : ID2+ { console.log(this.text); } ;\n" +
-	                  "fragment ID1 : { this.column < 2 }? [a-zA-Z];\n" +
-	                  "fragment ID2 : { this.column >= 2 }? [a-zA-Z];\n" +
-	                  "WS : (' '|'\\n') -> skip;";
+		StringBuilder sb = new StringBuilder();
+		sb.append("lexer grammar L;\n");
+		sb.append("WORD1 : ID1+ { console.log(this.text); } ;\n");
+		sb.append("WORD2 : ID2+ { console.log(this.text); } ;\n");
+		sb.append("fragment ID1 : { this.column < 2 }? [a-zA-Z];\n");
+		sb.append("fragment ID2 : { this.column >= 2 }? [a-zA-Z];\n");
+		sb.append("WS : (' '|'\\n') -> skip;\n");
+		String grammar = sb.toString();
 		String found = execLexer("L.g4", grammar, "L", "a cde\nabcde\n", true);
 		assertEquals("a\n" + 
 	              "cde\n" + 
@@ -128,10 +140,12 @@ public class TestSemPredEvalLexer extends BaseTest {
 
 	@Test
 	public void testPredicatedKeywords() throws Exception {
-		String grammar = "lexer grammar L;\n" +
-	                  "ENUM : [a-z]+ { this.text===\"enum\" }? { console.log(\"enum!\"); } ;\n" +
-	                  "ID   : [a-z]+ { console.log(\"ID \" + this.text); } ;\n" +
-	                  "WS   : [ \\n] -> skip ;";
+		StringBuilder sb = new StringBuilder();
+		sb.append("lexer grammar L;\n");
+		sb.append("ENUM : [a-z]+ { this.text===\"enum\" }? { console.log(\"enum!\"); } ;\n");
+		sb.append("ID   : [a-z]+ { console.log(\"ID \" + this.text); } ;\n");
+		sb.append("WS   : [ \\n] -> skip ;\n");
+		String grammar = sb.toString();
 		String found = execLexer("L.g4", grammar, "L", "enum enu a", false);
 		assertEquals("enum!\n" + 
 	              "ID enu\n" + 

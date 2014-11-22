@@ -26,7 +26,9 @@ public void test<test.name>() throws Exception {
 	mkdir(tmpdir);
 	writeFile(tmpdir, "<grammar.grammarName>.g4", slave_<grammar.grammarName>);
 	};separator="\n", wrap, anchor>
-	String grammar = <test.grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
+	StringBuilder sb = new StringBuilder();
+	<test.grammar.lines:{ line | sb.append("<line>\\n");};separator="\n", wrap, anchor>
+	String grammar = sb.toString();
 	<test.afterGrammar>
 	String found = execLexer("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName><if(!test.lexerOnly)>Lexer<endif>", "<test.input>", <test.showDFA>);
 	assertEquals(<test.outputLines:{ line | "<line>\\n"};separator=" + \n", wrap, anchor>, found);

@@ -267,15 +267,10 @@ Lexer.prototype.emit = function() {
 
 Lexer.prototype.emitEOF = function() {
 	var cpos = this.column;
-	// The character position for EOF is one beyond the position of
-	// the previous token's last character
-	if (this._token !== null) {
-		var n = this._token.stop - this._token.start + 1;
-		cpos = this._token.column + n;
-	}
+	var lpos = this.line;
 	var eof = this._factory.create(this._tokenFactorySourcePair, Token.EOF,
 			null, Token.DEFAULT_CHANNEL, this._input.index,
-			this._input.index - 1, this.line, cpos);
+			this._input.index - 1, lpos, cpos);
 	this.emitToken(eof);
 	return eof;
 };
