@@ -30,6 +30,7 @@
 package org.antlr.v4.test.rt.csharp;
 
 import static org.junit.Assert.*;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -90,7 +91,7 @@ public abstract class BaseTest {
 	 * directories for all tests which completed successfully, and preserving
 	 * the directories for tests which failed.</p>
 	 */
-	public static final boolean PRESERVE_TEST_DIR = Boolean.parseBoolean(System.getProperty("antlr.preserve-csharp-test-dir"));
+	public static final boolean PRESERVE_TEST_DIR = Boolean.parseBoolean(System.getProperty("antlr-preserve-csharp-test-dir"));
 
 	/**
 	 * The base test directory is the directory where generated files get placed
@@ -116,7 +117,7 @@ public abstract class BaseTest {
 	public static final boolean CREATE_PER_TEST_DIRECTORIES;
 
 	static {
-		String baseTestDir = System.getProperty("antlr.csharp-test-dir");
+		String baseTestDir = System.getProperty("antlr-csharp-test-dir");
 		boolean perTestDirectories = false;
 		if (baseTestDir == null || baseTestDir.isEmpty()) {
 			baseTestDir = System.getProperty("java.io.tmpdir");
@@ -403,19 +404,39 @@ public abstract class BaseTest {
 		}
 	}
 	
-	private File getProjectFile() {
+	private File getTestProjectFile() {
 		return new File(tmpdir, "Antlr4.Test.mono.csproj");
 	}
 	
 	private boolean buildProject() throws Exception {
+		String msbuild = locateMSBuild();
 		String[] args = {
-				"xbuild",
+				msbuild,
 				"/p:Configuration=Release",
-				getProjectFile().getAbsolutePath()
+				getTestProjectFile().getAbsolutePath()
 			};
 		Process process = Runtime.getRuntime().exec(args, null, new File(tmpdir));
 		process.waitFor();
 		return process.exitValue()==0;
+	}
+
+	private String locateMSBuild() {
+		return locateTool("xbuild");
+	}
+	
+	private String locateExec() {
+		return locateTool("mono");
+		// new File(tmpdir, "bin/Release/Test.exe").getAbsolutePath(),
+
+	}
+
+	private String locateTool(String tool) {
+		String[] roots = { "/usr/bin/", "/usr/local/bin/" };
+		for(String root : roots) {
+			if(new File(root + tool).exists())
+				return root + tool;
+		}
+		throw new RuntimeException("Could not locate " + tool);
 	}
 
 	public boolean createProject() {
@@ -433,7 +454,13 @@ public abstract class BaseTest {
 			input = Thread.currentThread().getContextClassLoader().getResourceAsStream(pack + "Antlr4.Test.mono.csproj");
 			Document prjXml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input);
 			// update runtime project reference
-			String runtimePath = System.getProperty("antlr.csharp-runtime-project");
+			String runtimePath = System.getProperty("antlr-csharp-runtime-project");
+			if(runtimePath==null)
+				runtimePath = "../../antlr4-csharp/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.mono.csproj";
+			File projFile = new File(runtimePath);
+			if(!projFile.exists())
+				throw new RuntimeException("C# runtime project file not found at:" + projFile.getAbsolutePath());
+			runtimePath = projFile.getAbsolutePath();
 			XPathExpression exp = XPathFactory.newInstance().newXPath().compile("/Project/ItemGroup/ProjectReference[@Include='Antlr4.Runtime.mono.csproj']");
 			Element node = (Element)exp.evaluate(prjXml, XPathConstants.NODE);
 			node.setAttribute("Include", runtimePath.replace("/", "\\"));
@@ -454,7 +481,7 @@ public abstract class BaseTest {
 				group.appendChild(elem);
 			}
 			// save project
-			File prjFile = getProjectFile();
+			File prjFile = getTestProjectFile();
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.transform(new DOMSource(prjXml), new StreamResult(prjFile));
@@ -466,8 +493,9 @@ public abstract class BaseTest {
 
 	public String execTest() {
 		try {
+			String exec = locateExec();
 			String[] args = new String[] {
-				"mono", 
+					exec, 
 				new File(tmpdir, "bin/Release/Test.exe").getAbsolutePath(),
 				new File(tmpdir, "input").getAbsolutePath()
 			};
