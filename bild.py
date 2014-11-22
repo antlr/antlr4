@@ -83,12 +83,12 @@ def mkjar_complete():
     copytree(src="tool/resources", trg="out")  # messages, Java code gen, etc...
     manifest = \
         """Main-Class: org.antlr.v4.Tool
-        Implementation-Vendor: ANTLR
-        Implementation-Title: ANTLR 4 Tool
-        Implementation-Version: %s
-        Built-By: %s
-        Build-Jdk: 1.6
-        Created-By: http://www.bildtool.org
+Implementation-Vendor: ANTLR
+Implementation-Title: ANTLR 4 Tool
+Implementation-Version: %s
+Built-By: %s
+Build-Jdk: 1.6
+Created-By: http://www.bildtool.org
         """ % (VERSION, os.getlogin())
     # unjar required libraries
     unjar("runtime/Java/lib/org.abego.treelayout.core.jar", trgdir="out")
@@ -117,11 +117,11 @@ def mkjar_runtime():
         javac(sp, "out", version="1.6", cp=cp, args=args)
     manifest = \
         """Implementation-Vendor: ANTLR
-        Implementation-Title: ANTLR 4 Runtime
-        Implementation-Version: %s
-        Built-By: %s
-        Build-Jdk: 1.6
-        Created-By: http://www.bildtool.org
+Implementation-Title: ANTLR 4 Runtime
+Implementation-Version: %s
+Built-By: %s
+Build-Jdk: 1.6
+Created-By: http://www.bildtool.org
         """ % (VERSION, os.getlogin())
     jarfile = "dist/antlr4-" + VERSION + ".jar"
     jar(jarfile, srcdir="out/runtime", manifest=manifest)
