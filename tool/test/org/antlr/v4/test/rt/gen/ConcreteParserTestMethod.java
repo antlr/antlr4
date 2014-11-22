@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.stringtemplate.v4.STGroup;
 
-public class ConcreteParserTestMethod extends TestMethod {
+public class ConcreteParserTestMethod extends JUnitTestMethod {
 
 	public String baseName;
 	

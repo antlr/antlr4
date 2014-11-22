@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.stringtemplate.v4.STGroup;
 
-public abstract class TestMethod {
+public abstract class JUnitTestMethod {
 
 	public String name;
 	public Grammar grammar;
@@ -14,7 +14,7 @@ public abstract class TestMethod {
 	public String expectedErrors;
 	public boolean debug = false;
 	
-	protected TestMethod(String name, String grammarName, String input, 
+	protected JUnitTestMethod(String name, String grammarName, String input, 
 			String expectedOutput, String expectedErrors, Integer index) {
 		this.name = name + (index==null ? "" : "_" + index);
 		this.grammar = new Grammar(name, grammarName);
