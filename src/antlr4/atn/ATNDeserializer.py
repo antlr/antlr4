@@ -247,7 +247,7 @@ class ATNDeserializer (object):
                     raise Exception("IllegalState")
                 state.endState.startState = state
 
-            if isinstance(state, PlusLoopbackState):
+            elif isinstance(state, PlusLoopbackState):
                 for i in range(0, len(state.transitions)):
                     target = state.transitions[i].target
                     if isinstance(target, PlusBlockStartState):

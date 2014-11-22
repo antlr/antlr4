@@ -5,3 +5,5 @@ src/TestAntLR.py
 /dist
 /MANIFEST
 *.egg-info/
+.DS_Store
+tmp/
