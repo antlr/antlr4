@@ -29,11 +29,7 @@
  */
 package org.antlr.v4.test.rt.js.node;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -73,7 +69,6 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
@@ -186,20 +181,6 @@ public abstract class BaseTest {
 		}
 	}
 
-	public DFA createDFA(Grammar g, DecisionState s) {
-//		PredictionDFAFactory conv = new PredictionDFAFactory(g, s);
-//		DFA dfa = conv.createDFA();
-//		conv.issueAmbiguityWarnings();
-//		System.out.print("DFA="+dfa);
-//		return dfa;
-		return null;
-	}
-
-//	public void minimizeDFA(DFA dfa) {
-//		DFAMinimizer dmin = new DFAMinimizer(dfa);
-//		dfa.minimized = dmin.minimize();
-//	}
-
 	IntegerList getTypesFromString(Grammar g, String expecting) {
 		IntegerList expectingTokenTypes = new IntegerList();
 		if ( expecting!=null && !expecting.trim().isEmpty() ) {
@@ -250,72 +231,6 @@ public abstract class BaseTest {
 		} while ( ttype!=Token.EOF );
 		return tokenTypes;
 	}
-
-	List<ANTLRMessage> checkRuleDFA(String gtext, String ruleName, String expecting)
-		throws Exception
-	{
-		ErrorQueue equeue = new ErrorQueue();
-		Grammar g = new Grammar(gtext, equeue);
-		ATN atn = createATN(g, false);
-		ATNState s = atn.ruleToStartState[g.getRule(ruleName).index];
-		if ( s==null ) {
-			System.err.println("no such rule: "+ruleName);
-			return null;
-		}
-		ATNState t = s.transition(0).target;
-		if ( !(t instanceof DecisionState) ) {
-			System.out.println(ruleName+" has no decision");
-			return null;
-		}
-		DecisionState blk = (DecisionState)t;
-		checkRuleDFA(g, blk, expecting);
-		return equeue.all;
-	}
-
-	List<ANTLRMessage> checkRuleDFA(String gtext, int decision, String expecting)
-		throws Exception
-	{
-		ErrorQueue equeue = new ErrorQueue();
-		Grammar g = new Grammar(gtext, equeue);
-		ATN atn = createATN(g, false);
-		DecisionState blk = atn.decisionToState.get(decision);
-		checkRuleDFA(g, blk, expecting);
-		return equeue.all;
-	}
-
-	void checkRuleDFA(Grammar g, DecisionState blk, String expecting)
-		throws Exception
-	{
-		DFA dfa = createDFA(g, blk);
-		String result = null;
-		if ( dfa!=null ) result = dfa.toString();
-		assertEquals(expecting, result);
-	}
-
-	List<ANTLRMessage> checkLexerDFA(String gtext, String expecting)
-		throws Exception
-	{
-		return checkLexerDFA(gtext, LexerGrammar.DEFAULT_MODE_NAME, expecting);
-	}
-
-	List<ANTLRMessage> checkLexerDFA(String gtext, String modeName, String expecting)
-		throws Exception
-	{
-		ErrorQueue equeue = new ErrorQueue();
-		LexerGrammar g = new LexerGrammar(gtext, equeue);
-		g.atn = createATN(g, false);
-//		LexerATNToDFAConverter conv = new LexerATNToDFAConverter(g);
-//		DFA dfa = conv.createDFA(modeName);
-//		g.setLookaheadDFA(0, dfa); // only one decision to worry about
-//
-//		String result = null;
-//		if ( dfa!=null ) result = dfa.toString();
-//		assertEquals(expecting, result);
-//
-//		return equeue.all;
-		return null;
-	}
-
 
 	/** Return true if all is ok, no errors */
 	protected ErrorQueue antlr(String fileName, String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
@@ -513,11 +428,23 @@ public abstract class BaseTest {
 		return null;
 	}
 
+	private String locateTool(String tool) {
+		String[] roots = { "/usr/bin/", "/usr/local/bin/" };
+		for(String root : roots) {
+			if(new File(root + tool).exists())
+				return root + tool;
+		}
+		throw new RuntimeException("Could not locate " + tool);
+	}
+
 	private String locateNodeJS() {
 		// typically /usr/local/bin/node
 		String propName = "antlr-javascript-nodejs";
 		String prop = System.getProperty(propName);
 		if(prop==null || prop.length()==0)
+			prop = locateTool("node");
+		File file = new File(prop);
+		if(!file.exists())
 			throw new RuntimeException("Missing system property:" + propName);
 		return prop;
 	}
@@ -526,8 +453,11 @@ public abstract class BaseTest {
 		String propName = "antlr-javascript-runtime";
 		String prop = System.getProperty(propName);
 		if(prop==null || prop.length()==0)
+			prop = "../../antlr4-javascript/src";
+		File file = new File(prop);
+		if(!file.exists())
 			throw new RuntimeException("Missing system property:" + propName);
-		return prop;
+		return file.getAbsolutePath();
 	}
 
 	public void testErrors(String[] pairs, boolean printTree) {

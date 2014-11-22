@@ -34,8 +34,8 @@ function IntervalSet() {
 }
 
 IntervalSet.prototype.first = function(v) {
-	if (this.intervals === null) {
-		return null;
+	if (this.intervals === null || this.intervals.length===0) {
+		return Token.INVALID_TYPE;
 	} else {
 		return this.intervals[0].start;
 	}
@@ -105,6 +105,15 @@ IntervalSet.prototype.reduce = function(k) {
 	}
 };
 
+IntervalSet.prototype.complement = function(start, stop) {
+    var result = new IntervalSet();
+    result.addInterval(new Interval(start,stop+1));
+    for(var i=0; i<this.intervals.length; i++) {
+        result.removeRange(this.intervals[i]);
+    }
+    return result;
+};
+
 IntervalSet.prototype.contains = function(item) {
 	if (this.intervals === null) {
 		return false;
@@ -126,7 +135,43 @@ Object.defineProperty(IntervalSet.prototype, "length", {
 	}
 });
 
-IntervalSet.prototype.remove = function(v) {
+IntervalSet.prototype.removeRange = function(v) {
+    if(v.start===v.stop-1) {
+        this.removeOne(v.start);
+    } else if (this.intervals!==null) {
+        var k = 0;
+        for(var n=0; n<this.intervals.length; n++) {
+            var i = this.intervals[k];
+            // intervals are ordered
+            if (v.stop<=i.start) {
+                return;
+            }
+            // check for including range, split it
+            else if(v.start>i.start && v.stop<i.stop) {
+                this.intervals[k] = new Interval(i.start, v.start);
+                var x = new Interval(v.stop, i.stop);
+                this.intervals.splice(k, 0, x);
+                return;
+            }
+            // check for included range, remove it
+            else if(v.start<=i.start && v.stop>=i.stop) {
+                this.intervals.splice(k, 1);
+                k = k - 1; // need another pass
+            }
+            // check for lower boundary
+            else if(v.start<i.stop) {
+                this.intervals[k] = new Interval(i.start, v.start);
+            }
+            // check for upper boundary
+            else if(v.stop<i.stop) {
+                this.intervals[k] = new Interval(v.stop, i.stop);
+            }
+            k += 1;
+        }
+    }
+};
+
+IntervalSet.prototype.removeOne = function(v) {
 	if (this.intervals !== null) {
 		for (var k = 0; k < this.intervals.length; k++) {
 			var i = this.intervals[k];

@@ -703,7 +703,7 @@ DefaultErrorStrategy.prototype.getErrorRecoverySet = function(recognizer) {
         recoverSet.addSet(follow);
         ctx = ctx.parentCtx;
     }
-    recoverSet.remove(Token.EPSILON);
+    recoverSet.removeOne(Token.EPSILON);
     return recoverSet;
 };
 

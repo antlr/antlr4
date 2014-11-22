@@ -223,5 +223,15 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	@Test
+	public void testComplementSet() throws Exception {
+		String grammar = "grammar T;\n" +
+	                  "parse : ~NEW_LINE;\n" +
+	                  "NEW_LINE: '\\r'? '\\n';";
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "parse", "a", false);
+		assertEquals("", found);
+		assertEquals("line 1:0 token recognition error at: 'a'\nline 1:1 missing {} at '<EOF>'\n", this.stderrDuringParse);
+	}
+
 
 }

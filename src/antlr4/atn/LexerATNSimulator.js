@@ -173,8 +173,6 @@ LexerATNSimulator.prototype.execATN = function(input, ds0) {
 	if (ds0.isAcceptState) {
 		// allow zero-length tokens
 		this.captureSimState(this.prevAccept, input, ds0);
-		// adjust index since the current input character was not yet consumed
-		this.prevAccept.index--;
 	}
 	var t = input.LA(1);
 	var s = ds0; // s is current/from DFA state
@@ -211,16 +209,20 @@ LexerATNSimulator.prototype.execATN = function(input, ds0) {
 		if (target === ATNSimulator.ERROR) {
 			break;
 		}
+		// If this is a consumable input element, make sure to consume before
+		// capturing the accept state so the input index, line, and char
+		// position accurately reflect the state of the interpreter at the
+		// end of the token.
+		if (t !== Token.EOF) {
+			this.consume(input);
+		}
 		if (target.isAcceptState) {
 			this.captureSimState(this.prevAccept, input, target);
 			if (t === Token.EOF) {
 				break;
 			}
 		}
-		if (t !== Token.EOF) {
-			this.consume(input);
-			t = input.LA(1);
-		}
+		t = input.LA(1);
 		s = target; // flip; current DFA target becomes new src/from state
 	}
 	return this.failOrAccept(this.prevAccept, input, s.configs, t);
@@ -342,9 +344,6 @@ LexerATNSimulator.prototype.accept = function(input, lexerActionExecutor,
 	input.seek(index);
 	this.line = line;
 	this.column = charPos;
-	if (input.LA(1) !== Token.EOF) {
-		this.consume(input);
-	}
 	if (lexerActionExecutor !== null && this.recog !== null) {
 		lexerActionExecutor.execute(this.recog, input, startIndex);
 	}

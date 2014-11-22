@@ -146,13 +146,13 @@ ATN.prototype.getExpectedTokens = function( stateNumber, ctx ) {
     }
     var expected = new IntervalSet();
     expected.addSet(following);
-    expected.remove(Token.EPSILON);
+    expected.removeOne(Token.EPSILON);
     while (ctx !== null && ctx.invokingState >= 0 && following.contains(Token.EPSILON)) {
         var invokingState = this.states[ctx.invokingState];
         var rt = invokingState.transitions[0];
         following = this.nextTokens(rt.followState);
         expected.addSet(following);
-        expected.remove(Token.EPSILON);
+        expected.removeOne(Token.EPSILON);
         ctx = ctx.parentCtx;
     }
     if (following.contains(Token.EPSILON)) {
