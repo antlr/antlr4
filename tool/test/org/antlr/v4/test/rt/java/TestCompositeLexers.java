@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 public class TestCompositeLexers extends BaseTest {
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLexerDelegatorInvokesDelegateRule() throws Exception {
 		String slave_S = "lexer grammar S;\n" +
@@ -28,6 +29,7 @@ public class TestCompositeLexers extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLexerDelegatorRuleOverridesDelegate() throws Exception {
 		String slave_S = "lexer grammar S;\n" +

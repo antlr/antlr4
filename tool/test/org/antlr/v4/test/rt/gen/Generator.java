@@ -1,7 +1,5 @@
 package org.antlr.v4.test.rt.gen;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -55,39 +53,31 @@ public class Generator {
 	}
 
 	private static File readCSharpDir() {
-		// TODO Auto-generated method stub
-		// TODO fix these are hardcoded paths
-		return new File("/Users/ericvergnaud/Development/antlr4/antlr/antlr4-csharp/tool/test/org/antlr/v4/test/rt/csharp");
+		return new File("../../antlr4-csharp/tool/test/org/antlr/v4/test/rt/csharp");
 	}
 
 	private static File readPython2Dir() {
-		// TODO Auto-generated method stub
-		return new File("/Users/ericvergnaud/Development/antlr4/antlr/antlr4-python2/tool/test/org/antlr/v4/test/rt/py2");
+		return new File("../../antlr4-python2/tool/test/org/antlr/v4/test/rt/py2");
 	}
 
 	private static File readPython3Dir() {
-		// TODO Auto-generated method stub
-		return new File("/Users/ericvergnaud/Development/antlr4/antlr/antlr4-python3/tool/test/org/antlr/v4/test/rt/py3");
+		return new File("../../antlr4-python3/tool/test/org/antlr/v4/test/rt/py3");
 	}
 
 	private static File readNodeJSDir() {
-		// TODO Auto-generated method stub
-		return new File("/Users/ericvergnaud/Development/antlr4/antlr/antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/node");
+		return new File("../../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/node");
 	}
 
 	private static File readSafariDir() {
-		// TODO read from env variable
-		return new File("/Users/ericvergnaud/Development/antlr4/antlr/antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/safari");
+		return new File("../../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/safari");
 	}
 
 	private static File readFirefoxDir() {
-		// TODO read from env variable
-		return new File("/Users/ericvergnaud/Development/antlr4/antlr/antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/firefox");
+		return new File("../..//antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/firefox");
 	}
 	
 	private static File readChromeDir() {
-		// TODO read from env variable
-		return new File("/Users/ericvergnaud/Development/antlr4/antlr/antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/firefox");
+		return new File("../..//antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/chrome");
 	}
 
 	private static File readGrammarDir() throws Exception {
