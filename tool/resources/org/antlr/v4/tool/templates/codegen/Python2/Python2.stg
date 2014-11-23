@@ -110,7 +110,7 @@ class <file.grammarName>Visitor(ParseTreeVisitor):
     <file.visitorNames:{lname |
 # Visit a parse tree produced by <file.parserName>#<lname>.
 def visit<lname; format="cap">(self, ctx):
-    pass
+    return self.visitChildren(ctx)
     
 }; separator="\n">
 
