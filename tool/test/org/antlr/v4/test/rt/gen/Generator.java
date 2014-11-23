@@ -41,6 +41,7 @@ public class Generator {
 		configs.put("Safari", readSafariDir()); // generated Safari tests
 		configs.put("Firefox", readFirefoxDir()); // generated Firefox tests
 		configs.put("Chrome", readChromeDir()); // generated Chrome tests
+		configs.put("Explorer", readExplorerDir()); // generated Explorer tests
 		return configs;
 	}
 
@@ -73,11 +74,15 @@ public class Generator {
 	}
 
 	private static File readFirefoxDir() {
-		return new File("../..//antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/firefox");
+		return new File("../../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/firefox");
 	}
 	
 	private static File readChromeDir() {
-		return new File("../..//antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/chrome");
+		return new File("../../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/chrome");
+	}
+
+	private static File readExplorerDir() {
+		return new File("../../antlr4-javascript/tool/test/org/antlr/v4/test/rt/js/explorer");
 	}
 
 	private static File readGrammarDir() throws Exception {
