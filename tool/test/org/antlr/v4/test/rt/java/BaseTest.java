@@ -655,10 +655,14 @@ public abstract class BaseTest {
 	}
 
 	public Class<?> loadClassFromTempDir(String name) throws Exception {
-		ClassLoader loader =
+		URLClassLoader loader =
 			new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() },
 							   ClassLoader.getSystemClassLoader());
-		return loader.loadClass(name);
+		try {
+			return loader.loadClass(name);
+		} finally {
+			loader.close();
+		}
 	}
 
 	public Class<? extends Lexer> loadLexerClassFromTempDir(String name) throws Exception {
@@ -775,8 +779,9 @@ public abstract class BaseTest {
 
 	public String execClass(String className) {
 		if (TEST_IN_SAME_PROCESS) {
+			URLClassLoader loader = null;
 			try {
-				ClassLoader loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
+				loader = new URLClassLoader(new URL[] { new File(tmpdir).toURI().toURL() }, ClassLoader.getSystemClassLoader());
                 final Class<?> mainClass = (Class<?>)loader.loadClass(className);
 				final Method mainMethod = mainClass.getDeclaredMethod("main", String[].class);
 				PipedInputStream stdoutIn = new PipedInputStream();
@@ -841,6 +846,12 @@ public abstract class BaseTest {
 			} catch (ClassNotFoundException ex) {
 				LOGGER.log(Level.SEVERE, null, ex);
 				throw new RuntimeException(ex);
+			} finally {
+				if(loader!=null) try {
+					loader.close();
+				} catch(IOException e) {
+					LOGGER.log(Level.WARNING, null, e);
+				}
 			}
 		}
 
