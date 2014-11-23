@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 public class TestSets extends BaseTest {
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSeqDoesNotBecomeSet() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -17,6 +18,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testParserSet() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -26,6 +28,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testParserNotSet() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -35,6 +38,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testParserNotToken() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -44,6 +48,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testParserNotTokenWithLabel() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -53,6 +58,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testRuleAsSet() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -62,6 +68,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testNotChar() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -72,6 +79,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testOptionalSingleElement() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -82,6 +90,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testOptionalLexerSingleElement() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -92,6 +101,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testStarLexerSingleElement(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : A {console.log(this._input.getText());} ;\n" +
@@ -99,6 +109,7 @@ public class TestSets extends BaseTest {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testStarLexerSingleElement_1() throws Exception {
 		String found = testStarLexerSingleElement("bbbbc");
@@ -106,6 +117,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testStarLexerSingleElement_2() throws Exception {
 		String found = testStarLexerSingleElement("c");
@@ -113,6 +125,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testPlusLexerSingleElement() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -123,6 +136,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testOptionalSet() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -132,6 +146,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testStarSet() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -141,6 +156,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testPlusSet() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -150,6 +166,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLexerOptionalSet() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -160,6 +177,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLexerStarSet() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -170,6 +188,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLexerPlusSet() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -180,6 +199,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testNotCharSet() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -190,6 +210,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testNotCharSetWithLabel() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -200,6 +221,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testNotCharSetWithRuleRef3() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -212,6 +234,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testCharSetLiteral() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -223,6 +246,7 @@ public class TestSets extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testComplementSet() throws Exception {
 		String grammar = "grammar T;\n" +

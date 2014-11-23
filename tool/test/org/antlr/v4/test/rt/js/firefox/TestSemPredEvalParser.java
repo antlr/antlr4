@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 public class TestSemPredEvalParser extends BaseTest {
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSimpleValidate() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -20,6 +21,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertEquals("line 1:0 no viable alternative at input 'x'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSimpleValidate2() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -35,6 +37,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertEquals("line 1:4 no viable alternative at input 'x'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testAtomWithClosureInTranslatedLRRule() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -47,6 +50,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testValidateInDFA() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -65,6 +69,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertEquals("line 1:0 no viable alternative at input 'x'\nline 1:4 no viable alternative at input 'y'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSimple() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -81,6 +86,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testOrder() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -98,6 +104,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void test2UnpredicatedAlts() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -114,6 +121,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertEquals("line 1:0 reportAttemptingFullContext d=0 (a), input='x'\nline 1:0 reportAmbiguity d=0 (a): ambigAlts={1, 2}, input='x'\nline 1:3 reportAttemptingFullContext d=0 (a), input='y'\nline 1:3 reportAmbiguity d=0 (a): ambigAlts={1, 2}, input='y'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void test2UnpredicatedAltsAndOneOrthogonalAlt() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -131,6 +139,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertEquals("line 1:4 reportAttemptingFullContext d=0 (a), input='x'\nline 1:4 reportAmbiguity d=0 (a): ambigAlts={2, 3}, input='x'\nline 1:7 reportAttemptingFullContext d=0 (a), input='y'\nline 1:7 reportAmbiguity d=0 (a): ambigAlts={2, 3}, input='y'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testRewindBeforePredEval() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -146,6 +155,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testNoTruePredsThrowsNoViableAlt() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -161,6 +171,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertEquals("line 1:0 no viable alternative at input 'y'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testToLeft() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -176,6 +187,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testUnpredicatedPathsInAlt() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -195,6 +207,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testActionHidesPreds() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -211,6 +224,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testToLeftWithVaryingPredicate() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -228,6 +242,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testPredicateDependentOnArg() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -245,6 +260,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testPredicateDependentOnArg2() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -262,6 +278,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDependentPredNotInOuterCtxShouldBeIgnored() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -279,6 +296,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testIndependentPredNotPassedOuterCtxToAvoidCastException() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -296,6 +314,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testPredsInGlobalFOLLOW() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -316,6 +335,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDepedentPredsInGlobalFOLLOW() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -337,6 +357,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testActionsHidePredsInGlobalFOLLOW() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -357,6 +378,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testPredTestedEvenWhenUnAmbig(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "@members {this.enumKeyword = true;}\n" +
@@ -369,6 +391,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "primary", input, true);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testPredTestedEvenWhenUnAmbig_1() throws Exception {
 		String found = testPredTestedEvenWhenUnAmbig("abc");
@@ -376,6 +399,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testPredTestedEvenWhenUnAmbig_2() throws Exception {
 		String found = testPredTestedEvenWhenUnAmbig("enum");
@@ -383,6 +407,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertEquals("line 1:0 no viable alternative at input 'enum'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDisabledAlternative() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -395,6 +420,7 @@ public class TestSemPredEvalParser extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testPredFromAltTestedInLoopBack(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "file_\n" +
@@ -408,13 +434,15 @@ public class TestSemPredEvalParser extends BaseTest {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "file_", input, true);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testPredFromAltTestedInLoopBack_1() throws Exception {
 		String found = testPredFromAltTestedInLoopBack("s\n\n\nx\n");
 		assertEquals("(file_ (para (paraContent s) \\n \\n) (para (paraContent \\n x \\n)) <EOF>)\n", found);
-		assertEquals("line 5:2 mismatched input '<EOF>' expecting '\n'\n", this.stderrDuringParse);
+		assertEquals("line 5:0 mismatched input '<EOF>' expecting '\n'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testPredFromAltTestedInLoopBack_2() throws Exception {
 		String found = testPredFromAltTestedInLoopBack("s\n\n\nx\n\n");
