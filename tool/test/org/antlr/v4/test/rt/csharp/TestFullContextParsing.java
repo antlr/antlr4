@@ -4,6 +4,7 @@ import org.junit.Test;
 
 public class TestFullContextParsing extends BaseTest {
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testAmbigYieldsCtxSensitiveDFA() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -16,6 +17,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("line 1:0 reportAttemptingFullContext d=0 (s), input='abc'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testCtxSensitiveDFA(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s @after {this.DumpDFA();}\n" +
@@ -29,6 +31,7 @@ public class TestFullContextParsing extends BaseTest {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "s", input, true);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testCtxSensitiveDFA_1() throws Exception {
 		String found = testCtxSensitiveDFA("$ 34 abc");
@@ -36,6 +39,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("line 1:5 reportAttemptingFullContext d=1 (e), input='34abc'\nline 1:2 reportContextSensitivity d=1 (e), input='34'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testCtxSensitiveDFA_2() throws Exception {
 		String found = testCtxSensitiveDFA("@ 34 abc");
@@ -43,6 +47,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("line 1:5 reportAttemptingFullContext d=1 (e), input='34abc'\nline 1:5 reportContextSensitivity d=1 (e), input='34abc'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testCtxSensitiveDFATwoDiffInput() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -59,6 +64,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("line 1:5 reportAttemptingFullContext d=2 (e), input='34abc'\nline 1:2 reportContextSensitivity d=2 (e), input='34'\nline 1:14 reportAttemptingFullContext d=2 (e), input='34abc'\nline 1:14 reportContextSensitivity d=2 (e), input='34abc'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSLLSeesEOFInLLGrammar() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -75,6 +81,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("line 1:3 reportAttemptingFullContext d=0 (e), input='34abc'\nline 1:0 reportContextSensitivity d=0 (e), input='34'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testFullContextIF_THEN_ELSEParse(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s \n" +
@@ -89,6 +96,7 @@ public class TestFullContextParsing extends BaseTest {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "s", input, true);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_1() throws Exception {
 		String found = testFullContextIF_THEN_ELSEParse("{ if x then return }");
@@ -96,6 +104,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_2() throws Exception {
 		String found = testFullContextIF_THEN_ELSEParse("{ if x then return else foo }");
@@ -103,6 +112,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("line 1:19 reportAttemptingFullContext d=1 (stat), input='else'\nline 1:19 reportContextSensitivity d=1 (stat), input='else'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_3() throws Exception {
 		String found = testFullContextIF_THEN_ELSEParse("{ if x then if y then return else foo }");
@@ -110,6 +120,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("line 1:29 reportAttemptingFullContext d=1 (stat), input='else'\nline 1:38 reportAmbiguity d=1 (stat): ambigAlts={1, 2}, input='elsefoo}'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_4() throws Exception {
 		String found = testFullContextIF_THEN_ELSEParse("{ if x then if y then return else foo else bar }");
@@ -117,6 +128,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("line 1:29 reportAttemptingFullContext d=1 (stat), input='else'\nline 1:38 reportContextSensitivity d=1 (stat), input='elsefooelse'\nline 1:38 reportAttemptingFullContext d=1 (stat), input='else'\nline 1:38 reportContextSensitivity d=1 (stat), input='else'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_5() throws Exception {
 		String found = testFullContextIF_THEN_ELSEParse("{ if x then return else foo\nif x then if y then return else foo }");
@@ -124,6 +136,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("line 1:19 reportAttemptingFullContext d=1 (stat), input='else'\nline 1:19 reportContextSensitivity d=1 (stat), input='else'\nline 2:27 reportAttemptingFullContext d=1 (stat), input='else'\nline 2:36 reportAmbiguity d=1 (stat): ambigAlts={1, 2}, input='elsefoo}'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testFullContextIF_THEN_ELSEParse_6() throws Exception {
 		String found = testFullContextIF_THEN_ELSEParse("{ if x then return else foo\nif x then if y then return else foo }");
@@ -131,6 +144,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("line 1:19 reportAttemptingFullContext d=1 (stat), input='else'\nline 1:19 reportContextSensitivity d=1 (stat), input='else'\nline 2:27 reportAttemptingFullContext d=1 (stat), input='else'\nline 2:36 reportAmbiguity d=1 (stat): ambigAlts={1, 2}, input='elsefoo}'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLoopsSimulateTailRecursion() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -153,6 +167,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("line 1:3 reportAttemptingFullContext d=3 (expr_primary), input='a(i)'\nline 1:7 reportAmbiguity d=3 (expr_primary): ambigAlts={2, 3}, input='a(i)<-x'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testAmbiguityNoLoop() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -172,6 +187,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("line 1:2 reportAttemptingFullContext d=0 (prog), input='a@'\nline 1:2 reportAmbiguity d=0 (prog): ambigAlts={1, 2}, input='a@'\nline 1:2 reportAttemptingFullContext d=1 (expr), input='a@'\nline 1:2 reportContextSensitivity d=1 (expr), input='a@'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testExprAmbiguity(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s\n" +
@@ -189,6 +205,7 @@ public class TestFullContextParsing extends BaseTest {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "s", input, true);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testExprAmbiguity_1() throws Exception {
 		String found = testExprAmbiguity("a+b");
@@ -196,6 +213,7 @@ public class TestFullContextParsing extends BaseTest {
 		assertEquals("line 1:1 reportAttemptingFullContext d=1 (expr), input='+'\nline 1:2 reportContextSensitivity d=1 (expr), input='+b'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testExprAmbiguity_2() throws Exception {
 		String found = testExprAmbiguity("a+b*c");

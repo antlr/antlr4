@@ -4,6 +4,7 @@ import org.junit.Test;
 
 public class TestParserExec extends BaseTest {
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLabels() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -17,6 +18,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testListLabelsOnSet() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -31,6 +33,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testAorB() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -47,6 +50,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testBasic() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -61,6 +65,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testAPlus() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -74,6 +79,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testAorAPlus() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -87,6 +93,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testIfIfElseGreedyBinding1() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -102,6 +109,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testIfIfElseGreedyBinding2() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -117,6 +125,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testIfIfElseNonGreedyBinding1() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -132,6 +141,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testIfIfElseNonGreedyBinding2() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -147,6 +157,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testAStar(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : ID* {\n" +
@@ -157,6 +168,7 @@ public class TestParserExec extends BaseTest {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "a", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testAStar_1() throws Exception {
 		String found = testAStar("");
@@ -164,6 +176,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testAStar_2() throws Exception {
 		String found = testAStar("a b c");
@@ -171,6 +184,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testLL1OptionalBlock(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : (ID|{}INT)? {\n" +
@@ -182,6 +196,7 @@ public class TestParserExec extends BaseTest {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "a", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLL1OptionalBlock_1() throws Exception {
 		String found = testLL1OptionalBlock("");
@@ -189,6 +204,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLL1OptionalBlock_2() throws Exception {
 		String found = testLL1OptionalBlock("a");
@@ -196,6 +212,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testAorAStar(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : (ID|ID)* {\n" +
@@ -206,6 +223,7 @@ public class TestParserExec extends BaseTest {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "a", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testAorAStar_1() throws Exception {
 		String found = testAorAStar("");
@@ -213,6 +231,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testAorAStar_2() throws Exception {
 		String found = testAorAStar("a b c");
@@ -220,6 +239,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testAorBPlus() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -235,6 +255,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testAorBStar(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : (ID|INT{\n" +
@@ -247,6 +268,7 @@ public class TestParserExec extends BaseTest {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "a", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testAorBStar_1() throws Exception {
 		String found = testAorBStar("");
@@ -254,6 +276,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testAorBStar_2() throws Exception {
 		String found = testAorBStar("a 34 c");
@@ -261,6 +284,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testOptional(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "stat : ifstat | 'x';\n" +
@@ -269,6 +293,7 @@ public class TestParserExec extends BaseTest {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "stat", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testOptional_1() throws Exception {
 		String found = testOptional("x");
@@ -276,6 +301,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testOptional_2() throws Exception {
 		String found = testOptional("if x");
@@ -283,6 +309,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testOptional_3() throws Exception {
 		String found = testOptional("if x else x");
@@ -290,6 +317,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testOptional_4() throws Exception {
 		String found = testOptional("if if x else x");
@@ -297,6 +325,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testPredicatedIfIfElse() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -311,6 +340,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLabelAliasingAcrossLabeledAlternatives() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -326,6 +356,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testPredictionIssue334() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -346,6 +377,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testListLabelForClosureContext() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -373,6 +405,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testMultipleEOFHandling() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -382,6 +415,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testEOFInClosure() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -392,6 +426,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testReferenceToATN(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a : (ID|ATN_)* ATN_? {Console.WriteLine($text);} ;\n" +
@@ -401,6 +436,7 @@ public class TestParserExec extends BaseTest {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "a", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testReferenceToATN_1() throws Exception {
 		String found = testReferenceToATN("");
@@ -408,6 +444,7 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testReferenceToATN_2() throws Exception {
 		String found = testReferenceToATN("a 34 c");

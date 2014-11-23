@@ -4,6 +4,7 @@ import org.junit.Test;
 
 public class TestParseTrees extends BaseTest {
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTokenAndRuleContextString() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -23,6 +24,7 @@ public class TestParseTrees extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testToken2() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -41,6 +43,7 @@ public class TestParseTrees extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void test2Alts() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -59,6 +62,7 @@ public class TestParseTrees extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void test2AltLoop() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -77,6 +81,7 @@ public class TestParseTrees extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testRuleRef() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -97,6 +102,7 @@ public class TestParseTrees extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testExtraToken() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -117,6 +123,7 @@ public class TestParseTrees extends BaseTest {
 		assertEquals("line 1:1 extraneous input 'z' expecting 'y'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testNoViableAlt() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -138,6 +145,7 @@ public class TestParseTrees extends BaseTest {
 		assertEquals("line 1:0 mismatched input 'z' expecting {'x', 'y'}\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSync() throws Exception {
 		String grammar = "grammar T;\n" +

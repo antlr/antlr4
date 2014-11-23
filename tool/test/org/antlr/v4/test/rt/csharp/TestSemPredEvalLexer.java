@@ -4,6 +4,7 @@ import org.junit.Test;
 
 public class TestSemPredEvalLexer extends BaseTest {
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDisableRule() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -27,6 +28,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testIDvsEnum() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -50,6 +52,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testIDnotEnum() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -67,6 +70,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testEnumNotID() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -84,6 +88,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testIndent() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -114,6 +119,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLexerInputPositionSensitivePredicates() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -137,6 +143,7 @@ public class TestSemPredEvalLexer extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testPredicatedKeywords() throws Exception {
 		StringBuilder sb = new StringBuilder();
