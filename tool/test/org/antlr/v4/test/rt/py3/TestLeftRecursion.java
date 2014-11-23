@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 public class TestLeftRecursion extends BasePython3Test {
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testSimple(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s @after {print($ctx.toStringTree(recog=self))} : a ;\n" +
@@ -16,6 +17,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSimple_1() throws Exception {
 		String found = testSimple("x");
@@ -23,6 +25,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSimple_2() throws Exception {
 		String found = testSimple("x y");
@@ -30,6 +33,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSimple_3() throws Exception {
 		String found = testSimple("x y z");
@@ -37,6 +41,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testDirectCallToLeftRecursiveRule(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "a @after {print($ctx.toStringTree(recog=self))} : a ID\n" +
@@ -47,6 +52,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "a", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDirectCallToLeftRecursiveRule_1() throws Exception {
 		String found = testDirectCallToLeftRecursiveRule("x");
@@ -54,6 +60,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDirectCallToLeftRecursiveRule_2() throws Exception {
 		String found = testDirectCallToLeftRecursiveRule("x y");
@@ -61,6 +68,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDirectCallToLeftRecursiveRule_3() throws Exception {
 		String found = testDirectCallToLeftRecursiveRule("x y z");
@@ -68,6 +76,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSemPred() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -82,6 +91,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testTernaryExpr(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s @after {print($ctx.toStringTree(recog=self))} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match\n" +
@@ -96,6 +106,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTernaryExpr_1() throws Exception {
 		String found = testTernaryExpr("a");
@@ -103,6 +114,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTernaryExpr_2() throws Exception {
 		String found = testTernaryExpr("a+b");
@@ -110,6 +122,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTernaryExpr_3() throws Exception {
 		String found = testTernaryExpr("a*b");
@@ -117,6 +130,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTernaryExpr_4() throws Exception {
 		String found = testTernaryExpr("a?b:c");
@@ -124,6 +138,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTernaryExpr_5() throws Exception {
 		String found = testTernaryExpr("a=b=c");
@@ -131,6 +146,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTernaryExpr_6() throws Exception {
 		String found = testTernaryExpr("a?b+c:d");
@@ -138,6 +154,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTernaryExpr_7() throws Exception {
 		String found = testTernaryExpr("a?b=c:d");
@@ -145,6 +162,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTernaryExpr_8() throws Exception {
 		String found = testTernaryExpr("a? b?c:d : e");
@@ -152,6 +170,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTernaryExpr_9() throws Exception {
 		String found = testTernaryExpr("a?b: c?d:e");
@@ -159,6 +178,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testExpressions(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s @after {print($ctx.toStringTree(recog=self))} : e EOF ; // must indicate EOF can follow\n" +
@@ -176,6 +196,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testExpressions_1() throws Exception {
 		String found = testExpressions("a");
@@ -183,6 +204,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testExpressions_2() throws Exception {
 		String found = testExpressions("1");
@@ -190,6 +212,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testExpressions_3() throws Exception {
 		String found = testExpressions("a-1");
@@ -197,6 +220,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testExpressions_4() throws Exception {
 		String found = testExpressions("a.b");
@@ -204,6 +228,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testExpressions_5() throws Exception {
 		String found = testExpressions("a.this");
@@ -211,6 +236,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testExpressions_6() throws Exception {
 		String found = testExpressions("-a");
@@ -218,6 +244,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testExpressions_7() throws Exception {
 		String found = testExpressions("-a+b");
@@ -225,6 +252,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testJavaExpressions(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s @after {print($ctx.toStringTree(recog=self))} : e EOF ; // must indicate EOF can follow\n" +
@@ -285,6 +313,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testJavaExpressions_1() throws Exception {
 		String found = testJavaExpressions("a|b&c");
@@ -292,6 +321,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testJavaExpressions_2() throws Exception {
 		String found = testJavaExpressions("(a|b)&c");
@@ -299,6 +329,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testJavaExpressions_3() throws Exception {
 		String found = testJavaExpressions("a > b");
@@ -306,6 +337,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testJavaExpressions_4() throws Exception {
 		String found = testJavaExpressions("a >> b");
@@ -313,6 +345,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testJavaExpressions_5() throws Exception {
 		String found = testJavaExpressions("a=b=c");
@@ -320,6 +353,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testJavaExpressions_6() throws Exception {
 		String found = testJavaExpressions("a^b^c");
@@ -327,6 +361,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testJavaExpressions_7() throws Exception {
 		String found = testJavaExpressions("(T)x");
@@ -334,6 +369,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testJavaExpressions_8() throws Exception {
 		String found = testJavaExpressions("new A().b");
@@ -341,6 +377,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testJavaExpressions_9() throws Exception {
 		String found = testJavaExpressions("(T)t.f()");
@@ -348,6 +385,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testJavaExpressions_10() throws Exception {
 		String found = testJavaExpressions("a.f(x)==T.c");
@@ -355,6 +393,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testJavaExpressions_11() throws Exception {
 		String found = testJavaExpressions("a.f().g(x,1)");
@@ -362,6 +401,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testJavaExpressions_12() throws Exception {
 		String found = testJavaExpressions("new T[((n-1) * x) + 1]");
@@ -369,6 +409,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testDeclarations(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s @after {print($ctx.toStringTree(recog=self))} : declarator EOF ; // must indicate EOF can follow\n" +
@@ -387,6 +428,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDeclarations_1() throws Exception {
 		String found = testDeclarations("a");
@@ -394,6 +436,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDeclarations_2() throws Exception {
 		String found = testDeclarations("*a");
@@ -401,6 +444,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDeclarations_3() throws Exception {
 		String found = testDeclarations("**a");
@@ -408,6 +452,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDeclarations_4() throws Exception {
 		String found = testDeclarations("a[3]");
@@ -415,6 +460,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDeclarations_5() throws Exception {
 		String found = testDeclarations("b[]");
@@ -422,6 +468,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDeclarations_6() throws Exception {
 		String found = testDeclarations("(a)");
@@ -429,6 +476,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDeclarations_7() throws Exception {
 		String found = testDeclarations("a[]()");
@@ -436,6 +484,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDeclarations_8() throws Exception {
 		String found = testDeclarations("a[][]");
@@ -443,6 +492,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDeclarations_9() throws Exception {
 		String found = testDeclarations("*a[]");
@@ -450,6 +500,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDeclarations_10() throws Exception {
 		String found = testDeclarations("(*a)[]");
@@ -457,6 +508,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testReturnValueAndActions(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s : e {print($e.v)}; \n" +
@@ -471,6 +523,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testReturnValueAndActions_1() throws Exception {
 		String found = testReturnValueAndActions("4");
@@ -478,6 +531,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testReturnValueAndActions_2() throws Exception {
 		String found = testReturnValueAndActions("1+2");
@@ -485,6 +539,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testReturnValueAndActions_3() throws Exception {
 		String found = testReturnValueAndActions("1+2*3");
@@ -492,6 +547,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testReturnValueAndActions_4() throws Exception {
 		String found = testReturnValueAndActions("(1+2)*3");
@@ -499,6 +555,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testLabelsOnOpSubrule(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s @after {print($ctx.toStringTree(recog=self))} : e;\n" +
@@ -511,6 +568,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLabelsOnOpSubrule_1() throws Exception {
 		String found = testLabelsOnOpSubrule("4");
@@ -518,6 +576,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLabelsOnOpSubrule_2() throws Exception {
 		String found = testLabelsOnOpSubrule("1*2/3");
@@ -525,6 +584,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLabelsOnOpSubrule_3() throws Exception {
 		String found = testLabelsOnOpSubrule("(1/2)*3");
@@ -532,6 +592,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testReturnValueAndActionsAndLabels(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s : q=e {print($e.v)}; \n" +
@@ -550,6 +611,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testReturnValueAndActionsAndLabels_1() throws Exception {
 		String found = testReturnValueAndActionsAndLabels("4");
@@ -557,6 +619,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testReturnValueAndActionsAndLabels_2() throws Exception {
 		String found = testReturnValueAndActionsAndLabels("1+2");
@@ -564,6 +627,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testReturnValueAndActionsAndLabels_3() throws Exception {
 		String found = testReturnValueAndActionsAndLabels("1+2*3");
@@ -571,6 +635,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testReturnValueAndActionsAndLabels_4() throws Exception {
 		String found = testReturnValueAndActionsAndLabels("i++*3");
@@ -578,6 +643,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testMultipleAlternativesWithCommonLabel(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s : e {print($e.v)}; \n" +
@@ -598,6 +664,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_1() throws Exception {
 		String found = testMultipleAlternativesWithCommonLabel("4");
@@ -605,6 +672,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_2() throws Exception {
 		String found = testMultipleAlternativesWithCommonLabel("1+2");
@@ -612,6 +680,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_3() throws Exception {
 		String found = testMultipleAlternativesWithCommonLabel("1+2*3");
@@ -619,6 +688,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testMultipleAlternativesWithCommonLabel_4() throws Exception {
 		String found = testMultipleAlternativesWithCommonLabel("i++*3");
@@ -626,6 +696,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testPrefixOpWithActionAndLabel(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s : e {print($e.result)} ;\n" +
@@ -640,6 +711,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testPrefixOpWithActionAndLabel_1() throws Exception {
 		String found = testPrefixOpWithActionAndLabel("a");
@@ -647,6 +719,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testPrefixOpWithActionAndLabel_2() throws Exception {
 		String found = testPrefixOpWithActionAndLabel("a+b");
@@ -654,6 +727,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testPrefixOpWithActionAndLabel_3() throws Exception {
 		String found = testPrefixOpWithActionAndLabel("a=b+c");
@@ -661,6 +735,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testAmbigLR(String input) throws Exception {
 		String grammar = "grammar Expr;\n" +
 	                  "prog:   stat ;\n" +
@@ -686,6 +761,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		return execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "ExprListener", "ExprVisitor", "prog", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testAmbigLR_1() throws Exception {
 		String found = testAmbigLR("1\n");
@@ -693,6 +769,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testAmbigLR_2() throws Exception {
 		String found = testAmbigLR("a = 5\n");
@@ -700,6 +777,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testAmbigLR_3() throws Exception {
 		String found = testAmbigLR("b = 6\n");
@@ -707,6 +785,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testAmbigLR_4() throws Exception {
 		String found = testAmbigLR("a+b*2\n");
@@ -714,6 +793,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testAmbigLR_5() throws Exception {
 		String found = testAmbigLR("(1+2)*3\n");
@@ -721,6 +801,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testWhitespaceInfluence(String input) throws Exception {
 		String grammar = "grammar Expr;\n" +
 	                  "prog : expression EOF;\n" +
@@ -774,6 +855,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		return execParser("Expr.g4", grammar, "ExprParser", "ExprLexer", "ExprListener", "ExprVisitor", "prog", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testWhitespaceInfluence_1() throws Exception {
 		String found = testWhitespaceInfluence("Test(1,3)");
@@ -781,6 +863,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testWhitespaceInfluence_2() throws Exception {
 		String found = testWhitespaceInfluence("Test(1, 3)");
@@ -788,6 +871,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testPrecedenceFilterConsidersContext() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -801,6 +885,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testMultipleActions(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s @after {print($ctx.toStringTree(recog=self))} : e ;\n" +
@@ -813,6 +898,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testMultipleActions_1() throws Exception {
 		String found = testMultipleActions("4");
@@ -820,6 +906,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testMultipleActions_2() throws Exception {
 		String found = testMultipleActions("1*2/3");
@@ -827,6 +914,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testMultipleActions_3() throws Exception {
 		String found = testMultipleActions("(1/2)*3");
@@ -834,6 +922,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testMultipleActionsPredicatesOptions(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s @after {print($ctx.toStringTree(recog=self))} : e ;\n" +
@@ -847,6 +936,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testMultipleActionsPredicatesOptions_1() throws Exception {
 		String found = testMultipleActionsPredicatesOptions("4");
@@ -854,6 +944,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testMultipleActionsPredicatesOptions_2() throws Exception {
 		String found = testMultipleActionsPredicatesOptions("1*2/3");
@@ -861,6 +952,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testMultipleActionsPredicatesOptions_3() throws Exception {
 		String found = testMultipleActionsPredicatesOptions("(1/2)*3");
@@ -868,6 +960,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSemPredFailOption() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -882,6 +975,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertEquals("line 1:4 rule a custom message\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testTernaryExprExplicitAssociativity(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s @after {print($ctx.toStringTree(recog=self))} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match\n" +
@@ -896,6 +990,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTernaryExprExplicitAssociativity_1() throws Exception {
 		String found = testTernaryExprExplicitAssociativity("a");
@@ -903,6 +998,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTernaryExprExplicitAssociativity_2() throws Exception {
 		String found = testTernaryExprExplicitAssociativity("a+b");
@@ -910,6 +1006,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTernaryExprExplicitAssociativity_3() throws Exception {
 		String found = testTernaryExprExplicitAssociativity("a*b");
@@ -917,6 +1014,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTernaryExprExplicitAssociativity_4() throws Exception {
 		String found = testTernaryExprExplicitAssociativity("a?b:c");
@@ -924,6 +1022,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTernaryExprExplicitAssociativity_5() throws Exception {
 		String found = testTernaryExprExplicitAssociativity("a=b=c");
@@ -931,6 +1030,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTernaryExprExplicitAssociativity_6() throws Exception {
 		String found = testTernaryExprExplicitAssociativity("a?b+c:d");
@@ -938,6 +1038,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTernaryExprExplicitAssociativity_7() throws Exception {
 		String found = testTernaryExprExplicitAssociativity("a?b=c:d");
@@ -945,6 +1046,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTernaryExprExplicitAssociativity_8() throws Exception {
 		String found = testTernaryExprExplicitAssociativity("a? b?c:d : e");
@@ -952,6 +1054,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTernaryExprExplicitAssociativity_9() throws Exception {
 		String found = testTernaryExprExplicitAssociativity("a?b: c?d:e");
@@ -959,6 +1062,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testReturnValueAndActionsList1(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s @after {print($ctx.toStringTree(recog=self))} : expr EOF;\n" +
@@ -976,6 +1080,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testReturnValueAndActionsList1_1() throws Exception {
 		String found = testReturnValueAndActionsList1("a*b");
@@ -983,6 +1088,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testReturnValueAndActionsList1_2() throws Exception {
 		String found = testReturnValueAndActionsList1("a,c>>x");
@@ -990,6 +1096,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testReturnValueAndActionsList1_3() throws Exception {
 		String found = testReturnValueAndActionsList1("x");
@@ -997,6 +1104,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testReturnValueAndActionsList1_4() throws Exception {
 		String found = testReturnValueAndActionsList1("a*b,c,x*y>>r");
@@ -1004,6 +1112,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testReturnValueAndActionsList2(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "s @after {print($ctx.toStringTree(recog=self))} : expr EOF;\n" +
@@ -1020,6 +1129,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "s", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testReturnValueAndActionsList2_1() throws Exception {
 		String found = testReturnValueAndActionsList2("a*b");
@@ -1027,6 +1137,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testReturnValueAndActionsList2_2() throws Exception {
 		String found = testReturnValueAndActionsList2("a,c>>x");
@@ -1034,6 +1145,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testReturnValueAndActionsList2_3() throws Exception {
 		String found = testReturnValueAndActionsList2("x");
@@ -1041,6 +1153,7 @@ public class TestLeftRecursion extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testReturnValueAndActionsList2_4() throws Exception {
 		String found = testReturnValueAndActionsList2("a*b,c,x*y>>r");
