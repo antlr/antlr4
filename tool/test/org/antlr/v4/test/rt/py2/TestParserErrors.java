@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 public class TestParserErrors extends BasePython2Test {
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTokenMismatch() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -14,6 +15,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:1 mismatched input 'a' expecting 'b'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSingleTokenDeletion() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -23,6 +25,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:1 extraneous input 'a' expecting 'b'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSingleTokenDeletionExpectingSet() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -32,6 +35,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSingleTokenInsertion() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -41,6 +45,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:1 missing 'b' at 'c'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testConjuringUpToken() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -50,6 +55,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:1 missing 'b' at 'c'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSingleSetInsertion() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -59,6 +65,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:1 missing {'b', 'c'} at 'd'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testConjuringUpTokenFromSet() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -68,6 +75,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:1 missing {'b', 'c'} at 'd'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLL2() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -80,6 +88,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:1 no viable alternative at input 'ae'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLL3() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -92,6 +101,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:2 no viable alternative at input 'abe'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLLStar() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -104,6 +114,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:3 no viable alternative at input 'aaae'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSingleTokenDeletionBeforeLoop() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -113,6 +124,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:1 extraneous input 'a' expecting {<EOF>, 'b'}\nline 1:3 token recognition error at: 'c'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testMultiTokenDeletionBeforeLoop() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -122,6 +134,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSingleTokenDeletionDuringLoop() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -131,6 +144,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:2 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testMultiTokenDeletionDuringLoop() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -140,6 +154,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:2 extraneous input 'a' expecting {'b', 'c'}\nline 1:6 extraneous input 'a' expecting {'b', 'c'}\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSingleTokenDeletionBeforeLoop2() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -149,6 +164,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:1 extraneous input 'a' expecting {<EOF>, 'b', 'z'}\nline 1:3 token recognition error at: 'c'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testMultiTokenDeletionBeforeLoop2() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -158,6 +174,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:1 extraneous input 'a' expecting {'b', 'z', 'c'}\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSingleTokenDeletionDuringLoop2() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -167,6 +184,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:2 extraneous input 'a' expecting {'b', 'z', 'c'}\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testMultiTokenDeletionDuringLoop2() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -176,6 +194,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:2 extraneous input 'a' expecting {'b', 'z', 'c'}\nline 1:6 extraneous input 'a' expecting {'b', 'z', 'c'}\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLL1ErrorInfo() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -197,6 +216,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testInvalidEmptyInput() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -207,6 +227,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertEquals("line 1:0 missing ID at '<EOF>'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testContextListGetters() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -224,6 +245,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testDuplicatedLeftRecursiveCall(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "start : expr EOF;\n" +
@@ -233,6 +255,7 @@ public class TestParserErrors extends BasePython2Test {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "TListener", "TVisitor", "start", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDuplicatedLeftRecursiveCall_1() throws Exception {
 		String found = testDuplicatedLeftRecursiveCall("xx");
@@ -240,6 +263,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDuplicatedLeftRecursiveCall_2() throws Exception {
 		String found = testDuplicatedLeftRecursiveCall("xxx");
@@ -247,6 +271,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDuplicatedLeftRecursiveCall_3() throws Exception {
 		String found = testDuplicatedLeftRecursiveCall("xxxx");
@@ -254,6 +279,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testInvalidATNStateRemoval() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -266,6 +292,7 @@ public class TestParserErrors extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testNoViableAltAvoidance() throws Exception {
 		String grammar = "grammar T;\n" +
