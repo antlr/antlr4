@@ -86,6 +86,8 @@ class ParseTreeVisitor(object):
     def shouldVisitNextChild(self, node, currentResult):
         return True
 
+ParserRuleContext = None
+
 class ParseTreeListener(object):
 
     def visitTerminal(self, node:TerminalNode):
