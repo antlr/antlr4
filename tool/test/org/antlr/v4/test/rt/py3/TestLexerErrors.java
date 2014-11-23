@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 public class TestLexerErrors extends BasePython3Test {
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testInvalidCharAtStart() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -16,6 +17,7 @@ public class TestLexerErrors extends BasePython3Test {
 		assertEquals("line 1:0 token recognition error at: 'x'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testStringsEmbeddedInActions_1() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -30,6 +32,7 @@ public class TestLexerErrors extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testStringsEmbeddedInActions_2() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -43,6 +46,7 @@ public class TestLexerErrors extends BasePython3Test {
 		assertEquals("line 1:0 token recognition error at: '[\"foo]'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testEnforcedGreedyNestedBrances_1() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -56,6 +60,7 @@ public class TestLexerErrors extends BasePython3Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testEnforcedGreedyNestedBrances_2() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -68,6 +73,7 @@ public class TestLexerErrors extends BasePython3Test {
 		assertEquals("line 1:0 token recognition error at: '{ { }'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testInvalidCharAtStartAfterDFACache() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -80,6 +86,7 @@ public class TestLexerErrors extends BasePython3Test {
 		assertEquals("line 1:2 token recognition error at: 'x'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testInvalidCharInToken() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -91,6 +98,7 @@ public class TestLexerErrors extends BasePython3Test {
 		assertEquals("line 1:0 token recognition error at: 'ax'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testInvalidCharInTokenAfterDFACache() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -103,6 +111,7 @@ public class TestLexerErrors extends BasePython3Test {
 		assertEquals("line 1:2 token recognition error at: 'ax'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDFAToATNThatFailsBackToDFA() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -117,6 +126,7 @@ public class TestLexerErrors extends BasePython3Test {
 		assertEquals("line 1:4 token recognition error at: 'x'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDFAToATNThatMatchesThenFailsInATN() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -132,6 +142,7 @@ public class TestLexerErrors extends BasePython3Test {
 		assertEquals("line 1:5 token recognition error at: 'x'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testErrorInMiddle() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -143,6 +154,7 @@ public class TestLexerErrors extends BasePython3Test {
 		assertEquals("line 1:0 token recognition error at: 'abx'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLexerExecDFA() throws Exception {
 		StringBuilder sb = new StringBuilder();
