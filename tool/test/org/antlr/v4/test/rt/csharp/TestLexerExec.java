@@ -4,6 +4,7 @@ import org.junit.Test;
 
 public class TestLexerExec extends BaseTest {
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testQuoteTranslation() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -16,6 +17,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testRefToRuleDoesNotSetTokenNorEmitAnother() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -32,6 +34,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testSlashes() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -51,6 +54,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testParentheses() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -69,6 +73,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testNonGreedyTermination1() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -82,6 +87,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testNonGreedyTermination2() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -94,6 +100,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testGreedyOptional() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -107,6 +114,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testNonGreedyOptional() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -121,6 +129,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testGreedyClosure() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -134,6 +143,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testNonGreedyClosure() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -148,6 +158,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testGreedyPositiveClosure() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -161,6 +172,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testNonGreedyPositiveClosure() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -175,6 +187,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testRecursiveLexerRuleRefWithWildcardStar_1() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -191,6 +204,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testRecursiveLexerRuleRefWithWildcardStar_2() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -207,6 +221,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals("line 1:9 token recognition error at: 'x'\nline 3:16 token recognition error at: 'x'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testRecursiveLexerRuleRefWithWildcardPlus_1() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -223,6 +238,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testRecursiveLexerRuleRefWithWildcardPlus_2() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -239,6 +255,7 @@ public class TestLexerExec extends BaseTest {
 		assertEquals("line 1:9 token recognition error at: 'x'\nline 3:16 token recognition error at: 'x'\n", this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testActionPlacement() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -261,6 +278,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testGreedyConfigs() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -276,6 +294,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testNonGreedyConfigs() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -293,6 +312,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testKeywordID() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -313,6 +333,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testHexVsID() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -343,6 +364,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testEOFByItself() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -356,6 +378,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testEOFSuffixInFirstRule_1() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -369,6 +392,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testEOFSuffixInFirstRule_2() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -383,6 +407,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testCharSet() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -399,6 +424,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testCharSetPlus() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -415,6 +441,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testCharSetNot() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -429,6 +456,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testCharSetInSet() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -446,6 +474,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testCharSetRange() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -467,6 +496,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testCharSetWithMissingEndRange() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -481,6 +511,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testCharSetWithMissingEscapeChar() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -495,6 +526,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testCharSetWithEscapedChar() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -511,6 +543,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testCharSetWithReversedRange() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -525,6 +558,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testCharSetWithQuote1() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -539,6 +573,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testCharSetWithQuote2() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -553,6 +588,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testPositionAdjustingLexer() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -679,6 +715,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLargeLexer() throws Exception {
 		StringBuilder sb = new StringBuilder();
@@ -4691,6 +4728,7 @@ public class TestLexerExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testZeroLengthToken() throws Exception {
 		StringBuilder sb = new StringBuilder();

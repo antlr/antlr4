@@ -18,6 +18,7 @@ public class Test<file.name> extends BaseTest {
 >>
 
 LexerTestMethod(test) ::= <<
+/* this file and method are generated, any edit will be overwritten by the next generation */
 @Test
 public void test<test.name>() throws Exception {
 <test.slaveGrammars:{ grammar | 
@@ -46,6 +47,7 @@ CompositeLexerTestMethod(test) ::= <<
 
 
 ParserTestMethod(test) ::= <<
+/* this file and method are generated, any edit will be overwritten by the next generation */
 @Test
 public void test<test.name>() throws Exception {
 <test.slaveGrammars:{ grammar | 
@@ -75,6 +77,7 @@ CompositeParserTestMethod(test) ::= <<
 >>
 
 AbstractParserTestMethod(test) ::= <<
+/* this file and method are generated, any edit will be overwritten by the next generation */
 String test<test.name>(String input) throws Exception {
 	String grammar = <test.grammar.lines:{ line | "<line>};separator="\\n\" +\n", wrap, anchor>";
 	return execParser("<test.grammar.grammarName>.g4", grammar, "<test.grammar.grammarName>Parser", "<test.grammar.grammarName>Lexer", "<test.startRule>", input, <test.debug>);
@@ -83,6 +86,7 @@ String test<test.name>(String input) throws Exception {
 >>
 
 ConcreteParserTestMethod(test) ::= <<
+/* this file and method are generated, any edit will be overwritten by the next generation */
 @Test
 public void test<test.name>() throws Exception {
 	String found = test<test.baseName>("<test.input>");

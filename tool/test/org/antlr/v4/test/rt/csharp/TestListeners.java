@@ -4,6 +4,7 @@ import org.junit.Test;
 
 public class TestListeners extends BaseTest {
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testBasic() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -38,6 +39,7 @@ public class TestListeners extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testTokenGetters(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "@parser::header {\n" +
@@ -82,6 +84,7 @@ public class TestListeners extends BaseTest {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "s", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTokenGetters_1() throws Exception {
 		String found = testTokenGetters("1 2");
@@ -89,6 +92,7 @@ public class TestListeners extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testTokenGetters_2() throws Exception {
 		String found = testTokenGetters("abc");
@@ -96,6 +100,7 @@ public class TestListeners extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	String testRuleGetters(String input) throws Exception {
 		String grammar = "grammar T;\n" +
 	                  "@parser::header {\n" +
@@ -132,6 +137,7 @@ public class TestListeners extends BaseTest {
 		return execParser("T.g4", grammar, "TParser", "TLexer", "s", input, false);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testRuleGetters_1() throws Exception {
 		String found = testRuleGetters("1 2");
@@ -139,6 +145,7 @@ public class TestListeners extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testRuleGetters_2() throws Exception {
 		String found = testRuleGetters("abc");
@@ -146,6 +153,7 @@ public class TestListeners extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLR() throws Exception {
 		String grammar = "grammar T;\n" +
@@ -185,6 +193,7 @@ public class TestListeners extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testLRWithLabels() throws Exception {
 		String grammar = "grammar T;\n" +
