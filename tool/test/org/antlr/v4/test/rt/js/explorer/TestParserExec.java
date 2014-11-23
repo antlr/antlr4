@@ -417,28 +417,5 @@ public class TestParserExec extends BaseTest {
 		assertNull(this.stderrDuringParse);
 	}
 
-	@Test
-	public void testAlternateQuotes() throws Exception {
-		String slave_ModeTagsLexer = "lexer grammar ModeTagsLexer;\r\n" +
-	                              "// Default mode rules (the SEA)\r\n" +
-	                              "OPEN  : '«'     -> mode(ISLAND) ;       // switch to ISLAND mode\r\n" +
-	                              "TEXT  : ~'«'+ ;                         // clump all text together\r\n" +
-	                              "mode ISLAND;\r\n" +
-	                              "CLOSE : '»'     -> mode(DEFAULT_MODE) ; // back to SEA mode\r\n" +
-	                              "SLASH : '/' ;\r\n" +
-	                              "ID    : [a-zA-Z]+ ;                     // match/send ID in tag to parser\r";
-		rawGenerateAndBuildRecognizer("ModeTagsLexer.g4", slave_ModeTagsLexer, null, "ModeTagsLexer");
-
-		String grammar = "parser grammar ModeTagsParser;\r\n" +
-	                  "options { tokenVocab=ModeTagsLexer; } // use tokens from ModeTagsLexer.g4\r\n" +
-	                  "file_: (tag | TEXT)* ;\r\n" +
-	                  "tag : '«' ID '»'\r\n" +
-	                  "    | '«' '/' ID '»'\r\n" +
-	                  "    ;\r";
-		String found = execParser("ModeTagsParser.g4", grammar, "ModeTagsParser", "ModeTagsLexer", "ModeTagsParserListener", "ModeTagsParserVisitor", "file_", "", false);
-		assertEquals("", found);
-		assertNull(this.stderrDuringParse);
-	}
-
 
 }

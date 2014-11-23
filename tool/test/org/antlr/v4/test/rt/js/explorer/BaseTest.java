@@ -94,6 +94,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -101,6 +102,7 @@ import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.openqa.selenium.By.ById;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.WebDriver;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -132,17 +134,20 @@ public abstract class BaseTest {
 
 	};
 
-	static WebDriver driver;
+	WebDriver driver;
 	
-	@BeforeClass
-	public static void initWebDriver() {
-		driver = SharedWebDriver.init();
+	@Before
+	public void initWebDriver() {
+		System.setProperty("webdriver.ie.driver", "C:\\Program Files (x86)\\Selenium\\IEDriverServer.exe");
+		driver = new InternetExplorerDriver();
 	}
 	
-	@AfterClass
-	public static void closeWebDriver() {
-		SharedWebDriver.close();
+	@After
+	public void closeWebPage() {
+		if(driver!=null)
+			driver.quit();
 	}
+	
 	
     @Before
 	public void setUp() throws Exception {
@@ -504,8 +509,11 @@ public abstract class BaseTest {
 		String propName = "antlr-javascript-runtime";
 		String prop = System.getProperty(propName);
 		if(prop==null || prop.length()==0)
+			prop = "../../antlr4-javascript/src";
+		File file = new File(prop);
+		if(!file.exists())
 			throw new RuntimeException("Missing system property:" + propName);
-		return prop;
+		return file.getAbsolutePath();
 	}
 
 	public void testErrors(String[] pairs, boolean printTree) {
