@@ -8,6 +8,7 @@ import org.antlr.v4.tool.Grammar;
 
 public class TestCompositeParsers extends BasePython2Test {
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDelegatorInvokesDelegateRule() throws Exception {
 		String slave_S = "parser grammar S;\n" +
@@ -25,6 +26,7 @@ public class TestCompositeParsers extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testBringInLiteralsFromDelegate() throws Exception {
 		String slave_S = "parser grammar S;\n" +
@@ -41,6 +43,7 @@ public class TestCompositeParsers extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDelegatorInvokesDelegateRuleWithArgs() throws Exception {
 		String slave_S = "parser grammar S;\n" +
@@ -58,6 +61,7 @@ public class TestCompositeParsers extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDelegatorInvokesDelegateRuleWithReturnStruct() throws Exception {
 		String slave_S = "parser grammar S;\n" +
@@ -75,6 +79,7 @@ public class TestCompositeParsers extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDelegatorAccessesDelegateMembers() throws Exception {
 		String slave_S = "parser grammar S;\n" +
@@ -95,6 +100,7 @@ public class TestCompositeParsers extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDelegatorInvokesFirstVersionOfDelegateRule() throws Exception {
 		String slave_S = "parser grammar S;\n" +
@@ -118,6 +124,7 @@ public class TestCompositeParsers extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDelegatesSeeSameTokenType() throws Exception {
 		String slave_S = "parser grammar S;\n" +
@@ -165,6 +172,7 @@ public class TestCompositeParsers extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testCombinedImportsCombined() throws Exception {
 		String slave_S = "parser grammar S;\n" +
@@ -188,6 +196,7 @@ public class TestCompositeParsers extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDelegatorRuleOverridesDelegate() throws Exception {
 		String slave_S = "parser grammar S;\n" +
@@ -205,6 +214,7 @@ public class TestCompositeParsers extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDelegatorRuleOverridesLookaheadInDelegate() throws Exception {
 		String slave_S = "parser grammar S;\n" +
@@ -227,6 +237,7 @@ public class TestCompositeParsers extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testDelegatorRuleOverridesDelegates() throws Exception {
 		String slave_S = "parser grammar S;\n" +
@@ -251,6 +262,7 @@ public class TestCompositeParsers extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testKeywordVSIDOrder() throws Exception {
 		String slave_S = "lexer grammar S;\n" +
@@ -268,6 +280,7 @@ public class TestCompositeParsers extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testImportedRuleWithAction() throws Exception {
 		String slave_S = "parser grammar S;\n" +
@@ -285,6 +298,7 @@ public class TestCompositeParsers extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testImportedGrammarWithEmptyOptions() throws Exception {
 		String slave_S = "parser grammar S;\n" +
@@ -303,6 +317,7 @@ public class TestCompositeParsers extends BasePython2Test {
 		assertNull(this.stderrDuringParse);
 	}
 
+	/* this file and method are generated, any edit will be overwritten by the next generation */
 	@Test
 	public void testImportLexerWithOnlyFragmentRules() throws Exception {
 		String slave_S = "lexer grammar S;\n" +
