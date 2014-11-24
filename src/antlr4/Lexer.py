@@ -307,7 +307,7 @@ class Lexer(Recognizer, TokenSource):
     def getErrorDisplay(self, s):
         with StringIO() as buf:
             for c in s:
-                buf.write(self.getErrorDisplayForChar(c))
+                buf.write(unicode(self.getErrorDisplayForChar(c)))
             return buf.getvalue()
 
     def getErrorDisplayForChar(self, c):
