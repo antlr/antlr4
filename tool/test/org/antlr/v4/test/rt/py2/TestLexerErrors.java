@@ -172,5 +172,4 @@ public class TestLexerErrors extends BasePython2Test {
 		assertEquals("line 1:1 token recognition error at: ' '\nline 1:3 token recognition error at: ' '\n", this.stderrDuringParse);
 	}
 
-
 }
