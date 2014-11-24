@@ -320,7 +320,7 @@ class Lexer(Recognizer, TokenSource):
         elif c=='\r':
             return "\\r"
         else:
-            return c
+            return str(c)
 
     def getCharErrorDisplay(self, c):
         return "'" + self.getErrorDisplayForChar(c) + "'"
