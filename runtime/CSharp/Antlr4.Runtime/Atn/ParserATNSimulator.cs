@@ -246,7 +246,6 @@ namespace Antlr4.Runtime.Atn
     /// <c>)</c>
     /// ;
     /// parser.
-    /// <see cref="Parser.ErrorHandler"/>
     /// (new
     /// <see cref="Antlr4.Runtime.BailErrorStrategy"/>
     /// ());
@@ -737,7 +736,7 @@ namespace Antlr4.Runtime.Atn
         /// and
         /// <see cref="PredictionMode()"/>
         /// is
-        /// <see cref="PredictionMode.LlExactAmbigDetection"/>
+        /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection"/>
         /// . In that case, only
         /// conflict states where
         /// <see cref="ATNConfigSet.IsExactConflict()"/>

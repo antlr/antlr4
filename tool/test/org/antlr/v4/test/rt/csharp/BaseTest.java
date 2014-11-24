@@ -421,13 +421,18 @@ public abstract class BaseTest {
 	}
 
 	private String locateMSBuild() {
-		return locateTool("xbuild");
+		if(isWindows())
+			return "\"C:\\Program Files (x86)\\MSBuild\\12.0\\Bin\\MSBuild.exe\"";
+		else
+			return locateTool("xbuild");
 	}
 	
-	private String locateExec() {
-		return locateTool("mono");
-		// new File(tmpdir, "bin/Release/Test.exe").getAbsolutePath(),
+	private boolean isWindows() {
+		return System.getProperty("os.name").toLowerCase().contains("windows");
+	}
 
+	private String locateExec() {
+		return new File(tmpdir, "bin/Release/Test.exe").getAbsolutePath();
 	}
 
 	private String locateTool(String tool) {
@@ -451,17 +456,19 @@ public abstract class BaseTest {
 			output.close();
 			input.close();
 			// update project
-			input = Thread.currentThread().getContextClassLoader().getResourceAsStream(pack + "Antlr4.Test.mono.csproj");
+			String projectName = isWindows() ? "Antlr4.Test.vs2013.csproj" : "Antlr4.Test.mono.csproj";
+			input = Thread.currentThread().getContextClassLoader().getResourceAsStream(pack + projectName);
 			Document prjXml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input);
 			// update runtime project reference
 			String runtimePath = System.getProperty("antlr-csharp-runtime-project");
+			String runtimeName = isWindows() ? "Antlr4.Runtime.vs2013.csproj" : "Antlr4.Runtime.mono.csproj";
 			if(runtimePath==null)
-				runtimePath = "../../antlr4-csharp/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.mono.csproj";
+				runtimePath = "../../antlr4-csharp/runtime/CSharp/Antlr4.Runtime/" + runtimeName;
 			File projFile = new File(runtimePath);
 			if(!projFile.exists())
 				throw new RuntimeException("C# runtime project file not found at:" + projFile.getAbsolutePath());
 			runtimePath = projFile.getAbsolutePath();
-			XPathExpression exp = XPathFactory.newInstance().newXPath().compile("/Project/ItemGroup/ProjectReference[@Include='Antlr4.Runtime.mono.csproj']");
+			XPathExpression exp = XPathFactory.newInstance().newXPath().compile("/Project/ItemGroup/ProjectReference[@Include='" + runtimeName + "']");
 			Element node = (Element)exp.evaluate(prjXml, XPathConstants.NODE);
 			node.setAttribute("Include", runtimePath.replace("/", "\\"));
 			// update project file list
@@ -494,11 +501,9 @@ public abstract class BaseTest {
 	public String execTest() {
 		try {
 			String exec = locateExec();
-			String[] args = new String[] {
-					exec, 
-				new File(tmpdir, "bin/Release/Test.exe").getAbsolutePath(),
-				new File(tmpdir, "input").getAbsolutePath()
-			};
+			String[] args = isWindows() ? 
+					new String[] { exec, new File(tmpdir, "input").getAbsolutePath() } :
+					new String[] { "mono", exec, new File(tmpdir, "input").getAbsolutePath() };
 			ProcessBuilder pb = new ProcessBuilder(args);
 			pb.directory(new File(tmpdir));
 			Process p = pb.start();

@@ -126,8 +126,7 @@ namespace Antlr4.Runtime
         /// <summary>The input stream.</summary>
         /// <remarks>The input stream.</remarks>
         /// <seealso cref="InputStream()"/>
-        /// <seealso cref="SetInputStream(ITokenStream)"/>
-		private ITokenStream _input;
+    	private ITokenStream _input;
 
 		private readonly List<int> _precedenceStack = new List<int> { 0 };
 

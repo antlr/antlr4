@@ -29,6 +29,7 @@
  */
 namespace Antlr4.Runtime.Sharpen
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
@@ -87,4 +88,5 @@ namespace Antlr4.Runtime.Sharpen
 #endif
         }
     }
+
 }
