@@ -59,7 +59,6 @@
     <Compile Include="Dfa\EmptyEdgeMap`1.cs" />
     <Compile Include="IVocabulary.cs" />
     <Compile Include="Vocabulary.cs" />
-    <None Include="Atn\ATNSerializer.cs" />
     <Compile Include="Atn\ATNSimulator.cs" />
     <Compile Include="Atn\ATNState.cs" />
     <Compile Include="Atn\ATNType.cs" />

@@ -23,3 +23,5 @@ tool/target/
 
 # ignore NuGet output folders
 /build/nuget/
+
+runtime/CSharp/Antlr4.Runtime/Atn/ATNSerializer.cs
